@@ -1,0 +1,3 @@
+[submodule "lib/support/class"]
+	path = lib/support/class
+	url = http://github.com/visionmedia/class.js.git

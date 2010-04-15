@@ -11,12 +11,10 @@
     User = models.load('User',devStore);
     
     
-    User.find({'age':{'$gt':1}}).each(function(err,item){
-      if(item !== null){
+    User.find({'age':{'$gt':10}}).one(function(item){
         sys.puts('------ age greater then 1 -------\n');
         sys.puts(sys.inspect(item));
-        sys.puts('\n---------------------------------\n'); 
-      }     
+        sys.puts('\n---------------------------------\n');    
     })
     
 //    User = require('mongoose').Storage

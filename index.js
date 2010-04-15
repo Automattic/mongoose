@@ -30,15 +30,22 @@ var  Class = require('./lib/support/class/lib/class').Class,
         },
 
         openCollection : function(name,callback){
-          if(!this.connection) this.queue.push(['collection',name,function(err,collection){
-              this.collections[name] = collection;
-              callback(collection);
+          this.queue.push(['collection',name,function(err,collection){
+              if(err){
+                sys.puts('----- error with open collection ------');
+                sys.puts(sys.inspect(err));
+                sys.puts('---------------------------------------\n');
+                return;
+              } else {
+                this.collections[name] = collection;
+                callback(collection);
+              }
           }.bind(this)]);
 
         },
 
         dequeue : function(){
-          if(!this.queue.length)  return;
+          if(!this.queue.length || !this.connection)  return;
           var op = this.queue.shift();
           this.db[op.shift()].apply(this.db,op);
           this.dequeue();

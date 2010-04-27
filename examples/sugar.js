@@ -1,21 +1,18 @@
-
-  require.paths.unshift(__dirname + '/models');
-  var sys = require('sys'),
-
-    mongoose = require('../../mongoose/').configure({
-            dev : { master : { host : 'localhost',  port : 27017, name : 'test', options : {auto_reconnect : true}} }
-        }),      
-    devStore = mongoose.connect('dev'),
-    models = require('../lib/model').Model,
+    var mongoose = require('../../mongoose/'),
+          Storage = mongoose.connect('mongodb://localhost:27017/test'),
+          User = Storage.bindModel('User');
     
-    User = models.load('User',devStore);
-    
-    
-    User.find({'age':{'$gt':10}}).one(function(item){
-        sys.puts('------ age greater then 1 -------\n');
+    User.find({'age':{'$gt':10}}).each(function(item){
         sys.puts(sys.inspect(item));
-        sys.puts('\n---------------------------------\n');    
-    })
+    });
+    
+//    for(i = 0; i < 10; i++) User.insert({name : 'Nathan', age : (32+i)});
+    
+    
+    
+    
+    
+    
     
 //    User = require('mongoose').Storage
 //            .connect({host: 'localhost', port : 34324})

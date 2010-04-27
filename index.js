@@ -4,14 +4,15 @@ require('./lib/utils/proto');
 var mongo = require('./lib/support/mongodb/lib/mongodb/'),
     Model = require('./lib/model').Model,
     EventEmitter = require('events').EventEmitter,
-    inherits = require('sys').inherits,
+    sys = require('sys'),
     instances = 0,
     connections = {},
     
     Storage = function(uri,options){
+      
       this.id = ++instances;
       this.uri = uri;
-      this.db = this.getDatabaseInstance(uri);
+      this.db = this.getDatabaseInstance(uri,options);
       
       EventEmitter.call(this);
       
@@ -31,16 +32,20 @@ var mongo = require('./lib/support/mongodb/lib/mongodb/'),
         buffer : [],
         
         getDatabaseInstance : function(uri){
-          var conn = this._process(uri);
-          
-          if(conn[0].type != 'mongodb') return this.emit('error','Must use mongodb:// in uri connection string');
+          var conn = this._parse(uri),
+              options = options || {};
+
+          if(conn[0].type != 'mongodb'){
+            this.emit('error','Must use mongodb:// in uri connection string');
+            return false;
+          }
           
           if(conn.length == 1) // simple (single server)
               return new mongo.Db(conn[0].db, new mongo.Server(conn[0].host, conn[0].port || 27017, options));
-          elseif(conn.length == 2) // server pair
+          else if(conn.length == 2) // server pair
               return new mongo.Db(conn[0].db, new mongo.ServerPair(
                 new mongo.Server(conn[0].host, conn[0].port || 27017, options),
-                new mongo.Server(conn[1].host, conn[1].port || 27017, options);
+                new mongo.Server(conn[1].host, conn[1].port || 27017, options)
               ));
           else // cluster (master and multiple slaves)
             return new mongo.Db(conn[0].db, new mongo.ServerCluster(
@@ -52,9 +57,10 @@ var mongo = require('./lib/support/mongodb/lib/mongodb/'),
         
         dequeue : function(){
           if(!this.buffer.length || !this.loaded || this.halted) return;
+          
           var op = this.buffer.shift();
           if(op.name == 'collection') op.args.push(function(err,collection){
-            if(err) this.emit('error',error);
+            if(err) this.emit('error',err);
             else {
               this.collections[collection.collectionName] = collection;
               op.callback(collection);
@@ -67,6 +73,7 @@ var mongo = require('./lib/support/mongodb/lib/mongodb/'),
         }, 
         
         bindModel : function(model,dirpath){
+          sys.puts(process.env['MONGOOSE_MODELS_DIR'] || (process.env['PWD']+'/models'));
           return Model.load(model, this, {dir : dirpath || process.env['MONGOOSE_MODELS_DIR'] || (process.env['PWD']+'/models') });
         },
         
@@ -112,7 +119,9 @@ var mongo = require('./lib/support/mongodb/lib/mongodb/'),
         }
     };
     
-    inherits(Storage, EventEmitter);
+    Storage.prototype.loadModel = Storage.prototype.bindModel; // alias
+    
+    for(i in process.EventEmitter.prototype) Storage.prototype[i] = process.EventEmitter.prototype[i];
 
 this.connect = function(uri,options){
   if(!connections[uri]) connections[uri] = new Storage(uri,options);

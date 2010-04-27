@@ -6,7 +6,7 @@
       sys.puts(err);
     });
     
-    User.find().gte({age : 30}).each(function(item){
+    User.find().gte({age : 30}).limit(1).each(function(item){
         sys.puts(sys.inspect(item));
     });
     

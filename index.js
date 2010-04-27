@@ -17,10 +17,7 @@ var mongo = require('./lib/support/mongodb/lib/mongodb/'),
       EventEmitter.call(this);
       
       this.db.open(function(err,connection){
-        if(err){
-          this.emit('error',err);
-          sys.puts(sys.inspect(err));
-        }
+        if(err) this.emit('error',err);
         this.loaded = (err) ? false : connection;
         this.dequeue();
       }.bind(this));
@@ -43,8 +40,9 @@ var mongo = require('./lib/support/mongodb/lib/mongodb/'),
             return false;
           }
           
-          if(conn.length == 1) // simple (single server)
-              return new mongo.Db(conn[0].db, new mongo.Server(conn[0].host, conn[0].port || 27017, options));
+          if(conn.length == 1){ // simple (single server)
+              return new mongo.Db(conn[0].db, new mongo.Server(conn[0].host, (conn[0].port || 27017), options),{});
+          }
           else if(conn.length == 2) // server pair
               return new mongo.Db(conn[0].db, new mongo.ServerPair(
                 new mongo.Server(conn[0].host, conn[0].port || 27017, options),
@@ -63,18 +61,17 @@ var mongo = require('./lib/support/mongodb/lib/mongodb/'),
           
           var op = this.buffer.shift();
           if(op.name == 'collection'){
- //           var callback = op.callback;
-            op.args.push(function(err,collection){
+            op.args.push(function(err,aCollection){
               if(err) this.emit('error',err);
               else {
-                this.collections[collection.collectionName] = collection;
-                op.callback(collection);
+                this.collections[aCollection.collectionName] = aCollection;
+                op.callback(aCollection);
               }
             }.bind(this)); 
           }
           else op.args.push(op.callback || function(){});
           
-          this.db[op.name].apply(this.collection,op.args);
+          this.db[op.name].apply(this.db,op.args);
           this.dequeue();
         }, 
         

@@ -2,14 +2,21 @@
 require('./lib/utils/proto');
 
 var mongo = require('./lib/support/mongodb/lib/mongodb/'),
+    Model = require('./lib/model').Model,
+    EventEmitter = require('events').EventEmitter,
+    inherits = require('sys').inherits,
+    instances = 0,
     connections = {},
     
     Storage = function(uri,options){
-      
+      this.id = ++instances;
       this.uri = uri;
       this.db = this.getDatabaseInstance(uri);
       
+      EventEmitter.call(this);
+      
       this.db.open(function(err,connection){
+        if(err) this.emit('error',err);
         this.loaded = (err) ? false : connection;
         this.dequeue();
       }.bind(this));
@@ -26,8 +33,10 @@ var mongo = require('./lib/support/mongodb/lib/mongodb/'),
         getDatabaseInstance : function(uri){
           var conn = this._process(uri);
           
-          if(conn instanceof Object) // simple (single server)
-              return new mongo.Db(conn.db, new mongo.Server(conn.host, conn.port || 27017, options));
+          if(conn[0].type != 'mongodb') return this.emit('error','Must use mongodb:// in uri connection string');
+          
+          if(conn.length == 1) // simple (single server)
+              return new mongo.Db(conn[0].db, new mongo.Server(conn[0].host, conn[0].port || 27017, options));
           elseif(conn.length == 2) // server pair
               return new mongo.Db(conn[0].db, new mongo.ServerPair(
                 new mongo.Server(conn[0].host, conn[0].port || 27017, options),
@@ -36,7 +45,7 @@ var mongo = require('./lib/support/mongodb/lib/mongodb/'),
           else // cluster (master and multiple slaves)
             return new mongo.Db(conn[0].db, new mongo.ServerCluster(
               conn.map(function(server){
-                new mongo.Server(server.host, server.port || 27017, options);
+                return new mongo.Server(server.host, server.port || 27017, options);
               })
             ));          
         },
@@ -44,26 +53,26 @@ var mongo = require('./lib/support/mongodb/lib/mongodb/'),
         dequeue : function(){
           if(!this.buffer.length || !this.loaded || this.halted) return;
           var op = this.buffer.shift();
-          op.args.push(op.callback || function(){})
+          if(op.name == 'collection') op.args.push(function(err,collection){
+            if(err) this.emit('error',error);
+            else {
+              this.collections[collection.collectionName] = collection;
+              op.callback(collection);
+            }
+          }.bind(this));
+          else op.args.push(op.callback || function(){});
+          
           this.db[op.name].apply(this.collection,op.args);
           this.dequeue();
         }, 
         
-        halt : function(){
-          this.halted = true;
-          return this;
+        bindModel : function(model,dirpath){
+          return Model.load(model, this, {dir : dirpath || process.env['MONGOOSE_MODELS_DIR'] || (process.env['PWD']+'/models') });
         },
         
-        resume : function(){
-          this.halted = false;
-          this.dequeue();
-          return this;
+        noSchema : function(collection){
+          return Model.load(collection, this, {noSchema : true});
         },
-        
-        clear : function(){
-          this.buffer = [];
-          return this;
-        },       
         
         collection : function(){ return this._cmd('collection',Array.prototype.slice.call(arguments,0)); },
         close : function(){ return this._cmd('close', Array.prototype.slice.call(arguments,0)); },
@@ -80,13 +89,30 @@ var mongo = require('./lib/support/mongodb/lib/mongodb/'),
         },
         
         _parse : function(uri){
-          var connections = str.split(',').map(function(conn,idx){
+          return uri.split(',').map(function(conn,idx){
               var a = conn.match(/^(?:(.+):\/\/(?:(.+?):(.+?)@)?)?(?:(.+?)(?::([0-9]+?))?(?:\/(.+?))?)$/);
-              return { 'type' : a[1], 'user' : a[2], 'password' : a[3], 'host' : a[4], 'port' : a[5] || 27017, 'db' : a[6] };
+              return { 'type' : a[1], 'user' : a[2], 'password' : a[3], 'host' : a[4], 'port' : a[5], 'db' : a[6] };
           });
-          return (connections.length == 1) ? connections[0] : connections;         
+        },
+        
+        halt : function(){
+          this.halted = true;
+          return this;
+        },
+        
+        resume : function(){
+          this.halted = false;
+          this.dequeue();
+          return this;
+        },
+        
+        clear : function(){
+          this.buffer = [];
+          return this;
         }
     };
+    
+    inherits(Storage, EventEmitter);
 
 this.connect = function(uri,options){
   if(!connections[uri]) connections[uri] = new Storage(uri,options);

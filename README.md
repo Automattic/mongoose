@@ -47,7 +47,66 @@ Quick Start
       var user = new User(object);
       
       
+      Sugar still doesn't hide the clumbsy nature of the cursor api.
       
+      right now
+      
+      Model.find({}).each(function(err,doc){
+          if(doc !== null){
+            
+          }
+      });
+      
+      Bad
+      ---
+      - handling for the err and the need to check it.
+      - the checking to see if the cursor is null.
+      
+      proposed
+      ---------
+      
+      Model.find({}).each(function(doc){
+        // process
+      });
+      
+      - Errors are silently ignored without halting the process.
+      - null last cursor is eliminates
+      - Error handling is now
+      
+          Model.addLister('error',callback);
+      
+      
+      var db = new mongo.Db('test', new mongo.Server(host, port, {}), {});
+      db.open(function(err,db){
+        db.collection('test',function(err,collection){
+            collection.find(function(err,cursor){
+              cursor.each(function(err,doc){
+                if(err) // error
+                else if(doc != null){
+                   // process here
+                }
+              })
+            });
+        });         
+      });
+      
+      User = require('mongoose').Storage
+            .connect({host: 'localhost', port : 34324, db : 'test'})
+            .bindModel(__dirname+'/models/User');
+            
+      User.find().each(function(doc){
+          // process here
+      });
+      
+      
+      
+      
+      
+      // or
+      
+      User.find(function(){
+        
+      })
 
 
 

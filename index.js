@@ -17,7 +17,10 @@ var mongo = require('./lib/support/mongodb/lib/mongodb/'),
       EventEmitter.call(this);
       
       this.db.open(function(err,connection){
-        if(err) this.emit('error',err);
+        if(err){
+          this.emit('error',err);
+          sys.puts(sys.inspect(err));
+        }
         this.loaded = (err) ? false : connection;
         this.dequeue();
       }.bind(this));
@@ -59,13 +62,16 @@ var mongo = require('./lib/support/mongodb/lib/mongodb/'),
           if(!this.buffer.length || !this.loaded || this.halted) return;
           
           var op = this.buffer.shift();
-          if(op.name == 'collection') op.args.push(function(err,collection){
-            if(err) this.emit('error',err);
-            else {
-              this.collections[collection.collectionName] = collection;
-              op.callback(collection);
-            }
-          }.bind(this));
+          if(op.name == 'collection'){
+ //           var callback = op.callback;
+            op.args.push(function(err,collection){
+              if(err) this.emit('error',err);
+              else {
+                this.collections[collection.collectionName] = collection;
+                op.callback(collection);
+              }
+            }.bind(this)); 
+          }
           else op.args.push(op.callback || function(){});
           
           this.db[op.name].apply(this.collection,op.args);
@@ -73,7 +79,6 @@ var mongo = require('./lib/support/mongodb/lib/mongodb/'),
         }, 
         
         bindModel : function(model,dirpath){
-          sys.puts(process.env['MONGOOSE_MODELS_DIR'] || (process.env['PWD']+'/models'));
           return Model.load(model, this, {dir : dirpath || process.env['MONGOOSE_MODELS_DIR'] || (process.env['PWD']+'/models') });
         },
         

@@ -1,131 +1,133 @@
 
-require('./lib/utils/proto');
-
-var mongo = require('./lib/support/mongodb/lib/mongodb/'),
-    Model = require('./lib/model').Model,
-    EventEmitter = require('events').EventEmitter,
+var fs = require('fs'),
+    path = require('path'),
     sys = require('sys'),
-    instances = 0,
-    connections = {},
-    
-    Storage = function(uri,options){
+    object = require('./lib/utils/object'),
+    EventEmitter = require('events').EventEmitter,
+    Script = process.binding('evals').Script,
+    Storage = require('./lib/storage').Storage,
+    Model = require('./lib/model/').Model,
+    Schema = require('./lib/schema').Schema,
+    Plugin = require('./lib/model/plugin').Plugin,
+
+    Mongoose = (function(){
+
+      var API = function(){
+        EventEmitter.call(this);
+        this.Schema = new Schema(this);
+        this.Model = new Model(this);
+        return this;
+      };
       
-      this.id = ++instances;
-      this.uri = uri;
-      this.db = this.getDatabaseInstance(uri,options);
-      
-      EventEmitter.call(this);
-      
-      this.db.open(function(err,connection){
-        if(err) this.emit('error',err);
-        this.loaded = (err) ? false : connection;
-        this.dequeue();
-      }.bind(this));
-      
-    };
-    
-    Storage.prototype = {
+      API.prototype = {
         
         loaded : false,
-        halted : false,
-        collections : {},
-        buffer : [],
         
-        getDatabaseInstance : function(uri){
-          var conn = this._parse(uri),
-              options = options || {};
-
-          if(conn[0].type != 'mongodb'){
-            this.emit('error','Must use mongodb:// in uri connection string');
-            return false;
-          }
-          
-          if(conn.length == 1){ // simple (single server)
-              return new mongo.Db(conn[0].db, new mongo.Server(conn[0].host, (conn[0].port || 27017), options),{});
-          }
-          else if(conn.length == 2) // server pair
-              return new mongo.Db(conn[0].db, new mongo.ServerPair(
-                new mongo.Server(conn[0].host, conn[0].port || 27017, options),
-                new mongo.Server(conn[1].host, conn[1].port || 27017, options)
-              ));
-          else // cluster (master and multiple slaves)
-            return new mongo.Db(conn[0].db, new mongo.ServerCluster(
-              conn.map(function(server){
-                return new mongo.Server(server.host, server.port || 27017, options);
-              })
-            ));          
+        options : {
+          strict : true,
+          sandboxName : 'Mongoose',
+          loadAddons : true,
+          activeStoreEnabled : true,
+          activeStore : false,          
+          connections : {},
         },
         
-        dequeue : function(){
-          if(!this.buffer.length || !this.loaded || this.halted) return;
-          
-          var op = this.buffer.shift();
-          if(op.name == 'collection'){
-            op.args.push(function(err,aCollection){
-              if(err) this.emit('error',err);
-              else {
-                this.collections[aCollection.collectionName] = aCollection;
-                op.callback(aCollection);
-              }
-            }.bind(this)); 
-          }
-          else op.args.push(op.callback || function(){});
-          
-          this.db[op.name].apply(this.db,op.args);
-          this.dequeue();
-        }, 
+        connections : {},
         
-        bindModel : function(model,dirpath){
-          return Model.load(model, this, {dir : dirpath || process.env['MONGOOSE_MODELS_DIR'] || (process.env['PWD']+'/models') });
+        defineTypes : {},
+        
+        Instance : API,
+        Storage : Storage,
+        
+        configure : function(options){
+         object.merge(this.options,options);
+         object.merge(this.connections,this.options.connections);
+         if(this.options.loadAddons){
+           this.load('./schema/types');
+           this.load('./schema/validators');
+           this.load('./model/plugins');
+         }
+         this.loaded = true;
+         return this;
         },
         
-        noSchema : function(collection){
-          return Model.load(collection, this, {noSchema : true});
-        },
-        
-        collection : function(){ return this._cmd('collection',Array.prototype.slice.call(arguments,0)); },
-        close : function(){ return this._cmd('close', Array.prototype.slice.call(arguments,0)); },
-        
-        _cmd : function(cmd,args){
-          var operation = { 
-                name : cmd,
-                callback : (args.length) ? ( (args[args.length-1] instanceof Function) ? args.pop() : null ) : null,
-                args : args 
-              };
+        load : function(resourcePath){
+          var stats = fs.statSync(reasourcePath),
+              files = [];
               
-          this.buffer.push(operation);
-          this.dequeue();
+          if(stats.isFile()) files = [resourcePath];    
+          if(stats.isDirectory()) 
+            files = fs.readdirSync(resourcePath).map(function(file){
+              return path.join(resourcePath,file);
+            });
+          
+          files.forEach(function(file){
+              if(fs.statSync(file).isFile())
+                var sandbox = {},
+                    code = fs.readFileSync(file);
+                    sandbox[this.options.sandboxName] = this;
+                    Script.runInNewContext(code,sandbox);
+            }.bind(this)); 
         },
         
-        _parse : function(uri){
+        connect : function(uri,options){
+          var uri = uri;
+          if(!this.loaded) this.configure();
+          if(!uri){
+            if(this.options.activeStoreEnabled && this.options.activeStore){
+              uri = this.options.activeStore;
+            }
+            else {
+              this.emit('error','activeStore not enabled or specify. Use an URI with connect');
+              return false;
+            }
+          }
+          
+          if(typeof this.connections[uri] == 'string') this.connections[uri] = this.parseURI(this.connections[uri]);
+          if(this.connections[uri] instanceof Array) this.connections[uri] = new Storage(this.connections[uri],options);
+          if(this.options.activeSyncEnabled) this.options.activeSync = uri;
+          return this.connections[uri];
+        },
+        
+        noSchema : function(collection,store){
+          if(!(store instanceof Storage)){
+            store = this.connect(store);
+            if(!(store instanceof Storage)) return false;
+          }
+          return this.Model.get(collection,store,true);
+        },
+        
+        define : function(type,obj){
+          var definer = this.defineTypes[type];
+          if(definer && (typeof definer.define == 'function')) definer.define(obj);
+          else this.emit('error','Define type ['+type+'] is invalid');
+        },
+        
+        bind : function(model,store){
+          this.Model.get(model,store)
+        },
+                
+        parseURI : function(uri){
           return uri.split(',').map(function(conn,idx){
               var a = conn.match(/^(?:(.+):\/\/(?:(.+?):(.+?)@)?)?(?:(.+?)(?::([0-9]+?))?(?:\/(.+?))?)$/);
               return { 'type' : a[1], 'user' : a[2], 'password' : a[3], 'host' : a[4], 'port' : a[5], 'db' : a[6] };
           });
         },
         
-        halt : function(){
-          this.halted = true;
-          return this;
+        addDefiner : function(name,callback){
+          if(this.defineTypes[name] && (typeof this.defineTypes[name] == 'function'))
+            this.emit('error','Definer ['+name+'] already exists');
+          else this.defineTypes[name] = callback;
         },
         
-        resume : function(){
-          this.halted = false;
-          this.dequeue();
-          return this;
-        },
+        merge : object.merge
         
-        clear : function(){
-          this.buffer = [];
-          return this;
-        }
-    };
-    
-    Storage.prototype.loadModel = Storage.prototype.bindModel; // alias
-    
-    for(i in process.EventEmitter.prototype) Storage.prototype[i] = process.EventEmitter.prototype[i];
+      };
+      
+      for(i in EventEmitter.prototype) API.prototype[i] = EventEmitter.prototype[i];
+      
+      return new API();
 
-this.connect = function(uri,options){
-  if(!connections[uri]) connections[uri] = new Storage(uri,options);
-  return connections[uri];
-}
+    })();
+
+this.Mongoose = Mongoose;

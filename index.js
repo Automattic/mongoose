@@ -28,7 +28,7 @@ var fs = require('fs'),
           sandboxName : 'Mongoose',
           loadAddons : true,
           activeStoreEnabled : true,
-          activeStore : false,          
+          activeStore : false,
           connections : {},
         },
         
@@ -66,6 +66,7 @@ var fs = require('fs'),
                 var sandbox = {},
                     code = fs.readFileSync(file);
                     sandbox[this.options.sandboxName] = this;
+                    sandbox['Model'] = this.Model;
                     Script.runInNewContext(code,sandbox);
             }.bind(this)); 
         },
@@ -104,7 +105,12 @@ var fs = require('fs'),
         },
         
         bind : function(model,store){
-          this.Model.get(model,store)
+          return this.Model.get(model,store)
+        },
+        
+        close : function(){
+          for(conn in this.connections) 
+            if(this.connections[conn] instanceof Storage) this.connections[conn].close();
         },
                 
         parseURI : function(uri){

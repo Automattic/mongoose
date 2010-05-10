@@ -52,7 +52,7 @@ var fs = require('fs'),
         },
         
         load : function(resourcePath){
-          var stats = fs.statSync(reasourcePath),
+          var stats = fs.statSync(resourcePath),
               files = [];
               
           if(stats.isFile()) files = [resourcePath];    
@@ -65,9 +65,12 @@ var fs = require('fs'),
               if(fs.statSync(file).isFile())
                 var sandbox = {},
                     code = fs.readFileSync(file);
-                    sandbox[this.options.sandboxName] = this;
-                    sandbox['Model'] = this.Model;
-                    Script.runInNewContext(code,sandbox);
+           //         sandbox[this.options.sandboxName] = this;
+          //          sandbox['Model'] = this.Model;
+          //          sandbox['require'] = require;
+                    var Mongoose = this;
+                    eval(code);
+             //       Script.runInThisContext(code /*,sandbox */);
             }.bind(this)); 
         },
         

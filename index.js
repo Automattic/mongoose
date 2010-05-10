@@ -26,7 +26,7 @@ var fs = require('fs'),
         options : {
           strict : true,
           sandboxName : 'Mongoose',
-          loadAddons : true,
+          loadAddons : false,
           activeStoreEnabled : true,
           activeStore : false,
           connections : {},
@@ -69,6 +69,7 @@ var fs = require('fs'),
           //          sandbox['Model'] = this.Model;
           //          sandbox['require'] = require;
                     var Mongoose = this;
+                    var Model = Mongoose.Model;
                     eval(code);
              //       Script.runInThisContext(code /*,sandbox */);
             }.bind(this)); 

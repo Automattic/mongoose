@@ -75,18 +75,19 @@ var fs = require('fs'),
           var uri = uri;
           if(!this.loaded) this.configure();
           if(!uri){
-            if(this.options.activeStoreEnabled && this.options.activeStore){
-              uri = this.options.activeStore;
+            if(this.options.activeStoreEnabled){
+              if(this.options.activeStore) uri = this.options.activeStore;
             }
             else {
               this.emit('error','activeStore not enabled or specify. Use an URI with connect');
               return false;
             }
           }
+          if(!this.connections[uri]) this.connections[uri] = uri;
           
           if(typeof this.connections[uri] == 'string') this.connections[uri] = this.parseURI(this.connections[uri]);
-          if(this.connections[uri] instanceof Array) this.connections[uri] = new Storage(this.connections[uri],options);
-          if(this.options.activeSyncEnabled) this.options.activeSync = uri;
+          if(this.connections[uri] instanceof Array) this.connections[uri] = new Storage(this,this.connections[uri],options);
+          if(this.options.activeStoreEnabled) this.options.activeStore = uri;
           return this.connections[uri];
         },
         
@@ -104,7 +105,7 @@ var fs = require('fs'),
           else this.emit('error','Define type ['+type+'] is invalid');
         },
         
-        bind : function(model,store){
+        get : function(model,store){
           return this.Model.get(model,store)
         },
         

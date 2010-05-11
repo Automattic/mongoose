@@ -1,6 +1,3 @@
-[submodule "lib/support/class"]
-	path = lib/support/class
-	url = http://github.com/visionmedia/class.js.git
 [submodule "lib/support/mongodb"]
 	path = lib/support/mongodb
-	url = git@github.com:nw/node-mongodb-native.git
+	url = http://github.com/christkv/node-mongodb-native.git

@@ -64,14 +64,12 @@ var fs = require('fs'),
           files.forEach(function(file){
               if(fs.statSync(file).isFile())
                 var sandbox = {},
-                    code = fs.readFileSync(file);
-           //         sandbox[this.options.sandboxName] = this;
-          //          sandbox['Model'] = this.Model;
-          //          sandbox['require'] = require;
-                    var Mongoose = this;
-                    var Model = Mongoose.Model;
-                    eval(code);
-             //       Script.runInThisContext(code /*,sandbox */);
+                    code = fs.readFileSync(file) + "\n\n__func_proto__ = Function.prototype;";
+                    sandbox[this.options.sandboxName] = this;
+                    sandbox['Model'] = this.Model;
+                    sandbox['require'] = require;
+                    Script.runInNewContext(code ,sandbox );
+                    for(i in Function.prototype) if(!sandbox.__func_proto__[i]) sandbox.__func_proto__[i] = Function.prototype[i];
             }.bind(this)); 
         },
         
@@ -115,7 +113,7 @@ var fs = require('fs'),
         
         close : function(){
           for(conn in this.connections) 
-            if(this.connections[conn] instanceof Storage) this.connections[conn].close();
+            if(this.connections[conn] instanceof Storage) this.connections[conn].db.close();
         },
                 
         parseURI : function(uri){

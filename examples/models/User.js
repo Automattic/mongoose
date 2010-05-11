@@ -1,5 +1,5 @@
 
-Model.define('User', {
+Mongoose.Model.define('User', {
   
   collection : 'test_user',
   

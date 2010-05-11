@@ -1,15 +1,34 @@
-var Model = require('../../lib/model');
 
-
-this.User = Model.Doc.extend({
+Model.define('User', {
   
-  name : 'user',
+  collection : 'test_user',
   
-  schema : {
-    name : { type : String, validator : null, if_missing : ''},
-    age :  { type : Number }
+  types: {
+    _id : Object,
+    username: String,
+    first : String,
+    last : String,
+    bio: {
+      age: Number
+    }
   },
-  
-  indexes : [['_id', 1], ['user', 1],['age', 1]]
+  setters: {
+    first: function(v){
+      return v.toUpperCase();
+    }
+  },
+  getters: {
+    username: function(v){
+      return v.toUpperCase();
+    },
+    
+    legalDrinkingAge : function(){
+      return (this.bio.age >= 21) ? true : false;
+    },
+    
+    first_last : function(){
+      return this.first + ' ' + this.last;
+    }
+  }
   
 });

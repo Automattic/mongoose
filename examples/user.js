@@ -34,9 +34,9 @@ var sys = require('sys'),
       User.find({})
         .gt({'bio.age' : 20})
         .lt({'bio.age' : 25})
-        .limit(20)
+        .limit(10)
         .each(function(doc){
-          sys.puts(doc.first_last+' legal drinking age?: '+ doc.legalDrinkingAge);
+          sys.puts(doc.first_last+' legal drinking age?: '+ doc.legalDrinkingAge + ' ('+doc.username+')');
           this.partial(doc.bio.age);
         },hydrate);
       

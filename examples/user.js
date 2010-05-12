@@ -1,4 +1,5 @@
 var sys = require('sys'),
+    inspect = function(item){ sys.puts(sys.inspect(item)); },
     Mongoose = require('../../mongoose/').Mongoose, db, User;
     
   //  Mongoose.load(__dirname+'/../lib/model/plugins/behaviors.js');
@@ -30,19 +31,30 @@ var sys = require('sys'),
       });
     }
     
-    User.insert(objs).run(function(docs){
+    User.insert(objs).exec(function(docs){
       // do something with docs that were inserted
     });
     
     hydrate = true;
-    User.find({}).limit(20).gt({'bio.age' : 20}).lt({'bio.age' : 25}).each(function(doc){
-      sys.puts(doc.first_last+' legal drinking age?: '+ doc.legalDrinkingAge);
-  //    sys.puts(JSON.stringify(doc));
-    },hydrate);
     
+    promise = 
+      User.find({})
+      .gt({'bio.age' : 20})
+      .lt({'bio.age' : 25})
+      .limit(20)
+      .each(function(doc){
+        
+        sys.puts(doc.first_last+' legal drinking age?: '+ doc.legalDrinkingAge);
+        this.partial(doc.bio.age);
+        
+      },hydrate);
+      
+  promise.then(function(ages){
+    inspect(ages);
     Mongoose.close();
+  },function(errs){
+    inspect(errs);
+    Mongoose.close();
+  });
     
-  //  setTimeout(function(){
-  //    Mongoose.close();
-  //  },500);
- //   Mongoose.close();
+  //  promise = User.insert(objs)

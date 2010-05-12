@@ -68,6 +68,8 @@ var fs = require('fs'),
                     sandbox[this.options.sandboxName] = this;
                     sandbox['Model'] = this.Model;
                     sandbox['require'] = require;
+                    sandbox['__filename'] = file;
+                    sandbox['__dirname'] = path.dirname(file);
                     Script.runInNewContext(code ,sandbox );
                     for(i in Function.prototype) if(!sandbox.__func_proto__[i]) sandbox.__func_proto__[i] = Function.prototype[i];
             }.bind(this)); 

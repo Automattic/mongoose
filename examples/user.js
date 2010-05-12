@@ -43,10 +43,10 @@ var sys = require('sys'),
       
       promise.then(function(ages){
         inspect(ages);
-        User.collection.db.dropCollection('test_user',function(){
-          User.collection.db.close();
+        User.drop(function(){
+          User.close();
         });
       },function(errs){
         inspect(errs);
-        User.collection.db.close();
+        User.close();
       });

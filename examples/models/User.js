@@ -12,6 +12,13 @@ Mongoose.Model.define('User', {
       age: Number
     }
   },
+  
+  indexes : [
+    'username',
+    'bio.age',
+    [['first'],['last']]
+  ],
+  
   setters: {
     first: function(v){
       return v.toUpperCase();

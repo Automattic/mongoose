@@ -6,7 +6,6 @@ var sys = require('sys'),
       sys.puts(err);
     });
     
-  //  Mongoose.load(__dirname+'/../lib/model/plugins/behaviors.js');
     Mongoose.load(__dirname+'/models/');
     db = Mongoose.connect('mongodb://localhost/test');
     

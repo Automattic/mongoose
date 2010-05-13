@@ -37,188 +37,6 @@ With Mongoose:
     Collection.find({}).each(function(doc){
       // do something
     });
-    
-Modeling Data with Mongoose:
-
-    
-
-
-Documentation
---------------
-
-### Mongoose
-
-Methods:
-
-- *configure(options)*
-  - connections
-  - activeStore
-      (str) Specify an activeStore within connections.
-  - activeStoreEnabled
-      (bool) default true. Allows for implicit binding of Models to Stores.
-      
-- *load(resource)*
-    Loads a file, if resource is a directory loads all files in directory. 
-    
-- *connect(uri)*
-    [format](http://www.mongodb.org/display/DOCS/Connections). If activeStoreEnabled, activeStore will be set to this connection.
-    returns Storage
-
-- *get(model,[store])*
-    returns a model that uses the Storage. If store is not passed, activeStore is then attempted.
-
-- *noSchema(collection,[store])*
-    same as get but doesn't require a Model definition, binds directly to a collection.
-
-- *close()*
-    closes all Storage connections.
-
-### Storage
-
-Properties:
-
-- *loaded* 
-    (bool) if connection established with Mongo.
-
-Methods:
-
-- *static(model)
-    Binds a model to the current Storage object.
-    
-    
-### Model
-
-Properties:
-
-- *loaded*
-
-- *collectionName*
-
-- *store*
-
-- *collection*
-
-Methods:
-
-- *find()*
-
-- *update()*
-
-- *insert()*
-
-- *count()*
-
-- *distinct()*
-
-- *mapReduce()*
-
-- *remove()*
-
-- *save()*
-
-- *drop()*
-
-- *close()*
-
-- *halt()*
-
-- *clear()*
-
-- *resume()*
-
-### QueryPromise
-
-Properties:
-
-- *completed*
-
-Methods (Promise):
-
-- *result()*
-
-- *partial()*
-
-- *error()*
-
-- *then(func,errorCallback)*
-
-Methods (Query Actions):
-
-- *each(fn,hydrate)*
-
-- *first(fn,hydrate)*
-
-- *execute(fn)*
-
-- *run(fn)*
-
-Method (Query Sugar):
-
-- *sort()*
-
-- *limit()*
-
-- *skip()*
-
-- *hint()*
-
-- *timeout()*
-
-- *snapshot()*
-
-- *explain()*
-
-- *where()*
-
-- *in()*
-
-- *nin()*
-
-- *ne()*
-
-- *gt()*
-
-- *gte()*
-
-- *lt()*
-
-- *lte()*
-
-- *min()*
-
-- *max()*
-
-- *mod()*
-
-- *add()*
-
-- *size()*
-
-- *exists()*
-
-- *type()*
-
-- *not()*
-
-- *inc()*
-
-- *set()*
-
-- *unset()*
-
-- *push()*
-
-- *pushAll()*
-
-- *addToSet()*
-
-- *pop()*
-
-- *pull()*
-
-- *pullAll()*
-
-    
         
 Mongoose buffers the connection to the database providing an easier to use API. Mongoose also adds some neat chaining features to allow for a more expressive and easier way of dealing with your data.
 
@@ -364,6 +182,190 @@ More to be announced soon.
 
 Documentation
 -------------
+
+### Mongoose
+
+Methods:
+
+- *configure(options)*
+  - connections
+  - activeStore
+      - (str) Specify an activeStore within connections.
+  - activeStoreEnabled
+      - (bool) default true. Allows for implicit binding of Models to Stores.
+      
+- *load(resource)*
+    - Loads a file, if resource is a directory loads all files in directory. 
+    
+- *connect(uri)*
+    - [format](http://www.mongodb.org/display/DOCS/Connections). If activeStoreEnabled, activeStore will be set to this connection.
+    - returns Storage
+
+- *get(model,[store])*
+    - returns a model that uses the Storage. If store is not passed, activeStore is then attempted.
+
+- *noSchema(collection,[store])*
+    - same as get but doesn't require a Model definition, binds directly to a collection.
+
+- *close()*
+    - closes all Storage connections.
+
+### Storage
+
+Properties:
+
+- *loaded* 
+    - (bool) if connection established with Mongo.
+
+Methods:
+
+- *static(model)
+    - Binds a model to the current Storage object.
+    - returns a Model
+    
+### Model
+
+Properties:
+
+- *loaded*
+    - (bool) if connection established with Mongo
+
+- *collectionName*
+
+- *store*
+    - Storage object
+
+- *collection*
+    - Mongodb-native Collection object
+
+Methods:
+
+- *find()*
+
+- *update()*
+
+- *insert()*
+
+- *count()*
+
+- *distinct()*
+
+- *mapReduce()*
+
+- *remove()*
+
+- *save()*
+
+- *drop()*
+
+- *close()*
+
+- *halt()*
+    - stopped all commands from being submitted to Mongo
+
+- *clear()*
+    - clears the buffer
+
+- *resume()*
+    - resumes the buffer after a halt
+
+### QueryPromise
+
+Properties:
+
+- *completed*
+
+Methods (Promise):
+
+- *result(value)*
+    - sets the result value for the query promise
+
+- *partial(part)*
+    - sets a partial result value for a query promise
+
+- *error(err)*
+    - sets an error for a promise. It acts as a stack, you can push multiple errors.
+
+- *then(func,errorCallback)*
+    - what to do after the promise has been completed. Func receives the value as first param. If result is undefined it uses the partial complete value
+    - errorCallback gets an array of errors passed as first parameter.
+
+Methods (Query Actions):
+
+- *each(fn,hydrate)*
+
+- *first(fn,hydrate)*
+
+- *execute(fn)*
+
+- *run(fn)*
+
+Method (Query Sugar):
+
+- *sort()*
+
+- *limit()*
+
+- *skip()*
+
+- *hint()*
+
+- *timeout()*
+
+- *snapshot()*
+
+- *explain()*
+
+- *where()*
+
+- *in()*
+
+- *nin()*
+
+- *ne()*
+
+- *gt()*
+
+- *gte()*
+
+- *lt()*
+
+- *lte()*
+
+- *min()*
+
+- *max()*
+
+- *mod()*
+
+- *add()*
+
+- *size()*
+
+- *exists()*
+
+- *type()*
+
+- *not()*
+
+- *inc()*
+
+- *set()*
+
+- *unset()*
+
+- *push()*
+
+- *pushAll()*
+
+- *addToSet()*
+
+- *pop()*
+
+- *pull()*
+
+- *pullAll()*
+
 
 
 Requirements

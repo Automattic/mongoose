@@ -45,8 +45,8 @@ Query Promises
 
 Mongoose implements the promise pattern for queries. This assures the developer that execution happens in proper order.
 
-  var promise = Collection.find();
-      promise.gt({age : 20}).lt({age : 25}).limit(10); // promise commands are chainable.
+    var promise = Collection.find();
+    promise.gt({age : 20}).lt({age : 25}).limit(10); // promise commands are chainable.
       
 Currently the Mongoose QueryPromise API is lazy. A query action is not performed until an 'action' method has been assigned.
 
@@ -79,17 +79,104 @@ QueryPromise query helper methods.
 
 Models
 -------
+Mongoose allows you to define models for your data. Models provide an interface to your data. 
 
-Configuration and Setup
+   Model.define('User',{
+    
+     collection : 'test_user', // (optional) if not present uses the model name instead.
+
+     // defines your data structure
+     types: {
+       _id : Object, // if not defined, Mongoose automatically defines for you.
+       username: String,
+       first : String,
+       last : String,
+       bio: {
+         age: Number
+       }
+     },
+
+     indexes : [
+       'username',
+       'bio.age',
+       [['first'],['last']] // compound key indexes
+     ],
+     
+     static : {}, // adds methods onto the Model.
+     methods : {}, // adds methods to Model instances.
+
+     setters: { // custom setters
+       first: function(v){
+         return v.toUpperCase();
+       }
+     },
+     
+     getters: { // custom getters
+       username: function(v){
+         return v.toUpperCase();
+       },
+
+       legalDrinkingAge : function(){
+         return (this.bio.age >= 21) ? true : false;
+       },
+
+       first_last : function(){ // custom getter that merges two getters together.
+         return this.first + ' ' + this.last;
+       }
+     }
+
+   });   
+   
+All sections of a Mongoose Model definition allow nesting of arbitrary level. This allows for namespaces for methods within your model.
+
+Once a model is defined. Your ready to use it with Mongoose.
+
+    Mongoose.load('./models/');
+    
+    User = Mongoose.get('User');
+    
+    user = new User({username : 'test', first : 'me', last : 'why', bio : { age : 100 }}); // create a new document.
+    user.save(); //save
+    
+    User.find()
+
+
+Configuration
 -----------------------
 
-### Connections
+Mongoose can help manage your connections with the configuration option to help with switching between dev and production environments.
 
-### Options
+    var Mongoose = require('./mongoose/).Mongoose;
+    Mongoose.configure({
+      connections : {
+        dev : 'mongodb://localhost/dev',
+        live : 'mongodb://localhost/live'
+      }
+    });
+    
+    store = Mongoose.connect('dev');    
+    
+In addition Mongoose has a featured we refer to as 'activeStore' This allows for implicit binding of Models/Collections.
+
+    Model = Mongoose.Model,
+    Mongoose.configure({
+      activeStore : 'dev',
+      connection : {...}
+    });
+    
+    Mongoose.load('./models/'); // if a directory, loads all files in directory.
+    
+    User = Model.get('User'); // no need to define storage since activeStore is set
+
+If 'activeStore' is not defined, it will be defined as soon as you connect(uri). If you want to disable this feature in the configuration object add 'activeStoreEnabled : false'.
 
 
 Plugins
 -------
+
+Mongoose supports a plugin architecture. This allows you to add dynamic mixins to your models.
+
+More to be announced soon.
 
 
 Example
@@ -109,6 +196,8 @@ Credits
 
 Future
 ------
+- More examples.
+- Add tests.
 - More robust Model type declaration
 - Ability to define foreign keys
 - Add Inheritance to Models.

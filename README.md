@@ -1,4 +1,4 @@
-Mongoose: MongoDB utility library with ORM-like functionality
+Mongoose: MongoDB utility library with ODM-like functionality
 ===============================================================
 
 The goal of Mongoose is to provide a extremely simple interface for MongoDB. 
@@ -6,154 +6,107 @@ The goal of Mongoose is to provide a extremely simple interface for MongoDB.
 Goals
 -----
 - Reduce the burden of dealing with nested callback from async operations.
-- Provide a simple yet rich set of APIs.
+- Provide a simple yet rich API.
 - Still have easy access to the database/collection.
-
+- Ability to model your data with custom interfaces.
 
 Quick Start
 ------------
 
-      User = require('mongoose').Storage
-            .connect({host: 'localhost', port : 34324})
-            .bindModel(__dirname+'/models/User');
-            
-      User.find(query).each(function(user){
-          // do something to matching user
+The current state of of mongo with async javascript.
+
+    var db = new mongo.Db('test', new mongo.Server('localhost', 34324, {}), {});
+    db.open(function(err, db) {
+      db.collection('test', function(err, collection) {
+    	  db.find({},function(err,cursor){
+    		  cursor.forEach(function(err,doc){
+    			  if(doc != null){
+    				  // do something.
+    			  }
+    		  });
+    	  });
       });
-      
-      User
-        .find
-        .update
-        .upsert
-        .insert
-        .count
-        .distinct
-        .mapReduce
-        .remove
-        .flush
+    });
+    
+With Mongoose:
+
+    var mongoose = require('mongoose/').Mongoose,
+        db = mongoose.connect('mongodb://localhost/test'),      
+        Collection = mongoose.noSchema('test',db); // collection name
         
-      each : [find,update,upsert,insert,distinct,remove]
-      get/one [find,count,mapReduce]  
+    Collection.find({}).each(function(doc){
+      // do something
+    });
         
-      User.collection = native collection instance
-      User.database = native database instance.
+Mongoose buffers the connection to the database providing an easier to use API. Mongoose also adds some neat chaining features to allow for a more expressive and easier way of dealing with your data.
+
+Query Promises
+-------------
+
+Mongoose implements the promise pattern for queries. This assures the developer that execution happens in proper order.
+
+  var promise = Collection.find();
+      promise.gt({'age' : 20}).lt({'bio.age' : 25}).limit(10); // promise commands are chainable.
       
-        
-      
-      User.update(query)
-      
-      User.insert(object);
-      
-      var user = new User(object);
-      
-      
-      Sugar still doesn't hide the clumbsy nature of the cursor api.
-      
-      right now
-      
-      Model.find({}).each(function(err,doc){
-          if(doc !== null){
-            
-          }
-      });
-      
-      Bad
-      ---
-      - handling for the err and the need to check it.
-      - the checking to see if the cursor is null.
-      
-      proposed
-      ---------
-      
-      Model.find({}).each(function(doc){
-        // process
-      });
-      
-      - Errors are silently ignored without halting the process.
-      - null last cursor is eliminates
-      - Error handling is now
-      
-          Model.addLister('error',callback);
-      
-      
-      var db = new mongo.Db('test', new mongo.Server(host, port, {}), {});
-      db.open(function(err,db){
-        db.collection('test',function(err,collection){
-            collection.find(function(err,cursor){
-              cursor.each(function(err,doc){
-                if(err) // error
-                else if(doc != null){
-                   // process here
-                }
-              })
-            });
-        });         
-      });
-      
-      User = require('mongoose').Storage
-            .connect({host: 'localhost', port : 34324, db : 'test'})
-            .bindModel(__dirname+'/models/User');
-            
-      User.find().each(function(doc){
-          // process here
-      });
-      
-      
-      
-      
-      
-      // or
-      
-      User.find(function(){
-        
-      })
+Currently the Mongoose QueryPromise API is lazy. A query action is not performed until an 'action' method has been assigned.
+
+- Actions (each,count,first,one,get,execute,exec,run)
+
+In the case of 'each','first','one','get' they take two arguments. A callback, and an option to hydrate. It is important to note that all callbacks operate within the scope of the QueryPromise. 
+
+QueryPromises provide the following helper methods in addition to the query 'sugar' methods.
+
+- result - sets a result value for the promise
+- partial - sets a partial result for a promise, handy for result sets using .each()
+- error - define an error
+- then - code you want to execute after the promise has been made. It takes 2 parameters. The first is your callback, second is an optional in case of errors.
+
+An example using each
+
+    promise.each(function(doc){
+        // do something
+        this.partial(doc.title);
+    }).then(function(titles){
+      // titles is an array of the doc titles
+    });
+    
+QueryPromise query helper methods.
+
+  'sort','limit','skip','hint','timeout','snapshot','explain',
+  'where','in','nin','ne','gt','gte','lt','lte', 'min','max','mod','all','size','exists','type','not'
+  'inc','set','unset','push','pushAll','addToSet','pop','pull','pullAll'
 
 
+Models
+-------
 
-    
-    /*
-      loadModels takes either an array of specifc model paths. 
-      Or it can take a require path that ends in a backslash (/)
-      it will load all .js files within the directory. 
-      
-      The return is an object whose keys are the basename and the 
-      values is the Model instance 
-      
-      ex:
-      
-      var storage = Mogoose.connect({...}),
-      m = Models = storage.loadModels('./models/');
-    
-      m.user.find({}).each()
-    
-      m.user.find().one(function(){})
-      
-    */
+Configuration and Setup
+-----------------------
+
+Connections
+...........
 
 
 Example
 -------
 
-    mongoose = require('../../mongoose/').configure({
-            dev : { master : { host : 'localhost',  port : 27017, name : 'test', options : {auto_reconnect : true}} }
-        }),      
-    devStore = mongoose.connect('dev'),
-    models = require('../lib/model').Model,
-    models.load('User',devStore,function(User){
-      
-    });
 
 Requirements
 ------------
+- Node Thanks Ryan.
+- [MongoDB](http://www.mongodb.org/display/DOCS/Downloads)
+- [node-mongodb-native](http://github.com/christkv/node-mongodb-native) Thanks Christian.
 
-- Node v0.1.32+ (tested with v0.1.32, v0.1.33)
-- [MongoDB](http://www.mongodb.org/display/DOCS/Downloads) (tested with 1.4.0)
-- [node-mongodb-native](http://github.com/christkv/node-mongodb-native) 
-
+Credits
+--------
+- Node, MongoDB, and node-mongodb-native without these none of this would have been possible.
+- Some ideas and inspiration from Ming
 
 Future
 ------
-- implement a generic BSON module for Node.js using: [Mongo BSON C++ Libray](http://www.mongodb.org/pages/viewpage.action?pageId=133415)
+- More robust Model type declaration
+- Ability to define foreign keys
+- Add Inheritance to Models.
 
 Revisions
 ---------

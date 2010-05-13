@@ -13,19 +13,20 @@ var sys = require('sys'),
     
     // Generate some data
     var objs = [],
-      unames = ['Nathan','Guillermo','Damian','Thianh','Rafael','Matt','Keeto'],
+      unames = ['Nathan','Guillermo','Damian','Thianh','Rafael','Matt'],
       lnames = ['Corrales','Lu','Rauch','Walker','White','Suarez'],
       ages = [19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40];
     
     Array.prototype.random = function(){ return this[Math.floor(Math.random()*this.length)]; }
+    
+ //   User.insert(doc,func,hydrate);
+    
     
     for(i=0,l=1000; i < l; i++){
       objs.push({
         username : unames.random(), first : unames.random(), last : lnames.random(), bio : { age : ages.random() }
       });
     }
-
-
 
     User.insert(objs).exec(function(docs){ /* do something with inserted docs */ });
 

@@ -72,9 +72,9 @@ An example using each
     
 QueryPromise query helper methods.
 
-  _sort_,_limit_,_skip_,_hint_,_timeout_,_snapshot_,_explain_,
-  _where_,_in_,_nin_,_ne_,_gt_,_gte_,_lt_,_lte_, _min_,_max_,_mod_,_all_,_size_,_exists_,_type_,_not_
-  _inc_,_set_,_unset_,_push_,_pushAll_,_addToSet_,_pop_,_pull_,_pullAll_
+**sort**,**limit**,**skip**,**hint**,**timeout**,**snapshot**,**explain**,
+**where**,**in**,**nin**,**ne**,**gt**,**gte**,**lt**,**lte**, **min**,**max**,**mod**,**all**,**size**,**exists**,**type**,**not**
+**inc**,**set**,**unset**,**push**,**pushAll**,**addToSet**,**pop**,**pull**,**pullAll**
 
 
 Models

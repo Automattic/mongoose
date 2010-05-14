@@ -1,0 +1,5 @@
+---
+  name: Mongoose
+  description: MongoDB ODM wrapper
+  version: 0.0.1
+

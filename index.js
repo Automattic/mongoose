@@ -109,8 +109,8 @@ var fs = require('fs'),
           else this.emit('error','Define type ['+type+'] is invalid');
         },
         
-        get : function(model,store){
-          return this.Model.get(model,store)
+        get : function(model,store,noSchema){
+          return this.Model.get(model,store,noSchema)
         },
         
         close : function(){

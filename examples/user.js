@@ -1,6 +1,6 @@
 var sys = require('sys'),
     inspect = function(item){ sys.puts(sys.inspect(item)); },
-    Mongoose = require('../../mongoose/').Mongoose, db, User;
+    Mongoose = require('../mongoose').Mongoose, db, User;
     
     Mongoose.addListener('error',function(err){
       sys.puts(err);

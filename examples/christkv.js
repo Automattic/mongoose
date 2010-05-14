@@ -1,4 +1,4 @@
-var Doc = require('../../mongoose/').Mongoose.connect('mongodb://localhost/test').use('docs');
+var Doc = require('../mongoose').Mongoose.connect('mongodb://localhost/test').use('docs');
 
 new Doc({awesome:1, info:{type:'binary'}}).save();
 

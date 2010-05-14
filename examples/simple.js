@@ -11,8 +11,6 @@ var sys = require('sys'),
     var s1 = new Simple({x : 2, y : 3}).save(); // create a new document and save
 
     Simple.find().one(function(doc){ // query for documents in 'simple' collection
-    sys.puts('in each');
-      inspect(doc); // output
       doc.y = 5;
       doc.save();
     },true).then(function(){ // promise (execute after query)

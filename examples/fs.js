@@ -1,4 +1,5 @@
-var sys = require('sys'),
+var BSON = require('../lib/support/mongodb/lib/mongodb/bson/bson').BSON,
+    sys = require('sys'),
     path = require('path'),
     fs = require('fs'),
     mongoose = require('../mongoose').Mongoose, // get Mongoose
@@ -7,7 +8,7 @@ var sys = require('sys'),
 
 mongoose.load(__dirname+'/models/file.js'); // load model
 
-File = mongoose.get('File',db);
+File = mongoose.get('File',db); // user model 'File'
 
 recursiveFolderScan = function(dir,file){
   var resource = (file) ? path.join(dir,file) : dir;

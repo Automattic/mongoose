@@ -63,17 +63,11 @@ var fs = require('fs'),
             });
           
           files.forEach(function(file){
-              if(fs.statSync(file).isFile())
-                var sandbox = {},
-                    code = fs.readFileSync(file) + "\n\n__func_proto__ = Function.prototype;";
-                    sandbox[this.options.sandboxName] = this;
-                    sandbox['Model'] = this.Model;
-                    sandbox['require'] = require;
-                    sandbox['__filename'] = file;
-                    sandbox['__dirname'] = path.dirname(file);
-                    Script.runInNewContext(code ,sandbox );
-                    for(i in Function.prototype) if(!sandbox.__func_proto__[i]) sandbox.__func_proto__[i] = Function.prototype[i];
-            }.bind(this)); 
+              if(fs.statSync(file).isFile()){
+                var dir = path.dirname(file), base = path.basename(file,'.js');
+                if(base) require(path.join(dir,base));
+              }
+          });
         },
         
         connect : function(uri,options){
@@ -143,3 +137,5 @@ var fs = require('fs'),
     })();
 
 this.Mongoose = Mongoose;
+global.Mongoose = Mongoose;
+global.Model = Mongoose.Model;

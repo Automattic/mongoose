@@ -19,8 +19,6 @@ var sys = require('sys'),
     
     Array.prototype.random = function(){ return this[Math.floor(Math.random()*this.length)]; }
     
- //   User.insert(doc,func,hydrate);
-    
     
     for(i=0,l=1000; i < l; i++){
       objs.push({

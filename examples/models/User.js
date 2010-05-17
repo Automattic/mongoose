@@ -4,7 +4,6 @@ Mongoose.Model.define('User', {
   collection : 'test_user',
   
   types: {
-    _id : Object,
     username: String,
     first : String,
     last : String,

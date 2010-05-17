@@ -26,14 +26,13 @@ Model.define('File', {
   static : {
     
     modifiedInLastWeek : function(){
-      return this.find().gt({mtime : (Date.now() - 604800000)+'' });
+      return this.find().gt({mtime : new Date(Date.now().getTime - 604800) });
     }
     
   },
   
   methods : {
-    ISODateString : function(ts){
-     var d = new Date(parseInt(ts));
+    ISODateString : function(d){
      function pad(n){return n<10 ? '0'+n : n}
      return d.getUTCFullYear()+'-'
           + pad(d.getUTCMonth()+1)+'-'
@@ -47,18 +46,18 @@ Model.define('File', {
   setters: {
     atime : function(date){
       if(!date) return;
-      if(Object.prototype.toString.call(date) == '[object Date]') return date.getTime()+'';
-      else return date;    
+      if(Object.prototype.toString.call(date) == '[object Date]') return date;
+      else return new Date(Date.parse(date));    
     },
     mtime : function(date){
       if(!date) return;
-      if(Object.prototype.toString.call(date) == '[object Date]') return date.getTime()+'';
-      else return date;        
+      if(Object.prototype.toString.call(date) == '[object Date]') return date;
+      else return new Date(Date.parse(date));      
     },
     ctime : function(date){
       if(!date) return;
-      if(Object.prototype.toString.call(date) == '[object Date]') return date.getTime()+'';
-      else return date;    
+      if(Object.prototype.toString.call(date) == '[object Date]') return date;
+      else return new Date(Date.parse(date)); 
     }
    
   },

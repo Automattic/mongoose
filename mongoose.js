@@ -115,8 +115,8 @@ var fs = require('fs'),
                 
         parseURI : function(uri){
           return uri.split(',').map(function(conn,idx){
-              var a = conn.match(/^(?:(.+):\/\/(?:(.+?):(.+?)@)?)?(?:(.+?)(?::([0-9]+?))?(?:\/(.+?))?)$/);
-              return { 'type' : a[1], 'user' : a[2], 'password' : a[3], 'host' : a[4], 'port' : a[5], 'db' : a[6] };
+              var a = conn.match(/^(?:(?:(.+):\/\/)?(?:(.+?):(.+?)@)?)?(?:(.+?)(?::([0-9]+?))?(?:\/(.+?))?)$/);
+              return { 'type' : a[1] || 'mongodb', 'user' : a[2], 'password' : a[3], 'host' : a[4], 'port' : (a[5]? parseInt(a[5]):27017), 'db' : a[6] };
           });
         },
         

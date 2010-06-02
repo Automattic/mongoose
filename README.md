@@ -92,7 +92,7 @@ Mongoose allows you to define models for your data. Models provide an interface 
    
 All sections of a Mongoose Model definition allow nesting of arbitrary level. This allows for namespaces for methods within your model.
 
-Once a model is defined. Your ready to use it with Mongoose.
+Once a model is defined, you are ready to use it with Mongoose.
 
     Mongoose.load('./models/');
     

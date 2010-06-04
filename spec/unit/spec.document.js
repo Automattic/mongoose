@@ -13,7 +13,6 @@ describe 'Document'
                 {}, // setters
                 false // strict
               );
-      doc.__dirty.should.equal true
       doc.__doc.name.should.equal 'test'
       doc.name.should.equal 'test'
       doc.__doc.data.should.equal 'test'
@@ -29,7 +28,6 @@ describe 'Document'
                 {}, // setters
                 true // strict
               );
-      doc.__dirty.should.equal true
       doc.__doc.name.should.equal 'test'
       doc.name.should.equal 'test'
       doc.__doc.data.should.equal 'test'
@@ -45,7 +43,6 @@ describe 'Document'
                 {}, // setters
                 false // strict
               );
-      doc.__dirty.should.equal true
       doc.__doc.name.should.equal 'test'
       doc.name.should.equal 'test'
       doc.__doc.data.should.equal 'test'
@@ -65,7 +62,6 @@ describe 'Document'
                 {}, // setters
                 true // strict
               );
-      doc.__dirty.should.equal true
       doc.__doc.name.should.equal 'test'
       doc.name.should.equal 'test'
       doc.__doc.data.should.equal 'test'

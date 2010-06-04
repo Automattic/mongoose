@@ -1,4 +1,4 @@
-var BSON = require('../lib/support/mongodb/lib/mongodb/bson/bson').BSON,
+var BSON = require('../lib/support/node-mongodb-native/lib/mongodb/bson/bson').BSON,
     sys = require('sys'),
     path = require('path'),
     fs = require('fs'),

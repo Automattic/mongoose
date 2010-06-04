@@ -1,8 +1,6 @@
+Document = require('model/document').Document
 
 describe 'Document'
-  before_each
-  end
- 
   describe 'Simple'
   
     it 'should return object in non strict mode'

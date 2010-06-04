@@ -1,18 +1,21 @@
-
-require.paths.unshift('spec', './spec/lib', 'lib')
+require.paths.unshift('.', 'spec', 'lib', 'spec/support/jspec/lib')
 require('jspec')
+require('mongoose')
 
-mongoose = require('../mongoose').Mongoose;
-QueryWriter = require('../lib/model/queryWriter').QueryWriter;
-Document = require('../lib/model/document').Document;
+function run(specs) {
+  [].concat(specs).forEach(function(spec){
+    JSpec.exec('spec/unit/spec.' + spec + '.js')
+  })
+}
 
+specs = {
+  independant: [
+    'mongoose',
+    'queryWriter',
+    'document',
+  ]
+}
 
-if (process.ARGV[2])
-  JSpec.exec('unit/spec.' + process.ARGV[2] + '.js')  
-else
-  JSpec
-    .exec('unit/spec.mongoose.js')
-    .exec('unit/spec.queryWriter.js')
-    .exec('unit/spec.document.js')
-JSpec.run({ reporter: JSpec.reporters.Terminal, fixturePath: 'spec/fixtures', failuresOnly: false })
-JSpec.report()
+run(process.ARGV[2] || specs.independant)
+
+JSpec.run({ reporter: JSpec.reporters.Terminal, failuresOnly: true }).report()

@@ -1,4 +1,4 @@
-require.paths.push(__dirname+"/lib/support/mongodb/lib")
+require.paths.push(__dirname + "/lib/support/node-mongodb-native/lib");
 
 var fs = require('fs'),
     path = require('path'),

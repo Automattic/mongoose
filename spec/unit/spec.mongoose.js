@@ -1,8 +1,6 @@
+mongoose = require('mongoose').Mongoose
 
 describe 'Mongoose'
-  before_each
-  end
-  
   describe 'URI Parsing'
     it 'should return basic connection parsed object'
       var parsed = mongoose.parseURI('mongodb://localhost/test');

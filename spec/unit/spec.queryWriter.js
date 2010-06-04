@@ -1,8 +1,6 @@
+QueryWriter = require('model/queryWriter').QueryWriter
 
 describe 'QueryWriter'
-  before_each
-  end
-  
   describe 'Find'
   
     it 'should add $where to find object'

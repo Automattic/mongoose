@@ -69,6 +69,12 @@ To create a new instance (document)
 	u.save(function(){
 		sys.puts('Saved!');
 	});
+	
+To fetch some stuff
+
+	User.find({ name: 'john' }).all(function(array){
+		
+	});
 
 ## API
 
@@ -174,15 +180,19 @@ These methods execute the query and return a `QueryPromise`.
 
 - **exec**
 
-Executes the query.
+	Executes the query.
 
 - **count**
 
-Executes the query (and triggers a count)
+	Executes the query (and triggers a count)
 
-In addition, for the sake of simplicity, all the promise methods (see "Queueable methods") are mirrored in the QueryWriter and trigger `.exec()`. Then, the following two are equivalent:
+	In addition, for the sake of simplicity, all the promise methods (see "Queueable methods") are mirrored in the QueryWriter and trigger `.exec()`. Then, the following two are equivalent:
 
-	Users.find({username: 'john'})
+		User.find({username: 'john'}).all(fn)
+	
+	and:
+	
+		User.find({username: 'john'}).exec().all(fn)
 
 ##### Modifiers
 	
@@ -204,7 +214,7 @@ A promise is a special object that acts as a `queue` if MongoDB has not resulted
 
 For example
 
-	Users.find({ age: { '$gt': 5 } }).first(function(result){
+	User.find({ age: { '$gt': 5 } }).first(function(result){
 		// gets first result
 	}).last(function(result){
 		// gets last result
@@ -214,11 +224,11 @@ For example
 
 - **stash(fn)**
 
-Stashes all the current queued methods, which will be called when `complete` is called. Methods that are queued **after** stash is called will only fire after `complete` is called again.
+	Stashes all the current queued methods, which will be called when `complete` is called. Methods that are queued **after** stash is called will only fire after `complete` is called again.
 
 - **complete(result)**
 
-Complets the promise. The result parameter is optional. It's either null or an array of documents. (internal use)
+	Completes the promise. The result parameter is optional. It's either null or an array of documents. (internal use)
 
 ##### Queueable Methods
 
@@ -226,23 +236,23 @@ You can call all of these in a row, but the callbacks will only trigger when `co
 
 - **all(fn)**
 
-Fires with all the results as an array, or an empty array.
+	Fires with all the results as an array, or an empty array.
 
 - **get(fn)**
 
-Synonym to `all`
+	Synonym to `all`
 
 - **last(fn)**
 
-Fires with the last document or *null*
+	Fires with the last document or *null*
 
 - **first(fn)**
 
-Fires with the first document of the resulset or *null* if no documents are returned
+	Fires with the first document of the resulset or *null* if no documents are returned
 
 - **one(fn)**
 
-Synonym to `first`
+	Synonym to `first`
 
 ## Credits
 

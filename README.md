@@ -1,400 +1,274 @@
-Mongoose: MongoDB utility library with ODM-like functionality
-===============================================================
+Mongoose: MongoDB ODM/ORM
+=========================
 
 The goal of Mongoose is to provide a extremely simple interface for MongoDB. 
 
-Features
----------
-- Reduce the burden of dealing with nested callback from async operations.
-- Provide a simple yet rich API.
-- Still have easy access to the native database/collection.
+## Features
+
+- Reduces the burden of dealing with nested callback from async operations.
+- Provides a simple yet rich API.
 - Ability to model your data with custom interfaces.
+- Allows for complex business logic in an async way (see `Promises`).
 
-Quick Start
-------------
+## How to use
 
-The current state of of mongo with async javascript.
+### Setup
 
-    var db = new mongo.Db('test', new mongo.Server('localhost', 34324, {}), {});
-    db.open(function(err, db) {
-      db.collection('test', function(err, collection) {
-    	  db.find({},function(err,cursor){
-    		  cursor.forEach(function(err,doc){
-    			  if(doc != null){
-    				  // do something.
-    			  }
-    		  });
-    	  });
-      });
-    });
-    
-With Mongoose:
+In your application, add mongoose to the requires path:
 
-    var mongoose = require('mongoose/').Mongoose,
-        db = mongoose.connect('mongodb://localhost/test'),      
-        Collection = mongoose.noSchema('test',db); // collection name
-        
-    Collection.find({}).each(function(doc){
-      // do something
-    });
-        
-Mongoose buffers the connection to the database providing an easier to use API. Mongoose also adds some neat chaining features to allow for a more expressive and easier way of dealing with your data.
+	require.paths.unshift('vendor/mongoose');
+	var mongoose = require('mongoose').Mongoose;
 
-Models
--------
-Mongoose allows you to define models for your data. Models provide an interface to your data. 
+### Defining a model
 
-     Model.define('User',{
-  
-       collection : 'test_user', // (optional) if not present uses the model name instead.
+	mongoose.model('User', {
+		
+		properties: ['first', 'last', 'age', 'updated_at'],
+		
+		setters: {
+			first: function(v){
+				return this.v.capitalize();
+			}
+		},
+		
+		getters: {
+			full_name: function(){ 
+				return this.first + ' ' + this.last 
+			}
+		},
+		
+		methods: {
+			save: function(fn){
+				this.updated_at = new Date();
+				this.__super__(fn);
+			}
+		},
+		
+		static: {
+			findOldPeople: function(){
+				return this.find({age: { '$gt': 70 }});
+			}
+		}
+		
+	});
+	
+### Getting a model
 
-       // defines your data structure
-       types: {
-         _id : Object, // if not defined, Mongoose automatically defines for you.
-         username: String,
-         first : String,
-         last : String,
-         bio: {
-           age: Number
-         }
-       },
+Models are pseudo-classes that depend on an active connection. To connect:
 
-       indexes : [
-         'username',
-         'bio.age',
-         [['first'],['last']] // compound key indexes
-       ],
-   
-       static : {}, // adds methods onto the Model.
-       methods : {}, // adds methods to Model instances.
+	var db = mongoose.connect('mongodb://localhost/db');
+	
+To get a model:
+	
+	var User = db.model('User');
+	
+To create a new instance (document)
 
-       setters: { // custom setters
-         first: function(v){
-           return v.toUpperCase();
-         }
-       },
-   
-       getters: { // custom getters
-         username: function(v){
-           return v.toUpperCase();
-         },
+	var u = new User();
+	u.name = 'John';
+	u.save(function(){
+		sys.puts('Saved!');
+	});
 
-         legalDrinkingAge : function(){
-           return (this.bio.age >= 21) ? true : false;
-         },
+## API
 
-         first_last : function(){ // custom getter that merges two getters together.
-           return this.first + ' ' + this.last;
-         }
-       }
+### mongoose
 
-     });   
-   
-All sections of a Mongoose Model definition allow nesting of arbitrary level. This allows for namespaces for methods within your model.
-
-Once a model is defined. Your ready to use it with Mongoose.
-
-    Mongoose.load('./models/');
-    
-    User = Mongoose.get('User');
-    
-    user = new User({username : 'test', first : 'me', last : 'why', bio : { age : 100 }}); // create a new document.
-    user.save(); //save
-    user.first_last // returns 'ME why'
-    user.legalDrinkingAge // true
-    
-    User.find()
-
-
-Configuration
------------------------
-
-Mongoose can help manage your connections with the configuration option to help with switching between dev and production environments.
-
-    var Mongoose = require('./mongoose/).Mongoose;
-    Mongoose.configure({
-      connections : {
-        dev : 'mongodb://localhost/dev',
-        live : 'mongodb://localhost/live'
-      }
-    });
-    
-    store = Mongoose.connect('dev');    
-    
-In addition Mongoose has a featured we refer to as 'activeStore' This allows for implicit binding of Models/Collections.
-
-    Model = Mongoose.Model,
-    Mongoose.configure({
-      activeStore : 'dev',
-      connection : {...}
-    });
-    
-    Mongoose.load('./models/'); // if a directory, loads all files in directory.
-    
-    User = Model.get('User'); // no need to define storage since activeStore is set
-
-If 'activeStore' is not defined, it will be defined as soon as you connect(uri). If you want to disable this feature in the configuration object add 'activeStoreEnabled : false'.
-
-
-Query Promises
--------------
-
-Mongoose implements the promise pattern for queries. This assures the developer that execution happens in proper order.
-
-    var promise = Collection.find();
-    promise.gt({age : 20}).lt({age : 25}).limit(10); // promise commands are chainable.
-      
-Currently the Mongoose QueryPromise API is lazy. A query action is not performed until an 'action' method has been assigned.
-
-- Actions (each,count,first,one,get,execute,exec,run)
-
-In the case of 'each','first','one','get' they take two arguments. A callback, and an option to hydrate. It is important to note that all callbacks operate within the scope of the QueryPromise. 
-
-QueryPromises provide the following helper methods in addition to the query 'sugar' methods.
-
-- result - sets a result value for the promise
-- partial - sets a partial result for a promise, handy for result sets using .each()
-- error - define an error
-- then - code you want to execute after the promise has been made. It takes 2 parameters. The first is your callback, second is an optional in case of errors.
-
-An example using each
-
-    promise.each(function(doc){
-        // do something
-        this.partial(doc.title);
-    }).then(function(titles){
-      // titles is an array of the doc titles
-    });
-    
-QueryPromise query helper methods.
-
-**sort**,**limit**,**skip**,**hint**,**timeout**,**snapshot**,**explain**,
-**where**,**in**,**nin**,**ne**,**gt**,**gte**,**lt**,**lte**, **min**,**max**,**mod**,**all**,**size**,**exists**,**type**,**not**
-**inc**,**set**,**unset**,**push**,**pushAll**,**addToSet**,**pop**,**pull**,**pullAll**
-
-
-Plugins
--------
-
-Mongoose supports a plugin architecture. This allows you to add dynamic mixins to your models.
-
-More to be announced soon.
-
-Documentation
--------------
-
-### Mongoose
-
-Methods:
-
-- *configure(options)*
-  - connections
-  - activeStore
-      - (str) Specify an activeStore within connections.
-  - activeStoreEnabled
-      - (bool) default true. Allows for implicit binding of Models to Stores.
-      
-- *load(resource)*
-    - Loads a file, if resource is a directory loads all files in directory. 
-    
-- *connect(uri)*
-    - [format](http://www.mongodb.org/display/DOCS/Connections). If activeStoreEnabled, activeStore will be set to this connection.
-    - returns Storage
-
-- *get(model,[store])*
-    - returns a model that uses the Storage. If store is not passed, activeStore is then attempted.
-
-- *noSchema(collection,[store])*
-    - same as get but doesn't require a Model definition, binds directly to a collection.
-
-- *close()*
-    - closes all Storage connections.
-
-### Storage
-
-Properties:
-
-- *loaded* 
-    - (bool) if connection established with Mongo.
-
-Methods:
-
-- *static(model)
-    - Binds a model to the current Storage object.
-    - returns a Model
-    
+#### Methods
+	
+- **model(name, definition)**
+	
+	- *definition* determines how the class will be constructed. It's composed of the following keys. All of them are optional:
+		
+		- *collection*
+		
+		Optionally, the MongoDB collection name. Defaults to the model name in lowercase and plural. Does not need to be created in advance.
+		
+		- *properties*
+		
+		Defines the properties for how you structure the model.
+		
+		To define simple keys:
+		
+			properties: [ 'name', 'last' ]
+		
+		To define arrays:
+		
+			properties: [ 'name', ['tags'] ]
+		
+		To define embedded objects:
+			
+			properties: [ 'name', [{blogposts: ['title', 'body', ...]}] ]
+		
+		`_id` is added automatically for all models.
+		
+		- *getters*
+		
+		- *setters*
+		
+		- *cast*
+		
+		Defines type casting. By default, all properties beginning with `_` are cast to `ObjectID`.
+		
+		- *indexes*
+		
+		- *methods*
+		
+		- *static*
+		
+		The name of the MongoDB collection in your database. If not specified, defaults to the plural of the model name, in lowercase.
+	
 ### Model
 
-Properties:
+These are methods and properties that all *model instances* already include:
 
-- *loaded*
-    - (bool) if connection established with Mongo
+#### Properties
 
-- *collectionName*
+- **isNew**
+	
+	Whether the instance exists as a document or the db (*false*), or hasn't been saved down before (*true*)
 
-- *store*
-    - Storage object
+#### Methods
 
-- *collection*
-    - Mongodb-native Collection object
+Note: if you override any of these by including them in the `methods` object of the model definition, the method is inherited and you can call __super__ to access the parent.
 
-Methods:
+- **save(fn)**
+	
+	Saves down the document and fires the callback.
+	
+### Model (static)
 
-- *find()*
+These are the methods that can be accessed statically, and affect the collection as a whole.
 
-- *update()*
+- **find(props, subset, hydrate)**
 
-- *insert()*
+	Returns an instance of QueryWriter
 
-- *count()*
+	- *props*
+	
+		Optional, calls the QueryWriter `where` on each key/value. `find({username: 'john'})` is equivalent to:
+			
+			model.find().where('username', 'john');
+		
+	- *subset*
+	
+		Optional, a subset of fields to retrieve. More information on [MongoDB Docs](http://www.mongodb.org/display/DOCS/Advanced+Queries#AdvancedQueries-RetrievingaSubsetofFields)
+	
+	- *hydrate*
+	
+		Possible values:
+			
+			- `true`. Returns a model instance (default)
+			- `null`. Returns a plain object that is augmented to match the missing properties defined in the model.
+			- `false`. Returns the object as it's retrieved from MongoDB.
+	
+### QueryWriter
 
-- *distinct()*
+QueryWriter allows you to construct queries with very simple syntax. All its methods return the `QueryWriter` instance, which means they're chainable.
 
-- *mapReduce()*
+#### Methods
 
-- *remove()*
+##### Executers
 
-- *save()*
+These methods execute the query and return a `QueryPromise`.
 
-- *drop()*
+- **exec**
 
-- *close()*
+Executes the query.
 
-- *halt()*
-    - stopped all commands from being submitted to Mongo
+- **count**
 
-- *clear()*
-    - clears the buffer
+Executes the query (and triggers a count)
 
-- *resume()*
-    - resumes the buffer after a halt
+In addition, for the sake of simplicity, all the promise methods (see "Queueable methods") are mirrored in the QueryWriter and trigger `.exec()`. Then, the following two are equivalent:
+
+	Users.find({username: 'john'})
+
+##### Modifiers
+	
+- **where**
+	
+- **sort**
+
+- **limit**
+
+- **skip**
+
+- **snapshot**
+
+- **group**
 
 ### QueryPromise
 
-Properties:
+A promise is a special object that acts as a `queue` if MongoDB has not resulted the results, and executes the methods you call on it once the results (or part of them) are available.
 
-- *completed*
+For example
 
-Methods (Promise):
+	Users.find({ age: { '$gt': 5 } }).first(function(result){
+		// this will fire when the first result is loaded
+	}).all(function(results){
+		// this will fire a few ms later, with the entire resultset
+	});
 
-- *result(value)*
-    - sets the result value for the query promise
+#### Methods
 
-- *partial(part)*
-    - sets a partial result value for a query promise
+- **stash(fn)**
 
-- *error(err)*
-    - sets an error for a promise. It acts as a stack, you can push multiple errors.
+Stashes all the current queued methods, which will be called when `complete` is called. Methods that are queued **after** stash is called will only fire after `complete` is called again.
 
-- *then(func,errorCallback)*
-    - what to do after the promise has been completed. Func receives the value as first param. If result is undefined it uses the partial complete value
-    - errorCallback gets an array of errors passed as first parameter.
+- **complete(result)**
 
-Methods (Query Actions):
+Complets the promise. The result parameter is optional. It's either null or an array of documents. (internal use)
 
-- *each(fn,hydrate)*
+##### Queueable Methods
 
-- *first(fn,hydrate)*
+You can call all of these in a row, but the callbacks will only trigger when `complete is called`
 
-- *execute(fn)*
+- **all(fn)**
 
-- *run(fn)*
+Fires with all the results as an array, or an empty array.
 
-Method (Query Sugar):
+- **get(fn)**
 
-- *sort()*
+Synonym to `all`
 
-- *limit()*
+- **last(fn)**
 
-- *skip()*
+Fires with the last document or *null*
 
-- *hint()*
+- **first(fn)**
 
-- *timeout()*
+Fires with the first document of the resulset or *null* if no documents are returned
 
-- *snapshot()*
+- **one(fn)**
 
-- *explain()*
+Synonym to `first`
 
-- *where()*
+## Credits
 
-- *in()*
-
-- *nin()*
-
-- *ne()*
-
-- *gt()*
-
-- *gte()*
-
-- *lt()*
-
-- *lte()*
-
-- *min()*
-
-- *max()*
-
-- *mod()*
-
-- *add()*
-
-- *size()*
-
-- *exists()*
-
-- *type()*
-
-- *not()*
-
-- *inc()*
-
-- *set()*
-
-- *unset()*
-
-- *push()*
-
-- *pushAll()*
-
-- *addToSet()*
-
-- *pop()*
-
-- *pull()*
-
-- *pullAll()*
-
-
-
-Requirements
-------------
-- Node Thanks Ryan.
-- [MongoDB](http://www.mongodb.org/display/DOCS/Downloads)
-- [node-mongodb-native](http://github.com/christkv/node-mongodb-native) Thanks Christian.
-
-Credits
---------
 Nathan White &lt;nathan@learnboost.com&gt;
 
-Future
-------
-- More examples.
-- Add tests.
-- More robust Model type declaration
-- Ability to define foreign keys
-- Add Inheritance to Models.
-
-License
--------
+## License 
 
 (The MIT License)
 
-Copyright (c) 2010 LearnBoost <dev@learnboost.com>
+Copyright (c) 2010 LearnBoost &lt;dev@learnboost.com&gt;
 
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the 'Software'), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+Permission is hereby granted, free of charge, to any person obtaining
+a copy of this software and associated documentation files (the
+'Software'), to deal in the Software without restriction, including
+without limitation the rights to use, copy, modify, merge, publish,
+distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so, subject to
+the following conditions:
 
-The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
 
-THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.

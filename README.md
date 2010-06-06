@@ -142,6 +142,10 @@ Note: if you override any of these by including them in the `methods` object of 
 	
 	Saves down the document and fires the callback.
 	
+- **remove(fn)**
+	
+	Removes the document and fires the callback.
+	
 ### Model (static)
 
 These are the methods that can be accessed statically, and affect the collection as a whole.

@@ -1,6 +1,6 @@
 var sys = require('sys'),
     inspect = function(item){ sys.puts(sys.inspect(item)); },
-    Mongoose = require('../../mongoose/').Mongoose, db, User;
+    Mongoose = require('../mongoose').Mongoose, db, User;
     
     Mongoose.addListener('error',function(err){
       sys.puts(err);
@@ -18,8 +18,6 @@ var sys = require('sys'),
       ages = [19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40];
     
     Array.prototype.random = function(){ return this[Math.floor(Math.random()*this.length)]; }
-    
- //   User.insert(doc,func,hydrate);
     
     
     for(i=0,l=1000; i < l; i++){

@@ -1,7 +1,7 @@
 var sys = require('sys'),
     object = require('../lib/utils/object'),
     inspect = function(item){ sys.puts(sys.inspect(item)); },
-    Mongoose = require('../../mongoose/').Mongoose, db, Simple;
+    Mongoose = require('../mongoose').Mongoose, db, Simple;
     
     db = Mongoose.connect('mongodb://localhost/test'); // connect to mongo
     

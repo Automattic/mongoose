@@ -1,3 +1,4 @@
+require.paths.push(__dirname + "/lib/support/node-mongodb-native/lib");
 
 var fs = require('fs'),
     path = require('path'),
@@ -62,17 +63,11 @@ var fs = require('fs'),
             });
           
           files.forEach(function(file){
-              if(fs.statSync(file).isFile())
-                var sandbox = {},
-                    code = fs.readFileSync(file) + "\n\n__func_proto__ = Function.prototype;";
-                    sandbox[this.options.sandboxName] = this;
-                    sandbox['Model'] = this.Model;
-                    sandbox['require'] = require;
-                    sandbox['__filename'] = file;
-                    sandbox['__dirname'] = path.dirname(file);
-                    Script.runInNewContext(code ,sandbox );
-                    for(i in Function.prototype) if(!sandbox.__func_proto__[i]) sandbox.__func_proto__[i] = Function.prototype[i];
-            }.bind(this)); 
+              if(fs.statSync(file).isFile()){
+                var dir = path.dirname(file), base = path.basename(file,'.js');
+                if(base) require(path.join(dir,base));
+              }
+          });
         },
         
         connect : function(uri,options){
@@ -120,8 +115,8 @@ var fs = require('fs'),
                 
         parseURI : function(uri){
           return uri.split(',').map(function(conn,idx){
-              var a = conn.match(/^(?:(.+):\/\/(?:(.+?):(.+?)@)?)?(?:(.+?)(?::([0-9]+?))?(?:\/(.+?))?)$/);
-              return { 'type' : a[1], 'user' : a[2], 'password' : a[3], 'host' : a[4], 'port' : a[5], 'db' : a[6] };
+              var a = conn.match(/^(?:(?:(.+):\/\/)?(?:(.+?):(.+?)@)?)?(?:(.+?)(?::([0-9]+?))?(?:\/(.+?))?)$/);
+              return { 'type' : a[1] || 'mongodb', 'user' : a[2], 'password' : a[3], 'host' : a[4], 'port' : (a[5]? parseInt(a[5]):27017), 'db' : a[6] };
           });
         },
         
@@ -142,3 +137,5 @@ var fs = require('fs'),
     })();
 
 this.Mongoose = Mongoose;
+global.Mongoose = Mongoose;
+global.Model = Mongoose.Model;

@@ -76,6 +76,32 @@ To fetch some stuff
 		
 	});
 
+### Operating on embeded objects
+
+Embedded objects are hydrated like model instances. Assume a MongoDB document like this stored in a variable `user`
+
+	{
+		name: 'John',
+		blogposts: [
+			{
+				title: 'Hi',
+				body: 'Hi there'
+			}
+		]
+	}
+	
+To add a blogpost:
+
+	user.blogposts.push({ title: 'New post', body: 'The body' });
+	user.save();
+
+To remove an existing one:
+
+	user.blogposts[0].remove();
+	user.save();
+	
+Each embedded object is an instance of EmbeddedObject.
+
 ## API
 
 ### mongoose
@@ -171,6 +197,14 @@ These are the methods that can be accessed statically, and affect the collection
 			- `true`. Returns a model instance (default)
 			- `null`. Returns a plain object that is augmented to match the missing properties defined in the model.
 			- `false`. Returns the object as it's retrieved from MongoDB.
+
+### EmbeddedObject
+
+#### Methods
+
+	- **delete**
+	
+		Marks the embeded object for deletion
 	
 ### QueryWriter
 

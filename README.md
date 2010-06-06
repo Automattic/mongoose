@@ -82,25 +82,25 @@ To create a new instance (document)
 		
 		- *collection*
 		
-		Optionally, the MongoDB collection name. Defaults to the model name in lowercase and plural. Does not need to be created in advance.
+			Optionally, the MongoDB collection name. Defaults to the model name in lowercase and plural. Does not need to be created in advance.
 		
 		- *properties*
 		
-		Defines the properties for how you structure the model.
+			Defines the properties for how you structure the model.
 		
-		To define simple keys:
+			To define simple keys:
 		
-			properties: [ 'name', 'last' ]
+				properties: [ 'name', 'last' ]
 		
-		To define arrays:
+			To define arrays:
 		
-			properties: [ 'name', ['tags'] ]
+				properties: [ 'name', ['tags'] ]
 		
-		To define embedded objects:
+			To define embedded objects:
 			
-			properties: [ 'name', [{blogposts: ['title', 'body', ...]}] ]
+				properties: [ 'name', [{blogposts: ['title', 'body', ...]}] ]
 		
-		`_id` is added automatically for all models.
+			`_id` is added automatically for all models.
 		
 		- *getters*
 		
@@ -108,7 +108,7 @@ To create a new instance (document)
 		
 		- *cast*
 		
-		Defines type casting. By default, all properties beginning with `_` are cast to `ObjectID`.
+			Defines type casting. By default, all properties beginning with `_` are cast to `ObjectID`.
 		
 		- *indexes*
 		
@@ -116,7 +116,7 @@ To create a new instance (document)
 		
 		- *static*
 		
-		The name of the MongoDB collection in your database. If not specified, defaults to the plural of the model name, in lowercase.
+			The name of the MongoDB collection in your database. If not specified, defaults to the plural of the model name, in lowercase.
 	
 ### Model
 
@@ -200,14 +200,14 @@ In addition, for the sake of simplicity, all the promise methods (see "Queueable
 
 ### QueryPromise
 
-A promise is a special object that acts as a `queue` if MongoDB has not resulted the results, and executes the methods you call on it once the results (or part of them) are available.
+A promise is a special object that acts as a `queue` if MongoDB has not resulted the results, and executes the methods you call on it once the results are available.
 
 For example
 
 	Users.find({ age: { '$gt': 5 } }).first(function(result){
-		// this will fire when the first result is loaded
-	}).all(function(results){
-		// this will fire a few ms later, with the entire resultset
+		// gets first result
+	}).last(function(result){
+		// gets last result
 	});
 
 #### Methods

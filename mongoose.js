@@ -1,14 +1,16 @@
-require.paths.push(__dirname + '/lib/support/node-mongodb-native/lib');
-require('lib/support/js-oo/lib/oo.js');
+require.paths.unshift(__dirname + '/lib/support/node-mongodb-native/lib', __dirname + '/lib/support/js-oo/lib');
+require('oo');
 
 var sys = require('sys'),
     url = require('url'),
-    Connection = require('lib/connection').Connection,
-    EventEmitter = require('events').EventEmitter;
+    EventEmitter = require('events').EventEmitter,
+    Connection = require('./lib/connection').Connection,
 
 Mongoose = this.Mongoose = {
   
   _models: {},
+  
+  _connections: {},
   
   connect: function(uri, options){
     var _uri = url.parse(uri);

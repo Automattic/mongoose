@@ -1,6 +1,12 @@
 [submodule "lib/support/node-mongodb-native"]
 	path = lib/support/node-mongodb-native
 	url = git://github.com/christkv/node-mongodb-native.git
-[submodule "spec/support/jspec"]
-	path = spec/support/jspec
+[submodule "tests/unit/support/jspec"]
+	path = tests/unit/support/jspec
 	url = git://github.com/visionmedia/jspec.git
+[submodule "tests/integration/support/expresso"]
+	path = tests/integration/support/expresso
+	url = git://github.com/visionmedia/expresso.git
+[submodule "lib/support/js-oo"]
+	path = lib/support/js-oo
+	url = git://github.com/visionmedia/js-oo.git

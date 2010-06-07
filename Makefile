@@ -1,4 +1,6 @@
+SH = sh
 NODE = node
 
 test:
-	@$(NODE) spec/specs.js
+	@$(NODE) tests/unit/run.js
+	# @$(SH) tests/integration/support/expresso/bin/expresso tests/integration/*

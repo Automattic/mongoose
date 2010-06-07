@@ -76,7 +76,7 @@ To fetch some stuff
 		
 	});
 
-### Operating on embeded objects
+### Operating on embedded objects
 
 Embedded objects are hydrated like model instances. Assume a MongoDB document like this stored in a variable `user`
 

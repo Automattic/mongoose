@@ -70,8 +70,9 @@ describe 'Model'
     
     it 'should add the static methods'
       User = db.model('User')
-      User.should.include 'findByName'
-      User.should.include 'findByLast'
+      User.find.should.not.be_undefined
+      User.findByName.should.not.be_undefined
+      User.findByLast.should.not.be_undefined
     end
     
     it 'should add the prototype methods'
@@ -79,7 +80,7 @@ describe 'Model'
       User.prototype.newMethod.should.not.be_undefined
       user = new User();
       -{ user.save(); }.should.not.throw_error
-      user.should.include 'newMethod'
+      user.newMethod.should.not.be_undefined
     end
     
     it 'should add the connection the prototype'
@@ -108,7 +109,16 @@ describe 'Model'
   end
   
   describe 'Hydration'
-  
+    
+    it 'should hydrate the objects'
+      User = db.model('User')
+      john = new User();
+      john._hydrate({likes: ['rock', 'pop']})
+      john.likes.length.should.be 2
+      john.likes[0].should.be 'rock'
+      john.likes[1].should.be 'pop'
+    end
+    
   end
   
   describe 'Getters/setters'

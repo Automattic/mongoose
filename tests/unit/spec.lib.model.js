@@ -113,15 +113,75 @@ describe 'Model'
     it 'should hydrate the objects'
       User = db.model('User')
       john = new User();
-      john._hydrate({likes: ['rock', 'pop']})
-      john.likes.length.should.be 2
-      john.likes[0].should.be 'rock'
-      john.likes[1].should.be 'pop'
+      john._hydrate({
+        some: 'stuff',
+        another: {
+          test: 'ing',
+          stuff: 'app'
+        },
+        likes: ['rock', 'pop'],
+        embedded: [{
+          test: 'test'
+        }]
+      })
+      
+      john.__doc.some.should.be 'stuff'
+      john.__doc.likes.length.should.be 2
+      john.__doc.likes[0].should.be 'rock'
+      john.__doc.likes[1].should.be 'pop'
+      john.__doc.another.should.be_type 'object'
+      john.__doc.another.should.have_property 'test', 'ing'
+      john.__doc.another.should.have_property 'stuff', 'app'
+      john.__doc.embedded.length.should.be 1
+      john.__doc.embedded[0].should.have_property 'test', 'test'
     end
     
   end
   
   describe 'Getters/setters'
+  
+    it 'should get from a string describing a path'
+      User = db.model('User')
+      john = new User()
+      john._hydrate({
+        some: 'stuff',
+        another: {
+          test: 'ing',
+          stuff: 'app'
+        },
+        arrrr: [],
+        embedded: [{
+          test: 'test'
+        }]
+      })
+      john._get('some').should.be 'stuff'
+      john._get('another').should.be_type 'object'
+      john._get('another.test').should.be 'ing'
+      john._get('another.stuff').should.be 'app'
+      john._get('arrrr').should.be_an Array
+      -{ john._get('embedded.test') }.should.throw_error /undefined/
+    end
+    
+    it 'should set from a string describing a path'
+      User = db.model('User')
+      john = new User()
+      john._hydrate({
+        some: 'stuff',
+        another: {
+          test: 'ing',
+          stuff: 'app'
+        }
+      })
+      
+      john._set('some', 'STUFF')
+      john._set('another.test', 'ING')
+      john._set('another.stuff', 'APP')
+      
+      john._get('some').should.be 'STUFF'
+      john._get('another').should.be_type 'object'
+      john._get('another.test').should.be 'ING'
+      john._get('another.stuff').should.be 'APP'
+    end
   
     it 'should detect return value to set the property and avoid recursion'
       User = db.model('User')

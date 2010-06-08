@@ -3,7 +3,7 @@ mongoose = require('mongoose').Mongoose
     
 mongoose.model('User', {
   
-  properties: ['name', ['likes'], ['dislikes'], [{blogposts: ['name', 'body']}], 'last'],
+  properties: ['name', ['likes'], ['dislikes'], {location: ['street', 'city']}, [{blogposts: ['name', 'body']}], 'last'],
   
   methods: {
     save: function(fn){
@@ -11,6 +11,30 @@ mongoose.model('User', {
     },
     
     newMethod: function(){}
+  },
+  
+  setters: {
+    
+    name: function(){
+      return 'John locke';
+    }
+    
+  },
+  
+  getters: {
+    
+    last: function(v){
+      return v.toLowerCase();
+    },
+    
+    full: function(){
+      return 'test'
+    },
+    
+    test: function(){
+      return arguments.length;
+    }
+    
   },
   
   static: {
@@ -64,11 +88,45 @@ describe 'Model'
       user.__doc.blogposts.should.be_an Array
       user.__doc.should.include 'last'
       user.__doc.last.should.be_null
+      user.__doc.should.include 'location'
+      user.__doc.location.should.be_type 'object'
+      user.__doc.location.should.include 'city'
+      user.__doc.location.should.include 'street'
     end
   end
   
+  describe 'Hydration'
+  
+  end
+  
   describe 'Getters/setters'
+  
+    it 'should detect return value to set the property and avoid recursion'
+      User = db.model('User')
+      john = new User()
+      john.name = 'Peter'
+      john.name.should.be 'John locke'
+    end
     
+    it 'should pass the value as argument if the getter matches a defined property'
+      User = db.model('User')
+      john = new User()
+      john.last = 'John'
+      john.__doc.last.should.be 'John'
+      john.last.should.be 'john'
+    end
+    
+    it 'should provide a getter for which no property is defined'
+      User = db.model('User')
+      john = new User()
+      john.full.should.be 'test'
+    end
+    
+    it 'should not pass any arguments to a getter for which no property is defined'
+      User = db.model('User')
+      john.test.should.be 0
+    end
+
   end
   
 end

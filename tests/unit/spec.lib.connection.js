@@ -51,17 +51,17 @@ describe 'Connection'
   describe 'Models'
     
     it 'should compile classes for each Connection'
-      mongoose.model('User', {
+      mongoose.model('Admin', {
         properties: ['name', ['likes'], ['dislikes'], [{blogposts: ['name', 'body']}], 'last'],
         methods: {
           newMethod: function(){}
         }
       })
       db = mongoose.connect('mongodb://localhost/conn')
-      User = db.model('User')
+      User = db.model('Admin')
       
       db = mongoose.connect('mongodb://localhost/conn2')
-      User2 = db.model('User')
+      User2 = db.model('Admin')
       
       User._connection.should.not.equal User2.connection
       User.prototype._connection.should.not.equal User2.prototype._connection

@@ -16,7 +16,7 @@ Mongoose = this.Mongoose = {
     var _uri = url.parse(uri);
     if (_uri.protocol !== 'mongodb:') throw new Error('Please include the mongodb:// protocol');
     if (!_uri.pathname) throw new Error('Please provide a database name');
-    _uri.port = _uri.port || 27017;
+    _uri.port = _uri.port || '27017';
     _uri.hostname = _uri.hostname.toLowerCase();
     _uri.host = _uri.host.toLowerCase();
     _uri.pathname = _uri.pathname.replace(/\//g, '').toLowerCase();
@@ -47,3 +47,15 @@ Mongoose = this.Mongoose = {
 
 sys.inherits(Mongoose, EventEmitter.prototype);
 EventEmitter.call(Mongoose);
+
+mocks = require('./lib/specs')
+Connection = mocks.MockConnection;
+
+db = Mongoose.connect('mongodb://localhost/test')
+tests = db.collection('tests-2')
+
+      tests.insert({})
+      tests.remove({})
+      tests.save({})
+      
+tests.setCollection(new mocks.MockCollection)

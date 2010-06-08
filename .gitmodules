@@ -7,6 +7,3 @@
 [submodule "tests/integration/support/expresso"]
 	path = tests/integration/support/expresso
 	url = git://github.com/visionmedia/expresso.git
-[submodule "lib/support/js-oo"]
-	path = lib/support/js-oo
-	url = git://github.com/visionmedia/js-oo.git

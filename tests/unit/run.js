@@ -13,6 +13,7 @@ function run(specs) {
 
 specs = {
   independant: [
+    'lib.util',
     'mongoose',
     'lib.connection',
     'lib.model',

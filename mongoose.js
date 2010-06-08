@@ -1,5 +1,4 @@
-require.paths.unshift(__dirname + '/lib/support/node-mongodb-native/lib', __dirname + '/lib/support/js-oo/lib');
-require('oo');
+require.paths.unshift(__dirname + '/lib/support/node-mongodb-native/lib');
 
 var sys = require('sys'),
     url = require('url'),

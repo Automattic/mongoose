@@ -14,7 +14,12 @@ Mongoose = this.Mongoose = {
   
   connect: function(uri, options){
     var _uri = url.parse(uri);
+    if (_uri.protocol !== 'mongodb:') throw new Error('Please include the mongodb:// protocol');
+    if (!_uri.pathname) throw new Error('Please provide a database name');
     _uri.port = _uri.port || 27017;
+    _uri.hostname = _uri.hostname.toLowerCase();
+    _uri.host = _uri.host.toLowerCase();
+    _uri.pathname = _uri.pathname.replace(/\//g, '').toLowerCase();
     return this._lookup(_uri) || this._open(_uri, options);
   },
   

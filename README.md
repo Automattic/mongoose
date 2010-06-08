@@ -202,9 +202,9 @@ These are the methods that can be accessed statically, and affect the collection
 
 #### Methods
 
-	- **delete**
+- **delete**
 	
-		Marks the embeded object for deletion
+	Marks the embeded object for deletion
 	
 ### QueryWriter
 

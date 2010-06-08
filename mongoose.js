@@ -47,15 +47,3 @@ Mongoose = this.Mongoose = {
 
 sys.inherits(Mongoose, EventEmitter.prototype);
 EventEmitter.call(Mongoose);
-
-mocks = require('./lib/specs')
-Connection = mocks.MockConnection;
-
-db = Mongoose.connect('mongodb://localhost/test')
-tests = db.collection('tests-2')
-
-      tests.insert({})
-      tests.remove({})
-      tests.save({})
-      
-tests.setCollection(new mocks.MockCollection)

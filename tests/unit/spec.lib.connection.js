@@ -48,4 +48,13 @@ describe 'Connection'
     
   end
   
+  describe 'Models'
+    
+    it 'should compile classes for each Connection'
+      db = mongoose.connect('mongodb://localhost/conn')
+      
+    end
+    
+  end
+  
 end

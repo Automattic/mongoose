@@ -5,6 +5,14 @@ mongoose.model('User', {
   
   properties: ['name', ['likes'], ['dislikes'], [{blogposts: ['name', 'body']}], 'last'],
   
+  methods: {
+    save: function(fn){
+      this.__super__(fn);
+    },
+    
+    newMethod: function(){}
+  },
+  
   static: {
     findByName: function(){},
     
@@ -28,6 +36,14 @@ describe 'Model'
       User = db.model('User')
       User.should.include 'findByName'
       User.should.include 'findByLast'
+    end
+    
+    it 'should add the prototype methods'
+      User = db.model('User')
+      User.prototype.newMethod.should.not.be_undefined
+      user = new User();
+      -{ user.save(); }.should.not.throw_error
+      user.should.include 'newMethod'
     end
     
     it 'should add the connection the prototype'

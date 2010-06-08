@@ -17,6 +17,12 @@ mongoose.model('User', {
     
     name: function(){
       return 'John locke';
+    },
+    
+    location: {
+      street: function(v){
+        return v + ' St';
+      }
     }
     
   },
@@ -33,6 +39,12 @@ mongoose.model('User', {
     
     test: function(){
       return arguments.length;
+    },
+    
+    location: {
+      city: function(v){
+        return 'in: ' + v;
+      }
     }
     
   },
@@ -125,6 +137,20 @@ describe 'Model'
     it 'should not pass any arguments to a getter for which no property is defined'
       User = db.model('User')
       john.test.should.be 0
+    end
+    
+    it 'should handle nested getters'
+      User = db.model('User')
+      john = new User();
+      john.location.city = 'Buenos Aires'
+      john.location.city.should.be 'in: Buenos Aires'
+    end
+    
+    it 'should handle nested setters'
+      User = db.model('User')
+      john = new User();
+      john.location.street = 'Rockefeller'
+      john.location.street.should.be 'Rockefeller St'
     end
 
   end

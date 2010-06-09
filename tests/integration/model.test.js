@@ -21,7 +21,8 @@ module.exports = {
     User.find({
       name: 'John'
     }).first(function(john){
-      assert(john && john.last == 'Lock');
+      assert.ok(john);
+      assert.equal(john.last, 'Lock');
     });
   },
   

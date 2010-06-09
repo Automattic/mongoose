@@ -20,7 +20,7 @@ module.exports = {
     })
   },
   
-  'test saving': function(){
+  'test saving and hydration': function(){
     var db = mongoose.connect('mongodb://localhost/mongoose-tests_2'),
         User = db.model('User');
     var john = new User();
@@ -32,10 +32,38 @@ module.exports = {
         first: 'John'
       }).first(function(john){
         assert.ok(john);
+        assert.ok(john instanceof User);
         assert.equal(john.last, 'Lock');
         db.close();
       });
     });
+  },
+  
+  'test finding many bypassing hydration': function(){
+    var db = mongoose.connect('mongodb://localhost/mongoose-tests_3'),
+        User = db.model('User'), 
+        _count = 0,
+        callback = function(){
+          if (++_count == 2){
+            User.find({}, false).all(function(res){
+              assert.ok(res instanceof Array);
+              assert.ok(res.length);
+              assert.ok(typeof res[0] == 'object')
+              assert.ok(! (res[0] instanceof User))
+              db.close();
+            });
+          }
+        };
+        
+    var john = new User();
+    john.first = 'Test';
+    john.last = 'Test 2';
+    john.save(callback);
+    
+    var mark = new User();
+    mark.first = 'Test';
+    mark.last = 'Test 2';
+    mark.save(callback);
   }
   
 };

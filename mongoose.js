@@ -7,6 +7,10 @@ var sys = require('sys'),
 
 Mongoose = this.Mongoose = {
   
+  _config: {
+    log: true
+  },
+  
   _models: {},
   
   _connections: {},
@@ -31,15 +35,43 @@ Mongoose = this.Mongoose = {
   },
   
   _open: function(uri, options){
-    var connection = new Connection(this, uri, options);
+    var connection = new Connection(this, uri, options), self = this;
     this._connections[url.format(uri)] = connection;
+    connection.addListener('error', function(err){
+      self._onError(connection, err);
+    });
     return connection;
+  },
+  
+  _onError: function(connection, err){
+    if (this.set('log')){
+      require('sys').log('Mongoose Error, connection: ' + url.format(connection.uri) + "\n" + err);
+    }
   },
   
   _lookup: function(uri){
     var _uri = url.format(uri);
     if (_uri in this._connections) return this._connections[_uri];
     return false;
+  },
+  
+  set: function(){
+    if (arguments.length == 1){
+      return this._config[arguments[0]];
+    } else {
+      this._config[arguments[0]] = arguments[1];
+      return this;
+    }
+  },
+  
+  enable: function(key){
+    this._config[key] = true;
+    return this;
+  },
+  
+  disable: function(key){
+    this._config[key] = false;
+    return this;
   }
   
 };

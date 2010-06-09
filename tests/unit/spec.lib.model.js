@@ -44,6 +44,10 @@ mongoose.model('User', {
     location: {
       city: function(v){
         return 'in: ' + v;
+      },
+      
+      custom: function(){
+        return 'custom';
       }
     }
     
@@ -202,6 +206,7 @@ describe 'Model'
       User = db.model('User')
       john = new User()
       john.full.should.be 'test'
+      john.location.custom.should.be 'custom'
     end
     
     it 'should not pass any arguments to a getter for which no property is defined'

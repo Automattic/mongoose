@@ -1,5 +1,6 @@
 require.paths.unshift('.')
-var mongoose = require('mongoose').Mongoose;
+var assert = require('assert'),
+    mongoose = require('mongoose').Mongoose;
 
 mongoose.model('User', {
   properties: ['first', 'last']
@@ -19,8 +20,8 @@ module.exports = {
     
     User.find({
       name: 'John'
-    }).first(function(){
-      assert(john.last == 'Lock');
+    }).first(function(john){
+      assert(john && john.last == 'Lock');
     });
   },
   

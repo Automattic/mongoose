@@ -116,8 +116,7 @@ describe 'Model'
     
     it 'should hydrate the objects'
       User = db.model('User')
-      john = new User();
-      john._hydrate({
+      john = new User({
         some: 'stuff',
         another: {
           test: 'ing',
@@ -127,7 +126,7 @@ describe 'Model'
         embedded: [{
           test: 'test'
         }]
-      })
+      },true);
       
       john.__doc.some.should.be 'stuff'
       john.__doc.likes.length.should.be 2
@@ -155,8 +154,7 @@ describe 'Model'
   
     it 'should get from a string describing a path'
       User = db.model('User')
-      john = new User()
-      john._hydrate({
+      john = new User({
         some: 'stuff',
         another: {
           test: 'ing',
@@ -166,7 +164,8 @@ describe 'Model'
         embedded: [{
           test: 'test'
         }]
-      })
+      },true);
+
       john._get('some').should.be 'stuff'
       john._get('another').should.be_type 'object'
       john._get('another.test').should.be 'ing'
@@ -177,15 +176,14 @@ describe 'Model'
     
     it 'should set from a string describing a path'
       User = db.model('User')
-      john = new User()
-      john._hydrate({
+      john = new User({
         some: 'stuff',
         another: {
           test: 'ing',
           stuff: 'app'
         }
-      })
-      
+      },true);
+
       john._set('some', 'STUFF')
       john._set('another.test', 'ING')
       john._set('another.stuff', 'APP')

@@ -30,7 +30,7 @@ mongoose.model('User', {
   getters: {
     
     last: function(v){
-      return v.toLowerCase();
+      return v ? v.toLowerCase() : '';
     },
     
     full: function(){
@@ -138,6 +138,15 @@ describe 'Model'
       john.__doc.another.should.have_property 'stuff', 'app'
       john.__doc.embedded.length.should.be 1
       john.__doc.embedded[0].should.have_property 'test', 'test'
+    end
+    
+    it 'should unlink the document from the prototype'
+      User = db.model('User')
+      
+      john = new User();
+      mark = new User();
+      john.last = 'last'
+      mark.last.should.not.be 'last'
     end
     
   end

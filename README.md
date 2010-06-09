@@ -97,10 +97,8 @@ To add a blogpost:
 
 To remove an existing one:
 
-	user.blogposts[0].remove();
+	user.blogposts[0] = null;
 	user.save();
-	
-Each embedded object is an instance of EmbeddedObject.
 
 ## API
 
@@ -295,6 +293,8 @@ You can call all of these in a row, but the callbacks will only trigger when `co
 ## Credits
 
 Nathan White &lt;nathan@learnboost.com&gt;
+
+Guillermo Rauch &lt;guillermo@learnboost.com&gt;
 
 ## License 
 

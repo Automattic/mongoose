@@ -12,22 +12,28 @@ User = db.model('User')
 
 module.exports = {
   
-  'test saving': function(){
-    var john = new User();
-    john.name = 'John';
-    john.last = 'Lock';
-    john.save();
-    
-    User.find({
-      name: 'John'
-    }).first(function(john){
-      assert.ok(john);
-      assert.equal(john.last, 'Lock');
-    });
+  'test clearing records and counting': function(){
+    User.remove({}, function(){
+      assert.ok(true)
+      User.count({}, function(c){
+        assert.equal(c, 0)
+      });
+    })
   },
   
-  'test hydration': function(){
-    
+  'test saving': function(){
+    var john = new User();
+    john.first = 'John';
+    john.last = 'Lock';
+    john.save(function(){
+      assert.ok(true);
+      User.find({
+        first: 'John'
+      }).first(function(john){
+        assert.ok(john);
+        assert.equal(john.last, 'Lock');
+      });
+    });
   }
   
 };

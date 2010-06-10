@@ -10,7 +10,7 @@ mongoose.model('User', {
       likes: [],
       dislikes: [],
       location: ['street','city'],
-      blogposts: []
+      blogposts: [['key', '']]
     }
   ],
   

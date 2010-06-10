@@ -118,6 +118,35 @@ describe 'Model'
       user.__doc.location.should.include 'city'
       user.__doc.location.should.include 'street'
     end
+    
+    it 'should generate the schema with multiple object syntax'
+      mongoose.model('Multi',{
+        properties: [
+          'name','last',
+          {likes: []},
+          {dislikes: []},
+          {blogposts: []},
+          {location: ['street','city']}
+        ]
+      });
+      Multi = db.model('Multi');
+      user = new Multi();
+      user.__doc.should.include 'name'
+      user.__doc.name.should.be_null
+      user.__doc.should.include 'likes'
+      user.__doc.likes.should.be_an Array
+      user.__doc.should.include 'dislikes'
+      user.__doc.dislikes.should.be_an Array
+      user.__doc.should.include 'blogposts'
+      user.__doc.blogposts.should.be_an Array
+      user.__doc.should.include 'last'
+      user.__doc.last.should.be_null
+      user.__doc.should.include 'location'
+      user.__doc.location.should.be_type 'object'
+      user.__doc.location.should.include 'city'
+      user.__doc.location.should.include 'street'
+    end
+    
   end
  
   describe 'Hydration'

@@ -3,7 +3,13 @@ mongoose = require('mongoose').Mongoose
     
 mongoose.model('User', {
   
-  properties: ['name', ['likes'], ['dislikes'], {location: ['street', 'city']}, [{blogposts: ['name', 'body']}], 'last'],
+  properties: [
+    'name','last',{ 
+     likes: [],
+     dislikes: [],
+     location: ['street','city'],
+     blogposts: []  
+    }],
   
   methods: {
     save: function(fn){
@@ -66,9 +72,10 @@ db = mongoose.connect('mongodb://localhost/fake') // fake!
 describe 'Model'
   
   describe 'Class generation'
+
     it 'should generate a class'
       User = db.model('User')
-      user = new User()
+      user = new User();
       user.should.be_an_instance_of Model
     end
     
@@ -94,6 +101,7 @@ describe 'Model'
     end
     
     it 'should generate the schema'
+      User = db.model('User');
       user = new User();
       user.__doc.should.include 'name'
       user.__doc.name.should.be_null
@@ -111,7 +119,7 @@ describe 'Model'
       user.__doc.location.should.include 'street'
     end
   end
-  
+ 
   describe 'Hydration'
     
     it 'should hydrate the objects'
@@ -235,6 +243,5 @@ describe 'Model'
       john.location.street.should.be 'Rockefeller St'
     end
 
-  end
-  
+  end 
 end

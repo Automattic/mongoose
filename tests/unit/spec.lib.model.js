@@ -4,12 +4,15 @@ mongoose = require('mongoose').Mongoose
 mongoose.model('User', {
   
   properties: [
-    'name','last',{ 
-     likes: [],
-     dislikes: [],
-     location: ['street','city'],
-     blogposts: []  
-    }],
+    'name',
+    'last',
+    { 
+      likes: [],
+      dislikes: [],
+      location: ['street','city'],
+      blogposts: []
+    }
+  ],
   
   methods: {
     save: function(fn){

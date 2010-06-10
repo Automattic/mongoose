@@ -25,6 +25,8 @@ In your application, add mongoose to the requires path:
 		
 		properties: ['first', 'last', 'age', 'updated_at'],
 		
+		indexes: ['first'],
+		
 		setters: {
 			first: function(v){
 				return this.v.capitalize();
@@ -134,7 +136,11 @@ To remove an existing one:
 		
 		- *getters*
 		
+			Defines getters (can be nested). If the getter matches an existing property, the existing value will be passed as the first argument.
+		
 		- *setters*
+		
+			Defines setters (can be nested). If the setter matches an existing property, the return value will be set.
 		
 		- *cast*
 		
@@ -142,12 +148,24 @@ To remove an existing one:
 		
 		- *indexes*
 		
+			An array of indexes.
+			
+			Simple indexes: ['name', 'last']
+			
+			Compound indexes: [{ name: 1, last: 1 }, ...]
+			
+			Indexes with options: ['simple', [{ name: 1 }, {unique: true}]]
+			
+			Notice that the objects that you pass are equivalent to those that you would pass to ensureIndex in MongoDB.
+		
 		- *methods*
+		
+			Methods that are added to the prototype of the model, or methods that override existing ones. For example `save` (you can call `__super__` to access the parent)
 		
 		- *static*
 		
-			The name of the MongoDB collection in your database. If not specified, defaults to the plural of the model name, in lowercase.
-	
+			Static methods that are not instance-dependent (eg: `findByAge()`)
+		
 ### Model
 
 These are methods and properties that all *model instances* already include:

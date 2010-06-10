@@ -14,6 +14,10 @@ mongoose.model('User', {
     }
   ],
   
+  cast: {
+    last: String
+  },
+  
   methods: {
     save: function(fn){
       this.__super__(fn);
@@ -275,6 +279,41 @@ describe 'Model'
       john.location.street.should.be 'Rockefeller St'
     end
 
+  end
+  
+  describe 'Casting'
+  
+    it 'should cast values to the proper type'
+      User = db.model('User')
+      user = new User()
+      user.last = 34324;
+      user.__doc.last.should.be_an String
+      user.__doc.last.should.be '34324'
+    end
+    
+    it 'should handle nested cast definitions'
+      mongoose.model('Casting',{
+        properties: [
+          'name','last','created',
+          {likes: []},
+          {dislikes: []},
+          {blogposts: []},
+          {location: ['street','city']}
+        ],
+        
+        cast: {
+          'cast': Date,
+          'location.street': Number
+        }
+        
+      });
+      Casting = db.model('Casting');
+      user = new Casting();
+      user.location.street = '3423 st.';
+      user.location.street.should.be_an Number
+      user.__doc.location.street.should.be 3423
+    end
+    
   end
   
 end

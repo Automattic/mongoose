@@ -124,11 +124,11 @@ To remove an existing one:
 		
 			To define arrays:
 		
-				properties: [ 'name', ['tags'] ]
+				properties: [ 'name', {'tags': []} ]
 		
 			To define embedded objects:
 			
-				properties: [ 'name', [{blogposts: ['title', 'body', ...]}] ]
+				properties: [ 'name', [{blogposts: [['title', 'body', ...]]}] ]
 		
 			`_id` is added automatically for all models.
 		

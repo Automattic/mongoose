@@ -275,5 +275,6 @@ describe 'Model'
       john.location.street.should.be 'Rockefeller St'
     end
 
-  end 
+  end
+  
 end

@@ -48,6 +48,28 @@ describe 'Connection'
     
   end
   
+  describe 'Collection Indexes'
+    
+    it 'should transform simple indexes into the mongodb syntax'
+      var db = mongoose.connect('mongodb://localhost/index1'),
+          collection = db.collection('index1')
+      collection._collection = null
+      collection.setIndexes([
+        'name',
+        {name: 1, last: 1},
+        [{name: 1, last: 1}, {unique: true}]
+      ])
+      collection._queued.length.should.be 3
+      collection._queued[0][1][0].should.eql [['name', 1]]
+      collection._queued[0][1][1].should.be_undefined
+      collection._queued[1][1][0].should.eql [['name', 1], ['last', 1]]
+      collection._queued[1][1][1].should.be_undefined
+      collection._queued[2][1][0].should.eql [['name', 1], ['last', 1]]
+      collection._queued[2][1][1].should.be true
+    end
+    
+  end
+  
   describe 'Models'
     
     it 'should compile classes for each Connection'

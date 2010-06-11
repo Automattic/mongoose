@@ -1,5 +1,6 @@
 Model = require('./lib/model').Model
 mongoose = require('mongoose').Mongoose
+ObjectID = require('mongodb').ObjectID
     
 mongoose.model('User', {
   
@@ -215,6 +216,7 @@ describe 'Model'
       john._get('another.test').should.be 'ing'
       john._get('another.stuff').should.be 'app'
       john._get('arrrr').should.be_an Array
+      john._get('embedded').should.be_an Array
       -{ john._get('embedded.test') }.should.throw_error /undefined/
     end
     
@@ -302,16 +304,59 @@ describe 'Model'
         ],
         
         cast: {
-          'cast': Date,
+          'created_at': Date,
+          'updated_at': Date,
           'location.street': Number
         }
         
       });
-      Casting = db.model('Casting');
-      user = new Casting();
+      var Casting = db.model('Casting'),
+          user = new Casting();
       user.location.street = '3423 st.';
       user.location.street.should.be_an Number
-      user.__doc.location.street.should.be 3423
+      user.location.street.should.be 3423
+      
+      require('sys').log(require('sys').inspect(typeof user.location.street));
+      
+      user.created_at = 'Thu, 01 Jan 1970 00:00:00 GMT-0400'
+      user.created_at.should.be_an Date
+      user.updated_at = 807937200000
+      user.updated_at.should.be_an Date
+    end
+    
+    it 'should cast arrays upon saving'
+      mongoose.model('Casting2', {
+        properties: [
+          { objects: [] }
+        ],
+        cast: {
+          'objects': ObjectID
+        }
+      })
+      
+      var Casting2 = db.model('Casting2'),
+          blogpost = new Casting2();
+      
+      blogpost.objects.push('4c04292b5e41436224a9a641', new ObjectID('f47af44b185411db1c010000'))
+      blogpost.save();
+      blogpost.objects[0].should.be_an ObjectID
+      blogpost.objects[1].should.be_an ObjectID
+    end
+    
+    it 'should cast properties beginning with _ automatically to ObjectID, including _id'
+      mongoose.model('Casting3', {
+        properties: ['_owner', '_category', '_test']
+      })
+      
+      var Casting3 = db.model('Casting3'),
+          blogpost = new Casting3();
+      blogpost._owner = '4c04292b5e41436224a9a641';
+      blogpost._category = 'f47af44b185411db1c010000';
+      blogpost._test = new ObjectID('4c04292b5e41436224a9a641');
+      
+      blogpost._owner.should.be_an ObjectID
+      blogpost._category.should.be_an ObjectID
+      blogpost._test.should.be_an ObjectID
     end
     
   end

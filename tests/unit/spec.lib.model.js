@@ -6,6 +6,7 @@ mongoose.model('User', {
   
   properties: [
     'name',
+    'first',
     'last',
     { 
       likes: [],
@@ -279,6 +280,17 @@ describe 'Model'
       john = new User();
       john.location.street = 'Rockefeller'
       john.location.street.should.be 'Rockefeller St'
+    end
+    
+    it 'should not set if value is undefined'
+      User = db.model('User')
+      john = new User();
+      john.first = 'John'
+      john.first.should.be 'John'
+      
+      john.first = undefined
+      john.first.should.be 'John'
+      
     end
 
   end

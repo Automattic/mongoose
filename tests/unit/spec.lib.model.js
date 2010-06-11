@@ -296,7 +296,7 @@ describe 'Model'
     it 'should handle nested cast definitions'
       mongoose.model('Casting',{
         properties: [
-          'name','last','created',
+          'name','last','created_at', 'updated_at','pid',
           {likes: []},
           {dislikes: []},
           {blogposts: []},
@@ -304,9 +304,10 @@ describe 'Model'
         ],
         
         cast: {
-          'created_at': Date,
-          'updated_at': Date,
-          'location.street': Number
+          created_at: Date,
+          updated_at: Date,
+          'location.street': Number,
+          pid: ObjectID
         }
         
       });
@@ -316,7 +317,8 @@ describe 'Model'
       user.location.street.should.be_an Number
       user.location.street.should.be 3423
       
-      require('sys').log(require('sys').inspect(typeof user.location.street));
+      user.pid = '4c04292b5e41436224a9a641'
+      user.pid.should.be_an ObjectID
       
       user.created_at = 'Thu, 01 Jan 1970 00:00:00 GMT-0400'
       user.created_at.should.be_an Date

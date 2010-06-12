@@ -25,6 +25,11 @@ In your application, add mongoose to the requires path:
 		
 		properties: ['first', 'last', 'age', 'updated_at'],
 		
+		cast: {
+		  age: Number,
+		  'nested.path': String
+		},
+		
 		indexes: ['first'],
 		
 		setters: {
@@ -144,7 +149,7 @@ To remove an existing one:
 		
 		- *cast*
 		
-			Defines type casting. By default, all properties beginning with `_` are cast to `ObjectID`.
+			Defines type casting. By default, all properties beginning with `_` are cast to `ObjectID`. (note: Casting an Array will cast all items in an the Array. Currently, Arrays cast when 'save' is called.)
 		
 		- *indexes*
 		

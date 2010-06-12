@@ -133,9 +133,13 @@ To remove an existing one:
 		
 				properties: [ 'name', {'tags': []} ]
 		
-			To define embedded objects:
+			To define nested objects:
 			
-				properties: [ 'name', [{blogposts: [['title', 'body', ...]]}] ]
+				properties: [ 'name', {contact: ['email', 'phone', ...]} ]
+				
+			To define array of embedded objects:
+			
+			  properties: [ 'name', {blogposts: [['title', 'body', ...]]} ]
 		
 			`_id` is added automatically for all models.
 		
@@ -149,7 +153,7 @@ To remove an existing one:
 		
 		- *cast*
 		
-			Defines type casting. By default, all properties beginning with `_` are cast to `ObjectID`. (note: Casting an Array will cast all items in an the Array. Currently, Arrays cast when 'save' is called.)
+			Defines type casting. By default, all properties beginning with `_` are cast to `ObjectID`. (note: Casting an Array will cast all items in the Array. Currently, Arrays cast when 'save' is called.)
 		
 		- *indexes*
 		

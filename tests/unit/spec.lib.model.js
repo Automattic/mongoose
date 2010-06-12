@@ -392,37 +392,40 @@ describe 'Model'
     
     it 'should not enumerate on instance private properties'
       User = db.model('User')
-      user = new User()
-      user.should.not.include '__doc'
-      user.should.not.include '_schema'
-      user.should.not.include 'isDirty'
-      user.should.not.include 'model'
+      user = new User();
+      props = {}; for(i in user) props[i] = true;
+      props.__doc.should.be_undefined
+      props._schema.should.be_undefined
+      props.isDirty.should.be_undefined
+      props.model.should.be_undefined
     end
     
     it 'should not enumerate the prototype'
       User = db.model('User')
-      user = new User()
-      user.should.not.include 'emit'
-      user.should.not.include 'addListener'
-      user.should.not.include 'removeListener'
-      user.should.not.include 'removeAllListeners'
-      user.should.not.include 'listeners'
-      user.should.not.include 'init'
-      user.should.not.include '_hydrate'
-      user.should.not.include '_error'
-      user.should.not.include '_set'
-      user.should.not.include '_get'
-      user.should.not.include '_cast'
-      user.should.not.include 'toObject'
+      user = new User();
+      props = {}; for(i in user) props[i] = true;
+      props.emit.should.be_undefined
+      props.addListener.should.be_undefined
+      props.removeListener.should.be_undefined
+      props.removeAllListners.should.be_undefined
+      props.listeners.should.be_undefined
+      props.init.should.be_undefined
+      props._hydrate.should.be_undefined
+      props._error.should.be_undefined
+      props._set.should.be_undefined
+      props._get.should.be_undefined
+      props._cast.should.be_undefined
+      props.toObject.should.be_undefined
     end
     
     it 'should not enumerate on extended properties'
-      User = db.model('User')
-      user = new User()
-      user.should.not.include 'save'
-      user.should.not.include 'remove'    
+      User = db.model('User');
+      user = new User();
+      props = {}; for(i in user) props[i] = true;
+      props['save'].should.be_undefined
+      props['remove'].should.be_undefined 
     end
-
+  /**/
   end
   
 end

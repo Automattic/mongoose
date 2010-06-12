@@ -375,4 +375,53 @@ describe 'Model'
     
   end
   
+  describe 'Enumerable Properties'
+  
+    it 'should enumerate model properties'
+      User = db.model('User')
+      user = new User()
+      user.should.not.be_undefined 'name'
+      user.should.not.be_undefined 'first'
+      user.should.not.be_undefined 'last'
+      user.should.not.be_undefined 'likes'
+      user.should.not.be_undefined 'dislikes'
+      user.should.not.be_undefined 'location'
+      user.should.not.be_undefined 'blogposts'
+      user.should.not.be_undefined '_id'    
+    end
+    
+    it 'should not enumerate on instance private properties'
+      User = db.model('User')
+      user = new User()
+      user.should.be_undefined '__doc'
+      user.should.be_undefined 'isDirty'
+      user.should.be_undefined 'model'
+    end
+    
+    it 'should not enumerate the prototype'
+      User = db.model('User')
+      user = new User()
+      user.should.be_undefined 'emit'
+      user.should.be_undefined 'addListener'
+      user.should.be_undefined 'removeListener'
+      user.should.be_undefined 'removeAllListeners'
+      user.should.be_undefined 'listeners'
+      user.should.be_undefined 'init'
+      user.should.be_undefined '_hydrate'
+      user.should.be_undefined '_error'
+      user.should.be_undefined '_set'
+      user.should.be_undefined '_get'
+      user.should.be_undefined '_cast'
+      user.should.be_undefined 'toObject'
+    end
+    
+    it 'should not enumerate on extended properties'
+      User = db.model('User')
+      user = new User()
+      user.should.be_undefined 'save'
+      user.should.be_undefined 'remove'    
+    end
+
+  end
+  
 end

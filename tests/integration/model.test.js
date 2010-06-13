@@ -1,9 +1,11 @@
 require.paths.unshift('.')
 var assert = require('assert'),
-    mongoose = require('mongoose').Mongoose;
+    mongoose = require('mongoose').Mongoose,
+    mongo = require('mongodb'),
+    ObjectID = require('mongodb/bson/bson').ObjectID;
 
 mongoose.model('User', {
-  properties: ['first', 'last']
+  properties: ['_someid', 'first', 'last']
 });
 
 module.exports = {
@@ -64,6 +66,18 @@ module.exports = {
     mark.first = 'Test';
     mark.last = 'Test 2';
     mark.save(callback);
+  },
+  
+  'test saving down objectids': function(){
+    var db = mongoose.connect('mongodb://localhost/mongoose-tests_4'),
+        User = db.model('User');
+
+    var john = new User();
+    john._someid = new mongo.ObjectID(null);
+    john.save(function(){
+      assert.ok(john._someid instanceof ObjectID);
+      db.close();
+    });
   }
   
 };

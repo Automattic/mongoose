@@ -11,7 +11,7 @@ mongoose.model('User', {
     { 
       likes: [],
       dislikes: [],
-      location: ['street','city'],
+      location: ['street','city','zip'],
       blogposts: [['key', '']]
     }
   ],
@@ -192,6 +192,15 @@ describe 'Model'
       mark = new User();
       john.last = 'last'
       mark.last.should.not.be 'last'
+    end
+    
+    it 'should unlink the document from the prototype (nested)'
+      User = db.model('User')
+      
+      john = new User();
+      mark = new User();
+      john.location.zip = 'random'
+      mark.location.zip.should.not.be 'random'
     end
     
   end

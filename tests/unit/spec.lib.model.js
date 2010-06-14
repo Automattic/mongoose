@@ -37,6 +37,10 @@ mongoose.model('User', {
     location: {
       street: function(v){
         return v + ' St';
+      },
+      
+      thezip: function(v){
+        this.zip = v;
       }
     }
     
@@ -289,6 +293,13 @@ describe 'Model'
       john = new User();
       john.location.street = 'Rockefeller'
       john.location.street.should.be 'Rockefeller St'
+    end
+    
+    it 'should handle nested fake setters'
+      User = db.model('User');
+      john = new User();
+      john.location.thezip = 505
+      john.location.zip.should.be 505
     end
     
     it 'should not set if value is undefined'

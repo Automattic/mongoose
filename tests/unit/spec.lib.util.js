@@ -146,10 +146,11 @@ describe 'Util'
       end
     
       it 'should call the "init" method only once per initialization'
-        init = function(){}
-        User = Class({ init: init })
-        User.prototype.should.receive('init', 'once').with_args('tj')
+        name = null;
+        init = function(val){ name = val; }
+        User = Class({ init: init });
         new User('tj')
+        name.should.be 'tj'
       end
     
       it 'should inherit properties of the super class'

@@ -395,4 +395,57 @@ describe 'Model'
     
   end
   
+  describe 'Enumerable Properties'
+  
+    it 'should enumerate model properties'
+      User = db.model('User')
+      user = new User()
+      user.should.include 'name'
+      user.should.include 'first'
+      user.should.include 'last'
+      user.should.include 'likes'
+      user.should.include 'dislikes'
+      user.should.include 'location'
+      user.should.include 'blogposts'
+      user.should.include '_id'
+    end
+    
+    it 'should not enumerate on instance private properties'
+      User = db.model('User')
+      user = new User();
+      props = {}; for(i in user) props[i] = true;
+      props.__doc.should.be_undefined
+      props._schema.should.be_undefined
+      props.isDirty.should.be_undefined
+      props.model.should.be_undefined
+    end
+    
+    it 'should not enumerate the prototype'
+      User = db.model('User')
+      user = new User();
+      props = {}; for(i in user) props[i] = true;
+      props.emit.should.be_undefined
+      props.addListener.should.be_undefined
+      props.removeListener.should.be_undefined
+      props.removeAllListners.should.be_undefined
+      props.listeners.should.be_undefined
+      props.init.should.be_undefined
+      props._hydrate.should.be_undefined
+      props._error.should.be_undefined
+      props._set.should.be_undefined
+      props._get.should.be_undefined
+      props._cast.should.be_undefined
+      props.toObject.should.be_undefined
+    end
+    
+    it 'should not enumerate on extended properties'
+      User = db.model('User');
+      user = new User();
+      props = {}; for(i in user) props[i] = true;
+      props['save'].should.be_undefined
+      props['remove'].should.be_undefined 
+    end
+  /**/
+  end
+  
 end

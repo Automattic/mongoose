@@ -5,7 +5,7 @@ var assert = require('assert'),
     ObjectID = require('mongodb/bson/bson').ObjectID;
 
 mongoose.model('User', {
-  properties: ['_someid', 'first', 'last']
+  properties: ['_someid', 'first', 'last', {'nested': ['test']}]
 });
 
 module.exports = {
@@ -68,16 +68,21 @@ module.exports = {
     mark.save(callback);
   },
   
-  'test saving down objectids': function(){
+  'test saving and searching for nested': function(){
     var db = mongoose.connect('mongodb://localhost/mongoose-tests_4'),
         User = db.model('User');
 
-    var john = new User();
-    john._someid = new mongo.ObjectID(null);
-    john.save(function(){
-      assert.ok(john._someid instanceof ObjectID);
-      db.close();
-    });
+    User.remove({}, function(){
+      var john = new User();
+      john.first = 'john';
+      john.nested.test = 'ok';
+      john.save(function(){
+        User.find({ 'nested.test': 'ok' }).one(function(john){
+          assert.equal(john.first, 'john');
+          db.close();
+        });
+      });
+    })
   }
   
 };

@@ -35,6 +35,8 @@ module.exports = {
       }).first(function(john){
         assert.ok(john);
         assert.ok(john instanceof User);
+        assert.ok(john._id);
+        assert.ok(john._id.toHexString);
         assert.equal(john.last, 'Lock');
         db.close();
       });
@@ -90,13 +92,13 @@ module.exports = {
         User = db.model('User'),
         _completed = 0,
         complete = function(){
-          if (_completed++ == 2) db.close();
+          if (++_completed == 2) db.close();
         };
     var john = new User();
     john.first = 'John';
     john.last = 'Lock';
     john.save(function(){
-      
+
       User.findById(john._id, function(john){
         assert.equal(john.first, 'John');
         complete();

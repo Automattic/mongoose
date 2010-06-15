@@ -240,11 +240,11 @@ describe 'Util'
   
   describe 'object'
     describe 'mixin'    
-      it 'should merge objects when a getter returns an object'
-        obj = {}; contact = {phone: '555-555-5555'};
-        obj.__defineGetter__('contact',function(){ return contact; });
-        object.mixin(true,obj, {contact:{email: 'nw@nwhite.net'}} );
-      end
+      // it 'should merge objects when a getter returns an object'
+      //   obj = {}; contact = {phone: '555-555-5555'};
+      //   obj.__defineGetter__('contact',function(){ return contact; });
+      //   object.mixin(true,obj, {contact:{email: 'nw@nwhite.net'}} );
+      // end
     end
   end
 end

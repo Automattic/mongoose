@@ -1,6 +1,7 @@
 query = require('./lib/query')
 Promise = query.Promise
 Writer = query.Writer
+ObjectID = require('mongodb').ObjectID
 
 describe 'Query'
   
@@ -26,6 +27,14 @@ describe 'Query'
       writer = new Writer()
       writer.where('something', 'ok')
       writer._query.something.should.be 'ok'
+    end
+    
+    it 'should cast object ids in the query object'
+      writer = new Writer();
+      writer.where('_something', '4c1781fae728161040ce6293');
+      writer.where('_else', ObjectID.createFromHexString('4c1781fae728161040ce6293'));
+      writer._query._something.should.be_an ObjectID
+      writer._query._else.should.be_an ObjectID
     end
     
     it 'should support objects for the where modifier'

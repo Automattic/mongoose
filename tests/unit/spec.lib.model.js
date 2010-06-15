@@ -457,8 +457,8 @@ describe 'Model'
       user.__doc.first.should.equal 'Nathan'
       user.last.should.equal 'white'
       user.__doc.last.should.equal 'White'
-      user.invalid.should.equal 'field'
-      user.__doc.invalid.should.equal undefined 
+      // user.invalid.should.equal 'field'
+      // user.__doc.invalid.should.equal undefined 
     end
     
     it 'should populated nested properties'

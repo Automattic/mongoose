@@ -33,8 +33,9 @@ module.exports = {
     var john = new User();
     john.first = 'John';
     john.last = 'Lock';
-    john._someid = '213321231321321';
-    john._someother = new ObjectID('213321231321321');
+    john._someid = 'ff7d174cff9f00c9a0141c00';
+    john._someother = ObjectID.createFromHexString('ff7d174cff9f00c9a0141c00');
+    
     john.save(function(){
       User.find({
         last: 'Lock'

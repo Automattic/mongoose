@@ -83,6 +83,31 @@ module.exports = {
         });
       });
     })
+  },
+  
+  'test finding by id': function(){
+    var db = mongoose.connect('mongodb://localhost/mongoose-tests_5'),
+        User = db.model('User'),
+        _completed = 0,
+        complete = function(){
+          if (_completed++ == 2) db.close();
+        };
+    var john = new User();
+    john.first = 'John';
+    john.last = 'Lock';
+    john.save(function(){
+      
+      User.findById(john._id, function(john){
+        assert.equal(john.first, 'John');
+        complete();
+      });
+      
+      User.findById(john._id.toHexString(), function(john){
+        assert.equal(john.last, 'Lock');
+        complete();
+      });
+      
+    });
   }
   
 };

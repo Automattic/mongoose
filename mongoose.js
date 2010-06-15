@@ -45,7 +45,7 @@ Mongoose = this.Mongoose = {
   
   _onError: function(connection, err){
     if (this.set('log')){
-      require('sys').log('Mongoose Error, connection: ' + url.format(connection.uri) + "\n" + err);
+      sys.log('Mongoose Error, connection: ' + url.format(connection.uri) + "\n" + err);
     }
   },
   

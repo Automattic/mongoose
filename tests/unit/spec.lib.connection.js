@@ -1,5 +1,5 @@
 mongoose = require('mongoose').Mongoose
-mocks = require('specs')
+mocks = require('tests')
 conn = require('./lib/connection')
 
 describe 'Connection'

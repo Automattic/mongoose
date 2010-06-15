@@ -99,12 +99,45 @@ describe 'Model'
       User.findByLast.should.not.be_undefined
     end
     
+    it 'should add event emitter to the static methods'
+      test = 0
+      User = db.model('User')
+      User.addListener('test', function(){
+        test = 1
+      });
+      User.emit('test');
+      test.should.be 1
+    end
+    
     it 'should add the prototype methods'
       User = db.model('User')
       User.prototype.newMethod.should.not.be_undefined
       user = new User();
       -{ user.save(); }.should.not.throw_error
       user.newMethod.should.not.be_undefined
+    end
+    
+    it 'should add a reference to the static to the prototype'
+      User = db.model('User')
+      user = new User();
+      user.static.should.be User
+    end
+    
+    it 'should fire two notifications, one at instance level, one at model level'
+      notifications = 0
+    
+      User = db.model('User')
+      User.addListener('test', function(a, b){
+        if (a == 'ok' && b instanceof User) notifications++;
+      });
+      
+      user = new User();
+      user.addListener('test', function(a, b){
+        if (a == 'ok' && b == undefined) notifications++;
+      })
+      user.fire('test', 'ok');
+
+      notifications.should.be 2
     end
     
     it 'should add the connection the prototype'

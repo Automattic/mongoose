@@ -1,7 +1,7 @@
 require.paths.unshift('.', 'lib', 'tests/unit', 'tests/unit/support/jspec/lib')
 require('jspec')
 mongoose = require('mongoose')
-specs = require('specs')
+specs = require('tests')
 connection = require('./lib/connection');
 connection.Connection = specs.MockConnection;
 

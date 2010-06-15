@@ -1,50 +1,58 @@
-require.paths.unshift('.')
+require.paths.unshift('.', 'lib')
 var assert = require('assert'),
     mongoose = require('mongoose').Mongoose,
     mongo = require('mongodb'),
     ObjectID = require('mongodb/bson/bson').ObjectID;
 
+require('tests');
+
 mongoose.model('User', {
-  properties: ['_someid', 'first', 'last', {'nested': ['test']}]
+  properties: ['_someid', '_someother', 'first', 'last', {'nested': ['test']}]
 });
 
 module.exports = {
   
   'test clearing records and counting': function(){
-    var db = mongoose.connect('mongodb://localhost/mongoose-tests'),
+    var db = mongoose.test(),
         User = db.model('User');
-    User.remove({}, function(){
-      assert.ok(true)
-      User.count({}, function(c){
-        assert.equal(c, 0)
-        db.close();
+    var u = new User();
+    u.first = 'Test';
+    u.save(function(){
+      User.remove({}, function(){
+        User.count({}, function(c){
+          assert.equal(c, 0)
+          db.terminate();
+        });
       });
-    })
+    });
   },
   
   'test saving and hydration': function(){
-    var db = mongoose.connect('mongodb://localhost/mongoose-tests_2'),
+    var db = mongoose.test(),
         User = db.model('User');
     var john = new User();
     john.first = 'John';
     john.last = 'Lock';
+    john._someid = '213321231321321';
+    john._someother = new ObjectID('213321231321321');
     john.save(function(){
-      assert.ok(true);
       User.find({
-        first: 'John'
+        last: 'Lock'
       }).first(function(john){
         assert.ok(john);
         assert.ok(john instanceof User);
         assert.ok(john._id);
         assert.ok(john._id.toHexString);
+        assert.ok(john._someid.toHexString);
+        assert.ok(john._someother.toHexString);
         assert.equal(john.last, 'Lock');
-        db.close();
+        db.terminate();
       });
     });
   },
   
   'test finding many bypassing hydration': function(){
-    var db = mongoose.connect('mongodb://localhost/mongoose-tests_3'),
+    var db = mongoose.test(),
         User = db.model('User'), 
         _count = 0,
         callback = function(){
@@ -54,7 +62,7 @@ module.exports = {
               assert.ok(res.length);
               assert.ok(typeof res[0] == 'object')
               assert.ok(! (res[0] instanceof User))
-              db.close();
+              db.terminate();
             });
           }
         };
@@ -71,7 +79,7 @@ module.exports = {
   },
   
   'test saving and searching for nested': function(){
-    var db = mongoose.connect('mongodb://localhost/mongoose-tests_4'),
+    var db = mongoose.test(),
         User = db.model('User');
 
     User.remove({}, function(){
@@ -81,18 +89,18 @@ module.exports = {
       john.save(function(){
         User.find({ 'nested.test': 'ok' }).one(function(john){
           assert.equal(john.first, 'john');
-          db.close();
+          db.terminate();
         });
       });
     })
   },
   
   'test finding by id': function(){
-    var db = mongoose.connect('mongodb://localhost/mongoose-tests_5'),
+    var db = mongoose.test(),
         User = db.model('User'),
         _completed = 0,
         complete = function(){
-          if (++_completed == 2) db.close();
+          if (++_completed == 2) db.terminate();
         };
     var john = new User();
     john.first = 'John';

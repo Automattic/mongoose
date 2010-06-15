@@ -445,7 +445,29 @@ describe 'Model'
       props['save'].should.be_undefined
       props['remove'].should.be_undefined 
     end
-  /**/
+
+  end
+  
+  describe 'Data Population'
+  
+    it 'should populate data when object passed on initialization'
+      User = db.model('User');
+      user = new User({first: 'Nathan', last: 'White', invalid: 'field'});
+      user.first.should.equal 'Nathan'
+      user.__doc.first.should.equal 'Nathan'
+      user.last.should.equal 'white'
+      user.__doc.last.should.equal 'White'
+      user.invalid.should.equal 'field'
+      user.__doc.invalid.should.equal undefined 
+    end
+    
+    it 'should populated nested properties'
+      User = db.model('User')
+      user = new User({location: {street: 'Mission'}})
+      user.location.street.should.equal 'Mission St'
+      user.__doc.location.street.should.equal 'Mission St'
+    end
+  
   end
   
 end

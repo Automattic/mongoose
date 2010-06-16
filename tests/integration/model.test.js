@@ -1,10 +1,10 @@
-require.paths.unshift('.', 'lib')
+require.paths.unshift('.')
 var assert = require('assert'),
     mongoose = require('mongoose').Mongoose,
     mongo = require('mongodb'),
     ObjectID = require('mongodb/bson/bson').ObjectID;
 
-require('tests');
+require('lib/tests');
 
 mongoose.model('User', {
   properties: ['_someid', '_someother', 'first', 'last', {'nested': ['test']}]

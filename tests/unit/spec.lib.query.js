@@ -127,6 +127,14 @@ describe 'Query'
       promise._queues.length.should.be 2
     end
     
+    it 'should allow empty promises'
+      promise = new Promise();
+      promise.get()
+      promise.one()
+      
+      -{ promise.complete([]) }.should.not.throw_error
+    end
+    
   end
   
 end

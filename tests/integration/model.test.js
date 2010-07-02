@@ -119,6 +119,35 @@ module.exports = {
       });
       
     });
+  },
+  
+  'test isNew / removing': function(){
+    var db = mongoose.test(),
+        User = db.model('User');
+        
+    var john = new User();
+    john.first = 'John';
+    john.last = 'Lock';
+    
+    assert.ok(john.isNew);
+    
+    john.save(function(){
+      
+      assert.ok(! john.isNew);
+      
+      User.find({}).all(function(docs){
+        assert.ok(docs.length == 1);
+        john.remove(function(){
+          
+          User.find({}).all(function(docs){
+            assert.ok(docs.length == 0);
+            db.terminate();
+          });
+          
+        });
+      });
+    
+    });
   }
   
 };

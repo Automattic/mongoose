@@ -447,7 +447,7 @@ describe 'Model'
       User = db.model('User')
       user = new User();
       props = {}; for(i in user) props[i] = true;
-      props.__doc.should.be_undefined
+      // props.__doc.should.be_undefined
       props._schema.should.be_undefined
       props.isDirty.should.be_undefined
       props.model.should.be_undefined

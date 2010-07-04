@@ -18,9 +18,9 @@ The goal of Mongoose is to provide a extremely simple interface for MongoDB.
    on top of which Mongoose runs
 3. Run this to install:
 
-    git clone http://github.com/LearnBoost/mongoose.git
-    cd mongoose
-    sudo npm install .
+        git clone http://github.com/LearnBoost/mongoose.git
+        cd mongoose
+        sudo npm install .
 
 
 ## How to use

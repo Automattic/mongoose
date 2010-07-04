@@ -10,13 +10,25 @@ The goal of Mongoose is to provide a extremely simple interface for MongoDB.
 - Ability to model your data with custom interfaces.
 - Allows for complex business logic in an async way (see `Promises`).
 
+
+## How to install
+
+#. Install the [npm](http://github.com/isaacs/npm) package manager
+#. Install [node-mongodb-native](http://github.com/christkv/node-mongodb-native),
+   on top of which Mongoose runs
+#. Run this to install:
+
+    git clone http://github.com/LearnBoost/mongoose.git
+    cd mongoose
+    sudo npm install .
+
+
 ## How to use
 
 ### Setup
 
-In your application, add mongoose to the requires path:
+Simply require Mongoose:
 
-	require.paths.unshift('vendor/mongoose');
 	var mongoose = require('mongoose').Mongoose;
 
 ### Defining a model

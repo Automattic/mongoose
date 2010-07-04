@@ -13,10 +13,10 @@ The goal of Mongoose is to provide a extremely simple interface for MongoDB.
 
 ## How to install
 
-#. Install the [npm](http://github.com/isaacs/npm) package manager
-#. Install [node-mongodb-native](http://github.com/christkv/node-mongodb-native),
+1. Install the [npm](http://github.com/isaacs/npm) package manager
+2. Install [node-mongodb-native](http://github.com/christkv/node-mongodb-native),
    on top of which Mongoose runs
-#. Run this to install:
+3. Run this to install:
 
     git clone http://github.com/LearnBoost/mongoose.git
     cd mongoose

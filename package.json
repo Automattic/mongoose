@@ -1,0 +1,18 @@
+{ "name":           "mongoose"
+, "version":        "0.0.1"
+, "author":         "LearnBoost"
+, "email":          "dev@learnboost.com"
+, "licenses":   [ { "type": "The MIT License"
+                  , "url":  "http://www.opensource.org/licenses/mit-license.php" } ]
+, "githubName":     "mongoose"
+, "type":           "tar"
+, "location":       "http://github.com/LearnBoost/mongoose/tarball/master"
+, "main":           "./mongoose"
+, "keywords":     [ "mongoose"
+                  , "mongo"
+                  , "mongodb"
+                  , "orm"
+                  , "node" ]
+, "engines":      ["node" ]
+, "directories":  { "lib": "./lib" }
+}

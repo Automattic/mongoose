@@ -193,6 +193,12 @@ describe 'Model'
       user.__doc.location.should.include 'street'
     end
     
+    it 'should generate an ObjectID at creation'
+      User._connection.should.be db
+      user = new User()
+      user._id.toHexString().should.be_type 'string'
+      user._id.toHexString().length.should.be 24   
+    end
   end
  
   describe 'Hydration'

@@ -193,6 +193,22 @@ describe 'Model'
       user.__doc.location.should.include 'street'
     end
     
+    it 'should handle model definition variants'
+      mongoose.model('Variant',{
+        properties: [
+          '_sid', 
+          {
+            name: ['prefix', 'first', 'middle', 'last'],
+            notes: []
+          },
+          'missing'
+        ]
+      });
+      Variant = db.model('Variant');
+      variant = new Variant();
+      variant.__doc.missing.should.be null
+    end
+    
     it 'should generate an ObjectID at creation'
       User._connection.should.be db
       user = new User()

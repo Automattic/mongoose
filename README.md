@@ -10,19 +10,28 @@ The goal of Mongoose is to provide a extremely simple interface for MongoDB.
 - Ability to model your data with custom interfaces.
 - Allows for complex business logic in an async way (see `Promises`).
 
+## Installation
 
-## How to install
+### As a submodule of your project (recommended)
 
-1. Install the [npm](http://github.com/isaacs/npm) package manager
-2. Install [node-mongodb-native](http://github.com/christkv/node-mongodb-native),
-   on top of which Mongoose runs
-3. Run this to install:
+  git submodule add git://github.com/LearnBoost/mongoose.git {path/to/mongoose}
+  git submodule update --init --recursive
+  
+Example paths: `support/mongoose`, `vendor/mongoose`.
+  
+### Cloning the repository (mainly for making changes to mongoose)
+  
+  git clone git://github.com/LearnBoost/mongoose.git --recursive
+  cd mongoose
+  
+### With npm
 
-        git clone http://github.com/LearnBoost/mongoose.git
-        cd mongoose
-        sudo npm install .
+  npm install http://github.com/learnboost/mongoose/tree/0.0.2
+  
+### With Kiwi
 
-
+  kiwi install mongoose
+  
 ## How to use
 
 ### Setup

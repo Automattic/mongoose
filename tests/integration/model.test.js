@@ -47,6 +47,7 @@ module.exports = {
         assert.ok(john._someid.toHexString);
         assert.ok(john._someother.toHexString);
         assert.equal(john.last, 'Lock');
+		assert.ok(!john.isNew);
         db.terminate();
       });
     });
@@ -61,8 +62,9 @@ module.exports = {
             User.find({}, false).all(function(res){
               assert.ok(res instanceof Array);
               assert.ok(res.length);
-              assert.ok(typeof res[0] == 'object')
-              assert.ok(! (res[0] instanceof User))
+              assert.ok(typeof res[0] == 'object');
+              assert.ok(! (res[0] instanceof User));
+			  assert.ok(!john.isNew);
               db.terminate();
             });
           }
@@ -110,11 +112,13 @@ module.exports = {
 
       User.findById(john._id, function(john){
         assert.equal(john.first, 'John');
+		assert.ok(!john.isNew);
         complete();
       });
       
       User.findById(john._id.toHexString(), function(john){
         assert.equal(john.last, 'Lock');
+		assert.ok(!john.isNew);
         complete();
       });
       
@@ -136,6 +140,7 @@ module.exports = {
       assert.ok(! john.isNew);
       
       User.find({}).all(function(docs){
+	    assert.ok(!john.isNew);
         assert.ok(docs.length == 1);
         john.remove(function(){
           

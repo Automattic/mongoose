@@ -92,12 +92,27 @@ describe 'Query'
       promise.get(function(){})
       promise.complete([]);
       promise._queues[0].should.be_null
-      right_away = false;
+      right_away = 0;
       promise.get(function(){
-        right_away = true;
+        right_away++;
+      })
+      promise.all(function(){
+        right_away++;
+      })
+      promise.last(function(){
+        right_away++;
       })
       promise._queues[0].should.be_null
-      right_away.should.be true
+      right_away.should.be 3
+    end
+    
+    it 'should fire callback immediately if it was completed before any callbacks were added'
+      right_away = 0;
+      promise = new Promise();
+      promise.complete([])
+      promise.get(function(){ right_away++ })
+      promise.all(function(){ right_away++ })
+      right_away.should.be 2
     end
     
     it 'should stash'

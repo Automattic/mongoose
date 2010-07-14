@@ -92,8 +92,12 @@ describe 'Query'
       promise.get(function(){})
       promise.complete([]);
       promise._queues[0].should.be_null
-      promise.get(function(){})
+      right_away = false;
+      promise.get(function(){
+        right_away = true;
+      })
       promise._queues[0].should.be_null
+      right_away.should.be true
     end
     
     it 'should stash'

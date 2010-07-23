@@ -1,4 +1,4 @@
-query = require('./lib/query')
+query = require('lib/query')
 Promise = query.Promise
 Writer = query.Writer
 ObjectID = require('mongodb').ObjectID

@@ -1,4 +1,4 @@
-Model = require('./lib/model').Model
+Model = require('lib/model').Model
 mongoose = require('mongoose').Mongoose
 ObjectID = require('mongodb').ObjectID
     

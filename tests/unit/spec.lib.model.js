@@ -448,6 +448,19 @@ describe 'Model'
       blogpost._test.should.be_an ObjectID
     end
     
+    it 'should allow array assignment with casters'
+      var Casting2 = db.model('Casting2'),
+          blogpost = new Casting2();
+          
+      blogpost.objects = '4c04292b5e41436224a9a641';
+      blogpost.objects.length.should.equal 1
+      blogpost.objects.should.be_an Array
+      
+      blogpost.objects = ['4c04292b5e41436224a9a641', new ObjectID('f47af44b185411db1c010000')];
+      blogpost.objects.length.should.equal 2
+
+    end
+    
   end
   
   describe 'Enumerable Properties'

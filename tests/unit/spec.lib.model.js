@@ -458,7 +458,23 @@ describe 'Model'
       
       blogpost.objects = ['4c04292b5e41436224a9a641', new ObjectID('f47af44b185411db1c010000')];
       blogpost.objects.length.should.equal 2
+    end
 
+    it 'should cast Date types and handle empty strings'
+      var Casting = db.model('Casting'),
+          user = new Casting();
+          
+      user.updated_at = 807937200000
+      user.created_at.should.be null
+      user.updated_at.should.be_an Date
+      
+      user.created_at = 'Dec 25, 1995'
+      user.created_at.should.be_an Date
+      user.created_at.getFullYear().should.be 1995
+      
+      user.created_at = '  '
+      user.created_at.should.be null
+      
     end
 
   end

@@ -7,9 +7,7 @@ connection.Connection = test.MockConnection;
 
 function run(specs) {
   [].concat(specs).forEach(function(spec){
-    src = 'tests/unit/spec.' + spec + '.js';
-    console.log(src);
-    JSpec.exec(src)
+    JSpec.exec('tests/unit/spec.' + spec + '.js')
   })
 }
 

@@ -286,7 +286,7 @@ describe 'Model'
       john._get('another.stuff').should.be 'app'
       john._get('arrrr').should.be_an Array
       john._get('embedded').should.be_an Array
-      -{ john._get('embedded.test') }.should.throw_error /undefined/
+      john._get('embedded.test.me').should.be null
     end
     
     it 'should set from a string describing a path'

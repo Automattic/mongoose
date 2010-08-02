@@ -460,7 +460,7 @@ describe 'Model'
       blogpost.objects.length.should.equal 2
 
     end
-    
+
   end
   
   describe 'Enumerable Properties'

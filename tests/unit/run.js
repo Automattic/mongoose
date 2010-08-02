@@ -1,13 +1,15 @@
 require.paths.unshift('.', 'lib', 'tests/unit', 'tests/unit/support/jspec/lib')
 require('jspec')
 mongoose = require('mongoose')
-specs = require('tests')
+test = require('lib/tests')
 connection = require('lib/connection');
-connection.Connection = specs.MockConnection;
+connection.Connection = test.MockConnection;
 
 function run(specs) {
   [].concat(specs).forEach(function(spec){
-    JSpec.exec('tests/unit/spec.' + spec + '.js')
+    src = 'tests/unit/spec.' + spec + '.js';
+    console.log(src);
+    JSpec.exec(src)
   })
 }
 

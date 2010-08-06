@@ -47,7 +47,7 @@ module.exports = {
         assert.ok(john._someid.toHexString);
         assert.ok(john._someother.toHexString);
         assert.equal(john.last, 'Lock');
-		assert.ok(!john.isNew);
+        assert.ok(!john.isNew);
         db.terminate();
       });
     });
@@ -64,7 +64,7 @@ module.exports = {
               assert.ok(res.length);
               assert.ok(typeof res[0] == 'object');
               assert.ok(! (res[0] instanceof User));
-			  assert.ok(!john.isNew);
+              assert.ok(!john.isNew);
               db.terminate();
             });
           }
@@ -112,13 +112,13 @@ module.exports = {
 
       User.findById(john._id, function(john){
         assert.equal(john.first, 'John');
-		assert.ok(!john.isNew);
+        assert.ok(!john.isNew);
         complete();
       });
       
       User.findById(john._id.toHexString(), function(john){
         assert.equal(john.last, 'Lock');
-		assert.ok(!john.isNew);
+        assert.ok(!john.isNew);
         complete();
       });
       

@@ -1,18 +1,12 @@
-{ "name":           "mongoose"
-, "version":        "0.0.1"
-, "author":         "LearnBoost"
-, "email":          "dev@learnboost.com"
-, "licenses":   [ { "type": "The MIT License"
-                  , "url":  "http://www.opensource.org/licenses/mit-license.php" } ]
-, "githubName":     "mongoose"
-, "type":           "tar"
-, "location":       "http://github.com/LearnBoost/mongoose/tarball/master"
-, "main":           "./mongoose"
-, "keywords":     [ "mongoose"
-                  , "mongo"
-                  , "mongodb"
-                  , "orm"
-                  , "node" ]
-, "engines":      ["node" ]
+{ "name": "mongoose"
+, "description":  "ORM for MongoDB"
+, "version":  "0.0.3"
+, "author": "LearnBoost <dev@learnboost.com>"
+, "dependencies": { "mongodb": "0.7.9"}
+, "keywords": [ "mongoose", "mongo", "mongodb", "orm", "nosql" ]
 , "directories":  { "lib": "./lib" }
+, "scripts": { "test": "make test" }
+, "engines": { "node": ">= 0.1.101" }
+, "main": "./mongoose"
+, "licenses": [ { "type": "The MIT License", "url": "http://www.opensource.org/licenses/mit-license.php" } ]
 }

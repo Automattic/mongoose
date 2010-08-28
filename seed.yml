@@ -1,8 +1,0 @@
----
-  name: Mongoose
-  description: MongoDB ODM wrapper
-  lib: .
-  version: 0.0.1
-  dependencies:
-    - mongodb-native >= 0.7.3
- 

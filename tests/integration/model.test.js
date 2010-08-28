@@ -153,6 +153,19 @@ module.exports = {
       });
     
     });
+  },
+  
+  'test merging into object': function(){
+    var db = mongoose.test(),
+        User = db.model('User');
+        
+        var nate = new User({first: 'Nathan', last: 'White'});
+        assert.equal(nate.first,'Nathan');
+        nate.save(function(){
+          nate.merge({nested: {test: 'me'}});
+          assert.equal(nate.nested.test, 'me');
+          db.terminate();
+        });
   }
   
 };

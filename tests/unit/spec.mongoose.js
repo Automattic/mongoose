@@ -1,5 +1,5 @@
-mongoose = require('mongoose').Mongoose
-Connection = require('lib/connection').Connection
+mongoose = require('.').Mongoose
+Connection = require('connection').Connection
 
 describe 'Mongoose'
   

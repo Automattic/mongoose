@@ -1,7 +1,6 @@
-mongoose = require('mongoose').Mongoose
-mocks = require('lib/tests')
-conn = require('lib/connection')
-
+mongoose = require('.').Mongoose
+mocks = require('tests')
+conn = require('connection')
 describe 'Connection'
   
   describe 'Collections'

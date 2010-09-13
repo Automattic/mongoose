@@ -19,15 +19,16 @@ module.exports = {
       clearTimeout(timer);
       assert.ok(mongoose.connected, 'Connected using uri / callback signature');
       
-      mongoose.disconnect();
-      assert.ok(!mongoose.disconnected);
-      
-      var timer = timeout(mongoose);
-      mongoose.connect('mongodb://localhost/' + now(), { some: 'option' }, function(){
-        clearTimeout(timer);
-        assert.ok(mongoose.connected, 'Connected using uri / options / callback signature');
-        mongoose.disconnect();
-      })
+      mongoose.disconnect(function(){
+        assert.ok(!mongoose.connected);
+        
+        var timer = timeout(mongoose);
+        mongoose.connect('mongodb://localhost/' + now(), { some: 'option' }, function(){
+          clearTimeout(timer);
+          assert.ok(mongoose.connected, 'Connected using uri / options / callback signature');
+          mongoose.disconnect();
+        });
+      });
     });
   }
   

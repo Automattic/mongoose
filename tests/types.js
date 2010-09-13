@@ -9,7 +9,6 @@ module.exports = {
         
     assert.ok(typeof type == 'function');
     assert.ok(str.type == 'string');
-    assert.ok(str.getters.length == 1);
     assert.ok(str.setters.length == 1);
   }
   

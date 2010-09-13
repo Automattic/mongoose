@@ -19,7 +19,7 @@ module.exports = {
         timer = timeout(mongoose);
     mongoose.connect('mongodb://localhost/' + now(), function(){
       clearTimeout(timer);
-      assert.ok(mongoose.connected, 'Connected using uri / callback signature');
+      assert.ok(mongoose.connected, 'It should connect using uri / callback signature');
       
       mongoose.disconnect(function(){
         assert.ok(!mongoose.connected);
@@ -27,7 +27,7 @@ module.exports = {
         var timer = timeout(mongoose);
         mongoose.connect('mongodb://localhost/' + now(), { some: 'option' }, function(){
           clearTimeout(timer);
-          assert.ok(mongoose.connected, 'Connected using uri / options / callback signature');
+          assert.ok(mongoose.connected, 'It should connect using uri / options / callback signature');
           mongoose.disconnect();
         });
       });
@@ -45,6 +45,17 @@ module.exports = {
     var instance = new mongoose.SingletonModel();
     assert.ok(instance instanceof mongoose.SingletonModel);
     assert.ok(instance instanceof Model);
+  },
+  
+  'test defining a model name that conflicts with an internal method': function(){
+    var document = mongoose.define,
+        conflict = false;
+    try {
+      document('disconnect')
+    } catch(e){
+      if (/choose/.test(e.toString())) conflict = true;
+    }
+    assert.ok(conflict, 'There should be a name conflict');
   }
   
 };

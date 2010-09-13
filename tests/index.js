@@ -1,5 +1,6 @@
-var assert = require('assert'),
-    mongoose = require('../');
+var assert = require('assert')
+  , mongoose = require('../')
+  , Model = require('../lib/mongoose/model');
 
 function now(){
   return Math.round(Date.now() + Math.random() * 100);
@@ -31,6 +32,19 @@ module.exports = {
         });
       });
     });
+  },
+  
+  'test accessing a model from the mongoose singleton': function(){
+    var document = mongoose.define;
+    document('SingletonModel')
+      .setters({
+        'onekey': function(){},
+        'twokey': function(){}
+      })
+      .indexes({ 'some.key': -1 });
+    var instance = new mongoose.SingletonModel();
+    assert(instance instanceof mongoose.SingletonModel);
+    assert(instance instanceof Model);
   }
   
 };

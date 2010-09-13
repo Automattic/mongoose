@@ -20,7 +20,7 @@ module.exports = {
     assert.ok(pluralize('sheep') == 'sheep');
     assert.ok(pluralize('information') == 'information');
     assert.ok(pluralize('money') == 'money');
-    assert.ok(pluralize('virus') == 'viruses');
+    assert.ok(pluralize('virus') == 'viri');
     assert.ok(pluralize('test') == 'tests');
     assert.ok(pluralize('bully') == 'bullies');
     assert.ok(pluralize('survey') == 'surveys');

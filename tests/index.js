@@ -43,8 +43,8 @@ module.exports = {
       })
       .indexes({ 'some.key': -1 });
     var instance = new mongoose.SingletonModel();
-    assert(instance instanceof mongoose.SingletonModel);
-    assert(instance instanceof Model);
+    assert.ok(instance instanceof mongoose.SingletonModel);
+    assert.ok(instance instanceof Model);
   }
   
 };

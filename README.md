@@ -1,7 +1,7 @@
 Mongoose: MongoDB ODM/ORM
 =========================
 
-The goal of Mongoose is to provide a extremely simple interface for MongoDB. 
+The goal of Mongoose is to provide a simple interface for MongoDB.
 
 ## Features
 
@@ -26,13 +26,7 @@ Example paths: `support/mongoose`, `vendor/mongoose`.
   
 ### With npm
 
-  npm install http://github.com/learnboost/mongoose/tree/0.0.2
-  
-### With Kiwi
-
-  kiwi install mongoose
-  
-## How to use
+  npm install mongoose
 
 ### Setup
 
@@ -41,93 +35,230 @@ Simply require Mongoose:
     require.paths.unshift('vendor/mongoose');
     var mongoose = require('mongoose').Mongoose;
 
+## How to Use
+
 ### Defining a model
 
-    mongoose.model('User', {
+Mongoose utilizes chaining for defining models. 
+
+**Chaining allows:**
+
+- nested structure to be easily visible.
+- automatically define casting for all properties.
+- easy to extend.
+ 
+example:
+ 
+    document = mongoose.define;
+  
+    User = document('User')
+      .oid('_id')
+      .object('name', 
+        document()
+          .string('prefix')
+          .string('first')
+          .string('last'))
+      .number('age')
+      .array('friends')
+      .array('notifications', 
+        document()
+          .date('date')
+          .string('type')
+          .boolean('read'))
+          
+### Mongoose Model Properties
+
+- **types** (see Types)
+- **type helpers**
+  - get
+  - set
+  - validate
+  - cast // shortcut to override initial (first) setter.
+- **task(name,fn)**
+- **pre(name,fn)**
+- **post(name,fn)**
+- **static(name,fn)**
+
+### Mongoose Types
+
+- **document([model [,collection]])** 
+  - *model* defines the name of the model, undefined for sub documents
+  - *collection* if defined the collection name used when connecting to Mongo. If not defined mongoose lowercases model and adds 's'.
+- **object(name, document)**
+- **array(name [,type])**
+  - *type* optional. A string of a defined mongoose type, auto-casts all items in array as type. If type is a document creates an array of sub documents.
+- **oid(name)** eases handling of Mongos ObjectID type.
+- **string(name)**
+- **number(name)**
+- **boolean(name)**
+- **date(name)**
+- **virtual(name)** Used for defining properties that are helpers to the model, but aren't a part of the model.
+- **plugin(fn)** (see 'Plugins')
+
+### Defining Types
+
+- Types can extend other types. 
+- Properties can have multiple getters, setters, validators.
+- Getters bubble up.
+- Setters bubble down.
+
+example:
+
+    type = mongoose.type;
+
+    type('string')
+      .get(function(document,key,type){
+        return document[key];
+      })
+      .set(function(val,document,key,type){
+        return (typeof val == 'string') ? val : val+'';
+      });
+    
+    type('email')
+      .extend('string')
+      .validate('email',function(value,callback){
+        return callback( /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/.test(value) )
+      });
+
+### Tasks
+
+Mongoose adds the concept of tasks (actions) to models. Tasks allows you to run actions before, during and after a task. Mongoose core has three predefined tasks:
+
+- hydrate
+- save
+- remove
+
+In addition to these tasks, Mongoose allows for custom tasks using the 'task' keyword in the model definition. Tasks have pre and post actions that can be triggered to help with proper flow control of logic and actions on your data.
+
+    .pre('save', function(complete){
+      doSomethingAsync(function(){
+        complete();
+      })
+    })
+    
+- **pre(name, fn)**
+  Logic that needs to be executed before a task or method
+- **post(name, fn)**
+  Logic that needs to be executed after a task or method
+
+### Flow Control
+
+Mongoose adds helpers to make async logic in nodejs easier. It is important to understand the parts of mongoose that are sync and async.
+
+- All getters and setters in mongoose are sync.
+- Validators can be sync or async.
+- Tasks provide helpers for async logic.
+
+Validators run prior to Tasks. Tasks are deferred until validators return. If any validator fails the task is not performed but the task callback is instantly called with the error parameter set. When validators pass, 'pre' task actions are triggered in parallel once complete with no errors the tasks is executed followed by post task actions.
+
+
+### Model Introspection
+
+When defining anything other then trivial models with mongoose the structure of the data can easily be lost with chaining of getters,setters,validators etc. Mongoose provides a remedy by allowing for model introspection. 
+
+example:
+
+    document = mongoose.define;
+
+    User = document('User')
+      .oid('_id')
+      .object('name', 
+        document()
+          .string('prefix')
+          .string('first')
+          .string('last'))
+      .number('age')
+      .array('friends')
+      .array('notifications', 
+        document()
+          .date('date')
+          .string('type')
+          .boolean('read'));
+          
+    User
+      .virtual('full_name')
+        .get(function(){
+          return this.name.first + ' ' + this.name.last;
+        });
         
-        properties: ['first', 'last', 'age', 'updated_at'],
+    User.age
+      .validate('not_minor',function(value,complete){
+        complete( (value > 17) ? true : false);
+      });
+
+### Plugins
+
+plugins are functions that receive a document object and decorate it.
+
+    .plugin(require('plugins/authentication') [, options])
+    
+    module.exports = function(document, options){
+
+      document
+        .string('username')
+        .string('password')
+        .virtual('password_plain')
+        .static('authenticate')
+        .task('save', function(complete){
+          someAsyncShizzle(function(){
+            complete();
+          });
+        })
         
-        cast: {
-          age: Number,
-          'nested.path': String
-        },
-        
-        indexes: ['first'],
-        
-        setters: {
-            first: function(v){
-                return this.v.capitalize();
-            }
-        },
-        
-        getters: {
-            full_name: function(){ 
-                return this.first + ' ' + this.last 
-            }
-        },
-        
-        methods: {
-            save: function(fn){
-                this.updated_at = new Date();
-                this.__super__(fn);
-            }
-        },
-        
-        static: {
-            findOldPeople: function(){
-                return this.find({age: { '$gt': 70 }});
-            }
-        }
-        
+      //overriding a caster
+      
+      document.username
+        .cast(function(val,key){
+          return this.username.toLowerCase();
+        })
+    
     });
-    
-### Getting a model
 
-Models are pseudo-classes that depend on an active connection. To connect:
+### Embedded Array
 
-    var db = mongoose.connect('mongodb://localhost/db');
-    
-To get a model:
-    
-    var User = db.model('User');
-    
-To create a new instance (document)
+Anytime a property is defined with .array() an EmbeddedArray is returned. It looks and acts like a regular array. Mongoose does not support index augmentation. ie. arr.length = 4 or arr[arr.length]. 
 
-    var u = new User();
-    u.name = 'John';
-    u.save(function(){
-        sys.puts('Saved!');
+#### API
+
+- **push(val)** // atomic by default
+- **pull(val)** // atomic by default removes all items that match val
+- **pop(atomic)**
+- **shift(atomic)**
+- **splice()**
+- **unshift()**
+- **set(array)** used to reset the array with a new array. Useful if running a map or filter
+
+### Error Handling
+
+Mongoose handles errors in specific locations in the flow of data. 
+
+- Setters can't fail. Setters only coerce data.
+- Validation can fail
+- Tasks can fail
+
+Errors will only be reported when an action (task) is performed.
+
+    user.email = 'invalid.address'; // fails
+    user.save(function(err,doc){
+      
     });
-    
-To fetch some stuff
 
-    User.find({ name: 'john' }).all(function(array){
-        
-    });
+However, when the user does the following:
 
-### Operating on embedded objects
+    user.email = 'invalid.address'; // fails
+    user.email = 'nathan@learnboost.com'; // success and clears out previous error state for key
 
-Embedded objects are hydrated like model instances. Assume a MongoDB document like this stored in a variable `user`
 
-    {
-        name: 'John',
-        blogposts: [
-            {
-                title: 'Hi',
-                body: 'Hi there'
-            }
-        ]
-    }
-    
-To add a blogpost:
+### Partial Hydration
 
-    user.blogposts.push({ title: 'New post', body: 'The body' });
-    user.save();
+### Atomic Operations
 
-To remove an existing one:
+Mongoose implements a partial save strategy by only updating the dirty keys. Since update is used in save we can make any updates to a document atomic.
 
-    user.blogposts[0] = null;
-    user.save();
+- **save(callback [,atomic])** 
+  - *atomic* defaults to false
+
+Mongoose also supports some atomic operations when dealing with arrays. (see 'Arrays').
 
 ## API
 
@@ -135,67 +266,13 @@ To remove an existing one:
 
 #### Methods
     
-- **model(name, definition)**
-    
-    - *definition* determines how the class will be constructed. It's composed of the following keys. All of them are optional:
-        
-        - *collection*
-        
-            Optionally, the MongoDB collection name. Defaults to the model name in lowercase and plural. Does not need to be created in advance.
-        
-        - *properties*
-        
-            Defines the properties for how you structure the model.
-        
-            To define simple keys:
-        
-                properties: [ 'name', 'last' ]
-        
-            To define arrays:
-        
-                properties: [ 'name', {'tags': []} ]
-        
-            To define nested objects:
-            
-                properties: [ 'name', {contact: ['email', 'phone', ...]} ]
-                
-            To define array of embedded objects:
-            
-              properties: [ 'name', {blogposts: [['title', 'body', ...]]} ]
-        
-            `_id` is added automatically for all models.
-        
-        - *getters*
-        
-            Defines getters (can be nested). If the getter matches an existing property, the existing value will be passed as the first argument.
-        
-        - *setters*
-        
-            Defines setters (can be nested). If the setter matches an existing property, the return value will be set.
-        
-        - *cast*
-        
-            Defines type casting. By default, all properties beginning with `_` are cast to `ObjectID`. (note: Casting an Array will cast all items in the Array. Currently, Arrays cast when 'save' is called.)
-        
-        - *indexes*
-        
-            An array of indexes.
-            
-            Simple indexes: ['name', 'last']
-            
-            Compound indexes: [{ name: 1, last: 1 }, ...]
-            
-            Indexes with options: ['simple', [{ name: 1 }, {unique: true}]]
-            
-            Notice that the objects that you pass are equivalent to those that you would pass to ensureIndex in MongoDB.
-        
-        - *methods*
-        
-            Methods that are added to the prototype of the model, or methods that override existing ones. For example `save` (you can call `__super__` to access the parent)
-        
-        - *static*
-        
-            Static methods that are not instance-dependent (eg: `findByAge()`)
+- **connect(uri)**
+  - *uri*  example: 'mongodb://user:pass@server:port/db' (see: http://www.mongodb.org/display/DOCS/Connections)
+  
+#### Getters
+
+- **define** returns document function for defining new models/documents.
+- **type** returns type function for defining new types.
         
 ### Model
 
@@ -209,9 +286,7 @@ These are methods and properties that all *model instances* already include:
 
 #### Methods
 
-Note: if you override any of these by including them in the `methods` object of the model definition, the method is inherited and you can call __super__ to access the parent.
-
-- **save(fn)**
+- **save(fn,atomic)**
     
     Saves down the document and fires the callback.
     
@@ -384,6 +459,7 @@ You can call all of these in a row, but the callbacks will only trigger when `co
 
     Synonym to `first`
 
+
 ## Credits
 
 Nathan White &lt;nathan@learnboost.com&gt;
@@ -414,3 +490,5 @@ IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
 CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
 TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+

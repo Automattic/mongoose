@@ -7,7 +7,7 @@ function now(){
 function timeout(goose){
   return setTimeout(function(){
     assert.ok(false, 'Connection timeout');
-  });
+  }, 5000);
 }
 
 module.exports = {

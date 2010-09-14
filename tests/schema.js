@@ -42,8 +42,7 @@ module.exports = {
     assert.ok(paths['interests.title'] === undefined);
     
     a._compile();
- //   console.dir(a._compiled);
-    assert.ok(a._compiled['interests.title'].type == 'string');
+    assert.ok(a.paths['interests.title'].type == 'string');
   },
   
   'test standard types': function(){

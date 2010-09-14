@@ -82,6 +82,24 @@ module.exports = {
     assert.ok(!Array.isArray(a._posts.remove));
     assert.ok(a._posts.hydrate.length == 1);
     assert.ok(a._posts.save.length == 2);
+  },
+  
+  'test overrides': function(){
+    var override1 = function(){
+      // overrde 1
+    };
+    var override2 = function(){
+      // override 2
+    };
+    var a = new Schema();
+    a.method('save', override1);
+    assert.ok(typeof a._overrides == 'object');
+    assert.ok(typeof a._overrides.save == 'function');
+    assert.ok(a._overrides.save == override1);
+        
+    a.method('save', override2);
+    assert.ok(typeof a._overrides.save == 'function');
+    assert.ok(a._overrides.save == override2);
   }
   
 };

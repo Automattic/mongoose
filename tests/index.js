@@ -1,6 +1,6 @@
 var assert = require('assert')
   , mongoose = require('../')
-  , Model = require('../lib/mongoose/model').Model;
+  , Model = require('../lib/mongoose/document').Model;
 
 function now(){
   return Math.round(Date.now() + Math.random() * 100);

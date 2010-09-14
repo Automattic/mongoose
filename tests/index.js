@@ -13,10 +13,7 @@ function timeout(goose){
 }
 
 module.exports = {
-  'test': function(){
-    assert.ok(true);
-  }
- /* 
+
   'test connecting to mongodb': function(){
     var mongoose = require('../'),
         timer = timeout(mongoose);
@@ -38,7 +35,7 @@ module.exports = {
       });
     });
   },
-  
+
   'test accessing a model from the mongoose singleton': function(){
     var document = mongoose.define;
     document('SingletonModel')
@@ -47,7 +44,7 @@ module.exports = {
         'twokey': function(){}
       })
       .indexes({ 'some.key': -1 });
-    var instance = new mongoose.SingletonModel();
+    var instance = new mongoose.SingletonModel;
     assert.ok(instance instanceof mongoose.SingletonModel);
     assert.ok(instance instanceof Model);
   },
@@ -62,5 +59,5 @@ module.exports = {
     }
     assert.ok(conflict, 'There should be a name conflict');
   }
-  */
+  
 };

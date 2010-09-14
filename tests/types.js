@@ -29,6 +29,22 @@ module.exports = {
     assert.ok(str.setters.length == 1);
     assert.ok(str.setters[0](4) === '4');
     assert.ok(str instanceof TypeSchema);
+  },
+  
+  'test extending types': function(){
+    var mongoose = require('../'),
+        type = mongoose.type,
+        str = type('string'),
+        email = type('email')
+          .extend(str)
+          .validate('email',function(val,complete){
+            return complete( /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/.test(value) );
+          });
+    
+    assert.ok(email.setters.length == 1);
+    assert.ok(email.parent == 'string');
+    assert.ok(typeof email.validators['email'] == 'function');
+    
   }
   
 };

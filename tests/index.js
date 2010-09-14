@@ -1,6 +1,6 @@
 var assert = require('assert')
   , mongoose = require('../')
-  , Model = require('../lib/mongoose/model').Model;
+  , Model = require('../lib/mongoose/document').Model;
 
 function now(){
   return Math.round(Date.now() + Math.random() * 100);
@@ -28,7 +28,9 @@ module.exports = {
         mongoose.connect('mongodb://localhost/' + now(), { some: 'option' }, function(){
           clearTimeout(timer);
           assert.ok(mongoose.connected, 'It should connect using uri / options / callback signature');
-          mongoose.disconnect();
+          mongoose.disconnect(function(){
+            assert.ok(!mongoose.connected);
+          });
         });
       });
     });

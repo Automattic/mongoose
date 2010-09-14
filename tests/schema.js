@@ -33,16 +33,16 @@ module.exports = {
         .index(-1)
       .array('interests', new Schema()
                             .string('title')
-                            .date('created_at'));
+                            .date('created_at')
+                            .object('nested', new Schema()
+                                .string('property')));
     
     var paths = a.paths;
     assert.ok(paths['name'] instanceof TypeSchema);
     assert.ok(paths['age'] instanceof TypeSchema);
     assert.ok(paths['interests'] instanceof TypeSchema);
-    assert.ok(paths['interests.title'] === undefined);
-    
-    a._compile();
     assert.ok(a.paths['interests.title'].type == 'string');
+    assert.ok(a.paths['interests.nested.property'].type == 'string');
   },
   
   'test standard types': function(){

@@ -28,7 +28,9 @@ module.exports = {
         mongoose.connect('mongodb://localhost/' + now(), { some: 'option' }, function(){
           clearTimeout(timer);
           assert.ok(mongoose.connected, 'It should connect using uri / options / callback signature');
-          mongoose.disconnect();
+          mongoose.disconnect(function(){
+            assert.ok(!mongoose.connected);
+          });
         });
       });
     });

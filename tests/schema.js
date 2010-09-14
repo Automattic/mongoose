@@ -49,8 +49,12 @@ module.exports = {
   'test standard types': function(){
     var a = new Schema();
     assert.ok(typeof a.string == 'function');
+    
     a.string('test').number('age');
-    assert.ok(a.registry['test'] instanceof TypeSchema);
+    assert.ok(a.paths['test'] instanceof TypeSchema);
+    assert.ok(a.paths['test'].schema === a);
+    assert.ok(a.paths['test'].key == 'test');
+    assert.ok(a.paths['test'].type == 'string');
   }
   
 };

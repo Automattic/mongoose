@@ -54,8 +54,7 @@ module.exports = {
     assert.ok(a.paths['test'].schema === a);
     assert.ok(a.paths['test'].key == 'test');
     assert.ok(a.paths['test'].type == 'string');
-  }
-  /*,
+  },
   
   'test pre tasks': function(){
     var a = new Schema();
@@ -104,5 +103,5 @@ module.exports = {
     assert.ok(typeof a._overrides.save == 'function');
     assert.ok(a._overrides.save == override2);
   }
-  */
+
 };

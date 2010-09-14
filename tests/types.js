@@ -1,4 +1,5 @@
-var assert = require('assert');
+var assert = require('assert')
+  , TypeSchema = require('../lib/mongoose/type')
 
 module.exports = {
   
@@ -27,6 +28,7 @@ module.exports = {
     assert.ok(str.type == 'string');
     assert.ok(str.setters.length == 1);
     assert.ok(str.setters[0](4) === '4');
+    assert.ok(str instanceof TypeSchema);
   }
   
 };

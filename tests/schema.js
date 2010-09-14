@@ -1,7 +1,7 @@
 var assert = require('assert')
   , Schema = require('../lib/mongoose/schema')
-  , TypeSchema = require('../lib/mongoose/type')
-
+  , TypeSchema = require('../lib/mongoose/type');
+  
 module.exports = {
   
   'test simple chaining': function(){
@@ -44,6 +44,13 @@ module.exports = {
     a._compile();
     
     assert.ok(a.paths['interests.title'] instanceof TypeSchema);
+  },
+  
+  'test standard types': function(){
+    var a = new Schema();
+    assert.ok(typeof a.string == 'function');
+    a.string('test').number('age');
+    assert.ok(a.registry['test'] instanceof TypeSchema);
   }
   
 };

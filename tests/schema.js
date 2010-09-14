@@ -42,16 +42,20 @@ module.exports = {
     assert.ok(paths['interests.title'] === undefined);
     
     a._compile();
-    
-    assert.ok(a.paths['interests.title'] instanceof TypeSchema);
+ //   console.dir(a._compiled);
+    assert.ok(a._compiled['interests.title'].type == 'string');
   },
   
   'test standard types': function(){
     var a = new Schema();
     assert.ok(typeof a.string == 'function');
     a.string('test').number('age');
-    assert.ok(a.registry['test'] instanceof TypeSchema);
-  },
+    assert.ok(a.paths['test'] instanceof TypeSchema);
+    assert.ok(a.paths['test'].schema === a);
+    assert.ok(a.paths['test'].key == 'test');
+    assert.ok(a.paths['test'].type == 'string');
+  }
+  /*,
   
   'test pre tasks': function(){
     var a = new Schema();
@@ -100,5 +104,5 @@ module.exports = {
     assert.ok(typeof a._overrides.save == 'function');
     assert.ok(a._overrides.save == override2);
   }
-  
+  */
 };

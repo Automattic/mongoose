@@ -45,6 +45,51 @@ module.exports = {
     assert.ok(a.paths['interests.nested.property'].type == 'string');
   },
   
+  'test model introspection (getters)': function(){
+      var a = new Schema('Model');
+      a.string('name')
+          .validate(function(){
+          
+          })
+          .get(function(){
+          
+          })
+          .set(function(){
+          
+          })
+        .number('age')
+          .validate(function(){
+          
+          })
+          .get(function(){
+          
+          })
+          .index(-1)
+        .array('interests', new Schema()
+                              .string('title')
+                              .date('created_at')
+                              .object('nested', new Schema()
+                                  .string('property')));
+      
+      assert.ok(a.name.type == 'string');
+      assert.ok(a.age.type == 'number');
+      assert.ok(a.interests.nested.property.type == 'string');
+      
+      // check model references
+      a.interests.created_at
+        .get(function(){
+          
+        });
+      
+      a.interests.methods({
+        one: function(){}
+      });
+
+      assert.ok(a.paths['interests.created_at'].getters.length == 1);
+      assert.ok(a.paths['interests'].options === a.interests);
+      assert.ok(typeof a.interests._overrides.one == 'function');
+  },
+  
   'test standard types': function(){
     var a = new Schema();
     assert.ok(typeof a.string == 'function');

@@ -35,7 +35,27 @@ module.exports = {
       });
     });
   },
-
+  
+  'test connection path errors': function(){
+      try{
+        mongoose.connect('localhost/db');
+      } catch(e){
+        assert.ok(/include the mongodb/.test(e.message));
+      }
+      
+      try{
+        mongoose.connect('mongodb:///db')
+      } catch(e){
+        assert.ok(/provide a hostname/.test(e.message));
+      }
+      
+      try{
+        mongoose.connect('mongodb://localhost/')
+      } catch(e){
+        assert.ok(/provide a database/.test(e.message));       
+      }
+  },
+  
   'test accessing a model from the mongoose singleton': function(){
     var document = mongoose.define;
     document('SingletonModel')
@@ -44,9 +64,23 @@ module.exports = {
         'twokey': function(){}
       })
       .indexes({ 'some.key': -1 });
-    var instance = new mongoose.SingletonModel;
+    var instance = new mongoose.SingletonModel();
+
     assert.ok(instance instanceof mongoose.SingletonModel);
     assert.ok(instance instanceof Model);
+  },
+  
+  'test accessing model statics': function(){
+      var model = mongoose.SingletonModel;
+   //   assert.ok(typeof model.find == 'function');
+  },
+  
+  'test accessing instance of model': function(){
+      var model = mongoose.SingletonModel;
+          instance = new model();
+          
+  //    assert.ok(typeof instance._run == 'function');
+  //    assert.ok(typeof instance.save == 'function');
   },
   
   'test defining a model name that conflicts with an internal method': function(){

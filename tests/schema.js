@@ -31,7 +31,7 @@ module.exports = {
           
         })
         .index(-1)
-      .array('interests', new Schema()
+      .object('interests', new Schema()
                             .string('title')
                             .date('created_at')
                             .object('nested', new Schema()
@@ -65,7 +65,7 @@ module.exports = {
           
           })
           .index(-1)
-        .array('interests', new Schema()
+        .object('interests', new Schema()
                               .string('title')
                               .date('created_at')
                               .object('nested', new Schema()
@@ -88,6 +88,46 @@ module.exports = {
       assert.ok(a.paths['interests.created_at'].getters.length == 1);
       assert.ok(a.paths['interests'].options === a.interests);
       assert.ok(typeof a.interests._overrides.one == 'function');
+  },
+  
+  'test array embedded docs (arrays) accessors': function(){
+    var a = new Schema('Test');
+    a.string('name')
+      .number('age')
+      .array('friends',new Schema()
+        .string('name')
+        .number('age')
+        .string('email'));
+    
+    assert.ok(a.friends.age.type == 'number');
+    
+  },
+  
+  'test internal structure': function(){
+    var a = new Schema('Test');
+    a.string('name')
+      .number('age')
+      .array('friends',new Schema()
+        .string('name')
+        .number('age')
+        .string('email'))
+      .object('contact', new Schema()
+        .string('email')
+        .string('phone')
+        .string('city')
+        .string('state')
+        .string('zip'))
+        
+    assert.ok(a._struct.length == 4);
+    assert.ok(a._struct[2] == 'friends');
+    assert.ok(Array.isArray(a._struct[3]));
+    assert.ok(a._struct[3].length == 2);
+    assert.ok(a._struct[3][0] == 'contact');
+    assert.ok(Array.isArray(a._struct[3][1]));
+    assert.ok(a._struct[3][1].length == 5);
+    
+    assert.ok(a._embedded['friends'] instanceof Schema);
+    
   },
   
   'test standard types': function(){

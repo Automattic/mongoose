@@ -83,6 +83,43 @@ module.exports = {
   //    assert.ok(typeof instance.save == 'function');
   },
   
+  'test hydration': function(){
+    var document = mongoose.define;
+    document('SimpleUser')
+      .string('name')
+        .get(function(val,path,type){
+          return val.toLowerCase();
+        })
+        .set(function(val,path,type){
+          return val.toUpperCase();
+        })
+      .object('contact',
+        document()
+          .string('email')
+          .string('phone')
+          .string('city')
+          .string('state')
+          .string('zip'))
+      .string('bio');
+      
+    var SimpleUser = mongoose.SimpleUser;
+    
+    var instance = new SimpleUser({
+      name: 'nathan',
+      contact: {
+        city: 'SF',
+        state: 'CA'
+      }
+    });
+
+    assert.ok(instance.hydrated('name'));
+    assert.ok(instance.hydrated('contact.city'));
+    assert.ok(instance.hydrated('bio') == false);
+    
+    assert.ok(instance.__doc.name == 'NATHAN');
+    assert.ok(instance.get('name') == 'nathan');
+  },
+  
   'test defining a model name that conflicts with an internal method': function(){
     var document = mongoose.define,
         conflict = false;

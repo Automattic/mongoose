@@ -118,6 +118,22 @@ module.exports = {
     
     assert.ok(instance.__doc.name == 'NATHAN');
     assert.ok(instance.get('name') == 'nathan');
+    
+    assert.ok(instance._schema['name'].getters.length == 1);
+    assert.ok(instance._schema['name'].setters.length == 2);
+  },
+  
+  'test setup functions': function(){
+    var document = mongoose.define;
+    document('SetupFn')
+      .oid('_id');
+      
+    var SetupFn = mongoose.SetupFn;
+    
+    var instance = new SetupFn();
+    assert.ok(instance._schema['id'].type == 'virtual');
+
+
   },
   
   'test defining a model name that conflicts with an internal method': function(){

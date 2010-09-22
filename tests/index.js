@@ -1,6 +1,6 @@
 var assert = require('assert')
   , mongoose = require('../')
-  , Model = require('../lib/mongoose/document').Model;
+  , Document = require('../lib/mongoose/document').Document;
 
 function now(){
   return Math.round(Date.now() + Math.random() * 100);
@@ -67,7 +67,7 @@ module.exports = {
     var instance = new mongoose.SingletonModel();
 
     assert.ok(instance instanceof mongoose.SingletonModel);
-    assert.ok(instance instanceof Model);
+    assert.ok(instance instanceof Document);
   },
   
   'test accessing model statics': function(){

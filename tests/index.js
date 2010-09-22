@@ -79,61 +79,8 @@ module.exports = {
       var model = mongoose.SingletonModel;
           instance = new model();
           
-  //    assert.ok(typeof instance._run == 'function');
-  //    assert.ok(typeof instance.save == 'function');
-  },
-  
-  'test hydration': function(){
-    var document = mongoose.define;
-    document('SimpleUser')
-      .string('name')
-        .get(function(val,path,type){
-          return val.toLowerCase();
-        })
-        .set(function(val,path,type){
-          return val.toUpperCase();
-        })
-      .object('contact',
-        document()
-          .string('email')
-          .string('phone')
-          .string('city')
-          .string('state')
-          .string('zip'))
-      .string('bio');
-      
-    var SimpleUser = mongoose.SimpleUser;
-    
-    var instance = new SimpleUser({
-      name: 'nathan',
-      contact: {
-        city: 'SF',
-        state: 'CA'
-      }
-    });
-
-    assert.ok(instance.hydrated('name'));
-    assert.ok(instance.hydrated('contact.city'));
-    assert.ok(instance.hydrated('bio') == false);
-    
-    assert.ok(instance.__doc.name == 'NATHAN');
-    assert.ok(instance.get('name') == 'nathan');
-    
-    assert.ok(instance._schema['name'].getters.length == 1);
-    assert.ok(instance._schema['name'].setters.length == 2);
-  },
-  
-  'test setup functions': function(){
-    var document = mongoose.define;
-    document('SetupFn')
-      .oid('_id');
-      
-    var SetupFn = mongoose.SetupFn;
-    
-    var instance = new SetupFn();
-    assert.ok(instance._schema['id'].type == 'virtual');
-
-
+      assert.ok(typeof instance._run == 'function');
+      assert.ok(typeof instance.save == 'function');
   },
   
   'test defining a model name that conflicts with an internal method': function(){

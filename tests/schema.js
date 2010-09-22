@@ -182,12 +182,12 @@ module.exports = {
       // override 2
     };
     var a = new Schema();
-    a.method('save', override1);
+    a.hook('save', override1);
     assert.ok(typeof a._overrides == 'object');
     assert.ok(typeof a._overrides.save == 'function');
     assert.ok(a._overrides.save == override1);
         
-    a.method('save', override2);
+    a.hook('save', override2);
     assert.ok(typeof a._overrides.save == 'function');
     assert.ok(a._overrides.save == override2);
   }

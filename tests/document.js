@@ -81,7 +81,7 @@ module.exports = {
        var SimpleUser = mongoose.SimpleUser;
 
        var instance = new SimpleUser({
-         name: 'nathan',
+         name: 'Nathan',
          contact: {
            city: 'SF',
            state: 'CA'
@@ -91,6 +91,9 @@ module.exports = {
        assert.ok(instance.hydrated('name') == false);
        assert.ok(instance.hydrated('contact.city') == false);
        assert.ok(instance.hydrated('bio') == false);
+       
+       assert.ok(instance._dirty['name'] == true);
+       assert.ok(instance._dirty['contact.state'] == true);
 
        assert.ok(instance.__doc.name == 'NATHAN');
        assert.ok(instance.get('name') == 'nathan');

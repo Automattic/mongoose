@@ -92,14 +92,15 @@ module.exports = {
        assert.ok(instance.hydrated('contact.city') == false);
        assert.ok(instance.hydrated('bio') == false);
        
-       assert.ok(instance._dirty['name'] == true);
-       assert.ok(instance._dirty['contact.state'] == true);
+       assert.ok(instance._.dirty['name'] == true);
+       assert.ok(instance._.dirty['contact.state'] == true);
 
-       assert.ok(instance.__doc.name == 'NATHAN');
+       assert.ok(instance._.doc.name == 'NATHAN');
        assert.ok(instance.get('name') == 'nathan');
 
        assert.ok(instance._schema['name'].getters.length == 1);
        assert.ok(instance._schema['name'].setters.length == 2);     
+       console.log(instance);
 
      });  
   },

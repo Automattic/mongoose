@@ -100,8 +100,7 @@ module.exports = {
 
        assert.ok(instance._schema['name'].getters.length == 1);
        assert.ok(instance._schema['name'].setters.length == 2);     
-       console.log(instance);
-
+       
      });  
   },
   

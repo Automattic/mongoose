@@ -289,6 +289,43 @@ module.exports = {
     assert.ok(virtual.nested.control == 'bizarre');
     assert.ok(Object.keys(virtual._.dirty).length == 3);
     assert.ok(virtual.nested.test == 'White Nathan');
-  }
+  },
+  
+  'test custom methods': function(){
+    var document = mongoose.define;
+    document('CustomHelpers')
+      .string('lang')
+      .method('getLang', function(){
+        return this.lang;
+      })
+      .static('getSchema', function(){
+        return this.prototype._schema;
+      });
+    
+    var CH = mongoose.CustomHelpers;
+    
+    var ch = new CH({lang: 'javascript'});
+    assert.ok(typeof ch.getLang == 'function');
+    assert.ok(ch.getLang() == 'javascript');
+  },
+  
+  'test custom static methods': function(){
+    var CH = mongoose.CustomHelpers;
+    
+    assert.ok(typeof CH.getSchema == 'function');
+    assert.ok(CH.getSchema().paths['lang'].type == 'string');    
+  },
+  
+  'augmenting compiled schemas': function(){
+    var document = mongoose.define;
+    document('CustomHelpers')
+      .method('randomMethod', function(lang){
+        return 'yawn';
+      });
+
+      var CH = mongoose.CustomHelpers;
+      var ch = new CH({lang: 'javascript'});
+      assert.ok(typeof ch.randomMethod != 'function');
+  },
   
 }

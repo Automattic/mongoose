@@ -115,6 +115,24 @@ module.exports = {
     assert.ok(instance._schema['id'].type == 'virtual');
   },
   
+  'test default property setting': function(){
+      var SetupFn = mongoose.SetupFn;
+      
+      var instance = new SetupFn();
+      
+      assert.ok(instance.isDirty('_id') == true);
+      assert.ok(instance._id.toHexString() == instance.id);   
+  },
+  
+  'test defaults with hydration': function(){
+    var SetupFn = mongoose.SetupFn;
+    
+    var instance = new SetupFn({},true);
+
+    assert.ok(instance.isDirty('_id') == false);
+    assert.ok(instance._id == undefined);
+  },
+  
   'test isNew flag': function(){
     var SimpleUser = mongoose.SimpleUser;
     
@@ -326,6 +344,6 @@ module.exports = {
       var CH = mongoose.CustomHelpers;
       var ch = new CH({lang: 'javascript'});
       assert.ok(typeof ch.randomMethod != 'function');
-  },
+  }
   
 }

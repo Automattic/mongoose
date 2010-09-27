@@ -72,7 +72,7 @@ module.exports = {
   
   'test accessing model statics': function(){
       var model = mongoose.SingletonModel;
-   //   assert.ok(typeof model.find == 'function');
+      assert.ok(typeof model.find == 'function');
   },
   
   'test accessing instance of model': function(){

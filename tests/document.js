@@ -9,7 +9,10 @@ var assert = require('assert')
     return setTimeout(function(){
       assert.ok(false, 'Connection timeout');
     },5000);
-  }
+  };
+  
+
+mongoose.connect('mongodb://localhost/'+ now());  
   
 module.exports = {
   
@@ -31,9 +34,7 @@ module.exports = {
           .string('state')
           .string('zip'))
       .string('bio');
-      
-     mongoose.connect('mongodb://localhost/' + now(), function(){
-     
+
        var SimpleUser = mongoose.SimpleUser;
 
        var instance = new SimpleUser({
@@ -47,14 +48,12 @@ module.exports = {
        assert.ok(instance.hydrated('name'));
        assert.ok(instance.hydrated('contact.city'));
        assert.ok(instance.hydrated('bio') == false);
-
-//       assert.ok(instance.__doc.name == 'NATHAN');
+       
        assert.ok(instance.get('name') == 'nathan');
 
        assert.ok(instance._schema['name'].getters.length == 1);
        assert.ok(instance._schema['name'].setters.length == 2);     
-     
-     });  
+       complete();
   },
   
   'test mixin': function(){
@@ -75,8 +74,6 @@ module.exports = {
           .string('state')
           .string('zip'))
       .string('bio');
-
-     mongoose.connect('mongodb://localhost/' + now(), function(){
 
        var SimpleUser = mongoose.SimpleUser;
 
@@ -101,7 +98,7 @@ module.exports = {
        assert.ok(instance._schema['name'].getters.length == 1);
        assert.ok(instance._schema['name'].setters.length == 2);     
        
-     });  
+       complete();
   },
   
   'test setup functions': function(){
@@ -113,15 +110,16 @@ module.exports = {
     
     var instance = new SetupFn();
     assert.ok(instance._schema['id'].type == 'virtual');
+    complete();
   },
   
   'test default property setting': function(){
       var SetupFn = mongoose.SetupFn;
       
       var instance = new SetupFn();
-      
       assert.ok(instance.isDirty('_id') == true);
-      assert.ok(instance._id.toHexString() == instance.id);   
+      assert.ok(instance._id.toHexString() == instance.id);
+      complete();
   },
   
   'test defaults with hydration': function(){
@@ -131,6 +129,7 @@ module.exports = {
 
     assert.ok(instance.isDirty('_id') == false);
     assert.ok(instance._id == undefined);
+    complete();
   },
   
   'test isNew flag': function(){
@@ -140,7 +139,8 @@ module.exports = {
     assert.ok(user.isNew == true);
     
     var user = new SimpleUser({name: 'Nathan'}, true);
-    assert.ok(user.isNew == false); 
+    assert.ok(user.isNew == false);
+    complete();
   },
   
   'test hydrated()': function(){
@@ -166,7 +166,8 @@ module.exports = {
     
     assert.ok(user.hydrated('name') == false);
     assert.ok(user.hydrated('contact.city') == false);
-    assert.ok(user.hydrated('contact.state') == false);    
+    assert.ok(user.hydrated('contact.state') == false);
+    complete();
   },
 
   'test isDirty()': function(){
@@ -192,7 +193,8 @@ module.exports = {
     
     assert.ok(user.isDirty('name') == true);
     assert.ok(user.isDirty('contact.city') == true);
-    assert.ok(user.isDirty('contact.state') == false);    
+    assert.ok(user.isDirty('contact.state') == false);
+    complete();
   },
   
   'test interal doc value when initialized': function(){
@@ -218,7 +220,8 @@ module.exports = {
     
     assert.ok(user._.doc.name == 'NATHAN');
     assert.ok(user._.doc.contact.city == 'SF');
-    assert.ok(user._.doc.contact.state == undefined);    
+    assert.ok(user._.doc.contact.state == undefined);
+    complete();
   },
   
   'test getters/setters': function(){
@@ -235,6 +238,7 @@ module.exports = {
     assert.ok(user.isDirty('contact.city') == true);
     assert.ok(Object.keys(user._.doc).length == 2);
     assert.ok(Object.keys(user._.doc.contact).length == 1);
+    complete();
   },
   
   'test dot notation getters/setters': function(){
@@ -251,6 +255,7 @@ module.exports = {
     assert.ok(user.isDirty('contact.city') == true);
     assert.ok(Object.keys(user._.doc).length == 2);
     assert.ok(Object.keys(user._.doc.contact).length == 1);
+    complete();
   },
   
   'test deep nested structures': function(){
@@ -272,7 +277,7 @@ module.exports = {
     assert.ok(Object.keys(nested._.doc).length == 1);
     assert.ok(nested.get('super.deep.nested.property') == 'cool');
     assert.ok(nested._.doc.super.deep.nested.property == 'cool');
-    
+    complete();
   },
   
   'test virtuals': function(){
@@ -307,6 +312,7 @@ module.exports = {
     assert.ok(virtual.nested.control == 'bizarre');
     assert.ok(Object.keys(virtual._.dirty).length == 3);
     assert.ok(virtual.nested.test == 'White Nathan');
+    complete();
   },
   
   'test custom methods': function(){
@@ -325,13 +331,15 @@ module.exports = {
     var ch = new CH({lang: 'javascript'});
     assert.ok(typeof ch.getLang == 'function');
     assert.ok(ch.getLang() == 'javascript');
+    complete();
   },
   
   'test custom static methods': function(){
     var CH = mongoose.CustomHelpers;
     
     assert.ok(typeof CH.getSchema == 'function');
-    assert.ok(CH.getSchema().paths['lang'].type == 'string');    
+    assert.ok(CH.getSchema().paths['lang'].type == 'string');
+    complete();
   },
   
   'augmenting compiled schemas': function(){
@@ -344,6 +352,12 @@ module.exports = {
       var CH = mongoose.CustomHelpers;
       var ch = new CH({lang: 'javascript'});
       assert.ok(typeof ch.randomMethod != 'function');
+      complete();
   }
-  
+   
 }
+
+totalFN = Object.keys(module.exports).length;
+function complete(){
+  if(--totalFN === 0) mongoose.disconnect();
+};

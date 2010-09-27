@@ -353,6 +353,106 @@ module.exports = {
       var ch = new CH({lang: 'javascript'});
       assert.ok(typeof ch.randomMethod != 'function');
       complete();
+  },
+  
+  'testing pre hooks': function(){
+    var document = mongoose.define;
+    var total = 0;
+    document('PreHooks')
+      .string('test')
+       .pre('hydrate', function(callback){
+        total++;
+ //       assert.ok(total == 1);
+        callback();
+      })
+      .pre('hydrate', function(callback){
+        total++;
+ //       assert.ok(total == 2);
+        callback();
+      });
+     
+    var PreHooks = mongoose.PreHooks;
+    
+    var ph = new PreHooks({test: 'hi'},true);
+    assert.ok(ph._.doc.test == 'hi');
+    assert.ok(total == 2);
+    complete();
+  },
+  
+  'test override': function(){
+    var document = mongoose.define;
+    var total = 0;
+    document('OverHooks')
+      .string('test')
+      .hook('hydrate', function(parent, callback, obj){
+         total++;
+         assert.ok(total == 1);
+         parent(callback, obj);
+       })
+     
+    var OverHooks = mongoose.OverHooks;
+    
+    var ph = new OverHooks({test: 'hi'},true);
+    assert.ok(ph._.doc.test == 'hi');
+    assert.ok(total == 1);
+    complete();
+  },
+  
+  'testing post hooks': function(){
+    var document = mongoose.define;
+    var total = 0;
+    document('PostHooks')
+      .string('test')
+      .post('hydrate', function(){
+        total++;
+      })
+      .post('hydrate', function(){
+        total++;
+      });
+     
+    var PostHooks = mongoose.PostHooks;
+    
+    var ph = new PostHooks({test: 'hi'},true);
+    assert.ok(ph._.doc.test == 'hi');
+    assert.ok(total == 2);
+    complete();
+  },
+  
+  'testing pre/override/post hooks together': function(){
+    var document = mongoose.define;
+    var total = 0;
+    document('AllHooks')
+      .string('test')
+       .pre('hydrate', function(callback){
+        total++;
+        assert.ok(total == 1);
+        callback();
+      })
+      .pre('hydrate', function(callback){
+        total++;
+        assert.ok(total == 2);
+        callback();
+      })
+     .hook('hydrate', function(parent, callback, obj){
+        total++;
+        assert.ok(total == 3);
+        parent(callback, obj);
+      })
+      .post('hydrate', function(){
+        total++;
+        assert.ok(total == 4);
+      })
+      .post('hydrate', function(){
+        total++;
+        assert.ok(total == 5);
+      });
+     
+    var AllHooks = mongoose.AllHooks;
+    
+    var ah = new AllHooks({test: 'hi'},true);
+    assert.ok(ah._.doc.test == 'hi');
+    assert.ok(total == 5);
+    complete();
   }
    
 }

@@ -362,12 +362,10 @@ module.exports = {
       .string('test')
        .pre('hydrate', function(callback){
         total++;
- //       assert.ok(total == 1);
         callback();
       })
       .pre('hydrate', function(callback){
         total++;
- //       assert.ok(total == 2);
         callback();
       });
      

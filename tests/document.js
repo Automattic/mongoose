@@ -382,7 +382,7 @@ module.exports = {
     var total = 0;
     document('OverHooks')
       .string('test')
-      .hook('hydrate', function(parent, callback, obj){
+      .hook('init', function(parent, callback, obj){
          total++;
          assert.ok(total == 1);
          parent(callback, obj);
@@ -431,7 +431,7 @@ module.exports = {
         assert.ok(total == 2);
         callback();
       })
-     .hook('hydrate', function(parent, callback, obj){
+     .hook('init', function(parent, callback, obj){
         total++;
         assert.ok(total == 3);
         parent(callback, obj);

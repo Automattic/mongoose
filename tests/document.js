@@ -11,11 +11,10 @@ var assert = require('assert')
     },5000);
   };
   
-
-mongoose.connect('mongodb://localhost/'+ now());  
+mongoose.connect('mongodb://localhost/mongoose_integration_tests');
   
 module.exports = {
-  
+    
   'test hydration': function(){
     var document = mongoose.define;
     document('SimpleUser')
@@ -451,11 +450,56 @@ module.exports = {
     assert.ok(ah._.doc.test == 'hi');
     assert.ok(total == 5);
     complete();
+  },
+  
+  'testing hydration w/ arrays': function(){
+    var document = mongoose.define;
+
+    document('ArrayFun')
+    .oid('_id')
+    .string('name')
+    .array('test');
+  
+    var ArrayFun = mongoose.ArrayFun;
+        
+    var af = new ArrayFun({
+      name: 'nate',
+      test: [1,2,3]
+    }, true);
+    assert.ok(af.test instanceof Array);
+    assert.ok(af.test.length == 3);
+    assert.ok(af.test.get(1) == 2);
+    af.test.set(1,5);
+    assert.ok(af._.dirty['test.1'] == true);
+    assert.ok(af.test.get(1) == 5);
+    assert.ok(af._.doc.test[1] == 5);
+    complete();
+  },
+  
+  'testing creation w/ arrays': function(){
+      var ArrayFun = mongoose.ArrayFun;
+    
+      var af = new ArrayFun({
+        name: 'nate',
+        test: [1,2,3]
+      });
+      assert.ok(af.test instanceof Array);
+      assert.ok(af.test.length == 3);
+      assert.ok(af.test.get(1) == 2);
+      af.test.set(1,5);
+      assert.ok(af._.dirty['test.1'] == true);
+      assert.ok(af.test.get(1) == 5);
+      assert.ok(af._.doc.test[1] == 5);
+      complete();
   }
    
 }
 
 totalFN = Object.keys(module.exports).length;
 function complete(){
-  if(--totalFN === 0) mongoose.disconnect();
+  if(--totalFN === 0) { console.log('disconnecting');
+    mongoose.disconnect(function(resp){
+      console.log(resp); console.log('hi');
+    });
+  }
 };

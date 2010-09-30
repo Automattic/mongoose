@@ -497,9 +497,5 @@ module.exports = {
 
 totalFN = Object.keys(module.exports).length;
 function complete(){
-  if(--totalFN === 0) { console.log('disconnecting');
-    mongoose.disconnect(function(resp){
-      console.log(resp); console.log('hi');
-    });
-  }
+  if(--totalFN === 0) mongoose.disconnect();
 };

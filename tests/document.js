@@ -506,7 +506,7 @@ module.exports = {
     
     assert.ok(af.test.length == 3);
     af.test.forEach(function(val,idx){
-      assert.ok(val+1 == idx);
+      assert.ok(val == idx+1);
     });
     
     af.test.push(4,5);

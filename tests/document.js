@@ -546,6 +546,77 @@ module.exports = {
       assert.ok(err.length == 2);
       complete();
     });
+  },
+  
+  'test plugins': function(){
+    var document = mongoose.define;
+    
+    var PT = document('PluginTest')
+        .plugin(function(doc,options){
+          if(typeof options != 'object') return;
+          for(prop in options){
+            if(doc[options[prop]]){
+              doc[options[prop]](prop);
+            }  
+          }
+        },{ name: 'string', age: 'number', invalid: 'crap'})
+        
+        .plugin(function(doc){
+          doc.virtual('virtual')
+            .get(function(){
+              return 'virtual key';
+            });
+        })
+        
+        .plugin(function(doc){
+          if(doc.paths['age'] && doc.paths['age'].type == 'number'){
+            doc.age.validate('isAdult', function(val,cb){
+              cb(this.age >= 18);
+            });
+          } 
+          doc.hook('save', function(parent, callback){
+            if(this.age >= 18) assert.ok(this._.errors.length == 0);
+            else assert.ok(this._.errors.length == 1);
+            if(callback) callback(this._.errors, this);
+          });
+        })
+                
+    var PluginTest = mongoose.PluginTest;
+    
+    assert.ok(PluginTest.prototype._schema);
+    assert.ok(PluginTest.prototype._schema.paths['age'].type == 'number');
+    assert.ok(PluginTest.prototype._schema.paths['name'].type == 'string');
+    
+    var pt = new PluginTest({
+      name: 'Nate',
+      age: 33
+    });
+    
+    assert.ok(pt._.doc.name == 'Nate');
+    assert.ok(pt._.doc.age == 33);
+    assert.ok(pt.name == 'Nate');
+    assert.ok(pt.virtual == 'virtual key');
+    
+    pt.save(function(err, doc){
+      assert.ok(doc == pt);
+      assert.ok(err.length == false);
+    });
+    
+    var pt2 = new PluginTest({
+      name: 'jimmy',
+      age: 15
+    });
+    
+    assert.ok(pt2.age == 15);
+    
+    pt2.save(function(err, doc){
+      assert.ok(Array.isArray(err) == true);
+      assert.ok(err.length == 1);
+      assert.ok(err[0].type == 'validation');
+      assert.ok(err[0].name == 'isAdult');
+    });
+    
+    
   }
 
 }

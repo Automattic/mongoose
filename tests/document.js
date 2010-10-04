@@ -354,7 +354,7 @@ module.exports = {
       complete();
   },
   
-  'testing pre hooks': function(){
+  'test pre hooks': function(){
     var document = mongoose.define;
     var total = 0;
     document('PreHooks')
@@ -415,7 +415,7 @@ module.exports = {
     complete();
   },
   
-  'testing pre/override/post hooks together': function(){
+  'test pre/override/post hooks together': function(){
     var document = mongoose.define;
     var total = 0;
     document('AllHooks')
@@ -452,7 +452,7 @@ module.exports = {
     complete();
   },
   
-  'testing hydration w/ arrays': function(){
+  'test hydration w/ arrays': function(){
     var document = mongoose.define;
 
     document('ArrayFun')
@@ -466,7 +466,7 @@ module.exports = {
       name: 'nate',
       test: [1,2,3]
     }, true);
-    assert.ok(af.test instanceof Array);
+    
     assert.ok(af.test.length == 3);
     assert.ok(af.test.get(1) == 2);
     af.test.set(1,5);
@@ -476,14 +476,14 @@ module.exports = {
     complete();
   },
   
-  'testing creation w/ arrays': function(){
+  'test creation w/ arrays': function(){
       var ArrayFun = mongoose.ArrayFun;
     
       var af = new ArrayFun({
         name: 'nate',
         test: [1,2,3]
       });
-      assert.ok(af.test instanceof Array);
+      
       assert.ok(af.test.length == 3);
       assert.ok(af.test.get(1) == 2);
       af.test.set(1,5);
@@ -492,6 +492,60 @@ module.exports = {
       assert.ok(af._.doc.test[1] == 5);
       
       complete();
+  },
+  
+  'test embeddedArray': function(){
+    var ArrayFun = mongoose.ArrayFun;
+  
+    var af = new ArrayFun({
+      name: 'nate',
+      test: [1,2,3]
+    });
+    
+    assert.ok(af.test.length == 3);
+    af.test.forEach(function(val,idx){
+      assert.ok(val+1 == idx);
+    });
+    
+    af.test.push(4,5);
+    assert.ok(af.test.length == 5);
+    assert.ok(af._.doc.test[3] == 4);
+    
+    complete();    
+  },
+  
+  'test validators': function(){
+    var document = mongoose.define;
+
+    var VT = document('ValidTests')
+    .oid('_id')
+    .string('email')
+    .number('age');
+    
+    VT.age.validate('qualify_for_medicare', function(value, cb){
+      return cb(value >= 55); 
+    });
+    
+    VT.email.validate('isEmail', function(value, cb){
+      return cb( (/^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/.test(value)) );
+    });
+    
+    VT.hook('save', function(parent, callback){
+      assert.ok(this._.errors.length == 2);
+      parent(callback);
+    });
+  
+    var ValidTests = mongoose.ValidTests;
+        
+    var af = new ValidTests({
+      email: 'email',
+      age: 33
+    });
+    
+    af.save(function(err, doc){
+      assert.ok(err.length == 2);
+      complete();
+    });
   }
 
 }

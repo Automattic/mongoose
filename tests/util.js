@@ -29,13 +29,12 @@ module.exports = {
   
   'test subclass of Native constructors': function(){
     var EmbeddedArray = subclass(Array, {
-      test: function(){
-        console.log('cool');
-      }
+      test: function(){}
     }) 
     , arr = []
     , ea = new EmbeddedArray();
 
+    assert.ok(ea instanceof EmbeddedArray);
     assert.ok(Array.isArray(ea));
     assert.ok(ea instanceof Array);
     assert.ok(typeof ea.test == 'function');

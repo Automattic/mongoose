@@ -470,7 +470,8 @@ module.exports = {
     assert.ok(af.test.length == 3);
     assert.ok(af.test.get(1) == 2);
     af.test.set(1,5);
-    assert.ok(af._.dirty['test.1'] == true);
+    assert.ok(Array.isArray(af._.dirty['test']));
+    assert.ok(af._.dirty['test'][0] == 1);
     assert.ok(af.test.get(1) == 5);
     assert.ok(af._.doc.test[1] == 5);
     complete();
@@ -487,7 +488,8 @@ module.exports = {
       assert.ok(af.test.length == 3);
       assert.ok(af.test.get(1) == 2);
       af.test.set(1,5);
-      assert.ok(af._.dirty['test.1'] == true);
+      assert.ok(Array.isArray(af._.dirty['test']));
+      assert.ok(af._.dirty['test'][0] == 1);
       assert.ok(af.test.get(1) == 5);
       assert.ok(af._.doc.test[1] == 5);
       
@@ -510,7 +512,7 @@ module.exports = {
     af.test.push(4,5);
     assert.ok(af.test.length == 5);
     assert.ok(af._.doc.test[3] == 4);
-    
+//    assert.ok(af._.dirty('test'));
     complete();    
   },
   
@@ -614,9 +616,7 @@ module.exports = {
       assert.ok(err.length == 1);
       assert.ok(err[0].type == 'validation');
       assert.ok(err[0].name == 'isAdult');
-    });
-    
-    
+    });  
   }
 
 }

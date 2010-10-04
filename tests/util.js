@@ -11,6 +11,7 @@ var testStrings = [
 ];
 
 var pluralize = require('../lib/mongoose/util').string.pluralize;
+var subclass = require('../lib/mongoose/util').subclass;
 
 module.exports = {
   
@@ -24,6 +25,22 @@ module.exports = {
     assert.ok(pluralize('test') == 'tests');
     assert.ok(pluralize('bully') == 'bullies');
     assert.ok(pluralize('survey') == 'surveys');
+  },
+  
+  'test subclass of Native constructors': function(){
+    var EmbeddedArray = subclass(Array, {
+      test: function(){
+        console.log('cool');
+      }
+    }) 
+    , arr = []
+    , ea = new EmbeddedArray();
+
+    assert.ok(Array.isArray(ea));
+    assert.ok(ea instanceof Array);
+    assert.ok(typeof ea.test == 'function');
+    assert.ok(typeof arr.test == 'undefined');
+    assert.ok(Object.prototype.toString.call(ea) == '[object Array]');
   }
   
 };

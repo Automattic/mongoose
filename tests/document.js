@@ -269,7 +269,7 @@ module.exports = {
     var SuperNested = mongoose.SuperNested;
     
     var nested = new SuperNested();
-    
+
     assert.ok(Object.keys(nested._.doc).length == 0);
     
     nested.super.deep.nested.property = 'cool';
@@ -490,12 +490,13 @@ module.exports = {
       assert.ok(af._.dirty['test.1'] == true);
       assert.ok(af.test.get(1) == 5);
       assert.ok(af._.doc.test[1] == 5);
+      
       complete();
   }
-   
+
 }
 
 totalFN = Object.keys(module.exports).length;
 function complete(){
-  if(--totalFN === 0) mongoose.disconnect();
+  //if(--totalFN === 0) mongoose.disconnect();
 };

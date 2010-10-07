@@ -32,8 +32,8 @@ Example paths: `support/mongoose`, `vendor/mongoose`.
 
 Simply require Mongoose:
 
-    require.paths.unshift('vendor/mongoose');
-    var mongoose = require('mongoose').Mongoose;
+    require.paths.unshift('vendor/mongoose/lib');
+    var mongoose = require('mongoose');
 
 ## How to Use
 
@@ -115,7 +115,7 @@ example:
       });
     
     type('email')
-      .extend('string')
+      .extend(type('string'))
       .validate('email',function(value,callback){
         return callback( /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/.test(value) )
       });

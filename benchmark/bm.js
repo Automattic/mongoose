@@ -1,5 +1,5 @@
 var sys = require('sys'),
-    mongoose = require('./'),
+    mongoose = require('../'),
     document = mongoose.define,
     BM = function(){};
 

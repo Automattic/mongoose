@@ -645,6 +645,10 @@ module.exports = {
     notes: [{note: 'hi', date: new Date()}] 
   });
   
+  assert.ok(edt.notes[0].note == 'hi');
+  edt.notes.push({note: 'bye', date: new Date()});
+  assert.ok(edt.notes[1].note == 'bye');
+  
   }
 
 }

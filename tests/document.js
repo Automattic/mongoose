@@ -610,6 +610,23 @@ module.exports = {
     });  
   },
   
+  'test Array casting': function(){
+    var document = mongoose.define;
+    var AC = 
+      document('ArrayCast')
+        .array('ids', 'oid');
+    
+    var ArrayCast = mongoose.ArrayCast;
+    
+    var ac = new ArrayCast({ids: ['4cbe1be90b2f4fc77e000004'] });
+    assert.ok(ac.ids.get(0).toHexString() == '4cbe1be90b2f4fc77e000004');
+    ac.ids.push('4cbe1be90b2f4fc77e000004');
+    assert.ok(ac.ids.get(1).toHexString() == '4cbe1be90b2f4fc77e000004');
+    ac.ids.push(null);
+    assert.ok(ac.ids.length == 3);
+    assert.ok(ac.ids.get(2).toHexString());
+  },
+  
   'test Embedded Documents': function(){
     var document = mongoose.define;
     
@@ -623,7 +640,10 @@ module.exports = {
             
   var EmbeddedDocTest = mongoose.EmbeddedDocTest;
   
-  
+  var edt = new EmbeddedDocTest({
+    test: 'me',
+    notes: [{note: 'hi', date: new Date()}] 
+  });
   
   }
 

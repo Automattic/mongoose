@@ -614,9 +614,5 @@ module.exports = {
 
 totalFN = Object.keys(module.exports).length;
 function complete(){
-<<<<<<< HEAD
-//  if(--totalFN === 0) mongoose.disconnect();
-=======
   if(--totalFN === 0) mongoose.disconnect();
->>>>>>> nw/1.0
 };

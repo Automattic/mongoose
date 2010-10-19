@@ -608,6 +608,23 @@ module.exports = {
       assert.ok(err[0].name == 'isAdult');
       complete();
     });  
+  },
+  
+  'test Embedded Documents': function(){
+    var document = mongoose.define;
+    
+    var EDT = 
+      document('EmbeddedDocTest')
+        .string('test')
+        .array('notes', 
+          document()
+            .string('note')
+            .date('date'));
+            
+  var EmbeddedDocTest = mongoose.EmbeddedDocTest;
+  
+  
+  
   }
 
 }

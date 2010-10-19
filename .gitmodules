@@ -4,3 +4,6 @@
 [submodule "support/node-mongodb-native"]
 	path = support/node-mongodb-native
 	url = git://github.com/christkv/node-mongodb-native.git
+[submodule "support/node-markdown"]
+	path = support/node-markdown
+	url = git://github.com/andris9/node-markdown.git

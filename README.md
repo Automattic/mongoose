@@ -115,7 +115,7 @@ example:
       });
     
     type('email')
-      .extend(type('string'))
+      .extend('string')
       .validate('email',function(value,callback){
         return callback( /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/.test(value) )
       });

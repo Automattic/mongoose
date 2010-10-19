@@ -45,6 +45,14 @@ module.exports = {
     assert.ok(email.parent == 'string');
     assert.ok(typeof email.validators['email'] == 'function');
     
+  },
+  
+  'test extending with string': function(){
+    var mongoose = require('../'),
+        type = mongoose.type,
+        phone = type('phone').extend('string');
+    assert.ok(phone.setters.length == 1);
+    assert.ok(phone.parent == 'string');
   }
   
 };

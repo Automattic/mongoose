@@ -1,2 +1,4 @@
+EXPRESSO = support/expresso/bin/expresso
+
 test:
-	support/expresso/bin/expresso tests/*.js
+	@$(EXPRESSO) tests/*.js

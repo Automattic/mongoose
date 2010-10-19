@@ -1,16 +1,6 @@
 var assert = require('assert')
   , mongoose = require('../');
 
-  function now(){
-    return Math.round(Date.now() + Math.random() * 100);
-  };
-
-  function timeout(goose){
-    return setTimeout(function(){
-      assert.ok(false, 'Connection timeout');
-    },5000);
-  };
-  
 mongoose.connect('mongodb://localhost/mongoose_integration_tests');
   
 module.exports = {
@@ -54,7 +44,7 @@ module.exports = {
        assert.ok(instance._schema['name'].setters.length == 2);     
        complete();
   },
-  
+   
   'test mixin': function(){
     var document = mongoose.define;
     document('SimpleUser')
@@ -353,7 +343,7 @@ module.exports = {
       assert.ok(typeof ch.randomMethod != 'function');
       complete();
   },
-  
+
   'test pre hooks': function(){
     var document = mongoose.define;
     var total = 0;
@@ -616,6 +606,7 @@ module.exports = {
       assert.ok(err.length == 1);
       assert.ok(err[0].type == 'validation');
       assert.ok(err[0].name == 'isAdult');
+      complete();
     });  
   }
 
@@ -623,5 +614,5 @@ module.exports = {
 
 totalFN = Object.keys(module.exports).length;
 function complete(){
-  //if(--totalFN === 0) mongoose.disconnect();
+  if(--totalFN === 0) mongoose.disconnect();
 };

@@ -349,7 +349,7 @@ module.exports = {
     var total = 0;
     document('PreHooks')
       .string('test')
-       .pre('hydrate', function(callback){
+      .pre('hydrate', function(callback){
         total++;
         callback();
       })

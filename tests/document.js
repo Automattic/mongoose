@@ -515,11 +515,11 @@ module.exports = {
     .number('age');
     
     VT.age.validate('qualify_for_medicare', function(value, cb){
-      return cb(value >= 55); 
+      cb(value >= 55); 
     });
     
     VT.email.validate('isEmail', function(value, cb){
-      return cb( (/^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/.test(value)) );
+      cb( (/^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/.test(value)) );
     });
     
     VT.hook('save', function(parent, callback){

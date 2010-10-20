@@ -183,7 +183,7 @@ example:
         
     User.age
       .validate('not_minor',function(value,complete){
-        complete( (value > 17) ? true : false);
+        complete(value > 17);
       });
 
 ### Plugins

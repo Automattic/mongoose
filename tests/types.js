@@ -73,6 +73,18 @@ module.exports = {
     assert.ok(bool instanceof TypeSchema);
   },
   
+  'test date type definition': function(){
+    var date = type('date');
+    
+    assert.equal('date', date.type);
+    assert.length(date.setters, 1);
+    assert.eql(new Date('may 25 1987'), date.setters[0]('may 25 1987'));
+    assert.eql(new Date('may 25 1987'), date.setters[0](new Date('may 25 1987')));
+    assert.isUndefined(date.setters[0]('asdfadsfasdf'));
+    assert.ok(date.setters[0](new Date) instanceof Date);
+    assert.ok(date instanceof TypeSchema);
+  },
+  
   'test extending types': function(){
     var str = type('string')
     , email = type('email')

@@ -39,6 +39,16 @@ module.exports = {
     assert.ok(arr instanceof TypeSchema);
   },
   
+  'test object type definition': function(){
+    var obj = type('object');
+    
+    assert.equal('object', obj.type);
+    assert.length(obj.setters, 1);
+    assert.eql({ foo: 'bar' }, obj.setters[0]({ foo: 'bar' }));
+    assert.eql({}, obj.setters[0](1));
+    assert.ok(obj instanceof TypeSchema);
+  },
+  
   'test extending types': function(){
     var str = type('string')
     , email = type('email')

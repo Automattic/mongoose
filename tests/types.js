@@ -49,6 +49,18 @@ module.exports = {
     assert.ok(obj instanceof TypeSchema);
   },
   
+  'test number type definition': function(){
+    var n = type('number');
+    
+    assert.equal('number', n.type);
+    assert.length(n.setters, 1);
+    assert.equal(1, n.setters[0](1));
+    assert.equal(1.5, n.setters[0](1.5));
+    assert.equal('1.5', n.setters[0]('1.5'));
+    assert.equal('1', n.setters[0]('1'));
+    assert.ok(n instanceof TypeSchema);
+  },
+  
   'test extending types': function(){
     var str = type('string')
     , email = type('email')

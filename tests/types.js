@@ -24,8 +24,10 @@ module.exports = {
     var str = type('string');
         
     assert.ok(str.type == 'string');
-    assert.ok(str.setters.length == 1);
-    assert.ok(str.setters[0](4) === '4');
+    assert.equal('string', str.type);
+    assert.length(str.setters, 1);
+    assert.equal('4', str.setters[0](4));
+    assert.equal('yay', str.setters[0]('yay'));
     assert.ok(str instanceof TypeSchema);
   },
   

@@ -1,4 +1,5 @@
 var assert = require('assert')
+  , fs = require('fs')
   , mongoose = require('mongoose')
   , document = mongoose.define;
 
@@ -21,8 +22,20 @@ document('DocTest')
 module.exports = {
   
   'test documention generation': function(){
-    mongoose.documentation('DocTest', __dirname+'/temp');
-    complete();
+    
+    mongoose.documentation('DocTest', __dirname, function(err){
+      var mdStat = fs.statSync(__dirname + '/DocTest.md')
+        , htmlStat = fs.statSync(__dirname + '/DocTest.html');
+        
+      assert.ok(err == null);  
+      assert.ok(mdStat);
+      assert.ok(htmlStat); 
+      assert.ok(mdStat.size > 2000);
+      assert.ok(htmlStat.size > 2000);
+      fs.unlink(__dirname + '/DocTest.md');
+      fs.unlink(__dirname + '/DocTest.html');
+      complete();
+    });
   }
 
   

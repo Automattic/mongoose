@@ -113,6 +113,22 @@ module.exports = {
     assert.strictEqual(1.5, set('1.5'));
     assert.strictEqual(1, set('1'));
     assert.equal(Error, set('asdf'));
+    assert.equal(Error, set({}));
+    assert.equal(Error, set());
+    assert.ok(n instanceof TypeSchema);
+  },
+  
+  'test strict number type definition': function(){
+    var n = type('strict number')
+      , set = n.setters[0];
+    
+    assert.equal('strict number', n.type);
+    assert.length(n.setters, 1);
+    assert.strictEqual(1, set(1));
+    assert.strictEqual(1.5, set(1.5));
+    assert.equal(Error, set('1.5'));
+    assert.equal(Error, set('1'));
+    assert.equal(Error, set('asdf'));
     assert.ok(n instanceof TypeSchema);
   },
   

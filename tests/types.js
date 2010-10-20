@@ -24,10 +24,25 @@ module.exports = {
     var str = type('string')
       , set = str.setters[0];
         
-    assert.ok(str.type == 'string');
     assert.equal('string', str.type);
     assert.length(str.setters, 1);
     assert.equal('4', set(4));
+    assert.equal('yay', set('yay'));
+
+    assert.equal(Error, set({}));
+    assert.equal(Error, set([]));
+    assert.equal(Error, set());
+
+    assert.ok(str instanceof TypeSchema);
+  },
+  
+  'test strict string type definition': function(){
+    var str = type('strict string')
+      , set = str.setters[0];
+        
+    assert.equal('strict string', str.type);
+    assert.length(str.setters, 1);
+    assert.equal(Error, set(4));
     assert.equal('yay', set('yay'));
 
     assert.equal(Error, set({}));

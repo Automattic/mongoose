@@ -103,14 +103,15 @@ module.exports = {
   },
   
   'test number type definition': function(){
-    var n = type('number');
+    var n = type('number')
+      , set = n.setters[0];
     
     assert.equal('number', n.type);
     assert.length(n.setters, 1);
-    assert.strictEqual(1, n.setters[0](1));
-    assert.strictEqual(1.5, n.setters[0](1.5));
-    assert.strictEqual(1.5, n.setters[0]('1.5'));
-    assert.strictEqual(1, n.setters[0]('1'));
+    assert.strictEqual(1, set(1));
+    assert.strictEqual(1.5, set(1.5));
+    assert.strictEqual(1.5, set('1.5'));
+    assert.strictEqual(1, set('1'));
     assert.ok(n instanceof TypeSchema);
   },
   

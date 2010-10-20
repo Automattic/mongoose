@@ -176,6 +176,18 @@ module.exports = {
     assert.ok(date instanceof TypeSchema);
   },
   
+  'test strict date type definition': function(){
+    var date = type('strict date');
+    
+    assert.equal('strict date', date.type);
+    assert.length(date.setters, 1);
+    assert.equal(Error, date.setters[0]('may 25 1987'));
+    assert.eql(new Date('may 25 1987'), date.setters[0](new Date('may 25 1987')));
+    assert.equal(Error, date.setters[0]('asdfadsfasdf'));
+    assert.ok(date.setters[0](new Date) instanceof Date);
+    assert.ok(date instanceof TypeSchema);
+  },
+  
   'test oid type definition': function(){
     var oid = type('oid');
 

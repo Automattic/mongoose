@@ -171,7 +171,7 @@ module.exports = {
     assert.length(date.setters, 1);
     assert.eql(new Date('may 25 1987'), date.setters[0]('may 25 1987'));
     assert.eql(new Date('may 25 1987'), date.setters[0](new Date('may 25 1987')));
-    assert.isUndefined(date.setters[0]('asdfadsfasdf'));
+    assert.equal(Error, date.setters[0]('asdfadsfasdf'));
     assert.ok(date.setters[0](new Date) instanceof Date);
     assert.ok(date instanceof TypeSchema);
   },

@@ -21,13 +21,19 @@ module.exports = {
   },
   
   'test string type definition': function(){
-    var str = type('string');
+    var str = type('string')
+      , set = str.setters[0];
         
     assert.ok(str.type == 'string');
     assert.equal('string', str.type);
     assert.length(str.setters, 1);
-    assert.equal('4', str.setters[0](4));
-    assert.equal('yay', str.setters[0]('yay'));
+    assert.equal('4', set(4));
+    assert.equal('yay', set('yay'));
+
+    assert.equal(Error, set({}));
+    assert.equal(Error, set([]));
+    assert.equal(Error, set());
+
     assert.ok(str instanceof TypeSchema);
   },
   

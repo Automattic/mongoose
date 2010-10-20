@@ -1,10 +1,10 @@
 var assert = require('assert')
-  , TypeSchema = require('../lib/mongoose/type');
+  , TypeSchema = require('mongoose/type');
 
 module.exports = {
   
   'test types': function(){
-    var mongoose = require('../'),
+    var mongoose = require('mongoose'),
         type = mongoose.type,
         str = type('string');
         
@@ -21,7 +21,7 @@ module.exports = {
   },
   
   'test string type definition': function(){
-    var mongoose = require('../'),
+    var mongoose = require('mongoose'),
         type = mongoose.type,
         str = type('string');
         
@@ -32,7 +32,7 @@ module.exports = {
   },
   
   'test extending types': function(){
-    var mongoose = require('../'),
+    var mongoose = require('mongoose'),
         type = mongoose.type,
         str = type('string'),
         email = type('email')
@@ -48,7 +48,7 @@ module.exports = {
   },
   
   'test extending with string': function(){
-    var mongoose = require('../'),
+    var mongoose = require('mongoose'),
         type = mongoose.type,
         phone = type('phone').extend('string');
     assert.ok(phone.setters.length == 1);

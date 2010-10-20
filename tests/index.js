@@ -1,6 +1,6 @@
 var assert = require('assert')
-  , mongoose = require('../')
-  , Document = require('../lib/mongoose/document').Document;
+  , mongoose = require('mongoose')
+  , Document = require('mongoose/document').Document;
 
 function now(){
   return Math.round(Date.now() + Math.random() * 100);
@@ -15,7 +15,7 @@ function timeout(goose){
 module.exports = {
 
   'test connecting to mongodb': function(){
-    var mongoose = require('../'),
+    var mongoose = require('mongoose'),
         timer = timeout(mongoose);
     mongoose.connect('mongodb://localhost/' + now(), function(){
       clearTimeout(timer);

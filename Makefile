@@ -1,6 +1,8 @@
 EXPRESSO = support/expresso/bin/expresso
 
 test:
-	@$(EXPRESSO) tests/*.js
+	@$(EXPRESSO) \
+		-I lib \
+		tests/*.js
 
 .PHONY: test

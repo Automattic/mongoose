@@ -1,5 +1,5 @@
 var assert = require('assert')
-  , mongoose = require('../');
+  , mongoose = require('mongoose');
 
 mongoose.connect('mongodb://localhost/mongoose_integration_tests');
   

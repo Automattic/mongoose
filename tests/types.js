@@ -84,6 +84,24 @@ module.exports = {
     assert.ok(obj instanceof TypeSchema);
   },
   
+  'test strict object type definition': function(){
+    var obj = type('strict object')
+      , set = obj.setters[0];
+    
+    assert.equal('strict object', obj.type);
+    assert.length(obj.setters, 1);
+    assert.eql({ foo: 'bar' }, set({ foo: 'bar' }));
+
+    assert.equal(Error, set([1,2]));
+    assert.equal(Error, set());
+    assert.equal(Error, set(null));
+    assert.equal(Error, set(NaN));
+    assert.equal(Error, set('asdf'));
+    assert.equal(Error, set(/foo/));
+
+    assert.ok(obj instanceof TypeSchema);
+  },
+  
   'test number type definition': function(){
     var n = type('number');
     

@@ -133,14 +133,34 @@ module.exports = {
   },
   
   'test boolean type definition': function(){
-    var bool = type('boolean');
+    var bool = type('boolean')
+      , set = bool.setters[0];
     
     assert.equal('boolean', bool.type);
     assert.length(bool.setters, 1);
-    assert.strictEqual(true, bool.setters[0]({}));
-    assert.strictEqual(true, bool.setters[0](1));
-    assert.strictEqual(true, bool.setters[0]('1'));
-    assert.strictEqual(false, bool.setters[0](0));
+    assert.strictEqual(true, set({}));
+    assert.strictEqual(true, set(1));
+    assert.strictEqual(true, set(true));
+    assert.strictEqual(true, set('1'));
+    assert.strictEqual(false, set(0));
+    assert.strictEqual(false, set(false));
+    assert.ok(bool instanceof TypeSchema);
+  },
+  
+  'test strict boolean type definition': function(){
+    var bool = type('strict boolean')
+      , set = bool.setters[0];
+    
+    assert.equal('strict boolean', bool.type);
+    assert.length(bool.setters, 1);
+
+    assert.equal(Error, set({}));
+    assert.equal(Error, set(1));
+    assert.equal(Error, set('1'));
+    assert.equal(Error, set(0));
+    assert.strictEqual(true, set(true));
+    assert.strictEqual(false, set(false));
+
     assert.ok(bool instanceof TypeSchema);
   },
   

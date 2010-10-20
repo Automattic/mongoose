@@ -53,12 +53,24 @@ module.exports = {
   },
   
   'test array type definition': function(){
-    var arr = type('array');
+    var arr = type('array')
+      , set = arr.setters[0];
 
     assert.equal('array', arr.type);
     assert.length(arr.setters, 1);
-    assert.eql([1], arr.setters[0](1));
-    assert.eql([1,2], arr.setters[0]([1,2]));
+    assert.eql([1], set(1));
+    assert.eql([1,2], set([1,2]));
+    assert.ok(arr instanceof TypeSchema);
+  },
+  
+  'test strict array type definition': function(){
+    var arr = type('strict array')
+      , set = arr.setters[0];
+
+    assert.equal('strict array', arr.type);
+    assert.length(arr.setters, 1);
+    assert.equal(Error, set(1));
+    assert.eql([1,2], set([1,2]));
     assert.ok(arr instanceof TypeSchema);
   },
   

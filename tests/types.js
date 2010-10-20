@@ -29,6 +29,16 @@ module.exports = {
     assert.ok(str instanceof TypeSchema);
   },
   
+  'test array type definition': function(){
+    var arr = type('array');
+
+    assert.equal('array', arr.type);
+    assert.length(arr.setters, 1);
+    assert.eql([1], arr.setters[0](1));
+    assert.eql([1,2], arr.setters[0]([1,2]));
+    assert.ok(arr instanceof TypeSchema);
+  },
+  
   'test extending types': function(){
     var str = type('string')
     , email = type('email')
@@ -40,7 +50,6 @@ module.exports = {
     assert.ok(email.setters.length == 1);
     assert.ok(email.parent == 'string');
     assert.ok(typeof email.validators['email'] == 'function');
-    
   },
   
   'test extending with string': function(){

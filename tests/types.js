@@ -87,6 +87,16 @@ module.exports = {
     assert.ok(date instanceof TypeSchema);
   },
   
+  'test oid type definition': function(){
+    var oid = type('oid');
+
+    assert.equal('oid', oid.type);
+    assert.length(oid.setters, 1);
+    assert.ok(oid.setters[0]('4cbf63b7ed2797e92f000007') instanceof mongoose.ObjectID);
+    assert.ok(oid.setters[0]() instanceof mongoose.ObjectID);
+    assert.ok(oid instanceof TypeSchema);
+  },
+  
   'test extending types': function(){
     var str = type('string')
     , email = type('email')

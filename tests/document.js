@@ -652,6 +652,18 @@ module.exports = {
     assert.ok(edt.notes[1].note == 'bye');
 
     complete();
+  },
+  
+  'test invalid type coercion': function(){
+    var Animal =
+      mongoose.define('Animal')
+        .strictString('name')
+        .strictNumber('age');
+
+    var tobi = new Animal({ name: 'Tobi', age: '1' });
+    tobi.save(function(err){
+      console.log(err);
+    });
   }
 
 };

@@ -10,8 +10,8 @@ var testStrings = [
   'ox','Ox','virus','Virus','archive','Archive','louse','Louse','curve','Curve'
 ];
 
-var pluralize = require('mongoose/util').string.pluralize;
-var subclass = require('mongoose/util').subclass;
+var pluralize = require('mongoose').util.string.pluralize;
+var subclass = require('mongoose').util.subclass;
 
 module.exports = {
   

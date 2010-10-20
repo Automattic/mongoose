@@ -1,6 +1,6 @@
 var assert = require('assert')
   , mongoose = require('mongoose')
-  , Document = require('mongoose/document').Document;
+  , Document = mongoose.Document;
 
 function now(){
   return Math.round(Date.now() + Math.random() * 100);

@@ -1,5 +1,5 @@
 var assert = require('assert')
-  , TypeSchema = require('mongoose/type');
+  , TypeSchema = require('mongoose').TypeSchema;
 
 module.exports = {
   

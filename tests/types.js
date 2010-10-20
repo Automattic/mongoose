@@ -112,6 +112,7 @@ module.exports = {
     assert.strictEqual(1.5, set(1.5));
     assert.strictEqual(1.5, set('1.5'));
     assert.strictEqual(1, set('1'));
+    assert.equal(Error, set('asdf'));
     assert.ok(n instanceof TypeSchema);
   },
   

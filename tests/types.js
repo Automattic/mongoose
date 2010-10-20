@@ -37,8 +37,8 @@ module.exports = {
   },
   
   'test strict string type definition': function(){
-    var str = type('strictString')
-      , set = str.setters[0];
+    var str = type('string').strict()
+      , set = str.strictSetters[0];
         
     assert.length(str.setters, 1);
     assert.equal(Error, set(4));
@@ -63,8 +63,8 @@ module.exports = {
   },
   
   'test strict array type definition': function(){
-    var arr = type('strictArray')
-      , set = arr.setters[0];
+    var arr = type('array').strict()
+      , set = arr.strictSetters[0];
 
     assert.length(arr.setters, 1);
     assert.equal(Error, set(1));
@@ -83,8 +83,8 @@ module.exports = {
   },
   
   'test strict object type definition': function(){
-    var obj = type('strictObject')
-      , set = obj.setters[0];
+    var obj = type('object').strict()
+      , set = obj.strictSetters[0];
     
     assert.length(obj.setters, 1);
     assert.eql({ foo: 'bar' }, set({ foo: 'bar' }));
@@ -116,8 +116,8 @@ module.exports = {
   },
   
   'test strict number type definition': function(){
-    var n = type('strictNumber')
-      , set = n.setters[0];
+    var n = type('number').strict()
+      , set = n.strictSetters[0];
     
     assert.length(n.setters, 1);
     assert.strictEqual(1, set(1));
@@ -144,8 +144,8 @@ module.exports = {
   },
   
   'test strict boolean type definition': function(){
-    var bool = type('strictBoolean')
-      , set = bool.setters[0];
+    var bool = type('boolean').strict()
+      , set = bool.strictSetters[0];
     
     assert.length(bool.setters, 1);
 
@@ -172,14 +172,14 @@ module.exports = {
   },
   
   'test strict date type definition': function(){
-    var date = type('strictDate');
+    var date = type('date').strict()
+      , set = date.strictSetters[0];
     
-    assert.equal('strictDate', date.type);
     assert.length(date.setters, 1);
-    assert.equal(Error, date.setters[0]('may 25 1987'));
-    assert.eql(new Date('may 25 1987'), date.setters[0](new Date('may 25 1987')));
-    assert.equal(Error, date.setters[0]('asdfadsfasdf'));
-    assert.ok(date.setters[0](new Date) instanceof Date);
+    assert.equal(Error, set('may 25 1987'));
+    assert.eql(new Date('may 25 1987'), set(new Date('may 25 1987')));
+    assert.equal(Error, set('asdfadsfasdf'));
+    assert.ok(set(new Date) instanceof Date);
     assert.ok(date instanceof TypeSchema);
   },
   

@@ -3,6 +3,9 @@ EXPRESSO = support/expresso/bin/expresso
 test:
 	@$(EXPRESSO) \
 		-I lib \
-		tests/*.js
+		$(TEST_FLAGS) tests/*.js
 
-.PHONY: test
+test-cov:
+	@$(MAKE) TEST_FLAGS=--cov test
+
+.PHONY: test test-cov

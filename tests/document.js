@@ -2,7 +2,7 @@ var assert = require('assert')
   , mongoose = require('mongoose');
 
 mongoose.connect('mongodb://localhost/mongoose_integration_tests');
-  
+
 module.exports = {
     
   'test hydration': function(){
@@ -649,12 +649,13 @@ module.exports = {
     assert.ok(edt.notes[0].note == 'hi');
     edt.notes.push({note: 'bye', date: new Date()});
     assert.ok(edt.notes[1].note == 'bye');
+
     complete();
   }
 
-}
+};
 
-totalFN = Object.keys(module.exports).length;
+var pending = Object.keys(module.exports).length;
 function complete(){
-  if(--totalFN === 0) mongoose.disconnect();
+  --pending || mongoose.disconnect();
 };

@@ -54,11 +54,23 @@ module.exports = {
     
     assert.equal('number', n.type);
     assert.length(n.setters, 1);
-    assert.equal(1, n.setters[0](1));
-    assert.equal(1.5, n.setters[0](1.5));
-    assert.equal('1.5', n.setters[0]('1.5'));
-    assert.equal('1', n.setters[0]('1'));
+    assert.strictEqual(1, n.setters[0](1));
+    assert.strictEqual(1.5, n.setters[0](1.5));
+    assert.strictEqual(1.5, n.setters[0]('1.5'));
+    assert.strictEqual(1, n.setters[0]('1'));
     assert.ok(n instanceof TypeSchema);
+  },
+  
+  'test boolean type definition': function(){
+    var bool = type('boolean');
+    
+    assert.equal('boolean', bool.type);
+    assert.length(bool.setters, 1);
+    assert.strictEqual(true, bool.setters[0]({}));
+    assert.strictEqual(true, bool.setters[0](1));
+    assert.strictEqual(true, bool.setters[0]('1'));
+    assert.strictEqual(false, bool.setters[0](0));
+    assert.ok(bool instanceof TypeSchema);
   },
   
   'test extending types': function(){

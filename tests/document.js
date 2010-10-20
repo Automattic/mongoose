@@ -2,7 +2,7 @@ var assert = require('assert')
   , mongoose = require('mongoose');
 
 mongoose.connect('mongodb://localhost/mongoose_integration_tests');
-  
+
 module.exports = {
     
   'test hydration': function(){
@@ -625,6 +625,7 @@ module.exports = {
     ac.ids.push(null);
     assert.ok(ac.ids.length == 3);
     assert.ok(ac.ids.get(2).toHexString());
+    complete();
   },
   
   'test Embedded Documents': function(){
@@ -638,22 +639,23 @@ module.exports = {
             .string('note')
             .date('date'));
             
-  var EmbeddedDocTest = mongoose.EmbeddedDocTest;
+    var EmbeddedDocTest = mongoose.EmbeddedDocTest;
   
-  var edt = new EmbeddedDocTest({
-    test: 'me',
-    notes: [{note: 'hi', date: new Date()}] 
-  });
+    var edt = new EmbeddedDocTest({
+      test: 'me',
+      notes: [{note: 'hi', date: new Date()}] 
+    });
   
-  assert.ok(edt.notes[0].note == 'hi');
-  edt.notes.push({note: 'bye', date: new Date()});
-  assert.ok(edt.notes[1].note == 'bye');
-  
+    assert.ok(edt.notes[0].note == 'hi');
+    edt.notes.push({note: 'bye', date: new Date()});
+    assert.ok(edt.notes[1].note == 'bye');
+
+    complete();
   }
 
-}
+};
 
-totalFN = Object.keys(module.exports).length;
+var pending = Object.keys(module.exports).length;
 function complete(){
-  if(--totalFN === 0) mongoose.disconnect();
+  --pending || mongoose.disconnect();
 };

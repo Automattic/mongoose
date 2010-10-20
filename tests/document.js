@@ -657,8 +657,8 @@ module.exports = {
   'test invalid type coercion': function(){
     var Animal =
       mongoose.define('Animal')
-        .strictString('name')
-        .strictNumber('age');
+        .string('name').strict()
+        .strict('age').strict();
 
     var tobi = new Animal({ name: 'Tobi', age: '1' });
     tobi.save(function(err){

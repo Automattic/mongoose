@@ -655,15 +655,14 @@ module.exports = {
   },
   
   'test invalid type coercion': function(){
-    // var Animal =
-    //   mongoose.define('Animal')
-    //     .string('name').strict()
-    //     .number('age').strict();
-    // 
-    // var tobi = new Animal({ name: 'Tobi', age: '1' });
-    // tobi.save(function(err){
-    //   console.log(err);
-    // });
+    var Animal =
+      mongoose.define('Animal')
+        .string('name').strict()
+        .number('age');
+    var tobi = new Animal({ name: { foo: 'bar' }, age: '23' });
+    tobi.save(function(err){
+      console.log(err);
+    });
   }
 
 };

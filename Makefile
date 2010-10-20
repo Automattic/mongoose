@@ -10,4 +10,7 @@ test:
 test-cov:
 	@$(MAKE) TEST_FLAGS=--cov test
 
-.PHONY: test test-cov
+benchmark:
+	@node benchmark/bm.js
+
+.PHONY: test test-cov benchmark

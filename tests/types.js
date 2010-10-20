@@ -1,12 +1,12 @@
 var assert = require('assert')
-  , TypeSchema = require('mongoose').TypeSchema;
+  , mongoose = require('mongoose')
+  , TypeSchema = mongoose.TypeSchema
+  , type = mongoose.type;
 
 module.exports = {
   
   'test types': function(){
-    var mongoose = require('mongoose'),
-        type = mongoose.type,
-        str = type('string');
+    var str = type('string');
         
     assert.ok(typeof type == 'function');
     
@@ -21,9 +21,7 @@ module.exports = {
   },
   
   'test string type definition': function(){
-    var mongoose = require('mongoose'),
-        type = mongoose.type,
-        str = type('string');
+    var str = type('string');
         
     assert.ok(str.type == 'string');
     assert.ok(str.setters.length == 1);
@@ -32,14 +30,12 @@ module.exports = {
   },
   
   'test extending types': function(){
-    var mongoose = require('mongoose'),
-        type = mongoose.type,
-        str = type('string'),
-        email = type('email')
-          .extend(str)
-          .validate('email',function(val,complete){
-            return complete( /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/.test(value) );
-          });
+    var str = type('string')
+    , email = type('email')
+        .extend(str)
+        .validate('email',function(val,complete){
+          return complete( /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/.test(value) );
+        });
     
     assert.ok(email.setters.length == 1);
     assert.ok(email.parent == 'string');
@@ -48,9 +44,7 @@ module.exports = {
   },
   
   'test extending with string': function(){
-    var mongoose = require('mongoose'),
-        type = mongoose.type,
-        phone = type('phone').extend('string');
+    var phone = type('phone').extend('string');
     assert.ok(phone.setters.length == 1);
     assert.ok(phone.parent == 'string');
   }

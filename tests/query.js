@@ -17,40 +17,34 @@ document('User')
   
 var User = mongoose.User;
 
-
-
 module.exports = {
-  
-  'test simple document insertion': function(){
+  'test simple document insertion': function(assert, done){
     var user = new User({
-        name: {
-          first: 'Nathan',
-          last: 'White'
-        },
-        contact: {
-          email: 'nathan@learnboost.com',
-          phone: '555-555-5555'
-        },
-        age: 33
-      });
+      name: {
+        first: 'Nathan',
+        last: 'White'
+      },
+      contact: {
+        email: 'nathan@learnboost.com',
+        phone: '555-555-5555'
+      },
+      age: 33
+    });
       
-      user.save(function(){
-        complete();
-      });
+    user.save(function(){
+      done();
+    });
   },
   
-  'test query find': function(){
+  'test query find': function(assert, done){
     User.find({age: 33}).one(function(doc){
       // assert.ok(doc.age == 33);
       // assert.ok(doc.name.first == 'Nathan');
-      // complete();
-    })
-    
-  }
+      // done();
+    });
+  },
   
-};
-
-var pending = Object.keys(module.exports).length;
-function complete(){
-  --pending || db.close();
+  teardown: function(){
+    db.close();
+  }
 };

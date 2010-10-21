@@ -5,6 +5,7 @@ TESTS = tests/*.js
 test:
 	@$(EXPRESSO) \
 		-I lib \
+		--serial \
 		$(TEST_FLAGS) $(TESTS)
 
 test-cov:

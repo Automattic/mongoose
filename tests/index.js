@@ -10,26 +10,28 @@ function timeout(goose){
 
 module.exports = {
 
-  'test connecting to mongodb': function(){
-    var timer = timeout(mongoose);
-    mongoose.connect('mongodb://localhost/mongoose_connect', function(){
-      clearTimeout(timer);
-      assert.ok(mongoose.connected, 'It should connect using uri / callback signature');
-      
-      mongoose.disconnect(function(){
-        assert.ok(!mongoose.connected);
-        
-        var timer = timeout(mongoose);
-        mongoose.connect('mongodb://localhost/mongoose_connect', { some: 'option' }, function(){
-          clearTimeout(timer);
-          assert.ok(mongoose.connected, 'It should connect using uri / options / callback signature');
-          mongoose.disconnect(function(){
-            assert.ok(!mongoose.connected);
-          });
-        });
-      });
-    });
-  },
+  // 'test connecting to mongodb': function(assert, done){
+  //   var mongoose = require('mongoose'),
+  //       timer = timeout(mongoose);
+  //   mongoose.connect('mongodb://localhost/mongoose_connect', function(){
+  //     clearTimeout(timer);
+  //     assert.ok(mongoose.connected, 'It should connect using uri / callback signature');
+  //     
+  //     mongoose.disconnect(function(){
+  //       assert.ok(!mongoose.connected);
+  //       
+  //       var timer = timeout(mongoose);
+  //       mongoose.connect('mongodb://localhost/mongoose_connect', { some: 'option' }, function(){
+  //         clearTimeout(timer);
+  //         assert.ok(mongoose.connected, 'It should connect using uri / options / callback signature');
+  //         mongoose.disconnect(function(){
+  //           assert.ok(!mongoose.connected);
+  //           done();
+  //         });
+  //       });
+  //     });
+  //   });
+  // },
   
   'test connection path errors': function(){
       try{

@@ -21,23 +21,54 @@ module.exports = {
   },
   
   'test string type definition': function(){
-    var str = type('string');
+    var str = type('string')
+      , set = str.setters[0];
         
-    assert.ok(str.type == 'string');
     assert.equal('string', str.type);
     assert.length(str.setters, 1);
-    assert.equal('4', str.setters[0](4));
-    assert.equal('yay', str.setters[0]('yay'));
+    assert.equal('4', set(4));
+    assert.equal('yay', set('yay'));
+
+    assert.equal(Error, set({}));
+    assert.equal(Error, set([]));
+    assert.equal(Error, set());
+
+    assert.ok(str instanceof TypeSchema);
+  },
+  
+  'test strict string type definition': function(){
+    var str = type('string').strict()
+      , set = str.strictSetters[0];
+        
+    assert.length(str.setters, 1);
+    assert.equal(Error, set(4));
+    assert.equal('yay', set('yay'));
+
+    assert.equal(Error, set({}));
+    assert.equal(Error, set([]));
+    assert.equal(Error, set());
+
     assert.ok(str instanceof TypeSchema);
   },
   
   'test array type definition': function(){
-    var arr = type('array');
+    var arr = type('array')
+      , set = arr.setters[1];
 
     assert.equal('array', arr.type);
     assert.length(arr.setters, 2);
     assert.eql([1], arr.setters[1](1));
     assert.eql([1,2], arr.setters[1]([1,2]));
+    assert.ok(arr instanceof TypeSchema);
+  },
+  
+  'test strict array type definition': function(){
+    var arr = type('array').strict()
+      , set = arr.strictSetters[0];
+
+    assert.length(arr.setters, 1);
+    assert.equal(Error, set(1));
+    assert.eql([1,2], set([1,2]));
     assert.ok(arr instanceof TypeSchema);
   },
   
@@ -51,27 +82,80 @@ module.exports = {
     assert.ok(obj instanceof TypeSchema);
   },
   
+  'test strict object type definition': function(){
+    var obj = type('object').strict()
+      , set = obj.strictSetters[0];
+    
+    assert.length(obj.setters, 1);
+    assert.eql({ foo: 'bar' }, set({ foo: 'bar' }));
+
+    assert.equal(Error, set([1,2]));
+    assert.equal(Error, set());
+    assert.equal(Error, set(null));
+    assert.equal(Error, set(NaN));
+    assert.equal(Error, set('asdf'));
+    assert.equal(Error, set(/foo/));
+
+    assert.ok(obj instanceof TypeSchema);
+  },
+  
   'test number type definition': function(){
-    var n = type('number');
+    var n = type('number')
+      , set = n.setters[0];
     
     assert.equal('number', n.type);
     assert.length(n.setters, 1);
-    assert.strictEqual(1, n.setters[0](1));
-    assert.strictEqual(1.5, n.setters[0](1.5));
-    assert.strictEqual(1.5, n.setters[0]('1.5'));
-    assert.strictEqual(1, n.setters[0]('1'));
+    assert.strictEqual(1, set(1));
+    assert.strictEqual(1.5, set(1.5));
+    assert.strictEqual(1.5, set('1.5'));
+    assert.strictEqual(1, set('1'));
+    assert.equal(Error, set('asdf'));
+    assert.equal(Error, set({}));
+    assert.equal(Error, set());
+    assert.ok(n instanceof TypeSchema);
+  },
+  
+  'test strict number type definition': function(){
+    var n = type('number').strict()
+      , set = n.strictSetters[0];
+    
+    assert.length(n.setters, 1);
+    assert.strictEqual(1, set(1));
+    assert.strictEqual(1.5, set(1.5));
+    assert.equal(Error, set('1.5'));
+    assert.equal(Error, set('1'));
+    assert.equal(Error, set('asdf'));
     assert.ok(n instanceof TypeSchema);
   },
   
   'test boolean type definition': function(){
-    var bool = type('boolean');
+    var bool = type('boolean')
+      , set = bool.setters[0];
     
     assert.equal('boolean', bool.type);
     assert.length(bool.setters, 1);
-    assert.strictEqual(true, bool.setters[0]({}));
-    assert.strictEqual(true, bool.setters[0](1));
-    assert.strictEqual(true, bool.setters[0]('1'));
-    assert.strictEqual(false, bool.setters[0](0));
+    assert.strictEqual(true, set({}));
+    assert.strictEqual(true, set(1));
+    assert.strictEqual(true, set(true));
+    assert.strictEqual(true, set('1'));
+    assert.strictEqual(false, set(0));
+    assert.strictEqual(false, set(false));
+    assert.ok(bool instanceof TypeSchema);
+  },
+  
+  'test strict boolean type definition': function(){
+    var bool = type('boolean').strict()
+      , set = bool.strictSetters[0];
+    
+    assert.length(bool.setters, 1);
+
+    assert.equal(Error, set({}));
+    assert.equal(Error, set(1));
+    assert.equal(Error, set('1'));
+    assert.equal(Error, set(0));
+    assert.strictEqual(true, set(true));
+    assert.strictEqual(false, set(false));
+
     assert.ok(bool instanceof TypeSchema);
   },
   
@@ -82,8 +166,20 @@ module.exports = {
     assert.length(date.setters, 1);
     assert.eql(new Date('may 25 1987'), date.setters[0]('may 25 1987'));
     assert.eql(new Date('may 25 1987'), date.setters[0](new Date('may 25 1987')));
-    assert.isUndefined(date.setters[0]('asdfadsfasdf'));
+    assert.equal(Error, date.setters[0]('asdfadsfasdf'));
     assert.ok(date.setters[0](new Date) instanceof Date);
+    assert.ok(date instanceof TypeSchema);
+  },
+  
+  'test strict date type definition': function(){
+    var date = type('date').strict()
+      , set = date.strictSetters[0];
+    
+    assert.length(date.setters, 1);
+    assert.equal(Error, set('may 25 1987'));
+    assert.eql(new Date('may 25 1987'), set(new Date('may 25 1987')));
+    assert.equal(Error, set('asdfadsfasdf'));
+    assert.ok(set(new Date) instanceof Date);
     assert.ok(date instanceof TypeSchema);
   },
   

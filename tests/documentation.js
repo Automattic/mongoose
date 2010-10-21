@@ -1,8 +1,8 @@
 var assert = require('assert')
   , fs = require('fs')
-  , mongoose = require('mongoose')
+  , mongoose = require('../')
   , document = mongoose.define
-  , db =mongoose.connect('mongodb://localhost/mongoose_integration_tests');
+  , db = mongoose.connect('mongodb://localhost/mongoose_integration_tests');
 
 document('DocTest')
   .oid('_id')
@@ -16,12 +16,9 @@ document('DocTest')
       .string('phone'))
   .number('age');
 
-
-
 module.exports = {
   
-  'test documention generation': function(){
-    
+  'test documention generation': function(assert, done){
     mongoose.documentation('DocTest', __dirname, function(err){
       var mdStat = fs.statSync(__dirname + '/DocTest.md')
         , htmlStat = fs.statSync(__dirname + '/DocTest.html');
@@ -33,15 +30,11 @@ module.exports = {
       assert.ok(htmlStat.size > 2000);
       fs.unlink(__dirname + '/DocTest.md');
       fs.unlink(__dirname + '/DocTest.html');
-      complete();
+      done();
     });
+  },
+  
+  teardown: function(){
+    db.close();
   }
-
-  
-  
-};
-
-var pending = Object.keys(module.exports).length;
-function complete(){
-  --pending || db.close();
 };

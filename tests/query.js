@@ -84,7 +84,13 @@ module.exports = {
   'test count()': function(assert, done){
     User.count(function(n){
       assert.equal(2, n);
-      done();
+      User.count({ 'name.last': 'White' }, function(n){
+        assert.equal(1, n);
+        User.count({ 'name.last': 'foobar' }, function(n){
+          assert.equal(0, n);
+          done();
+        });
+      });
     });
   },
 

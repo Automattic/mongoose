@@ -52,7 +52,7 @@ module.exports = {
     
   },
   
-  'test find/all query with one condition': function(assert, done){
+  'test find()/all() query with one condition': function(assert, done){
     User.find({age:33}).all(function(docs){
       assert.length(docs, 1);
       assert.equal('Nathan', docs[0].name.first);
@@ -64,20 +64,27 @@ module.exports = {
     });
   },
   
-  'test find/one query with one condition': function(assert, done){
+  'test find()/one() query with one condition': function(assert, done){
     User.find({ 'contact.email': 'nathan@learnboost.com' }).one(function(doc){
       assert.equal('Nathan', doc.name.first);
       done();
     });
   },
   
-  'test findById': function(assert, done){
+  'test findById()': function(assert, done){
     User.find({ 'name.first': 'TJ' }).all(function(docs){
       assert.length(docs, 1);
       User.findById(docs[0]._id, function(doc){
         assert.equal('TJ', doc.name.first);
         done();
       });
+    });
+  },
+  
+  'test count()': function(assert, done){
+    User.count(function(n){
+      assert.equal(2, n);
+      done();
     });
   },
 

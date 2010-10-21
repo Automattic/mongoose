@@ -70,13 +70,27 @@ module.exports = {
   },
   
   'test first()': function(assert, done){
+    User.first().all(function(docs){
+      assert.length(docs, 1);
+      done();
+    });
+  },
+  
+  'test first(n)': function(assert, done){
+    User.first(2).all(function(docs){
+      assert.length(docs, 2);
+      done();
+    });
+  },
+  
+  'test first(fn)': function(assert, done){
     User.first(function(doc){
       assert.equal('Nathan', doc.name.first);
       done();
     });
   },
   
-  'test first(n)': function(assert, done){
+  'test first(n, fn)': function(assert, done){
     User.first(2, function(docs){
       assert.length(docs, 2);
       done();

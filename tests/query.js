@@ -76,6 +76,13 @@ module.exports = {
     });
   },
   
+  'test first(n)': function(assert, done){
+    User.first(2, function(docs){
+      assert.length(docs, 2);
+      done();
+    });
+  },
+  
   'test find()/all() query with one condition': function(assert, done){
     User.find({age:33}).all(function(docs){
       assert.length(docs, 1);

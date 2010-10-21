@@ -31,13 +31,15 @@ module.exports = {
       age: 33
     });
       
-    user.save(function(){
+    user.save(function(errors){
+      assert.ok(!errors);
       done();
     });
   },
   
   'test query find': function(assert, done){
-    User.find({age: 33}).one(function(doc){
+    User.find({ age: 33 }).all(function(docs){
+      assert.length(docs, 1);
       // assert.ok(doc.age == 33);
       // assert.ok(doc.name.first == 'Nathan');
       done();

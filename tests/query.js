@@ -63,6 +63,13 @@ module.exports = {
       })
     });
   },
+  
+  'test find/one query with one condition': function(assert, done){
+    User.find({ 'contact.email': 'nathan@learnboost.com' }).one(function(doc){
+      assert.equal('Nathan', doc.name.first);
+      done();
+    });
+  },
 
   teardown: function(){
     db.close();

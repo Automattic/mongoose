@@ -111,6 +111,7 @@ module.exports = {
   'test remove()': function(assert, done){
     User.remove({ 'name.first': 'TJ' }, function(){
       User.find({ 'name.first': 'TJ' }).all(function(docs){
+        assert.length(docs, 0);
         User.find().all(function(docs){
           assert.length(docs, 1);
           done();

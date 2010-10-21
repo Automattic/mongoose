@@ -40,7 +40,6 @@ module.exports = {
   
   'test find query': function(assert, done){
     User.find({age: 33}).all(function(docs){
-      console.log(docs);
       assert.length(docs, 1);
       assert.ok(docs[0].age == 33);
       done();

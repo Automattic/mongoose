@@ -205,7 +205,7 @@ module.exports = {
     assert.ok(user.get('contact.city') == 'SF');
     assert.ok(user.isDirty('name') == true);
     assert.ok(user.isDirty('contact.city') == true);
-    assert.ok(Object.keys(user._.doc).length == 2);
+    assert.ok(Object.keys(user._.doc).length == 3);
     assert.ok(Object.keys(user._.doc.contact).length == 1);
   },
   
@@ -219,7 +219,7 @@ module.exports = {
     assert.ok(user.contact.city == 'SF');
     assert.ok(user.isDirty('name') == true);
     assert.ok(user.isDirty('contact.city') == true);
-    assert.ok(Object.keys(user._.doc).length == 2);
+    assert.ok(Object.keys(user._.doc).length == 3);
     assert.ok(Object.keys(user._.doc.contact).length == 1);
   },
   

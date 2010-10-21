@@ -43,7 +43,6 @@ module.exports = {
 
        assert.ok(instance._schema['name'].getters.length == 1);
        assert.ok(instance._schema['name'].setters.length == 2);     
-       complete();
   },
   
   'test mixin': function(){
@@ -87,8 +86,6 @@ module.exports = {
 
        assert.ok(instance._schema['name'].getters.length == 1);
        assert.ok(instance._schema['name'].setters.length == 2);     
-       
-       complete();
   },
   
   'test setup functions': function(){
@@ -100,7 +97,6 @@ module.exports = {
     
     var instance = new SetupFn();
     assert.ok(instance._schema['id'].type == 'virtual');
-    complete();
   },
   
   'test default property setting': function(){
@@ -109,7 +105,6 @@ module.exports = {
       var instance = new SetupFn();
       assert.ok(instance.isDirty('_id') == true);
       assert.ok(instance._id.toHexString() == instance.id);
-      complete();
   },
   
   'test defaults with hydration': function(){
@@ -119,7 +114,6 @@ module.exports = {
 
     assert.ok(instance.isDirty('_id') == false);
     assert.ok(instance._id == undefined);
-    complete();
   },
   
   'test isNew flag': function(){
@@ -130,7 +124,6 @@ module.exports = {
     
     var user = new SimpleUser({name: 'Nathan'}, true);
     assert.ok(user.isNew == false);
-    complete();
   },
   
   'test hydrated()': function(){
@@ -157,7 +150,6 @@ module.exports = {
     assert.ok(user.hydrated('name') == false);
     assert.ok(user.hydrated('contact.city') == false);
     assert.ok(user.hydrated('contact.state') == false);
-    complete();
   },
 
   'test isDirty()': function(){
@@ -184,7 +176,6 @@ module.exports = {
     assert.ok(user.isDirty('name') == true);
     assert.ok(user.isDirty('contact.city') == true);
     assert.ok(user.isDirty('contact.state') == false);
-    complete();
   },
   
   'test interal doc value when initialized': function(){
@@ -211,7 +202,6 @@ module.exports = {
     assert.ok(user._.doc.name == 'NATHAN');
     assert.ok(user._.doc.contact.city == 'SF');
     assert.ok(user._.doc.contact.state == undefined);
-    complete();
   },
   
   'test getters/setters': function(){
@@ -228,7 +218,6 @@ module.exports = {
     assert.ok(user.isDirty('contact.city') == true);
     assert.ok(Object.keys(user._.doc).length == 2);
     assert.ok(Object.keys(user._.doc.contact).length == 1);
-    complete();
   },
   
   'test dot notation getters/setters': function(){
@@ -245,7 +234,6 @@ module.exports = {
     assert.ok(user.isDirty('contact.city') == true);
     assert.ok(Object.keys(user._.doc).length == 2);
     assert.ok(Object.keys(user._.doc.contact).length == 1);
-    complete();
   },
   
   'test deep nested structures': function(){
@@ -267,7 +255,6 @@ module.exports = {
     assert.ok(Object.keys(nested._.doc).length == 1);
     assert.ok(nested.get('super.deep.nested.property') == 'cool');
     assert.ok(nested._.doc.super.deep.nested.property == 'cool');
-    complete();
   },
   
   'test virtuals': function(){
@@ -302,7 +289,6 @@ module.exports = {
     assert.ok(virtual.nested.control == 'bizarre');
     assert.ok(Object.keys(virtual._.dirty).length == 3);
     assert.ok(virtual.nested.test == 'White Nathan');
-    complete();
   },
   
   'test custom methods': function(){
@@ -321,7 +307,6 @@ module.exports = {
     var ch = new CH({lang: 'javascript'});
     assert.ok(typeof ch.getLang == 'function');
     assert.ok(ch.getLang() == 'javascript');
-    complete();
   },
   
   'test custom static methods': function(){
@@ -329,7 +314,6 @@ module.exports = {
     
     assert.ok(typeof CH.getSchema == 'function');
     assert.ok(CH.getSchema().paths['lang'].type == 'string');
-    complete();
   },
   
   'augmenting compiled schemas': function(){
@@ -342,7 +326,6 @@ module.exports = {
       var CH = mongoose.CustomHelpers;
       var ch = new CH({lang: 'javascript'});
       assert.ok(typeof ch.randomMethod != 'function');
-      complete();
   },
 
   'test pre hooks': function(){
@@ -364,7 +347,6 @@ module.exports = {
     var ph = new PreHooks({test: 'hi'},true);
     assert.ok(ph._.doc.test == 'hi');
     assert.ok(total == 2);
-    complete();
   },
   
   'test override': function(){
@@ -383,7 +365,6 @@ module.exports = {
     var ph = new OverHooks({test: 'hi'},true);
     assert.ok(ph._.doc.test == 'hi');
     assert.ok(total == 1);
-    complete();
   },
   
   'testing post hooks': function(){
@@ -403,7 +384,6 @@ module.exports = {
     var ph = new PostHooks({test: 'hi'},true);
     assert.ok(ph._.doc.test == 'hi');
     assert.ok(total == 2);
-    complete();
   },
   
   'test pre/override/post hooks together': function(){
@@ -440,7 +420,6 @@ module.exports = {
     var ah = new AllHooks({test: 'hi'},true);
     assert.ok(ah._.doc.test == 'hi');
     assert.ok(total == 5);
-    complete();
   },
   
   'test hydration w/ arrays': function(){
@@ -465,7 +444,6 @@ module.exports = {
     assert.ok(af._.dirty['test'][0] == 1);
     assert.ok(af.test.get(1) == 5);
     assert.ok(af._.doc.test[1] == 5);
-    complete();
   },
   
   'test creation w/ arrays': function(){
@@ -483,8 +461,6 @@ module.exports = {
       assert.ok(af._.dirty['test'][0] == 1);
       assert.ok(af.test.get(1) == 5);
       assert.ok(af._.doc.test[1] == 5);
-      
-      complete();
   },
   
   'test embeddedArray': function(){
@@ -504,10 +480,9 @@ module.exports = {
     assert.ok(af.test.length == 5);
     assert.ok(af._.doc.test[3] == 4);
 //    assert.ok(af._.dirty('test'));
-    complete();    
   },
   
-  'test validators': function(){
+  'test validators': function(assert, done){
     var document = mongoose.define;
 
     var VT = document('ValidTests')
@@ -537,11 +512,11 @@ module.exports = {
     
     af.save(function(err, doc){
       assert.ok(err.length == 2);
-      complete();
+      done();
     });
   },
   
-  'test plugins': function(){
+  'test plugins': function(assert, done){
     var document = mongoose.define;
     
     var PT = document('PluginTest')
@@ -607,7 +582,7 @@ module.exports = {
       assert.ok(err.length == 1);
       assert.ok(err[0].type == 'validation');
       assert.ok(err[0].name == 'isAdult');
-      complete();
+      done();
     });  
   },
   
@@ -626,7 +601,6 @@ module.exports = {
     ac.ids.push(null);
     assert.ok(ac.ids.length == 3);
     assert.ok(ac.ids.get(2).toHexString());
-    complete();
   },
   
   'test Embedded Documents': function(){
@@ -650,11 +624,9 @@ module.exports = {
     assert.ok(edt.notes[0].note == 'hi');
     edt.notes.push({note: 'bye', date: new Date()});
     assert.ok(edt.notes[1].note == 'bye');
-
-    complete();
   },
   
-  'test invalid type coercion': function(){
+  'test invalid type coercion': function(assert, done){
     mongoose.define('Animal')
       .string('name').strict()
       .number('age');
@@ -666,14 +638,13 @@ module.exports = {
       tobi.name = 'Tobi';
       tobi.save(function(errors){
         assert.ok(!errors);
-        complete();
+        done();
       });
     });
+  },
+  
+  teardown: function(){
+    db.close();
   }
 
-};
-
-var pending = Object.keys(module.exports).length;
-function complete(){
-  --pending || db.close();
 };

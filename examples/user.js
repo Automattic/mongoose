@@ -22,14 +22,13 @@ document('User')
 
 var User = mongoose.User;
 
-db.on('open', function(){
-  var tj = new User({ name: 'tj', age: 23 });
+var tj = new User({ name: 'tj', age: 23 });
+console.log(tj);
 
-  tj.save(function(errors){
-    if (errors) throw errors[0];
-    User.find({ name: 'tj' }).one(function(user){
-      console.log(user);
-      db.close();
-    });
+tj.save(function(errors){
+  if (errors) throw errors[0];
+  User.find({ name: 'tj' }).one(function(user){
+    console.log(user);
+    db.close();
   });
 });

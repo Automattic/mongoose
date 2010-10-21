@@ -131,6 +131,18 @@ module.exports = {
       });
   },
   
+  'test where() prop': function(assert, done){
+    User
+      .find()
+      .where({ 'name.last': 'Holowaychuk' })
+      .where('name.first', 'TJ')
+      .all(function(docs){
+        assert.length(docs, 1);
+        assert.equal('TJ', docs[0].name.first);
+        done();
+      });
+  },
+  
   'test find()/first() query with one condition': function(assert, done){
     User.find({ 'contact.email': 'nathan@learnboost.com' }).first(function(doc){
       assert.equal('Nathan', doc.name.first);

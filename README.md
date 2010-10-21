@@ -459,6 +459,15 @@ You can call all of these in a row, but the callbacks will only trigger when `co
 
     Synonym to `first`
 
+### Running Tests
+
+First launch mongo, then to run all tests simply execute:
+
+  $ make test
+
+To execute tests using a custom glob, you may specify __TESTS__:
+
+  $ make test TESTS=tests/document.js
 
 ## Credits
 

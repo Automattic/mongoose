@@ -40,7 +40,7 @@ module.exports = {
     User.find({age: 33}).one(function(doc){
       // assert.ok(doc.age == 33);
       // assert.ok(doc.name.first == 'Nathan');
-      // done();
+      done();
     });
   },
   

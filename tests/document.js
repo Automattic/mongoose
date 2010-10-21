@@ -665,7 +665,7 @@ module.exports = {
       assert.equal('failed to cast name value of {"foo":"bar"} to string', errors[0].message);
       tobi.name = 'Tobi';
       tobi.save(function(errors){
-        assert.length(errors, 0);
+        assert.ok(!errors);
         complete();
       });
     });

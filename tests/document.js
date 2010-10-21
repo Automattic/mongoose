@@ -1,7 +1,19 @@
 var assert = require('assert')
-  , mongoose = require('mongoose');
+  , mongoose = require('mongoose')
+  , document = mongoose.define
+  , db = mongoose.connect('mongodb://localhost/mongoose_document_tests');
 
-mongoose.connect('mongodb://localhost/mongoose_integration_tests');
+document('User')
+  .oid('_id')
+  .object('name',
+    document()
+      .string('first')
+      .string('last'))
+  .object('contact',
+    document()
+      .string('email')
+      .string('phone'))
+  .number('age');
 
 module.exports = {
     
@@ -657,5 +669,5 @@ module.exports = {
 
 var pending = Object.keys(module.exports).length;
 function complete(){
-  --pending || mongoose.disconnect();
+  --pending || db.close();
 };

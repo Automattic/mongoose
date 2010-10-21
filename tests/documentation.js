@@ -1,9 +1,8 @@
 var assert = require('assert')
   , fs = require('fs')
   , mongoose = require('mongoose')
-  , document = mongoose.define;
-
-mongoose.connect('mongodb://localhost/mongoose_integration_tests');
+  , document = mongoose.define
+  , db =mongoose.connect('mongodb://localhost/mongoose_integration_tests');
 
 document('DocTest')
   .oid('_id')
@@ -44,5 +43,5 @@ module.exports = {
 
 var pending = Object.keys(module.exports).length;
 function complete(){
-  --pending || mongoose.disconnect();
+  --pending || db.close();
 };

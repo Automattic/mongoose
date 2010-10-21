@@ -71,6 +71,20 @@ module.exports = {
     });
   },
   
+  'test find() given an ObjectID': function(assert, done){
+    User.find({ 'name.first': 'TJ' }).all(function(docs){
+      assert.length(docs, 1);
+      User.find(docs[0]._id, function(doc){
+        assert.equal('TJ', doc.name.first);
+        var promise = User.find(docs[0]._id);
+        promise.first(function(doc){
+          assert.equal('TJ', doc.name.first);
+          done();
+        });
+      });
+    });
+  },
+  
   'test findById()': function(assert, done){
     User.find({ 'name.first': 'TJ' }).all(function(docs){
       assert.length(docs, 1);

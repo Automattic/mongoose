@@ -95,6 +95,15 @@ module.exports = {
     });
   },
   
+  'test find()/all() query with several conditions': function(assert, done){
+    User.find({ 'name.last': 'Holowaychuk' }).all(function(docs){
+      assert.length(docs, 2);
+      assert.equal('TJ', docs[0].name.first);
+      assert.equal('Tobi', docs[1].name.first);
+      done();
+    });
+  },
+  
   'test find()/one() query with one condition': function(assert, done){
     User.find({ 'contact.email': 'nathan@learnboost.com' }).one(function(doc){
       assert.equal('Nathan', doc.name.first);

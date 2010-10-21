@@ -18,8 +18,12 @@ document('User')
 var User = mongoose.User;
 
 module.exports = {
+  before: function(assert, done){
+    User.remove({}, done);
+  },
+
   'test simple document insertion': function(assert, done){
-    var user = new User({
+    var nathan = new User({
       name: {
         first: 'Nathan',
         last: 'White'
@@ -30,25 +34,37 @@ module.exports = {
       },
       age: 33
     });
+    
+    var tj = new User({
+      name: {
+          first: 'TJ'
+        , last: 'Holowaychuk'
+      }
+    });
       
-    user.save(function(errors){
+    nathan.save(function(errors){
       assert.ok(!errors);
-      done();
+      tj.save(function(errors){
+        assert.ok(!errors);
+        done();
+      });
     });
     
   },
   
-  'test find query': function(assert, done){
-    User.find({age: 33}).all(function(docs){
+  'test find/all query with one condition': function(assert, done){
+    User.find({age:33}).all(function(docs){
       assert.length(docs, 1);
-      assert.ok(docs[0].age == 33);
-      done();
+      assert.equal('Nathan', docs[0].name.first);
+      User.find({ 'name.first': 'TJ' }).all(function(docs){
+        assert.length(docs, 1);
+        assert.equal('TJ', docs[0].name.first);
+        done();
+      })
     });
   },
 
   teardown: function(){
-    User.remove({}, function(){
-      db.close();
-    });
+    db.close();
   }
 };

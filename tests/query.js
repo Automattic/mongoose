@@ -35,18 +35,20 @@ module.exports = {
       assert.ok(!errors);
       done();
     });
+    
   },
   
-  'test query find': function(assert, done){
-    User.find({ age: 33 }).all(function(docs){
+  'test find query': function(assert, done){
+    User.find({age: 33}).all(function(docs){
       assert.length(docs, 1);
-      // assert.ok(doc.age == 33);
-      // assert.ok(doc.name.first == 'Nathan');
+      assert.ok(docs[0].age == 33);
       done();
     });
   },
-  
+
   teardown: function(){
-    db.close();
+    User.remove({}, function(){
+      db.close();
+    });
   }
 };

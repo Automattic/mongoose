@@ -1,8 +1,9 @@
-var assert = require('assert')
-  , mongoose = require('../');
 
-mongoose.connect('mongodb://localhost/mongoose_integration_tests');
-  
+var assert = require('assert')
+  , mongoose = require('../')
+  , document = mongoose.define
+  , db = mongoose.connect('mongodb://localhost/mongoose_document_tests');
+
 module.exports = {
     
   'test hydration': function(){
@@ -44,7 +45,7 @@ module.exports = {
        assert.ok(instance._schema['name'].setters.length == 2);     
        complete();
   },
-   
+  
   'test mixin': function(){
     var document = mongoose.define;
     document('SimpleUser')
@@ -515,11 +516,11 @@ module.exports = {
     .number('age');
     
     VT.age.validate('qualify_for_medicare', function(value, cb){
-      return cb(value >= 55); 
+      cb(value >= 55); 
     });
     
     VT.email.validate('isEmail', function(value, cb){
-      return cb( (/^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/.test(value)) );
+      cb( (/^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/.test(value)) );
     });
     
     VT.hook('save', function(parent, callback){
@@ -625,6 +626,7 @@ module.exports = {
     ac.ids.push(null);
     assert.ok(ac.ids.length == 3);
     assert.ok(ac.ids.get(2).toHexString());
+    complete();
   },
   
   'test Embedded Documents': function(){
@@ -638,22 +640,23 @@ module.exports = {
             .string('note')
             .date('date'));
             
-  var EmbeddedDocTest = mongoose.EmbeddedDocTest;
+    var EmbeddedDocTest = mongoose.EmbeddedDocTest;
   
-  var edt = new EmbeddedDocTest({
-    test: 'me',
-    notes: [{note: 'hi', date: new Date()}] 
-  });
+    var edt = new EmbeddedDocTest({
+      test: 'me',
+      notes: [{note: 'hi', date: new Date()}] 
+    });
   
-  assert.ok(edt.notes[0].note == 'hi');
-  edt.notes.push({note: 'bye', date: new Date()});
-  assert.ok(edt.notes[1].note == 'bye');
-  
+    assert.ok(edt.notes[0].note == 'hi');
+    edt.notes.push({note: 'bye', date: new Date()});
+    assert.ok(edt.notes[1].note == 'bye');
+
+    complete();
   }
 
-}
+};
 
-totalFN = Object.keys(module.exports).length;
+var pending = Object.keys(module.exports).length;
 function complete(){
-  if(--totalFN === 0) mongoose.disconnect();
+  --pending || db.close();
 };

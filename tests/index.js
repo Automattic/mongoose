@@ -1,10 +1,6 @@
 var assert = require('assert')
   , mongoose = require('../')
-  , Document = require('../lib/mongoose/document').Document;
-
-function now(){
-  return Math.round(Date.now() + Math.random() * 100);
-};
+  , Document = mongoose.Document;
 
 function timeout(goose){
   return setTimeout(function(){
@@ -15,9 +11,8 @@ function timeout(goose){
 module.exports = {
 
   'test connecting to mongodb': function(){
-    var mongoose = require('../'),
-        timer = timeout(mongoose);
-    mongoose.connect('mongodb://localhost/' + now(), function(){
+    var timer = timeout(mongoose);
+    mongoose.connect('mongodb://localhost/mongoose_connect', function(){
       clearTimeout(timer);
       assert.ok(mongoose.connected, 'It should connect using uri / callback signature');
       
@@ -25,7 +20,7 @@ module.exports = {
         assert.ok(!mongoose.connected);
         
         var timer = timeout(mongoose);
-        mongoose.connect('mongodb://localhost/' + now(), { some: 'option' }, function(){
+        mongoose.connect('mongodb://localhost/mongoose_connect', { some: 'option' }, function(){
           clearTimeout(timer);
           assert.ok(mongoose.connected, 'It should connect using uri / options / callback signature');
           mongoose.disconnect(function(){

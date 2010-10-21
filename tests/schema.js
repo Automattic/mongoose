@@ -1,7 +1,7 @@
 var assert = require('assert')
-  , mongoose = require('../index')
-  , Schema = require('../lib/mongoose/schema')
-  , TypeSchema = require('../lib/mongoose/type');
+  , mongoose = require('../')
+  , Schema = mongoose.Schema
+  , TypeSchema = mongoose.TypeSchema;
   
 module.exports = {
   

@@ -70,6 +70,17 @@ module.exports = {
       done();
     });
   },
+  
+  'test findById': function(assert, done){
+    User.find({ 'name.first': 'TJ' }).all(function(docs){
+      assert.length(docs, 1);
+      User.findById(docs[0]._id, function(doc){
+        console.log(doc.name.first);
+        assert.equal('TJ', doc.name.first);
+        done();
+      });
+    });
+  },
 
   teardown: function(){
     db.close();

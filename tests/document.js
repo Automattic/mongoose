@@ -655,13 +655,19 @@ module.exports = {
   },
   
   'test invalid type coercion': function(){
-    var Animal =
-      mongoose.define('Animal')
-        .string('name').strict()
-        .number('age');
+    mongoose.define('Animal')
+      .string('name').strict()
+      .number('age');
+    var Animal = mongoose.Animal;
     var tobi = new Animal({ name: { foo: 'bar' }, age: '23' });
-    tobi.save(function(err){
-      console.log(err);
+    tobi.save(function(errors){
+      assert.length(errors, 1);
+      assert.equal('failed to cast name value of {"foo":"bar"} to string', errors[0].message);
+      tobi.name = 'Tobi';
+      tobi.save(function(errors){
+        assert.length(errors, 0);
+        complete();
+      });
     });
   }
 

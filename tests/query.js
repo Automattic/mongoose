@@ -18,8 +18,12 @@ document('User')
 var User = mongoose.User;
 
 module.exports = {
+  before: function(assert, done){
+    User.drop(done);
+  },
+
   'test simple document insertion': function(assert, done){
-    var user = new User({
+    var nathan = new User({
       name: {
         first: 'Nathan',
         last: 'White'
@@ -30,20 +34,66 @@ module.exports = {
       },
       age: 33
     });
+    
+    var tj = new User({
+      name: {
+          first: 'TJ'
+        , last: 'Holowaychuk'
+      }
+    });
       
-    user.save(function(){
+    nathan.save(function(errors){
+      assert.ok(!errors);
+      tj.save(function(errors){
+        assert.ok(!errors);
+        done();
+      });
+    });
+    
+  },
+  
+  'test find()/all() query with one condition': function(assert, done){
+    User.find({age:33}).all(function(docs){
+      assert.length(docs, 1);
+      assert.equal('Nathan', docs[0].name.first);
+      User.find({ 'name.first': 'TJ' }).all(function(docs){
+        assert.length(docs, 1);
+        assert.equal('TJ', docs[0].name.first);
+        done();
+      })
+    });
+  },
+  
+  'test find()/one() query with one condition': function(assert, done){
+    User.find({ 'contact.email': 'nathan@learnboost.com' }).one(function(doc){
+      assert.equal('Nathan', doc.name.first);
       done();
     });
   },
   
-  'test query find': function(assert, done){
-    User.find({age: 33}).one(function(doc){
-      // assert.ok(doc.age == 33);
-      // assert.ok(doc.name.first == 'Nathan');
-      done();
+  'test findById()': function(assert, done){
+    User.find({ 'name.first': 'TJ' }).all(function(docs){
+      assert.length(docs, 1);
+      User.findById(docs[0]._id, function(doc){
+        assert.equal('TJ', doc.name.first);
+        done();
+      });
     });
   },
   
+  'test count()': function(assert, done){
+    User.count(function(n){
+      assert.equal(2, n);
+      User.count({ 'name.last': 'White' }, function(n){
+        assert.equal(1, n);
+        User.count({ 'name.last': 'foobar' }, function(n){
+          assert.equal(0, n);
+          done();
+        });
+      });
+    });
+  },
+
   teardown: function(){
     db.close();
   }

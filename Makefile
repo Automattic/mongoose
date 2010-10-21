@@ -1,12 +1,16 @@
 
-EXPRESSO = support/expresso/bin/expresso
-TESTS = tests/*.js
+EXPRESSO = support/expresso/bin/expresso -I lib --serial
+
+TESTS = tests/document.js \
+	      tests/documentation.js \
+	      tests/index.js \
+	      tests/schema.js \
+	      tests/types.js \
+	      tests/util.js
 
 test:
-	@$(EXPRESSO) \
-		-I lib \
-		--serial \
-		$(TEST_FLAGS) $(TESTS)
+	@$(EXPRESSO) $(TESTS) \
+		&& $(EXPRESSO) tests/query.js
 
 test-cov:
 	@$(MAKE) TEST_FLAGS=--cov test

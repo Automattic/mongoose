@@ -97,6 +97,13 @@ module.exports = {
     });
   },
   
+  'test find()/one()': function(assert, done){
+    User.find({ 'name.last': 'Holowaychuk' }).one(function(doc){
+      assert.equal('TJ', doc.name.first);
+      done();
+    })
+  },
+  
   'test find()/all() query with one condition': function(assert, done){
     User.find({age:33}).all(function(docs){
       assert.length(docs, 1);

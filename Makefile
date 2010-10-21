@@ -1,6 +1,17 @@
-SH = sh
-NODE = node
+
+EXPRESSO = support/expresso/bin/expresso
+TESTS = tests/*.js
 
 test:
-	@$(NODE) tests/unit/run.js
-	tests/integration/support/expresso/bin/expresso tests/integration/*.js
+	@$(EXPRESSO) \
+		-I lib \
+		--serial \
+		$(TEST_FLAGS) $(TESTS)
+
+test-cov:
+	@$(MAKE) TEST_FLAGS=--cov test
+
+benchmark:
+	@node benchmark/bm.js
+
+.PHONY: test test-cov benchmark

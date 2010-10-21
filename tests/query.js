@@ -52,6 +52,13 @@ module.exports = {
     
   },
   
+  'test all()': function(assert, done){
+    User.all(function(docs){
+      assert.length(docs, 2);
+      done();
+    });
+  },
+  
   'test find()/all() query with one condition': function(assert, done){
     User.find({age:33}).all(function(docs){
       assert.length(docs, 1);

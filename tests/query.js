@@ -1,7 +1,7 @@
 var assert = require('assert')
   , mongoose = require('mongoose')
   , document = mongoose.define
-  , db = mongoose.connect('mongodb://localhost/mongoose_integration_docs');
+  , db = mongoose.connect('mongodb://localhost/mongoose_integration_query');
 
 document('User')
   .oid('_id')
@@ -14,14 +14,15 @@ document('User')
       .string('email')
       .string('phone'))
   .number('age');
+  
+var User = mongoose.User;
 
 
 
 module.exports = {
   
   'test simple document insertion': function(){
-    var User = mongoose.User
-      , user = new User({
+    var user = new User({
         name: {
           first: 'Nathan',
           last: 'White'
@@ -39,8 +40,6 @@ module.exports = {
   },
   
   'test query find': function(){
-    var User = mongoose.User;
-    
     User.find({age: 33}).one(function(doc){
       assert.ok(doc.age == 33);
       assert.ok(doc.name.first == 'Nathan');

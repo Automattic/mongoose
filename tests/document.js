@@ -1,19 +1,8 @@
+
 var assert = require('assert')
   , mongoose = require('mongoose')
   , document = mongoose.define
   , db = mongoose.connect('mongodb://localhost/mongoose_document_tests');
-
-document('User')
-  .oid('_id')
-  .object('name',
-    document()
-      .string('first')
-      .string('last'))
-  .object('contact',
-    document()
-      .string('email')
-      .string('phone'))
-  .number('age');
 
 module.exports = {
     
@@ -56,7 +45,7 @@ module.exports = {
        assert.ok(instance._schema['name'].setters.length == 2);     
        complete();
   },
-   
+  
   'test mixin': function(){
     var document = mongoose.define;
     document('SimpleUser')

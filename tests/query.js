@@ -19,7 +19,7 @@ var User = mongoose.User;
 
 module.exports = {
   before: function(assert, done){
-    User.remove({}, done);
+    User.drop(done);
   },
 
   'test simple document insertion': function(assert, done){

@@ -107,8 +107,8 @@ module.exports = {
       assert.length(docs, 1);
       User.find(docs[0]._id, function(doc){
         assert.equal('TJ', doc.name.first);
-        var promise = User.find(docs[0]._id);
-        promise.first(function(doc){
+        var query = User.find(docs[0]._id);
+        query.first(function(doc){
           assert.equal('TJ', doc.name.first);
           done();
         });

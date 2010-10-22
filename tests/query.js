@@ -146,7 +146,12 @@ module.exports = {
       assert.length(docs, 2);
       assert.equal('Nathan', docs[0].name.first);
       assert.equal('TJ', docs[1].name.first);
-      done();
+      User.notAwesome.all(function(docs){
+        assert.length(docs, 2);
+        assert.equal('Tobi', docs[0].name.first);
+        assert.equal('Raul', docs[1].name.first);
+        done();
+      });
     });
   },
   

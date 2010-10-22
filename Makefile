@@ -1,12 +1,13 @@
 
 EXPRESSO = support/expresso/bin/expresso -I lib --serial
 
-TESTS = tests/document.js \
-	      tests/documentation.js \
-	      tests/index.js \
-	      tests/schema.js \
-	      tests/types.js \
-	      tests/util.js
+TESTS = tests/dbref.js \
+				tests/document.js \
+				tests/documentation.js \
+				tests/index.js \
+				tests/schema.js \
+				tests/types.js \
+				tests/util.js
 
 test:
 	@$(EXPRESSO) $(TESTS) \

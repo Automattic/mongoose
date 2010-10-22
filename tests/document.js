@@ -1,6 +1,6 @@
 
 var assert = require('assert')
-  , mongoose = require('../')
+  , mongoose = require('mongoose')
   , document = mongoose.define
   , db = mongoose.connect('mongodb://localhost/mongoose_document_tests');
 

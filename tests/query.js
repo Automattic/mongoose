@@ -118,6 +118,24 @@ module.exports = {
     })
   },
   
+  'test find(key, true)': function(assert, done){
+    User.find('awesome', true).all(function(docs){
+      assert.length(docs, 2);
+      assert.equal('Nathan', docs[0].name.first);
+      assert.equal('TJ', docs[1].name.first);
+      done();
+    });
+  },
+  
+  'test find(key, true)': function(assert, done){
+    User.find('awesome', false).all(function(docs){
+      assert.length(docs, 2);
+      assert.equal('Tobi', docs[0].name.first);
+      assert.equal('Raul', docs[1].name.first);
+      done();
+    });
+  },
+  
   'test find()/all() query with one condition': function(assert, done){
     User.find({age:33}).all(function(docs){
       assert.length(docs, 1);

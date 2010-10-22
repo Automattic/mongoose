@@ -52,6 +52,13 @@ module.exports = {
         , last: 'Holowaychuk'
       }
     });
+    
+    var raul = new User({
+      name: {
+          first: 'Raul'
+        , last: 'Rauch'
+      }
+    });
       
     nathan.save(function(errors){
       assert.ok(!errors);
@@ -59,7 +66,10 @@ module.exports = {
         assert.ok(!errors);
         tobi.save(function(errors){
           assert.ok(!errors);
-          done();
+          raul.save(function(errors){
+            assert.ok(!errors);
+            done();
+          })
         });
       });
     });
@@ -68,7 +78,7 @@ module.exports = {
   
   'test all()': function(assert, done){
     User.all(function(docs){
-      assert.length(docs, 3);
+      assert.length(docs, 4);
       done();
     });
   },
@@ -233,7 +243,7 @@ module.exports = {
   
   'test count()': function(assert, done){
     User.count(function(n){
-      assert.equal(3, n);
+      assert.equal(4, n);
       User.count({ 'name.last': 'White' }, function(n){
         assert.equal(1, n);
         User.count({ 'name.last': 'foobar' }, function(n){
@@ -249,7 +259,7 @@ module.exports = {
       User.find({ 'name.first': 'TJ' }).all(function(docs){
         assert.length(docs, 0);
         User.find().all(function(docs){
-          assert.length(docs, 2);
+          assert.length(docs, 3);
           done();
         });
       });

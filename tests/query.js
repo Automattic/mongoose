@@ -14,7 +14,7 @@ document('User')
       .string('email')
       .string('phone'))
   .number('age')
-  .boolean('awesome');
+  .bool('awesome');
   
 var User = mongoose.User;
 

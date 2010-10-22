@@ -10,15 +10,19 @@ var Dog = mongoose.Dog;
 mongoose.define('User')
   .oid('_id')
   .string('name')
-  .dbref('dog', Dog);
+  .dbref('dog', Dog)
+  .dbrefArray('puppies', Dog);
 var User = mongoose.User;
 
 module.exports = {
   setup: function (done) {
     Dog.remove({}, function () {
-      done();
+      User.remove({}, function () {
+        done();
+      });
     });
   },
+
   'setting via JSON input should allow you to access a Document instance': function (assert, done) {
     var user = new User({
       name: 'Charlie',

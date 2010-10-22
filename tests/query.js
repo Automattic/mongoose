@@ -13,7 +13,8 @@ document('User')
     document()
       .string('email')
       .string('phone'))
-  .number('age');
+  .number('age')
+  .boolean('awesome');
   
 var User = mongoose.User;
 
@@ -24,6 +25,7 @@ module.exports = {
 
   'test simple document insertion': function(assert, done){
     var nathan = new User({
+      awesome: true,
       name: {
         first: 'Nathan',
         last: 'White'
@@ -36,8 +38,17 @@ module.exports = {
     });
     
     var tj = new User({
+      awesome: true,
       name: {
           first: 'TJ'
+        , last: 'Holowaychuk'
+      }
+    });
+    
+    var tobi = new User({
+      awesome: false,
+      name: {
+          first: 'Tobi'
         , last: 'Holowaychuk'
       }
     });
@@ -46,10 +57,55 @@ module.exports = {
       assert.ok(!errors);
       tj.save(function(errors){
         assert.ok(!errors);
-        done();
+        tobi.save(function(errors){
+          assert.ok(!errors);
+          done();
+        });
       });
     });
     
+  },
+  
+  'test all()': function(assert, done){
+    User.all(function(docs){
+      assert.length(docs, 3);
+      done();
+    });
+  },
+  
+  'test first()': function(assert, done){
+    User.first().all(function(docs){
+      assert.length(docs, 1);
+      done();
+    });
+  },
+  
+  'test first(n)': function(assert, done){
+    User.first(2).all(function(docs){
+      assert.length(docs, 2);
+      done();
+    });
+  },
+  
+  'test first(fn)': function(assert, done){
+    User.first(function(doc){
+      assert.equal('Nathan', doc.name.first);
+      done();
+    });
+  },
+  
+  'test first(n, fn)': function(assert, done){
+    User.first(2, function(docs){
+      assert.length(docs, 2);
+      done();
+    });
+  },
+  
+  'test find()/one()': function(assert, done){
+    User.find({ 'name.last': 'Holowaychuk' }).one(function(doc){
+      assert.equal('TJ', doc.name.first);
+      done();
+    })
   },
   
   'test find()/all() query with one condition': function(assert, done){
@@ -64,10 +120,93 @@ module.exports = {
     });
   },
   
-  'test find()/one() query with one condition': function(assert, done){
-    User.find({ 'contact.email': 'nathan@learnboost.com' }).one(function(doc){
+  'test find()/all() query with several conditions': function(assert, done){
+    User.find({ 'name.last': 'Holowaychuk' }).all(function(docs){
+      assert.length(docs, 2);
+      assert.equal('TJ', docs[0].name.first);
+      assert.equal('Tobi', docs[1].name.first);
+      User.find({ 'name.last': 'Holowaychuk', 'name.first': 'TJ' }).all(function(docs){
+        assert.length(docs, 1);
+        assert.equal('TJ', docs[0].name.first);
+        done();
+      })
+    });
+  },
+  
+  'test find() chaining': function(assert, done){
+    User
+      .find({ 'name.last': 'Holowaychuk' })
+      .find({ 'name.first': 'TJ' })
+      .all(function(docs){
+        assert.length(docs, 1);
+        assert.equal('TJ', docs[0].name.first);
+        done();
+      });
+  },
+  
+  'test where() alias': function(assert, done){
+    User
+      .find()
+      .where({ 'name.last': 'Holowaychuk' })
+      .where({ 'name.first': 'TJ' })
+      .all(function(docs){
+        assert.length(docs, 1);
+        assert.equal('TJ', docs[0].name.first);
+        done();
+      });
+  },
+  
+  'test several kickers': function(assert, done){
+    var n = 2
+      , a = 0
+      , b = 0;
+    User
+      .find({ 'name.last': 'Holowaychuk' })
+      .all(function(docs){
+        assert.equal(1, ++a);
+        assert.length(docs, 2);
+        assert.equal('TJ', docs[0].name.first);
+        --n || done();
+      })
+      .find({ awesome: true })
+      .all(function(docs){
+        assert.equal(1, ++b);
+        assert.length(docs, 1);
+        assert.equal('TJ', docs[0].name.first);
+        --n || done();
+      });
+  },
+  
+  'test where() prop': function(assert, done){
+    User
+      .find()
+      .where({ 'name.last': 'Holowaychuk' })
+      .where('name.first', 'TJ')
+      .all(function(docs){
+        assert.length(docs, 1);
+        assert.equal('TJ', docs[0].name.first);
+        done();
+      });
+  },
+  
+  'test find()/first() query with one condition': function(assert, done){
+    User.find({ 'contact.email': 'nathan@learnboost.com' }).first(function(doc){
       assert.equal('Nathan', doc.name.first);
       done();
+    });
+  },
+  
+  'test find() given an ObjectID': function(assert, done){
+    User.find({ 'name.first': 'TJ' }).all(function(docs){
+      assert.length(docs, 1);
+      User.find(docs[0]._id, function(doc){
+        assert.equal('TJ', doc.name.first);
+        var query = User.find(docs[0]._id);
+        query.first(function(doc){
+          assert.equal('TJ', doc.name.first);
+          done();
+        });
+      });
     });
   },
   
@@ -83,11 +222,23 @@ module.exports = {
   
   'test count()': function(assert, done){
     User.count(function(n){
-      assert.equal(2, n);
+      assert.equal(3, n);
       User.count({ 'name.last': 'White' }, function(n){
         assert.equal(1, n);
         User.count({ 'name.last': 'foobar' }, function(n){
           assert.equal(0, n);
+          done();
+        });
+      });
+    });
+  },
+  
+  'test remove()': function(assert, done){
+    User.remove({ 'name.first': 'TJ' }, function(){
+      User.find({ 'name.first': 'TJ' }).all(function(docs){
+        assert.length(docs, 0);
+        User.find().all(function(docs){
+          assert.length(docs, 2);
           done();
         });
       });

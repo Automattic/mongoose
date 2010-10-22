@@ -190,6 +190,30 @@ module.exports = {
     });
   },
   
+  'test find() $in': function(assert, done){
+    User.find({ roles: { $in: ['admin'] }}).all(function(docs){
+      assert.length(docs, 2);
+      assert.equal('Nathan', docs[0].name.first);
+      assert.equal('TJ', docs[1].name.first);
+      done();
+    })
+  },
+  
+  'test find() $in multiple values': function(assert, done){
+    User.find({ roles: { $in: ['admin', 'pet'] }}).all(function(docs){
+      assert.length(docs, 4);
+      done();
+    })
+  },
+  
+  'test find() $all': function(assert, done){
+    User.find({ roles: { $all: ['pet', 'dog'] }}).all(function(docs){
+      assert.length(docs, 1);
+      assert.equal('Raul', docs[0].name.first);
+      done();
+    })
+  },
+  
   'test find()/all() query with one condition': function(assert, done){
     User.find({age:33}).all(function(docs){
       assert.length(docs, 1);

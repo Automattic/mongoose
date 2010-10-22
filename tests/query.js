@@ -175,6 +175,16 @@ module.exports = {
     });
   },
   
+  'test find() partial select field omission': function(assert, done){
+    User.find({ 'name.first': 'Nathan' }, 'name').all(function(docs){
+      assert.length(docs, 1);
+      assert.equal('Nathan', docs[0].name.first);
+      assert.isUndefined(docs[0].age);
+      assert.eql({}, docs[0].contact);
+      done();
+    });
+  },
+  
   'test find()/all() query with one condition': function(assert, done){
     User.find({age:33}).all(function(docs){
       assert.length(docs, 1);

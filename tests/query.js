@@ -145,10 +145,20 @@ module.exports = {
     });
   },
   
+  'test find() partial select': function(assert, done){
+    User.find({ 'name.first': 'Nathan' }, { name: true }).all(function(docs){
+      assert.length(docs, 1);
+      assert.equal('Nathan', docs[0].name.first);
+      assert.eql({}, docs[0].contact);
+      done();
+    });
+  },
+  
   'test find()/all() query with one condition': function(assert, done){
     User.find({age:33}).all(function(docs){
       assert.length(docs, 1);
       assert.equal('Nathan', docs[0].name.first);
+      assert.equal('nathan@learnboost.com', docs[0].contact.email);
       User.find({ 'name.first': 'TJ' }).all(function(docs){
         assert.length(docs, 1);
         assert.equal('TJ', docs[0].name.first);

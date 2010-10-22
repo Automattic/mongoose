@@ -14,6 +14,7 @@ document('User')
       .string('email')
       .string('phone'))
   .number('age').default(1)
+  .bool('blocked')
   .bool('awesome').default(true)
   .array('roles');
   
@@ -43,7 +44,8 @@ module.exports = {
           first: 'TJ'
         , last: 'Holowaychuk'
       },
-      roles: ['admin']
+      roles: ['admin'],
+      blocked: true
     });
     
     var tobi = new User({
@@ -152,6 +154,14 @@ module.exports = {
         assert.equal('Raul', docs[1].name.first);
         done();
       });
+    });
+  },
+  
+  'test .key / not<key> boolean getter chaining': function(assert, done){
+    User.notBlocked.awesome.all(function(docs){
+      assert.length(docs, 1);
+      assert.equal('Nathan', docs[0].name.first);
+      done();
     });
   },
   

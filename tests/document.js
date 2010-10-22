@@ -506,12 +506,24 @@ module.exports = {
     var ValidTests = mongoose.ValidTests;
         
     var af = new ValidTests({
-      email: 'email',
+      email: 'foobar',
       age: 33
     });
     
-    af.save(function(err, doc){
-      assert.ok(err.length == 2);
+    af.save(function(errors, doc){
+      assert.length(errors, 2);
+      assert.ok(errors[0] instanceof Error);
+      assert.ok(errors[1] instanceof Error);
+
+      assert.equal('validation isEmail failed for email', errors[0].message);
+      assert.equal('validation', errors[0].type);
+      assert.equal('email', errors[0].path);
+      assert.equal('isEmail', errors[0].name);
+
+      assert.equal('validation qualify_for_medicare failed for age', errors[1].message);
+      assert.equal('validation', errors[1].type);
+      assert.equal('age', errors[1].path);
+      assert.equal('qualify_for_medicare', errors[1].name);
       done();
     });
   },

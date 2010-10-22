@@ -13,7 +13,8 @@ document('User')
     document()
       .string('email')
       .string('phone'))
-  .number('age');
+  .number('age')
+  .boolean('awesome');
   
 var User = mongoose.User;
 
@@ -24,6 +25,7 @@ module.exports = {
 
   'test simple document insertion': function(assert, done){
     var nathan = new User({
+      awesome: true,
       name: {
         first: 'Nathan',
         last: 'White'
@@ -36,6 +38,7 @@ module.exports = {
     });
     
     var tj = new User({
+      awesome: true,
       name: {
           first: 'TJ'
         , last: 'Holowaychuk'
@@ -43,6 +46,7 @@ module.exports = {
     });
     
     var tobi = new User({
+      awesome: false,
       name: {
           first: 'Tobi'
         , last: 'Holowaychuk'

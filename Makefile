@@ -9,8 +9,8 @@ TESTS = tests/document.js \
 	      tests/util.js
 
 test:
-	@$(EXPRESSO) $(TESTS) \
-		&& $(EXPRESSO) tests/query.js
+	@$(EXPRESSO) $(TESTS) $(TEST_FLAGS) \
+		&& $(EXPRESSO) $(TEST_FLAGS) tests/query.js
 
 test-cov:
 	@$(MAKE) TEST_FLAGS=--cov test

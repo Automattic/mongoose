@@ -144,6 +144,17 @@ module.exports = {
       });
   },
   
+  'test find(key,val) chaining': function(assert, done){
+    User
+      .find('name.last', 'Holowaychuk')
+      .find('name.first', 'TJ')
+      .all(function(docs){
+        assert.length(docs, 1);
+        assert.equal('TJ', docs[0].name.first);
+        done();
+      });
+  },
+  
   'test where() alias': function(assert, done){
     User
       .find()

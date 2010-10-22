@@ -14,7 +14,8 @@ document('User')
       .string('email')
       .string('phone'))
   .number('age').default(1)
-  .bool('awesome').default(true);
+  .bool('awesome').default(true)
+  .array('roles');
   
 var User = mongoose.User;
 
@@ -33,6 +34,7 @@ module.exports = {
         email: 'nathan@learnboost.com',
         phone: '555-555-5555'
       },
+      roles: ['admin'],
       age: 33
     });
     
@@ -40,7 +42,8 @@ module.exports = {
       name: {
           first: 'TJ'
         , last: 'Holowaychuk'
-      }
+      },
+      roles: ['admin']
     });
     
     var tobi = new User({
@@ -48,7 +51,8 @@ module.exports = {
       name: {
           first: 'Tobi'
         , last: 'Holowaychuk'
-      }
+      },
+      roles: ['ferret', 'pet']
     });
     
     var raul = new User({
@@ -56,7 +60,8 @@ module.exports = {
       name: {
           first: 'Raul'
         , last: 'Rauch'
-      }
+      },
+      roles: ['dog', 'pet']
     });
       
     nathan.save(function(errors){

@@ -394,8 +394,7 @@ module.exports = {
   },
   
   'test find()/all() query with one condition': function(assert, done){
-    User.find({age:33}).all(function(err, docs){
-      assert.ok(!err);
+    User.find({ age: 33 }).all(function(docs){
       assert.length(docs, 1);
       assert.equal('Nathan', docs[0].name.first);
       assert.equal('nathan@learnboost.com', docs[0].contact.email);
@@ -405,6 +404,14 @@ module.exports = {
         assert.equal('TJ', docs[0].name.first);
         done();
       })
+    });
+  },
+  
+  'test find() type casting': function(assert, done){
+    User.find({ age: '33' }).all(function(docs){
+      assert.length(docs, 1);
+      assert.equal('Nathan', docs[0].name.first);
+      done();
     });
   },
   

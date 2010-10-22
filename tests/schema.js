@@ -89,7 +89,7 @@ module.exports = {
       }).hook('two', function(){});
 
       assert.ok(a.paths['interests.created_at'].getters.length == 1);
-      assert.ok(a.paths['interests'].options === a.interests);
+      assert.ok(a.paths['interests'].subtype === a.interests);
       assert.ok(typeof a.interests._hooks.two == 'function');
       assert.ok(typeof a.interests._overrides.two == 'function');
       assert.ok(typeof a.interests._methods.one == 'function');

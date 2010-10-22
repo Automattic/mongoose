@@ -23,9 +23,6 @@ document('SimpleUser')
       .string('zip'))
   .string('bio');
 var SimpleUser = mongoose.SimpleUser;
-SimpleUser.remove({}, function (err) {
-  console.log(err);
-});
 
 module.exports = {
 

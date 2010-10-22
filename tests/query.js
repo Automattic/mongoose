@@ -152,6 +152,27 @@ module.exports = {
       });
   },
   
+  'test several kickers': function(assert, done){
+    var n = 2
+      , aCalls = 0
+      , bCalls = 0;
+    User
+      .find({ 'name.last': 'Holowaychuk' })
+      .all(function(docs){
+        assert.equal(1, ++aCalls);
+        assert.length(docs, 2);
+        assert.equal('TJ', docs[0].name.first);
+        --n || done();
+      })
+      .find({ awesome: true })
+      .all(function(docs){
+        assert.equal(1, ++bCalls);
+        assert.length(docs, 1);
+        assert.equal('TJ', docs[0].name.first);
+        --n || done();
+      });
+  },
+  
   'test where() prop': function(assert, done){
     User
       .find()

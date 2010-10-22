@@ -141,6 +141,15 @@ module.exports = {
     });
   },
   
+  'test .key boolean getter': function(assert, done){
+    User.awesome.all(function(docs){
+      assert.length(docs, 2);
+      assert.equal('Nathan', docs[0].name.first);
+      assert.equal('TJ', docs[1].name.first);
+      done();
+    });
+  },
+  
   'test find(key, true)': function(assert, done){
     User.find('awesome', false).all(function(docs){
       assert.length(docs, 2);

@@ -13,7 +13,7 @@ document('User')
     document()
       .string('email')
       .string('phone'))
-  .number('age')
+  .number('age').default(1)
   .bool('awesome').default(true);
   
 var User = mongoose.User;
@@ -92,6 +92,7 @@ module.exports = {
   'test first(n)': function(assert, done){
     User.first(2).all(function(docs){
       assert.length(docs, 2);
+      assert.equal(1, docs[1].age);
       done();
     });
   },

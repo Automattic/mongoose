@@ -154,19 +154,19 @@ module.exports = {
   
   'test several kickers': function(assert, done){
     var n = 2
-      , aCalls = 0
-      , bCalls = 0;
+      , a = 0
+      , b = 0;
     User
       .find({ 'name.last': 'Holowaychuk' })
       .all(function(docs){
-        assert.equal(1, ++aCalls);
+        assert.equal(1, ++a);
         assert.length(docs, 2);
         assert.equal('TJ', docs[0].name.first);
         --n || done();
       })
       .find({ awesome: true })
       .all(function(docs){
-        assert.equal(1, ++bCalls);
+        assert.equal(1, ++b);
         assert.length(docs, 1);
         assert.equal('TJ', docs[0].name.first);
         --n || done();

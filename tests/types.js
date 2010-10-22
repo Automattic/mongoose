@@ -57,8 +57,8 @@ module.exports = {
 
     assert.equal('array', arr.type);
     assert.length(arr.setters, 2);
-    assert.eql([1], arr.setters[1](1));
-    assert.eql([1,2], arr.setters[1]([1,2]));
+    assert.eql([1], set(1));
+    assert.eql([1,2], set([1,2]));
     assert.ok(arr instanceof TypeSchema);
   },
   
@@ -66,7 +66,7 @@ module.exports = {
     var arr = type('array').strict()
       , set = arr.strictSetters[0];
 
-    assert.length(arr.setters, 1);
+    assert.length(arr.setters, 2);
     assert.equal(Error, set(1));
     assert.eql([1,2], set([1,2]));
     assert.ok(arr instanceof TypeSchema);
@@ -86,7 +86,7 @@ module.exports = {
     var obj = type('object').strict()
       , set = obj.strictSetters[0];
     
-    assert.length(obj.setters, 1);
+    assert.length(obj.setters, 2);
     assert.eql({ foo: 'bar' }, set({ foo: 'bar' }));
 
     assert.equal(Error, set([1,2]));

@@ -13,6 +13,7 @@ document('User')
     document()
       .string('email')
       .string('phone'))
+  .number('visits').default(0)
   .number('age').default(1)
   .bool('blocked')
   .bool('awesome').default(true)
@@ -36,7 +37,8 @@ module.exports = {
         phone: '555-555-5555'
       },
       roles: ['admin'],
-      age: 33
+      age: 33,
+      visits: 25
     });
     
     var tj = new User({
@@ -45,7 +47,8 @@ module.exports = {
         , last: 'Holowaychuk'
       },
       roles: ['admin'],
-      blocked: true
+      blocked: true,
+      visits: 20
     });
     
     var tobi = new User({
@@ -54,7 +57,8 @@ module.exports = {
           first: 'Tobi'
         , last: 'Holowaychuk'
       },
-      roles: ['ferret', 'pet']
+      roles: ['ferret', 'pet'],
+      visits: 10
     });
     
     var raul = new User({
@@ -63,7 +67,8 @@ module.exports = {
           first: 'Raul'
         , last: 'Rauch'
       },
-      roles: ['dog', 'pet']
+      roles: ['dog', 'pet'],
+      visits: 5
     });
       
     nathan.save(function(errors){
@@ -210,6 +215,15 @@ module.exports = {
       assert.equal('Nathan', docs[0].name.first);
       assert.isUndefined(docs[0].age);
       assert.eql({}, docs[0].contact);
+      done();
+    });
+  },
+  
+  'test find() $gt': function(assert, done){
+    User.find({ visits: { $gt: 10 }}).all(function(docs){
+      assert.length(docs, 2);
+      assert.equal('Nathan', docs[0].name.first);
+      assert.equal('TJ', docs[1].name.first);
       done();
     });
   },

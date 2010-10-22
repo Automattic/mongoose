@@ -190,6 +190,15 @@ module.exports = {
     });
   },
   
+  'test find() $nin': function(assert, done){
+    User.find({ roles: { $nin: ['pet'] }}).all(function(docs){
+      assert.length(docs, 2);
+      assert.equal('Nathan', docs[0].name.first);
+      assert.equal('TJ', docs[1].name.first);
+      done();
+    })
+  },
+  
   'test find() $in': function(assert, done){
     User.find({ roles: { $in: ['admin'] }}).all(function(docs){
       assert.length(docs, 2);

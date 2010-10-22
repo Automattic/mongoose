@@ -13,8 +13,8 @@ document('User')
     document()
       .string('email')
       .string('phone'))
-  .number('age')
-  .boolean('awesome');
+  .number('age').default(1)
+  .bool('awesome').default(true);
   
 var User = mongoose.User;
 
@@ -25,7 +25,6 @@ module.exports = {
 
   'test simple document insertion': function(assert, done){
     var nathan = new User({
-      awesome: true,
       name: {
         first: 'Nathan',
         last: 'White'
@@ -38,7 +37,6 @@ module.exports = {
     });
     
     var tj = new User({
-      awesome: true,
       name: {
           first: 'TJ'
         , last: 'Holowaychuk'
@@ -52,6 +50,14 @@ module.exports = {
         , last: 'Holowaychuk'
       }
     });
+    
+    var raul = new User({
+      awesome: false,
+      name: {
+          first: 'Raul'
+        , last: 'Rauch'
+      }
+    });
       
     nathan.save(function(errors){
       assert.ok(!errors);
@@ -59,7 +65,10 @@ module.exports = {
         assert.ok(!errors);
         tobi.save(function(errors){
           assert.ok(!errors);
-          done();
+          raul.save(function(errors){
+            assert.ok(!errors);
+            done();
+          })
         });
       });
     });
@@ -68,7 +77,7 @@ module.exports = {
   
   'test all()': function(assert, done){
     User.all(function(docs){
-      assert.length(docs, 3);
+      assert.length(docs, 4);
       done();
     });
   },
@@ -83,6 +92,7 @@ module.exports = {
   'test first(n)': function(assert, done){
     User.first(2).all(function(docs){
       assert.length(docs, 2);
+      assert.equal(1, docs[1].age);
       done();
     });
   },
@@ -108,10 +118,47 @@ module.exports = {
     })
   },
   
+  'test find(key, true)': function(assert, done){
+    User.find('awesome', true).all(function(docs){
+      assert.length(docs, 2);
+      assert.equal('Nathan', docs[0].name.first);
+      assert.equal('TJ', docs[1].name.first);
+      done();
+    });
+  },
+  
+  'test find(key) boolean true': function(assert, done){
+    User.find('awesome').all(function(docs){
+      assert.length(docs, 2);
+      assert.equal('Nathan', docs[0].name.first);
+      assert.equal('TJ', docs[1].name.first);
+      done();
+    });
+  },
+  
+  'test find(key, true)': function(assert, done){
+    User.find('awesome', false).all(function(docs){
+      assert.length(docs, 2);
+      assert.equal('Tobi', docs[0].name.first);
+      assert.equal('Raul', docs[1].name.first);
+      done();
+    });
+  },
+  
+  'test find() partial select': function(assert, done){
+    User.find({ 'name.first': 'Nathan' }, { name: true }).all(function(docs){
+      assert.length(docs, 1);
+      assert.equal('Nathan', docs[0].name.first);
+      assert.eql({}, docs[0].contact);
+      done();
+    });
+  },
+  
   'test find()/all() query with one condition': function(assert, done){
     User.find({age:33}).all(function(docs){
       assert.length(docs, 1);
       assert.equal('Nathan', docs[0].name.first);
+      assert.equal('nathan@learnboost.com', docs[0].contact.email);
       User.find({ 'name.first': 'TJ' }).all(function(docs){
         assert.length(docs, 1);
         assert.equal('TJ', docs[0].name.first);
@@ -137,6 +184,17 @@ module.exports = {
     User
       .find({ 'name.last': 'Holowaychuk' })
       .find({ 'name.first': 'TJ' })
+      .all(function(docs){
+        assert.length(docs, 1);
+        assert.equal('TJ', docs[0].name.first);
+        done();
+      });
+  },
+  
+  'test find(key,val) chaining': function(assert, done){
+    User
+      .find('name.last', 'Holowaychuk')
+      .find('name.first', 'TJ')
       .all(function(docs){
         assert.length(docs, 1);
         assert.equal('TJ', docs[0].name.first);
@@ -222,7 +280,7 @@ module.exports = {
   
   'test count()': function(assert, done){
     User.count(function(n){
-      assert.equal(3, n);
+      assert.equal(4, n);
       User.count({ 'name.last': 'White' }, function(n){
         assert.equal(1, n);
         User.count({ 'name.last': 'foobar' }, function(n){
@@ -238,7 +296,7 @@ module.exports = {
       User.find({ 'name.first': 'TJ' }).all(function(docs){
         assert.length(docs, 0);
         User.find().all(function(docs){
-          assert.length(docs, 2);
+          assert.length(docs, 3);
           done();
         });
       });

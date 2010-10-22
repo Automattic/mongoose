@@ -29,7 +29,7 @@ var tobi = new User({ name: { first: 'Tobi', last: 'ferret' }, age: 1 })
 tobi.save(function(){
   bandit.save(function(){
     tj.save(function(){
-      User.find({ 'name.last': 'ferret' }).all(function(users){
+      User.find('name.last', 'ferret').all(function(users){
         console.log(users);
         // Remove them all
         User.remove({}, function(){

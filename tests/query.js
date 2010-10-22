@@ -228,6 +228,15 @@ module.exports = {
     });
   },
   
+  'test find() key with $gt': function(assert, done){
+    User.find('visits', { $gt: 10 }).all(function(docs){
+      assert.length(docs, 2);
+      assert.equal('Nathan', docs[0].name.first);
+      assert.equal('TJ', docs[1].name.first);
+      done();
+    });
+  },
+  
   'test find() $nin': function(assert, done){
     User.find({ roles: { $nin: ['pet'] }}).all(function(docs){
       assert.length(docs, 2);

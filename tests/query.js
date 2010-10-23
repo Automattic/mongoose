@@ -13,8 +13,11 @@ document('User')
     document()
       .string('email')
       .string('phone'))
+  .number('visits').default(0)
   .number('age').default(1)
-  .bool('awesome').default(true);
+  .bool('blocked')
+  .bool('awesome').default(true)
+  .array('roles');
   
 var User = mongoose.User;
 
@@ -33,14 +36,19 @@ module.exports = {
         email: 'nathan@learnboost.com',
         phone: '555-555-5555'
       },
-      age: 33
+      roles: ['admin'],
+      age: 33,
+      visits: 25
     });
     
     var tj = new User({
       name: {
           first: 'TJ'
         , last: 'Holowaychuk'
-      }
+      },
+      roles: ['admin'],
+      blocked: true,
+      visits: 20
     });
     
     var tobi = new User({
@@ -48,7 +56,9 @@ module.exports = {
       name: {
           first: 'Tobi'
         , last: 'Holowaychuk'
-      }
+      },
+      roles: ['ferret', 'pet'],
+      visits: 10
     });
     
     var raul = new User({
@@ -56,7 +66,9 @@ module.exports = {
       name: {
           first: 'Raul'
         , last: 'Rauch'
-      }
+      },
+      roles: ['dog', 'pet'],
+      visits: 5
     });
       
     nathan.save(function(errors){
@@ -136,6 +148,28 @@ module.exports = {
     });
   },
   
+  'test .key boolean getter': function(assert, done){
+    User.awesome.all(function(docs){
+      assert.length(docs, 2);
+      assert.equal('Nathan', docs[0].name.first);
+      assert.equal('TJ', docs[1].name.first);
+      User.notAwesome.all(function(docs){
+        assert.length(docs, 2);
+        assert.equal('Tobi', docs[0].name.first);
+        assert.equal('Raul', docs[1].name.first);
+        done();
+      });
+    });
+  },
+  
+  'test .key / not<key> boolean getter chaining': function(assert, done){
+    User.notBlocked.awesome.all(function(docs){
+      assert.length(docs, 1);
+      assert.equal('Nathan', docs[0].name.first);
+      done();
+    });
+  },
+  
   'test find(key, true)': function(assert, done){
     User.find('awesome', false).all(function(docs){
       assert.length(docs, 2);
@@ -149,9 +183,91 @@ module.exports = {
     User.find({ 'name.first': 'Nathan' }, { name: true }).all(function(docs){
       assert.length(docs, 1);
       assert.equal('Nathan', docs[0].name.first);
+      assert.isUndefined(docs[0].age);
       assert.eql({}, docs[0].contact);
       done();
     });
+  },
+  
+  'test find() partial select with several fields': function(assert, done){
+    User.find({ 'name.first': 'Nathan' }, { name: true, age: true }).all(function(docs){
+      assert.length(docs, 1);
+      assert.equal('Nathan', docs[0].name.first);
+      assert.equal(33, docs[0].age);
+      assert.eql({}, docs[0].contact);
+      done();
+    });
+  },
+  
+  'test find() partial select field omission': function(assert, done){
+    User.find({ 'name.first': 'Nathan' }, { contact: false }).all(function(docs){
+      assert.length(docs, 1);
+      assert.equal('Nathan', docs[0].name.first);
+      assert.equal(33, docs[0].age);
+      assert.eql({}, docs[0].contact);
+      done();
+    });
+  },
+  
+  'test find() partial select field omission': function(assert, done){
+    User.find({ 'name.first': 'Nathan' }, 'name').all(function(docs){
+      assert.length(docs, 1);
+      assert.equal('Nathan', docs[0].name.first);
+      assert.isUndefined(docs[0].age);
+      assert.eql({}, docs[0].contact);
+      done();
+    });
+  },
+  
+  'test find() $gt': function(assert, done){
+    User.find({ visits: { $gt: 10 }}).all(function(docs){
+      assert.length(docs, 2);
+      assert.equal('Nathan', docs[0].name.first);
+      assert.equal('TJ', docs[1].name.first);
+      done();
+    });
+  },
+  
+  'test find() key with $gt': function(assert, done){
+    User.find('visits', { $gt: 10 }).all(function(docs){
+      assert.length(docs, 2);
+      assert.equal('Nathan', docs[0].name.first);
+      assert.equal('TJ', docs[1].name.first);
+      done();
+    });
+  },
+  
+  'test find() $nin': function(assert, done){
+    User.find({ roles: { $nin: ['pet'] }}).all(function(docs){
+      assert.length(docs, 2);
+      assert.equal('Nathan', docs[0].name.first);
+      assert.equal('TJ', docs[1].name.first);
+      done();
+    })
+  },
+  
+  'test find() $in': function(assert, done){
+    User.find({ roles: { $in: ['admin'] }}).all(function(docs){
+      assert.length(docs, 2);
+      assert.equal('Nathan', docs[0].name.first);
+      assert.equal('TJ', docs[1].name.first);
+      done();
+    })
+  },
+  
+  'test find() $in multiple values': function(assert, done){
+    User.find({ roles: { $in: ['admin', 'pet'] }}).all(function(docs){
+      assert.length(docs, 4);
+      done();
+    })
+  },
+  
+  'test find() $all': function(assert, done){
+    User.find({ roles: { $all: ['pet', 'dog'] }}).all(function(docs){
+      assert.length(docs, 1);
+      assert.equal('Raul', docs[0].name.first);
+      done();
+    })
   },
   
   'test find()/all() query with one condition': function(assert, done){

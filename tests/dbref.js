@@ -61,13 +61,12 @@ module.exports = {
   },
 
   'saving after setting the dbref to unpersisted data should automatically save that data to its own document': function (assert, done) {
-    var user = new User({
+    new User({
       name: 'Timmy',
       dog: {
         name: 'Lassie'
       }
-    });
-    user.save( function (errors, user) {
+    }).save( function (errors, user) {
       Dog.find({name: 'Lassie'}).first( function (dog) {
         user.dog.do( function (puppy) {
           assert.ok(puppy.id === dog.id);

@@ -7,9 +7,3 @@
 [submodule "support/node-markdown"]
 	path = support/node-markdown
 	url = git://github.com/andris9/node-markdown.git
-[submodule "support/node-lazy"]
-	path = support/node-lazy
-	url = http://github.com/pkrumins/node-lazy.git
-[submodule "support/js-traverse"]
-	path = support/js-traverse
-	url = http://github.com/substack/js-traverse.git

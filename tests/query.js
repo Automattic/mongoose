@@ -209,10 +209,47 @@ module.exports = {
     });
   },
   
-  'test find() partial select with several fields': function(assert, done){
+  'test fields() partial select': function(assert, done){
     User
       .find({ 'name.first': 'Nathan' })
       .fields({ name: true, age: true }).all(function(docs){
+        assert.length(docs, 1);
+        assert.equal('Nathan', docs[0].name.first);
+        assert.equal(33, docs[0].age);
+        assert.eql({}, docs[0].contact);
+        done();
+    });
+  },
+  
+  'test fields() partial select several calls': function(assert, done){
+    User
+      .find({ 'name.first': 'Nathan' })
+      .fields({ name: true })
+      .fields({ age: true }).all(function(docs){
+        assert.length(docs, 1);
+        assert.equal('Nathan', docs[0].name.first);
+        assert.equal(33, docs[0].age);
+        assert.eql({}, docs[0].contact);
+        done();
+    });
+  },
+  
+  'test fields() partial select strings': function(assert, done){
+    User
+      .find({ 'name.first': 'Nathan' })
+      .fields('name', 'age').all(function(docs){
+        assert.length(docs, 1);
+        assert.equal('Nathan', docs[0].name.first);
+        assert.equal(33, docs[0].age);
+        assert.eql({}, docs[0].contact);
+        done();
+    });
+  },
+  
+  'test fields() partial select mixed': function(assert, done){
+    User
+      .find({ 'name.first': 'Nathan' })
+      .fields('name', { age: true }).all(function(docs){
         assert.length(docs, 1);
         assert.equal('Nathan', docs[0].name.first);
         assert.equal(33, docs[0].age);

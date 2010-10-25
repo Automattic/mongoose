@@ -297,6 +297,15 @@ module.exports = {
     })
   },
   
+  'test array with<key>s() chaining': function(assert, done){
+    User.awesome.withRole('admin').all(function(docs){
+      assert.length(docs, 2);
+      assert.equal('Nathan', docs[0].name.first);
+      assert.equal('TJ', docs[1].name.first);
+      done();
+    })
+  },
+  
   'test find() $all': function(assert, done){
     User.find({ roles: { $all: ['pet', 'dog'] }}).all(function(docs){
       assert.length(docs, 1);

@@ -14,6 +14,7 @@ mongoose.define('User')
   .dbrefArray('puppies', Dog);
 var User = mongoose.User;
 
+// TODO api for refreshing/reloading data
 module.exports = {
   setup: function (done) {
     Dog.remove({}, function () {
@@ -152,7 +153,7 @@ module.exports = {
     });
   },
 
-  'test removing the dbref target': function () {
+  'test removing the dbref target': function (assert, done) {
     new User({
       name: 'Shaggy',
       dog: {
@@ -160,8 +161,11 @@ module.exports = {
       }
     }).save( function (errors, user) {
       user.dog.remove( function () {
-        assert.ok( typeof user.dog === "undefined" );
         assert.ok( typeof user._.doc.dog === "undefined");
+        user.dog.do( function (_dog) {
+          assert.ok( typeof _dog === "undefined" );
+          done();
+        });
       });
     });
   },

@@ -7,3 +7,6 @@
 [submodule "support/node-markdown"]
 	path = support/node-markdown
 	url = git://github.com/andris9/node-markdown.git
+[submodule "support/lingo"]
+	path = support/lingo
+	url = git://github.com/visionmedia/lingo.git

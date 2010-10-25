@@ -209,6 +209,55 @@ module.exports = {
     });
   },
   
+  'test fields() partial select': function(assert, done){
+    User
+      .find({ 'name.first': 'Nathan' })
+      .fields({ name: true, age: true }).all(function(docs){
+        assert.length(docs, 1);
+        assert.equal('Nathan', docs[0].name.first);
+        assert.equal(33, docs[0].age);
+        assert.eql({}, docs[0].contact);
+        done();
+    });
+  },
+  
+  'test fields() partial select several calls': function(assert, done){
+    User
+      .find({ 'name.first': 'Nathan' })
+      .fields({ name: true })
+      .fields({ age: true }).all(function(docs){
+        assert.length(docs, 1);
+        assert.equal('Nathan', docs[0].name.first);
+        assert.equal(33, docs[0].age);
+        assert.eql({}, docs[0].contact);
+        done();
+    });
+  },
+  
+  'test fields() partial select strings': function(assert, done){
+    User
+      .find({ 'name.first': 'Nathan' })
+      .fields('name', 'age').all(function(docs){
+        assert.length(docs, 1);
+        assert.equal('Nathan', docs[0].name.first);
+        assert.equal(33, docs[0].age);
+        assert.eql({}, docs[0].contact);
+        done();
+    });
+  },
+  
+  'test fields() partial select mixed': function(assert, done){
+    User
+      .find({ 'name.first': 'Nathan' })
+      .fields('name', { age: true }).all(function(docs){
+        assert.length(docs, 1);
+        assert.equal('Nathan', docs[0].name.first);
+        assert.equal(33, docs[0].age);
+        assert.eql({}, docs[0].contact);
+        done();
+    });
+  },
+  
   'test find() partial select field omission': function(assert, done){
     User.find({ 'name.first': 'Nathan' }, 'name').all(function(docs){
       assert.length(docs, 1);
@@ -258,6 +307,50 @@ module.exports = {
   'test find() $in multiple values': function(assert, done){
     User.find({ roles: { $in: ['admin', 'pet'] }}).all(function(docs){
       assert.length(docs, 4);
+      done();
+    })
+  },
+  
+  'test array with<key>()': function(assert, done){
+    User.withRole('admin').all(function(docs){
+      assert.length(docs, 2);
+      assert.equal('Nathan', docs[0].name.first);
+      assert.equal('TJ', docs[1].name.first);
+      done();
+    })
+  },
+  
+  'test array without<key>()': function(assert, done){
+    User.withoutRole('pet').all(function(docs){
+      assert.length(docs, 2);
+      assert.equal('Nathan', docs[0].name.first);
+      assert.equal('TJ', docs[1].name.first);
+      done();
+    })
+  },
+  
+  'test array without<key>s()': function(assert, done){
+    User.withoutRole(['pet', 'dog']).all(function(docs){
+      assert.length(docs, 2);
+      assert.equal('Nathan', docs[0].name.first);
+      assert.equal('TJ', docs[1].name.first);
+      done();
+    })
+  },
+  
+  'test array with<key>s()': function(assert, done){
+    User.withRoles(['pet', 'dog']).all(function(docs){
+      assert.length(docs, 1);
+      assert.equal('Raul', docs[0].name.first);
+      done();
+    })
+  },
+  
+  'test array with<key>s() chaining': function(assert, done){
+    User.awesome.withRole('admin').all(function(docs){
+      assert.length(docs, 2);
+      assert.equal('Nathan', docs[0].name.first);
+      assert.equal('TJ', docs[1].name.first);
       done();
     })
   },

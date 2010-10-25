@@ -1,8 +1,7 @@
 
 EXPRESSO = support/expresso/bin/expresso -I lib --serial
 
-TESTS =	tests/dbrefArray.js \
-				tests/dbref.js \
+TESTS =	tests/dbref.js \
 				tests/document.js \
 				tests/documentation.js \
 				tests/index.js \

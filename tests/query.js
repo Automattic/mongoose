@@ -271,18 +271,28 @@ module.exports = {
     })
   },
   
-  'test array with<key>s()': function(assert, done){
-    User.withRole(['admin', 'pet']).all(function(docs){
-      assert.length(docs, 4);
-      done();
-    });
-  },
-  
   'test array without<key>()': function(assert, done){
     User.withoutRole('pet').all(function(docs){
       assert.length(docs, 2);
       assert.equal('Nathan', docs[0].name.first);
       assert.equal('TJ', docs[1].name.first);
+      done();
+    })
+  },
+  
+  'test array without<key>s()': function(assert, done){
+    User.withoutRole(['pet', 'dog']).all(function(docs){
+      assert.length(docs, 2);
+      assert.equal('Nathan', docs[0].name.first);
+      assert.equal('TJ', docs[1].name.first);
+      done();
+    })
+  },
+  
+  'test array with<key>s()': function(assert, done){
+    User.withRoles(['pet', 'dog']).all(function(docs){
+      assert.length(docs, 1);
+      assert.equal('Raul', docs[0].name.first);
       done();
     })
   },

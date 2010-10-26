@@ -516,10 +516,12 @@ module.exports = {
       assert.equal('email', err.path);
       assert.equal('isEmail', err.name);
 
-      // assert.equal('validation qualify_for_medicare failed for age', errors[1].message);
-      // assert.equal('validation', errors[1].type);
-      // assert.equal('age', errors[1].path);
-      // assert.equal('qualify_for_medicare', errors[1].name);
+      assert.equal(err, doc.errors[0]);
+      
+      assert.equal('validation qualify_for_medicare failed for age', doc.errors[1].message);
+      assert.equal('validation', doc.errors[1].type);
+      assert.equal('age', doc.errors[1].path);
+      assert.equal('qualify_for_medicare', doc.errors[1].name);
       done();
     });
   },

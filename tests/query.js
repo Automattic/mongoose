@@ -162,7 +162,7 @@ module.exports = {
       assert.length(docs, 2);
       assert.equal('Nathan', docs[0].name.first);
       assert.equal('TJ', docs[1].name.first);
-      User.notAwesome.all(function(docs){
+      User.notAwesome.all(function(err, docs){
         assert.length(docs, 2);
         assert.equal('Tobi', docs[0].name.first);
         assert.equal('Raul', docs[1].name.first);
@@ -399,7 +399,8 @@ module.exports = {
       assert.length(docs, 1);
       assert.equal('Nathan', docs[0].name.first);
       assert.equal('nathan@learnboost.com', docs[0].contact.email);
-      User.find({ 'name.first': 'TJ' }).all(function(docs){
+      User.find({ 'name.first': 'TJ' }).all(function(err, docs){
+        assert.ok(!err);
         assert.length(docs, 1);
         assert.equal('TJ', docs[0].name.first);
         done();

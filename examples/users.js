@@ -31,15 +31,18 @@ var tobi = new User({ name: { first: 'Tobi', last: 'ferret' }, age: 1 })
 tobi.save(function(){
   bandit.save(function(){
     tj.save(function(){
-      User
-        .find('name.last', 'ferret')
-        .notBlocked
-        .first(function(err, user){
-        console.log(user);
-        User.drop(function(){
-          db.close();
-        });
+      jane.save(function(){
+        saved();
       });
     });
   });
 });
+
+function saved() {
+  User.find('name.last', 'ferret').notBlocked.first(function(err, user){
+    console.log(user);
+    User.drop(function(){
+      db.close();
+    });
+  });
+}

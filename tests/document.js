@@ -510,20 +510,16 @@ module.exports = {
       age: 33
     });
     
-    af.save(function(errors, doc){
-      assert.length(errors, 2);
-      assert.ok(errors[0] instanceof Error);
-      assert.ok(errors[1] instanceof Error);
+    af.save(function(err, doc){
+      assert.equal('validation isEmail failed for email', err.message);
+      assert.equal('validation', err.type);
+      assert.equal('email', err.path);
+      assert.equal('isEmail', err.name);
 
-      assert.equal('validation isEmail failed for email', errors[0].message);
-      assert.equal('validation', errors[0].type);
-      assert.equal('email', errors[0].path);
-      assert.equal('isEmail', errors[0].name);
-
-      assert.equal('validation qualify_for_medicare failed for age', errors[1].message);
-      assert.equal('validation', errors[1].type);
-      assert.equal('age', errors[1].path);
-      assert.equal('qualify_for_medicare', errors[1].name);
+      // assert.equal('validation qualify_for_medicare failed for age', errors[1].message);
+      // assert.equal('validation', errors[1].type);
+      // assert.equal('age', errors[1].path);
+      // assert.equal('qualify_for_medicare', errors[1].name);
       done();
     });
   },
@@ -557,7 +553,7 @@ module.exports = {
           doc.hook('save', function(parent, callback){
             if(this.age >= 18) assert.ok(this._.errors.length == 0);
             else assert.ok(this._.errors.length == 1);
-            if(callback) callback(this._.errors, this);
+            if(callback) callback(this._.errors[0], this);
           });
         })
                 
@@ -579,7 +575,7 @@ module.exports = {
     
     pt.save(function(err, doc){
       assert.ok(doc == pt);
-      assert.ok(err.length == false);
+      assert.ok(!err);
     });
     
     var pt2 = new PluginTest({
@@ -590,10 +586,9 @@ module.exports = {
     assert.ok(pt2.age == 15);
     
     pt2.save(function(err, doc){
-      assert.ok(Array.isArray(err) == true);
-      assert.ok(err.length == 1);
-      assert.ok(err[0].type == 'validation');
-      assert.ok(err[0].name == 'isAdult');
+      assert.ok(err);
+      assert.ok(err.type == 'validation');
+      assert.ok(err.name == 'isAdult');
       done();
     });  
   },
@@ -644,12 +639,11 @@ module.exports = {
       .number('age');
     var Animal = mongoose.Animal;
     var tobi = new Animal({ name: { foo: 'bar' }, age: '23' });
-    tobi.save(function(errors){
-      assert.length(errors, 1);
-      assert.equal('failed to cast name value of {"foo":"bar"} to string', errors[0].message);
+    tobi.save(function(err){
+      assert.equal('failed to cast name value of {"foo":"bar"} to string', err.message);
       tobi.name = 'Tobi';
-      tobi.save(function(errors){
-        assert.ok(!errors);
+      tobi.save(function(err){
+        assert.ok(!err);
         done();
       });
     });

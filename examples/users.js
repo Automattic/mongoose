@@ -18,21 +18,25 @@ document('User')
     document()
       .string('email')
       .string('phone'))
-  .number('age');
+  .number('age')
+  .bool('blocked');
 
 var User = mongoose.User;
 
 var tobi = new User({ name: { first: 'Tobi', last: 'ferret' }, age: 1 })
   , bandit = new User({ name: { first: 'Bandit', last: 'ferret' }, age: 4 })
-  , tj = new User({ name: { first: 'TJ', last: 'Holowaychuk' }, age: 3 });
+  , tj = new User({ name: { first: 'TJ', last: 'Holowaychuk' }, age: 23 })
+  , jane = new User({ name: { first: 'Jane', last: 'ferret' }, age: 4 });
 
 tobi.save(function(){
   bandit.save(function(){
     tj.save(function(){
-      User.find('name.last', 'ferret').all(function(users){
-        console.log(users);
-        // Remove them all
-        User.remove({}, function(){
+      User
+        .find('name.last', 'ferret')
+        .notBlocked
+        .first(function(err, user){
+        console.log(user);
+        User.drop(function(){
           db.close();
         });
       });

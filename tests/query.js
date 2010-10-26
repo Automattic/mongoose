@@ -88,21 +88,24 @@ module.exports = {
   },
   
   'test all()': function(assert, done){
-    User.all(function(docs){
+    User.all(function(err, docs){
+      assert.ok(!err);
       assert.length(docs, 4);
       done();
     });
   },
   
   'test first()': function(assert, done){
-    User.first().all(function(docs){
+    User.first().all(function(err, docs){
+      assert.ok(!err);
       assert.length(docs, 1);
       done();
     });
   },
   
   'test first(n)': function(assert, done){
-    User.first(2).all(function(docs){
+    User.first(2).all(function(err, docs){
+      assert.ok(!err);
       assert.length(docs, 2);
       assert.equal(1, docs[1].age);
       done();
@@ -110,28 +113,32 @@ module.exports = {
   },
   
   'test first(fn)': function(assert, done){
-    User.first(function(doc){
+    User.first(function(err, doc){
+      assert.ok(!err);
       assert.equal('Nathan', doc.name.first);
       done();
     });
   },
   
   'test first(n, fn)': function(assert, done){
-    User.first(2, function(docs){
+    User.first(2, function(err, docs){
+      assert.ok(!err);
       assert.length(docs, 2);
       done();
     });
   },
   
   'test find()/one()': function(assert, done){
-    User.find({ 'name.last': 'Holowaychuk' }).one(function(doc){
+    User.find({ 'name.last': 'Holowaychuk' }).one(function(err, doc){
+      assert.ok(!err);
       assert.equal('TJ', doc.name.first);
       done();
     })
   },
   
   'test find(key, true)': function(assert, done){
-    User.find('awesome', true).all(function(docs){
+    User.find('awesome', true).all(function(err, docs){
+      assert.ok(!err);
       assert.length(docs, 2);
       assert.equal('Nathan', docs[0].name.first);
       assert.equal('TJ', docs[1].name.first);
@@ -140,7 +147,8 @@ module.exports = {
   },
   
   'test find(key) boolean true': function(assert, done){
-    User.find('awesome').all(function(docs){
+    User.find('awesome').all(function(err, docs){
+      assert.ok(!err);
       assert.length(docs, 2);
       assert.equal('Nathan', docs[0].name.first);
       assert.equal('TJ', docs[1].name.first);
@@ -149,7 +157,8 @@ module.exports = {
   },
   
   'test .key boolean getter': function(assert, done){
-    User.awesome.all(function(docs){
+    User.awesome.all(function(err, docs){
+      assert.ok(!err);
       assert.length(docs, 2);
       assert.equal('Nathan', docs[0].name.first);
       assert.equal('TJ', docs[1].name.first);
@@ -163,7 +172,8 @@ module.exports = {
   },
   
   'test .key / not<key> boolean getter chaining': function(assert, done){
-    User.notBlocked.awesome.all(function(docs){
+    User.notBlocked.awesome.all(function(err, docs){
+      assert.ok(!err);
       assert.length(docs, 1);
       assert.equal('Nathan', docs[0].name.first);
       done();
@@ -171,7 +181,8 @@ module.exports = {
   },
   
   'test find(key, true)': function(assert, done){
-    User.find('awesome', false).all(function(docs){
+    User.find('awesome', false).all(function(err, docs){
+      assert.ok(!err);
       assert.length(docs, 2);
       assert.equal('Tobi', docs[0].name.first);
       assert.equal('Raul', docs[1].name.first);
@@ -180,7 +191,8 @@ module.exports = {
   },
   
   'test find() partial select': function(assert, done){
-    User.find({ 'name.first': 'Nathan' }, { name: true }).all(function(docs){
+    User.find({ 'name.first': 'Nathan' }, { name: true }).all(function(err, docs){
+      assert.ok(!err);
       assert.length(docs, 1);
       assert.equal('Nathan', docs[0].name.first);
       //assert.isUndefined(docs[0].age);
@@ -190,7 +202,8 @@ module.exports = {
   },
   
   'test find() partial select with several fields': function(assert, done){
-    User.find({ 'name.first': 'Nathan' }, { name: true, age: true }).all(function(docs){
+    User.find({ 'name.first': 'Nathan' }, { name: true, age: true }).all(function(err, docs){
+      assert.ok(!err);
       assert.length(docs, 1);
       assert.equal('Nathan', docs[0].name.first);
       assert.equal(33, docs[0].age);
@@ -200,7 +213,8 @@ module.exports = {
   },
   
   'test find() partial select field omission': function(assert, done){
-    User.find({ 'name.first': 'Nathan' }, { contact: false }).all(function(docs){
+    User.find({ 'name.first': 'Nathan' }, { contact: false }).all(function(err, docs){
+      assert.ok(!err);
       assert.length(docs, 1);
       assert.equal('Nathan', docs[0].name.first);
       assert.equal(33, docs[0].age);
@@ -212,7 +226,8 @@ module.exports = {
   'test fields() partial select': function(assert, done){
     User
       .find({ 'name.first': 'Nathan' })
-      .fields({ name: true, age: true }).all(function(docs){
+      .fields({ name: true, age: true }).all(function(err, docs){
+        assert.ok(!err);
         assert.length(docs, 1);
         assert.equal('Nathan', docs[0].name.first);
         assert.equal(33, docs[0].age);
@@ -225,7 +240,8 @@ module.exports = {
     User
       .find({ 'name.first': 'Nathan' })
       .fields({ name: true })
-      .fields({ age: true }).all(function(docs){
+      .fields({ age: true }).all(function(err, docs){
+        assert.ok(!err);
         assert.length(docs, 1);
         assert.equal('Nathan', docs[0].name.first);
         assert.equal(33, docs[0].age);
@@ -237,7 +253,8 @@ module.exports = {
   'test fields() partial select strings': function(assert, done){
     User
       .find({ 'name.first': 'Nathan' })
-      .fields('name', 'age').all(function(docs){
+      .fields('name', 'age').all(function(err, docs){
+        assert.ok(!err);
         assert.length(docs, 1);
         assert.equal('Nathan', docs[0].name.first);
         assert.equal(33, docs[0].age);
@@ -249,7 +266,8 @@ module.exports = {
   'test fields() partial select mixed': function(assert, done){
     User
       .find({ 'name.first': 'Nathan' })
-      .fields('name', { age: true }).all(function(docs){
+      .fields('name', { age: true }).all(function(err, docs){
+        assert.ok(!err);
         assert.length(docs, 1);
         assert.equal('Nathan', docs[0].name.first);
         assert.equal(33, docs[0].age);
@@ -259,7 +277,8 @@ module.exports = {
   },
   
   'test find() partial select field omission': function(assert, done){
-    User.find({ 'name.first': 'Nathan' }, 'name').all(function(docs){
+    User.find({ 'name.first': 'Nathan' }, 'name').all(function(err, docs){
+      assert.ok(!err);
       assert.length(docs, 1);
       assert.equal('Nathan', docs[0].name.first);
       //assert.isUndefined(docs[0].age);
@@ -269,7 +288,8 @@ module.exports = {
   },
   
   'test find() $gt': function(assert, done){
-    User.find({ visits: { $gt: 10 }}).all(function(docs){
+    User.find({ visits: { $gt: 10 }}).all(function(err, docs){
+      assert.ok(!err);
       assert.length(docs, 2);
       assert.equal('Nathan', docs[0].name.first);
       assert.equal('TJ', docs[1].name.first);
@@ -278,7 +298,8 @@ module.exports = {
   },
   
   'test find() key with $gt': function(assert, done){
-    User.find('visits', { $gt: 10 }).all(function(docs){
+    User.find('visits', { $gt: 10 }).all(function(err, docs){
+      assert.ok(!err);
       assert.length(docs, 2);
       assert.equal('Nathan', docs[0].name.first);
       assert.equal('TJ', docs[1].name.first);
@@ -287,7 +308,8 @@ module.exports = {
   },
   
   'test find() $nin': function(assert, done){
-    User.find({ roles: { $nin: ['pet'] }}).all(function(docs){
+    User.find({ roles: { $nin: ['pet'] }}).all(function(err, docs){
+      assert.ok(!err);
       assert.length(docs, 2);
       assert.equal('Nathan', docs[0].name.first);
       assert.equal('TJ', docs[1].name.first);
@@ -296,7 +318,8 @@ module.exports = {
   },
   
   'test find() $in': function(assert, done){
-    User.find({ roles: { $in: ['admin'] }}).all(function(docs){
+    User.find({ roles: { $in: ['admin'] }}).all(function(err, docs){
+      assert.ok(!err);
       assert.length(docs, 2);
       assert.equal('Nathan', docs[0].name.first);
       assert.equal('TJ', docs[1].name.first);
@@ -305,14 +328,16 @@ module.exports = {
   },
   
   'test find() $in multiple values': function(assert, done){
-    User.find({ roles: { $in: ['admin', 'pet'] }}).all(function(docs){
+    User.find({ roles: { $in: ['admin', 'pet'] }}).all(function(err, docs){
+      assert.ok(!err);
       assert.length(docs, 4);
       done();
     })
   },
   
   'test array with<key>()': function(assert, done){
-    User.withRole('admin').all(function(docs){
+    User.withRole('admin').all(function(err, docs){
+      assert.ok(!err);
       assert.length(docs, 2);
       assert.equal('Nathan', docs[0].name.first);
       assert.equal('TJ', docs[1].name.first);
@@ -321,7 +346,8 @@ module.exports = {
   },
   
   'test array without<key>()': function(assert, done){
-    User.withoutRole('pet').all(function(docs){
+    User.withoutRole('pet').all(function(err, docs){
+      assert.ok(!err);
       assert.length(docs, 2);
       assert.equal('Nathan', docs[0].name.first);
       assert.equal('TJ', docs[1].name.first);
@@ -330,7 +356,8 @@ module.exports = {
   },
   
   'test array without<key>s()': function(assert, done){
-    User.withoutRole(['pet', 'dog']).all(function(docs){
+    User.withoutRole(['pet', 'dog']).all(function(err, docs){
+      assert.ok(!err);
       assert.length(docs, 2);
       assert.equal('Nathan', docs[0].name.first);
       assert.equal('TJ', docs[1].name.first);
@@ -339,7 +366,8 @@ module.exports = {
   },
   
   'test array with<key>s()': function(assert, done){
-    User.withRoles(['pet', 'dog']).all(function(docs){
+    User.withRoles(['pet', 'dog']).all(function(err, docs){
+      assert.ok(!err);
       assert.length(docs, 1);
       assert.equal('Raul', docs[0].name.first);
       done();
@@ -347,7 +375,8 @@ module.exports = {
   },
   
   'test array with<key>s() chaining': function(assert, done){
-    User.awesome.withRole('admin').all(function(docs){
+    User.awesome.withRole('admin').all(function(err, docs){
+      assert.ok(!err);
       assert.length(docs, 2);
       assert.equal('Nathan', docs[0].name.first);
       assert.equal('TJ', docs[1].name.first);
@@ -356,7 +385,8 @@ module.exports = {
   },
   
   'test find() $all': function(assert, done){
-    User.find({ roles: { $all: ['pet', 'dog'] }}).all(function(docs){
+    User.find({ roles: { $all: ['pet', 'dog'] }}).all(function(err, docs){
+      assert.ok(!err);
       assert.length(docs, 1);
       assert.equal('Raul', docs[0].name.first);
       done();
@@ -364,7 +394,8 @@ module.exports = {
   },
   
   'test find()/all() query with one condition': function(assert, done){
-    User.find({age:33}).all(function(docs){
+    User.find({age:33}).all(function(err, docs){
+      assert.ok(!err);
       assert.length(docs, 1);
       assert.equal('Nathan', docs[0].name.first);
       assert.equal('nathan@learnboost.com', docs[0].contact.email);
@@ -377,11 +408,13 @@ module.exports = {
   },
   
   'test find()/all() query with several conditions': function(assert, done){
-    User.find({ 'name.last': 'Holowaychuk' }).all(function(docs){
+    User.find({ 'name.last': 'Holowaychuk' }).all(function(err, docs){
+      assert.ok(!err);
       assert.length(docs, 2);
       assert.equal('TJ', docs[0].name.first);
       assert.equal('Tobi', docs[1].name.first);
-      User.find({ 'name.last': 'Holowaychuk', 'name.first': 'TJ' }).all(function(docs){
+      User.find({ 'name.last': 'Holowaychuk', 'name.first': 'TJ' }).all(function(err, docs){
+        assert.ok(!err);
         assert.length(docs, 1);
         assert.equal('TJ', docs[0].name.first);
         done();
@@ -393,7 +426,8 @@ module.exports = {
     User
       .find({ 'name.last': 'Holowaychuk' })
       .find({ 'name.first': 'TJ' })
-      .all(function(docs){
+      .all(function(err, docs){
+        assert.ok(!err);
         assert.length(docs, 1);
         assert.equal('TJ', docs[0].name.first);
         done();
@@ -404,7 +438,8 @@ module.exports = {
     User
       .find('name.last', 'Holowaychuk')
       .find('name.first', 'TJ')
-      .all(function(docs){
+      .all(function(err, docs){
+        assert.ok(!err);
         assert.length(docs, 1);
         assert.equal('TJ', docs[0].name.first);
         done();
@@ -416,7 +451,8 @@ module.exports = {
       .find()
       .where({ 'name.last': 'Holowaychuk' })
       .where({ 'name.first': 'TJ' })
-      .all(function(docs){
+      .all(function(err, docs){
+        assert.ok(!err);
         assert.length(docs, 1);
         assert.equal('TJ', docs[0].name.first);
         done();
@@ -429,14 +465,16 @@ module.exports = {
       , b = 0;
     User
       .find({ 'name.last': 'Holowaychuk' })
-      .all(function(docs){
+      .all(function(err, docs){
+        assert.ok(!err);
         assert.equal(1, ++a);
         assert.length(docs, 2);
         assert.equal('TJ', docs[0].name.first);
         --n || done();
       })
       .find({ awesome: true })
-      .all(function(docs){
+      .all(function(err, docs){
+        assert.ok(!err);
         assert.equal(1, ++b);
         assert.length(docs, 1);
         assert.equal('TJ', docs[0].name.first);
@@ -449,7 +487,8 @@ module.exports = {
       .find()
       .where({ 'name.last': 'Holowaychuk' })
       .where('name.first', 'TJ')
-      .all(function(docs){
+      .all(function(err, docs){
+        assert.ok(!err);
         assert.length(docs, 1);
         assert.equal('TJ', docs[0].name.first);
         done();
@@ -457,19 +496,23 @@ module.exports = {
   },
   
   'test find()/first() query with one condition': function(assert, done){
-    User.find({ 'contact.email': 'nathan@learnboost.com' }).first(function(doc){
+    User.find({ 'contact.email': 'nathan@learnboost.com' }).first(function(err, doc){
+      assert.ok(!err);
       assert.equal('Nathan', doc.name.first);
       done();
     });
   },
   
   'test find() given an ObjectID': function(assert, done){
-    User.find({ 'name.first': 'TJ' }).all(function(docs){
+    User.find({ 'name.first': 'TJ' }).all(function(err, docs){
+      assert.ok(!err);
       assert.length(docs, 1);
-      User.find(docs[0]._id, function(doc){
+      User.find(docs[0]._id, function(err, doc){
+        assert.ok(!err);
         assert.equal('TJ', doc.name.first);
         var query = User.find(docs[0]._id);
-        query.first(function(doc){
+        query.first(function(err, doc){
+          assert.ok(!err);
           assert.equal('TJ', doc.name.first);
           done();
         });
@@ -478,9 +521,11 @@ module.exports = {
   },
   
   'test findById()': function(assert, done){
-    User.find({ 'name.first': 'TJ' }).all(function(docs){
+    User.find({ 'name.first': 'TJ' }).all(function(err, docs){
+      assert.ok(!err);
       assert.length(docs, 1);
-      User.findById(docs[0]._id, function(doc){
+      User.findById(docs[0]._id, function(err, doc){
+        assert.ok(!err);
         assert.equal('TJ', doc.name.first);
         done();
       });
@@ -488,11 +533,11 @@ module.exports = {
   },
   
   'test count()': function(assert, done){
-    User.count(function(n){
+    User.count(function(err, n){
       assert.equal(4, n);
-      User.count({ 'name.last': 'White' }, function(n){
+      User.count({ 'name.last': 'White' }, function(err, n){
         assert.equal(1, n);
-        User.count({ 'name.last': 'foobar' }, function(n){
+        User.count({ 'name.last': 'foobar' }, function(err, n){
           assert.equal(0, n);
           done();
         });
@@ -501,10 +546,13 @@ module.exports = {
   },
   
   'test remove()': function(assert, done){
-    User.remove({ 'name.first': 'TJ' }, function(){
-      User.find({ 'name.first': 'TJ' }).all(function(docs){
+    User.remove({ 'name.first': 'TJ' }, function(err){
+      assert.ok(!err);
+      User.find({ 'name.first': 'TJ' }).all(function(err, docs){
+        assert.ok(!err);
         assert.length(docs, 0);
-        User.find().all(function(docs){
+        User.find().all(function(err, docs){
+          assert.ok(!err);
           assert.length(docs, 3);
           done();
         });

@@ -483,12 +483,13 @@ module.exports = {
   },
   
   'test validators': function(assert, done){
-    var document = mongoose.define;
+    var document = mongoose.define
+      , saves = 0;
 
     var VT = document('ValidTests')
-    .oid('_id')
-    .string('email')
-    .number('age');
+      .oid('_id')
+      .string('email')
+      .number('age');
     
     VT.age.validate('qualify_for_medicare', function(value, cb){
       cb(value >= 55); 
@@ -499,7 +500,7 @@ module.exports = {
     });
     
     VT.hook('save', function(parent, callback){
-      assert.ok(this._.errors.length == 2);
+      if (++saves == 1) assert.ok(this._.errors.length == 2);
       parent(callback);
     });
   
@@ -522,7 +523,13 @@ module.exports = {
       assert.equal('validation', doc.errors[1].type);
       assert.equal('age', doc.errors[1].path);
       assert.equal('qualify_for_medicare', doc.errors[1].name);
-      done();
+      af.email = 'valid@email.com';
+      af.age = 60;
+      af.save(function(err, doc){
+        assert.ok(!err);
+        assert.ok(!doc.errors);
+        done();
+      });
     });
   },
   

@@ -16,6 +16,7 @@ document('User')
     document()
       .string('email')
       .string('phone'))
-  .number('age');
+  .number('age').strict()
+  .bool('blocked');
 
 mongoose.documentation();

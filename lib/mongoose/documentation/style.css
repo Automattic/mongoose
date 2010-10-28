@@ -4,26 +4,43 @@ body {
   color: #333;
   -webkit-font-smoothing: antialiased;
 }
-h2 {
+h2, h3 {
   margin: 35px 0 25px 0;
   font-size: 30px;
   padding-bottom: 10px;
   border-bottom: 5px solid #eee;
   color: #000;
 }
+h3 {
+  font-size: 22px;
+  border-bottom: 2px solid #eee;
+}
 strong {
   color: #000;
 }
-span.type {
+span.type,
+span.signature {
   color: #049DDA;
 }
-span.type::before {
+span.type::before,
+span.signature::before {
   content: '(';
 }
-span.type::after {
+span.type::after,
+span.signature::after {
   content: ')';
+}
+ul {
+  padding-left: 15px;
 }
 ul ul {
   margin: 5px 0;
   padding-left: 20px;
+}
+ul li {
+  list-style: none;
+}
+ul li::before {
+  content: '- ';
+  color: #C0C0C0;
 }

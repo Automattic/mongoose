@@ -2,7 +2,6 @@
 EXPRESSO = support/expresso/bin/expresso -I lib --serial
 
 TESTS = tests/document.js \
-	      tests/documentation.js \
 	      tests/index.js \
 	      tests/schema.js \
 	      tests/types.js \

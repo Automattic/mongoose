@@ -210,6 +210,17 @@ module.exports = {
     var phone = type('phone').extend('string');
     assert.ok(phone.setters.length == 1);
     assert.ok(phone.parent == 'string');
+  },
+  
+  'test required()': function(){
+    var str = type('string');
+    assert.equal(undefined, str._required);
+    assert.equal(str, str.required());
+    assert.equal(true, str._required);
+    assert.equal(str, str.required(false));
+    assert.equal(false, str._required);
+    assert.equal(str, str.required(true));
+    assert.equal(true, str._required);
   }
   
 };

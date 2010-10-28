@@ -19,4 +19,6 @@ document('User')
   .number('age').strict()
   .bool('blocked');
 
-mongoose.documentation();
+mongoose.documentation({
+  dest: __dirname
+});

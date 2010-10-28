@@ -19,6 +19,12 @@ document('User')
   .number('age').strict()
   .bool('blocked');
 
+document('Post')
+  .oid('_id')
+  .string('title').required()
+  .string('body').required();
+
 mongoose.documentation({
-  dest: __dirname
+    dest: __dirname
+  , title: 'User documentation'
 });

@@ -21,8 +21,8 @@ document('User')
 
 document('Post')
   .oid('_id')
-  .string('title').required(true)
-  .string('body').required(true);
+  .string('title').required()
+  .string('body').required();
 
 mongoose.documentation({
     dest: __dirname

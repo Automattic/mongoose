@@ -6,8 +6,6 @@
 var mongoose = require('../lib/mongoose')
   , document = mongoose.define;
 
-var db = mongoose.connect('mongodb://localhost/mongoose');
-
 document('User')
   .oid('_id')
   .object('name',
@@ -18,9 +16,15 @@ document('User')
     document()
       .string('email')
       .string('phone'))
-  .number('age');
+  .number('age').strict()
+  .bool('blocked');
 
-mongoose.documentation('User', __dirname, function(err){
-  if (err) throw err;
-  db.close();
+document('Post')
+  .oid('_id')
+  .string('title').required()
+  .string('body').required();
+
+mongoose.documentation({
+    dest: __dirname
+  , title: 'User documentation'
 });

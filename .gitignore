@@ -1,4 +1,4 @@
 lib-cov
 .pomo
-examples/User.html
-examples/User.md
+examples/*.html
+examples/*.md

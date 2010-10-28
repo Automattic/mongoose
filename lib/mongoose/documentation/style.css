@@ -1,0 +1,29 @@
+body {
+  padding: 15px 30px;
+  font: 14px/18px "Lucida Grande", "Lucida Sans Unicode", Arial, Verdana, sans-serif;
+  color: #333;
+  -webkit-font-smoothing: antialiased;
+}
+h2 {
+  margin: 35px 0 25px 0;
+  font-size: 30px;
+  padding-bottom: 10px;
+  border-bottom: 5px solid #eee;
+  color: #000;
+}
+strong {
+  color: #000;
+}
+span.type {
+  color: #049DDA;
+}
+span.type::before {
+  content: '(';
+}
+span.type::after {
+  content: ')';
+}
+ul ul {
+  margin: 5px 0;
+  padding-left: 20px;
+}

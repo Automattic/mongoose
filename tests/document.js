@@ -42,7 +42,7 @@ module.exports = {
        assert.ok(instance.get('name') == 'nathan');
 
        assert.ok(instance._schema['name'].getters.length == 1);
-       assert.ok(instance._schema['name'].setters.length == 1); 
+       assert.ok(instance._schema['name'].setters.length == 2); 
   },
   
   'test mixin': function(){
@@ -85,7 +85,7 @@ module.exports = {
        assert.ok(instance.get('name') == 'nathan');
 
        assert.ok(instance._schema['name'].getters.length == 1);
-       assert.ok(instance._schema['name'].setters.length == 1);     
+       assert.ok(instance._schema['name'].setters.length == 2);
   },
   
   'test setup functions': function(){

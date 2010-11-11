@@ -22,10 +22,10 @@ module.exports = {
   
   'test string type definition': function(){
     var str = type('string')
-      , cast = str._castSet;
+      , cast = str.setters[0];
         
     assert.equal('string', str.type);
-    assert.length(str.setters, 0);
+    assert.length(str.setters, 1);
     assert.equal('4', cast(4));
     assert.equal('yay', cast('yay'));
 
@@ -102,10 +102,10 @@ module.exports = {
   
   'test number type definition': function(){
     var n = type('number')
-      , cast = n._castSet;
+      , cast = n.setters[0];
     
     assert.equal('number', n.type);
-    assert.length(n.setters, 0);
+    assert.length(n.setters, 1);
     assert.strictEqual(1, cast(1));
     assert.strictEqual(1.5, cast(1.5));
     assert.strictEqual(1.5, cast('1.5'));
@@ -131,10 +131,10 @@ module.exports = {
   
   'test boolean type definition': function(){
     var bool = type('boolean')
-      , cast = bool._castSet;
+      , cast = bool.setters[0];
     
     assert.equal('boolean', bool.type);
-    assert.length(bool.setters, 0);
+    assert.length(bool.setters, 1);
     assert.strictEqual(true, cast({}));
     assert.strictEqual(true, cast(1));
     assert.strictEqual(true, cast(true));
@@ -162,10 +162,10 @@ module.exports = {
   
   'test date type definition': function(){
     var date = type('date'),
-        cast = date._castSet;
+        cast = date.setters[0];
     
     assert.equal('date', date.type);
-    assert.length(date.setters, 0);
+    assert.length(date.setters, 1);
     assert.eql(new Date('may 25 1987'), cast('may 25 1987'));
     assert.eql(new Date('may 25 1987'), cast(new Date('may 25 1987')));
     assert.equal(Error, cast('asdfadsfasdf'));
@@ -203,14 +203,14 @@ module.exports = {
           return complete( /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/.test(value) );
         });
     
-    assert.ok(email.setters.length == 0);
+    assert.ok(email.setters.length == 1);
     assert.ok(email.parent == 'string');
     assert.ok(typeof email.validators['email'] == 'function');
   },
   
   'test extending with string': function(){
     var phone = type('phone').extend('string');
-    assert.ok(phone.setters.length == 0);
+    assert.ok(phone.setters.length == 1);
     assert.ok(phone.parent == 'string');
   },
   

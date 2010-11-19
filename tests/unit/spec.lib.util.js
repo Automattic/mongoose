@@ -1,5 +1,5 @@
-Class = require('util').Class
-object = require('util').object
+Class = require('lib/util').Class
+object = require('lib/util').object
 
 describe 'Util'
   describe 'Class'

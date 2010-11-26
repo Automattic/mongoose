@@ -1,7 +1,7 @@
 Mongoose: MongoDB ODM/ORM
 =========================
 
-The goal of Mongoose is to provide a extremely simple interface for MongoDB. 
+The goal of Mongoose is to provide an extremely simple interface for MongoDB. 
 
 ## Features
 

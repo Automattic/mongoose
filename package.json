@@ -1,6 +1,6 @@
 { "name": "mongoose"
 , "description":  "ORM for MongoDB"
-, "version":  "0.0.4"
+, "version":  "0.0.5"
 , "author": "LearnBoost <dev@learnboost.com>"
 , "dependencies": { "mongodb": "0.7.9"}
 , "keywords": [ "mongoose", "mongo", "mongodb", "orm", "nosql" ]

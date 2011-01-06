@@ -14,7 +14,7 @@ var BlogPost = new Schema({
     title     : String
   , slug      : String
   , date      : Date
-  , comments  : Comments
+  , comments  : [Comments]
 });
 
 // recursive embedded-document schema
@@ -23,7 +23,7 @@ var Comments = new Schema({
     title     : String
   , date      : Date
   , body      : String
-  , comments  : Comments
+  , comments  : [Comments]
 });
 
 /**

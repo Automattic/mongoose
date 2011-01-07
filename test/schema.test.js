@@ -60,21 +60,28 @@ module.exports = {
       , age:        Number
     });
 
-    Person.get('name').should.be.instanceof(SchemaTypes.String);
-    Person.get('raccons').should.be.instanceof(SchemaTypes.DocumentArray);
-    Person.get('location.city').should.be.instanceof(SchemaTypes.String);
-    Person.get('location.state').should.be.instanceof(SchemaTypes.String);
+    Person.key('name').should.be.instanceof(SchemaTypes.String);
+    Person.key('raccons').should.be.instanceof(SchemaTypes.DocumentArray);
+    Person.key('location.city').should.be.instanceof(SchemaTypes.String);
+    Person.key('location.state').should.be.instanceof(SchemaTypes.String);
   },
 
-  'string type': function(){
+  'string type with built-in validators': function(){
     var Test = new Schema({
         simple: String
       , complex: { type: String, enum: ['a', 'b', 'c'],  }
     });
 
-    Test.get('name').should.be.instanceof(SchemaType.String);
-    Test.get('name').enumValues.should.eql(['a', 'b', 'c']);
-    Test.get('name').validators.should.have.length(1);
+    Test.key('simple').required(true);
+
+    Test.key('complex').should.be.instanceof(SchemaType.String);
+    Test.key('complex').enumValues.should.eql(['a', 'b', 'c']);
+    Test.key('complex').validators.should.have.length(1);
+
+    Test.key('complex').enum(['d']);
+    Test.key('complex').enum('e');
+
+    Test.key('complex').enumValues.should.eql(['a', 'b', 'c', 'd', 'e']);
   }
 
 };

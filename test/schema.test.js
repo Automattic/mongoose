@@ -20,7 +20,7 @@ module.exports = {
       , owner     : ObjectId
       , fur       : String
       , color     : { type: String }
-      , age:      : Number
+      , age       : Number
       , checkins  : [Checkin]
       , friends   : [ObjectId]
     });
@@ -28,8 +28,8 @@ module.exports = {
     var Checkin = new Schema({
         date      : Date 
       , location  : {
-            lat:    Number
-          , lng:    Number
+            lat: Number
+          , lng: Number
         }
     });
 
@@ -64,6 +64,17 @@ module.exports = {
     Person.get('raccons').should.be.instanceof(SchemaTypes.DocumentArray);
     Person.get('location.city').should.be.instanceof(SchemaTypes.String);
     Person.get('location.state').should.be.instanceof(SchemaTypes.String);
+  },
+
+  'string type': function(){
+    var Test = new Schema({
+        simple: String
+      , complex: { type: String, enum: ['a', 'b', 'c'],  }
+    });
+
+    Test.get('name').should.be.instanceof(SchemaType.String);
+    Test.get('name').enumValues.should.eql(['a', 'b', 'c']);
+    Test.get('name').validators.should.have.length(1);
   }
 
 };

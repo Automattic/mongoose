@@ -73,6 +73,7 @@ module.exports = {
     });
 
     Test.key('simple').required(true);
+    Test.key('simple').validators.should.have.length(1);
 
     Test.key('complex').should.be.instanceof(SchemaType.String);
     Test.key('complex').enumValues.should.eql(['a', 'b', 'c']);
@@ -82,6 +83,16 @@ module.exports = {
     Test.key('complex').enum('e');
 
     Test.key('complex').enumValues.should.eql(['a', 'b', 'c', 'd', 'e']);
+  },
+
+  'test default definition': function(){
+    var Test = new Schema({
+        simple: { type: String, default: 'test' }
+      , callback: { type: Number, default: function(){ } }
+    });
+
+    Test.key('simple').defaultValue.should.eql('test');
+    Test.key('callback').defaultValue.should.be.a('function');
   }
 
 };

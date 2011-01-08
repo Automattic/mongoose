@@ -5,6 +5,7 @@
 
 var mongoose = require('./common').mongoose
   , Schema = mongoose.Schema
+  , ValidatorError = Schema.ValidatorError
   , ObjectId = Schema.ObjectId
   , SchemaTypes = mongoose.SchemaTypes;
 
@@ -33,16 +34,16 @@ module.exports = {
         }
     });
 
-    Ferret.get('name').should.be.instanceof(SchemaType.String);
-    Ferret.get('owner').should.be.instanceof(SchemaType.ObjectId);
-    Ferret.get('fur').should.be.instanceof(SchemaType.String);
-    Ferret.get('color').should.be.instanceof(SchemaType.String);
-    Ferret.get('age').should.be.instanceof(SchemaType.Number);
-    Ferret.get('checkins').should.be.instanceof(SchemaType.DocumentArray);
-    Ferret.get('friends').should.be.instanceof(SchemaType.Array);
+    Ferret.get('name').should.be.an.instanceof(SchemaType.String);
+    Ferret.get('owner').should.be.an.instanceof(SchemaType.ObjectId);
+    Ferret.get('fur').should.be.an.instanceof(SchemaType.String);
+    Ferret.get('color').should.be.an.instanceof(SchemaType.String);
+    Ferret.get('age').should.be.an.instanceof(SchemaType.Number);
+    Ferret.get('checkins').should.be.an.instanceof(SchemaType.DocumentArray);
+    Ferret.get('friends').should.be.an.instanceof(SchemaType.Array);
 
-    Checkin.get('date').should.be.instanceof(SchemaType.Date);
-    Checkin.get('location').should.be.instanceof(SchemaType.Object);
+    Checkin.get('date').should.be.an.instanceof(SchemaType.Date);
+    Checkin.get('location').should.be.an.instanceof(SchemaType.Object);
   },
 
   'dot notation support for accessing keys': function(){
@@ -60,10 +61,10 @@ module.exports = {
       , age:        Number
     });
 
-    Person.key('name').should.be.instanceof(SchemaTypes.String);
-    Person.key('raccons').should.be.instanceof(SchemaTypes.DocumentArray);
-    Person.key('location.city').should.be.instanceof(SchemaTypes.String);
-    Person.key('location.state').should.be.instanceof(SchemaTypes.String);
+    Person.key('name').should.be.an.instanceof(SchemaTypes.String);
+    Person.key('raccons').should.be.an.instanceof(SchemaTypes.DocumentArray);
+    Person.key('location.city').should.be.an.instanceof(SchemaTypes.String);
+    Person.key('location.state').should.be.an.instanceof(SchemaTypes.String);
   },
 
   'string type with built-in validators': function(){
@@ -75,7 +76,7 @@ module.exports = {
     Test.key('simple').required(true);
     Test.key('simple').validators.should.have.length(1);
 
-    Test.key('complex').should.be.instanceof(SchemaType.String);
+    Test.key('complex').should.be.an.instanceof(SchemaType.String);
     Test.key('complex').enumValues.should.eql(['a', 'b', 'c']);
     Test.key('complex').validators.should.have.length(1);
 
@@ -97,29 +98,20 @@ module.exports = {
         }}
     });
 
-    var defaults = 0;
-
     Test.key('simple').defaultValue.should.eql('a');
     Test.key('callback').defaultValue.should.be.a('function');
     Test.key('async').defaultValue.should.be.a('function');
 
     Test.key('simple').getDefault(function(value){
       value.should.eql('a');
-      defaults++;
     });
 
     Test.key('callback').getDefault(function(value){
       value.should.eql('b');
-      defaults++;
     });
 
     Test.key('simple').getDefault(function(value){
       value.should.eql('c');
-      defaults++;
-    });
-
-    beforeExit(function(){
-      defaults.should.eql(3);
     });
   },
 
@@ -131,6 +123,14 @@ module.exports = {
     Test.key('simple').validators.length(1);
     Test.key('simple').match(/[0-9]/);
     Test.key('simple').validators.length(2);
+
+    Test.key('simple').doValidate('az', function(){
+      arguments.should.have.length(0);
+    });
+
+    Test.key('simple').doValidate('12', function(err){
+      err.should.be.an.instanceof(ValidatorError);
+    });
   },
 
   'test number validation based on minimums and maximums': function(){
@@ -139,6 +139,18 @@ module.exports = {
     });
 
     Tobi.key('friends').validators.length(2);
+
+    Tobi.key('friends').doValidate(10, function(){
+      arguments.should.have.length(0);
+    });
+
+    Tobi.key('friends').doValidate(100, function(){
+      arguments.should.have.length(1);
+    });
+
+    Tobi.key('friends').doValidate(1, function(){
+      arguments.should.have.length(1);
+    });
   }
 
 };

@@ -92,6 +92,16 @@ module.exports = {
 
     Test.key('simple').defaultValue.should.eql('test');
     Test.key('callback').defaultValue.should.be.a('function');
+  },
+
+  'test regular expression validation': funciton(){
+    var Test = new Schema({
+      simple: { type: String, match: /[a-z]/ }
+    });
+
+    Test.key('simple').validators.length(1);
+    Test.key('simple').match(/[0-9]/);
+    Test.key('simple').validators.length(2);
   }
 
 };

@@ -212,6 +212,24 @@ module.exports = {
     Loki.key('likes').doValidate([], function (err) {
       err.should.be.an.instanceof(ValidatorError);
     });
+  },
+
+  'test date required validation': function(){
+    var Loki = new Schema({
+        birth_date: { type: Date, required: true }
+    });
+
+    Loki.key('birth_date').doValidate(null, function (err) {
+      err.should.be.an.instanceof(ValidatorError);
+    });
+
+    Loki.key('birth_date').doValidate(undefined, function (err) {
+      err.should.be.an.instanceof(ValidatorError);
+    });
+
+    Loki.key('birth_date').doValidate(new Date(), function (err) {
+      err.should.be.an.instanceof(ValidatorError);
+    });
   }
 
 };

@@ -94,14 +94,22 @@ module.exports = {
     Test.key('callback').defaultValue.should.be.a('function');
   },
 
-  'test regular expression validation': funciton(){
+  'test regular expression validation': function(){
     var Test = new Schema({
-      simple: { type: String, match: /[a-z]/ }
+        simple: { type: String, match: /[a-z]/ }
     });
 
     Test.key('simple').validators.length(1);
     Test.key('simple').match(/[0-9]/);
     Test.key('simple').validators.length(2);
+  },
+
+  'test number validation based on minimums and maximums': function(){
+    var Tobi = new Schema({
+        friends: { type: Number, max: 15, min: 5 }
+    });
+
+    Tobi.key('friends').validators.length(2);
   }
 
 };

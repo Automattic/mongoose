@@ -24,6 +24,7 @@ module.exports = {
       , age       : Number
       , checkins  : [Checkin]
       , friends   : [ObjectId]
+      , likes     : Array
     });
 
     var Checkin = new Schema({
@@ -41,6 +42,7 @@ module.exports = {
     Ferret.get('age').should.be.an.instanceof(SchemaType.Number);
     Ferret.get('checkins').should.be.an.instanceof(SchemaType.DocumentArray);
     Ferret.get('friends').should.be.an.instanceof(SchemaType.Array);
+    Ferret.get('likes').should.be.an.instanceof(SchemaType.Array);
 
     Checkin.get('date').should.be.an.instanceof(SchemaType.Date);
     Checkin.get('location').should.be.an.instanceof(SchemaType.Object);
@@ -191,6 +193,24 @@ module.exports = {
 
     Edwald.key('friends').doValidate(0, function(){
       arguments.length.should.be(0);
+    });
+  },
+
+  'test array required validation': function(){
+    var Loki = new Schema({
+        likes: { type: Array, required: true }
+    });
+
+    Loki.key('likes').doValidate(null, function (err) {
+      err.should.be.an.instanceof(ValidatorError);
+    });
+
+    Loki.key('likes').doValidate(undefined, function (err) {
+      err.should.be.an.instanceof(ValidatorError);
+    });
+
+    Loki.key('likes').doValidate([], function (err) {
+      err.should.be.an.instanceof(ValidatorError);
     });
   }
 

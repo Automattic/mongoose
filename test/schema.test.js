@@ -86,12 +86,41 @@ module.exports = {
 
   'test default definition': function(){
     var Test = new Schema({
-        simple: { type: String, default: 'test' }
-      , callback: { type: Number, default: function(){ } }
+        simple    : { type: String, default: 'a' }
+      , callback  : { type: Number, default: function(){
+          return 'b';
+        }}
+      , async     : { type: String, default: function(fn){
+          process.nextTick(function(){
+            fn(null, 'c');
+          });
+        }}
     });
 
-    Test.key('simple').defaultValue.should.eql('test');
+    var defaults = 0;
+
+    Test.key('simple').defaultValue.should.eql('a');
     Test.key('callback').defaultValue.should.be.a('function');
+    Test.key('async').defaultValue.should.be.a('function');
+
+    Test.key('simple').getDefault(function(value){
+      value.should.eql('a');
+      defaults++;
+    });
+
+    Test.key('callback').getDefault(function(value){
+      value.should.eql('b');
+      defaults++;
+    });
+
+    Test.key('simple').getDefault(function(value){
+      value.should.eql('c');
+      defaults++;
+    });
+
+    beforeExit(function(){
+      defaults.should.eql(3);
+    });
   },
 
   'test regular expression validation': function(){

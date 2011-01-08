@@ -6,6 +6,7 @@
 var mongoose = require('./common').mongoose
   , Schema = mongoose.Schema
   , ValidatorError = Schema.ValidatorError
+  , CastError = Schema.CastError
   , ObjectId = Schema.ObjectId
   , SchemaTypes = mongoose.SchemaTypes;
 
@@ -230,6 +231,22 @@ module.exports = {
     Loki.key('birth_date').doValidate(new Date(), function (err) {
       err.should.be.an.instanceof(ValidatorError);
     });
+  },
+
+  'test date casting': function(){
+    var Loki = new Schema({
+        birth_date: { type: Date }
+    });
+
+    Loki.key('birth_date').cast(1294525628301).should.be.an.instanceof(Date);
+    Loki.key('birth_date').cast('8/24/2000').should.be.an.instanceof(Date);
+
+    try {
+      var obj = Loki.key('birth_date').cast('tobi');
+      obj.should.not.be.an.instanceof(Date); // shouldn't get executed
+    } catch(e){
+      e.should.be.an.instanceof(CastError);
+    }
   }
 
 };

@@ -67,24 +67,6 @@ module.exports = {
     Person.key('location.state').should.be.an.instanceof(SchemaTypes.String);
   },
 
-  'string type with built-in validators': function(){
-    var Test = new Schema({
-        simple: String
-      , complex: { type: String, enum: ['a', 'b', 'c'],  }
-    });
-
-    Test.key('simple').required(true);
-    Test.key('simple').validators.should.have.length(1);
-
-    Test.key('complex').should.be.an.instanceof(SchemaType.String);
-    Test.key('complex').enumValues.should.eql(['a', 'b', 'c']);
-    Test.key('complex').validators.should.have.length(1);
-
-    Test.key('complex').enum('d', 'e');
-
-    Test.key('complex').enumValues.should.eql(['a', 'b', 'c', 'd', 'e']);
-  },
-
   'test default definition': function(){
     var Test = new Schema({
         simple    : { type: String, default: 'a' }
@@ -115,7 +97,48 @@ module.exports = {
     });
   },
 
-  'test regular expression validation': function(){
+  'test string required validation': function(){
+    var Test = new Schema({
+        simple: String
+    });
+
+    Test.key('simple').required(true);
+    Test.key('simple').validators.should.have.length(1);
+    
+    Test.key('simple').doValidate(null, function(err){
+      
+    });
+    Test.key('simple').doValidate(undefined, function(err){
+      
+    });
+    Test.key('simple').doValidate('', function(err){
+      
+    });
+  },
+
+  'test string enum validation': function(){
+    var Test = new Schema({
+        complex: { type: String, enum: ['a', 'b', 'c'] }
+    });
+
+    Test.key('complex').should.be.an.instanceof(SchemaType.String);
+    Test.key('complex').enumValues.should.eql(['a', 'b', 'c']);
+    Test.key('complex').validators.should.have.length(1);
+
+    Test.key('complex').enum('d', 'e');
+
+    Test.key('complex').enumValues.should.eql(['a', 'b', 'c', 'd', 'e']);
+
+    Test.key('complex').doValidate('x', function(){
+      arguments.should.have.length(1);
+    });
+
+    Test.key('complex').doValidate('da', function(err){
+      err.should.be.an.instanceof(ValidatorError);
+    });
+  },
+
+  'test string regular expression validation': function(){
     var Test = new Schema({
         simple: { type: String, match: /[a-z]/ }
     });
@@ -133,7 +156,7 @@ module.exports = {
     });
   },
 
-  'test number validation based on minimums and maximums': function(){
+  'test number minimums and maximums validation': function(){
     var Tobi = new Schema({
         friends: { type: Number, max: 15, min: 5 }
     });

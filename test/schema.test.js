@@ -174,6 +174,24 @@ module.exports = {
     Tobi.key('friends').doValidate(1, function(){
       arguments.should.have.length(1);
     });
+  },
+
+  'test number required validation': function(){
+    var Edwald = new Schema({
+        friends: { type: Number, required: true }
+    });
+
+    Edwald.key('friends').doValidate(null, function(err){
+      err.should.be.an.instanceof(ValidatorError);
+    });
+
+    Edwald.key('friends').doValidate(undefined, function(err){
+      err.should.be.an.instanceof(ValidatorError);
+    });
+
+    Edwald.key('friends').doValidate(0, function(){
+      arguments.length.should.be(0);
+    });
   }
 
 };

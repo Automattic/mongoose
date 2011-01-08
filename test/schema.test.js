@@ -79,8 +79,7 @@ module.exports = {
     Test.key('complex').enumValues.should.eql(['a', 'b', 'c']);
     Test.key('complex').validators.should.have.length(1);
 
-    Test.key('complex').enum(['d']);
-    Test.key('complex').enum('e');
+    Test.key('complex').enum('d', 'e');
 
     Test.key('complex').enumValues.should.eql(['a', 'b', 'c', 'd', 'e']);
   },

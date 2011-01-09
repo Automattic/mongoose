@@ -28,6 +28,7 @@ module.exports = {
       , checkins  : [Checkin]
       , friends   : [ObjectId]
       , likes     : Array
+      , alive     : Boolean
     });
 
     var Checkin = new Schema({
@@ -46,6 +47,7 @@ module.exports = {
     Ferret.get('checkins').should.be.an.instanceof(SchemaType.DocumentArray);
     Ferret.get('friends').should.be.an.instanceof(SchemaType.Array);
     Ferret.get('likes').should.be.an.instanceof(SchemaType.Array);
+    Ferret.get('alive').should.be.an.instanceof(SchemaType.Boolean);
 
     Checkin.get('date').should.be.an.instanceof(SchemaType.Date);
     Checkin.get('location').should.be.an.instanceof(SchemaType.Object);

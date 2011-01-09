@@ -111,13 +111,15 @@ module.exports = {
     Test.key('simple').validators.should.have.length(1);
     
     Test.key('simple').doValidate(null, function(err){
-      
+      err.should.be.an.instanceof(ValidatorError);
     });
+
     Test.key('simple').doValidate(undefined, function(err){
-      
+      err.should.be.an.instanceof(ValidatorError);
     });
-    Test.key('simple').doValidate('', function(err){
-      
+    
+    Test.key('simple').doValidate('', function(){
+      arguments.should.have.length(0);
     });
   },
 
@@ -392,6 +394,44 @@ module.exports = {
 
     strings[1].should.be.a('number');
     strings[1].should.eql(123);
+  },
+
+  'test boolean required validator': function(){
+    var Animal = new Schema({
+        isFerret: { type: Boolean, required: true }
+    });
+
+    Animal.key('isFerret').doValidate(null, function(err){
+      err.should.be.an.instanceof(ValidatorError);
+    });
+
+    Animal.key('isFerret').doValidate(undefined, function(err){
+      err.should.be.an.instanceof(ValidatorError);
+    });
+    
+    Animal.key('isFerret').doValidate(true, function(){
+      arguments.should.have.length(0);
+    });
+
+    Animal.key('isFerret').doValidate(false, function(){
+      arguments.should.have.length(0);
+    });
+  },
+
+  'test boolean casting': function(){
+    var Animal = new Schema({
+        isFerret: { type: Boolean, required: true }
+    });
+
+    Animal.key('isFerret').cast(null).should.be.false;
+    Animal.key('isFerret').cast(undefined).should.be.false;
+    Animal.key('isFerret').cast(false).should.be.false;
+    Animal.key('isFerret').cast(0).should.be.false;
+    Animal.key('isFerret').cast('0').should.be.false;
+    Animal.key('isFerret').cast({}).should.be.true;
+    Animal.key('isFerret').cast(true).should.be.true;
+    Animal.key('isFerret').cast(1).should.be.true;
+    Animal.key('isFerret').cast('1').should.be.true;
   }
 
 };

@@ -303,13 +303,37 @@ module.exports = {
         owner: { type: ObjectId }
     });
 
-    Loki.key('owner').doValidate(new DocumentObjectId, function(){
+    Loki.key('owner').doValidate(new DocumentObjectId(), function(){
       arguments.should.have.length(0);
     });
 
     Loki.key('owner').doValidate(null, function(err){
       err.should.be.an.instanceof(ValidatorError);
     });
+  },
+
+  'test object id casting': function(){
+    var Loki = new Schema({
+        owner: { type: ObjectId }
+    });
+
+    Loki.key('owner').cast('4c54f3453e688c000000001a').should.be.an.instanceof(DocumentObjectId);
+
+    Loki.key('owner').cast(new DocumentObjectId()).should.be.an.instanceof(DocumentObjectId);
+
+    try {
+      var obj = Loki.key('owner').cast(undefined);
+      obj.should.not.be.an.instanceof(DocumentObjectId); // shouldn't get executed
+    } catch(e){
+      e.should.be.an.instanceof(CastError);
+    }
+
+    try {
+      var obj = Loki.key('owner').cast(null);
+      obj.should.not.be.an.instanceof(DocumentObjectId); // shouldn't get executed
+    } catch(e){
+      e.should.be.an.instanceof(CastError);
+    }
   }
 
 };

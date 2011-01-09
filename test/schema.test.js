@@ -159,6 +159,40 @@ module.exports = {
     });
   },
 
+  'test string casting': function(){
+    var Tobi = new Schema({
+        nickname: String
+    });
+
+    function Test(){};
+    Test.prototype.toString = function(){
+      return 'woot';
+    };
+
+    // test Number -> String cast
+    Tobi.key('nickname').cast(0).should.be.a('string');
+    Tobi.key('nickname').cast(0).should.eql('0');
+
+    // test any object that implements toString
+    Tobi.key('nickname').cast(new Test()).should.be.a('string');
+    Tobi.key('nickname').cast(new Test()).should.eql('woot');
+    
+    // test raising an error
+    try {
+      var obj = Tobi.key('nickname').cast(null);
+      obj.should.not.be.a('string'); // shouldn't get executed
+    } catch(e){
+      e.should.be.an.instanceof(CastError);
+    }
+
+    try {
+      var obj = Tobi.key('nickname').cast(undefined);
+      obj.should.not.be.a('string'); // shouldn't get executed
+    } catch(e){
+      e.should.be.an.instanceof(CastError);
+    }
+  },
+
   'test number minimums and maximums validation': function(){
     var Tobi = new Schema({
         friends: { type: Number, max: 15, min: 5 }
@@ -243,6 +277,20 @@ module.exports = {
 
     try {
       var obj = Loki.key('birth_date').cast('tobi');
+      obj.should.not.be.an.instanceof(Date); // shouldn't get executed
+    } catch(e){
+      e.should.be.an.instanceof(CastError);
+    }
+
+    try {
+      var obj = Loki.key('birth_date').cast(undefined);
+      obj.should.not.be.an.instanceof(Date); // shouldn't get executed
+    } catch(e){
+      e.should.be.an.instanceof(CastError);
+    }
+
+    try {
+      var obj = Loki.key('birth_date').cast(null);
       obj.should.not.be.an.instanceof(Date); // shouldn't get executed
     } catch(e){
       e.should.be.an.instanceof(CastError);

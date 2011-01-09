@@ -8,6 +8,7 @@ var mongoose = require('./common').mongoose
   , ValidatorError = Schema.ValidatorError
   , CastError = Schema.CastError
   , ObjectId = Schema.ObjectId
+  , DocumentObjectId = mongoose.ObjectId
   , SchemaTypes = mongoose.SchemaTypes;
 
 /**
@@ -16,7 +17,7 @@ var mongoose = require('./common').mongoose
 
 module.exports = {
 
-  'different schema types support': function(){
+  'test different schema types support': function(){
     var Ferret = new Schema({
         name      : String
       , owner     : ObjectId
@@ -295,6 +296,20 @@ module.exports = {
     } catch(e){
       e.should.be.an.instanceof(CastError);
     }
+  },
+
+  'test object id required validator': function(){
+    var Loki = new Schema({
+        owner: { type: ObjectId }
+    });
+
+    Loki.key('owner').doValidate(new DocumentObjectId, function(){
+      arguments.should.have.length(0);
+    });
+
+    Loki.key('owner').doValidate(null, function(err){
+      err.should.be.an.instanceof(ValidatorError);
+    });
   }
 
 };

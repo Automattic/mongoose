@@ -233,6 +233,19 @@ module.exports = {
     });
   },
 
+  'test number casting': function(){
+    var Tobi = new Schema({
+        age: Number
+    });
+
+    // test String -> Number cast
+    Tobi.key('nickname').cast('0').should.be.an.instanceof(MongooseNumber);
+    (+Tobi.key('nickname').cast('0')).should.eql(0);
+
+    Tobi.key('nickname').cast(0).should.be.an.instanceof(MongooseNumber);
+    (+Tobi.key('nickname').cast(0)).should.eql(0);
+  },
+
   'test date required validation': function(){
     var Loki = new Schema({
         birth_date: { type: Date, required: true }

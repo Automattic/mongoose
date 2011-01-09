@@ -180,21 +180,6 @@ module.exports = {
     // test any object that implements toString
     Tobi.key('nickname').cast(new Test()).should.be.a('string');
     Tobi.key('nickname').cast(new Test()).should.eql('woot');
-    
-    // test raising an error
-    try {
-      var obj = Tobi.key('nickname').cast(null);
-      obj.should.not.be.a('string'); // shouldn't get executed
-    } catch(e){
-      e.should.be.an.instanceof(CastError);
-    }
-
-    try {
-      var obj = Tobi.key('nickname').cast(undefined);
-      obj.should.not.be.a('string'); // shouldn't get executed
-    } catch(e){
-      e.should.be.an.instanceof(CastError);
-    }
   },
 
   'test number minimums and maximums validation': function(){
@@ -273,27 +258,6 @@ module.exports = {
 
     Loki.key('birth_date').cast(1294525628301).should.be.an.instanceof(Date);
     Loki.key('birth_date').cast('8/24/2000').should.be.an.instanceof(Date);
-
-    try {
-      var obj = Loki.key('birth_date').cast('tobi');
-      obj.should.not.be.an.instanceof(Date); // shouldn't get executed
-    } catch(e){
-      e.should.be.an.instanceof(CastError);
-    }
-
-    try {
-      var obj = Loki.key('birth_date').cast(undefined);
-      obj.should.not.be.an.instanceof(Date); // shouldn't get executed
-    } catch(e){
-      e.should.be.an.instanceof(CastError);
-    }
-
-    try {
-      var obj = Loki.key('birth_date').cast(null);
-      obj.should.not.be.an.instanceof(Date); // shouldn't get executed
-    } catch(e){
-      e.should.be.an.instanceof(CastError);
-    }
   },
 
   'test object id required validator': function(){
@@ -320,20 +284,6 @@ module.exports = {
 
     Loki.key('owner').cast(new DocumentObjectId())
                      .should.be.an.instanceof(DocumentObjectId);
-
-    try {
-      var obj = Loki.key('owner').cast(undefined);
-      obj.should.not.be.an.instanceof(DocumentObjectId); // shouldn't get executed
-    } catch(e){
-      e.should.be.an.instanceof(CastError);
-    }
-
-    try {
-      var obj = Loki.key('owner').cast(null);
-      obj.should.not.be.an.instanceof(DocumentObjectId); // shouldn't get executed
-    } catch(e){
-      e.should.be.an.instanceof(CastError);
-    }
   },
 
   'test array required validation': function(){

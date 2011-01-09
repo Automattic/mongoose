@@ -40,6 +40,7 @@ module.exports = {
 
     var post = new BlogPost();
     post.isNew.should.be.true;
+    db.close();
   }
 
 };

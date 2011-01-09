@@ -9,6 +9,7 @@ var start = require('./common')
   , random = require('mongoose/utils').random
   , Schema = mongoose.Schema
   , ObjectId = Schema.ObjectId
+  , DocumentObjectId = mongoose.ObjectId
   , DocumentArray = mongoose.Types.DocumentArray
   , EmbeddedDocument = mongoose.Types.Document
   , MongooseNumber = mongoose.Types.Number
@@ -66,6 +67,8 @@ module.exports = {
     var post = new BlogPost();
     post.isNew.should.be.true;
 
+    post._id.should.be.an.instanceof(DocumentObjectId);
+
     should.strictEqual(post.title, null);
     should.strictEqual(post.slug, null);
     should.strictEqual(post.date, null);
@@ -80,6 +83,31 @@ module.exports = {
 
     post.owners.should.be.an.instanceof(MongooseArray);
     post.comments.should.be.an.instanceof(DocumentArray);
+  },
+
+  'test a model structure when saved': function(){
+    var db = start()
+      , BlogPost = db.model('BlogPost');
+
+    var post = new BlogPost();
+    post.save(function(){
+      post._id.should.be.an.instanceof(DocumentObjectId);
+
+      should.strictEqual(post.title, null);
+      should.strictEqual(post.slug, null);
+      should.strictEqual(post.date, null);
+
+      post.meta.should.be.a('object');
+      post.meta.should.eql({
+          date: null
+        , visitors: null
+      });
+
+      should.strictEqual(post.published, null);
+
+      post.owners.should.be.an.instanceof(MongooseArray);
+      post.comments.should.be.an.instanceof(DocumentArray);
+    });
   }
 
 };

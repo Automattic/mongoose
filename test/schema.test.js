@@ -9,7 +9,8 @@ var mongoose = require('./common').mongoose
   , CastError = Schema.CastError
   , ObjectId = Schema.ObjectId
   , DocumentObjectId = mongoose.ObjectId
-  , SchemaTypes = mongoose.SchemaTypes;
+  , SchemaTypes = mongoose.SchemaTypes
+  , MongooseNumber = mongoose.Types.Number;
 
 /**
  * Test.
@@ -232,24 +233,6 @@ module.exports = {
     });
   },
 
-  'test array required validation': function(){
-    var Loki = new Schema({
-        likes: { type: Array, required: true }
-    });
-
-    Loki.key('likes').doValidate(null, function (err) {
-      err.should.be.an.instanceof(ValidatorError);
-    });
-
-    Loki.key('likes').doValidate(undefined, function (err) {
-      err.should.be.an.instanceof(ValidatorError);
-    });
-
-    Loki.key('likes').doValidate([], function (err) {
-      err.should.be.an.instanceof(ValidatorError);
-    });
-  },
-
   'test date required validation': function(){
     var Loki = new Schema({
         birth_date: { type: Date, required: true }
@@ -317,9 +300,11 @@ module.exports = {
         owner: { type: ObjectId }
     });
 
-    Loki.key('owner').cast('4c54f3453e688c000000001a').should.be.an.instanceof(DocumentObjectId);
+    Loki.key('owner').cast('4c54f3453e688c000000001a')
+                     .should.be.an.instanceof(DocumentObjectId);
 
-    Loki.key('owner').cast(new DocumentObjectId()).should.be.an.instanceof(DocumentObjectId);
+    Loki.key('owner').cast(new DocumentObjectId())
+                     .should.be.an.instanceof(DocumentObjectId);
 
     try {
       var obj = Loki.key('owner').cast(undefined);
@@ -334,6 +319,66 @@ module.exports = {
     } catch(e){
       e.should.be.an.instanceof(CastError);
     }
+  },
+
+  'test array required validation': function(){
+    var Loki = new Schema({
+        likes: { type: Array, required: true }
+    });
+
+    Loki.key('likes').doValidate(null, function (err) {
+      err.should.be.an.instanceof(ValidatorError);
+    });
+
+    Loki.key('likes').doValidate(undefined, function (err) {
+      err.should.be.an.instanceof(ValidatorError);
+    });
+
+    Loki.key('likes').doValidate([], function (err) {
+      err.should.be.an.instanceof(ValidatorError);
+    });
+  },
+
+  'test array casting': function(){
+    var Loki = new Schema({
+        oids        : [ObjectId]
+      , dates       : [Date]
+      , numbers     : [Number]
+      , strings     : [String]
+      , nocast      : []
+    });
+
+    var oids = Loki.key('oids').cast(['4c54f3453e688c000000001a'
+                                      , new DocumentObjectId]);
+    
+    oids[0].should.be.an.instanceof(DocumentObjectId);
+    oids[1].should.be.an.instanceof(DocumentObjectId);
+
+    var dates = Loki.key('dates').cast(['8/24/2010', 1294541504958]);
+
+    dates[0].should.be.an.instanceof(Date);
+    dates[1].should.be.an.instanceof(Date);
+
+    var numbers = Loki.key('numbers').cast([152, '31']);
+
+    numbers[0].should.be.an.instanceof(MongooseNumber);
+    numbers[1].should.be.an.instanceof(MongooseNumber);
+    
+    var strings = Loki.key('strings').cast(['test', 123]);
+
+    strings[0].should.be.a('string');
+    strings[0].should.eql('test');
+
+    strings[1].should.be.a('string');
+    strings[1].should.eql('123');
+
+    var nocasts = Loki.key('nocast').cast(['test', 123]);
+
+    nocasts[0].should.be.a('string');
+    nocasts[0].should.eql('test');
+
+    strings[1].should.be.a('number');
+    strings[1].should.eql(123);
   }
 
 };

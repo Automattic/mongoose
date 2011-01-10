@@ -139,6 +139,33 @@ module.exports = {
     post.owners[0].should.be.an.instanceof(DocumentObjectId);
     post.owners[1].should.be.an.instanceof(DocumentObjectId);
     post.comments.should.be.an.instanceof(DocumentsArray);
+  },
+
+  'test a model structure when partially initd': function(){
+    var db = start()
+      , BlogPost = db.model('BlogPost');
+
+    var post = new BlogPost()
+    post.init({
+        title       : 'Test'
+      , slug        : 'test'
+      , date        : new Date
+    });
+
+    post.title.should.eql('Test');
+    post.slug.should.eql('test');
+    post.date.should.be.an.instanceof(Date);
+    post.meta.should.be.a('object');
+
+    post.meta.should.eql({
+        date: null
+      , visitors: null
+    });
+
+    should.strictEqual(post.published, null);
+
+    post.owners.should.be.an.instanceof(MongooseArray);
+    post.comments.should.be.an.instanceof(DocumentArray);
   }
-  
+
 };

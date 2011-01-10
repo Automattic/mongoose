@@ -108,6 +108,37 @@ module.exports = {
       post.owners.should.be.an.instanceof(MongooseArray);
       post.comments.should.be.an.instanceof(DocumentArray);
     });
-  }
+  },
 
+  'test a model structure when initd': function(){
+    var db = start()
+      , BlogPost = db.model('BlogPost');
+
+    var post = new BlogPost()
+    post.init({
+        title       : 'Test'
+      , slug        : 'test'
+      , date        : new Date
+      , meta        : {
+            date      : new Date
+          , visitors  : 5
+        }
+      , published   : true
+      , owners      : [new DocumentObjectId, new DocumentObjectId]
+      , comments    : [ { title: 'Test', date: new Date, body: 'Test' } ]
+    });
+
+    post.title.should.eql('Test');
+    post.slug.should.eql('test');
+    post.date.should.be.an.instanceof(Date);
+    post.meta.should.be.a('object');
+    post.meta.date.should.be.an.instanceof(Date);
+    post.meta.visitors.should.be.an.instanceof(MongooseNumber);
+    post.published.should.be.true;
+    post.owners.should.be.an.instanceof(MongooseArray);
+    post.owners[0].should.be.an.instanceof(DocumentObjectId);
+    post.owners[1].should.be.an.instanceof(DocumentObjectId);
+    post.comments.should.be.an.instanceof(DocumentsArray);
+  }
+  
 };

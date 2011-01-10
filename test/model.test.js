@@ -166,6 +166,28 @@ module.exports = {
 
     post.owners.should.be.an.instanceof(MongooseArray);
     post.comments.should.be.an.instanceof(DocumentArray);
+  },
+
+  'test isModified when modifying keys': function(){
+    var db = start()
+      , BlogPost = db.model('BlogPost');
+
+    var post = new BlogPost()
+    post.init({
+        title       : 'Test'
+      , slug        : 'test'
+      , date        : new Date
+    });
+
+    post.isModified('title').should.be.false;
+    post.title = 'test';
+    post.isModified('title').should.be.true;
+
+    post.isModified('date').should.be.false;
+    post.date = Date.now()
+    post.isModified('date').should.be.true;
+
+    post.isModified('meta.date').should.be.false;
   }
 
 };

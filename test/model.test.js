@@ -139,6 +139,8 @@ module.exports = {
     post.owners[0].should.be.an.instanceof(DocumentObjectId);
     post.owners[1].should.be.an.instanceof(DocumentObjectId);
     post.comments.should.be.an.instanceof(DocumentsArray);
+    post.comments[0].should.be.an.instanceof(EmbeddedArray);
+    post.comments[1].should.be.an.instanceof(EmbeddedArray);
   },
 
   'test a model structure when partially initd': function(){
@@ -166,6 +168,21 @@ module.exports = {
 
     post.owners.should.be.an.instanceof(MongooseArray);
     post.comments.should.be.an.instanceof(DocumentArray);
+  },
+
+  'test isNew on embedded documents after initing': function(){
+    var db = start()
+      , BlogPost = db.model('BlogPost');
+
+    var post = new BlogPost()
+    post.init({
+        title       : 'Test'
+      , slug        : 'test'
+      , comments    : [ { title: 'Test', date: new Date, body: 'Test' } ]
+    });
+
+    post.comments[0].isNew.should.be.false;
+    post.comments[1].isNew.should.be.false;
   },
 
   'test isModified when modifying keys': function(){

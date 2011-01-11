@@ -231,8 +231,8 @@ module.exports = {
       err.should.be.an.instanceof(ValidatorError);
     });
 
-    Edwald.path('friends').doValidate(0, function(){
-      arguments.length.should.be(0);
+    Edwald.path('friends').doValidate(0, function(err){
+      should.strictEqual(err, null);
     });
   },
 

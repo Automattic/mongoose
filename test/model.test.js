@@ -39,7 +39,7 @@ var Comments = new Schema({
   , comments  : [Comments]
 });
 
-Mongoose.model('BlogPost', BlogPost, 'blogposts_' + random());
+mongoose.model('BlogPost', BlogPost, 'blogposts_' + random());
 
 module.exports = {
 

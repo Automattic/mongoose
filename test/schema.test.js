@@ -58,16 +58,16 @@ module.exports = {
 
   'dot notation support for accessing paths': function(){
     var Racoon = new Schema({
-        name:       { type: String, enum: ['Edwald', 'Tobi'] }
-      , age:        Number
+        name  : { type: String, enum: ['Edwald', 'Tobi'] }
+      , age   : Number
     });
 
     var Person = new Schema({
-        name:       String
-      , raccoons:   [Racoon]
-      , location:    {
-            city:   String
-          , state:  String
+        name      :       String
+      , raccoons  :   [Racoon]
+      , location  :    {
+            city  :   String
+          , state :  String
         }
     });
 

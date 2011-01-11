@@ -203,18 +203,18 @@ module.exports = {
         friends: { type: Number, max: 15, min: 5 }
     });
 
-    Tobi.path('friends').validators.length(2);
+    Tobi.path('friends').validators.should.have.length(2);
 
-    Tobi.path('friends').doValidate(10, function(){
+    Tobi.path('friends').doValidate(10, function(err){
       should.strictEqual(err, null);
     });
 
-    Tobi.path('friends').doValidate(100, function(){
-      arguments.should.have.length(1);
+    Tobi.path('friends').doValidate(100, function(err){
+      err.should.be.an.instanceof(ValidatorError);
     });
 
-    Tobi.path('friends').doValidate(1, function(){
-      arguments.should.have.length(1);
+    Tobi.path('friends').doValidate(1, function(err){
+      err.should.be.an.instanceof(ValidatorError);
     });
   },
 

@@ -39,18 +39,18 @@ module.exports = {
         }
     });
 
-    Ferret.get('name').should.be.an.instanceof(SchemaType.String);
-    Ferret.get('owner').should.be.an.instanceof(SchemaType.ObjectId);
-    Ferret.get('fur').should.be.an.instanceof(SchemaType.String);
-    Ferret.get('color').should.be.an.instanceof(SchemaType.String);
-    Ferret.get('age').should.be.an.instanceof(SchemaType.Number);
-    Ferret.get('checkins').should.be.an.instanceof(SchemaType.DocumentArray);
-    Ferret.get('friends').should.be.an.instanceof(SchemaType.Array);
-    Ferret.get('likes').should.be.an.instanceof(SchemaType.Array);
-    Ferret.get('alive').should.be.an.instanceof(SchemaType.Boolean);
+    Ferret.key('name').should.be.an.instanceof(SchemaType.String);
+    Ferret.key('owner').should.be.an.instanceof(SchemaType.ObjectId);
+    Ferret.key('fur').should.be.an.instanceof(SchemaType.String);
+    Ferret.key('color').should.be.an.instanceof(SchemaType.String);
+    Ferret.key('age').should.be.an.instanceof(SchemaType.Number);
+    Ferret.key('checkins').should.be.an.instanceof(SchemaType.DocumentArray);
+    Ferret.key('friends').should.be.an.instanceof(SchemaType.Array);
+    Ferret.key('likes').should.be.an.instanceof(SchemaType.Array);
+    Ferret.key('alive').should.be.an.instanceof(SchemaType.Boolean);
 
-    Checkin.get('date').should.be.an.instanceof(SchemaType.Date);
-    Checkin.get('location').should.be.an.instanceof(SchemaType.Object);
+    Checkin.key('date').should.be.an.instanceof(SchemaType.Date);
+    Checkin.key('location').should.be.an.instanceof(SchemaType.Object);
   },
 
   'dot notation support for accessing keys': function(){

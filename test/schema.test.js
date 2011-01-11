@@ -274,14 +274,15 @@ module.exports = {
 
     Loki.path('birth_date').cast(1294525628301).should.be.an.instanceof(Date);
     Loki.path('birth_date').cast('8/24/2000').should.be.an.instanceof(Date);
+    Loki.path('birth_date').cast(new Date).should.be.an.instanceof(Date);
   },
 
   'test object id required validator': function(){
     var Loki = new Schema({
-        owner: { type: ObjectId }
+        owner: { type: ObjectId, required: true }
     });
 
-    Loki.path('owner').doValidate(new DocumentObjectId(), function(){
+    Loki.path('owner').doValidate(new DocumentObjectId(), function(err){
       should.strictEqual(err, null);
     });
 

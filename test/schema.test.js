@@ -4,12 +4,14 @@
  */
 
 var mongoose = require('./common').mongoose
+  , should = require('should')
   , Schema = mongoose.Schema
-  , ValidatorError = Schema.ValidatorError
-  , CastError = Schema.CastError
+  , SchemaType = mongoose.SchemaType
   , ObjectId = Schema.ObjectId
-  , DocumentObjectId = mongoose.ObjectId
-  , SchemaTypes = mongoose.SchemaTypes
+  , ValidatorError = SchemaType.ValidatorError
+  , CastError = SchemaType.CastError
+  , SchemaTypes = Schema.Types
+  , DocumentObjectId = mongoose.Types.ObjectId
   , MongooseNumber = mongoose.Types.Number;
 
 /**
@@ -19,6 +21,14 @@ var mongoose = require('./common').mongoose
 module.exports = {
 
   'test different schema types support': function(){
+    var Checkin = new Schema({
+        date      : Date 
+      , location  : {
+            lat: Number
+          , lng: Number
+        }
+    });
+
     var Ferret = new Schema({
         name      : String
       , owner     : ObjectId
@@ -31,29 +41,25 @@ module.exports = {
       , alive     : Boolean
     });
 
-    var Checkin = new Schema({
-        date      : Date 
-      , location  : {
-            lat: Number
-          , lng: Number
-        }
-    });
+    Ferret.path('name').should.be.an.instanceof(SchemaTypes.String);
+    Ferret.path('owner').should.be.an.instanceof(SchemaTypes.ObjectId);
+    Ferret.path('fur').should.be.an.instanceof(SchemaTypes.String);
+    Ferret.path('color').should.be.an.instanceof(SchemaTypes.String);
+    Ferret.path('age').should.be.an.instanceof(SchemaTypes.Number);
+    Ferret.path('checkins').should.be.an.instanceof(SchemaTypes.DocumentArray);
+    Ferret.path('friends').should.be.an.instanceof(SchemaTypes.Array);
+    Ferret.path('likes').should.be.an.instanceof(SchemaTypes.Array);
+    Ferret.path('alive').should.be.an.instanceof(SchemaTypes.Boolean);
 
-    Ferret.path('name').should.be.an.instanceof(SchemaType.String);
-    Ferret.path('owner').should.be.an.instanceof(SchemaType.ObjectId);
-    Ferret.path('fur').should.be.an.instanceof(SchemaType.String);
-    Ferret.path('color').should.be.an.instanceof(SchemaType.String);
-    Ferret.path('age').should.be.an.instanceof(SchemaType.Number);
-    Ferret.path('checkins').should.be.an.instanceof(SchemaType.DocumentArray);
-    Ferret.path('friends').should.be.an.instanceof(SchemaType.Array);
-    Ferret.path('likes').should.be.an.instanceof(SchemaType.Array);
-    Ferret.path('alive').should.be.an.instanceof(SchemaType.Boolean);
-
-    Checkin.path('date').should.be.an.instanceof(SchemaType.Date);
-    Checkin.get('location').should.be.an.instanceof(SchemaType.Object);
+    Checkin.path('date').should.be.an.instanceof(SchemaTypes.Date);
   },
 
   'dot notation support for accessing paths': function(){
+    var Racoon = new Schema({
+        name:       { type: String, enum: ['Edwald', 'Tobi'] }
+      , age:        Number
+    });
+
     var Person = new Schema({
         name:       String
       , raccoons:   [Racoon]
@@ -61,11 +67,6 @@ module.exports = {
             city:   String
           , state:  String
         }
-    });
-
-    var Racoon = new Schema({
-        name:       { type: String, enum: ['Edwald', 'Tobi'] }
-      , age:        Number
     });
 
     Person.path('name').should.be.an.instanceof(SchemaTypes.String);
@@ -121,7 +122,7 @@ module.exports = {
     });
     
     Test.path('simple').doValidate('', function(){
-      arguments.should.have.length(0);
+      should.strictEqual(err, null);
     });
   },
 
@@ -156,8 +157,8 @@ module.exports = {
     Test.path('simple').match(/[0-9]/);
     Test.path('simple').validators.length(2);
 
-    Test.path('simple').doValidate('az', function(){
-      arguments.should.have.length(0);
+    Test.path('simple').doValidate('az', function(err){
+      should.strictEqual(err, null);
     });
 
     Test.path('simple').doValidate('12', function(err){
@@ -192,7 +193,7 @@ module.exports = {
     Tobi.path('friends').validators.length(2);
 
     Tobi.path('friends').doValidate(10, function(){
-      arguments.should.have.length(0);
+      should.strictEqual(err, null);
     });
 
     Tobi.path('friends').doValidate(100, function(){
@@ -268,7 +269,7 @@ module.exports = {
     });
 
     Loki.path('owner').doValidate(new DocumentObjectId(), function(){
-      arguments.should.have.length(0);
+      should.strictEqual(err, null);
     });
 
     Loki.path('owner').doValidate(null, function(err){
@@ -315,8 +316,7 @@ module.exports = {
       , nocast      : []
     });
 
-    var oids = Loki.path('oids').cast(['4c54f3453e688c000000001a'
-                                      , new DocumentObjectId]);
+    var oids = Loki.path('oids').cast(['4c54f3453e688c000000001a', new DocumentObjectId]);
     
     oids[0].should.be.an.instanceof(DocumentObjectId);
     oids[1].should.be.an.instanceof(DocumentObjectId);
@@ -361,12 +361,12 @@ module.exports = {
       err.should.be.an.instanceof(ValidatorError);
     });
     
-    Animal.path('isFerret').doValidate(true, function(){
-      arguments.should.have.length(0);
+    Animal.path('isFerret').doValidate(true, function(err){
+      should.strictEqual(err, null);
     });
 
-    Animal.path('isFerret').doValidate(false, function(){
-      arguments.should.have.length(0);
+    Animal.path('isFerret').doValidate(false, function(err){
+      should.strictEqual(err, null);
     });
   },
 

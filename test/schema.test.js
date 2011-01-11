@@ -51,6 +51,8 @@ module.exports = {
     Ferret.path('likes').should.be.an.instanceof(SchemaTypes.Array);
     Ferret.path('alive').should.be.an.instanceof(SchemaTypes.Boolean);
 
+    should.strictEqual(Ferret.path('unexistent'), undefined);
+
     Checkin.path('date').should.be.an.instanceof(SchemaTypes.Date);
   },
 
@@ -70,9 +72,11 @@ module.exports = {
     });
 
     Person.path('name').should.be.an.instanceof(SchemaTypes.String);
-    Person.path('raccons').should.be.an.instanceof(SchemaTypes.DocumentArray);
+    Person.path('raccoons').should.be.an.instanceof(SchemaTypes.DocumentArray);
     Person.path('location.city').should.be.an.instanceof(SchemaTypes.String);
     Person.path('location.state').should.be.an.instanceof(SchemaTypes.String);
+
+    should.strictEqual(Person.path('location.unexistent'), undefined);
   },
 
   'test default definition': function(){

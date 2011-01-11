@@ -242,11 +242,11 @@ module.exports = {
     });
 
     // test String -> Number cast
-    Tobi.path('nickname').cast('0').should.be.an.instanceof(MongooseNumber);
-    (+Tobi.path('nickname').cast('0')).should.eql(0);
+    Tobi.path('age').cast('0').should.be.an.instanceof(MongooseNumber);
+    (+Tobi.path('age').cast('0')).should.eql(0);
 
-    Tobi.path('nickname').cast(0).should.be.an.instanceof(MongooseNumber);
-    (+Tobi.path('nickname').cast(0)).should.eql(0);
+    Tobi.path('age').cast(0).should.be.an.instanceof(MongooseNumber);
+    (+Tobi.path('age').cast(0)).should.eql(0);
   },
 
   'test date required validation': function(){
@@ -263,7 +263,7 @@ module.exports = {
     });
 
     Loki.path('birth_date').doValidate(new Date(), function (err) {
-      err.should.be.an.instanceof(ValidatorError);
+      should.strictEqual(err, null);
     });
   },
 

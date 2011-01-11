@@ -96,15 +96,15 @@ module.exports = {
     Test.path('callback').defaultValue.should.be.a('function');
     Test.path('async').defaultValue.should.be.a('function');
 
-    Test.path('simple').getDefault(function(value){
+    Test.path('simple').getDefault(function(err, value){
       value.should.eql('a');
     });
 
-    Test.path('callback').getDefault(function(value){
+    Test.path('callback').getDefault(function(err, value){
       value.should.eql('b');
     });
 
-    Test.path('simple').getDefault(function(value){
+    Test.path('async').getDefault(function(err, value){
       value.should.eql('c');
     });
   },

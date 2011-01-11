@@ -161,16 +161,21 @@ module.exports = {
         simple: { type: String, match: /[a-z]/ }
     });
 
-    Test.path('simple').validators.length(1);
-    Test.path('simple').match(/[0-9]/);
-    Test.path('simple').validators.length(2);
+    Test.path('simple').validators.should.have.length(1);
 
     Test.path('simple').doValidate('az', function(err){
       should.strictEqual(err, null);
     });
 
+    Test.path('simple').match(/[0-9]/);
+    Test.path('simple').validators.should.have.length(2);
+
     Test.path('simple').doValidate('12', function(err){
       err.should.be.an.instanceof(ValidatorError);
+    });
+
+    Test.path('simple').doValidate('a12', function(err){
+      should.strictEqual(err, null);
     });
   },
 

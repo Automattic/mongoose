@@ -39,21 +39,21 @@ module.exports = {
         }
     });
 
-    Ferret.key('name').should.be.an.instanceof(SchemaType.String);
-    Ferret.key('owner').should.be.an.instanceof(SchemaType.ObjectId);
-    Ferret.key('fur').should.be.an.instanceof(SchemaType.String);
-    Ferret.key('color').should.be.an.instanceof(SchemaType.String);
-    Ferret.key('age').should.be.an.instanceof(SchemaType.Number);
-    Ferret.key('checkins').should.be.an.instanceof(SchemaType.DocumentArray);
-    Ferret.key('friends').should.be.an.instanceof(SchemaType.Array);
-    Ferret.key('likes').should.be.an.instanceof(SchemaType.Array);
-    Ferret.key('alive').should.be.an.instanceof(SchemaType.Boolean);
+    Ferret.path('name').should.be.an.instanceof(SchemaType.String);
+    Ferret.path('owner').should.be.an.instanceof(SchemaType.ObjectId);
+    Ferret.path('fur').should.be.an.instanceof(SchemaType.String);
+    Ferret.path('color').should.be.an.instanceof(SchemaType.String);
+    Ferret.path('age').should.be.an.instanceof(SchemaType.Number);
+    Ferret.path('checkins').should.be.an.instanceof(SchemaType.DocumentArray);
+    Ferret.path('friends').should.be.an.instanceof(SchemaType.Array);
+    Ferret.path('likes').should.be.an.instanceof(SchemaType.Array);
+    Ferret.path('alive').should.be.an.instanceof(SchemaType.Boolean);
 
-    Checkin.key('date').should.be.an.instanceof(SchemaType.Date);
-    Checkin.key('location').should.be.an.instanceof(SchemaType.Object);
+    Checkin.path('date').should.be.an.instanceof(SchemaType.Date);
+    Checkin.get('location').should.be.an.instanceof(SchemaType.Object);
   },
 
-  'dot notation support for accessing keys': function(){
+  'dot notation support for accessing paths': function(){
     var Person = new Schema({
         name:       String
       , raccoons:   [Racoon]
@@ -68,10 +68,10 @@ module.exports = {
       , age:        Number
     });
 
-    Person.key('name').should.be.an.instanceof(SchemaTypes.String);
-    Person.key('raccons').should.be.an.instanceof(SchemaTypes.DocumentArray);
-    Person.key('location.city').should.be.an.instanceof(SchemaTypes.String);
-    Person.key('location.state').should.be.an.instanceof(SchemaTypes.String);
+    Person.path('name').should.be.an.instanceof(SchemaTypes.String);
+    Person.path('raccons').should.be.an.instanceof(SchemaTypes.DocumentArray);
+    Person.path('location.city').should.be.an.instanceof(SchemaTypes.String);
+    Person.path('location.state').should.be.an.instanceof(SchemaTypes.String);
   },
 
   'test default definition': function(){
@@ -87,19 +87,19 @@ module.exports = {
         }}
     });
 
-    Test.key('simple').defaultValue.should.eql('a');
-    Test.key('callback').defaultValue.should.be.a('function');
-    Test.key('async').defaultValue.should.be.a('function');
+    Test.path('simple').defaultValue.should.eql('a');
+    Test.path('callback').defaultValue.should.be.a('function');
+    Test.path('async').defaultValue.should.be.a('function');
 
-    Test.key('simple').getDefault(function(value){
+    Test.path('simple').getDefault(function(value){
       value.should.eql('a');
     });
 
-    Test.key('callback').getDefault(function(value){
+    Test.path('callback').getDefault(function(value){
       value.should.eql('b');
     });
 
-    Test.key('simple').getDefault(function(value){
+    Test.path('simple').getDefault(function(value){
       value.should.eql('c');
     });
   },
@@ -109,18 +109,18 @@ module.exports = {
         simple: String
     });
 
-    Test.key('simple').required(true);
-    Test.key('simple').validators.should.have.length(1);
+    Test.path('simple').required(true);
+    Test.path('simple').validators.should.have.length(1);
     
-    Test.key('simple').doValidate(null, function(err){
+    Test.path('simple').doValidate(null, function(err){
       err.should.be.an.instanceof(ValidatorError);
     });
 
-    Test.key('simple').doValidate(undefined, function(err){
+    Test.path('simple').doValidate(undefined, function(err){
       err.should.be.an.instanceof(ValidatorError);
     });
     
-    Test.key('simple').doValidate('', function(){
+    Test.path('simple').doValidate('', function(){
       arguments.should.have.length(0);
     });
   },
@@ -130,19 +130,19 @@ module.exports = {
         complex: { type: String, enum: ['a', 'b', 'c'] }
     });
 
-    Test.key('complex').should.be.an.instanceof(SchemaType.String);
-    Test.key('complex').enumValues.should.eql(['a', 'b', 'c']);
-    Test.key('complex').validators.should.have.length(1);
+    Test.path('complex').should.be.an.instanceof(SchemaType.String);
+    Test.path('complex').enumValues.should.eql(['a', 'b', 'c']);
+    Test.path('complex').validators.should.have.length(1);
 
-    Test.key('complex').enum('d', 'e');
+    Test.path('complex').enum('d', 'e');
 
-    Test.key('complex').enumValues.should.eql(['a', 'b', 'c', 'd', 'e']);
+    Test.path('complex').enumValues.should.eql(['a', 'b', 'c', 'd', 'e']);
 
-    Test.key('complex').doValidate('x', function(){
+    Test.path('complex').doValidate('x', function(){
       arguments.should.have.length(1);
     });
 
-    Test.key('complex').doValidate('da', function(err){
+    Test.path('complex').doValidate('da', function(err){
       err.should.be.an.instanceof(ValidatorError);
     });
   },
@@ -152,15 +152,15 @@ module.exports = {
         simple: { type: String, match: /[a-z]/ }
     });
 
-    Test.key('simple').validators.length(1);
-    Test.key('simple').match(/[0-9]/);
-    Test.key('simple').validators.length(2);
+    Test.path('simple').validators.length(1);
+    Test.path('simple').match(/[0-9]/);
+    Test.path('simple').validators.length(2);
 
-    Test.key('simple').doValidate('az', function(){
+    Test.path('simple').doValidate('az', function(){
       arguments.should.have.length(0);
     });
 
-    Test.key('simple').doValidate('12', function(err){
+    Test.path('simple').doValidate('12', function(err){
       err.should.be.an.instanceof(ValidatorError);
     });
   },
@@ -176,12 +176,12 @@ module.exports = {
     };
 
     // test Number -> String cast
-    Tobi.key('nickname').cast(0).should.be.a('string');
-    Tobi.key('nickname').cast(0).should.eql('0');
+    Tobi.path('nickname').cast(0).should.be.a('string');
+    Tobi.path('nickname').cast(0).should.eql('0');
 
     // test any object that implements toString
-    Tobi.key('nickname').cast(new Test()).should.be.a('string');
-    Tobi.key('nickname').cast(new Test()).should.eql('woot');
+    Tobi.path('nickname').cast(new Test()).should.be.a('string');
+    Tobi.path('nickname').cast(new Test()).should.eql('woot');
   },
 
   'test number minimums and maximums validation': function(){
@@ -189,17 +189,17 @@ module.exports = {
         friends: { type: Number, max: 15, min: 5 }
     });
 
-    Tobi.key('friends').validators.length(2);
+    Tobi.path('friends').validators.length(2);
 
-    Tobi.key('friends').doValidate(10, function(){
+    Tobi.path('friends').doValidate(10, function(){
       arguments.should.have.length(0);
     });
 
-    Tobi.key('friends').doValidate(100, function(){
+    Tobi.path('friends').doValidate(100, function(){
       arguments.should.have.length(1);
     });
 
-    Tobi.key('friends').doValidate(1, function(){
+    Tobi.path('friends').doValidate(1, function(){
       arguments.should.have.length(1);
     });
   },
@@ -209,15 +209,15 @@ module.exports = {
         friends: { type: Number, required: true }
     });
 
-    Edwald.key('friends').doValidate(null, function(err){
+    Edwald.path('friends').doValidate(null, function(err){
       err.should.be.an.instanceof(ValidatorError);
     });
 
-    Edwald.key('friends').doValidate(undefined, function(err){
+    Edwald.path('friends').doValidate(undefined, function(err){
       err.should.be.an.instanceof(ValidatorError);
     });
 
-    Edwald.key('friends').doValidate(0, function(){
+    Edwald.path('friends').doValidate(0, function(){
       arguments.length.should.be(0);
     });
   },
@@ -228,11 +228,11 @@ module.exports = {
     });
 
     // test String -> Number cast
-    Tobi.key('nickname').cast('0').should.be.an.instanceof(MongooseNumber);
-    (+Tobi.key('nickname').cast('0')).should.eql(0);
+    Tobi.path('nickname').cast('0').should.be.an.instanceof(MongooseNumber);
+    (+Tobi.path('nickname').cast('0')).should.eql(0);
 
-    Tobi.key('nickname').cast(0).should.be.an.instanceof(MongooseNumber);
-    (+Tobi.key('nickname').cast(0)).should.eql(0);
+    Tobi.path('nickname').cast(0).should.be.an.instanceof(MongooseNumber);
+    (+Tobi.path('nickname').cast(0)).should.eql(0);
   },
 
   'test date required validation': function(){
@@ -240,15 +240,15 @@ module.exports = {
         birth_date: { type: Date, required: true }
     });
 
-    Loki.key('birth_date').doValidate(null, function (err) {
+    Loki.path('birth_date').doValidate(null, function (err) {
       err.should.be.an.instanceof(ValidatorError);
     });
 
-    Loki.key('birth_date').doValidate(undefined, function (err) {
+    Loki.path('birth_date').doValidate(undefined, function (err) {
       err.should.be.an.instanceof(ValidatorError);
     });
 
-    Loki.key('birth_date').doValidate(new Date(), function (err) {
+    Loki.path('birth_date').doValidate(new Date(), function (err) {
       err.should.be.an.instanceof(ValidatorError);
     });
   },
@@ -258,8 +258,8 @@ module.exports = {
         birth_date: { type: Date }
     });
 
-    Loki.key('birth_date').cast(1294525628301).should.be.an.instanceof(Date);
-    Loki.key('birth_date').cast('8/24/2000').should.be.an.instanceof(Date);
+    Loki.path('birth_date').cast(1294525628301).should.be.an.instanceof(Date);
+    Loki.path('birth_date').cast('8/24/2000').should.be.an.instanceof(Date);
   },
 
   'test object id required validator': function(){
@@ -267,11 +267,11 @@ module.exports = {
         owner: { type: ObjectId }
     });
 
-    Loki.key('owner').doValidate(new DocumentObjectId(), function(){
+    Loki.path('owner').doValidate(new DocumentObjectId(), function(){
       arguments.should.have.length(0);
     });
 
-    Loki.key('owner').doValidate(null, function(err){
+    Loki.path('owner').doValidate(null, function(err){
       err.should.be.an.instanceof(ValidatorError);
     });
   },
@@ -281,10 +281,10 @@ module.exports = {
         owner: { type: ObjectId }
     });
 
-    Loki.key('owner').cast('4c54f3453e688c000000001a')
+    Loki.path('owner').cast('4c54f3453e688c000000001a')
                      .should.be.an.instanceof(DocumentObjectId);
 
-    Loki.key('owner').cast(new DocumentObjectId())
+    Loki.path('owner').cast(new DocumentObjectId())
                      .should.be.an.instanceof(DocumentObjectId);
   },
 
@@ -293,15 +293,15 @@ module.exports = {
         likes: { type: Array, required: true }
     });
 
-    Loki.key('likes').doValidate(null, function (err) {
+    Loki.path('likes').doValidate(null, function (err) {
       err.should.be.an.instanceof(ValidatorError);
     });
 
-    Loki.key('likes').doValidate(undefined, function (err) {
+    Loki.path('likes').doValidate(undefined, function (err) {
       err.should.be.an.instanceof(ValidatorError);
     });
 
-    Loki.key('likes').doValidate([], function (err) {
+    Loki.path('likes').doValidate([], function (err) {
       err.should.be.an.instanceof(ValidatorError);
     });
   },
@@ -315,23 +315,23 @@ module.exports = {
       , nocast      : []
     });
 
-    var oids = Loki.key('oids').cast(['4c54f3453e688c000000001a'
+    var oids = Loki.path('oids').cast(['4c54f3453e688c000000001a'
                                       , new DocumentObjectId]);
     
     oids[0].should.be.an.instanceof(DocumentObjectId);
     oids[1].should.be.an.instanceof(DocumentObjectId);
 
-    var dates = Loki.key('dates').cast(['8/24/2010', 1294541504958]);
+    var dates = Loki.path('dates').cast(['8/24/2010', 1294541504958]);
 
     dates[0].should.be.an.instanceof(Date);
     dates[1].should.be.an.instanceof(Date);
 
-    var numbers = Loki.key('numbers').cast([152, '31']);
+    var numbers = Loki.path('numbers').cast([152, '31']);
 
     numbers[0].should.be.an.instanceof(MongooseNumber);
     numbers[1].should.be.an.instanceof(MongooseNumber);
     
-    var strings = Loki.key('strings').cast(['test', 123]);
+    var strings = Loki.path('strings').cast(['test', 123]);
 
     strings[0].should.be.a('string');
     strings[0].should.eql('test');
@@ -339,7 +339,7 @@ module.exports = {
     strings[1].should.be.a('string');
     strings[1].should.eql('123');
 
-    var nocasts = Loki.key('nocast').cast(['test', 123]);
+    var nocasts = Loki.path('nocast').cast(['test', 123]);
 
     nocasts[0].should.be.a('string');
     nocasts[0].should.eql('test');
@@ -353,19 +353,19 @@ module.exports = {
         isFerret: { type: Boolean, required: true }
     });
 
-    Animal.key('isFerret').doValidate(null, function(err){
+    Animal.path('isFerret').doValidate(null, function(err){
       err.should.be.an.instanceof(ValidatorError);
     });
 
-    Animal.key('isFerret').doValidate(undefined, function(err){
+    Animal.path('isFerret').doValidate(undefined, function(err){
       err.should.be.an.instanceof(ValidatorError);
     });
     
-    Animal.key('isFerret').doValidate(true, function(){
+    Animal.path('isFerret').doValidate(true, function(){
       arguments.should.have.length(0);
     });
 
-    Animal.key('isFerret').doValidate(false, function(){
+    Animal.path('isFerret').doValidate(false, function(){
       arguments.should.have.length(0);
     });
   },
@@ -375,15 +375,15 @@ module.exports = {
         isFerret: { type: Boolean, required: true }
     });
 
-    Animal.key('isFerret').cast(null).should.be.false;
-    Animal.key('isFerret').cast(undefined).should.be.false;
-    Animal.key('isFerret').cast(false).should.be.false;
-    Animal.key('isFerret').cast(0).should.be.false;
-    Animal.key('isFerret').cast('0').should.be.false;
-    Animal.key('isFerret').cast({}).should.be.true;
-    Animal.key('isFerret').cast(true).should.be.true;
-    Animal.key('isFerret').cast(1).should.be.true;
-    Animal.key('isFerret').cast('1').should.be.true;
+    Animal.path('isFerret').cast(null).should.be.false;
+    Animal.path('isFerret').cast(undefined).should.be.false;
+    Animal.path('isFerret').cast(false).should.be.false;
+    Animal.path('isFerret').cast(0).should.be.false;
+    Animal.path('isFerret').cast('0').should.be.false;
+    Animal.path('isFerret').cast({}).should.be.true;
+    Animal.path('isFerret').cast(true).should.be.true;
+    Animal.path('isFerret').cast(1).should.be.true;
+    Animal.path('isFerret').cast('1').should.be.true;
   }
 
 };

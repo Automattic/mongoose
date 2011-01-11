@@ -125,7 +125,11 @@ module.exports = {
       err.should.be.an.instanceof(ValidatorError);
     });
     
-    Test.path('simple').doValidate('', function(){
+    Test.path('simple').doValidate('', function(err){
+      err.should.be.an.instanceof(ValidatorError);
+    });
+
+    Test.path('simple').doValidate('woot', function(err){
       should.strictEqual(err, null);
     });
   },
@@ -135,7 +139,7 @@ module.exports = {
         complex: { type: String, enum: ['a', 'b', 'c'] }
     });
 
-    Test.path('complex').should.be.an.instanceof(SchemaType.String);
+    Test.path('complex').should.be.an.instanceof(SchemaTypes.String);
     Test.path('complex').enumValues.should.eql(['a', 'b', 'c']);
     Test.path('complex').validators.should.have.length(1);
 
@@ -143,8 +147,8 @@ module.exports = {
 
     Test.path('complex').enumValues.should.eql(['a', 'b', 'c', 'd', 'e']);
 
-    Test.path('complex').doValidate('x', function(){
-      arguments.should.have.length(1);
+    Test.path('complex').doValidate('x', function(err){
+      err.should.be.an.instanceof(ValidatorError);
     });
 
     Test.path('complex').doValidate('da', function(err){

@@ -358,8 +358,8 @@ module.exports = {
     nocasts[0].should.be.a('string');
     nocasts[0].should.eql('test');
 
-    strings[1].should.be.a('number');
-    strings[1].should.eql(123);
+    nocasts[1].should.be.a('number');
+    nocasts[1].should.eql(123);
   },
 
   'test boolean required validator': function(){

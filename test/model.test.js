@@ -39,13 +39,15 @@ var Comments = new Schema({
   , comments  : [Comments]
 });
 
-mongoose.model('BlogPost', BlogPost, 'blogposts_' + random());
+mongoose.model('BlogPost', BlogPost);
+
+var collection = 'blogposts_' + random();
 
 module.exports = {
 
   'test a model isNew flag when instantiating': function(){
     var db = start()
-      , BlogPost = db.model('BlogPost');
+      , BlogPost = db.model('BlogPost', collection);
 
     var post = new BlogPost();
     post.isNew.should.be.true;
@@ -58,6 +60,7 @@ module.exports = {
 
     BlogPost.schema.should.be.an.instanceof(Schema);
     BlogPost.prototype.schema.should.be.an.instanceof(Schema);
+    db.close();
   },
 
   'test a model default structure when instantiated': function(){
@@ -83,6 +86,7 @@ module.exports = {
 
     post.owners.should.be.an.instanceof(MongooseArray);
     post.comments.should.be.an.instanceof(DocumentArray);
+    db.close();
   },
 
   'test a model structure when saved': function(){
@@ -108,6 +112,7 @@ module.exports = {
       post.owners.should.be.an.instanceof(MongooseArray);
       post.comments.should.be.an.instanceof(DocumentArray);
     });
+    db.close();
   },
 
   'test a model structure when initd': function(){
@@ -168,6 +173,7 @@ module.exports = {
 
     post.owners.should.be.an.instanceof(MongooseArray);
     post.comments.should.be.an.instanceof(DocumentArray);
+    db.close();
   },
 
   'test isNew on embedded documents after initing': function(){
@@ -183,6 +189,7 @@ module.exports = {
 
     post.comments[0].isNew.should.be.false;
     post.comments[1].isNew.should.be.false;
+    db.close();
   },
 
   'test isModified when modifying keys': function(){
@@ -205,6 +212,7 @@ module.exports = {
     post.isModified('date').should.be.true;
 
     post.isModified('meta.date').should.be.false;
+    db.close();
   }
 
 };

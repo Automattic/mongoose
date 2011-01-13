@@ -68,4 +68,4 @@ BlogPost.use(slugGenerator());
  * Define model.
  */
 
-Mongoose.model('BlogPost', BlogPost, 'posts');
+Mongoose.model('BlogPost', BlogPost);

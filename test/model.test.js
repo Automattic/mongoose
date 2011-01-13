@@ -70,22 +70,22 @@ module.exports = {
     var post = new BlogPost();
     post.isNew.should.be.true;
 
-    post._id.should.be.an.instanceof(DocumentObjectId);
+    post.get('_id').should.be.an.instanceof(DocumentObjectId);
 
-    should.strictEqual(post.title, null);
-    should.strictEqual(post.slug, null);
-    should.strictEqual(post.date, null);
+    should.strictEqual(post.get('title'), null);
+    should.strictEqual(post.get('slug'), null);
+    should.strictEqual(post.get('date'), null);
 
-    post.meta.should.be.a('object');
-    post.meta.should.eql({
+    post.get('meta').should.be.a('object');
+    post.get('meta').should.eql({
         date: null
       , visitors: null
     });
 
-    should.strictEqual(post.published, null);
+    should.strictEqual(post.get('published'), null);
 
-    post.owners.should.be.an.instanceof(MongooseArray);
-    post.comments.should.be.an.instanceof(DocumentArray);
+    post.get('owners').should.be.an.instanceof(MongooseArray);
+    post.get('comments').should.be.an.instanceof(DocumentArray);
     db.close();
   },
 
@@ -95,22 +95,22 @@ module.exports = {
 
     var post = new BlogPost();
     post.save(function(){
-      post._id.should.be.an.instanceof(DocumentObjectId);
+      post.get('_id').should.be.an.instanceof(DocumentObjectId);
 
-      should.strictEqual(post.title, null);
-      should.strictEqual(post.slug, null);
-      should.strictEqual(post.date, null);
+      should.strictEqual(post.get('title'), null);
+      should.strictEqual(post.get('slug'), null);
+      should.strictEqual(post.get('date'), null);
 
-      post.meta.should.be.a('object');
-      post.meta.should.eql({
+      post.get('meta').should.be.a('object');
+      post.get('meta').should.eql({
           date: null
         , visitors: null
       });
 
-      should.strictEqual(post.published, null);
+      should.strictEqual(post.get('published'), null);
 
-      post.owners.should.be.an.instanceof(MongooseArray);
-      post.comments.should.be.an.instanceof(DocumentArray);
+      post.get('owners').should.be.an.instanceof(MongooseArray);
+      post.get('comments').should.be.an.instanceof(DocumentArray);
     });
     db.close();
   },
@@ -133,19 +133,19 @@ module.exports = {
       , comments    : [ { title: 'Test', date: new Date, body: 'Test' } ]
     });
 
-    post.title.should.eql('Test');
-    post.slug.should.eql('test');
-    post.date.should.be.an.instanceof(Date);
-    post.meta.should.be.a('object');
-    post.meta.date.should.be.an.instanceof(Date);
-    post.meta.visitors.should.be.an.instanceof(MongooseNumber);
-    post.published.should.be.true;
-    post.owners.should.be.an.instanceof(MongooseArray);
-    post.owners[0].should.be.an.instanceof(DocumentObjectId);
-    post.owners[1].should.be.an.instanceof(DocumentObjectId);
-    post.comments.should.be.an.instanceof(DocumentsArray);
-    post.comments[0].should.be.an.instanceof(EmbeddedArray);
-    post.comments[1].should.be.an.instanceof(EmbeddedArray);
+    post.get('title').should.eql('Test');
+    post.get('slug').should.eql('test');
+    post.get('date').should.be.an.instanceof(Date);
+    post.get('meta').should.be.a('object');
+    post.get('meta').date.should.be.an.instanceof(Date);
+    post.get('meta').visitors.should.be.an.instanceof(MongooseNumber);
+    post.get('published').should.be.true;
+    post.get('owners').should.be.an.instanceof(MongooseArray);
+    post.get('owners')[0].should.be.an.instanceof(DocumentObjectId);
+    post.get('owners')[1].should.be.an.instanceof(DocumentObjectId);
+    post.get('comments').should.be.an.instanceof(DocumentsArray);
+    post.get('comments')[0].should.be.an.instanceof(EmbeddedArray);
+    post.get('comments')[1].should.be.an.instanceof(EmbeddedArray);
   },
 
   'test a model structure when partially initd': function(){
@@ -159,20 +159,20 @@ module.exports = {
       , date        : new Date
     });
 
-    post.title.should.eql('Test');
-    post.slug.should.eql('test');
-    post.date.should.be.an.instanceof(Date);
-    post.meta.should.be.a('object');
+    post.get('title').should.eql('Test');
+    post.get('slug').should.eql('test');
+    post.get('date').should.be.an.instanceof(Date);
+    post.get('meta').should.be.a('object');
 
-    post.meta.should.eql({
+    post.get('meta').should.eql({
         date: null
       , visitors: null
     });
 
-    should.strictEqual(post.published, null);
+    should.strictEqual(post.get('published'), null);
 
-    post.owners.should.be.an.instanceof(MongooseArray);
-    post.comments.should.be.an.instanceof(DocumentArray);
+    post.get('owners').should.be.an.instanceof(MongooseArray);
+    post.get('comments').should.be.an.instanceof(DocumentArray);
     db.close();
   },
 
@@ -187,8 +187,8 @@ module.exports = {
       , comments    : [ { title: 'Test', date: new Date, body: 'Test' } ]
     });
 
-    post.comments[0].isNew.should.be.false;
-    post.comments[1].isNew.should.be.false;
+    post.get('comments')[0].isNew.should.be.false;
+    post.get('comments')[1].isNew.should.be.false;
     db.close();
   },
 
@@ -204,11 +204,11 @@ module.exports = {
     });
 
     post.isModified('title').should.be.false;
-    post.title = 'test';
+    post.set('title', 'test');
     post.isModified('title').should.be.true;
 
     post.isModified('date').should.be.false;
-    post.date = Date.now()
+    post.set('date') = Date.now()
     post.isModified('date').should.be.true;
 
     post.isModified('meta.date').should.be.false;

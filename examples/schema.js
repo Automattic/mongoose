@@ -19,7 +19,9 @@ var BlogPost = new Schema({
 
 // recursive embedded-document schema
 
-var Comments = new Schema({
+var Comments = new Schema();
+
+Comments.add({
     title     : String
   , date      : Date
   , body      : String

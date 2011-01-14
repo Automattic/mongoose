@@ -1,7 +1,0 @@
-0.6.8
-* Removed multiple message concept from bson
-* Changed db.open(db) to be db.open(err, db)
-0.1 2010-01-30
-* Initial release support of driver using native node.js interface
-* Supports gridfs specificatio
-* Supports admin functionality

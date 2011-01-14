@@ -9,7 +9,7 @@ var start = require('./common')
   , random = require('mongoose/utils').random
   , Schema = mongoose.Schema
   , ObjectId = Schema.ObjectId
-  , DocumentObjectId = mongoose.ObjectId
+  , DocumentObjectId = mongoose.Types.ObjectId
   , DocumentArray = mongoose.Types.DocumentArray
   , EmbeddedDocument = mongoose.Types.Document
   , MongooseNumber = mongoose.Types.Number
@@ -18,6 +18,15 @@ var start = require('./common')
 /**
  * Setup.
  */
+
+var Comments = new Schema();
+
+Comments.add({
+    title     : String
+  , date      : Date
+  , body      : String
+  , comments  : [Comments]
+});
 
 var BlogPost = new Schema({
     title     : String
@@ -29,13 +38,6 @@ var BlogPost = new Schema({
     }
   , published : Boolean
   , owners    : [ObjectId]
-  , comments  : [Comments]
-});
-
-var Comments = new Schema({
-    title     : String
-  , date      : Date
-  , body      : String
   , comments  : [Comments]
 });
 

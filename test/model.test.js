@@ -216,7 +216,7 @@ module.exports = {
     post.isModified('title').should.be.true;
 
     post.isModified('date').should.be.false;
-    post.set('date') = Date.now()
+    post.set('date', Date.now());
     post.isModified('date').should.be.true;
 
     post.isModified('meta.date').should.be.false;

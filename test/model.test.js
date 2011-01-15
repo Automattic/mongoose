@@ -132,7 +132,10 @@ module.exports = {
         }
       , published   : true
       , owners      : [new DocumentObjectId, new DocumentObjectId]
-      , comments    : [ { title: 'Test', date: new Date, body: 'Test' } ]
+      , comments    : [
+                          { title: 'Test', date: new Date, body: 'Test' }
+                        , { title: 'Super', date: new Date, body: 'Cool' }
+                      ]
     });
 
     post.get('title').should.eql('Test');
@@ -142,12 +145,16 @@ module.exports = {
     post.get('meta').date.should.be.an.instanceof(Date);
     post.get('meta').visitors.should.be.an.instanceof(MongooseNumber);
     post.get('published').should.be.true;
+
     post.get('owners').should.be.an.instanceof(MongooseArray);
     post.get('owners')[0].should.be.an.instanceof(DocumentObjectId);
     post.get('owners')[1].should.be.an.instanceof(DocumentObjectId);
-    post.get('comments').should.be.an.instanceof(DocumentsArray);
-    post.get('comments')[0].should.be.an.instanceof(EmbeddedArray);
-    post.get('comments')[1].should.be.an.instanceof(EmbeddedArray);
+
+    post.get('comments').should.be.an.instanceof(DocumentArray);
+    post.get('comments')[0].should.be.an.instanceof(EmbeddedDocument);
+    post.get('comments')[1].should.be.an.instanceof(EmbeddedDocument);
+
+    db.close();
   },
 
   'test a model structure when partially initd': function(){
@@ -190,7 +197,6 @@ module.exports = {
     });
 
     post.get('comments')[0].isNew.should.be.false;
-    post.get('comments')[1].isNew.should.be.false;
     db.close();
   },
 

@@ -41,6 +41,19 @@ var BlogPost = new Schema({
   , comments  : [Comments]
 });
 
+BlogPost.method('cool', function(){
+  return this;
+});
+
+BlogPost.method('init', function(super, obj){
+  this.wasOverriden = true;
+  return super(obj);
+});
+
+BlogPost.static('woot', function(){
+  return this;
+});
+
 mongoose.model('BlogPost', BlogPost);
 
 var collection = 'blogposts_' + random();
@@ -221,6 +234,142 @@ module.exports = {
 
     post.isModified('meta.date').should.be.false;
     db.close();
-  }
+  },
+
+  'test isModified on a DocumentArray': function(){
+    var db = start()
+      , BlogPost = db.model('BlogPost');
+
+    var post = new BlogPost()
+    post.init({
+        title       : 'Test'
+      , slug        : 'test'
+      , date        : new Date
+    });
+  },
+
+  'test isModified on a MongooseArray with atomics': function(){
+    var db = start()
+      , BlogPost = db.model('BlogPost');
+
+    var post = new BlogPost()
+    post.init({
+        title       : 'Test'
+      , slug        : 'test'
+      , date        : new Date
+    });
+  },
+
+  'test isModified on a MongooseArray with `commit`': function(){
+    var db = start()
+      , BlogPost = db.model('BlogPost');
+
+    var post = new BlogPost()
+    post.init({
+        title       : 'Test'
+      , slug        : 'test'
+      , date        : new Date
+    });
+  },
+
+  'test a new method': function(){
+    var db = start()
+      , BlogPost = db.model('BlogPost');
+
+    var post = new BlogPost();
+    post.cool().should.eql(post);
+    db.close();
+  },
+
+  'test overriding an existing method and calling the parent': function(){
+    var db = start()
+      , BlogPost = db.model('BlogPost');
+
+    var post = new BlogPost()
+    post.init({
+        title       : 'Test'
+    });
+
+    post.wasOverriden.should.be.true;
+    db.close();
+  },
+
+  'test defining a static': function(){
+    var db = start()
+      , BlogPost = db.model('BlogPost');
+
+    BlogPost.woot().should.eql(BlogPost);
+    db.close();
+  },
+
+  'test casting error': function(){
+    var db = start()
+      , BlogPost = db.model('BlogPost')
+      , threw = false;
+
+    var post = new BlogPost();
+    
+    try {
+      post.init({
+          date: 'Test'
+      });
+    } catch(e){
+      threw = true;
+    }
+
+    threw.should.be.false;
+
+    try {
+      post.set('title', 'Test');
+    } catch(e){
+      threw = true;
+    }
+
+    threw.should.be.false;
+  },
+  
+  'test nested casting error': function(){
+
+  },
+
+  'test casting error in subdocuments': function(){
+
+  },
+
+  'test validation': function(){
+    
+  },
+  
+  'test nested validation': function(){
+
+  },
+
+  'test validation in subdocuments': function(){
+
+  },
+
+  'test async validation': function(){
+
+  },
+
+  'test nested async validation': function(){
+
+  },
+
+  'test async validation in subdocuments': function(){
+
+  },
+
+  'test defaults application': function(){
+
+  },
+
+  'test nested defaults application': function(){
+
+  },
+  
+  'test defaults application in subdocuments': function(){
+
+  },
 
 };

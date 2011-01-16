@@ -199,6 +199,14 @@ module.exports = {
     db.close();
   },
 
+  'test adding a subdocument with `commit`': function(){
+
+  },
+
+  'test adding a subdocument with `add`': function(){
+
+  },
+
   'test isNew on embedded documents after initing': function(){
     var db = start()
       , BlogPost = db.model('BlogPost');
@@ -245,11 +253,17 @@ module.exports = {
     post.init({
         title       : 'Test'
       , slug        : 'test'
-      , date        : new Date
+      , comments    : [ { title: 'Test', date: new Date, body: 'Test' } ]
     });
+
+    post.get('comments')[0].set('title', 'Woot');
+    post.isModified('comments').should.be.true;
+
+    db.close();
   },
 
   'test isModified on a MongooseArray with atomics': function(){
+    // COMPLETEME
     var db = start()
       , BlogPost = db.model('BlogPost');
 
@@ -259,9 +273,12 @@ module.exports = {
       , slug        : 'test'
       , date        : new Date
     });
+
+    db.close();
   },
 
   'test isModified on a MongooseArray with `commit`': function(){
+    // COMPLETEME
     var db = start()
       , BlogPost = db.model('BlogPost');
 
@@ -271,6 +288,8 @@ module.exports = {
       , slug        : 'test'
       , date        : new Date
     });
+
+    db.close();
   },
 
   'test a new method': function(){
@@ -366,6 +385,10 @@ module.exports = {
   },
 
   'test casting error in subdocuments': function(){
+    var db = start()
+      , BlogPost = db.model('BlogPost')
+      , threw = false;
+
 
   },
 

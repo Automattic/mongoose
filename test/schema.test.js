@@ -398,6 +398,30 @@ module.exports = {
     Animal.path('isFerret').cast(true).should.be.true;
     Animal.path('isFerret').cast(1).should.be.true;
     Animal.path('isFerret').cast('1').should.be.true;
+  },
+
+  'test declaring a new method': function(){
+
+  },
+
+  'test declaring a new static': function(){
+
+  },
+
+  'test defining a setter': function(){
+
+  },
+
+  'test defining a getter': function(){
+
+  },
+
+  'test defining pre hooks': function(){
+
+  },
+
+  'test defining post hooks': function(){
+
   }
 
 };

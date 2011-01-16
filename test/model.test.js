@@ -328,11 +328,41 @@ module.exports = {
 
     threw.should.be.false;
 
-
+    post.save(function(err){
+      err.should.be.an.instanceof(MongooseError);
+      db.close();
+    });
   },
   
   'test nested casting error': function(){
+    var db = start()
+      , BlogPost = db.model('BlogPost')
+      , threw = false;
 
+    try {
+      post.init({
+          meta: {
+              date: 'Test'
+          }
+      });
+    } catch(e){
+      threw = true;
+    }
+
+    threw.should.be.false;
+
+    try {
+      post.set('meta.date', 'Test');
+    } catch(e){
+      threw = true;
+    }
+
+    threw.should.be.false;
+    
+    post.save(function(err){
+      err.should.be.an.instanceof(MongooseError);
+      db.close();
+    });
   },
 
   'test casting error in subdocuments': function(){

@@ -13,7 +13,8 @@ var start = require('./common')
   , DocumentArray = mongoose.Types.DocumentArray
   , EmbeddedDocument = mongoose.Types.Document
   , MongooseNumber = mongoose.Types.Number
-  , MongooseArray = mongoose.Types.Array;
+  , MongooseArray = mongoose.Types.Array
+  , MongooseErrror = mongoose.Error;
 
 /**
  * Setup.
@@ -326,6 +327,8 @@ module.exports = {
     }
 
     threw.should.be.false;
+
+
   },
   
   'test nested casting error': function(){

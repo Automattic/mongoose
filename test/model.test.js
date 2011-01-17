@@ -615,15 +615,83 @@ module.exports = {
   },
 
   'test defaults application': function(){
+    var now = Date.now();
 
+    mongoose.model('TestDefaults', new Schema({
+        date: { type: Date, default: now }
+    });
+
+    var db = start()
+      , TestDefaults = db.model('TestDefaults');
+
+    var post = new TestDefaults();
+    post.save(function(err){
+      post.get('date').should.be.an.instanceof(Date);
+      +post.get('date').should.eql(now);
+      db.close();
+    });
+  },
+
+  'test that defaults are applied before validators run': function(){
+    var now = Date.now();
+
+    mongoose.model('TestDefaults', new Schema({
+        date: { type: Date, default: now, required: true }
+    });
+
+    var db = start()
+      , TestDefaults = db.model('TestDefaults');
+
+    var post = new TestDefaults();
+    post.save(function(err){
+      should.assertEqual(err, null);
+      post.get('date').should.be.an.instanceof(Date);
+      +post.get('date').should.eql(now);
+      db.close();
+    });
   },
 
   'test nested defaults application': function(){
+    var now = Date.now();
 
+    mongoose.model('TestDefaults', new Schema({
+        nested: {
+            date: { type: Date, default: now }
+        }
+    });
+
+    var db = start()
+      , TestDefaults = db.model('TestDefaults');
+
+    var post = new TestDefaults();
+    post.save(function(err){
+      post.get('nested.date').should.be.an.instanceof(Date);
+      (+post.get('nested.date')).should.eql(now);
+      db.close();
+    });
   },
   
   'test defaults application in subdocuments': function(){
+    var now = Date.now();
 
-  },
+    var Items = new Schema({
+        date: { type: Date, default: now }
+    });
+
+    mongoose.model('TestSubdocumentsDefaults', new Schema({
+        items: [Items]
+    }));
+
+    var db = start()
+      , TestSubdocumentsDefaults = db.model('TestSubdocumentsDefaults');
+
+    var post = new TestSubdocumentsDefaults();
+    post.get('items').add({});
+    post.save(function(err){
+      post.get('items')[0].get('date').should.be.an.instanceof(Date);
+      (+post.get('items')[0].get('date')).should.eql(now);
+      db.close();
+    });
+  }
 
 };

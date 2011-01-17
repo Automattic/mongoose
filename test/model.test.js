@@ -433,7 +433,7 @@ module.exports = {
   'test validation': function(){
     mongoose.model('TestValidation', new Schema({
         simple: { type: String, required: true }
-    });
+    }));
 
     var db = start()
       , TestValidation = db.model('TestValidation');
@@ -458,7 +458,7 @@ module.exports = {
         nested: {
             required: { type: String, required: true }
         }
-    });
+    }));
 
     var db = start()
       , TestNestedValidation = db.model('TestNestedValidation');
@@ -484,7 +484,7 @@ module.exports = {
 
     mongoose.model('TestSubdocumentsValidation', new Schema({
         items: [Subdocs]
-    });
+    }));
 
     var db = start()
       , TestSubdocumentsValidation = db.model('TestSubdocumentsValidation');
@@ -516,7 +516,7 @@ module.exports = {
     };
     mongoose.model('TestAsyncValidation', new Schema({
         async: { type: Date, validate: [validator, 'async validator'] }
-    });
+    }));
 
     var db = start()
       , TestAsyncValidation = db.model('TestAsyncValidation');
@@ -552,7 +552,7 @@ module.exports = {
         nested: {
             async: { type: Date, validate: [validator, 'async validator'] }
         }
-    });
+    }));
 
     var db = start()
       , TestNestedAsyncValidation = db.model('TestNestedAsyncValidation');
@@ -590,7 +590,7 @@ module.exports = {
 
     mongoose.model('TestSubdocumentsAsyncValidation', new Schema({
         items: [Subdocs]
-    });
+    }));
 
     var db = start()
       , Test = db.model('TestSubdocumentsAsyncValidation');
@@ -619,7 +619,7 @@ module.exports = {
 
     mongoose.model('TestDefaults', new Schema({
         date: { type: Date, default: now }
-    });
+    }));
 
     var db = start()
       , TestDefaults = db.model('TestDefaults');
@@ -637,7 +637,7 @@ module.exports = {
 
     mongoose.model('TestDefaults', new Schema({
         date: { type: Date, default: now, required: true }
-    });
+    }));
 
     var db = start()
       , TestDefaults = db.model('TestDefaults');
@@ -658,7 +658,7 @@ module.exports = {
         nested: {
             date: { type: Date, default: now }
         }
-    });
+    }));
 
     var db = start()
       , TestDefaults = db.model('TestDefaults');
@@ -706,7 +706,7 @@ module.exports = {
 
     mongoose.model('TestAsyncDefaults', new Schema({
         asyncdef: { type: String, default: setDefault }
-    });
+    }));;
     
     var db = start()
       , TestAsyncDefaults = db.model('TestAsyncDefaults');
@@ -731,7 +731,7 @@ module.exports = {
 
     mongoose.model('TestAsyncDefaults', new Schema({
         asyncdef: { type: String, default: setDefault }
-    });
+    }));
     
     var db = start()
       , TestAsyncDefaults = db.model('TestAsyncDefaults');
@@ -760,7 +760,7 @@ module.exports = {
 
     mongoose.model('TestAsyncDefaults', new Schema({
         subdocs: [Subdocs]
-    });
+    }));
     
     var db = start()
       , TestAsyncDefaults = db.model('TestAsyncDefaults');
@@ -773,6 +773,26 @@ module.exports = {
         post.get('subdocs')[0].get('asyncdef').should.eql('test');
         db.close();
     });
+  },
+
+  'test middleware (serial)': function(){
+    
+  },
+
+  'test middleware (parallel)': function(){
+
+  },
+
+  'test middleware (serial and parallel)': function(){
+
+  },
+
+  'test middleware errors (serial)': function(){
+
+  },
+
+  'test middleware errors (parallel)': function(){
+
   }
 
 };

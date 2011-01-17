@@ -692,6 +692,87 @@ module.exports = {
       (+post.get('items')[0].get('date')).should.eql(now);
       db.close();
     });
+  },
+
+  'test async defaults': function(){
+    var executed = false;
+
+    function setDefault (fn) {
+      setTimeout(function(){
+        executed = true;
+        fn(null, 'test');
+      }, 50);
+    };
+
+    mongoose.model('TestAsyncDefaults', new Schema({
+        asyncdef: { type: String, default: setDefault }
+    });
+    
+    var db = start()
+      , TestAsyncDefaults = db.model('TestAsyncDefaults');
+
+    var post = new TestAsyncDefaults();
+    post.save(function(){
+        executed.should.be.true;
+        post.get('asyncdef').should.eql('test');
+        db.close();
+    });
+  },
+
+  'test nested async defaults': function(){
+    var executed = false;
+
+    function setDefault (fn) {
+      setTimeout(function(){
+        executed = true;
+        fn(null, 'test');
+      }, 50);
+    };
+
+    mongoose.model('TestAsyncDefaults', new Schema({
+        asyncdef: { type: String, default: setDefault }
+    });
+    
+    var db = start()
+      , TestAsyncDefaults = db.model('TestAsyncDefaults');
+
+    var post = new TestAsyncDefaults();
+    post.save(function(){
+        executed.should.be.true;
+        post.get('asyncdef').should.eql('test');
+        db.close();
+    });
+  },
+
+  'test async defaults in subdocuments': function(){
+    var executed = false;
+
+    function setDefault (fn) {
+      setTimeout(function(){
+        executed = true;
+        fn(null, 'test');
+      }, 50);
+    };
+
+    var Subdocs = new Schema({
+        asyncdef: { type: String, default: setDefault }
+    });
+
+    mongoose.model('TestAsyncDefaults', new Schema({
+        subdocs: [Subdocs]
+    });
+    
+    var db = start()
+      , TestAsyncDefaults = db.model('TestAsyncDefaults');
+
+    post.get('subdocs').push({});
+
+    var post = new TestAsyncDefaults();
+    post.save(function(){
+        executed.should.be.true;
+        post.get('subdocs')[0].get('asyncdef').should.eql('test');
+        db.close();
+    });
   }
 
 };

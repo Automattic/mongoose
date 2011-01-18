@@ -49,7 +49,7 @@ BlogPost.method('cool', function(){
   return this;
 });
 
-BlogPost.method('init', function(super, obj){
+BlogPost.method('init', function(obj){
   this.wasOverriden = true;
   return super(obj);
 });

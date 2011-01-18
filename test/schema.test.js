@@ -400,6 +400,10 @@ module.exports = {
     Animal.path('isFerret').cast('1').should.be.true;
   },
 
+  'test async validators': function(){
+
+  },
+
   'test declaring a new method': function(){
 
   },

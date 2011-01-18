@@ -22,7 +22,7 @@ var BlogPost = new Schema({
 var Comments = new Schema();
 
 Comments.add({
-    title     : String
+    title     : { type: String, index: true }
   , date      : Date
   , body      : String
   , comments  : [Comments]
@@ -32,7 +32,7 @@ Comments.add({
  * Accessing a specific schema type by key
  */
 
-BlogPost.key('date')
+BlogPost.path('date')
   .default(function(){
      return new Date()
    })

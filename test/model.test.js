@@ -607,30 +607,9 @@ module.exports = {
       , TestDefaults = db.model('TestDefaults');
 
     var post = new TestDefaults();
-    post.save(function(err){
-      post.get('date').should.be.an.instanceof(Date);
-      +post.get('date').should.eql(now);
-      db.close();
-    });
-  },
-
-  'test that defaults are applied before validators run': function(){
-    var now = Date.now();
-
-    mongoose.model('TestDefaults', new Schema({
-        date: { type: Date, default: now, required: true }
-    }));
-
-    var db = start()
-      , TestDefaults = db.model('TestDefaults');
-
-    var post = new TestDefaults();
-    post.save(function(err){
-      should.assertEqual(err, null);
-      post.get('date').should.be.an.instanceof(Date);
-      +post.get('date').should.eql(now);
-      db.close();
-    });
+    post.get('date').should.be.an.instanceof(Date);
+    +post.get('date').should.eql(now);
+    db.close();
   },
 
   'test nested defaults application': function(){
@@ -646,11 +625,9 @@ module.exports = {
       , TestDefaults = db.model('TestDefaults');
 
     var post = new TestDefaults();
-    post.save(function(err){
-      post.get('nested.date').should.be.an.instanceof(Date);
-      (+post.get('nested.date')).should.eql(now);
-      db.close();
-    });
+    post.get('nested.date').should.be.an.instanceof(Date);
+    (+post.get('nested.date')).should.eql(now);
+    db.close();
   },
   
   'test defaults application in subdocuments': function(){
@@ -669,92 +646,9 @@ module.exports = {
 
     var post = new TestSubdocumentsDefaults();
     post.get('items').push({});
-    post.save(function(err){
-      post.get('items')[0].get('date').should.be.an.instanceof(Date);
-      (+post.get('items')[0].get('date')).should.eql(now);
-      db.close();
-    });
-  },
-
-  'test async defaults': function(){
-    var executed = false;
-
-    function setDefault (fn) {
-      setTimeout(function(){
-        executed = true;
-        fn(null, 'test');
-      }, 50);
-    };
-
-    mongoose.model('TestAsyncDefaults', new Schema({
-        asyncdef: { type: String, default: setDefault }
-    }));;
-    
-    var db = start()
-      , TestAsyncDefaults = db.model('TestAsyncDefaults');
-
-    var post = new TestAsyncDefaults();
-    post.save(function(){
-        executed.should.be.true;
-        post.get('asyncdef').should.eql('test');
-        db.close();
-    });
-  },
-
-  'test nested async defaults': function(){
-    var executed = false;
-
-    function setDefault (fn) {
-      setTimeout(function(){
-        executed = true;
-        fn(null, 'test');
-      }, 50);
-    };
-
-    mongoose.model('TestAsyncDefaults', new Schema({
-        asyncdef: { type: String, default: setDefault }
-    }));
-    
-    var db = start()
-      , TestAsyncDefaults = db.model('TestAsyncDefaults');
-
-    var post = new TestAsyncDefaults();
-    post.save(function(){
-      executed.should.be.true;
-      post.get('asyncdef').should.eql('test');
-      db.close();
-    });
-  },
-
-  'test async defaults in subdocuments': function(){
-    var executed = false;
-
-    function setDefault (fn) {
-      setTimeout(function(){
-        executed = true;
-        fn(null, 'test');
-      }, 50);
-    };
-
-    var Subdocs = new Schema({
-        asyncdef: { type: String, default: setDefault }
-    });
-
-    mongoose.model('TestAsyncSubdocsDefaults', new Schema({
-        subdocs: [Subdocs]
-    }));
-    
-    var db = start()
-      , TestAsyncDefaults = db.model('TestAsyncSubdocsDefaults');
-
-    var post = new TestAsyncDefaults();
-    post.get('subdocs').push({});
-
-    post.save(function(){
-      executed.should.be.true;
-      post.get('subdocs')[0].get('asyncdef').should.eql('test');
-      db.close();
-    });
+    post.get('items')[0].get('date').should.be.an.instanceof(Date);
+    (+post.get('items')[0].get('date')).should.eql(now);
+    db.close();
   },
 
   'test middleware (serial)': function(){

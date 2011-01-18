@@ -1,9 +1,3 @@
-= Install
-
-Run:
-
-  make
-
 = Community
 Check out the google group http://groups.google.com/group/node-mongodb-native for questions/answers from users of the driver.
 
@@ -14,7 +8,7 @@ This is a node.js driver for MongoDB. It's a port (or close to a port) of the li
 A simple example of inserting a document.
 
   var client = new Db('integration_tests_20', new Server("127.0.0.1", 27017, {}));
-  client.open(function(err, p_client) {
+  client.open(function(p_client) {
   	client.createCollection('test_insert', function(err, collection) {
   	  client.collection('test_insert', function(err, collection) {
   	    for(var i = 1; i < 1000; i++) {
@@ -42,23 +36,6 @@ A simple example of inserting a document.
   	});
   });
 
-= Important
-
-The version V0.8.0 > contains a C/C++ native BSON parser, this leads to some small changes in the way you need to access the
-BSON classes as you need to use the right versions of the classes with the right driver.
-
-For the existing javascript driver please reference BSON via
-
-	BSON = require('./mongodb').BSONPure
-	
-or when using the native bson parser use
-
-	BSON = require('./mongodb').BSONNative
-	
-To enable the driver to use the C/C++ bson parser pass it the option native_parser:true like below
-
-	var client = new Db('integration_tests_20', new Server("127.0.0.1", 27017), {native_parser:true});
-	
 === GitHub information
 
 The source code is available at http://github.com/christkv/node-mongodb-native.
@@ -66,7 +43,7 @@ You can either clone the repository or download a tarball of the latest release.
 
 Once you have the source you can test the driver by running
 
-	$ make test
+	$ make test_all
 
 in the main directory. You will need to have a mongo instance running on localhost for the integration tests to pass.
 
@@ -103,7 +80,7 @@ Simple example below
 	}
 
 	var p_client = new Db('integration_tests_20', new Server("127.0.0.1", 27017, {}), {'pk':CustomPKFactory});
-	p_client.open(function(err, p_client) {
+	p_client.open(function(p_client) {
 	  p_client.dropDatabase(function(err, done) {    
 	    p_client.createCollection('test_custom_key', function(err, collection) {
 	      collection.insert({'a':1}, function(err, docs) {
@@ -128,7 +105,7 @@ attempt to create a collection that already exists. Strict is provided for conve
 
 	var error_client = new Db('integration_tests_', new Server("127.0.0.1", 27017, {auto_reconnect: false}), {strict:true});
 	test.assertEquals(true, error_client.strict);
-	error_client.open(function(err, error_client) {
+	error_client.open(function(error_client) {
 	  error_client.collection('does-not-exist', function(err, collection) {
 	    test.assertTrue(err instanceof Error);
 	    test.assertEquals("Collection does-not-exist does not exist. Currently in strict mode.", err.message);      
@@ -151,13 +128,6 @@ deferred until you request the first object using either .each/.nextObject/.toAr
 = Documentation
 
 Work in Progress
-
-= Sponsors
-Just as Felix Geisendörfer I'm also working on the driver for my own startup and this driver is a big project that also benefits other companies who are using MongoDB.
-
-If your company could benefit from a even better-engineered node.js mongodb driver I would appreciate any type of sponsorship you may be able to provide. All the sponsors will get a lifetime display in this readme, priority support and help on problems and votes on the roadmap decisions for the driver. If you are interested contact me on [christkv@gmail.com](mailto:christkv@gmail.com) for details.
-
-And I'm very thankful for code contributions. If you are interested in working on features please contact me so we can discuss API design and testing.
 
 = Release Notes
 

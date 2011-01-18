@@ -1,15 +1,15 @@
 var BaseCommand = require('./base_command').BaseCommand,
   BinaryParser = require('../bson/binary_parser').BinaryParser,
+  BSON = require('../bson/bson').BSON,
   inherits = require('sys').inherits;
 
 /**
   Insert Document Command
 **/
-var KillCursorCommand = exports.KillCursorCommand = function(db, cursorIds) {
+var KillCursorCommand = exports.KillCursorCommand = function(cursorIds) {
   BaseCommand.call(this);
 
   this.cursorIds = cursorIds;
-  this.db = db;
 };
 
 inherits(KillCursorCommand, BaseCommand);
@@ -27,11 +27,10 @@ struct {
 }
 */
 KillCursorCommand.prototype.getCommand = function() {
-  var self = this;
   // Generate the command string
   var command_string = BinaryParser.fromInt(0) + BinaryParser.fromInt(this.cursorIds.length);
   this.cursorIds.forEach(function(cursorId) {
-    command_string = command_string + self.db.bson_serializer.BSON.encodeLong(cursorId);
+    command_string = command_string + BSON.encodeLong(cursorId);
   });
   return command_string;
 };

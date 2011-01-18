@@ -1,20 +1,13 @@
-require.paths.unshift("../../external-libs/bson");
-
 var BinaryParser = require('./binary_parser').BinaryParser,
+  OrderedHash = require('./collections').OrderedHash,
   Integer = require('../goog/math/integer').Integer,
   Long = require('../goog/math/long').Long,
   Buffer = require('buffer').Buffer;
-  
+
 // Alias a string function
 var chr = String.fromCharCode;
 
-var BSON = exports.BSON = function(){},
-  sys = require('sys');
-
-// Exports Long value
-exports.Long = Long;
-exports.Timestamp = Long;
-var Timestamp = Long
+var BSON = exports.BSON = function(){};
 
 // BSON MAX VALUES
 BSON.BSON_INT32_MAX = 2147483648;
@@ -108,7 +101,7 @@ BSON.deserialize = function(data, is_array_item, returnData, returnArray) {
       index = index + 4;
       // Set the data on the object
       is_array_item ? return_array[insert_index] = value : return_data[string_name] = value;
-    } else if(type == BSON.BSON_DATA_LONG || type == BSON.BSON_DATA_TIMESTAMP) {
+    } else if(type == BSON.BSON_DATA_LONG) {
       // Read the null terminated string (indexof until first 0)
       var string_end_index = data.indexOf('\0', index);
       var string_name = data.substring(index, string_end_index);
@@ -120,7 +113,7 @@ BSON.deserialize = function(data, is_array_item, returnData, returnArray) {
       var low_bits = Integer.fromInt(BinaryParser.toInt(data.substr(index, 4)));
       var high_bits = Integer.fromInt(BinaryParser.toInt(data.substr(index + 4, 4)));
       // Create to integers
-      var value = type == BSON.BSON_DATA_TIMESTAMP ? new Timestamp(low_bits, high_bits) : new Long(low_bits, high_bits);
+      var value = new Long(low_bits, high_bits);
       // Adjust the index with the size
       index = index + 8;
       // Set the data on the object
@@ -144,7 +137,7 @@ BSON.deserialize = function(data, is_array_item, returnData, returnArray) {
       var string_end_index = data.indexOf('\0', index);
       var string_name = data.substring(index, string_end_index);
       // Ajust index to point to the end of the string
-      index = string_end_index + 1;      
+      index = string_end_index + 1;
       // If we have an index read the array index      
       if(is_array_item) insert_index = parseInt(string_name, 10);
       // Read the size of the object
@@ -263,22 +256,16 @@ BSON.deserialize = function(data, is_array_item, returnData, returnArray) {
       // Read characters until end of regular expression
       var reg_exp_array = [];
       var chr = 1;
-      var start_index = index
-      while(BinaryParser.toByte((chr = data.charAt(index))) != 0) {
-        index = index + 1
+      while(BinaryParser.toByte((chr = data.charAt(index++))) != 0) {
+        reg_exp_array.push(chr);
       }
-      
-      // RegExp Expression
-      reg_exp = data.substring(start_index, index)
-      index = index + 1
-      
       // Read the options for the regular expression
       var options_array = [];
       while(BinaryParser.toByte((chr = data.charAt(index++))) != 0) {
         options_array.push(chr);
       }
       // Regular expression
-      var value = new RegExp(BinaryParser.decode_utf8(reg_exp), options_array.join(''));
+      var value = new RegExp(reg_exp_array.join(''), options_array.join(''));
       // Set the data on the object
       is_array_item ? return_array[insert_index] = value : return_data[string_name] = value;
     } else if(type == BSON.BSON_DATA_BINARY) {
@@ -288,7 +275,7 @@ BSON.deserialize = function(data, is_array_item, returnData, returnArray) {
       // Ajust index to point to the end of the string
       index = string_end_index + 1;
       // If we have an index read the array index      
-      if(is_array_item) insert_index = parseInt(string_name, 10);      
+      if(is_array_item) insert_index = parseInt(string_name, 10);
       // The total number of bytes after subtype
       var total_number_of_bytes = BinaryParser.toInt(data.substr(index, 4));
       index = index + 4;
@@ -361,6 +348,18 @@ BSON.encodeObject = function(object, checkKeys) {
   return encoded_string;
 };
 
+BSON.encodeOrderedObject = function(object, checkKeys) {
+  var encoded_string = '';
+  // Ensure the id is always first object of ordered hash
+  if(object.get('_id') != null) encoded_string += BSON.encodeValue('', '_id', object.get('_id'), false, checkKeys);
+  // Encode all other objects in the order provided
+  for(var index = 0; index < object.keys().length; index++) {
+    var key = object.keys()[index];
+    if(key != '_id') encoded_string += BSON.encodeValue('', key, object.get(key), false, checkKeys);
+  }
+  return encoded_string;
+};
+
 BSON.encodeBoolean = function(value) {
   return value ? BinaryParser.fromSmall(1) : BinaryParser.fromSmall(0);
 };
@@ -411,9 +410,11 @@ BSON.encodeBinary = function(binary) {
 };
 
 BSON.encodeDBRef = function(dbref) {
-  var ordered_values = {'$ref':dbref.namespace, '$id':dbref.oid};
-  if(dbref.db != null) ordered_values['$db'] = dbref.db;
-  return BSON.encodeObject(ordered_values);
+  var ordered_values = new OrderedHash();
+  ordered_values.add('$ref', dbref.namespace);
+  ordered_values.add('$id', dbref.oid);
+  if(dbref.db != null) ordered_values.add('$db', dbref.db);
+  return BSON.encodeOrderedObject(ordered_values);
 };
 
 BSON.checkKey = function(variable) {
@@ -425,16 +426,6 @@ BSON.checkKey = function(variable) {
   }
 };
 
-BSON.toLong = function(low_bits, high_bits) {
-  var low_bits = Integer.fromInt(low_bits);
-  var high_bits = Integer.fromInt(high_bits);  
-  return new Long(low_bits, high_bits);
-}
-
-BSON.toInt = function(value) {
-  return Integer.fromNumber(value).toInt();
-}
-
 BSON.encodeValue = function(encoded_string, variable, value, top_level, checkKeys) {
   var variable_encoded = variable == null ? '' : BinaryParser.encode_cstring(variable);
   if(checkKeys && variable != null)BSON.checkKey(variable);
@@ -443,9 +434,7 @@ BSON.encodeValue = function(encoded_string, variable, value, top_level, checkKey
     encoded_string += BinaryParser.fromByte(BSON.BSON_DATA_NULL) + variable_encoded;
   } else if(value.constructor == String) {
     encoded_string += BinaryParser.fromByte(BSON.BSON_DATA_STRING) + variable_encoded + BSON.encodeString(value);
-  } else if(value instanceof Timestamp || Object.prototype.toString.call(value) == "[object Timestamp]") {
-    encoded_string += BinaryParser.fromByte(BSON.BSON_DATA_TIMESTAMP) + variable_encoded + BSON.encodeLong(value);
-  } else if(value instanceof Long || Object.prototype.toString.call(value) == "[object Long]") {
+  } else if(value instanceof Long) {
     encoded_string += BinaryParser.fromByte(BSON.BSON_DATA_LONG) + variable_encoded + BSON.encodeLong(value);
   } else if(value.constructor == Number && value === parseInt(value, 10)) {
     if(value > BSON.BSON_INT32_MAX || value < BSON.BSON_INT32_MIN) {      
@@ -464,11 +453,14 @@ BSON.encodeValue = function(encoded_string, variable, value, top_level, checkKey
     encoded_string += BinaryParser.fromByte(BSON.BSON_DATA_DATE) + variable_encoded + BSON.encodeDate(value);
   } else if(Object.prototype.toString.call(value) === '[object RegExp]') {
     encoded_string += BinaryParser.fromByte(BSON.BSON_DATA_REGEXP) + variable_encoded + BSON.encodeRegExp(value);
-  } else if(value instanceof ObjectID || (value.id && value.toHexString) || Object.prototype.toString.call(value) == "[object ObjectID]") {
+  } else if(value instanceof ObjectID || (value.id && value.toHexString)) {
     encoded_string += BinaryParser.fromByte(BSON.BSON_DATA_OID) + variable_encoded + BSON.encodeOid(value);
-  } else if(value instanceof Code || Object.prototype.toString.call(value) == "[object Code]") {
+  } else if(value instanceof Code) {
     encoded_string += BinaryParser.fromByte(BSON.BSON_DATA_CODE_W_SCOPE) + variable_encoded + BSON.encodeCode(value, checkKeys);
-  } else if(value instanceof Binary || Object.prototype.toString.call(value) == "[object Binary]") {
+  } else if(value instanceof OrderedHash) {
+    var object_string = BSON.encodeOrderedObject(value, checkKeys);
+    encoded_string += (!top_level ? BinaryParser.fromByte(BSON.BSON_DATA_OBJECT) : '') + variable_encoded + BSON.encodeInt(Integer.fromInt(object_string.length + 4 + 1)) + object_string + BinaryParser.fromByte(0);
+  } else if(value instanceof Binary) {
     var object_string = BSON.encodeBinary(value);
     encoded_string += BinaryParser.fromByte(BSON.BSON_DATA_BINARY) + variable_encoded + BSON.encodeInt(Integer.fromInt(object_string.length - 1)) + object_string;
   } else if(value instanceof DBRef) {
@@ -484,7 +476,7 @@ BSON.encodeValue = function(encoded_string, variable, value, top_level, checkKey
 
 var Code = exports.Code = function(code, scope) {
   this.code = code;
-  this.scope = scope == null ? {} : scope;
+  this.scope = scope == null ? new OrderedHash() : scope;
 };
 
 /**
@@ -495,10 +487,6 @@ var ObjectID = exports.ObjectID = function(id) {
   else if( /^[0-9a-fA-F]{24}$/.test(id)) return ObjectID.createFromHexString(id);
   else this.id = id;
 };
-
-ObjectID.prototype.toString = function() {
-  return "[object ObjectID]";
-}
 
 ObjectID.prototype.get_inc = function() {
   exports.ObjectID.index = (exports.ObjectID.index + 1) % 0xFFFFFF;
@@ -534,12 +522,8 @@ ObjectID.prototype.toHexString = function() {
 };
 
 ObjectID.prototype.toString = function() {
-  return this.toHexString();
+  return this.id;
 };
-
-ObjectID.prototype.inspect = function() {
-  return this.toHexString();  
-}
 
 // accurate up to number of seconds
 ObjectID.prototype.__defineGetter__("generationTime", function() {
@@ -565,10 +549,6 @@ ObjectID.createFromHexString= function(hexString) {
 
 ObjectID.prototype.toJSON = function() {
   return this.toHexString();
-}
-
-ObjectID.prototype.equals = function(otherID) {
-  return this.id == ((otherID instanceof ObjectID || otherID.toHexString) ? otherID.id : ObjectID.createFromHexString(otherID).id);
 }
 
 /**
@@ -626,11 +606,17 @@ Binary.prototype.write = function(string, offset) {
 
 Binary.prototype.read = function(position, length) {  
   length = length && length > 0 ? length : this.position;  
+  // sys.puts(this.buffer.toString('binary', position, position + length))
+  
   // Let's extract the string we want to read
   return this.buffer.toString('binary', position, position + length);
 };
 
 Binary.prototype.value = function() {
+  // sys.puts("=============================================================================== START")
+  // BinaryParser.pprint(this.buffer.toString('binary', 0, this.position))
+  // sys.puts("=============================================================================== END")
+  
   return this.buffer.toString('binary', 0, this.position);
 };
 

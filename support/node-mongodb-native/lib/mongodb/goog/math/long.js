@@ -258,10 +258,6 @@ exports.Long.prototype.toNumber = function() {
          this.getLowBitsUnsigned();
 };
 
-/** convert code to JSON **/
-exports.Long.prototype.toJSON = function() {
-  return this.toString();
-}
 
 /**
  * @param {number} opt_radix The radix in which the text should be written.

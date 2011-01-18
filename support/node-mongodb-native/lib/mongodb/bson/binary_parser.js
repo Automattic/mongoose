@@ -1,5 +1,3 @@
-var sys = require('sys');
-
 //+ Jonas Raoni Soares Silva
 //@ http://jsfromhell.com/classes/binary-parser [v1.0]
 var chr = String.fromCharCode;
@@ -178,8 +176,7 @@ p.encode_int64 = function(number) {
 p.decode_utf8 = function(a) {
   var string = "";
   var i = 0;
-  var c, c1, c2;
-  c = c1 = c2 = 0;
+  var c = c1 = c2 = 0;
 
   while ( i < a.length ) {
     c = a.charCodeAt(i);
@@ -223,28 +220,6 @@ p.encode_utf8 = function(s) {
   }
   return a;
 };
-
-p.hprint = function(s) {
-  for (var i=0; i<s.length; i++) {
-    if (s.charCodeAt(i)<32) {
-      var number = s.charCodeAt(i) <= 15 ? "0" + s.charCodeAt(i).toString(16) : s.charCodeAt(i).toString(16);
-      sys.debug(number+' : ');}
-    else {
-      var number = s.charCodeAt(i) <= 15 ? "0" + s.charCodeAt(i).toString(16) : s.charCodeAt(i).toString(16);      
-      sys.debug(number+' : '+ s.charAt(i));}
-  }
-};
-
-p.to_byte_array = function(s) {
-  var array = [];
-  
-  for (var i=0; i<s.length; i++) {
-    if (s.charCodeAt(i)<32) {array.push(s.charCodeAt(i));}
-    else {array.push(s.charCodeAt(i))}    
-  }  
-  
-  sys.puts(array);
-}
 
 p.pprint = function(s) {
   for (var i=0; i<s.length; i++) {

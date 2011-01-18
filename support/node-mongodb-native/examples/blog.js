@@ -1,21 +1,17 @@
 GLOBAL.DEBUG = true;
 
 sys = require("sys");
-test = require("assert");
+test = require("mjsunit");
 
-var Db = require('../lib/mongodb').Db,
-  Connection = require('../lib/mongodb').Connection,
-  Server = require('../lib/mongodb').Server,
-  // BSON = require('../lib/mongodb').BSONPure;
-  BSON = require('../lib/mongodb').BSONNative;
+var mongo = require('../lib/mongodb');
 
 var host = process.env['MONGO_NODE_DRIVER_HOST'] != null ? process.env['MONGO_NODE_DRIVER_HOST'] : 'localhost';
-var port = process.env['MONGO_NODE_DRIVER_PORT'] != null ? process.env['MONGO_NODE_DRIVER_PORT'] : Connection.DEFAULT_PORT;
+var port = process.env['MONGO_NODE_DRIVER_PORT'] != null ? process.env['MONGO_NODE_DRIVER_PORT'] : mongo.Connection.DEFAULT_PORT;
 
 var LINE_SIZE = 120;
 
 sys.puts("Connecting to " + host + ":" + port);
-var db = new Db('node-mongo-blog', new Server(host, port, {}), {native_parser:true});
+var db = new mongo.Db('node-mongo-blog', new mongo.Server(host, port, {}), {});
 db.open(function(err, db) {
   db.dropDatabase(function(err, result) {
     sys.puts("===================================================================================");

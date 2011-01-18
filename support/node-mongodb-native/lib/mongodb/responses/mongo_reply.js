@@ -1,11 +1,12 @@
 var BinaryParser = require('../bson/binary_parser').BinaryParser,
   Integer = require('../goog/math/integer').Integer,
-  Long = require('../goog/math/long').Long;
+  Long = require('../goog/math/long').Long,
+  BSON = require('../bson/bson').BSON;
 
 /**
   Reply message from mongo db
 **/
-var MongoReply = exports.MongoReply = function(db, binary_reply) {
+var MongoReply = exports.MongoReply = function(binary_reply) {
   this.documents = [];
   var index = 0;
   // Unpack the standard header first
@@ -20,9 +21,11 @@ var MongoReply = exports.MongoReply = function(db, binary_reply) {
   index = index + 4 + 4;
   // Unpack the reply message
   this.responseFlag = BinaryParser.toInt(binary_reply.substr(index, 4));
-  index = index + 4;  
+  index = index + 4;
   // Unpack the cursor id (a 64 bit long integer)
-  this.cursorId = new db.bson_serializer.BSON.toLong(BinaryParser.toInt(binary_reply.substr(index, 4)), BinaryParser.toInt(binary_reply.substr(index + 4, 4)));
+  var low_bits = Integer.fromInt(BinaryParser.toInt(binary_reply.substr(index, 4)));
+  var high_bits = Integer.fromInt(BinaryParser.toInt(binary_reply.substr(index + 4, 4)));
+  this.cursorId = new Long(low_bits, high_bits);
   index = index + 8;
   // Unpack the starting from
   this.startingFrom = BinaryParser.toInt(binary_reply.substr(index, 4));
@@ -34,12 +37,8 @@ var MongoReply = exports.MongoReply = function(db, binary_reply) {
   for(var object_index = 0; object_index < this.numberReturned; object_index++) {
     // Read the size of the bson object
     var bsonObjectSize = BinaryParser.toInt(binary_reply.substr(index, 4));
-    
-    // sys.debug("--------------------------------------------------- incoming")
-    // BinaryParser.hprint(binary_reply.substr(index, bsonObjectSize))
-    
     // Read the entire object and deserialize it
-    this.documents.push(db.bson_deserializer.BSON.deserialize(binary_reply.substr(index, bsonObjectSize)));
+    this.documents.push(BSON.deserialize(binary_reply.substr(index, bsonObjectSize)));
     // Adjust for next object
     index = index + bsonObjectSize;
   }

@@ -1,13 +1,15 @@
 var Collection = require('./collection').Collection,
-    Cursor = require('./cursor').Cursor,
-    DbCommand = require('./commands/db_command').DbCommand;
+  OrderedHash = require('./bson/collections').OrderedHash,
+  Cursor = require('./cursor').Cursor,
+  DbCommand = require('./commands/db_command').DbCommand;
 
 var Admin = exports.Admin = function(db) {  
   this.db = db;
 };
 
 Admin.prototype.profilingLevel = function(callback) {
-  var command = {profile:-1};
+  var command = new OrderedHash();
+  command.add('profile', -1);
   this.db.executeDbCommand(command, function(err, doc) {
     doc = doc.documents[0];
     if(err == null && (doc.ok == 1 || doc.was.constructor == Numeric)) {
@@ -28,7 +30,7 @@ Admin.prototype.profilingLevel = function(callback) {
 };
 
 Admin.prototype.setProfilingLevel = function(level, callback) {
-  var command = {};
+  var command = new OrderedHash();
   var profile = 0;
   if(level == "off") {
     profile = 0;
@@ -40,7 +42,7 @@ Admin.prototype.setProfilingLevel = function(level, callback) {
     callback(new Error("Error: illegal profiling level value " + level));
     return;
   }
-  command['profile'] = profile;
+  command.add('profile', profile);
 
   this.db.executeDbCommand(command, function(err, doc) {
     doc = doc.documents[0];
@@ -59,7 +61,8 @@ Admin.prototype.profilingInfo = function(callback) {
 };
 
 Admin.prototype.validatCollection = function(collectionName, callback) {
-  var command = {validate: collectionName};
+  var command = new OrderedHash();
+  command.add('validate', collectionName);
   this.db.executeDbCommand(command, function(err, doc) {
     doc = doc.documents[0];
 

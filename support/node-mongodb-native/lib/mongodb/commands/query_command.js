@@ -1,11 +1,13 @@
 var BaseCommand = require('./base_command').BaseCommand,
   BinaryParser = require('../bson/binary_parser').BinaryParser,
+  BSON = require('../bson/bson').BSON,
+  OrderedHash = require('../bson/collections').OrderedHash,
   inherits = require('sys').inherits;
 
 /**
   Insert Document Command
 **/
-var QueryCommand = exports.QueryCommand = function(db, collectionName, queryOptions, numberToSkip, numberToReturn, query, returnFieldSelector) {
+var QueryCommand = exports.QueryCommand = function(collectionName, queryOptions, numberToSkip, numberToReturn, query, returnFieldSelector) {
   BaseCommand.call(this);
   
   this.collectionName = collectionName;
@@ -14,7 +16,6 @@ var QueryCommand = exports.QueryCommand = function(db, collectionName, queryOpti
   this.numberToReturn = numberToReturn;
   this.query = query;
   this.returnFieldSelector = returnFieldSelector;
-  this.db = db;
 };
 
 inherits(QueryCommand, BaseCommand);
@@ -38,10 +39,15 @@ QueryCommand.prototype.getCommand = function() {
   // Generate the command string
   var command_string = BinaryParser.fromInt(this.queryOptions) + BinaryParser.encode_cstring(this.collectionName);
   command_string = command_string + BinaryParser.fromInt(this.numberToSkip) + BinaryParser.fromInt(this.numberToReturn);
-  command_string = command_string + this.db.bson_serializer.BSON.serialize(this.query);
+  command_string = command_string + BSON.serialize(this.query);
   if(this.returnFieldSelector != null)  {
-    var count = 0; for(var name in this.returnFieldSelector) { count += 1; }
-    if(count > 0) command_string = command_string + this.db.bson_serializer.BSON.serialize(this.returnFieldSelector);
+    // && (this.returnFieldSelector != {} ||)
+    if(this.returnFieldSelector instanceof OrderedHash && this.returnFieldSelector.length > 0) {
+      command_string = command_string + BSON.serialize(this.returnFieldSelector);
+    } else if(this.returnFieldSelector.constructor == Object) {
+      var count = 0; for(var name in this.returnFieldSelector) { count += 1; }
+      if(count > 0) command_string = command_string + BSON.serialize(this.returnFieldSelector);
+    }
   }
   return command_string;
 };

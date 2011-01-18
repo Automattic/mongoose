@@ -1,0 +1,36 @@
+# project noname (0.1.0) configured on Fri Dec 31 17:26:27 2010 by
+# waf 1.5.16 (abi 7, python 20601f0 on darwin)
+# using /usr/local/bin/node-waf configure build
+#
+
+----------------------------------------
+Checking for program g++ or c++
+  find program=['g++', 'c++'] paths=[] var='CXX'
+  -> '/usr/bin/g++'
+
+----------------------------------------
+Checking for program cpp
+  find program=['cpp'] paths=[] var='CPP'
+  -> '/usr/bin/cpp'
+
+----------------------------------------
+Checking for program ar
+  find program=['ar'] paths=[] var='AR'
+  -> '/usr/bin/ar'
+
+----------------------------------------
+Checking for program ranlib
+  find program=['ranlib'] paths=[] var='RANLIB'
+  -> '/usr/bin/ranlib'
+
+----------------------------------------
+Checking for g++ 
+ok 
+
+----------------------------------------
+Checking for node path 
+ok /Users/rauchg/.node_libraries
+
+----------------------------------------
+Checking for node prefix 
+ok /usr/local

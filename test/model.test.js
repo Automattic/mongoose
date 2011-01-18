@@ -338,6 +338,8 @@ module.exports = {
       , BlogPost = db.model('BlogPost')
       , threw = false;
 
+    var post = new BlogPost();
+
     try {
       post.init({
           meta: {

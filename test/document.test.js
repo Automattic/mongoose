@@ -186,7 +186,7 @@ module.exports = {
     });
 
     doc.hooksTest(function(err){
-      assert.strictEqual(err, null);
+      should.strictEqual(err, null);
       called = true;
     });
 
@@ -258,6 +258,30 @@ module.exports = {
 
     beforeExit(function(){
       steps.should.eql(4);
+      called.should.be.true;
+    });
+  },
+  
+  'test that its not necessary to call the last next in the parallel chain':
+  function(beforeExit){
+    var doc = new TestDocument()
+      , steps = 0
+      , called = false;
+
+    doc.pre('hooksTest', function(next, done){
+      next();
+      done();
+    });
+
+    doc.pre('hooksTest', function(next, done){
+      done();
+    });
+
+    doc.hooksTest(function(){
+      called = true;
+    });
+
+    beforeExit(function(){
       called.should.be.true;
     });
   }

@@ -83,6 +83,7 @@ module.exports = {
     var Test = new Schema({
         simple    : { type: String, default: 'a' }
       , callback  : { type: Number, default: function(){
+          this.a.should.eql('b');
           return 'b';
         }}
     });
@@ -90,8 +91,8 @@ module.exports = {
     Test.path('simple').defaultValue.should.eql('a');
     Test.path('callback').defaultValue.should.be.a('function');
 
-    Test.path('simple').default().should.eql('a');
-    Test.path('callback').default().should.eql('b');
+    Test.path('simple').getDefault().should.eql('a');
+    Test.path('callback').getDefault({ a: 'b' }).should.eql('b');
   },
 
   'test string required validation': function(){

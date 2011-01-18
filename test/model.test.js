@@ -268,7 +268,6 @@ module.exports = {
       , BlogPost = db.model('BlogPost');
 
     var post = new BlogPost()
-    post.init({});
 
     post.isModified('owners').should.be.false;
     post.get('owners').$push(new DocumentObjectId);
@@ -283,7 +282,6 @@ module.exports = {
       , BlogPost = db.model('BlogPost');
 
     var post = new BlogPost()
-    post.init({});
 
     post.isModified('owners').should.be.false;
     post.get('owners').push(new DocumentObjectId);

@@ -90,6 +90,7 @@ module.exports = {
     should.strictEqual(post.get('slug'), null);
     should.strictEqual(post.get('date'), null);
 
+    console.log(post);
     post.get('meta').should.be.a('object');
     post.get('meta').should.eql({
         date: null

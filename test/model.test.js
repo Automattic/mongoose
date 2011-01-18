@@ -49,11 +49,6 @@ BlogPost.method('cool', function(){
   return this;
 });
 
-BlogPost.method('init', function(obj){
-  this.wasOverriden = true;
-  return super(obj);
-});
-
 BlogPost.static('woot', function(){
   return this;
 });
@@ -289,25 +284,12 @@ module.exports = {
     db.close();
   },
 
-  'test a new method': function(){
+  'test defining a new method': function(){
     var db = start()
       , BlogPost = db.model('BlogPost');
 
     var post = new BlogPost();
     post.cool().should.eql(post);
-    db.close();
-  },
-
-  'test overriding an existing method and calling the parent': function(){
-    var db = start()
-      , BlogPost = db.model('BlogPost');
-
-    var post = new BlogPost()
-    post.init({
-        title       : 'Test'
-    });
-
-    post.wasOverriden.should.be.true;
     db.close();
   },
 

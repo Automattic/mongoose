@@ -668,7 +668,7 @@ module.exports = {
       , TestSubdocumentsDefaults = db.model('TestSubdocumentsDefaults');
 
     var post = new TestSubdocumentsDefaults();
-    post.get('items').add({});
+    post.get('items').push({});
     post.save(function(err){
       post.get('items')[0].get('date').should.be.an.instanceof(Date);
       (+post.get('items')[0].get('date')).should.eql(now);
@@ -740,16 +740,16 @@ module.exports = {
         asyncdef: { type: String, default: setDefault }
     });
 
-    mongoose.model('TestAsyncDefaults', new Schema({
+    mongoose.model('TestAsyncSubdocsDefaults', new Schema({
         subdocs: [Subdocs]
     }));
     
     var db = start()
-      , TestAsyncDefaults = db.model('TestAsyncDefaults');
-
-    post.get('subdocs').push({});
+      , TestAsyncDefaults = db.model('TestAsyncSubdocsDefaults');
 
     var post = new TestAsyncDefaults();
+    post.get('subdocs').push({});
+
     post.save(function(){
         executed.should.be.true;
         post.get('subdocs')[0].get('asyncdef').should.eql('test');

@@ -720,9 +720,9 @@ module.exports = {
 
     var post = new TestAsyncDefaults();
     post.save(function(){
-        executed.should.be.true;
-        post.get('asyncdef').should.eql('test');
-        db.close();
+      executed.should.be.true;
+      post.get('asyncdef').should.eql('test');
+      db.close();
     });
   },
 
@@ -751,9 +751,9 @@ module.exports = {
     post.get('subdocs').push({});
 
     post.save(function(){
-        executed.should.be.true;
-        post.get('subdocs')[0].get('asyncdef').should.eql('test');
-        db.close();
+      executed.should.be.true;
+      post.get('subdocs')[0].get('asyncdef').should.eql('test');
+      db.close();
     });
   },
 

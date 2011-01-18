@@ -1,7 +1,7 @@
 
 var start = require('./common')
   , mongoose = start.mongoose
-  , Collection = require('mongoose/connection');
+  , Collection = require('../lib/mongoose/connection');
 
 module.exports = {
 

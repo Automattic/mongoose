@@ -3,7 +3,7 @@
  * Module dependencies.
  */
 
-var mongoose = require('mongoose')
+var mongoose = require('../index')
   , should = require('should')
   , Mongoose = mongoose.Mongoose
   , Assertion = should.Assertion

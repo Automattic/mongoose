@@ -20,7 +20,7 @@ module.exports = {
     a.should.be.an.instanceof(MongooseArray);
     a.should.be.an.instanceof(MongooseDocumentArray);
     Array.isArray(a).should.be.true;
-    Array.isArray(a.atomics).should.be.true;
+    Array.isArray(a._atomics).should.be.true;
   }
 
 };

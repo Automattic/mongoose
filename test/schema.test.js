@@ -85,28 +85,13 @@ module.exports = {
       , callback  : { type: Number, default: function(){
           return 'b';
         }}
-      , async     : { type: String, default: function(fn){
-          process.nextTick(function(){
-            fn(null, 'c');
-          });
-        }}
     });
 
     Test.path('simple').defaultValue.should.eql('a');
     Test.path('callback').defaultValue.should.be.a('function');
-    Test.path('async').defaultValue.should.be.a('function');
 
-    Test.path('simple').getDefault(function(err, value){
-      value.should.eql('a');
-    });
-
-    Test.path('callback').getDefault(function(err, value){
-      value.should.eql('b');
-    });
-
-    Test.path('async').getDefault(function(err, value){
-      value.should.eql('c');
-    });
+    Test.path('simple').getDefault().should.eql('a');
+    Test.path('callback').getDefault().should.eql('b');
   },
 
   'test string required validation': function(){

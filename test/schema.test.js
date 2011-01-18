@@ -90,8 +90,8 @@ module.exports = {
     Test.path('simple').defaultValue.should.eql('a');
     Test.path('callback').defaultValue.should.be.a('function');
 
-    Test.path('simple').getDefault().should.eql('a');
-    Test.path('callback').getDefault().should.eql('b');
+    Test.path('simple').default().should.eql('a');
+    Test.path('callback').default().should.eql('b');
   },
 
   'test string required validation': function(){

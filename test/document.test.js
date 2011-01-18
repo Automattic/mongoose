@@ -186,7 +186,7 @@ module.exports = {
     });
 
     doc.hooksTest(function(err){
-      assert.strictEqual(err, null);
+      should.strictEqual(err, null);
       called = true;
     });
 

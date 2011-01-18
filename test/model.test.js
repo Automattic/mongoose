@@ -379,7 +379,7 @@ module.exports = {
       , comments    : [ { title: 'Test', date: new Date, body: 'Test' } ]
     });
 
-    post.get('comments')[0].set('date', new Date);
+    post.get('comments')[0].set('date', 'invalid');
 
     post.save(function(err){
       err.should.be.an.instanceof(MongooseError);

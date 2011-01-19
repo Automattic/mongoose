@@ -413,6 +413,31 @@ module.exports = {
     });
   },
 
+  'test async validators scope': function(beforeExit){
+    var executed = false;
+    
+    function validator (value, fn) {
+      this.a.should.eql('b');
+
+      setTimeout(function(){
+        executed = true;
+        fn(true);
+      }, 50);
+    };
+
+    var Animal = new Schema({
+        ferret: { type: Boolean, validate: validator }
+    });
+
+    Animal.path('ferret').doValidate(true, function(err){
+      should.strictEqual(err, null);
+    }, { a: 'b' });
+
+    beforeExit(function(){
+      executed.should.be.true;
+    });
+  },
+
   'test declaring a new method': function(){
     
   },

@@ -492,12 +492,68 @@ module.exports = {
     Tobi.path('name').applySetters('WHAT', { a: 'b' }).should.eql('what');
   },
 
-  'test applying setter(s)': function(){
+  'test getter(s)': function(){
+    function woot (v) {
+      return v + ' woot';
+    };
 
+    var Tobi = new Schema({
+        name: { type: String, get: woot }
+    });
+
+    Tobi.path('name').getters.should.have.length(1);
+    Tobi.path('name').applyGetters('test').should.eql('test woot');
   },
 
-  'test defining a getter': function(){
+  'test getters scope': function(){
+    function woot (v) {
+      this.a.should.eql('b');
+      return v.toLowerCase();
+    };
 
+    var Tobi = new Schema({
+        name: { type: String, get: woot }
+    });
+
+    Tobi.path('name').applyGetters('YEP', { a: 'b' }).should.eql('yep');
+  },
+
+  'test setters casting': function(){
+    function last (v) {
+      v.should.be.a('string');
+      v.should.eql('0');
+      return 'last';
+    };
+
+    function first (v) {
+      return 0;
+    };
+    
+    var Tobi = new Schema({
+        name: { type: String, set: last }
+    });
+
+    Tobi.path('name').set(first);
+    Tobi.path('name').applySetters('woot').should.eql('last');
+  },
+
+  'test getters casting': function(){
+    function last (v) {
+      v.should.be.a('string');
+      v.should.eql('0');
+      return 'last';
+    };
+
+    function first (v) {
+      return 0;
+    };
+    
+    var Tobi = new Schema({
+        name: { type: String, get: last }
+    });
+
+    Tobi.path('name').get(first);
+    Tobi.path('name').applyGetters('woot').should.eql('last');
   },
 
   'test defining pre hooks': function(){

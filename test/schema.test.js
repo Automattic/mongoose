@@ -84,7 +84,7 @@ module.exports = {
         simple    : { type: String, default: 'a' }
       , callback  : { type: Number, default: function(){
           this.a.should.eql('b');
-          return 'b';
+          return '3';
         }}
     });
 
@@ -92,7 +92,7 @@ module.exports = {
     Test.path('callback').defaultValue.should.be.a('function');
 
     Test.path('simple').getDefault().should.eql('a');
-    Test.path('callback').getDefault({ a: 'b' }).should.eql('b');
+    (+Test.path('callback').getDefault({ a: 'b' })).should.eql(3);
   },
 
   'test string required validation': function(){

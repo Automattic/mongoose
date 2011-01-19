@@ -403,7 +403,7 @@ module.exports = {
       threw = true;
     }
 
-    threw.should.be.false;
+    threw.should.be.true;
 
     post.save(function(err){
       err.should.be.an.instanceof(MongooseError);

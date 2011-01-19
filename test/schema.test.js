@@ -492,12 +492,7 @@ module.exports = {
     Tobi.path('name').applySetters('WHAT', { a: 'b' }).should.eql('what');
   },
 
-  'test applying setter(s)': function(){
-
-  },
-
   'test defining a getter': function(){
-
   },
 
   'test defining pre hooks': function(){

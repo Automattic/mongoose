@@ -608,21 +608,21 @@ module.exports = {
 
     var post = new TestDefaults();
     post.get('date').should.be.an.instanceof(Date);
-    +post.get('date').should.eql(now);
+    (+post.get('date')).should.eql(now);
     db.close();
   },
 
   'test nested defaults application': function(){
     var now = Date.now();
 
-    mongoose.model('TestDefaults', new Schema({
+    mongoose.model('TestNestedDefaults', new Schema({
         nested: {
             date: { type: Date, default: now }
         }
     }));
 
     var db = start()
-      , TestDefaults = db.model('TestDefaults');
+      , TestDefaults = db.model('TestNestedDefaults');
 
     var post = new TestDefaults();
     post.get('nested.date').should.be.an.instanceof(Date);

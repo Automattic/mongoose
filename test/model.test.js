@@ -108,7 +108,8 @@ module.exports = {
       , BlogPost = db.model('BlogPost');
 
     var post = new BlogPost();
-    post.save(function(){
+    post.save(function(err){
+      should.strictEqual(err, null);
       post.get('_id').should.be.an.instanceof(DocumentObjectId);
 
       should.strictEqual(post.get('title'), null);

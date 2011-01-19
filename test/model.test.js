@@ -126,8 +126,8 @@ module.exports = {
 
       post.get('owners').should.be.an.instanceof(MongooseArray);
       post.get('comments').should.be.an.instanceof(DocumentArray);
+      db.close();
     });
-    db.close();
   },
 
   'test a model structure when initd': function(){

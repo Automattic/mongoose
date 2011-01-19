@@ -83,30 +83,16 @@ module.exports = {
     var Test = new Schema({
         simple    : { type: String, default: 'a' }
       , callback  : { type: Number, default: function(){
-          return 'b';
-        }}
-      , async     : { type: String, default: function(fn){
-          process.nextTick(function(){
-            fn(null, 'c');
-          });
+          this.a.should.eql('b');
+          return '3';
         }}
     });
 
     Test.path('simple').defaultValue.should.eql('a');
     Test.path('callback').defaultValue.should.be.a('function');
-    Test.path('async').defaultValue.should.be.a('function');
 
-    Test.path('simple').getDefault(function(err, value){
-      value.should.eql('a');
-    });
-
-    Test.path('callback').getDefault(function(err, value){
-      value.should.eql('b');
-    });
-
-    Test.path('async').getDefault(function(err, value){
-      value.should.eql('c');
-    });
+    Test.path('simple').getDefault().should.eql('a');
+    (+Test.path('callback').getDefault({ a: 'b' })).should.eql(3);
   },
 
   'test string required validation': function(){

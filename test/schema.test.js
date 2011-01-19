@@ -571,4 +571,20 @@ module.exports = {
     Tobi.callQueue.should.have.length(3);
   },
 
+  'test applying setters when none have been defined': function(){
+    var Tobi = new Schema({
+        name: String
+    });
+
+    Tobi.path('name').applySetters('woot').should.eql('woot');
+  },
+
+  'test applying getters when none have been defined': function(){
+    var Tobi = new Schema({
+        name: String
+    });
+
+    Tobi.path('name').applyGetters('woot').should.eql('woot');
+  }
+
 };

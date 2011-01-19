@@ -386,12 +386,35 @@ module.exports = {
     Animal.path('isFerret').cast('1').should.be.true;
   },
 
-  'test async validators': function(){
+  'test async validators': function(beforeExit){
+    var executed = 0;
+    
+    function validator (value, fn) {
+      setTimeout(function(){
+        executed++;
+        fn(value === true);
+      }, 50);
+    };
 
+    var Animal = new Schema({
+        ferret: { type: Boolean, validate: validator }
+    });
+
+    Animal.path('ferret').doValidate(true, function(err){
+      should.strictEqual(err, null);
+    });
+
+    Animal.path('ferret').doValidate(false, function(err){
+      err.should.be.an.instanceof(Error);
+    });
+
+    beforeExit(function(){
+      executed.should.eql(2);
+    });
   },
 
   'test declaring a new method': function(){
-
+    
   },
 
   'test declaring a new static': function(){

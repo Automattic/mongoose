@@ -471,12 +471,14 @@ module.exports = {
     });
 
     Tobi.path('name').applySetters('WOOT').should.eql('woot');
+    Tobi.path('name').setters.should.have.length(1);
 
     Tobi.path('name').set(function(v){
       return v + 'WOOT';
     });
 
     Tobi.path('name').applySetters('WOOT').should.eql('wootwoot');
+    Tobi.path('name').setters.should.have.length(2);
   },
 
   'test setters scope': function(){
@@ -556,12 +558,17 @@ module.exports = {
     Tobi.path('name').applyGetters('woot').should.eql('last');
   },
 
-  'test defining pre hooks': function(){
+  'test hooks registration': function(){
+    var Tobi = new Schema();
 
+    Tobi.pre('save', function(){});
+    Tobi.callQueue.should.have.length(1);
+
+    Tobi.post('save', function(){});
+    Tobi.callQueue.should.have.length(2);
+
+    Tobi.pre('save', function(){});
+    Tobi.callQueue.should.have.length(3);
   },
-
-  'test defining post hooks': function(){
-
-  }
 
 };

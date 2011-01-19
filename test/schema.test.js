@@ -438,15 +438,61 @@ module.exports = {
     });
   },
 
-  'test declaring a new method': function(){
-    
+  'test declaring new methods': function(){
+    var a = new Schema();
+    a.method('test', function(){});
+    a.methods({
+        a: function(){}
+      , b: function(){}
+    });
+
+    Object.keys(a._methods).should.have.length(3);
   },
 
-  'test declaring a new static': function(){
+  'test declaring new statics': function(){
+    var a = new Schema();
+    a.static('test', function(){});
+    a.statics({
+        a: function(){}
+      , b: function(){}
+      , c: function(){}
+    });
 
+    Object.keys(a._statics).should.have.length(4);
   },
 
-  'test defining a setter': function(){
+  'test setter(s)': function(){
+    function lowercase (v) {
+      return v.toLowerCase();
+    };
+
+    var Tobi = new Schema({
+        name: { type: String, set: lowercase }
+    });
+
+    Tobi.path('name').applySetters('WOOT').should.eql('woot');
+
+    Tobi.path('name').set(function(v){
+      return v + 'WOOT';
+    });
+
+    Tobi.path('name').applySetters('WOOT').should.eql('wootwoot');
+  },
+
+  'test setters scope': function(){
+    function lowercase (v) {
+      this.a.should.eql('b');
+      return v.toLowerCase();
+    };
+
+    var Tobi = new Schema({
+        name: { type: String, set: lowercase }
+    });
+
+    Tobi.path('name').applySetters('WHAT', { a: 'b' }).should.eql('what');
+  },
+
+  'test applying setter(s)': function(){
 
   },
 

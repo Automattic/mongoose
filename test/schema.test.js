@@ -537,6 +537,25 @@ module.exports = {
     Tobi.path('name').applySetters('woot').should.eql('last');
   },
 
+  'test getters casting': function(){
+    function last (v) {
+      v.should.be.a('string');
+      v.should.eql('0');
+      return 'last';
+    };
+
+    function first (v) {
+      return 0;
+    };
+    
+    var Tobi = new Schema({
+        name: { type: String, get: last }
+    });
+
+    Tobi.path('name').get(first);
+    Tobi.path('name').applyGetters('woot').should.eql('last');
+  },
+
   'test defining pre hooks': function(){
 
   },

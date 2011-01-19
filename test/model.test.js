@@ -197,10 +197,6 @@ module.exports = {
     db.close();
   },
 
-  'test adding a subdocument with native methods': function(){
-
-  },
-
   'test isNew on embedded documents after initing': function(){
     var db = start()
       , BlogPost = db.model('BlogPost');
@@ -649,26 +645,6 @@ module.exports = {
     post.get('items')[0].get('date').should.be.an.instanceof(Date);
     (+post.get('items')[0].get('date')).should.eql(now);
     db.close();
-  },
-
-  'test middleware (serial)': function(){
-    
-  },
-
-  'test middleware (parallel)': function(){
-
-  },
-
-  'test middleware (serial and parallel)': function(){
-
-  },
-
-  'test middleware errors (serial)': function(){
-
-  },
-
-  'test middleware errors (parallel)': function(){
-
   }
 
 };

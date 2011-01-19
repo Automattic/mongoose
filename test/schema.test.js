@@ -386,19 +386,113 @@ module.exports = {
     Animal.path('isFerret').cast('1').should.be.true;
   },
 
-  'test async validators': function(){
+  'test async validators': function(beforeExit){
+    var executed = 0;
+    
+    function validator (value, fn) {
+      setTimeout(function(){
+        executed++;
+        fn(value === true);
+      }, 50);
+    };
 
+    var Animal = new Schema({
+        ferret: { type: Boolean, validate: validator }
+    });
+
+    Animal.path('ferret').doValidate(true, function(err){
+      should.strictEqual(err, null);
+    });
+
+    Animal.path('ferret').doValidate(false, function(err){
+      err.should.be.an.instanceof(Error);
+    });
+
+    beforeExit(function(){
+      executed.should.eql(2);
+    });
   },
 
-  'test declaring a new method': function(){
+  'test async validators scope': function(beforeExit){
+    var executed = false;
+    
+    function validator (value, fn) {
+      this.a.should.eql('b');
 
+      setTimeout(function(){
+        executed = true;
+        fn(true);
+      }, 50);
+    };
+
+    var Animal = new Schema({
+        ferret: { type: Boolean, validate: validator }
+    });
+
+    Animal.path('ferret').doValidate(true, function(err){
+      should.strictEqual(err, null);
+    }, { a: 'b' });
+
+    beforeExit(function(){
+      executed.should.be.true;
+    });
   },
 
-  'test declaring a new static': function(){
+  'test declaring new methods': function(){
+    var a = new Schema();
+    a.method('test', function(){});
+    a.methods({
+        a: function(){}
+      , b: function(){}
+    });
 
+    Object.keys(a._methods).should.have.length(3);
   },
 
-  'test defining a setter': function(){
+  'test declaring new statics': function(){
+    var a = new Schema();
+    a.static('test', function(){});
+    a.statics({
+        a: function(){}
+      , b: function(){}
+      , c: function(){}
+    });
+
+    Object.keys(a._statics).should.have.length(4);
+  },
+
+  'test setter(s)': function(){
+    function lowercase (v) {
+      return v.toLowerCase();
+    };
+
+    var Tobi = new Schema({
+        name: { type: String, set: lowercase }
+    });
+
+    Tobi.path('name').applySetters('WOOT').should.eql('woot');
+
+    Tobi.path('name').set(function(v){
+      return v + 'WOOT';
+    });
+
+    Tobi.path('name').applySetters('WOOT').should.eql('wootwoot');
+  },
+
+  'test setters scope': function(){
+    function lowercase (v) {
+      this.a.should.eql('b');
+      return v.toLowerCase();
+    };
+
+    var Tobi = new Schema({
+        name: { type: String, set: lowercase }
+    });
+
+    Tobi.path('name').applySetters('WHAT', { a: 'b' }).should.eql('what');
+  },
+
+  'test applying setter(s)': function(){
 
   },
 

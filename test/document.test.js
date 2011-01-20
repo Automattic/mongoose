@@ -262,6 +262,23 @@ module.exports = {
     });
   },
 
+  'test hooks system erros from last serial hook': function(){
+    var doc = new TestDocument()
+      , called = false;
+
+    doc.pre('hooksTest', function(next){
+      next(new Error());
+    });
+
+    doc.hooksTest(function(err){
+      err.should.be.an.instanceof(Error);
+    });
+
+    beforeExit(function(){
+      called.should.be.true;
+    });
+  },
+
   'test hooks system errors from a parallel hook': function(beforeExit){
     var doc = new TestDocument()
       , steps = 0

@@ -597,6 +597,20 @@ module.exports = {
     Tobi.path('name').index({ unique: true });
 
     Tobi.path('name')._index.should.eql({ unique: true });
+  },
+  
+  'test defining compound indexes': function(){
+    var Tobi = new Schema({
+        name: { type: String, index: true }
+      , last: { type: Number }
+    });
+
+    Tobi.index({ firstname: 1, last: 1 }, { unique: true });
+
+    Tobi.indexes.should.eql([
+        [{ name: 1 }, {}]
+      , [{ firstname: 1, last: 1}, {unique: true}]
+    ]);
   }
 
 };

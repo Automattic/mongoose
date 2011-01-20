@@ -10,7 +10,7 @@ var start = require('./common')
   , Schema = mongoose.Schema
   , SchemaType = mongoose.SchemaType
   , CastError = SchemaType.CastError
-  , ValidationError = SchemaType.ValidationError
+  , ValidatorError = SchemaType.ValidatorError
   , ObjectId = Schema.ObjectId
   , DocumentObjectId = mongoose.Types.ObjectId
   , DocumentArray = mongoose.Types.DocumentArray
@@ -422,7 +422,7 @@ module.exports = {
 
     post.save(function(err){
       err.should.be.an.instanceof(MongooseError);
-      err.should.be.an.instanceof(ValidationError);
+      err.should.be.an.instanceof(ValidatorError);
 
       post.set('simple', 'here');
       post.save(function(err){
@@ -446,7 +446,7 @@ module.exports = {
 
     post.save(function(err){
       err.should.be.an.instanceof(MongooseError);
-      err.should.be.an.instanceof(ValidationError);
+      err.should.be.an.instanceof(ValidatorError);
 
       post.set('nested.required', 'here');
       post.save(function(err){
@@ -474,7 +474,7 @@ module.exports = {
 
     post.save(function(err){
       err.should.be.an.instanceof(MongooseError);
-      err.should.be.an.instanceof(ValidationError);
+      err.should.be.an.instanceof(ValidatorError);
 
       post.get('items')[0].set('required', true);
       post.save(function(err){
@@ -505,7 +505,7 @@ module.exports = {
 
     post.save(function(err){
       err.should.be.an.instanceof(MongooseError);
-      err.should.be.an.instanceof(ValidationError);
+      err.should.be.an.instanceof(ValidatorError);
       executed.should.be.true;
       executed = false;
 
@@ -542,7 +542,7 @@ module.exports = {
 
     post.save(function(err){
       err.should.be.an.instanceof(MongooseError);
-      err.should.be.an.instanceof(ValidationError);
+      err.should.be.an.instanceof(ValidatorError);
       executed.should.be.true;
       executed = false;
 
@@ -582,7 +582,7 @@ module.exports = {
 
     post.save(function(err){
       err.should.be.an.instanceof(MongooseError);
-      err.should.be.an.instanceof(ValidationError);
+      err.should.be.an.instanceof(ValidatorError);
       executed.should.be.true;
       executed = false;
 

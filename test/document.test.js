@@ -7,7 +7,9 @@ var start = require('./common')
   , should = require('should')
   , mongoose = start.mongoose
   , Schema = mongoose.Schema
-  , Document = require('mongoose/document');
+  , ObjectId = Schema.ObjectId
+  , Document = require('mongoose/document')
+  , DocumentObjectId = mongoose.Types.ObjectId;
 
 /**
  * Test Document constructor.
@@ -27,7 +29,14 @@ TestDocument.prototype.__proto__ = Document.prototype;
  * Set a dummy schema to simulate compilation.
  */
 
-TestDocument.prototype.schema = new Schema();
+TestDocument.prototype.schema = new Schema({
+    test    : String
+  , oids    : [ObjectId]
+  , nested  : {
+        age   : Number
+      , cool  : ObjectId
+    }
+});
 
 /**
  * Method subject to hooks. Simply fires the callback once the hooks are
@@ -49,6 +58,32 @@ Document.registerHooks.call(TestDocument, 'hooksTest');
  */
 
 module.exports = {
+
+  'test toObject clone': function(){
+    var doc = new TestDocument();
+    doc.init({
+        test    : 'test'
+      , oids    : []
+      , nested  : {
+            age   : 5
+          , cool  : new DocumentObjectId
+        }
+    });
+
+    var copy = doc.toObject();
+
+    copy.test._marked = true;
+    copy.oids._marked = true;
+    copy.nested._marked = true;
+    copy.nested.age._marked = true;
+    copy.nested.cool._marked = true;
+
+    should.strictEqual(doc.doc.test._marked, undefined);
+    should.strictEqual(doc.doc.oids._marked, undefined);
+    should.strictEqual(doc.doc.nested._marked, undefined);
+    should.strictEqual(doc.doc.nested.age._marked, undefined);
+    should.strictEqual(doc.doc.nested.cool._marked, undefined);
+  },
 
   'test hooks system': function(beforeExit){
     var doc = new TestDocument()

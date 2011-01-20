@@ -108,7 +108,8 @@ module.exports = {
       , BlogPost = db.model('BlogPost');
 
     var post = new BlogPost();
-    post.save(function(){
+    post.save(function(err){
+      should.strictEqual(err, null);
       post.get('_id').should.be.an.instanceof(DocumentObjectId);
 
       should.strictEqual(post.get('title'), null);
@@ -125,8 +126,8 @@ module.exports = {
 
       post.get('owners').should.be.an.instanceof(MongooseArray);
       post.get('comments').should.be.an.instanceof(DocumentArray);
+      db.close();
     });
-    db.close();
   },
 
   'test a model structure when initd': function(){
@@ -399,7 +400,7 @@ module.exports = {
       threw = true;
     }
 
-    threw.should.be.true;
+    threw.should.be.false;
 
     post.save(function(err){
       err.should.be.an.instanceof(MongooseError);
@@ -489,17 +490,18 @@ module.exports = {
     function validator(v, fn){
       setTimeout(function () {
         executed = true;
-        fn(v !== '');
+        fn(v !== 'test');
       }, 50);
     };
     mongoose.model('TestAsyncValidation', new Schema({
-        async: { type: Date, validate: [validator, 'async validator'] }
+        async: { type: String, validate: [validator, 'async validator'] }
     }));
 
     var db = start()
       , TestAsyncValidation = db.model('TestAsyncValidation');
 
     var post = new TestAsyncValidation();
+    post.set('async', 'test');
 
     post.save(function(err){
       err.should.be.an.instanceof(MongooseError);
@@ -507,7 +509,7 @@ module.exports = {
       executed.should.be.true;
       executed = false;
 
-      post.set('async', new Date);
+      post.set('async', 'woot');
       post.save(function(err){
         executed.should.be.true;
         should.strictEqual(err, null);
@@ -519,16 +521,16 @@ module.exports = {
   'test nested async validation': function(){
     var executed = false;
 
-    function validator(fn){
-      setTimeout(function (v, fn) {
+    function validator(v, fn){
+      setTimeout(function () {
         executed = true;
-        fn(v !== '');
+        fn(v !== 'test');
       }, 50);
     };
     
     mongoose.model('TestNestedAsyncValidation', new Schema({
         nested: {
-            async: { type: Date, validate: [validator, 'async validator'] }
+            async: { type: String, validate: [validator, 'async validator'] }
         }
     }));
 
@@ -536,6 +538,7 @@ module.exports = {
       , TestNestedAsyncValidation = db.model('TestNestedAsyncValidation');
 
     var post = new TestNestedAsyncValidation();
+    post.set('nested.async', 'test');
 
     post.save(function(err){
       err.should.be.an.instanceof(MongooseError);
@@ -543,7 +546,7 @@ module.exports = {
       executed.should.be.true;
       executed = false;
 
-      post.set('nested.async', new Date);
+      post.set('nested.async', 'woot');
       post.save(function(err){
         executed.should.be.true;
         should.strictEqual(err, null);

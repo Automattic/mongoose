@@ -262,7 +262,7 @@ module.exports = {
     });
   },
 
-  'test hooks system erros from last serial hook': function(){
+  'test hooks system erros from last serial hook': function(beforeExit){
     var doc = new TestDocument()
       , called = false;
 
@@ -272,6 +272,26 @@ module.exports = {
 
     doc.hooksTest(function(err){
       err.should.be.an.instanceof(Error);
+      called = true;
+    });
+
+    beforeExit(function(){
+      called.should.be.true;
+    });
+  },
+
+  'test that passing something that is not an error is ignored':
+  function(beforeExit){
+    var doc = new TestDocument()
+      , called = false;
+
+    doc.pre('hooksTest', function(next){
+      next(true);
+    });
+
+    doc.hooksTest(function(err){
+      should.strictEqual(err, null);
+      called = true;
     });
 
     beforeExit(function(){

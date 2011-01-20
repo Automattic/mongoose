@@ -443,6 +443,7 @@ module.exports = {
       , TestNestedValidation = db.model('TestNestedValidation');
 
     var post = new TestNestedValidation();
+    post.set('nested.required', null);
 
     post.save(function(err){
       err.should.be.an.instanceof(MongooseError);

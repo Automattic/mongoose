@@ -1,4 +1,4 @@
-var ActiveRoster = require('mongoose/statemachine').ctor('require', 'init', 'modify')
+var ActiveRoster = require('mongoose/utils').StateMachine.ctor('require', 'init', 'modify')
   , should = require('should')
 
 module.exports = {

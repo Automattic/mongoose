@@ -4,6 +4,7 @@ test:
 		-I lib \
 		-I support \
 		-I support/should.js/lib \
+		-I support/cli-table/lib \
 		$(TESTFLAGS) \
 		test/*.test.js
 

@@ -5,12 +5,58 @@
 
 var mongoose = require('mongoose')
   , should = require('should')
+  , Table = require('cli-table')
   , Mongoose = mongoose.Mongoose
+  , Collection = mongoose.Collection
   , Assertion = should.Assertion
   , startTime = Date.now()
   , queryCount = 0
-  , connections = 0
-  , disconnections = 0;
+  , opened = 0
+  , closed = 0;
+
+/**
+ * Override all Collection related queries to keep count
+ */
+
+[   'ensureIndex'
+  , 'findAndModify'
+  , 'findOne'
+  , 'find'
+  , 'insert'
+  , 'save'
+  , 'update'
+].forEach(function (method) {
+
+  var oldMethod = Collection.prototype[method];
+
+  Collection.prototype[method] = function () {
+    queryCount++;
+    return oldMethod.apply(this, arguments);
+  };
+
+});
+
+/**
+ * Override Collection#onOpen to keep track of connections
+ */
+
+var oldOnOpen = Collection.prototype.onOpen;
+
+Collection.prototype.onOpen = function(){
+  opened++;
+  return oldOnOpen.apply(this, arguments);
+};
+
+/**
+ * Override Collection#onClose to keep track of disconnections
+ */
+
+var oldOnClose = Collection.prototype.onClose;
+
+Collection.prototype.onClose = function(){
+  closed++;
+  return oldOnClose.apply(this, arguments);
+};
 
 /**
  * Assert that a connection is open or that mongoose connections are open.
@@ -65,12 +111,21 @@ module.exports = function(){
  * Provide stats for tests
  */
 
-//process.on('beforeExit', function(){
-  //console.log('Queries run', queryCount);
-  //console.log('Time ellapsed', Date.now() - startTime);
-  //console.log('Connections opened', connections);
-  //console.log('Connections closed', closed);
-//});
+process.on('beforeExit', function(){
+  var table = new Table({
+      head: ['Stat', 'Time (ms)']
+    , colWidths: [23, 15]
+  });
+
+  table.push(
+      ['Queries run', queryCount]
+    , ['Time ellapsed', Date.now() - startTime]
+    , ['Connections opened', opened]
+    , ['Connections closed', closed]
+  );
+
+  console.log(table.toString());
+});
 
 /**
  * Module exports.

@@ -1,0 +1,11 @@
+{   "name": "cli-table"
+  , "description": "Pretty unicode tables for the CLI"
+  , "version": "0.0.1"
+  , "author": "Guillermo Rauch <guillermo@learnboost.com>"
+  , "keywords": ["cli", "colors", "table"]
+  , "dependencies": {
+      "colors": "0.3.0"
+  }
+  , "main": "./index.js"
+  , "engines": { "node": ">= 0.2.0" }
+}

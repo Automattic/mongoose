@@ -63,11 +63,11 @@ module.exports = {
     });
 
     var Person = new Schema({
-        name      :       String
-      , raccoons  :   [Racoon]
-      , location  :    {
-            city  :   String
-          , state :  String
+        name      : String
+      , raccoons  : [Racoon]
+      , location  : {
+            city  : String
+          , state : String
         }
     });
 
@@ -585,6 +585,32 @@ module.exports = {
     });
 
     Tobi.path('name').applyGetters('woot').should.eql('woot');
+  },
+
+  'test defining an index': function(){
+    var Tobi = new Schema({
+        name: { type: String, index: true }
+    });
+
+    Tobi.path('name')._index.should.be.true;
+
+    Tobi.path('name').index({ unique: true });
+
+    Tobi.path('name')._index.should.eql({ unique: true });
+  },
+  
+  'test defining compound indexes': function(){
+    var Tobi = new Schema({
+        name: { type: String, index: true }
+      , last: { type: Number }
+    });
+
+    Tobi.index({ firstname: 1, last: 1 }, { unique: true });
+
+    Tobi.indexes.should.eql([
+        [{ name: 1 }, {}]
+      , [{ firstname: 1, last: 1}, {unique: true}]
+    ]);
   }
 
 };

@@ -649,6 +649,40 @@ module.exports = {
     post.get('items')[0].get('date').should.be.an.instanceof(Date);
     (+post.get('items')[0].get('date')).should.eql(now);
     db.close();
+  },
+  
+  // TODO: adapt this text to handle a getIndexes callback that's not unique to
+  // the mongodb-native driver.
+  'test that indexes are ensured when the model is compiled': function(){
+    var Indexed = new Schema({
+        name  : { type: String, index: true }
+      , last  : String
+      , email : String
+    });
+
+    Indexed.index({ last: 1, email: 1 }, { unique: true });
+
+    mongoose.model('IndexedModel', Indexed);
+
+    var db = start()
+      , IndexedModel = db.model('IndexedModel', 'indexedmodel' + random())
+      , assertions = 0;
+
+    IndexedModel.on('index', function(){
+      IndexedModel.collection.getIndexes(function(err, indexes){
+        for (var i in indexes)
+          indexes[i].forEach(function(index){
+            if (index[0] == 'name')
+              assertions++;
+            if (index[0] == 'last')
+              assertions++;
+            if (index[0] == 'email')
+              assertions++;
+          });
+        assertions.should.eql(3);
+        db.close();
+      });
+    });
   }
 
 };

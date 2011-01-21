@@ -81,14 +81,14 @@ module.exports = {
     });
 
     doc.test.should.eql('test');
-    doc.oids.should.be.a('array');
-    doc.nested.age.should.eql(5);
-    DocumentObjectId.tostring(doc.nested.cool).should.eql('4c6c2d6240ced95d0e00003c');
+    doc.oids.should.be.an.instanceof(Array);
+    (doc.nested.age == 5).should.be.true;
+    DocumentObjectId.toString(doc.nested.cool).should.eql('4c6c2d6240ced95d0e00003c');
 
     doc2.test.should.eql('toop');
-    doc2.oids.should.be.a('array');
-    doc2.nested.age.should.eql(2);
-    DocumentObjectId.tostring(doc2.nested.cool).should.eql('4cf70857337498f95900001c');
+    doc2.oids.should.be.an.instanceof(Array);
+    (doc2.nested.age == 2).should.be.true;
+    DocumentObjectId.toString(doc2.nested.cool).should.eql('4cf70857337498f95900001c');
 
     doc.oids.should.not.equal(doc2.oids);
   },

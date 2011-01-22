@@ -736,13 +736,85 @@ module.exports = {
       };
 
       function complete () {
-        BlogPost.findOne({ _id: post.get('_Id') }, function (err, doc) {
+        BlogPost.findOne({ _id: post.get('_id') }, function (err, doc) {
           if (err) throw err;
           (doc.get('meta.visitors') == 9).should.be.true;
+          db.close();
         });
       };
-
     });
   },
+
+  'test saving subdocuments atomically': function () {
+    var db = start()
+      , BlogPost = db.model('BlogPost');
+    
+    var post = new BlogPost();
+
+    post.save(function(err){
+      if (err) throw err;
+
+      BlogPost.findOne({ _id: post.get('_id') }, function(err, doc){
+        if (err) throw err;
+        doc.get('comments').push({ title: '1' });
+        save(doc);
+      });
+
+      BlogPost.findOne({ _id: post.get('_id') }, function(err, doc){
+        if (err) throw err;
+        doc.get('comments').push({ title: '2' });
+        save(doc);
+      });
+
+      BlogPost.findOne({ _id: post.get('_id') }, function(err, doc){
+        if (err) throw err;
+        doc.get('comments').push({ title: '3' });
+        save(doc);
+      });
+
+      BlogPost.findOne({ _id: post.get('_id') }, function(err, doc){
+        if (err) throw err;
+        doc.get('comments').push({ title: '4' });
+        save(doc);
+      });
+
+      function save(doc) {
+        saveQueue.push(doc);
+        if (saveQueue.length == 4)
+          saveQueue.forEach(function (doc) {
+            doc.save(function (err) {
+              if (err) throw err;
+              --totalDocs || complete();
+            });
+          });
+      };
+
+      function complete () {
+        BlogPost.findOne({ _id: post.get('_id') }, function (err, doc) {
+          if (err) throw err;
+
+          doc.get('comments').length.should.eql(4);
+
+          doc.get('comments').some(function(comment){
+            return comment.get('title') == '1';
+          }).should.be.true;
+
+          doc.get('comments').some(function(comment){
+            return comment.get('title') == '2';
+          }).should.be.true;
+
+          doc.get('comments').some(function(comment){
+            return comment.get('title') == '3';
+          }).should.be.true;
+
+          doc.get('comments').some(function(comment){
+            return comment.get('title') == '4';
+          }).should.be.true;
+
+          db.close();
+        });
+      };
+    });
+  }
 
 };

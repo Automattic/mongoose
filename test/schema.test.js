@@ -611,6 +611,20 @@ module.exports = {
         [{ name: 1 }, {}]
       , [{ firstname: 1, last: 1}, {unique: true}]
     ]);
+  },
+
+  'test plugins': function (beforeExit) {
+    var Tobi = new Schema()
+      , called = false;
+
+    Tobi.plugin(function(schema){
+      schema.should.equal(Tobi);
+      called = true;
+    });
+
+    beforeExit(function () {
+      called.should.be.true;
+    });
   }
 
 };

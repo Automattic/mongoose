@@ -159,13 +159,29 @@ module.exports = {
     post.get('meta').visitors.should.be.an.instanceof(MongooseNumber);
     post.get('published').should.be.true;
 
+    post.title.should.eql('Test');
+    post.slug.should.eql('test');
+    post.date.should.be.an.instanceof(Date);
+    post.meta.should.be.a('object');
+    post.meta.date.should.be.an.instanceof(Date);
+    post.meta.visitors.should.be.an.instanceof(MongooseNumber);
+    post.published.should.be.true;
+
     post.get('owners').should.be.an.instanceof(MongooseArray);
     post.get('owners')[0].should.be.an.instanceof(DocumentObjectId);
     post.get('owners')[1].should.be.an.instanceof(DocumentObjectId);
 
+    post.owners.should.be.an.instanceof(MongooseArray);
+    post.owners[0].should.be.an.instanceof(DocumentObjectId);
+    post.owners[1].should.be.an.instanceof(DocumentObjectId);
+
     post.get('comments').should.be.an.instanceof(DocumentArray);
     post.get('comments')[0].should.be.an.instanceof(EmbeddedDocument);
     post.get('comments')[1].should.be.an.instanceof(EmbeddedDocument);
+
+    post.comments.should.be.an.instanceof(DocumentArray);
+    post.comments[0].should.be.an.instanceof(EmbeddedDocument);
+    post.comments[1].should.be.an.instanceof(EmbeddedDocument);
 
     db.close();
   },

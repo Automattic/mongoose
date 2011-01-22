@@ -683,6 +683,66 @@ module.exports = {
         db.close();
       });
     });
-  }
+  },
+
+  'test updating numbers atomically': function () {
+    var db = start()
+      , BlogPost = db.model('BlogPost')
+      , totalDocs = 4
+      , saveQueue = [];
+
+    var post = new BlogPost();
+
+    post.save(function(err){
+      if (err) throw err;
+
+      BlogPost.findOne({ _id: post.get('_id') }, function(err, doc){
+        if (err) throw err;
+        doc.get('meta.visitors').increment();
+        (doc.get('meta.visitors') == 6).should.be.true;
+        save(doc);
+      });
+
+      BlogPost.findOne({ _id: post.get('_id') }, function(err, doc){
+        if (err) throw err;
+        doc.get('meta.visitors').increment();
+        (doc.get('meta.visitors') == 6).should.be.true;
+        save(doc);
+      });
+
+      BlogPost.findOne({ _id: post.get('_id') }, function(err, doc){
+        if (err) throw err;
+        doc.get('meta.visitors').increment();
+        (doc.get('meta.visitors') == 6).should.be.true;
+        save(doc);
+      });
+
+      BlogPost.findOne({ _id: post.get('_id') }, function(err, doc){
+        if (err) throw err;
+        doc.get('meta.visitors').increment();
+        (doc.get('meta.visitors') == 6).should.be.true;
+        save(doc);
+      });
+
+      function save(doc) {
+        saveQueue.push(doc);
+        if (saveQueue.length == 4)
+          saveQueue.forEach(function (doc) {
+            doc.save(function (err) {
+              if (err) throw err;
+              --totalDocs || complete();
+            });
+          });
+      };
+
+      function complete () {
+        BlogPost.findOne({ _id: post.get('_Id') }, function (err, doc) {
+          if (err) throw err;
+          (doc.get('meta.visitors') == 9).should.be.true;
+        });
+      };
+
+    });
+  },
 
 };

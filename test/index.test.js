@@ -49,7 +49,8 @@ module.exports = {
 
   'test declaring global plugins': function (beforeExit) {
     var mong = new Mongoose()
-      , schema = new Schema();
+      , schema = new Schema()
+      , called = 0;
 
     mong.plugin(function (s) {
       s.should.equal(schema);
@@ -61,7 +62,7 @@ module.exports = {
       called++;
     });
 
-    Mongoose.model('GlobalPlugins', schema);
+    mong.model('GlobalPlugins', schema);
 
     beforeExit(function () {
       called.should.eql(2);

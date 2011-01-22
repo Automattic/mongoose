@@ -59,7 +59,7 @@ Document.registerHooks.call(TestDocument, 'hooksTest');
 
 module.exports = {
   
-  'test shortcut setters/getters': function(){
+  'test shortcut getters': function(){
     var doc = new TestDocument();
     doc.init({
         test    : 'test'
@@ -91,6 +91,27 @@ module.exports = {
     DocumentObjectId.toString(doc2.nested.cool).should.eql('4cf70857337498f95900001c');
 
     doc.oids.should.not.equal(doc2.oids);
+  },
+
+  'test shortcut setters': function () {
+    var doc = new TestDocument();
+
+    doc.init({
+        test    : 'Test'
+      , nested  : {
+            age   : 5
+        }
+    });
+
+    doc.isModified('test').should.be.false;
+    doc.test = 'Woot';
+    doc.test.should.eql('Woot');
+    doc.isModified('test').should.be.true;
+
+    doc.isModified('nested.age').should.be.false;
+    doc.nested.age = 2;
+    (doc.nested.age == 2).should.be.true;
+    doc.isModified('nested.age').should.be.true;
   },
 
   'test accessor of id': function () {

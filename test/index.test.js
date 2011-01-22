@@ -1,10 +1,12 @@
 
 var start = require('./common')
-  , mongoose = start.mongoose;
+  , mongoose = start.mongoose
+  , Mongoose = mongoose.Mongoose
+  , Schema = mongoose.Schema;
 
 module.exports = {
 
-  'try connecting to the demo database': function(beforeExit){
+  'test connecting to the demo database': function(beforeExit){
     var db = start()
       , connected = false;
 
@@ -18,7 +20,7 @@ module.exports = {
     });
   },
 
-  'try default connection': function(beforeExit){
+  'test default connection': function(beforeExit){
     var db = mongoose.connection
       , uri = 'mongodb://localhost/mongoose_test'
       , connected = false;
@@ -34,13 +36,36 @@ module.exports = {
     });
   },
 
-  'try setting options': function(){
+  'test setting options': function(){
+    var mongoose = new Mongoose();
+
     mongoose.set('a', 'b');
     mongoose.set('long option', 'c');
 
     mongoose.get('a').should.eql('b');
     mongoose.set('a').should.eql('b');
     mongoose.get('long option').should.eql('c');
+  },
+
+  'test declaring global plugins': function (beforeExit) {
+    var mong = new Mongoose()
+      , schema = new Schema();
+
+    mong.plugin(function (s) {
+      s.should.equal(schema);
+      called++;
+    });
+
+    schema.plugin(function (s) {
+      s.should.equal(schema);
+      called++;
+    });
+
+    Mongoose.model('GlobalPlugins', schema);
+
+    beforeExit(function () {
+      called.should.eql(2);
+    });
   }
 
 };

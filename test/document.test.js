@@ -93,6 +93,11 @@ module.exports = {
     doc.oids.should.not.equal(doc2.oids);
   },
 
+  'test accessor of id': function () {
+    var doc = new TestDocument();
+    doc._id.should.be.an.instanceof(DocumentObjectId);
+  },
+
   'test toObject clone': function(){
     var doc = new TestDocument();
     doc.init({

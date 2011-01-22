@@ -747,7 +747,9 @@ module.exports = {
 
   'test saving subdocuments atomically': function () {
     var db = start()
-      , BlogPost = db.model('BlogPost');
+      , BlogPost = db.model('BlogPost')
+      , totalDocs = 4
+      , saveQueue = [];
     
     var post = new BlogPost();
 

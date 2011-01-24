@@ -1042,6 +1042,26 @@ module.exports = {
     BlogPost.update({}, {}, {}, fn).executed.should.be.true;
 
     db.close();
-  }
+  },
+
+  'test finding a document': function () {
+    // findOne
+    var db = start()
+      , BlogPost = db.model('BlogPost')
+      , title = 'Wooooot ' + random();
+
+    var post = new BlogPost();
+    post.set('title', title);
+
+    post.save(function (err) {
+      should.strictEqual(err, null);
+
+      BlogPost.findOne({ title: title }, function (err, doc) {
+        should.strictEqual(err, null);
+        doc.get('title').should.eql(title);
+        doc.isNew.should.be.false;
+      });
+    });
+  },
 
 };

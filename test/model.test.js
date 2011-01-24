@@ -1011,7 +1011,35 @@ module.exports = {
     function fn () {};
 
     BlogPost.count({}, fn).should.be.an.instanceof(Query);
-    BlogPost.count({}, fn).executed.should.be.false;
+    BlogPost.count({}, fn).executed.should.be.true;
+
+    db.close();
+  },
+  
+  'test that update returns a Query': function () {
+    var db = start()
+      , BlogPost = db.model('BlogPost');
+
+    BlogPost.update({}, {}).should.be.an.instanceof(Query);
+    BlogPost.update({}, {}).executed.should.be.true;
+
+    BlogPost.update({}, {}, {}).should.be.an.instanceof(Query);
+    BlogPost.update({}, {}, {}).executed.should.be.true;
+
+    db.close();
+  },
+
+  'test that update Query executes when you pass a callback': function () {
+    var db = start()
+      , BlogPost = db.model('BlogPost');
+
+    function fn () {};
+
+    BlogPost.update({}, {}, fn).should.be.an.instanceof(Query);
+    BlogPost.update({}, {}, fn).executed.should.be.true;
+
+    BlogPost.update({}, {}, {}, fn).should.be.an.instanceof(Query);
+    BlogPost.update({}, {}, {}, fn).executed.should.be.true;
 
     db.close();
   }

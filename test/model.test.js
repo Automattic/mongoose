@@ -725,7 +725,7 @@ module.exports = {
     mongoose.model('TestMiddleware', schema);
 
     var db = start()
-      , TestMiddleware = new TestMiddleware();
+      , TestMiddleware = db.model('TestMiddleware');
 
     var test = new TestMiddleware();
 

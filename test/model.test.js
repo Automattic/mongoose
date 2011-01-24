@@ -1152,6 +1152,7 @@ module.exports = {
             should.strictEqual(err, null);
             
             count.should.eql(2);
+            db.close();
           });
         });
       });
@@ -1175,12 +1176,32 @@ module.exports = {
         should.strictEqual(err, null);
 
         doc.get('title').should.equal(title);
+        db.close();
       });
     });
   },
 
   'test update doc casting': function () {
+    var db = start()
+      , BlogPost = db.model('BlogPost');
 
+    var post = new BlogPost();
+    post.set('title', '1');
+
+    post.save(function (err) {
+      should.strictEqual(err, null);
+
+      BlogPost.update({ title: 1 }, { title: 2 }, function (err) {
+        should.strictEqual(err, null);
+
+        BlogPost.findOne({ _id: post.get('_id') }, function (err, doc) {
+          should.strictEqual(err, null);
+
+          doc.get('title').should.eql('2');
+          db.close();
+        });
+      });
+    });
   }
 
 };

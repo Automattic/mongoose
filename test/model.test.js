@@ -888,10 +888,10 @@ module.exports = {
       , BlogPost = db.model('BlogPost');
 
     BlogPost.update({}, {}).should.be.an.instanceof(Query);
-    BlogPost.update({}, {}).executed.should.be.true;
+    BlogPost.update({}, {}).executed.should.be.false;
 
     BlogPost.update({}, {}, {}).should.be.an.instanceof(Query);
-    BlogPost.update({}, {}, {}).executed.should.be.true;
+    BlogPost.update({}, {}, {}).executed.should.be.false;
 
     db.close();
   },

@@ -907,4 +907,29 @@ module.exports = {
     BlogPost.find({}, [], {}).executed.should.be.false;
   },
 
+  'test that findOne returns a Query': function () {
+    var db = start()
+      , BlogPost = db.model('BlogPost');
+    
+    // query
+    BlogPost.findOne({}).should.be.an.instanceof(Query);
+    BlogPost.findOne({}).executed.should.be.false;
+
+    // query, fields
+    BlogPost.findOne({}, {}).should.be.an.instanceof(Query);
+    BlogPost.findOne({}, {}).executed.should.be.false;
+
+    // query, fields (array)
+    BlogPost.findOne({}, []).should.be.an.instanceof(Query);
+    BlogPost.findOne({}, []).executed.should.be.false;
+
+    // query, fields, options
+    BlogPost.findOne({}, {}, {}).should.be.an.instanceof(Query);
+    BlogPost.findOne({}, {}, {}).executed.should.be.false;
+
+    // query, fields (array), options
+    BlogPost.findOne({}, [], {}).should.be.an.instanceof(Query);
+    BlogPost.findOne({}, [], {}).executed.should.be.false;
+  },
+
 };

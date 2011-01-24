@@ -1158,4 +1158,12 @@ module.exports = {
     });
   },
 
+  'test query casting': function () {
+    
+  },
+
+  'test update doc casting': function () {
+
+  }
+
 };

@@ -716,10 +716,12 @@ module.exports = {
     });
 
     schema.pre('save', function (next) {
+      called++;
       next(new Error('Error 101'));
     });
 
     schema.pre('remove', function (next) {
+      called++;
       next();
     });
 

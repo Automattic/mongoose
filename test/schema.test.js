@@ -631,7 +631,7 @@ module.exports = {
     var Tobi = new Schema();
 
     Tobi.options.should.be.a('object');
-    Tobi.options.safe.should.be.true;
+    Tobi.options.safe.should.be.false;
   },
 
   'test setting options': function () {

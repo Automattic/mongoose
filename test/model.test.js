@@ -1128,7 +1128,34 @@ module.exports = {
   },
 
   'test updating documents': function () {
+    var db = start()
+      , BlogPost = db.model('BlogPost')
+      , title = 'Tobi ' + random()
+      , newTitle = 'Woot ' + random();
 
-  }
+    var post = new BlogPost();
+    post.set('title', title);
+
+    post.save(function (err) {
+      should.strictEqual(err, null);
+
+      var post = new BlogPost();
+      post.set('title', title);
+
+      post.save(function (err) {
+        should.strictEqual(err, null);
+
+        BlogPost.update({ title: title }, { title: newTitle }, function (err) {
+          should.strictEqual(err, null);
+
+          BlogPost.count({ title: newTitle }, function (err, count) {
+            should.strictEqual(err, null);
+            
+            count.should.eql(2);
+          });
+        });
+      });
+    });
+  },
 
 };

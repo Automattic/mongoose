@@ -1045,7 +1045,6 @@ module.exports = {
   },
 
   'test finding a document': function () {
-    // findOne
     var db = start()
       , BlogPost = db.model('BlogPost')
       , title = 'Wooooot ' + random();
@@ -1067,7 +1066,6 @@ module.exports = {
   },
 
   'test finding documents': function () {
-    // find
     var db = start()
       , BlogPost = db.model('BlogPost')
       , title = 'Wooooot ' + random();
@@ -1101,7 +1099,32 @@ module.exports = {
   },
 
   'test counting documents': function () {
+    var db = start()
+      , BlogPost = db.model('BlogPost')
+      , title = 'Wooooot ' + random();
 
+    var post = new BlogPost();
+    post.set('title', title);
+
+    post.save(function (err) {
+      should.strictEqual(err, null);
+
+      var post = new BlogPost();
+      post.set('title', title);
+
+      post.save(function (err) {
+        should.strictEqual(err, null);
+
+        BlogPost.count({ title: title }, function (err, count) {
+          should.strictEqual(err, null);
+
+          count.should.be.a('number');
+          count.should.eql(2);
+
+          db.close();
+        });
+      });
+    });
   },
 
   'test updating documents': function () {

@@ -882,4 +882,29 @@ module.exports = {
     });
   },
 
+  'test that find returns a Query': function () {
+    var db = start()
+      , BlogPost = db.model('BlogPost');
+    
+    // query
+    BlogPost.find({}).should.be.an.instanceof(Query);
+    BlogPost.find({}).executed.should.be.false;
+
+    // query, fields
+    BlogPost.find({}, {}).should.be.an.instanceof(Query);
+    BlogPost.find({}, {}).executed.should.be.false;
+
+    // query, fields (array)
+    BlogPost.find({}, []).should.be.an.instanceof(Query);
+    BlogPost.find({}, []).executed.should.be.false;
+
+    // query, fields, options
+    BlogPost.find({}, {}, {}).should.be.an.instanceof(Query);
+    BlogPost.find({}, {}, {}).executed.should.be.false;
+
+    // query, fields (array), options
+    BlogPost.find({}, [], {}).should.be.an.instanceof(Query);
+    BlogPost.find({}, [], {}).executed.should.be.false;
+  },
+
 };

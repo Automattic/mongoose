@@ -625,6 +625,23 @@ module.exports = {
     beforeExit(function () {
       called.should.be.true;
     });
+  },
+
+  'test that default options are set': function () {
+    var Tobi = new Schema();
+
+    Tobi.options.should.be.a('object');
+    Tobi.options.safe.should.be.true;
+  },
+
+  'test setting options': function () {
+    var Tobi = new Schema();
+
+    Tobi.set('a', 'b');
+    Tobi.set('safe', false);
+
+    Tobi.options.a.should.eql('b');
+    Tobi.options.safe.should.be.false;
   }
 
 };

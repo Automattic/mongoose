@@ -1065,6 +1065,27 @@ module.exports = {
     });
   },
 
+  'test finding a document byId': function () {
+    var db = start()
+      , BlogPost = db.model('BlogPost')
+      , title = 'Edwald ' + random();
+
+    var post = new BlogPost();
+    post.set('title', title);
+
+    post.save(function (err) {
+      should.strictEqual(err, null);
+
+      BlogPost.findById(post.get('_id'), function (err, doc) {
+        should.strictEqual(err, null);
+        doc.should.be.an.instanceof(BlogPost);
+        doc.get('title').should.eql(title);
+
+        db.close();
+      });
+    });
+  },
+
   'test finding documents': function () {
     var db = start()
       , BlogPost = db.model('BlogPost')

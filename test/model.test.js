@@ -7,6 +7,7 @@ var start = require('./common')
   , should = require('should')
   , mongoose = start.mongoose
   , random = require('mongoose/utils').random
+  , Query = require('mongoose/query')
   , Schema = mongoose.Schema
   , SchemaType = mongoose.SchemaType
   , CastError = SchemaType.CastError
@@ -833,6 +834,52 @@ module.exports = {
         });
       };
     });
-  }
+  },
+
+  'test middleware': function () {
+    var schema = new Schema({
+        title: String
+    });
+
+    var called = 0;
+
+    schema.pre('init', function (next) {
+      called++;
+      next();
+    });
+
+    schema.pre('save', function (next) {
+      next(new Error('Error 101'));
+    });
+
+    schema.pre('remove', function (next) {
+      next();
+    });
+
+    mongoose.model('TestMiddleware', schema);
+
+    var db = start()
+      , TestMiddleware = new TestMiddleware();
+
+    var test = new TestMiddleware();
+
+    test.init({
+        title: 'Test'
+    });
+   
+    called.should.eql(1);
+
+    test.save(function(err){
+      err.should.be.an.instanceof(Error);
+      err.message.should.eql('Error 101');
+      called.should.eql(2);
+
+      test.remove(function(err){
+        should.strictEqual(err, null);
+        called.should.eql(3);
+        db.close();
+      });
+    });
+  },
 
 };

@@ -1060,8 +1060,52 @@ module.exports = {
         should.strictEqual(err, null);
         doc.get('title').should.eql(title);
         doc.isNew.should.be.false;
+
+        db.close();
       });
     });
   },
+
+  'test finding documents': function () {
+    // find
+    var db = start()
+      , BlogPost = db.model('BlogPost')
+      , title = 'Wooooot ' + random();
+
+    var post = new BlogPost();
+    post.set('title', title);
+
+    post.save(function (err) {
+      should.strictEqual(err, null);
+
+      var post = new BlogPost();
+      post.set('title', title);
+
+      post.save(function (err) {
+        should.strictEqual(err, null);
+
+        BlogPost.find({ title: title }, function (err, docs) {
+          should.strictEqual(err, null);
+          docs.should.have.length(2);
+
+          docs[0].get('title').should.eql(title);
+          docs[0].isNew.should.be.false;
+
+          docs[1].get('title').should.eql(title);
+          docs[1].isNew.should.be.false;
+
+          db.close();
+        });
+      });
+    });
+  },
+
+  'test counting documents': function () {
+
+  },
+
+  'test updating documents': function () {
+
+  }
 
 };

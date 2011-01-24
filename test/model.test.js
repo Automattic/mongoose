@@ -805,9 +805,12 @@ module.exports = {
 
   'test that a query is executed when a callback is passed': function () {
     var db = start()
-      , BlogPost = db.model('BlogPost');
+      , BlogPost = db.model('BlogPost')
+      , count = 10;
 
-    function fn () { };
+    function fn () {
+      --count || db.close();
+    };
     
     // query
     BlogPost.find({}, fn).should.be.an.instanceof(Query);
@@ -828,15 +831,16 @@ module.exports = {
     // query, fields (array), options
     BlogPost.find({}, [], {}, fn).should.be.an.instanceof(Query);
     BlogPost.find({}, [], {}, fn).executed.should.be.true;
-
-    db.close();
   },
 
   'test that query is executed with a callback for findOne': function () {
     var db = start()
-      , BlogPost = db.model('BlogPost');
+      , BlogPost = db.model('BlogPost')
+      , count = 10;
 
-    function fn () { };
+    function fn () {
+      --count || db.close();
+    };
     
     // query
     BlogPost.findOne({}, fn).should.be.an.instanceof(Query);
@@ -857,8 +861,6 @@ module.exports = {
     // query, fields (array), options
     BlogPost.findOne({}, [], {}, fn).should.be.an.instanceof(Query);
     BlogPost.findOne({}, [], {}, fn).executed.should.be.true;
-
-    db.close();
   },
   
   'test that count returns a Query': function () {
@@ -873,9 +875,12 @@ module.exports = {
 
   'test that count Query executes when you pass a callback': function () {
     var db = start()
-      , BlogPost = db.model('BlogPost');
+      , BlogPost = db.model('BlogPost')
+      , count = 2;
 
-    function fn () {};
+    function fn () {
+      --count || db.close();
+    };
 
     BlogPost.count({}, fn).should.be.an.instanceof(Query);
     BlogPost.count({}, fn).executed.should.be.true;
@@ -892,23 +897,22 @@ module.exports = {
 
     BlogPost.update({}, {}, {}).should.be.an.instanceof(Query);
     BlogPost.update({}, {}, {}).executed.should.be.false;
-
-    db.close();
   },
 
   'test that update Query executes when you pass a callback': function () {
     var db = start()
-      , BlogPost = db.model('BlogPost');
+      , BlogPost = db.model('BlogPost')
+      , count = 4;
 
-    function fn () {};
+    function fn () {
+      --count || db.close();
+    };
 
     BlogPost.update({}, {}, fn).should.be.an.instanceof(Query);
     BlogPost.update({}, {}, fn).executed.should.be.true;
 
     BlogPost.update({}, {}, {}, fn).should.be.an.instanceof(Query);
     BlogPost.update({}, {}, {}, fn).executed.should.be.true;
-
-    db.close();
   },
 
   'test finding a document': function () {

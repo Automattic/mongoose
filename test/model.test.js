@@ -1159,7 +1159,24 @@ module.exports = {
   },
 
   'test query casting': function () {
-    
+    var db = start()
+      , BlogPost = db.model('BlogPost')
+      , title = 'Loki ' + random();
+
+    var post = new BlogPost()
+      , id = DocumentObjectId.toString(post.get('_id'));
+
+    post.set('title', title);
+
+    post.save(function (err) {
+      should.strictEqual(err, null);
+
+      BlogPost.findOne({ _id: id }, function (err, doc) {
+        should.strictEqual(err, null);
+
+        doc.get('title').should.equal(title);
+      });
+    });
   },
 
   'test update doc casting': function () {

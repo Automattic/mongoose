@@ -905,6 +905,8 @@ module.exports = {
     // query, fields (array), options
     BlogPost.find({}, [], {}).should.be.an.instanceof(Query);
     BlogPost.find({}, [], {}).executed.should.be.false;
+
+    db.close();
   },
 
   'test that findOne returns a Query': function () {
@@ -930,6 +932,66 @@ module.exports = {
     // query, fields (array), options
     BlogPost.findOne({}, [], {}).should.be.an.instanceof(Query);
     BlogPost.findOne({}, [], {}).executed.should.be.false;
+
+    db.close();
   },
+
+  'test that a query is executed when a callback is passed': function () {
+    var db = start()
+      , BlogPost = db.model('BlogPost');
+
+    function fn () { };
+    
+    // query
+    BlogPost.find({}, fn).should.be.an.instanceof(Query);
+    BlogPost.find({}, fn).executed.should.be.true;
+
+    // query, fields
+    BlogPost.find({}, {}, fn).should.be.an.instanceof(Query);
+    BlogPost.find({}, {}, fn).executed.should.be.true;
+
+    // query, fields (array)
+    BlogPost.find({}, [], fn).should.be.an.instanceof(Query);
+    BlogPost.find({}, [], fn).executed.should.be.true;
+
+    // query, fields, options
+    BlogPost.find({}, {}, {}, fn).should.be.an.instanceof(Query);
+    BlogPost.find({}, {}, {}, fn).executed.should.be.true;
+
+    // query, fields (array), options
+    BlogPost.find({}, [], {}, fn).should.be.an.instanceof(Query);
+    BlogPost.find({}, [], {}, fn).executed.should.be.true;
+
+    db.close();
+  },
+
+  'test that query is executed with a callback for findOne': function () {
+    var db = start()
+      , BlogPost = db.model('BlogPost');
+
+    function fn () { };
+    
+    // query
+    BlogPost.findOne({}, fn).should.be.an.instanceof(Query);
+    BlogPost.findOne({}, fn).executed.should.be.true;
+
+    // query, fields
+    BlogPost.findOne({}, {}, fn).should.be.an.instanceof(Query);
+    BlogPost.findOne({}, {}, fn).executed.should.be.true;
+
+    // query, fields (array)
+    BlogPost.findOne({}, [], fn).should.be.an.instanceof(Query);
+    BlogPost.findOne({}, [], fn).executed.should.be.true;
+
+    // query, fields, options
+    BlogPost.findOne({}, {}, {}, fn).should.be.an.instanceof(Query);
+    BlogPost.findOne({}, {}, {}, fn).executed.should.be.true;
+
+    // query, fields (array), options
+    BlogPost.findOne({}, [], {}, fn).should.be.an.instanceof(Query);
+    BlogPost.findOne({}, [], {}, fn).executed.should.be.true;
+
+    db.close();
+  }
 
 };

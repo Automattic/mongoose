@@ -1,5 +1,7 @@
 
-var start = require('./common')
+var url = require('url')
+  , start = require('./common')
+  , should = require('should')
   , mongoose = start.mongoose
   , Mongoose = mongoose.Mongoose
   , Schema = mongoose.Schema;
@@ -134,6 +136,18 @@ module.exports = {
     }
 
     thrown.should.be.true;
+  },
+
+  'test connecting with a signature of host, database, function': function (){
+    var mong = new Mongoose()
+      , uri = process.env.MONGOOSE_TEST_URI || 'mongodb://localhost/mongoose_test';
+
+    uri = url.parse(uri);
+
+    mong.connect(uri.hostname, uri.pathname.substr(1), function (err) {
+      should.strictEqual(err, null);
+      mong.connection.close();
+    });
   }
 
 };

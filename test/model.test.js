@@ -1379,6 +1379,17 @@ module.exports = {
         });
       };
     });
+  },
+
+  'test a query that includes a casting error': function () {
+    var db = start()
+      , BlogPost = db.model('BlogPost');
+
+    BlogPost.find({ date: 'invalid date' }, function (err) {
+      err.should.be.an.instanceof(Error);
+      err.should.be.an.instanceof(CastError);
+      db.close();
+    });
   }
 
 };

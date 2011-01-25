@@ -1035,21 +1035,14 @@ module.exports = {
     post.save(function (err) {
       should.strictEqual(err, null);
 
-      var post = new BlogPost();
-      post.set('title', title);
-
-      post.save(function (err) {
+      BlogPost.update({ title: title }, { title: newTitle }, function (err) {
         should.strictEqual(err, null);
 
-        BlogPost.update({ title: title }, { title: newTitle }, function (err) {
+        BlogPost.count({ title: newTitle }, function (err, count) {
           should.strictEqual(err, null);
-
-          BlogPost.count({ title: newTitle }, function (err, count) {
-            should.strictEqual(err, null);
-            
-            count.should.eql(2);
-            db.close();
-          });
+          
+          count.should.eql(1);
+          db.close();
         });
       });
     });
@@ -1084,10 +1077,12 @@ module.exports = {
     var post = new BlogPost();
     post.set('title', '1');
 
+    var id = post.get('_id');
+
     post.save(function (err) {
       should.strictEqual(err, null);
 
-      BlogPost.update({ title: 1 }, { title: 2 }, function (err) {
+      BlogPost.update({ title: 1, _id: id }, { title: 2 }, function (err) {
         should.strictEqual(err, null);
 
         BlogPost.findOne({ _id: post.get('_id') }, function (err, doc) {

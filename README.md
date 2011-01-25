@@ -1,19 +1,240 @@
 Mongoose 1.0
 ============
 
-## Improvements over old Mongoose
+## What's Mongoose?
 
-  - NPM and git submodule friendly directory structure
-  - Removed the use of `require.paths`
-  - Leveraged `module.exports`
-  - Better model definition syntax
-  - Recursive schemas
-  - Support for safe mode
-  - Built-in support for timeouts for safety
-  - Clean error handling through the familiar `err, callback` signature.
-  - Seamless support for promises and callback parameters, with 
-  - Access to mongodb has been separated into driver adaptors.
+Mongoose is a MongoDB object modeling tool designed to work in an asychronous
+environment.
 
-## Issues
+Defining a model is as easy as:
 
-https://github.com/learnboost/mongoose/issues
+    var Comments = new Schema({
+        title     : String
+      , body      : String
+      , date      : Date
+    });
+
+    var BlogPost = new Schema({
+        author    : ObjectId
+      , title     : String
+      , body      : String
+      , date      : Date
+      , comments  : [Comments]
+      , meta      : {
+            votes : Number
+          , favs  : Number
+        }
+    });
+
+    mongoose.model('BlogPost', BlogPost);
+
+## Tutorial
+
+### Connecting to MongoDB
+
+First, we need to define a connection. If your app uses only one database, you
+should use `mongose.connect`. If you need to create additional connections, use
+`mongoose.createConnection`.
+
+Both `connect` and `createConnection` take a `mongodb://` URI, or the parameters
+`host, database, port`.
+
+    var mongoose = require('mongoose');
+
+    mongoose.connect('mongodb://localhost/my_database');
+
+Once connected, the `open` event is fired on the `Connection` instance. If
+you're using `mongoose.connect`, the `Connection` is `mongoose.connection`.
+Otherwise, `mongoose.createConnection` return value is a `Connection`.
+
+**Important!** Mongoose buffers all the commands until it's connected to the
+database. This means that you don't have to wait until it connects to MongoDB
+in order to define models, run queries, etc.
+
+### Defining a Model
+
+Models are defined through the `Schema` interface. 
+
+    var Schema = mongoose.Schema
+      , ObjectId = Schema.ObjectId;
+
+    var BlogPost = new Schema({
+        author    : ObjectId
+      , title     : String
+      , body      : String
+      , date      : Date
+    });
+
+Aside from defining the structure of your documents and the types of data you're
+storing, a Schema handles the definition of:
+
+* Validators (async and sync)
+* Defaults
+* Getters
+* Setters
+* Indexes
+* Middleware
+* Methods definition
+* Statics definition
+* Plugins
+
+    var Comment = new Schema({
+        name  :  { type: String, default: 'hahaha' }
+      , age   :  { type: Number, min: 18, index: true }
+      , bio   :  { type: String, match: /[a-z]/ }
+      , date  :  { type: Date, default: Date.now }
+    });
+
+    // a setter
+    Comment.path('name').set(function (v) {
+      return v.capitalize();
+    });
+
+    // middleware
+    Comment.pre('save', function (next) {
+        notify(this.get('email'));
+        next();
+    });
+
+Take a look at the example in `examples/schema.js` for an end-to-end example of
+(almost) all the functionality available.
+
+### Accessing a Model
+
+Once we define a model through `mongoose.model('ModelName', mySchema)`, we can
+access it through the same function
+
+    var myModel = mongoose.model('ModelName');
+
+We can then instantiate it, and save it:
+
+    var instance = new myModel();
+    myModel.my.key = 'hello';
+    myModel.save(function (err) {
+
+    });
+
+Or we can find documents from the same collection
+
+    myModel.find({}, function (err, docs) {
+      // docs.forEach
+    });
+
+You can also `findOne`, `findById`, `update`, etc. For more details check out
+the API docs.
+
+### Embedded Documents
+
+In the first example snippet, we defined a key in the Schema that looks like:
+
+    comments: [Comments]
+
+Where `Comments` is a `Schema` we created. This means that creating embedded
+documents is as simple as:
+
+    // retrieve my model
+    var BlogPost = mongoose.model('BlogPost');
+
+    // create a blog post
+    var post = new BlogPost();
+
+    // create a comment
+    post.comments.push({ title: 'My comment' });
+
+    post.save(function (err) {
+      if (!err) console.log('Success!');
+    });
+
+The same goes for removing them:
+
+    BlogPost.findById(myId, function (err, post) {
+      if (!err) {
+        post.comments[0].remove();
+        post.save(function (err) {
+          // do something
+        });
+      }
+    });
+
+Embedded documents enjoy all the same features as your models. Defaults,
+validators, middleware. Whenever an error occurs, it's bubbled to the `save()`
+error callback, so error handling is a snap!
+
+Mongoose interacts with your embedded documents in arrays _atomically_, out of
+the box.
+
+### Middleware
+
+Middleware is one of the most exciting features about Mongoose 1.0. Middleware
+takes away all the pain of nested callbacks.
+
+Middleware are defined at the Schema level and are applied when the methods
+`init` (when a document is initialized with data from MongoDB), `save` (when
+a document or embedded document is saved).
+
+There's two types of middleware, determined by the signature of the function
+you define (ie: the parameters your function accepts):
+
+- Serial
+  Serial middleware are defined like:
+
+      .pre(method, function (next) {
+
+      })
+
+  They're executed one after the other, when each middleware calls `next`.
+
+- Parallel
+  Parallel middleware offer more fine-grained flow control, and are defined
+  like
+
+      .pre(method, function (next, done) {
+
+      })
+
+  Parallel middleware can `next()` immediately, but the final argument will be
+  called when all the parallel middleware have called `done()`.
+
+#### Error handling
+
+If any middleware calls `next` or `done` with an `Error` instance, the flow is
+interrupted, and the error is passed to the function passed as an argument.
+
+For example:
+
+    schema.pre('save', function (next) {
+        // something goes wrong
+        next(new Error('something went wrong'));
+    });
+
+    // later...
+
+    myModel.save(function (err) {
+      // err can come from a middleware
+    });
+
+## API docs
+
+You can find the [Dox](http://github.com/visionmedia/dox) generated API docs at
+http://mongoosejs.com.
+
+## Contributing to Mongoose
+
+### Cloning the repository
+
+Make a fork of `mongoose`, then clone it in your computer. The `master` branch
+contains the current stable release, and the `develop` branch the next upcoming
+major release.
+
+If `master` is at `1.0`, `develop` will contain the upcoming `1.1` (or `2.0` if
+the `1` branch is nearing its completion).
+
+### Guidelines
+
+- Please write inline documentation for new methods or class members.
+- Please write tests and make sure your tests pass.
+- Before starting to write code, look for existing tickets or create one for
+  your specifc issue (unless you're addressing something that's clearly broken).
+  That way you avoid working on something that might not be of interest or that
+  has been addressed already in a different branch.
+

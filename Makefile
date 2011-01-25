@@ -6,7 +6,7 @@ test:
 		-I support/should.js/lib \
 		-I support/cli-table/lib \
 		$(TESTFLAGS) \
-		test/*.test.js
+		$(shell find test/ -name '*.test.js')
 
 test-cov:
 	@TESTFLAGS=--cov $(MAKE) test

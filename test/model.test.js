@@ -899,6 +899,8 @@ module.exports = {
 
     BlogPost.update({}, {}, {}).should.be.an.instanceof(Query);
     BlogPost.update({}, {}, {}).executed.should.be.false;
+
+    db.close();
   },
 
   'test that update Query executes when you pass a callback': function () {

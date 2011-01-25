@@ -1546,7 +1546,58 @@ module.exports = {
   },
 
   'test for find with partial initialization': function () {
+    var db = start()
+      , BlogPost = db.model('BlogPost')
+      , queries = 5;
 
+    var post = new BlogPost();
+
+    post.title = 'hahaha';
+    post.slug = 'woot';
+
+    post.save(function (err) {
+      should.strictEqual(err, null);
+
+      BlogPost.find({ _id: post.get('_id') }, function (err, docs) {
+        should.strictEqual(err, null);
+        docs[0].isInit('title').should.be.true;
+        docs[0].isInit('slug').should.be.true;
+        docs[0].isInit('date').should.be.true;
+        --queries || db.close();
+      });
+
+      BlogPost.find({ _id: post.get('_id') }, ['title', 'slug'], function (err, docs) {
+        should.strictEqual(err, null);
+        docs[0].isInit('title').should.be.true;
+        docs[0].isInit('slug').should.be.true;
+        docs[0].isInit('date').should.be.false;
+        --queries || db.close();
+      });
+
+      BlogPost.find({ _id: post.get('_id') }, { slug: 0 }, function (err, docs) {
+        should.strictEqual(err, null);
+        docs[0].isInit('title').should.be.true;
+        docs[0].isInit('slug').should.be.false;
+        docs[0].isInit('date').should.be.true;
+        --queries || db.close();
+      });
+
+      BlogPost.find({ _id: post.get('_id') }, ['title'], function (err, docs) {
+        should.strictEqual(err, null);
+        docs[0].isInit('title').should.be.true;
+        docs[0].isInit('slug').should.be.false;
+        docs[0].isInit('date').should.be.false;
+        --queries || db.close();
+      });
+
+      BlogPost.find({ _id: post.get('_id') }, ['slug'], function (err, docs) {
+        should.strictEqual(err, null);
+        docs[0].isInit('title').should.be.false;
+        docs[0].isInit('slug').should.be.true;
+        docs[0].isInit('date').should.be.false;
+        --queries || db.close();
+      });
+    });
   }
 
 };

@@ -86,7 +86,6 @@ module.exports = {
       disconnections++;
     });
 
-
     var db2 = mong.createConnection(process.env.MONGOOSE_TEST_URI || uri);
 
     db2.on('open', function () {

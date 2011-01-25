@@ -1110,28 +1110,28 @@ module.exports = {
       BlogPost.findOne({ _id: post.get('_id') }, function(err, doc){
         if (err) throw err;
         doc.get('meta.visitors').increment();
-        (doc.get('meta.visitors') == 6).should.be.true;
+        doc.get('meta.visitors').valueOf().should.be.equal(6);
         save(doc);
       });
 
       BlogPost.findOne({ _id: post.get('_id') }, function(err, doc){
         if (err) throw err;
         doc.get('meta.visitors').increment();
-        (doc.get('meta.visitors') == 6).should.be.true;
+        doc.get('meta.visitors').valueOf().should.be.equal(6);
         save(doc);
       });
 
       BlogPost.findOne({ _id: post.get('_id') }, function(err, doc){
         if (err) throw err;
         doc.get('meta.visitors').increment();
-        (doc.get('meta.visitors') == 6).should.be.true;
+        doc.get('meta.visitors').valueOf().should.be.equal(6);
         save(doc);
       });
 
       BlogPost.findOne({ _id: post.get('_id') }, function(err, doc){
         if (err) throw err;
         doc.get('meta.visitors').increment();
-        (doc.get('meta.visitors') == 6).should.be.true;
+        doc.get('meta.visitors').valueOf().should.be.equal(6);
         save(doc);
       });
 
@@ -1149,7 +1149,7 @@ module.exports = {
       function complete () {
         BlogPost.findOne({ _id: post.get('_id') }, function (err, doc) {
           if (err) throw err;
-          (doc.get('meta.visitors') == 9).should.be.true;
+          doc.get('meta.visitors').valueOf().should.be.equal(9);
           db.close();
         });
       };
@@ -1187,7 +1187,7 @@ module.exports = {
 
       BlogPost.findOne({ _id: post.get('_id') }, function(err, doc){
         if (err) throw err;
-        doc.get('comments').push({ title: '4' });
+        doc.get('comments').push({ title: '4' }, { title: '5' });
         save(doc);
       });
 
@@ -1206,7 +1206,7 @@ module.exports = {
         BlogPost.findOne({ _id: post.get('_id') }, function (err, doc) {
           if (err) throw err;
 
-          doc.get('comments').length.should.eql(4);
+          doc.get('comments').length.should.eql(5);
 
           doc.get('comments').some(function(comment){
             return comment.get('title') == '1';
@@ -1224,10 +1224,143 @@ module.exports = {
             return comment.get('title') == '4';
           }).should.be.true;
 
+          doc.get('comments').some(function(comment){
+            return comment.get('title') == '5';
+          }).should.be.true;
+
           db.close();
         });
       };
     });
   },
+
+  'test saving embedded arrays of Numbers atomically': function () {
+    var db = start()
+      , TempSchema = new Schema({
+          nums: [Number]
+        })
+      , totalDocs = 2
+      , saveQueue = [];
+
+    mongoose.model('Temp', TempSchema);
+    var Temp = db.model('Temp');
+    
+    var t = new Temp();
+
+    t.save(function(err){
+      if (err) throw err;
+
+      Temp.findOne({ _id: t.get('_id') }, function(err, doc){
+        if (err) throw err;
+        doc.get('nums').push(1);
+        save(doc);
+      });
+
+      Temp.findOne({ _id: t.get('_id') }, function(err, doc){
+        if (err) throw err;
+        doc.get('nums').push(2, 3);
+        save(doc);
+      });
+
+
+      function save(doc) {
+        saveQueue.push(doc);
+        if (saveQueue.length == totalDocs)
+          saveQueue.forEach(function (doc) {
+            doc.save(function (err) {
+              if (err) throw err;
+              --totalDocs || complete();
+            });
+          });
+      };
+
+      function complete () {
+        Temp.findOne({ _id: t.get('_id') }, function (err, doc) {
+          if (err) throw err;
+
+          doc.get('nums').length.should.eql(3);
+
+          doc.get('nums').some(function(num){
+            return num.valueOf() == '1';
+          }).should.be.true;
+
+          doc.get('nums').some(function(num){
+            return num.valueOf() == '2';
+          }).should.be.true;
+
+          doc.get('nums').some(function(num){
+            return num.valueOf() == '3';
+          }).should.be.true;
+
+
+          db.close();
+        });
+      };
+    });
+  },
+
+  'test saving embedded arrays of Strings atomically': function () {
+    var db = start()
+      , StrListSchema = new Schema({
+          strings: [String]
+        })
+      , totalDocs = 2
+      , saveQueue = [];
+
+    mongoose.model('StrList', StrListSchema);
+    var StrList = db.model('StrList');
+    
+    var t = new StrList();
+
+    t.save(function(err){
+      if (err) throw err;
+
+      StrList.findOne({ _id: t.get('_id') }, function(err, doc){
+        if (err) throw err;
+        doc.get('strings').push('a');
+        save(doc);
+      });
+
+      StrList.findOne({ _id: t.get('_id') }, function(err, doc){
+        if (err) throw err;
+        doc.get('strings').push('b', 'c');
+        save(doc);
+      });
+
+
+      function save(doc) {
+        saveQueue.push(doc);
+        if (saveQueue.length == totalDocs)
+          saveQueue.forEach(function (doc) {
+            doc.save(function (err) {
+              if (err) throw err;
+              --totalDocs || complete();
+            });
+          });
+      };
+
+      function complete () {
+        StrList.findOne({ _id: t.get('_id') }, function (err, doc) {
+          if (err) throw err;
+
+          doc.get('strings').length.should.eql(3);
+
+          doc.get('strings').some(function(str){
+            return str == 'a';
+          }).should.be.true;
+
+          doc.get('strings').some(function(str){
+            return str == 'b';
+          }).should.be.true;
+
+          doc.get('strings').some(function(str){
+            return str == 'c';
+          }).should.be.true;
+
+          db.close();
+        });
+      };
+    });
+  }
 
 };

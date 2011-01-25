@@ -74,15 +74,12 @@ module.exports = {
       , uri = 'mongodb://localhost/mongoose_test'
       , connections = 0
       , disconnections = 0;
-
-    var db = mongoose.createConnection(process.env.MONGOOSE_TEST_URI || uri);
+    
+    mong.connect(process.env.MONGOOSE_TEST_URI || uri);
+    var db = mong.connection;
 
     db.on('open', function(){
       connections++;
-
-      process.nextTick(function () {
-        db.close();
-      });
     });
 
     db.on('close', function () {
@@ -90,19 +87,17 @@ module.exports = {
     });
 
 
-    var db2 = mongoose.createConnection(process.env.MONGOOSE_TEST_URI || uri);
+    var db2 = mong.createConnection(process.env.MONGOOSE_TEST_URI || uri);
 
     db2.on('open', function () {
       connections++;
-
-      process.nextTick(function () {
-        db2.close();
-      });
     });
 
     db2.on('close', function () {
       disconnections++;
     });
+
+    mong.disconnect();
 
     beforeExit(function () {
       connections.should.eql(2);

@@ -1422,4 +1422,40 @@ module.exports = {
     });
   },
 
+  'test filtering an embedded array by the id with cast error': function () {
+    var db = start()
+      , BlogPost = db.model('BlogPost');
+
+    var post = new BlogPost();
+
+    post.save(function (err) {
+      should.strictEqual(err, null);
+
+      BlogPost.findById(post.get('_id'), function (err, doc) {
+        should.strictEqual(err, null);
+        should.strictEqual(doc.comments.id(null), null);
+
+        db.close();
+      });
+    });
+  },
+
+  'test filtering an embedded array by the id shortcut with no match': function () {
+    var db = start()
+      , BlogPost = db.model('BlogPost');
+
+    var post = new BlogPost();
+
+    post.save(function (err) {
+      should.strictEqual(err, null);
+
+      BlogPost.findById(post.get('_id'), function (err, doc) {
+        should.strictEqual(err, null);
+        should.strictEqual(doc.comments.id(new DocumentObjectId), null);
+
+        db.close();
+      });
+    });
+  }
+
 };

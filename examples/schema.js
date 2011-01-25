@@ -57,7 +57,7 @@ function slugGenerator (options){
   var key = options.key || 'title';
   
   return function slugGenerator(schema){
-    schema.key(key).setter(function(){
+    schema.path(key).setter(function(v){
       this.slug = v.toLowerCase().replace(/[^a-z0-9]/g, '').replace(/-+/g, '');
       return v;
     });

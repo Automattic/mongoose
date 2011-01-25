@@ -78,6 +78,8 @@ storing, a Schema handles the definition of:
 * Statics definition
 * Plugins
 
+The following example shows some of these features:
+
     var Comment = new Schema({
         name  :  { type: String, default: 'hahaha' }
       , age   :  { type: Number, min: 18, index: true }

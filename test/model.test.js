@@ -866,7 +866,7 @@ module.exports = {
     BlogPost.findOne(q, [], {}, fn).should.be.an.instanceof(Query);
     BlogPost.findOne(q, [], {}, fn).executed.should.be.true;
   },
-  
+
   'test that count returns a Query': function () {
     var db = start()
       , BlogPost = db.model('BlogPost');

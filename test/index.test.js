@@ -120,6 +120,20 @@ module.exports = {
     beforeExit(function () {
       called.should.be.true;
     });
+  },
+
+  'try accessing a model that hasn\'t been defined': function () {
+    var mong = new Mongoose()
+      , thrown = false;
+
+    try {
+      mong.model('Test');
+    } catch (e) {
+      /hasn't been registered/.test(e.message).should.be.true;
+      thrown = true;
+    }
+
+    thrown.should.be.true;
   }
 
 };

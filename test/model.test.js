@@ -839,31 +839,32 @@ module.exports = {
   'test that query is executed with a callback for findOne': function () {
     var db = start()
       , BlogPost = db.model('BlogPost')
-      , count = 10;
+      , count = 10
+      , q =  { _id: new DocumentObjectId }; // make sure the query is fast
 
     function fn () {
       --count || db.close();
     };
     
     // query
-    BlogPost.findOne({}, fn).should.be.an.instanceof(Query);
-    BlogPost.findOne({}, fn).executed.should.be.true;
+    BlogPost.findOne(q, fn).should.be.an.instanceof(Query);
+    BlogPost.findOne(q, fn).executed.should.be.true;
 
     // query, fields
-    BlogPost.findOne({}, {}, fn).should.be.an.instanceof(Query);
-    BlogPost.findOne({}, {}, fn).executed.should.be.true;
+    BlogPost.findOne(q, {}, fn).should.be.an.instanceof(Query);
+    BlogPost.findOne(q, {}, fn).executed.should.be.true;
 
     // query, fields (array)
-    BlogPost.findOne({}, [], fn).should.be.an.instanceof(Query);
-    BlogPost.findOne({}, [], fn).executed.should.be.true;
+    BlogPost.findOne(q, [], fn).should.be.an.instanceof(Query);
+    BlogPost.findOne(q, [], fn).executed.should.be.true;
 
     // query, fields, options
-    BlogPost.findOne({}, {}, {}, fn).should.be.an.instanceof(Query);
-    BlogPost.findOne({}, {}, {}, fn).executed.should.be.true;
+    BlogPost.findOne(q, {}, {}, fn).should.be.an.instanceof(Query);
+    BlogPost.findOne(q, {}, {}, fn).executed.should.be.true;
 
     // query, fields (array), options
-    BlogPost.findOne({}, [], {}, fn).should.be.an.instanceof(Query);
-    BlogPost.findOne({}, [], {}, fn).executed.should.be.true;
+    BlogPost.findOne(q, [], {}, fn).should.be.an.instanceof(Query);
+    BlogPost.findOne(q, [], {}, fn).executed.should.be.true;
   },
   
   'test that count returns a Query': function () {

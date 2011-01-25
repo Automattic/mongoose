@@ -429,6 +429,7 @@ module.exports = {
 
     doc.hooksTest(function (err, args) {
       args.should.have.length(2);
+      args[1].should.eql('test');
       called = true;
     }, 'test')
     

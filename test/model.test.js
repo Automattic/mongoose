@@ -272,6 +272,24 @@ module.exports = {
     db.close();
   },
 
+  'test isModified on a DocumentArray with accessors': function(){
+    var db = start()
+      , BlogPost = db.model('BlogPost');
+
+    var post = new BlogPost()
+    post.init({
+        title       : 'Test'
+      , slug        : 'test'
+      , comments    : [ { title: 'Test', date: new Date, body: 'Test' } ]
+    });
+
+    post.isModified('comments').should.be.false;
+    post.get('comments')[0].body = 'Woot';
+    post.isModified('comments').should.be.true;
+
+    db.close();
+  },
+
   'test isModified on a MongooseArray with atomics methods': function(){
     // COMPLETEME
     var db = start()

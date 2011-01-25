@@ -1390,6 +1390,36 @@ module.exports = {
       err.should.be.an.instanceof(CastError);
       db.close();
     });
-  }
+  },
+
+  'test filtering an embedded array by the id shortcut function': function () {
+    var db = start()
+      , BlogPost = db.model('BlogPost');
+
+    var post = new BlogPost();
+
+    post.comments.push({ title: 'woot' });
+    post.comments.push({ title: 'aaaa' });
+
+    var subdoc1 = post.comments[0];
+    var subdoc2 = post.comments[1];
+
+    post.save(function (err) {
+      should.strictEqual(err, null);
+
+      BlogPost.findById(post.get('_id'), function (err, doc) {
+        should.strictEqual(err, null);
+
+        // test with an objectid
+        doc.comments.id(subdoc1.get('_id')).title.should.eql('woot');
+
+        // test with a string
+        var id = DocumentObjectId.toString(subdoc2._id);
+        doc.comments.id(id).title.should.eql('aaaa');
+
+        db.close();
+      });
+    });
+  },
 
 };

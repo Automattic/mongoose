@@ -28,9 +28,7 @@ Defining a model is as easy as:
 
     mongoose.model('BlogPost', BlogPost);
 
-## Tutorial
-
-### Connecting to MongoDB
+## Connecting to MongoDB
 
 First, we need to define a connection. If your app uses only one database, you
 should use `mongose.connect`. If you need to create additional connections, use
@@ -51,7 +49,7 @@ Otherwise, `mongoose.createConnection` return value is a `Connection`.
 database. This means that you don't have to wait until it connects to MongoDB
 in order to define models, run queries, etc.
 
-### Defining a Model
+## Defining a Model
 
 Models are defined through the `Schema` interface. 
 
@@ -101,7 +99,7 @@ The following example shows some of these features:
 Take a look at the example in `examples/schema.js` for an end-to-end example of
 (almost) all the functionality available.
 
-### Accessing a Model
+## Accessing a Model
 
 Once we define a model through `mongoose.model('ModelName', mySchema)`, we can
 access it through the same function
@@ -125,7 +123,7 @@ Or we can find documents from the same collection
 You can also `findOne`, `findById`, `update`, etc. For more details check out
 the API docs.
 
-### Embedded Documents
+## Embedded Documents
 
 In the first example snippet, we defined a key in the Schema that looks like:
 
@@ -165,7 +163,7 @@ error callback, so error handling is a snap!
 Mongoose interacts with your embedded documents in arrays _atomically_, out of
 the box.
 
-### Middleware
+## Middleware
 
 Middleware is one of the most exciting features about Mongoose 1.0. Middleware
 takes away all the pain of nested callbacks.
@@ -197,7 +195,7 @@ you define (ie: the parameters your function accepts):
   Parallel middleware can `next()` immediately, but the final argument will be
   called when all the parallel middleware have called `done()`.
 
-#### Error handling
+### Error handling
 
 If any middleware calls `next` or `done` with an `Error` instance, the flow is
 interrupted, and the error is passed to the function passed as an argument.

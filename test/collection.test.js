@@ -1,7 +1,7 @@
 
 var start = require('./common')
   , mongoose = start.mongoose
-  , Collection = require('mongoose/connection');
+  , Collection = require('mongoose/collection');
 
 module.exports = {
 
@@ -28,6 +28,91 @@ module.exports = {
       connected.should.be.true;
       inserted.should.be.true;
     });
+  },
+
+  'test methods that should throw (unimplemented)': function () {
+    var collection = new Collection('test', mongoose.connection)
+      , thrown = false;
+
+    try {
+      collection.getIndexes();
+    } catch (e) {
+      /unimplemented/.test(e.message).should.be.true;
+      thrown = true;
+    }
+
+    thrown.should.be.true;
+    thrown = false;
+
+    try {
+      collection.update();
+    } catch (e) {
+      /unimplemented/.test(e.message).should.be.true;
+      thrown = true;
+    }
+
+    thrown.should.be.true;
+    thrown = false;
+
+    try {
+      collection.save();
+    } catch (e) {
+      /unimplemented/.test(e.message).should.be.true;
+      thrown = true;
+    }
+
+    thrown.should.be.true;
+    thrown = false;
+
+    try {
+      collection.insert();
+    } catch (e) {
+      /unimplemented/.test(e.message).should.be.true;
+      thrown = true;
+    }
+
+    thrown.should.be.true;
+    thrown = false;
+
+    try {
+      collection.find();
+    } catch (e) {
+      /unimplemented/.test(e.message).should.be.true;
+      thrown = true;
+    }
+
+    thrown.should.be.true;
+    thrown = false;
+
+    try {
+      collection.findOne();
+    } catch (e) {
+      /unimplemented/.test(e.message).should.be.true;
+      thrown = true;
+    }
+
+    thrown.should.be.true;
+    thrown = false;
+
+    try {
+      collection.findAndModify();
+    } catch (e) {
+      /unimplemented/.test(e.message).should.be.true;
+      thrown = true;
+    }
+
+    thrown.should.be.true;
+    thrown = false;
+
+    try {
+      collection.ensureIndex();
+    } catch (e) {
+      /unimplemented/.test(e.message).should.be.true;
+      thrown = true;
+    }
+
+    thrown.should.be.true;
+    thrown = false;
   }
 
 };

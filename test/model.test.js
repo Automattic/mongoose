@@ -888,10 +888,8 @@ module.exports = {
 
     BlogPost.count({}, fn).should.be.an.instanceof(Query);
     BlogPost.count({}, fn).executed.should.be.true;
-
-    db.close();
   },
-  
+
   'test that update returns a Query': function () {
     var db = start()
       , BlogPost = db.model('BlogPost');

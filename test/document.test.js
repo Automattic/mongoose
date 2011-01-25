@@ -45,6 +45,7 @@ TestDocument.prototype.schema = new Schema({
 
 TestDocument.prototype.hooksTest = function(fn){
   fn(null);
+  return arguments;
 };
 
 /**
@@ -414,6 +415,24 @@ module.exports = {
     });
 
     beforeExit(function(){
+      called.should.be.true;
+    });
+  },
+
+  'test passing two arguments to a method subject to hooks and return value':
+  function (beforeExit) {
+    var doc = new TestDocument()
+      , called = false;
+
+    doc.pre('hooksTest', function (next) {
+      next();
+    });
+
+    doc.hooksTest(function () {
+      called = true;
+    }, 'test').should.have.length(2);
+    
+    beforeExit(function () {
       called.should.be.true;
     });
   }

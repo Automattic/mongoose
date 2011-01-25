@@ -67,6 +67,47 @@ module.exports = {
     beforeExit(function () {
       called.should.eql(2);
     });
+  },
+
+  'test disconnection of all connections': function (beforeExit) {
+    var mong = new Mongoose()
+      , uri = 'mongodb://localhost/mongoose_test'
+      , connections = 0
+      , disconnections = 0;
+
+    var db = mongoose.createConnection(process.env.MONGOOSE_TEST_URI || uri);
+
+    db.on('open', function(){
+      connections++;
+
+      process.nextTick(function () {
+        db.close();
+      });
+    });
+
+    db.on('close', function () {
+      disconnections++;
+    });
+
+
+    var db2 = mongoose.createConnection(process.env.MONGOOSE_TEST_URI || uri);
+
+    db2.on('open', function () {
+      connections++;
+
+      process.nextTick(function () {
+        db2.close();
+      });
+    });
+
+    db2.on('close', function () {
+      disconnections++;
+    });
+
+    beforeExit(function () {
+      connections.should.eql(2);
+      disconnections.should.eql(2);
+    });
   }
 
 };

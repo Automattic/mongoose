@@ -44,7 +44,7 @@ TestDocument.prototype.schema = new Schema({
  */
 
 TestDocument.prototype.hooksTest = function(fn){
-  fn(arguments);
+  fn(null, arguments);
 };
 
 /**
@@ -427,7 +427,7 @@ module.exports = {
       next();
     });
 
-    doc.hooksTest(function (args) {
+    doc.hooksTest(function (err, args) {
       args.should.have.length(2);
       called = true;
     }, 'test')

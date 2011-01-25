@@ -1105,6 +1105,7 @@ module.exports = {
       , saveQueue = [];
 
     var post = new BlogPost();
+    post.set('meta.visitors', 5);
 
     post.save(function(err){
       if (err) throw err;

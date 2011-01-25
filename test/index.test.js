@@ -102,6 +102,24 @@ module.exports = {
       connections.should.eql(2);
       disconnections.should.eql(2);
     });
+  },
+
+  'test disconnection of all connections callback': function (beforeExit) {
+    var mong = new Mongoose()
+      , uri = 'mongodb://localhost/mongoose_test'
+      , called = false;
+
+    mong.connect(process.env.MONGOOSE_TEST_URI || uri);
+
+    mong.connection.on('open', function () {
+      mong.disconnect(function () {
+        called = true;
+      });
+    });
+
+    beforeExit(function () {
+      called.should.be.true;
+    });
   }
 
 };

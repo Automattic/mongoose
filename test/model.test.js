@@ -1488,6 +1488,65 @@ module.exports = {
         });
       });
     });
+  },
+
+  'test for findById with partial initialization': function () {
+    var db = start()
+      , BlogPost = db.model('BlogPost')
+      , queries = 5;
+
+    var post = new BlogPost();
+
+    post.title = 'hahaha';
+    post.slug = 'woot';
+
+    post.save(function (err) {
+      should.strictEqual(err, null);
+
+      BlogPost.findById(post.get('_id'), function (err, doc) {
+        should.strictEqual(err, null);
+        doc.isInit('title').should.be.true;
+        doc.isInit('slug').should.be.true;
+        doc.isInit('date').should.be.true;
+        --queries || db.close();
+      });
+
+      BlogPost.findById(post.get('_id'), ['title', 'slug'], function (err, doc) {
+        should.strictEqual(err, null);
+        doc.isInit('title').should.be.true;
+        doc.isInit('slug').should.be.true;
+        doc.isInit('date').should.be.false;
+        --queries || db.close();
+      });
+
+      BlogPost.findById(post.get('_id'), { slug: 0 }, function (err, doc) {
+        should.strictEqual(err, null);
+        doc.isInit('title').should.be.true;
+        doc.isInit('slug').should.be.false;
+        doc.isInit('date').should.be.true;
+        --queries || db.close();
+      });
+
+      BlogPost.findById(post.get('_id'), ['title'], function (err, doc) {
+        should.strictEqual(err, null);
+        doc.isInit('title').should.be.true;
+        doc.isInit('slug').should.be.false;
+        doc.isInit('date').should.be.false;
+        --queries || db.close();
+      });
+
+      BlogPost.findById(post.get('_id'), ['slug'], function (err, doc) {
+        should.strictEqual(err, null);
+        doc.isInit('title').should.be.false;
+        doc.isInit('slug').should.be.true;
+        doc.isInit('date').should.be.false;
+        --queries || db.close();
+      });
+    });
+  },
+
+  'test for find with partial initialization': function () {
+
   }
 
 };

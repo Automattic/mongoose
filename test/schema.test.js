@@ -441,24 +441,24 @@ module.exports = {
   'test declaring new methods': function(){
     var a = new Schema();
     a.method('test', function(){});
-    a.methods({
+    a.method({
         a: function(){}
       , b: function(){}
     });
 
-    Object.keys(a._methods).should.have.length(3);
+    Object.keys(a.methods).should.have.length(3);
   },
 
   'test declaring new statics': function(){
     var a = new Schema();
     a.static('test', function(){});
-    a.statics({
+    a.static({
         a: function(){}
       , b: function(){}
       , c: function(){}
     });
 
-    Object.keys(a._statics).should.have.length(4);
+    Object.keys(a.statics).should.have.length(4);
   },
 
   'test setter(s)': function(){

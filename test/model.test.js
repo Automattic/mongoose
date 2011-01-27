@@ -1658,6 +1658,44 @@ module.exports = {
         });
       });
     });
+  },
+
+  'test $push and $pop to an array at the same time': function () {
+    var db = start()
+      , BlogPost = db.model('BlogPost');
+
+    var post = new BlogPost();
+    post.owners.push(new DocumentObjectId(), new DocumentObjectId());
+    post.owners.should.have.length(2);
+
+    var oid1 = post.owners[0];
+    var oid2 = post.owners[1];
+
+    post.save(function (err) {
+      should.strictEqual(err, null);
+
+      BlogPost.findById(post._id, function (err, doc) {
+        should.strictEqual(err, null);
+
+        var oid3 = new DocumentObjectId();
+
+        doc.owners.should.have.length(2);
+        doc.owners.$pull(oid1);
+        doc.owners.push(oid3);
+        
+        doc.save(function (err) {
+          BlogPost.findById(post._id, function (doc) {
+            should.strictEqual(err, null);
+
+            doc.owners.should.have.length(2);
+            DocumentObjectId.toString(doc.owners[0]).should.eql(DocumentObjectId.toString(oid2));
+            DocumentObjectId.toString(doc.owners[1]).should.eql(DocumentObjectId.toString(oid3));
+
+            db.close();
+          });
+        });
+      });
+    });
   }
 
 };

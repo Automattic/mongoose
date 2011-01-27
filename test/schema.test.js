@@ -328,8 +328,8 @@ module.exports = {
 
     var numbers = Loki.path('numbers').cast([152, '31']);
 
-    numbers[0].should.be.an.instanceof(MongooseNumber);
-    numbers[1].should.be.an.instanceof(MongooseNumber);
+    numbers[0].should.be.a('number');
+    numbers[1].should.be.a('number');
     
     var strings = Loki.path('strings').cast(['test', 123]);
 

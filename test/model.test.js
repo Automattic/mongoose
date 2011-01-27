@@ -1681,6 +1681,45 @@ module.exports = {
         db.close();
       });
     });
+  },
+
+  'test removing from an array atomically using MongooseArray#remove': function () {
+    var db = start()
+      , BlogPost = db.model('BlogPost');
+
+    var post = new BlogPost();
+    post.numbers.push(1, 2, 3);
+
+    post.save(function (err) {
+      should.strictEqual(err, null);
+
+      BlogPost.findById(post._id, function (err, doc) {
+        should.strictEqual(err, null);
+
+        doc.numbers.remove('1');
+        doc.save(function (err) {
+          should.strictEqual(err, null);
+          
+          BlogPost.findById(post._id, function (err, doc) {
+            should.strictEqual(err, null);
+
+            doc.numbers.should.have.length(2);
+            doc.numbers.remove('2', '3');
+
+            doc.save(function (err) {
+              should.strictEqual(err, null);
+
+              BlogPost.findById(post._id, function (err, doc) {
+                should.strictEqual(err, null);
+
+                doc.numbers.should.have.length(0);
+                db.close();
+              });
+            });
+          });
+        });
+      });
+    });
   }
 
 };

@@ -43,6 +43,7 @@ var BlogPost = new Schema({
       , visitors  : Number
     }
   , published : Boolean
+  , mixed     : {}
   , owners    : [ObjectId]
   , comments  : [Comments]
 });
@@ -1596,6 +1597,65 @@ module.exports = {
         docs[0].isInit('slug').should.be.true;
         docs[0].isInit('date').should.be.false;
         --queries || db.close();
+      });
+    });
+  },
+
+  'try saving mixed data': function () {
+    var db = start()
+      , BlogPost = db.model('BlogPost')
+      , count = 3;
+
+    // string
+    var post = new BlogPost();
+    post.mixed = 'woot';
+    post.save(function (err) {
+      should.strictEqual(err, null);
+
+      BlogPost.findById(post._id, function (err) {
+        should.strictEqual(err, null);
+
+        --count || db.close();
+      });
+    });
+    
+    // array
+    var post2 = new BlogPost();
+    post2.mixed = [];
+    post2.save(function (err) {
+      should.strictEqual(err, null);
+
+      BlogPost.findById(post2._id, function (err, doc){
+        should.strictEqual(err, null);
+
+        Array.isArray(doc.mixed).should.be.true;
+        doc.mixed.push({ hello: 'world' });
+        doc.commit('mixed');
+
+        doc.save(function (err, doc) {
+          should.strictEqual(err, null);
+
+          BlogPost.findById(post2._id, function (err, doc) {
+            should.strictEqual(err, null);
+
+            doc.mixed[0].should.eql({ hello: 'world' });
+            --count || db.close();
+          });
+        });
+      });
+
+      // date
+      var post3 = new BlogPost();
+      post3.mixed = new Date;
+      post3.save(function (err) {
+        should.strictEqual(err, null);
+
+        BlogPost.findById(post3._id, function (err, doc) {
+          should.strictEqual(err, null);
+
+          doc.mixed.should.be.an.instanceof(Date);
+          --count || db.close();
+        });
       });
     });
   }

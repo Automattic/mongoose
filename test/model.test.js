@@ -708,6 +708,8 @@ module.exports = {
 
     IndexedModel.on('index', function(){
       IndexedModel.collection.getIndexes(function(err, indexes){
+        should.strictEqual(err, null);
+
         for (var i in indexes)
           indexes[i].forEach(function(index){
             if (index[0] == 'name')
@@ -717,6 +719,45 @@ module.exports = {
             if (index[0] == 'email')
               assertions++;
           });
+
+        assertions.should.eql(3);
+        db.close();
+      });
+    });
+  },
+
+  'test indexes on embedded documents': function () {
+    var BlogPosts = new Schema({
+        _id     : { type: ObjectId, index: true }
+      , title   : { type: String, index: true }
+      , desc    : String
+    });
+
+    var User = new Schema({
+        name        : { type: String, index: true }
+      , blogposts   : [BlogPosts]
+    });
+
+    mongoose.model('DeepIndexedModel', User);
+
+    var db = start()
+      , UserModel = db.model('DeepIndexedModel', 'deepindexedmodel' + random())
+      , assertions = 0;
+
+    UserModel.on('index', function () {
+      UserModel.collection.getIndexes(function (err, indexes) {
+        should.strictEqual(err, null);
+        
+        for (var i in indexes)
+          indexes[i].forEach(function(index){
+            if (index[0] == 'name')
+              assertions++;
+            if (index[0] == 'blogposts._id')
+              assertions++;
+            if (index[0] == 'blogposts.title')
+              assertions++;
+          });
+
         assertions.should.eql(3);
         db.close();
       });

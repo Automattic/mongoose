@@ -35,7 +35,7 @@ module.exports = {
   'test Query#sort': function () {
     var query = new Query();
 
-    query.sort({ test: 1, nope: -1 });
+    query.sort('test', 1, 'nope', -1);
     query.options.sort.should.eql([['test', 1], ['nope', -1]]);
   }
 

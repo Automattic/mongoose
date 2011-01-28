@@ -218,6 +218,21 @@ module.exports = {
     db.close();
   },
 
+  'test initializing with a nested hash': function () {
+    var db = start()
+      , BlogPost = db.model('BlogPost');
+
+    var post = new BlogPost({
+      meta: {
+          date      : new Date
+        , visitors  : 5
+      }
+    });
+
+    post.get('meta.visitors').should.equal(5);
+    db.close();
+  },
+
   'test isNew on embedded documents after initing': function(){
     var db = start()
       , BlogPost = db.model('BlogPost');

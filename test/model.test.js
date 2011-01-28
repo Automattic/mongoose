@@ -1812,5 +1812,43 @@ module.exports = {
         db.close();
       });
     });
+  },
+
+  'test setting a pseudo-nested virtual property': function () {
+    var db = start()
+      , PersonSchema = new Schema({
+          name: {
+              first: String
+            , last: String
+          }
+        });
+    PersonSchema.virtual('name.full')
+      .get( function () {
+        return this.get('name.first') + this.get('name.last');
+      })
+      .set( function (fullName) {
+        var split = fullName.split(' ');
+        this.set('name.first', split[0]);
+        this.set('name.last', split[1]);
+      });
+    mongoose.model('Person', PersonSchema);
+    var Person = db.model('Person')
+      , person = new Person({
+          name: {
+              first: 'Michael'
+            , last: 'Sorrentino'
+          }
+        });
+    person.get('name.full').should.equal('Michael Sorrentino');
+    person.set('name.full', 'The Situation');
+    person.get('name.first').should.equal('The');
+    person.get('name.last').should.equal('Situation');
+    db.close();
   }
+
+//  'test setting a nested virtual property via prop->{...}': function () {
+//  },
+//
+//  'test setting a nested virtual property via nested.prop.erty->val': function () {
+//  }
 };

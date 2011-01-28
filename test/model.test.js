@@ -1871,7 +1871,7 @@ module.exports = {
         });
     PersonSchema.virtual('name.full')
       .get( function () {
-        return this.get('name.first') + this.get('name.last');
+        return this.get('name.first') + ' ' + this.get('name.last');
       })
       .set( function (fullName) {
         var split = fullName.split(' ');

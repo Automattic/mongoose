@@ -1156,6 +1156,38 @@ module.exports = {
     });
   },
 
+  'test $push casting': function () {
+    var db = start()
+      , BlogPost = db.model('BlogPost')
+      , post = new BlogPost();
+
+    post.get('numbers').push('3');
+    post.get('numbers')[0].should.equal(3);
+    db.close();
+  },
+
+  'test $pull casting': function () {
+    var db = start()
+      , BlogPost = db.model('BlogPost')
+      , post = new BlogPost();
+
+    post.get('numbers').push(1, 2, 3, 4);
+    post.save( function (err) {
+      BlogPost.findById( post.get('_id'), function (err, found) {
+        found.get('numbers').length.should.equal(4);
+        found.get('numbers').$pull('3');
+        found.save( function (err) {
+          BlogPost.findById( found.get('_id'), function (err, found2) {
+            found2.get('numbers').length.should.equal(3);
+            db.close();
+          });
+        });
+      });
+    });
+    db.close();
+  },
+
+
   'test updating numbers atomically': function () {
     var db = start()
       , BlogPost = db.model('BlogPost')

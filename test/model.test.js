@@ -229,7 +229,7 @@ module.exports = {
       }
     });
 
-    post.get('meta.visitors').should.equal(5);
+    post.get('meta.visitors').valueOf().should.equal(5);
     db.close();
   },
 

@@ -36,6 +36,7 @@ Comments.add({
 
 var BlogPost = new Schema({
     title     : String
+  , author    : String
   , slug      : String
   , date      : Date
   , meta      : {
@@ -48,6 +49,17 @@ var BlogPost = new Schema({
   , owners    : [ObjectId]
   , comments  : [Comments]
 });
+
+BlogPost.virtual('titleWithAuthor')
+  .get(function () {
+    return this.get('title') + ' by ' + this.get('author');
+  })
+  .set(function (val) {
+    var split = val.split(' by ');
+    this.set('title', split[0]);
+    this.set('author', split[1]);
+  });
+
 
 BlogPost.method('cool', function(){
   return this;
@@ -1761,6 +1773,44 @@ module.exports = {
         });
       });
     });
-  }
+  },
 
+  'test getting a virtual property': function () {
+    var db = start()
+      , BlogPost = db.model('BlogPost')
+      , post = new BlogPost({
+            title: 'Letters from Earth'
+          , author: 'Mark Twain'
+        });
+    post.get('titleWithAuthor').should.equal('Letters from Earth by Mark Twain');
+    db.close();
+  },
+
+  'test setting a virtual property': function () {
+    var db = start()
+      , BlogPost = db.model('BlogPost')
+      , post = new BlogPost();
+    post.set('titleWithAuthor', 'Huckleberry Finn by Mark Twain')
+    post.get('title').should.equal('Huckleberry Finn');
+    post.get('author').should.equal('Mark Twain');
+    db.close();
+  },
+
+  'saving a doc with a set virtual property should persist the real properties but not the virtual property': function () {
+    var db = start()
+      , BlogPost = db.model('BlogPost')
+      , post = new BlogPost();
+    post.set('titleWithAuthor', 'Huckleberry Finn by Mark Twain')
+    post.get('title').should.equal('Huckleberry Finn');
+    post.get('author').should.equal('Mark Twain');
+    post.save(function (err) {
+      should.strictEqual(err, null);
+      BlogPost.findById(post.get('_id'), function (err, found) {
+        found.get('title').should.equal('Huckleberry Finn');
+        found.get('author').should.equal('Mark Twain');
+        found.toObject().should.not.have.property('titleWithAuthor');
+        db.close();
+      });
+    });
+  }
 };

@@ -7,6 +7,7 @@ var mongoose = require('./common').mongoose
   , should = require('should')
   , Schema = mongoose.Schema
   , SchemaType = mongoose.SchemaType
+  , VirtualType = mongoose.VirtualType
   , ObjectId = Schema.ObjectId
   , ValidatorError = SchemaType.ValidatorError
   , CastError = SchemaType.CastError
@@ -642,6 +643,23 @@ module.exports = {
 
     Tobi.options.a.should.eql('b');
     Tobi.options.safe.should.be.false;
+  },
+
+  'test declaring virtual attributes': function () {
+    var Contact = new Schema({
+        firstName: String
+      , lastName: String
+    });
+    Contact.virtual('fullName')
+      .get( function () {
+        return this.get('firstName') + ' ' + this.get('lastName');
+      }).set(function (fullName) {
+        var split = fullName.split(' ');
+        this.set('firstName', split[0]);
+        this.set('lastName', split[1]);
+      });
+
+    Contact.virtualpath('fullName').should.be.an.instanceof(VirtualType);
   }
 
 };

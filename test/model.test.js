@@ -1799,68 +1799,67 @@ module.exports = {
     });
   },
 
-//  'test that we don\'t instantiate MongooseNumber in arrays': function () {
-//    var db = start()
-//      , BlogPost = db.model('BlogPost', collection);
-//
-//    var post = new BlogPost();
-//    post.numbers.push(1, '2', 3);
-//
-//    post.save(function (err) {
-//      should.strictEqual(err, null);
-//
-//      BlogPost.findById(post._id, function (err, doc) {
-//        should.strictEqual(err, null);
-//
-//        (~doc.numbers.indexOf(1)).should.not.eql(0);
-//        (~doc.numbers.indexOf(2)).should.not.eql(0);
-//        (~doc.numbers.indexOf(3)).should.not.eql(0);
-//
-//        db.close();
-//      });
-//    });
-//  },
+  'test that we don\'t instantiate MongooseNumber in arrays': function () {
+    var db = start()
+      , BlogPost = db.model('BlogPost', collection);
 
-//  'test removing from an array atomically using MongooseArray#remove': function () {
-//    var db = start()
-//      , BlogPost = db.model('BlogPost', collection);
-//
-//    var post = new BlogPost();
-//    post.numbers.push(1, 2, 3);
-//
-//    post.save(function (err) {
-//      should.strictEqual(err, null);
-//
-//      BlogPost.findById(post._id, function (err, doc) {
-//        should.strictEqual(err, null);
-//
-//        doc.numbers.remove('1');
-//        doc.save(function (err) {
-//          should.strictEqual(err, null);
-//          
-//          setTimeout( function () {
-//            BlogPost.findById(post.get('_id'), function (err, doc) {
-//              should.strictEqual(err, null);
-//
-//              doc.numbers.should.have.length(2);
-//              doc.numbers.remove('2', '3');
-//
-//              doc.save(function (err) {
-//                should.strictEqual(err, null);
-//
-//                BlogPost.findById(post._id, function (err, doc) {
-//                  should.strictEqual(err, null);
-//
-//                  doc.numbers.should.have.length(0);
-//                  db.close();
-//                });
-//              });
-//            });
-//          }, 1000);
-//        });
-//      });
-//    });
-//  },
+    var post = new BlogPost();
+    post.numbers.push(1, '2', 3);
+
+    post.save(function (err) {
+      should.strictEqual(err, null);
+
+      BlogPost.findById(post._id, function (err, doc) {
+        should.strictEqual(err, null);
+
+        (~doc.numbers.indexOf(1)).should.not.eql(0);
+        (~doc.numbers.indexOf(2)).should.not.eql(0);
+        (~doc.numbers.indexOf(3)).should.not.eql(0);
+
+        db.close();
+      });
+    });
+  },
+
+  'test removing from an array atomically using MongooseArray#remove': function () {
+    var db = start()
+      , BlogPost = db.model('BlogPost', collection);
+
+    var post = new BlogPost();
+    post.numbers.push(1, 2, 3);
+
+    post.save(function (err) {
+      should.strictEqual(err, null);
+
+      BlogPost.findById(post._id, function (err, doc) {
+        should.strictEqual(err, null);
+
+        doc.numbers.remove('1');
+        doc.save(function (err) {
+          should.strictEqual(err, null);
+          
+          BlogPost.findById(post.get('_id'), function (err, doc) {
+            should.strictEqual(err, null);
+
+            doc.numbers.should.have.length(2);
+            doc.numbers.remove('2', '3');
+
+            doc.save(function (err) {
+              should.strictEqual(err, null);
+
+              BlogPost.findById(post._id, function (err, doc) {
+                should.strictEqual(err, null);
+
+                doc.numbers.should.have.length(0);
+                db.close();
+              });
+            });
+          });
+
+        });
+      });
+    });
+  },
 
   'test getting a virtual property': function () {
     var db = start()

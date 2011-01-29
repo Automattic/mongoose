@@ -1276,6 +1276,28 @@ module.exports = {
     });
   },
 
+  'test incrementing a number atomically with an arbitrary value': function () {
+    var db = start()
+      , BlogPost = db.model('BlogPost');
+
+    var post = new BlogPost();
+
+    post.meta.visitors = 0;
+
+    post.save(function (err) {
+      should.strictEqual(err, null);
+
+      post.meta.visitors.increment(50);
+
+      post.save(function (err) {
+        should.strictEqual(err, null);
+
+        (+post.meta.visitors).should.eql(50);
+        db.close();
+      });
+    });
+  },
+
   'test saving subdocuments atomically': function () {
     var db = start()
       , BlogPost = db.model('BlogPost')

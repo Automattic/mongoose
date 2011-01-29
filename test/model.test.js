@@ -1112,6 +1112,7 @@ module.exports = {
   },
 
   'test updating documents': function () {
+    var collection = 'blogposts_' + random();
     var db = start()
       , BlogPost = db.model('BlogPost', collection)
       , title = 'Tobi ' + random()
@@ -1495,6 +1496,7 @@ module.exports = {
   },
 
   'test findOne queries that require casting for $modifiers ($gt, $lt, etc)': function () {
+    var collection = 'blogposts_' + random();
     var db = start()
       , BlogPost = db.model('BlogPost', collection)
       , post = new BlogPost({
@@ -1513,6 +1515,7 @@ module.exports = {
   },
 
   'test find queries that require casting for $modifiers ($gt, $lt, etc)': function () {
+    var collection = 'blogposts_' + random();
     var db = start()
       , BlogPost = db.model('BlogPost', collection)
       , post = new BlogPost({
@@ -1532,35 +1535,36 @@ module.exports = {
   },
 
 
-//  'test filtering an embedded array by the id shortcut function': function () {
-//    var db = start()
-//      , BlogPost = db.model('BlogPost', collection);
-//
-//    var post = new BlogPost();
-//
-//    post.comments.push({ title: 'woot' });
-//    post.comments.push({ title: 'aaaa' });
-//
-//    var subdoc1 = post.comments[0];
-//    var subdoc2 = post.comments[1];
-//
-//    post.save(function (err) {
-//      should.strictEqual(err, null);
-//
-//      BlogPost.findById(post.get('_id'), function (err, doc) {
-//        should.strictEqual(err, null);
-//
-//        // test with an objectid
-//        doc.comments.id(subdoc1.get('_id')).title.should.eql('woot');
-//
-//        // test with a string
-//        var id = DocumentObjectId.toString(subdoc2._id);
-//        doc.comments.id(id).title.should.eql('aaaa');
-//
-//        db.close();
-//      });
-//    });
-//  },
+  'test filtering an embedded array by the id shortcut function': function () {
+    var collection = 'blogposts_' + random();
+    var db = start()
+      , BlogPost = db.model('BlogPost', collection);
+
+    var post = new BlogPost();
+
+    post.comments.push({ title: 'woot' });
+    post.comments.push({ title: 'aaaa' });
+
+    var subdoc1 = post.comments[0];
+    var subdoc2 = post.comments[1];
+
+    post.save(function (err) {
+      should.strictEqual(err, null);
+
+      BlogPost.findById(post.get('_id'), function (err, doc) {
+        should.strictEqual(err, null);
+
+        // test with an objectid
+        doc.comments.id(subdoc1.get('_id')).title.should.eql('woot');
+
+        // test with a string
+        var id = DocumentObjectId.toString(subdoc2._id);
+        doc.comments.id(id).title.should.eql('aaaa');
+
+        db.close();
+      });
+    });
+  },
 
   'test filtering an embedded array by the id with cast error': function () {
     var db = start()
@@ -1855,7 +1859,6 @@ module.exports = {
               });
             });
           });
-
         });
       });
     });

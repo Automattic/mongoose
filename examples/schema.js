@@ -36,7 +36,7 @@ BlogPost.path('date')
   .default(function(){
      return new Date()
    })
-  .setter(function(v){
+  .set(function(v){
      return v == 'now' ? new Date() : v;
    });
 
@@ -57,7 +57,7 @@ function slugGenerator (options){
   var key = options.key || 'title';
   
   return function slugGenerator(schema){
-    schema.path(key).setter(function(v){
+    schema.path(key).set(function(v){
       this.slug = v.toLowerCase().replace(/[^a-z0-9]/g, '').replace(/-+/g, '');
       return v;
     });

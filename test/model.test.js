@@ -1000,11 +1000,11 @@ module.exports = {
       --count || db.close();
     };
 
-    BlogPost.update({title: 'nada y nada y nada 1'}, {}, fn).should.be.an.instanceof(Query);
-    BlogPost.update({title: 'nada y nada y nada 2'}, {}, fn).executed.should.be.true;
+    BlogPost.update({title: random()}, {}, fn).should.be.an.instanceof(Query);
+    BlogPost.update({title: random()}, {}, fn).executed.should.be.true;
 
-    BlogPost.update({title: 'nada y nada y nada 3'}, {}, {}, fn).should.be.an.instanceof(Query);
-    BlogPost.update({title: 'nada y nada y nada 4'}, {}, {}, fn).executed.should.be.true;
+    BlogPost.update({title: random()}, {}, {}, fn).should.be.an.instanceof(Query);
+    BlogPost.update({title: random()}, {}, {}, fn).executed.should.be.true;
   },
 
   'test finding a document': function () {
@@ -1514,7 +1514,7 @@ module.exports = {
     });
   },
 
-  'test findOne queries that require casting for $modifiers ($gt, $lt, etc)': function () {
+  'test findOne queries that require casting for $modifiers': function () {
     var db = start()
       , BlogPost = db.model('BlogPost', collection)
       , post = new BlogPost({
@@ -1523,16 +1523,20 @@ module.exports = {
           }
         });
 
-    post.save( function (err) {
-      BlogPost.findOne({ 'meta.visitors': { $gt: '-20', $lt: -1 } }, function (err, found) {
-        found.get('meta.visitors').valueOf().should.equal(post.get('meta.visitors').valueOf());
+    post.save(function (err) {
+      should.strictEqual(err, null);
+
+      BlogPost.findOne({ 'meta.visitors': { $gt: '-20', $lt: -1 } }, 
+      function (err, found) {
+        found.get('meta.visitors')
+             .valueOf().should.equal(post.get('meta.visitors').valueOf());
         found.get('_id').should.eql(post.get('_id'));
         db.close();
       });
     });
   },
 
-  'test find queries that require casting for $modifiers ($gt, $lt, etc)': function () {
+  'test find queries that require casting for $modifiers': function () {
     var db = start()
       , BlogPost = db.model('BlogPost', collection)
       , post = new BlogPost({
@@ -1540,11 +1544,18 @@ module.exports = {
             visitors: -75
           }
         });
-    post.save( function (err) {
-      BlogPost.find({ 'meta.visitors': { $gt: '-100', $lt: -50 } }, function (err, found) {
+
+    post.save(function (err) {
+      should.strictEqual(err, null);
+
+      BlogPost.find({ 'meta.visitors': { $gt: '-100', $lt: -50 } },
+      function (err, found) {
+        should.strictEqual(err, null);
+
         found.should.have.length(1);
         found[0].get('_id').should.eql(post.get('_id'));
-        found[0].get('meta.visitors').valueOf().should.equal(post.get('meta.visitors').valueOf());
+        found[0].get('meta.visitors').valueOf()
+                .should.equal(post.get('meta.visitors').valueOf());
         db.close();
       });
     });
@@ -1886,7 +1897,9 @@ module.exports = {
             title: 'Letters from Earth'
           , author: 'Mark Twain'
         });
+
     post.get('titleWithAuthor').should.equal('Letters from Earth by Mark Twain');
+
     db.close();
   },
 
@@ -1894,9 +1907,11 @@ module.exports = {
     var db = start()
       , BlogPost = db.model('BlogPost', collection)
       , post = new BlogPost();
+
     post.set('titleWithAuthor', 'Huckleberry Finn by Mark Twain')
     post.get('title').should.equal('Huckleberry Finn');
     post.get('author').should.equal('Mark Twain');
+
     db.close();
   },
 
@@ -1904,12 +1919,17 @@ module.exports = {
     var db = start()
       , BlogPost = db.model('BlogPost', collection)
       , post = new BlogPost();
+
     post.set('titleWithAuthor', 'Huckleberry Finn by Mark Twain')
     post.get('title').should.equal('Huckleberry Finn');
     post.get('author').should.equal('Mark Twain');
+
     post.save(function (err) {
       should.strictEqual(err, null);
+
       BlogPost.findById(post.get('_id'), function (err, found) {
+        should.strictEqual(err, null);
+
         found.get('title').should.equal('Huckleberry Finn');
         found.get('author').should.equal('Mark Twain');
         found.toObject().should.not.have.property('titleWithAuthor');
@@ -1926,6 +1946,7 @@ module.exports = {
             , last: String
           }
         });
+
     PersonSchema.virtual('name.full')
       .get( function () {
         return this.get('name.first') + ' ' + this.get('name.last');
@@ -1935,7 +1956,9 @@ module.exports = {
         this.set('name.first', split[0]);
         this.set('name.last', split[1]);
       });
+
     mongoose.model('Person', PersonSchema);
+
     var Person = db.model('Person')
       , person = new Person({
           name: {
@@ -1943,29 +1966,35 @@ module.exports = {
             , last: 'Sorrentino'
           }
         });
+
     person.get('name.full').should.equal('Michael Sorrentino');
     person.set('name.full', 'The Situation');
     person.get('name.first').should.equal('The');
     person.get('name.last').should.equal('Situation');
+
     db.close();
   },
-
-//  'test setting a nested virtual property via prop->{...}': function () {
-//  },
-//
-//  'test setting a nested virtual property via nested.prop.erty->val': function () {
-//  },
 
   'test removing all documents from a collection via Model.remove': function () {
     var db = start()
       , collection = 'blogposts_' + random()
       , BlogPost = db.model('BlogPost', collection)
       , post = new BlogPost();
-    post.save( function (err) {
+
+    post.save(function (err) {
+      should.strictEqual(err, null);
+
       BlogPost.find({}, function (err, found) {
+        should.strictEqual(err, null);
+        
         found.should.have.length(1);
+        
         BlogPost.remove({}, function (err) {
+          should.strictEqual(err, null);
+
           BlogPost.find({}, function (err, found2) {
+            should.strictEqual(err, null);
+
             found2.should.have.length(0);
             db.close();
           });

@@ -991,21 +991,21 @@ module.exports = {
     db.close();
   },
 
-  'test that update Query executes when you pass a callback': function () {
-    var db = start()
-      , BlogPost = db.model('BlogPost', collection)
-      , count = 4;
-
-    function fn () {
-      --count || db.close();
-    };
-
-    BlogPost.update({}, {}, fn).should.be.an.instanceof(Query);
-    BlogPost.update({}, {}, fn).executed.should.be.true;
-
-    BlogPost.update({}, {}, {}, fn).should.be.an.instanceof(Query);
-    BlogPost.update({}, {}, {}, fn).executed.should.be.true;
-  },
+//  'test that update Query executes when you pass a callback': function () {
+//    var db = start()
+//      , BlogPost = db.model('BlogPost', collection)
+//      , count = 4;
+//
+//    function fn () {
+//      --count || db.close();
+//    };
+//
+//    BlogPost.update({}, {}, fn).should.be.an.instanceof(Query);
+//    BlogPost.update({}, {}, fn).executed.should.be.true;
+//
+//    BlogPost.update({}, {}, {}, fn).should.be.an.instanceof(Query);
+//    BlogPost.update({}, {}, {}, fn).executed.should.be.true;
+//  },
 
   'test finding a document': function () {
     var db = start()
@@ -1112,7 +1112,6 @@ module.exports = {
   },
 
   'test updating documents': function () {
-    var collection = 'blogposts_' + random();
     var db = start()
       , BlogPost = db.model('BlogPost', collection)
       , title = 'Tobi ' + random()
@@ -1212,9 +1211,7 @@ module.exports = {
         });
       });
     });
-    db.close();
   },
-
 
   'test updating numbers atomically': function () {
     var db = start()
@@ -1496,7 +1493,6 @@ module.exports = {
   },
 
   'test findOne queries that require casting for $modifiers ($gt, $lt, etc)': function () {
-    var collection = 'blogposts_' + random();
     var db = start()
       , BlogPost = db.model('BlogPost', collection)
       , post = new BlogPost({
@@ -1515,7 +1511,6 @@ module.exports = {
   },
 
   'test find queries that require casting for $modifiers ($gt, $lt, etc)': function () {
-    var collection = 'blogposts_' + random();
     var db = start()
       , BlogPost = db.model('BlogPost', collection)
       , post = new BlogPost({
@@ -1534,9 +1529,7 @@ module.exports = {
 
   },
 
-
   'test filtering an embedded array by the id shortcut function': function () {
-    var collection = 'blogposts_' + random();
     var db = start()
       , BlogPost = db.model('BlogPost', collection);
 

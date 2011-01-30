@@ -86,7 +86,7 @@ module.exports = {
 
   'test presence of model schema': function(){
     var db = start()
-      , BlogPost = db.model('BlogPost');
+      , BlogPost = db.model('BlogPost', collection);
 
     BlogPost.schema.should.be.an.instanceof(Schema);
     BlogPost.prototype.schema.should.be.an.instanceof(Schema);
@@ -95,7 +95,7 @@ module.exports = {
 
   'test a model default structure when instantiated': function(){
     var db = start()
-      , BlogPost = db.model('BlogPost');
+      , BlogPost = db.model('BlogPost', collection);
 
     var post = new BlogPost();
     post.isNew.should.be.true;
@@ -121,7 +121,7 @@ module.exports = {
 
   'test a model structure when saved': function(){
     var db = start()
-      , BlogPost = db.model('BlogPost');
+      , BlogPost = db.model('BlogPost', collection);
 
     var post = new BlogPost();
     post.save(function(err){
@@ -148,7 +148,7 @@ module.exports = {
 
   'test a model structure when initd': function(){
     var db = start()
-      , BlogPost = db.model('BlogPost');
+      , BlogPost = db.model('BlogPost', collection);
 
     var post = new BlogPost()
     post.init({
@@ -204,7 +204,7 @@ module.exports = {
 
   'test a model structure when partially initd': function(){
     var db = start()
-      , BlogPost = db.model('BlogPost');
+      , BlogPost = db.model('BlogPost', collection);
 
     var post = new BlogPost()
     post.init({
@@ -232,7 +232,7 @@ module.exports = {
 
   'test initializing with a nested hash': function () {
     var db = start()
-      , BlogPost = db.model('BlogPost');
+      , BlogPost = db.model('BlogPost', collection);
 
     var post = new BlogPost({
       meta: {
@@ -247,7 +247,7 @@ module.exports = {
 
   'test isNew on embedded documents after initing': function(){
     var db = start()
-      , BlogPost = db.model('BlogPost');
+      , BlogPost = db.model('BlogPost', collection);
 
     var post = new BlogPost()
     post.init({
@@ -262,7 +262,7 @@ module.exports = {
 
   'test isModified when modifying keys': function(){
     var db = start()
-      , BlogPost = db.model('BlogPost');
+      , BlogPost = db.model('BlogPost', collection);
 
     var post = new BlogPost()
     post.init({
@@ -285,7 +285,7 @@ module.exports = {
 
   'test isModified on a DocumentArray': function(){
     var db = start()
-      , BlogPost = db.model('BlogPost');
+      , BlogPost = db.model('BlogPost', collection);
 
     var post = new BlogPost()
     post.init({
@@ -303,7 +303,7 @@ module.exports = {
 
   'test isModified on a DocumentArray with accessors': function(){
     var db = start()
-      , BlogPost = db.model('BlogPost');
+      , BlogPost = db.model('BlogPost', collection);
 
     var post = new BlogPost()
     post.init({
@@ -322,7 +322,7 @@ module.exports = {
   'test isModified on a MongooseArray with atomics methods': function(){
     // COMPLETEME
     var db = start()
-      , BlogPost = db.model('BlogPost');
+      , BlogPost = db.model('BlogPost', collection);
 
     var post = new BlogPost()
 
@@ -336,7 +336,7 @@ module.exports = {
   'test isModified on a MongooseArray with native methods': function(){
     // COMPLETEME
     var db = start()
-      , BlogPost = db.model('BlogPost');
+      , BlogPost = db.model('BlogPost', collection);
 
     var post = new BlogPost()
 
@@ -348,7 +348,7 @@ module.exports = {
 
   'test defining a new method': function(){
     var db = start()
-      , BlogPost = db.model('BlogPost');
+      , BlogPost = db.model('BlogPost', collection);
 
     var post = new BlogPost();
     post.cool().should.eql(post);
@@ -357,7 +357,7 @@ module.exports = {
 
   'test defining a static': function(){
     var db = start()
-      , BlogPost = db.model('BlogPost');
+      , BlogPost = db.model('BlogPost', collection);
 
     BlogPost.woot().should.eql(BlogPost);
     db.close();
@@ -365,7 +365,7 @@ module.exports = {
 
   'test casting error': function(){
     var db = start()
-      , BlogPost = db.model('BlogPost')
+      , BlogPost = db.model('BlogPost', collection)
       , threw = false;
 
     var post = new BlogPost();
@@ -397,7 +397,7 @@ module.exports = {
   
   'test nested casting error': function(){
     var db = start()
-      , BlogPost = db.model('BlogPost')
+      , BlogPost = db.model('BlogPost', collection)
       , threw = false;
 
     var post = new BlogPost();
@@ -431,7 +431,7 @@ module.exports = {
 
   'test casting error in subdocuments': function(){
     var db = start()
-      , BlogPost = db.model('BlogPost')
+      , BlogPost = db.model('BlogPost', collection)
       , threw = false;
 
     var post = new BlogPost()
@@ -452,7 +452,7 @@ module.exports = {
 
   'test casting error when adding a subdocument': function(){
     var db = start()
-      , BlogPost = db.model('BlogPost')
+      , BlogPost = db.model('BlogPost', collection)
       , threw = false;
 
     var post = new BlogPost()
@@ -841,7 +841,7 @@ module.exports = {
 
   'test that find returns a Query': function () {
     var db = start()
-      , BlogPost = db.model('BlogPost');
+      , BlogPost = db.model('BlogPost', collection);
     
     // query
     BlogPost.find({}).should.be.an.instanceof(Query);
@@ -868,7 +868,7 @@ module.exports = {
 
   'test that findOne returns a Query': function () {
     var db = start()
-      , BlogPost = db.model('BlogPost');
+      , BlogPost = db.model('BlogPost', collection);
     
     // query
     BlogPost.findOne({}).should.be.an.instanceof(Query);
@@ -895,7 +895,7 @@ module.exports = {
 
   'test that a query is executed when a callback is passed': function () {
     var db = start()
-      , BlogPost = db.model('BlogPost')
+      , BlogPost = db.model('BlogPost', collection)
       , count = 10
       , q =  { _id: new DocumentObjectId }; // make sure the query is fast
 
@@ -926,7 +926,7 @@ module.exports = {
 
   'test that query is executed with a callback for findOne': function () {
     var db = start()
-      , BlogPost = db.model('BlogPost')
+      , BlogPost = db.model('BlogPost', collection)
       , count = 10
       , q =  { _id: new DocumentObjectId }; // make sure the query is fast
 
@@ -957,7 +957,7 @@ module.exports = {
 
   'test that count returns a Query': function () {
     var db = start()
-      , BlogPost = db.model('BlogPost');
+      , BlogPost = db.model('BlogPost', collection);
 
     BlogPost.count({}).should.be.an.instanceof(Query);
     BlogPost.count({}).executed.should.be.false;
@@ -967,7 +967,7 @@ module.exports = {
 
   'test that count Query executes when you pass a callback': function () {
     var db = start()
-      , BlogPost = db.model('BlogPost')
+      , BlogPost = db.model('BlogPost', collection)
       , count = 2;
 
     function fn () {
@@ -980,7 +980,7 @@ module.exports = {
 
   'test that update returns a Query': function () {
     var db = start()
-      , BlogPost = db.model('BlogPost');
+      , BlogPost = db.model('BlogPost', collection);
 
     BlogPost.update({}, {}).should.be.an.instanceof(Query);
     BlogPost.update({}, {}).executed.should.be.false;
@@ -993,23 +993,23 @@ module.exports = {
 
   'test that update Query executes when you pass a callback': function () {
     var db = start()
-      , BlogPost = db.model('BlogPost')
+      , BlogPost = db.model('BlogPost', collection)
       , count = 4;
 
     function fn () {
       --count || db.close();
     };
 
-    BlogPost.update({}, {}, fn).should.be.an.instanceof(Query);
-    BlogPost.update({}, {}, fn).executed.should.be.true;
+    BlogPost.update({title: 'nada y nada y nada 1'}, {}, fn).should.be.an.instanceof(Query);
+    BlogPost.update({title: 'nada y nada y nada 2'}, {}, fn).executed.should.be.true;
 
-    BlogPost.update({}, {}, {}, fn).should.be.an.instanceof(Query);
-    BlogPost.update({}, {}, {}, fn).executed.should.be.true;
+    BlogPost.update({title: 'nada y nada y nada 3'}, {}, {}, fn).should.be.an.instanceof(Query);
+    BlogPost.update({title: 'nada y nada y nada 4'}, {}, {}, fn).executed.should.be.true;
   },
 
   'test finding a document': function () {
     var db = start()
-      , BlogPost = db.model('BlogPost')
+      , BlogPost = db.model('BlogPost', collection)
       , title = 'Wooooot ' + random();
 
     var post = new BlogPost();
@@ -1030,7 +1030,7 @@ module.exports = {
 
   'test finding a document byId': function () {
     var db = start()
-      , BlogPost = db.model('BlogPost')
+      , BlogPost = db.model('BlogPost', collection)
       , title = 'Edwald ' + random();
 
     var post = new BlogPost();
@@ -1051,7 +1051,7 @@ module.exports = {
 
   'test finding documents': function () {
     var db = start()
-      , BlogPost = db.model('BlogPost')
+      , BlogPost = db.model('BlogPost', collection)
       , title = 'Wooooot ' + random();
 
     var post = new BlogPost();
@@ -1084,7 +1084,7 @@ module.exports = {
 
   'test counting documents': function () {
     var db = start()
-      , BlogPost = db.model('BlogPost')
+      , BlogPost = db.model('BlogPost', collection)
       , title = 'Wooooot ' + random();
 
     var post = new BlogPost();
@@ -1113,7 +1113,7 @@ module.exports = {
 
   'test updating documents': function () {
     var db = start()
-      , BlogPost = db.model('BlogPost')
+      , BlogPost = db.model('BlogPost', collection)
       , title = 'Tobi ' + random()
       , newTitle = 'Woot ' + random();
 
@@ -1138,7 +1138,7 @@ module.exports = {
 
   'test query casting': function () {
     var db = start()
-      , BlogPost = db.model('BlogPost')
+      , BlogPost = db.model('BlogPost', collection)
       , title = 'Loki ' + random();
 
     var post = new BlogPost()
@@ -1160,7 +1160,7 @@ module.exports = {
 
   'test update doc casting': function () {
     var db = start()
-      , BlogPost = db.model('BlogPost');
+      , BlogPost = db.model('BlogPost', collection);
 
     var post = new BlogPost();
     post.set('title', '1');
@@ -1185,7 +1185,7 @@ module.exports = {
 
   'test $push casting': function () {
     var db = start()
-      , BlogPost = db.model('BlogPost')
+      , BlogPost = db.model('BlogPost', collection)
       , post = new BlogPost();
 
     post.get('numbers').push('3');
@@ -1195,7 +1195,7 @@ module.exports = {
 
   'test $pull casting': function () {
     var db = start()
-      , BlogPost = db.model('BlogPost')
+      , BlogPost = db.model('BlogPost', collection)
       , post = new BlogPost();
 
     post.get('numbers').push(1, 2, 3, 4);
@@ -1211,13 +1211,11 @@ module.exports = {
         });
       });
     });
-    db.close();
   },
-
 
   'test updating numbers atomically': function () {
     var db = start()
-      , BlogPost = db.model('BlogPost')
+      , BlogPost = db.model('BlogPost', collection)
       , totalDocs = 4
       , saveQueue = [];
 
@@ -1300,7 +1298,7 @@ module.exports = {
 
   'test saving subdocuments atomically': function () {
     var db = start()
-      , BlogPost = db.model('BlogPost')
+      , BlogPost = db.model('BlogPost', collection)
       , totalDocs = 4
       , saveQueue = [];
     
@@ -1507,7 +1505,7 @@ module.exports = {
 
   'test a query that includes a casting error': function () {
     var db = start()
-      , BlogPost = db.model('BlogPost');
+      , BlogPost = db.model('BlogPost', collection);
 
     BlogPost.find({ date: 'invalid date' }, function (err) {
       err.should.be.an.instanceof(Error);
@@ -1516,9 +1514,46 @@ module.exports = {
     });
   },
 
+  'test findOne queries that require casting for $modifiers ($gt, $lt, etc)': function () {
+    var db = start()
+      , BlogPost = db.model('BlogPost', collection)
+      , post = new BlogPost({
+          meta: {
+            visitors: -10
+          }
+        });
+
+    post.save( function (err) {
+      BlogPost.findOne({ 'meta.visitors': { $gt: '-20', $lt: -1 } }, function (err, found) {
+        found.get('meta.visitors').valueOf().should.equal(post.get('meta.visitors').valueOf());
+        found.get('_id').should.eql(post.get('_id'));
+        db.close();
+      });
+    });
+  },
+
+  'test find queries that require casting for $modifiers ($gt, $lt, etc)': function () {
+    var db = start()
+      , BlogPost = db.model('BlogPost', collection)
+      , post = new BlogPost({
+          meta: {
+            visitors: -75
+          }
+        });
+    post.save( function (err) {
+      BlogPost.find({ 'meta.visitors': { $gt: '-100', $lt: -50 } }, function (err, found) {
+        found.should.have.length(1);
+        found[0].get('_id').should.eql(post.get('_id'));
+        found[0].get('meta.visitors').valueOf().should.equal(post.get('meta.visitors').valueOf());
+        db.close();
+      });
+    });
+
+  },
+
   'test filtering an embedded array by the id shortcut function': function () {
     var db = start()
-      , BlogPost = db.model('BlogPost');
+      , BlogPost = db.model('BlogPost', collection);
 
     var post = new BlogPost();
 
@@ -1548,7 +1583,7 @@ module.exports = {
 
   'test filtering an embedded array by the id with cast error': function () {
     var db = start()
-      , BlogPost = db.model('BlogPost');
+      , BlogPost = db.model('BlogPost', collection);
 
     var post = new BlogPost();
 
@@ -1566,7 +1601,7 @@ module.exports = {
 
   'test filtering an embedded array by the id shortcut with no match': function () {
     var db = start()
-      , BlogPost = db.model('BlogPost');
+      , BlogPost = db.model('BlogPost', collection);
 
     var post = new BlogPost();
 
@@ -1584,7 +1619,7 @@ module.exports = {
 
   'test for removing a subdocument atomically': function () {
     var db = start()
-      , BlogPost = db.model('BlogPost');
+      , BlogPost = db.model('BlogPost', collection);
 
     var post = new BlogPost();
     post.title = 'hahaha';
@@ -1616,7 +1651,7 @@ module.exports = {
 
   'test for findById with partial initialization': function () {
     var db = start()
-      , BlogPost = db.model('BlogPost')
+      , BlogPost = db.model('BlogPost', collection)
       , queries = 5;
 
     var post = new BlogPost();
@@ -1671,7 +1706,7 @@ module.exports = {
 
   'test for find with partial initialization': function () {
     var db = start()
-      , BlogPost = db.model('BlogPost')
+      , BlogPost = db.model('BlogPost', collection)
       , queries = 5;
 
     var post = new BlogPost();
@@ -1726,7 +1761,7 @@ module.exports = {
 
   'try saving mixed data': function () {
     var db = start()
-      , BlogPost = db.model('BlogPost')
+      , BlogPost = db.model('BlogPost', collection)
       , count = 3;
 
     // string
@@ -1785,7 +1820,7 @@ module.exports = {
 
   'test that we don\'t instantiate MongooseNumber in arrays': function () {
     var db = start()
-      , BlogPost = db.model('BlogPost');
+      , BlogPost = db.model('BlogPost', collection);
 
     var post = new BlogPost();
     post.numbers.push(1, '2', 3);
@@ -1807,7 +1842,7 @@ module.exports = {
 
   'test removing from an array atomically using MongooseArray#remove': function () {
     var db = start()
-      , BlogPost = db.model('BlogPost');
+      , BlogPost = db.model('BlogPost', collection);
 
     var post = new BlogPost();
     post.numbers.push(1, 2, 3);
@@ -1822,7 +1857,7 @@ module.exports = {
         doc.save(function (err) {
           should.strictEqual(err, null);
           
-          BlogPost.findById(post._id, function (err, doc) {
+          BlogPost.findById(post.get('_id'), function (err, doc) {
             should.strictEqual(err, null);
 
             doc.numbers.should.have.length(2);
@@ -1846,7 +1881,7 @@ module.exports = {
 
   'test getting a virtual property': function () {
     var db = start()
-      , BlogPost = db.model('BlogPost')
+      , BlogPost = db.model('BlogPost', collection)
       , post = new BlogPost({
             title: 'Letters from Earth'
           , author: 'Mark Twain'
@@ -1857,7 +1892,7 @@ module.exports = {
 
   'test setting a virtual property': function () {
     var db = start()
-      , BlogPost = db.model('BlogPost')
+      , BlogPost = db.model('BlogPost', collection)
       , post = new BlogPost();
     post.set('titleWithAuthor', 'Huckleberry Finn by Mark Twain')
     post.get('title').should.equal('Huckleberry Finn');
@@ -1867,7 +1902,7 @@ module.exports = {
 
   'saving a doc with a set virtual property should persist the real properties but not the virtual property': function () {
     var db = start()
-      , BlogPost = db.model('BlogPost')
+      , BlogPost = db.model('BlogPost', collection)
       , post = new BlogPost();
     post.set('titleWithAuthor', 'Huckleberry Finn by Mark Twain')
     post.get('title').should.equal('Huckleberry Finn');
@@ -1913,11 +1948,30 @@ module.exports = {
     person.get('name.first').should.equal('The');
     person.get('name.last').should.equal('Situation');
     db.close();
-  }
+  },
 
 //  'test setting a nested virtual property via prop->{...}': function () {
 //  },
 //
 //  'test setting a nested virtual property via nested.prop.erty->val': function () {
-//  }
+//  },
+
+  'test removing all documents from a collection via Model.remove': function () {
+    var db = start()
+      , collection = 'blogposts_' + random()
+      , BlogPost = db.model('BlogPost', collection)
+      , post = new BlogPost();
+    post.save( function (err) {
+      BlogPost.find({}, function (err, found) {
+        found.should.have.length(1);
+        BlogPost.remove({}, function (err) {
+          BlogPost.find({}, function (err, found2) {
+            found2.should.have.length(0);
+            db.close();
+          });
+        });
+      });
+    });
+  },
+
 };

@@ -2003,4 +2003,22 @@ module.exports = {
     });
   },
 
+  // GH-190
+  'test shorcut getter for a type defined with { type: Native }': function () {
+    var schema = new Schema({
+        date: { type: Date, index: true }
+    });
+
+    mongoose.model('ShortcutGetterObject', schema);
+
+    var db = start()
+      , ShortcutGetter = db.model('ShortcutGetterObject')
+      , post = new ShortcutGetter();
+
+    post.set('date', Date.now());
+    post.date.should.be.an.instanceof(Date);
+
+    db.close();
+  }
+
 };

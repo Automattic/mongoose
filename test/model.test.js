@@ -991,21 +991,21 @@ module.exports = {
     db.close();
   },
 
-//  'test that update Query executes when you pass a callback': function () {
-//    var db = start()
-//      , BlogPost = db.model('BlogPost', collection)
-//      , count = 4;
-//
-//    function fn () {
-//      --count || db.close();
-//    };
-//
-//    BlogPost.update({}, {}, fn).should.be.an.instanceof(Query);
-//    BlogPost.update({}, {}, fn).executed.should.be.true;
-//
-//    BlogPost.update({}, {}, {}, fn).should.be.an.instanceof(Query);
-//    BlogPost.update({}, {}, {}, fn).executed.should.be.true;
-//  },
+  'test that update Query executes when you pass a callback': function () {
+    var db = start()
+      , BlogPost = db.model('BlogPost', collection)
+      , count = 4;
+
+    function fn () {
+      --count || db.close();
+    };
+
+    BlogPost.update({title: 'nada y nada y nada 1'}, {}, fn).should.be.an.instanceof(Query);
+    BlogPost.update({title: 'nada y nada y nada 2'}, {}, fn).executed.should.be.true;
+
+    BlogPost.update({title: 'nada y nada y nada 3'}, {}, {}, fn).should.be.an.instanceof(Query);
+    BlogPost.update({title: 'nada y nada y nada 4'}, {}, {}, fn).executed.should.be.true;
+  },
 
   'test finding a document': function () {
     var db = start()

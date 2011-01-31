@@ -2019,6 +2019,34 @@ module.exports = {
     post.date.should.be.an.instanceof(Date);
 
     db.close();
+  },
+
+  // GH-195
+  'test that save on an unaltered model doesn\'t clear the document': function () {
+    var db = start()
+      , BlogPost = db.model('BlogPost');
+
+    var post = new BlogPost();
+    post.title = 'woot';
+    post.save(function (err) {
+      should.strictEqual(err, null);
+
+      BlogPost.findById(post._id, function (err, doc) {
+        should.strictEqual(err, null);
+
+        // we deliberately make no alterations
+        doc.save(function (err) {
+          should.strictEqual(err, null);
+
+          BlogPost.findById(doc._id, function (err, doc) {
+            should.strictEqual(err, null);
+
+            doc.title.should.be('woot');
+            db.close();
+          });
+        });
+      });
+    });
   }
 
 };

@@ -1303,7 +1303,7 @@ module.exports = {
   // GH-203
   'test changing a number non-atomically': function () {
     var db = start()
-      , BlogPost = db.model('BlogPost');
+      , BlogPost = db.model('BlogPost', collection);
 
     var post = new BlogPost();
 
@@ -2121,6 +2121,28 @@ module.exports = {
             db.close();
           });
         });
+      });
+    });
+  },
+
+  // GH-204
+  'test query casting when finding by Date': function () {
+    var db = start()
+      , BlogPost = db.model('BlogPost', collection);
+
+    var post = new BlogPost();
+
+    post.meta.date = new Date();
+
+    post.save(function (err) {
+      should.strictEqual(err, null);
+
+      BlogPost.findOne({ _id: post._id, 'meta.date': { $lte: Date.now() } },
+      function (err, doc) {
+        should.strictEqual(err, null);
+
+        DocumentObjectId.toString(doc._id).should.eql(DocumentObjectId.toString(post._id));
+        db.close();
       });
     });
   }

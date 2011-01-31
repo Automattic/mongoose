@@ -1559,7 +1559,26 @@ module.exports = {
         db.close();
       });
     });
+  },
 
+  // GH-199
+  'test find queries with $in cast the values within the array': function () {
+    var db = start()
+      , BlogPost = db.model('BlogPost', collection);
+
+    var post = new BlogPost()
+      , id = DocumentObjectId.toString(post._id);
+
+    post.save(function (err) {
+      should.strictEqual(err, null);
+
+      BlogPost.findOne({ _id: { $in: [id] } }, function (err, doc) {
+        should.strictEqual(err, null);
+
+        DocumentObjectId.toString(doc._id).should.eql(id);
+        db.close();
+      });
+    });
   },
 
   'test filtering an embedded array by the id shortcut function': function () {
@@ -2034,7 +2053,7 @@ module.exports = {
     mongoose.model('ShortcutGetterObject', schema);
 
     var db = start()
-      , ShortcutGetter = db.model('ShortcutGetterObject')
+      , ShortcutGetter = db.model('ShortcutGetterObject', collection)
       , post = new ShortcutGetter();
 
     post.set('date', Date.now());
@@ -2046,7 +2065,7 @@ module.exports = {
   // GH-195
   'test that save on an unaltered model doesn\'t clear the document': function () {
     var db = start()
-      , BlogPost = db.model('BlogPost');
+      , BlogPost = db.model('BlogPost', collection);
 
     var post = new BlogPost();
     post.title = 'woot';

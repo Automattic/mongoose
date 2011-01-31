@@ -1,0 +1,12 @@
+{
+    "name": "mongoose"
+  , "description": "Mongoose MongoDB ORM"
+  , "version": "1.0.0"
+  , "author": "Guillermo Rauch <guillermo@learnboost.com>"
+  , "keywords": ["mongodb", "mongoose", "orm", "data", "datastore", "nosql"]
+  , "dependencies": {}
+  , "directories": { "lib": "./lib/mongoose" }
+  , "scripts": { "test": "make test" }
+  , "main": "./index.js"
+  , "engines": { "node": ">= 0.2.0" }
+}

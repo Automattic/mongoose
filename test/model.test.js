@@ -1829,6 +1829,28 @@ module.exports = {
     });
   },
 
+  // GH-200
+  'try populating mixed data from the constructor': function () {
+    var db = start()
+      , BlogPost = db.model('BlogPost');
+
+    var post = new BlogPost({
+      mixed: {
+          type: 'test'
+        , github: 'rules'
+        , nested: {
+              number: 3
+          }
+      }
+    });
+
+    post.mixed.type.should.eql('test');
+    post.mixed.github.should.eql('rules');
+    post.mixed.nested.number.should.eql(3);
+
+    db.close();
+  },
+
   'test that we don\'t instantiate MongooseNumber in arrays': function () {
     var db = start()
       , BlogPost = db.model('BlogPost', collection);

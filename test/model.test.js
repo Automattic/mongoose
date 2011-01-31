@@ -1290,8 +1290,43 @@ module.exports = {
       post.save(function (err) {
         should.strictEqual(err, null);
 
-        (+post.meta.visitors).should.eql(50);
-        db.close();
+        BlogPost.findById(post._id, function (err, doc) {
+          should.strictEqual(err, null);
+
+          (+doc.meta.visitors).should.eql(50);
+          db.close();
+        });
+      });
+    });
+  },
+
+  // GH-203
+  'test changing a number non-atomically': function () {
+    var db = start()
+      , BlogPost = db.model('BlogPost');
+
+    var post = new BlogPost();
+
+    post.meta.visitors = 5;
+
+    post.save(function (err) {
+      should.strictEqual(err, null);
+
+      BlogPost.findById(post._id, function (err, doc) {
+        should.strictEqual(err, null);
+
+        doc.meta.visitors -= 2;
+        
+        doc.save(function (err) {
+          should.strictEqual(err, null);
+
+          BlogPost.findById(post._id, function (err, doc) {
+            should.strictEqual(err, null);
+  
+            (+doc.meta.visitors).should.eql(3);
+            db.close();
+          });
+        });
       });
     });
   },

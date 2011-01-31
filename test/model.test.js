@@ -2041,7 +2041,7 @@ module.exports = {
           BlogPost.findById(doc._id, function (err, doc) {
             should.strictEqual(err, null);
 
-            doc.title.should.be('woot');
+            doc.title.should.eql('woot');
             db.close();
           });
         });

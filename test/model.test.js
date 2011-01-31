@@ -2006,7 +2006,7 @@ module.exports = {
   // GH-190
   'test shorcut getter for a type defined with { type: Native }': function () {
     var schema = new Schema({
-        date: { type: Date, index: true }
+        date: { type: Date }
     });
 
     mongoose.model('ShortcutGetterObject', schema);

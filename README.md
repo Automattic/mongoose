@@ -111,7 +111,7 @@ We can then instantiate it, and save it:
     var instance = new myModel();
     myModel.my.key = 'hello';
     myModel.save(function (err) {
-
+      //
     });
 
 Or we can find documents from the same collection
@@ -179,7 +179,7 @@ you define (ie: the parameters your function accepts):
   Serial middleware are defined like:
 
         .pre(method, function (next) {
-
+          
         })
 
   They're executed one after the other, when each middleware calls `next`.
@@ -189,7 +189,7 @@ you define (ie: the parameters your function accepts):
   like
 
         .pre(method, function (next, done) {
-
+          
         })
 
   Parallel middleware can `next()` immediately, but the final argument will be

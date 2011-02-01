@@ -166,9 +166,9 @@
 you define (ie: the parameters your function accepts):</p>
 
 <ul><li><p>Serial
-Serial middleware are defined like:</p><p>  schema.pre(methodName, function (next) {</p><p>  })</p><p>They're executed one after the other, when each middleware calls <code>next</code>.</p></li><li><p>Parallel
+Serial middleware are defined like:</p><pre><code>schema.pre(methodName, function (next) {</code></pre><p>    })</p><p>They're executed one after the other, when each middleware calls <code>next</code>.</p></li><li><p>Parallel
 Parallel middleware offer more fine-grained flow control, and are defined
-like</p><p>  schema.pre(methodName, function (next, done) {</p><p>  })</p><p>Parallel middleware can <code>next()</code> immediately, but the final argument will be
+like</p><pre><code>schema.pre(methodName, function (next, done) {</code></pre><p>    })</p><p>Parallel middleware can <code>next()</code> immediately, but the final argument will be
 called when all the parallel middleware have called <code>done()</code>.</p></li></ul>
 
 <h2>Use cases</h2>

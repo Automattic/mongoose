@@ -240,9 +240,9 @@ the `1` branch is nearing its completion).
 
 ## Credits
 
-- Guillermo Rauch &lt;guillermo@learnboost.com&gt; ([Guille](http://github.com/guille))
-- Nathan White ([nw](http://github.com/nw/))
-- Brian Noguchi ([bnoguchi](https://github.com/bnoguchi))
+- Guillermo Rauch - guillermo@learnboost.com - [Guille](http://github.com/guille)
+- Nathan White - [nw](http://github.com/nw/)
+- Brian Noguchi - [bnoguchi](https://github.com/bnoguchi)
 
 ## License
 

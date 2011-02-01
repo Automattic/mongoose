@@ -1,0 +1,184 @@
+<html>
+  <head>
+    <title>Mongoose ORM</title>
+    <style>
+      body {
+        background: url('/images/bg.png');
+        padding: 30px;
+      }
+
+      #wrap {
+        background: url('/images/pattern.png') no-repeat -50px 10px;
+        min-height: 600px;
+      }
+
+      #page {
+        width: 800px;
+        margin: auto;
+        position: relative;
+      }
+
+      #content {
+        color: #414141;
+        font: 14px Courier;
+      }
+    
+      #content h1, #content h2, #content h3 {
+        text-shadow: 0 1px 0 #fff;
+      }
+
+      pre {
+        background: rgba(255,255,255,.2);
+        border: 1px solid #999;
+        padding: 10px;
+        color: #000;
+      }
+
+      form {
+        position: absolute;
+        right: 0;
+        top: 0;
+        color: #666;
+        font: bold 12px Helvetica;
+        text-shadow: 0 1px 0 #fff;
+      }
+
+      form img {
+        margin-right: 5px
+      }
+
+      #google-members-count {
+        vertical-align: top;
+        line-height: 32px;
+      }
+
+      h1 a {
+        background: url('/images/logo.png');
+        width: 404px;
+        height: 47px;
+        margin-bottom: 40px;
+        text-indent: -500em;
+        display: block;
+      }
+
+      a {
+        color: #2a758a;
+        text-shadow: 0 1px 0 #fff;
+        text-decoration: none;
+      } 
+
+      a:hover {
+        opacity: 0.8;
+      }
+
+      #menu {
+        border-top: 1px solid #1e1e1e;
+        border-bottom: 1px solid #e0e0e0;
+        margin-top: 10px;
+        font: bold 17px Helvetica;
+        background: rgba(255,255,255,.2);
+      }
+
+      #menu ul {
+        margin: 0;
+        border-top: 1px solid #e0e0de;
+        padding: 13px 0;
+        border-bottom: 1px solid #1e1e1e;
+        text-align: center;
+      }
+
+      #menu ul li {
+        list-style-type: none;
+        display: inline;
+        padding-right: 10px;
+      }
+    </style>
+
+    <script>
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-1122274-9']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();
+      
+      function getMembers(data){
+        if (!(data && data.query && data.query.results && data.query.results.p)) return;
+        var members = document.createElement('span');
+        members.id = 'google-members-count';
+        members.innerHTML = '('+ data.query.results.p +' members)';
+        document.getElementsByTagName('FORM')[0].insertBefore(members, document.getElementById('google-subscribe-input'));
+      };
+
+      window.onload = function(){
+        // lame jsonp
+        var script = document.createElement('script');
+        script.src = "http://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20html%20where%20url%3D%22http%3A%2F%2Fgroups.google.com%2Fgroup%2Fmongoose-orm%2Fabout%22%20and%20xpath%3D'%2F%2Fdiv%5B%40class%3D%5C'maincontbox%5C'%5D%2Ftable%2Ftr%5B1%5D%2Ftd%2Fp%5B1%5D'%0A&format=json&callback=getMembers";
+        document.head.appendChild(script);
+      };
+    </script>
+  </head>
+  <body>
+    <div id="wrap">
+      <div id="page">
+        <h1><a href="http://mongoosejs.com">Mongoose</a></h1>
+
+        <form action="http://groups.google.com/group/mongoose-orm/boxsubscribe">
+         <a href="http://groups.google.com/group/mongoose-orm" id="google-subscribe-link"><img src="/images/groups.png" border="0"></a>
+         <span id="google-members-count">&nbsp;</span>
+         <div id="google-subscribe-input">
+           Email: <input type="text" name="email" id="google-subscribe-email">
+           <input type="submit" name="go" value="Subscribe">
+         </div>
+        </form>
+
+        <div id="menu">
+          <ul>
+            <li><a href="/docs/api.html">API</a></li>
+            <li><a href="/docs/defaults.html">Defaults</a></li>
+            <li><a href="/docs/embedded-documents.html">Embedded documents</a></li>
+            <li><a href="/docs/indexes.html">Indexes</a></li>
+            <li><a href="/docs/middleware.html">Middleware</a></li>
+            <li><a href="/docs/model-definition.html">Model Definition</a></li>
+            <li><a href="/docs/validation.html">Validation</a></li>
+          </ul>
+        </div>
+
+        <div id="content">
+          <h1>Indexes</h1>
+
+<p>Indexes are defined through <code>ensureIndex</code> every time a model is compiled for a
+certain connection / database. This means that indexes will only be ensured
+once during the lifetime of your app.</p>
+
+<h2>Definition</h2>
+
+<p>Regular indexes:</p>
+
+<pre><code>var User = new Schema({
+    name: { type: String, index: true }
+})</code></pre>
+
+<p>Unique indexes:</p>
+
+<pre><code>var User = new Schema({
+    name: { type: String, unique: true }
+})
+
+// or 
+
+var User = new Schema({
+    name: { type: String, index: { unique: true } }
+})</code></pre>
+
+<p>Compound indexes are defined on the <code>Schema</code></p>
+
+<pre><code>User.index({ first: 1, last: -1 })</code></pre>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

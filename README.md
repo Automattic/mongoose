@@ -28,6 +28,23 @@ Defining a model is as easy as:
 
     mongoose.model('BlogPost', BlogPost);
 
+## Installation
+
+The recommended way is through the excellent NPM:
+
+    $ npm install mongoose
+
+Otherwise, you can check it in your repository and then expose it:
+
+    $ git clone git@github.com:LearnBoost/mongoose.git support/mongoose/
+
+    // in your code
+    require.paths.unshift('support/mongoose/lib')
+
+Then you can require it:
+
+    require('mongoose')
+
 ## Connecting to MongoDB
 
 First, we need to define a connection. If your app uses only one database, you

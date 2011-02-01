@@ -13,7 +13,7 @@ you define (ie: the parameters your function accepts):
   Serial middleware are defined like:
 
         schema.pre(methodName, function (next) {
-
+          
         })
 
   They're executed one after the other, when each middleware calls `next`.
@@ -23,7 +23,7 @@ you define (ie: the parameters your function accepts):
   like
 
         schema.pre(methodName, function (next, done) {
-
+          
         })
 
   Parallel middleware can `next()` immediately, but the final argument will be

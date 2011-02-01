@@ -216,7 +216,7 @@ For example:
 ## API docs
 
 You can find the [Dox](http://github.com/visionmedia/dox) generated API docs at
-http://mongoosejs.com.
+[http://mongoosejs.com](http://mongoosejs.com).
 
 ## Contributing to Mongoose
 

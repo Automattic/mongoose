@@ -235,6 +235,11 @@ For example:
 You can find the [Dox](http://github.com/visionmedia/dox) generated API docs at
 http://mongoosejs.com.
 
+## Getting support
+
+Please subscribe to the Google Groups [mailing
+list](http://groups.google.com/group/mongoose-orm/boxsubscribe).
+
 ## Contributing to Mongoose
 
 ### Cloning the repository

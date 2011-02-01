@@ -1966,7 +1966,7 @@ module.exports = {
     });
   },
 
-  'test getting a virtual property': function () {
+  'test getting a virtual property via get(...)': function () {
     var db = start()
       , BlogPost = db.model('BlogPost', collection)
       , post = new BlogPost({
@@ -1987,6 +1987,19 @@ module.exports = {
     post.set('titleWithAuthor', 'Huckleberry Finn by Mark Twain')
     post.get('title').should.equal('Huckleberry Finn');
     post.get('author').should.equal('Mark Twain');
+
+    db.close();
+  },
+
+  'test getting a virtual property via shortcut getter': function () {
+    var db = start()
+      , BlogPost = db.model('BlogPost', collection)
+      , post = new BlogPost({
+            title: 'Letters from Earth'
+          , author: 'Mark Twain'
+        });
+
+    post.titleWithAuthor.should.equal('Letters from Earth by Mark Twain');
 
     db.close();
   },

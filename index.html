@@ -185,6 +185,23 @@ var BlogPost = new Schema({
 
 mongoose.model('BlogPost', BlogPost);</code></pre>
 
+<h2>Installation</h2>
+
+<p>The recommended way is through the excellent NPM:</p>
+
+<pre><code>$ npm install mongoose</code></pre>
+
+<p>Otherwise, you can check it in your repository and then expose it:</p>
+
+<pre><code>$ git clone git@github.com:LearnBoost/mongoose.git support/mongoose/
+
+// in your code
+require.paths.unshift('support/mongoose/lib')</code></pre>
+
+<p>Then you can require it:</p>
+
+<pre><code>require('mongoose')</code></pre>
+
 <h2>Connecting to MongoDB</h2>
 
 <p>First, we need to define a connection. If your app uses only one database, you
@@ -355,7 +372,12 @@ myModel.save(function (err) {
 <h2>API docs</h2>
 
 <p>You can find the <a href="http://github.com/visionmedia/dox">Dox</a> generated API docs at
-http://mongoosejs.com.</p>
+<a href="http://mongoosejs.com">http://mongoosejs.com</a>.</p>
+
+<h2>Getting support</h2>
+
+<p>Please subscribe to the Google Groups <a href="http://groups.google.com/group/mongoose-orm/boxsubscribe">mailing
+list</a>.</p>
 
 <h2>Contributing to Mongoose</h2>
 

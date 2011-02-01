@@ -178,9 +178,9 @@ you define (ie: the parameters your function accepts):
 - Serial
   Serial middleware are defined like:
 
-      .pre(method, function (next) {
+        .pre(method, function (next) {
 
-      })
+        })
 
   They're executed one after the other, when each middleware calls `next`.
 
@@ -188,9 +188,9 @@ you define (ie: the parameters your function accepts):
   Parallel middleware offer more fine-grained flow control, and are defined
   like
 
-      .pre(method, function (next, done) {
+        .pre(method, function (next, done) {
 
-      })
+        })
 
   Parallel middleware can `next()` immediately, but the final argument will be
   called when all the parallel middleware have called `done()`.

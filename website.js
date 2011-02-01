@@ -19,3 +19,5 @@ process('docs/indexes.md', 'docs/indexes.html');
 process('docs/middleware.md', 'docs/middleware.html');
 process('docs/model-definition.md', 'docs/model-definition.html');
 process('docs/validation.md', 'docs/validation.html');
+process('docs/virtuals.md', 'docs/virtuals.html');
+process('docs/getters-setters.md', 'docs/getters-setters.html');

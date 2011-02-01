@@ -156,83 +156,48 @@
         </div>
 
         <div id="content">
-          <h1>Embedded Documents</h1>
+          <h1>Getters and Setters</h1>
 
-<p>Embedded documents are documents with schemas of their own that are part of
-other documents (as items within an array).</p>
+<p>Getters and setters help you change how you get and set the attributes defined by the keys and values in the underlying raw document.</p>
 
-<p>Embedded documents enjoy all the same features as your models. Defaults,
-validators, middleware. Whenever an error occurs, it's bubbled to the <code>save()</code>
-error callback, so error handling is a snap!</p>
+<h2>Setters</h2>
 
-<p>Mongoose interacts with your embedded documents in arrays <em>atomically</em>, out of
-the box.</p>
+<p>Setters allow you to transform the mongoose document's data before it gets to the raw mongodb document and is set as a value on an actual key.</p>
 
-<h2>Definition and initialization</h2>
+<p>Suppose you are implementing user registration for a website. User provide an email and password, which gets saved to mongodb. The email is a string that you will want to normalize to lower case, in order to avoid one email having more than one account -- e.g., otherwise, avenue@q.com can be registered for 2 accounts via avenue@q.com and AvEnUe@Q.CoM.</p>
 
-<p>When you define a Schema like this:</p>
-
-<pre><code>var Comments = new Schema({
-    title     : String
-  , body      : String
-  , date      : Date
-});
-
-var BlogPost = new Schema({
-    author    : ObjectId
-  , title     : String
-  , body      : String
-  , date      : Date
-  , comments  : [Comments]
-  , meta      : {
-        votes : Number
-      , favs  : Number
+<p>You can set up email lower case normalization easily via a Mongoose setter. Note in the following snippet that setters (and also getters) are defined in the <code>Schema</code>:
+    function toLower (v) {
+      return v.toLowerCase();
     }
-});
-
-mongoose.model('BlogPost', BlogPost);</code></pre>
-
-<p>The <code>comments</code> key of your <code>BlogPost</code> documents will then be an instance of
-<code>DocumentArray</code>. This is a special subclassed <code>Array</code> that can deal with
-casting, and has special methods to work with embedded documents.</p>
-
-<h2>Adding an embedded document to an array</h2>
-
-<pre><code>// retrieve my model
-var BlogPost = mongoose.model('BlogPost');
-
-// create a blog post
-var post = new BlogPost();
-
-// create a comment
-post.comments.push({ title: 'My comment' });
-
-post.save(function (err) {
-  if (!err) console.log('Success!');
-});</code></pre>
-
-<h2>Removing an embedded document</h2>
-
-<pre><code>BlogPost.findById(myId, function (err, post) {
-  if (!err) {
-    post.comments[0].remove();
-    post.save(function (err) {
-      // do something
+    var UserSchema = new Schema({
+      email: { type: String, set: toLower } 
     });
-  }
-});</code></pre>
+    var User = mongoose.model('User', UserSchema);
+    var user = new User({email: 'AVENUE@Q.COM'});
+    console.log(user.email); // 'avenue@q.com'</p>
 
-<h2>Finding an embedded document by id</h2>
+<p>As you can see above, setters allow you to transform the data before it gets to the raw mongodb document and is set as a value on an actual key.</p>
 
-<p><code>DocumentArray</code>s have an special method <code>id</code> that filters your embedded
-documents by their <code>_id</code> property (each embedded document gets one):</p>
+<h2>Getters</h2>
 
-<p>Consider the following snippet:</p>
+<p>Getters allow you to transform the representation of the data as it travels from the raw mongodb document to the value that you see.</p>
 
-<pre><code>post.comments.id(my_id).remove();
-post.save(function (err) {
-  // embedded comment with id `my_id` removed!
-});</code></pre>
+<p>Suppose you are storing credit card numbers and you want to hide everything except the last 4 digits to the mongoose user.  You can do so by defining a getter in the following way (again, notice that getters are defined in the <code>Schema</code>):
+    function obfuscate (cc) {
+      return '<strong></strong>-<strong></strong>-<strong></strong>-' + cc.slice(cc.length-4, cc.length);
+    }
+    var AccountSchema = new Schema({
+      creditCardNumber: { type: String, get: obfuscate }
+    });
+    var Account = mongoose.model('Account', AccountSchema);
+    Account.findById( someId, function (err, found) {
+      console.log(found.creditCardNumber); // '<strong></strong>-<strong></strong>-<strong></strong>-1234'
+    });</p>
+
+<h2>Summary</h2>
+
+<p>Setters are intended to modify the underlying raw data. Getters are intended to transform (but not modify at the raw data level) the underlying raw data into something that the user expects to see. They are both defined in the <code>Schema</code> definition.</p>
         </div>
 
         <div id="footer">

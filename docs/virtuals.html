@@ -156,83 +156,73 @@
         </div>
 
         <div id="content">
-          <h1>Embedded Documents</h1>
+          <h1>Virtual attributes</h1>
 
-<p>Embedded documents are documents with schemas of their own that are part of
-other documents (as items within an array).</p>
+<p>Mongoose supports virtual attributes. Virtual attributes are attributes
+that are convenient to have around but that do not get persisted to mongodb.</p>
 
-<p>Embedded documents enjoy all the same features as your models. Defaults,
-validators, middleware. Whenever an error occurs, it's bubbled to the <code>save()</code>
-error callback, so error handling is a snap!</p>
+<p>An example is helpful.</p>
 
-<p>Mongoose interacts with your embedded documents in arrays <em>atomically</em>, out of
-the box.</p>
+<h2>Example</h2>
 
-<h2>Definition and initialization</h2>
+<p>Take the following schema:
+    var PersonSchema = new Schema({
+        name: {
+            first: String
+          , last: String
+        }
+    });</p>
 
-<p>When you define a Schema like this:</p>
+<pre><code>var Person = mongoose.model('Person', PersonSchema);
 
-<pre><code>var Comments = new Schema({
-    title     : String
-  , body      : String
-  , date      : Date
-});
+var theSituation = new Person({name: { first: 'Michael', last: 'Sorrentino' }});</code></pre>
 
-var BlogPost = new Schema({
-    author    : ObjectId
-  , title     : String
-  , body      : String
-  , date      : Date
-  , comments  : [Comments]
-  , meta      : {
-        votes : Number
-      , favs  : Number
+<p>Suppose you want to write <code>theSituation</code>'s full name. You could do so via:
+    console.log( theSituation.name.first + ' ' + theSituation.name.last );</p>
+
+<p>It is more convenient to define a virtual attribute, <code>name.full</code>, so you can instead write:
+    console.log( theSituation.name.full ); </p>
+
+<p>To do so, you can declare a virtual attribute on the Schema, <code>Person</code>:
+    PersonSchema.virtual('name.full')
+      .get( function () {
+        return this.name.first + this.name.last;
+      });</p>
+
+<p>So when you get <code>name.full</code>, via
+    theSituation.name.full;
+the implementation ends up invoking the getter function
+    function () {
+      return this.name.first + this.name.last;
     }
-});
+and returning it.</p>
 
-mongoose.model('BlogPost', BlogPost);</code></pre>
+<p>It would also be nice to be able to set <code>this.name.first</code> and <code>this.name.last</code> by setting <code>this.name.full</code>. For example, it would be nice if we wanted to change theSituation's <code>name.first</code> and <code>name.last</code> to 'The' and 'Situation' respectively just by invoking:
+    theSituation.set('name.full', 'The Situation');</p>
 
-<p>The <code>comments</code> key of your <code>BlogPost</code> documents will then be an instance of
-<code>DocumentArray</code>. This is a special subclassed <code>Array</code> that can deal with
-casting, and has special methods to work with embedded documents.</p>
+<p>Mongoose allows you to do this, too, via virtual attribute setters. You can define a virtual attribute setter thusly:
+    PersonSchema.virtual('name.full')
+      .get( function () {
+        return this.name.first + this.name.last;
+      })
+      .set( function (setFullNameTo) {
+        var split = setFullNameTo.split(' ')
+          , firstName = split[0], lastName = split[1];
+        this.set('name.first', firstName);
+        this.set('name.last', lastName);
+      });</p>
 
-<h2>Adding an embedded document to an array</h2>
+<p>Then, when you invoke:
+    theSituation.set('name.full', 'The Situation');
+and you save the document, then <code>name.first</code> and <code>name.last</code> will be changed in monbodb, but the mongodb document will not have persisted a <code>name.full</code> key or value to the database:
+    theSituation.save( function (err) {
+      Person.findById(theSituation._id, function (err, found) {
+        console.log(found.name.first); // 'The'
+        console.log(found.name.last);  // 'Situation'
+      });
+    });</p>
 
-<pre><code>// retrieve my model
-var BlogPost = mongoose.model('BlogPost');
-
-// create a blog post
-var post = new BlogPost();
-
-// create a comment
-post.comments.push({ title: 'My comment' });
-
-post.save(function (err) {
-  if (!err) console.log('Success!');
-});</code></pre>
-
-<h2>Removing an embedded document</h2>
-
-<pre><code>BlogPost.findById(myId, function (err, post) {
-  if (!err) {
-    post.comments[0].remove();
-    post.save(function (err) {
-      // do something
-    });
-  }
-});</code></pre>
-
-<h2>Finding an embedded document by id</h2>
-
-<p><code>DocumentArray</code>s have an special method <code>id</code> that filters your embedded
-documents by their <code>_id</code> property (each embedded document gets one):</p>
-
-<p>Consider the following snippet:</p>
-
-<pre><code>post.comments.id(my_id).remove();
-post.save(function (err) {
-  // embedded comment with id `my_id` removed!
-});</code></pre>
+<p>If you want attributes that you can get and set but that are not themselves persisted to mongodb, virtual attributes is the Mongoose feature for you.</p>
         </div>
 
         <div id="footer">

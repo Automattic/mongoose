@@ -13,9 +13,15 @@
       }
 
       #page {
-        width: 800px;
+        width: 850px;
         margin: auto;
         position: relative;
+      }
+
+      #footer {
+        font: 13px Helvetica;
+        padding-top: 5px;
+        border-top: 1px solid #000;
       }
 
       #content {
@@ -75,7 +81,7 @@
         border-top: 1px solid #1e1e1e;
         border-bottom: 1px solid #e0e0e0;
         margin-top: 10px;
-        font: bold 17px Helvetica;
+        font: bold 14px Helvetica;
         background: rgba(255,255,255,.2);
       }
 
@@ -138,12 +144,14 @@
         <div id="menu">
           <ul>
             <li><a href="/docs/api.html">API</a></li>
-            <li><a href="/docs/defaults.html">Defaults</a></li>
-            <li><a href="/docs/embedded-documents.html">Embedded documents</a></li>
-            <li><a href="/docs/indexes.html">Indexes</a></li>
-            <li><a href="/docs/middleware.html">Middleware</a></li>
             <li><a href="/docs/model-definition.html">Model Definition</a></li>
+            <li><a href="/docs/embedded-documents.html">Embedded documents</a></li>
+            <li><a href="/docs/middleware.html">Middleware</a></li>
+            <li><a href="/docs/defaults.html">Defaults</a></li>
+            <li><a href="/docs/indexes.html">Indexes</a></li>
             <li><a href="/docs/validation.html">Validation</a></li>
+            <li><a href="/docs/virtuals.html">Virtuals</a></li>
+            <li><a href="/docs/getters-setters.html">Getters / Setters</a></li>
           </ul>
         </div>
 
@@ -282,6 +290,10 @@ You'd then define a hook on the User schema like this:</p>
 
 <p>More information about the specifics of middleware can be found in the
 appropriate chapter.</p>
+        </div>
+
+        <div id="footer">
+          Mongoose by <a href="http://learnboost.com">gradebook</a> <a href="http://github.com/learnboost">LearnBoost Labs</a>. Released under the MIT license - Copyright <a href="http://learnboost.com">LearnBoost 2011</a>
         </div>
       </div>
     </div>

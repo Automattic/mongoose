@@ -119,6 +119,17 @@ module.exports = {
     db.close();
   },
 
+  'test instantiating a model with a hash that maps to at least 1 null value': function () {
+    var db = start()
+      , BlogPost = db.model('BlogPost', collection);
+
+    var post = new BlogPost({
+      title: null
+    });
+    should.strictEqual(null, post.title);
+    db.close();
+  },
+
   'test a model structure when saved': function(){
     var db = start()
       , BlogPost = db.model('BlogPost', collection);

@@ -58,7 +58,6 @@ Document.registerHooks.call(TestDocument, 'hooksTest');
  */
 
 module.exports = {
-  
   'test shortcut getters': function(){
     var doc = new TestDocument();
     doc.init({

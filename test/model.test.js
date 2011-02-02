@@ -157,6 +157,32 @@ module.exports = {
     });
   },
 
+  'test a model structures when created': function () {
+    var db = start()
+      , BlogPost = db.model('BlogPost', collection);
+
+    BlogPost.create({ title: 'hi there'}, function (err, post) {
+      should.strictEqual(err, null);
+      post.get('_id').should.be.an.instanceof(DocumentObjectId);
+
+      should.strictEqual(post.get('title'), 'hi there');
+      should.strictEqual(post.get('slug'), null);
+      should.strictEqual(post.get('date'), null);
+
+      post.get('meta').should.be.a('object');
+      post.get('meta').should.eql({
+          date: null
+        , visitors: null
+      });
+
+      should.strictEqual(post.get('published'), null);
+
+      post.get('owners').should.be.an.instanceof(MongooseArray);
+      post.get('comments').should.be.an.instanceof(DocumentArray);
+      db.close();
+    });
+  },
+
   'test a model structure when initd': function(){
     var db = start()
       , BlogPost = db.model('BlogPost', collection);

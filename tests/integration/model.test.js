@@ -140,7 +140,7 @@ module.exports = {
       assert.ok(! john.isNew);
       
       User.find({}).all(function(docs){
-	    assert.ok(!john.isNew);
+	      assert.ok(!john.isNew);
         assert.ok(docs.length == 1);
         john.remove(function(){
           
@@ -166,6 +166,42 @@ module.exports = {
           assert.equal(nate.nested.test, 'me');
           db.terminate();
         });
+  },
+
+  "thrown exceptions don't re-execute callbacks on save": function(){
+    var db = mongoose.test()
+      , User = db.model('User')
+      , count = 0
+
+    var john = new User();
+    john.first = 'John';
+    john.last = 'Locke';
+
+    john.save(function(){
+      ++count;
+      assert.equal(1, count);
+      setTimeout(function(){ db.terminate() }, 100);
+      throw new Error("made a boo boo");
+    });
+  },
+
+  "thrown exceptions don't re-execute callbacks on remove": function(){
+    var db = mongoose.test()
+      , User = db.model('User')
+      , count = 0
+
+    var john = new User();
+    john.first = 'John';
+    john.last = 'Locke';
+
+    john.save(function(){
+      john.remove(function(){
+        ++count;
+        assert.equal(1, count);
+        setTimeout(function(){ db.terminate() }, 100);
+        throw new Error("made a boo boo");
+      });
+    });
   }
-  
+
 };

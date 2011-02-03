@@ -114,8 +114,24 @@ module.exports = {
 
     should.strictEqual(post.get('published'), null);
 
+    post.get('numbers').should.be.an.instanceof(MongooseArray);
     post.get('owners').should.be.an.instanceof(MongooseArray);
     post.get('comments').should.be.an.instanceof(DocumentArray);
+    db.close();
+  },
+
+  'test a model default structure that has a nested Array when instantiated': function () {
+    var db = start()
+      , NestedSchema = new Schema({
+          nested: {
+            array: [Number]
+          }
+        });
+    mongoose.model('NestedNumbers', NestedSchema)
+    var NestedNumbers = db.model('NestedNumbers', collection);
+
+    var nested = new NestedNumbers();
+    nested.get('nested.numbers').should.be.an.instanceof(MongooseArray);
     db.close();
   },
 

@@ -1579,6 +1579,34 @@ module.exports = {
     });
   },
 
+  'having both a pull and pullAll should default to pullAll': function () {
+    var db = start()
+      , schema = new Schema({
+          nested: {
+            nums: [Number]
+          }
+        });
+
+    mongoose.model('NestedPushes', schema);
+    var Temp = db.model('NestedPushes', collection);
+
+    Temp.create({nested: {nums: [1, 2, 3, 4, 5]}}, function (err, t) {
+      t.nested.nums.$pull(1);
+      t.nested.nums.$pullAll([2, 3]);
+
+      t.nested.nums.should.have.length(2);
+
+      t.save( function (err) {
+        should.strictEqual(null, err);
+        t.nested.nums.should.have.length(2);
+        Temp.findById(t._id, function (err, found) {
+          found.nested.nums.should.have.length(2);
+          db.close();
+        });
+      });
+    });
+  },
+
   'test saving embedded arrays of Numbers atomically': function () {
     var db = start()
       , TempSchema = new Schema({

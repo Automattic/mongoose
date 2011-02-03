@@ -114,8 +114,24 @@ module.exports = {
 
     should.strictEqual(post.get('published'), null);
 
+    post.get('numbers').should.be.an.instanceof(MongooseArray);
     post.get('owners').should.be.an.instanceof(MongooseArray);
     post.get('comments').should.be.an.instanceof(DocumentArray);
+    db.close();
+  },
+
+  'test a model default structure that has a nested Array when instantiated': function () {
+    var db = start()
+      , NestedSchema = new Schema({
+          nested: {
+            array: [Number]
+          }
+        });
+    mongoose.model('NestedNumbers', NestedSchema)
+    var NestedNumbers = db.model('NestedNumbers', collection);
+
+    var nested = new NestedNumbers();
+    nested.get('nested.array').should.be.an.instanceof(MongooseArray);
     db.close();
   },
 
@@ -1446,6 +1462,179 @@ module.exports = {
     });
   },
 
+  'test updating multiple Number $pushes as a single $pushAll': function () {
+    var db = start()
+      , schema = new Schema({
+          nested: {
+            nums: [Number]
+          }
+        });
+
+    mongoose.model('NestedPushes', schema);
+    var Temp = db.model('NestedPushes', collection);
+
+    Temp.create({}, function (err, t) {
+      t.nested.nums.push(1);
+      t.nested.nums.push(2);
+
+      t.nested.nums.should.have.length(2);
+
+      t.save( function (err) {
+        should.strictEqual(null, err);
+        t.nested.nums.should.have.length(2);
+        Temp.findById(t._id, function (err, found) {
+          found.nested.nums.should.have.length(2);
+          db.close();
+        });
+      });
+    });
+  },
+
+  'test updating at least a single $push and $pushAll as a single $pushAll': function () {
+    var db = start()
+      , schema = new Schema({
+          nested: {
+            nums: [Number]
+          }
+        });
+
+    mongoose.model('NestedPushes', schema);
+    var Temp = db.model('NestedPushes', collection);
+
+    Temp.create({}, function (err, t) {
+      t.nested.nums.push(1);
+      t.nested.nums.$pushAll([2, 3]);
+
+      t.nested.nums.should.have.length(3);
+
+      t.save( function (err) {
+        should.strictEqual(null, err);
+        t.nested.nums.should.have.length(3);
+        Temp.findById(t._id, function (err, found) {
+          found.nested.nums.should.have.length(3);
+          db.close();
+        });
+      });
+    });
+  },
+
+  'test activePaths should be updated for nested modifieds': function () {
+    var db = start()
+      , schema = new Schema({
+          nested: {
+            nums: [Number]
+          }
+        });
+
+    mongoose.model('NestedPushes', schema);
+    var Temp = db.model('NestedPushes', collection);
+
+    Temp.create({nested: {nums: [1, 2, 3, 4, 5]}}, function (err, t) {
+      t.nested.nums.$pull(1);
+      t.nested.nums.$pull(2);
+
+      t.activePaths.stateOf('nested.nums').should.equal('modify');
+      db.close();
+
+    });
+  },
+
+  '$pull should affect what you see in an array before a save': function () {
+    var db = start()
+      , schema = new Schema({
+          nested: {
+            nums: [Number]
+          }
+        });
+
+    mongoose.model('NestedPushes', schema);
+    var Temp = db.model('NestedPushes', collection);
+
+    Temp.create({nested: {nums: [1, 2, 3, 4, 5]}}, function (err, t) {
+      t.nested.nums.$pull(1);
+
+      t.nested.nums.should.have.length(4);
+
+      db.close();
+    });
+  },
+
+  '$pullAll should affect what you see in an array before a save': function () {
+    var db = start()
+      , schema = new Schema({
+          nested: {
+            nums: [Number]
+          }
+        });
+
+    mongoose.model('NestedPushes', schema);
+    var Temp = db.model('NestedPushes', collection);
+
+    Temp.create({nested: {nums: [1, 2, 3, 4, 5]}}, function (err, t) {
+      t.nested.nums.$pullAll([1, 2, 3]);
+
+      t.nested.nums.should.have.length(2);
+
+      db.close();
+    });
+  },
+
+  'test updating multiple Number $pulls as a single $pullAll': function () {
+    var db = start()
+      , schema = new Schema({
+          nested: {
+            nums: [Number]
+          }
+        });
+
+    mongoose.model('NestedPushes', schema);
+    var Temp = db.model('NestedPushes', collection);
+
+    Temp.create({nested: {nums: [1, 2, 3, 4, 5]}}, function (err, t) {
+      t.nested.nums.$pull(1);
+      t.nested.nums.$pull(2);
+
+      t.nested.nums.should.have.length(3);
+
+      t.save( function (err) {
+        should.strictEqual(null, err);
+        t.nested.nums.should.have.length(3);
+        Temp.findById(t._id, function (err, found) {
+          found.nested.nums.should.have.length(3);
+          db.close();
+        });
+      });
+    });
+  },
+
+  'having both a pull and pullAll should default to pullAll': function () {
+    var db = start()
+      , schema = new Schema({
+          nested: {
+            nums: [Number]
+          }
+        });
+
+    mongoose.model('NestedPushes', schema);
+    var Temp = db.model('NestedPushes', collection);
+
+    Temp.create({nested: {nums: [1, 2, 3, 4, 5]}}, function (err, t) {
+      t.nested.nums.$pull(1);
+      t.nested.nums.$pullAll([2, 3]);
+
+      t.nested.nums.should.have.length(2);
+
+      t.save( function (err) {
+        should.strictEqual(null, err);
+        t.nested.nums.should.have.length(2);
+        Temp.findById(t._id, function (err, found) {
+          found.nested.nums.should.have.length(2);
+          db.close();
+        });
+      });
+    });
+  },
+
   'test saving embedded arrays of Numbers atomically': function () {
     var db = start()
       , TempSchema = new Schema({
@@ -1455,7 +1644,7 @@ module.exports = {
       , saveQueue = [];
 
     mongoose.model('Temp', TempSchema);
-    var Temp = db.model('Temp');
+    var Temp = db.model('Temp', collection);
     
     var t = new Temp();
 
@@ -2143,6 +2332,24 @@ module.exports = {
 
     post.set('date', Date.now());
     post.date.should.be.an.instanceof(Date);
+
+    db.close();
+  },
+
+  'test shortcut getter for a nested path': function () {
+    var schema = new Schema({
+      first: {
+        second: [Number]
+      }
+    });
+    mongoose.model('ShortcutGetterNested', schema);
+
+    var db = start()
+      , ShortcutGetterNested = db.model('ShortcutGetterNested', collection)
+      , doc = new ShortcutGetterNested();
+
+    doc.first.should.be.a('object');
+    doc.first.second.should.be.an.instanceof(MongooseArray);
 
     db.close();
   },

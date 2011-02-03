@@ -1462,6 +1462,62 @@ module.exports = {
     });
   },
 
+  'test saving multiple Number $pushes as a single $pushAll': function () {
+    var db = start()
+      , schema = new Schema({
+          nested: {
+            nums: [Number]
+          }
+        });
+
+    mongoose.model('NestedPushes', schema);
+    var Temp = db.model('NestedPushes', collection);
+
+    var t = new Temp();
+
+    for (var i = 0; i < 100; i++) {
+      t.nested.nums.push(i);
+    }
+
+    t.nested.nums.should.have.length(100);
+
+    t.save( function (err) {
+      should.strictEqual(null, err);
+      t.nested.nums.should.have.length(100);
+      Temp.findById(t._id, function (err, found) {
+        found.nested.nums.should.have.length(100);
+        db.close();
+      });
+    });
+  },
+
+  'test saving multiple ObjectId $pushes as a single $pushAll': function () {
+    var db = start()
+      , schema = new Schema({
+          nested: {
+            ids: [ObjectId]
+          }
+        });
+
+    mongoose.model('NestedObjectIdPushes', schema);
+    var Temp = db.model('NestedObjectIdPushes', collection);
+
+    var t = new Temp();
+
+    t.nested.ids.push((new Temp())._id);
+
+    t.nested.ids.should.have.length(100);
+
+    t.save( function (err) {
+      should.strictEqual(null, err);
+      t.nested.ids.should.have.length(100);
+      Temp.findById(t._id, function (err, found) {
+        found.nested.ids.should.have.length(100);
+        db.close();
+      });
+    });
+  },
+
   'test saving embedded arrays of Numbers atomically': function () {
     var db = start()
       , TempSchema = new Schema({
@@ -1471,7 +1527,7 @@ module.exports = {
       , saveQueue = [];
 
     mongoose.model('Temp', TempSchema);
-    var Temp = db.model('Temp');
+    var Temp = db.model('Temp', collection);
     
     var t = new Temp();
 

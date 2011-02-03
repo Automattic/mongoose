@@ -1,4 +1,11 @@
 
+1.0.6 / 2011-02-03 
+==================
+
+  * Fixed `post` middleware
+  * Fixed; it's now possible to instantiate a model even when one of the paths maps
+  to an undefined value [brian]
+
 1.0.5 / 2011-02-02 
 ==================
 

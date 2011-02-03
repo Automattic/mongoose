@@ -1462,7 +1462,7 @@ module.exports = {
     });
   },
 
-  'test saving multiple Number $pushes as a single $pushAll': function () {
+  'test updating multiple Number $pushes as a single $pushAll': function () {
     var db = start()
       , schema = new Schema({
           nested: {
@@ -1473,50 +1473,22 @@ module.exports = {
     mongoose.model('NestedPushes', schema);
     var Temp = db.model('NestedPushes', collection);
 
-    var t = new Temp();
+    Temp.create({}, function (err, t) {
+      t.nested.nums.push(1);
+      t.nested.nums.push(2);
 
-    for (var i = 0; i < 100; i++) {
-      t.nested.nums.push(i);
-    }
+      t.nested.nums.should.have.length(2);
 
-    t.nested.nums.should.have.length(100);
-
-    t.save( function (err) {
-      should.strictEqual(null, err);
-      t.nested.nums.should.have.length(100);
-      Temp.findById(t._id, function (err, found) {
-        found.nested.nums.should.have.length(100);
-        db.close();
-      });
-    });
-  },
-
-  'test saving multiple ObjectId $pushes as a single $pushAll': function () {
-    var db = start()
-      , schema = new Schema({
-          nested: {
-            ids: [ObjectId]
-          }
+      t.save( function (err) {
+        should.strictEqual(null, err);
+        t.nested.nums.should.have.length(2);
+        Temp.findById(t._id, function (err, found) {
+          found.nested.nums.should.have.length(2);
+          db.close();
         });
-
-    mongoose.model('NestedObjectIdPushes', schema);
-    var Temp = db.model('NestedObjectIdPushes', collection);
-
-    var t = new Temp();
-
-    t.nested.ids.push((new Temp())._id);
-    t.nested.ids.push((new Temp())._id);
-
-    t.nested.ids.should.have.length(2);
-
-    t.save( function (err) {
-      should.strictEqual(null, err);
-      t.nested.ids.should.have.length(2);
-      Temp.findById(t._id, function (err, found) {
-        found.nested.ids.should.have.length(2);
-        db.close();
       });
     });
+
   },
 
   'test saving embedded arrays of Numbers atomically': function () {

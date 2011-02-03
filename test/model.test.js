@@ -1505,14 +1505,15 @@ module.exports = {
     var t = new Temp();
 
     t.nested.ids.push((new Temp())._id);
+    t.nested.ids.push((new Temp())._id);
 
-    t.nested.ids.should.have.length(100);
+    t.nested.ids.should.have.length(2);
 
     t.save( function (err) {
       should.strictEqual(null, err);
-      t.nested.ids.should.have.length(100);
+      t.nested.ids.should.have.length(2);
       Temp.findById(t._id, function (err, found) {
-        found.nested.ids.should.have.length(100);
+        found.nested.ids.should.have.length(2);
         db.close();
       });
     });

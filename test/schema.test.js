@@ -80,6 +80,17 @@ module.exports = {
     should.strictEqual(Person.path('location.unexistent'), undefined);
   },
 
+  'nested paths more than 2 levels deep': function () {
+    var Nested = new Schema({
+      first: {
+        second: {
+          third: String
+        }
+      }
+    });
+    Nested.path('first.second.third').should.be.an.instanceof(SchemaTypes.String);
+  },
+
   'test default definition': function(){
     var Test = new Schema({
         simple    : { type: String, default: 'a' }

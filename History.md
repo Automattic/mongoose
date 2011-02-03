@@ -1,4 +1,18 @@
 
+1.0.5 / 2011-02-02 
+==================
+
+  * Fixed; combo $push and $pushAll auto-converts into a $pushAll [brian]
+  * Fixed; combo $pull and $pullAll auto-converts to a single $pullAll [brian]
+  * Fixed; $pullAll now removes said members from array before save (so it acts just
+  like pushAll) [brian]
+  * Fixed; multiple $pulls and $pushes become a single $pullAll and $pushAll.
+  Moreover, $pull now modifies the array before save to reflect the immediate
+  change [brian]
+  * Added tests for nested shortcut getters [brian]
+  * Added tests that show that Schemas with nested Arrays don't apply defaults
+  [brian]
+
 1.0.4 / 2011-02-02 
 ==================
 

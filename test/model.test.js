@@ -2138,7 +2138,7 @@ module.exports = {
     mongoose.model('ShortcutGetterObject', schema);
 
     var db = start()
-      , ShortcutGetter = db.model('ShortcutGetterObject', collection)
+      , ShortcutGetter = db.model('ShortcutGetterObject', 'shortcut' + random())
       , post = new ShortcutGetter();
 
     post.set('date', Date.now());
@@ -2193,6 +2193,82 @@ module.exports = {
 
         DocumentObjectId.toString(doc._id).should.eql(DocumentObjectId.toString(post._id));
         db.close();
+      });
+    });
+  },
+
+  'test that safe mode is the default and it works': function () {
+    var Human = new Schema({
+        name  : String
+      , email : { type: String, unique: true }
+    });
+
+    mongoose.model('SafeHuman', Human);
+
+    var db = start()
+      , Human = db.model('SafeHuman', 'safehuman' + random());
+
+    var me = new Human({
+        name  : 'Guillermo Rauch'
+      , email : 'rauchg@gmail.com'
+    });
+
+    me.save(function (err) {
+      should.strictEqual(err, null);
+      
+      Human.findById(me._id, function (err, doc){
+        should.strictEqual(err, null);
+        doc.email.should.eql('rauchg@gmail.com');
+
+        var copycat = new Human({
+            name  : 'Lionel Messi'
+          , email : 'rauchg@gmail.com'
+        });
+
+        copycat.save(function (err) {
+          /duplicate/.test(err.message).should.be.true;
+          err.should.be.an.instanceof(Error);
+          db.close();
+        });
+      });
+    });
+  },
+
+  'test that safe mode can be turned off': function () {
+    var Human = new Schema({
+        name  : String
+      , email : { type: String, unique: true }
+    });
+
+    // turn it off
+    Human.set('safe', false);
+
+    mongoose.model('UnsafeHuman', Human);
+
+    var db = start()
+      , Human = db.model('UnsafeHuman', 'unsafehuman' + random());
+
+    var me = new Human({
+        name  : 'Guillermo Rauch'
+      , email : 'rauchg@gmail.com'
+    });
+
+    me.save(function (err) {
+      should.strictEqual(err, null);
+      
+      Human.findById(me._id, function (err, doc){
+        should.strictEqual(err, null);
+        doc.email.should.eql('rauchg@gmail.com');
+
+        var copycat = new Human({
+            name  : 'Lionel Messi'
+          , email : 'rauchg@gmail.com'
+        });
+
+        copycat.save(function (err) {
+          should.strictEqual(err, null);
+          db.close();
+        });
       });
     });
   }

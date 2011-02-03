@@ -1531,6 +1531,26 @@ module.exports = {
     });
   },
 
+  '$pullAll should affect what you see in an array before a save': function () {
+    var db = start()
+      , schema = new Schema({
+          nested: {
+            nums: [Number]
+          }
+        });
+
+    mongoose.model('NestedPushes', schema);
+    var Temp = db.model('NestedPushes', collection);
+
+    Temp.create({nested: {nums: [1, 2, 3, 4, 5]}}, function (err, t) {
+      t.nested.nums.$pullAll([1, 2, 3]);
+
+      t.nested.nums.should.have.length(2);
+
+      db.close();
+    });
+  },
+
   'test updating multiple Number $pulls as a single $pullAll': function () {
     var db = start()
       , schema = new Schema({

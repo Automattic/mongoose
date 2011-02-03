@@ -1,4 +1,10 @@
 
+1.0.4 / 2011-02-02 
+==================
+
+  * Added MongooseNumber#toString
+  * Added MongooseNumber unit tests
+
 1.0.3 / 2011-02-02 
 ==================
 

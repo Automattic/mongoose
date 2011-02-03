@@ -2163,6 +2163,24 @@ module.exports = {
     db.close();
   },
 
+  'test shortcut getter for a nested path': function () {
+    var schema = new Schema({
+      first: {
+        second: [Number]
+      }
+    });
+    mongoose.model('ShortcutGetterNested', schema);
+
+    var db = start()
+      , ShortcutGetterNested = db.model('ShortcutGetterNested', collection)
+      , doc = new ShortcutGetterNested();
+
+    doc.first.should.be.a('object');
+    doc.first.second.should.be.an.instanceof(MongooseArray);
+
+    db.close();
+  },
+
   // GH-195
   'test that save on an unaltered model doesn\'t clear the document': function () {
     var db = start()

@@ -146,6 +146,17 @@ module.exports = {
     db.close();
   },
 
+  'test instantiating a model with a hash that maps to at least 1 undefined value': function () {
+    var db = start()
+      , BlogPost = db.model('BlogPost', collection);
+
+    var post = new BlogPost({
+      title: undefined
+    });
+    should.strictEqual(undefined, post.title);
+    db.close();
+  },
+
   'test a model structure when saved': function(){
     var db = start()
       , BlogPost = db.model('BlogPost', collection);

@@ -1490,6 +1490,34 @@ module.exports = {
     });
   },
 
+  'test updating at least a single $push and $pushAll as a single $pushAll': function () {
+    var db = start()
+      , schema = new Schema({
+          nested: {
+            nums: [Number]
+          }
+        });
+
+    mongoose.model('NestedPushes', schema);
+    var Temp = db.model('NestedPushes', collection);
+
+    Temp.create({}, function (err, t) {
+      t.nested.nums.push(1);
+      t.nested.nums.$pushAll([2, 3]);
+
+      t.nested.nums.should.have.length(3);
+
+      t.save( function (err) {
+        should.strictEqual(null, err);
+        t.nested.nums.should.have.length(3);
+        Temp.findById(t._id, function (err, found) {
+          found.nested.nums.should.have.length(3);
+          db.close();
+        });
+      });
+    });
+  },
+
   'test activePaths should be updated for nested modifieds': function () {
     var db = start()
       , schema = new Schema({

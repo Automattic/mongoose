@@ -1,4 +1,11 @@
 
+1.0.3 / 2011-02-02 
+==================
+
+  * Make sure safe mode works with Model#save
+  * Changed Schema options: safe mode is now the default
+  * Updated node-mongodb-native to HEAD
+
 1.0.2 / 2011-02-02 
 ==================
 

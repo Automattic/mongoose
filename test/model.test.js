@@ -131,7 +131,7 @@ module.exports = {
     var NestedNumbers = db.model('NestedNumbers', collection);
 
     var nested = new NestedNumbers();
-    nested.get('nested.numbers').should.be.an.instanceof(MongooseArray);
+    nested.get('nested.array').should.be.an.instanceof(MongooseArray);
     db.close();
   },
 

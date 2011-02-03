@@ -26,7 +26,7 @@ Connection.prototype.open = function() {
   // Assign variable to point to local scope object
   var self = this;
   // Create the associated connection
-  this.connection = net.createConnection(this.port, this.host);
+  this.connection = net.createConnection(this.port, this.host);    
   // Set up the net client
   this.connection.setEncoding("binary");
   // Add connnect listener
@@ -102,7 +102,11 @@ Connection.prototype.send = function(command) {
   var self = this;
   // Check if the connection is closed
   try {
-    this.connection.write(command.toBinary(), "binary");
+    if(command.constructor == String) {
+      this.connection.write(command, "binary");      
+    } else {
+      this.connection.write(command.toBinary(), "binary");      
+    }    
   } catch(err) {
     // Check if the connection is closed
     if(this.connection.readyState != "open" && this.autoReconnect) {
@@ -126,16 +130,40 @@ Connection.prototype.send = function(command) {
           self.connection = this;
           // send all the messages
           while(self.messages.length > 0) {
-            this.write(self.messages.shift().toBinary(), "binary");
+            var msg = self.messages.shift();
+            if(msg.constructor == String) {
+              this.write(msg, "binary");      
+            } else {
+              this.write(msg.toBinary(), "binary");      
+            }    
+            // this.write(self.messages.shift().toBinary(), "binary");
           }
         });
       }
-   } else {
-      throw err;
+    } else {   
+      throw err;   
     }
   }
 };
+/**
+* Wrtie command without an attempt of reconnect
+* @param command 
+*/
 
+Connection.prototype.sendwithoutReconnect = function(command) {
+  var self = this;
+  // Check if the connection is closed
+  
+    try {
+          this.connection.write(command.toBinary(), "binary");
+        }
+  
+    catch(err) {
+  // no need to reconnect since called by latest master
+  // and already went through send() function
+     throw err;  
+  };
+};
 // Some basic defaults
 Connection.DEFAULT_PORT = 27017;
 
@@ -231,3 +259,17 @@ var ServerCluster = exports.ServerCluster = function(servers) {
 ServerCluster.prototype.setTarget = function(target) {
   this.target = target;
 };
+
+/**
+* ReplSetServers constructor provides master-slave functionality
+*
+* @param serverArr{Array of type Server}
+* @return constructor of ServerCluster
+*
+*/
+var ReplSetServers = exports.ReplSetServers = function(serverArr) {
+return  new ServerCluster(serverArr);
+};
+
+
+

@@ -1,17 +1,17 @@
 var BaseCommand = require('./base_command').BaseCommand,
   BinaryParser = require('../bson/binary_parser').BinaryParser,
-  BSON = require('../bson/bson').BSON,
   inherits = require('sys').inherits;
 
 /**
   Update Document Command
 **/
-var UpdateCommand = exports.UpdateCommand = function(collectionName, spec, document, options) {
+var UpdateCommand = exports.UpdateCommand = function(db, collectionName, spec, document, options) {
   BaseCommand.apply(this);
 
   this.collectionName = collectionName;
   this.spec = spec;
   this.document = document;
+  this.db = db;
 
   // Generate correct flags
   var db_upsert = 0;
@@ -43,7 +43,7 @@ struct {
 UpdateCommand.prototype.getCommand = function() {
   // Generate the command string
   var command_string = BinaryParser.fromInt(0) + BinaryParser.encode_cstring(this.collectionName);
-  return command_string + BinaryParser.fromInt(this.flags) + BSON.serialize(this.spec) + BSON.serialize(this.document, false);
+  return command_string + BinaryParser.fromInt(this.flags) + this.db.bson_serializer.BSON.serialize(this.spec) + this.db.bson_serializer.BSON.serialize(this.document, false);
 };
 
 // Constants

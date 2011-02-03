@@ -1,12 +1,47 @@
+/**
+ * @fileOverview GridFS is a tool for MongoDB to store files to the database.
+ * Because of the restrictions of the object size the database can hold, a
+ * facility to split a file into several chunks is needed. The {@link GridStore}
+ * class offers a simplified api to interact with files while managing the
+ * chunks of split files behind the scenes. More information about GridFS can be
+ * found <a href="http://www.mongodb.org/display/DOCS/GridFS">here</a>.
+ */
+
 var BinaryParser = require('../bson/binary_parser').BinaryParser,
   Chunk = require('./chunk').Chunk,
   DbCommand = require('../commands/db_command').DbCommand,
-  OrderedHash = require('../bson/collections').OrderedHash,
   Integer = require('../goog/math/integer').Integer,
-  Long = require('../goog/math/long').Long,
-  ObjectID = require('../bson/bson').ObjectID,
-  Buffer = require('buffer').Buffer;
+  // ObjectID = require('../bson/bson').ObjectID,
+  Buffer = require('buffer').Buffer,
+  fs = require('fs');
 
+/**
+ * A class representation of a file stored in GridFS.
+ *
+ * @class
+ *
+ * @param db {Db} A database instance to interact with.
+ * @param filename {string} The name for the file.
+ * @param mode {?string} Set the mode for this file. Available modes:
+ *     <ul>
+ *       <li>"r" - read only. This is the default mode.</li>
+ *       <li>"w" - write in truncate mode. Existing data will be overwriten</li>
+ *       <li>"w+" - write in edit mode.</li>
+ *     </ul>
+
+ * @param options {?object} Optional properties to specify. Recognized keys:
+ *
+ *     <pre><code>
+ *     {
+ *       'root' : , // {string} root collection to use. Defaults to GridStore#DEFAULT_ROOT_COLLECTION
+ *       'chunk_type' : , // {string} mime type of the file. Defaults to GridStore#DEFAULT_CONTENT_TYPE
+ *       'chunk_size' : , // {number} size for the chunk. Defaults to Chunk#DEFAULT_CHUNK_SIZE.
+ *       'metadata' : , // {object} arbitrary data the user wants to store
+ *     }
+ *     </code></pre>
+ *
+ * @see <a href="http://www.mongodb.org/display/DOCS/GridFS+Specification">MongoDB GridFS Specification</a>
+ */
 var GridStore = exports.GridStore = function(db, filename, mode, options) {
   this.db = db;
   this.filename = filename;
@@ -14,7 +49,14 @@ var GridStore = exports.GridStore = function(db, filename, mode, options) {
   this.options = options == null ? {} : options;
   this.root = this.options['root'] == null ? exports.GridStore.DEFAULT_ROOT_COLLECTION : this.options['root'];
   this.position = 0;
-  // Getters and Setters
+
+	/**
+	 * The chunk size used by this file.
+	 *
+	 * @name chunkSize
+	 * @lends GridStore
+	 * @field
+	 */
   this.__defineGetter__("chunkSize", function() { return this.internalChunkSize; });
   this.__defineSetter__("chunkSize", function(value) {
     if(!(this.mode[0] == "w" && this.position == 0 && this.uploadDate == null)) {
@@ -23,91 +65,176 @@ var GridStore = exports.GridStore = function(db, filename, mode, options) {
       this.internalChunkSize = value;
     }
   });
+
+	/**
+	 * The md5 checksum for this file.
+	 *
+	 * @name md5
+	 * @lends GridStore
+	 * @field
+	 */
   this.__defineGetter__("md5", function() { return this.internalMd5; });
   this.__defineSetter__("md5", function(value) {});
 };
 
+/**
+ * Opens the file from the database and initialize this object. Also creates a
+ * new one if file does not exist.
+ *
+ * @param callback {function(?Error, ?GridStore)} This will be called after 
+ *     executing this method. The first parameter will contain an {@link Error}
+ *     object and the second parameter will be null if an error occured.
+ *     Otherwise, the first parameter will be null and the second will contain
+ *     the reference to this object.
+ */
 GridStore.prototype.open = function(callback) {
   var self = this;
 
-  this.collection(function(err, collection) {
-    collection.find({'filename':self.filename}, function(err, cursor) {
-      cursor.nextObject(function(err, doc) {
-        // Chek if the collection for the files exists otherwise prepare the new one
-        if(doc != null) {
-          self.fileId = doc._id;
-          self.contentType = doc.contentType;
-          self.internalChunkSize = doc.chunkSize;
-          self.uploadDate = doc.uploadDate;
-          self.aliases = doc.aliases;
-          self.length = doc.length;
-          self.metadata = doc.metadata;
-          self.internalMd5 = doc.md5;
-        } else {
-          self.fileId = new ObjectID();
-          self.contentType = exports.GridStore.DEFAULT_CONTENT_TYPE;
-          self.internalChunkSize = Chunk.DEFAULT_CHUNK_SIZE;
-          self.length = 0;
-        }
+  self.collection(function(err, collection) {
+    self.chunkCollection(function(err, chunkCollection) {
+      collection.find({'filename':self.filename}, function(err, cursor) {
+        // Fetch the file
+        cursor.nextObject(function(err, doc) {
+          // Chek if the collection for the files exists otherwise prepare the new one
+          if(doc != null) {
+            self.fileId = doc._id;
+            self.contentType = doc.contentType;
+            self.internalChunkSize = doc.chunkSize;
+            self.uploadDate = doc.uploadDate;
+            self.aliases = doc.aliases;
+            self.length = doc.length;
+            self.metadata = doc.metadata;
+            self.internalMd5 = doc.md5;
+          } else {
+            self.fileId = new self.db.bson_serializer.ObjectID();
+            self.contentType = exports.GridStore.DEFAULT_CONTENT_TYPE;
+            self.internalChunkSize = Chunk.DEFAULT_CHUNK_SIZE;
+            self.length = 0;
+          }
 
-        // Process the mode of the object
-        if(self.mode == "r") {
-          self.nthChunk(0, function(err, chunk) {
-            self.currentChunk = chunk;
-            self.position = 0;
-            callback(null, self);
-          });
-        } else if(self.mode == "w") {
-          self.chunkCollection(function(err, collection2) {
-            // Create index for the chunks
-            collection.createIndex([['files_id', 1], ['n', 1]], function(err, index) {
-              // Delete any existing chunks
-              self.deleteChunks(function(err, result) {
-                self.currentChunk = new Chunk(self, {'n':0});
-                self.contentType = self.options['content_type'] == null ? self.contentType : self.options['content_type'];
-                self.internalChunkSize = self.options['chunk_size'] == null ? self.internalChunkSize : self.options['chunk_size'];
-                self.metadata = self.options['metadata'] == null ? self.metadata : self.options['metadata'];
+          // Process the mode of the object
+          if(self.mode == "r") {
+            chunkCollection.ensureIndex([['files_id', 1], ['n', 1]], function(err, index) {
+              self.nthChunk(0, function(err, chunk) {
+                self.currentChunk = chunk;
                 self.position = 0;
                 callback(null, self);
               });
             });
-          });
-        } else if(self.mode == "w+") {
-          self.chunkCollection(function(err, collection) {
-            // Create index for the chunks
-            collection.createIndex([['files_id', 1], ['n', 1]], function(err, index) {
-              self.nthChunk(self.lastChunkNumber, function(err, chunk) {
-                // Set the current chunk
-                self.currentChunk = chunk == null ? new Chunk(self, {'n':0}) : chunk;
-                self.currentChunk.position = self.currentChunk.data.length();
-                self.metadata = self.options['metadata'] == null ? self.metadata : self.options['metadata'];
-                self.position = self.length;
-                callback(null, self);
+          } else if(self.mode == "w") {
+            self.chunkCollection(function(err, collection2) {
+              // Create index for the chunks
+              chunkCollection.ensureIndex([['files_id', 1], ['n', 1]], function(err, index) {
+                // Delete any existing chunks
+                self.deleteChunks(function(err, result) {
+                  self.currentChunk = new Chunk(self, {'n':0});
+                  self.contentType = self.options['content_type'] == null ? self.contentType : self.options['content_type'];
+                  self.internalChunkSize = self.options['chunk_size'] == null ? self.internalChunkSize : self.options['chunk_size'];
+                  self.metadata = self.options['metadata'] == null ? self.metadata : self.options['metadata'];
+                  self.position = 0;
+                  callback(null, self);
+                });
               });
             });
-          });
-        } else {
-          callback(new Error("Illegal mode " + self.mode), null);
-        }
-      });
+          } else if(self.mode == "w+") {
+            self.chunkCollection(function(err, collection) {
+              // Create index for the chunks
+              chunkCollection.ensureIndex([['files_id', 1], ['n', 1]], function(err, index) {
+                self.nthChunk(self.lastChunkNumber(), function(err, chunk) {
+                  // Set the current chunk
+                  self.currentChunk = chunk == null ? new Chunk(self, {'n':0}) : chunk;
+                  self.currentChunk.position = self.currentChunk.data.length();
+                  self.metadata = self.options['metadata'] == null ? self.metadata : self.options['metadata'];
+                  self.position = self.length;
+                  callback(null, self);
+                });
+              });
+            });
+          } else {
+            callback(new Error("Illegal mode " + self.mode), null);
+          }
+        });
+      });      
     });
   });
 };
 
+/**
+ * Stores a file from the file system to the GridFS database.
+ *
+ * @param file {string|fd} The file to store.
+ * @param callback {function(*, GridStore)} This will be called after this
+ *     method is executed. The first parameter will be null and the the
+ *     second will contain the reference to this object.
+ *
+ * @see GridStore#write
+ */
+GridStore.prototype.writeFile = function (file, callback) {
+  var self = this;
+  if (typeof file === 'string') {
+    fs.open(file, 'r', 0666, function (err, fd) {
+      // TODO Handle err
+      self.writeFile(fd, callback);
+    });
+    return;
+  }
+
+  self.open(function (err, self) {
+    fs.fstat(file, function (err, stats) {
+      var startIndices = [];
+      for (var i = 0; i < stats.size; i += self.chunkSize) startIndices.push(i);
+
+      startIndices.forEach(function (start, index, startIndices) {
+        process.nextTick(function () {
+          fs.read(file, self.chunkSize, start, 'binary', function (err, data, bytesRead) {
+            var chunk = new Chunk(self, {n: index});
+            chunk.write(data, function (err, chunk) {
+              chunk.save(function (err, result) {
+                if (index == startIndices.length -1) {
+                  self.currentChunk = chunk;
+                  self.close(function (err, result) {
+                    callback(null, self);
+                  });
+                }
+              });
+            });
+          });
+        });
+      });
+    });
+  });
+
+};
+
+/**
+ * Writes some data. This method will work properly only if initialized with mode
+ * "w" or "w+".
+ *
+ * @param string {string} The data to write.
+ * @param close {boolean=false} opt_argument Closes this file after writing if
+ *     true.
+ * @param callback {function(*, GridStore)} This will be called after executing
+ *     this method. The first parameter will contain null and the second one
+ *     will contain a reference to this object.
+ *
+ * @see GridStore#writeFile
+ */
 GridStore.prototype.write = function(string, close, callback) {
   if(typeof close === "function") { callback = close; close = null; }
   var self = this;
   var finalClose = close == null ? false : close;
-  string = string instanceof Buffer ? string.toString() : string;
+  string = string instanceof Buffer ? string.toString("binary") : string;
 
   if(self.mode[0] != "w") {
     callback(new Error(self.filename + " not opened for writing"), null);
   } else {
     if((self.currentChunk.position + string.length) > self.chunkSize) {
+      // sys.puts("==============================================================1")
+
       var previousChunkNumber = self.currentChunk.chunkNumber;
       var leftOverDataSize = self.chunkSize - self.currentChunk.position;
       var previousChunkData = string.substr(0, leftOverDataSize);
-      var leftOverData = string.substr(leftOverData, (string.length - leftOverDataSize));
+      var leftOverData = string.substr(leftOverDataSize, (string.length - leftOverDataSize));
       // Let's finish the current chunk and then call write again for the remaining data
       self.currentChunk.write(previousChunkData, function(err, chunk) {
         chunk.save(function(err, result) {
@@ -140,8 +267,29 @@ GridStore.prototype.write = function(string, close, callback) {
   }
 };
 
+/**
+ * Creates a mongoDB object representation of this object.
+ *
+ * @param callback {function(object)} This will be called after executing this
+ *     method. The object will be passed to the first parameter and will have
+ *     the structure:
+ *        
+ *        <pre><code>
+ *        {
+ *          '_id' : , // {number} id for this file
+ *          'filename' : , // {string} name for this file
+ *          'contentType' : , // {string} mime type for this file
+ *          'length' : , // {number} size of this file?
+ *          'chunksize' : , // {number} chunk size used by this file
+ *          'uploadDate' : , // {Date}
+ *          'aliases' : , // {array of string}
+ *          'metadata' : , // {string}
+ *        }
+ *        </code></pre>
+ *
+ * @see <a href="http://www.mongodb.org/display/DOCS/GridFS+Specification#GridFSSpecification-{{files}}">MongoDB GridFS File Object Structure</a>
+ */
 GridStore.prototype.buildMongoObject = function(callback) {
-  // var mongoObject = new OrderedHash();
   var length = this.currentChunk != null ? (this.currentChunk.chunkNumber * this.chunkSize + this.currentChunk.position) : 0;
   var mongoObject = {
     '_id': this.fileId,
@@ -154,15 +302,23 @@ GridStore.prototype.buildMongoObject = function(callback) {
     'metadata': this.metadata
   };
 
-  var md5Command = new OrderedHash();
-  md5Command.add('filemd5', this.fileId).add('root', this.root);
-
+  var md5Command = {filemd5:this.fileId, root:this.root};
   this.db.command(md5Command, function(err, results) {
     mongoObject.md5 = results.md5;
     callback(mongoObject);
   });
 };
 
+/**
+ * Saves this file to the database. This will overwrite the old entry if it
+ * already exists. This will work properly only if mode was initialized to
+ * "w" or "w+".
+ *
+ * @param callback {function(?Error, GridStore)} This will be called after
+ *     executing this method. Passes an {@link Error} object to the first
+ *     parameter and null to the second if an error occured. Otherwise, passes
+ *     null to the first and a reference to this object to the second.
+ */
 GridStore.prototype.close = function(callback) {
   var self = this;
 
@@ -204,6 +360,17 @@ GridStore.prototype.close = function(callback) {
   }
 };
 
+/**
+ * Gets the nth chunk of this file.
+ *
+ * @param chunkNumber {number} The nth chunk to retrieve.
+ * @param callback {function(*, Chunk|object)} This will be called after
+ *     executing this method. null will be passed to the first parameter while
+ *     a new {@link Chunk} instance will be passed to the second parameter if
+ *     the chunk was found or an empty object {} if not.
+ *
+ * @see GridStore#lastChunkNumber
+ */
 GridStore.prototype.nthChunk = function(chunkNumber, callback) {
   var self = this;
 
@@ -217,14 +384,39 @@ GridStore.prototype.nthChunk = function(chunkNumber, callback) {
   });
 };
 
+/**
+ * @return {number} The last chunk number of this file.
+ *
+ * @see GridStore#nthChunk
+ */
 GridStore.prototype.lastChunkNumber = function() {
-  return Integer.fromNumber((self.length/self.chunkSize)).toInt();
+  return this.db.bson_serializer.BSON.toInt((this.length/this.chunkSize));
 };
 
+/**
+ * Retrieve this file's chunks collection.
+ *
+ * @param callback {function(?Error, ?Collection)} This will be called after
+ *     executing this method. An exception object will be passed to the first 
+ *     parameter when an error occured or null otherwise. A new
+ *     {@link Collection} object will be passed to the second parameter if no
+ *     error occured.
+ *
+ * @see Db#collection
+ * @see GridStore#collection
+ */
 GridStore.prototype.chunkCollection = function(callback) {
   this.db.collection((this.root + ".chunks"), callback);
 };
 
+/**
+ * Deletes all the chunks of this file in the database.
+ *
+ * @param callback {function(*, boolean)} This will be called after this method
+ *     executes. Passes null to the first and true to the second argument.
+ *
+ * @see GridStore#rewind
+ */
 GridStore.prototype.deleteChunks = function(callback) {
   var self = this;
 
@@ -239,12 +431,37 @@ GridStore.prototype.deleteChunks = function(callback) {
   }
 };
 
+/**
+ * Retrieves the file collection associated with this object.
+ *
+ * @param callback {function(?Error, ?Collection)} This will be called after
+ *     executing this method. An exception object will be passed to the first 
+ *     parameter when an error occured or null otherwise. A new
+ *     {@link Collection} object will be passed to the second parameter if no
+ *     error occured.
+ *
+ * @see Db#collection
+ * @see GridStore#chunkCollection
+ */
 GridStore.prototype.collection = function(callback) {
   this.db.collection(this.root + ".files", function(err, collection) {
     callback(err, collection);
   });
 };
 
+/**
+ * Reads the data of this file.
+ *
+ * @param separator {string=null} opt_argument The character to be recognized as
+ *     the newline separator.
+ * @param callback {function(*, Array<string>)} This will be called after this
+ *     method is executed. The first parameter will be null and the second
+ *     parameter will contain an array of strings representing the entire data,
+ *     each element representing a line including the separator character.
+ *
+ * @see GridStore#read
+ * @see GridStore#eof
+ */
 GridStore.prototype.readlines = function(separator, callback) {
   var args = Array.prototype.slice.call(arguments, 0);
   callback = args.pop();
@@ -260,6 +477,16 @@ GridStore.prototype.readlines = function(separator, callback) {
   });
 };
 
+/**
+ * Deletes all the chunks of this file in the database if mode was set to "w" or
+ * "w+" and resets the read/write head to the initial position.
+ *
+ * @param callback {function(*, GridStore)} This will be called after executing
+ *     this method. The first parameter will contain null and the second one
+ *     will contain a reference to this object.
+ *
+ * @see GridStore#deleteChunks
+ */
 GridStore.prototype.rewind = function(callback) {
   var self = this;
 
@@ -285,6 +512,28 @@ GridStore.prototype.rewind = function(callback) {
   }
 };
 
+/**
+ * Retrieves the contents of this file and advances the read/write head.
+ *
+ * There are 3 signatures for this method:
+ *
+ * (callback)
+ * (length, callback)
+ * (length, buffer, callback)
+ *
+ * @param length {number=} opt_argument The number of characters to read. Reads
+ *     all the characters from the read/write head to the EOF if not specified.
+ * @param buffer {string=''} opt_argument A string to hold temporary data. This
+ *     is used for storing the string data read so far when recursively calling
+ *     this method.
+ * @param callback {function(*, string)} This will be called after this method
+ *     is executed. null will be passed to the first parameter and a string 
+ *     containing the contents of the buffer concatenated with the contents read
+ *     from this file will be passed to the second.
+ *
+ * @see GridStore#readlines
+ * @see GridStore#eof
+ */
 GridStore.prototype.read = function(length, buffer, callback) {
   var self = this;
 
@@ -314,10 +563,41 @@ GridStore.prototype.read = function(length, buffer, callback) {
   }
 };
 
+/**
+ * Retrieves the position of the read/write head of this file.
+ *
+ * @param callback {function(*, number)} This gets called after this method
+ *     terminates. null is passed to the first parameter and the position is
+ *     passed to the second.
+ *
+ * @see GridStore#seek
+ */
 GridStore.prototype.tell = function(callback) {
   callback(null, this.position);
 };
 
+/**
+ * Moves the read/write head to a new location.
+ *
+ * There are 3 signatures for this method:
+ *
+ * (callback)
+ * (position, callback)
+ * (position, seekLocation, callback)
+ *
+ * @param position
+ * @param seekLocation {number} Seek mode. Use one of the ff constants -
+ *     {@link GridStore#IO_SEEK_SET}, {@link GridStore#IO_SEEK_CUR} or
+ *     {@link GridStore#IO_SEEK_END}. Defaults to {@link GridStore#IO_SEEK_SET}
+ *     when not specified.
+ * @param callback {function(*, GridStore)} This will be called after executing
+ *     this method. The first parameter will contain null and the second one
+ *     will contain a reference to this object.
+ *
+ * @see GridStore#IO_SEEK_SET
+ * @see GridStore#IO_SEEK_CUR
+ * @see GridStore#IO_SEEK_END
+ */
 GridStore.prototype.seek = function(position, seekLocation, callback) {
   var self = this;
 
@@ -336,7 +616,7 @@ GridStore.prototype.seek = function(position, seekLocation, callback) {
     targetPosition = finalPosition;
   }
 
-  var newChunkNumber = Integer.fromNumber((targetPosition/self.chunkSize)).toInt();
+  var newChunkNumber = this.db.bson_serializer.BSON.toInt((targetPosition/self.chunkSize));
   if(newChunkNumber != self.currentChunk.chunkNumber) {
     if(self.mode[0] == 'w') {
       self.currentChunk.save(function(err, chunk) {
@@ -355,10 +635,21 @@ GridStore.prototype.seek = function(position, seekLocation, callback) {
   }
 };
 
+/**
+ * @return {boolean} True if the read/write head is at the end of this file.
+ */
 GridStore.prototype.eof = function() {
   return this.position == this.length ? true : false;
 };
 
+/**
+ * Retrieves a single character from this file.
+ *
+ * @param callback {function(*, ?string)} This gets called after this method is
+ *     executed. Passes null to the first parameter and the character read to
+ *     the second or null to the second if the read/write head is at the end of
+ *     the file.
+ */
 GridStore.prototype.getc = function(callback) {
   var self = this;
 
@@ -376,17 +667,60 @@ GridStore.prototype.getc = function(callback) {
   }
 };
 
+/**
+ * Writes a string to the file with a newline character appended at the end if
+ * the given string does not have one.
+ *
+ * @param string {string} The string to write.
+ * @param callback {function(*, GridStore)} This will be called after executing
+ *     this method. The first parameter will contain null and the second one
+ *     will contain a reference to this object.
+ *
+ * @see GridStore#write
+ * @see GridStore#writeFile
+ */
 GridStore.prototype.puts = function(string, callback) {
   var finalString = string.match(/\n$/) == null ? string + "\n" : string;
   this.write(finalString, callback);
 };
 
+/**
+ * The collection to be used for holding the files and chunks collection.
+ * @constant
+ */
 GridStore.DEFAULT_ROOT_COLLECTION = 'fs';
+/**
+ * Default file mime type
+ * @constant
+ */
 GridStore.DEFAULT_CONTENT_TYPE = 'text/plain';
+/**
+ * Seek mode where the given length is absolute.
+ * @constant
+ */
 GridStore.IO_SEEK_SET = 0;
+/**
+ * Seek mode where the given length is an offset to the current read/write head.
+ * @constant
+ */
 GridStore.IO_SEEK_CUR = 1;
+/**
+ * Seek mode where the given length is an offset to the end of the file.
+ * @constant
+ */
 GridStore.IO_SEEK_END = 2;
 
+/**
+ * Checks if a file exists in the database.
+ *
+ * @param db {Db} The database to query.
+ * @param name {string} The name of the file to look for.
+ * @param rootCollection {string=} opt_argument The root collection that holds the files
+ *     and chunks collection. Defaults to {@link GridStore.DEFAULT_ROOT_COLLECTION}
+ * @param callback {function(*, boolean)} This will be called after this method
+ *     executes. Passes null to the first and passes true to the second if the
+ *     file exists and false otherwise.
+ */
 GridStore.exist = function(db, name, rootCollection, callback) {
   var args = Array.prototype.slice.call(arguments, 2);
   callback = args.pop();
@@ -402,6 +736,16 @@ GridStore.exist = function(db, name, rootCollection, callback) {
   });
 };
 
+/**
+ * Gets the list of files stored in the GridFS.
+ *
+ * @param db {Db} The database to query.
+ * @param rootCollection {string=} opt_argument The root collection that holds the files
+ *     and chunks collection. Defaults to {@link GridStore.DEFAULT_ROOT_COLLECTION}
+ * @param callback {function(*, array<string>)} This will be called after this method
+ *     executes. Passes null to the first and passes an array of strings containing
+ *     the names of the files.
+ */
 GridStore.list = function(db, rootCollection, callback) {
   var args = Array.prototype.slice.call(arguments, 1);
   callback = args.pop();
@@ -422,6 +766,33 @@ GridStore.list = function(db, rootCollection, callback) {
   });
 };
 
+/**
+ * Reads the contents of a file.
+ *
+ * This method has the following signatures
+ *
+ * (db, name, callback)
+ * (db, name, length, callback)
+ * (db, name, length, offset, callback)
+ * (db, name, length, offset, options, callback)
+ *
+ * @param db {Db} The database to query.
+ * @param name {string} The name of the file
+ * @param length {number=} opt_argument The size of data to read.
+ * @param offset {number=} opt_argument The offset from the head of the file of
+ *     which to start reading from.
+ * @param options {object=} opt_argument The options for the file.
+ * @param callback {function(?Error|string, ?string)} This will be called after
+ *     this method executes. A string with an error message will be passed to
+ *     the first parameter when the length and offset combination exceeds the
+ *     length of the file while an Error object will be passed if other forms
+ *     of error occured, otherwise, a string is passed. The second parameter
+ *     will contain the data read if successful or null if an error occured.
+ *
+ * @see GridStore#read
+ * @see GridStore#readlines
+ * @see GridStore for how to pass the options
+ */
 GridStore.read = function(db, name, length, offset, options, callback) {
   var args = Array.prototype.slice.call(arguments, 2);
   callback = args.pop();
@@ -449,6 +820,23 @@ GridStore.read = function(db, name, length, offset, options, callback) {
   });
 };
 
+/**
+ * Reads the data of this file.
+ *
+ * @param db {Db} The database to query.
+ * @param name {string} The name of the file.
+ * @param separator {string=null} opt_argument The character to be recognized as
+ *     the newline separator.
+ * @param options {object=} opt_argument
+ * @param callback {function(*, Array<string>)} This will be called after this
+ *     method is executed. The first parameter will be null and the second
+ *     parameter will contain an array of strings representing the entire data,
+ *     each element representing a line including the separator character.
+ * 
+ * @see GridStore#read
+ * @see GridStore#readlines
+ * @see GridStore for how to pass the options
+ */
 GridStore.readlines = function(db, name, separator, options, callback) {
   var args = Array.prototype.slice.call(arguments, 2);
   callback = args.pop();
@@ -463,6 +851,21 @@ GridStore.readlines = function(db, name, separator, options, callback) {
   });
 };
 
+/**
+ * Deletes the chunks and metadata information of a file from GridFS.
+ *
+ * @param db {Db} The database to interact with.
+ * @param names {string|Array<string>} The names of the files to delete.
+ * @param options {object=} opt_argument The options for the files.
+ * @callback {function(?Error, GridStore)} This will be called after this method
+ *     is executed. The first parameter will contain an Error object if an error
+ *     occured or null otherwise. The second parameter will contain a reference
+ *     to this object.
+ *
+ * @see GridStore#deleteChunks
+ * @see GridStore#rewind
+ * @see GridStore for how to pass the options
+ */
 GridStore.unlink = function(db, names, options, callback) {
   var self = this;
   var args = Array.prototype.slice.call(arguments, 2);

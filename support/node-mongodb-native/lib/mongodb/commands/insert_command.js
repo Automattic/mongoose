@@ -1,17 +1,17 @@
 var BaseCommand = require('./base_command').BaseCommand,
   BinaryParser = require('../bson/binary_parser').BinaryParser,
-  BSON = require('../bson/bson').BSON,
   inherits = require('sys').inherits;
 
 /**
   Insert Document Command
 **/
-var InsertCommand = exports.InsertCommand = function(collectionName, checkKeys) {
+var InsertCommand = exports.InsertCommand = function(db, collectionName, checkKeys) {
   BaseCommand.call(this);
 
   this.collectionName = collectionName;
   this.documents = [];
   this.checkKeys = checkKeys == null ? true : checkKeys;
+  this.db = db;
 };
 
 inherits(InsertCommand, BaseCommand);
@@ -36,7 +36,7 @@ struct {
 InsertCommand.prototype.getCommand = function() {
   var command_string = '';
   for(var i = 0; i < this.documents.length; i++) {
-    command_string = command_string + BSON.serialize(this.documents[i], this.checkKeys);
+    command_string = command_string + this.db.bson_serializer.BSON.serialize(this.documents[i], this.checkKeys);
   }
   // Build the command string
   return BinaryParser.fromInt(0) + BinaryParser.encode_cstring(this.collectionName) + command_string;

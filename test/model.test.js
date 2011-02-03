@@ -1488,7 +1488,75 @@ module.exports = {
         });
       });
     });
+  },
 
+  'test activePaths should be updated for nested modifieds': function () {
+    var db = start()
+      , schema = new Schema({
+          nested: {
+            nums: [Number]
+          }
+        });
+
+    mongoose.model('NestedPushes', schema);
+    var Temp = db.model('NestedPushes', collection);
+
+    Temp.create({nested: {nums: [1, 2, 3, 4, 5]}}, function (err, t) {
+      t.nested.nums.$pull(1);
+      t.nested.nums.$pull(2);
+
+      t.activePaths.stateOf('nested.nums').should.equal('modify');
+      db.close();
+
+    });
+  },
+
+  '$pull should affect what you see in an array before a save': function () {
+    var db = start()
+      , schema = new Schema({
+          nested: {
+            nums: [Number]
+          }
+        });
+
+    mongoose.model('NestedPushes', schema);
+    var Temp = db.model('NestedPushes', collection);
+
+    Temp.create({nested: {nums: [1, 2, 3, 4, 5]}}, function (err, t) {
+      t.nested.nums.$pull(1);
+
+      t.nested.nums.should.have.length(4);
+
+      db.close();
+    });
+  },
+
+  'test updating multiple Number $pulls as a single $pullAll': function () {
+    var db = start()
+      , schema = new Schema({
+          nested: {
+            nums: [Number]
+          }
+        });
+
+    mongoose.model('NestedPushes', schema);
+    var Temp = db.model('NestedPushes', collection);
+
+    Temp.create({nested: {nums: [1, 2, 3, 4, 5]}}, function (err, t) {
+      t.nested.nums.$pull(1);
+      t.nested.nums.$pull(2);
+
+      t.nested.nums.should.have.length(3);
+
+      t.save( function (err) {
+        should.strictEqual(null, err);
+        t.nested.nums.should.have.length(3);
+        Temp.findById(t._id, function (err, found) {
+          found.nested.nums.should.have.length(3);
+          db.close();
+        });
+      });
+    });
   },
 
   'test saving embedded arrays of Numbers atomically': function () {

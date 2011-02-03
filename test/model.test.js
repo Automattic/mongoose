@@ -2489,6 +2489,56 @@ module.exports = {
         });
       });
     });
-  }
+  },
+
+  'test post hooks': function () {
+    var schema = new Schema({
+            title: String
+        })
+      , save = false
+      , remove = false
+      , init = false;
+
+    schema.post('save', function () {
+      save = true;
+    });
+
+    schema.post('init', function () {
+      init = true;
+    });
+
+    schema.post('remove', function () {
+      remove = true;
+    });
+
+    mongoose.model('PostHookTest', schema);
+
+    var db = start()
+      , BlogPost = db.model('PostHookTest');
+
+    var post = new BlogPost();
+
+    post.save(function (err) {
+      process.nextTick(function () {
+        should.strictEqual(err, null);
+        save.should.be.true;
+
+        BlogPost.findById(post._id, function (err, doc) {
+          process.nextTick(function () {
+            should.strictEqual(err, null);
+            init.should.be.true;
+
+            doc.remove(function (err) {
+              process.nextTick(function () {
+                should.strictEqual(err, null);
+                remove.should.be.true;
+                db.close();
+              });
+            });
+          });
+        });
+      });
+    });
+  },
 
 };

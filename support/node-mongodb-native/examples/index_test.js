@@ -1,16 +1,22 @@
 GLOBAL.DEBUG = true;
 
 sys = require("sys");
-test = require("mjsunit");
+test = require("assert");
+
+var Db = require('../lib/mongodb').Db,
+  Connection = require('../lib/mongodb').Connection,
+  Server = require('../lib/mongodb').Server,
+  // BSON = require('../lib/mongodb').BSONPure;
+  BSON = require('../lib/mongodb').BSONNative;
 
 var mongo = require('../lib/mongodb'),
   Integer = require('../lib/mongodb/goog/math/integer').Integer;
 
 var host = process.env['MONGO_NODE_DRIVER_HOST'] != null ? process.env['MONGO_NODE_DRIVER_HOST'] : 'localhost';
-var port = process.env['MONGO_NODE_DRIVER_PORT'] != null ? process.env['MONGO_NODE_DRIVER_PORT'] : mongo.Connection.DEFAULT_PORT;
+var port = process.env['MONGO_NODE_DRIVER_PORT'] != null ? process.env['MONGO_NODE_DRIVER_PORT'] : Connection.DEFAULT_PORT;
 
 sys.puts(">> Connecting to " + host + ":" + port);
-var db = new mongo.Db('node-mongo-examples', new mongo.Server(host, port, {}), {});
+var db = new Db('node-mongo-examples', new Server(host, port, {}), {native_parser:true});
 db.open(function(err, db) {
   sys.puts(">> Dropping collection test");
   db.dropCollection('test', function(err, result) {

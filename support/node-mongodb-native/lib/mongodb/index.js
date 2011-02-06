@@ -1,5 +1,16 @@
+var sys = require('sys')
+
+// Add both the BSON Pure classes and the native ones
+var BSONPure = exports.BSONPure = require('./bson/bson');
+var BSONNative = null
+try {
+  BSONNative = exports.BSONNative = require('../../external-libs/bson/bson');
+} catch(err) {
+  sys.puts("native library not built")
+}
+
 [
-	'bson/bson', 'bson/collections', 'bson/binary_parser',
+	'bson/binary_parser',
 	
 	'commands/base_command', 'commands/db_command', 'commands/delete_command',
 	'commands/get_more_command', 'commands/insert_command', 'commands/kill_cursor_command',

@@ -1,4 +1,38 @@
 
+1.0.6 / 2011-02-03 
+==================
+
+  * Fixed `post` middleware
+  * Fixed; it's now possible to instantiate a model even when one of the paths maps
+  to an undefined value [brian]
+
+1.0.5 / 2011-02-02 
+==================
+
+  * Fixed; combo $push and $pushAll auto-converts into a $pushAll [brian]
+  * Fixed; combo $pull and $pullAll auto-converts to a single $pullAll [brian]
+  * Fixed; $pullAll now removes said members from array before save (so it acts just
+  like pushAll) [brian]
+  * Fixed; multiple $pulls and $pushes become a single $pullAll and $pushAll.
+  Moreover, $pull now modifies the array before save to reflect the immediate
+  change [brian]
+  * Added tests for nested shortcut getters [brian]
+  * Added tests that show that Schemas with nested Arrays don't apply defaults
+  [brian]
+
+1.0.4 / 2011-02-02 
+==================
+
+  * Added MongooseNumber#toString
+  * Added MongooseNumber unit tests
+
+1.0.3 / 2011-02-02 
+==================
+
+  * Make sure safe mode works with Model#save
+  * Changed Schema options: safe mode is now the default
+  * Updated node-mongodb-native to HEAD
+
 1.0.2 / 2011-02-02 
 ==================
 

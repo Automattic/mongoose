@@ -1,4 +1,13 @@
 
+1.0.7 / 2011-02-05 
+==================
+
+  * Fixed memory leak warnings for test suite on 0.3
+  * Fixed querying documents that have an array that contain at least one
+  specified member. [brian]
+  * Fixed default value for Array types (fixes GH-210). [brian]
+  * Fixed example code.
+
 1.0.6 / 2011-02-03 
 ==================
 

@@ -768,7 +768,7 @@ function runSuite(title, tests, fn) {
                         });
                     } else {
                         test(function(fn){
-                            process.addListener('beforeExit', function(){
+                            addBeforeExit(function(){
                                 try {
                                     fn();
                                 } catch (err) {
@@ -787,6 +787,24 @@ function runSuite(title, tests, fn) {
         }
     })();
 }
+
+/**
+ * Adds before exit handlers with only one event handler
+ *
+ * @param {Function} callback
+ * @api private
+ */
+
+var beforeExitHandlers = [];
+
+function addBeforeExit (fn) {
+  if (!beforeExitHandlers.length)
+      process.on('beforeExit', function () {
+          for (var i = 0, l = beforeExitHandlers.length; i < l; i++)
+              beforeExitHandlers[i]();
+      });
+  beforeExitHandlers.push(fn);
+};
 
 /**
  * Report exceptions.

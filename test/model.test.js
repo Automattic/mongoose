@@ -2035,6 +2035,20 @@ module.exports = {
     });
   },
 
+  'test find with subset of fields, excluding _id': function () {
+    var db = start()
+      , BlogPost = db.model('BlogPost', collection);
+    BlogPost.create({title: 'subset 1'}, function (err, created) {
+      should.strictEqual(err, null);
+      BlogPost.findOne({title: 'subset 1'}, {title: 1, _id: 0}, function (err, found) {
+        should.strictEqual(err, null);
+        found._id.should.be.null;
+        found.title.should.equal('subset 1');
+        db.close();
+      });
+    });
+  },
+
   'test for find with partial initialization': function () {
     var db = start()
       , BlogPost = db.model('BlogPost', collection)

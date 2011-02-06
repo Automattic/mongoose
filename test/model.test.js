@@ -127,11 +127,26 @@ module.exports = {
             array: [Number]
           }
         });
-    mongoose.model('NestedNumbers', NestedSchema)
+    mongoose.model('NestedNumbers', NestedSchema);
     var NestedNumbers = db.model('NestedNumbers', collection);
 
     var nested = new NestedNumbers();
     nested.get('nested.array').should.be.an.instanceof(MongooseArray);
+    db.close();
+  },
+
+  'test a model that defaults an Array attribute to a default non-empty array': function () {
+    var db = start()
+      , DefaultArraySchema = new Schema({
+          arr: {type: Array, cast: String, default: ['a', 'b', 'c']}
+        });
+    mongoose.model('DefaultArray', DefaultArraySchema);
+    var DefaultArray = db.model('DefaultArray', collection);
+    var arr = new DefaultArray();
+    arr.get('arr').should.have.length(3);
+    arr.get('arr')[0].should.equal('a');
+    arr.get('arr')[1].should.equal('b');
+    arr.get('arr')[2].should.equal('c');
     db.close();
   },
 

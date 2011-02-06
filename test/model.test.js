@@ -3278,5 +3278,54 @@ module.exports = {
         });
       });
     });
+  },
+
+  'test post hooks on embedded documents': function(){
+    var save = false,
+        init = false,
+        remove = false;
+
+    var EmbeddedSchema = new Schema({
+      title : String
+    });
+
+    var ParentSchema = new Schema({
+      embeds : [EmbeddedSchema]
+    });
+
+    EmbeddedSchema.post('save', function(next){
+      save = true;
+    });
+
+    // Don't know how to test those on a embedded document.
+    /*
+
+    EmbeddedSchema.post('init', function () {
+      init = true;
+    });
+
+    EmbeddedSchema.post('remove', function () {
+      remove = true;
+    });
+
+    */
+
+    mongoose.model('Parent', ParentSchema);
+
+    var db = start(),
+        Parent = db.model('Parent');
+
+    var parent = new Parent();
+
+    parent.embeds.push({title: 'Testing post hooks for embedded docs'});
+
+    parent.save(function(err){
+      process.nextTick(function () {
+        should.strictEqual(err, null);
+        save.should.be.true;
+        db.close();
+      });
+    });
   }
+
 };

@@ -643,7 +643,7 @@ module.exports = {
     var Tobi = new Schema();
 
     Tobi.options.should.be.a('object');
-    Tobi.options.safe.should.be.false;
+    Tobi.options.safe.should.be.true;
   },
 
   'test setting options': function () {

@@ -54,6 +54,7 @@ BlogPost.pre('save', function(next, done){
  */
 
 function slugGenerator (options){
+  options = options || {};
   var key = options.key || 'title';
   
   return function slugGenerator(schema){
@@ -64,10 +65,10 @@ function slugGenerator (options){
   };
 };
 
-BlogPost.use(slugGenerator());
+BlogPost.plugin(slugGenerator());
 
 /**
  * Define model.
  */
 
-Mongoose.model('BlogPost', BlogPost);
+mongoose.model('BlogPost', BlogPost);

@@ -1,10 +1,6 @@
 var QueryCommand = require('./commands/query_command').QueryCommand,
   DbCommand = require('./commands/db_command').DbCommand,
   BinaryParser = require('./bson/binary_parser').BinaryParser,
-  OrderedHash = require('./bson/collections').OrderedHash,
-  BSON = require('./bson/bson'),
-  ObjectID = BSON.ObjectID,
-  Code = BSON.Code,
   MongoReply = require('./responses/mongo_reply').MongoReply,
   Admin = require('./admin').Admin,
   Connection = require('./connection').Connection,
@@ -20,15 +16,17 @@ var QueryCommand = require('./commands/query_command').QueryCommand,
 
 var Db = exports.Db = function(databaseName, serverConfig, options) {
   EventEmitter.call(this);
-
   this.databaseName = databaseName;
   this.serverConfig = serverConfig;
   this.options = options == null ? {} : options;
+  // sys.puts(sys.inspect(require('../../external-libs/bson/bson')))
+  // Contains all the connections for the db
+  this.bson_serializer = this.options.native_parser ? require('../../external-libs/bson/bson') : require('./bson/bson');
+  this.bson_deserializer = this.options.native_parser ? require('../../external-libs/bson/bson') : require('./bson/bson');  
+  this.connections = [];
   // State of the db connection
   this.state = 'notConnected';
-  this.pkFactory = this.options.pk == null ? ObjectID : this.options.pk;
-  // Contains all the connections for the db
-  this.connections = [];
+  this.pkFactory = this.options.pk == null ? this.bson_serializer.ObjectID : this.options.pk;  
   // Added strict
   this.strict = this.options.strict == null ? false : this.options.strict;
 };
@@ -64,7 +62,8 @@ Db.prototype.open = function(callback) {
         }
       };
       // Create db command and Add the callback to the list of callbacks by the request id (mapping outgoing messages to correct callbacks)
-      var db_command = DbCommand.createIsMasterCommand(self.databaseName);
+      var db_command = DbCommand.createIsMasterCommand(self);
+      
       self.addListener(db_command.getRequestId().toString(), connectCallback);
       // Let's send a request to identify the state of the server
       this.send(db_command);
@@ -72,37 +71,44 @@ Db.prototype.open = function(callback) {
 
     self.serverConfig.connection.addListener("data", function(message) {
       // Parse the data as a reply object
-      var reply = new MongoReply(message);
+      var reply = new MongoReply(self, message);
       // Emit message
+      
+      
       self.emit(reply.responseTo.toString(), null, reply);
       // Remove the listener
       self.removeListener(reply.responseTo.toString(), self.listeners(reply.responseTo.toString())[0]);
     });
     
     self.serverConfig.connection.addListener("error", function(err) {
-      self.emit("error", err);
+      if(self.listeners("error") != null && self.listeners("error").length > 0) self.emit("error", err);
+      self.state = "notConnected"
+      return callback(err, null);
     });
     
     // Emit timeout and close events so the client using db can figure do proper error handling (emit contains the connection that triggered the event)
     self.serverConfig.connection.addListener("timeout", function() { self.emit("timeout", this); });
     self.serverConfig.connection.addListener("close", function() { self.emit("close", this); });
     // Open the connection
-    self.serverConfig.connection.open();      
+    self.serverConfig.connection.open();            
   } else if(self.serverConfig instanceof ServerPair || self.serverConfig instanceof ServerCluster) {
     var serverConnections = self.serverConfig instanceof ServerPair ? [self.serverConfig.leftServer, self.serverConfig.rightServer] : self.serverConfig.servers;
-    var numberOfConnectedServers = 0;
+    var numberOfConnectedServers = 0; 
     serverConnections.forEach(function(server) {
       server.connection = new Connection(server.host, server.port, server.autoReconnect);
       self.connections.push(server.connection);
 
       server.connection.addListener("connect", function() {
         // Create a callback function for a given connection
+
         var connectCallback = function(err, reply) {
-          if(err != null) {
+
+                  if(err != null) {
             callback(err, null);          
           } else {
             if(reply.documents[0].ismaster == 1) {
               // Locate the master connection and save it
+  
               self.masterConnection = server.connection;
               server.master = true;
             } else {
@@ -117,24 +123,31 @@ Db.prototype.open = function(callback) {
           }
         };
         // Create db command and Add the callback to the list of callbacks by the request id (mapping outgoing messages to correct callbacks)
-        var db_command = DbCommand.createIsMasterCommand(self.databaseName);
+        var db_command = DbCommand.createIsMasterCommand(self);
+        
         self.addListener(db_command.getRequestId().toString(), connectCallback);
         // Let's send a request to identify the state of the server
         this.send(db_command);
       });
 
+
       server.connection.addListener("data", function(message) {
         // Parse the data as a reply object
-        var reply = new MongoReply(message);
-        // Emit error if there is one
-        reply.responseFlag > 0 ? self.emit(reply.responseTo.toString(), reply.documents[0], reply) : self.emit(reply.responseTo.toString(), null, reply);
+        var reply = new MongoReply(self, message);
+        // Emit error if there is one       
+        reply.responseHasError ? self.emit(reply.responseTo.toString(), reply.documents[0], reply) : self.emit(reply.responseTo.toString(), null, reply);
         // Remove the listener
         self.removeListener(reply.responseTo.toString(), self.listeners(reply.responseTo.toString())[0]);
+        
       });
       
       server.connection.addListener("error", function(err) {
-        self.emit("error", err);
+        if(self.listeners("error") != null && self.listeners("error").length > 0) 
+        self.state = "notConnected"
+        return callback(err, null);
       });      
+      
+      
 
       // Emit timeout and close events so the client using db can figure do proper error handling (emit contains the connection that triggered the event)
       server.connection.addListener("timeout", function() { self.emit("timeout", this); });
@@ -143,14 +156,17 @@ Db.prototype.open = function(callback) {
       server.connection.open();
     });
   } else {
-    throw Error("Server parameter must be of type Server, ServerPair or ServerCluster");
+    return callback(Error("Server parameter must be of type Server, ServerPair or ServerCluster"), null);
   }
 };
 
 Db.prototype.close = function() {
+
   this.connections.forEach(function(connection) {
-    connection.close();
+   connection.close();
   });
+  // Clear out state of the connection
+  this.state = "notConnected"
 };
 
 Db.prototype.admin = function(callback) {
@@ -239,8 +255,8 @@ Db.prototype.eval = function(code, parameters, callback) {
   var finalCode = code;
   var finalParameters = [];
   // If not a code object translate to one
-  if(!(finalCode instanceof Code)) {
-    finalCode = new Code(finalCode);
+  if(!(finalCode instanceof this.bson_serializer.Code)) {
+    finalCode = new this.bson_serializer.Code(finalCode);
   }
 
   // Ensure the parameters are correct
@@ -250,7 +266,7 @@ Db.prototype.eval = function(code, parameters, callback) {
     finalParameters = parameters;
   }
   // Create execution selector
-  var selector = new OrderedHash().add('$eval', finalCode).add('args', finalParameters);
+  var selector = {'$eval':finalCode, 'args':finalParameters};
   // Iterate through all the fields of the index
   new Cursor(this, new Collection(this, DbCommand.SYSTEM_COMMAND_COLLECTION), selector, {}, 0, -1).nextObject(function(err, result) {
     if(result.ok == 1) {
@@ -275,12 +291,13 @@ Db.prototype.dereference = function(dbRef, callback) {
 Db.prototype.authenticate = function(username, password, callback) {
   var self = this;
   // Execute command
-  this.executeCommand(DbCommand.createGetNonceCommand(self.databaseName), function(err, reply) {
+  this.executeCommand(DbCommand.createGetNonceCommand(self), function(err, reply) {
     if(err == null) {
       // Nonce used to make authentication request with md5 hash
       var nonce = reply.documents[0].nonce;
+      // sys.puts("=========================== NONCE: " + nonce)
       // Execute command
-      self.executeCommand(DbCommand.createAuthenticationCommand(self.databaseName, username, password, nonce), function(err, result) {
+      self.executeCommand(DbCommand.createAuthenticationCommand(self, username, password, nonce), function(err, result) {
         if(err == null && result.documents[0].ok == 1) {
           callback(null, true);
         } else {
@@ -329,7 +346,7 @@ Db.prototype.removeUser = function(username, callback) {
   Logout user (if authenticated)
 **/
 Db.prototype.logout = function(callback) {
-  this.executeCommand(DbCommand.createLogoutCommand(this.databaseName), callback);
+  this.executeCommand(DbCommand.createLogoutCommand(this), callback);
 };
 
 /**
@@ -356,7 +373,7 @@ Db.prototype.createCollection = function(collectionName, options, callback) {
     }
 
     // Create a new collection and return it
-    self.executeCommand(DbCommand.createCreateCollectionCommand(self.databaseName, collectionName, options), function(err, result) {
+    self.executeCommand(DbCommand.createCreateCollectionCommand(self, collectionName, options), function(err, result) {
       if(err == null && result.documents[0].ok == 1) {
         callback(null, new Collection(self, collectionName, self.pkFactory));
       } else {
@@ -367,23 +384,19 @@ Db.prototype.createCollection = function(collectionName, options, callback) {
 };
 
 Db.prototype.command = function(selector, callback) {
-  if(!(selector instanceof OrderedHash)) {
-    callback(new Error("command must be given an OrderedHash"), null);
-  } else {
-    var cursor = new Cursor(this, new Collection(this, DbCommand.SYSTEM_COMMAND_COLLECTION), selector, {}, 0, -1, null, null, null, null, QueryCommand.OPTS_NO_CURSOR_TIMEOUT);
-    cursor.nextObject(callback);
-  }
+  var cursor = new Cursor(this, new Collection(this, DbCommand.SYSTEM_COMMAND_COLLECTION), selector, {}, 0, -1, null, null, null, null, QueryCommand.OPTS_NO_CURSOR_TIMEOUT);
+  cursor.nextObject(callback);
 };
 
 /**
   Drop Collection
 **/
 Db.prototype.dropCollection = function(collectionName, callback) {
-  this.executeCommand(DbCommand.createDropCollectionCommand(this.databaseName, collectionName), function(err, result) {
+  this.executeCommand(DbCommand.createDropCollectionCommand(this, collectionName), function(err, result) {
     if(err == null && result.documents[0].ok == 1) {
-      callback(null, true);
+      if(callback != null) return callback(null, true);
     } else {
-      err != null ? callback(err, null) : callback(new Error(result.documents[0].errmsg), null);
+      if(callback != null) err != null ? callback(err, null) : callback(new Error(result.documents[0].errmsg), null);
     }
   });
 };
@@ -392,14 +405,14 @@ Db.prototype.dropCollection = function(collectionName, callback) {
   Rename Collection
 **/
 Db.prototype.renameCollection = function(fromCollection, toCollection, callback) {
-  this.executeCommand(DbCommand.createRenameCollectionCommand(this.databaseName, fromCollection, toCollection), function(err, doc) { callback(err, doc); });
+  this.executeCommand(DbCommand.createRenameCollectionCommand(this, fromCollection, toCollection), function(err, doc) { callback(err, doc); });
 };
 
 /**
   Return last error message for the given connection
 **/
 Db.prototype.lastError = function(callback) {
-  this.executeCommand(DbCommand.createGetLastErrorCommand(this.databaseName), function(err, error) {
+  this.executeCommand(DbCommand.createGetLastErrorCommand(this), function(err, error) {
     callback(err, error.documents);
   });
 };
@@ -412,14 +425,14 @@ Db.prototype.error = function(callback) {
   Return the status for the last operation on the given connection
 **/
 Db.prototype.lastStatus = function(callback) {
-  this.executeCommand(DbCommand.createGetLastStatusCommand(this.databaseName), callback);
+  this.executeCommand(DbCommand.createGetLastStatusCommand(this), callback);
 };
 
 /**
   Return all errors up to the last time db reset_error_history was called
 **/
 Db.prototype.previousErrors = function(callback) {
-  this.executeCommand(DbCommand.createGetPreviousErrorsCommand(this.databaseName), function(err, error) {
+  this.executeCommand(DbCommand.createGetPreviousErrorsCommand(this), function(err, error) {
     callback(err, error.documents);
   });
 };
@@ -428,14 +441,14 @@ Db.prototype.previousErrors = function(callback) {
   Runs a command on the database
 **/
 Db.prototype.executeDbCommand = function(command_hash, callback) {
-  this.executeCommand(DbCommand.createDbCommand(this.databaseName, command_hash), callback);
+  this.executeCommand(DbCommand.createDbCommand(this, command_hash), callback);
 };
 
 /**
   Resets the error history of the mongo instance
 **/
 Db.prototype.resetErrorHistory = function(callback) {
-  this.executeCommand(DbCommand.createResetErrorHistoryCommand(this.databaseName), callback);
+  this.executeCommand(DbCommand.createResetErrorHistoryCommand(this), callback);
 };
 
 /**
@@ -443,7 +456,7 @@ Db.prototype.resetErrorHistory = function(callback) {
 **/
 Db.prototype.createIndex = function(collectionName, fieldOrSpec, unique, callback) {
   if(callback == null) { callback = unique; unique = null; }
-  var command = DbCommand.createCreateIndexCommand(this.databaseName, collectionName, fieldOrSpec, unique);
+  var command = DbCommand.createCreateIndexCommand(this, collectionName, fieldOrSpec, unique);
   this.executeCommand(command, function(result) {});
   callback(null, command.documents[0].name);
 };
@@ -453,7 +466,7 @@ Db.prototype.createIndex = function(collectionName, fieldOrSpec, unique, callbac
 **/
 Db.prototype.ensureIndex = function(collectionName, fieldOrSpec, unique, callback) {
   if(callback == null) { callback = unique; unique = null; }
-  var command = DbCommand.createCreateIndexCommand(this.databaseName, collectionName, fieldOrSpec, unique);
+  var command = DbCommand.createCreateIndexCommand(this, collectionName, fieldOrSpec, unique);
   var index_name = command.documents[0].name;
   var self = this;
   // Check if the index allready exists
@@ -467,7 +480,7 @@ Db.prototype.ensureIndex = function(collectionName, fieldOrSpec, unique, callbac
   Fetch the cursor information
 **/
 Db.prototype.cursorInfo = function(callback) {
-  this.executeCommand(DbCommand.createDbCommand(this.databaseName, {'cursorInfo':1}), function(err, result) {
+  this.executeCommand(DbCommand.createDbCommand(this, {'cursorInfo':1}), function(err, result) {
     callback(err, result.documents[0]);
   });
 };
@@ -476,7 +489,7 @@ Db.prototype.cursorInfo = function(callback) {
   Drop Index on a collection
 **/
 Db.prototype.dropIndex = function(collectionName, indexName, callback) {
-  this.executeCommand(DbCommand.createDropIndexCommand(this.databaseName, collectionName, indexName), callback);
+  this.executeCommand(DbCommand.createDropIndexCommand(this, collectionName, indexName), callback);
 };
 
 /**
@@ -502,10 +515,11 @@ Db.prototype.indexInformation = function(collectionName, callback) {
 };
 
 /**
-  Database Drop Commando
+  Database Drop Command
 **/
 Db.prototype.dropDatabase = function(callback) {
-  this.executeCommand(DbCommand.createDropDatabaseCommand(this.databaseName), function(err, result) {
+
+  this.executeCommand(DbCommand.createDropDatabaseCommand(this), function(err, result) {
     callback(err, result);
   });
 };
@@ -514,12 +528,21 @@ Db.prototype.dropDatabase = function(callback) {
   Execute db command
 **/
 Db.prototype.executeCommand = function(db_command, callback) {
-  if(callback instanceof Function) {
-    // Add the callback to the list of callbacks by the request id (mapping outgoing messages to correct callbacks)
-    this.addListener(db_command.getRequestId().toString(), callback);    
-  }
-  // Execute command
-  this.serverConfig.masterConnection.send(db_command);
+    if(callback instanceof Function) {
+      // Add the callback to the list of callbacks by the request id (mapping outgoing messages to correct callbacks)
+      this.addListener(db_command.getRequestId().toString(), callback);    
+    }
+
+    // Correctly handle serialization errors
+    var msg = db_command.toBinary()
+
+    try{
+      this.serverConfig.masterConnection.send(msg);   
+    } catch(err){
+      this.checkMaster_(this, function(err, reply, dbinstance){ 
+        dbinstance.serverConfig.masterConnection.send(db_command);           
+      });
+    }
 };
 
 /**
@@ -537,10 +560,72 @@ exports.connect = function(url, callback) {
   var port = config['port'] || Connection.DEFAULT_PORT;
   var dbname = config['pathname'].replace(/^\//, '');
 
-  var options = {};
-  if (config['auth'])
-    options['user'], options['password'] = config['auth'].split(':', 2)
+  if (config['auth']){
+    var auth = config['auth'].split(':', 2);
+  }
 
-  var db = new Db(dbname, new Server(host, port, options), {});
-  db.open(callback);
+  var db = new Db(dbname, new Server(host, port, {}), {});
+  db.open(function(err, db){
+    if(!err && auth){
+      db.authenticate(auth[0], auth[1], function(err, success){
+        if(success){
+          callback(null, db);
+        }
+        else {
+          callback(err ? err : new Error('Could not authenticate user ' + user), null);
+        }
+      });
+    }
+    else {
+      callback(err, db);
+    }
+  });
 }
+
+
+/**
+* Checks for latest master by calling isMasterCommand on each server
+* of serverConfig
+* @param dbcopy{instance of db}
+*
+**/
+
+Db.prototype.checkMaster_ = function(dbcopy, returnback){
+  var db_cmnd = null;
+  sys.puts("============================================ checkMaster_::0::" + sys.inspect(dbcopy.serverConfig.servers))
+  
+  dbcopy.serverConfig.servers.forEach(function(server) {
+    db_cmnd = DbCommand.createIsMasterCommand(dbcopy);
+    sys.puts("============================================ checkMaster_::1")
+
+    var connect_Callback = function(err, reply) {
+      sys.puts("============================================ checkMaster_::2")
+      if(err != null) {
+        returnback(err, null, null)
+      } else {
+        if(reply.documents[0].ismaster == 1) {
+          // Locate the master connection and save it
+          dbcopy.masterConnection = server.connection;
+          server.master = true;
+          returnback(null, reply, dbcopy);
+        } else {
+          server.master = false;
+        }         
+      }
+    };
+
+    sys.puts("============================================ checkMaster_::3")
+    dbcopy.addListener(db_cmnd.getRequestId().toString(), connect_Callback);
+    server.connection.sendwithoutReconnect(db_cmnd); 
+      
+    sys.puts("============================================ checkMaster_::4")
+    server.connection.addListener("error", function(err) {
+      dbcopy.emit("error", err);
+    });      
+
+    sys.puts("============================================ checkMaster_::5")
+    // Emit timeout and close events so the client using db can figure do proper error handling (emit contains the connection that triggered the event)
+    server.connection.addListener("timeout", function() { dbcopy.emit("timeout", this); });
+    server.connection.addListener("close", function() { dbcopy.emit("close", this); });      
+ });    
+};

@@ -1,16 +1,16 @@
 var BaseCommand = require('./base_command').BaseCommand,
   BinaryParser = require('../bson/binary_parser').BinaryParser,
-  BSON = require('../bson/bson').BSON,
   inherits = require('sys').inherits;
 
 /**
   Insert Document Command
 **/
-var DeleteCommand = exports.DeleteCommand = function(collectionName, selector) {
+var DeleteCommand = exports.DeleteCommand = function(db, collectionName, selector) {
   BaseCommand.call(this);
 
   this.collectionName = collectionName;
   this.selector = selector;
+  this.db = db;
 };
 
 inherits(DeleteCommand, BaseCommand);
@@ -30,5 +30,5 @@ struct {
 */
 DeleteCommand.prototype.getCommand = function() {
   // Generate the command string
-  return BinaryParser.fromInt(0) + BinaryParser.encode_cstring(this.collectionName) + BinaryParser.fromInt(0) + BSON.serialize(this.selector);
+  return BinaryParser.fromInt(0) + BinaryParser.encode_cstring(this.collectionName) + BinaryParser.fromInt(0) + this.db.bson_serializer.BSON.serialize(this.selector);
 };

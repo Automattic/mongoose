@@ -2338,7 +2338,7 @@ module.exports = {
     mongoose.model('ShortcutGetterObject', schema);
 
     var db = start()
-      , ShortcutGetter = db.model('ShortcutGetterObject', collection)
+      , ShortcutGetter = db.model('ShortcutGetterObject', 'shortcut' + random())
       , post = new ShortcutGetter();
 
     post.set('date', Date.now());
@@ -2413,6 +2413,132 @@ module.exports = {
         db.close();
       });
     });
-  }
+  },
+
+  'test that safe mode is the default and it works': function () {
+    var Human = new Schema({
+        name  : String
+      , email : { type: String, unique: true }
+    });
+
+    mongoose.model('SafeHuman', Human);
+
+    var db = start()
+      , Human = db.model('SafeHuman', 'safehuman' + random());
+
+    var me = new Human({
+        name  : 'Guillermo Rauch'
+      , email : 'rauchg@gmail.com'
+    });
+
+    me.save(function (err) {
+      should.strictEqual(err, null);
+      
+      Human.findById(me._id, function (err, doc){
+        should.strictEqual(err, null);
+        doc.email.should.eql('rauchg@gmail.com');
+
+        var copycat = new Human({
+            name  : 'Lionel Messi'
+          , email : 'rauchg@gmail.com'
+        });
+
+        copycat.save(function (err) {
+          /duplicate/.test(err.message).should.be.true;
+          err.should.be.an.instanceof(Error);
+          db.close();
+        });
+      });
+    });
+  },
+
+  'test that safe mode can be turned off': function () {
+    var Human = new Schema({
+        name  : String
+      , email : { type: String, unique: true }
+    });
+
+    // turn it off
+    Human.set('safe', false);
+
+    mongoose.model('UnsafeHuman', Human);
+
+    var db = start()
+      , Human = db.model('UnsafeHuman', 'unsafehuman' + random());
+
+    var me = new Human({
+        name  : 'Guillermo Rauch'
+      , email : 'rauchg@gmail.com'
+    });
+
+    me.save(function (err) {
+      should.strictEqual(err, null);
+      
+      Human.findById(me._id, function (err, doc){
+        should.strictEqual(err, null);
+        doc.email.should.eql('rauchg@gmail.com');
+
+        var copycat = new Human({
+            name  : 'Lionel Messi'
+          , email : 'rauchg@gmail.com'
+        });
+
+        copycat.save(function (err) {
+          should.strictEqual(err, null);
+          db.close();
+        });
+      });
+    });
+  },
+
+  'test post hooks': function () {
+    var schema = new Schema({
+            title: String
+        })
+      , save = false
+      , remove = false
+      , init = false;
+
+    schema.post('save', function () {
+      save = true;
+    });
+
+    schema.post('init', function () {
+      init = true;
+    });
+
+    schema.post('remove', function () {
+      remove = true;
+    });
+
+    mongoose.model('PostHookTest', schema);
+
+    var db = start()
+      , BlogPost = db.model('PostHookTest');
+
+    var post = new BlogPost();
+
+    post.save(function (err) {
+      process.nextTick(function () {
+        should.strictEqual(err, null);
+        save.should.be.true;
+
+        BlogPost.findById(post._id, function (err, doc) {
+          process.nextTick(function () {
+            should.strictEqual(err, null);
+            init.should.be.true;
+
+            doc.remove(function (err) {
+              process.nextTick(function () {
+                should.strictEqual(err, null);
+                remove.should.be.true;
+                db.close();
+              });
+            });
+          });
+        });
+      });
+    });
+  },
 
 };

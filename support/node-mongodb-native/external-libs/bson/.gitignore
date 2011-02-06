@@ -1,0 +1,3 @@
+build/
+bson.node
+.lock-wscript

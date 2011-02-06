@@ -142,7 +142,7 @@ describe 'BSON'
     end        
     
     it 'Should Correctly Serialize and Deserialize Ordered Hash'
-      var doc = {doc: new mongo.OrderedHash().add('b', 1).add('a', 2).add('c', 3).add('d', 4)};
+      var doc = {doc: {b:1, a:2, c:3, d:4}};
       var serialized_data = mongo.BSON.serialize(doc)
       var decoded_hash = mongo.BSON.deserialize(serialized_data).doc
       var keys = []
@@ -210,7 +210,7 @@ describe 'BSON'
     end
     
     it 'Should Always put the id as the first item in a hash'
-      var hash = {doc: new mongo.OrderedHash().add('not_id', 1).add('_id', 2)}
+      var hash = {doc: {not_id:1, '_id':2}}
       var serialized_data = mongo.BSON.serialize(hash)
       var deserialized_data = mongo.BSON.deserialize(serialized_data)
       var keys = [];
@@ -237,7 +237,7 @@ describe 'BSON'
     end
     
     it 'Should Correclty Serialize and Deserialize a Code object' 
-      var doc = {'doc': new mongo.Code('this.a > i', new mongo.OrderedHash().add('i', 1))};
+      var doc = {'doc': new mongo.Code('this.a > i', {i:1})};
       var serialized_data = mongo.BSON.serialize(doc)
       var deserialized_data = mongo.BSON.deserialize(serialized_data)
       deserialized_data.doc.code.should.eql(doc.doc.code);

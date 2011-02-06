@@ -1146,6 +1146,20 @@ module.exports = {
     });
   },
 
+  'test finding documents with an array that contains one specific member': function () {
+    var db = start()
+      , BlogPost = db.model('BlogPost', collection);
+    BlogPost.create({numbers: [100, 101, 102]}, function (err, created) {
+      should.strictEqual(err, null);
+      BlogPost.find({numbers: 100}, function (err, found) {
+        should.strictEqual(err, null);
+        found.should.have.length(1);
+        found[0]._id.should.eql(created._id);
+        db.close();
+      });
+    });
+  },
+
   'test counting documents': function () {
     var db = start()
       , BlogPost = db.model('BlogPost', collection)

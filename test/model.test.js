@@ -883,8 +883,8 @@ module.exports = {
 
     var post = new PostModel({
         title: 'Test'
-      , author: { name: 'A'}
-      , subject: {name: 'B'}
+      , author: { name: 'A' }
+      , subject: { name: 'B' }
     });
 
     post.author.name.should.eql('A');

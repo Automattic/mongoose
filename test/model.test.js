@@ -870,6 +870,22 @@ module.exports = {
     });
   },
 
+  'test getters with same name on embedded documents not clashing': function() {
+    var Post = new Schema(
+      { title : String
+      , author : { name : String }
+      , subject : { name: String }
+      });
+    mongoose.model('PostWithSubGetters', Post);
+    var db = start()
+      , PostModel = db.model('PostWithSubGetters', 'postwithsubgetters' + random())
+      , model = new PostModel({title: "Test", author: {name: "A"}, subject: {name: "B"}});
+
+    model.author.name.should.eql("A");
+    model.subject.name.should.eql("B");
+    model.author.name.should.eql("A");
+  },
+
   'test middleware': function () {
     var schema = new Schema({
         title: String

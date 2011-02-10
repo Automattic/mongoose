@@ -1,4 +1,13 @@
 
+1.0.8 / 2011-02-09 
+==================
+
+  * Fixed for collection-level buffering of commands [gitfy]
+  * Fixed `Document#toJSON` [dalejefferson]
+  * Fixed `Connection` authentication [robrighter]
+  * Fixed clash of accessors in getters/setters [eirikurn]
+  * Improved `Model#save` promise handling
+
 1.0.7 / 2011-02-05 
 ==================
 

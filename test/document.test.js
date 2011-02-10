@@ -435,6 +435,20 @@ module.exports = {
     beforeExit(function () {
       called.should.be.true;
     });
+  },
+
+  'test jsonifying an object': function () {
+    var doc = new TestDocument({ test: 'woot' })
+      , oidString = DocumentObjectId.toString(doc._id);
+
+    // convert to json string
+    var json = JSON.stringify(doc);
+
+    // parse again
+    var obj = JSON.parse(json);
+
+    obj.test.should.eql('woot');
+    obj._id.should.eql(oidString);
   }
 
 };

@@ -60,7 +60,6 @@ BlogPost.virtual('titleWithAuthor')
     this.set('author', split[1]);
   });
 
-
 BlogPost.method('cool', function(){
   return this;
 });
@@ -868,6 +867,31 @@ module.exports = {
         db.close();
       });
     });
+  },
+
+  'test getters with same name on embedded documents not clashing': function() {
+    var Post = new Schema({
+        title   : String
+      , author  : { name : String }
+      , subject : { name : String }
+    });
+
+    mongoose.model('PostWithClashGetters', Post);
+
+    var db = start()
+      , PostModel = db.model('PostWithClashGetters', 'postwithclash' + random());
+
+    var post = new PostModel({
+        title: 'Test'
+      , author: { name: 'A' }
+      , subject: { name: 'B' }
+    });
+
+    post.author.name.should.eql('A');
+    post.subject.name.should.eql('B');
+    post.author.name.should.eql('A');
+
+    db.close();
   },
 
   'test middleware': function () {

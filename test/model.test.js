@@ -150,6 +150,19 @@ module.exports = {
     db.close();
   },
 
+  'test a model that defaults an Array attribute to a default single member array': function () {
+    var db = start()
+      , DefaultOneCardArraySchema = new Schema({
+          arr: {type: Array, cast: String, default: ['a']}
+        });
+    mongoose.model('DefaultOneCardArray', DefaultOneCardArraySchema);
+    var DefaultOneCardArray = db.model('DefaultOneCardArray', collection);
+    var arr = new DefaultOneCardArray();
+    arr.get('arr').should.have.length(1);
+    arr.get('arr')[0].should.equal('a');
+    db.close();
+  },
+
   'test instantiating a model with a hash that maps to at least 1 null value': function () {
     var db = start()
       , BlogPost = db.model('BlogPost', collection);

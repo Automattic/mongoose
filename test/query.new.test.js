@@ -388,8 +388,6 @@ module.exports = {
     query._fields.should.eql({collection: {$slice: [14, 10]}});
   },
 
-  // TODO $elemMatch
-  
   'test Query#elemMatch not via with': function () {
     var query = new Query();
     query.elemMatch('comments', {author: 'bnoguchi', votes: {$gte: 5}});
@@ -434,6 +432,30 @@ module.exports = {
     var query = new Query();
     query.$where('this.lastName === this.firstName');
     query._conditions.should.eql({$where: 'this.lastName === this.firstName'});
-  }
+  },
+
+  'test Query#limit': function () {
+    var query = new Query();
+    query.limit(5);
+    query.options.limit.should.equal(5);
+  },
+
+  'test Query#skip': function () {
+    var query = new Query();
+    query.skip(9);
+    query.options.skip.should.equal(9);
+  },
+
+  'test Query#sort': function () {
+    var query = new Query();
+    query.sort('a', 1, 'c', -1, 'b', 1);
+    query.options.sort.should.eql([['a', 1], ['c', -1], ['b', 1]]);
+  },
+
+  'test Query#asc and Query#desc': function () {
+    var query = new Query();
+    query.asc('a').desc('c').asc('b');
+    query.options.sort.should.eql([['a', 1], ['c', -1], ['b', 1]]);
+  },
 
 };

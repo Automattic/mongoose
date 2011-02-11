@@ -420,4 +420,20 @@ module.exports = {
     query._conditions.should.eql({comments: {$elemMatch: {author: 'bnoguchi', votes: {$gte: 5}}}});
   },
 
+  
+  'test Query#$where with a function arg': function () {
+    var query = new Query();
+    function filter () {
+      return this.lastName === this.firstName;
+    }
+    query.$where(filter);
+    query._conditions.should.eql({$where: filter});
+  },
+
+  'test Query#where with a javascript string arg': function () {
+    var query = new Query();
+    query.$where('this.lastName === this.firstName');
+    query._conditions.should.eql({$where: 'this.lastName === this.firstName'});
+  }
+
 };

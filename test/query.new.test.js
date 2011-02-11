@@ -458,4 +458,43 @@ module.exports = {
     query.options.sort.should.eql([['a', 1], ['z', 1], ['c', -1], ['v', -1], ['b', 1]]);
   },
 
+
+  // Advanced Query options
+  
+  'test Query#maxscan': function () {
+    var query = new Query();
+    query.maxscan(100);
+    query.options.maxscan.should.equal(100);
+  },
+
+  //  TODO
+//  'test Query#min': function () {
+//    var query = new Query();
+//    query.min(10);
+//    query.options.min.should.equal(10);
+//  },
+//
+  //TODO
+//  'test Query#max': function () {
+//    var query = new Query();
+//    query.max(100);
+//    query.options.max.should.equal(100);
+//  },
+
+  // TODO Come back to this and make better
+//  'test Query#hint': function () {
+//    var query = new Query();
+//    query.hint('indexAttributeA', 'indexAttributeB');
+//    query.options.hint.should.equal('indexAttributeA', 'indexAttributeB');
+//  },
+
+  // TODO
+//  'test Query#explain': function () {
+//  }
+
+  'test Query#snapshot': function () {
+    var query = new Query();
+    query.snapshot(true);
+    query.options.snapshot.should.be.true;
+  }
 };

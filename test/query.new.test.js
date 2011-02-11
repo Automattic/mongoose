@@ -239,22 +239,52 @@ module.exports = {
     query._conditions.should.eql({age: {$nin: 21}});
   },
 
-  'test Query#mod with 2 arguments': function () {
+  'test Query#mod not via with, with [a, b] param': function () {
     var query = new Query();
     query.mod('age', [5, 2]);
     query._conditions.should.eql({age: {$mod: [5, 2]}});
   },
 
-  'test Query#mod with 1 argument': function () {
+  'test Query#mod not via with, with a and b params': function () {
+    var query = new Query();
+    query.mod('age', 5, 2);
+    query._conditions.should.eql({age: {$mod: [5, 2]}});
+  },
+
+  'test Query#mod via with, with [a, b] param': function () {
     var query = new Query();
     query.with("age").mod([5, 2]);
     query._conditions.should.eql({age: {$mod: [5, 2]}});
   },
 
-  'test Query#mod with 1 argument': function () {
+  'test Query#mod via with, with a and b params': function () {
     var query = new Query();
     query.with("age").mod(5, 2);
     query._conditions.should.eql({age: {$mod: [5, 2]}});
+  },
+
+  'test Query#near via with, with [lat, long] param': function () {
+    var query = new Query();
+    query.with('checkin').near([40, -72]);
+    query._conditions.should.eql({checkin: {$near: [40, -72]}});
+  },
+
+  'test Query#near via with, with lat and long params': function () {
+    var query = new Query();
+    query.with('checkin').near(40, -72);
+    query._conditions.should.eql({checkin: {$near: [40, -72]}});
+  },
+
+  'test Query#near not via with, with [lat, long] param': function () {
+    var query = new Query();
+    query.near('checkin', [40, -72]);
+    query._conditions.should.eql({checkin: {$near: [40, -72]}});
+  },
+
+  'test Query#near not via with, with lat and long params': function () {
+    var query = new Query();
+    query.near('checkin', 40, -72);
+    query._conditions.should.eql({checkin: {$near: [40, -72]}});
   },
 
   'test Query#exists with 0 arguments via with': function () {

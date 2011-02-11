@@ -287,6 +287,30 @@ module.exports = {
     query._conditions.should.eql({checkin: {$near: [40, -72]}});
   },
 
+  'test Query#within.box not via with': function () {
+    var query = new Query();
+    query.within.box('gps', {ll: [5, 25], ur: [10, 30]});
+    query._conditions.should.eql({gps: {$within: {$box: [[5, 25], [10, 30]]}}});
+  },
+
+  'test Query#within.box via with': function () {
+    var query = new Query();
+    query.with('gps').within.box({ll: [5, 25], ur: [10, 30]});
+    query._conditions.should.eql({gps: {$within: {$box: [[5, 25], [10, 30]]}}});
+  },
+
+  'test Query#within.center not via with': function () {
+    var query = new Query();
+    query.within.center('gps', {center: [5, 25], radius: 5});
+    query._conditions.should.eql({gps: {$within: {$center: [[5, 25], 5]}}});
+  },
+
+  'test Query#within.center not via with': function () {
+    var query = new Query();
+    query.with('gps').within.center({center: [5, 25], radius: 5});
+    query._conditions.should.eql({gps: {$within: {$center: [[5, 25], 5]}}});
+  },
+
   'test Query#exists with 0 arguments via with': function () {
     var query = new Query();
     query.with("username").exists();

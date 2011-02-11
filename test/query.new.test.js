@@ -101,6 +101,12 @@ module.exports = {
     query._fields.should.eql({a: 0, b: 0});
   },
 
+  'test setting a condition via with': function () {
+    var query = new Query();
+    query.with('name', 'guillermo');
+    query._conditions.should.eql({name: 'guillermo'});
+  },
+
   'test Query#gte with 2 arguments': function () {
     var query = new Query();
     query.gte('age', 18);
@@ -380,6 +386,38 @@ module.exports = {
     var query = new Query();
     query.slice('collection', 14, 10); // Return the 15th through 25th
     query._fields.should.eql({collection: {$slice: [14, 10]}});
+  },
+
+  // TODO $elemMatch
+  
+  'test Query#elemMatch not via with': function () {
+    var query = new Query();
+    query.elemMatch('comments', {author: 'bnoguchi', votes: {$gte: 5}});
+    query._conditions.should.eql({comments: {$elemMatch: {author: 'bnoguchi', votes: {$gte: 5}}}});
+  },
+
+  'test Query#elemMatch not via with, with block notation': function () {
+    var query = new Query();
+    query.elemMatch('comments', function (elem) {
+      elem.with('author', 'bnoguchi')
+      elem.with('votes').gte(5);
+    });
+    query._conditions.should.eql({comments: {$elemMatch: {author: 'bnoguchi', votes: {$gte: 5}}}});
+  },
+
+  'test Query#elemMatch via with': function () {
+    var query = new Query();
+    query.with('comments').elemMatch({author: 'bnoguchi', votes: {$gte: 5}});
+    query._conditions.should.eql({comments: {$elemMatch: {author: 'bnoguchi', votes: {$gte: 5}}}});
+  },
+
+  'test Query#elemMatch via with, with block notation': function () {
+    var query = new Query();
+    query.with('comments').elemMatch(function (elem) {
+      elem.with('author', 'bnoguchi')
+      elem.with('votes').gte(5);
+    });
+    query._conditions.should.eql({comments: {$elemMatch: {author: 'bnoguchi', votes: {$gte: 5}}}});
   },
 
 };

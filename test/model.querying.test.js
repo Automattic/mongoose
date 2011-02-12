@@ -440,6 +440,30 @@ module.exports = {
     });
   },
 
+  // GH-232
+  'test find queries with $nin cast the values within the array': function () {
+    var db = start()
+      , NinSchema = new Schema({
+          num: Number
+        });
+    mongoose.model('Nin', NinSchema);
+    var Nin = db.model('Nin', 'nins_' + random());
+    Nin.create({ num: 1 }, function (err, one) {
+      should.strictEqual(err, null);
+      Nin.create({ num: 2 }, function (err, two) {
+        should.strictEqual(err, null);
+        Nin.create({num: 3}, function (err, three) {
+          should.strictEqual(err, null);
+          Nin.find({ num: {$nin: [2]}}, function (err, found) {
+            should.strictEqual(err, null);
+            found.should.have.length(2);
+            db.close();
+          });
+        });
+      });
+    });
+  },
+
   'test for findById with partial initialization': function () {
     var db = start()
       , BlogPostB = db.model('BlogPostB', collection)

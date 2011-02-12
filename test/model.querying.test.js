@@ -607,7 +607,7 @@ module.exports = {
       });
   },
 
-  'test querying via $which': function () {
+  'test querying via $which with a string': function () {
     var db = start()
       , BlogPostB = db.model('BlogPostB', collection);
 
@@ -615,6 +615,24 @@ module.exports = {
       should.strictEqual(err, null);
 
       BlogPostB.findOne({ $where: "this.title !== null && this.title === this.author" }, function (err, found) {
+        should.strictEqual(err, null);
+
+        found._id.should.eql(created._id);
+        db.close();
+      });
+    });
+  },
+
+  'test querying via $which with a function': function () {
+    var db = start()
+      , BlogPostB = db.model('BlogPostB', collection);
+
+    BlogPostB.create({ author: 'Atari', slug: 'Atari'}, function (err, created) {
+      should.strictEqual(err, null);
+
+      BlogPostB.findOne({ $where: function () {
+        return (this.author !== null) && (this.slug !== null) && (this.author === this.slug);
+      } }, function (err, found) {
         should.strictEqual(err, null);
 
         found._id.should.eql(created._id);

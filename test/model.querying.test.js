@@ -663,5 +663,28 @@ module.exports = {
         db.close();
       });
     });
-  }
+  },
+
+  // TODO Won't pass until we fix materialization/raw data assymetry
+  'test find with $exists': function () {
+    var db = start()
+      , ExistsSchema = new Schema({
+            a: Number
+          , b: String
+        });
+    mongoose.model('Exists', ExistsSchema);
+    var Exists = db.model('Exists', 'exists_' + random());
+    Exists.create({ a: 1}, function (err, aExisting) {
+      should.strictEqual(err, null);
+      Exists.create({b: 'hi'}, function (err, bExisting) {
+        should.strictEqual(err, null);
+        Exists.find({b: {$exists: true}}, function (err, docs) {
+          should.strictEqual(err, null);
+          docs.should.have.length(1);
+          db.close();
+        });
+      });
+    });
+
+  },
 };

@@ -638,6 +638,17 @@ var all_tests = {
           });
         });
   
+        // Test sorting (descending), sort is hash
+        collection.find({'a': {'$lt':10}}, {sort: {a: -1}}, function(err, cursor) {
+          cursor.toArray(function(err, documents) {
+            test.equal(4, documents.length);
+            test.equal(4, documents[0].a);
+            test.equal(3, documents[1].a);
+            test.equal(2, documents[2].a);
+            test.equal(1, documents[3].a);
+          });
+        });
+  
         // Sorting using array of names, assumes ascending order
         collection.find({'a': {'$lt':10}}, {'sort': ['a']}, function(err, cursor) {
           cursor.toArray(function(err, documents) {
@@ -651,6 +662,17 @@ var all_tests = {
   
         // Sorting using single name, assumes ascending order
         collection.find({'a': {'$lt':10}}, {'sort': 'a'}, function(err, cursor) {
+          cursor.toArray(function(err, documents) {
+            test.equal(4, documents.length);
+            test.equal(1, documents[0].a);
+            test.equal(2, documents[1].a);
+            test.equal(3, documents[2].a);
+            test.equal(4, documents[3].a);
+          });
+        });
+  
+        // Sorting using single name, assumes ascending order, sort is hash
+        collection.find({'a': {'$lt':10}}, {sort: {'a':1}}, function(err, cursor) {
           cursor.toArray(function(err, documents) {
             test.equal(4, documents.length);
             test.equal(1, documents[0].a);
@@ -677,16 +699,19 @@ var all_tests = {
           });
         });
   
+        /* NONACTUAL */
         // Sorting using ordered hash
         collection.find({'a': {'$lt':10}}, {'sort': {a:-1}}, function(err, cursor) {
           cursor.toArray(function(err, documents) {
             // Fail test if not an error
-            test.ok(err instanceof Error);
-            test.equal("Error: Invalid sort argument was supplied", err.message);
+            //test.ok(err instanceof Error);
+            //test.equal("Error: Invalid sort argument was supplied", err.message);
+            test.equal(4, documents.length);
             // Let's close the db
             finished_test({test_find_sorting:'ok'});
           });
         });
+
       });
     });
   },
@@ -773,7 +798,7 @@ var all_tests = {
           replies.forEach(function(err, document) {
             if(document.name == "test_drop_collection") {
               found = true;
-              break;
+              return;
             }
           });
           // Let's close the db
@@ -796,7 +821,7 @@ var all_tests = {
             replies.forEach(function(document) {
               if(document.name == "test_other_drop") {
                 found = true;
-                break;
+                return;
               }
             });
             // Let's close the db

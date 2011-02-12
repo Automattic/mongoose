@@ -90,8 +90,8 @@ Collection.prototype.remove = function(selector, options, callback) {
 
   // Generate selector for remove all if not available
   var deleteCommand = new DeleteCommand(this.db, this.db.databaseName + "." + this.collectionName, removeSelector);
-  // Execute the command
-  this.db.executeCommand(deleteCommand, callback);
+  // Execute the command, do not add a callback as it's async
+  this.db.executeCommand(deleteCommand);
   // If safe mode check last error
   if(callback != null) {
     if(options.safe) {
@@ -494,10 +494,18 @@ Collection.prototype.mapReduce = function(map, reduce, options, callback) {
     if(err == null && result.documents[0].ok == 1) {
       // Create a collection object that wraps the result collection
       self.db.collection(result.documents[0].result, function(err, collection) {
-        callback(err, collection);
+        if(options.include_statistics) {
+          var stats = {
+            processtime: result.documents[0].timeMillis,
+            counts: result.documents[0].counts
+          };
+          callback(err, collection, stats);
+        } else {
+          callback(err, collection);
+        }
       });
     } else {
-      err != null ? callback(err, null) : callback(new Error("map-reduce failed: " + result.documents[0].errmsg), null);
+      err != null ? callback(err, null, null) : callback(new Error("map-reduce failed: " + result.documents[0].errmsg), null, null);
     }
   });
 };

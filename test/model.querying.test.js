@@ -40,6 +40,7 @@ var BlogPostB = new Schema({
   , published : Boolean
   , mixed     : {}
   , numbers   : [Number]
+  , tags      : [String]
   , owners    : [ObjectId]
   , comments  : [Comments]
 });
@@ -584,4 +585,25 @@ module.exports = {
       });
     });
   },
+
+  // GH-220
+  'test querying if an array contains at least a certain single member': function () {
+    var db = start()
+      , BlogPostB = db.model('BlogPostB', collection);
+
+      var post = new BlogPostB();
+
+      post.tags.push('cat');
+
+      post.save( function (err) {
+        should.strictEqual(err, null);
+
+        BlogPostB.findOne({tags: 'cat'}, function (err, doc) {
+          should.strictEqual(err, null);
+
+          doc._id.should.eql(post._id);
+          db.close();
+        });
+      });
+  }
 };

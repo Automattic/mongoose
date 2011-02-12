@@ -605,5 +605,21 @@ module.exports = {
           db.close();
         });
       });
+  },
+
+  'test querying via $which': function () {
+    var db = start()
+      , BlogPostB = db.model('BlogPostB', collection);
+
+    BlogPostB.create({ title: 'Steve Jobs', author: 'Steve Jobs'}, function (err, created) {
+      should.strictEqual(err, null);
+
+      BlogPostB.findOne({ $where: "this.title !== null && this.title === this.author" }, function (err, found) {
+        should.strictEqual(err, null);
+
+        found._id.should.eql(created._id);
+        db.close();
+      });
+    });
   }
 };

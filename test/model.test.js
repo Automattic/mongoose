@@ -7,8 +7,8 @@ var start = require('./common')
   , should = require('should')
   , mongoose = start.mongoose
   , random = require('mongoose/utils').random
-  , Query = require('mongoose/query').Query
-  , FindQuery = require('mongoose/query').FindQuery
+  , Query = require('mongoose/query.new').Query
+  , FindQuery = require('mongoose/query.new').FindQuery
   , Schema = mongoose.Schema
   , SchemaType = mongoose.SchemaType
   , CastError = SchemaType.CastError
@@ -961,23 +961,23 @@ module.exports = {
     
     // query
     BlogPost.find({}).should.be.an.instanceof(Query);
-    BlogPost.find({}).executed.should.be.false;
+//    BlogPost.find({}).executed.should.be.false;
 
     // query, fields
     BlogPost.find({}, {}).should.be.an.instanceof(Query);
-    BlogPost.find({}, {}).executed.should.be.false;
+//    BlogPost.find({}, {}).executed.should.be.false;
 
     // query, fields (array)
     BlogPost.find({}, []).should.be.an.instanceof(Query);
-    BlogPost.find({}, []).executed.should.be.false;
+//    BlogPost.find({}, []).executed.should.be.false;
 
     // query, fields, options
     BlogPost.find({}, {}, {}).should.be.an.instanceof(Query);
-    BlogPost.find({}, {}, {}).executed.should.be.false;
+//    BlogPost.find({}, {}, {}).executed.should.be.false;
 
     // query, fields (array), options
     BlogPost.find({}, [], {}).should.be.an.instanceof(Query);
-    BlogPost.find({}, [], {}).executed.should.be.false;
+//    BlogPost.find({}, [], {}).executed.should.be.false;
 
     db.close();
   },
@@ -988,23 +988,23 @@ module.exports = {
     
     // query
     BlogPost.findOne({}).should.be.an.instanceof(Query);
-    BlogPost.findOne({}).executed.should.be.false;
+//    BlogPost.findOne({}).executed.should.be.false;
 
     // query, fields
     BlogPost.findOne({}, {}).should.be.an.instanceof(Query);
-    BlogPost.findOne({}, {}).executed.should.be.false;
+//    BlogPost.findOne({}, {}).executed.should.be.false;
 
     // query, fields (array)
     BlogPost.findOne({}, []).should.be.an.instanceof(Query);
-    BlogPost.findOne({}, []).executed.should.be.false;
+//    BlogPost.findOne({}, []).executed.should.be.false;
 
     // query, fields, options
     BlogPost.findOne({}, {}, {}).should.be.an.instanceof(Query);
-    BlogPost.findOne({}, {}, {}).executed.should.be.false;
+//    BlogPost.findOne({}, {}, {}).executed.should.be.false;
 
     // query, fields (array), options
     BlogPost.findOne({}, [], {}).should.be.an.instanceof(Query);
-    BlogPost.findOne({}, [], {}).executed.should.be.false;
+//    BlogPost.findOne({}, [], {}).executed.should.be.false;
 
     db.close();
   },

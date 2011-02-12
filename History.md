@@ -1,4 +1,9 @@
 
+1.0.10 / 2011-02-11 
+===================
+
+  * Updated node-mongodb-native driver [thanks John Allen]
+
 1.0.9 / 2011-02-09 
 ==================
 

@@ -21,8 +21,13 @@ var Db = exports.Db = function(databaseName, serverConfig, options) {
   this.options = options == null ? {} : options;
   // sys.puts(sys.inspect(require('../../external-libs/bson/bson')))
   // Contains all the connections for the db
-  this.bson_serializer = this.options.native_parser ? require('../../external-libs/bson/bson') : require('./bson/bson');
-  this.bson_deserializer = this.options.native_parser ? require('../../external-libs/bson/bson') : require('./bson/bson');  
+  try {
+    this.bson_serializer = this.options.native_parser ? require('../../external-libs/bson/bson') : require('./bson/bson');
+    this.bson_deserializer = this.options.native_parser ? require('../../external-libs/bson/bson') : require('./bson/bson');      
+  } catch (err) {
+    // If we tried to instantiate the native driver
+    throw "Native bson parser not compiled, please compile or avoud using native_parser=true";
+  }
   this.connections = [];
   // State of the db connection
   this.state = 'notConnected';
@@ -518,7 +523,6 @@ Db.prototype.indexInformation = function(collectionName, callback) {
   Database Drop Command
 **/
 Db.prototype.dropDatabase = function(callback) {
-
   this.executeCommand(DbCommand.createDropDatabaseCommand(this), function(err, result) {
     callback(err, result);
   });

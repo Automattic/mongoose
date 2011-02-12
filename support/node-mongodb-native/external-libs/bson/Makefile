@@ -11,5 +11,8 @@ all:
 test:
 	@$(NODE) test_bson.js
 	@$(NODE) test_full_bson.js
+
+clean:
+	rm -rf build .lock-wscript bson.node
 	
 .PHONY: all

@@ -385,7 +385,8 @@ Cursor.prototype.formattedOrderClause = function() {
       }
     });
   } else if(Object.prototype.toString.call(this.sortValue) === '[object Object]') {
-    throw new Error("Invalid sort argument was supplied");
+    //throw new Error("Invalid sort argument was supplied");
+    return orderBy = this.sortValue;
   } else if(this.sortValue.constructor == String) {
     orderBy[this.sortValue] = 1
   } else {

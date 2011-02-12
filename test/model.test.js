@@ -1012,7 +1012,8 @@ module.exports = {
   'test that a query is executed when a callback is passed': function () {
     var db = start()
       , BlogPost = db.model('BlogPost', collection)
-      , count = 10
+      , count = 5
+//      , count = 10
       , q =  { _id: new DocumentObjectId }; // make sure the query is fast
 
     function fn () {
@@ -1043,7 +1044,8 @@ module.exports = {
   'test that query is executed with a callback for findOne': function () {
     var db = start()
       , BlogPost = db.model('BlogPost', collection)
-      , count = 10
+      , count = 5
+//      , count = 10
       , q =  { _id: new DocumentObjectId }; // make sure the query is fast
 
     function fn () {
@@ -1084,7 +1086,8 @@ module.exports = {
   'test that count Query executes when you pass a callback': function () {
     var db = start()
       , BlogPost = db.model('BlogPost', collection)
-      , count = 2;
+      , count = 1;
+//      , count = 2;
 
     function fn () {
       --count || db.close();
@@ -1110,7 +1113,8 @@ module.exports = {
   'test that update Query executes when you pass a callback': function () {
     var db = start()
       , BlogPost = db.model('BlogPost', collection)
-      , count = 4;
+      , count = 2;
+//      , count = 4;
 
     function fn () {
       --count || db.close();

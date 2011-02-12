@@ -687,8 +687,7 @@ module.exports = {
     });
   },
 
-  // GH-242
-  'test finding based on embedded document fields': function () {
+  'test finding based on nested fields': function () {
     var db = start()
       , BlogPostB = db.model('BlogPostB', collection)
       , post = new BlogPostB({
@@ -705,6 +704,21 @@ module.exports = {
         found.get('meta.visitors')
           .valueOf().should.equal(post.get('meta.visitors').valueOf());
         found.get('_id').should.eql(post.get('_id'));
+        db.close();
+      });
+    });
+  },
+
+  // GH-242
+  'test finding based on embedded document fields': function () {
+    var db = start()
+      , BlogPostB = db.model('BlogPostB', collection);
+
+    BlogPostB.create({comments: [{title: 'i should be queryable'}]}, function (err, created) {
+      should.strictEqual(err, null);
+      BlogPostB.findOne({'comments.title': 'i should be queryable'}, function (err, found) {
+        should.strictEqual(err, null);
+        found._id.should.eql(created._id);
         db.close();
       });
     });

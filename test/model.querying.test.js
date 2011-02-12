@@ -680,11 +680,33 @@ module.exports = {
         should.strictEqual(err, null);
         Exists.find({b: {$exists: true}}, function (err, docs) {
           should.strictEqual(err, null);
-          docs.should.have.length(1);
           db.close();
+          docs.should.have.length(1);
         });
       });
     });
-
   },
+
+  // GH-242
+  'test finding based on embedded document fields': function () {
+    var db = start()
+      , BlogPostB = db.model('BlogPostB', collection)
+      , post = new BlogPostB({
+          meta: {
+            visitors: 5678
+          }
+        });
+
+    post.save(function (err) {
+      should.strictEqual(err, null);
+
+      BlogPostB.findOne({ 'meta.visitors': 5678 }, function (err, found) {
+        should.strictEqual(err, null);
+        found.get('meta.visitors')
+          .valueOf().should.equal(post.get('meta.visitors').valueOf());
+        found.get('_id').should.eql(post.get('_id'));
+        db.close();
+      });
+    });
+  }
 };

@@ -957,13 +957,63 @@ module.exports = {
       should.strictEqual(err, null);
       BlogPostB.create({title: 'second limit'}, function (err, second) {
         should.strictEqual(err, null);
-        BlogPostB.create({title: 'second limit'}, function (err, second) {
+        BlogPostB.create({title: 'third limit'}, function (err, third) {
           should.strictEqual(err, null);
           BlogPostB.find({title: /limit$/}).limit(2).find( function (err, found) {
             should.strictEqual(err, null);
             found.should.have.length(2);
+            found[0]._id.should.eql(first._id);
+            found[1]._id.should.eql(second._id);
             db.close();
           });
+        });
+      });
+    });
+  },
+
+  'test skips': function () {
+    var db = start()
+      , BlogPostB = db.model('BlogPostB', collection);
+
+    BlogPostB.create({title: 'first skip'}, function (err, first) {
+      should.strictEqual(err, null);
+      BlogPostB.create({title: 'second skip'}, function (err, second) {
+        should.strictEqual(err, null);
+        BlogPostB.create({title: 'third skip'}, function (err, third) {
+          should.strictEqual(err, null);
+          BlogPostB.find({title: /skip$/}).skip(1).limit(2).find( function (err, found) {
+            should.strictEqual(err, null);
+            found.should.have.length(2);
+            found[0]._id.should.eql(second._id);
+            found[1]._id.should.eql(third._id);
+            db.close();
+          });
+        });
+      });
+    });
+  },
+
+  'test sorts': function () {
+    var db = start()
+      , BlogPostB = db.model('BlogPostB', collection);
+
+    BlogPostB.create({meta: {visitors: 100}}, function (err, least) {
+      should.strictEqual(err, null);
+      BlogPostB.create({meta: {visitors: 300}}, function (err, largest) {
+        should.strictEqual(err, null);
+        BlogPostB.create({meta: {visitors: 200}}, function (err, middle) {
+          should.strictEqual(err, null);
+          BlogPostB
+            .with('meta.visitors').gt(99).lt(301)
+            .sort('meta.visitors', -1)
+            .find( function (err, found) {
+              should.strictEqual(err, null);
+              found.should.have.length(3);
+              found[0]._id.should.eql(largest._id);
+              found[1]._id.should.eql(middle._id);
+              found[2]._id.should.eql(least._id);
+              db.close();
+            });
         });
       });
     });

@@ -3,8 +3,7 @@
  * Module dependencies.
  */
 
-var Query = require('mongoose/query').Query
-  , FindQuery = require('mongoose/query').FindQuery;
+var Query = require('mongoose/query').Query;
 
 /**
  * Test.
@@ -12,44 +11,44 @@ var Query = require('mongoose/query').Query
 
 module.exports = {
   'test query.fields({a: 1, b: 1, c: 1})': function () {
-    var query = new FindQuery();
+    var query = new Query();
     query.fields({a: 1, b: 1, c: 1});
     query._fields.should.eql({a: 1, b: 1, c: 1});
   },
   'test query.fields({only: "a b c"})': function () {
-    var query = new FindQuery();
+    var query = new Query();
     query.fields({only: "a b c"});
     query._fields.should.eql({a: 1, b: 1, c: 1});
   },
   'test query.fields({only: ["a", "b", "c"]})': function () {
-    var query = new FindQuery();
+    var query = new Query();
     query.fields({only: ['a', 'b', 'c']});
     query._fields.should.eql({a: 1, b: 1, c: 1});
   },
   'test query.fields("a b c")': function () {
-    var query = new FindQuery();
+    var query = new Query();
     query.fields("a b c");
     query._fields.should.eql({a: 1, b: 1, c: 1});
   },
   'test query.fields("a", "b", "c")': function () {
-    var query = new FindQuery();
+    var query = new Query();
     query.fields('a', 'b', 'c');
     query._fields.should.eql({a: 1, b: 1, c: 1});
   },
   "test query.fields(['a', 'b', 'c'])": function () {
-    var query = new FindQuery();
+    var query = new Query();
     query.fields(['a', 'b', 'c']);
     query._fields.should.eql({a: 1, b: 1, c: 1});
   },
-  "FindQuery#fields should not over-ride fields set in prior calls to FindQuery#fields": function () {
-    var query = new FindQuery();
+  "Query#fields should not over-ride fields set in prior calls to Query#fields": function () {
+    var query = new Query();
     query.fields('a');
     query._fields.should.eql({a: 1});
     query.fields('b');
     query._fields.should.eql({a: 1, b: 1});
   },
-//  "FindQuery#fields should be able to over-ride fields set in prior calls to FindQuery#fields if you specify override": function () {
-//    var query = new FindQuery();
+//  "Query#fields should be able to over-ride fields set in prior calls to Query#fields if you specify override": function () {
+//    var query = new Query();
 //    query.fields('a');
 //    query._fields.should.eql({a: 1});
 //    query.override.fields('b');
@@ -57,22 +56,22 @@ module.exports = {
 //  }
 
   "test query.only('a b c')": function () {
-    var query = new FindQuery();
+    var query = new Query();
     query.only("a b c");
     query._fields.should.eql({a: 1, b: 1, c: 1});
   },
   "test query.only('a', 'b', 'c')": function () {
-    var query = new FindQuery();
+    var query = new Query();
     query.only('a', 'b', 'c');
     query._fields.should.eql({a: 1, b: 1, c: 1});
   },
   "test query.only('a', 'b', 'c')": function () {
-    var query = new FindQuery();
+    var query = new Query();
     query.only(['a', 'b', 'c']);
     query._fields.should.eql({a: 1, b: 1, c: 1});
   },
-  "FindQuery#only should not over-ride fields set in prior calls to FindQuery#only": function () {
-    var query = new FindQuery();
+  "Query#only should not over-ride fields set in prior calls to Query#only": function () {
+    var query = new Query();
     query.only('a');
     query._fields.should.eql({a: 1});
     query.only('b');
@@ -80,22 +79,22 @@ module.exports = {
   },
 
   "test query.exclude('a b c')": function () {
-    var query = new FindQuery();
+    var query = new Query();
     query.exclude("a b c");
     query._fields.should.eql({a: 0, b: 0, c: 0});
   },
   "test query.exclude('a', 'b', 'c')": function () {
-    var query = new FindQuery();
+    var query = new Query();
     query.exclude('a', 'b', 'c');
     query._fields.should.eql({a: 0, b: 0, c: 0});
   },
   "test query.exclude('a', 'b', 'c')": function () {
-    var query = new FindQuery();
+    var query = new Query();
     query.exclude(['a', 'b', 'c']);
     query._fields.should.eql({a: 0, b: 0, c: 0});
   },
-  "FindQuery#exclude should not over-ride fields set in prior calls to FindQuery#exclude": function () {
-    var query = new FindQuery();
+  "Query#exclude should not over-ride fields set in prior calls to Query#exclude": function () {
+    var query = new Query();
     query.exclude('a');
     query._fields.should.eql({a: 0});
     query.exclude('b');
@@ -370,75 +369,75 @@ module.exports = {
     query._conditions.should.eql({collection: {$size: 5}});
   },
 
-  'test FindQuery#slice via with, with just positive limit param': function () {
-    var query = new FindQuery();
+  'test Query#slice via with, with just positive limit param': function () {
+    var query = new Query();
     query.with('collection').slice(5);
     query._fields.should.eql({collection: {$slice: 5}});
   },
 
-  'test FindQuery#slice via with, with just negative limit param': function () {
-    var query = new FindQuery();
+  'test Query#slice via with, with just negative limit param': function () {
+    var query = new Query();
     query.with('collection').slice(-5);
     query._fields.should.eql({collection: {$slice: -5}});
   },
 
-  'test FindQuery#slice via with, with [skip, limit] param': function () {
-    var query = new FindQuery();
+  'test Query#slice via with, with [skip, limit] param': function () {
+    var query = new Query();
     query.with('collection').slice([14, 10]); // Return the 15th through 25th
     query._fields.should.eql({collection: {$slice: [14, 10]}});
   },
 
-  'test FindQuery#slice via with, with skip and limit params': function () {
-    var query = new FindQuery();
+  'test Query#slice via with, with skip and limit params': function () {
+    var query = new Query();
     query.with('collection').slice(14, 10); // Return the 15th through 25th
     query._fields.should.eql({collection: {$slice: [14, 10]}});
   },
 
-  'test FindQuery#slice via with, with just positive limit param': function () {
-    var query = new FindQuery();
+  'test Query#slice via with, with just positive limit param': function () {
+    var query = new Query();
     query.with('collection').slice(5);
     query._fields.should.eql({collection: {$slice: 5}});
   },
 
-  'test FindQuery#slice via with, with just negative limit param': function () {
-    var query = new FindQuery();
+  'test Query#slice via with, with just negative limit param': function () {
+    var query = new Query();
     query.with('collection').slice(-5);
     query._fields.should.eql({collection: {$slice: -5}});
   },
 
-  'test FindQuery#slice via with, with the [skip, limit] param': function () {
-    var query = new FindQuery();
+  'test Query#slice via with, with the [skip, limit] param': function () {
+    var query = new Query();
     query.with('collection').slice([14, 10]); // Return the 15th through 25th
     query._fields.should.eql({collection: {$slice: [14, 10]}});
   },
 
-  'test FindQuery#slice via with, with the skip and limit params': function () {
-    var query = new FindQuery();
+  'test Query#slice via with, with the skip and limit params': function () {
+    var query = new Query();
     query.with('collection').slice(14, 10); // Return the 15th through 25th
     query._fields.should.eql({collection: {$slice: [14, 10]}});
   },
 
 
-  'test FindQuery#slice not via with, with just positive limit param': function () {
-    var query = new FindQuery();
+  'test Query#slice not via with, with just positive limit param': function () {
+    var query = new Query();
     query.slice('collection', 5);
     query._fields.should.eql({collection: {$slice: 5}});
   },
 
-  'test FindQuery#slice not via with, with just negative limit param': function () {
-    var query = new FindQuery();
+  'test Query#slice not via with, with just negative limit param': function () {
+    var query = new Query();
     query.slice('collection', -5);
     query._fields.should.eql({collection: {$slice: -5}});
   },
 
-  'test FindQuery#slice not via with, with [skip, limit] param': function () {
-    var query = new FindQuery();
+  'test Query#slice not via with, with [skip, limit] param': function () {
+    var query = new Query();
     query.slice('collection', [14, 10]); // Return the 15th through 25th
     query._fields.should.eql({collection: {$slice: [14, 10]}});
   },
 
-  'test FindQuery#slice not via with, with skip and limit params': function () {
-    var query = new FindQuery();
+  'test Query#slice not via with, with skip and limit params': function () {
+    var query = new Query();
     query.slice('collection', 14, 10); // Return the 15th through 25th
     query._fields.should.eql({collection: {$slice: [14, 10]}});
   },
@@ -489,26 +488,26 @@ module.exports = {
     query._conditions.should.eql({$where: 'this.lastName === this.firstName'});
   },
 
-  'test FindQuery#limit': function () {
-    var query = new FindQuery();
+  'test Query#limit': function () {
+    var query = new Query();
     query.limit(5);
     query.options.limit.should.equal(5);
   },
 
-  'test FindQuery#skip': function () {
-    var query = new FindQuery();
+  'test Query#skip': function () {
+    var query = new Query();
     query.skip(9);
     query.options.skip.should.equal(9);
   },
 
-  'test FindQuery#sort': function () {
-    var query = new FindQuery();
+  'test Query#sort': function () {
+    var query = new Query();
     query.sort('a', 1, 'c', -1, 'b', 1);
     query.options.sort.should.eql([['a', 1], ['c', -1], ['b', 1]]);
   },
 
-  'test FindQuery#asc and FindQuery#desc': function () {
-    var query = new FindQuery();
+  'test Query#asc and Query#desc': function () {
+    var query = new Query();
     query.asc('a', 'z').desc('c', 'v').asc('b');
     query.options.sort.should.eql([['a', 1], ['z', 1], ['c', -1], ['v', -1], ['b', 1]]);
   },
@@ -547,8 +546,8 @@ module.exports = {
 //  'test Query#explain': function () {
 //  }
 
-  'test FindQuery#snapshot': function () {
-    var query = new FindQuery();
+  'test Query#snapshot': function () {
+    var query = new Query();
     query.snapshot(true);
     query.options.snapshot.should.be.true;
   },

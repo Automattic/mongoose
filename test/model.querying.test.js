@@ -895,7 +895,7 @@ module.exports = {
     });
   },
 
-  'test finding documents with an array of a certain size': function () {
+  'test finding documents with an array of a certain $size': function () {
     var db = start()
       , BlogPostB = db.model('BlogPostB', collection);
 

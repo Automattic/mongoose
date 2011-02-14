@@ -858,5 +858,19 @@ module.exports = {
         });
       });
     });
-  }
+  },
+
+  'test finding strings via regular expressions': function () {
+    var db = start()
+      , BlogPostB = db.model('BlogPostB', collection + random());
+
+    BlogPostB.create({title: 'Next to Normal'}, function (err, created) {
+      should.strictEqual(err, null);
+      BlogPostB.findOne({title: /^Next/}, function (err, found) {
+        should.strictEqual(err, null);
+        found._id.should.eql(created._id);
+        db.close();
+      });
+    });
+  },
 };

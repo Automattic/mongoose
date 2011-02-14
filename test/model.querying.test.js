@@ -823,5 +823,22 @@ module.exports = {
         });
       });
     });
+  },
+
+  'test finding null matches null and undefined': function () {
+    var db = start()
+      , BlogPostB = db.model('BlogPostB', collection + random());
+
+    BlogPostB.create({title: 'A', author: null}, function (err, createdA) {
+      should.strictEqual(err, null);
+      BlogPostB.create({title: 'B'}, function (err, createdB) {
+        should.strictEqual(err, null);
+        BlogPostB.find({author: null}, function (err, found) {
+          should.strictEqual(err, null);
+          found.should.have.length(2);
+          db.close();
+        });
+      });
+    });
   }
 };

@@ -781,5 +781,29 @@ module.exports = {
         });
       });
     });
+  },
+
+  'test finding with $or': function () {
+    var db = start()
+      , Mod = db.model('Mod', 'mods_' + random());
+    Mod.create({num: 1}, function (err, one) {
+      should.strictEqual(err, null);
+      Mod.create({num: 2}, function (err, two) {
+        should.strictEqual(err, null);
+        Mod.create({num: 3}, function (err, three) {
+          should.strictEqual(err, null);
+          Mod.find({$or: [{num: 1}, {num: 2}]}, function (err, found) {
+            should.strictEqual(err, null);
+            found.should.have.length(2);
+            found[0]._id.should.eql(one._id);
+            found[1]._id.should.eql(two._id);
+            db.close();
+          });
+        });
+      });
+    });
+  },
+
+  'test finding with $ne': function () {
   }
 };

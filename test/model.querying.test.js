@@ -46,8 +46,12 @@ var BlogPostB = new Schema({
 });
 
 mongoose.model('BlogPostB', BlogPostB);
-
 var collection = 'blogposts_' + random();
+
+var ModSchema = new Schema({
+  num: Number
+});
+mongoose.model('Mod', ModSchema);
 
 module.exports = {
   'test that find returns a Query': function () {
@@ -741,6 +745,40 @@ module.exports = {
             db.close();
           }
         );
+      });
+    });
+  },
+
+  'test finding with $mod': function () {
+    var db = start()
+      , Mod = db.model('Mod', 'mods_' + random());
+    Mod.create({num: 1}, function (err, one) {
+      should.strictEqual(err, null);
+      Mod.create({num: 2}, function (err, two) {
+        should.strictEqual(err, null);
+        Mod.find({num: {$mod: [2, 1]}}, function (err, found) {
+          should.strictEqual(err, null);
+          found.should.have.length(1);
+          found[0]._id.should.eql(one._id);
+          db.close();
+        });
+      });
+    });
+  },
+
+  'test finding with $not': function () {
+    var db = start()
+      , Mod = db.model('Mod', 'mods_' + random());
+    Mod.create({num: 1}, function (err, one) {
+      should.strictEqual(err, null);
+      Mod.create({num: 2}, function (err, two) {
+        should.strictEqual(err, null);
+        Mod.find({num: {$not: {$mod: [2, 1]}}}, function (err, found) {
+          should.strictEqual(err, null);
+          found.should.have.length(1);
+          found[0]._id.should.eql(two._id);
+          db.close();
+        });
       });
     });
   }

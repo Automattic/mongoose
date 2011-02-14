@@ -805,5 +805,23 @@ module.exports = {
   },
 
   'test finding with $ne': function () {
+    var db = start()
+      , Mod = db.model('Mod', 'mods_' + random());
+    Mod.create({num: 1}, function (err, one) {
+      should.strictEqual(err, null);
+      Mod.create({num: 2}, function (err, two) {
+        should.strictEqual(err, null);
+        Mod.create({num: 3}, function (err, three) {
+          should.strictEqual(err, null);
+          Mod.find({num: {$ne: 1}}, function (err, found) {
+            should.strictEqual(err, null);
+            found.should.have.length(2);
+            found[0]._id.should.eql(two._id);
+            found[1]._id.should.eql(three._id);
+            db.close();
+          });
+        });
+      });
+    });
   }
 };

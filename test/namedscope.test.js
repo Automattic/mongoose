@@ -72,7 +72,7 @@ UserNSSchema.namedScope('olderThan', function (age) {
 });
 
 UserNSSchema.namedScope('youngerThan', function (age) {
-  return this.with(age).lt(age);
+  return this.with('age').lt(age);
 });
 
 UserNSSchema.namedScope('twenties').olderThan(19).youngerThan(30);
@@ -106,61 +106,61 @@ module.exports = {
       });
     });
   },
-//  'dynamic named scopes should work': function () {
-//    var db = start()
-//      , UserNS = db.model('UserNS', 'users_' + random());
-//    UserNS.create({age: 21}, function (err, _) {
-//      should.strictEqual(err, null);
-//      UserNS.create({gender: 22}, function (err, _) {
-//        should.strictEqual(err, null);
-//        UserNS.create({gender: 19}, function (err, _) {
-//          should.strictEqual(err, null);
-//          UserNS.olderThan(20).find( function (err, found) {
-//            db.close();
-//            should.strictEqual(err, null);
-//            found.should.have.length(2);
-//          });
-//        });
-//      });
-//    });
-//  },
-//  'named scopes built on top of dynamic named scopes should work': function () {
-//    var db = start()
-//      , UserNS = db.model('UserNS', 'users_' + random());
-//    UserNS.create({age: 21}, function (err, _) {
-//      should.strictEqual(err, null);
-//      UserNS.create({gender: 22}, function (err, _) {
-//        should.strictEqual(err, null);
-//        UserNS.create({gender: 19}, function (err, _) {
-//          should.strictEqual(err, null);
-//          UserNS.twenties.find( function (err, found) {
-//            db.close();
-//            should.strictEqual(err, null);
-//            found.should.have.length(2);
-//          });
-//        });
-//      });
-//    });
-//  },
-//  'chaining named scopes should work': function () {
-//    var db = start()
-//      , UserNS = db.model('UserNS', 'users_' + random());
-//    UserNS.create({age: 21, gender: 'male', lastLogin: (+new Date) - _24hours - 3600}, function (err, _) {
-//      should.strictEqual(err, null);
-//      UserNS.create({age: 45, gender: 'male', lastLogin: +new Date}, function (err, match) {
-//        should.strictEqual(err, null);
-//        UserNS.create({age: 50, gender: 'female', lastLogin: +new Date}, function (err, _) {
-//          should.strictEqual(err, null);
-//          UserNS.olderThan(40).active.male.find( function (err, found) {
-//            db.close();
-//            should.strictEqual(err, null);
-//            found.should.have.length(1);
-//            found[0]._id.should.eql(match._id);
-//          });
-//        });
-//      });
-//    });
-//  },
+  'dynamic named scopes should work': function () {
+    var db = start()
+      , UserNS = db.model('UserNS', 'users_' + random());
+    UserNS.create({age: 21}, function (err, _) {
+      should.strictEqual(err, null);
+      UserNS.create({age: 22}, function (err, _) {
+        should.strictEqual(err, null);
+        UserNS.create({age: 19}, function (err, _) {
+          should.strictEqual(err, null);
+          UserNS.olderThan(20).find( function (err, found) {
+            db.close();
+            should.strictEqual(err, null);
+            found.should.have.length(2);
+          });
+        });
+      });
+    });
+  },
+  'named scopes built on top of dynamic named scopes should work': function () {
+    var db = start()
+      , UserNS = db.model('UserNS', 'users_' + random());
+    UserNS.create({age: 21}, function (err, _) {
+      should.strictEqual(err, null);
+      UserNS.create({age: 22}, function (err, _) {
+        should.strictEqual(err, null);
+        UserNS.create({age: 19}, function (err, _) {
+          should.strictEqual(err, null);
+          UserNS.twenties.find( function (err, found) {
+            db.close();
+            should.strictEqual(err, null);
+            found.should.have.length(2);
+          });
+        });
+      });
+    });
+  },
+  'chaining named scopes should work': function () {
+    var db = start()
+      , UserNS = db.model('UserNS', 'users_' + random());
+    UserNS.create({age: 21, gender: 'male', lastLogin: (+new Date) - _24hours - 3600}, function (err, _) {
+      should.strictEqual(err, null);
+      UserNS.create({age: 45, gender: 'male', lastLogin: +new Date}, function (err, match) {
+        should.strictEqual(err, null);
+        UserNS.create({age: 50, gender: 'female', lastLogin: +new Date}, function (err, _) {
+          should.strictEqual(err, null);
+          UserNS.olderThan(40).active.male.find( function (err, found) {
+            db.close();
+            should.strictEqual(err, null);
+            found.should.have.length(1);
+            found[0]._id.should.eql(match._id);
+          });
+        });
+      });
+    });
+  },
 //  'using chained named scopes in a find': function () {
 //    var db = start()
 //      , UserNS = db.model('UserNS', 'users_' + random());

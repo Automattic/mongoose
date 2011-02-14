@@ -947,5 +947,28 @@ module.exports = {
         });
       });
     });
-  }
+  },
+
+  'test limits': function () {
+    var db = start()
+      , BlogPostB = db.model('BlogPostB', collection);
+
+    BlogPostB.create({title: 'first limit'}, function (err, first) {
+      should.strictEqual(err, null);
+      BlogPostB.create({title: 'second limit'}, function (err, second) {
+        should.strictEqual(err, null);
+        BlogPostB.create({title: 'second limit'}, function (err, second) {
+          should.strictEqual(err, null);
+          BlogPostB.find({title: /limit$/}).limit(2).find( function (err, found) {
+            should.strictEqual(err, null);
+            found.should.have.length(2);
+            db.close();
+          });
+        });
+      });
+    });
+  },
+
+
+  // IDIOMATIC SYNTAX TESTS
 };

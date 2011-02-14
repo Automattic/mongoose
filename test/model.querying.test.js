@@ -840,5 +840,23 @@ module.exports = {
         });
       });
     });
+  },
+
+  'test finding STRICT null matches': function () {
+    var db = start()
+      , BlogPostB = db.model('BlogPostB', collection + random());
+
+    BlogPostB.create({title: 'A', author: null}, function (err, createdA) {
+      should.strictEqual(err, null);
+      BlogPostB.create({title: 'B'}, function (err, createdB) {
+        should.strictEqual(err, null);
+        BlogPostB.find({author: {$in: [null], $exists: true}}, function (err, found) {
+          should.strictEqual(err, null);
+          found.should.have.length(1);
+          found[0]._id.should.eql(createdA._id);
+          db.close();
+        });
+      });
+    });
   }
 };

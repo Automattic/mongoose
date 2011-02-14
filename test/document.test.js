@@ -132,13 +132,11 @@ module.exports = {
     var copy = doc.toObject();
 
     copy.test._marked = true;
-    copy.oids._marked = true;
     copy.nested._marked = true;
     copy.nested.age._marked = true;
     copy.nested.cool._marked = true;
 
     should.strictEqual(doc.doc.test._marked, undefined);
-    should.strictEqual(doc.doc.oids._marked, undefined);
     should.strictEqual(doc.doc.nested._marked, undefined);
     should.strictEqual(doc.doc.nested.age._marked, undefined);
     should.strictEqual(doc.doc.nested.cool._marked, undefined);
@@ -449,6 +447,14 @@ module.exports = {
 
     obj.test.should.eql('woot');
     obj._id.should.eql(oidString);
+  },
+
+  'toObject should not set undefined values to null': function () {
+    var doc = new TestDocument()
+      , obj = doc.toObject();
+
+    delete obj._id;
+    obj.should.eql({});
   }
 
 };

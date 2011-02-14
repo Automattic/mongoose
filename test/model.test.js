@@ -101,17 +101,16 @@ module.exports = {
 
     post.get('_id').should.be.an.instanceof(DocumentObjectId);
 
-    should.strictEqual(post.get('title'), null);
-    should.strictEqual(post.get('slug'), null);
-    should.strictEqual(post.get('date'), null);
+    should.equal(undefined, post.get('title'));
+    should.equal(undefined, post.get('slug'));
+    should.equal(undefined, post.get('date'));
 
     post.get('meta').should.be.a('object');
-    post.get('meta').should.eql({
-        date: null
-      , visitors: null
-    });
+    post.get('meta').should.eql({});
+    should.equal(undefined, post.get('meta.date'));
+    should.equal(undefined, post.get('meta.visitors'));
 
-    should.strictEqual(post.get('published'), null);
+    should.equal(undefined, post.get('published'));
 
     post.get('numbers').should.be.an.instanceof(MongooseArray);
     post.get('owners').should.be.an.instanceof(MongooseArray);
@@ -193,17 +192,15 @@ module.exports = {
       should.strictEqual(err, null);
       post.get('_id').should.be.an.instanceof(DocumentObjectId);
 
-      should.strictEqual(post.get('title'), null);
-      should.strictEqual(post.get('slug'), null);
-      should.strictEqual(post.get('date'), null);
+      should.equal(undefined, post.get('title'));
+      should.equal(undefined, post.get('slug'));
+      should.equal(undefined, post.get('date'));
+      should.equal(undefined, post.get('published'));
 
       post.get('meta').should.be.a('object');
-      post.get('meta').should.eql({
-          date: null
-        , visitors: null
-      });
-
-      should.strictEqual(post.get('published'), null);
+      post.get('meta').should.eql({});
+      should.equal(undefined, post.get('meta.date'));
+      should.equal(undefined, post.get('meta.visitors'));
 
       post.get('owners').should.be.an.instanceof(MongooseArray);
       post.get('comments').should.be.an.instanceof(DocumentArray);
@@ -220,16 +217,15 @@ module.exports = {
       post.get('_id').should.be.an.instanceof(DocumentObjectId);
 
       should.strictEqual(post.get('title'), 'hi there');
-      should.strictEqual(post.get('slug'), null);
-      should.strictEqual(post.get('date'), null);
+      should.equal(undefined, post.get('slug'));
+      should.equal(undefined, post.get('date'));
 
       post.get('meta').should.be.a('object');
-      post.get('meta').should.eql({
-          date: null
-        , visitors: null
-      });
+      post.get('meta').should.eql({});
+      should.equal(undefined, post.get('meta.date'));
+      should.equal(undefined, post.get('meta.visitors'));
 
-      should.strictEqual(post.get('published'), null);
+      should.strictEqual(undefined, post.get('published'));
 
       post.get('owners').should.be.an.instanceof(MongooseArray);
       post.get('comments').should.be.an.instanceof(DocumentArray);
@@ -309,12 +305,11 @@ module.exports = {
     post.get('date').should.be.an.instanceof(Date);
     post.get('meta').should.be.a('object');
 
-    post.get('meta').should.eql({
-        date: null
-      , visitors: null
-    });
+    post.get('meta').should.eql({});
+    should.equal(undefined, post.get('meta.date'));
+    should.equal(undefined, post.get('meta.visitors'));
 
-    should.strictEqual(post.get('published'), null);
+    should.equal(undefined, post.get('published'));
 
     post.get('owners').should.be.an.instanceof(MongooseArray);
     post.get('comments').should.be.an.instanceof(DocumentArray);
@@ -575,6 +570,28 @@ module.exports = {
 
     var post = new TestValidation();
     post.set('simple', '');
+
+    post.save(function(err){
+      err.should.be.an.instanceof(MongooseError);
+      err.should.be.an.instanceof(ValidatorError);
+
+      post.set('simple', 'here');
+      post.save(function(err){
+        should.strictEqual(err, null);
+        db.close();
+      });
+    });
+  },
+
+  'test required validation for undefined values': function () {
+    mongoose.model('TestUndefinedValidation', new Schema({
+        simple: { type: String, required: true }
+    }));
+
+    var db = start()
+      , TestUndefinedValidation = db.model('TestUndefinedValidation');
+
+    var post = new TestUndefinedValidation();
 
     post.save(function(err){
       err.should.be.an.instanceof(MongooseError);
@@ -1650,7 +1667,7 @@ module.exports = {
     
     // array
     var post2 = new BlogPost();
-    post2.mixed = [];
+    post2.mixed = [{foo: 'bar'}];
     post2.save(function (err) {
       should.strictEqual(err, null);
 
@@ -1667,7 +1684,8 @@ module.exports = {
           BlogPost.findById(post2._id, function (err, doc) {
             should.strictEqual(err, null);
 
-            doc.mixed[0].should.eql({ hello: 'world' });
+            doc.mixed[0].should.eql({ foo: 'bar' });
+            doc.mixed[1].should.eql({ hello: 'world' });
             --count || db.close();
           });
         });

@@ -481,14 +481,14 @@ module.exports = {
         should.strictEqual(err, null);
         doc.isInit('title').should.be.true;
         doc.isInit('slug').should.be.true;
-        doc.isInit('date').should.be.true;
+        doc.isInit('date').should.be.false;
         --queries || db.close();
       });
 
-      BlogPostB.findById(post.get('_id'), ['title', 'slug'], function (err, doc) {
+      BlogPostB.findById(post.get('_id'), ['title'], function (err, doc) {
         should.strictEqual(err, null);
         doc.isInit('title').should.be.true;
-        doc.isInit('slug').should.be.true;
+        doc.isInit('slug').should.be.false;
         doc.isInit('date').should.be.false;
         --queries || db.close();
       });
@@ -497,7 +497,7 @@ module.exports = {
         should.strictEqual(err, null);
         doc.isInit('title').should.be.true;
         doc.isInit('slug').should.be.false;
-        doc.isInit('date').should.be.true;
+        doc.isInit('date').should.be.false;
         --queries || db.close();
       });
 
@@ -550,14 +550,14 @@ module.exports = {
         should.strictEqual(err, null);
         docs[0].isInit('title').should.be.true;
         docs[0].isInit('slug').should.be.true;
-        docs[0].isInit('date').should.be.true;
+        docs[0].isInit('date').should.be.false;
         --queries || db.close();
       });
 
-      BlogPostB.find({ _id: post.get('_id') }, ['title', 'slug'], function (err, docs) {
+      BlogPostB.find({ _id: post.get('_id') }, ['title'], function (err, docs) {
         should.strictEqual(err, null);
         docs[0].isInit('title').should.be.true;
-        docs[0].isInit('slug').should.be.true;
+        docs[0].isInit('slug').should.be.false;
         docs[0].isInit('date').should.be.false;
         --queries || db.close();
       });
@@ -566,7 +566,7 @@ module.exports = {
         should.strictEqual(err, null);
         docs[0].isInit('title').should.be.true;
         docs[0].isInit('slug').should.be.false;
-        docs[0].isInit('date').should.be.true;
+        docs[0].isInit('date').should.be.false;
         --queries || db.close();
       });
 
@@ -638,7 +638,7 @@ module.exports = {
     BlogPostB.create({ title: 'Steve Jobs', author: 'Steve Jobs'}, function (err, created) {
       should.strictEqual(err, null);
 
-      BlogPostB.findOne({ $where: "this.title !== null && this.title === this.author" }, function (err, found) {
+      BlogPostB.findOne({ $where: "this.title && this.title === this.author" }, function (err, found) {
         should.strictEqual(err, null);
 
         found._id.should.eql(created._id);
@@ -655,7 +655,7 @@ module.exports = {
       should.strictEqual(err, null);
 
       BlogPostB.findOne({ $where: function () {
-        return (this.author !== null) && (this.slug !== null) && (this.author === this.slug);
+        return (this.author && this.slug && this.author === this.slug);
       } }, function (err, found) {
         should.strictEqual(err, null);
 

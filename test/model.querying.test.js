@@ -722,5 +722,26 @@ module.exports = {
         db.close();
       });
     });
+  },
+
+  'test finding with $elemMatch': function () {
+    var db = start()
+      , BlogPostB = db.model('BlogPostB', collection)
+      , dateAnchor = +new Date;
+
+    BlogPostB.create({comments: [{title: 'elemMatch', date: dateAnchor + 5}]}, function (err, createdAfter) {
+      should.strictEqual(err, null);
+      BlogPostB.create({comments: [{title: 'elemMatch', date: dateAnchor - 5}]}, function (err, createdBefore) {
+        should.strictEqual(err, null);
+        BlogPostB.find({'comments': {'$elemMatch': {title: 'elemMatch', date: {$gt: dateAnchor}}}}, 
+          function (err, found) {
+            should.strictEqual(err, null);
+            found.should.have.length(1);
+            found[0]._id.should.eql(createdAfter._id);
+            db.close();
+          }
+        );
+      });
+    });
   }
 };

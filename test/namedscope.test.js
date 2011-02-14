@@ -145,11 +145,11 @@ module.exports = {
   'chaining named scopes should work': function () {
     var db = start()
       , UserNS = db.model('UserNS', 'users_' + random());
-    UserNS.create({age: 21, gender: 'male', lastLogin: (+new Date) - _24hours - 3600}, function (err, _) {
-      should.strictEqual(err, null);
-      UserNS.create({age: 45, gender: 'male', lastLogin: +new Date}, function (err, match) {
-        should.strictEqual(err, null);
-        UserNS.create({age: 50, gender: 'female', lastLogin: +new Date}, function (err, _) {
+    UserNS.create(
+        {age: 21, gender: 'male', lastLogin: (+new Date) - _24hours - 3600}
+      , {age: 45, gender: 'male', lastLogin: +new Date}
+      , {age: 50, gender: 'female', lastLogin: +new Date}
+      , function (err, _, match, _) {
           should.strictEqual(err, null);
           UserNS.olderThan(40).active.male.find( function (err, found) {
             db.close();
@@ -157,9 +157,8 @@ module.exports = {
             found.should.have.length(1);
             found[0]._id.should.eql(match._id);
           });
-        });
-      });
-    });
+        }
+    );
   },
 //  'using chained named scopes in a find': function () {
 //    var db = start()

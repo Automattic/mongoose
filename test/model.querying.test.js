@@ -917,4 +917,35 @@ module.exports = {
       });
     });
   },
+
+  'test finding documents with an array with the $slice operator': function () {
+    var db = start()
+      , BlogPostB = db.model('BlogPostB', collection);
+
+    BlogPostB.create({numbers: [500,600,700,800]}, function (err, created) {
+      should.strictEqual(err, null);
+      BlogPostB.findById(created._id, {numbers: {$slice: 2}}, function (err, found) {
+        should.strictEqual(err, null);
+        found._id.should.eql(created._id);
+        found.numbers.should.have.length(2);
+        found.numbers[0].should.equal(500);
+        found.numbers[1].should.equal(600);
+        BlogPostB.findById(created._id, {numbers: {$slice: -2}}, function (err, found) {
+          should.strictEqual(err, null);
+          found._id.should.eql(created._id);
+          found.numbers.should.have.length(2);
+          found.numbers[0].should.equal(700);
+          found.numbers[1].should.equal(800);
+          BlogPostB.findById(created._id, {numbers: {$slice: [1, 2]}}, function (err, found) {
+            should.strictEqual(err, null);
+            found._id.should.eql(created._id);
+            found.numbers.should.have.length(2);
+            found.numbers[0].should.equal(600);
+            found.numbers[1].should.equal(700);
+            db.close();
+          });
+        });
+      });
+    });
+  }
 };

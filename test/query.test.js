@@ -551,5 +551,14 @@ module.exports = {
     var query = new FindQuery();
     query.snapshot(true);
     query.options.snapshot.should.be.true;
+  },
+
+  'queries should be composable': function () {
+    var q1 = new Query({name: 'hello'})
+      , q2 = new Query({age: {$gte: 21}})
+      , q3 = q1.and(q2);
+    
+    q3.should.be.an.instanceof(Query);
+    q3._conditions.should.eql({name: 'hello', age: {$gte: 21}});
   }
 };

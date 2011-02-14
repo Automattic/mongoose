@@ -862,7 +862,7 @@ module.exports = {
 
   'test finding strings via regular expressions': function () {
     var db = start()
-      , BlogPostB = db.model('BlogPostB', collection + random());
+      , BlogPostB = db.model('BlogPostB', collection);
 
     BlogPostB.create({title: 'Next to Normal'}, function (err, created) {
       should.strictEqual(err, null);
@@ -870,6 +870,50 @@ module.exports = {
         should.strictEqual(err, null);
         found._id.should.eql(created._id);
         db.close();
+      });
+    });
+  },
+
+  'test finding a document whose arrays contain at least $all values': function () {
+    var db = start()
+      , BlogPostB = db.model('BlogPostB', collection);
+
+    BlogPostB.create({numbers: [-1,-2,-3,-4]}, function (err, withoutZero) {
+      should.strictEqual(err, null);
+      BlogPostB.create({numbers: [0,-1,-2,-3,-4]}, function (err, withZero) {
+        should.strictEqual(err, null);
+        BlogPostB.find({numbers: {$all: [-1, -2, -3, -4]}}, function (err, found) {
+          should.strictEqual(err, null);
+          found.should.have.length(2);
+          BlogPostB.find({numbers: {$all: [0, -1]}}, function (err, found) {
+            should.strictEqual(err, null);
+            found.should.have.length(1);
+            db.close();
+          });
+        });
+      });
+    });
+  },
+
+  'test finding documents with an array of a certain size': function () {
+    var db = start()
+      , BlogPostB = db.model('BlogPostB', collection);
+
+    BlogPostB.create({numbers: [1,2,3,4,5,6,7,8,9,10]}, function (err, withoutZero) {
+      should.strictEqual(err, null);
+      BlogPostB.create({numbers: [11,12,13,14,15,16,17,18,19,20]}, function (err, withZero) {
+        should.strictEqual(err, null);
+        BlogPostB.create({numbers: [1,2,3,4,5,6,7,8,9,10,11]}, function (err, found) {
+          BlogPostB.find({numbers: {$size: 10}}, function (err, found) {
+            should.strictEqual(err, null);
+            found.should.have.length(2);
+            BlogPostB.find({numbers: {$size: 11}}, function (err, found) {
+              should.strictEqual(err, null);
+              found.should.have.length(1);
+              db.close();
+            });
+          });
+        });
       });
     });
   },

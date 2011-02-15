@@ -1,24 +1,5 @@
-//BoundQuery
-//
-//Query.prototype.with(criteria)
 //Query.prototype.with(criteria, callback)
 //Query.prototype.with(path, val, callback)
-//
-//Query.prototype.with(criteria).find()
-//Query.prototype.with(criteria).remove()
-//Query.prototype.with(criteria).findOne()
-//Query.prototype.with(criteria).update()
-//Query.prototype.with(criteria).count()
-//
-//var query = UserNS.find(...);
-//
-//var twenties = new Query().with('age').gte(20).lt(30);
-//var male = new Query().with('gender', 'male');
-//var active = new Query().with('lastLogin').gte(+new Date - (24 * 3600 * 1000));
-//
-//UserNS.twenties = Query.with('age').gte(20).lt(30);
-//UserNS.male = Query.with('gender', 'male');
-//UserNS.active = Query.with('lastLogin').get(+new Date - (24 * 3600 * 1000));
 //
 //UserNS.namedScope({
 //    twenties: Query.with('age').gte(20).lt(30)
@@ -26,24 +7,16 @@
 //  , lastLogin: Query.with('lastLogin').get(+new Date - (24 * 3600 * 1000))
 //});
 //
-//UserNS.namedScope('twenties').with('age').gte(20).lt(30);
-//
-//UserNS.namedScope('olderThan', function (age) {
-//  return this.with('age').gt(age);
-//});
-//
 //UserNS.find(twenties, male, active, function (err, found) {
 //});
 //
 //// twenties.male OR twenties.active
+//UserNS.twenties.male.OR.twenties.active.find(callback);
 //UserNS.find(twenties.male, twenties.active, function (err, found) {
 //});
 //
 //UserNS.find(olderThan(20).male, olderThan(30).active, function (err, found) {
 //});
-//
-//UserNS.twenties.male.active.find(callback);
-//
 //UserNS.twenties.male.active.remove(callback);
 
 /**
@@ -87,62 +60,60 @@ UserNSSchema.namedScope('active', function () {
 
 mongoose.model('UserNS', UserNSSchema);
 
+// TODO Add in tests for using named scopes with findOne, update, remove
 module.exports = {
-  'basic named scopes should work': function () {
+  'basic named scopes should work, for find': function () {
     var db = start()
       , UserNS = db.model('UserNS', 'users_' + random());
-    UserNS.create({gender: 'male'}, function (err, _) {
-      should.strictEqual(err, null);
-      UserNS.create({gender: 'male'}, function (err, _) {
-        should.strictEqual(err, null);
-        UserNS.create({gender: 'female'}, function (err, _) {
+    UserNS.create(
+        {gender: 'male'}
+      , {gender: 'male'}
+      , {gender: 'female'}
+      , function (err, _) {
           should.strictEqual(err, null);
           UserNS.male.find( function (err, found) {
             db.close();
             should.strictEqual(err, null);
             found.should.have.length(2);
           });
-        });
-      });
-    });
+        }
+    );
   },
-  'dynamic named scopes should work': function () {
+  'dynamic named scopes should work, for find': function () {
     var db = start()
       , UserNS = db.model('UserNS', 'users_' + random());
-    UserNS.create({age: 21}, function (err, _) {
-      should.strictEqual(err, null);
-      UserNS.create({age: 22}, function (err, _) {
-        should.strictEqual(err, null);
-        UserNS.create({age: 19}, function (err, _) {
+    UserNS.create(
+        {age: 21}
+      , {age: 22}
+      , {age: 19}
+      , function (err, _) {
           should.strictEqual(err, null);
           UserNS.olderThan(20).find( function (err, found) {
             db.close();
             should.strictEqual(err, null);
             found.should.have.length(2);
           });
-        });
-      });
-    });
+        }
+    );
   },
-  'named scopes built on top of dynamic named scopes should work': function () {
+  'named scopes built on top of dynamic named scopes should work, for find': function () {
     var db = start()
       , UserNS = db.model('UserNS', 'users_' + random());
-    UserNS.create({age: 21}, function (err, _) {
-      should.strictEqual(err, null);
-      UserNS.create({age: 22}, function (err, _) {
-        should.strictEqual(err, null);
-        UserNS.create({age: 19}, function (err, _) {
+    UserNS.create(
+        {age: 21}
+      , {age: 22}
+      , {age: 19}
+      , function (err, _) {
           should.strictEqual(err, null);
           UserNS.twenties.find( function (err, found) {
             db.close();
             should.strictEqual(err, null);
             found.should.have.length(2);
           });
-        });
-      });
-    });
+        }
+    );
   },
-  'chaining named scopes should work': function () {
+  'chaining named scopes should work, for find': function () {
     var db = start()
       , UserNS = db.model('UserNS', 'users_' + random());
     UserNS.create(
@@ -156,6 +127,50 @@ module.exports = {
             should.strictEqual(err, null);
             found.should.have.length(1);
             found[0]._id.should.eql(match._id);
+          });
+        }
+    );
+  },
+
+  'basic named scopes should work, for remove': function () {
+    var db = start()
+      , UserNS = db.model('UserNS', 'users_' + random());
+    UserNS.create(
+        {gender: 'male'}
+      , {gender: 'male'}
+      , {gender: 'female'}
+      , function (err, _) {
+          UserNS.male.remove( function (err) {
+            should.strictEqual(err, null);
+            UserNS.male.find( function (err, found) {
+              db.close();
+              should.strictEqual(err, null);
+              found.should.have.length(0);
+            });
+          });
+        }
+    );
+  },
+
+  'basic named scopes should work, for update': function () {
+    var db = start()
+      , UserNS = db.model('UserNS', 'users_' + random());
+    UserNS.create(
+        {gender: 'male'}
+      , {gender: 'male'}
+      , {gender: 'female'}
+      , function (err, _) {
+          UserNS.male.update({gender: 'female'}, function (err) {
+            should.strictEqual(err, null);
+            UserNS.female.find( function (err, found) {
+              should.strictEqual(err, null);
+              found.should.have.length(3);
+              UserNS.male.find( function (err, found) {
+                db.close();
+                should.strictEqual(err, null);
+                found.should.have.length(0);
+              });
+            });
           });
         }
     );

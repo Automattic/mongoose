@@ -193,6 +193,22 @@ module.exports = {
         }
     );
   },
+
+  'hybrid use of chained named scopes and ad hoc querying should work': function () {
+    var db = start()
+      , UserNS = db.model('UserNS', 'users_' + random());
+    UserNS.create(
+        {age: 100, gender: 'female'}
+      , function (err, femaleCentenarian) {
+          should.strictEqual(null, err);
+          UserNS.female.with('age').gt(99).findOne( function (err, found) {
+            db.close();
+            should.strictEqual(err, null);
+            found._id.should.eql(femaleCentenarian._id);
+          });
+        }
+    );
+  }
 //  'using chained named scopes in a find': function () {
 //    var db = start()
 //      , UserNS = db.model('UserNS', 'users_' + random());

@@ -1,4 +1,10 @@
 
+1.0.11 / 2011-02-14 
+===================
+
+  * Query refactor and $ne, $slice, $or, $size, $elemMatch, $nin, $exists support [brian]
+  * Named scopes sugar [brian]
+
 1.0.10 / 2011-02-11 
 ===================
 

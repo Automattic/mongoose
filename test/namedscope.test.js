@@ -36,7 +36,7 @@ var start = require('./common')
 
 var UserNSSchema = new Schema({
     age: Number
-  , gender: {type: String}
+  , gender: String
   , lastLogin: Date
 });
 
@@ -152,6 +152,7 @@ module.exports = {
     );
   },
 
+  // TODO multi-updates
   'basic named scopes should work, for update': function () {
     var db = start()
       , UserNS = db.model('UserNS', 'users_' + random());
@@ -159,16 +160,17 @@ module.exports = {
         {gender: 'male'}
       , {gender: 'male'}
       , {gender: 'female'}
-      , function (err, _) {
+      , function (err, male1, male2, female1) {
+          should.strictEqual(err, null);
           UserNS.male.update({gender: 'female'}, function (err) {
             should.strictEqual(err, null);
             UserNS.female.find( function (err, found) {
               should.strictEqual(err, null);
-              found.should.have.length(3);
+              found.should.have.length(2);
               UserNS.male.find( function (err, found) {
                 db.close();
                 should.strictEqual(err, null);
-                found.should.have.length(0);
+                found.should.have.length(1);
               });
             });
           });

@@ -177,6 +177,22 @@ module.exports = {
         }
     );
   },
+
+  'chained named scopes should work, for findOne': function () {
+    var db = start()
+      , UserNS = db.model('UserNS', 'users_' + random());
+    UserNS.create(
+        {age: 100, gender: 'male'}
+      , function (err, maleCentenarian) {
+          should.strictEqual(err, null);
+          UserNS.male.olderThan(99).findOne( function (err, found) {
+            db.close();
+            should.strictEqual(err, null);
+            found._id.should.eql(maleCentenarian._id);
+          });
+        }
+    );
+  },
 //  'using chained named scopes in a find': function () {
 //    var db = start()
 //      , UserNS = db.model('UserNS', 'users_' + random());

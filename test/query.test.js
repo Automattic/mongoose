@@ -3,7 +3,7 @@
  * Module dependencies.
  */
 
-var Query = require('mongoose/query').Query;
+var Query = require('mongoose/query');
 
 /**
  * Test.

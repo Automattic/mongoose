@@ -160,6 +160,28 @@ module.exports = {
     db.close();
   },
 
+  'test a model that defaults an Array attributes to an empty array': function () {
+    var db = start()
+      , DefaultZeroCardArraySchema = new Schema({
+          arr: {type: Array, cast: String, default: []}
+        });
+    mongoose.model('DefaultZeroCardArray', DefaultZeroCardArraySchema);
+    var DefaultZeroCardArray = db.model('DefaultZeroCardArray', collection);
+    var arr = new DefaultZeroCardArray();
+    arr.get('arr').should.have.length(0);
+    arr.arr.should.have.length(0);
+    db.close();
+  },
+
+  'test that arrays auto-default to the empty array': function () {
+    var db = start()
+      , BlogPost = db.model('BlogPost', collection);
+
+    var post = new BlogPost();
+    post.numbers.should.have.length(0);
+    db.close();
+  },
+
   'test instantiating a model with a hash that maps to at least 1 null value': function () {
     var db = start()
       , BlogPost = db.model('BlogPost', collection);

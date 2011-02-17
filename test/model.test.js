@@ -1570,6 +1570,29 @@ module.exports = {
       };
     });
   },
+
+  // GH-255
+  'test updating an embedded document in an embedded array': function () {
+    var db = start()
+      , BlogPost = db.model('BlogPost', collection);
+
+    BlogPost.create({comments: [{title: 'woot'}]}, function (err, post) {
+      should.strictEqual(err, null);
+      BlogPost.findById(post._id, function (err, found) {
+        should.strictEqual(err, null);
+        found.comments[0].title.should.equal('woot');
+        found.comments[0].title = 'notwoot';
+        found.save( function (err) {
+          should.strictEqual(err, null);
+          BlogPost.findById(found._id, function (err, updated) {
+            db.close();
+            should.strictEqual(err, null);
+            updated.comments[0].title.should.equal('notwoot');
+          });
+        });
+      });
+    });
+  },
   'test filtering an embedded array by the id shortcut function': function () {
     var db = start()
       , BlogPost = db.model('BlogPost', collection);

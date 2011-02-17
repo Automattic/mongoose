@@ -1269,6 +1269,44 @@ module.exports = {
     });
   },
 
+  'test doubly nested array saving and loading': function(){
+    var Inner = new Schema({
+        arr: [Number]
+    });
+
+    var Outer = new Schema({
+        inner: [Inner]
+    });
+    mongoose.model('Outer', Outer);
+
+    var db = start();
+    var Outer = db.model('Outer', 'arr_test_' + random());
+
+    var outer = new Outer();
+    outer.inner.push({});
+    outer.save(function(err) {
+      should.strictEqual(err, null);
+      outer.get('_id').should.be.an.instanceof(DocumentObjectId);
+
+      Outer.findById(outer.get('_id'), function(err, found) {
+          should.strictEqual(err, null);
+          should.equal(1, found.inner.length);
+          found.inner[0].arr.push(5);
+          found.save(function(err) {
+              should.strictEqual(err, null);
+              found.get('_id').should.be.an.instanceof(DocumentObjectId);
+              Outer.findById(found.get('_id'), function(err, found2) {
+                  should.strictEqual(err, null);
+                  should.equal(1, found2.inner.length);
+                  should.equal(1, found2.inner[0].arr.length);
+                  should.equal(5, found2.inner[0].arr[0]);
+                  db.close();
+              });
+          });
+      });
+    });
+  },
+
   'test updating multiple Number $pushes as a single $pushAll': function () {
     var db = start()
       , schema = new Schema({

@@ -19,7 +19,7 @@ module.exports = {
     a.should.be.an.instanceof(MongooseNumber);
     a.toString().should.eql('5');
 
-    Array.isArray(a._atomics).should.be.true;
+    (a._atomics.constructor).should.eql(Object);
   }
 
 };

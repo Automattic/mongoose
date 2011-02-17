@@ -1289,20 +1289,20 @@ module.exports = {
       outer.get('_id').should.be.an.instanceof(DocumentObjectId);
 
       Outer.findById(outer.get('_id'), function(err, found) {
+        should.strictEqual(err, null);
+        should.equal(1, found.inner.length);
+        found.inner[0].arr.push(5);
+        found.save(function(err) {
           should.strictEqual(err, null);
-          should.equal(1, found.inner.length);
-          found.inner[0].arr.push(5);
-          found.save(function(err) {
-              should.strictEqual(err, null);
-              found.get('_id').should.be.an.instanceof(DocumentObjectId);
-              Outer.findById(found.get('_id'), function(err, found2) {
-                  should.strictEqual(err, null);
-                  should.equal(1, found2.inner.length);
-                  should.equal(1, found2.inner[0].arr.length);
-                  should.equal(5, found2.inner[0].arr[0]);
-                  db.close();
-              });
+          found.get('_id').should.be.an.instanceof(DocumentObjectId);
+          Outer.findById(found.get('_id'), function(err, found2) {
+            should.strictEqual(err, null);
+            should.equal(1, found2.inner.length);
+            should.equal(1, found2.inner[0].arr.length);
+            should.equal(5, found2.inner[0].arr[0]);
+            db.close();
           });
+        });
       });
     });
   },

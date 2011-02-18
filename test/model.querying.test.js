@@ -634,6 +634,26 @@ module.exports = {
       });
   },
 
+  'test querying if an array contains one of multiple members $in a set': function () {
+    var db = start()
+      , BlogPostB = db.model('BlogPostB', collection);
+
+      var post = new BlogPostB();
+
+      post.tags.push('football');
+
+      post.save( function (err) {
+        should.strictEqual(err, null);
+
+        BlogPostB.findOne({tags: {$in: ['football', 'baseball']}}, function (err, doc) {
+          should.strictEqual(err, null);
+
+          doc._id.should.eql(post._id);
+          db.close();
+        });
+      });
+  },
+
   'test querying via $which with a string': function () {
     var db = start()
       , BlogPostB = db.model('BlogPostB', collection);

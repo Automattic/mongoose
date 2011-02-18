@@ -1,10 +1,10 @@
-//Query.prototype.with(criteria, callback)
-//Query.prototype.with(path, val, callback)
+//Query.prototype.where(criteria, callback)
+//Query.prototype.where(path, val, callback)
 //
 //UserNS.namedScope({
-//    twenties: Query.with('age').gte(20).lt(30)
-//  , male: Query.with('gender', 'male')
-//  , lastLogin: Query.with('lastLogin').get(+new Date - (24 * 3600 * 1000))
+//    twenties: Query.where('age').gte(20).lt(30)
+//  , male: Query.where('gender', 'male')
+//  , lastLogin: Query.where('lastLogin').get(+new Date - (24 * 3600 * 1000))
 //});
 //
 //UserNS.find(twenties, male, active, function (err, found) {
@@ -41,26 +41,26 @@ var UserNSSchema = new Schema({
 });
 
 UserNSSchema.namedScope('olderThan', function (age) {
-  return this.with('age').gt(age);
+  return this.where('age').gt(age);
 });
 
 UserNSSchema.namedScope('youngerThan', function (age) {
-  return this.with('age').lt(age);
+  return this.where('age').lt(age);
 });
 
 UserNSSchema.namedScope('twenties').olderThan(19).youngerThan(30);
 
-UserNSSchema.namedScope('male').with('gender', 'male');
+UserNSSchema.namedScope('male').where('gender', 'male');
 
-UserNSSchema.namedScope('female').with('gender', 'female');
+UserNSSchema.namedScope('female').where('gender', 'female');
 
 UserNSSchema.namedScope('active', function () {
-  return this.with('lastLogin').gte(+new Date - _24hours)
+  return this.where('lastLogin').gte(+new Date - _24hours)
 });
 
 mongoose.model('UserNS', UserNSSchema);
 
-// TODO Add in tests for using named scopes with findOne, update, remove
+// TODO Add in tests for using named scopes where findOne, update, remove
 module.exports = {
   'basic named scopes should work, for find': function () {
     var db = start()
@@ -201,14 +201,14 @@ module.exports = {
         {age: 100, gender: 'female'}
       , function (err, femaleCentenarian) {
           should.strictEqual(null, err);
-          UserNS.female.with('age').gt(99).findOne( function (err, found) {
+          UserNS.female.where('age').gt(99).findOne( function (err, found) {
             db.close();
             should.strictEqual(err, null);
             found._id.should.eql(femaleCentenarian._id);
           });
         }
     );
-  }
+  },
 //  'using chained named scopes in a find': function () {
 //    var db = start()
 //      , UserNS = db.model('UserNS', 'users_' + random());

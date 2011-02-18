@@ -139,7 +139,7 @@ module.exports = {
 //    BlogPostB.find(q, [], {}, fn).executed.should.be.true;
   },
 
-  'test that query is executed with a callback for findOne': function () {
+  'test that query is executed where a callback for findOne': function () {
     var db = start()
       , BlogPostB = db.model('BlogPostB', collection)
       , count = 5
@@ -300,7 +300,7 @@ module.exports = {
     });
   },
 
-  'test finding documents with an array that contains one specific member': function () {
+  'test finding documents where an array that contains one specific member': function () {
     var db = start()
       , BlogPostB = db.model('BlogPostB', collection);
     BlogPostB.create({numbers: [100, 101, 102]}, function (err, created) {
@@ -424,7 +424,7 @@ module.exports = {
   },
 
   // GH-199
-  'test find queries with $in cast the values within the array': function () {
+  'test find queries where $in cast the values wherein the array': function () {
     var db = start()
       , BlogPostB = db.model('BlogPostB', collection);
 
@@ -444,7 +444,7 @@ module.exports = {
   },
 
   // GH-232
-  'test find queries with $nin cast the values within the array': function () {
+  'test find queries where $nin cast the values wherein the array': function () {
     var db = start()
       , NinSchema = new Schema({
           num: Number
@@ -467,7 +467,7 @@ module.exports = {
     });
   },
 
-  'test for findById with partial initialization': function () {
+  'test for findById where partial initialization': function () {
     var db = start()
       , BlogPostB = db.model('BlogPostB', collection)
       , queries = 5;
@@ -522,7 +522,7 @@ module.exports = {
     });
   },
 
-  'test find with subset of fields, excluding _id': function () {
+  'test find where subset of fields, excluding _id': function () {
     var db = start()
       , BlogPostB = db.model('BlogPostB', collection);
     BlogPostB.create({title: 'subset 1'}, function (err, created) {
@@ -536,7 +536,7 @@ module.exports = {
     });
   },
 
-  'test for find with partial initialization': function () {
+  'test for find where partial initialization': function () {
     var db = start()
       , BlogPostB = db.model('BlogPostB', collection)
       , queries = 5;
@@ -654,7 +654,7 @@ module.exports = {
       });
   },
 
-  'test querying via $which with a string': function () {
+  'test querying via $which where a string': function () {
     var db = start()
       , BlogPostB = db.model('BlogPostB', collection);
 
@@ -670,7 +670,7 @@ module.exports = {
     });
   },
 
-  'test querying via $which with a function': function () {
+  'test querying via $which where a function': function () {
     var db = start()
       , BlogPostB = db.model('BlogPostB', collection);
 
@@ -689,7 +689,7 @@ module.exports = {
   },
 
   // TODO Won't pass until we fix materialization/raw data assymetry
-  'test find with $exists': function () {
+  'test find where $exists': function () {
     var db = start()
       , ExistsSchema = new Schema({
             a: Number
@@ -747,7 +747,7 @@ module.exports = {
     });
   },
 
-  'test finding with $elemMatch': function () {
+  'test finding where $elemMatch': function () {
     var db = start()
       , BlogPostB = db.model('BlogPostB', collection)
       , dateAnchor = +new Date;
@@ -768,7 +768,7 @@ module.exports = {
     });
   },
 
-  'test finding with $mod': function () {
+  'test finding where $mod': function () {
     var db = start()
       , Mod = db.model('Mod', 'mods_' + random());
     Mod.create({num: 1}, function (err, one) {
@@ -785,7 +785,7 @@ module.exports = {
     });
   },
 
-  'test finding with $not': function () {
+  'test finding where $not': function () {
     var db = start()
       , Mod = db.model('Mod', 'mods_' + random());
     Mod.create({num: 1}, function (err, one) {
@@ -802,7 +802,7 @@ module.exports = {
     });
   },
 
-  'test finding with $or': function () {
+  'test finding where $or': function () {
     var db = start()
       , Mod = db.model('Mod', 'mods_' + random());
     Mod.create({num: 1}, function (err, one) {
@@ -823,7 +823,7 @@ module.exports = {
     });
   },
 
-  'test finding with $ne': function () {
+  'test finding where $ne': function () {
     var db = start()
       , Mod = db.model('Mod', 'mods_' + random());
     Mod.create({num: 1}, function (err, one) {
@@ -897,9 +897,9 @@ module.exports = {
     var db = start()
       , BlogPostB = db.model('BlogPostB', collection);
 
-    BlogPostB.create({numbers: [-1,-2,-3,-4]}, function (err, withoutZero) {
+    BlogPostB.create({numbers: [-1,-2,-3,-4]}, function (err, whereoutZero) {
       should.strictEqual(err, null);
-      BlogPostB.create({numbers: [0,-1,-2,-3,-4]}, function (err, withZero) {
+      BlogPostB.create({numbers: [0,-1,-2,-3,-4]}, function (err, whereZero) {
         should.strictEqual(err, null);
         BlogPostB.find({numbers: {$all: [-1, -2, -3, -4]}}, function (err, found) {
           should.strictEqual(err, null);
@@ -914,13 +914,13 @@ module.exports = {
     });
   },
 
-  'test finding documents with an array of a certain $size': function () {
+  'test finding documents where an array of a certain $size': function () {
     var db = start()
       , BlogPostB = db.model('BlogPostB', collection);
 
-    BlogPostB.create({numbers: [1,2,3,4,5,6,7,8,9,10]}, function (err, withoutZero) {
+    BlogPostB.create({numbers: [1,2,3,4,5,6,7,8,9,10]}, function (err, whereoutZero) {
       should.strictEqual(err, null);
-      BlogPostB.create({numbers: [11,12,13,14,15,16,17,18,19,20]}, function (err, withZero) {
+      BlogPostB.create({numbers: [11,12,13,14,15,16,17,18,19,20]}, function (err, whereZero) {
         should.strictEqual(err, null);
         BlogPostB.create({numbers: [1,2,3,4,5,6,7,8,9,10,11]}, function (err, found) {
           BlogPostB.find({numbers: {$size: 10}}, function (err, found) {
@@ -937,7 +937,7 @@ module.exports = {
     });
   },
 
-  'test finding documents with an array with the $slice operator': function () {
+  'test finding documents where an array where the $slice operator': function () {
     var db = start()
       , BlogPostB = db.model('BlogPostB', collection);
 
@@ -1023,7 +1023,7 @@ module.exports = {
         BlogPostB.create({meta: {visitors: 200}}, function (err, middle) {
           should.strictEqual(err, null);
           BlogPostB
-            .with('meta.visitors').gt(99).lt(301)
+            .where('meta.visitors').gt(99).lt(301)
             .sort('meta.visitors', -1)
             .find( function (err, found) {
               should.strictEqual(err, null);

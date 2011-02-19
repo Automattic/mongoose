@@ -118,6 +118,12 @@ module.exports = {
     doc._id.should.be.an.instanceof(DocumentObjectId);
   },
 
+  'test shortcut of id hexString': function () {
+    var doc = new TestDocument()
+      , _id = doc._id.toString();
+    doc.id.should.be.a('string');
+  },
+
   'test toObject clone': function(){
     var doc = new TestDocument();
     doc.init({

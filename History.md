@@ -1,4 +1,10 @@
 
+1.0.15 / 2011-02-18
+===================
+
+  * Added `id` virtual getter for documents to easily access the hexString of
+  the `_id`.
+
 1.0.14 / 2011-02-17
 ===================
 

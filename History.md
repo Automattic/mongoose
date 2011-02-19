@@ -1,4 +1,11 @@
 
+1.0.16 / 2011-02-18
+===================
+
+  * Added $nin as another whitelisted $conditional for SchemaArray [brian]
+  * Changed #with to #where [brian]
+  * Added ability to use $in conditional with Array types [brian]
+
 1.0.15 / 2011-02-18
 ===================
 

@@ -1,12 +1,10 @@
-
-
 Methods
 =======
 
 Methods can be defined by calling the 'method' method of the schema you wish
 to attach it to and passing a JSON object containing the method.
 
-## Adding a method to a model example
+## Adding a method to a model
 
     AccountSchema.method({
       changeEmail: function(edit_email,callback){
@@ -29,7 +27,7 @@ Similar to methods, statics can be defined by calling the 'static' method of the
 to attach it to and passing a JSON object containing the method.  Here because it is a static
 you no longer have access to 'this'.
 
-## Adding a static function to the model example
+## Adding a static function to the model
 
     AccountSchema.static({
         hashPassword: function(unhashed_password){

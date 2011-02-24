@@ -604,6 +604,33 @@ module.exports = {
     });
   },
 
+  'test validation with custom message': function () {
+    function validate (val) {
+      return val === 'abc';
+    }
+    mongoose.model('TestValidationMessage', new Schema({
+        simple: { type: String, validate: [validate, 'must be abc'] }
+    }));
+
+    var db = start()
+      , TestValidationMessage = db.model('TestValidationMessage');
+
+    var post = new TestValidationMessage();
+    post.set('simple', '');
+
+    post.save(function(err){
+      err.should.be.an.instanceof(MongooseError);
+      err.should.be.an.instanceof(ValidatorError);
+      err.message.should.equal('Validator "must be abc" failed for path simple');
+
+      post.set('simple', 'abc');
+      post.save(function(err){
+        should.strictEqual(err, null);
+        db.close();
+      });
+    });
+  },
+
   'test required validation for undefined values': function () {
     mongoose.model('TestUndefinedValidation', new Schema({
         simple: { type: String, required: true }

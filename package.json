@@ -3,7 +3,7 @@
   , "description": "Mongoose MongoDB ORM"
   , "version": "1.0.16"
   , "author": "Guillermo Rauch <guillermo@learnboost.com>"
-  , "keywords": ["mongodb", "mongoose", "orm", "data", "datastore", "nosql"]
+  , "keywords": ["mongodb", "mongoose", "orm", "data", "datastore", "nosql", "schemaless"]
   , "dependencies": {}
   , "directories": { "lib": "./lib/mongoose" }
   , "scripts": { "test": "make test" }

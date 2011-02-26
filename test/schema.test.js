@@ -13,6 +13,7 @@ var mongoose = require('./common').mongoose
   , CastError = SchemaType.CastError
   , SchemaTypes = Schema.Types
   , DocumentObjectId = mongoose.Types.ObjectId
+  , Mixed = SchemaTypes.Mixed
   , MongooseNumber = mongoose.Types.Number;
 
 /**
@@ -40,6 +41,7 @@ module.exports = {
       , friends   : [ObjectId]
       , likes     : Array
       , alive     : Boolean
+      , extra     : Mixed
     });
 
     Ferret.path('name').should.be.an.instanceof(SchemaTypes.String);
@@ -51,6 +53,7 @@ module.exports = {
     Ferret.path('friends').should.be.an.instanceof(SchemaTypes.Array);
     Ferret.path('likes').should.be.an.instanceof(SchemaTypes.Array);
     Ferret.path('alive').should.be.an.instanceof(SchemaTypes.Boolean);
+    Ferret.path('extra').should.be.an.instanceof(SchemaTypes.Mixed);
 
     should.strictEqual(Ferret.path('unexistent'), undefined);
 
@@ -326,6 +329,7 @@ module.exports = {
       , numbers     : [Number]
       , strings     : [String]
       , nocast      : []
+      , mixed       : [Mixed]
     });
 
     var oids = Loki.path('oids').cast(['4c54f3453e688c000000001a', new DocumentObjectId]);
@@ -358,6 +362,15 @@ module.exports = {
 
     nocasts[1].should.be.a('number');
     nocasts[1].should.eql(123);
+
+    var mixed = Loki.path('mixed').cast(['test', 123, '123', {}, new Date, new DocumentObjectId]);
+
+    mixed[0].should.be.a('string');
+    mixed[1].should.be.a('number');
+    mixed[2].should.be.a('string');
+    mixed[3].should.be.a('object');
+    mixed[4].should.be.an.instanceof(Date);
+    mixed[5].should.be.an.instanceof(DocumentObjectId);
   },
 
   'test boolean required validator': function(){

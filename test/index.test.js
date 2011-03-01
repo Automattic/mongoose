@@ -186,6 +186,18 @@ module.exports = {
         });
       });
     });
+  },
+
+  'test public exports': function () {
+    mongoose.version.should.be.a('string');
+    mongoose.Collection.should.be.a('function');
+    mongoose.Connection.should.be.a('function');
+    mongoose.Schema.should.be.a('function');
+    mongoose.SchemaType.should.be.a('function');
+    mongoose.Query.should.be.a('function');
+    mongoose.Promise.should.be.a('function');
+    mongoose.Model.should.be.a('function');
+    mongoose.Document.should.be.a('function');
   }
 
 };

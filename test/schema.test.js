@@ -6,6 +6,7 @@
 var mongoose = require('./common').mongoose
   , should = require('should')
   , Schema = mongoose.Schema
+  , Document = mongoose.Document
   , SchemaType = mongoose.SchemaType
   , VirtualType = mongoose.VirtualType
   , ObjectId = Schema.ObjectId
@@ -15,6 +16,28 @@ var mongoose = require('./common').mongoose
   , DocumentObjectId = mongoose.Types.ObjectId
   , Mixed = SchemaTypes.Mixed
   , MongooseNumber = mongoose.Types.Number;
+
+/**
+ * Test Document constructor.
+ */
+
+function TestDocument () {
+  Document.apply(this, arguments);
+};
+
+/**
+ * Inherits from Document.
+ */
+
+TestDocument.prototype.__proto__ = Document.prototype;
+
+/**
+ * Set a dummy schema to simulate compilation.
+ */
+
+TestDocument.prototype.schema = new Schema({
+    test    : String
+});
 
 /**
  * Test.
@@ -297,11 +320,19 @@ module.exports = {
         owner: { type: ObjectId }
     });
 
+    var doc = new TestDocument()
+      , id = doc._id.toString();
+
     Loki.path('owner').cast('4c54f3453e688c000000001a')
                      .should.be.an.instanceof(DocumentObjectId);
 
     Loki.path('owner').cast(new DocumentObjectId())
                      .should.be.an.instanceof(DocumentObjectId);
+
+    Loki.path('owner').cast(doc)
+                     .should.be.an.instanceof(DocumentObjectId);
+
+    Loki.path('owner').cast(doc).toString().should.eql(id);
   },
 
   'test array required validation': function(){

@@ -148,6 +148,56 @@ module.exports = {
       should.strictEqual(err, null);
       mong.connection.close();
     });
+  },
+
+  'test connecting to a replica set': function () {
+    var uri = process.env.MONGOOSE_SET_TEST_URI;
+
+    if (!uri) {
+      console.log('\033[31m', '\n', 'You\'re not testing for replica sets!'
+                , '\n', 'Please set the MONGOOSE_SET_TEST_URI env variable.', '\n'
+                , 'e.g: `mongodb://localhost:27017/db,mongodb://localhost…`', '\n'
+                , '\033[39m');
+      return;
+    }
+
+    var mong = new Mongoose();
+
+    mongoose.connectSet(uri, function (err) {
+      should.strictEqual(err, null);
+
+      mong.model('Test', new mongoose.Schema({
+          test: String
+      }));
+
+      var Test = mong.model('Test')
+        , test = new Test();
+
+      test.test = 'aa';
+      test.save(function (err) {
+        should.strictEqual(err, null);
+
+        Test.findById(test._id, function (err, doc) {
+          should.strictEqual(err, null);
+          
+          doc.test.should.eql('aa');
+
+          mongoose.connection.close();
+        });
+      });
+    });
+  },
+
+  'test public exports': function () {
+    mongoose.version.should.be.a('string');
+    mongoose.Collection.should.be.a('function');
+    mongoose.Connection.should.be.a('function');
+    mongoose.Schema.should.be.a('function');
+    mongoose.SchemaType.should.be.a('function');
+    mongoose.Query.should.be.a('function');
+    mongoose.Promise.should.be.a('function');
+    mongoose.Model.should.be.a('function');
+    mongoose.Document.should.be.a('function');
   }
 
 };

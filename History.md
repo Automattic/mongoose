@@ -1,4 +1,16 @@
 
+1.1.1 / 2011-03-01 
+==================
+
+  * Added SchemaType String `lowercase`, `uppercase`, `trim`.
+  * Public exports (`Model`, `Document`) and tests.
+  * Added ObjectId casting support for `Document`s.
+
+1.1.0 / 2011-02-25
+==================
+
+  * Added support for replica sets.
+
 1.0.16 / 2011-02-18
 ===================
 

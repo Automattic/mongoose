@@ -550,6 +550,30 @@ module.exports = {
     Tobi.path('name').applySetters('WHAT', { a: 'b' }).should.eql('what');
   },
 
+  'test string built-in setter `lowercase`': function () {
+    var Tobi = new Schema({
+        name: { type: String, lowercase: true }
+    });
+
+    Tobi.path('name').applySetters('WHAT').should.eql('what');
+  },
+
+  'test string built-in setter `uppercase`': function () {
+    var Tobi = new Schema({
+        name: { type: String, uppercase: true }
+    });
+
+    Tobi.path('name').applySetters('what').should.eql('WHAT');
+  },
+
+  'test string built-in setter `trim`': function () {
+    var Tobi = new Schema({
+        name: { type: String, uppercase: true, trim: true }
+    });
+
+    Tobi.path('name').applySetters('    what      ').should.eql('WHAT');
+  },
+
   'test getter(s)': function(){
     function woot (v) {
       return v + ' woot';

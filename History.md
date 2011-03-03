@@ -1,4 +1,10 @@
 
+1.1.2 / 2011-03-03
+==================
+
+  * Restored Query#exec and added notion of default operation [brian]
+  * Fixed ValidatorError messages [brian]
+
 1.1.1 / 2011-03-01 
 ==================
 

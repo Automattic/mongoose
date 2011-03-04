@@ -2219,7 +2219,6 @@ module.exports = {
     var db = start()
       , BlogPost = db.model('BlogPost', collection);
 
-
     BlogPost.create({title: 'interoperable count as promise'}, function (err, created) {
       should.strictEqual(err, null);
       var query = BlogPost.count({title: 'interoperable count as promise'});
@@ -2234,7 +2233,6 @@ module.exports = {
   'test update querying via #run (aka #exec)': function () {
     var db = start()
       , BlogPost = db.model('BlogPost', collection);
-
 
     BlogPost.create({title: 'interoperable update as promise'}, function (err, created) {
       should.strictEqual(err, null);
@@ -2254,7 +2252,6 @@ module.exports = {
     var db = start()
       , BlogPost = db.model('BlogPost', collection);
 
-
     BlogPost.create({title: 'interoperable findOne as promise'}, function (err, created) {
       should.strictEqual(err, null);
       var query = BlogPost.findOne({title: 'interoperable findOne as promise'});
@@ -2269,7 +2266,6 @@ module.exports = {
   'test find querying via #run (aka #exec)': function () {
     var db = start()
       , BlogPost = db.model('BlogPost', collection);
-
 
     BlogPost.create(
         {title: 'interoperable find as promise'}
@@ -2291,7 +2287,6 @@ module.exports = {
     var db = start()
       , BlogPost = db.model('BlogPost', collection);
 
-
     BlogPost.create(
         {title: 'interoperable remove as promise'}
       , function (err, createdOne, createdTwo) {
@@ -2311,11 +2306,118 @@ module.exports = {
     var db = start()
       , BlogPost = db.model('BlogPost', collection);
 
-
     BlogPost.create({title: 'interoperable ad-hoc as promise'}, function (err, created) {
       should.strictEqual(err, null);
       var query = BlogPost.count({title: 'interoperable ad-hoc as promise'});
       query.exec('findOne', function (err, found) {
+        should.strictEqual(err, null);
+        found._id.should.eql(created._id);
+        db.close();
+      });
+    });
+  },
+
+  'test count querying via #run (aka #exec) with promise': function () {
+    var db = start()
+      , BlogPost = db.model('BlogPost', collection);
+
+    BlogPost.create({title: 'interoperable count as promise 2'}, function (err, created) {
+      should.strictEqual(err, null);
+      var query = BlogPost.count({title: 'interoperable count as promise 2'});
+      var promise = query.exec();
+      promise.addBack(function (err, count) {
+        should.strictEqual(err, null);
+        count.should.equal(1);
+        db.close();
+      });
+    });
+  },
+
+  'test update querying via #run (aka #exec) with promise': function () {
+    var db = start()
+      , BlogPost = db.model('BlogPost', collection);
+
+    BlogPost.create({title: 'interoperable update as promise 2'}, function (err, created) {
+      should.strictEqual(err, null);
+      var query = BlogPost.update({title: 'interoperable update as promise 2'}, {title: 'interoperable update as promise delta 2'});
+      var promise = query.run();
+      promise.addBack(function (err) {
+        should.strictEqual(err, null);
+        BlogPost.count({title: 'interoperable update as promise delta 2'}, function (err, count) {
+          should.strictEqual(err, null);
+          count.should.equal(1);
+          db.close();
+        });
+      });
+    });
+  },
+
+  'test findOne querying via #run (aka #exec) with promise': function () {
+    var db = start()
+      , BlogPost = db.model('BlogPost', collection);
+
+    BlogPost.create({title: 'interoperable findOne as promise 2'}, function (err, created) {
+      should.strictEqual(err, null);
+      var query = BlogPost.findOne({title: 'interoperable findOne as promise 2'});
+      var promise = query.exec();
+      promise.addBack(function (err, found) {
+        should.strictEqual(err, null);
+        found._id.should.eql(created._id);
+        db.close();
+      });
+    });
+  },
+
+  'test find querying via #run (aka #exec) with promise': function () {
+    var db = start()
+      , BlogPost = db.model('BlogPost', collection);
+
+    BlogPost.create(
+        {title: 'interoperable find as promise 2'}
+      , {title: 'interoperable find as promise 2'}
+      , function (err, createdOne, createdTwo) {
+      should.strictEqual(err, null);
+      var query = BlogPost.find({title: 'interoperable find as promise 2'});
+      var promise = query.run();
+      promise.addBack(function (err, found) {
+        should.strictEqual(err, null);
+        found.should.have.length(2);
+        found[0]._id.should.eql(createdOne._id);
+        found[1]._id.should.eql(createdTwo._id);
+        db.close();
+      });
+    });
+  },
+
+  'test remove querying via #run (aka #exec) with promise': function () {
+    var db = start()
+      , BlogPost = db.model('BlogPost', collection);
+
+    BlogPost.create(
+        {title: 'interoperable remove as promise 2'}
+      , function (err, createdOne, createdTwo) {
+      should.strictEqual(err, null);
+      var query = BlogPost.remove({title: 'interoperable remove as promise 2'});
+      var promise = query.exec();
+      promise.addBack(function (err) {
+        should.strictEqual(err, null);
+        BlogPost.count({title: 'interoperable remove as promise 2'}, function (err, count) {
+          count.should.equal(0);
+          db.close();
+        });
+      });
+    });
+  },
+
+  'test changing query at the last minute via #run(op) with promise': function () {
+    var db = start()
+      , BlogPost = db.model('BlogPost', collection);
+
+    BlogPost.create({title: 'interoperable ad-hoc as promise 2'}, function (err, created) {
+      should.strictEqual(err, null);
+      var query = BlogPost.count({title: 'interoperable ad-hoc as promise 2'});
+      var promise = query.exec('findOne');
+      promise.addBack(function (err, found) {
         should.strictEqual(err, null);
         found._id.should.eql(created._id);
         db.close();

@@ -195,6 +195,7 @@ module.exports = {
     mongoose.Schema.should.be.a('function');
     mongoose.SchemaType.should.be.a('function');
     mongoose.Query.should.be.a('function');
+    mongoose.Promise.should.be.a('function');
     mongoose.Model.should.be.a('function');
     mongoose.Document.should.be.a('function');
   }

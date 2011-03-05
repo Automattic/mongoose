@@ -1,4 +1,11 @@
 
+1.1.3 / 2011-03-04
+==================
+
+  * Added Promise#resolve [aheckmann]
+  * Fixed backward compatibility with nulls [aheckmann]
+  * Changed; Query#{run,exec} return promises [aheckmann]
+
 1.1.2 / 2011-03-03
 ==================
 

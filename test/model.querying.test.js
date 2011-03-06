@@ -1052,7 +1052,65 @@ module.exports = {
         db.close();
       })
     })
-  }
+  },
 
+  'test streaming cursors with #each': function () {
+    var db = start()
+      , BlogPostB = db.model('BlogPostB', collection);
+
+    BlogPostB.create({title: "The Wrestler", tags: ["movie"]}, function (err, wrestler) {
+      should.strictEqual(err, null);
+      BlogPostB.create({title: "Black Swan", tags: ["movie"]}, function (err, blackswan) {
+        should.strictEqual(err, null);
+        BlogPostB.create({title: "Pi", tags: ["movie"]}, function (err, pi) {
+          should.strictEqual(err, null);
+          var found = {};
+          BlogPostB
+            .find({tags: "movie"})
+            .sort('title', -1)
+            .each(function (err, post) {
+              should.strictEqual(err, null);
+              if (post) found[post.title] = 1;
+              else {
+                found.should.have.property("The Wrestler", 1);
+                found.should.have.property("Black Swan", 1);
+                found.should.have.property("Pi", 1);
+                db.close();
+              }
+            });
+        });
+      });
+    });
+  },
+
+  'test streaming cursors with #each and manual iteration': function () {
+    var db = start()
+      , BlogPostB = db.model('BlogPostB', collection);
+
+    BlogPostB.create({title: "Bleu", tags: ["Krzysztof Kieślowski"]}, function (err, wrestler) {
+      should.strictEqual(err, null);
+      BlogPostB.create({title: "Blanc", tags: ["Krzysztof Kieślowski"]}, function (err, blackswan) {
+        should.strictEqual(err, null);
+        BlogPostB.create({title: "Rouge", tags: ["Krzysztof Kieślowski"]}, function (err, pi) {
+          should.strictEqual(err, null);
+          var found = {};
+          BlogPostB
+            .find({tags: "Krzysztof Kieślowski"})
+            .each(function (err, post, next) {
+              should.strictEqual(err, null);
+              if (post) {
+                found[post.title] = 1;
+                process.nextTick(next);
+              } else {
+                found.should.have.property("Bleu", 1);
+                found.should.have.property("Blanc", 1);
+                found.should.have.property("Rouge", 1);
+                db.close();
+              }
+            });
+        });
+      });
+    });
+  },
   // IDIOMATIC SYNTAX TESTS
 };

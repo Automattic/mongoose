@@ -1024,22 +1024,28 @@ module.exports = {
     var db = start()
       , BlogPost = db.model('BlogPost', collection)
       , title = 'Tobi ' + random()
+      , author = 'Brian ' + random()
       , newTitle = 'Woot ' + random();
 
     var post = new BlogPost();
     post.set('title', title);
+    post.author = author;
 
     post.save(function (err) {
       should.strictEqual(err, null);
-
-      BlogPost.update({ title: title }, { title: newTitle }, function (err) {
+      BlogPost.findById(post._id, function (err, createdFound) {
         should.strictEqual(err, null);
-
-        BlogPost.count({ title: newTitle }, function (err, count) {
+        createdFound.title.should.equal(title);
+        createdFound.author.should.equal(author);
+        BlogPost.update({ title: title }, { title: newTitle }, function (err) {
           should.strictEqual(err, null);
-          
-          count.should.eql(1);
-          db.close();
+
+          BlogPost.findById(post._id, function (err, updatedFound) {
+            db.close();
+            should.strictEqual(err, null);
+            updatedFound.title.should.equal(newTitle);
+            updatedFound.author.should.equal(author);
+          });
         });
       });
     });

@@ -512,6 +512,18 @@ module.exports = {
     query.options.sort.should.eql([['a', 1], ['z', 1], ['c', -1], ['v', -1], ['b', 1]]);
   },
 
+  'test running an empty Query should not throw': function () {
+    var query = new Query();
+    var threw = false;
+
+    try {
+      query.exec();
+    } catch (err) {
+      threw = true;
+    }
+
+    threw.should.eql(false);
+  },
 
   // Advanced Query options
   

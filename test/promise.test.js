@@ -142,6 +142,26 @@ module.exports = {
     beforeExit(function () {
       called.should.eql(1);
     });
+  },
+
+  'test return value of #on()': function () {
+    var promise = new Promise()
+    promise.on('jump', function(){}).should.be.an.instanceof(Promise);
+  },
+
+  'test return value of #addCallback()': function () {
+    var promise = new Promise()
+    promise.addCallback(function(){}).should.be.an.instanceof(Promise);
+  },
+
+  'test return value of #addErrback()': function () {
+    var promise = new Promise()
+    promise.addErrback(function(){}).should.be.an.instanceof(Promise);
+  },
+
+  'test return value of #addBack()': function () {
+    var promise = new Promise()
+    promise.addBack(function(){}).should.be.an.instanceof(Promise);
   }
 
 };

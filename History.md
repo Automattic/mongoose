@@ -1,4 +1,13 @@
 
+1.1.4 / 2011-03-09
+==================
+
+  * Fixed; running an empty Query doesn't throw. [aheckmann]
+  * Changed; Promise#addBack returns promise. [aheckmann]
+  * Added streaming cursor support. [aheckmann]
+  * Changed; Query#update defaults to use$SetOnSave now. [brian]
+  * Added more docs.
+
 1.1.3 / 2011-03-04
 ==================
 

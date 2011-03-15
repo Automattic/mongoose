@@ -268,12 +268,20 @@ module.exports = {
     post.save(function (err) {
       should.strictEqual(err, null);
 
+      var pending = 2;
+
       BlogPostB.findById(post.get('_id'), function (err, doc) {
         should.strictEqual(err, null);
         doc.should.be.an.instanceof(BlogPostB);
         doc.get('title').should.eql(title);
+        --pending || db.close();
+      });
 
-        db.close();
+      BlogPostB.findById(post.get('_id').toHexString(), function (err, doc) {
+        should.strictEqual(err, null);
+        doc.should.be.an.instanceof(BlogPostB);
+        doc.get('title').should.eql(title);
+        --pending || db.close();
       });
     });
   },

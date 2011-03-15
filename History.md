@@ -1,4 +1,10 @@
 
+1.1.5 / 2011-03-14
+==================
+
+  * Added support for `uri, db, fn` and `uri, fn` signatures for replica sets.
+  * Improved/extended replica set tests.
+
 1.1.4 / 2011-03-09
 ==================
 

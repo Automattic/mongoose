@@ -163,7 +163,7 @@ module.exports = {
 
     var mong = new Mongoose();
 
-    mongoose.connectSet(uri, function (err) {
+    mong.connectSet(uri, function (err) {
       should.strictEqual(err, null);
 
       mong.model('Test', new mongoose.Schema({
@@ -182,7 +182,39 @@ module.exports = {
           
           doc.test.should.eql('aa');
 
-          mongoose.connection.close();
+          mong.connection.close();
+        });
+      });
+    });
+  },
+
+  'test initializing a new Connection to a replica set': function () {
+    var uri = process.env.MONGOOSE_SET_TEST_URI;
+
+    if (!uri) return;
+
+    var mong = new Mongoose(true);
+
+    var conn = mong.createSetConnection(uri, function (err) {
+      should.strictEqual(err, null);
+
+      mong.model('ReplSetTwo', new mongoose.Schema({
+          test: String
+      }));
+
+      var Test = conn.model('ReplSetTwo')
+        , test = new Test();
+
+      test.test = 'aa';
+      test.save(function (err) {
+        should.strictEqual(err, null);
+
+        Test.findById(test._id, function (err, doc) {
+          should.strictEqual(err, null);
+          
+          doc.test.should.eql('aa');
+
+          conn.close();
         });
       });
     });

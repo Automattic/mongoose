@@ -107,6 +107,17 @@ module.exports = {
     db.close();
   },
 
+  'test that an empty find does not hang': function () {
+    var db = start()
+      , BlogPostB = db.model('BlogPostB', collection)
+
+    function fn () {
+      db.close();
+    };
+
+    BlogPostB.find({}, fn);
+  },
+
   'test that a query is executed when a callback is passed': function () {
     var db = start()
       , BlogPostB = db.model('BlogPostB', collection)

@@ -831,6 +831,34 @@ module.exports = {
     });
   },
 
+  'test validation without saving': function(){
+
+    mongoose.model('TestCallingValidation', new Schema({
+      item: { type: String, required: true }
+    }));
+
+    var db = start()
+      , TestCallingValidation = db.model('TestCallingValidation');
+
+    var post = new TestCallingValidation;
+
+    should.strictEqual(post.isNew, true);
+
+    post.validate(function(err){
+      err.should.be.an.instanceof(MongooseError);
+      err.should.be.an.instanceof(ValidatorError);
+      should.strictEqual(post.isNew, true);
+
+      post.item = 'yo';
+      post.validate(function(err){
+        should.equal(err, null);
+        should.strictEqual(post.isNew, true);
+        db.close();
+      });
+    });
+
+  },
+
   'test defaults application': function(){
     var now = Date.now();
 

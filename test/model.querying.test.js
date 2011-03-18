@@ -1073,6 +1073,25 @@ module.exports = {
     })
   },
 
+  'test backwards compatibility with unused values in db': function () {
+    var db = start()
+      , BlogPostB = db.model('BlogPostB', collection)
+      , post = new BlogPostB();
+
+    post.collection.insert({ meta: { visitors: 9898, color: 'blue'}}, {}, function (err, b) {
+      should.strictEqual(err, null);
+
+      BlogPostB.findOne({_id: b[0]._id}, function (err, found) {
+        should.strictEqual(err, null);
+        found.get('meta.visitors').valueOf().should.eql(9898);
+        found.save(function (err) {
+          should.strictEqual(err, null);
+          db.close();
+        })
+      })
+    })
+  },
+
   'test streaming cursors with #each': function () {
     var db = start()
       , BlogPostB = db.model('BlogPostB', collection);

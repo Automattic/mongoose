@@ -768,12 +768,26 @@ module.exports = {
       executed.should.be.true;
       executed = false;
 
-      post.set('nested.async', 'woot');
-      post.save(function(err){
+      post.validate(function(err){
+        err.should.be.an.instanceof(MongooseError);
+        err.should.be.an.instanceof(ValidatorError);
         executed.should.be.true;
-        should.strictEqual(err, null);
-        db.close();
-      });
+        executed = false;
+
+        post.set('nested.async', 'woot');
+        post.validate(function(err){
+          executed.should.be.true;
+          should.equal(err, null);
+          executed = false;
+
+          post.save(function(err){
+            executed.should.be.true;
+            should.strictEqual(err, null);
+            db.close();
+          });
+        });
+      })
+
     });
   },
 

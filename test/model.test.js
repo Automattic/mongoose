@@ -681,6 +681,37 @@ module.exports = {
       });
     })
   },
+
+  'test required validation for previously existing null values': function () {
+    mongoose.model('TestPreviousNullValidation', new Schema({
+        previous: { type: String, required: true }
+      , a: String
+    }));
+
+    var db = start()
+      , TestP = db.model('TestPreviousNullValidation')
+
+    TestP.collection.insert({ a: null, previous: null}, {}, function (err, f) {
+      should.strictEqual(err, null);
+
+      TestP.findOne({_id: f[0]._id}, function (err, found) {
+        should.strictEqual(err, null);
+        found.isNew.should.be.false;
+        should.strictEqual(found.get('previous'), undefined);
+
+        found.validate(function(err){
+          err.should.be.an.instanceof(MongooseError);
+          err.should.be.an.instanceof(ValidatorError);
+
+          found.set('previous', 'yoyo');
+          found.save(function (err) {
+            should.strictEqual(err, null);
+            db.close();
+          });
+        })
+      })
+    });
+  },
   
   'test nested validation': function(){
     mongoose.model('TestNestedValidation', new Schema({

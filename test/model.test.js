@@ -902,6 +902,8 @@ module.exports = {
 
     var post = new TestCallingValidation;
 
+    post.schema.path('item').isRequired.should.be.true;
+
     should.strictEqual(post.isNew, true);
 
     post.validate(function(err){
@@ -917,6 +919,25 @@ module.exports = {
       });
     });
 
+  },
+
+  'test setting required to false': function () {
+    function validator () {
+      return true;
+    }
+
+    mongoose.model('TestRequiredFalse', new Schema({
+      result: { type: String, validate: [validator, 'chump validator'], required: false }
+    }));
+
+    var db = start()
+      , TestV = db.model('TestRequiredFalse');
+
+    var post = new TestV;
+
+    post.schema.path('result').isRequired.should.be.false;
+
+    db.close();
   },
 
   'test defaults application': function(){

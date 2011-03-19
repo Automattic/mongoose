@@ -652,6 +652,35 @@ module.exports = {
       });
     });
   },
+
+  'test validation on a query result': function () {
+    mongoose.model('TestValidationOnResult', new Schema({
+        resultv: { type: String, required: true }
+    }));
+
+    var db = start()
+      , TestV = db.model('TestValidationOnResult');
+
+    var post = new TestV;
+
+    post.validate(function (err) {
+      err.should.be.an.instanceof(MongooseError);
+      err.should.be.an.instanceof(ValidatorError);
+
+      post.resultv = 'yeah';
+      post.save(function (err) {
+        should.strictEqual(err, null);
+        TestV.findOne({ _id: post.id }, function (err, found) {
+          should.strictEqual(err, null);
+          found.resultv.should.eql('yeah');
+          found.save(function(err){
+            should.strictEqual(err, null);
+            db.close();
+          })
+        });
+      });
+    })
+  },
   
   'test nested validation': function(){
     mongoose.model('TestNestedValidation', new Schema({

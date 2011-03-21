@@ -15,7 +15,8 @@ var mongoose = require('./common').mongoose
   , SchemaTypes = Schema.Types
   , DocumentObjectId = mongoose.Types.ObjectId
   , Mixed = SchemaTypes.Mixed
-  , MongooseNumber = mongoose.Types.Number;
+  , MongooseNumber = mongoose.Types.Number
+  , MongooseArray = mongoose.Types.Array;
 
 /**
  * Test Document constructor.
@@ -120,6 +121,8 @@ module.exports = {
   'test default definition': function(){
     var Test = new Schema({
         simple    : { type: String, default: 'a' }
+      , array     : { type: Array, default: [1,2,3,4,5] }
+      , arrayFn   : { type: Array, default: function () { return [8] } }
       , callback  : { type: Number, default: function(){
           this.a.should.eql('b');
           return '3';
@@ -131,6 +134,10 @@ module.exports = {
 
     Test.path('simple').getDefault().should.eql('a');
     (+Test.path('callback').getDefault({ a: 'b' })).should.eql(3);
+    Test.path('array').defaultValue.should.be.a('function');
+    Test.path('array').getDefault(new TestDocument)[3].should.eql(4);
+    Test.path('arrayFn').defaultValue.should.be.a('function');
+    Test.path('arrayFn').getDefault(new TestDocument).should.be.an.instanceof(MongooseArray);
   },
 
   'test string required validation': function(){

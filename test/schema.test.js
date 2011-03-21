@@ -122,6 +122,7 @@ module.exports = {
     var Test = new Schema({
         simple    : { type: String, default: 'a' }
       , array     : { type: Array, default: [1,2,3,4,5] }
+      , arrayX    : { type: Array, default: 9 }
       , arrayFn   : { type: Array, default: function () { return [8] } }
       , callback  : { type: Number, default: function(){
           this.a.should.eql('b');
@@ -136,6 +137,7 @@ module.exports = {
     (+Test.path('callback').getDefault({ a: 'b' })).should.eql(3);
     Test.path('array').defaultValue.should.be.a('function');
     Test.path('array').getDefault(new TestDocument)[3].should.eql(4);
+    Test.path('arrayX').getDefault(new TestDocument)[0].should.eql(9);
     Test.path('arrayFn').defaultValue.should.be.a('function');
     Test.path('arrayFn').getDefault(new TestDocument).should.be.an.instanceof(MongooseArray);
   },

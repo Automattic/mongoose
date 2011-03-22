@@ -117,6 +117,47 @@ module.exports = {
     db.close();
   },
 
+  'test default Array type casts to Mixed': function () {
+    var db = start()
+      , DefaultArraySchema = new Schema({
+          num1: Array
+        , num2: []
+        })
+
+    mongoose.model('DefaultArraySchema', DefaultArraySchema);
+    var DefaultArray = db.model('DefaultArraySchema', collection);
+    var arr = new DefaultArray();
+
+    arr.get('num1').should.have.length(0);
+    arr.get('num2').should.have.length(0);
+
+    var threw1 = false
+      , threw2 = false;
+
+    try {
+      arr.num1.push({ x: 1 })
+      arr.num2.push(9)
+      arr.num2.push("woah")
+    } catch (err) {
+      threw1 = true;
+    }
+
+    threw1.should.equal(false);
+
+    try {
+      arr.num2.push({ x: 1 })
+      arr.num2.push(9)
+      arr.num2.push("woah")
+    } catch (err) {
+      threw2 = true;
+    }
+
+    threw2.should.equal(false);
+
+    db.close();
+
+  },
+
   'test a model default structure that has a nested Array when instantiated': function () {
     var db = start()
       , NestedSchema = new Schema({

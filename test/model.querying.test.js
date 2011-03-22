@@ -668,7 +668,13 @@ module.exports = {
           should.strictEqual(err, null);
 
           doc._id.should.eql(post._id);
-          db.close();
+
+          BlogPostB.find({ _id: post._id, tags: /otba/i }, function (err, doc) {
+            should.strictEqual(err, null);
+            doc._id.should.eql(post._id);
+
+            db.close();
+          })
         });
       });
   },

@@ -2123,6 +2123,11 @@ module.exports = {
     person.get('name.first').should.equal('The');
     person.get('name.last').should.equal('Situation');
 
+    person.name.full.should.equal('Michael Sorrentino');
+    person.name.full = 'The Situation';
+    person.name.first.should.equal('The');
+    person.name.last.should.equal('Situation');
+
     db.close();
   },
 

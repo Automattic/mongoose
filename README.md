@@ -265,6 +265,7 @@ the `1` branch is nearing its completion).
 - Guillermo Rauch - guillermo@learnboost.com - [Guille](http://github.com/guille)
 - Nathan White - [nw](http://github.com/nw/)
 - Brian Noguchi - [bnoguchi](https://github.com/bnoguchi)
+- Aaron Heckmann - [aheckmann](https://github.com/aheckmann)
 
 ## License
 

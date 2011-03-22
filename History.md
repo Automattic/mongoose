@@ -1,4 +1,15 @@
 
+1.1.6 / 2011-03-22
+==================
+
+  * Only doValidate when path exists in Schema [aheckmann]
+  * Allow function defaults for Array types [aheckmann]
+  * Fix validation hang [aheckmann]
+  * Fix setting of isRequired of SchemaType [aheckmann]
+  * Fix SchemaType#required(false) filter [aheckmann]
+  * More backwards compatibility [aheckmann]
+  * More tests [aheckmann]
+
 1.1.5 / 2011-03-14
 ==================
 

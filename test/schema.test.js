@@ -750,8 +750,8 @@ module.exports = {
     Contact.virtualpath('fullName').should.be.an.instanceof(VirtualType);
   },
 
-  'test GH-298': function () {
-    new Schema({ id: String })
+  'test GH-298 - The default creation of a virtual `id` should be muted when someone defines their own `id` attribute': function () {
+    new Schema({ id: String });
   }
 
 };

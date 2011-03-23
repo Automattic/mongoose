@@ -1022,6 +1022,22 @@ module.exports = {
     db.close();
   },
 
+  'test "type" is allowed as a key': function(){
+    var now = Date.now();
+
+    mongoose.model('TestTypeDefaults', new Schema({
+        type: { type: String, default: 'YES!' }
+    }));
+
+    var db = start()
+      , TestDefaults = db.model('TestTypeDefaults');
+
+    var post = new TestDefaults();
+    post.get('type').should.be.a('string');
+    post.get('type').should.eql('YES!');
+    db.close();
+  },
+
   'test nested defaults application': function(){
     var now = Date.now();
 

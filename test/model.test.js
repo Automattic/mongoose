@@ -234,16 +234,41 @@ module.exports = {
     db.close();
   },
 
-//  'test instantiating a model with a hash that maps to at least 1 undefined value': function () {
-//    var db = start()
-//      , BlogPost = db.model('BlogPost', collection);
-//
-//    var post = new BlogPost({
-//      title: undefined
-//    });
-//    should.strictEqual(undefined, post.title);
-//    db.close();
-//  },
+  'saving a model with a null value should perpetuate that null value to the db': function () {
+    var db = start()
+      , BlogPost = db.model('BlogPost', collection);
+
+    var post = new BlogPost({
+      title: null
+    });
+    should.strictEqual(null, post.title);
+    post.save( function (err) {
+      should.strictEqual(err, null);
+      BlogPost.findById(post.id, function (err, found) {
+        db.close();
+        should.strictEqual(err, null);
+        should.strictEqual(found.title, null);
+      });
+    });
+  },
+
+  'test instantiating a model with a hash that maps to at least 1 undefined value': function () {
+    var db = start()
+      , BlogPost = db.model('BlogPost', collection);
+
+    var post = new BlogPost({
+      title: undefined
+    });
+    should.strictEqual(undefined, post.title);
+    post.save( function (err) {
+      should.strictEqual(null, err);
+      BlogPost.findById(post.id, function (err, found) {
+        db.close();
+        should.strictEqual(err, null);
+        should.strictEqual(found.title, undefined);
+      });
+    });
+  },
 
   'test a model structure when saved': function(){
     var db = start()
@@ -738,7 +763,7 @@ module.exports = {
       TestP.findOne({_id: f[0]._id}, function (err, found) {
         should.strictEqual(err, null);
         found.isNew.should.be.false;
-        should.strictEqual(found.get('previous'), undefined);
+        should.strictEqual(found.get('previous'), null);
 
         found.validate(function(err){
           err.should.be.an.instanceof(MongooseError);

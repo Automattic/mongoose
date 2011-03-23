@@ -1,4 +1,12 @@
 
+1.1.9 / 2011-03-2 
+==================
+
+  * Fixed; Mixed can now default to empty arrays
+  * Fixed; keys by the name 'type' are now valid
+  * Fixed; null values retrieved from the database are hydrated as null values.
+  * Fixed repeated atomic operations when saving a same document twice.
+
 1.1.8 / 2011-03-23
 ==================
 

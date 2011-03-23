@@ -1,4 +1,10 @@
 
+1.1.7 / 2011-03-22
+==================
+
+  * Fixed RegExp query casting when querying against an Array of Strings [bnoguchi]
+  * Fixed getters/setters for nested virtualsl. [bnoguchi]
+
 1.1.6 / 2011-03-22
 ==================
 

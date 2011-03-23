@@ -748,6 +748,10 @@ module.exports = {
       });
 
     Contact.virtualpath('fullName').should.be.an.instanceof(VirtualType);
+  },
+
+  'test GH-298': function () {
+    new Schema({ id: String })
   }
 
 };

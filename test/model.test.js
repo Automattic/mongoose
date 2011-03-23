@@ -1828,6 +1828,27 @@ module.exports = {
       });
     });
   },
+
+  // GH-267
+  'saving an embedded document twice should not push that doc onto the parent doc twice': function () {
+    var db = start()
+      , BlogPost = db.model('BlogPost', collection)
+      , post = new BlogPost();
+
+    post.comments.push({title: 'woot'});
+    post.save( function (err) {
+      should.strictEqual(err, null);
+      post.save( function (err) {
+        should.strictEqual(err, null);
+        BlogPost.findById(post.id, function (err, found) {
+          db.close();
+          should.strictEqual(err, null);
+          found.comments.should.have.length(1);
+        });
+      });
+    });
+  },
+
   'test filtering an embedded array by the id shortcut function': function () {
     var db = start()
       , BlogPost = db.model('BlogPost', collection);

@@ -142,6 +142,18 @@ module.exports = {
     Test.path('arrayFn').getDefault(new TestDocument).should.be.an.instanceof(MongooseArray);
   },
 
+  'test Mixed defaults can be empty arrays': function () {
+    var Test = new Schema({
+        mixed1    : { type: Mixed, default: [] }
+      , mixed2    : { type: Mixed, default: Array }
+    });
+
+    Test.path('mixed1').getDefault().should.be.an.instanceof(Array);
+    Test.path('mixed1').getDefault().length.should.be.eql(0);
+    Test.path('mixed2').getDefault().should.be.an.instanceof(Array);
+    Test.path('mixed2').getDefault().length.should.be.eql(0);
+  },
+
   'test string required validation': function(){
     var Test = new Schema({
         simple: String

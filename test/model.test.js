@@ -1838,12 +1838,18 @@ module.exports = {
     post.comments.push({title: 'woot'});
     post.save( function (err) {
       should.strictEqual(err, null);
-      post.save( function (err) {
+      post.comments.should.have.length(1);
+      BlogPost.findById(post.id, function (err, found) {
         should.strictEqual(err, null);
-        BlogPost.findById(post.id, function (err, found) {
-          db.close();
+        found.comments.should.have.length(1);
+        post.save( function (err) {
           should.strictEqual(err, null);
-          found.comments.should.have.length(1);
+          post.comments.should.have.length(1);
+          BlogPost.findById(post.id, function (err, found) {
+            db.close();
+            should.strictEqual(err, null);
+            found.comments.should.have.length(1);
+          });
         });
       });
     });

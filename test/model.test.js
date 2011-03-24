@@ -136,8 +136,8 @@ module.exports = {
 
     try {
       arr.num1.push({ x: 1 })
-      arr.num2.push(9)
-      arr.num2.push("woah")
+      arr.num1.push(9)
+      arr.num1.push("woah")
     } catch (err) {
       threw1 = true;
     }

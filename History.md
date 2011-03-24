@@ -1,4 +1,9 @@
 
+1.1.10 / 2011-03-23
+===================
+
+  * Changed; Make sure to only ensure indexes while connected
+
 1.1.9 / 2011-03-2 
 ==================
 

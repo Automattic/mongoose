@@ -6,6 +6,19 @@ var Admin = exports.Admin = function(db) {
   this.db = db;
 };
 
+Admin.prototype.serverInfo = function(callback) {
+  var self = this;
+  var command = {buildinfo:1};
+  var databaseName = self.db.databaseName;
+  self.db.databaseName = 'admin';
+  this.db.executeDbCommand(command, function(err, doc) {
+    if(err != null) return callback(err, null);
+    return callback(null, doc.documents[0]);
+  });
+  // Ensure change before event loop executes
+  self.db.databaseName = databaseName;
+}
+
 Admin.prototype.profilingLevel = function(callback) {
   var command = {profile:-1};
   this.db.executeDbCommand(command, function(err, doc) {

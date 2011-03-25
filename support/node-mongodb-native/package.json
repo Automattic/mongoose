@@ -1,6 +1,6 @@
 { "name" :            "mongodb"
 , "description" :     "A node.js driver for MongoDB"
-, "version" :         "0.8.0"
+, "version" :         "0.9.2"
 , "author" :          "Christian Amor Kvalheim <christkv@gmail.com>"
 , "contributors" :  [ "Nathan White <nw@nwhite.net>",
                       "Adam Wiggins <adam@heroku.com>",
@@ -19,8 +19,8 @@
                     , "freebsd" ]
 , "main":             "./lib/mongodb/index"
 , "directories" :   { "lib" : "./lib/mongodb" }
-, "engines" :       { "node" : ">=0.1.97" }
-, "scripts": { "install": "make total" }
+, "engines" :       { "node" : ">=0.4.0" }
+, "scripts": { "install" : "./install.sh" }
 , "licenses" :    [ { "type" :  "Apache License, Version 2.0"
                     , "url" :   "http://www.apache.org/licenses/LICENSE-2.0" } ]
 }

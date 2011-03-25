@@ -54,6 +54,8 @@ static Handle<Value> VException(const char *msg) {
     return ThrowException(Exception::Error(String::New(msg)));
   };
 
+Persistent<FunctionTemplate> BSON::constructor_template;
+
 class MyExternal : public String::ExternalAsciiStringResource {
  public:
   MyExternal (char *d, size_t length) : ExternalAsciiStringResource() {

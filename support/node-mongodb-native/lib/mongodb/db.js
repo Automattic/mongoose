@@ -19,7 +19,7 @@ var Db = exports.Db = function(databaseName, serverConfig, options) {
   this.databaseName = databaseName;
   this.serverConfig = serverConfig;
   this.options = options == null ? {} : options;
-  // sys.puts(sys.inspect(require('../../external-libs/bson/bson')))
+  
   // Contains all the connections for the db
   try {
     this.bson_serializer = this.options.native_parser ? require('../../external-libs/bson/bson') : require('./bson/bson');
@@ -49,7 +49,7 @@ Db.prototype.open = function(callback) {
 
     self.serverConfig.connection.addListener("connect", function() {
       // Create a callback function for a given connection
-      var connectCallback = function(err, reply) {        
+      var connectCallback = function(err, reply) {   
         if(err != null) {
           return callback(err, null);
         } else if(reply.documents[0].ismaster == 1) {
@@ -61,7 +61,16 @@ Db.prototype.open = function(callback) {
         // emit a message saying we got a master and are ready to go and change state to reflect it
         if(self.state == 'notConnected') {
           self.state = 'connected';
-          callback(null, self);
+          // 
+          // Call the server version function via admin to adapt to changes from 1.7.6 >
+          self.admin(function(err, admindb) {
+            admindb.serverInfo(function(err, doc) {
+              if(err != null) return callback(err, null);
+              // Store the db version
+              self.version = doc.version;
+              callback(null, self);
+            });
+          });
         } else {
           callback("connection already opened");
         }
@@ -78,8 +87,6 @@ Db.prototype.open = function(callback) {
       // Parse the data as a reply object
       var reply = new MongoReply(self, message);
       // Emit message
-      
-      
       self.emit(reply.responseTo.toString(), null, reply);
       // Remove the listener
       self.removeListener(reply.responseTo.toString(), self.listeners(reply.responseTo.toString())[0]);
@@ -166,7 +173,6 @@ Db.prototype.open = function(callback) {
 };
 
 Db.prototype.close = function() {
-
   this.connections.forEach(function(connection) {
    connection.close();
   });
@@ -225,14 +231,14 @@ Db.prototype.collection = function(collectionName, callback) {
         if(collections.length == 0) {
           callback(new Error("Collection " + collectionName + " does not exist. Currently in strict mode."), null);
         } else {
-          callback(null, new Collection(self, collectionName, self.pkFactory));
+          return callback(null, new Collection(self, collectionName, self.pkFactory));
         }
       });
     } else {
-      callback(null, new Collection(self, collectionName, self.pkFactory));
+      return callback(null, new Collection(self, collectionName, self.pkFactory));
     }
   } catch(err) {
-    callback(err, null);
+    return callback(err, null);
   }
 };
 
@@ -538,15 +544,19 @@ Db.prototype.executeCommand = function(db_command, callback) {
     }
 
     // Correctly handle serialization errors
-    var msg = db_command.toBinary()
-
+    var msg = db_command.toBinary();
+    var checkMasterHandler = function(err, reply, dbinstance){ 
+        dbinstance.serverConfig.masterConnection.send(db_command);           
+    };
+    
     try{
       this.serverConfig.masterConnection.send(msg);   
     } catch(err){
-      this.checkMaster_(this, function(err, reply, dbinstance){ 
-        dbinstance.serverConfig.masterConnection.send(db_command);           
-      });
+      this.checkMaster_(this, checkMasterHandler);
     }
+    
+    db_command = null;
+    checkMasterHandler = null;
 };
 
 /**

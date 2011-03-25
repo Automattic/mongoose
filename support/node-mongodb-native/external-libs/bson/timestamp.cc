@@ -11,6 +11,7 @@
 #include <iostream>
 #include <limits>
 
+#include "local.h"
 #include "timestamp.h"
 
 // BSON MAX VALUES

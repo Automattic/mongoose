@@ -436,6 +436,33 @@ var all_tests = {
     })
   },
 
+  // Test the error reporting functionality
+  test_failing_insert_due_to_unique_index_strict : function() {
+    var error_client = new Db('integration_tests2_', new Server("127.0.0.1", 27017, {auto_reconnect: false}), {strict:true});
+    error_client.bson_deserializer = client.bson_deserializer;
+    error_client.bson_serializer = client.bson_serializer;
+    error_client.pkFactory = client.pkFactory;
+    
+    error_client.open(function(err, error_client) {
+      error_client.dropCollection('test_failing_insert_due_to_unique_index_strict', function(err, r) {
+        error_client.createCollection('test_failing_insert_due_to_unique_index_strict', function(err, r) {
+          error_client.collection('test_failing_insert_due_to_unique_index_strict', function(err, collection) {
+            collection.ensureIndex([['a', 1 ]], true, function(err, indexName) {
+              collection.insert({a:2}, function(err, r) {
+                test.ok(err == null);
+                collection.insert({a:2}, function(err, r) {
+                  test.ok(err != null);
+                  error_client.close();
+                  finished_test({test_failing_insert_due_to_unique_index_strict:'ok'});
+                })
+              })
+            })
+          })
+        })                  
+      });
+    });
+  },
+
   // Test multiple document insert
   test_multiple_insert : function() {
     client.createCollection('test_multiple_insert', function(err, r) {
@@ -765,6 +792,54 @@ var all_tests = {
             test.equal(4, documents.length);
             // Let's close the db
             finished_test({test_find_limits:'ok'});
+          });
+        });
+      });
+    });
+  },
+    
+  // Test find by non-quoted values (issue #128)
+  test_find_non_quoted_values : function() {
+    client.createCollection('test_find_non_quoted_values', function(err, r) {
+      client.collection('test_find_non_quoted_values', function(err, collection) {
+        // insert test document
+        collection.insert([{ a: 19, b: 'teststring', c: 59920303 },
+                           { a: "19", b: 'teststring', c: 3984929 }]);
+        
+        collection.find({ a: 19 }, function(err, cursor) {
+          cursor.toArray(function(err, documents) {
+            test.equal(1, documents.length);
+            finished_test({test_find_non_quoted_values:'ok'});
+          });
+        });
+      });
+    });
+  },
+  
+  // Test for querying embedded document using dot-notation (issue #126)
+  test_find_embedded_document : function() {
+    client.createCollection('test_find_embedded_document', function(err, r) {
+      client.collection('test_find_embedded_document', function(err, collection) {
+        // insert test document
+        collection.insert([{ a: { id: 10, value: 'foo' }, b: 'bar', c: { id: 20, value: 'foobar' }},
+                           { a: { id: 11, value: 'foo' }, b: 'bar2', c: { id: 20, value: 'foobar' }}]);
+        
+        // test using integer value
+        collection.find({ 'a.id': 10 }, function(err, cursor) {
+          cursor.toArray(function(err, documents) {
+            test.equal(1, documents.length);
+            test.equal('bar', documents[0].b);
+          });
+        });
+        
+        // test using string value
+        collection.find({ 'a.value': 'foo' }, function(err, cursor) {
+          cursor.toArray(function(err, documents) {
+            // should yield 2 documents
+            test.equal(2, documents.length);
+            test.equal('bar', documents[0].b);
+            test.equal('bar2', documents[1].b);
+            finished_test({test_find_embedded_document:'ok'});
           });
         });
       });
@@ -3454,7 +3529,7 @@ var all_tests = {
       });
     });
   },
-  
+
   test_custom_primary_key_generator : function() {
     // Custom factory (need to provide a 12 byte array);
     CustomPKFactory = function() {}
@@ -3511,7 +3586,7 @@ var all_tests = {
   test_map_reduce_functions_scope : function() {
     client.createCollection('test_map_reduce_functions_scope', function(err, collection) {
       collection.insert([{'user_id':1, 'timestamp':new Date()}, {'user_id':2, 'timestamp':new Date()}]);
-
+  
       var map = function(){
           emit(test(this.timestamp.getYear()), 1);
       }

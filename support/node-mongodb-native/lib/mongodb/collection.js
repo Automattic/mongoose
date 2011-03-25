@@ -22,7 +22,7 @@ var formattedOrderClause = function(sortValue) {
   var orderBy = {};
   var self = this;
 
-  if(sortValue instanceof Array) {
+  if(Array.isArray(sortValue)) {
     sortValue.forEach(function(sortElement) {
       if(sortElement.constructor == String) {
         orderBy[sortElement] = 1;
@@ -94,7 +94,7 @@ Collection.prototype.remove = function(selector, options, callback) {
   this.db.executeCommand(deleteCommand);
   // If safe mode check last error
   if(callback != null) {
-    if(options.safe) {
+    if(options.safe || this.db.strict) {
       this.db.error(function(err, error) {
         if(error[0].err) {
           callback(new Error(error[0].err), null);
@@ -128,6 +128,7 @@ Collection.prototype.rename = function(collectionName, callback) {
 };
 
 Collection.prototype.insertAll = function(docs, options, callback) {
+  var self = this;
   var error= null;
   var args = Array.prototype.slice.call(arguments, 1);
   callback = args.pop();
@@ -161,7 +162,7 @@ Collection.prototype.insertAll = function(docs, options, callback) {
   }
   // If safe is defined check for error message
   if(callback != null) {
-    if(options.safe) {
+    if(options.safe || this.db.strict) {
       this.db.error(function(err, error) {
         if(error[0].err) {
           if(callback != null) callback(new Error(error[0].err), null);
@@ -229,7 +230,7 @@ Collection.prototype.update = function(spec, document, options, callback) {
     if(callback != null) return callback(err, null);
   }    
   // If safe, we need to check for successful execution
-  if(safe) {
+  if(safe || this.db.strict) {
     this.db.error(function(err, error) {
       if(callback != null) {
         if (upsert) {
@@ -477,9 +478,15 @@ Collection.prototype.dropIndexes = function(callback) {
 Collection.prototype.mapReduce = function(map, reduce, options, callback) {
   var args = Array.prototype.slice.call(arguments, 2);
   callback = args.pop();
-  options = args.length ? args.shift() : {};
-
   var self = this;
+  // Parse version of server if available
+  var version = this.db.version != null ? parseInt(this.db.version.replace(/\./g, '')) : 0;
+  
+  // Set default to be inline if we are dealing with a v 1.7.6 > server
+  if(version > 0 && version > 176) {
+    options = args.length ? args.shift() : {out:'inline'};
+    if(options.out == null) options.out = 'inline';
+  }
 
   if(Object.prototype.toString.call(map) === '[object Function]') map = map.toString();
   if(Object.prototype.toString.call(reduce) === '[object Function]') reduce = reduce.toString();
@@ -505,7 +512,7 @@ Collection.prototype.mapReduce = function(map, reduce, options, callback) {
         }
       });
     } else {
-      err != null ? callback(err, null, null) : callback(new Error("map-reduce failed: " + result.documents[0].errmsg), null, null);
+      err != null ? callback(err, null, null) : callback(result.documents[0], null, null);
     }
   });
 };

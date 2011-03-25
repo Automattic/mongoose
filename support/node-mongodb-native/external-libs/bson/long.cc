@@ -11,6 +11,7 @@
 #include <iostream>
 #include <limits>
 
+#include "local.h"
 #include "long.h"
 
 // BSON MAX VALUES

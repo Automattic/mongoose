@@ -25,7 +25,7 @@ def configure(conf):
 def build(bld):
   obj = bld.new_task_gen("cxx", "shlib", "node_addon")
   obj.target = "bson"
-  obj.source = ["bson.cc", "long.cc", "objectid.cc", "binary.cc", "code.cc", "dbref.cc", "timestamp.cc"]
+  obj.source = ["bson.cc", "long.cc", "objectid.cc", "binary.cc", "code.cc", "dbref.cc", "timestamp.cc", "local.cc"]
   # obj.uselib = "NODE"
 
 def shutdown():

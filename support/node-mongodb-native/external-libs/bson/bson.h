@@ -22,6 +22,9 @@ class BSON : public EventEmitter {
     static Handle<Value> ToLong(const Arguments &args);
     static Handle<Value> ToInt(const Arguments &args);
   
+    // Constructor used for creating new BSON objects from C++
+    static Persistent<FunctionTemplate> constructor_template;
+
   private:
     static Handle<Value> New(const Arguments &args);
     static Handle<Value> deserialize(char *data, bool is_array_item);

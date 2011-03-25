@@ -50,7 +50,7 @@ var Cursor = exports.Cursor = function(db, collection, selector, fields, skip, l
   this.hint = hint;
   this.explainValue = explain;
   this.snapshot = snapshot;
-  this.timeout = timeout;
+  this.timeout = timeout == null ? true : timeout;
   this.tailable = tailable;
   this.batchSizeValue = batchSize == null ? 0 : batchSize;
 
@@ -120,7 +120,11 @@ Cursor.prototype.toArray = function(callback) {
               items.push(item);
           } else {
               callback(err, items);
+              
+              items = null;
           }
+          
+          item = null;
       });
     } else {
       callback(new Error("Cursor is closed"), null);
@@ -162,6 +166,8 @@ Cursor.prototype.each = function(callback) {
           self.state = Cursor.CLOSED;
           callback(err, null);
         }
+        
+        item = null;
       });
     });
   } else {
@@ -344,7 +350,9 @@ Cursor.prototype.limitRequest = function() {
 Cursor.prototype.generateQueryCommand = function() {
   // Unpack the options
   var queryOptions = QueryCommand.OPTS_NONE;
-  if (this.timeout != null) queryOptions += this.timeout;
+  if (!this.timeout) {
+      queryOptions += QueryCommand.OPTS_NO_CURSOR_TIMEOUT;
+  }
   if (this.tailable != null) {
       queryOptions += QueryCommand.OPTS_TAILABLE_CURSOR;
       this.skipValue = this.limitValue = 0;
@@ -376,7 +384,7 @@ Cursor.prototype.formattedOrderClause = function() {
   var orderBy = {};
   var self = this;
 
-  if(this.sortValue instanceof Array) {
+  if(Array.isArray(this.sortValue)) {
     this.sortValue.forEach(function(sortElement) {
       if(sortElement.constructor == String) {
         orderBy[sortElement] = 1;
@@ -429,20 +437,25 @@ Cursor.prototype.nextObject = function(callback) {
 
   if(self.state == Cursor.INIT) {
     try {
-      self.db.executeCommand(self.generateQueryCommand(), function(err, result) {
-        if(!err && result.documents[0] && result.documents[0]['$err']) {
-          self.close(function() {callback(result.documents[0]['$err'], null);});
-          return;
-        }
-        self.queryRun = true;
-        self.state = Cursor.OPEN; // Adjust the state of the cursor
-        self.cursorId = result.cursorId;
-        self.totalNumberOfRecords = result.numberReturned;
-
-        // Add the new documents to the list of items
-        self.items = self.items.concat(result.documents);
-        self.nextObject(callback);
-      });
+      var commandHandler = function(err, result) {
+	      if(!err && result.documents[0] && result.documents[0]['$err']) {
+	          self.close(function() {callback(result.documents[0]['$err'], null);});
+	          return;
+	        }
+	        self.queryRun = true;
+	        self.state = Cursor.OPEN; // Adjust the state of the cursor
+	        self.cursorId = result.cursorId;
+	        self.totalNumberOfRecords = result.numberReturned;
+	
+	        // Add the new documents to the list of items
+	        self.items = self.items.concat(result.documents);
+	        self.nextObject(callback);
+	        
+	        result = null;
+      };
+      
+      self.db.executeCommand(self.generateQueryCommand(), commandHandler);
+      commandHandler = null;
     } catch(err) {
       callback(new Error(err.toString()), null);
     }
@@ -498,11 +511,18 @@ Cursor.prototype.getMore = function(callback) {
       } else {
         self.close(function() {callback(null, null);});
       }
+      
+      result = null;
     });
+    
+    getMoreCommand = null; 
+    
   } catch(err) {
-    self.close(function() {
+	var handleClose = function() {
       callback(new Error(err.toString()), null);
-    });
+    };
+    self.close(handleClose);
+    handleClose = null;
   }
 }
 
@@ -596,13 +616,15 @@ Cursor.prototype.close = function(callback) {
   if(this.cursorId instanceof self.db.bson_serializer.Long && this.cursorId.greaterThan(self.db.bson_serializer.Long.fromInt(0))) {
     try {
       var command = new KillCursorCommand(this.db, [this.cursorId]);
-      this.db.executeCommand(command, function(err, result) {});
+      this.db.executeCommand(command, null);      
     } catch(err) {}
   }
 
   this.cursorId = self.db.bson_serializer.Long.fromInt(0);
   this.state    = Cursor.CLOSED;
   if (callback) callback(null, this);
+  
+  this.items = null;
 };
 
 /**

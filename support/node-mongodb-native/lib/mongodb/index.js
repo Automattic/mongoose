@@ -1,5 +1,4 @@
 var sys = require('sys')
-
 // // Add both the BSON Pure classes and the native ones
 var BSONPure = exports.BSONPure = require('./bson/bson');
 var BSONNative = null

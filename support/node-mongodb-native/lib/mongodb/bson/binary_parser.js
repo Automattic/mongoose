@@ -3,6 +3,9 @@ var sys = require('sys');
 //+ Jonas Raoni Soares Silva
 //@ http://jsfromhell.com/classes/binary-parser [v1.0]
 var chr = String.fromCharCode;
+var maxBits = [];
+for(var i = 0; i<64; i++)
+	maxBits[i] = Math.pow(2, i);
 
 var p = exports.BinaryParser = function( bigEndian, allowExceptions ){
 	this.bigEndian = bigEndian;
@@ -52,7 +55,9 @@ p.warn = function( msg ){
 p.decodeFloat = function( data, precisionBits, exponentBits ){
 	var b = new this.Buffer( this.bigEndian, data );
 	b.checkBuffer( precisionBits + exponentBits + 1 );
-	var bias = Math.pow( 2, exponentBits - 1 ) - 1, signal = b.readBits( precisionBits + exponentBits, 1 ), exponent = b.readBits( precisionBits, exponentBits ), significand = 0,
+	//var bias = Math.pow( 2, exponentBits - 1 ) - 1, 
+	var bias = maxBits[exponentBits - 1] - 1,
+		signal = b.readBits( precisionBits + exponentBits, 1 ), exponent = b.readBits( precisionBits, exponentBits ), significand = 0,
 	divisor = 2, curByte = b.buffer.length + ( -precisionBits >> 3 ) - 1;
 	do{
 		for( var byteValue = b.buffer[ ++curByte ], startBit = precisionBits % 8 || 8, mask = 1 << startBit; mask >>= 1; ( byteValue & mask ) && ( significand += 1 / divisor ), divisor *= 2 );
@@ -60,11 +65,13 @@ p.decodeFloat = function( data, precisionBits, exponentBits ){
 	return exponent == ( bias << 1 ) + 1 ? significand ? NaN : signal ? -Infinity : +Infinity : ( 1 + signal * -2 ) * ( exponent || significand ? !exponent ? Math.pow( 2, -bias + 1 ) * significand : Math.pow( 2, exponent - bias ) * ( 1 + significand ) : 0 );
 };
 p.decodeInt = function( data, bits, signed, forceBigEndian ){
-	var b = new this.Buffer( this.bigEndian||forceBigEndian, data ), x = b.readBits( 0, bits ), max = Math.pow( 2, bits );
+	var b = new this.Buffer( this.bigEndian||forceBigEndian, data ), x = b.readBits( 0, bits ), max = maxBits[bits]; //max = Math.pow( 2, bits );
 	return signed && x >= max / 2 ? x - max : x;
 };
 p.encodeFloat = function( data, precisionBits, exponentBits ){
-	var bias = Math.pow( 2, exponentBits - 1 ) - 1, minExp = -bias + 1, maxExp = bias, minUnnormExp = minExp - precisionBits,
+	//var bias = Math.pow( 2, exponentBits - 1 ) - 1,
+	var bias = maxBits[exponentBits - 1] - 1,
+		minExp = -bias + 1, maxExp = bias, minUnnormExp = minExp - precisionBits,
 	status = isNaN( n = parseFloat( data ) ) || n == -Infinity || n == +Infinity ? n : 0,
 	exp = 0, len = 2 * bias + 1 + precisionBits + 3, bin = new Array( len ),
 	signal = ( n = status !== 0 ? 0 : n ) < 0, n = Math.abs( n ), intPart = Math.floor( n ), floatPart = n - intPart,
@@ -106,13 +113,17 @@ p.encodeFloat = function( data, precisionBits, exponentBits ){
 	r[r.length] = n ? String.fromCharCode( n ) : "";
 	return ( this.bigEndian ? r.reverse() : r ).join( "" );
 };
+
 p.encodeInt = function( data, bits, signed, forceBigEndian ){
-	var max = Math.pow( 2, bits );
+	//var max = Math.pow( 2, bits );
+	var max = maxBits[bits];
+	
 	( data >= max || data < -( max / 2 ) ) && this.warn( "encodeInt::overflow" ) && ( data = 0 );
 	data < 0 && ( data += max );
 	for( var r = []; data; r[r.length] = String.fromCharCode( data % 256 ), data = Math.floor( data / 256 ) );
 	for( bits = -( -bits >> 3 ) - r.length; bits--; r[r.length] = "\0" );
-        return ( (this.bigEndian||forceBigEndian) ? r.reverse() : r ).join( "" );
+	
+    return ( (this.bigEndian||forceBigEndian) ? r.reverse() : r ).join( "" );
 };
 p.toSmall    = function( data ){ return this.decodeInt( data,  8, true  ); };
 p.fromSmall  = function( data ){ return this.encodeInt( data,  8, true  ); };
@@ -178,7 +189,7 @@ p.encode_int64 = function(number) {
 p.decode_utf8 = function(a) {
   var string = "";
   var i = 0;
-  var c, c1, c2;
+  var c, c1, c2, c3;
   c = c1 = c2 = 0;
 
   while ( i < a.length ) {

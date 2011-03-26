@@ -1,4 +1,11 @@
 
+1.1.12 / 2011-03-26
+===================
+
+  * Fixed; nested objects now convert to JSON properly
+  * Fixed; setting nested objects directly now works
+  * Update node-mongodb-native
+
 1.1.11 / 2011-03-25
 ===================
 

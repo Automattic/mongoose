@@ -2728,16 +2728,20 @@ module.exports = {
     (+post.get('meta').visitors).should.eql(234);
 
     // set object directly
-    post.meta = newmeta;
+    //post.meta = newmeta;
+    post.meta = {
+        date: date - 3000
+      , visitors: 4815162342
+    };
 
     post.meta.date.should.be.an.instanceof(Date);
     post.get('meta').date.should.be.an.instanceof(Date);
     post.meta.visitors.should.be.an.instanceof(MongooseNumber);
     post.get('meta').visitors.should.be.an.instanceof(MongooseNumber);
-    (+post.meta.date).should.eql(date - 2000);
-    (+post.get('meta').date).should.eql(date - 2000);
-    (+post.meta.visitors).should.eql(234);
-    (+post.get('meta').visitors).should.eql(234);
+    (+post.meta.date).should.eql(date - 3000);
+    (+post.get('meta').date).should.eql(date - 3000);
+    (+post.meta.visitors).should.eql(4815162342);
+    (+post.get('meta').visitors).should.eql(4815162342);
 
     db.close();
 

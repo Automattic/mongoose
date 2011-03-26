@@ -2684,6 +2684,9 @@ module.exports = {
         meta: meta
     });
 
+    post.get('meta').date.should.be.an.instanceof(Date);
+    post.meta.date.should.be.an.instanceof(Date);
+
     var threw = false;
     var getter1;
     var getter2;
@@ -2700,21 +2703,41 @@ module.exports = {
     getter1.should.eql(strmet);
     getter2.should.eql(strmet);
 
-    // set object directly
-    post.meta = {
-        date: date + 1000
+    post.meta.date = new Date - 1000;
+    post.meta.date.should.be.an.instanceof(Date);
+    post.get('meta').date.should.be.an.instanceof(Date);
+
+    post.meta.visitors = 2;
+    post.get('meta').visitors.should.be.an.instanceof(MongooseNumber);
+    post.meta.visitors.should.be.an.instanceof(MongooseNumber);
+
+    var newmeta = {
+        date: date - 2000
       , visitors: 234
     };
 
-    post.get('meta').date.should.be.an.instanceof(Date);
-    post.get('meta').visitors.should.be.an.instanceof(MongooseNumber);
-    post.meta.should.be.a('object');
+    post.set(newmeta, 'meta');
+
     post.meta.date.should.be.an.instanceof(Date);
+    post.get('meta').date.should.be.an.instanceof(Date);
     post.meta.visitors.should.be.an.instanceof(MongooseNumber);
-    (+post.get('meta').date).should.eql(date + 1000);
-    (+post.meta.date).should.eql(date + 1000);
-    post.get('meta').visitors.should.eql(234);
-    post.meta.visitors.should.eql(234);
+    post.get('meta').visitors.should.be.an.instanceof(MongooseNumber);
+    (+post.meta.date).should.eql(date - 2000);
+    (+post.get('meta').date).should.eql(date - 2000);
+    (+post.meta.visitors).should.eql(234);
+    (+post.get('meta').visitors).should.eql(234);
+
+    // set object directly
+    post.meta = newmeta;
+
+    post.meta.date.should.be.an.instanceof(Date);
+    post.get('meta').date.should.be.an.instanceof(Date);
+    post.meta.visitors.should.be.an.instanceof(MongooseNumber);
+    post.get('meta').visitors.should.be.an.instanceof(MongooseNumber);
+    (+post.meta.date).should.eql(date - 2000);
+    (+post.get('meta').date).should.eql(date - 2000);
+    (+post.meta.visitors).should.eql(234);
+    (+post.get('meta').visitors).should.eql(234);
 
     db.close();
 

@@ -2672,8 +2672,10 @@ module.exports = {
     var db = start()
       , BlogPost = db.model('BlogPost', collection);
 
+    var date = new Date;
+
     var meta = {
-        date: new Date
+        date: date
       , visitors: 5
     };
 
@@ -2696,6 +2698,22 @@ module.exports = {
     threw.should.be.false;
     getter1.should.eql(strmet);
     getter2.should.eql(strmet);
+
+    // set object directly
+    post.meta = {
+        date: date + 1000
+      , visitors: 234
+    };
+
+    post.get('meta').date.should.be.an.instanceof(Date);
+    post.get('meta').visitors.should.be.an.instanceof(MongooseNumber);
+    post.meta.should.be.a('object');
+    post.meta.date.should.be.an.instanceof(Date);
+    post.meta.visitors.should.be.an.instanceof(MongooseNumber);
+    (+post.get('meta').date).should.eql(date + 1000);
+    (+post.meta.date).should.eql(date + 1000);
+    post.get('meta').visitors.should.eql(234);
+    post.meta.visitors.should.eql(234);
 
     db.close();
 

@@ -2666,6 +2666,39 @@ module.exports = {
         db.close();
       });
     });
+  },
+
+  'test nested obj literal getter/setters': function () {
+    var db = start()
+      , BlogPost = db.model('BlogPost', collection);
+
+    var meta = {
+        date: new Date
+      , visitors: 5
+    };
+
+    var post = new BlogPost()
+    post.init({
+        meta: meta
+    });
+
+    var threw = false;
+    var getter;
+    var strmet;
+    try {
+      strmet = JSON.stringify(meta);
+      getter1 = JSON.stringify(post.get('meta'));
+      getter2 = JSON.stringify(post.meta);
+    } catch (err) {
+      threw = true;
+    }
+
+    threw.should.be.false;
+    getter1.should.eql(strmet);
+    getter2.should.eql(strmet);
+
+    db.close();
+
   }
 
 };

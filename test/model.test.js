@@ -2685,7 +2685,8 @@ module.exports = {
     });
 
     var threw = false;
-    var getter;
+    var getter1;
+    var getter2;
     var strmet;
     try {
       strmet = JSON.stringify(meta);

@@ -2740,7 +2740,6 @@ module.exports = {
     (+post.get('meta').visitors).should.eql(234);
 
     db.close();
-
   }
 
 };

@@ -460,7 +460,7 @@ module.exports = {
       , obj = doc.toObject();
 
     delete obj._id;
-    obj.should.eql({});
+    obj.should.eql({ oids: [] });
   }
 
 };

@@ -2014,44 +2014,57 @@ module.exports = {
     
     // array
     var post2 = new BlogPost();
-    post2.mixed = [{foo: 'bar'}];
+    post2.mixed = { name: "mr bungle", arr: [] };
     post2.save(function (err) {
       should.strictEqual(err, null);
 
       BlogPost.findById(post2._id, function (err, doc){
         should.strictEqual(err, null);
 
-        Array.isArray(doc.mixed).should.be.true;
-        doc.mixed.push({ hello: 'world' });
-        doc.commit('mixed');
+        Array.isArray(doc.mixed.arr).should.be.true;
 
-        doc.save(function (err, doc) {
+        doc.mixed = [{foo: 'bar'}];
+        doc.save(function (err) {
           should.strictEqual(err, null);
 
-          BlogPost.findById(post2._id, function (err, doc) {
+          BlogPost.findById(doc._id, function (err, doc){
             should.strictEqual(err, null);
 
-            doc.mixed[0].should.eql({ foo: 'bar' });
-            doc.mixed[1].should.eql({ hello: 'world' });
-            --count || db.close();
+            Array.isArray(doc.mixed).should.be.true;
+            doc.mixed.push({ hello: 'world' });
+            doc.commit('mixed');
+
+            doc.save(function (err, doc) {
+              should.strictEqual(err, null);
+
+              BlogPost.findById(post2._id, function (err, doc) {
+                should.strictEqual(err, null);
+
+                doc.mixed[0].should.eql({ foo: 'bar' });
+                doc.mixed[1].should.eql({ hello: 'world' });
+                --count || db.close();
+              });
+            });
+          });
+
+          // date
+          var post3 = new BlogPost();
+          post3.mixed = new Date;
+          post3.save(function (err) {
+            should.strictEqual(err, null);
+
+            BlogPost.findById(post3._id, function (err, doc) {
+              should.strictEqual(err, null);
+
+              doc.mixed.should.be.an.instanceof(Date);
+              --count || db.close();
+            });
           });
         });
-      });
 
-      // date
-      var post3 = new BlogPost();
-      post3.mixed = new Date;
-      post3.save(function (err) {
-        should.strictEqual(err, null);
-
-        BlogPost.findById(post3._id, function (err, doc) {
-          should.strictEqual(err, null);
-
-          doc.mixed.should.be.an.instanceof(Date);
-          --count || db.close();
-        });
       });
     });
+
   },
 
   // GH-200

@@ -1,4 +1,14 @@
 
+1.1.15 / 2011-03-28
+===================
+
+  * Fixed; `null` and `undefined` are set atomically.
+
+1.1.14 / 2011-03-28
+===================
+
+  * Changed; more forgiving date casting, accepting '' as null.
+
 1.1.13 / 2011-03-26
 ===================
 

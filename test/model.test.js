@@ -2741,7 +2741,6 @@ module.exports = {
     (+post.get('meta').visitors).should.eql(234);
 
     // set object directly
-    //post.meta = newmeta;
     post.meta = {
         date: date - 3000
       , visitors: 4815162342
@@ -2757,6 +2756,22 @@ module.exports = {
     (+post.get('meta').visitors).should.eql(4815162342);
 
     db.close();
-  }
+  },
 
+  'nested object property access should work when initd with null': function () {
+    var db = start()
+      , schema = new Schema({
+          nest: {
+            st: String
+          }
+        });
+
+    mongoose.model('NestedString', schema);
+    var T = db.model('NestedString', collection);
+
+    var t = new T({ nest: null });
+    t.nest.st.should.eql(undefined);
+    db.close();
+
+  }
 };

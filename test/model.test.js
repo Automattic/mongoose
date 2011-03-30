@@ -2772,8 +2772,10 @@ module.exports = {
 
     var t = new T({ nest: null });
 
-    t.nest.should.eql({});
     should.strictEqual(t.nest.st, null);
+    t.nest = { st: "jsconf rules" };
+    t.nest.toObject().should.eql({ st: "jsconf rules" });
+    t.nest.st.should.eql("jsconf rules");
 
     db.close();
   },
@@ -2792,8 +2794,10 @@ module.exports = {
 
     var t = new T({ nest: undefined });
 
-    t.nest.should.eql({});
     should.strictEqual(t.nest.st, undefined);
+    t.nest = { st: "jsconf rules" };
+    t.nest.toObject().should.eql({ st: "jsconf rules" });
+    t.nest.st.should.eql("jsconf rules");
 
     db.close();
 

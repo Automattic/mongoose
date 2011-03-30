@@ -1,4 +1,9 @@
 
+1.1.17 / 2011-03-30
+===================
+
+  * Fixed; nested object property access works when root initd with null value
+
 1.1.16 / 2011-03-28
 ===================
 

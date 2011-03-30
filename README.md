@@ -266,7 +266,6 @@ the `1` branch is nearing its completion).
 - Nathan White - [nw](http://github.com/nw/)
 - Brian Noguchi - [bnoguchi](https://github.com/bnoguchi)
 
-great work guys....keep it up.
 
 ## License
 

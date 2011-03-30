@@ -2758,19 +2758,43 @@ module.exports = {
     db.close();
   },
 
-  'nested object property access should work when initd with null': function () {
+  'nested object property access works when root initd with null': function () {
     var db = start()
-      , schema = new Schema({
-          nest: {
-            st: String
-          }
-        });
 
-    mongoose.model('NestedString', schema);
-    var T = db.model('NestedString', collection);
+    var schema = new Schema({
+      nest: {
+        st: String
+      }
+    });
+
+    mongoose.model('NestedStringA', schema);
+    var T = db.model('NestedStringA', collection);
 
     var t = new T({ nest: null });
-    t.nest.st.should.eql(undefined);
+
+    t.nest.should.eql({});
+    should.strictEqual(t.nest.st, null);
+
+    db.close();
+  },
+
+  'nested object property access works when root initd with undefined': function () {
+    var db = start()
+
+    var schema = new Schema({
+      nest: {
+        st: String
+      }
+    });
+
+    mongoose.model('NestedStringB', schema);
+    var T = db.model('NestedStringB', collection);
+
+    var t = new T({ nest: undefined });
+
+    t.nest.should.eql({});
+    should.strictEqual(t.nest.st, undefined);
+
     db.close();
 
   }

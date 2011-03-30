@@ -492,6 +492,11 @@ Collection.prototype.mapReduce = function(map, reduce, options, callback) {
   // Execute command against server
   this.db.executeCommand(DbCommand.createDbCommand(this.db, mapCommandHash), function(err, result) {
     if(err == null && result.documents[0].ok == 1) {
+      //return the results, if the map/reduce is invoked with inline option
+      if(result.documents[0].results)  {
+      	return callback(err, result.documents[0].results);
+      }
+    	
       // Create a collection object that wraps the result collection
       self.db.collection(result.documents[0].result, function(err, collection) {
         if(options.include_statistics) {

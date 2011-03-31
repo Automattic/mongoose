@@ -2809,7 +2809,7 @@ module.exports = {
     })
   },
 
-  're-saving existing object with existing null nested object works': function(){
+  're-saving object with pre-existing null nested object': function(){
     var db = start()
 
     var schema = new Schema({

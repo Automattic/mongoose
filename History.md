@@ -1,4 +1,9 @@
 
+1.1.20 / 2011-03-31
+===================
+
+  * Fixed; setting multiple props on null field works
+
 1.1.19 / 2011-03-31
 ===================
 

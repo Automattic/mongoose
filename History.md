@@ -1,4 +1,9 @@
 
+1.1.19 / 2011-03-31
+===================
+
+  * Fixed; no longer using $set on paths to an unexisting fields
+
 1.1.18 / 2011-03-30
 ===================
 

@@ -3,7 +3,17 @@
  * Module dependencies.
  */
 
-var Query = require('mongoose/query');
+var Query = require('mongoose/query')
+  , start = require('./common')
+  , mongoose = start.mongoose
+  , DocumentObjectId = mongoose.Types.ObjectId
+  , Schema = mongoose.Schema
+
+var Product = new Schema({
+    tags: {} // mixed
+});
+
+mongoose.model('Product', Product);
 
 /**
  * Test.
@@ -523,6 +533,18 @@ module.exports = {
     }
 
     threw.should.eql(false);
+  },
+
+  'test casting an array set to mixed type works': function () {
+    var query = new Query();
+    var db = start();
+    var Product = db.model('Product');
+    var params = { _id: new DocumentObjectId, tags: { $in: [ 4, 8, 15, 16 ] }};
+
+    query.cast(Product, params);
+
+    params.tags.$in.should.eql([4,8,15,16]);
+    db.close();
   },
 
   // Advanced Query options

@@ -2834,9 +2834,16 @@ module.exports = {
         T.findById(t.id, function (err, t) {
           should.strictEqual(err, null);
           t.nest.st.should.eql("jsconf rules");
-          db.close();
-        })
-      })
-    })
+          t.nest.yep.should.eql("it does");
+
+          t.nest = null;
+          t.save(function (err) {
+            should.strictEqual(err, null);
+            should.strictEqual(t.doc.nest, null);
+            db.close();
+          });
+        });
+      });
+    });
   }
 };

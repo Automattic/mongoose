@@ -2814,7 +2814,8 @@ module.exports = {
 
     var schema = new Schema({
       nest: {
-        st: String
+          st: String
+        , yep: String
       }
     });
 
@@ -2826,7 +2827,7 @@ module.exports = {
     t.save(function (err) {
       should.strictEqual(err, null);
 
-      t.nest = { st: "jsconf rules" };
+      t.nest = { st: "jsconf rules", yep: "it does" };
       t.save(function (err) {
         should.strictEqual(err, null);
 

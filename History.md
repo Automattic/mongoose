@@ -1,4 +1,9 @@
 
+1.1.21 / 2011-03-31
+===================
+
+  * Fixed; setting object root to null/undefined works
+
 1.1.20 / 2011-03-31
 ===================
 

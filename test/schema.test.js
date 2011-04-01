@@ -334,6 +334,10 @@ module.exports = {
     Loki.path('owner').doValidate(null, function(err){
       err.should.be.an.instanceof(ValidatorError);
     });
+
+    Loki.path('owner').doValidate(undefined, function(err){
+      err.should.be.an.instanceof(ValidatorError);
+    });
   },
 
   'test object id casting': function(){

@@ -1,4 +1,9 @@
 
+1.1.24 / 2011-04-03
+===================
+
+  * fixed; pushing an array onto an Array works on existing docs
+
 1.1.23 / 2011-04-01
 ===================
 

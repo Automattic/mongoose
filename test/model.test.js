@@ -2032,6 +2032,7 @@ module.exports = {
 
             Array.isArray(doc.mixed).should.be.true;
             doc.mixed.push({ hello: 'world' });
+            doc.mixed.push([ 'foo', 'bar' ]);
             doc.commit('mixed');
 
             doc.save(function (err, doc) {
@@ -2042,6 +2043,7 @@ module.exports = {
 
                 doc.mixed[0].should.eql({ foo: 'bar' });
                 doc.mixed[1].should.eql({ hello: 'world' });
+                doc.mixed[2].should.eql(['foo','bar']);
                 --count || db.close();
               });
             });

@@ -2847,5 +2847,50 @@ module.exports = {
         });
       });
     });
+  },
+
+  'pushing to a nested array of Mixed works on existing doc': function () {
+    var db = start();
+
+    mongoose.model('MySchema', new Schema({
+      nested: {
+        arrays: []
+      }
+    }));
+
+    var DooDad = db.model('MySchema')
+      , doodad = new DooDad({ nested: { arrays: [] } })
+      , date = 1234567890;
+
+    doodad.nested.arrays.push(["+10", "yup", date]);
+
+    doodad.save(function (err) {
+      should.strictEqual(err, null);
+
+      DooDad.findById(doodad._id, function (err, doodad) {
+        should.strictEqual(err, null);
+
+        doodad.nested.arrays.toObject().should.eql([['+10','yup',date]]);
+
+        doodad.nested.arrays.push(["another", 1]);
+
+        doodad.save(function (err) {
+          should.strictEqual(err, null);
+
+          DooDad.findById(doodad._id, function (err, doodad) {
+            should.strictEqual(err, null);
+
+            doodad
+            .nested
+            .arrays
+            .toObject()
+            .should.eql([['+10','yup',date], ["another", 1]]);
+
+            db.close();
+          });
+        });
+      })
+    });
+
   }
 };

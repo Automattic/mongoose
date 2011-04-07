@@ -1507,6 +1507,39 @@ module.exports = {
     });
   },
 
+  // GH-310
+  'test setting a subdocument atomically': function () {
+    var db = start()
+      , BlogPost = db.model('BlogPost', collection)
+
+    BlogPost.create({
+      comments: [{ title: 'first-title', body: 'first-body'}]
+    }, function (err, blog) {
+      should.strictEqual(null, err);
+      BlogPost.findById(blog.id, function (err, agent1blog) {
+        should.strictEqual(null, err);
+        BlogPost.findById(blog.id, function (err, agent2blog) {
+          should.strictEqual(null, err);
+          agent1blog.get('comments')[0].title = 'second-title';
+          agent1blog.save( function (err) {
+            should.strictEqual(null, err);
+            agent2blog.get('comments')[0].body = 'second-body';
+            agent2blog.save( function (err) {
+              should.strictEqual(null, err);
+              BlogPost.findById(blog.id, function (err, foundBlog) {
+                should.strictEqual(null, err);
+                db.close();
+                var comment = foundBlog.get('comments')[0];
+                comment.title.should.eql('second-title');
+                comment.body.should.eql('second-body');
+              });
+            });
+          });
+        });
+      });
+    });
+  },
+
   'test doubly nested array saving and loading': function(){
     var Inner = new Schema({
         arr: [Number]

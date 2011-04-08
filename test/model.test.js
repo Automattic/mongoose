@@ -1225,6 +1225,44 @@ module.exports = {
     });
   },
 
+  'test post init middleware': function () {
+    var schema = new Schema({
+        title: String
+    });
+
+    var preinit = 0
+      , postinit = 0
+
+    schema.pre('init', function (next) {
+      ++preinit;
+      next();
+    });
+
+    schema.post('init', function () {
+      ++postinit;
+    });
+
+    mongoose.model('TestPostInitMiddleware', schema);
+
+    var db = start()
+      , Test = db.model('TestPostInitMiddleware');
+
+    var test = new Test({ title: "banana" });
+
+    test.save(function(err){
+      should.strictEqual(err, null);
+
+      Test.findById(test._id, function (err, test) {
+        should.strictEqual(err, null);
+        preinit.should.eql(1);
+        postinit.should.eql(1);
+        test.remove(function(err){
+          db.close();
+        });
+      });
+    });
+  },
+
   'test updating documents': function () {
     var db = start()
       , BlogPost = db.model('BlogPost', collection)

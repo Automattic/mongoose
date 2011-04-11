@@ -1,4 +1,9 @@
 
+1.2.0 / 2011-04-11
+===================
+
+  * changed; MongooseNumber now casts empty string to null
+
 1.1.25 / 2011-04-08
 ===================
 

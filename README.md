@@ -240,6 +240,17 @@ You can find the [Dox](http://github.com/visionmedia/dox) generated API docs at
 Please subscribe to the Google Groups [mailing
 list](http://groups.google.com/group/mongoose-orm/boxsubscribe).
 
+## Mongoose Plugins
+
+The following plugins are currently available for use with mongoose:
+
+- [mongoose-types](https://github.com/bnoguchi/mongoose-types) - Adds
+  several additional types (e.g., Email) that you can use in your
+  Schema declarations
+- [mongoose-auth](https://github.com/bnoguchi/mongoose-auth) - A drop in 
+  solution for your auth needs. Currently supports Password, Facebook,
+  Twitter, Github, and more.
+
 ## Contributing to Mongoose
 
 ### Cloning the repository

@@ -126,8 +126,8 @@ access it through the same function
 We can then instantiate it, and save it:
 
     var instance = new myModel();
-    myModel.my.key = 'hello';
-    myModel.save(function (err) {
+    instance.my.key = 'hello';
+    instance.save(function (err) {
       //
     });
 

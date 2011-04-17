@@ -9,4 +9,8 @@
   , "scripts": { "test": "make test" }
   , "main": "./index.js"
   , "engines": { "node": ">= 0.2.0" }
+  , "repository": {
+        "type": "git"
+      , "url": "git://github.com/LearnBoost/mongoose.git"
+    }
 }

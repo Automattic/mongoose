@@ -719,6 +719,32 @@ module.exports = {
     });
   },
 
+  // GH-319
+  'save callback should only execute once regardless of number of failed validations': function () {
+    mongoose.model('CallbackFiresOnceValidation', new Schema({
+        username: { type: String, validate: /^[a-z]{6}$/i }
+      , email: { type: String, validate: /^[a-z]{6}$/i }
+      , password: { type: String, validate: /^[a-z]{6}$/i }
+    }));
+
+    var db = start()
+      , CallbackFiresOnceValidation = db.model('CallbackFiresOnceValidation');
+
+    var post = new CallbackFiresOnceValidation({
+        username: "nope"
+      , email: "too"
+      , password: "short"
+    });
+
+    var timesCalled = 0;
+
+    post.save(function (err) {
+      err.should.be.an.instanceof(MongooseError);
+      err.should.be.an.instanceof(ValidatorError);
+      (++timesCalled).should.eql(1);
+    });
+  },
+
   'test validation on a query result': function () {
     mongoose.model('TestValidationOnResult', new Schema({
         resultv: { type: String, required: true }

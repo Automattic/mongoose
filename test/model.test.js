@@ -12,6 +12,7 @@ var start = require('./common')
   , SchemaType = mongoose.SchemaType
   , CastError = SchemaType.CastError
   , ValidatorError = SchemaType.ValidatorError
+  , ValidationError = mongoose.Document.ValidationError
   , ObjectId = Schema.ObjectId
   , DocumentObjectId = mongoose.Types.ObjectId
   , DocumentArray = mongoose.Types.DocumentArray
@@ -660,7 +661,7 @@ module.exports = {
 
     post.save(function(err){
       err.should.be.an.instanceof(MongooseError);
-      err.should.be.an.instanceof(ValidatorError);
+      err.should.be.an.instanceof(ValidationError);
 
       post.set('simple', 'here');
       post.save(function(err){
@@ -686,8 +687,9 @@ module.exports = {
 
     post.save(function(err){
       err.should.be.an.instanceof(MongooseError);
-      err.should.be.an.instanceof(ValidatorError);
-      err.message.should.equal('Validator "must be abc" failed for path simple');
+      err.should.be.an.instanceof(ValidationError);
+      err.errors.simple.should.equal('Validator "must be abc" failed for path simple');
+      post.errors.simple.should.equal('Validator "must be abc" failed for path simple');
 
       post.set('simple', 'abc');
       post.save(function(err){
@@ -709,7 +711,7 @@ module.exports = {
 
     post.save(function(err){
       err.should.be.an.instanceof(MongooseError);
-      err.should.be.an.instanceof(ValidatorError);
+      err.should.be.an.instanceof(ValidationError);
 
       post.set('simple', 'here');
       post.save(function(err){
@@ -740,8 +742,21 @@ module.exports = {
 
     post.save(function (err) {
       err.should.be.an.instanceof(MongooseError);
-      err.should.be.an.instanceof(ValidatorError);
+      err.should.be.an.instanceof(ValidationError);
+
       (++timesCalled).should.eql(1);
+
+      (Object.keys(err.errors).length).should.eql(3);
+      err.errors.password.should.eql('Validator failed for path password');
+      err.errors.email.should.eql('Validator failed for path email');
+      err.errors.username.should.eql('Validator failed for path username');
+
+      (Object.keys(post.errors).length).should.eql(3);
+      post.errors.password.should.eql('Validator failed for path password');
+      post.errors.email.should.eql('Validator failed for path email');
+      post.errors.username.should.eql('Validator failed for path username');
+
+      db.close();
     });
   },
 
@@ -757,7 +772,7 @@ module.exports = {
 
     post.validate(function (err) {
       err.should.be.an.instanceof(MongooseError);
-      err.should.be.an.instanceof(ValidatorError);
+      err.should.be.an.instanceof(ValidationError);
 
       post.resultv = 'yeah';
       post.save(function (err) {
@@ -793,7 +808,7 @@ module.exports = {
 
         found.validate(function(err){
           err.should.be.an.instanceof(MongooseError);
-          err.should.be.an.instanceof(ValidatorError);
+          err.should.be.an.instanceof(ValidationError);
 
           found.set('previous', 'yoyo');
           found.save(function (err) {
@@ -820,7 +835,7 @@ module.exports = {
 
     post.save(function(err){
       err.should.be.an.instanceof(MongooseError);
-      err.should.be.an.instanceof(ValidatorError);
+      err.should.be.an.instanceof(ValidationError);
 
       post.set('nested.required', 'here');
       post.save(function(err){
@@ -848,7 +863,7 @@ module.exports = {
 
     post.save(function(err){
       err.should.be.an.instanceof(MongooseError);
-      err.should.be.an.instanceof(ValidatorError);
+      err.should.be.an.instanceof(ValidationError);
 
       post.get('items')[0].set('required', true);
       post.save(function(err){
@@ -879,7 +894,7 @@ module.exports = {
 
     post.save(function(err){
       err.should.be.an.instanceof(MongooseError);
-      err.should.be.an.instanceof(ValidatorError);
+      err.should.be.an.instanceof(ValidationError);
       executed.should.be.true;
       executed = false;
 
@@ -916,13 +931,13 @@ module.exports = {
 
     post.save(function(err){
       err.should.be.an.instanceof(MongooseError);
-      err.should.be.an.instanceof(ValidatorError);
+      err.should.be.an.instanceof(ValidationError);
       executed.should.be.true;
       executed = false;
 
       post.validate(function(err){
         err.should.be.an.instanceof(MongooseError);
-        err.should.be.an.instanceof(ValidatorError);
+        err.should.be.an.instanceof(ValidationError);
         executed.should.be.true;
         executed = false;
 
@@ -970,7 +985,7 @@ module.exports = {
 
     post.save(function(err){
       err.should.be.an.instanceof(MongooseError);
-      err.should.be.an.instanceof(ValidatorError);
+      err.should.be.an.instanceof(ValidationError);
       executed.should.be.true;
       executed = false;
 
@@ -1000,7 +1015,7 @@ module.exports = {
 
     post.validate(function(err){
       err.should.be.an.instanceof(MongooseError);
-      err.should.be.an.instanceof(ValidatorError);
+      err.should.be.an.instanceof(ValidationError);
       should.strictEqual(post.isNew, true);
 
       post.item = 'yo';

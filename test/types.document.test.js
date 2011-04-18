@@ -10,6 +10,7 @@ var should = require('should')
   , Schema = mongoose.Schema
   , SchemaType = mongoose.SchemaType
   , ValidatorError = SchemaType.ValidatorError
+  , ValidationError = mongoose.Document.ValidationError
 
 /**
  * Setup.
@@ -44,7 +45,7 @@ module.exports = {
       a.set('test', '');
 
       a.save(function(err){
-        err.should.be.an.instanceof(ValidatorError);
+        err.should.be.an.instanceof(ValidationError);
       });
     },
 

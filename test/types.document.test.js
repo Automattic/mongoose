@@ -32,6 +32,7 @@ Subdocument.prototype.__proto__ = EmbeddedDocument.prototype;
 
 Subdocument.prototype.schema = new Schema({
     test: { type: String, required: true }
+  , work: { type: String, validate: /^good/ }
 });
 
 /**
@@ -39,19 +40,22 @@ Subdocument.prototype.schema = new Schema({
  */
 
 module.exports = {
-  
+
     'test that save fires errors': function(){
       var a = new Subdocument();
       a.set('test', '');
+      a.set('work', 'nope');
 
       a.save(function(err){
         err.should.be.an.instanceof(ValidationError);
+        err.toString().should.eql('ValidationError: Validator "required" failed for path test, Validator failed for path work');
       });
     },
 
     'test that save fires with null if no errors': function(){
       var a = new Subdocument();
       a.set('test', 'cool');
+      a.set('work', 'goods');
 
       a.save(function(err){
         should.strictEqual(err, null);

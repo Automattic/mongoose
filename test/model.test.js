@@ -864,6 +864,7 @@ module.exports = {
     post.save(function(err){
       err.should.be.an.instanceof(MongooseError);
       err.should.be.an.instanceof(ValidationError);
+      err.errors.required.should.eql('Validator "required" failed for path required');
 
       post.get('items')[0].set('required', true);
       post.save(function(err){
@@ -895,6 +896,7 @@ module.exports = {
     post.save(function(err){
       err.should.be.an.instanceof(MongooseError);
       err.should.be.an.instanceof(ValidationError);
+      err.errors.async.should.eql('Validator "async validator" failed for path async');
       executed.should.be.true;
       executed = false;
 
@@ -916,7 +918,7 @@ module.exports = {
         fn(v !== 'test');
       }, 50);
     };
-    
+
     mongoose.model('TestNestedAsyncValidation', new Schema({
         nested: {
             async: { type: String, validate: [validator, 'async validator'] }

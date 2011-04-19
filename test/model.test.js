@@ -3008,5 +3008,58 @@ module.exports = {
       })
     });
 
+  },
+
+  'directly setting nested props works when property is named "type"': function () {
+    var db = start();
+
+    function def () {
+      return [{ x: 1 }, { x: 2 }, { x:3 }]
+    }
+
+    mongoose.model('MySchema2', new Schema({
+      nested: {
+          type: { type: String, default: 'yep' }
+        , array: {
+            type: Array, default: def
+          }
+      }
+    }));
+
+    var DooDad = db.model('MySchema2', collection)
+      , doodad = new DooDad()
+
+    doodad.save(function (err) {
+      should.strictEqual(err, null);
+
+      DooDad.findById(doodad._id, function (err, doodad) {
+        should.strictEqual(err, null);
+
+        doodad.nested.type.should.eql("yep");
+        doodad.nested.array.toObject().should.eql([{x:1},{x:2},{x:3}]);
+
+        doodad.nested.type = "nope";
+        doodad.nested.array = ["some", "new", "stuff"];
+
+        doodad.save(function (err) {
+          should.strictEqual(err, null);
+
+          DooDad.findById(doodad._id, function (err, doodad) {
+            should.strictEqual(err, null);
+            db.close();
+
+            doodad.nested.type.should.eql("nope");
+
+            doodad
+            .nested
+            .array
+            .toObject()
+            .should.eql(["some", "new", "stuff"]);
+
+          });
+        });
+      })
+    });
+
   }
 };

@@ -1,4 +1,11 @@
 
+1.3.0 / 2011-04-19
+===================
+
+  * changed; save() callbacks now fire only once on failed validation
+  * changed; Errors returned from save() callbacks now instances of ValidationError
+  * fixed; MongooseArray#indexOf now works properly
+
 1.2.0 / 2011-04-11
 ===================
 

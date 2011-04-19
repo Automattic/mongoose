@@ -468,9 +468,10 @@ module.exports = {
       , comments    : [ { title: 'Test', date: new Date, body: 'Test' } ]
     });
 
-    post.isModified('comments').should.be.false;
+    post.isModified('comments.0.title').should.be.false;
     post.get('comments')[0].set('title', 'Woot');
-    post.isModified('comments').should.be.true;
+    post.isModified('comments').should.be.false;
+    post.isModified('comments.0.title').should.be.true;
 
     db.close();
   },
@@ -486,9 +487,10 @@ module.exports = {
       , comments    : [ { title: 'Test', date: new Date, body: 'Test' } ]
     });
 
-    post.isModified('comments').should.be.false;
+    post.isModified('comments.0.body').should.be.false;
     post.get('comments')[0].body = 'Woot';
-    post.isModified('comments').should.be.true;
+    post.isModified('comments').should.be.false;
+    post.isModified('comments.0.body').should.be.true;
 
     db.close();
   },
@@ -1648,11 +1650,11 @@ module.exports = {
           should.strictEqual(err, null);
           found.get('_id').should.be.an.instanceof(DocumentObjectId);
           Outer.findById(found.get('_id'), function(err, found2) {
+            db.close();
             should.strictEqual(err, null);
             should.equal(1, found2.inner.length);
             should.equal(1, found2.inner[0].arr.length);
             should.equal(5, found2.inner[0].arr[0]);
-            db.close();
           });
         });
       });

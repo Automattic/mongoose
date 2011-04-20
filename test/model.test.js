@@ -457,6 +457,23 @@ module.exports = {
     db.close();
   },
 
+  'setting a key identically to its current value should not dirty the key': function () {
+    var db = start()
+      , BlogPost = db.model('BlogPost', collection);
+
+    var post = new BlogPost()
+    post.init({
+        title       : 'Test'
+      , slug        : 'test'
+      , date        : new Date
+    });
+
+    post.isModified('title').should.be.false;
+    post.set('title', 'Test');
+    post.isModified('title').should.be.false;
+    db.close();
+  },
+
   'test isModified on a DocumentArray': function(){
     var db = start()
       , BlogPost = db.model('BlogPost', collection);

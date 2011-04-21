@@ -286,10 +286,33 @@ module.exports = {
 
   'test a model structure when saved': function(){
     var db = start()
-      , BlogPost = db.model('BlogPost', collection);
+      , BlogPost = db.model('BlogPost', collection)
+      , pending = 2;
+
+    function done () {
+      if (!--pending) db.close();
+    }
 
     var post = new BlogPost();
-    post.save(function(err){
+    post.on('save', function (post) {
+      post.get('_id').should.be.an.instanceof(DocumentObjectId);
+
+      should.equal(undefined, post.get('title'));
+      should.equal(undefined, post.get('slug'));
+      should.equal(undefined, post.get('date'));
+      should.equal(undefined, post.get('published'));
+
+      post.get('meta').should.be.a('object');
+      post.get('meta').should.eql({});
+      should.equal(undefined, post.get('meta.date'));
+      should.equal(undefined, post.get('meta.visitors'));
+
+      post.get('owners').should.be.an.instanceof(MongooseArray);
+      post.get('comments').should.be.an.instanceof(DocumentArray);
+      done();
+    });
+
+    post.save(function(err, post){
       should.strictEqual(err, null);
       post.get('_id').should.be.an.instanceof(DocumentObjectId);
 
@@ -305,7 +328,7 @@ module.exports = {
 
       post.get('owners').should.be.an.instanceof(MongooseArray);
       post.get('comments').should.be.an.instanceof(DocumentArray);
-      db.close();
+      done();
     });
   },
 

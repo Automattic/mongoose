@@ -118,6 +118,19 @@ module.exports = {
     db.close();
   },
 
+  'mongoose.model returns the model at creation': function () {
+    var Named = mongoose.model('Named', new Schema({ name: String }));
+    var n1 = new Named();
+    should.equal(n1.name, null);
+    var n2 = new Named({ name: 'Peter Bjorn' });
+    should.equal(n2.name, 'Peter Bjorn');
+
+    var schema = new Schema({ number: Number });
+    var Numbered = mongoose.model('Numbered', schema, collection);
+    var n3 = new Numbered({ number: 1234 });
+    n3.number.valueOf().should.equal(1234);
+  },
+
   'test default Array type casts to Mixed': function () {
     var db = start()
       , DefaultArraySchema = new Schema({
@@ -1138,7 +1151,7 @@ module.exports = {
     (+post.get('items')[0].get('date')).should.eql(now);
     db.close();
   },
-  
+
   // TODO: adapt this text to handle a getIndexes callback that's not unique to
   // the mongodb-native driver.
   'test that indexes are ensured when the model is compiled': function(){
@@ -1150,10 +1163,8 @@ module.exports = {
 
     Indexed.index({ last: 1, email: 1 }, { unique: true });
 
-    mongoose.model('IndexedModel', Indexed);
-
     var db = start()
-      , IndexedModel = db.model('IndexedModel', 'indexedmodel' + random())
+      , IndexedModel = db.model('IndexedModel', Indexed, 'indexedmodel' + random())
       , assertions = 0;
 
     IndexedModel.on('index', function(){
@@ -1188,16 +1199,14 @@ module.exports = {
       , blogposts   : [BlogPosts]
     });
 
-    mongoose.model('DeepIndexedModel', User);
-
     var db = start()
-      , UserModel = db.model('DeepIndexedModel', 'deepindexedmodel' + random())
+      , UserModel = db.model('DeepIndexedModel', User, 'deepindexedmodel' + random())
       , assertions = 0;
 
     UserModel.on('index', function () {
       UserModel.collection.getIndexes(function (err, indexes) {
         should.strictEqual(err, null);
-        
+
         for (var i in indexes)
           indexes[i].forEach(function(index){
             if (index[0] == 'name')
@@ -2486,7 +2495,7 @@ module.exports = {
       , email : { type: String, unique: true }
     });
 
-    mongoose.model('SafeHuman', Human);
+    mongoose.model('SafeHuman', Human, true);
 
     var db = start()
       , Human = db.model('SafeHuman', 'safehuman' + random());
@@ -2498,7 +2507,7 @@ module.exports = {
 
     me.save(function (err) {
       should.strictEqual(err, null);
-      
+
       Human.findById(me._id, function (err, doc){
         should.strictEqual(err, null);
         doc.email.should.eql('rauchg@gmail.com');
@@ -2526,7 +2535,7 @@ module.exports = {
     // turn it off
     Human.set('safe', false);
 
-    mongoose.model('UnsafeHuman', Human);
+    mongoose.model('UnsafeHuman', Human, true);
 
     var db = start()
       , Human = db.model('UnsafeHuman', 'unsafehuman' + random());
@@ -2538,7 +2547,7 @@ module.exports = {
 
     me.save(function (err) {
       should.strictEqual(err, null);
-      
+
       Human.findById(me._id, function (err, doc){
         should.strictEqual(err, null);
         doc.email.should.eql('rauchg@gmail.com');

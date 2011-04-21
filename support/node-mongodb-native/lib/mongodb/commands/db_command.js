@@ -92,16 +92,41 @@ DbCommand.createResetErrorHistoryCommand = function(db) {
 DbCommand.createCreateIndexCommand = function(db, collectionName, fieldOrSpec, unique) {
   var finalUnique = unique == null ? false : unique;
   var fieldHash = {};
-  var finalFieldOrSpec = fieldOrSpec.constructor == String ? [[fieldOrSpec, 1]] : fieldOrSpec;
   var indexes = [];
+  var keys;
 
-  // Get all the fields
-  finalFieldOrSpec.forEach(function(indexArray) {
-    var indexArrayFinal = indexArray;
-    if(indexArrayFinal.length == 1) indexArrayFinal[1] = 1;
-    fieldHash[indexArrayFinal[0]] = indexArrayFinal[1];
-    indexes.push(indexArrayFinal[0] + "_" + indexArrayFinal[1]);
-  });
+  // Get all the fields accordingly
+  if (fieldOrSpec.constructor === String) {             // 'type'
+    indexes.push(fieldOrSpec + '_' + 1);
+    fieldHash[fieldOrSpec] = 1;
+  } else if (fieldOrSpec.constructor === Array) {       // [{location:'2d'}, ...]
+    fieldOrSpec.forEach(function(f) {
+      if (f.constructor === String) {                   // [{location:'2d'}, 'type']
+        indexes.push(f + '_' + 1);
+        fieldHash[f] = 1;
+      } else if (f.constructor === Array) {             // [['location', '2d'],['type', 1]]
+        indexes.push(f[0] + '_' + (f[1] || 1));
+        fieldHash[f[0]] = f[1] || 1;
+      } else if (f.constructor === Object) {            // [{location:'2d'}, {type:1}]
+        keys = Object.keys(f);
+        keys.forEach(function(k) {
+          indexes.push(k + '_' + f[k]);
+          fieldHash[k] = f[k];
+      });
+      } else {
+        // undefined
+      }
+    });
+  } else if (fieldOrSpec.constructor === Object) {  // {location:'2d', type:1}
+    keys = Object.keys(fieldOrSpec);
+    keys.forEach(function(key) {
+      indexes.push(key + '_' + fieldOrSpec[key]);
+      fieldHash[key] = fieldOrSpec[key];
+    });
+  } else {
+    // undefined
+  }
+  
   // Generate the index name
   var indexName = indexes.join("_");
   // Build the selector

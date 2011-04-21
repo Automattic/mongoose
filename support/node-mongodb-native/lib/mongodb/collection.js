@@ -85,7 +85,7 @@ Collection.prototype.checkCollectionName = function(collectionName) {
 Collection.prototype.remove = function(selector, options, callback) {
   var args = Array.prototype.slice.call(arguments, 0);
   callback = args.pop();
-  removeSelector = args.length ? args.shift() : {};
+  var removeSelector = args.length ? args.shift() : {};
   options = args.length ? args.shift() : {};
 
   // Generate selector for remove all if not available
@@ -347,55 +347,65 @@ Collection.prototype.findAndModify = function(query, sort, update, options, call
 
 /**
  * Various argument possibilities
- * 1 callback
- * 2 selector, callback,
- * 2 callback, options  // really?!
- * 3 selector, fields, callback
- * 3 selector, options, callback
- * 4,selector, fields, options, callback
- * 5 selector, fields, skip, limit, callback
- * 6 selector, fields, skip, limit, timeout, callback
+ * 1 callback?
+ * 2 selector, callback?,
+ * 2 callback?, options  // really?!
+ * 3 selector, fields, callback?
+ * 3 selector, options, callback?
+ * 4,selector, fields, options, callback?
+ * 5 selector, fields, skip, limit, callback?
+ * 6 selector, fields, skip, limit, timeout, callback?
  *
  * Available options:
  * limit, sort, fields, skip, hint, explain, snapshot, timeout, tailable, batchSize
  */
 Collection.prototype.find = function() {
   var options,
-      len = arguments.length,
-      selector = (len > 1) ? arguments[0] : {},
-      fields = (len > 2) ? arguments[1] : undefined,
-      callback = arguments[len-1];
+      args = Array.prototype.slice.call(arguments, 0);
+      has_callback = typeof args[args.length - 1] === 'function',
+      has_weird_callback = typeof args[0] === 'function',
+      callback = has_callback ? args.pop() : (has_weird_callback ? args.shift() : null),
+      len = args.length,
+      selector = (len >= 1) ? args[0] : {},
+      fields = (len >= 2) ? args[1] : undefined;
 
-  if(len == 2 && typeof arguments[0] == 'function') {
-    selector = {}; options = arguments[1]; callback = arguments[0];
+  if(len == 1 && has_weird_callback) { // backwards compat for callback?, options case
+    selector = {};
+    options = args[0];
   }
 
-  if(len == 3){ // backwards compat for options object
+  if(len == 2){ // backwards compat for options object
     var test = ['limit','sort','fields','skip','hint','explain','snapshot','timeout','tailable', 'batchSize'],
         idx = 0, l = test.length, is_option = false;
     while(!is_option && idx < l) if(test[idx] in fields ) is_option = true; else idx++;
     options = is_option ? fields : {};
     if(is_option) fields = undefined;
   }
-  if(len == 4) options = arguments[2];
+  if(len == 3) options = args[2];
 
   if(options && options.fields){
     fields = {};
     if(options.fields.constructor == Array){
       if(options.fields.length == 0) fields['_id'] = 1;
-      else for(i = 0, l = options.fields.length; i < l; i++) fields[options.fields[i]] = 1;
+      else for(var i = 0, l = options.fields.length; i < l; i++) fields[options.fields[i]] = 1;
     }
     else fields = options.fields;
   }
   if(!options) options = {};
 
-  options.skip = len > 4 ? arguments[2] : options.skip ? options.skip : 0;
-  options.limit = len > 4 ? arguments[3] : options.limit ? options.limit : 0;
+  options.skip = len > 3 ? args[2] : options.skip ? options.skip : 0;
+  options.limit = len > 3 ? args[3] : options.limit ? options.limit : 0;
   options.hint = options.hint != null ? this.normalizeHintField(options.hint) : this.internalHint;
-  options.timeout = len == 6 ? arguments[4] : options.timeout ? options.timeout : undefined;
+  options.timeout = len == 5 ? args[4] : options.timeout ? options.timeout : undefined;
 
   var o = options;
-  callback(null, new Cursor(this.db, this, selector, fields, o.skip, o.limit, o.sort, o.hint, o.explain, o.snapshot, o.timeout, o.tailable, o.batchSize));
+
+  // callback for backward compatibility
+  if (callback) {
+    callback(null, new Cursor(this.db, this, selector, fields, o.skip, o.limit, o.sort, o.hint, o.explain, o.snapshot, o.timeout, o.tailable, o.batchSize));
+  } else {
+    return new Cursor(this.db, this, selector, fields, o.skip, o.limit, o.sort, o.hint, o.explain, o.snapshot, o.timeout, o.tailable, o.batchSize);
+  }
 };
 
 Collection.prototype.normalizeHintField = function(hint) {
@@ -426,12 +436,12 @@ Collection.prototype.findOne = function(queryObject, options, callback) {
     fields = {};
     if(options.fields.constructor == Array){
       if(options.fields.length == 0) fields['_id'] = 1;
-      else for(i = 0, l = options.fields.length; i < l; i++) fields[options.fields[i]] = 1;
+      else for(var i = 0, l = options.fields.length; i < l; i++) fields[options.fields[i]] = 1;
     }
     else fields = options.fields;
   }
   // Unpack the options
-  var timeout  = options.timeout != null ? options.timeout : QueryCommand.OPTS_NONE;
+  var timeout = options.timeout != null ? options.timeout : QueryCommand.OPTS_NONE;
   var queryOptions = timeout;
   // Build final query
   var finalQueryObject = queryObject == null ? {} : queryObject;
@@ -499,6 +509,10 @@ Collection.prototype.mapReduce = function(map, reduce, options, callback) {
   // Execute command against server
   this.db.executeCommand(DbCommand.createDbCommand(this.db, mapCommandHash), function(err, result) {
     if(err == null && result.documents[0].ok == 1) {
+      //return the results, if the map/reduce is invoked with inline option
+      if(result.documents[0].results)  {
+      	return callback(err, result.documents[0].results);
+      }
       // Create a collection object that wraps the result collection
       self.db.collection(result.documents[0].result, function(err, collection) {
         if(options.include_statistics) {

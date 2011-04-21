@@ -16,38 +16,32 @@ This is a node.js driver for MongoDB. It's a port (or close to a port) of the li
 
 A simple example of inserting a document.
 
-    var client = new Db('integration_tests_20', new Server("127.0.0.1", 27017, {}));
+    var client = new Db('test', new Server("127.0.0.1", 27017, {})),
+        test = function (err, collection) {
+          collection.insert({a:2}, function(err, docs) {
+
+            collection.count(function(err, count) {
+              test.assertEquals(1, count);
+            });
+
+            // Locate all the entries using find
+            collection.find().toArray(function(err, results) {
+              test.assertEquals(1, results.length);
+              test.assertTrue(results.a === 2);
+
+              // Let's close the db
+              client.close();
+            });
+          });
+        };
+
     client.open(function(err, p_client) {
-    	client.createCollection('test_insert', function(err, collection) {
-    	  client.collection('test_insert', function(err, collection) {
-    	    for(var i = 1; i < 1000; i++) {
-    	      collection.insert({c:1}, function(err, docs) {});
-    	    }
-
-    	    collection.insert({a:2}, function(err, docs) {
-    	      collection.insert({a:3}, function(err, docs) {
-    	        collection.count(function(err, count) {
-    	          test.assertEquals(1001, count);
-    	          // Locate all the entries using find
-    	          collection.find(function(err, cursor) {
-    	            cursor.toArray(function(err, results) {
-    	              test.assertEquals(1001, results.length);
-    	              test.assertTrue(results[0] != null);
-
-    	              // Let's close the db 
-    	              client.close();
-    	            });
-    	          });          
-    	        });        
-    	      });
-    	    });      
-    	  });    
-    	});
+      client.collection('test_insert', test);
     });
 
 Important
 ========
-	
+
 To enable the driver to use the C/C++ bson parser pass it the option native_parser:true like below
 
     var client = new Db('integration_tests_20',
@@ -61,10 +55,10 @@ To access the correct version of BSON objects for your instance do the following
     client.bson_serializer.Long
     client.bson_serializer.ObjectID
     client.bson_serializer.Timestamp
-    client.bson_serializer.DBRef  
+    client.bson_serializer.DBRef
     client.bson_serializer.Binary
     client.bson_serializer.Code
-	
+
 GitHub information
 --------
 
@@ -73,7 +67,7 @@ You can either clone the repository or download a tarball of the latest release.
 
 Once you have the source you can test the driver by running
 
-	$ make test
+  $ make test
 
 in the main directory. You will need to have a mongo instance running on localhost for the integration tests to pass.
 
@@ -82,8 +76,8 @@ Examples
 
 For examples look in the examples/ directory. You can execute the examples using node.
 
-	$ cd examples
-	$ node queries.js
+  $ cd examples
+  $ node queries.js
 
 GridStore
 ========
@@ -106,60 +100,55 @@ Defining your own primary key factory allows you to generate your own series of 
 
 Simple example below
 
-	// Custom factory (need to provide a 12 byte array);
-	CustomPKFactory = function() {}
-	CustomPKFactory.prototype = new Object();
-	CustomPKFactory.createPk = function() {  
-	  return new ObjectID("aaaaaaaaaaaa");
-	}
+    // Custom factory (need to provide a 12 byte array);
+    CustomPKFactory = function() {}
+    CustomPKFactory.prototype = new Object();
+    CustomPKFactory.createPk = function() {
+      return new ObjectID("aaaaaaaaaaaa");
+    }
 
-	var p_client = new Db('integration_tests_20', new Server("127.0.0.1", 27017, {}), {'pk':CustomPKFactory});
-	p_client.open(function(err, p_client) {
-	  p_client.dropDatabase(function(err, done) {    
-	    p_client.createCollection('test_custom_key', function(err, collection) {
-	      collection.insert({'a':1}, function(err, docs) {
-	        collection.find({'_id':new ObjectID("aaaaaaaaaaaa")}, function(err, cursor) {
-	          cursor.toArray(function(err, items) {
-	            test.assertEquals(1, items.length);
-              
-              // Let's close the db 
-	            p_client.close();
-	          });
-	        });
-	      });
-	    });
-	  });
-	});      
+    var p_client = new Db('integration_tests_20', new Server("127.0.0.1", 27017, {}), {'pk':CustomPKFactory});
+    p_client.open(function(err, p_client) {
+      p_client.dropDatabase(function(err, done) {
+        p_client.createCollection('test_custom_key', function(err, collection) {
+          collection.insert({'a':1}, function(err, docs) {
+            collection.find({'_id':new ObjectID("aaaaaaaaaaaa")}, function(err, cursor) {
+              cursor.toArray(function(err, items) {
+                test.assertEquals(1, items.length);
+
+                // Let's close the db
+                p_client.close();
+              });
+            });
+          });
+        });
+      });
+    });
 
 Strict mode
 --------
 
 Each database has an optional strict mode. If it is set then asking for a collection
 that does not exist will return an Error object in the callback. Similarly if you
-attempt to create a collection that already exists. Strict is provided for convenience. 
+attempt to create a collection that already exists. Strict is provided for convenience.
 
-	var error_client = new Db(
-	    'integration_tests_',
-	    new Server("127.0.0.1", 27017, {auto_reconnect: false}),
-	    {strict:true});
-	test.assertEquals(true, error_client.strict);
-	error_client.open(function(err, error_client) {
-	  error_client.collection('does-not-exist', function(err, collection) {
-	    test.assertTrue(err instanceof Error);
-	    test.assertEquals("Collection does-not-exist does not exist. " +
-	                      "Currently in strict mode.", err.message);      
-	  });      
-  
-	  error_client.createCollection('test_strict_access_collection',
-	                                function(err, collection) {  
-	    error_client.collection('test_strict_access_collection',
-	                            function(err, collection) {
-	      test.assertTrue(collection instanceof Collection);
-	      // Let's close the db 
-	      error_client.close();
-	    });
-	  });
-	});
+    var error_client = new Db('integration_tests_', new Server("127.0.0.1", 27017, {auto_reconnect: false}), {strict:true});    
+      test.assertEquals(true, error_client.strict);
+      
+      error_client.open(function(err, error_client) {
+      error_client.collection('does-not-exist', function(err, collection) {
+        test.assertTrue(err instanceof Error);
+        test.assertEquals("Collection does-not-exist does not exist. Currently in strict mode.", err.message);
+      });
+
+      error_client.createCollection('test_strict_access_collection', function(err, collection) {
+        error_client.collection('test_strict_access_collection', function(err, collection) {
+          test.assertTrue(collection instanceof Collection);
+          // Let's close the db
+          error_client.close();
+        });
+      });
+    });
 
 Documentation
 ========
@@ -182,7 +171,7 @@ that fetches the next object from the database. The convenience methods
 
 Signatures:
 
-    collection.find(query, [fields], options, function(err, cursor) {});
+    collection.find(query, [fields], options);
 
     cursor.nextObject(function(err, doc) {});
     cursor.each(function(err, doc) {});
@@ -222,11 +211,8 @@ For information on how to create queries, see the
     new mongodb.Db('test', server, {}).open(function (error, client) {
       if (error) throw error;
       var collection = new mongodb.Collection(client, 'test_collection');
-      collection.find({}, {limit:10},
-                      function(err, cursor) {
-        cursor.toArray(function(err, docs) {
-          console.dir(docs);
-        });
+      collection.find({}, {limit:10}).toArray(function(err, docs) {
+        console.dir(docs);
       });
     });
 

@@ -535,6 +535,33 @@ var all_tests = {
     });
   },
 
+  // Test a simple find chained
+  test_find_simple_chained : function() {
+    client.createCollection('test_find_simple_chained', function(err, r) {
+      var collection = client.collection('test_find_simple_chained', function(err, collection) {
+        var doc1 = null;
+        var doc2 = null;
+
+        // Insert some test documents
+        collection.insert([{a:2}, {b:3}], function(err, docs) {doc1 = docs[0]; doc2 = docs[1]});
+        // Ensure correct insertion testing via the cursor and the count function
+        collection.find().toArray(function(err, documents) {
+          test.equal(2, documents.length);
+        });
+        collection.count(function(err, count) {
+          test.equal(2, count);
+        });
+        // Fetch values by selection
+        collection.find({'a': doc1.a}).toArray(function(err, documents) {
+          test.equal(1, documents.length);
+          test.equal(doc1.a, documents[0].a);
+          // Let's close the db
+          finished_test({test_find_simple_chained:'ok'});
+        });
+      });
+    });
+  },
+
   // Test advanced find
   test_find_advanced : function() {
     client.createCollection('test_find_advanced', function(err, r) {
@@ -1971,6 +1998,36 @@ var all_tests = {
     });
   },
   
+  test_to_array : function() {
+    client.createCollection('test_to_array', function(err, collection) {
+      for(var i = 0; i < 2; i++) {
+        collection.save({'x':1}, function(err, document) {});
+      }
+  
+      collection.find(function(err, cursor) {
+        test.throws(function () {
+          cursor.toArray();
+        });
+        finished_test({test_to_array:'ok'});
+      });
+    });
+  },
+  
+  test_each : function() {
+    client.createCollection('test_each', function(err, collection) {
+      for(var i = 0; i < 2; i++) {
+        collection.save({'x':1}, function(err, document) {});
+      }
+  
+      collection.find(function(err, cursor) {
+        test.throws(function () {
+          cursor.each();
+        });
+        finished_test({test_each:'ok'});
+      });
+    });
+  },
+
   test_cursor_limit : function() {
     client.createCollection('test_cursor_limit', function(err, collection) {
       for(var i = 0; i < 10; i++) {
@@ -3582,6 +3639,22 @@ var all_tests = {
     });
   },
   
+  //map/reduce inline option test
+  test_map_reduce_functions_inline : function() {
+    client.createCollection('test_map_reduce_functions_inline', function(err, collection) {
+      collection.insert([{'user_id':1}, {'user_id':2}]);
+  
+      // String functions
+      var map = function() { emit(this.user_id, 1); };
+      var reduce = function(k,vals) { return 1; };
+  
+      collection.mapReduce(map, reduce, {out : {inline: 1}}, function(err, results) {
+        test.equal(2, results.length);
+        finished_test({test_map_reduce_functions_inline:'ok'});
+      });
+    });
+  },
+  
   // Mapreduce different test
   test_map_reduce_functions_scope : function() {
     client.createCollection('test_map_reduce_functions_scope', function(err, collection) {
@@ -4442,8 +4515,14 @@ var all_tests = {
         finished_test({test_insert_and_query_undefined:'ok'});
       });        
     })
-  }  
-  
+  },
+
+  // // Test the count result on a collection that does not exist
+  // test_shutdown : function() {
+  //   client.executeDbCommand({shutdown:1}, function(err, result) {
+  //     finished_test({test_shutdown:'ok'});      
+  //   });
+  // },  
 };
 
 /*******************************************************************************************************

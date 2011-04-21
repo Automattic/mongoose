@@ -105,17 +105,33 @@ Db.prototype.open = function(callback) {
     self.serverConfig.connection.open();            
   } else if(self.serverConfig instanceof ServerPair || self.serverConfig instanceof ServerCluster) {
     var serverConnections = self.serverConfig instanceof ServerPair ? [self.serverConfig.leftServer, self.serverConfig.rightServer] : self.serverConfig.servers;
-    var numberOfConnectedServers = 0; 
+    var numberOfCheckedServers = 0; 
+    
     serverConnections.forEach(function(server) {
       server.connection = new Connection(server.host, server.port, server.autoReconnect);
       self.connections.push(server.connection);
+      
+      var handleServerConnection = function() {
+        numberOfCheckedServers+=1;
+        
+        if(numberOfCheckedServers == serverConnections.length) {
+            if(self.masterConnection) {
+                // emit a message saying we got a master and are ready to go and change state to reflect it
+                self.state = 'connected';
+                callback(null, self);
+            } else {
+                // emit error only when all servers are checked and connecting to them failed.
+                self.state = "notConnected"
+                callback(new Error("Failed connecting to any of the servers in the cluster"), null);
+            }
+        }
+      }
 
       server.connection.addListener("connect", function() {
         // Create a callback function for a given connection
 
         var connectCallback = function(err, reply) {
-
-                  if(err != null) {
+          if(err != null) {
             callback(err, null);          
           } else {
             if(reply.documents[0].ismaster == 1) {
@@ -126,12 +142,8 @@ Db.prototype.open = function(callback) {
             } else {
               server.master = false;
             }
-
-            // emit a message saying we got a master and are ready to go and change state to reflect it
-            if(++numberOfConnectedServers == serverConnections.length && self.state == 'notConnected') {
-              self.state = 'connected';
-              callback(null, self);
-            }            
+            
+            handleServerConnection();
           }
         };
         // Create db command and Add the callback to the list of callbacks by the request id (mapping outgoing messages to correct callbacks)
@@ -154,12 +166,8 @@ Db.prototype.open = function(callback) {
       });
       
       server.connection.addListener("error", function(err) {
-        if(self.listeners("error") != null && self.listeners("error").length > 0) 
-        self.state = "notConnected"
-        return callback(err, null);
-      });      
-      
-      
+         handleServerConnection();
+      });
 
       // Emit timeout and close events so the client using db can figure do proper error handling (emit contains the connection that triggered the event)
       server.connection.addListener("timeout", function() { self.emit("timeout", this); });
@@ -193,8 +201,14 @@ Db.prototype.collectionsInfo = function(collection_name, callback) {
   var selector = {};
   // If we are limiting the access to a specific collection name
   if(collection_name != null) selector.name = this.databaseName + "." + collection_name;
+
   // Return Cursor
-  callback(null, new Cursor(this, new Collection(this, DbCommand.SYSTEM_NAMESPACE_COLLECTION), selector));
+  // callback for backward compatibility
+  if (callback) {
+    callback(null, new Cursor(this, new Collection(this, DbCommand.SYSTEM_NAMESPACE_COLLECTION), selector));
+  } else {
+    return new Cursor(this, new Collection(this, DbCommand.SYSTEM_NAMESPACE_COLLECTION), selector);
+  }
 };
 
 /**
@@ -606,14 +620,11 @@ exports.connect = function(url, callback) {
 
 Db.prototype.checkMaster_ = function(dbcopy, returnback){
   var db_cmnd = null;
-  sys.puts("============================================ checkMaster_::0::" + sys.inspect(dbcopy.serverConfig.servers))
   
   dbcopy.serverConfig.servers.forEach(function(server) {
     db_cmnd = DbCommand.createIsMasterCommand(dbcopy);
-    sys.puts("============================================ checkMaster_::1")
 
     var connect_Callback = function(err, reply) {
-      sys.puts("============================================ checkMaster_::2")
       if(err != null) {
         returnback(err, null, null)
       } else {
@@ -628,16 +639,13 @@ Db.prototype.checkMaster_ = function(dbcopy, returnback){
       }
     };
 
-    sys.puts("============================================ checkMaster_::3")
     dbcopy.addListener(db_cmnd.getRequestId().toString(), connect_Callback);
     server.connection.sendwithoutReconnect(db_cmnd); 
       
-    sys.puts("============================================ checkMaster_::4")
     server.connection.addListener("error", function(err) {
       dbcopy.emit("error", err);
     });      
 
-    sys.puts("============================================ checkMaster_::5")
     // Emit timeout and close events so the client using db can figure do proper error handling (emit contains the connection that triggered the event)
     server.connection.addListener("timeout", function() { dbcopy.emit("timeout", this); });
     server.connection.addListener("close", function() { dbcopy.emit("close", this); });      

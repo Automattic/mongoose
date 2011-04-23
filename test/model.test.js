@@ -3109,6 +3109,20 @@ module.exports = {
         });
       })
     });
+  },
 
+  'system.profile should be a default model': function () {
+    var Profile = mongoose.model('system.profile');
+    Profile.schema.paths.ts.should.be.a('object');
+    Profile.schema.paths.info.should.be.a('object');
+    Profile.schema.paths.millis.should.be.a('object');
+
+    var db = start();
+    Profile = db.model('system.profile');
+    Profile.schema.paths.ts.should.be.a('object');
+    Profile.schema.paths.info.should.be.a('object');
+    Profile.schema.paths.millis.should.be.a('object');
+    db.close();
   }
+
 };

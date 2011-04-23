@@ -3123,6 +3123,23 @@ module.exports = {
     Profile.schema.paths.info.should.be.a('object');
     Profile.schema.paths.millis.should.be.a('object');
     db.close();
+  },
+
+  'setting profiling levels': function () {
+    var db = start();
+    db.setProfiling(2, function (err, doc) {
+      should.strictEqual(err, null);
+      db.setProfiling(1, 50, function (err, doc) {
+        should.strictEqual(err, null);
+        doc.was.should.eql(2);
+        db.setProfiling(0, function (err, doc) {
+          db.close();
+          should.strictEqual(err, null);
+          doc.was.should.eql(1);
+          doc.slowms.should.eql(50);
+        });
+      });
+    });
   }
 
 };

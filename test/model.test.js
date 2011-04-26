@@ -1271,6 +1271,41 @@ module.exports = {
     db.close();
   },
 
+  'test post save middleware': function () {
+    var schema = new Schema({
+        title: String
+    });
+
+    var called = 0;
+
+    schema.post('save', function (obj) {
+      obj.title.should.eql('Little Green Running Hood');
+      called.should.equal(0);
+      called++;
+    });
+
+    schema.post('save', function (obj) {
+      obj.title.should.eql('Little Green Running Hood');
+      called.should.equal(1);
+      called++;
+    });
+
+    schema.post('save', function (obj) {
+      obj.title.should.eql('Little Green Running Hood');
+      called.should.equal(2);
+      db.close();
+    });
+
+    var db = start()
+      , TestMiddleware = db.model('TestPostSaveMiddleware', schema);
+
+    var test = new TestMiddleware({ title: 'Little Green Running Hood'});
+
+    test.save(function(err){
+      should.strictEqual(err, null);
+    });
+  },
+
   'test middleware': function () {
     var schema = new Schema({
         title: String

@@ -126,6 +126,29 @@ module.exports = {
       return path + '-suffix';
     });
     suffixedPaths.should.eql(['iAmTheWalrus-suffix', 'hello-suffix', 'world-suffix']);
+  },
+
+  'test utils.options': function () {
+    var o = { a: 1, b: 2, c: 3, 0: 'zero1' };
+    var defaults = { b: 10, d: 20, 0: 'zero2' };
+    var result = utils.options(defaults, o);
+    result.a.should.equal(1);
+    result.b.should.equal(2);
+    result.c.should.equal(3);
+    result.d.should.equal(20);
+    o.d.should.equal(result.d);
+    result['0'].should.equal('zero1');
+
+    var result2 = utils.options(defaults);
+    result2.b.should.equal(10);
+    result2.d.should.equal(20);
+    result2['0'].should.equal('zero2');
+
+    // same properties/vals
+    defaults.should.eql(result2);
+
+    // same object
+    defaults.should.not.equal(result2);
   }
 
 };

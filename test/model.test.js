@@ -2915,8 +2915,10 @@ module.exports = {
     }
 
     threw.should.be.false;
-    getter1.should.eql(strmet);
-    getter2.should.eql(strmet);
+    getter1 = JSON.parse(getter1);
+    getter2 = JSON.parse(getter2);
+    getter1.visitors.should.eql(getter2.visitors);
+    getter1.date.should.eql(getter2.date);
 
     post.meta.date = new Date - 1000;
     post.meta.date.should.be.an.instanceof(Date);

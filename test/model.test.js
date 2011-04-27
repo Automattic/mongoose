@@ -2070,6 +2070,35 @@ module.exports = {
     });
   },
 
+  // GH-334
+  'test updating an embedded array document to an Object value': function () {
+    var db = start()
+      , SubSchema = new Schema({ 
+          name : String , 
+          subObj : { subName : String } 
+        });
+    var GH334Schema = new Schema ({ name : String , arrData : [ SubSchema] });
+
+    mongoose.model('GH334' , GH334Schema);
+    var AModel = db.model('GH334');
+    var instance = new AModel();
+
+    instance.set( { name : 'name-value' , arrData : [ { name : 'arrName1' , subObj : { subName : 'subName1' } } ] });
+    instance.save(function(err)  {
+        AModel.findById(instance.id, function(err, doc)  {
+          doc.arrData[0].set('subObj' , { subName : 'modified subName' });
+          doc.save(function(err)  {
+            should.strictEqual(null, err);
+            AModel.findById(instance.id, function (err, doc) {
+              db.close();
+              should.strictEqual(null, err);
+              doc.arrData[0].subObj.subName.should.eql('modified subName');
+            });
+          });
+       });
+    });
+  },
+
   // GH-267
   'saving an embedded document twice should not push that doc onto the parent doc twice': function () {
     var db = start()

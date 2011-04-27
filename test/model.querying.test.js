@@ -1163,5 +1163,15 @@ module.exports = {
         docs.some(function (d) { return '2011-04-02' === d.dt }).should.be.false;
       });
     }
+  },
+
+  'nested mixed queries (x.y.z)': function () {
+    var db = start()
+      , BlogPostB = db.model('BlogPostB', collection);
+
+    BlogPostB.find({ 'mixed.nested.stuff': 'skynet' }, function (err, docs) {
+      db.close();
+      should.strictEqual(err, null);
+    });
   }
 };

@@ -1,5 +1,5 @@
 
-TESTS = $(shell find test/ -name 'model.test.js')
+TESTS = $(shell find test/ -name '*.test.js')
 
 test:
 	@NODE_ENV=test ./support/expresso/bin/expresso \

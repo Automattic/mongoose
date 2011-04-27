@@ -1,4 +1,22 @@
 
+1.3.1 / 2011-04-27
+===================
+
+  * fixed; setting a property on an embedded array no longer overwrites entire array (GH-310) 
+  * fixed; setting nested properties works when sibling prop is named "type"
+  * fixed; isModified is now much finer grained when .set() is used (GH-323)
+  * fixed; mongoose.model() and connection.model() now return the Model (GH-308, GH-305)
+  * fixed; can now use $gt, $lt, $gte, $lte with String schema types (GH-317)
+  * fixed; .lowercase() -> .toLowerCase() in pluralize()
+  * fixed; updating an embedded document by index works (GH-334)
+  * changed; .save() now passes the instance to the callback (GH-294, GH-264)
+  * added; can now query system.profile and system.indexes collections
+  * added; db.model('system.profile') is now included as a default Schema
+  * added; db.setProfiling(level, ms, callback)
+  * added; Query#hint() support
+  * added; more tests
+  * updated node-mongodb-native to 0.9.3
+
 1.3.0 / 2011-04-19
 ===================
 

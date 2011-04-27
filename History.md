@@ -1,4 +1,9 @@
 
+1.3.3 / 2011-04-27
+===================
+
+  * fixed; corrected query casting on nested mixed types
+
 1.3.2 / 2011-04-27
 ===================
 

@@ -1178,12 +1178,13 @@ module.exports = {
   // GH-336
   'finding by Date field works': function () {
     var db = start()
-      , Test = db.model('TestDateQuery', new Schema({ date: Date }))
+      , Test = db.model('TestDateQuery', new Schema({ date: Date }), collection)
       , now = new Date;
 
     Test.create({ date: now }, function (err) {
       Test.find({ date: now }, function (err, docs) {
         db.close();
+        should.strictEqual(err, null);
         docs.length.should.equal(1);
       });
     });

@@ -1188,5 +1188,23 @@ module.exports = {
         docs.length.should.equal(1);
       });
     });
+  },
+
+  // GH-309
+  'using $near with Arrays works (geo-spatial)': function () {
+    var db = start()
+      , schema = new Schema({ loc: { type: Array, index: '2d'}})
+      , Test = db.model('GeoSpatialArrayQuery', schema, collection);
+
+    Test.create({ loc: [ 10, 20 ]}, { loc: [ 40, 90 ]}, function (err) {
+      should.strictEqual(err, null);
+      Test.find({ loc: { $near: [30, 40] }}, function (err, docs) {
+        db.close();
+        should.strictEqual(err, null);
+        docs.length.should.equal(2);
+      });
+    });
+
   }
+
 };

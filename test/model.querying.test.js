@@ -1173,5 +1173,19 @@ module.exports = {
       db.close();
       should.strictEqual(err, null);
     });
+  },
+
+  // GH-336
+  'finding by Date field works': function () {
+    var db = start()
+      , Test = db.model('TestDateQuery', new Schema({ date: Date }))
+      , now = new Date;
+
+    Test.create({ date: now }, function (err) {
+      Test.find({ date: now }, function (err, docs) {
+        db.close();
+        docs.length.should.equal(1);
+      });
+    });
   }
 };

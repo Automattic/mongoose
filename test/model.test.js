@@ -1246,6 +1246,42 @@ module.exports = {
     });
   },
 
+  'compound indexes on embedded documents should be created': function () {
+    var BlogPosts = new Schema({
+        title   : String
+      , desc    : String
+    });
+
+    BlogPosts.index({ title: 1, desc: 1 });
+
+    var User = new Schema({
+        name        : { type: String, index: true }
+      , blogposts   : [BlogPosts]
+    });
+
+    var db = start()
+      , UserModel = db.model('DeepCompoundIndexModel', User, 'deepcompoundindexmodel' + random())
+      , found = 0;
+
+    UserModel.on('index', function () {
+      UserModel.collection.getIndexes(function (err, indexes) {
+        should.strictEqual(err, null);
+
+        for (var index in indexes) {
+          switch (index) {
+            case 'name_1':
+            case 'blogposts.title_1_blogposts.desc_1':
+              ++found;
+              break;
+          }
+        }
+
+        db.close();
+        found.should.eql(2);
+      });
+    });
+  },
+
   'test getters with same name on embedded documents not clashing': function() {
     var Post = new Schema({
         title   : String

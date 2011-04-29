@@ -614,7 +614,12 @@ Binary.prototype.write = function(string, offset) {
     this.buffer = buffer;
   }
   // Write the content to the buffer
-  this.buffer.write(string, 'binary', offset);
+  if(string instanceof Buffer) {
+    string.copy(this.buffer, offset, 0, string.length);
+  }
+  else {
+	  this.buffer.write(string, 'binary', offset);
+  }
   this.position = offset + string.length;
 };
 

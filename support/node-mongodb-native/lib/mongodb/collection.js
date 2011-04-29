@@ -91,7 +91,11 @@ Collection.prototype.remove = function(selector, options, callback) {
   // Generate selector for remove all if not available
   var deleteCommand = new DeleteCommand(this.db, this.db.databaseName + "." + this.collectionName, removeSelector);
   // Execute the command, do not add a callback as it's async
-  this.db.executeCommand(deleteCommand);
+  var result = this.db.executeCommand(deleteCommand);
+  if(result instanceof Error) {
+    if(callback != null) return callback(result, null);
+  }
+  
   // If safe mode check last error
   if(callback != null) {
     if(options.safe || this.db.strict) {
@@ -142,24 +146,24 @@ Collection.prototype.insertAll = function(docs, options, callback) {
 
   // List of all id's inserted
   var objects = [];
-  try {
-    // Create an insert command
-    var insertCommand = new InsertCommand(this.db, this.db.databaseName + "." + this.collectionName);
-    // Add id to each document if it's not already defined
-    for(var index = 0; index < docs.length; index++) {
-      var doc = docs[index];
-      // Add the id to the document
-      var id = doc["_id"] == null ? this.pkFactory.createPk() : doc["_id"];
-      doc['_id'] = id;
-      // Insert the document
-      insertCommand.add(doc);
-      objects.push(doc);
-    }
-    // Execute the command
-    this.db.executeCommand(insertCommand);
-  } catch(err) {
-    if(callback != null) return callback(err, null);
+  // Create an insert command
+  var insertCommand = new InsertCommand(this.db, this.db.databaseName + "." + this.collectionName);
+  // Add id to each document if it's not already defined
+  for(var index = 0; index < docs.length; index++) {
+    var doc = docs[index];
+    // Add the id to the document
+    var id = doc["_id"] == null ? this.pkFactory.createPk() : doc["_id"];
+    doc['_id'] = id;
+    // Insert the document
+    insertCommand.add(doc);
+    objects.push(doc);
   }
+  // Execute the command
+  var result = this.db.executeCommand(insertCommand);
+  if(result instanceof Error) {
+    if(callback != null) return callback(result, null);
+  }
+    
   // If safe is defined check for error message
   if(callback != null) {
     if(options.safe || this.db.strict) {
@@ -218,17 +222,16 @@ Collection.prototype.update = function(spec, document, options, callback) {
   }
 
   options = args.length ? args.shift() : null;
+  var safe = options == null || options.safe == null || options.safe == false ? false : true;
+  var upsert = options == null || options.upsert == null || options.upsert == false ? false : true;
+  // Create update command
+  var updateCommand = new UpdateCommand(this.db, this.db.databaseName + "." + this.collectionName, spec, document, options);
+  // Execute command
+  var result = this.db.executeCommand(updateCommand);;
+  if(result instanceof Error) {
+    if(callback != null) return callback(result, null);
+  }
 
-  try {
-    var safe = options == null || options.safe == null || options.safe == false ? false : true;
-    var upsert = options == null || options.upsert == null || options.upsert == false ? false : true;
-    // Create update command
-    var updateCommand = new UpdateCommand(this.db, this.db.databaseName + "." + this.collectionName, spec, document, options);
-    // Execute command
-    this.db.executeCommand(updateCommand);
-  } catch(err) {
-    if(callback != null) return callback(err, null);
-  }    
   // If safe, we need to check for successful execution
   if(safe || this.db.strict) {
     this.db.error(function(err, error) {
@@ -361,7 +364,7 @@ Collection.prototype.findAndModify = function(query, sort, update, options, call
  */
 Collection.prototype.find = function() {
   var options,
-      args = Array.prototype.slice.call(arguments, 0);
+      args = Array.prototype.slice.call(arguments, 0),
       has_callback = typeof args[args.length - 1] === 'function',
       has_weird_callback = typeof args[0] === 'function',
       callback = has_callback ? args.pop() : (has_weird_callback ? args.shift() : null),
@@ -397,14 +400,15 @@ Collection.prototype.find = function() {
   options.limit = len > 3 ? args[3] : options.limit ? options.limit : 0;
   options.hint = options.hint != null ? this.normalizeHintField(options.hint) : this.internalHint;
   options.timeout = len == 5 ? args[4] : options.timeout ? options.timeout : undefined;
+  options.slaveOk = options.slaveOk != null ? options.slaveOk : false;
 
   var o = options;
 
   // callback for backward compatibility
   if (callback) {
-    callback(null, new Cursor(this.db, this, selector, fields, o.skip, o.limit, o.sort, o.hint, o.explain, o.snapshot, o.timeout, o.tailable, o.batchSize));
+    callback(null, new Cursor(this.db, this, selector, fields, o.skip, o.limit, o.sort, o.hint, o.explain, o.snapshot, o.timeout, o.tailable, o.batchSize, o.slaveOk));
   } else {
-    return new Cursor(this.db, this, selector, fields, o.skip, o.limit, o.sort, o.hint, o.explain, o.snapshot, o.timeout, o.tailable, o.batchSize);
+    return new Cursor(this.db, this, selector, fields, o.skip, o.limit, o.sort, o.hint, o.explain, o.snapshot, o.timeout, o.tailable, o.batchSize, o.slaveOk);
   }
 };
 

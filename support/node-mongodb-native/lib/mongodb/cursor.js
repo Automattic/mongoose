@@ -39,7 +39,7 @@ var QueryCommand = require('./commands/query_command').QueryCommand,
  * @see Collection#find
  * @see Db#eval
  */
-var Cursor = exports.Cursor = function(db, collection, selector, fields, skip, limit, sort, hint, explain, snapshot, timeout, tailable, batchSize) {
+var Cursor = exports.Cursor = function(db, collection, selector, fields, skip, limit, sort, hint, explain, snapshot, timeout, tailable, batchSize, slaveOk) {
   this.db = db;
   this.collection = collection;
   this.selector = selector;
@@ -53,6 +53,7 @@ var Cursor = exports.Cursor = function(db, collection, selector, fields, skip, l
   this.timeout = timeout == null ? true : timeout;
   this.tailable = tailable;
   this.batchSizeValue = batchSize == null ? 0 : batchSize;
+  this.slaveOk = slaveOk == null ? false : slaveOk;
 
   this.totalNumberOfRecords = 0;
   this.items = [];
@@ -365,6 +366,10 @@ Cursor.prototype.generateQueryCommand = function() {
       queryOptions += QueryCommand.OPTS_TAILABLE_CURSOR;
       this.skipValue = this.limitValue = 0;
   }
+  if (this.slaveOk) {
+      queryOptions += QueryCommand.OPTS_SLAVE;
+  }
+
 
   // limitValue of -1 is a special case used by Db#eval
   var numberToReturn = this.limitValue == -1 ? -1 : this.limitRequest();

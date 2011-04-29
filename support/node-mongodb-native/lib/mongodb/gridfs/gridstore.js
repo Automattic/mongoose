@@ -13,7 +13,10 @@ var BinaryParser = require('../bson/binary_parser').BinaryParser,
   Integer = require('../goog/math/integer').Integer,
   // ObjectID = require('../bson/bson').ObjectID,
   Buffer = require('buffer').Buffer,
-  fs = require('fs');
+  fs = require('fs'),
+  util = require('util'),
+  Stream = require('stream').Stream;
+
 
 /**
  * A class representation of a file stored in GridFS.
@@ -91,6 +94,11 @@ GridStore.prototype.open = function(callback) {
   var self = this;
 
   self.collection(function(err, collection) {
+    if(err!==null) {
+      callback(new Error("at collection: "+err), null);
+      return;
+    }
+  
     self.chunkCollection(function(err, chunkCollection) {
       collection.find({'filename':self.filename}, function(err, cursor) {
         // Fetch the file
@@ -124,7 +132,7 @@ GridStore.prototype.open = function(callback) {
           } else if(self.mode == "w") {
             self.chunkCollection(function(err, collection2) {
               // Create index for the chunks
-              chunkCollection.ensureIndex([['files_id', 1], ['n', 1]], function(err, index) {
+              //chunkCollection.ensureIndex([['files_id', 1], ['n', 1]], function(err, index) {
                 // Delete any existing chunks
                 self.deleteChunks(function(err, result) {
                   self.currentChunk = new Chunk(self, {'n':0});
@@ -134,12 +142,12 @@ GridStore.prototype.open = function(callback) {
                   self.position = 0;
                   callback(null, self);
                 });
-              });
+              //});
             });
           } else if(self.mode == "w+") {
             self.chunkCollection(function(err, collection) {
               // Create index for the chunks
-              chunkCollection.ensureIndex([['files_id', 1], ['n', 1]], function(err, index) {
+              //chunkCollection.ensureIndex([['files_id', 1], ['n', 1]], function(err, index) {
                 self.nthChunk(self.lastChunkNumber(), function(err, chunk) {
                   // Set the current chunk
                   self.currentChunk = chunk == null ? new Chunk(self, {'n':0}) : chunk;
@@ -148,7 +156,7 @@ GridStore.prototype.open = function(callback) {
                   self.position = self.length;
                   callback(null, self);
                 });
-              });
+              //});
             });
           } else {
             callback(new Error("Illegal mode " + self.mode), null);
@@ -219,7 +227,7 @@ GridStore.prototype.writeFile = function (file, callback) {
  *
  * @see GridStore#writeFile
  */
-GridStore.prototype.write = function(string, close, callback) {
+GridStore.prototype.write = function(string, close, callback) { 
   if(typeof close === "function") { callback = close; close = null; }
   var self = this;
   var finalClose = close == null ? false : close;
@@ -265,6 +273,61 @@ GridStore.prototype.write = function(string, close, callback) {
       });
     }
   }
+};
+
+GridStore.prototype.writeBuffer = function(buffer, close, callback) {
+	if(typeof close === "function") { callback = close; close = null; }
+	var self = this;
+	var finalClose = (close == null) ? false : close;
+	
+	if(self.mode[0] != "w") {
+		callback(new Error(self.filename + " not opened for writing"), null);
+	} 
+	else {
+		if((self.currentChunk.position + buffer.length) > self.chunkSize) {
+			// Data exceeds current chunk remaining free size; fill up current chunk and write the rest
+			// to a new chunk (recursively)
+			var previousChunkNumber = self.currentChunk.chunkNumber;
+			var leftOverDataSize = self.chunkSize - self.currentChunk.position;
+			var firstChunkData = buffer.slice(0, leftOverDataSize);
+			
+			var leftOverData = buffer.slice(leftOverDataSize);
+			
+			// Let's finish the current chunk and then call write again for the remaining data
+			self.currentChunk.write(firstChunkData, function(err, chunk) {
+				chunk.save(function(err, result) {
+					self.currentChunk = new Chunk(self, {'n': (previousChunkNumber + 1)});
+					self.position = self.position + leftOverDataSize;
+					
+					// Write the remaining data
+					self.writeBuffer(leftOverData, function(err, gridStore) {
+						if(finalClose) {
+							self.close(function(err, result) {
+								callback(null, gridStore);
+							});
+						} 
+						else {
+							callback(null, gridStore);
+						}
+					});
+				});
+			});
+		} 
+		else {
+			// Write buffer to chunk all at once
+			self.currentChunk.write(buffer, function(err, chunk) {
+				self.position = self.position + buffer.length;
+				if(finalClose) {
+					self.close(function(err, result) {
+						callback(null, self);
+					});
+				} 
+				else {
+					callback(null, self);
+				}
+			});
+		}
+	}
 };
 
 /**
@@ -422,6 +485,9 @@ GridStore.prototype.deleteChunks = function(callback) {
 
   if(self.fileId != null) {
     self.chunkCollection(function(err, collection) {
+      if(err!==null) {
+        callback(err, false);
+      }
       collection.remove({'files_id':self.fileId}, function(err, result) {
         callback(null, true);
       });
@@ -429,6 +495,27 @@ GridStore.prototype.deleteChunks = function(callback) {
   } else {
     callback(null, true);
   }
+};
+
+GridStore.prototype.unlink = function(callback) {
+  var self = this;
+  this.deleteChunks(function(err) {
+    if(err!==null) {
+      callback("at deleteChunks: "+err);
+      return;
+    }
+  
+    self.collection(function(err, collection) {
+      if(err!==null) {
+        callback("at collection: "+err);
+        return;
+      }
+    
+      collection.remove({'_id':self.fileId}, function(err, collection) {
+        callback(err, self);
+      });
+    });
+  });
 };
 
 /**
@@ -562,6 +649,49 @@ GridStore.prototype.read = function(length, buffer, callback) {
     });
   }
 };
+
+GridStore.prototype.readBuffer = function(length, buffer, callback) {
+	var self = this;
+	var args = Array.prototype.slice.call(arguments, 0);
+	callback = args.pop();
+	length = args.length ? args.shift() : null;
+	buffer = args.length ? args.shift() : null;
+	
+	var left = Math.min(self.length - self.position, length);
+	if(buffer===null) {
+		buffer = new Buffer(left);
+	}
+	
+	var leftInCurrentChunk = self.currentChunk.length()-self.currentChunk.position;
+	
+	// Everything can be read from this chunk
+	if((leftInCurrentChunk >= left) && leftInCurrentChunk!==0) {
+		var slice = self.currentChunk.readSlice(left);
+		self.position += left;
+		callback(null, slice);
+	}
+	else {
+		if(leftInCurrentChunk > 0) {
+			var slice = self.currentChunk.readSlice(leftInCurrentChunk);
+			self.position += leftInCurrentChunk;
+			slice.copy(buffer, 0, 0, leftInCurrentChunk);
+		}
+		
+		var leftForNextChunk = left - leftInCurrentChunk;
+		var subBuffer = buffer.slice(leftInCurrentChunk, leftInCurrentChunk + leftForNextChunk);
+		
+		self.nthChunk(self.currentChunk.chunkNumber+1, function(err, chunk) {
+			self.currentChunk = chunk;
+			self.readBuffer(leftForNextChunk, subBuffer, function(err, subb) {
+				if(subb!==subBuffer) {
+					// readBuffer returned its own buffer slice
+					subb.copy(buffer, leftInCurrentChunk, 0, subb.length);
+				}
+				callback(err, buffer);
+			});
+		});
+	}
+}
 
 /**
  * Retrieves the position of the read/write head of this file.
@@ -873,10 +1003,14 @@ GridStore.unlink = function(db, names, options, callback) {
   options = args.length ? args.shift() : null;
 
   if(names.constructor == Array) {
+    var tc = 0;
     for(var i = 0; i < names.length; i++) {
-      self.unlink(function(result) {
-        if(i == (names.length - 1)) callback(null, self);
-      }, db, names[i]);
+      ++tc;
+      self.unlink(db, names[i], function(result) {
+        if(--tc == 0) {
+            callback(null, self);
+        }
+      });
     }
   } else {
     new GridStore(db, names, "w", options).open(function(err, gridStore) {
@@ -890,3 +1024,123 @@ GridStore.unlink = function(db, names, options, callback) {
     });
   }
 };
+
+var ReadStream = function(autoclose, gstore) {
+    if (!(this instanceof ReadStream)) return new ReadStream(autoclose, gstore);
+    Stream.call(this);
+
+    this.autoclose = !!autoclose;
+    this.gstore = gstore;
+
+    this.finalLength = gstore.length - gstore.position;
+    this.completedLength = 0;
+
+    this.paused = false;
+    this.readable = true;
+    this.pendingChunk = null;
+
+    var self = this;
+    process.nextTick(function() {
+        self._execute();
+    });
+};
+util.inherits(ReadStream, Stream);
+
+ReadStream.prototype._execute = function() {
+
+    if (this.paused === true || this.readable === false) {
+        return;
+    }
+
+    var gstore = this.gstore;
+    var self = this;
+
+    var last = false;
+    var toRead = 0;
+
+    if ((gstore.currentChunk.length() - gstore.currentChunk.position + 1 + self.completedLength) >= self.finalLength) {
+        toRead = self.finalLength - self.completedLength;
+        last = true;
+    } else {
+        toRead = gstore.currentChunk.length();
+    }
+
+    var data = gstore.currentChunk.read(toRead);
+    if (data != null) {
+        self.completedLength += data.length;
+        self.pendingChunk = null;
+        self.emit("data", data);
+    }
+
+    if (last === true) {
+        self.readable = false;
+        self.emit("end");
+        if (self.autoclose === true) {
+            if (gstore.mode[0] == "w") {
+                gstore.close(function(err, doc) {
+                    if (err) {
+                        self.emit("error", err);
+                        return;
+                    }
+                    self.emit("close", doc);
+                });
+            } else {
+                self.emit("close");
+            }
+        }
+    } else {
+        gstore.nthChunk(gstore.currentChunk.chunkNumber + 1, function(err, chunk) {
+            if (err) {
+                self.readable = false;
+                self.emit("error", err);
+                return;
+            }
+            self.pendingChunk = chunk;
+            if (self.paused === true) {
+                return;
+            }
+            gstore.currentChunk = self.pendingChunk;
+            self._execute();
+        });
+    }
+};
+
+/**
+ * Returns read stream based on this GridStore file
+ * Supported events:
+ * <ul>
+ *   <li>data</li>
+ *   <li>end</li>
+ *   <li>close</li>
+ *   <li>error</li>
+ * </ul>
+ *
+ * @param autoclose {Boolean?false} If true current GridStore will be closed when EOF
+ *                                  and 'close' event will be fired
+ */
+GridStore.prototype.stream = function(autoclose) {
+    return new ReadStream(autoclose, this);
+};
+
+
+/**
+ * Pauses this stream, then no farther events will be fired
+ */
+ReadStream.prototype.pause = function() {
+    this.paused = true;
+};
+
+/**
+ * Resumes this strea,
+ */
+ReadStream.prototype.resume = function() {
+    this.paused = false;
+    var self = this;
+    if (self.pendingChunk) {
+        self.currentChunk = self.pendingChunk;
+        process.nextTick(function() {
+            self._execute();
+        });
+    }
+};
+

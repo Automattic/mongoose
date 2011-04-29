@@ -73,6 +73,10 @@ Handle<Value> DBRef::New(const Arguments &args) {
 static Persistent<String> namespace_symbol;
 static Persistent<String> oid_symbol;
 static Persistent<String> db_symbol;
+
+static Persistent<String> namespace_json_symbol;
+static Persistent<String> oid_json_symbol;
+static Persistent<String> db_json_symbol;
 // static Persistent<String> id_symbol;
 
 void DBRef::Initialize(Handle<Object> target) {
@@ -88,6 +92,10 @@ void DBRef::Initialize(Handle<Object> target) {
   namespace_symbol = NODE_PSYMBOL("namespace");
   oid_symbol = NODE_PSYMBOL("oid");
   db_symbol = NODE_PSYMBOL("db");
+
+  namespace_json_symbol = NODE_PSYMBOL("$ref");
+  oid_json_symbol = NODE_PSYMBOL("$id");
+  db_json_symbol = NODE_PSYMBOL("$db");
   // id_symbol = NODE_PSYMBOL("id");
 
   // Getters for correct serialization of the object  
@@ -99,6 +107,7 @@ void DBRef::Initialize(Handle<Object> target) {
   // Instance methods
   NODE_SET_PROTOTYPE_METHOD(constructor_template, "toString", ToString);
   NODE_SET_PROTOTYPE_METHOD(constructor_template, "inspect", Inspect);  
+  NODE_SET_PROTOTYPE_METHOD(constructor_template, "toJSON", ToJSON);
 
   target->Set(String::NewSymbol("DBRef"), constructor_template->GetFunction());
 }
@@ -167,7 +176,20 @@ Handle<Value> DBRef::ToString(const Arguments &args) {
   return String::New("DBRef::ToString");
 }
 
+Handle<Value> DBRef::ToJSON(const Arguments &args) {
+    HandleScope scope;
 
+    DBRef *dbref_obj = ObjectWrap::Unwrap<DBRef > (args.This());
+    Local<Object> ret = Object::New();
+    if (dbref_obj->ref) {
+        ret->Set(namespace_json_symbol, String::New(dbref_obj->ref));
+    }
+    ret->Set(oid_json_symbol, dbref_obj->oid);
+    if (dbref_obj->db) {
+        ret->Set(db_json_symbol, String::New(dbref_obj->db));
+    }
+    return scope.Close(ret);
+}
 
 
 

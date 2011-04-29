@@ -28,6 +28,7 @@ class DBRef : public ObjectWrap {
     static void Initialize(Handle<Object> target);    
     static Handle<Value> ToString(const Arguments &args);
     static Handle<Value> Inspect(const Arguments &args);
+    static Handle<Value> ToJSON(const Arguments &args);
 
     // Properties
     static Handle<Value> NamespaceGetter(Local<String> property, const AccessorInfo& info);

@@ -39,7 +39,7 @@ const uint32_t BSON_DATA_INT = 16;
 const uint32_t BSON_DATA_TIMESTAMP = 17;
 const uint32_t BSON_DATA_LONG = 18;
 
-const int32_t BSON_INT32_MAX = (int32_t)2147483648L;
+const int32_t BSON_INT32_MAX = (int32_t)2147483647L;
 const int32_t BSON_INT32_MIN = (int32_t)(-1) * 2147483648L;
 
 // BSON BINARY DATA SUBTYPES
@@ -1371,19 +1371,14 @@ Handle<Value> BSON::deserialize(char *data, bool is_array_item) {
       
       // Get the object size
       uint32_t bson_object_size = BSON::deserialize_int32(data, index);
-      // Allocate bson object buffer and copy out the content
-      char *bson_buffer = (char *)malloc(bson_object_size * sizeof(char));
-      memcpy(bson_buffer, (data + index), bson_object_size);
-      // Adjust the index
-      index = index + bson_object_size;
       // Define the try catch block
       TryCatch try_catch;                
       // Decode the code object
-      Handle<Value> obj = BSON::deserialize(bson_buffer, false);
+      Handle<Value> obj = BSON::deserialize(data + index, false);
+      // Adjust the index
+      index = index + bson_object_size;
       // If an error was thrown push it up the chain
       if(try_catch.HasCaught()) {
-        // Clean up memory allocation
-        free(bson_buffer);
         // Rethrow exception
         return try_catch.ReThrow();
       }
@@ -1396,7 +1391,6 @@ Handle<Value> BSON::deserialize(char *data, bool is_array_item) {
       }
       
       // Clean up memory allocation
-      free(bson_buffer);
       free(string_name);
     } else if(type == BSON_DATA_ARRAY) {
       // printf("=================================================== unpacking array\n");
@@ -1413,18 +1407,13 @@ Handle<Value> BSON::deserialize(char *data, bool is_array_item) {
       
       // Get the size
       uint32_t array_size = BSON::deserialize_int32(data, index);
-      // Let's split off the data and parse all elements (keeping in mind the elements)
-      char *array_buffer = (char *)malloc(array_size * sizeof(char));
-      memcpy(array_buffer, (data + index), array_size);
       // Define the try catch block
       TryCatch try_catch;                
 
       // Decode the code object
-      Handle<Value> obj = BSON::deserialize(array_buffer, true);
+      Handle<Value> obj = BSON::deserialize(data + index, true);
       // If an error was thrown push it up the chain
       if(try_catch.HasCaught()) {
-        // Clean up memory allocation
-        free(array_buffer);
         // Rethrow exception
         return try_catch.ReThrow();
       }
@@ -1437,7 +1426,6 @@ Handle<Value> BSON::deserialize(char *data, bool is_array_item) {
         return_data->Set(String::New(string_name), obj);
       }      
       // Clean up memory allocation
-      free(array_buffer);
       free(string_name);
     }
   }

@@ -58,7 +58,7 @@ var Chunk = exports.Chunk = function(file, mongoObject) {
  *     will contain a reference to this object.
  */
 Chunk.prototype.write = function(data, callback) {
-  this.data.write(data, this.internalPosition);
+  this.data.write(data.toString('binary'), this.internalPosition);
   this.internalPosition = this.data.length();
   callback(null, this);
 };
@@ -79,6 +79,23 @@ Chunk.prototype.read = function(length) {
   } else {
     return '';
   }
+};
+
+Chunk.prototype.readSlice = function(length) {
+    if ((this.length() - this.internalPosition + 1) >= length) {
+        var data = null;
+        if (this.data.buffer != null) { //Pure BSON
+            data = this.data.buffer.slice(this.internalPosition, this.internalPosition + length);
+        } else { //Native BSON
+            data = new Buffer(length);
+            //todo there is performance degradation! we need direct Binary::write() into buffer with offset support!
+            length = data.write(this.data.read(this.internalPosition, length), 'binary', 0);
+        }
+        this.internalPosition = this.internalPosition + length;
+        return data;
+    } else {
+        return null;
+    }
 };
 
 /**

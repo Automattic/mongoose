@@ -8,6 +8,7 @@ var QueryCommand = require('./commands/query_command').QueryCommand,
   Server = require('./connection').Server,
   ServerPair = require('./connection').ServerPair,
   ServerCluster = require('./connection').ServerCluster,
+  ReplSetServers = require('./connection').ReplSetServers,
   Cursor = require('./cursor').Cursor,
   MD5 = require('./crypto/md5').MD5,
   EventEmitter = require('events').EventEmitter,
@@ -34,6 +35,8 @@ var Db = exports.Db = function(databaseName, serverConfig, options) {
   this.pkFactory = this.options.pk == null ? this.bson_serializer.ObjectID : this.options.pk;  
   // Added strict
   this.strict = this.options.strict == null ? false : this.options.strict;
+  this.notReplied ={};
+  this.isInitializing = true;
 };
 
 inherits(Db, EventEmitter);
@@ -79,6 +82,7 @@ Db.prototype.open = function(callback) {
       var db_command = DbCommand.createIsMasterCommand(self);
       
       self.addListener(db_command.getRequestId().toString(), connectCallback);
+      self.notReplied[db_command.getRequestId().toString()] = this;	
       // Let's send a request to identify the state of the server
       this.send(db_command);
     });
@@ -89,7 +93,10 @@ Db.prototype.open = function(callback) {
       // Emit message
       self.emit(reply.responseTo.toString(), null, reply);
       // Remove the listener
-      self.removeListener(reply.responseTo.toString(), self.listeners(reply.responseTo.toString())[0]);
+	  if ( self.notReplied[ reply.responseTo.toString()]) {
+        delete self.notReplied[ reply.responseTo.toString()];
+        self.removeListener(reply.responseTo.toString(), self.listeners( reply.responseTo.toString())[0] );
+	  }
     });
     
     self.serverConfig.connection.addListener("error", function(err) {
@@ -175,8 +182,122 @@ Db.prototype.open = function(callback) {
       // Open the connection
       server.connection.open();
     });
+  } else if ( self.serverConfig instanceof ReplSetServers ) {
+    var serverConnections = self.serverConfig instanceof ServerPair ? [self.serverConfig.leftServer, self.serverConfig.rightServer] : self.serverConfig.servers;
+    var numberOfConnectedServers = 0; 
+    var numberOfErrorServers = 0;
+    self.serverConfig.addresses = {};
+
+    var initServer = function(server)  {
+      self.serverConfig.addresses[ server.host + ':' + server.port ] = 1;
+      server.connection = new Connection(server.host, server.port, server.autoReconnect);
+      //console.log( 'Connect to ' + server.host + ':' + server.port );
+      self.connections.push(server.connection);
+
+      server.connection.addListener("connect", function() {
+        // Create a callback function for a given connection
+        var connectCallback = function(err, reply) {
+          if(err != null) {
+            callback(err, null);          
+          } else {
+            if(reply.documents[0].ismaster == 1) {
+              // Locate the master connection and save it
+              self.masterConnection = server.connection;
+              server.master = true;
+            } else {
+              server.master = false;
+            }
+			if ( self.serverConfig instanceof ReplSetServers && ( reply.documents[0].hosts != undefined ) ) {
+              var replicas = reply.documents[0].hosts;
+              for( var i in replicas ) {
+                if ( replicas[i] in self.serverConfig.addresses ) 
+                  continue;
+                self.serverConfig.addresses[ replicas[i] ] = 1;
+                var ipAndPort = replicas[i].split(":");
+                var newServer = new Server( ipAndPort[0], parseInt( ipAndPort[1]), { auto_reconnect: true}  );
+                console.log( 'Added ' + replicas[i] + ' to the replica set' );
+                serverConnections.push( newServer );
+                initServer( newServer );
+			  }
+            }
+            // emit a message saying we got a master and are ready to go and change state to reflect it
+            if(++numberOfConnectedServers == serverConnections.length && (self.state == 'notConnected')) {
+              self.state = 'connected';
+			  self.isInitializing  = false;
+              return callback(null, self);
+            } 
+            if ( self.serverConfig instanceof ReplSetServers && server.master ) {
+               //we have the master we are ok, wait for others (if any) to connect too
+               self.state = 'connected'; 
+            }            
+            if ( self.serverConfig instanceof ReplSetServers && ( (numberOfConnectedServers + numberOfErrorServers ) == serverConnections.length )) { 
+			  self.isInitializing  = false;
+              if ( self.state == 'connected' ) {
+                return callback( null, self );
+              } else { 
+                return callback( new Error( 'No master available'), null );
+              }
+            }
+          }
+        };
+        // Create db command and Add the callback to the list of callbacks by the request id (mapping outgoing messages to correct callbacks)
+        var db_command = DbCommand.createIsMasterCommand(self);
+        
+        self.addListener(db_command.getRequestId().toString(), connectCallback);
+        self.notReplied[db_command.getRequestId().toString()] = this;	
+
+        // Let's send a request to identify the state of the server
+        this.send(db_command);
+        server.connection.addListener("data", function(message) {
+          // Parse the data as a reply object
+          var reply = new MongoReply(self, message);
+          // Emit error if there is one       
+          reply.responseHasError ? self.emit(reply.responseTo.toString(), reply.documents[0], reply) : self.emit(reply.responseTo.toString(), null, reply);
+          // Remove the listener
+          //if ( self.listeners(reply.responseTo.toString()).length )
+		  if ( self.notReplied [ reply.responseTo.toString()] ) {
+		    delete self.notReplied[ reply.responseTo.toString()];
+            self.removeListener(reply.responseTo.toString(), self.listeners(reply.responseTo.toString())[0]);
+		  }
+        });
+      });
+
+      server.connection.addListener("error", function(err) {
+        if ( self.serverConfig instanceof ReplSetServers && self.isInitializing) {
+          //we only have one error, if the rest are ok there is no problem
+          numberOfErrorServers++;
+          //console.log( server.host + ':' + server.port + ' down!!!'+ err );
+          if ( (numberOfErrorServers + numberOfConnectedServers) == serverConnections.length) {
+			self.isInitializing  = false;
+            if ( self.state == 'connected' ) {
+              return callback( null, self );
+            } else { 
+              return callback( new Error( 'No master available'), null );
+            }
+          }
+        } else if ( self.serverConfig instanceof ReplSetServers ) {
+		  for ( var i in self.notReplied ) {
+		    //console.log( 'delete event ' + i );
+			if ( self.notReplied[i] == this ) {
+		      delete self.notReplied[i];
+		      self.emit( i, null, { documents: [{'$err':'Connection closed'}] } );
+              self.removeListener( i, self.listeners( i )[0]);
+			}
+		  }
+		} else {
+          return callback(err, null);
+        }
+      });      
+
+      // Emit timeout and close events so the client using db can figure do proper error handling (emit contains the connection that triggered the event)
+      server.connection.addListener("timeout", function() { self.emit("timeout", this); });
+      server.connection.addListener("close", function() { self.emit("close", this); });
+      // Open the connection
+      server.connection.open();
+    };
+    serverConnections.forEach( initServer );
   } else {
-    return callback(Error("Server parameter must be of type Server, ServerPair or ServerCluster"), null);
+    return callback(Error("Server parameter must be of type Server, ServerPair, ServerCluster or ReplSetServers"), null);
   }
 };
 
@@ -320,7 +441,6 @@ Db.prototype.authenticate = function(username, password, callback) {
     if(err == null) {
       // Nonce used to make authentication request with md5 hash
       var nonce = reply.documents[0].nonce;
-      // sys.puts("=========================== NONCE: " + nonce)
       // Execute command
       self.executeCommand(DbCommand.createAuthenticationCommand(self, username, password, nonce), function(err, result) {
         if(err == null && result.documents[0].ok == 1) {
@@ -552,25 +672,54 @@ Db.prototype.dropDatabase = function(callback) {
   Execute db command
 **/
 Db.prototype.executeCommand = function(db_command, callback) {
+    var self = this;
     if(callback instanceof Function) {
       // Add the callback to the list of callbacks by the request id (mapping outgoing messages to correct callbacks)
       this.addListener(db_command.getRequestId().toString(), callback);    
+      if ( self.serverConfig.masterConnection != null ) {
+	      this.notReplied[db_command.getRequestId().toString()] = self.serverConfig.masterConnection;
+	    }
     }
 
     // Correctly handle serialization errors
-    var msg = db_command.toBinary();
     var checkMasterHandler = function(err, reply, dbinstance){ 
-        dbinstance.serverConfig.masterConnection.send(db_command);           
+      if (err == null){
+        try{ 
+          if ( dbinstance.backup.server ) { // use slave this ONE time 
+	          self.notReplied[db_command.getRequestId().toString()] = dbinstance.backup.server.connection;
+            dbinstance.backup.server.connection.send( db_command);
+            dbinstance.backup.server = null;
+          } else {
+	          self.notReplied[db_command.getRequestId().toString()] = dbinstance.serverConfig.masterConnection;
+            dbinstance.serverConfig.masterConnection.send(db_command);          
+          }
+        } catch ( err ) {
+          // Clean up callback if it exists
+          if(this.notReplied[db_command.getRequestId().toString()] != null) {
+            delete self.notReplied[db_command.getRequestId().toString()];                    
+          }
+          
+          if(callback instanceof Function) {
+            return callback(err, null);
+          }          
+        }
+      } else {
+        // XXX : LOOP!!!!!!
+        setTimeout( self.checkMaster_(self, checkMasterHandler), 50 );
+      }
     };
     
     try{
-      this.serverConfig.masterConnection.send(msg);   
+      self.serverConfig.masterConnection.send(db_command);   
     } catch(err){
-      this.checkMaster_(this, checkMasterHandler);
+      if(callback instanceof Function) {        
+        delete self.notReplied[db_command.getRequestId().toString()];        
+        return callback(err, null);
+      }
+
+      // Return error object
+      return err;
     }
-    
-    db_command = null;
-    checkMasterHandler = null;
 };
 
 /**
@@ -603,8 +752,7 @@ exports.connect = function(url, callback) {
           callback(err ? err : new Error('Could not authenticate user ' + user), null);
         }
       });
-    }
-    else {
+    } else {
       callback(err, db);
     }
   });
@@ -617,37 +765,114 @@ exports.connect = function(url, callback) {
 * @param dbcopy{instance of db}
 *
 **/
-
-Db.prototype.checkMaster_ = function(dbcopy, returnback){
-  var db_cmnd = null;
+Db.prototype.checkMaster_ = function(dbcopy, returnback) {
+  var self = dbcopy;
+  var hasReturned = false;
+  var answers = 0;
+  dbcopy.backup = {};  
+  var servers = dbcopy.serverConfig.servers;
   
-  dbcopy.serverConfig.servers.forEach(function(server) {
-    db_cmnd = DbCommand.createIsMasterCommand(dbcopy);
-
-    var connect_Callback = function(err, reply) {
-      if(err != null) {
-        returnback(err, null, null)
-      } else {
-        if(reply.documents[0].ismaster == 1) {
-          // Locate the master connection and save it
-          dbcopy.masterConnection = server.connection;
-          server.master = true;
-          returnback(null, reply, dbcopy);
-        } else {
-          server.master = false;
-        }         
-      }
-    };
-
-    dbcopy.addListener(db_cmnd.getRequestId().toString(), connect_Callback);
-    server.connection.sendwithoutReconnect(db_cmnd); 
+  if(Array.isArray(servers)) {
+    for(var serveri = 0; serveri < servers.length; serveri++) {      
+      var server = servers[serveri];
+      server.master = false;
       
-    server.connection.addListener("error", function(err) {
-      dbcopy.emit("error", err);
-    });      
-
-    // Emit timeout and close events so the client using db can figure do proper error handling (emit contains the connection that triggered the event)
-    server.connection.addListener("timeout", function() { dbcopy.emit("timeout", this); });
-    server.connection.addListener("close", function() { dbcopy.emit("close", this); });      
- });    
-};
+      if(server.connection.connection.readyState == "open" || server.connection.autoReconnect) {
+        var db_cmnd = DbCommand.createIsMasterCommand(dbcopy);
+        var connect_Callback = function(err, reply) {        
+          if(err != null) {
+            if (!hasReturned && ( ++answers == dbcopy.serverConfig.servers.length)) {
+              if (dbcopy.backup.server && dbcopy.backup.reply) { 
+                dbcopy.masterConnection = dbcopy.backup.server.connection;
+                return returnback( null, dbcopy.backup.reply, dbcopy );
+              } else {
+                return returnback( new Error( 'No master found' ) );
+              }
+            }
+          } else {           
+            if(reply.documents[0].ismaster == 1) {
+              // Locate the master connection and save it
+              dbcopy.masterConnection = server.connection;
+              server.master = true;
+              hasReturned = true;
+              return returnback(null, reply, dbcopy);
+            } else {
+              server.master = false;
+              // we may not have a master so we keep a secondary server,
+              // that is able to respond, just in case
+              dbcopy.backup.server = server;
+              dbcopy.backup.reply = reply;
+              if ( !hasReturned && ( ++answers == dbcopy.serverConfig.servers.length )) {
+                if ( dbcopy.backup.server && dbcopy.backup.reply ) { 
+                  dbcopy.masterConnection = dbcopy.backup.server.connection;
+                  return returnback( null, dbcopy.backup.reply, dbcopy );
+                } else {
+                  return returnback(new Error( 'No master found' ));
+                }
+              }
+            }         
+          }
+        }
+      
+        dbcopy.addListener(db_cmnd.getRequestId().toString(), connect_Callback);
+        self.notReplied[db_cmnd.getRequestId().toString()] = server.connection;  
+      
+        if(server.connection.connection.readyState == "open") {
+          server.connection.sendwithoutReconnect(db_cmnd); 
+        } else {
+           // This if it's closed it may not have a listener
+          // The listener is of general use so we need not use one for every command
+          if (!server.connection.listeners("data").length) { 
+            server.connection.addListener("data", function(message) {
+              // Parse the data as a reply object
+              var reply = null;    
+              if ( message ) {
+                reply = new MongoReply(self, message);
+              } else {
+                reply = {};
+                reply.responseHasError = true;
+                reply.documents = ['Error connecting'];
+              }
+              // Emit error if there is one       
+              reply.responseHasError ? self.emit(reply.responseTo.toString(), reply.documents[0], reply) : self.emit(reply.responseTo.toString(), null, reply);
+              // Remove the listener
+              if(self.notReplied[ reply.responseTo.toString()]) {
+                delete self.notReplied[ reply.responseTo.toString()];
+                self.removeListener(reply.responseTo.toString(), self.listeners( reply.responseTo.toString())[0]);
+              }
+            });
+          }
+      
+          if (server.connection.listeners("error").length == 0) {
+            server.connection.addListener("error", function(err) {
+              dbcopy.emit("error", err);
+              server.master = false;
+            });      
+          }
+          
+          // Emit timeout and close events so the client using db can figure do proper error handling (emit contains the connection that triggered the event)
+          if (server.connection.listeners("timeout").length == 0) {
+            server.connection.addListener("timeout", function() { dbcopy.emit("timeout", this); });          
+          }
+          
+          if (server.connection.listeners("close").length == 0) {
+            server.connection.addListener("close", function() { dbcopy.emit("close", this); });          
+          }
+          
+          server.connection.send(db_cmnd); 
+        } 
+      } else {
+        server.master = false;
+      
+        if (!hasReturned && ( ++answers == dbcopy.serverConfig.servers.length)) {
+          if (dbcopy.backup.server && dbcopy.backup.reply) { 
+            dbcopy.masterConnection = dbcopy.backup.server.connection;
+            return returnback( null, dbcopy.backup.reply, dbcopy );
+          } else {
+            return returnback( new Error( 'No master found' ) );
+          }
+        }
+      }
+    }          
+  }
+}

@@ -41,6 +41,10 @@ Connection.prototype.open = function() {
     self.emit("error", err);
   });
   
+  this.connection.addListener("timeout", function(err) {
+    self.emit("timeout", err);
+  });
+  
   // Add a close listener
   this.connection.addListener("close", function() {
     self.emit("close");
@@ -98,10 +102,12 @@ Connection.prototype.close = function() {
   if(this.connection) this.connection.end();
 };
 
-Connection.prototype.send = function(command) {
+Connection.prototype.send = function(command) { 
   var self = this;
   // Check if the connection is closed
   try {
+    if ( this.connection.readyState != "open" )
+      throw 'notConnected';
     if(command.constructor == String) {
       this.connection.write(command, "binary");      
     } else {
@@ -119,6 +125,10 @@ Connection.prototype.send = function(command) {
         var new_connection = net.createConnection(this.port, this.host);
         // Set up the net client
         new_connection.setEncoding("binary");
+        new_connection.addListener( "error", function( err ) {
+          self.emit( "error", err ); 
+          self.connection.currently_reconnecting = null;
+        });
         // Add connnect listener
         new_connection.addListener("connect", function() {
           this.setEncoding("binary");
@@ -153,12 +163,12 @@ Connection.prototype.send = function(command) {
 Connection.prototype.sendwithoutReconnect = function(command) {
   var self = this;
   // Check if the connection is closed
-  
-    try {
-          this.connection.write(command.toBinary(), "binary");
-        }
-  
-    catch(err) {
+  if ( this.connection.readyState != "open" ) {
+    throw new Error( 'Connection closed!' );
+  }
+  try {
+    this.connection.write(command.toBinary(), "binary");
+  } catch(err) {
   // no need to reconnect since called by latest master
   // and already went through send() function
      throw err;  
@@ -267,9 +277,44 @@ ServerCluster.prototype.setTarget = function(target) {
 * @return constructor of ServerCluster
 *
 */
-var ReplSetServers = exports.ReplSetServers = function(serverArr) {
-return  new ServerCluster(serverArr);
+var ReplSetServers = exports.ReplSetServers = function(servers) {
+  // Contains the master server entry
+  this.master = null;
+  this.target = null;
+
+  if(servers.constructor != Array || servers.length == 0) {
+    throw Error("The parameter must be an array of servers and contain at least one server");
+  } else if(servers.constructor == Array || servers.length > 0) {
+    var count = 0;
+    servers.forEach(function(server) {
+      if(server instanceof Server) count = count + 1;
+    });
+
+    if(count < servers.length) {
+      throw Error("All server entries must be of type Server");
+    } else {
+      this.servers = servers;
+    }
+  }
+  // Setters and getters
+  this.__defineGetter__("autoReconnect", function() {
+    if(this.target != null) return this.target.autoReconnect;
+    if(this.masterConnection != null) return this.masterConnection.autoReconnect;
+  });
+  this.__defineGetter__("masterConnection", function() {
+    // Allow overriding to a specific connection
+    if(this.target != null && this.target instanceof Server) {
+      return this.target.masterConnection;
+    } else {
+      var finalServer = null;
+      this.servers.forEach(function(server) {
+        if(server.master == true && ( server.connection.connection.readyState == "open") ) finalServer = server;
+      });
+      return finalServer != null ? finalServer.masterConnection : finalServer;
+    }
+  });
 };
 
-
-
+ReplSetServers.prototype.setTarget = function(target) {
+  this.target = target;
+};

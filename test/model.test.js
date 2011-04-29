@@ -3229,25 +3229,27 @@ module.exports = {
 
   'setting profiling levels': function () {
     var db = start();
-    db.setProfiling(3, function (err) {
-      err.message.should.eql('Invalid profiling level: 3');
-      db.setProfiling('fail', function (err) {
-        err.message.should.eql('Invalid profiling level: fail');
-        db.setProfiling(2, function (err, doc) {
-          should.strictEqual(err, null);
-          db.setProfiling(1, 50, function (err, doc) {
+    db.on('open', function () {
+      db.setProfiling(3, function (err) {
+        err.message.should.eql('Invalid profiling level: 3');
+        db.setProfiling('fail', function (err) {
+          err.message.should.eql('Invalid profiling level: fail');
+          db.setProfiling(2, function (err, doc) {
             should.strictEqual(err, null);
-            doc.was.should.eql(2);
-            db.setProfiling(0, function (err, doc) {
-              db.close();
+            db.setProfiling(1, 50, function (err, doc) {
               should.strictEqual(err, null);
-              doc.was.should.eql(1);
-              doc.slowms.should.eql(50);
+              doc.was.should.eql(2);
+              db.setProfiling(0, function (err, doc) {
+                db.close();
+                should.strictEqual(err, null);
+                doc.was.should.eql(1);
+                doc.slowms.should.eql(50);
+              });
             });
           });
         });
       });
-    });
+    })
   }
 
 };

@@ -579,6 +579,32 @@ module.exports = {
     db.close();
   },
 
+  // GH-342
+  'over-writing a number should persist to the db': function () {
+    var db = start()
+      , BlogPost = db.model('BlogPost', collection);
+
+    var post = new BlogPost({
+      meta: {
+          date      : new Date
+        , visitors  : 10
+      }
+    });
+
+    post.save( function (err) {
+      should.strictEqual(null, err);
+      post.set('meta.visitors', 20);
+      post.save( function (err) {
+        should.strictEqual(null, err);
+        BlogPost.findById(post.id, function (err, found) {
+          should.strictEqual(null, err);
+          found.get('meta.visitors').valueOf().should.equal(20);
+          db.close();
+        });
+      });
+    });
+  },
+
   'test defining a new method': function(){
     var db = start()
       , BlogPost = db.model('BlogPost', collection);

@@ -510,7 +510,7 @@ module.exports = {
     db.close();
   },
 
-  'test isModified on a DocumentArray': function(){
+  'test isModified and isDirectModified on a DocumentArray': function(){
     var db = start()
       , BlogPost = db.model('BlogPost', collection);
 
@@ -523,8 +523,10 @@ module.exports = {
 
     post.isModified('comments.0.title').should.be.false;
     post.get('comments')[0].set('title', 'Woot');
-    post.isModified('comments').should.be.false;
+    post.isModified('comments').should.be.true;
+    post.isDirectModified('comments').should.be.false;
     post.isModified('comments.0.title').should.be.true;
+    post.isDirectModified('comments.0.title').should.be.true;
 
     db.close();
   },
@@ -542,8 +544,10 @@ module.exports = {
 
     post.isModified('comments.0.body').should.be.false;
     post.get('comments')[0].body = 'Woot';
-    post.isModified('comments').should.be.false;
+    post.isModified('comments').should.be.true;
+    post.isDirectModified('comments').should.be.false;
     post.isModified('comments.0.body').should.be.true;
+    post.isDirectModified('comments.0.body').should.be.true;
 
     db.close();
   },

@@ -3,7 +3,7 @@ Mongoose 1.0
 
 ## What's Mongoose?
 
-Mongoose is a MongoDB object modeling tool designed to work in an asychronous
+Mongoose is a MongoDB object modeling tool designed to work in an asynchronous
 environment.
 
 Defining a model is as easy as:

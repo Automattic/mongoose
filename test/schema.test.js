@@ -771,7 +771,7 @@ module.exports = {
   },
 
   'allow disabling the auto .id virtual': function () {
-    var schema = new Schema({ name: String }, { novirtualid: true });
+    var schema = new Schema({ name: String }, { noVirtualId: true });
     should.strictEqual(undefined, schema.virtuals.id);
   }
 

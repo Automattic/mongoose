@@ -1198,11 +1198,13 @@ module.exports = {
 
     Test.create({ loc: [ 10, 20 ]}, { loc: [ 40, 90 ]}, function (err) {
       should.strictEqual(err, null);
-      Test.find({ loc: { $near: [30, 40] }}, function (err, docs) {
-        db.close();
-        should.strictEqual(err, null);
-        docs.length.should.equal(2);
-      });
+      setTimeout(function () {
+        Test.find({ loc: { $near: [30, 40] }}, function (err, docs) {
+          db.close();
+          should.strictEqual(err, null);
+          docs.length.should.equal(2);
+        });
+      }, 400);
     });
 
   }

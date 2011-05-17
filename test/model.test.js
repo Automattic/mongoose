@@ -3320,11 +3320,9 @@ module.exports = {
     parent.embeds.push({title: 'Testing post hooks for embedded docs'});
 
     parent.save(function(err){
-      process.nextTick(function () {
-        should.strictEqual(err, null);
-        save.should.be.true;
-        db.close();
-      });
+      db.close();
+      should.strictEqual(err, null);
+      save.should.be.true;
     });
   }
 

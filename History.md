@@ -1,4 +1,18 @@
 
+1.3.4 / 2011-05-17
+===================
+
+  * fixed; find by Date works as expected (#336)
+  * added; geospatial 2d index support
+  * added; support for $near (#309)
+  * updated; node-mongodb-native driver
+  * fixed; updating numbers work (#342)
+  * added; better error msg when try to remove an embedded doc without an _id (#307)
+  * added; support for 'on-the-fly' schemas (#227)
+  * changed; virtual id getters can now be skipped
+  * fixed; .index() called on subdoc schema now works as expected
+  * fixed; db.setProfile() now buffers until the db is open (#340)
+
 1.3.3 / 2011-04-27
 ===================
 

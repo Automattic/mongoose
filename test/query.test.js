@@ -601,6 +601,49 @@ module.exports = {
     params.numbers.$ne[0].should.eql(10000);
   },
 
+  'Query#find should not cast single value to array for schematype of Array': function () {
+    var query = new Query();
+    var db = start();
+    var Product = db.model('Product');
+    var Comment = db.model('Comment');
+    db.close();
+
+    var id = new DocumentObjectId;
+    var castedComment = { _id: id, text: 'hello there' };
+    var comment = new Comment(castedComment);
+
+    var params = {
+        array: 5
+      , ids: id
+      , comments: comment
+      , strings: 'Hi there'
+      , numbers: 10000
+    };
+
+    query.cast(Product, params);
+    params.array.should.equal(5);
+    params.ids.should.eql(id);
+    params.comments.should.eql(castedComment);
+    params.strings.should.eql('Hi there');
+    params.numbers.should.eql(10000);
+
+    params.array = [5];
+    params.ids = [id];
+    params.comments = [comment];
+    params.strings = ['Hi there'];
+    params.numbers = [10000];
+    query.cast(Product, params);
+    params.array.should.be.instanceof(Array);
+    params.array[0].should.eql(5);
+    params.ids.should.be.instanceof(Array);
+    params.ids[0].toString().should.eql(id.toString());
+    params.comments.should.be.instanceof(Array);
+    params.comments[0].toObject().should.eql(castedComment);
+    params.strings.should.be.instanceof(Array);
+    params.strings[0].should.eql('Hi there');
+    params.numbers.should.be.instanceof(Array);
+    params.numbers[0].should.eql(10000);
+  },
   // Advanced Query options
 
   'test Query#maxscan': function () {

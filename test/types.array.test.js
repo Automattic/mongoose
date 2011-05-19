@@ -75,5 +75,34 @@ module.exports = {
         });
       });
     }
+  },
+
+  'test #splice()': function () {
+    var collection = 'splicetest' + random();
+    var db = start()
+      , schema = new Schema({ numbers: Array })
+      , A = db.model('splicetest', schema, collection);
+
+    var a = new A({ numbers: [4,5,6,7] });
+    a.save(function (err) {
+      should.equal(null, err, 'could not save splice test');
+      A.findById(a._id, function (err, doc) {
+        should.equal(null, err, 'error finding splice doc');
+        doc.numbers.splice(1, 1);
+        doc.numbers.toObject().should.eql([4,6,7]);
+        doc.save(function (err) {
+          should.equal(null, err, 'could not save splice test');
+          A.findById(a._id, function (err, doc) {
+            should.equal(null, err, 'error finding splice doc');
+            doc.numbers.toObject().should.eql([4,6,7]);
+
+            A.collection.drop(function (err) {
+              db.close();
+              should.strictEqual(err, null);
+            });
+          });
+        });
+      });
+    });
   }
 };

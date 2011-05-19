@@ -1,4 +1,11 @@
 
+
+1.3.5 / 2011-05-17
+===================
+
+  * fixed; $ne queries work properly with single vals
+  * added; #inspect() methods to improve console.log output
+
 1.3.4 / 2011-05-17
 ===================
 

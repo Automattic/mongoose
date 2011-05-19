@@ -1,4 +1,9 @@
 
+1.3.6 / 2011-05-18
+===================
+
+  * fixed; corrected casting for queries against array types
+  * added; Document#set now accepts Document instances
 
 1.3.5 / 2011-05-17
 ===================

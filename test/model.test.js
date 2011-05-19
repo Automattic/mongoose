@@ -3334,7 +3334,6 @@ module.exports = {
       save.should.be.true;
     });
   },
-
   'console.log shows helpful values': function () {
     var db = start()
       , BlogPost = db.model('BlogPost', collection);
@@ -3362,6 +3361,166 @@ module.exports = {
     var a = '{ meta: { visitors: 45 },\n  numbers: [ 5, 6, 7 ],\n  owners: [ 4dd3e169dbfb13b4570000b6 ],\n  comments: \n   [{ _id: 4dd3e169dbfb13b4570000b7,\n     comments: [],\n     body: \'this is a comment\',\n     date: Wed, 18 May 2011 15:02:31 GMT,\n     title: \'my comment\' }\n   { _id: 4dd3e169dbfb13b4570000b8,\n     comments: [],\n     body: \'this is a comment too!\',\n     date: Wed, 18 May 2011 15:02:31 GMT,\n     title: \'the next thang\' }],\n  _id: 4dd3e169dbfb13b4570000b9,\n  date: Wed, 18 May 2011 15:02:31 GMT,\n  title: \'Test\' }'
 
     post.inspect().should.eql(a);
+  },
+  'test standalone invalidate': function() {
+    var db = start()
+      , InvalidateSchema = null
+      , Post = null
+      , post = null;
+
+    InvalidateSchema = new Schema({
+      prop: { type: String },
+    });
+
+    mongoose.model('InvalidateSchema', InvalidateSchema);
+
+    Post = db.model('InvalidateSchema');
+    post = new Post();
+    post.set({baz: 'val'});
+    post.invalidate('baz', 'reason');
+
+    post.save(function(err){
+      err.should.be.an.instanceof(MongooseError);
+      err.should.be.an.instanceof(ValidationError);
+
+      err.errors.baz.should.be.an.instanceof(ValidatorError);
+      err.errors.baz.message.should.equal('Validator "reason" failed for path baz');
+
+      post.save(function(err){
+        should.strictEqual(err, null);
+        db.close();
+      });
+    });
+  },
+  'test simple validation middleware': function() {
+    var db = start()
+      , ValidationMiddlewareSchema = null
+      , Post = null
+      , post = null;
+
+    ValidationMiddlewareSchema = new Schema({
+      baz: { type: String }
+    });
+
+    ValidationMiddlewareSchema.pre('validate', function(next) {
+      if (this.get('baz') == 'bad') {
+        this.invalidate('baz', 'bad');
+      }
+      next();
+    });
+
+    mongoose.model('ValidationMiddleware', ValidationMiddlewareSchema);
+
+    Post = db.model('ValidationMiddleware');
+    post = new Post();
+    post.set({baz: 'bad'});
+
+    post.save(function(err){
+      err.should.be.an.instanceof(MongooseError);
+      err.should.be.an.instanceof(ValidationError);
+
+      post.set('baz', 'good');
+      post.save(function(err){
+        should.strictEqual(err, null);
+        db.close();
+      });
+    });
+  },
+  'test async validation middleware': function() {
+    var db = start()
+      , AsyncValidationMiddlewareSchema = null
+      , Post = null
+      , post = null;
+
+    AsyncValidationMiddlewareSchema = new Schema({
+      prop: { type: String }
+    });
+
+    AsyncValidationMiddlewareSchema.pre('validate', function(next, done) {
+      var self = this;
+      setTimeout(function() {
+        if (self.get('prop') == 'bad') {
+          self.invalidate('prop', 'bad');
+        }
+        done();
+      }, 50);
+      next();
+    });
+
+    mongoose.model('AsyncValidationMiddleware', AsyncValidationMiddlewareSchema);
+
+    Post = db.model('AsyncValidationMiddleware');
+    post = new Post();
+    post.set({prop: 'bad'});
+
+    post.save(function(err){
+      err.should.be.an.instanceof(MongooseError);
+      err.should.be.an.instanceof(ValidationError);
+
+      post.set('prop', 'good');
+      post.save(function(err){
+        should.strictEqual(err, null);
+        db.close();
+      });
+    });
+  },
+  'test complex validation middleware': function() {
+    var db = start()
+      , ComplexValidationMiddlewareSchema = null
+      , Post = null
+      , post = null
+      , abc = function(v) {
+          return v === 'abc';
+        };
+
+    ComplexValidationMiddlewareSchema = new Schema({
+      baz: { type: String },
+      abc: { type: String, validate: [abc, 'must be abc'] },
+      test: { type: String, validate: [/test/, 'must be abc'] },
+      required: { type: String, required: true }
+    });
+
+    ComplexValidationMiddlewareSchema.pre('validate', function(next, done) {
+      var self = this;
+      setTimeout(function() {
+        if (self.get('baz') == 'bad') {
+          self.invalidate('baz', 'bad');
+        }
+        done();
+      }, 50);
+      next();
+    });
+
+    mongoose.model('ComplexValidationMiddleware', ComplexValidationMiddlewareSchema);
+
+    Post = db.model('ComplexValidationMiddleware');
+    post = new Post();
+    post.set({
+      baz: 'bad',
+      abc: 'not abc',
+      test: 'fail'
+    });
+
+    post.save(function(err){
+      err.should.be.an.instanceof(MongooseError);
+      err.should.be.an.instanceof(ValidationError);
+      Object.keys(err.errors).length.should.equal(4);
+      err.errors.baz.should.be.an.instanceof(ValidatorError);
+      err.errors.abc.should.be.an.instanceof(ValidatorError);
+      err.errors.test.should.be.an.instanceof(ValidatorError);
+      err.errors.required.should.be.an.instanceof(ValidatorError);
+
+      post.set({
+        baz: 'good',
+        abc: 'abc',
+        test: 'test',
+        required: 'here'
+      });
+      post.save(function(err){
+        should.strictEqual(err, null);
+        db.close();
+      });
+    });
   }
 
 };

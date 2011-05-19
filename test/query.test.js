@@ -9,11 +9,21 @@ var Query = require('mongoose/query')
   , DocumentObjectId = mongoose.Types.ObjectId
   , Schema = mongoose.Schema
 
+var Comment = new Schema({
+    text: String
+});
+
 var Product = new Schema({
     tags: {} // mixed
+  , array: Array
+  , ids: [Schema.ObjectId]
+  , strings: [String]
+  , numbers: [Number]
+  , comments: [Comment]
 });
 
 mongoose.model('Product', Product);
+mongoose.model('Comment', Comment);
 
 /**
  * Test.
@@ -545,6 +555,50 @@ module.exports = {
 
     params.tags.$in.should.eql([4,8,15,16]);
     db.close();
+  },
+
+  'Query#find $ne should not cast single value to array for schematype of Array': function () {
+    var query = new Query();
+    var db = start();
+    var Product = db.model('Product');
+    var Comment = db.model('Comment');
+    db.close();
+
+    var id = new DocumentObjectId;
+    var castedComment = { _id: id, text: 'hello there' };
+    var comment = new Comment(castedComment);
+
+    var params = {
+        array: { $ne: 5 }
+      , ids: { $ne: id }
+      , comments: { $ne: comment }
+      , strings: { $ne: 'Hi there' }
+      , numbers: { $ne: 10000 }
+    };
+
+    query.cast(Product, params);
+    params.array.$ne.should.equal(5);
+    params.ids.$ne.should.eql(id);
+    params.comments.$ne.should.eql(castedComment);
+    params.strings.$ne.should.eql('Hi there');
+    params.numbers.$ne.should.eql(10000);
+
+    params.array.$ne = [5];
+    params.ids.$ne = [id];
+    params.comments.$ne = [comment];
+    params.strings.$ne = ['Hi there'];
+    params.numbers.$ne = [10000];
+    query.cast(Product, params);
+    params.array.$ne.should.be.instanceof(Array);
+    params.array.$ne[0].should.eql(5);
+    params.ids.$ne.should.be.instanceof(Array);
+    params.ids.$ne[0].toString().should.eql(id.toString());
+    params.comments.$ne.should.be.instanceof(Array);
+    params.comments.$ne[0].toObject().should.eql(castedComment);
+    params.strings.$ne.should.be.instanceof(Array);
+    params.strings.$ne[0].should.eql('Hi there');
+    params.numbers.$ne.should.be.instanceof(Array);
+    params.numbers.$ne[0].should.eql(10000);
   },
 
   // Advanced Query options

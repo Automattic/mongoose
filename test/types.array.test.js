@@ -37,10 +37,9 @@ module.exports = {
     Array.isArray(a).should.be.true;
     (a._atomics.constructor).should.eql(Object);
   },
-  
+
   'test indexOf()': function(){
     var db = start()
-      , a = new MongooseArray
       , User = db.model('User', 'users_' + random())
       , Pet = db.model('Pet', 'pets' + random());
 
@@ -55,7 +54,7 @@ module.exports = {
     tj.pets.push(jane);
 
     var pending = 3;
-  
+
     [tobi, loki, jane].forEach(function(pet){
       pet.save(function(){
         --pending || done();

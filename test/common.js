@@ -3,7 +3,7 @@
  * Module dependencies.
  */
 
-var mongoose = require('mongoose')
+var mongoose = require('../')
   , should = require('should')
   , Table = require('cli-table')
   , Mongoose = mongoose.Mongoose

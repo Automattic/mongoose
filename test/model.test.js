@@ -3353,6 +3353,22 @@ module.exports = {
     var a = '{ meta: { visitors: 45 },\n  numbers: [ 5, 6, 7 ],\n  owners: [ 4dd3e169dbfb13b4570000b6 ],\n  comments: \n   [{ _id: 4dd3e169dbfb13b4570000b7,\n     comments: [],\n     body: \'this is a comment\',\n     date: Wed, 18 May 2011 15:02:31 GMT,\n     title: \'my comment\' }\n   { _id: 4dd3e169dbfb13b4570000b8,\n     comments: [],\n     body: \'this is a comment too!\',\n     date: Wed, 18 May 2011 15:02:31 GMT,\n     title: \'the next thang\' }],\n  _id: 4dd3e169dbfb13b4570000b9,\n  date: Wed, 18 May 2011 15:02:31 GMT,\n  title: \'Test\' }'
 
     post.inspect().should.eql(a);
+  },
+
+  'path can be used as pathname': function () {
+    var db = start()
+      , P = db.model('pathnametest', new Schema({ path: String }))
+    db.close();
+
+    var threw = false;
+    try {
+      new P({ path: 'i should not throw' });
+    } catch (err) {
+      threw = true;
+    }
+
+    threw.should.be.false;
+
   }
 
 };

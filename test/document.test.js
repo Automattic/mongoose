@@ -48,12 +48,6 @@ TestDocument.prototype.hooksTest = function(fn){
 };
 
 /**
- * Apply hooks.
- */
-
-Document.registerHooks.call(TestDocument, 'hooksTest');
-
-/**
  * Test.
  */
 
@@ -180,7 +174,7 @@ module.exports = {
         done();
       }, 100);
       next();
-    });
+    }, true);
 
     doc.pre('hooksTest', function(next, done){
       steps++;
@@ -192,7 +186,7 @@ module.exports = {
         done();
       }, 100);
       next();
-    });
+    }, true);
 
     doc.hooksTest(function(err){
       should.strictEqual(err, null);
@@ -244,14 +238,14 @@ module.exports = {
       next();
       done();
       done();
-    });
+    }, true);
 
     doc.pre('hooksTest', function(next, done){
       steps++;
       next();
       done();
       done();
-    });
+    }, true);
 
     doc.hooksTest(function(err){
       should.strictEqual(err, null);
@@ -276,12 +270,12 @@ module.exports = {
       next();
       done();
       done();
-    });
+    }, true);
 
     doc.pre('hooksTest', function(next, done){
       steps++;
       next();
-    });
+    }, true);
 
     doc.hooksTest(function(err){
       should.strictEqual(err, null);
@@ -343,25 +337,20 @@ module.exports = {
     });
   },
 
-  'test that passing something that is not an error is ignored':
-  function(beforeExit){
-    var doc = new TestDocument()
-      , called = false;
+  'test mutating incoming args via middleware': function (beforeExit) {
+    var doc = new TestDocument();
 
-    doc.pre('hooksTest', function(next){
-      next(true);
+    doc.pre('set', function(next, path, val){
+      next(path, 'altered-' + val);
     });
 
-    doc.hooksTest(function(err){
-      should.strictEqual(err, null);
-      called = true;
-    });
+    doc.set('test', 'me');
 
     beforeExit(function(){
-      called.should.be.true;
+      doc.test.should.equal('altered-me');
     });
   },
-
+  
   'test hooks system errors from a parallel hook': function(beforeExit){
     var doc = new TestDocument()
       , steps = 0
@@ -371,19 +360,19 @@ module.exports = {
       steps++;
       next();
       done();
-    });
+    }, true);
 
     doc.pre('hooksTest', function(next, done){
       steps++;
       next();
       done();
-    });
+    }, true);
 
     doc.pre('hooksTest', function(next, done){
       steps++;
       next();
       done(new Error);
-    });
+    }, true);
 
     doc.hooksTest(function(err){
       err.should.be.an.instanceof(Error);

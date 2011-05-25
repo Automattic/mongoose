@@ -276,8 +276,8 @@ access it through the same function</p>
 <p>We can then instantiate it, and save it:</p>
 
 <pre><code>var instance = new myModel();
-myModel.my.key = 'hello';
-myModel.save(function (err) {
+instance.my.key = 'hello';
+instance.save(function (err) {
   //
 });</code></pre>
 

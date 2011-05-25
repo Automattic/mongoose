@@ -3369,6 +3369,24 @@ module.exports = {
 
     threw.should.be.false;
 
+  },
+
+  'when mongo is down, save callback should fire with err': function () {
+    var db = start();
+    var T = db.model('Thing', new Schema({ type: String }));
+    db.close();
+
+    var t = new T({ type: "monster" });
+
+    var worked = false;
+    t.save(function (err) {
+      worked = true;
+      err.message.should.eql('notConnected');
+    });
+
+    setTimeout(function () {
+      worked.should.be.true;
+    }, 1000);
   }
 
 };

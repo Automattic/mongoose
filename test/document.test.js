@@ -81,6 +81,10 @@ module.exports = {
     doc2.test.should.eql('toop');
     doc2.oids.should.be.an.instanceof(Array);
     (doc2.nested.age == 2).should.be.true;
+
+    // GH-366
+    should.strictEqual(doc2.nested.nested, undefined);
+
     DocumentObjectId.toString(doc2.nested.cool).should.eql('4cf70857337498f95900001c');
 
     doc.oids.should.not.equal(doc2.oids);

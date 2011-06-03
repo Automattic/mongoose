@@ -83,6 +83,22 @@ module.exports = {
     db.close();
   },
 
+  'modified getter should not throw': function () {
+    var db = start();
+    var BlogPost = db.model('BlogPost', collection);
+    var post = new BlogPost;
+    db.close();
+
+    var threw = false;
+    try {
+      post.modified;
+    } catch (err) {
+      threw = true;
+    }
+
+    threw.should.be.false;
+  },
+
   'test presence of model schema': function(){
     var db = start()
       , BlogPost = db.model('BlogPost', collection);

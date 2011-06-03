@@ -3507,6 +3507,24 @@ module.exports = {
         });
       })
     })
+  },
+
+  'RegExps can be saved': function () {
+    var db = start()
+      , BlogPost = db.model('BlogPost', collection);
+
+    var post = new BlogPost({ mixed: { rgx: /^asdf$/ } });
+    post.mixed.rgx.should.be.instanceof(RegExp);
+    post.mixed.rgx.source.should.eql('^asdf$');
+    post.save(function (err) {
+      should.strictEqual(err, null);
+      BlogPost.findById(post._id, function (err, post) {
+        db.close();
+        should.strictEqual(err, null);
+        post.mixed.rgx.should.be.instanceof(RegExp);
+        post.mixed.rgx.source.should.eql('^asdf$');
+      });
+    });
   }
 
 };

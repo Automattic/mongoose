@@ -209,9 +209,9 @@ There's two types of middleware:
   Parallel middleware offer more fine-grained flow control, and are defined
   like
 
-        .pre(method, function (next, done, methodArg1, methodArg2) {
+        .pre(method, true, function (next, done, methodArg1, methodArg2) {
           // ...
-        }, true)
+        })
 
   Parallel middleware can `next()` immediately, but the final argument will be
   called when all the parallel middleware have called `done()`.

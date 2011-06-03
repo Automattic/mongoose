@@ -3492,7 +3492,6 @@ module.exports = {
             sub.commit('mixed');
             sub.isModified('mixed').should.be.true;
             sub.modified.should.be.true;
-            t.isModified().should.be.true;
             t.modified.should.be.true;
 
             t.save(function (err) {

@@ -3451,6 +3451,63 @@ module.exports = {
     setTimeout(function () {
       worked.should.be.true;
     }, 1000);
+  },
+
+  'subdocuments with changed values should persist the values': function () {
+    var db = start()
+    var Subdoc = new Schema({ name: String, mixed: Schema.Types.Mixed });
+    var T = db.model('SubDocMixed', new Schema({ subs: [Subdoc] }));
+
+    var t = new T({ subs: [{ name: "Hubot", mixed: { w: 1, x: 2 }}] });
+    t.subs[0].name.should.equal("Hubot");
+    t.subs[0].mixed.w.should.equal(1);
+    t.subs[0].mixed.x.should.equal(2);
+
+    t.save(function (err) {
+      should.strictEqual(null, err);
+
+      T.findById(t._id, function (err, t) {
+        should.strictEqual(null, err);
+        t.subs[0].name.should.equal("Hubot");
+        t.subs[0].mixed.w.should.equal(1);
+        t.subs[0].mixed.x.should.equal(2);
+
+        var sub = t.subs[0];
+        sub.name = "Hubot1";
+        sub.name.should.equal("Hubot1");
+        sub.isModified('name').should.be.true;
+        t.modified.should.be.true;
+
+        t.save(function (err) {
+          should.strictEqual(null, err);
+
+          T.findById(t._id, function (err, t) {
+            should.strictEqual(null, err);
+            should.strictEqual(t.subs[0].name, "Hubot1");
+
+            var sub = t.subs[0];
+            sub.mixed.w = 5;
+            sub.mixed.w.should.equal(5);
+            sub.isModified('mixed').should.be.false;
+            sub.commit('mixed');
+            sub.isModified('mixed').should.be.true;
+            sub.modified.should.be.true;
+            t.isModified().should.be.true;
+            t.modified.should.be.true;
+
+            t.save(function (err) {
+              should.strictEqual(null, err);
+
+              T.findById(t._id, function (err, t) {
+                db.close();
+                should.strictEqual(null, err);
+                should.strictEqual(t.subs[0].mixed.w, 5);
+              })
+            })
+          });
+        });
+      })
+    })
   }
 
 };

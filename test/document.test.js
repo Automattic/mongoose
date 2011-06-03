@@ -84,6 +84,7 @@ module.exports = {
 
     // GH-366
     should.strictEqual(doc2.nested.nested, undefined);
+    should.strictEqual(doc2.nested.test, undefined);
 
     DocumentObjectId.toString(doc2.nested.cool).should.eql('4cf70857337498f95900001c');
 

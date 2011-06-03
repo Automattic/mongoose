@@ -83,6 +83,22 @@ module.exports = {
     db.close();
   },
 
+  'modified getter should not throw': function () {
+    var db = start();
+    var BlogPost = db.model('BlogPost', collection);
+    var post = new BlogPost;
+    db.close();
+
+    var threw = false;
+    try {
+      post.modified;
+    } catch (err) {
+      threw = true;
+    }
+
+    threw.should.be.false;
+  },
+
   'test presence of model schema': function(){
     var db = start()
       , BlogPost = db.model('BlogPost', collection);
@@ -1984,6 +2000,54 @@ module.exports = {
     });
   },
 
+  '$shift': function () {
+    var db = start()
+      , schema = new Schema({
+          nested: {
+            nums: [Number]
+          }
+        });
+
+    mongoose.model('TestingShift', schema);
+    var Temp = db.model('TestingShift', collection);
+
+    Temp.create({ nested: { nums: [1,2,3] }}, function (err, t) {
+      should.strictEqual(null, err);
+
+      Temp.findById(t._id, function (err, found) {
+        should.strictEqual(null, err);
+        found.nested.nums.should.have.length(3);
+        found.nested.nums.$pop();
+        found.nested.nums.should.have.length(2);
+        found.nested.nums[0].should.eql(1);
+        found.nested.nums[1].should.eql(2);
+
+        found.save(function (err) {
+          should.strictEqual(null, err);
+          Temp.findById(t._id, function (err, found) {
+            should.strictEqual(null, err);
+            found.nested.nums.should.have.length(2);
+            found.nested.nums[0].should.eql(1);
+            found.nested.nums[1].should.eql(2);
+            found.nested.nums.$shift();
+            found.nested.nums.should.have.length(1);
+            found.nested.nums[0].should.eql(2);
+
+            found.save(function (err) {
+              should.strictEqual(null, err);
+              Temp.findById(t._id, function (err, found) {
+                db.close();
+                should.strictEqual(null, err);
+                found.nested.nums.should.have.length(1);
+                found.nested.nums[0].should.eql(2);
+              });
+            });
+          });
+        });
+      });
+    });
+  },
+
   'test saving embedded arrays of Numbers atomically': function () {
     var db = start()
       , TempSchema = new Schema({
@@ -3387,6 +3451,80 @@ module.exports = {
     setTimeout(function () {
       worked.should.be.true;
     }, 1000);
+  },
+
+  'subdocuments with changed values should persist the values': function () {
+    var db = start()
+    var Subdoc = new Schema({ name: String, mixed: Schema.Types.Mixed });
+    var T = db.model('SubDocMixed', new Schema({ subs: [Subdoc] }));
+
+    var t = new T({ subs: [{ name: "Hubot", mixed: { w: 1, x: 2 }}] });
+    t.subs[0].name.should.equal("Hubot");
+    t.subs[0].mixed.w.should.equal(1);
+    t.subs[0].mixed.x.should.equal(2);
+
+    t.save(function (err) {
+      should.strictEqual(null, err);
+
+      T.findById(t._id, function (err, t) {
+        should.strictEqual(null, err);
+        t.subs[0].name.should.equal("Hubot");
+        t.subs[0].mixed.w.should.equal(1);
+        t.subs[0].mixed.x.should.equal(2);
+
+        var sub = t.subs[0];
+        sub.name = "Hubot1";
+        sub.name.should.equal("Hubot1");
+        sub.isModified('name').should.be.true;
+        t.modified.should.be.true;
+
+        t.save(function (err) {
+          should.strictEqual(null, err);
+
+          T.findById(t._id, function (err, t) {
+            should.strictEqual(null, err);
+            should.strictEqual(t.subs[0].name, "Hubot1");
+
+            var sub = t.subs[0];
+            sub.mixed.w = 5;
+            sub.mixed.w.should.equal(5);
+            sub.isModified('mixed').should.be.false;
+            sub.commit('mixed');
+            sub.isModified('mixed').should.be.true;
+            sub.modified.should.be.true;
+            t.modified.should.be.true;
+
+            t.save(function (err) {
+              should.strictEqual(null, err);
+
+              T.findById(t._id, function (err, t) {
+                db.close();
+                should.strictEqual(null, err);
+                should.strictEqual(t.subs[0].mixed.w, 5);
+              })
+            })
+          });
+        });
+      })
+    })
+  },
+
+  'RegExps can be saved': function () {
+    var db = start()
+      , BlogPost = db.model('BlogPost', collection);
+
+    var post = new BlogPost({ mixed: { rgx: /^asdf$/ } });
+    post.mixed.rgx.should.be.instanceof(RegExp);
+    post.mixed.rgx.source.should.eql('^asdf$');
+    post.save(function (err) {
+      should.strictEqual(err, null);
+      BlogPost.findById(post._id, function (err, post) {
+        db.close();
+        should.strictEqual(err, null);
+        post.mixed.rgx.should.be.instanceof(RegExp);
+        post.mixed.rgx.source.should.eql('^asdf$');
+      });
+    });
   }
 
 };

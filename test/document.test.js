@@ -84,6 +84,7 @@ module.exports = {
 
     // GH-366
     should.strictEqual(doc2.nested.nested, undefined);
+    should.strictEqual(doc2.nested.test, undefined);
 
     DocumentObjectId.toString(doc2.nested.cool).should.eql('4cf70857337498f95900001c');
 
@@ -168,7 +169,7 @@ module.exports = {
     });
 
     // parallel
-    doc.pre('hooksTest', function(next, done){
+    doc.pre('hooksTest', true, function(next, done){
       steps++;
       setTimeout(function(){
         steps.should.eql(4);
@@ -178,9 +179,9 @@ module.exports = {
         done();
       }, 100);
       next();
-    }, true);
+    });
 
-    doc.pre('hooksTest', function(next, done){
+    doc.pre('hooksTest', true, function(next, done){
       steps++;
       setTimeout(function(){
         steps.should.eql(4);
@@ -190,7 +191,7 @@ module.exports = {
         done();
       }, 100);
       next();
-    }, true);
+    });
 
     doc.hooksTest(function(err){
       should.strictEqual(err, null);
@@ -237,19 +238,19 @@ module.exports = {
       , steps = 0
       , called = false;
 
-    doc.pre('hooksTest', function(next, done){
+    doc.pre('hooksTest', true, function(next, done){
       steps++;
       next();
       done();
       done();
-    }, true);
+    });
 
-    doc.pre('hooksTest', function(next, done){
+    doc.pre('hooksTest', true, function(next, done){
       steps++;
       next();
       done();
       done();
-    }, true);
+    });
 
     doc.hooksTest(function(err){
       should.strictEqual(err, null);
@@ -269,17 +270,17 @@ module.exports = {
       , steps = 0
       , called = false;
 
-    doc.pre('hooksTest', function(next, done){
+    doc.pre('hooksTest', true, function(next, done){
       steps++;
       next();
       done();
       done();
-    }, true);
+    });
 
-    doc.pre('hooksTest', function(next, done){
+    doc.pre('hooksTest', true, function(next, done){
       steps++;
       next();
-    }, true);
+    });
 
     doc.hooksTest(function(err){
       should.strictEqual(err, null);
@@ -360,23 +361,23 @@ module.exports = {
       , steps = 0
       , called = false;
 
-    doc.pre('hooksTest', function(next, done){
+    doc.pre('hooksTest', true, function(next, done){
       steps++;
       next();
       done();
-    }, true);
+    });
 
-    doc.pre('hooksTest', function(next, done){
+    doc.pre('hooksTest', true, function(next, done){
       steps++;
       next();
       done();
-    }, true);
+    });
 
-    doc.pre('hooksTest', function(next, done){
+    doc.pre('hooksTest', true, function(next, done){
       steps++;
       next();
       done(new Error);
-    }, true);
+    });
 
     doc.hooksTest(function(err){
       err.should.be.an.instanceof(Error);

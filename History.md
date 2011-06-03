@@ -1,4 +1,16 @@
 
+1.3.7 / 2011-06-03
+===================
+
+  * added MongooseArray#splice support
+  * fixed; 'path' is now a valid Schema pathname
+  * improved hooks (utilizing https://github.com/bnoguchi/hooks-js)
+  * fixed; MongooseArray#$shift now works (never did)
+  * fixed; Document.modified no longer throws
+  * fixed; modifying subdoc property sets modified paths for subdoc and parent doc
+  * fixed; marking subdoc path as modified properly persists the value to the db
+  * fixed; RexExps can again be saved ( #357 )
+
 1.3.6 / 2011-05-18
 ===================
 

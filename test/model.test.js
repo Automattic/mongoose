@@ -1984,6 +1984,54 @@ module.exports = {
     });
   },
 
+  '$shift': function () {
+    var db = start()
+      , schema = new Schema({
+          nested: {
+            nums: [Number]
+          }
+        });
+
+    mongoose.model('TestingShift', schema);
+    var Temp = db.model('TestingShift', collection);
+
+    Temp.create({ nested: { nums: [1,2,3] }}, function (err, t) {
+      should.strictEqual(null, err);
+
+      Temp.findById(t._id, function (err, found) {
+        should.strictEqual(null, err);
+        found.nested.nums.should.have.length(3);
+        found.nested.nums.$pop();
+        found.nested.nums.should.have.length(2);
+        found.nested.nums[0].should.eql(1);
+        found.nested.nums[1].should.eql(2);
+
+        found.save(function (err) {
+          should.strictEqual(null, err);
+          Temp.findById(t._id, function (err, found) {
+            should.strictEqual(null, err);
+            found.nested.nums.should.have.length(2);
+            found.nested.nums[0].should.eql(1);
+            found.nested.nums[1].should.eql(2);
+            found.nested.nums.$shift();
+            found.nested.nums.should.have.length(1);
+            found.nested.nums[0].should.eql(2);
+
+            found.save(function (err) {
+              should.strictEqual(null, err);
+              Temp.findById(t._id, function (err, found) {
+                db.close();
+                should.strictEqual(null, err);
+                found.nested.nums.should.have.length(1);
+                found.nested.nums[0].should.eql(2);
+              });
+            });
+          });
+        });
+      });
+    });
+  },
+
   'test saving embedded arrays of Numbers atomically': function () {
     var db = start()
       , TempSchema = new Schema({

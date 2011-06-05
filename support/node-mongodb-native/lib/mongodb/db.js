@@ -13,7 +13,8 @@ var QueryCommand = require('./commands/query_command').QueryCommand,
   MD5 = require('./crypto/md5').MD5,
   EventEmitter = require('events').EventEmitter,
   inherits = require('sys').inherits,
-  sys = require('sys');
+  sys = require('sys'),
+  env = require('./env');
 
 var Db = exports.Db = function(databaseName, serverConfig, options) {
   EventEmitter.call(this);
@@ -37,6 +38,10 @@ var Db = exports.Db = function(databaseName, serverConfig, options) {
   this.strict = this.options.strict == null ? false : this.options.strict;
   this.notReplied ={};
   this.isInitializing = true;
+
+  // Register database in db environment
+  env.databases[databaseName] = this;
+  env.currentdb = this;
 };
 
 inherits(Db, EventEmitter);

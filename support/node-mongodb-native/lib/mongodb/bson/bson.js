@@ -1,7 +1,8 @@
 var BinaryParser = require('./binary_parser').BinaryParser,
   Integer = require('../goog/math/integer').Integer,
   Long = require('../goog/math/long').Long,
-  Buffer = require('buffer').Buffer;
+  Buffer = require('buffer').Buffer,
+  env = require('../env');
   
 // Alias a string function
 var chr = String.fromCharCode;
@@ -573,6 +574,22 @@ var DBRef = exports.DBRef = function(namespace, oid, db) {
   this.oid = oid;
   this.db = db;
 };
+
+DBRef.prototype.fetch = function(callback) {
+  var database;
+  if (typeof this.db === "string") {
+    database = env[this.db];
+    if (database === null) {
+      throw Error("database '" + this.db + "' not registered in environment");
+    }
+  } else {
+    database = env.currentdb;
+    if (database === null) {
+      throw Error("no current database set in environment");
+    }
+  }
+  return database.dereference(this, callback);
+}
 
 /**
   Contains the a binary stream of data

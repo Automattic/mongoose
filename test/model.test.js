@@ -2791,6 +2791,7 @@ module.exports = {
     });
 
     schema.methods.save = function (callback) {
+      should.strictEqual('function', typeof callback);
       this.name = 'overridden';
       mongoose.Model.prototype.save.call(this, callback);
     };
@@ -2802,7 +2803,6 @@ module.exports = {
       db.close();
       should.strictEqual(null, err);
       s.name.should.equal('overridden');
-      console.error('done');
     });
 
   },

@@ -3544,6 +3544,24 @@ module.exports = {
         post.mixed.rgx.source.should.eql('^asdf$');
       });
     });
+  },
+
+  'null defaults are allowed': function () {
+    var db = start();
+    var T = db.model('NullDefault', new Schema({ name: { type: String, default: null }}), collection);
+    var t = new T();
+
+    should.strictEqual(null, t.name);
+
+    t.save(function (err) {
+      should.strictEqual(null, err);
+
+      T.findById(t._id, function (err, t) {
+        db.close();
+        should.strictEqual(null, err);
+        should.strictEqual(null, t.name);
+      });
+    });
   }
 
 };

@@ -2794,6 +2794,7 @@ module.exports = {
     var s = new S({name: 'zupa'});
 
     s.save(function (err) {
+      clearTimeout(timer);
       db.close();
       should.strictEqual(null, err);
     });

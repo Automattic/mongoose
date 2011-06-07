@@ -1,4 +1,42 @@
 
+1.3.7 / 2011-06-03
+===================
+
+  * added MongooseArray#splice support
+  * fixed; 'path' is now a valid Schema pathname
+  * improved hooks (utilizing https://github.com/bnoguchi/hooks-js)
+  * fixed; MongooseArray#$shift now works (never did)
+  * fixed; Document.modified no longer throws
+  * fixed; modifying subdoc property sets modified paths for subdoc and parent doc
+  * fixed; marking subdoc path as modified properly persists the value to the db
+  * fixed; RexExps can again be saved ( #357 )
+
+1.3.6 / 2011-05-18
+===================
+
+  * fixed; corrected casting for queries against array types
+  * added; Document#set now accepts Document instances
+
+1.3.5 / 2011-05-17
+===================
+
+  * fixed; $ne queries work properly with single vals
+  * added; #inspect() methods to improve console.log output
+
+1.3.4 / 2011-05-17
+===================
+
+  * fixed; find by Date works as expected (#336)
+  * added; geospatial 2d index support
+  * added; support for $near (#309)
+  * updated; node-mongodb-native driver
+  * fixed; updating numbers work (#342)
+  * added; better error msg when try to remove an embedded doc without an _id (#307)
+  * added; support for 'on-the-fly' schemas (#227)
+  * changed; virtual id getters can now be skipped
+  * fixed; .index() called on subdoc schema now works as expected
+  * fixed; db.setProfile() now buffers until the db is open (#340)
+
 1.3.3 / 2011-04-27
 ===================
 

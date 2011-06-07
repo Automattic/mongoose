@@ -455,6 +455,52 @@ module.exports = {
     });
   },
 
+  'test find queries with $ne with single value against array': function () {
+    var db = start();
+    var schema = new Schema({
+        ids: [Schema.ObjectId]
+      , b: Schema.ObjectId
+    });
+
+    var NE = db.model('NE_Test', schema, 'nes__' + random());
+
+    var id1 = new DocumentObjectId;
+    var id2 = new DocumentObjectId;
+    var id3 = new DocumentObjectId;
+    var id4 = new DocumentObjectId;
+
+    NE.create({ ids: [id1, id4], b: id3 }, function (err, ne1) {
+      should.strictEqual(err, null);
+      NE.create({ ids: [id2, id4], b: id3 },function (err, ne2) {
+        should.strictEqual(err, null);
+
+        var query = NE.find({ 'b': id3.toString(), 'ids': { $ne: id1 }});
+        query.run(function (err, nes1) {
+          should.strictEqual(err, null);
+          nes1.length.should.eql(1);
+
+          NE.find({ b: { $ne: [1] }}, function (err, nes2) {
+            should.strictEqual(err, null);
+            nes2.length.should.eql(2);
+
+            NE.find({ b: { $ne: 4 }}, function (err, nes3) {
+              should.strictEqual(err, null);
+              nes3.length.should.eql(2);
+
+              NE.find({ b: id3, ids: { $ne: id4 }}, function (err, nes4) {
+                db.close();
+                should.strictEqual(err, null);
+                nes4.length.should.eql(0);
+              });
+            });
+          });
+        });
+
+      });
+    });
+
+  },
+
   'test for findById where partial initialization': function () {
     var db = start()
       , BlogPostB = db.model('BlogPostB', collection)
@@ -1198,13 +1244,14 @@ module.exports = {
 
     Test.create({ loc: [ 10, 20 ]}, { loc: [ 40, 90 ]}, function (err) {
       should.strictEqual(err, null);
-      Test.find({ loc: { $near: [30, 40] }}, function (err, docs) {
-        db.close();
-        should.strictEqual(err, null);
-        docs.length.should.equal(2);
-      });
+      setTimeout(function () {
+        Test.find({ loc: { $near: [30, 40] }}, function (err, docs) {
+          db.close();
+          should.strictEqual(err, null);
+          docs.length.should.equal(2);
+        });
+      }, 400);
     });
-
   }
 
 };

@@ -83,6 +83,22 @@ module.exports = {
     db.close();
   },
 
+  'modified getter should not throw': function () {
+    var db = start();
+    var BlogPost = db.model('BlogPost', collection);
+    var post = new BlogPost;
+    db.close();
+
+    var threw = false;
+    try {
+      post.modified;
+    } catch (err) {
+      threw = true;
+    }
+
+    threw.should.be.false;
+  },
+
   'test presence of model schema': function(){
     var db = start()
       , BlogPost = db.model('BlogPost', collection);
@@ -1984,6 +2000,54 @@ module.exports = {
     });
   },
 
+  '$shift': function () {
+    var db = start()
+      , schema = new Schema({
+          nested: {
+            nums: [Number]
+          }
+        });
+
+    mongoose.model('TestingShift', schema);
+    var Temp = db.model('TestingShift', collection);
+
+    Temp.create({ nested: { nums: [1,2,3] }}, function (err, t) {
+      should.strictEqual(null, err);
+
+      Temp.findById(t._id, function (err, found) {
+        should.strictEqual(null, err);
+        found.nested.nums.should.have.length(3);
+        found.nested.nums.$pop();
+        found.nested.nums.should.have.length(2);
+        found.nested.nums[0].should.eql(1);
+        found.nested.nums[1].should.eql(2);
+
+        found.save(function (err) {
+          should.strictEqual(null, err);
+          Temp.findById(t._id, function (err, found) {
+            should.strictEqual(null, err);
+            found.nested.nums.should.have.length(2);
+            found.nested.nums[0].should.eql(1);
+            found.nested.nums[1].should.eql(2);
+            found.nested.nums.$shift();
+            found.nested.nums.should.have.length(1);
+            found.nested.nums[0].should.eql(2);
+
+            found.save(function (err) {
+              should.strictEqual(null, err);
+              Temp.findById(t._id, function (err, found) {
+                db.close();
+                should.strictEqual(null, err);
+                found.nested.nums.should.have.length(1);
+                found.nested.nums[0].should.eql(2);
+              });
+            });
+          });
+        });
+      });
+    });
+  },
+
   'test saving embedded arrays of Numbers atomically': function () {
     var db = start()
       , TempSchema = new Schema({
@@ -2718,6 +2782,25 @@ module.exports = {
     });
   },
 
+  'passing null in pre hook works': function () {
+    var db = start();
+    var schema = new Schema({ name: String });
+
+    schema.pre('save', function (next) {
+      next(null); // <<-----
+    });
+
+    var S = db.model('S', schema, collection);
+    var s = new S({name: 'zupa'});
+
+    s.save(function (err) {
+      clearTimeout(timer);
+      db.close();
+      should.strictEqual(null, err);
+    });
+
+  },
+
   'test post hooks': function () {
     var schema = new Schema({
             title: String
@@ -3259,27 +3342,226 @@ module.exports = {
 
   'setting profiling levels': function () {
     var db = start();
-    db.on('open', function () {
-      db.setProfiling(3, function (err) {
-        err.message.should.eql('Invalid profiling level: 3');
-        db.setProfiling('fail', function (err) {
-          err.message.should.eql('Invalid profiling level: fail');
-          db.setProfiling(2, function (err, doc) {
+    db.setProfiling(3, function (err) {
+      err.message.should.eql('Invalid profiling level: 3');
+      db.setProfiling('fail', function (err) {
+        err.message.should.eql('Invalid profiling level: fail');
+        db.setProfiling(2, function (err, doc) {
+          should.strictEqual(err, null);
+          db.setProfiling(1, 50, function (err, doc) {
             should.strictEqual(err, null);
-            db.setProfiling(1, 50, function (err, doc) {
+            doc.was.should.eql(2);
+            db.setProfiling(0, function (err, doc) {
+              db.close();
               should.strictEqual(err, null);
-              doc.was.should.eql(2);
-              db.setProfiling(0, function (err, doc) {
-                db.close();
-                should.strictEqual(err, null);
-                doc.was.should.eql(1);
-                doc.slowms.should.eql(50);
-              });
+              doc.was.should.eql(1);
+              doc.slowms.should.eql(50);
             });
           });
         });
       });
+    });
+  },
+
+  'test post hooks on embedded documents': function(){
+    var save = false,
+        init = false,
+        remove = false;
+
+    var EmbeddedSchema = new Schema({
+      title : String
+    });
+
+    var ParentSchema = new Schema({
+      embeds : [EmbeddedSchema]
+    });
+
+    EmbeddedSchema.post('save', function(next){
+      save = true;
+    });
+
+    // Don't know how to test those on a embedded document.
+    /*
+
+    EmbeddedSchema.post('init', function () {
+      init = true;
+    });
+
+    EmbeddedSchema.post('remove', function () {
+      remove = true;
+    });
+
+    */
+
+    mongoose.model('Parent', ParentSchema);
+
+    var db = start(),
+        Parent = db.model('Parent');
+
+    var parent = new Parent();
+
+    parent.embeds.push({title: 'Testing post hooks for embedded docs'});
+
+    parent.save(function(err){
+      db.close();
+      should.strictEqual(err, null);
+      save.should.be.true;
+    });
+  },
+
+  'console.log shows helpful values': function () {
+    var db = start()
+      , BlogPost = db.model('BlogPost', collection);
+
+    var date = new Date(1305730951086);
+    var id0 = new DocumentObjectId('4dd3e169dbfb13b4570000b9');
+    var id1 = new DocumentObjectId('4dd3e169dbfb13b4570000b6');
+    var id2 = new DocumentObjectId('4dd3e169dbfb13b4570000b7');
+    var id3 = new DocumentObjectId('4dd3e169dbfb13b4570000b8');
+
+    var post = new BlogPost({
+        title: 'Test'
+      , _id: id0
+      , date: date
+      , numbers: [5,6,7]
+      , owners: [id1]
+      , meta: { visitors: 45 }
+      , comments: [
+          { _id: id2, title: 'my comment', date: date, body: 'this is a comment' },
+          { _id: id3, title: 'the next thang', date: date, body: 'this is a comment too!' }]
+    });
+
+    db.close();
+
+    var a = '{ meta: { visitors: 45 },\n  numbers: [ 5, 6, 7 ],\n  owners: [ 4dd3e169dbfb13b4570000b6 ],\n  comments: \n   [{ _id: 4dd3e169dbfb13b4570000b7,\n     comments: [],\n     body: \'this is a comment\',\n     date: Wed, 18 May 2011 15:02:31 GMT,\n     title: \'my comment\' }\n   { _id: 4dd3e169dbfb13b4570000b8,\n     comments: [],\n     body: \'this is a comment too!\',\n     date: Wed, 18 May 2011 15:02:31 GMT,\n     title: \'the next thang\' }],\n  _id: 4dd3e169dbfb13b4570000b9,\n  date: Wed, 18 May 2011 15:02:31 GMT,\n  title: \'Test\' }'
+
+    post.inspect().should.eql(a);
+  },
+
+  'path can be used as pathname': function () {
+    var db = start()
+      , P = db.model('pathnametest', new Schema({ path: String }))
+    db.close();
+
+    var threw = false;
+    try {
+      new P({ path: 'i should not throw' });
+    } catch (err) {
+      threw = true;
+    }
+
+    threw.should.be.false;
+
+  },
+
+  'when mongo is down, save callback should fire with err': function () {
+    var db = start();
+    var T = db.model('Thing', new Schema({ type: String }));
+    db.close();
+
+    var t = new T({ type: "monster" });
+
+    var worked = false;
+    t.save(function (err) {
+      worked = true;
+      err.message.should.eql('notConnected');
+    });
+
+    setTimeout(function () {
+      worked.should.be.true;
+    }, 1000);
+  },
+
+  'subdocuments with changed values should persist the values': function () {
+    var db = start()
+    var Subdoc = new Schema({ name: String, mixed: Schema.Types.Mixed });
+    var T = db.model('SubDocMixed', new Schema({ subs: [Subdoc] }));
+
+    var t = new T({ subs: [{ name: "Hubot", mixed: { w: 1, x: 2 }}] });
+    t.subs[0].name.should.equal("Hubot");
+    t.subs[0].mixed.w.should.equal(1);
+    t.subs[0].mixed.x.should.equal(2);
+
+    t.save(function (err) {
+      should.strictEqual(null, err);
+
+      T.findById(t._id, function (err, t) {
+        should.strictEqual(null, err);
+        t.subs[0].name.should.equal("Hubot");
+        t.subs[0].mixed.w.should.equal(1);
+        t.subs[0].mixed.x.should.equal(2);
+
+        var sub = t.subs[0];
+        sub.name = "Hubot1";
+        sub.name.should.equal("Hubot1");
+        sub.isModified('name').should.be.true;
+        t.modified.should.be.true;
+
+        t.save(function (err) {
+          should.strictEqual(null, err);
+
+          T.findById(t._id, function (err, t) {
+            should.strictEqual(null, err);
+            should.strictEqual(t.subs[0].name, "Hubot1");
+
+            var sub = t.subs[0];
+            sub.mixed.w = 5;
+            sub.mixed.w.should.equal(5);
+            sub.isModified('mixed').should.be.false;
+            sub.commit('mixed');
+            sub.isModified('mixed').should.be.true;
+            sub.modified.should.be.true;
+            t.modified.should.be.true;
+
+            t.save(function (err) {
+              should.strictEqual(null, err);
+
+              T.findById(t._id, function (err, t) {
+                db.close();
+                should.strictEqual(null, err);
+                should.strictEqual(t.subs[0].mixed.w, 5);
+              })
+            })
+          });
+        });
+      })
     })
+  },
+
+  'RegExps can be saved': function () {
+    var db = start()
+      , BlogPost = db.model('BlogPost', collection);
+
+    var post = new BlogPost({ mixed: { rgx: /^asdf$/ } });
+    post.mixed.rgx.should.be.instanceof(RegExp);
+    post.mixed.rgx.source.should.eql('^asdf$');
+    post.save(function (err) {
+      should.strictEqual(err, null);
+      BlogPost.findById(post._id, function (err, post) {
+        db.close();
+        should.strictEqual(err, null);
+        post.mixed.rgx.should.be.instanceof(RegExp);
+        post.mixed.rgx.source.should.eql('^asdf$');
+      });
+    });
+  },
+
+  'null defaults are allowed': function () {
+    var db = start();
+    var T = db.model('NullDefault', new Schema({ name: { type: String, default: null }}), collection);
+    var t = new T();
+
+    should.strictEqual(null, t.name);
+
+    t.save(function (err) {
+      should.strictEqual(null, err);
+
+      T.findById(t._id, function (err, t) {
+        db.close();
+        should.strictEqual(null, err);
+        should.strictEqual(null, t.name);
+      });
+    });
   }
 
 };

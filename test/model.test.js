@@ -2782,6 +2782,31 @@ module.exports = {
     });
   },
 
+  'test overriding model#save still works when passing null in pre hook': function () {
+    var db = start();
+    var schema = new Schema({ name: String });
+
+    schema.pre('save', function (next) {
+      next(null); // <<-----
+    });
+
+    schema.methods.save = function (callback) {
+      this.name = 'overridden';
+      mongoose.Model.prototype.save.call(this, callback);
+    };
+
+    var S = db.model('S', schema, collection);
+    var s = new S({name: 'zupa'});
+
+    s.save(function (err) {
+      db.close();
+      should.strictEqual(null, err);
+      s.name.should.equal('overridden');
+      console.error('done');
+    });
+
+  },
+
   'test post hooks': function () {
     var schema = new Schema({
             title: String

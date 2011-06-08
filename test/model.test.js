@@ -3634,6 +3634,27 @@ module.exports = {
         });
       });
     });
+  },
+
+  'defining a method on a Schema corresponding to an EmbeddedDocument should generate an instance method for the ED': function () {
+    var db = start();
+    var ChildSchema = new Schema({});
+    var ParentSchema = new Schema({
+      children: [ChildSchema]
+    });
+    ChildSchema.method('talk', function () {
+      return 'gaga';
+    });
+
+    var ChildA = db.model('ChildA', ChildSchema, 'children_' + random());
+    var ParentA = db.model('ParentA', ParentSchema, 'parents_' + random());
+
+    var c = new ChildA;
+    c.talk.should.be.a('function');
+
+    var p = new ParentA();
+    p.children.push({});
+    p.children[0].talk.should.be.a('function');
   }
 
 };

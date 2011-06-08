@@ -3610,6 +3610,30 @@ module.exports = {
         should.strictEqual(undefined, preId);
       });
     });
+  },
+
+  // Demonstration showing why GH-261 is a misunderstanding
+  'a single instantiated document should be able to update its embedded documents more than once': function () {
+    var db = start()
+      , BlogPost = db.model('BlogPost', collection);
+
+    var post = new BlogPost();
+    post.comments.push({title: 'one'});
+    post.save(function (err) {
+      should.strictEqual(err, null);
+      post.comments[0].title.should.eql('one');
+      post.comments[0].title = 'two';
+      post.comments[0].title.should.eql('two');
+      post.save( function (err) {
+        should.strictEqual(err, null);
+        BlogPost.findById(post._id, function (err, found) {
+          should.strictEqual(err, null);
+          db.close();
+          should.strictEqual(err, null);
+          found.comments[0].title.should.eql('two');
+        });
+      });
+    });
   }
 
 };

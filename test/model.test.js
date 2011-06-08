@@ -3561,6 +3561,34 @@ module.exports = {
         should.strictEqual(null, t.name);
       });
     });
-  }
+  },
+
+  // GH-365
+  'test that setters are used on embedded documents': function () {
+    var db = start();
+    function setLat (val) {
+      return parseInt(val);
+    }
+
+    var Location = new Schema({
+      lat: {type: Number, default: 0, set: setLat}
+    });
+
+    var Deal = new Schema({
+        title: String
+      , locations: [Location]
+    });
+
+    Location = db.model('Location', Location, 'locations_' + random());
+    Deal = db.model('Deal', Deal, 'deals_' + random());
+
+    var location = new Location({lat: 1.2});
+    location.lat.valueOf().should.equal(1);
+
+    var deal = new Deal({title: "My deal", locations: [{lat: 1.2}]});
+    deal.locations[0].lat.valueOf().should.equal(1);
+    db.close();
+  },
+
 
 };

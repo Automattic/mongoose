@@ -171,15 +171,40 @@ module.exports = {
 
   'test that count Query executes when you pass a callback': function () {
     var db = start()
-      , BlogPostB = db.model('BlogPostB', collection)
-      , count = 1;
+      , BlogPostB = db.model('BlogPostB', collection);
 
     function fn () {
-      --count || db.close();
+      db.close();
     };
 
     BlogPostB.count({}, fn).should.be.an.instanceof(Query);
   },
+
+  'test that distinct returns a Query': function () {
+    var db = start()
+      , BlogPostB = db.model('BlogPostB', collection);
+
+    BlogPostB.distinct('title', {}).should.be.an.instanceof(Query);
+
+    db.close();
+  },
+
+  'test that distinct Query executes when you pass a callback': function () {
+    var db = start();
+    var Address = new Schema({ zip: String });
+    Address = db.model('Address', Address, 'addresses_' + random());
+
+    Address.create({ zip: '10010'}, { zip: '10010'}, { zip: '99701'}, function (err, a1, a2, a3) {
+      should.strictEqual(null, err);
+      var query = Address.distinct('zip', {}, function (err, results) {
+        should.strictEqual(null, err);
+        results.should.eql(['10010', '99701']);
+        db.close();
+      });
+      query.should.be.an.instanceof(Query);
+    });
+  },
+
 
   'test that update returns a Query': function () {
     var db = start()
@@ -588,11 +613,9 @@ module.exports = {
     var db = start()
       , BlogPostB = db.model('BlogPostB', collection);
     BlogPostB.create({title: 'subset 1'}, function (err, created) {
-      console.log(created);
       should.strictEqual(err, null);
       BlogPostB.findById(created.id, {title: 0}, function (err, found) {
         should.strictEqual(err, null);
-        console.log(found);
         found._id.should.eql(created._id);
         should.strictEqual(undefined, found.title);
         db.close();

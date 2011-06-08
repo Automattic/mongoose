@@ -584,6 +584,22 @@ module.exports = {
     });
   },
 
+  'exluded fields that are not objects or arrays in the schema should be undefined': function () {
+    var db = start()
+      , BlogPostB = db.model('BlogPostB', collection);
+    BlogPostB.create({title: 'subset 1'}, function (err, created) {
+      console.log(created);
+      should.strictEqual(err, null);
+      BlogPostB.findById(created.id, {title: 0}, function (err, found) {
+        should.strictEqual(err, null);
+        console.log(found);
+        found._id.should.eql(created._id);
+        should.strictEqual(undefined, found.title);
+        db.close();
+      });
+    });
+  },
+
   'test for find where partial initialization': function () {
     var db = start()
       , BlogPostB = db.model('BlogPostB', collection)

@@ -556,7 +556,7 @@ module.exports = {
     });
   },
 
-  'test find where subset of fields, excluding _id': function () {
+  'test findOne where subset of fields, excluding _id': function () {
     var db = start()
       , BlogPostB = db.model('BlogPostB', collection);
     BlogPostB.create({title: 'subset 1'}, function (err, created) {
@@ -565,6 +565,21 @@ module.exports = {
         should.strictEqual(err, null);
         should.strictEqual(undefined, found._id);
         found.title.should.equal('subset 1');
+        db.close();
+      });
+    });
+  },
+
+  'test find where subset of fields, excluding _id': function () {
+    var db = start()
+      , BlogPostB = db.model('BlogPostB', collection);
+    BlogPostB.create({title: 'subset 1'}, function (err, created) {
+      should.strictEqual(err, null);
+      BlogPostB.find({title: 'subset 1'}, {title: 1, _id: 0}, function (err, found) {
+        should.strictEqual(err, null);
+        console.log(found);
+        should.strictEqual(undefined, found[0]._id);
+        found[0].title.should.equal('subset 1');
         db.close();
       });
     });

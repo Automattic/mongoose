@@ -563,7 +563,7 @@ module.exports = {
       should.strictEqual(err, null);
       BlogPostB.findOne({title: 'subset 1'}, {title: 1, _id: 0}, function (err, found) {
         should.strictEqual(err, null);
-        found._id.should.be.null;
+        should.strictEqual(undefined, found._id);
         found.title.should.equal('subset 1');
         db.close();
       });

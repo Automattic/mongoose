@@ -3607,7 +3607,7 @@ module.exports = {
       PreInit.findById(doc._id, function (err, found) {
         db.close();
         should.strictEqual(err, null);
-        preId.should.equal(doc._id);
+        should.strictEqual(undefined, preId);
       });
     });
   }

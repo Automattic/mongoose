@@ -3590,5 +3590,26 @@ module.exports = {
     db.close();
   },
 
+  // GH-289
+  'test that pre-init middleware has access to the true ObjectId when used with querying': function () {
+    var db = start()
+      , PreInitSchema = new Schema({})
+      , preId;
+    PreInitSchema.pre('init', function (next) {
+      preId = this._id;
+      next();
+    });
+    var PreInit = db.model('PreInit', PreInitSchema, 'pre_inits' + random());
+
+    var doc = new PreInit();
+    doc.save( function (err) {
+      should.strictEqual(err, null);
+      PreInit.findById(doc._id, function (err, found) {
+        db.close();
+        should.strictEqual(err, null);
+        preId.should.equal(doc._id);
+      });
+    });
+  }
 
 };

@@ -800,6 +800,25 @@ module.exports = {
     });
   },
 
+  // GH-272
+  'test validation with Model.schema.path introspection': function () {
+    var db = start();
+    var IntrospectionValidationSchema = new Schema({
+      name: String
+    });
+    var IntrospectionValidation = db.model('IntrospectionValidation', IntrospectionValidationSchema, 'introspections_' + random());
+    IntrospectionValidation.schema.path('name').validate(function (value) {
+      return value.length < 2;
+    }, 'Name cannot be greater than 1 character');
+    var doc = new IntrospectionValidation({name: 'hi'});
+    doc.save( function (err) {
+      err.errors.name.should.equal("Validator \"Name cannot be greater than 1 character\" failed for path name");
+      err.name.should.equal("ValidationError");
+      err.message.should.equal("Validation failed");
+      db.close();
+    });
+  },
+
   'test required validation for undefined values': function () {
     mongoose.model('TestUndefinedValidation', new Schema({
         simple: { type: String, required: true }

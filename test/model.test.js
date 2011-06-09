@@ -3638,12 +3638,13 @@ module.exports = {
 
   'defining a method on a Schema corresponding to an EmbeddedDocument should generate an instance method for the ED': function () {
     var db = start();
-    var ChildSchema = new Schema({});
-    var ParentSchema = new Schema({
-      children: [ChildSchema]
-    });
+    var ChildSchema = new Schema({ name: String });
     ChildSchema.method('talk', function () {
       return 'gaga';
+    });
+
+    var ParentSchema = new Schema({
+      children: [ChildSchema]
     });
 
     var ChildA = db.model('ChildA', ChildSchema, 'children_' + random());
@@ -3655,6 +3656,7 @@ module.exports = {
     var p = new ParentA();
     p.children.push({});
     p.children[0].talk.should.be.a('function');
+    db.close();
   }
 
 };

@@ -3676,6 +3676,19 @@ module.exports = {
     p.children.push({});
     p.children[0].talk.should.be.a('function');
     db.close();
+  },
+
+  'backward compatibility with conflicted data in the db': function () {
+    var db = start();
+    var M = db.model('backwardDataConflict', new Schema({ namey: { first: String, last: String }}));
+    var m = new M({ namey: "[object Object]" });
+    m.namey = { first: 'GI', last: 'Joe' };// <-- should overwrite the string
+    m.save(function (err) {
+      db.close();
+      should.strictEqual(err, null);
+      should.strictEqual('GI', m.namey.first);
+      should.strictEqual('Joe', m.namey.last);
+    });
   }
 
 };

@@ -1,4 +1,15 @@
 
+1.4.0 / 2011-06-10
+===================
+
+  * bumped hooks-js dependency (fixes issue passing null as first arg to next())
+  * fixed; document#inspect now works properly with nested docs
+  * fixed; 'set' now works as a schema attribute (GH-365)
+  * fixed; _id is now set properly within pre-init hooks (GH-289)
+  * added; Query#distinct / Model#distinct support (GH-155)
+  * fixed; embedded docs now can use instance methods (GH-249)
+  * fixed; can now overwrite strings conflicting with schema type
+
 1.3.7 / 2011-06-03
 ===================
 

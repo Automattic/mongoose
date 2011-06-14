@@ -644,6 +644,15 @@ module.exports = {
     params.numbers.should.be.instanceof(Array);
     params.numbers[0].should.eql(10000);
   },
+
+  'distinct Query op should be "distinct"': function () {
+    var query = new Query();
+    var db = start();
+    var Product = db.model('Product');
+    db.close();
+    new Query().bind(Product, 'distinct').distinct('blah', function(){}).op.should.equal('distinct');
+  },
+
   // Advanced Query options
 
   'test Query#maxscan': function () {

@@ -3676,6 +3676,25 @@ module.exports = {
     p.children.push({});
     p.children[0].talk.should.be.a('function');
     db.close();
+  },
+
+  'Model#save should emit an error as its default error handler if a callback is not passed to it': function () {
+    var db = start();
+    var DefaultErrSchema = new Schema({});
+
+    DefaultErrSchema.pre('save', function (next, fn) {
+      next(new Error());
+    });
+
+    var DefaultErr = db.model('DefaultErr', DefaultErrSchema, 'default_err_' + random());
+
+    var e = new DefaultErr();
+    e.on('error', function (err) {
+      err.should.be.an.instanceof(Error);
+      db.close();
+    });
+
+    e.save();
   }
 
 };

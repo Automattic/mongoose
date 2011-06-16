@@ -800,6 +800,25 @@ module.exports = {
     });
   },
 
+  // GH-272
+  'test validation with Model.schema.path introspection': function () {
+    var db = start();
+    var IntrospectionValidationSchema = new Schema({
+      name: String
+    });
+    var IntrospectionValidation = db.model('IntrospectionValidation', IntrospectionValidationSchema, 'introspections_' + random());
+    IntrospectionValidation.schema.path('name').validate(function (value) {
+      return value.length < 2;
+    }, 'Name cannot be greater than 1 character');
+    var doc = new IntrospectionValidation({name: 'hi'});
+    doc.save( function (err) {
+      err.errors.name.should.equal("Validator \"Name cannot be greater than 1 character\" failed for path name");
+      err.name.should.equal("ValidationError");
+      err.message.should.equal("Validation failed");
+      db.close();
+    });
+  },
+
   'test required validation for undefined values': function () {
     mongoose.model('TestUndefinedValidation', new Schema({
         simple: { type: String, required: true }
@@ -2794,7 +2813,6 @@ module.exports = {
     var s = new S({name: 'zupa'});
 
     s.save(function (err) {
-      clearTimeout(timer);
       db.close();
       should.strictEqual(null, err);
     });
@@ -3561,6 +3579,134 @@ module.exports = {
         should.strictEqual(null, err);
         should.strictEqual(null, t.name);
       });
+    });
+  },
+
+  // GH-365
+  'test that setters are used on embedded documents': function () {
+    var db = start();
+    function setLat (val) {
+      return parseInt(val);
+    }
+
+    var Location = new Schema({
+      lat: {type: Number, default: 0, set: setLat}
+    });
+
+    var Deal = new Schema({
+        title: String
+      , locations: [Location]
+    });
+
+    Location = db.model('Location', Location, 'locations_' + random());
+    Deal = db.model('Deal', Deal, 'deals_' + random());
+
+    var location = new Location({lat: 1.2});
+    location.lat.valueOf().should.equal(1);
+
+    var deal = new Deal({title: "My deal", locations: [{lat: 1.2}]});
+    deal.locations[0].lat.valueOf().should.equal(1);
+    db.close();
+  },
+
+  // GH-289
+  'test that pre-init middleware has access to the true ObjectId when used with querying': function () {
+    var db = start()
+      , PreInitSchema = new Schema({})
+      , preId;
+    PreInitSchema.pre('init', function (next) {
+      preId = this._id;
+      next();
+    });
+    var PreInit = db.model('PreInit', PreInitSchema, 'pre_inits' + random());
+
+    var doc = new PreInit();
+    doc.save( function (err) {
+      should.strictEqual(err, null);
+      PreInit.findById(doc._id, function (err, found) {
+        db.close();
+        should.strictEqual(err, null);
+        should.strictEqual(undefined, preId);
+      });
+    });
+  },
+
+  // Demonstration showing why GH-261 is a misunderstanding
+  'a single instantiated document should be able to update its embedded documents more than once': function () {
+    var db = start()
+      , BlogPost = db.model('BlogPost', collection);
+
+    var post = new BlogPost();
+    post.comments.push({title: 'one'});
+    post.save(function (err) {
+      should.strictEqual(err, null);
+      post.comments[0].title.should.eql('one');
+      post.comments[0].title = 'two';
+      post.comments[0].title.should.eql('two');
+      post.save( function (err) {
+        should.strictEqual(err, null);
+        BlogPost.findById(post._id, function (err, found) {
+          should.strictEqual(err, null);
+          db.close();
+          should.strictEqual(err, null);
+          found.comments[0].title.should.eql('two');
+        });
+      });
+    });
+  },
+
+  'defining a method on a Schema corresponding to an EmbeddedDocument should generate an instance method for the ED': function () {
+    var db = start();
+    var ChildSchema = new Schema({ name: String });
+    ChildSchema.method('talk', function () {
+      return 'gaga';
+    });
+
+    var ParentSchema = new Schema({
+      children: [ChildSchema]
+    });
+
+    var ChildA = db.model('ChildA', ChildSchema, 'children_' + random());
+    var ParentA = db.model('ParentA', ParentSchema, 'parents_' + random());
+
+    var c = new ChildA;
+    c.talk.should.be.a('function');
+
+    var p = new ParentA();
+    p.children.push({});
+    p.children[0].talk.should.be.a('function');
+    db.close();
+  },
+
+  'Model#save should emit an error as its default error handler if a callback is not passed to it': function () {
+    var db = start();
+    var DefaultErrSchema = new Schema({});
+
+    DefaultErrSchema.pre('save', function (next, fn) {
+      next(new Error());
+    });
+
+    var DefaultErr = db.model('DefaultErr', DefaultErrSchema, 'default_err_' + random());
+
+    var e = new DefaultErr();
+    e.on('error', function (err) {
+      err.should.be.an.instanceof(Error);
+      db.close();
+    });
+
+    e.save();
+  },
+
+  'backward compatibility with conflicted data in the db': function () {
+    var db = start();
+    var M = db.model('backwardDataConflict', new Schema({ namey: { first: String, last: String }}));
+    var m = new M({ namey: "[object Object]" });
+    m.namey = { first: 'GI', last: 'Joe' };// <-- should overwrite the string
+    m.save(function (err) {
+      db.close();
+      should.strictEqual(err, null);
+      should.strictEqual('GI', m.namey.first);
+      should.strictEqual('Joe', m.namey.last);
     });
   }
 

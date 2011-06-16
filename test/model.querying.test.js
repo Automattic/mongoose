@@ -171,15 +171,40 @@ module.exports = {
 
   'test that count Query executes when you pass a callback': function () {
     var db = start()
-      , BlogPostB = db.model('BlogPostB', collection)
-      , count = 1;
+      , BlogPostB = db.model('BlogPostB', collection);
 
     function fn () {
-      --count || db.close();
+      db.close();
     };
 
     BlogPostB.count({}, fn).should.be.an.instanceof(Query);
   },
+
+  'test that distinct returns a Query': function () {
+    var db = start()
+      , BlogPostB = db.model('BlogPostB', collection);
+
+    BlogPostB.distinct('title', {}).should.be.an.instanceof(Query);
+
+    db.close();
+  },
+
+  'test that distinct Query executes when you pass a callback': function () {
+    var db = start();
+    var Address = new Schema({ zip: String });
+    Address = db.model('Address', Address, 'addresses_' + random());
+
+    Address.create({ zip: '10010'}, { zip: '10010'}, { zip: '99701'}, function (err, a1, a2, a3) {
+      should.strictEqual(null, err);
+      var query = Address.distinct('zip', {}, function (err, results) {
+        should.strictEqual(null, err);
+        results.should.eql(['10010', '99701']);
+        db.close();
+      });
+      query.should.be.an.instanceof(Query);
+    });
+  },
+
 
   'test that update returns a Query': function () {
     var db = start()
@@ -556,15 +581,43 @@ module.exports = {
     });
   },
 
-  'test find where subset of fields, excluding _id': function () {
+  'test findOne where subset of fields, excluding _id': function () {
     var db = start()
       , BlogPostB = db.model('BlogPostB', collection);
     BlogPostB.create({title: 'subset 1'}, function (err, created) {
       should.strictEqual(err, null);
       BlogPostB.findOne({title: 'subset 1'}, {title: 1, _id: 0}, function (err, found) {
         should.strictEqual(err, null);
-        found._id.should.be.null;
+        should.strictEqual(undefined, found._id);
         found.title.should.equal('subset 1');
+        db.close();
+      });
+    });
+  },
+
+  'test find where subset of fields, excluding _id': function () {
+    var db = start()
+      , BlogPostB = db.model('BlogPostB', collection);
+    BlogPostB.create({title: 'subset 1'}, function (err, created) {
+      should.strictEqual(err, null);
+      BlogPostB.find({title: 'subset 1'}, {title: 1, _id: 0}, function (err, found) {
+        should.strictEqual(err, null);
+        should.strictEqual(undefined, found[0]._id);
+        found[0].title.should.equal('subset 1');
+        db.close();
+      });
+    });
+  },
+
+  'exluded fields that are not objects or arrays in the schema should be undefined': function () {
+    var db = start()
+      , BlogPostB = db.model('BlogPostB', collection);
+    BlogPostB.create({title: 'subset 1'}, function (err, created) {
+      should.strictEqual(err, null);
+      BlogPostB.findById(created.id, {title: 0}, function (err, found) {
+        should.strictEqual(err, null);
+        found._id.should.eql(created._id);
+        should.strictEqual(undefined, found.title);
         db.close();
       });
     });

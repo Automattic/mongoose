@@ -455,6 +455,18 @@ module.exports = {
 
     delete obj._id;
     obj.should.eql({ oids: [] });
+  },
+
+  // GH-209
+  'MongooseErrors should be instances of Error': function () {
+    var MongooseError = require('../lib/mongoose/error')
+      , err = new MongooseError("Some message");
+    err.should.be.an.instanceof(Error);
+  },
+  'ValidationErrors should be instances of Error': function () {
+    var ValidationError = Document.ValidationError
+      , err = new ValidationError(new TestDocument);
+    err.should.be.an.instanceof(Error);
   }
 
 };

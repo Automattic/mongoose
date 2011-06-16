@@ -98,5 +98,8 @@ module.exports = {
         rankingPostCast.should.equal('1');
       });
     });
+  },
+  'should support on the fly nested documents': function () {
+    // TODO
   }
 };

@@ -221,11 +221,11 @@ There's two types of middleware:
 - Serial
   Serial middleware are defined like:
 
-  ```javascript
-  .pre(method, function (next, methodArg1, methodArg2, ...) {
-	// ...
-  })
-  ```
+```javascript
+.pre(method, function (next, methodArg1, methodArg2, ...) {
+  // ...
+})
+```
 
   They're executed one after the other, when each middleware calls `next`.
 
@@ -238,11 +238,11 @@ There's two types of middleware:
   Parallel middleware offer more fine-grained flow control, and are defined
   like:
   
-  ```javascript
-  .pre(method, true, function (next, done, methodArg1, methodArg2) {
-	// ...
-  })
-  ```
+```javascript
+.pre(method, true, function (next, done, methodArg1, methodArg2) {
+  // ...
+})
+```
 
   Parallel middleware can `next()` immediately, but the final argument will be
   called when all the parallel middleware have called `done()`.
@@ -256,8 +256,8 @@ For example:
 
 ```javascript
 schema.pre('save', function (next) {
-    // something goes wrong
-    next(new Error('something went wrong'));
+  // something goes wrong
+  next(new Error('something went wrong'));
 });
 
 // later...

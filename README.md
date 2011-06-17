@@ -51,7 +51,7 @@ require.paths.unshift('support/mongoose/lib')
 Then you can `require` it:
 
 ```javascript
-    require('mongoose')
+require('mongoose')
 ```
 
 ## Connecting to MongoDB
@@ -173,31 +173,31 @@ Where `Comments` is a `Schema` we created. This means that creating embedded
 documents is as simple as:
 
 ```javascript
-    // retrieve my model
-    var BlogPost = mongoose.model('BlogPost');
+// retrieve my model
+var BlogPost = mongoose.model('BlogPost');
 
-    // create a blog post
-    var post = new BlogPost();
+// create a blog post
+var post = new BlogPost();
 
-    // create a comment
-    post.comments.push({ title: 'My comment' });
+// create a comment
+post.comments.push({ title: 'My comment' });
 
-    post.save(function (err) {
-      if (!err) console.log('Success!');
-    });
+post.save(function (err) {
+  if (!err) console.log('Success!');
+});
 ```
 
 The same goes for removing them:
 
 ```javascript
-    BlogPost.findById(myId, function (err, post) {
-      if (!err) {
-        post.comments[0].remove();
-        post.save(function (err) {
-          // do something
-        });
-      }
+BlogPost.findById(myId, function (err, post) {
+  if (!err) {
+    post.comments[0].remove();
+    post.save(function (err) {
+      // do something
     });
+  }
+});
 ```
 
 Embedded documents enjoy all the same features as your models. Defaults,
@@ -255,16 +255,16 @@ interrupted, and the error is passed to the function passed as an argument.
 For example:
 
 ```javascript
-    schema.pre('save', function (next) {
-        // something goes wrong
-        next(new Error('something went wrong'));
-    });
+schema.pre('save', function (next) {
+    // something goes wrong
+    next(new Error('something went wrong'));
+});
 
-    // later...
+// later...
 
-    myModel.save(function (err) {
-      // err can come from a middleware
-    });
+myModel.save(function (err) {
+  // err can come from a middleware
+});
 ```
 
 ### Intercepting and mutating method arguments

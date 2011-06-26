@@ -329,6 +329,7 @@ The following plugins are currently available for use with mongoose:
   solution for your auth needs. Currently supports Password, Facebook,
   Twitter, Github, and more.
 - [mongoose-dbref](https://github.com/goulash1971/mongoose-dbref) - Adds DBRef support
+- [mongoose-joins](https://github.com/goulash1971/mongoose-joins) - Adds simple join support
 
 ## Contributing to Mongoose
 

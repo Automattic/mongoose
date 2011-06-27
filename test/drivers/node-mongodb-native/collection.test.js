@@ -5,6 +5,7 @@
 
 var start = require('../../common')
   , mongoose = start.mongoose
+  , should = require('should')
   , Schema = mongoose.Schema;
 
 /**
@@ -21,14 +22,17 @@ mongoose.model('NativeDriverTest', new Schema({
 
 module.exports = {
 
-  'test that trying to implement a sparse index throws an error': function () {
+  'test that trying to implement a sparse index works': function () {
       var db = start()
         , NativeTestCollection = db.model('NativeDriverTest');
 
       NativeTestCollection.collection.ensureIndex({ title: 1 }, { sparse: true }, function (err) {
-        err.should.be.an.instanceof(Error);
-        /driver only implements/.test(err.message).should.be.true;
-        db.close();
+        should.strictEqual(!!err, false);
+        NativeTestCollection.collection.getIndexes(function (err, indexes) {
+          db.close();
+          should.strictEqual(!!err, false);
+          indexes['title_1'].should.eql([['title', 1]]);
+        });
       });
   },
 

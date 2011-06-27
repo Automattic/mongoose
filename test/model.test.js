@@ -2648,7 +2648,7 @@ module.exports = {
         found.should.have.length(1);
         
         BlogPost.remove({}, function (err) {
-          should.strictEqual(err, null);
+          should.strictEqual(!!err, false);
 
           BlogPost.find({}, function (err, found2) {
             should.strictEqual(err, null);

@@ -31,7 +31,7 @@ To do so, you can declare a virtual attribute on the Schema, `Person`:
 
     PersonSchema.virtual('name.full')
       .get( function () {
-        return this.name.first + this.name.last;
+        return this.name.first + ' ' + this.name.last;
       });
 
 So when you get `name.full`, via
@@ -41,7 +41,7 @@ So when you get `name.full`, via
 the implementation ends up invoking the getter function
 
     function () {
-      return this.name.first + this.name.last;
+      return this.name.first + ' ' + this.name.last;
     }
 
 and returning it.
@@ -54,7 +54,7 @@ Mongoose allows you to do this, too, via virtual attribute setters. You can defi
 
     PersonSchema.virtual('name.full')
       .get( function () {
-        return this.name.first + this.name.last;
+        return this.name.first + ' ' + this.name.last;
       })
       .set( function (setFullNameTo) {
         var split = setFullNameTo.split(' ')

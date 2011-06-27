@@ -1,6 +1,6 @@
 var BaseCommand = require('./base_command').BaseCommand,
   BinaryParser = require('../bson/binary_parser').BinaryParser,
-  inherits = require('sys').inherits;
+  inherits = require('util').inherits;
 
 /**
   Insert Document Command
@@ -52,3 +52,5 @@ QueryCommand.OPTS_TAILABLE_CURSOR = 2;
 QueryCommand.OPTS_SLAVE = 4;
 QueryCommand.OPTS_OPLOG_REPLY = 8;
 QueryCommand.OPTS_NO_CURSOR_TIMEOUT = 16;
+QueryCommand.OPTS_AWAIT_DATA = 32;
+QueryCommand.OPTS_EXHAUST = 64;

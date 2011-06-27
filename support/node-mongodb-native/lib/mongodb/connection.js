@@ -1,320 +1,299 @@
 var net = require('net'),
+  debug = require('util').debug,
+  inspect = require('util').inspect,
   EventEmitter = require("events").EventEmitter,
   BinaryParser = require('./bson/binary_parser').BinaryParser,
-  inherits = require('sys').inherits;
+  inherits = require('util').inherits,
+  Server = require('./connections/server').Server;
 
-var Connection = exports.Connection = function(host, port, autoReconnect) {
+var Connection = exports.Connection = function(host, port, autoReconnect, options) {
+  this.options = options == null ? {} : options;
   this.host = host;
   this.port = port;
   this.autoReconnect = autoReconnect;
   this.drained = true;
+  // Fetch the poolsize
+  this.poolSize = this.options["poolSize"] == null ? 1 : this.options["poolSize"];    
   // Reconnect buffer for messages
   this.messages = [];
-  // Message sender
-  var self = this;
+
   // Status messages
   this.sizeOfMessage = 0;
   this.bytesRead = 0;
   this.buffer = '';
   this.stubBuffer = '';
+  this.connected = false;
+  
+  // Connection pool variables
+  this.pool = [];
+  this.poolByReference = {};
+  this.poolIndex = 0;
 };
 
 inherits(Connection, EventEmitter);
 
-// Functions to open the connection
-Connection.prototype.open = function() {
-  // Assign variable to point to local scope object
-  var self = this;
-  // Create the associated connection
-  this.connection = net.createConnection(this.port, this.host);    
-  // Set up the net client
-  this.connection.setEncoding("binary");
-  // Add connnect listener
-  this.connection.addListener("connect", function() {
-    this.setEncoding("binary");
-    this.setTimeout(0);
-    this.setNoDelay();
-    self.emit("connect");
-  });
-  
-  this.connection.addListener("error", function(err) {
-    self.emit("error", err);
-  });
-  
-  this.connection.addListener("timeout", function(err) {
-    self.emit("timeout", err);
-  });
-  
-  // Add a close listener
-  this.connection.addListener("close", function() {
-    self.emit("close");
-  });
-  
-  // Listener for receive data
-  this.receiveListener = function(result) {
+var getConnection = function(self) {
+  return self.pool[self.poolIndex++ % self.pool.length];
+}
+
+// Setup the connection pool
+var setupConnectionPool = function(self, poolSize, reconnect) {
+  // Pool off connections and status variables
+  var connectionPool = [];  
+  var connectedTo = 0;
+  var errors = 0;
+  var connectionError = null;
+
+  //
+  // Listener that handles callbacks for the connection
+  // Uses the internal object states to keep individual tcp connections seperate
+  var receiveListener = function(result, fd) {    
+    fd = fd == null ? this.fd : fd;
+    
+    // Fetch the pool reference
+    var conObj = self.poolByReference[fd];
+    
+    // if(conObj == null) {
+    //   debug("================================================================ failed to find connection :: " + this.fd)
+    //   debug(inspect(self.poolByReference))
+    // }
+    
     // Check if we have an unfinished message
-    if(self.bytesRead > 0 && self.sizeOfMessage > 0) {
+    if(conObj != null && conObj.bytesRead > 0 && conObj.sizeOfMessage > 0) {
       // Calculate remaing bytes to fetch
-      var remainingBytes = self.sizeOfMessage - self.bytesRead;
+      var remainingBytes = conObj.sizeOfMessage - conObj.bytesRead;
       // Check if we have multiple packet messages and save the pieces otherwise emit the message
       if(remainingBytes > result.length) {
-        self.buffer = self.buffer + result; self.bytesRead = self.bytesRead + result.length;
+        conObj.buffer = conObj.buffer + result; conObj.bytesRead = conObj.bytesRead + result.length;
       } else {
         // Cut off the remaining message
-        self.buffer = self.buffer + result.substr(0, remainingBytes);
+        conObj.buffer = conObj.buffer + result.substr(0, remainingBytes);
         // Emit the message
-        self.emit("data", self.buffer);
+        self.emit("data", conObj.buffer);
         // Reset the variables
-        self.buffer = ''; self.bytesRead = 0; self.sizeOfMessage = 0;
+        conObj.buffer = ''; conObj.bytesRead = 0; conObj.sizeOfMessage = 0;
         // If message is longer than the current one, keep parsing
         if(remainingBytes < result.length) {
-          self.receiveListener(result.substr(remainingBytes, (result.length - remainingBytes)));
+          // debug("--------------------------------------- remainingBytes < result.length :: " + this.fd)
+          // receiveListener.call(this, result.substr(remainingBytes, (result.length - remainingBytes)));
+          receiveListener(result.substr(remainingBytes, (result.length - remainingBytes)), fd);
         }
       }
-    } else {
-      if(self.stubBuffer.length > 0) {
-        result = self.stubBuffer + result;
-        self.stubBuffer = '';
+    } else if(conObj != null){
+      if(conObj.stubBuffer.length > 0) {
+        result = conObj.stubBuffer + result;
+        conObj.stubBuffer = '';
       }
 
       if(result.length > 4) {
         var sizeOfMessage = BinaryParser.toInt(result.substr(0, 4));
         // We got a partial message, store the result and wait for more
         if(sizeOfMessage > result.length) {
-          self.buffer = self.buffer + result; self.bytesRead = result.length; self.sizeOfMessage = sizeOfMessage;
+          conObj.buffer = conObj.buffer + result; conObj.bytesRead = result.length; conObj.sizeOfMessage = sizeOfMessage;
         } else if(sizeOfMessage == result.length) {
           self.emit("data", result);
         } else if(sizeOfMessage < result.length) {
           self.emit("data", result.substr(0, sizeOfMessage));
-          self.receiveListener(result.substr(sizeOfMessage, (result.length - sizeOfMessage)));
+          // debug("--------------------------------------- sizeOfMessage < result.length :: " + this.fd)
+          // receiveListener.call(this, result.substr(sizeOfMessage, (result.length - sizeOfMessage)));
+          receiveListener(result.substr(sizeOfMessage, (result.length - sizeOfMessage)), fd);
         }
       } else {
-        self.stubBuffer = result;
+        conObj.stubBuffer = result;
       }
     }
   };
+  
+  // Fill the pool
+  for(var i = 0; i < poolSize; i++) {
+    // Create the associated connection
+    var connection = net.createConnection(self.port, self.host);    
+    // Set up the net client
+    connection.setEncoding("binary");
+    // Add connnect listener
+    connection.addListener("connect", function() {
+      this.setEncoding("binary");
+      this.setTimeout(0);
+      this.setNoDelay();
+      // Update number of connected to server
+      connectedTo = connectedTo + 1;
+    });
+    
+    connection.addListener("error", function(err) {
+      // Update number of errors
+      errors = errors + 1;
+      connectionError = err;
+    });
+    
+    connection.addListener("timeout", function(err) {
+      // Update number of errors
+      errors = errors + 1;
+      connectionError = err;
+    });
+    
+    // Add a close listener
+    connection.addListener("close", function() {
+      self.emit("close");
+    });
+    
+    // Add connection to the pool array
+    connectionPool.push({"connection": connection,
+      "sizeOfMessage": 0,
+      "bytesRead": 0,
+      "buffer": '',
+      "stubBuffer": ''});      
+    // Add the listener to the connection
+    connection.addListener("data", receiveListener);
+  }
+  
+  // Function that wait for connection to finish up
+  var waitForConnections = function() {
+    // Emit a connect message once all connections are up
+    if(connectedTo == connectionPool.length) {
+      if(reconnect == null || !reconnect) {
+        self.connected = true;
+        self.poolByReference = {};
+     
+         // Save the connections by the fd reference
+        self.pool.forEach(function(con) {
+          self.poolByReference[con.connection.fd] = con;
+        });
+                
+        self.emit("connect");
+      } else {
+        self.connected = false;
+        self.emit("reconnect");
+      }
+    } else if(errors + connectedTo == connectionPool.length) {
+      if(reconnect == null || !reconnect) {
+        self.connected = false;
+        self.emit("error", connectionError);
+      } else {
+        self.connected = false;
+        self.emit("reconnect");
+      }              
+    } else {
+      process.nextTick(waitForConnections);
+    }
+  }
+  
+  // Wait until we are done connected to all pool entries before emitting connect signal
+  process.nextTick(waitForConnections);
+  
+  // Return the pool
+  return connectionPool;
+}
 
-  // Add a receieved data connection
-  this.connection.addListener("data", this.receiveListener);
-};
+// Functions to open the connection
+Connection.prototype.open = function() {
+  var self = this;
+  // Create the pool with connections
+  this.pool = setupConnectionPool(this, this.poolSize);
+}
 
 Connection.prototype.close = function() {
-  if(this.connection) this.connection.end();
+  this.connected = false;
+  // Close all entries in the pool
+  for(var i = 0; i < this.pool.length; i++) {
+    this.pool[i].connection.end();      
+  }
 };
 
-Connection.prototype.send = function(command) { 
+Connection.prototype.send = function(command, rawConnection) { 
   var self = this;
+  // If we are executing the commnand on the entire pool
+  var connection = null;
+  // If we are forcing the use of a connection
+  if(rawConnection != null) {
+    connection = rawConnection;
+  } else {
+    connection = getConnection(self).connection;    
+  }
+
   // Check if the connection is closed
   try {
-    if ( this.connection.readyState != "open" )
-      throw 'notConnected';
-    if(command.constructor == String) {
-      this.connection.write(command, "binary");      
+    if (connection.readyState != "open") {
+      throw 'notConnected';      
+    }
+
+    // Send the command, if it's an array of commands execute them all on the same connection
+    if(Array.isArray(command)) {
+      for(var i = 0; i < command.length; i++) {
+        // debug("========================================================================= command string")
+        // BinaryParser.ilprint((command.constructor == String) ? command : command.toBinary())
+        connection.write((command[i].constructor == String) ? command[i] : command[i].toBinary(), "binary");
+      }
     } else {
-      this.connection.write(command.toBinary(), "binary");      
-    }    
+      // debug("========================================================================= command string")
+      // BinaryParser.ilprint((command.constructor == String) ? command : command.toBinary())
+      connection.write((command.constructor == String) ? command : command.toBinary(), "binary");      
+    }
   } catch(err) {
     // Check if the connection is closed
-    if(this.connection.readyState != "open" && this.autoReconnect) {
+    if(connection.readyState != "open" && self.autoReconnect) {
       // Add the message to the queue of messages to send
-      this.messages.push(command);
+      self.messages.push(command);
       // Initiate reconnect if no current running
-      if(this.connection.currently_reconnecting == null) {
-        this.connection.currently_reconnecting = true;
-        // Create the associated connection
-        var new_connection = net.createConnection(this.port, this.host);
-        // Set up the net client
-        new_connection.setEncoding("binary");
-        new_connection.addListener( "error", function( err ) {
-          self.emit( "error", err ); 
-          self.connection.currently_reconnecting = null;
-        });
-        // Add connnect listener
-        new_connection.addListener("connect", function() {
-          this.setEncoding("binary");
-          this.setTimeout(0);
-          this.setNoDelay();
-          // Add the listener
-          this.addListener("data", self.receiveListener);
-          // assign the new ready connection
-          self.connection = this;
-          // send all the messages
+      if(self.currently_reconnecting == null || self.currently_reconnecting == false) {
+        self.currently_reconnecting = true;
+
+        // Create the pool with connections
+        self.pool = setupConnectionPool(self, self.poolSize, true);
+        self.poolByReference = {};
+        // Save the connections by the fd reference
+        self.pool.forEach(function(con) {
+          self.poolByReference[con.connection.fd] = con;
+        })
+
+        // Wait for a reconnect and send all the messages
+        self.on("reconnect", function() {
+          self.currently_reconnecting = false;
+          // Fire the message again
           while(self.messages.length > 0) {
-            var msg = self.messages.shift();
-            if(msg.constructor == String) {
-              this.write(msg, "binary");      
+            // Fetch a connection and resend messages
+            connection = getConnection(self).connection;
+            // Fetch the a message
+            var command = self.messages.shift();
+            // Fire
+            if(Array.isArray(command)) {
+              for(var i = 0; i < command.length; i++) {
+                connection.write((command[i].constructor == String) ? command[i] : command[i].toBinary(), "binary");
+              }
             } else {
-              this.write(msg.toBinary(), "binary");      
-            }    
-            // this.write(self.messages.shift().toBinary(), "binary");
-          }
-        });
+              connection.write((command.constructor == String) ? command : command.toBinary(), "binary");      
+            }
+          }          
+        })
       }
     } else {   
+      // Set connected to false
+      self.connected = false;
+      // Throw error
       throw err;   
     }
   }
 };
+
 /**
 * Wrtie command without an attempt of reconnect
 * @param command 
 */
-
 Connection.prototype.sendwithoutReconnect = function(command) {
   var self = this;
+  var connection = this.connection;
+  
   // Check if the connection is closed
-  if ( this.connection.readyState != "open" ) {
+  if (connection.readyState != "open") {
     throw new Error( 'Connection closed!' );
   }
   try {
-    this.connection.write(command.toBinary(), "binary");
+    connection.write(command.toBinary(), "binary");
   } catch(err) {
-  // no need to reconnect since called by latest master
-  // and already went through send() function
-     throw err;  
+    // no need to reconnect since called by latest master
+    // and already went through send() function
+    throw err;  
   };
 };
+
 // Some basic defaults
 Connection.DEFAULT_PORT = 27017;
-
-var Server = exports.Server = function(host, port, options) {
-  this.host = host;
-  this.port = port;
-  this.options = options == null ? {} : options;
-  this.internalConnection;
-  this.internalMaster = false;
-  // Setters and getters
-  this.__defineGetter__("autoReconnect", function() { return this.options['auto_reconnect'] == null ? false : this.options['auto_reconnect']; });
-  this.__defineGetter__("connection", function() { return this.internalConnection; });
-  this.__defineSetter__("connection", function(connection) { this.internalConnection = connection; });
-  this.__defineGetter__("master", function() { return this.internalMaster; });
-  this.__defineSetter__("master", function(value) { this.internalMaster = value; });
-  this.__defineGetter__("masterConnection", function() { return this.internalConnection; });
-};
-
-Server.prototype.close = function(callback) {
-  this.connection.close(callback);
-};
-
-// Server pair object used to support a failover connection set
-var ServerPair = exports.ServerPair = function(leftServer, rightServer) {
-  if(leftServer == null || rightServer == null || !(leftServer instanceof Server) || !(rightServer instanceof Server)) {
-    throw Error("Both left/right must be defined and off the type Server");
-  }
-  this.leftServer = leftServer;
-  this.rightServer = rightServer;
-  // Containst the master server entry
-  this.master = null;
-  this.target = null;
-  // Setters and getters
-  this.__defineGetter__("autoReconnect", function() {
-    if(this.target != null) return this.target.autoReconnect;
-    if(this.masterConnection != null) return this.masterConnection.autoReconnect;
-  });
-  this.__defineGetter__("masterConnection", function() {
-    if(this.target != null && this.target instanceof Server) return this.target.masterConnection;
-    if(this.leftServer.master) return this.leftServer.masterConnection;
-    if(this.rightServer.master) return this.rightServer.masterConnection;
-    return null;
-  });
-};
-
-ServerPair.prototype.setTarget = function(target) {
-  this.target = target;
-  this.servers = [];
-};
-
-ServerPair.MASTER = 0;
-ServerPair.SHADOW_MASTER = 1;
-
-// Server cluster (one master and multiple read slaves)
-var ServerCluster = exports.ServerCluster = function(servers) {
-  // Containst the master server entry
-  this.master = null;
-  this.target = null;
-
-  if(servers.constructor != Array || servers.length == 0) {
-    throw Error("The parameter must be an array of servers and contain at least one server");
-  } else if(servers.constructor == Array || servers.length > 0) {
-    var count = 0;
-    servers.forEach(function(server) {
-      if(server instanceof Server) count = count + 1;
-    });
-
-    if(count < servers.length) {
-      throw Error("All server entries must be of type Server");
-    } else {
-      this.servers = servers;
-    }
-  }
-  // Setters and getters
-  this.__defineGetter__("autoReconnect", function() {
-    if(this.target != null) return this.target.autoReconnect;
-    if(this.masterConnection != null) return this.masterConnection.autoReconnect;
-  });
-  this.__defineGetter__("masterConnection", function() {
-    // Allow overriding to a specific connection
-    if(this.target != null && this.target instanceof Server) {
-      return this.target.masterConnection;
-    } else {
-      var finalServer = null;
-      this.servers.forEach(function(server) {
-        if(server.master == true) finalServer = server;
-      });
-      return finalServer != null ? finalServer.masterConnection : finalServer;
-    }
-  });
-};
-
-ServerCluster.prototype.setTarget = function(target) {
-  this.target = target;
-};
-
-/**
-* ReplSetServers constructor provides master-slave functionality
-*
-* @param serverArr{Array of type Server}
-* @return constructor of ServerCluster
-*
-*/
-var ReplSetServers = exports.ReplSetServers = function(servers) {
-  // Contains the master server entry
-  this.master = null;
-  this.target = null;
-
-  if(servers.constructor != Array || servers.length == 0) {
-    throw Error("The parameter must be an array of servers and contain at least one server");
-  } else if(servers.constructor == Array || servers.length > 0) {
-    var count = 0;
-    servers.forEach(function(server) {
-      if(server instanceof Server) count = count + 1;
-    });
-
-    if(count < servers.length) {
-      throw Error("All server entries must be of type Server");
-    } else {
-      this.servers = servers;
-    }
-  }
-  // Setters and getters
-  this.__defineGetter__("autoReconnect", function() {
-    if(this.target != null) return this.target.autoReconnect;
-    if(this.masterConnection != null) return this.masterConnection.autoReconnect;
-  });
-  this.__defineGetter__("masterConnection", function() {
-    // Allow overriding to a specific connection
-    if(this.target != null && this.target instanceof Server) {
-      return this.target.masterConnection;
-    } else {
-      var finalServer = null;
-      this.servers.forEach(function(server) {
-        if(server.master == true && ( server.connection.connection.readyState == "open") ) finalServer = server;
-      });
-      return finalServer != null ? finalServer.masterConnection : finalServer;
-    }
-  });
-};
-
-ReplSetServers.prototype.setTarget = function(target) {
-  this.target = target;
-};

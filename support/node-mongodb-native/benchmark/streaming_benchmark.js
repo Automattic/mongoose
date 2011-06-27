@@ -5,10 +5,11 @@ var Db = require('mongodb').Db,
   Server = require('mongodb').Server,
   Cursor = require('mongodb').Cursor,
   Collection = require('mongodb').Collection,
-  sys = require('sys');  
+  sys = require('util'),
+  debug = require('util').debug;  
 var BSON = require('bson');
 
-var db = new Db('streaming_benchmark', new Server("127.0.0.1", 27017, {auto_reconnect: true}), {})
+var db = new Db('streaming_benchmark', new Server("127.0.0.1", 27017, {auto_reconnect: true, poolSize:4}), {})
 // Set native deserializer
 db.bson_deserializer = BSON;
 db.bson_serializer = BSON;
@@ -21,8 +22,8 @@ db.open(function(err, client) {
       // Benchmark
       var started_at = new Date().getTime(); 
       // Add documents
-      for(var i = 0; i < 100000; i++) {
-      // for(var i = 0; i < 1000; i++) {
+      // for(var i = 0; i < 100000; i++) {
+      for(var i = 0; i < 10000; i++) {
         collection.save({'i':i, 'a':i, 'c':i, 'd':{'i':i}}, function(err, result){});
       }    
       sys.puts("save recs: " + ((new Date().getTime() - started_at)/1000) + "seconds"); 
@@ -38,7 +39,7 @@ db.open(function(err, client) {
         stream.addListener('data',function(data){ 
           if(count == 0) started_at = new Date().getTime();           
           count++; 
-          if ((count%10000)==0) sys.puts("recs:" + count + " :: " + 
+          if ((count%1000)==0) sys.puts("recs:" + count + " :: " + 
             ((new Date().getTime() - started_at)/1000) + "seconds"); 
         }); 
       });                      

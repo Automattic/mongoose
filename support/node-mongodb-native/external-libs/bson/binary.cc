@@ -14,6 +14,9 @@
 
 #include "binary.h"
 
+#define MIN(a,b) ((a) < (b) ? (a) : (b))
+
+const uint32_t BSON_BINARY_SUBTYPE_DEFAULT = 0;
 const uint32_t BSON_BINARY_SUBTYPE_FUNCTION = 1;
 const uint32_t BSON_BINARY_SUBTYPE_BYTE_ARRAY = 2;
 const uint32_t BSON_BINARY_SUBTYPE_UUID = 3;
@@ -49,7 +52,7 @@ Handle<Value> Binary::New(const Arguments &args) {
   if(args.Length() == 0) {
     char *oid_string_bytes = (char *)malloc(256);
     *(oid_string_bytes) = '\0';
-    binary = new Binary(BSON_BINARY_SUBTYPE_BYTE_ARRAY, 256, 0, oid_string_bytes);
+    binary = new Binary(BSON_BINARY_SUBTYPE_DEFAULT, 256, 0, oid_string_bytes);
   } else if(args.Length() == 1 && args[0]->IsString()) {
     Local<String> str = args[0]->ToString();
     // Contains the bytes for the data
@@ -58,10 +61,10 @@ Handle<Value> Binary::New(const Arguments &args) {
     // Decode the data from the string
     node::DecodeWrite(oid_string_bytes, str->Length(), str, node::BINARY);    
     // Create a binary object
-    binary = new Binary(BSON_BINARY_SUBTYPE_BYTE_ARRAY, str->Length(), str->Length(), oid_string_bytes);
-  } else if(args.Length() == 2 && args[0]->IsNumber() && args[1]->IsString()) {    
-    Local<Integer> intr = args[0]->ToInteger();
-    Local<String> str = args[1]->ToString();
+    binary = new Binary(BSON_BINARY_SUBTYPE_DEFAULT, str->Length(), str->Length(), oid_string_bytes);
+  } else if(args.Length() == 2 && args[1]->IsNumber() && args[0]->IsString()) {    
+    Local<String> str = args[0]->ToString();
+    Local<Integer> intr = args[1]->ToInteger();
     // Contains the bytes for the data
     char *oid_string_bytes = (char *)malloc(str->Length() + 1);
     *(oid_string_bytes + str->Length()) = '\0';
@@ -71,7 +74,7 @@ Handle<Value> Binary::New(const Arguments &args) {
     uint32_t sub_type = intr->Uint32Value();
     binary = new Binary(sub_type, str->Length(), str->Length(), oid_string_bytes);
   } else {
-    return VException("Argument must be either none, a string or a sub_type and string");        
+    return VException("Argument must be either none, a string or a string and a sub_type");        
   }
   
   // Wrap it
@@ -102,6 +105,7 @@ void Binary::Initialize(Handle<Object> target) {
   NODE_SET_PROTOTYPE_METHOD(constructor_template, "put", Put);
   NODE_SET_PROTOTYPE_METHOD(constructor_template, "write", Write);
   NODE_SET_PROTOTYPE_METHOD(constructor_template, "read", Read);
+  NODE_SET_PROTOTYPE_METHOD(constructor_template, "readInto", ReadInto);
 
   // Getters for correct serialization of the object  
   constructor_template->InstanceTemplate()->SetAccessor(subtype_symbol, SubtypeGetter, SubtypeSetter);
@@ -114,14 +118,19 @@ Handle<Value> Binary::SubtypeGetter(Local<String> property, const AccessorInfo& 
 
   // Unpack object reference
   Binary *binary_obj = ObjectWrap::Unwrap<Binary>(info.Holder());
+  
   // Extract value doing a cast of the pointer to Long and accessing low_bits
-  int32_t sub_type = binary_obj->sub_type;
-  Local<Integer> sub_type_int = Integer::New(sub_type);
+  Local<Integer> sub_type_int = Integer::New(binary_obj->sub_type);
   return scope.Close(sub_type_int);
 }
 
 void Binary::SubtypeSetter(Local<String> property, Local<Value> value, const AccessorInfo& info) {
-  // Do nothing for now
+  if(value->IsNumber()) {
+    // Unpack the long object
+    Binary *b = ObjectWrap::Unwrap<Binary>(info.Holder());
+    // Set the low bits
+    b->sub_type = value->IntegerValue();
+  }
 }
 
 Handle<Value> Binary::Read(const Arguments &args) {
@@ -144,6 +153,31 @@ Handle<Value> Binary::Read(const Arguments &args) {
   } else {
     return VException("position and length is outside the size of the binary");
   } 
+}
+
+Handle<Value> Binary::ReadInto(const Arguments &args) {
+  HandleScope scope;
+  
+  if (args.Length() == 0 || !Buffer::HasInstance(args[0])) {
+      return VException("Function takes at least one argument of type Buffer");
+  }
+  
+  size_t offset = args[1]->IsUint32() ? args[1]->Uint32Value() : 0;
+  Binary *binary = ObjectWrap::Unwrap<Binary>(args.This());
+  if (binary->index - offset < 0) {
+     return VException("offset argument out of bounds"); 
+  }
+  
+  Local<Object> obj = args[0]->ToObject();
+  size_t blength = Buffer::Length(obj);
+  char *data = Buffer::Data(obj);
+  size_t towrite = MIN(blength, binary->index - offset);
+  
+  if (towrite > 0) {
+      memmove(data, binary->data + offset, towrite);
+  }
+  
+  return scope.Close(Integer::New(towrite));
 }
 
 Handle<Value> Binary::Write(const Arguments &args) {

@@ -7,7 +7,7 @@ var Db = require('mongodb').Db,
   Collection = require('mongodb').Collection,
   Buffer = require('buffer').Buffer,
   GridStore = require('mongodb').GridStore,
-  sys = require('sys');
+  sys = require('util');
 
 var simulated_buffer = new Buffer(1024*1000*10).toString();
 

@@ -80,11 +80,15 @@ For examples look in the examples/ directory. You can execute the examples using
   $ node queries.js
 
 GridStore
-========
+=========
 
 The GridStore class allows for storage of binary files in mongoDB using the mongoDB defined files and chunks collection definition.
 
-See the gridfs.js file under examples/ for how to use it or view the integration tests marked with test_gs_...
+For more information have a look at [Gridstore](https://github.com/christkv/node-mongodb-native/blob/master/docs/gridfs.md)
+
+Replicasets
+===========
+For more information about how to connect to a replicaset have a look at [Replicasets](https://github.com/christkv/node-mongodb-native/blob/master/docs/replicaset.md)
 
 Notes
 ========
@@ -154,8 +158,8 @@ Documentation
 ========
 
 If this document doesn't answer your questions, see the source of
-[Collection](https://github.com/mongodb/mongo-python-driver/blob/master/pymongo/connection.py)
-or [Cursor](https://github.com/mongodb/mongo-python-driver/blob/master/pymongo/cursor.py),
+[Collection](https://github.com/christkv/node-mongodb-native/blob/master/lib/mongodb/collection.js)
+or [Cursor](https://github.com/christkv/node-mongodb-native/blob/master/lib/mongodb/cursor.js),
 or the documentation at MongoDB for query and update formats.
 
 Find

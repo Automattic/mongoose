@@ -10,13 +10,12 @@
 var BinaryParser = require('../bson/binary_parser').BinaryParser,
   Chunk = require('./chunk').Chunk,
   DbCommand = require('../commands/db_command').DbCommand,
-  Integer = require('../goog/math/integer').Integer,
-  // ObjectID = require('../bson/bson').ObjectID,
   Buffer = require('buffer').Buffer,
   fs = require('fs'),
   util = require('util'),
+  debug = require('util').debug,
+  inspect = require('util').inspect,
   Stream = require('stream').Stream;
-
 
 /**
  * A class representation of a file stored in GridFS.
@@ -92,6 +91,29 @@ var GridStore = exports.GridStore = function(db, filename, mode, options) {
  */
 GridStore.prototype.open = function(callback) {
   var self = this;
+  
+  if((self.mode == "w" || self.mode == "w+") && self.db.serverConfig.primary != null) {
+    // Get files collection
+    self.collection(function(err, collection) {
+      // Ensure index on files Collection
+      collection.ensureIndex([['filename', 1], ['uploadDate', -1]], function(err, index) {
+
+        // Get chunk collection
+        self.chunkCollection(function(err, chunkCollection) {
+          // Ensure index on chunk collection
+          chunkCollection.ensureIndex([['files_id', 1], ['n', 1]], function(err, index) {
+            self._open(callback);
+          });
+        });
+      });
+    });
+  } else {
+    self._open(callback);
+  }  
+}
+ 
+GridStore.prototype._open = function(callback) {
+  var self = this;
 
   self.collection(function(err, collection) {
     if(err!==null) {
@@ -122,42 +144,36 @@ GridStore.prototype.open = function(callback) {
 
           // Process the mode of the object
           if(self.mode == "r") {
-            chunkCollection.ensureIndex([['files_id', 1], ['n', 1]], function(err, index) {
-              self.nthChunk(0, function(err, chunk) {
-                self.currentChunk = chunk;
+            // chunkCollection.ensureIndex([['files_id', 1], ['n', 1]], function(err, index) {
+            self.nthChunk(0, function(err, chunk) {
+              self.currentChunk = chunk;
+              self.position = 0;
+              callback(null, self);
+            });
+            // });
+          } else if(self.mode == "w") {
+            self.chunkCollection(function(err, collection2) {
+              // Delete any existing chunks
+              self.deleteChunks(function(err, result) {
+                self.currentChunk = new Chunk(self, {'n':0});
+                self.contentType = self.options['content_type'] == null ? self.contentType : self.options['content_type'];
+                self.internalChunkSize = self.options['chunk_size'] == null ? self.internalChunkSize : self.options['chunk_size'];
+                self.metadata = self.options['metadata'] == null ? self.metadata : self.options['metadata'];
                 self.position = 0;
                 callback(null, self);
               });
             });
-          } else if(self.mode == "w") {
-            self.chunkCollection(function(err, collection2) {
-              // Create index for the chunks
-              //chunkCollection.ensureIndex([['files_id', 1], ['n', 1]], function(err, index) {
-                // Delete any existing chunks
-                self.deleteChunks(function(err, result) {
-                  self.currentChunk = new Chunk(self, {'n':0});
-                  self.contentType = self.options['content_type'] == null ? self.contentType : self.options['content_type'];
-                  self.internalChunkSize = self.options['chunk_size'] == null ? self.internalChunkSize : self.options['chunk_size'];
-                  self.metadata = self.options['metadata'] == null ? self.metadata : self.options['metadata'];
-                  self.position = 0;
-                  callback(null, self);
-                });
-              //});
-            });
           } else if(self.mode == "w+") {
             self.chunkCollection(function(err, collection) {
-              // Create index for the chunks
-              //chunkCollection.ensureIndex([['files_id', 1], ['n', 1]], function(err, index) {
-                self.nthChunk(self.lastChunkNumber(), function(err, chunk) {
-                  // Set the current chunk
-                  self.currentChunk = chunk == null ? new Chunk(self, {'n':0}) : chunk;
-                  self.currentChunk.position = self.currentChunk.data.length();
-                  self.metadata = self.options['metadata'] == null ? self.metadata : self.options['metadata'];
-                  self.position = self.length;
-                  callback(null, self);
-                });
-              //});
-            });
+              self.nthChunk(self.lastChunkNumber(), function(err, chunk) {
+                // Set the current chunk
+                self.currentChunk = chunk == null ? new Chunk(self, {'n':0}) : chunk;
+                self.currentChunk.position = self.currentChunk.data.length();
+                self.metadata = self.options['metadata'] == null ? self.metadata : self.options['metadata'];
+                self.position = self.length;
+                callback(null, self);
+              });
+            });                
           } else {
             callback(new Error("Illegal mode " + self.mode), null);
           }
@@ -189,26 +205,60 @@ GridStore.prototype.writeFile = function (file, callback) {
 
   self.open(function (err, self) {
     fs.fstat(file, function (err, stats) {
-      var startIndices = [];
-      for (var i = 0; i < stats.size; i += self.chunkSize) startIndices.push(i);
-
-      startIndices.forEach(function (start, index, startIndices) {
-        process.nextTick(function () {
-          fs.read(file, self.chunkSize, start, 'binary', function (err, data, bytesRead) {
-            var chunk = new Chunk(self, {n: index});
-            chunk.write(data, function (err, chunk) {
-              chunk.save(function (err, result) {
-                if (index == startIndices.length -1) {
-                  self.currentChunk = chunk;
-                  self.close(function (err, result) {
-                    callback(null, self);
-                  });
-                }
-              });
+      var offset = 0;
+      var index = 0;
+      var numberOfChunksLeft = Math.min(stats.size / self.chunkSize);
+      
+      // Write a chunk
+      var writeChunk = function() {
+        fs.read(file, self.chunkSize, offset, 'binary', function(err, data, bytesRead) {
+          offset = offset + bytesRead;
+          // Create a new chunk for the data
+          var chunk = new Chunk(self, {n:index++});
+          chunk.write(data, function(err, chunk) {
+            chunk.save(function(err, result) {
+              // Point to current chunk
+              self.currentChunk = chunk;
+              // debug("=========================== err :: " + err)
+              // debug("=========================== err :: " + inspect(result))
+              // debug("============================= offset :: " + offset)
+              
+              if(offset >= stats.size) {
+                fs.close(file);
+                self.close(function(err, result) {
+                  return callback(null, self);                  
+                })                 
+              } else {
+                return process.nextTick(writeChunk);
+              }
             });
           });
         });
-      });
+      }
+      
+      // Process the first write
+      process.nextTick(writeChunk);
+      
+      // var startIndices = [];
+      // for (var i = 0; i < stats.size; i += self.chunkSize) startIndices.push(i);
+      // 
+      // startIndices.forEach(function (start, index, startIndices) {
+      //   process.nextTick(function () {
+      //     fs.read(file, self.chunkSize, start, 'binary', function (err, data, bytesRead) {
+      //       var chunk = new Chunk(self, {n: index});
+      //       chunk.write(data, function (err, chunk) {
+      //         chunk.save(function (err, result) {
+      //           if (index == startIndices.length -1) {
+      //             self.currentChunk = chunk;
+      //             self.close(function (err, result) {
+      //               callback(null, self);
+      //             });
+      //           }
+      //         });
+      //       });
+      //     });
+      //   });
+      // });
     });
   });
 
@@ -237,8 +287,6 @@ GridStore.prototype.write = function(string, close, callback) {
     callback(new Error(self.filename + " not opened for writing"), null);
   } else {
     if((self.currentChunk.position + string.length) > self.chunkSize) {
-      // sys.puts("==============================================================1")
-
       var previousChunkNumber = self.currentChunk.chunkNumber;
       var leftOverDataSize = self.chunkSize - self.currentChunk.position;
       var previousChunkData = string.substr(0, leftOverDataSize);
@@ -391,9 +439,9 @@ GridStore.prototype.close = function(callback) {
         self.collection(function(err, files) {
           // Build the mongo object
           if(self.uploadDate != null) {
-            files.remove({'_id':self.fileId}, function(err, collection) {
+            files.remove({'_id':self.fileId}, {safe:true}, function(err, collection) {
               self.buildMongoObject(function(mongoObject) {
-                files.save(mongoObject, function(err, doc) {
+                files.save(mongoObject, {safe:true}, function(err, doc) {
                   callback(err, doc);
                 });
               });
@@ -401,7 +449,7 @@ GridStore.prototype.close = function(callback) {
           } else {
             self.uploadDate = new Date();
             self.buildMongoObject(function(mongoObject) {
-              files.save( mongoObject, function(err, doc) {
+              files.save(mongoObject, {safe:true}, function(err, doc) {
                 callback(err, doc);
               });
             });
@@ -412,12 +460,14 @@ GridStore.prototype.close = function(callback) {
       self.collection(function(err, files) {
         self.uploadDate = new Date();
         self.buildMongoObject(function(mongoObject) {
-          files.save(mongoObject, function(err, doc) {
+          files.save(mongoObject, {safe:true}, function(err, doc) {
             callback(err, doc);
           });
         });
       });
     }
+  } else if(self.mode[0] == "r") {
+    callback(null, null);
   } else {
     callback(new Error("Illegal mode " + self.mode), null);
   }
@@ -488,7 +538,7 @@ GridStore.prototype.deleteChunks = function(callback) {
       if(err!==null) {
         callback(err, false);
       }
-      collection.remove({'files_id':self.fileId}, function(err, result) {
+      collection.remove({'files_id':self.fileId}, {safe:true}, function(err, result) {
         callback(null, true);
       });
     });
@@ -511,7 +561,7 @@ GridStore.prototype.unlink = function(callback) {
         return;
       }
     
-      collection.remove({'_id':self.fileId}, function(err, collection) {
+      collection.remove({'_id':self.fileId}, {safe:true}, function(err, collection) {
         callback(err, self);
       });
     });
@@ -642,6 +692,7 @@ GridStore.prototype.read = function(length, buffer, callback) {
   } else {
     finalBuffer = finalBuffer + self.currentChunk.read(self.currentChunk.length());
     numberToRead = numberToRead - self.currentChunk.length();
+    
     // Load the next chunk and read some more
     self.nthChunk(self.currentChunk.chunkNumber + 1, function(err, chunk) {
       self.currentChunk = chunk;
@@ -823,7 +874,7 @@ GridStore.DEFAULT_ROOT_COLLECTION = 'fs';
  * Default file mime type
  * @constant
  */
-GridStore.DEFAULT_CONTENT_TYPE = 'text/plain';
+GridStore.DEFAULT_CONTENT_TYPE = 'binary/octet-stream';
 /**
  * Seek mode where the given length is absolute.
  * @constant
@@ -1016,7 +1067,7 @@ GridStore.unlink = function(db, names, options, callback) {
     new GridStore(db, names, "w", options).open(function(err, gridStore) {
       gridStore.deleteChunks(function(err, result) {
         gridStore.collection(function(err, collection) {
-          collection.remove({'_id':gridStore.fileId}, function(err, collection) {
+          collection.remove({'_id':gridStore.fileId}, {safe:true}, function(err, collection) {
             callback(err, self);
           });
         });
@@ -1065,7 +1116,7 @@ ReadStream.prototype._execute = function() {
         toRead = gstore.currentChunk.length();
     }
 
-    var data = gstore.currentChunk.read(toRead);
+    var data = gstore.currentChunk.readSlice(toRead);
     if (data != null) {
         self.completedLength += data.length;
         self.pendingChunk = null;

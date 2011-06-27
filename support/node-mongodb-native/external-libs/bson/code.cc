@@ -34,21 +34,27 @@ Handle<Value> Code::New(const Arguments &args) {
   
   char *code;
   Persistent<Object> scope_object;
+  Local<String> str;
   
   if(args.Length() != 1 && args.Length() != 2) {
     return VException("There must be either 1 or 2 arguments passed in where the first argument is a string and the second a object for the scope");
   }
   
-  if(args.Length() == 1 && !args[0]->IsString()) {
+  if(args.Length() == 1 && (!args[0]->IsString() && !args[0]->IsFunction())) {
     return VException("There must be either 1 or 2 arguments passed in where the first argument is a string and the second a object for the scope");    
   }
   
-  if(args.Length() == 2 && !args[0]->IsString() && !args[1]->IsObject()) {
+  if(args.Length() == 2 && (!args[0]->IsString() && !args[0]->IsFunction()) && !args[1]->IsObject()) {
     return VException("There must be either 1 or 2 arguments passed in where the first argument is a string and the second a object for the scope");        
   }  
   
-  // Decode the string
-  Local<String> str = args[0]->ToString();
+  if(args[0]->IsFunction()) {
+    str = args[0]->ToObject()->ToString();
+  } else {
+    // Decode the string
+    str = args[0]->ToString();    
+  }
+  
   // Set up the string
   code = (char *)malloc(str->Length() * sizeof(char) + 1);
   *(code + str->Length()) = '\0';

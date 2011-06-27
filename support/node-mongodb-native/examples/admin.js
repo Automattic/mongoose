@@ -1,6 +1,8 @@
 GLOBAL.DEBUG = true;
 
 sys = require("sys");
+debug = require('util').debug,
+inspect = require('util').inspect,
 test = require("assert");
 
 var Db = require('../lib/mongodb').Db,
@@ -20,7 +22,7 @@ db.open(function(err, db) {
       db.createCollection('test', function(err, collection) {
 
         // Erase all records in collection
-        collection.remove(function(err, collection) {
+        collection.remove({}, function(err, r) {
           db.admin(function(err, admin) {
 
             // Profiling level set/get
@@ -35,16 +37,15 @@ db.open(function(err, db) {
               // Read records, creating a profiling event
               collection.find(function(err, cursor) {
                 cursor.toArray(function(err, items) {
-
                   // Stop profiling
                   admin.setProfilingLevel('off', function(err, level) {
                     // Print all profiling info
                     admin.profilingInfo(function(err, info) {
                       sys.puts(sys.inspect(info));
 
-                      // Validate returns a hash if all is well or return an error has if there is a
+                      // Validate returns a hash if all is well or return an error hash if there is a
                       // problem.
-                      admin.validatCollection(collection.collectionName, function(err, result) {
+                      admin.validateCollection(collection.collectionName, function(err, result) {
                         sys.puts(result.result);
                         db.close();
                       });

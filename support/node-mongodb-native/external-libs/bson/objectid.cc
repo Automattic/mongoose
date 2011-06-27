@@ -20,28 +20,14 @@ static Handle<Value> VException(const char *msg) {
 
 Persistent<FunctionTemplate> ObjectID::constructor_template;
 
-ObjectID::ObjectID(char *oid) : ObjectWrap() {
-  // Allocate space for the oid
-  char *oid_internal = (char *)malloc(25);
-  memcpy(oid_internal, oid, 25);
-  // Save the char pointer
-  this->oid = oid_internal;
-  
-  // Adjust of external allocated memory
-  V8::AdjustAmountOfExternalAllocatedMemory(sizeof(ObjectID));        
+ObjectID::ObjectID(char *o) : ObjectWrap() {
+    memcpy(this->oid, o, OBJECTID_SIZE);
 }
 
 ObjectID::~ObjectID() {
-  // Adjust the cleaning up of the oid size
-  V8::AdjustAmountOfExternalAllocatedMemory(-25);  
-  // Adjust the allocated memory
-  V8::AdjustAmountOfExternalAllocatedMemory(-static_cast<long int>(sizeof(ObjectID)));
-  // oid
-  free(this->oid);
 }
 
-char *ObjectID::uint32_to_char(uint32_t value) {
-  char *buf = (char *) malloc(4 * sizeof(char) + 1);
+char *ObjectID::uint32_to_char(uint32_t value, char *buf) {
   *(buf) = (char)(value & 0xff);
   *(buf + 1) = (char)((value >> 8) & 0xff);
   *(buf + 2) = (char)((value >> 16) & 0xff);
@@ -51,7 +37,7 @@ char *ObjectID::uint32_to_char(uint32_t value) {
 }
 
 // Generates a new oid
-char *ObjectID::oid_id_generator() {
+char *ObjectID::oid_id_generator(char *oid_string) {
   // Blatant copy of the code from mongodb-c driver
   static int incr = 0;
   int fuzz = 0;
@@ -66,25 +52,16 @@ char *ObjectID::oid_id_generator() {
   }
   
   // Build a 12 byte char string based on the address of the current object, the rand number and the current time
-  char *oid_string_c = (char *)malloc(12 * sizeof(char) + 1);
+  char oid_string_c[12 * sizeof(char) + 1];
+  
   *(oid_string_c + 12) = '\0';
   
-  // Fetch the address int value from the variable t
-  int *m_p = &t;
-  int *i_p = &i;  
-  
-  // Parts of the string
-  char *first_four_bytes = ObjectID::uint32_to_char(t);
-  char *second_four_bytes = ObjectID::uint32_to_char(fuzz);
-  char *third_four_bytes = ObjectID::uint32_to_char(i);
-  
-  // Build the string
-  memcpy(oid_string_c, first_four_bytes, 4);
-  memcpy((oid_string_c + 4), second_four_bytes, 4);
-  memcpy((oid_string_c + 8), third_four_bytes, 4);
+  ObjectID::uint32_to_char(t,oid_string_c);
+  ObjectID::uint32_to_char(fuzz,oid_string_c + 4);
+  ObjectID::uint32_to_char(i,oid_string_c + 8);
+
   // Allocate storage for a 24 character hex oid    
-  char *oid_string = (char *)malloc(12 * 2 * sizeof(char) + 1);
-  char *pbuffer = oid_string;      
+  char *pbuffer = oid_string;
   // Terminate the string
   *(pbuffer + 24) = '\0';      
   // Unpack the oid in hex form
@@ -93,12 +70,6 @@ char *ObjectID::oid_id_generator() {
     pbuffer += 2;
   }        
   
-  // Free memory
-  free(oid_string_c);
-  free(first_four_bytes);
-  free(second_four_bytes);
-  free(third_four_bytes);
-  // Return encoded hex string
   return oid_string;
 }
 
@@ -108,29 +79,33 @@ Handle<Value> ObjectID::New(const Arguments &args) {
   // If no arguments are passed in we generate a new ID automagically
   if(args.Length() == 0) {
     // Instantiate a ObjectID object
-    char *oid_string = ObjectID::oid_id_generator();
+    char oid_string[OBJECTID_SIZE];
+    ObjectID::oid_id_generator(oid_string);
     ObjectID *oid = new ObjectID(oid_string);
-    // Release oid_string
-    free(oid_string);
+    
     // Wrap it
     oid->Wrap(args.This());
     // Return the object
     return args.This();        
-  } else {
+  } 
+  else 
+  {
     // Ensure we have correct parameters passed in
     if(args.Length() != 1 && (!args[0]->IsString() || !args[0]->IsNull())) {
       return VException("Argument passed in must be a single String of 12 bytes or a string of 24 hex characters in hex format");
     }
 
     // Contains the final oid string
-    char *oid_string_c;
+    char oid_string_c[OBJECTID_SIZE];
+    
 
     // If we have a null generate a new oid
-    if(args[0]->IsNull()) {
-      oid_string_c = ObjectID::oid_id_generator();
-    } else {
-      oid_string_c = (char *)malloc(25);;
-      // Terminate the string
+    if(args[0]->IsNull()) 
+    {
+      ObjectID::oid_id_generator(oid_string_c);
+    } 
+    else 
+    {
       *(oid_string_c + 24) = '\0';      
       
       // Convert the argument to a String
@@ -139,9 +114,10 @@ Handle<Value> ObjectID::New(const Arguments &args) {
         return VException("Argument passed in must be a single String of 12 bytes or a string of 24 hex characters in hex format");
       }
   
-      if(oid_string->Length() == 12) {            
+      if(oid_string->Length() == 12) 
+      {            
         // Contains the bytes for the string
-        char *oid_string_bytes = (char *)malloc(13);
+        char oid_string_bytes[13];
         // Decode the 12 bytes of the oid
         node::DecodeWrite(oid_string_bytes, 13, oid_string, node::BINARY);    
         // Unpack the String object to char*
@@ -151,10 +127,9 @@ Handle<Value> ObjectID::New(const Arguments &args) {
           sprintf(pbuffer, "%02x", (unsigned char)*(oid_string_bytes + i));
           pbuffer += 2;
         } 
-        
-        // Free up memory
-        free(oid_string_bytes);
-      } else {
+      } 
+      else 
+      {
         // Decode the content
         node::DecodeWrite(oid_string_c, 25, oid_string, node::BINARY);        
       }      
@@ -162,8 +137,7 @@ Handle<Value> ObjectID::New(const Arguments &args) {
   
     // Instantiate a ObjectID object
     ObjectID *oid = new ObjectID(oid_string_c);
-    // Free string
-    free(oid_string_c);
+
     // Wrap it
     oid->Wrap(args.This());
     // Return the object
@@ -223,12 +197,12 @@ Handle<Value> ObjectID::Equals(const Arguments &args) {
 Handle<Value> ObjectID::CreatePk(const Arguments &args) {
   HandleScope scope;
   
-  char *oid_string = ObjectID::oid_id_generator();
+  char oid_string[OBJECTID_SIZE];
+  ObjectID::oid_id_generator(oid_string);
   // Return the value  
   Local<Value> argv[] = {String::New(oid_string)};
   Handle<Value> object_id_obj = ObjectID::constructor_template->GetFunction()->NewInstance(1, argv);    
-  // Free oid string
-  free(oid_string);
+
   // Return the close object
   return scope.Close(object_id_obj);
 }
@@ -251,30 +225,34 @@ Handle<Value> ObjectID::IdGetter(Local<String> property, const AccessorInfo& inf
 bool ObjectID::equals(ObjectID *object_id) {
   char *current_id = this->oid;
   char *compare_id = object_id->oid;
-  bool result = true;
   
   for(uint32_t i = 0; i < 24; i++) {
-    if(*(current_id + i) != *(compare_id + i)) result = false;
+    if(*(current_id + i) != *(compare_id + i))
+    {
+      return false;
+    }
   }
   
-  return result;
+  return true;
 }
 
 char *ObjectID::convert_hex_oid_to_bin() {
   // Turn the oid into the binary equivalent
   char *binary_oid = (char *)malloc(12 * sizeof(char) + 1);
+  *(binary_oid + 12) = '\0';
   char n_val;
   char *nval_str = (char *)malloc(3);
   *(nval_str + 2) = '\0';  
+  uint32_t x1;
+
   // Let's convert the hex value to binary
   for(uint32_t i = 0; i < 12; i++) {
     nval_str[0] = *(this->oid + (i*2));
-    nval_str[1] = *(this->oid + (i*2) + 1);
-    // Convert the string to a char    
-    n_val = strtoul(nval_str, NULL, 16);
-    // Add to string
-    *(binary_oid + i) = n_val;
-  }  
+    nval_str[1] = *(this->oid + (i*2) + 1);    
+    sscanf(nval_str, "%x", &x1);
+    *(binary_oid + i) = (char)(x1);
+  }
+
   // release the memory for the n_val_str
   free(nval_str);
   // Return the pointer to the converted string
@@ -296,21 +274,11 @@ Handle<Value> ObjectID::CreateFromHexString(const Arguments &args) {
 }
 
 Handle<Value> ObjectID::ToHexString(const Arguments &args) {
-  HandleScope scope;
-  
-  // Unpack the ObjectID instance
-  ObjectID *oid = ObjectWrap::Unwrap<ObjectID>(args.This());  
-  // Return the id
-  return String::New(oid->oid);  
+  return ToString(args);
 }
 
 Handle<Value> ObjectID::Inspect(const Arguments &args) {
-  HandleScope scope;
-  
-  // Unpack the ObjectID instance
-  ObjectID *oid = ObjectWrap::Unwrap<ObjectID>(args.This());  
-  // Return the id
-  return String::New(oid->oid);
+  return ToString(args);
 }
 
 Handle<Value> ObjectID::ToString(const Arguments &args) {
@@ -323,12 +291,7 @@ Handle<Value> ObjectID::ToString(const Arguments &args) {
 }
 
 Handle<Value> ObjectID::ToJSON(const Arguments &args) {
-  HandleScope scope;
-
-  // Unpack the ObjectID instance
-  ObjectID *oid = ObjectWrap::Unwrap<ObjectID>(args.This());  
-  // Return the id
-  return String::New(oid->oid);
+  return ToString(args);
 }
 
 

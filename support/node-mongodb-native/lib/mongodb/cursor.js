@@ -1,8 +1,9 @@
 var QueryCommand = require('./commands/query_command').QueryCommand,
   GetMoreCommand = require('./commands/get_more_command').GetMoreCommand,
   KillCursorCommand = require('./commands/kill_cursor_command').KillCursorCommand,
-  Integer = require('./goog/math/integer').Integer,
-  Long = require('./goog/math/long').Long;
+  Long = require('./goog/math/long').Long,
+  debug = require('util').debug,
+  inspect = require('util').inspect;
 
 /**
  * Constructor for a cursor object that handles all the operations on query result
@@ -53,7 +54,7 @@ var Cursor = exports.Cursor = function(db, collection, selector, fields, skip, l
   this.timeout = timeout == null ? true : timeout;
   this.tailable = tailable;
   this.batchSizeValue = batchSize == null ? 0 : batchSize;
-  this.slaveOk = slaveOk == null ? false : slaveOk;
+  this.slaveOk = slaveOk == null ? collection.slaveOk : slaveOk;
 
   this.totalNumberOfRecords = 0;
   this.items = [];
@@ -111,31 +112,27 @@ Cursor.prototype.rewind = function() {
 Cursor.prototype.toArray = function(callback) {
   var self = this;
 
-  if (!callback) {
+  if(!callback) {
     throw Error('callback is mandatory');
   }
 
-  try {
-    if(this.tailable) {
-      callback(new Error("Tailable cursor cannot be converted to array"), null);
-    } else if(this.state != Cursor.CLOSED) {
-      var items = [];
-      this.each(function(err, item) {
-        if (item != null) {
-          items.push(item);
-        } else {
-          callback(err, items);
+  if(this.tailable) {
+    callback(new Error("Tailable cursor cannot be converted to array"), null);
+  } else if(this.state != Cursor.CLOSED) {
+    var items = [];
 
-          items = null;
-        }
+    this.each(function(err, item) {
+      if(err != null) return callback(err, null);
 
-        item = null;
-      });
-    } else {
-      callback(new Error("Cursor is closed"), null);
-    }
-  } catch(err) {
-    callback(new Error(err.toString()), null);
+      if (item != null) {
+        items.push(item);
+      } else {
+        callback(err, items);
+        items = null;
+      }
+    });
+  } else {
+    callback(new Error("Cursor is closed"), null);
   }
 };
 
@@ -168,10 +165,13 @@ Cursor.prototype.each = function(callback) {
     process.nextTick(function(){
       // Fetch the next object until there is no more objects
       self.nextObject(function(err, item) {
+        if(err != null) return callback(err, null);
+
         if(item != null) {
           callback(null, item);
           self.each(callback);
         } else {
+          // Close the cursor if done
           self.state = Cursor.CLOSED;
           callback(err, null);
         }
@@ -231,6 +231,7 @@ Cursor.prototype.count = function(callback) {
 Cursor.prototype.sort = function(keyOrList, direction, callback) {
   callback = callback || function(){};
   if(typeof direction === "function") { callback = direction; direction = null; }
+
   if(this.tailable) {
     callback(new Error("Tailable cursor doesn't support sorting"), null);
   } else if(this.queryRun == true || this.state == Cursor.CLOSED) {
@@ -241,6 +242,7 @@ Cursor.prototype.sort = function(keyOrList, direction, callback) {
     if(direction != null) {
       order = [[keyOrList, direction]];
     }
+
     this.sortValue = order;
     callback(null, this);
   }
@@ -261,6 +263,7 @@ Cursor.prototype.sort = function(keyOrList, direction, callback) {
  */
 Cursor.prototype.limit = function(limit, callback) {
   callback = callback || function(){};
+
   if(this.tailable) {
     callback(new Error("Tailable cursor doesn't support limit"), null);
   } else if(this.queryRun == true || this.state == Cursor.CLOSED) {
@@ -273,6 +276,7 @@ Cursor.prototype.limit = function(limit, callback) {
       callback(null, this);
     }
   }
+
   return this;
 };
 
@@ -290,6 +294,7 @@ Cursor.prototype.limit = function(limit, callback) {
  */
 Cursor.prototype.skip = function(skip, callback) {
   callback = callback || function(){};
+
   if(this.tailable) {
     callback(new Error("Tailable cursor doesn't support skip"), null);
   } else if(this.queryRun == true || this.state == Cursor.CLOSED) {
@@ -302,6 +307,7 @@ Cursor.prototype.skip = function(skip, callback) {
       callback(null, this);
     }
   }
+
   return this;
 };
 
@@ -319,6 +325,7 @@ Cursor.prototype.skip = function(skip, callback) {
  */
 Cursor.prototype.batchSize = function(batchSize, callback) {
   callback = callback || function(){};
+
   if(this.state == Cursor.CLOSED) {
     callback(new Error("Cursor is closed"), null);
   } else if(batchSize != null && batchSize.constructor != Number) {
@@ -342,8 +349,7 @@ Cursor.prototype.limitRequest = function() {
       requestedLimit = this.limitValue < this.batchSizeValue ?
         this.limitValue : this.batchSizeValue;
     }
-  }
-  else {
+  } else {
     requestedLimit = this.batchSizeValue;
   }
 
@@ -360,16 +366,15 @@ Cursor.prototype.generateQueryCommand = function() {
   // Unpack the options
   var queryOptions = QueryCommand.OPTS_NONE;
   if (!this.timeout) {
-      queryOptions += QueryCommand.OPTS_NO_CURSOR_TIMEOUT;
+    queryOptions |= QueryCommand.OPTS_NO_CURSOR_TIMEOUT;
   }
   if (this.tailable != null) {
-      queryOptions += QueryCommand.OPTS_TAILABLE_CURSOR;
-      this.skipValue = this.limitValue = 0;
+    queryOptions |= QueryCommand.OPTS_TAILABLE_CURSOR;
+    this.skipValue = this.limitValue = 0;
   }
   if (this.slaveOk) {
-      queryOptions += QueryCommand.OPTS_SLAVE;
+    queryOptions |= QueryCommand.OPTS_SLAVE;
   }
-
 
   // limitValue of -1 is a special case used by Db#eval
   var numberToReturn = this.limitValue == -1 ? -1 : this.limitRequest();
@@ -451,23 +456,28 @@ Cursor.prototype.nextObject = function(callback) {
   if(self.state == Cursor.INIT) {
     try {
       var commandHandler = function(err, result) {
-	      if(!err && result.documents[0] && result.documents[0]['$err']) {
-	          self.close(function() {callback(result.documents[0]['$err'], null);});
-	          return;
-	        }
-	        self.queryRun = true;
-	        self.state = Cursor.OPEN; // Adjust the state of the cursor
-	        self.cursorId = result.cursorId;
-	        self.totalNumberOfRecords = result.numberReturned;
-	
-	        // Add the new documents to the list of items
-	        self.items = self.items.concat(result.documents);
-	        self.nextObject(callback);
-	        
-	        result = null;
+        try {
+          if(err != null && result == null) return callback(err, null);
+  	      if(!err && result.documents[0] && result.documents[0]['$err']) {
+            // Let's keep the cursor open
+            return self.close(function() {callback(result.documents[0]['$err'], null);});	            
+  	      }
+
+          self.queryRun = true;
+          self.state = Cursor.OPEN; // Adjust the state of the cursor
+          self.cursorId = result.cursorId;
+          self.totalNumberOfRecords = result.numberReturned;
+
+          // Add the new documents to the list of items
+          self.items = self.items.concat(result.documents);
+          self.nextObject(callback);	        
+          result = null;          
+        } catch(err) {
+          callback(new Error(err.toString()), null);
+        }
       };
       
-      self.db.executeCommand(self.generateQueryCommand(), commandHandler);
+      self.db.executeCommand(self.generateQueryCommand(), {read:true}, commandHandler);
       commandHandler = null;
     } catch(err) {
       callback(new Error(err.toString()), null);
@@ -477,7 +487,8 @@ Cursor.prototype.nextObject = function(callback) {
   } else if(self.cursorId.greaterThan(self.db.bson_serializer.Long.fromInt(0))) {
     self.getMore(callback);
   } else {
-    self.close(function() {callback(null, null);});
+    // Force cursor to stay open
+    return self.close(function() {callback(null, null);});
   }
 }
 
@@ -503,37 +514,42 @@ Cursor.prototype.getMore = function(callback) {
   try {
     var getMoreCommand = new GetMoreCommand(self.db, self.collectionName, self.limitRequest(), self.cursorId);
     // Execute the command
-    self.db.executeCommand(getMoreCommand, function(err, result) {
+    self.db.executeCommand(getMoreCommand, {read:true}, function(err, result) {
+      try {
+        if(err != null) callback(err, null);
 
-      self.cursorId = result.cursorId;
-      self.totalNumberOfRecords += result.numberReturned;
-      // Determine if there's more documents to fetch
-      if(result.numberReturned > 0) {
-        if (self.limitValue > 0) {
-          var excessResult = self.totalNumberOfRecords - self.limitValue;
+        self.cursorId = result.cursorId;
+        self.totalNumberOfRecords += result.numberReturned;
+        // Determine if there's more documents to fetch
+        if(result.numberReturned > 0) {
+          if (self.limitValue > 0) {
+            var excessResult = self.totalNumberOfRecords - self.limitValue;
 
-          if (excessResult > 0) {
-            result.documents.splice(-1*excessResult, excessResult);
+            if (excessResult > 0) {
+              result.documents.splice(-1*excessResult, excessResult);
+            }
           }
+
+          self.items = self.items.concat(result.documents);
+          callback(null, self.items.shift());
+        } else if(self.tailable) {
+          self.getMoreTimer = setTimeout(function() {self.getMore(callback);}, 500);
+        } else {
+          self.close(function() {callback(null, null);});
         }
 
-        self.items = self.items.concat(result.documents);
-        callback(null, self.items.shift());
-      } else if(self.tailable) {
-        self.getMoreTimer = setTimeout(function() {self.getMore(callback);}, 500);
-      } else {
-        self.close(function() {callback(null, null);});
+        result = null;        
+      } catch(err) {
+        callback(new Error(err.toString()), null);
       }
-      
-      result = null;
     });
     
-    getMoreCommand = null; 
-    
+    getMoreCommand = null;     
   } catch(err) {
-	var handleClose = function() {
+	  var handleClose = function() {
       callback(new Error(err.toString()), null);
     };
+    
     self.close(handleClose);
     handleClose = null;
   }
@@ -555,8 +571,10 @@ Cursor.prototype.explain = function(callback) {
   var cursor = new Cursor(this.db, this.collection, this.selector, this.fields, this.skipValue, limit,
 													this.sortValue, this.hint, true, this.snapshot, this.timeout, this.tailable, this.batchSizeValue);
   cursor.nextObject(function(err, item) {
+    if(err != null) return callback(err, null);
     // close the cursor
     cursor.close(function(err, result) {
+      if(err != null) return callback(err, null);
       callback(null, item);
     });
   });
@@ -579,13 +597,16 @@ Cursor.prototype.streamRecords = function(options) {
   execute(queryCommand);
 
   function execute(command) {
-    self.db.executeCommand(command, function(err,result) {
+    self.db.executeCommand(command, {read:true}, function(err,result) {
+      if(err != null) return callback(err, null);
+
       if (!self.queryRun && result) {
         self.queryRun = true;
         self.cursorId = result.cursorId;
         self.state = Cursor.OPEN;
         self.getMoreCommand = new GetMoreCommand(self.db, self.collectionName, queryCommand.numberToReturn, result.cursorId);
       }
+      
       if (result.documents && result.documents.length) {
         try {
           result.documents.forEach(function(doc){
@@ -612,6 +633,7 @@ Cursor.prototype.streamRecords = function(options) {
       }
     });
   }
+  
   return stream;
 };
 
@@ -629,15 +651,15 @@ Cursor.prototype.close = function(callback) {
   if(this.cursorId instanceof self.db.bson_serializer.Long && this.cursorId.greaterThan(self.db.bson_serializer.Long.fromInt(0))) {
     try {
       var command = new KillCursorCommand(this.db, [this.cursorId]);
-      this.db.executeCommand(command, null);
+      this.db.executeCommand(command, {read:true}, null);
     } catch(err) {}
   }
 
   this.cursorId = self.db.bson_serializer.Long.fromInt(0);
-  this.state    = Cursor.CLOSED;
+  this.state = Cursor.CLOSED;
 
   // callback for backward compatibility
-  if (callback) {
+  if(callback) {
     callback(null, this);
   } else {
     return this;

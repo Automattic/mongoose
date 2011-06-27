@@ -1,7 +1,29 @@
+0.9.6-1 2011-06-25
+* Fixes for test to run properly using c++ bson parser
+* Fixes for dbref in native parser (correctly handles ref without db component)
+* Connection fixes for replicasets to avoid runtime conditions in cygwin (https://github.com/vincentcr)
+* Fixes for timestamp in js bson parser (distinct timestamp type now)
+
+0.9.6 2011-06-21
+* Worked around npm version handling bug
+* Race condition fix for cygwin (https://github.com/vincentcr)
+
+0.9.5-1 2011-06-21
+* Extracted Timestamp as separate class for bson js parser to avoid instanceof problems
+* Fixed driver strict mode issue
+
+0.9.5 2011-06-20
+* Replicaset support (failover and reading from secondary servers)
+* Removed ServerPair and ServerCluster
+* Added connection pool functionality
+* Fixed serious bug in C++ bson parser where bytes > 127 would generate 2 byte sequences
+* Allows for forcing the server to assign ObjectID's using the option {forceServerObjectId: true}
+
 0.6.8
 * Removed multiple message concept from bson
 * Changed db.open(db) to be db.open(err, db)
+
 0.1 2010-01-30
 * Initial release support of driver using native node.js interface
-* Supports gridfs specificatio
+* Supports gridfs specification
 * Supports admin functionality

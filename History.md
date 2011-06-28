@@ -1,4 +1,16 @@
 
+1.5.0 / 2011-06-27
+===================
+
+  * changed; saving without a callback no longer ignores the error (@bnoguchi)
+  * changed; hook-js version bump to 0.1.9
+  * changed; node-mongodb-native version bumped to 0.9.6.1 - When .remove() doesn't
+             return an error, null is no longer passed.
+  * fixed; two memory leaks (@justmoon)
+  * added; sparse index support
+  * added; more ObjectId conditionals (gt, lt, gte, lte) (@phillyqueso)
+  * added; options are now passed in model#remote (@JerryLuke)
+
 1.4.0 / 2011-06-10
 ===================
 

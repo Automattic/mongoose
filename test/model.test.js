@@ -3678,21 +3678,32 @@ module.exports = {
     db.close();
   },
 
-  'Model#save should emit an error as its default error handler if a callback is not passed to it': function () {
+  'Model#save should emit an error on its db if a callback is not passed to it': function () {
     var db = start();
+
     var DefaultErrSchema = new Schema({});
 
+    var err = "";
+
     DefaultErrSchema.pre('save', function (next, fn) {
-      next(new Error());
+      try {
+        next(new Error);
+      } catch (error) {
+        // throws b/c nothing is listening to the error event
+        error.should.be.instanceof(Error);
+
+        db.on('error', function (err) {
+          db.close();
+          err.should.be.an.instanceof(Error);
+        });
+
+        next(new Error);
+      }
     });
 
     var DefaultErr = db.model('DefaultErr', DefaultErrSchema, 'default_err_' + random());
 
     var e = new DefaultErr();
-    e.on('error', function (err) {
-      err.should.be.an.instanceof(Error);
-      db.close();
-    });
 
     e.save();
   },

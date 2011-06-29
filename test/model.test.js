@@ -3708,6 +3708,24 @@ module.exports = {
     e.save();
   },
 
+  'ensureIndex error should emit on the db': function () {
+    var db = start();
+
+    db.on('error', function (err) {
+      /^E11000 duplicate key error index:/.test(err.message).should.equal(true);
+      db.close();
+    });
+
+    var schema = new Schema({ name: { type: String } })
+      , Test = db.model('IndexError', schema, "x"+random());
+
+    Test.create({ name: 'hi' }, { name: 'hi' }, function (err) {
+      should.strictEqual(err, null);
+      Test.schema.index({ name: 1 }, { unique: true });
+      Test.init();
+    });
+  },
+
   'backward compatibility with conflicted data in the db': function () {
     var db = start();
     var M = db.model('backwardDataConflict', new Schema({ namey: { first: String, last: String }}));

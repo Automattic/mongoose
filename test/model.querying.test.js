@@ -52,6 +52,8 @@ var ModSchema = new Schema({
 });
 mongoose.model('Mod', ModSchema);
 
+var geoSchema = new Schema({ loc: { type: [Number], index: '2d'}});
+
 module.exports = {
   'test that find returns a Query': function () {
     var db = start()
@@ -1292,8 +1294,7 @@ module.exports = {
   // GH-309
   'using $near with Arrays works (geo-spatial)': function () {
     var db = start()
-      , schema = new Schema({ loc: { type: Array, index: '2d'}})
-      , Test = db.model('GeoSpatialArrayQuery', schema, collection);
+      , Test = db.model('Geo1', geoSchema, collection);
 
     Test.create({ loc: [ 10, 20 ]}, { loc: [ 40, 90 ]}, function (err) {
       should.strictEqual(err, null);
@@ -1303,7 +1304,27 @@ module.exports = {
           should.strictEqual(err, null);
           docs.length.should.equal(2);
         });
-      }, 400);
+      }, 700);
+    });
+  },
+
+  'using $maxDistance with Array works (geo-spatial)': function () {
+    var db = start()
+      , Test = db.model('Geo2', geoSchema, "x"+random());
+
+    Test.create({ loc: [ 20, 80 ]}, { loc: [ 25, 30 ]}, function (err, docs) {
+      should.strictEqual(!!err, false);
+      setTimeout(function () {
+        Test.find({ loc: { $near: [25, 31], $maxDistance: 1 }}, function (err, docs) {
+          should.strictEqual(err, null);
+          docs.length.should.equal(1);
+          Test.find({ loc: { $near: [25, 32], $maxDistance: 1 }}, function (err, docs) {
+            db.close();
+            should.strictEqual(err, null);
+            docs.length.should.equal(0);
+          });
+        });
+      }, 500);
     });
   }
 

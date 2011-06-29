@@ -307,6 +307,15 @@ module.exports = {
     query._conditions.should.eql({checkin: {$near: [40, -72]}});
   },
 
+  'test Query#maxDistance via where': function () {
+    var query = new Query();
+    query.where('checkin').near([40, -72]).maxDistance(1);
+    query._conditions.should.eql({checkin: {$near: [40, -72], $maxDistance: 1}});
+    query = new Query();
+    query.where('checkin').near([40, -72]).$maxDistance(1);
+    query._conditions.should.eql({checkin: {$near: [40, -72], $maxDistance: 1}});
+  },
+
   'test Query#wherein.box not via where': function () {
     var query = new Query();
     query.wherein.box('gps', {ll: [5, 25], ur: [10, 30]});

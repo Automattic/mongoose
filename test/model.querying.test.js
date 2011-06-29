@@ -841,6 +841,21 @@ module.exports = {
     });
   },
 
+  // GH-389
+  'find using nested doc._id': function () {
+    var db = start()
+      , BlogPostB = db.model('BlogPostB', collection);
+
+    BlogPostB.create({comments: [{title: 'i should be queryable by _id'}, {title:'me too me too!'}]}, function (err, created) {
+      should.strictEqual(err, null);
+      BlogPostB.findOne({'comments._id': created.comments[1]._id}, function (err, found) {
+        db.close();
+        should.strictEqual(err, null);
+        found._id.should.eql(created._id);
+      });
+    });
+  },
+
   'test finding where $elemMatch': function () {
     var db = start()
       , BlogPostB = db.model('BlogPostB', collection)

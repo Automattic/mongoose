@@ -3737,6 +3737,42 @@ module.exports = {
       should.strictEqual('GI', m.namey.first);
       should.strictEqual('Joe', m.namey.last);
     });
+  },
+
+  '#push should work on EmbeddedDocuments more than 2 levels deep': function () {
+    var db = start()
+      , Post = db.model('BlogPost', collection)
+      , Comment = db.model('CommentNesting', Comments, collection);
+
+    var p =new Post({ title: "comment nesting" });
+    var c1 =new Comment({ title: "c1" });
+    var c2 =new Comment({ title: "c2" });
+    var c3 =new Comment({ title: "c3" });
+
+    p.comments.push(c1);
+    c1.comments.push(c2);
+    c2.comments.push(c3);
+
+    p.save(function (err) {
+      should.strictEqual(err, null);
+
+      Post.findById(p._id, function (err, p) {
+        should.strictEqual(err, null);
+
+        var c4=new Comment({ title: "c4" });
+        p.comments[0].comments[0].comments[0].comments.push(c4);
+        p.save(function (err) {
+          should.strictEqual(err, null);
+
+          Post.findById(p._id, function (err, p) {
+            db.close();
+            should.strictEqual(err, null);
+            p.comments[0].comments[0].comments[0].comments[0].title.should.equal('c4');
+          });
+        });
+      });
+    })
+
   }
 
 };

@@ -1503,6 +1503,7 @@ module.exports = {
     var post = new BlogPost();
     post.set('title', title);
     post.author = author;
+    post.meta.visitors = 0;
 
     post.save(function (err) {
       should.strictEqual(err, null);
@@ -1510,14 +1511,30 @@ module.exports = {
         should.strictEqual(err, null);
         createdFound.title.should.equal(title);
         createdFound.author.should.equal(author);
+        createdFound.meta.visitors.valueOf().should.eql(0);
+
         BlogPost.update({ title: title }, { title: newTitle }, function (err) {
           should.strictEqual(err, null);
 
           BlogPost.findById(post._id, function (err, updatedFound) {
-            db.close();
             should.strictEqual(err, null);
             updatedFound.title.should.equal(newTitle);
             updatedFound.author.should.equal(author);
+            updatedFound.meta.visitors.valueOf().should.equal(0);
+
+            // Note: use BlogPost.collection.update for anything other than set operations
+            BlogPost.update({ _id: post._id }, { $inc: { 'meta.visitors': 1 } }, function (err) {
+              if (err) db.close();
+              should.strictEqual(!!err, false, "Model.update doesn't work with $inc");
+
+              BlogPost.findById(post._id, function (err, updatedFound) {
+                db.close();
+                should.strictEqual(err, null);
+                updatedFound.meta.visitors.valueOf().should.equal(1);
+                updatedFound.title.should.equal(newTitle);
+                updatedFound.author.should.equal(author);
+              });
+            });
           });
         });
       });

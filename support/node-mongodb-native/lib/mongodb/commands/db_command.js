@@ -45,10 +45,7 @@ DbCommand.createGetNonceCommand = function(db) {
 DbCommand.createAuthenticationCommand = function(db, username, password, nonce) {
   // Generate keys used for authentication
   var hash_password = MD5.hex_md5(username + ":mongo:" + password);
-  // debug("=========================== hash_password :: " + hash_password)
   var key = MD5.hex_md5(nonce + username + hash_password);
-  // debug("=========================== pre_hash_key :: " + (nonce + username + hash_password))
-  // debug("=========================== key :: " + key)
   var selector = {'authenticate':1, 'user':username, 'nonce':nonce, 'key':key};
   // Create db command
   return new DbCommand(db, db.databaseName + "." + DbCommand.SYSTEM_COMMAND_COLLECTION, QueryCommand.OPTS_NONE, 0, -1, selector, null);
@@ -91,16 +88,11 @@ DbCommand.createGetLastErrorCommand = function(options, db) {
     }
   }
   
-  // debug("createGetLastErrorCommand :: " + inspect(command))
-  
   // Execute command
   return new DbCommand(db, db.databaseName + "." + DbCommand.SYSTEM_COMMAND_COLLECTION, QueryCommand.OPTS_NO_CURSOR_TIMEOUT, 0, -1, command, null);
 };
 
 DbCommand.createGetLastStatusCommand = DbCommand.createGetLastErrorCommand;
-// function(db) {
-//   return new DbCommand(db, db.databaseName + "." + DbCommand.SYSTEM_COMMAND_COLLECTION, QueryCommand.OPTS_NO_CURSOR_TIMEOUT, 0, -1, {'getlasterror':1}, null);
-// };
 
 DbCommand.createGetPreviousErrorsCommand = function(db) {
   return new DbCommand(db, db.databaseName + "." + DbCommand.SYSTEM_COMMAND_COLLECTION, QueryCommand.OPTS_NO_CURSOR_TIMEOUT, 0, -1, {'getpreverror':1}, null);
@@ -167,6 +159,10 @@ DbCommand.createCreateIndexCommand = function(db, collectionName, fieldOrSpec, o
   // Create the insert command for the index and return the document
   return new InsertCommand(db, db.databaseName + "." + DbCommand.SYSTEM_INDEX_COLLECTION, false).add(selector);
 };
+
+DbCommand.logoutCommand = function(db, command_hash) {
+  return new DbCommand(db, db.databaseName + "." + DbCommand.SYSTEM_COMMAND_COLLECTION, QueryCommand.OPTS_NO_CURSOR_TIMEOUT, 0, -1, command_hash, null);
+}
 
 DbCommand.createDropIndexCommand = function(db, collectionName, indexName) {
   return new DbCommand(db, db.databaseName + "." + DbCommand.SYSTEM_COMMAND_COLLECTION, QueryCommand.OPTS_NO_CURSOR_TIMEOUT, 0, -1, {'deleteIndexes':collectionName, 'index':indexName}, null);

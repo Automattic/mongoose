@@ -22,8 +22,8 @@ db.open(function(err, client) {
       // Benchmark
       var started_at = new Date().getTime(); 
       // Add documents
-      // for(var i = 0; i < 100000; i++) {
-      for(var i = 0; i < 10000; i++) {
+      for(var i = 0; i < 100000; i++) {
+      // for(var i = 0; i < 10000; i++) {
         collection.save({'i':i, 'a':i, 'c':i, 'd':{'i':i}}, function(err, result){});
       }    
       sys.puts("save recs: " + ((new Date().getTime() - started_at)/1000) + "seconds"); 
@@ -39,8 +39,8 @@ db.open(function(err, client) {
         stream.addListener('data',function(data){ 
           if(count == 0) started_at = new Date().getTime();           
           count++; 
-          if ((count%1000)==0) sys.puts("recs:" + count + " :: " + 
-            ((new Date().getTime() - started_at)/1000) + "seconds"); 
+          if ((count%10000)==0) sys.puts("recs:" + count + " :: " + 
+            ((new Date().getTime() - started_at)/10000) + "seconds"); 
         }); 
       });                      
     })

@@ -16,6 +16,7 @@ var Server = exports.Server = function(host, port, options) {
   this.internalMaster = false;
   this.connected = false;
   this.poolSize = this.options.poolSize == null ? 1 : this.options.poolSize;
+  this.slaveOk = this.options["slave_ok"];
   this.auths = [];
   // Setters and getters
   this.__defineGetter__("autoReconnect", function() { return self.options['auto_reconnect'] == null ? false : this.options['auto_reconnect']; });
@@ -24,6 +25,11 @@ var Server = exports.Server = function(host, port, options) {
   this.__defineGetter__("master", function() { return self.internalMaster; });
   this.__defineSetter__("master", function(value) { self.internalMaster = value; });
   this.__defineGetter__("primary", function() { return self; });
+
+  // Add handler of resend message
+  this.on('resend', function(err) {
+    self.connection.emit("resend");    
+  });
 };
 
 inherits(Server, EventEmitter);
@@ -44,6 +50,9 @@ Server.prototype.isConnected = function() {
 }
 
 Server.prototype.connect = function(parent, callback) {
+  // Ensure parent can do a slave query if it's set
+  parent.slaveOk = this.slaveOk ? this.slaveOk : parent.slaveOk;
+  // Let's connect
   var server = this;
   server.connection = new Connection(this.host, this.port, this.autoReconnect, {poolSize:this.poolSize});  
   server.connection.on("connect", function() {
@@ -94,9 +103,9 @@ Server.prototype.connect = function(parent, callback) {
   });
   
   server.connection.on("reconnect", function(err) {
-    parent.emit("reconnect");
+    server.emit('reconnect');
   });
-  
+    
   server.connection.on("error", function(err) {
     if(parent.listeners("error") != null && parent.listeners("error").length > 0) parent.emit("error", err);
     parent.state = "notConnected"

@@ -43,13 +43,33 @@ Admin.prototype.profilingLevel = function(callback) {
 
 Admin.prototype.authenticate = function(username, password, callback) {
   var self = this;
-
   var databaseName = this.db.databaseName;
   this.db.databaseName = 'admin';
   this.db.authenticate(username, password, function(err, result) {
     self.db.databaseName = databaseName;
     return callback(err, result);
   })
+}
+
+Admin.prototype.logout = function(options, callback) {
+  var self = this;
+  var databaseName = this.db.databaseName;
+  this.db.databaseName = 'admin';
+  this.db.logout(options, function(err, result) {
+    return callback(err, result);
+  })  
+
+  self.db.databaseName = databaseName;
+}
+
+Admin.prototype.addUser = function(username, password, callback) {
+  var self = this;
+  var databaseName = this.db.databaseName;
+  this.db.databaseName = 'admin';
+  this.db.addUser(username, password, function(err, result) {
+    self.db.databaseName = databaseName;
+    return callback(err, result);
+  })  
 }
 
 Admin.prototype.setProfilingLevel = function(level, callback) {

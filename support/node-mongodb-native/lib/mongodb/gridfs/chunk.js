@@ -85,20 +85,20 @@ Chunk.prototype.read = function(length) {
 };
 
 Chunk.prototype.readSlice = function(length) {
-    if ((this.length() - this.internalPosition + 1) >= length) {
-        var data = null;
-        if (this.data.buffer != null) { //Pure BSON
-            data = this.data.buffer.slice(this.internalPosition, this.internalPosition + length);
-        } else { //Native BSON
-            data = new Buffer(length);
-            //length = data.write(this.data.read(this.internalPosition, length), 'binary', 0);
-            length = this.data.readInto(data, this.internalPosition);
-        }
-        this.internalPosition = this.internalPosition + length;
-        return data;
-    } else {
-        return null;
+  if ((this.length() - this.internalPosition + 1) >= length) {
+    var data = null;
+    if (this.data.buffer != null) { //Pure BSON
+      data = this.data.buffer.slice(this.internalPosition, this.internalPosition + length);
+    } else { //Native BSON
+      data = new Buffer(length);
+      //length = data.write(this.data.read(this.internalPosition, length), 'binary', 0);
+      length = this.data.readInto(data, this.internalPosition);
     }
+    this.internalPosition = this.internalPosition + length;
+    return data;
+  } else {
+    return null;
+  }
 };
 
 /**

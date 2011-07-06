@@ -19,12 +19,15 @@ var ReplicaSetManager = exports.ReplicaSetManager = function(options) {
   this.retries = options["retries"] != null ? options["retries"] : 60;
   this.config = {"_id": this.name, "members": []};
   this.durable = options["durable"] != null ? options["durable"] : false;
+  this.auth = options['auth'] != null ? options['auth'] : false; 
   this.path = path.resolve("data");
   
   this.arbiterCount = options["arbiter_count"] != null ? options["arbiter_count"] : 2;
   this.secondaryCount = options["secondary_count"] != null ? options["secondary_count"] : 1;
   this.passiveCount = options["passive_count"] != null ? options["passive_count"] : 1;
   this.primaryCount = 1;
+  this.keyPath = [process.cwd(), "test", "tools", "keyfile.txt"].join("/");
+  fs.chmodSync(this.keyPath, 0600);
   
   this.count = this.primaryCount + this.passiveCount + this.arbiterCount + this.secondaryCount;
   if(this.count > 7) {
@@ -497,9 +500,11 @@ ReplicaSetManager.prototype.startCmd = function(n) {
   // Create boot command
   this.mongods[n]["start"] = "mongod --noprealloc --smallfiles --replSet " + this.name + " --logpath '" + this.mongods[n]['log_path'] + "' " +
       " --dbpath " + this.mongods[n]['db_path'] + " --port " + this.mongods[n]['port'] + " --fork";
-  this.mongods[n]["start"] = this.durable ? this.mongods[n]["start"] + "  --dur" : this.mongods[n]["start"];
-  // debug("================================================== start server")
-  // debug(this.mongods[n]["start"])  
+  this.mongods[n]["start"] = this.durable ? this.mongods[n]["start"] + " --dur" : this.mongods[n]["start"];
+  
+  if(this.auth) {
+    this.mongods[n]["start"] = this.auth ? this.mongods[n]["start"] + " --keyFile " + this.keyPath : this.mongods[n]["start"];
+  }
   return this.mongods[n]["start"];
 }
 

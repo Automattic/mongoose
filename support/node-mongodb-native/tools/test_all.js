@@ -72,7 +72,7 @@ exec('rm -rf ./output', function(err, stdout, stderr) {
     Step(
       // Start the single server
       function startSingleServer() {
-        serverManager.start(true, this);
+        serverManager.start(true, {purgedirectories:true}, this);
       },
       // Run all the integration tests using the pure js bson parser
       function runPureJS() {
@@ -101,7 +101,7 @@ exec('rm -rf ./output', function(err, stdout, stderr) {
     // Execute without replicaset tests
     Step(
       function startSingleServer() {
-        serverManager.start(true, this);
+        serverManager.start(true, {purgedirectories:true}, this);
       },
       function runPureJS() {
         options.suffix = 'pure';

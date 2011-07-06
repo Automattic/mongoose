@@ -21,7 +21,7 @@ function Binary (buffer, subType) {
     this.sub_type = subType == null ? bson.BSON.BSON_BINARY_SUBTYPE_DEFAULT : subType;
   }
 
-  if (buffer != null && (buffer instanceof Number)) {
+  if (buffer != null && !(buffer instanceof Number)) {
     this.buffer = buffer;
     this.position = buffer.length;
   } else {

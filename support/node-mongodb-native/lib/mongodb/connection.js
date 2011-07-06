@@ -53,11 +53,6 @@ var setupConnectionPool = function(self, poolSize, reconnect) {
     // Fetch the pool reference
     var conObj = self.poolByReference[fd];
     
-    // if(conObj == null) {
-    //   debug("================================================================ failed to find connection :: " + this.fd)
-    //   debug(inspect(self.poolByReference))
-    // }
-    
     // Check if we have an unfinished message
     if(conObj != null && conObj.bytesRead > 0 && conObj.sizeOfMessage > 0) {
       // Calculate remaing bytes to fetch
@@ -142,6 +137,7 @@ var setupConnectionPool = function(self, poolSize, reconnect) {
       "bytesRead": 0,
       "buffer": '',
       "stubBuffer": ''});      
+
     // Add the listener to the connection
     connection.addListener("data", receiveListener);
   }
@@ -246,7 +242,7 @@ Connection.prototype.send = function(command, rawConnection) {
         })
 
         // Wait for a reconnect and send all the messages
-        self.on("reconnect", function() {
+        self.on("resend", function() {
           self.currently_reconnecting = false;
           // Fire the message again
           while(self.messages.length > 0) {

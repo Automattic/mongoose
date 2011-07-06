@@ -78,9 +78,6 @@ function Collection (db, collectionName, pkFactory, options) {
   this.opts = options != null && ('object' === typeof options) ? options : {};
   this.slaveOk = options == null || options.slaveOk == null ? db.slaveOk : options.slaveOk;
 
-  // debug("======================================================== options")
-  // debug(inspect(options))
-
   this.pkFactory = pkFactory == null
     ? db.bson_serializer.ObjectID
     : pkFactory;
@@ -107,6 +104,8 @@ function Collection (db, collectionName, pkFactory, options) {
 
 Collection.prototype.insert = function insert (docs, options, callback) {
   if ('function' === typeof options) callback = options, options = {};
+  if(options == null) options = {};
+  if(!('function' === typeof callback)) callback = null;
 
   this.insertAll(Array.isArray(docs) ? docs : [docs], options, callback);
 
@@ -153,19 +152,38 @@ Collection.prototype.remove = function remove (selector, options, callback) {
     callback = options;
     options = {};
   }
+  
+  // Ensure options
+  if(options == null) options = {};
+  if(!('function' === typeof callback)) callback = null;  
 
   var deleteCommand = new DeleteCommand(
       this.db
     , this.db.databaseName + "." + this.collectionName
     , selector);
 
+  var errorOptions = options.safe != null ? options.safe : null;
+  errorOptions = errorOptions == null && this.opts.safe != null ? this.opts.safe : errorOptions;
+  errorOptions = errorOptions == null && this.db.strict != null ? this.db.strict : errorOptions;
+
   // Execute the command, do not add a callback as it's async
   if (options && options.safe || this.opts.safe != null || this.db.strict) {
-    var errorOptions = options.safe != null ? options.safe : null;
-    errorOptions = errorOptions == null && this.opts.safe != null ? this.opts.safe : errorOptions;
-    errorOptions = errorOptions == null && this.db.strict != null ? this.db.strict : errorOptions;
+    // Insert options
+    var commandOptions = {read:false};
+    // If we have safe set set async to false
+    if(errorOptions == null) commandOptions['async'] = true;
+    // Set safe option
+    commandOptions['safe'] = true;
+    // If we have an error option
+    if(typeof errorOptions == 'object') {
+      var keys = Object.keys(errorOptions);
+      for(var i = 0; i < keys.length; i++) {
+        commandOptions[keys[i]] = errorOptions[keys[i]];
+      }
+    }
+
     // Execute command with safe options (rolls up both command and safe command into one and executes them on the same connection)
-    this.db.executeCommand(deleteCommand, {read:false, safe: errorOptions}, function (err, error) {
+    this.db.executeCommand(deleteCommand, commandOptions, function (err, error) {
       error = error && error.documents;
       if(!callback) return;      
 
@@ -225,7 +243,9 @@ Collection.prototype.rename = function rename (newName, callback) {
  */
 
 Collection.prototype.insertAll = function insertAll (docs, options, callback) {
-  if ('function' === typeof options) callback = options, options = {};
+  if('function' === typeof options) callback = options, options = {};  
+  if(options == null) options = {};
+  if(!('function' === typeof callback)) callback = null;
 
   var insertCommand = new InsertCommand(
       this.db
@@ -243,18 +263,30 @@ Collection.prototype.insertAll = function insertAll (docs, options, callback) {
     insertCommand.add(doc);
   }
   
+  // Collect errorOptions
+  var errorOptions = options.safe != null ? options.safe : null;
+  errorOptions = errorOptions == null && this.opts.safe != null ? this.opts.safe : errorOptions;
+  errorOptions = errorOptions == null && this.db.strict != null ? this.db.strict : errorOptions;
+  
   // If safe is defined check for error message
-  if (options != null && (options.safe == true || this.db.strict == true || this.opts.safe == true)) {
-    var errorOptions = options.safe != null ? options.safe : null;
-    errorOptions = errorOptions == null && this.opts.safe != null ? this.opts.safe : errorOptions;
-    errorOptions = errorOptions == null && this.db.strict != null ? this.db.strict : errorOptions;
-
+  // if(options != null && (options.safe == true || this.db.strict == true || this.opts.safe == true)) {
+  if(errorOptions) {
     // Insert options
-    var insertOptions = {read:false, safe: errorOptions};
+    var commandOptions = {read:false};
     // If we have safe set set async to false
-    if(errorOptions == null) insertOptions['async'] = true;
+    if(errorOptions == null) commandOptions['async'] = true;
+    // Set safe option
+    commandOptions['safe'] = true;
+    // If we have an error option
+    if(typeof errorOptions == 'object') {
+      var keys = Object.keys(errorOptions);
+      for(var i = 0; i < keys.length; i++) {
+        commandOptions[keys[i]] = errorOptions[keys[i]];
+      }
+    }
+    
     // Execute command with safe options (rolls up both command and safe command into one and executes them on the same connection)
-    this.db.executeCommand(insertCommand, insertOptions, function (err, error) {
+    this.db.executeCommand(insertCommand, commandOptions, function (err, error) {
       error = error && error.documents;
       if(!callback) return;      
 
@@ -266,12 +298,12 @@ Collection.prototype.insertAll = function insertAll (docs, options, callback) {
         callback(null, docs);
       }      
     });    
-  } else {
+  } else {    
     var result = this.db.executeCommand(insertCommand);    
     // If no callback just return
-    if (!callback) return;
+    if(!callback) return;
     // If error return error
-    if (result instanceof Error) {
+    if(result instanceof Error) {
       return callback(result);
     }
     // Otherwise just return
@@ -330,6 +362,8 @@ Collection.prototype.save = function save (doc, options, callback) {
 
 Collection.prototype.update = function update (selector, document, options, callback) {
   if('function' === typeof options) callback = options, options = null;
+  if(options == null) options = {};
+  if(!('function' === typeof callback)) callback = null;
 
   var updateCommand = new UpdateCommand(
       this.db
@@ -338,15 +372,29 @@ Collection.prototype.update = function update (selector, document, options, call
     , document
     , options);
 
+  // Unpack the error options if any
+  var errorOptions = (options && options.safe != null) ? options.safe : null;    
+  errorOptions = errorOptions == null && this.opts.safe != null ? this.opts.safe : errorOptions;
+  errorOptions = errorOptions == null && this.db.strict != null ? this.db.strict : errorOptions;
+
   // If we are executing in strict mode or safe both the update and the safe command must happen on the same line
-  if (options && options.safe || this.db.strict || this.opts.safe) {
-    // Unpack the error options if any
-    var errorOptions = (options && options.safe != null) ? options.safe : null;    
-    errorOptions = errorOptions == null && this.opts.safe != null ? this.opts.safe : errorOptions;
-    errorOptions = errorOptions == null && this.db.strict != null ? this.db.strict : errorOptions;
-    
+  if(errorOptions) {    
+    // Insert options
+    var commandOptions = {read:false};
+    // If we have safe set set async to false
+    if(errorOptions == null) commandOptions['async'] = true;
+    // Set safe option
+    commandOptions['safe'] = true;
+    // If we have an error option
+    if(typeof errorOptions == 'object') {
+      var keys = Object.keys(errorOptions);
+      for(var i = 0; i < keys.length; i++) {
+        commandOptions[keys[i]] = errorOptions[keys[i]];
+      }
+    }
+
     // Execute command with safe options (rolls up both command and safe command into one and executes them on the same connection)
-    this.db.executeCommand(updateCommand, {read:false, safe: errorOptions}, function (err, error) {
+    this.db.executeCommand(updateCommand, commandOptions, function (err, error) {
       error = error && error.documents;
       if(!callback) return;      
       
@@ -663,9 +711,15 @@ Collection.prototype.findOne = function findOne (queryObject, options, callback)
 
   var query = { 'query': queryObject };
 
+  // If we have a timeout set
   var timeout = null != options.timeout
     ? options.timeout
     : QueryCommand.OPTS_NONE;
+
+  // Make sure we can do slaveOk commands
+  if (options.slaveOk || this.slaveOk || this.db.slaveOk) {
+    timeout |= QueryCommand.OPTS_SLAVE;
+  }
 
   var collectionName = (this.db.databaseName ? this.db.databaseName + '.' : '')
                      + this.collectionName;

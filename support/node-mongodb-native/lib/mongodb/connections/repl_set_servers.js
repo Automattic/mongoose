@@ -28,8 +28,8 @@ var ReplSetServers = exports.ReplSetServers = function(servers, options) {
   this.secondaries = [];
   this.arbiters = [];
   // Are we allowing reads from secondaries ?
-  this.readSecondary = options["read_secondary"] == null ? false : options["read_secondary"];
-  this.slaveOk = this.readSecondary ? true : false;
+  this.readSecondary = options["read_secondary"];
+  this.slaveOk = this.readSecondary;
   this.otherErrors = [];
 
   if(!Array.isArray(servers) || servers.length == 0) {
@@ -115,8 +115,6 @@ ReplSetServers.prototype.isPrimary = function(config) {
 ReplSetServers.prototype.isReadPrimary = ReplSetServers.prototype.isPrimary;
 
 ReplSetServers.prototype.connect = function(parent, callback) {
-  // debug("================================================================== ReplSetServers.prototype.connect")
-
   var replSetSelf = this;
   var serverConnections = this.servers;
   var numberOfConnectedServers = 0; 
@@ -124,19 +122,17 @@ ReplSetServers.prototype.connect = function(parent, callback) {
   this.addresses = {};  
   this.target = null;
   // Ensure parent can do a slave query if it's set
-  parent.slaveOk = this.slaveOk;
+  parent.slaveOk = this.slaveOk ? this.slaveOk : parent.slaveOk;
 
   var initServer = function(server)  {
-    // debug("======= connect :: initServer")
-    
     replSetSelf.addresses[server.host + ':' + server.port] = 1;
     server.connection = new Connection(server.host, server.port, server.autoReconnect);
 
     // Add the connect
     server.connection.on("connect", function() {
-      // debug("======= connect :: initServer :: connect")
       // Create a callback function for a given connection
       var connectCallback = function(err, reply) {
+        if(replSetSelf.otherErrors.length > 0) return;
         // Update number of connected servers, ensure we update before any possible errors
         numberOfConnectedServers = numberOfConnectedServers + 1;
                 
@@ -177,13 +173,19 @@ ReplSetServers.prototype.connect = function(parent, callback) {
             // Set target/primary server
             replSetSelf.target = server;            
 
-            if(replSetSelf.replicaSet != node["setName"]) {
+            if(replSetSelf.replicaSet == null) {
+              replSetSelf.replicaSet = node["setName"];
+            } else if(replSetSelf.replicaSet != node["setName"]) {
               // Add other error to the list of errors
-              replSetSelf.otherErrors.push(new Error("configured mongodb replicaset does not match provided replicaset [" + node["setName"] + "] != [" + replSetSelf.replicaSet + "]"));
+              var errorMessage = new Error("configured mongodb replicaset does not match provided replicaset [" + node["setName"] + "] != [" + replSetSelf.replicaSet + "]");
+              replSetSelf.otherErrors.push(errorMessage);
               // Close all servers and return an error
               for(var i = 0; i < serverConnections.length; i++) {
                 serverConnections[i].close();
               }
+              
+              // Return the error message
+              return callback(errorMessage);
             }
           }
         
@@ -208,8 +210,7 @@ ReplSetServers.prototype.connect = function(parent, callback) {
         }
 
         // emit a message saying we got a master and are ready to go and change state to reflect it
-        if(numberOfConnectedServers == serverConnections.length && (parent.state == 'notConnected')) {
-          // debug("========================================================== 1")
+        if(numberOfConnectedServers >= serverConnections.length && (parent.state == 'notConnected')) {
           parent.isInitializing  = false;
           // If we have no master connection
           if(replSetSelf.otherErrors.length > 0) {
@@ -228,14 +229,9 @@ ReplSetServers.prototype.connect = function(parent, callback) {
           replSetSelf.target = server;
         }            
 
-        // debug("#############################################################################")
-        // debug("numberOfConnectedServers :: " + numberOfConnectedServers)
-        // debug("numberOfErrorServers :: " + numberOfErrorServers)
-        // debug("serverConnections :: " + serverConnections.length)
-
         // We had some errored out servers, does not matter as long as we have a master server
         // we can write to.
-        if ((numberOfConnectedServers + numberOfErrorServers) == serverConnections.length) { 
+        if((numberOfConnectedServers + numberOfErrorServers) >= serverConnections.length) { 
           parent.isInitializing  = false;
           // If we have no master connection
           if(replSetSelf.otherErrors.length > 0) {
@@ -272,7 +268,7 @@ ReplSetServers.prototype.connect = function(parent, callback) {
         }
       });
     });
-
+    
     server.connection.on("error", function(err) {
       if(parent.isInitializing) {
         //we only have one error, if the rest are ok there is no problem

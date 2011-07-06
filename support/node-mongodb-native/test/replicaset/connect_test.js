@@ -58,6 +58,23 @@ module.exports = testCase({
       callback();        
     })
   },
+
+  shouldCorrectlyConnectWithDefaultReplicaset : function(test) {
+    // Replica configuration
+    var replSet = new ReplSetServers([ 
+        new Server( RS.host, RS.ports[1], { auto_reconnect: true } ),
+        new Server( RS.host, RS.ports[0], { auto_reconnect: true } ),
+        new Server( RS.host, RS.ports[2], { auto_reconnect: true } )
+      ], 
+      {}
+    );
+  
+    var db = new Db('integration_test_', replSet);
+    db.open(function(err, p_db) {
+      test.equal(null, err);
+      test.done();
+    })    
+  },  
   
   shouldCorrectlyPassErrorWhenWrongReplicaSet : function(test) {
     // Replica configuration
@@ -68,7 +85,7 @@ module.exports = testCase({
       ], 
       {rs_name:RS.name + "-wrong"}
     );
-
+  
     var db = new Db('integration_test_', replSet);
     db.open(function(err, p_db) {
       test.notEqual(null, err);
@@ -96,7 +113,7 @@ module.exports = testCase({
     // debug("=========================================== shouldConnectWithThirdNodeKilled")
     RS.getNodeFromPort(RS.ports[2], function(err, node) {
       if(err != null) debug("shouldConnectWithThirdNodeKilled :: " + inspect(err));
-
+  
       RS.kill(node, function(err, result) {
         if(err != null) debug("shouldConnectWithThirdNodeKilled :: " + inspect(err));
         // Replica configuration
@@ -212,14 +229,14 @@ module.exports = testCase({
       // Test primary
       RS.primary(function(err, primary) {
         if(err != null) debug("shouldCorrectlyConnect :: " + inspect(err));
-
+  
         test.notEqual(null, primary);                
         test.equal(primary, p_db.serverConfig.primary.host + ":" + p_db.serverConfig.primary.port);
   
         // Perform tests
         RS.secondaries(function(err, items) {
           if(err != null) debug("shouldCorrectlyConnect :: " + inspect(err));
-
+  
           // Test if we have the right secondaries
           test.deepEqual(items.sort(), p_db.serverConfig.secondaries.map(function(item) {
                                           return item.host + ":" + item.port;
@@ -228,7 +245,7 @@ module.exports = testCase({
           // Test if we have the right arbiters
           RS.arbiters(function(err, items) {
             if(err != null) debug("shouldCorrectlyConnect :: " + inspect(err));
-
+  
             test.deepEqual(items.sort(), p_db.serverConfig.arbiters.map(function(item) {
                                             return item.host + ":" + item.port;
                                           }).sort());
@@ -237,7 +254,7 @@ module.exports = testCase({
             var db2 = new Db('integration_test_', replSet );
             db2.open(function(err, p_db2) {
               if(err != null) debug("shouldCorrectlyConnect :: " + inspect(err));
-
+  
               test.equal(true, p_db2.serverConfig.isConnected());
   
               // Close top instance

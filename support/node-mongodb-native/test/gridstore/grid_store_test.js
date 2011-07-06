@@ -45,13 +45,51 @@ var tests = testCase({
       callback();        
     }      
   },
-
+  
   // Gridstore tests
+  shouldCorrectlyExecuteGridStoreExistsByObjectId : function(test) {
+    var gridStore = new GridStore(client, null, "w");
+    gridStore.open(function(err, gridStore) {
+      gridStore.write("hello world!", function(err, gridStore) {
+        gridStore.close(function(err, result) {          
+          GridStore.exist(client, result._id, function(err, result) {
+            test.equal(true, result);
+          })
+  
+          GridStore.exist(client, new client.bson_serializer.ObjectID(), function(err, result) {
+            test.equal(false, result);
+          });
+            
+          GridStore.exist(client, new client.bson_serializer.ObjectID(), 'another_root', function(err, result) {
+            test.equal(false, result);
+            test.done();
+          });
+        });
+      });
+    });
+  },
+  
+  shouldCorrectlySafeFileAndReadFileByObjectId : function(test) {
+    var gridStore = new GridStore(client, null, "w");
+    gridStore.open(function(err, gridStore) {
+      gridStore.write("hello world!", function(err, gridStore) {
+        gridStore.close(function(err, result) {          
+          
+          // Let's read the file using object Id
+          GridStore.read(client, result._id, function(err, data) {
+            test.equal('hello world!', data);
+            test.done();
+          });          
+        });
+      });
+    });    
+  },
+  
   shouldCorrectlyExecuteGridStoreExists : function(test) {
     var gridStore = new GridStore(client, "foobar", "w");
     gridStore.open(function(err, gridStore) {
       gridStore.write("hello world!", function(err, gridStore) {
-        gridStore.close(function(err, result) {
+        gridStore.close(function(err, result) {          
           GridStore.exist(client, 'foobar', function(err, result) {
             test.equal(true, result);
           });
@@ -83,6 +121,15 @@ var tests = testCase({
             test.ok(items.length >= 1);
             test.ok(found);
           });
+          
+          GridStore.list(client, {id:true}, function(err, items) {
+            var found = false;
+            items.forEach(function(id) {
+              test.ok(typeof id == 'object');
+            });
+  
+            test.ok(items.length >= 1);
+          });          
   
           GridStore.list(client, 'fs', function(err, items) {
             var found = false;
@@ -373,13 +420,36 @@ var tests = testCase({
     var data = fs.readFileSync('./test/gridstore/test_gs_weird_bug.png', 'binary');
     
     gridStore.open(function(err, gridStore) {
-      gridStore.writeFile('./test/gridstore/test_gs_weird_bug.png', function(err, gridStore) {
+      gridStore.writeFile('./test/gridstore/test_gs_weird_bug.png', function(err, doc) {
         GridStore.read(client, 'test_gs_writing_file', function(err, fileData) {
           test.equal(data, fileData)
           test.equal(fileSize, fileData.length);
           
           // Ensure we have a md5
           var gridStore2 = new GridStore(client, 'test_gs_writing_file', 'r');
+          gridStore2.open(function(err, gridStore2) {
+            test.ok(gridStore2.md5 != null)            
+            test.done();
+          });          
+        });
+      });
+    });
+  },
+  
+  shouldCorrectlyWriteFileToGridStoreUsingObjectId: function(test) {
+    var gridStore = new GridStore(client, null, 'w');
+    var fileSize = fs.statSync('./test/gridstore/test_gs_weird_bug.png').size;
+    var data = fs.readFileSync('./test/gridstore/test_gs_weird_bug.png', 'binary');
+    
+    gridStore.open(function(err, gridStore) {
+      gridStore.writeFile('./test/gridstore/test_gs_weird_bug.png', function(err, doc) {
+        
+        GridStore.read(client, doc._id, function(err, fileData) {
+          test.equal(data, fileData)
+          test.equal(fileSize, fileData.length);
+          
+          // Ensure we have a md5
+          var gridStore2 = new GridStore(client, doc._id, 'r');
           gridStore2.open(function(err, gridStore2) {
             test.ok(gridStore2.md5 != null)            
             test.done();
@@ -422,6 +492,121 @@ var tests = testCase({
       });
     });
   },  
+  
+  shouldCorrectlyReadAndWriteFileByObjectId : function(test) {
+    var gridStore = new GridStore(client, null, "w");
+    var data = fs.readFileSync("./test/gridstore/test_gs_weird_bug.png", 'binary');
+  
+    gridStore.open(function(err, gridStore) {
+      gridStore.write(data, function(err, gridStore) {
+        gridStore.close(function(err, result) {
+  
+          // Assert that we have overwriten the data
+          GridStore.read(client, result._id, function(err, fileData) {
+            test.equal(data.length, fileData.length);
+            test.done();
+          });
+        });
+      });
+    });
+  },  
+  
+  shouldCorrectlyWriteAndReadJpgImage : function(test) {
+    var data = fs.readFileSync('./test/gridstore/iya_logo_final_bw.jpg').toString('binary');
+    
+    var gs = new GridStore(client, "test", "w");
+    gs.open(function(err, gs) {
+      gs.write(data, function(err, gs) {
+        gs.close(function(err, gs) {
+          
+          // Open and read
+          var gs2 = new GridStore(client, "test", "r");
+          gs2.open(function(err, gs) {
+            gs2.seek(0, function() {
+              gs2.read(0, function(err, data2) {
+                test.equal(data, data2);
+                test.done();                          
+              });
+            });
+          });
+        });
+      })
+    })    
+  },
+  
+  shouldCorrectlyReadAndWriteBuffersMultipleChunks : function(test) {
+    var gridStore = new GridStore(client, null, 'w');
+    // Force multiple chunks to be stored
+    gridStore.chunkSize = 5000;
+    var fileSize = fs.statSync('./test/gridstore/test_gs_weird_bug.png').size;
+    var data = fs.readFileSync('./test/gridstore/test_gs_weird_bug.png');
+    
+    gridStore.open(function(err, gridStore) {
+        
+      // Write the file using writeBuffer
+      gridStore.writeBuffer(data, function(err, doc) {
+        gridStore.close(function(err, doc) {
+  
+          // Read the file using readBuffer
+          new GridStore(client, doc._id, 'r').open(function(err, gridStore) {
+            gridStore.readBuffer(function(err, data2) {
+              test.equal(data.toString('base64'), data2.toString('base64'));
+              test.done();            
+            })
+          });          
+        });
+      })        
+    });
+  },
+
+  shouldCorrectlyReadAndWriteBuffersSingleChunks : function(test) {
+    var gridStore = new GridStore(client, null, 'w');
+    // Force multiple chunks to be stored
+    var fileSize = fs.statSync('./test/gridstore/test_gs_weird_bug.png').size;
+    var data = fs.readFileSync('./test/gridstore/test_gs_weird_bug.png');
+    
+    gridStore.open(function(err, gridStore) {
+        
+      // Write the file using writeBuffer
+      gridStore.writeBuffer(data, function(err, doc) {
+        gridStore.close(function(err, doc) {
+
+          // Read the file using readBuffer
+          new GridStore(client, doc._id, 'r').open(function(err, gridStore) {
+            gridStore.readBuffer(function(err, data2) {
+              test.equal(data.toString('base64'), data2.toString('base64'));
+              test.done();            
+            })
+          });          
+        });
+      })        
+    });
+  },
+  
+  shouldCorrectlyReadAndWriteBuffersUsingNormalWriteWithMultipleChunks : function(test) {
+    var gridStore = new GridStore(client, null, 'w');
+    // Force multiple chunks to be stored
+    gridStore.chunkSize = 5000;
+    var fileSize = fs.statSync('./test/gridstore/test_gs_weird_bug.png').size;
+    var data = fs.readFileSync('./test/gridstore/test_gs_weird_bug.png');
+    
+    gridStore.open(function(err, gridStore) {
+        
+      // Write the buffer using the .write method that should use writeBuffer correctly
+      gridStore.write(data, function(err, doc) {
+        gridStore.close(function(err, doc) {
+  
+          // Read the file using readBuffer
+          new GridStore(client, doc._id, 'r').open(function(err, gridStore) {
+            gridStore.readBuffer(function(err, data2) {
+              test.equal(data.toString('base64'), data2.toString('base64'));
+              test.done();            
+            })
+          });          
+        });
+      })        
+    });
+  },
 })
 
 // Stupid freaking workaround due to there being no way to run setup once for each suite

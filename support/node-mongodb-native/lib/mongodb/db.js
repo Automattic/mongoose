@@ -22,6 +22,7 @@ var Db = exports.Db = function(databaseName, serverConfig, options) {
   
   // Contains all the connections for the db
   try {
+    this.native_parser = this.options.native_parser;
     var serializer = this.options.native_parser ? require('../../external-libs/bson') : require('./bson/bson');
     this.bson_serializer = serializer;
     this.bson_deserializer = serializer;
@@ -37,44 +38,49 @@ var Db = exports.Db = function(databaseName, serverConfig, options) {
   // Added strict
   this.strict = this.options.strict == null ? false : this.options.strict;
   this.notReplied ={};
-  this.slaveOk = false;
   this.isInitializing = true;
   this.auths = [];
+  // Allow slaveOk
+  this.slaveOk = this.options["slave_ok"] == null ? false : this.options["slave_ok"];
+  
+  var self = this;
+  // Add a listener for the reconnect event
+  this.serverConfig.on("reconnect", function() {
+    // Number of current auths
+    var authLength = self.auths.length;
+    var numberOfReadyAuth = 0;
+
+    if(authLength > 0) {
+      // If we have any auths fire off the auth message to all the connections
+      for(var i = 0; i < authLength; i++) {
+
+        // Execute auth commands
+        self.authenticate(self.auths[i].username, self.auths[i].password, function(err, result) {
+          numberOfReadyAuth = numberOfReadyAuth + 1;
+
+          if(numberOfReadyAuth == self.auths.length) {
+            self.serverConfig.emit("resend");
+          }            
+        });        
+      }        
+    } else {
+      self.serverConfig.emit("resend");
+    }
+  });  
 };
 
 inherits(Db, EventEmitter);
 
 Db.prototype.open = function(callback) {
-  var self = this;
-
+  var self = this;  
   // Set up connections
   if(self.serverConfig instanceof Server || self.serverConfig instanceof ReplSetServers) {
-    // Inner function for authentication
-    var authenticateFunction = function(self, username, password) {
-      return function() {
-        self.authenticate(username, password, function(err, result) {
-          // Just ignore the result for now
-        });        
-      }
-    }
-    
-    // Add a listener for the reconnect event
-    self.on("reconnect", function() {
-      // Number of current auths
-      var authLength = self.auths.length;
-      // // If we have any auths fire off the auth message to all the connections
-      if(self.auths.length > 0) {
-        for(var i = 0; i < authLength; i++) {
-          authenticateFunction(self, self.auths[i].username, self.auths[i].password)();
-        }
-      }
-    });    
-
     self.serverConfig.connect(self, function(err, result) {
       if(err != null) return callback(err, null);            
       // Callback
       return callback(null, self);
     });
+    
   } else {
     return callback(Error("Server parameter must be of type Server or ReplSetServers"), null);
   }
@@ -225,6 +231,44 @@ Db.prototype.dereference = function(dbRef, callback) {
 };
 
 /**
+  Logout user from server
+  Fire off on all connections and remove all auth info
+**/
+Db.prototype.logout = function(options, callback) {
+  var self = this;
+  // If the first object is a function
+  if(typeof options === "function") { callback = options; options = {}}
+  
+  // Let's generate the logout command object
+  var logoutCommand = DbCommand.logoutCommand(self, {logout:1, socket:options['socket']});
+
+  // For all the connections let's execute the command
+  var rawConnections = self.serverConfig.allRawConnections();
+  var numberOfExpectedReturns = rawConnections.length;
+  
+  for(var index = 0; index < numberOfExpectedReturns; index++) {
+    // Execute the logout on all raw connections
+    self.executeCommand(logoutCommand, {writer: rawConnections[index].connection}, function(err, result) {      
+      // Ajust the number of expected results
+      numberOfExpectedReturns = numberOfExpectedReturns - 1;
+
+      // If we are done let's evaluate
+      if(numberOfExpectedReturns <= 0) {
+        // Reset auth
+        self.auths = [];
+        
+        // Handle any errors
+        if(err == null && result.documents[0].ok == 1) {
+          callback(null, true);
+        } else {
+          err != null ? callback(err, false) : callback(new Error(result.documents[0].errmsg), false);
+        }            
+      }      
+    });
+  }
+}
+
+/**
   Authenticate against server
 **/
 Db.prototype.authenticate = function(username, password, callback) {
@@ -250,7 +294,7 @@ Db.prototype.authenticate = function(username, password, callback) {
       return function(err, reply) {
         if(err == null) {
           // Nonce used to make authentication request with md5 hash
-          var nonce = reply.documents[0].nonce;
+          var nonce = reply.documents[0].nonce;          
           // Execute command
           self.executeCommand(DbCommand.createAuthenticationCommand(self, username, password, nonce), {writer: rawConnections[index].connection}, function(err, result) {
             // Ajust the number of expected results
@@ -304,13 +348,6 @@ Db.prototype.removeUser = function(username, callback) {
       }
     });
   });
-};
-
-/**
-  Logout user (if authenticated)
-**/
-Db.prototype.logout = function(callback) {
-  this.executeCommand(DbCommand.createLogoutCommand(this), callback);
 };
 
 /**
@@ -535,11 +572,6 @@ Db.prototype.executeCommand = function(db_command, options, callback) {
     // Let's us pass in a writer to force the use of a connection (used for admin where we need to peform 2 calls against the same connection)
     var rawConnection = options['writer'] != null ? options['writer'] : null;
 
-    // debug("===================================================== executeCommnad")
-    // debug(" read :: " + read)
-    // debug(" safe :: " + safe)
-    // debug(" writer :: " + writer)
-
     var errorCommand = null;    
     if(safe == true) {
       errorCommand = DbCommand.createGetLastErrorCommand(safe, this);
@@ -566,9 +598,6 @@ Db.prototype.executeCommand = function(db_command, options, callback) {
         var reconnectAttempt = function() {
           // Try reconnect
           self.serverConfig.connect(self, function(err, result) {
-            // debug("============================================================ reconnectAttemp")
-            // debug("err :: " + inspect(err))
-            
             // Initialize
             self.isInitializing = true;
             // Set retries
@@ -582,7 +611,6 @@ Db.prototype.executeCommand = function(db_command, options, callback) {
               try {
                 if(err != null && callback instanceof Function) return callback(err, null);            
                 // for the other instances fire the message
-                // debug("=========================== attempt read :: 2 :: " + read)                
                 var writer = read ? self.serverConfig.checkoutReader() : self.serverConfig.checkoutWriter();
                 // If we got safe set
                 if(errorCommand != null) {
@@ -606,7 +634,8 @@ Db.prototype.executeCommand = function(db_command, options, callback) {
               }
             }            
           });          
-        }        
+        }       
+         
         // Force a reconnect after self.serverConfig.reconnectWait seconds
         setTimeout(reconnectAttempt, self.serverConfig.reconnectWait);
       } else {

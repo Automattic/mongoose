@@ -1,3 +1,23 @@
+0.9.6-4 2011-07-01
+* Added test and bug fix for insert/update/remove without callback supplied
+
+0.9.6-3 2011-07-01
+* Added simple grid class called Grid with put, get, delete methods
+* Fixed writeBuffer/readBuffer methods on GridStore so they work correctly
+* Automatic handling of buffers when using write method on GridStore
+* GridStore now accepts a ObjectID instead of file name for write and read methods
+* GridStore.list accepts id option to return of file ids instead of filenames
+* GridStore close method returns document for the file allowing user to reference _id field
+
+0.9.6-2 2011-06-30
+* Fixes for reconnect logic for server object (replays auth correctly)
+* More testcases for auth
+* Fixes in error handling for replicaset
+* Fixed bug with safe parameter that would fail to execute safe when passing w or wtimeout
+* Fixed slaveOk bug for findOne method
+* Implemented auth support for replicaset and test cases
+* Fixed error when not passing in rs_name
+
 0.9.6-1 2011-06-25
 * Fixes for test to run properly using c++ bson parser
 * Fixes for dbref in native parser (correctly handles ref without db component)

@@ -87,9 +87,7 @@ Handle<Value> ObjectID::New(const Arguments &args) {
     oid->Wrap(args.This());
     // Return the object
     return args.This();        
-  } 
-  else 
-  {
+  } else {
     // Ensure we have correct parameters passed in
     if(args.Length() != 1 && (!args[0]->IsString() || !args[0]->IsNull())) {
       return VException("Argument passed in must be a single String of 12 bytes or a string of 24 hex characters in hex format");
@@ -100,12 +98,9 @@ Handle<Value> ObjectID::New(const Arguments &args) {
     
 
     // If we have a null generate a new oid
-    if(args[0]->IsNull()) 
-    {
+    if(args[0]->IsNull()) {
       ObjectID::oid_id_generator(oid_string_c);
-    } 
-    else 
-    {
+    } else {
       *(oid_string_c + 24) = '\0';      
       
       // Convert the argument to a String
@@ -114,8 +109,7 @@ Handle<Value> ObjectID::New(const Arguments &args) {
         return VException("Argument passed in must be a single String of 12 bytes or a string of 24 hex characters in hex format");
       }
   
-      if(oid_string->Length() == 12) 
-      {            
+      if(oid_string->Length() == 12) {            
         // Contains the bytes for the string
         char oid_string_bytes[13];
         // Decode the 12 bytes of the oid
@@ -127,9 +121,7 @@ Handle<Value> ObjectID::New(const Arguments &args) {
           sprintf(pbuffer, "%02x", (unsigned char)*(oid_string_bytes + i));
           pbuffer += 2;
         } 
-      } 
-      else 
-      {
+      } else {
         // Decode the content
         node::DecodeWrite(oid_string_c, 25, oid_string, node::BINARY);        
       }      

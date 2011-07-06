@@ -35,8 +35,7 @@ var serialized_data = '';
 for(var i = 0; i < bytes.length; i++) {
   serialized_data = serialized_data + BinaryParser.fromByte(bytes[i]);
 }
-
-var object = BSONJS.deserialize(new Buffer(serialized_data, 'binary'));
+var object = BSONJS.deserialize(serialized_data);
 assert.equal("hello", object.string);
 assert.deepEqual([1, 2, 3], object.array);
 assert.equal(1, object.hash.a);
@@ -71,7 +70,7 @@ assert.deepEqual(test_null, object);
 // Should Correctly Serialize and Deserialize undefined value
 var test_undefined = {doc:undefined}
 var serialized_data = BSON.serialize(test_undefined)
-var object = BSONJS.deserialize(new Buffer(serialized_data, 'binary'));
+var object = BSONJS.deserialize(serialized_data);
 assert.equal(null, object.doc)
 
 // Should Correctly Serialize and Deserialize Number

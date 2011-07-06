@@ -39,14 +39,25 @@ Grid.prototype.put = function(data, options, callback) {
   gridStore.open(function(err, gridStore) {
     if(err) return callback(err, null);
 
-    gridStore.writeBuffer(data, function(err, result) {
-      if(err) return callback(err, null);
-
-      gridStore.close(function(err, result) {
+    if(data instanceof Buffer) {
+      gridStore.writeBuffer(data, function(err, result) {
         if(err) return callback(err, null);
-        callback(null, result);
-      })
-    })            
+
+        gridStore.close(function(err, result) {
+          if(err) return callback(err, null);
+          callback(null, result);
+        })
+      })            
+    } else {
+      gridStore.write(data, function(err, result) {
+        if(err) return callback(err, null);
+
+        gridStore.close(function(err, result) {
+          if(err) return callback(err, null);
+          callback(null, result);
+        })
+      })      
+    }    
   })
 }
 

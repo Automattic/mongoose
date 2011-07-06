@@ -23,7 +23,8 @@ InsertCommand.prototype.add = function(document) {
   return this;
 };
 
-InsertCommand.prototype.getOpCode = function() {  
+InsertCommand.prototype.getOpCode = function() {
+  
   return BaseCommand.OP_INSERT;
 };
 
@@ -35,22 +36,11 @@ struct {
     BSON[]    documents;          // one or more documents to insert into the collection
 }
 */
-InsertCommand.prototype.getCommandAsBuffers = function(buffers) {
-  var collectionNameBuffers = BaseCommand.encodeCString(this.collectionName);
-  // Add command to buffers
-  buffers.push(BaseCommand.encodeInt(0), collectionNameBuffers[0], collectionNameBuffers[1]);  
-  // Basic command length
-  var commandLength = 4 + collectionNameBuffers[0].length + 1;
-
-  for(var i = 0; i < this.documents.length; i++) {
-    var command = this.db.bson_serializer.BSON.serialize(this.documents[i], this.checkKeys, true);
-    commandLength += command.length;
-    buffers.push(command);
+InsertCommand.prototype.getCommand = function() {
+  var command_string = '';
+  for(var i = 0; i < this.documents.length; i++) {    
+    command_string = command_string + this.db.bson_serializer.BSON.serialize(this.documents[i], this.checkKeys);
   }
-  
-  return commandLength;
-}
-
-
-
-
+  // Build the command string
+  return BinaryParser.fromInt(0) + BinaryParser.encode_cstring(this.collectionName) + command_string;
+};

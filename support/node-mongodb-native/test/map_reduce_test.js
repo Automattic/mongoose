@@ -55,16 +55,16 @@ var tests = testCase({
         collection.insert([{'a':2}, {'b':5}, {'a':1}], {safe:true}, function(err, ids) {
           collection.group([], {}, {"count":0}, "function (obj, prev) { prev.count++; }", function(err, results) {
             test.equal(3, results[0].count);
-  
+
             collection.group([], {}, {"count":0}, "function (obj, prev) { prev.count++; }", true, function(err, results) {
               test.equal(3, results[0].count);
   
               collection.group([], {'a':{'$gt':1}}, {"count":0}, "function (obj, prev) { prev.count++; }", function(err, results) {
                 test.equal(1, results[0].count);
-  
+
                 collection.group([], {'a':{'$gt':1}}, {"count":0}, "function (obj, prev) { prev.count++; }", true, function(err, results) {
                   test.equal(1, results[0].count);
-  
+
                   // Insert some more test data
                   collection.insert([{'a':2}, {'b':3}], {safe:true}, function(err, ids) {
                     collection.group(['a'], {}, {"count":0}, "function (obj, prev) { prev.count++; }", function(err, results) {
@@ -74,7 +74,7 @@ var tests = testCase({
                       test.equal(2, results[1].count);
                       test.equal(1, results[2].a);
                       test.equal(1, results[2].count);
-  
+
                       collection.group({'a':true}, {}, {"count":0}, function (obj, prev) { prev.count++; }, true, function(err, results) {
                         test.equal(2, results[0].a);
                         test.equal(2, results[0].count);
@@ -82,7 +82,7 @@ var tests = testCase({
                         test.equal(2, results[1].count);
                         test.equal(1, results[2].a);
                         test.equal(1, results[2].count);
-  
+
                         collection.group([], {}, {}, "5 ++ 5", function(err, results) {
                           test.ok(err instanceof Error);
                           test.ok(err.message != null);
@@ -96,13 +96,14 @@ var tests = testCase({
                             test.equal(1, results[1].count);
                             test.equal(1, results[1].a);
                             test.equal(1, results[1].value);
-  
+
                             collection.group([], {}, {}, "5 ++ 5", true, function(err, results) {
                               test.ok(err instanceof Error);
                               test.ok(err.message != null);
                               // Let's close the db
                               test.done();
-                            });                          
+                            });
+                          
                           });
                         });
                       });
@@ -124,12 +125,12 @@ var tests = testCase({
         // String functions
         var map = function() { emit(this.user_id, 1); };
         var reduce = function(k,vals) { return 1; };
-  
+
         collection.mapReduce(map, reduce, function(err, collection) {
           collection.findOne({'_id':1}, function(err, result) {
             test.equal(1, result.value);
           });
-  
+
           collection.findOne({'_id':2}, function(err, result) {
             test.equal(1, result.value);
             test.done();
@@ -149,7 +150,7 @@ var tests = testCase({
           // String functions
           var map = function() { emit(this.user_id, 1); };
           var reduce = function(k,vals) { return 1; };
-  
+
           collection.mapReduce(map, reduce, {out : {inline: 1}}, function(err, results) {
             test.equal(2, results.length);
             test.done();
@@ -168,7 +169,7 @@ var tests = testCase({
         var map = function(){
             emit(test(this.timestamp.getYear()), 1);
         }
-  
+
         var reduce = function(k, v){
             count = 0;
             for(i = 0; i < v.length; i++) {
@@ -176,9 +177,9 @@ var tests = testCase({
             }
             return count;
         }
-  
+
         var t = function(val){ return val+1; }
-  
+
         collection.mapReduce(map, reduce, {scope:{test:new client.bson_serializer.Code(t.toString())}}, function(err, collection) {
           collection.find(function(err, cursor) {
             cursor.toArray(function(err, results) {
@@ -198,12 +199,12 @@ var tests = testCase({
         // String functions
         var map = "function() { emit(this.user_id, 1); }";
         var reduce = "function(k,vals) { return 1; }";
-  
+
         collection.mapReduce(map, reduce, function(err, collection) {
           collection.findOne({'_id':1}, function(err, result) {
             test.equal(1, result.value);
           });
-  
+
           collection.findOne({'_id':2}, function(err, result) {
             test.equal(1, result.value);
             test.done();
@@ -219,7 +220,7 @@ var tests = testCase({
         // String functions
         var map = function() { emit(this.user_id, 1); };
         var reduce = function(k,vals) { return 1; };
-  
+
         collection.mapReduce(map, reduce, function(err, collection) {
           collection.findOne({'_id':1}, function(err, result) {
             test.equal(1, result.value);
@@ -239,7 +240,7 @@ var tests = testCase({
         // String functions
         var map = new client.bson_serializer.Code("function() { emit(this.user_id, 1); }");
         var reduce = new client.bson_serializer.Code("function(k,vals) { return 1; }");
-  
+
         collection.mapReduce(map, reduce, function(err, collection) {
           collection.findOne({'_id':1}, function(err, result) {
             test.equal(1, result.value);
@@ -259,11 +260,11 @@ var tests = testCase({
         // String functions
         var map = new client.bson_serializer.Code("function() { emit(this.user_id, 1); }");
         var reduce = new client.bson_serializer.Code("function(k,vals) { return 1; }");
-  
+
         collection.mapReduce(map, reduce, {'query': {'user_id':{'$gt':1}}}, function(err, collection) {
           collection.count(function(err, count) {
             test.equal(2, count);
-  
+
             collection.findOne({'_id':2}, function(err, result) {
               test.equal(1, result.value);
             });
@@ -283,7 +284,7 @@ var tests = testCase({
         // String functions
         var map = new client.bson_serializer.Code("function() { throw 'error'; }");
         var reduce = new client.bson_serializer.Code("function(k,vals) { throw 'error'; }");
-  
+
         collection.mapReduce(map, reduce, {'query': {'user_id':{'$gt':1}}}, function(err, r) {
           test.ok(err != null);
           test.done();

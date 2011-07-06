@@ -1,6 +1,7 @@
 var BaseCommand = require('./base_command').BaseCommand,
   BinaryParser = require('../bson/binary_parser').BinaryParser,
-  inherits = require('util').inherits;
+  inherits = require('util').inherits,
+  binaryutils = require('../bson/binary_utils');
 
 /**
   Insert Document Command
@@ -26,12 +27,21 @@ struct {
     int64[]   cursorIDs;                // array of cursorIDs to close
 }
 */
-KillCursorCommand.prototype.getCommand = function() {
-  var self = this;
-  // Generate the command string
-  var command_string = BinaryParser.fromInt(0) + BinaryParser.fromInt(this.cursorIds.length);
-  this.cursorIds.forEach(function(cursorId) {
-    command_string = command_string + self.db.bson_serializer.BSON.encodeLong(cursorId);
-  });
-  return command_string;
-};
+KillCursorCommand.prototype.getCommandAsBuffers = function(buffers) {
+  var totalObjectLength = 4 + 4;
+  // Push headers
+  buffers.push(BaseCommand.encodeInt(0), BaseCommand.encodeInt(this.cursorIds.length));
+  // Add all cursorids
+  for(var i = 0; i < this.cursorIds.length; i++) {
+    totalObjectLength += 8;
+
+    var longBuffer = new Buffer(8);
+    binaryutils.encodeIntInPlace(this.cursorIds[i], longBuffer, 0);
+    binaryutils.encodeIntInPlace(this.cursorIds[i], longBuffer, 4);
+
+    // Add values to buffer
+    buffers.push(longBuffer);    
+  }
+  
+  return totalObjectLength;
+}

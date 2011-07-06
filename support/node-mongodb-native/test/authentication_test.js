@@ -61,7 +61,7 @@ var tests = testCase({
       });
     });    
   },
-
+  
   shouldCorrectlyReAuthorizeReconnectedConnections : function(test) {
     var user_name = 'spongebob2';
     var password = 'password';
@@ -80,7 +80,7 @@ var tests = testCase({
           p_client.authenticate(user_name, password, function(err, replies) {
             test.ok(err == null);
             test.ok(replies);
-
+  
             // Kill a connection to force a reconnect
             p_client.serverConfig.connection.pool[0].connection.end();
             

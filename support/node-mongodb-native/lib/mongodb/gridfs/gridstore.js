@@ -154,7 +154,7 @@ GridStore.prototype._open = function(callback) {
               self.metadata = doc.metadata;
               self.internalMd5 = doc.md5;
             } else {
-              self.fileId = new self.db.bson_serializer.ObjectID();
+              self.fileId = self.fileId instanceof self.db.bson_serializer.ObjectID ? self.fileId : new self.db.bson_serializer.ObjectID();
               self.contentType = exports.GridStore.DEFAULT_CONTENT_TYPE;
               self.internalChunkSize = self.internalChunkSize == null ? Chunk.DEFAULT_CHUNK_SIZE : self.internalChunkSize;
               self.length = 0;
@@ -531,7 +531,7 @@ GridStore.prototype.nthChunk = function(chunkNumber, callback) {
  * @see GridStore#nthChunk
  */
 GridStore.prototype.lastChunkNumber = function() {
-  return this.db.bson_serializer.BSON.toInt((this.length/this.chunkSize));
+  return Math.floor(this.length/this.chunkSize);
 };
 
 /**
@@ -817,7 +817,7 @@ GridStore.prototype.seek = function(position, seekLocation, callback) {
     targetPosition = finalPosition;
   }
 
-  var newChunkNumber = this.db.bson_serializer.BSON.toInt((targetPosition/self.chunkSize));
+  var newChunkNumber = Math.floor(targetPosition/self.chunkSize);
   if(newChunkNumber != self.currentChunk.chunkNumber) {
     if(self.mode[0] == 'w') {
       self.currentChunk.save(function(err, chunk) {

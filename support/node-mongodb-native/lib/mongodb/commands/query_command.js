@@ -1,6 +1,8 @@
 var BaseCommand = require('./base_command').BaseCommand,
   BinaryParser = require('../bson/binary_parser').BinaryParser,
-  inherits = require('util').inherits;
+  inherits = require('util').inherits,
+  debug = require('util').debug,
+  inspect = require('util').inspect;
 
 /**
   Insert Document Command
@@ -34,17 +36,32 @@ struct {
   [ BSON      returnFieldSelector; ]  // OPTIONAL : selector indicating the fields to return.  See below for details.
 }
 */
-QueryCommand.prototype.getCommand = function() {
-  // Generate the command string
-  var command_string = BinaryParser.fromInt(this.queryOptions) + BinaryParser.encode_cstring(this.collectionName);
-  command_string = command_string + BinaryParser.fromInt(this.numberToSkip) + BinaryParser.fromInt(this.numberToReturn);
-  command_string = command_string + this.db.bson_serializer.BSON.serialize(this.query);
+QueryCommand.prototype.getCommandAsBuffers = function(buffers) {
+  var collectionNameBuffers = BaseCommand.encodeCString(this.collectionName);
+  var queryCommand = this.db.bson_serializer.BSON.serialize(this.query, false, true);
+  var totalObjectLength = 0;
+
+  // Push basic options + query
+  buffers.push(BaseCommand.encodeInt(this.queryOptions), collectionNameBuffers[0], collectionNameBuffers[1],
+    BaseCommand.encodeInt(this.numberToSkip), BaseCommand.encodeInt(this.numberToReturn),
+    queryCommand);
+    
+  // Add up total length
+  totalObjectLength += 4 + collectionNameBuffers[0].length + 1 + 4 + 4 + queryCommand.length;
+
+  // Push field selector if available
   if(this.returnFieldSelector != null)  {
     var count = 0; for(var name in this.returnFieldSelector) { count += 1; }
-    if(count > 0) command_string = command_string + this.db.bson_serializer.BSON.serialize(this.returnFieldSelector);
+    if(count > 0) {
+      var fieldsCommand = this.db.bson_serializer.BSON.serialize(this.returnFieldSelector, false, true);
+      totalObjectLength += fieldsCommand.length;
+      buffers.push(fieldsCommand);
+    }
   }
-  return command_string;
-};
+  
+  // Return value
+  return totalObjectLength
+}
 
 // Constants
 QueryCommand.OPTS_NONE = 0;

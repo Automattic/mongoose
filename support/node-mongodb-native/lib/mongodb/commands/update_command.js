@@ -1,6 +1,8 @@
 var BaseCommand = require('./base_command').BaseCommand,
   BinaryParser = require('../bson/binary_parser').BinaryParser,
-  inherits = require('util').inherits;
+  inherits = require('util').inherits,
+  debug = require('util').debug,
+  inspect = require('util').inspect;
 
 /**
   Update Document Command
@@ -40,11 +42,16 @@ struct {
     BSON      document;           // the document data to update with or insert
 }
 */
-UpdateCommand.prototype.getCommand = function() {
-  // Generate the command string
-  var command_string = BinaryParser.fromInt(0) + BinaryParser.encode_cstring(this.collectionName);
-  return command_string + BinaryParser.fromInt(this.flags) + this.db.bson_serializer.BSON.serialize(this.spec) + this.db.bson_serializer.BSON.serialize(this.document, false);
-};
+UpdateCommand.prototype.getCommandAsBuffers = function(buffers) {
+  var collectionNameBuffers = BaseCommand.encodeCString(this.collectionName);
+  var specCommand = this.db.bson_serializer.BSON.serialize(this.spec, false, true);
+  var docCommand = this.db.bson_serializer.BSON.serialize(this.document, false, true);
+
+  var totalObjectLength = 4 + collectionNameBuffers[0].length + 1 + 4 + specCommand.length + docCommand.length;
+  buffers.push(BaseCommand.encodeInt(0), collectionNameBuffers[0], collectionNameBuffers[1],
+            BaseCommand.encodeInt(this.flags), specCommand, docCommand);
+  return totalObjectLength;
+}
 
 // Constants
 UpdateCommand.DB_UPSERT = 0;

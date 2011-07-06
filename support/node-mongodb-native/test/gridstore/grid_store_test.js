@@ -558,7 +558,7 @@ var tests = testCase({
       })        
     });
   },
-
+  
   shouldCorrectlyReadAndWriteBuffersSingleChunks : function(test) {
     var gridStore = new GridStore(client, null, 'w');
     // Force multiple chunks to be stored
@@ -570,7 +570,7 @@ var tests = testCase({
       // Write the file using writeBuffer
       gridStore.writeBuffer(data, function(err, doc) {
         gridStore.close(function(err, doc) {
-
+  
           // Read the file using readBuffer
           new GridStore(client, doc._id, 'r').open(function(err, gridStore) {
             gridStore.readBuffer(function(err, data2) {
@@ -607,6 +607,51 @@ var tests = testCase({
       })        
     });
   },
+  
+  shouldCorrectlyReadAndWriteBuffersSingleChunksAndVerifyExistance : function(test) {
+    var gridStore = new GridStore(client, null, 'w');
+    // Force multiple chunks to be stored
+    var fileSize = fs.statSync('./test/gridstore/test_gs_weird_bug.png').size;
+    var data = fs.readFileSync('./test/gridstore/test_gs_weird_bug.png');
+    
+    gridStore.open(function(err, gridStore) {
+        
+      // Write the file using writeBuffer
+      gridStore.writeBuffer(data, function(err, doc) {
+        gridStore.close(function(err, doc) {
+  
+          // Read the file using readBuffer
+          GridStore.exist(client, doc._id, function(err, result) {
+            test.equal(null, err);
+            test.equal(true, result);
+  
+            client.close();
+            test.done();
+          });          
+        });
+      })        
+    });
+  },  
+  
+  shouldCorrectlySaveDataByObjectID : function(test) {
+    var id = new client.bson_serializer.ObjectID();
+    var gridStore = new GridStore(client, id, 'w');
+
+    gridStore.open(function(err, gridStore) {
+      gridStore.write('bar', function(err, gridStore) {
+        gridStore.close(function(err, result) {
+
+          GridStore.exist(client, id, function(err, result) {
+            test.equal(null, err);
+            test.equal(true, result);
+
+            client.close();
+            test.done();
+          });
+        });
+      });
+    });    
+  }
 })
 
 // Stupid freaking workaround due to there being no way to run setup once for each suite

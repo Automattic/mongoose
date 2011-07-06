@@ -139,7 +139,7 @@ var tests = testCase({
         client.error(function(err, errors) {
           test.equal(1, errors.length);
           test.ok(errors[0].err == null);
-
+  
           // Create a unique subfield index and test that insert fails
           client.createCollection('test_index_on_subfield2', function(err, collection) {
             client.createIndex(collection.collectionName, 'hello.a', true, function(err, indexName) {
@@ -232,7 +232,12 @@ var tests = testCase({
               test.equal(1, items.length);
               test.equal("Sarah", items[0].name);
 
-              test.done();
+              // Fetch the info for the indexes
+              collection.indexInformation({full:true}, function(err, indexInfo) {
+                test.equal(null, err);
+                test.equal(2, indexInfo.length);
+                test.done();
+              })
             })
           });          
         })

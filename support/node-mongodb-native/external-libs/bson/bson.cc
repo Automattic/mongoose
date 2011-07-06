@@ -85,10 +85,13 @@ Handle<Value> BSON::New(const Arguments &args) {
 }
 
 Handle<Value> BSON::BSONSerialize(const Arguments &args) {
+  HandleScope scope;
+
   // printf("= BSONSerialize ===================================== USING Native BSON Parser\n");  
-  if(args.Length() == 1 && !args[0]->IsObject()) return VException("One or two arguments required - [object] or [object, boolean]");
-  if(args.Length() == 2 && !args[0]->IsObject() && !args[1]->IsBoolean()) return VException("One or two arguments required - [object] or [object, boolean]");
-  if(args.Length() > 2) return VException("One or two arguments required - [object] or [object, boolean]");
+  if(args.Length() == 1 && !args[0]->IsObject()) return VException("One, two or tree arguments required - [object] or [object, boolean] or [object, boolean, boolean]");
+  if(args.Length() == 2 && !args[0]->IsObject() && !args[1]->IsBoolean()) return VException("One, two or tree arguments required - [object] or [object, boolean] or [object, boolean, boolean]");
+  if(args.Length() == 3 && !args[0]->IsObject() && !args[1]->IsBoolean() && !args[2]->IsBoolean()) return VException("One, two or tree arguments required - [object] or [object, boolean] or [object, boolean, boolean]");
+  if(args.Length() > 3) return VException("One, two or tree arguments required - [object] or [object, boolean] or [object, boolean, boolean]");
 
   // Calculate the total size of the document in binary form to ensure we only allocate memory once
   uint32_t object_size = BSON::calculate_object_size(args[0]);
@@ -98,7 +101,7 @@ Handle<Value> BSON::BSONSerialize(const Arguments &args) {
   try {
     // Check if we have a boolean value
     bool check_key = false;
-    if(args.Length() == 2 && args[1]->IsBoolean()) {
+    if(args.Length() == 3 && args[1]->IsBoolean()) {
       check_key = args[1]->BooleanValue();
     }
     
@@ -115,13 +118,21 @@ Handle<Value> BSON::BSONSerialize(const Arguments &args) {
     // Return error
     return error;
   }
-  
+
   // Write the object size
   BSON::write_int32((serialized_object), object_size);  
-  // Encode the string (string - null termiating character)
-  Local<Value> bin_value = Encode(serialized_object, object_size, BINARY)->ToString();
-  // Return the serialized content
-  return bin_value;
+
+  // If we have 3 arguments
+  if(args.Length() == 3) {
+    // Local<Boolean> asBuffer = args[2]->ToBoolean();    
+    Buffer *buffer = Buffer::New(serialized_object, object_size);
+    return scope.Close(buffer->handle_);
+  } else {
+    // Encode the string (string - null termiating character)
+    Local<Value> bin_value = Encode(serialized_object, object_size, BINARY)->ToString();
+    // Return the serialized content
+    return bin_value;    
+  }  
 }
 
 Handle<Value> BSON::ToLong(const Arguments &args) {

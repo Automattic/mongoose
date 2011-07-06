@@ -17,7 +17,7 @@ var client = new Db(MONGODB, new Server("127.0.0.1", 27017, {auto_reconnect: tru
 // db connection once
 var tests = testCase({
   setUp: function(callback) {
-    client.open(function(err, db_p) {
+    client.open(function(err, db_p) {      
       if(numberOfTestsRun == Object.keys(tests).length) {
         // If first test drop the db
         client.dropDatabase(function(err, done) {
@@ -84,13 +84,13 @@ var tests = testCase({
                   var found_spiderman = false;
                   var found_mario = false;
                   var found_does_not_exist = false;
-
+  
                   collections.forEach(function(collection) {
                     if(collection.collectionName == "test.spiderman") found_spiderman = true;
                     if(collection.collectionName == "test.mario") found_mario = true;
                     if(collection.collectionName == "does_not_exist") found_does_not_exist = true;
                   });
-
+  
                   test.ok(found_spiderman);
                   test.ok(found_mario);
                   test.ok(!found_does_not_exist);
@@ -279,35 +279,35 @@ var tests = testCase({
           test.ok(err instanceof Error);
           test.equal("key $hello must not start with '$'", err.message);
         });
-
+  
         collection.insert({'hello':{'$hello':'world'}}, {safe:true}, function(err, doc) {
           test.ok(err instanceof Error);
           test.equal("key $hello must not start with '$'", err.message);
         });
-
+  
         collection.insert({'he$llo':'world'}, {safe:true}, function(err, docs) {
           test.ok(docs[0].constructor == Object);
         })
-
+  
         collection.insert({'hello':{'hell$o':'world'}}, {safe:true}, function(err, docs) {
           test.ok(err == null);
         })
-
+  
         collection.insert({'.hello':'world'}, {safe:true}, function(err, doc) {
           test.ok(err instanceof Error);
           test.equal("key .hello must not contain '.'", err.message);
         });
-
+  
         collection.insert({'hello':{'.hello':'world'}}, {safe:true}, function(err, doc) {
           test.ok(err instanceof Error);
           test.equal("key .hello must not contain '.'", err.message);
         });
-
+  
         collection.insert({'hello.':'world'}, {safe:true}, function(err, doc) {
           test.ok(err instanceof Error);
           test.equal("key hello. must not contain '.'", err.message);
         });
-
+  
         collection.insert({'hello':{'hello.':'world'}}, {safe:true}, function(err, doc) {
           test.ok(err instanceof Error);
           test.equal("key hello. must not contain '.'", err.message);
@@ -363,34 +363,41 @@ var tests = testCase({
       var doc = {'hello':'world'};
       collection.save(doc, {safe:true}, function(err, docs) {
         test.ok(docs._id instanceof client.bson_serializer.ObjectID || Object.prototype.toString.call(docs._id) === '[object ObjectID]');
+  
         collection.count(function(err, count) {
           test.equal(1, count);
           doc = docs;
   
-          collection.save(doc, {safe:true}, function(err, doc) {
+          collection.save(doc, {safe:true}, function(err, doc2) {
+  
             collection.count(function(err, count) {
               test.equal(1, count);
-            });
+            
+              collection.findOne(function(err, doc3) {
+                test.equal('world', doc3.hello);
+                
+                // REMOVE REMOVE
+                // HACK HACK DUE TO MIXXING NATIVE AND PURE JS BSON PARSER
+                // REMOVE REMOVE
+                // REMOVE REMOVE
+                doc3._id = doc._id;
+                doc3.hello = 'mike';
+            
+                collection.save(doc3, {safe:true}, function(err, doc4) {
+                  collection.count(function(err, count) {
+                    test.equal(1, count);
+            
+                    collection.findOne(function(err, doc5) {
+                      test.equal('mike', doc5.hello);
   
-            collection.findOne(function(err, doc) {
-              test.equal('world', doc.hello);
-  
-              // Modify doc and save
-              doc.hello = 'mike';
-              collection.save(doc, {safe:true}, function(err, doc) {
-                collection.count(function(err, count) {
-                  test.equal(1, count);
-                });
-  
-                collection.findOne(function(err, doc) {
-                  test.equal('mike', doc.hello);
-  
-                  // Save another document
-                  collection.save({hello:'world'}, {safe:true}, function(err, doc) {
-                    collection.count(function(err, count) {
-                      test.equal(2, count);
-                      // Let's close the db
-                      test.done();
+                      // Save another document
+                      collection.save({hello:'world'}, {safe:true}, function(err, doc) {
+                        collection.count(function(err, count) {
+                          test.equal(2, count);
+                          // Let's close the db
+                          test.done();
+                        });
+                      });
                     });
                   });
                 });
@@ -446,11 +453,10 @@ var tests = testCase({
     client.createCollection('test_should_correctly_do_upsert', function(err, collection) {
       var id = new client.bson_serializer.ObjectID(null)
       var doc = {_id:id, a:1};
-
+    
       Step(
         function test1() {
-          var self = this;
-          
+          var self = this;        
   
           collection.update({"_id":id}, doc, {upsert:true, safe:true}, function(err, result) {
             test.equal(null, err);        
@@ -463,26 +469,32 @@ var tests = testCase({
         function test2(err, doc) {
           var self = this;
           test.equal(1, doc.a);
-          
+
           id = new client.bson_serializer.ObjectID(null)
           doc = {_id:id, a:2};
           
           collection.update({"_id":id}, doc, {safe:true, upsert:true}, function(err, result) {
             test.equal(null, err);
             test.equal(1, result);
-  
+            
             collection.findOne({"_id":id}, self);
           });          
         },
         
-        function test3(err, doc) {
+        function test3(err, doc2) {
           var self = this;
-          test.equal(2, doc.a);          
-  
-          collection.update({"_id":id}, doc, {safe:true, upsert:true}, function(err, result) {
+          test.equal(2, doc2.a);
+
+          // REMOVE REMOVE
+          // HACK HACK DUE TO MIXXING NATIVE AND PURE JS BSON PARSER
+          // REMOVE REMOVE
+          // REMOVE REMOVE
+          doc2._id = id;
+
+          collection.update({"_id":id}, doc2, {safe:true, upsert:true}, function(err, result) {
             test.equal(null, err);
             test.equal(1, result);
-  
+          
             collection.findOne({"_id":id}, function(err, doc) {
               test.equal(2, doc.a);
               test.done();                        
@@ -533,22 +545,31 @@ var tests = testCase({
   
   shouldPerformMultipleSaves : function(test) {
      client.createCollection("multiple_save_test", function(err, collection) {
+       var doc = {
+          name: 'amit',
+          text: 'some text'
+       };
+       
        //insert new user
-       collection.save({
-         name: 'amit',
-         text: 'some text'
-       }, {safe:true}, function(err, r) {
+       collection.save(doc, {safe:true}, function(err, r) {
          collection.find({}, {name: 1}).limit(1).toArray(function(err, users){
            user = users[0]
+  
+           // REMOVE REMOVE
+           // HACK HACK DUE TO MIXXING NATIVE AND PURE JS BSON PARSER
+           // REMOVE REMOVE
+           // REMOVE REMOVE
+           user._id = doc._id;
+  
            if(err) {
              throw new Error(err)
            } else if(user) {
              user.pants = 'worn'
-
+  
              collection.save(user, {safe:true}, function(err, result){
                test.equal(null, err);
                test.equal(1, result);
-
+  
               test.done();
              })
            }
@@ -556,7 +577,7 @@ var tests = testCase({
        })
     });
   },
-  
+    
   shouldCorrectlySaveDocumentWithNestedArray : function(test) {
     var db = new Db(MONGODB, new Server('localhost', 27017, {auto_reconnect: true}), {native_parser: (process.env['TEST_NATIVE'] != null)});
     db.bson_deserializer = client.bson_deserializer;
@@ -567,8 +588,7 @@ var tests = testCase({
       db.createCollection("save_error_on_save_test", function(err, collection) {      
         // Create unique index for username
         collection.createIndex([['username', 1]], true, function(err, result) {
-          //insert new user
-          collection.save({
+          var doc = {
             email: 'email@email.com',
             encrypted_password: 'password',
             friends: 
@@ -579,26 +599,33 @@ var tests = testCase({
             name: 'Amit Kumar',
             password_salt: 'salty',
             profile_fields: [],
-            username: 'amit' }, {safe:true}, function(err, doc){
+            username: 'amit' };
+          //insert new user
+          collection.save(doc, {safe:true}, function(err, doc) {
           
-              collection.find({}).limit(1).toArray(function(err, users){
+              collection.find({}).limit(1).toArray(function(err, users) {
                 test.equal(null, err);        
                 user = users[0]
+                // REMOVE REMOVE
+                // HACK HACK DUE TO MIXXING NATIVE AND PURE JS BSON PARSER
+                // REMOVE REMOVE
+                // REMOVE REMOVE
+                user._id = doc._id 
                 user.friends.splice(1,1)
   
-                collection.save(user, function(err, doc){
+                collection.save(user, function(err, doc) {
                   test.equal(null, err);    
   
                   // Update again
                   collection.update({_id:new client.bson_serializer.ObjectID(user._id.toString())}, {friends:user.friends}, {upsert:true, safe:true}, function(err, result) {
-                  test.equal(null, err);
-                  test.equal(1, result);                
-  
-                  db.close();
-                  test.done();
-                });             
-              });
-            });        
+                    test.equal(null, err);
+                    test.equal(1, result);                
+                    
+                    db.close();
+                    test.done();
+                  });             
+                });
+              });        
           });
         })
       });
@@ -606,23 +633,22 @@ var tests = testCase({
   },
   
   shouldPeformCollectionRemoveWithNoCallback : function(test) {
-     client.collection("remove_with_no_callback_bug_test", function(err, collection) {
-       collection.save({a:1}, {safe:true}, function(){
-         collection.save({b:1}, {safe:true}, function(){
-           collection.save({c:1}, {safe:true}, function(){
+    client.collection("remove_with_no_callback_bug_test", function(err, collection) {
+      collection.save({a:1}, {safe:true}, function(){
+        collection.save({b:1}, {safe:true}, function(){
+          collection.save({c:1}, {safe:true}, function(){
              collection.remove({a:1}, {safe:true}, function() {
                // Let's perform a count
                collection.count(function(err, count) {
                  test.equal(null, err);    
                  test.equal(2, count);
-  
-                test.done();
+                 test.done();
                });               
              })             
            });
          });
-       });
-     });
+      });
+    });
   },    
 })
 

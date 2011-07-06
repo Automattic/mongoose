@@ -92,7 +92,7 @@ Server.prototype.connect = function(parent, callback) {
   
   server.connection.on("data", function(message) {
     // Parse the data as a reply object
-    var reply = new MongoReply(parent, message);
+    var reply = new MongoReply(parent, message);    
     // Emit message
     parent.emit(reply.responseTo.toString(), null, reply);
     // Remove the listener

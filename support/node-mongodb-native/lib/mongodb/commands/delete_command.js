@@ -28,7 +28,13 @@ struct {
     mongo.BSON      selector;               // query object.  See below for details.
 }
 */
-DeleteCommand.prototype.getCommand = function() {
-  // Generate the command string
-  return BinaryParser.fromInt(0) + BinaryParser.encode_cstring(this.collectionName) + BinaryParser.fromInt(0) + this.db.bson_serializer.BSON.serialize(this.selector);
-};
+DeleteCommand.prototype.getCommandAsBuffers = function(buffers) {
+  var collectionNameBuffers = BaseCommand.encodeCString(this.collectionName);
+  var totalObjectLength = 4 + 4 + collectionNameBuffers[0].length + 1;
+  // Long command for cursor
+  var selectorCommand = this.db.bson_serializer.BSON.serialize(this.selector, false, true);
+  totalObjectLength += selectorCommand.length;
+  // Push headers
+  buffers.push(BaseCommand.encodeInt(0), collectionNameBuffers[0], collectionNameBuffers[1], BaseCommand.encodeInt(0), selectorCommand);
+  return totalObjectLength;
+}

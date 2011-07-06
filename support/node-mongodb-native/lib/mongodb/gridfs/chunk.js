@@ -21,7 +21,16 @@ var BinaryParser = require('../bson/binary_parser').BinaryParser,
 var Chunk = exports.Chunk = function(file, mongoObject) {
   this.file = file;
   var mongoObjectFinal = mongoObject == null ? {} : mongoObject;
+
+
+  // REMOVE REMOVE
+  // HACK HACK DUE TO MIXXING NATIVE AND PURE JS BSON PARSER
+  // REMOVE REMOVE
+  // REMOVE REMOVE
+  // this.objectId = mongoObjectFinal._id == null ? new file.db.bson_serializer.ObjectID() : self.doc.bson_serializer.ObjectID.createFromHexString(mongoObjectFinal._id.toHexString());
   this.objectId = mongoObjectFinal._id == null ? new file.db.bson_serializer.ObjectID() : mongoObjectFinal._id;
+
+
   this.chunkNumber = mongoObjectFinal.n == null ? 0 : mongoObjectFinal.n;
   this.data = new file.db.bson_serializer.Binary();
 
@@ -60,7 +69,6 @@ var Chunk = exports.Chunk = function(file, mongoObject) {
  *     will contain a reference to this object.
  */
 Chunk.prototype.write = function(data, callback) {
-  // this.data.write(data.toString('binary'), this.internalPosition);
   this.data.write(data, this.internalPosition);
   this.internalPosition = this.data.length();
   callback(null, this);

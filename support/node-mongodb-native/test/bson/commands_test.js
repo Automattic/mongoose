@@ -97,24 +97,24 @@ var tests = testCase({
     test.done();
   },
   
-  'Should Correctly Generate and parse a Reply Object' : function(test) {
-    var reply_message = BinaryParser.fromInt(0) + BSON.encodeLong(Long.fromNumber(1222)) + BinaryParser.fromInt(100) + BinaryParser.fromInt(2);
-    reply_message = reply_message + BSON.serialize({name:'peter pan'}) + BSON.serialize({name:'captain hook'});
-    var message = BinaryParser.fromInt(reply_message.length + 4*4) + BinaryParser.fromInt(2) + BinaryParser.fromInt(1) + BinaryParser.fromInt(BaseCommand.OP_QUERY) + reply_message;
-    // Parse the message into a proper reply object
-    var mongo_reply = new MongoReply({bson_deserializer: {BSON:BSON},
-      bson_serializer: {BSON:BSON}}, message);
-    test.equal(2, mongo_reply.requestId);
-    test.equal(1, mongo_reply.responseTo);
-    test.equal(0, mongo_reply.responseFlag);
-    test.equal(Long.fromNumber(1222).toString(), mongo_reply.cursorId.toString());
-    test.equal(100, mongo_reply.startingFrom);
-    test.equal(2, mongo_reply.numberReturned);
-    test.equal(2, mongo_reply.documents.length);
-    test.deepEqual({name:'peter pan'}, mongo_reply.documents[0]);
-    test.deepEqual({name:'captain hook'}, mongo_reply.documents[1]);
-    test.done();
-  },
+  // 'Should Correctly Generate and parse a Reply Object' : function(test) {
+  //   var reply_message = BinaryParser.fromInt(0) + BSON.encodeLong(Long.fromNumber(1222)) + BinaryParser.fromInt(100) + BinaryParser.fromInt(2);
+  //   reply_message = reply_message + BSON.serialize({name:'peter pan'}) + BSON.serialize({name:'captain hook'});
+  //   var message = BinaryParser.fromInt(reply_message.length + 4*4) + BinaryParser.fromInt(2) + BinaryParser.fromInt(1) + BinaryParser.fromInt(BaseCommand.OP_QUERY) + reply_message;
+  //   // Parse the message into a proper reply object
+  //   var mongo_reply = new MongoReply({bson_deserializer: {BSON:BSON},
+  //     bson_serializer: {BSON:BSON}}, message);
+  //   test.equal(2, mongo_reply.requestId);
+  //   test.equal(1, mongo_reply.responseTo);
+  //   test.equal(0, mongo_reply.responseFlag);
+  //   test.equal(Long.fromNumber(1222).toString(), mongo_reply.cursorId.toString());
+  //   test.equal(100, mongo_reply.startingFrom);
+  //   test.equal(2, mongo_reply.numberReturned);
+  //   test.equal(2, mongo_reply.documents.length);
+  //   test.deepEqual({name:'peter pan'}, mongo_reply.documents[0]);
+  //   test.deepEqual({name:'captain hook'}, mongo_reply.documents[1]);
+  //   test.done();
+  // },
 });
 
 // Assign out tests

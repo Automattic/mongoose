@@ -1015,12 +1015,43 @@ module.exports = {
           should.strictEqual(err, null);
           found.should.have.length(2);
           BlogPostB.find({numbers: {$all: [0, -1]}}, function (err, found) {
+            db.close();
             should.strictEqual(err, null);
             found.should.have.length(1);
-            db.close();
           });
         });
       });
+    });
+  },
+
+  'test finding a document whose arrays contain at least $all string values': function () {
+    var db = start()
+      , BlogPostB = db.model('BlogPostB', collection);
+
+    var post = new BlogPostB();
+
+    post.tags.push('onex');
+    post.tags.push('twox');
+    post.tags.push('threex');
+
+    post.save(function (err) {
+      should.strictEqual(err, null);
+
+      BlogPostB.findById(post._id, function (err, post) {
+        should.strictEqual(err, null);
+
+        BlogPostB.find({tags: { '$all': [/^onex/i]}}, function (err, docs) {
+          should.strictEqual(err, null);
+          docs.length.should.equal(1);
+
+          BlogPostB.findOne({tags: { '$all': /^two/ }}, function (err, doc) {
+            db.close();
+            should.strictEqual(err, null);
+            doc.id.should.eql(post.id);
+          });
+        });
+      });
+
     });
   },
 

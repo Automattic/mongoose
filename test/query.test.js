@@ -688,6 +688,20 @@ module.exports = {
     query.options.maxscan.should.equal(100);
   },
 
+  'test Query#slaveOk': function () {
+    var query = new Query();
+    query.slaveOk();
+    query.options.slaveOk.should.be.true;
+
+    var query = new Query();
+    query.slaveOk(true);
+    query.options.slaveOk.should.be.true;
+
+    var query = new Query();
+    query.slaveOk(false);
+    query.options.slaveOk.should.be.false;
+  },
+
   'test Query#hint': function () {
     var query = new Query();
     query.hint('indexAttributeA', 1, 'indexAttributeB', -1);

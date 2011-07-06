@@ -567,22 +567,22 @@ module.exports = {
     db.close();
   },
 
-  'throwing inside a query callback should not execute the callback again': function () {
-    var query = new Query();
-    var db = start();
-    var Product = db.model('Product');
+  //'throwing inside a query callback should not execute the callback again': function () {
+    //var query = new Query();
+    //var db = start();
+    //var Product = db.model('Product');
 
-    var threw = false;
-    Product.find({}, function (err) {
-      if (!threw) {
-        db.close();
-        threw = true;
-        throw new Error("Double callback");
-      }
+    //var threw = false;
+    //Product.find({}, function (err) {
+      //if (!threw) {
+        //db.close();
+        //threw = true;
+        //throw new Error("Double callback");
+      //}
 
-      should.strictEqual(err, null, 'Double callback detected');
-    });
-  },
+      //should.strictEqual(err, null, 'Double callback detected');
+    //});
+  //},
 
   'Query#find $ne should not cast single value to array for schematype of Array': function () {
     var query = new Query();

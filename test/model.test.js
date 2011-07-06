@@ -114,6 +114,8 @@ module.exports = {
 
     var post = new BlogPost();
     post.isNew.should.be.true;
+    post.db.model('BlogPost').modelName.should.equal('BlogPost');
+    post.constructor.modelName.should.equal('BlogPost');
 
     post.get('_id').should.be.an.instanceof(DocumentObjectId);
 

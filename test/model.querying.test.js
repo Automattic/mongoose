@@ -852,6 +852,7 @@ module.exports = {
       BlogPostB.findOne({'comments._id': id}, function (err, found) {
         db.close();
         should.strictEqual(err, null);
+        should.strictEqual(!! found, true, 'Find by nested doc id hex string fails');
         found._id.should.eql(created._id);
       });
     });

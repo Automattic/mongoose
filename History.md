@@ -1,4 +1,15 @@
 
+1.6.0 / 2011-07-07
+===================
+
+  * changed; .save() errors are now emitted on the instances db instead of the instance 9782463fc
+  * fixed; errors occurring when creating indexes now properly emit on db
+  * added; $maxDistance support to MongooseArrays
+  * fixed; RegExps now work with $all
+  * changed; node-mongodb-native driver to v0.9.6.4
+  * fixed; model names are now accessible via .modelName
+  * added; Query#slaveOk support
+
 1.5.0 / 2011-06-27
 ===================
 

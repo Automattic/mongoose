@@ -83,6 +83,22 @@ module.exports = {
     db.close();
   },
 
+  'modified getter should not throw': function () {
+    var db = start();
+    var BlogPost = db.model('BlogPost', collection);
+    var post = new BlogPost;
+    db.close();
+
+    var threw = false;
+    try {
+      post.modified;
+    } catch (err) {
+      threw = true;
+    }
+
+    threw.should.be.false;
+  },
+
   'test presence of model schema': function(){
     var db = start()
       , BlogPost = db.model('BlogPost', collection);
@@ -98,6 +114,8 @@ module.exports = {
 
     var post = new BlogPost();
     post.isNew.should.be.true;
+    post.db.model('BlogPost').modelName.should.equal('BlogPost');
+    post.constructor.modelName.should.equal('BlogPost');
 
     post.get('_id').should.be.an.instanceof(DocumentObjectId);
 
@@ -781,6 +799,25 @@ module.exports = {
         should.strictEqual(err, null);
         db.close();
       });
+    });
+  },
+
+  // GH-272
+  'test validation with Model.schema.path introspection': function () {
+    var db = start();
+    var IntrospectionValidationSchema = new Schema({
+      name: String
+    });
+    var IntrospectionValidation = db.model('IntrospectionValidation', IntrospectionValidationSchema, 'introspections_' + random());
+    IntrospectionValidation.schema.path('name').validate(function (value) {
+      return value.length < 2;
+    }, 'Name cannot be greater than 1 character');
+    var doc = new IntrospectionValidation({name: 'hi'});
+    doc.save( function (err) {
+      err.errors.name.should.equal("Validator \"Name cannot be greater than 1 character\" failed for path name");
+      err.name.should.equal("ValidationError");
+      err.message.should.equal("Validation failed");
+      db.close();
     });
   },
 
@@ -1468,6 +1505,7 @@ module.exports = {
     var post = new BlogPost();
     post.set('title', title);
     post.author = author;
+    post.meta.visitors = 0;
 
     post.save(function (err) {
       should.strictEqual(err, null);
@@ -1475,14 +1513,30 @@ module.exports = {
         should.strictEqual(err, null);
         createdFound.title.should.equal(title);
         createdFound.author.should.equal(author);
+        createdFound.meta.visitors.valueOf().should.eql(0);
+
         BlogPost.update({ title: title }, { title: newTitle }, function (err) {
           should.strictEqual(err, null);
 
           BlogPost.findById(post._id, function (err, updatedFound) {
-            db.close();
             should.strictEqual(err, null);
             updatedFound.title.should.equal(newTitle);
             updatedFound.author.should.equal(author);
+            updatedFound.meta.visitors.valueOf().should.equal(0);
+
+            // Note: use BlogPost.collection.update for anything other than set operations
+            BlogPost.update({ _id: post._id }, { $inc: { 'meta.visitors': 1 } }, function (err) {
+              if (err) db.close();
+              should.strictEqual(!!err, false, "Model.update doesn't work with $inc");
+
+              BlogPost.findById(post._id, function (err, updatedFound) {
+                db.close();
+                should.strictEqual(err, null);
+                updatedFound.meta.visitors.valueOf().should.equal(1);
+                updatedFound.title.should.equal(newTitle);
+                updatedFound.author.should.equal(author);
+              });
+            });
           });
         });
       });
@@ -1979,6 +2033,54 @@ module.exports = {
         Temp.findById(t._id, function (err, found) {
           found.nested.nums.should.have.length(2);
           db.close();
+        });
+      });
+    });
+  },
+
+  '$shift': function () {
+    var db = start()
+      , schema = new Schema({
+          nested: {
+            nums: [Number]
+          }
+        });
+
+    mongoose.model('TestingShift', schema);
+    var Temp = db.model('TestingShift', collection);
+
+    Temp.create({ nested: { nums: [1,2,3] }}, function (err, t) {
+      should.strictEqual(null, err);
+
+      Temp.findById(t._id, function (err, found) {
+        should.strictEqual(null, err);
+        found.nested.nums.should.have.length(3);
+        found.nested.nums.$pop();
+        found.nested.nums.should.have.length(2);
+        found.nested.nums[0].should.eql(1);
+        found.nested.nums[1].should.eql(2);
+
+        found.save(function (err) {
+          should.strictEqual(null, err);
+          Temp.findById(t._id, function (err, found) {
+            should.strictEqual(null, err);
+            found.nested.nums.should.have.length(2);
+            found.nested.nums[0].should.eql(1);
+            found.nested.nums[1].should.eql(2);
+            found.nested.nums.$shift();
+            found.nested.nums.should.have.length(1);
+            found.nested.nums[0].should.eql(2);
+
+            found.save(function (err) {
+              should.strictEqual(null, err);
+              Temp.findById(t._id, function (err, found) {
+                db.close();
+                should.strictEqual(null, err);
+                found.nested.nums.should.have.length(1);
+                found.nested.nums[0].should.eql(2);
+              });
+            });
+          });
         });
       });
     });
@@ -2565,7 +2667,7 @@ module.exports = {
         found.should.have.length(1);
         
         BlogPost.remove({}, function (err) {
-          should.strictEqual(err, null);
+          should.strictEqual(!!err, false);
 
           BlogPost.find({}, function (err, found2) {
             should.strictEqual(err, null);
@@ -2716,6 +2818,24 @@ module.exports = {
         });
       });
     });
+  },
+
+  'passing null in pre hook works': function () {
+    var db = start();
+    var schema = new Schema({ name: String });
+
+    schema.pre('save', function (next) {
+      next(null); // <<-----
+    });
+
+    var S = db.model('S', schema, collection);
+    var s = new S({name: 'zupa'});
+
+    s.save(function (err) {
+      db.close();
+      should.strictEqual(null, err);
+    });
+
   },
 
   'test post hooks': function () {
@@ -3259,26 +3379,419 @@ module.exports = {
 
   'setting profiling levels': function () {
     var db = start();
-    db.on('open', function () {
-      db.setProfiling(3, function (err) {
-        err.message.should.eql('Invalid profiling level: 3');
-        db.setProfiling('fail', function (err) {
-          err.message.should.eql('Invalid profiling level: fail');
-          db.setProfiling(2, function (err, doc) {
+    db.setProfiling(3, function (err) {
+      err.message.should.eql('Invalid profiling level: 3');
+      db.setProfiling('fail', function (err) {
+        err.message.should.eql('Invalid profiling level: fail');
+        db.setProfiling(2, function (err, doc) {
+          should.strictEqual(err, null);
+          db.setProfiling(1, 50, function (err, doc) {
             should.strictEqual(err, null);
-            db.setProfiling(1, 50, function (err, doc) {
+            doc.was.should.eql(2);
+            db.setProfiling(0, function (err, doc) {
+              db.close();
               should.strictEqual(err, null);
-              doc.was.should.eql(2);
-              db.setProfiling(0, function (err, doc) {
-                db.close();
-                should.strictEqual(err, null);
-                doc.was.should.eql(1);
-                doc.slowms.should.eql(50);
-              });
+              doc.was.should.eql(1);
+              doc.slowms.should.eql(50);
             });
           });
         });
       });
+    });
+  },
+
+  'test post hooks on embedded documents': function(){
+    var save = false,
+        init = false,
+        remove = false;
+
+    var EmbeddedSchema = new Schema({
+      title : String
+    });
+
+    var ParentSchema = new Schema({
+      embeds : [EmbeddedSchema]
+    });
+
+    EmbeddedSchema.post('save', function(next){
+      save = true;
+    });
+
+    // Don't know how to test those on a embedded document.
+    /*
+
+    EmbeddedSchema.post('init', function () {
+      init = true;
+    });
+
+    EmbeddedSchema.post('remove', function () {
+      remove = true;
+    });
+
+    */
+
+    mongoose.model('Parent', ParentSchema);
+
+    var db = start(),
+        Parent = db.model('Parent');
+
+    var parent = new Parent();
+
+    parent.embeds.push({title: 'Testing post hooks for embedded docs'});
+
+    parent.save(function(err){
+      db.close();
+      should.strictEqual(err, null);
+      save.should.be.true;
+    });
+  },
+
+  'console.log shows helpful values': function () {
+    var db = start()
+      , BlogPost = db.model('BlogPost', collection);
+
+    var date = new Date(1305730951086);
+    var id0 = new DocumentObjectId('4dd3e169dbfb13b4570000b9');
+    var id1 = new DocumentObjectId('4dd3e169dbfb13b4570000b6');
+    var id2 = new DocumentObjectId('4dd3e169dbfb13b4570000b7');
+    var id3 = new DocumentObjectId('4dd3e169dbfb13b4570000b8');
+
+    var post = new BlogPost({
+        title: 'Test'
+      , _id: id0
+      , date: date
+      , numbers: [5,6,7]
+      , owners: [id1]
+      , meta: { visitors: 45 }
+      , comments: [
+          { _id: id2, title: 'my comment', date: date, body: 'this is a comment' },
+          { _id: id3, title: 'the next thang', date: date, body: 'this is a comment too!' }]
+    });
+
+    db.close();
+
+    var a = '{ meta: { visitors: 45 },\n  numbers: [ 5, 6, 7 ],\n  owners: [ 4dd3e169dbfb13b4570000b6 ],\n  comments: \n   [{ _id: 4dd3e169dbfb13b4570000b7,\n     comments: [],\n     body: \'this is a comment\',\n     date: Wed, 18 May 2011 15:02:31 GMT,\n     title: \'my comment\' }\n   { _id: 4dd3e169dbfb13b4570000b8,\n     comments: [],\n     body: \'this is a comment too!\',\n     date: Wed, 18 May 2011 15:02:31 GMT,\n     title: \'the next thang\' }],\n  _id: 4dd3e169dbfb13b4570000b9,\n  date: Wed, 18 May 2011 15:02:31 GMT,\n  title: \'Test\' }'
+
+    post.inspect().should.eql(a);
+  },
+
+  'path can be used as pathname': function () {
+    var db = start()
+      , P = db.model('pathnametest', new Schema({ path: String }))
+    db.close();
+
+    var threw = false;
+    try {
+      new P({ path: 'i should not throw' });
+    } catch (err) {
+      threw = true;
+    }
+
+    threw.should.be.false;
+
+  },
+
+  'when mongo is down, save callback should fire with err': function () {
+    var db = start();
+    var T = db.model('Thing', new Schema({ type: String }));
+    db.close();
+
+    var t = new T({ type: "monster" });
+
+    var worked = false;
+    t.save(function (err) {
+      worked = true;
+      err.message.should.eql('notConnected');
+    });
+
+    setTimeout(function () {
+      worked.should.be.true;
+    }, 1000);
+  },
+
+  'subdocuments with changed values should persist the values': function () {
+    var db = start()
+    var Subdoc = new Schema({ name: String, mixed: Schema.Types.Mixed });
+    var T = db.model('SubDocMixed', new Schema({ subs: [Subdoc] }));
+
+    var t = new T({ subs: [{ name: "Hubot", mixed: { w: 1, x: 2 }}] });
+    t.subs[0].name.should.equal("Hubot");
+    t.subs[0].mixed.w.should.equal(1);
+    t.subs[0].mixed.x.should.equal(2);
+
+    t.save(function (err) {
+      should.strictEqual(null, err);
+
+      T.findById(t._id, function (err, t) {
+        should.strictEqual(null, err);
+        t.subs[0].name.should.equal("Hubot");
+        t.subs[0].mixed.w.should.equal(1);
+        t.subs[0].mixed.x.should.equal(2);
+
+        var sub = t.subs[0];
+        sub.name = "Hubot1";
+        sub.name.should.equal("Hubot1");
+        sub.isModified('name').should.be.true;
+        t.modified.should.be.true;
+
+        t.save(function (err) {
+          should.strictEqual(null, err);
+
+          T.findById(t._id, function (err, t) {
+            should.strictEqual(null, err);
+            should.strictEqual(t.subs[0].name, "Hubot1");
+
+            var sub = t.subs[0];
+            sub.mixed.w = 5;
+            sub.mixed.w.should.equal(5);
+            sub.isModified('mixed').should.be.false;
+            sub.commit('mixed');
+            sub.isModified('mixed').should.be.true;
+            sub.modified.should.be.true;
+            t.modified.should.be.true;
+
+            t.save(function (err) {
+              should.strictEqual(null, err);
+
+              T.findById(t._id, function (err, t) {
+                db.close();
+                should.strictEqual(null, err);
+                should.strictEqual(t.subs[0].mixed.w, 5);
+              })
+            })
+          });
+        });
+      })
     })
+  },
+
+  'RegExps can be saved': function () {
+    var db = start()
+      , BlogPost = db.model('BlogPost', collection);
+
+    var post = new BlogPost({ mixed: { rgx: /^asdf$/ } });
+    post.mixed.rgx.should.be.instanceof(RegExp);
+    post.mixed.rgx.source.should.eql('^asdf$');
+    post.save(function (err) {
+      should.strictEqual(err, null);
+      BlogPost.findById(post._id, function (err, post) {
+        db.close();
+        should.strictEqual(err, null);
+        post.mixed.rgx.should.be.instanceof(RegExp);
+        post.mixed.rgx.source.should.eql('^asdf$');
+      });
+    });
+  },
+
+  'null defaults are allowed': function () {
+    var db = start();
+    var T = db.model('NullDefault', new Schema({ name: { type: String, default: null }}), collection);
+    var t = new T();
+
+    should.strictEqual(null, t.name);
+
+    t.save(function (err) {
+      should.strictEqual(null, err);
+
+      T.findById(t._id, function (err, t) {
+        db.close();
+        should.strictEqual(null, err);
+        should.strictEqual(null, t.name);
+      });
+    });
+  },
+
+  // GH-365
+  'test that setters are used on embedded documents': function () {
+    var db = start();
+    function setLat (val) {
+      return parseInt(val);
+    }
+
+    var Location = new Schema({
+      lat: {type: Number, default: 0, set: setLat}
+    });
+
+    var Deal = new Schema({
+        title: String
+      , locations: [Location]
+    });
+
+    Location = db.model('Location', Location, 'locations_' + random());
+    Deal = db.model('Deal', Deal, 'deals_' + random());
+
+    var location = new Location({lat: 1.2});
+    location.lat.valueOf().should.equal(1);
+
+    var deal = new Deal({title: "My deal", locations: [{lat: 1.2}]});
+    deal.locations[0].lat.valueOf().should.equal(1);
+    db.close();
+  },
+
+  // GH-289
+  'test that pre-init middleware has access to the true ObjectId when used with querying': function () {
+    var db = start()
+      , PreInitSchema = new Schema({})
+      , preId;
+    PreInitSchema.pre('init', function (next) {
+      preId = this._id;
+      next();
+    });
+    var PreInit = db.model('PreInit', PreInitSchema, 'pre_inits' + random());
+
+    var doc = new PreInit();
+    doc.save( function (err) {
+      should.strictEqual(err, null);
+      PreInit.findById(doc._id, function (err, found) {
+        db.close();
+        should.strictEqual(err, null);
+        should.strictEqual(undefined, preId);
+      });
+    });
+  },
+
+  // Demonstration showing why GH-261 is a misunderstanding
+  'a single instantiated document should be able to update its embedded documents more than once': function () {
+    var db = start()
+      , BlogPost = db.model('BlogPost', collection);
+
+    var post = new BlogPost();
+    post.comments.push({title: 'one'});
+    post.save(function (err) {
+      should.strictEqual(err, null);
+      post.comments[0].title.should.eql('one');
+      post.comments[0].title = 'two';
+      post.comments[0].title.should.eql('two');
+      post.save( function (err) {
+        should.strictEqual(err, null);
+        BlogPost.findById(post._id, function (err, found) {
+          should.strictEqual(err, null);
+          db.close();
+          should.strictEqual(err, null);
+          found.comments[0].title.should.eql('two');
+        });
+      });
+    });
+  },
+
+  'defining a method on a Schema corresponding to an EmbeddedDocument should generate an instance method for the ED': function () {
+    var db = start();
+    var ChildSchema = new Schema({ name: String });
+    ChildSchema.method('talk', function () {
+      return 'gaga';
+    });
+
+    var ParentSchema = new Schema({
+      children: [ChildSchema]
+    });
+
+    var ChildA = db.model('ChildA', ChildSchema, 'children_' + random());
+    var ParentA = db.model('ParentA', ParentSchema, 'parents_' + random());
+
+    var c = new ChildA;
+    c.talk.should.be.a('function');
+
+    var p = new ParentA();
+    p.children.push({});
+    p.children[0].talk.should.be.a('function');
+    db.close();
+  },
+
+  'Model#save should emit an error on its db if a callback is not passed to it': function () {
+    var db = start();
+
+    var DefaultErrSchema = new Schema({});
+
+    var err = "";
+
+    DefaultErrSchema.pre('save', function (next, fn) {
+      try {
+        next(new Error);
+      } catch (error) {
+        // throws b/c nothing is listening to the error event
+        error.should.be.instanceof(Error);
+
+        db.on('error', function (err) {
+          db.close();
+          err.should.be.an.instanceof(Error);
+        });
+
+        next(new Error);
+      }
+    });
+
+    var DefaultErr = db.model('DefaultErr', DefaultErrSchema, 'default_err_' + random());
+
+    var e = new DefaultErr();
+
+    e.save();
+  },
+
+  'ensureIndex error should emit on the db': function () {
+    var db = start();
+
+    db.on('error', function (err) {
+      /^E11000 duplicate key error index:/.test(err.message).should.equal(true);
+      db.close();
+    });
+
+    var schema = new Schema({ name: { type: String } })
+      , Test = db.model('IndexError', schema, "x"+random());
+
+    Test.create({ name: 'hi' }, { name: 'hi' }, function (err) {
+      should.strictEqual(err, null);
+      Test.schema.index({ name: 1 }, { unique: true });
+      Test.init();
+    });
+  },
+
+  'backward compatibility with conflicted data in the db': function () {
+    var db = start();
+    var M = db.model('backwardDataConflict', new Schema({ namey: { first: String, last: String }}));
+    var m = new M({ namey: "[object Object]" });
+    m.namey = { first: 'GI', last: 'Joe' };// <-- should overwrite the string
+    m.save(function (err) {
+      db.close();
+      should.strictEqual(err, null);
+      should.strictEqual('GI', m.namey.first);
+      should.strictEqual('Joe', m.namey.last);
+    });
+  },
+
+  '#push should work on EmbeddedDocuments more than 2 levels deep': function () {
+    var db = start()
+      , Post = db.model('BlogPost', collection)
+      , Comment = db.model('CommentNesting', Comments, collection);
+
+    var p =new Post({ title: "comment nesting" });
+    var c1 =new Comment({ title: "c1" });
+    var c2 =new Comment({ title: "c2" });
+    var c3 =new Comment({ title: "c3" });
+
+    p.comments.push(c1);
+    c1.comments.push(c2);
+    c2.comments.push(c3);
+
+    p.save(function (err) {
+      should.strictEqual(err, null);
+
+      Post.findById(p._id, function (err, p) {
+        should.strictEqual(err, null);
+
+        var c4=new Comment({ title: "c4" });
+        p.comments[0].comments[0].comments[0].comments.push(c4);
+        p.save(function (err) {
+          should.strictEqual(err, null);
+
+          Post.findById(p._id, function (err, p) {
+            db.close();
+            should.strictEqual(err, null);
+            p.comments[0].comments[0].comments[0].comments[0].title.should.equal('c4');
+          });
+        });
+      });
+    })
+
   }
+
 };

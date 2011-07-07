@@ -1,5 +1,4 @@
 var BinaryParser = require('../bson/binary_parser').BinaryParser,
-  Integer = require('../goog/math/integer').Integer,
   Long = require('../goog/math/long').Long;
 
 /**

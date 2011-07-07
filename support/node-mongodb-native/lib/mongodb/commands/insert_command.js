@@ -1,6 +1,8 @@
 var BaseCommand = require('./base_command').BaseCommand,
   BinaryParser = require('../bson/binary_parser').BinaryParser,
-  inherits = require('sys').inherits;
+  inherits = require('util').inherits,
+  debug = require('util').debug,
+  inspect = require('util').inspect;
 
 /**
   Insert Document Command
@@ -22,6 +24,7 @@ InsertCommand.prototype.add = function(document) {
 };
 
 InsertCommand.prototype.getOpCode = function() {
+  
   return BaseCommand.OP_INSERT;
 };
 
@@ -35,7 +38,7 @@ struct {
 */
 InsertCommand.prototype.getCommand = function() {
   var command_string = '';
-  for(var i = 0; i < this.documents.length; i++) {
+  for(var i = 0; i < this.documents.length; i++) {    
     command_string = command_string + this.db.bson_serializer.BSON.serialize(this.documents[i], this.checkKeys);
   }
   // Build the command string

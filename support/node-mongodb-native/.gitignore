@@ -3,3 +3,6 @@
 *.seed
 .project
 .settings
+data
+node_modules
+output

@@ -41,7 +41,7 @@ class Timestamp : public ObjectWrap {
     int32_t toInt();
     int64_t compare(Timestamp *other);
     int64_t getLowBitsUnsigned();
-    char *toString(int32_t radix);
+    char *toString(int32_t radix, char *buffer);
     Timestamp *shiftRight(int32_t number_bits);
     Timestamp *shiftLeft(int32_t number_bits);
 

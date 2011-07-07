@@ -25,6 +25,8 @@ const double LN2 = 0.6931471805599453;
 const int64_t BSON_INT64_MAX = (int64_t)9223372036854775807LL;
 const int64_t BSON_INT64_MIN = (int64_t)(-1)*(9223372036854775807LL);
 
+const int32_t TIMESTAMP_BUFFER_SIZE = 64;
+
 // Constant objects used in calculations
 Timestamp* TIMESTAMP_MIN_VALUE = Timestamp::fromBits(0, 0x80000000 | 0);
 Timestamp* TIMESTAMP_MAX_VALUE = Timestamp::fromBits(0xFFFFFFFF | 0, 0x7FFFFFFF | 0);
@@ -75,18 +77,11 @@ Handle<Value> Timestamp::New(const Arguments &args) {
     // Parse the strings into int32_t values
     int32_t low_bits = 0;
     int32_t high_bits = 0;
-    char *low_bits_str = (char *)malloc(4 * sizeof(char));
-    char *high_bits_str = (char *)malloc(4 * sizeof(char));
     
     // Let's write the strings to the bits
-    DecodeWrite(low_bits_str, 4, args[0]->ToString(), BINARY);
-    DecodeWrite(high_bits_str, 4, args[1]->ToString(), BINARY);
-    // Copy the string to the int
-    memcpy(&low_bits, low_bits_str, 4);
-    memcpy(&high_bits, high_bits_str, 4);
-    // Free memory
-    free(low_bits_str);
-    free(high_bits_str);
+    DecodeWrite((char*)&low_bits, 4, args[0]->ToString(), BINARY);
+    DecodeWrite((char*)&high_bits, 4, args[1]->ToString(), BINARY);
+    
     // Create an instance of long
     Timestamp *l = new Timestamp(low_bits, high_bits);
     // Wrap it in the object wrap
@@ -191,16 +186,7 @@ void Timestamp::HighSetter(Local<String> property, Local<Value> value, const Acc
 }
 
 Handle<Value> Timestamp::Inspect(const Arguments &args) {
-  HandleScope scope;
-  
-  // Let's unpack the Timestamp instance that contains the number in low_bits and high_bits form
-  Timestamp *l = ObjectWrap::Unwrap<Timestamp>(args.This());
-  // Let's create the string from the Timestamp number
-  char *result = l->toString(10);
-  // Package the result in a V8 String object and return
-  Local<Value> str = String::New(result);
-  free(result);
-  return str;
+  return ToString(args);
 }
 
 Handle<Value> Timestamp::GetLowBits(const Arguments &args) {
@@ -255,149 +241,38 @@ int32_t Timestamp::toInt() {
   return this->low_bits;
 }
 
-char *Timestamp::toString(int32_t opt_radix) {
-  // Set the radix
-  int32_t radix = opt_radix;
-  // Check if we have a zero value
-  if(this->isZero()) {
-    // Allocate a string to return
-    char *result = (char *)malloc(1 * sizeof(char) + 1);
-    // Set the string to the character 0
-    *(result) = '0';
-    // Terminate the C String
-    *(result + 1) = '\0';
-    return result;
-  }
-  
-  // If the long is negative we need to perform som arithmetics
-  if(this->isNegative()) {
-    // Min value object
-    Timestamp *minTimestamp = new Timestamp(0, 0x80000000 | 0);
-    
-    if(this->equals(minTimestamp)) {
-      // We need to change the exports.Timestamp value before it can be negated, so we remove
-      // the bottom-most digit in this base and then recurse to do the rest.
-      Timestamp *radix_long = Timestamp::fromNumber(radix);
-      Timestamp *div = this->div(radix_long);
-      Timestamp *mul = div->multiply(radix_long);
-      Timestamp *rem = mul->subtract(this);
-      // Fetch div result      
-      char *div_result = div->toString(radix);
-      // Unpack the rem result and convert int to string
-      char *int_buf = (char *)malloc(50 * sizeof(char) + 1);
-      *(int_buf) = '\0';
-      uint32_t rem_int = rem->toInt();
-      sprintf(int_buf, "%d", rem_int);
-      // Final bufferr
-      char *final_buffer = (char *)malloc(50 * sizeof(char) + 1);
-      *(final_buffer) = '\0';
-      strncat(final_buffer, div_result, strlen(div_result));
-      strncat(final_buffer + strlen(div_result), int_buf, strlen(div_result));
-      // Release some memory
-      free(div_result);
-      free(int_buf);
-      // Delete object
-      delete rem;
-      delete mul;
-      return final_buffer;
-    } else {
-      char *buf = (char *)malloc(50 * sizeof(char) + 1);
-      *(buf) = '\0';
-      Timestamp *negate = this->negate();
-      char *result = negate->toString(radix);      
-      strncat(buf, "-", 1);
-      strncat(buf + 1, result, strlen(result));
-      // Release memory
-      free(result);
-      delete negate;
-      return buf;
-    }  
-  }
-  
-  // Do several (6) digits each time through the loop, so as to
-  // minimize the calls to the very expensive emulated div.
-  Timestamp *radix_to_power = Timestamp::fromInt(pow(radix, 6));
-  Timestamp *rem = this;
-  char *result = (char *)malloc(1024 * sizeof(char) + 1);
-  // Ensure the allocated space is null terminated to ensure a proper CString
-  *(result) = '\0';
-  
-  while(true) {
-    Timestamp *rem_div = rem->div(radix_to_power);
-    Timestamp *mul = rem_div->multiply(radix_to_power);
-    int32_t interval = rem->subtract(mul)->toInt();
-    // Convert interval into string
-    char digits[50];    
-    sprintf(digits, "%d", interval);
-    // Remove existing object if it's not this
-    if(this != rem) delete rem;    
-    
-    rem = rem_div;
-    if(rem->isZero()) {
-      // Join digits and result to create final result
-      int total_length = strlen(digits) + strlen(result);      
-      char *new_result = (char *)malloc(total_length * sizeof(char) + 1);
-      *(new_result) = '\0';
-      strncat(new_result, digits, strlen(digits));
-      strncat(new_result + strlen(digits), result, strlen(result));
-      // Free the existing structure
-      free(result);
-      delete rem_div;
-      delete mul;
-      delete radix_to_power;
-      return new_result;
-    } else {
-      // Allocate some new space for the number
-      char *new_result = (char *)malloc(1024 * sizeof(char) + 1);
-      *(new_result) = '\0';
-      int digits_length = (int)strlen(digits);
-      int index = 0;
-      // Pad with zeros
-      while(digits_length < 6) {
-        strncat(new_result + index, "0", 1);
-        digits_length = digits_length + 1;
-        index = index + 1;
-      }
-  
-      strncat(new_result + index, digits, strlen(digits));
-      strncat(new_result + strlen(digits) + index, result, strlen(result));
-      
-      free(result);
-      result = new_result;
-    }
-    // Free memory
-    delete mul;
-  }  
+char *Timestamp::toString(int32_t opt_radix, char *buffer) {
+  if (opt_radix == 10) {
+	  if (isNegative()) {
+      sprintf(buffer,"%lld",toNumber());
+	  }
+	  else {
+      sprintf(buffer,"%llu",toNumber());
+	  }
+	}
+	else if (opt_radix == 16) {
+      sprintf(buffer,"%llx",toNumber());	  
+	}
+	else {
+    throw "Unsupported radix";
+	}
+	
+  return buffer;
 }
 
 Handle<Value> Timestamp::ToString(const Arguments &args) {
   HandleScope scope;
 
-  // Let's unpack the Timestamp instance that contains the number in low_bits and high_bits form
-  Timestamp *l = ObjectWrap::Unwrap<Timestamp>(args.This());
-  // Let's create the string from the Timestamp number
-  char *result = l->toString(10);
-  // Package the result in a V8 String object and return
-  Handle<Value> result_str = String::New(result);
-  // Free memory
-  free(result);
-  // Return string
-  return result_str;
+  Timestamp *ts = ObjectWrap::Unwrap<Timestamp>(args.This());
+  
+  char buffer[TIMESTAMP_BUFFER_SIZE];
+  ts->toString(10,buffer);
+
+  return String::New(buffer);
 }
 
 Handle<Value> Timestamp::ToJSON(const Arguments &args) {
-  HandleScope scope;
-
-  // Let's unpack the Timestamp instance that contains the number in low_bits and high_bits form
-  Timestamp *l = ObjectWrap::Unwrap<Timestamp>(args.This());
-  // Let's create the string from the Timestamp number
-  char *result = l->toString(10);
-  // Package the result in a V8 String object and return
-  Handle<Value> result_str = String::New(result);
-  // Free memory
-  free(result);
-  // Return string
-  return result_str;
+  return ToString(args);
 }
 
 Timestamp *Timestamp::shiftRight(int32_t number_bits) {

@@ -52,6 +52,8 @@ var ModSchema = new Schema({
 });
 mongoose.model('Mod', ModSchema);
 
+var geoSchema = new Schema({ loc: { type: [Number], index: '2d'}});
+
 module.exports = {
   'test that find returns a Query': function () {
     var db = start()
@@ -171,15 +173,40 @@ module.exports = {
 
   'test that count Query executes when you pass a callback': function () {
     var db = start()
-      , BlogPostB = db.model('BlogPostB', collection)
-      , count = 1;
+      , BlogPostB = db.model('BlogPostB', collection);
 
     function fn () {
-      --count || db.close();
+      db.close();
     };
 
     BlogPostB.count({}, fn).should.be.an.instanceof(Query);
   },
+
+  'test that distinct returns a Query': function () {
+    var db = start()
+      , BlogPostB = db.model('BlogPostB', collection);
+
+    BlogPostB.distinct('title', {}).should.be.an.instanceof(Query);
+
+    db.close();
+  },
+
+  'test that distinct Query executes when you pass a callback': function () {
+    var db = start();
+    var Address = new Schema({ zip: String });
+    Address = db.model('Address', Address, 'addresses_' + random());
+
+    Address.create({ zip: '10010'}, { zip: '10010'}, { zip: '99701'}, function (err, a1, a2, a3) {
+      should.strictEqual(null, err);
+      var query = Address.distinct('zip', {}, function (err, results) {
+        should.strictEqual(null, err);
+        results.should.eql(['10010', '99701']);
+        db.close();
+      });
+      query.should.be.an.instanceof(Query);
+    });
+  },
+
 
   'test that update returns a Query': function () {
     var db = start()
@@ -455,6 +482,52 @@ module.exports = {
     });
   },
 
+  'test find queries with $ne with single value against array': function () {
+    var db = start();
+    var schema = new Schema({
+        ids: [Schema.ObjectId]
+      , b: Schema.ObjectId
+    });
+
+    var NE = db.model('NE_Test', schema, 'nes__' + random());
+
+    var id1 = new DocumentObjectId;
+    var id2 = new DocumentObjectId;
+    var id3 = new DocumentObjectId;
+    var id4 = new DocumentObjectId;
+
+    NE.create({ ids: [id1, id4], b: id3 }, function (err, ne1) {
+      should.strictEqual(err, null);
+      NE.create({ ids: [id2, id4], b: id3 },function (err, ne2) {
+        should.strictEqual(err, null);
+
+        var query = NE.find({ 'b': id3.toString(), 'ids': { $ne: id1 }});
+        query.run(function (err, nes1) {
+          should.strictEqual(err, null);
+          nes1.length.should.eql(1);
+
+          NE.find({ b: { $ne: [1] }}, function (err, nes2) {
+            should.strictEqual(err, null);
+            nes2.length.should.eql(2);
+
+            NE.find({ b: { $ne: 4 }}, function (err, nes3) {
+              should.strictEqual(err, null);
+              nes3.length.should.eql(2);
+
+              NE.find({ b: id3, ids: { $ne: id4 }}, function (err, nes4) {
+                db.close();
+                should.strictEqual(err, null);
+                nes4.length.should.eql(0);
+              });
+            });
+          });
+        });
+
+      });
+    });
+
+  },
+
   'test for findById where partial initialization': function () {
     var db = start()
       , BlogPostB = db.model('BlogPostB', collection)
@@ -510,15 +583,43 @@ module.exports = {
     });
   },
 
-  'test find where subset of fields, excluding _id': function () {
+  'test findOne where subset of fields, excluding _id': function () {
     var db = start()
       , BlogPostB = db.model('BlogPostB', collection);
     BlogPostB.create({title: 'subset 1'}, function (err, created) {
       should.strictEqual(err, null);
       BlogPostB.findOne({title: 'subset 1'}, {title: 1, _id: 0}, function (err, found) {
         should.strictEqual(err, null);
-        found._id.should.be.null;
+        should.strictEqual(undefined, found._id);
         found.title.should.equal('subset 1');
+        db.close();
+      });
+    });
+  },
+
+  'test find where subset of fields, excluding _id': function () {
+    var db = start()
+      , BlogPostB = db.model('BlogPostB', collection);
+    BlogPostB.create({title: 'subset 1'}, function (err, created) {
+      should.strictEqual(err, null);
+      BlogPostB.find({title: 'subset 1'}, {title: 1, _id: 0}, function (err, found) {
+        should.strictEqual(err, null);
+        should.strictEqual(undefined, found[0]._id);
+        found[0].title.should.equal('subset 1');
+        db.close();
+      });
+    });
+  },
+
+  'exluded fields that are not objects or arrays in the schema should be undefined': function () {
+    var db = start()
+      , BlogPostB = db.model('BlogPostB', collection);
+    BlogPostB.create({title: 'subset 1'}, function (err, created) {
+      should.strictEqual(err, null);
+      BlogPostB.findById(created.id, {title: 0}, function (err, found) {
+        should.strictEqual(err, null);
+        found._id.should.eql(created._id);
+        should.strictEqual(undefined, found.title);
         db.close();
       });
     });
@@ -740,6 +841,23 @@ module.exports = {
     });
   },
 
+  // GH-389
+  'find nested doc using string id': function () {
+    var db = start()
+      , BlogPostB = db.model('BlogPostB', collection);
+
+    BlogPostB.create({comments: [{title: 'i should be queryable by _id'}, {title:'me too me too!'}]}, function (err, created) {
+      should.strictEqual(err, null);
+      var id = created.comments[1]._id.id;
+      BlogPostB.findOne({'comments._id': id}, function (err, found) {
+        db.close();
+        should.strictEqual(err, null);
+        should.strictEqual(!! found, true, 'Find by nested doc id hex string fails');
+        found._id.should.eql(created._id);
+      });
+    });
+  },
+
   'test finding where $elemMatch': function () {
     var db = start()
       , BlogPostB = db.model('BlogPostB', collection)
@@ -898,12 +1016,43 @@ module.exports = {
           should.strictEqual(err, null);
           found.should.have.length(2);
           BlogPostB.find({numbers: {$all: [0, -1]}}, function (err, found) {
+            db.close();
             should.strictEqual(err, null);
             found.should.have.length(1);
-            db.close();
           });
         });
       });
+    });
+  },
+
+  'test finding a document whose arrays contain at least $all string values': function () {
+    var db = start()
+      , BlogPostB = db.model('BlogPostB', collection);
+
+    var post = new BlogPostB();
+
+    post.tags.push('onex');
+    post.tags.push('twox');
+    post.tags.push('threex');
+
+    post.save(function (err) {
+      should.strictEqual(err, null);
+
+      BlogPostB.findById(post._id, function (err, post) {
+        should.strictEqual(err, null);
+
+        BlogPostB.find({tags: { '$all': [/^onex/i]}}, function (err, docs) {
+          should.strictEqual(err, null);
+          docs.length.should.equal(1);
+
+          BlogPostB.findOne({tags: { '$all': /^two/ }}, function (err, doc) {
+            db.close();
+            should.strictEqual(err, null);
+            doc.id.should.eql(post.id);
+          });
+        });
+      });
+
     });
   },
 
@@ -1178,10 +1327,11 @@ module.exports = {
   // GH-336
   'finding by Date field works': function () {
     var db = start()
-      , Test = db.model('TestDateQuery', new Schema({ date: Date }), collection)
+      , Test = db.model('TestDateQuery', new Schema({ date: Date }), 'datetest_' + random())
       , now = new Date;
 
-    Test.create({ date: now }, function (err) {
+    Test.create({ date: now }, { date: new Date(now-10000) }, function (err, a, b) {
+      should.strictEqual(err, null);
       Test.find({ date: now }, function (err, docs) {
         db.close();
         should.strictEqual(err, null);
@@ -1193,18 +1343,38 @@ module.exports = {
   // GH-309
   'using $near with Arrays works (geo-spatial)': function () {
     var db = start()
-      , schema = new Schema({ loc: { type: Array, index: '2d'}})
-      , Test = db.model('GeoSpatialArrayQuery', schema, collection);
+      , Test = db.model('Geo1', geoSchema, collection);
 
     Test.create({ loc: [ 10, 20 ]}, { loc: [ 40, 90 ]}, function (err) {
       should.strictEqual(err, null);
-      Test.find({ loc: { $near: [30, 40] }}, function (err, docs) {
-        db.close();
-        should.strictEqual(err, null);
-        docs.length.should.equal(2);
-      });
+      setTimeout(function () {
+        Test.find({ loc: { $near: [30, 40] }}, function (err, docs) {
+          db.close();
+          should.strictEqual(err, null);
+          docs.length.should.equal(2);
+        });
+      }, 700);
     });
+  },
 
+  'using $maxDistance with Array works (geo-spatial)': function () {
+    var db = start()
+      , Test = db.model('Geo2', geoSchema, "x"+random());
+
+    Test.create({ loc: [ 20, 80 ]}, { loc: [ 25, 30 ]}, function (err, docs) {
+      should.strictEqual(!!err, false);
+      setTimeout(function () {
+        Test.find({ loc: { $near: [25, 31], $maxDistance: 1 }}, function (err, docs) {
+          should.strictEqual(err, null);
+          docs.length.should.equal(1);
+          Test.find({ loc: { $near: [25, 32], $maxDistance: 1 }}, function (err, docs) {
+            db.close();
+            should.strictEqual(err, null);
+            docs.length.should.equal(0);
+          });
+        });
+      }, 500);
+    });
   }
 
 };

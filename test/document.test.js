@@ -48,12 +48,6 @@ TestDocument.prototype.hooksTest = function(fn){
 };
 
 /**
- * Apply hooks.
- */
-
-Document.registerHooks.call(TestDocument, 'hooksTest');
-
-/**
  * Test.
  */
 
@@ -87,6 +81,11 @@ module.exports = {
     doc2.test.should.eql('toop');
     doc2.oids.should.be.an.instanceof(Array);
     (doc2.nested.age == 2).should.be.true;
+
+    // GH-366
+    should.strictEqual(doc2.nested.nested, undefined);
+    should.strictEqual(doc2.nested.test, undefined);
+
     DocumentObjectId.toString(doc2.nested.cool).should.eql('4cf70857337498f95900001c');
 
     doc.oids.should.not.equal(doc2.oids);
@@ -170,7 +169,7 @@ module.exports = {
     });
 
     // parallel
-    doc.pre('hooksTest', function(next, done){
+    doc.pre('hooksTest', true, function(next, done){
       steps++;
       setTimeout(function(){
         steps.should.eql(4);
@@ -182,7 +181,7 @@ module.exports = {
       next();
     });
 
-    doc.pre('hooksTest', function(next, done){
+    doc.pre('hooksTest', true, function(next, done){
       steps++;
       setTimeout(function(){
         steps.should.eql(4);
@@ -239,14 +238,14 @@ module.exports = {
       , steps = 0
       , called = false;
 
-    doc.pre('hooksTest', function(next, done){
+    doc.pre('hooksTest', true, function(next, done){
       steps++;
       next();
       done();
       done();
     });
 
-    doc.pre('hooksTest', function(next, done){
+    doc.pre('hooksTest', true, function(next, done){
       steps++;
       next();
       done();
@@ -271,14 +270,14 @@ module.exports = {
       , steps = 0
       , called = false;
 
-    doc.pre('hooksTest', function(next, done){
+    doc.pre('hooksTest', true, function(next, done){
       steps++;
       next();
       done();
       done();
     });
 
-    doc.pre('hooksTest', function(next, done){
+    doc.pre('hooksTest', true, function(next, done){
       steps++;
       next();
     });
@@ -343,43 +342,38 @@ module.exports = {
     });
   },
 
-  'test that passing something that is not an error is ignored':
-  function(beforeExit){
-    var doc = new TestDocument()
-      , called = false;
+  'test mutating incoming args via middleware': function (beforeExit) {
+    var doc = new TestDocument();
 
-    doc.pre('hooksTest', function(next){
-      next(true);
+    doc.pre('set', function(next, path, val){
+      next(path, 'altered-' + val);
     });
 
-    doc.hooksTest(function(err){
-      should.strictEqual(err, null);
-      called = true;
-    });
+    doc.set('test', 'me');
 
     beforeExit(function(){
-      called.should.be.true;
+      doc.test.should.equal('altered-me');
     });
   },
-
+  
   'test hooks system errors from a parallel hook': function(beforeExit){
     var doc = new TestDocument()
       , steps = 0
       , called = false;
 
-    doc.pre('hooksTest', function(next, done){
+    doc.pre('hooksTest', true, function(next, done){
       steps++;
       next();
       done();
     });
 
-    doc.pre('hooksTest', function(next, done){
+    doc.pre('hooksTest', true, function(next, done){
       steps++;
       next();
       done();
     });
 
-    doc.pre('hooksTest', function(next, done){
+    doc.pre('hooksTest', true, function(next, done){
       steps++;
       next();
       done(new Error);
@@ -461,6 +455,18 @@ module.exports = {
 
     delete obj._id;
     obj.should.eql({ oids: [] });
+  },
+
+  // GH-209
+  'MongooseErrors should be instances of Error': function () {
+    var MongooseError = require('../lib/mongoose/error')
+      , err = new MongooseError("Some message");
+    err.should.be.an.instanceof(Error);
+  },
+  'ValidationErrors should be instances of Error': function () {
+    var ValidationError = Document.ValidationError
+      , err = new ValidationError(new TestDocument);
+    err.should.be.an.instanceof(Error);
   }
 
 };

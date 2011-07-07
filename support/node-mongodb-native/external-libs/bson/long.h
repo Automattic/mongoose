@@ -38,7 +38,7 @@ class Long : public ObjectWrap {
     int32_t toInt();
     int64_t compare(Long *other);
     int64_t getLowBitsUnsigned();
-    char *toString(int32_t radix);
+	char *toString(int32_t radix, char *buffer);
     Long *shiftRight(int32_t number_bits);
     Long *shiftLeft(int32_t number_bits);
 

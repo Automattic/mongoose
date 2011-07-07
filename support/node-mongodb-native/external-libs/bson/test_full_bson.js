@@ -1,6 +1,6 @@
 require.paths.unshift("../../lib");
 
-var sys = require('sys'),
+var sys = require('util'),
   fs = require('fs'),
   Buffer = require('buffer').Buffer,
   BSON = require('./bson').BSON,
@@ -14,7 +14,7 @@ var sys = require('sys'),
   BSONJS = require('mongodb/bson/bson').BSON,
   Binary2 = require('mongodb/bson/bson').Binary;
 
-sys.puts("=== EXCEUTING TEST_FULL_BSON ===");
+sys.puts("=== EXECUTING TEST_FULL_BSON ===");
 
 // Should Correctly Deserialize object
 var bytes = [95,0,0,0,2,110,115,0,42,0,0,0,105,110,116,101,103,114,97,116,105,111,110,95,116,101,115,116,115,95,46,116,101,115,116,95,105,110,100,101,120,95,105,110,102,111,114,109,97,116,105,111,110,0,8,117,110,105,113,117,101,0,0,3,107,101,121,0,12,0,0,0,16,97,0,1,0,0,0,0,2,110,97,109,101,0,4,0,0,0,97,95,49,0,0];
@@ -165,7 +165,7 @@ var deserialized_data = BSON.deserialize(serialized_data);
 assert.equal(doc.doc.value(), deserialized_data.doc.value())
 
 // Should Correctly Serialize and Deserialize a big Binary object
-var data = fs.readFileSync("../../integration/test_gs_weird_bug.png", 'binary');
+var data = fs.readFileSync("../../test/gridstore/test_gs_weird_bug.png", 'binary');
 var bin = new Binary()
 bin.write(data)
 var doc = {doc: bin}

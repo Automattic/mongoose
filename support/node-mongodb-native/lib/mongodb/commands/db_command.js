@@ -1,7 +1,9 @@
 var QueryCommand = require('./query_command').QueryCommand,
   InsertCommand = require('./insert_command').InsertCommand,
   MD5 = require('../crypto/md5').MD5,
-  inherits = require('sys').inherits;
+  inherits = require('util').inherits,
+  debug = require('util').debug,
+  inspect = require('util').inspect;
 
 /**
   Db Command
@@ -46,7 +48,7 @@ DbCommand.createAuthenticationCommand = function(db, username, password, nonce) 
   var key = MD5.hex_md5(nonce + username + hash_password);
   var selector = {'authenticate':1, 'user':username, 'nonce':nonce, 'key':key};
   // Create db command
-  return new DbCommand(db, db.databaseName + "." + DbCommand.SYSTEM_COMMAND_COLLECTION, QueryCommand.OPTS_NO_CURSOR_TIMEOUT, 0, -1, selector, null);
+  return new DbCommand(db, db.databaseName + "." + DbCommand.SYSTEM_COMMAND_COLLECTION, QueryCommand.OPTS_NONE, 0, -1, selector, null);
 };
 
 DbCommand.createLogoutCommand = function(db) {
@@ -73,13 +75,24 @@ DbCommand.createRenameCollectionCommand = function(db, fromCollectionName, toCol
   return new DbCommand(db, "admin." + DbCommand.SYSTEM_COMMAND_COLLECTION, QueryCommand.OPTS_NO_CURSOR_TIMEOUT, 0, -1, {'renameCollection':renameCollection, 'to':toCollection}, null);
 };
 
-DbCommand.createGetLastErrorCommand = function(db) {
-  return new DbCommand(db, db.databaseName + "." + DbCommand.SYSTEM_COMMAND_COLLECTION, QueryCommand.OPTS_NO_CURSOR_TIMEOUT, 0, -1, {'getlasterror':1}, null);
+DbCommand.createGetLastErrorCommand = function(options, db) {
+  var args = Array.prototype.slice.call(arguments, 0);
+  db = args.pop();
+  options = args.length ? args.shift() : {};
+  // Final command 
+  var command = {'getlasterror':1};
+  // If we have an options Object let's merge in the fields (fsync/wtimeout/w)
+  if('object' === typeof options) {
+    for(var name in options) {
+      command[name] = options[name]
+    }
+  }
+  
+  // Execute command
+  return new DbCommand(db, db.databaseName + "." + DbCommand.SYSTEM_COMMAND_COLLECTION, QueryCommand.OPTS_NO_CURSOR_TIMEOUT, 0, -1, command, null);
 };
 
-DbCommand.createGetLastStatusCommand = function(db) {
-  return new DbCommand(db, db.databaseName + "." + DbCommand.SYSTEM_COMMAND_COLLECTION, QueryCommand.OPTS_NO_CURSOR_TIMEOUT, 0, -1, {'getlasterror':1}, null);
-};
+DbCommand.createGetLastStatusCommand = DbCommand.createGetLastErrorCommand;
 
 DbCommand.createGetPreviousErrorsCommand = function(db) {
   return new DbCommand(db, db.databaseName + "." + DbCommand.SYSTEM_COMMAND_COLLECTION, QueryCommand.OPTS_NO_CURSOR_TIMEOUT, 0, -1, {'getpreverror':1}, null);
@@ -89,11 +102,20 @@ DbCommand.createResetErrorHistoryCommand = function(db) {
   return new DbCommand(db, db.databaseName + "." + DbCommand.SYSTEM_COMMAND_COLLECTION, QueryCommand.OPTS_NO_CURSOR_TIMEOUT, 0, -1, {'reseterror':1}, null);
 };
 
-DbCommand.createCreateIndexCommand = function(db, collectionName, fieldOrSpec, unique) {
-  var finalUnique = unique == null ? false : unique;
+DbCommand.createCreateIndexCommand = function(db, collectionName, fieldOrSpec, options) {
+  var finalUnique = options == null && !(options instanceof Object) ? false : options;
   var fieldHash = {};
   var indexes = [];
   var keys;
+  var sparse;
+  var background;
+  
+  // If the options is a hash
+  if(options instanceof Object) {
+    finalUnique = options['unique'] != null ? options['unique'] : false;
+    sparse = options['sparse'] != null ? options['sparse'] : false;
+    background = options['background'] != null ? options['background'] : false;
+  }
 
   // Get all the fields accordingly
   if (fieldOrSpec.constructor === String) {             // 'type'
@@ -130,10 +152,17 @@ DbCommand.createCreateIndexCommand = function(db, collectionName, fieldOrSpec, u
   // Generate the index name
   var indexName = indexes.join("_");
   // Build the selector
-  var selector = {'ns':(db.databaseName + "." + collectionName), 'unique':finalUnique, 'key':fieldHash, 'name':indexName};
+  var selector = {'ns':(db.databaseName + "." + collectionName), 'key':fieldHash, 'name':indexName};
+  selector['unique'] = finalUnique;
+  selector['sparse'] = sparse;
+  selector['background'] = background;
   // Create the insert command for the index and return the document
   return new InsertCommand(db, db.databaseName + "." + DbCommand.SYSTEM_INDEX_COLLECTION, false).add(selector);
 };
+
+DbCommand.logoutCommand = function(db, command_hash) {
+  return new DbCommand(db, db.databaseName + "." + DbCommand.SYSTEM_COMMAND_COLLECTION, QueryCommand.OPTS_NO_CURSOR_TIMEOUT, 0, -1, command_hash, null);
+}
 
 DbCommand.createDropIndexCommand = function(db, collectionName, indexName) {
   return new DbCommand(db, db.databaseName + "." + DbCommand.SYSTEM_COMMAND_COLLECTION, QueryCommand.OPTS_NO_CURSOR_TIMEOUT, 0, -1, {'deleteIndexes':collectionName, 'index':indexName}, null);
@@ -145,4 +174,8 @@ DbCommand.createDropDatabaseCommand = function(db) {
 
 DbCommand.createDbCommand = function(db, command_hash) {
   return new DbCommand(db, db.databaseName + "." + DbCommand.SYSTEM_COMMAND_COLLECTION, QueryCommand.OPTS_NO_CURSOR_TIMEOUT, 0, -1, command_hash, null);
+};
+
+DbCommand.createAdminDbCommand = function(db, command_hash) {
+  return new DbCommand(db, "admin." + DbCommand.SYSTEM_COMMAND_COLLECTION, QueryCommand.OPTS_NO_CURSOR_TIMEOUT, 0, -1, command_hash, null);
 };

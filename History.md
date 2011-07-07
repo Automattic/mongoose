@@ -1,4 +1,76 @@
 
+1.6.0 / 2011-07-07
+===================
+
+  * changed; .save() errors are now emitted on the instances db instead of the instance 9782463fc
+  * fixed; errors occurring when creating indexes now properly emit on db
+  * added; $maxDistance support to MongooseArrays
+  * fixed; RegExps now work with $all
+  * changed; node-mongodb-native driver to v0.9.6.4
+  * fixed; model names are now accessible via .modelName
+  * added; Query#slaveOk support
+
+1.5.0 / 2011-06-27
+===================
+
+  * changed; saving without a callback no longer ignores the error (@bnoguchi)
+  * changed; hook-js version bump to 0.1.9
+  * changed; node-mongodb-native version bumped to 0.9.6.1 - When .remove() doesn't
+             return an error, null is no longer passed.
+  * fixed; two memory leaks (@justmoon)
+  * added; sparse index support
+  * added; more ObjectId conditionals (gt, lt, gte, lte) (@phillyqueso)
+  * added; options are now passed in model#remote (@JerryLuke)
+
+1.4.0 / 2011-06-10
+===================
+
+  * bumped hooks-js dependency (fixes issue passing null as first arg to next())
+  * fixed; document#inspect now works properly with nested docs
+  * fixed; 'set' now works as a schema attribute (GH-365)
+  * fixed; _id is now set properly within pre-init hooks (GH-289)
+  * added; Query#distinct / Model#distinct support (GH-155)
+  * fixed; embedded docs now can use instance methods (GH-249)
+  * fixed; can now overwrite strings conflicting with schema type
+
+1.3.7 / 2011-06-03
+===================
+
+  * added MongooseArray#splice support
+  * fixed; 'path' is now a valid Schema pathname
+  * improved hooks (utilizing https://github.com/bnoguchi/hooks-js)
+  * fixed; MongooseArray#$shift now works (never did)
+  * fixed; Document.modified no longer throws
+  * fixed; modifying subdoc property sets modified paths for subdoc and parent doc
+  * fixed; marking subdoc path as modified properly persists the value to the db
+  * fixed; RexExps can again be saved ( #357 )
+
+1.3.6 / 2011-05-18
+===================
+
+  * fixed; corrected casting for queries against array types
+  * added; Document#set now accepts Document instances
+
+1.3.5 / 2011-05-17
+===================
+
+  * fixed; $ne queries work properly with single vals
+  * added; #inspect() methods to improve console.log output
+
+1.3.4 / 2011-05-17
+===================
+
+  * fixed; find by Date works as expected (#336)
+  * added; geospatial 2d index support
+  * added; support for $near (#309)
+  * updated; node-mongodb-native driver
+  * fixed; updating numbers work (#342)
+  * added; better error msg when try to remove an embedded doc without an _id (#307)
+  * added; support for 'on-the-fly' schemas (#227)
+  * changed; virtual id getters can now be skipped
+  * fixed; .index() called on subdoc schema now works as expected
+  * fixed; db.setProfile() now buffers until the db is open (#340)
+
 1.3.3 / 2011-04-27
 ===================
 

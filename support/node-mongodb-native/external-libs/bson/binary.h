@@ -34,6 +34,14 @@ class Binary : public ObjectWrap {
     static Handle<Value> Put(const Arguments &args);
     static Handle<Value> Write(const Arguments &args);
     static Handle<Value> Read(const Arguments &args);
+    
+    /**
+     * Writes this binary data into node Buffer passed as first js arg. 
+     * Optional second js arg: internal data offset of this binary (Integer)
+     * Up to Min(Buffer.length, Binary.length - offset) bytes will be writen into buffer.
+     * Return number of bytes actually written into buffer.
+     */
+    static Handle<Value> ReadInto(const Arguments &args);
 
     // Constructor used for creating new Long objects from C++
     static Persistent<FunctionTemplate> constructor_template;

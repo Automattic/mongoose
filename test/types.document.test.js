@@ -60,6 +60,24 @@ module.exports = {
       a.save(function(err){
         should.strictEqual(err, null);
       });
+    },
+
+    'objects can be passed to #set': function () {
+      var a = new Subdocument();
+      a.set({ test: 'paradiddle', work: 'good flam'});
+      a.test.should.eql('paradiddle');
+      a.work.should.eql('good flam');
+    },
+
+    'Subdocuments can be passed to #set': function () {
+      var a = new Subdocument();
+      a.set({ test: 'paradiddle', work: 'good flam'});
+      a.test.should.eql('paradiddle');
+      a.work.should.eql('good flam');
+      var b = new Subdocument();
+      b.set(a);
+      b.test.should.eql('paradiddle');
+      b.work.should.eql('good flam');
     }
 
 };

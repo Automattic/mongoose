@@ -1,12 +1,13 @@
 GLOBAL.DEBUG = true;
 
-sys = require("sys");
+sys = require("sys"),
+debug = require('util').debug,
+inspect = require('util').inspect,
 test = require("assert");
 
 var Db = require('../lib/mongodb').Db,
   Connection = require('../lib/mongodb').Connection,
   Server = require('../lib/mongodb').Server,
-  // BSON = require('../lib/mongodb').BSONPure;
   BSON = require('../lib/mongodb').BSONNative;
 
 var host = process.env['MONGO_NODE_DRIVER_HOST'] != null ? process.env['MONGO_NODE_DRIVER_HOST'] : 'localhost';
@@ -16,9 +17,9 @@ sys.puts("Connecting to " + host + ":" + port);
 var db = new Db('node-mongo-examples', new Server(host, port, {}), {native_parser:true});
 db.open(function(err, db) {
   db.dropDatabase(function(err, result) {
-    db.collection('test', function(err, collection) {
+    db.collection('test', function(err, collection) {      
       // Erase all records from the collection, if any
-      collection.remove(function(err, collection) {
+      collection.remove({}, function(err, result) {
         // Insert 3 records
         for(var i = 0; i < 3; i++) {
           collection.insert({'a':i});

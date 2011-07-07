@@ -148,7 +148,12 @@ Handle<Value> DBRef::DbGetter(Local<String> property, const AccessorInfo& info) 
   
   // Unpack the long object
   DBRef *dbref_obj = ObjectWrap::Unwrap<DBRef>(info.Holder());
+  
   // Char value
+  if(dbref_obj->db == NULL) {
+    return scope.Close(Null());
+  }
+  
   char *value = dbref_obj->db;
   // Return the value  
   return scope.Close(String::New(value));
@@ -160,20 +165,12 @@ void DBRef::DbSetter(Local<String> property, Local<Value> value, const AccessorI
 
 Handle<Value> DBRef::Inspect(const Arguments &args) {
   HandleScope scope;
-  
-  // // Unpack the ObjectID instance
-  // ObjectID *oid = ObjectWrap::Unwrap<ObjectID>(args.This());  
-  // Return the id
-  return String::New("DBRef::Inspect");
+  return ToJSON(args);
 }
 
 Handle<Value> DBRef::ToString(const Arguments &args) {
   HandleScope scope;
-
-  // // Unpack the ObjectID instance
-  // ObjectID *oid = ObjectWrap::Unwrap<ObjectID>(args.This());  
-  // Return the id
-  return String::New("DBRef::ToString");
+  return ToJSON(args);
 }
 
 Handle<Value> DBRef::ToJSON(const Arguments &args) {

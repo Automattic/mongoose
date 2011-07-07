@@ -10,7 +10,10 @@ using namespace node;
 
 class ObjectID : public ObjectWrap {  
   public:
-    char *oid;
+    
+    static const int32_t OBJECTID_SIZE = 24+1;
+    
+    char oid[OBJECTID_SIZE];
     
     ObjectID(char *oid);
     ~ObjectID();    
@@ -44,8 +47,8 @@ class ObjectID : public ObjectWrap {
     static Handle<Value> New(const Arguments &args);
     
     // Generates oid's (Based on BSON C lib)
-    static char *oid_id_generator();
-    static char *uint32_to_char(uint32_t value);    
+    static char *oid_id_generator(char* buffer);
+    static char *uint32_to_char(uint32_t value, char* buffer);    
 };
 
 #endif  // OBJECTID_H_

@@ -34,11 +34,11 @@ module.exports = {
 
     var postOne = new Decorated();
     postOne.set('adhoc', '9', Number);
-    postOne.path('adhoc').should.not.equal(undefined);
+    postOne._path('adhoc').should.not.equal(undefined);
 
     var postTwo = new Decorated();
-    postTwo.path('title').should.not.equal(undefined);
-    should.strictEqual(undefined, postTwo.path('adhoc'));
+    postTwo._path('title').should.not.equal(undefined);
+    should.strictEqual(undefined, postTwo._path('adhoc'));
     db.close();
   },
 
@@ -98,5 +98,8 @@ module.exports = {
         rankingPostCast.should.equal('1');
       });
     });
+  },
+  'should support on the fly nested documents': function () {
+    // TODO
   }
 };

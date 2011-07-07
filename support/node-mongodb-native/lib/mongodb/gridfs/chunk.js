@@ -1,5 +1,7 @@
 var BinaryParser = require('../bson/binary_parser').BinaryParser,
-  sys = require('sys');
+  sys = require('util'),
+  debug = require('util').debug,
+  inspect = require('util').inspect;
 
 /**
  * Class for representing a signle chunk in GridFS.
@@ -58,7 +60,8 @@ var Chunk = exports.Chunk = function(file, mongoObject) {
  *     will contain a reference to this object.
  */
 Chunk.prototype.write = function(data, callback) {
-  this.data.write(data.toString('binary'), this.internalPosition);
+  // this.data.write(data.toString('binary'), this.internalPosition);
+  this.data.write(data, this.internalPosition);
   this.internalPosition = this.data.length();
   callback(null, this);
 };
@@ -82,20 +85,20 @@ Chunk.prototype.read = function(length) {
 };
 
 Chunk.prototype.readSlice = function(length) {
-    if ((this.length() - this.internalPosition + 1) >= length) {
-        var data = null;
-        if (this.data.buffer != null) { //Pure BSON
-            data = this.data.buffer.slice(this.internalPosition, this.internalPosition + length);
-        } else { //Native BSON
-            data = new Buffer(length);
-            //todo there is performance degradation! we need direct Binary::write() into buffer with offset support!
-            length = data.write(this.data.read(this.internalPosition, length), 'binary', 0);
-        }
-        this.internalPosition = this.internalPosition + length;
-        return data;
-    } else {
-        return null;
+  if ((this.length() - this.internalPosition + 1) >= length) {
+    var data = null;
+    if (this.data.buffer != null) { //Pure BSON
+      data = this.data.buffer.slice(this.internalPosition, this.internalPosition + length);
+    } else { //Native BSON
+      data = new Buffer(length);
+      //length = data.write(this.data.read(this.internalPosition, length), 'binary', 0);
+      length = this.data.readInto(data, this.internalPosition);
     }
+    this.internalPosition = this.internalPosition + length;
+    return data;
+  } else {
+    return null;
+  }
 };
 
 /**
@@ -140,10 +143,11 @@ Chunk.prototype.save = function(callback) {
   var self = this;
 
   self.file.chunkCollection(function(err, collection) {
-    collection.remove({'_id':self.objectId}, function(err, collection) {
+    collection.remove({'_id':self.objectId}, {safe:true}, function(err, result) {
       if(self.data.length() > 0) {
         self.buildMongoObject(function(mongoObject) {
-          collection.insert(mongoObject, function(collection) {
+          
+          collection.insert(mongoObject, {safe:true}, function(err, collection) {
             callback(null, self);
           });
         });

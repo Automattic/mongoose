@@ -8,7 +8,6 @@ var Db = require('../lib/mongodb').Db,
   DbCommand = require('../lib/mongodb/commands/db_command').DbCommand,
   Connection = require('../lib/mongodb').Connection,
   Server = require('../lib/mongodb').Server,
-  ServerCluster = require('../lib/mongodb').ServerCluster,  
   // BSON = require('../lib/mongodb').BSONPure;
   ReplSetServers = require('../lib/mongodb').ReplSetServers,
    CheckMaster = require('../lib/mongodb').CheckMaster,

@@ -1,6 +1,6 @@
 var BaseCommand = require('./base_command').BaseCommand,
   BinaryParser = require('../bson/binary_parser').BinaryParser,
-  inherits = require('sys').inherits;
+  inherits = require('util').inherits;
 
 /**
   Get More Document Command

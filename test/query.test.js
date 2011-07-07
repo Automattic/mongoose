@@ -8,12 +8,23 @@ var Query = require('mongoose/query')
   , mongoose = start.mongoose
   , DocumentObjectId = mongoose.Types.ObjectId
   , Schema = mongoose.Schema
+  , should = require('should')
+
+var Comment = new Schema({
+    text: String
+});
 
 var Product = new Schema({
     tags: {} // mixed
+  , array: Array
+  , ids: [Schema.ObjectId]
+  , strings: [String]
+  , numbers: [Number]
+  , comments: [Comment]
 });
 
 mongoose.model('Product', Product);
+mongoose.model('Comment', Comment);
 
 /**
  * Test.
@@ -297,6 +308,15 @@ module.exports = {
     query._conditions.should.eql({checkin: {$near: [40, -72]}});
   },
 
+  'test Query#maxDistance via where': function () {
+    var query = new Query();
+    query.where('checkin').near([40, -72]).maxDistance(1);
+    query._conditions.should.eql({checkin: {$near: [40, -72], $maxDistance: 1}});
+    query = new Query();
+    query.where('checkin').near([40, -72]).$maxDistance(1);
+    query._conditions.should.eql({checkin: {$near: [40, -72], $maxDistance: 1}});
+  },
+
   'test Query#wherein.box not via where': function () {
     var query = new Query();
     query.wherein.box('gps', {ll: [5, 25], ur: [10, 30]});
@@ -547,12 +567,139 @@ module.exports = {
     db.close();
   },
 
+  //'throwing inside a query callback should not execute the callback again': function () {
+    //var query = new Query();
+    //var db = start();
+    //var Product = db.model('Product');
+
+    //var threw = false;
+    //Product.find({}, function (err) {
+      //if (!threw) {
+        //db.close();
+        //threw = true;
+        //throw new Error("Double callback");
+      //}
+
+      //should.strictEqual(err, null, 'Double callback detected');
+    //});
+  //},
+
+  'Query#find $ne should not cast single value to array for schematype of Array': function () {
+    var query = new Query();
+    var db = start();
+    var Product = db.model('Product');
+    var Comment = db.model('Comment');
+    db.close();
+
+    var id = new DocumentObjectId;
+    var castedComment = { _id: id, text: 'hello there' };
+    var comment = new Comment(castedComment);
+
+    var params = {
+        array: { $ne: 5 }
+      , ids: { $ne: id }
+      , comments: { $ne: comment }
+      , strings: { $ne: 'Hi there' }
+      , numbers: { $ne: 10000 }
+    };
+
+    query.cast(Product, params);
+    params.array.$ne.should.equal(5);
+    params.ids.$ne.should.eql(id);
+    params.comments.$ne.should.eql(castedComment);
+    params.strings.$ne.should.eql('Hi there');
+    params.numbers.$ne.should.eql(10000);
+
+    params.array.$ne = [5];
+    params.ids.$ne = [id];
+    params.comments.$ne = [comment];
+    params.strings.$ne = ['Hi there'];
+    params.numbers.$ne = [10000];
+    query.cast(Product, params);
+    params.array.$ne.should.be.instanceof(Array);
+    params.array.$ne[0].should.eql(5);
+    params.ids.$ne.should.be.instanceof(Array);
+    params.ids.$ne[0].toString().should.eql(id.toString());
+    params.comments.$ne.should.be.instanceof(Array);
+    params.comments.$ne[0].toObject().should.eql(castedComment);
+    params.strings.$ne.should.be.instanceof(Array);
+    params.strings.$ne[0].should.eql('Hi there');
+    params.numbers.$ne.should.be.instanceof(Array);
+    params.numbers.$ne[0].should.eql(10000);
+  },
+
+  'Query#find should not cast single value to array for schematype of Array': function () {
+    var query = new Query();
+    var db = start();
+    var Product = db.model('Product');
+    var Comment = db.model('Comment');
+    db.close();
+
+    var id = new DocumentObjectId;
+    var castedComment = { _id: id, text: 'hello there' };
+    var comment = new Comment(castedComment);
+
+    var params = {
+        array: 5
+      , ids: id
+      , comments: comment
+      , strings: 'Hi there'
+      , numbers: 10000
+    };
+
+    query.cast(Product, params);
+    params.array.should.equal(5);
+    params.ids.should.eql(id);
+    params.comments.should.eql(castedComment);
+    params.strings.should.eql('Hi there');
+    params.numbers.should.eql(10000);
+
+    params.array = [5];
+    params.ids = [id];
+    params.comments = [comment];
+    params.strings = ['Hi there'];
+    params.numbers = [10000];
+    query.cast(Product, params);
+    params.array.should.be.instanceof(Array);
+    params.array[0].should.eql(5);
+    params.ids.should.be.instanceof(Array);
+    params.ids[0].toString().should.eql(id.toString());
+    params.comments.should.be.instanceof(Array);
+    params.comments[0].toObject().should.eql(castedComment);
+    params.strings.should.be.instanceof(Array);
+    params.strings[0].should.eql('Hi there');
+    params.numbers.should.be.instanceof(Array);
+    params.numbers[0].should.eql(10000);
+  },
+
+  'distinct Query op should be "distinct"': function () {
+    var query = new Query();
+    var db = start();
+    var Product = db.model('Product');
+    db.close();
+    new Query().bind(Product, 'distinct').distinct('blah', function(){}).op.should.equal('distinct');
+  },
+
   // Advanced Query options
 
   'test Query#maxscan': function () {
     var query = new Query();
     query.maxscan(100);
     query.options.maxscan.should.equal(100);
+  },
+
+  'test Query#slaveOk': function () {
+    var query = new Query();
+    query.slaveOk();
+    query.options.slaveOk.should.be.true;
+
+    var query = new Query();
+    query.slaveOk(true);
+    query.options.slaveOk.should.be.true;
+
+    var query = new Query();
+    query.slaveOk(false);
+    query.options.slaveOk.should.be.false;
   },
 
   'test Query#hint': function () {

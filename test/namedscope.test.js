@@ -141,7 +141,7 @@ module.exports = {
       , {gender: 'female'}
       , function (err, _) {
           UserNS.male.remove( function (err) {
-            should.strictEqual(err, null);
+            should.strictEqual(!!err, false);
             UserNS.male.find( function (err, found) {
               db.close();
               should.strictEqual(err, null);

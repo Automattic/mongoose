@@ -1188,8 +1188,6 @@ module.exports = {
   },
 
   'test "type" is allowed as a key': function(){
-    var now = Date.now();
-
     mongoose.model('TestTypeDefaults', new Schema({
         type: { type: String, default: 'YES!' }
     }));
@@ -1200,7 +1198,20 @@ module.exports = {
     var post = new TestDefaults();
     post.get('type').should.be.a('string');
     post.get('type').should.eql('YES!');
-    db.close();
+
+    // GH-402
+    var TestDefaults2 = db.model('TestTypeDefaults2', new Schema({
+        x: { y: { type: { type: String }, owner: String } }
+    }));
+
+    var post = new TestDefaults2;
+    post.x.y.type = "#402";
+    post.x.y.owner= "me";
+    post.save(function (err) {
+      db.close();
+      should.strictEqual(null, err);
+    });
+
   },
 
   'test nested defaults application': function(){

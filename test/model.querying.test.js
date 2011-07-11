@@ -507,12 +507,10 @@ module.exports = {
           nes1.length.should.eql(1);
 
           NE.find({ b: { $ne: [1] }}, function (err, nes2) {
-            should.strictEqual(err, null);
-            nes2.length.should.eql(2);
+            err.message.should.eql("Invalid ObjectId");
 
             NE.find({ b: { $ne: 4 }}, function (err, nes3) {
-              should.strictEqual(err, null);
-              nes3.length.should.eql(2);
+              err.message.should.eql("Invalid ObjectId");
 
               NE.find({ b: id3, ids: { $ne: id4 }}, function (err, nes4) {
                 db.close();

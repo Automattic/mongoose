@@ -109,7 +109,7 @@ var tests = testCase({
             test.ok(explaination.n.constructor == Number);
             test.ok(explaination.millis.constructor == Number);
             test.ok(explaination.nscanned.constructor == Number);
-
+  
             // Let's close the db
             test.done();
           });
@@ -123,11 +123,11 @@ var tests = testCase({
       collection.find(function(err, cursor) {
         cursor.count(function(err, count) {
           test.equal(0, count);
-
+  
           Step(
             function insert() {
               var group = this.group();
-
+  
               for(var i = 0; i < 10; i++) {
                 collection.insert({'x':i}, {safe:true}, group());
               }
@@ -138,19 +138,19 @@ var tests = testCase({
                   test.equal(10, count);
                   test.ok(count.constructor == Number);
               });
-
+  
               collection.find({}, {'limit':5}).count(function(err, count) {
                 test.equal(10, count);
               });
-
+  
               collection.find({}, {'skip':5}).count(function(err, count) {
                 test.equal(10, count);
               });
-
+  
               collection.find(function(err, cursor) {
                 cursor.count(function(err, count) {
                   test.equal(10, count);
-
+  
                   cursor.each(function(err, item) {
                     if(item == null) {
                       cursor.count(function(err, count2) {
@@ -163,7 +163,7 @@ var tests = testCase({
                   });
                 });
               });
-
+  
               client.collection('acollectionthatdoesn', function(err, collection) {
                 collection.count(function(err, count) {
                   test.equal(0, count);
@@ -181,7 +181,7 @@ var tests = testCase({
       Step(
         function insert() {
           var group = this.group();
-
+  
           for(var i = 0; i < 5; i++) {
             collection.insert({'a':i}, {safe:true}, group());
           }
@@ -194,7 +194,7 @@ var tests = testCase({
               test.deepEqual(['a', 1], cursor.sortValue);
             });
           });
-
+  
           collection.find(function(err, cursor) {
             cursor.sort('a', 1, function(err, cursor) {
               cursor.nextObject(function(err, doc) {
@@ -202,7 +202,7 @@ var tests = testCase({
               });
             });
           });
-
+  
           collection.find(function(err, cursor) {
             cursor.sort('a', -1, function(err, cursor) {
               cursor.nextObject(function(err, doc) {
@@ -210,7 +210,7 @@ var tests = testCase({
               });
             });
           });
-
+  
           collection.find(function(err, cursor) {
             cursor.sort('a', "asc", function(err, cursor) {
               cursor.nextObject(function(err, doc) {
@@ -218,14 +218,14 @@ var tests = testCase({
               });
             });
           });
-
+  
           collection.find(function(err, cursor) {
             cursor.sort([['a', -1], ['b', 1]], function(err, cursor) {
               test.ok(cursor instanceof Cursor);
               test.deepEqual([['a', -1], ['b', 1]], cursor.sortValue);
             });
           });
-
+  
           collection.find(function(err, cursor) {
             cursor.sort('a', 1, function(err, cursor) {
               cursor.sort('a', -1, function(err, cursor) {
@@ -235,7 +235,7 @@ var tests = testCase({
               })
             });
           });
-
+  
           collection.find(function(err, cursor) {
             cursor.sort('a', -1, function(err, cursor) {
               cursor.sort('a', 1, function(err, cursor) {
@@ -245,7 +245,7 @@ var tests = testCase({
               })
             });
           });
-
+  
           collection.find(function(err, cursor) {
             cursor.nextObject(function(err, doc) {
               cursor.sort(['a'], function(err, cursor) {
@@ -254,7 +254,7 @@ var tests = testCase({
               });
             });
           });
-
+  
           collection.find(function(err, cursor) {
             cursor.sort('a', 25, function(err, cursor) {
               cursor.nextObject(function(err, doc) {
@@ -263,7 +263,7 @@ var tests = testCase({
               });
             });
           });
-
+  
           collection.find(function(err, cursor) {
             cursor.sort(25, function(err, cursor) {
               cursor.nextObject(function(err, doc) {
@@ -284,7 +284,7 @@ var tests = testCase({
       Step(
         function insert() {
           var group = this.group();
-
+  
           for(var i = 0; i < 2; i++) {
             collection.save({'x':1}, {safe:true}, group());
           }
@@ -307,7 +307,7 @@ var tests = testCase({
       Step(
         function insert() {
           var group = this.group();
-
+  
           for(var i = 0; i < 2; i++) {
             collection.save({'x':1}, {safe:true}, group());
           }
@@ -324,13 +324,13 @@ var tests = testCase({
       )
     });
   },
-
+  
   shouldCorrectlyHandleLimitOnCursor : function(test) {
     client.createCollection('test_cursor_limit', function(err, collection) {
       Step(
         function insert() {
           var group = this.group();
-
+  
           for(var i = 0; i < 10; i++) {
             collection.save({'x':1}, {safe:true}, group());
           }
@@ -379,7 +379,7 @@ var tests = testCase({
           cursor.limit(1, function(err, cursor) {
             test.ok(err instanceof Error);
             test.equal("Cursor is closed", err.message);
-
+  
             test.done();
           });
         });
@@ -392,7 +392,7 @@ var tests = testCase({
       Step(
         function insert() {
           var group = this.group();
-
+  
           for(var i = 0; i < 10; i++) {
             collection.insert({'x':i}, {safe:true}, group());
           }
@@ -404,25 +404,25 @@ var tests = testCase({
               test.equal(10, count);
             });
           });
-
+  
           collection.find(function(err, cursor) {
             cursor.toArray(function(err, items) {
               test.equal(10, items.length);
-
+  
               collection.find(function(err, cursor) {
                 cursor.skip(2, function(err, cursor) {
                   cursor.toArray(function(err, items2) {
                     test.equal(8, items2.length);
-
+  
                     // Check that we have the same elements
                     var numberEqual = 0;
                     var sliced = items.slice(2, 10);
-
+  
                     for(var i = 0; i < sliced.length; i++) {
                       if(sliced[i].x == items2[i].x) numberEqual = numberEqual + 1;
                     }
                     test.equal(8, numberEqual);
-
+  
                     // Let's close the db
                     test.done();
                   });
@@ -500,7 +500,7 @@ var tests = testCase({
       });
     });
   },
-
+  
   shouldCorrectlyHandleChangesInBatchSizes : function(test) {
     client.createCollection('test_not_multiple_batch_size', function(err, collection) {
       var records = 6;
@@ -509,7 +509,7 @@ var tests = testCase({
       for(var i = 0; i < records; i++) {
         docs.push({'a':i});
       }
-
+  
       collection.insert(docs, {safe:true}, function() {
         collection.find({}, {batchSize : batchSize}, function(err, cursor) {
           //1st
@@ -517,36 +517,36 @@ var tests = testCase({
             //cursor.items should contain 1 since nextObject already popped one
             test.equal(1, cursor.items.length);
             test.ok(items != null);
-
+  
             //2nd
             cursor.nextObject(function(err, items) {
               test.equal(0, cursor.items.length);
               test.ok(items != null);
-
+  
               //test batch size modification on the fly
               batchSize = 3;
               cursor.batchSize(batchSize);
-
+  
               //3rd
               cursor.nextObject(function(err, items) {
                 test.equal(2, cursor.items.length);
                 test.ok(items != null);
-
+  
                 //4th
                 cursor.nextObject(function(err, items) {
                   test.equal(1, cursor.items.length);
                   test.ok(items != null);
-
+  
                   //5th
                   cursor.nextObject(function(err, items) {
                     test.equal(0, cursor.items.length);
                     test.ok(items != null);
-
+  
                     //6th
                     cursor.nextObject(function(err, items) {
                       test.equal(0, cursor.items.length);
                       test.ok(items != null);
-
+  
                       //No more
                       cursor.nextObject(function(err, items) {
                         test.ok(items == null);
@@ -574,29 +574,29 @@ var tests = testCase({
       for(var i = 0; i < records; i++) {
         docs.push({'a':i});
       }
-
+  
       collection.insert(docs, {safe:true}, function() {
         collection.find({}, {batchSize : batchSize}, function(err, cursor) {
           //1st
           cursor.nextObject(function(err, items) {
             test.equal(1, cursor.items.length);
             test.ok(items != null);
-
+  
             //2nd
             cursor.nextObject(function(err, items) {
               test.equal(0, cursor.items.length);
               test.ok(items != null);
-
+  
               //3rd
               cursor.nextObject(function(err, items) {
                 test.equal(1, cursor.items.length);
                 test.ok(items != null);
-
+  
                 //4th
                 cursor.nextObject(function(err, items) {
                   test.equal(0, cursor.items.length);
                   test.ok(items != null);
-
+  
                   //No more
                   cursor.nextObject(function(err, items) {
                     test.ok(items == null);
@@ -612,7 +612,7 @@ var tests = testCase({
       });
     });
   },
-
+  
   shouldHandleWhenLimitBiggerThanBatchSize : function(test) {
     client.createCollection('test_limit_greater_than_batch_size', function(err, collection) {
       var limit = 4;
@@ -622,21 +622,21 @@ var tests = testCase({
       for(var i = 0; i < records; i++) {
         docs.push({'a':i});
       }
-
+  
       collection.insert(docs, {safe:true}, function() {
         collection.find({}, {batchSize : batchSize, limit : limit}, function(err, cursor) {
           //1st
           cursor.nextObject(function(err, items) {
             test.equal(2, cursor.items.length);
-
+  
             //2nd
             cursor.nextObject(function(err, items) {
               test.equal(1, cursor.items.length);
-
+  
               //3rd
               cursor.nextObject(function(err, items) {
                 test.equal(0, cursor.items.length);
-
+  
                 //4th
                 cursor.nextObject(function(err, items) {
                   test.equal(0, cursor.items.length);
@@ -656,7 +656,7 @@ var tests = testCase({
       });
     });
   },
-
+  
   shouldHandleLimitLessThanBatchSize : function(test) {
     client.createCollection('test_limit_less_than_batch_size', function(err, collection) {
       var limit = 2;
@@ -666,22 +666,22 @@ var tests = testCase({
       for(var i = 0; i < records; i++) {
         docs.push({'a':i});
       }
-
+  
       collection.insert(docs, {safe:true}, function() {
         collection.find({}, {batchSize : batchSize, limit : limit}, function(err, cursor) {
           //1st
           cursor.nextObject(function(err, items) {
             test.equal(1, cursor.items.length);
-
+  
             //2nd
             cursor.nextObject(function(err, items) {
               test.equal(0, cursor.items.length);
-
+  
               //No more
               cursor.nextObject(function(err, items) {
                 test.ok(items == null);
                 test.ok(cursor.isClosed());
-
+  
                 test.done();
               });
             });
@@ -690,13 +690,13 @@ var tests = testCase({
       });
     });
   },
-
+  
   shouldHandleSkipLimitChaining : function(test) {
     client.createCollection('test_limit_skip_chaining', function(err, collection) {
       Step(
         function insert() {
           var group = this.group();
-
+  
           for(var i = 0; i < 10; i++) {
             collection.insert({'x':1}, {safe:true}, group());
           }
@@ -706,22 +706,22 @@ var tests = testCase({
           collection.find(function(err, cursor) {
             cursor.toArray(function(err, items) {
               test.equal(10, items.length);
-
+  
               collection.find(function(err, cursor) {
                 cursor.limit(5, function(err, cursor) {
                   cursor.skip(3, function(err, cursor) {
                     cursor.toArray(function(err, items2) {
                       test.equal(5, items2.length);
-
+  
                       // Check that we have the same elements
                       var numberEqual = 0;
                       var sliced = items.slice(3, 8);
-
+  
                       for(var i = 0; i < sliced.length; i++) {
                         if(sliced[i].x == items2[i].x) numberEqual = numberEqual + 1;
                       }
                       test.equal(5, numberEqual);
-
+  
                       // Let's close the db
                       test.done();
                     });
@@ -740,7 +740,7 @@ var tests = testCase({
       Step(
         function insert() {
           var group = this.group();
-
+  
           for(var i = 0; i < 10; i++) {
             collection.insert({'x':1}, {safe:true}, group());
           }
@@ -750,20 +750,20 @@ var tests = testCase({
           collection.find(function(err, cursor) {
             cursor.toArray(function(err, items) {
               test.equal(10, items.length);
-
+  
               collection.find(function(err, cursor) {
                 cursor.limit(5).skip(3).toArray(function(err, items2) {
                   test.equal(5, items2.length);
-
+  
                   // Check that we have the same elements
                   var numberEqual = 0;
                   var sliced = items.slice(3, 8);
-
+  
                   for(var i = 0; i < sliced.length; i++) {
                     if(sliced[i].x == items2[i].x) numberEqual = numberEqual + 1;
                   }
                   test.equal(5, numberEqual);
-
+  
                   // Let's close the db
                   test.done();
                 });
@@ -792,7 +792,7 @@ var tests = testCase({
       Step(
         function insert() {
           var group = this.group();
-
+  
           for(var i = 0; i < 1000; i++) { 
             collection.save({'a': i}, {safe:true}, group()); 
           }
@@ -802,7 +802,7 @@ var tests = testCase({
           collection.count(function(err, count) {
             test.equal(1000, count);
           });
-
+  
           var total = 0;
           collection.find(function(err, cursor) {
             cursor.each(function(err, item) {
@@ -810,14 +810,14 @@ var tests = testCase({
                 total = total + item.a;
               } else {
                 test.equal(499500, total);
-
+  
                 collection.count(function(err, count) {
                   test.equal(1000, count);
                 });
-
+  
                 collection.count(function(err, count) {
                   test.equal(1000, count);
-
+  
                   var total2 = 0;
                   collection.find(function(err, cursor) {
                     cursor.each(function(err, item) {
@@ -845,11 +845,11 @@ var tests = testCase({
   
   shouldCorrectlyRefillViaGetMoreAlternativeCollection : function(test) {
     client.createCollection('test_refill_via_get_more_alt_coll', function(err, collection) {
-
+  
       Step(
         function insert() {
           var group = this.group();
-
+  
           for(var i = 0; i < 1000; i++) { 
             collection.save({'a': i}, {safe:true}, group()); 
           }
@@ -859,7 +859,7 @@ var tests = testCase({
           collection.count(function(err, count) {
             test.equal(1000, count);
           });
-
+  
           var total = 0;
           collection.find(function(err, cursor) {
             cursor.each(function(err, item) {
@@ -867,14 +867,14 @@ var tests = testCase({
                 total = total + item.a;
               } else {
                 test.equal(499500, total);
-
+  
                 collection.count(function(err, count) {
                   test.equal(1000, count);
                 });
-
+  
                 collection.count(function(err, count) {
                   test.equal(1000, count);
-
+  
                   var total2 = 0;
                   collection.find(function(err, cursor) {
                     cursor.each(function(err, item) {
@@ -933,7 +933,7 @@ var tests = testCase({
       });
     });
   },
-
+  
   shouldCorrectlyCountWithFieldsUsingExclude : function(test) {
     client.createCollection('test_count_with_fields_using_exclude', function(err, collection) {
       collection.save({'x':1, 'a':2}, {safe:true}, function(err, doc) {

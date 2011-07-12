@@ -537,11 +537,13 @@ Collection.prototype.findAndModify = function findAndModify (query, sort, doc, o
     queryObject.update = doc;
   }
 
-  this.db.executeDbCommand(queryObject, function (err, doc) {
+  this.db.executeDbCommand(queryObject, function (err, result) {
     if (err) {
-      callback(err, doc)
+      callback(err);
+    } else if (result.documents[0].ok != 1) {
+      callback(new Error(result.documents[0].errmsg));
     } else {
-      callback(err, doc.documents[0].value)
+      callback(err, result.documents[0].value)
     }
   });
 }
@@ -674,7 +676,7 @@ Collection.prototype.normalizeHintField = function normalizeHintField (hint) {
 /**
  * Finds one document.
  *
- * @param {Object} queryQbject
+ * @param {Object} queryObject
  * @param {Object} options
  * @param {Function} callback
  */
@@ -682,7 +684,7 @@ Collection.prototype.normalizeHintField = function normalizeHintField (hint) {
 Collection.prototype.findOne = function findOne (queryObject, options, callback) {
   if ('function' === typeof queryObject) {
     callback = queryObject;
-    queryQbject = {};
+    queryObject = {};
     options = {};
   } else if ('function' === typeof options) {
     callback = options;
@@ -769,11 +771,17 @@ Collection.prototype.ensureIndex = function ensureIndex (fieldOrSpec, options, c
 /**
  * Retrieves this collections index info.
  *
+ * @param {Object} options -
+ *        full: {Bool} set to true to remove raw index information
  * @param {Function} callback
  */
-
-Collection.prototype.indexInformation = function indexInformation (callback) {
-  this.db.indexInformation(this.collectionName, callback);
+Collection.prototype.indexInformation = function indexInformation (options, callback) {
+  // Unpack calls
+  var args = Array.prototype.slice.call(arguments, 0);
+  callback = args.pop();
+  options = args.length ? args.shift() : {};
+  // Call the index information
+  this.db.indexInformation(this.collectionName, options, callback);
 };
 
 /**

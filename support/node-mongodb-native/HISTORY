@@ -1,3 +1,15 @@
+0.9.6-6 2011-07-12
+* FindAndModify not returning error message as other methods Issue #277
+* Added test coverage for $push, $pushAll and $inc atomic operations
+* Correct Error handling for non 12/24 bit ids on Pure JS ObjectID class Issue #276
+* Fixed terrible deserialization bug in js bson code #285
+* Fix by andrewjstone to avoid throwing errors when this.primary not defined
+
+0.9.6-5 2011-07-06
+* Rewritten BSON js parser now faster than the C parser on my core2duo laptop
+* Added option full to indexInformation to get all index info Issue #265
+* Passing in ObjectID for new Gridstore works correctly Issue #272
+
 0.9.6-4 2011-07-01
 * Added test and bug fix for insert/update/remove without callback supplied
 

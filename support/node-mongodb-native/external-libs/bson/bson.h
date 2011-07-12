@@ -22,6 +22,10 @@ class BSON : public EventEmitter {
     static Handle<Value> ToLong(const Arguments &args);
     static Handle<Value> ToInt(const Arguments &args);
   
+    // Calculate size of function
+    static Handle<Value> CalculateObjectSize(const Arguments &args);
+    static Handle<Value> SerializeWithBufferAndIndex(const Arguments &args);
+  
     // Constructor used for creating new BSON objects from C++
     static Persistent<FunctionTemplate> constructor_template;
 

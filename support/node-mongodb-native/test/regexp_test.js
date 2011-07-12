@@ -42,21 +42,21 @@ var tests = testCase({
     }      
   },
   
-  shouldCorrectlyInsertSimpleRegExpDocument : function(test) {
-    var regexp = /foobar/i;
-
-    client.createCollection('test_regex', function(err, collection) {
-      collection.insert({'b':regexp}, {safe:true}, function(err, ids) {
-        collection.find({}, {'fields': ['b']}, function(err, cursor) {
-          cursor.toArray(function(err, items) {
-            test.equal(("" + regexp), ("" + items[0].b));
-            // Let's close the db
-            test.done();
-          });
-        });
-      });
-    });
-  },
+  // shouldCorrectlyInsertSimpleRegExpDocument : function(test) {
+  //   var regexp = /foobar/i;
+  // 
+  //   client.createCollection('test_regex', function(err, collection) {
+  //     collection.insert({'b':regexp}, {safe:true}, function(err, ids) {
+  //       collection.find({}, {'fields': ['b']}, function(err, cursor) {
+  //         cursor.toArray(function(err, items) {
+  //           test.equal(("" + regexp), ("" + items[0].b));
+  //           // Let's close the db
+  //           test.done();
+  //         });
+  //       });
+  //     });
+  //   });
+  // },
   
   shouldCorrectlyInsertSimpleUTF8Regexp : function(test) {
     var regexp = /foobaré/;
@@ -74,29 +74,29 @@ var tests = testCase({
     });    
   },
   
-  shouldCorrectlyFindDocumentsByRegExp : function(test) {
-    // Serialized regexes contain extra trailing chars. Sometimes these trailing chars contain / which makes
-    // the original regex invalid, and leads to segmentation fault.
-    client.createCollection('test_regex_serialization', function(err, collection) {
-      collection.insert({keywords: ["test", "segmentation", "fault", "regex", "serialization", "native"]}, {safe:true}, function(err, r) {
-        
-        var count = 20,
-            run = function(i) {
-              // search by regex            
-              collection.findOne({keywords: {$all: [/ser/, /test/, /seg/, /fault/, /nat/]}}, function(err, item) {            
-                test.equal(6, item.keywords.length);              
-                if (i === 0) {
-                 test.done()
-               }
-              });
-            };
-        // loop a few times to catch the / in trailing chars case
-        while (count--) {
-          run(count);
-        }
-      });      
-    });    
-  }
+  // shouldCorrectlyFindDocumentsByRegExp : function(test) {
+  //   // Serialized regexes contain extra trailing chars. Sometimes these trailing chars contain / which makes
+  //   // the original regex invalid, and leads to segmentation fault.
+  //   client.createCollection('test_regex_serialization', function(err, collection) {
+  //     collection.insert({keywords: ["test", "segmentation", "fault", "regex", "serialization", "native"]}, {safe:true}, function(err, r) {
+  //       
+  //       var count = 20,
+  //           run = function(i) {
+  //             // search by regex            
+  //             collection.findOne({keywords: {$all: [/ser/, /test/, /seg/, /fault/, /nat/]}}, function(err, item) {            
+  //               test.equal(6, item.keywords.length);              
+  //               if (i === 0) {
+  //                test.done()
+  //              }
+  //             });
+  //           };
+  //       // loop a few times to catch the / in trailing chars case
+  //       while (count--) {
+  //         run(count);
+  //       }
+  //     });      
+  //   });    
+  // }
 })
 
 // Stupid freaking workaround due to there being no way to run setup once for each suite

@@ -184,12 +184,19 @@ Handle<Value> Binary::Write(const Arguments &args) {
   HandleScope scope;
   
   // Ensure we have the right parameters
-  if(args.Length() != 1 && (!args[0]->IsString() || Buffer::HasInstance(args[0]))) return VException("Function takes one argument of type String or Buffer");
+  if(args.Length() == 1 && (!args[0]->IsString() || Buffer::HasInstance(args[0]))) return VException("Function takes one argument of type String or Buffer");
+  if(args.Length() == 2 && (!args[0]->IsString() || Buffer::HasInstance(args[0])) && !args[1]->IsUint32()) return VException("Function takes one argument of type String or Buffer");
   
   // Reference variables
   char *data;
   uint32_t length;
+  uint32_t offset = 0;
   Local<Object> obj = args[0]->ToObject();
+  
+  // Unpack the offset value
+  if(args.Length() == 2) {
+    offset = args[1]->ToUint32()->Value();
+  }
   
   // If we have a buffer let's retrieve the data
   if(Buffer::HasInstance(obj)) {
@@ -218,10 +225,13 @@ Handle<Value> Binary::Write(const Arguments &args) {
     binary->number_of_bytes = (binary->number_of_bytes * 2) + length;
   }
   
+  // If no offset specified use internal index
+  if(offset == 0) offset = binary->index;
+  
   // Write the element out
-  memcpy((binary->data + binary->index), data, length);
+  memcpy((binary->data + offset), data, length);
   // Update the index pointer
-  binary->index = binary->index + length;
+  binary->index = offset + length;
   // free the memory if we have allocated
   if(!Buffer::HasInstance(args[0])) {
     free(data);

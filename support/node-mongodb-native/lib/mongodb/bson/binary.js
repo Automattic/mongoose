@@ -14,15 +14,15 @@ var bson = require('./bson'),
  * @param {Buffer} buffer (optional)
  */
 
-function Binary (buffer, subType) {
+function Binary(buffer, subType) {  
   if(buffer instanceof Number) {
     this.sub_type = buffer;
   } else {    
     this.sub_type = subType == null ? bson.BSON.BSON_BINARY_SUBTYPE_DEFAULT : subType;
   }
 
-  if (buffer != null && !(buffer instanceof Number)) {
-    this.buffer = buffer;
+  if(buffer != null && !(buffer instanceof Number)) {
+    this.buffer = typeof buffer == 'string' ? new Buffer(buffer) : buffer;
     this.position = buffer.length;
   } else {
     this.buffer = new Buffer(Binary.BUFFER_SIZE);
@@ -98,8 +98,9 @@ Binary.prototype.read = function read (position, length) {
  * @return {String}
  */
 
-Binary.prototype.value = function value () {
-  return this.buffer.toString('binary', 0, this.position);
+Binary.prototype.value = function value(asRaw) {
+  asRaw = asRaw == null ? false : asRaw;  
+  return asRaw ? this.buffer.slice(0, this.position) : this.buffer.toString('binary', 0, this.position);
 };
 
 /**

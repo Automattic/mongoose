@@ -21,6 +21,7 @@ var BinaryParser = require('../bson/binary_parser').BinaryParser,
 var Chunk = exports.Chunk = function(file, mongoObject) {
   this.file = file;
   var mongoObjectFinal = mongoObject == null ? {} : mongoObject;
+
   this.objectId = mongoObjectFinal._id == null ? new file.db.bson_serializer.ObjectID() : mongoObjectFinal._id;
   this.chunkNumber = mongoObjectFinal.n == null ? 0 : mongoObjectFinal.n;
   this.data = new file.db.bson_serializer.Binary();
@@ -36,6 +37,7 @@ var Chunk = exports.Chunk = function(file, mongoObject) {
     this.data = new file.db.bson_serializer.Binary(buffer);
   } else if(mongoObjectFinal.data instanceof file.db.bson_serializer.Binary || Object.prototype.toString.call(mongoObjectFinal.data) == "[object Binary]") {    
     this.data = mongoObjectFinal.data;
+  } else if(mongoObjectFinal.data instanceof Buffer) {
   } else {
     throw Error("Illegal chunk format");
   }
@@ -60,7 +62,6 @@ var Chunk = exports.Chunk = function(file, mongoObject) {
  *     will contain a reference to this object.
  */
 Chunk.prototype.write = function(data, callback) {
-  // this.data.write(data.toString('binary'), this.internalPosition);
   this.data.write(data, this.internalPosition);
   this.internalPosition = this.data.length();
   callback(null, this);
@@ -75,6 +76,9 @@ Chunk.prototype.write = function(data, callback) {
  *     the chunk. Returns an empty String otherwise.
  */
 Chunk.prototype.read = function(length) {  
+  // Default to full read if no index defined
+  length = length == null || length == 0 ? this.length() : length;
+  
   if(this.length() - this.internalPosition + 1 >= length) {
     var data = this.data.read(this.internalPosition, length);
     this.internalPosition = this.internalPosition + length;

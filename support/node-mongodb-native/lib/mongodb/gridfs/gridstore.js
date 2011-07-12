@@ -144,7 +144,7 @@ GridStore.prototype._open = function(callback) {
           // Fetch the file
           cursor.nextObject(function(err, doc) {
             // Chek if the collection for the files exists otherwise prepare the new one
-            if(doc != null) {
+            if(doc != null) {              
               self.fileId = doc._id;
               self.contentType = doc.contentType;
               self.internalChunkSize = doc.chunkSize;
@@ -154,7 +154,7 @@ GridStore.prototype._open = function(callback) {
               self.metadata = doc.metadata;
               self.internalMd5 = doc.md5;
             } else {
-              self.fileId = new self.db.bson_serializer.ObjectID();
+              self.fileId = self.fileId instanceof self.db.bson_serializer.ObjectID ? self.fileId : new self.db.bson_serializer.ObjectID();
               self.contentType = exports.GridStore.DEFAULT_CONTENT_TYPE;
               self.internalChunkSize = self.internalChunkSize == null ? Chunk.DEFAULT_CHUNK_SIZE : self.internalChunkSize;
               self.length = 0;
@@ -531,7 +531,7 @@ GridStore.prototype.nthChunk = function(chunkNumber, callback) {
  * @see GridStore#nthChunk
  */
 GridStore.prototype.lastChunkNumber = function() {
-  return this.db.bson_serializer.BSON.toInt((this.length/this.chunkSize));
+  return Math.floor(this.length/this.chunkSize);
 };
 
 /**
@@ -700,8 +700,7 @@ GridStore.prototype.rewind = function(callback) {
  * @see GridStore#eof
  */
 GridStore.prototype.read = function(length, buffer, callback) {
-  var self = this;
-
+  var self = this;  
   var args = Array.prototype.slice.call(arguments, 0);
   callback = args.pop();
   length = args.length ? args.shift() : null;
@@ -711,12 +710,21 @@ GridStore.prototype.read = function(length, buffer, callback) {
   var finalBuffer = buffer == null ? '' : buffer;
   var finalLength = length == null ? self.length - self.position : length;
 
+  // debug("===================================================================== read")
+  // debug(inspect(self.length))
+  // debug(inspect(self.position))
+  // debug(finalLength)
+
   if((self.currentChunk.length() - self.currentChunk.position + 1 + finalBuffer.length) >= finalLength) {
+    // debug("---------------------------- finalLength :: " + finalLength)    
     finalBuffer = finalBuffer + self.currentChunk.read(finalLength - finalBuffer.length);
+
+    // debug("---------------------------- finalLength :: " + finalBuffer.length)    
+
     self.position = finalBuffer.length;
     callback(null, finalBuffer);
   } else {
-    finalBuffer = finalBuffer + self.currentChunk.read(self.currentChunk.length());    
+    finalBuffer = finalBuffer + self.currentChunk.read(self.currentChunk.length());
     // Load the next chunk and read some more
     self.nthChunk(self.currentChunk.chunkNumber + 1, function(err, chunk) {
       self.currentChunk = chunk;
@@ -817,7 +825,7 @@ GridStore.prototype.seek = function(position, seekLocation, callback) {
     targetPosition = finalPosition;
   }
 
-  var newChunkNumber = this.db.bson_serializer.BSON.toInt((targetPosition/self.chunkSize));
+  var newChunkNumber = Math.floor(targetPosition/self.chunkSize);
   if(newChunkNumber != self.currentChunk.chunkNumber) {
     if(self.mode[0] == 'w') {
       self.currentChunk.save(function(err, chunk) {

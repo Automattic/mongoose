@@ -4,7 +4,8 @@ var net = require('net'),
   EventEmitter = require("events").EventEmitter,
   BinaryParser = require('./bson/binary_parser').BinaryParser,
   inherits = require('util').inherits,
-  Server = require('./connections/server').Server;
+  Server = require('./connections/server').Server,
+  binaryutils = require("./bson/binary_utils");
 
 var Connection = exports.Connection = function(host, port, autoReconnect, options) {
   this.options = options == null ? {} : options;
@@ -47,6 +48,54 @@ var setupConnectionPool = function(self, poolSize, reconnect) {
   //
   // Listener that handles callbacks for the connection
   // Uses the internal object states to keep individual tcp connections seperate
+  // var receiveListener = function(result, fd) {    
+  //   fd = fd == null ? this.fd : fd;
+  //   
+  //   // Fetch the pool reference
+  //   var conObj = self.poolByReference[fd];
+  //   
+  //   // Check if we have an unfinished message
+  //   if(conObj != null && conObj.bytesRead > 0 && conObj.sizeOfMessage > 0) {
+  //     // Calculate remaing bytes to fetch
+  //     var remainingBytes = conObj.sizeOfMessage - conObj.bytesRead;
+  //     // Check if we have multiple packet messages and save the pieces otherwise emit the message
+  //     if(remainingBytes > result.length) {
+  //       conObj.buffer = conObj.buffer + result; conObj.bytesRead = conObj.bytesRead + result.length;
+  //     } else {
+  //       // Cut off the remaining message
+  //       conObj.buffer = conObj.buffer + result.substr(0, remainingBytes);
+  //       // Emit the message
+  //       self.emit("data", conObj.buffer);
+  //       // Reset the variables
+  //       conObj.buffer = ''; conObj.bytesRead = 0; conObj.sizeOfMessage = 0;
+  //       // If message is longer than the current one, keep parsing
+  //       if(remainingBytes < result.length) {
+  //         receiveListener(result.substr(remainingBytes, (result.length - remainingBytes)), fd);
+  //       }
+  //     }
+  //   } else if(conObj != null){
+  //     if(conObj.stubBuffer.length > 0) {
+  //       result = conObj.stubBuffer + result;
+  //       conObj.stubBuffer = '';
+  //     }
+  // 
+  //     if(result.length > 4) {
+  //       var sizeOfMessage = BinaryParser.toInt(result.substr(0, 4));
+  //       // We got a partial message, store the result and wait for more
+  //       if(sizeOfMessage > result.length) {
+  //         conObj.buffer = conObj.buffer + result; conObj.bytesRead = result.length; conObj.sizeOfMessage = sizeOfMessage;
+  //       } else if(sizeOfMessage == result.length) {
+  //         self.emit("data", result);
+  //       } else if(sizeOfMessage < result.length) {
+  //         self.emit("data", result.substr(0, sizeOfMessage));
+  //         receiveListener(result.substr(sizeOfMessage, (result.length - sizeOfMessage)), fd);
+  //       }
+  //     } else {
+  //       conObj.stubBuffer = result;
+  //     }
+  //   }
+  // };
+
   var receiveListener = function(result, fd) {    
     fd = fd == null ? this.fd : fd;
     
@@ -59,39 +108,60 @@ var setupConnectionPool = function(self, poolSize, reconnect) {
       var remainingBytes = conObj.sizeOfMessage - conObj.bytesRead;
       // Check if we have multiple packet messages and save the pieces otherwise emit the message
       if(remainingBytes > result.length) {
-        conObj.buffer = conObj.buffer + result; conObj.bytesRead = conObj.bytesRead + result.length;
+        // conObj.buffer = conObj.buffer + result; conObj.bytesRead = conObj.bytesRead + result.length;
+
+        // Let's copy all the results into a new buffer
+        var buffer = new Buffer(conObj.buffer.length + result.length);
+        conObj.buffer.copy(buffer, 0, 0, conObj.buffer.length);
+        result.copy(buffer, conObj.buffer.length, 0, result.length);
+        // Save the reference to the new buffer
+        conObj.buffer = buffer;
+        // Adjust the number of read bytes
+        conObj.bytesRead = conObj.bytesRead + result.length;
+        
       } else {
         // Cut off the remaining message
-        conObj.buffer = conObj.buffer + result.substr(0, remainingBytes);
+        var buffer = new Buffer(conObj.buffer.length + remainingBytes);
+        conObj.buffer.copy(buffer, 0, 0, conObj.buffer.length);
+        result.copy(buffer, conObj.buffer.length, 0, remainingBytes);
         // Emit the message
-        self.emit("data", conObj.buffer);
+        self.emit("data", buffer);
         // Reset the variables
-        conObj.buffer = ''; conObj.bytesRead = 0; conObj.sizeOfMessage = 0;
+        conObj.buffer = new Buffer(0); conObj.bytesRead = 0; conObj.sizeOfMessage = 0;
         // If message is longer than the current one, keep parsing
         if(remainingBytes < result.length) {
-          // debug("--------------------------------------- remainingBytes < result.length :: " + this.fd)
-          // receiveListener.call(this, result.substr(remainingBytes, (result.length - remainingBytes)));
-          receiveListener(result.substr(remainingBytes, (result.length - remainingBytes)), fd);
+          receiveListener(result.slice(remainingBytes, result.length), fd);
         }
+        
       }
     } else if(conObj != null){
       if(conObj.stubBuffer.length > 0) {
-        result = conObj.stubBuffer + result;
-        conObj.stubBuffer = '';
+        // Add missing stub files
+        var buffer = new Buffer(conObj.stubBuffer.length + result.length);
+        conObj.stubBuffer.copy(buffer, 0, 0, conObj.stubBuffer.length);
+        result.copy(buffer, conObj.stubBuffer.length, 0, result.length);
+        // New result contains the former missing bytes as well as the incoming payload
+        result = buffer;
+        conObj.stubBuffer = new Buffer(0);
       }
 
       if(result.length > 4) {
-        var sizeOfMessage = BinaryParser.toInt(result.substr(0, 4));
+        // var sizeOfMessage = BinaryParser.toInt(result.toString('binary', 0, 4));
+        var sizeOfMessage = binaryutils.decodeUInt32(result, 0);
         // We got a partial message, store the result and wait for more
         if(sizeOfMessage > result.length) {
-          conObj.buffer = conObj.buffer + result; conObj.bytesRead = result.length; conObj.sizeOfMessage = sizeOfMessage;
+          // Create a new buffer with the correct size
+          var buffer = new Buffer(conObj.buffer.length + result.length);
+          conObj.buffer.copy(buffer, 0, 0, self.buffer.length);
+          result.copy(buffer, conObj.buffer.length, 0, result.length);
+          conObj.buffer = buffer;
+          // Adjust variables
+          conObj.bytesRead = result.length; conObj.sizeOfMessage = sizeOfMessage;
         } else if(sizeOfMessage == result.length) {
           self.emit("data", result);
         } else if(sizeOfMessage < result.length) {
-          self.emit("data", result.substr(0, sizeOfMessage));
-          // debug("--------------------------------------- sizeOfMessage < result.length :: " + this.fd)
-          // receiveListener.call(this, result.substr(sizeOfMessage, (result.length - sizeOfMessage)));
-          receiveListener(result.substr(sizeOfMessage, (result.length - sizeOfMessage)), fd);
+          self.emit("data", result.slice(0, sizeOfMessage));
+          receiveListener(result.slice(sizeOfMessage, result.length), fd);
         }
       } else {
         conObj.stubBuffer = result;
@@ -104,10 +174,12 @@ var setupConnectionPool = function(self, poolSize, reconnect) {
     // Create the associated connection
     var connection = net.createConnection(self.port, self.host);    
     // Set up the net client
-    connection.setEncoding("binary");
+    // connection.setEncoding("binary");
+    // connection.setTimeout(0);
+    // connection.setNoDelay();
     // Add connnect listener
     connection.addListener("connect", function() {
-      this.setEncoding("binary");
+      // // this.setEncoding("binary");
       this.setTimeout(0);
       this.setNoDelay();
       // Update number of connected to server
@@ -135,7 +207,7 @@ var setupConnectionPool = function(self, poolSize, reconnect) {
     connectionPool.push({"connection": connection,
       "sizeOfMessage": 0,
       "bytesRead": 0,
-      "buffer": '',
+      "buffer": new Buffer(0),
       "stubBuffer": ''});      
 
     // Add the listener to the connection
@@ -215,14 +287,10 @@ Connection.prototype.send = function(command, rawConnection) {
     // Send the command, if it's an array of commands execute them all on the same connection
     if(Array.isArray(command)) {
       for(var i = 0; i < command.length; i++) {
-        // debug("========================================================================= command string")
-        // BinaryParser.ilprint((command.constructor == String) ? command : command.toBinary())
-        connection.write((command[i].constructor == String) ? command[i] : command[i].toBinary(), "binary");
+        connection.write(command[i].toBinary());
       }
     } else {
-      // debug("========================================================================= command string")
-      // BinaryParser.ilprint((command.constructor == String) ? command : command.toBinary())
-      connection.write((command.constructor == String) ? command : command.toBinary(), "binary");      
+      connection.write(command.toBinary());
     }
   } catch(err) {
     // Check if the connection is closed
@@ -253,10 +321,10 @@ Connection.prototype.send = function(command, rawConnection) {
             // Fire
             if(Array.isArray(command)) {
               for(var i = 0; i < command.length; i++) {
-                connection.write((command[i].constructor == String) ? command[i] : command[i].toBinary(), "binary");
+                connection.write(command[i].toBinary());
               }
-            } else {
-              connection.write((command.constructor == String) ? command : command.toBinary(), "binary");      
+            } else {              
+              connection.write(command.toBinary());
             }
           }          
         })

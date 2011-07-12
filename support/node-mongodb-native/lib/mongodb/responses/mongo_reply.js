@@ -1,47 +1,61 @@
-var BinaryParser = require('../bson/binary_parser').BinaryParser,
-  Long = require('../goog/math/long').Long;
+var Long = require('../goog/math/long').Long,
+  debug = require('util').debug,
+  inspect = require('util').inspect,
+  binaryutils = require('../bson/binary_utils');  
 
 /**
   Reply message from mongo db
 **/
 var MongoReply = exports.MongoReply = function(db, binary_reply) {
+  // debug("------------------------------------------------------------------------- 1")
+  // debug(inspect(binary_reply.length))
+  // // debug(inspect(data))
+  // for(var j = 0; j < binary_reply.length; j++) {
+  //   // debug("------")
+  //   debug(binary_reply[j] + " :: " + binary_reply.toString('ascii', j, j + 1))
+  // }    
+  
   this.documents = [];
   var index = 0;
   // Unpack the standard header first
-  var messageLength = BinaryParser.toInt(binary_reply.substr(index, 4));
+  var messageLength = binaryutils.decodeUInt32(binary_reply, index);  
   index = index + 4;
   // Fetch the request id for this reply
-  this.requestId = BinaryParser.toInt(binary_reply.substr(index, 4));
+  this.requestId = binaryutils.decodeUInt32(binary_reply, index);  
   index = index + 4;
   // Fetch the id of the request that triggered the response
-  this.responseTo = BinaryParser.toInt(binary_reply.substr(index, 4));
+  this.responseTo = binaryutils.decodeUInt32(binary_reply, index);  
   // Skip op-code field
   index = index + 4 + 4;
   // Unpack the reply message
-  this.responseFlag = BinaryParser.toInt(binary_reply.substr(index, 4));
-  index = index + 4;  
+  this.responseFlag = binaryutils.decodeUInt32(binary_reply, index);  
+  index = index + 4;
   // Unpack the cursor id (a 64 bit long integer)
-  this.cursorId = new db.bson_serializer.BSON.toLong(BinaryParser.toInt(binary_reply.substr(index, 4)), BinaryParser.toInt(binary_reply.substr(index + 4, 4)));
+  var low_bits = binaryutils.decodeUInt32(binary_reply, index);
+  var high_bits = binaryutils.decodeUInt32(binary_reply, index + 4);
+
+  this.cursorId = new db.bson_deserializer.Long(low_bits, high_bits);
   index = index + 8;
   // Unpack the starting from
-  this.startingFrom = BinaryParser.toInt(binary_reply.substr(index, 4));
+  this.startingFrom = binaryutils.decodeUInt32(binary_reply, index);  
   index = index + 4;
   // Unpack the number of objects returned
-  this.numberReturned = BinaryParser.toInt(binary_reply.substr(index, 4));
+  this.numberReturned = binaryutils.decodeUInt32(binary_reply, index);  
   index = index + 4;
+  
   // Let's unpack all the bson document, deserialize them and store them
   for(var object_index = 0; object_index < this.numberReturned; object_index++) {
-    // Read the size of the bson object
-    var bsonObjectSize = BinaryParser.toInt(binary_reply.substr(index, 4));
+    // Read the size of the bson object    
+    var bsonObjectSize = binaryutils.decodeUInt32(binary_reply, index);  
     
-    // sys.debug("--------------------------------------------------- incoming")
-    // BinaryParser.hprint(binary_reply.substr(index, bsonObjectSize))
-    
-    // Read the entire object and deserialize it
-    this.documents.push(db.bson_deserializer.BSON.deserialize(binary_reply.substr(index, bsonObjectSize)));
-    // Adjust for next object
+    // debug("================================================================== bsonObjectSize  = " + bsonObjectSize)    
+    // Deserialize the object and add to the documents array
+    this.documents.push(db.bson_deserializer.BSON.deserialize(binary_reply.slice(index, index + bsonObjectSize)));
+    // Adjust binary index to point to next block of binary bson data
     index = index + bsonObjectSize;
-  }
+  }    
+  // debug("--------------------------------------------------- docs")
+  // debug(inspect(this.documents))
 };
 
 MongoReply.prototype.is_error = function(){

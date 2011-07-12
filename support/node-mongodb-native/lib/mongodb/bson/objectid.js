@@ -1,9 +1,10 @@
-
 /**
  * Module dependencies.
  */
 
-var BinaryParser = require('./binary_parser').BinaryParser;
+var BinaryParser = require('./binary_parser').BinaryParser,
+  inspect = require('util').inspect,
+  debug = require('util').debug;
 
 /**
  * Machine id.
@@ -22,6 +23,9 @@ var MACHINE_ID = parseInt(Math.random() * 0xFFFFFF, 10);
  */
 
 function ObjectID (id) {
+  // Throw an error if it's not a valid setup
+  if(id != null && (id.length != 12 && id.length != 24)) throw new Error("Argument passed in must be a single String of 12 bytes or a string of 24 hex characters in hex format");
+  // Generate id based on the input
   if (null == id) {
     this.id = this.generate();
   } else if (/^[0-9a-fA-F]{24}$/.test(id)) {

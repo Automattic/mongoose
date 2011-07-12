@@ -51,13 +51,13 @@ BinaryParser.decodeFloat = function decodeFloat (data, precisionBits, exponentBi
 };
 
 BinaryParser.decodeInt = function decodeInt (data, bits, signed, forceBigEndian) {
-	var b = new this.Buffer(this.bigEndian || forceBigEndian, data)
-    , x = b.readBits(0, bits)
-    , max = maxBits[bits]; //max = Math.pow( 2, bits );
-
-	return signed && x >= max / 2
-    ? x - max
-    : x;
+  var b = new this.Buffer(this.bigEndian || forceBigEndian, data)
+      , x = b.readBits(0, bits)
+      , max = maxBits[bits]; //max = Math.pow( 2, bits );
+  
+  return signed && x >= max / 2
+      ? x - max
+      : x;
 };
 
 BinaryParser.encodeFloat = function encodeFloat (data, precisionBits, exponentBits) {
@@ -278,12 +278,12 @@ BinaryParser.hprint = function hprint (s) {
       number = s.charCodeAt(i) <= 15
         ? "0" + s.charCodeAt(i).toString(16)
         : s.charCodeAt(i).toString(16);        
-      process.stdout.write(number)
+      process.stdout.write(number + " ")
     } else {
       number = s.charCodeAt(i) <= 15
         ? "0" + s.charCodeAt(i).toString(16)
         : s.charCodeAt(i).toString(16);
-        process.stdout.write(number)
+        process.stdout.write(number + " ")
     }
   }
   

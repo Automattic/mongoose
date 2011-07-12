@@ -452,7 +452,7 @@ Cursor.prototype.formatSortValue = function(sortDirection) {
  */
 Cursor.prototype.nextObject = function(callback) {
   var self = this;
-
+  
   if(self.state == Cursor.INIT) {
     try {
       var commandHandler = function(err, result) {

@@ -1,20 +1,11 @@
-var BinaryParser = require('../bson/binary_parser').BinaryParser;
+var BinaryParser = require('../bson/binary_parser').BinaryParser,
+  debug = require('util').debug,
+  inspect = require('util').inspect;
 
 /**
   Base object used for common functionality
 **/
 var BaseCommand = exports.BaseCommand = function() {
-};
-
-BaseCommand.prototype.toBinary = function() {
-  // Get the command op code
-  var op_code = this.getOpCode();
-  // Get the command data structure
-  var command = this.getCommand();
-  // Total Size of command
-  var totalSize = 4*4 + command.length;
-  // Create the command with the standard header file
-  return BinaryParser.fromInt(totalSize) + BinaryParser.fromInt(this.requestId) + BinaryParser.fromInt(0) + BinaryParser.fromInt(op_code) + command;
 };
 
 var id = 1;

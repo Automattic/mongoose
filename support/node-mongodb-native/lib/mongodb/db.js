@@ -526,24 +526,38 @@ Db.prototype.dropIndex = function(collectionName, indexName, callback) {
 /**
   Index Information
 **/
-Db.prototype.indexInformation = function(collectionName, callback) {
-  if(typeof collectionName === "function") { callback = collectionName; collectionName = null;}
+Db.prototype.indexInformation = function(collectionName, options, callback) {
+  // Unpack calls
+  var args = Array.prototype.slice.call(arguments, 0);
+  callback = args.pop();
+  collectionName = args.length ? args.shift() : null;
+  options = args.length ? args.shift() : {};
+
+  // If we specified full information
+  var full = options['full'] == null ? false : options['full'];  
   // Build selector for the indexes
   var selector = collectionName != null ? {ns: (this.databaseName + "." + collectionName)} : {};
-  var info = {};
   // Iterate through all the fields of the index
-  new Cursor(this, new Collection(this, DbCommand.SYSTEM_INDEX_COLLECTION), selector).each(function(err, index) {
+  new Cursor(this, new Collection(this, DbCommand.SYSTEM_INDEX_COLLECTION), selector).toArray(function(err, indexes) {
     if(err != null) return callback(err, null);
+    // Contains all the information
+    var info = {};
 
-    // Return the info when finished
-    if(index == null) {
-      callback(null, info);
-    } else {
+    // if full defined just return all the indexes directly
+    if(full) return callback(null, indexes);
+        
+    // Process all the indexes
+    for(var i = 0; i < indexes.length; i++) {
+      var index = indexes[i];
+      // Let's unpack the object
       info[index.name] = [];
       for(var name in index.key) {
         info[index.name].push([name, index.key[name]]);
       }
     }
+    
+    // Return all the indexes
+    callback(null, info);
   });
 };
 

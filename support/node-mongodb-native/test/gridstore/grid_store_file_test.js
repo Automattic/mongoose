@@ -47,17 +47,24 @@ var tests = testCase({
   shouldCorrectlyWriteASmallPayload : function(test) {
     var gridStore = new GridStore(client, "test_gs_small_write", "w");
     gridStore.open(function(err, gridStore) {
+      
       gridStore.write("hello world!", function(err, gridStore) {
+  
         gridStore.close(function(err, result) {
+  
           client.collection('fs.files', function(err, collection) {
+  
             collection.find({'filename':'test_gs_small_write'}, function(err, cursor) {
+  
               cursor.toArray(function(err, items) {
                 test.equal(1, items.length);
                 var item = items[0];
                 test.ok(item._id instanceof client.bson_serializer.ObjectID || Object.prototype.toString.call(item._id) === '[object ObjectID]');
   
                 client.collection('fs.chunks', function(err, collection) {
-                  collection.find({'files_id':item._id}, function(err, cursor) {
+                  var id = client.bson_serializer.ObjectID.createFromHexString(item._id.toHexString());
+  
+                  collection.find({'files_id':id}, function(err, cursor) {
                     cursor.toArray(function(err, items) {
                       test.equal(1, items.length);
                       test.done();
@@ -108,6 +115,7 @@ var tests = testCase({
       gridStore.write("hello world!", function(err, gridStore) {
         gridStore.close(function(err, result) {
           client.collection('fs.files', function(err, collection) {
+
             collection.find({'filename':'test_gs_small_file'}, function(err, cursor) {
               cursor.toArray(function(err, items) {
                 test.equal(1, items.length);
@@ -358,14 +366,14 @@ var tests = testCase({
     gridStore.open(function(err, gridStore) {
       gridStore.write("hello, world!", function(err, gridStore) {
         gridStore.close(function(err, result) {
-
+  
           var gridStore2 = new GridStore(client, "test_gs_rewind_and_truncate_on_write", "w");
           gridStore2.open(function(err, gridStore) {
             gridStore.write('some text is inserted here', function(err, gridStore) {
               gridStore.rewind(function(err, gridStore) {
                 gridStore.write('abc', function(err, gridStore) {
                   gridStore.close(function(err, result) {
-
+  
                     GridStore.read(client, 'test_gs_rewind_and_truncate_on_write', function(err, data) {
                       test.equal("abc", data);
                       test.done();

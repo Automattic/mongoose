@@ -1,12 +1,13 @@
 var BaseCommand = require('./base_command').BaseCommand,
-  BinaryParser = require('../bson/binary_parser').BinaryParser,
-  inherits = require('util').inherits;
+  inherits = require('util').inherits,
+  debug = require('util').debug,
+  inspect = require('util').inspect;
 
 /**
   Update Document Command
 **/
 var UpdateCommand = exports.UpdateCommand = function(db, collectionName, spec, document, options) {
-  BaseCommand.apply(this);
+  BaseCommand.call(this);
 
   this.collectionName = collectionName;
   this.spec = spec;
@@ -25,10 +26,7 @@ var UpdateCommand = exports.UpdateCommand = function(db, collectionName, spec, d
 
 inherits(UpdateCommand, BaseCommand);
 
-
-UpdateCommand.prototype.getOpCode = function() {
-  return BaseCommand.OP_UPDATE;
-};
+UpdateCommand.OP_UPDATE = 2001;
 
 /*
 struct {
@@ -40,10 +38,84 @@ struct {
     BSON      document;           // the document data to update with or insert
 }
 */
-UpdateCommand.prototype.getCommand = function() {
-  // Generate the command string
-  var command_string = BinaryParser.fromInt(0) + BinaryParser.encode_cstring(this.collectionName);
-  return command_string + BinaryParser.fromInt(this.flags) + this.db.bson_serializer.BSON.serialize(this.spec) + this.db.bson_serializer.BSON.serialize(this.document, false);
+UpdateCommand.prototype.toBinary = function() {
+  // Calculate total length of the document
+  var totalLengthOfCommand = 4 + Buffer.byteLength(this.collectionName) + 1 + 4 + this.db.bson_serializer.BSON.calculateObjectSize(this.spec) +
+      this.db.bson_serializer.BSON.calculateObjectSize(this.document) + (4 * 4);
+
+  // Let's build the single pass buffer command
+  var _index = 0;
+  var _command = new Buffer(totalLengthOfCommand);
+  // Write the header information to the buffer
+  _command[_index + 3] = (totalLengthOfCommand >> 24) & 0xff;     
+  _command[_index + 2] = (totalLengthOfCommand >> 16) & 0xff;
+  _command[_index + 1] = (totalLengthOfCommand >> 8) & 0xff;
+  _command[_index] = totalLengthOfCommand & 0xff;
+  // Adjust index
+  _index = _index + 4;
+  // Write the request ID
+  _command[_index + 3] = (this.requestId >> 24) & 0xff;     
+  _command[_index + 2] = (this.requestId >> 16) & 0xff;
+  _command[_index + 1] = (this.requestId >> 8) & 0xff;
+  _command[_index] = this.requestId & 0xff;
+  // Adjust index
+  _index = _index + 4;
+  // Write zero
+  _command[_index++] = 0;
+  _command[_index++] = 0;
+  _command[_index++] = 0;
+  _command[_index++] = 0;
+  // Write the op_code for the command
+  _command[_index + 3] = (UpdateCommand.OP_UPDATE >> 24) & 0xff;     
+  _command[_index + 2] = (UpdateCommand.OP_UPDATE >> 16) & 0xff;
+  _command[_index + 1] = (UpdateCommand.OP_UPDATE >> 8) & 0xff;
+  _command[_index] = UpdateCommand.OP_UPDATE & 0xff;
+  // Adjust index
+  _index = _index + 4;
+
+  // Write zero
+  _command[_index++] = 0;
+  _command[_index++] = 0;
+  _command[_index++] = 0;
+  _command[_index++] = 0;
+
+  // Write the collection name to the command
+  _index = _index + _command.write(this.collectionName, _index, 'utf8') + 1;
+  _command[_index - 1] = 0;    
+
+  // Write the update flags
+  _command[_index + 3] = (this.flags >> 24) & 0xff;     
+  _command[_index + 2] = (this.flags >> 16) & 0xff;
+  _command[_index + 1] = (this.flags >> 8) & 0xff;
+  _command[_index] = this.flags & 0xff;
+  // Adjust index
+  _index = _index + 4;
+
+  // Serialize the spec document
+  var documentLength = this.db.bson_serializer.BSON.serializeWithBufferAndIndex(this.spec, this.checkKeys, _command, _index) - _index + 1;
+  // Write the length to the document
+  _command[_index + 3] = (documentLength >> 24) & 0xff;     
+  _command[_index + 2] = (documentLength >> 16) & 0xff;
+  _command[_index + 1] = (documentLength >> 8) & 0xff;
+  _command[_index] = documentLength & 0xff;
+  // Update index in buffer
+  _index = _index + documentLength;
+  // Add terminating 0 for the object
+  _command[_index - 1] = 0;    
+
+  // Serialize the document
+  var documentLength = this.db.bson_serializer.BSON.serializeWithBufferAndIndex(this.document, this.checkKeys, _command, _index) - _index + 1;
+  // Write the length to the document
+  _command[_index + 3] = (documentLength >> 24) & 0xff;     
+  _command[_index + 2] = (documentLength >> 16) & 0xff;
+  _command[_index + 1] = (documentLength >> 8) & 0xff;
+  _command[_index] = documentLength & 0xff;
+  // Update index in buffer
+  _index = _index + documentLength;
+  // Add terminating 0 for the object
+  _command[_index - 1] = 0;    
+
+  return _command;
 };
 
 // Constants

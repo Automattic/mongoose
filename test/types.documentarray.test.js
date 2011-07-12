@@ -21,6 +21,11 @@ module.exports = {
     a.should.be.an.instanceof(MongooseDocumentArray);
     Array.isArray(a).should.be.true;
     Array.isArray(a._atomics).should.be.true;
+    'object'.should.eql(typeof a);
+
+    var b = new MongooseArray([1,2,3,4]);
+    'object'.should.eql(typeof b);
+    Object.keys(b).length.should.equal(4);
   }
 
 };

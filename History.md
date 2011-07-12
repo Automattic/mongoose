@@ -1,4 +1,14 @@
 
+1.7.0 / 2011-07-12
+===================
+
+  * fixed; collection name misspelling [mathrawka]
+  * fixed; 2nd param is required for ReplSetServers [kevinmarvin]
+  * fixed; MongooseArray behaves properly with Object.keys
+  * changed; node-mongodb-native driver to v0.9.6.6
+  * fixed/changed; Mongodb segfault when passed invalid ObjectId (#407)
+      - This means invalid data passed to the ObjectId constructor will now error
+
 1.6.0 / 2011-07-07
 ===================
 

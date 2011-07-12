@@ -55,6 +55,7 @@ mongoose.model('Mod', ModSchema);
 var geoSchema = new Schema({ loc: { type: [Number], index: '2d'}});
 
 module.exports = {
+
   'test that find returns a Query': function () {
     var db = start()
       , BlogPostB = db.model('BlogPostB', collection);
@@ -705,45 +706,81 @@ module.exports = {
     var db = start()
       , BlogPostB = db.model('BlogPostB', collection);
 
-      var post = new BlogPostB();
+    var post = new BlogPostB();
 
-      post.tags.push('cat');
+    post.tags.push('cat');
 
-      post.save( function (err) {
+    post.save(function (err) {
+      should.strictEqual(err, null);
+
+      BlogPostB.findOne({tags: 'cat'}, function (err, doc) {
         should.strictEqual(err, null);
 
-        BlogPostB.findOne({tags: 'cat'}, function (err, doc) {
-          should.strictEqual(err, null);
-
-          doc._id.should.eql(post._id);
-          db.close();
-        });
+        doc._id.should.eql(post._id);
+        db.close();
       });
+    });
   },
 
   'test querying if an array contains one of multiple members $in a set': function () {
     var db = start()
       , BlogPostB = db.model('BlogPostB', collection);
 
-      var post = new BlogPostB();
+    var post = new BlogPostB();
 
-      post.tags.push('football');
+    post.tags.push('football');
 
-      post.save( function (err) {
+    post.save(function (err) {
+      should.strictEqual(err, null);
+
+      BlogPostB.findOne({tags: {$in: ['football', 'baseball']}}, function (err, doc) {
         should.strictEqual(err, null);
+        doc._id.should.eql(post._id);
 
-        BlogPostB.findOne({tags: {$in: ['football', 'baseball']}}, function (err, doc) {
+        BlogPostB.findOne({ _id: post._id, tags: /otba/i }, function (err, doc) {
           should.strictEqual(err, null);
           doc._id.should.eql(post._id);
 
-          BlogPostB.findOne({ _id: post._id, tags: /otba/i }, function (err, doc) {
-            should.strictEqual(err, null);
-            doc._id.should.eql(post._id);
-
-            db.close();
-          })
-        });
+          db.close();
+        })
       });
+    });
+  },
+
+  'test querying if an array contains one of multiple members $in a set 2': function () {
+    var db = start()
+      , BlogPostA = db.model('BlogPostB', collection)
+
+    var post = new BlogPostA({ tags: ['gooberOne'] });
+
+    post.save(function (err) {
+      should.strictEqual(err, null);
+
+      var query = {tags: {$in:[ 'gooberOne' ]}};
+
+      BlogPostA.findOne(query, function (err, returned) {
+        done();
+        should.strictEqual(err, null);
+        ;(!!~returned.tags.indexOf('gooberOne')).should.be.true;
+        returned._id.should.eql(post._id);
+      });
+    });
+
+    post.collection.insert({ meta: { visitors: 9898, a: null } }, {}, function (err, b) {
+      should.strictEqual(err, null);
+
+      BlogPostA.findOne({_id: b[0]._id}, function (err, found) {
+        done();
+        should.strictEqual(err, null);
+        found.get('meta.visitors').valueOf().should.eql(9898);
+      })
+    });
+
+    var pending = 2;
+    function done () {
+      if (--pending) return;
+      db.close();
+    }
   },
 
   'test querying via $which where a string': function () {
@@ -1341,7 +1378,7 @@ module.exports = {
   // GH-309
   'using $near with Arrays works (geo-spatial)': function () {
     var db = start()
-      , Test = db.model('Geo1', geoSchema, collection);
+      , Test = db.model('Geo1', geoSchema, collection + 'geospatial');
 
     Test.create({ loc: [ 10, 20 ]}, { loc: [ 40, 90 ]}, function (err) {
       should.strictEqual(err, null);

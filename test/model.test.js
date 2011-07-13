@@ -791,8 +791,9 @@ module.exports = {
     post.save(function(err){
       err.should.be.an.instanceof(MongooseError);
       err.should.be.an.instanceof(ValidationError);
-      err.errors.simple.should.equal('Validator "must be abc" failed for path simple');
-      post.errors.simple.should.equal('Validator "must be abc" failed for path simple');
+      err.errors.simple.should.be.an.instanceof(ValidatorError);
+      err.errors.simple.message.should.equal('Validator "must be abc" failed for path simple');
+      post.errors.simple.message.should.equal('Validator "must be abc" failed for path simple');
 
       post.set('simple', 'abc');
       post.save(function(err){
@@ -814,7 +815,7 @@ module.exports = {
     }, 'Name cannot be greater than 1 character');
     var doc = new IntrospectionValidation({name: 'hi'});
     doc.save( function (err) {
-      err.errors.name.should.equal("Validator \"Name cannot be greater than 1 character\" failed for path name");
+      err.errors.name.message.should.equal("Validator \"Name cannot be greater than 1 character\" failed for path name");
       err.name.should.equal("ValidationError");
       err.message.should.equal("Validation failed");
       db.close();
@@ -869,14 +870,20 @@ module.exports = {
       (++timesCalled).should.eql(1);
 
       (Object.keys(err.errors).length).should.eql(3);
-      err.errors.password.should.eql('Validator failed for path password');
-      err.errors.email.should.eql('Validator failed for path email');
-      err.errors.username.should.eql('Validator failed for path username');
+      err.errors.password.should.be.an.instanceof(ValidatorError);
+      err.errors.email.should.be.an.instanceof(ValidatorError);
+      err.errors.username.should.be.an.instanceof(ValidatorError);
+      err.errors.password.message.should.eql('Validator failed for path password');
+      err.errors.email.message.should.eql('Validator failed for path email');
+      err.errors.username.message.should.eql('Validator failed for path username');
 
       (Object.keys(post.errors).length).should.eql(3);
-      post.errors.password.should.eql('Validator failed for path password');
-      post.errors.email.should.eql('Validator failed for path email');
-      post.errors.username.should.eql('Validator failed for path username');
+      post.errors.password.should.be.an.instanceof(ValidatorError);
+      post.errors.email.should.be.an.instanceof(ValidatorError);
+      post.errors.username.should.be.an.instanceof(ValidatorError);
+      post.errors.password.message.should.eql('Validator failed for path password');
+      post.errors.email.message.should.eql('Validator failed for path email');
+      post.errors.username.message.should.eql('Validator failed for path username');
 
       db.close();
     });
@@ -986,7 +993,8 @@ module.exports = {
     post.save(function(err){
       err.should.be.an.instanceof(MongooseError);
       err.should.be.an.instanceof(ValidationError);
-      err.errors.required.should.eql('Validator "required" failed for path required');
+      err.errors.required.should.be.an.instanceof(ValidatorError);
+      err.errors.required.message.should.eql('Validator "required" failed for path required');
 
       post.get('items')[0].set('required', true);
       post.save(function(err){
@@ -1018,7 +1026,8 @@ module.exports = {
     post.save(function(err){
       err.should.be.an.instanceof(MongooseError);
       err.should.be.an.instanceof(ValidationError);
-      err.errors.async.should.eql('Validator "async validator" failed for path async');
+      err.errors.async.should.be.an.instanceof(ValidatorError);
+      err.errors.async.message.should.eql('Validator "async validator" failed for path async');
       executed.should.be.true;
       executed = false;
 
@@ -3803,6 +3812,166 @@ module.exports = {
       });
     })
 
+  },
+  'test standalone invalidate': function() {
+    var db = start()
+      , InvalidateSchema = null
+      , Post = null
+      , post = null;
+
+    InvalidateSchema = new Schema({
+      prop: { type: String },
+    });
+
+    mongoose.model('InvalidateSchema', InvalidateSchema);
+
+    Post = db.model('InvalidateSchema');
+    post = new Post();
+    post.set({baz: 'val'});
+    post.invalidate('baz', 'reason');
+
+    post.save(function(err){
+      err.should.be.an.instanceof(MongooseError);
+      err.should.be.an.instanceof(ValidationError);
+
+      err.errors.baz.should.be.an.instanceof(ValidatorError);
+      err.errors.baz.message.should.equal('Validator "reason" failed for path baz');
+
+      post.save(function(err){
+        should.strictEqual(err, null);
+        db.close();
+      });
+    });
+  },
+  'test simple validation middleware': function() {
+    var db = start()
+      , ValidationMiddlewareSchema = null
+      , Post = null
+      , post = null;
+
+    ValidationMiddlewareSchema = new Schema({
+      baz: { type: String }
+    });
+
+    ValidationMiddlewareSchema.pre('validate', function(next) {
+      if (this.get('baz') == 'bad') {
+        this.invalidate('baz', 'bad');
+      }
+      next();
+    });
+
+    mongoose.model('ValidationMiddleware', ValidationMiddlewareSchema);
+
+    Post = db.model('ValidationMiddleware');
+    post = new Post();
+    post.set({baz: 'bad'});
+
+    post.save(function(err){
+      err.should.be.an.instanceof(MongooseError);
+      err.should.be.an.instanceof(ValidationError);
+
+      post.set('baz', 'good');
+      post.save(function(err){
+        should.strictEqual(err, null);
+        db.close();
+      });
+    });
+  },
+  'test async validation middleware': function() {
+    var db = start()
+      , AsyncValidationMiddlewareSchema = null
+      , Post = null
+      , post = null;
+
+    AsyncValidationMiddlewareSchema = new Schema({
+      prop: { type: String }
+    });
+
+    AsyncValidationMiddlewareSchema.pre('validate', true, function(next, done) {
+      var self = this;
+      setTimeout(function() {
+        if (self.get('prop') == 'bad') {
+          self.invalidate('prop', 'bad');
+        }
+        done();
+      }, 50);
+      next();
+    });
+
+    mongoose.model('AsyncValidationMiddleware', AsyncValidationMiddlewareSchema);
+
+    Post = db.model('AsyncValidationMiddleware');
+    post = new Post();
+    post.set({prop: 'bad'});
+
+    post.save(function(err){
+      err.should.be.an.instanceof(MongooseError);
+      err.should.be.an.instanceof(ValidationError);
+
+      post.set('prop', 'good');
+      post.save(function(err){
+        should.strictEqual(err, null);
+        db.close();
+      });
+    });
+  },
+  'test complex validation middleware': function() {
+    var db = start()
+      , ComplexValidationMiddlewareSchema = null
+      , Post = null
+      , post = null
+      , abc = function(v) {
+          return v === 'abc';
+        };
+
+    ComplexValidationMiddlewareSchema = new Schema({
+      baz: { type: String },
+      abc: { type: String, validate: [abc, 'must be abc'] },
+      test: { type: String, validate: [/test/, 'must be abc'] },
+      required: { type: String, required: true }
+    });
+
+    ComplexValidationMiddlewareSchema.pre('validate', true, function(next, done) {
+      var self = this;
+      setTimeout(function() {
+        if (self.get('baz') == 'bad') {
+          self.invalidate('baz', 'bad');
+        }
+        done();
+      }, 50);
+      next();
+    });
+
+    mongoose.model('ComplexValidationMiddleware', ComplexValidationMiddlewareSchema);
+
+    Post = db.model('ComplexValidationMiddleware');
+    post = new Post();
+    post.set({
+      baz: 'bad',
+      abc: 'not abc',
+      test: 'fail'
+    });
+
+    post.save(function(err){
+      err.should.be.an.instanceof(MongooseError);
+      err.should.be.an.instanceof(ValidationError);
+      Object.keys(err.errors).length.should.equal(4);
+      err.errors.baz.should.be.an.instanceof(ValidatorError);
+      err.errors.abc.should.be.an.instanceof(ValidatorError);
+      err.errors.test.should.be.an.instanceof(ValidatorError);
+      err.errors.required.should.be.an.instanceof(ValidatorError);
+
+      post.set({
+        baz: 'good',
+        abc: 'abc',
+        test: 'test',
+        required: 'here'
+      });
+      post.save(function(err){
+        should.strictEqual(err, null);
+        db.close();
+      });
+    });
   }
 
 };

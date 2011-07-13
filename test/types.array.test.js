@@ -55,7 +55,7 @@ module.exports = {
 
     var pending = 3;
 
-    [tobi, loki, jane].forEach(function(pet){
+    ;[tobi, loki, jane].forEach(function(pet){
       pet.save(function(){
         --pending || done();
       });
@@ -65,12 +65,15 @@ module.exports = {
       Pet.find({}, function(err, pets){
         tj.save(function(err){
           User.findOne({ name: 'tj' }, function(err, user){
+            db.close();
             should.equal(null, err, 'error in callback');
             user.pets.should.have.length(3);
             user.pets.indexOf(tobi.id).should.equal(0);
             user.pets.indexOf(loki.id).should.equal(1);
             user.pets.indexOf(jane.id).should.equal(2);
-            db.close();
+            user.pets.indexOf(tobi._id).should.equal(0);
+            user.pets.indexOf(loki._id).should.equal(1);
+            user.pets.indexOf(jane._id).should.equal(2);
           });
         });
       });

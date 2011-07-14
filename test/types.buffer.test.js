@@ -10,12 +10,12 @@ var start = require('./common')
   , random = require('mongoose/utils').random
   , MongooseBuffer = mongoose.Types.Buffer;
 
-var User = new Schema({
+var UserBuffer = new Schema({
     name: String
   , serial: Buffer
 });
 
-mongoose.model('User', User);
+mongoose.model('UserBuffer', UserBuffer);
 
 /**
  * Test.
@@ -33,13 +33,13 @@ module.exports = {
 
   'test storage': function(){
     var db = start()
-      , User = db.model('User', 'users_' + random());
+      , User = db.model('UserBuffer', 'usersbuffer_' + random());
 
     var sampleBuffer = new Buffer([123, 223, 23, 42, 11]);
 
     var tj = new User({
-        name: 'tj',
-        serial: sampleBuffer
+        name: 'tj'
+      , serial: sampleBuffer
     });
 
     tj.save(function (err) {
@@ -57,13 +57,13 @@ module.exports = {
 
   'test write markModified': function(){
     var db = start()
-      , User = db.model('User', 'users_' + random());
+      , User = db.model('UserBuffer', 'usersbuffer_' + random());
 
     var sampleBuffer = new Buffer([123, 223, 23, 42, 11]);
 
     var tj = new User({
-        name: 'tj',
-        serial: sampleBuffer
+        name: 'tj'
+      , serial: sampleBuffer
     });
 
     tj.save(function (err) {

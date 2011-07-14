@@ -17,12 +17,6 @@ var User = new Schema({
 
 mongoose.model('User', User);
 
-var Pet = new Schema({
-  name: String
-});
-
-mongoose.model('Pet', Pet);
-
 /**
  * Test.
  */
@@ -39,8 +33,7 @@ module.exports = {
 
   'test storage': function(){
     var db = start()
-      , User = db.model('User', 'users_' + random())
-      , Pet = db.model('Pet', 'pets' + random());
+      , User = db.model('User', 'users_' + random());
 
     var sampleBuffer = new Buffer([123, 223, 23, 42, 11]);
 
@@ -52,7 +45,6 @@ module.exports = {
     tj.save(function (err) {
       should.equal(null, err, 'error in callback');
       User.find({}, function (err, users) {
-
         db.close();
         should.equal(null, err, 'error in callback');
         users.should.have.length(1);

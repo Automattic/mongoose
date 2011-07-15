@@ -7,6 +7,7 @@
   , "dependencies": {
         "hooks": "0.1.9"
       , "mongodb": "0.9.6-7"
+      , "colors": "0.5.0"
     }
   , "devDependencies": {
         "should": "0.2.1"

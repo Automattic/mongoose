@@ -3813,6 +3813,7 @@ module.exports = {
     })
 
   },
+
   'test standalone invalidate': function() {
     var db = start()
       , InvalidateSchema = null
@@ -3836,13 +3837,16 @@ module.exports = {
 
       err.errors.baz.should.be.an.instanceof(ValidatorError);
       err.errors.baz.message.should.equal('Validator "reason" failed for path baz');
+      err.errors.baz.type.should.equal('reason');
+      err.errors.baz.path.should.equal('baz');
 
       post.save(function(err){
-        should.strictEqual(err, null);
         db.close();
+        should.strictEqual(err, null);
       });
     });
   },
+
   'test simple validation middleware': function() {
     var db = start()
       , ValidationMiddlewareSchema = null
@@ -3869,14 +3873,17 @@ module.exports = {
     post.save(function(err){
       err.should.be.an.instanceof(MongooseError);
       err.should.be.an.instanceof(ValidationError);
+      err.errors.baz.type.should.equal('bad');
+      err.errors.baz.path.should.equal('baz');
 
       post.set('baz', 'good');
       post.save(function(err){
-        should.strictEqual(err, null);
         db.close();
+        should.strictEqual(err, null);
       });
     });
   },
+
   'test async validation middleware': function() {
     var db = start()
       , AsyncValidationMiddlewareSchema = null
@@ -3907,14 +3914,17 @@ module.exports = {
     post.save(function(err){
       err.should.be.an.instanceof(MongooseError);
       err.should.be.an.instanceof(ValidationError);
+      err.errors.prop.type.should.equal('bad');
+      err.errors.prop.path.should.equal('prop');
 
       post.set('prop', 'good');
       post.save(function(err){
-        should.strictEqual(err, null);
         db.close();
+        should.strictEqual(err, null);
       });
     });
   },
+
   'test complex validation middleware': function() {
     var db = start()
       , ComplexValidationMiddlewareSchema = null
@@ -3927,7 +3937,7 @@ module.exports = {
     ComplexValidationMiddlewareSchema = new Schema({
       baz: { type: String },
       abc: { type: String, validate: [abc, 'must be abc'] },
-      test: { type: String, validate: [/test/, 'must be abc'] },
+      test: { type: String, validate: [/test/, 'must also be abc'] },
       required: { type: String, required: true }
     });
 
@@ -3957,9 +3967,17 @@ module.exports = {
       err.should.be.an.instanceof(ValidationError);
       Object.keys(err.errors).length.should.equal(4);
       err.errors.baz.should.be.an.instanceof(ValidatorError);
+      err.errors.baz.type.should.equal('bad');
+      err.errors.baz.path.should.equal('baz');
       err.errors.abc.should.be.an.instanceof(ValidatorError);
+      err.errors.abc.type.should.equal('must be abc');
+      err.errors.abc.path.should.equal('abc');
       err.errors.test.should.be.an.instanceof(ValidatorError);
+      err.errors.test.type.should.equal('must also be abc');
+      err.errors.test.path.should.equal('test');
       err.errors.required.should.be.an.instanceof(ValidatorError);
+      err.errors.required.type.should.equal('required');
+      err.errors.required.path.should.equal('required');
 
       post.set({
         baz: 'good',
@@ -3967,9 +3985,10 @@ module.exports = {
         test: 'test',
         required: 'here'
       });
+
       post.save(function(err){
-        should.strictEqual(err, null);
         db.close();
+        should.strictEqual(err, null);
       });
     });
   }

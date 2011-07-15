@@ -752,8 +752,22 @@ module.exports = {
   },
 
   'test validation': function(){
+    function dovalidate (val) {
+      this.asyncScope.should.equal('correct');
+      return true;
+    }
+
+    function dovalidateAsync (val, callback) {
+      this.scope.should.equal('correct');
+      process.nextTick(function () {
+        callback(true);
+      });
+    }
+
     mongoose.model('TestValidation', new Schema({
         simple: { type: String, required: true }
+      , scope: { type: String, validate: [dovalidate, 'scope failed'], required: true }
+      , asyncScope: { type: String, validate: [dovalidateAsync, 'async scope failed'], required: true }
     }));
 
     var db = start()
@@ -761,6 +775,8 @@ module.exports = {
 
     var post = new TestValidation();
     post.set('simple', '');
+    post.set('scope', 'correct');
+    post.set('asyncScope', 'correct');
 
     post.save(function(err){
       err.should.be.an.instanceof(MongooseError);
@@ -941,7 +957,7 @@ module.exports = {
       })
     });
   },
-  
+
   'test nested validation': function(){
     mongoose.model('TestNestedValidation', new Schema({
         nested: {

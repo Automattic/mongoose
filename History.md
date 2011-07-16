@@ -1,4 +1,10 @@
 
+1.7.3 / 2011-07-16
+===================
+
+  * fixed; MongooseArray#indexOf now works with ObjectIds
+  * fixed; validation scope now set properly (#418)
+  * fixed; added missing colors dependency (#398)
 
 1.7.2 / 2011-07-13
 ===================

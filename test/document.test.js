@@ -171,13 +171,14 @@ module.exports = {
     // parallel
     doc.pre('hooksTest', true, function(next, done){
       steps++;
+      steps.should.eql(3);
       setTimeout(function(){
         steps.should.eql(4);
-      }, 50);
+      }, 10);
       setTimeout(function(){
         steps++;
         done();
-      }, 100);
+      }, 110);
       next();
     });
 
@@ -185,11 +186,11 @@ module.exports = {
       steps++;
       setTimeout(function(){
         steps.should.eql(4);
-      }, 50);
+      }, 10);
       setTimeout(function(){
         steps++;
         done();
-      }, 100);
+      }, 110);
       next();
     });
 

@@ -94,7 +94,7 @@ module.exports = {
   'test errback+callback after error()ing': function (beforeExit) {
     var promise = new Promise()
       , called = 0;
-    
+
     promise.error(new Error('woot'));
 
     promise.addBack(function (err){

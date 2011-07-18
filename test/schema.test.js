@@ -698,22 +698,52 @@ module.exports = {
     });
 
     Tobi.path('name')._index.should.be.true;
-
     Tobi.path('name').index({ unique: true });
-
     Tobi.path('name')._index.should.eql({ unique: true });
+    Tobi.path('name').unique(false);
+    Tobi.path('name')._index.should.eql({ unique: false});
+
+    var T1 = new Schema({
+        name: { type: String, sparse: true }
+    });
+    T1.path('name')._index.should.eql({ sparse: true });
+
+    var T2 = new Schema({
+        name: { type: String, unique: true }
+    });
+    T2.path('name')._index.should.eql({ unique: true });
+
+    var T3 = new Schema({
+        name: { type: String, sparse: true, unique: true }
+    });
+    T3.path('name')._index.should.eql({ sparse: true, unique: true });
+
+    var T4 = new Schema({
+        name: { type: String, unique: true, sparse: true }
+    });
+    var i = T4.path('name')._index;
+    i.unique.should.be.true;
+    i.sparse.should.be.true;
+
+    var T5 = new Schema({
+        name: { type: String, index: { sparse: true, unique: true } }
+    });
+    var i = T5.path('name')._index;
+    i.unique.should.be.true;
+    i.sparse.should.be.true;
   },
-  
+
   'test defining compound indexes': function(){
     var Tobi = new Schema({
         name: { type: String, index: true }
-      , last: { type: Number }
+      , last: { type: Number, sparse: true }
     });
 
     Tobi.index({ firstname: 1, last: 1 }, { unique: true });
 
     Tobi.indexes.should.eql([
         [{ name: 1 }, {}]
+      , [{ last: 1 }, { sparse: true }]
       , [{ firstname: 1, last: 1}, {unique: true}]
     ]);
   },

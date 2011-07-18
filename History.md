@@ -1,4 +1,48 @@
 
+
+1.7.2 / 2011-07-13
+===================
+
+  * changed; node-mongodb-native driver to v0.9.6.7
+
+1.7.1 / 2011-07-12
+===================
+
+  * changed; roll back node-mongodb-native driver to v0.9.6.4
+
+1.7.0 / 2011-07-12
+===================
+
+  * fixed; collection name misspelling [mathrawka]
+  * fixed; 2nd param is required for ReplSetServers [kevinmarvin]
+  * fixed; MongooseArray behaves properly with Object.keys
+  * changed; node-mongodb-native driver to v0.9.6.6
+  * fixed/changed; Mongodb segfault when passed invalid ObjectId (#407)
+      - This means invalid data passed to the ObjectId constructor will now error
+
+1.6.0 / 2011-07-07
+===================
+
+  * changed; .save() errors are now emitted on the instances db instead of the instance 9782463fc
+  * fixed; errors occurring when creating indexes now properly emit on db
+  * added; $maxDistance support to MongooseArrays
+  * fixed; RegExps now work with $all
+  * changed; node-mongodb-native driver to v0.9.6.4
+  * fixed; model names are now accessible via .modelName
+  * added; Query#slaveOk support
+
+1.5.0 / 2011-06-27
+===================
+
+  * changed; saving without a callback no longer ignores the error (@bnoguchi)
+  * changed; hook-js version bump to 0.1.9
+  * changed; node-mongodb-native version bumped to 0.9.6.1 - When .remove() doesn't
+             return an error, null is no longer passed.
+  * fixed; two memory leaks (@justmoon)
+  * added; sparse index support
+  * added; more ObjectId conditionals (gt, lt, gte, lte) (@phillyqueso)
+  * added; options are now passed in model#remote (@JerryLuke)
+
 1.4.0 / 2011-06-10
 ===================
 

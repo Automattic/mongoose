@@ -52,7 +52,10 @@ var ModSchema = new Schema({
 });
 mongoose.model('Mod', ModSchema);
 
+var geoSchema = new Schema({ loc: { type: [Number], index: '2d'}});
+
 module.exports = {
+
   'test that find returns a Query': function () {
     var db = start()
       , BlogPostB = db.model('BlogPostB', collection);
@@ -505,12 +508,10 @@ module.exports = {
           nes1.length.should.eql(1);
 
           NE.find({ b: { $ne: [1] }}, function (err, nes2) {
-            should.strictEqual(err, null);
-            nes2.length.should.eql(2);
+            err.message.should.eql("Invalid ObjectId");
 
             NE.find({ b: { $ne: 4 }}, function (err, nes3) {
-              should.strictEqual(err, null);
-              nes3.length.should.eql(2);
+              err.message.should.eql("Invalid ObjectId");
 
               NE.find({ b: id3, ids: { $ne: id4 }}, function (err, nes4) {
                 db.close();
@@ -705,45 +706,81 @@ module.exports = {
     var db = start()
       , BlogPostB = db.model('BlogPostB', collection);
 
-      var post = new BlogPostB();
+    var post = new BlogPostB();
 
-      post.tags.push('cat');
+    post.tags.push('cat');
 
-      post.save( function (err) {
+    post.save(function (err) {
+      should.strictEqual(err, null);
+
+      BlogPostB.findOne({tags: 'cat'}, function (err, doc) {
         should.strictEqual(err, null);
 
-        BlogPostB.findOne({tags: 'cat'}, function (err, doc) {
-          should.strictEqual(err, null);
-
-          doc._id.should.eql(post._id);
-          db.close();
-        });
+        doc._id.should.eql(post._id);
+        db.close();
       });
+    });
   },
 
   'test querying if an array contains one of multiple members $in a set': function () {
     var db = start()
       , BlogPostB = db.model('BlogPostB', collection);
 
-      var post = new BlogPostB();
+    var post = new BlogPostB();
 
-      post.tags.push('football');
+    post.tags.push('football');
 
-      post.save( function (err) {
+    post.save(function (err) {
+      should.strictEqual(err, null);
+
+      BlogPostB.findOne({tags: {$in: ['football', 'baseball']}}, function (err, doc) {
         should.strictEqual(err, null);
+        doc._id.should.eql(post._id);
 
-        BlogPostB.findOne({tags: {$in: ['football', 'baseball']}}, function (err, doc) {
+        BlogPostB.findOne({ _id: post._id, tags: /otba/i }, function (err, doc) {
           should.strictEqual(err, null);
           doc._id.should.eql(post._id);
 
-          BlogPostB.findOne({ _id: post._id, tags: /otba/i }, function (err, doc) {
-            should.strictEqual(err, null);
-            doc._id.should.eql(post._id);
-
-            db.close();
-          })
-        });
+          db.close();
+        })
       });
+    });
+  },
+
+  'test querying if an array contains one of multiple members $in a set 2': function () {
+    var db = start()
+      , BlogPostA = db.model('BlogPostB', collection)
+
+    var post = new BlogPostA({ tags: ['gooberOne'] });
+
+    post.save(function (err) {
+      should.strictEqual(err, null);
+
+      var query = {tags: {$in:[ 'gooberOne' ]}};
+
+      BlogPostA.findOne(query, function (err, returned) {
+        done();
+        should.strictEqual(err, null);
+        ;(!!~returned.tags.indexOf('gooberOne')).should.be.true;
+        returned._id.should.eql(post._id);
+      });
+    });
+
+    post.collection.insert({ meta: { visitors: 9898, a: null } }, {}, function (err, b) {
+      should.strictEqual(err, null);
+
+      BlogPostA.findOne({_id: b[0]._id}, function (err, found) {
+        done();
+        should.strictEqual(err, null);
+        found.get('meta.visitors').valueOf().should.eql(9898);
+      })
+    });
+
+    var pending = 2;
+    function done () {
+      if (--pending) return;
+      db.close();
+    }
   },
 
   'test querying via $which where a string': function () {
@@ -835,6 +872,23 @@ module.exports = {
         should.strictEqual(err, null);
         found._id.should.eql(created._id);
         db.close();
+      });
+    });
+  },
+
+  // GH-389
+  'find nested doc using string id': function () {
+    var db = start()
+      , BlogPostB = db.model('BlogPostB', collection);
+
+    BlogPostB.create({comments: [{title: 'i should be queryable by _id'}, {title:'me too me too!'}]}, function (err, created) {
+      should.strictEqual(err, null);
+      var id = created.comments[1]._id.id;
+      BlogPostB.findOne({'comments._id': id}, function (err, found) {
+        db.close();
+        should.strictEqual(err, null);
+        should.strictEqual(!! found, true, 'Find by nested doc id hex string fails');
+        found._id.should.eql(created._id);
       });
     });
   },
@@ -997,12 +1051,43 @@ module.exports = {
           should.strictEqual(err, null);
           found.should.have.length(2);
           BlogPostB.find({numbers: {$all: [0, -1]}}, function (err, found) {
+            db.close();
             should.strictEqual(err, null);
             found.should.have.length(1);
-            db.close();
           });
         });
       });
+    });
+  },
+
+  'test finding a document whose arrays contain at least $all string values': function () {
+    var db = start()
+      , BlogPostB = db.model('BlogPostB', collection);
+
+    var post = new BlogPostB();
+
+    post.tags.push('onex');
+    post.tags.push('twox');
+    post.tags.push('threex');
+
+    post.save(function (err) {
+      should.strictEqual(err, null);
+
+      BlogPostB.findById(post._id, function (err, post) {
+        should.strictEqual(err, null);
+
+        BlogPostB.find({tags: { '$all': [/^onex/i]}}, function (err, docs) {
+          should.strictEqual(err, null);
+          docs.length.should.equal(1);
+
+          BlogPostB.findOne({tags: { '$all': /^two/ }}, function (err, doc) {
+            db.close();
+            should.strictEqual(err, null);
+            doc.id.should.eql(post.id);
+          });
+        });
+      });
+
     });
   },
 
@@ -1277,10 +1362,11 @@ module.exports = {
   // GH-336
   'finding by Date field works': function () {
     var db = start()
-      , Test = db.model('TestDateQuery', new Schema({ date: Date }), collection)
+      , Test = db.model('TestDateQuery', new Schema({ date: Date }), 'datetest_' + random())
       , now = new Date;
 
-    Test.create({ date: now }, function (err) {
+    Test.create({ date: now }, { date: new Date(now-10000) }, function (err, a, b) {
+      should.strictEqual(err, null);
       Test.find({ date: now }, function (err, docs) {
         db.close();
         should.strictEqual(err, null);
@@ -1292,8 +1378,7 @@ module.exports = {
   // GH-309
   'using $near with Arrays works (geo-spatial)': function () {
     var db = start()
-      , schema = new Schema({ loc: { type: Array, index: '2d'}})
-      , Test = db.model('GeoSpatialArrayQuery', schema, collection);
+      , Test = db.model('Geo1', geoSchema, collection + 'geospatial');
 
     Test.create({ loc: [ 10, 20 ]}, { loc: [ 40, 90 ]}, function (err) {
       should.strictEqual(err, null);
@@ -1303,7 +1388,27 @@ module.exports = {
           should.strictEqual(err, null);
           docs.length.should.equal(2);
         });
-      }, 400);
+      }, 700);
+    });
+  },
+
+  'using $maxDistance with Array works (geo-spatial)': function () {
+    var db = start()
+      , Test = db.model('Geo2', geoSchema, "x"+random());
+
+    Test.create({ loc: [ 20, 80 ]}, { loc: [ 25, 30 ]}, function (err, docs) {
+      should.strictEqual(!!err, false);
+      setTimeout(function () {
+        Test.find({ loc: { $near: [25, 31], $maxDistance: 1 }}, function (err, docs) {
+          should.strictEqual(err, null);
+          docs.length.should.equal(1);
+          Test.find({ loc: { $near: [25, 32], $maxDistance: 1 }}, function (err, docs) {
+            db.close();
+            should.strictEqual(err, null);
+            docs.length.should.equal(0);
+          });
+        });
+      }, 500);
     });
   }
 

@@ -114,6 +114,8 @@ module.exports = {
 
     var post = new BlogPost();
     post.isNew.should.be.true;
+    post.db.model('BlogPost').modelName.should.equal('BlogPost');
+    post.constructor.modelName.should.equal('BlogPost');
 
     post.get('_id').should.be.an.instanceof(DocumentObjectId);
 
@@ -750,8 +752,22 @@ module.exports = {
   },
 
   'test validation': function(){
+    function dovalidate (val) {
+      this.asyncScope.should.equal('correct');
+      return true;
+    }
+
+    function dovalidateAsync (val, callback) {
+      this.scope.should.equal('correct');
+      process.nextTick(function () {
+        callback(true);
+      });
+    }
+
     mongoose.model('TestValidation', new Schema({
         simple: { type: String, required: true }
+      , scope: { type: String, validate: [dovalidate, 'scope failed'], required: true }
+      , asyncScope: { type: String, validate: [dovalidateAsync, 'async scope failed'], required: true }
     }));
 
     var db = start()
@@ -759,6 +775,8 @@ module.exports = {
 
     var post = new TestValidation();
     post.set('simple', '');
+    post.set('scope', 'correct');
+    post.set('asyncScope', 'correct');
 
     post.save(function(err){
       err.should.be.an.instanceof(MongooseError);
@@ -789,8 +807,9 @@ module.exports = {
     post.save(function(err){
       err.should.be.an.instanceof(MongooseError);
       err.should.be.an.instanceof(ValidationError);
-      err.errors.simple.should.equal('Validator "must be abc" failed for path simple');
-      post.errors.simple.should.equal('Validator "must be abc" failed for path simple');
+      err.errors.simple.should.be.an.instanceof(ValidatorError);
+      err.errors.simple.message.should.equal('Validator "must be abc" failed for path simple');
+      post.errors.simple.message.should.equal('Validator "must be abc" failed for path simple');
 
       post.set('simple', 'abc');
       post.save(function(err){
@@ -812,7 +831,7 @@ module.exports = {
     }, 'Name cannot be greater than 1 character');
     var doc = new IntrospectionValidation({name: 'hi'});
     doc.save( function (err) {
-      err.errors.name.should.equal("Validator \"Name cannot be greater than 1 character\" failed for path name");
+      err.errors.name.message.should.equal("Validator \"Name cannot be greater than 1 character\" failed for path name");
       err.name.should.equal("ValidationError");
       err.message.should.equal("Validation failed");
       db.close();
@@ -867,14 +886,20 @@ module.exports = {
       (++timesCalled).should.eql(1);
 
       (Object.keys(err.errors).length).should.eql(3);
-      err.errors.password.should.eql('Validator failed for path password');
-      err.errors.email.should.eql('Validator failed for path email');
-      err.errors.username.should.eql('Validator failed for path username');
+      err.errors.password.should.be.an.instanceof(ValidatorError);
+      err.errors.email.should.be.an.instanceof(ValidatorError);
+      err.errors.username.should.be.an.instanceof(ValidatorError);
+      err.errors.password.message.should.eql('Validator failed for path password');
+      err.errors.email.message.should.eql('Validator failed for path email');
+      err.errors.username.message.should.eql('Validator failed for path username');
 
       (Object.keys(post.errors).length).should.eql(3);
-      post.errors.password.should.eql('Validator failed for path password');
-      post.errors.email.should.eql('Validator failed for path email');
-      post.errors.username.should.eql('Validator failed for path username');
+      post.errors.password.should.be.an.instanceof(ValidatorError);
+      post.errors.email.should.be.an.instanceof(ValidatorError);
+      post.errors.username.should.be.an.instanceof(ValidatorError);
+      post.errors.password.message.should.eql('Validator failed for path password');
+      post.errors.email.message.should.eql('Validator failed for path email');
+      post.errors.username.message.should.eql('Validator failed for path username');
 
       db.close();
     });
@@ -939,7 +964,7 @@ module.exports = {
       })
     });
   },
-  
+
   'test nested validation': function(){
     mongoose.model('TestNestedValidation', new Schema({
         nested: {
@@ -984,7 +1009,8 @@ module.exports = {
     post.save(function(err){
       err.should.be.an.instanceof(MongooseError);
       err.should.be.an.instanceof(ValidationError);
-      err.errors.required.should.eql('Validator "required" failed for path required');
+      err.errors.required.should.be.an.instanceof(ValidatorError);
+      err.errors.required.message.should.eql('Validator "required" failed for path required');
 
       post.get('items')[0].set('required', true);
       post.save(function(err){
@@ -1016,7 +1042,8 @@ module.exports = {
     post.save(function(err){
       err.should.be.an.instanceof(MongooseError);
       err.should.be.an.instanceof(ValidationError);
-      err.errors.async.should.eql('Validator "async validator" failed for path async');
+      err.errors.async.should.be.an.instanceof(ValidatorError);
+      err.errors.async.message.should.eql('Validator "async validator" failed for path async');
       executed.should.be.true;
       executed = false;
 
@@ -1186,8 +1213,6 @@ module.exports = {
   },
 
   'test "type" is allowed as a key': function(){
-    var now = Date.now();
-
     mongoose.model('TestTypeDefaults', new Schema({
         type: { type: String, default: 'YES!' }
     }));
@@ -1198,7 +1223,20 @@ module.exports = {
     var post = new TestDefaults();
     post.get('type').should.be.a('string');
     post.get('type').should.eql('YES!');
-    db.close();
+
+    // GH-402
+    var TestDefaults2 = db.model('TestTypeDefaults2', new Schema({
+        x: { y: { type: { type: String }, owner: String } }
+    }));
+
+    var post = new TestDefaults2;
+    post.x.y.type = "#402";
+    post.x.y.owner= "me";
+    post.save(function (err) {
+      db.close();
+      should.strictEqual(null, err);
+    });
+
   },
 
   'test nested defaults application': function(){
@@ -1503,6 +1541,7 @@ module.exports = {
     var post = new BlogPost();
     post.set('title', title);
     post.author = author;
+    post.meta.visitors = 0;
 
     post.save(function (err) {
       should.strictEqual(err, null);
@@ -1510,14 +1549,30 @@ module.exports = {
         should.strictEqual(err, null);
         createdFound.title.should.equal(title);
         createdFound.author.should.equal(author);
+        createdFound.meta.visitors.valueOf().should.eql(0);
+
         BlogPost.update({ title: title }, { title: newTitle }, function (err) {
           should.strictEqual(err, null);
 
           BlogPost.findById(post._id, function (err, updatedFound) {
-            db.close();
             should.strictEqual(err, null);
             updatedFound.title.should.equal(newTitle);
             updatedFound.author.should.equal(author);
+            updatedFound.meta.visitors.valueOf().should.equal(0);
+
+            // Note: use BlogPost.collection.update for anything other than set operations
+            BlogPost.update({ _id: post._id }, { $inc: { 'meta.visitors': 1 } }, function (err) {
+              if (err) db.close();
+              should.strictEqual(!!err, false, "Model.update doesn't work with $inc");
+
+              BlogPost.findById(post._id, function (err, updatedFound) {
+                db.close();
+                should.strictEqual(err, null);
+                updatedFound.meta.visitors.valueOf().should.equal(1);
+                updatedFound.title.should.equal(newTitle);
+                updatedFound.author.should.equal(author);
+              });
+            });
           });
         });
       });
@@ -2648,7 +2703,7 @@ module.exports = {
         found.should.have.length(1);
         
         BlogPost.remove({}, function (err) {
-          should.strictEqual(err, null);
+          should.strictEqual(!!err, false);
 
           BlogPost.find({}, function (err, found2) {
             should.strictEqual(err, null);
@@ -3678,23 +3733,52 @@ module.exports = {
     db.close();
   },
 
-  'Model#save should emit an error as its default error handler if a callback is not passed to it': function () {
+  'Model#save should emit an error on its db if a callback is not passed to it': function () {
     var db = start();
+
     var DefaultErrSchema = new Schema({});
 
+    var err = "";
+
     DefaultErrSchema.pre('save', function (next, fn) {
-      next(new Error());
+      try {
+        next(new Error);
+      } catch (error) {
+        // throws b/c nothing is listening to the error event
+        error.should.be.instanceof(Error);
+
+        db.on('error', function (err) {
+          db.close();
+          err.should.be.an.instanceof(Error);
+        });
+
+        next(new Error);
+      }
     });
 
     var DefaultErr = db.model('DefaultErr', DefaultErrSchema, 'default_err_' + random());
 
     var e = new DefaultErr();
-    e.on('error', function (err) {
-      err.should.be.an.instanceof(Error);
+
+    e.save();
+  },
+
+  'ensureIndex error should emit on the db': function () {
+    var db = start();
+
+    db.on('error', function (err) {
+      /^E11000 duplicate key error index:/.test(err.message).should.equal(true);
       db.close();
     });
 
-    e.save();
+    var schema = new Schema({ name: { type: String } })
+      , Test = db.model('IndexError', schema, "x"+random());
+
+    Test.create({ name: 'hi' }, { name: 'hi' }, function (err) {
+      should.strictEqual(err, null);
+      Test.schema.index({ name: 1 }, { unique: true });
+      Test.init();
+    });
   },
 
   'backward compatibility with conflicted data in the db': function () {
@@ -3707,6 +3791,221 @@ module.exports = {
       should.strictEqual(err, null);
       should.strictEqual('GI', m.namey.first);
       should.strictEqual('Joe', m.namey.last);
+    });
+  },
+
+  '#push should work on EmbeddedDocuments more than 2 levels deep': function () {
+    var db = start()
+      , Post = db.model('BlogPost', collection)
+      , Comment = db.model('CommentNesting', Comments, collection);
+
+    var p =new Post({ title: "comment nesting" });
+    var c1 =new Comment({ title: "c1" });
+    var c2 =new Comment({ title: "c2" });
+    var c3 =new Comment({ title: "c3" });
+
+    p.comments.push(c1);
+    c1.comments.push(c2);
+    c2.comments.push(c3);
+
+    p.save(function (err) {
+      should.strictEqual(err, null);
+
+      Post.findById(p._id, function (err, p) {
+        should.strictEqual(err, null);
+
+        var c4=new Comment({ title: "c4" });
+        p.comments[0].comments[0].comments[0].comments.push(c4);
+        p.save(function (err) {
+          should.strictEqual(err, null);
+
+          Post.findById(p._id, function (err, p) {
+            db.close();
+            should.strictEqual(err, null);
+            p.comments[0].comments[0].comments[0].comments[0].title.should.equal('c4');
+          });
+        });
+      });
+    })
+
+  },
+
+  'test standalone invalidate': function() {
+    var db = start()
+      , InvalidateSchema = null
+      , Post = null
+      , post = null;
+
+    InvalidateSchema = new Schema({
+      prop: { type: String },
+    });
+
+    mongoose.model('InvalidateSchema', InvalidateSchema);
+
+    Post = db.model('InvalidateSchema');
+    post = new Post();
+    post.set({baz: 'val'});
+    post.invalidate('baz', 'reason');
+
+    post.save(function(err){
+      err.should.be.an.instanceof(MongooseError);
+      err.should.be.an.instanceof(ValidationError);
+
+      err.errors.baz.should.be.an.instanceof(ValidatorError);
+      err.errors.baz.message.should.equal('Validator "reason" failed for path baz');
+      err.errors.baz.type.should.equal('reason');
+      err.errors.baz.path.should.equal('baz');
+
+      post.save(function(err){
+        db.close();
+        should.strictEqual(err, null);
+      });
+    });
+  },
+
+  'test simple validation middleware': function() {
+    var db = start()
+      , ValidationMiddlewareSchema = null
+      , Post = null
+      , post = null;
+
+    ValidationMiddlewareSchema = new Schema({
+      baz: { type: String }
+    });
+
+    ValidationMiddlewareSchema.pre('validate', function(next) {
+      if (this.get('baz') == 'bad') {
+        this.invalidate('baz', 'bad');
+      }
+      next();
+    });
+
+    mongoose.model('ValidationMiddleware', ValidationMiddlewareSchema);
+
+    Post = db.model('ValidationMiddleware');
+    post = new Post();
+    post.set({baz: 'bad'});
+
+    post.save(function(err){
+      err.should.be.an.instanceof(MongooseError);
+      err.should.be.an.instanceof(ValidationError);
+      err.errors.baz.type.should.equal('bad');
+      err.errors.baz.path.should.equal('baz');
+
+      post.set('baz', 'good');
+      post.save(function(err){
+        db.close();
+        should.strictEqual(err, null);
+      });
+    });
+  },
+
+  'test async validation middleware': function() {
+    var db = start()
+      , AsyncValidationMiddlewareSchema = null
+      , Post = null
+      , post = null;
+
+    AsyncValidationMiddlewareSchema = new Schema({
+      prop: { type: String }
+    });
+
+    AsyncValidationMiddlewareSchema.pre('validate', true, function(next, done) {
+      var self = this;
+      setTimeout(function() {
+        if (self.get('prop') == 'bad') {
+          self.invalidate('prop', 'bad');
+        }
+        done();
+      }, 50);
+      next();
+    });
+
+    mongoose.model('AsyncValidationMiddleware', AsyncValidationMiddlewareSchema);
+
+    Post = db.model('AsyncValidationMiddleware');
+    post = new Post();
+    post.set({prop: 'bad'});
+
+    post.save(function(err){
+      err.should.be.an.instanceof(MongooseError);
+      err.should.be.an.instanceof(ValidationError);
+      err.errors.prop.type.should.equal('bad');
+      err.errors.prop.path.should.equal('prop');
+
+      post.set('prop', 'good');
+      post.save(function(err){
+        db.close();
+        should.strictEqual(err, null);
+      });
+    });
+  },
+
+  'test complex validation middleware': function() {
+    var db = start()
+      , ComplexValidationMiddlewareSchema = null
+      , Post = null
+      , post = null
+      , abc = function(v) {
+          return v === 'abc';
+        };
+
+    ComplexValidationMiddlewareSchema = new Schema({
+      baz: { type: String },
+      abc: { type: String, validate: [abc, 'must be abc'] },
+      test: { type: String, validate: [/test/, 'must also be abc'] },
+      required: { type: String, required: true }
+    });
+
+    ComplexValidationMiddlewareSchema.pre('validate', true, function(next, done) {
+      var self = this;
+      setTimeout(function() {
+        if (self.get('baz') == 'bad') {
+          self.invalidate('baz', 'bad');
+        }
+        done();
+      }, 50);
+      next();
+    });
+
+    mongoose.model('ComplexValidationMiddleware', ComplexValidationMiddlewareSchema);
+
+    Post = db.model('ComplexValidationMiddleware');
+    post = new Post();
+    post.set({
+      baz: 'bad',
+      abc: 'not abc',
+      test: 'fail'
+    });
+
+    post.save(function(err){
+      err.should.be.an.instanceof(MongooseError);
+      err.should.be.an.instanceof(ValidationError);
+      Object.keys(err.errors).length.should.equal(4);
+      err.errors.baz.should.be.an.instanceof(ValidatorError);
+      err.errors.baz.type.should.equal('bad');
+      err.errors.baz.path.should.equal('baz');
+      err.errors.abc.should.be.an.instanceof(ValidatorError);
+      err.errors.abc.type.should.equal('must be abc');
+      err.errors.abc.path.should.equal('abc');
+      err.errors.test.should.be.an.instanceof(ValidatorError);
+      err.errors.test.type.should.equal('must also be abc');
+      err.errors.test.path.should.equal('test');
+      err.errors.required.should.be.an.instanceof(ValidatorError);
+      err.errors.required.type.should.equal('required');
+      err.errors.required.path.should.equal('required');
+
+      post.set({
+        baz: 'good',
+        abc: 'abc',
+        test: 'test',
+        required: 'here'
+      });
+
+      post.save(function(err){
+        db.close();
+        should.strictEqual(err, null);
+      });
     });
   }
 

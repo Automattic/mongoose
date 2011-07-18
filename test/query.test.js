@@ -8,6 +8,7 @@ var Query = require('mongoose/query')
   , mongoose = start.mongoose
   , DocumentObjectId = mongoose.Types.ObjectId
   , Schema = mongoose.Schema
+  , should = require('should')
 
 var Comment = new Schema({
     text: String
@@ -307,6 +308,15 @@ module.exports = {
     query._conditions.should.eql({checkin: {$near: [40, -72]}});
   },
 
+  'test Query#maxDistance via where': function () {
+    var query = new Query();
+    query.where('checkin').near([40, -72]).maxDistance(1);
+    query._conditions.should.eql({checkin: {$near: [40, -72], $maxDistance: 1}});
+    query = new Query();
+    query.where('checkin').near([40, -72]).$maxDistance(1);
+    query._conditions.should.eql({checkin: {$near: [40, -72], $maxDistance: 1}});
+  },
+
   'test Query#wherein.box not via where': function () {
     var query = new Query();
     query.wherein.box('gps', {ll: [5, 25], ur: [10, 30]});
@@ -557,6 +567,23 @@ module.exports = {
     db.close();
   },
 
+  //'throwing inside a query callback should not execute the callback again': function () {
+    //var query = new Query();
+    //var db = start();
+    //var Product = db.model('Product');
+
+    //var threw = false;
+    //Product.find({}, function (err) {
+      //if (!threw) {
+        //db.close();
+        //threw = true;
+        //throw new Error("Double callback");
+      //}
+
+      //should.strictEqual(err, null, 'Double callback detected');
+    //});
+  //},
+
   'Query#find $ne should not cast single value to array for schematype of Array': function () {
     var query = new Query();
     var db = start();
@@ -659,6 +686,20 @@ module.exports = {
     var query = new Query();
     query.maxscan(100);
     query.options.maxscan.should.equal(100);
+  },
+
+  'test Query#slaveOk': function () {
+    var query = new Query();
+    query.slaveOk();
+    query.options.slaveOk.should.be.true;
+
+    var query = new Query();
+    query.slaveOk(true);
+    query.options.slaveOk.should.be.true;
+
+    var query = new Query();
+    query.slaveOk(false);
+    query.options.slaveOk.should.be.false;
   },
 
   'test Query#hint': function () {

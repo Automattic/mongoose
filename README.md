@@ -8,42 +8,51 @@ environment.
 
 Defining a model is as easy as:
 
-    var Comments = new Schema({
-        title     : String
-      , body      : String
-      , date      : Date
-    });
+```javascript
+var Comments = new Schema({
+	title     : String
+  , body      : String
+  , date      : Date
+});
 
-    var BlogPost = new Schema({
-        author    : ObjectId
-      , title     : String
-      , body      : String
-      , date      : Date
-      , comments  : [Comments]
-      , meta      : {
-            votes : Number
-          , favs  : Number
-        }
-    });
+var BlogPost = new Schema({
+	author    : ObjectId
+  , title     : String
+  , body      : String
+  , date      : Date
+  , comments  : [Comments]
+  , meta      : {
+		votes : Number
+	  , favs  : Number
+	}
+});
 
-    mongoose.model('BlogPost', BlogPost);
+mongoose.model('BlogPost', BlogPost);
+```
 
 ## Installation
 
 The recommended way is through the excellent NPM:
 
-    $ npm install mongoose
+```bash
+$ npm install mongoose
+```
 
 Otherwise, you can check it in your repository and then expose it:
 
-    $ git clone git@github.com:LearnBoost/mongoose.git support/mongoose/
+```bash
+$ git clone git@github.com:LearnBoost/mongoose.git support/mongoose/
+```
+```javascript
+// in your code
+require.paths.unshift('support/mongoose/lib')
+```
 
-    // in your code
-    require.paths.unshift('support/mongoose/lib')
+Then you can `require` it:
 
-Then you can require it:
-
-    require('mongoose')
+```javascript
+require('mongoose')
+```
 
 ## Connecting to MongoDB
 
@@ -54,9 +63,11 @@ should use `mongose.connect`. If you need to create additional connections, use
 Both `connect` and `createConnection` take a `mongodb://` URI, or the parameters
 `host, database, port`.
 
-    var mongoose = require('mongoose');
+```javascript
+var mongoose = require('mongoose');
 
-    mongoose.connect('mongodb://localhost/my_database');
+mongoose.connect('mongodb://localhost/my_database');
+```
 
 Once connected, the `open` event is fired on the `Connection` instance. If
 you're using `mongoose.connect`, the `Connection` is `mongoose.connection`.
@@ -70,15 +81,17 @@ in order to define models, run queries, etc.
 
 Models are defined through the `Schema` interface. 
 
-    var Schema = mongoose.Schema
-      , ObjectId = Schema.ObjectId;
+```javascript
+var Schema = mongoose.Schema
+  , ObjectId = Schema.ObjectId;
 
-    var BlogPost = new Schema({
-        author    : ObjectId
-      , title     : String
-      , body      : String
-      , date      : Date
-    });
+var BlogPost = new Schema({
+	author    : ObjectId
+  , title     : String
+  , body      : String
+  , date      : Date
+});
+```
 
 Aside from defining the structure of your documents and the types of data you're
 storing, a Schema handles the definition of:
@@ -95,23 +108,25 @@ storing, a Schema handles the definition of:
 
 The following example shows some of these features:
 
-    var Comment = new Schema({
-        name  :  { type: String, default: 'hahaha' }
-      , age   :  { type: Number, min: 18, index: true }
-      , bio   :  { type: String, match: /[a-z]/ }
-      , date  :  { type: Date, default: Date.now }
-    });
+```javascript
+var Comment = new Schema({
+	name  :  { type: String, default: 'hahaha' }
+  , age   :  { type: Number, min: 18, index: true }
+  , bio   :  { type: String, match: /[a-z]/ }
+  , date  :  { type: Date, default: Date.now }
+});
 
-    // a setter
-    Comment.path('name').set(function (v) {
-      return v.capitalize();
-    });
+// a setter
+Comment.path('name').set(function (v) {
+  return v.capitalize();
+});
 
-    // middleware
-    Comment.pre('save', function (next) {
-        notify(this.get('email'));
-        next();
-    });
+// middleware
+Comment.pre('save', function (next) {
+	notify(this.get('email'));
+	next();
+});
+```
 
 Take a look at the example in `examples/schema.js` for an end-to-end example of
 (almost) all the functionality available.
@@ -121,21 +136,27 @@ Take a look at the example in `examples/schema.js` for an end-to-end example of
 Once we define a model through `mongoose.model('ModelName', mySchema)`, we can
 access it through the same function
 
-    var myModel = mongoose.model('ModelName');
+```javascript
+var myModel = mongoose.model('ModelName');
+```
 
 We can then instantiate it, and save it:
 
-    var instance = new myModel();
-    instance.my.key = 'hello';
-    instance.save(function (err) {
-      //
-    });
+```javascript
+var instance = new myModel();
+instance.my.key = 'hello';
+instance.save(function (err) {
+  //
+});
+```
 
 Or we can find documents from the same collection
 
-    myModel.find({}, function (err, docs) {
-      // docs.forEach
-    });
+```javascript
+myModel.find({}, function (err, docs) {
+  // docs.forEach
+});
+```
 
 You can also `findOne`, `findById`, `update`, etc. For more details check out
 the API docs.
@@ -144,34 +165,40 @@ the API docs.
 
 In the first example snippet, we defined a key in the Schema that looks like:
 
-    comments: [Comments]
+```
+comments: [Comments]
+```
 
 Where `Comments` is a `Schema` we created. This means that creating embedded
 documents is as simple as:
 
-    // retrieve my model
-    var BlogPost = mongoose.model('BlogPost');
+```javascript
+// retrieve my model
+var BlogPost = mongoose.model('BlogPost');
 
-    // create a blog post
-    var post = new BlogPost();
+// create a blog post
+var post = new BlogPost();
 
-    // create a comment
-    post.comments.push({ title: 'My comment' });
+// create a comment
+post.comments.push({ title: 'My comment' });
 
-    post.save(function (err) {
-      if (!err) console.log('Success!');
-    });
+post.save(function (err) {
+  if (!err) console.log('Success!');
+});
+```
 
 The same goes for removing them:
 
-    BlogPost.findById(myId, function (err, post) {
-      if (!err) {
-        post.comments[0].remove();
-        post.save(function (err) {
-          // do something
-        });
-      }
+```javascript
+BlogPost.findById(myId, function (err, post) {
+  if (!err) {
+    post.comments[0].remove();
+    post.save(function (err) {
+      // do something
     });
+  }
+});
+```
 
 Embedded documents enjoy all the same features as your models. Defaults,
 validators, middleware. Whenever an error occurs, it's bubbled to the `save()`
@@ -194,9 +221,11 @@ There's two types of middleware:
 - Serial
   Serial middleware are defined like:
 
-        .pre(method, function (next, methodArg1, methodArg2, ...) {
-          // ...
-        })
+```javascript
+.pre(method, function (next, methodArg1, methodArg2, ...) {
+  // ...
+})
+```
 
   They're executed one after the other, when each middleware calls `next`.
 
@@ -207,11 +236,13 @@ There's two types of middleware:
 
 - Parallel
   Parallel middleware offer more fine-grained flow control, and are defined
-  like
-
-        .pre(method, true, function (next, done, methodArg1, methodArg2) {
-          // ...
-        })
+  like:
+  
+```javascript
+.pre(method, true, function (next, done, methodArg1, methodArg2) {
+  // ...
+})
+```
 
   Parallel middleware can `next()` immediately, but the final argument will be
   called when all the parallel middleware have called `done()`.
@@ -223,16 +254,18 @@ interrupted, and the error is passed to the function passed as an argument.
 
 For example:
 
-    schema.pre('save', function (next) {
-        // something goes wrong
-        next(new Error('something went wrong'));
-    });
+```javascript
+schema.pre('save', function (next) {
+  // something goes wrong
+  next(new Error('something went wrong'));
+});
 
-    // later...
+// later...
 
-    myModel.save(function (err) {
-      // err can come from a middleware
-    });
+myModel.save(function (err) {
+  // err can come from a middleware
+});
+```
 
 ### Intercepting and mutating method arguments
 
@@ -296,6 +329,7 @@ The following plugins are currently available for use with mongoose:
   solution for your auth needs. Currently supports Password, Facebook,
   Twitter, Github, and more.
 - [mongoose-dbref](https://github.com/goulash1971/mongoose-dbref) - Adds DBRef support
+- [mongoose-joins](https://github.com/goulash1971/mongoose-joins) - Adds simple join support
 
 ## Contributing to Mongoose
 

@@ -1413,7 +1413,7 @@ module.exports = {
     });
   },
 
-  'buffers': function () {
+  'buffers find using available types': function () {
     var db = start()
       , BufSchema = new Schema({ name: String, block: Buffer })
       , Test = db.model('Buffer', BufSchema, "buffers");
@@ -1450,9 +1450,13 @@ module.exports = {
                   rb.block.toString('utf8').should.equal('hello world');
 
                   Test.findOne({ block: new MongooseBuffer('aGVsbG8gd29ybGQ=', 'base64') }, function (err, rb) {
-                    db.close();
                     should.strictEqual(err, null);
                     rb.block.toString('utf8').should.equal('hello world');
+
+                    Test.remove({}, function (err) {
+                      db.close();
+                      should.strictEqual(err, null);
+                    });
                   });
                 });
               });
@@ -1461,6 +1465,96 @@ module.exports = {
         });
       });
 
+    });
+  },
+
+  'buffer tests using conditionals': function () {
+    // $in $nin etc
+    var db = start()
+      , BufSchema = new Schema({ name: String, block: Buffer })
+      , Test = db.model('Buffer2', BufSchema, "buffer_"+random());
+
+    var docA = { name: 'A', block: new MongooseBuffer([195, 188, 98, 101, 114]) }; //über
+    var docB = { name: 'B', block: new MongooseBuffer("buffer shtuffs are neat") };
+    var docC = { name: 'C', block: new MongooseBuffer('aGVsbG8gd29ybGQ=', 'base64') };
+
+    Test.create(docA, docB, docC, function (err, a, b, c) {
+      should.strictEqual(err, null);
+      a.block.toString('utf8').should.equal('über');
+      b.block.toString('utf8').should.equal('buffer shtuffs are neat');
+      c.block.toString('utf8').should.equal('hello world');
+
+      Test.find({ block: { $in: [[195, 188, 98, 101, 114], "buffer shtuffs are neat", new Buffer('aGVsbG8gd29ybGQ=', 'base64')] }}, function (err, tests) {
+        done();
+        should.strictEqual(err, null);
+        tests.length.should.equal(3);
+      });
+
+      Test.find({ block: { $in: ['über', 'hello world'] }}, function (err, tests) {
+        done();
+        should.strictEqual(err, null);
+        tests.length.should.equal(2);
+      });
+
+      Test.find({ block: { $in: ['über'] }}, function (err, tests) {
+        done();
+        should.strictEqual(err, null);
+        tests.length.should.equal(1);
+        tests[0].block.toString('utf8').should.equal('über');
+      });
+
+      Test.find({ block: { $nin: ['über'] }}, function (err, tests) {
+        done();
+        should.strictEqual(err, null);
+        tests.length.should.equal(2);
+      });
+
+      Test.find({ block: { $nin: [[195, 188, 98, 101, 114], new Buffer('aGVsbG8gd29ybGQ=', 'base64')] }}, function (err, tests) {
+        done();
+        should.strictEqual(err, null);
+        tests.length.should.equal(1);
+        tests[0].block.toString('utf8').should.equal('buffer shtuffs are neat');
+      });
+
+      Test.find({ block: { $ne: 'über' }}, function (err, tests) {
+        done();
+        should.strictEqual(err, null);
+        tests.length.should.equal(2);
+      });
+
+      Test.find({ block: { $gt: 'über' }}, function (err, tests) {
+        done();
+        should.strictEqual(err, null);
+        tests.length.should.equal(2);
+      });
+
+      Test.find({ block: { $gte: 'über' }}, function (err, tests) {
+        done();
+        should.strictEqual(err, null);
+        tests.length.should.equal(3);
+      });
+
+      Test.find({ block: { $lt: new Buffer('buffer shtuffs are neat') }}, function (err, tests) {
+        done();
+        should.strictEqual(err, null);
+        tests.length.should.equal(2);
+        tests[0].block.toString('utf8').should.equal('über');
+      });
+
+      Test.find({ block: { $lte: 'buffer shtuffs are neat' }}, function (err, tests) {
+        done();
+        should.strictEqual(err, null);
+        tests.length.should.equal(3);
+      });
+
+      var pending = 9;
+      function done () {
+        if (--pending) return;
+        Test.remove({}, function (err) {
+          db.close();
+          should.strictEqual(err, null);
+        });
+      }
     });
   }
 };

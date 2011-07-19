@@ -12,6 +12,7 @@ var start = require('./common')
   , SchemaType = mongoose.SchemaType
   , CastError = SchemaType.CastError
   , ObjectId = Schema.ObjectId
+  , MongooseBuffer = mongoose.Types.Buffer
   , DocumentObjectId = mongoose.Types.ObjectId;
 
 /**
@@ -1410,7 +1411,56 @@ module.exports = {
         });
       }, 500);
     });
+  },
+
+  'buffers': function () {
+    var db = start()
+      , BufSchema = new Schema({ name: String, block: Buffer })
+      , Test = db.model('Buffer', BufSchema, "buffers");
+
+    var docA = { name: 'A', block: new Buffer('über') };
+    var docB = { name: 'B', block: new Buffer("buffer shtuffs are neat") };
+
+    Test.create(docA, docB, function (err, a, b) {
+      should.strictEqual(err, null);
+      b.block.toString('utf8').should.equal('buffer shtuffs are neat');
+      a.block.toString('utf8').should.equal('über');
+
+      Test.findById(a._id, function (err, a) {
+        should.strictEqual(err, null);
+        a.block.toString('utf8').should.equal('über');
+
+        Test.findOne({ block: 'buffer shtuffs are neat' }, function (err, rb) {
+          should.strictEqual(err, null);
+          rb.block.toString('utf8').should.equal('buffer shtuffs are neat');
+
+          Test.findOne({ block: /buffer/i }, function (err, rb) {
+            err.message.should.eql('Cast to buffer failed for value "/buffer/i"')
+            Test.findOne({ block: [195, 188, 98, 101, 114] }, function (err, rb) {
+              should.strictEqual(err, null);
+              rb.block.toString('utf8').should.equal('über');
+
+              Test.findOne({ block: 'aGVsbG8gd29ybGQ=' }, function (err, rb) {
+                should.strictEqual(err, null);
+                should.strictEqual(rb, null);
+
+                Test.findOne({ block: new Buffer('aGVsbG8gd29ybGQ=', 'base64') }, function (err, rb) {
+                  db.close();
+                  should.strictEqual(err, null);
+                  rb.block.toString('utf8').should.equal('hello world');
+
+                  Test.findOne({ block: new MongooseBuffer('aGVsbG8gd29ybGQ=', 'base64') }, function (err, rb) {
+                    db.close();
+                    should.strictEqual(err, null);
+                    rb.block.toString('utf8').should.equal('hello world');
+                  });
+                });
+              });
+            });
+          });
+        });
+      });
+
+    });
   }
-
-
 };

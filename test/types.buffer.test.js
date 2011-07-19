@@ -43,6 +43,14 @@ module.exports = {
     a.should.be.an.instanceof(Buffer);
     a.should.be.an.instanceof(MongooseBuffer);
     Buffer.isBuffer(a).should.be.true;
+
+    var a = new MongooseBuffer([195, 188, 98, 101, 114]);
+    var b = new MongooseBuffer("buffer shtuffs are neat");
+    var c = new MongooseBuffer('aGVsbG8gd29ybGQ=', 'base64');
+
+    a.toString('utf8').should.equal('über');
+    b.toString('utf8').should.equal('buffer shtuffs are neat');
+    c.toString('utf8').should.equal('hello world');
   },
 
   'test validation': function () {

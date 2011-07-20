@@ -16,7 +16,8 @@ var mongoose = require('./common').mongoose
   , DocumentObjectId = mongoose.Types.ObjectId
   , Mixed = SchemaTypes.Mixed
   , MongooseNumber = mongoose.Types.Number
-  , MongooseArray = mongoose.Types.Array;
+  , MongooseArray = mongoose.Types.Array
+  , vm = require('vm')
 
 /**
  * Test Document constructor.
@@ -803,6 +804,31 @@ module.exports = {
   'allow disabling the auto .id virtual': function () {
     var schema = new Schema({ name: String }, { noVirtualId: true });
     should.strictEqual(undefined, schema.virtuals.id);
+  },
+
+  'schema creation works with objects from other contexts': function () {
+    var str = 'code = {' +
+      '  name: String' +
+      ', arr1: Array ' +
+      ', arr2: { type: [] }' +
+      ', date: Date  ' +
+      ', num: { type: Number }' +
+      ', bool: Boolean' +
+      ', nest: { sub: { type: {}, required: true }}' +
+      '}';
+
+    var script = vm.createScript(str, 'testSchema.vm');
+    var sandbox = { code: null };
+    script.runInNewContext(sandbox);
+
+    var Ferret = new Schema(sandbox.code);
+    Ferret.path('nest.sub').should.be.an.instanceof(SchemaTypes.Mixed);
+    Ferret.path('name').should.be.an.instanceof(SchemaTypes.String);
+    Ferret.path('arr1').should.be.an.instanceof(SchemaTypes.Array);
+    Ferret.path('arr2').should.be.an.instanceof(SchemaTypes.Array);
+    Ferret.path('date').should.be.an.instanceof(SchemaTypes.Date);
+    Ferret.path('num').should.be.an.instanceof(SchemaTypes.Number);
+    Ferret.path('bool').should.be.an.instanceof(SchemaTypes.Boolean);
   }
 
 };

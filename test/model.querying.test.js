@@ -1420,11 +1420,13 @@ module.exports = {
 
     var docA = { name: 'A', block: new Buffer('über') };
     var docB = { name: 'B', block: new Buffer("buffer shtuffs are neat") };
+    var docC = { name: 'C', block: 'hello world' };
 
-    Test.create(docA, docB, function (err, a, b) {
+    Test.create(docA, docB, docC, function (err, a, b, c) {
       should.strictEqual(err, null);
       b.block.toString('utf8').should.equal('buffer shtuffs are neat');
       a.block.toString('utf8').should.equal('über');
+      c.block.toString('utf8').should.equal('hello world');
 
       Test.findById(a._id, function (err, a) {
         should.strictEqual(err, null);
@@ -1445,7 +1447,6 @@ module.exports = {
                 should.strictEqual(rb, null);
 
                 Test.findOne({ block: new Buffer('aGVsbG8gd29ybGQ=', 'base64') }, function (err, rb) {
-                  db.close();
                   should.strictEqual(err, null);
                   rb.block.toString('utf8').should.equal('hello world');
 

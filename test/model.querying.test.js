@@ -41,6 +41,7 @@ var BlogPostB = new Schema({
   , mixed     : {}
   , numbers   : [Number]
   , tags      : [String]
+  , sigs      : [Buffer]
   , owners    : [ObjectId]
   , comments  : [Comments]
 });
@@ -1141,6 +1142,26 @@ module.exports = {
             found.numbers[1].should.equal(700);
             db.close();
           });
+        });
+      });
+    });
+  },
+
+  'test finding documents with a specifc Buffer in their array': function () {
+    var db = start()
+      , BlogPostB = db.model('BlogPostB', collection);
+
+    BlogPostB.create({sigs: [new Buffer([1, 2, 3]),
+                             new Buffer([4, 5, 6]),
+                             new Buffer([7, 8, 9])]}, function (err, created) {
+      should.strictEqual(err, null);
+      BlogPostB.findOne({sigs: new Buffer([1, 2, 3])}, function (err, found) {
+        should.strictEqual(err, null);
+        found._id.should.eql(created._id);
+        var query = { sigs: { "$in" : [new Buffer([3, 3, 3]), new Buffer([4, 5, 6])] } };
+        BlogPostB.findOne(query, function (err, found) {
+          should.strictEqual(err, null);
+          db.close();
         });
       });
     });

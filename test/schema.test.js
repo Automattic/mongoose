@@ -393,6 +393,7 @@ module.exports = {
       , dates       : [Date]
       , numbers     : [Number]
       , strings     : [String]
+      , buffers     : [Buffer]
       , nocast      : []
       , mixed       : [Mixed]
     });
@@ -419,6 +420,11 @@ module.exports = {
 
     strings[1].should.be.a('string');
     strings[1].should.eql('123');
+
+    var buffers = Loki.path('buffers').cast(['\0\0\0', new Buffer("abc")]);
+    
+    buffers[0].should.be.an.instanceof(Buffer);
+    buffers[1].should.be.an.instanceof(Buffer);
 
     var nocasts = Loki.path('nocast').cast(['test', 123]);
 

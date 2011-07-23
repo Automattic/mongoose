@@ -2251,6 +2251,70 @@ module.exports = {
     });
   },
 
+  'test saving embedded arrays of Buffers atomically': function () {
+    var db = start()
+      , BufListSchema = new Schema({
+          buffers: [Buffer]
+        })
+      , totalDocs = 2
+      , saveQueue = [];
+
+    mongoose.model('BufList', BufListSchema);
+    var BufList = db.model('BufList');
+    
+    var t = new BufList();
+
+    t.save(function(err){
+      if (err) throw err;
+
+      BufList.findOne({ _id: t.get('_id') }, function(err, doc){
+        if (err) throw err;
+        doc.get('buffers').push(new Buffer([140]));
+        save(doc);
+      });
+
+      BufList.findOne({ _id: t.get('_id') }, function(err, doc){
+        if (err) throw err;
+        doc.get('buffers').push(new Buffer([141]), new Buffer([142]));
+        save(doc);
+      });
+
+
+      function save(doc) {
+        saveQueue.push(doc);
+        if (saveQueue.length == totalDocs)
+          saveQueue.forEach(function (doc) {
+            doc.save(function (err) {
+              if (err) throw err;
+              --totalDocs || complete();
+            });
+          });
+      };
+
+      function complete () {
+        BufList.findOne({ _id: t.get('_id') }, function (err, doc) {
+          if (err) throw err;
+
+          doc.get('buffers').length.should.eql(3);
+
+          doc.get('buffers').some(function(buf){
+            return buf[0] == 140;
+          }).should.be.true;
+
+          doc.get('buffers').some(function(buf){
+            return buf[0] == 141;
+          }).should.be.true;
+
+          doc.get('buffers').some(function(buf){
+            return buf[0] == 142;
+          }).should.be.true;
+
+          db.close();
+        });
+      };
+    });
+  },
+
   // GH-255
   'test updating an embedded document in an embedded array': function () {
     var db = start()

@@ -182,16 +182,16 @@ module.exports = {
 
   'test string enum validation': function(){
     var Test = new Schema({
-        complex: { type: String, enum: ['a', 'b', 'c'] }
+        complex: { type: String, enum: ['a', 'b', 'c', null] }
     });
 
     Test.path('complex').should.be.an.instanceof(SchemaTypes.String);
-    Test.path('complex').enumValues.should.eql(['a', 'b', 'c']);
+    Test.path('complex').enumValues.should.eql(['a', 'b', 'c', null]);
     Test.path('complex').validators.should.have.length(1);
 
     Test.path('complex').enum('d', 'e');
 
-    Test.path('complex').enumValues.should.eql(['a', 'b', 'c', 'd', 'e']);
+    Test.path('complex').enumValues.should.eql(['a', 'b', 'c', null, 'd', 'e']);
 
     Test.path('complex').doValidate('x', function(err){
       err.should.be.an.instanceof(ValidatorError);

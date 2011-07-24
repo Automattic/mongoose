@@ -197,6 +197,10 @@ module.exports = {
       err.should.be.an.instanceof(ValidatorError);
     });
 
+    Test.path('complex').doValidate(null, function(err){
+      should.strictEqual(null, err);
+    });
+
     Test.path('complex').doValidate('da', function(err){
       err.should.be.an.instanceof(ValidatorError);
     });

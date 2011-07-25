@@ -182,7 +182,7 @@ module.exports = {
 
   'test string enum validation': function(){
     var Test = new Schema({
-        complex: { type: String, enum: ['a', 'b', 'c', null] }
+        complex: { type: String, enum: ['a', 'b', undefined, 'c', null] }
     });
 
     Test.path('complex').should.be.an.instanceof(SchemaTypes.String);
@@ -194,6 +194,10 @@ module.exports = {
     Test.path('complex').enumValues.should.eql(['a', 'b', 'c', null, 'd', 'e']);
 
     Test.path('complex').doValidate('x', function(err){
+      err.should.be.an.instanceof(ValidatorError);
+    });
+
+    Test.path('complex').doValidate(undefined, function(err){
       err.should.be.an.instanceof(ValidatorError);
     });
 

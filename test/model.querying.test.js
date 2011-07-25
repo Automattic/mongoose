@@ -883,7 +883,7 @@ module.exports = {
 
     BlogPostB.create({comments: [{title: 'i should be queryable by _id'}, {title:'me too me too!'}]}, function (err, created) {
       should.strictEqual(err, null);
-      var id = created.comments[1]._id.id;
+      var id = created.comments[1]._id.toString();
       BlogPostB.findOne({'comments._id': id}, function (err, found) {
         db.close();
         should.strictEqual(err, null);

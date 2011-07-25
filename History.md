@@ -1,4 +1,13 @@
 
+1.7.4 / 2011-07-25
+===================
+
+  * fixed; sparse now a valid seperate schema option
+  * fixed; now catching cast errors in queries
+  * fixed; calling new Schema with object created in vm.runInNewContext now works (#384) [Sija]
+  * fixed; String enum was disallowing null
+  * fixed; Find by nested document _id now works (#389)
+
 1.7.3 / 2011-07-16
 ===================
 

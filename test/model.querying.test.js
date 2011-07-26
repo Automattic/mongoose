@@ -953,21 +953,38 @@ module.exports = {
   'test finding where $or': function () {
     var db = start()
       , Mod = db.model('Mod', 'mods_' + random());
-    Mod.create({num: 1}, function (err, one) {
+
+    Mod.create({num: 1}, {num: 2, str: 'two'}, function (err, one, two) {
       should.strictEqual(err, null);
-      Mod.create({num: 2}, function (err, two) {
-        should.strictEqual(err, null);
-        Mod.create({num: 3}, function (err, three) {
+
+      var pending = 2;
+      test1();
+      test2();
+
+      function test1 () {
+        Mod.find({$or: [{num: 1}, {num: 2}]}, function (err, found) {
+          done();
           should.strictEqual(err, null);
-          Mod.find({$or: [{num: 1}, {num: 2}]}, function (err, found) {
-            should.strictEqual(err, null);
-            found.should.have.length(2);
-            found[0]._id.should.eql(one._id);
-            found[1]._id.should.eql(two._id);
-            db.close();
-          });
+          found.should.have.length(2);
+          found[0]._id.should.eql(one._id);
+          found[1]._id.should.eql(two._id);
         });
-      });
+      }
+
+      function test2 () {
+        Mod.find({ $or: [{ str: 'two'}, {str:'three'}] }, function (err, found) {
+          if (err) console.error(err);
+          done();
+          should.strictEqual(err, null);
+          found.should.have.length(1);
+          found[0]._id.should.eql(two._id);
+        });
+      }
+
+      function done () {
+        if (--pending) return;
+        db.close();
+      }
     });
   },
 
@@ -1045,17 +1062,24 @@ module.exports = {
     var db = start()
       , BlogPostB = db.model('BlogPostB', collection);
 
-    BlogPostB.create({numbers: [-1,-2,-3,-4]}, function (err, whereoutZero) {
+    BlogPostB.create(
+        {numbers: [-1,-2,-3,-4], meta: { visitors: 4 }}
+      , {numbers: [0,-1,-2,-3,-4]}
+      , function (err, whereoutZero, whereZero) {
       should.strictEqual(err, null);
-      BlogPostB.create({numbers: [0,-1,-2,-3,-4]}, function (err, whereZero) {
+
+      BlogPostB.find({numbers: {$all: [-1, -2, -3, -4]}}, function (err, found) {
         should.strictEqual(err, null);
-        BlogPostB.find({numbers: {$all: [-1, -2, -3, -4]}}, function (err, found) {
+        found.should.have.length(2);
+        BlogPostB.find({'meta.visitors': {$all: [4] }}, function (err, found) {
           should.strictEqual(err, null);
-          found.should.have.length(2);
+          found.should.have.length(1);
+          found[0]._id.should.eql(whereoutZero._id);
           BlogPostB.find({numbers: {$all: [0, -1]}}, function (err, found) {
             db.close();
             should.strictEqual(err, null);
             found.should.have.length(1);
+            found[0]._id.should.eql(whereZero._id);
           });
         });
       });

@@ -1064,7 +1064,7 @@ module.exports = {
     var db = start()
       , BlogPostB = db.model('BlogPostB', collection);
 
-    var post = new BlogPostB();
+    var post = new BlogPostB({ title: "Aristocats" });
 
     post.tags.push('onex');
     post.tags.push('twox');
@@ -1076,14 +1076,29 @@ module.exports = {
       BlogPostB.findById(post._id, function (err, post) {
         should.strictEqual(err, null);
 
-        BlogPostB.find({tags: { '$all': [/^onex/i]}}, function (err, docs) {
+        BlogPostB.find({ title: { '$all': ['Aristocats']}}, function (err, docs) {
           should.strictEqual(err, null);
           docs.length.should.equal(1);
 
-          BlogPostB.findOne({tags: { '$all': /^two/ }}, function (err, doc) {
-            db.close();
+          BlogPostB.find({ title: { '$all': [/^Aristocats/]}}, function (err, docs) {
             should.strictEqual(err, null);
-            doc.id.should.eql(post.id);
+            docs.length.should.equal(1);
+
+            BlogPostB.find({tags: { '$all': ['onex','twox','threex']}}, function (err, docs) {
+              should.strictEqual(err, null);
+              docs.length.should.equal(1);
+
+              BlogPostB.find({tags: { '$all': [/^onex/i]}}, function (err, docs) {
+                should.strictEqual(err, null);
+                docs.length.should.equal(1);
+
+                BlogPostB.findOne({tags: { '$all': /^two/ }}, function (err, doc) {
+                  db.close();
+                  should.strictEqual(err, null);
+                  doc.id.should.eql(post.id);
+                });
+              });
+            });
           });
         });
       });

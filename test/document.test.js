@@ -29,13 +29,14 @@ TestDocument.prototype.__proto__ = Document.prototype;
  * Set a dummy schema to simulate compilation.
  */
 
-TestDocument.prototype.schema = new Schema({
+var schema = TestDocument.prototype.schema = new Schema({
     test    : String
   , oids    : [ObjectId]
   , nested  : {
         age   : Number
       , cool  : ObjectId
       , deep  : { x: String }
+      , path  : String
     }
   , nested2 : {
         nested: String
@@ -45,6 +46,13 @@ TestDocument.prototype.schema = new Schema({
           , age     : Number
         }
     }
+});
+
+schema.virtual('nested.agePlus2').get(function (v) {
+  return this.nested.age + 2;
+});
+schema.path('nested.path').get(function (v) {
+  return this.nested.age + (v ? v : '');
 });
 
 /**
@@ -69,8 +77,16 @@ module.exports = {
       , nested  : {
             age   : 5
           , cool  : DocumentObjectId.fromString('4c6c2d6240ced95d0e00003c')
+          , path  : 'my path'
         }
     });
+
+    doc.test.should.eql('test');
+    doc.oids.should.be.an.instanceof(Array);
+    (doc.nested.age == 5).should.be.true;
+    DocumentObjectId.toString(doc.nested.cool).should.eql('4c6c2d6240ced95d0e00003c');
+    doc.nested.agePlus2.should.eql(7);
+    doc.nested.path.should.eql('5my path');
 
     var doc2 = new TestDocument();
     doc2.init({
@@ -82,11 +98,6 @@ module.exports = {
           , deep  : { x: 'yay' }
         }
     });
-
-    doc.test.should.eql('test');
-    doc.oids.should.be.an.instanceof(Array);
-    (doc.nested.age == 5).should.be.true;
-    DocumentObjectId.toString(doc.nested.cool).should.eql('4c6c2d6240ced95d0e00003c');
 
     doc2.test.should.eql('toop');
     doc2.oids.should.be.an.instanceof(Array);

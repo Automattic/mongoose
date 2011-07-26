@@ -6,7 +6,7 @@
 require('./common');
 
 var utils = require('mongoose/utils')
-  , StateMachine = utils.StateMachine;
+  , StateMachine = require('mongoose/statemachine')
 
 /**
  * Setup.

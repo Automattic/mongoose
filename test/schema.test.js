@@ -399,7 +399,7 @@ module.exports = {
     });
 
     var oids = Loki.path('oids').cast(['4c54f3453e688c000000001a', new DocumentObjectId]);
-    
+
     oids[0].should.be.an.instanceof(DocumentObjectId);
     oids[1].should.be.an.instanceof(DocumentObjectId);
 
@@ -412,7 +412,7 @@ module.exports = {
 
     numbers[0].should.be.a('number');
     numbers[1].should.be.a('number');
-    
+
     var strings = Loki.path('strings').cast(['test', 123]);
 
     strings[0].should.be.a('string');
@@ -422,7 +422,7 @@ module.exports = {
     strings[1].should.eql('123');
 
     var buffers = Loki.path('buffers').cast(['\0\0\0', new Buffer("abc")]);
-    
+
     buffers[0].should.be.an.instanceof(Buffer);
     buffers[1].should.be.an.instanceof(Buffer);
 

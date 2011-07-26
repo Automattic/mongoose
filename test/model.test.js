@@ -2261,20 +2261,20 @@ module.exports = {
 
     mongoose.model('BufList', BufListSchema);
     var BufList = db.model('BufList');
-    
+
     var t = new BufList();
 
     t.save(function(err){
-      if (err) throw err;
+      should.strictEqual(null, err);
 
       BufList.findOne({ _id: t.get('_id') }, function(err, doc){
-        if (err) throw err;
+        should.strictEqual(null, err);
         doc.get('buffers').push(new Buffer([140]));
         save(doc);
       });
 
       BufList.findOne({ _id: t.get('_id') }, function(err, doc){
-        if (err) throw err;
+        should.strictEqual(null, err);
         doc.get('buffers').push(new Buffer([141]), new Buffer([142]));
         save(doc);
       });
@@ -2285,7 +2285,7 @@ module.exports = {
         if (saveQueue.length == totalDocs)
           saveQueue.forEach(function (doc) {
             doc.save(function (err) {
-              if (err) throw err;
+              should.strictEqual(null, err);
               --totalDocs || complete();
             });
           });
@@ -2293,7 +2293,8 @@ module.exports = {
 
       function complete () {
         BufList.findOne({ _id: t.get('_id') }, function (err, doc) {
-          if (err) throw err;
+          db.close();
+          should.strictEqual(null, err);
 
           doc.get('buffers').length.should.eql(3);
 
@@ -2309,7 +2310,6 @@ module.exports = {
             return buf[0] == 142;
           }).should.be.true;
 
-          db.close();
         });
       };
     });

@@ -37,6 +37,7 @@ var schema = TestDocument.prototype.schema = new Schema({
       , cool  : ObjectId
       , deep  : { x: String }
       , path  : String
+      , setr  : String
     }
   , nested2 : {
         nested: String
@@ -51,8 +52,14 @@ var schema = TestDocument.prototype.schema = new Schema({
 schema.virtual('nested.agePlus2').get(function (v) {
   return this.nested.age + 2;
 });
+schema.virtual('nested.setAge').set(function (v) {
+  this.nested.age = v;
+});
 schema.path('nested.path').get(function (v) {
   return this.nested.age + (v ? v : '');
+});
+schema.path('nested.setr').set(function (v) {
+  return v + ' setter';
 });
 
 /**
@@ -87,6 +94,10 @@ module.exports = {
     DocumentObjectId.toString(doc.nested.cool).should.eql('4c6c2d6240ced95d0e00003c');
     doc.nested.agePlus2.should.eql(7);
     doc.nested.path.should.eql('5my path');
+    doc.nested.setAge = 10;
+    (doc.nested.age == 10).should.be.true;
+    doc.nested.setr = 'set it';
+    doc.getValue('nested.setr').should.eql('set it setter');
 
     var doc2 = new TestDocument();
     doc2.init({
@@ -138,7 +149,6 @@ module.exports = {
     DocumentObjectId.toString(doc2.nested.cool).should.eql('4cf70857337498f95900001c');
 
     doc.oids.should.not.equal(doc2.oids);
-
   },
 
   'test shortcut setters': function () {

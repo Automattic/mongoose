@@ -35,15 +35,6 @@ TestDocument.prototype.schema = new Schema({
   , nested  : {
         age   : Number
       , cool  : ObjectId
-      , deep  : { x: String }
-    }
-  , nested2 : {
-        nested: String
-      , yup   : {
-            nested  : Boolean
-          , yup     : String
-          , age     : Number
-        }
     }
 });
 
@@ -79,7 +70,6 @@ module.exports = {
       , nested  : {
             age   : 2
           , cool  : DocumentObjectId.fromString('4cf70857337498f95900001c')
-          , deep  : { x: 'yay' }
         }
     });
 
@@ -93,41 +83,12 @@ module.exports = {
     (doc2.nested.age == 2).should.be.true;
 
     // GH-366
-    should.strictEqual(doc2.nested.bonk, undefined);
     should.strictEqual(doc2.nested.nested, undefined);
     should.strictEqual(doc2.nested.test, undefined);
-    should.strictEqual(doc2.nested.age.test, undefined);
-    should.strictEqual(doc2.nested.age.nested, undefined);
-    should.strictEqual(doc2.oids.nested, undefined);
-    should.strictEqual(doc2.nested.deep.x, 'yay');
-    should.strictEqual(doc2.nested.deep.nested, undefined);
-    should.strictEqual(doc2.nested.deep.cool, undefined);
-    should.strictEqual(doc2.nested2.yup.nested, undefined);
-    should.strictEqual(doc2.nested2.yup.nested2, undefined);
-    should.strictEqual(doc2.nested2.yup.yup, undefined);
-    should.strictEqual(doc2.nested2.yup.age, undefined);
-    doc2.nested2.yup.should.be.a('object');
-
-    doc2.nested2.yup = {
-        age: 150
-      , yup: "Yesiree"
-      , nested: true
-    };
-
-    should.strictEqual(doc2.nested2.nested, undefined);
-    should.strictEqual(doc2.nested2.yup.nested, true);
-    should.strictEqual(doc2.nested2.yup.yup, "Yesiree");
-    (doc2.nested2.yup.age == 150).should.be.true;
-    doc2.nested2.nested = "y";
-    should.strictEqual(doc2.nested2.nested, "y");
-    should.strictEqual(doc2.nested2.yup.nested, true);
-    should.strictEqual(doc2.nested2.yup.yup, "Yesiree");
-    (doc2.nested2.yup.age == 150).should.be.true;
 
     DocumentObjectId.toString(doc2.nested.cool).should.eql('4cf70857337498f95900001c');
 
     doc.oids.should.not.equal(doc2.oids);
-
   },
 
   'test shortcut setters': function () {

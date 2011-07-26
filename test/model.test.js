@@ -3572,7 +3572,12 @@ module.exports = {
 
     var a = '{ meta: { visitors: 45 },\n  numbers: [ 5, 6, 7 ],\n  owners: [ 4dd3e169dbfb13b4570000b6 ],\n  comments: \n   [{ _id: 4dd3e169dbfb13b4570000b7,\n     comments: [],\n     body: \'this is a comment\',\n     date: Wed, 18 May 2011 15:02:31 GMT,\n     title: \'my comment\' }\n   { _id: 4dd3e169dbfb13b4570000b8,\n     comments: [],\n     body: \'this is a comment too!\',\n     date: Wed, 18 May 2011 15:02:31 GMT,\n     title: \'the next thang\' }],\n  _id: 4dd3e169dbfb13b4570000b9,\n  date: Wed, 18 May 2011 15:02:31 GMT,\n  title: \'Test\' }'
 
-    post.inspect().should.eql(a);
+    var out = post.inspect();
+    ;/meta: { visitors: 45 }/.test(out).should.be.true;
+    ;/numbers: \[ 5, 6, 7 \]/.test(out).should.be.true;
+    ;/date: Wed, 18 May 2011 15:02:31 GMT/.test(out).should.be.true;
+    ;/activePaths:/.test(out).should.be.false;
+    ;/_atomics:/.test(out).should.be.false;
   },
 
   'path can be used as pathname': function () {

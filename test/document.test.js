@@ -201,10 +201,10 @@ module.exports = {
     copy.nested.age._marked = true;
     copy.nested.cool._marked = true;
 
-    should.strictEqual(doc.doc.test._marked, undefined);
-    should.strictEqual(doc.doc.nested._marked, undefined);
-    should.strictEqual(doc.doc.nested.age._marked, undefined);
-    should.strictEqual(doc.doc.nested.cool._marked, undefined);
+    should.strictEqual(doc._doc.test._marked, undefined);
+    should.strictEqual(doc._doc.nested._marked, undefined);
+    should.strictEqual(doc._doc.nested.age._marked, undefined);
+    should.strictEqual(doc._doc.nested.cool._marked, undefined);
   },
 
   'test hooks system': function(beforeExit){

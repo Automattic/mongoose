@@ -1972,7 +1972,7 @@ module.exports = {
       t.nested.nums.$pull(1);
       t.nested.nums.$pull(2);
 
-      t.activePaths.stateOf('nested.nums').should.equal('modify');
+      t._activePaths.stateOf('nested.nums').should.equal('modify');
       db.close();
 
     });
@@ -3358,7 +3358,7 @@ module.exports = {
           t.nest = null;
           t.save(function (err) {
             should.strictEqual(err, null);
-            should.strictEqual(t.doc.nest, null);
+            should.strictEqual(t._doc.nest, null);
             db.close();
           });
         });

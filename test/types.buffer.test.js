@@ -260,9 +260,9 @@ module.exports = {
 
     function reset (model) {
       // internal
-      model.activePaths.clear('modify');
+      model._activePaths.clear('modify');
       model.schema.requiredPaths.forEach(function (path) {
-        model.activePaths.require(path);
+        model._activePaths.require(path);
       });
     }
   },

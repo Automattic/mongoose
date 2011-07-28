@@ -3593,25 +3593,28 @@ module.exports = {
     }
 
     threw.should.be.false;
-
   },
 
-  'when mongo is down, save callback should fire with err': function () {
+  'when mongo is down, save callback should fire with err': function (beforeExit) {
     var db = start();
-    var T = db.model('Thing', new Schema({ type: String }));
-    db.close();
+    var T = db.model('Thing', new Schema({ a: String }));
+    db.on('open', function () {
+      var t = new T({ a: "monster" });
 
-    var t = new T({ type: "monster" });
+      var worked = false;
+      t.save(function (err) {
+        worked = true;
+        err.message.should.eql('notConnected');
+      });
 
-    var worked = false;
-    t.save(function (err) {
-      worked = true;
-      err.message.should.eql('notConnected');
+      process.nextTick(function () {
+        db.close();
+      });
+
+      setTimeout(function () {
+        worked.should.be.true;
+      }, 500);
     });
-
-    setTimeout(function () {
-      worked.should.be.true;
-    }, 1000);
   },
 
   'subdocuments with changed values should persist the values': function () {

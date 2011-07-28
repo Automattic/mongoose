@@ -265,5 +265,34 @@ module.exports = {
         model.activePaths.require(path);
       });
     }
+  },
+
+  'indexes should not be supported': function () {
+    var threw = false;
+    try {
+      new Schema({ buf: { type: Buffer, index: true }});
+    } catch (err) {
+      err.message.should.eql("Buffer indexes are not supported.");
+      threw = true;
+    }
+    threw.should.be.true;
+
+    threw = false;
+    try {
+      new Schema({ buf: { type: Buffer, sparse: true }});
+    } catch (err) {
+      err.message.should.eql("Buffer indexes are not supported.");
+      threw = true;
+    }
+    threw.should.be.true;
+
+    threw = false;
+    try {
+      new Schema({ buf: { type: Buffer, unique: true }});
+    } catch (err) {
+      err.message.should.eql("Buffer indexes are not supported.");
+      threw = true;
+    }
+    threw.should.be.true;
   }
 };

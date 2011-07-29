@@ -628,6 +628,21 @@ module.exports = {
     params.numbers.$ne[0].should.eql(10000);
   },
 
+  'Querying a subdocument array with $ne: null should not throw': function () {
+    var query = new Query();
+    var db = start();
+    var Product = db.model('Product');
+    var Comment = db.model('Comment');
+    db.close();
+
+    var params = {
+        comments: { $ne: null }
+    };
+
+    query.cast(Product, params);
+    should.strictEqual(params.comments.$ne, null);
+  },
+
   'Query#find should not cast single value to array for schematype of Array': function () {
     var query = new Query();
     var db = start();

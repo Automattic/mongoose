@@ -17,11 +17,9 @@ module.exports = {
       db.close();
     });
 
-    process.nextTick(function(){
-      var uri = 'mongodb://localhost/mongoose_test';
-      db.open(process.env.MONGOOSE_TEST_URI || uri, function(err){
-        connected = !err;
-      });
+    var uri = 'mongodb://localhost/mongoose_test';
+    db.open(process.env.MONGOOSE_TEST_URI || uri, function(err){
+      connected = !err;
     });
 
     beforeExit(function(){

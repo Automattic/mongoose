@@ -10,19 +10,19 @@ Defining a model is as easy as:
 
 ```javascript
 var Comments = new Schema({
-	title     : String
+    title     : String
   , body      : String
   , date      : Date
 });
 
 var BlogPost = new Schema({
-	author    : ObjectId
+    author    : ObjectId
   , title     : String
   , body      : String
   , date      : Date
   , comments  : [Comments]
   , meta      : {
-		votes : Number
+      votes : Number
 	  , favs  : Number
 	}
 });
@@ -86,7 +86,7 @@ var Schema = mongoose.Schema
   , ObjectId = Schema.ObjectId;
 
 var BlogPost = new Schema({
-	author    : ObjectId
+    author    : ObjectId
   , title     : String
   , body      : String
   , date      : Date
@@ -110,7 +110,7 @@ The following example shows some of these features:
 
 ```javascript
 var Comment = new Schema({
-	name  :  { type: String, default: 'hahaha' }
+    name  :  { type: String, default: 'hahaha' }
   , age   :  { type: Number, min: 18, index: true }
   , bio   :  { type: String, match: /[a-z]/ }
   , date  :  { type: Date, default: Date.now }
@@ -118,7 +118,7 @@ var Comment = new Schema({
 
 // a setter
 Comment.path('name').set(function (v) {
-  return v.capitalize();
+  return capitalize(v);
 });
 
 // middleware
@@ -138,6 +138,12 @@ access it through the same function
 
 ```javascript
 var myModel = mongoose.model('ModelName');
+```
+
+Or just do it all at once
+
+```javascript
+var myModel = mongoose.model('ModelName', mySchema);
 ```
 
 We can then instantiate it, and save it:
@@ -292,7 +298,9 @@ new values to `next`:
 .pre(method, function firstPre (next, methodArg1, methodArg2) {
   // Mutate methodArg1
   next("altered-" + methodArg1.toString(), methodArg2);
-}) // pre declaration is chainable
+})
+
+// pre declaration is chainable
 .pre(method, function secondPre (next, methodArg1, methodArg2) {
   console.log(methodArg1);
   // => 'altered-originalValOfMethodArg1' 

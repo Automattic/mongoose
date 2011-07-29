@@ -278,7 +278,7 @@ every time someone `set`s a path in your Document to a new value:
 schema.pre('set', function (next, path, val, typel) {
   // `this` is the current Document
   this.emit('set', path, val);
-      
+
   // Pass control to the next pre
   next();
 });
@@ -335,12 +335,9 @@ The following plugins are currently available for use with mongoose:
 
 ### Cloning the repository
 
-Make a fork of `mongoose`, then clone it in your computer. The `master` branch
-contains the current stable release, and the `develop` branch the next upcoming
+Make a fork of `mongoose`, then clone it in your computer. The `v1.x` branch
+contains the current stable release, and the `master` branch the next upcoming
 major release.
-
-If `master` is at `1.0`, `develop` will contain the upcoming `1.1` (or `2.0` if
-the `1` branch is nearing its completion).
 
 ### Guidelines
 

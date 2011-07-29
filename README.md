@@ -8,51 +8,43 @@ environment.
 
 Defining a model is as easy as:
 
-```javascript
-var Comments = new Schema({
-	title     : String
-  , body      : String
-  , date      : Date
-});
+    var Comments = new Schema({
+      title     : String
+      , body      : String
+      , date      : Date
+    });
 
-var BlogPost = new Schema({
-	author    : ObjectId
-  , title     : String
-  , body      : String
-  , date      : Date
-  , comments  : [Comments]
-  , meta      : {
-		votes : Number
-	  , favs  : Number
-	}
-});
+    var BlogPost = new Schema({
+      author    : ObjectId
+      , title     : String
+      , body      : String
+      , date      : Date
+      , comments  : [Comments]
+      , meta      : {
+        votes : Number
+        , favs  : Number
+      }
+    });
 
-mongoose.model('BlogPost', BlogPost);
-```
+    mongoose.model('BlogPost', BlogPost);
+
 
 ## Installation
 
 The recommended way is through the excellent NPM:
 
-```bash
-$ npm install mongoose
-```
+    $ npm install mongoose
 
 Otherwise, you can check it in your repository and then expose it:
 
-```bash
-$ git clone git@github.com:LearnBoost/mongoose.git support/mongoose/
-```
-```javascript
-// in your code
-require.paths.unshift('support/mongoose/lib')
-```
+    $ git clone git@github.com:LearnBoost/mongoose.git support/mongoose/
+
+    // in your code
+    require.paths.unshift('support/mongoose/lib')
 
 Then you can `require` it:
 
-```javascript
-require('mongoose')
-```
+    require('mongoose')
 
 ## Connecting to MongoDB
 
@@ -63,11 +55,9 @@ should use `mongose.connect`. If you need to create additional connections, use
 Both `connect` and `createConnection` take a `mongodb://` URI, or the parameters
 `host, database, port`.
 
-```javascript
-var mongoose = require('mongoose');
+    var mongoose = require('mongoose');
 
-mongoose.connect('mongodb://localhost/my_database');
-```
+    mongoose.connect('mongodb://localhost/my_database');
 
 Once connected, the `open` event is fired on the `Connection` instance. If
 you're using `mongoose.connect`, the `Connection` is `mongoose.connection`.
@@ -81,17 +71,15 @@ in order to define models, run queries, etc.
 
 Models are defined through the `Schema` interface. 
 
-```javascript
-var Schema = mongoose.Schema
-  , ObjectId = Schema.ObjectId;
+    var Schema = mongoose.Schema
+      , ObjectId = Schema.ObjectId;
 
-var BlogPost = new Schema({
-	author    : ObjectId
-  , title     : String
-  , body      : String
-  , date      : Date
-});
-```
+    var BlogPost = new Schema({
+      author    : ObjectId
+      , title     : String
+      , body      : String
+      , date      : Date
+    });
 
 Aside from defining the structure of your documents and the types of data you're
 storing, a Schema handles the definition of:
@@ -108,25 +96,23 @@ storing, a Schema handles the definition of:
 
 The following example shows some of these features:
 
-```javascript
-var Comment = new Schema({
-	name  :  { type: String, default: 'hahaha' }
-  , age   :  { type: Number, min: 18, index: true }
-  , bio   :  { type: String, match: /[a-z]/ }
-  , date  :  { type: Date, default: Date.now }
-});
+    var Comment = new Schema({
+      name  :  { type: String, default: 'hahaha' }
+      , age   :  { type: Number, min: 18, index: true }
+      , bio   :  { type: String, match: /[a-z]/ }
+      , date  :  { type: Date, default: Date.now }
+    });
 
-// a setter
-Comment.path('name').set(function (v) {
-  return v.capitalize();
-});
+    // a setter
+    Comment.path('name').set(function (v) {
+      return v.capitalize();
+    });
 
-// middleware
-Comment.pre('save', function (next) {
-	notify(this.get('email'));
-	next();
-});
-```
+    // middleware
+    Comment.pre('save', function (next) {
+      notify(this.get('email'));
+      next();
+    });
 
 Take a look at the example in `examples/schema.js` for an end-to-end example of
 (almost) all the functionality available.
@@ -136,27 +122,25 @@ Take a look at the example in `examples/schema.js` for an end-to-end example of
 Once we define a model through `mongoose.model('ModelName', mySchema)`, we can
 access it through the same function
 
-```javascript
-var myModel = mongoose.model('ModelName');
-```
+    var myModel = mongoose.model('ModelName');
+
+Or just do it all at once
+
+    var myModel = mongoose.model('ModelName', mySchema);
 
 We can then instantiate it, and save it:
 
-```javascript
-var instance = new myModel();
-instance.my.key = 'hello';
-instance.save(function (err) {
-  //
-});
-```
+    var instance = new myModel();
+    instance.my.key = 'hello';
+    instance.save(function (err) {
+      //
+    });
 
 Or we can find documents from the same collection
 
-```javascript
-myModel.find({}, function (err, docs) {
-  // docs.forEach
-});
-```
+    myModel.find({}, function (err, docs) {
+      // docs.forEach
+    });
 
 You can also `findOne`, `findById`, `update`, etc. For more details check out
 the API docs.
@@ -165,40 +149,34 @@ the API docs.
 
 In the first example snippet, we defined a key in the Schema that looks like:
 
-```
-comments: [Comments]
-```
+    comments: [Comments]
 
 Where `Comments` is a `Schema` we created. This means that creating embedded
 documents is as simple as:
 
-```javascript
-// retrieve my model
-var BlogPost = mongoose.model('BlogPost');
+    // retrieve my model
+    var BlogPost = mongoose.model('BlogPost');
 
-// create a blog post
-var post = new BlogPost();
+    // create a blog post
+    var post = new BlogPost();
 
-// create a comment
-post.comments.push({ title: 'My comment' });
+    // create a comment
+    post.comments.push({ title: 'My comment' });
 
-post.save(function (err) {
-  if (!err) console.log('Success!');
-});
-```
+    post.save(function (err) {
+      if (!err) console.log('Success!');
+    });
 
 The same goes for removing them:
 
-```javascript
-BlogPost.findById(myId, function (err, post) {
-  if (!err) {
-    post.comments[0].remove();
-    post.save(function (err) {
-      // do something
+    BlogPost.findById(myId, function (err, post) {
+      if (!err) {
+        post.comments[0].remove();
+        post.save(function (err) {
+          // do something
+        });
+      }
     });
-  }
-});
-```
 
 Embedded documents enjoy all the same features as your models. Defaults,
 validators, middleware. Whenever an error occurs, it's bubbled to the `save()`
@@ -221,28 +199,24 @@ There's two types of middleware:
 - Serial
   Serial middleware are defined like:
 
-```javascript
-.pre(method, function (next, methodArg1, methodArg2, ...) {
-  // ...
-})
-```
+        .pre(method, function (next, methodArg1, methodArg2, ...) {
+          // ...
+        })
 
   They're executed one after the other, when each middleware calls `next`.
 
   You can also intercept the `method`'s incoming arguments via your middleware -- 
   notice `methodArg1`, `methodArg2`, etc in the `pre` definition above. See
   section "Intercepting and mutating method arguments" below.
-  
+
 
 - Parallel
   Parallel middleware offer more fine-grained flow control, and are defined
   like:
-  
-```javascript
-.pre(method, true, function (next, done, methodArg1, methodArg2) {
-  // ...
-})
-```
+
+          .pre(method, true, function (next, done, methodArg1, methodArg2) {
+            // ...
+          })
 
   Parallel middleware can `next()` immediately, but the final argument will be
   called when all the parallel middleware have called `done()`.
@@ -254,18 +228,16 @@ interrupted, and the error is passed to the function passed as an argument.
 
 For example:
 
-```javascript
-schema.pre('save', function (next) {
-  // something goes wrong
-  next(new Error('something went wrong'));
-});
+    schema.pre('save', function (next) {
+      // something goes wrong
+      next(new Error('something went wrong'));
+    });
 
-// later...
+    // later...
 
-myModel.save(function (err) {
-  // err can come from a middleware
-});
-```
+    myModel.save(function (err) {
+      // err can come from a middleware
+    });
 
 ### Intercepting and mutating method arguments
 
@@ -274,39 +246,35 @@ You can intercept method arguments via middleware.
 For example, this would allow you to broadcast changes about your Documents
 every time someone `set`s a path in your Document to a new value:
 
-```javascript
-schema.pre('set', function (next, path, val, typel) {
-  // `this` is the current Document
-  this.emit('set', path, val);
+    schema.pre('set', function (next, path, val, typel) {
+      // `this` is the current Document
+      this.emit('set', path, val);
 
-  // Pass control to the next pre
-  next();
-});
-```
+      // Pass control to the next pre
+      next();
+    });
 
 Moreover, you can mutate the incoming `method` arguments so that subsequent
 middleware see different values for those arguments. To do so, just pass the
 new values to `next`:
 
-```javascript
-.pre(method, function firstPre (next, methodArg1, methodArg2) {
-  // Mutate methodArg1
-  next("altered-" + methodArg1.toString(), methodArg2);
-}) // pre declaration is chainable
-.pre(method, function secondPre (next, methodArg1, methodArg2) {
-  console.log(methodArg1);
-  // => 'altered-originalValOfMethodArg1' 
-  
-  console.log(methodArg2);
-  // => 'originalValOfMethodArg2' 
-  
-  // Passing no arguments to `next` automatically passes along the current argument values
-  // i.e., the following `next()` is equivalent to `next(methodArg1, methodArg2)`
-  // and also equivalent to, with the example method arg 
-  // values, `next('altered-originalValOfMethodArg1', 'originalValOfMethodArg2')`
-  next();
-})
-```
+    .pre(method, function firstPre (next, methodArg1, methodArg2) {
+      // Mutate methodArg1
+      next("altered-" + methodArg1.toString(), methodArg2);
+    }) // pre declaration is chainable
+    .pre(method, function secondPre (next, methodArg1, methodArg2) {
+      console.log(methodArg1);
+      // => 'altered-originalValOfMethodArg1' 
+
+      console.log(methodArg2);
+      // => 'originalValOfMethodArg2' 
+
+      // Passing no arguments to `next` automatically passes along the current argument values
+      // i.e., the following `next()` is equivalent to `next(methodArg1, methodArg2)`
+      // and also equivalent to, with the example method arg 
+      // values, `next('altered-originalValOfMethodArg1', 'originalValOfMethodArg2')`
+      next();
+    })
 
 ## API docs
 
@@ -357,7 +325,7 @@ major release.
 
 ## License
 
-Copyright (c) 2010 LearnBoost &lt;dev@learnboost.com&gt;
+Copyright (c) 2011 LearnBoost &lt;dev@learnboost.com&gt;
 
 Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the

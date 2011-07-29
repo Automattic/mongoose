@@ -4,12 +4,14 @@
     <style>
       body {
         background: url('/images/bg.png');
-        padding: 30px;
+        padding: 0 30px 30px;
+        margin-top: 0;
       }
 
       #wrap {
-        background: url('/images/pattern.png') no-repeat -50px 10px;
+        background: url('/images/pattern.png') no-repeat -134px -211px;
         min-height: 600px;
+        padding-top: 30px;
       }
 
       #page {
@@ -25,19 +27,20 @@
       }
 
       #content {
-        color: #414141;
+        color: #333;
         font: 14px Courier;
       }
-    
+
       #content h1, #content h2, #content h3 {
         text-shadow: 0 1px 0 #fff;
       }
 
       pre {
-        background: rgba(255,255,255,.2);
-        border: 1px solid #999;
+        background: rgba(255,255,255,.8);
+        border: 1px solid #e6e6e6;
         padding: 10px;
         color: #000;
+        border-radius: 3px
       }
 
       form {
@@ -128,10 +131,9 @@
     </script>
   </head>
   <body>
-    <a href="http://github.com/learnboost/mongoose/"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://assets2.github.com/img/e6bef7a091f5f3138b8cd40bc3e114258dd68ddf?repo=&url=http%3A%2F%2Fs3.amazonaws.com%2Fgithub%2Fribbons%2Fforkme_right_red_aa0000.png&path=" alt="Fork me on GitHub"></a>
     <div id="wrap">
       <div id="page">
-        <h1><a href="http://mongoosejs.com">Mongoose</a></h1>
+        <h1><a href="/">Mongoose</a></h1>
 
         <form action="http://groups.google.com/group/mongoose-orm/boxsubscribe">
          <a href="http://groups.google.com/group/mongoose-orm" id="google-subscribe-link"><img src="/images/groups.png" border="0"></a>
@@ -144,7 +146,6 @@
 
         <div id="menu">
           <ul>
-            <li><a href="/docs/api.html">API</a></li>
             <li><a href="/docs/model-definition.html">Model Definition</a></li>
             <li><a href="/docs/embedded-documents.html">Embedded documents</a></li>
             <li><a href="/docs/middleware.html">Middleware</a></li>
@@ -153,38 +154,39 @@
             <li><a href="/docs/validation.html">Validation</a></li>
             <li><a href="/docs/virtuals.html">Virtuals</a></li>
             <li><a href="/docs/getters-setters.html">Getters / Setters</a></li>
+            <li><a href="/docs/api.html">API</a></li>
           </ul>
         </div>
 
         <div id="content">
           <h1>Mongoose 1.0</h1>
 
-<h2>What's Mongoose?</h2>
+<h2>What&#39;s Mongoose?</h2>
 
-<p>Mongoose is a MongoDB object modeling tool designed to work in an asychronous
+<p>Mongoose is a MongoDB object modeling tool designed to work in an asynchronous
 environment.</p>
 
 <p>Defining a model is as easy as:</p>
 
 <pre><code>var Comments = new Schema({
-    title     : String
+  title     : String
   , body      : String
   , date      : Date
 });
 
 var BlogPost = new Schema({
-    author    : ObjectId
+  author    : ObjectId
   , title     : String
   , body      : String
   , date      : Date
   , comments  : [Comments]
   , meta      : {
-        votes : Number
-      , favs  : Number
-    }
+    votes : Number
+    , favs  : Number
+  }
 });
 
-mongoose.model('BlogPost', BlogPost);</code></pre>
+mongoose.model(&#39;BlogPost&#39;, BlogPost);</code></pre>
 
 <h2>Installation</h2>
 
@@ -197,11 +199,11 @@ mongoose.model('BlogPost', BlogPost);</code></pre>
 <pre><code>$ git clone git@github.com:LearnBoost/mongoose.git support/mongoose/
 
 // in your code
-require.paths.unshift('support/mongoose/lib')</code></pre>
+require.paths.unshift(&#39;support/mongoose/lib&#39;)</code></pre>
 
-<p>Then you can require it:</p>
+<p>Then you can <code>require</code> it:</p>
 
-<pre><code>require('mongoose')</code></pre>
+<pre><code>require(&#39;mongoose&#39;)</code></pre>
 
 <h2>Connecting to MongoDB</h2>
 
@@ -212,16 +214,16 @@ should use <code>mongose.connect</code>. If you need to create additional connec
 <p>Both <code>connect</code> and <code>createConnection</code> take a <code>mongodb://</code> URI, or the parameters
 <code>host, database, port</code>.</p>
 
-<pre><code>var mongoose = require('mongoose');
+<pre><code>var mongoose = require(&#39;mongoose&#39;);
 
-mongoose.connect('mongodb://localhost/my_database');</code></pre>
+mongoose.connect(&#39;mongodb://localhost/my_database&#39;);</code></pre>
 
 <p>Once connected, the <code>open</code> event is fired on the <code>Connection</code> instance. If
-you're using <code>mongoose.connect</code>, the <code>Connection</code> is <code>mongoose.connection</code>.
+you&#39;re using <code>mongoose.connect</code>, the <code>Connection</code> is <code>mongoose.connection</code>.
 Otherwise, <code>mongoose.createConnection</code> return value is a <code>Connection</code>.</p>
 
-<p><strong>Important!</strong> Mongoose buffers all the commands until it's connected to the
-database. This means that you don't have to wait until it connects to MongoDB
+<p><strong>Important!</strong> Mongoose buffers all the commands until it&#39;s connected to the
+database. This means that you don&#39;t have to wait until it connects to MongoDB
 in order to define models, run queries, etc.</p>
 
 <h2>Defining a Model</h2>
@@ -232,13 +234,13 @@ in order to define models, run queries, etc.</p>
   , ObjectId = Schema.ObjectId;
 
 var BlogPost = new Schema({
-    author    : ObjectId
+  author    : ObjectId
   , title     : String
   , body      : String
   , date      : Date
 });</code></pre>
 
-<p>Aside from defining the structure of your documents and the types of data you're
+<p>Aside from defining the structure of your documents and the types of data you&#39;re
 storing, a Schema handles the definition of:</p>
 
 <ul><li>Validators (async and sync)</li><li>Defaults</li><li>Getters</li><li>Setters</li><li>Indexes</li><li>Middleware</li><li>Methods definition</li><li>Statics definition</li><li>Plugins</li></ul>
@@ -246,21 +248,21 @@ storing, a Schema handles the definition of:</p>
 <p>The following example shows some of these features:</p>
 
 <pre><code>var Comment = new Schema({
-    name  :  { type: String, default: 'hahaha' }
+  name  :  { type: String, default: &#39;hahaha&#39; }
   , age   :  { type: Number, min: 18, index: true }
   , bio   :  { type: String, match: /[a-z]/ }
   , date  :  { type: Date, default: Date.now }
 });
 
 // a setter
-Comment.path('name').set(function (v) {
+Comment.path(&#39;name&#39;).set(function (v) {
   return v.capitalize();
 });
 
 // middleware
-Comment.pre('save', function (next) {
-    notify(this.get('email'));
-    next();
+Comment.pre(&#39;save&#39;, function (next) {
+  notify(this.get(&#39;email&#39;));
+  next();
 });</code></pre>
 
 <p>Take a look at the example in <code>examples/schema.js</code> for an end-to-end example of
@@ -268,15 +270,19 @@ Comment.pre('save', function (next) {
 
 <h2>Accessing a Model</h2>
 
-<p>Once we define a model through <code>mongoose.model('ModelName', mySchema)</code>, we can
+<p>Once we define a model through <code>mongoose.model(&#39;ModelName&#39;, mySchema)</code>, we can
 access it through the same function</p>
 
-<pre><code>var myModel = mongoose.model('ModelName');</code></pre>
+<pre><code>var myModel = mongoose.model(&#39;ModelName&#39;);</code></pre>
+
+<p>Or just do it all at once</p>
+
+<pre><code>var myModel = mongoose.model(&#39;ModelName&#39;, mySchema);</code></pre>
 
 <p>We can then instantiate it, and save it:</p>
 
 <pre><code>var instance = new myModel();
-instance.my.key = 'hello';
+instance.my.key = &#39;hello&#39;;
 instance.save(function (err) {
   //
 });</code></pre>
@@ -300,16 +306,16 @@ the API docs.</p>
 documents is as simple as:</p>
 
 <pre><code>// retrieve my model
-var BlogPost = mongoose.model('BlogPost');
+var BlogPost = mongoose.model(&#39;BlogPost&#39;);
 
 // create a blog post
 var post = new BlogPost();
 
 // create a comment
-post.comments.push({ title: 'My comment' });
+post.comments.push({ title: &#39;My comment&#39; });
 
 post.save(function (err) {
-  if (!err) console.log('Success!');
+  if (!err) console.log(&#39;Success!&#39;);
 });</code></pre>
 
 <p>The same goes for removing them:</p>
@@ -324,7 +330,7 @@ post.save(function (err) {
 });</code></pre>
 
 <p>Embedded documents enjoy all the same features as your models. Defaults,
-validators, middleware. Whenever an error occurs, it's bubbled to the <code>save()</code>
+validators, middleware. Whenever an error occurs, it&#39;s bubbled to the <code>save()</code>
 error callback, so error handling is a snap!</p>
 
 <p>Mongoose interacts with your embedded documents in arrays <em>atomically</em>, out of
@@ -339,17 +345,18 @@ takes away all the pain of nested callbacks.</p>
 <code>init</code> (when a document is initialized with data from MongoDB), <code>save</code> (when
 a document or embedded document is saved).</p>
 
-<p>There's two types of middleware, determined by the signature of the function
-you define (ie: the parameters your function accepts):</p>
+<p>There&#39;s two types of middleware:</p>
 
 <ul><li><p>Serial
-Serial middleware are defined like:</p><pre><code>.pre(method, function (next) {
+Serial middleware are defined like:</p><pre><code>.pre(method, function (next, methodArg1, methodArg2, ...) {
   // ...
-})</code></pre><p>They're executed one after the other, when each middleware calls <code>next</code>.</p></li><li><p>Parallel
+})</code></pre><p>They&#39;re executed one after the other, when each middleware calls <code>next</code>.</p><p>You can also intercept the <code>method</code>&#39;s incoming arguments via your middleware -- 
+notice <code>methodArg1</code>, <code>methodArg2</code>, etc in the <code>pre</code> definition above. See
+section &quot;Intercepting and mutating method arguments&quot; below.</p></li><li><p>Parallel
 Parallel middleware offer more fine-grained flow control, and are defined
-like</p><pre><code>.pre(method, function (next, done) {
-  // ...
-})</code></pre><p>Parallel middleware can <code>next()</code> immediately, but the final argument will be
+like:</p><pre><code>  .pre(method, true, function (next, done, methodArg1, methodArg2) {
+    // ...
+  })</code></pre><p>Parallel middleware can <code>next()</code> immediately, but the final argument will be
 called when all the parallel middleware have called <code>done()</code>.</p></li></ul>
 
 <h3>Error handling</h3>
@@ -359,9 +366,9 @@ interrupted, and the error is passed to the function passed as an argument.</p>
 
 <p>For example:</p>
 
-<pre><code>schema.pre('save', function (next) {
-    // something goes wrong
-    next(new Error('something went wrong'));
+<pre><code>schema.pre(&#39;save&#39;, function (next) {
+  // something goes wrong
+  next(new Error(&#39;something went wrong&#39;));
 });
 
 // later...
@@ -369,6 +376,43 @@ interrupted, and the error is passed to the function passed as an argument.</p>
 myModel.save(function (err) {
   // err can come from a middleware
 });</code></pre>
+
+<h3>Intercepting and mutating method arguments</h3>
+
+<p>You can intercept method arguments via middleware.</p>
+
+<p>For example, this would allow you to broadcast changes about your Documents
+every time someone <code>set</code>s a path in your Document to a new value:</p>
+
+<pre><code>schema.pre(&#39;set&#39;, function (next, path, val, typel) {
+  // `this` is the current Document
+  this.emit(&#39;set&#39;, path, val);
+
+  // Pass control to the next pre
+  next();
+});</code></pre>
+
+<p>Moreover, you can mutate the incoming <code>method</code> arguments so that subsequent
+middleware see different values for those arguments. To do so, just pass the
+new values to <code>next</code>:</p>
+
+<pre><code>.pre(method, function firstPre (next, methodArg1, methodArg2) {
+  // Mutate methodArg1
+  next(&quot;altered-&quot; + methodArg1.toString(), methodArg2);
+}) // pre declaration is chainable
+.pre(method, function secondPre (next, methodArg1, methodArg2) {
+  console.log(methodArg1);
+  // =&gt; &#39;altered-originalValOfMethodArg1&#39; 
+
+  console.log(methodArg2);
+  // =&gt; &#39;originalValOfMethodArg2&#39; 
+
+  // Passing no arguments to `next` automatically passes along the current argument values
+  // i.e., the following `next()` is equivalent to `next(methodArg1, methodArg2)`
+  // and also equivalent to, with the example method arg 
+  // values, `next(&#39;altered-originalValOfMethodArg1&#39;, &#39;originalValOfMethodArg2&#39;)`
+  next();
+})</code></pre>
 
 <h2>API docs</h2>
 
@@ -380,35 +424,42 @@ myModel.save(function (err) {
 <p>Please subscribe to the Google Groups <a href="http://groups.google.com/group/mongoose-orm/boxsubscribe">mailing
 list</a>.</p>
 
+<h2>Mongoose Plugins</h2>
+
+<p>The following plugins are currently available for use with mongoose:</p>
+
+<ul><li><a href="https://github.com/bnoguchi/mongoose-types">mongoose-types</a> - Adds
+several additional types (e.g., Email) that you can use in your
+Schema declarations</li><li><a href="https://github.com/bnoguchi/mongoose-auth">mongoose-auth</a> - A drop in 
+solution for your auth needs. Currently supports Password, Facebook,
+Twitter, Github, and more.</li><li><a href="https://github.com/goulash1971/mongoose-dbref">mongoose-dbref</a> - Adds DBRef support</li><li><a href="https://github.com/goulash1971/mongoose-joins">mongoose-joins</a> - Adds simple join support</li></ul>
+
 <h2>Contributing to Mongoose</h2>
 
 <h3>Cloning the repository</h3>
 
-<p>Make a fork of <code>mongoose</code>, then clone it in your computer. The <code>master</code> branch
-contains the current stable release, and the <code>develop</code> branch the next upcoming
+<p>Make a fork of <code>mongoose</code>, then clone it in your computer. The <code>v1.x</code> branch
+contains the current stable release, and the <code>master</code> branch the next upcoming
 major release.</p>
-
-<p>If <code>master</code> is at <code>1.0</code>, <code>develop</code> will contain the upcoming <code>1.1</code> (or <code>2.0</code> if
-the <code>1</code> branch is nearing its completion).</p>
 
 <h3>Guidelines</h3>
 
 <ul><li>Please write inline documentation for new methods or class members.</li><li>Please write tests and make sure your tests pass.</li><li>Before starting to write code, look for existing tickets or create one for
-your specifc issue (unless you're addressing something that's clearly broken).
+your specifc issue (unless you&#39;re addressing something that&#39;s clearly broken).
 That way you avoid working on something that might not be of interest or that
 has been addressed already in a different branch.</li></ul>
 
 <h2>Credits</h2>
 
-<ul><li>Guillermo Rauch - guillermo@learnboost.com - <a href="http://github.com/guille">Guille</a></li><li>Nathan White - <a href="http://github.com/nw/">nw</a></li><li>Brian Noguchi - <a href="https://github.com/bnoguchi">bnoguchi</a></li></ul>
+<ul><li>Guillermo Rauch - guillermo@learnboost.com - <a href="http://github.com/guille">Guille</a></li><li>Nathan White - <a href="http://github.com/nw/">nw</a></li><li>Brian Noguchi - <a href="https://github.com/bnoguchi">bnoguchi</a></li><li>Aaron Heckmann - <a href="https://github.com/aheckmann">aheckmann</a></li></ul>
 
 <h2>License</h2>
 
-<p>Copyright (c) 2010 LearnBoost &amp;lt;dev@learnboost.com&amp;gt;</p>
+<p>Copyright (c) 2011 LearnBoost &amp;lt;dev@learnboost.com&amp;gt;</p>
 
 <p>Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the
-'Software'), to deal in the Software without restriction, including
+&#39;Software&#39;), to deal in the Software without restriction, including
 without limitation the rights to use, copy, modify, merge, publish,
 distribute, sublicense, and/or sell copies of the Software, and to
 permit persons to whom the Software is furnished to do so, subject to
@@ -417,7 +468,7 @@ the following conditions:</p>
 <p>The above copyright notice and this permission notice shall be
 included in all copies or substantial portions of the Software.</p>
 
-<p>THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND,
+<p>THE SOFTWARE IS PROVIDED &#39;AS IS&#39;, WITHOUT WARRANTY OF ANY KIND,
 EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
 MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
 IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY

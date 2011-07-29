@@ -9,19 +9,19 @@ environment.
 Defining a model is as easy as:
 
     var Comments = new Schema({
-      title     : String
+        title     : String
       , body      : String
       , date      : Date
     });
 
     var BlogPost = new Schema({
-      author    : ObjectId
+        author    : ObjectId
       , title     : String
       , body      : String
       , date      : Date
       , comments  : [Comments]
       , meta      : {
-        votes : Number
+          votes : Number
         , favs  : Number
       }
     });
@@ -97,7 +97,7 @@ storing, a Schema handles the definition of:
 The following example shows some of these features:
 
     var Comment = new Schema({
-      name  :  { type: String, default: 'hahaha' }
+        name  :  { type: String, default: 'hahaha' }
       , age   :  { type: Number, min: 18, index: true }
       , bio   :  { type: String, match: /[a-z]/ }
       , date  :  { type: Date, default: Date.now }
@@ -105,7 +105,7 @@ The following example shows some of these features:
 
     // a setter
     Comment.path('name').set(function (v) {
-      return v.capitalize();
+      return capitalize(v);
     });
 
     // middleware
@@ -261,7 +261,9 @@ new values to `next`:
     .pre(method, function firstPre (next, methodArg1, methodArg2) {
       // Mutate methodArg1
       next("altered-" + methodArg1.toString(), methodArg2);
-    }) // pre declaration is chainable
+    })
+
+    // pre declaration is chainable
     .pre(method, function secondPre (next, methodArg1, methodArg2) {
       console.log(methodArg1);
       // => 'altered-originalValOfMethodArg1' 

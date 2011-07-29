@@ -4,12 +4,14 @@
     <style>
       body {
         background: url('/images/bg.png');
-        padding: 30px;
+        padding: 0 30px 30px;
+        margin-top: 0;
       }
 
       #wrap {
-        background: url('/images/pattern.png') no-repeat -50px 10px;
+        background: url('/images/pattern.png') no-repeat -134px -211px;
         min-height: 600px;
+        padding-top: 30px;
       }
 
       #page {
@@ -25,19 +27,20 @@
       }
 
       #content {
-        color: #414141;
+        color: #333;
         font: 14px Courier;
       }
-    
+
       #content h1, #content h2, #content h3 {
         text-shadow: 0 1px 0 #fff;
       }
 
       pre {
-        background: rgba(255,255,255,.2);
-        border: 1px solid #999;
+        background: rgba(255,255,255,.8);
+        border: 1px solid #e6e6e6;
         padding: 10px;
         color: #000;
+        border-radius: 3px
       }
 
       form {
@@ -130,7 +133,7 @@
   <body>
     <div id="wrap">
       <div id="page">
-        <h1><a href="http://mongoosejs.com">Mongoose</a></h1>
+        <h1><a href="/">Mongoose</a></h1>
 
         <form action="http://groups.google.com/group/mongoose-orm/boxsubscribe">
          <a href="http://groups.google.com/group/mongoose-orm" id="google-subscribe-link"><img src="/images/groups.png" border="0"></a>
@@ -143,7 +146,6 @@
 
         <div id="menu">
           <ul>
-            <li><a href="/docs/api.html">API</a></li>
             <li><a href="/docs/model-definition.html">Model Definition</a></li>
             <li><a href="/docs/embedded-documents.html">Embedded documents</a></li>
             <li><a href="/docs/middleware.html">Middleware</a></li>
@@ -152,6 +154,7 @@
             <li><a href="/docs/validation.html">Validation</a></li>
             <li><a href="/docs/virtuals.html">Virtuals</a></li>
             <li><a href="/docs/getters-setters.html">Getters / Setters</a></li>
+            <li><a href="/docs/api.html">API</a></li>
           </ul>
         </div>
 

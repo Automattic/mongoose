@@ -4,12 +4,14 @@
     <style>
       body {
         background: url('/images/bg.png');
-        padding: 30px;
+        padding: 0 30px 30px;
+        margin-top: 0;
       }
 
       #wrap {
-        background: url('/images/pattern.png') no-repeat -50px 10px;
+        background: url('/images/pattern.png') no-repeat -134px -211px;
         min-height: 600px;
+        padding-top: 30px;
       }
 
       #page {
@@ -25,19 +27,20 @@
       }
 
       #content {
-        color: #414141;
+        color: #333;
         font: 14px Courier;
       }
-    
+
       #content h1, #content h2, #content h3 {
         text-shadow: 0 1px 0 #fff;
       }
 
       pre {
-        background: rgba(255,255,255,.2);
-        border: 1px solid #999;
+        background: rgba(255,255,255,.8);
+        border: 1px solid #e6e6e6;
         padding: 10px;
         color: #000;
+        border-radius: 3px
       }
 
       form {
@@ -130,7 +133,7 @@
   <body>
     <div id="wrap">
       <div id="page">
-        <h1><a href="http://mongoosejs.com">Mongoose</a></h1>
+        <h1><a href="/">Mongoose</a></h1>
 
         <form action="http://groups.google.com/group/mongoose-orm/boxsubscribe">
          <a href="http://groups.google.com/group/mongoose-orm" id="google-subscribe-link"><img src="/images/groups.png" border="0"></a>
@@ -143,7 +146,6 @@
 
         <div id="menu">
           <ul>
-            <li><a href="/docs/api.html">API</a></li>
             <li><a href="/docs/model-definition.html">Model Definition</a></li>
             <li><a href="/docs/embedded-documents.html">Embedded documents</a></li>
             <li><a href="/docs/middleware.html">Middleware</a></li>
@@ -152,6 +154,7 @@
             <li><a href="/docs/validation.html">Validation</a></li>
             <li><a href="/docs/virtuals.html">Virtuals</a></li>
             <li><a href="/docs/getters-setters.html">Getters / Setters</a></li>
+            <li><a href="/docs/api.html">API</a></li>
           </ul>
         </div>
 
@@ -160,12 +163,12 @@
 
 <p>Models are defined by passing a <code>Schema</code> instance to <code>mongoose.model</code>.</p>
 
-<pre><code>mongoose.model('MyModel', mySchema);
+<pre><code>mongoose.model(&#39;MyModel&#39;, mySchema);
 // mySchema is &lt;a Schema&gt;</code></pre>
 
 <p>You can easily access the <code>Schema</code> constructor from the <code>mongoose</code> singleton:</p>
 
-<pre><code>var mongoose = require('mongoose')
+<pre><code>var mongoose = require(&#39;mongoose&#39;)
   , Schema = mongoose.Schema;
 
 var mySchema = new Schema({
@@ -176,20 +179,20 @@ var mySchema = new Schema({
 connection:</p>
 
 <pre><code>// connect the `mongoose` instance
-mongoose.connect('mongodb://host/db');
+mongoose.connect(&#39;mongodb://host/db&#39;);
 
-var BlogPost = mongoose.model('BlogPost');</code></pre>
+var BlogPost = mongoose.model(&#39;BlogPost&#39;);</code></pre>
 
 <p>Or from a <code>Connection</code> instance if you want to use multiple
 databases/connections:</p>
 
-<pre><code>var db = mongoose.createConnection('mongodb://host/db')
-  , BlogPost = db.model('BlogPost');</code></pre>
+<pre><code>var db = mongoose.createConnection(&#39;mongodb://host/db&#39;)
+  , BlogPost = db.model(&#39;BlogPost&#39;);</code></pre>
 
 <p><strong>Important</strong>: the actual interaction with the data happens with the <code>Model</code>
-that you obtain through <code>mongoose.model</code> or <code>db.model</code>. That's the object that
+that you obtain through <code>mongoose.model</code> or <code>db.model</code>. That&#39;s the object that
 you can instantiate or that you can call <code>.find()</code>, <code>.findOne()</code>, etc upon.
-Don't confuse schemas and actual models!</p>
+Don&#39;t confuse schemas and actual models!</p>
 
 <h2>Defining your keys</h2>
 
@@ -215,7 +218,7 @@ var PostSchema = new Schema({
 <p>To define an array of documents that follows a certain schema, make the value
 an array with the schema constructor inside.</p>
 
-<p>For example, let's assume we want to have a collection of comments within a
+<p>For example, let&#39;s assume we want to have a collection of comments within a
 blogpost, and we want the to be subject to casting, validation, and other
 functionality provided by models:</p>
 
@@ -230,13 +233,13 @@ var Post = new Schema({
 });</code></pre>
 
 <p>This will allow you to interact very easily with subdocuments later on. For
-more information, refer to the chapter on embedded documents that's part of
+more information, refer to the chapter on embedded documents that&#39;s part of
 this documentation.</p>
 
 <h3>Defining custom options for keys</h3>
 
 <p>Each key that you define is internally mapped to a <code>SchemaType</code>. Bear in mind, a
-Schema is not something that you interact directly with, but it's a way to
+Schema is not something that you interact directly with, but it&#39;s a way to
 describe to Mongoose what your want your data to look like, and how you want
 it to behave.</p>
 
@@ -260,13 +263,13 @@ your model, set your key to an object with the format <code>{ type: {Type}, … 
 If you want to define options later on, you could access a certain key through
 the <code>path</code> function:</p>
 
-<pre><code>Person.path('age').max(400);
+<pre><code>Person.path(&#39;age&#39;).max(400);
 
-Person.path('meta.birth').set(function (v) {
+Person.path(&#39;meta.birth&#39;).set(function (v) {
   // this is a setter
 });
 
-Person.path('title').validate(function (v) {
+Person.path(&#39;title&#39;).validate(function (v) {
   return v.length &gt; 50;
 });</code></pre>
 
@@ -280,11 +283,11 @@ found in other chapters.</p>
 when certain native methods are called on <code>Document</code> instances (<code>init</code>, <code>save</code>
 and <code>remove</code>).</p>
 
-<p>Let's say that you want to email a certain user when his document changes.
-You'd then define a hook on the User schema like this:</p>
+<p>Let&#39;s say that you want to email a certain user when his document changes.
+You&#39;d then define a hook on the User schema like this:</p>
 
-<pre><code>User.pre('save', function (next) {
-  email(this.email, 'Your record has changed');
+<pre><code>User.pre(&#39;save&#39;, function (next) {
+  email(this.email, &#39;Your record has changed&#39;);
   next();
 });</code></pre>
 

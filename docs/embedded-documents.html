@@ -4,12 +4,14 @@
     <style>
       body {
         background: url('/images/bg.png');
-        padding: 30px;
+        padding: 0 30px 30px;
+        margin-top: 0;
       }
 
       #wrap {
-        background: url('/images/pattern.png') no-repeat -50px 10px;
+        background: url('/images/pattern.png') no-repeat -134px -211px;
         min-height: 600px;
+        padding-top: 30px;
       }
 
       #page {
@@ -25,19 +27,20 @@
       }
 
       #content {
-        color: #414141;
+        color: #333;
         font: 14px Courier;
       }
-    
+
       #content h1, #content h2, #content h3 {
         text-shadow: 0 1px 0 #fff;
       }
 
       pre {
-        background: rgba(255,255,255,.2);
-        border: 1px solid #999;
+        background: rgba(255,255,255,.8);
+        border: 1px solid #e6e6e6;
         padding: 10px;
         color: #000;
+        border-radius: 3px
       }
 
       form {
@@ -130,7 +133,7 @@
   <body>
     <div id="wrap">
       <div id="page">
-        <h1><a href="http://mongoosejs.com">Mongoose</a></h1>
+        <h1><a href="/">Mongoose</a></h1>
 
         <form action="http://groups.google.com/group/mongoose-orm/boxsubscribe">
          <a href="http://groups.google.com/group/mongoose-orm" id="google-subscribe-link"><img src="/images/groups.png" border="0"></a>
@@ -143,7 +146,6 @@
 
         <div id="menu">
           <ul>
-            <li><a href="/docs/api.html">API</a></li>
             <li><a href="/docs/model-definition.html">Model Definition</a></li>
             <li><a href="/docs/embedded-documents.html">Embedded documents</a></li>
             <li><a href="/docs/middleware.html">Middleware</a></li>
@@ -152,6 +154,7 @@
             <li><a href="/docs/validation.html">Validation</a></li>
             <li><a href="/docs/virtuals.html">Virtuals</a></li>
             <li><a href="/docs/getters-setters.html">Getters / Setters</a></li>
+            <li><a href="/docs/api.html">API</a></li>
           </ul>
         </div>
 
@@ -162,7 +165,7 @@
 other documents (as items within an array).</p>
 
 <p>Embedded documents enjoy all the same features as your models. Defaults,
-validators, middleware. Whenever an error occurs, it's bubbled to the <code>save()</code>
+validators, middleware. Whenever an error occurs, it&#39;s bubbled to the <code>save()</code>
 error callback, so error handling is a snap!</p>
 
 <p>Mongoose interacts with your embedded documents in arrays <em>atomically</em>, out of
@@ -190,7 +193,7 @@ var BlogPost = new Schema({
     }
 });
 
-mongoose.model('BlogPost', BlogPost);</code></pre>
+mongoose.model(&#39;BlogPost&#39;, BlogPost);</code></pre>
 
 <p>The <code>comments</code> key of your <code>BlogPost</code> documents will then be an instance of
 <code>DocumentArray</code>. This is a special subclassed <code>Array</code> that can deal with
@@ -199,16 +202,16 @@ casting, and has special methods to work with embedded documents.</p>
 <h2>Adding an embedded document to an array</h2>
 
 <pre><code>// retrieve my model
-var BlogPost = mongoose.model('BlogPost');
+var BlogPost = mongoose.model(&#39;BlogPost&#39;);
 
 // create a blog post
 var post = new BlogPost();
 
 // create a comment
-post.comments.push({ title: 'My comment' });
+post.comments.push({ title: &#39;My comment&#39; });
 
 post.save(function (err) {
-  if (!err) console.log('Success!');
+  if (!err) console.log(&#39;Success!&#39;);
 });</code></pre>
 
 <h2>Removing an embedded document</h2>

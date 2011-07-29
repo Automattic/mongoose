@@ -4,12 +4,14 @@
     <style>
       body {
         background: url('/images/bg.png');
-        padding: 30px;
+        padding: 0 30px 30px;
+        margin-top: 0;
       }
 
       #wrap {
-        background: url('/images/pattern.png') no-repeat -50px 10px;
+        background: url('/images/pattern.png') no-repeat -134px -211px;
         min-height: 600px;
+        padding-top: 30px;
       }
 
       #page {
@@ -25,19 +27,20 @@
       }
 
       #content {
-        color: #414141;
+        color: #333;
         font: 14px Courier;
       }
-    
+
       #content h1, #content h2, #content h3 {
         text-shadow: 0 1px 0 #fff;
       }
 
       pre {
-        background: rgba(255,255,255,.2);
-        border: 1px solid #999;
+        background: rgba(255,255,255,.8);
+        border: 1px solid #e6e6e6;
         padding: 10px;
         color: #000;
+        border-radius: 3px
       }
 
       form {
@@ -130,7 +133,7 @@
   <body>
     <div id="wrap">
       <div id="page">
-        <h1><a href="http://mongoosejs.com">Mongoose</a></h1>
+        <h1><a href="/">Mongoose</a></h1>
 
         <form action="http://groups.google.com/group/mongoose-orm/boxsubscribe">
          <a href="http://groups.google.com/group/mongoose-orm" id="google-subscribe-link"><img src="/images/groups.png" border="0"></a>
@@ -143,7 +146,6 @@
 
         <div id="menu">
           <ul>
-            <li><a href="/docs/api.html">API</a></li>
             <li><a href="/docs/model-definition.html">Model Definition</a></li>
             <li><a href="/docs/embedded-documents.html">Embedded documents</a></li>
             <li><a href="/docs/middleware.html">Middleware</a></li>
@@ -152,6 +154,7 @@
             <li><a href="/docs/validation.html">Validation</a></li>
             <li><a href="/docs/virtuals.html">Virtuals</a></li>
             <li><a href="/docs/getters-setters.html">Getters / Setters</a></li>
+            <li><a href="/docs/api.html">API</a></li>
           </ul>
         </div>
 
@@ -162,9 +165,9 @@
 following rules in mind:</p>
 
 <ul><li><p>Validation is defined in the <code>Schema</code></p></li><li><p>Validation occurs when a document attempts to be saved, after defaults have
-been applied.</p></li><li><p>Mongoose doesn't care about complex error message construction. Errors have
-type identifiers. For example, <code>"min"</code> is the identifier for the error
-triggered when a number doesn't meet the minimum value. The path and value
+been applied.</p></li><li><p>Mongoose doesn&#39;t care about complex error message construction. Errors have
+type identifiers. For example, <code>&quot;min&quot;</code> is the identifier for the error
+triggered when a number doesn&#39;t meet the minimum value. The path and value
 that triggered the error can be accessed in the <code>ValidationError</code> object.</p></li><li><p>Validation is an internal piece of middleware</p></li><li><p>Validation is asynchronously recursive: when you call <code>Model#save</code>, embedded
 documents validation is executed. If an error happens, your <code>Model#save</code>
 callback receives it.</p></li></ul>
@@ -180,7 +183,7 @@ more about schemas).</p>
 };
 
 new Schema({
-    name: { type: String, validate: [validator, 'my error type'] }
+    name: { type: String, validate: [validator, &#39;my error type&#39;] }
 })</code></pre>
 
 <p>If you find this syntax too clumsy, you can also define the type</p>
@@ -191,9 +194,9 @@ new Schema({
 
 <p>and then your validator</p>
 
-<pre><code>schema.path('name').validate(function (v) {
+<pre><code>schema.path(&#39;name&#39;).validate(function (v) {
   return v.length &gt; 5;
-}, 'my error type'); </code></pre>
+}, &#39;my error type&#39;); </code></pre>
 
 <h2>Regular expressions</h2>
 
@@ -207,9 +210,9 @@ new Schema({
 
 <p>If you define a validator function with two parameters, like:</p>
 
-<pre><code>schema.path('name').validate(function (v, fn) {
+<pre><code>schema.path(&#39;name&#39;).validate(function (v, fn) {
   // my logic
-}, 'my error type'); </code></pre>
+}, &#39;my error type&#39;); </code></pre>
 
 <p>Then the function <code>fn</code> has to be called with <code>true</code> or <code>false</code>, depending on
 whether the validator passed. This allows for calling other models and querying
@@ -218,7 +221,7 @@ data asynchronously from your validator.</p>
 <h2>Built in validators</h2>
 
 <ul><li><p>For Strings:</p><ul><li><p><code>enum</code>: takes a list of allowed values. Example:</p><p>var Post = new Schema({
-    type: { type: String, enum: ['page', 'post', 'link'] }
+    type: { type: String, enum: [&#39;page&#39;, &#39;post&#39;, &#39;link&#39;] }
 })</p></li></ul></li><li><p>For Numbers:</p><ul><li><p><code>min</code>: minimum value</p><p>var Person = new Schema({
     age: { type: Number, min: 5 }
 })</p></li><li><p><code>max</code>: maxmimum value</p><p>var Person = new Schema({

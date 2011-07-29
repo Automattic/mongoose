@@ -4,7 +4,9 @@
   , "version": "1.0.2"
   , "author": "Guillermo Rauch <guillermo@learnboost.com>"
   , "keywords": ["mongodb", "mongoose", "orm", "data", "datastore", "nosql"]
-  , "dependencies": {}
+  , "devDependencies": {
+      "markdown": "0.2.1"
+    }
   , "directories": { "lib": "./lib/mongoose" }
   , "scripts": { "test": "make test" }
   , "main": "./index.js"

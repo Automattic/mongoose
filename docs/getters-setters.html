@@ -4,12 +4,14 @@
     <style>
       body {
         background: url('/images/bg.png');
-        padding: 30px;
+        padding: 0 30px 30px;
+        margin-top: 0;
       }
 
       #wrap {
-        background: url('/images/pattern.png') no-repeat -50px 10px;
+        background: url('/images/pattern.png') no-repeat -134px -211px;
         min-height: 600px;
+        padding-top: 30px;
       }
 
       #page {
@@ -25,19 +27,20 @@
       }
 
       #content {
-        color: #414141;
+        color: #333;
         font: 14px Courier;
       }
-    
+
       #content h1, #content h2, #content h3 {
         text-shadow: 0 1px 0 #fff;
       }
 
       pre {
-        background: rgba(255,255,255,.2);
-        border: 1px solid #999;
+        background: rgba(255,255,255,.8);
+        border: 1px solid #e6e6e6;
         padding: 10px;
         color: #000;
+        border-radius: 3px
       }
 
       form {
@@ -130,7 +133,7 @@
   <body>
     <div id="wrap">
       <div id="page">
-        <h1><a href="http://mongoosejs.com">Mongoose</a></h1>
+        <h1><a href="/">Mongoose</a></h1>
 
         <form action="http://groups.google.com/group/mongoose-orm/boxsubscribe">
          <a href="http://groups.google.com/group/mongoose-orm" id="google-subscribe-link"><img src="/images/groups.png" border="0"></a>
@@ -143,7 +146,6 @@
 
         <div id="menu">
           <ul>
-            <li><a href="/docs/api.html">API</a></li>
             <li><a href="/docs/model-definition.html">Model Definition</a></li>
             <li><a href="/docs/embedded-documents.html">Embedded documents</a></li>
             <li><a href="/docs/middleware.html">Middleware</a></li>
@@ -152,6 +154,7 @@
             <li><a href="/docs/validation.html">Validation</a></li>
             <li><a href="/docs/virtuals.html">Virtuals</a></li>
             <li><a href="/docs/getters-setters.html">Getters / Setters</a></li>
+            <li><a href="/docs/api.html">API</a></li>
           </ul>
         </div>
 
@@ -162,7 +165,7 @@
 
 <h2>Setters</h2>
 
-<p>Setters allow you to transform the mongoose document's data before it gets to the raw mongodb document and is set as a value on an actual key.</p>
+<p>Setters allow you to transform the mongoose document&#39;s data before it gets to the raw mongodb document and is set as a value on an actual key.</p>
 
 <p>Suppose you are implementing user registration for a website. User provide an email and password, which gets saved to mongodb. The email is a string that you will want to normalize to lower case, in order to avoid one email having more than one account -- e.g., otherwise, avenue@q.com can be registered for 2 accounts via avenue@q.com and AvEnUe@Q.CoM.</p>
 
@@ -176,10 +179,10 @@ var UserSchema = new Schema({
   email: { type: String, set: toLower } 
 });
 
-var User = mongoose.model('User', UserSchema);
-var user = new User({email: 'AVENUE@Q.COM'});
+var User = mongoose.model(&#39;User&#39;, UserSchema);
+var user = new User({email: &#39;AVENUE@Q.COM&#39;});
 
-console.log(user.email); // 'avenue@q.com'</code></pre>
+console.log(user.email); // &#39;avenue@q.com&#39;</code></pre>
 
 <p>As you can see above, setters allow you to transform the data before it gets to the raw mongodb document and is set as a value on an actual key.</p>
 
@@ -190,17 +193,17 @@ console.log(user.email); // 'avenue@q.com'</code></pre>
 <p>Suppose you are storing credit card numbers and you want to hide everything except the last 4 digits to the mongoose user.  You can do so by defining a getter in the following way (again, notice that getters are defined in the <code>Schema</code>):</p>
 
 <pre><code>function obfuscate (cc) {
-  return '****-****-****-' + cc.slice(cc.length-4, cc.length);
+  return &#39;****-****-****-&#39; + cc.slice(cc.length-4, cc.length);
 }
 
 var AccountSchema = new Schema({
   creditCardNumber: { type: String, get: obfuscate }
 });
 
-var Account = mongoose.model('Account', AccountSchema);
+var Account = mongoose.model(&#39;Account&#39;, AccountSchema);
 
 Account.findById( someId, function (err, found) {
-  console.log(found.creditCardNumber); // '****-****-****-1234'
+  console.log(found.creditCardNumber); // &#39;****-****-****-1234&#39;
 });</code></pre>
 
 <h2>Summary</h2>

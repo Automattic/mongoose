@@ -10,19 +10,19 @@ Defining a model is as easy as:
 
 ```javascript
 var Comments = new Schema({
-	title     : String
+    title     : String
   , body      : String
   , date      : Date
 });
 
 var BlogPost = new Schema({
-	author    : ObjectId
+    author    : ObjectId
   , title     : String
   , body      : String
   , date      : Date
   , comments  : [Comments]
   , meta      : {
-		votes : Number
+      votes : Number
 	  , favs  : Number
 	}
 });
@@ -86,7 +86,7 @@ var Schema = mongoose.Schema
   , ObjectId = Schema.ObjectId;
 
 var BlogPost = new Schema({
-	author    : ObjectId
+    author    : ObjectId
   , title     : String
   , body      : String
   , date      : Date
@@ -110,7 +110,7 @@ The following example shows some of these features:
 
 ```javascript
 var Comment = new Schema({
-	name  :  { type: String, default: 'hahaha' }
+    name  :  { type: String, default: 'hahaha' }
   , age   :  { type: Number, min: 18, index: true }
   , bio   :  { type: String, match: /[a-z]/ }
   , date  :  { type: Date, default: Date.now }
@@ -118,7 +118,7 @@ var Comment = new Schema({
 
 // a setter
 Comment.path('name').set(function (v) {
-  return v.capitalize();
+  return capitalize(v);
 });
 
 // middleware
@@ -138,6 +138,12 @@ access it through the same function
 
 ```javascript
 var myModel = mongoose.model('ModelName');
+```
+
+Or just do it all at once
+
+```javascript
+var myModel = mongoose.model('ModelName', mySchema);
 ```
 
 We can then instantiate it, and save it:
@@ -278,7 +284,7 @@ every time someone `set`s a path in your Document to a new value:
 schema.pre('set', function (next, path, val, typel) {
   // `this` is the current Document
   this.emit('set', path, val);
-      
+
   // Pass control to the next pre
   next();
 });
@@ -292,7 +298,9 @@ new values to `next`:
 .pre(method, function firstPre (next, methodArg1, methodArg2) {
   // Mutate methodArg1
   next("altered-" + methodArg1.toString(), methodArg2);
-}) // pre declaration is chainable
+})
+
+// pre declaration is chainable
 .pre(method, function secondPre (next, methodArg1, methodArg2) {
   console.log(methodArg1);
   // => 'altered-originalValOfMethodArg1' 
@@ -335,12 +343,9 @@ The following plugins are currently available for use with mongoose:
 
 ### Cloning the repository
 
-Make a fork of `mongoose`, then clone it in your computer. The `master` branch
-contains the current stable release, and the `develop` branch the next upcoming
+Make a fork of `mongoose`, then clone it in your computer. The `v1.x` branch
+contains the current stable release, and the `master` branch the next upcoming
 major release.
-
-If `master` is at `1.0`, `develop` will contain the upcoming `1.1` (or `2.0` if
-the `1` branch is nearing its completion).
 
 ### Guidelines
 

@@ -2474,13 +2474,14 @@ module.exports = {
       BlogPost.findById(post.get('_id'), function (err, doc) {
         should.strictEqual(err, null);
 
+        doc.comments[0].title = "changed";
         doc.comments[0].remove();
         doc.save(function (err) {
           should.strictEqual(err, null);
 
           BlogPost.findById(post.get('_id'), function (err, doc) {
             should.strictEqual(err, null);
-            
+
             doc.comments.should.have.length(1);
             doc.comments[0].title.should.eql('aaaa');
 
@@ -2626,7 +2627,7 @@ module.exports = {
         doc.numbers.remove('1');
         doc.save(function (err) {
           should.strictEqual(err, null);
-          
+
           BlogPost.findById(post.get('_id'), function (err, doc) {
             should.strictEqual(err, null);
 

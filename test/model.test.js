@@ -3519,17 +3519,13 @@ module.exports = {
     });
 
     // Don't know how to test those on a embedded document.
-    /*
+    //EmbeddedSchema.post('init', function () {
+      //init = true;
+    //});
 
-    EmbeddedSchema.post('init', function () {
-      init = true;
-    });
-
-    EmbeddedSchema.post('remove', function () {
-      remove = true;
-    });
-
-    */
+    //EmbeddedSchema.post('remove', function () {
+      //remove = true;
+    //});
 
     mongoose.model('Parent', ParentSchema);
 
@@ -3710,15 +3706,22 @@ module.exports = {
     });
   },
 
-  // GH-365
+  // GH-365, GH-390, GH-422
   'test that setters are used on embedded documents': function () {
     var db = start();
+
     function setLat (val) {
       return parseInt(val);
     }
 
+    var tick = 0;
+    function uptick () {
+      return ++tick;
+    }
+
     var Location = new Schema({
-      lat: {type: Number, default: 0, set: setLat}
+        lat:  { type: Number, default: 0, set: setLat}
+      , long: { type: Number, set: uptick }
     });
 
     var Deal = new Schema({
@@ -3729,12 +3732,24 @@ module.exports = {
     Location = db.model('Location', Location, 'locations_' + random());
     Deal = db.model('Deal', Deal, 'deals_' + random());
 
-    var location = new Location({lat: 1.2});
+    var location = new Location({lat: 1.2, long: 10});
     location.lat.valueOf().should.equal(1);
+    location.long.valueOf().should.equal(1);
 
-    var deal = new Deal({title: "My deal", locations: [{lat: 1.2}]});
+    var deal = new Deal({title: "My deal", locations: [{lat: 1.2, long: 33}]});
     deal.locations[0].lat.valueOf().should.equal(1);
-    db.close();
+    deal.locations[0].long.valueOf().should.equal(2);
+
+    deal.save(function (err) {
+      should.strictEqual(err, null);
+      Deal.findById(deal._id, function (err, deal) {
+        db.close();
+        should.strictEqual(err, null);
+        deal.locations[0].lat.valueOf().should.equal(1);
+        // GH-422
+        deal.locations[0].long.valueOf().should.equal(2);
+      });
+    });
   },
 
   // GH-289

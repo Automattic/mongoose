@@ -1,4 +1,12 @@
 
+1.8.0 / 2011-08-04
+===================
+
+  * fixed; can now use $all with String and Number
+  * fixed; can query subdoc array with $ne: null
+  * fixed; instance.subdocs#id now works with custom _ids
+  * fixed; do not apply setters when doc returned from db (change in bad behavior)
+
 1.7.4 / 2011-07-25
 ===================
 

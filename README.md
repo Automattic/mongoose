@@ -28,7 +28,6 @@ Defining a model is as easy as:
 
     mongoose.model('BlogPost', BlogPost);
 
-
 ## Installation
 
 The recommended way is through the excellent NPM:
@@ -75,7 +74,7 @@ Models are defined through the `Schema` interface.
       , ObjectId = Schema.ObjectId;
 
     var BlogPost = new Schema({
-      author    : ObjectId
+        author    : ObjectId
       , title     : String
       , body      : String
       , date      : Date
@@ -208,15 +207,15 @@ There's two types of middleware:
   You can also intercept the `method`'s incoming arguments via your middleware -- 
   notice `methodArg1`, `methodArg2`, etc in the `pre` definition above. See
   section "Intercepting and mutating method arguments" below.
-
+  
 
 - Parallel
   Parallel middleware offer more fine-grained flow control, and are defined
   like:
 
-          .pre(method, true, function (next, done, methodArg1, methodArg2) {
-            // ...
-          })
+        .pre(method, true, function (next, done, methodArg1, methodArg2) {
+          // ...
+        })
 
   Parallel middleware can `next()` immediately, but the final argument will be
   called when all the parallel middleware have called `done()`.
@@ -267,16 +266,37 @@ new values to `next`:
     .pre(method, function secondPre (next, methodArg1, methodArg2) {
       console.log(methodArg1);
       // => 'altered-originalValOfMethodArg1' 
-
+      
       console.log(methodArg2);
       // => 'originalValOfMethodArg2' 
-
+      
       // Passing no arguments to `next` automatically passes along the current argument values
       // i.e., the following `next()` is equivalent to `next(methodArg1, methodArg2)`
       // and also equivalent to, with the example method arg 
       // values, `next('altered-originalValOfMethodArg1', 'originalValOfMethodArg2')`
       next();
     })
+
+### Schema gotcha
+
+`type`, when used in schema has special meaning within Mongoose. If your
+schema requires using `type` as a nested property you must use object notation:
+
+    new Schema({
+        broken: { type: Boolean }
+      , asset : {
+            name: String
+          , type: String // uh oh, it broke. asset will be interpreted as String
+        }
+    });
+
+    new Schema({
+        works: { type: Boolean }
+      , asset : {
+            name: String
+          , type: { type: String } // works. asset is an object with a type property
+        }
+    });
 
 ## API docs
 
@@ -287,6 +307,10 @@ You can find the [Dox](http://github.com/visionmedia/dox) generated API docs at
 
 Please subscribe to the Google Groups [mailing
 list](http://groups.google.com/group/mongoose-orm/boxsubscribe).
+
+## Driver access
+
+The driver being used defaults to [node-mongodb-native](https://github.com/christkv/node-mongodb-native) and is directly accessible through `YourModel.collection`. **Note**: using the driver directly bypasses all Mongoose power-tools like validation, getters, setters, hooks, etc.
 
 ## Mongoose Plugins
 
@@ -327,7 +351,7 @@ major release.
 
 ## License
 
-Copyright (c) 2011 LearnBoost &lt;dev@learnboost.com&gt;
+Copyright (c) 2010 LearnBoost &lt;dev@learnboost.com&gt;
 
 Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the

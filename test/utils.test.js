@@ -6,6 +6,7 @@
 require('./common');
 
 var utils = require('mongoose/utils')
+  , ObjectId = require('mongoose/types/objectid')
   , StateMachine = utils.StateMachine;
 
 /**
@@ -149,6 +150,17 @@ module.exports = {
 
     // same object
     defaults.should.not.equal(result2);
+  },
+
+  'test deepEquals on ObjectIds': function () {
+    var s = (new ObjectId).toString();
+
+    var a = new ObjectId(s)
+      , b = new ObjectId(s);
+
+    utils.deepEqual(a, b).should.be.true;
+    utils.deepEqual(a, a).should.be.true;
+    utils.deepEqual(a, new ObjectId).should.be.false;
   }
 
 };

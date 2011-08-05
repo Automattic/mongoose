@@ -279,8 +279,8 @@ new values to `next`:
 
 ### Schema gotcha
 
-`type`, when used in schema has special meaning within Mongoose. If your
-schema requires using `type` as a nested property you must use object notation:
+_type_, when used in a schema has special meaning within Mongoose. If your
+schema requires using _type_ as a nested property you must use object notation:
 
     new Schema({
         broken: { type: Boolean }

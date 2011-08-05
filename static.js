@@ -14,3 +14,4 @@ require('http').createServer(function (req, res) {
   });
 }).listen(8080);
 
+console.error('now listening on localhost:8080');

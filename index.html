@@ -234,7 +234,7 @@ in order to define models, run queries, etc.</p>
   , ObjectId = Schema.ObjectId;
 
 var BlogPost = new Schema({
-  author    : ObjectId
+    author    : ObjectId
   , title     : String
   , body      : String
   , date      : Date
@@ -354,9 +354,9 @@ Serial middleware are defined like:</p><pre><code>.pre(method, function (next, m
 notice <code>methodArg1</code>, <code>methodArg2</code>, etc in the <code>pre</code> definition above. See
 section &quot;Intercepting and mutating method arguments&quot; below.</p></li><li><p>Parallel
 Parallel middleware offer more fine-grained flow control, and are defined
-like:</p><pre><code>  .pre(method, true, function (next, done, methodArg1, methodArg2) {
-    // ...
-  })</code></pre><p>Parallel middleware can <code>next()</code> immediately, but the final argument will be
+like:</p><pre><code>.pre(method, true, function (next, done, methodArg1, methodArg2) {
+  // ...
+})</code></pre><p>Parallel middleware can <code>next()</code> immediately, but the final argument will be
 called when all the parallel middleware have called <code>done()</code>.</p></li></ul>
 
 <h3>Error handling</h3>
@@ -416,6 +416,27 @@ new values to <code>next</code>:</p>
   next();
 })</code></pre>
 
+<h3>Schema gotcha</h3>
+
+<p><em>type</em>, when used in a schema has special meaning within Mongoose. If your
+schema requires using <em>type</em> as a nested property you must use object notation:</p>
+
+<pre><code>new Schema({
+    broken: { type: Boolean }
+  , asset : {
+        name: String
+      , type: String // uh oh, it broke. asset will be interpreted as String
+    }
+});
+
+new Schema({
+    works: { type: Boolean }
+  , asset : {
+        name: String
+      , type: { type: String } // works. asset is an object with a type property
+    }
+});</code></pre>
+
 <h2>API docs</h2>
 
 <p>You can find the <a href="http://github.com/visionmedia/dox">Dox</a> generated API docs at
@@ -425,6 +446,10 @@ new values to <code>next</code>:</p>
 
 <p>Please subscribe to the Google Groups <a href="http://groups.google.com/group/mongoose-orm/boxsubscribe">mailing
 list</a>.</p>
+
+<h2>Driver access</h2>
+
+<p>The driver being used defaults to <a href="https://github.com/christkv/node-mongodb-native">node-mongodb-native</a> and is directly accessible through <code>YourModel.collection</code>. <strong>Note</strong>: using the driver directly bypasses all Mongoose power-tools like validation, getters, setters, hooks, etc.</p>
 
 <h2>Mongoose Plugins</h2>
 
@@ -457,7 +482,7 @@ has been addressed already in a different branch.</li></ul>
 
 <h2>License</h2>
 
-<p>Copyright (c) 2011 LearnBoost &amp;lt;dev@learnboost.com&amp;gt;</p>
+<p>Copyright (c) 2010 LearnBoost &amp;lt;dev@learnboost.com&amp;gt;</p>
 
 <p>Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the

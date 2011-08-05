@@ -316,6 +316,29 @@ new values to `next`:
 })
 ```
 
+### Schema gotcha
+
+`type`, when used in a schema has special meaning within Mongoose. If your
+schema requires using `type` as a nested property you must use object notation:
+
+``` javascript
+new Schema({
+    broken: { type: Boolean }
+  , asset : {
+        name: String
+      , type: String // uh oh, it broke. asset will be interpreted as String
+    }
+});
+
+new Schema({
+    works: { type: Boolean }
+  , asset : {
+        name: String
+      , type: { type: String } // works. asset is an object with a type property
+    }
+});
+```
+
 ## API docs
 
 You can find the [Dox](http://github.com/visionmedia/dox) generated API docs at

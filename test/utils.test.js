@@ -8,7 +8,6 @@ require('./common');
 var utils = require('mongoose/utils')
   , StateMachine = require('mongoose/statemachine')
   , ObjectId = require('mongoose/types/objectid')
-  , StateMachine = utils.StateMachine;
 
 /**
  * Setup.

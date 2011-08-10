@@ -1,4 +1,11 @@
 
+1.8.1 / 2011-08-10
+===================
+
+  * fixed; ObjectIds were always marked modified
+  * fixed; can now query using document instances
+  * fixed; can now query/update using documents with subdocs
+
 1.8.0 / 2011-08-04
 ===================
 

@@ -695,6 +695,40 @@ module.exports = {
     new Query().bind(Product, 'distinct').distinct('blah', function(){}).op.should.equal('distinct');
   },
 
+  'querying/updating with model instance containing embedded docs should work (#454)': function () {
+    var db = start();
+    var Product = db.model('Product');
+
+    var proddoc = { comments: [{ text: 'hello' }] };
+    var prod2doc = { comments: [{ text: 'goodbye' }] };
+
+    var prod = new Product(proddoc);
+    var prod2 = new Product(prod2doc);
+
+    prod.save(function (err) {
+      should.strictEqual(err, null);
+
+      Product.findOne(prod, function (err, product) {
+        should.strictEqual(err, null);
+        product.comments.length.should.equal(1);
+        product.comments[0].text.should.equal('hello');
+
+        Product.update(product, prod2doc, function (err) {
+          should.strictEqual(err, null);
+
+          Product.collection.findOne({ _id: product._id }, function (err, doc) {
+            db.close();
+            should.strictEqual(err, null);
+            doc.comments.length.should.equal(1);
+            // ensure hidden private props were not saved to db
+            doc.comments[0].should.not.have.ownProperty('parentArr');
+            doc.comments[0].text.should.equal('goodbye');
+          });
+        });
+      });
+    });
+  },
+
   // Advanced Query options
 
   'test Query#maxscan': function () {

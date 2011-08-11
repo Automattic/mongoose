@@ -621,7 +621,7 @@ module.exports = {
     params.ids.$ne.should.be.instanceof(Array);
     params.ids.$ne[0].toString().should.eql(id.toString());
     params.comments.$ne.should.be.instanceof(Array);
-    params.comments.$ne[0].toObject().should.eql(castedComment);
+    params.comments.$ne[0].should.eql(castedComment);
     params.strings.$ne.should.be.instanceof(Array);
     params.strings.$ne[0].should.eql('Hi there');
     params.numbers.$ne.should.be.instanceof(Array);

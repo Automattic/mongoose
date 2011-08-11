@@ -57,7 +57,7 @@ module.exports = {
 
     var b = new MongooseArray([1,2,3,4]);
     'object'.should.eql(typeof b);
-    Object.keys(b).length.should.equal(4);
+    Object.keys(b.toObject()).length.should.equal(4);
   },
 
   '#id': function () {

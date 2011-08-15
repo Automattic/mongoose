@@ -3592,16 +3592,38 @@ module.exports = {
     threw.should.be.false;
   },
 
-  'when mongo is down, save callback should fire with err': function (beforeExit) {
-    var db = start();
-    var T = db.model('Thing', new Schema({ a: String }));
+  'when mongo is down, save callback should fire with err if auto_reconnect is disabled': function () {
+    var db = start({ server: { auto_reconnect: false }});
+    var T = db.model('Thing', new Schema({ type: String }));
     db.on('open', function () {
-      var t = new T({ a: "monster" });
+      var t = new T({ type: "monster" });
 
       var worked = false;
       t.save(function (err) {
         worked = true;
         err.message.should.eql('notConnected');
+      });
+
+      process.nextTick(function () {
+        db.close();
+      });
+
+      setTimeout(function () {
+        worked.should.be.true;
+      }, 500);
+    });
+  },
+
+  'when mongo is down, auto_reconnect should kick in and db operation should succeed': function () {
+    var db = start();
+    var T = db.model('Thing', new Schema({ type: String }));
+    db.on('open', function () {
+      var t = new T({ type: "monster" });
+
+      var worked = false;
+      t.save(function (err) {
+        should.strictEqual(err, null);
+        worked = true;
       });
 
       process.nextTick(function () {

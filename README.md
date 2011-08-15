@@ -379,7 +379,7 @@ major release.
 - Please write inline documentation for new methods or class members.
 - Please write tests and make sure your tests pass.
 - Before starting to write code, look for existing tickets or create one for
-  your specifc issue (unless you're addressing something that's clearly broken).
+  your specific issue (unless you're addressing something that's clearly broken).
   That way you avoid working on something that might not be of interest or that
   has been addressed already in a different branch.
 

@@ -12,7 +12,7 @@ you define (ie: the parameters your function accepts):
 - Serial
   Serial middleware are defined like:
 
-        schema.pre(methodName, function (next) {
+        schema.pre('save', function (next) {
           // ...
         })
 
@@ -22,7 +22,7 @@ you define (ie: the parameters your function accepts):
   Parallel middleware offer more fine-grained flow control, and are defined
   like
 
-        schema.pre(methodName, function (next, done) {
+        schema.pre('remove', true, function (next, done) {
           // ...
         })
 

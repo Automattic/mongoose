@@ -308,6 +308,8 @@ You can find the [Dox](http://github.com/visionmedia/dox) generated API docs at
 Please subscribe to the Google Groups [mailing
 list](http://groups.google.com/group/mongoose-orm/boxsubscribe).
 
+Join #mongoosejs on freenode.
+
 ## Driver access
 
 The driver being used defaults to [node-mongodb-native](https://github.com/christkv/node-mongodb-native) and is directly accessible through `YourModel.collection`. **Note**: using the driver directly bypasses all Mongoose power-tools like validation, getters, setters, hooks, etc.

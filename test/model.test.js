@@ -3516,7 +3516,7 @@ module.exports = {
   },
 
   'when mongo is down, save callback should fire with err if auto_reconnect is disabled': function () {
-    var db = start({ server: { auto_reconnect: false }});
+    var db = start();
     var T = db.model('Thing', new Schema({ type: String }));
     db.on('open', function () {
       var t = new T({ type: "monster" });
@@ -3538,7 +3538,7 @@ module.exports = {
   },
 
   'when mongo is down, auto_reconnect should kick in and db operation should succeed': function () {
-    var db = start();
+    var db = start({ server: { auto_reconnect: true }});
     var T = db.model('Thing', new Schema({ type: String }));
     db.on('open', function () {
       var t = new T({ type: "monster" });

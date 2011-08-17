@@ -33,7 +33,7 @@ module.exports = {
     var db = mongoose.createConnection('mongodb://localhost/fake');
     db.options.should.be.a('object');
     db.options.server.should.be.a('object');
-    db.options.server.auto_reconnect.should.be.false;
+    db.options.server.auto_reconnect.should.be.true;
     db.options.db.should.be.a('object');
     db.options.db.forceServerObjectId.should.be.false;
     should.strictEqual(undefined, db.pass);
@@ -46,7 +46,7 @@ module.exports = {
     db = mongoose.createConnection('mongodb://localhost:27000/fake');
     db.options.should.be.a('object');
     db.options.server.should.be.a('object');
-    db.options.server.auto_reconnect.should.be.false;
+    db.options.server.auto_reconnect.should.be.true;
     db.options.db.should.be.a('object');
     db.options.db.forceServerObjectId.should.be.false;
     should.strictEqual(undefined, db.pass);
@@ -59,7 +59,7 @@ module.exports = {
     db = mongoose.createConnection('mongodb://aaron:psw@localhost:27000/fake');
     db.options.should.be.a('object');
     db.options.server.should.be.a('object');
-    db.options.server.auto_reconnect.should.be.false;
+    db.options.server.auto_reconnect.should.be.true;
     db.options.db.should.be.a('object');
     db.options.db.forceServerObjectId.should.be.false;
     should.strictEqual('psw', db.pass);
@@ -72,15 +72,15 @@ module.exports = {
     db = mongoose.createConnection('mongodb://aaron:psw@localhost:27000/fake', { db: { forceServerObjectId: true }});
     db.options.should.be.a('object');
     db.options.server.should.be.a('object');
-    db.options.server.auto_reconnect.should.be.false;
+    db.options.server.auto_reconnect.should.be.true;
     db.options.db.should.be.a('object');
     db.options.db.forceServerObjectId.should.be.false;
     db.close();
 
-    db = mongoose.createConnection('mongodb://aaron:psw@localhost:27000/fake', { server: { auto_reconnect: true }});
+    db = mongoose.createConnection('mongodb://aaron:psw@localhost:27000/fake', { server: { auto_reconnect: false }});
     db.options.should.be.a('object');
     db.options.server.should.be.a('object');
-    db.options.server.auto_reconnect.should.be.true;
+    db.options.server.auto_reconnect.should.be.false;
     db.options.db.should.be.a('object');
     db.options.db.forceServerObjectId.should.be.false;
     db.close();
@@ -108,7 +108,7 @@ module.exports = {
     });
     db.options.should.be.a('object');
     db.options.server.should.be.a('object');
-    db.options.server.auto_reconnect.should.be.false;
+    db.options.server.auto_reconnect.should.be.true;
     db.options.db.should.be.a('object');
     db.options.db.forceServerObjectId.should.be.false;
     db.name.should.equal('fake');
@@ -121,7 +121,7 @@ module.exports = {
     });
     db.options.should.be.a('object');
     db.options.server.should.be.a('object');
-    db.options.server.auto_reconnect.should.be.false;
+    db.options.server.auto_reconnect.should.be.true;
     db.options.db.should.be.a('object');
     db.options.db.forceServerObjectId.should.be.false;
     should.strictEqual(undefined, db.name);
@@ -134,7 +134,7 @@ module.exports = {
     });
     db.options.should.be.a('object');
     db.options.server.should.be.a('object');
-    db.options.server.auto_reconnect.should.be.false;
+    db.options.server.auto_reconnect.should.be.true;
     db.options.db.should.be.a('object');
     db.options.db.forceServerObjectId.should.be.false;
     should.strictEqual(undefined, db.name);
@@ -143,7 +143,7 @@ module.exports = {
     db.close();
 
     var called3 = false;
-    db = mongoose.createConnection('127.0.0.1', 'faker', 28000, { server: { auto_reconnect: true }}, function () {
+    db = mongoose.createConnection('127.0.0.1', 'faker', 28000, { server: { auto_reconnect: false }}, function () {
        called3 = true;
     });
     beforeExit(function () {
@@ -151,7 +151,7 @@ module.exports = {
     });
     db.options.should.be.a('object');
     db.options.server.should.be.a('object');
-    db.options.server.auto_reconnect.should.be.true;
+    db.options.server.auto_reconnect.should.be.false;
     db.options.db.should.be.a('object');
     db.options.db.forceServerObjectId.should.be.false;
     db.name.should.equal('faker');
@@ -168,7 +168,7 @@ module.exports = {
     });
     db.options.should.be.a('object');
     db.options.server.should.be.a('object');
-    db.options.server.auto_reconnect.should.be.false;
+    db.options.server.auto_reconnect.should.be.true;
     db.options.db.should.be.a('object');
     db.options.db.forceServerObjectId.should.be.false;
     db.name.should.equal('faker');
@@ -190,7 +190,7 @@ module.exports = {
     db = mongoose.createConnection('127.0.0.1', 'faker', 28001);
     db.options.should.be.a('object');
     db.options.server.should.be.a('object');
-    db.options.server.auto_reconnect.should.be.false;
+    db.options.server.auto_reconnect.should.be.true;
     db.options.db.should.be.a('object');
     db.options.db.forceServerObjectId.should.be.false;
     db.name.should.equal('faker');
@@ -201,7 +201,7 @@ module.exports = {
     db = mongoose.createConnection('127.0.0.1', 'faker', { blah: 1 });
     db.options.should.be.a('object');
     db.options.server.should.be.a('object');
-    db.options.server.auto_reconnect.should.be.false;
+    db.options.server.auto_reconnect.should.be.true;
     db.options.db.should.be.a('object');
     db.options.db.forceServerObjectId.should.be.false;
     db.options.blah.should.equal(1);
@@ -219,7 +219,7 @@ module.exports = {
     });
     db.options.should.be.a('object');
     db.options.server.should.be.a('object');
-    db.options.server.auto_reconnect.should.be.false;
+    db.options.server.auto_reconnect.should.be.true;
     db.options.db.should.be.a('object');
     db.options.db.forceServerObjectId.should.be.false;
     db.name.should.equal('faker');

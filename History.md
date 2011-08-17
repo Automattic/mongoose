@@ -1,4 +1,12 @@
 
+1.8.2 / 2011-08-17
+===================
+
+  * fixed; reset connection.readyState after failure [tomseago]
+  * fixed; can now query positionally for non-embedded docs (arrays of numbers/strings etc)
+  * fixed; embedded document query casting
+  * added; support for passing options to node-mongo-native db, server, and replsetserver [tomseago]
+
 1.8.1 / 2011-08-10
 ===================
 

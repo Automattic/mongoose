@@ -817,7 +817,6 @@ module.exports = {
     });
   },
 
-  // TODO Won't pass until we fix materialization/raw data assymetry
   'test find where $exists': function () {
     var db = start()
       , ExistsSchema = new Schema({
@@ -866,12 +865,28 @@ module.exports = {
     var db = start()
       , BlogPostB = db.model('BlogPostB', collection);
 
-    BlogPostB.create({comments: [{title: 'i should be queryable'}]}, function (err, created) {
+    BlogPostB.create({comments: [{title: 'i should be queryable'}], numbers: [1,2,33333], tags:['yes', 'no']}, function (err, created) {
       should.strictEqual(err, null);
       BlogPostB.findOne({'comments.title': 'i should be queryable'}, function (err, found) {
         should.strictEqual(err, null);
         found._id.should.eql(created._id);
-        db.close();
+
+        BlogPostB.findOne({'comments.0.title': 'i should be queryable'}, function (err, found) {
+          should.strictEqual(err, null);
+          found._id.should.eql(created._id);
+
+          // GH-463
+          BlogPostB.findOne({'numbers.2': 33333}, function (err, found) {
+            should.strictEqual(err, null);
+            found._id.should.eql(created._id);
+
+            BlogPostB.findOne({'tags.1': 'no'}, function (err, found) {
+              should.strictEqual(err, null);
+              found._id.should.eql(created._id);
+              db.close();
+            });
+          });
+        });
       });
     });
   },

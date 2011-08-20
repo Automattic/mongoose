@@ -1536,41 +1536,101 @@ module.exports = {
       , BlogPost = db.model('BlogPost', collection)
       , title = 'Tobi ' + random()
       , author = 'Brian ' + random()
-      , newTitle = 'Woot ' + random();
+      , newTitle = 'Woot ' + random()
+      , id0 = new DocumentObjectId
+      , id1 = new DocumentObjectId
 
     var post = new BlogPost();
     post.set('title', title);
     post.author = author;
     post.meta.visitors = 0;
+    post.date = new Date;
+    post.published = true;
+    post.mixed = { x: 'ex' };
+    post.numbers = [4,5,6,7];
+    post.owners = [id0, id1];
+    post.comments = [{ body: 'been there' }, { body: 'done that' }];
 
     post.save(function (err) {
       should.strictEqual(err, null);
-      BlogPost.findById(post._id, function (err, createdFound) {
+      BlogPost.findById(post._id, function (err, cf) {
         should.strictEqual(err, null);
-        createdFound.title.should.equal(title);
-        createdFound.author.should.equal(author);
-        createdFound.meta.visitors.valueOf().should.eql(0);
+        cf.title.should.equal(title);
+        cf.author.should.equal(author);
+        cf.meta.visitors.valueOf().should.eql(0);
+        cf.date.should.eql(post.date);
+        cf.published.should.be.true;
+        cf.mixed.x.should.equal('ex');
+        cf.numbers.toObject().should.eql([4,5,6,7]);
+        cf.owners.length.should.equal(2);
+        cf.owners[0].toString().should.equal(id0.toString());
+        cf.owners[1].toString().should.equal(id1.toString());
+        cf.comments.length.should.equal(2);
+        cf.comments[0].body.should.eql('been there');
+        cf.comments[1].body.should.eql('done that');
 
-        BlogPost.update({ title: title }, { title: newTitle }, function (err) {
+        var update = {
+            title: newTitle // becomes $set
+          , $inc: { 'meta.visitors': 2 }
+          , $set: { date: new Date }
+          , published: false // becomes $set
+          , 'mixed': { x: 'ECKS', y: 'why' } // $set
+          , $pullAll: { 'numbers': [4, 6] }
+          , $pull: { 'owners': id0 }
+          , 'comments.1.body': 8
+        }
+
+        BlogPost.update({ title: title }, update, function (err) {
           should.strictEqual(err, null);
 
-          BlogPost.findById(post._id, function (err, updatedFound) {
+          BlogPost.findById(post._id, function (err, up) {
             should.strictEqual(err, null);
-            updatedFound.title.should.equal(newTitle);
-            updatedFound.author.should.equal(author);
-            updatedFound.meta.visitors.valueOf().should.equal(0);
+            up.title.should.equal(newTitle);
+            up.author.should.equal(author);
+            up.meta.visitors.valueOf().should.equal(2);
+            up.date.toString().should.equal(update.$set.date.toString());
+            up.published.should.eql(false);
+            up.mixed.x.should.equal('ECKS');
+            up.mixed.y.should.equal('why');
+            up.numbers.toObject().should.eql([5,7]);
+            up.owners.length.should.equal(1);
+            up.owners[0].toString().should.eql(id1.toString());
+            up.comments[0].body.should.equal('been there');
+            up.comments[1].body.should.equal('8');
 
-            // Note: use BlogPost.collection.update for anything other than set operations
-            BlogPost.update({ _id: post._id }, { $inc: { 'meta.visitors': 1 } }, function (err) {
-              if (err) db.close();
-              should.strictEqual(!!err, false, "Model.update doesn't work with $inc");
+            var update2 = {
+                'comments.body': 'fail'
+            }
 
-              BlogPost.findById(post._id, function (err, updatedFound) {
-                db.close();
-                should.strictEqual(err, null);
-                updatedFound.meta.visitors.valueOf().should.equal(1);
-                updatedFound.title.should.equal(newTitle);
-                updatedFound.author.should.equal(author);
+            BlogPost.update({ _id: post._id }, update2, function (err) {
+              should.strictEqual(!!err, true);
+              ;/^can't append to array using string field name \[body\]/.test(err.message).should.be.true;
+
+              var update3 = {
+                  $pull: 'fail'
+              }
+
+              BlogPost.update({ _id: post._id }, update3, function (err) {
+                should.strictEqual(!!err, true);
+                ;/Invalid atomic update value/.test(err.message).should.be.true;
+
+                var update4 = {
+                    comments: [{ body: 'worked great' }]
+                  , $set: {'numbers.1': 100}
+                }
+
+                BlogPost.update({ _id: post._id }, update4, function (err) {
+                  should.strictEqual(err, null);
+                  BlogPost.findById(post._id, function (err, up) {
+                    db.close();
+                    should.strictEqual(err, null);
+                    up.comments.length.should.equal(1);
+                    up.comments[0].body.should.equal('worked great');
+                    up.meta.visitors.valueOf().should.equal(2);
+                    up.mixed.x.should.equal('ECKS');
+                    up.numbers.toObject().should.eql([5,100]);
+                  });
+                });
               });
             });
           });

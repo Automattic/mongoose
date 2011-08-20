@@ -230,7 +230,7 @@ module.exports = {
     db = mongoose.createConnection('127.0.0.1', 'faker');
     db.options.should.be.a('object');
     db.options.server.should.be.a('object');
-    db.options.server.auto_reconnect.should.be.false;
+    db.options.server.auto_reconnect.should.be.true;
     db.options.db.should.be.a('object');
     db.options.db.forceServerObjectId.should.be.false;
     db.name.should.equal('faker');

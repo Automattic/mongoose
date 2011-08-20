@@ -528,6 +528,37 @@ module.exports = {
     var ValidationError = Document.ValidationError
       , err = new ValidationError(new TestDocument);
     err.should.be.an.instanceof(Error);
+  },
+
+  'methods on embedded docs should work': function () {
+    var db = start()
+      , ESchema = new Schema({ name: String })
+
+    ESchema.methods.test = function () {
+      return this.name + ' butter';
+    }
+    ESchema.statics.ten = function () {
+      return 10;
+    }
+
+    var E = db.model('EmbeddedMethodsAndStaticsE', ESchema);
+    var PSchema = new Schema({ embed: [ESchema] });
+    var P = db.model('EmbeddedMethodsAndStaticsP', PSchema);
+
+    var p = new P({ embed: [{name: 'peanut'}] });
+    should.equal('function', typeof p.embed[0].test);
+    should.equal('function', typeof E.ten);
+    p.embed[0].test().should.equal('peanut butter');
+    E.ten().should.equal(10);
+
+    // test push casting
+    p = new P;
+    p.embed.push({name: 'apple'});
+    should.equal('function', typeof p.embed[0].test);
+    should.equal('function', typeof E.ten);
+    p.embed[0].test().should.equal('apple butter');
+
+    db.close();
   }
 
 };

@@ -17,7 +17,7 @@ methods are executed on your `Model`s.
       // docs is an array
     });
 
-### Retrieveing only certain fields
+### Retrieving only certain fields
 
     Model.find({}, ['first', 'last'], function (err, docs){
       // docs is an array of partially-`init`d documents
@@ -33,9 +33,13 @@ Same as `Model#find`, but only receives a single document as second parameter:
 
 ## Model#findById
 
-Same as `findById`, but receives a value to search a document by their `_id`
+Same as `findByOne`, but receives a value to search a document by their `_id`
 key. This value is subject to casting, so it can be a hex string or a proper 
 ObjectId.
+
+    Model.findById(obj._id, function (err, doc){
+        // doc is a Document
+    });
 
 ## count
 

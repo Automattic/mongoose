@@ -9,18 +9,19 @@ methods are executed on your `Model`s.
 
     Model.find(query, fields, options, callback)
 
-    // fields and options can be ommitted
+    // fields and options can be omitted
 
 ### Simple query:
 
-    Model.find({ 'some.value': 5 }, function(err, docs){
+    Model.find({ 'some.value': 5 }, function (err, docs) {
       // docs is an array
     });
 
 ### Retrieving only certain fields
 
-    Model.find({}, ['first', 'last'], function (err, docs){
+    Model.find({}, ['first', 'last'], function (err, docs) {
       // docs is an array of partially-`init`d documents
+      // defaults are still applied and will be "populated"
     })
 
 ## Model#findOne
@@ -38,10 +39,10 @@ key. This value is subject to casting, so it can be a hex string or a proper
 ObjectId.
 
     Model.findById(obj._id, function (err, doc){
-        // doc is a Document
+      // doc is a Document
     });
 
-## count
+## Count
 
     Model.count(query, callback)
 
@@ -57,11 +58,7 @@ fields, etc), before it's `exec`d.
     query.limit(5);
     query.skip(100);
 
-    // query.executed == false
-
-    query.exec (function (err, docs) {
+    query.exec(function (err, docs) {
       // called when the `query.complete` or `query.error` are called
       // internally
     });
-    
-    // query.executed == true

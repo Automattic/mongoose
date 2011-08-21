@@ -1,5 +1,5 @@
 
-Finding documents
+Querying
 =================
 
 Documents can be retrieved through `find`, `findOne` and `findById`. These

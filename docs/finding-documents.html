@@ -170,33 +170,67 @@
         </div>
 
         <div id="content">
-          <h1>Defaults</h1>
+          <h1>Finding documents</h1>
 
-<p>Each <code>SchemaType</code> that you define (you can read more about them in the model
-definition chapter) can have a default value.</p>
+<p>Documents can be retrieved through <code>find</code>, <code>findOne</code> and <code>findById</code>. These
+methods are executed on your <code>Model</code>s.</p>
 
-<p>Default values are applied when the document skeleton is constructed. This
-means that if you create a new document (<code>new MyModel</code>) or if you find an
-existing document (<code>MyModel.findById</code> for example), both will have defaults
-provided that a certain key is missing.</p>
+<h2>Model#find</h2>
 
-<h2>Definition</h2>
+<pre><code>Model.find(query, fields, options, callback)
 
-<p>You can define a default with a function:</p>
+// fields and options can be ommitted</code></pre>
 
-<pre><code>new Schema({
-    date: { type: Date, default: Date.now }
+<h3>Simple query:</h3>
+
+<pre><code>Model.find({ &#39;some.value&#39;: 5 }, function(err, docs){
+  // docs is an array
+});</code></pre>
+
+<h3>Retrieveing only certain fields</h3>
+
+<pre><code>Model.find({}, [&#39;first&#39;, &#39;last&#39;], function (err, docs){
+  // docs is an array of partially-`init`d documents
 })</code></pre>
 
-<p>or a value:</p>
+<h2>Model#findOne</h2>
 
-<pre><code>new Schema({
-    date: { type: Date, default: &#39;12/10/1990&#39; }
-})</code></pre>
+<p>Same as <code>Model#find</code>, but only receives a single document as second parameter:</p>
 
-<p>Notice that defaults are automatically casted. In both cases, the defaults will
-become actual <code>Date</code> objects, but we&#39;re passing a timestamp first, and a string
-date second.</p>
+<pre><code>Model.findOne({ age: 5}, function (err, doc){
+  // doc is a Document
+});</code></pre>
+
+<h2>Model#findById</h2>
+
+<p>Same as <code>findById</code>, but receives a value to search a document by their <code>_id</code>
+key. This value is subject to casting, so it can be a hex string or a proper 
+ObjectId.</p>
+
+<h2>count</h2>
+
+<pre><code>Model.count(query, callback)</code></pre>
+
+<h2>Query</h2>
+
+<p>Each of these methods returns a Query. If you don&#39;t pass a callback to these
+methods, the Query can be continued to be modified (such as adding options,
+fields, etc), before it&#39;s <code>exec</code>d.</p>
+
+<pre><code>var query = Model.find({});
+
+query.where(&#39;field&#39;, 5);
+query.limit(5);
+query.skip(100);
+
+// query.executed == false
+
+query.exec (function (err, docs) {
+  // called when the `query.complete` or `query.error` are called
+  // internally
+});
+
+// query.executed == true</code></pre>
         </div>
 
         <div id="footer">

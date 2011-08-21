@@ -33,7 +33,7 @@ Same as `Model#find`, but only receives a single document as second parameter:
 
 ## Model#findById
 
-Same as `findByOne`, but receives a value to search a document by their `_id`
+Same as `findOne`, but receives a value to search a document by their `_id`
 key. This value is subject to casting, so it can be a hex string or a proper 
 ObjectId.
 

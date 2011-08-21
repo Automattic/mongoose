@@ -15,6 +15,7 @@ function process (input, output) {
 process('README.md', 'index.html');
 process('docs/defaults.md', 'docs/defaults.html');
 process('docs/embedded-documents.md', 'docs/embedded-documents.html');
+process('docs/finding-documents.md', 'docs/finding-documents.html');
 process('docs/indexes.md', 'docs/indexes.html');
 process('docs/middleware.md', 'docs/middleware.html');
 process('docs/model-definition.md', 'docs/model-definition.html');

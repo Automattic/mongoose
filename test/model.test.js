@@ -1170,7 +1170,7 @@ module.exports = {
 
   //GH-464
   'test validation still fires with non-schema paths': function(){
-    
+
     mongoose.model('TestNonSchemaValidation', new Schema({
       item: { type: String, required: true }
     }));
@@ -1186,7 +1186,7 @@ module.exports = {
       err.should.be.an.instanceof(MongooseError);
       err.should.be.an.instanceof(ValidationError);
       err.errors.item.should.eql('Validator "required" failed for path item');
-      db.close(); 
+      db.close();
     });
   },
 

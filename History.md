@@ -1,4 +1,9 @@
 
+1.8.4 / 2011-08-21
+===================
+
+  * Fixed; validation bug when instantiated with non-schema properties (#464) [jmreidy]
+
 1.8.3 / 2011-08-19
 ===================
 

@@ -8,7 +8,7 @@ var start = require('./common')
   , mongoose = start.mongoose
   , Schema = mongoose.Schema
   , ObjectId = Schema.ObjectId
-  , Document = require('mongoose/document')
+  , Document = require('../lib/document')
   , DocumentObjectId = mongoose.Types.ObjectId;
 
 /**
@@ -520,7 +520,7 @@ module.exports = {
 
   // GH-209
   'MongooseErrors should be instances of Error': function () {
-    var MongooseError = require('../lib/mongoose/error')
+    var MongooseError = require('../lib/error')
       , err = new MongooseError("Some message");
     err.should.be.an.instanceof(Error);
   },

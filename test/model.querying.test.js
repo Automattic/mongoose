@@ -6,8 +6,8 @@
 var start = require('./common')
   , should = require('should')
   , mongoose = start.mongoose
-  , random = require('mongoose/utils').random
-  , Query = require('mongoose/query')
+  , random = require('../lib/utils').random
+  , Query = require('../lib/query')
   , Schema = mongoose.Schema
   , SchemaType = mongoose.SchemaType
   , CastError = SchemaType.CastError

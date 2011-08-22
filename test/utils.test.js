@@ -5,9 +5,9 @@
 
 require('./common');
 
-var utils = require('mongoose/utils')
-  , StateMachine = require('mongoose/statemachine')
-  , ObjectId = require('mongoose/types/objectid')
+var utils = require('../lib/utils')
+  , StateMachine = require('../lib/statemachine')
+  , ObjectId = require('../lib/types/objectid')
 
 /**
  * Setup.

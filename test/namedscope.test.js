@@ -26,7 +26,7 @@
 var start = require('./common')
   , should = require('should')
   , mongoose = start.mongoose
-  , random = require('mongoose/utils').random
+  , random = require('../lib/utils').random
   , Schema = mongoose.Schema
   , _24hours = 24 * 3600 * 1000;
 

@@ -4,4 +4,4 @@
  *
  */
 
-module.exports = require('./lib/mongoose/');
+module.exports = require('./lib/');

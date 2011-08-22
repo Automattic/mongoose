@@ -3,7 +3,7 @@
  * Module dependencies.
  */
 
-var Query = require('mongoose/query')
+var Query = require('../lib/query')
   , start = require('./common')
   , mongoose = start.mongoose
   , DocumentObjectId = mongoose.Types.ObjectId

@@ -6,8 +6,8 @@
 var should = require('should')
   , start = require('./common')
   , mongoose = start.mongoose
-  , EmbeddedDocument = require('mongoose/types/document')
-  , DocumentArray = require('mongoose/types/documentarray')
+  , EmbeddedDocument = require('../lib/types/document')
+  , DocumentArray = require('../lib/types/documentarray')
   , Schema = mongoose.Schema
   , SchemaType = mongoose.SchemaType
   , ValidatorError = SchemaType.ValidatorError

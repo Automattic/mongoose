@@ -4,7 +4,7 @@
  */
 
 var should = require('should')
-  , Promise = require('mongoose/promise');
+  , Promise = require('../lib/promise');
 
 /**
  * Test.

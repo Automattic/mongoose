@@ -6,8 +6,8 @@
 var start = require('./common')
   , should = require('should')
   , mongoose = start.mongoose
-  , random = require('mongoose/utils').random
-  , Query = require('mongoose/query')
+  , random = require('../lib/utils').random
+  , Query = require('../lib/query')
   , Schema = mongoose.Schema
   , SchemaType = mongoose.SchemaType
   , CastError = SchemaType.CastError
@@ -1536,41 +1536,101 @@ module.exports = {
       , BlogPost = db.model('BlogPost', collection)
       , title = 'Tobi ' + random()
       , author = 'Brian ' + random()
-      , newTitle = 'Woot ' + random();
+      , newTitle = 'Woot ' + random()
+      , id0 = new DocumentObjectId
+      , id1 = new DocumentObjectId
 
     var post = new BlogPost();
     post.set('title', title);
     post.author = author;
     post.meta.visitors = 0;
+    post.date = new Date;
+    post.published = true;
+    post.mixed = { x: 'ex' };
+    post.numbers = [4,5,6,7];
+    post.owners = [id0, id1];
+    post.comments = [{ body: 'been there' }, { body: 'done that' }];
 
     post.save(function (err) {
       should.strictEqual(err, null);
-      BlogPost.findById(post._id, function (err, createdFound) {
+      BlogPost.findById(post._id, function (err, cf) {
         should.strictEqual(err, null);
-        createdFound.title.should.equal(title);
-        createdFound.author.should.equal(author);
-        createdFound.meta.visitors.valueOf().should.eql(0);
+        cf.title.should.equal(title);
+        cf.author.should.equal(author);
+        cf.meta.visitors.valueOf().should.eql(0);
+        cf.date.should.eql(post.date);
+        cf.published.should.be.true;
+        cf.mixed.x.should.equal('ex');
+        cf.numbers.toObject().should.eql([4,5,6,7]);
+        cf.owners.length.should.equal(2);
+        cf.owners[0].toString().should.equal(id0.toString());
+        cf.owners[1].toString().should.equal(id1.toString());
+        cf.comments.length.should.equal(2);
+        cf.comments[0].body.should.eql('been there');
+        cf.comments[1].body.should.eql('done that');
 
-        BlogPost.update({ title: title }, { title: newTitle }, function (err) {
+        var update = {
+            title: newTitle // becomes $set
+          , $inc: { 'meta.visitors': 2 }
+          , $set: { date: new Date }
+          , published: false // becomes $set
+          , 'mixed': { x: 'ECKS', y: 'why' } // $set
+          , $pullAll: { 'numbers': [4, 6] }
+          , $pull: { 'owners': id0 }
+          , 'comments.1.body': 8
+        }
+
+        BlogPost.update({ title: title }, update, function (err) {
           should.strictEqual(err, null);
 
-          BlogPost.findById(post._id, function (err, updatedFound) {
+          BlogPost.findById(post._id, function (err, up) {
             should.strictEqual(err, null);
-            updatedFound.title.should.equal(newTitle);
-            updatedFound.author.should.equal(author);
-            updatedFound.meta.visitors.valueOf().should.equal(0);
+            up.title.should.equal(newTitle);
+            up.author.should.equal(author);
+            up.meta.visitors.valueOf().should.equal(2);
+            up.date.toString().should.equal(update.$set.date.toString());
+            up.published.should.eql(false);
+            up.mixed.x.should.equal('ECKS');
+            up.mixed.y.should.equal('why');
+            up.numbers.toObject().should.eql([5,7]);
+            up.owners.length.should.equal(1);
+            up.owners[0].toString().should.eql(id1.toString());
+            up.comments[0].body.should.equal('been there');
+            up.comments[1].body.should.equal('8');
 
-            // Note: use BlogPost.collection.update for anything other than set operations
-            BlogPost.update({ _id: post._id }, { $inc: { 'meta.visitors': 1 } }, function (err) {
-              if (err) db.close();
-              should.strictEqual(!!err, false, "Model.update doesn't work with $inc");
+            var update2 = {
+                'comments.body': 'fail'
+            }
 
-              BlogPost.findById(post._id, function (err, updatedFound) {
-                db.close();
-                should.strictEqual(err, null);
-                updatedFound.meta.visitors.valueOf().should.equal(1);
-                updatedFound.title.should.equal(newTitle);
-                updatedFound.author.should.equal(author);
+            BlogPost.update({ _id: post._id }, update2, function (err) {
+              should.strictEqual(!!err, true);
+              ;/^can't append to array using string field name \[body\]/.test(err.message).should.be.true;
+
+              var update3 = {
+                  $pull: 'fail'
+              }
+
+              BlogPost.update({ _id: post._id }, update3, function (err) {
+                should.strictEqual(!!err, true);
+                ;/Invalid atomic update value/.test(err.message).should.be.true;
+
+                var update4 = {
+                    comments: [{ body: 'worked great' }]
+                  , $set: {'numbers.1': 100}
+                }
+
+                BlogPost.update({ _id: post._id }, update4, function (err) {
+                  should.strictEqual(err, null);
+                  BlogPost.findById(post._id, function (err, up) {
+                    db.close();
+                    should.strictEqual(err, null);
+                    up.comments.length.should.equal(1);
+                    up.comments[0].body.should.equal('worked great');
+                    up.meta.visitors.valueOf().should.equal(2);
+                    up.mixed.x.should.equal('ECKS');
+                    up.numbers.toObject().should.eql([5,100]);
+                  });
+                });
               });
             });
           });
@@ -1972,7 +2032,7 @@ module.exports = {
       t.nested.nums.$pull(1);
       t.nested.nums.$pull(2);
 
-      t.activePaths.stateOf('nested.nums').should.equal('modify');
+      t._activePaths.stateOf('nested.nums').should.equal('modify');
       db.close();
 
     });
@@ -2251,6 +2311,70 @@ module.exports = {
     });
   },
 
+  'test saving embedded arrays of Buffers atomically': function () {
+    var db = start()
+      , BufListSchema = new Schema({
+          buffers: [Buffer]
+        })
+      , totalDocs = 2
+      , saveQueue = [];
+
+    mongoose.model('BufList', BufListSchema);
+    var BufList = db.model('BufList');
+
+    var t = new BufList();
+
+    t.save(function(err){
+      should.strictEqual(null, err);
+
+      BufList.findOne({ _id: t.get('_id') }, function(err, doc){
+        should.strictEqual(null, err);
+        doc.get('buffers').push(new Buffer([140]));
+        save(doc);
+      });
+
+      BufList.findOne({ _id: t.get('_id') }, function(err, doc){
+        should.strictEqual(null, err);
+        doc.get('buffers').push(new Buffer([141]), new Buffer([142]));
+        save(doc);
+      });
+
+
+      function save(doc) {
+        saveQueue.push(doc);
+        if (saveQueue.length == totalDocs)
+          saveQueue.forEach(function (doc) {
+            doc.save(function (err) {
+              should.strictEqual(null, err);
+              --totalDocs || complete();
+            });
+          });
+      };
+
+      function complete () {
+        BufList.findOne({ _id: t.get('_id') }, function (err, doc) {
+          db.close();
+          should.strictEqual(null, err);
+
+          doc.get('buffers').length.should.eql(3);
+
+          doc.get('buffers').some(function(buf){
+            return buf[0] == 140;
+          }).should.be.true;
+
+          doc.get('buffers').some(function(buf){
+            return buf[0] == 141;
+          }).should.be.true;
+
+          doc.get('buffers').some(function(buf){
+            return buf[0] == 142;
+          }).should.be.true;
+
+        });
+      };
+    });
+  },
+
   // GH-255
   'test updating an embedded document in an embedded array': function () {
     var db = start()
@@ -2410,13 +2534,14 @@ module.exports = {
       BlogPost.findById(post.get('_id'), function (err, doc) {
         should.strictEqual(err, null);
 
+        doc.comments[0].title = "changed";
         doc.comments[0].remove();
         doc.save(function (err) {
           should.strictEqual(err, null);
 
           BlogPost.findById(post.get('_id'), function (err, doc) {
             should.strictEqual(err, null);
-            
+
             doc.comments.should.have.length(1);
             doc.comments[0].title.should.eql('aaaa');
 
@@ -2562,7 +2687,7 @@ module.exports = {
         doc.numbers.remove('1');
         doc.save(function (err) {
           should.strictEqual(err, null);
-          
+
           BlogPost.findById(post.get('_id'), function (err, doc) {
             should.strictEqual(err, null);
 
@@ -3294,7 +3419,7 @@ module.exports = {
           t.nest = null;
           t.save(function (err) {
             should.strictEqual(err, null);
-            should.strictEqual(t.doc.nest, null);
+            should.strictEqual(t._doc.nest, null);
             db.close();
           });
         });
@@ -3454,17 +3579,13 @@ module.exports = {
     });
 
     // Don't know how to test those on a embedded document.
-    /*
+    //EmbeddedSchema.post('init', function () {
+      //init = true;
+    //});
 
-    EmbeddedSchema.post('init', function () {
-      init = true;
-    });
-
-    EmbeddedSchema.post('remove', function () {
-      remove = true;
-    });
-
-    */
+    //EmbeddedSchema.post('remove', function () {
+      //remove = true;
+    //});
 
     mongoose.model('Parent', ParentSchema);
 
@@ -3508,7 +3629,12 @@ module.exports = {
 
     var a = '{ meta: { visitors: 45 },\n  numbers: [ 5, 6, 7 ],\n  owners: [ 4dd3e169dbfb13b4570000b6 ],\n  comments: \n   [{ _id: 4dd3e169dbfb13b4570000b7,\n     comments: [],\n     body: \'this is a comment\',\n     date: Wed, 18 May 2011 15:02:31 GMT,\n     title: \'my comment\' }\n   { _id: 4dd3e169dbfb13b4570000b8,\n     comments: [],\n     body: \'this is a comment too!\',\n     date: Wed, 18 May 2011 15:02:31 GMT,\n     title: \'the next thang\' }],\n  _id: 4dd3e169dbfb13b4570000b9,\n  date: Wed, 18 May 2011 15:02:31 GMT,\n  title: \'Test\' }'
 
-    post.inspect().should.eql(a);
+    var out = post.inspect();
+    ;/meta: { visitors: 45 }/.test(out).should.be.true;
+    ;/numbers: \[ 5, 6, 7 \]/.test(out).should.be.true;
+    ;/date: Wed, 18 May 2011 15:02:31 GMT/.test(out).should.be.true;
+    ;/activePaths:/.test(out).should.be.false;
+    ;/_atomics:/.test(out).should.be.false;
   },
 
   'path can be used as pathname': function () {
@@ -3524,25 +3650,50 @@ module.exports = {
     }
 
     threw.should.be.false;
-
   },
 
-  'when mongo is down, save callback should fire with err': function () {
+  'when mongo is down, save callback should fire with err if auto_reconnect is disabled': function () {
+    var db = start({ server: { auto_reconnect: false }});
+    var T = db.model('Thing', new Schema({ type: String }));
+    db.on('open', function () {
+      var t = new T({ type: "monster" });
+
+      var worked = false;
+      t.save(function (err) {
+        worked = true;
+        err.message.should.eql('notConnected');
+      });
+
+      process.nextTick(function () {
+        db.close();
+      });
+
+      setTimeout(function () {
+        worked.should.be.true;
+      }, 500);
+    });
+  },
+
+  'when mongo is down, auto_reconnect should kick in and db operation should succeed': function () {
     var db = start();
     var T = db.model('Thing', new Schema({ type: String }));
-    db.close();
+    db.on('open', function () {
+      var t = new T({ type: "monster" });
 
-    var t = new T({ type: "monster" });
+      var worked = false;
+      t.save(function (err) {
+        should.strictEqual(err, null);
+        worked = true;
+      });
 
-    var worked = false;
-    t.save(function (err) {
-      worked = true;
-      err.message.should.eql('notConnected');
+      process.nextTick(function () {
+        db.close();
+      });
+
+      setTimeout(function () {
+        worked.should.be.true;
+      }, 500);
     });
-
-    setTimeout(function () {
-      worked.should.be.true;
-    }, 1000);
   },
 
   'subdocuments with changed values should persist the values': function () {
@@ -3637,15 +3788,22 @@ module.exports = {
     });
   },
 
-  // GH-365
+  // GH-365, GH-390, GH-422
   'test that setters are used on embedded documents': function () {
     var db = start();
+
     function setLat (val) {
       return parseInt(val);
     }
 
+    var tick = 0;
+    function uptick () {
+      return ++tick;
+    }
+
     var Location = new Schema({
-      lat: {type: Number, default: 0, set: setLat}
+        lat:  { type: Number, default: 0, set: setLat}
+      , long: { type: Number, set: uptick }
     });
 
     var Deal = new Schema({
@@ -3656,12 +3814,24 @@ module.exports = {
     Location = db.model('Location', Location, 'locations_' + random());
     Deal = db.model('Deal', Deal, 'deals_' + random());
 
-    var location = new Location({lat: 1.2});
+    var location = new Location({lat: 1.2, long: 10});
     location.lat.valueOf().should.equal(1);
+    location.long.valueOf().should.equal(1);
 
-    var deal = new Deal({title: "My deal", locations: [{lat: 1.2}]});
+    var deal = new Deal({title: "My deal", locations: [{lat: 1.2, long: 33}]});
     deal.locations[0].lat.valueOf().should.equal(1);
-    db.close();
+    deal.locations[0].long.valueOf().should.equal(2);
+
+    deal.save(function (err) {
+      should.strictEqual(err, null);
+      Deal.findById(deal._id, function (err, deal) {
+        db.close();
+        should.strictEqual(err, null);
+        deal.locations[0].lat.valueOf().should.equal(1);
+        // GH-422
+        deal.locations[0].long.valueOf().should.equal(2);
+      });
+    });
   },
 
   // GH-289

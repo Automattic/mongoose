@@ -1,3 +1,0 @@
-[submodule "support/expresso"]
-	path = support/expresso
-	url = git://github.com/visionmedia/expresso.git

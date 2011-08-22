@@ -16,7 +16,8 @@ var mongoose = require('./common').mongoose
   , DocumentObjectId = mongoose.Types.ObjectId
   , Mixed = SchemaTypes.Mixed
   , MongooseNumber = mongoose.Types.Number
-  , MongooseArray = mongoose.Types.Array;
+  , MongooseArray = mongoose.Types.Array
+  , vm = require('vm')
 
 /**
  * Test Document constructor.
@@ -181,19 +182,27 @@ module.exports = {
 
   'test string enum validation': function(){
     var Test = new Schema({
-        complex: { type: String, enum: ['a', 'b', 'c'] }
+        complex: { type: String, enum: ['a', 'b', undefined, 'c', null] }
     });
 
     Test.path('complex').should.be.an.instanceof(SchemaTypes.String);
-    Test.path('complex').enumValues.should.eql(['a', 'b', 'c']);
+    Test.path('complex').enumValues.should.eql(['a', 'b', 'c', null]);
     Test.path('complex').validators.should.have.length(1);
 
     Test.path('complex').enum('d', 'e');
 
-    Test.path('complex').enumValues.should.eql(['a', 'b', 'c', 'd', 'e']);
+    Test.path('complex').enumValues.should.eql(['a', 'b', 'c', null, 'd', 'e']);
 
     Test.path('complex').doValidate('x', function(err){
       err.should.be.an.instanceof(ValidatorError);
+    });
+
+    Test.path('complex').doValidate(undefined, function(err){
+      err.should.be.an.instanceof(ValidatorError);
+    });
+
+    Test.path('complex').doValidate(null, function(err){
+      should.strictEqual(null, err);
     });
 
     Test.path('complex').doValidate('da', function(err){
@@ -384,12 +393,13 @@ module.exports = {
       , dates       : [Date]
       , numbers     : [Number]
       , strings     : [String]
+      , buffers     : [Buffer]
       , nocast      : []
       , mixed       : [Mixed]
     });
 
     var oids = Loki.path('oids').cast(['4c54f3453e688c000000001a', new DocumentObjectId]);
-    
+
     oids[0].should.be.an.instanceof(DocumentObjectId);
     oids[1].should.be.an.instanceof(DocumentObjectId);
 
@@ -402,7 +412,7 @@ module.exports = {
 
     numbers[0].should.be.a('number');
     numbers[1].should.be.a('number');
-    
+
     var strings = Loki.path('strings').cast(['test', 123]);
 
     strings[0].should.be.a('string');
@@ -410,6 +420,11 @@ module.exports = {
 
     strings[1].should.be.a('string');
     strings[1].should.eql('123');
+
+    var buffers = Loki.path('buffers').cast(['\0\0\0', new Buffer("abc")]);
+
+    buffers[0].should.be.an.instanceof(Buffer);
+    buffers[1].should.be.an.instanceof(Buffer);
 
     var nocasts = Loki.path('nocast').cast(['test', 123]);
 
@@ -698,22 +713,52 @@ module.exports = {
     });
 
     Tobi.path('name')._index.should.be.true;
-
     Tobi.path('name').index({ unique: true });
-
     Tobi.path('name')._index.should.eql({ unique: true });
+    Tobi.path('name').unique(false);
+    Tobi.path('name')._index.should.eql({ unique: false});
+
+    var T1 = new Schema({
+        name: { type: String, sparse: true }
+    });
+    T1.path('name')._index.should.eql({ sparse: true });
+
+    var T2 = new Schema({
+        name: { type: String, unique: true }
+    });
+    T2.path('name')._index.should.eql({ unique: true });
+
+    var T3 = new Schema({
+        name: { type: String, sparse: true, unique: true }
+    });
+    T3.path('name')._index.should.eql({ sparse: true, unique: true });
+
+    var T4 = new Schema({
+        name: { type: String, unique: true, sparse: true }
+    });
+    var i = T4.path('name')._index;
+    i.unique.should.be.true;
+    i.sparse.should.be.true;
+
+    var T5 = new Schema({
+        name: { type: String, index: { sparse: true, unique: true } }
+    });
+    var i = T5.path('name')._index;
+    i.unique.should.be.true;
+    i.sparse.should.be.true;
   },
-  
+
   'test defining compound indexes': function(){
     var Tobi = new Schema({
         name: { type: String, index: true }
-      , last: { type: Number }
+      , last: { type: Number, sparse: true }
     });
 
     Tobi.index({ firstname: 1, last: 1 }, { unique: true });
 
     Tobi.indexes.should.eql([
         [{ name: 1 }, {}]
+      , [{ last: 1 }, { sparse: true }]
       , [{ firstname: 1, last: 1}, {unique: true}]
     ]);
   },
@@ -773,6 +818,31 @@ module.exports = {
   'allow disabling the auto .id virtual': function () {
     var schema = new Schema({ name: String }, { noVirtualId: true });
     should.strictEqual(undefined, schema.virtuals.id);
+  },
+
+  'schema creation works with objects from other contexts': function () {
+    var str = 'code = {' +
+      '  name: String' +
+      ', arr1: Array ' +
+      ', arr2: { type: [] }' +
+      ', date: Date  ' +
+      ', num: { type: Number }' +
+      ', bool: Boolean' +
+      ', nest: { sub: { type: {}, required: true }}' +
+      '}';
+
+    var script = vm.createScript(str, 'testSchema.vm');
+    var sandbox = { code: null };
+    script.runInNewContext(sandbox);
+
+    var Ferret = new Schema(sandbox.code);
+    Ferret.path('nest.sub').should.be.an.instanceof(SchemaTypes.Mixed);
+    Ferret.path('name').should.be.an.instanceof(SchemaTypes.String);
+    Ferret.path('arr1').should.be.an.instanceof(SchemaTypes.Array);
+    Ferret.path('arr2').should.be.an.instanceof(SchemaTypes.Array);
+    Ferret.path('date').should.be.an.instanceof(SchemaTypes.Date);
+    Ferret.path('num').should.be.an.instanceof(SchemaTypes.Number);
+    Ferret.path('bool').should.be.an.instanceof(SchemaTypes.Boolean);
   }
 
 };

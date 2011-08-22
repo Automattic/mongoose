@@ -6,12 +6,13 @@
 var start = require('./common')
   , should = require('should')
   , mongoose = start.mongoose
-  , random = require('mongoose/utils').random
-  , Query = require('mongoose/query')
+  , random = require('../lib/utils').random
+  , Query = require('../lib/query')
   , Schema = mongoose.Schema
   , SchemaType = mongoose.SchemaType
   , CastError = SchemaType.CastError
   , ObjectId = Schema.ObjectId
+  , MongooseBuffer = mongoose.Types.Buffer
   , DocumentObjectId = mongoose.Types.ObjectId;
 
 /**
@@ -40,6 +41,7 @@ var BlogPostB = new Schema({
   , mixed     : {}
   , numbers   : [Number]
   , tags      : [String]
+  , sigs      : [Buffer]
   , owners    : [ObjectId]
   , comments  : [Comments]
 });
@@ -817,7 +819,6 @@ module.exports = {
     });
   },
 
-  // TODO Won't pass until we fix materialization/raw data assymetry
   'test find where $exists': function () {
     var db = start()
       , ExistsSchema = new Schema({
@@ -866,12 +867,28 @@ module.exports = {
     var db = start()
       , BlogPostB = db.model('BlogPostB', collection);
 
-    BlogPostB.create({comments: [{title: 'i should be queryable'}]}, function (err, created) {
+    BlogPostB.create({comments: [{title: 'i should be queryable'}], numbers: [1,2,33333], tags:['yes', 'no']}, function (err, created) {
       should.strictEqual(err, null);
       BlogPostB.findOne({'comments.title': 'i should be queryable'}, function (err, found) {
         should.strictEqual(err, null);
         found._id.should.eql(created._id);
-        db.close();
+
+        BlogPostB.findOne({'comments.0.title': 'i should be queryable'}, function (err, found) {
+          should.strictEqual(err, null);
+          found._id.should.eql(created._id);
+
+          // GH-463
+          BlogPostB.findOne({'numbers.2': 33333}, function (err, found) {
+            should.strictEqual(err, null);
+            found._id.should.eql(created._id);
+
+            BlogPostB.findOne({'tags.1': 'no'}, function (err, found) {
+              should.strictEqual(err, null);
+              found._id.should.eql(created._id);
+              db.close();
+            });
+          });
+        });
       });
     });
   },
@@ -883,7 +900,7 @@ module.exports = {
 
     BlogPostB.create({comments: [{title: 'i should be queryable by _id'}, {title:'me too me too!'}]}, function (err, created) {
       should.strictEqual(err, null);
-      var id = created.comments[1]._id.id;
+      var id = created.comments[1]._id.toString();
       BlogPostB.findOne({'comments._id': id}, function (err, found) {
         db.close();
         should.strictEqual(err, null);
@@ -951,21 +968,38 @@ module.exports = {
   'test finding where $or': function () {
     var db = start()
       , Mod = db.model('Mod', 'mods_' + random());
-    Mod.create({num: 1}, function (err, one) {
+
+    Mod.create({num: 1}, {num: 2, str: 'two'}, function (err, one, two) {
       should.strictEqual(err, null);
-      Mod.create({num: 2}, function (err, two) {
-        should.strictEqual(err, null);
-        Mod.create({num: 3}, function (err, three) {
+
+      var pending = 2;
+      test1();
+      test2();
+
+      function test1 () {
+        Mod.find({$or: [{num: 1}, {num: 2}]}, function (err, found) {
+          done();
           should.strictEqual(err, null);
-          Mod.find({$or: [{num: 1}, {num: 2}]}, function (err, found) {
-            should.strictEqual(err, null);
-            found.should.have.length(2);
-            found[0]._id.should.eql(one._id);
-            found[1]._id.should.eql(two._id);
-            db.close();
-          });
+          found.should.have.length(2);
+          found[0]._id.should.eql(one._id);
+          found[1]._id.should.eql(two._id);
         });
-      });
+      }
+
+      function test2 () {
+        Mod.find({ $or: [{ str: 'two'}, {str:'three'}] }, function (err, found) {
+          if (err) console.error(err);
+          done();
+          should.strictEqual(err, null);
+          found.should.have.length(1);
+          found[0]._id.should.eql(two._id);
+        });
+      }
+
+      function done () {
+        if (--pending) return;
+        db.close();
+      }
     });
   },
 
@@ -1043,17 +1077,24 @@ module.exports = {
     var db = start()
       , BlogPostB = db.model('BlogPostB', collection);
 
-    BlogPostB.create({numbers: [-1,-2,-3,-4]}, function (err, whereoutZero) {
+    BlogPostB.create(
+        {numbers: [-1,-2,-3,-4], meta: { visitors: 4 }}
+      , {numbers: [0,-1,-2,-3,-4]}
+      , function (err, whereoutZero, whereZero) {
       should.strictEqual(err, null);
-      BlogPostB.create({numbers: [0,-1,-2,-3,-4]}, function (err, whereZero) {
+
+      BlogPostB.find({numbers: {$all: [-1, -2, -3, -4]}}, function (err, found) {
         should.strictEqual(err, null);
-        BlogPostB.find({numbers: {$all: [-1, -2, -3, -4]}}, function (err, found) {
+        found.should.have.length(2);
+        BlogPostB.find({'meta.visitors': {$all: [4] }}, function (err, found) {
           should.strictEqual(err, null);
-          found.should.have.length(2);
+          found.should.have.length(1);
+          found[0]._id.should.eql(whereoutZero._id);
           BlogPostB.find({numbers: {$all: [0, -1]}}, function (err, found) {
             db.close();
             should.strictEqual(err, null);
             found.should.have.length(1);
+            found[0]._id.should.eql(whereZero._id);
           });
         });
       });
@@ -1064,7 +1105,7 @@ module.exports = {
     var db = start()
       , BlogPostB = db.model('BlogPostB', collection);
 
-    var post = new BlogPostB();
+    var post = new BlogPostB({ title: "Aristocats" });
 
     post.tags.push('onex');
     post.tags.push('twox');
@@ -1076,14 +1117,29 @@ module.exports = {
       BlogPostB.findById(post._id, function (err, post) {
         should.strictEqual(err, null);
 
-        BlogPostB.find({tags: { '$all': [/^onex/i]}}, function (err, docs) {
+        BlogPostB.find({ title: { '$all': ['Aristocats']}}, function (err, docs) {
           should.strictEqual(err, null);
           docs.length.should.equal(1);
 
-          BlogPostB.findOne({tags: { '$all': /^two/ }}, function (err, doc) {
-            db.close();
+          BlogPostB.find({ title: { '$all': [/^Aristocats/]}}, function (err, docs) {
             should.strictEqual(err, null);
-            doc.id.should.eql(post.id);
+            docs.length.should.equal(1);
+
+            BlogPostB.find({tags: { '$all': ['onex','twox','threex']}}, function (err, docs) {
+              should.strictEqual(err, null);
+              docs.length.should.equal(1);
+
+              BlogPostB.find({tags: { '$all': [/^onex/i]}}, function (err, docs) {
+                should.strictEqual(err, null);
+                docs.length.should.equal(1);
+
+                BlogPostB.findOne({tags: { '$all': /^two/ }}, function (err, doc) {
+                  db.close();
+                  should.strictEqual(err, null);
+                  doc.id.should.eql(post.id);
+                });
+              });
+            });
           });
         });
       });
@@ -1140,6 +1196,26 @@ module.exports = {
             found.numbers[1].should.equal(700);
             db.close();
           });
+        });
+      });
+    });
+  },
+
+  'test finding documents with a specifc Buffer in their array': function () {
+    var db = start()
+      , BlogPostB = db.model('BlogPostB', collection);
+
+    BlogPostB.create({sigs: [new Buffer([1, 2, 3]),
+                             new Buffer([4, 5, 6]),
+                             new Buffer([7, 8, 9])]}, function (err, created) {
+      should.strictEqual(err, null);
+      BlogPostB.findOne({sigs: new Buffer([1, 2, 3])}, function (err, found) {
+        should.strictEqual(err, null);
+        found._id.should.eql(created._id);
+        var query = { sigs: { "$in" : [new Buffer([3, 3, 3]), new Buffer([4, 5, 6])] } };
+        BlogPostB.findOne(query, function (err, found) {
+          should.strictEqual(err, null);
+          db.close();
         });
       });
     });
@@ -1410,6 +1486,151 @@ module.exports = {
         });
       }, 500);
     });
-  }
+  },
 
+  'buffers find using available types': function () {
+    var db = start()
+      , BufSchema = new Schema({ name: String, block: Buffer })
+      , Test = db.model('Buffer', BufSchema, "buffers");
+
+    var docA = { name: 'A', block: new Buffer('über') };
+    var docB = { name: 'B', block: new Buffer("buffer shtuffs are neat") };
+    var docC = { name: 'C', block: 'hello world' };
+
+    Test.create(docA, docB, docC, function (err, a, b, c) {
+      should.strictEqual(err, null);
+      b.block.toString('utf8').should.equal('buffer shtuffs are neat');
+      a.block.toString('utf8').should.equal('über');
+      c.block.toString('utf8').should.equal('hello world');
+
+      Test.findById(a._id, function (err, a) {
+        should.strictEqual(err, null);
+        a.block.toString('utf8').should.equal('über');
+
+        Test.findOne({ block: 'buffer shtuffs are neat' }, function (err, rb) {
+          should.strictEqual(err, null);
+          rb.block.toString('utf8').should.equal('buffer shtuffs are neat');
+
+          Test.findOne({ block: /buffer/i }, function (err, rb) {
+            err.message.should.eql('Cast to buffer failed for value "/buffer/i"')
+            Test.findOne({ block: [195, 188, 98, 101, 114] }, function (err, rb) {
+              should.strictEqual(err, null);
+              rb.block.toString('utf8').should.equal('über');
+
+              Test.findOne({ block: 'aGVsbG8gd29ybGQ=' }, function (err, rb) {
+                should.strictEqual(err, null);
+                should.strictEqual(rb, null);
+
+                Test.findOne({ block: new Buffer('aGVsbG8gd29ybGQ=', 'base64') }, function (err, rb) {
+                  should.strictEqual(err, null);
+                  rb.block.toString('utf8').should.equal('hello world');
+
+                  Test.findOne({ block: new MongooseBuffer('aGVsbG8gd29ybGQ=', 'base64') }, function (err, rb) {
+                    should.strictEqual(err, null);
+                    rb.block.toString('utf8').should.equal('hello world');
+
+                    Test.remove({}, function (err) {
+                      db.close();
+                      should.strictEqual(err, null);
+                    });
+                  });
+                });
+              });
+            });
+          });
+        });
+      });
+
+    });
+  },
+
+  'buffer tests using conditionals': function () {
+    // $in $nin etc
+    var db = start()
+      , BufSchema = new Schema({ name: String, block: Buffer })
+      , Test = db.model('Buffer2', BufSchema, "buffer_"+random());
+
+    var docA = { name: 'A', block: new MongooseBuffer([195, 188, 98, 101, 114]) }; //über
+    var docB = { name: 'B', block: new MongooseBuffer("buffer shtuffs are neat") };
+    var docC = { name: 'C', block: new MongooseBuffer('aGVsbG8gd29ybGQ=', 'base64') };
+
+    Test.create(docA, docB, docC, function (err, a, b, c) {
+      should.strictEqual(err, null);
+      a.block.toString('utf8').should.equal('über');
+      b.block.toString('utf8').should.equal('buffer shtuffs are neat');
+      c.block.toString('utf8').should.equal('hello world');
+
+      Test.find({ block: { $in: [[195, 188, 98, 101, 114], "buffer shtuffs are neat", new Buffer('aGVsbG8gd29ybGQ=', 'base64')] }}, function (err, tests) {
+        done();
+        should.strictEqual(err, null);
+        tests.length.should.equal(3);
+      });
+
+      Test.find({ block: { $in: ['über', 'hello world'] }}, function (err, tests) {
+        done();
+        should.strictEqual(err, null);
+        tests.length.should.equal(2);
+      });
+
+      Test.find({ block: { $in: ['über'] }}, function (err, tests) {
+        done();
+        should.strictEqual(err, null);
+        tests.length.should.equal(1);
+        tests[0].block.toString('utf8').should.equal('über');
+      });
+
+      Test.find({ block: { $nin: ['über'] }}, function (err, tests) {
+        done();
+        should.strictEqual(err, null);
+        tests.length.should.equal(2);
+      });
+
+      Test.find({ block: { $nin: [[195, 188, 98, 101, 114], new Buffer('aGVsbG8gd29ybGQ=', 'base64')] }}, function (err, tests) {
+        done();
+        should.strictEqual(err, null);
+        tests.length.should.equal(1);
+        tests[0].block.toString('utf8').should.equal('buffer shtuffs are neat');
+      });
+
+      Test.find({ block: { $ne: 'über' }}, function (err, tests) {
+        done();
+        should.strictEqual(err, null);
+        tests.length.should.equal(2);
+      });
+
+      Test.find({ block: { $gt: 'über' }}, function (err, tests) {
+        done();
+        should.strictEqual(err, null);
+        tests.length.should.equal(2);
+      });
+
+      Test.find({ block: { $gte: 'über' }}, function (err, tests) {
+        done();
+        should.strictEqual(err, null);
+        tests.length.should.equal(3);
+      });
+
+      Test.find({ block: { $lt: new Buffer('buffer shtuffs are neat') }}, function (err, tests) {
+        done();
+        should.strictEqual(err, null);
+        tests.length.should.equal(2);
+        tests[0].block.toString('utf8').should.equal('über');
+      });
+
+      Test.find({ block: { $lte: 'buffer shtuffs are neat' }}, function (err, tests) {
+        done();
+        should.strictEqual(err, null);
+        tests.length.should.equal(3);
+      });
+
+      var pending = 9;
+      function done () {
+        if (--pending) return;
+        Test.remove({}, function (err) {
+          db.close();
+          should.strictEqual(err, null);
+        });
+      }
+    });
+  }
 };

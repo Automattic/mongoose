@@ -3,26 +3,26 @@ Mongoose 1.0
 
 ## What's Mongoose?
 
-Mongoose is a MongoDB object modeling tool designed to work in an asynchronous
+Mongoose is a [MongoDB](http://www.mongodb.org/) object modeling tool designed to work in an asynchronous
 environment.
 
 Defining a model is as easy as:
 
 ```javascript
 var Comments = new Schema({
-	title     : String
+    title     : String
   , body      : String
   , date      : Date
 });
 
 var BlogPost = new Schema({
-	author    : ObjectId
+    author    : ObjectId
   , title     : String
   , body      : String
   , date      : Date
   , comments  : [Comments]
   , meta      : {
-		votes : Number
+      votes : Number
 	  , favs  : Number
 	}
 });
@@ -86,7 +86,7 @@ var Schema = mongoose.Schema
   , ObjectId = Schema.ObjectId;
 
 var BlogPost = new Schema({
-	author    : ObjectId
+    author    : ObjectId
   , title     : String
   , body      : String
   , date      : Date
@@ -110,7 +110,7 @@ The following example shows some of these features:
 
 ```javascript
 var Comment = new Schema({
-	name  :  { type: String, default: 'hahaha' }
+    name  :  { type: String, default: 'hahaha' }
   , age   :  { type: Number, min: 18, index: true }
   , bio   :  { type: String, match: /[a-z]/ }
   , date  :  { type: Date, default: Date.now }
@@ -118,7 +118,7 @@ var Comment = new Schema({
 
 // a setter
 Comment.path('name').set(function (v) {
-  return v.capitalize();
+  return capitalize(v);
 });
 
 // middleware
@@ -138,6 +138,12 @@ access it through the same function
 
 ```javascript
 var myModel = mongoose.model('ModelName');
+```
+
+Or just do it all at once
+
+```javascript
+var myModel = mongoose.model('ModelName', mySchema);
 ```
 
 We can then instantiate it, and save it:
@@ -278,7 +284,7 @@ every time someone `set`s a path in your Document to a new value:
 schema.pre('set', function (next, path, val, typel) {
   // `this` is the current Document
   this.emit('set', path, val);
-      
+
   // Pass control to the next pre
   next();
 });
@@ -292,7 +298,9 @@ new values to `next`:
 .pre(method, function firstPre (next, methodArg1, methodArg2) {
   // Mutate methodArg1
   next("altered-" + methodArg1.toString(), methodArg2);
-}) // pre declaration is chainable
+})
+
+// pre declaration is chainable
 .pre(method, function secondPre (next, methodArg1, methodArg2) {
   console.log(methodArg1);
   // => 'altered-originalValOfMethodArg1' 
@@ -308,6 +316,29 @@ new values to `next`:
 })
 ```
 
+### Schema gotcha
+
+`type`, when used in a schema has special meaning within Mongoose. If your
+schema requires using `type` as a nested property you must use object notation:
+
+``` javascript
+new Schema({
+    broken: { type: Boolean }
+  , asset : {
+        name: String
+      , type: String // uh oh, it broke. asset will be interpreted as String
+    }
+});
+
+new Schema({
+    works: { type: Boolean }
+  , asset : {
+        name: String
+      , type: { type: String } // works. asset is an object with a type property
+    }
+});
+```
+
 ## API docs
 
 You can find the [Dox](http://github.com/visionmedia/dox) generated API docs at
@@ -317,6 +348,12 @@ You can find the [Dox](http://github.com/visionmedia/dox) generated API docs at
 
 Please subscribe to the Google Groups [mailing
 list](http://groups.google.com/group/mongoose-orm/boxsubscribe).
+
+Join #mongoosejs on freenode.
+
+## Driver access
+
+The driver being used defaults to [node-mongodb-native](https://github.com/christkv/node-mongodb-native) and is directly accessible through `YourModel.collection`. **Note**: using the driver directly bypasses all Mongoose power-tools like validation, getters, setters, hooks, etc.
 
 ## Mongoose Plugins
 
@@ -335,19 +372,16 @@ The following plugins are currently available for use with mongoose:
 
 ### Cloning the repository
 
-Make a fork of `mongoose`, then clone it in your computer. The `master` branch
-contains the current stable release, and the `develop` branch the next upcoming
+Make a fork of `mongoose`, then clone it in your computer. The `v1.x` branch
+contains the current stable release, and the `master` branch the next upcoming
 major release.
-
-If `master` is at `1.0`, `develop` will contain the upcoming `1.1` (or `2.0` if
-the `1` branch is nearing its completion).
 
 ### Guidelines
 
 - Please write inline documentation for new methods or class members.
 - Please write tests and make sure your tests pass.
 - Before starting to write code, look for existing tickets or create one for
-  your specifc issue (unless you're addressing something that's clearly broken).
+  your specific issue (unless you're addressing something that's clearly broken).
   That way you avoid working on something that might not be of interest or that
   has been addressed already in a different branch.
 

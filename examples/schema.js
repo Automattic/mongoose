@@ -10,22 +10,32 @@ var mongoose = require('mongoose')
  * Schema definition
  */
 
-var BlogPost = new Schema({
-    title     : String
-  , slug      : String
-  , date      : Date
-  , comments  : [Comments]
-});
-
 // recursive embedded-document schema
 
-var Comments = new Schema();
+var Comment = new Schema();
 
-Comments.add({
+Comment.add({
     title     : { type: String, index: true }
   , date      : Date
   , body      : String
-  , comments  : [Comments]
+  , comments  : [Comment]
+});
+
+var BlogPost = new Schema({
+    title     : { type: String, index: true }
+  , slug      : { type: String, lowercase: true, trim: true }
+  , date      : Date
+  , comments  : [Comment]
+  , creator   : Schema.ObjectId
+});
+
+var Person = new Schema({
+    name: {
+        first: String
+      , last : String
+    }
+  , email: { type: String, required: true, index: { unique: true, sparse: true } }
+  , alive: Boolean
 });
 
 /**
@@ -33,12 +43,12 @@ Comments.add({
  */
 
 BlogPost.path('date')
-  .default(function(){
-     return new Date()
-   })
-  .set(function(v){
-     return v == 'now' ? new Date() : v;
-   });
+.default(function(){
+   return new Date()
+ })
+.set(function(v){
+   return v == 'now' ? new Date() : v;
+ });
 
 /**
  * Pre hook.
@@ -48,6 +58,18 @@ BlogPost.pre('save', function(next, done){
   emailAuthor(done); // some async function
   next();
 });
+
+/**
+ * Methods
+ */
+
+BlogPost.methods.findCreator = function (callback) {
+  return this.db.model('Person').findById(this.creator, callback);
+}
+
+BlogPost.statics.findByTitle = function (title, callback) {
+  return this.find({ title: title }, callback);
+}
 
 /**
  * Plugins
@@ -72,3 +94,4 @@ BlogPost.plugin(slugGenerator());
  */
 
 mongoose.model('BlogPost', BlogPost);
+mongoose.model('Person', Person);

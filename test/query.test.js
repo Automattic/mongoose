@@ -3,7 +3,7 @@
  * Module dependencies.
  */
 
-var Query = require('mongoose/query')
+var Query = require('../lib/query')
   , start = require('./common')
   , mongoose = start.mongoose
   , DocumentObjectId = mongoose.Types.ObjectId
@@ -621,11 +621,26 @@ module.exports = {
     params.ids.$ne.should.be.instanceof(Array);
     params.ids.$ne[0].toString().should.eql(id.toString());
     params.comments.$ne.should.be.instanceof(Array);
-    params.comments.$ne[0].toObject().should.eql(castedComment);
+    params.comments.$ne[0].should.eql(castedComment);
     params.strings.$ne.should.be.instanceof(Array);
     params.strings.$ne[0].should.eql('Hi there');
     params.numbers.$ne.should.be.instanceof(Array);
     params.numbers.$ne[0].should.eql(10000);
+  },
+
+  'Querying a subdocument array with $ne: null should not throw': function () {
+    var query = new Query();
+    var db = start();
+    var Product = db.model('Product');
+    var Comment = db.model('Comment');
+    db.close();
+
+    var params = {
+        comments: { $ne: null }
+    };
+
+    query.cast(Product, params);
+    should.strictEqual(params.comments.$ne, null);
   },
 
   'Query#find should not cast single value to array for schematype of Array': function () {
@@ -665,7 +680,7 @@ module.exports = {
     params.ids.should.be.instanceof(Array);
     params.ids[0].toString().should.eql(id.toString());
     params.comments.should.be.instanceof(Array);
-    params.comments[0].toObject().should.eql(castedComment);
+    params.comments[0].should.eql(castedComment);
     params.strings.should.be.instanceof(Array);
     params.strings[0].should.eql('Hi there');
     params.numbers.should.be.instanceof(Array);
@@ -678,6 +693,40 @@ module.exports = {
     var Product = db.model('Product');
     db.close();
     new Query().bind(Product, 'distinct').distinct('blah', function(){}).op.should.equal('distinct');
+  },
+
+  'querying/updating with model instance containing embedded docs should work (#454)': function () {
+    var db = start();
+    var Product = db.model('Product');
+
+    var proddoc = { comments: [{ text: 'hello' }] };
+    var prod2doc = { comments: [{ text: 'goodbye' }] };
+
+    var prod = new Product(proddoc);
+    var prod2 = new Product(prod2doc);
+
+    prod.save(function (err) {
+      should.strictEqual(err, null);
+
+      Product.findOne(prod, function (err, product) {
+        should.strictEqual(err, null);
+        product.comments.length.should.equal(1);
+        product.comments[0].text.should.equal('hello');
+
+        Product.update(product, prod2doc, function (err) {
+          should.strictEqual(err, null);
+
+          Product.collection.findOne({ _id: product._id }, function (err, doc) {
+            db.close();
+            should.strictEqual(err, null);
+            doc.comments.length.should.equal(1);
+            // ensure hidden private props were not saved to db
+            doc.comments[0].should.not.have.ownProperty('parentArr');
+            doc.comments[0].text.should.equal('goodbye');
+          });
+        });
+      });
+    });
   },
 
   // Advanced Query options

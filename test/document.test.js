@@ -8,7 +8,7 @@ var start = require('./common')
   , mongoose = start.mongoose
   , Schema = mongoose.Schema
   , ObjectId = Schema.ObjectId
-  , Document = require('mongoose/document')
+  , Document = require('../lib/document')
   , DocumentObjectId = mongoose.Types.ObjectId;
 
 /**
@@ -29,13 +29,37 @@ TestDocument.prototype.__proto__ = Document.prototype;
  * Set a dummy schema to simulate compilation.
  */
 
-TestDocument.prototype.schema = new Schema({
+var schema = TestDocument.prototype.schema = new Schema({
     test    : String
   , oids    : [ObjectId]
   , nested  : {
         age   : Number
       , cool  : ObjectId
+      , deep  : { x: String }
+      , path  : String
+      , setr  : String
     }
+  , nested2 : {
+        nested: String
+      , yup   : {
+            nested  : Boolean
+          , yup     : String
+          , age     : Number
+        }
+    }
+});
+
+schema.virtual('nested.agePlus2').get(function (v) {
+  return this.nested.age + 2;
+});
+schema.virtual('nested.setAge').set(function (v) {
+  this.nested.age = v;
+});
+schema.path('nested.path').get(function (v) {
+  return this.nested.age + (v ? v : '');
+});
+schema.path('nested.setr').set(function (v) {
+  return v + ' setter';
 });
 
 /**
@@ -60,8 +84,20 @@ module.exports = {
       , nested  : {
             age   : 5
           , cool  : DocumentObjectId.fromString('4c6c2d6240ced95d0e00003c')
+          , path  : 'my path'
         }
     });
+
+    doc.test.should.eql('test');
+    doc.oids.should.be.an.instanceof(Array);
+    (doc.nested.age == 5).should.be.true;
+    DocumentObjectId.toString(doc.nested.cool).should.eql('4c6c2d6240ced95d0e00003c');
+    doc.nested.agePlus2.should.eql(7);
+    doc.nested.path.should.eql('5my path');
+    doc.nested.setAge = 10;
+    (doc.nested.age == 10).should.be.true;
+    doc.nested.setr = 'set it';
+    doc.getValue('nested.setr').should.eql('set it setter');
 
     var doc2 = new TestDocument();
     doc2.init({
@@ -70,21 +106,45 @@ module.exports = {
       , nested  : {
             age   : 2
           , cool  : DocumentObjectId.fromString('4cf70857337498f95900001c')
+          , deep  : { x: 'yay' }
         }
     });
-
-    doc.test.should.eql('test');
-    doc.oids.should.be.an.instanceof(Array);
-    (doc.nested.age == 5).should.be.true;
-    DocumentObjectId.toString(doc.nested.cool).should.eql('4c6c2d6240ced95d0e00003c');
 
     doc2.test.should.eql('toop');
     doc2.oids.should.be.an.instanceof(Array);
     (doc2.nested.age == 2).should.be.true;
 
     // GH-366
+    should.strictEqual(doc2.nested.bonk, undefined);
     should.strictEqual(doc2.nested.nested, undefined);
     should.strictEqual(doc2.nested.test, undefined);
+    should.strictEqual(doc2.nested.age.test, undefined);
+    should.strictEqual(doc2.nested.age.nested, undefined);
+    should.strictEqual(doc2.oids.nested, undefined);
+    should.strictEqual(doc2.nested.deep.x, 'yay');
+    should.strictEqual(doc2.nested.deep.nested, undefined);
+    should.strictEqual(doc2.nested.deep.cool, undefined);
+    should.strictEqual(doc2.nested2.yup.nested, undefined);
+    should.strictEqual(doc2.nested2.yup.nested2, undefined);
+    should.strictEqual(doc2.nested2.yup.yup, undefined);
+    should.strictEqual(doc2.nested2.yup.age, undefined);
+    doc2.nested2.yup.should.be.a('object');
+
+    doc2.nested2.yup = {
+        age: 150
+      , yup: "Yesiree"
+      , nested: true
+    };
+
+    should.strictEqual(doc2.nested2.nested, undefined);
+    should.strictEqual(doc2.nested2.yup.nested, true);
+    should.strictEqual(doc2.nested2.yup.yup, "Yesiree");
+    (doc2.nested2.yup.age == 150).should.be.true;
+    doc2.nested2.nested = "y";
+    should.strictEqual(doc2.nested2.nested, "y");
+    should.strictEqual(doc2.nested2.yup.nested, true);
+    should.strictEqual(doc2.nested2.yup.yup, "Yesiree");
+    (doc2.nested2.yup.age == 150).should.be.true;
 
     DocumentObjectId.toString(doc2.nested.cool).should.eql('4cf70857337498f95900001c');
 
@@ -141,10 +201,10 @@ module.exports = {
     copy.nested.age._marked = true;
     copy.nested.cool._marked = true;
 
-    should.strictEqual(doc.doc.test._marked, undefined);
-    should.strictEqual(doc.doc.nested._marked, undefined);
-    should.strictEqual(doc.doc.nested.age._marked, undefined);
-    should.strictEqual(doc.doc.nested.cool._marked, undefined);
+    should.strictEqual(doc._doc.test._marked, undefined);
+    should.strictEqual(doc._doc.nested._marked, undefined);
+    should.strictEqual(doc._doc.nested.age._marked, undefined);
+    should.strictEqual(doc._doc.nested.cool._marked, undefined);
   },
 
   'test hooks system': function(beforeExit){
@@ -171,13 +231,14 @@ module.exports = {
     // parallel
     doc.pre('hooksTest', true, function(next, done){
       steps++;
+      steps.should.eql(3);
       setTimeout(function(){
         steps.should.eql(4);
-      }, 50);
+      }, 10);
       setTimeout(function(){
         steps++;
         done();
-      }, 100);
+      }, 110);
       next();
     });
 
@@ -185,11 +246,11 @@ module.exports = {
       steps++;
       setTimeout(function(){
         steps.should.eql(4);
-      }, 50);
+      }, 10);
       setTimeout(function(){
         steps++;
         done();
-      }, 100);
+      }, 110);
       next();
     });
 
@@ -459,7 +520,7 @@ module.exports = {
 
   // GH-209
   'MongooseErrors should be instances of Error': function () {
-    var MongooseError = require('../lib/mongoose/error')
+    var MongooseError = require('../lib/error')
       , err = new MongooseError("Some message");
     err.should.be.an.instanceof(Error);
   },
@@ -467,6 +528,37 @@ module.exports = {
     var ValidationError = Document.ValidationError
       , err = new ValidationError(new TestDocument);
     err.should.be.an.instanceof(Error);
+  },
+
+  'methods on embedded docs should work': function () {
+    var db = start()
+      , ESchema = new Schema({ name: String })
+
+    ESchema.methods.test = function () {
+      return this.name + ' butter';
+    }
+    ESchema.statics.ten = function () {
+      return 10;
+    }
+
+    var E = db.model('EmbeddedMethodsAndStaticsE', ESchema);
+    var PSchema = new Schema({ embed: [ESchema] });
+    var P = db.model('EmbeddedMethodsAndStaticsP', PSchema);
+
+    var p = new P({ embed: [{name: 'peanut'}] });
+    should.equal('function', typeof p.embed[0].test);
+    should.equal('function', typeof E.ten);
+    p.embed[0].test().should.equal('peanut butter');
+    E.ten().should.equal(10);
+
+    // test push casting
+    p = new P;
+    p.embed.push({name: 'apple'});
+    should.equal('function', typeof p.embed[0].test);
+    should.equal('function', typeof E.ten);
+    p.embed[0].test().should.equal('apple butter');
+
+    db.close();
   }
 
 };

@@ -1,7 +1,7 @@
 var start = require('./common')
   , should = require('should')
   , mongoose = start.mongoose
-  , random = require('mongoose/utils').random
+  , random = require('../lib/utils').random
   , Schema = mongoose.Schema
   , ObjectId = Schema.ObjectId;
 

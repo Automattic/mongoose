@@ -5,8 +5,9 @@
 
 require('./common');
 
-var utils = require('mongoose/utils')
-  , StateMachine = utils.StateMachine;
+var utils = require('../lib/utils')
+  , StateMachine = require('../lib/statemachine')
+  , ObjectId = require('../lib/types/objectid')
 
 /**
  * Setup.
@@ -19,20 +20,6 @@ var ActiveRoster = StateMachine.ctor('require', 'init', 'modify');
  */
 
 module.exports = {
-
-  'test array erasing util': function(){
-    function fn(){};
-    var arr = [fn, 'test', 1]
-      , arr2 = [fn, 'a', 'b', fn, 'c'];
-
-    utils.erase(arr, fn);
-    arr.should.have.length(2);
-    arr.should.eql(['test', 1]);
-
-    utils.erase(arr2, fn);
-    arr2.should.have.length(3);
-    arr2.should.eql(['a', 'b', 'c']);
-  },
 
   'should detect a path as required if it has been required': function () {
     var ar = new ActiveRoster();
@@ -149,6 +136,17 @@ module.exports = {
 
     // same object
     defaults.should.not.equal(result2);
+  },
+
+  'test deepEquals on ObjectIds': function () {
+    var s = (new ObjectId).toString();
+
+    var a = new ObjectId(s)
+      , b = new ObjectId(s);
+
+    utils.deepEqual(a, b).should.be.true;
+    utils.deepEqual(a, a).should.be.true;
+    utils.deepEqual(a, new ObjectId).should.be.false;
   }
 
 };

@@ -7,7 +7,7 @@ var start = require('./common')
   , should = require('should')
   , mongoose = require('./common').mongoose
   , Schema = mongoose.Schema
-  , random = require('mongoose/utils').random
+  , random = require('../lib/utils').random
   , MongooseArray = mongoose.Types.Array;
 
 var User = new Schema({

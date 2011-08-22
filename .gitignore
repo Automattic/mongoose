@@ -3,3 +3,4 @@ lib-cov
 *.swo
 *.swn
 node_modules/
+*.orig

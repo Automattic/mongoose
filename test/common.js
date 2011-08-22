@@ -101,9 +101,10 @@ Assertion.prototype.__defineGetter__('disconnected', function(){
  * @api private
  */
 
-module.exports = function(){
+module.exports = function (options) {
   return mongoose.createConnection(
-    process.env.MONGOOSE_TEST_URI || 'mongodb://localhost/mongoose_test'
+      process.env.MONGOOSE_TEST_URI || 'mongodb://localhost/mongoose_test'
+    , options
   );
 };
 

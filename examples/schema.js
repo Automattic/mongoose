@@ -25,6 +25,7 @@ var BlogPost = new Schema({
     title     : { type: String, index: true }
   , slug      : { type: String, lowercase: true, trim: true }
   , date      : Date
+  , buf       : Buffer
   , comments  : [Comment]
   , creator   : Schema.ObjectId
 });
@@ -71,6 +72,10 @@ BlogPost.statics.findByTitle = function (title, callback) {
   return this.find({ title: title }, callback);
 }
 
+BlogPost.methods.expressiveQuery = function (creator, date, callback) {
+  return this.find('creator', creator).where('date').gte(date).run(callback);
+}
+
 /**
  * Plugins
  */
@@ -78,7 +83,7 @@ BlogPost.statics.findByTitle = function (title, callback) {
 function slugGenerator (options){
   options = options || {};
   var key = options.key || 'title';
-  
+
   return function slugGenerator(schema){
     schema.path(key).set(function(v){
       this.slug = v.toLowerCase().replace(/[^a-z0-9]/g, '').replace(/-+/g, '');

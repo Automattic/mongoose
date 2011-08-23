@@ -1,4 +1,71 @@
 
+2.0.0 / 2011-08-24
+===================
+
+  * Added; support for Buffers [justmoon]
+  * Changed; improved error handling [maelstrom]
+  * Removed: unused utils.erase
+  * Fixed; support for passing other context object into Schemas (#234) [Sija]
+  * Fixed; getters are no longer circular refs to themselves (#366)
+  * Removed; unused compat.js
+  * Fixed; getter/setter scopes are set properly
+  * Changed; made several private properties more obvious by prefixing _
+  * Added; DBRef support [guille]
+  * Changed; removed support for multiple collection names per model
+  * Fixed; no longer applying setters when document returned from db
+  * Changed; default auto_reconnect to true
+  * Changed; Query#bind no longer clones the query
+  * Fixed; Model.update now accepts $pull, $inc and friends (#404)
+  * Added; virtual type option support [nw]
+
+1.8.4 / 2011-08-21
+===================
+
+  * Fixed; validation bug when instantiated with non-schema properties (#464) [jmreidy]
+
+1.8.3 / 2011-08-19
+===================
+
+  * Fixed; regression in connection#open [jshaw86]
+
+1.8.2 / 2011-08-17
+===================
+
+  * fixed; reset connection.readyState after failure [tomseago]
+  * fixed; can now query positionally for non-embedded docs (arrays of numbers/strings etc)
+  * fixed; embedded document query casting
+  * added; support for passing options to node-mongo-native db, server, and replsetserver [tomseago]
+
+1.8.1 / 2011-08-10
+===================
+
+  * fixed; ObjectIds were always marked modified
+  * fixed; can now query using document instances
+  * fixed; can now query/update using documents with subdocs
+
+1.8.0 / 2011-08-04
+===================
+
+  * fixed; can now use $all with String and Number
+  * fixed; can query subdoc array with $ne: null
+  * fixed; instance.subdocs#id now works with custom _ids
+  * fixed; do not apply setters when doc returned from db (change in bad behavior)
+
+1.7.4 / 2011-07-25
+===================
+
+  * fixed; sparse now a valid seperate schema option
+  * fixed; now catching cast errors in queries
+  * fixed; calling new Schema with object created in vm.runInNewContext now works (#384) [Sija]
+  * fixed; String enum was disallowing null
+  * fixed; Find by nested document _id now works (#389)
+
+1.7.3 / 2011-07-16
+===================
+
+  * fixed; MongooseArray#indexOf now works with ObjectIds
+  * fixed; validation scope now set properly (#418)
+  * fixed; added missing colors dependency (#398)
 
 1.7.2 / 2011-07-13
 ===================

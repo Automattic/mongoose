@@ -14,18 +14,30 @@ Regular indexes:
         name: { type: String, index: true }
     })
 
+[Sparse](http://www.mongodb.org/display/DOCS/Indexes#Indexes-SparseIndexes) indexes:
+
+    var User = new Schema({
+        name: { type: String, sparse: true }
+    })
+
 Unique indexes:
 
     var User = new Schema({
         name: { type: String, unique: true }
     })
 
-    // or 
+    // or
 
     var User = new Schema({
         name: { type: String, index: { unique: true } }
     })
 
-Compound indexes are defined on the `Schema`
+Unique sparse indexes:
 
-    User.index({ first: 1, last: -1 })
+    var User = new Schema({
+        name: { type: String, unique: true, sparse: true }
+    })
+
+Compound indexes are defined on the `Schema` itself.
+
+    User.index({ first: 1, last: -1 }, { unique: true })

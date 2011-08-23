@@ -192,19 +192,21 @@ var Person = mongoose.model(&#39;Person&#39;, PersonSchema);
 
 var theSituation = new Person({name: { first: &#39;Michael&#39;, last: &#39;Sorrentino&#39; }});</code></pre>
 
-<p>Suppose you want to write <code>theSituation</code>&#39;s full name. You could do so via:
-    console.log( theSituation.name.first + &#39; &#39; + theSituation.name.last );</p>
+<p>Suppose you want to write <code>theSituation</code>&#39;s full name. You could do so via:</p>
+
+<pre><code>console.log(theSituation.name.first + &#39; &#39; + theSituation.name.last);</code></pre>
 
 <p>It is more convenient to define a virtual attribute, <code>name.full</code>, so you can instead write:</p>
 
-<pre><code>console.log( theSituation.name.full ); </code></pre>
+<pre><code>console.log(theSituation.name.full); </code></pre>
 
 <p>To do so, you can declare a virtual attribute on the Schema, <code>Person</code>:</p>
 
-<pre><code>PersonSchema.virtual(&#39;name.full&#39;)
-  .get( function () {
-    return this.name.first + this.name.last;
-  });</code></pre>
+<pre><code>PersonSchema
+.virtual(&#39;name.full&#39;)
+.get(function () {
+  return this.name.first + &#39; &#39; + this.name.last;
+});</code></pre>
 
 <p>So when you get <code>name.full</code>, via</p>
 
@@ -213,7 +215,7 @@ var theSituation = new Person({name: { first: &#39;Michael&#39;, last: &#39;Sorr
 <p>the implementation ends up invoking the getter function</p>
 
 <pre><code>function () {
-  return this.name.first + this.name.last;
+  return this.name.first + &#39; &#39; + this.name.last;
 }</code></pre>
 
 <p>and returning it.</p>
@@ -224,16 +226,19 @@ var theSituation = new Person({name: { first: &#39;Michael&#39;, last: &#39;Sorr
 
 <p>Mongoose allows you to do this, too, via virtual attribute setters. You can define a virtual attribute setter thusly:</p>
 
-<pre><code>PersonSchema.virtual(&#39;name.full&#39;)
-  .get( function () {
-    return this.name.first + this.name.last;
-  })
-  .set( function (setFullNameTo) {
-    var split = setFullNameTo.split(&#39; &#39;)
-      , firstName = split[0], lastName = split[1];
-    this.set(&#39;name.first&#39;, firstName);
-    this.set(&#39;name.last&#39;, lastName);
-  });</code></pre>
+<pre><code>PersonSchema
+.virtual(&#39;name.full&#39;)
+.get(function () {
+  return this.name.first + &#39; &#39; + this.name.last;
+})
+.set(function (setFullNameTo) {
+  var split = setFullNameTo.split(&#39; &#39;)
+    , firstName = split[0]
+    , lastName = split[1];
+
+  this.set(&#39;name.first&#39;, firstName);
+  this.set(&#39;name.last&#39;, lastName);
+});</code></pre>
 
 <p>Then, when you invoke:</p>
 
@@ -241,7 +246,7 @@ var theSituation = new Person({name: { first: &#39;Michael&#39;, last: &#39;Sorr
 
 <p>and you save the document, then <code>name.first</code> and <code>name.last</code> will be changed in monbodb, but the mongodb document will not have persisted a <code>name.full</code> key or value to the database:</p>
 
-<pre><code>theSituation.save( function (err) {
+<pre><code>theSituation.save(function (err) {
   Person.findById(theSituation._id, function (err, found) {
     console.log(found.name.first); // &#39;The&#39;
     console.log(found.name.last);  // &#39;Situation&#39;

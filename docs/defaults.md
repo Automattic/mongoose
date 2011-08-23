@@ -2,12 +2,12 @@
 Defaults
 ========
 
-Each `SchemaType` that you define (you can read more about them in the model
-definition chapter) can have a default value.
+Each `SchemaType` that you define \(you can read more about them in the [model
+definition chapter](/docs/model-definition.html) \) can have a default value.
 
 Default values are applied when the document skeleton is constructed. This
 means that if you create a new document (`new MyModel`) or if you find an
-existing document (`MyModel.findById` for example), both will have defaults
+existing document (`MyModel.findById`), both will have defaults
 provided that a certain key is missing.
 
 ## Definition

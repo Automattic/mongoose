@@ -186,7 +186,7 @@ callback receives it.</p></li></ul>
 <h2>Simple validation</h2>
 
 <p>Simple validation is declared by passing a function to <code>validate</code> and an error
-type to your <code>SchemaType</code> (please read the chapter on model definition to learn
+type to your <code>SchemaType</code> (please read the chapter on <a href="/docs/model-definition.html">model definition</a> to learn
 more about schemas).</p>
 
 <pre><code>function validator (v) {
@@ -231,13 +231,19 @@ data asynchronously from your validator.</p>
 
 <h2>Built in validators</h2>
 
-<ul><li><p>For Strings:</p><ul><li><p><code>enum</code>: takes a list of allowed values. Example:</p><p>var Post = new Schema({
+<p>Strings:</p>
+
+<ul><li><p><code>enum</code>: takes a list of allowed values. Example:</p><pre><code>var Post = new Schema({
     type: { type: String, enum: [&#39;page&#39;, &#39;post&#39;, &#39;link&#39;] }
-})</p></li></ul></li><li><p>For Numbers:</p><ul><li><p><code>min</code>: minimum value</p><p>var Person = new Schema({
+})</code></pre></li></ul>
+
+<p>Numbers:</p>
+
+<ul><li><p><code>min</code>: minimum value</p><pre><code>var Person = new Schema({
     age: { type: Number, min: 5 }
-})</p></li><li><p><code>max</code>: maxmimum value</p><p>var Person = new Schema({
+})</code></pre></li><li><p><code>max</code>: maxmimum value</p><pre><code>var Person = new Schema({
     age: { type: Number, max: 100 }
-})</p></li></ul></li></ul>
+})</code></pre></li></ul>
         </div>
 
         <div id="footer">

@@ -176,18 +176,25 @@
 <code>init</code> (when a document is initialized with data from MongoDB), <code>save</code>, and
 <code>remove</code> are called on a document instance.</p>
 
-<p>There&#39;s two types of middleware, determined by the signature of the function
-you define (ie: the parameters your function accepts):</p>
+<p>There are two types of middleware, serial and parallel.</p>
 
-<ul><li><p>Serial
-Serial middleware are defined like:</p><pre><code>schema.pre(&#39;save&#39;, function (next) {
+<p>Serial middleware are defined like:</p>
+
+<pre><code>schema.pre(&#39;save&#39;, function (next) {
   // ...
-})</code></pre><p>They&#39;re executed one after the other, when each middleware calls <code>next</code>.</p></li><li><p>Parallel
-Parallel middleware offer more fine-grained flow control, and are defined
-like</p><pre><code>schema.pre(&#39;remove&#39;, true, function (next, done) {
+})</code></pre>
+
+<p>They&#39;re executed one after the other, when each middleware calls <code>next</code>.</p>
+
+<p>Parallel middleware offer more fine-grained flow control, and are defined
+like</p>
+
+<pre><code>schema.pre(&#39;remove&#39;, true, function (next, done) {
   // ...
-})</code></pre><p>Parallel middleware can <code>next()</code> immediately, but the final argument will be
-called when all the parallel middleware have called <code>done()</code>.</p></li></ul>
+})</code></pre>
+
+<p>Parallel middleware can <code>next()</code> immediately, but the final argument will be
+called when all the parallel middleware have called <code>done()</code>.</p>
 
 <h2>Use cases</h2>
 
@@ -202,7 +209,7 @@ and avoiding nested blocks of async code.</p>
 <h2>Error handling</h2>
 
 <p>If any middleware calls <code>next</code> or <code>done</code> with an <code>Error</code> instance, the flow is
-interrupted, and the error is passed to the function passed as an argument.</p>
+interrupted, and the error is passed to the callback.</p>
 
 <p>For example:</p>
 

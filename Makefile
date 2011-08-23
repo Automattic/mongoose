@@ -15,11 +15,11 @@ test-cov:
 
 docs: docs/api.html
 
-docs/api.html: lib/mongoose/*.js
+docs/api.html: lib/*.js
 	dox \
 		--title Mongoose \
 		--desc "Expressive MongoDB for Node.JS" \
-		$(shell find lib/mongoose/* -type f) > $@
+		$(shell find lib/* -type f) > $@
 
 docclean:
 	rm -f docs/*.{1,html}

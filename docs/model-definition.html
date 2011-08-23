@@ -213,7 +213,7 @@ the same functionality.</p>
 
 <p>Unlike older versions of mongoose, defining the data types is now a main part
 of defining your models. Your schema is constructed by passing all the
-JavaScript natives that you know (Schema, Number, Date) as well as others
+JavaScript natives that you know (String, Number, Date) as well as others
 exclusive to MongoDb (for example <code>Schema.ObjectId</code>).</p>
 
 <pre><code>var ObjectId = Schema.ObjectId;
@@ -244,8 +244,8 @@ var Post = new Schema({
 });</code></pre>
 
 <p>This will allow you to interact very easily with subdocuments later on. For
-more information, refer to the chapter on embedded documents that&#39;s part of
-this documentation.</p>
+more information, refer to the chapter on
+<a href="/docs/embedded-documents.html">embedded documents</a>.</p>
 
 <h3>Defining custom options for keys</h3>
 
@@ -302,8 +302,7 @@ You&#39;d then define a hook on the User schema like this:</p>
   next();
 });</code></pre>
 
-<p>More information about the specifics of middleware can be found in the
-appropriate chapter.</p>
+<p>More information about the specifics of middleware can be found <a href="/docs/middleware.html">here</a>.</p>
         </div>
 
         <div id="footer">

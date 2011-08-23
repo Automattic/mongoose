@@ -184,21 +184,33 @@ once during the lifetime of your app.</p>
     name: { type: String, index: true }
 })</code></pre>
 
+<p><a href="http://www.mongodb.org/display/DOCS/Indexes#Indexes-SparseIndexes">Sparse</a> indexes:</p>
+
+<pre><code>var User = new Schema({
+    name: { type: String, sparse: true }
+})</code></pre>
+
 <p>Unique indexes:</p>
 
 <pre><code>var User = new Schema({
     name: { type: String, unique: true }
 })
 
-// or 
+// or
 
 var User = new Schema({
     name: { type: String, index: { unique: true } }
 })</code></pre>
 
-<p>Compound indexes are defined on the <code>Schema</code></p>
+<p>Unique sparse indexes:</p>
 
-<pre><code>User.index({ first: 1, last: -1 })</code></pre>
+<pre><code>var User = new Schema({
+    name: { type: String, unique: true, sparse: true }
+})</code></pre>
+
+<p>Compound indexes are defined on the <code>Schema</code> itself.</p>
+
+<pre><code>User.index({ first: 1, last: -1 }, { unique: true })</code></pre>
         </div>
 
         <div id="footer">

@@ -1,4 +1,6 @@
 
+TESTS = $(shell find test/ -name '*.test.js')
+
 test:
 	@NODE_ENV=test ./support/expresso/bin/expresso \
 		-I lib \
@@ -6,7 +8,7 @@ test:
 		-I support/should.js/lib \
 		-I support/cli-table/lib \
 		$(TESTFLAGS) \
-		$(shell find test/ -name '*.test.js')
+		$(TESTS)
 
 test-cov:
 	@TESTFLAGS=--cov $(MAKE) test
@@ -15,8 +17,7 @@ docs: docs/api.html
 
 docs/api.html: lib/mongoose/*.js
 	dox \
-		--private \
-		--title Mongooose \
+		--title Mongoose \
 		--desc "Expressive MongoDB for Node.JS" \
 		$(shell find lib/mongoose/* -type f) > $@
 

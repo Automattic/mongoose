@@ -205,15 +205,15 @@ than the value specified.</p></li></ul>
 
 <h3>Date</h3>
 
-<ul><li>no options</li></ul>
+<ul><li>no custom options</li></ul>
 
 <h3>Boolean</h3>
 
-<ul><li>no options</li></ul>
+<ul><li>no custom options</li></ul>
 
 <h3>Buffer (v2.x only)</h3>
 
-<ul><li>no options</li></ul>
+<ul><li>no custom options</li></ul>
 
 <h3>ObjectId</h3>
 
@@ -223,7 +223,7 @@ than the value specified.</p></li></ul>
 var Schema = mongoose.Schema;
 var Car = new Schema({ driver: Schema.ObjectId })</code></pre>
 
-<ul><li>no options</li></ul>
+<ul><li>no custom options</li></ul>
 
 <h3>Mixed</h3>
 
@@ -244,7 +244,7 @@ var Any = new Schema({ any: Schema.Types.Mixed });</code></pre>
 person.markModified(&#39;anything&#39;);
 person.save(); // anything will now get saved</code></pre>
 
-<ul><li>no options</li></ul>
+<ul><li>no custom options</li></ul>
 
 <h3>Array</h3>
 
@@ -267,11 +267,11 @@ var Empty2 = new Schema({ any: Array });
 var Empty3 = new Schema({ any: [Schema.Types.Mixed] });
 var Empty4 = new Schema({ any: [{}] });</code></pre>
 
-<ul><li>no options</li></ul>
+<ul><li>no custom options</li></ul>
 
 <h2>Additional options</h2>
 
-<p>Besides the options listed above, each SchemaType shares the following additional
+<p>Besides the options listed above, all SchemaTypes share the following additional
 options.</p>
 
 <ul><li><p><code>default</code>: {Function|value} - Determines the default value for the path. All values are casted. If using a function, the value it returns will be casted as the default value.</p></li><li><p><code>required</code>: {Boolean} - If true, creates a validation rule requiring this path be set before saving occurs.</p></li><li><p><code>get</code>: {Function} - Adds a getter for this path. See the <a href="/docs/getters-setters.html">getters / setters</a> docs for more detail.</p></li><li><p><code>set</code>: {Function} - Adds a setter for this path. See the <a href="/docs/getters-setters.html">getters / setters</a> docs for more detail.</p></li><li><p><code>index</code>: {Boolean|Object} - Tells Mongoose to ensure an index is created for this path. An object can be passed as well.</p><pre><code>var Person = new Schema({ name: String, index: true }})

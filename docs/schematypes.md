@@ -59,15 +59,15 @@ called on each SchemaType. Each `SchemaType` has its own set of custom options.
 
 ### Date
 
-  - no options
+  - no custom options
 
 ### Boolean
 
-  - no options
+  - no custom options
 
 ### Buffer (v2.x only)
 
-  - no options
+  - no custom options
 
 ### ObjectId
 
@@ -77,7 +77,7 @@ called on each SchemaType. Each `SchemaType` has its own set of custom options.
     var Schema = mongoose.Schema;
     var Car = new Schema({ driver: Schema.ObjectId })
 
-  - no options
+  - no custom options
 
 ### Mixed
 
@@ -98,7 +98,7 @@ called on each SchemaType. Each `SchemaType` has its own set of custom options.
     person.markModified('anything');
     person.save(); // anything will now get saved
 
-  - no options
+  - no custom options
 
 ### Array
 
@@ -121,11 +121,11 @@ called on each SchemaType. Each `SchemaType` has its own set of custom options.
     var Empty3 = new Schema({ any: [Schema.Types.Mixed] });
     var Empty4 = new Schema({ any: [{}] });
 
-  - no options
+  - no custom options
 
 ## Additional options
 
-Besides the options listed above, each SchemaType shares the following additional
+Besides the options listed above, all SchemaTypes share the following additional
 options.
 
   - `default`: {Function|value} - Determines the default value for the path. All values are casted. If using a function, the value it returns will be casted as the default value.

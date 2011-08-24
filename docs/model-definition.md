@@ -116,7 +116,7 @@ the `path` function:
 
 Some of the options are versatile. `default` takes a `Function` or a value.
 `validate` takes a `Function` or a `RegExp`. More information on these can be
-found in other chapters.
+found in the [Schema Type chapter](/docs/schematypes.html).
 
 ## Beyond keys: Middleware
 

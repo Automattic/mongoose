@@ -170,7 +170,7 @@
         </div>
 
         <div id="content">
-          <h1>Mongoose 1.0</h1>
+          <h1>Mongoose 2.0</h1>
 
 <h2>What&#39;s Mongoose?</h2>
 
@@ -189,6 +189,7 @@ var BlogPost = new Schema({
     author    : ObjectId
   , title     : String
   , body      : String
+  , buf       : Buffer
   , date      : Date
   , comments  : [Comments]
   , meta      : {
@@ -197,11 +198,11 @@ var BlogPost = new Schema({
   }
 });
 
-mongoose.model(&#39;BlogPost&#39;, BlogPost);</code></pre>
+var Post = mongoose.model(&#39;BlogPost&#39;, BlogPost);</code></pre>
 
 <h2>Installation</h2>
 
-<p>The recommended way is through the excellent NPM:</p>
+<p>The recommended way is through the excellent <a href="http://www.npmjs.org/">NPM</a>:</p>
 
 <pre><code>$ npm install mongoose</code></pre>
 
@@ -223,7 +224,7 @@ should use <code>mongose.connect</code>. If you need to create additional connec
 <code>mongoose.createConnection</code>.</p>
 
 <p>Both <code>connect</code> and <code>createConnection</code> take a <code>mongodb://</code> URI, or the parameters
-<code>host, database, port</code>.</p>
+<code>host, database, port, options</code>.</p>
 
 <pre><code>var mongoose = require(&#39;mongoose&#39;);
 
@@ -263,6 +264,7 @@ storing, a Schema handles the definition of:</p>
   , age   :  { type: Number, min: 18, index: true }
   , bio   :  { type: String, match: /[a-z]/ }
   , date  :  { type: Date, default: Date.now }
+  , buff  :  Buffer
 });
 
 // a setter
@@ -277,7 +279,7 @@ Comment.pre(&#39;save&#39;, function (next) {
 });</code></pre>
 
 <p>Take a look at the example in <code>examples/schema.js</code> for an end-to-end example of
-(almost) all the functionality available.</p>
+a typical setup.</p>
 
 <h2>Accessing a Model</h2>
 
@@ -288,11 +290,11 @@ access it through the same function</p>
 
 <p>Or just do it all at once</p>
 
-<pre><code>var myModel = mongoose.model(&#39;ModelName&#39;, mySchema);</code></pre>
+<pre><code>var MyModel = mongoose.model(&#39;ModelName&#39;, mySchema);</code></pre>
 
 <p>We can then instantiate it, and save it:</p>
 
-<pre><code>var instance = new myModel();
+<pre><code>var instance = new MyModel();
 instance.my.key = &#39;hello&#39;;
 instance.save(function (err) {
   //
@@ -300,12 +302,12 @@ instance.save(function (err) {
 
 <p>Or we can find documents from the same collection</p>
 
-<pre><code>myModel.find({}, function (err, docs) {
+<pre><code>MyModel.find({}, function (err, docs) {
   // docs.forEach
 });</code></pre>
 
 <p>You can also <code>findOne</code>, <code>findById</code>, <code>update</code>, etc. For more details check out
-the API docs.</p>
+<a href="http://mongoosejs.com/docs/finding-documents.html">this link</a>.</p>
 
 <h2>Embedded Documents</h2>
 
@@ -349,10 +351,10 @@ the box.</p>
 
 <h2>Middleware</h2>
 
-<p>Middleware is one of the most exciting features about Mongoose 1.0. Middleware
+<p>Middleware is one of the most exciting features about Mongoose. Middleware
 takes away all the pain of nested callbacks.</p>
 
-<p>Middleware are defined at the Schema level and are applied when the methods
+<p>Middleware are defined at the Schema level and are applied for the methods
 <code>init</code> (when a document is initialized with data from MongoDB), <code>save</code> (when
 a document or embedded document is saved).</p>
 
@@ -429,8 +431,8 @@ new values to <code>next</code>:</p>
 
 <h3>Schema gotcha</h3>
 
-<p><em>type</em>, when used in a schema has special meaning within Mongoose. If your
-schema requires using <em>type</em> as a nested property you must use object notation:</p>
+<p><code>type</code>, when used in a schema has special meaning within Mongoose. If your
+schema requires using <code>type</code> as a nested property you must use object notation:</p>
 
 <pre><code>new Schema({
     broken: { type: Boolean }
@@ -450,8 +452,8 @@ new Schema({
 
 <h2>API docs</h2>
 
-<p>You can find the <a href="http://github.com/visionmedia/dox">Dox</a> generated API docs at
-<a href="http://mongoosejs.com">http://mongoosejs.com</a>.</p>
+<p>You can find the <a href="http://github.com/visionmedia/dox">Dox</a> generated API docs
+<a href="http://mongoosejs.com/docs/api.html">here</a>.</p>
 
 <h2>Getting support</h2>
 
@@ -472,20 +474,20 @@ list</a>.</p>
 several additional types (e.g., Email) that you can use in your
 Schema declarations</li><li><a href="https://github.com/bnoguchi/mongoose-auth">mongoose-auth</a> - A drop in 
 solution for your auth needs. Currently supports Password, Facebook,
-Twitter, Github, and more.</li><li><a href="https://github.com/goulash1971/mongoose-dbref">mongoose-dbref</a> - Adds DBRef support</li><li><a href="https://github.com/goulash1971/mongoose-joins">mongoose-joins</a> - Adds simple join support</li></ul>
+Twitter, Github, and more.</li><li><a href="https://github.com/goulash1971/mongoose-joins">mongoose-joins</a> - Adds simple join support</li><li><a href="https://github.com/goulash1971/mongoose-dbref">mongoose-dbref</a> - An alternative DBRef option</li></ul>
 
 <h2>Contributing to Mongoose</h2>
 
 <h3>Cloning the repository</h3>
 
-<p>Make a fork of <code>mongoose</code>, then clone it in your computer. The <code>v1.x</code> branch
+<p>Make a fork of <code>mongoose</code>, then clone it in your computer. The <code>v2.x</code> branch
 contains the current stable release, and the <code>master</code> branch the next upcoming
 major release.</p>
 
 <h3>Guidelines</h3>
 
 <ul><li>Please write inline documentation for new methods or class members.</li><li>Please write tests and make sure your tests pass.</li><li>Before starting to write code, look for existing tickets or create one for
-your specifc issue (unless you&#39;re addressing something that&#39;s clearly broken).
+your specific issue (unless you&#39;re addressing something that&#39;s clearly broken).
 That way you avoid working on something that might not be of interest or that
 has been addressed already in a different branch.</li></ul>
 
@@ -495,7 +497,7 @@ has been addressed already in a different branch.</li></ul>
 
 <h2>License</h2>
 
-<p>Copyright (c) 2010 LearnBoost &amp;lt;dev@learnboost.com&amp;gt;</p>
+<p>Copyright (c) 2010-2011 LearnBoost &amp;lt;dev@learnboost.com&amp;gt;</p>
 
 <p>Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the

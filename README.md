@@ -1,4 +1,4 @@
-Mongoose 1.0
+Mongoose 2.0
 ============
 
 ## What's Mongoose?
@@ -18,6 +18,7 @@ Defining a model is as easy as:
         author    : ObjectId
       , title     : String
       , body      : String
+      , buf       : Buffer
       , date      : Date
       , comments  : [Comments]
       , meta      : {
@@ -26,11 +27,11 @@ Defining a model is as easy as:
       }
     });
 
-    mongoose.model('BlogPost', BlogPost);
+    var Post = mongoose.model('BlogPost', BlogPost);
 
 ## Installation
 
-The recommended way is through the excellent NPM:
+The recommended way is through the excellent [NPM](http://www.npmjs.org/):
 
     $ npm install mongoose
 
@@ -52,7 +53,7 @@ should use `mongose.connect`. If you need to create additional connections, use
 `mongoose.createConnection`.
 
 Both `connect` and `createConnection` take a `mongodb://` URI, or the parameters
-`host, database, port`.
+`host, database, port, options`.
 
     var mongoose = require('mongoose');
 
@@ -100,6 +101,7 @@ The following example shows some of these features:
       , age   :  { type: Number, min: 18, index: true }
       , bio   :  { type: String, match: /[a-z]/ }
       , date  :  { type: Date, default: Date.now }
+      , buff  :  Buffer
     });
 
     // a setter
@@ -114,7 +116,7 @@ The following example shows some of these features:
     });
 
 Take a look at the example in `examples/schema.js` for an end-to-end example of
-(almost) all the functionality available.
+a typical setup.
 
 ## Accessing a Model
 
@@ -125,11 +127,11 @@ access it through the same function
 
 Or just do it all at once
 
-    var myModel = mongoose.model('ModelName', mySchema);
+    var MyModel = mongoose.model('ModelName', mySchema);
 
 We can then instantiate it, and save it:
 
-    var instance = new myModel();
+    var instance = new MyModel();
     instance.my.key = 'hello';
     instance.save(function (err) {
       //
@@ -137,12 +139,12 @@ We can then instantiate it, and save it:
 
 Or we can find documents from the same collection
 
-    myModel.find({}, function (err, docs) {
+    MyModel.find({}, function (err, docs) {
       // docs.forEach
     });
 
 You can also `findOne`, `findById`, `update`, etc. For more details check out
-the API docs.
+[this link](http://mongoosejs.com/docs/finding-documents.html).
 
 ## Embedded Documents
 
@@ -186,10 +188,10 @@ the box.
 
 ## Middleware
 
-Middleware is one of the most exciting features about Mongoose 1.0. Middleware
+Middleware is one of the most exciting features about Mongoose. Middleware
 takes away all the pain of nested callbacks.
 
-Middleware are defined at the Schema level and are applied when the methods
+Middleware are defined at the Schema level and are applied for the methods
 `init` (when a document is initialized with data from MongoDB), `save` (when
 a document or embedded document is saved).
 
@@ -207,7 +209,7 @@ There's two types of middleware:
   You can also intercept the `method`'s incoming arguments via your middleware -- 
   notice `methodArg1`, `methodArg2`, etc in the `pre` definition above. See
   section "Intercepting and mutating method arguments" below.
-  
+
 
 - Parallel
   Parallel middleware offer more fine-grained flow control, and are defined
@@ -279,8 +281,8 @@ new values to `next`:
 
 ### Schema gotcha
 
-_type_, when used in a schema has special meaning within Mongoose. If your
-schema requires using _type_ as a nested property you must use object notation:
+`type`, when used in a schema has special meaning within Mongoose. If your
+schema requires using `type` as a nested property you must use object notation:
 
     new Schema({
         broken: { type: Boolean }
@@ -300,8 +302,8 @@ schema requires using _type_ as a nested property you must use object notation:
 
 ## API docs
 
-You can find the [Dox](http://github.com/visionmedia/dox) generated API docs at
-[http://mongoosejs.com](http://mongoosejs.com).
+You can find the [Dox](http://github.com/visionmedia/dox) generated API docs
+[here](http://mongoosejs.com/docs/api.html).
 
 ## Getting support
 
@@ -324,14 +326,14 @@ The following plugins are currently available for use with mongoose:
 - [mongoose-auth](https://github.com/bnoguchi/mongoose-auth) - A drop in 
   solution for your auth needs. Currently supports Password, Facebook,
   Twitter, Github, and more.
-- [mongoose-dbref](https://github.com/goulash1971/mongoose-dbref) - Adds DBRef support
 - [mongoose-joins](https://github.com/goulash1971/mongoose-joins) - Adds simple join support
+- [mongoose-dbref](https://github.com/goulash1971/mongoose-dbref) - An alternative DBRef option
 
 ## Contributing to Mongoose
 
 ### Cloning the repository
 
-Make a fork of `mongoose`, then clone it in your computer. The `v1.x` branch
+Make a fork of `mongoose`, then clone it in your computer. The `v2.x` branch
 contains the current stable release, and the `master` branch the next upcoming
 major release.
 
@@ -340,7 +342,7 @@ major release.
 - Please write inline documentation for new methods or class members.
 - Please write tests and make sure your tests pass.
 - Before starting to write code, look for existing tickets or create one for
-  your specifc issue (unless you're addressing something that's clearly broken).
+  your specific issue (unless you're addressing something that's clearly broken).
   That way you avoid working on something that might not be of interest or that
   has been addressed already in a different branch.
 
@@ -353,7 +355,7 @@ major release.
 
 ## License
 
-Copyright (c) 2010 LearnBoost &lt;dev@learnboost.com&gt;
+Copyright (c) 2010-2011 LearnBoost &lt;dev@learnboost.com&gt;
 
 Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the

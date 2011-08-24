@@ -37,7 +37,7 @@ called on each SchemaType. Each `SchemaType` has its own set of custom options.
 
   - `match`: {RegExp}
 
-    Creates a RegExp based validator. The value being set is `.test()`ed
+    Creates a RegExp based [validator](/docs/validation.html). The value being set is `.test()`ed
     against the RegExp. If it does not pass, validation will fail.
 
   - `enum`: {Array}

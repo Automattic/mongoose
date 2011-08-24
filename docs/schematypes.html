@@ -193,7 +193,7 @@ called on each SchemaType. Each <code>SchemaType</code> has its own set of custo
 
 <h3>String</h3>
 
-<ul><li><p><code>lowercase</code>: {Boolean}</p><p>Creates a setter which calls <code>.toLowerCase()</code> on the value</p></li><li><p><code>uppercase</code>: {Boolean}</p><p>Creates a setter which calls <code>.toUpperCase()</code> on the value</p></li><li><p><code>trim</code>: {Boolean}</p><p>Creates a setter which calls <code>.trim()</code> on the value</p></li><li><p><code>match</code>: {RegExp}</p><p>Creates a RegExp based validator. The value being set is <code>.test()</code>ed
+<ul><li><p><code>lowercase</code>: {Boolean}</p><p>Creates a setter which calls <code>.toLowerCase()</code> on the value</p></li><li><p><code>uppercase</code>: {Boolean}</p><p>Creates a setter which calls <code>.toUpperCase()</code> on the value</p></li><li><p><code>trim</code>: {Boolean}</p><p>Creates a setter which calls <code>.trim()</code> on the value</p></li><li><p><code>match</code>: {RegExp}</p><p>Creates a RegExp based <a href="/docs/validation.html">validator</a>. The value being set is <code>.test()</code>ed
 against the RegExp. If it does not pass, validation will fail.</p></li><li><p><code>enum</code>: {Array}</p><p>Creates an enum validator. If the value being set is not in this
 array, validation will fail.</p></li></ul>
 

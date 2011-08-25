@@ -88,8 +88,7 @@ your mongoose Model.
 ## Model.update
 
 Updates all documents matching `conditions` using the `update` clause. All
-`update` values are casted to their appropriate types and defaults are
-applied before being sent.
+`update` values are casted to their appropriate types before being sent.
 
     var conditions = { name: 'borne' }
       , update = { $inc: { visits: 1 }}

@@ -1,8 +1,8 @@
 Mongoose 2.0
 ============
 
-<div id="announce"><strong>08-25-2011: Mongoose 2.0 is here</strong> with new support for DBRefs, Buffers, and a
-number of bugfixes. Read more about it <a href='http://mongoosejs.com/release/2.0.0.html'>here</a>.
+<div id="announce"><strong>08-25-2011: Mongoose 2.0 is here</strong> with new support for <a href="/docs/dbrefs.html">DBRefs</a>, Buffers, and a
+number of bugfixes. Read the changelog <a href='https://github.com/LearnBoost/mongoose/blob/master/History.md'>here</a>.
 </div>
 
 ## What's Mongoose?

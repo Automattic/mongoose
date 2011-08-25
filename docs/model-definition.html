@@ -27,12 +27,28 @@
       }
 
       #content {
-        color: #272727;
+        color: #111;
         font: 14px Courier;
       }
 
       #content h1, #content h2, #content h3 {
         text-shadow: 0 1px 0 #fff;
+      }
+
+      #announce {
+        background: #2A758A;
+        border: 10px solid black;
+        border-radius: 7px;
+        padding: 30px;
+        font-size: 125%;
+        color: white;
+        text-shadow: none;
+        font-family: Arial;
+      }
+
+      #announce a {
+        color: orange;
+        text-shadow: none;
       }
 
       pre {
@@ -303,6 +319,10 @@ You&#39;d then define a hook on the User schema like this:</p>
 });</code></pre>
 
 <p>More information about the specifics of middleware can be found <a href="/docs/middleware.html">here</a>.</p>
+
+<h2>Plugins</h2>
+
+<p>Schemas also support plugins. Read more about it on the <a href="/docs/plugins.html">Plugins</a> page.</p>
         </div>
 
         <div id="footer">

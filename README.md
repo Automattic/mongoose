@@ -1,6 +1,10 @@
 Mongoose 2.0
 ============
 
+<div id="announce"><strong>08-25-2011: Mongoose 2.0 is here</strong> with new support for DBRefs, Buffers, and a
+number of bugfixes. Read more about it <a href='http://mongoosejs.com/release/2.0.0.html'>here</a>.
+</div>
+
 ## What's Mongoose?
 
 Mongoose is a [MongoDB](http://www.mongodb.org/) object modeling tool designed to work in an asynchronous

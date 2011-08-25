@@ -133,3 +133,7 @@ You'd then define a hook on the User schema like this:
     });
 
 More information about the specifics of middleware can be found [here](/docs/middleware.html).
+
+## Plugins
+
+Schemas also support plugins. Read more about it on the [Plugins](/docs/plugins.html) page.

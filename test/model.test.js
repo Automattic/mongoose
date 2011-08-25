@@ -1615,20 +1615,56 @@ module.exports = {
                 ;/Invalid atomic update value/.test(err.message).should.be.true;
 
                 var update4 = {
-                    comments: [{ body: 'worked great' }]
-                  , $set: {'numbers.1': 100}
+                    $inc: { idontexist: 1 }
                 }
 
+                // should not overwrite doc when no valid paths are submitted
                 BlogPost.update({ _id: post._id }, update4, function (err) {
                   should.strictEqual(err, null);
+
                   BlogPost.findById(post._id, function (err, up) {
-                    db.close();
                     should.strictEqual(err, null);
-                    up.comments.length.should.equal(1);
-                    up.comments[0].body.should.equal('worked great');
+
+                    up.title.should.equal(newTitle);
+                    up.author.should.equal(author);
                     up.meta.visitors.valueOf().should.equal(2);
+                    up.date.toString().should.equal(update.$set.date.toString());
+                    up.published.should.eql(false);
                     up.mixed.x.should.equal('ECKS');
-                    up.numbers.toObject().should.eql([5,100]);
+                    up.mixed.y.should.equal('why');
+                    up.numbers.toObject().should.eql([5,7]);
+                    up.owners.length.should.equal(1);
+                    up.owners[0].toString().should.eql(id1.toString());
+                    up.comments[0].body.should.equal('been there');
+                    up.comments[1].body.should.equal('8');
+
+                    var update5 = {
+                        comments: [{ body: 'worked great' }]
+                      , $set: {'numbers.1': 100}
+                      , $inc: { idontexist: 1 }
+                    }
+
+                    BlogPost.update({ _id: post._id }, update5, function (err) {
+                      should.strictEqual(err, null);
+
+                      // get the underlying doc
+                      BlogPost.collection.findOne({ _id: post._id }, function (err, doc) {
+                        db.close();
+                        should.strictEqual(err, null);
+
+                        var up = new BlogPost;
+                        up.init(doc);
+                        up.comments.length.should.equal(1);
+                        up.comments[0].body.should.equal('worked great');
+                        up.meta.visitors.valueOf().should.equal(2);
+                        up.mixed.x.should.equal('ECKS');
+                        up.numbers.toObject().should.eql([5,100]);
+                        up.numbers[1].valueOf().should.eql(100);
+
+                        should.strictEqual(undefined, doc.idontexist);
+                        doc.numbers[1].should.eql(100);
+                      });
+                    });
                   });
                 });
               });

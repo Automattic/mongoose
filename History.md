@@ -1,4 +1,10 @@
 
+
+2.0.1 / 2011-08-25
+==================
+
+  * Fixed; do not over-write the doc when no valide props exist in Model.update
+
 2.0.0 / 2011-08-24
 ===================
 

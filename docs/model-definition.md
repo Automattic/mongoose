@@ -41,10 +41,10 @@ The `Schema` constructor receives an object representation of your schemas as
 its first parameter. If you want to add more keys later, `Schema#add` provides
 the same functionality.
 
-Unlike older versions of mongoose, defining the data types is now a main part
-of defining your models. Your schema is constructed by passing all the
-JavaScript natives that you know (String, Number, Date) as well as others
-exclusive to MongoDb (for example `Schema.ObjectId`).
+Your schema is constructed by passing all the
+JavaScript natives that you know (String, Number, Date, Buffer) as well
+as others exclusive to MongoDb (for example `Schema.ObjectId`). For details on all
+SchemaTypes see the [Schema Type chapter](/docs/schematypes.html).
 
     var ObjectId = Schema.ObjectId;
 

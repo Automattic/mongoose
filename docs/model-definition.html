@@ -211,10 +211,10 @@ Don&#39;t confuse schemas and actual models!</p>
 its first parameter. If you want to add more keys later, <code>Schema#add</code> provides
 the same functionality.</p>
 
-<p>Unlike older versions of mongoose, defining the data types is now a main part
-of defining your models. Your schema is constructed by passing all the
-JavaScript natives that you know (String, Number, Date) as well as others
-exclusive to MongoDb (for example <code>Schema.ObjectId</code>).</p>
+<p>Your schema is constructed by passing all the
+JavaScript natives that you know (String, Number, Date, Buffer) as well
+as others exclusive to MongoDb (for example <code>Schema.ObjectId</code>). For details on all
+SchemaTypes see the <a href="/docs/schematypes.html">Schema Type chapter</a>.</p>
 
 <pre><code>var ObjectId = Schema.ObjectId;
 

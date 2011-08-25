@@ -97,6 +97,7 @@ storing, a Schema handles the definition of:
 * [Methods](http://mongoosejs.com/docs/methods-statics.html) definition
 * [Statics](http://mongoosejs.com/docs/methods-statics.html) definition
 * [Plugins](http://mongoosejs.com/docs/plugins.html)
+* [DBRefs](http://mongoosejs.com/docs/dbrefs.html)
 
 The following example shows some of these features:
 

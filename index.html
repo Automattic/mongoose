@@ -15,20 +15,29 @@
       }
 
       #page {
-        width: 850px;
+        width: 650px;
         margin: auto;
         position: relative;
       }
 
       #footer {
         font: 13px Helvetica;
-        padding-top: 5px;
+        padding-top: 15px;
         border-top: 1px solid #000;
+        color: #666;
+        margin-top: 25px;
+      }
+
+      #footer > div {
+        padding-top: 8px;
+        float: right;
+        text-align: right;
+        padding-bottom: 20px;
       }
 
       #content {
         color: #111;
-        font: 14px Courier;
+        font: 15px Courier;
       }
 
       #content h1, #content h2, #content h3 {
@@ -70,12 +79,10 @@
       }
 
       form {
-        position: absolute;
-        right: 0;
-        top: 0;
-        color: #666;
         font: bold 12px Helvetica;
         text-shadow: 0 1px 0 #fff;
+        float: left;
+        padding-bottom: 25px;
       }
 
       form img {
@@ -100,32 +107,39 @@
         color: #2a758a;
         text-shadow: 0 1px 0 #fff;
         text-decoration: none;
-      } 
+      }
 
       a:hover {
         opacity: 0.8;
       }
 
       #menu {
-        border-top: 1px solid #1e1e1e;
-        border-bottom: 1px solid #e0e0e0;
-        margin-top: 10px;
-        font: bold 14px Helvetica;
-        background: rgba(255,255,255,.2);
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100%;
+        background-color: rgba(0,0,0,0.3);
+        font: bold 15px Helvetica;
+        border-right: 1px solid rgba(0,0,0,0.2);
       }
 
       #menu ul {
         margin: 0;
-        border-top: 1px solid #e0e0de;
-        padding: 13px 0;
-        border-bottom: 1px solid #1e1e1e;
-        text-align: center;
+        padding: 50px 0;
       }
 
       #menu ul li {
         list-style-type: none;
-        display: inline;
-        padding-right: 10px;
+        padding-left: 15px;
+        padding-right: 20px;
+      }
+
+      #menu ul li a {
+        color: #fff;
+        text-shadow: none;
+      }
+      #menu ul li a:hover {
+        text-decoration: underline;
       }
     </style>
 
@@ -159,19 +173,9 @@
   <body>
     <div id="wrap">
       <div id="page">
-        <h1><a href="/">Mongoose</a></h1>
-
-        <form action="http://groups.google.com/group/mongoose-orm/boxsubscribe">
-         <a href="http://groups.google.com/group/mongoose-orm" id="google-subscribe-link"><img src="/images/groups.png" border="0"></a>
-         <span id="google-members-count">&nbsp;</span>
-         <div id="google-subscribe-input">
-           Email: <input type="text" name="email" id="google-subscribe-email">
-           <input type="submit" name="go" value="Subscribe">
-         </div>
-        </form>
-
         <div id="menu">
           <ul>
+            <li><a href="/">Home</a></li>
             <li><a href="/docs/model-definition.html">Models</a></li>
             <li><a href="/docs/finding-documents.html">Querying</a></li>
             <li><a href="/docs/middleware.html">Middleware</a></li>
@@ -185,6 +189,8 @@
             <li><a href="/docs/api.html">API</a></li>
           </ul>
         </div>
+
+        <h1><a href="/">Mongoose</a></h1>
 
         <div id="content">
           <h1>Mongoose 2.0</h1>
@@ -541,7 +547,21 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</p>
         </div>
 
         <div id="footer">
-          Mongoose by <a href="http://learnboost.com">gradebook</a> <a href="http://github.com/learnboost">LearnBoost Labs</a>. Released under the MIT license - Copyright <a href="http://learnboost.com">LearnBoost 2011</a>
+
+          <form action="http://groups.google.com/group/mongoose-orm/boxsubscribe">
+           <a href="http://groups.google.com/group/mongoose-orm" id="google-subscribe-link"><img src="/images/groups.png" border="0"></a>
+           <span id="google-members-count">&nbsp;</span>
+           <div id="google-subscribe-input">
+             Email: <input type="text" name="email" id="google-subscribe-email">
+             <input type="submit" name="go" value="Subscribe">
+           </div>
+          </form>
+
+          <div>
+            Mongoose by <a href="http://github.com/learnboost">LearnBoost Labs</a>.<br>
+            Released under the MIT license.<br>
+            Copyright <a href="http://learnboost.com">LearnBoost 2011</a>.
+          </div>
         </div>
       </div>
     </div>

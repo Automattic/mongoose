@@ -84,15 +84,15 @@ Models are defined through the `Schema` interface.
 Aside from defining the structure of your documents and the types of data you're
 storing, a Schema handles the definition of:
 
-* Validators (async and sync)
-* Defaults
-* Getters
-* Setters
-* Indexes
-* Middleware
-* Methods definition
-* Statics definition
-* Plugins
+* [Validators](http://mongoosejs.com/docs/validation.html) (async and sync)
+* [Defaults](http://mongoosejs.com/docs/schematypes.html)
+* [Getters](http://mongoosejs.com/docs/getters-setters.html)
+* [Setters](http://mongoosejs.com/docs/getters-setters.html)
+* [Indexes](http://mongoosejs.com/docs/indexes.html)
+* [Middleware](http://mongoosejs.com/docs/middleware.html)
+* [Methods](http://mongoosejs.com/docs/methods-statics.html) definition
+* [Statics](http://mongoosejs.com/docs/methods-statics.html) definition
+* [Plugins](http://mongoosejs.com/docs/plugins.html)
 
 The following example shows some of these features:
 

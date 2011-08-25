@@ -23,3 +23,4 @@ process('docs/schematypes.md', 'docs/schematypes.html');
 process('docs/validation.md', 'docs/validation.html');
 process('docs/virtuals.md', 'docs/virtuals.html');
 process('docs/getters-setters.md', 'docs/getters-setters.html');
+process('docs/methods-statics.md', 'docs/methods-statics.html');

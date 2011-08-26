@@ -12,7 +12,7 @@ function process (input, output) {
   );
 };
 
-process('README.md', 'index.html');
+//process('README.md', 'index.html');
 process('docs/defaults.md', 'docs/defaults.html');
 process('docs/embedded-documents.md', 'docs/embedded-documents.html');
 process('docs/finding-documents.md', 'docs/finding-documents.html');
@@ -26,3 +26,4 @@ process('docs/getters-setters.md', 'docs/getters-setters.html');
 process('docs/methods-statics.md', 'docs/methods-statics.html');
 process('docs/plugins.md', 'docs/plugins.html');
 process('docs/dbrefs.md', 'docs/dbrefs.html');
+process('docs/migration-guide.md', 'docs/migration-1x-2x.html');

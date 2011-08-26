@@ -523,6 +523,7 @@ module.exports = {
 
         BlogPost.create({
             title: 'Woot'
+          , _creator: user1._id
           , comments: [
                 { _creator: user1._id, content: 'Woot woot' }
               , { _creator: user2._id, content: 'Wha wha' }
@@ -532,13 +533,15 @@ module.exports = {
 
           BlogPost
             .findById(post._id)
+            .populate('_creator')
             .populate('comments._creator')
             .run(function (err, post) {
+              db.close();
               should.strictEqual(err, null);
 
+              post._creator.name.should.equal('User 1');
               post.comments[0]._creator.name.should.equal('User 1');
               post.comments[1]._creator.name.should.equal('User 2');
-              db.close();
             });
         });
       });

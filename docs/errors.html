@@ -197,116 +197,57 @@
         <h1><a href="/">Mongoose</a></h1>
 
         <div id="content">
-          <h1>DBRefs</h1>
+          <h1>Error handling</h1>
 
-<p>DBRefs are properties of type <code>ObjectId</code> which refer to another documents <code>_id</code>
-and can be <code>populate()</code>d when querying. An example is helpful:</p>
+<p>Errors returned after failed validation contain an <code>errors</code> object
+holding the actual ValidatorErrors. Each ValidatorError has a <code>type</code> and <code>path</code> property
+providing us with a little more error handling flexibility.</p>
 
-<pre><code>var mongoose = require(&#39;mongoose&#39;)
-  , Schema = mongoose.Schema
-
-var PersonSchema = new Schema({
-    name    : String
-  , age     : Number
-  , stories : [{ type: Schema.ObjectId, ref: &#39;Story&#39; }]
+<pre><code>var ToySchema = new Schema({
+    color: String
+  , name: String
 });
 
-var StorySchema = new Schema({
-    _creator : { type: Schema.ObjectId, ref: &#39;Person&#39; }
-  , title    : String
-  , fans     : [{ type: Schema.ObjectId, ref: &#39;Person&#39; }]
-});
+var Toy = db.model(&#39;Toy&#39;, ToySchema);
 
-var Story  = mongoose.model(&#39;Story&#39;, StorySchema);
-var Person = mongoose.model(&#39;Person&#39;, PersonSchema);</code></pre>
+Toy.schema.path(&#39;name&#39;).validate(function (value) {
+  return /blue|green|white|red|orange|periwinkel/i.test(value);
+}, &#39;Invalid color&#39;);
 
-<p>So far we&#39;ve created two models. Our <code>Person</code> model has it&#39;s <code>stories</code> field
-set to an array of <code>DBRefs</code>. The <code>ref</code> option is what tells Mongoose which
-model this DBRef refers to, in our case the <code>Story</code> model. All <code>_id</code>s we
-store here must be document <code>_id</code>s from the <code>Story</code> model. We also added
-a <code>_creator</code> DBRef to our <code>Story</code> schema which refers to a single <code>Person</code>.</p>
+var toy = new Toy({ color: &#39;grease&#39;});
 
-<h2>Querying DBRefs</h2>
+toy.save(function (err) {
+  // previous behavior (v1x):
 
-<pre><code>var aaron = new Person({ name: &#39;Aaron&#39;, age: 100 });
+  console.log(err.errors.color)
+  // prints &#39;Validator &quot;Invalid color&quot; failed for path color&#39;
 
-aaron.save(function (err) {
-  if (err) ...
+  // new v2x behavior - err.errors.color is a ValidatorError object
 
-  var story1 = new Story({
-      title: &quot;A man who cooked Nintendo&quot;
-    , _creator: aaron._id
-  });
+  console.log(err.errors.color.message)
+  // prints &#39;Validator &quot;Invalid color&quot; failed for path color&#39;
 
-  story1.save(function (err) {
-    if (err) ...
-  });
-})</code></pre>
+  // you can get v1 behavior back by casting error.color toString
 
-<p>So far we haven&#39;t done anything special. We&#39;ve merely created a <code>Person</code> and
-a <code>Story</code>. Now let&#39;s take a look at populating our story&#39;s <code>_creator</code>:</p>
+  console.log(String(err.errors.color))
+  // prints &#39;Validator &quot;Invalid color&quot; failed for path color&#39;
 
-<pre><code>Story
-.findOne({ title: /Nintendo/i })
-.populate(&#39;_creator&#39;) // &lt;--
-.run(function (err, story) {
-  if (err) ..
-  console.log(&#39;The creator is %s&#39;, story._creator.name);
-  // prints &quot;The creator is Aaron&quot;
-})</code></pre>
+  console.log(err.errors.color.type);
+  // prints &quot;Invalid color&quot;
 
-<p>Yup that&#39;s it. We&#39;ve just queried for a <code>Story</code> with the term Nintendo in it&#39;s
-title and also queried the <code>Person</code> collection for the story&#39;s creator. Nice!</p>
+  console.log(err.errors.color.path)
+  // prints &quot;color&quot;
 
-<p>Arrays of DBRefs work the same way. Just call the <code>populate</code> method on the query and
-an array of documents will be returned in place of the <code>ObjectId</code>s.</p>
+  console.log(err.name)
+  // prints &quot;ValidationError&quot;
 
-<p>What if we only want a few specific fields returned for the DBRef query? This can
-be accomplished by passing an array of field names to the <code>populate</code> method:</p>
+  console.log(err.message)
+  // prints &quot;Validation failed&quot;
+});</code></pre>
 
-<pre><code>Story
-.findOne({ title: /Nintendo/i })
-.populate(&#39;_creator&#39;, [&#39;name&#39;]) // &lt;-- only return the Persons name
-.run(function (err, story) {
-  if (err) ..
+<p>BTW, the <code>err.errors</code> object is also available on the model instance.</p>
 
-  console.log(&#39;The creator is %s&#39;, story._creator.name);
-  // prints &quot;The creator is Aaron&quot;
-
-  console.log(&#39;The creators age is %s&#39;, story._creator.age)
-  // prints &quot;The creators age is null&#39;
-})</code></pre>
-
-<p>Now this is much better. The only property of the creator we are using
-is the <code>name</code> so we only returned that field from the db. Efficiency FTW!</p>
-
-<h2>Updating DBRefs</h2>
-
-<p>Now that we have a story we realized that the <code>_creator</code> was incorrect. We can
-update <code>DBRef</code>s the same as any other property through the magic of Mongooses
-internal casting:</p>
-
-<pre><code>var guille = new Person({ name: &#39;Guillermo&#39; });
-guille.save(function (err) {
-  if (err) ..
-
-  story._creator = guille; // or guille._id
-
-  story.save(function (err) {
-    if (err) ..
-
-    Story
-    .findOne({ title: /Nintendo/i })
-    .populate(&#39;_creator&#39;, [&#39;name&#39;])
-    .run(function (err, story) {
-      if (err) ..
-
-      console.log(&#39;The creator is %s&#39;, story._creator.name)
-      // prints &quot;The creator is Guillermo&quot;
-    })
-
-  })
-})</code></pre>
+<pre><code>toy.errors.color.message === err.errors.color.message</code></pre>
         </div>
 
         <div id="footer">

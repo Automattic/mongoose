@@ -1,4 +1,8 @@
 
+2.0.2 / 2011-08-25
+==================
+
+  * Fixed; Maintain query option key order (fixes 'bad hint' error from compound query hints)
 
 2.0.1 / 2011-08-25
 ==================

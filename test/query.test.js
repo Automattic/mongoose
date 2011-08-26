@@ -729,6 +729,19 @@ module.exports = {
     });
   },
 
+  'optionsForExecute should retain key order': function () {
+    // this is important for query hints
+    var hint = { x: 1, y: 1, z: 1 };
+    var a = JSON.stringify({ hint: hint, safe: true});
+
+    var q = new Query;
+    q.hint(hint);
+
+    var options = q._optionsForExec({ options: { safe: true } });
+
+    a.should.equal(JSON.stringify(options));
+  },
+
   // Advanced Query options
 
   'test Query#maxscan': function () {

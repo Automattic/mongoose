@@ -79,12 +79,11 @@ module.exports = {
       });
     }
   },
-
-  'test #splice()': function () {
-    var collection = 'splicetest' + random();
+  'test #splice() with numbers': function () {
+    var collection = 'splicetest-number' + random();
     var db = start()
       , schema = new Schema({ numbers: Array })
-      , A = db.model('splicetest', schema, collection);
+      , A = db.model('splicetestNumber', schema, collection);
 
     var a = new A({ numbers: [4,5,6,7] });
     a.save(function (err) {
@@ -98,6 +97,45 @@ module.exports = {
           A.findById(a._id, function (err, doc) {
             should.equal(null, err, 'error finding splice doc');
             doc.numbers.toObject().should.eql([4,6,7]);
+
+            A.collection.drop(function (err) {
+              db.close();
+              should.strictEqual(err, null);
+            });
+          });
+        });
+      });
+    });
+  },
+
+  'test #splice() on embedded docs': function () {
+    var collection = 'splicetest-embeddeddocs' + random();
+    var db = start()
+      , schema = new Schema({ types: [new Schema({ type: String }) ]})
+      , A = db.model('splicetestEmbeddedDoc', schema, collection);
+
+    var a = new A({ types: [{type:'bird'},{type:'boy'},{type:'frog'},{type:'cloud'}] });
+    a.save(function (err) {
+      should.equal(null, err, 'could not save splice test');
+      A.findById(a._id, function (err, doc) {
+        should.equal(null, err, 'error finding splice doc');
+
+        doc.types.splice(1, 1);
+
+        var obj = doc.types.toObject();
+        obj[0].type.should.eql('bird');
+        obj[1].type.should.eql('frog');
+        obj[2].type.should.eql('cloud');
+
+        doc.save(function (err) {
+          should.equal(null, err, 'could not save splice test');
+          A.findById(a._id, function (err, doc) {
+            should.equal(null, err, 'error finding splice doc');
+
+            var obj = doc.types.toObject();
+            obj[0].type.should.eql('bird');
+            obj[1].type.should.eql('frog');
+            obj[2].type.should.eql('cloud');
 
             A.collection.drop(function (err) {
               db.close();

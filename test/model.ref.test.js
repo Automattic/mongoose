@@ -587,6 +587,33 @@ module.exports = {
         });
       });
     });
-  }
+  },
 
+  // gh-481
+  'test populating subdocuments partially with empty array': function () {
+    var db = start()
+      , BlogPost = db.model('RefBlogPost', posts)
+      , worked = false;
+
+    var post = BlogPost.create({
+        title: 'Woot'
+      , comments: [] // EMPTY ARRAY
+    }, function (err, post) {
+      should.strictEqual(err, null);
+
+      BlogPost
+      .findById(post._id)
+      .populate('comments._creator', ['email'])
+      .run(function (err, returned) {
+        db.close();
+        worked = true;
+        should.strictEqual(err, null);
+        returned.id.should.equal(post.id);
+      });
+    });
+
+    setTimeout(function () {
+      worked.should.be.true;
+    }, 1700);
+  }
 };

@@ -1,4 +1,4 @@
-DBRefs
+DBRefs (experimental)
 ====================
 
 DBRefs are properties of type `ObjectId` which refer to another documents `_id`

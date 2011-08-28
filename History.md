@@ -1,4 +1,10 @@
 
+2.0.3 / 2011-08-28
+==================
+
+  * Fixed; manipulating a populated array no longer causes infinite loop in BSON serializer during save (#477)
+  * Fixed; populating an empty array no longer hangs foreeeeeeeever (#481)
+
 2.0.2 / 2011-08-25
 ==================
 

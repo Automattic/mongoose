@@ -1,4 +1,10 @@
 
+2.0.4 / 2011-08-29
+==================
+
+  * Fixed; Only send the depopulated ObjectId instead of the entire doc on save (DBRefs)
+  * Fixed; Properly cast nested array values in Model.update (the data was stored in Mongo incorrectly but recast on document fetch was "fixing" it)
+
 2.0.3 / 2011-08-28
 ==================
 

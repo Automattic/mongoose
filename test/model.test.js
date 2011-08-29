@@ -596,6 +596,43 @@ module.exports = {
 
     db.close();
   },
+  
+  'test isModified on a Mongoose Document - Modifying an existing record' : function(){
+    var db = start()
+      , BlogPost = db.model('BlogPost', collection)
+      , doc = {
+    	        title       : 'Test'
+	            , slug        : 'test'
+	            , date        : new Date
+	            , meta        : {
+	                  date      : new Date
+	                , visitors  : 5
+	              }
+	            , published   : true
+	            , owners      : [new DocumentObjectId, new DocumentObjectId]
+	            , comments    : [
+	                                { title: 'Test', date: new Date, body: 'Test' }
+	                              , { title: 'Super', date: new Date, body: 'Cool' }
+	                            ]
+	          };
+
+    BlogPost.create(doc, function (err, post) {
+    	BlogPost.findById(post.id, function (err, postRead) {
+    		//set the same data again back to the document.
+    		//expected result, nothing should be set to modified
+    		postRead.set(doc);
+    		
+    		postRead.isModified('meta.visitors').should.be.false;
+    		postRead.isModified('owners').should.be.false;
+    		
+    		//uncomment this, this should the bug with respect to Embedded array
+    		//documents where it is set to modified even though it is not
+    		//postRead.isModified('comments').should.be.false;
+    		
+    		db.close();
+    	});
+    });
+  },
 
   // GH-342
   'over-writing a number should persist to the db': function () {

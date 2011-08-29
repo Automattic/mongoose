@@ -2570,7 +2570,6 @@ module.exports = {
       BlogPost.findById(post.get('_id'), function (err, doc) {
         should.strictEqual(err, null);
 
-        doc.comments[0].title = "changed";
         doc.comments[0].remove();
         doc.save(function (err) {
           should.strictEqual(err, null);

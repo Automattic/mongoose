@@ -32,6 +32,7 @@ TestDocument.prototype.__proto__ = Document.prototype;
 var schema = TestDocument.prototype.schema = new Schema({
     test    : String
   , oids    : [ObjectId]
+  , numbers : [Number]
   , nested  : {
         age   : Number
       , cool  : ObjectId
@@ -515,7 +516,7 @@ module.exports = {
       , obj = doc.toObject();
 
     delete obj._id;
-    obj.should.eql({ oids: [] });
+    obj.should.eql({ numbers: [], oids: [] });
   },
 
   // GH-209
@@ -559,6 +560,15 @@ module.exports = {
     p.embed[0].test().should.equal('apple butter');
 
     db.close();
-  }
+  },
 
+  'setting a positional path does not cast value to array': function () {
+    var doc = new TestDocument;
+    doc.init({ numbers: [1,3] });
+    doc.numbers[0].should.eql(1);
+    doc.numbers[1].valueOf().should.eql(3);
+    doc.set('numbers.1', 2);
+    doc.numbers[0].should.eql(1);
+    doc.numbers[1].valueOf().should.eql(2);
+  }
 };

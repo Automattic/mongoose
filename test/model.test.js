@@ -2685,7 +2685,7 @@ module.exports = {
     db.close();
   },
 
-  'test that we don\'t instantiate MongooseNumber in arrays': function () {
+  'test that we instantiate MongooseNumber in arrays': function () {
     var db = start()
       , BlogPost = db.model('BlogPost', collection);
 

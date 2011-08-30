@@ -494,6 +494,22 @@ module.exports = {
     db.close();
   },
 
+  'test isNew on embedded documents after saving': function(){
+    var db = start()
+      , BlogPost = db.model('BlogPost', collection);
+
+    var post = new BlogPost({ title: 'hocus pocus' })
+    post.comments.push({ title: 'Humpty Dumpty', comments: [{title: 'nested'}] });
+    post.get('comments')[0].isNew.should.be.true;
+    post.get('comments')[0].comments[0].isNew.should.be.true;
+    post.save(function (err) {
+      db.close();
+      should.strictEqual(null, err);
+      post.get('comments')[0].isNew.should.be.false;
+      post.get('comments')[0].comments[0].isNew.should.be.false;
+    });
+  },
+
   'test isModified when modifying keys': function(){
     var db = start()
       , BlogPost = db.model('BlogPost', collection);

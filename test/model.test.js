@@ -149,6 +149,12 @@ module.exports = {
     n3.number.valueOf().should.equal(1234);
   },
 
+  'collection name can be specified through schema': function () {
+    var schema = new Schema({ name: String }, { collection: 'users' });
+    var Named = mongoose.model('CollectionNamedInSchema', schema);
+    Named.prototype.collection.name.should.equal('users');
+  },
+
   'test default Array type casts to Mixed': function () {
     var db = start()
       , DefaultArraySchema = new Schema({

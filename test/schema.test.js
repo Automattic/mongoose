@@ -785,10 +785,11 @@ module.exports = {
   },
 
   'test setting options': function () {
-    var Tobi = new Schema();
+    var Tobi = new Schema({}, { collection: 'users' });
 
     Tobi.set('a', 'b');
     Tobi.set('safe', false);
+    Tobi.options.collection.should.eql('users');
 
     Tobi.options.a.should.eql('b');
     Tobi.options.safe.should.be.false;

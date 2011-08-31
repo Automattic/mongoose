@@ -125,7 +125,7 @@ process.on('beforeExit', function(){
     , ['Connections closed', closed]
   );
 
-  console.log(table.toString());
+  console.error(table.toString());
 });
 
 /**

@@ -77,12 +77,12 @@ module.exports = {
           .findById(post._id)
           .populate('_creator')
           .run(function (err, post) {
+            db.close();
             should.strictEqual(err, null);
 
             post._creator.should.be.an.instanceof(User);
             post._creator.name.should.equal('Guillermo');
             post._creator.email.should.equal('rauchg@gmail.com');
-            db.close();
           });
       });
     });
@@ -121,9 +121,9 @@ module.exports = {
           .findById(post._id)
           .populate('_creator')
           .run(function (err, post) {
+            db.close();
             err.should.be.an.instanceof(Error);
             err.message.should.equal('woot');
-            db.close();
           });
       });
     });
@@ -150,12 +150,12 @@ module.exports = {
           .findById(post._id)
           .populate('_creator', ['email'])
           .run(function (err, post) {
+            db.close();
             should.strictEqual(err, null);
 
             post._creator.should.be.an.instanceof(User);
             post.isInit('_name').should.be.false;
             post._creator.email.should.equal('rauchg@gmail.com');
-            db.close();
           });
       });
     });
@@ -202,11 +202,11 @@ module.exports = {
                   .findById(post._id)
                   .populate('_creator')
                   .run(function (err, post) {
+                    db.close();
                     should.strictEqual(err, null);
 
                     post._creator.name.should.equal('Aaron');
                     post._creator.email.should.equal('aaron@learnboost.com');
-                    db.close();
                   });
               });
             });
@@ -255,11 +255,11 @@ module.exports = {
                   .findById(post._id)
                   .populate('_creator')
                   .run(function (err, post) {
+                    db.close();
                     should.strictEqual(err, null);
 
                     post._creator.name.should.equal('Aaron');
                     post._creator.email.should.equal('aaron@learnboost.com');
-                    db.close();
                   });
               });
             });
@@ -301,6 +301,7 @@ module.exports = {
               .find({ _id: { $in: [post1._id, post2._id ] } })
               .populate('fans')
               .run(function (err, blogposts) {
+                db.close();
                 should.strictEqual(err, null);
 
                 blogposts[0].fans[0].name.should.equal('Fan 1');
@@ -313,7 +314,6 @@ module.exports = {
                 blogposts[1].fans[1].name.should.equal('Fan 1');
                 blogposts[1].fans[1].email.should.equal('fan1@learnboost.com');
 
-                db.close();
               });
           });
         });
@@ -366,9 +366,9 @@ module.exports = {
               .find({ $or: [{ _id: post1._id }, { _id: post2._id }] })
               .populate('fans')
               .run(function (err, blogposts) {
+                db.close();
                 err.should.be.an.instanceof(Error);
                 err.message.should.equal('woot 2');
-                db.close();
               });
           });
         });
@@ -409,6 +409,7 @@ module.exports = {
               .find({ _id: { $in: [post1._id, post2._id ] } })
               .populate('fans', ['name'])
               .run(function (err, blogposts) {
+                db.close();
                 should.strictEqual(err, null);
 
                 blogposts[0].fans[0].name.should.equal('Fan 1');
@@ -421,7 +422,6 @@ module.exports = {
                 blogposts[1].fans[1].name.should.equal('Fan 1');
                 blogposts[1].fans[1].isInit('email').should.be.false;
 
-                db.close();
               });
           });
         });
@@ -576,13 +576,13 @@ module.exports = {
             .findById(post._id)
             .populate('comments._creator', ['email'])
             .run(function (err, post) {
+              db.close();
               should.strictEqual(err, null);
 
               post.comments[0]._creator.email.should.equal('user1@learnboost.com');
               post.comments[0]._creator.isInit('name').should.be.false;
               post.comments[1]._creator.email.should.equal('user2@learnboost.com');
               post.comments[1]._creator.isInit('name').should.be.false;
-              db.close();
             });
         });
       });

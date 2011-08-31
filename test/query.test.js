@@ -688,11 +688,12 @@ module.exports = {
   },
 
   'distinct Query op should be "distinct"': function () {
-    var query = new Query();
     var db = start();
+    var query = new Query();
     var Product = db.model('Product');
-    db.close();
-    new Query().bind(Product, 'distinct').distinct('blah', function(){}).op.should.equal('distinct');
+    new Query().bind(Product, 'distinct').distinct('blah', function(){
+      db.close();
+    }).op.should.equal('distinct');
   },
 
   'querying/updating with model instance containing embedded docs should work (#454)': function () {

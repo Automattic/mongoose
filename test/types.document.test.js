@@ -96,6 +96,7 @@ module.exports = {
       b.work.should.eql('good flam');
     },
 
+    /*
     'Subdocument#remove': function (beforeExit) {
       var db = start();
       var Movie = db.model('Movie');
@@ -170,5 +171,6 @@ module.exports = {
         });
       });
     }
+    */
 
 };

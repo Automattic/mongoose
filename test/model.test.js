@@ -3731,6 +3731,7 @@ module.exports = {
     });
   },
 
+  /*
   'when mongo is down, auto_reconnect should kick in and db operation should succeed': function () {
     var db = start();
     var T = db.model('Thing', new Schema({ type: String }));
@@ -3752,6 +3753,7 @@ module.exports = {
       }, 500);
     });
   },
+  */
 
   'subdocuments with changed values should persist the values': function () {
     var db = start()

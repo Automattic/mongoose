@@ -6,7 +6,7 @@
 var should = require('should')
   , start = require('./common')
   , mongoose = start.mongoose
-  , EmbeddedDocument = require('../lib/types/document')
+  , EmbeddedDocument = require('../lib/types/embedded')
   , DocumentArray = require('../lib/types/documentarray')
   , Schema = mongoose.Schema
   , SchemaType = mongoose.SchemaType

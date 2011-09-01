@@ -6,7 +6,7 @@
 var mongoose = require('./common').mongoose
   , MongooseArray = mongoose.Types.Array
   , MongooseDocumentArray = mongoose.Types.DocumentArray
-  , EmbeddedDocument = require('../lib/types/document')
+  , EmbeddedDocument = require('../lib/types/embedded')
   , DocumentArray = require('../lib/types/documentarray')
   , Schema = mongoose.Schema
 

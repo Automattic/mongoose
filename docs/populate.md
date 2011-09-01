@@ -110,3 +110,10 @@ internal casting:
 
       })
     })
+
+### Note:
+
+The documents returned from calling `populate` become fully functional,
+`remove`able, `save`able documents. Do not confuse them with embedded
+docs. Take caution when calling its `remove` method because 
+you'll be removing it from the database, not just the array.

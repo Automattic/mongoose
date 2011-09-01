@@ -310,6 +310,13 @@ guille.save(function (err) {
 
   })
 })</code></pre>
+
+<h3>Note:</h3>
+
+<p>The documents returned from calling <code>populate</code> become fully functional,
+<code>remove</code>able, <code>save</code>able documents. Do not confuse them with embedded
+docs. Take caution when calling its <code>remove</code> method because 
+you&#39;ll be removing it from the database, not just the array.</p>
         </div>
 
         <div id="footer">

@@ -502,11 +502,18 @@ module.exports = {
     post.comments.push({ title: 'Humpty Dumpty', comments: [{title: 'nested'}] });
     post.get('comments')[0].isNew.should.be.true;
     post.get('comments')[0].comments[0].isNew.should.be.true;
+    post.invalidate('title'); // force error
     post.save(function (err) {
-      db.close();
-      should.strictEqual(null, err);
-      post.get('comments')[0].isNew.should.be.false;
-      post.get('comments')[0].comments[0].isNew.should.be.false;
+      post.isNew.should.be.true;
+      post.get('comments')[0].isNew.should.be.true;
+      post.get('comments')[0].comments[0].isNew.should.be.true;
+      post.save(function (err) {
+        db.close();
+        should.strictEqual(null, err);
+        post.isNew.should.be.false;
+        post.get('comments')[0].isNew.should.be.false;
+        post.get('comments')[0].comments[0].isNew.should.be.false;
+      });
     });
   },
 

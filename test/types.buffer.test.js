@@ -13,7 +13,7 @@ var start = require('./common')
 // can't index Buffer fields yet
 
 function valid (v) {
-  return v.length > 10;
+  return !v || v.length > 10;
 }
 
 var subBuf = new Schema({
@@ -75,7 +75,7 @@ module.exports = {
         t.sub.push({ name: 'Friday Friday' });
         t.save(function (err) {
           err.message.should.eql('Validation failed');
-          err.errors.buf.type.should.equal('valid failed');
+          err.errors.buf.type.should.equal('required');
           t.sub[0].buf = new Buffer("well well");
           t.save(function (err) {
             err.message.should.eql('Validation failed');

@@ -28,6 +28,6 @@ convert('docs/virtuals.md', 'docs/virtuals.html');
 convert('docs/getters-setters.md', 'docs/getters-setters.html');
 convert('docs/methods-statics.md', 'docs/methods-statics.html');
 convert('docs/plugins.md', 'docs/plugins.html');
-convert('docs/dbrefs.md', 'docs/dbrefs.html');
+convert('docs/populate.md', 'docs/populate.html');
 convert('docs/errors.md', 'docs/errors.html');
 convert('docs/migration-guide.md', 'docs/migration-1x-2x.html');

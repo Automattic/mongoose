@@ -1,8 +1,9 @@
-DBRefs (experimental)
-====================
+Populate - DBRef-like behavior (experimental)
+=============================================
 
-DBRefs are properties of type `ObjectId` which refer to another documents `_id`
-and can be `populate()`d when querying. An example is helpful:
+`ObjectIds` can now refer to another document in a
+collection within our database and be `populate()`d when
+querying. An example is helpful:
 
     var mongoose = require('mongoose')
       , Schema = mongoose.Schema
@@ -23,12 +24,12 @@ and can be `populate()`d when querying. An example is helpful:
     var Person = mongoose.model('Person', PersonSchema);
 
 So far we've created two models. Our `Person` model has it's `stories` field
-set to an array of `DBRefs`. The `ref` option is what tells Mongoose which
-model this DBRef refers to, in our case the `Story` model. All `_id`s we
+set to an array of `ObjectId`s. The `ref` option is what tells Mongoose in which
+model to look, in our case the `Story` model. All `_id`s we
 store here must be document `_id`s from the `Story` model. We also added
-a `_creator` DBRef to our `Story` schema which refers to a single `Person`.
+a `_creator` `ObjectId` to our `Story` schema which refers to a single `Person`.
 
-## Querying DBRefs
+## Populating the refs
 
     var aaron = new Person({ name: 'Aaron', age: 100 });
 
@@ -60,10 +61,10 @@ a `Story`. Now let's take a look at populating our story's `_creator`:
 Yup that's it. We've just queried for a `Story` with the term Nintendo in it's
 title and also queried the `Person` collection for the story's creator. Nice!
 
-Arrays of DBRefs work the same way. Just call the `populate` method on the query and
+Arrays of `ObjectId` refs work the same way. Just call the `populate` method on the query and
 an array of documents will be returned in place of the `ObjectId`s.
 
-What if we only want a few specific fields returned for the DBRef query? This can
+What if we only want a few specific fields returned for the query? This can
 be accomplished by passing an array of field names to the `populate` method:
 
     Story
@@ -82,10 +83,10 @@ be accomplished by passing an array of field names to the `populate` method:
 Now this is much better. The only property of the creator we are using
 is the `name` so we only returned that field from the db. Efficiency FTW!
 
-## Updating DBRefs
+## Updating
 
 Now that we have a story we realized that the `_creator` was incorrect. We can
-update `DBRef`s the same as any other property through the magic of Mongooses
+update `ObjectId` refs the same as any other property through the magic of Mongooses
 internal casting:
 
     var guille = new Person({ name: 'Guillermo' });

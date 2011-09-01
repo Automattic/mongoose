@@ -188,7 +188,7 @@
             <li><a href="/docs/virtuals.html">Virtuals</a></li>
             <li><a href="/docs/getters-setters.html">Getters / Setters</a></li>
             <li><a href="/docs/embedded-documents.html">Embedded Docs</a></li>
-            <li><a href="/docs/dbrefs.html">DBRefs</a></li>
+            <li><a href="/docs/populate.html">Populate (DBRef-like)</a></li>
             <li><a href="/docs/plugins.html">Plugins</a></li>
             <li><a href="/docs/errors.html">Errors</a></li>
             <li><a href="/docs/migration-1x-2x.html">v1x - v2x Migration</a></li>
@@ -199,10 +199,11 @@
         <h1><a href="/">Mongoose</a></h1>
 
         <div id="content">
-          <h1>DBRefs (experimental)</h1>
+          <h1>Populate - DBRef-like behavior (experimental)</h1>
 
-<p>DBRefs are properties of type <code>ObjectId</code> which refer to another documents <code>_id</code>
-and can be <code>populate()</code>d when querying. An example is helpful:</p>
+<p><code>ObjectIds</code> can now refer to another document in a
+collection within our database and be <code>populate()</code>d when
+querying. An example is helpful:</p>
 
 <pre><code>var mongoose = require(&#39;mongoose&#39;)
   , Schema = mongoose.Schema
@@ -223,12 +224,12 @@ var Story  = mongoose.model(&#39;Story&#39;, StorySchema);
 var Person = mongoose.model(&#39;Person&#39;, PersonSchema);</code></pre>
 
 <p>So far we&#39;ve created two models. Our <code>Person</code> model has it&#39;s <code>stories</code> field
-set to an array of <code>DBRefs</code>. The <code>ref</code> option is what tells Mongoose which
-model this DBRef refers to, in our case the <code>Story</code> model. All <code>_id</code>s we
+set to an array of <code>ObjectId</code>s. The <code>ref</code> option is what tells Mongoose in which
+model to look, in our case the <code>Story</code> model. All <code>_id</code>s we
 store here must be document <code>_id</code>s from the <code>Story</code> model. We also added
-a <code>_creator</code> DBRef to our <code>Story</code> schema which refers to a single <code>Person</code>.</p>
+a <code>_creator</code> <code>ObjectId</code> to our <code>Story</code> schema which refers to a single <code>Person</code>.</p>
 
-<h2>Querying DBRefs</h2>
+<h2>Populating the refs</h2>
 
 <pre><code>var aaron = new Person({ name: &#39;Aaron&#39;, age: 100 });
 
@@ -260,10 +261,10 @@ a <code>Story</code>. Now let&#39;s take a look at populating our story&#39;s <c
 <p>Yup that&#39;s it. We&#39;ve just queried for a <code>Story</code> with the term Nintendo in it&#39;s
 title and also queried the <code>Person</code> collection for the story&#39;s creator. Nice!</p>
 
-<p>Arrays of DBRefs work the same way. Just call the <code>populate</code> method on the query and
+<p>Arrays of <code>ObjectId</code> refs work the same way. Just call the <code>populate</code> method on the query and
 an array of documents will be returned in place of the <code>ObjectId</code>s.</p>
 
-<p>What if we only want a few specific fields returned for the DBRef query? This can
+<p>What if we only want a few specific fields returned for the query? This can
 be accomplished by passing an array of field names to the <code>populate</code> method:</p>
 
 <pre><code>Story
@@ -282,10 +283,10 @@ be accomplished by passing an array of field names to the <code>populate</code> 
 <p>Now this is much better. The only property of the creator we are using
 is the <code>name</code> so we only returned that field from the db. Efficiency FTW!</p>
 
-<h2>Updating DBRefs</h2>
+<h2>Updating</h2>
 
 <p>Now that we have a story we realized that the <code>_creator</code> was incorrect. We can
-update <code>DBRef</code>s the same as any other property through the magic of Mongooses
+update <code>ObjectId</code> refs the same as any other property through the magic of Mongooses
 internal casting:</p>
 
 <pre><code>var guille = new Person({ name: &#39;Guillermo&#39; });

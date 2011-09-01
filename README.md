@@ -1,7 +1,7 @@
 Mongoose 2.0
 ============
 
-<div id="announce"><strong>08-25-2011: Mongoose 2.0 is here</strong> with new support for <a href="/docs/dbrefs.html">DBRefs</a>, Buffers, and a
+<div id="announce"><strong>08-25-2011: Mongoose 2.0 is here</strong> with new support for <a href="/docs/populate.html">DBRef-like methods</a>, Buffers, and a
             number of bugfixes. Check out the <a href="/docs/migration-1x-2x.html">migration guide</a> for details.
 </div>
 
@@ -97,7 +97,7 @@ storing, a Schema handles the definition of:
 * [Methods](http://mongoosejs.com/docs/methods-statics.html) definition
 * [Statics](http://mongoosejs.com/docs/methods-statics.html) definition
 * [Plugins](http://mongoosejs.com/docs/plugins.html)
-* [DBRefs](http://mongoosejs.com/docs/dbrefs.html)
+* [DBRef-like Population](http://mongoosejs.com/docs/populate.html)
 
 The following example shows some of these features:
 

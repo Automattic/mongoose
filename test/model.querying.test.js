@@ -176,13 +176,16 @@ module.exports = {
 
   'test that count Query executes when you pass a callback': function () {
     var db = start()
-      , BlogPostB = db.model('BlogPostB', collection);
+      , BlogPostB = db.model('BlogPostB', collection)
+      , pending = 2
 
     function fn () {
+      if (--pending) return;
       db.close();
     };
 
     BlogPostB.count({}, fn).should.be.an.instanceof(Query);
+    BlogPostB.count(fn).should.be.an.instanceof(Query);
   },
 
   'test that distinct returns a Query': function () {

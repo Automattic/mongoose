@@ -9,6 +9,7 @@ var start = require('./common')
   , random = require('../lib/utils').random
   , Schema = mongoose.Schema
   , ObjectId = Schema.ObjectId
+  , DocObjectId = mongoose.Types.ObjectId
 
 /**
  * Setup.
@@ -615,5 +616,14 @@ module.exports = {
     setTimeout(function () {
       worked.should.be.true;
     }, 1700);
+  },
+
+  'refs should cast to ObjectId from hexstrings': function () {
+    var BP = mongoose.model('RefBlogPost', BlogPost);
+    var bp = new BP;
+    bp._creator = new DocObjectId().toString();
+    bp._creator.should.be.an.instanceof(DocObjectId);
+    bp.set('_creator', new DocObjectId().toString());
+    bp._creator.should.be.an.instanceof(DocObjectId);
   }
 };

@@ -1,4 +1,15 @@
 
+2.1.0 / 2011-09-01
+==================
+
+  * changed; document#validate is a public method
+  * fixed; setting number to same value no longer marks modified (#476) [gitfy]
+  * fixed; Buffers shouldn't have default vals
+  * added; allow specifying collection name in schema (#470) [ixti]
+  * fixed; reset modified paths and atomics after saved (#459)
+  * fixed; set isNew on embedded docs to false after save
+  * fixed; use self to ensure proper scope of options in doOpenSet (#483) [andrewjstone]
+
 2.0.4 / 2011-08-29
 ==================
 

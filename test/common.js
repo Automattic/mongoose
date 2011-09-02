@@ -25,6 +25,9 @@ var mongoose = require('../')
   , 'insert'
   , 'save'
   , 'update'
+  , 'remove'
+  , 'count'
+  , 'distinct'
 ].forEach(function (method) {
 
   var oldMethod = Collection.prototype[method];

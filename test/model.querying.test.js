@@ -1491,6 +1491,21 @@ module.exports = {
     });
   },
 
+  '$type tests': function () {
+    var db = start()
+      , B = db.model('BlogPostB', collection);
+
+    B.find({ title: { $type: "asd" }}, function (err, posts) {
+      err.message.should.eql("$type parameter must be Number");
+
+      B.find({ title: { $type: 2 }}, function (err, posts) {
+        db.close();
+        should.strictEqual(null, err);
+        should.strictEqual(Array.isArray(posts), true);
+      });
+    });
+  },
+
   'buffers find using available types': function () {
     var db = start()
       , BufSchema = new Schema({ name: String, block: Buffer })

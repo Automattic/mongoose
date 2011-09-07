@@ -1,6 +1,6 @@
 
 TESTS = $(shell find test/ -name '*.test.js')
-
+@MONGOOSE_SET_TEST_URI="mongodb://localhost:27017/mgtest1,mongodb://localhost:27017/mgtest2"
 test:
 	@NODE_ENV=test ./support/expresso/bin/expresso \
 		-I lib \

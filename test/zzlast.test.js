@@ -1,7 +1,7 @@
 
 var should = require('should');
 var gleak = require('gleak')();
-gleak.whitelist.push('currentObjectStored', 'reg_exp', 'subpath');
+gleak.whitelist.push('currentObjectStored', 'reg_exp'); // node-mongodb-native
 
 module.exports.globals = function (beforeExist) {
   beforeExist(function () {

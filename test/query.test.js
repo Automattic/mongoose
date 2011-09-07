@@ -385,6 +385,19 @@ module.exports = {
     query._conditions.should.eql({pets: ['dog', 'cat', 'ferret']});
   },
 
+  '#find with no args should not throw': function () {
+    var threw = false;
+    var q = new Query();
+
+    try {
+      q.find();
+    } catch (err) {
+      threw = true;
+    }
+
+    threw.should.be.false;
+  },
+
   // TODO Check key.index queries
 
   'test Query#size via where': function () {

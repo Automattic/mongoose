@@ -747,7 +747,7 @@ module.exports = {
       db.close();
     });
   },
-  
+
   'test nested casting error': function(){
     var db = start()
       , BlogPost = db.model('BlogPost', collection)
@@ -4288,6 +4288,40 @@ module.exports = {
       post.save(function(err){
         db.close();
         should.strictEqual(err, null);
+      });
+    });
+  },
+
+  'date casting test (gh-502)': function () {
+    var db = start()
+
+    var S = new Schema({
+        name: String
+      , description: String
+      , sabreId: String
+      , data: {
+            lastPrice: Number
+          , comm: String
+          , curr: String
+          , rateName: String
+        }
+      , created: { type: Date, default: Date.now }
+      , valid: { type: Boolean, default: true }
+    });
+
+    var M = db.model('gh502', S);
+
+    var m = new M;
+    m.save(function (err) {
+      should.strictEqual(err, null);
+      M.findById(m._id, function (err, m) {
+        should.strictEqual(err, null);
+        m.save(function (err) {
+          should.strictEqual(err, null);
+          M.remove(function (err) {
+            db.close();
+          });
+        });
       });
     });
   }

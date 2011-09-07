@@ -1,6 +1,6 @@
 
 var should = require('should');
-var gleak = require('gleak');
+var gleak = require('gleak')();
 gleak.whitelist.push('currentObjectStored', 'reg_exp', 'subpath');
 
 module.exports.globals = function (beforeExist) {

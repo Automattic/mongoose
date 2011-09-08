@@ -1,4 +1,20 @@
 
+2.1.2 / 2011-09-07
+==================
+
+  * fixed; Query#find with no args no longer throws
+
+2.1.1 / 2011-09-07
+==================
+
+  * added; support Model.count(fn)
+  * fixed; compatibility with node >=0.4.0 < 0.4.3
+  * added; pass model.options.safe through with .save() so w:2, wtimeout:5000 options work [andrewjstone]
+  * added; support for $type queries
+  * added; support for Query#or
+  * added; more tests
+  * optimized populate queries
+
 2.1.0 / 2011-09-01
 ==================
 

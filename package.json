@@ -1,7 +1,7 @@
 {
     "name": "mongoose"
   , "description": "Mongoose MongoDB ORM"
-  , "version": "2.1.0"
+  , "version": "2.1.2"
   , "author": "Guillermo Rauch <guillermo@learnboost.com>"
   , "keywords": ["mongodb", "mongoose", "orm", "data", "datastore", "nosql"]
   , "dependencies": {
@@ -11,11 +11,12 @@
     }
   , "devDependencies": {
         "should": "0.2.1"
+      , "gleak": "0.1.0"
     }
   , "directories": { "lib": "./lib/mongoose" }
   , "scripts": { "test": "make test" }
   , "main": "./index.js"
-  , "engines": { "node": ">= 0.2.0" }
+  , "engines": { "node": ">= 0.4.0" }
   , "repository": {
         "type": "git"
       , "url": "git://github.com/LearnBoost/mongoose.git"

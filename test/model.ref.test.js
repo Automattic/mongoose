@@ -327,17 +327,6 @@ module.exports = {
       , BlogPost = db.model('RefBlogPost', posts + '2')
       , User = db.model('RefUser', users + '2');
 
-    var origFind = User.findById;
-
-    // mock an error
-    User.findById = function () {
-      var args = Array.prototype.map.call(arguments, function (arg) {
-        return 'function' == typeof arg ? function () {
-          arg(new Error('woot 2'));
-        } : arg;
-      });
-      return origFind.apply(this, args);
-    };
 
     User.create({
         name  : 'Fan 1'
@@ -363,14 +352,25 @@ module.exports = {
           }, function (err, post2) {
             should.strictEqual(err, null);
 
-            BlogPost
-              .find({ $or: [{ _id: post1._id }, { _id: post2._id }] })
-              .populate('fans')
-              .run(function (err, blogposts) {
-                db.close();
-                err.should.be.an.instanceof(Error);
-                err.message.should.equal('woot 2');
+            // mock an error
+            var origFind = User.find;
+            User.find = function () {
+              var args = Array.prototype.map.call(arguments, function (arg) {
+                return 'function' == typeof arg ? function () {
+                  arg(new Error('woot 2'));
+                } : arg;
               });
+              return origFind.apply(this, args);
+            };
+
+            BlogPost
+            .find({ $or: [{ _id: post1._id }, { _id: post2._id }] })
+            .populate('fans')
+            .run(function (err, blogposts) {
+              db.close();
+              err.should.be.an.instanceof(Error);
+              err.message.should.equal('woot 2');
+            });
           });
         });
       });
@@ -407,23 +407,23 @@ module.exports = {
             should.strictEqual(err, null);
 
             BlogPost
-              .find({ _id: { $in: [post1._id, post2._id ] } })
-              .populate('fans', ['name'])
-              .run(function (err, blogposts) {
-                db.close();
-                should.strictEqual(err, null);
+            .find({ _id: { $in: [post1._id, post2._id ] } })
+            .populate('fans', ['name'])
+            .run(function (err, blogposts) {
+              db.close();
+              should.strictEqual(err, null);
 
-                blogposts[0].fans[0].name.should.equal('Fan 1');
-                blogposts[0].fans[0].isInit('email').should.be.false;
-                blogposts[0].fans[1].name.should.equal('Fan 2');
-                blogposts[0].fans[1].isInit('email').should.be.false;
+              blogposts[0].fans[0].name.should.equal('Fan 1');
+              blogposts[0].fans[0].isInit('email').should.be.false;
+              blogposts[0].fans[1].name.should.equal('Fan 2');
+              blogposts[0].fans[1].isInit('email').should.be.false;
+              should.strictEqual(blogposts[0].fans[1].email, undefined);
 
-                blogposts[1].fans[0].name.should.equal('Fan 2');
-                blogposts[1].fans[0].isInit('email').should.be.false;
-                blogposts[1].fans[1].name.should.equal('Fan 1');
-                blogposts[1].fans[1].isInit('email').should.be.false;
-
-              });
+              blogposts[1].fans[0].name.should.equal('Fan 2');
+              blogposts[1].fans[0].isInit('email').should.be.false;
+              blogposts[1].fans[1].name.should.equal('Fan 1');
+              blogposts[1].fans[1].isInit('email').should.be.false;
+            });
           });
         });
       });

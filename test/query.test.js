@@ -385,6 +385,19 @@ module.exports = {
     query._conditions.should.eql({pets: ['dog', 'cat', 'ferret']});
   },
 
+  '#find with no args should not throw': function () {
+    var threw = false;
+    var q = new Query();
+
+    try {
+      q.find();
+    } catch (err) {
+      threw = true;
+    }
+
+    threw.should.be.false;
+  },
+
   // TODO Check key.index queries
 
   'test Query#size via where': function () {
@@ -540,6 +553,19 @@ module.exports = {
     var query = new Query();
     query.asc('a', 'z').desc('c', 'v').asc('b');
     query.options.sort.should.eql([['a', 1], ['z', 1], ['c', -1], ['v', -1], ['b', 1]]);
+  },
+
+  'Query#or': function () {
+    var query = new Query;
+    query.find({ $or: [{x:1},{x:2}] });
+    query._conditions.$or.length.should.equal(2);
+    query.$or([{y:"We're under attack"}, {z:47}]);
+    query._conditions.$or.length.should.equal(4);
+    query._conditions.$or[3].z.should.equal(47);
+    query.or({z:"phew"});
+    query._conditions.$or.length.should.equal(5);
+    query._conditions.$or[3].z.should.equal(47);
+    query._conditions.$or[4].z.should.equal("phew");
   },
 
   'test running an empty Query should not throw': function () {
@@ -801,14 +827,5 @@ module.exports = {
 
   // TODO
 //  'test Query#explain': function () {
-//  }
-
-//  'queries should be composable': function () {
-//    var q1 = new Query({name: 'hello'})
-//      , q2 = new Query({age: {$gte: 21}})
-//      , q3 = q1.and(q2);
-//    
-//    q3.should.be.an.instanceof(Query);
-//    q3._conditions.should.eql({name: 'hello', age: {$gte: 21}});
 //  }
 };

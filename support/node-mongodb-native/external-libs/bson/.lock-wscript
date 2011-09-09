@@ -1,9 +1,0 @@
-argv = ['/usr/local/bin/node-waf', 'configure', 'build']
-blddir = '/Users/rauchg/Sites/mongoose/support/node-mongodb-native/external-libs/bson/build'
-commands = {'dist': 0, 'configure': True, 'distcheck': 0, 'install': 0, 'build': True, 'clean': 0, 'distclean': 0, 'check': 0, 'uninstall': 0}
-cwd = '/Users/rauchg/Sites/mongoose/support/node-mongodb-native/external-libs/bson'
-environ = {'SSH_AUTH_SOCK': '/tmp/launch-kXs7y7/Listeners', 'LSCOLORS': 'gxfxcxdxbxegedabagacad', 'VERSIONER_PYTHON_PREFER_32_BIT': 'no', 'TMPDIR': '/var/folders/vd/vd3w4ReHF7iw7iMKNtWUu++++TI/-Tmp-/', 'SHELL': '/bin/bash', 'LOGNAME': 'rauchg', 'USER': 'rauchg', 'HOME': '/Users/rauchg', 'PATH': '/opt/local/bin:/opt/local/sbin:/Users/rauchg/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin:/usr/X11/bin', 'DISPLAY': '/tmp/launch-DNLBiU/org.x:0', '_': '/usr/bin/make', 'TERM_PROGRAM': 'iTerm.app', 'LANG': 'en_US.UTF-8', 'TERM': 'xterm', 'Apple_PubSub_Socket_Render': '/tmp/launch-dKdga3/Render', 'COLORFGBG': '15;0', 'VERSIONER_PYTHON_VERSION': '2.6', 'SHLVL': '1', 'OLDPWD': '/Users/rauchg/Sites/mongoose/support', 'CLICOLOR': '1', '__CF_USER_TEXT_ENCODING': '0x1F5:0:0', 'MAKELEVEL': '2', 'PWD': '/Users/rauchg/Sites/mongoose/support/node-mongodb-native', 'MAKEFLAGS': '', 'COMMAND_MODE': 'unix2003', 'MFLAGS': '', 'EDITOR': 'vim'}
-files = []
-hash = 0
-options = {'compile_targets': None, 'force': False, 'verbose': 0, 'nocache': False, 'progress_bar': 0, 'check_cxx_compiler': 'g++', 'destdir': '', 'keep': False, 'zones': '', 'blddir': '', 'prefix': '/usr/local/', 'debug': False, 'srcdir': '', 'jobs': 4}
-srcdir = '/Users/rauchg/Sites/mongoose/support/node-mongodb-native/external-libs/bson'

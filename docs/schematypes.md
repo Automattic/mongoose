@@ -138,7 +138,7 @@ options.
 
   - `index`: {Boolean|Object} - Tells Mongoose to ensure an index is created for this path. An object can be passed as well.
 
-        var Person = new Schema({ name: String, index: true }})
+        var Person = new Schema({ name: String, index: true })
         var Person = new Schema({ name: String, index: { unique: true }})
 
     Note: indexes cannot be created for `Buffer` `SchemaTypes`. <br>
@@ -146,7 +146,7 @@ options.
 
   - `unique`: {Boolean} - Tells Mongoose to ensure a unique index is created for this path. The following are equivalent:
 
-        var Person = new Schema({ name: String, unique: true }})
+        var Person = new Schema({ name: String, unique: true })
         var Person = new Schema({ name: String, index: { unique: true }})
 
     Note: indexes cannot be created for `Buffer` `SchemaTypes`. <br>
@@ -154,7 +154,7 @@ options.
 
   - `sparse`: {Boolean} - Tells Mongoose to ensure a sparse index is created for this path. The following are equivalent:
 
-        var Person = new Schema({ name: String, sparse: true }})
+        var Person = new Schema({ name: String, sparse: true })
         var Person = new Schema({ name: String, index: { sparse: true }})
 
     Note: indexes cannot be created for `Buffer` `SchemaTypes`. <br>

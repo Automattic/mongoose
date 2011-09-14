@@ -3785,29 +3785,27 @@ module.exports = {
     });
   },
 
-  /*
-  'when mongo is down, auto_reconnect should kick in and db operation should succeed': function () {
-    var db = start();
-    var T = db.model('Thing', new Schema({ type: String }));
-    db.on('open', function () {
-      var t = new T({ type: "monster" });
+  //'when mongo is down, auto_reconnect should kick in and db operation should succeed': function () {
+    //var db = start();
+    //var T = db.model('Thing', new Schema({ type: String }));
+    //db.on('open', function () {
+      //var t = new T({ type: "monster" });
 
-      var worked = false;
-      t.save(function (err) {
-        should.strictEqual(err, null);
-        worked = true;
-      });
+      //var worked = false;
+      //t.save(function (err) {
+        //should.strictEqual(err, null);
+        //worked = true;
+      //});
 
-      process.nextTick(function () {
-        db.close();
-      });
+      //process.nextTick(function () {
+        //db.close();
+      //});
 
-      setTimeout(function () {
-        worked.should.be.true;
-      }, 500);
-    });
-  },
-  */
+      //setTimeout(function () {
+        //worked.should.be.true;
+      //}, 500);
+    //});
+  //},
 
   'subdocuments with changed values should persist the values': function () {
     var db = start()
@@ -4021,9 +4019,7 @@ module.exports = {
 
     var DefaultErrSchema = new Schema({});
 
-    var err = "";
-
-    DefaultErrSchema.pre('save', function (next, fn) {
+    DefaultErrSchema.pre('save', function (next) {
       try {
         next(new Error);
       } catch (error) {
@@ -4035,7 +4031,7 @@ module.exports = {
           err.should.be.an.instanceof(Error);
         });
 
-        next(new Error);
+        next(new Error('doh'));
       }
     });
 
@@ -4044,6 +4040,127 @@ module.exports = {
     var e = new DefaultErr();
 
     e.save();
+  },
+
+  'err is fired on the instance when a hook errors': function () {
+    var db = start();
+    db.on('error', function(){});
+    var schema = new Schema({});
+
+    schema.pre('save', function (next) {
+      next(new Error);
+    });
+
+    var M = db.model('errFiredOnHookError', schema);
+
+    var m = new M;
+    var pending = 3;
+
+    function handleError (err) {
+      --pending || db.close();
+      err.should.be.an.instanceof(Error);
+    }
+
+    m.on('err', handleError);
+
+    m.save();
+    m.save(handleError);
+  },
+
+  'err is fired on the instance when save() errors': function () {
+    var db = start();
+    db.on('error', function(){});
+    var schema = new Schema({t: { type: String, unique: true }});
+
+    var M = db.model('errFiredOnErrorFromDb', schema);
+
+    M.remove({}, function () {
+      var m1 = new M({ t: 'a' });
+      var m2 = new M({ t: 'a' });
+
+      m1.save(function (err) {
+        should.strictEqual(null, err);
+
+        var pending = 3;
+
+        function errorHandler (err) {
+          --pending || db.close();
+          err.should.be.an.instanceof(Error);
+        }
+
+        m2.on('err', errorHandler);
+        m2.save(errorHandler);
+        m2.save();
+      });
+    });
+  },
+
+  'err is fired on the instance when remove() errors': function (beforeExit) {
+    var db = start({ server: { auto_reconnect: false }});
+    db.on('error', function(){});
+    var schema = new Schema({t: { type: String }});
+    var M = db.model('errFiredOnRemoveFromDb', schema);
+
+    db.on('open', function () {
+      M.remove({}, function () {
+        var m = new M({ t: "x" });
+
+        m.save(function (err) {
+          should.strictEqual(null, err);
+
+          var callbacks = 0;
+
+          beforeExit(function () {
+            callbacks.should.equal(2);
+          });
+
+          m.on('err', function (err) {
+            ++callbacks;
+            err.should.be.an.instanceof(Error);
+            err.message.should.eql('notConnected');
+          });
+
+          m.remove(function(err){
+            err.should.be.an.instanceof(Error);
+          });
+          m.remove();
+          db.close();
+        });
+      });
+    });
+  },
+
+  'errors in subdoc hooks emit err on parent doc': function (beforeExit) {
+    var db = start();
+    db.on('error', function(){});
+
+    var toy = new Schema({ name: String })
+
+    toy.pre('save', function (next) {
+      next(new Error('i broked'));
+    });
+
+    var box = new Schema({ toys: [toy] });
+
+    var Box = db.model('subdocErrorEmitsonParent', box);
+    var b = new Box({ toys: [{name: 'transformer'}] });
+
+    var callbacks = 0;
+    beforeExit(function () {
+      callbacks.should.equal(2);
+    });
+
+    b.on('err', function (err) {
+      ++callbacks;
+      err.should.be.an.instanceof(Error);
+      err.message.should.eql('i broked');
+      db.close();
+    });
+
+    b.save();
+    b.save(function (err) {
+      err.message.should.eql('i broked');
+    });
   },
 
   'ensureIndex error should emit on the db': function () {
@@ -4113,7 +4230,7 @@ module.exports = {
 
   },
 
-  'test standalone invalidate': function() {
+  'test standalone invalidate': function(beforeExit) {
     var db = start()
       , InvalidateSchema = null
       , Post = null
@@ -4129,6 +4246,15 @@ module.exports = {
     post = new Post();
     post.set({baz: 'val'});
     post.invalidate('baz', 'reason');
+
+    var callbacks = 0;
+    beforeExit(function () {
+      callbacks.should.equal(1);
+    });
+
+    post.on('err', function (err) {
+      ++callbacks;
+    });
 
     post.save(function(err){
       err.should.be.an.instanceof(MongooseError);
@@ -4146,7 +4272,7 @@ module.exports = {
     });
   },
 
-  'test simple validation middleware': function() {
+  'test simple validation middleware': function(beforeExit) {
     var db = start()
       , ValidationMiddlewareSchema = null
       , Post = null
@@ -4169,6 +4295,15 @@ module.exports = {
     post = new Post();
     post.set({baz: 'bad'});
 
+    var callbacks = 0;
+    beforeExit(function () {
+      callbacks.should.equal(1);
+    });
+
+    post.on('err', function (err) {
+      ++callbacks;
+    });
+
     post.save(function(err){
       err.should.be.an.instanceof(MongooseError);
       err.should.be.an.instanceof(ValidationError);
@@ -4183,7 +4318,7 @@ module.exports = {
     });
   },
 
-  'test async validation middleware': function() {
+  'test async validation middleware': function(beforeExit) {
     var db = start()
       , AsyncValidationMiddlewareSchema = null
       , Post = null
@@ -4209,6 +4344,15 @@ module.exports = {
     Post = db.model('AsyncValidationMiddleware');
     post = new Post();
     post.set({prop: 'bad'});
+
+    var callbacks = 0;
+    beforeExit(function () {
+      callbacks.should.equal(1);
+    });
+
+    post.on('err', function (err) {
+      ++callbacks;
+    });
 
     post.save(function(err){
       err.should.be.an.instanceof(MongooseError);

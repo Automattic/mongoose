@@ -53,7 +53,7 @@ Then you can `require` it:
 ## Connecting to MongoDB
 
 First, we need to define a connection. If your app uses only one database, you
-should use `mongose.connect`. If you need to create additional connections, use
+should use `mongoose.connect`. If you need to create additional connections, use
 `mongoose.createConnection`.
 
 Both `connect` and `createConnection` take a `mongodb://` URI, or the parameters

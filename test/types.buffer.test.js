@@ -25,11 +25,13 @@ var UserBuffer = new Schema({
     name: String
   , serial: Buffer
   , array: [Buffer]
-  , required: { type: Buffer, required: true }
+  , required: { type: Buffer, required: true, index: true }
   , sub: [subBuf]
 });
 
-mongoose.model('UserBuffer', UserBuffer);
+// Dont put indexed models on the default connection, it
+// breaks index.test.js tests on a "pure" default conn.
+// mongoose.model('UserBuffer', UserBuffer);
 
 /**
  * Test.
@@ -53,207 +55,213 @@ module.exports = {
     c.toString('utf8').should.equal('hello world');
   },
 
-  'test validation': function () {
+  'buffer validation': function () {
     var db = start()
-      , User = db.model('UserBuffer', 'usersbuffer_' + random());
+      , User = db.model('UserBuffer', UserBuffer, 'usersbuffer_' + random());
 
-    var t = new User({
-        name: 'test validation'
-    });
+    User.on('index', function () {
+      var t = new User({
+          name: 'test validation'
+      });
 
-    t.validate(function (err) {
-      err.message.should.eql('Validation failed');
-      err.errors.required.type.should.equal('required');
-      t.required = 20;
-      t.save(function (err) {
-        err.name.should.eql('CastError');
-        err.type.should.eql('buffer');
-        err.value.should.equal(20);
-        err.message.should.eql('Cast to buffer failed for value "20"');
-        t.required = new Buffer("hello");
-
-        t.sub.push({ name: 'Friday Friday' });
+      t.validate(function (err) {
+        err.message.should.eql('Validation failed');
+        err.errors.required.type.should.equal('required');
+        t.required = 20;
         t.save(function (err) {
-          err.message.should.eql('Validation failed');
-          err.errors.buf.type.should.equal('required');
-          t.sub[0].buf = new Buffer("well well");
+          err.name.should.eql('CastError');
+          err.type.should.eql('buffer');
+          err.value.should.equal(20);
+          err.message.should.eql('Cast to buffer failed for value "20"');
+          t.required = new Buffer("hello");
+
+          t.sub.push({ name: 'Friday Friday' });
           t.save(function (err) {
             err.message.should.eql('Validation failed');
-            err.errors.buf.type.should.equal('valid failed');
+            err.errors.buf.type.should.equal('required');
+            t.sub[0].buf = new Buffer("well well");
+            t.save(function (err) {
+              err.message.should.eql('Validation failed');
+              err.errors.buf.type.should.equal('valid failed');
 
-            t.sub[0].buf = new Buffer("well well well");
-            t.validate(function (err) {
-              db.close();
-              should.strictEqual(null, err);
+              t.sub[0].buf = new Buffer("well well well");
+              t.validate(function (err) {
+                db.close();
+                should.strictEqual(null, err);
+              });
             });
           });
         });
       });
-    });
+    })
   },
 
-  'test storage': function(){
+  'buffer storage': function(){
     var db = start()
-      , User = db.model('UserBuffer', 'usersbuffer_' + random());
+      , User = db.model('UserBuffer', UserBuffer, 'usersbuffer_' + random());
 
-    var sampleBuffer = new Buffer([123, 223, 23, 42, 11]);
+    User.on('index', function () {
+      var sampleBuffer = new Buffer([123, 223, 23, 42, 11]);
 
-    var tj = new User({
-        name: 'tj'
-      , serial: sampleBuffer
-      , required: new Buffer(sampleBuffer)
-    });
+      var tj = new User({
+          name: 'tj'
+        , serial: sampleBuffer
+        , required: new Buffer(sampleBuffer)
+      });
 
-    tj.save(function (err) {
-      should.equal(null, err);
-      User.find({}, function (err, users) {
-        db.close();
+      tj.save(function (err) {
         should.equal(null, err);
-        users.should.have.length(1);
-        var user = users[0];
-        var base64 = sampleBuffer.toString('base64');
-        should.equal(base64,
-                     user.serial.toString('base64'), 'buffer mismatch');
-        should.equal(base64,
-                     user.required.toString('base64'), 'buffer mismatch');
+        User.find({}, function (err, users) {
+          db.close();
+          should.equal(null, err);
+          users.should.have.length(1);
+          var user = users[0];
+          var base64 = sampleBuffer.toString('base64');
+          should.equal(base64,
+                       user.serial.toString('base64'), 'buffer mismatch');
+          should.equal(base64,
+                       user.required.toString('base64'), 'buffer mismatch');
+        });
       });
     });
   },
 
   'test write markModified': function(){
     var db = start()
-      , User = db.model('UserBuffer', 'usersbuffer_' + random());
+      , User = db.model('UserBuffer', UserBuffer, 'usersbuffer_' + random());
 
-    var sampleBuffer = new Buffer([123, 223, 23, 42, 11]);
+    User.on('index', function () {
+      var sampleBuffer = new Buffer([123, 223, 23, 42, 11]);
 
-    var tj = new User({
-        name: 'tj'
-      , serial: sampleBuffer
-      , required: sampleBuffer
-    });
-
-    tj.save(function (err) {
-      should.equal(null, err);
-
-      tj.serial.write('aa', 1, 'ascii');
-      tj.isModified('serial').should.be.true;
+      var tj = new User({
+          name: 'tj'
+        , serial: sampleBuffer
+        , required: sampleBuffer
+      });
 
       tj.save(function (err) {
         should.equal(null, err);
 
-        User.findById(tj._id, function (err, user) {
-          db.close();
+        tj.serial.write('aa', 1, 'ascii');
+        tj.isModified('serial').should.be.true;
+
+        tj.save(function (err) {
           should.equal(null, err);
 
-          var expectedBuffer = new Buffer([123, 97, 97, 42, 11]);
+          User.findById(tj._id, function (err, user) {
+            db.close();
+            should.equal(null, err);
 
-          should.equal(expectedBuffer.toString('base64'),
-                       user.serial.toString('base64'), 'buffer mismatch');
+            var expectedBuffer = new Buffer([123, 97, 97, 42, 11]);
 
-          tj.isModified('required').should.be.false;
-          tj.serial.copy(tj.required, 1);
-          tj.isModified('required').should.be.true;
-          should.equal('e3thYSo=', tj.required.toString('base64'));
+            should.equal(expectedBuffer.toString('base64'),
+                         user.serial.toString('base64'), 'buffer mismatch');
+
+            tj.isModified('required').should.be.false;
+            tj.serial.copy(tj.required, 1);
+            tj.isModified('required').should.be.true;
+            should.equal('e3thYSo=', tj.required.toString('base64'));
 
 
-          // buffer method tests
-          var fns = {
-              'writeUInt8': function () {
-                reset(tj);
-                tj.isModified('required').should.be.false;
-                tj.required.writeUInt8(0x3, 0, 'big');
-                tj.isModified('required').should.be.true;
-              }
-            , 'writeUInt16': function () {
-                reset(tj);
-                tj.isModified('required').should.be.false;
-                tj.required.writeUInt16(0xbeef, 0, 'little');
-                tj.isModified('required').should.be.true;
-              }
-            , 'writeUInt32': function () {
-                reset(tj);
-                tj.isModified('required').should.be.false;
-                tj.required.writeUInt32(0xfeedface, 0, 'little');
-                tj.isModified('required').should.be.true;
-              }
-            , 'writeInt8': function () {
-                reset(tj);
-                tj.isModified('required').should.be.false;
-                tj.required.writeInt8(-5, 0, 'big');
-                tj.isModified('required').should.be.true;
-              }
-            , 'writeInt16': function () {
-                reset(tj);
-                tj.isModified('required').should.be.false;
-                tj.required.writeInt16(0x0023, 2, 'little');
-                tj.isModified('required').should.be.true;
-                tj.required[2].should.eql(0x23);
-                tj.required[3].should.eql(0x00);
-              }
-            , 'writeInt32': function () {
-                reset(tj);
-                tj.isModified('required').should.be.false;
-                tj.required.writeInt32(0x23, 0, 'big');
-                tj.isModified('required').should.be.true;
-                tj.required[0].should.eql(0x00);
-                tj.required[1].should.eql(0x00);
-                tj.required[2].should.eql(0x00);
-                tj.required[3].should.eql(0x23);
-                tj.required = new Buffer(8);
-              }
-            , 'writeFloat': function () {
-                reset(tj);
-                tj.isModified('required').should.be.false;
-                tj.required.writeFloat(1.793662034335766e-43, 0, 'big');
-                tj.isModified('required').should.be.true;
-                tj.required[0].should.eql(0x00);
-                tj.required[1].should.eql(0x00);
-                tj.required[2].should.eql(0x00);
-                tj.required[3].should.eql(0x80);
-              }
-            , 'writeFloat': function () {
-                tj.required = new Buffer(16);
-
-                reset(tj);
-                tj.isModified('required').should.be.false;
-                tj.required.writeFloat(2.225073858507201e-308, 0, 'big');
-                tj.isModified('required').should.be.true;
-                tj.required[0].should.eql(0x00);
-                tj.required[1].should.eql(0x0f);
-                tj.required[2].should.eql(0xff);
-                tj.required[3].should.eql(0xff);
-                tj.required[4].should.eql(0xff);
-                tj.required[5].should.eql(0xff);
-                tj.required[6].should.eql(0xff);
-                tj.required[7].should.eql(0xff);
-              }
-            , 'fill': function () {
-                reset(tj);
-                tj.isModified('required').should.be.false;
-                tj.required.fill(0);
-                tj.isModified('required').should.be.true;
-                for (var i = 0; i < tj.required.length; i++) {
-                  tj.required[i].should.eql(0);
+            // buffer method tests
+            var fns = {
+                'writeUInt8': function () {
+                  reset(tj);
+                  tj.isModified('required').should.be.false;
+                  tj.required.writeUInt8(0x3, 0, 'big');
+                  tj.isModified('required').should.be.true;
                 }
-              }
-            , 'set': function () {
-                reset(tj);
-                tj.isModified('required').should.be.false;
-                tj.required.set(0, 1);
-                tj.isModified('required').should.be.true;
-              }
-          };
+              , 'writeUInt16': function () {
+                  reset(tj);
+                  tj.isModified('required').should.be.false;
+                  tj.required.writeUInt16(0xbeef, 0, 'little');
+                  tj.isModified('required').should.be.true;
+                }
+              , 'writeUInt32': function () {
+                  reset(tj);
+                  tj.isModified('required').should.be.false;
+                  tj.required.writeUInt32(0xfeedface, 0, 'little');
+                  tj.isModified('required').should.be.true;
+                }
+              , 'writeInt8': function () {
+                  reset(tj);
+                  tj.isModified('required').should.be.false;
+                  tj.required.writeInt8(-5, 0, 'big');
+                  tj.isModified('required').should.be.true;
+                }
+              , 'writeInt16': function () {
+                  reset(tj);
+                  tj.isModified('required').should.be.false;
+                  tj.required.writeInt16(0x0023, 2, 'little');
+                  tj.isModified('required').should.be.true;
+                  tj.required[2].should.eql(0x23);
+                  tj.required[3].should.eql(0x00);
+                }
+              , 'writeInt32': function () {
+                  reset(tj);
+                  tj.isModified('required').should.be.false;
+                  tj.required.writeInt32(0x23, 0, 'big');
+                  tj.isModified('required').should.be.true;
+                  tj.required[0].should.eql(0x00);
+                  tj.required[1].should.eql(0x00);
+                  tj.required[2].should.eql(0x00);
+                  tj.required[3].should.eql(0x23);
+                  tj.required = new Buffer(8);
+                }
+              , 'writeFloat': function () {
+                  reset(tj);
+                  tj.isModified('required').should.be.false;
+                  tj.required.writeFloat(1.793662034335766e-43, 0, 'big');
+                  tj.isModified('required').should.be.true;
+                  tj.required[0].should.eql(0x00);
+                  tj.required[1].should.eql(0x00);
+                  tj.required[2].should.eql(0x00);
+                  tj.required[3].should.eql(0x80);
+                }
+              , 'writeFloat': function () {
+                  tj.required = new Buffer(16);
 
-          var keys = Object.keys(fns)
-            , i = keys.length
-            , key
+                  reset(tj);
+                  tj.isModified('required').should.be.false;
+                  tj.required.writeFloat(2.225073858507201e-308, 0, 'big');
+                  tj.isModified('required').should.be.true;
+                  tj.required[0].should.eql(0x00);
+                  tj.required[1].should.eql(0x0f);
+                  tj.required[2].should.eql(0xff);
+                  tj.required[3].should.eql(0xff);
+                  tj.required[4].should.eql(0xff);
+                  tj.required[5].should.eql(0xff);
+                  tj.required[6].should.eql(0xff);
+                  tj.required[7].should.eql(0xff);
+                }
+              , 'fill': function () {
+                  reset(tj);
+                  tj.isModified('required').should.be.false;
+                  tj.required.fill(0);
+                  tj.isModified('required').should.be.true;
+                  for (var i = 0; i < tj.required.length; i++) {
+                    tj.required[i].should.eql(0);
+                  }
+                }
+              , 'set': function () {
+                  reset(tj);
+                  tj.isModified('required').should.be.false;
+                  tj.required.set(0, 1);
+                  tj.isModified('required').should.be.true;
+                }
+            };
 
-          while (i--) {
-            key = keys[i];
-            if (Buffer.prototype[key]) {
-              fns[key]();
+            var keys = Object.keys(fns)
+              , i = keys.length
+              , key
+
+            while (i--) {
+              key = keys[i];
+              if (Buffer.prototype[key]) {
+                fns[key]();
+              }
             }
-          }
+          });
         });
       });
     });
@@ -265,34 +273,5 @@ module.exports = {
         model._activePaths.require(path);
       });
     }
-  },
-
-  'indexes should not be supported': function () {
-    var threw = false;
-    try {
-      new Schema({ buf: { type: Buffer, index: true }});
-    } catch (err) {
-      err.message.should.eql("Buffer indexes are not supported.");
-      threw = true;
-    }
-    threw.should.be.true;
-
-    threw = false;
-    try {
-      new Schema({ buf: { type: Buffer, sparse: true }});
-    } catch (err) {
-      err.message.should.eql("Buffer indexes are not supported.");
-      threw = true;
-    }
-    threw.should.be.true;
-
-    threw = false;
-    try {
-      new Schema({ buf: { type: Buffer, unique: true }});
-    } catch (err) {
-      err.message.should.eql("Buffer indexes are not supported.");
-      threw = true;
-    }
-    threw.should.be.true;
   }
 };

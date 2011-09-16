@@ -150,9 +150,15 @@ module.exports = {
   },
 
   'collection name can be specified through schema': function () {
-    var schema = new Schema({ name: String }, { collection: 'users' });
-    var Named = mongoose.model('CollectionNamedInSchema', schema);
-    Named.prototype.collection.name.should.equal('users');
+    var schema = new Schema({ name: String }, { collection: 'users1' });
+    var Named = mongoose.model('CollectionNamedInSchema1', schema);
+    Named.prototype.collection.name.should.equal('users1');
+
+    var db = start();
+    var users2schema = new Schema({ name: String }, { collection: 'users2' });
+    var Named2 = db.model('CollectionNamedInSchema2', users2schema);
+    db.close();
+    Named2.prototype.collection.name.should.equal('users2');
   },
 
   'test default Array type casts to Mixed': function () {
@@ -2935,9 +2941,9 @@ module.exports = {
 
       BlogPost.find({}, function (err, found) {
         should.strictEqual(err, null);
-        
-        found.should.have.length(1);
-        
+
+        found.length.should.equal(1);
+
         BlogPost.remove({}, function (err) {
           should.strictEqual(!!err, false);
 
@@ -3220,7 +3226,7 @@ module.exports = {
       var query = BlogPost.find({title: 'interoperable find as promise'});
       query.exec(function (err, found) {
         should.strictEqual(err, null);
-        found.should.have.length(2);
+        found.length.should.equal(2);
         found[0]._id.should.eql(createdOne._id);
         found[1]._id.should.eql(createdTwo._id);
         db.close();
@@ -3326,7 +3332,7 @@ module.exports = {
       var promise = query.run();
       promise.addBack(function (err, found) {
         should.strictEqual(err, null);
-        found.should.have.length(2);
+        found.length.should.equal(2);
         found[0]._id.should.eql(createdOne._id);
         found[1]._id.should.eql(createdTwo._id);
         db.close();

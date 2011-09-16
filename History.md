@@ -1,4 +1,12 @@
 
+2.1.3 / 2011-09-16
+==================
+
+  * updated; version of -native driver to 0.9.6-15
+  * added; emit `error` on connection when open fails [edwardhotchkiss]
+  * added; index support to Buffers (thanks justmoon for helping track this down)
+  * fixed; passing collection name via schema in conn.model() now works (thanks vedmalex for reporting)
+
 2.1.2 / 2011-09-07
 ==================
 

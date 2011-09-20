@@ -313,7 +313,7 @@ You can find the [Dox](http://github.com/visionmedia/dox) generated API docs
 ## Getting support
 
 Please subscribe to the Google Groups [mailing
-list](http://groups.google.com/group/mongoose-orm/boxsubscribe).
+list](http://groups.google.com/group/mongoose-orm).
 
 Join #mongoosejs on freenode.
 

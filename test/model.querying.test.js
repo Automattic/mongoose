@@ -44,6 +44,7 @@ var BlogPostB = new Schema({
   , sigs      : [Buffer]
   , owners    : [ObjectId]
   , comments  : [Comments]
+  , def       : { type: String, default: 'kandinsky' }
 });
 
 mongoose.model('BlogPostB', BlogPostB);
@@ -541,6 +542,8 @@ module.exports = {
 
     post.title = 'hahaha';
     post.slug = 'woot';
+    post.meta.visitors = 53;
+    post.tags = ['humidity', 'soggy'];
 
     post.save(function (err) {
       should.strictEqual(err, null);
@@ -550,6 +553,9 @@ module.exports = {
         doc.isInit('title').should.be.true;
         doc.isInit('slug').should.be.true;
         doc.isInit('date').should.be.false;
+        doc.isInit('meta.visitors').should.be.true;
+        doc.meta.visitors.valueOf().should.equal(53);
+        doc.tags.length.should.equal(2);
         --queries || db.close();
       });
 
@@ -558,6 +564,9 @@ module.exports = {
         doc.isInit('title').should.be.true;
         doc.isInit('slug').should.be.false;
         doc.isInit('date').should.be.false;
+        doc.isInit('meta.visitors').should.be.false;
+        should.strictEqual(undefined, doc.meta.visitors);
+        should.strictEqual(undefined, doc.tags);
         --queries || db.close();
       });
 
@@ -566,14 +575,20 @@ module.exports = {
         doc.isInit('title').should.be.true;
         doc.isInit('slug').should.be.false;
         doc.isInit('date').should.be.false;
+        doc.isInit('meta.visitors').should.be.true;
+        doc.meta.visitors.valueOf().should.equal(53);
+        doc.tags.length.should.equal(2);
         --queries || db.close();
       });
 
-      BlogPostB.findById(post.get('_id'), ['title'], function (err, doc) {
+      BlogPostB.findById(post.get('_id'), { title:1 }, function (err, doc) {
         should.strictEqual(err, null);
         doc.isInit('title').should.be.true;
         doc.isInit('slug').should.be.false;
         doc.isInit('date').should.be.false;
+        doc.isInit('meta.visitors').should.be.false;
+        should.strictEqual(undefined, doc.meta.visitors);
+        should.strictEqual(undefined, doc.tags);
         --queries || db.close();
       });
 
@@ -582,6 +597,9 @@ module.exports = {
         doc.isInit('title').should.be.false;
         doc.isInit('slug').should.be.true;
         doc.isInit('date').should.be.false;
+        doc.isInit('meta.visitors').should.be.false;
+        should.strictEqual(undefined, doc.meta.visitors);
+        should.strictEqual(undefined, doc.tags);
         --queries || db.close();
       });
     });
@@ -604,27 +622,62 @@ module.exports = {
   'test find where subset of fields, excluding _id': function () {
     var db = start()
       , BlogPostB = db.model('BlogPostB', collection);
-    BlogPostB.create({title: 'subset 1'}, function (err, created) {
+    BlogPostB.create({title: 'subset 1', author: 'me'}, function (err, created) {
       should.strictEqual(err, null);
       BlogPostB.find({title: 'subset 1'}, {title: 1, _id: 0}, function (err, found) {
         should.strictEqual(err, null);
         should.strictEqual(undefined, found[0]._id);
         found[0].title.should.equal('subset 1');
+        should.strictEqual(undefined, found.def);
+        should.strictEqual(undefined, found.author);
+        should.strictEqual(false, Array.isArray(found.comments));
         db.close();
       });
     });
   },
 
-  'exluded fields that are not objects or arrays in the schema should be undefined': function () {
+  'exluded fields should be undefined': function () {
     var db = start()
-      , BlogPostB = db.model('BlogPostB', collection);
-    BlogPostB.create({title: 'subset 1'}, function (err, created) {
+      , BlogPostB = db.model('BlogPostB', collection)
+      , date = new Date
+
+    BlogPostB.create({title: 'subset 1', author: 'me', meta: { date: date }}, function (err, created) {
       should.strictEqual(err, null);
-      BlogPostB.findById(created.id, {title: 0}, function (err, found) {
+      var id = created.id;
+      BlogPostB.findById(created.id, {title: 0, 'meta.date': 0, owners: 0}, function (err, found) {
+        db.close();
         should.strictEqual(err, null);
         found._id.should.eql(created._id);
         should.strictEqual(undefined, found.title);
+        should.strictEqual('kandinsky', found.def);
+        should.strictEqual('me', found.author);
+        should.strictEqual(true, Array.isArray(found.comments));
+        should.equal(undefined, found.meta.date);
+        found.comments.length.should.equal(0);
+        should.equal(undefined, found.owners);
+      });
+    });
+  },
+
+  'exluded fields should be undefined and defaults applied to other fields': function () {
+    var db = start()
+      , BlogPostB = db.model('BlogPostB', collection)
+      , id = new DocumentObjectId
+      , date = new Date
+
+    BlogPostB.collection.insert({ _id: id, title: 'hahaha1', meta: { date: date }}, function (err) {
+      should.strictEqual(err, null);
+
+      BlogPostB.findById(id, {title: 0}, function (err, found) {
         db.close();
+        should.strictEqual(err, null);
+        found._id.should.eql(id);
+        should.strictEqual(undefined, found.title);
+        should.strictEqual('kandinsky', found.def);
+        should.strictEqual(undefined, found.author);
+        should.strictEqual(true, Array.isArray(found.comments));
+        should.equal(date.toString(), found.meta.date.toString());
+        found.comments.length.should.equal(0);
       });
     });
   },
@@ -632,7 +685,7 @@ module.exports = {
   'test for find where partial initialization': function () {
     var db = start()
       , BlogPostB = db.model('BlogPostB', collection)
-      , queries = 5;
+      , queries = 4;
 
     var post = new BlogPostB();
 
@@ -647,6 +700,7 @@ module.exports = {
         docs[0].isInit('title').should.be.true;
         docs[0].isInit('slug').should.be.true;
         docs[0].isInit('date').should.be.false;
+        should.strictEqual('kandinsky', docs[0].def);
         --queries || db.close();
       });
 
@@ -655,22 +709,16 @@ module.exports = {
         docs[0].isInit('title').should.be.true;
         docs[0].isInit('slug').should.be.false;
         docs[0].isInit('date').should.be.false;
+        should.strictEqual(undefined, docs[0].def);
         --queries || db.close();
       });
 
-      BlogPostB.find({ _id: post.get('_id') }, { slug: 0 }, function (err, docs) {
+      BlogPostB.find({ _id: post.get('_id') }, { slug: 0, def: 0 }, function (err, docs) {
         should.strictEqual(err, null);
         docs[0].isInit('title').should.be.true;
         docs[0].isInit('slug').should.be.false;
         docs[0].isInit('date').should.be.false;
-        --queries || db.close();
-      });
-
-      BlogPostB.find({ _id: post.get('_id') }, ['title'], function (err, docs) {
-        should.strictEqual(err, null);
-        docs[0].isInit('title').should.be.true;
-        docs[0].isInit('slug').should.be.false;
-        docs[0].isInit('date').should.be.false;
+        should.strictEqual(undefined, docs[0].def);
         --queries || db.close();
       });
 
@@ -679,6 +727,7 @@ module.exports = {
         docs[0].isInit('title').should.be.false;
         docs[0].isInit('slug').should.be.true;
         docs[0].isInit('date').should.be.false;
+        should.strictEqual(undefined, docs[0].def);
         --queries || db.close();
       });
     });

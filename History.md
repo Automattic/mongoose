@@ -1,4 +1,10 @@
 
+2.1.4 / 2011-09-20
+==================
+
+  * fixed; new private methods that stomped on users code
+  * changed; finished removing old "compat" support which did nothing
+
 2.1.3 / 2011-09-16
 ==================
 

@@ -570,5 +570,38 @@ module.exports = {
     doc.set('numbers.1', 2);
     doc.numbers[0].should.eql(1);
     doc.numbers[1].valueOf().should.eql(2);
+  },
+
+  'no maxListeners warning should occur': function () {
+    var db = start();
+
+    var traced = false;
+    var trace = console.trace;
+
+    console.trace = function () {
+      traced = true;
+      console.trace = trace;
+    }
+
+    var schema = new Schema({
+        title: String
+      , embed1: [new Schema({name:String})]
+      , embed2: [new Schema({name:String})]
+      , embed3: [new Schema({name:String})]
+      , embed4: [new Schema({name:String})]
+      , embed5: [new Schema({name:String})]
+      , embed6: [new Schema({name:String})]
+      , embed7: [new Schema({name:String})]
+      , embed8: [new Schema({name:String})]
+      , embed9: [new Schema({name:String})]
+      , embed10: [new Schema({name:String})]
+      , embed11: [new Schema({name:String})]
+    });
+
+    var S = db.model('noMaxListeners', schema);
+
+    var s = new S({ title: "test" });
+    db.close();
+    traced.should.be.false
   }
 };

@@ -628,9 +628,9 @@ module.exports = {
         should.strictEqual(err, null);
         should.strictEqual(undefined, found[0]._id);
         found[0].title.should.equal('subset 1');
-        should.strictEqual(undefined, found.def);
-        should.strictEqual(undefined, found.author);
-        should.strictEqual(false, Array.isArray(found.comments));
+        should.strictEqual(undefined, found[0].def);
+        should.strictEqual(undefined, found[0].author);
+        should.strictEqual(false, Array.isArray(found[0].comments));
         db.close();
       });
     });

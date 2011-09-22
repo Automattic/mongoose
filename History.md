@@ -1,4 +1,11 @@
 
+2.2.0 / 2011-09-22
+==================
+
+  * fixed; maxListeners warning on schemas with many arrays (#530)
+  * changed; return / apply defaults based on fields selected in query (#423)
+  * fixed; correctly detect Mixed types within schema arrays (#532)
+
 2.1.4 / 2011-09-20
 ==================
 

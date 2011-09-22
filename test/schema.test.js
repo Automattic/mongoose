@@ -844,6 +844,14 @@ module.exports = {
     Ferret.path('date').should.be.an.instanceof(SchemaTypes.Date);
     Ferret.path('num').should.be.an.instanceof(SchemaTypes.Number);
     Ferret.path('bool').should.be.an.instanceof(SchemaTypes.Boolean);
+  },
+
+  'array of object literal missing a `type` is interpreted as Mixed': function () {
+    var s = new Schema({
+        arr: [
+          { something: { type: String } }
+        ]
+    });
   }
 
 };

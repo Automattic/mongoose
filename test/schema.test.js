@@ -846,6 +846,16 @@ module.exports = {
     Ferret.path('bool').should.be.an.instanceof(SchemaTypes.Boolean);
   },
 
+  'schema string casts undefined to "undefined"': function () {
+    var db= require('./common')();
+    var schema = new Schema({ arr: [String] });
+    var M = db.model('castingStringArrayWithUndefined', schema);
+    M.find({ arr: { $in: [undefined] }}, function (err) {
+      db.close();
+      should.equal(err && err.message, 'Cast to string failed for value "undefined"');
+    })
+  },
+
   'array of object literal missing a `type` is interpreted as Mixed': function () {
     var s = new Schema({
         arr: [

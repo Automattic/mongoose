@@ -837,7 +837,7 @@ module.exports = {
     }
   },
 
-  'test querying via $which where a string': function () {
+  'test querying via $where a string': function () {
     var db = start()
       , BlogPostB = db.model('BlogPostB', collection);
 
@@ -853,7 +853,7 @@ module.exports = {
     });
   },
 
-  'test querying via $which where a function': function () {
+  'test querying via $where a function': function () {
     var db = start()
       , BlogPostB = db.model('BlogPostB', collection);
 

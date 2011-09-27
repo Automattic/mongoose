@@ -1,4 +1,10 @@
 
+2.2.1 / 2011-09-22
+==================
+
+  * more descript error when casting undefined to string
+  * updated; version of -native driver to 0.9.6-18
+
 2.2.0 / 2011-09-22
 ==================
 

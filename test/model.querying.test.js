@@ -1132,7 +1132,30 @@ module.exports = {
       BlogPostB.findOne({title: /^Next/}, function (err, found) {
         should.strictEqual(err, null);
         found._id.should.eql(created._id);
-        db.close();
+
+        var reg = '^Next to Normal$';
+
+        BlogPostB.find({ title: { $regex: reg }}, function (err, found) {
+          should.strictEqual(err, null);
+          found.length.should.equal(1);
+          found[0]._id.should.eql(created._id);
+
+          BlogPostB.findOne({ title: { $regex: reg }}, function (err, found) {
+            should.strictEqual(err, null);
+            found._id.should.eql(created._id);
+
+            BlogPostB.where('title').$regex(reg).findOne(function (err, found) {
+              should.strictEqual(err, null);
+              found._id.should.eql(created._id);
+
+              BlogPostB.where('title').$regex(/^Next/).findOne(function (err, found) {
+                db.close();
+                should.strictEqual(err, null);
+                found._id.should.eql(created._id);
+              });
+            });
+          });
+        });
       });
     });
   },

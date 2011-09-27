@@ -3233,6 +3233,27 @@ module.exports = {
       });
     });
   },
+  
+  'test find querying with regex operator via #run (aka #exec)': function () {
+    var db = start()
+      , BlogPost = db.model('BlogPost', collection);
+
+    BlogPost.create(
+        {title: 'interoperable find as promise'}
+      , {title: 'interoperable find as promise'}
+      , function (err, createdOne, createdTwo) {
+      should.strictEqual(err, null);
+      var query = BlogPost.find({title: { $regex: '^inter.*promise$' } });
+      query.exec(function (err, found) {
+        should.strictEqual(err, null);
+        found.length.should.equal(2);
+        found[0]._id.should.eql(createdOne._id);
+        found[1]._id.should.eql(createdTwo._id);
+        db.close();
+      });
+    });
+  },
+
 
   'test remove querying via #run (aka #exec)': function () {
     var db = start()

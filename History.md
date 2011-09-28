@@ -1,4 +1,13 @@
 
+
+2.2.2 / 2011-09-28
+==================
+
+  * added; $regex support to String [davidandrewcope]
+  * added; support for other contexts like repl etc (#535)
+  * fixed; clear modified state properly after saving
+  * added; $addToSet support to Array
+
 2.2.1 / 2011-09-22
 ==================
 

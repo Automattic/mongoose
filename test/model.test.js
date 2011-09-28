@@ -2275,6 +2275,54 @@ module.exports = {
     });
   },
 
+  'pulling an object without _id should work with DocumentArrays': function () {
+    var db = start()
+      , E = new Schema({ name: String, nest: { x: [Number] } })
+      , schema = new Schema({ arr: [E] });
+
+    var M = db.model('pullWithoutIdFromDocArray', schema);
+
+    M.create({arr: [{name: 'aaron'},{name:'heckmann', nest: { x: [4] }}]}, function (err, t) {
+      should.strictEqual(null, err);
+      t.arr.should.have.length(2);
+      t.arr.pull({ name: 'heckmann', nest: { x: [4] }});
+      t.arr.should.have.length(1);
+      t.save(function (err) {
+        should.strictEqual(null, err);
+        M.findById(t, function (err, t) {
+          db.close();
+          should.strictEqual(null, err);
+          t.arr.should.have.length(1);
+          t.arr[0].name.should.equal('aaron');
+        });
+      });
+    });
+  },
+
+  'pulling an object with _id should work with DocumentArrays': function () {
+    var db = start()
+      , E = new Schema({ name: String })
+      , schema = new Schema({ arr: [E] });
+
+    var M = db.model('pullWithIdFromDocArray', schema);
+
+    M.create({arr: [{name: 'aaron'},{name:'heckmann'}]}, function (err, t) {
+      should.strictEqual(null, err);
+      t.arr.should.have.length(2);
+      t.arr.pull({ _id: t.arr[0]._id });
+      t.arr.should.have.length(1);
+      t.save(function (err) {
+        should.strictEqual(null, err);
+        M.findById(t, function (err, t) {
+          db.close();
+          should.strictEqual(null, err);
+          t.arr.should.have.length(1);
+          t.arr[0].name.should.equal('heckmann');
+        });
+      });
+    });
+  },
+
   '$shift': function () {
     var db = start()
       , schema = new Schema({

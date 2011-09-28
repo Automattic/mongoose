@@ -145,5 +145,87 @@ module.exports = {
         });
       });
     });
+  },
+
+  '#addToSet': function () {
+    var db = start()
+      , e = new Schema({ name: String, arr: [] })
+      , schema = new Schema({
+          num: [Number]
+        , str: [String]
+        , doc: [e]
+        , date: [Date]
+        , id:  [Schema.ObjectId]
+      });
+
+    var M = db.model('testAddToSet', schema);
+    var m = new M;
+
+    m.num.push(1,2,3);
+    m.str.push('one','two','tres');
+    m.doc.push({ name: 'Dubstep', arr: [1] }, { name: 'Polka', arr: [{ x: 3 }]});
+
+    var d1 = new Date;
+    var d2 = new Date( d1 + 60000);
+    var d3 = new Date( d1 + 30000);
+    m.date.push(d1, d2);
+
+    var id1 = new mongoose.Types.ObjectId;
+    var id2 = new mongoose.Types.ObjectId;
+    var id3 = new mongoose.Types.ObjectId;
+
+    m.id.push(id1, id2);
+
+    m.num.addToSet(3,4,5);
+    m.num.length.should.equal(5);
+    m.str.$addToSet('four', 'five', 'two');
+    m.str.length.should.equal(5);
+    m.id.addToSet(id2, id3);
+    m.id.length.should.equal(3);
+    m.doc.$addToSet(m.doc[0]);
+    m.doc.length.should.equal(2);
+    m.doc.$addToSet({ name: 'Waltz', arr: [1] }, m.doc[0]);
+    m.doc.length.should.equal(3);
+    m.date.$addToSet(d1);
+    m.date.length.should.equal(2);
+    m.date.addToSet(d3);
+    m.date.length.should.equal(3);
+
+    m.save(function (err) {
+      should.strictEqual(null, err);
+      M.findById(m, function (err, m) {
+        db.close();
+        should.strictEqual(null, err);
+
+        m.num.length.should.equal(5);
+        (~m.num.indexOf(1)).should.be.ok;
+        (~m.num.indexOf(2)).should.be.ok;
+        (~m.num.indexOf(3)).should.be.ok;
+        (~m.num.indexOf(4)).should.be.ok;
+        (~m.num.indexOf(5)).should.be.ok;
+
+        m.str.length.should.equal(5);
+        (~m.str.indexOf('one')).should.be.ok;
+        (~m.str.indexOf('two')).should.be.ok;
+        (~m.str.indexOf('tres')).should.be.ok;
+        (~m.str.indexOf('four')).should.be.ok;
+        (~m.str.indexOf('five')).should.be.ok;
+
+        m.id.length.should.equal(3);
+        (~m.id.indexOf(id1)).should.be.ok;
+        (~m.id.indexOf(id2)).should.be.ok;
+        (~m.id.indexOf(id3)).should.be.ok;
+
+        m.date.length.should.equal(3);
+        (~m.date.indexOf(d1.toString())).should.be.ok;
+        (~m.date.indexOf(d2.toString())).should.be.ok;
+        (~m.date.indexOf(d3.toString())).should.be.ok;
+
+        m.doc.length.should.equal(3);
+        m.doc.some(function(v){return v.name === 'Waltz'}).should.be.ok
+        m.doc.some(function(v){return v.name === 'Dubstep'}).should.be.ok
+        m.doc.some(function(v){return v.name === 'Polka'}).should.be.ok
+      });
+    });
   }
 };

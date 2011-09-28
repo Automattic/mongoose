@@ -2252,29 +2252,6 @@ module.exports = {
     });
   },
 
-  'pull should work with arrays of Mixed': function () {
-    var db = start()
-      , schema = new Schema({ arr: [] });
-
-    var M = db.model('pullFromMixedArray', schema);
-
-    M.create({arr: [{y:1},{y:2, z: 3, a: { aa: ['hi']}}]}, function (err, t) {
-      should.strictEqual(null, err);
-      t.arr.should.have.length(2);
-      t.arr.pull({ y: 2, a: { aa: ['hi'] }});
-      t.arr.should.have.length(1);
-      t.save(function (err) {
-        should.strictEqual(null, err);
-        M.findOne(t, function (err, t) {
-          db.close();
-          should.strictEqual(null, err);
-          t.arr.should.have.length(1);
-          t.arr[0].y.should.equal(1);
-        });
-      });
-    });
-  },
-
   '$shift': function () {
     var db = start()
       , schema = new Schema({

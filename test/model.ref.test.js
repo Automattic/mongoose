@@ -22,6 +22,8 @@ var start = require('./common')
 var User = new Schema({
     name      : String
   , email     : String
+  , gender    : { type: String, enum: ['male', 'female'], default: 'male' }
+  , age       : { type: Number, default: 21 }
   , blogposts : [{ type: ObjectId, ref: 'RefBlogPost' }]
 });
 
@@ -430,6 +432,209 @@ module.exports = {
     });
   },
 
+  'test populating an array of references and filtering': function () {
+    var db = start()
+      , BlogPost = db.model('RefBlogPost', posts)
+      , User = db.model('RefUser', users);
+
+    User.create({
+        name  : 'Fan 1'
+      , email : 'fan1@learnboost.com'
+    }, function (err, fan1) {
+      should.strictEqual(err, null);
+
+      User.create({
+          name   : 'Fan 2'
+        , email  : 'fan2@learnboost.com'
+        , gender : 'female'
+      }, function (err, fan2) {
+        should.strictEqual(err, null);
+
+        User.create({
+            name   : 'Fan 3'
+          , email  : 'fan3@learnboost.com'
+          , gender : 'female'
+        }, function (err, fan3) {
+          should.strictEqual(err, null);
+
+          BlogPost.create({
+              title : 'Woot'
+            , fans  : [fan1, fan2, fan3]
+          }, function (err, post1) {
+            should.strictEqual(err, null);
+
+            BlogPost.create({
+                title : 'Woot'
+              , fans  : [fan3, fan2, fan1]
+            }, function (err, post2) {
+              should.strictEqual(err, null);
+
+              BlogPost
+                .find({ _id: { $in: [post1._id, post2._id ] } })
+                .populate('fans', { gender: 'female' })
+                .run(function (err, blogposts) {
+                  db.close();
+                  should.strictEqual(err, null);
+
+                  blogposts[0].fans[0].gender.should.equal('female');
+                  blogposts[0].fans[0].name.should.equal('Fan 2');
+                  blogposts[0].fans[0].email.should.equal('fan2@learnboost.com');
+                  blogposts[0].fans[1].gender.should.equal('female');
+                  blogposts[0].fans[1].name.should.equal('Fan 3');
+                  blogposts[0].fans[1].email.should.equal('fan3@learnboost.com');
+                  should.strictEqual(blogposts[0].fans.length, 2);
+                  should.not.exist(blogposts[0].fans[2]);
+
+                  blogposts[1].fans[0].gender.should.equal('female');
+                  blogposts[1].fans[0].name.should.equal('Fan 3');
+                  blogposts[1].fans[0].email.should.equal('fan3@learnboost.com');
+                  blogposts[1].fans[1].gender.should.equal('female');
+                  blogposts[1].fans[1].name.should.equal('Fan 2');
+                  blogposts[1].fans[1].email.should.equal('fan2@learnboost.com');
+                  should.strictEqual(blogposts[1].fans.length, 2);
+                  should.not.exist(blogposts[1].fans[2]);
+                });
+            });
+          });
+        });
+      });
+    });
+  },
+
+  'test populating an array of references and multi-filtering': function () {
+    var db = start()
+      , BlogPost = db.model('RefBlogPost', posts)
+      , User = db.model('RefUser', users);
+
+    User.create({
+        name  : 'Fan 1'
+      , email : 'fan1@learnboost.com'
+    }, function (err, fan1) {
+      should.strictEqual(err, null);
+
+      User.create({
+          name   : 'Fan 2'
+        , email  : 'fan2@learnboost.com'
+        , gender : 'female'
+      }, function (err, fan2) {
+        should.strictEqual(err, null);
+
+        User.create({
+            name   : 'Fan 3'
+          , email  : 'fan3@learnboost.com'
+          , gender : 'female'
+          , age    : 25
+        }, function (err, fan3) {
+          should.strictEqual(err, null);
+
+          BlogPost.create({
+              title : 'Woot'
+            , fans  : [fan1, fan2, fan3]
+          }, function (err, post1) {
+            should.strictEqual(err, null);
+
+            BlogPost.create({
+                title : 'Woot'
+              , fans  : [fan3, fan2, fan1]
+            }, function (err, post2) {
+              should.strictEqual(err, null);
+
+              BlogPost
+                .find({ _id: { $in: [post1._id, post2._id ] } })
+                .populate('fans', { gender: 'female', age: 25 })
+                .run(function (err, blogposts) {
+                  db.close();
+                  should.strictEqual(err, null);
+
+                  blogposts[0].fans[0].gender.should.equal('female');
+                  blogposts[0].fans[0].name.should.equal('Fan 3');
+                  blogposts[0].fans[0].email.should.equal('fan3@learnboost.com');
+                  should.equal(blogposts[0].fans[0].age, 25);
+                  should.strictEqual(blogposts[0].fans.length, 1);
+                  should.not.exist(blogposts[0].fans[1]);
+                  should.not.exist(blogposts[0].fans[2]);
+
+                  blogposts[1].fans[0].gender.should.equal('female');
+                  blogposts[1].fans[0].name.should.equal('Fan 3');
+                  blogposts[1].fans[0].email.should.equal('fan3@learnboost.com');
+                  should.equal(blogposts[1].fans[0].age, 25);
+                  should.not.exist(blogposts[1].fans[1]);
+                  should.not.exist(blogposts[1].fans[2]);
+                });
+            });
+          });
+        });
+      });
+    });
+  },
+
+  'test populating an array of references and multi-filtering with field selection': function () {
+    var db = start()
+      , BlogPost = db.model('RefBlogPost', posts)
+      , User = db.model('RefUser', users);
+
+    User.create({
+        name  : 'Fan 1'
+      , email : 'fan1@learnboost.com'
+    }, function (err, fan1) {
+      should.strictEqual(err, null);
+
+      User.create({
+          name   : 'Fan 2'
+        , email  : 'fan2@learnboost.com'
+        , gender : 'female'
+      }, function (err, fan2) {
+        should.strictEqual(err, null);
+
+        User.create({
+            name   : 'Fan 3'
+          , email  : 'fan3@learnboost.com'
+          , gender : 'female'
+          , age    : 25
+        }, function (err, fan3) {
+          should.strictEqual(err, null);
+
+          BlogPost.create({
+              title : 'Woot'
+            , fans  : [fan1, fan2, fan3]
+          }, function (err, post1) {
+            should.strictEqual(err, null);
+
+            BlogPost.create({
+                title : 'Woot'
+              , fans  : [fan3, fan2, fan1]
+            }, function (err, post2) {
+              should.strictEqual(err, null);
+
+              BlogPost
+                .find({ _id: { $in: [post1._id, post2._id ] } })
+                .populate('fans', { gender: 'female', age: 25 }, ['name'])
+                .run(function (err, blogposts) {
+                  db.close();
+                  should.strictEqual(err, null);
+
+                  blogposts[0].fans[0].name.should.equal('Fan 3');
+                  blogposts[0].fans[0].isInit('email').should.be.false;
+                  blogposts[0].fans[0].isInit('gender').should.be.false;
+                  blogposts[0].fans[0].isInit('age').should.be.false;
+                  should.strictEqual(blogposts[0].fans.length, 1);
+                  should.not.exist(blogposts[0].fans[1]);
+                  should.not.exist(blogposts[0].fans[2]);
+
+                  blogposts[1].fans[0].name.should.equal('Fan 3');
+                  blogposts[1].fans[0].isInit('email').should.be.false;
+                  blogposts[1].fans[0].isInit('gender').should.be.false;
+                  blogposts[1].fans[0].isInit('age').should.be.false;
+                  should.not.exist(blogposts[1].fans[1]);
+                  should.not.exist(blogposts[1].fans[2]);
+                });
+            });
+          });
+        });
+      });
+    });
+  },
+
   'test populating an array of refs, changing one, and removing one': function () {
     var db = start()
       , BlogPost = db.model('RefBlogPost', posts)
@@ -626,4 +831,5 @@ module.exports = {
     bp.set('_creator', new DocObjectId().toString());
     bp._creator.should.be.an.instanceof(DocObjectId);
   }
+
 };

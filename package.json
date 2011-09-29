@@ -6,7 +6,7 @@
   , "keywords": ["mongodb", "mongoose", "orm", "data", "datastore", "nosql"]
   , "dependencies": {
         "hooks": "0.1.9"
-      , "mongodb": "0.9.6-18"
+      , "mongodb": "git://github.com/christkv/node-mongodb-native.git#63aef2e228"
       , "colors": "0.5.0"
     }
   , "devDependencies": {

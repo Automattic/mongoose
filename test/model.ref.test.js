@@ -591,7 +591,7 @@ module.exports = {
   },
 
   // gh-481
-  'test populating subdocuments partially with empty array': function () {
+  'test populating subdocuments partially with empty array': function (beforeExit) {
     var db = start()
       , BlogPost = db.model('RefBlogPost', posts)
       , worked = false;
@@ -613,9 +613,49 @@ module.exports = {
       });
     });
 
-    setTimeout(function () {
+    beforeExit(function () {
       worked.should.be.true;
-    }, 1700);
+    });
+  },
+
+  'populating subdocuments with array including nulls': function () {
+    var db = start()
+      , BlogPost = db.model('RefBlogPost', posts)
+      , User = db.model('RefUser', users)
+      , worked = false
+
+    var user = new User({ name: 'hans zimmer' });
+    user.save(function (err) {
+      should.strictEqual(err, null);
+
+      var post = BlogPost.create({
+          title: 'Woot'
+        , fans: []
+      }, function (err, post) {
+        should.strictEqual(err, null);
+
+        // shove some uncasted vals
+        BlogPost.collection.update({ _id: post._id }, { $set: { fans: [null, undefined, user.id, null] } }, function (err) {
+          should.strictEqual(err, undefined);
+
+          BlogPost
+          .findById(post._id)
+          .populate('fans', ['name'])
+          .run(function (err, returned) {
+            db.close();
+            worked = true;
+            should.strictEqual(err, null);
+            returned.id.should.equal(post.id);
+            returned.fans.length.should.equal(4);
+          });
+
+          setTimeout(function () {
+            worked.should.be.true;
+          }, 1500);
+        })
+      });
+    });
+
   },
 
   'refs should cast to ObjectId from hexstrings': function () {

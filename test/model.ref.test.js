@@ -622,7 +622,6 @@ module.exports = {
     var db = start()
       , BlogPost = db.model('RefBlogPost', posts)
       , User = db.model('RefUser', users)
-      , worked = false
 
     var user = new User({ name: 'hans zimmer' });
     user.save(function (err) {
@@ -643,15 +642,10 @@ module.exports = {
           .populate('fans', ['name'])
           .run(function (err, returned) {
             db.close();
-            worked = true;
             should.strictEqual(err, null);
             returned.id.should.equal(post.id);
             returned.fans.length.should.equal(4);
           });
-
-          setTimeout(function () {
-            worked.should.be.true;
-          }, 1500);
         })
       });
     });

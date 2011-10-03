@@ -1,4 +1,8 @@
 
+2.2.4 / 2011-10-03
+==================
+
+  * fixed; populate() works when returned array contains undefined/nulls
 
 2.2.3 / 2011-09-29
 ==================

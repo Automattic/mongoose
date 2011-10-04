@@ -736,21 +736,28 @@ module.exports = {
   // GH-204
   'test query casting when finding by Date': function () {
     var db = start()
-      , BlogPostB = db.model('BlogPostB', collection);
+      , P = db.model('BlogPostB', collection);
 
-    var post = new BlogPostB();
+    var post = new P;
 
     post.meta.date = new Date();
 
     post.save(function (err) {
       should.strictEqual(err, null);
 
-      BlogPostB.findOne({ _id: post._id, 'meta.date': { $lte: Date.now() } },
-      function (err, doc) {
+      P.findOne({ _id: post._id, 'meta.date': { $lte: Date.now() } }, function (err, doc) {
         should.strictEqual(err, null);
 
         DocumentObjectId.toString(doc._id).should.eql(DocumentObjectId.toString(post._id));
-        db.close();
+        doc.meta.date = null;
+        doc.save(function (err) {
+          should.strictEqual(err, null);
+          P.findById(doc._id, function (err, doc) {
+            db.close();
+            should.strictEqual(err, null);
+            should.strictEqual(doc.meta.date, null);
+          });
+        });
       });
     });
   },

@@ -1,4 +1,10 @@
 
+2.3.0 / 2011-10-04
+==================
+
+  * fixed; nulls as default values for Boolean now works as expected
+  * updated; version of -native driver to 0.9.6-20
+
 2.2.4 / 2011-10-03
 ==================
 

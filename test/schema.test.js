@@ -471,7 +471,7 @@ module.exports = {
         isFerret: { type: Boolean, required: true }
     });
 
-    Animal.path('isFerret').cast(null).should.be.false;
+    should.strictEqual(Animal.path('isFerret').cast(null), null);
     Animal.path('isFerret').cast(undefined).should.be.false;
     Animal.path('isFerret').cast(false).should.be.false;
     Animal.path('isFerret').cast(0).should.be.false;

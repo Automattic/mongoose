@@ -96,18 +96,6 @@ module.exports = {
       , BlogPost = db.model('RefBlogPost', posts + '1')
       , User = db.model('RefUser', users + '1');
 
-    var origFind = User.findById;
-
-    // mock an error
-    User.findOne = function () {
-      var args = Array.prototype.map.call(arguments, function (arg) {
-        return 'function' == typeof arg ? function () {
-          arg(new Error('woot'));
-        } : arg;
-      });
-      return origFind.apply(this, args);
-    };
-
     User.create({
         name: 'Guillermo'
       , email: 'rauchg@gmail.com'
@@ -119,6 +107,18 @@ module.exports = {
         , _creator : creator
       }, function (err, post) {
         should.strictEqual(err, null);
+
+        var origFind = User.findOne;
+
+        // mock an error
+        User.findOne = function () {
+          var args = Array.prototype.map.call(arguments, function (arg) {
+            return 'function' == typeof arg ? function () {
+              arg(new Error('woot'));
+            } : arg;
+          });
+          return origFind.apply(this, args);
+        };
 
         BlogPost
           .findById(post._id)
@@ -157,7 +157,7 @@ module.exports = {
             should.strictEqual(err, null);
 
             post._creator.should.be.an.instanceof(User);
-            post.isInit('_name').should.be.false;
+            post._creator.isInit('name').should.be.false;
             post._creator.email.should.equal('rauchg@gmail.com');
           });
       });
@@ -368,7 +368,6 @@ module.exports = {
       , BlogPost = db.model('RefBlogPost', posts + '2')
       , User = db.model('RefUser', users + '2');
 
-
     User.create({
         name  : 'Fan 1'
       , email : 'fan1@learnboost.com'
@@ -509,30 +508,52 @@ module.exports = {
               should.strictEqual(err, null);
 
               BlogPost
+              .find({ _id: { $in: [post1._id, post2._id ] } })
+              .populate('fans', { gender: 'female', _id: { $in: [fan2] }})
+              .run(function (err, blogposts) {
+                should.strictEqual(err, null);
+
+                blogposts[0].fans.length.should.equal(3);
+                should.strictEqual(blogposts[0].fans[0], null);
+                blogposts[0].fans[1].gender.should.equal('female');
+                blogposts[0].fans[1].name.should.equal('Fan 2');
+                blogposts[0].fans[1].email.should.equal('fan2@learnboost.com');
+                should.not.exist(blogposts[0].fans[2]);
+
+                blogposts[1].fans.length.should.equal(3);
+                should.strictEqual(blogposts[1].fans[0], null);
+                blogposts[1].fans[1].gender.should.equal('female');
+                blogposts[1].fans[1].name.should.equal('Fan 2');
+                blogposts[1].fans[1].email.should.equal('fan2@learnboost.com');
+                should.strictEqual(blogposts[1].fans[2], null);
+
+                BlogPost
                 .find({ _id: { $in: [post1._id, post2._id ] } })
                 .populate('fans', { gender: 'female' })
                 .run(function (err, blogposts) {
                   db.close();
                   should.strictEqual(err, null);
 
-                  blogposts[0].fans[0].gender.should.equal('female');
-                  blogposts[0].fans[0].name.should.equal('Fan 2');
-                  blogposts[0].fans[0].email.should.equal('fan2@learnboost.com');
+                  should.strictEqual(blogposts[0].fans.length, 3);
+                  should.not.exist(blogposts[0].fans[0]);
                   blogposts[0].fans[1].gender.should.equal('female');
-                  blogposts[0].fans[1].name.should.equal('Fan 3');
-                  blogposts[0].fans[1].email.should.equal('fan3@learnboost.com');
-                  should.strictEqual(blogposts[0].fans.length, 2);
-                  should.not.exist(blogposts[0].fans[2]);
+                  blogposts[0].fans[1].name.should.equal('Fan 2');
+                  blogposts[0].fans[1].email.should.equal('fan2@learnboost.com');
+                  blogposts[0].fans[2].gender.should.equal('female');
+                  blogposts[0].fans[2].name.should.equal('Fan 3');
+                  blogposts[0].fans[2].email.should.equal('fan3@learnboost.com');
 
+                  should.strictEqual(blogposts[1].fans.length, 3);
                   blogposts[1].fans[0].gender.should.equal('female');
                   blogposts[1].fans[0].name.should.equal('Fan 3');
                   blogposts[1].fans[0].email.should.equal('fan3@learnboost.com');
                   blogposts[1].fans[1].gender.should.equal('female');
                   blogposts[1].fans[1].name.should.equal('Fan 2');
                   blogposts[1].fans[1].email.should.equal('fan2@learnboost.com');
-                  should.strictEqual(blogposts[1].fans.length, 2);
                   should.not.exist(blogposts[1].fans[2]);
                 });
+
+              });
             });
           });
         });
@@ -579,27 +600,56 @@ module.exports = {
               should.strictEqual(err, null);
 
               BlogPost
+              .find({ _id: { $in: [post1._id, post2._id ] } })
+              .populate('fans', { _id: fan3 })
+              .run(function (err, blogposts) {
+                should.strictEqual(err, null);
+
+                blogposts[0].fans.length.should.equal(3);
+                should.strictEqual(blogposts[0].fans[0], null);
+                should.strictEqual(blogposts[0].fans[1], null);
+
+                blogposts[0].fans[2].gender.should.equal('female');
+                blogposts[0].fans[2].name.should.equal('Fan 3');
+                blogposts[0].fans[2].email.should.equal('fan3@learnboost.com');
+                should.equal(blogposts[0].fans[2].age, 25);
+
+                blogposts[1].fans.length.should.equal(3);
+                should.strictEqual(blogposts[1].fans[1], null);
+                should.strictEqual(blogposts[1].fans[2], null);
+                blogposts[1].fans[0].gender.should.equal('female');
+                blogposts[1].fans[0].name.should.equal('Fan 3');
+                blogposts[1].fans[0].email.should.equal('fan3@learnboost.com');
+                should.equal(blogposts[1].fans[0].age, 25);
+
+                BlogPost
                 .find({ _id: { $in: [post1._id, post2._id ] } })
-                .populate('fans', { gender: 'female', age: 25 })
+                .populate('fans', { gender: 'female' })
                 .run(function (err, blogposts) {
                   db.close();
                   should.strictEqual(err, null);
 
-                  blogposts[0].fans[0].gender.should.equal('female');
-                  blogposts[0].fans[0].name.should.equal('Fan 3');
-                  blogposts[0].fans[0].email.should.equal('fan3@learnboost.com');
-                  should.equal(blogposts[0].fans[0].age, 25);
-                  should.strictEqual(blogposts[0].fans.length, 1);
-                  should.not.exist(blogposts[0].fans[1]);
-                  should.not.exist(blogposts[0].fans[2]);
+                  blogposts[0].fans.length.should.equal(3);
+                  should.strictEqual(null, blogposts[0].fans[0]);
+                  blogposts[0].fans[1].gender.should.equal('female');
+                  blogposts[0].fans[1].name.should.equal('Fan 2');
+                  blogposts[0].fans[1].email.should.equal('fan2@learnboost.com');
+                  blogposts[0].fans[2].gender.should.equal('female');
+                  blogposts[0].fans[2].name.should.equal('Fan 3');
+                  blogposts[0].fans[2].email.should.equal('fan3@learnboost.com');
+                  should.equal(blogposts[0].fans[2].age, 25);
 
+                  blogposts[1].fans.length.should.equal(3);
                   blogposts[1].fans[0].gender.should.equal('female');
                   blogposts[1].fans[0].name.should.equal('Fan 3');
                   blogposts[1].fans[0].email.should.equal('fan3@learnboost.com');
                   should.equal(blogposts[1].fans[0].age, 25);
-                  should.not.exist(blogposts[1].fans[1]);
-                  should.not.exist(blogposts[1].fans[2]);
+                  blogposts[1].fans[1].gender.should.equal('female');
+                  blogposts[1].fans[1].name.should.equal('Fan 2');
+                  blogposts[1].fans[1].email.should.equal('fan2@learnboost.com');
+                  should.strictEqual(null, blogposts[1].fans[2]);
                 });
+              });
             });
           });
         });
@@ -652,14 +702,15 @@ module.exports = {
                   db.close();
                   should.strictEqual(err, null);
 
-                  blogposts[0].fans[0].name.should.equal('Fan 3');
-                  blogposts[0].fans[0].isInit('email').should.be.false;
-                  blogposts[0].fans[0].isInit('gender').should.be.false;
-                  blogposts[0].fans[0].isInit('age').should.be.false;
-                  should.strictEqual(blogposts[0].fans.length, 1);
+                  should.strictEqual(blogposts[0].fans.length, 3);
+                  should.not.exist(blogposts[0].fans[0]);
                   should.not.exist(blogposts[0].fans[1]);
-                  should.not.exist(blogposts[0].fans[2]);
+                  blogposts[0].fans[2].name.should.equal('Fan 3');
+                  blogposts[0].fans[2].isInit('email').should.be.false;
+                  blogposts[0].fans[2].isInit('gender').should.be.false;
+                  blogposts[0].fans[2].isInit('age').should.be.false;
 
+                  should.strictEqual(blogposts[1].fans.length, 3);
                   blogposts[1].fans[0].name.should.equal('Fan 3');
                   blogposts[1].fans[0].isInit('email').should.be.false;
                   blogposts[1].fans[0].isInit('gender').should.be.false;
@@ -893,7 +944,6 @@ module.exports = {
         })
       });
     });
-
   },
 
   'refs should cast to ObjectId from hexstrings': function () {

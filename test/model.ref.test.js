@@ -164,6 +164,45 @@ module.exports = {
     });
   },
 
+  'populating single oid with partial field selection and filter': function () {
+    var db = start()
+      , BlogPost = db.model('RefBlogPost', posts)
+      , User = db.model('RefUser', users);
+
+    User.create({
+        name  : 'Banana'
+      , email : 'cats@example.com'
+    }, function (err, creator) {
+      should.strictEqual(err, null);
+
+      BlogPost.create({
+          title     : 'woot'
+        , _creator  : creator
+      }, function (err, post) {
+        should.strictEqual(err, null);
+
+        BlogPost
+        .findById(post._id)
+        .populate('_creator', { name: 'Peanut' }, ['email'])
+        .run(function (err, post) {
+          should.strictEqual(err, null);
+          should.strictEqual(post._creator, null);
+
+          BlogPost
+          .findById(post._id)
+          .populate('_creator', { name: 'Banana' }, ['email'])
+          .run(function (err, post) {
+            db.close();
+            should.strictEqual(err, null);
+            post._creator.should.be.an.instanceof(User);
+            post._creator.isInit('name').should.be.false;
+            post._creator.email.should.equal('cats@example.com');
+          });
+        });
+      });
+    });
+  },
+
   'test populating and changing a reference': function () {
     var db = start()
       , BlogPost = db.model('RefBlogPost', posts)

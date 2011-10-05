@@ -99,7 +99,7 @@ module.exports = {
     var origFind = User.findById;
 
     // mock an error
-    User.findById = function () {
+    User.findOne = function () {
       var args = Array.prototype.map.call(arguments, function (arg) {
         return 'function' == typeof arg ? function () {
           arg(new Error('woot'));

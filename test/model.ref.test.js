@@ -870,6 +870,50 @@ module.exports = {
     });
   },
 
+  'test populating subdocuments partially with conditions': function () {
+    var db = start()
+      , BlogPost = db.model('RefBlogPost', posts)
+      , User = db.model('RefUser', users);
+
+    User.create({
+        name  : 'User 1'
+      , email : 'user1@learnboost.com'
+    }, function (err, user1) {
+      should.strictEqual(err, null);
+
+      User.create({
+          name  : 'User 2'
+        , email : 'user2@learnboost.com'
+      }, function (err, user2) {
+        should.strictEqual(err, null);
+
+        var post = BlogPost.create({
+            title: 'Woot'
+          , comments: [
+                { _creator: user1, content: 'Woot woot' }
+              , { _creator: user2, content: 'Wha wha' }
+            ]
+        }, function (err, post) {
+          should.strictEqual(err, null);
+
+          BlogPost
+            .findById(post._id)
+            .populate('comments._creator', {'email': 1}, { name: /User/ })
+            .run(function (err, post) {
+              db.close();
+              should.strictEqual(err, null);
+
+              post.comments[0]._creator.email.should.equal('user1@learnboost.com');
+              post.comments[0]._creator.isInit('name').should.be.false;
+              post.comments[1]._creator.email.should.equal('user2@learnboost.com');
+              post.comments[1]._creator.isInit('name').should.be.false;
+            });
+        });
+      });
+    });
+  },
+
+
   // gh-481
   'test populating subdocuments partially with empty array': function (beforeExit) {
     var db = start()

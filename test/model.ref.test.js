@@ -697,7 +697,7 @@ module.exports = {
 
               BlogPost
                 .find({ _id: { $in: [post1._id, post2._id ] } })
-                .populate('fans', { gender: 'female', age: 25 }, ['name'])
+                .populate('fans', { gender: 'female', age: 25 }, 'name email')
                 .run(function (err, blogposts) {
                   db.close();
                   should.strictEqual(err, null);
@@ -706,13 +706,15 @@ module.exports = {
                   should.not.exist(blogposts[0].fans[0]);
                   should.not.exist(blogposts[0].fans[1]);
                   blogposts[0].fans[2].name.should.equal('Fan 3');
-                  blogposts[0].fans[2].isInit('email').should.be.false;
+                  blogposts[0].fans[2].email.should.equal('fan3@learnboost.com');
+                  blogposts[0].fans[2].isInit('email').should.be.true;
                   blogposts[0].fans[2].isInit('gender').should.be.false;
                   blogposts[0].fans[2].isInit('age').should.be.false;
 
                   should.strictEqual(blogposts[1].fans.length, 3);
                   blogposts[1].fans[0].name.should.equal('Fan 3');
-                  blogposts[1].fans[0].isInit('email').should.be.false;
+                  blogposts[1].fans[0].email.should.equal('fan3@learnboost.com');
+                  blogposts[1].fans[0].isInit('email').should.be.true;
                   blogposts[1].fans[0].isInit('gender').should.be.false;
                   blogposts[1].fans[0].isInit('age').should.be.false;
                   should.not.exist(blogposts[1].fans[1]);

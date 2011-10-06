@@ -605,7 +605,7 @@ module.exports = {
     });
   },
 
-  'test findOne where subset of fields, excluding _id': function () {
+  'findOne where subset of fields excludes _id': function () {
     var db = start()
       , BlogPostB = db.model('BlogPostB', collection);
     BlogPostB.create({title: 'subset 1'}, function (err, created) {

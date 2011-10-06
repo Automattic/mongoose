@@ -183,14 +183,14 @@ module.exports = {
 
         BlogPost
         .findById(post._id)
-        .populate('_creator', { name: 'Peanut' }, ['email'])
+        .populate('_creator', 'email', { name: 'Peanut' })
         .run(function (err, post) {
           should.strictEqual(err, null);
           should.strictEqual(post._creator, null);
 
           BlogPost
           .findById(post._id)
-          .populate('_creator', { name: 'Banana' }, ['email'])
+          .populate('_creator', 'email', { name: 'Banana' })
           .run(function (err, post) {
             db.close();
             should.strictEqual(err, null);
@@ -275,37 +275,37 @@ module.exports = {
         should.strictEqual(err, null);
 
         BlogPost
-          .findById(post._id)
-          .populate('_creator', ['name'])
-          .run(function (err, post) {
+        .findById(post._id)
+        .populate('_creator', {'name': 1})
+        .run(function (err, post) {
+          should.strictEqual(err, null);
+
+          post._creator.should.be.an.instanceof(User);
+          post._creator.name.should.equal('Guillermo');
+
+          User.create({
+              name  : 'Aaron'
+            , email : 'aaron@learnboost.com'
+          }, function (err, newCreator) {
             should.strictEqual(err, null);
 
-            post._creator.should.be.an.instanceof(User);
-            post._creator.name.should.equal('Guillermo');
-
-            User.create({
-                name  : 'Aaron'
-              , email : 'aaron@learnboost.com'
-            }, function (err, newCreator) {
+            post._creator = newCreator._id;
+            post.save(function (err) {
               should.strictEqual(err, null);
 
-              post._creator = newCreator._id;
-              post.save(function (err) {
+              BlogPost
+              .findById(post._id)
+              .populate('_creator', {email: 0})
+              .run(function (err, post) {
+                db.close();
                 should.strictEqual(err, null);
 
-                BlogPost
-                  .findById(post._id)
-                  .populate('_creator')
-                  .run(function (err, post) {
-                    db.close();
-                    should.strictEqual(err, null);
-
-                    post._creator.name.should.equal('Aaron');
-                    post._creator.email.should.equal('aaron@learnboost.com');
-                  });
+                post._creator.name.should.equal('Aaron');
+                should.not.exist(post._creator.email);
               });
             });
           });
+        });
       });
     });
   },
@@ -448,7 +448,7 @@ module.exports = {
 
             BlogPost
             .find({ _id: { $in: [post1._id, post2._id ] } })
-            .populate('fans', ['name'])
+            .populate('fans', 'name')
             .run(function (err, blogposts) {
               db.close();
               should.strictEqual(err, null);
@@ -509,7 +509,7 @@ module.exports = {
 
               BlogPost
               .find({ _id: { $in: [post1._id, post2._id ] } })
-              .populate('fans', { gender: 'female', _id: { $in: [fan2] }})
+              .populate('fans', '', { gender: 'female', _id: { $in: [fan2] }})
               .run(function (err, blogposts) {
                 should.strictEqual(err, null);
 
@@ -529,7 +529,7 @@ module.exports = {
 
                 BlogPost
                 .find({ _id: { $in: [post1._id, post2._id ] } })
-                .populate('fans', { gender: 'female' })
+                .populate('fans', false, { gender: 'female' })
                 .run(function (err, blogposts) {
                   db.close();
                   should.strictEqual(err, null);
@@ -601,7 +601,7 @@ module.exports = {
 
               BlogPost
               .find({ _id: { $in: [post1._id, post2._id ] } })
-              .populate('fans', { _id: fan3 })
+              .populate('fans', undefined, { _id: fan3 })
               .run(function (err, blogposts) {
                 should.strictEqual(err, null);
 
@@ -624,7 +624,7 @@ module.exports = {
 
                 BlogPost
                 .find({ _id: { $in: [post1._id, post2._id ] } })
-                .populate('fans', { gender: 'female' })
+                .populate('fans', 0, { gender: 'female' })
                 .run(function (err, blogposts) {
                   db.close();
                   should.strictEqual(err, null);
@@ -697,7 +697,7 @@ module.exports = {
 
               BlogPost
                 .find({ _id: { $in: [post1._id, post2._id ] } })
-                .populate('fans', { gender: 'female', age: 25 }, 'name email')
+                .populate('fans', 'name email', { gender: 'female', age: 25 })
                 .run(function (err, blogposts) {
                   db.close();
                   should.strictEqual(err, null);

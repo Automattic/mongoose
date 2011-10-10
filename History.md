@@ -1,4 +1,12 @@
 
+2.3.1 / 2011-10-10
+==================
+
+  * added; support for Query filters to populate()
+  * fixed; querying with number no longer crashes mongodb (#555) [jlbyrey]
+  * updated; version of -native driver to 0.9.6-21
+  * fixed; prevent query callbacks that throw errors from corrupting -native connection state
+
 2.3.0 / 2011-10-04
 ==================
 

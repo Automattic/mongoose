@@ -1,4 +1,9 @@
 
+2.3.2 / 2011-10-11
+==================
+
+  * fixed; population of null subdoc properties no longer hangs (#561)
+
 2.3.1 / 2011-10-10
 ==================
 

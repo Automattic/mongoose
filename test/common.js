@@ -5,7 +5,7 @@
 
 var mongoose = require('../')
   , should = require('should')
-  , Table = require('cli-table')
+  , Table = require('../support/cli-table')
   , Mongoose = mongoose.Mongoose
   , Collection = mongoose.Collection
   , Assertion = should.Assertion

@@ -1090,7 +1090,7 @@ module.exports = {
           p1.comments.length.should.equal(2);
           p2.comments.length.should.equal(2);
           should.exist(p1.comments[0]._creator.email);
-          should.exist(p2.comments[0]._creator.email);
+          should.not.exist(p2.comments[0]._creator);
           p1.comments[0]._creator.email.should.equal('fan1@learnboost.com');
           p2.comments[1]._creator.email.should.equal('fan1@learnboost.com');
           p1.comments[0]._creator.isInit('name').should.be.false;
@@ -1100,7 +1100,7 @@ module.exports = {
           should.not.exist(p1.comments[1]._creator);
           should.not.exist(p2.comments[0]._creator);
           p1.comments[1].content.should.equal('chickfila');
-          p1.comments[0].content.should.equal('hello');
+          p2.comments[0].content.should.equal('hello');
         });
       });
     });

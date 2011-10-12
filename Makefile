@@ -3,10 +3,6 @@ TESTS = $(shell find test/ -name '*.test.js')
 
 test:
 	@NODE_ENV=test ./support/expresso/bin/expresso \
-		-I lib \
-		-I support \
-		-I support/should.js/lib \
-		-I support/cli-table/lib \
 		$(TESTFLAGS) \
 		$(TESTS)
 

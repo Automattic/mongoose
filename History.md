@@ -1,4 +1,10 @@
 
+2.3.3 / 2011-10-12
+==================
+
+  * fixed; population conditions in multi-query settings [vedmalex] (#563)
+  * fixed; now compatible with Node v0.5.x
+
 2.3.2 / 2011-10-11
 ==================
 

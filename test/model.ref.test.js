@@ -1033,6 +1033,59 @@ module.exports = {
     });
   },
 
+  'populating more than one array at a time': function () {
+    var db = start()
+      , BlogPost = db.model('RefBlogPost', posts)
+      , User = db.model('RefUser', users)
+
+    User.create({
+        email : 'fan1@learnboost.com'
+    }, function (err, fan1) {
+      should.strictEqual(err, null);
+
+      User.create({
+          name   : 'Fan 2'
+        , email  : 'fan2@learnboost.com'
+        , gender : 'female'
+      }, function (err, fan2) {
+        should.strictEqual(err, null);
+
+        BlogPost.create({
+            title : 'Woot'
+          , fans  : [fan1, fan2]
+          , comments: [
+                { _creator: fan1, content: 'bejeah!' }
+              , { _creator: fan2, content: 'chickfila' }
+            ]
+        }, function (err, post1) {
+          should.strictEqual(err, null);
+
+          BlogPost
+          .findById(post1._id)
+          .populate('comments._creator', ['email'], { name: null })
+          .populate('fans', 'name', { gender: 'female' })
+          .run(function (err, p) {
+            db.close();
+            should.strictEqual(err, null);
+
+            should.exist(p);
+            should.strictEqual(p.fans.length, 1);
+            p.fans[0].name.should.equal('Fan 2');
+            p.fans[0].isInit('email').should.be.false;
+            p.fans[0].isInit('gender').should.be.false;
+            p.comments.length.should.equal(2);
+            should.exist(p.comments[0]._creator.email);
+            p.comments[0]._creator.email.should.equal('fan1@learnboost.com');
+            p.comments[0]._creator.isInit('name').should.be.false;
+            p.comments[0].content.should.equal('bejeah!');
+            should.not.exist(p.comments[1]._creator);
+            p.comments[1].content.should.equal('chickfila');
+          });
+        });
+      });
+    });
+  },
+
   'refs should cast to ObjectId from hexstrings': function () {
     var BP = mongoose.model('RefBlogPost', BlogPost);
     var bp = new BP;

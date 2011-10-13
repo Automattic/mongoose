@@ -4326,6 +4326,44 @@ module.exports = {
     });
   },
 
+  'Model.create can accept an array': function () {
+    var db = start()
+      , BlogPost = db.model('BlogPost', collection);
+
+    BlogPost.create([{ title: 'hi'}, { title: 'bye'}], function (err, post1, post2) {
+      db.close();
+      should.strictEqual(err, null);
+      post1.get('_id').should.be.an.instanceof(DocumentObjectId);
+      post2.get('_id').should.be.an.instanceof(DocumentObjectId);
+
+      post1.title.should.equal('hi');
+      post2.title.should.equal('bye');
+    });
+  },
+
+  'Model.create when passed no docs still fires callback': function () {
+    var db = start()
+      , BlogPost = db.model('BlogPost', collection);
+
+    BlogPost.create(function (err, a) {
+      db.close();
+      should.strictEqual(err, null);
+      should.not.exist(a);
+    });
+  },
+
+  'Model.create fires callback when an empty array is passed': function () {
+    var db = start()
+      , BlogPost = db.model('BlogPost', collection);
+
+    BlogPost.create([], function (err, a) {
+      db.close();
+      should.strictEqual(err, null);
+      should.not.exist(a);
+    });
+  },
+
+
   'date casting test (gh-502)': function () {
     var db = start()
 

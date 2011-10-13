@@ -103,6 +103,30 @@ module.exports = {
     var a = new MongooseDocumentArray([sub3]);
     a.id(id3).title.should.equal('rock-n-roll');
     a.id(sub3._id).title.should.equal('rock-n-roll');
+  },
+
+  'inspect works with bad data': function () {
+    var threw = false;
+    var a = new MongooseDocumentArray([null]);
+    try {
+      a.inspect();
+    } catch (err) {
+      threw = true;
+      console.error(err.stack);
+    }
+    threw.should.be.false;
+  },
+
+  'toObject works with bad data': function () {
+    var threw = false;
+    var a = new MongooseDocumentArray([null]);
+    try {
+      a.toObject();
+    } catch (err) {
+      threw = true;
+      console.error(err.stack);
+    }
+    threw.should.be.false;
   }
 
 };

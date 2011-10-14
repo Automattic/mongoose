@@ -147,6 +147,87 @@ module.exports = {
     });
   },
 
+  '#unshift': function () {
+    var db = start()
+      , schema = new Schema({
+            types: [new Schema({ type: String })]
+          , nums: [Number]
+          , strs: [String]
+        })
+      , A = db.model('unshift', schema, 'unshift'+random());
+
+    var a = new A({
+        types: [{type:'bird'},{type:'boy'},{type:'frog'},{type:'cloud'}]
+      , nums: [1,2,3]
+      , strs: 'one two three'.split(' ')
+    });
+
+    a.save(function (err) {
+      should.equal(null, err);
+      A.findById(a._id, function (err, doc) {
+        should.equal(null, err);
+
+        var tlen = doc.types.unshift({type:'tree'});
+        var nlen = doc.nums.unshift(0);
+        var slen = doc.strs.unshift('zero');
+
+        tlen.should.equal(5);
+        nlen.should.equal(4);
+        slen.should.equal(4);
+
+        var obj = doc.types.toObject();
+        obj[0].type.should.eql('tree');
+        obj[1].type.should.eql('bird');
+        obj[2].type.should.eql('boy');
+        obj[3].type.should.eql('frog');
+        obj[4].type.should.eql('cloud');
+
+        obj = doc.nums.toObject();
+        obj[0].valueOf().should.equal(0);
+        obj[1].valueOf().should.equal(1);
+        obj[2].valueOf().should.equal(2);
+        obj[3].valueOf().should.equal(3);
+
+        obj = doc.strs.toObject();
+        obj[0].should.equal('zero');
+        obj[1].should.equal('one');
+        obj[2].should.equal('two');
+        obj[3].should.equal('three');
+
+        doc.save(function (err) {
+          should.equal(null, err);
+          A.findById(a._id, function (err, doc) {
+            should.equal(null, err);
+
+            var obj = doc.types.toObject();
+            obj[0].type.should.eql('tree');
+            obj[1].type.should.eql('bird');
+            obj[2].type.should.eql('boy');
+            obj[3].type.should.eql('frog');
+            obj[4].type.should.eql('cloud');
+
+            obj = doc.nums.toObject();
+            obj[0].valueOf().should.equal(0);
+            obj[1].valueOf().should.equal(1);
+            obj[2].valueOf().should.equal(2);
+            obj[3].valueOf().should.equal(3);
+
+            obj = doc.strs.toObject();
+            obj[0].should.equal('zero');
+            obj[1].should.equal('one');
+            obj[2].should.equal('two');
+            obj[3].should.equal('three');
+
+            A.collection.drop(function (err) {
+              db.close();
+              should.strictEqual(err, null);
+            });
+          });
+        });
+      });
+    });
+  },
+
   '#addToSet': function () {
     var db = start()
       , e = new Schema({ name: String, arr: [] })

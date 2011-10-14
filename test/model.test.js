@@ -3145,17 +3145,49 @@ module.exports = {
   },
 
   'pre hooks called on all sub levels': function () {
+    var db = start();
+    var grandSchema = new Schema({ name : String });
+    grandSchema.pre('save', function (next) {
+      this.name = 'grand';
+        next();
+      });
+    var childSchema = new Schema({ name : String, grand : [grandSchema]});
+    childSchema.pre('save', function (next) {
+      this.name = 'child';
+        next();
+    });
+    var schema = new Schema({ name: String, child : [childSchema] });
+
+    schema.pre('save', function (next) {
+      this.name = 'parent';
+      next(); 
+    });
+
+    var S = db.model('presave_hook', schema, 'presave_hook');
+    var s = new S({ name : 'a' , child : [ { name : 'b', grand : [{ name : 'c'}] } ]});
+
+    s.save(function (err, doc) {
+      db.close();
+      should.strictEqual(null, err);
+      doc.name.should.eql('parent');
+      doc.name.child[0].name.should.eql('child');
+      doc.name.child[0].grand[0].name.should.eql('grand');
+        
+    });
+
+  },
+
+  'pre hooks error on all sub levels': function () {
       var db = start();
       var grandSchema = new Schema({ name : String });
       grandSchema.pre('save', function (next) {
-          this.name = 'grand';
-          next();
-        });
+        next(new Error('Error 101'));
+      });
       var childSchema = new Schema({ name : String, grand : [grandSchema]});
       childSchema.pre('save', function (next) {
-          this.name = 'child';
-          next();
-        });
+        this.name = 'child';
+        next();
+      });
       var schema = new Schema({ name: String, child : [childSchema] });
 
       schema.pre('save', function (next) {
@@ -3163,21 +3195,18 @@ module.exports = {
         next(); 
       });
 
-      var S = db.model('presave_hook', schema, 'presave_hook');
+      var S = db.model('presave_hook_error', schema, 'presave_hook_error');
       var s = new S({ name : 'a' , child : [ { name : 'b', grand : [{ name : 'c'}] } ]});
 
       s.save(function (err, doc) {
         db.close();
-        should.strictEqual(null, err);
-        doc.name.should.eql('parent');
-        doc.name.child[0].name.should.eql('child');
-        doc.name.child[0].grand[0].name.should.eql('grand');
-        
+        err.should.be.an.instanceof(Error);
+        err.message.should.eql('Error 101');
       });
 
     },
-
-    'test post hooks': function () {
+      
+  'test post hooks': function () {
     var schema = new Schema({
             title: String
         })

@@ -3146,21 +3146,24 @@ module.exports = {
 
   'pre hooks called on all sub levels': function () {
     var db = start();
+
     var grandSchema = new Schema({ name : String });
     grandSchema.pre('save', function (next) {
       this.name = 'grand';
-        next();
-      });
+      next();
+    });
+
     var childSchema = new Schema({ name : String, grand : [grandSchema]});
     childSchema.pre('save', function (next) {
       this.name = 'child';
-        next();
+      next();
     });
+
     var schema = new Schema({ name: String, child : [childSchema] });
 
     schema.pre('save', function (next) {
       this.name = 'parent';
-      next(); 
+      next();
     });
 
     var S = db.model('presave_hook', schema, 'presave_hook');
@@ -3172,40 +3175,39 @@ module.exports = {
       doc.name.should.eql('parent');
       doc.name.child[0].name.should.eql('child');
       doc.name.child[0].grand[0].name.should.eql('grand');
-        
     });
-
   },
 
   'pre hooks error on all sub levels': function () {
-      var db = start();
-      var grandSchema = new Schema({ name : String });
-      grandSchema.pre('save', function (next) {
-        next(new Error('Error 101'));
-      });
-      var childSchema = new Schema({ name : String, grand : [grandSchema]});
-      childSchema.pre('save', function (next) {
-        this.name = 'child';
-        next();
-      });
-      var schema = new Schema({ name: String, child : [childSchema] });
+    var db = start();
 
-      schema.pre('save', function (next) {
-        this.name = 'parent';
-        next(); 
-      });
+    var grandSchema = new Schema({ name : String });
+    grandSchema.pre('save', function (next) {
+      next(new Error('Error 101'));
+    });
 
-      var S = db.model('presave_hook_error', schema, 'presave_hook_error');
-      var s = new S({ name : 'a' , child : [ { name : 'b', grand : [{ name : 'c'}] } ]});
+    var childSchema = new Schema({ name : String, grand : [grandSchema]});
+    childSchema.pre('save', function (next) {
+      this.name = 'child';
+      next();
+    });
 
-      s.save(function (err, doc) {
-        db.close();
-        err.should.be.an.instanceof(Error);
-        err.message.should.eql('Error 101');
-      });
+    var schema = new Schema({ name: String, child : [childSchema] });
+    schema.pre('save', function (next) {
+      this.name = 'parent';
+      next();
+    });
 
-    },
-      
+    var S = db.model('presave_hook_error', schema, 'presave_hook_error');
+    var s = new S({ name : 'a' , child : [ { name : 'b', grand : [{ name : 'c'}] } ]});
+
+    s.save(function (err, doc) {
+      db.close();
+      err.should.be.an.instanceof(Error);
+      err.message.should.eql('Error 101');
+    });
+  },
+
   'test post hooks': function () {
     var schema = new Schema({
             title: String

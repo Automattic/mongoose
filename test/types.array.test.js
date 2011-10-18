@@ -249,11 +249,13 @@ module.exports = {
     var d1 = new Date;
     var d2 = new Date( d1 + 60000);
     var d3 = new Date( d1 + 30000);
+    var d4 = new Date( d1 + 20000);
     m.date.push(d1, d2);
 
     var id1 = new mongoose.Types.ObjectId;
     var id2 = new mongoose.Types.ObjectId;
     var id3 = new mongoose.Types.ObjectId;
+    var id4 = new mongoose.Types.ObjectId;
 
     m.id.push(id1, id2);
 
@@ -306,6 +308,19 @@ module.exports = {
         m.doc.some(function(v){return v.name === 'Waltz'}).should.be.ok
         m.doc.some(function(v){return v.name === 'Dubstep'}).should.be.ok
         m.doc.some(function(v){return v.name === 'Polka'}).should.be.ok
+
+        //
+        m.num.addToSet(3,4,5,6);
+        m.num.length.should.equal(6);
+        m.str.$addToSet('four', 'five', 'two', 'six');
+        m.str.length.should.equal(6);
+        m.id.addToSet(id2, id3, id4);
+        m.id.length.should.equal(4);
+        m.doc.$addToSet(m.doc[0], { name: '8bit' });
+        m.doc.length.should.equal(4);
+        m.date.$addToSet(d1, d3, d4);
+        m.date.length.should.equal(3);
+
       });
     });
   }

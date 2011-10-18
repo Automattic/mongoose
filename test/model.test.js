@@ -1687,7 +1687,7 @@ module.exports = {
           , 'mixed': { x: 'ECKS', y: 'why' } // $set
           , $pullAll: { 'numbers': [4, 6] }
           , $pull: { 'owners': id0 }
-          , 'comments.1.body': 8
+          , 'comments.1.body': 8 // $set
         }
 
         BlogPost.update({ title: title }, update, function (err) {

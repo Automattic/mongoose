@@ -247,9 +247,9 @@ module.exports = {
     m.doc.push({ name: 'Dubstep', arr: [1] }, { name: 'Polka', arr: [{ x: 3 }]});
 
     var d1 = new Date;
-    var d2 = new Date( d1 + 60000);
-    var d3 = new Date( d1 + 30000);
-    var d4 = new Date( d1 + 20000);
+    var d2 = new Date( +d1 + 60000);
+    var d3 = new Date( +d1 + 30000);
+    var d4 = new Date( +d1 + 20000);
     m.date.push(d1, d2);
 
     var id1 = new mongoose.Types.ObjectId;
@@ -269,6 +269,7 @@ module.exports = {
     m.doc.length.should.equal(2);
     m.doc.$addToSet({ name: 'Waltz', arr: [1] }, m.doc[0]);
     m.doc.length.should.equal(3);
+    m.date.length.should.equal(2);
     m.date.$addToSet(d1);
     m.date.length.should.equal(2);
     m.date.addToSet(d3);
@@ -316,13 +317,13 @@ module.exports = {
         m.id.addToSet(id2, id3, id4);
         m.id.length.should.equal(4);
 
+        m.date.$addToSet(d1, d3, d4);
+        m.date.length.should.equal(4);
+
         m.doc.$addToSet(m.doc[0], { name: '8bit' });
         m.doc.length.should.equal(4);
         m.doc.$addToSet({ name: 'Waltz', arr: [1] }, m.doc[0]);
         m.doc.length.should.equal(4);
-
-        m.date.$addToSet(d1, d3, d4);
-        m.date.length.should.equal(4);
 
         m.save(function (err) {
           should.strictEqual(null, err);

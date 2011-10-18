@@ -3,9 +3,10 @@
  * Module dependencies.
  */
 
-require('./common');
-
-var utils = require('../lib/utils')
+var start = require('./common')
+  , mongoose = start.mongoose
+  , Schema = mongoose.Schema
+  , utils = require('../lib/utils')
   , StateMachine = require('../lib/statemachine')
   , ObjectId = require('../lib/types/objectid')
 
@@ -32,7 +33,7 @@ module.exports = {
     ar.init('hello');
     ar.stateOf('hello').should.equal('init');
   },
-  
+
   'should detect a path as modified': function () {
     var ar = new ActiveRoster();
     ar.modify('hello');
@@ -46,7 +47,6 @@ module.exports = {
     ar.states.init.should.not.have.property('hello');
     ar.states.modify.should.have.property('hello');
   },
-
 
   'forEach should be able to iterate through the paths belonging to one state': function () {
     var ar = new ActiveRoster();
@@ -147,6 +147,25 @@ module.exports = {
     utils.deepEqual(a, b).should.be.true;
     utils.deepEqual(a, a).should.be.true;
     utils.deepEqual(a, new ObjectId).should.be.false;
+  },
+
+  'deepEquals on MongooseDocumentArray works': function () {
+    var db = start()
+      , A = new Schema({ a: String })
+      , M = db.model('deepEqualsOnMongooseDocArray', new Schema({
+            a1: [A]
+          , a2: [A]
+        }));
+
+    db.close();
+
+    var m = new M({
+        a1: [{a: 'Hi'}, {a: 'Bye'}]
+    });
+
+    m.a2 = m.a1;
+
+    utils.deepEqual(m.a1, m.a2).should.be.true;
   }
 
 };

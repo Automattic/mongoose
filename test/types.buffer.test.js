@@ -162,7 +162,6 @@ module.exports = {
             tj.isModified('required').should.be.true;
             should.equal('e3thYSo=', tj.required.toString('base64'));
 
-
             // buffer method tests
             var fns = {
                 'writeUInt8': function () {
@@ -177,10 +176,34 @@ module.exports = {
                   tj.required.writeUInt16(0xbeef, 0, 'little');
                   tj.isModified('required').should.be.true;
                 }
+              , 'writeUInt16LE': function () {
+                  reset(tj);
+                  tj.isModified('required').should.be.false;
+                  tj.required.writeUInt16LE(0xbeef, 0);
+                  tj.isModified('required').should.be.true;
+                }
+              , 'writeUInt16BE': function () {
+                  reset(tj);
+                  tj.isModified('required').should.be.false;
+                  tj.required.writeUInt16BE(0xbeef, 0);
+                  tj.isModified('required').should.be.true;
+                }
               , 'writeUInt32': function () {
                   reset(tj);
                   tj.isModified('required').should.be.false;
                   tj.required.writeUInt32(0xfeedface, 0, 'little');
+                  tj.isModified('required').should.be.true;
+                }
+              , 'writeUInt32LE': function () {
+                  reset(tj);
+                  tj.isModified('required').should.be.false;
+                  tj.required.writeUInt32LE(0xfeedface, 0);
+                  tj.isModified('required').should.be.true;
+                }
+              , 'writeUInt32BE': function () {
+                  reset(tj);
+                  tj.isModified('required').should.be.false;
+                  tj.required.writeUInt32BE(0xfeedface, 0);
                   tj.isModified('required').should.be.true;
                 }
               , 'writeInt8': function () {
@@ -197,6 +220,20 @@ module.exports = {
                   tj.required[2].should.eql(0x23);
                   tj.required[3].should.eql(0x00);
                 }
+              , 'writeInt16LE': function () {
+                  reset(tj);
+                  tj.isModified('required').should.be.false;
+                  tj.required.writeInt16LE(0x0023, 2);
+                  tj.isModified('required').should.be.true;
+                  tj.required[2].should.eql(0x23);
+                  tj.required[3].should.eql(0x00);
+                }
+              , 'writeInt16BE': function () {
+                  reset(tj);
+                  tj.isModified('required').should.be.false;
+                  tj.required.writeInt16BE(0x0023, 2);
+                  tj.isModified('required').should.be.true;
+                }
               , 'writeInt32': function () {
                   reset(tj);
                   tj.isModified('required').should.be.false;
@@ -208,19 +245,26 @@ module.exports = {
                   tj.required[3].should.eql(0x23);
                   tj.required = new Buffer(8);
                 }
-              , 'writeFloat': function () {
+              , 'writeInt32LE': function () {
+                  tj.required = new Buffer(8);
                   reset(tj);
                   tj.isModified('required').should.be.false;
-                  tj.required.writeFloat(1.793662034335766e-43, 0, 'big');
+                  tj.required.writeInt32LE(0x23, 0);
+                  tj.isModified('required').should.be.true;
+                }
+              , 'writeInt32BE': function () {
+                  tj.required = new Buffer(8);
+                  reset(tj);
+                  tj.isModified('required').should.be.false;
+                  tj.required.writeInt32BE(0x23, 0);
                   tj.isModified('required').should.be.true;
                   tj.required[0].should.eql(0x00);
                   tj.required[1].should.eql(0x00);
                   tj.required[2].should.eql(0x00);
-                  tj.required[3].should.eql(0x80);
+                  tj.required[3].should.eql(0x23);
                 }
               , 'writeFloat': function () {
                   tj.required = new Buffer(16);
-
                   reset(tj);
                   tj.isModified('required').should.be.false;
                   tj.required.writeFloat(2.225073858507201e-308, 0, 'big');
@@ -234,7 +278,36 @@ module.exports = {
                   tj.required[6].should.eql(0xff);
                   tj.required[7].should.eql(0xff);
                 }
+              , 'writeFloatLE': function () {
+                  tj.required = new Buffer(16);
+                  reset(tj);
+                  tj.isModified('required').should.be.false;
+                  tj.required.writeFloatLE(2.225073858507201e-308, 0);
+                  tj.isModified('required').should.be.true;
+                }
+              , 'writeFloatBE': function () {
+                  tj.required = new Buffer(16);
+                  reset(tj);
+                  tj.isModified('required').should.be.false;
+                  tj.required.writeFloatBE(2.225073858507201e-308, 0);
+                  tj.isModified('required').should.be.true;
+                }
+              , 'writeDoubleLE': function () {
+                  tj.required = new Buffer(8);
+                  reset(tj);
+                  tj.isModified('required').should.be.false;
+                  tj.required.writeDoubleLE(0xdeadbeefcafebabe, 0);
+                  tj.isModified('required').should.be.true;
+                }
+              , 'writeDoubleBE': function () {
+                  tj.required = new Buffer(8);
+                  reset(tj);
+                  tj.isModified('required').should.be.false;
+                  tj.required.writeDoubleBE(0xdeadbeefcafebabe, 0);
+                  tj.isModified('required').should.be.true;
+                }
               , 'fill': function () {
+                  tj.required = new Buffer(8);
                   reset(tj);
                   tj.isModified('required').should.be.false;
                   tj.required.fill(0);

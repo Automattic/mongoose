@@ -1748,33 +1748,7 @@ module.exports = {
                     up.comments[0].body.should.equal('been there');
                     up.comments[1].body.should.equal('8');
 
-                    var update5 = {
-                        comments: [{ body: 'worked great' }]
-                      , $set: {'numbers.1': 100}
-                      , $inc: { idontexist: 1 }
-                    }
-
-                    BlogPost.update({ _id: post._id }, update5, function (err) {
-                      should.strictEqual(err, null);
-
-                      // get the underlying doc
-                      BlogPost.collection.findOne({ _id: post._id }, function (err, doc) {
-                        db.close();
-                        should.strictEqual(err, null);
-
-                        var up = new BlogPost;
-                        up.init(doc);
-                        up.comments.length.should.equal(1);
-                        up.comments[0].body.should.equal('worked great');
-                        up.meta.visitors.valueOf().should.equal(2);
-                        up.mixed.x.should.equal('ECKS');
-                        up.numbers.toObject().should.eql([5,100]);
-                        up.numbers[1].valueOf().should.eql(100);
-
-                        should.strictEqual(undefined, doc.idontexist);
-                        doc.numbers[1].should.eql(100);
-                      });
-                    });
+                    update5(post);
                   });
                 });
               });
@@ -1783,6 +1757,70 @@ module.exports = {
         });
       });
     });
+
+    function update5 (post) {
+      var update = {
+          comments: [{ body: 'worked great' }]
+        , $set: {'numbers.1': 100}
+        , $inc: { idontexist: 1 }
+      }
+
+      BlogPost.update({ _id: post._id }, update, function (err) {
+        should.strictEqual(err, null);
+
+        // get the underlying doc
+        BlogPost.collection.findOne({ _id: post._id }, function (err, doc) {
+          should.strictEqual(err, null);
+
+          var up = new BlogPost;
+          up.init(doc);
+          up.comments.length.should.equal(1);
+          up.comments[0].body.should.equal('worked great');
+          up.meta.visitors.valueOf().should.equal(2);
+          up.mixed.x.should.equal('ECKS');
+          up.numbers.toObject().should.eql([5,100]);
+          up.numbers[1].valueOf().should.eql(100);
+
+          should.strictEqual(undefined, doc.idontexist);
+          doc.numbers[1].should.eql(100);
+
+          update6(post);
+        });
+      });
+    }
+
+    function update6 (post) {
+      var update = {
+          $push: { comments: { body: 'i am number 2' } }
+      }
+
+      BlogPost.update({ _id: post._id }, update, function (err) {
+        should.strictEqual(null, err);
+        BlogPost.findById(post, function (err, ret) {
+          should.strictEqual(null, err);
+          ret.comments.length.should.equal(2);
+          ret.comments[1].body.should.equal('i am number 2');
+
+          update7(post);
+        })
+      });
+    }
+
+    function update7 (post) {
+      var update = {
+          $pull: { comments: { body: 'i am number 2' } }
+      }
+
+      BlogPost.update({ _id: post._id }, update, function (err) {
+        should.strictEqual(null, err);
+        BlogPost.findById(post, function (err, ret) {
+          db.close();
+          should.strictEqual(null, err);
+          ret.comments.length.should.equal(1);
+          ret.comments[1].body.should.equal('worked great');
+        })
+      });
+    }
   },
 
   'test update doc casting': function () {

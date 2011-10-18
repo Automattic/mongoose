@@ -1,4 +1,18 @@
 
+2.3.4 / 2011-10-18
+==================
+
+  * added; Model.create now accepts an array as a first arg
+  * fixed; calling toObject on a DocumentArray with nulls no longer throws
+  * fixed; calling inspect on a DocumentArray with nulls no longer throws
+  * added; MongooseArray#unshift support
+  * fixed; save hooks now fire on embedded documents [gitfy] (#456)
+  * updated; -native driver to 0.9.6-22
+  * fixed; correctly pass $addToSet op instead of $push
+  * fixed; $addToSet properly detects dates
+  * fixed; $addToSet with multiple items works
+  * updated; better node 0.6 Buffer support
+
 2.3.3 / 2011-10-12
 ==================
 

@@ -250,12 +250,16 @@ module.exports = {
     var d2 = new Date( +d1 + 60000);
     var d3 = new Date( +d1 + 30000);
     var d4 = new Date( +d1 + 20000);
+    var d5 = new Date( +d1 + 90000);
+    var d6 = new Date( +d1 + 10000);
     m.date.push(d1, d2);
 
     var id1 = new mongoose.Types.ObjectId;
     var id2 = new mongoose.Types.ObjectId;
     var id3 = new mongoose.Types.ObjectId;
     var id4 = new mongoose.Types.ObjectId;
+    var id5 = new mongoose.Types.ObjectId;
+    var id6 = new mongoose.Types.ObjectId;
 
     m.id.push(id1, id2);
 
@@ -309,7 +313,7 @@ module.exports = {
         m.doc.some(function(v){return v.name === 'Dubstep'}).should.be.ok
         m.doc.some(function(v){return v.name === 'Polka'}).should.be.ok
 
-        //
+        // test single $addToSet
         m.num.addToSet(3,4,5,6);
         m.num.length.should.equal(6);
         m.str.$addToSet('four', 'five', 'two', 'six');
@@ -322,14 +326,11 @@ module.exports = {
 
         m.doc.$addToSet(m.doc[0], { name: '8bit' });
         m.doc.length.should.equal(4);
-        m.doc.$addToSet({ name: 'Waltz', arr: [1] }, m.doc[0]);
-        m.doc.length.should.equal(4);
 
         m.save(function (err) {
           should.strictEqual(null, err);
 
           M.findById(m, function (err, m) {
-            db.close();
             should.strictEqual(null, err);
 
             m.num.length.should.equal(6);
@@ -365,6 +366,73 @@ module.exports = {
             m.doc.some(function(v){return v.name === 'Dubstep'}).should.be.ok
             m.doc.some(function(v){return v.name === 'Polka'}).should.be.ok
             m.doc.some(function(v){return v.name === '8bit'}).should.be.ok
+
+            // test multiple $addToSet
+            m.num.addToSet(7,8);
+            m.num.length.should.equal(8);
+            m.str.$addToSet('seven', 'eight');
+            m.str.length.should.equal(8);
+            m.id.addToSet(id5, id6);
+            m.id.length.should.equal(6);
+
+            m.date.$addToSet(d5, d6);
+            m.date.length.should.equal(6);
+
+            m.doc.$addToSet(m.doc[1], { name: 'BigBeat' }, { name: 'Funk' });
+            m.doc.length.should.equal(6);
+
+            m.save(function (err) {
+              should.strictEqual(null, err);
+
+              M.findById(m, function (err, m) {
+                db.close();
+                should.strictEqual(null, err);
+
+                m.num.length.should.equal(8);
+                (~m.num.indexOf(1)).should.be.ok;
+                (~m.num.indexOf(2)).should.be.ok;
+                (~m.num.indexOf(3)).should.be.ok;
+                (~m.num.indexOf(4)).should.be.ok;
+                (~m.num.indexOf(5)).should.be.ok;
+                (~m.num.indexOf(6)).should.be.ok;
+                (~m.num.indexOf(7)).should.be.ok;
+                (~m.num.indexOf(8)).should.be.ok;
+
+                m.str.length.should.equal(8);
+                (~m.str.indexOf('one')).should.be.ok;
+                (~m.str.indexOf('two')).should.be.ok;
+                (~m.str.indexOf('tres')).should.be.ok;
+                (~m.str.indexOf('four')).should.be.ok;
+                (~m.str.indexOf('five')).should.be.ok;
+                (~m.str.indexOf('six')).should.be.ok;
+                (~m.str.indexOf('seven')).should.be.ok;
+                (~m.str.indexOf('eight')).should.be.ok;
+
+                m.id.length.should.equal(6);
+                (~m.id.indexOf(id1)).should.be.ok;
+                (~m.id.indexOf(id2)).should.be.ok;
+                (~m.id.indexOf(id3)).should.be.ok;
+                (~m.id.indexOf(id4)).should.be.ok;
+                (~m.id.indexOf(id5)).should.be.ok;
+                (~m.id.indexOf(id6)).should.be.ok;
+
+                m.date.length.should.equal(6);
+                (~m.date.indexOf(d1.toString())).should.be.ok;
+                (~m.date.indexOf(d2.toString())).should.be.ok;
+                (~m.date.indexOf(d3.toString())).should.be.ok;
+                (~m.date.indexOf(d4.toString())).should.be.ok;
+                (~m.date.indexOf(d5.toString())).should.be.ok;
+                (~m.date.indexOf(d6.toString())).should.be.ok;
+
+                m.doc.length.should.equal(6);
+                m.doc.some(function(v){return v.name === 'Waltz'}).should.be.ok
+                m.doc.some(function(v){return v.name === 'Dubstep'}).should.be.ok
+                m.doc.some(function(v){return v.name === 'Polka'}).should.be.ok
+                m.doc.some(function(v){return v.name === '8bit'}).should.be.ok
+                m.doc.some(function(v){return v.name === 'BigBeat'}).should.be.ok
+                m.doc.some(function(v){return v.name === 'Funk'}).should.be.ok
+              });
+            });
           });
         });
       });

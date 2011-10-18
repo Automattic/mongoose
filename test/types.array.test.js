@@ -318,6 +318,8 @@ module.exports = {
         m.id.length.should.equal(4);
         m.doc.$addToSet(m.doc[0], { name: '8bit' });
         m.doc.length.should.equal(4);
+        m.doc.$addToSet({ name: 'Waltz', arr: [1] }, m.doc[0]);
+        m.doc.length.should.equal(4);
         m.date.$addToSet(d1, d3, d4);
         m.date.length.should.equal(3);
 

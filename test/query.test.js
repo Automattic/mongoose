@@ -722,6 +722,14 @@ module.exports = {
     }).op.should.equal('distinct');
   },
 
+  'distinct Query without a callback works': function () {
+    var db = start();
+    var query = new Query();
+    var Product = db.model('Product');
+    new Query().bind(Product, 'distinct').distinct('blah');
+    setTimeout(db.close.bind(db), 300);
+  },
+
   'querying/updating with model instance containing embedded docs should work (#454)': function () {
     var db = start();
     var Product = db.model('Product');

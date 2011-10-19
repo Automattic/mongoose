@@ -1113,6 +1113,78 @@ module.exports = {
     bp._creator.should.be.an.instanceof(DocObjectId);
     bp.set('_creator', new DocObjectId().toString());
     bp._creator.should.be.an.instanceof(DocObjectId);
+  },
+
+  'populate should work on String _ids': function () {
+    var db = start();
+
+    var UserSchema = new Schema({
+        _id: String
+      , name: String
+    })
+
+    var NoteSchema = new Schema({
+        author: { type: String, ref: 'UserWithStringId' }
+      , body: String
+    })
+
+    var User = db.model('UserWithStringId', UserSchema, random())
+    var Note = db.model('NoteWithStringId', NoteSchema, random())
+
+    var alice = new User({_id: 'alice', name: "Alice"})
+
+    alice.save(function (err) {
+      should.strictEqual(err, null);
+
+      var note  = new Note({author: 'alice', body: "Buy Milk"});
+      note.save(function (err) {
+        should.strictEqual(err, null);
+
+        Note.findById(note.id).populate('author').run(function (err, note) {
+          db.close();
+          should.strictEqual(err, null);
+          note.body.should.equal('Buy Milk');
+          should.exist(note.author);
+          note.author.name.should.equal('Alice');
+        });
+      });
+    })
+  },
+
+  'populate should work on Number _ids': function () {
+    var db = start();
+
+    var UserSchema = new Schema({
+        _id: Number
+      , name: String
+    })
+
+    var NoteSchema = new Schema({
+        author: { type: Number, ref: 'UserWithNumberId' }
+      , body: String
+    })
+
+    var User = db.model('UserWithNumberId', UserSchema, random())
+    var Note = db.model('NoteWithNumberId', NoteSchema, random())
+
+    var alice = new User({_id: 2359, name: "Alice"})
+
+    alice.save(function (err) {
+      should.strictEqual(err, null);
+
+      var note = new Note({author: 2359, body: "Buy Milk"});
+      note.save(function (err) {
+        should.strictEqual(err, null);
+
+        Note.findById(note.id).populate('author').run(function (err, note) {
+          db.close();
+          should.strictEqual(err, null);
+          note.body.should.equal('Buy Milk');
+          should.exist(note.author);
+          note.author.name.should.equal('Alice');
+        });
+      });
+    })
   }
 
 };

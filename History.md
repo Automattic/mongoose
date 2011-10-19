@@ -1,4 +1,10 @@
 
+2.3.5 / 2011-10-19
+==================
+
+  * fixed; calling queries without passing a callback works (#569)
+  * fixed; populate() works with String and Number _ids too (#568)
+
 2.3.4 / 2011-10-18
 ==================
 

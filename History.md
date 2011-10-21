@@ -1,4 +1,9 @@
 
+2.3.6 / 2011-10-21
+==================
+
+  * fixed; exclusion of embedded doc _id from query results (#541)
+
 2.3.5 / 2011-10-19
 ==================
 

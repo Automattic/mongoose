@@ -636,6 +636,29 @@ module.exports = {
     });
   },
 
+  // gh-541
+  'find subset of fields excluding embedded doc _id': function () {
+    var db = start()
+      , BlogPostB = db.model('BlogPostB', collection);
+
+    BlogPostB.create({title: 'LOTR', comments: [{ title: ':)' }]}, function (err, created) {
+      should.strictEqual(err, null);
+      BlogPostB.find({_id: created}, { _id: 0, 'comments._id': 0 }, function (err, found) {
+        db.close();
+        should.strictEqual(err, null);
+        should.strictEqual(undefined, found[0]._id);
+        found[0].title.should.equal('LOTR');
+        should.strictEqual('kandinsky', found[0].def);
+        should.strictEqual(undefined, found[0].author);
+        should.strictEqual(true, Array.isArray(found[0].comments));
+        found[0].comments.length.should.equal(1);
+        found[0].comments[0].title.should.equal(':)');
+        should.strictEqual(undefined, found[0].comments[0]._id);
+      });
+    });
+  },
+
+
   'exluded fields should be undefined': function () {
     var db = start()
       , BlogPostB = db.model('BlogPostB', collection)

@@ -1,4 +1,9 @@
 
+2.3.7 / 2011-10-24
+==================
+
+  * fixed; wrapped save/remove callbacks in nextTick to mitigate -native swallowing thrown errors
+
 2.3.6 / 2011-10-21
 ==================
 

@@ -3211,8 +3211,8 @@ module.exports = {
       db.close();
       should.strictEqual(null, err);
       doc.name.should.eql('parent');
-      doc.name.child[0].name.should.eql('child');
-      doc.name.child[0].grand[0].name.should.eql('grand');
+      doc.child[0].name.should.eql('child');
+      doc.child[0].grand[0].name.should.eql('grand');
     });
   },
 

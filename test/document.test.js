@@ -207,7 +207,24 @@ module.exports = {
     should.strictEqual(doc._doc.nested.age._marked, undefined);
     should.strictEqual(doc._doc.nested.cool._marked, undefined);
   },
-
+  
+  'test toObject with virtual path':function(){
+	  var doc = new TestDocument();
+    doc.init({
+        test    : 'test'
+      , oids    : []
+      , nested  : {
+            age   : 5
+          , cool  : new DocumentObjectId
+        }
+    });
+    var copy = doc.toObject({loadVirtuals:true});
+    should.strictEqual(copy.nested.agePlus2, 7);
+	var copy2 = doc.toObject();
+    should.strictEqual(copy2.nested.agePlus2, 5);
+  }
+  ,
+  
   'test hooks system': function(beforeExit){
     var doc = new TestDocument()
       , steps = 0

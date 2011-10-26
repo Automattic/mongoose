@@ -551,6 +551,22 @@ module.exports = {
     }
   },
 
+  'modified states in emb-doc are reset after save runs': function () {
+    var db = start()
+      , BlogPost = db.model('BlogPost', collection);
+
+    var post = new BlogPost({ title: 'hocus pocus' });
+    post.comments.push({ title: 'Humpty Dumpty', comments: [{title: 'nested'}] });
+    post.save(function(err){
+      db.close();
+      should.strictEqual(null, err);
+      var mFlag = post.comments[0].isModified('title');
+      mFlag.should.equal(false);
+      post.isModified('title').should.equal(false);
+    });
+
+  },
+
   'test isModified when modifying keys': function(){
     var db = start()
       , BlogPost = db.model('BlogPost', collection);
@@ -686,7 +702,7 @@ module.exports = {
     	BlogPost.findById(post.id, function (err, postRead) {
     		//set the same data again back to the document.
     		//expected result, nothing should be set to modified
-    		postRead.set(doc);
+    		postRead.set(post.toObject());
 
         postRead.isModified('title').should.be.false;
         postRead.isModified('slug').should.be.false;
@@ -700,7 +716,7 @@ module.exports = {
 
         //uncomment this, this should the bug with respect to Embedded array
         //documents where it is set to modified even though it is not
-        //postRead.isModified('comments').should.be.false;
+        postRead.isModified('comments').should.be.false;
 
         db.close();
     	});

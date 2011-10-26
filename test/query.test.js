@@ -730,6 +730,17 @@ module.exports = {
     setTimeout(db.close.bind(db), 300);
   },
 
+  '#findOne should set the op when callback is passed': function () {
+    var db = start();
+    var query = new Query();
+    var Product = db.model('Product');
+    var q = new Query().bind(Product, 'distinct');
+    q.op.should.equal('distinct');
+    q.findOne();
+    q.op.should.equal('findOne');
+    db.close();
+  },
+
   'querying/updating with model instance containing embedded docs should work (#454)': function () {
     var db = start();
     var Product = db.model('Product');

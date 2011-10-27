@@ -688,7 +688,7 @@ module.exports = {
         db.close();
         //set the same data again back to the document.
         //expected result, nothing should be set to modified
-        postRead.set(doc);
+        postRead.set(postRead.toObject());
 
         postRead.isModified('title').should.be.false;
         postRead.isModified('slug').should.be.false;
@@ -703,7 +703,6 @@ module.exports = {
         //uncomment this, this should the bug with respect to Embedded array
         //documents where it is set to modified even though it is not
         postRead.isModified('comments').should.be.false;
-
     	});
     });
   },

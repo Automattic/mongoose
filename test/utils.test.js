@@ -169,9 +169,9 @@ module.exports = {
     var m2 = new M;
     m2.init(m1.toObject());
 
-    console.error(m1);
-    console.error(m2);
+    utils.deepEqual(m1.a1, m2.a1).should.be.true;
 
+    m2.set(m1.toObject());
     utils.deepEqual(m1.a1, m2.a1).should.be.true;
   }
 

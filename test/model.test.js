@@ -1834,8 +1834,8 @@ module.exports = {
         BlogPost.findById(post, function (err, ret) {
           db.close();
           should.strictEqual(null, err);
-          //ret.comments.length.should.equal(1);
-          //ret.comments[1].body.should.equal('worked great');
+          ret.comments.length.should.equal(1);
+          ret.comments[1].body.should.equal('worked great');
         })
       });
     }

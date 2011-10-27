@@ -684,15 +684,17 @@ module.exports = {
 
     BlogPost.create(doc, function (err, post) {
     	BlogPost.findById(post.id, function (err, postRead) {
-    		//set the same data again back to the document.
-    		//expected result, nothing should be set to modified
-    		postRead.set(doc);
+        should.strictEqual(null, err);
+        db.close();
+        //set the same data again back to the document.
+        //expected result, nothing should be set to modified
+        postRead.set(doc);
 
         postRead.isModified('title').should.be.false;
         postRead.isModified('slug').should.be.false;
         postRead.isModified('date').should.be.false;
         postRead.isModified('meta.date').should.be.false;
-    		postRead.isModified('meta.visitors').should.be.false;
+        postRead.isModified('meta.visitors').should.be.false;
         postRead.isModified('published').should.be.false;
         postRead.isModified('mixed').should.be.false;
         postRead.isModified('numbers').should.be.false;
@@ -700,9 +702,8 @@ module.exports = {
 
         //uncomment this, this should the bug with respect to Embedded array
         //documents where it is set to modified even though it is not
-        //postRead.isModified('comments').should.be.false;
+        postRead.isModified('comments').should.be.false;
 
-        db.close();
     	});
     });
   },

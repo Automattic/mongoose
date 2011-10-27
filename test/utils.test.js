@@ -159,13 +159,20 @@ module.exports = {
 
     db.close();
 
-    var m = new M({
+    var m1 = new M({
         a1: [{a: 'Hi'}, {a: 'Bye'}]
     });
 
-    m.a2 = m.a1;
+    m1.a2 = m1.a1;
+    utils.deepEqual(m1.a1, m1.a2).should.be.true;
 
-    utils.deepEqual(m.a1, m.a2).should.be.true;
+    var m2 = new M;
+    m2.init(m1.toObject());
+
+    console.error(m1);
+    console.error(m2);
+
+    utils.deepEqual(m1.a1, m2.a1).should.be.true;
   }
 
 };

@@ -722,11 +722,11 @@ module.exports = {
     }).op.should.equal('distinct');
   },
 
-  'distinct Query without a callback works': function () {
+  'Query without a callback works': function () {
     var db = start();
     var query = new Query();
     var Product = db.model('Product');
-    new Query().bind(Product, 'distinct').distinct('blah');
+    new Query().bind(Product, 'count').count();
     setTimeout(db.close.bind(db), 300);
   },
 

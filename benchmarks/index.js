@@ -33,7 +33,8 @@ var A = mongoose.model('A', AllSchema);
 // listener that knows about all subdocs and notifies
 // them.
 
-console.error(process.memoryUsage());
+var started = process.memoryUsage();
+//console.error(started);
 var start = new Date;
 var total = 10000;
 var i = total;
@@ -61,9 +62,9 @@ while (i--) {
 }
 var time= (new Date - start)/1000;
 console.error('took %d seconds for %d docs (%d dps)', time, total, total/time);
-console.error(process.memoryUsage());
+var used = process.memoryUsage();
+console.error(((used.vsize - started.vsize) / 1048576)+' MB');
 
-console.error('last object');
-console.error(a.toObject({depopulate:true}));
+//console.error(a.toObject({depopulate:true}));
 
 // --trace-opt --trace-deopt --trace-bailout 

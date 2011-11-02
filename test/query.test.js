@@ -3,8 +3,8 @@
  * Module dependencies.
  */
 
-var Query = require('../lib/query')
-  , start = require('./common')
+var start = require('./common')
+  , Query = require('../lib/query')
   , mongoose = start.mongoose
   , DocumentObjectId = mongoose.Types.ObjectId
   , Schema = mongoose.Schema

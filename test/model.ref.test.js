@@ -1251,5 +1251,33 @@ module.exports = {
         });
       });
     }
+  },
+
+  'populate works with schemas with both id and _id defined': function () {
+    var db =start()
+      , S1 = new Schema({ id: String })
+      , S2 = new Schema({ things: [{ type: ObjectId, ref: '_idAndid' }]})
+
+    var M1 = db.model('_idAndid', S1);
+    var M2 = db.model('populateWorksWith_idAndidSchemas', S2);
+
+    M1.create(
+        { id: "The Tiger That Isn't" }
+      , { id: "Users Guide To The Universe" }
+      , function (err, a, b) {
+      should.strictEqual(null, err);
+
+      var m2 = new M2({ things: [a, b]});
+      m2.save(function (err) {
+        should.strictEqual(null, err);
+        M2.findById(m2).populate('things').run(function (err, doc) {
+          db.close();
+          should.strictEqual(null, err);
+          doc.things.length.should.equal(2);
+          doc.things[0].id.should.equal("The Tiger That Isn't");
+          doc.things[1].id.should.equal("Users Guide To The Universe");
+        })
+      });
+    })
   }
 };

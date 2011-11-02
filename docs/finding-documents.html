@@ -265,6 +265,7 @@ ObjectId.</p>
 Handy when expressing complex directives.</p>
 
 <pre><code>Model
+.find({})
 .select(&#39;name&#39;, &#39;age&#39;, &#39;tags&#39;)
 .where(&#39;age&#39;).gte(25)
 .where(&#39;tags&#39;).in([&#39;movie&#39;, &#39;music&#39;, &#39;art&#39;])

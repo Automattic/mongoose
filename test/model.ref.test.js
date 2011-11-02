@@ -1185,6 +1185,71 @@ module.exports = {
         });
       });
     })
-  }
+  },
 
+  // gh-577
+  'required works on ref fields': function () {
+    var db = start();
+
+    var userSchema = new Schema({
+        email: {type: String, required: true}
+    });
+    var User = db.model('ObjectIdRefRequiredField', userSchema, random());
+
+    var numSchema = new Schema({ _id: Number, val: Number });
+    var Num = db.model('NumberRefRequired', numSchema, random());
+
+    var strSchema = new Schema({ _id: String, val: String });
+    var Str = db.model('StringRefRequired', strSchema, random());
+
+    var commentSchema = new Schema({
+        user: {type: ObjectId, ref: 'ObjectIdRefRequiredField', required: true}
+      , num: {type: Number, ref: 'NumberRefRequired', required: true}
+      , str: {type: String, ref: 'StringRefRequired', required: true}
+      , text: String
+    });
+    var Comment = db.model('CommentWithRequiredField', commentSchema);
+
+    var pending = 3;
+
+    var string = new Str({ _id: 'my string', val: 'hello' });
+    var number = new Num({ _id: 1995, val: 234 });
+    var user = new User({ email: 'test' });
+
+    string.save(next);
+    number.save(next);
+    user.save(next);
+
+    function next (err) {
+      should.strictEqual(null, err);
+      if (--pending) return;
+
+      var comment = new Comment({
+          user: user
+        , num: 1995
+        , str: 'my string'
+        , text: 'test'
+      });
+
+      comment.save(function (err, comment) {
+        should.strictEqual(err, null);
+
+        Comment
+        .findById(comment.id)
+        .populate('user')
+        .populate('num')
+        .populate('str')
+        .run(function (err, comment) {
+          should.strictEqual(err, null);
+
+          comment.set({text: 'test2'});
+
+          comment.save(function (err, comment) {
+            db.close();
+            should.strictEqual(err, null);
+          });
+        });
+      });
+    }
+  }
 };

@@ -1696,6 +1696,10 @@ module.exports = {
         cf.comments.length.should.equal(2);
         cf.comments[0].body.should.eql('been there');
         cf.comments[1].body.should.eql('done that');
+        should.exist(cf.comments[0]._id);
+        should.exist(cf.comments[1]._id);
+        cf.comments[0]._id.should.be.an.instanceof(DocumentObjectId)
+        cf.comments[1]._id.should.be.an.instanceof(DocumentObjectId);
 
         var update = {
             title: newTitle // becomes $set
@@ -1725,6 +1729,10 @@ module.exports = {
             up.owners[0].toString().should.eql(id1.toString());
             up.comments[0].body.should.equal('been there');
             up.comments[1].body.should.equal('8');
+            should.exist(up.comments[0]._id);
+            should.exist(up.comments[1]._id);
+            up.comments[0]._id.should.be.an.instanceof(DocumentObjectId)
+            up.comments[1]._id.should.be.an.instanceof(DocumentObjectId);
 
             var update2 = {
                 'comments.body': 'fail'
@@ -1733,40 +1741,45 @@ module.exports = {
             BlogPost.update({ _id: post._id }, update2, function (err) {
               should.strictEqual(!!err, true);
               ;/^can't append to array using string field name \[body\]/.test(err.message).should.be.true;
+              BlogPost.findById(post, function (err, p) {
+                should.strictEqual(null, err);
 
-              var update3 = {
-                  $pull: 'fail'
-              }
-
-              BlogPost.update({ _id: post._id }, update3, function (err) {
-                should.strictEqual(!!err, true);
-                ;/Invalid atomic update value/.test(err.message).should.be.true;
-
-                var update4 = {
-                    $inc: { idontexist: 1 }
+                var update3 = {
+                    $pull: 'fail'
                 }
 
-                // should not overwrite doc when no valid paths are submitted
-                BlogPost.update({ _id: post._id }, update4, function (err) {
-                  should.strictEqual(err, null);
+                BlogPost.update({ _id: post._id }, update3, function (err) {
+                  should.strictEqual(!!err, true);
+                  ;/Invalid atomic update value/.test(err.message).should.be.true;
 
-                  BlogPost.findById(post._id, function (err, up) {
+                  var update4 = {
+                      $inc: { idontexist: 1 }
+                  }
+
+                  // should not overwrite doc when no valid paths are submitted
+                  BlogPost.update({ _id: post._id }, update4, function (err) {
                     should.strictEqual(err, null);
 
-                    up.title.should.equal(newTitle);
-                    up.author.should.equal(author);
-                    up.meta.visitors.valueOf().should.equal(2);
-                    up.date.toString().should.equal(update.$set.date.toString());
-                    up.published.should.eql(false);
-                    up.mixed.x.should.equal('ECKS');
-                    up.mixed.y.should.equal('why');
-                    up.numbers.toObject().should.eql([5,7]);
-                    up.owners.length.should.equal(1);
-                    up.owners[0].toString().should.eql(id1.toString());
-                    up.comments[0].body.should.equal('been there');
-                    up.comments[1].body.should.equal('8');
+                    BlogPost.findById(post._id, function (err, up) {
+                      should.strictEqual(err, null);
 
-                    update5(post);
+                      up.title.should.equal(newTitle);
+                      up.author.should.equal(author);
+                      up.meta.visitors.valueOf().should.equal(2);
+                      up.date.toString().should.equal(update.$set.date.toString());
+                      up.published.should.eql(false);
+                      up.mixed.x.should.equal('ECKS');
+                      up.mixed.y.should.equal('why');
+                      up.numbers.toObject().should.eql([5,7]);
+                      up.owners.length.should.equal(1);
+                      up.owners[0].toString().should.eql(id1.toString());
+                      up.comments[0].body.should.equal('been there');
+                      up.comments[1].body.should.equal('8');
+                      // non-schema data was still stored in mongodb
+                      should.strictEqual(1, up._doc.idontexist);
+
+                      update5(post);
+                    });
                   });
                 });
               });
@@ -1794,12 +1807,13 @@ module.exports = {
           up.init(doc);
           up.comments.length.should.equal(1);
           up.comments[0].body.should.equal('worked great');
+          should.strictEqual(true, !! doc.comments[0]._id);
           up.meta.visitors.valueOf().should.equal(2);
           up.mixed.x.should.equal('ECKS');
           up.numbers.toObject().should.eql([5,100]);
           up.numbers[1].valueOf().should.eql(100);
 
-          should.strictEqual(undefined, doc.idontexist);
+          doc.idontexist.should.equal(2);
           doc.numbers[1].should.eql(100);
 
           update6(post);
@@ -1818,12 +1832,15 @@ module.exports = {
           should.strictEqual(null, err);
           ret.comments.length.should.equal(2);
           ret.comments[1].body.should.equal('i am number 2');
+          should.exist(ret.comments[1]._id);
+          ret.comments[1]._id.should.be.an.instanceof(DocumentObjectId)
 
           update7(post);
         })
       });
     }
 
+    // gh-542
     function update7 (post) {
       var update = {
           $pull: { comments: { body: 'i am number 2' } }
@@ -1832,10 +1849,95 @@ module.exports = {
       BlogPost.update({ _id: post._id }, update, function (err) {
         should.strictEqual(null, err);
         BlogPost.findById(post, function (err, ret) {
-          db.close();
           should.strictEqual(null, err);
           ret.comments.length.should.equal(1);
-          ret.comments[1].body.should.equal('worked great');
+          ret.comments[0].body.should.equal('worked great');
+          ret.comments[0]._id.should.be.an.instanceof(DocumentObjectId)
+
+          update8(post);
+        })
+      });
+    }
+
+    // gh-479
+    function update8 (post) {
+      var update = {
+          $addToSet: { 'comments.$.comments': { body: 'The Ring Of Power' } }
+        , $set: { 'comments.$.title': 'MongoDB++' }
+      }
+
+      BlogPost.update({ _id: post._id, 'comments.body': 'worked great' }, update, function (err) {
+        should.strictEqual(null, err);
+        BlogPost.findById(post, function (err, ret) {
+          should.strictEqual(null, err);
+          ret.comments.length.should.equal(1);
+          ret.comments[0].body.should.equal('worked great');
+          ret.comments[0].title.should.equal('MongoDB++');
+          should.exist(ret.comments[0].comments);
+          ret.comments[0].comments.length.should.equal(1);
+          should.strictEqual(ret.comments[0].comments[0].body, 'The Ring Of Power');
+          ret.comments[0]._id.should.be.an.instanceof(DocumentObjectId)
+          ret.comments[0].comments[0]._id.should.be.an.instanceof(DocumentObjectId)
+
+          update9(post);
+        })
+      });
+    }
+
+    // gh-479
+    function update9 (post) {
+      var update = {
+          $inc: { 'comments.$.newprop': 1 }
+      }
+
+      BlogPost.update({ _id: post._id, 'comments.body': 'worked great' }, update, function (err) {
+        should.strictEqual(null, err);
+        BlogPost.findById(post, function (err, ret) {
+          should.strictEqual(null, err);
+          ret._doc.comments[0]._doc.newprop.should.equal(1);
+
+          update10(post, ret);
+        })
+      });
+    }
+
+    // gh-545
+    function update10 (post, last) {
+      var owner = last.owners[0];
+
+      var update = {
+          $addToSet: { 'owners': owner }
+      }
+
+      BlogPost.update({ _id: post._id }, update, function (err) {
+        should.strictEqual(null, err);
+        BlogPost.findById(post, function (err, ret) {
+          should.strictEqual(null, err);
+          ret.owners.length.should.equal(1);
+          ret.owners[0].toString().should.eql(owner.toString());
+
+          update11(post, ret);
+        })
+      });
+    }
+
+    // gh-545
+    function update11 (post, last) {
+      var owner = last.owners[0]
+        , newowner = new DocumentObjectId
+
+      var update = {
+          $addToSet: { 'owners': { $each: [owner, newowner] }}
+      }
+
+      BlogPost.update({ _id: post._id }, update, function (err) {
+        should.strictEqual(null, err);
+        BlogPost.findById(post, function (err, ret) {
+          db.close();
+          should.strictEqual(null, err);
+          ret.owners.length.should.equal(2);
+          ret.owners[0].toString().should.eql(owner.toString());
+          ret.owners[1].toString().should.eql(newowner.toString());
         })
       });
     }
@@ -3939,29 +4041,27 @@ module.exports = {
     });
   },
 
-  /*
-  'when mongo is down, auto_reconnect should kick in and db operation should succeed': function () {
-    var db = start();
-    var T = db.model('Thing', new Schema({ type: String }));
-    db.on('open', function () {
-      var t = new T({ type: "monster" });
+  //'when mongo is down, auto_reconnect should kick in and db operation should succeed': function () {
+    //var db = start();
+    //var T = db.model('Thing', new Schema({ type: String }));
+    //db.on('open', function () {
+      //var t = new T({ type: "monster" });
 
-      var worked = false;
-      t.save(function (err) {
-        should.strictEqual(err, null);
-        worked = true;
-      });
+      //var worked = false;
+      //t.save(function (err) {
+        //should.strictEqual(err, null);
+        //worked = true;
+      //});
 
-      process.nextTick(function () {
-        db.close();
-      });
+      //process.nextTick(function () {
+        //db.close();
+      //});
 
-      setTimeout(function () {
-        worked.should.be.true;
-      }, 500);
-    });
-  },
-  */
+      //setTimeout(function () {
+        //worked.should.be.true;
+      //}, 500);
+    //});
+  //},
 
   'subdocuments with changed values should persist the values': function () {
     var db = start()

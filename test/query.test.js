@@ -727,7 +727,7 @@ module.exports = {
     var query = new Query();
     var Product = db.model('Product');
     new Query().bind(Product, 'count').count();
-    setTimeout(db.close.bind(db), 300);
+    setTimeout(db.close.bind(db), 1000);
   },
 
   '#findOne should set the op when callback is passed': function () {

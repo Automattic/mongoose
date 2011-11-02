@@ -1933,11 +1933,31 @@ module.exports = {
       BlogPost.update({ _id: post._id }, update, function (err) {
         should.strictEqual(null, err);
         BlogPost.findById(post, function (err, ret) {
-          db.close();
           should.strictEqual(null, err);
           ret.owners.length.should.equal(2);
           ret.owners[0].toString().should.eql(owner.toString());
           ret.owners[1].toString().should.eql(newowner.toString());
+
+          update12(post, newowner);
+        })
+      });
+    }
+
+    // gh-574
+    function update12 (post, newowner) {
+      var update = {
+          $pop: { 'owners': -1 }
+        , $unset: { title: 1 }
+      }
+
+      BlogPost.update({ _id: post._id }, update, function (err) {
+        should.strictEqual(null, err);
+        BlogPost.findById(post, function (err, ret) {
+          db.close();
+          should.strictEqual(null, err);
+          ret.owners.length.should.equal(1);
+          ret.owners[0].toString().should.eql(newowner.toString());
+          should.strictEqual(undefined, ret.title);
         })
       });
     }

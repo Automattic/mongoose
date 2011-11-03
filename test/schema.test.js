@@ -862,6 +862,22 @@ module.exports = {
           { something: { type: String } }
         ]
     });
+  },
+
+  'helpful schema debugging msg': function () {
+    var err;
+    try {
+      new Schema({ name: { first: null } })
+    } catch (e) {
+      err = e;
+    }
+    err.message.should.equal('Invalid value for schema path `name.first`')
+    try {
+      new Schema({ age: undefined })
+    } catch (e) {
+      err = e;
+    }
+    err.message.should.equal('Invalid value for schema path `age`')
   }
 
 };

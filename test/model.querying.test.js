@@ -654,6 +654,8 @@ module.exports = {
         found[0].comments.length.should.equal(1);
         found[0].comments[0].title.should.equal(':)');
         should.strictEqual(undefined, found[0].comments[0]._id);
+        // gh-590
+        should.strictEqual(null, found[0].comments[0].id);
       });
     });
   },

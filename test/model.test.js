@@ -1956,11 +1956,28 @@ module.exports = {
       BlogPost.update({ _id: post._id }, update, function (err) {
         should.strictEqual(null, err);
         BlogPost.findById(post, function (err, ret) {
-          db.close();
           should.strictEqual(null, err);
           ret.owners.length.should.equal(1);
           ret.owners[0].toString().should.eql(newowner.toString());
           should.strictEqual(undefined, ret.title);
+
+          update13(post, ret);
+        })
+      });
+    }
+
+    // gh-542
+    function update13 (post, ret) {
+      var update = {
+          $pull: { comments: { _id: ret.comments[0].id } }
+      }
+
+      BlogPost.update({ _id: post._id }, update, function (err) {
+        should.strictEqual(null, err);
+        BlogPost.findById(post, function (err, ret) {
+          db.close();
+          should.strictEqual(null, err);
+          ret.comments.length.should.equal(0);
         })
       });
     }

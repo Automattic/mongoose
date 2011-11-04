@@ -1861,9 +1861,12 @@ module.exports = {
 
     // gh-479
     function update8 (post) {
+      var crazy = {};
+      crazy.toString = function () { return 'MongoDB++' }
+
       var update = {
           $addToSet: { 'comments.$.comments': { body: 'The Ring Of Power' } }
-        , $set: { 'comments.$.title': 'MongoDB++' }
+        , $set: { 'comments.$.title': crazy }
       }
 
       BlogPost.update({ _id: post._id, 'comments.body': 'worked great' }, update, function (err) {
@@ -1887,7 +1890,7 @@ module.exports = {
     // gh-479
     function update9 (post) {
       var update = {
-          $inc: { 'comments.$.newprop': 1 }
+          $inc: { 'comments.$.newprop': '1' }
       }
 
       BlogPost.update({ _id: post._id, 'comments.body': 'worked great' }, update, function (err) {

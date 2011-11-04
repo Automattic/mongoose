@@ -1,4 +1,18 @@
 
+2.3.9 / 2011-11-04
+==================
+
+  * fixed; deepEquals check for MongooseArray returned false
+  * fixed; reset modified flags of embedded docs after save [gitfy]
+  * fixed; setting embedded doc with identical values no longer marks modified [gitfy]
+  * updated; -native driver to 0.9.6.23 [mlazarov]
+  * fixed; Model.update casting (#542, #545, #479)
+  * fixed; populated refs no longer fail required validators (#577)
+  * fixed; populating refs of objects with custom ids works
+  * fixed; $pop & $unset work with Model.update (#574)
+  * added; more helpful debugging message for Schema#add (#578)
+  * fixed; accessing .id when no _id exists now returns null (#590)
+
 2.3.8 / 2011-10-26
 ==================
 

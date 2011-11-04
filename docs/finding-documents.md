@@ -66,9 +66,9 @@ Creates a Query for this model.
 Handy when expressing complex directives.
 
     Model
-    .select('name', 'age', 'tags')
     .where('age').gte(25)
     .where('tags').in(['movie', 'music', 'art'])
+    .select('name', 'age', 'tags')
     .skip(20)
     .limit(10)
     .asc('age')

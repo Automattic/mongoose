@@ -1,4 +1,9 @@
 
+2.3.10 / 2011-11-05
+===================
+
+  * fixed; model.update casting for nested paths works (#542)
+
 2.3.9 / 2011-11-04
 ==================
 

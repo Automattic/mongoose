@@ -1823,17 +1823,20 @@ module.exports = {
 
     function update6 (post) {
       var update = {
-          $push: { comments: { body: 'i am number 2' } }
+          $pushAll: { comments: [{ body: 'i am number 2' }, { body: 'i am number 3' }] }
       }
 
       BlogPost.update({ _id: post._id }, update, function (err) {
         should.strictEqual(null, err);
         BlogPost.findById(post, function (err, ret) {
           should.strictEqual(null, err);
-          ret.comments.length.should.equal(2);
+          ret.comments.length.should.equal(3);
           ret.comments[1].body.should.equal('i am number 2');
-          should.exist(ret.comments[1]._id);
+          should.strictEqual(true, !! ret.comments[1]._id);
           ret.comments[1]._id.should.be.an.instanceof(DocumentObjectId)
+          ret.comments[2].body.should.equal('i am number 3');
+          should.strictEqual(true, !! ret.comments[2]._id);
+          ret.comments[2]._id.should.be.an.instanceof(DocumentObjectId)
 
           update7(post);
         })
@@ -1850,9 +1853,11 @@ module.exports = {
         should.strictEqual(null, err);
         BlogPost.findById(post, function (err, ret) {
           should.strictEqual(null, err);
-          ret.comments.length.should.equal(1);
+          ret.comments.length.should.equal(2);
           ret.comments[0].body.should.equal('worked great');
           ret.comments[0]._id.should.be.an.instanceof(DocumentObjectId)
+          ret.comments[1].body.should.equal('i am number 3');
+          ret.comments[1]._id.should.be.an.instanceof(DocumentObjectId)
 
           update8(post);
         })
@@ -1861,8 +1866,9 @@ module.exports = {
 
     // gh-479
     function update8 (post) {
-      var crazy = {};
-      crazy.toString = function () { return 'MongoDB++' }
+      function a () {};
+      a.prototype.toString = function () { return 'MongoDB++' }
+      var crazy = new a;
 
       var update = {
           $addToSet: { 'comments.$.comments': { body: 'The Ring Of Power' } }
@@ -1873,14 +1879,17 @@ module.exports = {
         should.strictEqual(null, err);
         BlogPost.findById(post, function (err, ret) {
           should.strictEqual(null, err);
-          ret.comments.length.should.equal(1);
+          ret.comments.length.should.equal(2);
           ret.comments[0].body.should.equal('worked great');
           ret.comments[0].title.should.equal('MongoDB++');
-          should.exist(ret.comments[0].comments);
+          should.strictEqual(true, !! ret.comments[0].comments);
           ret.comments[0].comments.length.should.equal(1);
           should.strictEqual(ret.comments[0].comments[0].body, 'The Ring Of Power');
           ret.comments[0]._id.should.be.an.instanceof(DocumentObjectId)
           ret.comments[0].comments[0]._id.should.be.an.instanceof(DocumentObjectId)
+          ret.comments[1].body.should.equal('i am number 3');
+          should.strictEqual(undefined, ret.comments[1].title);
+          ret.comments[1]._id.should.be.an.instanceof(DocumentObjectId)
 
           update9(post);
         })
@@ -1891,6 +1900,7 @@ module.exports = {
     function update9 (post) {
       var update = {
           $inc: { 'comments.$.newprop': '1' }
+        , $set: { date: (new Date).getTime() } // check for single val casting
       }
 
       BlogPost.update({ _id: post._id, 'comments.body': 'worked great' }, update, function (err) {
@@ -1898,6 +1908,9 @@ module.exports = {
         BlogPost.findById(post, function (err, ret) {
           should.strictEqual(null, err);
           ret._doc.comments[0]._doc.newprop.should.equal(1);
+          should.strictEqual(undefined, ret._doc.comments[1]._doc.newprop);
+          ret.date.should.be.an.instanceof(Date);
+          ret.date.toString().should.equal(update.$set.date.toString());
 
           update10(post, ret);
         })
@@ -1966,8 +1979,31 @@ module.exports = {
       });
     }
 
-    // gh-542
     function update13 (post, ret) {
+      var update = {
+          $set: {
+              'comments.0.comments.0.date': '11/5/2011'
+            , 'comments.1.body': 9000
+          }
+      }
+
+      BlogPost.update({ _id: post._id }, update, function (err) {
+        should.strictEqual(null, err);
+        BlogPost.findById(post, function (err, ret) {
+          should.strictEqual(null, err);
+          ret.comments.length.should.equal(2);
+          ret.comments[0].body.should.equal('worked great');
+          ret.comments[1].body.should.equal('9000');
+          ret.comments[0].comments[0].date.toString().should.equal(new Date('11/5/2011').toString())
+          ret.comments[1].comments.length.should.equal(0);
+
+          update14(post, ret);
+        })
+      });
+    }
+
+    // gh-542
+    function update14 (post, ret) {
       var update = {
           $pull: { comments: { _id: ret.comments[0].id } }
       }
@@ -1977,10 +2013,12 @@ module.exports = {
         BlogPost.findById(post, function (err, ret) {
           db.close();
           should.strictEqual(null, err);
-          ret.comments.length.should.equal(0);
+          ret.comments.length.should.equal(1);
+          ret.comments[0].body.should.equal('9000');
         })
       });
     }
+
   },
 
   'test update doc casting': function () {

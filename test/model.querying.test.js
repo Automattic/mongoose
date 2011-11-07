@@ -1786,5 +1786,38 @@ module.exports = {
         });
       }
     });
+  },
+
+  // gh-591
+  'querying Mixed types with elemMatch': function () {
+    var db = start()
+      , S = new Schema({ a: [{}], b: Number })
+      , M = db.model('QueryingMixedArrays', S, random())
+
+    var m = new M;
+    m.a = [1,2,{ name: 'Frodo' },'IDK', {name: 100}];
+    m.b = 10;
+
+    m.save(function (err) {
+      should.strictEqual(null, err);
+
+      M.find({ a: { name: 'Frodo' }, b: '10' }, function (err, docs) {
+        should.strictEqual(null, err);
+        docs[0].a.length.should.equal(5);
+        docs[0].b.valueOf().should.equal(10);
+
+        var query = {
+            a: {
+                $elemMatch: { name: 100 }
+            }
+        }
+
+        M.find(query, function (err, docs) {
+          db.close();
+          should.strictEqual(null, err);
+          docs[0].a.length.should.equal(5);
+        });
+      });
+    });
   }
 };

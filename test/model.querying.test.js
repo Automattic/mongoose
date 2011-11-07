@@ -1819,5 +1819,27 @@ module.exports = {
         });
       });
     });
+  },
+
+  // gh-599
+  'regex with Array should work': function () {
+    var db = start()
+      , B = db.model('BlogPostB', random())
+
+    B.create({ tags: 'wooof baaaark meeeeow'.split(' ') }, function (err, b) {
+      should.strictEqual(null, err);
+      B.findOne({ tags: /ooof$/ }, function (err, doc) {
+        should.strictEqual(null, err);
+        should.strictEqual(true, !! doc);
+        ;(!! ~doc.tags.indexOf('meeeeow')).should.be.true;
+
+        B.findOne({ tags: {$regex: 'eow$' } }, function (err, doc) {
+          db.close();
+          should.strictEqual(null, err);
+          should.strictEqual(true, !! doc);
+          ;(!! ~doc.tags.indexOf('meeeeow')).should.be.true;
+        });
+      });
+    });
   }
 };

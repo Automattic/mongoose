@@ -1279,5 +1279,38 @@ module.exports = {
         })
       });
     })
+  },
+
+  // gh-602
+  'Update works with populated arrays': function () {
+    var db = start()
+      , BlogPost = db.model('RefBlogPost', posts)
+      , User = db.model('RefUser', users)
+
+    var user1 = new User({ name: 'aphex' });
+    var user2 = new User({ name: 'twin' });
+
+    User.create({name:'aphex'},{name:'twin'}, function (err, u1, u2) {
+      should.strictEqual(err, null);
+
+      var post = BlogPost.create({
+          title: 'Woot'
+        , fans: []
+      }, function (err, post) {
+        should.strictEqual(err, null);
+
+        BlogPost.update({ _id: post }, { fans: [u1, u2] }, function (err) {
+          should.strictEqual(err, null);
+
+          BlogPost.findById(post, function (err, post) {
+            db.close();
+            should.strictEqual(err, null);
+            post.fans.length.should.equal(2);
+            post.fans[0].should.be.instanceof(DocObjectId);
+            post.fans[1].should.be.instanceof(DocObjectId);
+          });
+        });
+      });
+    });
   }
 };

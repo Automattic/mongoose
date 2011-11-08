@@ -1,4 +1,11 @@
 
+2.3.11 / 2011-11-08
+===================
+
+  * fixed; using $elemMatch on arrays of Mixed types (#591)
+  * fixed; allow using $regex when querying Arrays (#599)
+  * fixed; calling Model.update with no atomic keys (#602)
+
 2.3.10 / 2011-11-05
 ===================
 

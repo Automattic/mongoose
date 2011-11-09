@@ -1299,8 +1299,15 @@ module.exports = {
       }, function (err, post) {
         should.strictEqual(err, null);
 
-        BlogPost.update({ _id: post }, { fans: [u1, u2] }, function (err) {
+        var update = { fans: [u1, u2] };
+        BlogPost.update({ _id: post }, update, function (err) {
           should.strictEqual(err, null);
+
+          // the original update doc should not be modified
+          ;('fans' in update).should.be.true;
+          ;('$set' in update).should.be.false;
+          update.fans[0].should.be.instanceof(mongoose.Document);
+          update.fans[1].should.be.instanceof(mongoose.Document);
 
           BlogPost.findById(post, function (err, post) {
             db.close();

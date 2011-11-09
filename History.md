@@ -1,4 +1,10 @@
 
+2.3.12 / 2011-11-09
+===================
+
+  * fixed; regression, objects passed to Model.update should not be changed (#605)
+  * fixed; regression, empty Model.update should not be executed
+
 2.3.11 / 2011-11-08
 ===================
 

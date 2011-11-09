@@ -830,6 +830,11 @@ module.exports = {
     query.options.snapshot.should.be.true;
   },
 
+  'empty updates are not run': function () {
+    var q = new Query;
+    ;(!!q._castUpdate({})).should.be.false;
+  }
+
   //  TODO
 //  'test Query#min': function () {
 //    var query = new Query();

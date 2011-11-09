@@ -4693,6 +4693,22 @@ module.exports = {
         });
       });
     });
+  },
+
+  'should not persist non-schema props': function () {
+    var db = start()
+      , B = db.model('BlogPost', collection)
+
+    var b = new B;
+    b.whateveriwant = 10;
+    b.save(function (err) {
+      should.strictEqual(null, err);
+      B.collection.findOne({ _id: b._id }, function (err, doc) {
+        db.close();
+        should.strictEqual(null, err);
+        ;('whateveriwant' in doc).should.be.false;
+      });
+    });
   }
 
 };

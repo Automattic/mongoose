@@ -295,6 +295,16 @@ your mongoose Model.</p>
 
 Model.update(conditions, update, options, callback)</code></pre>
 
+<p>Note: for backwards compatibility, all top-level <code>update</code> keys that are
+not $atomic operation names are treated as <code>$set</code> operations. Example:</p>
+
+<pre><code>var query = { name: &#39;borne&#39; };
+Model.update(query, { name: &#39;jason borne&#39; }, options, callback)
+
+// is sent as
+
+Model.update(query, { $set: { name: &#39;jason borne&#39; }}, options, callback)</code></pre>
+
 <h2>Query</h2>
 
 <p>Each of these methods returns a <a href="https://github.com/LearnBoost/mongoose/blob/master/lib/query.js">Query</a>.

@@ -96,6 +96,16 @@ Updates all documents matching `conditions` using the `update` clause. All
 
     Model.update(conditions, update, options, callback)
 
+Note: for backwards compatibility, all top-level `update` keys that are
+not $atomic operation names are treated as `$set` operations. Example:
+
+    var query = { name: 'borne' };
+    Model.update(query, { name: 'jason borne' }, options, callback)
+
+    // is sent as
+
+    Model.update(query, { $set: { name: 'jason borne' }}, options, callback)
+
 ## Query
 
 Each of these methods returns a [Query](https://github.com/LearnBoost/mongoose/blob/master/lib/query.js).

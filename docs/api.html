@@ -620,79 +620,6 @@ node-mongodb-native driver instance for detail.</p>
 <pre><code><span class="variable">module</span>.<span class="variable">exports</span> = <span class="class">Connection</span>;
 </code></pre>
 </td>
-</tr><tr class="filename"><td><h2 id="lib/drivers/node-mongodb-native/collection.js"><a href="#">collection</a></h2></td><td>lib/drivers/node-mongodb-native/collection.js</td></tr><tr class="code">
-<td class="docs">
-<p>Module dependencies.
- </p>
-</td>
-<td class="code">
-<pre><code><span class="keyword">var</span> <span class="class">Collection</span> = <span class="variable">require</span>(<span class="string">'../../collection'</span>)
-  , <span class="class">NativeCollection</span> = <span class="variable">require</span>(<span class="string">'mongodb'</span>).<span class="class">Collection</span>;</code></pre>
-</td>
-</tr>
-<tr class="code">
-<td class="docs">
-<p>Inherit from abstract Collection.
- </p>
-</td>
-<td class="code">
-<pre><code><span class="class">MongooseCollection</span>.<span class="variable">prototype</span>.<span class="variable">__proto__</span> = <span class="class">Collection</span>.<span class="variable">prototype</span>;</code></pre>
-</td>
-</tr>
-<tr class="code">
-<td class="docs">
-<p>Copy the collection methods and make them subject to queues
- </p>
-</td>
-<td class="code">
-<pre><code><span class="keyword">for</span> (<span class="keyword">var</span> <span class="variable">i</span> <span class="keyword">in</span> <span class="class">NativeCollection</span>.<span class="variable">prototype</span>)
-  (<span class="keyword">function</span>(<span class="variable">i</span>){
-    <span class="class">MongooseCollection</span>.<span class="variable">prototype</span>[<span class="variable">i</span>] = <span class="keyword">function</span> () {
-      <span class="comment">// BENCHMARKME: is it worth caching the prototype methods? probably</span>
-      <span class="keyword">if</span> (!<span class="this">this</span>.<span class="variable">buffer</span>){
-        <span class="keyword">var</span> <span class="variable">collection</span> = <span class="this">this</span>.<span class="variable">collection</span>
-          , <span class="variable">args</span> = <span class="variable">arguments</span>
-          , <span class="variable">self</span> = <span class="this">this</span>;
-
-        <span class="variable">process</span>.<span class="variable">nextTick</span>(<span class="keyword">function</span>(){
-          <span class="variable">collection</span>[<span class="variable">i</span>].<span class="variable">apply</span>(<span class="variable">collection</span>, <span class="variable">args</span>);
-        });
-      } <span class="keyword">else</span> {
-        <span class="this">this</span>.<span class="variable">addQueue</span>(<span class="variable">i</span>, <span class="variable">arguments</span>);
-      }
-    };
-  })(<span class="variable">i</span>);</code></pre>
-</td>
-</tr>
-<tr class="code">
-<td class="docs">
-<p>Override signature of ensureIndex. -native one is not standard.</p>
-
-<h2></h2>
-
-<ul><li><p><strong>param</strong>: <em>Object</em>  spec</p></li><li><p><strong>param</strong>: <em>Object</em>  options</p></li><li><p><strong>param</strong>: <em>Function</em>  callback</p></li><li><p><strong>api</strong>: <em>public</em></p></li></ul>
-</td>
-<td class="code">
-<pre><code><span class="keyword">var</span> <span class="variable">oldEnsureIndex</span> = <span class="class">NativeCollection</span>.<span class="variable">prototype</span>.<span class="variable">ensureIndex</span>;
-
-<span class="keyword">function</span> <span class="variable">noop</span> () {};
-
-<span class="class">NativeCollection</span>.<span class="variable">prototype</span>.<span class="variable">ensureIndex</span> = <span class="keyword">function</span>(<span class="variable">fields</span>, <span class="variable">options</span>, <span class="variable">fn</span>){
-  <span class="keyword">if</span> (!<span class="this">this</span>.<span class="variable">buffer</span>) {
-    <span class="keyword">return</span> <span class="variable">oldEnsureIndex</span>.<span class="variable">apply</span>(<span class="this">this</span>, <span class="variable">arguments</span>);
-  }
-};</code></pre>
-</td>
-</tr>
-<tr class="code">
-<td class="docs">
-<p>Module exports.
- </p>
-</td>
-<td class="code">
-<pre><code><span class="variable">module</span>.<span class="variable">exports</span> = <span class="class">MongooseCollection</span>;
-</code></pre>
-</td>
 </tr><tr class="filename"><td><h2 id="lib/document.js"><a href="#">document</a></h2></td><td>lib/document.js</td></tr><tr class="code">
 <td class="docs">
 <p>Module dependencies.
@@ -1258,6 +1185,79 @@ we apply getters?
 <span class="variable">exports</span>.<span class="class">Error</span> = <span class="class">DocumentError</span>;
 </code></pre>
 </td>
+</tr><tr class="filename"><td><h2 id="lib/drivers/node-mongodb-native/collection.js"><a href="#">collection</a></h2></td><td>lib/drivers/node-mongodb-native/collection.js</td></tr><tr class="code">
+<td class="docs">
+<p>Module dependencies.
+ </p>
+</td>
+<td class="code">
+<pre><code><span class="keyword">var</span> <span class="class">Collection</span> = <span class="variable">require</span>(<span class="string">'../../collection'</span>)
+  , <span class="class">NativeCollection</span> = <span class="variable">require</span>(<span class="string">'mongodb'</span>).<span class="class">Collection</span>;</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Inherit from abstract Collection.
+ </p>
+</td>
+<td class="code">
+<pre><code><span class="class">MongooseCollection</span>.<span class="variable">prototype</span>.<span class="variable">__proto__</span> = <span class="class">Collection</span>.<span class="variable">prototype</span>;</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Copy the collection methods and make them subject to queues
+ </p>
+</td>
+<td class="code">
+<pre><code><span class="keyword">for</span> (<span class="keyword">var</span> <span class="variable">i</span> <span class="keyword">in</span> <span class="class">NativeCollection</span>.<span class="variable">prototype</span>)
+  (<span class="keyword">function</span>(<span class="variable">i</span>){
+    <span class="class">MongooseCollection</span>.<span class="variable">prototype</span>[<span class="variable">i</span>] = <span class="keyword">function</span> () {
+      <span class="comment">// BENCHMARKME: is it worth caching the prototype methods? probably</span>
+      <span class="keyword">if</span> (!<span class="this">this</span>.<span class="variable">buffer</span>){
+        <span class="keyword">var</span> <span class="variable">collection</span> = <span class="this">this</span>.<span class="variable">collection</span>
+          , <span class="variable">args</span> = <span class="variable">arguments</span>
+          , <span class="variable">self</span> = <span class="this">this</span>;
+
+        <span class="variable">process</span>.<span class="variable">nextTick</span>(<span class="keyword">function</span>(){
+          <span class="variable">collection</span>[<span class="variable">i</span>].<span class="variable">apply</span>(<span class="variable">collection</span>, <span class="variable">args</span>);
+        });
+      } <span class="keyword">else</span> {
+        <span class="this">this</span>.<span class="variable">addQueue</span>(<span class="variable">i</span>, <span class="variable">arguments</span>);
+      }
+    };
+  })(<span class="variable">i</span>);</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Override signature of ensureIndex. -native one is not standard.</p>
+
+<h2></h2>
+
+<ul><li><p><strong>param</strong>: <em>Object</em>  spec</p></li><li><p><strong>param</strong>: <em>Object</em>  options</p></li><li><p><strong>param</strong>: <em>Function</em>  callback</p></li><li><p><strong>api</strong>: <em>public</em></p></li></ul>
+</td>
+<td class="code">
+<pre><code><span class="keyword">var</span> <span class="variable">oldEnsureIndex</span> = <span class="class">NativeCollection</span>.<span class="variable">prototype</span>.<span class="variable">ensureIndex</span>;
+
+<span class="keyword">function</span> <span class="variable">noop</span> () {};
+
+<span class="class">NativeCollection</span>.<span class="variable">prototype</span>.<span class="variable">ensureIndex</span> = <span class="keyword">function</span>(<span class="variable">fields</span>, <span class="variable">options</span>, <span class="variable">fn</span>){
+  <span class="keyword">if</span> (!<span class="this">this</span>.<span class="variable">buffer</span>) {
+    <span class="keyword">return</span> <span class="variable">oldEnsureIndex</span>.<span class="variable">apply</span>(<span class="this">this</span>, <span class="variable">arguments</span>);
+  }
+};</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Module exports.
+ </p>
+</td>
+<td class="code">
+<pre><code><span class="variable">module</span>.<span class="variable">exports</span> = <span class="class">MongooseCollection</span>;
+</code></pre>
+</td>
 </tr><tr class="filename"><td><h2 id="lib/drivers/node-mongodb-native/objectid.js"><a href="#">objectid</a></h2></td><td>lib/drivers/node-mongodb-native/objectid.js</td></tr><tr class="code">
 <td class="docs">
 <p>Module dependencies.
@@ -1640,7 +1640,7 @@ on each Schema you create.</p>
 <ul><li><p><strong>param</strong>: <em>version</em></p></li></ul>
 </td>
 <td class="code">
-<pre><code><span class="variable">exports</span>.<span class="variable">version</span> = <span class="string">'2.3.9'</span>;</code></pre>
+<pre><code><span class="variable">exports</span>.<span class="variable">version</span> = <span class="string">'2.3.12'</span>;</code></pre>
 </td>
 </tr>
 <tr class="code">
@@ -1754,86 +1754,6 @@ on each Schema you create.</p>
 
 <span class="variable">exports</span>.<span class="variable">mongo</span> = <span class="variable">require</span>(<span class="string">'mongodb'</span>);
 </code></pre>
-</td>
-</tr><tr class="filename"><td><h2 id="lib/namedscope.js"><a href="#">namedscope</a></h2></td><td>lib/namedscope.js</td></tr><tr class="code">
-<td class="docs">
-<p>var Query = require('./query');
-function NamedScope () {}</p>
-
-<p>NamedScope.prototype.query;</p>
-
-<p>NamedScope.prototype.where = function () {
-  var q = this.query || (this.query = new Query());
-  q.where.apply(q, arguments);
-  return q;
-};</p>
-</td>
-<td class="code">
-<pre><code>*
- * <span class="class">Decorate</span>
- *
- * @<span class="variable">param</span> {<span class="class">NamedScope</span>} <span class="variable">target</span>
- * @<span class="variable">param</span> {<span class="class">Object</span>} <span class="variable">getters</span>
- * @<span class="variable">api</span> <span class="variable">private</span>
- </code></pre>
-</td>
-</tr>
-<tr class="code">
-<td class="docs">
-<p>NamedScope.prototype.decorate = function (target, getters) {
-  var name = this.name
-    , block = this.block
-    , query = this.query;
-  if (block) {
-    if (block.length === 0) {
-      Object.defineProperty(target, name, {
-        get: getters.block0(block)
-      });
-    } else {
-      target[name] = getters.blockN(block);
-    }
-  } else {
-    Object.defineProperty(target, name, {
-      get: getters.basic(query)
-    });
-  }
-};</p>
-
-<p>NamedScope.prototype.compile = function (model) {
-  var allScopes = this.scopesByName
-    , scope;
-  for (var k in allScopes) {
-    scope = allScopes[k];
-    scope.decorate(model, {
-      block0: function (block) {
-        return function () {
-          var cquery = this.<em>cumulativeQuery || (this.</em>cumulativeQuery = new Query().bind(this));
-          block.call(cquery);
-          return this;
-        };
-      },
-      blockN: function (block) {
-        return function () {
-          var cquery = this.<em>cumulativeQuery || (this.</em>cumulativeQuery = new Query().bind(this));
-          block.apply(cquery, arguments);
-          return this;
-        };
-      },
-      basic: function (query) {
-        return function () {
-          var cquery = this.<em>cumulativeQuery || (this.</em>cumulativeQuery = new Query().bind(this));
-          cquery.find(query);
-          return this;
-        };
-      }
-    });
-  }
-};</p>
-
-<p>module.exports = NamedScope;</p>
-</td>
-<td class="code">
-
 </td>
 </tr><tr class="filename"><td><h2 id="lib/model.js"><a href="#">model</a></h2></td><td>lib/model.js</td></tr><tr class="code">
 <td class="docs">
@@ -2328,6 +2248,86 @@ MyModel.update({ name: 'Tobi' }, { ferret: true }, { multi: true }, fn);</code><
   <span class="keyword">return</span> <span class="variable">query</span>.<span class="variable">update</span>(<span class="variable">doc</span>, <span class="variable">callback</span>);
 };</code></pre>
 </td>
+</tr><tr class="filename"><td><h2 id="lib/namedscope.js"><a href="#">namedscope</a></h2></td><td>lib/namedscope.js</td></tr><tr class="code">
+<td class="docs">
+<p>var Query = require('./query');
+function NamedScope () {}</p>
+
+<p>NamedScope.prototype.query;</p>
+
+<p>NamedScope.prototype.where = function () {
+  var q = this.query || (this.query = new Query());
+  q.where.apply(q, arguments);
+  return q;
+};</p>
+</td>
+<td class="code">
+<pre><code>*
+ * <span class="class">Decorate</span>
+ *
+ * @<span class="variable">param</span> {<span class="class">NamedScope</span>} <span class="variable">target</span>
+ * @<span class="variable">param</span> {<span class="class">Object</span>} <span class="variable">getters</span>
+ * @<span class="variable">api</span> <span class="variable">private</span>
+ </code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>NamedScope.prototype.decorate = function (target, getters) {
+  var name = this.name
+    , block = this.block
+    , query = this.query;
+  if (block) {
+    if (block.length === 0) {
+      Object.defineProperty(target, name, {
+        get: getters.block0(block)
+      });
+    } else {
+      target[name] = getters.blockN(block);
+    }
+  } else {
+    Object.defineProperty(target, name, {
+      get: getters.basic(query)
+    });
+  }
+};</p>
+
+<p>NamedScope.prototype.compile = function (model) {
+  var allScopes = this.scopesByName
+    , scope;
+  for (var k in allScopes) {
+    scope = allScopes[k];
+    scope.decorate(model, {
+      block0: function (block) {
+        return function () {
+          var cquery = this.<em>cumulativeQuery || (this.</em>cumulativeQuery = new Query().bind(this));
+          block.call(cquery);
+          return this;
+        };
+      },
+      blockN: function (block) {
+        return function () {
+          var cquery = this.<em>cumulativeQuery || (this.</em>cumulativeQuery = new Query().bind(this));
+          block.apply(cquery, arguments);
+          return this;
+        };
+      },
+      basic: function (query) {
+        return function () {
+          var cquery = this.<em>cumulativeQuery || (this.</em>cumulativeQuery = new Query().bind(this));
+          cquery.find(query);
+          return this;
+        };
+      }
+    });
+  }
+};</p>
+
+<p>module.exports = NamedScope;</p>
+</td>
+<td class="code">
+
+</td>
 </tr><tr class="filename"><td><h2 id="lib/promise.js"><a href="#">promise</a></h2></td><td>lib/promise.js</td></tr><tr class="code">
 <td class="docs">
 <p>Module dependencies.
@@ -2616,6 +2616,12 @@ based on the model's schema.</p>
       <span class="keyword">continue</span>;
 
     } <span class="keyword">else</span> {
+
+      <span class="keyword">if</span> (!<span class="variable">schema</span>) {
+        <span class="comment">// no casting for Mixed types</span>
+        <span class="keyword">continue</span>;
+      }
+
       <span class="variable">schematype</span> = <span class="variable">schema</span>.<span class="variable">path</span>(<span class="variable">path</span>);
 
       <span class="keyword">if</span> (!<span class="variable">schematype</span>) {
@@ -3328,14 +3334,31 @@ receiving results</p>
 </tr>
 <tr class="code">
 <td class="docs">
-<p>Casts the query, sends the update command to mongodb.</p>
+<p>Casts the <code>doc</code> according to the model Schema and
+sends an update command to MongoDB.</p>
+
+<p><em>All paths passed that are not $atomic operations
+will become $set ops so we retain backwards compatibility.</em></p>
+
+<h2>Example</h2>
+
+<p><code>Model.update({..}, { title: 'remove words' }, ...)</code></p>
+
+<p>  becomes</p>
+
+<p><code>Model.update({..}, { $set: { title: 'remove words' }}, ...)</code></p>
+
+<p><em>Passing an empty object <code>{}</code> as the doc will result
+in a no-op. The update operation will be ignored and the
+callback executed without sending the command to MongoDB so as
+to prevent accidently overwritting the collection.</em></p>
 
 <h2></h2>
 
-<ul><li><p><strong>param</strong>: <em>Function</em>  callback fn(err)</p></li><li><p><strong>api</strong>: <em>public</em></p></li></ul>
+<ul><li><p><strong>param</strong>: <em>Object</em>  doc - the update</p></li><li><p><strong>param</strong>: <em>Function</em>  callback - fn(err)</p></li><li><p><strong>api</strong>: <em>public</em></p></li></ul>
 </td>
 <td class="code">
-<pre><code><span class="class">Query</span>.<span class="variable">prototype</span>.<span class="variable">update</span> = <span class="keyword">function</span> (<span class="variable">doc</span>, <span class="variable">callback</span>) {
+<pre><code><span class="class">Query</span>.<span class="variable">prototype</span>.<span class="variable">update</span> = <span class="keyword">function</span> <span class="variable">update</span> (<span class="variable">doc</span>, <span class="variable">callback</span>) {
   <span class="this">this</span>.<span class="variable">op</span> = <span class="string">'update'</span>;
   <span class="this">this</span>.<span class="variable">_updateArg</span> = <span class="variable">doc</span>;
 

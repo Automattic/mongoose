@@ -24,7 +24,7 @@ that triggered the error can be accessed in the `ValidationError` object.
 ## Simple validation
 
 Simple validation is declared by passing a function to `validate` and an error
-type to your `SchemaType` (please read the chapter on model definition to learn
+type to your `SchemaType` \(please read the chapter on [model definition](/docs/model-definition.html) to learn
 more about schemas).
 
     function validator (v) {
@@ -69,14 +69,16 @@ data asynchronously from your validator.
 
 ## Built in validators
 
-- For Strings:
+Strings:
+
   - `enum`: takes a list of allowed values. Example:
 
         var Post = new Schema({
             type: { type: String, enum: ['page', 'post', 'link'] }
         })
 
-- For Numbers:
+Numbers:
+
   - `min`: minimum value
 
         var Person = new Schema({

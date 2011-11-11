@@ -6,28 +6,25 @@ Middleware are defined at the Schema level and are applied when the methods
 `init` (when a document is initialized with data from MongoDB), `save`, and
 `remove` are called on a document instance.
 
-There's two types of middleware, determined by the signature of the function
-you define (ie: the parameters your function accepts):
+There are two types of middleware, serial and parallel.
 
-- Serial
-  Serial middleware are defined like:
+Serial middleware are defined like:
 
-        schema.pre(methodName, function (next) {
-          // ...
-        })
+    schema.pre('save', function (next) {
+      // ...
+    })
 
-  They're executed one after the other, when each middleware calls `next`.
+They're executed one after the other, when each middleware calls `next`.
 
-- Parallel
-  Parallel middleware offer more fine-grained flow control, and are defined
-  like
+Parallel middleware offer more fine-grained flow control, and are defined
+like
 
-        schema.pre(methodName, function (next, done) {
-          // ...
-        })
+    schema.pre('remove', true, function (next, done) {
+      // ...
+    })
 
-  Parallel middleware can `next()` immediately, but the final argument will be
-  called when all the parallel middleware have called `done()`.
+Parallel middleware can `next()` immediately, but the final argument will be
+called when all the parallel middleware have called `done()`.
 
 ## Use cases
 
@@ -48,7 +45,7 @@ and avoiding nested blocks of async code.
 ## Error handling
 
 If any middleware calls `next` or `done` with an `Error` instance, the flow is
-interrupted, and the error is passed to the function passed as an argument.
+interrupted, and the error is passed to the callback.
 
 For example:
 

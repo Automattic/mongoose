@@ -41,10 +41,10 @@ The `Schema` constructor receives an object representation of your schemas as
 its first parameter. If you want to add more keys later, `Schema#add` provides
 the same functionality.
 
-Unlike older versions of mongoose, defining the data types is now a main part
-of defining your models. Your schema is constructed by passing all the
-JavaScript natives that you know (Schema, Number, Date) as well as others
-exclusive to MongoDb (for example `Schema.ObjectId`).
+Your schema is constructed by passing all the
+JavaScript natives that you know (String, Number, Date, Buffer) as well
+as others exclusive to MongoDb (for example `Schema.ObjectId`). For details on all
+SchemaTypes see the [Schema Type chapter](/docs/schematypes.html).
 
     var ObjectId = Schema.ObjectId;
 
@@ -74,8 +74,8 @@ functionality provided by models:
     });
 
 This will allow you to interact very easily with subdocuments later on. For
-more information, refer to the chapter on embedded documents that's part of
-this documentation.
+more information, refer to the chapter on
+[embedded documents](/docs/embedded-documents.html).
 
 ### Defining custom options for keys
 
@@ -89,7 +89,7 @@ options. Some functionality is exclusive to certain types of `SchemaType`s, for
 example only numbers support `min` and `max` values.
 
 In order to customize some of these options directly from the definition of
-your model, set your key to an object with the format `{ type: {Type}, … }`.
+your model, set your key to an object with the format `{ type: Type, ... }`.
 
       var Person = new Schema({
           title   : { type: String, required: true }
@@ -116,7 +116,7 @@ the `path` function:
 
 Some of the options are versatile. `default` takes a `Function` or a value.
 `validate` takes a `Function` or a `RegExp`. More information on these can be
-found in other chapters.
+found in the [Schema Type chapter](/docs/schematypes.html).
 
 ## Beyond keys: Middleware
 
@@ -132,5 +132,12 @@ You'd then define a hook on the User schema like this:
       next();
     });
 
-More information about the specifics of middleware can be found in the
-appropriate chapter.
+More information about the specifics of middleware can be found [here](/docs/middleware.html).
+
+## Instance Methods and Static methods
+
+For details about defining your own custom static and instance methods read [this](/docs/methods-statics.html).
+
+## Plugins
+
+Schemas also support plugins. Read more about it on the [Plugins](/docs/plugins.html) page.

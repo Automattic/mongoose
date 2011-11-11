@@ -21,18 +21,20 @@ Take the following schema:
     var theSituation = new Person({name: { first: 'Michael', last: 'Sorrentino' }});
 
 Suppose you want to write `theSituation`'s full name. You could do so via:
-    console.log( theSituation.name.first + ' ' + theSituation.name.last );
+
+    console.log(theSituation.name.first + ' ' + theSituation.name.last);
 
 It is more convenient to define a virtual attribute, `name.full`, so you can instead write:
 
-    console.log( theSituation.name.full ); 
+    console.log(theSituation.name.full); 
 
 To do so, you can declare a virtual attribute on the Schema, `Person`:
 
-    PersonSchema.virtual('name.full')
-      .get( function () {
-        return this.name.first + ' ' + this.name.last;
-      });
+    PersonSchema
+    .virtual('name.full')
+    .get(function () {
+      return this.name.first + ' ' + this.name.last;
+    });
 
 So when you get `name.full`, via
 
@@ -52,16 +54,19 @@ It would also be nice to be able to set `this.name.first` and `this.name.last` b
 
 Mongoose allows you to do this, too, via virtual attribute setters. You can define a virtual attribute setter thusly:
 
-    PersonSchema.virtual('name.full')
-      .get( function () {
-        return this.name.first + ' ' + this.name.last;
-      })
-      .set( function (setFullNameTo) {
-        var split = setFullNameTo.split(' ')
-          , firstName = split[0], lastName = split[1];
-        this.set('name.first', firstName);
-        this.set('name.last', lastName);
-      });
+    PersonSchema
+    .virtual('name.full')
+    .get(function () {
+      return this.name.first + ' ' + this.name.last;
+    })
+    .set(function (setFullNameTo) {
+      var split = setFullNameTo.split(' ')
+        , firstName = split[0]
+        , lastName = split[1];
+
+      this.set('name.first', firstName);
+      this.set('name.last', lastName);
+    });
 
 Then, when you invoke:
 
@@ -69,7 +74,7 @@ Then, when you invoke:
 
 and you save the document, then `name.first` and `name.last` will be changed in monbodb, but the mongodb document will not have persisted a `name.full` key or value to the database:
 
-    theSituation.save( function (err) {
+    theSituation.save(function (err) {
       Person.findById(theSituation._id, function (err, found) {
         console.log(found.name.first); // 'The'
         console.log(found.name.last);  // 'Situation'

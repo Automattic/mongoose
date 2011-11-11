@@ -1,44 +1,55 @@
-Methods
-=======
+Methods and Statics
+====================
 
-Methods can be defined by calling the 'method' method of the schema you wish
-to attach it to and passing a JSON object containing the method.
+Each `Schema` can define instance and static methods for its model.
 
-## Adding a method to a model
+## Methods
 
-    AccountSchema.method({
-      changeEmail: function(edit_email,callback){
-        this.email = edit_email;
-        this.save(callback);
-      }
+Methods are easy to define:
+
+    var AnimalSchema = new Schema({
+        name: String
+      , type: String
     });
 
-You can now call this by doing something like
+    AnimalSchema.methods.findSimilarType = function findSimilarType (cb) {
+      return this.find({ type: this.type }, cb);
+    };
 
-    // Assuming you've obtained an account document model instance from mongo called a
-    a.changeEmail('example@somedomain.com',function(){
-      console.log('changed account email');
-    });
+Now when we have an instance of `Animal` we can call our `findSimilarType` method and
+find all animals with a matching `type`.
 
-Statics
-=======
+    var Animal = mongoose.model('Animal', AnimalSchema);
+    var dog = new Animal({ name: 'Rover', type: 'dog' });
 
-Similar to methods, statics can be defined by calling the 'static' method of the schema you wish
-to attach it to and passing a JSON object containing the method.  Here because it is a static
-you no longer have access to 'this'.
+    dog.findSimilarType(function (err, dogs) {
+      if (err) return ...
+      dogs.forEach(..);
+    })
 
-## Adding a static function to the model
+Note that we return what `.find()` returns in our method. The advantages are two-fold.
+First, by passing `cb` into `find` we are making it optional b/c `find` called
+without a callback will not run the query. Secondly, `this.find`, `this.where`,
+and other Model methods return instances of [Query](/docs/finding-documents.html)
+which allow us to further utilize its expressive capabilities.
 
-    AccountSchema.static({
-        hashPassword: function(unhashed_password){
-        var salt = '_should_make_this_salt_dynamic';
-        var hash = hashlib.sha1(unhashed_password+salt);
-        return hash;
-      }
-    });
+    dog
+    .findSimilarType()
+    .where('name': /rover/i)
+    .limit(20)
+    .run(function (err, rovers) {
+      if (err) ...
+    })
 
-You can now call this by doing something like
+## Statics
 
-    // Account is the overall mongoose model not an instance
-    var hashed_pw = Account.hashPassword('mypassword'); 
+Statics are pretty much the same as methods but allow for defining functions that
+exist directly on your Model.
 
+    AnimalSchema.statics.search = function search (name, cb) {
+      return this.where('name', new RegExp(name, 'i')).run(cb);
+    }
+
+    Animal.search('Rover', function (err) {
+      if (err) ...
+    })

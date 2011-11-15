@@ -1607,6 +1607,23 @@ module.exports = {
     });
   },
 
+  // GH-610
+  'using nearSphere with Arrays works (geo-spatial)': function () {
+    var db = start()
+      , Test = db.model('Geo3', geoSchema, "y"+random());
+
+    Test.create({ loc: [ 10, 20 ]}, { loc: [ 40, 90 ]}, function (err) {
+      should.strictEqual(err, null);
+      setTimeout(function () {
+        Test.find({ loc: { $nearSphere: [30, 40] }}, function (err, docs) {
+          db.close();
+          should.strictEqual(err, null);
+          docs.length.should.equal(2);
+        });
+      }, 700);
+    });
+  },
+
   'using $maxDistance with Array works (geo-spatial)': function () {
     var db = start()
       , Test = db.model('Geo2', geoSchema, "x"+random());

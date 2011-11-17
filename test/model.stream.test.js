@@ -73,4 +73,25 @@ function assignExports () {
       });
     });
   }
+
+  exports['cursor stream pipe'] = function () {
+    var db = start()
+      , P = db.model('PersonForStream', collection)
+      , filename = '/tmp/_mongoose_stream_out.txt'
+      , out = fs.createWriteStream(filename)
+
+    var stream = P.find({}).stream();
+    stream.pipe(out);
+
+    stream.on('error', function (err) {
+      console.error('ERROR!');
+      console.error(err.stack);
+    });
+    stream.on('close', function () {
+      console.error('closed');
+      P.remove(function () {
+        db.close();
+      });
+    });
+  }
 }

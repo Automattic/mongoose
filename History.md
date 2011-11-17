@@ -2,7 +2,7 @@
 2.3.13 / 2011-11-15
 ===================
 
-  * fixed; required validation for Refs [ded] (#612)
+  * fixed; required validation for Refs (#612) [ded]
   * added; $nearSphere support for Arrays (#610)
 
 2.3.12 / 2011-11-09

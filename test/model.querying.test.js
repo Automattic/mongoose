@@ -1607,6 +1607,23 @@ module.exports = {
     });
   },
 
+  // GH-586
+  'using $within with Arrays works (geo-spatial)': function () {
+    var db = start()
+      , Test = db.model('Geo1', geoSchema, collection + 'geospatial');
+
+    Test.create({ loc: [ 35, 50 ]}, { loc: [ -40, -90 ]}, function (err) {
+      should.strictEqual(err, null);
+      setTimeout(function () {
+        Test.find({ loc: { '$within': { '$box': [[30,40], [40,60]] }}}, function (err, docs) {
+          db.close();
+          should.strictEqual(err, null);
+          docs.length.should.equal(1);
+        });
+      }, 700);
+    });
+  },
+
   // GH-610
   'using nearSphere with Arrays works (geo-spatial)': function () {
     var db = start()

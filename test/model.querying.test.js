@@ -1593,7 +1593,7 @@ module.exports = {
   // GH-309
   'using $near with Arrays works (geo-spatial)': function () {
     var db = start()
-      , Test = db.model('Geo1', geoSchema, collection + 'geospatial');
+      , Test = db.model('Geo1', geoSchema, 'geospatial'+random());
 
     Test.create({ loc: [ 10, 20 ]}, { loc: [ 40, 90 ]}, function (err) {
       should.strictEqual(err, null);
@@ -1610,7 +1610,7 @@ module.exports = {
   // GH-586
   'using $within with Arrays works (geo-spatial)': function () {
     var db = start()
-      , Test = db.model('Geo1', geoSchema, collection + 'geospatial');
+      , Test = db.model('Geo2', geoSchema, collection + 'geospatial');
 
     Test.create({ loc: [ 35, 50 ]}, { loc: [ -40, -90 ]}, function (err) {
       should.strictEqual(err, null);
@@ -1643,7 +1643,7 @@ module.exports = {
 
   'using $maxDistance with Array works (geo-spatial)': function () {
     var db = start()
-      , Test = db.model('Geo2', geoSchema, "x"+random());
+      , Test = db.model('Geo4', geoSchema, "x"+random());
 
     Test.create({ loc: [ 20, 80 ]}, { loc: [ 25, 30 ]}, function (err, docs) {
       should.strictEqual(!!err, false);

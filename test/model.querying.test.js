@@ -1214,7 +1214,6 @@ module.exports = {
         b.save(function (err) {
           should.strictEqual(null, err);
           B.findById(b._id, function (err, b) {
-            db.close();
             should.strictEqual(null, err);
             should.strictEqual(undefined, b.title);
             should.strictEqual(null, b.author);
@@ -1225,6 +1224,16 @@ module.exports = {
             should.strictEqual(undefined, b.comments[0].body);
             b.comments[1].title.should.equal('turkey');
             b.comments[1].body.should.equal('cranberries');
+
+            b.meta = undefined;
+            b.save(function (err) {
+              should.strictEqual(null, err);
+              B.collection.findOne({ _id: b._id}, function (err, b) {
+                db.close();
+                should.strictEqual(null, err);
+                should.strictEqual(undefined, b.meta);
+              });
+            });
           });
         });
       });

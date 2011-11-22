@@ -5,6 +5,7 @@ test:
 	@NODE_ENV=test ./support/expresso/bin/expresso \
 		$(TESTFLAGS) \
 		$(TESTS)
+	@node test/dropdb.js
 
 test-cov:
 	@TESTFLAGS=--cov $(MAKE) test

@@ -830,6 +830,12 @@ module.exports = {
     query.options.snapshot.should.be.true;
   },
 
+  'test Query#batchSize': function () {
+    var query = new Query();
+    query.batchSize(10);
+    query.options.batchSize.should.equal(10);
+  },
+
   'empty updates are not run': function () {
     var q = new Query;
     ;(!!q._castUpdate({})).should.be.false;

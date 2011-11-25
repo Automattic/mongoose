@@ -31,3 +31,5 @@ convert('docs/plugins.md', 'docs/plugins.html');
 convert('docs/populate.md', 'docs/populate.html');
 convert('docs/errors.md', 'docs/errors.html');
 convert('docs/migration-guide.md', 'docs/migration-1x-2x.html');
+convert('docs/query.md', 'docs/query.html');
+convert('docs/querystream.md', 'docs/querystream.html');

@@ -1,5 +1,5 @@
 
-Querying
+Finding documents
 =================
 
 Documents can be retrieved through `find`, `findOne` and `findById`. These
@@ -106,9 +106,9 @@ not $atomic operation names are treated as `$set` operations. Example:
 
     Model.update(query, { $set: { name: 'jason borne' }}, options, callback)
 
-## Query
+## Query API
 
-Each of these methods returns a [Query](https://github.com/LearnBoost/mongoose/blob/master/lib/query.js).
+Each of these methods returns a [Query](/docs/query.html).
 If you don't pass a callback to these methods, the Query can be continued to be
 modified (such as adding options, fields, etc), before it's `exec`d.
 

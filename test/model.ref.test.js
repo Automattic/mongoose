@@ -1225,28 +1225,39 @@ module.exports = {
       if (--pending) return;
 
       var comment = new Comment({
-          user: user
-        , num: 1995
-        , str: 'my string'
-        , text: 'test'
+          text: 'test'
       });
 
-      comment.save(function (err, comment) {
-        should.strictEqual(err, null);
+      comment.save(function (err) {
+        should.equal('Validation failed', err && err.message);
+        err.errors.should.have.property('num');
+        err.errors.should.have.property('str');
+        err.errors.should.have.property('user');
+        err.errors.num.type.should.equal('required');
+        err.errors.str.type.should.equal('required');
+        err.errors.user.type.should.equal('required');
 
-        Comment
-        .findById(comment.id)
-        .populate('user')
-        .populate('num')
-        .populate('str')
-        .run(function (err, comment) {
-          should.strictEqual(err, null);
+        comment.user = user;
+        comment.num = 1995;
+        comment.str = 'my string';
 
-          comment.set({text: 'test2'});
+        comment.save(function (err, comment) {
+          should.strictEqual(null, err);
 
-          comment.save(function (err, comment) {
-            db.close();
+          Comment
+          .findById(comment.id)
+          .populate('user')
+          .populate('num')
+          .populate('str')
+          .run(function (err, comment) {
             should.strictEqual(err, null);
+
+            comment.set({text: 'test2'});
+
+            comment.save(function (err, comment) {
+              db.close();
+              should.strictEqual(err, null);
+            });
           });
         });
       });

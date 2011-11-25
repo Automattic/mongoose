@@ -320,25 +320,25 @@ module.exports = {
   'test Query#wherein.box not via where': function () {
     var query = new Query();
     query.wherein.box('gps', {ll: [5, 25], ur: [10, 30]});
-    query._conditions.should.eql({gps: {$wherein: {$box: [[5, 25], [10, 30]]}}});
+    query._conditions.should.eql({gps: {$within: {$box: [[5, 25], [10, 30]]}}});
   },
 
   'test Query#wherein.box via where': function () {
     var query = new Query();
     query.where('gps').wherein.box({ll: [5, 25], ur: [10, 30]});
-    query._conditions.should.eql({gps: {$wherein: {$box: [[5, 25], [10, 30]]}}});
+    query._conditions.should.eql({gps: {$within: {$box: [[5, 25], [10, 30]]}}});
   },
 
   'test Query#wherein.center not via where': function () {
     var query = new Query();
     query.wherein.center('gps', {center: [5, 25], radius: 5});
-    query._conditions.should.eql({gps: {$wherein: {$center: [[5, 25], 5]}}});
+    query._conditions.should.eql({gps: {$within: {$center: [[5, 25], 5]}}});
   },
 
   'test Query#wherein.center not via where': function () {
     var query = new Query();
     query.where('gps').wherein.center({center: [5, 25], radius: 5});
-    query._conditions.should.eql({gps: {$wherein: {$center: [[5, 25], 5]}}});
+    query._conditions.should.eql({gps: {$within: {$center: [[5, 25], 5]}}});
   },
 
   'test Query#exists where 0 arguments via where': function () {
@@ -828,6 +828,12 @@ module.exports = {
     var query = new Query();
     query.snapshot(true);
     query.options.snapshot.should.be.true;
+  },
+
+  'test Query#batchSize': function () {
+    var query = new Query();
+    query.batchSize(10);
+    query.options.batchSize.should.equal(10);
   },
 
   'empty updates are not run': function () {

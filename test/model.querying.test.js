@@ -1144,15 +1144,14 @@ module.exports = {
     var db = start()
       , BlogPostB = db.model('BlogPostB', collection + random());
 
-    BlogPostB.create({title: 'A', author: null}, function (err, createdA) {
+    BlogPostB.create(
+        { title: 'A', author: null }
+      , { title: 'B' }, function (err, createdA, createdB) {
       should.strictEqual(err, null);
-      BlogPostB.create({title: 'B'}, function (err, createdB) {
+      BlogPostB.find({author: null}, function (err, found) {
+        db.close();
         should.strictEqual(err, null);
-        BlogPostB.find({author: null}, function (err, found) {
-          should.strictEqual(err, null);
-          found.should.have.length(2);
-          db.close();
-        });
+        found.should.have.length(2);
       });
     });
   },
@@ -1161,15 +1160,81 @@ module.exports = {
     var db = start()
       , BlogPostB = db.model('BlogPostB', collection + random());
 
-    BlogPostB.create({title: 'A', author: null}, function (err, createdA) {
+    BlogPostB.create(
+        { title: 'A', author: null}
+      , { title: 'B' }, function (err, createdA, createdB) {
       should.strictEqual(err, null);
-      BlogPostB.create({title: 'B'}, function (err, createdB) {
+      BlogPostB.find({author: {$in: [null], $exists: true}}, function (err, found) {
+        db.close();
         should.strictEqual(err, null);
-        BlogPostB.find({author: {$in: [null], $exists: true}}, function (err, found) {
-          should.strictEqual(err, null);
-          found.should.have.length(1);
-          found[0]._id.should.eql(createdA._id);
-          db.close();
+        found.should.have.length(1);
+        found[0]._id.should.eql(createdA._id);
+      });
+    });
+  },
+
+  'setting a path to undefined should retain the value as undefined': function () {
+    var db = start()
+      , B = db.model('BlogPostB', collection + random())
+
+    var doc = new B;
+    doc.title='css3';
+    doc._delta().$set.title.should.equal('css3');
+    doc.title = undefined;
+    doc._delta().$unset.title.should.equal(1);
+    should.strictEqual(undefined, doc._delta().$set);
+
+    doc.title='css3';
+    doc.author = 'aaron';
+    doc.numbers = [3,4,5];
+    doc.meta.date = new Date;
+    doc.meta.visitors = 89;
+    doc.comments = [{ title: 'thanksgiving', body: 'yuuuumm' }];
+    doc.comments.push({ title: 'turkey', body: 'cranberries' });
+
+    doc.save(function (err) {
+      should.strictEqual(null, err);
+      B.findById(doc._id, function (err, b) {
+        should.strictEqual(null, err);
+        b.title.should.equal('css3');
+        b.author.should.equal('aaron');
+        should.equal(b.meta.date.toString(), doc.meta.date.toString());
+        b.meta.visitors.valueOf().should.equal(doc.meta.visitors.valueOf());
+        b.comments.length.should.equal(2);
+        b.comments[0].title.should.equal('thanksgiving');
+        b.comments[0].body.should.equal('yuuuumm');
+        b.comments[1].title.should.equal('turkey');
+        b.comments[1].body.should.equal('cranberries');
+        b.title = undefined;
+        b.author = null;
+        b.meta.date = undefined;
+        b.meta.visitors = null;
+        b.comments[0].title = null;
+        b.comments[0].body = undefined;
+        b.save(function (err) {
+          should.strictEqual(null, err);
+          B.findById(b._id, function (err, b) {
+            should.strictEqual(null, err);
+            should.strictEqual(undefined, b.title);
+            should.strictEqual(null, b.author);
+
+            should.strictEqual(undefined, b.meta.date);
+            should.strictEqual(null, b.meta.visitors);
+            should.strictEqual(null, b.comments[0].title);
+            should.strictEqual(undefined, b.comments[0].body);
+            b.comments[1].title.should.equal('turkey');
+            b.comments[1].body.should.equal('cranberries');
+
+            b.meta = undefined;
+            b.save(function (err) {
+              should.strictEqual(null, err);
+              B.collection.findOne({ _id: b._id}, function (err, b) {
+                db.close();
+                should.strictEqual(null, err);
+                should.strictEqual(undefined, b.meta);
+              });
+            });
+          });
         });
       });
     });
@@ -1593,7 +1658,7 @@ module.exports = {
   // GH-309
   'using $near with Arrays works (geo-spatial)': function () {
     var db = start()
-      , Test = db.model('Geo1', geoSchema, collection + 'geospatial');
+      , Test = db.model('Geo1', geoSchema, 'geospatial'+random());
 
     Test.create({ loc: [ 10, 20 ]}, { loc: [ 40, 90 ]}, function (err) {
       should.strictEqual(err, null);
@@ -1607,9 +1672,43 @@ module.exports = {
     });
   },
 
+  // GH-586
+  'using $within with Arrays works (geo-spatial)': function () {
+    var db = start()
+      , Test = db.model('Geo2', geoSchema, collection + 'geospatial');
+
+    Test.create({ loc: [ 35, 50 ]}, { loc: [ -40, -90 ]}, function (err) {
+      should.strictEqual(err, null);
+      setTimeout(function () {
+        Test.find({ loc: { '$within': { '$box': [[30,40], [40,60]] }}}, function (err, docs) {
+          db.close();
+          should.strictEqual(err, null);
+          docs.length.should.equal(1);
+        });
+      }, 700);
+    });
+  },
+
+  // GH-610
+  'using nearSphere with Arrays works (geo-spatial)': function () {
+    var db = start()
+      , Test = db.model('Geo3', geoSchema, "y"+random());
+
+    Test.create({ loc: [ 10, 20 ]}, { loc: [ 40, 90 ]}, function (err) {
+      should.strictEqual(err, null);
+      setTimeout(function () {
+        Test.find({ loc: { $nearSphere: [30, 40] }}, function (err, docs) {
+          db.close();
+          should.strictEqual(err, null);
+          docs.length.should.equal(2);
+        });
+      }, 700);
+    });
+  },
+
   'using $maxDistance with Array works (geo-spatial)': function () {
     var db = start()
-      , Test = db.model('Geo2', geoSchema, "x"+random());
+      , Test = db.model('Geo4', geoSchema, "x"+random());
 
     Test.create({ loc: [ 20, 80 ]}, { loc: [ 25, 30 ]}, function (err, docs) {
       should.strictEqual(!!err, false);

@@ -280,6 +280,9 @@ Results in
 
 ## Query#within, Query#$within
 
+    query.within.box
+    query.within.center
+
 todo
 
 ## Query#box, Query#$box
@@ -321,19 +324,73 @@ results in
 
 ## Query#select, Query#fields
 
-todo
+Specifies which [subset of fields](http://www.mongodb.org/display/DOCS/Retrieving+a+Subset+of+Fields)
+you want to return.
+
+    query.select('title', 'name')
+    // only _id, title, and name fields will be populated in your docs
+
+You can also use object syntax:
+
+    query.select({ age: 0, contact: 0 })
+    // return everything but age and contact
+
+or space delimited string syntax:
+
+    query.fields('title name')
+    // return title and name only
+
+or pass an array of field names:
+
+    query.select(['title', 'name'])
+    // return title and name only
 
 ## Query#only
 
-todo
+Specifies a [subset of fields](http://www.mongodb.org/display/DOCS/Retrieving+a+Subset+of+Fields)
+to return. This is like `select()` but this option only
+specifies which fields you want returned.
+
+    query.only('title name')
+    query.only('title', 'name')
+    query.only(['title', 'name'])
 
 ## Query#exclude
 
-todo
+Specifies a [subset of fields](http://www.mongodb.org/display/DOCS/Retrieving+a+Subset+of+Fields)
+to return. This is like `select()` but this option only
+specifies which fields you DO NOT want returned.
+
+    query.exclude('title name')
+    query.exclude('title', 'name')
+    query.exclude(['title', 'name'])
 
 ## Query#slice, Query#$slice
 
-todo
+Retrieve a sub-range of elements in an array with the
+[$slice](http://www.mongodb.org/display/DOCS/Retrieving+a+Subset+of+Fields#RetrievingaSubsetofFields-RetrievingaSubrangeofArrayElements)
+method.
+
+    query.slice(path, val)
+
+`val` can be a Number:
+
+    query.where('tags').slice(5) // last 5 tags
+    query.where('tags').slice(-5) // first 5 tags
+
+or an Array.
+
+    query.where('tags').slice([20, 10]) // skip 20, limit 10
+    query.where('tags').slice([-20, 10]) // 20 from the end, limit 10
+
+`$slice` is also one of the methods with extra chaining sugar: when only one
+argument is passed, it uses the path used the last call to `where()`. Example:
+
+    query.slice('tags', -5)
+
+is the same as
+
+    query.where('tags').slice(-5)
 
 ## Query#populate
 
@@ -343,45 +400,100 @@ Specifies the paths to be populated. See in-depth docs [here](/docs/populate.htm
 
 ## Query#sort
 
-todo
+Sets the [sort](http://www.mongodb.org/display/DOCS/Advanced+Queries#AdvancedQueries-%7B%7Bsort%28%29%7D%7D) path and direction.
+
+    query.sort('path', 1)
+    query.sort('path', -1)
+    query.sort('path', 1, 'another.path', -1)
 
 ## Query#asc
 
-todo
+Sorting sugar.
+
+    query.asc('path' [, paths])
+
+Each string `path` argument will be added to the sort ascending [clause](http://www.mongodb.org/display/DOCS/Advanced+Queries#AdvancedQueries-%7B%7Bsort%28%29%7D%7D).
+
+    query.asc('title', 'name');
+
+Is the same as
+
+    query.sort('title', 1).sort('name', 1);
 
 ## Query#desc
 
-todo
+Sorting sugar.
+
+    query.desc('path' [, paths])
+
+Each string `path` argument will be added to the sort descending [clause](http://www.mongodb.org/display/DOCS/Advanced+Queries#AdvancedQueries-%7B%7Bsort%28%29%7D%7D).
+
+    query.desc('title', 'name');
+
+Is the same as
+
+    query.sort('title', -1, 'name', -1);
 
 # Options
 
 ## Query#limit
 
-todo
+The [limit](http://www.mongodb.org/display/DOCS/Advanced+Queries#AdvancedQueries-%7B%7Blimit%28%29%7D%7D)
+method specifies the max number of documents to return.
+
+    query.limit(20).skip(10)
 
 ## Query#skip
 
-todo
+The [skip](http://www.mongodb.org/display/DOCS/Advanced+Queries#AdvancedQueries-%7B%7Bskip%28%29%7D%7D)
+method specifies at which document the database should begin returning results.
+
+    query.skip(10).limit(20)
 
 ## Query#maxscan
+Limits the number of documents to [scan](http://www.mongodb.org/display/DOCS/Advanced+Queries#AdvancedQueries-%24maxScan).
 
-todo
+    query.maxscan(Number)
 
 ## Query#snapshot
 
-todo
+The [snapshot](http://www.mongodb.org/display/DOCS/Advanced+Queries#AdvancedQueries-%7B%7Bsnapshot%28%29%7D%7D)
+method indicates the use of snapshot mode for the query.
+
+    query.snapshot(Boolean)
 
 ## Query#batchSize
 
-todo
+Sets the numer of documents to return per database query. For example, if we
+were qeurying for 10000 docs and streaming them to the client, we
+may want to limit the number of documents retrieved per cursor iteration to
+reduce memory consuption (all docs are held in memory during iteration).
+Setting `batchSize` to, say, 100, would mean that the cursor would be pulling
+only 100 documents at a time from MongoDB.
+
+    query.batchSize(Number)
 
 ## Query#slaveOk
 
-todo
+Sets the [slaveOk](http://www.mongodb.org/display/DOCS/Replica+Pairs#ReplicaPairs-Queryingtheslave) option.
+
+    query.slaveOk(Boolean)
 
 ## Query#hint
 
-todo
+Specifies the [hint](http://www.mongodb.org/display/DOCS/Optimization#Optimization-Hint)
+option for MongoDB.
+
+    query.hint(indexName)
+
+If your schema has an index like
+
+    Thing.index({ name: 1, title: 1 })
+
+and you wanted to tell MongoDB to use that index for your query (in the off
+chance that MongoDB was not able to figure our that it should use it)
+
+    query.hint({ name: 1, title: 1}).run(callback)
 
 # Executing
 
@@ -391,35 +503,85 @@ todo
 
 ## Query#findOne
 
-todo
+    query.findOne([callback])
 
 ## Query#count
 
-todo
+Sends the count command to MongoDB.
+
+    query.count(callback)
 
 ## Query#distinct
 
-todo
+Casts `field` and sends a distinct command to MongoDB.
+
+    query.distinct(field, callback)
 
 ## Query#update
 
-todo
+Casts the `doc` according to the model Schema and
+sends an update command to MongoDB.
+
+    query.update(doc, callback)
+
+_All paths passed that are not $atomic operations
+will become $set ops so we retain backwards compatibility._
+
+    query.update({..}, { title: 'remove words' }, ...)
+
+becomes
+
+    query.update({..}, { $set: { title: 'remove words' }}, ...)
 
 ## Query#remove
 
-todo
+Casts the query, then sends the remove command to MongoDB.
+
+    query.remove(callback)
 
 ## Query#run, Query#exec
 
 Executes the query passing the results to the optional `callback`.
 
-    query.run(function (err, ...) {
+    query.exec([callback])
+
+Typically used in chaining scenarios:
+
+    Model.findOne().where('points').$gt(1000).run(function (err, doc) {
       if (err) ...
-    })
+    });
 
 ## Query#each
 
-todo
+Streaming cursor interface. _Deprecated as of 2.4.0 which introduces
+query.stream()_
+
+    query.each(callback);
+
+The `callback` is called repeatedly for each document
+found as its streamed. If an error occurs streaming stops.
+
+    query.each(function (err, user) {
+      if (err) return res.end("aww, received an error. all done.");
+      if (user) {
+        res.write(user.name + '\n')
+      } else {
+        res.end("reached end of cursor. all done.");
+      }
+    });
+
+A third parameter may also be used in the callback which
+allows you to iterate the cursor manually.
+
+    query.each(function (err, user, next) {
+      if (err) return res.end("aww, received an error. all done.");
+      if (user) {
+        res.write(user.name + '\n')
+        doSomethingAsync(next);
+      } else {
+        res.end("reached end of cursor. all done.");
+      }
+    });
 
 ## Query#stream
 
@@ -427,3 +589,6 @@ Returns a [QueryStream](/docs/querystream.html) for the query.
 
     Model.find({}).stream().pipe(writeStream)
 
+See the [QueryStream](/docs/querystream.html) docs for details.
+
+Introduced in 2.4.0.

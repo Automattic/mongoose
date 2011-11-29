@@ -830,9 +830,8 @@ doc.set({
 <td class="docs">
 <p>Triggers casting on a specific path</p>
 
-<h2></h2>
-
-<ul><li><p><strong>param</strong>: <em>String</em>  path</p></li><li><p><strong>api</strong>: <em>public</em></p></li></ul>
+<ul><li><strong>tod</strong>: <em>o</em></li><li><p>deprecate? not used anywhere
+## </p></li><li><p><strong>param</strong>: <em>String</em>  path</p></li><li><p><strong>api</strong>: <em>public</em></p></li></ul>
 </td>
 <td class="code">
 <pre><code><span class="class">Document</span>.<span class="variable">prototype</span>.<span class="variable">doCast</span> = <span class="keyword">function</span> (<span class="variable">path</span>) {
@@ -1102,7 +1101,8 @@ we apply getters?
 <ul><li><p><strong>api</strong>: <em>public</em></p></li></ul>
 </td>
 <td class="code">
-<pre><code><span class="class">Document</span>.<span class="variable">prototype</span>.<span class="variable">inspect</span> = <span class="keyword">function</span> () {
+<pre><code><span class="class">Document</span>.<span class="variable">prototype</span>.<span class="variable">toString</span> =
+<span class="class">Document</span>.<span class="variable">prototype</span>.<span class="variable">inspect</span> = <span class="keyword">function</span> () {
   <span class="keyword">return</span> <span class="variable">inspect</span>(<span class="this">this</span>.<span class="variable">toObject</span>());
 };</code></pre>
 </td>
@@ -1192,7 +1192,8 @@ we apply getters?
 </td>
 <td class="code">
 <pre><code><span class="keyword">var</span> <span class="class">Collection</span> = <span class="variable">require</span>(<span class="string">'../../collection'</span>)
-  , <span class="class">NativeCollection</span> = <span class="variable">require</span>(<span class="string">'mongodb'</span>).<span class="class">Collection</span>;</code></pre>
+  , <span class="class">NativeCollection</span> = <span class="variable">require</span>(<span class="string">'mongodb'</span>).<span class="class">Collection</span>
+  , <span class="variable">utils</span> = <span class="variable">require</span>(<span class="string">'../../utils'</span>)</code></pre>
 </td>
 </tr>
 <tr class="code">
@@ -1214,12 +1215,29 @@ we apply getters?
   (<span class="keyword">function</span>(<span class="variable">i</span>){
     <span class="class">MongooseCollection</span>.<span class="variable">prototype</span>[<span class="variable">i</span>] = <span class="keyword">function</span> () {
       <span class="comment">// BENCHMARKME: is it worth caching the prototype methods? probably</span>
-      <span class="keyword">if</span> (!<span class="this">this</span>.<span class="variable">buffer</span>){
+      <span class="keyword">if</span> (!<span class="this">this</span>.<span class="variable">buffer</span>) {
         <span class="keyword">var</span> <span class="variable">collection</span> = <span class="this">this</span>.<span class="variable">collection</span>
           , <span class="variable">args</span> = <span class="variable">arguments</span>
           , <span class="variable">self</span> = <span class="this">this</span>;
 
         <span class="variable">process</span>.<span class="variable">nextTick</span>(<span class="keyword">function</span>(){
+          <span class="keyword">var</span> <span class="variable">debug</span> = <span class="variable">self</span>.<span class="variable">conn</span>.<span class="variable">base</span>.<span class="variable">options</span>.<span class="variable">debug</span>;
+
+          <span class="keyword">if</span> (<span class="variable">debug</span>) {
+            <span class="keyword">if</span> (<span class="string">'function'</span> === <span class="keyword">typeof</span> <span class="variable">debug</span>) {
+              <span class="variable">debug</span>.<span class="variable">apply</span>(<span class="variable">debug</span>
+                , [<span class="variable">self</span>.<span class="variable">name</span>, <span class="variable">i</span>].<span class="variable">concat</span>(<span class="variable">utils</span>.<span class="variable">args</span>(<span class="variable">args</span>, <span class="number integer">0</span>, <span class="variable">args</span>.<span class="variable">length</span>-<span class="number integer">1</span>)));
+            } <span class="keyword">else</span> {
+              <span class="variable">console</span>.<span class="variable">error</span>(<span class="string">'\x1B[0;36mMongoose:\x1B[0m %s.%s(%s) %s %s %s'</span>
+                , <span class="variable">self</span>.<span class="variable">name</span>
+                , <span class="variable">i</span>
+                , <span class="variable">print</span>(<span class="variable">args</span>[<span class="number integer">0</span>])
+                , <span class="variable">print</span>(<span class="variable">args</span>[<span class="number integer">1</span>])
+                , <span class="variable">print</span>(<span class="variable">args</span>[<span class="number integer">2</span>])
+                , <span class="variable">print</span>(<span class="variable">args</span>[<span class="number integer">3</span>]))
+            }
+          }
+
           <span class="variable">collection</span>[<span class="variable">i</span>].<span class="variable">apply</span>(<span class="variable">collection</span>, <span class="variable">args</span>);
         });
       } <span class="keyword">else</span> {
@@ -1640,7 +1658,7 @@ on each Schema you create.</p>
 <ul><li><p><strong>param</strong>: <em>version</em></p></li></ul>
 </td>
 <td class="code">
-<pre><code><span class="variable">exports</span>.<span class="variable">version</span> = <span class="string">'2.3.12'</span>;</code></pre>
+<pre><code><span class="variable">exports</span>.<span class="variable">version</span> = <span class="string">'2.3.13'</span>;</code></pre>
 </td>
 </tr>
 <tr class="code">
@@ -2467,7 +2485,8 @@ success condition.</p>
   , <span class="class">Promise</span> = <span class="variable">require</span>(<span class="string">'./promise'</span>)
   , <span class="class">Document</span> = <span class="variable">require</span>(<span class="string">'./document'</span>)
   , <span class="variable">inGroupsOf</span> = <span class="variable">utils</span>.<span class="variable">inGroupsOf</span>
-  , <span class="variable">tick</span> = <span class="variable">utils</span>.<span class="variable">tick</span></code></pre>
+  , <span class="variable">tick</span> = <span class="variable">utils</span>.<span class="variable">tick</span>
+  , <span class="class">QueryStream</span> = <span class="variable">require</span>(<span class="string">'./querystream'</span>)</code></pre>
 </td>
 </tr>
 <tr class="code">
@@ -2831,33 +2850,22 @@ Moreover, you can also chain a bunch of these together like:
     <span class="variable">conds</span>[<span class="string">'$elemMatch'</span>] = <span class="variable">criteria</span>;
   }
   <span class="keyword">return</span> <span class="this">this</span>;
-};
-
-;[<span class="string">'maxscan'</span>].<span class="variable">forEach</span>( <span class="keyword">function</span> (<span class="variable">method</span>) {
-  <span class="class">Query</span>.<span class="variable">prototype</span>[<span class="variable">method</span>] = <span class="keyword">function</span> (<span class="variable">v</span>) {
-    <span class="this">this</span>.<span class="variable">options</span>[<span class="variable">method</span>] = <span class="variable">v</span>;
-    <span class="keyword">return</span> <span class="this">this</span>;
-  };
-});
-
-<span class="comment">// TODO</span>
-<span class="class">Query</span>.<span class="variable">prototype</span>.<span class="variable">explain</span> = <span class="keyword">function</span> () {
-  <span class="keyword">throw</span> <span class="keyword">new</span> <span class="class">Error</span>(&<span class="variable">quot</span>;<span class="class">Unimplemented</span>&<span class="variable">quot</span>;);
-};
-
-<span class="comment">// TODO Add being able to skip casting -- e.g., this would be nice for scenarios like</span>
-<span class="comment">// if you're migrating to usernames from user id numbers:</span>
-<span class="comment">// query.where('user_id').in([4444, 'brian']);</span>
-
-<span class="comment">// TODO &quot;immortal&quot; cursors - (only work on capped collections)</span>
-<span class="comment">// TODO geoNear command</span>
-
-<span class="comment">// To be used idiomatically where Query#box and Query#center</span>
-;[<span class="string">'wherein'</span>, <span class="string">'$wherein'</span>].<span class="variable">forEach</span>(<span class="keyword">function</span> (<span class="variable">getter</span>) {
+};</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Spatial queries
+ </p>
+</td>
+<td class="code">
+<pre><code><span class="comment">// query.within.box()</span>
+<span class="comment">// query.within.center()</span>
+<span class="keyword">var</span> <span class="variable">within</span> = <span class="string">'within $within'</span>.<span class="variable">split</span>(<span class="string">' '</span>);
+<span class="variable">within</span>.<span class="variable">push</span>(<span class="string">'wherein'</span>, <span class="string">'$wherein'</span>); <span class="comment">// deprecated, an old mistake possibly?</span>
+<span class="variable">within</span>.<span class="variable">forEach</span>(<span class="keyword">function</span> (<span class="variable">getter</span>) {
   <span class="class">Object</span>.<span class="variable">defineProperty</span>(<span class="class">Query</span>.<span class="variable">prototype</span>, <span class="variable">getter</span>, {
-    <span class="variable">get</span>: <span class="keyword">function</span> () {
-      <span class="keyword">return</span> <span class="this">this</span>;
-    }
+    <span class="variable">get</span>: <span class="variable">me</span>
   });
 });
 
@@ -2868,7 +2876,7 @@ Moreover, you can also chain a bunch of these together like:
     <span class="variable">path</span> = <span class="this">this</span>.<span class="variable">_currPath</span>;
   }
   <span class="keyword">var</span> <span class="variable">conds</span> = <span class="this">this</span>.<span class="variable">_conditions</span>[<span class="variable">path</span>] || (<span class="this">this</span>.<span class="variable">_conditions</span>[<span class="variable">path</span>] = {});
-  <span class="variable">conds</span>[<span class="string">'$wherein'</span>] = { <span class="string">'$box'</span>: [<span class="variable">val</span>.<span class="variable">ll</span>, <span class="variable">val</span>.<span class="variable">ur</span>]  };
+  <span class="variable">conds</span>[<span class="string">'$within'</span>] = { <span class="string">'$box'</span>: [<span class="variable">val</span>.<span class="variable">ll</span>, <span class="variable">val</span>.<span class="variable">ur</span>]  };
   <span class="keyword">return</span> <span class="this">this</span>;
 };
 
@@ -2879,7 +2887,18 @@ Moreover, you can also chain a bunch of these together like:
     <span class="variable">path</span> = <span class="this">this</span>.<span class="variable">_currPath</span>;
   }
   <span class="keyword">var</span> <span class="variable">conds</span> = <span class="this">this</span>.<span class="variable">_conditions</span>[<span class="variable">path</span>] || (<span class="this">this</span>.<span class="variable">_conditions</span>[<span class="variable">path</span>] = {});
-  <span class="variable">conds</span>[<span class="string">'$wherein'</span>] = { <span class="string">'$center'</span>: [<span class="variable">val</span>.<span class="variable">center</span>, <span class="variable">val</span>.<span class="variable">radius</span>]  };
+  <span class="variable">conds</span>[<span class="string">'$within'</span>] = { <span class="string">'$center'</span>: [<span class="variable">val</span>.<span class="variable">center</span>, <span class="variable">val</span>.<span class="variable">radius</span>]  };
+  <span class="keyword">return</span> <span class="this">this</span>;
+};
+
+<span class="class">Query</span>.<span class="variable">prototype</span>[<span class="string">'$centerSphere'</span>] =
+<span class="class">Query</span>.<span class="variable">prototype</span>.<span class="variable">centerSphere</span> = <span class="keyword">function</span> (<span class="variable">path</span>, <span class="variable">val</span>) {
+  <span class="keyword">if</span> (<span class="variable">arguments</span>.<span class="variable">length</span> === <span class="number integer">1</span>) {
+    <span class="variable">val</span> = <span class="variable">path</span>;
+    <span class="variable">path</span> = <span class="this">this</span>.<span class="variable">_currPath</span>;
+  }
+  <span class="keyword">var</span> <span class="variable">conds</span> = <span class="this">this</span>.<span class="variable">_conditions</span>[<span class="variable">path</span>] || (<span class="this">this</span>.<span class="variable">_conditions</span>[<span class="variable">path</span>] = {});
+  <span class="variable">conds</span>[<span class="string">'$within'</span>] = { <span class="string">'$centerSphere'</span>: [<span class="variable">val</span>.<span class="variable">center</span>, <span class="variable">val</span>.<span class="variable">radius</span>]  };
   <span class="keyword">return</span> <span class="this">this</span>;
 };</code></pre>
 </td>
@@ -3018,7 +3037,7 @@ query.sort('field', -1, 'test', 1)</code></pre>
   <span class="keyword">return</span> <span class="this">this</span>;
 };
 
-;[<span class="string">'limit'</span>, <span class="string">'skip'</span>, <span class="string">'maxscan'</span>, <span class="string">'snapshot'</span>].<span class="variable">forEach</span>( <span class="keyword">function</span> (<span class="variable">method</span>) {
+;[<span class="string">'limit'</span>, <span class="string">'skip'</span>, <span class="string">'maxscan'</span>, <span class="string">'snapshot'</span>, <span class="string">'batchSize'</span>].<span class="variable">forEach</span>( <span class="keyword">function</span> (<span class="variable">method</span>) {
   <span class="class">Query</span>.<span class="variable">prototype</span>[<span class="variable">method</span>] = <span class="keyword">function</span> (<span class="variable">v</span>) {
     <span class="this">this</span>.<span class="variable">options</span>[<span class="variable">method</span>] = <span class="variable">v</span>;
     <span class="keyword">return</span> <span class="this">this</span>;
@@ -3426,7 +3445,9 @@ result.</p>
 <tr class="code">
 <td class="docs">
 <p>Sets population options.
- </p>
+ - <strong>api</strong>: <em>public</em></p>
+
+<p> </p>
 </td>
 <td class="code">
 <pre><code><span class="class">Query</span>.<span class="variable">prototype</span>.<span class="variable">populate</span> = <span class="keyword">function</span> (<span class="variable">path</span>, <span class="variable">fields</span>, <span class="variable">conditions</span>) {
@@ -3443,11 +3464,161 @@ result.</p>
 </tr>
 <tr class="code">
 <td class="docs">
+<p>Returns a stream interface</p>
+
+<h2>Example</h2>
+
+<p> Thing.find({ name: /^hello/ }).stream().pipe(res)</p>
+
+<ul><li><p><strong>api</strong>: <em>public</em></p></li></ul>
+</td>
+<td class="code">
+<pre><code><span class="class">Query</span>.<span class="variable">prototype</span>.<span class="variable">stream</span> = <span class="keyword">function</span> <span class="variable">stream</span> () {
+  <span class="keyword">return</span> <span class="keyword">new</span> <span class="class">QueryStream</span>(<span class="this">this</span>);
+}
+
+
+<span class="comment">// TODO</span>
+<span class="class">Query</span>.<span class="variable">prototype</span>.<span class="variable">explain</span> = <span class="keyword">function</span> () {
+  <span class="keyword">throw</span> <span class="keyword">new</span> <span class="class">Error</span>(&<span class="variable">quot</span>;<span class="class">Unimplemented</span>&<span class="variable">quot</span>;);
+};
+
+<span class="comment">// TODO Add being able to skip casting -- e.g., this would be nice for scenarios like</span>
+<span class="comment">// if you're migrating to usernames from user id numbers:</span>
+<span class="comment">// query.where('user_id').in([4444, 'brian']);</span>
+<span class="comment">// TODO &quot;immortal&quot; cursors - (only work on capped collections)</span>
+<span class="comment">// TODO geoNear command</span></code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
 <p>Exports.
  </p>
 </td>
 <td class="code">
 <pre><code><span class="variable">module</span>.<span class="variable">exports</span> = <span class="class">Query</span>;
+<span class="variable">module</span>.<span class="variable">exports</span>.<span class="class">QueryStream</span> = <span class="class">QueryStream</span>;
+</code></pre>
+</td>
+</tr><tr class="filename"><td><h2 id="lib/querystream.js"><a href="#">querystream</a></h2></td><td>lib/querystream.js</td></tr><tr class="code">
+<td class="docs">
+<p>Module dependencies.
+ </p>
+</td>
+<td class="code">
+<pre><code><span class="keyword">var</span> <span class="class">Stream</span> = <span class="variable">require</span>(<span class="string">'stream'</span>).<span class="class">Stream</span>
+<span class="keyword">var</span> <span class="variable">utils</span> = <span class="variable">require</span>(<span class="string">'./utils'</span>)</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>QueryStream</p>
+
+<p>Returns a stream interface for the <code>query</code>.</p>
+
+<h2></h2>
+
+<ul><li><p><strong>param</strong>: <em>Query</em>  query</p></li><li><p><strong>return</strong>: <em>Stream</em> </p></li></ul>
+</td>
+<td class="code">
+<pre><code><span class="keyword">function</span> <span class="class">QueryStream</span> (<span class="variable">query</span>) {
+  <span class="class">Stream</span>.<span class="variable">call</span>(<span class="this">this</span>);
+
+  <span class="this">this</span>.<span class="variable">query</span> = <span class="variable">query</span>;
+  <span class="this">this</span>.<span class="variable">readable</span> = <span class="variable">true</span>;
+  <span class="this">this</span>.<span class="variable">paused</span> = <span class="variable">false</span>;
+  <span class="this">this</span>.<span class="variable">_cursor</span> = <span class="keyword">null</span>;
+  <span class="this">this</span>.<span class="variable">_destroyed</span> = <span class="keyword">null</span>;
+  <span class="this">this</span>.<span class="variable">_fields</span> = <span class="keyword">null</span>;
+
+  <span class="comment">// give time to hook up events</span>
+  <span class="keyword">var</span> <span class="variable">self</span> = <span class="this">this</span>;
+  <span class="variable">process</span>.<span class="variable">nextTick</span>(<span class="keyword">function</span> () {
+    <span class="variable">self</span>.<span class="variable">_init</span>();
+  });
+}</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Flag stating whether or not this stream is readable.
+ - <strong>api</strong>: <em>public</em></p>
+
+<p> </p>
+</td>
+<td class="code">
+<pre><code><span class="class">QueryStream</span>.<span class="variable">prototype</span>.<span class="variable">readable</span>;</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Flag stating whether or not this stream is paused.
+ - <strong>api</strong>: <em>public</em></p>
+
+<p> </p>
+</td>
+<td class="code">
+<pre><code><span class="class">QueryStream</span>.<span class="variable">prototype</span>.<span class="variable">paused</span>;</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Pauses this stream.
+ - <strong>api</strong>: <em>public</em></p>
+
+<p> </p>
+</td>
+<td class="code">
+<pre><code><span class="class">QueryStream</span>.<span class="variable">prototype</span>.<span class="variable">pause</span> = <span class="keyword">function</span> () {
+  <span class="this">this</span>.<span class="variable">paused</span> = <span class="variable">true</span>;
+}</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Resumes this stream.
+ - <strong>api</strong>: <em>public</em></p>
+
+<p> </p>
+</td>
+<td class="code">
+<pre><code><span class="class">QueryStream</span>.<span class="variable">prototype</span>.<span class="variable">resume</span> = <span class="keyword">function</span> () {
+  <span class="this">this</span>.<span class="variable">paused</span> = <span class="variable">false</span>;
+  <span class="this">this</span>.<span class="variable">_next</span>();
+}</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Destroys the stream, closing the underlying
+cursor. No more events will be emitted.
+ - <strong>api</strong>: <em>public</em></p>
+
+<p> </p>
+</td>
+<td class="code">
+<pre><code><span class="class">QueryStream</span>.<span class="variable">prototype</span>.<span class="variable">destroy</span> = <span class="keyword">function</span> (<span class="variable">err</span>) {
+  <span class="keyword">if</span> (<span class="this">this</span>.<span class="variable">_destroyed</span>) <span class="keyword">return</span>;
+  <span class="this">this</span>.<span class="variable">_destroyed</span> = <span class="variable">true</span>;
+  <span class="this">this</span>.<span class="variable">readable</span> = <span class="variable">false</span>;
+
+  <span class="keyword">if</span> (<span class="this">this</span>.<span class="variable">_cursor</span>) {
+    <span class="this">this</span>.<span class="variable">_cursor</span>.<span class="variable">close</span>();
+  }
+
+  <span class="keyword">if</span> (<span class="variable">err</span>) {
+    <span class="this">this</span>.<span class="variable">emit</span>(<span class="string">'error'</span>, <span class="variable">err</span>);
+  }
+
+  <span class="this">this</span>.<span class="variable">emit</span>(<span class="string">'close'</span>);
+}
+
+<span class="comment">// TODO - maybe implement the -native raw option to pass binary?</span>
+<span class="comment">//QueryStream.prototype.setEncoding = function () {</span>
+<span class="comment">//}</span>
+
+
+<span class="variable">module</span>.<span class="variable">exports</span> = <span class="variable">exports</span> = <span class="class">QueryStream</span>;
 </code></pre>
 </td>
 </tr><tr class="filename"><td><h2 id="lib/schema/string.js"><a href="#">string</a></h2></td><td>lib/schema/string.js</td></tr><tr class="code">

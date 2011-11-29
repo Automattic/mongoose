@@ -1,5 +1,6 @@
 <html>
   <head>
+    <meta charset="utf-8">
     <title>Mongoose ODM</title>
     <style>
       body {
@@ -64,7 +65,8 @@
         background: rgba(255,255,255,.8);
         border: 1px solid #c6c6c6;
         padding: 10px;
-        border-radius: 3px
+        border-radius: 3px;
+        box-shadow: 1px 3px 6px #ddd;
       }
 
       code {
@@ -480,6 +482,9 @@ query.elemMatch(path, function)</code></pre>
 
 <h2>Query#within, Query#$within</h2>
 
+<pre><code>query.within.box
+query.within.center</code></pre>
+
 <p>todo</p>
 
 <h2>Query#box, Query#$box</h2>
@@ -521,19 +526,73 @@ query.where(path).$near(10, 1)</code></pre>
 
 <h2>Query#select, Query#fields</h2>
 
-<p>todo</p>
+<p>Specifies which <a href="http://www.mongodb.org/display/DOCS/Retrieving+a+Subset+of+Fields">subset of fields</a>
+you want to return.</p>
+
+<pre><code>query.select(&#39;title&#39;, &#39;name&#39;)
+// only _id, title, and name fields will be populated in your docs</code></pre>
+
+<p>You can also use object syntax:</p>
+
+<pre><code>query.select({ age: 0, contact: 0 })
+// return everything but age and contact</code></pre>
+
+<p>or space delimited string syntax:</p>
+
+<pre><code>query.fields(&#39;title name&#39;)
+// return title and name only</code></pre>
+
+<p>or pass an array of field names:</p>
+
+<pre><code>query.select([&#39;title&#39;, &#39;name&#39;])
+// return title and name only</code></pre>
 
 <h2>Query#only</h2>
 
-<p>todo</p>
+<p>Specifies a <a href="http://www.mongodb.org/display/DOCS/Retrieving+a+Subset+of+Fields">subset of fields</a>
+to return. This is like <code>select()</code> but this option only
+specifies which fields you want returned.</p>
+
+<pre><code>query.only(&#39;title name&#39;)
+query.only(&#39;title&#39;, &#39;name&#39;)
+query.only([&#39;title&#39;, &#39;name&#39;])</code></pre>
 
 <h2>Query#exclude</h2>
 
-<p>todo</p>
+<p>Specifies a <a href="http://www.mongodb.org/display/DOCS/Retrieving+a+Subset+of+Fields">subset of fields</a>
+to return. This is like <code>select()</code> but this option only
+specifies which fields you DO NOT want returned.</p>
+
+<pre><code>query.exclude(&#39;title name&#39;)
+query.exclude(&#39;title&#39;, &#39;name&#39;)
+query.exclude([&#39;title&#39;, &#39;name&#39;])</code></pre>
 
 <h2>Query#slice, Query#$slice</h2>
 
-<p>todo</p>
+<p>Retrieve a sub-range of elements in an array with the
+<a href="http://www.mongodb.org/display/DOCS/Retrieving+a+Subset+of+Fields#RetrievingaSubsetofFields-RetrievingaSubrangeofArrayElements">$slice</a>
+method.</p>
+
+<pre><code>query.slice(path, val)</code></pre>
+
+<p><code>val</code> can be a Number:</p>
+
+<pre><code>query.where(&#39;tags&#39;).slice(5) // last 5 tags
+query.where(&#39;tags&#39;).slice(-5) // first 5 tags</code></pre>
+
+<p>or an Array.</p>
+
+<pre><code>query.where(&#39;tags&#39;).slice([20, 10]) // skip 20, limit 10
+query.where(&#39;tags&#39;).slice([-20, 10]) // 20 from the end, limit 10</code></pre>
+
+<p><code>$slice</code> is also one of the methods with extra chaining sugar: when only one
+argument is passed, it uses the path used the last call to <code>where()</code>. Example:</p>
+
+<pre><code>query.slice(&#39;tags&#39;, -5)</code></pre>
+
+<p>is the same as</p>
+
+<pre><code>query.where(&#39;tags&#39;).slice(-5)</code></pre>
 
 <h2>Query#populate</h2>
 
@@ -543,45 +602,102 @@ query.where(path).$near(10, 1)</code></pre>
 
 <h2>Query#sort</h2>
 
-<p>todo</p>
+<p>Sets the <a href="http://www.mongodb.org/display/DOCS/Advanced+Queries#AdvancedQueries-%7B%7Bsort%28%29%7D%7D">sort</a> path and direction.</p>
+
+<pre><code>query.sort(&#39;path&#39;, 1)
+query.sort(&#39;path&#39;, -1)
+query.sort(&#39;path&#39;, 1, &#39;another.path&#39;, -1)</code></pre>
 
 <h2>Query#asc</h2>
 
-<p>todo</p>
+<p>Sorting sugar.</p>
+
+<pre><code>query.asc(&#39;path&#39; [, paths])</code></pre>
+
+<p>Each string <code>path</code> argument will be added to the sort ascending <a href="http://www.mongodb.org/display/DOCS/Advanced+Queries#AdvancedQueries-%7B%7Bsort%28%29%7D%7D">clause</a>.</p>
+
+<pre><code>query.asc(&#39;title&#39;, &#39;name&#39;);</code></pre>
+
+<p>Is the same as</p>
+
+<pre><code>query.sort(&#39;title&#39;, 1).sort(&#39;name&#39;, 1);</code></pre>
 
 <h2>Query#desc</h2>
 
-<p>todo</p>
+<p>Sorting sugar.</p>
+
+<pre><code>query.desc(&#39;path&#39; [, paths])</code></pre>
+
+<p>Each string <code>path</code> argument will be added to the sort descending <a href="http://www.mongodb.org/display/DOCS/Advanced+Queries#AdvancedQueries-%7B%7Bsort%28%29%7D%7D">clause</a>.</p>
+
+<pre><code>query.desc(&#39;title&#39;, &#39;name&#39;);</code></pre>
+
+<p>Is the same as</p>
+
+<pre><code>query.sort(&#39;title&#39;, -1, &#39;name&#39;, -1);</code></pre>
 
 <h1>Options</h1>
 
 <h2>Query#limit</h2>
 
-<p>todo</p>
+<p>The <a href="http://www.mongodb.org/display/DOCS/Advanced+Queries#AdvancedQueries-%7B%7Blimit%28%29%7D%7D">limit</a>
+method specifies the max number of documents to return.</p>
+
+<pre><code>query.limit(20).skip(10)</code></pre>
 
 <h2>Query#skip</h2>
 
-<p>todo</p>
+<p>The <a href="http://www.mongodb.org/display/DOCS/Advanced+Queries#AdvancedQueries-%7B%7Bskip%28%29%7D%7D">skip</a>
+method specifies at which document the database should begin returning results.</p>
+
+<pre><code>query.skip(10).limit(20)</code></pre>
 
 <h2>Query#maxscan</h2>
 
-<p>todo</p>
+<p>Limits the number of documents to <a href="http://www.mongodb.org/display/DOCS/Advanced+Queries#AdvancedQueries-%24maxScan">scan</a>.</p>
+
+<pre><code>query.maxscan(Number)</code></pre>
 
 <h2>Query#snapshot</h2>
 
-<p>todo</p>
+<p>The <a href="http://www.mongodb.org/display/DOCS/Advanced+Queries#AdvancedQueries-%7B%7Bsnapshot%28%29%7D%7D">snapshot</a>
+method indicates the use of snapshot mode for the query.</p>
+
+<pre><code>query.snapshot(Boolean)</code></pre>
 
 <h2>Query#batchSize</h2>
 
-<p>todo</p>
+<p>Sets the numer of documents to return per database query. For example, if we
+were qeurying for 10000 docs and streaming them to the client, we
+may want to limit the number of documents retrieved per cursor iteration to
+reduce memory consuption (all docs are held in memory during iteration).
+Setting <code>batchSize</code> to, say, 100, would mean that the cursor would be pulling
+only 100 documents at a time from MongoDB.</p>
+
+<pre><code>query.batchSize(Number)</code></pre>
 
 <h2>Query#slaveOk</h2>
 
-<p>todo</p>
+<p>Sets the <a href="http://www.mongodb.org/display/DOCS/Replica+Pairs#ReplicaPairs-Queryingtheslave">slaveOk</a> option.</p>
+
+<pre><code>query.slaveOk(Boolean)</code></pre>
 
 <h2>Query#hint</h2>
 
-<p>todo</p>
+<p>Specifies the <a href="http://www.mongodb.org/display/DOCS/Optimization#Optimization-Hint">hint</a>
+option for MongoDB.</p>
+
+<pre><code>query.hint(indexName)</code></pre>
+
+<p>If your schema has an index like</p>
+
+<pre><code>Thing.index({ name: 1, title: 1 })</code></pre>
+
+<p>and you wanted to tell MongoDB to use that index for your query (in the off
+chance that MongoDB was not able to figure our that it should use it)
+you can give MongoDB a hint like so:</p>
+
+<pre><code>query.hint({ name: 1, title: 1}).run(callback)</code></pre>
 
 <h1>Executing</h1>
 
@@ -591,41 +707,97 @@ query.where(path).$near(10, 1)</code></pre>
 
 <h2>Query#findOne</h2>
 
-<p>todo</p>
+<pre><code>query.findOne([callback])</code></pre>
 
 <h2>Query#count</h2>
 
-<p>todo</p>
+<p>Sends the count command to MongoDB.</p>
+
+<pre><code>query.count(callback)</code></pre>
 
 <h2>Query#distinct</h2>
 
-<p>todo</p>
+<p>Casts <code>field</code> and sends a distinct command to MongoDB.</p>
+
+<pre><code>query.distinct(field, callback)</code></pre>
 
 <h2>Query#update</h2>
 
-<p>todo</p>
+<p>Casts the <code>doc</code> according to the model Schema and
+sends an update command to MongoDB.</p>
+
+<pre><code>query.update(doc, callback)</code></pre>
+
+<p><em>All paths passed that are not $atomic operations
+will become $set ops so we retain backwards compatibility.</em></p>
+
+<pre><code>query.update({..}, { title: &#39;remove words&#39; }, ...)</code></pre>
+
+<p>becomes</p>
+
+<pre><code>query.update({..}, { $set: { title: &#39;remove words&#39; }}, ...)</code></pre>
 
 <h2>Query#remove</h2>
 
-<p>todo</p>
+<p>Casts the query, then sends the remove command to MongoDB.</p>
+
+<pre><code>query.remove(callback)</code></pre>
 
 <h2>Query#run, Query#exec</h2>
 
 <p>Executes the query passing the results to the optional <code>callback</code>.</p>
 
-<pre><code>query.run(function (err, ...) {
+<pre><code>query.exec([callback])</code></pre>
+
+<p>Typically used in chaining scenarios:</p>
+
+<pre><code>Model.findOne().where(&#39;points&#39;).$gt(1000).run(function (err, doc) {
   if (err) ...
-})</code></pre>
+});</code></pre>
 
 <h2>Query#each</h2>
 
-<p>todo</p>
+<p>A streaming cursor interface.</p>
+
+<p><em>2.4.0 introduces the query.stream() method
+which is a more &#39;node-like&#39; way of streaming records and provides
+better cursor management. It is recommended that you use query.stream in
+place of query.each.</em></p>
+
+<pre><code>query.each(callback);</code></pre>
+
+<p>The <code>callback</code> is called repeatedly for each document
+found as its streamed. If an error occurs streaming stops.</p>
+
+<pre><code>query.each(function (err, user) {
+  if (err) return res.end(&quot;aww, received an error. all done.&quot;);
+  if (user) {
+    res.write(user.name + &#39;\n&#39;)
+  } else {
+    res.end(&quot;reached end of cursor. all done.&quot;);
+  }
+});</code></pre>
+
+<p>A third parameter may also be used in the callback which
+allows you to iterate the cursor manually.</p>
+
+<pre><code>query.each(function (err, user, next) {
+  if (err) return res.end(&quot;aww, received an error. all done.&quot;);
+  if (user) {
+    res.write(user.name + &#39;\n&#39;)
+    doSomethingAsync(next);
+  } else {
+    res.end(&quot;reached end of cursor. all done.&quot;);
+  }
+});</code></pre>
 
 <h2>Query#stream</h2>
 
 <p>Returns a <a href="/docs/querystream.html">QueryStream</a> for the query.</p>
 
 <pre><code>Model.find({}).stream().pipe(writeStream)</code></pre>
+
+<p>See the <a href="/docs/querystream.html">QueryStream</a> docs for details.</p>
         </div>
 
         <div id="footer">

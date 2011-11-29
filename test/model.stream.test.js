@@ -188,7 +188,7 @@ function assignExports () { var o = {
     function done (err) {
       ++finished;
       setTimeout(function () {
-        should.equal('notConnected', err.message);
+        should.equal('no open connections', err.message);
         i.should.equal(5);
         closed.should.equal(1);
         finished.should.equal(1);

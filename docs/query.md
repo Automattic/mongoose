@@ -492,6 +492,7 @@ If your schema has an index like
 
 and you wanted to tell MongoDB to use that index for your query (in the off
 chance that MongoDB was not able to figure our that it should use it)
+you can give MongoDB a hint like so:
 
     query.hint({ name: 1, title: 1}).run(callback)
 
@@ -553,8 +554,12 @@ Typically used in chaining scenarios:
 
 ## Query#each
 
-Streaming cursor interface. _Deprecated as of 2.4.0 which introduces
-query.stream()_
+A streaming cursor interface.
+
+_2.4.0 introduces the query.stream() method
+which is a more 'node-like' way of streaming records and provides
+better cursor management. It is recommended that you use query.stream in
+place of query.each._
 
     query.each(callback);
 
@@ -591,4 +596,3 @@ Returns a [QueryStream](/docs/querystream.html) for the query.
 
 See the [QueryStream](/docs/querystream.html) docs for details.
 
-Introduced in 2.4.0.

@@ -1,4 +1,4 @@
-Populate - DBRef-like behavior (experimental)
+Populate - DBRef-like behavior
 =============================================
 
 `ObjectIds` can now refer to another document in a

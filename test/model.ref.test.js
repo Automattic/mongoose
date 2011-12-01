@@ -1119,7 +1119,7 @@ module.exports = {
         should.strictEqual(err, null);
 
         P.findById(post)
-        .populate('fans', null, null, { sort: [['name', 1]] })
+        .populate('fans', null, null, { sort: 'name' })
         .run(function (err, post) {
           should.strictEqual(err, null);
 
@@ -1142,7 +1142,7 @@ module.exports = {
             should.strictEqual(undefined, post.fans[0].age)
 
             P.findById(post)
-            .populate('fans', 'age', { age: { $gt: 3 }}, { sort: [['name', -1]] })
+            .populate('fans', 'age', { age: { $gt: 3 }}, { sort: [['name', 'desc']] })
             .run(function (err, post) {
               db.close();
               should.strictEqual(err, null);

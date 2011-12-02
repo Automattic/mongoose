@@ -24,4 +24,8 @@ docs/api.html: lib/*.js
 docclean:
 	rm -f docs/*.{1,html}
 
-.PHONY: test test-cov docs docclean
+site:
+	node website.js && node static.js
+
+
+.PHONY: test test-cov docs docclean site

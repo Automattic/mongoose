@@ -1,4 +1,23 @@
 
+2.4.1 / 2011-12-02
+===================
+
+  * added; options support for populate() queries
+  * updated; -native driver to 0.9.7-1.4
+
+2.4.0 / 2011-11-29
+===================
+
+  * added; QueryStreams (#614)
+  * added; debug print mode for development
+  * added; $within support to Array queries (#586) [ggoodale]
+  * added; $centerSphere query support
+  * fixed; $within support
+  * added; $unset is now used when setting a path to undefined (#519)
+  * added; query#batchSize support
+  * updated; docs
+  * updated; -native driver to 0.9.7-1.3 (provides Windows support)
+
 2.3.13 / 2011-11-15
 ===================
 

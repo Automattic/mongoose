@@ -4106,7 +4106,7 @@ module.exports = {
       var worked = false;
       t.save(function (err) {
         worked = true;
-        err.message.should.eql('notConnected');
+        err.message.should.eql('no open connections');
       });
 
       process.nextTick(function () {

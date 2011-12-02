@@ -17,7 +17,7 @@ var start = require('./common')
   , DocumentObjectId = mongoose.Types.ObjectId
   , fs = require('fs')
 
-var names = fs.readFileSync(__dirname + '/testnames.txt', 'utf8').split(' ')
+var names = ('Aaden Aaron Adrian Aditya Agustin Jim Bob Jonah Frank Sally Lucy').split(' ');
 
 /**
  * Setup.
@@ -67,7 +67,7 @@ function assignExports () { var o = {
         return done();
       }
 
-      if (++i === 500) {
+      if (++i === 3) {
         stream.paused.should.be.false;
         stream.pause();
         stream.paused.should.be.true;
@@ -188,7 +188,7 @@ function assignExports () { var o = {
     function done (err) {
       ++finished;
       setTimeout(function () {
-        should.equal('notConnected', err.message);
+        should.equal('no open connections', err.message);
         i.should.equal(5);
         closed.should.equal(1);
         finished.should.equal(1);

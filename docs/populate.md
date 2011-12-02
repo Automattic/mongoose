@@ -83,6 +83,15 @@ be accomplished by passing an array of field names to the `populate` method:
 Now this is much better. The only property of the creator we are using
 is the `name` so we only returned that field from the db. Efficiency FTW!
 
+Great, but what if we wanted to populate
+our `fans` array based on their age, and return, at most, any 5 of them?
+
+    Story
+    .find(...)
+    .populate('fans', null, { age: { $gte: 21 }}, { limit: 5 })
+
+Done. Conditions and options are the third and fourth arguments respectively.
+
 ## Updating
 
 Now that we have a story we realized that the `_creator` was incorrect. We can

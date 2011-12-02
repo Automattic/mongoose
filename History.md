@@ -1,4 +1,10 @@
 
+2.4.1 / 2011-12-02
+===================
+
+  * added; options support for populate() queries
+  * updated; -native driver to 0.9.7-1.4
+
 2.4.0 / 2011-11-29
 ===================
 

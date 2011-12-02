@@ -1658,7 +1658,9 @@ on each Schema you create.</p>
 <ul><li><p><strong>param</strong>: <em>version</em></p></li></ul>
 </td>
 <td class="code">
-<pre><code><span class="variable">exports</span>.<span class="variable">version</span> = <span class="string">'2.3.13'</span>;</code></pre>
+<pre><code><span class="variable">exports</span>.<span class="variable">version</span> = <span class="class">JSON</span>.<span class="variable">parse</span>(
+  <span class="variable">require</span>(<span class="string">'fs'</span>).<span class="variable">readFileSync</span>(<span class="variable">__dirname</span> + <span class="string">'/../package.json'</span>, <span class="string">'utf8'</span>)
+).<span class="variable">version</span>;</code></pre>
 </td>
 </tr>
 <tr class="code">
@@ -3450,14 +3452,13 @@ result.</p>
 <p> </p>
 </td>
 <td class="code">
-<pre><code><span class="class">Query</span>.<span class="variable">prototype</span>.<span class="variable">populate</span> = <span class="keyword">function</span> (<span class="variable">path</span>, <span class="variable">fields</span>, <span class="variable">conditions</span>) {
+<pre><code><span class="class">Query</span>.<span class="variable">prototype</span>.<span class="variable">populate</span> = <span class="keyword">function</span> (<span class="variable">path</span>, <span class="variable">fields</span>, <span class="variable">conditions</span>, <span class="variable">options</span>) {
   <span class="comment">// The order of fields/conditions args is opposite Model.find but</span>
   <span class="comment">// necessary to keep backward compatibility (fields could be</span>
   <span class="comment">// an array, string, or object literal).</span>
-  <span class="this">this</span>.<span class="variable">options</span>.<span class="variable">populate</span>[<span class="variable">path</span>] = {
-      <span class="variable">conditions</span>: <span class="variable">conditions</span>
-    , <span class="variable">fields</span>: <span class="variable">fields</span>
-  };
+  <span class="this">this</span>.<span class="variable">options</span>.<span class="variable">populate</span>[<span class="variable">path</span>] =
+    <span class="keyword">new</span> <span class="class">PopulateOptions</span>(<span class="variable">fields</span>, <span class="variable">conditions</span>, <span class="variable">options</span>);
+
   <span class="keyword">return</span> <span class="this">this</span>;
 };</code></pre>
 </td>
@@ -3475,19 +3476,7 @@ result.</p>
 <td class="code">
 <pre><code><span class="class">Query</span>.<span class="variable">prototype</span>.<span class="variable">stream</span> = <span class="keyword">function</span> <span class="variable">stream</span> () {
   <span class="keyword">return</span> <span class="keyword">new</span> <span class="class">QueryStream</span>(<span class="this">this</span>);
-}
-
-
-<span class="comment">// TODO</span>
-<span class="class">Query</span>.<span class="variable">prototype</span>.<span class="variable">explain</span> = <span class="keyword">function</span> () {
-  <span class="keyword">throw</span> <span class="keyword">new</span> <span class="class">Error</span>(&<span class="variable">quot</span>;<span class="class">Unimplemented</span>&<span class="variable">quot</span>;);
-};
-
-<span class="comment">// TODO Add being able to skip casting -- e.g., this would be nice for scenarios like</span>
-<span class="comment">// if you're migrating to usernames from user id numbers:</span>
-<span class="comment">// query.where('user_id').in([4444, 'brian']);</span>
-<span class="comment">// TODO &quot;immortal&quot; cursors - (only work on capped collections)</span>
-<span class="comment">// TODO geoNear command</span></code></pre>
+}</code></pre>
 </td>
 </tr>
 <tr class="code">
@@ -3542,9 +3531,7 @@ result.</p>
 <tr class="code">
 <td class="docs">
 <p>Flag stating whether or not this stream is readable.
- - <strong>api</strong>: <em>public</em></p>
-
-<p> </p>
+ </p>
 </td>
 <td class="code">
 <pre><code><span class="class">QueryStream</span>.<span class="variable">prototype</span>.<span class="variable">readable</span>;</code></pre>
@@ -3553,9 +3540,7 @@ result.</p>
 <tr class="code">
 <td class="docs">
 <p>Flag stating whether or not this stream is paused.
- - <strong>api</strong>: <em>public</em></p>
-
-<p> </p>
+ </p>
 </td>
 <td class="code">
 <pre><code><span class="class">QueryStream</span>.<span class="variable">prototype</span>.<span class="variable">paused</span>;</code></pre>
@@ -3564,9 +3549,7 @@ result.</p>
 <tr class="code">
 <td class="docs">
 <p>Pauses this stream.
- - <strong>api</strong>: <em>public</em></p>
-
-<p> </p>
+ </p>
 </td>
 <td class="code">
 <pre><code><span class="class">QueryStream</span>.<span class="variable">prototype</span>.<span class="variable">pause</span> = <span class="keyword">function</span> () {
@@ -3577,9 +3560,7 @@ result.</p>
 <tr class="code">
 <td class="docs">
 <p>Resumes this stream.
- - <strong>api</strong>: <em>public</em></p>
-
-<p> </p>
+ </p>
 </td>
 <td class="code">
 <pre><code><span class="class">QueryStream</span>.<span class="variable">prototype</span>.<span class="variable">resume</span> = <span class="keyword">function</span> () {
@@ -3592,9 +3573,7 @@ result.</p>
 <td class="docs">
 <p>Destroys the stream, closing the underlying
 cursor. No more events will be emitted.
- - <strong>api</strong>: <em>public</em></p>
-
-<p> </p>
+ </p>
 </td>
 <td class="code">
 <pre><code><span class="class">QueryStream</span>.<span class="variable">prototype</span>.<span class="variable">destroy</span> = <span class="keyword">function</span> (<span class="variable">err</span>) {
@@ -3611,14 +3590,16 @@ cursor. No more events will be emitted.
   }
 
   <span class="this">this</span>.<span class="variable">emit</span>(<span class="string">'close'</span>);
-}
-
-<span class="comment">// TODO - maybe implement the -native raw option to pass binary?</span>
-<span class="comment">//QueryStream.prototype.setEncoding = function () {</span>
-<span class="comment">//}</span>
-
-
-<span class="variable">module</span>.<span class="variable">exports</span> = <span class="variable">exports</span> = <span class="class">QueryStream</span>;
+}</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Exports
+ </p>
+</td>
+<td class="code">
+<pre><code><span class="variable">module</span>.<span class="variable">exports</span> = <span class="variable">exports</span> = <span class="class">QueryStream</span>;
 </code></pre>
 </td>
 </tr><tr class="filename"><td><h2 id="lib/schema/string.js"><a href="#">string</a></h2></td><td>lib/schema/string.js</td></tr><tr class="code">

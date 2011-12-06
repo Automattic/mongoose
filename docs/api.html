@@ -2234,7 +2234,7 @@ to the db if valid.</p>
 MyModel.update({ name: 'Tobi' }, { ferret: true }, { multi: true }, fn);</code></pre>
 
 <p>Valid options:
- - safe (boolean) safe mode (defaults to value set in schema (false))
+ - safe (boolean) safe mode (defaults to value set in schema (true))
  - upsert (boolean) whether to create the doc if it doesn't match (false)
  - multi (boolean) whether multiple documents should be update (false)</p>
 
@@ -2474,6 +2474,116 @@ success condition.</p>
 </td>
 <td class="code">
 <pre><code><span class="variable">module</span>.<span class="variable">exports</span> = <span class="class">Promise</span>;
+</code></pre>
+</td>
+</tr><tr class="filename"><td><h2 id="lib/querystream.js"><a href="#">querystream</a></h2></td><td>lib/querystream.js</td></tr><tr class="code">
+<td class="docs">
+<p>Module dependencies.
+ </p>
+</td>
+<td class="code">
+<pre><code><span class="keyword">var</span> <span class="class">Stream</span> = <span class="variable">require</span>(<span class="string">'stream'</span>).<span class="class">Stream</span>
+<span class="keyword">var</span> <span class="variable">utils</span> = <span class="variable">require</span>(<span class="string">'./utils'</span>)</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>QueryStream</p>
+
+<p>Returns a stream interface for the <code>query</code>.</p>
+
+<h2></h2>
+
+<ul><li><p><strong>param</strong>: <em>Query</em>  query</p></li><li><p><strong>return</strong>: <em>Stream</em> </p></li></ul>
+</td>
+<td class="code">
+<pre><code><span class="keyword">function</span> <span class="class">QueryStream</span> (<span class="variable">query</span>) {
+  <span class="class">Stream</span>.<span class="variable">call</span>(<span class="this">this</span>);
+
+  <span class="this">this</span>.<span class="variable">query</span> = <span class="variable">query</span>;
+  <span class="this">this</span>.<span class="variable">readable</span> = <span class="variable">true</span>;
+  <span class="this">this</span>.<span class="variable">paused</span> = <span class="variable">false</span>;
+  <span class="this">this</span>.<span class="variable">_cursor</span> = <span class="keyword">null</span>;
+  <span class="this">this</span>.<span class="variable">_destroyed</span> = <span class="keyword">null</span>;
+  <span class="this">this</span>.<span class="variable">_fields</span> = <span class="keyword">null</span>;
+
+  <span class="comment">// give time to hook up events</span>
+  <span class="keyword">var</span> <span class="variable">self</span> = <span class="this">this</span>;
+  <span class="variable">process</span>.<span class="variable">nextTick</span>(<span class="keyword">function</span> () {
+    <span class="variable">self</span>.<span class="variable">_init</span>();
+  });
+}</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Flag stating whether or not this stream is readable.
+ </p>
+</td>
+<td class="code">
+<pre><code><span class="class">QueryStream</span>.<span class="variable">prototype</span>.<span class="variable">readable</span>;</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Flag stating whether or not this stream is paused.
+ </p>
+</td>
+<td class="code">
+<pre><code><span class="class">QueryStream</span>.<span class="variable">prototype</span>.<span class="variable">paused</span>;</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Pauses this stream.
+ </p>
+</td>
+<td class="code">
+<pre><code><span class="class">QueryStream</span>.<span class="variable">prototype</span>.<span class="variable">pause</span> = <span class="keyword">function</span> () {
+  <span class="this">this</span>.<span class="variable">paused</span> = <span class="variable">true</span>;
+}</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Resumes this stream.
+ </p>
+</td>
+<td class="code">
+<pre><code><span class="class">QueryStream</span>.<span class="variable">prototype</span>.<span class="variable">resume</span> = <span class="keyword">function</span> () {
+  <span class="this">this</span>.<span class="variable">paused</span> = <span class="variable">false</span>;
+  <span class="this">this</span>.<span class="variable">_next</span>();
+}</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Destroys the stream, closing the underlying
+cursor. No more events will be emitted.
+ </p>
+</td>
+<td class="code">
+<pre><code><span class="class">QueryStream</span>.<span class="variable">prototype</span>.<span class="variable">destroy</span> = <span class="keyword">function</span> (<span class="variable">err</span>) {
+  <span class="keyword">if</span> (<span class="this">this</span>.<span class="variable">_destroyed</span>) <span class="keyword">return</span>;
+  <span class="this">this</span>.<span class="variable">_destroyed</span> = <span class="variable">true</span>;
+  <span class="this">this</span>.<span class="variable">readable</span> = <span class="variable">false</span>;
+
+  <span class="keyword">if</span> (<span class="this">this</span>.<span class="variable">_cursor</span>) {
+    <span class="this">this</span>.<span class="variable">_cursor</span>.<span class="variable">close</span>();
+  }
+
+  <span class="keyword">if</span> (<span class="variable">err</span>) {
+    <span class="this">this</span>.<span class="variable">emit</span>(<span class="string">'error'</span>, <span class="variable">err</span>);
+  }
+
+  <span class="this">this</span>.<span class="variable">emit</span>(<span class="string">'close'</span>);
+}
+
+<span class="comment">// TODO - maybe implement the -native raw option to pass binary?</span>
+<span class="comment">//QueryStream.prototype.setEncoding = function () {</span>
+<span class="comment">//}</span>
+
+<span class="variable">module</span>.<span class="variable">exports</span> = <span class="variable">exports</span> = <span class="class">QueryStream</span>;
 </code></pre>
 </td>
 </tr><tr class="filename"><td><h2 id="lib/query.js"><a href="#">query</a></h2></td><td>lib/query.js</td></tr><tr class="code">
@@ -3487,119 +3597,6 @@ result.</p>
 <td class="code">
 <pre><code><span class="variable">module</span>.<span class="variable">exports</span> = <span class="class">Query</span>;
 <span class="variable">module</span>.<span class="variable">exports</span>.<span class="class">QueryStream</span> = <span class="class">QueryStream</span>;
-</code></pre>
-</td>
-</tr><tr class="filename"><td><h2 id="lib/querystream.js"><a href="#">querystream</a></h2></td><td>lib/querystream.js</td></tr><tr class="code">
-<td class="docs">
-<p>Module dependencies.
- </p>
-</td>
-<td class="code">
-<pre><code><span class="keyword">var</span> <span class="class">Stream</span> = <span class="variable">require</span>(<span class="string">'stream'</span>).<span class="class">Stream</span>
-<span class="keyword">var</span> <span class="variable">utils</span> = <span class="variable">require</span>(<span class="string">'./utils'</span>)</code></pre>
-</td>
-</tr>
-<tr class="code">
-<td class="docs">
-<p>QueryStream</p>
-
-<p>Returns a stream interface for the <code>query</code>.</p>
-
-<h2></h2>
-
-<ul><li><p><strong>param</strong>: <em>Query</em>  query</p></li><li><p><strong>return</strong>: <em>Stream</em> </p></li></ul>
-</td>
-<td class="code">
-<pre><code><span class="keyword">function</span> <span class="class">QueryStream</span> (<span class="variable">query</span>) {
-  <span class="class">Stream</span>.<span class="variable">call</span>(<span class="this">this</span>);
-
-  <span class="this">this</span>.<span class="variable">query</span> = <span class="variable">query</span>;
-  <span class="this">this</span>.<span class="variable">readable</span> = <span class="variable">true</span>;
-  <span class="this">this</span>.<span class="variable">paused</span> = <span class="variable">false</span>;
-  <span class="this">this</span>.<span class="variable">_cursor</span> = <span class="keyword">null</span>;
-  <span class="this">this</span>.<span class="variable">_destroyed</span> = <span class="keyword">null</span>;
-  <span class="this">this</span>.<span class="variable">_fields</span> = <span class="keyword">null</span>;
-
-  <span class="comment">// give time to hook up events</span>
-  <span class="keyword">var</span> <span class="variable">self</span> = <span class="this">this</span>;
-  <span class="variable">process</span>.<span class="variable">nextTick</span>(<span class="keyword">function</span> () {
-    <span class="variable">self</span>.<span class="variable">_init</span>();
-  });
-}</code></pre>
-</td>
-</tr>
-<tr class="code">
-<td class="docs">
-<p>Flag stating whether or not this stream is readable.
- </p>
-</td>
-<td class="code">
-<pre><code><span class="class">QueryStream</span>.<span class="variable">prototype</span>.<span class="variable">readable</span>;</code></pre>
-</td>
-</tr>
-<tr class="code">
-<td class="docs">
-<p>Flag stating whether or not this stream is paused.
- </p>
-</td>
-<td class="code">
-<pre><code><span class="class">QueryStream</span>.<span class="variable">prototype</span>.<span class="variable">paused</span>;</code></pre>
-</td>
-</tr>
-<tr class="code">
-<td class="docs">
-<p>Pauses this stream.
- </p>
-</td>
-<td class="code">
-<pre><code><span class="class">QueryStream</span>.<span class="variable">prototype</span>.<span class="variable">pause</span> = <span class="keyword">function</span> () {
-  <span class="this">this</span>.<span class="variable">paused</span> = <span class="variable">true</span>;
-}</code></pre>
-</td>
-</tr>
-<tr class="code">
-<td class="docs">
-<p>Resumes this stream.
- </p>
-</td>
-<td class="code">
-<pre><code><span class="class">QueryStream</span>.<span class="variable">prototype</span>.<span class="variable">resume</span> = <span class="keyword">function</span> () {
-  <span class="this">this</span>.<span class="variable">paused</span> = <span class="variable">false</span>;
-  <span class="this">this</span>.<span class="variable">_next</span>();
-}</code></pre>
-</td>
-</tr>
-<tr class="code">
-<td class="docs">
-<p>Destroys the stream, closing the underlying
-cursor. No more events will be emitted.
- </p>
-</td>
-<td class="code">
-<pre><code><span class="class">QueryStream</span>.<span class="variable">prototype</span>.<span class="variable">destroy</span> = <span class="keyword">function</span> (<span class="variable">err</span>) {
-  <span class="keyword">if</span> (<span class="this">this</span>.<span class="variable">_destroyed</span>) <span class="keyword">return</span>;
-  <span class="this">this</span>.<span class="variable">_destroyed</span> = <span class="variable">true</span>;
-  <span class="this">this</span>.<span class="variable">readable</span> = <span class="variable">false</span>;
-
-  <span class="keyword">if</span> (<span class="this">this</span>.<span class="variable">_cursor</span>) {
-    <span class="this">this</span>.<span class="variable">_cursor</span>.<span class="variable">close</span>();
-  }
-
-  <span class="keyword">if</span> (<span class="variable">err</span>) {
-    <span class="this">this</span>.<span class="variable">emit</span>(<span class="string">'error'</span>, <span class="variable">err</span>);
-  }
-
-  <span class="this">this</span>.<span class="variable">emit</span>(<span class="string">'close'</span>);
-}</code></pre>
-</td>
-</tr>
-<tr class="code">
-<td class="docs">
-<p>Exports
- </p>
-</td>
-<td class="code">
-<pre><code><span class="variable">module</span>.<span class="variable">exports</span> = <span class="variable">exports</span> = <span class="class">QueryStream</span>;
 </code></pre>
 </td>
 </tr><tr class="filename"><td><h2 id="lib/schema/string.js"><a href="#">string</a></h2></td><td>lib/schema/string.js</td></tr><tr class="code">
@@ -5540,7 +5537,7 @@ doc.array.remove('tag 1', 'tag 2')</code></pre>
   }
 
   <span class="keyword">if</span> (<span class="variable">values</span>[<span class="number integer">0</span>] <span class="variable">instanceof</span> <span class="class">EmbeddedDocument</span>) {
-    <span class="this">this</span>.<span class="variable">_registerAtomic</span>(<span class="string">'$pullAll'</span>, <span class="variable">values</span>.<span class="variable">map</span>( <span class="keyword">function</span> (<span class="variable">v</span>) { <span class="keyword">return</span> {<span class="variable">_id</span>: <span class="variable">v</span>.<span class="variable">_id</span>}; } ));
+    <span class="this">this</span>.<span class="variable">_registerAtomic</span>(<span class="string">'$pullDocs'</span>, <span class="variable">values</span>.<span class="variable">map</span>( <span class="keyword">function</span> (<span class="variable">v</span>) { <span class="keyword">return</span> <span class="variable">v</span>.<span class="variable">_id</span>; } ));
   } <span class="keyword">else</span> {
     <span class="this">this</span>.<span class="variable">_registerAtomic</span>(<span class="string">'$pullAll'</span>, <span class="variable">values</span>);
   }
@@ -5568,7 +5565,11 @@ doc.array.remove('tag 1', 'tag 2')</code></pre>
         }
       } <span class="keyword">else</span> <span class="keyword">if</span> (~<span class="variable">values</span>.<span class="variable">indexOf</span>(<span class="variable">mem</span>)) <span class="variable">oldArr</span>.<span class="variable">splice</span>(<span class="variable">i</span>, <span class="number integer">1</span>);
     }
-    <span class="this">this</span>.<span class="variable">_registerAtomic</span>(<span class="string">'$pullAll'</span>, <span class="variable">values</span>);
+    <span class="keyword">if</span> (<span class="variable">values</span>[<span class="number integer">0</span>] <span class="variable">instanceof</span> <span class="class">EmbeddedDocument</span>) {
+      <span class="this">this</span>.<span class="variable">_registerAtomic</span>(<span class="string">'$pullDocs'</span>, <span class="variable">values</span>.<span class="variable">map</span>( <span class="keyword">function</span> (<span class="variable">v</span>) { <span class="keyword">return</span> <span class="variable">v</span>.<span class="variable">_id</span>; } ));
+    } <span class="keyword">else</span> {
+      <span class="this">this</span>.<span class="variable">_registerAtomic</span>(<span class="string">'$pullAll'</span>, <span class="variable">values</span>);
+    }
   }
   <span class="keyword">return</span> <span class="this">this</span>;
 };</code></pre>

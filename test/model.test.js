@@ -2933,6 +2933,37 @@ module.exports = {
     });
   },
 
+  'test for single pull embedded doc' : function()  {
+    var db = start()
+    , BlogPost = db.model('BlogPost', collection);
+
+    var post = new BlogPost();
+    post.title = 'hahaha';
+    post.comments.push({ title: 'woot' });
+    post.comments.push({ title: 'aaaa' });
+  
+    post.save(function (err) {
+      should.strictEqual(err, null);
+  
+      BlogPost.findById(post.get('_id'), function (err, doc) {
+        should.strictEqual(err, null);
+  
+        doc.comments.pull(doc.comments[0]);
+        doc.comments.pull(doc.comments[0]);
+        doc.save(function (err) {
+          should.strictEqual(err, null);
+  
+          BlogPost.findById(post.get('_id'), function (err, doc) {
+            should.strictEqual(err, null);
+  
+            doc.comments.should.have.length(0);
+            db.close();
+          });
+        });
+      });
+    });    
+  },
+  
   'try saving mixed data': function () {
     var db = start()
       , BlogPost = db.model('BlogPost', collection)

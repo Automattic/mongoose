@@ -1,4 +1,3 @@
-
 Defining a model
 ================
 
@@ -60,7 +59,7 @@ To define an array of documents that follows a certain schema, make the value
 an array with the schema constructor inside.
 
 For example, let's assume we want to have a collection of comments within a
-blogpost, and we want the to be subject to casting, validation, and other
+blogpost, and we want them to be subject to casting, validation, and other
 functionality provided by models:
 
     var Comment = new Schema({

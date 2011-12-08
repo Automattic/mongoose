@@ -1136,34 +1136,27 @@ module.exports = {
           title     : 'yay'
       }, function (err, post1, post2) {
         should.strictEqual(err, null);
-          M.create({
-            kids: [
-                { user: fan1, post: post1, y: 5 }
-              , { user: fan2, post: post2, y: 8 }
-            ]
-          , x: 4
-          }, function (err, m1) {
+        M.create({
+          kids: [
+              { user: fan1, post: post1, y: 5 }
+            , { user: fan2, post: post2, y: 8 }
+          ]
+        , x: 4
+        }, function (err, m1) {
           should.strictEqual(err, null);
 
-          M.where('_id').in([m1])
+          M.findById(m1)
           .populate('kids.user', ["name"])
           .populate('kids.post', ["title"], { title: "woot" })
-          .run(function (err, objs) {
+          .run(function (err, o) {
             db.close();
             should.strictEqual(err, null);
-
-            should.exist(objs);
-            should.strictEqual(objs.length, 1);
-            var o = objs[0];
-            should.exist(o.kids);
             should.strictEqual(o.kids.length, 2);
             var k1 = o.kids[0];
             var k2 = o.kids[1];
-            should.exist(k1.user);
-            should.exist(k1.post);
-            should.exist(k2.user);
-            should.not.exist(k2.post);
+            should.strictEqual(true, !k2.post);
             should.strictEqual(k1.user.name, "Fan 1");
+            should.strictEqual(k1.user.email, undefined);
             should.strictEqual(k1.post.title, "woot");
             should.strictEqual(k2.user.name, "Fan 2");
           });

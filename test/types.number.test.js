@@ -27,6 +27,11 @@ module.exports = {
   'an empty string casts to null': function () {
     var n = new SchemaNumber();
     should.strictEqual(n.cast(''), null);
+  },
+
+  'a null number should castForQuery to null': function () {
+    var n = new SchemaNumber();
+    should.strictEqual(n.castForQuery(null), null);
   }
 
 };

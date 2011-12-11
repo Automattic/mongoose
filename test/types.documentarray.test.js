@@ -51,7 +51,7 @@ module.exports = {
     a.should.be.an.instanceof(MongooseArray);
     a.should.be.an.instanceof(MongooseDocumentArray);
     Array.isArray(a).should.be.true;
-    Array.isArray(a._atomics).should.be.true;
+    a._atomics.constructor.name.should.equal('Object');
     'object'.should.eql(typeof a);
 
     var b = new MongooseArray([1,2,3,4]);

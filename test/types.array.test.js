@@ -79,6 +79,7 @@ module.exports = {
       });
     }
   },
+
   'test #splice() with numbers': function () {
     var collection = 'splicetest-number' + random();
     var db = start()

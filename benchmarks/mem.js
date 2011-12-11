@@ -28,39 +28,39 @@ var AllSchema = new Schema({
 var A = mongoose.model('A', AllSchema);
 
 var methods = [];
-//methods.push(function (a, cb) {
-  //A.findOne({ _id: a._id }, cb);
-//}); // 2 MB
-//methods.push(function (a, cb) {
-  //A.find({ _id: a._id, bool: a.bool }, cb);
-//}); // 3.8 MB
-//methods.push(function (a, cb) {
-  //A.findById(a._id, cb);
-//}); // 4.6 MB
-//methods.push(function (a, cb) {
-  //A.where('number', a.number).sort('_id', -1).limit(10).run(cb)
-//}); // 4.8 MB
 methods.push(function (a, cb) {
-  a.where('date', a.date).select('string').limit(10).run(cb)
+  A.findOne({ _id: a._id }, cb);
+}); // 2 MB
+methods.push(function (a, cb) {
+  A.find({ _id: a._id, bool: a.bool }, cb);
+}); // 3.8 MB
+methods.push(function (a, cb) {
+  A.findById(a._id, cb);
+}); // 4.6 MB
+methods.push(function (a, cb) {
+  A.where('number', a.number).sort('_id', -1).limit(10).run(cb)
+}); // 4.8 MB
+methods.push(function (a, cb) {
+  A.where('date', a.date).select('string').limit(10).run(cb)
 }); // 3.5 mb
-//methods.push(function (a, cb) {
-  //A.where('date', a.date).select('string', 'bool').asc('date').limit(10).run(cb)
-//}); // 3.5 MB
-//methods.push(function (a, cb) {
-  //A.find('date', a.date).where('array').$in(3).limit(10).run(cb)
-//}); // 1.82 MB
-//methods.push(function (a, cb) {
-  //A.update({ _id: a._id }, { $addToset: { array: "heeeeello" }}, cb);
-//}); // 3.32 MB
-//methods.push(function (a, cb) {
-  //A.remove({ _id: a._id }, cb);
-//}); // 3.32 MB
-//methods.push(function (a, cb) {
-  //A.find().where('objectids').exists().only('dates').limit(10).exec(cb);
-//}); // 3.32 MB
-//methods.push(function (a, cb) {
-  //A.count({ strings: a.strings[2], number: a.number }, cb);
-//}); // 3.32 MB
+methods.push(function (a, cb) {
+  A.where('date', a.date).select('string', 'bool').asc('date').limit(10).run(cb)
+}); // 3.5 MB
+methods.push(function (a, cb) {
+  A.find('date', a.date).where('array').$in(3).limit(10).run(cb)
+}); // 1.82 MB
+methods.push(function (a, cb) {
+  A.update({ _id: a._id }, { $addToset: { array: "heeeeello" }}, cb);
+}); // 3.32 MB
+methods.push(function (a, cb) {
+  A.remove({ _id: a._id }, cb);
+}); // 3.32 MB
+methods.push(function (a, cb) {
+  A.find().where('objectids').exists().only('dates').limit(10).exec(cb);
+}); // 3.32 MB
+methods.push(function (a, cb) {
+  A.count({ strings: a.strings[2], number: a.number }, cb);
+}); // 3.32 MB
 
 // bench the normal way
 // the try building the doc into the document prototype
@@ -73,7 +73,7 @@ methods.push(function (a, cb) {
 var started = process.memoryUsage();
 //console.error(started);
 var start = new Date;
-var total = 10000;
+var total = 1000;
 var i = total;
 
 mongoose.connection.on('open', function () {
@@ -110,7 +110,7 @@ mongoose.connection.on('open', function () {
       //else
         //a._delta();
 
-      if (!(i%40)) {
+      if (!(i%50)) {
         var u = process.memoryUsage();
         console.error('rss: %d, vsize: %d, heapTotal: %d, heapUsed: %d',
             u.rss, u.vsize, u.heapTotal, u.heapUsed);

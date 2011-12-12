@@ -1,4 +1,10 @@
 
+2.4.2 / 2011-12-12
+===================
+
+  * fixed; partially populating multiple children of subdocs (#639) [kenpratt]
+  * fixed; allow Update of numbers to null (#640) [jerem]
+
 2.4.1 / 2011-12-02
 ===================
 

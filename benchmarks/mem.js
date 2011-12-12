@@ -85,17 +85,7 @@ methods.push(function (a, cb) {
   cb();
 });
 
-
-// bench the normal way
-// the try building the doc into the document prototype
-// and using inheritance and bench that 
-//
-// also, bench using listeners for each subdoc vs one 
-// listener that knows about all subdocs and notifies
-// them.
-
 var started = process.memoryUsage();
-//console.error(started);
 var start = new Date;
 var total = 500;
 var i = total;

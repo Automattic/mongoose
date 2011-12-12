@@ -1940,5 +1940,24 @@ module.exports = {
         });
       });
     });
+  },
+
+  // gh-640
+  'updating a number to null': function () {
+    var db = start()
+    var B = db.model('BlogPostB')
+    var b = new B({ meta: { visitors: null }});
+    b.save(function (err) {
+      should.strictEqual(null, err);
+      B.findById(b, function (err, b) {
+        should.strictEqual(null, err);
+        should.strictEqual(b.meta.visitors, null);
+
+        B.update({ _id: b._id }, { meta: { visitors: null }}, function (err, docs) {
+          db.close();
+          should.strictEqual(null, err);
+        });
+      });
+    });
   }
 };

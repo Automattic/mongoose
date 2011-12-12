@@ -23,6 +23,7 @@ var AllSchema = new Schema({
   , buffers: [Buffer]
   , objectids: [Schema.ObjectId]
   , docs     : { type: [DocSchema], validate: function () { return true }}
+  , s: { nest: String }
 });
 
 var A = mongoose.model('A', AllSchema);
@@ -61,6 +62,29 @@ methods.push(function (a, cb) {
 methods.push(function (a, cb) {
   A.count({ strings: a.strings[2], number: a.number }, cb);
 }); // 3.32 MB
+methods.push(function (a, cb) {
+  a.string= "asdfaf";
+  a.number = 38383838;
+  a.date= new Date;
+  a.bool = false;
+  a.array.push(3);
+  a.dates.push(new Date);
+  a.bools.$pushAll([true, false]);
+  a.docs.$addToSet({ title: 'woot' });
+  a.strings.remove("three");
+  a.numbers.$pull(72);
+  a.objectids.$pop();
+  a.docs.$pullAll(a.docs);
+  a.s.nest = "aooooooga";
+
+  if (i%2)
+  a.toObject({ depopulate: true });
+  else
+  a._delta();
+
+  cb();
+});
+
 
 // bench the normal way
 // the try building the doc into the document prototype
@@ -73,7 +97,7 @@ methods.push(function (a, cb) {
 var started = process.memoryUsage();
 //console.error(started);
 var start = new Date;
-var total = 1000;
+var total = 500;
 var i = total;
 
 mongoose.connection.on('open', function () {

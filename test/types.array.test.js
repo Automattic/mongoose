@@ -35,7 +35,21 @@ module.exports = {
     a.should.be.an.instanceof(Array);
     a.should.be.an.instanceof(MongooseArray);
     Array.isArray(a).should.be.true;
-    (a._atomics.constructor).should.eql(Object);
+    ;(a._atomics.constructor).should.eql(Object);
+
+  },
+
+  'doAtomics does not throw': function () {
+    var b = new MongooseArray([12,3,4,5]).filter(Boolean);
+    var threw = false;
+
+    try {
+      b.doAtomics
+    } catch (_) {
+      threw = true;
+    }
+
+    threw.should.be.false;
   },
 
   'test indexOf()': function(){

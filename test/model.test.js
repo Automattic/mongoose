@@ -4006,12 +4006,59 @@ module.exports = {
     Profile.schema.paths.info.should.be.a('object');
     Profile.schema.paths.millis.should.be.a('object');
 
+    Profile.schema.paths.op.should.be.a('object');
+    Profile.schema.paths.ns.should.be.a('object');
+    Profile.schema.paths.query.should.be.a('object');
+    Profile.schema.paths.updateobj.should.be.a('object');
+    Profile.schema.paths.ntoreturn.should.be.a('object');
+    Profile.schema.paths.nreturned.should.be.a('object');
+    Profile.schema.paths.nscanned.should.be.a('object');
+    Profile.schema.paths.responseLength.should.be.a('object');
+    Profile.schema.paths.client.should.be.a('object');
+    Profile.schema.paths.user.should.be.a('object');
+    Profile.schema.paths.idhack.should.be.a('object');
+    Profile.schema.paths.scanAndOrder.should.be.a('object');
+    Profile.schema.paths.keyUpdates.should.be.a('object');
+    should.strictEqual(undefined, Profile.schema.paths._id);
+    should.strictEqual(undefined, Profile.schema.virtuals.id);
+
     var db = start();
     Profile = db.model('system.profile');
+    db.close();
     Profile.schema.paths.ts.should.be.a('object');
     Profile.schema.paths.info.should.be.a('object');
     Profile.schema.paths.millis.should.be.a('object');
+    Profile.schema.paths.op.should.be.a('object');
+    Profile.schema.paths.ns.should.be.a('object');
+    Profile.schema.paths.query.should.be.a('object');
+    Profile.schema.paths.updateobj.should.be.a('object');
+    Profile.schema.paths.ntoreturn.should.be.a('object');
+    Profile.schema.paths.nreturned.should.be.a('object');
+    Profile.schema.paths.nscanned.should.be.a('object');
+    Profile.schema.paths.responseLength.should.be.a('object');
+    Profile.schema.paths.client.should.be.a('object');
+    Profile.schema.paths.user.should.be.a('object');
+    Profile.schema.paths.idhack.should.be.a('object');
+    Profile.schema.paths.scanAndOrder.should.be.a('object');
+    Profile.schema.paths.keyUpdates.should.be.a('object');
+    should.strictEqual(undefined, Profile.schema.paths._id);
+    should.strictEqual(undefined, Profile.schema.virtuals.id);
+
+    // can override the default
+    db = start();
+    // reset Mongoose state
+    delete db.base.modelSchemas['system.profile']
+    delete db.base.models['system.profile']
+    delete db.models['system.profile'];
     db.close();
+    // test
+    var over = db.model('system.profile', new Schema({ name: String }));
+    over.schema.paths.name.should.be.a('object');
+    should.strictEqual(undefined, over.schema.paths.ts);
+    // reset
+    delete db.base.modelSchemas['system.profile']
+    delete db.base.models['system.profile']
+    delete db.models['system.profile'];
   },
 
   'setting profiling levels': function () {

@@ -1,4 +1,9 @@
 
+2.4.4 / 2011-12-14
+===================
+
+  * fixed; MongooseArray#doAtomics throwing after sliced
+
 2.4.3 / 2011-12-14
 ===================
 

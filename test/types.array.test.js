@@ -50,6 +50,17 @@ module.exports = {
     }
 
     threw.should.be.false;
+
+    var a = new MongooseArray([67,8]).filter(Boolean);
+    try {
+      a.push(3,4);
+    } catch (_) {
+      console.error(_);
+      threw = true;
+    }
+
+    threw.should.be.false;
+
   },
 
   'test indexOf()': function(){

@@ -307,7 +307,6 @@ module.exports = {
     });
 
     var total=2;
-
     function afterFinalSave(err, doc, result) {
         if(--total) {
            should.strictEqual(null, err);
@@ -337,14 +336,54 @@ module.exports = {
 
                 posts[1].version = 2;
                 posts[1].title = "UPDATE TWO";
-                posts[0].save({version : 1}, afterFinalSave);
-                posts[1].save({version : 1}, afterFinalSave);
+
+                posts[0].save({ queryParams : { version : 1} }, afterFinalSave);
+                posts[1].save({ queryParams : { version : 1} }, afterFinalSave);
                }
            });
     }
    
     post.save(afterInitialSave);
 
+  },
+
+  'test saving with options' : function() {
+      var db = start()
+      , BlogPost = db.model('BlogPost', collection);
+
+      var post = new BlogPost({
+          title: 'save overriding safe:true'
+      });
+
+      function afterSave(err, doc) {
+        should.strictEqual(null, err);
+        doc.title = 'should not call getLastError on save';
+        doc.save({
+            options : { safe: false }
+        }, checkGetLastErrorNotCalled);
+      }
+
+      function checkGetLastErrorNotCalled(err, doc, result) {
+        should.strictEqual(null, err);
+        doc.title = 'should call getLastError on save';
+        doc.save({
+            options : { safe: true }
+        }, checkGetLastErrorIsCalled);
+        //verify no result was passed back (getLastError was not called on update)
+        should.not.exist(result);
+      }
+
+      function checkGetLastErrorIsCalled(err, doc, result) {
+        should.exist(result);
+        result.should.eql(1);
+        db.close();
+      }
+
+      post.save({
+        options : {
+            safe : false
+        }
+      }, afterSave);
   },
 
   'test instantiating a model with a hash that maps to at least 1 undefined value': function () {

@@ -463,5 +463,47 @@ module.exports = {
         });
       });
     });
+  },
+
+  'setting doc array should adjust path positions': function () {
+    var db = start();
+
+    var D = db.model('subDocPositions', new Schema({
+        em1: [new Schema({ name: String })]
+      , em2: [new Schema({ name: String })]
+    }));
+
+    var d = new D({
+        em1: [
+            { name: 'pos0' }
+          , { name: 'pos1' }
+          , { name: 'pos2' }
+        ]
+    });
+
+    d.save(function (err) {
+      should.strictEqual(null, err);
+      D.findById(d, function (err, d) {
+        should.strictEqual(null, err);
+
+        var n = d.em1.slice();
+        n[2].name = 'position two';
+        var x = [];
+        x[1] = n[2];
+        x[2] = n[1];
+        d.em1 = x.filter(Boolean);
+
+        //mongoose.set('debug', true);
+
+        d.save(function (err) {
+          should.strictEqual(null, err);
+          D.findById(d, function (err, d) {
+            db.close();
+            should.strictEqual(null, err);
+          });
+        });
+      });
+    });
+
   }
 };

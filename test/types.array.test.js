@@ -493,8 +493,6 @@ module.exports = {
         x[2] = n[1];
         d.em1 = x.filter(Boolean);
 
-        //mongoose.set('debug', true);
-
         d.save(function (err) {
           should.strictEqual(null, err);
           D.findById(d, function (err, d) {

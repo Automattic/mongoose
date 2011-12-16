@@ -4787,6 +4787,62 @@ module.exports = {
         ;('whateveriwant' in doc).should.be.false;
       });
     });
-  }
+  },
 
+  'strict mode': function(){
+    var db = start();
+
+    var lax = new Schema({
+        ts  : { type: Date, default: Date.now }
+      , content: String
+    });
+
+    var strict = new Schema({
+        ts  : { type: Date, default: Date.now }
+      , content: String
+    }, {lax: false});
+
+    var Lax = db.model('Lax', lax);
+    var Strict = db.model('Strict', strict);
+
+    var l = new Lax({content: 'sample', rouge: 'data'}).toObject();
+    l.content.should.equal('sample')
+    l.rouge.should.equal('data');
+    should.exist(l.rouge);
+
+    var s = new Strict({content: 'sample', rouge: 'data'}).toObject();
+    s.should.have.property('ts');
+    s.content.should.equal('sample');
+    s.should.not.have.property('rouge');
+    should.not.exist(s.rouge);
+
+    // instance override
+    var instance = new Lax({content: 'sample', rouge: 'data'}, false).toObject();
+    instance.content.should.equal('sample')
+    should.not.exist(instance.rouge);
+
+
+    // hydrate works as normal, but supports the schema level flag.
+    var s2 = new Strict({content: 'sample', rouge: 'data'}, true).toObject();
+    s2.should.not.have.property('ts')
+    s2.content.should.equal('sample');
+    s2.should.not.have.property('rouge');
+    should.not.exist(s2.rouge);
+
+    // testing init
+    var s3 = new Strict();
+    s3.init({content: 'sample', rouge: 'data'});
+    var s3obj = s3.toObject();
+    s3.content.should.equal('sample');
+    s3.should.not.have.property('rouge');
+    should.not.exist(s3.rouge);
+
+    // strict on create
+    Strict.create({content: 'sample2', rouge: 'data'}, function(err, doc){
+      doc.content.should.equal('sample2');
+      doc.should.not.have.property('rouge');
+      should.not.exist(doc.rouge);
+      db.close();
+    });
+  }
 };

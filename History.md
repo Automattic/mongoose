@@ -1,4 +1,10 @@
 
+2.4.6 / 2011-12-16
+===================
+
+  * fixed; conflicting mods on update bug [sirlantis]
+  * improved; doc.id getter performance
+
 2.4.5 / 2011-12-14
 ===================
 

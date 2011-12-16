@@ -470,7 +470,6 @@ module.exports = {
 
     var D = db.model('subDocPositions', new Schema({
         em1: [new Schema({ name: String })]
-      , em2: [new Schema({ name: String })]
     }));
 
     var d = new D({
@@ -502,6 +501,48 @@ module.exports = {
         });
       });
     });
+  },
 
+  'paths with similar names should be saved': function () {
+    var db = start();
+
+    var D = db.model('similarPathNames', new Schema({
+        account: {
+            role: String
+          , roles: [String]
+        }
+      , em: [new Schema({ name: String })]
+    }));
+
+    var d = new D({
+        account: { role: 'teacher', roles: ['teacher', 'admin'] }
+      , em: [{ name: 'bob' }]
+    });
+
+    d.save(function (err) {
+      should.strictEqual(null, err);
+      D.findById(d, function (err, d) {
+        should.strictEqual(null, err);
+
+        d.account.role = 'president';
+        d.account.roles = ['president', 'janitor'];
+        d.em[0].name = 'memorable';
+        d.em = [{ name: 'frida' }];
+
+        d.save(function (err) {
+          should.strictEqual(null, err);
+          D.findById(d, function (err, d) {
+            db.close();
+            should.strictEqual(null, err);
+            d.account.role.should.equal('president');
+            d.account.roles.length.should.equal(2);
+            d.account.roles[0].should.equal('president');
+            d.account.roles[1].should.equal('janitor');
+            d.em.length.should.equal(1);
+            d.em[0].name.should.equal('frida');
+          });
+        });
+      });
+    });
   }
 };

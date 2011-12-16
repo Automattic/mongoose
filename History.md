@@ -1,4 +1,11 @@
 
+2.4.7 / 2011-12-16
+===================
+
+  * fixed; bug in 2.4.6 with path setting
+  * updated; bump -native to 0.9.7.2-1
+  * added; strict schema option [nw]
+
 2.4.6 / 2011-12-16
 ===================
 

@@ -4739,8 +4739,21 @@ module.exports = {
     });
   },
 
-  'date casting test (gh-502)': function () {
+  'enhanced date casting test (datejs - gh-502)': function () {
     var db = start()
+
+    Date.prototype.toObject = function() {
+        return {
+              millisecond: 86
+            , second: 42
+            , minute: 47
+            , hour: 17
+            , day: 13
+            , week: 50
+            , month: 11
+            , year: 2011
+        };
+    };
 
     var S = new Schema({
         name: String
@@ -4766,6 +4779,7 @@ module.exports = {
         m.save(function (err) {
           should.strictEqual(err, null);
           M.remove(function (err) {
+            delete Date.prototype.toObject;
             db.close();
           });
         });

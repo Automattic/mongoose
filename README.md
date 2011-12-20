@@ -42,12 +42,9 @@ $ npm install mongoose
 Otherwise, you can check it in your repository and then expose it:
 
 ```bash
-$ git clone git@github.com:LearnBoost/mongoose.git support/mongoose/
+$ git clone git://github.com/LearnBoost/mongoose.git node_modules/mongoose/
 ```
-```javascript
-// in your code
-require.paths.unshift('support/mongoose/lib')
-```
+And install dependency modules written on `package.json`.
 
 Then you can `require` it:
 

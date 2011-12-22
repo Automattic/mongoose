@@ -632,6 +632,7 @@ module.exports = {
     query.cast(Product, params);
     params.array.$ne.should.equal(5);
     params.ids.$ne.should.eql(id);
+    params.comments.$ne._id.toHexString();
     params.comments.$ne.should.eql(castedComment);
     params.strings.$ne.should.eql('Hi there');
     params.numbers.$ne.should.eql(10000);
@@ -691,6 +692,7 @@ module.exports = {
     query.cast(Product, params);
     params.array.should.equal(5);
     params.ids.should.eql(id);
+    params.comments._id.toHexString();
     params.comments.should.eql(castedComment);
     params.strings.should.eql('Hi there');
     params.numbers.should.eql(10000);

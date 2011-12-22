@@ -414,6 +414,7 @@ module.exports = {
       function (err, found) {
         found.get('meta.visitors')
              .valueOf().should.equal(post.get('meta.visitors').valueOf());
+        found.id;
         found.get('_id').should.eql(post.get('_id'));
         db.close();
       });
@@ -672,6 +673,7 @@ module.exports = {
       BlogPostB.findById(created.id, {title: 0, 'meta.date': 0, owners: 0}, function (err, found) {
         db.close();
         should.strictEqual(err, null);
+        found.id;
         found._id.should.eql(created._id);
         should.strictEqual(undefined, found.title);
         should.strictEqual('kandinsky', found.def);
@@ -822,6 +824,7 @@ module.exports = {
       BlogPostB.findOne({tags: 'cat'}, function (err, doc) {
         should.strictEqual(err, null);
 
+        doc.id;
         doc._id.should.eql(post._id);
         db.close();
       });
@@ -841,10 +844,12 @@ module.exports = {
 
       BlogPostB.findOne({tags: {$in: ['football', 'baseball']}}, function (err, doc) {
         should.strictEqual(err, null);
+        doc.id;
         doc._id.should.eql(post._id);
 
         BlogPostB.findOne({ _id: post._id, tags: /otba/i }, function (err, doc) {
           should.strictEqual(err, null);
+          doc.id;
           doc._id.should.eql(post._id);
 
           db.close();
@@ -868,6 +873,7 @@ module.exports = {
         done();
         should.strictEqual(err, null);
         ;(!!~returned.tags.indexOf('gooberOne')).should.be.true;
+        returned.id;
         returned._id.should.eql(post._id);
       });
     });
@@ -899,6 +905,7 @@ module.exports = {
       BlogPostB.findOne({ $where: "this.title && this.title === this.author" }, function (err, found) {
         should.strictEqual(err, null);
 
+        found.id;
         found._id.should.eql(created._id);
         db.close();
       });
@@ -917,6 +924,7 @@ module.exports = {
       } }, function (err, found) {
         should.strictEqual(err, null);
 
+        found.id;
         found._id.should.eql(created._id);
         db.close();
       });
@@ -960,6 +968,7 @@ module.exports = {
         should.strictEqual(err, null);
         found.get('meta.visitors')
           .valueOf().should.equal(post.get('meta.visitors').valueOf());
+        found.id;
         found.get('_id').should.eql(post.get('_id'));
         db.close();
       });
@@ -975,19 +984,23 @@ module.exports = {
       should.strictEqual(err, null);
       BlogPostB.findOne({'comments.title': 'i should be queryable'}, function (err, found) {
         should.strictEqual(err, null);
+        found.id;
         found._id.should.eql(created._id);
 
         BlogPostB.findOne({'comments.0.title': 'i should be queryable'}, function (err, found) {
           should.strictEqual(err, null);
+          found.id;
           found._id.should.eql(created._id);
 
           // GH-463
           BlogPostB.findOne({'numbers.2': 33333}, function (err, found) {
             should.strictEqual(err, null);
+            found.id;
             found._id.should.eql(created._id);
 
             BlogPostB.findOne({'tags.1': 'no'}, function (err, found) {
               should.strictEqual(err, null);
+              found.id;
               found._id.should.eql(created._id);
               db.close();
             });
@@ -1009,6 +1022,7 @@ module.exports = {
         db.close();
         should.strictEqual(err, null);
         should.strictEqual(!! found, true, 'Find by nested doc id hex string fails');
+        found.id;
         found._id.should.eql(created._id);
       });
     });
@@ -1248,6 +1262,7 @@ module.exports = {
       should.strictEqual(err, null);
       BlogPostB.findOne({title: /^Next/}, function (err, found) {
         should.strictEqual(err, null);
+        found.id;
         found._id.should.eql(created._id);
 
         var reg = '^Next to Normal$';
@@ -1255,19 +1270,23 @@ module.exports = {
         BlogPostB.find({ title: { $regex: reg }}, function (err, found) {
           should.strictEqual(err, null);
           found.length.should.equal(1);
+          found[0].id;
           found[0]._id.should.eql(created._id);
 
           BlogPostB.findOne({ title: { $regex: reg }}, function (err, found) {
             should.strictEqual(err, null);
+            found.id;
             found._id.should.eql(created._id);
 
             BlogPostB.where('title').$regex(reg).findOne(function (err, found) {
               should.strictEqual(err, null);
+              found.id;
               found._id.should.eql(created._id);
 
               BlogPostB.where('title').$regex(/^Next/).findOne(function (err, found) {
                 db.close();
                 should.strictEqual(err, null);
+                found.id;
                 found._id.should.eql(created._id);
               });
             });
@@ -1382,18 +1401,21 @@ module.exports = {
       should.strictEqual(err, null);
       BlogPostB.findById(created._id, {numbers: {$slice: 2}}, function (err, found) {
         should.strictEqual(err, null);
+        found.id;
         found._id.should.eql(created._id);
         found.numbers.should.have.length(2);
         found.numbers[0].should.equal(500);
         found.numbers[1].should.equal(600);
         BlogPostB.findById(created._id, {numbers: {$slice: -2}}, function (err, found) {
           should.strictEqual(err, null);
+          found.id;
           found._id.should.eql(created._id);
           found.numbers.should.have.length(2);
           found.numbers[0].should.equal(700);
           found.numbers[1].should.equal(800);
           BlogPostB.findById(created._id, {numbers: {$slice: [1, 2]}}, function (err, found) {
             should.strictEqual(err, null);
+            found.id;
             found._id.should.eql(created._id);
             found.numbers.should.have.length(2);
             found.numbers[0].should.equal(600);
@@ -1415,6 +1437,7 @@ module.exports = {
       should.strictEqual(err, null);
       BlogPostB.findOne({sigs: new Buffer([1, 2, 3])}, function (err, found) {
         should.strictEqual(err, null);
+        found.id;
         found._id.should.eql(created._id);
         var query = { sigs: { "$in" : [new Buffer([3, 3, 3]), new Buffer([4, 5, 6])] } };
         BlogPostB.findOne(query, function (err, found) {

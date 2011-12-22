@@ -3567,7 +3567,7 @@ module.exports = {
       var query = BlogPost.findOne({title: 'interoperable findOne as promise'});
       query.exec(function (err, found) {
         should.strictEqual(err, null);
-        found._id.should.eql(created._id);
+        found.id.should.eql(created.id);
         db.close();
       });
     });
@@ -3586,8 +3586,8 @@ module.exports = {
       query.exec(function (err, found) {
         should.strictEqual(err, null);
         found.length.should.equal(2);
-        found[0]._id.should.eql(createdOne._id);
-        found[1]._id.should.eql(createdTwo._id);
+        found[0]._id.id.should.eql(createdOne._id.id);
+        found[1]._id.id.should.eql(createdTwo._id.id);
         db.close();
       });
     });
@@ -3621,6 +3621,7 @@ module.exports = {
       var query = BlogPost.count({title: 'interoperable ad-hoc as promise'});
       query.exec('findOne', function (err, found) {
         should.strictEqual(err, null);
+        found.id;
         found._id.should.eql(created._id);
         db.close();
       });
@@ -3672,7 +3673,7 @@ module.exports = {
       var promise = query.exec();
       promise.addBack(function (err, found) {
         should.strictEqual(err, null);
-        found._id.should.eql(created._id);
+        found.id.should.eql(created.id);
         db.close();
       });
     });
@@ -3692,6 +3693,8 @@ module.exports = {
       promise.addBack(function (err, found) {
         should.strictEqual(err, null);
         found.length.should.equal(2);
+        found[0].id;
+        found[1].id;
         found[0]._id.should.eql(createdOne._id);
         found[1]._id.should.eql(createdTwo._id);
         db.close();
@@ -3729,7 +3732,7 @@ module.exports = {
       var promise = query.exec('findOne');
       promise.addBack(function (err, found) {
         should.strictEqual(err, null);
-        found._id.should.eql(created._id);
+        found._id.id.should.eql(created._id.id);
         db.close();
       });
     });

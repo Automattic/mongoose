@@ -1,4 +1,13 @@
 
+2.4.8 / 2011-12-22
+===================
+
+  * updated; bump -native to 0.9.7.2-5
+  * fixed; compatibility with date.js (#646) [chrisleishman]
+  * changed; undocumented schema "lax" option to "strict"
+  * fixed; default value population for strict schemas
+  * updated; the nextTick helper for small performance gain. 1bee2a2
+
 2.4.7 / 2011-12-16
 ===================
 

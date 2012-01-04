@@ -96,6 +96,27 @@ module.exports = {
       b.work.should.eql('good flam');
     },
 
+    'cached _ids': function () {
+      var db = start();
+      var Movie = db.model('Movie');
+      db.close();
+      var m = new Movie;
+
+      should.equal(m.id, m.__id);
+      var old = m.id;
+      m._id = new mongoose.Types.ObjectId;
+      should.equal(m.id, m.__id);
+      should.strictEqual(true, old !== m.__id);
+
+      var m2= new Movie;
+      delete m2._doc._id;
+      m2.init({ _id: new mongoose.Types.ObjectId });
+      should.equal(m2.id, m2.__id);
+      should.strictEqual(true, m.__id !== m2.__id);
+      should.strictEqual(true, m.id !== m2.id);
+      should.strictEqual(true, m.__id !== m2.__id);
+    }
+
     /*
     'Subdocument#remove': function (beforeExit) {
       var db = start();

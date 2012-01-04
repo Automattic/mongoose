@@ -3567,7 +3567,7 @@ module.exports = {
       var query = BlogPost.findOne({title: 'interoperable findOne as promise'});
       query.exec(function (err, found) {
         should.strictEqual(err, null);
-        found._id.should.eql(created._id);
+        found.id.should.eql(created.id);
         db.close();
       });
     });
@@ -3586,8 +3586,8 @@ module.exports = {
       query.exec(function (err, found) {
         should.strictEqual(err, null);
         found.length.should.equal(2);
-        found[0]._id.should.eql(createdOne._id);
-        found[1]._id.should.eql(createdTwo._id);
+        found[0]._id.id.should.eql(createdOne._id.id);
+        found[1]._id.id.should.eql(createdTwo._id.id);
         db.close();
       });
     });
@@ -3621,6 +3621,7 @@ module.exports = {
       var query = BlogPost.count({title: 'interoperable ad-hoc as promise'});
       query.exec('findOne', function (err, found) {
         should.strictEqual(err, null);
+        found.id;
         found._id.should.eql(created._id);
         db.close();
       });
@@ -3672,7 +3673,7 @@ module.exports = {
       var promise = query.exec();
       promise.addBack(function (err, found) {
         should.strictEqual(err, null);
-        found._id.should.eql(created._id);
+        found.id.should.eql(created.id);
         db.close();
       });
     });
@@ -3692,6 +3693,8 @@ module.exports = {
       promise.addBack(function (err, found) {
         should.strictEqual(err, null);
         found.length.should.equal(2);
+        found[0].id;
+        found[1].id;
         found[0]._id.should.eql(createdOne._id);
         found[1]._id.should.eql(createdTwo._id);
         db.close();
@@ -3729,7 +3732,7 @@ module.exports = {
       var promise = query.exec('findOne');
       promise.addBack(function (err, found) {
         should.strictEqual(err, null);
-        found._id.should.eql(created._id);
+        found._id.id.should.eql(created._id.id);
         db.close();
       });
     });
@@ -4006,12 +4009,59 @@ module.exports = {
     Profile.schema.paths.info.should.be.a('object');
     Profile.schema.paths.millis.should.be.a('object');
 
+    Profile.schema.paths.op.should.be.a('object');
+    Profile.schema.paths.ns.should.be.a('object');
+    Profile.schema.paths.query.should.be.a('object');
+    Profile.schema.paths.updateobj.should.be.a('object');
+    Profile.schema.paths.ntoreturn.should.be.a('object');
+    Profile.schema.paths.nreturned.should.be.a('object');
+    Profile.schema.paths.nscanned.should.be.a('object');
+    Profile.schema.paths.responseLength.should.be.a('object');
+    Profile.schema.paths.client.should.be.a('object');
+    Profile.schema.paths.user.should.be.a('object');
+    Profile.schema.paths.idhack.should.be.a('object');
+    Profile.schema.paths.scanAndOrder.should.be.a('object');
+    Profile.schema.paths.keyUpdates.should.be.a('object');
+    should.strictEqual(undefined, Profile.schema.paths._id);
+    should.strictEqual(undefined, Profile.schema.virtuals.id);
+
     var db = start();
     Profile = db.model('system.profile');
+    db.close();
     Profile.schema.paths.ts.should.be.a('object');
     Profile.schema.paths.info.should.be.a('object');
     Profile.schema.paths.millis.should.be.a('object');
+    Profile.schema.paths.op.should.be.a('object');
+    Profile.schema.paths.ns.should.be.a('object');
+    Profile.schema.paths.query.should.be.a('object');
+    Profile.schema.paths.updateobj.should.be.a('object');
+    Profile.schema.paths.ntoreturn.should.be.a('object');
+    Profile.schema.paths.nreturned.should.be.a('object');
+    Profile.schema.paths.nscanned.should.be.a('object');
+    Profile.schema.paths.responseLength.should.be.a('object');
+    Profile.schema.paths.client.should.be.a('object');
+    Profile.schema.paths.user.should.be.a('object');
+    Profile.schema.paths.idhack.should.be.a('object');
+    Profile.schema.paths.scanAndOrder.should.be.a('object');
+    Profile.schema.paths.keyUpdates.should.be.a('object');
+    should.strictEqual(undefined, Profile.schema.paths._id);
+    should.strictEqual(undefined, Profile.schema.virtuals.id);
+
+    // can override the default
+    db = start();
+    // reset Mongoose state
+    delete db.base.modelSchemas['system.profile']
+    delete db.base.models['system.profile']
+    delete db.models['system.profile'];
     db.close();
+    // test
+    var over = db.model('system.profile', new Schema({ name: String }));
+    over.schema.paths.name.should.be.a('object');
+    should.strictEqual(undefined, over.schema.paths.ts);
+    // reset
+    delete db.base.modelSchemas['system.profile']
+    delete db.base.models['system.profile']
+    delete db.models['system.profile'];
   },
 
   'setting profiling levels': function () {
@@ -4692,8 +4742,21 @@ module.exports = {
     });
   },
 
-  'date casting test (gh-502)': function () {
+  'enhanced date casting test (datejs - gh-502)': function () {
     var db = start()
+
+    Date.prototype.toObject = function() {
+        return {
+              millisecond: 86
+            , second: 42
+            , minute: 47
+            , hour: 17
+            , day: 13
+            , week: 50
+            , month: 11
+            , year: 2011
+        };
+    };
 
     var S = new Schema({
         name: String
@@ -4719,6 +4782,7 @@ module.exports = {
         m.save(function (err) {
           should.strictEqual(err, null);
           M.remove(function (err) {
+            delete Date.prototype.toObject;
             db.close();
           });
         });
@@ -4740,6 +4804,70 @@ module.exports = {
         ;('whateveriwant' in doc).should.be.false;
       });
     });
-  }
+  },
 
+  'strict mode': function(){
+    var db = start();
+
+    var lax = new Schema({
+        ts  : { type: Date, default: Date.now }
+      , content: String
+    });
+
+    var strict = new Schema({
+        ts  : { type: Date, default: Date.now }
+      , content: String
+    }, { strict: true });
+
+    var Lax = db.model('Lax', lax);
+    var Strict = db.model('Strict', strict);
+
+    var l = new Lax({content: 'sample', rouge: 'data'});
+    l._strictMode.should.be.false;
+    l = l.toObject();
+    l.content.should.equal('sample')
+    l.rouge.should.equal('data');
+    should.exist(l.rouge);
+
+    var s = new Strict({content: 'sample', rouge: 'data'});
+    s._strictMode.should.be.true;
+    s = s.toObject();
+    s.should.have.property('ts');
+    s.content.should.equal('sample');
+    s.should.not.have.property('rouge');
+    should.not.exist(s.rouge);
+
+    // instance override
+    var instance = new Lax({content: 'sample', rouge: 'data'}, true);
+    instance._strictMode.should.be.true;
+    instance = instance.toObject();
+    instance.content.should.equal('sample')
+    should.not.exist(instance.rouge);
+    instance.should.have.property('ts')
+
+    // hydrate works as normal, but supports the schema level flag.
+    var s2 = new Strict({content: 'sample', rouge: 'data'}, false);
+    s2._strictMode.should.be.false;
+    s2 = s2.toObject();
+    s2.should.have.property('ts')
+    s2.content.should.equal('sample');
+    s2.should.have.property('rouge');
+    should.exist(s2.rouge);
+
+    // testing init
+    var s3 = new Strict();
+    s3.init({content: 'sample', rouge: 'data'});
+    var s3obj = s3.toObject();
+    s3.content.should.equal('sample');
+    s3.should.not.have.property('rouge');
+    should.not.exist(s3.rouge);
+
+    // strict on create
+    Strict.create({content: 'sample2', rouge: 'data'}, function(err, doc){
+      doc.content.should.equal('sample2');
+      doc.should.not.have.property('rouge');
+      should.not.exist(doc.rouge);
+      db.close();
+    });
+  }
 };

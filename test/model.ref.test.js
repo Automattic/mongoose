@@ -1106,6 +1106,65 @@ module.exports = {
     });
   },
 
+  'populating multiple children of a sub-array at a time': function () {
+    var db = start()
+      , User = db.model('RefUser', users)
+      , BlogPost = db.model('RefBlogPost', posts)
+      , Inner = new Schema({
+            user: { type: ObjectId, ref: 'RefUser' }
+          , post: { type: ObjectId, ref: 'RefBlogPost' }
+        })
+      , I = db.model('PopMultiChildrenOfSubDocInner', Inner)
+    var M = db.model('PopMultiChildrenOfSubDoc', new Schema({
+            kids: [Inner]
+        }))
+
+    User.create({
+        name   : 'Fan 1'
+      , email  : 'fan1@learnboost.com'
+      , gender : 'male'
+    }, {
+        name   : 'Fan 2'
+      , email  : 'fan2@learnboost.com'
+      , gender : 'female'
+    }, function (err, fan1, fan2) {
+      should.strictEqual(err, null);
+
+      BlogPost.create({
+          title     : 'woot'
+      }, {
+          title     : 'yay'
+      }, function (err, post1, post2) {
+        should.strictEqual(err, null);
+        M.create({
+          kids: [
+              { user: fan1, post: post1, y: 5 }
+            , { user: fan2, post: post2, y: 8 }
+          ]
+        , x: 4
+        }, function (err, m1) {
+          should.strictEqual(err, null);
+
+          M.findById(m1)
+          .populate('kids.user', ["name"])
+          .populate('kids.post', ["title"], { title: "woot" })
+          .run(function (err, o) {
+            db.close();
+            should.strictEqual(err, null);
+            should.strictEqual(o.kids.length, 2);
+            var k1 = o.kids[0];
+            var k2 = o.kids[1];
+            should.strictEqual(true, !k2.post);
+            should.strictEqual(k1.user.name, "Fan 1");
+            should.strictEqual(k1.user.email, undefined);
+            should.strictEqual(k1.post.title, "woot");
+            should.strictEqual(k2.user.name, "Fan 2");
+          });
+        });
+      });
+    });
+  },
+
   'passing sort options to the populate method': function () {
     var db = start()
       , P = db.model('RefBlogPost', posts)

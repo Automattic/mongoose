@@ -23,57 +23,71 @@ var AllSchema = new Schema({
   , buffers: [Buffer]
   , objectids: [Schema.ObjectId]
   , docs     : { type: [DocSchema], validate: function () { return true }}
+  , s: { nest: String }
 });
 
 var A = mongoose.model('A', AllSchema);
 
 var methods = [];
-//methods.push(function (a, cb) {
-  //A.findOne({ _id: a._id }, cb);
-//}); // 2 MB
-//methods.push(function (a, cb) {
-  //A.find({ _id: a._id, bool: a.bool }, cb);
-//}); // 3.8 MB
-//methods.push(function (a, cb) {
-  //A.findById(a._id, cb);
-//}); // 4.6 MB
-//methods.push(function (a, cb) {
-  //A.where('number', a.number).sort('_id', -1).limit(10).run(cb)
-//}); // 4.8 MB
 methods.push(function (a, cb) {
-  a.where('date', a.date).select('string').limit(10).run(cb)
+  A.findOne({ _id: a._id }, cb);
+}); // 2 MB
+methods.push(function (a, cb) {
+  A.find({ _id: a._id, bool: a.bool }, cb);
+}); // 3.8 MB
+methods.push(function (a, cb) {
+  A.findById(a._id, cb);
+}); // 4.6 MB
+methods.push(function (a, cb) {
+  A.where('number', a.number).sort('_id', -1).limit(10).run(cb)
+}); // 4.8 MB
+methods.push(function (a, cb) {
+  A.where('date', a.date).select('string').limit(10).run(cb)
 }); // 3.5 mb
-//methods.push(function (a, cb) {
-  //A.where('date', a.date).select('string', 'bool').asc('date').limit(10).run(cb)
-//}); // 3.5 MB
-//methods.push(function (a, cb) {
-  //A.find('date', a.date).where('array').$in(3).limit(10).run(cb)
-//}); // 1.82 MB
-//methods.push(function (a, cb) {
-  //A.update({ _id: a._id }, { $addToset: { array: "heeeeello" }}, cb);
-//}); // 3.32 MB
-//methods.push(function (a, cb) {
-  //A.remove({ _id: a._id }, cb);
-//}); // 3.32 MB
-//methods.push(function (a, cb) {
-  //A.find().where('objectids').exists().only('dates').limit(10).exec(cb);
-//}); // 3.32 MB
-//methods.push(function (a, cb) {
-  //A.count({ strings: a.strings[2], number: a.number }, cb);
-//}); // 3.32 MB
+methods.push(function (a, cb) {
+  A.where('date', a.date).select('string', 'bool').asc('date').limit(10).run(cb)
+}); // 3.5 MB
+methods.push(function (a, cb) {
+  A.find('date', a.date).where('array').$in(3).limit(10).run(cb)
+}); // 1.82 MB
+methods.push(function (a, cb) {
+  A.update({ _id: a._id }, { $addToset: { array: "heeeeello" }}, cb);
+}); // 3.32 MB
+methods.push(function (a, cb) {
+  A.remove({ _id: a._id }, cb);
+}); // 3.32 MB
+methods.push(function (a, cb) {
+  A.find().where('objectids').exists().only('dates').limit(10).exec(cb);
+}); // 3.32 MB
+methods.push(function (a, cb) {
+  A.count({ strings: a.strings[2], number: a.number }, cb);
+}); // 3.32 MB
+methods.push(function (a, cb) {
+  a.string= "asdfaf";
+  a.number = 38383838;
+  a.date= new Date;
+  a.bool = false;
+  a.array.push(3);
+  a.dates.push(new Date);
+  a.bools.$pushAll([true, false]);
+  a.docs.$addToSet({ title: 'woot' });
+  a.strings.remove("three");
+  a.numbers.$pull(72);
+  a.objectids.$pop();
+  a.docs.$pullAll(a.docs);
+  a.s.nest = "aooooooga";
 
-// bench the normal way
-// the try building the doc into the document prototype
-// and using inheritance and bench that 
-//
-// also, bench using listeners for each subdoc vs one 
-// listener that knows about all subdocs and notifies
-// them.
+  if (i%2)
+  a.toObject({ depopulate: true });
+  else
+  a._delta();
+
+  cb();
+});
 
 var started = process.memoryUsage();
-//console.error(started);
 var start = new Date;
-var total = 10000;
+var total = 500;
 var i = total;
 
 mongoose.connection.on('open', function () {
@@ -110,7 +124,7 @@ mongoose.connection.on('open', function () {
       //else
         //a._delta();
 
-      if (!(i%40)) {
+      if (!(i%50)) {
         var u = process.memoryUsage();
         console.error('rss: %d, vsize: %d, heapTotal: %d, heapUsed: %d',
             u.rss, u.vsize, u.heapTotal, u.heapUsed);

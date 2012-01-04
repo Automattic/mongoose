@@ -1,4 +1,52 @@
 
+2.4.9 / 2012-01-04
+===================
+
+  * updated; driver to 0.9.7-3-5 to fix Linux performance degradation on some boxes
+
+2.4.8 / 2011-12-22
+===================
+
+  * updated; bump -native to 0.9.7.2-5
+  * fixed; compatibility with date.js (#646) [chrisleishman]
+  * changed; undocumented schema "lax" option to "strict"
+  * fixed; default value population for strict schemas
+  * updated; the nextTick helper for small performance gain. 1bee2a2
+
+2.4.7 / 2011-12-16
+===================
+
+  * fixed; bug in 2.4.6 with path setting
+  * updated; bump -native to 0.9.7.2-1
+  * added; strict schema option [nw]
+
+2.4.6 / 2011-12-16
+===================
+
+  * fixed; conflicting mods on update bug [sirlantis]
+  * improved; doc.id getter performance
+
+2.4.5 / 2011-12-14
+===================
+
+  * fixed; bad MongooseArray behavior in 2.4.2 - 2.4.4
+
+2.4.4 / 2011-12-14
+===================
+
+  * fixed; MongooseArray#doAtomics throwing after sliced
+
+2.4.3 / 2011-12-14
+===================
+
+  * updated; system.profile schema for MongoDB 2x
+
+2.4.2 / 2011-12-12
+===================
+
+  * fixed; partially populating multiple children of subdocs (#639) [kenpratt]
+  * fixed; allow Update of numbers to null (#640) [jerem]
+
 2.4.1 / 2011-12-02
 ===================
 

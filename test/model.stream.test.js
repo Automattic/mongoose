@@ -75,9 +75,9 @@ function assignExports () { var o = {
 
         setTimeout(function () {
           stream.paused.should.be.true;
+          resumed++;
           stream.resume();
           stream.paused.should.be.false;
-          resumed++;
         }, 20);
       }
     });

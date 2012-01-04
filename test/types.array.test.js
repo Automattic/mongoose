@@ -35,7 +35,32 @@ module.exports = {
     a.should.be.an.instanceof(Array);
     a.should.be.an.instanceof(MongooseArray);
     Array.isArray(a).should.be.true;
-    (a._atomics.constructor).should.eql(Object);
+    ;(a._atomics.constructor).should.eql(Object);
+
+  },
+
+  'doAtomics does not throw': function () {
+    var b = new MongooseArray([12,3,4,5]).filter(Boolean);
+    var threw = false;
+
+    try {
+      b.doAtomics
+    } catch (_) {
+      threw = true;
+    }
+
+    threw.should.be.false;
+
+    var a = new MongooseArray([67,8]).filter(Boolean);
+    try {
+      a.push(3,4);
+    } catch (_) {
+      console.error(_);
+      threw = true;
+    }
+
+    threw.should.be.false;
+
   },
 
   'test indexOf()': function(){
@@ -79,6 +104,7 @@ module.exports = {
       });
     }
   },
+
   'test #splice() with numbers': function () {
     var collection = 'splicetest-number' + random();
     var db = start()
@@ -433,6 +459,87 @@ module.exports = {
                 m.doc.some(function(v){return v.name === 'Funk'}).should.be.ok
               });
             });
+          });
+        });
+      });
+    });
+  },
+
+  'setting doc array should adjust path positions': function () {
+    var db = start();
+
+    var D = db.model('subDocPositions', new Schema({
+        em1: [new Schema({ name: String })]
+    }));
+
+    var d = new D({
+        em1: [
+            { name: 'pos0' }
+          , { name: 'pos1' }
+          , { name: 'pos2' }
+        ]
+    });
+
+    d.save(function (err) {
+      should.strictEqual(null, err);
+      D.findById(d, function (err, d) {
+        should.strictEqual(null, err);
+
+        var n = d.em1.slice();
+        n[2].name = 'position two';
+        var x = [];
+        x[1] = n[2];
+        x[2] = n[1];
+        d.em1 = x.filter(Boolean);
+
+        d.save(function (err) {
+          should.strictEqual(null, err);
+          D.findById(d, function (err, d) {
+            db.close();
+            should.strictEqual(null, err);
+          });
+        });
+      });
+    });
+  },
+
+  'paths with similar names should be saved': function () {
+    var db = start();
+
+    var D = db.model('similarPathNames', new Schema({
+        account: {
+            role: String
+          , roles: [String]
+        }
+      , em: [new Schema({ name: String })]
+    }));
+
+    var d = new D({
+        account: { role: 'teacher', roles: ['teacher', 'admin'] }
+      , em: [{ name: 'bob' }]
+    });
+
+    d.save(function (err) {
+      should.strictEqual(null, err);
+      D.findById(d, function (err, d) {
+        should.strictEqual(null, err);
+
+        d.account.role = 'president';
+        d.account.roles = ['president', 'janitor'];
+        d.em[0].name = 'memorable';
+        d.em = [{ name: 'frida' }];
+
+        d.save(function (err) {
+          should.strictEqual(null, err);
+          D.findById(d, function (err, d) {
+            db.close();
+            should.strictEqual(null, err);
+            d.account.role.should.equal('president');
+            d.account.roles.length.should.equal(2);
+            d.account.roles[0].should.equal('president');
+            d.account.roles[1].should.equal('janitor');
+            d.em.length.should.equal(1);
+            d.em[0].name.should.equal('frida');
           });
         });
       });

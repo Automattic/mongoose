@@ -188,6 +188,7 @@ module.exports = {
           UserNS.male.olderThan(99).findOne( function (err, found) {
             db.close();
             should.strictEqual(err, null);
+            found.id;
             found._id.should.eql(maleCentenarian._id);
           });
         }
@@ -204,6 +205,7 @@ module.exports = {
           UserNS.female.where('age').gt(99).findOne( function (err, found) {
             db.close();
             should.strictEqual(err, null);
+            found.id;
             found._id.should.eql(femaleCentenarian._id);
           });
         }

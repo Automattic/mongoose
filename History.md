@@ -1,4 +1,9 @@
 
+2.4.9 / 2011-01-04
+===================
+
+  * updated; driver to 0.9.7-3-5 to fix Linux performance degradation on some boxes
+
 2.4.8 / 2011-12-22
 ===================
 

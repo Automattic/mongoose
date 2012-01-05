@@ -34,3 +34,4 @@ convert('docs/migration-guide.md', 'docs/migration-1x-2x.html');
 convert('docs/query.md', 'docs/query.html');
 convert('docs/querystream.md', 'docs/querystream.html');
 convert('docs/schema-options.md', 'docs/schema-options.html');
+convert('docs/in-the-wild.md', 'docs/in-the-wild.html');

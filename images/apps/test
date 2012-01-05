@@ -1,0 +1,13 @@
+#!/bin/bash
+
+regex='([^[:space:]]+)[[:space:]]*(.*)'
+count=0
+
+while read url
+do
+    [[ $url =~ $regex ]]
+    url=${BASH_REMATCH[1]}
+    name=${BASH_REMATCH[2]}
+    echo $url
+    echo $name
+done < urls

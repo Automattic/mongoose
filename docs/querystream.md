@@ -114,7 +114,7 @@ will be emitted with the `err` before `close` is emitted.
 
 `pipe`s the QueryStream into another WritableStream.
 This method is inherited from
-[Stream](http://nodejs.org/docs/v0.6.3/api/streams.html#stream.pipe).
+[Stream](http://nodejs.org/docs/latest/api/streams.html#stream.pipe).
 
     Model.find().stream().pipe(writeStream [, options]);
 

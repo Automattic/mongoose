@@ -80,7 +80,7 @@ more information, refer to the chapter on
 
 Each key that you define is internally mapped to a `SchemaType`. Bear in mind, a
 Schema is not something that you interact directly with, but it's a way to
-describe to Mongoose what your want your data to look like, and how you want
+describe to Mongoose what you want your data to look like, and how you want
 it to behave.
 
 `SchemaType`s take care of validation, casting, defaults, and other general
@@ -126,12 +126,16 @@ and `remove`).
 Let's say that you want to email a certain user when his document changes.
 You'd then define a hook on the User schema like this:
 
-    User.pre('save', function (next) {
+    UserSchema.pre('save', function (next) {
       email(this.email, 'Your record has changed');
       next();
     });
 
 More information about the specifics of middleware can be found [here](/docs/middleware.html).
+
+## Schema options
+
+For schema options [read this](/docs/schema-options.html).
 
 ## Instance Methods and Static methods
 

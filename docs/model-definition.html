@@ -179,12 +179,14 @@
         <div id="menu">
           <ul>
             <li><a href="/">Home</a></li>
-            <li><a href="/docs/model-definition.html">Models</a></li>
+            <li><a href="/docs/model-definition.html">Models/Schemas</a></li>
             <li><a href="/docs/schematypes.html">Schema Types</a></li>
+            <li><a href="/docs/schema-options.html">Schema Options</a></li>
+            <li><a href="/docs/middleware.html">Middleware</a></li>
             <li><a href="/docs/finding-documents.html">Finding Docs</a></li>
             <li><a href="/docs/query.html">Queries</a></li>
+            <li><a href="/docs/querystream.html">Query Streams</a></li>
             <li><a href="/docs/methods-statics.html">Methods &amp; Statics</a>
-            <li><a href="/docs/middleware.html">Middleware</a></li>
             <li><a href="/docs/defaults.html">Defaults</a></li>
             <li><a href="/docs/indexes.html">Indexes</a></li>
             <li><a href="/docs/validation.html">Validation</a></li>
@@ -283,7 +285,7 @@ more information, refer to the chapter on
 
 <p>Each key that you define is internally mapped to a <code>SchemaType</code>. Bear in mind, a
 Schema is not something that you interact directly with, but it&#39;s a way to
-describe to Mongoose what your want your data to look like, and how you want
+describe to Mongoose what you want your data to look like, and how you want
 it to behave.</p>
 
 <p><code>SchemaType</code>s take care of validation, casting, defaults, and other general
@@ -329,12 +331,16 @@ and <code>remove</code>).</p>
 <p>Let&#39;s say that you want to email a certain user when his document changes.
 You&#39;d then define a hook on the User schema like this:</p>
 
-<pre><code>User.pre(&#39;save&#39;, function (next) {
+<pre><code>UserSchema.pre(&#39;save&#39;, function (next) {
   email(this.email, &#39;Your record has changed&#39;);
   next();
 });</code></pre>
 
 <p>More information about the specifics of middleware can be found <a href="/docs/middleware.html">here</a>.</p>
+
+<h2>Schema options</h2>
+
+<p>For schema options <a href="/docs/schema-options.html">read this</a>.</p>
 
 <h2>Instance Methods and Static methods</h2>
 

@@ -204,133 +204,57 @@
         <h1><a href="/">Mongoose</a></h1>
 
         <div id="content">
-          <h1>Populate - DBRef-like behavior</h1>
+          <h1>Schema options</h1>
 
-<p><code>ObjectIds</code> can now refer to another document in a
-collection within our database and be <code>populate()</code>d when
-querying. An example is helpful:</p>
+<p>The schema constructor takes a second options argument. There are currently
+two available options:</p>
 
-<pre><code>var mongoose = require(&#39;mongoose&#39;)
-  , Schema = mongoose.Schema
+<ol><li>safe</li><li>strict</li></ol>
 
-var PersonSchema = new Schema({
-    name    : String
-  , age     : Number
-  , stories : [{ type: Schema.ObjectId, ref: &#39;Story&#39; }]
-});
+<h3>safe</h3>
 
-var StorySchema = new Schema({
-    _creator : { type: Schema.ObjectId, ref: &#39;Person&#39; }
-  , title    : String
-  , fans     : [{ type: Schema.ObjectId, ref: &#39;Person&#39; }]
-});
+<p>This option is passed to mongodb with all operations and let&#39;s us specify
+if errors should be returned to our callbacks as well as tune write behavior.</p>
 
-var Story  = mongoose.model(&#39;Story&#39;, StorySchema);
-var Person = mongoose.model(&#39;Person&#39;, PersonSchema);</code></pre>
+<pre><code>var safe = true;
+new Schema({ .. }, { safe: safe })</code></pre>
 
-<p>So far we&#39;ve created two models. Our <code>Person</code> model has it&#39;s <code>stories</code> field
-set to an array of <code>ObjectId</code>s. The <code>ref</code> option is what tells Mongoose in which
-model to look, in our case the <code>Story</code> model. All <code>_id</code>s we
-store here must be document <code>_id</code>s from the <code>Story</code> model. We also added
-a <code>_creator</code> <code>ObjectId</code> to our <code>Story</code> schema which refers to a single <code>Person</code>.</p>
+<p>By default this is set to <code>true</code> for all schemas which guarentees that
+any error that occurs will get reported back to our method callback.</p>
 
-<h2>Populating the refs</h2>
+<p>By setting <code>safe</code> to something else like <code>{ j: 1, w: 2, wtimeout: 10000 }</code>
+we can guarantee the write was committed to the
+journal <em>(j: 1)</em>, at least 2 replicas <em>(w: 2)</em>, and that the write will
+timeout if it takes longer than 10 seconds <em>(wtimeout: 10000)</em>.
+Errors will still be reported back to our callback.</p>
 
-<pre><code>var aaron = new Person({ name: &#39;Aaron&#39;, age: 100 });
+<p>There are other options like <code>{ w: &quot;majority&quot; }</code> too.
+See the <a href="http://www.mongodb.org/display/DOCS/Verifying+Propagation+of+Writes+with+getLastError">MongoDB docs</a>
+for more detail.</p>
 
-aaron.save(function (err) {
-  if (err) ...
+<pre><code>var safe = { w: &quot;majority&quot;, wtimeout: 10000 };
+new Schema({ .. }, { safe: safe })</code></pre>
 
-  var story1 = new Story({
-      title: &quot;A man who cooked Nintendo&quot;
-    , _creator: aaron._id
-  });
+<h3>strict</h3>
 
-  story1.save(function (err) {
-    if (err) ...
-  });
-})</code></pre>
+<p>The strict option makes it possible to ensure that values added to
+our model instance that were not specified in our schema do not get
+saved to the db.</p>
 
-<p>So far we haven&#39;t done anything special. We&#39;ve merely created a <code>Person</code> and
-a <code>Story</code>. Now let&#39;s take a look at populating our story&#39;s <code>_creator</code>:</p>
+<pre><code>var thing = new Thing({ iAmNotInTheSchema: true });
+thing.save() // iAmNotInTheSchema was saved to the db @#$%^!!</code></pre>
 
-<pre><code>Story
-.findOne({ title: /Nintendo/i })
-.populate(&#39;_creator&#39;) // &lt;--
-.run(function (err, story) {
-  if (err) ..
-  console.log(&#39;The creator is %s&#39;, story._creator.name);
-  // prints &quot;The creator is Aaron&quot;
-})</code></pre>
+<p>By default this is <code>false</code> for backward compatibility. Set it to true
+and sleep peacefully.</p>
 
-<p>Yup that&#39;s it. We&#39;ve just queried for a <code>Story</code> with the term Nintendo in it&#39;s
-title and also queried the <code>Person</code> collection for the story&#39;s creator. Nice!</p>
+<pre><code>new Schema({ .. }, { strict: true })</code></pre>
 
-<p>Arrays of <code>ObjectId</code> refs work the same way. Just call the <code>populate</code> method on the query and
-an array of documents will be returned in place of the <code>ObjectId</code>s.</p>
+<p>This value can also be overridden at the model instance level by passing
+a second boolean argument:</p>
 
-<p>What if we only want a few specific fields returned for the query? This can
-be accomplished by passing an array of field names to the <code>populate</code> method:</p>
-
-<pre><code>Story
-.findOne({ title: /Nintendo/i })
-.populate(&#39;_creator&#39;, [&#39;name&#39;]) // &lt;-- only return the Persons name
-.run(function (err, story) {
-  if (err) ..
-
-  console.log(&#39;The creator is %s&#39;, story._creator.name);
-  // prints &quot;The creator is Aaron&quot;
-
-  console.log(&#39;The creators age is %s&#39;, story._creator.age)
-  // prints &quot;The creators age is null&#39;
-})</code></pre>
-
-<p>Now this is much better. The only property of the creator we are using
-is the <code>name</code> so we only returned that field from the db. Efficiency FTW!</p>
-
-<p>Great, but what if we wanted to populate
-our <code>fans</code> array based on their age, and return, at most, any 5 of them?</p>
-
-<pre><code>Story
-.find(...)
-.populate(&#39;fans&#39;, null, { age: { $gte: 21 }}, { limit: 5 })</code></pre>
-
-<p>Done. Conditions and options are the third and fourth arguments respectively.</p>
-
-<h2>Updating</h2>
-
-<p>Now that we have a story we realized that the <code>_creator</code> was incorrect. We can
-update <code>ObjectId</code> refs the same as any other property through the magic of Mongooses
-internal casting:</p>
-
-<pre><code>var guille = new Person({ name: &#39;Guillermo&#39; });
-guille.save(function (err) {
-  if (err) ..
-
-  story._creator = guille; // or guille._id
-
-  story.save(function (err) {
-    if (err) ..
-
-    Story
-    .findOne({ title: /Nintendo/i })
-    .populate(&#39;_creator&#39;, [&#39;name&#39;])
-    .run(function (err, story) {
-      if (err) ..
-
-      console.log(&#39;The creator is %s&#39;, story._creator.name)
-      // prints &quot;The creator is Guillermo&quot;
-    })
-
-  })
-})</code></pre>
-
-<h3>Note:</h3>
-
-<p>The documents returned from calling <code>populate</code> become fully functional,
-<code>remove</code>able, <code>save</code>able documents. Do not confuse them with embedded
-docs. Take caution when calling its <code>remove</code> method because 
-you&#39;ll be removing it from the database, not just the array.</p>
+<pre><code>var Thing = db.model(&#39;Thing&#39;);
+var thing = new Thing(doc, true);  // enables strict mode
+var thing = new Thing(doc, false); // disables strict mode</code></pre>
         </div>
 
         <div id="footer">

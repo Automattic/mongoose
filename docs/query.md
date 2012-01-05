@@ -2,10 +2,7 @@
 Queries
 =================
 
-A `Query` is what is returned when calling many `Model`
-[methods](/docs/finding-documents.html). These `Query`
-objects provide a chaining api to specify search terms,
-cursor options, hints, and other behavior.
+A `Query` is what is returned when calling many `Model` [methods](/docs/finding-documents.html). These `Query` objects provide a chaining api to specify search terms, cursor options, hints, and other behavior.
 
 ## Query#where
 
@@ -13,23 +10,20 @@ Lets you specify query terms with sugar.
 
     query.where(path [, val])
 
-`path` is a valid document path. `val` is optional. Its useful to omit
-`val` when used in conjunction with other query methods. For example:
+`path` is a valid document path. `val` is optional. Its useful to omit `val` when used in conjunction with other query methods. For example:
 
     query
     .where('name', 'Space Ghost')
     .where('age').gte(21).lte(65)
     .run(callback)
 
-In this case, `gte()` and `lte()` operate on the previous path if not
-explicitly passed. The above query results in the following query expression:
+In this case, `gte()` and `lte()` operate on the previous path if not explicitly passed. The above query results in the following query expression:
 
     { name: 'Space Ghost', age: { $gte: 21, $lte: 65 }}
 
 ## Query#$where
 
-Specifies the javascript function to run on MongoDB on each document scanned.
-See the [MongoDB docs](http://www.mongodb.org/display/DOCS/Advanced+Queries#AdvancedQueries-JavascriptExpressionsand%7B%7B%24where%7D%7D) for details.
+Specifies the javascript function to run on MongoDB on each document scanned. See the [MongoDB docs](http://www.mongodb.org/display/DOCS/Advanced+Queries#AdvancedQueries-JavascriptExpressionsand%7B%7B%24where%7D%7D) for details.
 
     Model.find().$where(fn)
 
@@ -51,8 +45,7 @@ Specifies a [greater than](http://www.mongodb.org/display/DOCS/Advanced+Queries#
 
     query.$gt(path, val);
 
-`$gt` is also one of the methods with extra chaining sugar: when only one
-argument is passed, it uses the path used the last call to `where()`. Example:
+`$gt` is also one of the methods with extra chaining sugar: when only one argument is passed, it uses the path used the last call to `where()`. Example:
 
     Model.where('age').$gt(21)
 
@@ -66,8 +59,7 @@ Specifies a [greater than or equal to](http://www.mongodb.org/display/DOCS/Advan
 
     query.$gte(path, val);
 
-`$gte` is also one of the methods with extra chaining sugar: when only one
-argument is passed, it uses the path used the last call to `where()`. Example:
+`$gte` is also one of the methods with extra chaining sugar: when only one argument is passed, it uses the path used the last call to `where()`. Example:
 
     Model.where('age').$gte(21)
 
@@ -81,8 +73,7 @@ Specifies a [less than](http://www.mongodb.org/display/DOCS/Advanced+Queries#Adv
 
     query.$lt(path, val);
 
-`$lt` is also one of the methods with extra chaining sugar: when only one
-argument is passed, it uses the path used the last call to `where()`. Example:
+`$lt` is also one of the methods with extra chaining sugar: when only one argument is passed, it uses the path used the last call to `where()`. Example:
 
     Model.where('age').$lt(21)
 
@@ -96,8 +87,7 @@ Specifies a [less than or equal to](http://www.mongodb.org/display/DOCS/Advanced
 
     query.$lte(path, val);
 
-`$lte` is also one of the methods with extra chaining sugar: when only one
-argument is passed, it uses the path used the last call to `where()`. Example:
+`$lte` is also one of the methods with extra chaining sugar: when only one argument is passed, it uses the path used the last call to `where()`. Example:
 
     Model.where('age').$lte(21)
 
@@ -111,9 +101,7 @@ Specifies the [$ne](http://www.mongodb.org/display/DOCS/Advanced+Queries#Advance
 
     query.$ne(path, val);
 
-These methods have extra sugar in that
-when only one argument is passed, the path in the last call
-to `where()` is used. Example:
+These methods have extra sugar in that when only one argument is passed, the path in the last call to `where()` is used. Example:
 
     query.where('_id').ne('4ecf92f31993a52c58e07f6a')
 
@@ -131,9 +119,7 @@ Specifies the [$in](http://www.mongodb.org/display/DOCS/Advanced+Queries#Advance
 
     query.$in(path, array)
 
-These methods have extra sugar in that
-when only one argument is passed, the path in the last call
-to `where()` is used.
+These methods have extra sugar in that when only one argument is passed, the path in the last call to `where()` is used.
 
     query.where('tags').in(['game', 'fun', 'holiday'])
 
@@ -147,9 +133,7 @@ Specifies the [$nin](http://www.mongodb.org/display/DOCS/Advanced+Queries#Advanc
 
     query.$nin(path, array)
 
-These methods have extra sugar in that
-when only one argument is passed, the path in the last call
-to `where()` is used.
+These methods have extra sugar in that when only one argument is passed, the path in the last call to `where()` is used.
 
     query.where('games').nin(['boring', 'lame'])
 
@@ -163,9 +147,7 @@ Specifies the [$all](http://www.mongodb.org/display/DOCS/Advanced+Queries#Advanc
 
     query.$all(path, array)
 
-These methods have extra sugar in that
-when only one argument is passed, the path in the last call
-to `where()` is used.
+These methods have extra sugar in that when only one argument is passed, the path in the last call to `where()` is used.
 
     query.where('games').all(['fun', 'exhausting'])
 
@@ -179,9 +161,7 @@ Specifies the [$regex](http://www.mongodb.org/display/DOCS/Advanced+Queries#Adva
 
     query.regex('name.first', /^a/i)
 
-These methods have extra sugar in that
-when only one argument is passed, the path in the last call
-to `where()` is used.
+These methods have extra sugar in that when only one argument is passed, the path in the last call to `where()` is used.
 
     query.where('name.first').$regex(/^a/i)
 
@@ -195,9 +175,7 @@ Specifies the [$size](http://www.mongodb.org/display/DOCS/Advanced+Queries#Advan
 
     query.$size(path, integer)
 
-These methods have extra sugar in that
-when only one argument is passed, the path in the last call
-to `where()` is used.
+These methods have extra sugar in that when only one argument is passed, the path in the last call to `where()` is used.
 
     query.size('comments', 2)
     query.where('comments').size(2)
@@ -227,9 +205,7 @@ Specifies the [$exists](http://www.mongodb.org/display/DOCS/Advanced+Queries#Adv
 
     query.exists(path, Boolean)
 
-These methods have extra sugar in that
-when only one argument is passed, the path from the last call
-to `where()` is used.
+These methods have extra sugar in that when only one argument is passed, the path from the last call to `where()` is used.
 
 Given the following query,
 
@@ -261,8 +237,7 @@ Specifies the [$elemMatch](http://www.mongodb.org/display/DOCS/Advanced+Queries#
     query.elemMatch(path, criteria)
     query.where(path).elemMatch(criteria)
 
-Functions can also be passed so you can further use query sugar
-to declare the expression:
+Functions can also be passed so you can further use query sugar to declare the expression:
 
     query.where(path).elemMatch(function)
     query.elemMatch(path, function)
@@ -324,8 +299,7 @@ results in
 
 ## Query#select, Query#fields
 
-Specifies which [subset of fields](http://www.mongodb.org/display/DOCS/Retrieving+a+Subset+of+Fields)
-you want to return.
+Specifies which [subset of fields](http://www.mongodb.org/display/DOCS/Retrieving+a+Subset+of+Fields) you want to return.
 
     query.select('title', 'name')
     // only _id, title, and name fields will be populated in your docs
@@ -347,9 +321,7 @@ or pass an array of field names:
 
 ## Query#only
 
-Specifies a [subset of fields](http://www.mongodb.org/display/DOCS/Retrieving+a+Subset+of+Fields)
-to return. This is like `select()` but this option only
-specifies which fields you want returned.
+Specifies a [subset of fields](http://www.mongodb.org/display/DOCS/Retrieving+a+Subset+of+Fields) to return. This is like `select()` but this option only specifies which fields you want returned.
 
     query.only('title name')
     query.only('title', 'name')
@@ -357,9 +329,7 @@ specifies which fields you want returned.
 
 ## Query#exclude
 
-Specifies a [subset of fields](http://www.mongodb.org/display/DOCS/Retrieving+a+Subset+of+Fields)
-to return. This is like `select()` but this option only
-specifies which fields you DO NOT want returned.
+Specifies a [subset of fields](http://www.mongodb.org/display/DOCS/Retrieving+a+Subset+of+Fields) to return. This is like `select()` but this option only specifies which fields you DO NOT want returned.
 
     query.exclude('title name')
     query.exclude('title', 'name')
@@ -367,9 +337,7 @@ specifies which fields you DO NOT want returned.
 
 ## Query#slice, Query#$slice
 
-Retrieve a sub-range of elements in an array with the
-[$slice](http://www.mongodb.org/display/DOCS/Retrieving+a+Subset+of+Fields#RetrievingaSubsetofFields-RetrievingaSubrangeofArrayElements)
-method.
+Retrieve a sub-range of elements in an array with the [$slice](http://www.mongodb.org/display/DOCS/Retrieving+a+Subset+of+Fields#RetrievingaSubsetofFields-RetrievingaSubrangeofArrayElements) method.
 
     query.slice(path, val)
 
@@ -383,8 +351,7 @@ or an Array.
     query.where('tags').slice([20, 10]) // skip 20, limit 10
     query.where('tags').slice([-20, 10]) // 20 from the end, limit 10
 
-`$slice` is also one of the methods with extra chaining sugar: when only one
-argument is passed, it uses the path used the last call to `where()`. Example:
+`$slice` is also one of the methods with extra chaining sugar: when only one argument is passed, it uses the path used the last call to `where()`. Example:
 
     query.slice('tags', -5)
 
@@ -438,38 +405,29 @@ Is the same as
 
 ## Query#limit
 
-The [limit](http://www.mongodb.org/display/DOCS/Advanced+Queries#AdvancedQueries-%7B%7Blimit%28%29%7D%7D)
-method specifies the max number of documents to return.
+The [limit](http://www.mongodb.org/display/DOCS/Advanced+Queries#AdvancedQueries-%7B%7Blimit%28%29%7D%7D) method specifies the max number of documents to return.
 
     query.limit(20).skip(10)
 
 ## Query#skip
 
-The [skip](http://www.mongodb.org/display/DOCS/Advanced+Queries#AdvancedQueries-%7B%7Bskip%28%29%7D%7D)
-method specifies at which document the database should begin returning results.
+The [skip](http://www.mongodb.org/display/DOCS/Advanced+Queries#AdvancedQueries-%7B%7Bskip%28%29%7D%7D) method specifies at which document the database should begin returning results.
 
     query.skip(10).limit(20)
 
 ## Query#maxscan
-Limits the number of documents to [scan](http://www.mongodb.org/display/DOCS/Advanced+Queries#AdvancedQueries-%24maxScan).
-
+Limits the number of documents to [scan](http://www.mongodb.org/display/DOCS/Advanced+Queries#AdvancedQueries-%24maxScan). 
     query.maxscan(Number)
 
 ## Query#snapshot
 
-The [snapshot](http://www.mongodb.org/display/DOCS/Advanced+Queries#AdvancedQueries-%7B%7Bsnapshot%28%29%7D%7D)
-method indicates the use of snapshot mode for the query.
+The [snapshot](http://www.mongodb.org/display/DOCS/Advanced+Queries#AdvancedQueries-%7B%7Bsnapshot%28%29%7D%7D) method indicates the use of snapshot mode for the query.
 
     query.snapshot(Boolean)
 
 ## Query#batchSize
 
-Sets the numer of documents to return per database query. For example, if we
-were qeurying for 10000 docs and streaming them to the client, we
-may want to limit the number of documents retrieved per cursor iteration to
-reduce memory consuption (all docs are held in memory during iteration).
-Setting `batchSize` to, say, 100, would mean that the cursor would be pulling
-only 100 documents at a time from MongoDB.
+Sets the numer of documents to return per database query. For example, if we were qeurying for 10000 docs and streaming them to the client, we may want to limit the number of documents retrieved per cursor iteration to reduce memory consuption (all docs are held in memory during iteration). Setting `batchSize` to, say, 100, would mean that the cursor would be pulling only 100 documents at a time from MongoDB.
 
     query.batchSize(Number)
 
@@ -481,8 +439,7 @@ Sets the [slaveOk](http://www.mongodb.org/display/DOCS/Replica+Pairs#ReplicaPair
 
 ## Query#hint
 
-Specifies the [hint](http://www.mongodb.org/display/DOCS/Optimization#Optimization-Hint)
-option for MongoDB.
+Specifies the [hint](http://www.mongodb.org/display/DOCS/Optimization#Optimization-Hint) option for MongoDB.
 
     query.hint(indexName)
 
@@ -490,9 +447,7 @@ If your schema has an index like
 
     Thing.index({ name: 1, title: 1 })
 
-and you wanted to tell MongoDB to use that index for your query (in the off
-chance that MongoDB was not able to figure our that it should use it)
-you can give MongoDB a hint like so:
+and you wanted to tell MongoDB to use that index for your query (in the off chance that MongoDB was not able to figure our that it should use it) you can give MongoDB a hint like so:
 
     query.hint({ name: 1, title: 1}).run(callback)
 
@@ -520,13 +475,11 @@ Casts `field` and sends a distinct command to MongoDB.
 
 ## Query#update
 
-Casts the `doc` according to the model Schema and
-sends an update command to MongoDB.
+Casts the `doc` according to the model Schema and sends an update command to MongoDB.
 
     query.update(doc, callback)
 
-_All paths passed that are not $atomic operations
-will become $set ops so we retain backwards compatibility._
+_All paths passed that are not $atomic operations will become $set ops so we retain backwards compatibility._
 
     query.update({..}, { title: 'remove words' }, ...)
 
@@ -556,15 +509,11 @@ Typically used in chaining scenarios:
 
 A streaming cursor interface.
 
-_2.4.0 introduces the query.stream() method
-which is a more 'node-like' way of streaming records and provides
-better cursor management. It is recommended that you use query.stream in
-place of query.each._
+_2.4.0 introduces the query.stream() method which is a more 'node-like' way of streaming records and provides better cursor management. It is recommended that you use query.stream in place of query.each._
 
     query.each(callback);
 
-The `callback` is called repeatedly for each document
-found as its streamed. If an error occurs streaming stops.
+The `callback` is called repeatedly for each document found as its streamed. If an error occurs streaming stops.
 
     query.each(function (err, user) {
       if (err) return res.end("aww, received an error. all done.");
@@ -575,8 +524,7 @@ found as its streamed. If an error occurs streaming stops.
       }
     });
 
-A third parameter may also be used in the callback which
-allows you to iterate the cursor manually.
+A third parameter may also be used in the callback which allows you to iterate the cursor manually.
 
     query.each(function (err, user, next) {
       if (err) return res.end("aww, received an error. all done.");

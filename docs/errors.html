@@ -206,55 +206,55 @@
         <div id="content">
           <h1>Error handling</h1>
 
-<p>Errors returned after failed validation contain an <code>errors</code> object
-holding the actual ValidatorErrors. Each ValidatorError has a <code>type</code> and <code>path</code> property
-providing us with a little more error handling flexibility.</p>
+<p>Errors returned after failed validation contain an <code>errors</code> object holding the actual ValidatorErrors. Each ValidatorError has a <code>type</code> and <code>path</code> property providing us with a little more error handling flexibility.</p>
 
 <pre><code>var ToySchema = new Schema({
     color: String
   , name: String
 });
 
-var Toy = db.model(&#39;Toy&#39;, ToySchema);
+var Toy = db.model('Toy', ToySchema);
 
-Toy.schema.path(&#39;name&#39;).validate(function (value) {
+Toy.schema.path('name').validate(function (value) {
   return /blue|green|white|red|orange|periwinkel/i.test(value);
-}, &#39;Invalid color&#39;);
+}, 'Invalid color');
 
-var toy = new Toy({ color: &#39;grease&#39;});
+var toy = new Toy({ color: 'grease'});
 
 toy.save(function (err) {
   // previous behavior (v1x):
 
   console.log(err.errors.color)
-  // prints &#39;Validator &quot;Invalid color&quot; failed for path color&#39;
+  // prints 'Validator "Invalid color" failed for path color'
 
   // new v2x behavior - err.errors.color is a ValidatorError object
 
   console.log(err.errors.color.message)
-  // prints &#39;Validator &quot;Invalid color&quot; failed for path color&#39;
+  // prints 'Validator "Invalid color" failed for path color'
 
   // you can get v1 behavior back by casting error.color toString
 
   console.log(String(err.errors.color))
-  // prints &#39;Validator &quot;Invalid color&quot; failed for path color&#39;
+  // prints 'Validator "Invalid color" failed for path color'
 
   console.log(err.errors.color.type);
-  // prints &quot;Invalid color&quot;
+  // prints "Invalid color"
 
   console.log(err.errors.color.path)
-  // prints &quot;color&quot;
+  // prints "color"
 
   console.log(err.name)
-  // prints &quot;ValidationError&quot;
+  // prints "ValidationError"
 
   console.log(err.message)
-  // prints &quot;Validation failed&quot;
-});</code></pre>
+  // prints "Validation failed"
+});
+</code></pre>
 
 <p>BTW, the <code>err.errors</code> object is also available on the model instance.</p>
 
-<pre><code>toy.errors.color.message === err.errors.color.message</code></pre>
+<pre><code>toy.errors.color.message === err.errors.color.message
+</code></pre>
         </div>
 
         <div id="footer">

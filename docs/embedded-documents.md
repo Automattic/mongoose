@@ -2,15 +2,11 @@
 Embedded Documents
 ==================
 
-Embedded documents are documents with schemas of their own that are part of
-other documents (as items within an array).
+Embedded documents are documents with schemas of their own that are part of other documents (as items within an array).
 
-Embedded documents enjoy all the same features as your models. Defaults,
-validators, middleware. Whenever an error occurs, it's bubbled to the `save()`
-error callback, so error handling is a snap!
+Embedded documents enjoy all the same features as your models. Defaults, validators, middleware. Whenever an error occurs, it's bubbled to the `save()` error callback, so error handling is a snap!
 
-Mongoose interacts with your embedded documents in arrays _atomically_, out of
-the box.
+Mongoose interacts with your embedded documents in arrays _atomically_, out of the box.
 
 ## Definition and initialization
 
@@ -36,9 +32,7 @@ When you define a Schema like this:
 
     mongoose.model('BlogPost', BlogPost);
 
-The `comments` key of your `BlogPost` documents will then be an instance of
-`DocumentArray`. This is a special subclassed `Array` that can deal with
-casting, and has special methods to work with embedded documents.
+The `comments` key of your `BlogPost` documents will then be an instance of `DocumentArray`. This is a special subclassed `Array` that can deal with casting, and has special methods to work with embedded documents.
 
 ## Adding an embedded document to an array
 
@@ -68,8 +62,7 @@ casting, and has special methods to work with embedded documents.
 
 ## Finding an embedded document by id
 
-`DocumentArray`s have an special method `id` that filters your embedded
-documents by their `_id` property (each embedded document gets one):
+`DocumentArray`s have an special method `id` that filters your embedded documents by their `_id` property (each embedded document gets one):
 
 Consider the following snippet:
 

@@ -18,7 +18,9 @@ Take the following schema:
 
     var Person = mongoose.model('Person', PersonSchema);
 
-    var theSituation = new Person({name: { first: 'Michael', last: 'Sorrentino' }});
+    var theSituation = new Person({
+        name: { first: 'Michael', last: 'Sorrentino' }
+    });
 
 Suppose you want to write `theSituation`'s full name. You could do so via:
 

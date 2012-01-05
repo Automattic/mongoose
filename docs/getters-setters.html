@@ -210,9 +210,9 @@
 
 <h2>Setters</h2>
 
-<p>Setters allow you to transform the mongoose document&#39;s data before it gets to the raw mongodb document and is set as a value on an actual key.</p>
+<p>Setters allow you to transform the mongoose document's data before it gets to the raw mongodb document and is set as a value on an actual key.</p>
 
-<p>Suppose you are implementing user registration for a website. User provide an email and password, which gets saved to mongodb. The email is a string that you will want to normalize to lower case, in order to avoid one email having more than one account -- e.g., otherwise, avenue@q.com can be registered for 2 accounts via avenue@q.com and AvEnUe@Q.CoM.</p>
+<p>Suppose you are implementing user registration for a website. User provide an email and password, which gets saved to mongodb. The email is a string that you will want to normalize to lower case, in order to avoid one email having more than one account -- e.g., otherwise, <a href='mailto:avenue@q.com'>avenue@q.com</a> can be registered for 2 accounts via <a href='mailto:avenue@q.com'>avenue@q.com</a> and <a href='mailto:AvEnUe@Q.CoM'>AvEnUe@Q.CoM</a>.</p>
 
 <p>You can set up email lower case normalization easily via a Mongoose setter. Note in the following snippet that setters (and also getters) are defined in the <code>Schema</code>:</p>
 
@@ -224,10 +224,11 @@ var UserSchema = new Schema({
   email: { type: String, set: toLower } 
 });
 
-var User = mongoose.model(&#39;User&#39;, UserSchema);
-var user = new User({email: &#39;AVENUE@Q.COM&#39;});
+var User = mongoose.model('User', UserSchema);
+var user = new User({email: '<a href='mailto:AVENUE@Q.COM'>AVENUE@Q.COM</a>'});
 
-console.log(user.email); // &#39;avenue@q.com&#39;</code></pre>
+console.log(user.email); // '<a href='mailto:avenue@q.com'>avenue@q.com</a>'
+</code></pre>
 
 <p>As you can see above, setters allow you to transform the data before it gets to the raw mongodb document and is set as a value on an actual key.</p>
 
@@ -238,18 +239,19 @@ console.log(user.email); // &#39;avenue@q.com&#39;</code></pre>
 <p>Suppose you are storing credit card numbers and you want to hide everything except the last 4 digits to the mongoose user.  You can do so by defining a getter in the following way (again, notice that getters are defined in the <code>Schema</code>):</p>
 
 <pre><code>function obfuscate (cc) {
-  return &#39;****-****-****-&#39; + cc.slice(cc.length-4, cc.length);
+  return '****-****-****-' + cc.slice(cc.length-4, cc.length);
 }
 
 var AccountSchema = new Schema({
   creditCardNumber: { type: String, get: obfuscate }
 });
 
-var Account = mongoose.model(&#39;Account&#39;, AccountSchema);
+var Account = mongoose.model('Account', AccountSchema);
 
 Account.findById( someId, function (err, found) {
-  console.log(found.creditCardNumber); // &#39;****-****-****-1234&#39;
-});</code></pre>
+  console.log(found.creditCardNumber); // '****-****-****-1234'
+});
+</code></pre>
 
 <h2>Summary</h2>
 

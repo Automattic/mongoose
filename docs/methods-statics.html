@@ -219,45 +219,43 @@
 
 AnimalSchema.methods.findSimilarType = function findSimilarType (cb) {
   return this.find({ type: this.type }, cb);
-};</code></pre>
+};
+</code></pre>
 
-<p>Now when we have an instance of <code>Animal</code> we can call our <code>findSimilarType</code> method and
-find all animals with a matching <code>type</code>.</p>
+<p>Now when we have an instance of <code>Animal</code> we can call our <code>findSimilarType</code> method and find all animals with a matching <code>type</code>.</p>
 
-<pre><code>var Animal = mongoose.model(&#39;Animal&#39;, AnimalSchema);
-var dog = new Animal({ name: &#39;Rover&#39;, type: &#39;dog&#39; });
+<pre><code>var Animal = mongoose.model('Animal', AnimalSchema);
+var dog = new Animal({ name: 'Rover', type: 'dog' });
 
 dog.findSimilarType(function (err, dogs) {
   if (err) return ...
   dogs.forEach(..);
-})</code></pre>
+})
+</code></pre>
 
-<p>Note that we return what <code>.find()</code> returns in our method. The advantages are two-fold.
-First, by passing <code>cb</code> into <code>find</code> we are making it optional b/c <code>find</code> called
-without a callback will not run the query. Secondly, <code>this.find</code>, <code>this.where</code>,
-and other Model methods return instances of <a href="/docs/finding-documents.html">Query</a>
-which allow us to further utilize its expressive capabilities.</p>
+<p>Note that we return what <code>.find()</code> returns in our method. The advantages are two-fold. First, by passing <code>cb</code> into <code>find</code> we are making it optional b/c <code>find</code> called without a callback will not run the query. Secondly, <code>this.find</code>, <code>this.where</code>, and other Model methods return instances of <a href="/docs/finding-documents.html">Query</a> which allow us to further utilize its expressive capabilities.</p>
 
 <pre><code>dog
 .findSimilarType()
-.where(&#39;name&#39;: /rover/i)
+.where('name': /rover/i)
 .limit(20)
 .run(function (err, rovers) {
   if (err) ...
-})</code></pre>
+})
+</code></pre>
 
 <h2>Statics</h2>
 
-<p>Statics are pretty much the same as methods but allow for defining functions that
-exist directly on your Model.</p>
+<p>Statics are pretty much the same as methods but allow for defining functions that exist directly on your Model.</p>
 
 <pre><code>AnimalSchema.statics.search = function search (name, cb) {
-  return this.where(&#39;name&#39;, new RegExp(name, &#39;i&#39;)).run(cb);
+  return this.where('name', new RegExp(name, 'i')).run(cb);
 }
 
-Animal.search(&#39;Rover&#39;, function (err) {
+Animal.search('Rover', function (err) {
   if (err) ...
-})</code></pre>
+})
+</code></pre>
         </div>
 
         <div id="footer">

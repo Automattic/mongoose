@@ -206,8 +206,7 @@
         <div id="content">
           <h1>Schema Types</h1>
 
-<p><code>SchemaType</code>s take care of validation, casting, defaults, and other general
-options in our models. We can specify our types one of two ways:</p>
+<p><code>SchemaType</code>s take care of validation, casting, defaults, and other general options in our models. We can specify our types one of two ways:</p>
 
 <pre><code>// directly without options
 var Person = new Schema({
@@ -217,72 +216,97 @@ var Person = new Schema({
 // or with options
 var Person = new Schema({
     title   : { type: String, lowercase: true }
-});</code></pre>
+});
+</code></pre>
 
-<p>In the example above we specified the <code>lowercase</code> option for strings which
-will lowercase the string whenever it is set. Options are functions that are
-called on each SchemaType. Each <code>SchemaType</code> has its own set of custom options.</p>
+<p>In the example above we specified the <code>lowercase</code> option for strings which will lowercase the string whenever it is set. Options are functions that are called on each SchemaType. Each <code>SchemaType</code> has its own set of custom options.</p>
 
 <h2>Available Schema Types</h2>
 
 <h3>String</h3>
 
-<ul><li><p><code>lowercase</code>: {Boolean}</p><p>Creates a setter which calls <code>.toLowerCase()</code> on the value</p></li><li><p><code>uppercase</code>: {Boolean}</p><p>Creates a setter which calls <code>.toUpperCase()</code> on the value</p></li><li><p><code>trim</code>: {Boolean}</p><p>Creates a setter which calls <code>.trim()</code> on the value</p></li><li><p><code>match</code>: {RegExp}</p><p>Creates a RegExp based <a href="/docs/validation.html">validator</a>. The value being set is <code>.test()</code>ed
-against the RegExp. If it does not pass, validation will fail.</p></li><li><p><code>enum</code>: {Array}</p><p>Creates an enum validator. If the value being set is not in this
-array, validation will fail.</p></li></ul>
+<ul>
+<li><p><code>lowercase</code>: {Boolean}</p>
+
+<p>Creates a setter which calls <code>.toLowerCase()</code> on the value</p></li>
+<li><p><code>uppercase</code>: {Boolean}</p>
+
+<p>Creates a setter which calls <code>.toUpperCase()</code> on the value</p></li>
+<li><p><code>trim</code>: {Boolean}</p>
+
+<p>Creates a setter which calls <code>.trim()</code> on the value</p></li>
+<li><p><code>match</code>: {RegExp}</p>
+
+<p>Creates a RegExp based <a href="/docs/validation.html">validator</a>. The value being set is <code>.test()</code>ed against the RegExp. If it does not pass, validation will fail.</p></li>
+<li><p><code>enum</code>: {Array}</p>
+
+<p>Creates an enum validator. If the value being set is not in this array, validation will fail.</p></li>
+</ul>
 
 <h3>Number</h3>
 
-<ul><li><p><code>min</code>: {Number}</p><p>Creates a validator which checks that the value being set is not less
-than the value specified.</p></li><li><p><code>max</code>: {Number}</p><p>Creates a validator which checks that the value being set is not greater
-than the value specified.</p></li></ul>
+<ul>
+<li><p><code>min</code>: {Number}</p>
+
+<p>Creates a validator which checks that the value being set is not less than the value specified.</p></li>
+<li><p><code>max</code>: {Number}</p>
+
+<p>Creates a validator which checks that the value being set is not greater than the value specified.</p></li>
+</ul>
 
 <h3>Date</h3>
 
-<ul><li>no custom options</li></ul>
+<ul>
+<li>no custom options</li>
+</ul>
 
 <h3>Boolean</h3>
 
-<ul><li>no custom options</li></ul>
+<ul>
+<li>no custom options</li>
+</ul>
 
 <h3>Buffer (v2.x only)</h3>
 
-<ul><li>no custom options</li></ul>
+<ul>
+<li>no custom options</li>
+</ul>
 
 <h3>ObjectId</h3>
 
-<p>  To specify a type of <code>ObjectId</code>, use <code>Schema.ObjectId</code> in your declaration.</p>
+<p>To specify a type of <code>ObjectId</code>, use <code>Schema.ObjectId</code> in your declaration.</p>
 
-<pre><code>var mongoose = require(&#39;mongoose&#39;);
+<pre><code>var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
-var Car = new Schema({ driver: Schema.ObjectId })</code></pre>
+var Car = new Schema({ driver: Schema.ObjectId })
+</code></pre>
 
-<ul><li>no custom options</li></ul>
+<ul>
+<li>no custom options</li>
+</ul>
 
 <h3>Mixed</h3>
 
-<p>  An &quot;anything goes&quot; <code>SchemaType</code>, its flexibility comes at a trade-off of it being
-  harder to maintain. <code>Mixed</code> is available either through <code>Schema.Types.Mixed</code> or
-  by passing an empty object literal. The following are equivalent:</p>
+<p>An "anything goes" <code>SchemaType</code>, its flexibility comes at a trade-off of it being harder to maintain. <code>Mixed</code> is available either through <code>Schema.Types.Mixed</code> or by passing an empty object literal. The following are equivalent:</p>
 
 <pre><code>var Any = new Schema({ any: {} });
-var Any = new Schema({ any: Schema.Types.Mixed });</code></pre>
+var Any = new Schema({ any: Schema.Types.Mixed });
+</code></pre>
 
-<p>  Since it is a schema-less type, you can change the value to anything else
-  you like, but Mongoose loses the ability to auto detect/save those changes.
-  To &quot;tell&quot; Mongoose that the value of a <code>Mixed</code> type has changed, call
-  the <code>.markModified(path)</code> method of the document passing the path to
-  the <code>Mixed</code> type you just changed.</p>
+<p>Since it is a schema-less type, you can change the value to anything else you like, but Mongoose loses the ability to auto detect/save those changes. To "tell" Mongoose that the value of a <code>Mixed</code> type has changed, call the <code>.markModified(path)</code> method of the document passing the path to the <code>Mixed</code> type you just changed.</p>
 
-<pre><code>person.anything = { x: [3, 4, { y: &quot;changed&quot; }] };
-person.markModified(&#39;anything&#39;);
-person.save(); // anything will now get saved</code></pre>
+<pre><code>person.anything = { x: [3, 4, { y: "changed" }] };
+person.markModified('anything');
+person.save(); // anything will now get saved
+</code></pre>
 
-<ul><li>no custom options</li></ul>
+<ul>
+<li>no custom options</li>
+</ul>
 
 <h3>Array</h3>
 
-<p>  Creates an array of <code>SchemaTypes</code> or <a href="/docs/embedded-documents.html">Embedded Documents</a>.</p>
+<p>Creates an array of <code>SchemaTypes</code> or <a href="/docs/embedded-documents.html">Embedded Documents</a>.</p>
 
 <pre><code>var ToySchema = new Schema({ name: String });
 var ToyBox = new Schema({
@@ -291,52 +315,89 @@ var ToyBox = new Schema({
   , string:  [String]
   , numbers: [Number]
   ... etc
-});</code></pre>
+});
+</code></pre>
 
-<p>  Note: specifying an empty array is equivalent to <code>[Mixed]</code>. The following all
-  create arrays of <code>Mixed</code>:</p>
+<p>Note: specifying an empty array is equivalent to <code>[Mixed]</code>. The following all create arrays of <code>Mixed</code>:</p>
 
 <pre><code>var Empty1 = new Schema({ any: [] });
 var Empty2 = new Schema({ any: Array });
 var Empty3 = new Schema({ any: [Schema.Types.Mixed] });
-var Empty4 = new Schema({ any: [{}] });</code></pre>
+var Empty4 = new Schema({ any: [{}] });
+</code></pre>
 
-<ul><li>no custom options</li></ul>
+<ul>
+<li>no custom options</li>
+</ul>
 
 <h2>Additional options</h2>
 
-<p>Besides the options listed above, all SchemaTypes share the following additional
-options.</p>
+<p>Besides the options listed above, all SchemaTypes share the following additional options.</p>
 
-<ul><li><p><code>default</code>: {Function|value} - Determines the default value for the path. All values are casted. If using a function, the value it returns will be casted as the default value.</p></li><li><p><code>required</code>: {Boolean} - If true, creates a validation rule requiring this path be set before saving occurs.</p></li><li><p><code>get</code>: {Function} - Adds a getter for this path. See the <a href="/docs/getters-setters.html">getters / setters</a> docs for more detail.</p></li><li><p><code>set</code>: {Function} - Adds a setter for this path. See the <a href="/docs/getters-setters.html">getters / setters</a> docs for more detail.</p></li><li><p><code>index</code>: {Boolean|Object} - Tells Mongoose to ensure an index is created for this path. An object can be passed as well.</p><pre><code>var Person = new Schema({ name: String, index: true })
-var Person = new Schema({ name: String, index: { unique: true }})</code></pre><p>Note: indexes cannot be created for <code>Buffer</code> <code>SchemaTypes</code>. &lt;br&gt;
-Note: if the index already exists on the db, it will <em>not</em> be replaced.</p></li><li><p><code>unique</code>: {Boolean} - Tells Mongoose to ensure a unique index is created for this path. The following are equivalent:</p><pre><code>var Person = new Schema({ name: String, unique: true })
-var Person = new Schema({ name: String, index: { unique: true }})</code></pre><p>Note: indexes cannot be created for <code>Buffer</code> <code>SchemaTypes</code>. &lt;br&gt;
-Note: if the index already exists on the db, it will <em>not</em> be replaced.</p></li><li><p><code>sparse</code>: {Boolean} - Tells Mongoose to ensure a sparse index is created for this path. The following are equivalent:</p><pre><code>var Person = new Schema({ name: String, sparse: true })
-var Person = new Schema({ name: String, index: { sparse: true }})</code></pre><p>Note: indexes cannot be created for <code>Buffer</code> <code>SchemaTypes</code>. &lt;br&gt;
-Note: if the index already exists on the db, it will <em>not</em> be replaced.</p></li><li><p><code>validate</code>: {Function|RegExp|Array} - Creates a <a href="/docs/validation.html">validator</a> for this path.</p><pre><code>// passing a function
+<ul>
+<li><p><code>default</code>: {Function|value} - Determines the default value for the path. All values are casted. If using a function, the value it returns will be casted as the default value.</p></li>
+<li><p><code>required</code>: {Boolean} - If true, creates a validation rule requiring this path be set before saving occurs.</p></li>
+<li><p><code>get</code>: {Function} - Adds a getter for this path. See the <a href="/docs/getters-setters.html">getters / setters</a> docs for more detail.</p></li>
+<li><p><code>set</code>: {Function} - Adds a setter for this path. See the <a href="/docs/getters-setters.html">getters / setters</a> docs for more detail.</p></li>
+<li><p><code>index</code>: {Boolean|Object} - Tells Mongoose to ensure an index is created for this path. An object can be passed as well.</p>
+
+<pre><code>var Person = new Schema({ name: String, index: true })
+var Person = new Schema({ name: String, index: { unique: true }})
+</code></pre>
+
+<p>Note: indexes cannot be created for <code>Buffer</code> <code>SchemaTypes</code>. <br><br />Note: if the index already exists on the db, it will <em>not</em> be replaced.</p></li>
+<li><p><code>unique</code>: {Boolean} - Tells Mongoose to ensure a unique index is created for this path. The following are equivalent:</p>
+
+<pre><code>var Person = new Schema({ name: String, unique: true })
+var Person = new Schema({ name: String, index: { unique: true }})
+</code></pre>
+
+<p>Note: indexes cannot be created for <code>Buffer</code> <code>SchemaTypes</code>. <br><br />Note: if the index already exists on the db, it will <em>not</em> be replaced.</p></li>
+<li><p><code>sparse</code>: {Boolean} - Tells Mongoose to ensure a sparse index is created for this path. The following are equivalent:</p>
+
+<pre><code>var Person = new Schema({ name: String, sparse: true })
+var Person = new Schema({ name: String, index: { sparse: true }})
+</code></pre>
+
+<p>Note: indexes cannot be created for <code>Buffer</code> <code>SchemaTypes</code>. <br><br />Note: if the index already exists on the db, it will <em>not</em> be replaced.</p></li>
+<li><p><code>validate</code>: {Function|RegExp|Array} - Creates a <a href="/docs/validation.html">validator</a> for this path.</p>
+
+<pre><code>// passing a function
 function hasNumber (v) {
   return v.length &amp;&amp; /\d/.test(v);
 }
-var Person = new Schema({ street: String, validate: hasNumber });</code></pre><p>    // passing a RegExp
-    var Person = new Schema({ street: String, validate: /\d/ });</p><pre><code>// passing an array
-var Person = new Schema({ street: String, validate: [hasNumber, &#39;street number required&#39;] });</code></pre><p>    // or
-    var Person = new Schema({ street: String, validate: [/\d/, &#39;street number required&#39;] });</p><p>  For more detail about validation including async validation, see the <a href="/docs/validation.html">validation</a> page.</p></li></ul>
+var Person = new Schema({ street: String, validate: hasNumber });
+
+
+// passing a RegExp
+var Person = new Schema({ street: String, validate: /\d/ });
+
+
+// passing an array
+var Person = new Schema({ street: String, validate: [hasNumber, 'street number required'] });
+
+
+// or
+var Person = new Schema({ street: String, validate: [/\d/, 'street number required'] });
+</code></pre>
+
+<p>For more detail about validation including async validation, see the <a href="/docs/validation.html">validation</a> page.</p></li>
+</ul>
 
 <h2>Alternate options definition</h2>
 
-<p>Instead of defining options when instanciating your <code>Schema</code> we can also
-access keys through the <code>path</code> function and add options there:</p>
+<p>Instead of defining options when instanciating your <code>Schema</code> we can also access keys through the <code>path</code> function and add options there:</p>
 
-<pre><code>Person.path(&#39;age&#39;).max(400);
+<pre><code>Person.path('age').max(400);
 
-Person.path(&#39;meta.birth&#39;).set(function (v) {
+Person.path('meta.birth').set(function (v) {
   // this is a setter
 });
 
-Person.path(&#39;title&#39;).validate(function (v) {
+Person.path('title').validate(function (v) {
   return v.length &gt; 50;
-});</code></pre>
+});
+</code></pre>
         </div>
 
         <div id="footer">

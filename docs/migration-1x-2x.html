@@ -210,17 +210,11 @@
 
 <h2>Auto-reconnect</h2>
 
-<p>Previously the <code>auto_reconnect</code> option of the node-mongodb-driver
-defaulted to false. It now defaults to true so if your connection drops
-while your app is running the driver will continue retrying until it
-can connect again.</p>
+<p>Previously the <code>auto_reconnect</code> option of the node-mongodb-driver defaulted to false. It now defaults to true so if your connection drops while your app is running the driver will continue retrying until it can connect again.</p>
 
 <h2>Private props</h2>
 
-<p>Several internal instance props have had name changes so its more obvious that
-they are not intended for public use. Namely <code>instance.doc</code> has changed
-to <code>instance._doc</code> since it contains the structure Mongoose relies on
-to operate properly and should only be manipulated with caution.</p>
+<p>Several internal instance props have had name changes so its more obvious that they are not intended for public use. Namely <code>instance.doc</code> has changed to <code>instance._doc</code> since it contains the structure Mongoose relies on to operate properly and should only be manipulated with caution.</p>
 
 <p>Here are the relavent changes:</p>
 
@@ -229,23 +223,24 @@ to operate properly and should only be manipulated with caution.</p>
 thing.doc             -&gt; thing._doc
 thing.activePaths     -&gt; thing._activePaths
 thing.saveError       -&gt; thing._saveError
-thing.validationError -&gt; thing._validationError</code></pre>
+thing.validationError -&gt; thing._validationError
+</code></pre>
 
 <h2>Circular refs in getters</h2>
 
 <p>Previously Mongoose exibited very odd behavior with getters:</p>
 
-<pre><code>toy.color.color.color.color ... // actually worked!</code></pre>
+<pre><code>toy.color.color.color.color ... // actually worked!
+</code></pre>
 
 <p>Obviously this was wrong and has now been fixed.</p>
 
-<pre><code>toy.color.color // undefined</code></pre>
+<pre><code>toy.color.color // undefined
+</code></pre>
 
 <h2>Getter / Setter scope</h2>
 
-<p>Nested getter/setter scopes were set incorrectly since version 1.7 or so.
-This has been fixed. In your getter/setter, <code>this</code> now properly refers
-to the instance.</p>
+<p>Nested getter/setter scopes were set incorrectly since version 1.7 or so. This has been fixed. In your getter/setter, <code>this</code> now properly refers to the instance.</p>
 
 <pre><code>var SongSchema = new Schema({
     title: String
@@ -254,101 +249,93 @@ to the instance.</p>
     }
 });
 
-SongSchema.path(&#39;detail.format&#39;).get(function () {
+SongSchema.path('detail.format').get(function () {
   console.log(this !== this.detail) // true, used to be false
-});</code></pre>
+});
+</code></pre>
 
-<p>You may not have noticed this bug since the circular getters previously
-masked (<em>mostly</em>) this bad behavior.</p>
+<p>You may not have noticed this bug since the circular getters previously masked (<em>mostly</em>) this bad behavior.</p>
 
 <h2>Setters application</h2>
 
-<p>Setters are no longer applied when the doc returns from the db (bug). It
-caused problems for folks trying to use setters for passwords / salts
-resulting in doubly hashed passwords after queries.</p>
+<p>Setters are no longer applied when the doc returns from the db (bug). It caused problems for folks trying to use setters for passwords / salts resulting in doubly hashed passwords after queries.</p>
 
-<pre><code>UserSchema.path(&#39;password&#39;).set(function (val) {
+<pre><code>UserSchema.path('password').set(function (val) {
   // now only runs when you change `user.password`
   // not when the doc returns from the db
-});</code></pre>
+});
+</code></pre>
 
 <h2>Query#bind</h2>
 
-<p>If you were using the <code>Query</code> object directly and calling its <code>bind</code>
-method, the v1.x behavior cloned the query and returned the
-new one. This is no longer the case. The query is now simply
-bound and returns itself.</p>
+<p>If you were using the <code>Query</code> object directly and calling its <code>bind</code> method, the v1.x behavior cloned the query and returned the new one. This is no longer the case. The query is now simply bound and returns itself.</p>
 
 <h2>Multiple collection support removed</h2>
 
-<p>In 1.x Mongoose had support for multiple collection names per model. This
-was an edge case and support for it has been removed.</p>
+<p>In 1.x Mongoose had support for multiple collection names per model. This was an edge case and support for it has been removed.</p>
 
 <h2>Compat.js removed</h2>
 
 <p>Backward compatibility with verions 0.x has been removed.</p>
 
-<pre><code>require(&#39;mongoose&#39;).compat = true // no longer does anything</code></pre>
+<pre><code>require('mongoose').compat = true // no longer does anything
+</code></pre>
 
 <h2>Utils.erase removed</h2>
 
-<p>We removed utils.erase since it was unused in the project. If you were
-using it you&#39;ll need to copy it from the 1.x branch into your own.</p>
+<p>We removed utils.erase since it was unused in the project. If you were using it you'll need to copy it from the 1.x branch into your own.</p>
 
 <h2>Error handling</h2>
 
-<p>Previously, the error returned after failed validation contained an <code>errors</code>
-object which was a hash of path keys to error message values.
-Now the Error returned is more helpful. Instead of the <code>errors</code>
-object containing string values it holds the actual
-ValidatorError. Each ValidatorError has a <code>type</code> and <code>path</code> property
-providing us with a little more error handling flexibility.</p>
+<p>Previously, the error returned after failed validation contained an <code>errors</code> object which was a hash of path keys to error message values. Now the Error returned is more helpful. Instead of the <code>errors</code> object containing string values it holds the actual ValidatorError. Each ValidatorError has a <code>type</code> and <code>path</code> property providing us with a little more error handling flexibility.</p>
 
 <pre><code>var ToySchema = new Schema({
     color: String
   , name: String
 });
 
-var Toy = db.model(&#39;Toy&#39;, ToySchema);
+var Toy = db.model('Toy', ToySchema);
 
-Toy.schema.path(&#39;name&#39;).validate(function (value) {
+Toy.schema.path('name').validate(function (value) {
   return /blue|green|white|red|orange|periwinkel/i.test(value);
-}, &#39;Invalid color&#39;);
+}, 'Invalid color');
 
-var toy = new Toy({ color: &#39;grease&#39;});
+var toy = new Toy({ color: 'grease'});
 
 toy.save(function (err) {
   // previous behavior (v1x):
 
   console.log(err.errors.color)
-  // prints &#39;Validator &quot;Invalid color&quot; failed for path color&#39;
+  // prints 'Validator "Invalid color" failed for path color'
 
   // new v2x behavior - err.errors.color is a ValidatorError object
 
   console.log(err.errors.color.message)
-  // prints &#39;Validator &quot;Invalid color&quot; failed for path color&#39;
+  // prints 'Validator "Invalid color" failed for path color'
 
   // you can get v1 behavior back by casting error.color toString
 
   console.log(String(err.errors.color))
-  // prints &#39;Validator &quot;Invalid color&quot; failed for path color&#39;
+  // prints 'Validator "Invalid color" failed for path color'
 
   console.log(err.errors.color.type);
-  // prints &quot;Invalid color&quot;
+  // prints "Invalid color"
 
   console.log(err.errors.color.path)
-  // prints &quot;color&quot;
+  // prints "color"
 
   console.log(err.name)
-  // prints &quot;ValidationError&quot;
+  // prints "ValidationError"
 
   console.log(err.message)
-  // prints &quot;Validation failed&quot;
-});</code></pre>
+  // prints "Validation failed"
+});
+</code></pre>
 
 <p>BTW, the <code>err.errors</code> object is also available on the model instance.</p>
 
-<pre><code>toy.errors.color.message === err.errors.color.message</code></pre>
+<pre><code>toy.errors.color.message === err.errors.color.message
+</code></pre>
         </div>
 
         <div id="footer">

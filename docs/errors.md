@@ -2,9 +2,7 @@
 Error handling
 ==============
 
-Errors returned after failed validation contain an `errors` object
-holding the actual ValidatorErrors. Each ValidatorError has a `type` and `path` property
-providing us with a little more error handling flexibility.
+Errors returned after failed validation contain an `errors` object holding the actual ValidatorErrors. Each ValidatorError has a `type` and `path` property providing us with a little more error handling flexibility.
 
     var ToySchema = new Schema({
         color: String

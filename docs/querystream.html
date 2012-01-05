@@ -206,20 +206,18 @@
         <div id="content">
           <h1>QueryStreams</h1>
 
-<p><em>New in 2.4.0 :: Experimental</em></p>
+<p><em>New in 2.4.0</em></p>
 
-<p>A QueryStream provides a ReadStream interface for <a href="/docs/query.html">Queries</a>.
-The Stream interface allows us to simply &quot;plug-in&quot; to other Node streams such as http
-responses and write streams so everything &quot;just works&quot; out of the box.</p>
+<p>A QueryStream provides a ReadStream interface for <a href="/docs/query.html">Queries</a>. The Stream interface allows us to simply "plug-in" to other Node streams such as http responses and write streams so everything "just works" out of the box.</p>
 
-<pre><code>Model.where(&#39;created&#39;).gte(twoWeeksAgo).stream().pipe(writeStream);</code></pre>
+<pre><code>Model.where('created').gte(twoWeeksAgo).stream().pipe(writeStream);
+</code></pre>
 
-<p>This api provides a more natural node-like api than than what is presently
-available with the <a href="/docs/query.html">Query#each</a> method.</p>
+<p>This api provides a more natural node-like api than than what is presently available with the <a href="/docs/query.html">Query#each</a> method.</p>
 
 <pre><code>var stream = Model.find().stream();
 
-stream.on(&#39;data&#39;, function (doc) {
+stream.on('data', function (doc) {
   if (somethingHappened) {
     this.pause()
 
@@ -232,23 +230,18 @@ stream.on(&#39;data&#39;, function (doc) {
   res.write(doc)
 })
 
-stream.on(&#39;error&#39;, function (err) {
+stream.on('error', function (err) {
   // handle err
 })
 
-stream.on(&#39;close&#39;, function () {
+stream.on('close', function () {
   // all done
-})</code></pre>
+})
+</code></pre>
 
-<p>QueryStreams can be <code>pause</code>d and <code>resume</code>d like you’d expect which
-allows us to stop streaming while waiting for other processes to complete
-for example.</p>
+<p>QueryStreams can be <code>pause</code>d and <code>resume</code>d like you’d expect which allows us to stop streaming while waiting for other processes to complete for example.</p>
 
-<p>QueryStreams also manage the underlying Cursors better than what we
-had in <code>Query#each</code> such that
-after the QueryStream has completed, whether due to an error, reaching
-the end of the cursor, or being manually destroyed, the internal Cursor
-is properly cleaned up.</p>
+<p>QueryStreams also manage the underlying Cursors better than what we had in <code>Query#each</code> such that after the QueryStream has completed, whether due to an error, reaching the end of the cursor, or being manually destroyed, the internal Cursor is properly cleaned up.</p>
 
 <h1>Events</h1>
 
@@ -256,29 +249,26 @@ is properly cleaned up.</p>
 
 <p>The <code>data</code> event emits a Mongoose Document as its only argument.</p>
 
-<pre><code>stream.on(&#39;data&#39;, function (doc) { });</code></pre>
+<pre><code>stream.on('data', function (doc) { });
+</code></pre>
 
 <h2>error</h2>
 
-<p>Emitted if an error occurs while streaming documents. This event
-will fire <em>before</em> the <code>close</code> event.</p>
+<p>Emitted if an error occurs while streaming documents. This event will fire <em>before</em> the <code>close</code> event.</p>
 
 <h2>close</h2>
 
-<p>Emitted when the stream reaches the end of the cursor,
-or an error occurs, or the stream is manually <code>destroy</code>ed. After
-this event, no more events will be emitted.</p>
+<p>Emitted when the stream reaches the end of the cursor, or an error occurs, or the stream is manually <code>destroy</code>ed. After this event, no more events will be emitted.</p>
 
 <h1>Properties</h1>
 
 <h2>QueryStream.readable</h2>
 
-<p>Boolean, tells us if the stream is readable or not. <code>true</code> by
-default, <code>false</code> after calling <code>destroy</code> or an error occurs
-or the stream is closed.</p>
+<p>Boolean, tells us if the stream is readable or not. <code>true</code> by default, <code>false</code> after calling <code>destroy</code> or an error occurs or the stream is closed.</p>
 
 <pre><code>var stream = Model.find().stream();
-stream.readable // true</code></pre>
+stream.readable // true
+</code></pre>
 
 <h2>QueryStream.paused</h2>
 
@@ -287,53 +277,48 @@ stream.readable // true</code></pre>
 <pre><code>var stream = Model.find().stream()
 stream.paused // false
 stream.pause()
-stream.paused // true</code></pre>
+stream.paused // true
+</code></pre>
 
 <h1>Methods</h1>
 
 <h2>QueryStream#pause</h2>
 
-<p>Pauses the stream. <code>data</code> events will stop until <code>resume()</code> is
-called.</p>
+<p>Pauses the stream. <code>data</code> events will stop until <code>resume()</code> is<br />called.</p>
 
-<pre><code>stream.pause();</code></pre>
+<pre><code>stream.pause();
+</code></pre>
 
 <h2>QuerySteam#resume</h2>
 
 <p>Resumes the QueryStream.</p>
 
-<pre><code>stream.resume()</code></pre>
+<pre><code>stream.resume()
+</code></pre>
 
 <h2>QueryStream#destroy</h2>
 
-<p>Destroys the stream. No more events will be emitted after
-calling this method.</p>
+<p>Destroys the stream. No more events will be emitted after<br />calling this method.</p>
 
-<pre><code>stream.destroy([err])</code></pre>
+<pre><code>stream.destroy([err])
+</code></pre>
 
-<p>If the optional <code>err</code> argument is passed, an <code>error</code> event
-will be emitted with the <code>err</code> before <code>close</code> is emitted.</p>
+<p>If the optional <code>err</code> argument is passed, an <code>error</code> event will be emitted with the <code>err</code> before <code>close</code> is emitted.</p>
 
 <h2>QueryStream#pipe</h2>
 
-<p><code>pipe</code>s the QueryStream into another WritableStream.
-This method is inherited from
-<a href="http://nodejs.org/docs/latest/api/streams.html#stream.pipe">Stream</a>.</p>
+<p><code>pipe</code>s the QueryStream into another WritableStream. This method is inherited from <a href="http://nodejs.org/docs/latest/api/streams.html#stream.pipe">Stream</a>.</p>
 
-<pre><code>Model.find().stream().pipe(writeStream [, options]);</code></pre>
+<pre><code>Model.find().stream().pipe(writeStream [, options]);
+</code></pre>
 
-<p>This could be particularily useful if you are, for example,
-setting up an API for a service and want to stream out the docs based on some
-criteria. We could first pipe the QueryStream into a sort of
-filter that formats the stream as an array before passing on
-the document to an http response.</p>
+<p>This could be particularily useful if you are, for example, setting up an API for a service and want to stream out the docs based on some criteria. We could first pipe the QueryStream into a sort of filter that formats the stream as an array before passing on the document to an http response.</p>
 
 <pre><code>var format = new ArrayFormatter;
-Events.find().stream().pipe(format).pipe(res);</code></pre>
+Events.find().stream().pipe(format).pipe(res);
+</code></pre>
 
-<p>As long as <code>ArrayFormat</code> implements the WriteStream API we can
-stream large formatted result sets out to the client.
-See this <a href="https://gist.github.com/1403797">gist</a> for a hacked example.</p>
+<p>As long as <code>ArrayFormat</code> implements the WriteStream API we can stream large formatted result sets out to the client. See this <a href="https://gist.github.com/1403797">gist</a> for a hacked example.</p>
         </div>
 
         <div id="footer">

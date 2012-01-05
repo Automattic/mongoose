@@ -206,9 +206,7 @@
         <div id="content">
           <h1>Indexes</h1>
 
-<p>Indexes are defined through <code>ensureIndex</code> every time a model is compiled for a
-certain connection / database. This means that indexes will only be ensured
-once during the lifetime of your app.</p>
+<p>Indexes are defined through <code>ensureIndex</code> every time a model is compiled for a certain connection / database. This means that indexes will only be ensured once during the lifetime of your app.</p>
 
 <h2>Definition</h2>
 
@@ -216,13 +214,15 @@ once during the lifetime of your app.</p>
 
 <pre><code>var User = new Schema({
     name: { type: String, index: true }
-})</code></pre>
+})
+</code></pre>
 
 <p><a href="http://www.mongodb.org/display/DOCS/Indexes#Indexes-SparseIndexes">Sparse</a> indexes:</p>
 
 <pre><code>var User = new Schema({
     name: { type: String, sparse: true }
-})</code></pre>
+})
+</code></pre>
 
 <p>Unique indexes:</p>
 
@@ -234,17 +234,20 @@ once during the lifetime of your app.</p>
 
 var User = new Schema({
     name: { type: String, index: { unique: true } }
-})</code></pre>
+})
+</code></pre>
 
 <p>Unique sparse indexes:</p>
 
 <pre><code>var User = new Schema({
     name: { type: String, unique: true, sparse: true }
-})</code></pre>
+})
+</code></pre>
 
 <p>Compound indexes are defined on the <code>Schema</code> itself.</p>
 
-<pre><code>User.index({ first: 1, last: -1 }, { unique: true })</code></pre>
+<pre><code>User.index({ first: 1, last: -1 }, { unique: true })
+</code></pre>
         </div>
 
         <div id="footer">

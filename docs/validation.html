@@ -206,42 +206,42 @@
         <div id="content">
           <h1>Validation in models</h1>
 
-<p>Before we get into the specifics of validation syntax, please keep the
-following rules in mind:</p>
+<p>Before we get into the specifics of validation syntax, please keep the<br />following rules in mind:</p>
 
-<ul><li><p>Validation is defined in the <code>Schema</code></p></li><li><p>Validation occurs when a document attempts to be saved, after defaults have
-been applied.</p></li><li><p>Mongoose doesn&#39;t care about complex error message construction. Errors have
-type identifiers. For example, <code>&quot;min&quot;</code> is the identifier for the error
-triggered when a number doesn&#39;t meet the minimum value. The path and value
-that triggered the error can be accessed in the <code>ValidationError</code> object.</p></li><li><p>Validation is an internal piece of middleware</p></li><li><p>Validation is asynchronously recursive: when you call <code>Model#save</code>, embedded
-documents validation is executed. If an error happens, your <code>Model#save</code>
-callback receives it.</p></li></ul>
+<ul>
+<li><p>Validation is defined in the <code>Schema</code></p></li>
+<li><p>Validation occurs when a document attempts to be saved, after defaults have<br />been applied.</p></li>
+<li><p>Mongoose doesn't care about complex error message construction. Errors have<br />type identifiers. For example, <code>"min"</code> is the identifier for the error<br />triggered when a number doesn't meet the minimum value. The path and value<br />that triggered the error can be accessed in the <code>ValidationError</code> object.</p></li>
+<li><p>Validation is an internal piece of middleware</p></li>
+<li><p>Validation is asynchronously recursive: when you call <code>Model#save</code>, embedded<br />documents validation is executed. If an error happens, your <code>Model#save</code><br />callback receives it.</p></li>
+</ul>
 
 <h2>Simple validation</h2>
 
-<p>Simple validation is declared by passing a function to <code>validate</code> and an error
-type to your <code>SchemaType</code> (please read the chapter on <a href="/docs/model-definition.html">model definition</a> to learn
-more about schemas).</p>
+<p>Simple validation is declared by passing a function to <code>validate</code> and an error<br />type to your <code>SchemaType</code> (please read the chapter on <a href="/docs/model-definition.html">model definition</a> to learn<br />more about schemas).</p>
 
 <pre><code>function validator (v) {
   return v.length &gt; 5;
 };
 
 new Schema({
-    name: { type: String, validate: [validator, &#39;my error type&#39;] }
-})</code></pre>
+    name: { type: String, validate: [validator, 'my error type'] }
+})
+</code></pre>
 
 <p>If you find this syntax too clumsy, you can also define the type</p>
 
 <pre><code>var schema = new Schema({
     name: String
-})</code></pre>
+})
+</code></pre>
 
 <p>and then your validator</p>
 
-<pre><code>schema.path(&#39;name&#39;).validate(function (v) {
+<pre><code>schema.path('name').validate(function (v) {
   return v.length &gt; 5;
-}, &#39;my error type&#39;); </code></pre>
+}, 'my error type'); 
+</code></pre>
 
 <h2>Regular expressions</h2>
 
@@ -249,35 +249,49 @@ new Schema({
 
 <pre><code>var schema = new Schema({
     name: { type: String, validate: /[a-z]/ }
-});</code></pre>
+});
+</code></pre>
 
 <h2>Asynchronous validation</h2>
 
 <p>If you define a validator function with two parameters, like:</p>
 
-<pre><code>schema.path(&#39;name&#39;).validate(function (v, fn) {
+<pre><code>schema.path('name').validate(function (v, fn) {
   // my logic
-}, &#39;my error type&#39;); </code></pre>
+}, 'my error type'); 
+</code></pre>
 
-<p>Then the function <code>fn</code> has to be called with <code>true</code> or <code>false</code>, depending on
-whether the validator passed. This allows for calling other models and querying
-data asynchronously from your validator.</p>
+<p>Then the function <code>fn</code> has to be called with <code>true</code> or <code>false</code>, depending on<br />whether the validator passed. This allows for calling other models and querying<br />data asynchronously from your validator.</p>
 
 <h2>Built in validators</h2>
 
 <p>Strings:</p>
 
-<ul><li><p><code>enum</code>: takes a list of allowed values. Example:</p><pre><code>var Post = new Schema({
-    type: { type: String, enum: [&#39;page&#39;, &#39;post&#39;, &#39;link&#39;] }
-})</code></pre></li></ul>
+<ul>
+<li><p><code>enum</code>: takes a list of allowed values. Example:</p>
+
+<pre><code>var Post = new Schema({
+    type: { type: String, enum: ['page', 'post', 'link'] }
+})
+</code></pre></li>
+</ul>
 
 <p>Numbers:</p>
 
-<ul><li><p><code>min</code>: minimum value</p><pre><code>var Person = new Schema({
+<ul>
+<li><p><code>min</code>: minimum value</p>
+
+<pre><code>var Person = new Schema({
     age: { type: Number, min: 5 }
-})</code></pre></li><li><p><code>max</code>: maxmimum value</p><pre><code>var Person = new Schema({
+})
+</code></pre></li>
+<li><p><code>max</code>: maxmimum value</p>
+
+<pre><code>var Person = new Schema({
     age: { type: Number, max: 100 }
-})</code></pre></li></ul>
+})
+</code></pre></li>
+</ul>
         </div>
 
         <div id="footer">

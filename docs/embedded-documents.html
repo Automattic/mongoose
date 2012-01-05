@@ -206,15 +206,11 @@
         <div id="content">
           <h1>Embedded Documents</h1>
 
-<p>Embedded documents are documents with schemas of their own that are part of
-other documents (as items within an array).</p>
+<p>Embedded documents are documents with schemas of their own that are part of other documents (as items within an array).</p>
 
-<p>Embedded documents enjoy all the same features as your models. Defaults,
-validators, middleware. Whenever an error occurs, it&#39;s bubbled to the <code>save()</code>
-error callback, so error handling is a snap!</p>
+<p>Embedded documents enjoy all the same features as your models. Defaults, validators, middleware. Whenever an error occurs, it's bubbled to the <code>save()</code> error callback, so error handling is a snap!</p>
 
-<p>Mongoose interacts with your embedded documents in arrays <em>atomically</em>, out of
-the box.</p>
+<p>Mongoose interacts with your embedded documents in arrays <em>atomically</em>, out of the box.</p>
 
 <h2>Definition and initialization</h2>
 
@@ -238,26 +234,26 @@ var BlogPost = new Schema({
     }
 });
 
-mongoose.model(&#39;BlogPost&#39;, BlogPost);</code></pre>
+mongoose.model('BlogPost', BlogPost);
+</code></pre>
 
-<p>The <code>comments</code> key of your <code>BlogPost</code> documents will then be an instance of
-<code>DocumentArray</code>. This is a special subclassed <code>Array</code> that can deal with
-casting, and has special methods to work with embedded documents.</p>
+<p>The <code>comments</code> key of your <code>BlogPost</code> documents will then be an instance of <code>DocumentArray</code>. This is a special subclassed <code>Array</code> that can deal with casting, and has special methods to work with embedded documents.</p>
 
 <h2>Adding an embedded document to an array</h2>
 
 <pre><code>// retrieve my model
-var BlogPost = mongoose.model(&#39;BlogPost&#39;);
+var BlogPost = mongoose.model('BlogPost');
 
 // create a blog post
 var post = new BlogPost();
 
 // create a comment
-post.comments.push({ title: &#39;My comment&#39; });
+post.comments.push({ title: 'My comment' });
 
 post.save(function (err) {
-  if (!err) console.log(&#39;Success!&#39;);
-});</code></pre>
+  if (!err) console.log('Success!');
+});
+</code></pre>
 
 <h2>Removing an embedded document</h2>
 
@@ -268,19 +264,20 @@ post.save(function (err) {
       // do something
     });
   }
-});</code></pre>
+});
+</code></pre>
 
 <h2>Finding an embedded document by id</h2>
 
-<p><code>DocumentArray</code>s have an special method <code>id</code> that filters your embedded
-documents by their <code>_id</code> property (each embedded document gets one):</p>
+<p><code>DocumentArray</code>s have an special method <code>id</code> that filters your embedded documents by their <code>_id</code> property (each embedded document gets one):</p>
 
 <p>Consider the following snippet:</p>
 
 <pre><code>post.comments.id(my_id).remove();
 post.save(function (err) {
   // embedded comment with id `my_id` removed!
-});</code></pre>
+});
+</code></pre>
         </div>
 
         <div id="footer">

@@ -206,57 +206,62 @@
         <div id="content">
           <h1>Middleware</h1>
 
-<p>Middleware are defined at the Schema level and are applied when the methods
-<code>init</code> (when a document is initialized with data from MongoDB), <code>save</code>, and
-<code>remove</code> are called on a document instance.</p>
+<p>Middleware are defined at the Schema level and are applied when the methods <code>init</code> (when a document is initialized with data from MongoDB), <code>save</code>, and <code>remove</code> are called on a document instance.</p>
 
 <p>There are two types of middleware, serial and parallel.</p>
 
 <p>Serial middleware are defined like:</p>
 
-<pre><code>schema.pre(&#39;save&#39;, function (next) {
+<pre><code>schema.pre('save', function (next) {
   // ...
-})</code></pre>
+})
+</code></pre>
 
-<p>They&#39;re executed one after the other, when each middleware calls <code>next</code>.</p>
+<p>They're executed one after the other, when each middleware calls <code>next</code>.</p>
 
-<p>Parallel middleware offer more fine-grained flow control, and are defined
-like</p>
+<p>Parallel middleware offer more fine-grained flow control, and are defined like</p>
 
-<pre><code>schema.pre(&#39;remove&#39;, true, function (next, done) {
+<pre><code>schema.pre('remove', true, function (next, done) {
   // ...
-})</code></pre>
+})
+</code></pre>
 
-<p>Parallel middleware can <code>next()</code> immediately, but the final argument will be
-called when all the parallel middleware have called <code>done()</code>.</p>
+<p>Parallel middleware can <code>next()</code> immediately, but the final argument will be called when all the parallel middleware have called <code>done()</code>.</p>
 
 <h2>Use cases</h2>
 
 <p>Middleware are useful for:</p>
 
-<ul><li>Complex validation</li><li>Removing dependent documents when a certain document is removed (eg:
-removing a user removes all his blogposts)</li><li>Asynchronous defaults</li><li>Asynchronous tasks that a certain action triggers. For example:<ul><li>Triggering custom events</li><li>Creating notifications</li><li>Emails</li></ul></li></ul>
+<ul>
+<li>Complex validation</li>
+<li>Removing dependent documents when a certain document is removed (eg:
+removing a user removes all his blogposts)</li>
+<li>Asynchronous defaults</li>
+<li>Asynchronous tasks that a certain action triggers. For example:
+<ul><li>Triggering custom events</li>
+<li>Creating notifications</li>
+<li>Emails</li></ul></li>
+</ul>
 
-<p>and many other things. They&#39;re specially useful for atomizing model logic
-and avoiding nested blocks of async code.</p>
+<p>and many other things. They're specially useful for atomizing model logic and avoiding nested blocks of async code.</p>
 
 <h2>Error handling</h2>
 
-<p>If any middleware calls <code>next</code> or <code>done</code> with an <code>Error</code> instance, the flow is
-interrupted, and the error is passed to the callback.</p>
+<p>If any middleware calls <code>next</code> or <code>done</code> with an <code>Error</code> instance, the flow is interrupted, and the error is passed to the callback.</p>
 
 <p>For example:</p>
 
-<pre><code>schema.pre(&#39;save&#39;, function (next) {
+<pre><code>schema.pre('save', function (next) {
     // something goes wrong
-    next(new Error(&#39;something went wrong&#39;));
+    next(new Error('something went wrong'));
 });
 
 // later...
 
 myModel.save(function (err) {
   // err can come from a middleware
-});</code></pre>
+});
+</code></pre>
         </div>
 
         <div id="footer">

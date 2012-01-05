@@ -2,8 +2,7 @@
 Schema Types
 ============
 
-`SchemaType`s take care of validation, casting, defaults, and other general
-options in our models. We can specify our types one of two ways:
+`SchemaType`s take care of validation, casting, defaults, and other general options in our models. We can specify our types one of two ways:
 
     // directly without options
     var Person = new Schema({
@@ -15,9 +14,7 @@ options in our models. We can specify our types one of two ways:
         title   : { type: String, lowercase: true }
     });
 
-In the example above we specified the `lowercase` option for strings which
-will lowercase the string whenever it is set. Options are functions that are
-called on each SchemaType. Each `SchemaType` has its own set of custom options.
+In the example above we specified the `lowercase` option for strings which will lowercase the string whenever it is set. Options are functions that are called on each SchemaType. Each `SchemaType` has its own set of custom options.
 
 ## Available Schema Types
 
@@ -37,25 +34,21 @@ called on each SchemaType. Each `SchemaType` has its own set of custom options.
 
   - `match`: {RegExp}
 
-    Creates a RegExp based [validator](/docs/validation.html). The value being set is `.test()`ed
-    against the RegExp. If it does not pass, validation will fail.
+    Creates a RegExp based [validator](/docs/validation.html). The value being set is `.test()`ed against the RegExp. If it does not pass, validation will fail.
 
   - `enum`: {Array}
 
-    Creates an enum validator. If the value being set is not in this
-    array, validation will fail.
+    Creates an enum validator. If the value being set is not in this array, validation will fail.
 
 ### Number
 
   - `min`: {Number}
 
-    Creates a validator which checks that the value being set is not less
-    than the value specified.
+    Creates a validator which checks that the value being set is not less than the value specified.
 
   - `max`: {Number}
 
-    Creates a validator which checks that the value being set is not greater
-    than the value specified.
+    Creates a validator which checks that the value being set is not greater than the value specified.
 
 ### Date
 
@@ -81,18 +74,12 @@ called on each SchemaType. Each `SchemaType` has its own set of custom options.
 
 ### Mixed
 
-  An "anything goes" `SchemaType`, its flexibility comes at a trade-off of it being
-  harder to maintain. `Mixed` is available either through `Schema.Types.Mixed` or
-  by passing an empty object literal. The following are equivalent:
+  An "anything goes" `SchemaType`, its flexibility comes at a trade-off of it being harder to maintain. `Mixed` is available either through `Schema.Types.Mixed` or by passing an empty object literal. The following are equivalent:
 
     var Any = new Schema({ any: {} });
     var Any = new Schema({ any: Schema.Types.Mixed });
 
-  Since it is a schema-less type, you can change the value to anything else
-  you like, but Mongoose loses the ability to auto detect/save those changes.
-  To "tell" Mongoose that the value of a `Mixed` type has changed, call
-  the `.markModified(path)` method of the document passing the path to
-  the `Mixed` type you just changed.
+  Since it is a schema-less type, you can change the value to anything else you like, but Mongoose loses the ability to auto detect/save those changes. To "tell" Mongoose that the value of a `Mixed` type has changed, call the `.markModified(path)` method of the document passing the path to the `Mixed` type you just changed.
 
     person.anything = { x: [3, 4, { y: "changed" }] };
     person.markModified('anything');
@@ -113,8 +100,7 @@ called on each SchemaType. Each `SchemaType` has its own set of custom options.
       ... etc
     });
 
-  Note: specifying an empty array is equivalent to `[Mixed]`. The following all
-  create arrays of `Mixed`:
+  Note: specifying an empty array is equivalent to `[Mixed]`. The following all create arrays of `Mixed`:
 
     var Empty1 = new Schema({ any: [] });
     var Empty2 = new Schema({ any: Array });
@@ -125,8 +111,7 @@ called on each SchemaType. Each `SchemaType` has its own set of custom options.
 
 ## Additional options
 
-Besides the options listed above, all SchemaTypes share the following additional
-options.
+Besides the options listed above, all SchemaTypes share the following additional options.
 
   - `default`: {Function|value} - Determines the default value for the path. All values are casted. If using a function, the value it returns will be casted as the default value.
 
@@ -167,13 +152,13 @@ options.
           return v.length && /\d/.test(v);
         }
         var Person = new Schema({ street: String, validate: hasNumber });
-        
+
         // passing a RegExp
         var Person = new Schema({ street: String, validate: /\d/ });
-        
+
         // passing an array
         var Person = new Schema({ street: String, validate: [hasNumber, 'street number required'] });
-        
+
         // or
         var Person = new Schema({ street: String, validate: [/\d/, 'street number required'] });
 
@@ -181,8 +166,7 @@ options.
 
 ## Alternate options definition
 
-Instead of defining options when instanciating your `Schema` we can also
-access keys through the `path` function and add options there:
+Instead of defining options when instanciating your `Schema` we can also access keys through the `path` function and add options there:
 
     Person.path('age').max(400);
 

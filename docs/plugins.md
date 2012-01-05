@@ -33,6 +33,4 @@ is easy. Just create a plugin once and apply it to each `Schema`:
 
     Player.plugin(lastMod, { index: true });
 
-In the example above we added last-modified functionality to both the Game
-and Player schemas. We also took advantage of options passing supported by
-the `plugin()` method to dynamically define an index on the Player.
+In the example above we added last-modified functionality to both the Game and Player schemas. We also took advantage of options passing supported by the `plugin()` method to dynamically define an index on the Player.

@@ -1,7 +1,8 @@
 
 var fs = require('fs')
   , template = fs.readFileSync('template.html').toString()
-  , markdown = require('markdown');
+  //, markdown = require('markdown');
+  , markdown = require('github-flavored-markdown');
 
 function convert (input, output) {
   fs.writeFileSync(

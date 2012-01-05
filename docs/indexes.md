@@ -2,9 +2,7 @@
 Indexes
 =======
 
-Indexes are defined through `ensureIndex` every time a model is compiled for a
-certain connection / database. This means that indexes will only be ensured
-once during the lifetime of your app.
+Indexes are defined through `ensureIndex` every time a model is compiled for a certain connection / database. This means that indexes will only be ensured once during the lifetime of your app.
 
 ## Definition
 

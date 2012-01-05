@@ -35,8 +35,7 @@ Same as `Model#find`, but only receives a single document as second parameter:
 ## Model.findById
 
 Same as `findOne`, but receives a value to search a document by their `_id`
-key. This value is subject to casting, so it can be a hex string or a proper 
-ObjectId.
+key. This value is subject to casting, so it can be a hex string or a proper ObjectId.
 
     Model.findById(obj._id, function (err, doc){
       // doc is a Document
@@ -62,8 +61,7 @@ Finds distinct values of `field` for documents matching `conditions`.
 
 ## Model.where
 
-Creates a Query for this model.
-Handy when expressing complex directives.
+Creates a Query for this model. Handy when expressing complex directives.
 
     Model
     .where('age').gte(25)
@@ -78,17 +76,13 @@ Handy when expressing complex directives.
 
 ## Model.$where
 
-Sometimes you need to query for things in mongodb using a JavaScript
-expression. You can do so via find({$where: javascript}), or you can
-use the mongoose shortcut method $where via a Query chain or from
-your mongoose Model.
+Sometimes you need to query for things in mongodb using a JavaScript expression. You can do so via find({$where: javascript}), or you can use the mongoose shortcut method $where via a Query chain or from your mongoose Model.
 
     Model.$where('this.firstname === this.lastname').exec(callback)
 
 ## Model.update
 
-Updates all documents matching `conditions` using the `update` clause. All
-`update` values are casted to their appropriate types before being sent.
+Updates all documents matching `conditions` using the `update` clause. All `update` values are casted to their appropriate types before being sent.
 
     var conditions = { name: 'borne' }
       , update = { $inc: { visits: 1 }}
@@ -96,8 +90,7 @@ Updates all documents matching `conditions` using the `update` clause. All
 
     Model.update(conditions, update, options, callback)
 
-Note: for backwards compatibility, all top-level `update` keys that are
-not $atomic operation names are treated as `$set` operations. Example:
+Note: for backwards compatibility, all top-level `update` keys that are not $atomic operation names are treated as `$set` operations. Example:
 
     var query = { name: 'borne' };
     Model.update(query, { name: 'jason borne' }, options, callback)
@@ -108,9 +101,7 @@ not $atomic operation names are treated as `$set` operations. Example:
 
 ## Query API
 
-Each of these methods returns a [Query](/docs/query.html).
-If you don't pass a callback to these methods, the Query can be continued to be
-modified (such as adding options, fields, etc), before it's `exec`d.
+Each of these methods returns a [Query](/docs/query.html). If you don't pass a callback to these methods, the Query can be continued to be modified (such as adding options, fields, etc), before it's `exec`d.
 
     var query = Model.find({});
 

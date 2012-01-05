@@ -15,35 +15,25 @@ You can easily access the `Schema` constructor from the `mongoose` singleton:
         // my props
     });
 
-Models are then accessed from `mongoose` if you want to use a single
-connection:
+Models are then accessed from `mongoose` if you want to use a single connection:
 
     // connect the `mongoose` instance
     mongoose.connect('mongodb://host/db');
 
     var BlogPost = mongoose.model('BlogPost');
 
-Or from a `Connection` instance if you want to use multiple
-databases/connections:
+Or from a `Connection` instance if you want to use multiple databases/connections:
 
     var db = mongoose.createConnection('mongodb://host/db')
       , BlogPost = db.model('BlogPost');
 
-**Important**: the actual interaction with the data happens with the `Model`
-that you obtain through `mongoose.model` or `db.model`. That's the object that
-you can instantiate or that you can call `.find()`, `.findOne()`, etc upon.
-Don't confuse schemas and actual models!
+**Important**: the actual interaction with the data happens with the `Model` that you obtain through `mongoose.model` or `db.model`. That's the object that you can instantiate or that you can call `.find()`, `.findOne()`, etc upon. Don't confuse schemas and actual models!
 
 ## Defining your keys
 
-The `Schema` constructor receives an object representation of your schemas as
-its first parameter. If you want to add more keys later, `Schema#add` provides
-the same functionality.
+The `Schema` constructor receives an object representation of your schemas as its first parameter. If you want to add more keys later, `Schema#add` provides the same functionality.
 
-Your schema is constructed by passing all the
-JavaScript natives that you know (String, Number, Date, Buffer) as well
-as others exclusive to MongoDb (for example `Schema.ObjectId`). For details on all
-SchemaTypes see the [Schema Type chapter](/docs/schematypes.html).
+Your schema is constructed by passing all the JavaScript natives that you know (String, Number, Date, Buffer) as well as others exclusive to MongoDb (for example `Schema.ObjectId`). For details on all SchemaTypes see the [Schema Type chapter](/docs/schematypes.html).
 
     var ObjectId = Schema.ObjectId;
 
@@ -55,12 +45,9 @@ SchemaTypes see the [Schema Type chapter](/docs/schematypes.html).
 
 ### Defining documents within documents
 
-To define an array of documents that follows a certain schema, make the value
-an array with the schema constructor inside.
+To define an array of documents that follows a certain schema, make the value an array with the schema constructor inside.
 
-For example, let's assume we want to have a collection of comments within a
-blogpost, and we want them to be subject to casting, validation, and other
-functionality provided by models:
+For example, let's assume we want to have a collection of comments within a blogpost, and we want them to be subject to casting, validation, and other functionality provided by models:
 
     var Comment = new Schema({
         body  : String
@@ -72,23 +59,15 @@ functionality provided by models:
       , comments  : [Comment]
     });
 
-This will allow you to interact very easily with subdocuments later on. For
-more information, refer to the chapter on
-[embedded documents](/docs/embedded-documents.html).
+This will allow you to interact very easily with subdocuments later on. For more information, refer to the chapter on [embedded documents](/docs/embedded-documents.html).
 
 ### Defining custom options for keys
 
-Each key that you define is internally mapped to a `SchemaType`. Bear in mind, a
-Schema is not something that you interact directly with, but it's a way to
-describe to Mongoose what you want your data to look like, and how you want
-it to behave.
+Each key that you define is internally mapped to a `SchemaType`. Bear in mind, a Schema is not something that you interact directly with, but it's a way to describe to Mongoose what you want your data to look like, and how you want it to behave.
 
-`SchemaType`s take care of validation, casting, defaults, and other general
-options. Some functionality is exclusive to certain types of `SchemaType`s, for
-example only numbers support `min` and `max` values.
+`SchemaType`s take care of validation, casting, defaults, and other general options. Some functionality is exclusive to certain types of `SchemaType`s, for example only numbers support `min` and `max` values.
 
-In order to customize some of these options directly from the definition of
-your model, set your key to an object with the format `{ type: Type, ... }`.
+In order to customize some of these options directly from the definition of your model, set your key to an object with the format<br>`{ type: Type, ... }`.
 
       var Person = new Schema({
           title   : { type: String, required: true }
@@ -99,9 +78,7 @@ your model, set your key to an object with the format `{ type: Type, ... }`.
           }
       });
 
-Those options are functions that are called on each SchemaType.
-If you want to define options later on, you could access a certain key through
-the `path` function:
+Those options are functions that are called on each SchemaType. If you want to define options later on, you could access a certain key through the `path` function:
 
     Person.path('age').max(400);
 
@@ -113,18 +90,13 @@ the `path` function:
       return v.length > 50;
     });
 
-Some of the options are versatile. `default` takes a `Function` or a value.
-`validate` takes a `Function` or a `RegExp`. More information on these can be
-found in the [Schema Type chapter](/docs/schematypes.html).
+Some of the options are versatile. `default` takes a `Function` or a value. `validate` takes a `Function` or a `RegExp`. More information on these can be found in the [Schema Type chapter](/docs/schematypes.html).
 
 ## Beyond keys: Middleware
 
-Middleware are special user-defined functions that are called transparently
-when certain native methods are called on `Document` instances (`init`, `save`
-and `remove`).
+Middleware are special user-defined functions that are called transparently when certain native methods are called on `Document` instances (`init`, `save` and `remove`).
 
-Let's say that you want to email a certain user when his document changes.
-You'd then define a hook on the User schema like this:
+Let's say that you want to email a certain user when his document changes. You'd then define a hook on the User schema like this:
 
     UserSchema.pre('save', function (next) {
       email(this.email, 'Your record has changed');

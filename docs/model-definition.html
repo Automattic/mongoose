@@ -208,47 +208,41 @@
 
 <p>Models are defined by passing a <code>Schema</code> instance to <code>mongoose.model</code>.</p>
 
-<pre><code>mongoose.model(&#39;MyModel&#39;, mySchema);
-// mySchema is &lt;a Schema&gt;</code></pre>
+<pre><code>mongoose.model('MyModel', mySchema);
+// mySchema is &lt;a Schema&gt;
+</code></pre>
 
 <p>You can easily access the <code>Schema</code> constructor from the <code>mongoose</code> singleton:</p>
 
-<pre><code>var mongoose = require(&#39;mongoose&#39;)
+<pre><code>var mongoose = require('mongoose')
   , Schema = mongoose.Schema;
 
 var mySchema = new Schema({
     // my props
-});</code></pre>
+});
+</code></pre>
 
-<p>Models are then accessed from <code>mongoose</code> if you want to use a single
-connection:</p>
+<p>Models are then accessed from <code>mongoose</code> if you want to use a single connection:</p>
 
 <pre><code>// connect the `mongoose` instance
-mongoose.connect(&#39;mongodb://host/db&#39;);
+mongoose.connect('mongodb://host/db');
 
-var BlogPost = mongoose.model(&#39;BlogPost&#39;);</code></pre>
+var BlogPost = mongoose.model('BlogPost');
+</code></pre>
 
-<p>Or from a <code>Connection</code> instance if you want to use multiple
-databases/connections:</p>
+<p>Or from a <code>Connection</code> instance if you want to use multiple databases/connections:</p>
 
-<pre><code>var db = mongoose.createConnection(&#39;mongodb://host/db&#39;)
-  , BlogPost = db.model(&#39;BlogPost&#39;);</code></pre>
+<pre><code>var db = mongoose.createConnection('mongodb://host/db')
+  , BlogPost = db.model('BlogPost');
+</code></pre>
 
-<p><strong>Important</strong>: the actual interaction with the data happens with the <code>Model</code>
-that you obtain through <code>mongoose.model</code> or <code>db.model</code>. That&#39;s the object that
-you can instantiate or that you can call <code>.find()</code>, <code>.findOne()</code>, etc upon.
-Don&#39;t confuse schemas and actual models!</p>
+<p><strong>Important</strong>: the actual interaction with the data happens with the <code>Model</code> that you obtain through <code>mongoose.model</code> or <code>db.model</code>. That's the object that you can instantiate or that you can call <code>.find()</code>, <code>.findOne()</code>, etc upon. Don't confuse schemas and actual models!</p>
 
 <h2>Defining your keys</h2>
 
-<p>The <code>Schema</code> constructor receives an object representation of your schemas as
-its first parameter. If you want to add more keys later, <code>Schema#add</code> provides
-the same functionality.</p>
+<p>The <code>Schema</code> constructor receives an object representation of your schemas as its first parameter. If you want to add more keys later, <code>Schema#add</code> provides the same functionality.</p>
 
-<p>Your schema is constructed by passing all the
-JavaScript natives that you know (String, Number, Date, Buffer) as well
-as others exclusive to MongoDb (for example <code>Schema.ObjectId</code>). For details on all
-SchemaTypes see the <a href="/docs/schematypes.html">Schema Type chapter</a>.</p>
+<p>Your schema is constructed by passing all the JavaScript natives that you know (String, Number, Date, Buffer) as well as others exclusive to MongoDb (for example <code>Schema.ObjectId</code>). For details on all SchemaTypes see the <a href="/docs/schematypes.html">Schema Type chapter</a>.</p>
 
 <pre><code>var ObjectId = Schema.ObjectId;
 
@@ -256,16 +250,14 @@ var PostSchema = new Schema({
     owner   : ObjectId
   , title   : String
   , date    : Date
-});</code></pre>
+});
+</code></pre>
 
 <h3>Defining documents within documents</h3>
 
-<p>To define an array of documents that follows a certain schema, make the value
-an array with the schema constructor inside.</p>
+<p>To define an array of documents that follows a certain schema, make the value an array with the schema constructor inside.</p>
 
-<p>For example, let&#39;s assume we want to have a collection of comments within a
-blogpost, and we want them to be subject to casting, validation, and other
-functionality provided by models:</p>
+<p>For example, let's assume we want to have a collection of comments within a blogpost, and we want them to be subject to casting, validation, and other functionality provided by models:</p>
 
 <pre><code>var Comment = new Schema({
     body  : String
@@ -275,25 +267,18 @@ functionality provided by models:</p>
 var Post = new Schema({
     title     : String
   , comments  : [Comment]
-});</code></pre>
+});
+</code></pre>
 
-<p>This will allow you to interact very easily with subdocuments later on. For
-more information, refer to the chapter on
-<a href="/docs/embedded-documents.html">embedded documents</a>.</p>
+<p>This will allow you to interact very easily with subdocuments later on. For more information, refer to the chapter on <a href="/docs/embedded-documents.html">embedded documents</a>.</p>
 
 <h3>Defining custom options for keys</h3>
 
-<p>Each key that you define is internally mapped to a <code>SchemaType</code>. Bear in mind, a
-Schema is not something that you interact directly with, but it&#39;s a way to
-describe to Mongoose what you want your data to look like, and how you want
-it to behave.</p>
+<p>Each key that you define is internally mapped to a <code>SchemaType</code>. Bear in mind, a Schema is not something that you interact directly with, but it's a way to describe to Mongoose what you want your data to look like, and how you want it to behave.</p>
 
-<p><code>SchemaType</code>s take care of validation, casting, defaults, and other general
-options. Some functionality is exclusive to certain types of <code>SchemaType</code>s, for
-example only numbers support <code>min</code> and <code>max</code> values.</p>
+<p><code>SchemaType</code>s take care of validation, casting, defaults, and other general options. Some functionality is exclusive to certain types of <code>SchemaType</code>s, for example only numbers support <code>min</code> and <code>max</code> values.</p>
 
-<p>In order to customize some of these options directly from the definition of
-your model, set your key to an object with the format <code>{ type: Type, ... }</code>.</p>
+<p>In order to customize some of these options directly from the definition of your model, set your key to an object with the format<br><code>{ type: Type, ... }</code>.</p>
 
 <pre><code>  var Person = new Schema({
       title   : { type: String, required: true }
@@ -302,39 +287,35 @@ your model, set your key to an object with the format <code>{ type: Type, ... }<
           likes : [String]
         , birth : { type: Date, default: Date.now }
       }
-  });</code></pre>
+  });
+</code></pre>
 
-<p>Those options are functions that are called on each SchemaType.
-If you want to define options later on, you could access a certain key through
-the <code>path</code> function:</p>
+<p>Those options are functions that are called on each SchemaType. If you want to define options later on, you could access a certain key through the <code>path</code> function:</p>
 
-<pre><code>Person.path(&#39;age&#39;).max(400);
+<pre><code>Person.path('age').max(400);
 
-Person.path(&#39;meta.birth&#39;).set(function (v) {
+Person.path('meta.birth').set(function (v) {
   // this is a setter
 });
 
-Person.path(&#39;title&#39;).validate(function (v) {
+Person.path('title').validate(function (v) {
   return v.length &gt; 50;
-});</code></pre>
+});
+</code></pre>
 
-<p>Some of the options are versatile. <code>default</code> takes a <code>Function</code> or a value.
-<code>validate</code> takes a <code>Function</code> or a <code>RegExp</code>. More information on these can be
-found in the <a href="/docs/schematypes.html">Schema Type chapter</a>.</p>
+<p>Some of the options are versatile. <code>default</code> takes a <code>Function</code> or a value. <code>validate</code> takes a <code>Function</code> or a <code>RegExp</code>. More information on these can be found in the <a href="/docs/schematypes.html">Schema Type chapter</a>.</p>
 
 <h2>Beyond keys: Middleware</h2>
 
-<p>Middleware are special user-defined functions that are called transparently
-when certain native methods are called on <code>Document</code> instances (<code>init</code>, <code>save</code>
-and <code>remove</code>).</p>
+<p>Middleware are special user-defined functions that are called transparently when certain native methods are called on <code>Document</code> instances (<code>init</code>, <code>save</code> and <code>remove</code>).</p>
 
-<p>Let&#39;s say that you want to email a certain user when his document changes.
-You&#39;d then define a hook on the User schema like this:</p>
+<p>Let's say that you want to email a certain user when his document changes. You'd then define a hook on the User schema like this:</p>
 
-<pre><code>UserSchema.pre(&#39;save&#39;, function (next) {
-  email(this.email, &#39;Your record has changed&#39;);
+<pre><code>UserSchema.pre('save', function (next) {
+  email(this.email, 'Your record has changed');
   next();
-});</code></pre>
+});
+</code></pre>
 
 <p>More information about the specifics of middleware can be found <a href="/docs/middleware.html">here</a>.</p>
 

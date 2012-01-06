@@ -26,11 +26,22 @@ Mongoose in the Wild
 
 <br>
 
+[Grow The Game Golf](http://home.gtggolf.com) let's you think, act, and score your golf game like a pro with real-time scoring, live leaderboards and more.
+
+[![Grow The Game Golf](/images/apps/gtggolf.png)](http://home.gtggolf.com)
+
+<br>
+
+[ClickDummy](https://clickdummy.com) is a rapid mockup prototyping application for designers and dummies.
+
+[![ClickDummy](/images/apps/clickdummy.png)](https://clickdummy.com)
+
+<br>
+
 [Linkr](http://linkr.cc) is a service for saving links for reading later.
 
 [![Linkr](/images/apps/linkr.png)](http://linkr.cc)
 
 <br>
 
-The applications shown above are not listed in any specific order.
-To have an application added or removed please contact [dev@learnboost.com](mailto:dev@learnboost.com).
+The applications shown above are not listed in any specific order. To have an application added or removed please contact [dev@learnboost.com](mailto:dev@learnboost.com).

@@ -39,6 +39,16 @@ Specifies the [$or](http://www.mongodb.org/display/DOCS/Advanced+Queries#Advance
 
     query.or([{ color: 'blue' }, { color: 'red' }]);
 
+## Query#$nor, Query#nor
+
+Specifies the [$nor](http://www.mongodb.org/display/DOCS/Advanced+Queries#AdvancedQueries-%24nor) operator.
+
+    query.$nor(array);
+
+`array` is an array of expressions.
+
+    query.nor([{ color: 'daffodil yellow' }, { color: 'atomic tangerine' }]);
+
 ## Query#gt, Query#$gt
 
 Specifies a [greater than](http://www.mongodb.org/display/DOCS/Advanced+Queries#AdvancedQueries-%3C%2C%3C%3D%2C%3E%2C%3E%3D) expression.

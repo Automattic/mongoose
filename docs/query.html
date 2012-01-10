@@ -251,6 +251,18 @@
 <pre><code>query.or([{ color: 'blue' }, { color: 'red' }]);
 </code></pre>
 
+<h2>Query#$nor, Query#nor</h2>
+
+<p>Specifies the <a href="http://www.mongodb.org/display/DOCS/Advanced+Queries#AdvancedQueries-%24nor">$nor</a> operator.</p>
+
+<pre><code>query.$nor(array);
+</code></pre>
+
+<p><code>array</code> is an array of expressions.</p>
+
+<pre><code>query.nor([{ color: 'daffodil yellow' }, { color: 'atomic tangerine' }]);
+</code></pre>
+
 <h2>Query#gt, Query#$gt</h2>
 
 <p>Specifies a <a href="http://www.mongodb.org/display/DOCS/Advanced+Queries#AdvancedQueries-%3C%2C%3C%3D%2C%3E%2C%3E%3D">greater than</a> expression.</p>

@@ -1395,6 +1395,31 @@ module.exports = {
     });
   },
 
+  'find using #or with nested #elemMatch': function () {
+    var db = start()
+      , P = db.model('BlogPostB', collection);
+
+    var post = new P({ title: "nested elemMatch" });
+    post.comments.push({ title: 'comment D' }, { title: 'comment E' }, { title: 'comment F' })
+
+    var id0 = post.comments[0]._id;
+    var id1 = post.comments[1]._id;
+    var id2 = post.comments[2]._id;
+
+    post.save(function (err) {
+      should.strictEqual(null, err);
+
+      var query0 = { comments: { $elemMatch: { title: 'comment Z' }}};
+      var query1 = { comments: { $elemMatch: { _id: id1.toString(), title: 'comment E' }}};
+
+      P.findOne({ $or: [query0, query1] }, function (err, p) {
+        db.close();
+        should.strictEqual(null, err);
+        p.id.should.equal(post.id);
+      });
+    });
+  },
+
   'test finding documents where an array of a certain $size': function () {
     var db = start()
       , BlogPostB = db.model('BlogPostB', collection);

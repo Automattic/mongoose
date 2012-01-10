@@ -208,6 +208,47 @@ module.exports = {
     should.strictEqual(doc._doc.nested.cool._marked, undefined);
   },
 
+  'toObject options': function () {
+    var doc = new TestDocument();
+
+    doc.init({
+        test    : 'test'
+      , oids    : []
+      , nested  : {
+            age   : 5
+          , cool  : DocumentObjectId.fromString('4c6c2d6240ced95d0e00003c')
+          , path  : 'my path'
+        }
+    });
+
+    var clone = doc.toObject({ getters: true, virtuals: false });
+
+    clone.test.should.eql('test');
+    clone.oids.should.be.an.instanceof(Array);
+    (clone.nested.age == 5).should.be.true;
+    DocumentObjectId.toString(clone.nested.cool).should.eql('4c6c2d6240ced95d0e00003c');
+    clone.nested.path.should.eql('5my path');
+    should.equal(undefined, clone.nested.agePlus2);
+
+    clone = doc.toObject({ virtuals: true });
+
+    clone.test.should.eql('test');
+    clone.oids.should.be.an.instanceof(Array);
+    (clone.nested.age == 5).should.be.true;
+    DocumentObjectId.toString(clone.nested.cool).should.eql('4c6c2d6240ced95d0e00003c');
+    clone.nested.path.should.eql('my path');
+    clone.nested.agePlus2.should.eql(7);
+
+    clone = doc.toObject({ getters: true });
+
+    clone.test.should.eql('test');
+    clone.oids.should.be.an.instanceof(Array);
+    (clone.nested.age == 5).should.be.true;
+    DocumentObjectId.toString(clone.nested.cool).should.eql('4c6c2d6240ced95d0e00003c');
+    clone.nested.path.should.eql('5my path');
+    clone.nested.agePlus2.should.eql(7);
+  },
+
   'test hooks system': function(beforeExit){
     var doc = new TestDocument()
       , steps = 0

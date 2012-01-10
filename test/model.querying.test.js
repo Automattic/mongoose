@@ -1372,7 +1372,7 @@ module.exports = {
 
   'find using #all with nested #elemMatch': function () {
     var db = start()
-      , P = db.model('BlogPostB', collection);
+      , P = db.model('BlogPostB', collection + '_nestedElemMatch');
 
     var post = new P({ title: "nested elemMatch" });
     post.comments.push({ title: 'comment A' }, { title: 'comment B' }, { title: 'comment C' })

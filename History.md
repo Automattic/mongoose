@@ -1,4 +1,12 @@
 
+2.4.10 / 2012-01-10
+===================
+
+  * added; optional getter application in .toObject()/.toJSON() (#412)
+  * fixed; nested $operators in $all queries (#670)
+  * added; $nor support (#674)
+  * fixed; bug when adding nested schema (#662) [paulwe]
+
 2.4.9 / 2012-01-04
 ===================
 

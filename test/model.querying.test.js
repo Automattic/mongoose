@@ -1133,6 +1133,52 @@ module.exports = {
     });
   },
 
+  'finding where #nor': function () {
+    var db = start()
+      , Mod = db.model('Mod', 'nor_' + random());
+
+    Mod.create({num: 1}, {num: 2, str: 'two'}, function (err, one, two) {
+      should.strictEqual(err, null);
+
+      var pending = 3;
+      test1();
+      test2();
+      test3();
+
+      function test1 () {
+        Mod.find({$nor: [{num: 1}, {num: 3}]}, function (err, found) {
+          done();
+          should.strictEqual(err, null);
+          found.should.have.length(1);
+          found[0]._id.should.eql(two._id);
+        });
+      }
+
+      function test2 () {
+        Mod.find({ $nor: [{ str: 'two'}, {str:'three'}] }, function (err, found) {
+          done();
+          should.strictEqual(err, null);
+          found.should.have.length(1);
+          found[0]._id.should.eql(one._id);
+        });
+      }
+
+      function test3 () {
+        Mod.find({$nor: [{num: 2}]}).$nor([{ str: 'two' }]).run(function (err, found) {
+          done();
+          should.strictEqual(err, null);
+          found.should.have.length(1);
+          found[0]._id.should.eql(one._id);
+        });
+      }
+
+      function done () {
+        if (--pending) return;
+        db.close();
+      }
+    });
+  },
+
   'test finding where $ne': function () {
     var db = start()
       , Mod = db.model('Mod', 'mods_' + random());
@@ -1418,6 +1464,33 @@ module.exports = {
         p.id.should.equal(post.id);
       });
     });
+  },
+
+  'find using #nor with nested #elemMatch': function () {
+    var db = start()
+      , P = db.model('BlogPostB', collection + '_norWithNestedElemMatch');
+
+    var p0 = { title: "nested $nor elemMatch1", comments: [] };
+
+    var p1 = { title: "nested $nor elemMatch0", comments: [] };
+    p1.comments.push({ title: 'comment X' }, { title: 'comment Y' }, { title: 'comment W' })
+
+    P.create(p0, p1, function (err, post0, post1) {
+      should.strictEqual(null, err);
+
+      var id = post1.comments[1]._id;
+
+      var query0 = { comments: { $elemMatch: { title: 'comment Z' }}};
+      var query1 = { comments: { $elemMatch: { _id: id.toString(), title: 'comment Y' }}};
+
+      P.find({ $nor: [query0, query1] }, function (err, posts) {
+        db.close();
+        should.strictEqual(null, err);
+        posts.length.should.equal(1);
+        posts[0].id.should.equal(post0.id);
+      });
+    });
+
   },
 
   'test finding documents where an array of a certain $size': function () {

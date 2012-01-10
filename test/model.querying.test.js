@@ -1370,6 +1370,31 @@ module.exports = {
     });
   },
 
+  'find using #all with nested #elemMatch': function () {
+    var db = start()
+      , P = db.model('BlogPostB', collection);
+
+    var post = new P({ title: "nested elemMatch" });
+    post.comments.push({ title: 'comment A' }, { title: 'comment B' }, { title: 'comment C' })
+
+    var id0 = post.comments[0]._id;
+    var id1 = post.comments[1]._id;
+    var id2 = post.comments[2]._id;
+
+    post.save(function (err) {
+      should.strictEqual(null, err);
+
+      var query0 = { $elemMatch: { _id: id1, title: 'comment B' }};
+      var query1 = { $elemMatch: { _id: id2.toString(), title: 'comment C' }};
+
+      P.findOne({ comments: { $all: [query0, query1] }}, function (err, p) {
+        db.close();
+        should.strictEqual(null, err);
+        p.id.should.equal(post.id);
+      });
+    });
+  },
+
   'test finding documents where an array of a certain $size': function () {
     var db = start()
       , BlogPostB = db.model('BlogPostB', collection);

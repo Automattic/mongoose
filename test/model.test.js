@@ -523,6 +523,26 @@ module.exports = {
     });
   },
 
+  'test isNew on embedded documents added after saving': function(){
+    var db = start()
+      , BlogPost = db.model('BlogPost', collection);
+
+    var post = new BlogPost({ title: 'hocus pocus' })
+    post.save(function (err) {
+      post.isNew.should.be.false;
+      post.comments.push({ title: 'Humpty Dumpty', comments: [{title: 'nested'}] });
+      post.get('comments')[0].isNew.should.be.true;
+      post.get('comments')[0].comments[0].isNew.should.be.true;
+      post.save(function (err) {
+        should.strictEqual(null, err);
+        post.isNew.should.be.false;
+        post.get('comments')[0].isNew.should.be.false;
+        post.get('comments')[0].comments[0].isNew.should.be.false;
+        db.close();
+      });
+    });
+  },
+
   'modified states are reset after save runs': function () {
     var db = start()
       , B = db.model('BlogPost', collection)

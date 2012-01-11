@@ -1440,5 +1440,52 @@ module.exports = {
         });
       });
     });
+  },
+  
+  // gh-675
+  'toJSON should also be called for refs': function () {
+    var db = start()
+      , BlogPost = db.model('RefBlogPost', posts)
+      , User = db.model('RefUser', users)
+
+    User.prototype._toJSON = User.prototype.toJSON;
+    User.prototype.toJSON = function() {
+      var res = this._toJSON();
+      res.was_in_to_json = true;
+      return res;
+    }
+
+    BlogPost.prototype._toJSON = BlogPost.prototype.toJSON;
+    BlogPost.prototype.toJSON = function() {
+      var res = this._toJSON();
+      res.was_in_to_json = true;
+      return res;
+    }
+
+    User.create({
+        name  : 'Jerem'
+      , email : 'jerem@jolicloud.com'
+    }, function (err, creator) {
+      should.strictEqual(err, null);
+
+      BlogPost.create({
+          title     : 'Ping Pong'
+        , _creator  : creator
+      }, function (err, post) {
+        should.strictEqual(err, null);
+
+        BlogPost
+          .findById(post._id)
+          .populate('_creator')
+          .run(function (err, post) {
+            db.close();
+            should.strictEqual(err, null);
+
+            var json = post.toJSON();
+            json.was_in_to_json.should.equal(true);
+            json._creator.was_in_to_json.should.equal(true);
+          });
+      });
+    });
   }
 };

@@ -4974,6 +4974,7 @@ module.exports = {
       });
 
     var StrictModel = db.model('StrictVirtual', strictSchema);
+    db.close();
 
     var strictInstance = new StrictModel({
       email: 'hunter@skookum.com',

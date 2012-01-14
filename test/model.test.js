@@ -4952,35 +4952,36 @@ module.exports = {
     });
   },
 
-  'strict mode virtuals': function() {
+  'strict mode virtuals': function () {
     var db = start();
 
-    var getCount = 0,
-        setCount = 0;
+    var getCount = 0
+      , setCount = 0;
 
     var strictSchema = new Schema({
-      email: String,
-      prop: String
+        email: String
+      , prop: String
     }, {strict: true});
 
-    strictSchema.virtual('myvirtual')
-      .get(function() {
-        getCount++;
-        return 'ok';
-      })
-      .set(function(v) {
-        setCount++;
-        this.prop = v;
-      });
-
-    var StrictModel = db.model('StrictVirtual', strictSchema);
-    db.close();
-
-    var strictInstance = new StrictModel({
-      email: 'hunter@skookum.com',
-      myvirtual: 'test'
+    strictSchema
+    .virtual('myvirtual')
+    .get(function() {
+      getCount++;
+      return 'ok';
+    })
+    .set(function(v) {
+      setCount++;
+      this.prop = v;
     });
 
+    var StrictModel = db.model('StrictVirtual', strictSchema);
+
+    var strictInstance = new StrictModel({
+        email: 'hunter@skookum.com'
+      , myvirtual: 'test'
+    });
+
+    db.close();
     getCount.should.equal(0);
     setCount.should.equal(1);
 

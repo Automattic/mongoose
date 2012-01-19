@@ -1441,7 +1441,7 @@ module.exports = {
       });
     });
   },
-  
+
   // gh-686
   'populate should work on Buffer _ids': function () {
     var db = start();

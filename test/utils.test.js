@@ -9,6 +9,7 @@ var start = require('./common')
   , utils = require('../lib/utils')
   , StateMachine = require('../lib/statemachine')
   , ObjectId = require('../lib/types/objectid')
+  , MongooseBuffer = require('../lib/types/buffer')
 
 /**
  * Setup.
@@ -173,6 +174,23 @@ module.exports = {
 
     m2.set(m1.toObject());
     utils.deepEqual(m1.a1, m2.a1).should.be.true;
+  },
+
+  // gh-688
+  'deepEquals with MongooseBuffer': function () {
+    var str = "this is the day";
+    var a = new MongooseBuffer(str);
+    var b = new MongooseBuffer(str);
+    var c = new Buffer(str);
+    var d = new Buffer("this is the way");
+    var e = new Buffer("other length");
+
+    utils.deepEqual(a, b).should.be.true;
+    utils.deepEqual(a, c).should.be.true;
+    utils.deepEqual(a, d).should.be.false;
+    utils.deepEqual(a, e).should.be.false;
+    utils.deepEqual(a, []).should.be.false;
+    utils.deepEqual([], a).should.be.false;
   }
 
 };

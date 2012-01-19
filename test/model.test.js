@@ -3241,6 +3241,43 @@ module.exports = {
     db.close();
   },
 
+  // gh-685
+  'getters should not be triggered at construction': function () {
+    var db = start()
+      , called = false
+
+    db.close();
+
+    var schema = new mongoose.Schema({
+        number: {
+            type:Number
+          , set: function(x){return x/2}
+          , get: function(x){
+              called = true;
+              return x*2;
+            }
+        }
+    });
+
+    var A = mongoose.model('gettersShouldNotBeTriggeredAtConstruction', schema);
+
+    var a = new A({ number: 100 });
+    called.should.be.false;
+    var num = a.number;
+    called.should.be.true;
+    num.valueOf().should.equal(100);
+    a.getValue('number').valueOf().should.equal(50);
+
+    called = false;
+    var b = new A;
+    b.init({ number: 50 });
+    called.should.be.false;
+    num = b.number;
+    called.should.be.true;
+    num.valueOf().should.equal(100);
+    b.getValue('number').valueOf().should.equal(50);
+  },
+
   'saving a doc with a set virtual property should persist the real properties but not the virtual property': function () {
     var db = start()
       , BlogPost = db.model('BlogPost', collection)

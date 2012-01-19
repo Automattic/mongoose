@@ -1440,5 +1440,42 @@ module.exports = {
         });
       });
     });
+  },
+  
+  // gh-686
+  'populate should work on Buffer _ids': function () {
+    var db = start();
+
+    var UserSchema = new Schema({
+        _id: Buffer
+      , name: String
+    })
+
+    var NoteSchema = new Schema({
+        author: { type: Buffer, ref: 'UserWithBufferId' }
+      , body: String
+    })
+
+    var User = db.model('UserWithBufferId', UserSchema, random())
+    var Note = db.model('NoteWithBufferId', NoteSchema, random())
+
+    var alice = new User({_id: new mongoose.Types.Buffer('YWxpY2U=', 'base64'), name: "Alice"})
+
+    alice.save(function (err) {
+      should.strictEqual(err, null);
+
+      var note  = new Note({author: 'alice', body: "Buy Milk"});
+      note.save(function (err) {
+        should.strictEqual(err, null);
+
+        Note.findById(note.id).populate('author').run(function (err, note) {
+          db.close();
+          should.strictEqual(err, null);
+          note.body.should.equal('Buy Milk');
+          should.exist(note.author);
+          note.author.name.should.equal('Alice');
+        });
+      });
+    })
   }
 };

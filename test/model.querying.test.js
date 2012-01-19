@@ -2105,5 +2105,78 @@ module.exports = {
         });
       });
     });
+  },
+
+  // gh-690
+  'using $all with ObjectIds': function () {
+    var db = start()
+
+    var SSchema = new Schema({ name: String });
+    var PSchema = new Schema({ sub: [SSchema] });
+
+    var P = db.model('usingAllWithObjectIds', PSchema);
+    var sub = [{ name: 'one' }, { name: 'two' }, { name: 'three' }];
+
+    P.create({ sub: sub }, function (err, p) {
+      should.strictEqual(null, err);
+
+      var o0 = p.sub[0]._id;
+      var o1 = p.sub[1]._id;
+      var o2 = p.sub[2]._id;
+
+      P.findOne({ 'sub._id': { $all: [o1, o2] }}, function (err, doc) {
+        should.strictEqual(null, err);
+        doc.id.should.equal(p.id);
+
+        P.findOne({ 'sub._id': { $all: [o0, new DocumentObjectId] }}, function (err, doc) {
+          should.strictEqual(null, err);
+          should.equal(false, !!doc);
+
+          P.findOne({ 'sub._id': { $all: [o2] }}, function (err, doc) {
+            db.close();
+            should.strictEqual(null, err);
+            doc.id.should.equal(p.id);
+          });
+        });
+      });
+    });
+  },
+
+  'using $all with Dates': function () {
+    var db = start()
+
+    var SSchema = new Schema({ d: Date });
+    var PSchema = new Schema({ sub: [SSchema] });
+
+    var P = db.model('usingAllWithDates', PSchema);
+    var sub = [
+        { d: new Date }
+      , { d: new Date(Date.now()-10000) }
+      , { d: new Date(Date.now()-30000) }
+    ];
+
+    P.create({ sub: sub }, function (err, p) {
+      should.strictEqual(null, err);
+
+      var o0 = p.sub[0].d;
+      var o1 = p.sub[1].d;
+      var o2 = p.sub[2].d;
+
+      P.findOne({ 'sub.d': { $all: [o1, o2] }}, function (err, doc) {
+        should.strictEqual(null, err);
+        doc.id.should.equal(p.id);
+
+        P.findOne({ 'sub.d': { $all: [o0, new Date] }}, function (err, doc) {
+          should.strictEqual(null, err);
+          should.equal(false, !!doc);
+
+          P.findOne({ 'sub.d': { $all: [o2] }}, function (err, doc) {
+            db.close();
+            should.strictEqual(null, err);
+            doc.id.should.equal(p.id);
+          });
+        });
+      });
+    });
   }
 };

@@ -14,6 +14,12 @@ Mongoose in the Wild
 
 <br>
 
+[Storify](http://storify.com/) lets you curate social networks to build social stories, bringing together media scattered across the Web into a coherent narrative.
+
+[![Storify](/images/apps/storify.png)](http://storify.com/)
+
+<br>
+
 [Scotty App](http://scottyapp.com) allows you to create data driven backends for your apps in minutes instead of weeks.
 
 [![Scotty App](/images/apps/scotty.png)](http://scottyapp.com)

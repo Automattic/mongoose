@@ -6,7 +6,7 @@
   , "keywords": ["mongodb", "mongoose", "orm", "data", "datastore", "nosql"]
   , "dependencies": {
         "hooks": "0.1.9"
-      , "mongodb": "0.9.8-1"
+      , "mongodb": "0.9.8-3"
     }
   , "devDependencies": {
         "should": "0.2.1"

@@ -48,6 +48,7 @@ var BlogPost = new Schema({
   , numbers   : [Number]
   , owners    : [ObjectId]
   , comments  : [Comments]
+  , version   : Number
 });
 
 BlogPost.virtual('titleWithAuthor')
@@ -286,7 +287,7 @@ module.exports = {
       title: null
     });
     should.strictEqual(null, post.title);
-    post.save( function (err) {
+    post.save( function (err, doc, result) {
       should.strictEqual(err, null);
       BlogPost.findById(post.id, function (err, found) {
         db.close();
@@ -294,6 +295,95 @@ module.exports = {
         should.strictEqual(found.title, null);
       });
     });
+  },
+
+  'test saving with additionalCriteria' : function() {
+    var db = start()
+      , BlogPost = db.model('BlogPost', collection);
+
+    var post = new BlogPost({
+      title: 'version 1.0'
+      , version: 1
+    });
+
+    var total=2;
+    function afterFinalSave(err, doc, result) {
+        if(--total) {
+           should.strictEqual(null, err);
+           result.should.eql(1);
+        } else {
+           db.close();
+           should.strictEqual(null, err);
+           result.should.eql(0);
+        }
+    }
+
+    function afterInitialSave(err, doc, res) {
+       should.strictEqual(null, err); 
+
+       var pending = 2;
+       var posts = [];
+       for(i=0; i<2; i++)
+           BlogPost.findOne({_id: post.id}, function(err, doc) {
+               should.strictEqual(null, err);
+               posts.push(doc); 
+
+               if(!--pending) {
+                posts.should.have.length(2);
+
+                posts[0].version = 2;
+                posts[0].title = "UPDATE ONE";
+
+                posts[1].version = 2;
+                posts[1].title = "UPDATE TWO";
+
+                posts[0].save({ queryParams : { version : 1} }, afterFinalSave);
+                posts[1].save({ queryParams : { version : 1} }, afterFinalSave);
+               }
+           });
+    }
+   
+    post.save(afterInitialSave);
+
+  },
+
+  'test saving with options' : function() {
+      var db = start()
+      , BlogPost = db.model('BlogPost', collection);
+
+      var post = new BlogPost({
+          title: 'save overriding safe:true'
+      });
+
+      function afterSave(err, doc) {
+        should.strictEqual(null, err);
+        doc.title = 'should not call getLastError on save';
+        doc.save({
+            options : { safe: false }
+        }, checkGetLastErrorNotCalled);
+      }
+
+      function checkGetLastErrorNotCalled(err, doc, result) {
+        should.strictEqual(null, err);
+        doc.title = 'should call getLastError on save';
+        doc.save({
+            options : { safe: true }
+        }, checkGetLastErrorIsCalled);
+        //verify no result was passed back (getLastError was not called on update)
+        should.not.exist(result);
+      }
+
+      function checkGetLastErrorIsCalled(err, doc, result) {
+        should.exist(result);
+        result.should.eql(1);
+        db.close();
+      }
+
+      post.save({
+        options : {
+            safe : false
+        }
+      }, afterSave);
   },
 
   'test instantiating a model with a hash that maps to at least 1 undefined value': function () {

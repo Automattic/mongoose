@@ -23,7 +23,11 @@ Populate - DBRef-like behavior
 
 So far we've created two models. Our `Person` model has it's `stories` field set to an array of `ObjectId`s. The `ref` option is what tells Mongoose in which model to look, in our case the `Story` model. All `_id`s we store here must be document `_id`s from the `Story` model. We also added a `_creator` `ObjectId` to our `Story` schema which refers to a single `Person`.
 
-## Populating the refs
+## Saving a ref (to the parent)
+
+Below you can see how we "save" a ref in 'story1' back to the _creator.  This 
+is usually all you need to do.
+
 
     var aaron = new Person({ name: 'Aaron', age: 100 });
 
@@ -39,6 +43,8 @@ So far we've created two models. Our `Person` model has it's `stories` field set
         if (err) ...
       });
     })
+
+## Populating the refs (to the parent)
 
 So far we haven't done anything special. We've merely created a `Person` and a `Story`. Now let's take a look at populating our story's `_creator`:
 
@@ -79,6 +85,38 @@ Great, but what if we wanted to populate our `fans` array based on their age, an
     .populate('fans', null, { age: { $gte: 21 }}, { limit: 5 })
 
 Done. Conditions and options are the third and fourth arguments respectively.
+
+
+## References to the children
+
+You may find however, if you use the `aaron` object, you are unable to get a list of the `stories`.  This is because no `story` objects were ever 'pushed' on to `aaron.stories`.
+
+There are two perspectives to this story.  First, it's nice to have aaron know which are his stories.
+
+      aaron.stories.push(story1);
+      aaron.save();
+
+This allows you do a find & populate like:
+
+    Person
+    .findOne({ name: 'Aaron' })
+    .populate('stories') // <-- only works if you pushed refs to children
+    .run(function (err, person) {
+      if (err) ..
+
+      console.log('JSON for person is: ', person);
+    })
+
+However, it is debatable that you really want two sets of pointers as they may get out of sync.  So you could instead merely find() the documents you are interested in.
+
+    Story
+    .find({ _creator: aaron._id })
+    .populate('_creator') // <-- not really necessary
+    .run(function (err, stories) {
+      if (err) ..
+
+      console.log('The stories JSON is an array: ', stories);
+    })
 
 ## Updating
 

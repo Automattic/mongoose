@@ -5027,5 +5027,28 @@ module.exports = {
 
     getCount.should.equal(1);
     setCount.should.equal(2);
+  },
+
+  'should not throw range error when using Number _id and saving existing doc': function () {
+    var db =start();
+
+    var T = new Schema({ _id: Number, a: String });
+
+    var D = db.model('Testing691', T, 'asdf' + random());
+
+    var d = new D({ _id: 1 });
+    d.save(function (err) {
+      should.strictEqual(null, err);
+
+      D.findById(d._id, function (err, d) {
+        should.strictEqual(null, err);
+
+        d.a = 'yo';
+        d.save(function (err) {
+          db.close();
+          should.strictEqual(null, err);
+        });
+      });
+    });
   }
 };

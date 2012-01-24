@@ -878,6 +878,13 @@ module.exports = {
       err = e;
     }
     err.message.should.equal('Invalid value for schema path `age`')
+  },
+
+  'add() does not polute existing paths': function () {
+    var o = { name: String }
+    var s = new Schema(o);
+    s.add({ age: Number }, 'name.');
+    ;('age' in o.name).should.be.false;
   }
 
 };

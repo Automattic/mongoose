@@ -1,7 +1,9 @@
-Populate - DBRef-like behavior
+Populate - DBRef-like behavior (experimental)
 =============================================
 
-`ObjectIds` can now refer to another document in a collection within our database and be `populate()`d when querying. An example is helpful:
+`ObjectIds` can now refer to another document in a
+collection within our database and be `populate()`d when
+querying. An example is helpful:
 
     var mongoose = require('mongoose')
       , Schema = mongoose.Schema
@@ -21,9 +23,17 @@ Populate - DBRef-like behavior
     var Story  = mongoose.model('Story', StorySchema);
     var Person = mongoose.model('Person', PersonSchema);
 
-So far we've created two models. Our `Person` model has it's `stories` field set to an array of `ObjectId`s. The `ref` option is what tells Mongoose in which model to look, in our case the `Story` model. All `_id`s we store here must be document `_id`s from the `Story` model. We also added a `_creator` `ObjectId` to our `Story` schema which refers to a single `Person`.
+So far we've created two models. Our `Person` model has it's `stories` field
+set to an array of `ObjectId`s. The `ref` option is what tells Mongoose in which
+model to look, in our case the `Story` model. All `_id`s we
+store here must be document `_id`s from the `Story` model. We also added
+a `_creator` `ObjectId` to our `Story` schema which refers to a single `Person`.
 
-## Populating the refs
+## Saving a ref (to the parent)
+
+Below you can see how we "save" a ref in 'story1' back to the _creator.  This 
+is usually all you need to do.
+
 
     var aaron = new Person({ name: 'Aaron', age: 100 });
 
@@ -40,7 +50,10 @@ So far we've created two models. Our `Person` model has it's `stories` field set
       });
     })
 
-So far we haven't done anything special. We've merely created a `Person` and a `Story`. Now let's take a look at populating our story's `_creator`:
+## Populating the refs (to the parent)
+
+So far we haven't done anything special. We've merely created a `Person` and
+a `Story`. Now let's take a look at populating our story's `_creator`:
 
     Story
     .findOne({ title: /Nintendo/i })
@@ -51,11 +64,14 @@ So far we haven't done anything special. We've merely created a `Person` and a `
       // prints "The creator is Aaron"
     })
 
-Yup that's it. We've just queried for a `Story` with the term Nintendo in it's title and also queried the `Person` collection for the story's creator. Nice!
+Yup that's it. We've just queried for a `Story` with the term Nintendo in it's
+title and also queried the `Person` collection for the story's creator. Nice!
 
-Arrays of `ObjectId` refs work the same way. Just call the `populate` method on the query and an array of documents will be returned in place of the `ObjectId`s.
+Arrays of `ObjectId` refs work the same way. Just call the `populate` method on the query and
+an array of documents will be returned in place of the `ObjectId`s.
 
-What if we only want a few specific fields returned for the query? This can be accomplished by passing an array of field names to the `populate` method:
+What if we only want a few specific fields returned for the query? This can
+be accomplished by passing an array of field names to the `populate` method:
 
     Story
     .findOne({ title: /Nintendo/i })
@@ -70,19 +86,55 @@ What if we only want a few specific fields returned for the query? This can be a
       // prints "The creators age is null'
     })
 
-Now this is much better. The only property of the creator we are using is the `name` so we only returned that field from the db. Efficiency FTW!
+Now this is much better. The only property of the creator we are using
+is the `name` so we only returned that field from the db. Efficiency FTW!
 
-Great, but what if we wanted to populate our `fans` array based on their age, and return, at most, any 5 of them?
+
+## References to the children
+
+You may find however, if you use the `aaron` object, you are unable to get 
+a list of the `stories`.  This is because no `story` objects were ever 'pushed'
+on to `aaron.stories`.
+
+There are two perspectives to this story.  First, it's nice to have aaron know
+which are his stories.
+
+      aaron.stories.push(story1);
+      aaron.save();
+
+This allows you do a find & populate like:
+ 
+    Person
+    .findOne({ name: 'Aaron' })
+    .populate('stories') // <-- only works if you pushed refs to children
+    .run(function (err, person) {
+      if (err) ..
+
+      console.log('JSON for person is: ', person);
+
+    })
+    
+However, it is debatable that you really want two sets of pointers as they
+may get out of sync.  So you could instead merely find() the documents you 
+are interested in.
 
     Story
-    .find(...)
-    .populate('fans', null, { age: { $gte: 21 }}, { limit: 5 })
+    .find({ _creator: aaron._id })
+    .populate('_creator') // <-- not really necessary
+    .run(function (err, stories) {
+      if (err) ..
 
-Done. Conditions and options are the third and fourth arguments respectively.
+      console.log('The stories JSON is an array: ', stoires);
+    })
+    
+
+
 
 ## Updating
 
-Now that we have a story we realized that the `_creator` was incorrect. We can update `ObjectId` refs the same as any other property through the magic of Mongooses internal casting:
+Now that we have a story we realized that the `_creator` was incorrect. We can
+update `ObjectId` refs the same as any other property through the magic of Mongooses
+internal casting:
 
     var guille = new Person({ name: 'Guillermo' });
     guille.save(function (err) {
@@ -108,4 +160,7 @@ Now that we have a story we realized that the `_creator` was incorrect. We can u
 
 ### Note:
 
-The documents returned from calling `populate` become fully functional, `remove`able, `save`able documents. Do not confuse them with embedded docs. Take caution when calling its `remove` method because you'll be removing it from the database, not just the array.
+The documents returned from calling `populate` become fully functional,
+`remove`able, `save`able documents. Do not confuse them with embedded
+docs. Take caution when calling its `remove` method because 
+you'll be removing it from the database, not just the array.

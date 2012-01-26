@@ -3,7 +3,41 @@ Getters and Setters
 
 Getters and setters help you change how you get and set the attributes defined by the keys and values in the underlying raw document.
 
-## Setters
+## Basic Getters and Setters
+
+Once you have a document in hand, you can set and get attributes on it.  
+
+The best way is with the get() and set() calls.  For example:
+
+    u = new User()
+    u.set('age', 25);
+    u.set('name.first', 'John');
+    u.set('name.last', 'Doe');
+    
+    u.get('age')  // 25
+    u.get('name.first')  // John
+
+You may be tempted to use dot noation. For example:
+    
+    u = new User();
+    u.age = 25;
+
+However you'll quickly find that it "doesn't always work". 
+
+Bad Situation #1:  If you use this object `u` in a ejs template 
+(for example express.js or railway.js) the attribute `age` is not visible in
+the template.
+
+Bad Situation #2: if you try to set some nested attribute.  For example:
+
+    u.name.first = "John"
+
+Mongoose doesn't magically create a name hash that will take any key on request. So you'll just throw an error.
+
+
+
+
+## Enhancing Setters
 
 Setters allow you to transform the mongoose document's data before it gets to the raw mongodb document and is set as a value on an actual key.
 
@@ -27,7 +61,7 @@ You can set up email lower case normalization easily via a Mongoose setter. Note
 
 As you can see above, setters allow you to transform the data before it gets to the raw mongodb document and is set as a value on an actual key.
 
-## Getters
+## Enhancing Getters
 
 Getters allow you to transform the representation of the data as it travels from the raw mongodb document to the value that you see.
 

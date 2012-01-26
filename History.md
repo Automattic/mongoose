@@ -5,7 +5,7 @@
   * added; doc.toJSON calls toJSON on embedded docs when exists [jerem]
   * added; populate support for refs of type Buffer (#686) [jerem]
   * added; $all support for ObjectIds and Dates (#690)
-  * fixed; virtual setter calling on instantiation when strict: true [hunterloftis] (#682)
+  * fixed; virtual setter calling on instantiation when strict: true (#682) [hunterloftis]
   * fixed; doc construction triggering getters (#685)
   * fixed; MongooseBuffer check in deepEquals (#688)
   * fixed; range error when using Number _ids with `instance.save()` (#691)

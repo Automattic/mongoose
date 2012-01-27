@@ -72,6 +72,9 @@ mongoose.model('BlogPost', BlogPost);
 
 var collection = 'blogposts_' + random();
 
+var strictSchema = new Schema({ name: String }, { strict: true });
+mongoose.model('UpdateStrictSchema', strictSchema);
+
 module.exports = {
 
   'test updating documents': function () {
@@ -433,7 +436,37 @@ module.exports = {
         })
       });
     }
+  },
 
+  // gh-699
+  'Model._castUpdate should honor strict schemas': function () {
+    var db = start();
+    var S = db.model('UpdateStrictSchema');
+    db.close();
+
+    var doc = S.find()._castUpdate({ ignore: true });
+    Object.keys(doc.$set).length.should.equal(0);
+  },
+
+  'Model.update should honor strict schemas': function () {
+    var db = start();
+    var S = db.model('UpdateStrictSchema');
+    var s = new S({ name: 'orange crush' });
+
+    s.save(function (err) {
+      should.strictEqual(null, err);
+
+      S.update({ _id: s._id }, { ignore: true }, function (err) {
+        should.strictEqual(null, err);
+
+        S.findById(s._id, function (err, doc) {
+          db.close();
+          should.strictEqual(null, err);
+          should.not.exist(doc.ignore);
+          should.not.exist(doc._doc.ignore);
+        });
+      });
+    });
   }
 
 }

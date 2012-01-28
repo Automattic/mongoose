@@ -146,27 +146,23 @@ module.exports = {
       A.findById(a._id, function (err, doc) {
         should.equal(null, err, 'error finding splice doc');
 
+        mongoose.set('debug', true);
+        doc.types.$pop();
         doc.types.splice(1, 1);
 
         var obj = doc.types.toObject();
         obj[0].type.should.eql('bird');
         obj[1].type.should.eql('frog');
-        obj[2].type.should.eql('cloud');
 
         doc.save(function (err) {
           should.equal(null, err, 'could not save splice test');
           A.findById(a._id, function (err, doc) {
+            db.close();
             should.equal(null, err, 'error finding splice doc');
 
             var obj = doc.types.toObject();
             obj[0].type.should.eql('bird');
             obj[1].type.should.eql('frog');
-            obj[2].type.should.eql('cloud');
-
-            A.collection.drop(function (err) {
-              db.close();
-              should.strictEqual(err, null);
-            });
           });
         });
       });
@@ -201,12 +197,14 @@ module.exports = {
         nlen.should.equal(4);
         slen.should.equal(4);
 
+        doc.types.push({type:'worm'});
         var obj = doc.types.toObject();
         obj[0].type.should.eql('tree');
         obj[1].type.should.eql('bird');
         obj[2].type.should.eql('boy');
         obj[3].type.should.eql('frog');
         obj[4].type.should.eql('cloud');
+        obj[5].type.should.eql('worm');
 
         obj = doc.nums.toObject();
         obj[0].valueOf().should.equal(0);
@@ -232,6 +230,7 @@ module.exports = {
             obj[2].type.should.eql('boy');
             obj[3].type.should.eql('frog');
             obj[4].type.should.eql('cloud');
+            obj[5].type.should.eql('worm');
 
             obj = doc.nums.toObject();
             obj[0].valueOf().should.equal(0);
@@ -284,9 +283,11 @@ module.exports = {
         obj[1].type.should.eql('frog');
         obj[2].type.should.eql('cloud');
 
+        doc.nums.$push(4);
         obj = doc.nums.toObject();
         obj[0].valueOf().should.equal(2);
         obj[1].valueOf().should.equal(3);
+        obj[2].valueOf().should.equal(4);
 
         obj = doc.strs.toObject();
         obj[0].should.equal('two');
@@ -306,6 +307,7 @@ module.exports = {
             obj = doc.nums.toObject();
             obj[0].valueOf().should.equal(2);
             obj[1].valueOf().should.equal(3);
+            obj[2].valueOf().should.equal(4);
 
             obj = doc.strs.toObject();
             obj[0].should.equal('two');

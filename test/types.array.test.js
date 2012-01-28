@@ -146,7 +146,6 @@ module.exports = {
       A.findById(a._id, function (err, doc) {
         should.equal(null, err, 'error finding splice doc');
 
-        mongoose.set('debug', true);
         doc.types.$pop();
         doc.types.splice(1, 1);
 
@@ -523,6 +522,42 @@ module.exports = {
                 m.doc.some(function(v){return v.name === 'Funk'}).should.be.ok
               });
             });
+          });
+        });
+      });
+    });
+  },
+
+  '#nonAtomicPush': function () {
+    var db = start();
+    var U = db.model('User');
+    var ID = mongoose.Types.ObjectId;
+
+    var u = new U({ name: 'banana', pets: [new ID] });
+    u.pets.length.should.equal(1);
+    u.pets.nonAtomicPush(new ID);
+    u.pets.length.should.equal(2);
+    u.save(function (err) {
+      should.strictEqual(null, err);
+      U.findById(u._id, function (err) {
+        should.strictEqual(null, err);
+        u.pets.length.should.equal(2);
+        var id0 = u.pets[0];
+        var id1 = u.pets[1];
+        var id2 = new ID;
+        u.pets.pull(id0);
+        u.pets.nonAtomicPush(id2);
+        u.pets.length.should.equal(2);
+        u.pets[0].toString().should.equal(id1.toString());
+        u.pets[1].toString().should.equal(id2.toString());
+        u.save(function (err) {
+          should.strictEqual(null, err);
+          U.findById(u._id, function (err) {
+            db.close();
+            should.strictEqual(null, err);
+            u.pets.length.should.equal(2);
+            u.pets[0].toString().should.equal(id1.toString());
+            u.pets[1].toString().should.equal(id2.toString());
           });
         });
       });

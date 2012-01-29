@@ -17,7 +17,6 @@ var start = require('./common')
   , DocumentObjectId = mongoose.Types.ObjectId
   , DocumentArray = mongoose.Types.DocumentArray
   , EmbeddedDocument = mongoose.Types.Embedded
-  , MongooseNumber = mongoose.Types.Number
   , MongooseArray = mongoose.Types.Array
   , MongooseError = mongoose.Error;
 
@@ -427,7 +426,7 @@ module.exports = {
     post.get('date').should.be.an.instanceof(Date);
     post.get('meta').should.be.a('object');
     post.get('meta').date.should.be.an.instanceof(Date);
-    post.get('meta').visitors.should.be.an.instanceof(MongooseNumber);
+    post.get('meta').visitors.should.be.a('number');
     post.get('published').should.be.true;
 
     post.title.should.eql('Test');
@@ -435,7 +434,7 @@ module.exports = {
     post.date.should.be.an.instanceof(Date);
     post.meta.should.be.a('object');
     post.meta.date.should.be.an.instanceof(Date);
-    post.meta.visitors.should.be.an.instanceof(MongooseNumber);
+    post.meta.visitors.should.be.a('number');
     post.published.should.be.true;
 
     post.get('owners').should.be.an.instanceof(MongooseArray);
@@ -1845,93 +1844,6 @@ module.exports = {
     });
   },
 
-  'test updating numbers atomically': function () {
-    var db = start()
-      , BlogPost = db.model('BlogPost', collection)
-      , totalDocs = 4
-      , saveQueue = [];
-
-    var post = new BlogPost();
-    post.set('meta.visitors', 5);
-
-    post.save(function(err){
-      if (err) throw err;
-
-      BlogPost.findOne({ _id: post.get('_id') }, function(err, doc){
-        if (err) throw err;
-        doc.get('meta.visitors').increment();
-        doc.get('meta.visitors').valueOf().should.be.equal(6);
-        save(doc);
-      });
-
-      BlogPost.findOne({ _id: post.get('_id') }, function(err, doc){
-        if (err) throw err;
-        doc.get('meta.visitors').increment();
-        doc.get('meta.visitors').valueOf().should.be.equal(6);
-        save(doc);
-      });
-
-      BlogPost.findOne({ _id: post.get('_id') }, function(err, doc){
-        if (err) throw err;
-        doc.get('meta.visitors').increment();
-        doc.get('meta.visitors').valueOf().should.be.equal(6);
-        save(doc);
-      });
-
-      BlogPost.findOne({ _id: post.get('_id') }, function(err, doc){
-        if (err) throw err;
-        doc.get('meta.visitors').increment();
-        doc.get('meta.visitors').valueOf().should.be.equal(6);
-        save(doc);
-      });
-
-      function save(doc) {
-        saveQueue.push(doc);
-        if (saveQueue.length == 4)
-          saveQueue.forEach(function (doc) {
-            doc.save(function (err) {
-              if (err) throw err;
-              --totalDocs || complete();
-            });
-          });
-      };
-
-      function complete () {
-        BlogPost.findOne({ _id: post.get('_id') }, function (err, doc) {
-          if (err) throw err;
-          doc.get('meta.visitors').valueOf().should.be.equal(9);
-          db.close();
-        });
-      };
-    });
-  },
-
-  'test incrementing a number atomically with an arbitrary value': function () {
-    var db = start()
-      , BlogPost = db.model('BlogPost');
-
-    var post = new BlogPost();
-
-    post.meta.visitors = 0;
-
-    post.save(function (err) {
-      should.strictEqual(err, null);
-
-      post.meta.visitors.increment(50);
-
-      post.save(function (err) {
-        should.strictEqual(err, null);
-
-        BlogPost.findById(post._id, function (err, doc) {
-          should.strictEqual(err, null);
-
-          (+doc.meta.visitors).should.eql(50);
-          db.close();
-        });
-      });
-    });
-  },
-
   // GH-203
   'test changing a number non-atomically': function () {
     var db = start()
@@ -1948,13 +1860,13 @@ module.exports = {
         should.strictEqual(err, null);
 
         doc.meta.visitors -= 2;
-        
+
         doc.save(function (err) {
           should.strictEqual(err, null);
 
           BlogPost.findById(post._id, function (err, doc) {
             should.strictEqual(err, null);
-  
+
             (+doc.meta.visitors).should.eql(3);
             db.close();
           });
@@ -2830,7 +2742,7 @@ module.exports = {
     db.close();
   },
 
-  'test that we instantiate MongooseNumber in arrays': function () {
+  'test that we instantiate Numbers in arrays': function () {
     var db = start()
       , BlogPost = db.model('BlogPost', collection);
 
@@ -3588,8 +3500,8 @@ module.exports = {
     post.get('meta').date.should.be.an.instanceof(Date);
 
     post.meta.visitors = 2;
-    post.get('meta').visitors.should.be.an.instanceof(MongooseNumber);
-    post.meta.visitors.should.be.an.instanceof(MongooseNumber);
+    post.get('meta').visitors.should.be.a('number');
+    post.meta.visitors.should.be.a('number');
 
     var newmeta = {
         date: date - 2000
@@ -3600,8 +3512,8 @@ module.exports = {
 
     post.meta.date.should.be.an.instanceof(Date);
     post.get('meta').date.should.be.an.instanceof(Date);
-    post.meta.visitors.should.be.an.instanceof(MongooseNumber);
-    post.get('meta').visitors.should.be.an.instanceof(MongooseNumber);
+    post.meta.visitors.should.be.a('number');
+    post.get('meta').visitors.should.be.a('number');
     (+post.meta.date).should.eql(date - 2000);
     (+post.get('meta').date).should.eql(date - 2000);
     (+post.meta.visitors).should.eql(234);
@@ -3615,8 +3527,8 @@ module.exports = {
 
     post.meta.date.should.be.an.instanceof(Date);
     post.get('meta').date.should.be.an.instanceof(Date);
-    post.meta.visitors.should.be.an.instanceof(MongooseNumber);
-    post.get('meta').visitors.should.be.an.instanceof(MongooseNumber);
+    post.meta.visitors.should.be.a('number');
+    post.get('meta').visitors.should.be.a('number');
     (+post.meta.date).should.eql(date - 3000);
     (+post.get('meta').date).should.eql(date - 3000);
     (+post.meta.visitors).should.eql(4815162342);

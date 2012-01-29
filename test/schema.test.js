@@ -15,7 +15,6 @@ var mongoose = require('./common').mongoose
   , SchemaTypes = Schema.Types
   , DocumentObjectId = mongoose.Types.ObjectId
   , Mixed = SchemaTypes.Mixed
-  , MongooseNumber = mongoose.Types.Number
   , MongooseArray = mongoose.Types.Array
   , vm = require('vm')
 
@@ -296,10 +295,10 @@ module.exports = {
     });
 
     // test String -> Number cast
-    Tobi.path('age').cast('0').should.be.an.instanceof(MongooseNumber);
+    Tobi.path('age').cast('0').should.be.a('number');
     (+Tobi.path('age').cast('0')).should.eql(0);
 
-    Tobi.path('age').cast(0).should.be.an.instanceof(MongooseNumber);
+    Tobi.path('age').cast(0).should.be.a('number');
     (+Tobi.path('age').cast(0)).should.eql(0);
   },
 

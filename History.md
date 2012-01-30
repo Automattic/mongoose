@@ -1,4 +1,11 @@
 
+2.5.2 / 2012-01-30
+===================
+
+  * fixed; rollback -native driver to 0.9.7-3-5 (was causing timeouts and other replica set weirdness)
+  * deprecated; MongooseNumber (will be moved to a separate repo for 3.x)
+  * added; init event is emitted on schemas
+
 2.5.1 / 2012-01-27
 ===================
 

@@ -149,6 +149,20 @@ module.exports = {
     n3.number.valueOf().should.equal(1234);
   },
 
+  'mongoose.model!init emits init event on schema': function () {
+    var db = start()
+      , schema = new Schema({ name: String })
+      , model
+
+    schema.on('init', function (model_) {
+      model = model_;
+    });
+
+    var Named = db.model('EmitInitOnSchema', schema);
+    db.close();
+    model.should.equal(Named);
+  },
+
   'collection name can be specified through schema': function () {
     var schema = new Schema({ name: String }, { collection: 'users1' });
     var Named = mongoose.model('CollectionNamedInSchema1', schema);

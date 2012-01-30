@@ -1,4 +1,30 @@
 
+2.5.2 / 2012-01-30
+===================
+
+  * fixed; rollback -native driver to 0.9.7-3-5 (was causing timeouts and other replica set weirdness)
+  * deprecated; MongooseNumber (will be moved to a separate repo for 3.x)
+  * added; init event is emitted on schemas
+
+2.5.1 / 2012-01-27
+===================
+
+  * fixed; honor strict schemas in Model.update (#699)
+
+2.5.0 / 2012-01-26
+===================
+
+  * added; doc.toJSON calls toJSON on embedded docs when exists [jerem]
+  * added; populate support for refs of type Buffer (#686) [jerem]
+  * added; $all support for ObjectIds and Dates (#690)
+  * fixed; virtual setter calling on instantiation when strict: true (#682) [hunterloftis]
+  * fixed; doc construction triggering getters (#685)
+  * fixed; MongooseBuffer check in deepEquals (#688)
+  * fixed; range error when using Number _ids with `instance.save()` (#691)
+  * fixed; isNew on embedded docs edge case (#680)
+  * updated; driver to 0.9.8-3
+  * updated; expose `model()` method within static methods
+
 2.4.10 / 2012-01-10
 ===================
 

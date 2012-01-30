@@ -213,6 +213,7 @@
 <ol>
 <li>safe</li>
 <li>strict</li>
+<li>shardkey</li>
 </ol>
 
 <h3>safe</h3>
@@ -252,6 +253,17 @@ thing.save() // iAmNotInTheSchema was saved to the db @#$%^!!
 var thing = new Thing(doc, true);  // enables strict mode
 var thing = new Thing(doc, false); // disables strict mode
 </code></pre>
+
+<h3>shardkey (new in v2.5.3)</h3>
+
+<p>The <code>shardkey</code> option is used when we have a <a href="http://www.mongodb.org/display/DOCS/Sharding+Introduction">sharded MongoDB architecture</a>. Each sharded collection is given a shard key which must be present in all insert/update operations. We just need to set this schema option to the same shard key and we’ll be all set.</p>
+
+<pre><code>new Schema({ .. }, { shardkey: { tag: 1, name: 1 }})
+</code></pre>
+
+<p>In this example, Mongoose will include the required <code>tag</code> and <code>name</code> in all <code>doc.save()</code> <code>where</code> clauses for us.</p>
+
+<p><em>Note that Mongoose does not send the <code>shardcollection</code> command for you. You must configure your shards yourself.</em></p>
         </div>
 
         <div id="footer">

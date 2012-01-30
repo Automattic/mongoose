@@ -327,11 +327,24 @@ Person.path('title').validate(function (v) {
 
 <h2>Instance Methods and Static methods</h2>
 
-<p>For details about defining your own custom static and instance methods read <a href="/docs/methods-statics.html">this</a>.</p>
+<p>For details about default instance methods and defining your own custom static and instance methods read <a href="/docs/methods-statics.html">this</a>.</p>
 
 <h2>Plugins</h2>
 
 <p>Schemas also support plugins. Read more about it on the <a href="/docs/plugins.html">Plugins</a> page.</p>
+
+<h2>Schema events</h2>
+
+<p>When a schema is passed to <code>mongoose.model()</code> the <code>init</code> event will be emitted on the schema, passing in the model. This is helpful for some plugins that need to hook directly into the model.</p>
+
+<pre><code>var schema = new Schema({ name: String });
+
+schema.on('init', function (model) {
+  // do stuff with the model
+});
+
+mongoose.model('MyModel', schema);
+</code></pre>
         </div>
 
         <div id="footer">

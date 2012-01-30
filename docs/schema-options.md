@@ -6,6 +6,7 @@ The schema constructor takes a second options argument. There are currently two 
 
 1. safe
 2. strict
+3. shardkey
 
 ### safe
 
@@ -39,3 +40,13 @@ This value can also be overridden at the model instance level by passing a secon
     var Thing = db.model('Thing');
     var thing = new Thing(doc, true);  // enables strict mode
     var thing = new Thing(doc, false); // disables strict mode
+
+### shardkey (new in v2.5.3)
+
+The `shardkey` option is used when we have a [sharded MongoDB architecture](http://www.mongodb.org/display/DOCS/Sharding+Introduction). Each sharded collection is given a shard key which must be present in all insert/update operations. We just need to set this schema option to the same shard key and we’ll be all set.
+
+    new Schema({ .. }, { shardkey: { tag: 1, name: 1 }})
+
+In this example, Mongoose will include the required `tag` and `name` in all `doc.save()` `where` clauses for us.
+
+_Note that Mongoose does not send the `shardcollection` command for you. You must configure your shards yourself._

@@ -1,4 +1,4 @@
-<html>
+<a href="https://github.com/learnboost/mongoose"><img alt="Fork me on GitHub" id="ribbon" src="http://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png"></a><html>
 	<head>
 		<title>Mongoose</title>
 		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
@@ -37,7 +37,6 @@ table#source td:first-child pre {
 table#source td:last-child {
     padding: 30px 0 30px 40px;
     border-left: 1px solid #E5E5EE;
-    background: #F5F5FF;
 }
 table#source tr {
     border-bottom: 1px solid #E5E5EE;
@@ -45,6 +44,9 @@ table#source tr {
 table#source tr.filename {
     padding-top: 40px;
     border-top: 1px solid #E5E5EE;
+}
+table#source tr.filename td {
+    background: #F5F5FF;
 }
 table#source tr.filename td:first-child {
     text-transform: capitalize;
@@ -82,6 +84,9 @@ table#source tr.code ul li p {
     margin: 0;
     padding: 0;
 }
+table#source tr.code td.docs {
+  padding-left: 75px;
+}
 table#source tr.code td:first-child pre {
     padding: 20px;
 }
@@ -95,14 +100,26 @@ code .regexp { color: #219161; }
 code .keyword { color: #954121; }
 code .number { color: #19469D; }
 code .comment { color: #bbb; }
-code .this { color: #19469D; }</style>
+code .this { color: #19469D; }
+</style>
 		<script>
 			$(function(){
-				$('tr.code').hide();
+        $('#source').on('dblclick', 'td', function (e) {
+          var td = $(this)
+            , tr = td.closest('tr')
+
+          if (tr.is('.filename')) {
+            tr.click();
+          } else if (tr.is('.code')) {
+
+            tr.prevAll('tr.filename:first').click();
+          }
+        });
+
 				$('tr.filename').toggle(function(){
-					$(this).nextUntil('.filename').fadeIn();
-				}, function(){
 					$(this).nextUntil('.filename').fadeOut();
+				}, function(){
+					$(this).nextUntil('.filename').fadeIn();
 				});
 			});
 		</script>
@@ -633,6 +650,7 @@ node-mongodb-native driver instance for detail.</p>
   , <span class="class">ValidatorError</span> = <span class="variable">require</span>(<span class="string">'./schematype'</span>).<span class="class">ValidatorError</span>
   , <span class="variable">utils</span> = <span class="variable">require</span>(<span class="string">'./utils'</span>)
   , <span class="variable">clone</span> = <span class="variable">utils</span>.<span class="variable">clone</span>
+  , <span class="variable">isMongooseObject</span> = <span class="variable">utils</span>.<span class="variable">isMongooseObject</span>
   , <span class="variable">inspect</span> = <span class="variable">require</span>(<span class="string">'util'</span>).<span class="variable">inspect</span>
   , <span class="class">StateMachine</span> = <span class="variable">require</span>(<span class="string">'./statemachine'</span>)
   , <span class="class">ActiveRoster</span> = <span class="class">StateMachine</span>.<span class="variable">ctor</span>(<span class="string">'require'</span>, <span class="string">'modify'</span>, <span class="string">'init'</span>)
@@ -715,41 +733,47 @@ doc.set({
 </td>
 <td class="code">
 <pre><code><span class="class">Document</span>.<span class="variable">prototype</span>.<span class="variable">set</span> = <span class="keyword">function</span> (<span class="variable">path</span>, <span class="variable">val</span>, <span class="variable">type</span>) {
-  <span class="keyword">var</span> <span class="variable">adhocs</span>;
-  <span class="keyword">if</span> (<span class="variable">type</span>) {
+  <span class="keyword">var</span> <span class="variable">constructing</span> = <span class="variable">true</span> === <span class="variable">type</span>
+    , <span class="variable">adhoc</span> = <span class="variable">type</span> &<span class="variable">amp</span>;&<span class="variable">amp</span>; <span class="variable">true</span> !== <span class="variable">type</span>
+    , <span class="variable">adhocs</span>
+
+  <span class="keyword">if</span> (<span class="variable">adhoc</span>) {
     <span class="variable">adhocs</span> = <span class="this">this</span>.<span class="variable">_adhocPaths</span> || (<span class="this">this</span>.<span class="variable">_adhocPaths</span> = {});
     <span class="variable">adhocs</span>[<span class="variable">path</span>] = <span class="class">Schema</span>.<span class="variable">interpretAsType</span>(<span class="variable">path</span>, <span class="variable">type</span>);
   }
 
   <span class="keyword">if</span> (<span class="string">'string'</span> !== <span class="keyword">typeof</span> <span class="variable">path</span>) {
+    <span class="comment">// new Document({ key: val })</span>
+
     <span class="keyword">if</span> (<span class="keyword">null</span> === <span class="variable">path</span> || <span class="variable">undefined</span> === <span class="variable">path</span>) {
       <span class="keyword">var</span> <span class="variable">_</span> = <span class="variable">path</span>;
       <span class="variable">path</span> = <span class="variable">val</span>;
       <span class="variable">val</span> = <span class="variable">_</span>;
+
     } <span class="keyword">else</span> {
       <span class="keyword">var</span> <span class="variable">prefix</span> = <span class="variable">val</span>
         ? <span class="variable">val</span> + <span class="string">'.'</span>
         : <span class="string">''</span>;
 
-      <span class="keyword">if</span> (<span class="variable">path</span> <span class="variable">instanceof</span> <span class="class">Document</span>) {
-        <span class="variable">path</span> = <span class="variable">path</span>.<span class="variable">_doc</span>;
-      }
+      <span class="keyword">if</span> (<span class="variable">path</span> <span class="variable">instanceof</span> <span class="class">Document</span>) <span class="variable">path</span> = <span class="variable">path</span>.<span class="variable">_doc</span>;
 
-      <span class="keyword">var</span> <span class="variable">keys</span> = <span class="class">Object</span>.<span class="variable">keys</span>(<span class="variable">path</span>);
-      <span class="keyword">var</span> <span class="variable">i</span> = <span class="variable">keys</span>.<span class="variable">length</span>;
-      <span class="keyword">var</span> <span class="variable">key</span>;
+      <span class="keyword">var</span> <span class="variable">keys</span> = <span class="class">Object</span>.<span class="variable">keys</span>(<span class="variable">path</span>)
+        , <span class="variable">i</span> = <span class="variable">keys</span>.<span class="variable">length</span>
+        , <span class="variable">pathtype</span>
+        , <span class="variable">key</span>
 
       <span class="keyword">while</span> (<span class="variable">i</span>--) {
         <span class="variable">key</span> = <span class="variable">keys</span>[<span class="variable">i</span>];
         <span class="keyword">if</span> (<span class="keyword">null</span> != <span class="variable">path</span>[<span class="variable">key</span>] &<span class="variable">amp</span>;&<span class="variable">amp</span>; <span class="string">'Object'</span> === <span class="variable">path</span>[<span class="variable">key</span>].<span class="variable">constructor</span>.<span class="variable">name</span>
           &<span class="variable">amp</span>;&<span class="variable">amp</span>; !(<span class="this">this</span>.<span class="variable">_path</span>(<span class="variable">prefix</span> + <span class="variable">key</span>) <span class="variable">instanceof</span> <span class="class">MixedSchema</span>)) {
-          <span class="this">this</span>.<span class="variable">set</span>(<span class="variable">path</span>[<span class="variable">key</span>], <span class="variable">prefix</span> + <span class="variable">key</span>);
+          <span class="this">this</span>.<span class="variable">set</span>(<span class="variable">path</span>[<span class="variable">key</span>], <span class="variable">prefix</span> + <span class="variable">key</span>, <span class="variable">constructing</span>);
         } <span class="keyword">else</span> <span class="keyword">if</span> (<span class="this">this</span>.<span class="variable">_strictMode</span>) {
-          <span class="keyword">if</span> (<span class="this">this</span>.<span class="variable">_path</span>(<span class="variable">prefix</span> + <span class="variable">key</span>) !== <span class="variable">undefined</span>) {
-            <span class="this">this</span>.<span class="variable">set</span>(<span class="variable">prefix</span> + <span class="variable">key</span>, <span class="variable">path</span>[<span class="variable">key</span>]);
+          <span class="variable">pathtype</span> = <span class="this">this</span>.<span class="variable">schema</span>.<span class="variable">pathType</span>(<span class="variable">prefix</span> + <span class="variable">key</span>);
+          <span class="keyword">if</span> (<span class="string">'real'</span> === <span class="variable">pathtype</span> || <span class="string">'virtual'</span> === <span class="variable">pathtype</span>) {
+            <span class="this">this</span>.<span class="variable">set</span>(<span class="variable">prefix</span> + <span class="variable">key</span>, <span class="variable">path</span>[<span class="variable">key</span>], <span class="variable">constructing</span>);
           }
         } <span class="keyword">else</span> <span class="keyword">if</span> (<span class="variable">undefined</span> !== <span class="variable">path</span>[<span class="variable">key</span>]) {
-          <span class="this">this</span>.<span class="variable">set</span>(<span class="variable">prefix</span> + <span class="variable">key</span>, <span class="variable">path</span>[<span class="variable">key</span>]);
+          <span class="this">this</span>.<span class="variable">set</span>(<span class="variable">prefix</span> + <span class="variable">key</span>, <span class="variable">path</span>[<span class="variable">key</span>], <span class="variable">constructing</span>);
         }
       }
 
@@ -757,22 +781,24 @@ doc.set({
     }
   }
 
-  <span class="keyword">var</span> <span class="variable">schema</span> = <span class="this">this</span>.<span class="variable">_path</span>(<span class="variable">path</span>)
-    , <span class="variable">parts</span> = <span class="variable">path</span>.<span class="variable">split</span>(<span class="string">'.'</span>)
-    , <span class="variable">obj</span> = <span class="this">this</span>.<span class="variable">_doc</span>
-    , <span class="variable">self</span> = <span class="this">this</span>;
-
-  <span class="keyword">if</span> (<span class="this">this</span>.<span class="variable">schema</span>.<span class="variable">pathType</span>(<span class="variable">path</span>) === <span class="string">'virtual'</span>) {
+  <span class="keyword">var</span> <span class="variable">schema</span>;
+  <span class="keyword">if</span> (<span class="string">'virtual'</span> === <span class="this">this</span>.<span class="variable">schema</span>.<span class="variable">pathType</span>(<span class="variable">path</span>)) {
     <span class="variable">schema</span> = <span class="this">this</span>.<span class="variable">schema</span>.<span class="variable">virtualpath</span>(<span class="variable">path</span>);
     <span class="variable">schema</span>.<span class="variable">applySetters</span>(<span class="variable">val</span>, <span class="this">this</span>);
     <span class="keyword">return</span> <span class="this">this</span>;
+  } <span class="keyword">else</span> {
+    <span class="variable">schema</span> = <span class="this">this</span>.<span class="variable">_path</span>(<span class="variable">path</span>);
   }
+
+  <span class="keyword">var</span> <span class="variable">parts</span> = <span class="variable">path</span>.<span class="variable">split</span>(<span class="string">'.'</span>)
+    , <span class="variable">obj</span> = <span class="this">this</span>.<span class="variable">_doc</span>
+    , <span class="variable">self</span> = <span class="this">this</span>
+    , <span class="variable">pathToMark</span>
+    , <span class="variable">subpaths</span>
+    , <span class="variable">subpath</span>
 
   <span class="comment">// When using the $set operator the path to the field must already exist.</span>
   <span class="comment">// Else mongodb throws: &quot;LEFT_SUBFIELD only supports Object&quot;</span>
-  <span class="keyword">var</span> <span class="variable">pathToMark</span>
-    , <span class="variable">subpaths</span>
-    , <span class="variable">subpath</span>;
 
   <span class="keyword">if</span> (<span class="variable">parts</span>.<span class="variable">length</span> &<span class="variable">lt</span>;= <span class="number integer">1</span>) {
     <span class="variable">pathToMark</span> = <span class="variable">path</span>;
@@ -796,7 +822,10 @@ doc.set({
 
   <span class="keyword">if</span> ((!<span class="variable">schema</span> || <span class="keyword">null</span> === <span class="variable">val</span> || <span class="variable">undefined</span> === <span class="variable">val</span>) ||
     <span class="this">this</span>.<span class="keyword">try</span>(<span class="keyword">function</span>(){
-      <span class="keyword">var</span> <span class="variable">casted</span> = <span class="variable">schema</span>.<span class="variable">cast</span>(<span class="variable">val</span>, <span class="variable">self</span>, <span class="variable">false</span>, <span class="variable">self</span>.<span class="variable">get</span>(<span class="variable">path</span>));
+      <span class="comment">// if this doc is being constructed we should not</span>
+      <span class="comment">// trigger getters.</span>
+      <span class="keyword">var</span> <span class="variable">cur</span> = <span class="variable">constructing</span> ? <span class="variable">undefined</span> : <span class="variable">self</span>.<span class="variable">get</span>(<span class="variable">path</span>);
+      <span class="keyword">var</span> <span class="variable">casted</span> = <span class="variable">schema</span>.<span class="variable">cast</span>(<span class="variable">val</span>, <span class="variable">self</span>, <span class="variable">false</span>, <span class="variable">cur</span>);
       <span class="variable">val</span> = <span class="variable">schema</span>.<span class="variable">applySetters</span>(<span class="variable">casted</span>, <span class="variable">self</span>);
     })) {
 
@@ -989,6 +1018,59 @@ the path is only part of a larger path that was directly set.</p>
 </tr>
 <tr class="code">
 <td class="docs">
+<p>Checks if a path was selected.
+## </p>
+
+<ul><li><p><strong>param</strong>: <em>String</em>  path</p></li><li><p><strong>return</strong>: <em>Boolean</em></p></li></ul>
+</td>
+<td class="code">
+<pre><code><span class="class">Document</span>.<span class="variable">prototype</span>.<span class="variable">isSelected</span> = <span class="keyword">function</span> <span class="variable">isSelected</span> (<span class="variable">path</span>) {
+  <span class="keyword">if</span> (<span class="this">this</span>.<span class="variable">_selected</span>) {
+
+    <span class="keyword">if</span> (<span class="string">'_id'</span> === <span class="variable">path</span>) {
+      <span class="keyword">return</span> <span class="number integer">0</span> !== <span class="this">this</span>.<span class="variable">_selected</span>.<span class="variable">_id</span>;
+    }
+
+    <span class="keyword">var</span> <span class="variable">paths</span> = <span class="class">Object</span>.<span class="variable">keys</span>(<span class="this">this</span>.<span class="variable">_selected</span>)
+      , <span class="variable">i</span> = <span class="variable">paths</span>.<span class="variable">length</span>
+      , <span class="variable">inclusive</span> = <span class="variable">false</span>
+      , <span class="variable">cur</span>
+
+    <span class="keyword">while</span> (<span class="variable">i</span>--) {
+      <span class="variable">cur</span> = <span class="variable">paths</span>[<span class="variable">i</span>];
+      <span class="keyword">if</span> (<span class="string">'_id'</span> == <span class="variable">cur</span>) <span class="keyword">continue</span>;
+      <span class="variable">inclusive</span> = !! <span class="this">this</span>.<span class="variable">_selected</span>[<span class="variable">cur</span>];
+      <span class="keyword">break</span>;
+    }
+
+    <span class="keyword">if</span> (<span class="variable">path</span> <span class="keyword">in</span> <span class="this">this</span>.<span class="variable">_selected</span>) {
+      <span class="keyword">return</span> <span class="variable">inclusive</span>;
+    }
+
+    <span class="variable">i</span> = <span class="variable">paths</span>.<span class="variable">length</span>;
+
+    <span class="keyword">while</span> (<span class="variable">i</span>--) {
+      <span class="variable">cur</span> = <span class="variable">paths</span>[<span class="variable">i</span>];
+      <span class="keyword">if</span> (<span class="string">'_id'</span> == <span class="variable">cur</span>) <span class="keyword">continue</span>;
+
+      <span class="keyword">if</span> (<span class="number integer">0</span> === <span class="variable">cur</span>.<span class="variable">indexOf</span>(<span class="variable">path</span> + <span class="string">'.'</span>)) {
+        <span class="keyword">return</span> <span class="variable">inclusive</span>;
+      }
+
+      <span class="keyword">if</span> (<span class="number integer">0</span> === (<span class="variable">path</span> + <span class="string">'.'</span>).<span class="variable">indexOf</span>(<span class="variable">cur</span>)) {
+        <span class="keyword">return</span> <span class="variable">inclusive</span>;
+      }
+    }
+
+    <span class="keyword">return</span> ! <span class="variable">inclusive</span>;
+  }
+
+  <span class="keyword">return</span> <span class="variable">true</span>;
+}</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
 <p>Validation middleware</p>
 
 <h2></h2>
@@ -1125,6 +1207,8 @@ to JSON.stringify()</p>
 </td>
 <td class="code">
 <pre><code><span class="class">Document</span>.<span class="variable">prototype</span>.<span class="variable">toJSON</span> = <span class="keyword">function</span> (<span class="variable">options</span>) {
+  <span class="keyword">if</span> (<span class="string">'undefined'</span> === <span class="keyword">typeof</span> <span class="variable">options</span>) <span class="variable">options</span> = {};
+  <span class="variable">options</span>.<span class="variable">json</span> = <span class="variable">true</span>;
   <span class="keyword">return</span> <span class="this">this</span>.<span class="variable">toObject</span>(<span class="variable">options</span>);
 };</code></pre>
 </td>
@@ -1913,10 +1997,13 @@ default mongoose connection;</p>
     <span class="this">this</span>.<span class="variable">_reset</span>();
 
     <span class="keyword">if</span> (<span class="variable">delta</span>) {
-      <span class="this">this</span>.<span class="variable">collection</span>.<span class="variable">update</span>({ <span class="variable">_id</span>: <span class="this">this</span>.<span class="variable">_doc</span>.<span class="variable">_id</span> }, <span class="variable">delta</span>, <span class="variable">options</span>, <span class="variable">complete</span>);
+      <span class="keyword">var</span> <span class="variable">where</span> = <span class="this">this</span>.<span class="variable">_where</span>();
+      <span class="this">this</span>.<span class="variable">collection</span>.<span class="variable">update</span>(<span class="variable">where</span>, <span class="variable">delta</span>, <span class="variable">options</span>, <span class="variable">complete</span>);
     } <span class="keyword">else</span> {
       <span class="variable">complete</span>(<span class="keyword">null</span>);
     }
+
+    <span class="this">this</span>.<span class="variable">emit</span>(<span class="string">'isNew'</span>, <span class="variable">false</span>);
   }
 };</code></pre>
 </td>
@@ -2009,7 +2096,7 @@ default mongoose connection;</p>
  </p>
 </td>
 <td class="code">
-<pre><code>[<span class="string">'db'</span>, <span class="string">'collection'</span>, <span class="string">'schema'</span>, <span class="string">'options'</span>].<span class="variable">forEach</span>(<span class="keyword">function</span>(<span class="variable">prop</span>){
+<pre><code>[<span class="string">'db'</span>, <span class="string">'collection'</span>, <span class="string">'schema'</span>, <span class="string">'options'</span>, <span class="string">'model'</span>].<span class="variable">forEach</span>(<span class="keyword">function</span>(<span class="variable">prop</span>){
   <span class="class">Model</span>.<span class="variable">__defineGetter__</span>(<span class="variable">prop</span>, <span class="keyword">function</span>(){
     <span class="keyword">return</span> <span class="this">this</span>.<span class="variable">prototype</span>[<span class="variable">prop</span>];
   });
@@ -2802,7 +2889,30 @@ Moreover, you can also chain a bunch of these together like:
   }
   <span class="this">this</span>.<span class="variable">_currPath</span> = <span class="variable">path</span>;
   <span class="keyword">return</span> <span class="this">this</span>;
-};
+};</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Sugar.</p>
+
+<pre><code>User.where('age').equals(49);</code></pre>
+
+<p>Same as</p>
+
+<pre><code>User.where('age', 49);</code></pre>
+
+<h2></h2>
+
+<ul><li><p><strong>param</strong>: <em>object</em>  val</p></li><li><p><strong>return</strong>: <em>Query</em> </p></li><li><p><strong>api</strong>: <em>public</em></p></li></ul>
+</td>
+<td class="code">
+<pre><code><span class="class">Query</span>.<span class="variable">prototype</span>.<span class="variable">equals</span> = <span class="keyword">function</span> <span class="variable">equals</span> (<span class="variable">val</span>) {
+  <span class="keyword">var</span> <span class="variable">path</span> = <span class="this">this</span>.<span class="variable">_currPath</span>;
+  <span class="keyword">if</span> (!<span class="variable">path</span>) <span class="keyword">throw</span> <span class="keyword">new</span> <span class="class">Error</span>(<span class="string">'equals() must be used after where()'</span>);
+  <span class="this">this</span>.<span class="variable">_conditions</span>[<span class="variable">path</span>] = <span class="variable">val</span>;
+  <span class="keyword">return</span> <span class="this">this</span>;
+}
 
 <span class="class">Query</span>.<span class="variable">prototype</span>.<span class="variable">or</span> =
 <span class="class">Query</span>.<span class="variable">prototype</span>.$<span class="variable">or</span> = <span class="keyword">function</span> $<span class="variable">or</span> (<span class="variable">array</span>) {
@@ -4242,12 +4352,11 @@ Gets a path (if arity 1)</p>
     , <span class="variable">branch</span> = <span class="this">this</span>.<span class="variable">tree</span>;
 
   <span class="variable">subpaths</span>.<span class="variable">forEach</span>(<span class="keyword">function</span>(<span class="variable">path</span>) {
-    <span class="keyword">if</span> (!<span class="variable">branch</span>[<span class="variable">path</span>])
-      <span class="variable">branch</span>[<span class="variable">path</span>] = {};
+    <span class="keyword">if</span> (!<span class="variable">branch</span>[<span class="variable">path</span>]) <span class="variable">branch</span>[<span class="variable">path</span>] = {};
     <span class="variable">branch</span> = <span class="variable">branch</span>[<span class="variable">path</span>];
   });
 
-  <span class="variable">branch</span>[<span class="variable">last</span>] = <span class="variable">obj</span>;
+  <span class="variable">branch</span>[<span class="variable">last</span>] = <span class="variable">utils</span>.<span class="variable">clone</span>(<span class="variable">obj</span>);
 
   <span class="this">this</span>.<span class="variable">paths</span>[<span class="variable">path</span>] = <span class="class">Schema</span>.<span class="variable">interpretAsType</span>(<span class="variable">path</span>, <span class="variable">obj</span>);
   <span class="keyword">return</span> <span class="this">this</span>;
@@ -5492,17 +5601,14 @@ operations</p>
 <ul><li><p><strong>param</strong>: <em>Object</em>  value</p></li><li><p><strong>api</strong>: <em>public</em></p></li></ul>
 </td>
 <td class="code">
-<pre><code><span class="keyword">var</span> <span class="variable">oldPush</span> = <span class="class">Array</span>.<span class="variable">prototype</span>.<span class="variable">push</span>;
-
-<span class="class">MongooseArray</span>.<span class="variable">prototype</span>.$<span class="variable">push</span> =
+<pre><code><span class="class">MongooseArray</span>.<span class="variable">prototype</span>.$<span class="variable">push</span> =
 <span class="class">MongooseArray</span>.<span class="variable">prototype</span>.<span class="variable">push</span> = <span class="keyword">function</span> () {
-  <span class="keyword">var</span> <span class="variable">values</span> = <span class="class">Array</span>.<span class="variable">prototype</span>.<span class="variable">map</span>.<span class="variable">call</span>(<span class="variable">arguments</span>, <span class="this">this</span>.<span class="variable">_cast</span>, <span class="this">this</span>)
-    , <span class="variable">ret</span> = <span class="variable">oldPush</span>.<span class="variable">apply</span>(<span class="this">this</span>, <span class="variable">values</span>);
+  <span class="keyword">var</span> <span class="variable">values</span> = [].<span class="variable">map</span>.<span class="variable">call</span>(<span class="variable">arguments</span>, <span class="this">this</span>.<span class="variable">_cast</span>, <span class="this">this</span>)
+    , <span class="variable">ret</span> = [].<span class="variable">push</span>.<span class="variable">apply</span>(<span class="this">this</span>, <span class="variable">values</span>);
 
   <span class="comment">// $pushAll might be fibbed (could be $push). But it makes it easier to</span>
   <span class="comment">// handle what could have been $push, $pushAll combos</span>
   <span class="this">this</span>.<span class="variable">_registerAtomic</span>(<span class="string">'$pushAll'</span>, <span class="variable">values</span>);
-
   <span class="keyword">return</span> <span class="variable">ret</span>;
 };</code></pre>
 </td>
@@ -5517,11 +5623,9 @@ operations</p>
 </td>
 <td class="code">
 <pre><code><span class="class">MongooseArray</span>.<span class="variable">prototype</span>.<span class="variable">nonAtomicPush</span> = <span class="keyword">function</span> () {
-  <span class="keyword">var</span> <span class="variable">values</span> = <span class="class">Array</span>.<span class="variable">prototype</span>.<span class="variable">map</span>.<span class="variable">call</span>(<span class="variable">arguments</span>, <span class="this">this</span>.<span class="variable">_cast</span>, <span class="this">this</span>)
-    , <span class="variable">ret</span> = <span class="variable">oldPush</span>.<span class="variable">apply</span>(<span class="this">this</span>, <span class="variable">values</span>);
-
+  <span class="keyword">var</span> <span class="variable">values</span> = [].<span class="variable">map</span>.<span class="variable">call</span>(<span class="variable">arguments</span>, <span class="this">this</span>.<span class="variable">_cast</span>, <span class="this">this</span>)
+    , <span class="variable">ret</span> = [].<span class="variable">push</span>.<span class="variable">apply</span>(<span class="this">this</span>, <span class="variable">values</span>);
   <span class="this">this</span>.<span class="variable">_markModified</span>();
-
   <span class="keyword">return</span> <span class="variable">ret</span>;
 };</code></pre>
 </td>
@@ -5559,7 +5663,11 @@ operations</p>
 </tr>
 <tr class="code">
 <td class="docs">
-<p>Shifts the array</p>
+<p>Atomically shifts the array.</p>
+
+<p>Only works once per doc.save(). Calling this mulitple
+times on an array before saving is the same as calling
+it once.</p>
 
 <ul><li><p><strong>api</strong>: <em>public</em></p></li></ul>
 </td>
@@ -5585,7 +5693,7 @@ doc.array.remove('tag 1', 'tag 2')</code></pre>
 </td>
 <td class="code">
 <pre><code><span class="class">MongooseArray</span>.<span class="variable">prototype</span>.<span class="variable">remove</span> = <span class="keyword">function</span> () {
-  <span class="keyword">var</span> <span class="variable">args</span> = <span class="class">Array</span>.<span class="variable">prototype</span>.<span class="variable">map</span>.<span class="variable">call</span>(<span class="variable">arguments</span>, <span class="this">this</span>.<span class="variable">_cast</span>, <span class="this">this</span>);
+  <span class="keyword">var</span> <span class="variable">args</span> = [].<span class="variable">map</span>.<span class="variable">call</span>(<span class="variable">arguments</span>, <span class="this">this</span>.<span class="variable">_cast</span>, <span class="this">this</span>);
   <span class="keyword">if</span> (<span class="variable">args</span>.<span class="variable">length</span> == <span class="number integer">1</span>)
     <span class="this">this</span>.$<span class="variable">pull</span>(<span class="variable">args</span>[<span class="number integer">0</span>]);
   <span class="keyword">else</span>
@@ -5603,7 +5711,7 @@ doc.array.remove('tag 1', 'tag 2')</code></pre>
 <td class="code">
 <pre><code><span class="class">MongooseArray</span>.<span class="variable">prototype</span>.<span class="variable">pull</span> =
 <span class="class">MongooseArray</span>.<span class="variable">prototype</span>.$<span class="variable">pull</span> = <span class="keyword">function</span> () {
-  <span class="keyword">var</span> <span class="variable">values</span> = <span class="class">Array</span>.<span class="variable">prototype</span>.<span class="variable">map</span>.<span class="variable">call</span>(<span class="variable">arguments</span>, <span class="this">this</span>.<span class="variable">_cast</span>, <span class="this">this</span>)
+  <span class="keyword">var</span> <span class="variable">values</span> = [].<span class="variable">map</span>.<span class="variable">call</span>(<span class="variable">arguments</span>, <span class="this">this</span>.<span class="variable">_cast</span>, <span class="this">this</span>)
     , <span class="variable">oldArr</span> = <span class="this">this</span>.<span class="variable">_parent</span>.<span class="variable">get</span>(<span class="this">this</span>.<span class="variable">_path</span>)
     , <span class="variable">i</span> = <span class="variable">oldArr</span>.<span class="variable">length</span>
     , <span class="variable">mem</span>;
@@ -5672,9 +5780,8 @@ it.</p>
 <ul><li><p><strong>api</strong>: <em>public</em></p></li></ul>
 </td>
 <td class="code">
-<pre><code><span class="keyword">var</span> <span class="variable">oldSplice</span> = <span class="class">Array</span>.<span class="variable">prototype</span>.<span class="variable">splice</span>;
-<span class="class">MongooseArray</span>.<span class="variable">prototype</span>.<span class="variable">splice</span> = <span class="keyword">function</span> () {
-  <span class="variable">oldSplice</span>.<span class="variable">apply</span>(<span class="this">this</span>, <span class="variable">arguments</span>);
+<pre><code><span class="class">MongooseArray</span>.<span class="variable">prototype</span>.<span class="variable">splice</span> = <span class="keyword">function</span> () {
+  [].<span class="variable">splice</span>.<span class="variable">apply</span>(<span class="this">this</span>, <span class="variable">arguments</span>);
   <span class="this">this</span>.<span class="variable">_markModified</span>();
   <span class="keyword">return</span> <span class="this">this</span>;
 };</code></pre>
@@ -5682,7 +5789,7 @@ it.</p>
 </tr>
 <tr class="code">
 <td class="docs">
-<p>Unshifts onto the array.</p>
+<p>Non-atomically unshifts onto the array.</p>
 
 <h2>Note marks the _entire_ array as modified which</h2>
 
@@ -5694,10 +5801,9 @@ it.</p>
 <ul><li><p><strong>api</strong>: <em>public</em></p></li></ul>
 </td>
 <td class="code">
-<pre><code><span class="keyword">var</span> <span class="variable">oldUnshift</span> = <span class="class">Array</span>.<span class="variable">prototype</span>.<span class="variable">unshift</span>;
-<span class="class">MongooseArray</span>.<span class="variable">prototype</span>.<span class="variable">unshift</span> = <span class="keyword">function</span> () {
-  <span class="keyword">var</span> <span class="variable">values</span> = <span class="class">Array</span>.<span class="variable">prototype</span>.<span class="variable">map</span>.<span class="variable">call</span>(<span class="variable">arguments</span>, <span class="this">this</span>.<span class="variable">_cast</span>, <span class="this">this</span>);
-  <span class="variable">oldUnshift</span>.<span class="variable">apply</span>(<span class="this">this</span>, <span class="variable">values</span>);
+<pre><code><span class="class">MongooseArray</span>.<span class="variable">prototype</span>.<span class="variable">unshift</span> = <span class="keyword">function</span> () {
+  <span class="keyword">var</span> <span class="variable">values</span> = [].<span class="variable">map</span>.<span class="variable">call</span>(<span class="variable">arguments</span>, <span class="this">this</span>.<span class="variable">_cast</span>, <span class="this">this</span>);
+  [].<span class="variable">unshift</span>.<span class="variable">apply</span>(<span class="this">this</span>, <span class="variable">values</span>);
   <span class="this">this</span>.<span class="variable">_markModified</span>();
   <span class="keyword">return</span> <span class="this">this</span>.<span class="variable">length</span>;
 };</code></pre>
@@ -5713,7 +5819,7 @@ it.</p>
 <td class="code">
 <pre><code><span class="class">MongooseArray</span>.<span class="variable">prototype</span>.$<span class="variable">addToSet</span> =
 <span class="class">MongooseArray</span>.<span class="variable">prototype</span>.<span class="variable">addToSet</span> = <span class="keyword">function</span> <span class="variable">addToSet</span> () {
-  <span class="keyword">var</span> <span class="variable">values</span> = <span class="class">Array</span>.<span class="variable">prototype</span>.<span class="variable">map</span>.<span class="variable">call</span>(<span class="variable">arguments</span>, <span class="this">this</span>.<span class="variable">_cast</span>, <span class="this">this</span>)
+  <span class="keyword">var</span> <span class="variable">values</span> = [].<span class="variable">map</span>.<span class="variable">call</span>(<span class="variable">arguments</span>, <span class="this">this</span>.<span class="variable">_cast</span>, <span class="this">this</span>)
     , <span class="variable">added</span> = []
     , <span class="variable">type</span> = <span class="variable">values</span>[<span class="number integer">0</span>] <span class="variable">instanceof</span> <span class="class">EmbeddedDocument</span> ? <span class="string">'doc'</span> :
              <span class="variable">values</span>[<span class="number integer">0</span>] <span class="variable">instanceof</span> <span class="class">Date</span> ? <span class="string">'date'</span> :
@@ -5734,9 +5840,9 @@ it.</p>
     }
 
     <span class="keyword">if</span> (!<span class="variable">found</span>) {
-      <span class="variable">oldPush</span>.<span class="variable">call</span>(<span class="this">this</span>, <span class="variable">v</span>);
+      [].<span class="variable">push</span>.<span class="variable">call</span>(<span class="this">this</span>, <span class="variable">v</span>);
       <span class="this">this</span>.<span class="variable">_registerAtomic</span>(<span class="string">'$addToSet'</span>, <span class="variable">v</span>);
-      <span class="variable">oldPush</span>.<span class="variable">call</span>(<span class="variable">added</span>, <span class="variable">v</span>);
+      [].<span class="variable">push</span>.<span class="variable">call</span>(<span class="variable">added</span>, <span class="variable">v</span>);
     }
   }, <span class="this">this</span>);
 
@@ -5934,6 +6040,15 @@ it.</p>
   <span class="comment">// Handle MongooseNumbers</span>
   <span class="keyword">if</span> (<span class="variable">a</span> <span class="variable">instanceof</span> <span class="class">Number</span> &<span class="variable">amp</span>;&<span class="variable">amp</span>; <span class="variable">b</span> <span class="variable">instanceof</span> <span class="class">Number</span>) {
     <span class="keyword">return</span> <span class="variable">a</span>.<span class="variable">valueOf</span>() === <span class="variable">b</span>.<span class="variable">valueOf</span>();
+  }
+
+  <span class="keyword">if</span> (<span class="class">Buffer</span>.<span class="variable">isBuffer</span>(<span class="variable">a</span>)) {
+    <span class="keyword">if</span> (!<span class="class">Buffer</span>.<span class="variable">isBuffer</span>(<span class="variable">b</span>)) <span class="keyword">return</span> <span class="variable">false</span>;
+    <span class="keyword">if</span> (<span class="variable">a</span>.<span class="variable">length</span> !== <span class="variable">b</span>.<span class="variable">length</span>) <span class="keyword">return</span> <span class="variable">false</span>;
+    <span class="keyword">for</span> (<span class="keyword">var</span> <span class="variable">i</span> = <span class="number integer">0</span>, <span class="variable">len</span> = <span class="variable">a</span>.<span class="variable">length</span>; <span class="variable">i</span> &<span class="variable">lt</span>; <span class="variable">len</span>; ++<span class="variable">i</span>) {
+      <span class="keyword">if</span> (<span class="variable">a</span>[<span class="variable">i</span>] !== <span class="variable">b</span>[<span class="variable">i</span>]) <span class="keyword">return</span> <span class="variable">false</span>;
+    }
+    <span class="keyword">return</span> <span class="variable">true</span>;
   }
 
   <span class="keyword">if</span> (<span class="variable">isMongooseObject</span>(<span class="variable">a</span>)) <span class="variable">a</span> = <span class="variable">a</span>.<span class="variable">toObject</span>();

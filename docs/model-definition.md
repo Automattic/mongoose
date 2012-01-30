@@ -111,7 +111,7 @@ For schema options [read this](/docs/schema-options.html).
 
 ## Instance Methods and Static methods
 
-For details about defining your own custom static and instance methods read [this](/docs/methods-statics.html).
+For details about default instance methods and defining your own custom static and instance methods read [this](/docs/methods-statics.html).
 
 ## Plugins
 

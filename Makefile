@@ -19,6 +19,8 @@ docs/api.html: lib/*.js
 	dox \
 		--title Mongoose \
 		--desc "Expressive MongoDB for Node.JS" \
+		--ribbon "https://github.com/learnboost/mongoose" \
+		--style mongoose \
 		$(shell find lib/* -type f) > $@
 
 docclean:

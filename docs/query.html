@@ -263,6 +263,17 @@
 <pre><code>query.nor([{ color: 'daffodil yellow' }, { color: 'atomic tangerine' }]);
 </code></pre>
 
+<h2>Query#equals</h2>
+
+<p>Assigns <code>val</code> to the last path used in <code>where()</code>.</p>
+
+<pre><code>query.where(path).equals(val)
+
+// same as
+
+query.where(path, val);
+</code></pre>
+
 <h2>Query#gt, Query#$gt</h2>
 
 <p>Specifies a <a href="http://www.mongodb.org/display/DOCS/Advanced+Queries#AdvancedQueries-%3C%2C%3C%3D%2C%3E%2C%3E%3D">greater than</a> expression.</p>

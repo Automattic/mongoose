@@ -208,19 +208,19 @@
         <div id="content">
           <h1>Validation in models</h1>
 
-<p>Before we get into the specifics of validation syntax, please keep the<br />following rules in mind:</p>
+<p>Before we get into the specifics of validation syntax, please keep the following rules in mind:</p>
 
 <ul>
 <li><p>Validation is defined in the <code>Schema</code></p></li>
-<li><p>Validation occurs when a document attempts to be saved, after defaults have<br />been applied.</p></li>
-<li><p>Mongoose doesn't care about complex error message construction. Errors have<br />type identifiers. For example, <code>"min"</code> is the identifier for the error<br />triggered when a number doesn't meet the minimum value. The path and value<br />that triggered the error can be accessed in the <code>ValidationError</code> object.</p></li>
+<li><p>Validation occurs when a document attempts to be saved, after defaults have been applied.</p></li>
+<li><p>Mongoose doesn't care about complex error message construction. Errors have type identifiers. For example, <code>"min"</code> is the identifier for the error triggered when a number doesn't meet the minimum value. The path and value that triggered the error can be accessed in the <code>ValidationError</code> object.</p></li>
 <li><p>Validation is an internal piece of middleware</p></li>
-<li><p>Validation is asynchronously recursive: when you call <code>Model#save</code>, embedded<br />documents validation is executed. If an error happens, your <code>Model#save</code><br />callback receives it.</p></li>
+<li><p>Validation is asynchronously recursive: when you call <code>Model#save</code>, embedded documents validation is executed. If an error happens, your <code>Model#save</code> callback receives it.</p></li>
 </ul>
 
 <h2>Simple validation</h2>
 
-<p>Simple validation is declared by passing a function to <code>validate</code> and an error<br />type to your <code>SchemaType</code> (please read the chapter on <a href="/docs/model-definition.html">model definition</a> to learn<br />more about schemas).</p>
+<p>Simple validation is declared by passing a function to <code>validate</code> and an error type to your <code>SchemaType</code> (please read the chapter on <a href="/docs/model-definition.html">model definition</a> to learn more about schemas).</p>
 
 <pre><code>function validator (v) {
   return v.length &gt; 5;
@@ -263,7 +263,7 @@ new Schema({
 }, 'my error type'); 
 </code></pre>
 
-<p>Then the function <code>fn</code> has to be called with <code>true</code> or <code>false</code>, depending on<br />whether the validator passed. This allows for calling other models and querying<br />data asynchronously from your validator.</p>
+<p>Then the function <code>fn</code> has to be called with <code>true</code> or <code>false</code>, depending on whether the validator passed. This allows for calling other models and querying data asynchronously from your validator.</p>
 
 <h2>Built in validators</h2>
 

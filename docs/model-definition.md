@@ -116,3 +116,15 @@ For details about defining your own custom static and instance methods read [thi
 ## Plugins
 
 Schemas also support plugins. Read more about it on the [Plugins](/docs/plugins.html) page.
+
+## Schema events
+
+When a schema is passed to `mongoose.model()` the `init` event will be emitted on the schema, passing in the model. This is helpful for some plugins that need to hook directly into the model.
+
+    var schema = new Schema({ name: String });
+
+    schema.on('init', function (model) {
+      // do stuff with the model
+    });
+
+    mongoose.model('MyModel', schema);

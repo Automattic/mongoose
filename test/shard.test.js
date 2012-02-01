@@ -79,16 +79,28 @@ var tests = {
     zangief.save(function (err) {
       should.strictEqual(null, err);
 
+      zangief._shardval.name.should.equal('Zangief');
+      zangief._shardval.age.should.equal(33);
+
       P.findById(zangief._id, function (err, zang) {
         should.strictEqual(null, err);
+
+        zang._shardval.name.should.equal('Zangief');
+        zang._shardval.age.should.equal(33);
 
         zang.likes = ['spinning', 'laughing'];
         zang.save(function (err) {
           should.strictEqual(null, err);
+
+          zang._shardval.name.should.equal('Zangief');
+          zang._shardval.age.should.equal(33);
+
           zang.likes.addToSet('winning');
           zang.save(function (err) {
             db.close();
             should.strictEqual(null, err);
+            zang._shardval.name.should.equal('Zangief');
+            zang._shardval.age.should.equal(33);
           });
         });
       });
@@ -173,12 +185,22 @@ var tests = {
     P.create({ name: 'chun li', age: 19, likes: ['street fighting']}, function (err, chunli) {
       should.strictEqual(null, err);
 
+      chunli._shardval.name.should.equal('chun li');
+      chunli._shardval.age.should.equal(19);
+
       chunli.age = 20;
       chunli.save(function (err) {
         /^Can't modify shard key's value field/.test(err.message).should.be.true;
 
+        chunli._shardval.name.should.equal('chun li');
+        chunli._shardval.age.should.equal(19);
+
         P.findById(chunli._id, function (err, chunli) {
           should.strictEqual(null, err);
+
+          chunli._shardval.name.should.equal('chun li');
+          chunli._shardval.age.should.equal(19);
+
           chunli.name='chuuuun liiiii';
           chunli.save(function (err) {
             db.close();

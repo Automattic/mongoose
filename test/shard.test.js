@@ -26,32 +26,36 @@ var schema = new Schema({
   , likes: [String]
 }, { shardkey: { name: 1, age: 1 }});
 
-mongoose.model('ShardPerson', schema);
 var collection = 'shardperson_' + random();
-//var collection = 'people'
+mongoose.model('ShardPerson', schema, collection);
 
-module.exports = {
+var db = start({ uri: uri });
+db.on('open', function () {
 
-  'auto shards the collection': function () {
-    var db = start({ uri:  uri })
-    var P = db.model('ShardPerson', collection);
+  // set up a sharded test collection
+  var P = db.model('ShardPerson', collection);
 
-    var name = collection;
+  var cmd = {};
+  cmd.shardcollection = db.name + '.' + collection;
+  cmd.key = P.schema.options.shardkey;
 
-    // avoid the race condition caused by calling db.db.command directly
-    db.on('open', function () {
-      P.db.db.command({ collStats: name }, function (err, stats) {
-        db.close();
-        should.strictEqual(!!err, false);
-        should.exist(stats);
-        stats.sharded.should.be.true;
-      });
+  P.db.db.executeDbAdminCommand(cmd,function (err, res) {
+    db.close();
+
+    if (err) throw err;
+
+    if (!(res && res.documents && res.documents[0] && res.documents[0].ok)) {
+      throw new Error('could not shard test collection ' + collection);
+    }
+
+    Object.keys(tests).forEach(function (test) {
+      exports[test] = tests[test];
     });
 
-    //
-    // need to run "shardcollection" command with key
-    // this will error if its already sharded (which is ok) ("already sharded")
-  },
+  });
+});
+
+var tests = {
 
   'can read and write to a shard': function () {
     var db = start({ uri:  uri })
@@ -184,5 +188,4 @@ module.exports = {
       });
     });
   }
-
 }

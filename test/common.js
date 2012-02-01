@@ -105,10 +105,17 @@ Assertion.prototype.__defineGetter__('disconnected', function(){
  */
 
 module.exports = function (options) {
-  return mongoose.createConnection(
-      process.env.MONGOOSE_TEST_URI || 'mongodb://localhost/mongoose_test'
-    , options
-  );
+  var uri;
+
+  if (options && options.uri) {
+    uri = options.uri;
+    delete options.uri;
+  } else {
+    uri = process.env.MONGOOSE_TEST_URI ||
+          'mongodb://localhost/mongoose_test'
+  }
+
+  return mongoose.createConnection(uri, options);
 };
 
 /**

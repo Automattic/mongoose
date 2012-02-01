@@ -6,10 +6,7 @@ var start = require('./common')
   , Mongoose = mongoose.Mongoose
   , Schema = mongoose.Schema;
 
-var uri = 'mongodb://localhost:27020/test';
-//var uri = 'mongodb://localhost:27020/testing';
-
-//var uri = process.env.MONGOOSE_SHARD_TEST_URI;
+var uri = process.env.MONGOOSE_SHARD_TEST_URI;
 
 if (!uri) {
   console.log('\033[31m', '\n', 'You\'re not testing shards!'
@@ -17,6 +14,8 @@ if (!uri) {
             , 'e.g: `mongodb://localhost:27017/database', '\n'
             , 'Sharding must already be enabled on your database'
             , '\033[39m');
+
+  exports.r = function expressoHack(){}
   return;
 }
 
@@ -48,6 +47,7 @@ db.on('open', function () {
       throw new Error('could not shard test collection ' + collection);
     }
 
+    // assign exports to tell expresso to begin
     Object.keys(tests).forEach(function (test) {
       exports[test] = tests[test];
     });

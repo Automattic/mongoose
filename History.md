@@ -1,4 +1,14 @@
 
+2.5.3 / 2012-02-02
+===================
+
+  * added; doc#isSelected(path)
+  * added; query#equals()
+  * added; beta sharding support
+  * added; more descript error msgs (#700) [obeleh]
+  * added; document.modifiedPaths (#709) [ljharb]
+  * fixed; only functions can be added as getters/setters (#707,704) [ljharb]
+
 2.5.2 / 2012-01-30
 ===================
 

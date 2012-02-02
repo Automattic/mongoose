@@ -368,6 +368,7 @@ The following plugins are currently available for use with mongoose:
 - [mongoose-joins](https://github.com/goulash1971/mongoose-joins) - Adds simple join support
 - [mongoose-dbref](https://github.com/goulash1971/mongoose-dbref) - An alternative DBRef option
 - [mongoose-flatmatcher](https://github.com/marksweiss/mongoose-flatmatcher) - A query pre-processor that maps flat name/value pairs to schemas 
+- [mongoose-ttl](https://github.com/aheckmann/mongoose-ttl) - TTL support
 
 ## Contributing to Mongoose
 

@@ -807,5 +807,47 @@ module.exports = {
 
     doc.isSelected('_id').should.be.false;
     doc.isSelected('nested.deep.x.no').should.be.true;
+
+    doc = new TestDocument({ test: 'boom' });
+    doc.isSelected('_id').should.be.true;
+    doc.isSelected('test').should.be.true;
+    doc.isSelected('numbers').should.be.true;
+    doc.isSelected('oids').should.be.true;
+    doc.isSelected('nested').should.be.true;
+    doc.isSelected('nested.age').should.be.true;
+    doc.isSelected('nested.cool').should.be.true;
+    doc.isSelected('nested.path').should.be.true;
+    doc.isSelected('nested.deep').should.be.true;
+    doc.isSelected('nested.nope').should.be.true;
+    doc.isSelected('nested.deep.x').should.be.true;
+    doc.isSelected('nested.deep.x.no').should.be.true;
+    doc.isSelected('nested.deep.y').should.be.true;
+    doc.isSelected('noway').should.be.true;
+    doc.isSelected('notapath').should.be.true;
+    doc.isSelected('em').should.be.true;
+    doc.isSelected('em.title').should.be.true;
+    doc.isSelected('em.body').should.be.true;
+    doc.isSelected('em.nonpath').should.be.true;
+
+    doc = new TestDocument({ test: 'boom' }, true);
+    doc.isSelected('_id').should.be.true;
+    doc.isSelected('test').should.be.true;
+    doc.isSelected('numbers').should.be.true;
+    doc.isSelected('oids').should.be.true;
+    doc.isSelected('nested').should.be.true;
+    doc.isSelected('nested.age').should.be.true;
+    doc.isSelected('nested.cool').should.be.true;
+    doc.isSelected('nested.path').should.be.true;
+    doc.isSelected('nested.deep').should.be.true;
+    doc.isSelected('nested.nope').should.be.true;
+    doc.isSelected('nested.deep.x').should.be.true;
+    doc.isSelected('nested.deep.x.no').should.be.true;
+    doc.isSelected('nested.deep.y').should.be.true;
+    doc.isSelected('noway').should.be.true;
+    doc.isSelected('notapath').should.be.true;
+    doc.isSelected('em').should.be.true;
+    doc.isSelected('em.title').should.be.true;
+    doc.isSelected('em.body').should.be.true;
+    doc.isSelected('em.nonpath').should.be.true;
   }
 };

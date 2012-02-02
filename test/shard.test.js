@@ -9,7 +9,7 @@ var start = require('./common')
 var uri = process.env.MONGOOSE_SHARD_TEST_URI;
 
 if (!uri) {
-  console.log('\033[31m', '\n', 'You\'re not testing shards!'
+  console.log('\033[30m', '\n', 'You\'re not testing shards!'
             , '\n', 'Please set the MONGOOSE_SHARD_TEST_URI env variable.', '\n'
             , 'e.g: `mongodb://localhost:27017/database', '\n'
             , 'Sharding must already be enabled on your database'

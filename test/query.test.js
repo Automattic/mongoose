@@ -128,6 +128,12 @@ module.exports = {
     query._conditions.should.eql({name: 'guillermo'});
   },
 
+  'setting a value via equals': function () {
+    var query = new Query();
+    query.where('name').equals('guillermo');
+    query._conditions.should.eql({name: 'guillermo'});
+  },
+
   'test Query#gte where 2 arguments': function () {
     var query = new Query();
     query.gte('age', 18);

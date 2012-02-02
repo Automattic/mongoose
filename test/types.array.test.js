@@ -223,6 +223,7 @@ module.exports = {
         doc.save(function (err) {
           should.equal(null, err);
           A.findById(a._id, function (err, doc) {
+            db.close();
             should.equal(null, err);
 
             var obj = doc.types.toObject();
@@ -243,11 +244,72 @@ module.exports = {
             obj[1].should.equal('one');
             obj[2].should.equal('two');
             obj[3].should.equal('three');
+          });
+        });
+      });
+    });
+  },
 
-            A.collection.drop(function (err) {
-              db.close();
-              should.strictEqual(err, null);
-            });
+  '#shift': function () {
+    var db = start()
+      , schema = new Schema({
+            types: [new Schema({ type: String })]
+          , nums: [Number]
+          , strs: [String]
+        })
+
+    var A = db.model('shift', schema, 'unshift'+random());
+
+    var a = new A({
+        types: [{type:'bird'},{type:'boy'},{type:'frog'},{type:'cloud'}]
+      , nums: [1,2,3]
+      , strs: 'one two three'.split(' ')
+    });
+
+    a.save(function (err) {
+      should.equal(null, err);
+      A.findById(a._id, function (err, doc) {
+        should.equal(null, err);
+
+        var t = doc.types.shift();
+        var n = doc.nums.shift();
+        var s = doc.strs.shift();
+
+        t.type.should.equal('bird');
+        n.should.equal(1);
+        s.should.equal('one');
+
+        var obj = doc.types.toObject();
+        obj[0].type.should.eql('boy');
+        obj[1].type.should.eql('frog');
+        obj[2].type.should.eql('cloud');
+
+        obj = doc.nums.toObject();
+        obj[0].valueOf().should.equal(2);
+        obj[1].valueOf().should.equal(3);
+
+        obj = doc.strs.toObject();
+        obj[0].should.equal('two');
+        obj[1].should.equal('three');
+
+        doc.save(function (err) {
+          should.equal(null, err);
+          A.findById(a._id, function (err, doc) {
+            db.close();
+            should.equal(null, err);
+
+            var obj = doc.types.toObject();
+            obj[0].type.should.eql('boy');
+            obj[1].type.should.eql('frog');
+            obj[2].type.should.eql('cloud');
+
+            obj = doc.nums.toObject();
+            obj[0].valueOf().should.equal(2);
+            obj[1].valueOf().should.equal(3);
+
+            obj = doc.strs.toObject();
+            obj[0].should.equal('two');
+            obj[1].should.equal('three');
           });
         });
       });

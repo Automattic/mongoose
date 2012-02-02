@@ -20,6 +20,7 @@ if (process.argv.length > 2 && 'index' === process.argv[2]) {
 convert('docs/defaults.md', 'docs/defaults.html');
 convert('docs/embedded-documents.md', 'docs/embedded-documents.html');
 convert('docs/finding-documents.md', 'docs/finding-documents.html');
+convert('docs/updating-documents.md', 'docs/updating-documents.html');
 convert('docs/indexes.md', 'docs/indexes.html');
 convert('docs/middleware.md', 'docs/middleware.html');
 convert('docs/model-definition.md', 'docs/model-definition.html');

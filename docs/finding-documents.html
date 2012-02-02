@@ -185,6 +185,7 @@
             <li><a href="/docs/schema-options.html">Schema Options</a></li>
             <li><a href="/docs/middleware.html">Middleware</a></li>
             <li><a href="/docs/finding-documents.html">Finding Docs</a></li>
+            <li><a href="/docs/updating-documents.html">Updating Docs</a></li>
             <li><a href="/docs/query.html">Queries</a></li>
             <li><a href="/docs/querystream.html">Query Streams</a></li>
             <li><a href="/docs/methods-statics.html">Methods &amp; Statics</a>
@@ -273,7 +274,7 @@
 
 <h2>Model.where</h2>
 
-<p>Creates a Query for this model. Handy when expressing complex directives.</p>
+<p>Creates a <a href="/docs/query.html">Query</a> for this model. Handy when expressing complex directives.</p>
 
 <pre><code>Model
 .where('age').gte(25)
@@ -296,24 +297,7 @@
 
 <h2>Model.update</h2>
 
-<p>Updates all documents matching <code>conditions</code> using the <code>update</code> clause. All <code>update</code> values are casted to their appropriate types before being sent.</p>
-
-<pre><code>var conditions = { name: 'borne' }
-  , update = { $inc: { visits: 1 }}
-  , options = { multi: true };
-
-Model.update(conditions, update, options, callback)
-</code></pre>
-
-<p>Note: for backwards compatibility, all top-level <code>update</code> keys that are not $atomic operation names are treated as <code>$set</code> operations. Example:</p>
-
-<pre><code>var query = { name: 'borne' };
-Model.update(query, { name: 'jason borne' }, options, callback)
-
-// is sent as
-
-Model.update(query, { $set: { name: 'jason borne' }}, options, callback)
-</code></pre>
+<p>See the <a href="/docs/updating-documents.html">updating docs</a> page.</p>
 
 <h2>Query API</h2>
 

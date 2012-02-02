@@ -945,6 +945,31 @@ doc.set({
 </tr>
 <tr class="code">
 <td class="docs">
+<p>modifiedPaths</p>
+
+<p>Returns the list of paths that have been modified.</p>
+
+<p>If we set <code>documents.0.title</code> to 'newTitle'
+then <code>documents</code>, <code>documents.0</code>, and <code>documents.0.title</code>
+are modified.</p>
+
+<ul><li><p><strong>api</strong>: <em>public</em></p></li><li><p><strong>returns</strong>: <em>Boolean</em></p></li></ul>
+</td>
+<td class="code">
+<pre><code><span class="class">Document</span>.<span class="variable">prototype</span>.<span class="variable">__defineGetter__</span>(<span class="string">'modifiedPaths'</span>, <span class="keyword">function</span> () {
+  <span class="keyword">var</span> <span class="variable">directModifiedPaths</span> = <span class="class">Object</span>.<span class="variable">keys</span>(<span class="this">this</span>.<span class="variable">_activePaths</span>.<span class="variable">states</span>.<span class="variable">modify</span>);
+
+  <span class="keyword">return</span> <span class="variable">directModifiedPaths</span>.<span class="variable">reduce</span>(<span class="keyword">function</span> (<span class="variable">list</span>, <span class="variable">path</span>) {
+    <span class="keyword">var</span> <span class="variable">parts</span> = <span class="variable">path</span>.<span class="variable">split</span>(<span class="string">'.'</span>);
+    <span class="keyword">return</span> <span class="variable">list</span>.<span class="variable">concat</span>(<span class="variable">parts</span>.<span class="variable">reduce</span>(<span class="keyword">function</span> (<span class="variable">chains</span>, <span class="variable">part</span>, <span class="variable">i</span>) {
+      <span class="keyword">return</span> <span class="variable">chains</span>.<span class="variable">concat</span>(<span class="variable">parts</span>.<span class="variable">slice</span>(<span class="number integer">0</span>, <span class="variable">i</span>).<span class="variable">concat</span>(<span class="variable">part</span>).<span class="variable">join</span>(<span class="string">'.'</span>));
+    }, []));
+  }, []);
+});</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
 <p>Checks if a path or any full path containing path as part of
 its path chain has been directly modified.</p>
 
@@ -960,20 +985,11 @@ its path chain has been directly modified.</p>
 
 <h2></h2>
 
-<ul><li><p><strong>param</strong>: <em>String</em>  path</p></li></ul>
+<ul><li><p><strong>param</strong>: <em>String</em>  path</p></li><li><p><strong>returns</strong>: <em>Boolean</em></p></li><li><p><strong>api</strong>: <em>public</em></p></li></ul>
 </td>
 <td class="code">
 <pre><code><span class="class">Document</span>.<span class="variable">prototype</span>.<span class="variable">isModified</span> = <span class="keyword">function</span> (<span class="variable">path</span>) {
-  <span class="keyword">var</span> <span class="variable">directModifiedPaths</span> = <span class="class">Object</span>.<span class="variable">keys</span>(<span class="this">this</span>.<span class="variable">_activePaths</span>.<span class="variable">states</span>.<span class="variable">modify</span>);
-
-  <span class="keyword">var</span> <span class="variable">allPossibleChains</span> = <span class="variable">directModifiedPaths</span>.<span class="variable">reduce</span>(<span class="keyword">function</span> (<span class="variable">list</span>, <span class="variable">path</span>) {
-    <span class="keyword">var</span> <span class="variable">parts</span> = <span class="variable">path</span>.<span class="variable">split</span>(<span class="string">'.'</span>);
-    <span class="keyword">return</span> <span class="variable">list</span>.<span class="variable">concat</span>(<span class="variable">parts</span>.<span class="variable">reduce</span>(<span class="keyword">function</span> (<span class="variable">chains</span>, <span class="variable">part</span>, <span class="variable">i</span>) {
-      <span class="keyword">return</span> <span class="variable">chains</span>.<span class="variable">concat</span>(<span class="variable">parts</span>.<span class="variable">slice</span>(<span class="number integer">0</span>, <span class="variable">i</span>).<span class="variable">concat</span>(<span class="variable">part</span>).<span class="variable">join</span>(<span class="string">'.'</span>));
-    }, []));
-  }, []);
-
-  <span class="keyword">return</span> !!~<span class="variable">allPossibleChains</span>.<span class="variable">indexOf</span>(<span class="variable">path</span>);
+  <span class="keyword">return</span> !!~<span class="this">this</span>.<span class="variable">modifiedPaths</span>.<span class="variable">indexOf</span>(<span class="variable">path</span>);
 };</code></pre>
 </td>
 </tr>
@@ -994,7 +1010,7 @@ the path is only part of a larger path that was directly set.</p>
 
 <h2></h2>
 
-<ul><li><p><strong>param</strong>: <em>String</em>  path</p></li></ul>
+<ul><li><p><strong>param</strong>: <em>String</em>  path</p></li><li><p><strong>returns</strong>: <em>Boolean</em></p></li><li><p><strong>api</strong>: <em>public</em></p></li></ul>
 </td>
 <td class="code">
 <pre><code><span class="class">Document</span>.<span class="variable">prototype</span>.<span class="variable">isDirectModified</span> = <span class="keyword">function</span> (<span class="variable">path</span>) {
@@ -1008,7 +1024,7 @@ the path is only part of a larger path that was directly set.</p>
 
 <h2></h2>
 
-<ul><li><p><strong>param</strong>: <em>String</em>  path</p></li></ul>
+<ul><li><p><strong>param</strong>: <em>String</em>  path</p></li><li><p><strong>returns</strong>: <em>Boolean</em></p></li><li><p><strong>api</strong>: <em>public</em></p></li></ul>
 </td>
 <td class="code">
 <pre><code><span class="class">Document</span>.<span class="variable">prototype</span>.<span class="variable">isInit</span> = <span class="keyword">function</span> (<span class="variable">path</span>) {
@@ -1021,7 +1037,7 @@ the path is only part of a larger path that was directly set.</p>
 <p>Checks if a path was selected.
 ## </p>
 
-<ul><li><p><strong>param</strong>: <em>String</em>  path</p></li><li><p><strong>return</strong>: <em>Boolean</em></p></li></ul>
+<ul><li><p><strong>param</strong>: <em>String</em>  path</p></li><li><p><strong>return</strong>: <em>Boolean</em></p></li><li><p><strong>api</strong>: <em>public</em></p></li></ul>
 </td>
 <td class="code">
 <pre><code><span class="class">Document</span>.<span class="variable">prototype</span>.<span class="variable">isSelected</span> = <span class="keyword">function</span> <span class="variable">isSelected</span> (<span class="variable">path</span>) {
@@ -1894,6 +1910,86 @@ on each Schema you create.</p>
 <span class="variable">exports</span>.<span class="variable">mongo</span> = <span class="variable">require</span>(<span class="string">'mongodb'</span>);
 </code></pre>
 </td>
+</tr><tr class="filename"><td><h2 id="lib/namedscope.js"><a href="#">namedscope</a></h2></td><td>lib/namedscope.js</td></tr><tr class="code">
+<td class="docs">
+<p>var Query = require('./query');
+function NamedScope () {}</p>
+
+<p>NamedScope.prototype.query;</p>
+
+<p>NamedScope.prototype.where = function () {
+  var q = this.query || (this.query = new Query());
+  q.where.apply(q, arguments);
+  return q;
+};</p>
+</td>
+<td class="code">
+<pre><code>*
+ * <span class="class">Decorate</span>
+ *
+ * @<span class="variable">param</span> {<span class="class">NamedScope</span>} <span class="variable">target</span>
+ * @<span class="variable">param</span> {<span class="class">Object</span>} <span class="variable">getters</span>
+ * @<span class="variable">api</span> <span class="variable">private</span>
+ </code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>NamedScope.prototype.decorate = function (target, getters) {
+  var name = this.name
+    , block = this.block
+    , query = this.query;
+  if (block) {
+    if (block.length === 0) {
+      Object.defineProperty(target, name, {
+        get: getters.block0(block)
+      });
+    } else {
+      target[name] = getters.blockN(block);
+    }
+  } else {
+    Object.defineProperty(target, name, {
+      get: getters.basic(query)
+    });
+  }
+};</p>
+
+<p>NamedScope.prototype.compile = function (model) {
+  var allScopes = this.scopesByName
+    , scope;
+  for (var k in allScopes) {
+    scope = allScopes[k];
+    scope.decorate(model, {
+      block0: function (block) {
+        return function () {
+          var cquery = this.<em>cumulativeQuery || (this.</em>cumulativeQuery = new Query().bind(this));
+          block.call(cquery);
+          return this;
+        };
+      },
+      blockN: function (block) {
+        return function () {
+          var cquery = this.<em>cumulativeQuery || (this.</em>cumulativeQuery = new Query().bind(this));
+          block.apply(cquery, arguments);
+          return this;
+        };
+      },
+      basic: function (query) {
+        return function () {
+          var cquery = this.<em>cumulativeQuery || (this.</em>cumulativeQuery = new Query().bind(this));
+          cquery.find(query);
+          return this;
+        };
+      }
+    });
+  }
+};</p>
+
+<p>module.exports = NamedScope;</p>
+</td>
+<td class="code">
+
+</td>
 </tr><tr class="filename"><td><h2 id="lib/model.js"><a href="#">model</a></h2></td><td>lib/model.js</td></tr><tr class="code">
 <td class="docs">
 <p>Module dependencies.
@@ -2343,7 +2439,7 @@ to the db if valid.</p>
   });
 
   <span class="comment">// TODO</span>
-  <span class="comment">// utilize collection.insertAll for batch processing</span>
+  <span class="comment">// utilize collection.insertAll for batch processing?</span>
 };</code></pre>
 </td>
 </tr>
@@ -2356,15 +2452,13 @@ to the db if valid.</p>
 <pre><code>MyModel.update({ age: { $gt: 18 } }, { oldEnough: true }, fn);
 MyModel.update({ name: 'Tobi' }, { ferret: true }, { multi: true }, fn);</code></pre>
 
-<p>Valid options:
- - safe (boolean) safe mode (defaults to value set in schema (true))
- - upsert (boolean) whether to create the doc if it doesn't match (false)
- - multi (boolean) whether multiple documents should be update (false)</p>
+<p>Valid options:</p>
+
+<ul><li>safe (boolean) safe mode (defaults to value set in schema (true))</li><li>upsert (boolean) whether to create the doc if it doesn't match (false)</li><li>multi (boolean) whether multiple documents should be updated (false)</li></ul>
 
 <h2></h2>
 
-<ul><li><p><strong>param</strong>: <em>Object</em>  conditions</p></li><li><p><strong>param</strong>: _Object] doc</p></li><li><p><strong>para</strong>: <em>m</em>
-{Object_  options</p></li><li><p><strong>param</strong>: <em>Function</em>  callback</p></li><li><p><strong>return</strong>: <em>Query</em> </p></li><li><p><strong>api</strong>: <em>public</em></p></li></ul>
+<ul><li><p><strong>param</strong>: <em>Object</em>  conditions</p></li><li><p><strong>param</strong>: <em>Object</em>  doc</p></li><li><p><strong>param</strong>: <em>Object</em>  options</p></li><li><p><strong>param</strong>: <em>Function</em>  callback</p></li><li><p><strong>return</strong>: <em>Query</em> </p></li><li><p><strong>api</strong>: <em>public</em></p></li></ul>
 </td>
 <td class="code">
 <pre><code><span class="class">Model</span>.<span class="variable">update</span> = <span class="keyword">function</span> <span class="variable">update</span> (<span class="variable">conditions</span>, <span class="variable">doc</span>, <span class="variable">options</span>, <span class="variable">callback</span>) {
@@ -2390,86 +2484,6 @@ MyModel.update({ name: 'Tobi' }, { ferret: true }, { multi: true }, fn);</code><
   <span class="this">this</span>.<span class="variable">_applyNamedScope</span>(<span class="variable">query</span>);
   <span class="keyword">return</span> <span class="variable">query</span>.<span class="variable">update</span>(<span class="variable">doc</span>, <span class="variable">callback</span>);
 };</code></pre>
-</td>
-</tr><tr class="filename"><td><h2 id="lib/namedscope.js"><a href="#">namedscope</a></h2></td><td>lib/namedscope.js</td></tr><tr class="code">
-<td class="docs">
-<p>var Query = require('./query');
-function NamedScope () {}</p>
-
-<p>NamedScope.prototype.query;</p>
-
-<p>NamedScope.prototype.where = function () {
-  var q = this.query || (this.query = new Query());
-  q.where.apply(q, arguments);
-  return q;
-};</p>
-</td>
-<td class="code">
-<pre><code>*
- * <span class="class">Decorate</span>
- *
- * @<span class="variable">param</span> {<span class="class">NamedScope</span>} <span class="variable">target</span>
- * @<span class="variable">param</span> {<span class="class">Object</span>} <span class="variable">getters</span>
- * @<span class="variable">api</span> <span class="variable">private</span>
- </code></pre>
-</td>
-</tr>
-<tr class="code">
-<td class="docs">
-<p>NamedScope.prototype.decorate = function (target, getters) {
-  var name = this.name
-    , block = this.block
-    , query = this.query;
-  if (block) {
-    if (block.length === 0) {
-      Object.defineProperty(target, name, {
-        get: getters.block0(block)
-      });
-    } else {
-      target[name] = getters.blockN(block);
-    }
-  } else {
-    Object.defineProperty(target, name, {
-      get: getters.basic(query)
-    });
-  }
-};</p>
-
-<p>NamedScope.prototype.compile = function (model) {
-  var allScopes = this.scopesByName
-    , scope;
-  for (var k in allScopes) {
-    scope = allScopes[k];
-    scope.decorate(model, {
-      block0: function (block) {
-        return function () {
-          var cquery = this.<em>cumulativeQuery || (this.</em>cumulativeQuery = new Query().bind(this));
-          block.call(cquery);
-          return this;
-        };
-      },
-      blockN: function (block) {
-        return function () {
-          var cquery = this.<em>cumulativeQuery || (this.</em>cumulativeQuery = new Query().bind(this));
-          block.apply(cquery, arguments);
-          return this;
-        };
-      },
-      basic: function (query) {
-        return function () {
-          var cquery = this.<em>cumulativeQuery || (this.</em>cumulativeQuery = new Query().bind(this));
-          cquery.find(query);
-          return this;
-        };
-      }
-    });
-  }
-};</p>
-
-<p>module.exports = NamedScope;</p>
-</td>
-<td class="code">
-
 </td>
 </tr><tr class="filename"><td><h2 id="lib/promise.js"><a href="#">promise</a></h2></td><td>lib/promise.js</td></tr><tr class="code">
 <td class="docs">
@@ -4197,6 +4211,44 @@ cursor. No more events will be emitted.
 <pre><code><span class="variable">module</span>.<span class="variable">exports</span> = <span class="class">SchemaArray</span>;
 </code></pre>
 </td>
+</tr><tr class="filename"><td><h2 id="lib/schemadefault.js"><a href="#">schemadefault</a></h2></td><td>lib/schemadefault.js</td></tr><tr class="code">
+<td class="docs">
+<p>Module dependencies.
+ </p>
+</td>
+<td class="code">
+<pre><code><span class="keyword">var</span> <span class="class">Schema</span> = <span class="variable">require</span>(<span class="string">'./schema'</span>)</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Default model for querying the system.profiles
+collection (it only exists when profiling is
+enabled.
+ </p>
+</td>
+<td class="code">
+<pre><code><span class="variable">exports</span>[<span class="string">'system.profile'</span>] = <span class="keyword">new</span> <span class="class">Schema</span>({
+    <span class="variable">ts</span>: <span class="class">Date</span>
+  , <span class="variable">info</span>: <span class="class">String</span> <span class="comment">// deprecated</span>
+  , <span class="variable">millis</span>: <span class="class">Number</span>
+  , <span class="variable">op</span>: <span class="class">String</span>
+  , <span class="variable">ns</span>: <span class="class">String</span>
+  , <span class="variable">query</span>: <span class="class">Schema</span>.<span class="class">Types</span>.<span class="class">Mixed</span>
+  , <span class="variable">updateobj</span>: <span class="class">Schema</span>.<span class="class">Types</span>.<span class="class">Mixed</span>
+  , <span class="variable">ntoreturn</span>: <span class="class">Number</span>
+  , <span class="variable">nreturned</span>: <span class="class">Number</span>
+  , <span class="variable">nscanned</span>: <span class="class">Number</span>
+  , <span class="variable">responseLength</span>: <span class="class">Number</span>
+  , <span class="variable">client</span>: <span class="class">String</span>
+  , <span class="variable">user</span>: <span class="class">String</span>
+  , <span class="variable">idhack</span>: <span class="class">Boolean</span>
+  , <span class="variable">scanAndOrder</span>: <span class="class">Boolean</span>
+  , <span class="variable">keyUpdates</span>: <span class="class">Number</span>
+  , <span class="variable">cursorid</span>: <span class="class">Number</span>
+}, { <span class="variable">noVirtualId</span>: <span class="variable">true</span>, <span class="variable">noId</span>: <span class="variable">true</span> });
+</code></pre>
+</td>
 </tr><tr class="filename"><td><h2 id="lib/schema.js"><a href="#">schema</a></h2></td><td>lib/schema.js</td></tr><tr class="code">
 <td class="docs">
 <p>Module dependencies.
@@ -4401,6 +4453,13 @@ later for casting, validation, etc.
 
     <span class="keyword">return</span> <span class="keyword">new</span> <span class="class">Types</span>.<span class="class">Array</span>(<span class="variable">path</span>, <span class="variable">cast</span> || <span class="class">Types</span>.<span class="class">Mixed</span>, <span class="variable">obj</span>);
   }
+
+  <span class="keyword">if</span> (<span class="variable">undefined</span> == <span class="class">Types</span>[<span class="variable">type</span>.<span class="variable">name</span>]) {
+    <span class="keyword">throw</span> <span class="keyword">new</span> <span class="class">TypeError</span>(<span class="string">'Undefined type at `'</span> + <span class="variable">path</span> +
+        <span class="string">'`\n  Did you try nesting Schemas? '</span> +
+        <span class="string">'You can only nest using refs or arrays.'</span>);
+  }
+
   <span class="keyword">return</span> <span class="keyword">new</span> <span class="class">Types</span>[<span class="variable">type</span>.<span class="variable">name</span>](<span class="variable">path</span>, <span class="variable">obj</span>);
 };</code></pre>
 </td>
@@ -4768,44 +4827,6 @@ if the path doesn't exist.</p>
 
 </code></pre>
 </td>
-</tr><tr class="filename"><td><h2 id="lib/schemadefault.js"><a href="#">schemadefault</a></h2></td><td>lib/schemadefault.js</td></tr><tr class="code">
-<td class="docs">
-<p>Module dependencies.
- </p>
-</td>
-<td class="code">
-<pre><code><span class="keyword">var</span> <span class="class">Schema</span> = <span class="variable">require</span>(<span class="string">'./schema'</span>)</code></pre>
-</td>
-</tr>
-<tr class="code">
-<td class="docs">
-<p>Default model for querying the system.profiles
-collection (it only exists when profiling is
-enabled.
- </p>
-</td>
-<td class="code">
-<pre><code><span class="variable">exports</span>[<span class="string">'system.profile'</span>] = <span class="keyword">new</span> <span class="class">Schema</span>({
-    <span class="variable">ts</span>: <span class="class">Date</span>
-  , <span class="variable">info</span>: <span class="class">String</span> <span class="comment">// deprecated</span>
-  , <span class="variable">millis</span>: <span class="class">Number</span>
-  , <span class="variable">op</span>: <span class="class">String</span>
-  , <span class="variable">ns</span>: <span class="class">String</span>
-  , <span class="variable">query</span>: <span class="class">Schema</span>.<span class="class">Types</span>.<span class="class">Mixed</span>
-  , <span class="variable">updateobj</span>: <span class="class">Schema</span>.<span class="class">Types</span>.<span class="class">Mixed</span>
-  , <span class="variable">ntoreturn</span>: <span class="class">Number</span>
-  , <span class="variable">nreturned</span>: <span class="class">Number</span>
-  , <span class="variable">nscanned</span>: <span class="class">Number</span>
-  , <span class="variable">responseLength</span>: <span class="class">Number</span>
-  , <span class="variable">client</span>: <span class="class">String</span>
-  , <span class="variable">user</span>: <span class="class">String</span>
-  , <span class="variable">idhack</span>: <span class="class">Boolean</span>
-  , <span class="variable">scanAndOrder</span>: <span class="class">Boolean</span>
-  , <span class="variable">keyUpdates</span>: <span class="class">Number</span>
-  , <span class="variable">cursorid</span>: <span class="class">Number</span>
-}, { <span class="variable">noVirtualId</span>: <span class="variable">true</span>, <span class="variable">noId</span>: <span class="variable">true</span> });
-</code></pre>
-</td>
 </tr><tr class="filename"><td><h2 id="lib/schematype.js"><a href="#">schematype</a></h2></td><td>lib/schematype.js</td></tr><tr class="code">
 <td class="docs">
 <p>Module dependencies.
@@ -4897,6 +4918,8 @@ http://www.mongodb.org/display/DOCS/Indexes#Indexes-CompoundKeysIndexes</p>
 </td>
 <td class="code">
 <pre><code><span class="class">SchemaType</span>.<span class="variable">prototype</span>.<span class="variable">set</span> = <span class="keyword">function</span> (<span class="variable">fn</span>) {
+  <span class="keyword">if</span> (<span class="string">'function'</span> != <span class="keyword">typeof</span> <span class="variable">fn</span>)
+    <span class="keyword">throw</span> <span class="keyword">new</span> <span class="class">Error</span>(<span class="string">'A setter must be a function.'</span>);
   <span class="this">this</span>.<span class="variable">setters</span>.<span class="variable">push</span>(<span class="variable">fn</span>);
   <span class="keyword">return</span> <span class="this">this</span>;
 };</code></pre>
@@ -4912,6 +4935,8 @@ http://www.mongodb.org/display/DOCS/Indexes#Indexes-CompoundKeysIndexes</p>
 </td>
 <td class="code">
 <pre><code><span class="class">SchemaType</span>.<span class="variable">prototype</span>.<span class="variable">get</span> = <span class="keyword">function</span> (<span class="variable">fn</span>) {
+  <span class="keyword">if</span> (<span class="string">'function'</span> != <span class="keyword">typeof</span> <span class="variable">fn</span>)
+    <span class="keyword">throw</span> <span class="keyword">new</span> <span class="class">Error</span>(<span class="string">'A getter must be a function.'</span>);
   <span class="this">this</span>.<span class="variable">getters</span>.<span class="variable">push</span>(<span class="variable">fn</span>);
   <span class="keyword">return</span> <span class="this">this</span>;
 };</code></pre>
@@ -5000,97 +5025,6 @@ http://www.mongodb.org/display/DOCS/Indexes#Indexes-CompoundKeysIndexes</p>
 </td>
 <td class="code">
 <pre><code><span class="keyword">var</span> <span class="variable">utils</span> = <span class="variable">require</span>(<span class="string">'./utils'</span>);</code></pre>
-</td>
-</tr><tr class="filename"><td><h2 id="lib/types/documentarray.js"><a href="#">documentarray</a></h2></td><td>lib/types/documentarray.js</td></tr><tr class="code">
-<td class="docs">
-<p>Module dependencies.
- </p>
-</td>
-<td class="code">
-<pre><code><span class="keyword">var</span> <span class="class">MongooseArray</span> = <span class="variable">require</span>(<span class="string">'./array'</span>)
-  , <span class="variable">driver</span> = <span class="variable">global</span>.<span class="class">MONGOOSE_DRIVER_PATH</span> || <span class="string">'../drivers/node-mongodb-native'</span>
-  , <span class="class">ObjectId</span> = <span class="variable">require</span>(<span class="variable">driver</span> + <span class="string">'/objectid'</span>)
-  , <span class="class">ObjectIdSchema</span> = <span class="variable">require</span>(<span class="string">'../schema/objectid'</span>);</code></pre>
-</td>
-</tr>
-<tr class="code">
-<td class="docs">
-<p>Inherits from MongooseArray
- </p>
-</td>
-<td class="code">
-<pre><code><span class="class">MongooseDocumentArray</span>.<span class="variable">prototype</span>.<span class="variable">__proto__</span> = <span class="class">MongooseArray</span>.<span class="variable">prototype</span>;</code></pre>
-</td>
-</tr>
-<tr class="code">
-<td class="docs">
-<p>Filters items by id</p>
-
-<h2></h2>
-
-<ul><li><p><strong>param</strong>: <em>Object</em>  id</p></li><li><p><strong>api</strong>: <em>public</em></p></li></ul>
-</td>
-<td class="code">
-<pre><code><span class="class">MongooseDocumentArray</span>.<span class="variable">prototype</span>.<span class="variable">id</span> = <span class="keyword">function</span> (<span class="variable">id</span>) {
-  <span class="keyword">try</span> {
-    <span class="keyword">var</span> <span class="variable">casted</span> = <span class="class">ObjectId</span>.<span class="variable">toString</span>(<span class="class">ObjectIdSchema</span>.<span class="variable">prototype</span>.<span class="variable">cast</span>.<span class="variable">call</span>({}, <span class="variable">id</span>));
-  } <span class="keyword">catch</span> (<span class="variable">e</span>) {
-    <span class="keyword">var</span> <span class="variable">casted</span> = <span class="keyword">null</span>;
-  }
-
-  <span class="keyword">for</span> (<span class="keyword">var</span> <span class="variable">i</span> = <span class="number integer">0</span>, <span class="variable">l</span> = <span class="this">this</span>.<span class="variable">length</span>; <span class="variable">i</span> &<span class="variable">lt</span>; <span class="variable">l</span>; <span class="variable">i</span>++) {
-    <span class="keyword">if</span> (!(<span class="this">this</span>[<span class="variable">i</span>].<span class="variable">get</span>(<span class="string">'_id'</span>) <span class="variable">instanceof</span> <span class="class">ObjectId</span>)) {
-      <span class="keyword">if</span> (<span class="class">String</span>(<span class="variable">id</span>) == <span class="this">this</span>[<span class="variable">i</span>].<span class="variable">get</span>(<span class="string">'_id'</span>).<span class="variable">toString</span>())
-        <span class="keyword">return</span> <span class="this">this</span>[<span class="variable">i</span>];
-    } <span class="keyword">else</span> {
-      <span class="keyword">if</span> (<span class="variable">casted</span> == <span class="this">this</span>[<span class="variable">i</span>].<span class="variable">get</span>(<span class="string">'_id'</span>).<span class="variable">toString</span>())
-        <span class="keyword">return</span> <span class="this">this</span>[<span class="variable">i</span>];
-    }
-  }
-
-  <span class="keyword">return</span> <span class="keyword">null</span>;
-};</code></pre>
-</td>
-</tr>
-<tr class="code">
-<td class="docs">
-<p>Returns an Array and converts any Document
-members toObject.</p>
-
-<h2></h2>
-
-<ul><li><p><strong>return</strong>: <em>Array</em> </p></li><li><p><strong>api</strong>: <em>public</em></p></li></ul>
-</td>
-<td class="code">
-<pre><code><span class="class">MongooseDocumentArray</span>.<span class="variable">prototype</span>.<span class="variable">toObject</span> = <span class="keyword">function</span> () {
-  <span class="keyword">return</span> <span class="this">this</span>.<span class="variable">map</span>(<span class="keyword">function</span> (<span class="variable">doc</span>) {
-    <span class="keyword">return</span> <span class="variable">doc</span> &<span class="variable">amp</span>;&<span class="variable">amp</span>; <span class="variable">doc</span>.<span class="variable">toObject</span>() || <span class="keyword">null</span>;
-  });
-};</code></pre>
-</td>
-</tr>
-<tr class="code">
-<td class="docs">
-<p>Helper for console.log</p>
-
-<ul><li><p><strong>api</strong>: <em>public</em></p></li></ul>
-</td>
-<td class="code">
-<pre><code><span class="class">MongooseDocumentArray</span>.<span class="variable">prototype</span>.<span class="variable">inspect</span> = <span class="keyword">function</span> () {
-  <span class="keyword">return</span> <span class="string">'['</span> + <span class="this">this</span>.<span class="variable">map</span>(<span class="keyword">function</span> (<span class="variable">doc</span>) {
-    <span class="keyword">return</span> <span class="variable">doc</span> &<span class="variable">amp</span>;&<span class="variable">amp</span>; <span class="variable">doc</span>.<span class="variable">inspect</span>() || <span class="string">'null'</span>;
-  }).<span class="variable">join</span>(<span class="string">'\n'</span>) + <span class="string">']'</span>;
-};</code></pre>
-</td>
-</tr>
-<tr class="code">
-<td class="docs">
-<p>Module exports.
- </p>
-</td>
-<td class="code">
-<pre><code><span class="variable">module</span>.<span class="variable">exports</span> = <span class="class">MongooseDocumentArray</span>;
-</code></pre>
 </td>
 </tr><tr class="filename"><td><h2 id="lib/types/document.js"><a href="#">document</a></h2></td><td>lib/types/document.js</td></tr><tr class="code">
 <td class="docs">
@@ -5206,6 +5140,97 @@ members toObject.</p>
 <span class="variable">exports</span>.<span class="class">ObjectId</span> = <span class="variable">require</span>(<span class="string">'./objectid'</span>);
 </code></pre>
 </td>
+</tr><tr class="filename"><td><h2 id="lib/types/documentarray.js"><a href="#">documentarray</a></h2></td><td>lib/types/documentarray.js</td></tr><tr class="code">
+<td class="docs">
+<p>Module dependencies.
+ </p>
+</td>
+<td class="code">
+<pre><code><span class="keyword">var</span> <span class="class">MongooseArray</span> = <span class="variable">require</span>(<span class="string">'./array'</span>)
+  , <span class="variable">driver</span> = <span class="variable">global</span>.<span class="class">MONGOOSE_DRIVER_PATH</span> || <span class="string">'../drivers/node-mongodb-native'</span>
+  , <span class="class">ObjectId</span> = <span class="variable">require</span>(<span class="variable">driver</span> + <span class="string">'/objectid'</span>)
+  , <span class="class">ObjectIdSchema</span> = <span class="variable">require</span>(<span class="string">'../schema/objectid'</span>);</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Inherits from MongooseArray
+ </p>
+</td>
+<td class="code">
+<pre><code><span class="class">MongooseDocumentArray</span>.<span class="variable">prototype</span>.<span class="variable">__proto__</span> = <span class="class">MongooseArray</span>.<span class="variable">prototype</span>;</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Filters items by id</p>
+
+<h2></h2>
+
+<ul><li><p><strong>param</strong>: <em>Object</em>  id</p></li><li><p><strong>api</strong>: <em>public</em></p></li></ul>
+</td>
+<td class="code">
+<pre><code><span class="class">MongooseDocumentArray</span>.<span class="variable">prototype</span>.<span class="variable">id</span> = <span class="keyword">function</span> (<span class="variable">id</span>) {
+  <span class="keyword">try</span> {
+    <span class="keyword">var</span> <span class="variable">casted</span> = <span class="class">ObjectId</span>.<span class="variable">toString</span>(<span class="class">ObjectIdSchema</span>.<span class="variable">prototype</span>.<span class="variable">cast</span>.<span class="variable">call</span>({}, <span class="variable">id</span>));
+  } <span class="keyword">catch</span> (<span class="variable">e</span>) {
+    <span class="keyword">var</span> <span class="variable">casted</span> = <span class="keyword">null</span>;
+  }
+
+  <span class="keyword">for</span> (<span class="keyword">var</span> <span class="variable">i</span> = <span class="number integer">0</span>, <span class="variable">l</span> = <span class="this">this</span>.<span class="variable">length</span>; <span class="variable">i</span> &<span class="variable">lt</span>; <span class="variable">l</span>; <span class="variable">i</span>++) {
+    <span class="keyword">if</span> (!(<span class="this">this</span>[<span class="variable">i</span>].<span class="variable">get</span>(<span class="string">'_id'</span>) <span class="variable">instanceof</span> <span class="class">ObjectId</span>)) {
+      <span class="keyword">if</span> (<span class="class">String</span>(<span class="variable">id</span>) == <span class="this">this</span>[<span class="variable">i</span>].<span class="variable">get</span>(<span class="string">'_id'</span>).<span class="variable">toString</span>())
+        <span class="keyword">return</span> <span class="this">this</span>[<span class="variable">i</span>];
+    } <span class="keyword">else</span> {
+      <span class="keyword">if</span> (<span class="variable">casted</span> == <span class="this">this</span>[<span class="variable">i</span>].<span class="variable">get</span>(<span class="string">'_id'</span>).<span class="variable">toString</span>())
+        <span class="keyword">return</span> <span class="this">this</span>[<span class="variable">i</span>];
+    }
+  }
+
+  <span class="keyword">return</span> <span class="keyword">null</span>;
+};</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Returns an Array and converts any Document
+members toObject.</p>
+
+<h2></h2>
+
+<ul><li><p><strong>return</strong>: <em>Array</em> </p></li><li><p><strong>api</strong>: <em>public</em></p></li></ul>
+</td>
+<td class="code">
+<pre><code><span class="class">MongooseDocumentArray</span>.<span class="variable">prototype</span>.<span class="variable">toObject</span> = <span class="keyword">function</span> () {
+  <span class="keyword">return</span> <span class="this">this</span>.<span class="variable">map</span>(<span class="keyword">function</span> (<span class="variable">doc</span>) {
+    <span class="keyword">return</span> <span class="variable">doc</span> &<span class="variable">amp</span>;&<span class="variable">amp</span>; <span class="variable">doc</span>.<span class="variable">toObject</span>() || <span class="keyword">null</span>;
+  });
+};</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Helper for console.log</p>
+
+<ul><li><p><strong>api</strong>: <em>public</em></p></li></ul>
+</td>
+<td class="code">
+<pre><code><span class="class">MongooseDocumentArray</span>.<span class="variable">prototype</span>.<span class="variable">inspect</span> = <span class="keyword">function</span> () {
+  <span class="keyword">return</span> <span class="string">'['</span> + <span class="this">this</span>.<span class="variable">map</span>(<span class="keyword">function</span> (<span class="variable">doc</span>) {
+    <span class="keyword">return</span> <span class="variable">doc</span> &<span class="variable">amp</span>;&<span class="variable">amp</span>; <span class="variable">doc</span>.<span class="variable">inspect</span>() || <span class="string">'null'</span>;
+  }).<span class="variable">join</span>(<span class="string">'\n'</span>) + <span class="string">']'</span>;
+};</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Module exports.
+ </p>
+</td>
+<td class="code">
+<pre><code><span class="variable">module</span>.<span class="variable">exports</span> = <span class="class">MongooseDocumentArray</span>;
+</code></pre>
+</td>
 </tr><tr class="filename"><td><h2 id="lib/types/objectid.js"><a href="#">objectid</a></h2></td><td>lib/types/objectid.js</td></tr><tr class="code">
 <td class="docs">
 <p>Access driver.
@@ -5236,9 +5261,8 @@ members toObject.</p>
 </tr>
 <tr class="code">
 <td class="docs">
-<p>Inherit from Document</p>
-
-<p> </p>
+<p>Inherit from Document
+ </p>
 </td>
 <td class="code">
 <pre><code><span class="class">EmbeddedDocument</span>.<span class="variable">prototype</span>.<span class="variable">__proto__</span> = <span class="class">Document</span>.<span class="variable">prototype</span>;</code></pre>
@@ -5246,7 +5270,7 @@ members toObject.</p>
 </tr>
 <tr class="code">
 <td class="docs">
-<p>Save the subdocument</p>
+<p>Noop. Does not actually save the doc to the db.</p>
 
 <ul><li><p><strong>api</strong>: <em>public</em></p></li></ul>
 </td>
@@ -5303,6 +5327,90 @@ members toObject.</p>
 </td>
 <td class="code">
 <pre><code><span class="variable">module</span>.<span class="variable">exports</span> = <span class="class">EmbeddedDocument</span>;
+</code></pre>
+</td>
+</tr><tr class="filename"><td><h2 id="lib/types/number.js"><a href="#">number</a></h2></td><td>lib/types/number.js</td></tr><tr class="code">
+<td class="docs">
+<p>Module dependencies.
+ </p>
+</td>
+<td class="code">
+
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Inherits from Number.
+ </p>
+</td>
+<td class="code">
+<pre><code><span class="class">MongooseNumber</span>.<span class="variable">prototype</span> = <span class="keyword">new</span> <span class="class">Number</span>();</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Atomic increment</p>
+
+<ul><li><p><strong>api</strong>: <em>public</em></p></li></ul>
+</td>
+<td class="code">
+<pre><code><span class="class">MongooseNumber</span>.<span class="variable">prototype</span>.$<span class="variable">inc</span> =
+<span class="class">MongooseNumber</span>.<span class="variable">prototype</span>.<span class="variable">increment</span> = <span class="keyword">function</span> <span class="variable">increment</span> (<span class="variable">value</span>) {
+  <span class="keyword">var</span> <span class="variable">schema</span> = <span class="this">this</span>.<span class="variable">_parent</span>.<span class="variable">schema</span>.<span class="variable">path</span>(<span class="this">this</span>.<span class="variable">_path</span>)
+    , <span class="variable">value</span> = <span class="class">Number</span>(<span class="variable">value</span>) || <span class="number integer">1</span>;
+  <span class="keyword">if</span> (<span class="variable">isNaN</span>(<span class="variable">value</span>)) <span class="variable">value</span> = <span class="number integer">1</span>;
+  <span class="this">this</span>.<span class="variable">_parent</span>.<span class="variable">setValue</span>(<span class="this">this</span>.<span class="variable">_path</span>, <span class="variable">schema</span>.<span class="variable">cast</span>(<span class="this">this</span> + <span class="variable">value</span>));
+  <span class="this">this</span>.<span class="variable">_parent</span>.<span class="variable">getValue</span>(<span class="this">this</span>.<span class="variable">_path</span>).<span class="variable">_atomics</span>[<span class="string">'$inc'</span>] = <span class="variable">value</span> || <span class="number integer">1</span>;
+  <span class="this">this</span>.<span class="variable">_parent</span>.<span class="variable">_activePaths</span>.<span class="variable">modify</span>(<span class="this">this</span>.<span class="variable">_path</span>);
+  <span class="keyword">return</span> <span class="this">this</span>;
+};</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Returns true if we have to perform atomics for this, and no normal
+operations</p>
+
+<ul><li><p><strong>api</strong>: <em>public</em></p></li></ul>
+</td>
+<td class="code">
+<pre><code><span class="class">MongooseNumber</span>.<span class="variable">prototype</span>.<span class="variable">__defineGetter__</span>(<span class="string">'doAtomics'</span>, <span class="keyword">function</span> () {
+  <span class="keyword">return</span> <span class="class">Object</span>.<span class="variable">keys</span>(<span class="this">this</span>.<span class="variable">_atomics</span>).<span class="variable">length</span>;
+});</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Atomic decrement</p>
+
+<ul><li><p><strong>api</strong>: <em>public</em></p></li></ul>
+</td>
+<td class="code">
+<pre><code><span class="class">MongooseNumber</span>.<span class="variable">prototype</span>.<span class="variable">decrement</span> = <span class="keyword">function</span>(){
+  <span class="this">this</span>.<span class="variable">increment</span>(-<span class="number integer">1</span>);
+};</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Re-declare toString (for <code>console.log</code>)</p>
+
+<ul><li><p><strong>api</strong>: <em>public</em></p></li></ul>
+</td>
+<td class="code">
+<pre><code><span class="class">MongooseNumber</span>.<span class="variable">prototype</span>.<span class="variable">inspect</span> =
+<span class="class">MongooseNumber</span>.<span class="variable">prototype</span>.<span class="variable">toString</span> = <span class="keyword">function</span> () {
+  <span class="keyword">return</span> <span class="class">String</span>(<span class="this">this</span>.<span class="variable">valueOf</span>());
+};</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Module exports
+ </p>
+</td>
+<td class="code">
+<pre><code><span class="variable">module</span>.<span class="variable">exports</span> = <span class="class">MongooseNumber</span>;
 </code></pre>
 </td>
 </tr><tr class="filename"><td><h2 id="lib/types/buffer.js"><a href="#">buffer</a></h2></td><td>lib/types/buffer.js</td></tr><tr class="code">
@@ -5439,88 +5547,245 @@ as expected.</p>
 <span class="variable">module</span>.<span class="variable">exports</span> = <span class="class">MongooseBuffer</span>;
 </code></pre>
 </td>
-</tr><tr class="filename"><td><h2 id="lib/types/number.js"><a href="#">number</a></h2></td><td>lib/types/number.js</td></tr><tr class="code">
+</tr><tr class="filename"><td><h2 id="lib/utils.js"><a href="#">utils</a></h2></td><td>lib/utils.js</td></tr><tr class="code">
 <td class="docs">
 <p>Module dependencies.
  </p>
 </td>
 <td class="code">
-
+<pre><code><span class="keyword">var</span> <span class="class">EventEmitter</span> = <span class="variable">require</span>(<span class="string">'events'</span>).<span class="class">EventEmitter</span>
+  , <span class="class">ObjectId</span> = <span class="variable">require</span>(<span class="string">'./types/objectid'</span>)
+  , <span class="class">MongooseBuffer</span>
+  , <span class="class">MongooseArray</span>
+  , <span class="class">Document</span></code></pre>
 </td>
 </tr>
 <tr class="code">
 <td class="docs">
-<p>Inherits from Number.
+<p>Pluralization rules.
  </p>
 </td>
 <td class="code">
-<pre><code><span class="class">MongooseNumber</span>.<span class="variable">prototype</span> = <span class="keyword">new</span> <span class="class">Number</span>();</code></pre>
+<pre><code><span class="keyword">var</span> <span class="variable">rules</span> = [
+  [<span class="regexp">/(m)an$/gi</span>, <span class="string">'$1en'</span>],
+  [<span class="regexp">/(pe)rson$/gi</span>, <span class="string">'$1ople'</span>],
+  [<span class="regexp">/(child)$/gi</span>, <span class="string">'$1ren'</span>],
+  [<span class="regexp">/^(ox)$/gi</span>, <span class="string">'$1en'</span>],
+  [<span class="regexp">/(ax|test)is$/gi</span>, <span class="string">'$1es'</span>],
+  [<span class="regexp">/(octop|vir)us$/gi</span>, <span class="string">'$1i'</span>],
+  [<span class="regexp">/(alias|status)$/gi</span>, <span class="string">'$1es'</span>],
+  [<span class="regexp">/(bu)s$/gi</span>, <span class="string">'$1ses'</span>],
+  [<span class="regexp">/(buffal|tomat|potat)o$/gi</span>, <span class="string">'$1oes'</span>],
+  [<span class="regexp">/([ti])um$/gi</span>, <span class="string">'$1a'</span>],
+  [<span class="regexp">/sis$/gi</span>, <span class="string">'ses'</span>],
+  [<span class="regexp">/(?:([^f])fe|([lr])f)$/gi</span>, <span class="string">'$1$2ves'</span>],
+  [<span class="regexp">/(hive)$/gi</span>, <span class="string">'$1s'</span>],
+  [<span class="regexp">/([^aeiouy]|qu)y$/gi</span>, <span class="string">'$1ies'</span>],
+  [<span class="regexp">/(x|ch|ss|sh)$/gi</span>, <span class="string">'$1es'</span>],
+  [<span class="regexp">/(matr|vert|ind)ix|ex$/gi</span>, <span class="string">'$1ices'</span>],
+  [<span class="regexp">/([m|l])ouse$/gi</span>, <span class="string">'$1ice'</span>],
+  [<span class="regexp">/(quiz)$/gi</span>, <span class="string">'$1zes'</span>],
+  [<span class="regexp">/s$/gi</span>, <span class="string">'s'</span>],
+  [<span class="regexp">/$/gi</span>, <span class="string">'s'</span>]
+];</code></pre>
 </td>
 </tr>
 <tr class="code">
 <td class="docs">
-<p>Atomic increment</p>
-
-<ul><li><p><strong>api</strong>: <em>public</em></p></li></ul>
-</td>
-<td class="code">
-<pre><code><span class="class">MongooseNumber</span>.<span class="variable">prototype</span>.$<span class="variable">inc</span> =
-<span class="class">MongooseNumber</span>.<span class="variable">prototype</span>.<span class="variable">increment</span> = <span class="keyword">function</span> <span class="variable">increment</span> (<span class="variable">value</span>) {
-  <span class="keyword">var</span> <span class="variable">schema</span> = <span class="this">this</span>.<span class="variable">_parent</span>.<span class="variable">schema</span>.<span class="variable">path</span>(<span class="this">this</span>.<span class="variable">_path</span>)
-    , <span class="variable">value</span> = <span class="class">Number</span>(<span class="variable">value</span>) || <span class="number integer">1</span>;
-  <span class="keyword">if</span> (<span class="variable">isNaN</span>(<span class="variable">value</span>)) <span class="variable">value</span> = <span class="number integer">1</span>;
-  <span class="this">this</span>.<span class="variable">_parent</span>.<span class="variable">setValue</span>(<span class="this">this</span>.<span class="variable">_path</span>, <span class="variable">schema</span>.<span class="variable">cast</span>(<span class="this">this</span> + <span class="variable">value</span>));
-  <span class="this">this</span>.<span class="variable">_parent</span>.<span class="variable">getValue</span>(<span class="this">this</span>.<span class="variable">_path</span>).<span class="variable">_atomics</span>[<span class="string">'$inc'</span>] = <span class="variable">value</span> || <span class="number integer">1</span>;
-  <span class="this">this</span>.<span class="variable">_parent</span>.<span class="variable">_activePaths</span>.<span class="variable">modify</span>(<span class="this">this</span>.<span class="variable">_path</span>);
-  <span class="keyword">return</span> <span class="this">this</span>;
-};</code></pre>
-</td>
-</tr>
-<tr class="code">
-<td class="docs">
-<p>Returns true if we have to perform atomics for this, and no normal
-operations</p>
-
-<ul><li><p><strong>api</strong>: <em>public</em></p></li></ul>
-</td>
-<td class="code">
-<pre><code><span class="class">MongooseNumber</span>.<span class="variable">prototype</span>.<span class="variable">__defineGetter__</span>(<span class="string">'doAtomics'</span>, <span class="keyword">function</span> () {
-  <span class="keyword">return</span> <span class="class">Object</span>.<span class="variable">keys</span>(<span class="this">this</span>.<span class="variable">_atomics</span>).<span class="variable">length</span>;
-});</code></pre>
-</td>
-</tr>
-<tr class="code">
-<td class="docs">
-<p>Atomic decrement</p>
-
-<ul><li><p><strong>api</strong>: <em>public</em></p></li></ul>
-</td>
-<td class="code">
-<pre><code><span class="class">MongooseNumber</span>.<span class="variable">prototype</span>.<span class="variable">decrement</span> = <span class="keyword">function</span>(){
-  <span class="this">this</span>.<span class="variable">increment</span>(-<span class="number integer">1</span>);
-};</code></pre>
-</td>
-</tr>
-<tr class="code">
-<td class="docs">
-<p>Re-declare toString (for <code>console.log</code>)</p>
-
-<ul><li><p><strong>api</strong>: <em>public</em></p></li></ul>
-</td>
-<td class="code">
-<pre><code><span class="class">MongooseNumber</span>.<span class="variable">prototype</span>.<span class="variable">inspect</span> =
-<span class="class">MongooseNumber</span>.<span class="variable">prototype</span>.<span class="variable">toString</span> = <span class="keyword">function</span> () {
-  <span class="keyword">return</span> <span class="class">String</span>(<span class="this">this</span>.<span class="variable">valueOf</span>());
-};</code></pre>
-</td>
-</tr>
-<tr class="code">
-<td class="docs">
-<p>Module exports
+<p>Uncountable words.
  </p>
 </td>
 <td class="code">
-<pre><code><span class="variable">module</span>.<span class="variable">exports</span> = <span class="class">MongooseNumber</span>;
+<pre><code><span class="keyword">var</span> <span class="variable">uncountables</span> = [
+  <span class="string">'advice'</span>,
+  <span class="string">'energy'</span>,
+  <span class="string">'excretion'</span>,
+  <span class="string">'digestion'</span>,
+  <span class="string">'cooperation'</span>,
+  <span class="string">'health'</span>,
+  <span class="string">'justice'</span>,
+  <span class="string">'labour'</span>,
+  <span class="string">'machinery'</span>,
+  <span class="string">'equipment'</span>,
+  <span class="string">'information'</span>,
+  <span class="string">'pollution'</span>,
+  <span class="string">'sewage'</span>,
+  <span class="string">'paper'</span>,
+  <span class="string">'money'</span>,
+  <span class="string">'species'</span>,
+  <span class="string">'series'</span>,
+  <span class="string">'rain'</span>,
+  <span class="string">'rice'</span>,
+  <span class="string">'fish'</span>,
+  <span class="string">'sheep'</span>,
+  <span class="string">'moose'</span>,
+  <span class="string">'deer'</span>,
+  <span class="string">'news'</span>
+];</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Inherit from EventEmitter.
+   </p>
+</td>
+<td class="code">
+<pre><code><span class="class">Events</span>.<span class="variable">prototype</span>.<span class="variable">__proto__</span> = <span class="class">EventEmitter</span>.<span class="variable">prototype</span>;</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Add <code>once</code>.
+   </p>
+</td>
+<td class="code">
+<pre><code><span class="class">Events</span>.<span class="variable">prototype</span>.<span class="variable">once</span> = <span class="keyword">function</span> (<span class="variable">type</span>, <span class="variable">listener</span>) {
+    <span class="keyword">var</span> <span class="variable">self</span> = <span class="this">this</span>;
+    <span class="variable">self</span>.<span class="variable">on</span>(<span class="variable">type</span>, <span class="keyword">function</span> <span class="variable">g</span>(){
+      <span class="variable">self</span>.<span class="variable">removeListener</span>(<span class="variable">type</span>, <span class="variable">g</span>);
+      <span class="variable">listener</span>.<span class="variable">apply</span>(<span class="this">this</span>, <span class="variable">arguments</span>);
+    });
+  };
+
+}
+
+<span class="variable">exports</span>.<span class="class">EventEmitter</span> = <span class="class">Events</span>;
+
+<span class="comment">// Modified from node/lib/assert.js</span>
+<span class="variable">exports</span>.<span class="variable">deepEqual</span> = <span class="keyword">function</span> <span class="variable">deepEqual</span> (<span class="variable">a</span>, <span class="variable">b</span>) {
+  <span class="keyword">if</span> (<span class="variable">a</span> === <span class="variable">b</span>) <span class="keyword">return</span> <span class="variable">true</span>;
+
+  <span class="keyword">if</span> (<span class="variable">a</span> <span class="variable">instanceof</span> <span class="class">Date</span> &<span class="variable">amp</span>;&<span class="variable">amp</span>; <span class="variable">b</span> <span class="variable">instanceof</span> <span class="class">Date</span>)
+    <span class="keyword">return</span> <span class="variable">a</span>.<span class="variable">getTime</span>() === <span class="variable">b</span>.<span class="variable">getTime</span>();
+
+  <span class="keyword">if</span> (<span class="variable">a</span> <span class="variable">instanceof</span> <span class="class">ObjectId</span> &<span class="variable">amp</span>;&<span class="variable">amp</span>; <span class="variable">b</span> <span class="variable">instanceof</span> <span class="class">ObjectId</span>) {
+    <span class="keyword">return</span> <span class="variable">a</span>.<span class="variable">toString</span>() === <span class="variable">b</span>.<span class="variable">toString</span>();
+  }
+
+  <span class="keyword">if</span> (<span class="keyword">typeof</span> <span class="variable">a</span> !== <span class="string">'object'</span> &<span class="variable">amp</span>;&<span class="variable">amp</span>; <span class="keyword">typeof</span> <span class="variable">b</span> !== <span class="string">'object'</span>)
+    <span class="keyword">return</span> <span class="variable">a</span> == <span class="variable">b</span>;
+
+  <span class="keyword">if</span> (<span class="variable">a</span> === <span class="keyword">null</span> || <span class="variable">b</span> === <span class="keyword">null</span> || <span class="variable">a</span> === <span class="variable">undefined</span> || <span class="variable">b</span> === <span class="variable">undefined</span>)
+    <span class="keyword">return</span> <span class="variable">false</span>
+
+  <span class="keyword">if</span> (<span class="variable">a</span>.<span class="variable">prototype</span> !== <span class="variable">b</span>.<span class="variable">prototype</span>) <span class="keyword">return</span> <span class="variable">false</span>;
+
+  <span class="comment">// Handle MongooseNumbers</span>
+  <span class="keyword">if</span> (<span class="variable">a</span> <span class="variable">instanceof</span> <span class="class">Number</span> &<span class="variable">amp</span>;&<span class="variable">amp</span>; <span class="variable">b</span> <span class="variable">instanceof</span> <span class="class">Number</span>) {
+    <span class="keyword">return</span> <span class="variable">a</span>.<span class="variable">valueOf</span>() === <span class="variable">b</span>.<span class="variable">valueOf</span>();
+  }
+
+  <span class="keyword">if</span> (<span class="class">Buffer</span>.<span class="variable">isBuffer</span>(<span class="variable">a</span>)) {
+    <span class="keyword">if</span> (!<span class="class">Buffer</span>.<span class="variable">isBuffer</span>(<span class="variable">b</span>)) <span class="keyword">return</span> <span class="variable">false</span>;
+    <span class="keyword">if</span> (<span class="variable">a</span>.<span class="variable">length</span> !== <span class="variable">b</span>.<span class="variable">length</span>) <span class="keyword">return</span> <span class="variable">false</span>;
+    <span class="keyword">for</span> (<span class="keyword">var</span> <span class="variable">i</span> = <span class="number integer">0</span>, <span class="variable">len</span> = <span class="variable">a</span>.<span class="variable">length</span>; <span class="variable">i</span> &<span class="variable">lt</span>; <span class="variable">len</span>; ++<span class="variable">i</span>) {
+      <span class="keyword">if</span> (<span class="variable">a</span>[<span class="variable">i</span>] !== <span class="variable">b</span>[<span class="variable">i</span>]) <span class="keyword">return</span> <span class="variable">false</span>;
+    }
+    <span class="keyword">return</span> <span class="variable">true</span>;
+  }
+
+  <span class="keyword">if</span> (<span class="variable">isMongooseObject</span>(<span class="variable">a</span>)) <span class="variable">a</span> = <span class="variable">a</span>.<span class="variable">toObject</span>();
+  <span class="keyword">if</span> (<span class="variable">isMongooseObject</span>(<span class="variable">b</span>)) <span class="variable">b</span> = <span class="variable">b</span>.<span class="variable">toObject</span>();
+
+  <span class="keyword">try</span> {
+    <span class="keyword">var</span> <span class="variable">ka</span> = <span class="class">Object</span>.<span class="variable">keys</span>(<span class="variable">a</span>),
+        <span class="variable">kb</span> = <span class="class">Object</span>.<span class="variable">keys</span>(<span class="variable">b</span>),
+        <span class="variable">key</span>, <span class="variable">i</span>;
+  } <span class="keyword">catch</span> (<span class="variable">e</span>) {<span class="comment">//happens when one is a string literal and the other isn't</span>
+    <span class="keyword">return</span> <span class="variable">false</span>;
+  }
+
+  <span class="comment">// having the same number of owned properties (keys incorporates</span>
+  <span class="comment">// hasOwnProperty)</span>
+  <span class="keyword">if</span> (<span class="variable">ka</span>.<span class="variable">length</span> != <span class="variable">kb</span>.<span class="variable">length</span>)
+    <span class="keyword">return</span> <span class="variable">false</span>;
+
+  <span class="comment">//the same set of keys (although not necessarily the same order),</span>
+  <span class="variable">ka</span>.<span class="variable">sort</span>();
+  <span class="variable">kb</span>.<span class="variable">sort</span>();
+
+  <span class="comment">//~~~cheap key test</span>
+  <span class="keyword">for</span> (<span class="variable">i</span> = <span class="variable">ka</span>.<span class="variable">length</span> - <span class="number integer">1</span>; <span class="variable">i</span> &<span class="variable">gt</span>;= <span class="number integer">0</span>; <span class="variable">i</span>--) {
+    <span class="keyword">if</span> (<span class="variable">ka</span>[<span class="variable">i</span>] != <span class="variable">kb</span>[<span class="variable">i</span>])
+      <span class="keyword">return</span> <span class="variable">false</span>;
+  }
+
+  <span class="comment">//equivalent values for every corresponding key, and</span>
+  <span class="comment">//~~~possibly expensive deep test</span>
+  <span class="keyword">for</span> (<span class="variable">i</span> = <span class="variable">ka</span>.<span class="variable">length</span> - <span class="number integer">1</span>; <span class="variable">i</span> &<span class="variable">gt</span>;= <span class="number integer">0</span>; <span class="variable">i</span>--) {
+    <span class="variable">key</span> = <span class="variable">ka</span>[<span class="variable">i</span>];
+    <span class="keyword">if</span> (!<span class="variable">deepEqual</span>(<span class="variable">a</span>[<span class="variable">key</span>], <span class="variable">b</span>[<span class="variable">key</span>])) <span class="keyword">return</span> <span class="variable">false</span>;
+  }
+
+  <span class="keyword">return</span> <span class="variable">true</span>;
+};</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Merges <code>from</code> into <code>to</code> without overwriting
+existing properties of <code>to</code>.</p>
+
+<h2></h2>
+
+<ul><li><p><strong>param</strong>: <em>Object</em>  to</p></li><li><p><strong>param</strong>: <em>Object</em>  from</p></li></ul>
+</td>
+<td class="code">
+<pre><code><span class="variable">exports</span>.<span class="variable">merge</span> = <span class="keyword">function</span> <span class="variable">merge</span> (<span class="variable">to</span>, <span class="variable">from</span>) {
+  <span class="keyword">var</span> <span class="variable">keys</span> = <span class="class">Object</span>.<span class="variable">keys</span>(<span class="variable">from</span>)
+    , <span class="variable">i</span> = <span class="variable">keys</span>.<span class="variable">length</span>
+    , <span class="variable">key</span>
+
+  <span class="keyword">while</span> (<span class="variable">i</span>--) {
+    <span class="variable">key</span> = <span class="variable">keys</span>[<span class="variable">i</span>];
+    <span class="keyword">if</span> (<span class="string">'undefined'</span> === <span class="keyword">typeof</span> <span class="variable">to</span>[<span class="variable">key</span>]) {
+      <span class="variable">to</span>[<span class="variable">key</span>] = <span class="variable">from</span>[<span class="variable">key</span>];
+    } <span class="keyword">else</span> {
+      <span class="variable">merge</span>(<span class="variable">to</span>[<span class="variable">key</span>], <span class="variable">from</span>[<span class="variable">key</span>]);
+    }
+  }
+};</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>A faster Array.prototype.slice.call(arguments) alternative
+ </p>
+</td>
+<td class="code">
+<pre><code><span class="variable">exports</span>.<span class="variable">args</span> = <span class="keyword">function</span> (<span class="variable">args</span>, <span class="variable">slice</span>, <span class="variable">sliceEnd</span>) {
+  <span class="keyword">var</span> <span class="variable">ret</span> = [];
+  <span class="keyword">var</span> <span class="variable">start</span> = <span class="variable">slice</span> || <span class="number integer">0</span>;
+  <span class="keyword">var</span> <span class="variable">end</span> = <span class="number integer">3</span> === <span class="variable">arguments</span>.<span class="variable">length</span>
+    ? <span class="variable">sliceEnd</span>
+    : <span class="variable">args</span>.<span class="variable">length</span>;
+
+  <span class="keyword">for</span> (<span class="keyword">var</span> <span class="variable">i</span> = <span class="variable">start</span>; <span class="variable">i</span> &<span class="variable">lt</span>; <span class="variable">end</span>; ++<span class="variable">i</span>) {
+    <span class="variable">ret</span>[<span class="variable">i</span> - <span class="variable">start</span>] = <span class="variable">args</span>[<span class="variable">i</span>];
+  }
+
+  <span class="keyword">return</span> <span class="variable">ret</span>;
+}</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Returns if <code>v</code> is a mongoose object that has
+a <code>toObject()</code> method we can use. This is for
+compatibility with libs like Date.js which do
+foolish things to Natives.
+ </p>
+</td>
+<td class="code">
+<pre><code><span class="keyword">var</span> <span class="variable">isMongooseObject</span> = <span class="variable">exports</span>.<span class="variable">isMongooseObject</span> = <span class="keyword">function</span> (<span class="variable">v</span>) {
+  <span class="class">Document</span> || (<span class="class">Document</span> = <span class="variable">require</span>(<span class="string">'./document'</span>));
+  <span class="class">MongooseArray</span> || (<span class="class">MongooseArray</span> = <span class="variable">require</span>(<span class="string">'./types'</span>).<span class="class">Array</span>);
+  <span class="class">MongooseBuffer</span> || (<span class="class">MongooseBuffer</span> = <span class="variable">require</span>(<span class="string">'./types'</span>).<span class="class">Buffer</span>);
+
+  <span class="keyword">return</span> <span class="variable">v</span> <span class="variable">instanceof</span> <span class="class">Document</span> ||
+         <span class="variable">v</span> <span class="variable">instanceof</span> <span class="class">MongooseArray</span> ||
+         <span class="variable">v</span> <span class="variable">instanceof</span> <span class="class">MongooseBuffer</span>
+}
 </code></pre>
 </td>
 </tr><tr class="filename"><td><h2 id="lib/types/array.js"><a href="#">array</a></h2></td><td>lib/types/array.js</td></tr><tr class="code">
@@ -5912,247 +6177,6 @@ it.</p>
 </td>
 <td class="code">
 <pre><code><span class="variable">module</span>.<span class="variable">exports</span> = <span class="variable">exports</span> = <span class="class">MongooseArray</span>;
-</code></pre>
-</td>
-</tr><tr class="filename"><td><h2 id="lib/utils.js"><a href="#">utils</a></h2></td><td>lib/utils.js</td></tr><tr class="code">
-<td class="docs">
-<p>Module dependencies.
- </p>
-</td>
-<td class="code">
-<pre><code><span class="keyword">var</span> <span class="class">EventEmitter</span> = <span class="variable">require</span>(<span class="string">'events'</span>).<span class="class">EventEmitter</span>
-  , <span class="class">ObjectId</span> = <span class="variable">require</span>(<span class="string">'./types/objectid'</span>)
-  , <span class="class">MongooseBuffer</span>
-  , <span class="class">MongooseArray</span>
-  , <span class="class">Document</span></code></pre>
-</td>
-</tr>
-<tr class="code">
-<td class="docs">
-<p>Pluralization rules.
- </p>
-</td>
-<td class="code">
-<pre><code><span class="keyword">var</span> <span class="variable">rules</span> = [
-  [<span class="regexp">/(m)an$/gi</span>, <span class="string">'$1en'</span>],
-  [<span class="regexp">/(pe)rson$/gi</span>, <span class="string">'$1ople'</span>],
-  [<span class="regexp">/(child)$/gi</span>, <span class="string">'$1ren'</span>],
-  [<span class="regexp">/^(ox)$/gi</span>, <span class="string">'$1en'</span>],
-  [<span class="regexp">/(ax|test)is$/gi</span>, <span class="string">'$1es'</span>],
-  [<span class="regexp">/(octop|vir)us$/gi</span>, <span class="string">'$1i'</span>],
-  [<span class="regexp">/(alias|status)$/gi</span>, <span class="string">'$1es'</span>],
-  [<span class="regexp">/(bu)s$/gi</span>, <span class="string">'$1ses'</span>],
-  [<span class="regexp">/(buffal|tomat|potat)o$/gi</span>, <span class="string">'$1oes'</span>],
-  [<span class="regexp">/([ti])um$/gi</span>, <span class="string">'$1a'</span>],
-  [<span class="regexp">/sis$/gi</span>, <span class="string">'ses'</span>],
-  [<span class="regexp">/(?:([^f])fe|([lr])f)$/gi</span>, <span class="string">'$1$2ves'</span>],
-  [<span class="regexp">/(hive)$/gi</span>, <span class="string">'$1s'</span>],
-  [<span class="regexp">/([^aeiouy]|qu)y$/gi</span>, <span class="string">'$1ies'</span>],
-  [<span class="regexp">/(x|ch|ss|sh)$/gi</span>, <span class="string">'$1es'</span>],
-  [<span class="regexp">/(matr|vert|ind)ix|ex$/gi</span>, <span class="string">'$1ices'</span>],
-  [<span class="regexp">/([m|l])ouse$/gi</span>, <span class="string">'$1ice'</span>],
-  [<span class="regexp">/(quiz)$/gi</span>, <span class="string">'$1zes'</span>],
-  [<span class="regexp">/s$/gi</span>, <span class="string">'s'</span>],
-  [<span class="regexp">/$/gi</span>, <span class="string">'s'</span>]
-];</code></pre>
-</td>
-</tr>
-<tr class="code">
-<td class="docs">
-<p>Uncountable words.
- </p>
-</td>
-<td class="code">
-<pre><code><span class="keyword">var</span> <span class="variable">uncountables</span> = [
-  <span class="string">'advice'</span>,
-  <span class="string">'energy'</span>,
-  <span class="string">'excretion'</span>,
-  <span class="string">'digestion'</span>,
-  <span class="string">'cooperation'</span>,
-  <span class="string">'health'</span>,
-  <span class="string">'justice'</span>,
-  <span class="string">'labour'</span>,
-  <span class="string">'machinery'</span>,
-  <span class="string">'equipment'</span>,
-  <span class="string">'information'</span>,
-  <span class="string">'pollution'</span>,
-  <span class="string">'sewage'</span>,
-  <span class="string">'paper'</span>,
-  <span class="string">'money'</span>,
-  <span class="string">'species'</span>,
-  <span class="string">'series'</span>,
-  <span class="string">'rain'</span>,
-  <span class="string">'rice'</span>,
-  <span class="string">'fish'</span>,
-  <span class="string">'sheep'</span>,
-  <span class="string">'moose'</span>,
-  <span class="string">'deer'</span>,
-  <span class="string">'news'</span>
-];</code></pre>
-</td>
-</tr>
-<tr class="code">
-<td class="docs">
-<p>Inherit from EventEmitter.
-   </p>
-</td>
-<td class="code">
-<pre><code><span class="class">Events</span>.<span class="variable">prototype</span>.<span class="variable">__proto__</span> = <span class="class">EventEmitter</span>.<span class="variable">prototype</span>;</code></pre>
-</td>
-</tr>
-<tr class="code">
-<td class="docs">
-<p>Add <code>once</code>.
-   </p>
-</td>
-<td class="code">
-<pre><code><span class="class">Events</span>.<span class="variable">prototype</span>.<span class="variable">once</span> = <span class="keyword">function</span> (<span class="variable">type</span>, <span class="variable">listener</span>) {
-    <span class="keyword">var</span> <span class="variable">self</span> = <span class="this">this</span>;
-    <span class="variable">self</span>.<span class="variable">on</span>(<span class="variable">type</span>, <span class="keyword">function</span> <span class="variable">g</span>(){
-      <span class="variable">self</span>.<span class="variable">removeListener</span>(<span class="variable">type</span>, <span class="variable">g</span>);
-      <span class="variable">listener</span>.<span class="variable">apply</span>(<span class="this">this</span>, <span class="variable">arguments</span>);
-    });
-  };
-
-}
-
-<span class="variable">exports</span>.<span class="class">EventEmitter</span> = <span class="class">Events</span>;
-
-<span class="comment">// Modified from node/lib/assert.js</span>
-<span class="variable">exports</span>.<span class="variable">deepEqual</span> = <span class="keyword">function</span> <span class="variable">deepEqual</span> (<span class="variable">a</span>, <span class="variable">b</span>) {
-  <span class="keyword">if</span> (<span class="variable">a</span> === <span class="variable">b</span>) <span class="keyword">return</span> <span class="variable">true</span>;
-
-  <span class="keyword">if</span> (<span class="variable">a</span> <span class="variable">instanceof</span> <span class="class">Date</span> &<span class="variable">amp</span>;&<span class="variable">amp</span>; <span class="variable">b</span> <span class="variable">instanceof</span> <span class="class">Date</span>)
-    <span class="keyword">return</span> <span class="variable">a</span>.<span class="variable">getTime</span>() === <span class="variable">b</span>.<span class="variable">getTime</span>();
-
-  <span class="keyword">if</span> (<span class="variable">a</span> <span class="variable">instanceof</span> <span class="class">ObjectId</span> &<span class="variable">amp</span>;&<span class="variable">amp</span>; <span class="variable">b</span> <span class="variable">instanceof</span> <span class="class">ObjectId</span>) {
-    <span class="keyword">return</span> <span class="variable">a</span>.<span class="variable">toString</span>() === <span class="variable">b</span>.<span class="variable">toString</span>();
-  }
-
-  <span class="keyword">if</span> (<span class="keyword">typeof</span> <span class="variable">a</span> !== <span class="string">'object'</span> &<span class="variable">amp</span>;&<span class="variable">amp</span>; <span class="keyword">typeof</span> <span class="variable">b</span> !== <span class="string">'object'</span>)
-    <span class="keyword">return</span> <span class="variable">a</span> == <span class="variable">b</span>;
-
-  <span class="keyword">if</span> (<span class="variable">a</span> === <span class="keyword">null</span> || <span class="variable">b</span> === <span class="keyword">null</span> || <span class="variable">a</span> === <span class="variable">undefined</span> || <span class="variable">b</span> === <span class="variable">undefined</span>)
-    <span class="keyword">return</span> <span class="variable">false</span>
-
-  <span class="keyword">if</span> (<span class="variable">a</span>.<span class="variable">prototype</span> !== <span class="variable">b</span>.<span class="variable">prototype</span>) <span class="keyword">return</span> <span class="variable">false</span>;
-
-  <span class="comment">// Handle MongooseNumbers</span>
-  <span class="keyword">if</span> (<span class="variable">a</span> <span class="variable">instanceof</span> <span class="class">Number</span> &<span class="variable">amp</span>;&<span class="variable">amp</span>; <span class="variable">b</span> <span class="variable">instanceof</span> <span class="class">Number</span>) {
-    <span class="keyword">return</span> <span class="variable">a</span>.<span class="variable">valueOf</span>() === <span class="variable">b</span>.<span class="variable">valueOf</span>();
-  }
-
-  <span class="keyword">if</span> (<span class="class">Buffer</span>.<span class="variable">isBuffer</span>(<span class="variable">a</span>)) {
-    <span class="keyword">if</span> (!<span class="class">Buffer</span>.<span class="variable">isBuffer</span>(<span class="variable">b</span>)) <span class="keyword">return</span> <span class="variable">false</span>;
-    <span class="keyword">if</span> (<span class="variable">a</span>.<span class="variable">length</span> !== <span class="variable">b</span>.<span class="variable">length</span>) <span class="keyword">return</span> <span class="variable">false</span>;
-    <span class="keyword">for</span> (<span class="keyword">var</span> <span class="variable">i</span> = <span class="number integer">0</span>, <span class="variable">len</span> = <span class="variable">a</span>.<span class="variable">length</span>; <span class="variable">i</span> &<span class="variable">lt</span>; <span class="variable">len</span>; ++<span class="variable">i</span>) {
-      <span class="keyword">if</span> (<span class="variable">a</span>[<span class="variable">i</span>] !== <span class="variable">b</span>[<span class="variable">i</span>]) <span class="keyword">return</span> <span class="variable">false</span>;
-    }
-    <span class="keyword">return</span> <span class="variable">true</span>;
-  }
-
-  <span class="keyword">if</span> (<span class="variable">isMongooseObject</span>(<span class="variable">a</span>)) <span class="variable">a</span> = <span class="variable">a</span>.<span class="variable">toObject</span>();
-  <span class="keyword">if</span> (<span class="variable">isMongooseObject</span>(<span class="variable">b</span>)) <span class="variable">b</span> = <span class="variable">b</span>.<span class="variable">toObject</span>();
-
-  <span class="keyword">try</span> {
-    <span class="keyword">var</span> <span class="variable">ka</span> = <span class="class">Object</span>.<span class="variable">keys</span>(<span class="variable">a</span>),
-        <span class="variable">kb</span> = <span class="class">Object</span>.<span class="variable">keys</span>(<span class="variable">b</span>),
-        <span class="variable">key</span>, <span class="variable">i</span>;
-  } <span class="keyword">catch</span> (<span class="variable">e</span>) {<span class="comment">//happens when one is a string literal and the other isn't</span>
-    <span class="keyword">return</span> <span class="variable">false</span>;
-  }
-
-  <span class="comment">// having the same number of owned properties (keys incorporates</span>
-  <span class="comment">// hasOwnProperty)</span>
-  <span class="keyword">if</span> (<span class="variable">ka</span>.<span class="variable">length</span> != <span class="variable">kb</span>.<span class="variable">length</span>)
-    <span class="keyword">return</span> <span class="variable">false</span>;
-
-  <span class="comment">//the same set of keys (although not necessarily the same order),</span>
-  <span class="variable">ka</span>.<span class="variable">sort</span>();
-  <span class="variable">kb</span>.<span class="variable">sort</span>();
-
-  <span class="comment">//~~~cheap key test</span>
-  <span class="keyword">for</span> (<span class="variable">i</span> = <span class="variable">ka</span>.<span class="variable">length</span> - <span class="number integer">1</span>; <span class="variable">i</span> &<span class="variable">gt</span>;= <span class="number integer">0</span>; <span class="variable">i</span>--) {
-    <span class="keyword">if</span> (<span class="variable">ka</span>[<span class="variable">i</span>] != <span class="variable">kb</span>[<span class="variable">i</span>])
-      <span class="keyword">return</span> <span class="variable">false</span>;
-  }
-
-  <span class="comment">//equivalent values for every corresponding key, and</span>
-  <span class="comment">//~~~possibly expensive deep test</span>
-  <span class="keyword">for</span> (<span class="variable">i</span> = <span class="variable">ka</span>.<span class="variable">length</span> - <span class="number integer">1</span>; <span class="variable">i</span> &<span class="variable">gt</span>;= <span class="number integer">0</span>; <span class="variable">i</span>--) {
-    <span class="variable">key</span> = <span class="variable">ka</span>[<span class="variable">i</span>];
-    <span class="keyword">if</span> (!<span class="variable">deepEqual</span>(<span class="variable">a</span>[<span class="variable">key</span>], <span class="variable">b</span>[<span class="variable">key</span>])) <span class="keyword">return</span> <span class="variable">false</span>;
-  }
-
-  <span class="keyword">return</span> <span class="variable">true</span>;
-};</code></pre>
-</td>
-</tr>
-<tr class="code">
-<td class="docs">
-<p>Merges <code>from</code> into <code>to</code> without overwriting
-existing properties of <code>to</code>.</p>
-
-<h2></h2>
-
-<ul><li><p><strong>param</strong>: <em>Object</em>  to</p></li><li><p><strong>param</strong>: <em>Object</em>  from</p></li></ul>
-</td>
-<td class="code">
-<pre><code><span class="variable">exports</span>.<span class="variable">merge</span> = <span class="keyword">function</span> <span class="variable">merge</span> (<span class="variable">to</span>, <span class="variable">from</span>) {
-  <span class="keyword">var</span> <span class="variable">keys</span> = <span class="class">Object</span>.<span class="variable">keys</span>(<span class="variable">from</span>)
-    , <span class="variable">i</span> = <span class="variable">keys</span>.<span class="variable">length</span>
-    , <span class="variable">key</span>
-
-  <span class="keyword">while</span> (<span class="variable">i</span>--) {
-    <span class="variable">key</span> = <span class="variable">keys</span>[<span class="variable">i</span>];
-    <span class="keyword">if</span> (<span class="string">'undefined'</span> === <span class="keyword">typeof</span> <span class="variable">to</span>[<span class="variable">key</span>]) {
-      <span class="variable">to</span>[<span class="variable">key</span>] = <span class="variable">from</span>[<span class="variable">key</span>];
-    } <span class="keyword">else</span> {
-      <span class="variable">merge</span>(<span class="variable">to</span>[<span class="variable">key</span>], <span class="variable">from</span>[<span class="variable">key</span>]);
-    }
-  }
-};</code></pre>
-</td>
-</tr>
-<tr class="code">
-<td class="docs">
-<p>A faster Array.prototype.slice.call(arguments) alternative
- </p>
-</td>
-<td class="code">
-<pre><code><span class="variable">exports</span>.<span class="variable">args</span> = <span class="keyword">function</span> (<span class="variable">args</span>, <span class="variable">slice</span>, <span class="variable">sliceEnd</span>) {
-  <span class="keyword">var</span> <span class="variable">ret</span> = [];
-  <span class="keyword">var</span> <span class="variable">start</span> = <span class="variable">slice</span> || <span class="number integer">0</span>;
-  <span class="keyword">var</span> <span class="variable">end</span> = <span class="number integer">3</span> === <span class="variable">arguments</span>.<span class="variable">length</span>
-    ? <span class="variable">sliceEnd</span>
-    : <span class="variable">args</span>.<span class="variable">length</span>;
-
-  <span class="keyword">for</span> (<span class="keyword">var</span> <span class="variable">i</span> = <span class="variable">start</span>; <span class="variable">i</span> &<span class="variable">lt</span>; <span class="variable">end</span>; ++<span class="variable">i</span>) {
-    <span class="variable">ret</span>[<span class="variable">i</span> - <span class="variable">start</span>] = <span class="variable">args</span>[<span class="variable">i</span>];
-  }
-
-  <span class="keyword">return</span> <span class="variable">ret</span>;
-}</code></pre>
-</td>
-</tr>
-<tr class="code">
-<td class="docs">
-<p>Returns if <code>v</code> is a mongoose object that has
-a <code>toObject()</code> method we can use. This is for
-compatibility with libs like Date.js which do
-foolish things to Natives.
- </p>
-</td>
-<td class="code">
-<pre><code><span class="keyword">var</span> <span class="variable">isMongooseObject</span> = <span class="variable">exports</span>.<span class="variable">isMongooseObject</span> = <span class="keyword">function</span> (<span class="variable">v</span>) {
-  <span class="class">Document</span> || (<span class="class">Document</span> = <span class="variable">require</span>(<span class="string">'./document'</span>));
-  <span class="class">MongooseArray</span> || (<span class="class">MongooseArray</span> = <span class="variable">require</span>(<span class="string">'./types'</span>).<span class="class">Array</span>);
-  <span class="class">MongooseBuffer</span> || (<span class="class">MongooseBuffer</span> = <span class="variable">require</span>(<span class="string">'./types'</span>).<span class="class">Buffer</span>);
-
-  <span class="keyword">return</span> <span class="variable">v</span> <span class="variable">instanceof</span> <span class="class">Document</span> ||
-         <span class="variable">v</span> <span class="variable">instanceof</span> <span class="class">MongooseArray</span> ||
-         <span class="variable">v</span> <span class="variable">instanceof</span> <span class="class">MongooseBuffer</span>
-}
 </code></pre>
 </td>
 </tr><tr class="filename"><td><h2 id="lib/virtualtype.js"><a href="#">virtualtype</a></h2></td><td>lib/virtualtype.js</td></tr><tr class="code">

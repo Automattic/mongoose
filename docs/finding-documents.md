@@ -61,7 +61,7 @@ Finds distinct values of `field` for documents matching `conditions`.
 
 ## Model.where
 
-Creates a Query for this model. Handy when expressing complex directives.
+Creates a [Query](/docs/query.html) for this model. Handy when expressing complex directives.
 
     Model
     .where('age').gte(25)
@@ -82,22 +82,7 @@ Sometimes you need to query for things in mongodb using a JavaScript expression.
 
 ## Model.update
 
-Updates all documents matching `conditions` using the `update` clause. All `update` values are casted to their appropriate types before being sent.
-
-    var conditions = { name: 'borne' }
-      , update = { $inc: { visits: 1 }}
-      , options = { multi: true };
-
-    Model.update(conditions, update, options, callback)
-
-Note: for backwards compatibility, all top-level `update` keys that are not $atomic operation names are treated as `$set` operations. Example:
-
-    var query = { name: 'borne' };
-    Model.update(query, { name: 'jason borne' }, options, callback)
-
-    // is sent as
-
-    Model.update(query, { $set: { name: 'jason borne' }}, options, callback)
+See the [updating docs](/docs/updating-documents.html) page.
 
 ## Query API
 

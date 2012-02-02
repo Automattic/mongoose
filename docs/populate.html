@@ -185,6 +185,7 @@
             <li><a href="/docs/schema-options.html">Schema Options</a></li>
             <li><a href="/docs/middleware.html">Middleware</a></li>
             <li><a href="/docs/finding-documents.html">Finding Docs</a></li>
+            <li><a href="/docs/updating-documents.html">Updating Docs</a></li>
             <li><a href="/docs/query.html">Queries</a></li>
             <li><a href="/docs/querystream.html">Query Streams</a></li>
             <li><a href="/docs/methods-statics.html">Methods &amp; Statics</a>
@@ -231,7 +232,9 @@ var Person = mongoose.model('Person', PersonSchema);
 
 <p>So far we've created two models. Our <code>Person</code> model has it's <code>stories</code> field set to an array of <code>ObjectId</code>s. The <code>ref</code> option is what tells Mongoose in which model to look, in our case the <code>Story</code> model. All <code>_id</code>s we store here must be document <code>_id</code>s from the <code>Story</code> model. We also added a <code>_creator</code> <code>ObjectId</code> to our <code>Story</code> schema which refers to a single <code>Person</code>.</p>
 
-<h2>Populating the refs</h2>
+<h2>Saving a ref (to the parent)</h2>
+
+<p>Below you can see how we "save" a ref in 'story1' back to the _creator.  This <br />is usually all you need to do.</p>
 
 <pre><code>var aaron = new Person({ name: 'Aaron', age: 100 });
 
@@ -248,6 +251,8 @@ aaron.save(function (err) {
   });
 })
 </code></pre>
+
+<h2>Populating the refs (to the parent)</h2>
 
 <p>So far we haven't done anything special. We've merely created a <code>Person</code> and a <code>Story</code>. Now let's take a look at populating our story's <code>_creator</code>:</p>
 
@@ -291,6 +296,40 @@ aaron.save(function (err) {
 </code></pre>
 
 <p>Done. Conditions and options are the third and fourth arguments respectively.</p>
+
+<h2>References to the children</h2>
+
+<p>You may find however, if you use the <code>aaron</code> object, you are unable to get a list of the <code>stories</code>.  This is because no <code>story</code> objects were ever 'pushed' on to <code>aaron.stories</code>.</p>
+
+<p>There are two perspectives to this story.  First, it's nice to have aaron know which are his stories.</p>
+
+<pre><code>  aaron.stories.push(story1);
+  aaron.save();
+</code></pre>
+
+<p>This allows you do a find &amp; populate like:</p>
+
+<pre><code>Person
+.findOne({ name: 'Aaron' })
+.populate('stories') // &lt;-- only works if you pushed refs to children
+.run(function (err, person) {
+  if (err) ..
+
+  console.log('JSON for person is: ', person);
+})
+</code></pre>
+
+<p>However, it is debatable that you really want two sets of pointers as they may get out of sync.  So you could instead merely find() the documents you are interested in.</p>
+
+<pre><code>Story
+.find({ _creator: aaron._id })
+.populate('_creator') // &lt;-- not really necessary
+.run(function (err, stories) {
+  if (err) ..
+
+  console.log('The stories JSON is an array: ', stories);
+})
+</code></pre>
 
 <h2>Updating</h2>
 

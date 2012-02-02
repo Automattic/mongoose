@@ -885,6 +885,21 @@ module.exports = {
     var s = new Schema(o);
     s.add({ age: Number }, 'name.');
     ;('age' in o.name).should.be.false;
+  },
+
+  // gh-700
+  'nested schemas should throw': function () {
+    var a = new Schema({ title: String })
+      , err
+
+    try {
+      new Schema({ blah: Boolean, a: a });
+    } catch (err_) {
+      err = err_;
+    }
+
+    should.exist(err);
+    ;/Did you try nesting Schemas/.test(err.message).should.be.true;
   }
 
 };

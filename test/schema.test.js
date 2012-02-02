@@ -900,6 +900,29 @@ module.exports = {
 
     should.exist(err);
     ;/Did you try nesting Schemas/.test(err.message).should.be.true;
+  },
+
+  'non-function etters throw': function () {
+    var schema = new Schema({ fun: String });
+    var g, s;
+
+    try {
+      schema.path('fun').get(true);
+    } catch (err_) {
+      g = err_;
+    }
+
+    should.exist(g);
+    g.message.should.equal('A getter must be a function.');
+
+    try {
+      schema.path('fun').set(4);
+    } catch (err_) {
+      s = err_;
+    }
+
+    should.exist(s);
+    s.message.should.equal('A setter must be a function.');
   }
 
 };

@@ -1,4 +1,9 @@
 
+2.5.4 / 2012-02-03
+===================
+
+  * fixed; RangeError: maximum call stack exceed error (#714)
+
 2.5.3 / 2012-02-02
 ===================
 

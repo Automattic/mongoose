@@ -800,43 +800,29 @@ module.exports = {
     });
   },
 
-  // gh-662
-  'test nested structure created by merging': function() {
-    var db = start();
+  // gh-714
+  'modified nested objects which contain MongoseNumbers should not cause a RangeError on save': function () {
+    var db =start()
 
-    var MergedSchema = new Schema({
-      a: {
-        foo: String
-      }
-    });
-
-    MergedSchema.add({
-      a: {
-        b: {
-          bar: String
+    var schema = new Schema({
+        nested: {
+            num: Number
         }
-      }
     });
 
-    mongoose.model('Merged', MergedSchema);
-    var Merged = db.model('Merged', 'merged_' + Math.random());
-
-    var merged = new Merged({
-      a: {
-          foo: 'baz'
-        , b: {
-            bar: 'qux'
-          }
-      }
-    });
-
-    merged.save(function(err) {
+    var M = db.model('NestedObjectWithMongooseNumber', schema);
+    var m = new M;
+    m.nested = null;
+    m.save(function (err) {
       should.strictEqual(null, err);
-      Merged.findById(merged.id, function(err, found) {
-        db.close();
+
+      M.findById(m, function (err, m) {
         should.strictEqual(null, err);
-        found.a.foo.should.eql('baz');
-        found.a.b.bar.should.eql('qux');
+        m.nested.num = 5;
+        m.save(function (err) {
+          db.close();
+          should.strictEqual(null, err);
+        });
       });
     });
   },

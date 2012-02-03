@@ -1,4 +1,9 @@
 
+2.5.5 / 2012-02-03
+===================
+
+  * fixed; RangeError: maximum call stack exceed error when removing docs with Number _id (#714)
+
 2.5.4 / 2012-02-03
 ===================
 

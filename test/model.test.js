@@ -827,6 +827,36 @@ module.exports = {
     });
   },
 
+  // gh-714 pt 2
+  'no RangeError on remove() of a doc with Number _id': function () {
+    var db = start()
+
+    var MySchema = new Schema({
+        _id: { type: Number },
+        name: String
+    });
+
+    var MyModel = db.model('MyModel', MySchema, 'numberrangeerror'+random());
+
+    var instance = new MyModel({
+        name: 'test'
+      , _id: 35
+    });
+
+    instance.save(function (err) {
+      should.strictEqual(null, err);
+
+      MyModel.findById(35, function (err, doc) {
+        should.strictEqual(null, err);
+
+        doc.remove(function (err) {
+          db.close();
+          should.strictEqual(null, err);
+        });
+      });
+    });
+  },
+
   // GH-342
   'over-writing a number should persist to the db': function () {
     var db = start()

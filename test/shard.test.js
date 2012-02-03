@@ -71,7 +71,7 @@ var tests = {
     });
   },
 
-  'save() works with shard keys transparently': function () {
+  'save() and remove() works with shard keys transparently': function () {
     var db = start({ uri:  uri })
     var P = db.model('ShardPerson', collection);
 
@@ -97,10 +97,13 @@ var tests = {
 
           zang.likes.addToSet('winning');
           zang.save(function (err) {
-            db.close();
             should.strictEqual(null, err);
             zang._shardval.name.should.equal('Zangief');
             zang._shardval.age.should.equal(33);
+            zang.remove(function (err) {
+              db.close();
+              should.strictEqual(null, err);
+            });
           });
         });
       });

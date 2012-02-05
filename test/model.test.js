@@ -2124,6 +2124,25 @@ module.exports = {
     });
   },
 
+  'test creating multiple docs' : function() {
+    var db = start()
+      , schema = new Schema({
+          name: String
+        })
+      , count = 0;
+
+    schema.post('save', function(doc){
+      ++count === 2 && db.close();
+    });
+    mongoose.model('MultiDoc', schema);
+    var Temp = db.model('MultiDoc', collection);
+  
+    Temp.create([{ name: 'doc1'}, { name: 'doc2'}], function (err, doc1, doc2) {
+      should.equal('doc1', doc1.name);
+      should.equal('doc2', doc2.name);
+    });
+  },
+  
   'test updating at least a single $push and $pushAll as a single $pushAll': function () {
     var db = start()
       , schema = new Schema({

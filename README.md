@@ -146,14 +146,23 @@ Or just do it all at once
 var MyModel = mongoose.model('ModelName', mySchema);
 ```
 
-**Important!** If you define your model in a separate file you will need to call require('mongoose') in your model. 
-When require is called mongoose will use the default connection: `mongoose.connection`. However, if you connected 
-to mongo by calling `mongoose.createConnection`, then your model will not return any data when querying or saving as
-the default connection will not be set. You should always connect to your mongo instance by calling `mongoose.connect` which will set the default connection ('mongoose.connection')
-unless you need multiple connections. Finally, update your model definitions using the default connection:
+**Important!** If you opened a separate connection using `mongoose.createConnection()`
+but attempt to access the model through `mongoose.model('ModelName')` it will
+not work as expected since it is not hooked up to an active db connection. In this
+case access your model through the connection you created:
 
-```javascript
-var MyModel = mongoose.connection.model('ModelName', mySchema);
+```js
+var conn = mongoose.createConnection('your connection string');
+var MyModel = conn.model('ModelName', schema);
+var m = new MyModel;
+m.save() // works
+
+vs
+
+var conn = mongoose.createConnection('your connection string');
+var MyModel = mongoose.model('ModelName', schema);
+var m = new MyModel;
+m.save() // does not work b/c the default connection object was never connected
 ```
 
 ```javascript

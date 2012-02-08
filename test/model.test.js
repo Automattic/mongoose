@@ -4634,5 +4634,22 @@ module.exports = {
         });
       });
     });
+  },
+
+  'number of affected docs should be returned when saving': function () {
+    var db = start()
+    var schema = new Schema({ name: String });
+    var S = db.model('AffectedDocsAreReturned', schema);
+    var s = new S({ name: 'aaron' });
+    s.save(function (err, doc, affected) {
+      should.strictEqual(null, err);
+      affected.should.equal(1);
+      s.name = 'heckmanananananana';
+      s.save(function (err, doc, affected) {
+        db.close();
+        should.strictEqual(null, err);
+        affected.should.equal(1);
+      });
+    });
   }
 };

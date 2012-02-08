@@ -482,6 +482,41 @@ module.exports = {
     Animal.path('isFerret').cast('1').should.be.true;
   },
 
+'test async multiple validators': function(beforeExit){
+    var executed = 0;
+    
+    function validator (value, fn) {
+      setTimeout(function(){
+        executed++;
+        fn(value === true);
+      }, 50);
+    };
+
+    var Animal = new Schema({
+      ferret: { 
+        type: Boolean, 
+        validate: [
+          {
+            'validator': validator,
+            'msg': 'validator1'
+          },
+          {
+            'validator': validator,
+            'msg': 'validator2'
+          },
+        ],
+      }
+    });
+
+    Animal.path('ferret').doValidate(true, function(err){
+      should.strictEqual(err, null);
+    });
+
+    beforeExit(function(){
+      executed.should.eql(2);
+    });
+  },
+
   'test async validators': function(beforeExit){
     var executed = 0;
     

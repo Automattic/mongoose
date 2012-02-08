@@ -2,7 +2,7 @@ Populate - DBRef-like behavior (experimental)
 =============================================
 
 `ObjectIds` can now refer to another document in a
-collection within our database and be `populate()`d when
+collection within our database and be populated when
 querying. An example is helpful:
 
     var mongoose = require('mongoose')

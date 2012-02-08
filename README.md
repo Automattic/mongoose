@@ -146,7 +146,15 @@ Or just do it all at once
 var MyModel = mongoose.model('ModelName', mySchema);
 ```
 
-We can then instantiate it, and save it:
+**Important!** If you define your model in a separate file you will need to call require('mongoose') in your model. 
+When require is called mongoose will use the default connection: `mongoose.connection`. However, if you connected 
+to mongo by calling `mongoose.createConnection`, then your model will not return any data when querying or saving as
+the default connection will not be set. You should always connect to your mongo instance by calling `mongoose.connect` which will set the default connection ('mongoose.connection')
+unless you need multiple connections. Finally, update your model definitions using the default connection:
+
+```javascript
+var MyModel = mongoose.connection.model('ModelName', mySchema);
+```
 
 ```javascript
 var instance = new MyModel();

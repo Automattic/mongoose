@@ -20,10 +20,7 @@ function convert (input, output, index) {
   fs.writeFileSync(output, contents);
 };
 
-if (process.argv.length > 2 && 'index' === process.argv[2]) {
-  convert('README.md', 'index.html', true);
-}
-
+convert('README.md', 'index.html', true);
 convert('docs/defaults.md', 'docs/defaults.html');
 convert('docs/embedded-documents.md', 'docs/embedded-documents.html');
 convert('docs/finding-documents.md', 'docs/finding-documents.html');

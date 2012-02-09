@@ -1122,16 +1122,15 @@ module.exports = {
 
   // GH-319
   'save callback should only execute once regardless of number of failed validations': function () {
-    mongoose.model('CallbackFiresOnceValidation', new Schema({
+    var db = start()
+
+    var D = db.model('CallbackFiresOnceValidation', new Schema({
         username: { type: String, validate: /^[a-z]{6}$/i }
       , email: { type: String, validate: /^[a-z]{6}$/i }
       , password: { type: String, validate: /^[a-z]{6}$/i }
     }));
 
-    var db = start()
-      , CallbackFiresOnceValidation = db.model('CallbackFiresOnceValidation');
-
-    var post = new CallbackFiresOnceValidation({
+    var post = new D({
         username: "nope"
       , email: "too"
       , password: "short"
@@ -1140,6 +1139,7 @@ module.exports = {
     var timesCalled = 0;
 
     post.save(function (err) {
+      db.close();
       err.should.be.an.instanceof(MongooseError);
       err.should.be.an.instanceof(ValidationError);
 
@@ -1161,7 +1161,6 @@ module.exports = {
       post.errors.email.message.should.eql('Validator failed for path email');
       post.errors.username.message.should.eql('Validator failed for path username');
 
-      db.close();
     });
   },
 

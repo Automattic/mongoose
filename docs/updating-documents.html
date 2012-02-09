@@ -216,7 +216,11 @@
   , update = { $inc: { visits: 1 }}
   , options = { multi: true };
 
-Model.update(conditions, update, options, callback)
+Model.update(conditions, update, options, callback);
+
+function callback (err, numAffected) {
+  // numAffected is the number of updated documents
+})
 </code></pre>
 
 <p>Keep in mind that that the <code>safe</code> option specified in your schema is used by default when not specified here.</p>

@@ -6,7 +6,11 @@ Updates all documents matching `conditions` using the `update` clause. All `upda
       , update = { $inc: { visits: 1 }}
       , options = { multi: true };
 
-    Model.update(conditions, update, options, callback)
+    Model.update(conditions, update, options, callback);
+
+    function callback (err, numAffected) {
+      // numAffected is the number of updated documents
+    })
 
 Keep in mind that that the `safe` option specified in your schema is used by default when not specified here.
 

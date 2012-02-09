@@ -1,20 +1,27 @@
 
 var fs = require('fs')
   , template = fs.readFileSync('template.html').toString()
-  //, markdown = require('markdown');
+  , announcement = 'announcement.html'
   , markdown = require('github-flavored-markdown');
 
-function convert (input, output) {
-  fs.writeFileSync(
-      output
-    , template.replace('<!-- CONTENT -->', 
-        markdown.parse(fs.readFileSync(input).toString())
+function convert (input, output, index) {
+  var contents = template.replace(
+      '<!-- CONTENT -->'
+    , markdown.parse(fs.readFileSync(input).toString())
+  )
+
+  if (index) {
+      contents = contents.replace(
+          '<!-- ANNOUNCE -->'
+        , markdown.parse(fs.readFileSync(announcement).toString())
       )
-  );
+  }
+
+  fs.writeFileSync(output, contents);
 };
 
 if (process.argv.length > 2 && 'index' === process.argv[2]) {
-  convert('README.md', 'index.html');
+  convert('README.md', 'index.html', true);
 }
 
 convert('docs/defaults.md', 'docs/defaults.html');

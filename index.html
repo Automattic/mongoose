@@ -1,5 +1,6 @@
 <html>
   <head>
+    <meta charset="utf-8">
     <title>Mongoose ODM</title>
     <style>
       body {
@@ -206,296 +207,215 @@
         <h1><a href="/">Mongoose</a></h1>
 
         <div id="content">
-          <h1>Mongoose 2.5.3</h1>
+          <h1>Mongoose 2.5.6</h1>
+
 <div id="announce"><strong>01-26-2012: Mongoose 2.5 is here</strong> with many bugfixes
-            and enhancements to queries, populate(), and other goodies.
-            Check out the <a href="http://groups.google.com/group/mongoose-orm/browse_thread/thread/19068f141f0bf017">release notes</a> for details.
+  and enhancements to queries, populate(), and other goodies.
+  Check out the <a href="http://groups.google.com/group/mongoose-orm/browse_thread/thread/19068f141f0bf017">release notes</a> for details.
 </div>
+          <h1>Mongoose 2.0</h1>
 
-<h2>What&#39;s Mongoose?</h2>
+<h2>What's Mongoose?</h2>
 
-<p>Mongoose is a <a href="http://www.mongodb.org/">MongoDB</a> object modeling tool designed to work in an asynchronous
-environment.</p>
+<p>Mongoose is a <a href="http://www.mongodb.org/">MongoDB</a> object modeling tool designed to work in an asynchronous<br />environment.</p>
 
 <p>Defining a model is as easy as:</p>
 
-<pre><code>var Comments = new Schema({
-    title     : String
-  , body      : String
-  , date      : Date
-});
+<p>```javascript<br />var Comments = new Schema({<br />    title     : String<br />  , body      : String<br />  , date      : Date<br />});</p>
 
-var BlogPost = new Schema({
-    author    : ObjectId
-  , title     : String
-  , body      : String
-  , buf       : Buffer
-  , date      : Date
-  , comments  : [Comments]
-  , meta      : {
-      votes : Number
-    , favs  : Number
-  }
-});
+<p>var BlogPost = new Schema({<br />    author    : ObjectId<br />  , title     : String<br />  , body      : String<br />  , buf       : Buffer<br />  , date      : Date<br />  , comments  : [Comments]<br />  , meta      : {<br />      votes : Number<br />      , favs  : Number<br />    }<br />});</p>
 
-var Post = mongoose.model(&#39;BlogPost&#39;, BlogPost);</code></pre>
+<p>var Post = mongoose.model('BlogPost', BlogPost);<br />```</p>
 
 <h2>Installation</h2>
 
 <p>The recommended way is through the excellent <a href="http://www.npmjs.org/">NPM</a>:</p>
 
-<pre><code>$ npm install mongoose</code></pre>
+<p><code>bash<br />$ npm install mongoose<br /></code></p>
 
 <p>Otherwise, you can check it in your repository and then expose it:</p>
 
-<pre><code>$ git clone git@github.com:LearnBoost/mongoose.git node_modules/mongoose/</code></pre>
+<p><code>bash<br />$ git clone git://github.com/LearnBoost/mongoose.git node_modules/mongoose/<br /></code><br />And install dependency modules written on <code>package.json</code>.</p>
 
 <p>Then you can <code>require</code> it:</p>
 
-<pre><code>require(&#39;mongoose&#39;)</code></pre>
+<p><code>javascript<br />require('mongoose')<br /></code></p>
 
 <h2>Connecting to MongoDB</h2>
 
-<p>First, we need to define a connection. If your app uses only one database, you
-should use <code>mongoose.connect</code>. If you need to create additional connections, use
-<code>mongoose.createConnection</code>.</p>
+<p>First, we need to define a connection. If your app uses only one database, you<br />should use <code>mongose.connect</code>. If you need to create additional connections, use<br /><code>mongoose.createConnection</code>.</p>
 
-<p>Both <code>connect</code> and <code>createConnection</code> take a <code>mongodb://</code> URI, or the parameters
-<code>host, database, port, options</code>.</p>
+<p>Both <code>connect</code> and <code>createConnection</code> take a <code>mongodb://</code> URI, or the parameters<br /><code>host, database, port, options</code>.</p>
 
-<pre><code>var mongoose = require(&#39;mongoose&#39;);
+<p>```javascript<br />var mongoose = require('mongoose');</p>
 
-mongoose.connect(&#39;mongodb://localhost/my_database&#39;);</code></pre>
+<p>mongoose.connect('mongodb://localhost/my_database');<br />```</p>
 
-<p>Once connected, the <code>open</code> event is fired on the <code>Connection</code> instance. If
-you&#39;re using <code>mongoose.connect</code>, the <code>Connection</code> is <code>mongoose.connection</code>.
-Otherwise, <code>mongoose.createConnection</code> return value is a <code>Connection</code>.</p>
+<p>Once connected, the <code>open</code> event is fired on the <code>Connection</code> instance. If<br />you're using <code>mongoose.connect</code>, the <code>Connection</code> is <code>mongoose.connection</code>.<br />Otherwise, <code>mongoose.createConnection</code> return value is a <code>Connection</code>.</p>
 
-<p><strong>Important!</strong> Mongoose buffers all the commands until it&#39;s connected to the
-database. This means that you don&#39;t have to wait until it connects to MongoDB
-in order to define models, run queries, etc.</p>
+<p><strong>Important!</strong> Mongoose buffers all the commands until it's connected to the<br />database. This means that you don't have to wait until it connects to MongoDB<br />in order to define models, run queries, etc.</p>
 
 <h2>Defining a Model</h2>
 
 <p>Models are defined through the <code>Schema</code> interface. </p>
 
-<pre><code>var Schema = mongoose.Schema
-  , ObjectId = Schema.ObjectId;
+<p>```javascript<br />var Schema = mongoose.Schema<br />  , ObjectId = Schema.ObjectId;</p>
 
-var BlogPost = new Schema({
-    author    : ObjectId
-  , title     : String
-  , body      : String
-  , date      : Date
-});</code></pre>
+<p>var BlogPost = new Schema({<br />    author    : ObjectId<br />  , title     : String<br />  , body      : String<br />  , date      : Date<br />});<br />```</p>
 
-<p>Aside from defining the structure of your documents and the types of data you&#39;re
-storing, a Schema handles the definition of:</p>
+<p>Aside from defining the structure of your documents and the types of data you're<br />storing, a Schema handles the definition of:</p>
 
-<ul><li><a href="http://mongoosejs.com/docs/validation.html">Validators</a> (async and sync)</li><li><a href="http://mongoosejs.com/docs/schematypes.html">Defaults</a></li><li><a href="http://mongoosejs.com/docs/getters-setters.html">Getters</a></li><li><a href="http://mongoosejs.com/docs/getters-setters.html">Setters</a></li><li><a href="http://mongoosejs.com/docs/indexes.html">Indexes</a></li><li><a href="http://mongoosejs.com/docs/middleware.html">Middleware</a></li><li><a href="http://mongoosejs.com/docs/methods-statics.html">Methods</a> definition</li><li><a href="http://mongoosejs.com/docs/methods-statics.html">Statics</a> definition</li><li><a href="http://mongoosejs.com/docs/plugins.html">Plugins</a></li><li><a href="http://mongoosejs.com/docs/populate.html">DBRef-like populate</a></li></ul>
+<ul>
+<li><a href="http://mongoosejs.com/docs/validation.html">Validators</a> (async and sync)</li>
+<li><a href="http://mongoosejs.com/docs/schematypes.html">Defaults</a></li>
+<li><a href="http://mongoosejs.com/docs/getters-setters.html">Getters</a></li>
+<li><a href="http://mongoosejs.com/docs/getters-setters.html">Setters</a></li>
+<li><a href="http://mongoosejs.com/docs/indexes.html">Indexes</a></li>
+<li><a href="http://mongoosejs.com/docs/middleware.html">Middleware</a></li>
+<li><a href="http://mongoosejs.com/docs/methods-statics.html">Methods</a> definition</li>
+<li><a href="http://mongoosejs.com/docs/methods-statics.html">Statics</a> definition</li>
+<li><a href="http://mongoosejs.com/docs/plugins.html">Plugins</a></li>
+<li><a href="http://mongoosejs.com/docs/dbrefs.html">DBRefs</a></li>
+</ul>
 
 <p>The following example shows some of these features:</p>
 
-<pre><code>var Comment = new Schema({
-    name  :  { type: String, default: &#39;hahaha&#39; }
-  , age   :  { type: Number, min: 18, index: true }
-  , bio   :  { type: String, match: /[a-z]/ }
-  , date  :  { type: Date, default: Date.now }
-  , buff  :  Buffer
-});
+<p>```javascript<br />var Comment = new Schema({<br />    name  :  { type: String, default: 'hahaha' }<br />  , age   :  { type: Number, min: 18, index: true }<br />  , bio   :  { type: String, match: /[a-z]/ }<br />  , date  :  { type: Date, default: Date.now }<br />  , buff  :  Buffer<br />});</p>
 
-// a setter
-Comment.path(&#39;name&#39;).set(function (v) {
-  return capitalize(v);
-});
+<p>// a setter<br />Comment.path('name').set(function (v) {<br />  return capitalize(v);<br />});</p>
 
-// middleware
-Comment.pre(&#39;save&#39;, function (next) {
-  notify(this.get(&#39;email&#39;));
-  next();
-});</code></pre>
+<p>// middleware<br />Comment.pre('save', function (next) {<br />    notify(this.get('email'));<br />    next();<br />});<br />```</p>
 
-<p>Take a look at the example in <code>examples/schema.js</code> for an end-to-end example of
-a typical setup.</p>
+<p>Take a look at the example in <code>examples/schema.js</code> for an end-to-end example of<br />a typical setup.</p>
 
 <h2>Accessing a Model</h2>
 
-<p>Once we define a model through <code>mongoose.model(&#39;ModelName&#39;, mySchema)</code>, we can
-access it through the same function</p>
+<p>Once we define a model through <code>mongoose.model('ModelName', mySchema)</code>, we can<br />access it through the same function</p>
 
-<pre><code>var myModel = mongoose.model(&#39;ModelName&#39;);</code></pre>
+<p><code>javascript<br />var myModel = mongoose.model('ModelName');<br /></code></p>
 
 <p>Or just do it all at once</p>
 
-<pre><code>var MyModel = mongoose.model(&#39;ModelName&#39;, mySchema);</code></pre>
+<p><code>javascript<br />var MyModel = mongoose.model('ModelName', mySchema);<br /></code></p>
 
 <p>We can then instantiate it, and save it:</p>
 
-<pre><code>var instance = new MyModel();
-instance.my.key = &#39;hello&#39;;
-instance.save(function (err) {
-  //
-});</code></pre>
+<p><code>javascript<br />var instance = new MyModel();<br />instance.my.key = 'hello';<br />instance.save(function (err) {<br />  //<br />});<br /></code></p>
 
 <p>Or we can find documents from the same collection</p>
 
-<pre><code>MyModel.find({}, function (err, docs) {
-  // docs.forEach
-});</code></pre>
+<p><code>javascript<br />MyModel.find({}, function (err, docs) {<br />  // docs.forEach<br />});<br /></code></p>
 
-<p>You can also <code>findOne</code>, <code>findById</code>, <code>update</code>, etc. For more details check out
-<a href="http://mongoosejs.com/docs/finding-documents.html">this link</a>.</p>
+<p>You can also <code>findOne</code>, <code>findById</code>, <code>update</code>, etc. For more details check out<br /><a href="http://mongoosejs.com/docs/finding-documents.html">this link</a>.</p>
+
+<p><strong>Important!</strong> If you opened a separate connection using <code>mongoose.createConnection()</code><br />but attempt to access the model through <code>mongoose.model('ModelName')</code> it will<br />not work as expected since it is not hooked up to an active db connection. In this<br />case access your model through the connection you created:</p>
+
+<p>```js<br />var conn = mongoose.createConnection('your connection string');<br />var MyModel = conn.model('ModelName', schema);<br />var m = new MyModel;<br />m.save() // works</p>
+
+<p>vs</p>
+
+<p>var conn = mongoose.createConnection('your connection string');<br />var MyModel = mongoose.model('ModelName', schema);<br />var m = new MyModel;<br />m.save() // does not work b/c the default connection object was never connected<br />```</p>
 
 <h2>Embedded Documents</h2>
 
 <p>In the first example snippet, we defined a key in the Schema that looks like:</p>
 
-<pre><code>comments: [Comments]</code></pre>
+<p><code><br />comments: [Comments]<br /></code></p>
 
-<p>Where <code>Comments</code> is a <code>Schema</code> we created. This means that creating embedded
-documents is as simple as:</p>
+<p>Where <code>Comments</code> is a <code>Schema</code> we created. This means that creating embedded<br />documents is as simple as:</p>
 
-<pre><code>// retrieve my model
-var BlogPost = mongoose.model(&#39;BlogPost&#39;);
+<p>```javascript<br />// retrieve my model<br />var BlogPost = mongoose.model('BlogPost');</p>
 
-// create a blog post
-var post = new BlogPost();
+<p>// create a blog post<br />var post = new BlogPost();</p>
 
-// create a comment
-post.comments.push({ title: &#39;My comment&#39; });
+<p>// create a comment<br />post.comments.push({ title: 'My comment' });</p>
 
-post.save(function (err) {
-  if (!err) console.log(&#39;Success!&#39;);
-});</code></pre>
+<p>post.save(function (err) {<br />  if (!err) console.log('Success!');<br />});<br />```</p>
 
 <p>The same goes for removing them:</p>
 
-<pre><code>BlogPost.findById(myId, function (err, post) {
-  if (!err) {
-    post.comments[0].remove();
-    post.save(function (err) {
-      // do something
-    });
-  }
-});</code></pre>
+<p><code>javascript<br />BlogPost.findById(myId, function (err, post) {<br />  if (!err) {<br />    post.comments[0].remove();<br />    post.save(function (err) {<br />      // do something<br />    });<br />  }<br />});<br /></code></p>
 
-<p>Embedded documents enjoy all the same features as your models. Defaults,
-validators, middleware. Whenever an error occurs, it&#39;s bubbled to the <code>save()</code>
-error callback, so error handling is a snap!</p>
+<p>Embedded documents enjoy all the same features as your models. Defaults,<br />validators, middleware. Whenever an error occurs, it's bubbled to the <code>save()</code><br />error callback, so error handling is a snap!</p>
 
-<p>Mongoose interacts with your embedded documents in arrays <em>atomically</em>, out of
-the box.</p>
+<p>Mongoose interacts with your embedded documents in arrays <em>atomically</em>, out of<br />the box.</p>
 
 <h2>Middleware</h2>
 
-<p>Middleware is one of the most exciting features about Mongoose. Middleware
-takes away all the pain of nested callbacks.</p>
+<p>Middleware is one of the most exciting features about Mongoose. Middleware<br />takes away all the pain of nested callbacks.</p>
 
-<p>Middleware are defined at the Schema level and are applied for the methods
-<code>init</code> (when a document is initialized with data from MongoDB), <code>save</code> (when
-a document or embedded document is saved).</p>
+<p>Middleware are defined at the Schema level and are applied for the methods<br /><code>init</code> (when a document is initialized with data from MongoDB), <code>save</code> (when<br />a document or embedded document is saved).</p>
 
-<p>There&#39;s two types of middleware:</p>
+<p>There's two types of middleware:</p>
 
-<ul><li><p>Serial
-Serial middleware are defined like:</p><pre><code>.pre(method, function (next, methodArg1, methodArg2, ...) {
-  // ...
-})</code></pre><p>They&#39;re executed one after the other, when each middleware calls <code>next</code>.</p><p>You can also intercept the <code>method</code>&#39;s incoming arguments via your middleware -- 
-notice <code>methodArg1</code>, <code>methodArg2</code>, etc in the <code>pre</code> definition above. See
-section &quot;Intercepting and mutating method arguments&quot; below.</p></li><li><p>Parallel
+<ul>
+<li>Serial
+Serial middleware are defined like:</li>
+</ul>
+
+<p><code>javascript<br />.pre(method, function (next, methodArg1, methodArg2, ...) {<br />  // ...<br />})<br /></code></p>
+
+<p>They're executed one after the other, when each middleware calls <code>next</code>.</p>
+
+<p>You can also intercept the <code>method</code>'s incoming arguments via your middleware -- <br />  notice <code>methodArg1</code>, <code>methodArg2</code>, etc in the <code>pre</code> definition above. See<br />  section "Intercepting and mutating method arguments" below.</p>
+
+<ul>
+<li>Parallel
 Parallel middleware offer more fine-grained flow control, and are defined
-like:</p><pre><code>.pre(method, true, function (next, done, methodArg1, methodArg2) {
-  // ...
-})</code></pre><p>Parallel middleware can <code>next()</code> immediately, but the final argument will be
-called when all the parallel middleware have called <code>done()</code>.</p></li></ul>
+like:</li>
+</ul>
+
+<p><code>javascript<br />.pre(method, true, function (next, done, methodArg1, methodArg2) {<br />  // ...<br />})<br /></code></p>
+
+<p>Parallel middleware can <code>next()</code> immediately, but the final argument will be<br />  called when all the parallel middleware have called <code>done()</code>.</p>
 
 <h3>Error handling</h3>
 
-<p>If any middleware calls <code>next</code> or <code>done</code> with an <code>Error</code> instance, the flow is
-interrupted, and the error is passed to the function passed as an argument.</p>
+<p>If any middleware calls <code>next</code> or <code>done</code> with an <code>Error</code> instance, the flow is<br />interrupted, and the error is passed to the function passed as an argument.</p>
 
 <p>For example:</p>
 
-<pre><code>schema.pre(&#39;save&#39;, function (next) {
-  // something goes wrong
-  next(new Error(&#39;something went wrong&#39;));
-});
+<p>```javascript<br />schema.pre('save', function (next) {<br />  // something goes wrong<br />  next(new Error('something went wrong'));<br />});</p>
 
-// later...
+<p>// later...</p>
 
-myModel.save(function (err) {
-  // err can come from a middleware
-});</code></pre>
+<p>myModel.save(function (err) {<br />  // err can come from a middleware<br />});<br />```</p>
 
 <h3>Intercepting and mutating method arguments</h3>
 
 <p>You can intercept method arguments via middleware.</p>
 
-<p>For example, this would allow you to broadcast changes about your Documents
-every time someone <code>set</code>s a path in your Document to a new value:</p>
+<p>For example, this would allow you to broadcast changes about your Documents<br />every time someone <code>set</code>s a path in your Document to a new value:</p>
 
-<pre><code>schema.pre(&#39;set&#39;, function (next, path, val, typel) {
-  // `this` is the current Document
-  this.emit(&#39;set&#39;, path, val);
+<p><code>``javascript<br />schema.pre('set', function (next, path, val, typel) {<br />  //</code>this` is the current Document<br />  this.emit('set', path, val);</p>
 
-  // Pass control to the next pre
-  next();
-});</code></pre>
+<p>// Pass control to the next pre<br />  next();<br />});<br />```</p>
 
-<p>Moreover, you can mutate the incoming <code>method</code> arguments so that subsequent
-middleware see different values for those arguments. To do so, just pass the
-new values to <code>next</code>:</p>
+<p>Moreover, you can mutate the incoming <code>method</code> arguments so that subsequent<br />middleware see different values for those arguments. To do so, just pass the<br />new values to <code>next</code>:</p>
 
-<pre><code>.pre(method, function firstPre (next, methodArg1, methodArg2) {
-  // Mutate methodArg1
-  next(&quot;altered-&quot; + methodArg1.toString(), methodArg2);
-})
+<p>```javascript<br />.pre(method, function firstPre (next, methodArg1, methodArg2) {<br />  // Mutate methodArg1<br />  next("altered-" + methodArg1.toString(), methodArg2);<br />})</p>
 
-// pre declaration is chainable
-.pre(method, function secondPre (next, methodArg1, methodArg2) {
-  console.log(methodArg1);
-  // =&gt; &#39;altered-originalValOfMethodArg1&#39; 
+<p>// pre declaration is chainable<br />.pre(method, function secondPre (next, methodArg1, methodArg2) {<br />  console.log(methodArg1);<br />  // => 'altered-originalValOfMethodArg1' </p>
 
-  console.log(methodArg2);
-  // =&gt; &#39;originalValOfMethodArg2&#39; 
+<p>console.log(methodArg2);<br />  // => 'originalValOfMethodArg2' </p>
 
-  // Passing no arguments to `next` automatically passes along the current argument values
-  // i.e., the following `next()` is equivalent to `next(methodArg1, methodArg2)`
-  // and also equivalent to, with the example method arg 
-  // values, `next(&#39;altered-originalValOfMethodArg1&#39;, &#39;originalValOfMethodArg2&#39;)`
-  next();
-})</code></pre>
+<p>// Passing no arguments to <code>next</code> automatically passes along the current argument values<br />  // i.e., the following <code>next()</code> is equivalent to <code>next(methodArg1, methodArg2)</code><br />  // and also equivalent to, with the example method arg <br />  // values, <code>next('altered-originalValOfMethodArg1', 'originalValOfMethodArg2')</code><br />  next();<br />})<br />```</p>
 
 <h3>Schema gotcha</h3>
 
-<p><code>type</code>, when used in a schema has special meaning within Mongoose. If your
-schema requires using <code>type</code> as a nested property you must use object notation:</p>
+<p><code>type</code>, when used in a schema has special meaning within Mongoose. If your<br />schema requires using <code>type</code> as a nested property you must use object notation:</p>
 
-<pre><code>new Schema({
-    broken: { type: Boolean }
-  , asset : {
-        name: String
-      , type: String // uh oh, it broke. asset will be interpreted as String
-    }
-});
+<p>``` javascript<br />new Schema({<br />    broken: { type: Boolean }<br />  , asset : {<br />        name: String<br />      , type: String // uh oh, it broke. asset will be interpreted as String<br />    }<br />});</p>
 
-new Schema({
-    works: { type: Boolean }
-  , asset : {
-        name: String
-      , type: { type: String } // works. asset is an object with a type property
-    }
-});</code></pre>
+<p>new Schema({<br />    works: { type: Boolean }<br />  , asset : {<br />        name: String<br />      , type: { type: String } // works. asset is an object with a type property<br />    }<br />});<br />```</p>
 
 <h2>API docs</h2>
 
-<p>You can find the <a href="http://github.com/visionmedia/dox">Dox</a> generated API docs
-<a href="http://mongoosejs.com/docs/api.html">here</a>.</p>
+<p>You can find the <a href="http://github.com/visionmedia/dox">Dox</a> generated API docs<br /><a href="http://mongoosejs.com/docs/api.html">here</a>.</p>
 
 <h2>Getting support</h2>
 
-<p>Please subscribe to the Google Groups <a href="http://groups.google.com/group/mongoose-orm">mailing
-list</a>.</p>
+<p>Please subscribe to the Google Groups <a href="http://groups.google.com/group/mongoose-orm">mailing<br />list</a>.</p>
 
 <p>Join #mongoosejs on freenode.</p>
 
@@ -507,56 +427,54 @@ list</a>.</p>
 
 <p>The following plugins are currently available for use with mongoose:</p>
 
-<ul><li><a href="https://github.com/bnoguchi/mongoose-types">mongoose-types</a> - Adds
+<ul>
+<li><a href="https://github.com/bnoguchi/mongoose-types">mongoose-types</a> - Adds
 several additional types (e.g., Email) that you can use in your
-Schema declarations</li><li><a href="https://github.com/bnoguchi/mongoose-auth">mongoose-auth</a> - A drop in 
+Schema declarations</li>
+<li><a href="https://github.com/bnoguchi/mongoose-auth">mongoose-auth</a> - A drop in 
 solution for your auth needs. Currently supports Password, Facebook,
-Twitter, Github, and more.</li><li><a href="https://github.com/goulash1971/mongoose-joins">mongoose-joins</a> - Adds simple join support</li><li><a href="https://github.com/goulash1971/mongoose-dbref">mongoose-dbref</a> - An alternative DBRef option</li>
-<li><a href="https://github.com/marksweiss/mongoose-flatmatcher">mongoose-flatmatcher</a> - A query pre-processor that maps flat name/value pairs to schemas.</li>
-<li><a href="https://github.com/aheckmann/mongoose-ttl">mongoose-ttl</a> - TTL support for MongoDB.</li>
+Twitter, Github, and more.</li>
+<li><a href="https://github.com/goulash1971/mongoose-joins">mongoose-joins</a> - Adds simple join support</li>
+<li><a href="https://github.com/goulash1971/mongoose-dbref">mongoose-dbref</a> - An alternative DBRef option</li>
+<li><a href="https://github.com/marksweiss/mongoose-flatmatcher">mongoose-flatmatcher</a> - A query pre-processor that maps flat name/value pairs to schemas </li>
+<li><a href="https://github.com/aheckmann/mongoose-ttl">mongoose-ttl</a> - TTL support</li>
 </ul>
 
 <h2>Contributing to Mongoose</h2>
 
 <h3>Cloning the repository</h3>
 
-<p>Make a fork of <code>mongoose</code>, then clone it in your computer. The <code>v2.x</code> branch
-contains the current stable release, and the <code>master</code> branch the next upcoming
-major release.</p>
+<p>Make a fork of <code>mongoose</code>, then clone it in your computer. The <code>v2.x</code> branch<br />contains the current stable release, and the <code>master</code> branch the next upcoming<br />major release.</p>
 
 <h3>Guidelines</h3>
 
-<ul><li>Please write inline documentation for new methods or class members.</li><li>Please write tests and make sure your tests pass.</li><li>Before starting to write code, look for existing tickets or create one for
-your specific issue (unless you&#39;re addressing something that&#39;s clearly broken).
+<ul>
+<li>Please write inline documentation for new methods or class members.</li>
+<li>Please write tests and make sure your tests pass.</li>
+<li>Before starting to write code, look for existing tickets or create one for
+your specific issue (unless you're addressing something that's clearly broken).
 That way you avoid working on something that might not be of interest or that
-has been addressed already in a different branch.</li></ul>
+has been addressed already in a different branch.</li>
+</ul>
 
 <h2>Credits</h2>
 
-<ul><li>Guillermo Rauch - guillermo@learnboost.com - <a href="http://github.com/guille">Guille</a></li><li>Nathan White - <a href="http://github.com/nw/">nw</a></li><li>Brian Noguchi - <a href="https://github.com/bnoguchi">bnoguchi</a></li><li>Aaron Heckmann - <a href="https://github.com/aheckmann">aheckmann</a></li></ul>
+<ul>
+<li>Guillermo Rauch - <a href='mailto:guillermo@learnboost.com'>guillermo@learnboost.com</a> - <a href="http://github.com/guille">Guille</a></li>
+<li>Nathan White - <a href="http://github.com/nw/">nw</a></li>
+<li>Brian Noguchi - <a href="https://github.com/bnoguchi">bnoguchi</a></li>
+<li>Aaron Heckmann - <a href="https://github.com/aheckmann">aheckmann</a></li>
+</ul>
 
 <h2>License</h2>
 
-<p>Copyright (c) 2010-2011 LearnBoost &amp;lt;dev@learnboost.com&amp;gt;</p>
+<p>Copyright (c) 2010-2011 LearnBoost &lt;<a href='mailto:dev@learnboost.com'>dev@learnboost.com</a>&gt;</p>
 
-<p>Permission is hereby granted, free of charge, to any person obtaining
-a copy of this software and associated documentation files (the
-&#39;Software&#39;), to deal in the Software without restriction, including
-without limitation the rights to use, copy, modify, merge, publish,
-distribute, sublicense, and/or sell copies of the Software, and to
-permit persons to whom the Software is furnished to do so, subject to
-the following conditions:</p>
+<p>Permission is hereby granted, free of charge, to any person obtaining<br />a copy of this software and associated documentation files (the<br />'Software'), to deal in the Software without restriction, including<br />without limitation the rights to use, copy, modify, merge, publish,<br />distribute, sublicense, and/or sell copies of the Software, and to<br />permit persons to whom the Software is furnished to do so, subject to<br />the following conditions:</p>
 
-<p>The above copyright notice and this permission notice shall be
-included in all copies or substantial portions of the Software.</p>
+<p>The above copyright notice and this permission notice shall be<br />included in all copies or substantial portions of the Software.</p>
 
-<p>THE SOFTWARE IS PROVIDED &#39;AS IS&#39;, WITHOUT WARRANTY OF ANY KIND,
-EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
-IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
-CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
-TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
-SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</p>
+<p>THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND,<br />EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF<br />MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.<br />IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY<br />CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,<br />TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE<br />SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</p>
         </div>
 
         <div id="footer">

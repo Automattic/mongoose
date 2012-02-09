@@ -1,10 +1,6 @@
 Mongoose 2.0
 ============
 
-<div id="announce"><strong>08-25-2011: Mongoose 2.0 is here</strong> with new support for <a href="/docs/populate.html">DBRef-like methods</a>, Buffers, and a
-            number of bugfixes. Check out the <a href="/docs/migration-1x-2x.html">migration guide</a> for details.
-</div>
-
 ## What's Mongoose?
 
 Mongoose is a [MongoDB](http://www.mongodb.org/) object modeling tool designed to work in an asynchronous
@@ -12,56 +8,64 @@ environment.
 
 Defining a model is as easy as:
 
-    var Comments = new Schema({
-        title     : String
-      , body      : String
-      , date      : Date
-    });
+```javascript
+var Comments = new Schema({
+    title     : String
+  , body      : String
+  , date      : Date
+});
 
-    var BlogPost = new Schema({
-        author    : ObjectId
-      , title     : String
-      , body      : String
-      , buf       : Buffer
-      , date      : Date
-      , comments  : [Comments]
-      , meta      : {
-          votes : Number
-        , favs  : Number
-      }
-    });
+var BlogPost = new Schema({
+    author    : ObjectId
+  , title     : String
+  , body      : String
+  , buf       : Buffer
+  , date      : Date
+  , comments  : [Comments]
+  , meta      : {
+      votes : Number
+	  , favs  : Number
+	}
+});
 
-    var Post = mongoose.model('BlogPost', BlogPost);
+var Post = mongoose.model('BlogPost', BlogPost);
+```
 
 ## Installation
 
 The recommended way is through the excellent [NPM](http://www.npmjs.org/):
 
-    $ npm install mongoose
+```bash
+$ npm install mongoose
+```
 
 Otherwise, you can check it in your repository and then expose it:
 
-    $ git clone git@github.com:LearnBoost/mongoose.git support/mongoose/
-
-    // in your code
-    require.paths.unshift('support/mongoose/lib')
+```bash
+$ git clone git://github.com/LearnBoost/mongoose.git node_modules/mongoose/
+```
+And install dependency modules written on `package.json`.
 
 Then you can `require` it:
 
-    require('mongoose')
+```javascript
+require('mongoose')
+```
 
 ## Connecting to MongoDB
 
 First, we need to define a connection. If your app uses only one database, you
-should use `mongoose.connect`. If you need to create additional connections, use
+should use `mongose.connect`. If you need to create additional connections, use
 `mongoose.createConnection`.
 
 Both `connect` and `createConnection` take a `mongodb://` URI, or the parameters
 `host, database, port, options`.
 
-    var mongoose = require('mongoose');
+```javascript
+var mongoose = require('mongoose');
 
-    mongoose.connect('mongodb://localhost/my_database');
+mongoose.connect('mongodb://localhost/my_database');
+```
 
 Once connected, the `open` event is fired on the `Connection` instance. If
 you're using `mongoose.connect`, the `Connection` is `mongoose.connection`.
@@ -75,15 +79,17 @@ in order to define models, run queries, etc.
 
 Models are defined through the `Schema` interface. 
 
-    var Schema = mongoose.Schema
-      , ObjectId = Schema.ObjectId;
+```javascript
+var Schema = mongoose.Schema
+  , ObjectId = Schema.ObjectId;
 
-    var BlogPost = new Schema({
-        author    : ObjectId
-      , title     : String
-      , body      : String
-      , date      : Date
-    });
+var BlogPost = new Schema({
+    author    : ObjectId
+  , title     : String
+  , body      : String
+  , date      : Date
+});
+```
 
 Aside from defining the structure of your documents and the types of data you're
 storing, a Schema handles the definition of:
@@ -97,28 +103,30 @@ storing, a Schema handles the definition of:
 * [Methods](http://mongoosejs.com/docs/methods-statics.html) definition
 * [Statics](http://mongoosejs.com/docs/methods-statics.html) definition
 * [Plugins](http://mongoosejs.com/docs/plugins.html)
-* [DBRef-like Population](http://mongoosejs.com/docs/populate.html)
+* [DBRefs](http://mongoosejs.com/docs/dbrefs.html)
 
 The following example shows some of these features:
 
-    var Comment = new Schema({
-        name  :  { type: String, default: 'hahaha' }
-      , age   :  { type: Number, min: 18, index: true }
-      , bio   :  { type: String, match: /[a-z]/ }
-      , date  :  { type: Date, default: Date.now }
-      , buff  :  Buffer
-    });
+```javascript
+var Comment = new Schema({
+    name  :  { type: String, default: 'hahaha' }
+  , age   :  { type: Number, min: 18, index: true }
+  , bio   :  { type: String, match: /[a-z]/ }
+  , date  :  { type: Date, default: Date.now }
+  , buff  :  Buffer
+});
 
-    // a setter
-    Comment.path('name').set(function (v) {
-      return capitalize(v);
-    });
+// a setter
+Comment.path('name').set(function (v) {
+  return capitalize(v);
+});
 
-    // middleware
-    Comment.pre('save', function (next) {
-      notify(this.get('email'));
-      next();
-    });
+// middleware
+Comment.pre('save', function (next) {
+	notify(this.get('email'));
+	next();
+});
+```
 
 Take a look at the example in `examples/schema.js` for an end-to-end example of
 a typical setup.
@@ -128,61 +136,94 @@ a typical setup.
 Once we define a model through `mongoose.model('ModelName', mySchema)`, we can
 access it through the same function
 
-    var myModel = mongoose.model('ModelName');
+```javascript
+var myModel = mongoose.model('ModelName');
+```
 
 Or just do it all at once
 
-    var MyModel = mongoose.model('ModelName', mySchema);
+```javascript
+var MyModel = mongoose.model('ModelName', mySchema);
+```
 
 We can then instantiate it, and save it:
 
-    var instance = new MyModel();
-    instance.my.key = 'hello';
-    instance.save(function (err) {
-      //
-    });
+```javascript
+var instance = new MyModel();
+instance.my.key = 'hello';
+instance.save(function (err) {
+  //
+});
+```
 
 Or we can find documents from the same collection
 
-    MyModel.find({}, function (err, docs) {
-      // docs.forEach
-    });
+```javascript
+MyModel.find({}, function (err, docs) {
+  // docs.forEach
+});
+```
 
 You can also `findOne`, `findById`, `update`, etc. For more details check out
 [this link](http://mongoosejs.com/docs/finding-documents.html).
+
+**Important!** If you opened a separate connection using `mongoose.createConnection()`
+but attempt to access the model through `mongoose.model('ModelName')` it will
+not work as expected since it is not hooked up to an active db connection. In this
+case access your model through the connection you created:
+
+```js
+var conn = mongoose.createConnection('your connection string');
+var MyModel = conn.model('ModelName', schema);
+var m = new MyModel;
+m.save() // works
+
+vs
+
+var conn = mongoose.createConnection('your connection string');
+var MyModel = mongoose.model('ModelName', schema);
+var m = new MyModel;
+m.save() // does not work b/c the default connection object was never connected
+```
 
 ## Embedded Documents
 
 In the first example snippet, we defined a key in the Schema that looks like:
 
-    comments: [Comments]
+```
+comments: [Comments]
+```
 
 Where `Comments` is a `Schema` we created. This means that creating embedded
 documents is as simple as:
 
-    // retrieve my model
-    var BlogPost = mongoose.model('BlogPost');
+```javascript
+// retrieve my model
+var BlogPost = mongoose.model('BlogPost');
 
-    // create a blog post
-    var post = new BlogPost();
+// create a blog post
+var post = new BlogPost();
 
-    // create a comment
-    post.comments.push({ title: 'My comment' });
+// create a comment
+post.comments.push({ title: 'My comment' });
 
-    post.save(function (err) {
-      if (!err) console.log('Success!');
-    });
+post.save(function (err) {
+  if (!err) console.log('Success!');
+});
+```
 
 The same goes for removing them:
 
-    BlogPost.findById(myId, function (err, post) {
-      if (!err) {
-        post.comments[0].remove();
-        post.save(function (err) {
-          // do something
-        });
-      }
+```javascript
+BlogPost.findById(myId, function (err, post) {
+  if (!err) {
+    post.comments[0].remove();
+    post.save(function (err) {
+      // do something
     });
+  }
+});
+```
 
 Embedded documents enjoy all the same features as your models. Defaults,
 validators, middleware. Whenever an error occurs, it's bubbled to the `save()`
@@ -205,24 +246,28 @@ There's two types of middleware:
 - Serial
   Serial middleware are defined like:
 
-        .pre(method, function (next, methodArg1, methodArg2, ...) {
-          // ...
-        })
+```javascript
+.pre(method, function (next, methodArg1, methodArg2, ...) {
+  // ...
+})
+```
 
   They're executed one after the other, when each middleware calls `next`.
 
   You can also intercept the `method`'s incoming arguments via your middleware -- 
   notice `methodArg1`, `methodArg2`, etc in the `pre` definition above. See
   section "Intercepting and mutating method arguments" below.
-
+  
 
 - Parallel
   Parallel middleware offer more fine-grained flow control, and are defined
   like:
-
-        .pre(method, true, function (next, done, methodArg1, methodArg2) {
-          // ...
-        })
+  
+```javascript
+.pre(method, true, function (next, done, methodArg1, methodArg2) {
+  // ...
+})
+```
 
   Parallel middleware can `next()` immediately, but the final argument will be
   called when all the parallel middleware have called `done()`.
@@ -234,16 +279,18 @@ interrupted, and the error is passed to the function passed as an argument.
 
 For example:
 
-    schema.pre('save', function (next) {
-      // something goes wrong
-      next(new Error('something went wrong'));
-    });
+```javascript
+schema.pre('save', function (next) {
+  // something goes wrong
+  next(new Error('something went wrong'));
+});
 
-    // later...
+// later...
 
-    myModel.save(function (err) {
-      // err can come from a middleware
-    });
+myModel.save(function (err) {
+  // err can come from a middleware
+});
+```
 
 ### Intercepting and mutating method arguments
 
@@ -252,58 +299,64 @@ You can intercept method arguments via middleware.
 For example, this would allow you to broadcast changes about your Documents
 every time someone `set`s a path in your Document to a new value:
 
-    schema.pre('set', function (next, path, val, typel) {
-      // `this` is the current Document
-      this.emit('set', path, val);
+```javascript
+schema.pre('set', function (next, path, val, typel) {
+  // `this` is the current Document
+  this.emit('set', path, val);
 
-      // Pass control to the next pre
-      next();
-    });
+  // Pass control to the next pre
+  next();
+});
+```
 
 Moreover, you can mutate the incoming `method` arguments so that subsequent
 middleware see different values for those arguments. To do so, just pass the
 new values to `next`:
 
-    .pre(method, function firstPre (next, methodArg1, methodArg2) {
-      // Mutate methodArg1
-      next("altered-" + methodArg1.toString(), methodArg2);
-    })
+```javascript
+.pre(method, function firstPre (next, methodArg1, methodArg2) {
+  // Mutate methodArg1
+  next("altered-" + methodArg1.toString(), methodArg2);
+})
 
-    // pre declaration is chainable
-    .pre(method, function secondPre (next, methodArg1, methodArg2) {
-      console.log(methodArg1);
-      // => 'altered-originalValOfMethodArg1' 
-      
-      console.log(methodArg2);
-      // => 'originalValOfMethodArg2' 
-      
-      // Passing no arguments to `next` automatically passes along the current argument values
-      // i.e., the following `next()` is equivalent to `next(methodArg1, methodArg2)`
-      // and also equivalent to, with the example method arg 
-      // values, `next('altered-originalValOfMethodArg1', 'originalValOfMethodArg2')`
-      next();
-    })
+// pre declaration is chainable
+.pre(method, function secondPre (next, methodArg1, methodArg2) {
+  console.log(methodArg1);
+  // => 'altered-originalValOfMethodArg1' 
+  
+  console.log(methodArg2);
+  // => 'originalValOfMethodArg2' 
+  
+  // Passing no arguments to `next` automatically passes along the current argument values
+  // i.e., the following `next()` is equivalent to `next(methodArg1, methodArg2)`
+  // and also equivalent to, with the example method arg 
+  // values, `next('altered-originalValOfMethodArg1', 'originalValOfMethodArg2')`
+  next();
+})
+```
 
 ### Schema gotcha
 
 `type`, when used in a schema has special meaning within Mongoose. If your
 schema requires using `type` as a nested property you must use object notation:
 
-    new Schema({
-        broken: { type: Boolean }
-      , asset : {
-            name: String
-          , type: String // uh oh, it broke. asset will be interpreted as String
-        }
-    });
+``` javascript
+new Schema({
+    broken: { type: Boolean }
+  , asset : {
+        name: String
+      , type: String // uh oh, it broke. asset will be interpreted as String
+    }
+});
 
-    new Schema({
-        works: { type: Boolean }
-      , asset : {
-            name: String
-          , type: { type: String } // works. asset is an object with a type property
-        }
-    });
+new Schema({
+    works: { type: Boolean }
+  , asset : {
+        name: String
+      , type: { type: String } // works. asset is an object with a type property
+    }
+});
+```
 
 ## API docs
 
@@ -333,6 +386,8 @@ The following plugins are currently available for use with mongoose:
   Twitter, Github, and more.
 - [mongoose-joins](https://github.com/goulash1971/mongoose-joins) - Adds simple join support
 - [mongoose-dbref](https://github.com/goulash1971/mongoose-dbref) - An alternative DBRef option
+- [mongoose-flatmatcher](https://github.com/marksweiss/mongoose-flatmatcher) - A query pre-processor that maps flat name/value pairs to schemas 
+- [mongoose-ttl](https://github.com/aheckmann/mongoose-ttl) - TTL support
 
 ## Contributing to Mongoose
 

@@ -146,24 +146,7 @@ Or just do it all at once
 var MyModel = mongoose.model('ModelName', mySchema);
 ```
 
-**Important!** If you opened a separate connection using `mongoose.createConnection()`
-but attempt to access the model through `mongoose.model('ModelName')` it will
-not work as expected since it is not hooked up to an active db connection. In this
-case access your model through the connection you created:
-
-```js
-var conn = mongoose.createConnection('your connection string');
-var MyModel = conn.model('ModelName', schema);
-var m = new MyModel;
-m.save() // works
-
-vs
-
-var conn = mongoose.createConnection('your connection string');
-var MyModel = mongoose.model('ModelName', schema);
-var m = new MyModel;
-m.save() // does not work b/c the default connection object was never connected
-```
+We can then instantiate it, and save it:
 
 ```javascript
 var instance = new MyModel();
@@ -183,6 +166,25 @@ MyModel.find({}, function (err, docs) {
 
 You can also `findOne`, `findById`, `update`, etc. For more details check out
 [this link](http://mongoosejs.com/docs/finding-documents.html).
+
+**Important!** If you opened a separate connection using `mongoose.createConnection()`
+but attempt to access the model through `mongoose.model('ModelName')` it will
+not work as expected since it is not hooked up to an active db connection. In this
+case access your model through the connection you created:
+
+```js
+var conn = mongoose.createConnection('your connection string');
+var MyModel = conn.model('ModelName', schema);
+var m = new MyModel;
+m.save() // works
+
+vs
+
+var conn = mongoose.createConnection('your connection string');
+var MyModel = mongoose.model('ModelName', schema);
+var m = new MyModel;
+m.save() // does not work b/c the default connection object was never connected
+```
 
 ## Embedded Documents
 

@@ -456,8 +456,9 @@ module.exports = {
     s.save(function (err) {
       should.strictEqual(null, err);
 
-      S.update({ _id: s._id }, { ignore: true }, function (err) {
+      S.update({ _id: s._id }, { ignore: true }, function (err, affected) {
         should.strictEqual(null, err);
+        affected.should.equal(1);
 
         S.findById(s._id, function (err, doc) {
           db.close();
@@ -465,6 +466,20 @@ module.exports = {
           should.not.exist(doc.ignore);
           should.not.exist(doc._doc.ignore);
         });
+      });
+    });
+  },
+
+  'model.update passes number of affected documents': function () {
+    var db = start()
+      , B = db.model('BlogPost', 'wwwwowowo'+random())
+
+    B.create({ title: 'one'},{title:'two'},{title:'three'}, function (err) {
+      should.strictEqual(null, err);
+      B.update({}, { title: 'newtitle' }, { multi: true }, function (err, affected) {
+        db.close();
+        should.strictEqual(null, err);
+        affected.should.equal(3);
       });
     });
   }

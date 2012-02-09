@@ -1,4 +1,18 @@
 
+2.5.7 / 2012-02-09
+===================
+
+  * fixed; RegExp validators on node >= v0.6.x
+
+2.5.6 / 2012-02-09
+===================
+
+  * fixed; emit errors returned from db.collection() on the connection (were being swallowed)
+  * added; can add multiple validators in your schema at once (#718) [diogogmt]
+  * fixed; strict embedded documents (#717)
+  * updated; docs [niemyjski]
+  * added; pass number of affected docs back in model.update/save
+
 2.5.5 / 2012-02-03
 ===================
 

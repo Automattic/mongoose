@@ -1,9 +1,5 @@
 lib-cov
 **.swp
-*.swo
-*.swn
-*.swk
-*.swl
-*.swm
+*.sw*
 node_modules/
 *.orig

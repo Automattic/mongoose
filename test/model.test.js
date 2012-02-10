@@ -3287,9 +3287,11 @@ module.exports = {
         })
       , save = false
       , remove = false
-      , init = false;
+      , init = false
+      , post = undefined;
 
-    schema.post('save', function () {
+    schema.post('save', function (arg) {
+      arg._id.should.equal(post._id)
       save = true;
     });
 
@@ -3297,7 +3299,8 @@ module.exports = {
       init = true;
     });
 
-    schema.post('remove', function () {
+    schema.post('remove', function (arg) {
+      arg._id.should.eql(post._id)
       remove = true;
     });
 
@@ -3306,13 +3309,12 @@ module.exports = {
     var db = start()
       , BlogPost = db.model('PostHookTest');
 
-    var post = new BlogPost();
+    post = new BlogPost();
 
     post.save(function (err) {
       process.nextTick(function () {
         should.strictEqual(err, null);
         save.should.be.true;
-
         BlogPost.findById(post._id, function (err, doc) {
           process.nextTick(function () {
             should.strictEqual(err, null);

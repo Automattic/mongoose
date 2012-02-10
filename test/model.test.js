@@ -3291,7 +3291,7 @@ module.exports = {
       , post = undefined;
 
     schema.post('save', function (arg) {
-      arg._id.should.equal(post._id)
+      arg.id.should.equal(post.id)
       save = true;
     });
 
@@ -3300,7 +3300,7 @@ module.exports = {
     });
 
     schema.post('remove', function (arg) {
-      arg._id.should.eql(post._id)
+      arg.id.should.eql(post.id)
       remove = true;
     });
 

@@ -1,0 +1,1588 @@
+
+/**
+ * Test dependencies.
+ */
+
+var start = require('./common')
+  , should = require('should')
+  , mongoose = start.mongoose
+  , random = require('../lib/utils').random
+  , Schema = mongoose.Schema
+  , ObjectId = Schema.ObjectId
+  , StringRef = Schema.Types.StringRef
+  , DocObjectId = mongoose.Types.ObjectId
+
+/**
+ * Setup.
+ */
+
+/**
+ * User schema.
+ */
+
+var User = new Schema({
+    name      : String
+  , email     : StringRef
+  , gender    : { type: String, enum: ['male', 'female'], default: 'male' }
+  , age       : { type: Number, default: 21 }
+  , blogposts : [{ type: StringRef, ref: 'RefBlogPostSL' , refPk:"title" }]
+});
+
+/**
+ * Comment subdocument schema.
+ */
+
+var Comment = new Schema({
+    _creator  : { type: StringRef, ref: 'RefUserSL', refPk:"email" }
+  , content   : String
+});
+
+/**
+ * Blog post schema.
+ */
+
+var BlogPost = new Schema({
+    _creator      : { type: StringRef, ref: 'RefUserSL', refPk:"email" }
+  , title         : { type:StringRef, unique:true }
+  , comments      : [Comment]
+  , fans          : [{ type: StringRef, ref: 'RefUserSL', refPk:"email" }]
+});
+
+var posts = 'blogposts_' + random()
+  , users = 'users_' + random()
+  , iteration = 0;
+
+mongoose.model('RefBlogPostSL', BlogPost);
+mongoose.model('RefUserSL', User);
+
+/**
+ * Tests.
+ */
+
+module.exports = {
+
+  'SL test populating a single reference': function () {
+    var db = start()
+      , BlogPost = db.model('RefBlogPostSL', posts + iteration)
+      , User = db.model('RefUserSL', users + iteration++)
+
+    User.create({
+        name  : 'Guillermo'
+      , email : 'rauchg@gmail.com'
+    }, function (err, creator) {
+      should.strictEqual(err, null);
+
+      BlogPost.create({
+          title     : 'woot'
+        , _creator  : creator
+      }, function (err, post) {
+        should.strictEqual(err, null);
+
+        BlogPost
+          .findById(post._id)
+          .populate('_creator')
+          .run(function (err, post) {
+            db.close();
+            should.strictEqual(err, null);
+
+            post._creator.should.be.an.instanceof(User);
+            post._creator.name.should.equal('Guillermo');
+            post._creator.email.should.equal('rauchg@gmail.com');
+          });
+      });
+    });
+  },
+
+  'SL test an error in single reference population propagates': function () {
+    var db = start()
+      , BlogPost = db.model('RefBlogPostSL', posts + iteration)
+      , User = db.model('RefUserSL', users + iteration++)
+
+    User.create({
+        name: 'Guillermo'
+      , email: 'rauchg@gmail.com'
+    }, function (err, creator) {
+      should.strictEqual(err, null);
+
+      BlogPost.create({
+          title    : 'woot'
+        , _creator : creator
+      }, function (err, post) {
+        should.strictEqual(err, null);
+
+        var origFind = User.findOne;
+
+        // mock an error
+        User.findOne = function () {
+          var args = Array.prototype.map.call(arguments, function (arg) {
+            return 'function' == typeof arg ? function () {
+              arg(new Error('woot'));
+            } : arg;
+          });
+          return origFind.apply(this, args);
+        };
+
+        BlogPost
+          .findById(post._id)
+          .populate('_creator')
+          .run(function (err, post) {
+            db.close();
+            err.should.be.an.instanceof(Error);
+            err.message.should.equal('woot');
+          });
+      });
+    });
+  },
+
+  'SL test populating with partial fields selection': function () {
+    var db = start()
+      , BlogPost = db.model('RefBlogPostSL', posts + iteration)
+      , User = db.model('RefUserSL', users + iteration++)
+
+    User.create({
+        name  : 'Guillermo'
+      , email : 'rauchg@gmail.com'
+    }, function (err, creator) {
+      should.strictEqual(err, null);
+
+      BlogPost.create({
+          title     : 'woot'
+        , _creator  : creator
+      }, function (err, post) {
+        should.strictEqual(err, null);
+
+        BlogPost
+          .findById(post._id)
+          .populate('_creator', ['email'])
+          .run(function (err, post) {
+            db.close();
+            should.strictEqual(err, null);
+
+            post._creator.should.be.an.instanceof(User);
+            post._creator.isInit('name').should.be.false;
+            post._creator.email.should.equal('rauchg@gmail.com');
+          });
+      });
+    });
+  },
+
+  'SL populating single oid with partial field selection and filter': function () {
+    var db = start()
+      , BlogPost = db.model('RefBlogPostSL', posts + iteration)
+      , User = db.model('RefUserSL', users + iteration++)
+
+    User.create({
+        name  : 'Banana'
+      , email : 'cats@example.com'
+    }, function (err, creator) {
+      should.strictEqual(err, null);
+
+      BlogPost.create({
+          title     : 'woot'
+        , _creator  : creator
+      }, function (err, post) {
+        should.strictEqual(err, null);
+
+        BlogPost
+        .findById(post._id)
+        .populate('_creator', 'email', { name: 'Peanut' })
+        .run(function (err, post) {
+          should.strictEqual(err, null);
+          should.strictEqual(post._creator, null);
+
+          BlogPost
+          .findById(post._id)
+          .populate('_creator', 'email', { name: 'Banana' })
+          .run(function (err, post) {
+            db.close();
+            should.strictEqual(err, null);
+            post._creator.should.be.an.instanceof(User);
+            post._creator.isInit('name').should.be.false;
+            post._creator.email.should.equal('cats@example.com');
+          });
+        });
+      });
+    });
+  },
+
+  'SL test populating and changing a reference': function () {
+    var db = start()
+      , BlogPost = db.model('RefBlogPostSL', posts + iteration)
+      , User = db.model('RefUserSL', users + iteration++)
+
+    User.create({
+        name  : 'Guillermo'
+      , email : 'rauchg@gmail.com'
+    }, function (err, creator) {
+      should.strictEqual(err, null);
+
+      BlogPost.create({
+          title     : 'woot'
+        , _creator  : creator
+      }, function (err, post) {
+        should.strictEqual(err, null);
+
+        BlogPost
+          .findById(post._id)
+          .populate('_creator')
+          .run(function (err, post) {
+            should.strictEqual(err, null);
+
+            post._creator.should.be.an.instanceof(User);
+            post._creator.name.should.equal('Guillermo');
+            post._creator.email.should.equal('rauchg@gmail.com');
+
+            User.create({
+                name  : 'Aaron'
+              , email : 'aaron@learnboost.com'
+            }, function (err, newCreator) {
+              should.strictEqual(err, null);
+
+              post._creator = 'aaron@learnboost.com'
+              post.save(function (err) {
+                should.strictEqual(err, null);
+
+                BlogPost
+                  .findById(post._id)
+                  .populate('_creator')
+                  .run(function (err, post) {
+                    db.close();
+                    should.strictEqual(err, null);
+
+                    post._creator.name.should.equal('Aaron');
+                    post._creator.email.should.equal('aaron@learnboost.com');
+                  });
+              });
+            });
+          });
+      });
+    });
+  },
+
+  'SL test populating with partial fields selection and changing ref': function () {
+    var db = start()
+      , BlogPost = db.model('RefBlogPostSL', posts + iteration)
+      , User = db.model('RefUserSL', users + iteration++)
+
+    User.create({
+        name  : 'Guillermo'
+      , email : 'rauchg@gmail.com'
+    }, function (err, creator) {
+      should.strictEqual(err, null);
+
+      BlogPost.create({
+          title     : 'woot'
+        , _creator  : creator
+      }, function (err, post) {
+        should.strictEqual(err, null);
+
+        BlogPost
+        .findById(post._id)
+        .populate('_creator', {'name': 1})
+        .run(function (err, post) {
+          should.strictEqual(err, null);
+
+          post._creator.should.be.an.instanceof(User);
+          post._creator.name.should.equal('Guillermo');
+
+          User.create({
+              name  : 'Aaron'
+            , email : 'aaron@learnboost.com'
+          }, function (err, newCreator) {
+            should.strictEqual(err, null);
+
+            post._creator = 'aaron@learnboost.com';
+            post.save(function (err) {
+              should.strictEqual(err, null);
+
+              BlogPost
+              .findById(post._id)
+              .populate('_creator', {name: 0})
+              .run(function (err, post) {
+                db.close();
+                should.strictEqual(err, null);
+
+                post._creator.email.should.equal('aaron@learnboost.com');
+                should.not.exist(post._creator.name);
+              });
+            });
+          });
+        });
+      });
+    });
+  },
+
+  'test populating an array of references and fetching many': function () {
+    var db = start()
+      , BlogPost = db.model('RefBlogPostSL', posts + iteration)
+      , User = db.model('RefUserSL', users + iteration++)
+
+    User.create({
+        name  : 'Fan 1'
+      , email : 'fan1@learnboost.com'
+    }, function (err, fan1) {
+      should.strictEqual(err, null);
+
+      User.create({
+          name  : 'Fan 2'
+        , email : 'fan2@learnboost.com'
+      }, function (err, fan2) {
+        should.strictEqual(err, null);
+
+        BlogPost.create({
+            title : 'Woot1'
+          , fans  : ['fan1@learnboost.com', 'fan2@learnboost.com']
+        }, function (err, post1) {
+          should.strictEqual(err, null);
+
+          BlogPost.create({
+              title : 'Woot2'
+            , fans  : ['fan2@learnboost.com', 'fan1@learnboost.com']
+          }, function (err, post2) {
+            should.strictEqual(err, null);
+
+            BlogPost
+              .find({ title: { $in: ["Woot1","Woot2"] } })
+              .populate('fans')
+              .run(function (err, blogposts) {
+                db.close();
+                should.strictEqual(err, null);
+
+                blogposts[0].fans[0].name.should.equal('Fan 1');
+                blogposts[0].fans[0].email.should.equal('fan1@learnboost.com');
+                blogposts[0].fans[1].name.should.equal('Fan 2');
+                blogposts[0].fans[1].email.should.equal('fan2@learnboost.com');
+
+                blogposts[1].fans[0].name.should.equal('Fan 2');
+                blogposts[1].fans[0].email.should.equal('fan2@learnboost.com');
+                blogposts[1].fans[1].name.should.equal('Fan 1');
+                blogposts[1].fans[1].email.should.equal('fan1@learnboost.com');
+
+              });
+          });
+        });
+      });
+    });
+  },
+
+  'test an error in array reference population propagates': function () {
+    var db = start()
+      , BlogPost = db.model('RefBlogPostSL', posts + iteration)
+      , User = db.model('RefUserSL', users + iteration++)
+
+    User.create({
+        name  : 'Fan 1'
+      , email : 'fan1@learnboost.com'
+    }, function (err, fan1) {
+      should.strictEqual(err, null);
+
+      User.create({
+          name  : 'Fan 2'
+        , email : 'fan2@learnboost.com'
+      }, function (err, fan2) {
+        should.strictEqual(err, null);
+
+        BlogPost.create({
+            title : 'Woot1'
+          , fans  : [fan1, fan2]
+        }, function (err, post1) {
+          should.strictEqual(err, null);
+
+          BlogPost.create({
+              title : 'Woot2'
+            , fans  : [fan2, fan1]
+          }, function (err, post2) {
+            should.strictEqual(err, null);
+
+            // mock an error
+            var origFind = User.find;
+            User.find = function () {
+              var args = Array.prototype.map.call(arguments, function (arg) {
+                return 'function' == typeof arg ? function () {
+                  arg(new Error('woot 2'));
+                } : arg;
+              });
+              return origFind.apply(this, args);
+            };
+
+            BlogPost
+            .find({ $or: [{ _id: post1._id }, { _id: post2._id }] })
+            .populate('fans')
+            .run(function (err, blogposts) {
+              db.close();
+              err.should.be.an.instanceof(Error);
+              err.message.should.equal('woot 2');
+            });
+          });
+        });
+      });
+    });
+  },
+
+  'test populating an array of references with fields selection': function () {
+    var db = start()
+      , BlogPost = db.model('RefBlogPostSL', posts + iteration)
+      , User = db.model('RefUserSL', users + iteration++)
+
+    User.create({
+        name  : 'Fan 1'
+      , email : 'fan1@learnboost.com'
+    }, function (err, fan1) {
+      should.strictEqual(err, null);
+
+      User.create({
+          name  : 'Fan 2'
+        , email : 'fan2@learnboost.com'
+      }, function (err, fan2) {
+        should.strictEqual(err, null);
+
+        BlogPost.create({
+            title : 'Woot1'
+          , fans  : [fan1, fan2]
+        }, function (err, post1) {
+          should.strictEqual(err, null);
+
+          BlogPost.create({
+              title : 'Woot2'
+            , fans  : [fan2, fan1]
+          }, function (err, post2) {
+            should.strictEqual(err, null);
+
+            BlogPost
+            .find({ _id: { $in: [post1._id,post2._id] } })
+            .populate('fans', 'name')
+            .run(function (err, blogposts) {
+              db.close();
+              should.strictEqual(err, null);
+
+              blogposts[0].fans[0].name.should.equal('Fan 1');
+              blogposts[0].fans[0].isInit('email').should.be.true;
+              blogposts[0].fans[1].name.should.equal('Fan 2');
+              blogposts[0].fans[1].isInit('email').should.be.true;
+              should.strictEqual(blogposts[0].fans[1].email, 'fan2@learnboost.com');
+
+              blogposts[1].fans[0].name.should.equal('Fan 2');
+              blogposts[1].fans[0].isInit('email').should.be.true;
+              blogposts[1].fans[1].name.should.equal('Fan 1');
+              blogposts[1].fans[1].isInit('email').should.be.true;
+              should.strictEqual(blogposts[1].fans[1].email, 'fan1@learnboost.com');
+
+            });
+          });
+        });
+      });
+    });
+  },
+
+// тесты на новый тип данных, + тесты на сериализацию массивов
+
+  'test populating an array of references and filtering': function () {
+    var db = start()
+      , BlogPost = db.model('RefBlogPostSL', posts + iteration)
+      , User = db.model('RefUserSL', users + iteration++)
+
+    User.create({
+        name  : 'Fan 1'
+      , email : 'fan1@learnboost.com'
+    }, function (err, fan1) {
+      should.strictEqual(err, null);
+
+      User.create({
+          name   : 'Fan 2'
+        , email  : 'fan2@learnboost.com'
+        , gender : 'female'
+      }, function (err, fan2) {
+        should.strictEqual(err, null);
+
+        User.create({
+            name   : 'Fan 3'
+          , email  : 'fan3@learnboost.com'
+          , gender : 'female'
+        }, function (err, fan3) {
+          should.strictEqual(err, null);
+
+          BlogPost.create({
+              title : 'Woot1'
+            , fans  : [fan1, fan2, fan3]
+          }, function (err, post1) {
+            should.strictEqual(err, null);
+
+            BlogPost.create({
+                title : 'Woot2'
+              , fans  : [fan3, fan2, fan1]
+            }, function (err, post2) {
+              should.strictEqual(err, null);
+
+              BlogPost
+              .find({ title: { $in: ["Woot1","Woot2" ] } })
+              .populate('fans', '', { gender: 'female', email: { $in: ['fan2@learnboost.com'] }})
+              .run(function (err, blogposts) {
+                should.strictEqual(err, null);
+
+                blogposts[0].fans.length.should.equal(1);
+                blogposts[0].fans[0].gender.should.equal('female');
+                blogposts[0].fans[0].name.should.equal('Fan 2');
+                blogposts[0].fans[0].email.should.equal('fan2@learnboost.com');
+
+                blogposts[1].fans.length.should.equal(1);
+                blogposts[1].fans[0].gender.should.equal('female');
+                blogposts[1].fans[0].name.should.equal('Fan 2');
+                blogposts[1].fans[0].email.should.equal('fan2@learnboost.com');
+
+                BlogPost
+                .find({ title: { $in: ["Woot1","Woot2" ] } })
+                .populate('fans', false, { gender: 'female' })
+                .run(function (err, blogposts) {
+                  db.close();
+                  should.strictEqual(err, null);
+
+                  should.strictEqual(blogposts[0].fans.length, 2);
+                  blogposts[0].fans[0].gender.should.equal('female');
+                  blogposts[0].fans[0].name.should.equal('Fan 2');
+                  blogposts[0].fans[0].email.should.equal('fan2@learnboost.com');
+                  blogposts[0].fans[1].gender.should.equal('female');
+                  blogposts[0].fans[1].name.should.equal('Fan 3');
+                  blogposts[0].fans[1].email.should.equal('fan3@learnboost.com');
+
+                  should.strictEqual(blogposts[1].fans.length, 2);
+                  blogposts[1].fans[0].gender.should.equal('female');
+                  blogposts[1].fans[0].name.should.equal('Fan 3');
+                  blogposts[1].fans[0].email.should.equal('fan3@learnboost.com');
+                  blogposts[1].fans[1].gender.should.equal('female');
+                  blogposts[1].fans[1].name.should.equal('Fan 2');
+                  blogposts[1].fans[1].email.should.equal('fan2@learnboost.com');
+                });
+
+              });
+            });
+          });
+        });
+      });
+    });
+  },
+
+  'test populating an array of references and multi-filtering': function () {
+    var db = start()
+      , BlogPost = db.model('RefBlogPostSL', posts + iteration)
+      , User = db.model('RefUserSL', users + iteration++)
+
+    User.create({
+        name  : 'Fan 1'
+      , email : 'fan1@learnboost.com'
+    }, function (err, fan1) {
+      should.strictEqual(err, null);
+
+      User.create({
+          name   : 'Fan 2'
+        , email  : 'fan2@learnboost.com'
+        , gender : 'female'
+      }, function (err, fan2) {
+        should.strictEqual(err, null);
+
+        User.create({
+            name   : 'Fan 3'
+          , email  : 'fan3@learnboost.com'
+          , gender : 'female'
+          , age    : 25
+        }, function (err, fan3) {
+          should.strictEqual(err, null);
+
+          BlogPost.create({
+              title : 'Woot1'
+            , fans  : [fan1, fan2, fan3]
+          }, function (err, post1) {
+            should.strictEqual(err, null);
+
+            BlogPost.create({
+                title : 'Woot2'
+              , fans  : [fan3, fan2, fan1]
+            }, function (err, post2) {
+              should.strictEqual(err, null);
+
+              BlogPost
+              .find({ title: { $in: ['Woot1', 'Woot2' ] } })
+              .populate('fans', undefined, { email: fan3 })
+              .run(function (err, blogposts) {
+                should.strictEqual(err, null);
+
+                blogposts[0].fans.length.should.equal(1);
+                blogposts[0].fans[0].gender.should.equal('female');
+                blogposts[0].fans[0].name.should.equal('Fan 3');
+                blogposts[0].fans[0].email.should.equal('fan3@learnboost.com');
+                should.equal(blogposts[0].fans[0].age, 25);
+
+                blogposts[1].fans.length.should.equal(1);
+                blogposts[1].fans[0].gender.should.equal('female');
+                blogposts[1].fans[0].name.should.equal('Fan 3');
+                blogposts[1].fans[0].email.should.equal('fan3@learnboost.com');
+                should.equal(blogposts[1].fans[0].age, 25);
+
+                BlogPost
+                .find({ title: { $in: ['Woot1', 'Woot2' ] } })
+                .populate('fans', 0, { gender: 'female' })
+                .run(function (err, blogposts) {
+                  db.close();
+                  should.strictEqual(err, null);
+
+                  blogposts[0].fans.length.should.equal(2);
+                  blogposts[0].fans[0].gender.should.equal('female');
+                  blogposts[0].fans[0].name.should.equal('Fan 2');
+                  blogposts[0].fans[0].email.should.equal('fan2@learnboost.com');
+                  blogposts[0].fans[1].gender.should.equal('female');
+                  blogposts[0].fans[1].name.should.equal('Fan 3');
+                  blogposts[0].fans[1].email.should.equal('fan3@learnboost.com');
+                  should.equal(blogposts[0].fans[1].age, 25);
+
+                  blogposts[1].fans.length.should.equal(2);
+                  blogposts[1].fans[0].gender.should.equal('female');
+                  blogposts[1].fans[0].name.should.equal('Fan 3');
+                  blogposts[1].fans[0].email.should.equal('fan3@learnboost.com');
+                  should.equal(blogposts[1].fans[0].age, 25);
+                  blogposts[1].fans[1].gender.should.equal('female');
+                  blogposts[1].fans[1].name.should.equal('Fan 2');
+                  blogposts[1].fans[1].email.should.equal('fan2@learnboost.com');
+                });
+              });
+            });
+          });
+        });
+      });
+    });
+  },
+
+  'test populating an array of references and multi-filtering with field selection': function () {
+    var db = start()
+      , BlogPost = db.model('RefBlogPostSL', posts + iteration)
+      , User = db.model('RefUserSL', users + iteration++)
+
+    User.create({
+        name  : 'Fan 1'
+      , email : 'fan1@learnboost.com'
+    }, function (err, fan1) {
+      should.strictEqual(err, null);
+
+      User.create({
+          name   : 'Fan 2'
+        , email  : 'fan2@learnboost.com'
+        , gender : 'female'
+      }, function (err, fan2) {
+        should.strictEqual(err, null);
+
+        User.create({
+            name   : 'Fan 3'
+          , email  : 'fan3@learnboost.com'
+          , gender : 'female'
+          , age    : 25
+        }, function (err, fan3) {
+          should.strictEqual(err, null);
+
+          BlogPost.create({
+              title : 'Woot1'
+            , fans  : [fan1, fan2, fan3]
+          }, function (err, post1) {
+            should.strictEqual(err, null);
+
+            BlogPost.create({
+                title : 'Woot2'
+              , fans  : [fan3, fan2, fan1]
+            }, function (err, post2) {
+              should.strictEqual(err, null);
+
+              BlogPost
+              .find({ title: { $in: ['Woot1', 'Woot2' ] } })
+              .populate('fans', 'name email', { gender: 'female', age: 25 })
+              .run(function (err, blogposts) {
+                db.close();
+                should.strictEqual(err, null);
+                should.strictEqual(blogposts[0].fans.length, 1);
+                blogposts[0].fans[0].name.should.equal('Fan 3');
+                blogposts[0].fans[0].email.should.equal('fan3@learnboost.com');
+                blogposts[0].fans[0].isInit('email').should.be.true;
+                blogposts[0].fans[0].isInit('gender').should.be.false;
+                blogposts[0].fans[0].isInit('age').should.be.false;
+
+                should.strictEqual(blogposts[1].fans.length, 1);
+                blogposts[1].fans[0].name.should.equal('Fan 3');
+                blogposts[1].fans[0].email.should.equal('fan3@learnboost.com');
+                blogposts[1].fans[0].isInit('email').should.be.true;
+                blogposts[1].fans[0].isInit('gender').should.be.false;
+                blogposts[1].fans[0].isInit('age').should.be.false;
+              });
+            });
+          });
+        });
+      });
+    });
+  },
+
+  'test populating an array of refs, changing one, and removing one': function () {
+    var db = start()
+      , BlogPost = db.model('RefBlogPostSL', posts + iteration)
+      , User = db.model('RefUserSL', users + iteration++)
+
+    User.create({
+        name  : 'Fan 1'
+      , email : 'fan1@learnboost.com'
+    }, {
+        name  : 'Fan 2'
+      , email : 'fan2@learnboost.com'
+    }, {
+        name  : 'Fan 3'
+      , email : 'fan3@learnboost.com'
+    }, {
+        name  : 'Fan 4'
+      , email : 'fan4@learnboost.com'
+    }, function (err, fan1, fan2, fan3, fan4) {
+      should.strictEqual(err, null);
+
+      BlogPost.create({
+          title : 'Woot1'
+        , fans  : [fan1, fan2]
+      }, {
+          title : 'Woot2'
+        , fans  : [fan2, fan1]
+      }, function (err, post1, post2) {
+        should.strictEqual(err, null);
+
+        BlogPost
+        .find({ title: { $in: ['Woot1','Woot2' ] } })
+        .populate('fans', ['name'])
+        .run(function (err, blogposts) {
+          should.strictEqual(err, null);
+
+          blogposts[0].fans[0].name.should.equal('Fan 1');
+          blogposts[0].fans[0].isInit('age').should.be.false;
+          blogposts[0].fans[1].name.should.equal('Fan 2');
+          blogposts[0].fans[1].isInit('age').should.be.false;
+
+          blogposts[1].fans[0].name.should.equal('Fan 2');
+          blogposts[1].fans[0].isInit('age').should.be.false;
+          blogposts[1].fans[1].name.should.equal('Fan 1');
+          blogposts[1].fans[1].isInit('age').should.be.false;
+
+          blogposts[1].fans = [fan3, fan4];
+
+          blogposts[1].save(function (err) {
+            should.strictEqual(err, null);
+
+            BlogPost
+            .findById(blogposts[1]._id, [], { populate: ['fans'] })
+            .run(function (err, post) {
+              should.strictEqual(err, null);
+
+              post.fans[0].name.should.equal('Fan 3');
+              post.fans[1].name.should.equal('Fan 4');
+
+              post.fans.splice(0, 1);
+              post.save(function (err) {
+                should.strictEqual(err, null);
+
+                BlogPost
+                .findById(post._id)
+                .populate('fans')
+                .run(function (err, post) {
+                  db.close();
+                  should.strictEqual(err, null);
+                  post.fans.length.should.equal(1);
+                  post.fans[0].name.should.equal('Fan 4');
+                });
+              });
+            });
+          });
+        });
+      });
+    });
+  },
+
+  'test populating subdocuments': function () {
+    var db = start()
+      , BlogPost = db.model('RefBlogPostSL', posts + iteration)
+      , User = db.model('RefUserSL', users + iteration++)
+
+    User.create({ name: 'User 1', email:"u1@mail.com" }, function (err, user1) {
+      should.strictEqual(err, null);
+
+      User.create({ name: 'User 2', email:"u2@mail.com"  }, function (err, user2) {
+        should.strictEqual(err, null);
+
+        BlogPost.create({
+            title: 'Woot'
+          , _creator: "u1@mail.com" 
+          , comments: [
+                { _creator: user1 , content: 'Woot woot' }
+              , { _creator: "u2@mail.com", content: 'Wha wha' }
+            ]
+        }, function (err, post) {
+          should.strictEqual(err, null);
+
+          BlogPost
+            .findById(post._id)
+            .populate('_creator')
+            .populate('comments._creator')
+            .run(function (err, post) {
+              db.close();
+              should.strictEqual(err, null);
+
+              post._creator.name.should.equal('User 1');
+              post.comments[0]._creator.name.should.equal('User 1');
+              post.comments[1]._creator.name.should.equal('User 2');
+            });
+        });
+      });
+    });
+  },
+
+  'test populating subdocuments partially': function () {
+    var db = start()
+      , BlogPost = db.model('RefBlogPostSL', posts + iteration)
+      , User = db.model('RefUserSL', users + iteration++)
+
+    User.create({
+        name  : 'User 1'
+      , email : 'user1@learnboost.com'
+    }, function (err, user1) {
+      should.strictEqual(err, null);
+
+      User.create({
+          name  : 'User 2'
+        , email : 'user2@learnboost.com'
+      }, function (err, user2) {
+        should.strictEqual(err, null);
+
+        var post = BlogPost.create({
+            title: 'Woot'
+          , comments: [
+                { _creator: user1, content: 'Woot woot' }
+              , { _creator: user2, content: 'Wha wha' }
+            ]
+        }, function (err, post) {
+          should.strictEqual(err, null);
+
+          BlogPost
+            .findById(post._id)
+            .populate('comments._creator', ['email'])
+            .run(function (err, post) {
+              db.close();
+              should.strictEqual(err, null);
+
+              post.comments[0]._creator.email.should.equal('user1@learnboost.com');
+              post.comments[0]._creator.isInit('name').should.be.false;
+              post.comments[1]._creator.email.should.equal('user2@learnboost.com');
+              post.comments[1]._creator.isInit('name').should.be.false;
+            });
+        });
+      });
+    });
+  },
+
+  'test populating subdocuments partially with conditions': function () {
+    var db = start()
+      , BlogPost = db.model('RefBlogPostSL', posts + iteration)
+      , User = db.model('RefUserSL', users + iteration++)
+
+    User.create({
+        name  : 'User 1'
+      , email : 'user1@learnboost.com'
+    }, function (err, user1) {
+      should.strictEqual(err, null);
+
+      User.create({
+          name  : 'User 2'
+        , email : 'user2@learnboost.com'
+      }, function (err, user2) {
+        should.strictEqual(err, null);
+
+        var post = BlogPost.create({
+            title: 'Woot'
+          , comments: [
+                { _creator: 'user1@learnboost.com', content: 'Woot woot' }
+              , { _creator: user2, content: 'Wha wha' }
+            ]
+        }, function (err, post) {
+          should.strictEqual(err, null);
+
+          BlogPost
+            .findById(post._id)
+            .populate('comments._creator', {'email': 1 }, { name: /User/ })
+            .run(function (err, post) {
+              db.close();
+              should.strictEqual(err, null);
+
+              post.comments[0]._creator.email.should.equal('user1@learnboost.com');
+              post.comments[0]._creator.isInit('name').should.be.false;
+              post.comments[1]._creator.email.should.equal('user2@learnboost.com');
+              post.comments[1]._creator.isInit('name').should.be.false;
+            });
+        });
+      });
+    });
+  },
+
+  'populating subdocs with invalid/missing subproperties': function () {
+    var db = start()
+      , BlogPost = db.model('RefBlogPostSL', posts + iteration)
+      , User = db.model('RefUserSL', users + iteration++)
+
+    User.create({
+        name  : 'T-100'
+      , email : 'terminator100@learnboost.com'
+    }, function (err, user1) {
+      should.strictEqual(err, null);
+
+      User.create({
+          name  : 'T-1000'
+        , email : 'terminator1000@learnboost.com'
+      }, function (err, user2) {
+        should.strictEqual(err, null);
+
+        var post = BlogPost.create({
+            title: 'Woot'
+          , comments: [
+                { _creator: null, content: 'Woot woot' }
+              , { _creator: user2, content: 'Wha wha' }
+            ]
+        }, function (err, post) {
+          should.strictEqual(err, null);
+
+          // invalid subprop
+          BlogPost
+          .findById(post._id)
+          .populate('comments._idontexist', 'email')
+          .run(function (err, post) {
+            should.strictEqual(err, null);
+            should.exist(post);
+            post.comments.length.should.equal(2);
+            should.strictEqual(post.comments[0]._creator, null);
+            post.comments[1]._creator.toString().should.equal('terminator1000@learnboost.com');
+
+            // subprop is null in a doc
+            BlogPost
+            .findById(post._id)
+            .populate('comments._creator', 'email')
+            .run(function (err, post) {
+              db.close();
+              should.strictEqual(err, null);
+
+              should.exist(post);
+              post.comments.length.should.equal(2);
+              should.strictEqual(post.comments[0]._creator, null);
+              should.strictEqual(post.comments[0].content, 'Woot woot');
+              post.comments[1]._creator.email.should.equal('terminator1000@learnboost.com');
+              post.comments[1]._creator.isInit('name').should.be.false;
+              post.comments[1].content.should.equal('Wha wha');
+            });
+          });
+        });
+      });
+    });
+  },
+
+  // gh-481
+  'test populating subdocuments partially with empty array': function (beforeExit) {
+    var db = start()
+      , BlogPost = db.model('RefBlogPostSL', posts + iteration++)
+      , worked = false;
+
+    var post = BlogPost.create({
+        title: 'Woot'
+      , comments: [] // EMPTY ARRAY
+    }, function (err, post) {
+      should.strictEqual(err, null);
+
+      BlogPost
+      .findById(post._id)
+      .populate('comments._creator', ['email'])
+      .run(function (err, returned) {
+        db.close();
+        worked = true;
+        should.strictEqual(err, null);
+        returned.id.should.equal(post.id);
+      });
+    });
+
+    beforeExit(function () {
+      worked.should.be.true;
+    });
+  },
+
+  'populating subdocuments with array including nulls': function () {
+    var db = start()
+      , BlogPost = db.model('RefBlogPostSL', posts + iteration)
+      , User = db.model('RefUserSL', users + iteration++)
+
+    var user = new User({ name: 'hans zimmer', email:"hanz@zimmer.home" });
+    user.save(function (err) {
+      should.strictEqual(err, null);
+
+      var post = BlogPost.create({
+          title: 'Woot'
+        , fans: []
+      }, function (err, post) {
+        should.strictEqual(err, null);
+
+        // shove some uncasted vals
+        BlogPost.collection.update({ title: 'Woot' }, { $set: { fans: [null, undefined, 'hanz@zimmer.home', null] } }, function (err) {
+          should.strictEqual(err, undefined);
+
+          BlogPost
+          .findById(post._id)
+          .populate('fans', ['name'])
+          .run(function (err, returned) {
+            db.close();
+            should.strictEqual(err, null);
+            returned.id.should.equal(post.id);
+            returned.fans.length.should.equal(1);
+          });
+        })
+      });
+    });
+  },
+
+  'populating more than one array at a time': function () {
+    var db = start()
+      , User = db.model('RefUserSL',  + iteration++)
+      , M = db.model('PopMultiSubDocsSL', new Schema({
+            users: [{ type: StringRef, ref: 'RefUserSL', refPk: 'email' }]
+          , fans:  [{ type: StringRef, ref: 'RefUserSL', refPk: 'email' }]
+          , comments: [Comment]
+        }))
+
+    User.create({
+        email : 'fan1@learnboost.com'
+    }, {
+        name: "Fan 2"
+      , email  : 'fan2@learnboost.com'
+      , gender : 'female'
+    }, {
+       name: 'Fan 3',
+       email: 'fan3@some.mail'
+    }, function (err, fan1, fan2, fan3) {
+      should.strictEqual(err, null);
+
+      M.create({
+          users: [fan3]
+        , fans: [fan1]
+        , comments: [
+              { _creator: fan1, content: 'bejeah!' }
+            , { _creator: fan2, content: 'chickfila' }
+          ]
+      }, {
+          users: [fan1]
+        , fans: [fan2]
+        , comments: [
+              { _creator: 'fan3@some.mail', content: 'hello' }
+            , { _creator: fan1, content: 'world' }
+          ]
+      }, function (err, post1, post2) {
+        should.strictEqual(err, null);
+
+        M.where('_id').in([post1, post2])
+        .populate('fans', 'name', { gender: 'female' })
+        .populate('users', 'name', { gender: 'male' })
+        .populate('comments._creator', ['email'], { name: null })
+        .run(function (err, posts) {
+          db.close();
+          should.strictEqual(err, null);
+
+          should.exist(posts);
+          posts.length.should.equal(2);
+          var p1 = posts[0];
+          var p2 = posts[1];
+          should.strictEqual(p1.fans.length, 0);
+          should.strictEqual(p2.fans.length, 1);
+          p2.fans[0].name.should.equal('Fan 2');
+          p2.fans[0].isInit('email').should.be.true;
+          p2.fans[0].isInit('gender').should.be.false;
+          p1.comments.length.should.equal(2);
+          p2.comments.length.should.equal(2);
+          should.exist(p1.comments[0]._creator.email);
+          should.not.exist(p2.comments[0]._creator);
+          p1.comments[0]._creator.email.should.equal('fan1@learnboost.com');
+          p2.comments[1]._creator.email.should.equal('fan1@learnboost.com');
+          p1.comments[0]._creator.isInit('name').should.be.false;
+          p2.comments[1]._creator.isInit('name').should.be.false;
+          p1.comments[0].content.should.equal('bejeah!');
+          p2.comments[1].content.should.equal('world');
+          should.not.exist(p1.comments[1]._creator);
+          should.not.exist(p2.comments[0]._creator);
+          p1.comments[1].content.should.equal('chickfila');
+          p2.comments[0].content.should.equal('hello');
+        });
+      });
+    });
+  },
+
+  'populating multiple children of a sub-array at a time': function () {
+    var db = start()
+      , User = db.model('RefUserSL', users)
+      , BlogPost = db.model('RefBlogPostSL', posts)
+      , Inner = new Schema({
+            user: { type: StringRef, ref: 'RefUserSL', refPk:'email'}
+          , post: { type: StringRef, ref: 'RefBlogPostSL', refPk: 'title' }
+        })
+      , I = db.model('PopMultiChildrenOfSubDocInnerSL', Inner)
+    var M = db.model('PopMultiChildrenOfSubDocSL', new Schema({
+            kids: [Inner]
+        }))
+
+    User.create({
+        name   : 'Fan 1'
+      , email  : 'fan1@learnboost.com'
+      , gender : 'male'
+    }, {
+        name   : 'Fan 2'
+      , email  : 'fan2@learnboost.com'
+      , gender : 'female'
+    }, function (err, fan1, fan2) {
+      should.strictEqual(err, null);
+
+      BlogPost.create({
+          title     : 'woot'
+      }, {
+          title     : 'yay'
+      }, function (err, post1, post2) {
+        should.strictEqual(err, null);
+
+        M.create({
+          kids: [
+              { user: fan1, post: post1, y: 5 }
+            , { user: fan2, post: post2, y: 8 }
+          ]
+        , x: 4
+        }, function (err, m1) {
+          should.strictEqual(err, null);
+
+          M.findById(m1)
+          .populate('kids.user', ["name"])
+          .populate('kids.post', ["title"], { title: "woot" })
+          .run(function (err, o) {
+            db.close();
+            should.strictEqual(err, null);
+            should.strictEqual(o.kids.length, 2);
+            var k1 = o.kids[0];
+            var k2 = o.kids[1];
+            should.strictEqual(true, !k2.post);
+            should.strictEqual(k1.user.name, "Fan 1");
+            should.strictEqual(k1.user.email, "fan1@learnboost.com");
+            should.strictEqual(k1.user.gender, undefined);
+            should.strictEqual(k1.post.title, "woot");
+            should.strictEqual(k2.user.name, "Fan 2");
+            should.strictEqual(k2.user.email, "fan2@learnboost.com");
+          });
+        });
+      });
+    });
+  },
+
+  'passing sort options to the populate method': function () {
+    var db = start()
+      , P = db.model('RefBlogPostSL', posts  + iteration)
+      , User = db.model('RefUserSL', users + iteration++);
+
+    User.create({ name: 'aaron', email:'aaron@mail', age: 10 }, { name: 'fan2', email:'fan@mail', age: 8 }, { name: 'someone else', email:'se@mail', age: 3 },
+    function (err, fan1, fan2, fan3) {
+      should.strictEqual(err, null);
+
+      P.create({ fans: [fan2, fan3, fan1] }, function (err, post) {
+        should.strictEqual(err, null);
+
+        P.findById(post)
+        .populate('fans', null, null, { sort: 'name' })
+        .run(function (err, post) {
+          should.strictEqual(err, null);
+
+          post.fans.length.should.equal(3);
+          post.fans[0].name.should.equal('aaron');
+          post.fans[1].name.should.equal('fan2');
+          post.fans[2].name.should.equal('someone else');
+
+          P.findById(post)
+          .populate('fans', 'name', null, { sort: [['name', -1]] })
+          .run(function (err, post) {
+            should.strictEqual(err, null);
+
+            post.fans.length.should.equal(3);
+            post.fans[2].name.should.equal('aaron');
+            should.strictEqual(undefined, post.fans[2].age)
+            post.fans[1].name.should.equal('fan2');
+            should.strictEqual(undefined, post.fans[1].age)
+            post.fans[0].name.should.equal('someone else');
+            should.strictEqual(undefined, post.fans[0].age)
+
+            P.findById(post)
+            .populate('fans', 'age', { age: { $gt: 3 }}, { sort: [['name', 'desc']] })
+            .run(function (err, post) {
+              db.close();
+              should.strictEqual(err, null);
+
+              post.fans.length.should.equal(2);
+              post.fans[1].age.valueOf().should.equal(10);
+              post.fans[0].age.valueOf().should.equal(8);
+            });
+          });
+        });
+      });
+    });
+  },
+
+  // no need to test
+  'refs should cast to ObjectId from hexstrings': function () {
+    // var BP = mongoose.model('RefBlogPostSL', BlogPost);
+    // var bp = new BP;
+    // bp._creator = new DocObjectId().toString();
+    // bp._creator.should.be.an.instanceof(DocObjectId);
+    // bp.set('_creator', new DocObjectId().toString());
+    // bp._creator.should.be.an.instanceof(DocObjectId);
+  },
+// no need to test
+  'populate should work on String _ids': function () {
+    // var db = start();
+
+    // var UserSchemaSS = new Schema({
+    //     _id: String
+    //   , name: String
+    // })
+
+    // var NoteSchemaSS = new Schema({
+    //     author: { type: String, ref: 'UserWithStringId' }
+    //   , body: String
+    // })
+
+    // var User = db.model('UserWithStringId', UserSchema, random())
+    // var Note = db.model('NoteWithStringId', NoteSchema, random())
+
+    // var alice = new User({_id: 'alice', name: "Alice"})
+
+    // alice.save(function (err) {
+    //   should.strictEqual(err, null);
+
+    //   var note  = new Note({author: 'alice', body: "Buy Milk"});
+    //   note.save(function (err) {
+    //     should.strictEqual(err, null);
+
+    //     Note.findById(note.id).populate('author').run(function (err, note) {
+    //       db.close();
+    //       should.strictEqual(err, null);
+    //       note.body.should.equal('Buy Milk');
+    //       should.exist(note.author);
+    //       note.author.name.should.equal('Alice');
+    //     });
+    //   });
+    // })
+  },
+// no need to test
+  'populate should work on Number _ids': function () {
+  //   var db = start();
+
+  //   var UserSchema = new Schema({
+  //       _id: Number
+  //     , name: String
+  //   })
+
+  //   var NoteSchema = new Schema({
+  //       author: { type: Number, ref: 'UserWithNumberId' }
+  //     , body: String
+  //   })
+
+  //   var User = db.model('UserWithNumberId', UserSchema, random())
+  //   var Note = db.model('NoteWithNumberId', NoteSchema, random())
+
+  //   var alice = new User({_id: 2359, name: "Alice"})
+
+  //   alice.save(function (err) {
+  //     should.strictEqual(err, null);
+
+  //     var note = new Note({author: 2359, body: "Buy Milk"});
+  //     note.save(function (err) {
+  //       should.strictEqual(err, null);
+
+  //       Note.findById(note.id).populate('author').run(function (err, note) {
+  //         db.close();
+  //         should.strictEqual(err, null);
+  //         note.body.should.equal('Buy Milk');
+  //         should.exist(note.author);
+  //         note.author.name.should.equal('Alice');
+  //       });
+  //     });
+  //   })
+  },
+
+  // gh-577
+  'required works on ref fields': function () {
+    var db = start();
+
+    var userSchema = new Schema({
+        email: {type: String, required: true}
+    });
+    var User = db.model('ObjectIdRefRequiredField', userSchema, random());
+
+    var numSchema = new Schema({ _id: Number, val: Number });
+    var Num = db.model('NumberRefRequired', numSchema, random());
+
+    var strSchema = new Schema({ _id: String, val: String });
+    var Str = db.model('StringRefRequired', strSchema, random());
+
+    var commentSchema = new Schema({
+        user: {type: ObjectId, ref: 'ObjectIdRefRequiredField', required: true}
+      , num: {type: Number, ref: 'NumberRefRequired', required: true}
+      , str: {type: String, ref: 'StringRefRequired', required: true}
+      , text: String
+    });
+    var Comment = db.model('CommentWithRequiredField', commentSchema);
+
+    var pending = 3;
+
+    var string = new Str({ _id: 'my string', val: 'hello' });
+    var number = new Num({ _id: 1995, val: 234 });
+    var user = new User({ email: 'test' });
+
+    string.save(next);
+    number.save(next);
+    user.save(next);
+
+    function next (err) {
+      should.strictEqual(null, err);
+      if (--pending) return;
+
+      var comment = new Comment({
+          text: 'test'
+      });
+
+      comment.save(function (err) {
+        should.equal('Validation failed', err && err.message);
+        err.errors.should.have.property('num');
+        err.errors.should.have.property('str');
+        err.errors.should.have.property('user');
+        err.errors.num.type.should.equal('required');
+        err.errors.str.type.should.equal('required');
+        err.errors.user.type.should.equal('required');
+
+        comment.user = user;
+        comment.num = 1995;
+        comment.str = 'my string';
+
+        comment.save(function (err, comment) {
+          should.strictEqual(null, err);
+
+          Comment
+          .findById(comment.id)
+          .populate('user')
+          .populate('num')
+          .populate('str')
+          .run(function (err, comment) {
+            should.strictEqual(err, null);
+
+            comment.set({text: 'test2'});
+
+            comment.save(function (err, comment) {
+              db.close();
+              should.strictEqual(err, null);
+            });
+          });
+        });
+      });
+    }
+  },
+
+  'populate works with schemas with both id and _id defined': function () {
+    var db =start()
+      , S1 = new Schema({ id: String })
+      , S2 = new Schema({ things: [{ type: ObjectId, ref: '_idAndidSL' }]})
+
+    var M1 = db.model('_idAndidSL', S1);
+    var M2 = db.model('populateWorksWith_idAndidSchemasSL', S2);
+
+    M1.create(
+        { id: "The Tiger That Isn't" }
+      , { id: "Users Guide To The Universe" }
+      , function (err, a, b) {
+      should.strictEqual(null, err);
+
+      var m2 = new M2({ things: [a, b]});
+      m2.save(function (err) {
+        should.strictEqual(null, err);
+        M2.findById(m2).populate('things').run(function (err, doc) {
+          db.close();
+          should.strictEqual(null, err);
+          doc.things.length.should.equal(2);
+          doc.things[0].id.should.equal("The Tiger That Isn't");
+          doc.things[1].id.should.equal("Users Guide To The Universe");
+        })
+      });
+    })
+  },
+
+  // gh-602
+  'Update works with populated arrays': function () {
+    var db = start()
+      , BlogPost = db.model('RefBlogPostSL', posts + iteration)
+      , User = db.model('RefUserSL', users + iteration++)
+
+    User.create({name:'aphex', email:"some@mail"},{name:'twin',email:'someother@mail'}, function (err, u1, u2) {
+      should.strictEqual(err, null);
+
+      var post = BlogPost.create({
+          title: 'Woot'
+        , fans: []
+      }, function (err, post) {
+        should.strictEqual(err, null);
+
+        var update = { fans: [u1, u2] };
+        BlogPost.update({ _id: post }, update, function (err) {
+          should.strictEqual(err, null);
+
+          // the original update doc should not be modified
+          ;('fans' in update).should.be.true;
+          ;('$set' in update).should.be.false;
+          update.fans[0].should.be.instanceof(mongoose.Document);
+          update.fans[1].should.be.instanceof(mongoose.Document);
+
+          BlogPost.findById(post, function (err, post) {
+
+            db.close();
+            should.strictEqual(err, null);
+            post.fans.length.should.equal(2);
+            post.fans[0].should.be.equal('some@mail');
+            post.fans[1].should.be.equal('someother@mail');
+          });
+        });
+      });
+    });
+  },
+  
+  // gh-675
+  'toJSON should also be called for refs': function () {
+    var db = start()
+      , BlogPost = db.model('RefBlogPostSL', posts + iteration)
+      , User = db.model('RefUserSL', users + iteration++)
+
+    User.prototype._toJSON = User.prototype.toJSON;
+    User.prototype.toJSON = function() {
+      var res = this._toJSON();
+      res.was_in_to_json = true;
+      return res;
+    }
+
+    BlogPost.prototype._toJSON = BlogPost.prototype.toJSON;
+    BlogPost.prototype.toJSON = function() {
+      var res = this._toJSON();
+      res.was_in_to_json = true;
+      return res;
+    }
+
+    User.create({
+        name  : 'Jerem'
+      , email : 'jerem@jolicloud.com'
+    }, function (err, creator) {
+      should.strictEqual(err, null);
+
+      BlogPost.create({
+          title     : 'Ping Pong'
+        , _creator  : creator
+      }, function (err, post) {
+        should.strictEqual(err, null);
+
+        BlogPost
+          .findById(post._id)
+          .populate('_creator')
+          .run(function (err, post) {
+            db.close();
+            should.strictEqual(err, null);
+
+            var json = post.toJSON();
+            json.was_in_to_json.should.equal(true);
+            json._creator.was_in_to_json.should.equal(true);
+          });
+      });
+    });
+  },
+
+  // no need
+  // gh-686
+  'populate should work on Buffer _ids': function () {
+    // var db = start();
+
+    // var UserSchema = new Schema({
+    //     _id: Buffer
+    //   , name: String
+    // })
+
+    // var NoteSchema = new Schema({
+    //     author: { type: Buffer, ref: 'UserWithBufferId' }
+    //   , body: String
+    // })
+
+    // var User = db.model('UserWithBufferId', UserSchema, random())
+    // var Note = db.model('NoteWithBufferId', NoteSchema, random())
+
+    // var alice = new User({_id: new mongoose.Types.Buffer('YWxpY2U=', 'base64'), name: "Alice"})
+
+    // alice.save(function (err) {
+    //   should.strictEqual(err, null);
+
+    //   var note  = new Note({author: 'alice', body: "Buy Milk"});
+    //   note.save(function (err) {
+    //     should.strictEqual(err, null);
+
+    //     Note.findById(note.id).populate('author').run(function (err, note) {
+    //       db.close();
+    //       should.strictEqual(err, null);
+    //       note.body.should.equal('Buy Milk');
+    //       should.exist(note.author);
+    //       note.author.name.should.equal('Alice');
+    //     });
+    //   });
+    // })
+  },
+
+  'Depopulate should works correctly':function(){
+    var current = iteration++
+
+    var UserSchema = new Schema({
+      name:String,
+      group:{type:StringRef, ref:"Group"+current, refPk:'name'}
+    }) 
+
+    var GroupSchema = new Schema({
+      name:String,
+      users:[{type:StringRef, ref: "User"+current, refPk:'name'}]
+    })
+    
+    mongoose.model('User' + current, UserSchema)
+    mongoose.model('Group' + current, GroupSchema)
+    
+    var db = start()
+
+    var User = db.model('User' + current,'User_' + random())
+    var Group = db.model('Group' + current,'Group_' + random())
+
+    User.create({
+      name:'Mike',
+      group:'admin'
+    },{
+      name:'Donavan',
+      group:'admin'
+    },
+    function(err){
+      should.strictEqual(err, null);
+      Group.create({
+        name:'admin',
+        users:['Mike','Donavan']
+      },
+      function(err){
+        should.strictEqual(err, null);
+        User.findOne({name:'Mike'}).populate('group').exec(function(err,data){
+          should.strictEqual(err, null);
+          data.group.should.be.instanceof(mongoose.Document);
+        })
+        Group.findOne({name:'admin'}).populate('users').exec(function(err,data){
+          should.strictEqual(err, null);
+          data.users.should.be.instanceof(mongoose.Types.Array);
+          var depopulated = data.toObject({depopulate:1})
+          depopulated.users[0].should.be.equal('Mike')
+          depopulated.users[1].should.be.equal('Donavan')
+        })
+      })
+    })
+  }
+};

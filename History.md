@@ -1,4 +1,9 @@
 
+2.5.8 / 2012-02-21
+===================
+
+  * added; post 'remove' middleware includes model that was removed (#729) [timoxley]
+
 2.5.7 / 2012-02-09
 ===================
 

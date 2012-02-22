@@ -1,4 +1,9 @@
 
+2.5.9 / 2012-02-22
+===================
+
+  * fixed; properly cast nested atomic update operators for sub-documents
+
 2.5.8 / 2012-02-21
 ===================
 

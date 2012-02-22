@@ -1,0 +1,10 @@
+{
+	"required": "{path} cannot be blank."
+  , "string": {
+      "": ""
+    }
+  , "number": {
+        "min": "{path} is too small (minimum is {min})."
+      , "max": "{path} is too big (maximum is {max})."
+    }
+}

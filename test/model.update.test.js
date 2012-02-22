@@ -429,10 +429,49 @@ module.exports = {
       BlogPost.update({ _id: post._id }, update, function (err) {
         should.strictEqual(null, err);
         BlogPost.findById(post, function (err, ret) {
-          db.close();
           should.strictEqual(null, err);
           ret.comments.length.should.equal(1);
           ret.comments[0].body.should.equal('9000');
+          update15(post, ret);
+        })
+      });
+    }
+
+    function update15 (post, ret) {
+      var update = {
+          $pull: { comments: { body: { $in: [ret.comments[0].body] }} }
+      }
+
+      BlogPost.update({ _id: post._id }, update, function (err) {
+        should.strictEqual(null, err);
+        BlogPost.findById(post, function (err, ret) {
+          should.strictEqual(null, err);
+          ret.comments.length.should.equal(0);
+          update16(post, ret);
+        })
+      });
+    }
+
+    function update16 (post, ret) {
+      ret.comments.$pushAll([{body: 'hi'}, {body:'there'}]);
+      ret.save(function (err) {
+        should.strictEqual(null, err);
+        BlogPost.findById(post, function (err, ret) {
+          should.strictEqual(null, err);
+          ret.comments.length.should.equal(2);
+
+          var update = {
+              $pull: { comments: { body: { $nin: ['there'] }} }
+          }
+
+          BlogPost.update({ _id: ret._id }, update, function (err) {
+            should.strictEqual(null, err);
+            BlogPost.findById(post, function (err, ret) {
+              db.close();
+              should.strictEqual(null, err);
+              ret.comments.length.should.equal(1);
+            })
+          });
         })
       });
     }

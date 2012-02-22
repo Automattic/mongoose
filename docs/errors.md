@@ -1,4 +1,3 @@
-
 Error handling
 ==============
 
@@ -13,7 +12,7 @@ providing us with a little more error handling flexibility.
 
     var Toy = db.model('Toy', ToySchema);
 
-    Toy.schema.path('name').validate(function (value) {
+    Toy.schema.path('color').validate(function (value) {
       return /blue|green|white|red|orange|periwinkel/i.test(value);
     }, 'Invalid color');
 

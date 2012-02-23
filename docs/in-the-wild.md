@@ -56,6 +56,12 @@ Mongoose in the Wild
 
 <br>
 
+[AtticTV](http://www.attictv.com/) is Music Television (MTV) for the web.
+
+[![AtticTV](/images/apps/attictv.png)](http://www.attictv.com/)
+
+<br>
+
 [Lists](http://apps.newleafdigital.com/lists) is a service for saving links for reading later.
 
 [![Lists](/images/apps/lists.png)](http://apps.newleafdigital.com/lists)

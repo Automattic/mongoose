@@ -11,7 +11,7 @@ Errors returned after failed validation contain an `errors` object holding the a
 
     var Toy = db.model('Toy', ToySchema);
 
-    Toy.schema.path('name').validate(function (value) {
+    Toy.schema.path('color').validate(function (value) {
       return /blue|green|white|red|orange|periwinkel/i.test(value);
     }, 'Invalid color');
 

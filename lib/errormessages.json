@@ -6,5 +6,6 @@
   , "number": {
         "min": "{path} is too small (minimum is {min})."
       , "max": "{path} is too big (maximum is {max})."
+      , "cast": "{path} must be a number."
     }
 }

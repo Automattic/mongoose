@@ -16,7 +16,7 @@ test-cov:
 docs: docs/api.html
 
 docs/api.html: lib/*.js
-	dox \
+	./node_modules/dox/bin/dox \
 		--title Mongoose \
 		--desc "Expressive MongoDB for Node.JS" \
 		--ribbon "https://github.com/learnboost/mongoose" \

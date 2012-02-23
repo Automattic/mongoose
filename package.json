@@ -8,6 +8,7 @@
         "markdown": "0.3.1"
       , "node-static": "0.5.9"
       , "github-flavored-markdown": "1.0.0"
+      , "dox": "0.0.5"
     }
   , "directories": { "lib": "./lib/mongoose" }
   , "scripts": { "test": "make test" }

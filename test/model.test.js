@@ -758,46 +758,6 @@ module.exports = {
     	});
     });
   },
-  
-  'test nested structure created by merging': function() {
-    var db = start();
-    
-    var MergedSchema = new Schema({
-      a: {
-        foo: String
-      }
-    });
-    
-    MergedSchema.add({
-      a: {
-        b: {
-          bar: String
-        }
-      }
-    });
-    
-    mongoose.model('Merged', MergedSchema);
-    var Merged = db.model('Merged', 'merged_' + Math.random());
-    
-    var merged = new Merged({
-      a: {
-          foo: 'baz'
-        , b: {
-            bar: 'qux'
-          }
-      }
-    });
-    
-    merged.save(function(err) {
-      should.strictEqual(null, err);
-      Merged.findById(merged.id, function(err, found) {
-        should.strictEqual(null, err);
-        found.a.foo.should.eql('baz');
-        found.a.b.bar.should.eql('qux');
-        db.close();
-      });
-    });
-  },
 
   // gh-662
   'test nested structure created by merging': function() {
@@ -836,6 +796,63 @@ module.exports = {
         should.strictEqual(null, err);
         found.a.foo.should.eql('baz');
         found.a.b.bar.should.eql('qux');
+      });
+    });
+  },
+
+  // gh-714
+  'modified nested objects which contain MongoseNumbers should not cause a RangeError on save': function () {
+    var db =start()
+
+    var schema = new Schema({
+        nested: {
+            num: Number
+        }
+    });
+
+    var M = db.model('NestedObjectWithMongooseNumber', schema);
+    var m = new M;
+    m.nested = null;
+    m.save(function (err) {
+      should.strictEqual(null, err);
+
+      M.findById(m, function (err, m) {
+        should.strictEqual(null, err);
+        m.nested.num = 5;
+        m.save(function (err) {
+          db.close();
+          should.strictEqual(null, err);
+        });
+      });
+    });
+  },
+
+  // gh-714 pt 2
+  'no RangeError on remove() of a doc with Number _id': function () {
+    var db = start()
+
+    var MySchema = new Schema({
+        _id: { type: Number },
+        name: String
+    });
+
+    var MyModel = db.model('MyModel', MySchema, 'numberrangeerror'+random());
+
+    var instance = new MyModel({
+        name: 'test'
+      , _id: 35
+    });
+
+    instance.save(function (err) {
+      should.strictEqual(null, err);
+
+      MyModel.findById(35, function (err, doc) {
+        should.strictEqual(null, err);
+
+        doc.remove(function (err) {
+          db.close();
+          should.strictEqual(null, err);
+        });
       });
     });
   },
@@ -1105,16 +1122,15 @@ module.exports = {
 
   // GH-319
   'save callback should only execute once regardless of number of failed validations': function () {
-    mongoose.model('CallbackFiresOnceValidation', new Schema({
+    var db = start()
+
+    var D = db.model('CallbackFiresOnceValidation', new Schema({
         username: { type: String, validate: /^[a-z]{6}$/i }
       , email: { type: String, validate: /^[a-z]{6}$/i }
       , password: { type: String, validate: /^[a-z]{6}$/i }
     }));
 
-    var db = start()
-      , CallbackFiresOnceValidation = db.model('CallbackFiresOnceValidation');
-
-    var post = new CallbackFiresOnceValidation({
+    var post = new D({
         username: "nope"
       , email: "too"
       , password: "short"
@@ -1123,6 +1139,7 @@ module.exports = {
     var timesCalled = 0;
 
     post.save(function (err) {
+      db.close();
       err.should.be.an.instanceof(MongooseError);
       err.should.be.an.instanceof(ValidationError);
 
@@ -1144,7 +1161,6 @@ module.exports = {
       post.errors.email.message.should.eql('Validator failed for path email');
       post.errors.username.message.should.eql('Validator failed for path username');
 
-      db.close();
     });
   },
 
@@ -3271,9 +3287,11 @@ module.exports = {
         })
       , save = false
       , remove = false
-      , init = false;
+      , init = false
+      , post = undefined;
 
-    schema.post('save', function () {
+    schema.post('save', function (arg) {
+      arg.id.should.equal(post.id)
       save = true;
     });
 
@@ -3281,7 +3299,8 @@ module.exports = {
       init = true;
     });
 
-    schema.post('remove', function () {
+    schema.post('remove', function (arg) {
+      arg.id.should.eql(post.id)
       remove = true;
     });
 
@@ -3290,13 +3309,12 @@ module.exports = {
     var db = start()
       , BlogPost = db.model('PostHookTest');
 
-    var post = new BlogPost();
+    post = new BlogPost();
 
     post.save(function (err) {
       process.nextTick(function () {
         should.strictEqual(err, null);
         save.should.be.true;
-
         BlogPost.findById(post._id, function (err, doc) {
           process.nextTick(function () {
             should.strictEqual(err, null);
@@ -4596,111 +4614,6 @@ module.exports = {
     });
   },
 
-  'strict mode': function(){
-    var db = start();
-
-    var lax = new Schema({
-        ts  : { type: Date, default: Date.now }
-      , content: String
-    });
-
-    var strict = new Schema({
-        ts  : { type: Date, default: Date.now }
-      , content: String
-    }, { strict: true });
-
-    var Lax = db.model('Lax', lax);
-    var Strict = db.model('Strict', strict);
-
-    var l = new Lax({content: 'sample', rouge: 'data'});
-    l._strictMode.should.be.false;
-    l = l.toObject();
-    l.content.should.equal('sample')
-    l.rouge.should.equal('data');
-    should.exist(l.rouge);
-
-    var s = new Strict({content: 'sample', rouge: 'data'});
-    s._strictMode.should.be.true;
-    s = s.toObject();
-    s.should.have.property('ts');
-    s.content.should.equal('sample');
-    s.should.not.have.property('rouge');
-    should.not.exist(s.rouge);
-
-    // instance override
-    var instance = new Lax({content: 'sample', rouge: 'data'}, true);
-    instance._strictMode.should.be.true;
-    instance = instance.toObject();
-    instance.content.should.equal('sample')
-    should.not.exist(instance.rouge);
-    instance.should.have.property('ts')
-
-    // hydrate works as normal, but supports the schema level flag.
-    var s2 = new Strict({content: 'sample', rouge: 'data'}, false);
-    s2._strictMode.should.be.false;
-    s2 = s2.toObject();
-    s2.should.have.property('ts')
-    s2.content.should.equal('sample');
-    s2.should.have.property('rouge');
-    should.exist(s2.rouge);
-
-    // testing init
-    var s3 = new Strict();
-    s3.init({content: 'sample', rouge: 'data'});
-    var s3obj = s3.toObject();
-    s3.content.should.equal('sample');
-    s3.should.not.have.property('rouge');
-    should.not.exist(s3.rouge);
-
-    // strict on create
-    Strict.create({content: 'sample2', rouge: 'data'}, function(err, doc){
-      doc.content.should.equal('sample2');
-      doc.should.not.have.property('rouge');
-      should.not.exist(doc.rouge);
-      db.close();
-    });
-  },
-
-  'strict mode virtuals': function () {
-    var db = start();
-
-    var getCount = 0
-      , setCount = 0;
-
-    var strictSchema = new Schema({
-        email: String
-      , prop: String
-    }, {strict: true});
-
-    strictSchema
-    .virtual('myvirtual')
-    .get(function() {
-      getCount++;
-      return 'ok';
-    })
-    .set(function(v) {
-      setCount++;
-      this.prop = v;
-    });
-
-    var StrictModel = db.model('StrictVirtual', strictSchema);
-
-    var strictInstance = new StrictModel({
-        email: 'hunter@skookum.com'
-      , myvirtual: 'test'
-    });
-
-    db.close();
-    getCount.should.equal(0);
-    setCount.should.equal(1);
-
-    strictInstance.myvirtual = 'anotherone';
-    var myvirtual = strictInstance.myvirtual;
-
-    getCount.should.equal(1);
-    setCount.should.equal(2);
-  },
-
   'should not throw range error when using Number _id and saving existing doc': function () {
     var db =start();
 
@@ -4720,6 +4633,23 @@ module.exports = {
           db.close();
           should.strictEqual(null, err);
         });
+      });
+    });
+  },
+
+  'number of affected docs should be returned when saving': function () {
+    var db = start()
+    var schema = new Schema({ name: String });
+    var S = db.model('AffectedDocsAreReturned', schema);
+    var s = new S({ name: 'aaron' });
+    s.save(function (err, doc, affected) {
+      should.strictEqual(null, err);
+      affected.should.equal(1);
+      s.name = 'heckmanananananana';
+      s.save(function (err, doc, affected) {
+        db.close();
+        should.strictEqual(null, err);
+        affected.should.equal(1);
       });
     });
   }

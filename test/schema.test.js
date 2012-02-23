@@ -456,7 +456,7 @@ module.exports = {
     Animal.path('isFerret').doValidate(undefined, function(err){
       err.should.be.an.instanceof(ValidatorError);
     });
-    
+
     Animal.path('isFerret').doValidate(true, function(err){
       should.strictEqual(err, null);
     });
@@ -482,9 +482,44 @@ module.exports = {
     Animal.path('isFerret').cast('1').should.be.true;
   },
 
+  'test async multiple validators': function(beforeExit){
+    var executed = 0;
+
+    function validator (value, fn) {
+      setTimeout(function(){
+        executed++;
+        fn(value === true);
+      }, 50);
+    };
+
+    var Animal = new Schema({
+      ferret: {
+        type: Boolean,
+        validate: [
+          {
+            'validator': validator,
+            'msg': 'validator1'
+          },
+          {
+            'validator': validator,
+            'msg': 'validator2'
+          },
+        ],
+      }
+    });
+
+    Animal.path('ferret').doValidate(true, function(err){
+      should.strictEqual(err, null);
+    });
+
+    beforeExit(function(){
+      executed.should.eql(2);
+    });
+  },
+
   'test async validators': function(beforeExit){
     var executed = 0;
-    
+
     function validator (value, fn) {
       setTimeout(function(){
         executed++;
@@ -885,6 +920,44 @@ module.exports = {
     var s = new Schema(o);
     s.add({ age: Number }, 'name.');
     ;('age' in o.name).should.be.false;
+  },
+
+  // gh-700
+  'nested schemas should throw': function () {
+    var a = new Schema({ title: String })
+      , err
+
+    try {
+      new Schema({ blah: Boolean, a: a });
+    } catch (err_) {
+      err = err_;
+    }
+
+    should.exist(err);
+    ;/Did you try nesting Schemas/.test(err.message).should.be.true;
+  },
+
+  'non-function etters throw': function () {
+    var schema = new Schema({ fun: String });
+    var g, s;
+
+    try {
+      schema.path('fun').get(true);
+    } catch (err_) {
+      g = err_;
+    }
+
+    should.exist(g);
+    g.message.should.equal('A getter must be a function.');
+
+    try {
+      schema.path('fun').set(4);
+    } catch (err_) {
+      s = err_;
+    }
+
+    should.exist(s);
+    s.message.should.equal('A setter must be a function.');
   }
 
 };

@@ -1,4 +1,48 @@
 
+2.5.9 / 2012-02-22
+===================
+
+  * fixed; properly cast nested atomic update operators for sub-documents
+
+2.5.8 / 2012-02-21
+===================
+
+  * added; post 'remove' middleware includes model that was removed (#729) [timoxley]
+
+2.5.7 / 2012-02-09
+===================
+
+  * fixed; RegExp validators on node >= v0.6.x
+
+2.5.6 / 2012-02-09
+===================
+
+  * fixed; emit errors returned from db.collection() on the connection (were being swallowed)
+  * added; can add multiple validators in your schema at once (#718) [diogogmt]
+  * fixed; strict embedded documents (#717)
+  * updated; docs [niemyjski]
+  * added; pass number of affected docs back in model.update/save
+
+2.5.5 / 2012-02-03
+===================
+
+  * fixed; RangeError: maximum call stack exceed error when removing docs with Number _id (#714)
+
+2.5.4 / 2012-02-03
+===================
+
+  * fixed; RangeError: maximum call stack exceed error (#714)
+
+2.5.3 / 2012-02-02
+===================
+
+  * added; doc#isSelected(path)
+  * added; query#equals()
+  * added; beta sharding support
+  * added; more descript error msgs (#700) [obeleh]
+  * added; document.modifiedPaths (#709) [ljharb]
+  * fixed; only functions can be added as getters/setters (#707,704) [ljharb]
+
 2.5.2 / 2012-01-30
 ===================
 

@@ -29,6 +29,7 @@ TestDocument.prototype.__proto__ = Document.prototype;
  * Set a dummy schema to simulate compilation.
  */
 
+var em = new Schema({ title: String, body: String });
 var schema = TestDocument.prototype.schema = new Schema({
     test    : String
   , oids    : [ObjectId]
@@ -48,6 +49,7 @@ var schema = TestDocument.prototype.schema = new Schema({
           , age     : Number
         }
     }
+  , em: [em]
 });
 
 schema.virtual('nested.agePlus2').get(function (v) {
@@ -557,7 +559,7 @@ module.exports = {
       , obj = doc.toObject();
 
     delete obj._id;
-    obj.should.eql({ numbers: [], oids: [] });
+    obj.should.eql({ numbers: [], oids: [], em: [] });
   },
 
   // GH-209
@@ -644,5 +646,208 @@ module.exports = {
     var s = new S({ title: "test" });
     db.close();
     traced.should.be.false
+  },
+
+  'isSelected': function () {
+    var doc = new TestDocument();
+
+    doc.init({
+        test    : 'test'
+      , numbers : [4,5,6,7]
+      , nested  : {
+            age   : 5
+          , cool  : DocumentObjectId.fromString('4c6c2d6240ced95d0e00003c')
+          , path  : 'my path'
+          , deep  : { x: 'a string' }
+        }
+      , notapath: 'i am not in the schema'
+      , em: [{ title: 'gocars' }]
+    });
+
+    doc.isSelected('_id').should.be.true;
+    doc.isSelected('test').should.be.true;
+    doc.isSelected('numbers').should.be.true;
+    doc.isSelected('oids').should.be.true; // even if no data
+    doc.isSelected('nested').should.be.true;
+    doc.isSelected('nested.age').should.be.true;
+    doc.isSelected('nested.cool').should.be.true;
+    doc.isSelected('nested.path').should.be.true;
+    doc.isSelected('nested.deep').should.be.true;
+    doc.isSelected('nested.nope').should.be.true; // not a path
+    doc.isSelected('nested.deep.x').should.be.true;
+    doc.isSelected('nested.deep.x.no').should.be.true;
+    doc.isSelected('nested.deep.y').should.be.true; // not a path
+    doc.isSelected('noway').should.be.true; // not a path
+    doc.isSelected('notapath').should.be.true; // not a path but in the _doc
+    doc.isSelected('em').should.be.true;
+    doc.isSelected('em.title').should.be.true;
+    doc.isSelected('em.body').should.be.true;
+    doc.isSelected('em.nonpath').should.be.true; // not a path
+
+    var selection = {
+        'test': 1
+      , 'numbers': 1
+      , 'nested.deep': 1
+      , 'oids': 1
+    }
+
+    doc = new TestDocument(undefined, selection);
+
+    doc.init({
+        test    : 'test'
+      , numbers : [4,5,6,7]
+      , nested  : {
+            deep  : { x: 'a string' }
+        }
+    });
+
+    doc.isSelected('_id').should.be.true;
+    doc.isSelected('test').should.be.true;
+    doc.isSelected('numbers').should.be.true;
+    doc.isSelected('oids').should.be.true; // even if no data
+    doc.isSelected('nested').should.be.true;
+    doc.isSelected('nested.age').should.be.false;
+    doc.isSelected('nested.cool').should.be.false;
+    doc.isSelected('nested.path').should.be.false;
+    doc.isSelected('nested.deep').should.be.true;
+    doc.isSelected('nested.nope').should.be.false;
+    doc.isSelected('nested.deep.x').should.be.true;
+    doc.isSelected('nested.deep.x.no').should.be.true;
+    doc.isSelected('nested.deep.y').should.be.true;
+    doc.isSelected('noway').should.be.false;
+    doc.isSelected('notapath').should.be.false;
+    doc.isSelected('em').should.be.false;
+    doc.isSelected('em.title').should.be.false;
+    doc.isSelected('em.body').should.be.false;
+    doc.isSelected('em.nonpath').should.be.false;
+
+    var selection = {
+        'em.title': 1
+    }
+
+    doc = new TestDocument(undefined, selection);
+
+    doc.init({
+        em: [{ title: 'one' }]
+    });
+
+    doc.isSelected('_id').should.be.true;
+    doc.isSelected('test').should.be.false;
+    doc.isSelected('numbers').should.be.false;
+    doc.isSelected('oids').should.be.false;
+    doc.isSelected('nested').should.be.false;
+    doc.isSelected('nested.age').should.be.false;
+    doc.isSelected('nested.cool').should.be.false;
+    doc.isSelected('nested.path').should.be.false;
+    doc.isSelected('nested.deep').should.be.false;
+    doc.isSelected('nested.nope').should.be.false;
+    doc.isSelected('nested.deep.x').should.be.false;
+    doc.isSelected('nested.deep.x.no').should.be.false;
+    doc.isSelected('nested.deep.y').should.be.false;
+    doc.isSelected('noway').should.be.false;
+    doc.isSelected('notapath').should.be.false;
+    doc.isSelected('em').should.be.true;
+    doc.isSelected('em.title').should.be.true;
+    doc.isSelected('em.body').should.be.false;
+    doc.isSelected('em.nonpath').should.be.false;
+
+    var selection = {
+        'em': 0
+    }
+
+    doc = new TestDocument(undefined, selection);
+    doc.init({
+        test    : 'test'
+      , numbers : [4,5,6,7]
+      , nested  : {
+            age   : 5
+          , cool  : DocumentObjectId.fromString('4c6c2d6240ced95d0e00003c')
+          , path  : 'my path'
+          , deep  : { x: 'a string' }
+        }
+      , notapath: 'i am not in the schema'
+    });
+
+    doc.isSelected('_id').should.be.true;
+    doc.isSelected('test').should.be.true;
+    doc.isSelected('numbers').should.be.true;
+    doc.isSelected('oids').should.be.true;
+    doc.isSelected('nested').should.be.true;
+    doc.isSelected('nested.age').should.be.true;
+    doc.isSelected('nested.cool').should.be.true;
+    doc.isSelected('nested.path').should.be.true;
+    doc.isSelected('nested.deep').should.be.true;
+    doc.isSelected('nested.nope').should.be.true;
+    doc.isSelected('nested.deep.x').should.be.true;
+    doc.isSelected('nested.deep.x.no').should.be.true;
+    doc.isSelected('nested.deep.y').should.be.true;
+    doc.isSelected('noway').should.be.true;
+    doc.isSelected('notapath').should.be.true;
+    doc.isSelected('em').should.be.false;
+    doc.isSelected('em.title').should.be.false;
+    doc.isSelected('em.body').should.be.false;
+    doc.isSelected('em.nonpath').should.be.false;
+
+    var selection = {
+        '_id': 0
+    }
+
+    doc = new TestDocument(undefined, selection);
+    doc.init({
+        test    : 'test'
+      , numbers : [4,5,6,7]
+      , nested  : {
+            age   : 5
+          , cool  : DocumentObjectId.fromString('4c6c2d6240ced95d0e00003c')
+          , path  : 'my path'
+          , deep  : { x: 'a string' }
+        }
+      , notapath: 'i am not in the schema'
+    });
+
+    doc.isSelected('_id').should.be.false;
+    doc.isSelected('nested.deep.x.no').should.be.true;
+
+    doc = new TestDocument({ test: 'boom' });
+    doc.isSelected('_id').should.be.true;
+    doc.isSelected('test').should.be.true;
+    doc.isSelected('numbers').should.be.true;
+    doc.isSelected('oids').should.be.true;
+    doc.isSelected('nested').should.be.true;
+    doc.isSelected('nested.age').should.be.true;
+    doc.isSelected('nested.cool').should.be.true;
+    doc.isSelected('nested.path').should.be.true;
+    doc.isSelected('nested.deep').should.be.true;
+    doc.isSelected('nested.nope').should.be.true;
+    doc.isSelected('nested.deep.x').should.be.true;
+    doc.isSelected('nested.deep.x.no').should.be.true;
+    doc.isSelected('nested.deep.y').should.be.true;
+    doc.isSelected('noway').should.be.true;
+    doc.isSelected('notapath').should.be.true;
+    doc.isSelected('em').should.be.true;
+    doc.isSelected('em.title').should.be.true;
+    doc.isSelected('em.body').should.be.true;
+    doc.isSelected('em.nonpath').should.be.true;
+
+    doc = new TestDocument({ test: 'boom' }, true);
+    doc.isSelected('_id').should.be.true;
+    doc.isSelected('test').should.be.true;
+    doc.isSelected('numbers').should.be.true;
+    doc.isSelected('oids').should.be.true;
+    doc.isSelected('nested').should.be.true;
+    doc.isSelected('nested.age').should.be.true;
+    doc.isSelected('nested.cool').should.be.true;
+    doc.isSelected('nested.path').should.be.true;
+    doc.isSelected('nested.deep').should.be.true;
+    doc.isSelected('nested.nope').should.be.true;
+    doc.isSelected('nested.deep.x').should.be.true;
+    doc.isSelected('nested.deep.x.no').should.be.true;
+    doc.isSelected('nested.deep.y').should.be.true;
+    doc.isSelected('noway').should.be.true;
+    doc.isSelected('notapath').should.be.true;
+    doc.isSelected('em').should.be.true;
+    doc.isSelected('em.title').should.be.true;
+    doc.isSelected('em.body').should.be.true;
+    doc.isSelected('em.nonpath').should.be.true;
   }
 };

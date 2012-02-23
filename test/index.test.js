@@ -154,7 +154,7 @@ module.exports = {
     var uri = process.env.MONGOOSE_SET_TEST_URI;
 
     if (!uri) {
-      console.log('\033[31m', '\n', 'You\'re not testing for replica sets!'
+      console.log('\033[30m', '\n', 'You\'re not testing replica sets!'
                 , '\n', 'Please set the MONGOOSE_SET_TEST_URI env variable.', '\n'
                 , 'e.g: `mongodb://localhost:27017/db,mongodb://localhost…`', '\n'
                 , '\033[39m');

@@ -429,10 +429,49 @@ module.exports = {
       BlogPost.update({ _id: post._id }, update, function (err) {
         should.strictEqual(null, err);
         BlogPost.findById(post, function (err, ret) {
-          db.close();
           should.strictEqual(null, err);
           ret.comments.length.should.equal(1);
           ret.comments[0].body.should.equal('9000');
+          update15(post, ret);
+        })
+      });
+    }
+
+    function update15 (post, ret) {
+      var update = {
+          $pull: { comments: { body: { $in: [ret.comments[0].body] }} }
+      }
+
+      BlogPost.update({ _id: post._id }, update, function (err) {
+        should.strictEqual(null, err);
+        BlogPost.findById(post, function (err, ret) {
+          should.strictEqual(null, err);
+          ret.comments.length.should.equal(0);
+          update16(post, ret);
+        })
+      });
+    }
+
+    function update16 (post, ret) {
+      ret.comments.$pushAll([{body: 'hi'}, {body:'there'}]);
+      ret.save(function (err) {
+        should.strictEqual(null, err);
+        BlogPost.findById(post, function (err, ret) {
+          should.strictEqual(null, err);
+          ret.comments.length.should.equal(2);
+
+          var update = {
+              $pull: { comments: { body: { $nin: ['there'] }} }
+          }
+
+          BlogPost.update({ _id: ret._id }, update, function (err) {
+            should.strictEqual(null, err);
+            BlogPost.findById(post, function (err, ret) {
+              db.close();
+              should.strictEqual(null, err);
+              ret.comments.length.should.equal(1);
+            })
+          });
         })
       });
     }
@@ -456,8 +495,9 @@ module.exports = {
     s.save(function (err) {
       should.strictEqual(null, err);
 
-      S.update({ _id: s._id }, { ignore: true }, function (err) {
+      S.update({ _id: s._id }, { ignore: true }, function (err, affected) {
         should.strictEqual(null, err);
+        affected.should.equal(1);
 
         S.findById(s._id, function (err, doc) {
           db.close();
@@ -465,6 +505,20 @@ module.exports = {
           should.not.exist(doc.ignore);
           should.not.exist(doc._doc.ignore);
         });
+      });
+    });
+  },
+
+  'model.update passes number of affected documents': function () {
+    var db = start()
+      , B = db.model('BlogPost', 'wwwwowowo'+random())
+
+    B.create({ title: 'one'},{title:'two'},{title:'three'}, function (err) {
+      should.strictEqual(null, err);
+      B.update({}, { title: 'newtitle' }, { multi: true }, function (err, affected) {
+        db.close();
+        should.strictEqual(null, err);
+        affected.should.equal(3);
       });
     });
   }

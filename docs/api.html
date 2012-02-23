@@ -2046,7 +2046,7 @@ default mongoose connection;</p>
       <span class="keyword">return</span> <span class="variable">promise</span>.<span class="variable">error</span>(<span class="variable">err</span>);
     }
     <span class="variable">promise</span>.<span class="variable">complete</span>();
-    <span class="variable">self</span>.<span class="variable">emit</span>(<span class="string">'remove'</span>);
+    <span class="variable">self</span>.<span class="variable">emit</span>(<span class="string">'remove'</span>, <span class="variable">self</span>);
   }));
 
   <span class="keyword">return</span> <span class="this">this</span>;
@@ -4212,44 +4212,6 @@ cursor. No more events will be emitted.
 <pre><code><span class="variable">module</span>.<span class="variable">exports</span> = <span class="class">SchemaArray</span>;
 </code></pre>
 </td>
-</tr><tr class="filename"><td><h2 id="lib/schemadefault.js"><a href="#">schemadefault</a></h2></td><td>lib/schemadefault.js</td></tr><tr class="code">
-<td class="docs">
-<p>Module dependencies.
- </p>
-</td>
-<td class="code">
-<pre><code><span class="keyword">var</span> <span class="class">Schema</span> = <span class="variable">require</span>(<span class="string">'./schema'</span>)</code></pre>
-</td>
-</tr>
-<tr class="code">
-<td class="docs">
-<p>Default model for querying the system.profiles
-collection (it only exists when profiling is
-enabled.
- </p>
-</td>
-<td class="code">
-<pre><code><span class="variable">exports</span>[<span class="string">'system.profile'</span>] = <span class="keyword">new</span> <span class="class">Schema</span>({
-    <span class="variable">ts</span>: <span class="class">Date</span>
-  , <span class="variable">info</span>: <span class="class">String</span> <span class="comment">// deprecated</span>
-  , <span class="variable">millis</span>: <span class="class">Number</span>
-  , <span class="variable">op</span>: <span class="class">String</span>
-  , <span class="variable">ns</span>: <span class="class">String</span>
-  , <span class="variable">query</span>: <span class="class">Schema</span>.<span class="class">Types</span>.<span class="class">Mixed</span>
-  , <span class="variable">updateobj</span>: <span class="class">Schema</span>.<span class="class">Types</span>.<span class="class">Mixed</span>
-  , <span class="variable">ntoreturn</span>: <span class="class">Number</span>
-  , <span class="variable">nreturned</span>: <span class="class">Number</span>
-  , <span class="variable">nscanned</span>: <span class="class">Number</span>
-  , <span class="variable">responseLength</span>: <span class="class">Number</span>
-  , <span class="variable">client</span>: <span class="class">String</span>
-  , <span class="variable">user</span>: <span class="class">String</span>
-  , <span class="variable">idhack</span>: <span class="class">Boolean</span>
-  , <span class="variable">scanAndOrder</span>: <span class="class">Boolean</span>
-  , <span class="variable">keyUpdates</span>: <span class="class">Number</span>
-  , <span class="variable">cursorid</span>: <span class="class">Number</span>
-}, { <span class="variable">noVirtualId</span>: <span class="variable">true</span>, <span class="variable">noId</span>: <span class="variable">true</span> });
-</code></pre>
-</td>
 </tr><tr class="filename"><td><h2 id="lib/schema.js"><a href="#">schema</a></h2></td><td>lib/schema.js</td></tr><tr class="code">
 <td class="docs">
 <p>Module dependencies.
@@ -4828,6 +4790,44 @@ if the path doesn't exist.</p>
 
 </code></pre>
 </td>
+</tr><tr class="filename"><td><h2 id="lib/schemadefault.js"><a href="#">schemadefault</a></h2></td><td>lib/schemadefault.js</td></tr><tr class="code">
+<td class="docs">
+<p>Module dependencies.
+ </p>
+</td>
+<td class="code">
+<pre><code><span class="keyword">var</span> <span class="class">Schema</span> = <span class="variable">require</span>(<span class="string">'./schema'</span>)</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Default model for querying the system.profiles
+collection (it only exists when profiling is
+enabled.
+ </p>
+</td>
+<td class="code">
+<pre><code><span class="variable">exports</span>[<span class="string">'system.profile'</span>] = <span class="keyword">new</span> <span class="class">Schema</span>({
+    <span class="variable">ts</span>: <span class="class">Date</span>
+  , <span class="variable">info</span>: <span class="class">String</span> <span class="comment">// deprecated</span>
+  , <span class="variable">millis</span>: <span class="class">Number</span>
+  , <span class="variable">op</span>: <span class="class">String</span>
+  , <span class="variable">ns</span>: <span class="class">String</span>
+  , <span class="variable">query</span>: <span class="class">Schema</span>.<span class="class">Types</span>.<span class="class">Mixed</span>
+  , <span class="variable">updateobj</span>: <span class="class">Schema</span>.<span class="class">Types</span>.<span class="class">Mixed</span>
+  , <span class="variable">ntoreturn</span>: <span class="class">Number</span>
+  , <span class="variable">nreturned</span>: <span class="class">Number</span>
+  , <span class="variable">nscanned</span>: <span class="class">Number</span>
+  , <span class="variable">responseLength</span>: <span class="class">Number</span>
+  , <span class="variable">client</span>: <span class="class">String</span>
+  , <span class="variable">user</span>: <span class="class">String</span>
+  , <span class="variable">idhack</span>: <span class="class">Boolean</span>
+  , <span class="variable">scanAndOrder</span>: <span class="class">Boolean</span>
+  , <span class="variable">keyUpdates</span>: <span class="class">Number</span>
+  , <span class="variable">cursorid</span>: <span class="class">Number</span>
+}, { <span class="variable">noVirtualId</span>: <span class="variable">true</span>, <span class="variable">noId</span>: <span class="variable">true</span> });
+</code></pre>
+</td>
 </tr><tr class="filename"><td><h2 id="lib/schematype.js"><a href="#">schematype</a></h2></td><td>lib/schematype.js</td></tr><tr class="code">
 <td class="docs">
 <p>Module dependencies.
@@ -4968,7 +4968,7 @@ new Schema({ name: { type: String, validate: many }});</code></pre>
 </td>
 <td class="code">
 <pre><code><span class="class">SchemaType</span>.<span class="variable">prototype</span>.<span class="variable">validate</span> = <span class="keyword">function</span> (<span class="variable">obj</span>, <span class="variable">error</span>) {
-  <span class="keyword">if</span> (<span class="string">'function'</span> == <span class="keyword">typeof</span> <span class="variable">obj</span>) {
+  <span class="keyword">if</span> (<span class="string">'function'</span> == <span class="keyword">typeof</span> <span class="variable">obj</span> || <span class="variable">obj</span> &<span class="variable">amp</span>;&<span class="variable">amp</span>; <span class="string">'RegExp'</span> === <span class="variable">obj</span>.<span class="variable">constructor</span>.<span class="variable">name</span>) {
     <span class="this">this</span>.<span class="variable">validators</span>.<span class="variable">push</span>([<span class="variable">obj</span>, <span class="variable">error</span>]);
     <span class="keyword">return</span> <span class="this">this</span>;
   }

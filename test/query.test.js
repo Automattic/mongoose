@@ -821,7 +821,6 @@ module.exports = {
   'Query#comment': function () {
     var query = new Query;
     'function'.should.equal(typeof query.comment);
-    'function'.should.equal(typeof query.$comment);
     query.comment('Lowpass is more fun').should.equal(query);
     query.options.comment.should.equal('Lowpass is more fun');
   },

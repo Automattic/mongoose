@@ -1,9 +1,10 @@
 {
-	"required": "{path} cannot be blank."
+  "required": "{path} cannot be blank."
   , "string": {
         "min": "{path} is too short (minimum is {min} characters)."
       , "max": "{path} is too long (maximum is {max} characters)."
       , "length": "{path} is of the wrong length (should be {length} characters)."
+      , "match": "{path} is invalid."
       , "cast": "{path} must be a string."
     }
   , "number": {

@@ -4237,34 +4237,60 @@ module.exports = {
     db.close();
   },
 
-  'Model#save should emit an error on its db if a callback is not passed to it': function () {
+  'Model#save should throw errors if a callback is not passed': function () {
     var db = start();
 
     var DefaultErrSchema = new Schema({});
-
-    var err = "";
-
-    DefaultErrSchema.pre('save', function (next, fn) {
+    DefaultErrSchema.pre('save', function (next) {
       try {
         next(new Error);
       } catch (error) {
         // throws b/c nothing is listening to the error event
+        db.close();
         error.should.be.instanceof(Error);
-
-        db.on('error', function (err) {
-          db.close();
-          err.should.be.an.instanceof(Error);
-        });
-
-        next(new Error);
       }
     });
+    var DefaultErr = db.model('DefaultErr1', DefaultErrSchema, 'default_err_' + random());
+    new DefaultErr().save();
+  },
 
-    var DefaultErr = db.model('DefaultErr', DefaultErrSchema, 'default_err_' + random());
+  'Model#save should emit an error on its db if a callback is not passed to it': function () {
+    var db = start();
 
-    var e = new DefaultErr();
+    db.on('error', function (err) {
+      db.close();
+      err.should.be.an.instanceof(Error);
+    });
 
-    e.save();
+    var DefaultErrSchema = new Schema({});
+    DefaultErrSchema.pre('save', function (next) {
+      next(new Error);
+    });
+    var DefaultErr = db.model('DefaultErr2', DefaultErrSchema, 'default_err_' + random());
+    new DefaultErr().save();
+  },
+
+  // once hooks-js merges our fix this will pass
+  'calling next() after a thrown error should not work': function () {
+    var db = start();
+
+    var s = new Schema({});
+    s.methods.funky = function () {
+      should.strictEqual(false, true, 'reached unreachable code');
+    }
+
+    s.pre('funky', function (next) {
+      db.close();
+      try {
+        next(new Error);
+      } catch (error) {
+        error.should.be.instanceof(Error);
+        next();
+        // throws b/c nothing is listening to the error event
+      }
+    });
+    var Kaboom = db.model('wowNext2xAndThrow', s, 'next2xAndThrow' + random());
+    new Kaboom().funky();
   },
 
   'ensureIndex error should emit on the db': function () {

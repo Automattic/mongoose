@@ -818,6 +818,14 @@ module.exports = {
     query.options.slaveOk.should.be.false;
   },
 
+  'Query#comment': function () {
+    var query = new Query;
+    'function'.should.equal(typeof query.comment);
+    'function'.should.equal(typeof query.$comment);
+    query.comment('Lowpass is more fun').should.equal(query);
+    query.options.comment.should.equal('Lowpass is more fun');
+  },
+
   'test Query#hint': function () {
     var query = new Query();
     query.hint('indexAttributeA', 1, 'indexAttributeB', -1);

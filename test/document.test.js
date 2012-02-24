@@ -540,6 +540,31 @@ module.exports = {
     });
   },
 
+  // gh-746
+  'hooking set works with document arrays': function () {
+    var db = start();
+
+    var child = new Schema({ text: String });
+
+    child.pre('set', function (next, path, value, type) {
+      next(path, value, type);
+    });
+
+    var schema = new Schema({
+        name: String
+      , e: [child]
+    });
+
+    var S = db.model('docArrayWithHookedSet', schema);
+
+    var s = new S({ name: "test" });
+    s.e = [{ text: 'hi' }];
+    s.save(function (err) {
+      db.close();
+      should.strictEqual(null, err);
+    });
+  },
+
   'test jsonifying an object': function () {
     var doc = new TestDocument({ test: 'woot' })
       , oidString = DocumentObjectId.toString(doc._id);

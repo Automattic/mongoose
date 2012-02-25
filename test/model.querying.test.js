@@ -2180,5 +2180,49 @@ module.exports = {
         });
       });
     });
+  },
+
+  'excluding paths by schematype': function () {
+    var db =start()
+
+    var schema = new Schema({
+        thin: Boolean
+      , name: { type: String, select: false }
+    });
+
+    var S = db.model('ExcludingBySchemaType', schema);
+    S.create({ thin: true, name: 'the excluded' },function (err, s) {
+      should.strictEqual(null, err);
+      s.name.should.equal('the excluded');
+      S.findById(s, function (err, s) {
+        db.close();
+        should.strictEqual(null, err);
+        s.isSelected('name').should.be.false;
+        should.strictEqual(undefined, s.name);
+      });
+    });
+  },
+
+  'including paths by schematype': function () {
+    var db =start()
+
+    var schema = new Schema({
+        thin: Boolean
+      , name: { type: String, select: true }
+    });
+
+    var S = db.model('IncludingBySchemaType', schema);
+    S.create({ thin: true, name: 'the included' },function (err, s) {
+      should.strictEqual(null, err);
+      s.name.should.equal('the included');
+      mongoose.set('debug', true);
+      S.findById(s).select('thin').exec(function (err, s) {
+        mongoose.set('debug', false);
+        db.close();
+        should.strictEqual(null, err);
+        s.isSelected('name').should.be.true;
+        should.strictEqual('the included', s.name);
+      });
+    });
   }
 };

@@ -1286,12 +1286,14 @@ module.exports = {
             b.comments[1].body.should.equal('cranberries');
 
             b.meta = undefined;
+            b.comments = undefined;
             b.save(function (err) {
               should.strictEqual(null, err);
               B.collection.findOne({ _id: b._id}, function (err, b) {
                 db.close();
                 should.strictEqual(null, err);
                 should.strictEqual(undefined, b.meta);
+                should.strictEqual(undefined, b.comments);
               });
             });
           });

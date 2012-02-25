@@ -855,6 +855,14 @@ module.exports = {
     should.strictEqual(undefined, schema.virtuals.id);
   },
 
+  'selected option': function () {
+    var s = new Schema({ thought: { type: String, select: false }});
+    s.path('thought').selected.should.be.false;
+
+    var a = new Schema({ thought: { type: String, select: true }});
+    a.path('thought').selected.should.be.true;
+  },
+
   'schema creation works with objects from other contexts': function () {
     var str = 'code = {' +
       '  name: String' +

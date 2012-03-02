@@ -2203,7 +2203,34 @@ module.exports = {
     });
   },
 
-  'including paths by schematype': function () {
+  'excluding paths through schematype': function () {
+    var db =start()
+
+    var schema = new Schema({
+        thin: Boolean
+      , name: { type: String, select: false}
+    });
+
+    var S = db.model('ExcludingBySchemaType', schema);
+    S.create({ thin: true, name: 'the excluded' },function (err, s) {
+      should.strictEqual(null, err);
+      s.name.should.equal('the excluded');
+
+      var pending = 2;
+      function done (err, s) {
+        --pending || db.close();
+        if (Array.isArray(s)) s = s[0];
+        should.strictEqual(null, err);
+        s.isSelected('name').should.be.false;
+        should.strictEqual(undefined, s.name);
+      }
+
+      S.findById(s).exclude('thin').exec(done);
+      S.find({ _id: s._id }).select('thin').exec(done);
+    });
+  },
+
+  'including paths through schematype': function () {
     var db =start()
 
     var schema = new Schema({
@@ -2215,14 +2242,47 @@ module.exports = {
     S.create({ thin: true, name: 'the included' },function (err, s) {
       should.strictEqual(null, err);
       s.name.should.equal('the included');
-      mongoose.set('debug', true);
-      S.findById(s).select('thin').exec(function (err, s) {
-        mongoose.set('debug', false);
-        db.close();
+
+      var pending = 2;
+      function done (err, s) {
+        --pending || db.close();
+        if (Array.isArray(s)) s = s[0];
         should.strictEqual(null, err);
         s.isSelected('name').should.be.true;
-        should.strictEqual('the included', s.name);
-      });
+        s.name.should.equal('the included');
+      }
+
+      S.findById(s).exclude('thin').exec(done);
+      S.find({ _id: s._id }).select('thin').exec(done);
     });
-  }
+  },
+
+  'conflicting schematype path selection should error': function () {
+    var db =start()
+
+    var schema = new Schema({
+        thin: Boolean
+      , name: { type: String, select: true }
+      , conflict: { type: String, select: false}
+    });
+
+    var S = db.model('ConflictingBySchemaType', schema);
+    S.create({ thin: true, name: 'bing', conflict: 'crosby' },function (err, s) {
+      should.strictEqual(null, err);
+      s.name.should.equal('bing');
+      s.conflict.should.equal('crosby');
+
+      var pending = 2;
+      function done (err, s) {
+        --pending || db.close();
+        if (Array.isArray(s)) s = s[0];
+        should.exist(err);
+        var rgx = /You cannot currently mix including and excluding fields/;
+        rgx.test(err.message||err).should.be.true;
+      }
+
+      S.findById(s).exec(done);
+      S.find({ _id: s._id }).exec(done);
+    });
+  },
 };

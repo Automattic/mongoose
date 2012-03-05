@@ -2276,9 +2276,7 @@ module.exports = {
       function done (err, s) {
         --pending || db.close();
         if (Array.isArray(s)) s = s[0];
-        should.exist(err);
-        var rgx = /You cannot currently mix including and excluding fields/;
-        rgx.test(err.message||err).should.be.true;
+        should.equal(true, !!err);
       }
 
       S.findById(s).exec(done);

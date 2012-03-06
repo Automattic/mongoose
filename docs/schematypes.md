@@ -117,6 +117,18 @@ Besides the options listed above, all SchemaTypes share the following additional
 
   - `required`: {Boolean} - If true, creates a validation rule requiring this path be set before saving occurs.
 
+  - `select`: {Boolean} - Specifies default path selection behavior. (May be overridden on the query level.)
+
+      // `bio` will not be included in query results by default
+      var Person = new Schema({ bio: { type: String, select: false }})
+
+      // `name` will be included in query results by default
+      var Person = new Schema({ name: { type: String, select: true }})
+
+      // can be overridden
+      var P = db.model('Person', Person);
+      P.findOne().select('bio').exec(callback); // bio will be selected
+
   - `get`: {Function} - Adds a getter for this path. See the [getters / setters](/docs/getters-setters.html) docs for more detail.
 
   - `set`: {Function} - Adds a setter for this path. See the [getters / setters](/docs/getters-setters.html) docs for more detail.

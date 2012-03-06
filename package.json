@@ -1,9 +1,9 @@
 {
     "name": "mongoose"
   , "description": "Mongoose MongoDB ODM"
-  , "version": "2.5.9"
+  , "version": "2.5.10"
   , "author": "Guillermo Rauch <guillermo@learnboost.com>"
-  , "keywords": ["mongodb", "mongoose", "orm", "data", "datastore", "nosql"]
+  , "keywords": ["mongodb", "mongoose", "orm", "data", "datastore", "nosql", "odm", "sql"]
   , "dependencies": {
         "hooks": "0.2.0"
       , "mongodb": "0.9.9-4"

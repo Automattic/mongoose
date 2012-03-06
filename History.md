@@ -1,4 +1,15 @@
 
+2.5.10 / 2012-03-06
+===================
+
+  * updated; node-mongodb-native driver to 0.9.9-4
+  * added; Query#comment()
+  * fixed; allow unsetting arrays
+  * fixed; hooking the set method of subdocuments (#746)
+  * fixed; edge case in hooks
+  * fixed; allow $id and $ref in queries (fixes compatibility with mongoose-dbref) (#749) [richtera]
+  * added; default path selection to SchemaTypes
+
 2.5.9 / 2012-02-22
 ===================
 

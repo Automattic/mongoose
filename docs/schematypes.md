@@ -135,24 +135,24 @@ Besides the options listed above, all SchemaTypes share the following additional
 
   - `index`: {Boolean|Object} - Tells Mongoose to ensure an index is created for this path. An object can be passed as well.
 
-        var Person = new Schema({ name: String, index: true })
-        var Person = new Schema({ name: String, index: { unique: true }})
+        var Person = new Schema({ name: { type: String, index: true }})
+        var Person = new Schema({ name: { type: String, index: { unique: true }}})
 
     Note: indexes cannot be created for `Buffer` `SchemaTypes`. <br>
     Note: if the index already exists on the db, it will _not_ be replaced.
 
   - `unique`: {Boolean} - Tells Mongoose to ensure a unique index is created for this path. The following are equivalent:
 
-        var Person = new Schema({ name: String, unique: true })
-        var Person = new Schema({ name: String, index: { unique: true }})
+        var Person = new Schema({ name: { type: String, unique: true }})
+        var Person = new Schema({ name: { type: String, index: { unique: true }}})
 
     Note: indexes cannot be created for `Buffer` `SchemaTypes`. <br>
     Note: if the index already exists on the db, it will _not_ be replaced.
 
   - `sparse`: {Boolean} - Tells Mongoose to ensure a sparse index is created for this path. The following are equivalent:
 
-        var Person = new Schema({ name: String, sparse: true })
-        var Person = new Schema({ name: String, index: { sparse: true }})
+        var Person = new Schema({ name: { type: String, sparse: true }})
+        var Person = new Schema({ name: { type: String, index: { sparse: true }}})
 
     Note: indexes cannot be created for `Buffer` `SchemaTypes`. <br>
     Note: if the index already exists on the db, it will _not_ be replaced.
@@ -163,16 +163,16 @@ Besides the options listed above, all SchemaTypes share the following additional
         function hasNumber (v) {
           return v.length && /\d/.test(v);
         }
-        var Person = new Schema({ street: String, validate: hasNumber });
+        var Person = new Schema({ street: { type: String, validate: hasNumber }});
 
         // passing a RegExp
-        var Person = new Schema({ street: String, validate: /\d/ });
+        var Person = new Schema({ street: { type: String, validate: /\d/ }});
 
         // passing an array
-        var Person = new Schema({ street: String, validate: [hasNumber, 'street number required'] });
+        var Person = new Schema({ street: { type: String, validate: [hasNumber, 'street number required'] }});
 
         // or
-        var Person = new Schema({ street: String, validate: [/\d/, 'street number required'] });
+        var Person = new Schema({ street: { type: String, validate: [/\d/, 'street number required'] }});
 
       For more detail about validation including async validation, see the [validation](/docs/validation.html) page.
 

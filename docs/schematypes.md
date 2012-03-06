@@ -117,17 +117,34 @@ Besides the options listed above, all SchemaTypes share the following additional
 
   - `required`: {Boolean} - If true, creates a validation rule requiring this path be set before saving occurs.
 
-  - `select`: {Boolean} - Specifies default path selection behavior. (May be overridden on the query level.)
+  - `select`: {Boolean} - Specifies default path selection behavior. In other words, you can specify if this path should be included or excluded from query results by default.
 
-      // `bio` will not be included in query results by default
-      var Person = new Schema({ bio: { type: String, select: false }})
+        // Excluding `bio` from query results by default
 
-      // `name` will be included in query results by default
-      var Person = new Schema({ name: { type: String, select: true }})
+        var Person = new Schema({ bio: { type: String, select: false }})
+        var P = db.model('Person', Person);
+        P.findOne(function (err, p) {
+          console.log(p.bio) // undefined
+        });
 
-      // can be overridden
-      var P = db.model('Person', Person);
-      P.findOne().select('bio').exec(callback); // bio will be selected
+        // Including `name` in query results by default
+
+        var Person = new Schema({
+            name: { type: String, select: true }
+          , age: Number
+        })
+
+        var P = db.model('Person', Person);
+        P.findOne().select('age').exec(function (err, p) {
+          console.log(p.isSelected('age'))  // true
+          console.log(p.isSelected('name')) // true
+        });
+
+        // can also be overridden on a query by query basis
+
+        var Person = new Schema({ bio: { type: String, select: false }})
+        var P = db.model('Person', Person);
+        P.findOne().select('bio').exec(callback); // bio will be selected
 
   - `get`: {Function} - Adds a getter for this path. See the [getters / setters](/docs/getters-setters.html) docs for more detail.
 
@@ -136,7 +153,9 @@ Besides the options listed above, all SchemaTypes share the following additional
   - `index`: {Boolean|Object} - Tells Mongoose to ensure an index is created for this path. An object can be passed as well.
 
         var Person = new Schema({ name: { type: String, index: true }})
-        var Person = new Schema({ name: { type: String, index: { unique: true }}})
+
+        var name = { type: String, index: { unique: true }}
+        var Person = new Schema({ name: name })
 
     Note: indexes cannot be created for `Buffer` `SchemaTypes`. <br>
     Note: if the index already exists on the db, it will _not_ be replaced.
@@ -144,7 +163,9 @@ Besides the options listed above, all SchemaTypes share the following additional
   - `unique`: {Boolean} - Tells Mongoose to ensure a unique index is created for this path. The following are equivalent:
 
         var Person = new Schema({ name: { type: String, unique: true }})
-        var Person = new Schema({ name: { type: String, index: { unique: true }}})
+
+        var name = { type: String, index: { unique: true }}
+        var Person = new Schema({ name: name })
 
     Note: indexes cannot be created for `Buffer` `SchemaTypes`. <br>
     Note: if the index already exists on the db, it will _not_ be replaced.
@@ -152,7 +173,9 @@ Besides the options listed above, all SchemaTypes share the following additional
   - `sparse`: {Boolean} - Tells Mongoose to ensure a sparse index is created for this path. The following are equivalent:
 
         var Person = new Schema({ name: { type: String, sparse: true }})
-        var Person = new Schema({ name: { type: String, index: { sparse: true }}})
+
+        var name = { type: String, index: { sparse: true }}
+        var Person = new Schema({ name: name })
 
     Note: indexes cannot be created for `Buffer` `SchemaTypes`. <br>
     Note: if the index already exists on the db, it will _not_ be replaced.
@@ -163,16 +186,26 @@ Besides the options listed above, all SchemaTypes share the following additional
         function hasNumber (v) {
           return v.length && /\d/.test(v);
         }
-        var Person = new Schema({ street: { type: String, validate: hasNumber }});
+        var street = { type: String, validate: hasNumber }
+        var Person = new Schema({ street: street });
 
         // passing a RegExp
-        var Person = new Schema({ street: { type: String, validate: /\d/ }});
+        var street = { type: String, validate: /\d/ }
+        var Person = new Schema({ street: street });
 
         // passing an array
-        var Person = new Schema({ street: { type: String, validate: [hasNumber, 'street number required'] }});
+        var street = {
+            type: String
+          , validate: [hasNumber, 'street number required']
+        }
+        var Person = new Schema({ street: street })
 
         // or
-        var Person = new Schema({ street: { type: String, validate: [/\d/, 'street number required'] }});
+        var street = {
+            type: String
+          , validate: [/\d/, 'street number required']
+        }
+        var Person = new Schema({ street: street });
 
       For more detail about validation including async validation, see the [validation](/docs/validation.html) page.
 

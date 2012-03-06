@@ -762,6 +762,13 @@ query.sort('path', 1, 'another.path', -1)
 <pre><code>query.hint({ name: 1, title: 1}).run(callback)
 </code></pre>
 
+<h2>Query#comment</h2>
+
+<p>Sets the <a href="http://www.mongodb.org/display/DOCS/Advanced+Queries#AdvancedQueries-%24comment">comment</a> option.</p>
+
+<pre><code>query.comment(String)
+</code></pre>
+
 <h1>Executing</h1>
 
 <h2>Query#find</h2>

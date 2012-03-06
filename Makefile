@@ -24,7 +24,7 @@ docs/api.html: lib/*.js
 		$(shell find lib/* -type f) > $@
 
 docclean:
-	rm -f docs/*.{1,html}
+	rm -f ./docs/*.{1,html}
 
 site:
 	node website.js && node static.js

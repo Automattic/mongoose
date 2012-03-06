@@ -471,6 +471,12 @@ and you wanted to tell MongoDB to use that index for your query (in the off chan
 
     query.hint({ name: 1, title: 1}).run(callback)
 
+## Query#comment
+
+Sets the [comment](http://www.mongodb.org/display/DOCS/Advanced+Queries#AdvancedQueries-%24comment) option.
+
+    query.comment(String)
+
 # Executing
 
 ## Query#find
@@ -480,12 +486,6 @@ and you wanted to tell MongoDB to use that index for your query (in the off chan
 ## Query#findOne
 
     query.findOne([callback])
-
-## Query#comment
-
-Sets the [comment](http://www.mongodb.org/display/DOCS/Advanced+Queries#AdvancedQueries-%24comment) option.
-
-    query.comment(String)
 
 ## Query#count
 

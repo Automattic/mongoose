@@ -2257,6 +2257,72 @@ module.exports = {
     });
   },
 
+  'overriding schematype select options': function () {
+    var db =start()
+
+    var selected = new Schema({
+        thin: Boolean
+      , name: { type: String, select: true }
+    });
+    var excluded = new Schema({
+        thin: Boolean
+      , name: { type: String, select: false }
+    });
+
+    var S = db.model('OverriddingSelectedBySchemaType', selected);
+    var E = db.model('OverriddingExcludedBySchemaType', excluded);
+
+    var pending = 4;
+
+    S.create({ thin: true, name: 'the included' },function (err, s) {
+      should.strictEqual(null, err);
+      s.name.should.equal('the included');
+
+      S.find({ _id: s._id }).select('thin name').exec(function (err, s) {
+        --pending || db.close();
+        s = s[0];
+        should.strictEqual(null, err);
+        s.isSelected('name').should.be.true;
+        s.isSelected('thin').should.be.true;
+        s.name.should.equal('the included');
+        s.thin.should.be.true;
+      });
+
+      S.findById(s).exclude('name').exec(function (err, s) {
+        --pending || db.close();
+        should.strictEqual(null, err);
+        s.isSelected('name').should.be.false;
+        s.isSelected('thin').should.be.true;
+        should.equal(undefined, s.name);
+        should.equal(true, s.thin);
+      })
+    });
+
+    E.create({ thin: true, name: 'the excluded' },function (err, e) {
+      should.strictEqual(null, err);
+      e.name.should.equal('the excluded');
+
+      E.find({ _id: e._id }).select('thin name').exec(function (err, e) {
+        --pending || db.close();
+        e = e[0];
+        should.strictEqual(null, err);
+        e.isSelected('name').should.be.true;
+        e.isSelected('thin').should.be.true;
+        e.name.should.equal('the excluded');
+        e.thin.should.be.true;
+      });
+
+      E.findById(e).exclude('name').exec(function (err, e) {
+        --pending || db.close();
+        should.strictEqual(null, err);
+        e.isSelected('name').should.be.false;
+        e.isSelected('thin').should.be.true;
+        should.equal(undefined, e.name);
+        should.equal(true, e.thin);
+      })
+    });
+  },
+
   'conflicting schematype path selection should error': function () {
     var db =start()
 

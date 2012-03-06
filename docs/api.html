@@ -2176,7 +2176,9 @@ default mongoose connection;</p>
     <span class="variable">options</span> = <span class="keyword">null</span>;
   }
 
-  <span class="keyword">var</span> <span class="variable">query</span> = <span class="keyword">new</span> <span class="class">Query</span>(<span class="variable">conditions</span>, <span class="variable">options</span>).<span class="variable">select</span>(<span class="variable">fields</span>).<span class="variable">bind</span>(<span class="this">this</span>, <span class="string">'find'</span>);
+  <span class="keyword">var</span> <span class="variable">query</span> = <span class="keyword">new</span> <span class="class">Query</span>(<span class="variable">conditions</span>, <span class="variable">options</span>);
+  <span class="variable">query</span>.<span class="variable">bind</span>(<span class="this">this</span>, <span class="string">'find'</span>);
+  <span class="variable">query</span>.<span class="variable">select</span>(<span class="variable">fields</span>);
 
   <span class="keyword">if</span> (<span class="string">'undefined'</span> === <span class="keyword">typeof</span> <span class="variable">callback</span>)
     <span class="keyword">return</span> <span class="variable">query</span>;
@@ -2819,7 +2821,7 @@ based on the model's schema.</p>
       } <span class="keyword">else</span> <span class="keyword">if</span> (<span class="string">'Object'</span> === <span class="variable">val</span>.<span class="variable">constructor</span>.<span class="variable">name</span>) {
 
         <span class="variable">any</span>$<span class="variable">conditionals</span> = <span class="class">Object</span>.<span class="variable">keys</span>(<span class="variable">val</span>).<span class="variable">some</span>(<span class="keyword">function</span> (<span class="variable">k</span>) {
-          <span class="keyword">return</span> <span class="variable">k</span>.<span class="variable">charAt</span>(<span class="number integer">0</span>) === <span class="string">'$'</span>;
+          <span class="keyword">return</span> <span class="variable">k</span>.<span class="variable">charAt</span>(<span class="number integer">0</span>) === <span class="string">'$'</span> &<span class="variable">amp</span>;&<span class="variable">amp</span>; <span class="variable">k</span> !== <span class="string">'$id'</span> &<span class="variable">amp</span>;&<span class="variable">amp</span>; <span class="variable">k</span> !== <span class="string">'$ref'</span>;
         });
 
         <span class="keyword">if</span> (!<span class="variable">any</span>$<span class="variable">conditionals</span>) {
@@ -2884,16 +2886,22 @@ your mongoose Model.</p>
 <tr class="code">
 <td class="docs">
 <p><code>where</code> enables a very nice sugary api for doing your queries.
-For example, instead of writing:
-    User.find({age: {$gte: 21, $lte: 65}}, callback);
-we can instead write more readably:
-    User.where('age').gte(21).lte(65);
-Moreover, you can also chain a bunch of these together like:
-    User
-      .where('age').gte(21).lte(65)
-      .where('name', /^b/i)        // All names that begin where b or B
-      .where('friends').slice(10);
-## </p>
+For example, instead of writing:</p>
+
+<pre><code>User.find({age: {$gte: 21, $lte: 65}}, callback);</code></pre>
+
+<p>we can instead write more readably:</p>
+
+<pre><code>User.where('age').gte(21).lte(65);</code></pre>
+
+<p>Moreover, you can also chain a bunch of these together like:</p>
+
+<pre><code>User
+  .where('age').gte(21).lte(65)
+  .where('name', /^b/i)        // All names that begin where b or B
+  .where('friends').slice(10);</code></pre>
+
+<h2></h2>
 
 <ul><li><p><strong>param</strong>: <em>String</em>  path</p></li><li><p><strong>param</strong>: <em>Object</em>  val (optional)</p></li><li><p><strong>return</strong>: <em>Query</em> </p></li><li><p><strong>api</strong>: <em>public</em></p></li></ul>
 </td>
@@ -2909,7 +2917,7 @@ Moreover, you can also chain a bunch of these together like:
 </tr>
 <tr class="code">
 <td class="docs">
-<p>Sugar.</p>
+<p><code>equals</code> sugar.</p>
 
 <pre><code>User.where('age').equals(49);</code></pre>
 
@@ -2927,26 +2935,51 @@ Moreover, you can also chain a bunch of these together like:
   <span class="keyword">if</span> (!<span class="variable">path</span>) <span class="keyword">throw</span> <span class="keyword">new</span> <span class="class">Error</span>(<span class="string">'equals() must be used after where()'</span>);
   <span class="this">this</span>.<span class="variable">_conditions</span>[<span class="variable">path</span>] = <span class="variable">val</span>;
   <span class="keyword">return</span> <span class="this">this</span>;
-}
-
-<span class="class">Query</span>.<span class="variable">prototype</span>.<span class="variable">or</span> =
+}</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>$or
+ </p>
+</td>
+<td class="code">
+<pre><code><span class="class">Query</span>.<span class="variable">prototype</span>.<span class="variable">or</span> =
 <span class="class">Query</span>.<span class="variable">prototype</span>.$<span class="variable">or</span> = <span class="keyword">function</span> $<span class="variable">or</span> (<span class="variable">array</span>) {
   <span class="keyword">var</span> <span class="variable">or</span> = <span class="this">this</span>.<span class="variable">_conditions</span>.$<span class="variable">or</span> || (<span class="this">this</span>.<span class="variable">_conditions</span>.$<span class="variable">or</span> = []);
   <span class="keyword">if</span> (!<span class="class">Array</span>.<span class="variable">isArray</span>(<span class="variable">array</span>)) <span class="variable">array</span> = [<span class="variable">array</span>];
   <span class="variable">or</span>.<span class="variable">push</span>.<span class="variable">apply</span>(<span class="variable">or</span>, <span class="variable">array</span>);
   <span class="keyword">return</span> <span class="this">this</span>;
-}
-
-<span class="class">Query</span>.<span class="variable">prototype</span>.<span class="variable">nor</span> =
+}</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>$nor
+ </p>
+</td>
+<td class="code">
+<pre><code><span class="class">Query</span>.<span class="variable">prototype</span>.<span class="variable">nor</span> =
 <span class="class">Query</span>.<span class="variable">prototype</span>.$<span class="variable">nor</span> = <span class="keyword">function</span> $<span class="variable">nor</span> (<span class="variable">array</span>) {
   <span class="keyword">var</span> <span class="variable">nor</span> = <span class="this">this</span>.<span class="variable">_conditions</span>.$<span class="variable">nor</span> || (<span class="this">this</span>.<span class="variable">_conditions</span>.$<span class="variable">nor</span> = []);
   <span class="keyword">if</span> (!<span class="class">Array</span>.<span class="variable">isArray</span>(<span class="variable">array</span>)) <span class="variable">array</span> = [<span class="variable">array</span>];
   <span class="variable">nor</span>.<span class="variable">push</span>.<span class="variable">apply</span>(<span class="variable">nor</span>, <span class="variable">array</span>);
   <span class="keyword">return</span> <span class="this">this</span>;
-}
+}</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>$gt, $gte, $lt, $lte, $ne, $in, $nin, $all, $regex, $size, $maxDistance</p>
 
-<span class="comment">// $lt, $lte, $gt, $gte can be used on Numbers or Dates</span>
-<span class="string">'gt gte lt lte ne in nin all regex size maxDistance'</span>.<span class="variable">split</span>(<span class="string">' '</span>).<span class="variable">forEach</span>( <span class="keyword">function</span> ($<span class="variable">conditional</span>) {
+<p>Can be used on Numbers or Dates.</p>
+
+<pre><code>Thing.where('type').$nin(array)</code></pre>
+
+<p> </p>
+</td>
+<td class="code">
+<pre><code><span class="string">'gt gte lt lte ne in nin all regex size maxDistance'</span>.<span class="variable">split</span>(<span class="string">' '</span>).<span class="variable">forEach</span>( <span class="keyword">function</span> ($<span class="variable">conditional</span>) {
   <span class="class">Query</span>.<span class="variable">prototype</span>[<span class="string">'$'</span> + $<span class="variable">conditional</span>] =
   <span class="class">Query</span>.<span class="variable">prototype</span>[$<span class="variable">conditional</span>] = <span class="keyword">function</span> (<span class="variable">path</span>, <span class="variable">val</span>) {
     <span class="keyword">if</span> (<span class="variable">arguments</span>.<span class="variable">length</span> === <span class="number integer">1</span>) {
@@ -2957,11 +2990,27 @@ Moreover, you can also chain a bunch of these together like:
     <span class="variable">conds</span>[<span class="string">'$'</span> + $<span class="variable">conditional</span>] = <span class="variable">val</span>;
     <span class="keyword">return</span> <span class="this">this</span>;
   };
-});
+});</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>notEqualTo</p>
 
-<span class="class">Query</span>.<span class="variable">prototype</span>.<span class="variable">notEqualTo</span> = <span class="class">Query</span>.<span class="variable">prototype</span>.<span class="variable">ne</span>;
-
-;[<span class="string">'mod'</span>, <span class="string">'near'</span>].<span class="variable">forEach</span>( <span class="keyword">function</span> ($<span class="variable">conditional</span>) {
+<p>alias of <code>query.$ne()</code>
+ </p>
+</td>
+<td class="code">
+<pre><code><span class="class">Query</span>.<span class="variable">prototype</span>.<span class="variable">notEqualTo</span> = <span class="class">Query</span>.<span class="variable">prototype</span>.<span class="variable">ne</span>;</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>$mod, $near
+ </p>
+</td>
+<td class="code">
+<pre><code>;[<span class="string">'mod'</span>, <span class="string">'near'</span>].<span class="variable">forEach</span>( <span class="keyword">function</span> ($<span class="variable">conditional</span>) {
   <span class="class">Query</span>.<span class="variable">prototype</span>[<span class="string">'$'</span> + $<span class="variable">conditional</span>] =
   <span class="class">Query</span>.<span class="variable">prototype</span>[$<span class="variable">conditional</span>] = <span class="keyword">function</span> (<span class="variable">path</span>, <span class="variable">val</span>) {
     <span class="keyword">if</span> (<span class="variable">arguments</span>.<span class="variable">length</span> === <span class="number integer">1</span>) {
@@ -2977,9 +3026,16 @@ Moreover, you can also chain a bunch of these together like:
     <span class="variable">conds</span>[<span class="string">'$'</span> + $<span class="variable">conditional</span>] = <span class="variable">val</span>;
     <span class="keyword">return</span> <span class="this">this</span>;
   };
-});
-
-<span class="class">Query</span>.<span class="variable">prototype</span>[<span class="string">'$exists'</span>] =
+});</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>$exists
+ </p>
+</td>
+<td class="code">
+<pre><code><span class="class">Query</span>.<span class="variable">prototype</span>.$<span class="variable">exists</span> =
 <span class="class">Query</span>.<span class="variable">prototype</span>.<span class="variable">exists</span> = <span class="keyword">function</span> (<span class="variable">path</span>, <span class="variable">val</span>) {
   <span class="keyword">if</span> (<span class="variable">arguments</span>.<span class="variable">length</span> === <span class="number integer">0</span>) {
     <span class="variable">path</span> = <span class="this">this</span>.<span class="variable">_currPath</span>
@@ -2995,9 +3051,16 @@ Moreover, you can also chain a bunch of these together like:
   <span class="keyword">var</span> <span class="variable">conds</span> = <span class="this">this</span>.<span class="variable">_conditions</span>[<span class="variable">path</span>] || (<span class="this">this</span>.<span class="variable">_conditions</span>[<span class="variable">path</span>] = {});
   <span class="variable">conds</span>[<span class="string">'$exists'</span>] = <span class="variable">val</span>;
   <span class="keyword">return</span> <span class="this">this</span>;
-};
-
-<span class="class">Query</span>.<span class="variable">prototype</span>[<span class="string">'$elemMatch'</span>] =
+};</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>$elemMatch
+ </p>
+</td>
+<td class="code">
+<pre><code><span class="class">Query</span>.<span class="variable">prototype</span>.$<span class="variable">elemMatch</span> =
 <span class="class">Query</span>.<span class="variable">prototype</span>.<span class="variable">elemMatch</span> = <span class="keyword">function</span> (<span class="variable">path</span>, <span class="variable">criteria</span>) {
   <span class="keyword">var</span> <span class="variable">block</span>;
   <span class="keyword">if</span> (<span class="string">'Object'</span> === <span class="variable">path</span>.<span class="variable">constructor</span>.<span class="variable">name</span>) {
@@ -3076,14 +3139,18 @@ Moreover, you can also chain a bunch of these together like:
 </tr>
 <tr class="code">
 <td class="docs">
+<p>select</p>
+
+<p><em>also aliased as fields()</em></p>
+
 <p>Chainable method for specifying which fields
 to include or exclude from the document that is
 returned from MongoDB.</p>
 
 <h2>Examples</h2>
 
-<p>query.fields({a: 1, b: 1, c: 1, _id: 0});
-query.fields('a b c');</p>
+<pre><code>query.fields({a: 1, b: 1, c: 1, _id: 0});
+query.fields('a b c');</code></pre>
 
 <h2></h2>
 
@@ -3107,15 +3174,18 @@ query.fields('a b c');</p>
 </tr>
 <tr class="code">
 <td class="docs">
+<p>only</p>
+
 <p>Chainable method for adding the specified fields to the
 object of fields to only include.</p>
 
 <h2>Examples</h2>
 
-<p>query.only('a b c');
+<pre><code>query.only('a b c');
 query.only('a', 'b', 'c');
-query.only(['a', 'b', 'c']);
-## </p>
+query.only(['a', 'b', 'c']);</code></pre>
+
+<h2></h2>
 
 <ul><li><p><strong>param</strong>: <em>String | Array</em>  space separated list of fields OR</p><p>                  an array of field names
 We can also take arguments as the "array" of field names</p></li><li><p><strong>api</strong>: <em>public</em></p></li></ul>
@@ -3130,15 +3200,18 @@ We can also take arguments as the "array" of field names</p></li><li><p><strong>
 </tr>
 <tr class="code">
 <td class="docs">
+<p>exclude</p>
+
 <p>Chainable method for adding the specified fields to the
 object of fields to exclude.</p>
 
 <h2>Examples</h2>
 
-<p>query.exclude('a b c');
+<pre><code>query.exclude('a b c');
 query.exclude('a', 'b', 'c');
-query.exclude(['a', 'b', 'c']);
-## </p>
+query.exclude(['a', 'b', 'c']);</code></pre>
+
+<h2></h2>
 
 <ul><li><p><strong>param</strong>: <em>String | Array</em>  space separated list of fields OR</p><p>                  an array of field names
 We can also take arguments as the "array" of field names</p></li><li><p><strong>api</strong>: <em>public</em></p></li></ul>
@@ -3148,9 +3221,16 @@ We can also take arguments as the "array" of field names</p></li><li><p><strong>
   <span class="variable">fields</span> = <span class="this">this</span>.<span class="variable">_parseOnlyExcludeFields</span>.<span class="variable">apply</span>(<span class="this">this</span>, <span class="variable">arguments</span>);
   <span class="this">this</span>.<span class="variable">_applyFields</span>({ <span class="variable">exclude</span>: <span class="variable">fields</span> });
   <span class="keyword">return</span> <span class="this">this</span>;
-};
-
-<span class="class">Query</span>.<span class="variable">prototype</span>[<span class="string">'$slice'</span>] =
+};</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>$slice()
+ </p>
+</td>
+<td class="code">
+<pre><code><span class="class">Query</span>.<span class="variable">prototype</span>[<span class="string">'$slice'</span>] =
 <span class="class">Query</span>.<span class="variable">prototype</span>.<span class="variable">slice</span> = <span class="keyword">function</span> (<span class="variable">path</span>, <span class="variable">val</span>) {
   <span class="keyword">if</span> (<span class="variable">arguments</span>.<span class="variable">length</span> === <span class="number integer">1</span>) {
       <span class="variable">val</span> = <span class="variable">path</span>;
@@ -3171,6 +3251,8 @@ We can also take arguments as the "array" of field names</p></li><li><p><strong>
 </tr>
 <tr class="code">
 <td class="docs">
+<p>sort</p>
+
 <p>Sets the sort</p>
 
 <h2>Examples</h2>
@@ -3190,25 +3272,61 @@ query.sort('field', -1, 'test', 1)</code></pre>
   });
 
   <span class="keyword">return</span> <span class="this">this</span>;
-};
+};</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>asc</p>
 
-<span class="class">Query</span>.<span class="variable">prototype</span>.<span class="variable">asc</span> = <span class="keyword">function</span> () {
+<p>Sorts ascending.</p>
+
+<pre><code>query.asc('name', 'age');</code></pre>
+
+<p> </p>
+</td>
+<td class="code">
+<pre><code><span class="class">Query</span>.<span class="variable">prototype</span>.<span class="variable">asc</span> = <span class="keyword">function</span> () {
   <span class="keyword">var</span> <span class="variable">sort</span> = <span class="this">this</span>.<span class="variable">options</span>.<span class="variable">sort</span> || (<span class="this">this</span>.<span class="variable">options</span>.<span class="variable">sort</span> = []);
   <span class="keyword">for</span> (<span class="keyword">var</span> <span class="variable">i</span> = <span class="number integer">0</span>, <span class="variable">l</span> = <span class="variable">arguments</span>.<span class="variable">length</span>; <span class="variable">i</span> &<span class="variable">lt</span>; <span class="variable">l</span>; <span class="variable">i</span>++) {
     <span class="variable">sort</span>.<span class="variable">push</span>([<span class="variable">arguments</span>[<span class="variable">i</span>], <span class="number integer">1</span>]);
   }
   <span class="keyword">return</span> <span class="this">this</span>;
-};
+};</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>desc</p>
 
-<span class="class">Query</span>.<span class="variable">prototype</span>.<span class="variable">desc</span> = <span class="keyword">function</span> () {
+<p>Sorts descending.</p>
+
+<pre><code>query.desc('name', 'age');</code></pre>
+
+<p> </p>
+</td>
+<td class="code">
+<pre><code><span class="class">Query</span>.<span class="variable">prototype</span>.<span class="variable">desc</span> = <span class="keyword">function</span> () {
   <span class="keyword">var</span> <span class="variable">sort</span> = <span class="this">this</span>.<span class="variable">options</span>.<span class="variable">sort</span> || (<span class="this">this</span>.<span class="variable">options</span>.<span class="variable">sort</span> = []);
   <span class="keyword">for</span> (<span class="keyword">var</span> <span class="variable">i</span> = <span class="number integer">0</span>, <span class="variable">l</span> = <span class="variable">arguments</span>.<span class="variable">length</span>; <span class="variable">i</span> &<span class="variable">lt</span>; <span class="variable">l</span>; <span class="variable">i</span>++) {
     <span class="variable">sort</span>.<span class="variable">push</span>([<span class="variable">arguments</span>[<span class="variable">i</span>], -<span class="number integer">1</span>]);
   }
   <span class="keyword">return</span> <span class="this">this</span>;
-};
+};</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>limit, skip, maxscan, snapshot, batchSize, comment</p>
 
-;[<span class="string">'limit'</span>, <span class="string">'skip'</span>, <span class="string">'maxscan'</span>, <span class="string">'snapshot'</span>, <span class="string">'batchSize'</span>].<span class="variable">forEach</span>( <span class="keyword">function</span> (<span class="variable">method</span>) {
+<p>Sets these associated options.</p>
+
+<pre><code>query.comment('feed query');</code></pre>
+
+<p> </p>
+</td>
+<td class="code">
+<pre><code>;[<span class="string">'limit'</span>, <span class="string">'skip'</span>, <span class="string">'maxscan'</span>, <span class="string">'snapshot'</span>, <span class="string">'batchSize'</span>, <span class="string">'comment'</span>].<span class="variable">forEach</span>( <span class="keyword">function</span> (<span class="variable">method</span>) {
   <span class="class">Query</span>.<span class="variable">prototype</span>[<span class="variable">method</span>] = <span class="keyword">function</span> (<span class="variable">v</span>) {
     <span class="this">this</span>.<span class="variable">options</span>[<span class="variable">method</span>] = <span class="variable">v</span>;
     <span class="keyword">return</span> <span class="this">this</span>;
@@ -3218,12 +3336,14 @@ query.sort('field', -1, 'test', 1)</code></pre>
 </tr>
 <tr class="code">
 <td class="docs">
-<p>Query hints.</p>
+<p>hint</p>
+
+<p>Sets query hints.</p>
 
 <h2>Examples</h2>
 
-<p>  new Query().hint({ indexA: 1, indexB: -1})
-  new Query().hint("indexA", 1, "indexB", -1)</p>
+<pre><code>new Query().hint({ indexA: 1, indexB: -1})
+new Query().hint("indexA", 1, "indexB", -1)</code></pre>
 
 <h2></h2>
 
@@ -3251,70 +3371,29 @@ query.sort('field', -1, 'test', 1)</code></pre>
 </tr>
 <tr class="code">
 <td class="docs">
+<p>slaveOk</p>
+
 <p>Sets slaveOk option</p>
 
-<p>  new Query().slaveOk() &lt;== true
-  new Query().slaveOk(true)
-  new Query().slaveOk(false)</p>
+<pre><code>new Query().slaveOk() &lt;== true
+new Query().slaveOk(true)
+new Query().slaveOk(false)</code></pre>
 
 <h2></h2>
 
-<ul><li><p><strong>param</strong>: <em>Boolean</em>  v (defaults to true)</p></li></ul>
+<ul><li><p><strong>param</strong>: <em>Boolean</em>  v (defaults to true)</p></li><li><p><strong>api</strong>: <em>public</em></p></li></ul>
 </td>
 <td class="code">
 <pre><code><span class="class">Query</span>.<span class="variable">prototype</span>.<span class="variable">slaveOk</span> = <span class="keyword">function</span> (<span class="variable">v</span>) {
   <span class="this">this</span>.<span class="variable">options</span>.<span class="variable">slaveOk</span> = <span class="variable">arguments</span>.<span class="variable">length</span> ? !!<span class="variable">v</span> : <span class="variable">true</span>;
-  <span class="keyword">return</span> <span class="this">this</span>;
-};
-
-<span class="class">Query</span>.<span class="variable">prototype</span>.<span class="variable">execFind</span> = <span class="keyword">function</span> (<span class="variable">callback</span>) {
-  <span class="keyword">var</span> <span class="variable">model</span> = <span class="this">this</span>.<span class="variable">model</span>
-    , <span class="variable">options</span> = <span class="this">this</span>.<span class="variable">_optionsForExec</span>(<span class="variable">model</span>)
-    , <span class="variable">self</span> = <span class="this">this</span>
-
-  <span class="keyword">var</span> <span class="variable">promise</span> = <span class="keyword">new</span> <span class="class">Promise</span>(<span class="variable">callback</span>);
-
-  <span class="keyword">try</span> {
-    <span class="this">this</span>.<span class="variable">cast</span>(<span class="variable">model</span>);
-  } <span class="keyword">catch</span> (<span class="variable">err</span>) {
-    <span class="keyword">return</span> <span class="variable">promise</span>.<span class="variable">error</span>(<span class="variable">err</span>);
-  }
-
-  <span class="keyword">var</span> <span class="variable">fields</span> = <span class="variable">utils</span>.<span class="variable">clone</span>(<span class="variable">options</span>.<span class="variable">fields</span> = <span class="this">this</span>.<span class="variable">_fields</span>);
-  <span class="keyword">var</span> <span class="variable">castQuery</span> = <span class="this">this</span>.<span class="variable">_conditions</span>;
-
-  <span class="variable">model</span>.<span class="variable">collection</span>.<span class="variable">find</span>(<span class="variable">castQuery</span>, <span class="variable">options</span>, <span class="keyword">function</span> (<span class="variable">err</span>, <span class="variable">cursor</span>) {
-    <span class="keyword">if</span> (<span class="variable">err</span>) <span class="keyword">return</span> <span class="variable">promise</span>.<span class="variable">error</span>(<span class="variable">err</span>);
-    <span class="variable">cursor</span>.<span class="variable">toArray</span>(<span class="variable">tick</span>(<span class="variable">cb</span>));
-  });
-
-  <span class="keyword">function</span> <span class="variable">cb</span> (<span class="variable">err</span>, <span class="variable">docs</span>) {
-    <span class="keyword">if</span> (<span class="variable">err</span>) <span class="keyword">return</span> <span class="variable">promise</span>.<span class="variable">error</span>(<span class="variable">err</span>);
-
-    <span class="keyword">var</span> <span class="variable">arr</span> = []
-      , <span class="variable">count</span> = <span class="variable">docs</span>.<span class="variable">length</span>;
-
-    <span class="keyword">if</span> (!<span class="variable">count</span>) <span class="keyword">return</span> <span class="variable">promise</span>.<span class="variable">complete</span>([]);
-
-    <span class="keyword">for</span> (<span class="keyword">var</span> <span class="variable">i</span> = <span class="number integer">0</span>, <span class="variable">l</span> = <span class="variable">docs</span>.<span class="variable">length</span>; <span class="variable">i</span> &<span class="variable">lt</span>; <span class="variable">l</span>; <span class="variable">i</span>++) {
-      <span class="variable">arr</span>[<span class="variable">i</span>] = <span class="keyword">new</span> <span class="variable">model</span>(<span class="variable">undefined</span>, <span class="variable">fields</span>);
-
-      <span class="comment">// skip _id for pre-init hooks</span>
-      <span class="keyword">delete</span> <span class="variable">arr</span>[<span class="variable">i</span>].<span class="variable">_doc</span>.<span class="variable">_id</span>;
-
-      <span class="variable">arr</span>[<span class="variable">i</span>].<span class="variable">init</span>(<span class="variable">docs</span>[<span class="variable">i</span>], <span class="variable">self</span>, <span class="keyword">function</span> (<span class="variable">err</span>) {
-        <span class="keyword">if</span> (<span class="variable">err</span>) <span class="keyword">return</span> <span class="variable">promise</span>.<span class="variable">error</span>(<span class="variable">err</span>);
-        --<span class="variable">count</span> || <span class="variable">promise</span>.<span class="variable">complete</span>(<span class="variable">arr</span>);
-      });
-    }
-  }
-
   <span class="keyword">return</span> <span class="this">this</span>;
 };</code></pre>
 </td>
 </tr>
 <tr class="code">
 <td class="docs">
+<p>each()</p>
+
 <p>Streaming cursors.</p>
 
 <p>The <code>callback</code> is called repeatedly for each document
@@ -3323,21 +3402,21 @@ occurs streaming stops.</p>
 
 <h2>Example</h2>
 
-<p>query.each(function (err, user) {
+<pre><code>query.each(function (err, user) {
   if (err) return res.end("aww, received an error. all done.");
   if (user) {
     res.write(user.name + '\n')
   } else {
     res.end("reached end of cursor. all done.");
   }
-});</p>
+});</code></pre>
 
 <p>A third parameter may also be used in the callback which
 allows you to iterate the cursor manually.</p>
 
 <h2>Example</h2>
 
-<p>query.each(function (err, user, next) {
+<pre><code>query.each(function (err, user, next) {
   if (err) return res.end("aww, received an error. all done.");
   if (user) {
     res.write(user.name + '\n')
@@ -3345,7 +3424,7 @@ allows you to iterate the cursor manually.</p>
   } else {
     res.end("reached end of cursor. all done.");
   }
-});</p>
+});</code></pre>
 
 <h2></h2>
 
@@ -3421,6 +3500,8 @@ allows you to iterate the cursor manually.</p>
 </tr>
 <tr class="code">
 <td class="docs">
+<p>findOne</p>
+
 <p>Casts the query, sends the findOne command to mongodb.
 Upon receiving the document, we initialize a mongoose
 document based on the returned document from mongodb,
@@ -3445,6 +3526,9 @@ and then we invoke a callback on our mongoose document.</p>
     <span class="variable">promise</span>.<span class="variable">error</span>(<span class="variable">err</span>);
     <span class="keyword">return</span> <span class="this">this</span>;
   }
+
+  <span class="comment">// apply default schematype path selections</span>
+  <span class="this">this</span>.<span class="variable">_applyPaths</span>();
 
   <span class="keyword">var</span> <span class="variable">self</span> = <span class="this">this</span>
     , <span class="variable">castQuery</span> = <span class="this">this</span>.<span class="variable">_conditions</span>
@@ -3473,6 +3557,8 @@ and then we invoke a callback on our mongoose document.</p>
 </tr>
 <tr class="code">
 <td class="docs">
+<p>count</p>
+
 <p>Casts this._conditions and sends a count
 command to mongodb. Invokes a callback upon
 receiving results</p>
@@ -3501,6 +3587,8 @@ receiving results</p>
 </tr>
 <tr class="code">
 <td class="docs">
+<p>distinct</p>
+
 <p>Casts this._conditions and sends a distinct
 command to mongodb. Invokes a callback upon
 receiving results</p>
@@ -3529,6 +3617,8 @@ receiving results</p>
 </tr>
 <tr class="code">
 <td class="docs">
+<p>update</p>
+
 <p>Casts the <code>doc</code> according to the model Schema and
 sends an update command to MongoDB.</p>
 
@@ -3590,6 +3680,8 @@ to prevent accidently overwritting the collection.</em></p>
 </tr>
 <tr class="code">
 <td class="docs">
+<p>remove</p>
+
 <p>Casts the query, sends the remove command to
 mongodb where the query contents, and then
 invokes a callback upon receiving the command
@@ -3620,6 +3712,8 @@ result.</p>
 </tr>
 <tr class="code">
 <td class="docs">
+<p>populate</p>
+
 <p>Sets population options.
  - <strong>api</strong>: <em>public</em></p>
 
@@ -3639,11 +3733,13 @@ result.</p>
 </tr>
 <tr class="code">
 <td class="docs">
+<p>stream</p>
+
 <p>Returns a stream interface</p>
 
 <h2>Example</h2>
 
-<p> Thing.find({ name: /^hello/ }).stream().pipe(res)</p>
+<pre><code>Thing.find({ name: /^hello/ }).stream().pipe(res)</code></pre>
 
 <ul><li><p><strong>api</strong>: <em>public</em></p></li></ul>
 </td>
@@ -4855,6 +4951,7 @@ enabled.
   <span class="this">this</span>.<span class="variable">getters</span> = [];
   <span class="this">this</span>.<span class="variable">options</span> = <span class="variable">options</span>;
   <span class="this">this</span>.<span class="variable">_index</span> = <span class="keyword">null</span>;
+  <span class="this">this</span>.<span class="variable">selected</span>;
 
   <span class="keyword">for</span> (<span class="keyword">var</span> <span class="variable">i</span> <span class="keyword">in</span> <span class="variable">options</span>) <span class="keyword">if</span> (<span class="this">this</span>[<span class="variable">i</span>] &<span class="variable">amp</span>;&<span class="variable">amp</span>; <span class="string">'function'</span> == <span class="keyword">typeof</span> <span class="this">this</span>[<span class="variable">i</span>]) {
     <span class="keyword">var</span> <span class="variable">opts</span> = <span class="class">Array</span>.<span class="variable">isArray</span>(<span class="variable">options</span>[<span class="variable">i</span>])
@@ -5013,6 +5110,28 @@ new Schema({ name: { type: String, validate: many }});</code></pre>
 
   <span class="keyword">return</span> <span class="this">this</span>;
 };</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<h2>select</h2>
+
+<p>Set default select() behavior for this path. True if
+this path should always be included in the results,
+false if it should be excluded by default. This setting
+can be overridden at the query level.</p>
+
+<pre><code>T = db.model('T', new Schema({ x: { type: String, select: true }}));
+T.find(..); // x will always be selected ..
+// .. unless overridden;
+T.find().select({ x: 0 }).exec();</code></pre>
+
+<p> </p>
+</td>
+<td class="code">
+<pre><code><span class="class">SchemaType</span>.<span class="variable">prototype</span>.<span class="variable">select</span> = <span class="keyword">function</span> <span class="variable">select</span> (<span class="variable">val</span>) {
+  <span class="this">this</span>.<span class="variable">selected</span> = !! <span class="variable">val</span>;
+}</code></pre>
 </td>
 </tr>
 <tr class="code">
@@ -5724,9 +5843,9 @@ it once.</p>
 <ul><li><p><strong>api</strong>: <em>public</em></p></li></ul>
 </td>
 <td class="code">
-<pre><code><span class="class">MongooseArray</span>.<span class="variable">prototype</span>.$<span class="variable">shift</span> = <span class="keyword">function</span> $<span class="variable">shift</span> () {
+<pre><code><span class="class">MongooseArray</span>.<span class="variable">prototype</span>.$<span class="variable">shift</span> = <span class="keyword">function</span> () {
   <span class="this">this</span>.<span class="variable">_registerAtomic</span>(<span class="string">'$pop'</span>, -<span class="number integer">1</span>);
-  <span class="keyword">return</span> [].<span class="variable">shift</span>.<span class="variable">call</span>(<span class="this">this</span>);
+  <span class="keyword">return</span> <span class="this">this</span>.<span class="variable">shift</span>();
 };</code></pre>
 </td>
 </tr>
@@ -5863,27 +5982,6 @@ it.</p>
 </tr>
 <tr class="code">
 <td class="docs">
-<p>Non-atomically shifts the array.</p>
-
-<h2>Note marks the _entire_ array as modified which</h2>
-
-<p>will pass the entire thing to $set potentially
-overwritting any changes that happen between
-when you retrieved the object and when you save
-it.</p>
-
-<ul><li><p><strong>api</strong>: <em>public</em></p></li></ul>
-</td>
-<td class="code">
-<pre><code><span class="class">MongooseArray</span>.<span class="variable">prototype</span>.<span class="variable">shift</span> = <span class="keyword">function</span> () {
-  <span class="keyword">var</span> <span class="variable">ret</span> = [].<span class="variable">shift</span>.<span class="variable">call</span>(<span class="this">this</span>);
-  <span class="this">this</span>.<span class="variable">_registerAtomic</span>(<span class="string">'$set'</span>, <span class="this">this</span>);
-  <span class="keyword">return</span> <span class="variable">ret</span>;
-};</code></pre>
-</td>
-</tr>
-<tr class="code">
-<td class="docs">
 <p>Adds values to the array if not already present.
  - <strong>api</strong>: <em>public</em></p>
 
@@ -5925,7 +6023,7 @@ it.</p>
 </tr>
 <tr class="code">
 <td class="docs">
-<p>Returns an native js Array</p>
+<p>Returns an Array</p>
 
 <h2></h2>
 

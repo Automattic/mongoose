@@ -4,7 +4,7 @@ Mongoose is a [MongoDB](http://www.mongodb.org/) object modeling tool designed t
 
 Defining a model is as easy as:
 
-    var Comments = new Schema({
+    var Comment = new Schema({
         title     : String
       , body      : String
       , date      : Date
@@ -16,7 +16,7 @@ Defining a model is as easy as:
       , body      : String
       , buf       : Buffer
       , date      : Date
-      , comments  : [Comments]
+      , comments  : [Comment]
       , meta      : {
           votes : Number
         , favs  : Number

@@ -613,8 +613,9 @@ module.exports = {
   },
 
   'test setters scope': function(){
-    function lowercase (v) {
+    function lowercase (v, self) {
       this.a.should.eql('b');
+      self.path.should.eql('name');
       return v.toLowerCase();
     };
 
@@ -663,8 +664,9 @@ module.exports = {
   },
 
   'test getters scope': function(){
-    function woot (v) {
+    function woot (v, self) {
       this.a.should.eql('b');
+      self.path.should.eql('name');
       return v.toLowerCase();
     };
 

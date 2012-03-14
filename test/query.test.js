@@ -818,6 +818,20 @@ module.exports = {
     query.options.slaveOk.should.be.false;
   },
 
+  'test Query#tailable': function () {
+    var query = new Query();
+    query.tailable();
+    query.options.tailable.should.be.true;
+
+    var query = new Query();
+    query.tailable(true);
+    query.options.tailable.should.be.true;
+
+    var query = new Query();
+    query.tailable(false);
+    query.options.tailable.should.be.false;
+  },
+
   'Query#comment': function () {
     var query = new Query;
     'function'.should.equal(typeof query.comment);

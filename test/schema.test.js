@@ -269,6 +269,11 @@ module.exports = {
     Tobi.path('friends').doValidate(1, function(err){
       err.should.be.an.instanceof(ValidatorError);
     });
+
+    // null is allowed
+    Tobi.path('friends').doValidate(null, function(err){
+      should.strictEqual(err, null);
+    });
   },
 
   'test number required validation': function(){

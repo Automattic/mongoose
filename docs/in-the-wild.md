@@ -68,4 +68,10 @@ Mongoose in the Wild
 
 <br>
 
-The applications shown above are not listed in any specific order. To have an application added or removed please contact [dev@learnboost.com](mailto:dev@learnboost.com).
+[LocalResponse](https://localresponse.com) helps marketers respond to real-time consumer intent.
+
+[![LocalResponse](/images/apps/localreponse.png)](https://localresponse.com)
+
+<br>
+
+The applications shown above are not listed in any specific order. To have your app added or removed please contact [aaronheckmann@gmail.com](mailto:aaron.heckmann+github@gmail.com).

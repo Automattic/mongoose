@@ -237,8 +237,8 @@ module.exports = {
     db.host.should.equal('127.0.0.1');
     db.port.should.equal(27017);
     db.close();
-	
-	// Test connecting using user/pass in hostname
+
+    // Test connecting using user/pass in hostname
     db = mongoose.createConnection('aaron:psw@localhost', 'fake', 27000);
     db.options.should.be.a('object');
     db.options.server.should.be.a('object');
@@ -251,8 +251,8 @@ module.exports = {
     db.host.should.equal('localhost');
     db.port.should.equal(27000);
     db.close();
-	
-	// Test connecting using user/pass options
+
+    // Test connecting using user/pass options
     db = mongoose.createConnection('localhost', 'fake', 27000, {user: 'aaron', pass: 'psw'});
     db.options.should.be.a('object');
     db.options.server.should.be.a('object');
@@ -265,8 +265,8 @@ module.exports = {
     db.host.should.equal('localhost');
     db.port.should.equal(27000);
     db.close();
-	
-	// Test connecting using only user option - which shouldn't work
+
+    // Test connecting using only user option - which shouldn't work
     db = mongoose.createConnection('localhost', 'fake', 27000, {user: 'no_pass'});
     db.options.should.be.a('object');
     db.options.server.should.be.a('object');
@@ -279,8 +279,6 @@ module.exports = {
     db.host.should.equal('localhost');
     db.port.should.equal(27000);
     db.close();
-
-	
   },
 
   'connection.model allows passing a schema': function () {

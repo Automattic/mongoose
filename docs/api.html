@@ -3373,7 +3373,7 @@ new Query().hint("indexA", 1, "indexB", -1)</code></pre>
 <td class="docs">
 <p>slaveOk</p>
 
-<p>Sets slaveOk option</p>
+<p>Sets slaveOk option.</p>
 
 <pre><code>new Query().slaveOk() &lt;== true
 new Query().slaveOk(true)
@@ -3386,6 +3386,27 @@ new Query().slaveOk(false)</code></pre>
 <td class="code">
 <pre><code><span class="class">Query</span>.<span class="variable">prototype</span>.<span class="variable">slaveOk</span> = <span class="keyword">function</span> (<span class="variable">v</span>) {
   <span class="this">this</span>.<span class="variable">options</span>.<span class="variable">slaveOk</span> = <span class="variable">arguments</span>.<span class="variable">length</span> ? !!<span class="variable">v</span> : <span class="variable">true</span>;
+  <span class="keyword">return</span> <span class="this">this</span>;
+};</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>tailable</p>
+
+<p>Sets tailable option.</p>
+
+<pre><code>new Query().tailable() &lt;== true
+new Query().tailable(true)
+new Query().tailable(false)</code></pre>
+
+<h2></h2>
+
+<ul><li><p><strong>param</strong>: <em>Boolean</em>  v (defaults to true)</p></li><li><p><strong>api</strong>: <em>public</em></p></li></ul>
+</td>
+<td class="code">
+<pre><code><span class="class">Query</span>.<span class="variable">prototype</span>.<span class="variable">tailable</span> = <span class="keyword">function</span> (<span class="variable">v</span>) {
+  <span class="this">this</span>.<span class="variable">options</span>.<span class="variable">tailable</span> = <span class="variable">arguments</span>.<span class="variable">length</span> ? !!<span class="variable">v</span> : <span class="variable">true</span>;
   <span class="keyword">return</span> <span class="this">this</span>;
 };</code></pre>
 </td>
@@ -4230,7 +4251,7 @@ cursor. No more events will be emitted.
     });
   <span class="keyword">if</span> (<span class="variable">value</span> != <span class="keyword">null</span>)
     <span class="this">this</span>.<span class="variable">validators</span>.<span class="variable">push</span>([<span class="keyword">function</span>(<span class="variable">v</span>){
-      <span class="keyword">return</span> <span class="variable">v</span> &<span class="variable">gt</span>;= <span class="variable">value</span>;
+      <span class="keyword">return</span> <span class="variable">v</span> === <span class="keyword">null</span> || <span class="variable">v</span> &<span class="variable">gt</span>;= <span class="variable">value</span>;
     }, <span class="string">'min'</span>]);
   <span class="keyword">return</span> <span class="this">this</span>;
 };</code></pre>
@@ -4252,7 +4273,7 @@ cursor. No more events will be emitted.
     });
   <span class="keyword">if</span> (<span class="variable">value</span> != <span class="keyword">null</span>)
     <span class="this">this</span>.<span class="variable">validators</span>.<span class="variable">push</span>([<span class="this">this</span>.<span class="variable">maxValidator</span> = <span class="keyword">function</span>(<span class="variable">v</span>){
-      <span class="keyword">return</span> <span class="variable">v</span> &<span class="variable">lt</span>;= <span class="variable">value</span>;
+      <span class="keyword">return</span> <span class="variable">v</span> === <span class="keyword">null</span> || <span class="variable">v</span> &<span class="variable">lt</span>;= <span class="variable">value</span>;
     }, <span class="string">'max'</span>]);
   <span class="keyword">return</span> <span class="this">this</span>;
 };</code></pre>

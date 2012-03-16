@@ -54,10 +54,9 @@ module.exports = {
     NativeTestCollection.create({ title: 'x' }, {title:'x'}, function (err) {
       should.strictEqual(!!err, false);
 
-      NativeTestCollection.collection.ensureIndex({ title: 1 }, { unique: true }, function (err) {
-        ;/E11000 duplicate key error index/.test(err.message).should.equal(true);
-
+      NativeTestCollection.collection.ensureIndex({ title: 1 }, { unique: true, safe: true }, function (err) {
         db.close();
+        ;/E11000 duplicate key error index/.test(err.message).should.equal(true);
       });
     });
   }

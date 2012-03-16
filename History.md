@@ -1,3 +1,11 @@
+2.5.11 / 2012-03-15
+===================
+
+  * added; introspection for getters/setters (#745)
+  * updated; node-mongodb-driver to 0.9.9-5
+  * added; tailable method to Query (#769) [holic]
+  * fixed; Number min/max validation of null (#764) [btamas]
+  * added; more flexible user/password connection options (#738) [KarneAsada]
 
 2.5.10 / 2012-03-06
 ===================

@@ -145,7 +145,7 @@ module.exports = {
     var schema = new Schema({ number: Number });
     var Numbered = mongoose.model('Numbered', schema, collection);
     var n3 = new Numbered({ number: 1234 });
-    n3.number.valueOf().should.equal(1234);
+    n3.number.should.equal(1234);
   },
 
   'mongoose.model!init emits init event on schema': function () {
@@ -494,7 +494,7 @@ module.exports = {
       }
     });
 
-    post.get('meta.visitors').valueOf().should.equal(5);
+    post.get('meta.visitors').should.equal(5);
     db.close();
   },
 
@@ -875,7 +875,7 @@ module.exports = {
         should.strictEqual(null, err);
         BlogPost.findById(post.id, function (err, found) {
           should.strictEqual(null, err);
-          found.get('meta.visitors').valueOf().should.equal(20);
+          found.get('meta.visitors').should.equal(20);
           db.close();
         });
       });
@@ -2292,15 +2292,15 @@ module.exports = {
           doc.get('nums').length.should.eql(3);
 
           doc.get('nums').some(function(num){
-            return num.valueOf() == '1';
+            return num === 1;
           }).should.be.true;
 
           doc.get('nums').some(function(num){
-            return num.valueOf() == '2';
+            return num === 2;
           }).should.be.true;
 
           doc.get('nums').some(function(num){
-            return num.valueOf() == '3';
+            return num === 3;
           }).should.be.true;
 
 
@@ -2865,8 +2865,8 @@ module.exports = {
     called.should.be.false;
     var num = a.number;
     called.should.be.true;
-    num.valueOf().should.equal(100);
-    a.getValue('number').valueOf().should.equal(50);
+    num.should.equal(100);
+    a.getValue('number').should.equal(50);
 
     called = false;
     var b = new A;
@@ -2874,8 +2874,8 @@ module.exports = {
     called.should.be.false;
     num = b.number;
     called.should.be.true;
-    num.valueOf().should.equal(100);
-    b.getValue('number').valueOf().should.equal(50);
+    num.should.equal(100);
+    b.getValue('number').should.equal(50);
   },
 
   'saving a doc with a set virtual property should persist the real properties but not the virtual property': function () {
@@ -4061,21 +4061,21 @@ module.exports = {
     Deal = db.model('Deal', Deal, 'deals_' + random());
 
     var location = new Location({lat: 1.2, long: 10});
-    location.lat.valueOf().should.equal(1);
-    location.long.valueOf().should.equal(1);
+    location.lat.should.equal(1);
+    location.long.should.equal(1);
 
     var deal = new Deal({title: "My deal", locations: [{lat: 1.2, long: 33}]});
-    deal.locations[0].lat.valueOf().should.equal(1);
-    deal.locations[0].long.valueOf().should.equal(2);
+    deal.locations[0].lat.should.equal(1);
+    deal.locations[0].long.should.equal(2);
 
     deal.save(function (err) {
       should.strictEqual(err, null);
       Deal.findById(deal._id, function (err, deal) {
         db.close();
         should.strictEqual(err, null);
-        deal.locations[0].lat.valueOf().should.equal(1);
+        deal.locations[0].lat.should.equal(1);
         // GH-422
-        deal.locations[0].long.valueOf().should.equal(2);
+        deal.locations[0].long.should.equal(2);
       });
     });
   },

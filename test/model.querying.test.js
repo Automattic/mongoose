@@ -2349,4 +2349,65 @@ module.exports = {
       S.find({ _id: s._id }).exec(done);
     });
   },
+  
+  'query with lean doc option - find' : function()  {
+    var db = start()
+    , BlogPostB = db.model('BlogPostB', collection)
+    , title = 'Wooooot ' + random();
+
+    var post = new BlogPostB();
+    post.set('title', title);
+  
+    post.save(function (err) {
+      should.strictEqual(null, err);
+      BlogPostB.find({title : title}, null, { lean : true }, function(err, docs){
+        should.strictEqual(null, err);
+        should.equal(docs.length, 1);
+        should.strictEqual(docs[0] instanceof mongoose.Document, false);
+      });
+    });
+  },
+  
+  'query with lean doc option - findOne' : function()  {
+    var db = start()
+    , BlogPostB = db.model('BlogPostB', collection)
+    , title = 'Wooooot ' + random();
+
+    var post = new BlogPostB();
+    post.set('title', title);
+  
+    post.save(function (err) {
+      should.strictEqual(null, err);
+      BlogPostB.findOne({title : title}, null, { lean : true }, function(err, doc){
+        should.strictEqual(null, err);
+        doc.should.not.be.equal(undefined);
+        should.strictEqual(doc instanceof mongoose.Document, false);
+      });
+    });
+  },
+  
+  'query with lean doc option - find each' : function()  {
+    var db = start()
+    , BlogPostB = db.model('BlogPostB', collection)
+    , title = 'Wooooot ' + random();
+
+    var post = new BlogPostB();
+    post.set('title', title);
+  
+    post.save(function (err) {
+      should.strictEqual(null, err);
+      var found = 0;
+      BlogPostB.find({title : title}, null, { lean : true })
+        .each(function(err, doc){
+          should.strictEqual(null, err);
+          if(doc) {
+            doc.should.not.be.equal(undefined);
+            should.strictEqual(doc instanceof mongoose.Document, false);
+            found++
+          }  else {
+            should.strictEqual(found, 1);
+          }
+      });
+    });
+  }
 };

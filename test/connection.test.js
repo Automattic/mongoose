@@ -293,6 +293,18 @@ module.exports = {
     var m = new MyModel({name:'aaron'});
     m.name.should.eql('aaron');
     db.close();
+  },
+
+  'connection error event fires with one listener': function (exit) {
+    var db= start({ uri: 'mongodb://localasdfads/fakeeee'})
+      , called = false;
+    db.on('error', function () {
+      // this callback has no params which triggered the bug #759
+      called = true;
+    });
+    exit(function () {
+      called.should.be.true;
+    });
   }
 
 };

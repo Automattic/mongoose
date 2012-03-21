@@ -3135,11 +3135,18 @@ module.exports = {
     });
   },
 
-  'passing null in pre hook works': function () {
+  'passing undefined and null in pre hook works': function () {
     var db = start();
     var schema = new Schema({ name: String });
+    var called = 0;
 
     schema.pre('save', function (next) {
+      called++;
+      next(undefined); // <<-----
+    });
+
+    schema.pre('save', function (next) {
+      called++;
       next(null); // <<-----
     });
 
@@ -3148,9 +3155,9 @@ module.exports = {
 
     s.save(function (err) {
       db.close();
+      called.should.equal(2);
       should.strictEqual(null, err);
     });
-
   },
 
   'pre hooks called on all sub levels': function () {

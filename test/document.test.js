@@ -887,10 +887,24 @@ module.exports = {
       T.findById(t).select('name').exec(function (err, t) {
         should.strictEqual(null, err);
         should.strictEqual(undefined, t.req);
-        t.name = 'reborn';
+        t.name = 'wooo';
         t.save(function (err) {
-          db.close();
           should.strictEqual(null, err);
+
+          T.findById(t).select('name').exec(function (err, t) {
+            should.strictEqual(null, err);
+            t.req = undefined;
+            t.save(function (err) {
+              err = String(err);
+              var invalid  = /Validator "required" failed for path req/.test(err);
+              invalid.should.be.true;
+              t.req = 'it works again'
+              t.save(function (err) {
+                db.close();
+                should.strictEqual(null, err);
+              });
+            });
+          });
         });
       });
     });

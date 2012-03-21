@@ -874,5 +874,25 @@ module.exports = {
     doc.isSelected('em.title').should.be.true;
     doc.isSelected('em.body').should.be.true;
     doc.isSelected('em.nonpath').should.be.true;
+  },
+
+  'unselected required fields should pass validation': function () {
+    var db = start()
+      , Tschema = new Schema({ name: String, req: { type: String, required: true }})
+      , T = db.model('unselectedRequiredFieldValidation', Tschema);
+
+    var t = new T({ name: 'teeee', req: 'i am required' });
+    t.save(function (err) {
+      should.strictEqual(null, err);
+      T.findById(t).select('name').exec(function (err, t) {
+        should.strictEqual(null, err);
+        should.strictEqual(undefined, t.req);
+        t.name = 'reborn';
+        t.save(function (err) {
+          db.close();
+          should.strictEqual(null, err);
+        });
+      });
+    });
   }
 };

@@ -1,3 +1,9 @@
+2.5.12 / 2012-03-21
+===================
+
+  * fixed; honor the `safe` option in all ensureIndex calls
+  * updated; node-mongodb-native driver to 0.9.9-7
+
 2.5.11 / 2012-03-15
 ===================
 

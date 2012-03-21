@@ -116,7 +116,8 @@ module.exports = {
       should.equal(null, err, 'could not save splice test');
       A.findById(a._id, function (err, doc) {
         should.equal(null, err, 'error finding splice doc');
-        doc.numbers.splice(1, 1);
+        var removed = doc.numbers.splice(1, 1);
+        removed.should.eql([5]);
         doc.numbers.toObject().should.eql([4,6,7]);
         doc.save(function (err) {
           should.equal(null, err, 'could not save splice test');
@@ -146,7 +147,9 @@ module.exports = {
       A.findById(a._id, function (err, doc) {
         should.equal(null, err, 'error finding splice doc');
 
-        doc.types.splice(1, 1);
+        var removed = doc.types.splice(1, 1);
+        removed.length.should.eql(1);
+        removed[0].type.should.eql('boy');
 
         var obj = doc.types.toObject();
         obj[0].type.should.eql('bird');

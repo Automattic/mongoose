@@ -52,6 +52,7 @@ var posts = 'blogposts_' + random()
 
 mongoose.model('RefBlogPost', BlogPost);
 mongoose.model('RefUser', User);
+mongoose.model('RefAlternateUser', User);
 
 /**
  * Tests.
@@ -1524,5 +1525,38 @@ module.exports = {
         });
       });
     })
-  }
+  },
+
+  // gh-773
+  'test populating with custom model selection': function () {
+    var db = start()
+      , BlogPost = db.model('RefBlogPost', posts)
+      , User = db.model('RefAlternateUser', users);
+
+    User.create({
+        name  : 'Daniel'
+      , email : 'daniel.baulig@gmx.de'
+    }, function (err, creator) {
+      should.strictEqual(err, null);
+
+      BlogPost.create({
+          title     : 'woot'
+        , _creator  : creator
+      }, function (err, post) {
+        should.strictEqual(err, null);
+
+        BlogPost
+          .findById(post._id)
+          .populate('_creator', ['email'], 'RefAlternateUser')
+          .run(function (err, post) {
+            db.close();
+            should.strictEqual(err, null);
+
+            post._creator.should.be.an.instanceof(User);
+            post._creator.isInit('name').should.be.false;
+            post._creator.email.should.equal('daniel.baulig@gmx.de');
+          });
+      });
+    });
+  },
 };

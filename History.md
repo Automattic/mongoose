@@ -1,3 +1,10 @@
+2.5.13 / 2012-03-22
+===================
+
+  * fixed; failing validation of unselected required paths (#730,#713)
+  * fixed; emitting connection error when only one listener (#759)
+  * fixed; MongooseArray#splice was not returning values (#784) [chrisleishman]
+
 2.5.12 / 2012-03-21
 ===================
 

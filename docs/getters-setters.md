@@ -47,6 +47,9 @@ Suppose you are storing credit card numbers and you want to hide everything exce
       console.log(found.creditCardNumber); // '****-****-****-1234'
     });
 
+
+**Important!** Note that getters only works when creating or modifying `Document` instances; it will not be invoked when `Document` instances are not involved like in `Model.update()`.
+
 ## Summary
 
 Setters are intended to modify the underlying raw data. Getters are intended to transform (but not modify at the raw data level) the underlying raw data into something that the user expects to see. They are both defined in the `Schema` definition.

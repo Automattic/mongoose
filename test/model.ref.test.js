@@ -710,7 +710,7 @@ module.exports = {
     });
   },
 
-  'test populating an array of refs changing one and removing one': function () {
+  'test populating an array of refs, changing one, and removing one': function () {
     var db = start()
       , BlogPost = db.model('RefBlogPost', posts)
       , User = db.model('RefUser', users);

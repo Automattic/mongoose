@@ -24,3 +24,18 @@ Note: for backwards compatibility, all top-level `update` keys that are not $ato
     Model.update(query, { $set: { name: 'jason borne' }}, options, callback)
 
 This helps prevent accidentally overwriting all of your document(s) with `{ name: 'jason borne' }`.
+
+Also note: although values are casted to their appropriate types when using `update`, the following are **not** applied:
+
+- defaults
+- setters
+- validators
+- middleware triggered on `save`
+
+If you want those features, please use the following convention rather than `update`:
+
+    Model.findOne({ name: 'borne' }, function (err, doc){
+      doc.name = 'jason borne';
+      doc.visits.$inc();
+      doc.save();
+    });

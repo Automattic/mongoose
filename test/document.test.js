@@ -579,6 +579,32 @@ module.exports = {
     obj._id.should.eql(oidString);
   },
 
+  // gh-794
+  'calling update on document should relay to its model': function (beforeExit) {
+    var db = start();
+    var Docs = new Schema({text:String});
+    var docs = db.model('docRelayUpdate', Docs);
+    var d = new docs({text:'A doc'});
+    var called = false;
+    d.save(function () {
+      var oldUpdate = docs.update;
+      docs.update = function (query, operation) {
+        query.should.eql({_id: d._id});
+        operation.should.eql({$set: {text:'A changed doc'}});
+        called = true;
+        docs.update = oldUpdate;
+        oldUpdate.apply(docs, arguments);
+      };
+      d.update({$set :{text: 'A changed doc'}}, function (err) {
+        should.not.exist(err);
+        db.close();
+      });
+    });
+    beforeExit(function () {
+      called.should.be.true;
+    });
+  },
+
   'toObject should not set undefined values to null': function () {
     var doc = new TestDocument()
       , obj = doc.toObject();

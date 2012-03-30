@@ -1,3 +1,24 @@
+2.5.13 / 2012-03-22
+===================
+
+  * fixed; failing validation of unselected required paths (#730,#713)
+  * fixed; emitting connection error when only one listener (#759)
+  * fixed; MongooseArray#splice was not returning values (#784) [chrisleishman]
+
+2.5.12 / 2012-03-21
+===================
+
+  * fixed; honor the `safe` option in all ensureIndex calls
+  * updated; node-mongodb-native driver to 0.9.9-7
+
+2.5.11 / 2012-03-15
+===================
+
+  * added; introspection for getters/setters (#745)
+  * updated; node-mongodb-driver to 0.9.9-5
+  * added; tailable method to Query (#769) [holic]
+  * fixed; Number min/max validation of null (#764) [btamas]
+  * added; more flexible user/password connection options (#738) [KarneAsada]
 
 2.5.10 / 2012-03-06
 ===================

@@ -275,8 +275,9 @@ module.exports = {
       , query;
 
     // Model.updateOne
-    query = M.updateOne({ author: 'aaron' }, { $set: { date: now }}, { new: false });
+    query = M.updateOne({ author: 'aaron' }, { $set: { date: now }}, { new: false, fields: 'author' });
     should.strictEqual(false, query.options.new);
+    should.strictEqual(1, query._fields.author);
     should.equal(now, query._updateArg.$set.date);
     should.strictEqual('aaron', query._conditions.author);
 

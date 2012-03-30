@@ -291,6 +291,11 @@ module.exports = {
     should.equal(now, query._updateArg.$set.date);
     should.strictEqual(undefined, query._conditions.author);
 
+    query = M.updateOne();
+    should.strictEqual(undefined, query.options.new);
+    should.equal(undefined, query._updateArg.date);
+    should.strictEqual(undefined, query._conditions.author);
+
     // Query.updateOne
     query = M.where('author', 'aaron').updateOne({ date: now });
     should.strictEqual(undefined, query.options.new);

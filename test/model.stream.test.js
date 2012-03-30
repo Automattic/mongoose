@@ -229,14 +229,13 @@ function assignExports () { var o = {
       , P = db.model('PersonForStream', collection)
       , i = 0
       , closed = 0
-      , paused = 0
-      , resumed = 0
       , err
   
     var stream = P.find({},null, {lean : true}).stream();
   
     stream.on('data', function (doc) {
       should.strictEqual(false, doc instanceof mongoose.Document);
+      i++;  
     });
   
     stream.on('error', function (er) {
@@ -254,8 +253,6 @@ function assignExports () { var o = {
       should.strictEqual(undefined, err);
       should.equal(i, names.length);
       closed.should.equal(1);
-      paused.should.equal(1);
-      resumed.should.equal(1);
       stream._cursor.isClosed().should.be.true;
     }
   }

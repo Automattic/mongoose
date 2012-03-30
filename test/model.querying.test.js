@@ -2364,6 +2364,7 @@ module.exports = {
         should.strictEqual(null, err);
         should.equal(docs.length, 1);
         should.strictEqual(docs[0] instanceof mongoose.Document, false);
+        db.close();  
       });
     });
   },
@@ -2382,6 +2383,7 @@ module.exports = {
         should.strictEqual(null, err);
         doc.should.not.be.equal(undefined);
         should.strictEqual(doc instanceof mongoose.Document, false);
+        db.close();  
       });
     });
   },
@@ -2406,6 +2408,7 @@ module.exports = {
             found++
           }  else {
             should.strictEqual(found, 1);
+            db.close();  
           }
       });
     });

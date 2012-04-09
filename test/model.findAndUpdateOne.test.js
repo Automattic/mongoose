@@ -398,5 +398,132 @@ module.exports = {
         should.not.exist(doc._doc.ignore);
       });
     });
+  },
+
+  // by id
+
+  'Model.findByIdAndUpdate(callback) throws': function () {
+    var db = start()
+      , M = db.model(modelname, collection)
+      , err
+
+    try {
+      M.findByIdAndUpdate(function(){});
+    } catch (e) {
+      err = e;
+    }
+
+    db.close();
+    ;/First argument must not be a function/.test(err).should.be.true;
+  },
+
+  'findByIdAndUpdate executes when a callback is passed': function () {
+    var db = start()
+      , M = db.model(modelname, collection + random())
+      , _id = new DocumentObjectId
+      , pending = 2
+
+    M.findByIdAndUpdate(_id, { $set: { name: 'Aaron'}}, { new: false }, done);
+    M.findByIdAndUpdate(_id, { $set: { name: 'changed' }}, done);
+
+    function done (err, doc) {
+      should.strictEqual(null, err);
+      should.strictEqual(null, doc); // no previously existing doc
+      if (--pending) return;
+      db.close();
+    }
+  },
+
+  'findByIdAndUpdate returns the original document': function () {
+    var db = start()
+      , M = db.model(modelname, collection)
+      , title = 'Tobi ' + random()
+      , author = 'Brian ' + random()
+      , newTitle = 'Woot ' + random()
+      , id0 = new DocumentObjectId
+      , id1 = new DocumentObjectId
+
+    var post = new M;
+    post.set('title', title);
+    post.author = author;
+    post.meta.visitors = 0;
+    post.date = new Date;
+    post.published = true;
+    post.mixed = { x: 'ex' };
+    post.numbers = [4,5,6,7];
+    post.owners = [id0, id1];
+    post.comments = [{ body: 'been there' }, { body: 'done that' }];
+
+    post.save(function (err) {
+      should.strictEqual(err, null);
+      M.findById(post._id, function (err, cf) {
+        should.strictEqual(err, null);
+
+        var update = {
+            title: newTitle // becomes $set
+          , $inc: { 'meta.visitors': 2 }
+          , $set: { date: new Date }
+          , published: false // becomes $set
+          , 'mixed': { x: 'ECKS', y: 'why' } // $set
+          , $pullAll: { 'numbers': [4, 6] }
+          , $pull: { 'owners': id0 }
+          , 'comments.1.body': 8 // $set
+        }
+
+        M.findByIdAndUpdate(post.id, update, { new: false }, function (err, up) {
+          db.close();
+          should.strictEqual(err, null, err && err.stack);
+
+          up.title.should.equal(post.title);
+          up.author.should.equal(post.author);
+          up.meta.visitors.valueOf().should.equal(post.meta.visitors);
+          up.date.toString().should.equal(post.date.toString());
+          up.published.should.eql(post.published);
+          up.mixed.x.should.equal(post.mixed.x);
+          should.strictEqual(up.mixed.y, post.mixed.y);
+          up.numbers.toObject().should.eql(post.numbers.toObject());
+          up.owners.length.should.equal(post.owners.length);
+          up.owners[0].toString().should.eql(post.owners[0].toString());
+          up.comments[0].body.should.equal(post.comments[0].body);
+          up.comments[1].body.should.equal(post.comments[1].body);
+          should.exist(up.comments[0]._id);
+          should.exist(up.comments[1]._id);
+          up.comments[0]._id.should.be.an.instanceof(DocumentObjectId)
+          up.comments[1]._id.should.be.an.instanceof(DocumentObjectId);
+        });
+      });
+    });
+  },
+
+  'findByIdAndUpdate: options/conditions/doc are merged when no callback is passed': function () {
+    var db = start()
+      , M = db.model(modelname, collection)
+      , _id = new DocumentObjectId
+
+    db.close();
+
+    var now = new Date
+      , query;
+
+    // Model.findByIdAndUpdate
+    query = M.findByIdAndUpdate(_id, { $set: { date: now }}, { new: false, fields: 'author' });
+    should.strictEqual(false, query.options.new);
+    should.strictEqual(1, query._fields.author);
+    should.equal(now, query._updateArg.$set.date);
+    should.strictEqual(_id.toString(), query._conditions._id.toString());
+
+    query = M.findByIdAndUpdate(_id, { $set: { date: now }});
+    should.strictEqual(undefined, query.options.new);
+    should.equal(now, query._updateArg.$set.date);
+    should.strictEqual(_id.toString(), query._conditions._id.toString());
+
+    query = M.findByIdAndUpdate(_id);
+    should.strictEqual(undefined, query.options.new);
+    should.strictEqual(_id, query._conditions._id);
+
+    query = M.findByIdAndUpdate();
+    should.strictEqual(undefined, query.options.new);
+    should.equal(undefined, query._updateArg.date);
+    should.strictEqual(undefined, query._conditions._id);
   }
 }

@@ -167,5 +167,85 @@ module.exports = {
 
     db.close();
     ;/First argument must not be a function/.test(err).should.be.true;
+  },
+
+  /// byid
+
+  'Model.findByIdAndRemove(callback) throws': function () {
+    var db = start()
+      , M = db.model(modelname, collection)
+      , err
+
+    try {
+      M.findByIdAndRemove(function(){});
+    } catch (e) {
+      err = e;
+    }
+
+    db.close();
+    ;/First argument must not be a function/.test(err).should.be.true;
+  },
+
+  'findByIdAndRemove executes when a callback is passed': function () {
+    var db = start()
+      , M = db.model(modelname, collection + random())
+      , _id = new DocumentObjectId
+      , pending = 2
+
+    M.findByIdAndRemove(_id, { fields: 'name' }, done);
+    M.findByIdAndRemove(_id, done);
+
+    function done (err, doc) {
+      should.strictEqual(null, err);
+      should.strictEqual(null, doc); // no previously existing doc
+      if (--pending) return;
+      db.close();
+    }
+  },
+
+  'findByIdAndRemove returns the original document': function () {
+    var db = start()
+      , M = db.model(modelname, collection)
+      , title = 'remove muah pleez'
+
+    var post = new M({ title: title });
+    post.save(function (err) {
+      should.strictEqual(err, null);
+      M.findByIdAndRemove(post.id, function (err, doc) {
+        should.strictEqual(err, null);
+        doc.id.should.equal(post.id);
+        M.findById(post.id, function (err, gone) {
+          db.close();
+          should.strictEqual(err, null);
+          should.strictEqual(gone, null);
+        });
+      });
+    });
+  },
+
+  'findByIdAndRemove: options/conditions/doc are merged when no callback is passed': function () {
+    var db = start()
+      , M = db.model(modelname, collection)
+      , _id = new DocumentObjectId
+
+    db.close();
+
+    var now = new Date
+      , query;
+
+    // Model.findByIdAndRemove
+    query = M.findByIdAndRemove(_id, { fields: 'author' });
+    should.strictEqual(1, query._fields.author);
+    should.strictEqual(_id.toString(), query._conditions._id.toString());
+
+    query = M.findByIdAndRemove(_id.toString());
+    should.strictEqual(undefined, query._fields);
+    should.strictEqual(_id.toString(), query._conditions._id);
+
+    query = M.findByIdAndRemove();
+    should.strictEqual(undefined, query.options.new);
+    should.strictEqual(undefined, query._fields);
+    should.strictEqual(undefined, query._conditions._id);
   }
+
 }

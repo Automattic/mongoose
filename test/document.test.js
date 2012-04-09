@@ -587,7 +587,7 @@ module.exports = {
     var d = new docs({text:'A doc'});
     var called = false;
     d.save(function () {
-      var oldUpdate = Docs.update;
+      var oldUpdate = docs.update;
       docs.update = function (query, operation) {
         query.should.eql({_id: d._id});
         operation.should.eql({$set: {text:'A changed doc'}});

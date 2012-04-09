@@ -223,6 +223,39 @@ function assignExports () { var o = {
       fs.unlink(filename);
     }
   }
+
+, 'cursor stream with lean option': function () {
+    var db = start()
+      , P = db.model('PersonForStream', collection)
+      , i = 0
+      , closed = 0
+      , err
+  
+    var stream = P.find({},null, {lean : true}).stream();
+  
+    stream.on('data', function (doc) {
+      should.strictEqual(false, doc instanceof mongoose.Document);
+      i++;  
+    });
+  
+    stream.on('error', function (er) {
+      err = er;
+      done();
+    });
+  
+    stream.on('close', function () {
+      closed++;
+      done();
+    });
+  
+    function done () {
+      db.close();
+      should.strictEqual(undefined, err);
+      should.equal(i, names.length);
+      closed.should.equal(1);
+      stream._cursor.isClosed().should.be.true;
+    }
+  }
 }
 
 // end exports

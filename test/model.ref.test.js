@@ -46,6 +46,7 @@ var BlogPost = new Schema({
   , comments      : [Comment]
   , fans          : [{ type: ObjectId, ref: 'RefUser' }]
 });
+var BlogPostSchema = BlogPost;
 
 var posts = 'blogposts_' + random()
   , users = 'users_' + random();
@@ -1484,6 +1485,19 @@ module.exports = {
             var json = post.toJSON();
             json.was_in_to_json.should.equal(true);
             json._creator.was_in_to_json.should.equal(true);
+            
+            should.strictEqual(json.id, undefined);
+            
+            BlogPostSchema.options.toJSONOptions = {virtuals: true};
+            json = post.toJSON()
+            should.equal(json.id, json._id);
+
+            var obj = post.toObject();
+            should.strictEqual(obj.id, undefined);
+
+            BlogPostSchema.options.toObjectOptions = {virtuals: true};
+            obj = post.toObject();
+            should.equal(obj.id, obj._id);
           });
       });
     });

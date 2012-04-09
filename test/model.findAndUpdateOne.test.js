@@ -77,7 +77,7 @@ mongoose.model('UpdateOneStrictSchema', strictSchema);
 
 module.exports = {
 
-  'updateOne returns the edited document': function () {
+  'findOneAndUpdate returns the edited document': function () {
     var db = start()
       , M = db.model(modelname, collection)
       , title = 'Tobi ' + random()
@@ -130,7 +130,7 @@ module.exports = {
           , 'comments.1.body': 8 // $set
         }
 
-        M.updateOne({ title: title }, update, function (err, up) {
+        M.findOneAndUpdate({ title: title }, update, function (err, up) {
           db.close();
           should.strictEqual(err, null, err && err.stack);
 
@@ -156,7 +156,7 @@ module.exports = {
 
   },
 
-  'updateOne returns the original document': function () {
+  'findOneAndUpdate returns the original document': function () {
     var db = start()
       , M = db.model(modelname, collection)
       , title = 'Tobi ' + random()
@@ -192,7 +192,7 @@ module.exports = {
           , 'comments.1.body': 8 // $set
         }
 
-        M.updateOne({ title: title }, update, { new: false }, function (err, up) {
+        M.findOneAndUpdate({ title: title }, update, { new: false }, function (err, up) {
           db.close();
           should.strictEqual(err, null, err && err.stack);
 
@@ -218,7 +218,7 @@ module.exports = {
 
   },
 
-  'updateOne allows upserting': function () {
+  'findOneAndUpdate allows upserting': function () {
     var db = start()
       , M = db.model(modelname, collection)
       , title = 'Tobi ' + random()
@@ -248,7 +248,7 @@ module.exports = {
       , $pull: { 'owners': id0 }
     }
 
-    M.updateOne({ title: title }, update, { upsert: true, new: true }, function (err, up) {
+    M.findOneAndUpdate({ title: title }, update, { upsert: true, new: true }, function (err, up) {
       db.close();
       should.strictEqual(err, null, err && err.stack);
 
@@ -274,61 +274,61 @@ module.exports = {
     var now = new Date
       , query;
 
-    // Model.updateOne
-    query = M.updateOne({ author: 'aaron' }, { $set: { date: now }}, { new: false, fields: 'author' });
+    // Model.findOneAndUpdate
+    query = M.findOneAndUpdate({ author: 'aaron' }, { $set: { date: now }}, { new: false, fields: 'author' });
     should.strictEqual(false, query.options.new);
     should.strictEqual(1, query._fields.author);
     should.equal(now, query._updateArg.$set.date);
     should.strictEqual('aaron', query._conditions.author);
 
-    query = M.updateOne({ author: 'aaron' }, { $set: { date: now }});
+    query = M.findOneAndUpdate({ author: 'aaron' }, { $set: { date: now }});
     should.strictEqual(undefined, query.options.new);
     should.equal(now, query._updateArg.$set.date);
     should.strictEqual('aaron', query._conditions.author);
 
-    query = M.updateOne({ $set: { date: now }});
+    query = M.findOneAndUpdate({ $set: { date: now }});
     should.strictEqual(undefined, query.options.new);
     should.equal(now, query._updateArg.$set.date);
     should.strictEqual(undefined, query._conditions.author);
 
-    query = M.updateOne();
+    query = M.findOneAndUpdate();
     should.strictEqual(undefined, query.options.new);
     should.equal(undefined, query._updateArg.date);
     should.strictEqual(undefined, query._conditions.author);
 
-    // Query.updateOne
-    query = M.where('author', 'aaron').updateOne({ date: now });
+    // Query.findOneAndUpdate
+    query = M.where('author', 'aaron').findOneAndUpdate({ date: now });
     should.strictEqual(undefined, query.options.new);
     should.equal(now, query._updateArg.date);
     should.strictEqual('aaron', query._conditions.author);
 
-    query = M.find().updateOne({ author: 'aaron' }, { date: now });
+    query = M.find().findOneAndUpdate({ author: 'aaron' }, { date: now });
     should.strictEqual(undefined, query.options.new);
     should.equal(now, query._updateArg.date);
     should.strictEqual('aaron', query._conditions.author);
 
-    query = M.find().updateOne({ date: now });
+    query = M.find().findOneAndUpdate({ date: now });
     should.strictEqual(undefined, query.options.new);
     should.equal(now, query._updateArg.date);
     should.strictEqual(undefined, query._conditions.author);
 
-    query = M.find().updateOne();
+    query = M.find().findOneAndUpdate();
     should.strictEqual(undefined, query.options.new);
     should.equal(undefined, query._updateArg.date);
     should.strictEqual(undefined, query._conditions.author);
   },
 
-  'updateOne executes when a callback is passed': function () {
+  'findOneAndUpdate executes when a callback is passed': function () {
     var db = start()
       , M = db.model(modelname, collection + random())
       , pending = 6
 
-    M.updateOne({ name: 'aaron' }, { $set: { name: 'Aaron'}}, { new: false }, done);
-    M.updateOne({ name: 'aaron' }, { $set: { name: 'Aaron'}}, done);
-    M.where().updateOne({ name: 'aaron' }, { $set: { name: 'Aaron'}}, { new: false }, done);
-    M.where().updateOne({ name: 'aaron' }, { $set: { name: 'Aaron'}}, done);
-    M.where().updateOne({ $set: { name: 'Aaron'}}, done);
-    M.where('name', 'aaron').updateOne({ $set: { name: 'Aaron'}}).updateOne(done);
+    M.findOneAndUpdate({ name: 'aaron' }, { $set: { name: 'Aaron'}}, { new: false }, done);
+    M.findOneAndUpdate({ name: 'aaron' }, { $set: { name: 'Aaron'}}, done);
+    M.where().findOneAndUpdate({ name: 'aaron' }, { $set: { name: 'Aaron'}}, { new: false }, done);
+    M.where().findOneAndUpdate({ name: 'aaron' }, { $set: { name: 'Aaron'}}, done);
+    M.where().findOneAndUpdate({ $set: { name: 'Aaron'}}, done);
+    M.where('name', 'aaron').findOneAndUpdate({ $set: { name: 'Aaron'}}).findOneAndUpdate(done);
 
     function done (err, doc) {
       should.strictEqual(null, err);
@@ -338,13 +338,13 @@ module.exports = {
     }
   },
 
-  'Model.updateOne(callback) throws': function () {
+  'Model.findOneAndUpdate(callback) throws': function () {
     var db = start()
       , M = db.model(modelname, collection)
       , err
 
     try {
-      M.updateOne(function(){});
+      M.findOneAndUpdate(function(){});
     } catch (e) {
       err = e;
     }
@@ -353,7 +353,7 @@ module.exports = {
     ;/First argument must not be a function/.test(err).should.be.true;
   },
 
-  'updateOne updates numbers atomically': function () {
+  'findOneAndUpdate updates numbers atomically': function () {
     var db = start()
       , BlogPost = db.model('BlogPost', collection)
       , totalDocs = 4
@@ -367,7 +367,7 @@ module.exports = {
 
       for (var i = 0; i < 4; ++i) {
         BlogPost
-        .updateOne({ _id: post._id }, { $inc: { 'meta.visitors': 1 }}, function (err) {
+        .findOneAndUpdate({ _id: post._id }, { $inc: { 'meta.visitors': 1 }}, function (err) {
           if (err) throw err;
           --totalDocs || complete();
         });
@@ -383,7 +383,7 @@ module.exports = {
     });
   },
 
-  'Model.updateOne should honor strict schemas': function () {
+  'Model.findOneAndUpdate should honor strict schemas': function () {
     var db = start();
     var S = db.model('UpdateStrictSchema');
     var s = new S({ name: 'orange crush' });
@@ -391,7 +391,7 @@ module.exports = {
     s.save(function (err) {
       should.strictEqual(null, err);
 
-      S.updateOne({ _id: s._id }, { ignore: true }, function (err, doc) {
+      S.findOneAndUpdate({ _id: s._id }, { ignore: true }, function (err, doc) {
         db.close();
         should.strictEqual(null, err);
         should.not.exist(doc.ignore);

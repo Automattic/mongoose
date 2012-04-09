@@ -77,7 +77,7 @@ mongoose.model('UpdateOneStrictSchema', strictSchema);
 
 module.exports = {
 
-  'removeOne returns the original document': function () {
+  'findOneAndRemove returns the original document': function () {
     var db = start()
       , M = db.model(modelname, collection)
       , title = 'remove muah'
@@ -85,7 +85,7 @@ module.exports = {
     var post = new M({ title: title });
     post.save(function (err) {
       should.strictEqual(err, null);
-      M.removeOne({ title: title }, function (err, doc) {
+      M.findOneAndRemove({ title: title }, function (err, doc) {
         should.strictEqual(err, null);
         doc.id.should.equal(post.id);
         M.findById(post.id, function (err, gone) {
@@ -97,7 +97,7 @@ module.exports = {
     });
   },
 
-  'removeOne: options/conditions/doc are merged when no callback is passed': function () {
+  'findOneAndRemove: options/conditions/doc are merged when no callback is passed': function () {
     var db = start()
       , M = db.model(modelname, collection)
 
@@ -106,44 +106,45 @@ module.exports = {
     var now = new Date
       , query;
 
-    // Model.removeOne
-    query = M.removeOne({ author: 'aaron' }, { fields: 'author' });
+    // Model.findOneAndRemove
+    query = M.findOneAndRemove({ author: 'aaron' }, { fields: 'author' });
     should.strictEqual(1, query._fields.author);
     should.strictEqual('aaron', query._conditions.author);
 
-    query = M.removeOne({ author: 'aaron' });
+    query = M.findOneAndRemove({ author: 'aaron' });
     should.strictEqual(undefined, query._fields);
     should.strictEqual('aaron', query._conditions.author);
 
-    query = M.removeOne();
+    query = M.findOneAndRemove();
     should.strictEqual(undefined, query.options.new);
     should.strictEqual(undefined, query._fields);
     should.strictEqual(undefined, query._conditions.author);
 
-    // Query.removeOne
-    query = M.where('author', 'aaron').removeOne({ date: now });
+    // Query.findOneAndRemove
+    query = M.where('author', 'aaron').findOneAndRemove({ date: now });
     should.strictEqual(undefined, query._fields);
     should.equal(now, query._conditions.date);
     should.strictEqual('aaron', query._conditions.author);
 
-    query = M.find().removeOne({ author: 'aaron' }, { fields: 'author' });
+    query = M.find().findOneAndRemove({ author: 'aaron' }, { fields: 'author' });
     should.strictEqual(1, query._fields.author);
     should.strictEqual('aaron', query._conditions.author);
 
-    query = M.find().removeOne();
+    query = M.find().findOneAndRemove();
     should.strictEqual(undefined, query._fields);
     should.strictEqual(undefined, query._conditions.author);
   },
 
-  'removeOne executes when a callback is passed': function () {
+  'findOneAndRemove executes when a callback is passed': function () {
     var db = start()
       , M = db.model(modelname, collection + random())
-      , pending = 4
+      , pending = 5
 
-    M.removeOne({ name: 'aaron1' }, { fields: 'name' }, done);
-    M.removeOne({ name: 'aaron1' }, done);
-    M.where().removeOne({ name: 'aaron1' }, { fields: 'name' }, done);
-    M.where().removeOne({ name: 'aaron1' }, done);
+    M.findOneAndRemove({ name: 'aaron1' }, { fields: 'name' }, done);
+    M.findOneAndRemove({ name: 'aaron1' }, done);
+    M.where().findOneAndRemove({ name: 'aaron1' }, { fields: 'name' }, done);
+    M.where().findOneAndRemove({ name: 'aaron1' }, done);
+    M.where('name', 'aaron1').findOneAndRemove(done);
 
     function done (err, doc) {
       should.strictEqual(null, err);
@@ -153,13 +154,13 @@ module.exports = {
     }
   },
 
-  'Model.removeOne(callback) throws': function () {
+  'Model.findOneAndRemove(callback) throws': function () {
     var db = start()
       , M = db.model(modelname, collection)
       , err
 
     try {
-      M.removeOne(function(){});
+      M.findOneAndRemove(function(){});
     } catch (e) {
       err = e;
     }

@@ -43,12 +43,12 @@ Suppose you are storing credit card numbers and you want to hide everything exce
 
     var Account = mongoose.model('Account', AccountSchema);
 
-    Account.findById( someId, function (err, found) {
+    Account.findById(someId, function (err, found) {
       console.log(found.creditCardNumber); // '****-****-****-1234'
     });
 
 
-**Important!** Note that getters only works when creating or modifying `Document` instances; it will not be invoked when `Document` instances are not involved like in `Model.update()`.
+**Important!** Getters/Setters are not invoked in calls to `Model.update()`.
 
 ## Summary
 

@@ -889,7 +889,7 @@ module.exports = {
     q.setOptions({ hint: { index1: 1, index2: -1 }});
 
     q.options.thing.should.equal('cat');
-    q.options.populate.fans.should.eql({ fields: undefined, conditions: undefined, options: undefined });
+    q.options.populate.fans.should.eql({ fields: undefined, conditions: undefined, options: undefined, model: undefined });
     q.options.batchSize.should.eql(10);
     q.options.limit.should.eql(4);
     q.options.skip.should.eql(3);

@@ -9,6 +9,7 @@ var start = require('./common')
   , DocumentObjectId = mongoose.Types.ObjectId
   , Schema = mongoose.Schema
   , should = require('should')
+  , assert = require('assert')
 
 var Comment = new Schema({
     text: String
@@ -31,96 +32,41 @@ mongoose.model('Comment', Comment);
  */
 
 module.exports = {
-  'test query.fields({a: 1, b: 1, c: 1})': function () {
+  'test query.select(object)': function () {
     var query = new Query();
-    query.fields({a: 1, b: 1, c: 1});
-    query._fields.should.eql({a: 1, b: 1, c: 1});
+    query.select({a: 1, b: 1, c: 0});
+    query._fields.should.eql({a: 1, b: 1, c: 0});
   },
-  'test query.fields({only: "a b c"})': function () {
+  'test query.select(string)': function () {
     var query = new Query();
-    query.fields({only: "a b c"});
-    query._fields.should.eql({a: 1, b: 1, c: 1});
+    query.select("a b -c");
+    query._fields.should.eql({a: 1, b: 1, c: 0});
   },
-  'test query.fields({only: ["a", "b", "c"]})': function () {
-    var query = new Query();
-    query.fields({only: ['a', 'b', 'c']});
-    query._fields.should.eql({a: 1, b: 1, c: 1});
+  'test query.select("a", "b", "c")': function () {
+    assert.throws(function () {
+      var query = new Query();
+      query.select('a', 'b', 'c');
+    }, /Invalid select/);
   },
-  'test query.fields("a b c")': function () {
-    var query = new Query();
-    query.fields("a b c");
-    query._fields.should.eql({a: 1, b: 1, c: 1});
+  "test query.select(['a', 'b', 'c'])": function () {
+    assert.throws(function () {
+      var query = new Query();
+      query.select(['a', 'b', 'c']);
+    }, /Invalid select/);
   },
-  'test query.fields("a", "b", "c")': function () {
+  "Query#select should not overwrite fields set in prior calls": function () {
     var query = new Query();
-    query.fields('a', 'b', 'c');
-    query._fields.should.eql({a: 1, b: 1, c: 1});
-  },
-  "test query.fields(['a', 'b', 'c'])": function () {
-    var query = new Query();
-    query.fields(['a', 'b', 'c']);
-    query._fields.should.eql({a: 1, b: 1, c: 1});
-  },
-  "Query#fields should not over-ride fields set in prior calls to Query#fields": function () {
-    var query = new Query();
-    query.fields('a');
+    query.select('a');
     query._fields.should.eql({a: 1});
-    query.fields('b');
+    query.select('b');
     query._fields.should.eql({a: 1, b: 1});
-  },
-//  "Query#fields should be able to over-ride fields set in prior calls to Query#fields if you specify override": function () {
-//    var query = new Query();
-//    query.fields('a');
-//    query._fields.should.eql({a: 1});
-//    query.override.fields('b');
-//    query._fields.should.eql({b: 1});
-//  }
-
-  "test query.only('a b c')": function () {
-    var query = new Query();
-    query.only("a b c");
-    query._fields.should.eql({a: 1, b: 1, c: 1});
-  },
-  "test query.only('a', 'b', 'c')": function () {
-    var query = new Query();
-    query.only('a', 'b', 'c');
-    query._fields.should.eql({a: 1, b: 1, c: 1});
-  },
-  "test query.only('a', 'b', 'c')": function () {
-    var query = new Query();
-    query.only(['a', 'b', 'c']);
-    query._fields.should.eql({a: 1, b: 1, c: 1});
-  },
-  "Query#only should not over-ride fields set in prior calls to Query#only": function () {
-    var query = new Query();
-    query.only('a');
-    query._fields.should.eql({a: 1});
-    query.only('b');
-    query._fields.should.eql({a: 1, b: 1});
+    query.select({ c: 0 })
+    query._fields.should.eql({a: 1, b: 1, c: 0});
+    query.select('-d')
+    query._fields.should.eql({a: 1, b: 1, c: 0, d: 0});
   },
 
-  "test query.exclude('a b c')": function () {
-    var query = new Query();
-    query.exclude("a b c");
-    query._fields.should.eql({a: 0, b: 0, c: 0});
-  },
-  "test query.exclude('a', 'b', 'c')": function () {
-    var query = new Query();
-    query.exclude('a', 'b', 'c');
-    query._fields.should.eql({a: 0, b: 0, c: 0});
-  },
-  "test query.exclude('a', 'b', 'c')": function () {
-    var query = new Query();
-    query.exclude(['a', 'b', 'c']);
-    query._fields.should.eql({a: 0, b: 0, c: 0});
-  },
-  "Query#exclude should not over-ride fields set in prior calls to Query#exclude": function () {
-    var query = new Query();
-    query.exclude('a');
-    query._fields.should.eql({a: 0});
-    query.exclude('b');
-    query._fields.should.eql({a: 0, b: 0});
-  },
+
 
   'test setting a condition via where': function () {
     var query = new Query();
@@ -205,16 +151,6 @@ module.exports = {
   'test Query#gte where 1 argument': function () {
     var query = new Query();
     query.where("age").ne(21);
-    query._conditions.should.eql({age: {$ne: 21}});
-  },
-
-  'test Query#ne alias Query#notEqualTo': function () {
-    var query = new Query();
-    query.where('age').notEqualTo(21);
-    query._conditions.should.eql({age: {$ne: 21}});
-
-    query = new Query();
-    query.notEqualTo('age', 21);
     query._conditions.should.eql({age: {$ne: 21}});
   },
 
@@ -318,32 +254,29 @@ module.exports = {
     var query = new Query();
     query.where('checkin').near([40, -72]).maxDistance(1);
     query._conditions.should.eql({checkin: {$near: [40, -72], $maxDistance: 1}});
-    query = new Query();
-    query.where('checkin').near([40, -72]).$maxDistance(1);
-    query._conditions.should.eql({checkin: {$near: [40, -72], $maxDistance: 1}});
   },
 
-  'test Query#wherein.box not via where': function () {
+  'test Query#within.box not via where': function () {
     var query = new Query();
-    query.wherein.box('gps', {ll: [5, 25], ur: [10, 30]});
+    query.within.box('gps', {ll: [5, 25], ur: [10, 30]});
     query._conditions.should.eql({gps: {$within: {$box: [[5, 25], [10, 30]]}}});
   },
 
-  'test Query#wherein.box via where': function () {
+  'test Query#within.box via where': function () {
     var query = new Query();
-    query.where('gps').wherein.box({ll: [5, 25], ur: [10, 30]});
+    query.where('gps').within.box({ll: [5, 25], ur: [10, 30]});
     query._conditions.should.eql({gps: {$within: {$box: [[5, 25], [10, 30]]}}});
   },
 
-  'test Query#wherein.center not via where': function () {
+  'test Query#within.center not via where': function () {
     var query = new Query();
-    query.wherein.center('gps', {center: [5, 25], radius: 5});
+    query.within.center('gps', {center: [5, 25], radius: 5});
     query._conditions.should.eql({gps: {$within: {$center: [[5, 25], 5]}}});
   },
 
-  'test Query#wherein.center not via where': function () {
+  'test Query#within.center not via where': function () {
     var query = new Query();
-    query.where('gps').wherein.center({center: [5, 25], radius: 5});
+    query.where('gps').within.center({center: [5, 25], radius: 5});
     query._conditions.should.eql({gps: {$within: {$center: [[5, 25], 5]}}});
   },
 
@@ -371,8 +304,6 @@ module.exports = {
     query._conditions.should.eql({username: {$exists: false}});
   },
 
-  // TODO $not
-  
   'test Query#all via where': function () {
     var query = new Query();
     query.where('pets').all(['dog', 'cat', 'ferret']);
@@ -567,17 +498,11 @@ module.exports = {
     e.message.should.eql('Invalid sort clause: [a,1]');
   },
 
-  'test Query#asc and Query#desc': function () {
-    var query = new Query();
-    query.asc('a', 'z').desc('c', 'v').asc('b');
-    query.options.sort.should.eql([['a', 1], ['z', 1], ['c', -1], ['v', -1], ['b', 1]]);
-  },
-
   'Query#or': function () {
     var query = new Query;
     query.find({ $or: [{x:1},{x:2}] });
     query._conditions.$or.length.should.equal(2);
-    query.$or([{y:"We're under attack"}, {z:47}]);
+    query.or([{y:"We're under attack"}, {z:47}]);
     query._conditions.$or.length.should.equal(4);
     query._conditions.$or[3].z.should.equal(47);
     query.or({z:"phew"});
@@ -852,17 +777,14 @@ module.exports = {
   },
 
   'test Query#hint': function () {
-    var query = new Query();
-    query.hint('indexAttributeA', 1, 'indexAttributeB', -1);
-    query.options.hint.should.eql({'indexAttributeA': 1, 'indexAttributeB': -1});
-
     var query2 = new Query();
     query2.hint({'indexAttributeA': 1, 'indexAttributeB': -1});
     query2.options.hint.should.eql({'indexAttributeA': 1, 'indexAttributeB': -1});
 
-    var query3 = new Query();
-    query3.hint('indexAttributeA');
-    query3.options.hint.should.eql({});
+    assert.throws(function(){
+      var query3 = new Query();
+      query3.hint('indexAttributeA');
+    }, /Invalid hint/);
   },
 
   'test Query#snapshot': function () {
@@ -885,7 +807,7 @@ module.exports = {
     q.setOptions({ limit: 4 });
     q.setOptions({ skip: 3 });
     q.setOptions({ sort: ['blah', -1] });
-    q.setOptions({ asc: 'ascending' });
+    q.setOptions({ sort: {'woot': -1} });
     q.setOptions({ hint: { index1: 1, index2: -1 }});
 
     q.options.thing.should.equal('cat');
@@ -896,8 +818,8 @@ module.exports = {
     q.options.sort.length.should.eql(2);
     q.options.sort[0][0].should.equal('blah');
     q.options.sort[0][1].should.equal(-1);
-    q.options.sort[1][0].should.equal('ascending');
-    q.options.sort[1][1].should.equal(1);
+    q.options.sort[1][0].should.equal('woot');
+    q.options.sort[1][1].should.equal(-1);
     q.options.hint.index1.should.equal(1);
     q.options.hint.index2.should.equal(-1);
 
@@ -909,7 +831,7 @@ module.exports = {
 
       should.strictEqual(null, err);
 
-      Product.find().setOptions({ limit: 1, desc: '_id' }).exec(function (err, docs) {
+      Product.find().setOptions({ limit: 1, sort: {_id: -1} }).exec(function (err, docs) {
         db.close();
         should.strictEqual(null, err);
         docs.length.should.equal(1);
@@ -923,21 +845,4 @@ module.exports = {
     ;(!!q._castUpdate({})).should.be.false;
   }
 
-  //  TODO
-//  'test Query#min': function () {
-//    var query = new Query();
-//    query.min(10);
-//    query.options.min.should.equal(10);
-//  },
-//
-  //TODO
-//  'test Query#max': function () {
-//    var query = new Query();
-//    query.max(100);
-//    query.options.max.should.equal(100);
-//  },
-
-  // TODO
-//  'test Query#explain': function () {
-//  }
 };

@@ -134,7 +134,7 @@ function assignExports () { var o = {
       , finished = 0
       , i = 0
 
-    var stream = P.where('name').$exists().limit(10).only('_id').stream();
+    var stream = P.where('name').exists().limit(10).select('_id').stream();
 
     should.strictEqual(null, stream._destroyed);
     stream.readable.should.be.true;

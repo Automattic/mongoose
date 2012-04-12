@@ -107,7 +107,7 @@ module.exports = {
       , query;
 
     // Model.findOneAndRemove
-    query = M.findOneAndRemove({ author: 'aaron' }, { fields: 'author' });
+    query = M.findOneAndRemove({ author: 'aaron' }, { select: 'author' });
     should.strictEqual(1, query._fields.author);
     should.strictEqual('aaron', query._conditions.author);
 
@@ -126,7 +126,7 @@ module.exports = {
     should.equal(now, query._conditions.date);
     should.strictEqual('aaron', query._conditions.author);
 
-    query = M.find().findOneAndRemove({ author: 'aaron' }, { fields: 'author' });
+    query = M.find().findOneAndRemove({ author: 'aaron' }, { select: 'author' });
     should.strictEqual(1, query._fields.author);
     should.strictEqual('aaron', query._conditions.author);
 
@@ -140,9 +140,9 @@ module.exports = {
       , M = db.model(modelname, collection + random())
       , pending = 5
 
-    M.findOneAndRemove({ name: 'aaron1' }, { fields: 'name' }, done);
+    M.findOneAndRemove({ name: 'aaron1' }, { select: 'name' }, done);
     M.findOneAndRemove({ name: 'aaron1' }, done);
-    M.where().findOneAndRemove({ name: 'aaron1' }, { fields: 'name' }, done);
+    M.where().findOneAndRemove({ name: 'aaron1' }, { select: 'name' }, done);
     M.where().findOneAndRemove({ name: 'aaron1' }, done);
     M.where('name', 'aaron1').findOneAndRemove(done);
 
@@ -192,7 +192,7 @@ module.exports = {
       , _id = new DocumentObjectId
       , pending = 2
 
-    M.findByIdAndRemove(_id, { fields: 'name' }, done);
+    M.findByIdAndRemove(_id, { select: 'name' }, done);
     M.findByIdAndRemove(_id, done);
 
     function done (err, doc) {
@@ -234,7 +234,7 @@ module.exports = {
       , query;
 
     // Model.findByIdAndRemove
-    query = M.findByIdAndRemove(_id, { fields: 'author' });
+    query = M.findByIdAndRemove(_id, { select: 'author' });
     should.strictEqual(1, query._fields.author);
     should.strictEqual(_id.toString(), query._conditions._id.toString());
 

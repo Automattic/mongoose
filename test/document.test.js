@@ -216,6 +216,7 @@ module.exports = {
     doc.init({
         test    : 'test'
       , oids    : []
+      , em: [{title:'asdf'}]
       , nested  : {
             age   : 5
           , cool  : DocumentObjectId.fromString('4c6c2d6240ced95d0e00003c')
@@ -249,6 +250,51 @@ module.exports = {
     DocumentObjectId.toString(clone.nested.cool).should.eql('4c6c2d6240ced95d0e00003c');
     clone.nested.path.should.eql('5my path');
     clone.nested.agePlus2.should.eql(7);
+
+    // test toObject options
+    doc.schema.options.toObject = { virtuals: true };
+    clone = doc.toObject();
+    clone.test.should.eql('test');
+    clone.oids.should.be.an.instanceof(Array);
+    (clone.nested.age == 5).should.be.true;
+    DocumentObjectId.toString(clone.nested.cool).should.eql('4c6c2d6240ced95d0e00003c');
+    clone.nested.path.should.eql('my path');
+    clone.nested.agePlus2.should.eql(7);
+    clone.em[0].title.should.equal('asdf');
+    delete doc.schema.options.toObject;
+  },
+
+  'toJSON options': function () {
+    var doc = new TestDocument();
+
+    doc.init({
+        test    : 'test'
+      , oids    : []
+      , em: [{title:'asdf'}]
+      , nested  : {
+            age   : 5
+          , cool  : DocumentObjectId.fromString('4c6c2d6240ced95d0e00003c')
+          , path  : 'my path'
+        }
+    });
+
+    // override to check if toJSON gets fired
+    var path = TestDocument.prototype.schema.path('em');
+    path.casterConstructor.prototype.toJSON = function () {
+      return {};
+    }
+
+    doc.schema.options.toJSON = { virtuals: true };
+    var clone = doc.toJSON();
+    clone.test.should.eql('test');
+    clone.oids.should.be.an.instanceof(Array);
+    (clone.nested.age == 5).should.be.true;
+    DocumentObjectId.toString(clone.nested.cool).should.eql('4c6c2d6240ced95d0e00003c');
+    clone.nested.path.should.eql('my path');
+    clone.nested.agePlus2.should.eql(7);
+    clone.em[0].should.eql({});
+    delete doc.schema.options.toJSON;
+    delete path.casterConstructor.prototype.toJSON;
   },
 
   'test hooks system': function(beforeExit){

@@ -2349,7 +2349,7 @@ module.exports = {
       S.find({ _id: s._id }).exec(done);
     });
   },
-  
+
   'query with lean doc option - find' : function()  {
     var db = start()
     , BlogPostB = db.model('BlogPostB', collection)
@@ -2357,18 +2357,18 @@ module.exports = {
 
     var post = new BlogPostB();
     post.set('title', title);
-  
+
     post.save(function (err) {
       should.strictEqual(null, err);
       BlogPostB.find({title : title}, null, { lean : true }, function(err, docs){
         should.strictEqual(null, err);
         should.equal(docs.length, 1);
         should.strictEqual(docs[0] instanceof mongoose.Document, false);
-        db.close();  
+        db.close();
       });
     });
   },
-  
+
   'query with lean doc option - findOne' : function()  {
     var db = start()
     , BlogPostB = db.model('BlogPostB', collection)
@@ -2376,18 +2376,18 @@ module.exports = {
 
     var post = new BlogPostB();
     post.set('title', title);
-  
+
     post.save(function (err) {
       should.strictEqual(null, err);
       BlogPostB.findOne({title : title}, null, { lean : true }, function(err, doc){
         should.strictEqual(null, err);
         doc.should.not.be.equal(undefined);
         should.strictEqual(doc instanceof mongoose.Document, false);
-        db.close();  
+        db.close();
       });
     });
   },
-  
+
   'query with lean doc option - find each' : function()  {
     var db = start()
     , BlogPostB = db.model('BlogPostB', collection)
@@ -2395,7 +2395,7 @@ module.exports = {
 
     var post = new BlogPostB();
     post.set('title', title);
-  
+
     post.save(function (err) {
       should.strictEqual(null, err);
       var found = 0;
@@ -2408,9 +2408,24 @@ module.exports = {
             found++
           }  else {
             should.strictEqual(found, 1);
-            db.close();  
+            db.close();
           }
       });
+    });
+  },
+
+  'regex with options': function () {
+    var db = start()
+      , B = db.model('BlogPostB', collection)
+
+    var post = new B({ title: '$option queries' });
+    post.save(function (err) {
+      should.strictEqual(null, err);
+      B.findOne({ title: { $regex: ' QUERIES$', $options: 'i' }}, function (err, doc) {
+        db.close();
+        should.strictEqual(null, err, err && err.stack);
+        doc.id.should.eql(post.id);
+      })
     });
   }
 };

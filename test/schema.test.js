@@ -793,14 +793,18 @@ module.exports = {
     var Tobi = new Schema({
         name: { type: String, index: true }
       , last: { type: Number, sparse: true }
+      , nope: { type: String, index: { background: false }}
     });
 
     Tobi.index({ firstname: 1, last: 1 }, { unique: true });
+    Tobi.index({ firstname: 1, nope: 1 }, { unique: true, background: false });
 
     Tobi.indexes.should.eql([
-        [{ name: 1 }, {}]
-      , [{ last: 1 }, { sparse: true }]
-      , [{ firstname: 1, last: 1}, {unique: true}]
+        [{ name: 1 }, { background: true }]
+      , [{ last: 1 }, { sparse: true, background :true }]
+      , [{ nope: 1 }, { background : false}]
+      , [{ firstname: 1, last: 1}, {unique: true, background: true }]
+      , [{ firstname: 1, nope: 1 }, { unique: true, background: false }]
     ]);
   },
 

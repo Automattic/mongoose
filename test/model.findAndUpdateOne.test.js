@@ -355,7 +355,7 @@ module.exports = {
 
   'findOneAndUpdate updates numbers atomically': function () {
     var db = start()
-      , BlogPost = db.model('BlogPost', collection)
+      , BlogPost = db.model(modelname, collection)
       , totalDocs = 4
       , saveQueue = [];
 
@@ -385,7 +385,7 @@ module.exports = {
 
   'Model.findOneAndUpdate should honor strict schemas': function () {
     var db = start();
-    var S = db.model('UpdateStrictSchema');
+    var S = db.model('UpdateOneStrictSchema');
     var s = new S({ name: 'orange crush' });
 
     s.save(function (err) {

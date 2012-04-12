@@ -553,6 +553,18 @@ module.exports = {
     var query = new Query();
     query.sort('a', 1, 'c', -1, 'b', 1);
     query.options.sort.should.eql([['a', 1], ['c', -1], ['b', 1]]);
+    query = new Query();
+    query.sort({'a': 1, 'c': -1, 'b': 'asc', e: 'descending', f: 'ascending'});
+    query.options.sort.should.eql([['a', 1], ['c', -1], ['b', 'asc'], ['e', 'descending'], ['f', 'ascending']]);
+    query = new Query();
+    var e;
+    try {
+      query.sort(['a', 1]);
+    } catch (err) {
+      e= err;
+    }
+    should.exist(e, 'uh oh. no error was thrown');
+    e.message.should.eql('Invalid sort clause: [a,1]');
   },
 
   'test Query#asc and Query#desc': function () {

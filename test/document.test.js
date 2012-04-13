@@ -854,6 +854,16 @@ module.exports = {
     doc.isSelected('em.body').should.be.true;
     doc.isSelected('em.nonpath').should.be.true;
 
+    var selection = {
+        '_id': 1
+    }
+
+    doc = new TestDocument(undefined, selection);
+    doc.init({ _id: 'test' });
+
+    doc.isSelected('_id').should.be.true;
+    doc.isSelected('test').should.be.false;
+
     doc = new TestDocument({ test: 'boom' }, true);
     doc.isSelected('_id').should.be.true;
     doc.isSelected('test').should.be.true;
@@ -900,8 +910,15 @@ module.exports = {
               invalid.should.be.true;
               t.req = 'it works again'
               t.save(function (err) {
-                db.close();
                 should.strictEqual(null, err);
+
+                T.findById(t).select('_id').exec(function (err, t) {
+                  should.strictEqual(null, err);
+                  t.save(function (err) {
+                    db.close();
+                    should.strictEqual(null, err);
+                  });
+                });
               });
             });
           });

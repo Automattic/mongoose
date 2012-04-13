@@ -1,3 +1,10 @@
+2.5.14 / 2012-04-13
+===================
+
+  * fixed; setting an unset default value (#742)
+  * fixed; doc.isSelected() when only _id is selected (#730)
+  * updated; docs
+
 2.5.13 / 2012-03-22
 ===================
 

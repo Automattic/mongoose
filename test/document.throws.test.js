@@ -13,7 +13,7 @@ exports['test document throws mode fails with extra fields'] = function () {
   // Simple schema with throws option
   var FooSchema = new mongoose.Schema({
       name: { type: String }
-  }, {throws: true});
+  }, {strict: "throws"});
 
   // Create the model
   var Foo = db.model('Foo', FooSchema);

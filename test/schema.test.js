@@ -82,6 +82,51 @@ module.exports = {
     should.strictEqual(Ferret.path('unexistent'), undefined);
 
     Checkin.path('date').should.be.an.instanceof(SchemaTypes.Date);
+
+    // check strings
+    var Checkin1 = new Schema({
+        date      : 'date'
+      , location  : {
+            lat: 'number'
+          , lng: 'Number'
+        }
+    });
+
+    Checkin1.path('date').should.be.an.instanceof(SchemaTypes.Date);
+    Checkin1.path('location.lat').should.be.an.instanceof(SchemaTypes.Number);
+    Checkin1.path('location.lng').should.be.an.instanceof(SchemaTypes.Number);
+
+    var Ferret1 = new Schema({
+        name      : "string"
+      , owner     : "oid"
+      , fur       : { type: "string" }
+      , color     : { type: "String" }
+      , checkins  : [Checkin]
+      , friends   : Array
+      , likes     : "array"
+      , alive     : "Bool"
+      , alive1    : "bool"
+      , alive2    : "boolean"
+      , extra     : "mixed"
+      , obj       : "object"
+      , buf       : "buffer"
+      , Buf       : "Buffer"
+    });
+
+    Ferret1.path('name').should.be.an.instanceof(SchemaTypes.String);
+    Ferret1.path('owner').should.be.an.instanceof(SchemaTypes.ObjectId);
+    Ferret1.path('fur').should.be.an.instanceof(SchemaTypes.String);
+    Ferret1.path('color').should.be.an.instanceof(SchemaTypes.String);
+    Ferret1.path('checkins').should.be.an.instanceof(SchemaTypes.DocumentArray);
+    Ferret1.path('friends').should.be.an.instanceof(SchemaTypes.Array);
+    Ferret1.path('likes').should.be.an.instanceof(SchemaTypes.Array);
+    Ferret1.path('alive').should.be.an.instanceof(SchemaTypes.Boolean);
+    Ferret1.path('alive1').should.be.an.instanceof(SchemaTypes.Boolean);
+    Ferret1.path('alive2').should.be.an.instanceof(SchemaTypes.Boolean);
+    Ferret1.path('extra').should.be.an.instanceof(SchemaTypes.Mixed);
+    Ferret1.path('obj').should.be.an.instanceof(SchemaTypes.Mixed);
+    Ferret1.path('buf').should.be.an.instanceof(SchemaTypes.Buffer);
+    Ferret1.path('Buf').should.be.an.instanceof(SchemaTypes.Buffer);
   },
 
   'dot notation support for accessing paths': function(){
@@ -793,14 +838,18 @@ module.exports = {
     var Tobi = new Schema({
         name: { type: String, index: true }
       , last: { type: Number, sparse: true }
+      , nope: { type: String, index: { background: false }}
     });
 
     Tobi.index({ firstname: 1, last: 1 }, { unique: true });
+    Tobi.index({ firstname: 1, nope: 1 }, { unique: true, background: false });
 
     Tobi.indexes.should.eql([
-        [{ name: 1 }, {}]
-      , [{ last: 1 }, { sparse: true }]
-      , [{ firstname: 1, last: 1}, {unique: true}]
+        [{ name: 1 }, { background: true }]
+      , [{ last: 1 }, { sparse: true, background :true }]
+      , [{ nope: 1 }, { background : false}]
+      , [{ firstname: 1, last: 1}, {unique: true, background: true }]
+      , [{ firstname: 1, nope: 1 }, { unique: true, background: false }]
     ]);
   },
 

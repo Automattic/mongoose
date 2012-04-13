@@ -553,6 +553,18 @@ module.exports = {
     var query = new Query();
     query.sort('a', 1, 'c', -1, 'b', 1);
     query.options.sort.should.eql([['a', 1], ['c', -1], ['b', 1]]);
+    query = new Query();
+    query.sort({'a': 1, 'c': -1, 'b': 'asc', e: 'descending', f: 'ascending'});
+    query.options.sort.should.eql([['a', 1], ['c', -1], ['b', 'asc'], ['e', 'descending'], ['f', 'ascending']]);
+    query = new Query();
+    var e;
+    try {
+      query.sort(['a', 1]);
+    } catch (err) {
+      e= err;
+    }
+    should.exist(e, 'uh oh. no error was thrown');
+    e.message.should.eql('Invalid sort clause: [a,1]');
   },
 
   'test Query#asc and Query#desc': function () {
@@ -877,7 +889,7 @@ module.exports = {
     q.setOptions({ hint: { index1: 1, index2: -1 }});
 
     q.options.thing.should.equal('cat');
-    q.options.populate.fans.should.eql({ fields: undefined, conditions: undefined, options: undefined });
+    q.options.populate.fans.should.eql({ fields: undefined, conditions: undefined, options: undefined, model: undefined });
     q.options.batchSize.should.eql(10);
     q.options.limit.should.eql(4);
     q.options.skip.should.eql(3);

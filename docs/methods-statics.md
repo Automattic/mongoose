@@ -13,7 +13,7 @@ Methods are easy to define:
     });
 
     AnimalSchema.methods.findSimilarType = function findSimilarType (cb) {
-      return this.find({ type: this.type }, cb);
+      return this.model('Animal').find({ type: this.type }, cb);
     };
 
 Now when we have an instance of `Animal` we can call our `findSimilarType` method and find all animals with a matching `type`.

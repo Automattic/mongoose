@@ -237,6 +237,48 @@ module.exports = {
     db.host.should.equal('127.0.0.1');
     db.port.should.equal(27017);
     db.close();
+
+    // Test connecting using user/pass in hostname
+    db = mongoose.createConnection('aaron:psw@localhost', 'fake', 27000);
+    db.options.should.be.a('object');
+    db.options.server.should.be.a('object');
+    db.options.server.auto_reconnect.should.be.true;
+    db.options.db.should.be.a('object');
+    db.options.db.forceServerObjectId.should.be.false;
+    should.strictEqual('psw', db.pass);
+    should.strictEqual('aaron', db.user);
+    db.name.should.equal('fake');
+    db.host.should.equal('localhost');
+    db.port.should.equal(27000);
+    db.close();
+
+    // Test connecting using user/pass options
+    db = mongoose.createConnection('localhost', 'fake', 27000, {user: 'aaron', pass: 'psw'});
+    db.options.should.be.a('object');
+    db.options.server.should.be.a('object');
+    db.options.server.auto_reconnect.should.be.true;
+    db.options.db.should.be.a('object');
+    db.options.db.forceServerObjectId.should.be.false;
+    should.strictEqual('psw', db.pass);
+    should.strictEqual('aaron', db.user);
+    db.name.should.equal('fake');
+    db.host.should.equal('localhost');
+    db.port.should.equal(27000);
+    db.close();
+
+    // Test connecting using only user option - which shouldn't work
+    db = mongoose.createConnection('localhost', 'fake', 27000, {user: 'no_pass'});
+    db.options.should.be.a('object');
+    db.options.server.should.be.a('object');
+    db.options.server.auto_reconnect.should.be.true;
+    db.options.db.should.be.a('object');
+    db.options.db.forceServerObjectId.should.be.false;
+    should.strictEqual(undefined, db.pass);
+    should.strictEqual(undefined, db.user);
+    db.name.should.equal('fake');
+    db.host.should.equal('localhost');
+    db.port.should.equal(27000);
+    db.close();
   },
 
   'connection.model allows passing a schema': function () {
@@ -251,6 +293,18 @@ module.exports = {
     var m = new MyModel({name:'aaron'});
     m.name.should.eql('aaron');
     db.close();
+  },
+
+  'connection error event fires with one listener': function (exit) {
+    var db= start({ uri: 'mongodb://localasdfads/fakeeee'})
+      , called = false;
+    db.on('error', function () {
+      // this callback has no params which triggered the bug #759
+      called = true;
+    });
+    exit(function () {
+      called.should.be.true;
+    });
   }
 
 };

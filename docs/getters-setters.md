@@ -43,9 +43,12 @@ Suppose you are storing credit card numbers and you want to hide everything exce
 
     var Account = mongoose.model('Account', AccountSchema);
 
-    Account.findById( someId, function (err, found) {
+    Account.findById(someId, function (err, found) {
       console.log(found.creditCardNumber); // '****-****-****-1234'
     });
+
+
+**Important!** Getters/Setters are not invoked in calls to `Model.update()`.
 
 ## Summary
 

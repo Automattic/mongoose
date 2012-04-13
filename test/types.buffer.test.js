@@ -342,7 +342,7 @@ module.exports = {
     function reset (model) {
       // internal
       model._activePaths.clear('modify');
-      model.schema.requiredPaths.forEach(function (path) {
+      model.schema.requiredPaths().forEach(function (path) {
         model._activePaths.require(path);
       });
     }

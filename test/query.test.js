@@ -553,6 +553,18 @@ module.exports = {
     var query = new Query();
     query.sort('a', 1, 'c', -1, 'b', 1);
     query.options.sort.should.eql([['a', 1], ['c', -1], ['b', 1]]);
+    query = new Query();
+    query.sort({'a': 1, 'c': -1, 'b': 'asc', e: 'descending', f: 'ascending'});
+    query.options.sort.should.eql([['a', 1], ['c', -1], ['b', 'asc'], ['e', 'descending'], ['f', 'ascending']]);
+    query = new Query();
+    var e;
+    try {
+      query.sort(['a', 1]);
+    } catch (err) {
+      e= err;
+    }
+    should.exist(e, 'uh oh. no error was thrown');
+    e.message.should.eql('Invalid sort clause: [a,1]');
   },
 
   'test Query#asc and Query#desc': function () {
@@ -818,6 +830,20 @@ module.exports = {
     query.options.slaveOk.should.be.false;
   },
 
+  'test Query#tailable': function () {
+    var query = new Query();
+    query.tailable();
+    query.options.tailable.should.be.true;
+
+    var query = new Query();
+    query.tailable(true);
+    query.options.tailable.should.be.true;
+
+    var query = new Query();
+    query.tailable(false);
+    query.options.tailable.should.be.false;
+  },
+
   'Query#comment': function () {
     var query = new Query;
     'function'.should.equal(typeof query.comment);
@@ -849,6 +875,47 @@ module.exports = {
     var query = new Query();
     query.batchSize(10);
     query.options.batchSize.should.equal(10);
+  },
+
+  'Query#setOptions': function () {
+    var q = new Query;
+    q.setOptions({ thing: "cat" });
+    q.setOptions({ populate: ['fans'] });
+    q.setOptions({ batchSize: 10 });
+    q.setOptions({ limit: 4 });
+    q.setOptions({ skip: 3 });
+    q.setOptions({ sort: ['blah', -1] });
+    q.setOptions({ asc: 'ascending' });
+    q.setOptions({ hint: { index1: 1, index2: -1 }});
+
+    q.options.thing.should.equal('cat');
+    q.options.populate.fans.should.eql({ fields: undefined, conditions: undefined, options: undefined, model: undefined });
+    q.options.batchSize.should.eql(10);
+    q.options.limit.should.eql(4);
+    q.options.skip.should.eql(3);
+    q.options.sort.length.should.eql(2);
+    q.options.sort[0][0].should.equal('blah');
+    q.options.sort[0][1].should.equal(-1);
+    q.options.sort[1][0].should.equal('ascending');
+    q.options.sort[1][1].should.equal(1);
+    q.options.hint.index1.should.equal(1);
+    q.options.hint.index2.should.equal(-1);
+
+    var db = start();
+    var Product = db.model('Product', 'Product_setOptions_test');
+    Product.create(
+        { numbers: [3,4,5] }
+      , { strings: 'hi there'.split(' ') } , function (err, doc1, doc2) {
+
+      should.strictEqual(null, err);
+
+      Product.find().setOptions({ limit: 1, desc: '_id' }).exec(function (err, docs) {
+        db.close();
+        should.strictEqual(null, err);
+        docs.length.should.equal(1);
+        docs[0].id.should.equal(doc2.id);
+      });
+    });
   },
 
   'empty updates are not run': function () {

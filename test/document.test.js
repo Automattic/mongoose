@@ -216,6 +216,7 @@ module.exports = {
     doc.init({
         test    : 'test'
       , oids    : []
+      , em: [{title:'asdf'}]
       , nested  : {
             age   : 5
           , cool  : DocumentObjectId.fromString('4c6c2d6240ced95d0e00003c')
@@ -249,6 +250,51 @@ module.exports = {
     DocumentObjectId.toString(clone.nested.cool).should.eql('4c6c2d6240ced95d0e00003c');
     clone.nested.path.should.eql('5my path');
     clone.nested.agePlus2.should.eql(7);
+
+    // test toObject options
+    doc.schema.options.toObject = { virtuals: true };
+    clone = doc.toObject();
+    clone.test.should.eql('test');
+    clone.oids.should.be.an.instanceof(Array);
+    (clone.nested.age == 5).should.be.true;
+    DocumentObjectId.toString(clone.nested.cool).should.eql('4c6c2d6240ced95d0e00003c');
+    clone.nested.path.should.eql('my path');
+    clone.nested.agePlus2.should.eql(7);
+    clone.em[0].title.should.equal('asdf');
+    delete doc.schema.options.toObject;
+  },
+
+  'toJSON options': function () {
+    var doc = new TestDocument();
+
+    doc.init({
+        test    : 'test'
+      , oids    : []
+      , em: [{title:'asdf'}]
+      , nested  : {
+            age   : 5
+          , cool  : DocumentObjectId.fromString('4c6c2d6240ced95d0e00003c')
+          , path  : 'my path'
+        }
+    });
+
+    // override to check if toJSON gets fired
+    var path = TestDocument.prototype.schema.path('em');
+    path.casterConstructor.prototype.toJSON = function () {
+      return {};
+    }
+
+    doc.schema.options.toJSON = { virtuals: true };
+    var clone = doc.toJSON();
+    clone.test.should.eql('test');
+    clone.oids.should.be.an.instanceof(Array);
+    (clone.nested.age == 5).should.be.true;
+    DocumentObjectId.toString(clone.nested.cool).should.eql('4c6c2d6240ced95d0e00003c');
+    clone.nested.path.should.eql('my path');
+    clone.nested.agePlus2.should.eql(7);
+    clone.em[0].should.eql({});
+    delete doc.schema.options.toJSON;
+    delete path.casterConstructor.prototype.toJSON;
   },
 
   'test hooks system': function(beforeExit){
@@ -579,6 +625,32 @@ module.exports = {
     obj._id.should.eql(oidString);
   },
 
+  // gh-794
+  'calling update on document should relay to its model': function (beforeExit) {
+    var db = start();
+    var Docs = new Schema({text:String});
+    var docs = db.model('docRelayUpdate', Docs);
+    var d = new docs({text:'A doc'});
+    var called = false;
+    d.save(function () {
+      var oldUpdate = docs.update;
+      docs.update = function (query, operation) {
+        query.should.eql({_id: d._id});
+        operation.should.eql({$set: {text:'A changed doc'}});
+        called = true;
+        docs.update = oldUpdate;
+        oldUpdate.apply(docs, arguments);
+      };
+      d.update({$set :{text: 'A changed doc'}}, function (err) {
+        should.not.exist(err);
+        db.close();
+      });
+    });
+    beforeExit(function () {
+      called.should.be.true;
+    });
+  },
+
   'toObject should not set undefined values to null': function () {
     var doc = new TestDocument()
       , obj = doc.toObject();
@@ -874,5 +946,39 @@ module.exports = {
     doc.isSelected('em.title').should.be.true;
     doc.isSelected('em.body').should.be.true;
     doc.isSelected('em.nonpath').should.be.true;
+  },
+
+  'unselected required fields should pass validation': function () {
+    var db = start()
+      , Tschema = new Schema({ name: String, req: { type: String, required: true }})
+      , T = db.model('unselectedRequiredFieldValidation', Tschema);
+
+    var t = new T({ name: 'teeee', req: 'i am required' });
+    t.save(function (err) {
+      should.strictEqual(null, err);
+      T.findById(t).select('name').exec(function (err, t) {
+        should.strictEqual(null, err);
+        should.strictEqual(undefined, t.req);
+        t.name = 'wooo';
+        t.save(function (err) {
+          should.strictEqual(null, err);
+
+          T.findById(t).select('name').exec(function (err, t) {
+            should.strictEqual(null, err);
+            t.req = undefined;
+            t.save(function (err) {
+              err = String(err);
+              var invalid  = /Validator "required" failed for path req/.test(err);
+              invalid.should.be.true;
+              t.req = 'it works again'
+              t.save(function (err) {
+                db.close();
+                should.strictEqual(null, err);
+              });
+            });
+          });
+        });
+      });
+    });
   }
 };

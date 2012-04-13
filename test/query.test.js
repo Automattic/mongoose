@@ -784,7 +784,7 @@ module.exports = {
     assert.throws(function(){
       var query3 = new Query();
       query3.hint('indexAttributeA');
-    }, /Invalid hint/);
+    }, /Invalid hint./);
   },
 
   'test Query#snapshot': function () {

@@ -7,13 +7,13 @@ var start = require('./common')
   , mongoose = start.mongoose
   , should = require('should')
 
-exports['test document really strict mode fails with extra fields'] = function () {
+exports['test document throws mode fails with extra fields'] = function () {
   var db = mongoose.createConnection("mongodb://localhost/test-crash");
 
-  // Simple schema that is srsly strict
+  // Simple schema with throws option
   var FooSchema = new mongoose.Schema({
       name: { type: String }
-  }, {srslyStrict: true});
+  }, {throws: true});
 
   // Create the model
   var Foo = db.model('Foo', FooSchema);
@@ -24,7 +24,7 @@ exports['test document really strict mode fails with extra fields'] = function (
   try {
     // The extra baz field should throw and error.
     var bad = new Foo({name: 'bar', baz: 'bam'});
-    throw new Error("Srsly strict document did not fail!");
+    throw new Error("Document did not throw with extra fields.");
   } catch (e) {
     db.close();
     // Make sure the error is the one we are expecting.

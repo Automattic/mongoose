@@ -2180,5 +2180,252 @@ module.exports = {
         });
       });
     });
+  },
+
+  'excluding paths by schematype': function () {
+    var db =start()
+
+    var schema = new Schema({
+        thin: Boolean
+      , name: { type: String, select: false }
+    });
+
+    var S = db.model('ExcludingBySchemaType', schema);
+    S.create({ thin: true, name: 'the excluded' },function (err, s) {
+      should.strictEqual(null, err);
+      s.name.should.equal('the excluded');
+      S.findById(s, function (err, s) {
+        db.close();
+        should.strictEqual(null, err);
+        s.isSelected('name').should.be.false;
+        should.strictEqual(undefined, s.name);
+      });
+    });
+  },
+
+  'excluding paths through schematype': function () {
+    var db =start()
+
+    var schema = new Schema({
+        thin: Boolean
+      , name: { type: String, select: false}
+    });
+
+    var S = db.model('ExcludingBySchemaType', schema);
+    S.create({ thin: true, name: 'the excluded' },function (err, s) {
+      should.strictEqual(null, err);
+      s.name.should.equal('the excluded');
+
+      var pending = 2;
+      function done (err, s) {
+        --pending || db.close();
+        if (Array.isArray(s)) s = s[0];
+        should.strictEqual(null, err);
+        s.isSelected('name').should.be.false;
+        should.strictEqual(undefined, s.name);
+      }
+
+      S.findById(s).exclude('thin').exec(done);
+      S.find({ _id: s._id }).select('thin').exec(done);
+    });
+  },
+
+  'including paths through schematype': function () {
+    var db =start()
+
+    var schema = new Schema({
+        thin: Boolean
+      , name: { type: String, select: true }
+    });
+
+    var S = db.model('IncludingBySchemaType', schema);
+    S.create({ thin: true, name: 'the included' },function (err, s) {
+      should.strictEqual(null, err);
+      s.name.should.equal('the included');
+
+      var pending = 2;
+      function done (err, s) {
+        --pending || db.close();
+        if (Array.isArray(s)) s = s[0];
+        should.strictEqual(null, err);
+        s.isSelected('name').should.be.true;
+        s.name.should.equal('the included');
+      }
+
+      S.findById(s).exclude('thin').exec(done);
+      S.find({ _id: s._id }).select('thin').exec(done);
+    });
+  },
+
+  'overriding schematype select options': function () {
+    var db =start()
+
+    var selected = new Schema({
+        thin: Boolean
+      , name: { type: String, select: true }
+    });
+    var excluded = new Schema({
+        thin: Boolean
+      , name: { type: String, select: false }
+    });
+
+    var S = db.model('OverriddingSelectedBySchemaType', selected);
+    var E = db.model('OverriddingExcludedBySchemaType', excluded);
+
+    var pending = 4;
+
+    S.create({ thin: true, name: 'the included' },function (err, s) {
+      should.strictEqual(null, err);
+      s.name.should.equal('the included');
+
+      S.find({ _id: s._id }).select('thin name').exec(function (err, s) {
+        --pending || db.close();
+        s = s[0];
+        should.strictEqual(null, err);
+        s.isSelected('name').should.be.true;
+        s.isSelected('thin').should.be.true;
+        s.name.should.equal('the included');
+        s.thin.should.be.true;
+      });
+
+      S.findById(s).exclude('name').exec(function (err, s) {
+        --pending || db.close();
+        should.strictEqual(null, err);
+        s.isSelected('name').should.be.false;
+        s.isSelected('thin').should.be.true;
+        should.equal(undefined, s.name);
+        should.equal(true, s.thin);
+      })
+    });
+
+    E.create({ thin: true, name: 'the excluded' },function (err, e) {
+      should.strictEqual(null, err);
+      e.name.should.equal('the excluded');
+
+      E.find({ _id: e._id }).select('thin name').exec(function (err, e) {
+        --pending || db.close();
+        e = e[0];
+        should.strictEqual(null, err);
+        e.isSelected('name').should.be.true;
+        e.isSelected('thin').should.be.true;
+        e.name.should.equal('the excluded');
+        e.thin.should.be.true;
+      });
+
+      E.findById(e).exclude('name').exec(function (err, e) {
+        --pending || db.close();
+        should.strictEqual(null, err);
+        e.isSelected('name').should.be.false;
+        e.isSelected('thin').should.be.true;
+        should.equal(undefined, e.name);
+        should.equal(true, e.thin);
+      })
+    });
+  },
+
+  'conflicting schematype path selection should error': function () {
+    var db =start()
+
+    var schema = new Schema({
+        thin: Boolean
+      , name: { type: String, select: true }
+      , conflict: { type: String, select: false}
+    });
+
+    var S = db.model('ConflictingBySchemaType', schema);
+    S.create({ thin: true, name: 'bing', conflict: 'crosby' },function (err, s) {
+      should.strictEqual(null, err);
+      s.name.should.equal('bing');
+      s.conflict.should.equal('crosby');
+
+      var pending = 2;
+      function done (err, s) {
+        --pending || db.close();
+        if (Array.isArray(s)) s = s[0];
+        should.equal(true, !!err);
+      }
+
+      S.findById(s).exec(done);
+      S.find({ _id: s._id }).exec(done);
+    });
+  },
+
+  'query with lean doc option - find' : function()  {
+    var db = start()
+    , BlogPostB = db.model('BlogPostB', collection)
+    , title = 'Wooooot ' + random();
+
+    var post = new BlogPostB();
+    post.set('title', title);
+
+    post.save(function (err) {
+      should.strictEqual(null, err);
+      BlogPostB.find({title : title}, null, { lean : true }, function(err, docs){
+        should.strictEqual(null, err);
+        should.equal(docs.length, 1);
+        should.strictEqual(docs[0] instanceof mongoose.Document, false);
+        db.close();
+      });
+    });
+  },
+
+  'query with lean doc option - findOne' : function()  {
+    var db = start()
+    , BlogPostB = db.model('BlogPostB', collection)
+    , title = 'Wooooot ' + random();
+
+    var post = new BlogPostB();
+    post.set('title', title);
+
+    post.save(function (err) {
+      should.strictEqual(null, err);
+      BlogPostB.findOne({title : title}, null, { lean : true }, function(err, doc){
+        should.strictEqual(null, err);
+        doc.should.not.be.equal(undefined);
+        should.strictEqual(doc instanceof mongoose.Document, false);
+        db.close();
+      });
+    });
+  },
+
+  'query with lean doc option - find each' : function()  {
+    var db = start()
+    , BlogPostB = db.model('BlogPostB', collection)
+    , title = 'Wooooot ' + random();
+
+    var post = new BlogPostB();
+    post.set('title', title);
+
+    post.save(function (err) {
+      should.strictEqual(null, err);
+      var found = 0;
+      BlogPostB.find({title : title}, null, { lean : true })
+        .each(function(err, doc){
+          should.strictEqual(null, err);
+          if(doc) {
+            doc.should.not.be.equal(undefined);
+            should.strictEqual(doc instanceof mongoose.Document, false);
+            found++
+          }  else {
+            should.strictEqual(found, 1);
+            db.close();
+          }
+      });
+    });
+  },
+
+  'regex with options': function () {
+    var db = start()
+      , B = db.model('BlogPostB', collection)
+
+    var post = new B({ title: '$option queries' });
+    post.save(function (err) {
+      should.strictEqual(null, err);
+      B.findOne({ title: { $regex: ' QUERIES$', $options: 'i' }}, function (err, doc) {
+        db.close();
+        should.strictEqual(null, err, err && err.stack);
+        doc.id.should.eql(post.id);
+      })
+    });
   }
 };

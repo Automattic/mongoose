@@ -17,7 +17,6 @@ var start = require('./common')
   , DocumentObjectId = mongoose.Types.ObjectId
   , DocumentArray = mongoose.Types.DocumentArray
   , EmbeddedDocument = mongoose.Types.Embedded
-  , MongooseNumber = mongoose.Types.Number
   , MongooseArray = mongoose.Types.Array
   , MongooseError = mongoose.Error;
 
@@ -485,6 +484,36 @@ module.exports = {
 
     var doc = S.find()._castUpdate({ ignore: true });
     Object.keys(doc.$set).length.should.equal(0);
+  },
+
+  'test updating numbers atomically': function () {
+    var db = start()
+      , BlogPost = db.model('BlogPost', collection)
+      , totalDocs = 4
+      , saveQueue = [];
+
+    var post = new BlogPost();
+    post.set('meta.visitors', 5);
+
+    post.save(function(err){
+      if (err) throw err;
+
+      for (var i = 0; i < 4; ++i) {
+        BlogPost
+        .update({ _id: post._id }, { $inc: { 'meta.visitors': 1 }}, function (err) {
+          if (err) throw err;
+          --totalDocs || complete();
+        });
+      }
+
+      function complete () {
+        BlogPost.findOne({ _id: post.get('_id') }, function (err, doc) {
+          db.close();
+          if (err) throw err;
+          doc.get('meta.visitors').should.equal(9);
+        });
+      };
+    });
   },
 
   'Model.update should honor strict schemas': function () {

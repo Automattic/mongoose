@@ -116,7 +116,8 @@ module.exports = {
       should.equal(null, err, 'could not save splice test');
       A.findById(a._id, function (err, doc) {
         should.equal(null, err, 'error finding splice doc');
-        doc.numbers.splice(1, 1);
+        var removed = doc.numbers.splice(1, 1);
+        removed.should.eql([5]);
         doc.numbers.toObject().should.eql([4,6,7]);
         doc.save(function (err) {
           should.equal(null, err, 'could not save splice test');
@@ -146,27 +147,25 @@ module.exports = {
       A.findById(a._id, function (err, doc) {
         should.equal(null, err, 'error finding splice doc');
 
-        doc.types.splice(1, 1);
+        doc.types.$pop();
+
+        var removed = doc.types.splice(1, 1);
+        removed.length.should.eql(1);
+        removed[0].type.should.eql('boy');
 
         var obj = doc.types.toObject();
         obj[0].type.should.eql('bird');
         obj[1].type.should.eql('frog');
-        obj[2].type.should.eql('cloud');
 
         doc.save(function (err) {
           should.equal(null, err, 'could not save splice test');
           A.findById(a._id, function (err, doc) {
+            db.close();
             should.equal(null, err, 'error finding splice doc');
 
             var obj = doc.types.toObject();
             obj[0].type.should.eql('bird');
             obj[1].type.should.eql('frog');
-            obj[2].type.should.eql('cloud');
-
-            A.collection.drop(function (err) {
-              db.close();
-              should.strictEqual(err, null);
-            });
           });
         });
       });
@@ -201,12 +200,14 @@ module.exports = {
         nlen.should.equal(4);
         slen.should.equal(4);
 
+        doc.types.push({type:'worm'});
         var obj = doc.types.toObject();
         obj[0].type.should.eql('tree');
         obj[1].type.should.eql('bird');
         obj[2].type.should.eql('boy');
         obj[3].type.should.eql('frog');
         obj[4].type.should.eql('cloud');
+        obj[5].type.should.eql('worm');
 
         obj = doc.nums.toObject();
         obj[0].valueOf().should.equal(0);
@@ -223,6 +224,7 @@ module.exports = {
         doc.save(function (err) {
           should.equal(null, err);
           A.findById(a._id, function (err, doc) {
+            db.close();
             should.equal(null, err);
 
             var obj = doc.types.toObject();
@@ -231,6 +233,7 @@ module.exports = {
             obj[2].type.should.eql('boy');
             obj[3].type.should.eql('frog');
             obj[4].type.should.eql('cloud');
+            obj[5].type.should.eql('worm');
 
             obj = doc.nums.toObject();
             obj[0].valueOf().should.equal(0);
@@ -243,11 +246,75 @@ module.exports = {
             obj[1].should.equal('one');
             obj[2].should.equal('two');
             obj[3].should.equal('three');
+          });
+        });
+      });
+    });
+  },
 
-            A.collection.drop(function (err) {
-              db.close();
-              should.strictEqual(err, null);
-            });
+  '#shift': function () {
+    var db = start()
+      , schema = new Schema({
+            types: [new Schema({ type: String })]
+          , nums: [Number]
+          , strs: [String]
+        })
+
+    var A = db.model('shift', schema, 'unshift'+random());
+
+    var a = new A({
+        types: [{type:'bird'},{type:'boy'},{type:'frog'},{type:'cloud'}]
+      , nums: [1,2,3]
+      , strs: 'one two three'.split(' ')
+    });
+
+    a.save(function (err) {
+      should.equal(null, err);
+      A.findById(a._id, function (err, doc) {
+        should.equal(null, err);
+
+        var t = doc.types.shift();
+        var n = doc.nums.shift();
+        var s = doc.strs.shift();
+
+        t.type.should.equal('bird');
+        n.should.equal(1);
+        s.should.equal('one');
+
+        var obj = doc.types.toObject();
+        obj[0].type.should.eql('boy');
+        obj[1].type.should.eql('frog');
+        obj[2].type.should.eql('cloud');
+
+        doc.nums.$push(4);
+        obj = doc.nums.toObject();
+        obj[0].valueOf().should.equal(2);
+        obj[1].valueOf().should.equal(3);
+        obj[2].valueOf().should.equal(4);
+
+        obj = doc.strs.toObject();
+        obj[0].should.equal('two');
+        obj[1].should.equal('three');
+
+        doc.save(function (err) {
+          should.equal(null, err);
+          A.findById(a._id, function (err, doc) {
+            db.close();
+            should.equal(null, err);
+
+            var obj = doc.types.toObject();
+            obj[0].type.should.eql('boy');
+            obj[1].type.should.eql('frog');
+            obj[2].type.should.eql('cloud');
+
+            obj = doc.nums.toObject();
+            obj[0].valueOf().should.equal(2);
+            obj[1].valueOf().should.equal(3);
+            obj[2].valueOf().should.equal(4);
+
+            obj = doc.strs.toObject();
+            obj[0].should.equal('two');
+            obj[1].should.equal('three');
           });
         });
       });
@@ -459,6 +526,42 @@ module.exports = {
                 m.doc.some(function(v){return v.name === 'Funk'}).should.be.ok
               });
             });
+          });
+        });
+      });
+    });
+  },
+
+  '#nonAtomicPush': function () {
+    var db = start();
+    var U = db.model('User');
+    var ID = mongoose.Types.ObjectId;
+
+    var u = new U({ name: 'banana', pets: [new ID] });
+    u.pets.length.should.equal(1);
+    u.pets.nonAtomicPush(new ID);
+    u.pets.length.should.equal(2);
+    u.save(function (err) {
+      should.strictEqual(null, err);
+      U.findById(u._id, function (err) {
+        should.strictEqual(null, err);
+        u.pets.length.should.equal(2);
+        var id0 = u.pets[0];
+        var id1 = u.pets[1];
+        var id2 = new ID;
+        u.pets.pull(id0);
+        u.pets.nonAtomicPush(id2);
+        u.pets.length.should.equal(2);
+        u.pets[0].toString().should.equal(id1.toString());
+        u.pets[1].toString().should.equal(id2.toString());
+        u.save(function (err) {
+          should.strictEqual(null, err);
+          U.findById(u._id, function (err) {
+            db.close();
+            should.strictEqual(null, err);
+            u.pets.length.should.equal(2);
+            u.pets[0].toString().should.equal(id1.toString());
+            u.pets[1].toString().should.equal(id2.toString());
           });
         });
       });

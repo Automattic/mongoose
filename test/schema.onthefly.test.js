@@ -90,8 +90,7 @@ module.exports = {
         rankingPreCast.should.eql(1);
         should.strictEqual(undefined, rankingPreCast.increment);
         var rankingPostCast = found.get('moderators', [ModeratorSchema])[0].ranking;
-        rankingPostCast.valueOf().should.equal(1);
-        rankingPostCast.increment.should.not.equal(undefined);
+        rankingPostCast.should.equal(1);
 
         var NewModeratorSchema = new Schema({ name: String, ranking: String});
         rankingPostCast = found.get('moderators', [NewModeratorSchema])[0].ranking;

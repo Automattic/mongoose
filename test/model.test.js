@@ -4678,5 +4678,44 @@ module.exports = {
         affected.should.equal(1);
       });
     });
+  },
+
+  // gh-742
+  'setting an unset default value is saved': function () {
+    var db = start();
+
+    var DefaultTestObject = db.model("defaultTestObject",
+      new Schema({
+        score:{type:Number, "default":55}
+      })
+    );
+
+    var myTest = new DefaultTestObject();
+
+    myTest.save(function (err, doc){
+      should.strictEqual(null, err);
+      should.equal(doc.score, 55);
+
+      DefaultTestObject.findById(doc._id, function (err, doc){
+        should.strictEqual(null, err);
+
+        doc.score = undefined; // unset
+        doc.save(function (err, doc, count){
+          should.strictEqual(null, err);
+
+          DefaultTestObject.findById(doc._id, function (err, doc){
+            should.strictEqual(null, err);
+
+            doc.score = 55;
+            doc.save(function (err, doc, count){
+              db.close();
+              should.strictEqual(null, err);
+              should.equal(doc.score, 55);
+              should.equal(count, 1);
+            });
+          });
+        });
+      });
+    })
   }
 };

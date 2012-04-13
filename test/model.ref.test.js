@@ -1547,8 +1547,8 @@ module.exports = {
 
         BlogPost
           .findById(post._id)
-          .populate('_creator', ['email'], 'RefAlternateUser')
-          .run(function (err, post) {
+          .populate('_creator', 'email', 'RefAlternateUser')
+          .exec(function (err, post) {
             db.close();
             should.strictEqual(err, null);
 

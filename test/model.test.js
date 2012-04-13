@@ -3245,7 +3245,7 @@ module.exports = {
     });
   },
 
-  'test count querying via #run (aka #exec)': function () {
+  'test count querying via #exec': function () {
     var db = start()
       , BlogPost = db.model('BlogPost', collection);
 
@@ -3260,7 +3260,7 @@ module.exports = {
     });
   },
 
-  'test update querying via #run (aka #exec)': function () {
+  'test update querying via #exec': function () {
     var db = start()
       , BlogPost = db.model('BlogPost', collection);
 
@@ -3278,7 +3278,7 @@ module.exports = {
     });
   },
 
-  'test findOne querying via #run (aka #exec)': function () {
+  'test findOne querying via #exec': function () {
     var db = start()
       , BlogPost = db.model('BlogPost', collection);
 
@@ -3293,7 +3293,7 @@ module.exports = {
     });
   },
 
-  'test find querying via #run (aka #exec)': function () {
+  'test find querying via #exec': function () {
     var db = start()
       , BlogPost = db.model('BlogPost', collection);
 
@@ -3313,7 +3313,7 @@ module.exports = {
     });
   },
 
-  'test remove querying via #run (aka #exec)': function () {
+  'test remove querying via #exec': function () {
     var db = start()
       , BlogPost = db.model('BlogPost', collection);
 
@@ -3348,7 +3348,7 @@ module.exports = {
     });
   },
 
-  'test count querying via #run (aka #exec) with promise': function () {
+  'test count querying via #exec with promise': function () {
     var db = start()
       , BlogPost = db.model('BlogPost', collection);
 
@@ -3364,7 +3364,7 @@ module.exports = {
     });
   },
 
-  'test update querying via #run (aka #exec) with promise': function () {
+  'test update querying via #exec with promise': function () {
     var db = start()
       , BlogPost = db.model('BlogPost', collection);
 
@@ -3383,7 +3383,7 @@ module.exports = {
     });
   },
 
-  'test findOne querying via #run (aka #exec) with promise': function () {
+  'test findOne querying via #exec with promise': function () {
     var db = start()
       , BlogPost = db.model('BlogPost', collection);
 
@@ -3399,7 +3399,7 @@ module.exports = {
     });
   },
 
-  'test find querying via #run (aka #exec) with promise': function () {
+  'test find querying via #exec with promise': function () {
     var db = start()
       , BlogPost = db.model('BlogPost', collection);
 

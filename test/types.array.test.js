@@ -647,5 +647,25 @@ module.exports = {
         });
       });
     });
+  },
+
+  'nulls are allowed in number arrays': function () {
+    var db = start();
+    var schema = new Schema({ x: [Number] }, { collection: 'nullsareallowed'+random() });
+    var M = db.model('nullsareallowed', schema);
+    var m;
+    var threw = false;
+
+    m = new M({ x: [1, null, 3] });
+    m.save(function (err) {
+      should.strictEqual(null, err);
+
+      // undefined is not allowed
+      m = new M({ x: [1, undefined, 3] });
+      m.save(function (err) {
+        db.close();
+        should.exist(err);
+      });
+    });
   }
 };

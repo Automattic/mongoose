@@ -738,6 +738,15 @@ module.exports = {
     setTimeout(db.close.bind(db), 1000);
   },
 
+  'update() and remove() work without callbacks': function () {
+    var db = start();
+    var query = new Query();
+    var Product = db.model('Product');
+    Product.find({ 'blah': 12345 }).remove();
+    Product.find({ 'blah': 12345 }).update({ $set: { blah: 123456 }});
+    setTimeout(db.close.bind(db), 1000);
+  },
+
   '#findOne should set the op when callback is passed': function () {
     var db = start();
     var query = new Query();

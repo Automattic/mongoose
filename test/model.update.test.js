@@ -72,7 +72,7 @@ mongoose.model('BlogPost', BlogPost);
 
 var collection = 'blogposts_' + random();
 
-var strictSchema = new Schema({ name: String }, { strict: true });
+var strictSchema = new Schema({ name: String, x: { nested: String }}, { strict: true });
 mongoose.model('UpdateStrictSchema', strictSchema);
 
 module.exports = {
@@ -485,6 +485,8 @@ module.exports = {
 
     var doc = S.find()._castUpdate({ ignore: true });
     Object.keys(doc.$set).length.should.equal(0);
+    var doc = S.find()._castUpdate({ $unset: {x: 1}});
+    Object.keys(doc.$unset).length.should.equal(1);
   },
 
   'Model.update should honor strict schemas': function () {

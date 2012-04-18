@@ -3,6 +3,7 @@
 
   * updated; hooks.js to 0.2.1
   * fixed; issue with passing undefined to a hook callback. thanks to [chrisleishman] for reporting.
+  * fixed; updating/setting nested objects in strict schemas (#843) as reported by [kof]
 
 2.5.14 / 2012-04-13
 ===================

@@ -1,3 +1,9 @@
+2.5.15 / 2012-04...
+===================
+
+  * updated; hooks.js to 0.2.1
+  * fixed; issue with passing undefined to a hook callback. thanks to [chrisleishman] for reporting.
+
 2.5.14 / 2012-04-13
 ===================
 

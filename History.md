@@ -1,10 +1,11 @@
-2.5.15 / 2012-04...
+2.6.0 / 2012-04-19
 ===================
 
   * updated; hooks.js to 0.2.1
   * fixed; issue with passing undefined to a hook callback. thanks to [chrisleishman] for reporting.
   * fixed; updating/setting nested objects in strict schemas (#843) as reported by [kof]
   * fixed; Query#{update,remove}() work without callbacks again (#788)
+  * fixed; modifying subdoc along with parent array $atomic op (#842)
 
 2.5.14 / 2012-04-13
 ===================

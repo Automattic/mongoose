@@ -493,13 +493,16 @@ module.exports = {
         var x = [];
         x[1] = n[2];
         x[2] = n[1];
-        d.em1 = x.filter(Boolean);
+        x = x.filter(Boolean);
+        d.em1 = x;
 
         d.save(function (err) {
           should.strictEqual(null, err);
           D.findById(d, function (err, d) {
             db.close();
             should.strictEqual(null, err);
+            d.em1[0].name.should.eql('position two');
+            d.em1[1].name.should.eql('pos1');
           });
         });
       });
@@ -543,6 +546,48 @@ module.exports = {
             d.account.roles[1].should.equal('janitor');
             d.em.length.should.equal(1);
             d.em[0].name.should.equal('frida');
+          });
+        });
+      });
+    });
+  },
+
+  // gh-842
+  'modifying sub-doc properties and manipulating the array works': function () {
+    var db= start();
+    var schema = new Schema({ em: [new Schema({ username: String })]});
+    var M = db.model('modifyingSubDocAndPushing', schema);
+    var m = new M({ em: [ { username: 'Arrietty' }]});
+
+    m.save(function (err) {
+      should.strictEqual(null, err);
+      M.findById(m, function (err, m) {
+        should.strictEqual(null, err);
+        m.em[0].username.should.eql('Arrietty');
+
+        m.em[0].username = 'Shawn';
+        m.em.push({ username: 'Homily' });
+        m.save(function (err) {
+          should.strictEqual(null, err);
+
+          M.findById(m, function (err, m) {
+            should.strictEqual(null, err);
+            m.em.length.should.equal(2);
+            m.em[0].username.should.eql('Shawn');
+            m.em[1].username.should.eql('Homily');
+
+            m.em[0].username = 'Arrietty';
+            m.em[1].remove();
+            m.save(function (err) {
+              should.strictEqual(null, err);
+
+              M.findById(m, function (err, m) {
+                db.close();
+                should.strictEqual(null, err);
+                m.em.length.should.equal(1);
+                m.em[0].username.should.eql('Arrietty');
+              });
+            });
           });
         });
       });

@@ -573,7 +573,7 @@ module.exports = {
       var b = new A({ name: 'i am new', em: [{x:2}] });
       b.save(function (err) {
         db.close();
-        assert(err);
+        assert.ok(err);
         assert.equal(b.isNew, true);
         assert.equal(b.em[0].isNew, true);
       });

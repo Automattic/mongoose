@@ -295,6 +295,13 @@ module.exports = {
     db.close();
   },
 
+  'connection.model should properly assign the db': function () {
+    var A = mongoose.model('testing853a', new Schema({x:String}), 'testing853-1');
+    var B = mongoose.model('testing853b', new Schema({x:String}), 'testing853-2');
+    var C = B.model('testing853a');
+    should.eql(C, A)
+  },
+
   'connection error event fires with one listener': function (exit) {
     var db= start({ uri: 'mongodb://localasdfads/fakeeee'})
       , called = false;

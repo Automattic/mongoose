@@ -484,7 +484,7 @@ module.exports = {
     db.close();
 
     var doc = S.find()._castUpdate({ ignore: true });
-    Object.keys(doc.$set).length.should.equal(0);
+    should.eql(false, doc)
     var doc = S.find()._castUpdate({ $unset: {x: 1}});
     Object.keys(doc.$unset).length.should.equal(1);
   },
@@ -499,7 +499,7 @@ module.exports = {
 
       S.update({ _id: s._id }, { ignore: true }, function (err, affected) {
         should.strictEqual(null, err);
-        affected.should.equal(1);
+        affected.should.equal(0);
 
         S.findById(s._id, function (err, doc) {
           db.close();

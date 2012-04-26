@@ -1273,8 +1273,12 @@ module.exports = {
   },
 
   'test validation in subdocuments': function(){
+
+    var Subsubdocs= new Schema({ required: { type: String, required: true }});
+
     var Subdocs = new Schema({
         required: { type: String, required: true }
+      , subs: [Subsubdocs]
     });
 
     mongoose.model('TestSubdocumentsValidation', new Schema({
@@ -1286,15 +1290,18 @@ module.exports = {
 
     var post = new TestSubdocumentsValidation();
 
-    post.get('items').push({ required: '' });
+    post.get('items').push({ required: '', subs: [{required: ''}] });
 
     post.save(function(err){
       err.should.be.an.instanceof(MongooseError);
       err.should.be.an.instanceof(ValidationError);
-      err.errors.required.should.be.an.instanceof(ValidatorError);
-      err.errors.required.message.should.eql('Validator "required" failed for path required');
+      err.errors['items.0.subs.0.required'].should.be.an.instanceof(ValidatorError);
+      err.errors['items.0.subs.0.required'].message.should.eql('Validator "required" failed for path required');
+      err.errors['items.0.required'].should.be.an.instanceof(ValidatorError);
+      err.errors['items.0.required'].message.should.eql('Validator "required" failed for path required');
 
       post.get('items')[0].set('required', true);
+      post.items[0].subs[0].set('required', true);
       post.save(function(err){
         should.strictEqual(err, null);
         db.close();

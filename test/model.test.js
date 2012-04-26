@@ -1291,8 +1291,8 @@ module.exports = {
     post.save(function(err){
       err.should.be.an.instanceof(MongooseError);
       err.should.be.an.instanceof(ValidationError);
-      err.errors.required.should.be.an.instanceof(ValidatorError);
-      err.errors.required.message.should.eql('Validator "required" failed for path required');
+      err.errors['items.0.required'].should.be.an.instanceof(ValidatorError);
+      err.errors['items.0.required'].message.should.eql('Validator "required" failed for path required');
 
       post.get('items')[0].set('required', true);
       post.save(function(err){

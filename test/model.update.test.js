@@ -71,7 +71,7 @@ mongoose.model('BlogPost', BlogPost);
 
 var collection = 'blogposts_' + random();
 
-var strictSchema = new Schema({ name: String }, { strict: true });
+var strictSchema = new Schema({ name: String, x: { nested: String }}, { strict: true });
 mongoose.model('UpdateStrictSchema', strictSchema);
 
 module.exports = {
@@ -483,7 +483,9 @@ module.exports = {
     db.close();
 
     var doc = S.find()._castUpdate({ ignore: true });
-    Object.keys(doc.$set).length.should.equal(0);
+    should.eql(false, doc);
+    var doc = S.find()._castUpdate({ $unset: {x: 1}});
+    Object.keys(doc.$unset).length.should.equal(1);
   },
 
   'test updating numbers atomically': function () {
@@ -526,7 +528,7 @@ module.exports = {
 
       S.update({ _id: s._id }, { ignore: true }, function (err, affected) {
         should.strictEqual(null, err);
-        affected.should.equal(1);
+        affected.should.equal(0);
 
         S.findById(s._id, function (err, doc) {
           db.close();

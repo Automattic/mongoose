@@ -222,6 +222,7 @@ module.exports = {
           , cool  : DocumentObjectId.fromString('4c6c2d6240ced95d0e00003c')
           , path  : 'my path'
         }
+      , nested2: {}
     });
 
     var clone = doc.toObject({ getters: true, virtuals: false });
@@ -262,6 +263,19 @@ module.exports = {
     clone.nested.agePlus2.should.eql(7);
     clone.em[0].title.should.equal('asdf');
     delete doc.schema.options.toObject;
+
+    // minimize
+    clone = doc.toObject({ minimize: true });
+    should.equal(undefined, clone.nested2);
+    clone = doc.toObject({ minimize: false });
+    should.eql({}, clone.nested2);
+    clone = doc.toObject('2');
+    should.equal(undefined, clone.nested2);
+
+    doc.schema.options.toObject = { minimize: false };
+    clone = doc.toObject();
+    should.eql({}, clone.nested2);
+    delete doc.schema.options.toObject;
   },
 
   'toJSON options': function () {
@@ -276,6 +290,7 @@ module.exports = {
           , cool  : DocumentObjectId.fromString('4c6c2d6240ced95d0e00003c')
           , path  : 'my path'
         }
+      , nested2: {}
     });
 
     // override to check if toJSON gets fired
@@ -295,6 +310,25 @@ module.exports = {
     clone.em[0].should.eql({});
     delete doc.schema.options.toJSON;
     delete path.casterConstructor.prototype.toJSON;
+
+    doc.schema.options.toJSON = { minimize: false };
+    clone = doc.toJSON();
+    should.eql({}, clone.nested2);
+    clone = doc.toJSON('8');
+    should.eql({}, clone.nested2);
+
+    // gh-852
+    var arr = [doc]
+      , err = false
+      , str
+    try {
+      str = JSON.stringify(arr);
+    } catch (_) { err = true; }
+    err.should.be.false;
+    ;/nested2/.test(str).should.be.true;
+    should.eql({}, clone.nested2);
+
+    delete doc.schema.options.toJSON;
   },
 
   'test hooks system': function(beforeExit){

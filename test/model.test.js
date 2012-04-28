@@ -5,6 +5,7 @@
 
 var start = require('./common')
   , should = require('should')
+  , assert = require('assert')
   , mongoose = start.mongoose
   , random = require('../lib/utils').random
   , Query = require('../lib/query')
@@ -552,6 +553,29 @@ module.exports = {
         post.get('comments')[0].isNew.should.be.false;
         post.get('comments')[0].comments[0].isNew.should.be.false;
         db.close();
+      });
+    });
+  },
+
+  'isNew on parent and subdocs on failed inserts': function () {
+    var db = start()
+
+    var schema = new Schema({
+        name: { type: String, unique: true }
+      , em: [new Schema({ x: Number })]
+    }, { collection: 'testisnewonfail_'+random() });
+    var A = db.model('isNewOnFail', schema);
+    var a = new A({ name: 'i am new', em: [{ x: 1 }] });
+    a.save(function (err) {
+      should.strictEqual(null, err);
+      assert.equal(a.isNew, false);
+      assert.equal(a.em[0].isNew, false);
+      var b = new A({ name: 'i am new', em: [{x:2}] });
+      b.save(function (err) {
+        db.close();
+        assert.ok(err);
+        assert.equal(b.isNew, true);
+        assert.equal(b.em[0].isNew, true);
       });
     });
   },
@@ -1249,8 +1273,12 @@ module.exports = {
   },
 
   'test validation in subdocuments': function(){
+
+    var Subsubdocs= new Schema({ required: { type: String, required: true }});
+
     var Subdocs = new Schema({
         required: { type: String, required: true }
+      , subs: [Subsubdocs]
     });
 
     mongoose.model('TestSubdocumentsValidation', new Schema({
@@ -1262,15 +1290,18 @@ module.exports = {
 
     var post = new TestSubdocumentsValidation();
 
-    post.get('items').push({ required: '' });
+    post.get('items').push({ required: '', subs: [{required: ''}] });
 
     post.save(function(err){
       err.should.be.an.instanceof(MongooseError);
       err.should.be.an.instanceof(ValidationError);
-      err.errors.required.should.be.an.instanceof(ValidatorError);
-      err.errors.required.message.should.eql('Validator "required" failed for path required');
+      err.errors['items.0.subs.0.required'].should.be.an.instanceof(ValidatorError);
+      err.errors['items.0.subs.0.required'].message.should.eql('Validator "required" failed for path required');
+      err.errors['items.0.required'].should.be.an.instanceof(ValidatorError);
+      err.errors['items.0.required'].message.should.eql('Validator "required" failed for path required');
 
       post.get('items')[0].set('required', true);
+      post.items[0].subs[0].set('required', true);
       post.save(function(err){
         should.strictEqual(err, null);
         db.close();
@@ -3111,11 +3142,18 @@ module.exports = {
     });
   },
 
-  'passing null in pre hook works': function () {
+  'passing undefined and null in pre hook works': function () {
     var db = start();
     var schema = new Schema({ name: String });
+    var called = 0;
 
     schema.pre('save', function (next) {
+      called++;
+      next(undefined); // <<-----
+    });
+
+    schema.pre('save', function (next) {
+      called++;
       next(null); // <<-----
     });
 
@@ -3124,9 +3162,9 @@ module.exports = {
 
     s.save(function (err) {
       db.close();
+      called.should.equal(2);
       should.strictEqual(null, err);
     });
-
   },
 
   'pre hooks called on all sub levels': function () {

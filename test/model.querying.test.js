@@ -612,10 +612,10 @@ module.exports = {
     BlogPostB.create({title: 'subset 1'}, function (err, created) {
       should.strictEqual(err, null);
       BlogPostB.findOne({title: 'subset 1'}, {title: 1, _id: 0}, function (err, found) {
+        db.close();
         should.strictEqual(err, null);
         should.strictEqual(undefined, found._id);
         found.title.should.equal('subset 1');
-        db.close();
       });
     });
   },
@@ -626,13 +626,13 @@ module.exports = {
     BlogPostB.create({title: 'subset 1', author: 'me'}, function (err, created) {
       should.strictEqual(err, null);
       BlogPostB.find({title: 'subset 1'}, {title: 1, _id: 0}, function (err, found) {
+        db.close();
         should.strictEqual(err, null);
         should.strictEqual(undefined, found[0]._id);
         found[0].title.should.equal('subset 1');
         should.strictEqual(undefined, found[0].def);
         should.strictEqual(undefined, found[0].author);
         should.strictEqual(false, Array.isArray(found[0].comments));
-        db.close();
       });
     });
   },
@@ -660,7 +660,6 @@ module.exports = {
       });
     });
   },
-
 
   'exluded fields should be undefined': function () {
     var db = start()
@@ -704,6 +703,29 @@ module.exports = {
         should.strictEqual(undefined, found.author);
         should.strictEqual(true, Array.isArray(found.comments));
         should.equal(date.toString(), found.meta.date.toString());
+        found.comments.length.should.equal(0);
+      });
+    });
+  },
+
+  // gh-870
+  'included fields should have defaults applied when no value exists in db': function () {
+    var db = start()
+      , BlogPostB = db.model('BlogPostB', collection)
+      , id = new DocumentObjectId
+
+    BlogPostB.collection.insert(
+        { _id: id, title: 'issue 870'}, function (err) {
+      should.strictEqual(err, null);
+
+      BlogPostB.findById(id, 'def comments', function (err, found) {
+        db.close();
+        should.strictEqual(err, null);
+        found._id.should.eql(id);
+        should.strictEqual(undefined, found.title);
+        should.strictEqual('kandinsky', found.def);
+        should.strictEqual(undefined, found.author);
+        should.strictEqual(true, Array.isArray(found.comments));
         found.comments.length.should.equal(0);
       });
     });

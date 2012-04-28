@@ -269,6 +269,8 @@ module.exports = {
     should.equal(undefined, clone.nested2);
     clone = doc.toObject({ minimize: false });
     should.eql({}, clone.nested2);
+    clone = doc.toObject('2');
+    should.equal(undefined, clone.nested2);
 
     doc.schema.options.toObject = { minimize: false };
     clone = doc.toObject();
@@ -309,10 +311,24 @@ module.exports = {
     delete doc.schema.options.toJSON;
     delete path.casterConstructor.prototype.toJSON;
 
-    doc.schema.options.toObject = { minimize: false };
-    clone = doc.toObject();
+    doc.schema.options.toJSON = { minimize: false };
+    clone = doc.toJSON();
     should.eql({}, clone.nested2);
-    delete doc.schema.options.toObject;
+    clone = doc.toJSON('8');
+    should.eql({}, clone.nested2);
+
+    // gh-852
+    var arr = [doc]
+      , err = false
+      , str
+    try {
+      str = JSON.stringify(arr);
+    } catch (_) { err = true; }
+    err.should.be.false;
+    ;/nested2/.test(str).should.be.true;
+    should.eql({}, clone.nested2);
+
+    delete doc.schema.options.toJSON;
   },
 
   'test hooks system': function(beforeExit){

@@ -205,7 +205,7 @@ function assignExports () { var o = {
       , filename = '/tmp/_mongoose_stream_out.txt'
       , out = fs.createWriteStream(filename)
 
-    var stream = P.find().sort('name', 1).limit(20).stream();
+    var stream = P.find().sort('name').limit(20).stream();
     stream.pipe(out);
 
     stream.on('error', done);

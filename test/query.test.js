@@ -482,7 +482,7 @@ module.exports = {
 
   'test Query#sort': function () {
     var query = new Query();
-    query.sort('a', 1, 'c', -1, 'b', 1);
+    query.sort('a -c b');
     query.options.sort.should.eql([['a', 1], ['c', -1], ['b', 1]]);
     query = new Query();
     query.sort({'a': 1, 'c': -1, 'b': 'asc', e: 'descending', f: 'ascending'});
@@ -495,7 +495,16 @@ module.exports = {
       e= err;
     }
     should.exist(e, 'uh oh. no error was thrown');
-    e.message.should.eql('Invalid sort clause: [a,1]');
+    e.message.should.eql('Invalid sort() argument. Must be a string or object.');
+
+    e= undefined;
+    try {
+      query.sort('a', 1, 'c', -1, 'b', 1);
+    } catch (err) {
+      e= err;
+    }
+    should.exist(e, 'uh oh. no error was thrown');
+    e.message.should.eql('Invalid sort() argument. Must be a string or object.');
   },
 
   'Query#or': function () {
@@ -815,7 +824,7 @@ module.exports = {
     q.setOptions({ batchSize: 10 });
     q.setOptions({ limit: 4 });
     q.setOptions({ skip: 3 });
-    q.setOptions({ sort: ['blah', -1] });
+    q.setOptions({ sort: '-blah' });
     q.setOptions({ sort: {'woot': -1} });
     q.setOptions({ hint: { index1: 1, index2: -1 }});
 

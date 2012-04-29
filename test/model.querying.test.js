@@ -1651,7 +1651,7 @@ module.exports = {
           should.strictEqual(err, null);
           BlogPostB
             .where('meta.visitors').gt(99).lt(301)
-            .sort('meta.visitors', -1)
+            .sort('-meta.visitors')
             .find( function (err, found) {
               should.strictEqual(err, null);
               found.should.have.length(3);
@@ -1718,7 +1718,7 @@ module.exports = {
 
       pending = 2;
 
-      D.find({ 'dt': { $gte: '2011-03-30', $lte: '2011-04-01' }}).sort('dt', 1).exec(function (err, docs) {
+      D.find({ 'dt': { $gte: '2011-03-30', $lte: '2011-04-01' }}).sort('dt').exec(function (err, docs) {
         if (--pending) db.close();
         should.strictEqual(err, null);
         docs.length.should.eql(3);
@@ -1728,7 +1728,7 @@ module.exports = {
         docs.some(function (d) { return '2011-04-02' === d.dt }).should.be.false;
       });
 
-      D.find({ 'dt': { $gt: '2011-03-30', $lt: '2011-04-02' }}).sort('dt', 1).exec(function (err, docs) {
+      D.find({ 'dt': { $gt: '2011-03-30', $lt: '2011-04-02' }}).sort('dt').exec(function (err, docs) {
         if (--pending) db.close();
         should.strictEqual(err, null);
         docs.length.should.eql(2);

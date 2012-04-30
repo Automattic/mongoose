@@ -1,3 +1,9 @@
+2.6.1 / 2012-04-30
+===================
+
+  * fixed; connection assignment in mongoose#model (#853, #877)
+  * fixed; incorrect reported num of affected docs in update ops (#862)
+
 2.6.0 / 2012-04-19
 ===================
 

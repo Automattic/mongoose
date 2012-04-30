@@ -15,6 +15,7 @@ if (!uri) {
             , 'Sharding must already be enabled on your database'
             , '\033[39m');
 
+  // let expresso shut down this test
   exports.r = function expressoHack(){}
   return;
 }
@@ -29,6 +30,19 @@ var collection = 'shardperson_' + random();
 mongoose.model('ShardPerson', schema, collection);
 
 var db = start({ uri: uri });
+db.on('error', function (err) {
+  if (/failed to connect/.test(err)) {
+    err.message = 'Shard test error: '
+      + err.message
+      + '\n'
+      + '    Are you sure there is a db running at '
+      + uri + ' ?'
+      + '\n'
+  }
+  // let expresso shut down this test
+  exports.r = function expressoHack(){}
+  throw err;
+});
 db.on('open', function () {
 
   // set up a sharded test collection

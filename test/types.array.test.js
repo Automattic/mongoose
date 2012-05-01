@@ -257,6 +257,33 @@ module.exports = {
     });
   },
 
+  '#pull': function () {
+    var db= start();
+    var catschema = new Schema({ name: String })
+    var Cat = db.model('Cat', catschema);
+    var schema = new Schema({
+        a: [{ type: Schema.ObjectId, ref: 'Cat' }]
+    });
+    var A = db.model('TestPull', schema);
+    var cat  = new Cat({ name: 'peanut' });
+    cat.save(function (err) {
+      should.strictEqual(null, err);
+
+      var a = new A({ a: [cat._id] });
+      a.save(function (err) {
+        should.strictEqual(null, err);
+
+        A.findById(a, function (err, doc) {
+          db.close();
+          should.strictEqual(null, err);
+          doc.a.length.should.equal(1);
+          doc.a.pull(cat.id);
+          doc.a.length.should.equal(0);
+        });
+      });
+    });
+  },
+
   '#addToSet': function () {
     var db = start()
       , e = new Schema({ name: String, arr: [] })

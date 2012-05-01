@@ -1,3 +1,8 @@
+2.6.2 / 2012-04-30
+===================
+
+  * fixed; default field application of selected fields (#870)
+
 2.6.1 / 2012-04-30
 ===================
 

@@ -4249,6 +4249,7 @@ module.exports = {
     var db = start();
 
     db.on('error', function (err) {
+      if (/connection closed/.test(err.message)) return;
       /^E11000 duplicate key error index:/.test(err.message).should.equal(true);
       db.close();
     });
@@ -4258,7 +4259,7 @@ module.exports = {
 
     Test.create({ name: 'hi' }, { name: 'hi' }, function (err) {
       should.strictEqual(err, null);
-      Test.schema.index({ name: 1 }, { unique: true, background: false });
+      Test.schema.index({ name: 1 }, { unique: true });
       Test.init();
     });
   },
@@ -4670,4 +4671,5 @@ module.exports = {
       });
     })
   }
+
 };

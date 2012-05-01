@@ -565,17 +565,19 @@ module.exports = {
       , em: [new Schema({ x: Number })]
     }, { collection: 'testisnewonfail_'+random() });
     var A = db.model('isNewOnFail', schema);
-    var a = new A({ name: 'i am new', em: [{ x: 1 }] });
-    a.save(function (err) {
-      should.strictEqual(null, err);
-      assert.equal(a.isNew, false);
-      assert.equal(a.em[0].isNew, false);
-      var b = new A({ name: 'i am new', em: [{x:2}] });
-      b.save(function (err) {
-        db.close();
-        assert.ok(err);
-        assert.equal(b.isNew, true);
-        assert.equal(b.em[0].isNew, true);
+    A.on('index', function () {
+      var a = new A({ name: 'i am new', em: [{ x: 1 }] });
+      a.save(function (err) {
+        should.strictEqual(null, err);
+        assert.equal(a.isNew, false);
+        assert.equal(a.em[0].isNew, false);
+        var b = new A({ name: 'i am new', em: [{x:2}] });
+        b.save(function (err) {
+          db.close();
+          assert.ok(err);
+          assert.equal(b.isNew, true);
+          assert.equal(b.em[0].isNew, true);
+        });
       });
     });
   },
@@ -4256,7 +4258,7 @@ module.exports = {
 
     Test.create({ name: 'hi' }, { name: 'hi' }, function (err) {
       should.strictEqual(err, null);
-      Test.schema.index({ name: 1 }, { unique: true });
+      Test.schema.index({ name: 1 }, { unique: true, background: false });
       Test.init();
     });
   },

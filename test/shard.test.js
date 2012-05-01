@@ -119,38 +119,38 @@ var tests = {
     P.create({ name: 'ryu', likes: ['street fighting']}, function (err, ryu) {
       --pending || db.close();
       should.exist(err);
-      err.message.should.equal('tried to insert object with no valid shard key');
+      /tried to insert object with no valid shard key/.test(err.message).should.be.true;
     });
 
     P.create({ likes: ['street fighting']}, function (err, ryu) { should.exist(err);
       --pending || db.close();
       should.exist(err);
-      err.message.should.equal('tried to insert object with no valid shard key');
+      /tried to insert object with no valid shard key/.test(err.message).should.be.true;
     });
 
     P.create({ name: 'ryu' }, function (err, ryu) { should.exist(err);
       --pending || db.close();
       should.exist(err);
-      err.message.should.equal('tried to insert object with no valid shard key');
+      /tried to insert object with no valid shard key/.test(err.message).should.be.true;
     });
 
     P.create({ age: 49 }, function (err, ryu) { should.exist(err);
       --pending || db.close();
       should.exist(err);
-      err.message.should.equal('tried to insert object with no valid shard key');
+      /tried to insert object with no valid shard key/.test(err.message).should.be.true;
     });
 
     P.create({ likes: ['street fighting'], age: 8 }, function (err, ryu) {
       --pending || db.close();
       should.exist(err);
-      err.message.should.equal('tried to insert object with no valid shard key');
+      /tried to insert object with no valid shard key/.test(err.message).should.be.true;
     });
 
     var p = new P;
     p.save(function (err) {
       --pending || db.close();
       should.exist(err);
-      err.message.should.equal('tried to insert object with no valid shard key');
+      /tried to insert object with no valid shard key/.test(err.message).should.be.true;
     });
 
   },
@@ -164,7 +164,7 @@ var tests = {
 
       P.update({ _id: ken._id }, { likes: ['kicking', 'punching'] }, function (err) {
         should.exist(err);
-        "right object doesn't have full shard key".should.equal(err.message);
+        /doesn't have full shard key/.test(err.message).should.be.true;
 
         P.update({ _id: ken._id, name: 'ken' }, { likes: ['kicking', 'punching'] }, function (err) {
           should.exist(err);

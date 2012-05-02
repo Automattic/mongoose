@@ -30,6 +30,9 @@ TestDocument.prototype.__proto__ = Document.prototype;
  */
 
 var em = new Schema({ title: String, body: String });
+em.virtual('works').get(function () {
+  return 'em virtual works'
+});
 var schema = TestDocument.prototype.schema = new Schema({
     test    : String
   , oids    : [ObjectId]
@@ -216,6 +219,7 @@ module.exports = {
     doc.init({
         test    : 'test'
       , oids    : []
+      , em      : [{ title: 'title' }]
       , nested  : {
             age   : 5
           , cool  : DocumentObjectId.fromString('4c6c2d6240ced95d0e00003c')
@@ -231,6 +235,7 @@ module.exports = {
     DocumentObjectId.toString(clone.nested.cool).should.eql('4c6c2d6240ced95d0e00003c');
     clone.nested.path.should.eql('5my path');
     should.equal(undefined, clone.nested.agePlus2);
+    should.equal(undefined, clone.em[0].works);
 
     clone = doc.toObject({ virtuals: true });
 
@@ -240,6 +245,7 @@ module.exports = {
     DocumentObjectId.toString(clone.nested.cool).should.eql('4c6c2d6240ced95d0e00003c');
     clone.nested.path.should.eql('my path');
     clone.nested.agePlus2.should.eql(7);
+    clone.em[0].works.should.eql('em virtual works');
 
     clone = doc.toObject({ getters: true });
 
@@ -249,6 +255,7 @@ module.exports = {
     DocumentObjectId.toString(clone.nested.cool).should.eql('4c6c2d6240ced95d0e00003c');
     clone.nested.path.should.eql('5my path');
     clone.nested.agePlus2.should.eql(7);
+    clone.em[0].works.should.eql('em virtual works');
   },
 
   'test hooks system': function(beforeExit){

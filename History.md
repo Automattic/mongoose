@@ -1,3 +1,11 @@
+2.6.3 / 2012-05-03
+===================
+
+  * fixed; repl-set connectivity issues during failover
+  * updated; driver to 1.0.0
+  * fixed; virtuals application of subdocs when using toObject({ virtuals: true }) (#889)
+  * fixed; MongooseArray#pull of ObjectId correctly updates the array itself (#881)
+
 2.6.2 / 2012-04-30
 ===================
 

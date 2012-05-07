@@ -163,7 +163,7 @@ module.exports = {
 
     var mong = new Mongoose();
 
-    mong.connectSet(uri, function (err) {
+    mong.connect(uri, function (err) {
       should.strictEqual(err, null);
 
       mong.model('Test', new mongoose.Schema({
@@ -195,7 +195,7 @@ module.exports = {
 
     var mong = new Mongoose(true);
 
-    var conn = mong.createSetConnection(uri, function (err) {
+    var conn = mong.createConnection(uri, function (err) {
       should.strictEqual(err, null);
 
       mong.model('ReplSetTwo', new mongoose.Schema({

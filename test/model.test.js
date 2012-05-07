@@ -565,17 +565,19 @@ module.exports = {
       , em: [new Schema({ x: Number })]
     }, { collection: 'testisnewonfail_'+random() });
     var A = db.model('isNewOnFail', schema);
-    var a = new A({ name: 'i am new', em: [{ x: 1 }] });
-    a.save(function (err) {
-      should.strictEqual(null, err);
-      assert.equal(a.isNew, false);
-      assert.equal(a.em[0].isNew, false);
-      var b = new A({ name: 'i am new', em: [{x:2}] });
-      b.save(function (err) {
-        db.close();
-        assert.ok(err);
-        assert.equal(b.isNew, true);
-        assert.equal(b.em[0].isNew, true);
+    A.on('index', function () {
+      var a = new A({ name: 'i am new', em: [{ x: 1 }] });
+      a.save(function (err) {
+        should.strictEqual(null, err);
+        assert.equal(a.isNew, false);
+        assert.equal(a.em[0].isNew, false);
+        var b = new A({ name: 'i am new', em: [{x:2}] });
+        b.save(function (err) {
+          db.close();
+          assert.ok(err);
+          assert.equal(b.isNew, true);
+          assert.equal(b.em[0].isNew, true);
+        });
       });
     });
   },
@@ -4247,6 +4249,7 @@ module.exports = {
     var db = start();
 
     db.on('error', function (err) {
+      if (/connection closed/.test(err.message)) return;
       /^E11000 duplicate key error index:/.test(err.message).should.equal(true);
       db.close();
     });
@@ -4668,4 +4671,5 @@ module.exports = {
       });
     })
   }
+
 };

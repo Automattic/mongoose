@@ -103,6 +103,26 @@ module.exports = {
     var a = new MongooseDocumentArray([sub3]);
     a.id(id3).title.should.equal('rock-n-roll');
     a.id(sub3._id).title.should.equal('rock-n-roll');
+
+    // test with no _id
+    var NoId = new Schema({
+        title: { type: String }
+    }, { noId: true });
+
+    var Subdocument = TestDoc(NoId);
+
+    var sub4 = new Subdocument();
+    sub4.title = 'rock-n-roll';
+
+    var a = new MongooseDocumentArray([sub4])
+      , threw = false;
+    try {
+      a.id('i better not throw');
+    } catch (err) {
+      threw = err;
+    }
+    threw.should.equal(false);
+
   },
 
   'inspect works with bad data': function () {

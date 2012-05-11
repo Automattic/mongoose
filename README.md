@@ -6,22 +6,22 @@ Defining a model is as easy as:
 
 ````javascript
 var Comment = new Schema({
-    title     : String
-     , body      : String
-     , date      : Date
+  title     : String
+  , body      : String
+  , date      : Date
 });
 
 var BlogPost = new Schema({
-    author    : ObjectId
-    , title     : String
-    , body      : String
-    , buf       : Buffer
-    , date      : Date
-    , comments  : [Comment]
-    , meta      : {
-        votes : Number
-        , favs  : Number
-    }
+  author    : ObjectId
+  , title     : String
+  , body      : String
+  , buf       : Buffer
+  , date      : Date
+  , comments  : [Comment]
+  , meta      : {
+    votes : Number
+    , favs  : Number
+  }
 });
 
 var Post = mongoose.model('BlogPost', BlogPost);

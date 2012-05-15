@@ -3,6 +3,7 @@
 
     * updated; backport string regex $options to 2.x
     * updated; use driver 1.0.2 (performance improvements) (#914)
+    * fixed; calling MongooseDocumentArray#id when the doc has no _id (#897)
 
 2.6.3 / 2012-05-03
 ===================

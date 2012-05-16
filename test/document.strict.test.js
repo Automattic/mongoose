@@ -119,10 +119,12 @@ module.exports = {
 
     s = new Strict;
     s.set('name', { last: 'goose', hack: 'xx' });
+    s.set('shouldnt.exist', ':(');
     s = s.toObject();
     s.name.last.should.equal('goose');
     s.name.should.not.have.property('hack');
     should.not.exist(s.name.hack);
+    should.not.exist(s.shouldnt);
   },
 
   'sub doc strict mode': function(){

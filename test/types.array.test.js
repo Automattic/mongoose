@@ -63,6 +63,38 @@ module.exports = {
 
   },
 
+  '$push is push': function() {
+    var db = start()
+    var User = db.model('User')
+    var tj = new User({ name: 'tj',  pets: []})
+    tj.pets.push.should.equal(tj.pets.$push)
+    db.close()
+  },
+
+  '$pop is pop': function() {
+    var db = start()
+    var User = db.model('User')
+    var tj = new User({ name: 'tj',  pets: []})
+    tj.pets.pop.should.equal(tj.pets.$pop)
+    db.close()
+  },
+
+  '$shift is shift': function() {
+    var db = start()
+    var User = db.model('User')
+    var tj = new User({ name: 'tj',  pets: []})
+    tj.pets.shift.should.equal(tj.pets.$shift)
+    db.close()
+  },
+
+  '$unshift is unshift': function() {
+    var db = start()
+    var User = db.model('User')
+    var tj = new User({ name: 'tj',  pets: []})
+    tj.pets.unshift.should.equal(tj.pets.$unshift)
+    db.close()
+  },
+
   'test indexOf()': function(){
     var db = start()
       , User = db.model('User', 'users_' + random())

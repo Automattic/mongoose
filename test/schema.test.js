@@ -661,6 +661,26 @@ module.exports = {
     Tobi.path('name').setters.should.have.length(2);
   },
 
+  'test setter order': function(){
+    function extract (v, self) {
+      return (v && v._id)
+        ? v._id
+        : v
+    };
+
+    var Tobi = new Schema({
+        name: { type: Schema.ObjectId, set: extract }
+    });
+
+    var id = new DocumentObjectId
+      , sid = id.toString()
+      , _id = { _id: id };
+
+    Tobi.path('name').applySetters(sid, { a: 'b' }).toString().should.eql(sid);
+    Tobi.path('name').applySetters(_id, { a: 'b' }).toString().should.eql(sid);
+    Tobi.path('name').applySetters(id, { a: 'b' }).toString().should.eql(sid);
+  },
+
   'test setters scope': function(){
     function lowercase (v, self) {
       this.a.should.eql('b');

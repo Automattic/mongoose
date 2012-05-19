@@ -732,6 +732,20 @@ module.exports = {
     Tobi.path('name').applyGetters('test').should.eql('test woot');
   },
 
+  'test getter order': function(){
+    function format (v, self) {
+      return v
+        ? '$' + v
+        : v
+    };
+
+    var Tobi = new Schema({
+        name: { type: Number, get: format }
+    });
+
+    Tobi.path('name').applyGetters(30, { a: 'b' }).should.equal('$30');
+  },
+
   'test getters scope': function(){
     function woot (v, self) {
       this.a.should.eql('b');
@@ -748,15 +762,15 @@ module.exports = {
 
   'test setters casting': function(){
     function last (v) {
-      v.should.be.a('string');
-      v.should.eql('0');
+      v.should.be.a('number');
+      v.should.equal(0);
       return 'last';
     };
 
     function first (v) {
       return 0;
     };
-    
+
     var Tobi = new Schema({
         name: { type: String, set: last }
     });
@@ -767,15 +781,15 @@ module.exports = {
 
   'test getters casting': function(){
     function last (v) {
-      v.should.be.a('string');
-      v.should.eql('0');
+      v.should.be.a('number');
+      v.should.equal(0);
       return 'last';
     };
 
     function first (v) {
       return 0;
     };
-    
+
     var Tobi = new Schema({
         name: { type: String, get: last }
     });

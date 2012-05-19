@@ -94,7 +94,7 @@ module.exports = {
 
         var NewModeratorSchema = new Schema({ name: String, ranking: String});
         rankingPostCast = found.get('moderators', [NewModeratorSchema])[0].ranking;
-        rankingPostCast.should.equal('1');
+        rankingPostCast.should.equal(1);
       });
     });
   },

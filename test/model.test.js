@@ -4671,6 +4671,20 @@ module.exports = {
         });
       });
     })
+  },
+
+  'path is cast to correct value when retreived from db': function () {
+    var db = start();
+    var schema = new Schema({ title: { type: 'string', index: true }});
+    var T = db.model('T', schema);
+    T.collection.insert({ title: 234 }, {safe:true}, function (err) {
+      if (err) throw err;
+      T.findOne(function (err, doc) {
+        db.close();
+        if (err) throw err;
+        assert.equal('234', doc.title);
+      });
+    });
   }
 
 };

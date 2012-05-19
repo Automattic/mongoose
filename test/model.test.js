@@ -777,8 +777,9 @@ module.exports = {
         postRead.isModified('numbers').should.be.false;
         postRead.isModified('owners').should.be.false;
         postRead.isModified('comments').should.be.false;
-        postRead.comments[2] = { title: 'index' };
-        postRead.comments = postRead.comments;
+        var arr = postRead.comments.slice();
+        arr[2] = postRead.comments.create({ title: 'index' });
+        postRead.comments = arr;
         postRead.isModified('comments').should.be.true;
     	});
     });

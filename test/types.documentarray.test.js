@@ -4,11 +4,13 @@
  */
 
 var mongoose = require('./common').mongoose
+  , random = require('../lib/utils').random
   , MongooseArray = mongoose.Types.Array
   , MongooseDocumentArray = mongoose.Types.DocumentArray
   , EmbeddedDocument = require('../lib/types/embedded')
   , DocumentArray = require('../lib/types/documentarray')
   , Schema = mongoose.Schema
+  , assert = require('assert')
 
 /**
  * Setup.
@@ -147,6 +149,20 @@ module.exports = {
       console.error(err.stack);
     }
     threw.should.be.false;
+  },
+
+  'EmbeddedDocumentArray#create': function () {
+    var a = new MongooseDocumentArray([]);
+    assert.equal('function', typeof a.create);
+
+    var schema = new Schema({ docs: [new Schema({ name: 'string' })] });
+    var T = mongoose.model('embeddedDocument#create_test', schema, 'asdfasdfa'+ random());
+    var t = new T;
+    assert.equal('function', typeof t.docs.create);
+    var subdoc = t.docs.create({ name: 100 });
+    assert.ok(subdoc._id);
+    assert.equal(subdoc.name, '100');
+    assert.ok(subdoc instanceof EmbeddedDocument);
   }
 
 };

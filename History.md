@@ -1,3 +1,11 @@
+2.6.5 / 2012-05-24
+===================
+
+  * fixed; do not save virtuals in Model.update (#894)
+  * added; missing $ prefixed query aliases (going away in 3.x) (#884) [timoxley]
+  * fixed; setting invalid paths in strict mode (#916)
+  * fixed; resetting isNew after insert failure (#837) [boutell]
+
 2.6.4 / 2012-05-15
 ===================
 

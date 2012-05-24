@@ -275,6 +275,21 @@ module.exports = {
     Test.path('simple').doValidate('a12', function(err){
       should.strictEqual(err, null);
     });
+
+    Test.path('simple').doValidate('', function(err){
+      should.strictEqual(err, null);
+    });
+    Test.path('simple').doValidate(null, function(err){
+      should.strictEqual(err, null);
+    });
+    Test.path('simple').doValidate(undefined, function(err){
+      should.strictEqual(err, null);
+    });
+    Test.path('simple').validators = [];
+    Test.path('simple').match(/[1-9]/);
+    Test.path('simple').doValidate(0, function(err){
+      err.should.be.an.instanceof(ValidatorError);
+    });
   },
 
   'test string casting': function(){

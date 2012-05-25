@@ -5,6 +5,7 @@
 
 var start = require('./common')
   , should = require('should')
+  , assert = require('assert')
   , mongoose = require('./common').mongoose
   , Schema = mongoose.Schema
   , random = require('../lib/utils').random
@@ -343,6 +344,83 @@ module.exports = {
           doc.a.length.should.equal(1);
           doc.a.pull(cat.id);
           doc.a.length.should.equal(0);
+        });
+      });
+    });
+  },
+
+  '#$pop': function () {
+    var db= start();
+    var painting = new Schema({ colors: [] })
+    var Painting= db.model('Painting', painting);
+    var p = new Painting({ colors : ['blue', 'green', 'yellow'] });
+    p.save(function (err) {
+      should.strictEqual(null, err);
+
+      Painting.findById(p, function (err, doc) {
+        should.strictEqual(null, err);
+        assert.equal(3, doc.colors.length);
+        var color = doc.colors.$pop();
+        assert.equal(2, doc.colors.length);
+        assert.equal(color, 'yellow');
+        // MongoDB pop command can only be called once per save, each
+        // time only removing one element.
+        color = doc.colors.$pop();
+        assert.equal(color, undefined);
+        assert.equal(2, doc.colors.length);
+        doc.save(function (err) {
+          assert.equal(null, err);
+          var color = doc.colors.$pop();
+          assert.equal(1, doc.colors.length);
+          assert.equal(color, 'green');
+          doc.save(function (err) {
+            assert.equal(null, err);
+            Painting.findById(doc, function (err, doc) {
+              db.close();
+              should.strictEqual(null, err);
+              assert.equal(1, doc.colors.length);
+              assert.equal(doc.colors[0], 'blue')
+            });
+          });
+        });
+      });
+    });
+  },
+
+  '#$shift': function () {
+    // atomic shift uses $pop -1
+    var db= start();
+    var painting = new Schema({ colors: [] })
+    var Painting= db.model('Painting', painting);
+    var p = new Painting({ colors : ['blue', 'green', 'yellow'] });
+    p.save(function (err) {
+      should.strictEqual(null, err);
+
+      Painting.findById(p, function (err, doc) {
+        should.strictEqual(null, err);
+        assert.equal(3, doc.colors.length);
+        var color = doc.colors.$shift();
+        assert.equal(2, doc.colors.length);
+        assert.equal(color, 'blue');
+        // MongoDB pop command can only be called once per save, each
+        // time only removing one element.
+        color = doc.colors.$shift();
+        assert.equal(color, undefined);
+        assert.equal(2, doc.colors.length);
+        doc.save(function (err) {
+          assert.equal(null, err);
+          var color = doc.colors.$shift();
+          assert.equal(1, doc.colors.length);
+          assert.equal(color, 'green');
+          doc.save(function (err) {
+            assert.equal(null, err);
+            Painting.findById(doc, function (err, doc) {
+              db.close();
+              should.strictEqual(null, err);
+              assert.equal(1, doc.colors.length);
+              assert.equal(doc.colors[0], 'yellow')
+            });
+          });
         });
       });
     });

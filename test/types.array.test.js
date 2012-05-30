@@ -437,6 +437,7 @@ module.exports = {
         color = doc.colors.$pop();
         assert.equal(color, undefined);
         assert.equal(2, doc.colors.length);
+        assert.equal(false, '$set' in doc.colors._atomics, 'invalid $atomic op used');
         doc.save(function (err) {
           assert.equal(null, err);
           var color = doc.colors.$pop();

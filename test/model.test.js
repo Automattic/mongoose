@@ -3285,7 +3285,7 @@ module.exports = {
     });
   },
 
-  'test count querying via #run (aka #exec)': function () {
+  'test count querying via #exec': function () {
     var db = start()
       , BlogPost = db.model('BlogPost', collection);
 
@@ -3300,7 +3300,7 @@ module.exports = {
     });
   },
 
-  'test update querying via #run (aka #exec)': function () {
+  'test update querying via #exec': function () {
     var db = start()
       , BlogPost = db.model('BlogPost', collection);
 
@@ -3318,7 +3318,7 @@ module.exports = {
     });
   },
 
-  'test findOne querying via #run (aka #exec)': function () {
+  'test findOne querying via #exec': function () {
     var db = start()
       , BlogPost = db.model('BlogPost', collection);
 
@@ -3333,7 +3333,7 @@ module.exports = {
     });
   },
 
-  'test find querying via #run (aka #exec)': function () {
+  'test find querying via #exec': function () {
     var db = start()
       , BlogPost = db.model('BlogPost', collection);
 
@@ -3353,7 +3353,7 @@ module.exports = {
     });
   },
 
-  'test remove querying via #run (aka #exec)': function () {
+  'test remove querying via #exec': function () {
     var db = start()
       , BlogPost = db.model('BlogPost', collection);
 
@@ -3372,7 +3372,7 @@ module.exports = {
     });
   },
 
-  'test changing query at the last minute via #run(op, callback)': function () {
+  'test changing query at the last minute via #exec(op, callback)': function () {
     var db = start()
       , BlogPost = db.model('BlogPost', collection);
 
@@ -3388,7 +3388,7 @@ module.exports = {
     });
   },
 
-  'test count querying via #run (aka #exec) with promise': function () {
+  'test count querying via #exec with promise': function () {
     var db = start()
       , BlogPost = db.model('BlogPost', collection);
 
@@ -3404,14 +3404,14 @@ module.exports = {
     });
   },
 
-  'test update querying via #run (aka #exec) with promise': function () {
+  'test update querying via #exec with promise': function () {
     var db = start()
       , BlogPost = db.model('BlogPost', collection);
 
     BlogPost.create({title: 'interoperable update as promise 2'}, function (err, created) {
       should.strictEqual(err, null);
       var query = BlogPost.update({title: 'interoperable update as promise 2'}, {title: 'interoperable update as promise delta 2'});
-      var promise = query.run();
+      var promise = query.exec();
       promise.addBack(function (err) {
         should.strictEqual(err, null);
         BlogPost.count({title: 'interoperable update as promise delta 2'}, function (err, count) {
@@ -3423,7 +3423,7 @@ module.exports = {
     });
   },
 
-  'test findOne querying via #run (aka #exec) with promise': function () {
+  'test findOne querying via #exec with promise': function () {
     var db = start()
       , BlogPost = db.model('BlogPost', collection);
 
@@ -3439,7 +3439,7 @@ module.exports = {
     });
   },
 
-  'test find querying via #run (aka #exec) with promise': function () {
+  'test find querying via #exec with promise': function () {
     var db = start()
       , BlogPost = db.model('BlogPost', collection);
 
@@ -3449,7 +3449,7 @@ module.exports = {
       , function (err, createdOne, createdTwo) {
       should.strictEqual(err, null);
       var query = BlogPost.find({title: 'interoperable find as promise 2'});
-      var promise = query.run();
+      var promise = query.exec();
       promise.addBack(function (err, found) {
         should.strictEqual(err, null);
         found.length.should.equal(2);
@@ -3462,7 +3462,7 @@ module.exports = {
     });
   },
 
-  'test remove querying via #run (aka #exec) with promise': function () {
+  'test remove querying via #exec with promise': function () {
     var db = start()
       , BlogPost = db.model('BlogPost', collection);
 
@@ -3482,7 +3482,7 @@ module.exports = {
     });
   },
 
-  'test changing query at the last minute via #run(op) with promise': function () {
+  'test changing query at the last minute via #exec(op) with promise': function () {
     var db = start()
       , BlogPost = db.model('BlogPost', collection);
 

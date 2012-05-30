@@ -2289,7 +2289,7 @@ module.exports = {
 
     mongoose.model('Temp', TempSchema);
     var Temp = db.model('Temp', collection);
-    
+
     var t = new Temp();
 
     t.save(function(err){

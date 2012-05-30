@@ -2175,7 +2175,7 @@ module.exports = {
     });
   },
 
-  'test updating multiple Number $pulls as a single $pullAll': function () {
+  'test updating multiple Number pulls as a single pullAll': function () {
     var db = start()
       , schema = new Schema({
           nested: {

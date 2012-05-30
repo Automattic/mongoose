@@ -322,6 +322,75 @@ module.exports = {
     });
   },
 
+  '#pop': function () {
+    var db = start()
+      , schema = new Schema({
+            types: [new Schema({ type: String })]
+          , nums: [Number]
+          , strs: [String]
+        })
+
+    var A = db.model('pop', schema, 'pop'+random());
+
+    var a = new A({
+        types: [{type:'bird'},{type:'boy'},{type:'frog'},{type:'cloud'}]
+      , nums: [1,2,3]
+      , strs: 'one two three'.split(' ')
+    });
+
+    a.save(function (err) {
+      should.equal(null, err);
+      A.findById(a._id, function (err, doc) {
+        should.equal(null, err);
+
+        var t = doc.types.pop();
+        var n = doc.nums.pop();
+        var s = doc.strs.pop();
+
+        t.type.should.equal('cloud');
+        n.should.equal(3);
+        s.should.equal('three');
+
+        var obj = doc.types.toObject();
+        obj[0].type.should.eql('bird');
+        obj[1].type.should.eql('boy');
+        obj[2].type.should.eql('frog');
+
+        doc.nums.$push(4);
+        obj = doc.nums.toObject();
+        obj[0].valueOf().should.equal(1);
+        obj[1].valueOf().should.equal(2);
+        obj[2].valueOf().should.equal(4);
+
+        obj = doc.strs.toObject();
+        obj[0].should.equal('one');
+        obj[1].should.equal('two');
+
+        doc.save(function (err) {
+          should.equal(null, err);
+          A.findById(a._id, function (err, doc) {
+            db.close();
+            should.equal(null, err);
+
+            var obj = doc.types.toObject();
+            obj[0].type.should.eql('bird');
+            obj[1].type.should.eql('boy');
+            obj[2].type.should.eql('frog');
+
+            obj = doc.nums.toObject();
+            obj[0].valueOf().should.equal(1);
+            obj[1].valueOf().should.equal(2);
+            obj[2].valueOf().should.equal(4);
+
+            obj = doc.strs.toObject();
+            obj[0].should.equal('one');
+            obj[1].should.equal('two');
+          });
+        });
+      });
+    });
+  },
+
   '#pull': function () {
     var db= start();
     var catschema = new Schema({ name: String })

@@ -661,6 +661,26 @@ module.exports = {
     Tobi.path('name').setters.should.have.length(2);
   },
 
+  'test setter order': function(){
+    function extract (v, self) {
+      return (v && v._id)
+        ? v._id
+        : v
+    };
+
+    var Tobi = new Schema({
+        name: { type: Schema.ObjectId, set: extract }
+    });
+
+    var id = new DocumentObjectId
+      , sid = id.toString()
+      , _id = { _id: id };
+
+    Tobi.path('name').applySetters(sid, { a: 'b' }).toString().should.eql(sid);
+    Tobi.path('name').applySetters(_id, { a: 'b' }).toString().should.eql(sid);
+    Tobi.path('name').applySetters(id, { a: 'b' }).toString().should.eql(sid);
+  },
+
   'test setters scope': function(){
     function lowercase (v, self) {
       this.a.should.eql('b');
@@ -712,6 +732,20 @@ module.exports = {
     Tobi.path('name').applyGetters('test').should.eql('test woot');
   },
 
+  'test getter order': function(){
+    function format (v, self) {
+      return v
+        ? '$' + v
+        : v
+    };
+
+    var Tobi = new Schema({
+        name: { type: Number, get: format }
+    });
+
+    Tobi.path('name').applyGetters(30, { a: 'b' }).should.equal('$30');
+  },
+
   'test getters scope': function(){
     function woot (v, self) {
       this.a.should.eql('b');
@@ -728,15 +762,15 @@ module.exports = {
 
   'test setters casting': function(){
     function last (v) {
-      v.should.be.a('string');
-      v.should.eql('0');
+      v.should.be.a('number');
+      v.should.equal(0);
       return 'last';
     };
 
     function first (v) {
       return 0;
     };
-    
+
     var Tobi = new Schema({
         name: { type: String, set: last }
     });
@@ -747,15 +781,15 @@ module.exports = {
 
   'test getters casting': function(){
     function last (v) {
-      v.should.be.a('string');
-      v.should.eql('0');
+      v.should.be.a('number');
+      v.should.equal(0);
       return 'last';
     };
 
     function first (v) {
       return 0;
     };
-    
+
     var Tobi = new Schema({
         name: { type: String, get: last }
     });

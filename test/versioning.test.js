@@ -270,18 +270,15 @@ module.exports = {
 
     doc.save(test);
 
-    // TODO
-    // TEST console.log() hiding the version
-
     function test (err) {
       assert.ifError(err);
       // test getting docs back from db missing version key
       V.findById(doc).select('numbers comments').exec(function (err, doc) {
+        db.close();
         assert.ifError(err);
         doc.comments[0].title = 'no version was included';
         var d = doc._delta();
-        console.error(d);
-        db.close();
+        assert.ok(!d[0].__v, 'no version key was selected so should not be included');
       })
     }
   }

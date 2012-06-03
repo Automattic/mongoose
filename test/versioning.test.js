@@ -281,5 +281,76 @@ module.exports = {
         assert.ok(!d[0].__v, 'no version key was selected so should not be included');
       })
     }
+  },
+
+  'version works with strict docs': function () {
+    var db = start();
+    var schema = new Schema({ str: ['string'] }, { strict: true, collection: 'versionstrict_'+random() });
+    var M = db.model('VersionStrict', schema);
+    var m =new M({ str: ['death', 'to', 'smootchy'] });
+    m.save(function (err) {
+      assert.ifError(err);
+      M.find(m, function (err, m) {
+        assert.ifError(err);
+        assert.equal(1, m.length);
+        m = m[0];
+        assert.equal(0, m._doc.__v);
+        m.str.$pull('death');
+        m.save(function (err) {
+          assert.ifError(err);
+          M.findById(m, function (err, m) {
+            db.close();
+            assert.ifError(err);
+            assert.equal(1, m._doc.__v);
+            assert.equal(2, m.str.length);
+            assert.ok(!~m.str.indexOf('death'));
+          })
+        })
+      });
+    })
+  },
+
+  'version works with existing unversioned docs': function () {
+    var db = start()
+      , V = db.model('Versioning')
+
+    V.collection.insert({ title: 'unversioned', numbers: [1,2,3] }, {safe:true}, function (err) {
+      assert.ifError(err);
+      V.findOne({ title: 'unversioned' }, function (err, d) {
+        assert.ifError(err);
+        assert.ok(!d._doc.__v);
+        d.numbers.splice(1, 1, 10);
+        var o = d._delta();
+        assert.equal(undefined, o[0].__v);
+        assert.ok(o[1].$inc);
+        assert.equal(1, o[1].$inc.__v);
+        d.save(function (err, d) {
+          assert.ifError(err);
+          assert.equal(1, d._doc.__v);
+          V.findById(d, function (err, d) {
+            db.close();
+            assert.ifError(err);
+            assert.ok(d);
+          });
+        });
+      });
+    });
+  },
+
+  'versionKey is configurable': function () {
+    var db =start();
+    var schema = new Schema(
+        { configured: 'bool' }
+      , { versionKey: 'lolwat', collection: 'configuredversion'+random() });
+    var V = db.model('ConfiguredVersionKey', schema);
+    var v = new V({ configured: true });
+    v.save(function (err) {
+      assert.ifError(err);
+      V.findById(v, function (err, v) {
+        db.close();
+        assert.ifError(err);
+        assert.equal(0, v._doc.lolwat);
+      });
+    });
   }
 }

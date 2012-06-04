@@ -1,3 +1,48 @@
+2.6.5 / 2012-05-24
+===================
+
+  * fixed; do not save virtuals in Model.update (#894)
+  * added; missing $ prefixed query aliases (going away in 3.x) (#884) [timoxley]
+  * fixed; setting invalid paths in strict mode (#916)
+  * fixed; resetting isNew after insert failure (#837) [boutell]
+
+2.6.4 / 2012-05-15
+===================
+
+  * updated; backport string regex $options to 2.x
+  * updated; use driver 1.0.2 (performance improvements) (#914)
+  * fixed; calling MongooseDocumentArray#id when the doc has no _id (#897)
+
+2.6.3 / 2012-05-03
+===================
+
+  * fixed; repl-set connectivity issues during failover on MongoDB 2.0.1
+  * updated; driver to 1.0.0
+  * fixed; virtuals application of subdocs when using toObject({ virtuals: true }) (#889)
+  * fixed; MongooseArray#pull of ObjectId correctly updates the array itself (#881)
+
+2.6.1 / 2012-04-30
+===================
+
+  * fixed; connection assignment in mongoose#model (#853, #877)
+  * fixed; incorrect reported num of affected docs in update ops (#862)
+
+2.6.0 / 2012-04-19
+===================
+
+  * updated; hooks.js to 0.2.1
+  * fixed; issue with passing undefined to a hook callback. thanks to [chrisleishman] for reporting.
+  * fixed; updating/setting nested objects in strict schemas (#843) as reported by [kof]
+  * fixed; Query#{update,remove}() work without callbacks again (#788)
+  * fixed; modifying subdoc along with parent array $atomic op (#842)
+
+2.5.14 / 2012-04-13
+===================
+
+  * fixed; setting an unset default value (#742)
+  * fixed; doc.isSelected(otherpath) when only _id is selected (#730)
+  * updated; docs
+
 2.5.13 / 2012-03-22
 ===================
 

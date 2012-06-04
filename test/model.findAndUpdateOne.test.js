@@ -338,6 +338,26 @@ module.exports = {
     }
   },
 
+  'findOneAndUpdate executes when a callback is passed to a succeeding function': function() {
+    var db = start()
+      , M = db.model(modelname, collection + random())
+      , pending = 6
+
+    M.findOneAndUpdate({ name: 'aaron' }, { $set: { name: 'Aaron'}}, { new: false }).exec(done);
+    M.findOneAndUpdate({ name: 'aaron' }, { $set: { name: 'Aaron'}}).exec(done);
+    M.where().findOneAndUpdate({ name: 'aaron' }, { $set: { name: 'Aaron'}}, { new: false }).exec(done);
+    M.where().findOneAndUpdate({ name: 'aaron' }, { $set: { name: 'Aaron'}}).exec(done);
+    M.where().findOneAndUpdate({ $set: { name: 'Aaron'}}).exec(done);
+    M.where('name', 'aaron').findOneAndUpdate({ $set: { name: 'Aaron'}}).exec(done);
+
+    function done (err, doc) {
+      should.strictEqual(null, err);
+      should.strictEqual(null, doc); // not an upsert, no previously existing doc
+      if (--pending) return;
+      db.close();
+    }
+  },
+
   'Model.findOneAndUpdate(callback) throws': function () {
     var db = start()
       , M = db.model(modelname, collection)
@@ -425,6 +445,23 @@ module.exports = {
 
     M.findByIdAndUpdate(_id, { $set: { name: 'Aaron'}}, { new: false }, done);
     M.findByIdAndUpdate(_id, { $set: { name: 'changed' }}, done);
+
+    function done (err, doc) {
+      should.strictEqual(null, err);
+      should.strictEqual(null, doc); // no previously existing doc
+      if (--pending) return;
+      db.close();
+    }
+  },
+
+  'findByIdAndUpdate executes when a callback is passed to a succeeding function': function () {
+    var db = start()
+      , M = db.model(modelname, collection + random())
+      , _id = new DocumentObjectId
+      , pending = 2
+
+    M.findByIdAndUpdate(_id, { $set: { name: 'Aaron'}}, { new: false }).exec(done);
+    M.findByIdAndUpdate(_id, { $set: { name: 'changed' }}).exec(done);
 
     function done (err, doc) {
       should.strictEqual(null, err);

@@ -160,7 +160,7 @@ module.exports = {
 
             BlogPost.update({ _id: post._id }, update2, function (err) {
               should.strictEqual(!!err, true);
-              ;/^can't append to array using string field name \[body\]/.test(err.message).should.be.true;
+    //          ;/^can't append to array using string field name \[body\]/.test(err.message).should.be.true;
               BlogPost.findById(post, function (err, p) {
                 should.strictEqual(null, err);
 
@@ -563,6 +563,40 @@ module.exports = {
         db.close();
         should.strictEqual(null, err);
         affected.should.equal(3);
+      });
+    });
+  },
+
+  'model.update accepts a doc as the basis from which to update': function() {
+    var db = start()
+      , BlogPost = db.model('BlogPost', collection)
+      , post = new BlogPost()
+      , id0 = new DocumentObjectId;
+
+    post.set('titleWithAuthor', random()+"Moby Dick by Herman Melville");
+    post.numbers = [1,2,3,4];
+    post.comments = [{ body: "some text" }, { body: "is just boring" }];
+    post.owners = [id0];
+    post.published = false;
+
+    BlogPost.update({title: post.title}, post, { upsert:true }, function(err, affected) {
+      should.strictEqual(null, err);
+      affected.should.equal(1);
+
+      BlogPost.findOne({title: post.title}, function(err, doc) {
+        db.close();
+        should.strictEqual(null, err);
+        doc.title.should.equal(post.title);
+        doc.author.should.equal(post.author);
+        Array.isArray(doc.numbers).should.be.true;
+        Array.isArray(doc.comments).should.be.true;
+        Array.isArray(doc.owners).should.be.true;
+        doc.numbers.length.should.equal(post.numbers.length);
+        doc.numbers[0].should.equal(post.numbers[0]);
+        doc.numbers[3].should.equal(post.numbers[3]);
+        doc.comments[0].body.should.equal(post.comments[0].body);
+        doc.owners[0].toString().should.equal(post.owners[0].toString());
+        doc.published.should.be.false;
       });
     });
   }

@@ -454,6 +454,23 @@ module.exports = {
     }
   },
 
+  'findByIdAndUpdate executes when a callback is passed to a succeeding function': function () {
+    var db = start()
+      , M = db.model(modelname, collection + random())
+      , _id = new DocumentObjectId
+      , pending = 2
+
+    M.findByIdAndUpdate(_id, { $set: { name: 'Aaron'}}, { new: false }).exec(done);
+    M.findByIdAndUpdate(_id, { $set: { name: 'changed' }}).exec(done);
+
+    function done (err, doc) {
+      should.strictEqual(null, err);
+      should.strictEqual(null, doc); // no previously existing doc
+      if (--pending) return;
+      db.close();
+    }
+  },
+
   'findByIdAndUpdate returns the original document': function () {
     var db = start()
       , M = db.model(modelname, collection)

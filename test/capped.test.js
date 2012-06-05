@@ -52,10 +52,39 @@ module.exports = {
     var schema = new Schema({ key: 'string' }, { capped: 100 });
     var Capped = db.model('Capped3', schema);
     Capped.collection.options(function (err, options) {
-      db.close();
       assert.ifError(err);
       assert.ok(options.capped, 'should create a capped collection');
       assert.equal(100, options.size);
+      var s = '';
+      for (var i = 0; i < 3800; ++i) s+='A';
+      Capped.create({ key: s }, function (err, doc) {
+        assert.ifError(err);
+        var id = doc.id;
+        Capped.count(function (err, count) {
+          assert.ifError(err);
+          assert.equal(1, count);
+          var c = new Capped({ key: s });
+          c.save(function (err, doc, num) {
+            assert.ifError(err);
+            assert.equal(1, num);
+            Capped.find(function (err, docs) {
+              assert.ifError(err);
+              assert.equal(1, docs.length);
+              c = docs[0];
+              assert.notEqual(id, c.id);
+              c.key = c.key + s;
+              c.save(function (err) {
+                assert.ok(err);
+                c.remove(function (err) {
+                  db.close();
+                  assert.ok(err);
+                  assert.equal(10101, err.code);
+                });
+              });
+            });
+          });
+        });
+      });
     });
   },
 

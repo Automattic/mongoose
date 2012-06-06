@@ -1261,10 +1261,10 @@ module.exports = {
 
     var doc = new B;
     doc.title='css3';
-    doc._delta().$set.title.should.equal('css3');
+    doc._delta()[1].$set.title.should.equal('css3');
     doc.title = undefined;
-    doc._delta().$unset.title.should.equal(1);
-    should.strictEqual(undefined, doc._delta().$set);
+    doc._delta()[1].$unset.title.should.equal(1);
+    should.strictEqual(undefined, doc._delta()[1].$set);
 
     doc.title='css3';
     doc.author = 'aaron';

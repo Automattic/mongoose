@@ -4329,8 +4329,8 @@ module.exports = {
 
     db.on('error', function (err) {
       if (/connection closed/.test(err.message)) return;
-      /^E11000 duplicate key error index:/.test(err.message).should.equal(true);
       db.close();
+      assert.ok(/^E11000 duplicate key error index:/.test(err.message), err);
     });
 
     var schema = new Schema({ name: { type: String } })

@@ -1,3 +1,11 @@
+
+2.6.6 / 2012-06-06
+===================
+
+  * fixed; stack overflow in query stream with large result sets (#929)
+  * added; $gt, $gte, $lt, $lte support to arrays (#902)
+  * fixed; pass option `safe` along to doc#remove() calls
+
 2.6.5 / 2012-05-24
 ===================
 

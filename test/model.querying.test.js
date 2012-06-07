@@ -5,6 +5,7 @@
 
 var start = require('./common')
   , should = require('should')
+  , assert = require('assert')
   , mongoose = start.mongoose
   , random = require('../lib/utils').random
   , Query = require('../lib/query')
@@ -1261,10 +1262,10 @@ module.exports = {
 
     var doc = new B;
     doc.title='css3';
-    doc._delta().$set.title.should.equal('css3');
+    doc._delta()[1].$set.title.should.equal('css3');
     doc.title = undefined;
-    doc._delta().$unset.title.should.equal(1);
-    should.strictEqual(undefined, doc._delta().$set);
+    doc._delta()[1].$unset.title.should.equal(1);
+    should.strictEqual(undefined, doc._delta()[1].$set);
 
     doc.title='css3';
     doc.author = 'aaron';
@@ -2286,7 +2287,57 @@ module.exports = {
     });
   },
 
-  'conflicting schematype path selection should error': function () {
+  'forcing inclusion of a deselected schema path works': function () {
+    var db = start();
+    var excluded = new Schema({
+        thin: Boolean
+      , name: { type: String, select: false }
+    });
+
+    var M = db.model('ForcedInclusionOfPath', excluded);
+    M.create({ thin: false, name: '1 meter' }, function (err, d) {
+      assert.ifError(err);
+
+      M.findById(d)
+      .select('+name')
+      .exec(function (err, doc) {
+        assert.ifError(err);
+        assert.equal(false, doc.thin);
+        assert.equal('1 meter', doc.name);
+        assert.equal(d.id, doc.id);
+
+        M.findById(d)
+        .select('+name -thin')
+        .exec(function (err, doc) {
+          assert.ifError(err);
+          assert.equal(undefined, doc.thin);
+          assert.equal('1 meter', doc.name);
+          assert.equal(d.id, doc.id);
+
+          M.findById(d)
+          .select('-thin +name')
+          .exec(function (err, doc) {
+            assert.ifError(err);
+            assert.equal(undefined, doc.thin);
+            assert.equal('1 meter', doc.name);
+            assert.equal(d.id, doc.id);
+
+            M.findById(d)
+            .select('-thin')
+            .exec(function (err, doc) {
+              db.close();
+              assert.ifError(err);
+              assert.equal(undefined, doc.thin);
+              assert.equal(undefined, doc.name);
+              assert.equal(d.id, doc.id);
+            });
+          });
+        });
+      });
+    });
+  },
+
+  'conflicting schematype path selection should not error': function () {
     var db =start()
 
     var schema = new Schema({
@@ -2305,7 +2356,9 @@ module.exports = {
       function done (err, s) {
         --pending || db.close();
         if (Array.isArray(s)) s = s[0];
-        should.equal(true, !!err);
+        should.equal(true, !err);
+        s.name.should.equal('bing');
+        assert.equal(undefined, s.conflict);
       }
 
       S.findById(s).exec(done);

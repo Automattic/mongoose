@@ -2175,7 +2175,7 @@ module.exports = {
     });
   },
 
-  'test updating multiple Number $pulls as a single $pullAll': function () {
+  'test updating multiple Number pulls as a single pullAll': function () {
     var db = start()
       , schema = new Schema({
           nested: {
@@ -2289,7 +2289,7 @@ module.exports = {
 
     mongoose.model('Temp', TempSchema);
     var Temp = db.model('Temp', collection);
-    
+
     var t = new Temp();
 
     t.save(function(err){
@@ -4251,8 +4251,8 @@ module.exports = {
 
     db.on('error', function (err) {
       if (/connection closed/.test(err.message)) return;
-      /^E11000 duplicate key error index:/.test(err.message).should.equal(true);
       db.close();
+      assert.ok(/^E11000 duplicate key error index:/.test(err.message), err);
     });
 
     var schema = new Schema({ name: { type: String } })

@@ -1,4 +1,11 @@
 
+2.6.7 / 2012-06-08
+===================
+
+  * fixed; ensure promise#error always emits instanceof Error
+  * fixed; selection of _id w/ another excluded path (#954)
+  * fixed; setting default DocumentArrays (#953)
+
 2.6.6 / 2012-06-06
 ===================
 

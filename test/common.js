@@ -28,6 +28,8 @@ var mongoose = require('../')
   , 'remove'
   , 'count'
   , 'distinct'
+  , 'isCapped'
+  , 'options'
 ].forEach(function (method) {
 
   var oldMethod = Collection.prototype[method];

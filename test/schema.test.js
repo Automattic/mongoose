@@ -893,7 +893,7 @@ module.exports = {
     Tobi.index({ firstname: 1, last: 1 }, { unique: true });
     Tobi.index({ firstname: 1, nope: 1 }, { unique: true, background: false });
 
-    Tobi.indexes.should.eql([
+    Tobi.indexes().should.eql([
         [{ name: 1 }, { background: true }]
       , [{ last: 1 }, { sparse: true, background :true }]
       , [{ nope: 1 }, { background : false}]

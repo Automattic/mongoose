@@ -36,9 +36,9 @@ TestDocument.prototype.__proto__ = Document.prototype;
  * Set a dummy schema to simulate compilation.
  */
 
-TestDocument.prototype.schema = new Schema({
+TestDocument.prototype.setSchema(new Schema({
     test    : String
-});
+}));
 
 /**
  * Test.

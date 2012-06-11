@@ -33,7 +33,7 @@ var em = new Schema({ title: String, body: String });
 em.virtual('works').get(function () {
   return 'em virtual works'
 });
-var schema = TestDocument.prototype.schema = new Schema({
+var schema = new Schema({
     test    : String
   , oids    : [ObjectId]
   , numbers : [Number]
@@ -54,6 +54,7 @@ var schema = TestDocument.prototype.schema = new Schema({
     }
   , em: [em]
 });
+TestDocument.prototype.setSchema(schema);
 
 schema.virtual('nested.agePlus2').get(function (v) {
   return this.nested.age + 2;

@@ -746,7 +746,7 @@ module.exports = {
     var q = new Query;
     q.hint(hint);
 
-    var options = q._optionsForExec({ options: { safe: true } });
+    var options = q._optionsForExec({ schema: { options: { safe: true } }});
 
     a.should.equal(JSON.stringify(options));
   },

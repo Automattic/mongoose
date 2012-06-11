@@ -2129,7 +2129,7 @@ module.exports = {
       t.nested.nums.$pull(1);
       t.nested.nums.$pull(2);
 
-      t._activePaths.stateOf('nested.nums').should.equal('modify');
+      t._activePaths.paths['nested.nums'].should.equal('modify');
       db.close();
 
     });

@@ -83,7 +83,7 @@ module.exports = {
     db.close();
   },
 
-  'modified getter should not throw': function () {
+  'isModified with no arg should not throw': function () {
     var db = start();
     var BlogPost = db.model('BlogPost', collection);
     var post = new BlogPost;
@@ -91,7 +91,7 @@ module.exports = {
 
     var threw = false;
     try {
-      post.modified;
+      post.isModified();
     } catch (err) {
       threw = true;
     }
@@ -4006,7 +4006,7 @@ module.exports = {
         sub.name = "Hubot1";
         sub.name.should.equal("Hubot1");
         sub.isModified('name').should.be.true;
-        t.modified.should.be.true;
+        t.isModified().should.be.true;
 
         t.save(function (err) {
           should.strictEqual(null, err);
@@ -4021,8 +4021,8 @@ module.exports = {
             sub.isModified('mixed').should.be.false;
             sub.commit('mixed');
             sub.isModified('mixed').should.be.true;
-            sub.modified.should.be.true;
-            t.modified.should.be.true;
+            sub.isModified().should.be.true;
+            t.isModified().should.be.true;
 
             t.save(function (err) {
               should.strictEqual(null, err);

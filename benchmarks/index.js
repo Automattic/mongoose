@@ -1,5 +1,5 @@
 Error.stackTraceLimit = Infinity;
-var out = process.argv.length > 2 ? process.argv[2] : false;
+var out = process.argv.length < 3;
 function log () {
   if (out) {
     console.error.apply(console, arguments);

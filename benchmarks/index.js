@@ -32,6 +32,9 @@ var AllSchema = new Schema({
 
 var A = mongoose.model('A', AllSchema);
 
+var numdocs = 0;
+var totaltime = 0;
+
 // bench the normal way
 // the try building the doc into the document prototype
 // and using inheritance and bench that 
@@ -54,6 +57,8 @@ function run (label, fn) {
       a._delta();
   }
   var time = (new Date - start)/1000;
+  totaltime += time;
+  numdocs += total;
   log(label + ' took %d seconds for %d docs (%d dps)', time, total, total/time);
   var used = process.memoryUsage();
   var res = {}
@@ -137,5 +142,6 @@ run('array of docs', function () {
 })
 
 //console.error(a.toObject({depopulate:true}));
+console.error('completed %d docs in %d seconds (%d dps)', numdocs, totaltime,numdocs/totaltime);
 
 // --trace-opt --trace-deopt --trace-bailout 

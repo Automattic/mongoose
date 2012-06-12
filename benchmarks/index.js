@@ -1,4 +1,11 @@
 Error.stackTraceLimit = Infinity;
+var out = process.argv.length > 2 ? process.argv[2] : false;
+function log () {
+  if (out) {
+    console.error.apply(console, arguments);
+  }
+}
+
 var mongoose = require('../')
   , Schema = mongoose.Schema;
 
@@ -34,7 +41,7 @@ var A = mongoose.model('A', AllSchema);
 // them.
 
 function run (label, fn) {
-  console.error('running %s', label);
+  log('running %s', label);
   var started = process.memoryUsage();
   var start = new Date;
   var total = 10000;
@@ -47,13 +54,14 @@ function run (label, fn) {
       a._delta();
   }
   var time = (new Date - start)/1000;
-  console.error(label + ' took %d seconds for %d docs (%d dps)', time, total, total/time);
+  log(label + ' took %d seconds for %d docs (%d dps)', time, total, total/time);
   var used = process.memoryUsage();
   var res = {}
   res.rss  = used.rss - started.rss;
   res.heapTotal = used.heapTotal - started.heapTotal;
   res.heapUsed = used.heapUsed - started.heapUsed;
-  console.error('change: ', res);
+  log('change: ', res);
+  a = res = used = time = started = start = total = i = null
   //console.error(((used.vsize - started.vsize) / 1048576)+' MB');
 }
 

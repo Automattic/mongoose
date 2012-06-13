@@ -5,6 +5,7 @@
 
 var mongoose = require('./common').mongoose
   , should = require('should')
+  , assert = require('assert')
   , Schema = mongoose.Schema
   , Document = mongoose.Document
   , SchemaType = mongoose.SchemaType
@@ -1003,12 +1004,18 @@ module.exports = {
     })
   },
 
-  'array of object literal missing a `type` is interpreted as Mixed': function () {
+  'array of object literal missing a type is interpreted as DocumentArray': function () {
+    var goose = new mongoose.Mongoose;
     var s = new Schema({
         arr: [
           { something: { type: String } }
         ]
     });
+    assert.ok(s.path('arr') instanceof SchemaTypes.DocumentArray);
+    var M = goose.model('objectliteralschema', s);
+    var m = new M({ arr: [ { something: 'wicked this way comes' }] });
+    assert.equal('wicked this way comes', m.arr[0].something);
+    assert.ok(m.arr[0]._id);
   },
 
   'helpful schema debugging msg': function () {

@@ -2718,7 +2718,7 @@ module.exports = {
             Array.isArray(doc.mixed).should.be.true;
             doc.mixed.push({ hello: 'world' });
             doc.mixed.push([ 'foo', 'bar' ]);
-            doc.commit('mixed');
+            doc.markModified('mixed');
 
             doc.save(function (err, doc) {
               should.strictEqual(err, null);
@@ -4019,7 +4019,7 @@ module.exports = {
             sub.mixed.w = 5;
             sub.mixed.w.should.equal(5);
             sub.isModified('mixed').should.be.false;
-            sub.commit('mixed');
+            sub.markModified('mixed');
             sub.isModified('mixed').should.be.true;
             sub.isModified().should.be.true;
             t.isModified().should.be.true;

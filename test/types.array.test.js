@@ -5,6 +5,7 @@
 
 var start = require('./common')
   , should = require('should')
+  , assert = require('assert')
   , mongoose = require('./common').mongoose
   , Schema = mongoose.Schema
   , random = require('../lib/utils').random
@@ -63,20 +64,20 @@ module.exports = {
 
   },
 
-  '$push is push': function() {
+  '$push exists': function() {
     var db = start()
     var User = db.model('User')
     var tj = new User({ name: 'tj',  pets: []})
-    tj.pets.push.should.equal(tj.pets.$push)
     db.close()
+    assert.equal('function', typeof tj.pets.$push)
   },
 
-  '$pop is pop': function() {
+  '$pop exists': function() {
     var db = start()
     var User = db.model('User')
     var tj = new User({ name: 'tj',  pets: []})
-    tj.pets.pop.should.equal(tj.pets.$pop)
     db.close()
+    assert.equal('function', typeof tj.pets.$pop)
   },
 
   '$shift is shift': function() {
@@ -91,8 +92,8 @@ module.exports = {
     var db = start()
     var User = db.model('User')
     var tj = new User({ name: 'tj',  pets: []})
-    tj.pets.unshift.should.equal(tj.pets.$unshift)
     db.close()
+    assert.equal('function', typeof tj.pets.$unshift)
   },
 
   'test indexOf()': function(){

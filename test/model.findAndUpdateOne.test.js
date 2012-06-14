@@ -5,6 +5,7 @@
 
 var start = require('./common')
   , should = require('should')
+  , assert = require('assert')
   , mongoose = start.mongoose
   , random = require('../lib/utils').random
   , Query = require('../lib/query')
@@ -391,11 +392,29 @@ module.exports = {
     s.save(function (err) {
       should.strictEqual(null, err);
 
-      S.findOneAndUpdate({ _id: s._id }, { ignore: true }, function (err, doc) {
-        db.close();
+      var name = Date.now();
+      S.findOneAndUpdate({ name: name }, { ignore: true }, { upsert: true }, function (err, doc) {
         should.strictEqual(null, err);
-        should.not.exist(doc.ignore);
-        should.not.exist(doc._doc.ignore);
+        assert.ok(doc);
+        assert.ok(doc._id);
+        assert.equal(undefined, doc.ignore);
+        assert.equal(undefined, doc._doc.ignore);
+        assert.equal(name, doc.name);
+
+        S.findOneAndUpdate({ _id: s._id }, { ignore: true }, { upsert: true }, function (err, doc) {
+          should.strictEqual(null, err);
+          should.not.exist(doc.ignore);
+          should.not.exist(doc._doc.ignore);
+          assert.equal('orange crush', doc.name, 'doc was not overwritten with {} during upsert');
+
+          S.findOneAndUpdate({ _id: s._id }, { ignore: true }, function (err, doc) {
+            db.close();
+            should.strictEqual(null, err);
+            should.not.exist(doc.ignore);
+            should.not.exist(doc._doc.ignore);
+            assert.equal('orange crush', doc.name);
+          });
+        });
       });
     });
   },

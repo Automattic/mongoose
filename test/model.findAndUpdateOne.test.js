@@ -269,6 +269,45 @@ module.exports = {
     });
   },
 
+  'findOneAndUpdate allows passing a doc as the conditions argument and the update argument': function () {
+    var db = start()
+      , M = db.model(modelname, collection)
+      , title = 'Tobi ' + random()
+      , author = 'Brian ' + random()
+      , id0 = new DocumentObjectId
+      , id1 = new DocumentObjectId
+
+    var post = new M;
+    post.set('title', title);
+    post.author = author;
+    post.meta.visitors = 2;
+    post.date = new Date;
+    post.published = true;
+    post.mixed = { x: 'ex', y: 'why' };
+    post.numbers = [4,5,6,7];
+    post.owners = [id0, id1];
+    post.comments = [{ body: 'been there' }, { body: 'done that' }];
+
+    M.findOneAndUpdate(post, post, { upsert: true, new: true }, function (err, up) {
+      db.close();
+      should.strictEqual(err, null, err && err.stack);
+
+      up.title.should.equal(title);
+      up.author.should.equal(author)
+      up.meta.visitors.valueOf().should.equal(2);
+      up.date.toString().should.equal(post.date.toString());
+      up.published.should.eql(post.published);
+      up.mixed.x.should.equal(post.mixed.x);
+      should.strictEqual(up.mixed.y, post.mixed.y);
+      Array.isArray(up.numbers).should.be.true;
+      Array.isArray(up.owners).should.be.true;
+      Array.isArray(up.comments).should.be.true;
+      up.numbers.length.should.equal(4);
+      up.owners.length.should.equal(2);
+      up.comments.length.should.equal(2);
+    });
+  },
+
   'options/conditions/doc are merged when no callback is passed': function () {
     var db = start()
       , M = db.model(modelname, collection)

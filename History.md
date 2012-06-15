@@ -1,4 +1,9 @@
 
+2.7.0 / 2012-06-14
+===================
+
+  * added; deprecation warnings to methods being removed in 3.x
+
 2.6.8 / 2012-06-14
 ===================
 

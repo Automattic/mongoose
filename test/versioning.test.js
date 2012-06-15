@@ -111,7 +111,7 @@ module.exports = {
     function test3 (err, a, b) {
       assert.ifError(err);
       assert.equal(a.meta.numbers.length, 5);
-      assert.equal(a.meta.numbers.length, 5);
+      assert.equal(b.meta.numbers.length, 5);
       assert.equal(-1, a.meta.numbers.indexOf(10));
       assert.ok(~a.meta.numbers.indexOf(20));
 
@@ -123,7 +123,7 @@ module.exports = {
     }
 
     function test4 (err, a, b) {
-      assert.ok(/No matching document/.test(err));
+      assert.ok(/No matching document/.test(err), err);
       a.set('arr.0.0', 'updated');
       var d = a._delta()[0];
       assert.equal(a._doc.__v, d.__v, 'version should be added to where clause')

@@ -6,6 +6,7 @@ var url = require('url')
   , Mongoose = mongoose.Mongoose
   , Schema = mongoose.Schema;
 
+mongoose.set('dep warnings', false)
 module.exports = {
 
   'test connecting to the demo database': function(beforeExit){

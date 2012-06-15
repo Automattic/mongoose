@@ -11,7 +11,7 @@ var start = require('./common')
 
 var DecoratedSchema = new Schema({
     title     : String
-});
+}, { strict: false });
 
 mongoose.model('Decorated', DecoratedSchema);
 

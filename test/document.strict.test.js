@@ -29,12 +29,12 @@ module.exports = {
     var lax = new Schema({
         ts  : { type: Date, default: Date.now }
       , content: String
-    });
+    }, { strict: false });
 
     var strict = new Schema({
         ts  : { type: Date, default: Date.now }
       , content: String
-    }, { strict: true });
+    });
 
     var Lax = db.model('Lax', lax);
     var Strict = db.model('Strict', strict);
@@ -93,11 +93,11 @@ module.exports = {
 
     var lax = new Schema({
         name: { last: String }
-    });
+    }, { strict: false });
 
     var strict = new Schema({
         name: { last: String }
-    }, { strict: true });
+    });
 
     var Lax = db.model('NestedLax', lax, 'nestdoc'+random());
     var Strict = db.model('NestedStrict', strict, 'nestdoc'+random());
@@ -133,15 +133,15 @@ module.exports = {
     var lax = new Schema({
         ts  : { type: Date, default: Date.now }
       , content: String
-    });
+    }, { strict: false });
 
     var strict = new Schema({
         ts  : { type: Date, default: Date.now }
       , content: String
-    }, { strict: true });
+    });
 
-    var Lax = db.model('EmbeddedLax', new Schema({ dox: [lax] }), 'embdoc'+random());
-    var Strict = db.model('EmbeddedStrict', new Schema({ dox: [strict] }), 'embdoc'+random());
+    var Lax = db.model('EmbeddedLax', new Schema({ dox: [lax] }, { strict: false }), 'embdoc'+random());
+    var Strict = db.model('EmbeddedStrict', new Schema({ dox: [strict] }, { strict: false }), 'embdoc'+random());
 
     var l = new Lax({ dox: [{content: 'sample', rouge: 'data'}] });
     l.dox[0]._strictMode.should.be.false;
@@ -184,7 +184,7 @@ module.exports = {
     var strictSchema = new Schema({
         email: String
       , prop: String
-    }, {strict: true});
+    });
 
     strictSchema
     .virtual('myvirtual')

@@ -52,7 +52,8 @@ mongoose.model('BlogPostB', BlogPostB);
 var collection = 'blogposts_' + random();
 
 var ModSchema = new Schema({
-  num: Number
+    num: Number
+  , str: String
 });
 mongoose.model('Mod', ModSchema);
 

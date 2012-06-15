@@ -47,7 +47,7 @@ var BlogPost = new Schema({
   , numbers   : [Number]
   , owners    : [ObjectId]
   , comments  : [Comments]
-});
+}, { strict: false });
 
 BlogPost.virtual('titleWithAuthor')
   .get(function () {
@@ -67,11 +67,11 @@ BlogPost.static('woot', function(){
   return this;
 });
 
-mongoose.model('BlogPost', BlogPost);
+mongoose.model('BlogPostForUpdates', BlogPost);
 
 var collection = 'blogposts_' + random();
 
-var strictSchema = new Schema({ name: String, x: { nested: String }}, { strict: true });
+var strictSchema = new Schema({ name: String, x: { nested: String }});
 strictSchema.virtual('foo').get(function () {
   return 'i am a virtual FOO!'
 });
@@ -81,7 +81,7 @@ module.exports = {
 
   'test updating documents': function () {
     var db = start()
-      , BlogPost = db.model('BlogPost', collection)
+      , BlogPost = db.model('BlogPostForUpdates', collection)
       , title = 'Tobi ' + random()
       , author = 'Brian ' + random()
       , newTitle = 'Woot ' + random()
@@ -493,7 +493,7 @@ module.exports = {
 
   'test updating numbers atomically': function () {
     var db = start()
-      , BlogPost = db.model('BlogPost', collection)
+      , BlogPost = db.model('BlogPostForUpdates', collection)
       , totalDocs = 4
       , saveQueue = [];
 
@@ -555,7 +555,7 @@ module.exports = {
 
   'model.update passes number of affected documents': function () {
     var db = start()
-      , B = db.model('BlogPost', 'wwwwowowo'+random())
+      , B = db.model('BlogPostForUpdates', 'wwwwowowo'+random())
 
     B.create({ title: 'one'},{title:'two'},{title:'three'}, function (err) {
       should.strictEqual(null, err);

@@ -129,12 +129,12 @@ module.exports = {
             assert.equal('nathan', docs[3]._id);
 
             // update casting works
-            ret.findOneAndUpdate({ _id: 'aaron' }, { updated: true }, function (err, doc) {
+            ret.findOneAndUpdate({ _id: 'aaron' }, { published: true }, function (err, doc) {
               db.close();
               if (err) throw err;
               assert.ok(doc);
               assert.equal('aaron', doc._id);
-              assert.equal(true, doc.updated);
+              assert.equal(true, doc.published);
             });
           });
         });

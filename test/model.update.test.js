@@ -455,7 +455,7 @@ module.exports = {
     }
 
     function update16 (post, ret) {
-      ret.comments.$pushAll([{body: 'hi'}, {body:'there'}]);
+      ret.comments.push({body: 'hi'}, {body:'there'});
       ret.save(function (err) {
         should.strictEqual(null, err);
         BlogPost.findById(post, function (err, ret) {

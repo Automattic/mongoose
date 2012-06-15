@@ -716,7 +716,7 @@ module.exports = {
     var post = new BlogPost()
 
     post.isModified('owners').should.be.false;
-    post.get('owners').$push(new DocumentObjectId);
+    post.get('owners').push(new DocumentObjectId);
     post.isModified('owners').should.be.true;
 
     db.close();
@@ -1867,7 +1867,7 @@ module.exports = {
     post.save( function (err) {
       BlogPost.findById( post.get('_id'), function (err, found) {
         found.get('numbers').length.should.equal(4);
-        found.get('numbers').$pull('3');
+        found.get('numbers').pull('3');
         found.save( function (err) {
           BlogPost.findById( found.get('_id'), function (err, found2) {
             found2.get('numbers').length.should.equal(3);
@@ -2099,8 +2099,7 @@ module.exports = {
 
     Temp.create({}, function (err, t) {
       t.nested.nums.push(1);
-      t.nested.nums.$pushAll([2, 3]);
-
+      t.nested.nums.push(2, 3);
       t.nested.nums.should.have.length(3);
 
       t.save( function (err) {
@@ -2126,8 +2125,8 @@ module.exports = {
     var Temp = db.model('NestedPushes', collection);
 
     Temp.create({nested: {nums: [1, 2, 3, 4, 5]}}, function (err, t) {
-      t.nested.nums.$pull(1);
-      t.nested.nums.$pull(2);
+      t.nested.nums.pull(1);
+      t.nested.nums.pull(2);
 
       t._activePaths.paths['nested.nums'].should.equal('modify');
       db.close();
@@ -2147,7 +2146,7 @@ module.exports = {
     var Temp = db.model('NestedPushes', collection);
 
     Temp.create({nested: {nums: [1, 2, 3, 4, 5]}}, function (err, t) {
-      t.nested.nums.$pull(1);
+      t.nested.nums.pull(1);
 
       t.nested.nums.should.have.length(4);
 
@@ -2167,7 +2166,7 @@ module.exports = {
     var Temp = db.model('NestedPushes', collection);
 
     Temp.create({nested: {nums: [1, 2, 3, 4, 5]}}, function (err, t) {
-      t.nested.nums.$pullAll([1, 2, 3]);
+      t.nested.nums.pull(1, 2, 3);
 
       t.nested.nums.should.have.length(2);
 
@@ -2187,8 +2186,8 @@ module.exports = {
     var Temp = db.model('NestedPushes', collection);
 
     Temp.create({nested: {nums: [1, 2, 3, 4, 5]}}, function (err, t) {
-      t.nested.nums.$pull(1);
-      t.nested.nums.$pull(2);
+      t.nested.nums.pull(1);
+      t.nested.nums.pull(2);
 
       t.nested.nums.should.have.length(3);
 
@@ -2215,8 +2214,8 @@ module.exports = {
     var Temp = db.model('NestedPushes', collection);
 
     Temp.create({nested: {nums: [1, 2, 3, 4, 5]}}, function (err, t) {
-      t.nested.nums.$pull(1);
-      t.nested.nums.$pullAll([2, 3]);
+      t.nested.nums.pull(1);
+      t.nested.nums.pull(2, 3);
 
       t.nested.nums.should.have.length(2);
 

@@ -287,7 +287,7 @@ module.exports = {
         obj[1].type.should.eql('frog');
         obj[2].type.should.eql('cloud');
 
-        doc.nums.$push(4);
+        doc.nums.push(4);
         obj = doc.nums.toObject();
         obj[0].valueOf().should.equal(2);
         obj[1].valueOf().should.equal(3);
@@ -356,7 +356,7 @@ module.exports = {
         obj[1].type.should.eql('boy');
         obj[2].type.should.eql('frog');
 
-        doc.nums.$push(4);
+        doc.nums.push(4);
         obj = doc.nums.toObject();
         obj[0].valueOf().should.equal(1);
         obj[1].valueOf().should.equal(2);
@@ -533,16 +533,16 @@ module.exports = {
 
     m.num.addToSet(3,4,5);
     m.num.length.should.equal(5);
-    m.str.$addToSet('four', 'five', 'two');
+    m.str.addToSet('four', 'five', 'two');
     m.str.length.should.equal(5);
     m.id.addToSet(id2, id3);
     m.id.length.should.equal(3);
-    m.doc.$addToSet(m.doc[0]);
+    m.doc.addToSet(m.doc[0]);
     m.doc.length.should.equal(2);
-    m.doc.$addToSet({ name: 'Waltz', arr: [1] }, m.doc[0]);
+    m.doc.addToSet({ name: 'Waltz', arr: [1] }, m.doc[0]);
     m.doc.length.should.equal(3);
     m.date.length.should.equal(2);
-    m.date.$addToSet(d1);
+    m.date.addToSet(d1);
     m.date.length.should.equal(2);
     m.date.addToSet(d3);
     m.date.length.should.equal(3);
@@ -584,15 +584,15 @@ module.exports = {
         // test single $addToSet
         m.num.addToSet(3,4,5,6);
         m.num.length.should.equal(6);
-        m.str.$addToSet('four', 'five', 'two', 'six');
+        m.str.addToSet('four', 'five', 'two', 'six');
         m.str.length.should.equal(6);
         m.id.addToSet(id2, id3, id4);
         m.id.length.should.equal(4);
 
-        m.date.$addToSet(d1, d3, d4);
+        m.date.addToSet(d1, d3, d4);
         m.date.length.should.equal(4);
 
-        m.doc.$addToSet(m.doc[0], { name: '8bit' });
+        m.doc.addToSet(m.doc[0], { name: '8bit' });
         m.doc.length.should.equal(4);
 
         m.save(function (err) {
@@ -638,15 +638,15 @@ module.exports = {
             // test multiple $addToSet
             m.num.addToSet(7,8);
             m.num.length.should.equal(8);
-            m.str.$addToSet('seven', 'eight');
+            m.str.addToSet('seven', 'eight');
             m.str.length.should.equal(8);
             m.id.addToSet(id5, id6);
             m.id.length.should.equal(6);
 
-            m.date.$addToSet(d5, d6);
+            m.date.addToSet(d5, d6);
             m.date.length.should.equal(6);
 
-            m.doc.$addToSet(m.doc[1], { name: 'BigBeat' }, { name: 'Funk' });
+            m.doc.addToSet(m.doc[1], { name: 'BigBeat' }, { name: 'Funk' });
             m.doc.length.should.equal(6);
 
             m.save(function (err) {

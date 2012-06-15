@@ -115,7 +115,7 @@ module.exports = {
       assert.equal(-1, a.meta.numbers.indexOf(10));
       assert.ok(~a.meta.numbers.indexOf(20));
 
-      a.numbers.$pullAll([3, 20]);
+      a.numbers.pull(3, 20);
 
       // should fail
       b.set('numbers.2', 100);
@@ -148,7 +148,7 @@ module.exports = {
       b.set('arr.0', 'not an array');
       // should overwrite b's changes, last write wins
       // force a $set
-      a.arr.pullAll(['using set']);
+      a.arr.pull('using set');
       a.arr.push('woot', 'woot2');
       a.arr.$pop();
       save(a, b, test7)
@@ -167,9 +167,9 @@ module.exports = {
     function test8 (err, a, b) {
       assert.ok(/No matching document/.test(err), 'changes to b should not be applied');
       assert.equal(a.meta.nested.length, 3);
-      a.meta.nested.$push({ title: 'the' });
-      a.meta.nested.$push({ title: 'killing' });
-      b.meta.nested.$push({ title: 'biutiful' });
+      a.meta.nested.push({ title: 'the' });
+      a.meta.nested.push({ title: 'killing' });
+      b.meta.nested.push({ title: 'biutiful' });
       save(a, b, test9);
     }
 
@@ -295,7 +295,7 @@ module.exports = {
         assert.equal(1, m.length);
         m = m[0];
         assert.equal(0, m._doc.__v);
-        m.str.$pull('death');
+        m.str.pull('death');
         m.save(function (err) {
           assert.ifError(err);
           M.findById(m, function (err, m) {

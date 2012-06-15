@@ -76,6 +76,9 @@ var collection = 'updateoneblogposts_' + random();
 var strictSchema = new Schema({ name: String }, { strict: true });
 mongoose.model('UpdateOneStrictSchema', strictSchema);
 
+var strictThrowSchema = new Schema({ name: String }, { strict: 'throw'});
+mongoose.model('UpdateOneStrictThrowSchema', strictThrowSchema);
+
 module.exports = {
 
   'findOneAndUpdate returns the edited document': function () {
@@ -419,6 +422,29 @@ module.exports = {
     });
   },
 
+  'Model.findOneAndUpdate should return errors strict:throw schemas': function () {
+    var db = start();
+    var S = db.model('UpdateOneStrictThrowSchema');
+    var s = new S({ name: 'orange crush' });
+
+    s.save(function (err) {
+      should.strictEqual(null, err);
+
+      var name = Date.now();
+      S.findOneAndUpdate({ name: name }, { ignore: true }, { upsert: true }, function (err, doc) {
+        assert.ok(err);
+        assert.ok(/not in schema/.test(err));
+        assert.ok(!doc);
+
+        S.findOneAndUpdate({ _id: s._id }, { ignore: true }, function (err, doc) {
+          db.close();
+          assert.ok(err);
+          assert.ok(/not in schema/.test(err));
+          assert.ok(!doc);
+        });
+      });
+    });
+  },
   // by id
 
   'Model.findByIdAndUpdate(callback) throws': function () {

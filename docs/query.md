@@ -448,9 +448,25 @@ Sets the numer of documents to return per database query. For example, if we wer
 
 ## Query#slaveOk
 
-Sets the [slaveOk](http://www.mongodb.org/display/DOCS/Replica+Pairs#ReplicaPairs-Queryingtheslave) option.
+Sets the [slaveOk](http://www.mongodb.org/display/DOCS/Replica+Pairs#ReplicaPairs-Queryingtheslave) option or `true` with no arguments.
 
     query.slaveOk(Boolean)
+    query.slaveOk() // equivalent to query.slaveOk(true)
+
+## Query#tailable
+
+Sets the [tailable](http://www.mongodb.org/display/DOCS/Tailable+Cursors) option or `true` with no arguments.
+
+    query.tailable(Boolean)
+    query.tailable() // equivalent to query.tailable(true)
+
+Tailable queries can only be used on capped collections, can only return documents in their natural order, and never use indexes. Unless the cursor dies, a tailable [QueryStream](/docs/querystream.html) will remain open and receive documents as they are inserted into the collection, much like the Unix `tail -f` command.
+
+    var stream = Model.find().tailable().stream();
+
+    stream.on('data', function (doc) {
+        // do stuff
+    });
 
 ## Query#hint
 

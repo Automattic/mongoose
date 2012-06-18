@@ -6,32 +6,32 @@
 var mongoose = require('./common').mongoose
   , MongooseNumber = mongoose.Types.Number
   , SchemaNumber = mongoose.Schema.Types.Number
-  , should = require('should')
+  , assert = require('assert')
 
 /**
  * Test.
  */
 
-module.exports = {
+describe('types.number', function(){
 
-  'test that a mongoose number behaves and quacks like a number': function(){
+  it('test that a mongoose number behaves and quacks like a number', function(){
     var a = new MongooseNumber(5);
 
-    a.should.be.an.instanceof(Number);
-    a.should.be.an.instanceof(MongooseNumber);
-    a.toString().should.eql('5');
+    assert.ok(a instanceof Number);
+    assert.ok(a instanceof MongooseNumber);
+    assert.equal(a.toString(),'5');
+    assert.equal(a._atomics.constructor, Object);
+  })
 
-    (a._atomics.constructor).should.eql(Object);
-  },
-
-  'an empty string casts to null': function () {
+  it('an empty string casts to null', function () {
     var n = new SchemaNumber();
-    should.strictEqual(n.cast(''), null);
-  },
+    assert.strictEqual(n.cast(''), null);
+  })
 
-  'a null number should castForQuery to null': function () {
+  it('a null number should castForQuery to null', function () {
     var n = new SchemaNumber();
-    should.strictEqual(n.castForQuery(null), null);
-  }
+    assert.strictEqual(n.castForQuery(null), null);
+  })
 
-};
+
+})

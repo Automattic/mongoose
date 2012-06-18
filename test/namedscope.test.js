@@ -1,3 +1,4 @@
+
 //Query.prototype.where(criteria, callback)
 //Query.prototype.where(path, val, callback)
 //
@@ -24,7 +25,7 @@
  */
 
 var start = require('./common')
-  , should = require('should')
+  , assert = require('assert')
   , mongoose = start.mongoose
   , random = require('../lib/utils').random
   , Schema = mongoose.Schema
@@ -61,25 +62,28 @@ UserNSSchema.namedScope('active', function () {
 mongoose.model('UserNS', UserNSSchema);
 
 // TODO Add in tests for using named scopes where findOne, update, remove
-module.exports = {
-  'basic named scopes should work, for find': function () {
+
+describe('named scope', function(){
+  it('basic named scopes should work, for find', function(done){
     var db = start()
       , UserNS = db.model('UserNS', 'users_' + random());
+
     UserNS.create(
         {gender: 'male'}
       , {gender: 'male'}
       , {gender: 'female'}
       , function (err, _) {
-          should.strictEqual(err, null);
-          UserNS.male.find( function (err, found) {
-            db.close();
-            should.strictEqual(err, null);
-            found.should.have.length(2);
-          });
-        }
-    );
-  },
-  'dynamic named scopes should work, for find': function () {
+        assert.ifError(err);
+        UserNS.male.find( function (err, found) {
+          db.close();
+          assert.ifError(err);
+          assert.equal(2, found.length);
+          done();
+        });
+    });
+  })
+
+  it('dynamic named scopes should work, for find', function(done){
     var db = start()
       , UserNS = db.model('UserNS', 'users_' + random());
     UserNS.create(
@@ -87,16 +91,18 @@ module.exports = {
       , {age: 22}
       , {age: 19}
       , function (err, _) {
-          should.strictEqual(err, null);
+          assert.ifError(err);
           UserNS.olderThan(20).find( function (err, found) {
             db.close();
-            should.strictEqual(err, null);
-            found.should.have.length(2);
+            assert.ifError(err);
+            assert.equal(2, found.length);
+            done();
           });
         }
     );
-  },
-  'named scopes built on top of dynamic named scopes should work, for find': function () {
+  })
+
+  it('named scopes built on top of dynamic named scopes should work, for find', function(done){
     var db = start()
       , UserNS = db.model('UserNS', 'users_' + random());
     UserNS.create(
@@ -104,16 +110,18 @@ module.exports = {
       , {age: 22}
       , {age: 19}
       , function (err, _) {
-          should.strictEqual(err, null);
-          UserNS.twenties.find( function (err, found) {
-            db.close();
-            should.strictEqual(err, null);
-            found.should.have.length(2);
-          });
-        }
+        assert.ifError(err);
+        UserNS.twenties.find( function (err, found) {
+          db.close();
+          assert.ifError(err);
+          assert.equal(2, found.length);
+          done();
+        });
+      }
     );
-  },
-  'chaining named scopes should work, for find': function () {
+  });
+
+  it('chaining named scopes should work, for find', function(done){
     var db = start()
       , UserNS = db.model('UserNS', 'users_' + random());
     UserNS.create(
@@ -121,18 +129,19 @@ module.exports = {
       , {age: 45, gender: 'male', lastLogin: +new Date}
       , {age: 50, gender: 'female', lastLogin: +new Date}
       , function (err, _, match, _) {
-          should.strictEqual(err, null);
-          UserNS.olderThan(40).active.male.find( function (err, found) {
-            db.close();
-            should.strictEqual(err, null);
-            found.should.have.length(1);
-            found[0]._id.should.eql(match._id);
-          });
-        }
+        assert.ifError(err);
+        UserNS.olderThan(40).active.male.find( function (err, found) {
+          db.close();
+          assert.ifError(err);
+          assert.equal(1, found.length);
+          assert.deepEqual(found[0]._id,match._id);
+          done();
+        });
+      }
     );
-  },
+  })
 
-  'basic named scopes should work, for remove': function () {
+  it('basic named scopes should work, for remove', function(done){
     var db = start()
       , UserNS = db.model('UserNS', 'users_' + random());
     UserNS.create(
@@ -140,20 +149,21 @@ module.exports = {
       , {gender: 'male'}
       , {gender: 'female'}
       , function (err, _) {
-          UserNS.male.remove( function (err) {
-            should.strictEqual(!!err, false);
-            UserNS.male.find( function (err, found) {
-              db.close();
-              should.strictEqual(err, null);
-              found.should.have.length(0);
-            });
+        assert.ifError(err);
+        UserNS.male.remove( function (err) {
+          assert.ifError(err);
+          UserNS.male.find( function (err, found) {
+            db.close();
+            assert.ifError(err);
+            assert.equal(0, found.length);
+            done();
           });
-        }
+        });
+      }
     );
-  },
+  })
 
-  // TODO multi-updates
-  'basic named scopes should work, for update': function () {
+  it('basic named scopes should work, for update', function(done){
     var db = start()
       , UserNS = db.model('UserNS', 'users_' + random());
     UserNS.create(
@@ -161,56 +171,58 @@ module.exports = {
       , {gender: 'male'}
       , {gender: 'female'}
       , function (err, male1, male2, female1) {
-          should.strictEqual(err, null);
-          UserNS.male.update({gender: 'female'}, function (err) {
-            should.strictEqual(err, null);
-            UserNS.female.find( function (err, found) {
-              should.strictEqual(err, null);
-              found.should.have.length(2);
-              UserNS.male.find( function (err, found) {
-                db.close();
-                should.strictEqual(err, null);
-                found.should.have.length(1);
-              });
+        assert.ifError(err);
+        UserNS.male.update({gender: 'female'}, function (err) {
+          assert.ifError(err);
+          UserNS.female.find( function (err, found) {
+            assert.ifError(err);
+            assert.equal(2, found.length);
+            UserNS.male.find( function (err, found) {
+              db.close();
+              assert.ifError(err);
+              assert.equal(1, found.length);
+              done();
             });
           });
-        }
+        });
+      }
     );
-  },
+  })
 
-  'chained named scopes should work, for findOne': function () {
+  it('chained named scopes should work, for findOne', function(done){
     var db = start()
       , UserNS = db.model('UserNS', 'users_' + random());
     UserNS.create(
         {age: 100, gender: 'male'}
       , function (err, maleCentenarian) {
-          should.strictEqual(err, null);
-          UserNS.male.olderThan(99).findOne( function (err, found) {
-            db.close();
-            should.strictEqual(err, null);
-            found.id;
-            found._id.should.eql(maleCentenarian._id);
-          });
-        }
+        assert.ifError(err);
+        UserNS.male.olderThan(99).findOne( function (err, found) {
+          db.close();
+          assert.ifError(err);
+          assert.deepEqual(found._id,maleCentenarian._id);
+          done();
+        });
+      }
     );
-  },
+  })
 
-  'hybrid use of chained named scopes and ad hoc querying should work': function () {
+  it('hybrid use of chained named scopes and ad hoc querying should work', function(done){
     var db = start()
       , UserNS = db.model('UserNS', 'users_' + random());
     UserNS.create(
         {age: 100, gender: 'female'}
       , function (err, femaleCentenarian) {
-          should.strictEqual(null, err);
-          UserNS.female.where('age').gt(99).findOne( function (err, found) {
-            db.close();
-            should.strictEqual(err, null);
-            found.id;
-            found._id.should.eql(femaleCentenarian._id);
-          });
-        }
+        assert.ifError(err);
+        UserNS.female.where('age').gt(99).findOne( function (err, found) {
+          db.close();
+          assert.ifError(err);
+          assert.deepEqual(found._id,femaleCentenarian._id);
+          done();
+        });
+      }
     );
-  },
+  })
+})
 //  'using chained named scopes in a find': function () {
 //    var db = start()
 //      , UserNS = db.model('UserNS', 'users_' + random());
@@ -250,4 +262,4 @@ module.exports = {
 //        }
 //    );
 //  },
-};
+//};

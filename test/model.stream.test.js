@@ -4,7 +4,7 @@
  */
 
 var start = require('./common')
-  , should = require('should')
+  , assert = require('assert')
   , mongoose = start.mongoose
   , utils = require('../lib/utils')
   , random = utils.random
@@ -30,24 +30,23 @@ var Person = new Schema({
 mongoose.model('PersonForStream', Person);
 var collection = 'personforstream_' + random();
 
-;(function setup () {
-  var db = start()
-    , P = db.model('PersonForStream', collection)
+describe('cursor stream:', function(){
+  before(function (done) {
+    var db = start()
+      , P = db.model('PersonForStream', collection)
 
-  var people = names.map(function (name) {
-    return { name: name };
+    var people = names.map(function (name) {
+      return { name: name };
+    });
+
+    P.create(people, function (err) {
+      assert.ifError(err);
+      db.close();
+      done();
+    });
   });
 
-  P.create(people, function (err) {
-    should.strictEqual(null, err);
-    db.close();
-    assignExports();
-  });
-})()
-
-function assignExports () { var o = {
-
-  'cursor stream': function () {
+  it('works', function(done){
     var db = start()
       , P = db.model('PersonForStream', collection)
       , i = 0
@@ -59,51 +58,52 @@ function assignExports () { var o = {
     var stream = P.find({}).stream();
 
     stream.on('data', function (doc) {
-      should.strictEqual(true, !! doc.name);
-      should.strictEqual(true, !! doc._id);
+      assert.strictEqual(true, !! doc.name);
+      assert.strictEqual(true, !! doc._id);
 
       if (paused > 0 && 0 === resumed) {
         err = new Error('data emitted during pause');
-        return done();
+        return cb();
       }
 
       if (++i === 3) {
-        stream.paused.should.be.false;
+        assert.equal(false, stream.paused);
         stream.pause();
-        stream.paused.should.be.true;
+        assert.equal(true, stream.paused);
         paused++;
 
         setTimeout(function () {
-          stream.paused.should.be.true;
+          assert.equal(true, stream.paused);
           resumed++;
           stream.resume();
-          stream.paused.should.be.false;
+          assert.equal(false, stream.paused);
         }, 20);
       }
     });
 
     stream.on('error', function (er) {
       err = er;
-      done();
+      cb();
     });
 
     stream.on('close', function () {
       closed++;
-      done();
+      cb();
     });
 
-    function done () {
+    function cb () {
       db.close();
-      should.strictEqual(undefined, err);
-      should.equal(i, names.length);
-      closed.should.equal(1);
-      paused.should.equal(1);
-      resumed.should.equal(1);
-      stream._cursor.isClosed().should.be.true;
+      assert.strictEqual(undefined, err);
+      assert.equal(i, names.length);
+      assert.equal(1, closed);
+      assert.equal(1, paused);
+      assert.equal(1, resumed);
+      assert.equal(true, stream._cursor.isClosed());
+      done();
     }
-  }
+  });
 
-, 'immediately destroying a stream prevents the query from executing': function () {
+  it('immediately destroying a stream prevents the query from executing', function(done){
     var db = start()
       , P = db.model('PersonForStream', collection)
       , i = 0
@@ -113,22 +113,23 @@ function assignExports () { var o = {
     stream.on('data', function () {
       i++;
     })
-    stream.on('close', done);
-    stream.on('error', done);
+    stream.on('close', cb);
+    stream.on('error', cb);
 
     stream.destroy();
 
-    function done (err) {
-      should.strictEqual(undefined, err);
-      i.should.equal(0);
+    function cb (err) {
+      assert.ifError(err);
+      assert.equal(0, i);
       process.nextTick(function () {
         db.close();
-        should.strictEqual(null, stream._fields);
+        assert.strictEqual(null, stream._fields);
+        done();
       })
     }
-  }
+  });
 
-, 'destroying a stream stops it': function () {
+  it('destroying a stream stops it', function(done){
     var db = start()
       , P = db.model('PersonForStream', collection)
       , finished = 0
@@ -136,35 +137,36 @@ function assignExports () { var o = {
 
     var stream = P.where('name').$exists().limit(10).only('_id').stream();
 
-    should.strictEqual(null, stream._destroyed);
-    stream.readable.should.be.true;
+    assert.strictEqual(null, stream._destroyed);
+    assert.equal(true, stream.readable);
 
     stream.on('data', function (doc) {
-      should.strictEqual(undefined, doc.name);
+      assert.strictEqual(undefined, doc.name);
       if (++i === 5) {
         stream.destroy();
-        stream.readable.should.be.false;
+        assert.equal(false, stream.readable);
       }
     });
 
-    stream.on('close', done);
-    stream.on('error', done);
+    stream.on('close', cb);
+    stream.on('error', cb);
 
-    function done (err) {
+    function cb (err) {
       ++finished;
       setTimeout(function () {
         db.close();
-        should.strictEqual(undefined, err);
-        i.should.equal(5);
-        finished.should.equal(1);
-        stream._destroyed.should.equal(true);
-        stream.readable.should.be.false;
-        stream._cursor.isClosed().should.be.true;
-      }, 150)
+        assert.strictEqual(undefined, err);
+        assert.equal(5, i);
+        assert.equal(1, finished);
+        assert.equal(true, stream._destroyed);
+        assert.equal(false, stream.readable);
+        assert.equal(true, stream._cursor.isClosed());
+        done();
+      }, 100)
     }
-  }
+  });
 
-, 'cursor stream errors': function () {
+  it('errors', function(done){
     var db = start({ server: { auto_reconnect: false }})
       , P = db.model('PersonForStream', collection)
       , finished = 0
@@ -183,23 +185,24 @@ function assignExports () { var o = {
       closed++;
     });
 
-    stream.on('error', done);
+    stream.on('error', cb);
 
-    function done (err) {
+    function cb (err) {
       ++finished;
       setTimeout(function () {
-        should.equal('no open connections', err.message);
-        i.should.equal(5);
-        closed.should.equal(1);
-        finished.should.equal(1);
-        stream._destroyed.should.equal(true);
-        stream.readable.should.be.false;
-        stream._cursor.isClosed().should.be.true;
-      }, 150)
+        assert.equal('no open connections', err.message);
+        assert.equal(i, 5);
+        assert.equal(1, closed);
+        assert.equal(1, finished);
+        assert.equal(stream._destroyed,true);
+        assert.equal(stream.readable, false);
+        assert.equal(stream._cursor.isClosed(), true);
+        done();
+      }, 100)
     }
-  }
+  })
 
-, 'cursor stream pipe': function () {
+  it('pipe', function(done){
     var db = start()
       , P = db.model('PersonForStream', collection)
       , filename = '/tmp/_mongoose_stream_out.txt'
@@ -208,25 +211,21 @@ function assignExports () { var o = {
     var stream = P.find().sort('name', 1).limit(20).stream();
     stream.pipe(out);
 
-    stream.on('error', done);
-    stream.on('close', done);
+    stream.on('error', cb);
+    stream.on('close', cb);
 
-    function done (err) {
+    function cb (err) {
       db.close();
-      should.strictEqual(undefined, err);
+      assert.ifError(err);
       var contents = fs.readFileSync(filename, 'utf8');
-      ;/Aaden/.test(contents).should.be.true;
-      ;/Aaron/.test(contents).should.be.true;
-      ;/Adrian/.test(contents).should.be.true;
-      ;/Aditya/.test(contents).should.be.true;
-      ;/Agustin/.test(contents).should.be.true;
+      assert.ok(/Aaden/.test(contents));
+      assert.ok(/Aaron/.test(contents));
+      assert.ok(/Adrian/.test(contents));
+      assert.ok(/Aditya/.test(contents));
+      assert.ok(/Agustin/.test(contents));
       fs.unlink(filename);
+      done();
     }
-  }
-}
+  })
 
-// end exports
-
-utils.merge(exports, o);
-
-}
+});

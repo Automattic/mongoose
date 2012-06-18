@@ -3,7 +3,7 @@
  * Module dependencies.
  */
 
-var should = require('should')
+var assert = require('assert')
   , start = require('./common')
   , mongoose = start.mongoose
   , EmbeddedDocument = require('../lib/types/embedded')
@@ -55,143 +55,125 @@ mongoose.model('Movie', MovieSchema);
  * Test.
  */
 
-module.exports = {
+describe('types.document', function(){
 
-    'test that save fires errors': function(){
-      var a = new Subdocument();
-      a.set('test', '');
-      a.set('work', 'nope');
+  it('test that save fires errors', function(done){
+    var a = new Subdocument();
+    a.set('test', '');
+    a.set('work', 'nope');
 
-      a.save(function(err){
-        err.should.be.an.instanceof(ValidationError);
-        err.toString().should.eql('ValidationError: Validator "required" failed for path test, Validator failed for path work');
-      });
-    },
+    a.save(function(err){
+      assert.ok(err instanceof ValidationError);
+      assert.equal(err.toString(), 'ValidationError: Validator "required" failed for path test, Validator failed for path work');
+      done();
+    });
+  });
 
-    'test that save fires with null if no errors': function(){
-      var a = new Subdocument();
-      a.set('test', 'cool');
-      a.set('work', 'goods');
+  it('objects can be passed to #set', function () {
+    var a = new Subdocument();
+    a.set({ test: 'paradiddle', work: 'good flam'});
+    assert.equal(a.test, 'paradiddle');
+    assert.equal(a.work, 'good flam');
+  })
 
-      a.save(function(err){
-        should.strictEqual(err, null);
-      });
-    },
+  it('Subdocuments can be passed to #set', function () {
+    var a = new Subdocument();
+    a.set({ test: 'paradiddle', work: 'good flam'});
+    assert.equal(a.test, 'paradiddle');
+    assert.equal(a.work, 'good flam');
+    var b = new Subdocument();
+    b.set(a);
+    assert.equal(b.test, 'paradiddle');
+    assert.equal(b.work, 'good flam');
+  })
 
-    'objects can be passed to #set': function () {
-      var a = new Subdocument();
-      a.set({ test: 'paradiddle', work: 'good flam'});
-      a.test.should.eql('paradiddle');
-      a.work.should.eql('good flam');
-    },
+  it('cached _ids', function () {
+    var db = start();
+    var Movie = db.model('Movie');
+    db.close();
+    var m = new Movie;
 
-    'Subdocuments can be passed to #set': function () {
-      var a = new Subdocument();
-      a.set({ test: 'paradiddle', work: 'good flam'});
-      a.test.should.eql('paradiddle');
-      a.work.should.eql('good flam');
-      var b = new Subdocument();
-      b.set(a);
-      b.test.should.eql('paradiddle');
-      b.work.should.eql('good flam');
-    },
+    assert.equal(m.id, m.__id);
+    var old = m.id;
+    m._id = new mongoose.Types.ObjectId;
+    assert.equal(m.id, m.__id);
+    assert.strictEqual(true, old !== m.__id);
 
-    'cached _ids': function () {
-      var db = start();
-      var Movie = db.model('Movie');
-      db.close();
-      var m = new Movie;
+    var m2= new Movie;
+    delete m2._doc._id;
+    m2.init({ _id: new mongoose.Types.ObjectId });
+    assert.equal(m2.id, m2.__id);
+    assert.strictEqual(true, m.__id !== m2.__id);
+    assert.strictEqual(true, m.id !== m2.id);
+    assert.strictEqual(true, m.__id !== m2.__id);
+  });
 
-      should.equal(m.id, m.__id);
-      var old = m.id;
-      m._id = new mongoose.Types.ObjectId;
-      should.equal(m.id, m.__id);
-      should.strictEqual(true, old !== m.__id);
+  it('Subdocument#remove', function (done) {
+    var db = start();
+    var Movie = db.model('Movie');
 
-      var m2= new Movie;
-      delete m2._doc._id;
-      m2.init({ _id: new mongoose.Types.ObjectId });
-      should.equal(m2.id, m2.__id);
-      should.strictEqual(true, m.__id !== m2.__id);
-      should.strictEqual(true, m.id !== m2.id);
-      should.strictEqual(true, m.__id !== m2.__id);
-    }
+    var super8 = new Movie({ title: 'Super 8' });
 
-    /*
-    'Subdocument#remove': function (beforeExit) {
-      var db = start();
-      var Movie = db.model('Movie');
+    var id1 = '4e3d5fc7da5d7eb635063c96';
+    var id2 = '4e3d5fc7da5d7eb635063c97';
+    var id3 = '4e3d5fc7da5d7eb635063c98';
+    var id4 = '4e3d5fc7da5d7eb635063c99';
 
-      var super8 = new Movie({ title: 'Super 8' });
+    super8.ratings.push({ stars: 9, _id: id1 });
+    super8.ratings.push({ stars: 8, _id: id2 });
+    super8.ratings.push({ stars: 7, _id: id3 });
+    super8.ratings.push({ stars: 6, _id: id4 });
+    //console.error('pre save', super8);
 
-      var id1 = '4e3d5fc7da5d7eb635063c96';
-      var id2 = '4e3d5fc7da5d7eb635063c97';
-      var id3 = '4e3d5fc7da5d7eb635063c98';
-      var id4 = '4e3d5fc7da5d7eb635063c99';
+    super8.save(function (err) {
+      assert.ifError(err);
 
-      super8.ratings.push({ stars: 9, _id: id1 });
-      super8.ratings.push({ stars: 8, _id: id2 });
-      super8.ratings.push({ stars: 7, _id: id3 });
-      super8.ratings.push({ stars: 6, _id: id4 });
-      console.error('pre save', super8);
+      assert.equal(super8.title, 'Super 8');
+      assert.equal(super8.ratings.id(id1).stars.valueOf(), 9);
+      assert.equal(super8.ratings.id(id2).stars.valueOf(), 8);
+      assert.equal(super8.ratings.id(id3).stars.valueOf(), 7);
+      assert.equal(super8.ratings.id(id4).stars.valueOf(), 6);
+
+      super8.ratings.id(id1).stars = 5;
+      super8.ratings.id(id2).remove();
+      super8.ratings.id(id3).stars = 4;
+      super8.ratings.id(id4).stars = 3;
 
       super8.save(function (err) {
-        should.strictEqual(err, null);
+        assert.ifError(err);
 
-        super8.title.should.eql('Super 8');
-        super8.ratings.id(id1).stars.valueOf().should.eql(9);
-        super8.ratings.id(id2).stars.valueOf().should.eql(8);
-        super8.ratings.id(id3).stars.valueOf().should.eql(7);
-        super8.ratings.id(id4).stars.valueOf().should.eql(6);
+        Movie.findById(super8._id, function (err, movie) {
+          assert.ifError(err);
 
-        super8.ratings.id(id1).stars = 5;
-        super8.ratings.id(id2).remove();
-        super8.ratings.id(id3).stars = 4;
-        super8.ratings.id(id4).stars = 3;
+          assert.equal(movie.title, 'Super 8');
+          assert.equal(movie.ratings.length,3);
+          assert.equal(movie.ratings.id(id1).stars.valueOf(), 5);
+          assert.equal(movie.ratings.id(id3).stars.valueOf(), 4);
+          assert.equal(movie.ratings.id(id4).stars.valueOf(), 3);
 
-        super8.save(function (err) {
-          should.strictEqual(err, null);
+          //console.error('after save + findbyId', movie);
 
-          Movie.findById(super8._id, function (err, movie) {
-            should.strictEqual(err, null);
+          movie.ratings.id(id1).stars = 2;
+          movie.ratings.id(id3).remove();
+          movie.ratings.id(id4).stars = 1;
 
-            movie.title.should.eql('Super 8');
-            movie.ratings.length.should.equal(3);
-            movie.ratings.id(id1).stars.valueOf().should.eql(5);
-            movie.ratings.id(id3).stars.valueOf().should.eql(4);
-            movie.ratings.id(id4).stars.valueOf().should.eql(3);
+          //console.error('after modified', movie);
 
-            console.error('after save + findbyId', movie);
+          movie.save(function (err) {
+            assert.ifError(err);
 
-            movie.ratings.id(id1).stars = 2;
-            movie.ratings.id(id3).remove();
-            movie.ratings.id(id4).stars = 1;
-
-            console.error('after modified', movie);
-
-            movie.save(function (err) {
-              should.strictEqual(err, null);
-
-              Movie.findById(super8._id, function (err, movie) {
-                db.close();
-                should.strictEqual(err, null);
-                movie.ratings.length.should.equal(2);
-                movie.ratings.id(id1).stars.valueOf().should.eql(2);
-                movie.ratings.id(id4).stars.valueOf().should.eql(1);
-                console.error('after resave + findById', movie);
-              });
+            Movie.findById(super8._id, function (err, movie) {
+              db.close();
+              assert.ifError(err);
+              assert.equal(movie.ratings.length,2);
+              assert.equal(movie.ratings.id(id1).stars.valueOf(), 2);
+              assert.equal(movie.ratings.id(id4).stars.valueOf(), 1);
+              //console.error('after resave + findById', movie);
+              done();
             });
           });
         });
       });
-
-      beforeExit(function () {
-        var db = start();
-        Movie.remove({}, function (err) {
-          db.close();
-        });
-      });
-    }
-    */
-
-};
+    });
+  });
+});

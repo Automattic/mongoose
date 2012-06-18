@@ -4,11 +4,8 @@
  */
 
 var mongoose = require('../')
-  , should = require('should')
-  , Table = require('cli-table')
   , Mongoose = mongoose.Mongoose
   , Collection = mongoose.Collection
-  , Assertion = should.Assertion
   , startTime = Date.now()
   , queryCount = 0
   , opened = 0
@@ -70,14 +67,15 @@ Collection.prototype.onClose = function(){
  * @api public
  */
 
-Assertion.prototype.__defineGetter__('connected', function(){
-  if (this.obj instanceof Mongoose)
-    this.obj.connections.forEach(function(connected){
-      c.should.be.connected;
-    });
-  else
-    this.obj.readyState.should.eql(1);
-});
+// should.Assertion
+//Assertion.prototype.__defineGetter__('connected', function(){
+  //if (this.obj instanceof Mongoose)
+    //this.obj.connections.forEach(function(connected){
+      //c.should.be.connected;
+    //});
+  //else
+    //this.obj.readyState.should.eql(1);
+//});
 
 /**
  * Assert that a connection is closed or that a mongoose connections are closed.
@@ -88,14 +86,15 @@ Assertion.prototype.__defineGetter__('connected', function(){
  * @api public
  */
 
-Assertion.prototype.__defineGetter__('disconnected', function(){
-  if (this.obj instanceof Mongoose)
-    this.obj.connections.forEach(function(){
-      c.should.be.disconnected;
-    });
-  else
-    this.obj.readyState.should.eql(0);
-});
+// should.Assertion
+//Assertion.prototype.__defineGetter__('disconnected', function(){
+  //if (this.obj instanceof Mongoose)
+    //this.obj.connections.forEach(function(){
+      //c.should.be.disconnected;
+    //});
+  //else
+    //this.obj.readyState.should.eql(0);
+//});
 
 /**
  * Create a connection to the test database.
@@ -117,26 +116,6 @@ module.exports = function (options) {
 
   return mongoose.createConnection(uri, options);
 };
-
-/**
- * Provide stats for tests
- */
-
-process.on('beforeExit', function(){
-  var table = new Table({
-      head: ['Stat', 'Time (ms)']
-    , colWidths: [23, 15]
-  });
-
-  table.push(
-      ['Queries run', queryCount]
-    , ['Time ellapsed', Date.now() - startTime]
-    , ['Connections opened', opened]
-    , ['Connections closed', closed]
-  );
-
-  console.error(table.toString());
-});
 
 /**
  * Module exports.

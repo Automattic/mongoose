@@ -4,8 +4,8 @@
  */
 
 var start = require('./common')
-  , should = require('should')
   , mongoose = start.mongoose
+  , assert = require('assert')
   , random = require('../lib/utils').random
   , Query = require('../lib/query')
   , Schema = mongoose.Schema
@@ -21,9 +21,8 @@ var start = require('./common')
   , MongooseArray = mongoose.Types.Array
   , MongooseError = mongoose.Error;
 
-module.exports = {
-
-  'strict mode': function(){
+describe('document: strict mode:', function(){
+  it('should work', function(done){
     var db = start();
 
     var lax = new Schema({
@@ -40,55 +39,53 @@ module.exports = {
     var Strict = db.model('Strict', strict);
 
     var l = new Lax({content: 'sample', rouge: 'data'});
-    l._strictMode.should.be.false;
+    assert.equal(false, l._strictMode);
     l = l.toObject();
-    l.content.should.equal('sample')
-    l.rouge.should.equal('data');
-    should.exist(l.rouge);
+    assert.equal('sample', l.content);
+    assert.equal('data', l.rouge);
 
     var s = new Strict({content: 'sample', rouge: 'data'});
-    s._strictMode.should.be.true;
+    assert.equal(true, s._strictMode);
     s = s.toObject();
-    s.should.have.property('ts');
-    s.content.should.equal('sample');
-    s.should.not.have.property('rouge');
-    should.not.exist(s.rouge);
+    assert.ok('ts' in s);
+    assert.equal('sample', s.content);
+    assert.ok(!('rouge' in s));
+    assert.ok(!s.rouge);
 
     // instance override
     var instance = new Lax({content: 'sample', rouge: 'data'}, true);
-    instance._strictMode.should.be.true;
+    assert.ok(instance._strictMode);
     instance = instance.toObject();
-    instance.content.should.equal('sample')
-    should.not.exist(instance.rouge);
-    instance.should.have.property('ts')
+    assert.equal('sample', instance.content);
+    assert.ok(!instance.rouge);
+    assert.ok('ts' in instance);
 
     // hydrate works as normal, but supports the schema level flag.
     var s2 = new Strict({content: 'sample', rouge: 'data'}, false);
-    s2._strictMode.should.be.false;
+    assert.equal(false, s2._strictMode);
     s2 = s2.toObject();
-    s2.should.have.property('ts')
-    s2.content.should.equal('sample');
-    s2.should.have.property('rouge');
-    should.exist(s2.rouge);
+    assert.ok('ts' in s2);
+    assert.equal('sample', s2.content);
+    assert.ok('rouge' in s2);
 
     // testing init
     var s3 = new Strict();
     s3.init({content: 'sample', rouge: 'data'});
     var s3obj = s3.toObject();
-    s3.content.should.equal('sample');
-    s3.should.not.have.property('rouge');
-    should.not.exist(s3.rouge);
+    assert.equal('sample', s3.content);
+    assert.ok(!('rouge' in s3));
+    assert.ok(!s3.rouge);
 
     // strict on create
     Strict.create({content: 'sample2', rouge: 'data'}, function(err, doc){
       db.close();
-      doc.content.should.equal('sample2');
-      doc.should.not.have.property('rouge');
-      should.not.exist(doc.rouge);
+      assert.equal('sample2', doc.content);
+      assert.ok(!('rouge' in doc));
+      assert.ok(!doc.rouge);
+      done();
     });
-  },
-
-  'nested doc strict mode': function () {
+  })
+  it('nested doc', function(){
     var db = start();
 
     var lax = new Schema({
@@ -107,27 +104,26 @@ module.exports = {
     var l = new Lax;
     l.set('name', { last: 'goose', hack: 'xx' });
     l = l.toObject();
-    l.name.last.should.equal('goose');
-    l.name.hack.should.equal('xx');
+    assert.equal('goose', l.name.last);
+    assert.equal('xx', l.name.hack);
 
     var s = new Strict;
     s.set({ name: { last: 'goose', hack: 'xx' }});
     s = s.toObject();
-    s.name.last.should.equal('goose');
-    s.name.should.not.have.property('hack');
-    should.not.exist(s.name.hack);
+    assert.equal('goose', s.name.last);
+    assert.ok(!('hack' in s.name));
+    assert.ok(!s.name.hack);
 
     s = new Strict;
     s.set('name', { last: 'goose', hack: 'xx' });
     s.set('shouldnt.exist', ':(');
     s = s.toObject();
-    s.name.last.should.equal('goose');
-    s.name.should.not.have.property('hack');
-    should.not.exist(s.name.hack);
-    should.not.exist(s.shouldnt);
-  },
-
-  'sub doc strict mode': function(){
+    assert.equal('goose', s.name.last);
+    assert.ok(!('hack' in s.name));
+    assert.ok(!s.name.hack);
+    assert.ok(!s.shouldnt);
+  })
+  it('sub doc', function(done){
     var db = start();
 
     var lax = new Schema({
@@ -144,38 +140,39 @@ module.exports = {
     var Strict = db.model('EmbeddedStrict', new Schema({ dox: [strict] }), 'embdoc'+random());
 
     var l = new Lax({ dox: [{content: 'sample', rouge: 'data'}] });
-    l.dox[0]._strictMode.should.be.false;
+    assert.equal(false, l.dox[0]._strictMode);
     l = l.dox[0].toObject();
-    l.content.should.equal('sample')
-    l.rouge.should.equal('data');
-    should.exist(l.rouge);
+    assert.equal('sample', l.content);
+    assert.equal('data', l.rouge);
+    assert.ok(l.rouge);
 
     var s = new Strict({ dox: [{content: 'sample', rouge: 'data'}] });
-    s.dox[0]._strictMode.should.be.true;
+    assert.equal(true, s.dox[0]._strictMode);
     s = s.dox[0].toObject();
-    s.should.have.property('ts');
-    s.content.should.equal('sample');
-    s.should.not.have.property('rouge');
-    should.not.exist(s.rouge);
+    assert.ok('ts' in s);
+    assert.equal('sample', s.content);
+    assert.ok(!('rouge' in s));
+    assert.ok(!s.rouge);
 
     // testing init
     var s3 = new Strict();
     s3.init({dox: [{content: 'sample', rouge: 'data'}]});
     var s3obj = s3.toObject();
-    s3.dox[0].content.should.equal('sample');
-    s3.dox[0].should.not.have.property('rouge');
-    should.not.exist(s3.dox[0].rouge);
+    assert.equal('sample', s3.dox[0].content);
+    assert.ok(!('rouge' in s3.dox[0]));
+    assert.ok(!s3.dox[0].rouge);
 
     // strict on create
     Strict.create({dox:[{content: 'sample2', rouge: 'data'}]}, function(err, doc){
       db.close();
-      doc.dox[0].content.should.equal('sample2');
-      doc.dox[0].should.not.have.property('rouge');
-      should.not.exist(doc.dox[0].rouge);
+      assert.equal('sample2', doc.dox[0].content);
+      assert.ok(!('rouge' in doc.dox[0]));
+      assert.ok(!doc.dox[0].rouge);
+      done();
     });
-  },
+  })
 
-  'strict mode virtuals': function () {
+  it('virtuals', function(){
     var db = start();
 
     var getCount = 0
@@ -205,13 +202,13 @@ module.exports = {
     });
 
     db.close();
-    getCount.should.equal(0);
-    setCount.should.equal(1);
+    assert.equal(0, getCount);
+    assert.equal(1, setCount);
 
     strictInstance.myvirtual = 'anotherone';
     var myvirtual = strictInstance.myvirtual;
 
-    getCount.should.equal(1);
-    setCount.should.equal(2);
-  }
-}
+    assert.equal(1, getCount);
+    assert.equal(2, setCount);
+  })
+})

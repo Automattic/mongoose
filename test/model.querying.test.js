@@ -4,7 +4,7 @@
  */
 
 var start = require('./common')
-  , should = require('should')
+  , assert = require('assert')
   , mongoose = start.mongoose
   , random = require('../lib/utils').random
   , Query = require('../lib/query')
@@ -19,7 +19,7 @@ var start = require('./common')
  * Setup.
  */
 
-var Comments = new Schema();
+var Comments = new Schema;
 
 Comments.add({
     title     : String
@@ -57,1861 +57,1549 @@ mongoose.model('Mod', ModSchema);
 
 var geoSchema = new Schema({ loc: { type: [Number], index: '2d'}});
 
-module.exports = {
-
-  'test that find returns a Query': function () {
+describe('model: querying:', function(){
+  it('find returns a Query', function(){
     var db = start()
       , BlogPostB = db.model('BlogPostB', collection);
 
     // query
-    BlogPostB.find({}).should.be.an.instanceof(Query);
+    assert.ok(BlogPostB.find({}) instanceof Query);
 
     // query, fields
-    BlogPostB.find({}, {}).should.be.an.instanceof(Query);
+    assert.ok(BlogPostB.find({}, {}) instanceof Query);
 
-    // query, fields (array)
-    BlogPostB.find({}, []).should.be.an.instanceof(Query);
+    // query, fields (empty string)
+    assert.ok(BlogPostB.find({}, '') instanceof Query);
 
     // query, fields, options
-    BlogPostB.find({}, {}, {}).should.be.an.instanceof(Query);
+    assert.ok(BlogPostB.find({}, {}, {}) instanceof Query);
 
-    // query, fields (array), options
-    BlogPostB.find({}, [], {}).should.be.an.instanceof(Query);
+    // query, fields (null), options
+    assert.ok(BlogPostB.find({}, null, {}) instanceof Query);
 
     db.close();
-  },
+  });
 
-  'test that findOne returns a Query': function () {
+  it('findOne returns a Query', function(){
     var db = start()
       , BlogPostB = db.model('BlogPostB', collection);
 
     // query
-    BlogPostB.findOne({}).should.be.an.instanceof(Query);
+    assert.ok(BlogPostB.findOne({}) instanceof Query);
 
     // query, fields
-    BlogPostB.findOne({}, {}).should.be.an.instanceof(Query);
+    assert.ok(BlogPostB.findOne({}, {}) instanceof Query);
 
-    // query, fields (array)
-    BlogPostB.findOne({}, []).should.be.an.instanceof(Query);
+    // query, fields (empty string)
+    assert.ok(BlogPostB.findOne({}, '') instanceof Query);
 
     // query, fields, options
-    BlogPostB.findOne({}, {}, {}).should.be.an.instanceof(Query);
+    assert.ok(BlogPostB.findOne({}, {}, {}) instanceof Query);
 
-    // query, fields (array), options
-    BlogPostB.findOne({}, [], {}).should.be.an.instanceof(Query);
+    // query, fields (null), options
+    assert.ok(BlogPostB.findOne({}, null, {}) instanceof Query);
 
     db.close();
-  },
+  });
 
-  'test that an empty find does not hang': function () {
+  it('an empty find does not hang', function(done){
     var db = start()
       , BlogPostB = db.model('BlogPostB', collection)
 
     function fn () {
       db.close();
+      done();
     };
 
     BlogPostB.find({}, fn);
-  },
+  });
 
-  'test that a query is executed when a callback is passed': function () {
+  it('a query is executed when a callback is passed', function(done){
     var db = start()
       , BlogPostB = db.model('BlogPostB', collection)
       , count = 5
       , q =  { _id: new DocumentObjectId }; // make sure the query is fast
 
     function fn () {
-      --count || db.close();
+      if (--count) return;
+      db.close();
+      done();
     };
 
     // query
-    BlogPostB.find(q, fn).should.be.an.instanceof(Query);
+    assert.ok(BlogPostB.find(q, fn) instanceof Query);
 
-    // query, fields
-    BlogPostB.find(q, {}, fn).should.be.an.instanceof(Query);
+    // query, fields (object)
+    assert.ok(BlogPostB.find(q, {}, fn) instanceof Query);
 
-    // query, fields (array)
-    BlogPostB.find(q, [], fn).should.be.an.instanceof(Query);
+    // query, fields (null)
+    assert.ok(BlogPostB.find(q, null, fn) instanceof Query);
 
     // query, fields, options
-    BlogPostB.find(q, {}, {}, fn).should.be.an.instanceof(Query);
+    assert.ok(BlogPostB.find(q, {}, {}, fn) instanceof Query);
 
-    // query, fields (array), options
-    BlogPostB.find(q, [], {}, fn).should.be.an.instanceof(Query);
-  },
+    // query, fields (''), options
+    assert.ok(BlogPostB.find(q, '', {}, fn) instanceof Query);
+  });
 
-  'test that query is executed where a callback for findOne': function () {
+  it('query is executed where a callback for findOne', function(done){
     var db = start()
       , BlogPostB = db.model('BlogPostB', collection)
       , count = 5
       , q =  { _id: new DocumentObjectId }; // make sure the query is fast
 
     function fn () {
-      --count || db.close();
+      if (--count) return;
+      db.close();
+      done();
     };
 
     // query
-    BlogPostB.findOne(q, fn).should.be.an.instanceof(Query);
+    assert.ok(BlogPostB.findOne(q, fn) instanceof Query);
 
     // query, fields
-    BlogPostB.findOne(q, {}, fn).should.be.an.instanceof(Query);
+    assert.ok(BlogPostB.findOne(q, {}, fn) instanceof Query);
 
-    // query, fields (array)
-    BlogPostB.findOne(q, [], fn).should.be.an.instanceof(Query);
+    // query, fields (empty string)
+    assert.ok(BlogPostB.findOne(q, '', fn) instanceof Query);
 
     // query, fields, options
-    BlogPostB.findOne(q, {}, {}, fn).should.be.an.instanceof(Query);
+    assert.ok(BlogPostB.findOne(q, {}, {}, fn) instanceof Query);
 
-    // query, fields (array), options
-    BlogPostB.findOne(q, [], {}, fn).should.be.an.instanceof(Query);
-  },
+    // query, fields (null), options
+    assert.ok(BlogPostB.findOne(q, null, {}, fn) instanceof Query);
+  });
 
-  'test that count returns a Query': function () {
-    var db = start()
-      , BlogPostB = db.model('BlogPostB', collection);
-
-    BlogPostB.count({}).should.be.an.instanceof(Query);
-
-    db.close();
-  },
-
-  'test that count Query executes when you pass a callback': function () {
-    var db = start()
-      , BlogPostB = db.model('BlogPostB', collection)
-      , pending = 2
-
-    function fn () {
-      if (--pending) return;
+  describe('count', function(){
+    it('returns a Query', function(){
+      var db = start()
+        , BlogPostB = db.model('BlogPostB', collection);
+      assert.ok(BlogPostB.count({}) instanceof Query);
       db.close();
-    };
+    });
 
-    BlogPostB.count({}, fn).should.be.an.instanceof(Query);
-    BlogPostB.count(fn).should.be.an.instanceof(Query);
-  },
+    it('Query executes when you pass a callback', function(done){
+      var db = start()
+        , BlogPostB = db.model('BlogPostB', collection)
+        , pending = 2
 
-  'test that distinct returns a Query': function () {
-    var db = start()
-      , BlogPostB = db.model('BlogPostB', collection);
-
-    BlogPostB.distinct('title', {}).should.be.an.instanceof(Query);
-
-    db.close();
-  },
-
-  'test that distinct Query executes when you pass a callback': function () {
-    var db = start();
-    var Address = new Schema({ zip: String });
-    Address = db.model('Address', Address, 'addresses_' + random());
-
-    Address.create({ zip: '10010'}, { zip: '10010'}, { zip: '99701'}, function (err, a1, a2, a3) {
-      should.strictEqual(null, err);
-      var query = Address.distinct('zip', {}, function (err, results) {
-        should.strictEqual(null, err);
-        results.should.eql(['10010', '99701']);
+      function fn () {
+        if (--pending) return;
         db.close();
-      });
-      query.should.be.an.instanceof(Query);
+        done();
+      };
+
+      assert.ok(BlogPostB.count({}, fn) instanceof Query);
+      assert.ok(BlogPostB.count(fn) instanceof Query);
     });
-  },
 
-
-  'test that update returns a Query': function () {
-    var db = start()
-      , BlogPostB = db.model('BlogPostB', collection);
-
-    BlogPostB.update({}, {}).should.be.an.instanceof(Query);
-    BlogPostB.update({}, {}, {}).should.be.an.instanceof(Query);
-
-    db.close();
-  },
-
-  'test that update Query executes when you pass a callback': function () {
-    var db = start()
-      , BlogPostB = db.model('BlogPostB', collection)
-      , count = 2;
-
-    function fn () {
-      --count || db.close();
-    };
-
-    BlogPostB.update({title: random()}, {}, fn).should.be.an.instanceof(Query);
-
-    BlogPostB.update({title: random()}, {}, {}, fn).should.be.an.instanceof(Query);
-  },
-
-  'test finding a document': function () {
-    var db = start()
-      , BlogPostB = db.model('BlogPostB', collection)
-      , title = 'Wooooot ' + random();
-
-    var post = new BlogPostB();
-    post.set('title', title);
-
-    post.save(function (err) {
-      should.strictEqual(err, null);
-
-      BlogPostB.findOne({ title: title }, function (err, doc) {
-        should.strictEqual(err, null);
-        doc.get('title').should.eql(title);
-        doc.isNew.should.be.false;
-
-        db.close();
-      });
-    });
-  },
-
-  'test finding a document byId': function () {
-    var db = start()
-      , BlogPostB = db.model('BlogPostB', collection)
-      , title = 'Edwald ' + random();
-
-    var post = new BlogPostB();
-    post.set('title', title);
-
-    post.save(function (err) {
-      should.strictEqual(err, null);
-
-      var pending = 2;
-
-      BlogPostB.findById(post.get('_id'), function (err, doc) {
-        should.strictEqual(err, null);
-        doc.should.be.an.instanceof(BlogPostB);
-        doc.get('title').should.eql(title);
-        --pending || db.close();
-      });
-
-      BlogPostB.findById(post.get('_id').toHexString(), function (err, doc) {
-        should.strictEqual(err, null);
-        doc.should.be.an.instanceof(BlogPostB);
-        doc.get('title').should.eql(title);
-        --pending || db.close();
-      });
-    });
-  },
-
-  'test finding documents': function () {
-    var db = start()
-      , BlogPostB = db.model('BlogPostB', collection)
-      , title = 'Wooooot ' + random();
-
-    var post = new BlogPostB();
-    post.set('title', title);
-
-    post.save(function (err) {
-      should.strictEqual(err, null);
+    it('counts documents', function(done){
+      var db = start()
+        , BlogPostB = db.model('BlogPostB', collection)
+        , title = 'Wooooot ' + random();
 
       var post = new BlogPostB();
       post.set('title', title);
 
       post.save(function (err) {
-        should.strictEqual(err, null);
+        assert.ifError(err);
 
-        BlogPostB.find({ title: title }, function (err, docs) {
-          should.strictEqual(err, null);
-          docs.should.have.length(2);
+        var post = new BlogPostB();
+        post.set('title', title);
 
-          docs[0].get('title').should.eql(title);
-          docs[0].isNew.should.be.false;
+        post.save(function (err) {
+          assert.ifError(err);
 
-          docs[1].get('title').should.eql(title);
-          docs[1].isNew.should.be.false;
+          BlogPostB.count({ title: title }, function (err, count) {
+            assert.ifError(err);
 
-          db.close();
-        });
-      });
-    });
-  },
+            assert.equal('number', typeof count);
+            assert.equal(2, count);
 
-  'test finding documents where an array that contains one specific member': function () {
-    var db = start()
-      , BlogPostB = db.model('BlogPostB', collection);
-    BlogPostB.create({numbers: [100, 101, 102]}, function (err, created) {
-      should.strictEqual(err, null);
-      BlogPostB.find({numbers: 100}, function (err, found) {
-        should.strictEqual(err, null);
-        found.should.have.length(1);
-        found[0]._id.should.eql(created._id);
-        db.close();
-      });
-    });
-  },
-
-  'test counting documents': function () {
-    var db = start()
-      , BlogPostB = db.model('BlogPostB', collection)
-      , title = 'Wooooot ' + random();
-
-    var post = new BlogPostB();
-    post.set('title', title);
-
-    post.save(function (err) {
-      should.strictEqual(err, null);
-
-      var post = new BlogPostB();
-      post.set('title', title);
-
-      post.save(function (err) {
-        should.strictEqual(err, null);
-
-        BlogPostB.count({ title: title }, function (err, count) {
-          should.strictEqual(err, null);
-
-          count.should.be.a('number');
-          count.should.eql(2);
-
-          db.close();
-        });
-      });
-    });
-  },
-
-  'test query casting': function () {
-    var db = start()
-      , BlogPostB = db.model('BlogPostB', collection)
-      , title = 'Loki ' + random();
-
-    var post = new BlogPostB()
-      , id = DocumentObjectId.toString(post.get('_id'));
-
-    post.set('title', title);
-
-    post.save(function (err) {
-      should.strictEqual(err, null);
-
-      BlogPostB.findOne({ _id: id }, function (err, doc) {
-        should.strictEqual(err, null);
-
-        doc.get('title').should.equal(title);
-        db.close();
-      });
-    });
-  },
-
-  'test a query that includes a casting error': function () {
-    var db = start()
-      , BlogPostB = db.model('BlogPostB', collection);
-
-    BlogPostB.find({ date: 'invalid date' }, function (err) {
-      err.should.be.an.instanceof(Error);
-      err.should.be.an.instanceof(CastError);
-      db.close();
-    });
-  },
-
-  'test findOne queries that require casting for $modifiers': function () {
-    var db = start()
-      , BlogPostB = db.model('BlogPostB', collection)
-      , post = new BlogPostB({
-          meta: {
-            visitors: -10
-          }
-        });
-
-    post.save(function (err) {
-      should.strictEqual(err, null);
-
-      BlogPostB.findOne({ 'meta.visitors': { $gt: '-20', $lt: -1 } }, 
-      function (err, found) {
-        found.get('meta.visitors')
-             .valueOf().should.equal(post.get('meta.visitors').valueOf());
-        found.id;
-        found.get('_id').should.eql(post.get('_id'));
-        db.close();
-      });
-    });
-  },
-
-  'test find queries that require casting for $modifiers': function () {
-    var db = start()
-      , BlogPostB = db.model('BlogPostB', collection)
-      , post = new BlogPostB({
-          meta: {
-            visitors: -75
-          }
-        });
-
-    post.save(function (err) {
-      should.strictEqual(err, null);
-
-      BlogPostB.find({ 'meta.visitors': { $gt: '-100', $lt: -50 } },
-      function (err, found) {
-        should.strictEqual(err, null);
-
-        found.should.have.length(1);
-        found[0].get('_id').should.eql(post.get('_id'));
-        found[0].get('meta.visitors').valueOf()
-                .should.equal(post.get('meta.visitors').valueOf());
-        db.close();
-      });
-    });
-  },
-
-  // GH-199
-  'test find queries where $in cast the values wherein the array': function () {
-    var db = start()
-      , BlogPostB = db.model('BlogPostB', collection);
-
-    var post = new BlogPostB()
-      , id = DocumentObjectId.toString(post._id);
-
-    post.save(function (err) {
-      should.strictEqual(err, null);
-
-      BlogPostB.findOne({ _id: { $in: [id] } }, function (err, doc) {
-        should.strictEqual(err, null);
-
-        DocumentObjectId.toString(doc._id).should.eql(id);
-        db.close();
-      });
-    });
-  },
-
-  // GH-232
-  'test find queries where $nin cast the values wherein the array': function () {
-    var db = start()
-      , NinSchema = new Schema({
-          num: Number
-        });
-    mongoose.model('Nin', NinSchema);
-    var Nin = db.model('Nin', 'nins_' + random());
-    Nin.create({ num: 1 }, function (err, one) {
-      should.strictEqual(err, null);
-      Nin.create({ num: 2 }, function (err, two) {
-        should.strictEqual(err, null);
-        Nin.create({num: 3}, function (err, three) {
-          should.strictEqual(err, null);
-          Nin.find({ num: {$nin: [2]}}, function (err, found) {
-            should.strictEqual(err, null);
-            found.should.have.length(2);
             db.close();
+            done();
+          });
+        });
+      });
+    })
+  });
+
+  describe('distinct', function(){
+    it('returns a Query', function(){
+      var db = start()
+        , BlogPostB = db.model('BlogPostB', collection);
+
+      assert.ok(BlogPostB.distinct('title', {}) instanceof Query);
+      db.close();
+    });
+
+    it('executes when you pass a callback', function(done){
+      var db = start();
+      var Address = new Schema({ zip: String });
+      Address = db.model('Address', Address, 'addresses_' + random());
+
+      Address.create({ zip: '10010'}, { zip: '10010'}, { zip: '99701'}, function (err, a1, a2, a3) {
+        assert.strictEqual(null, err);
+        var query = Address.distinct('zip', {}, function (err, results) {
+          assert.ifError(err);
+          assert.deepEqual(results, ['10010', '99701']);
+          db.close();
+          done();
+        });
+        assert.ok(query instanceof Query);
+      });
+    });
+  });
+
+  describe('update', function(){
+    it('returns a Query', function(){
+      var db = start()
+        , BlogPostB = db.model('BlogPostB', collection);
+
+      assert.ok(BlogPostB.update({}, {}) instanceof Query);
+      assert.ok(BlogPostB.update({}, {}, {}) instanceof Query);
+      db.close();
+    });
+
+    it('Query executes when you pass a callback', function(done){
+      var db = start()
+        , BlogPostB = db.model('BlogPostB', collection)
+        , count = 2;
+
+      function fn () {
+        if (--count) return;
+        db.close();
+        done();
+      };
+
+      assert.ok(BlogPostB.update({title: random()}, {}, fn) instanceof Query);
+      assert.ok(BlogPostB.update({title: random()}, {}, {}, fn) instanceof Query);
+    })
+  });
+
+  describe('findOne', function () {
+    it('works', function(done){
+      var db = start()
+        , BlogPostB = db.model('BlogPostB', collection)
+        , title = 'Wooooot ' + random();
+
+      var post = new BlogPostB();
+      post.set('title', title);
+
+      post.save(function (err) {
+        assert.ifError(err);
+
+        BlogPostB.findOne({ title: title }, function (err, doc) {
+          assert.ifError(err);
+          assert.equal(title, doc.get('title'));
+          assert.equal(false, doc.isNew);
+
+          db.close();
+          done();
+        });
+      });
+    });
+
+    it('casts $modifiers', function(done){
+      var db = start()
+        , BlogPostB = db.model('BlogPostB', collection)
+        , post = new BlogPostB({
+            meta: {
+              visitors: -10
+            }
+          });
+
+      post.save(function (err) {
+        assert.ifError(err);
+
+        var query = { 'meta.visitors': { $gt: '-20', $lt: -1 }};
+        BlogPostB.findOne(query, function (err, found) {
+          assert.ifError(err);
+          assert.ok(found);
+          assert.equal(found.get('meta.visitors').valueOf(), post.get('meta.visitors').valueOf());
+          found.id; // trigger caching
+          assert.equal(found.get('_id').toString(), post.get('_id'));
+          db.close();
+          done();
+        });
+      });
+    })
+
+    it('querying if an array contains one of multiple members $in a set', function(done){
+      var db = start()
+        , BlogPostB = db.model('BlogPostB', collection);
+
+      var post = new BlogPostB();
+
+      post.tags.push('football');
+
+      post.save(function (err) {
+        assert.ifError(err);
+
+        BlogPostB.findOne({tags: {$in: ['football', 'baseball']}}, function (err, doc) {
+          assert.ifError(err);
+          assert.equal(doc._id.toString(),post._id);
+
+          BlogPostB.findOne({ _id: post._id, tags: /otba/i }, function (err, doc) {
+            assert.ifError(err);
+            assert.equal(doc._id.toString(),post._id);
+            db.close();
+            done();
           });
         });
       });
     });
-  },
 
-  'test find queries with $ne with single value against array': function () {
-    var db = start();
-    var schema = new Schema({
-        ids: [Schema.ObjectId]
-      , b: Schema.ObjectId
+    it('querying if an array contains one of multiple members $in a set 2', function(done){
+      var db = start()
+        , BlogPostA = db.model('BlogPostB', collection)
+
+      var post = new BlogPostA({ tags: ['gooberOne'] });
+
+      post.save(function (err) {
+        assert.ifError(err);
+
+        var query = {tags: {$in:[ 'gooberOne' ]}};
+
+        BlogPostA.findOne(query, function (err, returned) {
+          cb();
+          assert.ifError(err);
+          assert.ok(!!~returned.tags.indexOf('gooberOne'));
+          assert.equal(returned._id.toString(), post._id);
+        });
+      });
+
+      post.collection.insert({ meta: { visitors: 9898, a: null } }, {}, function (err, b) {
+        assert.ifError(err);
+
+        BlogPostA.findOne({_id: b[0]._id}, function (err, found) {
+          cb();
+          assert.ifError(err);
+          assert.equal(found.get('meta.visitors'), 9898);
+        });
+      });
+
+      var pending = 2;
+      function cb () {
+        if (--pending) return;
+        db.close();
+        done();
+      }
+    })
+
+    it('querying via $where a string', function(done){
+      var db = start()
+        , BlogPostB = db.model('BlogPostB', collection);
+
+      BlogPostB.create({ title: 'Steve Jobs', author: 'Steve Jobs'}, function (err, created) {
+        assert.ifError(err);
+
+        BlogPostB.findOne({ $where: "this.title && this.title === this.author" }, function (err, found) {
+          assert.ifError(err);
+
+          assert.equal(found._id.toString(),created._id);
+          db.close();
+          done();
+        });
+      });
     });
 
-    var NE = db.model('NE_Test', schema, 'nes__' + random());
+    it('querying via $where a function', function(done){
+      var db = start()
+        , BlogPostB = db.model('BlogPostB', collection);
 
-    var id1 = new DocumentObjectId;
-    var id2 = new DocumentObjectId;
-    var id3 = new DocumentObjectId;
-    var id4 = new DocumentObjectId;
+      BlogPostB.create({ author: 'Atari', slug: 'Atari'}, function (err, created) {
+        assert.ifError(err);
 
-    NE.create({ ids: [id1, id4], b: id3 }, function (err, ne1) {
-      should.strictEqual(err, null);
-      NE.create({ ids: [id2, id4], b: id3 },function (err, ne2) {
-        should.strictEqual(err, null);
+        BlogPostB.findOne({ $where: function () {
+          return (this.author && this.slug && this.author === this.slug);
+        } }, function (err, found) {
+          assert.ifError(err);
 
-        var query = NE.find({ 'b': id3.toString(), 'ids': { $ne: id1 }});
-        query.run(function (err, nes1) {
-          should.strictEqual(err, null);
-          nes1.length.should.eql(1);
+          assert.equal(found._id.toString(), created._id);
+          db.close();
+          done();
+        });
+      });
+    })
 
-          NE.find({ b: { $ne: [1] }}, function (err, nes2) {
-            err.message.should.eql("Invalid ObjectId");
+    it('based on nested fields', function(done){
+      var db = start()
+        , BlogPostB = db.model('BlogPostB', collection)
+        , post = new BlogPostB({
+            meta: {
+              visitors: 5678
+            }
+          });
 
-            NE.find({ b: { $ne: 4 }}, function (err, nes3) {
-              err.message.should.eql("Invalid ObjectId");
+      post.save(function (err) {
+        assert.ifError(err);
 
-              NE.find({ b: id3, ids: { $ne: id4 }}, function (err, nes4) {
+        BlogPostB.findOne({ 'meta.visitors': 5678 }, function (err, found) {
+          assert.ifError(err);
+          assert.equal(found.get('meta.visitors')
+            .valueOf(), post.get('meta.visitors').valueOf());
+          assert.equal(found.get('_id').toString(), post.get('_id'));
+          db.close();
+          done();
+        });
+      });
+    })
+
+    it('based on embedded doc fields (gh-242, gh-463)', function(done){
+      var db = start()
+        , BlogPostB = db.model('BlogPostB', collection);
+
+      BlogPostB.create({comments: [{title: 'i should be queryable'}], numbers: [1,2,33333], tags:['yes', 'no']}, function (err, created) {
+        assert.ifError(err);
+        BlogPostB.findOne({'comments.title': 'i should be queryable'}, function (err, found) {
+          assert.ifError(err);
+          assert.equal(found._id.toString(), created._id);
+
+          BlogPostB.findOne({'comments.0.title': 'i should be queryable'}, function (err, found) {
+            assert.ifError(err);
+            assert.equal(found._id.toString(), created._id);
+
+            // GH-463
+            BlogPostB.findOne({'numbers.2': 33333}, function (err, found) {
+              assert.ifError(err);
+              assert.equal(found._id.toString(), created._id);
+
+              BlogPostB.findOne({'tags.1': 'no'}, function (err, found) {
+                assert.ifError(err);
+                assert.equal(found._id.toString(), created._id);
                 db.close();
-                should.strictEqual(err, null);
-                nes4.length.should.eql(0);
+                done();
               });
             });
           });
         });
+      });
+    })
 
+    it('works with nested docs and string ids (gh-389)', function(done){
+      var db = start()
+        , BlogPostB = db.model('BlogPostB', collection);
+
+      BlogPostB.create({comments: [{title: 'i should be queryable by _id'}, {title:'me too me too!'}]}, function (err, created) {
+        assert.ifError(err);
+        var id = created.comments[1]._id.toString();
+        BlogPostB.findOne({'comments._id': id}, function (err, found) {
+          db.close();
+          assert.ifError(err);
+          assert.strictEqual(!! found, true, 'Find by nested doc id hex string fails');
+          assert.equal(found._id.toString(), created._id);
+          done();
+        });
+      });
+    })
+
+    it('using #all with nested #elemMatch', function(done){
+      var db = start()
+        , P = db.model('BlogPostB', collection + '_nestedElemMatch');
+
+      var post = new P({ title: "nested elemMatch" });
+      post.comments.push({ title: 'comment A' }, { title: 'comment B' }, { title: 'comment C' })
+
+      var id0 = post.comments[0]._id;
+      var id1 = post.comments[1]._id;
+      var id2 = post.comments[2]._id;
+
+      post.save(function (err) {
+        assert.ifError(err);
+
+        var query0 = { $elemMatch: { _id: id1, title: 'comment B' }};
+        var query1 = { $elemMatch: { _id: id2.toString(), title: 'comment C' }};
+
+        P.findOne({ comments: { $all: [query0, query1] }}, function (err, p) {
+          db.close();
+          assert.ifError(err);
+          assert.equal(p.id, post.id);
+          done();
+        });
       });
     });
 
-  },
+    it('using #or with nested #elemMatch', function(done){
+      var db = start()
+        , P = db.model('BlogPostB', collection);
 
-  'test for findById where partial initialization': function () {
-    var db = start()
-      , BlogPostB = db.model('BlogPostB', collection)
-      , queries = 5;
+      var post = new P({ title: "nested elemMatch" });
+      post.comments.push({ title: 'comment D' }, { title: 'comment E' }, { title: 'comment F' })
 
-    var post = new BlogPostB();
+      var id0 = post.comments[0]._id;
+      var id1 = post.comments[1]._id;
+      var id2 = post.comments[2]._id;
 
-    post.title = 'hahaha';
-    post.slug = 'woot';
-    post.meta.visitors = 53;
-    post.tags = ['humidity', 'soggy'];
+      post.save(function (err) {
+        assert.ifError(err);
 
-    post.save(function (err) {
-      should.strictEqual(err, null);
+        var query0 = { comments: { $elemMatch: { title: 'comment Z' }}};
+        var query1 = { comments: { $elemMatch: { _id: id1.toString(), title: 'comment E' }}};
 
-      BlogPostB.findById(post.get('_id'), function (err, doc) {
-        should.strictEqual(err, null);
-        doc.isInit('title').should.be.true;
-        doc.isInit('slug').should.be.true;
-        doc.isInit('date').should.be.false;
-        doc.isInit('meta.visitors').should.be.true;
-        doc.meta.visitors.valueOf().should.equal(53);
-        doc.tags.length.should.equal(2);
-        --queries || db.close();
-      });
-
-      BlogPostB.findById(post.get('_id'), ['title'], function (err, doc) {
-        should.strictEqual(err, null);
-        doc.isInit('title').should.be.true;
-        doc.isInit('slug').should.be.false;
-        doc.isInit('date').should.be.false;
-        doc.isInit('meta.visitors').should.be.false;
-        should.strictEqual(undefined, doc.meta.visitors);
-        should.strictEqual(undefined, doc.tags);
-        --queries || db.close();
-      });
-
-      BlogPostB.findById(post.get('_id'), { slug: 0 }, function (err, doc) {
-        should.strictEqual(err, null);
-        doc.isInit('title').should.be.true;
-        doc.isInit('slug').should.be.false;
-        doc.isInit('date').should.be.false;
-        doc.isInit('meta.visitors').should.be.true;
-        doc.meta.visitors.valueOf().should.equal(53);
-        doc.tags.length.should.equal(2);
-        --queries || db.close();
-      });
-
-      BlogPostB.findById(post.get('_id'), { title:1 }, function (err, doc) {
-        should.strictEqual(err, null);
-        doc.isInit('title').should.be.true;
-        doc.isInit('slug').should.be.false;
-        doc.isInit('date').should.be.false;
-        doc.isInit('meta.visitors').should.be.false;
-        should.strictEqual(undefined, doc.meta.visitors);
-        should.strictEqual(undefined, doc.tags);
-        --queries || db.close();
-      });
-
-      BlogPostB.findById(post.get('_id'), ['slug'], function (err, doc) {
-        should.strictEqual(err, null);
-        doc.isInit('title').should.be.false;
-        doc.isInit('slug').should.be.true;
-        doc.isInit('date').should.be.false;
-        doc.isInit('meta.visitors').should.be.false;
-        should.strictEqual(undefined, doc.meta.visitors);
-        should.strictEqual(undefined, doc.tags);
-        --queries || db.close();
+        P.findOne({ $or: [query0, query1] }, function (err, p) {
+          db.close();
+          assert.ifError(err);
+          assert.equal(p.id, post.id);
+          done();
+        });
       });
     });
-  },
 
-  'findOne where subset of fields excludes _id': function () {
-    var db = start()
-      , BlogPostB = db.model('BlogPostB', collection);
-    BlogPostB.create({title: 'subset 1'}, function (err, created) {
-      should.strictEqual(err, null);
-      BlogPostB.findOne({title: 'subset 1'}, {title: 1, _id: 0}, function (err, found) {
-        db.close();
-        should.strictEqual(err, null);
-        should.strictEqual(undefined, found._id);
-        found.title.should.equal('subset 1');
-      });
-    });
-  },
+    it('buffer $in array', function(done){
+      var db = start()
+        , BlogPostB = db.model('BlogPostB', collection);
 
-  'test find where subset of fields, excluding _id': function () {
-    var db = start()
-      , BlogPostB = db.model('BlogPostB', collection);
-    BlogPostB.create({title: 'subset 1', author: 'me'}, function (err, created) {
-      should.strictEqual(err, null);
-      BlogPostB.find({title: 'subset 1'}, {title: 1, _id: 0}, function (err, found) {
-        db.close();
-        should.strictEqual(err, null);
-        should.strictEqual(undefined, found[0]._id);
-        found[0].title.should.equal('subset 1');
-        should.strictEqual(undefined, found[0].def);
-        should.strictEqual(undefined, found[0].author);
-        should.strictEqual(false, Array.isArray(found[0].comments));
-      });
-    });
-  },
-
-  // gh-541
-  'find subset of fields excluding embedded doc _id': function () {
-    var db = start()
-      , BlogPostB = db.model('BlogPostB', collection);
-
-    BlogPostB.create({title: 'LOTR', comments: [{ title: ':)' }]}, function (err, created) {
-      should.strictEqual(err, null);
-      BlogPostB.find({_id: created}, { _id: 0, 'comments._id': 0 }, function (err, found) {
-        db.close();
-        should.strictEqual(err, null);
-        should.strictEqual(undefined, found[0]._id);
-        found[0].title.should.equal('LOTR');
-        should.strictEqual('kandinsky', found[0].def);
-        should.strictEqual(undefined, found[0].author);
-        should.strictEqual(true, Array.isArray(found[0].comments));
-        found[0].comments.length.should.equal(1);
-        found[0].comments[0].title.should.equal(':)');
-        should.strictEqual(undefined, found[0].comments[0]._id);
-        // gh-590
-        should.strictEqual(null, found[0].comments[0].id);
-      });
-    });
-  },
-
-  'exluded fields should be undefined': function () {
-    var db = start()
-      , BlogPostB = db.model('BlogPostB', collection)
-      , date = new Date
-
-    BlogPostB.create({title: 'subset 1', author: 'me', meta: { date: date }}, function (err, created) {
-      should.strictEqual(err, null);
-      var id = created.id;
-      BlogPostB.findById(created.id, {title: 0, 'meta.date': 0, owners: 0}, function (err, found) {
-        db.close();
-        should.strictEqual(err, null);
-        found.id;
-        found._id.should.eql(created._id);
-        should.strictEqual(undefined, found.title);
-        should.strictEqual('kandinsky', found.def);
-        should.strictEqual('me', found.author);
-        should.strictEqual(true, Array.isArray(found.comments));
-        should.equal(undefined, found.meta.date);
-        found.comments.length.should.equal(0);
-        should.equal(undefined, found.owners);
-      });
-    });
-  },
-
-  'exluded fields should be undefined and defaults applied to other fields': function () {
-    var db = start()
-      , BlogPostB = db.model('BlogPostB', collection)
-      , id = new DocumentObjectId
-      , date = new Date
-
-    BlogPostB.collection.insert({ _id: id, title: 'hahaha1', meta: { date: date }}, function (err) {
-      should.strictEqual(err, null);
-
-      BlogPostB.findById(id, {title: 0}, function (err, found) {
-        db.close();
-        should.strictEqual(err, null);
-        found._id.should.eql(id);
-        should.strictEqual(undefined, found.title);
-        should.strictEqual('kandinsky', found.def);
-        should.strictEqual(undefined, found.author);
-        should.strictEqual(true, Array.isArray(found.comments));
-        should.equal(date.toString(), found.meta.date.toString());
-        found.comments.length.should.equal(0);
-      });
-    });
-  },
-
-  // gh-870
-  'included fields should have defaults applied when no value exists in db': function () {
-    var db = start()
-      , BlogPostB = db.model('BlogPostB', collection)
-      , id = new DocumentObjectId
-
-    BlogPostB.collection.insert(
-        { _id: id, title: 'issue 870'}, function (err) {
-      should.strictEqual(err, null);
-
-      BlogPostB.findById(id, 'def comments', function (err, found) {
-        db.close();
-        should.strictEqual(err, null);
-        found._id.should.eql(id);
-        should.strictEqual(undefined, found.title);
-        should.strictEqual('kandinsky', found.def);
-        should.strictEqual(undefined, found.author);
-        should.strictEqual(true, Array.isArray(found.comments));
-        found.comments.length.should.equal(0);
-      });
-    });
-  },
-
-  'test for find where partial initialization': function () {
-    var db = start()
-      , BlogPostB = db.model('BlogPostB', collection)
-      , queries = 4;
-
-    var post = new BlogPostB();
-
-    post.title = 'hahaha';
-    post.slug = 'woot';
-
-    post.save(function (err) {
-      should.strictEqual(err, null);
-
-      BlogPostB.find({ _id: post.get('_id') }, function (err, docs) {
-        should.strictEqual(err, null);
-        docs[0].isInit('title').should.be.true;
-        docs[0].isInit('slug').should.be.true;
-        docs[0].isInit('date').should.be.false;
-        should.strictEqual('kandinsky', docs[0].def);
-        --queries || db.close();
-      });
-
-      BlogPostB.find({ _id: post.get('_id') }, ['title'], function (err, docs) {
-        should.strictEqual(err, null);
-        docs[0].isInit('title').should.be.true;
-        docs[0].isInit('slug').should.be.false;
-        docs[0].isInit('date').should.be.false;
-        should.strictEqual(undefined, docs[0].def);
-        --queries || db.close();
-      });
-
-      BlogPostB.find({ _id: post.get('_id') }, { slug: 0, def: 0 }, function (err, docs) {
-        should.strictEqual(err, null);
-        docs[0].isInit('title').should.be.true;
-        docs[0].isInit('slug').should.be.false;
-        docs[0].isInit('date').should.be.false;
-        should.strictEqual(undefined, docs[0].def);
-        --queries || db.close();
-      });
-
-      BlogPostB.find({ _id: post.get('_id') }, ['slug'], function (err, docs) {
-        should.strictEqual(err, null);
-        docs[0].isInit('title').should.be.false;
-        docs[0].isInit('slug').should.be.true;
-        docs[0].isInit('date').should.be.false;
-        should.strictEqual(undefined, docs[0].def);
-        --queries || db.close();
-      });
-    });
-  },
-
-  // GH-204
-  'test query casting when finding by Date': function () {
-    var db = start()
-      , P = db.model('BlogPostB', collection);
-
-    var post = new P;
-
-    post.meta.date = new Date();
-
-    post.save(function (err) {
-      should.strictEqual(err, null);
-
-      P.findOne({ _id: post._id, 'meta.date': { $lte: Date.now() } }, function (err, doc) {
-        should.strictEqual(err, null);
-
-        DocumentObjectId.toString(doc._id).should.eql(DocumentObjectId.toString(post._id));
-        doc.meta.date = null;
-        doc.save(function (err) {
-          should.strictEqual(err, null);
-          P.findById(doc._id, function (err, doc) {
+      BlogPostB.create({sigs: [new Buffer([1, 2, 3]),
+                               new Buffer([4, 5, 6]),
+                               new Buffer([7, 8, 9])]}, function (err, created) {
+        assert.ifError(err);
+        BlogPostB.findOne({sigs: new Buffer([1, 2, 3])}, function (err, found) {
+          assert.ifError(err);
+          found.id;
+          assert.equal(found._id.toString(), created._id);
+          var query = { sigs: { "$in" : [new Buffer([3, 3, 3]), new Buffer([4, 5, 6])] } };
+          BlogPostB.findOne(query, function (err, found) {
+            assert.ifError(err);
             db.close();
-            should.strictEqual(err, null);
-            should.strictEqual(doc.meta.date, null);
+            done();
           });
         });
       });
     });
-  },
 
-  // gh-523
-  'null boolean default is allowed': function () {
-    var db = start()
-      , s1 = new Schema({ b: { type: Boolean, default: null }})
-      , M1 = db.model('NullDateDefaultIsAllowed1', s1)
-      , s2 = new Schema({ b: { type: Boolean, default: false }})
-      , M2 = db.model('NullDateDefaultIsAllowed2', s2)
-      , s3 = new Schema({ b: { type: Boolean, default: true }})
-      , M3 = db.model('NullDateDefaultIsAllowed3', s3)
+    it('regex with Array (gh-599)', function(done){
+      var db = start()
+        , B = db.model('BlogPostB', random())
 
-    db.close();
+      B.create({ tags: 'wooof baaaark meeeeow'.split(' ') }, function (err, b) {
+        assert.ifError(err);
+        B.findOne({ tags: /ooof$/ }, function (err, doc) {
+          assert.ifError(err);
+          assert.strictEqual(true, !! doc);
+          assert.ok(!! ~doc.tags.indexOf('meeeeow'));
 
-    var m1 = new M1;
-    should.strictEqual(null, m1.b);
-    var m2 = new M2;
-    should.strictEqual(false, m2.b);
-    var m3 = new M3;
-    should.strictEqual(true, m3.b);
-  },
-
-  // GH-220
-  'test querying if an array contains at least a certain single member': function () {
-    var db = start()
-      , BlogPostB = db.model('BlogPostB', collection);
-
-    var post = new BlogPostB();
-
-    post.tags.push('cat');
-
-    post.save(function (err) {
-      should.strictEqual(err, null);
-
-      BlogPostB.findOne({tags: 'cat'}, function (err, doc) {
-        should.strictEqual(err, null);
-
-        doc.id;
-        doc._id.should.eql(post._id);
-        db.close();
+          B.findOne({ tags: {$regex: 'eow$' } }, function (err, doc) {
+            db.close();
+            assert.ifError(err);
+            assert.strictEqual(true, !! doc);
+            assert.strictEqual(true, !! ~doc.tags.indexOf('meeeeow'));
+            done();
+          });
+        });
       });
     });
-  },
 
-  'test querying if an array contains one of multiple members $in a set': function () {
-    var db = start()
-      , BlogPostB = db.model('BlogPostB', collection);
+    it('regex with options', function(done){
+      var db = start()
+        , B = db.model('BlogPostB', collection)
 
-    var post = new BlogPostB();
-
-    post.tags.push('football');
-
-    post.save(function (err) {
-      should.strictEqual(err, null);
-
-      BlogPostB.findOne({tags: {$in: ['football', 'baseball']}}, function (err, doc) {
-        should.strictEqual(err, null);
-        doc.id;
-        doc._id.should.eql(post._id);
-
-        BlogPostB.findOne({ _id: post._id, tags: /otba/i }, function (err, doc) {
-          should.strictEqual(err, null);
-          doc.id;
-          doc._id.should.eql(post._id);
-
+      var post = new B({ title: '$option queries' });
+      post.save(function (err) {
+        assert.ifError(err);
+        B.findOne({ title: { $regex: ' QUERIES$', $options: 'i' }}, function (err, doc) {
           db.close();
+          assert.strictEqual(null, err, err && err.stack);
+          assert.equal(doc.id, post.id);
+          done();
         })
       });
     });
-  },
 
-  'test querying if an array contains one of multiple members $in a set 2': function () {
-    var db = start()
-      , BlogPostA = db.model('BlogPostB', collection)
+  });
 
-    var post = new BlogPostA({ tags: ['gooberOne'] });
+  describe('findById', function () {
+    it('works', function(done){
+      var db = start()
+        , BlogPostB = db.model('BlogPostB', collection)
+        , title = 'Edwald ' + random();
 
-    post.save(function (err) {
-      should.strictEqual(err, null);
+      var post = new BlogPostB();
+      post.set('title', title);
 
-      var query = {tags: {$in:[ 'gooberOne' ]}};
+      post.save(function (err) {
+        assert.ifError(err);
 
-      BlogPostA.findOne(query, function (err, returned) {
-        done();
-        should.strictEqual(err, null);
-        ;(!!~returned.tags.indexOf('gooberOne')).should.be.true;
-        returned.id;
-        returned._id.should.eql(post._id);
-      });
-    });
+        var pending = 2;
 
-    post.collection.insert({ meta: { visitors: 9898, a: null } }, {}, function (err, b) {
-      should.strictEqual(err, null);
-
-      BlogPostA.findOne({_id: b[0]._id}, function (err, found) {
-        done();
-        should.strictEqual(err, null);
-        found.get('meta.visitors').valueOf().should.eql(9898);
-      })
-    });
-
-    var pending = 2;
-    function done () {
-      if (--pending) return;
-      db.close();
-    }
-  },
-
-  'test querying via $where a string': function () {
-    var db = start()
-      , BlogPostB = db.model('BlogPostB', collection);
-
-    BlogPostB.create({ title: 'Steve Jobs', author: 'Steve Jobs'}, function (err, created) {
-      should.strictEqual(err, null);
-
-      BlogPostB.findOne({ $where: "this.title && this.title === this.author" }, function (err, found) {
-        should.strictEqual(err, null);
-
-        found.id;
-        found._id.should.eql(created._id);
-        db.close();
-      });
-    });
-  },
-
-  'test querying via $where a function': function () {
-    var db = start()
-      , BlogPostB = db.model('BlogPostB', collection);
-
-    BlogPostB.create({ author: 'Atari', slug: 'Atari'}, function (err, created) {
-      should.strictEqual(err, null);
-
-      BlogPostB.findOne({ $where: function () {
-        return (this.author && this.slug && this.author === this.slug);
-      } }, function (err, found) {
-        should.strictEqual(err, null);
-
-        found.id;
-        found._id.should.eql(created._id);
-        db.close();
-      });
-    });
-  },
-
-  'test find where $exists': function () {
-    var db = start()
-      , ExistsSchema = new Schema({
-            a: Number
-          , b: String
-        });
-    mongoose.model('Exists', ExistsSchema);
-    var Exists = db.model('Exists', 'exists_' + random());
-    Exists.create({ a: 1}, function (err, aExisting) {
-      should.strictEqual(err, null);
-      Exists.create({b: 'hi'}, function (err, bExisting) {
-        should.strictEqual(err, null);
-        Exists.find({b: {$exists: true}}, function (err, docs) {
-          should.strictEqual(err, null);
+        BlogPostB.findById(post.get('_id'), function (err, doc) {
+          assert.ifError(err);
+          assert.ok(doc instanceof BlogPostB);
+          assert.equal(title, doc.get('title'));
+          if (--pending) return;
           db.close();
-          docs.should.have.length(1);
+          done();
+        });
+
+        BlogPostB.findById(post.get('_id').toHexString(), function (err, doc) {
+          assert.ifError(err);
+          assert.ok(doc instanceof BlogPostB);
+          assert.equal(title, doc.get('title'));
+          if (--pending) return;
+          db.close();
+          done();
         });
       });
     });
-  },
 
-  'test finding based on nested fields': function () {
-    var db = start()
-      , BlogPostB = db.model('BlogPostB', collection)
-      , post = new BlogPostB({
-          meta: {
-            visitors: 5678
-          }
+    it('works with partial initialization', function(done){
+      var db = start()
+        , BlogPostB = db.model('BlogPostB', collection)
+        , queries = 5;
+
+      var post = new BlogPostB();
+
+      post.title = 'hahaha';
+      post.slug = 'woot';
+      post.meta.visitors = 53;
+      post.tags = ['humidity', 'soggy'];
+
+      post.save(function (err) {
+        assert.ifError(err);
+
+        BlogPostB.findById(post.get('_id'), function (err, doc) {
+          assert.ifError(err);
+
+          assert.equal(true, doc.isInit('title'));
+          assert.equal(true, doc.isInit('slug'));
+          assert.equal(false, doc.isInit('date'));
+          assert.equal(true, doc.isInit('meta.visitors'));
+          assert.equal(53, doc.meta.visitors.valueOf());
+          assert.equal(2, doc.tags.length);
+          if (--queries) return;
+          db.close();
+          done();
         });
 
-    post.save(function (err) {
-      should.strictEqual(err, null);
+        BlogPostB.findById(post.get('_id'), 'title', function (err, doc) {
+          assert.ifError(err);
+          assert.equal(true, doc.isInit('title'));
+          assert.equal(false, doc.isInit('slug'));
+          assert.equal(false, doc.isInit('date'));
+          assert.equal(false, doc.isInit('meta.visitors'));
+          assert.equal(undefined, doc.meta.visitors);
+          assert.equal(undefined, doc.tags);
+          if (--queries) return;
+          db.close();
+          done();
+        });
 
-      BlogPostB.findOne({ 'meta.visitors': 5678 }, function (err, found) {
-        should.strictEqual(err, null);
-        found.get('meta.visitors')
-          .valueOf().should.equal(post.get('meta.visitors').valueOf());
-        found.id;
-        found.get('_id').should.eql(post.get('_id'));
-        db.close();
+        BlogPostB.findById(post.get('_id'), {'slug':0}, function (err, doc) {
+          assert.ifError(err);
+          assert.equal(true, doc.isInit('title'));
+          assert.equal(false, doc.isInit('slug'));
+          assert.equal(false, doc.isInit('date'));
+          assert.equal(true, doc.isInit('meta.visitors'));
+          assert.equal(53, doc.meta.visitors);
+          assert.equal(2, doc.tags.length);
+          if (--queries) return;
+          db.close();
+          done();
+        });
+
+        BlogPostB.findById(post.get('_id'), { title:1 }, function (err, doc) {
+          assert.ifError(err);
+          assert.equal(true, doc.isInit('title'));
+          assert.equal(false, doc.isInit('slug'));
+          assert.equal(false, doc.isInit('date'));
+          assert.equal(false, doc.isInit('meta.visitors'));
+          assert.equal(undefined, doc.meta.visitors);
+          assert.equal(undefined, doc.tags);
+          if (--queries) return;
+          db.close();
+          done();
+        });
+
+        BlogPostB.findById(post.get('_id'), 'slug', function (err, doc) {
+          assert.ifError(err);
+          assert.equal(false, doc.isInit('title'));
+          assert.equal(true, doc.isInit('slug'));
+          assert.equal(false, doc.isInit('date'));
+          assert.equal(false, doc.isInit('meta.visitors'));
+          assert.equal(undefined, doc.meta.visitors);
+          assert.equal(undefined, doc.tags);
+          if (--queries) return;
+          db.close();
+          done();
+        });
       });
     });
-  },
 
-  // GH-242
-  'test finding based on embedded document fields': function () {
-    var db = start()
-      , BlogPostB = db.model('BlogPostB', collection);
+    it('querying if an array contains at least a certain single member (gh-220)', function(done){
+      var db = start()
+        , BlogPostB = db.model('BlogPostB', collection);
 
-    BlogPostB.create({comments: [{title: 'i should be queryable'}], numbers: [1,2,33333], tags:['yes', 'no']}, function (err, created) {
-      should.strictEqual(err, null);
-      BlogPostB.findOne({'comments.title': 'i should be queryable'}, function (err, found) {
-        should.strictEqual(err, null);
-        found.id;
-        found._id.should.eql(created._id);
+      var post = new BlogPostB();
 
-        BlogPostB.findOne({'comments.0.title': 'i should be queryable'}, function (err, found) {
-          should.strictEqual(err, null);
-          found.id;
-          found._id.should.eql(created._id);
+      post.tags.push('cat');
 
-          // GH-463
-          BlogPostB.findOne({'numbers.2': 33333}, function (err, found) {
-            should.strictEqual(err, null);
-            found.id;
-            found._id.should.eql(created._id);
+      post.save(function (err) {
+        assert.ifError(err);
 
-            BlogPostB.findOne({'tags.1': 'no'}, function (err, found) {
-              should.strictEqual(err, null);
-              found.id;
-              found._id.should.eql(created._id);
+        BlogPostB.findOne({tags: 'cat'}, function (err, doc) {
+          assert.ifError(err);
+          assert.equal(doc._id.toString(),post._id);
+          db.close();
+          done();
+        });
+      });
+    });
+
+
+    it('where an array where the $slice operator', function(done){
+      var db = start()
+        , BlogPostB = db.model('BlogPostB', collection);
+
+      BlogPostB.create({numbers: [500,600,700,800]}, function (err, created) {
+        assert.ifError(err);
+        BlogPostB.findById(created._id, {numbers: {$slice: 2}}, function (err, found) {
+          assert.ifError(err);
+          assert.equal(found._id.toString(), created._id);
+          assert.equal(2, found.numbers.length);
+          assert.equal(500, found.numbers[0]);
+          assert.equal(600, found.numbers[1]);
+          BlogPostB.findById(created._id, {numbers: {$slice: -2}}, function (err, found) {
+            assert.ifError(err);
+            assert.equal(found._id.toString(), created._id);
+            assert.equal(2, found.numbers.length);
+            assert.equal(700, found.numbers[0]);
+            assert.equal(800, found.numbers[1]);
+            BlogPostB.findById(created._id, {numbers: {$slice: [1, 2]}}, function (err, found) {
+              assert.ifError(err);
+              assert.equal(found._id.toString(), created._id);
+              assert.equal(2, found.numbers.length);
+              assert.equal(600, found.numbers[0]);
+              assert.equal(700, found.numbers[1]);
               db.close();
+              done();
             });
           });
         });
       });
     });
-  },
 
-  // GH-389
-  'find nested doc using string id': function () {
-    var db = start()
-      , BlogPostB = db.model('BlogPostB', collection);
+  });
 
-    BlogPostB.create({comments: [{title: 'i should be queryable by _id'}, {title:'me too me too!'}]}, function (err, created) {
-      should.strictEqual(err, null);
-      var id = created.comments[1]._id.toString();
-      BlogPostB.findOne({'comments._id': id}, function (err, found) {
-        db.close();
-        should.strictEqual(err, null);
-        should.strictEqual(!! found, true, 'Find by nested doc id hex string fails');
-        found.id;
-        found._id.should.eql(created._id);
-      });
-    });
-  },
+  describe('find', function () {
+    it('works', function(done){
+      var db = start()
+        , BlogPostB = db.model('BlogPostB', collection)
+        , title = 'Wooooot ' + random();
 
-  'test finding where $elemMatch': function () {
-    var db = start()
-      , BlogPostB = db.model('BlogPostB', collection)
-      , dateAnchor = +new Date;
+      var post = new BlogPostB();
+      post.set('title', title);
 
-    BlogPostB.create({comments: [{title: 'elemMatch', date: dateAnchor + 5}]}, function (err, createdAfter) {
-      should.strictEqual(err, null);
-      BlogPostB.create({comments: [{title: 'elemMatch', date: dateAnchor - 5}]}, function (err, createdBefore) {
-        should.strictEqual(err, null);
-        BlogPostB.find({'comments': {'$elemMatch': {title: 'elemMatch', date: {$gt: dateAnchor}}}}, 
-          function (err, found) {
-            should.strictEqual(err, null);
-            found.should.have.length(1);
-            found[0]._id.should.eql(createdAfter._id);
+      post.save(function (err) {
+        assert.ifError(err);
+
+        var post = new BlogPostB();
+        post.set('title', title);
+
+        post.save(function (err) {
+          assert.ifError(err);
+
+          BlogPostB.find({ title: title }, function (err, docs) {
+            assert.ifError(err);
+            assert.equal(2, docs.length);
+
+            assert.equal(title, docs[0].get('title'));
+            assert.equal(false, docs[0].isNew);
+
+            assert.equal(title, docs[1].get('title'));
+            assert.equal(false, docs[1].isNew);
+
             db.close();
-          }
-        );
+            done();
+          });
+        });
       });
     });
-  },
 
-  'test finding where $mod': function () {
-    var db = start()
-      , Mod = db.model('Mod', 'mods_' + random());
-    Mod.create({num: 1}, function (err, one) {
-      should.strictEqual(err, null);
-      Mod.create({num: 2}, function (err, two) {
-        should.strictEqual(err, null);
-        Mod.find({num: {$mod: [2, 1]}}, function (err, found) {
-          should.strictEqual(err, null);
-          found.should.have.length(1);
-          found[0]._id.should.eql(one._id);
+    it('returns docs where an array that contains one specific member', function(done){
+      var db = start()
+        , BlogPostB = db.model('BlogPostB', collection);
+      BlogPostB.create({numbers: [100, 101, 102]}, function (err, created) {
+        assert.ifError(err);
+        BlogPostB.find({numbers: 100}, function (err, found) {
+          assert.ifError(err);
+          assert.equal(1, found.length);
+          assert.equal(found[0]._id.toString(), created._id);
           db.close();
-        });
-      });
-    });
-  },
-
-  'test finding where $not': function () {
-    var db = start()
-      , Mod = db.model('Mod', 'mods_' + random());
-    Mod.create({num: 1}, function (err, one) {
-      should.strictEqual(err, null);
-      Mod.create({num: 2}, function (err, two) {
-        should.strictEqual(err, null);
-        Mod.find({num: {$not: {$mod: [2, 1]}}}, function (err, found) {
-          should.strictEqual(err, null);
-          found.should.have.length(1);
-          found[0]._id.should.eql(two._id);
-          db.close();
-        });
-      });
-    });
-  },
-
-  'test finding where $or': function () {
-    var db = start()
-      , Mod = db.model('Mod', 'mods_' + random());
-
-    Mod.create({num: 1}, {num: 2, str: 'two'}, function (err, one, two) {
-      should.strictEqual(err, null);
-
-      var pending = 3;
-      test1();
-      test2();
-      test3();
-
-      function test1 () {
-        Mod.find({$or: [{num: 1}, {num: 2}]}, function (err, found) {
           done();
-          should.strictEqual(err, null);
-          found.should.have.length(2);
-          found[0]._id.should.eql(one._id);
-          found[1]._id.should.eql(two._id);
-        });
-      }
-
-      function test2 () {
-        Mod.find({ $or: [{ str: 'two'}, {str:'three'}] }, function (err, found) {
-          if (err) console.error(err);
-          done();
-          should.strictEqual(err, null);
-          found.should.have.length(1);
-          found[0]._id.should.eql(two._id);
-        });
-      }
-
-      function test3 () {
-        Mod.find({$or: [{num: 1}]}).$or([{ str: 'two' }]).run(function (err, found) {
-          if (err) console.error(err);
-          done();
-          should.strictEqual(err, null);
-          found.should.have.length(2);
-          found[0]._id.should.eql(one._id);
-          found[1]._id.should.eql(two._id);
-        });
-      }
-
-      function done () {
-        if (--pending) return;
-        db.close();
-      }
-    });
-  },
-
-  'finding where #nor': function () {
-    var db = start()
-      , Mod = db.model('Mod', 'nor_' + random());
-
-    Mod.create({num: 1}, {num: 2, str: 'two'}, function (err, one, two) {
-      should.strictEqual(err, null);
-
-      var pending = 3;
-      test1();
-      test2();
-      test3();
-
-      function test1 () {
-        Mod.find({$nor: [{num: 1}, {num: 3}]}, function (err, found) {
-          done();
-          should.strictEqual(err, null);
-          found.should.have.length(1);
-          found[0]._id.should.eql(two._id);
-        });
-      }
-
-      function test2 () {
-        Mod.find({ $nor: [{ str: 'two'}, {str:'three'}] }, function (err, found) {
-          done();
-          should.strictEqual(err, null);
-          found.should.have.length(1);
-          found[0]._id.should.eql(one._id);
-        });
-      }
-
-      function test3 () {
-        Mod.find({$nor: [{num: 2}]}).$nor([{ str: 'two' }]).run(function (err, found) {
-          done();
-          should.strictEqual(err, null);
-          found.should.have.length(1);
-          found[0]._id.should.eql(one._id);
-        });
-      }
-
-      function done () {
-        if (--pending) return;
-        db.close();
-      }
-    });
-  },
-
-  'test finding where $ne': function () {
-    var db = start()
-      , Mod = db.model('Mod', 'mods_' + random());
-    Mod.create({num: 1}, function (err, one) {
-      should.strictEqual(err, null);
-      Mod.create({num: 2}, function (err, two) {
-        should.strictEqual(err, null);
-        Mod.create({num: 3}, function (err, three) {
-          should.strictEqual(err, null);
-          Mod.find({num: {$ne: 1}}, function (err, found) {
-            should.strictEqual(err, null);
-            found.should.have.length(2);
-            found[0]._id.should.eql(two._id);
-            found[1]._id.should.eql(three._id);
-            db.close();
-          });
         });
       });
     });
-  },
 
-  'test finding null matches null and undefined': function () {
-    var db = start()
-      , BlogPostB = db.model('BlogPostB', collection + random());
-
-    BlogPostB.create(
-        { title: 'A', author: null }
-      , { title: 'B' }, function (err, createdA, createdB) {
-      should.strictEqual(err, null);
-      BlogPostB.find({author: null}, function (err, found) {
-        db.close();
-        should.strictEqual(err, null);
-        found.should.have.length(2);
+    it('works when comparing $ne with single value against an array', function(done){
+      var db = start();
+      var schema = new Schema({
+          ids: [Schema.ObjectId]
+        , b: Schema.ObjectId
       });
-    });
-  },
 
-  'test finding STRICT null matches': function () {
-    var db = start()
-      , BlogPostB = db.model('BlogPostB', collection + random());
+      var NE = db.model('NE_Test', schema, 'nes__' + random());
 
-    BlogPostB.create(
-        { title: 'A', author: null}
-      , { title: 'B' }, function (err, createdA, createdB) {
-      should.strictEqual(err, null);
-      BlogPostB.find({author: {$in: [null], $exists: true}}, function (err, found) {
-        db.close();
-        should.strictEqual(err, null);
-        found.should.have.length(1);
-        found[0]._id.should.eql(createdA._id);
-      });
-    });
-  },
+      var id1 = new DocumentObjectId;
+      var id2 = new DocumentObjectId;
+      var id3 = new DocumentObjectId;
+      var id4 = new DocumentObjectId;
 
-  'setting a path to undefined should retain the value as undefined': function () {
-    var db = start()
-      , B = db.model('BlogPostB', collection + random())
+      NE.create({ ids: [id1, id4], b: id3 }, function (err, ne1) {
+        assert.ifError(err);
+        NE.create({ ids: [id2, id4], b: id3 },function (err, ne2) {
+          assert.ifError(err);
 
-    var doc = new B;
-    doc.title='css3';
-    doc._delta().$set.title.should.equal('css3');
-    doc.title = undefined;
-    doc._delta().$unset.title.should.equal(1);
-    should.strictEqual(undefined, doc._delta().$set);
+          var query = NE.find({ 'b': id3.toString(), 'ids': { $ne: id1 }});
+          query.exec(function (err, nes1) {
+            assert.ifError(err);
+            assert.equal(1, nes1.length);
 
-    doc.title='css3';
-    doc.author = 'aaron';
-    doc.numbers = [3,4,5];
-    doc.meta.date = new Date;
-    doc.meta.visitors = 89;
-    doc.comments = [{ title: 'thanksgiving', body: 'yuuuumm' }];
-    doc.comments.push({ title: 'turkey', body: 'cranberries' });
+            NE.find({ b: { $ne: [1] }}, function (err, nes2) {
+              assert.equal("Invalid ObjectId", err.message);
 
-    doc.save(function (err) {
-      should.strictEqual(null, err);
-      B.findById(doc._id, function (err, b) {
-        should.strictEqual(null, err);
-        b.title.should.equal('css3');
-        b.author.should.equal('aaron');
-        should.equal(b.meta.date.toString(), doc.meta.date.toString());
-        b.meta.visitors.valueOf().should.equal(doc.meta.visitors.valueOf());
-        b.comments.length.should.equal(2);
-        b.comments[0].title.should.equal('thanksgiving');
-        b.comments[0].body.should.equal('yuuuumm');
-        b.comments[1].title.should.equal('turkey');
-        b.comments[1].body.should.equal('cranberries');
-        b.title = undefined;
-        b.author = null;
-        b.meta.date = undefined;
-        b.meta.visitors = null;
-        b.comments[0].title = null;
-        b.comments[0].body = undefined;
-        b.save(function (err) {
-          should.strictEqual(null, err);
-          B.findById(b._id, function (err, b) {
-            should.strictEqual(null, err);
-            should.strictEqual(undefined, b.title);
-            should.strictEqual(null, b.author);
+              NE.find({ b: { $ne: 4 }}, function (err, nes3) {
+                assert.equal("Invalid ObjectId", err.message);
 
-            should.strictEqual(undefined, b.meta.date);
-            should.strictEqual(null, b.meta.visitors);
-            should.strictEqual(null, b.comments[0].title);
-            should.strictEqual(undefined, b.comments[0].body);
-            b.comments[1].title.should.equal('turkey');
-            b.comments[1].body.should.equal('cranberries');
-
-            b.meta = undefined;
-            b.comments = undefined;
-            b.save(function (err) {
-              should.strictEqual(null, err);
-              B.collection.findOne({ _id: b._id}, function (err, b) {
-                db.close();
-                should.strictEqual(null, err);
-                should.strictEqual(undefined, b.meta);
-                should.strictEqual(undefined, b.comments);
-              });
-            });
-          });
-        });
-      });
-    });
-  },
-
-  'test finding strings via regular expressions': function () {
-    var db = start()
-      , BlogPostB = db.model('BlogPostB', collection);
-
-    BlogPostB.create({title: 'Next to Normal'}, function (err, created) {
-      should.strictEqual(err, null);
-      BlogPostB.findOne({title: /^Next/}, function (err, found) {
-        should.strictEqual(err, null);
-        found.id;
-        found._id.should.eql(created._id);
-
-        var reg = '^Next to Normal$';
-
-        BlogPostB.find({ title: { $regex: reg }}, function (err, found) {
-          should.strictEqual(err, null);
-          found.length.should.equal(1);
-          found[0].id;
-          found[0]._id.should.eql(created._id);
-
-          BlogPostB.findOne({ title: { $regex: reg }}, function (err, found) {
-            should.strictEqual(err, null);
-            found.id;
-            found._id.should.eql(created._id);
-
-            BlogPostB.where('title').$regex(reg).findOne(function (err, found) {
-              should.strictEqual(err, null);
-              found.id;
-              found._id.should.eql(created._id);
-
-              BlogPostB.where('title').$regex(/^Next/).findOne(function (err, found) {
-                db.close();
-                should.strictEqual(err, null);
-                found.id;
-                found._id.should.eql(created._id);
-              });
-            });
-          });
-        });
-      });
-    });
-  },
-
-  'test finding a document whose arrays contain at least $all values': function () {
-    var db = start()
-      , BlogPostB = db.model('BlogPostB', collection);
-
-    BlogPostB.create(
-        {numbers: [-1,-2,-3,-4], meta: { visitors: 4 }}
-      , {numbers: [0,-1,-2,-3,-4]}
-      , function (err, whereoutZero, whereZero) {
-      should.strictEqual(err, null);
-
-      BlogPostB.find({numbers: {$all: [-1, -2, -3, -4]}}, function (err, found) {
-        should.strictEqual(err, null);
-        found.should.have.length(2);
-        BlogPostB.find({'meta.visitors': {$all: [4] }}, function (err, found) {
-          should.strictEqual(err, null);
-          found.should.have.length(1);
-          found[0]._id.should.eql(whereoutZero._id);
-          BlogPostB.find({numbers: {$all: [0, -1]}}, function (err, found) {
-            db.close();
-            should.strictEqual(err, null);
-            found.should.have.length(1);
-            found[0]._id.should.eql(whereZero._id);
-          });
-        });
-      });
-    });
-  },
-
-  'test finding a document whose arrays contain at least $all string values': function () {
-    var db = start()
-      , BlogPostB = db.model('BlogPostB', collection);
-
-    var post = new BlogPostB({ title: "Aristocats" });
-
-    post.tags.push('onex');
-    post.tags.push('twox');
-    post.tags.push('threex');
-
-    post.save(function (err) {
-      should.strictEqual(err, null);
-
-      BlogPostB.findById(post._id, function (err, post) {
-        should.strictEqual(err, null);
-
-        BlogPostB.find({ title: { '$all': ['Aristocats']}}, function (err, docs) {
-          should.strictEqual(err, null);
-          docs.length.should.equal(1);
-
-          BlogPostB.find({ title: { '$all': [/^Aristocats/]}}, function (err, docs) {
-            should.strictEqual(err, null);
-            docs.length.should.equal(1);
-
-            BlogPostB.find({tags: { '$all': ['onex','twox','threex']}}, function (err, docs) {
-              should.strictEqual(err, null);
-              docs.length.should.equal(1);
-
-              BlogPostB.find({tags: { '$all': [/^onex/i]}}, function (err, docs) {
-                should.strictEqual(err, null);
-                docs.length.should.equal(1);
-
-                BlogPostB.findOne({tags: { '$all': /^two/ }}, function (err, doc) {
+                NE.find({ b: id3, ids: { $ne: id4 }}, function (err, nes4) {
                   db.close();
-                  should.strictEqual(err, null);
-                  doc.id.should.eql(post.id);
+                  assert.ifError(err);
+                  assert.equal(0, nes4.length);
+                  done();
+                });
+              });
+            });
+          });
+
+        });
+      });
+    });
+
+    it('with partial initialization', function(done){
+      var db = start()
+        , BlogPostB = db.model('BlogPostB', collection)
+        , queries = 4;
+
+      var post = new BlogPostB();
+
+      post.title = 'hahaha';
+      post.slug = 'woot';
+
+      post.save(function (err) {
+        assert.ifError(err);
+
+        BlogPostB.find({ _id: post.get('_id') }, function (err, docs) {
+          assert.ifError(err);
+          assert.equal(true, docs[0].isInit('title'));
+          assert.equal(true, docs[0].isInit('slug'));
+          assert.equal(false, docs[0].isInit('date'));
+          assert.strictEqual('kandinsky', docs[0].def);
+          if (--queries) return;
+          db.close();
+          done();
+        });
+
+        BlogPostB.find({ _id: post.get('_id') }, 'title', function (err, docs) {
+          assert.ifError(err);
+          assert.equal(true, docs[0].isInit('title'));
+          assert.equal(false, docs[0].isInit('slug'));
+          assert.equal(false, docs[0].isInit('date'));
+          assert.strictEqual(undefined, docs[0].def);
+          if (--queries) return;
+          db.close();
+          done();
+        });
+
+        BlogPostB.find({ _id: post.get('_id') }, { slug: 0, def: 0 }, function (err, docs) {
+          assert.ifError(err);
+          assert.equal(true, docs[0].isInit('title'));
+          assert.equal(false, docs[0].isInit('slug'));
+          assert.equal(false, docs[0].isInit('date'));
+          assert.strictEqual(undefined, docs[0].def);
+          if (--queries) return;
+          db.close();
+          done();
+        });
+
+        BlogPostB.find({ _id: post.get('_id') }, 'slug', function (err, docs) {
+          assert.ifError(err);
+          assert.equal(false, docs[0].isInit('title'));
+          assert.equal(true, docs[0].isInit('slug'));
+          assert.equal(false, docs[0].isInit('date'));
+          assert.strictEqual(undefined, docs[0].def);
+          if (--queries) return;
+          db.close();
+          done();
+        });
+      })
+    })
+
+    it('where $exists', function(done){
+      var db = start()
+        , ExistsSchema = new Schema({
+              a: Number
+            , b: String
+          });
+      mongoose.model('Exists', ExistsSchema);
+      var Exists = db.model('Exists', 'exists_' + random());
+      Exists.create({ a: 1}, function (err, aExisting) {
+        assert.ifError(err);
+        Exists.create({b: 'hi'}, function (err, bExisting) {
+          assert.ifError(err);
+          Exists.find({b: {$exists: true}}, function (err, docs) {
+            assert.ifError(err);
+            db.close();
+            assert.equal(1, docs.length);
+            done();
+          });
+        });
+      });
+    });
+
+    it('works with $elemMatch', function(done){
+      var db = start()
+        , BlogPostB = db.model('BlogPostB', collection)
+        , dateAnchor = +new Date;
+
+      BlogPostB.create({comments: [{title: 'elemMatch', date: dateAnchor + 5}]}, function (err, createdAfter) {
+        assert.ifError(err);
+        BlogPostB.create({comments: [{title: 'elemMatch', date: dateAnchor - 5}]}, function (err, createdBefore) {
+          assert.ifError(err);
+          BlogPostB.find({'comments': {'$elemMatch': {title: 'elemMatch', date: {$gt: dateAnchor}}}}, 
+            function (err, found) {
+              assert.ifError(err);
+              assert.equal(1, found.length);
+              assert.equal(found[0]._id.toString(), createdAfter._id);
+              db.close();
+              done();
+            }
+          );
+        });
+      });
+    })
+
+    it('where $mod', function(done){
+      var db = start()
+        , Mod = db.model('Mod', 'mods_' + random());
+      Mod.create({num: 1}, function (err, one) {
+        assert.ifError(err);
+        Mod.create({num: 2}, function (err, two) {
+          assert.ifError(err);
+          Mod.find({num: {$mod: [2, 1]}}, function (err, found) {
+            assert.ifError(err);
+            assert.equal(1, found.length);
+            assert.equal(found[0]._id.toString(), one._id);
+            db.close();
+            done();
+          });
+        });
+      });
+    });
+
+    it('where $not', function(done){
+      var db = start()
+        , Mod = db.model('Mod', 'mods_' + random());
+      Mod.create({num: 1}, function (err, one) {
+        assert.ifError(err);
+        Mod.create({num: 2}, function (err, two) {
+          assert.ifError(err);
+          Mod.find({num: {$not: {$mod: [2, 1]}}}, function (err, found) {
+            assert.ifError(err);
+            assert.equal(1, found.length);
+            assert.equal(found[0]._id.toString(),two._id);
+            db.close();
+            done();
+          });
+        });
+      });
+    });
+
+    it('where or()', function(done){
+      var db = start()
+        , Mod = db.model('Mod', 'mods_' + random());
+
+      Mod.create({num: 1}, {num: 2, str: 'two'}, function (err, one, two) {
+        assert.ifError(err);
+
+        var pending = 3;
+        test1();
+        test2();
+        test3();
+
+        function test1 () {
+          Mod.find({$or: [{num: 1}, {num: 2}]}, function (err, found) {
+            cb();
+            assert.ifError(err);
+            assert.equal(2, found.length);
+            assert.equal(found[0]._id.toString(), one._id);
+            assert.equal(found[1]._id.toString(), two._id);
+          });
+        }
+
+        function test2 () {
+          Mod.find({ $or: [{ str: 'two'}, {str:'three'}] }, function (err, found) {
+            cb();
+            assert.ifError(err);
+            assert.equal(1, found.length);
+            assert.equal(found[0]._id.toString(),two._id);
+          });
+        }
+
+        function test3 () {
+          Mod.find({$or: [{num: 1}]}).or([{ str: 'two' }]).exec(function (err, found) {
+            cb();
+            assert.ifError(err);
+            assert.equal(2, found.length);
+            assert.equal(found[0]._id.toString(), one._id);
+            assert.equal(found[1]._id.toString(), two._id);
+          });
+        }
+
+        function cb () {
+          if (--pending) return;
+          db.close();
+          done();
+        }
+      });
+    })
+
+    it('where $ne', function(done){
+      var db = start()
+        , Mod = db.model('Mod', 'mods_' + random());
+      Mod.create({num: 1}, function (err, one) {
+        assert.ifError(err);
+        Mod.create({num: 2}, function (err, two) {
+          assert.ifError(err);
+          Mod.create({num: 3}, function (err, three) {
+            assert.ifError(err);
+            Mod.find({num: {$ne: 1}}, function (err, found) {
+              assert.ifError(err);
+
+              assert.equal(found.length, 2);
+              assert.equal(found[0]._id.toString(),two._id);
+              assert.equal(found[1]._id.toString(),three._id);
+              db.close();
+              done();
+            });
+          });
+        });
+      });
+    });
+
+    it('where $nor', function(done){
+      var db = start()
+        , Mod = db.model('Mod', 'nor_' + random());
+
+      Mod.create({num: 1}, {num: 2, str: 'two'}, function (err, one, two) {
+        assert.ifError(err);
+
+        var pending = 3;
+        test1();
+        test2();
+        test3();
+
+        function test1 () {
+          Mod.find({$nor: [{num: 1}, {num: 3}]}, function (err, found) {
+            cb();
+            assert.ifError(err);
+            assert.equal(1, found.length);
+            assert.equal(found[0]._id.toString(),two._id);
+          });
+        }
+
+        function test2 () {
+          Mod.find({ $nor: [{ str: 'two'}, {str:'three'}] }, function (err, found) {
+            cb();
+            assert.ifError(err);
+            assert.equal(1, found.length);
+            assert.equal(found[0]._id.toString(), one._id);
+          });
+        }
+
+        function test3 () {
+          Mod.find({$nor: [{num: 2}]}).nor([{ str: 'two' }]).exec(function (err, found) {
+            cb();
+            assert.ifError(err);
+            assert.equal(1, found.length);
+            assert.equal(found[0]._id.toString(), one._id);
+          });
+        }
+
+        function cb () {
+          if (--pending) return;
+          db.close();
+          done()
+        }
+      });
+    });
+
+    it('STRICT null matches', function(done){
+      var db = start()
+      var BlogPostB = db.model('BlogPostB', collection + random());
+
+      var a = { title: 'A', author: null};
+      var b = { title: 'B' };
+      BlogPostB.create(a, b, function (err, createdA, createdB) {
+        assert.ifError(err);
+        BlogPostB.find({author: {$in: [null], $exists: true}}, function (err, found) {
+          db.close();
+          assert.ifError(err);
+          assert.equal(1, found.length);
+          assert.equal(found[0]._id.toString(), createdA._id);
+          done();
+        });
+      });
+    });
+
+    it('null matches null and undefined', function(done){
+      var db = start()
+        , BlogPostB = db.model('BlogPostB', collection + random());
+
+      BlogPostB.create(
+          { title: 'A', author: null }
+        , { title: 'B' }, function (err, createdA, createdB) {
+        assert.ifError(err);
+        BlogPostB.find({author: null}, function (err, found) {
+          db.close();
+          assert.ifError(err);
+          assert.equal(2, found.length);
+          done();
+        });
+      });
+    });
+
+    it('a document whose arrays contain at least $all string values', function(done){
+      var db = start()
+        , BlogPostB = db.model('BlogPostB', collection);
+
+      var post = new BlogPostB({ title: "Aristocats" });
+
+      post.tags.push('onex');
+      post.tags.push('twox');
+      post.tags.push('threex');
+
+      post.save(function (err) {
+        assert.ifError(err);
+
+        BlogPostB.findById(post._id, function (err, post) {
+          assert.ifError(err);
+
+          BlogPostB.find({ title: { '$all': ['Aristocats']}}, function (err, docs) {
+            assert.ifError(err);
+            assert.equal(1, docs.length);
+
+            BlogPostB.find({ title: { '$all': [/^Aristocats/]}}, function (err, docs) {
+              assert.ifError(err);
+              assert.equal(1, docs.length);
+
+              BlogPostB.find({tags: { '$all': ['onex','twox','threex']}}, function (err, docs) {
+                assert.ifError(err);
+                assert.equal(1, docs.length);
+
+                BlogPostB.find({tags: { '$all': [/^onex/i]}}, function (err, docs) {
+                  assert.ifError(err);
+                  assert.equal(1, docs.length);
+
+                  BlogPostB.findOne({tags: { '$all': /^two/ }}, function (err, doc) {
+                    db.close();
+                    assert.ifError(err);
+                    assert.equal(post.id, doc.id);
+                    done();
+                  });
+                });
+              });
+            });
+          });
+        });
+
+      });
+    });
+
+    it('using #nor with nested #elemMatch', function(done){
+      var db = start()
+        , P = db.model('BlogPostB', collection + '_norWithNestedElemMatch');
+
+      var p0 = { title: "nested $nor elemMatch1", comments: [] };
+
+      var p1 = { title: "nested $nor elemMatch0", comments: [] };
+      p1.comments.push({ title: 'comment X' }, { title: 'comment Y' }, { title: 'comment W' })
+
+      P.create(p0, p1, function (err, post0, post1) {
+        assert.ifError(err);
+
+        var id = post1.comments[1]._id;
+
+        var query0 = { comments: { $elemMatch: { title: 'comment Z' }}};
+        var query1 = { comments: { $elemMatch: { _id: id.toString(), title: 'comment Y' }}};
+
+        P.find({ $nor: [query0, query1] }, function (err, posts) {
+          db.close();
+          assert.ifError(err);
+          assert.equal(1, posts.length);
+          assert.equal(posts[0].id, post0.id);
+          done();
+        });
+      });
+    });
+
+    it('strings via regexp', function(done){
+      var db = start()
+        , BlogPostB = db.model('BlogPostB', collection);
+
+      BlogPostB.create({title: 'Next to Normal'}, function (err, created) {
+        assert.ifError(err);
+        BlogPostB.findOne({title: /^Next/}, function (err, found) {
+          assert.ifError(err);
+          assert.equal(found._id.toString(), created._id);
+
+          var reg = '^Next to Normal$';
+
+          BlogPostB.find({ title: { $regex: reg }}, function (err, found) {
+            assert.ifError(err);
+            assert.equal(1, found.length);
+            assert.equal(found[0]._id.toString(), created._id);
+
+            BlogPostB.findOne({ title: { $regex: reg }}, function (err, found) {
+              assert.ifError(err);
+              assert.equal(found._id.toString(), created._id);
+
+              BlogPostB.where('title').regex(reg).findOne(function (err, found) {
+                assert.ifError(err);
+                assert.equal(found._id.toString(), created._id);
+
+                BlogPostB.where('title').regex(/^Next/).findOne(function (err, found) {
+                  db.close();
+                  assert.ifError(err);
+                  assert.equal(found._id.toString(), created._id);
+                  done();
                 });
               });
             });
           });
         });
       });
-
-    });
-  },
-
-  'find using #all with nested #elemMatch': function () {
-    var db = start()
-      , P = db.model('BlogPostB', collection + '_nestedElemMatch');
-
-    var post = new P({ title: "nested elemMatch" });
-    post.comments.push({ title: 'comment A' }, { title: 'comment B' }, { title: 'comment C' })
-
-    var id0 = post.comments[0]._id;
-    var id1 = post.comments[1]._id;
-    var id2 = post.comments[2]._id;
-
-    post.save(function (err) {
-      should.strictEqual(null, err);
-
-      var query0 = { $elemMatch: { _id: id1, title: 'comment B' }};
-      var query1 = { $elemMatch: { _id: id2.toString(), title: 'comment C' }};
-
-      P.findOne({ comments: { $all: [query0, query1] }}, function (err, p) {
-        db.close();
-        should.strictEqual(null, err);
-        p.id.should.equal(post.id);
-      });
-    });
-  },
-
-  'find using #or with nested #elemMatch': function () {
-    var db = start()
-      , P = db.model('BlogPostB', collection);
-
-    var post = new P({ title: "nested elemMatch" });
-    post.comments.push({ title: 'comment D' }, { title: 'comment E' }, { title: 'comment F' })
-
-    var id0 = post.comments[0]._id;
-    var id1 = post.comments[1]._id;
-    var id2 = post.comments[2]._id;
-
-    post.save(function (err) {
-      should.strictEqual(null, err);
-
-      var query0 = { comments: { $elemMatch: { title: 'comment Z' }}};
-      var query1 = { comments: { $elemMatch: { _id: id1.toString(), title: 'comment E' }}};
-
-      P.findOne({ $or: [query0, query1] }, function (err, p) {
-        db.close();
-        should.strictEqual(null, err);
-        p.id.should.equal(post.id);
-      });
-    });
-  },
-
-  'find using #nor with nested #elemMatch': function () {
-    var db = start()
-      , P = db.model('BlogPostB', collection + '_norWithNestedElemMatch');
-
-    var p0 = { title: "nested $nor elemMatch1", comments: [] };
-
-    var p1 = { title: "nested $nor elemMatch0", comments: [] };
-    p1.comments.push({ title: 'comment X' }, { title: 'comment Y' }, { title: 'comment W' })
-
-    P.create(p0, p1, function (err, post0, post1) {
-      should.strictEqual(null, err);
-
-      var id = post1.comments[1]._id;
-
-      var query0 = { comments: { $elemMatch: { title: 'comment Z' }}};
-      var query1 = { comments: { $elemMatch: { _id: id.toString(), title: 'comment Y' }}};
-
-      P.find({ $nor: [query0, query1] }, function (err, posts) {
-        db.close();
-        should.strictEqual(null, err);
-        posts.length.should.equal(1);
-        posts[0].id.should.equal(post0.id);
-      });
     });
 
-  },
+    it('a document whose arrays contain at least $all values', function(done){
+      var db = start()
+        , BlogPostB = db.model('BlogPostB', collection);
+      var a1 = {numbers: [-1,-2,-3,-4], meta: { visitors: 4 }};
+      var a2 = {numbers: [0,-1,-2,-3,-4]};
+      BlogPostB.create(a1, a2, function (err, whereoutZero, whereZero) {
+        assert.ifError(err);
 
-  'test finding documents where an array of a certain $size': function () {
-    var db = start()
-      , BlogPostB = db.model('BlogPostB', collection);
-
-    BlogPostB.create({numbers: [1,2,3,4,5,6,7,8,9,10]}, function (err, whereoutZero) {
-      should.strictEqual(err, null);
-      BlogPostB.create({numbers: [11,12,13,14,15,16,17,18,19,20]}, function (err, whereZero) {
-        should.strictEqual(err, null);
-        BlogPostB.create({numbers: [1,2,3,4,5,6,7,8,9,10,11]}, function (err, found) {
-          BlogPostB.find({numbers: {$size: 10}}, function (err, found) {
-            should.strictEqual(err, null);
-            found.should.have.length(2);
-            BlogPostB.find({numbers: {$size: 11}}, function (err, found) {
-              should.strictEqual(err, null);
-              found.should.have.length(1);
+        BlogPostB.find({numbers: {$all: [-1, -2, -3, -4]}}, function (err, found) {
+          assert.ifError(err);
+          assert.equal(2, found.length);
+          BlogPostB.find({'meta.visitors': {$all: [4] }}, function (err, found) {
+            assert.ifError(err);
+            assert.equal(1, found.length);
+            assert.equal(found[0]._id.toString(), whereoutZero._id);
+            BlogPostB.find({numbers: {$all: [0, -1]}}, function (err, found) {
               db.close();
+              assert.ifError(err);
+              assert.equal(1, found.length);
+              assert.equal(found[0]._id.toString(), whereZero._id);
+              done();
             });
           });
         });
       });
     });
-  },
 
-  'test finding documents where an array where the $slice operator': function () {
-    var db = start()
-      , BlogPostB = db.model('BlogPostB', collection);
+    it('where $size', function(done){
+      var db = start()
+        , BlogPostB = db.model('BlogPostB', collection);
 
-    BlogPostB.create({numbers: [500,600,700,800]}, function (err, created) {
-      should.strictEqual(err, null);
-      BlogPostB.findById(created._id, {numbers: {$slice: 2}}, function (err, found) {
-        should.strictEqual(err, null);
-        found.id;
-        found._id.should.eql(created._id);
-        found.numbers.should.have.length(2);
-        found.numbers[0].should.equal(500);
-        found.numbers[1].should.equal(600);
-        BlogPostB.findById(created._id, {numbers: {$slice: -2}}, function (err, found) {
-          should.strictEqual(err, null);
-          found.id;
-          found._id.should.eql(created._id);
-          found.numbers.should.have.length(2);
-          found.numbers[0].should.equal(700);
-          found.numbers[1].should.equal(800);
-          BlogPostB.findById(created._id, {numbers: {$slice: [1, 2]}}, function (err, found) {
-            should.strictEqual(err, null);
-            found.id;
-            found._id.should.eql(created._id);
-            found.numbers.should.have.length(2);
-            found.numbers[0].should.equal(600);
-            found.numbers[1].should.equal(700);
-            db.close();
+      BlogPostB.create({numbers: [1,2,3,4,5,6,7,8,9,10]}, function (err, whereoutZero) {
+        assert.ifError(err);
+        BlogPostB.create({numbers: [11,12,13,14,15,16,17,18,19,20]}, function (err, whereZero) {
+          assert.ifError(err);
+          BlogPostB.create({numbers: [1,2,3,4,5,6,7,8,9,10,11]}, function (err, found) {
+            assert.ifError(err);
+            BlogPostB.find({numbers: {$size: 10}}, function (err, found) {
+              assert.ifError(err);
+              assert.equal(2, found.length);
+              BlogPostB.find({numbers: {$size: 11}}, function (err, found) {
+                assert.ifError(err);
+                assert.equal(1, found.length);
+                db.close();
+                done();
+              });
+            });
           });
         });
       });
     });
-  },
 
-  'test finding documents with a specifc Buffer in their array': function () {
-    var db = start()
-      , BlogPostB = db.model('BlogPostB', collection);
+    it('$gt, $lt, $lte, $gte work on strings', function(done){
+      var db = start()
+      var D = db.model('D', new Schema({dt: String}), collection);
 
-    BlogPostB.create({sigs: [new Buffer([1, 2, 3]),
-                             new Buffer([4, 5, 6]),
-                             new Buffer([7, 8, 9])]}, function (err, created) {
-      should.strictEqual(err, null);
-      BlogPostB.findOne({sigs: new Buffer([1, 2, 3])}, function (err, found) {
-        should.strictEqual(err, null);
-        found.id;
-        found._id.should.eql(created._id);
-        var query = { sigs: { "$in" : [new Buffer([3, 3, 3]), new Buffer([4, 5, 6])] } };
-        BlogPostB.findOne(query, function (err, found) {
-          should.strictEqual(err, null);
-          db.close();
-        });
-      });
-    });
-  },
+      D.create({ dt: '2011-03-30' }, cb);
+      D.create({ dt: '2011-03-31' }, cb);
+      D.create({ dt: '2011-04-01' }, cb);
+      D.create({ dt: '2011-04-02' }, cb);
 
-  'test limits': function () {
-    var db = start()
-      , BlogPostB = db.model('BlogPostB', collection);
+      var pending = 4;
+      function cb (err) {
+        if (err) db.close();
+        assert.ifError(err);
 
-    BlogPostB.create({title: 'first limit'}, function (err, first) {
-      should.strictEqual(err, null);
-      BlogPostB.create({title: 'second limit'}, function (err, second) {
-        should.strictEqual(err, null);
-        BlogPostB.create({title: 'third limit'}, function (err, third) {
-          should.strictEqual(err, null);
-          BlogPostB.find({title: /limit$/}).limit(2).find( function (err, found) {
-            should.strictEqual(err, null);
-            found.should.have.length(2);
-            found[0]._id.should.eql(first._id);
-            found[1]._id.should.eql(second._id);
+        if (--pending) return;
+
+        pending = 2;
+
+        D.find({ 'dt': { $gte: '2011-03-30', $lte: '2011-04-01' }}).sort('dt', 1).exec(function (err, docs) {
+          if (!--pending) {
             db.close();
+            done();
+          }
+          assert.ifError(err);
+          assert.equal(3, docs.length);
+          assert.equal(docs[0].dt, '2011-03-30');
+          assert.equal(docs[1].dt, '2011-03-31');
+          assert.equal(docs[2].dt, '2011-04-01');
+          assert.equal(false, docs.some(function (d) { return '2011-04-02' === d.dt }));
+        });
+
+        D.find({ 'dt': { $gt: '2011-03-30', $lt: '2011-04-02' }}).sort('dt', 1).exec(function (err, docs) {
+          if (!--pending) {
+            db.close();
+            done();
+          }
+          assert.ifError(err);
+          assert.equal(2, docs.length);
+          assert.equal(docs[0].dt, '2011-03-31');
+          assert.equal(docs[1].dt, '2011-04-01');
+          assert.equal(false, docs.some(function (d) { return '2011-03-30' === d.dt }));
+          assert.equal(false, docs.some(function (d) { return '2011-04-02' === d.dt }));
+        });
+      }
+
+    })
+  });
+
+  describe('limit', function(){
+    it('works', function(done){
+      var db = start()
+        , BlogPostB = db.model('BlogPostB', collection);
+
+      BlogPostB.create({title: 'first limit'}, function (err, first) {
+        assert.ifError(err);
+        BlogPostB.create({title: 'second limit'}, function (err, second) {
+          assert.ifError(err);
+          BlogPostB.create({title: 'third limit'}, function (err, third) {
+            assert.ifError(err);
+            BlogPostB.find({title: /limit$/}).limit(2).find( function (err, found) {
+              db.close();
+              assert.ifError(err);
+              assert.equal(2, found.length);
+              assert.equal(found[0].id, first.id);
+              assert.equal(found[1].id, second.id);
+              done()
+            });
           });
         });
       });
-    });
-  },
+    })
+  })
 
-  'test skips': function () {
-    var db = start()
-      , BlogPostB = db.model('BlogPostB', collection);
+  describe('skip', function(){
+    it('works', function(done){
+      var db = start()
+        , BlogPostB = db.model('BlogPostB', collection);
 
-    BlogPostB.create({title: 'first skip'}, function (err, first) {
-      should.strictEqual(err, null);
-      BlogPostB.create({title: 'second skip'}, function (err, second) {
-        should.strictEqual(err, null);
-        BlogPostB.create({title: 'third skip'}, function (err, third) {
-          should.strictEqual(err, null);
-          BlogPostB.find({title: /skip$/}).skip(1).limit(2).find( function (err, found) {
-            should.strictEqual(err, null);
-            found.should.have.length(2);
-            found[0]._id.should.eql(second._id);
-            found[1]._id.should.eql(third._id);
-            db.close();
+      BlogPostB.create({title: 'first skip'}, function (err, first) {
+        assert.ifError(err);
+        BlogPostB.create({title: 'second skip'}, function (err, second) {
+          assert.ifError(err);
+          BlogPostB.create({title: 'third skip'}, function (err, third) {
+            assert.ifError(err);
+            BlogPostB.find({title: /skip$/}).skip(1).limit(2).find( function (err, found) {
+              assert.ifError(err);
+              assert.equal(2,found.length);
+              assert.equal(found[0].id,second._id);
+              assert.equal(found[1].id,third._id);
+              db.close();
+              done();
+            });
           });
         });
       });
-    });
-  },
+    })
+  });
 
-  'test sorts': function () {
-    var db = start()
-      , BlogPostB = db.model('BlogPostB', collection);
+  describe('sort', function(){
+    it('works', function(done){
+      var db = start()
+        , BlogPostB = db.model('BlogPostB', collection);
 
-    BlogPostB.create({meta: {visitors: 100}}, function (err, least) {
-      should.strictEqual(err, null);
-      BlogPostB.create({meta: {visitors: 300}}, function (err, largest) {
-        should.strictEqual(err, null);
-        BlogPostB.create({meta: {visitors: 200}}, function (err, middle) {
-          should.strictEqual(err, null);
-          BlogPostB
+      BlogPostB.create({meta: {visitors: 100}}, function (err, least) {
+        assert.ifError(err);
+        BlogPostB.create({meta: {visitors: 300}}, function (err, largest) {
+          assert.ifError(err);
+          BlogPostB.create({meta: {visitors: 200}}, function (err, middle) {
+            assert.ifError(err);
+            BlogPostB
             .where('meta.visitors').gt(99).lt(301)
             .sort('meta.visitors', -1)
             .find( function (err, found) {
-              should.strictEqual(err, null);
-              found.should.have.length(3);
-              found[0]._id.should.eql(largest._id);
-              found[1]._id.should.eql(middle._id);
-              found[2]._id.should.eql(least._id);
+              assert.ifError(err);
+              assert.equal(3, found.length);
+              assert.equal(found[0].id, largest._id);
+              assert.equal(found[1].id, middle._id);
+              assert.equal(found[2].id, least._id);
               db.close();
+              done();
             });
+          });
         });
       });
-    });
-  },
+    })
+  });
 
-  'test backwards compatibility with previously existing null values in db': function () {
-    var db = start()
-      , BlogPostB = db.model('BlogPostB', collection)
-      , post = new BlogPostB();
+  describe('nested mixed "x.y.z"', function(){
+    it('works', function(done){
+      var db = start()
+        , BlogPostB = db.model('BlogPostB', collection);
 
-    post.collection.insert({ meta: { visitors: 9898, a: null } }, {}, function (err, b) {
-      should.strictEqual(err, null);
-
-      BlogPostB.findOne({_id: b[0]._id}, function (err, found) {
-        should.strictEqual(err, null);
-        found.get('meta.visitors').valueOf().should.eql(9898);
+      BlogPostB.find({ 'mixed.nested.stuff': 'skynet' }, function (err, docs) {
         db.close();
-      })
-    })
-  },
-
-  'test backwards compatibility with unused values in db': function () {
-    var db = start()
-      , BlogPostB = db.model('BlogPostB', collection)
-      , post = new BlogPostB();
-
-    post.collection.insert({ meta: { visitors: 9898, color: 'blue'}}, {}, function (err, b) {
-      should.strictEqual(err, null);
-
-      BlogPostB.findOne({_id: b[0]._id}, function (err, found) {
-        should.strictEqual(err, null);
-        found.get('meta.visitors').valueOf().should.eql(9898);
-        found.save(function (err) {
-          should.strictEqual(err, null);
-          db.close();
-        })
-      })
-    })
-  },
-
-  'test streaming cursors with #each': function () {
-    var db = start()
-      , BlogPostB = db.model('BlogPostB', collection);
-
-    BlogPostB.create({title: "The Wrestler", tags: ["movie"]}, function (err, wrestler) {
-      should.strictEqual(err, null);
-      BlogPostB.create({title: "Black Swan", tags: ["movie"]}, function (err, blackswan) {
-        should.strictEqual(err, null);
-        BlogPostB.create({title: "Pi", tags: ["movie"]}, function (err, pi) {
-          should.strictEqual(err, null);
-          var found = {};
-          BlogPostB
-            .find({tags: "movie"})
-            .sort('title', -1)
-            .each(function (err, post) {
-              should.strictEqual(err, null);
-              if (post) found[post.title] = 1;
-              else {
-                found.should.have.property("The Wrestler", 1);
-                found.should.have.property("Black Swan", 1);
-                found.should.have.property("Pi", 1);
-                db.close();
-              }
-            });
-        });
+        assert.ifError(err);
+        done();
       });
     });
-  },
+  });
 
-  'test streaming cursors with #each and manual iteration': function () {
-    var db = start()
-      , BlogPostB = db.model('BlogPostB', collection);
-
-    BlogPostB.create({title: "Bleu", tags: ["Krzysztof Kieślowski"]}, function (err, wrestler) {
-      should.strictEqual(err, null);
-      BlogPostB.create({title: "Blanc", tags: ["Krzysztof Kieślowski"]}, function (err, blackswan) {
-        should.strictEqual(err, null);
-        BlogPostB.create({title: "Rouge", tags: ["Krzysztof Kieślowski"]}, function (err, pi) {
-          should.strictEqual(err, null);
-          var found = {};
-          BlogPostB
-            .find({tags: "Krzysztof Kieślowski"})
-            .each(function (err, post, next) {
-              should.strictEqual(err, null);
-              if (post) {
-                found[post.title] = 1;
-                process.nextTick(next);
-              } else {
-                found.should.have.property("Bleu", 1);
-                found.should.have.property("Blanc", 1);
-                found.should.have.property("Rouge", 1);
-                db.close();
-              }
-            });
-        });
-      });
-    });
-  },
-
-  '$gt, $lt, $lte, $gte work on strings': function () {
-    var db = start()
-    var D = db.model('D', new Schema({dt: String}), collection);
-
-    D.create({ dt: '2011-03-30' }, done);
-    D.create({ dt: '2011-03-31' }, done);
-    D.create({ dt: '2011-04-01' }, done);
-    D.create({ dt: '2011-04-02' }, done);
-
-    var pending = 3;
-    function done (err) {
-      if (err) db.close();
-      should.strictEqual(err, null);
-
-      if (--pending) return;
-
-      pending = 2;
-
-      D.find({ 'dt': { $gte: '2011-03-30', $lte: '2011-04-01' }}).sort('dt', 1).run(function (err, docs) {
-        if (--pending) db.close();
-        should.strictEqual(err, null);
-        docs.length.should.eql(3);
-        docs[0].dt.should.eql('2011-03-30');
-        docs[1].dt.should.eql('2011-03-31');
-        docs[2].dt.should.eql('2011-04-01');
-        docs.some(function (d) { return '2011-04-02' === d.dt }).should.be.false;
-      });
-
-      D.find({ 'dt': { $gt: '2011-03-30', $lt: '2011-04-02' }}).sort('dt', 1).run(function (err, docs) {
-        if (--pending) db.close();
-        should.strictEqual(err, null);
-        docs.length.should.eql(2);
-        docs[0].dt.should.eql('2011-03-31');
-        docs[1].dt.should.eql('2011-04-01');
-        docs.some(function (d) { return '2011-03-30' === d.dt }).should.be.false;
-        docs.some(function (d) { return '2011-04-02' === d.dt }).should.be.false;
-      });
-    }
-  },
-
-  'nested mixed queries (x.y.z)': function () {
-    var db = start()
-      , BlogPostB = db.model('BlogPostB', collection);
-
-    BlogPostB.find({ 'mixed.nested.stuff': 'skynet' }, function (err, docs) {
-      db.close();
-      should.strictEqual(err, null);
-    });
-  },
-
-  // GH-336
-  'finding by Date field works': function () {
+  it('by Date (gh-336)', function(done){
+    // GH-336
     var db = start()
       , Test = db.model('TestDateQuery', new Schema({ date: Date }), 'datetest_' + random())
       , now = new Date;
 
     Test.create({ date: now }, { date: new Date(now-10000) }, function (err, a, b) {
-      should.strictEqual(err, null);
+      assert.ifError(err);
       Test.find({ date: now }, function (err, docs) {
         db.close();
-        should.strictEqual(err, null);
-        docs.length.should.equal(1);
+        assert.ifError(err);
+        assert.equal(1, docs.length);
+        done();
       });
     });
-  },
+  })
 
-  // GH-309
-  'using $near with Arrays works (geo-spatial)': function () {
+  it('mixed types with $elemMatch (gh-591)', function(done){
     var db = start()
-      , Test = db.model('Geo1', geoSchema, 'geospatial'+random());
+      , S = new Schema({ a: [{}], b: Number })
+      , M = db.model('QueryingMixedArrays', S, random())
 
-    Test.create({ loc: [ 10, 20 ]}, { loc: [ 40, 90 ]}, function (err) {
-      should.strictEqual(err, null);
-      setTimeout(function () {
-        Test.find({ loc: { $near: [30, 40] }}, function (err, docs) {
+    var m = new M;
+    m.a = [1,2,{ name: 'Frodo' },'IDK', {name: 100}];
+    m.b = 10;
+
+    m.save(function (err) {
+      assert.ifError(err);
+
+      M.find({ a: { name: 'Frodo' }, b: '10' }, function (err, docs) {
+        assert.ifError(err);
+        assert.equal(5, docs[0].a.length);
+        assert.equal(10, docs[0].b.valueOf());
+
+        var query = {
+            a: {
+                $elemMatch: { name: 100 }
+            }
+        }
+
+        M.find(query, function (err, docs) {
           db.close();
-          should.strictEqual(err, null);
-          docs.length.should.equal(2);
+          assert.ifError(err);
+          assert.equal(5, docs[0].a.length);
+          done();
         });
-      }, 700);
+      });
     });
-  },
+  });
 
-  // GH-586
-  'using $within with Arrays works (geo-spatial)': function () {
-    var db = start()
-      , Test = db.model('Geo2', geoSchema, collection + 'geospatial');
+  describe('$all', function(){
+    it('with ObjectIds (gh-690)', function (done) {
+      var db = start()
 
-    Test.create({ loc: [ 35, 50 ]}, { loc: [ -40, -90 ]}, function (err) {
-      should.strictEqual(err, null);
-      setTimeout(function () {
-        Test.find({ loc: { '$within': { '$box': [[30,40], [40,60]] }}}, function (err, docs) {
-          db.close();
-          should.strictEqual(err, null);
-          docs.length.should.equal(1);
-        });
-      }, 700);
-    });
-  },
+      var SSchema = new Schema({ name: String });
+      var PSchema = new Schema({ sub: [SSchema] });
 
-  // GH-610
-  'using nearSphere with Arrays works (geo-spatial)': function () {
-    var db = start()
-      , Test = db.model('Geo3', geoSchema, "y"+random());
+      var P = db.model('usingAllWithObjectIds', PSchema);
+      var sub = [{ name: 'one' }, { name: 'two' }, { name: 'three' }];
 
-    Test.create({ loc: [ 10, 20 ]}, { loc: [ 40, 90 ]}, function (err) {
-      should.strictEqual(err, null);
-      setTimeout(function () {
-        Test.find({ loc: { $nearSphere: [30, 40] }}, function (err, docs) {
-          db.close();
-          should.strictEqual(err, null);
-          docs.length.should.equal(2);
-        });
-      }, 700);
-    });
-  },
+      P.create({ sub: sub }, function (err, p) {
+        assert.ifError(err);
 
-  'using $maxDistance with Array works (geo-spatial)': function () {
-    var db = start()
-      , Test = db.model('Geo4', geoSchema, "x"+random());
+        var o0 = p.sub[0]._id;
+        var o1 = p.sub[1]._id;
+        var o2 = p.sub[2]._id;
 
-    Test.create({ loc: [ 20, 80 ]}, { loc: [ 25, 30 ]}, function (err, docs) {
-      should.strictEqual(!!err, false);
-      setTimeout(function () {
-        Test.find({ loc: { $near: [25, 31], $maxDistance: 1 }}, function (err, docs) {
-          should.strictEqual(err, null);
-          docs.length.should.equal(1);
-          Test.find({ loc: { $near: [25, 32], $maxDistance: 1 }}, function (err, docs) {
-            db.close();
-            should.strictEqual(err, null);
-            docs.length.should.equal(0);
+        P.findOne({ 'sub._id': { $all: [o1, o2] }}, function (err, doc) {
+          assert.ifError(err);
+          assert.equal(doc.id, p.id);
+
+          P.findOne({ 'sub._id': { $all: [o0, new DocumentObjectId] }}, function (err, doc) {
+            assert.ifError(err);
+            assert.equal(false, !!doc);
+
+            P.findOne({ 'sub._id': { $all: [o2] }}, function (err, doc) {
+              db.close();
+              assert.ifError(err);
+              assert.equal(doc.id, p.id);
+              done();
+            });
           });
         });
-      }, 500);
-    });
-  },
-
-  '$type tests': function () {
-    var db = start()
-      , B = db.model('BlogPostB', collection);
-
-    B.find({ title: { $type: "asd" }}, function (err, posts) {
-      err.message.should.eql("$type parameter must be Number");
-
-      B.find({ title: { $type: 2 }}, function (err, posts) {
-        db.close();
-        should.strictEqual(null, err);
-        should.strictEqual(Array.isArray(posts), true);
       });
     });
-  },
 
-  'buffers find using available types': function () {
+    it('with Dates', function(done){
+      var db = start()
+
+      var SSchema = new Schema({ d: Date });
+      var PSchema = new Schema({ sub: [SSchema] });
+
+      var P = db.model('usingAllWithDates', PSchema);
+      var sub = [
+          { d: new Date }
+        , { d: new Date(Date.now()-10000) }
+        , { d: new Date(Date.now()-30000) }
+      ];
+
+      P.create({ sub: sub }, function (err, p) {
+        assert.ifError(err);
+
+        var o0 = p.sub[0].d;
+        var o1 = p.sub[1].d;
+        var o2 = p.sub[2].d;
+
+        P.findOne({ 'sub.d': { $all: [o1, o2] }}, function (err, doc) {
+          assert.ifError(err);
+          assert.equal(doc.id,p.id);
+
+          P.findOne({ 'sub.d': { $all: [o0, new Date] }}, function (err, doc) {
+            assert.ifError(err);
+            assert.equal(false, !!doc);
+
+            P.findOne({ 'sub.d': { $all: [o2] }}, function (err, doc) {
+              db.close();
+              assert.ifError(err);
+              assert.equal(doc.id, p.id);
+              done();
+            });
+          });
+        });
+      });
+    });
+  });
+});
+
+describe('buffers', function(){
+  it('works with different methods and query types', function(done){
     var db = start()
       , BufSchema = new Schema({ name: String, block: Buffer })
       , Test = db.model('Buffer', BufSchema, "buffers");
@@ -1921,40 +1609,41 @@ module.exports = {
     var docC = { name: 'C', block: 'hello world' };
 
     Test.create(docA, docB, docC, function (err, a, b, c) {
-      should.strictEqual(err, null);
-      b.block.toString('utf8').should.equal('buffer shtuffs are neat');
-      a.block.toString('utf8').should.equal('über');
-      c.block.toString('utf8').should.equal('hello world');
+      assert.ifError(err);
+      assert.equal(b.block.toString('utf8'),'buffer shtuffs are neat');
+      assert.equal(a.block.toString('utf8'),'über');
+      assert.equal(c.block.toString('utf8'),'hello world');
 
       Test.findById(a._id, function (err, a) {
-        should.strictEqual(err, null);
-        a.block.toString('utf8').should.equal('über');
+        assert.ifError(err);
+        assert.equal(a.block.toString('utf8'),'über');
 
         Test.findOne({ block: 'buffer shtuffs are neat' }, function (err, rb) {
-          should.strictEqual(err, null);
-          rb.block.toString('utf8').should.equal('buffer shtuffs are neat');
+          assert.ifError(err);
+          assert.equal(rb.block.toString('utf8'),'buffer shtuffs are neat');
 
           Test.findOne({ block: /buffer/i }, function (err, rb) {
-            err.message.should.eql('Cast to buffer failed for value "/buffer/i"')
+            assert.equal(err.message, 'Cast to buffer failed for value "/buffer/i"')
             Test.findOne({ block: [195, 188, 98, 101, 114] }, function (err, rb) {
-              should.strictEqual(err, null);
-              rb.block.toString('utf8').should.equal('über');
+              assert.ifError(err);
+              assert.equal(rb.block.toString('utf8'),'über');
 
               Test.findOne({ block: 'aGVsbG8gd29ybGQ=' }, function (err, rb) {
-                should.strictEqual(err, null);
-                should.strictEqual(rb, null);
+                assert.ifError(err);
+                assert.strictEqual(rb, null);
 
                 Test.findOne({ block: new Buffer('aGVsbG8gd29ybGQ=', 'base64') }, function (err, rb) {
-                  should.strictEqual(err, null);
-                  rb.block.toString('utf8').should.equal('hello world');
+                  assert.ifError(err);
+                  assert.equal(rb.block.toString('utf8'),'hello world');
 
                   Test.findOne({ block: new MongooseBuffer('aGVsbG8gd29ybGQ=', 'base64') }, function (err, rb) {
-                    should.strictEqual(err, null);
-                    rb.block.toString('utf8').should.equal('hello world');
+                    assert.ifError(err);
+                    assert.equal(rb.block.toString('utf8'),'hello world');
 
                     Test.remove({}, function (err) {
                       db.close();
-                      should.strictEqual(err, null);
+                      assert.ifError(err);
+                      done();
                     });
                   });
                 });
@@ -1965,9 +1654,9 @@ module.exports = {
       });
 
     });
-  },
+  });
 
-  'buffer tests using conditionals': function () {
+  it('with conditionals', function(done){
     // $in $nin etc
     var db = start()
       , BufSchema = new Schema({ name: String, block: Buffer })
@@ -1978,412 +1667,197 @@ module.exports = {
     var docC = { name: 'C', block: new MongooseBuffer('aGVsbG8gd29ybGQ=', 'base64') };
 
     Test.create(docA, docB, docC, function (err, a, b, c) {
-      should.strictEqual(err, null);
-      a.block.toString('utf8').should.equal('über');
-      b.block.toString('utf8').should.equal('buffer shtuffs are neat');
-      c.block.toString('utf8').should.equal('hello world');
+      assert.ifError(err);
+      assert.equal(a.block.toString('utf8'),'über');
+      assert.equal(b.block.toString('utf8'),'buffer shtuffs are neat');
+      assert.equal(c.block.toString('utf8'),'hello world')
 
       Test.find({ block: { $in: [[195, 188, 98, 101, 114], "buffer shtuffs are neat", new Buffer('aGVsbG8gd29ybGQ=', 'base64')] }}, function (err, tests) {
-        done();
-        should.strictEqual(err, null);
-        tests.length.should.equal(3);
+        cb();
+        assert.ifError(err);
+        assert.equal(3, tests.length);
       });
 
       Test.find({ block: { $in: ['über', 'hello world'] }}, function (err, tests) {
-        done();
-        should.strictEqual(err, null);
-        tests.length.should.equal(2);
+        cb();
+        assert.ifError(err);
+        assert.equal(2, tests.length);
       });
 
       Test.find({ block: { $in: ['über'] }}, function (err, tests) {
-        done();
-        should.strictEqual(err, null);
-        tests.length.should.equal(1);
-        tests[0].block.toString('utf8').should.equal('über');
+        cb();
+        assert.ifError(err);
+        assert.equal(1, tests.length);
+        assert.equal(tests[0].block.toString('utf8'),'über');
       });
 
       Test.find({ block: { $nin: ['über'] }}, function (err, tests) {
-        done();
-        should.strictEqual(err, null);
-        tests.length.should.equal(2);
+        cb();
+        assert.ifError(err);
+        assert.equal(2, tests.length);
       });
 
       Test.find({ block: { $nin: [[195, 188, 98, 101, 114], new Buffer('aGVsbG8gd29ybGQ=', 'base64')] }}, function (err, tests) {
-        done();
-        should.strictEqual(err, null);
-        tests.length.should.equal(1);
-        tests[0].block.toString('utf8').should.equal('buffer shtuffs are neat');
+        cb();
+        assert.ifError(err);
+        assert.equal(1, tests.length);
+        assert.equal(tests[0].block.toString('utf8'),'buffer shtuffs are neat');
       });
 
       Test.find({ block: { $ne: 'über' }}, function (err, tests) {
-        done();
-        should.strictEqual(err, null);
-        tests.length.should.equal(2);
+        cb();
+        assert.ifError(err);
+        assert.equal(2, tests.length);
       });
 
       Test.find({ block: { $gt: 'über' }}, function (err, tests) {
-        done();
-        should.strictEqual(err, null);
-        tests.length.should.equal(2);
+        cb();
+        assert.ifError(err);
+        assert.equal(2, tests.length);
       });
 
       Test.find({ block: { $gte: 'über' }}, function (err, tests) {
-        done();
-        should.strictEqual(err, null);
-        tests.length.should.equal(3);
+        cb();
+        assert.ifError(err);
+        assert.equal(3, tests.length);
       });
 
       Test.find({ block: { $lt: new Buffer('buffer shtuffs are neat') }}, function (err, tests) {
-        done();
-        should.strictEqual(err, null);
-        tests.length.should.equal(2);
-        tests[0].block.toString('utf8').should.equal('über');
+        cb();
+        assert.ifError(err);
+        assert.equal(2, tests.length);
+        assert.equal(tests[0].block.toString('utf8'),'über');
       });
 
       Test.find({ block: { $lte: 'buffer shtuffs are neat' }}, function (err, tests) {
-        done();
-        should.strictEqual(err, null);
-        tests.length.should.equal(3);
+        cb();
+        assert.ifError(err);
+        assert.equal(3, tests.length);
       });
 
       var pending = 9;
-      function done () {
+      function cb () {
         if (--pending) return;
         Test.remove({}, function (err) {
           db.close();
-          should.strictEqual(err, null);
+          assert.ifError(err);
+          done();
         });
       }
     });
-  },
+  });
+})
 
-  // gh-591
-  'querying Mixed types with elemMatch': function () {
+describe('backwards compatibility', function(){
+  it('with previously existing null values in the db', function(done){
     var db = start()
-      , S = new Schema({ a: [{}], b: Number })
-      , M = db.model('QueryingMixedArrays', S, random())
+      , BlogPostB = db.model('BlogPostB', collection)
+      , post = new BlogPostB();
 
-    var m = new M;
-    m.a = [1,2,{ name: 'Frodo' },'IDK', {name: 100}];
-    m.b = 10;
+    post.collection.insert({ meta: { visitors: 9898, a: null } }, {}, function (err, b) {
+      assert.ifError(err);
 
-    m.save(function (err) {
-      should.strictEqual(null, err);
+      BlogPostB.findOne({_id: b[0]._id}, function (err, found) {
+        assert.ifError(err);
+        assert.equal(9898, found.get('meta.visitors').valueOf());
+        db.close();
+        done();
+      })
+    })
+  });
 
-      M.find({ a: { name: 'Frodo' }, b: '10' }, function (err, docs) {
-        should.strictEqual(null, err);
-        docs[0].a.length.should.equal(5);
-        docs[0].b.valueOf().should.equal(10);
+  it('with unused values in the db', function(done){
+    var db = start()
+      , BlogPostB = db.model('BlogPostB', collection)
+      , post = new BlogPostB();
 
-        var query = {
-            a: {
-                $elemMatch: { name: 100 }
-            }
-        }
+    post.collection.insert({ meta: { visitors: 9898, color: 'blue'}}, {}, function (err, b) {
+      assert.ifError(err);
 
-        M.find(query, function (err, docs) {
+      BlogPostB.findOne({_id: b[0]._id}, function (err, found) {
+        assert.ifError(err);
+        assert.equal(9898, found.get('meta.visitors').valueOf());
+        found.save(function (err) {
+          assert.ifError(err);
           db.close();
-          should.strictEqual(null, err);
-          docs[0].a.length.should.equal(5);
-        });
-      });
-    });
-  },
+          done();
+        })
+      })
+    })
+  });
+});
 
-  // gh-599
-  'regex with Array should work': function () {
+describe('geo-spatial', function(){
+  it('$near (gh-309)', function(done){
     var db = start()
-      , B = db.model('BlogPostB', random())
+      , Test = db.model('Geo1', geoSchema, 'geospatial'+random());
 
-    B.create({ tags: 'wooof baaaark meeeeow'.split(' ') }, function (err, b) {
-      should.strictEqual(null, err);
-      B.findOne({ tags: /ooof$/ }, function (err, doc) {
-        should.strictEqual(null, err);
-        should.strictEqual(true, !! doc);
-        ;(!! ~doc.tags.indexOf('meeeeow')).should.be.true;
-
-        B.findOne({ tags: {$regex: 'eow$' } }, function (err, doc) {
+    Test.create({ loc: [ 10, 20 ]}, { loc: [ 40, 90 ]}, function (err) {
+      assert.ifError(err);
+      setTimeout(function () {
+        Test.find({ loc: { $near: [30, 40] }}, function (err, docs) {
           db.close();
-          should.strictEqual(null, err);
-          should.strictEqual(true, !! doc);
-          ;(!! ~doc.tags.indexOf('meeeeow')).should.be.true;
+          assert.ifError(err);
+          assert.equal(2, docs.length);
+          done();
         });
-      });
+      }, 100);
     });
-  },
+  });
 
-  // gh-640
-  'updating a number to null': function () {
+  it('$within arrays (gh-586)', function(done){
     var db = start()
-    var B = db.model('BlogPostB')
-    var b = new B({ meta: { visitors: null }});
-    b.save(function (err) {
-      should.strictEqual(null, err);
-      B.findById(b, function (err, b) {
-        should.strictEqual(null, err);
-        should.strictEqual(b.meta.visitors, null);
+      , Test = db.model('Geo2', geoSchema, collection + 'geospatial');
 
-        B.update({ _id: b._id }, { meta: { visitors: null }}, function (err, docs) {
+    Test.create({ loc: [ 35, 50 ]}, { loc: [ -40, -90 ]}, function (err) {
+      assert.ifError(err);
+      setTimeout(function () {
+        Test.find({ loc: { '$within': { '$box': [[30,40], [40,60]] }}}, function (err, docs) {
           db.close();
-          should.strictEqual(null, err);
+          assert.ifError(err);
+          assert.equal(1, docs.length);
+          done()
         });
-      });
+      }, 100);
     });
-  },
+  });
 
-  // gh-690
-  'using $all with ObjectIds': function () {
+  it('$nearSphere with arrays (gh-610)', function(done){
     var db = start()
+      , Test = db.model('Geo3', geoSchema, "y"+random());
 
-    var SSchema = new Schema({ name: String });
-    var PSchema = new Schema({ sub: [SSchema] });
+    Test.create({ loc: [ 10, 20 ]}, { loc: [ 40, 90 ]}, function (err) {
+      assert.ifError(err);
+      setTimeout(function () {
+        Test.find({ loc: { $nearSphere: [30, 40] }}, function (err, docs) {
+          db.close();
+          assert.ifError(err);
+          assert.equal(2, docs.length);
+          done()
+        });
+      }, 100);
+    });
+  });
 
-    var P = db.model('usingAllWithObjectIds', PSchema);
-    var sub = [{ name: 'one' }, { name: 'two' }, { name: 'three' }];
+  it('$maxDistance with arrays', function(done){
+    var db = start()
+      , Test = db.model('Geo4', geoSchema, "x"+random());
 
-    P.create({ sub: sub }, function (err, p) {
-      should.strictEqual(null, err);
-
-      var o0 = p.sub[0]._id;
-      var o1 = p.sub[1]._id;
-      var o2 = p.sub[2]._id;
-
-      P.findOne({ 'sub._id': { $all: [o1, o2] }}, function (err, doc) {
-        should.strictEqual(null, err);
-        doc.id.should.equal(p.id);
-
-        P.findOne({ 'sub._id': { $all: [o0, new DocumentObjectId] }}, function (err, doc) {
-          should.strictEqual(null, err);
-          should.equal(false, !!doc);
-
-          P.findOne({ 'sub._id': { $all: [o2] }}, function (err, doc) {
+    Test.create({ loc: [ 20, 80 ]}, { loc: [ 25, 30 ]}, function (err, docs) {
+      assert.ifError(err);
+      setTimeout(function () {
+        Test.find({ loc: { $near: [25, 31], $maxDistance: 1 }}, function (err, docs) {
+          assert.ifError(err);
+          assert.equal(1, docs.length);
+          Test.find({ loc: { $near: [25, 32], $maxDistance: 1 }}, function (err, docs) {
             db.close();
-            should.strictEqual(null, err);
-            doc.id.should.equal(p.id);
+            assert.ifError(err);
+            assert.equal(0, docs.length);
+            done();
           });
         });
-      });
+      }, 100);
     });
-  },
+  })
+});
 
-  'using $all with Dates': function () {
-    var db = start()
-
-    var SSchema = new Schema({ d: Date });
-    var PSchema = new Schema({ sub: [SSchema] });
-
-    var P = db.model('usingAllWithDates', PSchema);
-    var sub = [
-        { d: new Date }
-      , { d: new Date(Date.now()-10000) }
-      , { d: new Date(Date.now()-30000) }
-    ];
-
-    P.create({ sub: sub }, function (err, p) {
-      should.strictEqual(null, err);
-
-      var o0 = p.sub[0].d;
-      var o1 = p.sub[1].d;
-      var o2 = p.sub[2].d;
-
-      P.findOne({ 'sub.d': { $all: [o1, o2] }}, function (err, doc) {
-        should.strictEqual(null, err);
-        doc.id.should.equal(p.id);
-
-        P.findOne({ 'sub.d': { $all: [o0, new Date] }}, function (err, doc) {
-          should.strictEqual(null, err);
-          should.equal(false, !!doc);
-
-          P.findOne({ 'sub.d': { $all: [o2] }}, function (err, doc) {
-            db.close();
-            should.strictEqual(null, err);
-            doc.id.should.equal(p.id);
-          });
-        });
-      });
-    });
-  },
-
-  'excluding paths by schematype': function () {
-    var db =start()
-
-    var schema = new Schema({
-        thin: Boolean
-      , name: { type: String, select: false }
-    });
-
-    var S = db.model('ExcludingBySchemaType', schema);
-    S.create({ thin: true, name: 'the excluded' },function (err, s) {
-      should.strictEqual(null, err);
-      s.name.should.equal('the excluded');
-      S.findById(s, function (err, s) {
-        db.close();
-        should.strictEqual(null, err);
-        s.isSelected('name').should.be.false;
-        should.strictEqual(undefined, s.name);
-      });
-    });
-  },
-
-  'excluding paths through schematype': function () {
-    var db =start()
-
-    var schema = new Schema({
-        thin: Boolean
-      , name: { type: String, select: false}
-    });
-
-    var S = db.model('ExcludingBySchemaType', schema);
-    S.create({ thin: true, name: 'the excluded' },function (err, s) {
-      should.strictEqual(null, err);
-      s.name.should.equal('the excluded');
-
-      var pending = 2;
-      function done (err, s) {
-        --pending || db.close();
-        if (Array.isArray(s)) s = s[0];
-        should.strictEqual(null, err);
-        s.isSelected('name').should.be.false;
-        should.strictEqual(undefined, s.name);
-      }
-
-      S.findById(s).exclude('thin').exec(done);
-      S.find({ _id: s._id }).select('thin').exec(done);
-    });
-  },
-
-  'including paths through schematype': function () {
-    var db =start()
-
-    var schema = new Schema({
-        thin: Boolean
-      , name: { type: String, select: true }
-    });
-
-    var S = db.model('IncludingBySchemaType', schema);
-    S.create({ thin: true, name: 'the included' },function (err, s) {
-      should.strictEqual(null, err);
-      s.name.should.equal('the included');
-
-      var pending = 2;
-      function done (err, s) {
-        --pending || db.close();
-        if (Array.isArray(s)) s = s[0];
-        should.strictEqual(null, err);
-        s.isSelected('name').should.be.true;
-        s.name.should.equal('the included');
-      }
-
-      S.findById(s).exclude('thin').exec(done);
-      S.find({ _id: s._id }).select('thin').exec(done);
-    });
-  },
-
-  'overriding schematype select options': function () {
-    var db =start()
-
-    var selected = new Schema({
-        thin: Boolean
-      , name: { type: String, select: true }
-    });
-    var excluded = new Schema({
-        thin: Boolean
-      , name: { type: String, select: false }
-    });
-
-    var S = db.model('OverriddingSelectedBySchemaType', selected);
-    var E = db.model('OverriddingExcludedBySchemaType', excluded);
-
-    var pending = 4;
-
-    S.create({ thin: true, name: 'the included' },function (err, s) {
-      should.strictEqual(null, err);
-      s.name.should.equal('the included');
-
-      S.find({ _id: s._id }).select('thin name').exec(function (err, s) {
-        --pending || db.close();
-        s = s[0];
-        should.strictEqual(null, err);
-        s.isSelected('name').should.be.true;
-        s.isSelected('thin').should.be.true;
-        s.name.should.equal('the included');
-        s.thin.should.be.true;
-      });
-
-      S.findById(s).exclude('name').exec(function (err, s) {
-        --pending || db.close();
-        should.strictEqual(null, err);
-        s.isSelected('name').should.be.false;
-        s.isSelected('thin').should.be.true;
-        should.equal(undefined, s.name);
-        should.equal(true, s.thin);
-      })
-    });
-
-    E.create({ thin: true, name: 'the excluded' },function (err, e) {
-      should.strictEqual(null, err);
-      e.name.should.equal('the excluded');
-
-      E.find({ _id: e._id }).select('thin name').exec(function (err, e) {
-        --pending || db.close();
-        e = e[0];
-        should.strictEqual(null, err);
-        e.isSelected('name').should.be.true;
-        e.isSelected('thin').should.be.true;
-        e.name.should.equal('the excluded');
-        e.thin.should.be.true;
-      });
-
-      E.findById(e).exclude('name').exec(function (err, e) {
-        --pending || db.close();
-        should.strictEqual(null, err);
-        e.isSelected('name').should.be.false;
-        e.isSelected('thin').should.be.true;
-        should.equal(undefined, e.name);
-        should.equal(true, e.thin);
-      })
-    });
-  },
-
-  'conflicting schematype path selection should error': function () {
-    var db =start()
-
-    var schema = new Schema({
-        thin: Boolean
-      , name: { type: String, select: true }
-      , conflict: { type: String, select: false}
-    });
-
-    var S = db.model('ConflictingBySchemaType', schema);
-    S.create({ thin: true, name: 'bing', conflict: 'crosby' },function (err, s) {
-      should.strictEqual(null, err);
-      s.name.should.equal('bing');
-      s.conflict.should.equal('crosby');
-
-      var pending = 2;
-      function done (err, s) {
-        --pending || db.close();
-        if (Array.isArray(s)) s = s[0];
-        should.equal(true, !!err);
-      }
-
-      S.findById(s).exec(done);
-      S.find({ _id: s._id }).exec(done);
-    });
-  },
-
-  'regex with options': function () {
-    var db = start()
-       , B = db.model('BlogPostB', collection)
-
-    var post = new B({ title: '$option queries' });
-    post.save(function (err) {
-      should.strictEqual(null, err);
-      B.findOne({ title: { $regex: ' QUERIES$', $options: 'i' }}, function (err, doc) {
-        db.close();
-        should.strictEqual(null, err, err && err.stack);
-        doc.id.should.eql(post.id);
-      })
-    });
-  }
-};

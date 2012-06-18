@@ -4,7 +4,7 @@
  */
 
 var start = require('./common')
-  , should = require('should')
+  , assert = require('assert')
   , mongoose = start.mongoose
   , random = require('../lib/utils').random
   , Schema = mongoose.Schema
@@ -57,9 +57,8 @@ mongoose.model('RefUser', User);
  * Tests.
  */
 
-module.exports = {
-
-  'test populating a single reference': function () {
+describe('model: ref:', function(){
+  it('populating a single ref', function(done){
     var db = start()
       , BlogPost = db.model('RefBlogPost', posts)
       , User = db.model('RefUser', users)
@@ -68,30 +67,31 @@ module.exports = {
         name  : 'Guillermo'
       , email : 'rauchg@gmail.com'
     }, function (err, creator) {
-      should.strictEqual(err, null);
+      assert.ifError(err);
 
       BlogPost.create({
           title     : 'woot'
         , _creator  : creator
       }, function (err, post) {
-        should.strictEqual(err, null);
+        assert.ifError(err);
 
         BlogPost
-          .findById(post._id)
-          .populate('_creator')
-          .run(function (err, post) {
-            db.close();
-            should.strictEqual(err, null);
+        .findById(post._id)
+        .populate('_creator')
+        .exec(function (err, post) {
+          db.close();
+          assert.ifError(err);
 
-            post._creator.should.be.an.instanceof(User);
-            post._creator.name.should.equal('Guillermo');
-            post._creator.email.should.equal('rauchg@gmail.com');
-          });
+          assert.ok(post._creator instanceof User);
+          assert.equal(post._creator.name, 'Guillermo');
+          assert.equal(post._creator.email, 'rauchg@gmail.com');
+          done();
+        });
       });
     });
-  },
+  })
 
-  'test an error in single reference population propagates': function () {
+  it('an error in single ref population propagates', function(done){
     var db = start()
       , BlogPost = db.model('RefBlogPost', posts + '1')
       , User = db.model('RefUser', users + '1');
@@ -100,13 +100,13 @@ module.exports = {
         name: 'Guillermo'
       , email: 'rauchg@gmail.com'
     }, function (err, creator) {
-      should.strictEqual(err, null);
+      assert.ifError(err);
 
       BlogPost.create({
           title    : 'woot'
         , _creator : creator
       }, function (err, post) {
-        should.strictEqual(err, null);
+        assert.ifError(err);
 
         var origFind = User.findOne;
 
@@ -121,18 +121,19 @@ module.exports = {
         };
 
         BlogPost
-          .findById(post._id)
-          .populate('_creator')
-          .run(function (err, post) {
-            db.close();
-            err.should.be.an.instanceof(Error);
-            err.message.should.equal('woot');
-          });
+        .findById(post._id)
+        .populate('_creator')
+        .exec(function (err, post) {
+          db.close();
+          assert.ok(err instanceof Error);
+          assert.equal('woot', err.message);
+          done()
+        });
       });
     });
-  },
+  })
 
-  'test populating with partial fields selection': function () {
+  it('populating with partial fields selection', function(done){
     var db = start()
       , BlogPost = db.model('RefBlogPost', posts)
       , User = db.model('RefUser', users);
@@ -141,30 +142,31 @@ module.exports = {
         name  : 'Guillermo'
       , email : 'rauchg@gmail.com'
     }, function (err, creator) {
-      should.strictEqual(err, null);
+      assert.ifError(err);
 
       BlogPost.create({
           title     : 'woot'
         , _creator  : creator
       }, function (err, post) {
-        should.strictEqual(err, null);
+        assert.ifError(err);
 
         BlogPost
-          .findById(post._id)
-          .populate('_creator', ['email'])
-          .run(function (err, post) {
-            db.close();
-            should.strictEqual(err, null);
+        .findById(post._id)
+        .populate('_creator', 'email')
+        .exec(function (err, post) {
+          db.close();
+          assert.ifError(err);
 
-            post._creator.should.be.an.instanceof(User);
-            post._creator.isInit('name').should.be.false;
-            post._creator.email.should.equal('rauchg@gmail.com');
-          });
+          assert.ok(post._creator instanceof User);
+          assert.equal(false, post._creator.isInit('name'));
+          assert.equal(post._creator.email,'rauchg@gmail.com');
+          done();
+        });
       });
     });
-  },
+  });
 
-  'populating single oid with partial field selection and filter': function () {
+  it('population of single oid with partial field selection and filter', function(done){
     var db = start()
       , BlogPost = db.model('RefBlogPost', posts)
       , User = db.model('RefUser', users);
@@ -173,37 +175,38 @@ module.exports = {
         name  : 'Banana'
       , email : 'cats@example.com'
     }, function (err, creator) {
-      should.strictEqual(err, null);
+      assert.ifError(err);
 
       BlogPost.create({
           title     : 'woot'
         , _creator  : creator
       }, function (err, post) {
-        should.strictEqual(err, null);
+        assert.ifError(err);
 
         BlogPost
         .findById(post._id)
         .populate('_creator', 'email', { name: 'Peanut' })
-        .run(function (err, post) {
-          should.strictEqual(err, null);
-          should.strictEqual(post._creator, null);
+        .exec(function (err, post) {
+          assert.ifError(err);
+          assert.strictEqual(post._creator, null);
 
           BlogPost
           .findById(post._id)
           .populate('_creator', 'email', { name: 'Banana' })
           .run(function (err, post) {
             db.close();
-            should.strictEqual(err, null);
-            post._creator.should.be.an.instanceof(User);
-            post._creator.isInit('name').should.be.false;
-            post._creator.email.should.equal('cats@example.com');
+            assert.ifError(err);
+            assert.ok(post._creator instanceof User);
+            assert.equal(false,post._creator.isInit('name'));
+            assert.equal(post._creator.email,'cats@example.com');
+            done();
           });
         });
       });
     });
-  },
+  })
 
-  'test populating and changing a reference': function () {
+  it('population and changing a reference', function(done){
     var db = start()
       , BlogPost = db.model('RefBlogPost', posts)
       , User = db.model('RefUser', users);
@@ -212,52 +215,52 @@ module.exports = {
         name  : 'Guillermo'
       , email : 'rauchg@gmail.com'
     }, function (err, creator) {
-      should.strictEqual(err, null);
+      assert.ifError(err);
 
       BlogPost.create({
           title     : 'woot'
         , _creator  : creator
       }, function (err, post) {
-        should.strictEqual(err, null);
+        assert.ifError(err);
 
         BlogPost
-          .findById(post._id)
-          .populate('_creator')
-          .run(function (err, post) {
-            should.strictEqual(err, null);
+        .findById(post._id)
+        .populate('_creator')
+        .exec(function (err, post) {
+          assert.ifError(err);
 
-            post._creator.should.be.an.instanceof(User);
-            post._creator.name.should.equal('Guillermo');
-            post._creator.email.should.equal('rauchg@gmail.com');
+          assert.ok(post._creator instanceof User);
+          assert.equal(post._creator.name,'Guillermo');
+          assert.equal(post._creator.email,'rauchg@gmail.com');
 
-            User.create({
-                name  : 'Aaron'
-              , email : 'aaron@learnboost.com'
-            }, function (err, newCreator) {
-              should.strictEqual(err, null);
+          User.create({
+              name  : 'Aaron'
+            , email : 'aaron.heckmann@10gen.com'
+          }, function (err, newCreator) {
+            assert.ifError(err);
 
-              post._creator = newCreator._id;
-              post.save(function (err) {
-                should.strictEqual(err, null);
+            post._creator = newCreator._id;
+            post.save(function (err) {
+              assert.ifError(err);
 
-                BlogPost
-                  .findById(post._id)
-                  .populate('_creator')
-                  .run(function (err, post) {
-                    db.close();
-                    should.strictEqual(err, null);
-
-                    post._creator.name.should.equal('Aaron');
-                    post._creator.email.should.equal('aaron@learnboost.com');
-                  });
+              BlogPost
+              .findById(post._id)
+              .populate('_creator')
+              .exec(function (err, post) {
+                db.close();
+                assert.ifError(err);
+                assert.equal(post._creator.name,'Aaron');
+                assert.equal(post._creator.email,'aaron.heckmann@10gen.com');
+                done();
               });
             });
           });
+        });
       });
     });
-  },
+  })
 
-  'test populating with partial fields selection and changing ref': function () {
+  it('populating with partial fields selection and changing ref', function(done){
     var db = start()
       , BlogPost = db.model('RefBlogPost', posts)
       , User = db.model('RefUser', users);
@@ -266,51 +269,52 @@ module.exports = {
         name  : 'Guillermo'
       , email : 'rauchg@gmail.com'
     }, function (err, creator) {
-      should.strictEqual(err, null);
+      assert.ifError(err);
 
       BlogPost.create({
           title     : 'woot'
         , _creator  : creator
       }, function (err, post) {
-        should.strictEqual(err, null);
+        assert.ifError(err);
 
         BlogPost
         .findById(post._id)
         .populate('_creator', {'name': 1})
-        .run(function (err, post) {
-          should.strictEqual(err, null);
+        .exec(function (err, post) {
+          assert.ifError(err);
 
-          post._creator.should.be.an.instanceof(User);
-          post._creator.name.should.equal('Guillermo');
+          assert.ok(post._creator instanceof User);
+          assert.equal(post._creator.name,'Guillermo');
 
           User.create({
               name  : 'Aaron'
             , email : 'aaron@learnboost.com'
           }, function (err, newCreator) {
-            should.strictEqual(err, null);
+            assert.ifError(err);
 
             post._creator = newCreator._id;
             post.save(function (err) {
-              should.strictEqual(err, null);
+              assert.ifError(err);
 
               BlogPost
               .findById(post._id)
               .populate('_creator', {email: 0})
               .run(function (err, post) {
                 db.close();
-                should.strictEqual(err, null);
+                assert.ifError(err);
 
-                post._creator.name.should.equal('Aaron');
-                should.not.exist(post._creator.email);
+                assert.equal(post._creator.name,'Aaron');
+                assert.ok(!post._creator.email);
+                done();
               });
             });
           });
         });
       });
     });
-  },
+  });
 
-  'test populating an array of references and fetching many': function () {
+  it('populating an array of refs and fetching many', function(done){
     var db = start()
       , BlogPost = db.model('RefBlogPost', posts)
       , User = db.model('RefUser', users);
@@ -319,51 +323,51 @@ module.exports = {
         name  : 'Fan 1'
       , email : 'fan1@learnboost.com'
     }, function (err, fan1) {
-      should.strictEqual(err, null);
+      assert.ifError(err);
 
       User.create({
           name  : 'Fan 2'
         , email : 'fan2@learnboost.com'
       }, function (err, fan2) {
-        should.strictEqual(err, null);
+        assert.ifError(err);
 
         BlogPost.create({
             title : 'Woot'
           , fans  : [fan1, fan2]
         }, function (err, post1) {
-          should.strictEqual(err, null);
+          assert.ifError(err);
 
           BlogPost.create({
               title : 'Woot'
             , fans  : [fan2, fan1]
           }, function (err, post2) {
-            should.strictEqual(err, null);
+            assert.ifError(err);
 
             BlogPost
-              .find({ _id: { $in: [post1._id, post2._id ] } })
-              .populate('fans')
-              .run(function (err, blogposts) {
-                db.close();
-                should.strictEqual(err, null);
+            .find({ _id: { $in: [post1._id, post2._id ] } })
+            .populate('fans')
+            .exec(function (err, blogposts) {
+              db.close();
+              assert.ifError(err);
 
-                blogposts[0].fans[0].name.should.equal('Fan 1');
-                blogposts[0].fans[0].email.should.equal('fan1@learnboost.com');
-                blogposts[0].fans[1].name.should.equal('Fan 2');
-                blogposts[0].fans[1].email.should.equal('fan2@learnboost.com');
+              assert.equal(blogposts[0].fans[0].name,'Fan 1');
+              assert.equal(blogposts[0].fans[0].email,'fan1@learnboost.com');
+              assert.equal(blogposts[0].fans[1].name,'Fan 2');
+              assert.equal(blogposts[0].fans[1].email,'fan2@learnboost.com');
 
-                blogposts[1].fans[0].name.should.equal('Fan 2');
-                blogposts[1].fans[0].email.should.equal('fan2@learnboost.com');
-                blogposts[1].fans[1].name.should.equal('Fan 1');
-                blogposts[1].fans[1].email.should.equal('fan1@learnboost.com');
-
-              });
+              assert.equal(blogposts[1].fans[0].name,'Fan 2');
+              assert.equal(blogposts[1].fans[0].email,'fan2@learnboost.com');
+              assert.equal(blogposts[1].fans[1].name,'Fan 1');
+              assert.equal(blogposts[1].fans[1].email,'fan1@learnboost.com');
+              done();
+            });
           });
         });
       });
     });
-  },
+  })
 
-  'test an error in array reference population propagates': function () {
+  it('an error in array reference population propagates', function(done){
     var db = start()
       , BlogPost = db.model('RefBlogPost', posts + '2')
       , User = db.model('RefUser', users + '2');
@@ -372,25 +376,25 @@ module.exports = {
         name  : 'Fan 1'
       , email : 'fan1@learnboost.com'
     }, function (err, fan1) {
-      should.strictEqual(err, null);
+      assert.ifError(err);
 
       User.create({
           name  : 'Fan 2'
         , email : 'fan2@learnboost.com'
       }, function (err, fan2) {
-        should.strictEqual(err, null);
+        assert.ifError(err);
 
         BlogPost.create({
             title : 'Woot'
           , fans  : [fan1, fan2]
         }, function (err, post1) {
-          should.strictEqual(err, null);
+          assert.ifError(err);
 
           BlogPost.create({
               title : 'Woot'
             , fans  : [fan2, fan1]
           }, function (err, post2) {
-            should.strictEqual(err, null);
+            assert.ifError(err);
 
             // mock an error
             var origFind = User.find;
@@ -408,16 +412,18 @@ module.exports = {
             .populate('fans')
             .run(function (err, blogposts) {
               db.close();
-              err.should.be.an.instanceof(Error);
-              err.message.should.equal('woot 2');
+
+              assert.ok(err instanceof Error);
+              assert.equal(err.message,'woot 2');
+              done();
             });
           });
         });
       });
     });
-  },
+  })
 
-  'test populating an array of references with fields selection': function () {
+  it('populating an array of references with fields selection', function(done){
     var db = start()
       , BlogPost = db.model('RefBlogPost', posts)
       , User = db.model('RefUser', users);
@@ -426,51 +432,53 @@ module.exports = {
         name  : 'Fan 1'
       , email : 'fan1@learnboost.com'
     }, function (err, fan1) {
-      should.strictEqual(err, null);
+      assert.ifError(err);
 
       User.create({
           name  : 'Fan 2'
         , email : 'fan2@learnboost.com'
       }, function (err, fan2) {
-        should.strictEqual(err, null);
+        assert.ifError(err);
 
         BlogPost.create({
             title : 'Woot'
           , fans  : [fan1, fan2]
         }, function (err, post1) {
-          should.strictEqual(err, null);
+          assert.ifError(err);
 
           BlogPost.create({
               title : 'Woot'
             , fans  : [fan2, fan1]
           }, function (err, post2) {
-            should.strictEqual(err, null);
+            assert.ifError(err);
 
             BlogPost
             .find({ _id: { $in: [post1._id, post2._id ] } })
             .populate('fans', 'name')
             .run(function (err, blogposts) {
               db.close();
-              should.strictEqual(err, null);
+              assert.ifError(err);
 
-              blogposts[0].fans[0].name.should.equal('Fan 1');
-              blogposts[0].fans[0].isInit('email').should.be.false;
-              blogposts[0].fans[1].name.should.equal('Fan 2');
-              blogposts[0].fans[1].isInit('email').should.be.false;
-              should.strictEqual(blogposts[0].fans[1].email, undefined);
+              assert.equal(blogposts[0].fans[0].name,'Fan 1');
+              assert.equal(blogposts[0].fans[0].isInit('email'), false);
+              assert.equal(blogposts[0].fans[1].name, 'Fan 2');
+              assert.equal(blogposts[0].fans[1].isInit('email'), false);
+              assert.strictEqual(blogposts[0].fans[1].email, undefined);
 
-              blogposts[1].fans[0].name.should.equal('Fan 2');
-              blogposts[1].fans[0].isInit('email').should.be.false;
-              blogposts[1].fans[1].name.should.equal('Fan 1');
-              blogposts[1].fans[1].isInit('email').should.be.false;
+              assert.equal(blogposts[1].fans[0].name, 'Fan 2');
+              assert.equal(blogposts[1].fans[0].isInit('email'), false);
+              assert.equal(blogposts[1].fans[1].name, 'Fan 1');
+              assert.equal(blogposts[1].fans[1].isInit('email'), false);
+
+              done();
             });
           });
         });
       });
     });
-  },
+  })
 
-  'test populating an array of references and filtering': function () {
+  it('populating an array of references and filtering', function(done){
     var db = start()
       , BlogPost = db.model('RefBlogPost', posts)
       , User = db.model('RefUser', users);
@@ -479,72 +487,74 @@ module.exports = {
         name  : 'Fan 1'
       , email : 'fan1@learnboost.com'
     }, function (err, fan1) {
-      should.strictEqual(err, null);
+      assert.ifError(err);
 
       User.create({
           name   : 'Fan 2'
         , email  : 'fan2@learnboost.com'
         , gender : 'female'
       }, function (err, fan2) {
-        should.strictEqual(err, null);
+        assert.ifError(err);
 
         User.create({
             name   : 'Fan 3'
           , email  : 'fan3@learnboost.com'
           , gender : 'female'
         }, function (err, fan3) {
-          should.strictEqual(err, null);
+          assert.ifError(err);
 
           BlogPost.create({
               title : 'Woot'
             , fans  : [fan1, fan2, fan3]
           }, function (err, post1) {
-            should.strictEqual(err, null);
+            assert.ifError(err);
 
             BlogPost.create({
                 title : 'Woot'
               , fans  : [fan3, fan2, fan1]
             }, function (err, post2) {
-              should.strictEqual(err, null);
+              assert.ifError(err);
 
               BlogPost
               .find({ _id: { $in: [post1._id, post2._id ] } })
               .populate('fans', '', { gender: 'female', _id: { $in: [fan2] }})
-              .run(function (err, blogposts) {
-                should.strictEqual(err, null);
+              .exec(function (err, blogposts) {
+                assert.ifError(err);
 
-                blogposts[0].fans.length.should.equal(1);
-                blogposts[0].fans[0].gender.should.equal('female');
-                blogposts[0].fans[0].name.should.equal('Fan 2');
-                blogposts[0].fans[0].email.should.equal('fan2@learnboost.com');
+                assert.equal(blogposts[0].fans.length, 1);
+                assert.equal(blogposts[0].fans[0].gender, 'female');
+                assert.equal(blogposts[0].fans[0].name,'Fan 2');
+                assert.equal(blogposts[0].fans[0].email,'fan2@learnboost.com');
 
-                blogposts[1].fans.length.should.equal(1);
-                blogposts[1].fans[0].gender.should.equal('female');
-                blogposts[1].fans[0].name.should.equal('Fan 2');
-                blogposts[1].fans[0].email.should.equal('fan2@learnboost.com');
+                assert.equal(blogposts[1].fans.length, 1);
+                assert.equal(blogposts[1].fans[0].gender,'female');
+                assert.equal(blogposts[1].fans[0].name,'Fan 2');
+                assert.equal(blogposts[1].fans[0].email,'fan2@learnboost.com');
 
                 BlogPost
                 .find({ _id: { $in: [post1._id, post2._id ] } })
                 .populate('fans', false, { gender: 'female' })
                 .run(function (err, blogposts) {
                   db.close();
-                  should.strictEqual(err, null);
+                  assert.ifError(err);
 
-                  should.strictEqual(blogposts[0].fans.length, 2);
-                  blogposts[0].fans[0].gender.should.equal('female');
-                  blogposts[0].fans[0].name.should.equal('Fan 2');
-                  blogposts[0].fans[0].email.should.equal('fan2@learnboost.com');
-                  blogposts[0].fans[1].gender.should.equal('female');
-                  blogposts[0].fans[1].name.should.equal('Fan 3');
-                  blogposts[0].fans[1].email.should.equal('fan3@learnboost.com');
+                  assert.strictEqual(blogposts[0].fans.length, 2);
+                  assert.equal(blogposts[0].fans[0].gender,'female');
+                  assert.equal(blogposts[0].fans[0].name,'Fan 2');
+                  assert.equal(blogposts[0].fans[0].email,'fan2@learnboost.com');
+                  assert.equal(blogposts[0].fans[1].gender,'female');
+                  assert.equal(blogposts[0].fans[1].name,'Fan 3');
+                  assert.equal(blogposts[0].fans[1].email,'fan3@learnboost.com');
 
-                  should.strictEqual(blogposts[1].fans.length, 2);
-                  blogposts[1].fans[0].gender.should.equal('female');
-                  blogposts[1].fans[0].name.should.equal('Fan 3');
-                  blogposts[1].fans[0].email.should.equal('fan3@learnboost.com');
-                  blogposts[1].fans[1].gender.should.equal('female');
-                  blogposts[1].fans[1].name.should.equal('Fan 2');
-                  blogposts[1].fans[1].email.should.equal('fan2@learnboost.com');
+                  assert.strictEqual(blogposts[1].fans.length, 2);
+                  assert.equal(blogposts[1].fans[0].gender,'female');
+                  assert.equal(blogposts[1].fans[0].name,'Fan 3');
+                  assert.equal(blogposts[1].fans[0].email,'fan3@learnboost.com');
+                  assert.equal(blogposts[1].fans[1].gender,'female');
+                  assert.equal(blogposts[1].fans[1].name,'Fan 2');
+                  assert.equal(blogposts[1].fans[1].email,'fan2@learnboost.com');
+
+                  done();
                 });
 
               });
@@ -553,9 +563,9 @@ module.exports = {
         });
       });
     });
-  },
+  });
 
-  'test populating an array of references and multi-filtering': function () {
+  it('populating an array of references and multi-filtering', function(done){
     var db = start()
       , BlogPost = db.model('RefBlogPost', posts)
       , User = db.model('RefUser', users);
@@ -564,14 +574,14 @@ module.exports = {
         name  : 'Fan 1'
       , email : 'fan1@learnboost.com'
     }, function (err, fan1) {
-      should.strictEqual(err, null);
+      assert.ifError(err);
 
       User.create({
           name   : 'Fan 2'
         , email  : 'fan2@learnboost.com'
         , gender : 'female'
       }, function (err, fan2) {
-        should.strictEqual(err, null);
+        assert.ifError(err);
 
         User.create({
             name   : 'Fan 3'
@@ -579,62 +589,64 @@ module.exports = {
           , gender : 'female'
           , age    : 25
         }, function (err, fan3) {
-          should.strictEqual(err, null);
+          assert.ifError(err);
 
           BlogPost.create({
               title : 'Woot'
             , fans  : [fan1, fan2, fan3]
           }, function (err, post1) {
-            should.strictEqual(err, null);
+            assert.ifError(err);
 
             BlogPost.create({
                 title : 'Woot'
               , fans  : [fan3, fan2, fan1]
             }, function (err, post2) {
-              should.strictEqual(err, null);
+              assert.ifError(err);
 
               BlogPost
               .find({ _id: { $in: [post1._id, post2._id ] } })
               .populate('fans', undefined, { _id: fan3 })
-              .run(function (err, blogposts) {
-                should.strictEqual(err, null);
+              .exec(function (err, blogposts) {
+                assert.ifError(err);
 
-                blogposts[0].fans.length.should.equal(1);
-                blogposts[0].fans[0].gender.should.equal('female');
-                blogposts[0].fans[0].name.should.equal('Fan 3');
-                blogposts[0].fans[0].email.should.equal('fan3@learnboost.com');
-                should.equal(blogposts[0].fans[0].age, 25);
+                assert.equal(blogposts[0].fans.length, 1);
+                assert.equal(blogposts[0].fans[0].gender,'female');
+                assert.equal(blogposts[0].fans[0].name,'Fan 3');
+                assert.equal(blogposts[0].fans[0].email,'fan3@learnboost.com');
+                assert.equal(blogposts[0].fans[0].age, 25);
 
-                blogposts[1].fans.length.should.equal(1);
-                blogposts[1].fans[0].gender.should.equal('female');
-                blogposts[1].fans[0].name.should.equal('Fan 3');
-                blogposts[1].fans[0].email.should.equal('fan3@learnboost.com');
-                should.equal(blogposts[1].fans[0].age, 25);
+                assert.equal(blogposts[1].fans.length,1);
+                assert.equal(blogposts[1].fans[0].gender,'female');
+                assert.equal(blogposts[1].fans[0].name,'Fan 3');
+                assert.equal(blogposts[1].fans[0].email,'fan3@learnboost.com');
+                assert.equal(blogposts[1].fans[0].age, 25);
 
                 BlogPost
                 .find({ _id: { $in: [post1._id, post2._id ] } })
                 .populate('fans', 0, { gender: 'female' })
                 .run(function (err, blogposts) {
                   db.close();
-                  should.strictEqual(err, null);
+                  assert.ifError(err);
 
-                  blogposts[0].fans.length.should.equal(2);
-                  blogposts[0].fans[0].gender.should.equal('female');
-                  blogposts[0].fans[0].name.should.equal('Fan 2');
-                  blogposts[0].fans[0].email.should.equal('fan2@learnboost.com');
-                  blogposts[0].fans[1].gender.should.equal('female');
-                  blogposts[0].fans[1].name.should.equal('Fan 3');
-                  blogposts[0].fans[1].email.should.equal('fan3@learnboost.com');
-                  should.equal(blogposts[0].fans[1].age, 25);
+                  assert.equal(blogposts[0].fans.length, 2);
+                  assert.equal(blogposts[0].fans[0].gender,'female');
+                  assert.equal(blogposts[0].fans[0].name,'Fan 2');
+                  assert.equal(blogposts[0].fans[0].email, 'fan2@learnboost.com');
+                  assert.equal(blogposts[0].fans[1].gender, 'female');
+                  assert.equal(blogposts[0].fans[1].name, 'Fan 3');
+                  assert.equal(blogposts[0].fans[1].email, 'fan3@learnboost.com');
+                  assert.equal(blogposts[0].fans[1].age, 25);
 
-                  blogposts[1].fans.length.should.equal(2);
-                  blogposts[1].fans[0].gender.should.equal('female');
-                  blogposts[1].fans[0].name.should.equal('Fan 3');
-                  blogposts[1].fans[0].email.should.equal('fan3@learnboost.com');
-                  should.equal(blogposts[1].fans[0].age, 25);
-                  blogposts[1].fans[1].gender.should.equal('female');
-                  blogposts[1].fans[1].name.should.equal('Fan 2');
-                  blogposts[1].fans[1].email.should.equal('fan2@learnboost.com');
+                  assert.equal(blogposts[1].fans.length, 2);
+                  assert.equal(blogposts[1].fans[0].gender, 'female');
+                  assert.equal(blogposts[1].fans[0].name, 'Fan 3');
+                  assert.equal(blogposts[1].fans[0].email, 'fan3@learnboost.com');
+                  assert.equal(blogposts[1].fans[0].age, 25);
+                  assert.equal(blogposts[1].fans[1].gender, 'female');
+                  assert.equal(blogposts[1].fans[1].name, 'Fan 2');
+                  assert.equal(blogposts[1].fans[1].email, 'fan2@learnboost.com');
+
+                  done();
                 });
               });
             });
@@ -642,9 +654,9 @@ module.exports = {
         });
       });
     });
-  },
+  });
 
-  'test populating an array of references and multi-filtering with field selection': function () {
+  it('populating an array of references and multi-filtering with field selection', function(done){
     var db = start()
       , BlogPost = db.model('RefBlogPost', posts)
       , User = db.model('RefUser', users);
@@ -653,14 +665,14 @@ module.exports = {
         name  : 'Fan 1'
       , email : 'fan1@learnboost.com'
     }, function (err, fan1) {
-      should.strictEqual(err, null);
+      assert.ifError(err);
 
       User.create({
           name   : 'Fan 2'
         , email  : 'fan2@learnboost.com'
         , gender : 'female'
       }, function (err, fan2) {
-        should.strictEqual(err, null);
+        assert.ifError(err);
 
         User.create({
             name   : 'Fan 3'
@@ -668,49 +680,51 @@ module.exports = {
           , gender : 'female'
           , age    : 25
         }, function (err, fan3) {
-          should.strictEqual(err, null);
+          assert.ifError(err);
 
           BlogPost.create({
               title : 'Woot'
             , fans  : [fan1, fan2, fan3]
           }, function (err, post1) {
-            should.strictEqual(err, null);
+            assert.ifError(err);
 
             BlogPost.create({
                 title : 'Woot'
               , fans  : [fan3, fan2, fan1]
             }, function (err, post2) {
-              should.strictEqual(err, null);
+              assert.ifError(err);
 
               BlogPost
               .find({ _id: { $in: [post1._id, post2._id ] } })
               .populate('fans', 'name email', { gender: 'female', age: 25 })
               .run(function (err, blogposts) {
                 db.close();
-                should.strictEqual(err, null);
+                assert.ifError(err);
 
-                should.strictEqual(blogposts[0].fans.length, 1);
-                blogposts[0].fans[0].name.should.equal('Fan 3');
-                blogposts[0].fans[0].email.should.equal('fan3@learnboost.com');
-                blogposts[0].fans[0].isInit('email').should.be.true;
-                blogposts[0].fans[0].isInit('gender').should.be.false;
-                blogposts[0].fans[0].isInit('age').should.be.false;
+                assert.strictEqual(blogposts[0].fans.length, 1);
+                assert.equal(blogposts[0].fans[0].name,'Fan 3');
+                assert.equal(blogposts[0].fans[0].email,'fan3@learnboost.com');
+                assert.equal(blogposts[0].fans[0].isInit('email'), true)
+                assert.equal(blogposts[0].fans[0].isInit('gender'), false);
+                assert.equal(blogposts[0].fans[0].isInit('age'), false);
 
-                should.strictEqual(blogposts[1].fans.length, 1);
-                blogposts[1].fans[0].name.should.equal('Fan 3');
-                blogposts[1].fans[0].email.should.equal('fan3@learnboost.com');
-                blogposts[1].fans[0].isInit('email').should.be.true;
-                blogposts[1].fans[0].isInit('gender').should.be.false;
-                blogposts[1].fans[0].isInit('age').should.be.false;
+                assert.strictEqual(blogposts[1].fans.length, 1);
+                assert.equal(blogposts[1].fans[0].name,'Fan 3');
+                assert.equal(blogposts[1].fans[0].email,'fan3@learnboost.com');
+                assert.equal(blogposts[1].fans[0].isInit('email'), true);
+                assert.equal(blogposts[1].fans[0].isInit('gender'), false);
+                assert.equal(blogposts[1].fans[0].isInit('age'), false)
+
+                done()
               });
             });
           });
         });
       });
     });
-  },
+  })
 
-  'test populating an array of refs, changing one, and removing one': function () {
+  it('populating an array of refs changing one and removing one', function(done){
     var db = start()
       , BlogPost = db.model('RefBlogPost', posts)
       , User = db.model('RefUser', users);
@@ -728,7 +742,7 @@ module.exports = {
         name  : 'Fan 4'
       , email : 'fan4@learnboost.com'
     }, function (err, fan1, fan2, fan3, fan4) {
-      should.strictEqual(err, null);
+      assert.ifError(err);
 
       BlogPost.create({
           title : 'Woot'
@@ -737,49 +751,50 @@ module.exports = {
           title : 'Woot'
         , fans  : [fan2, fan1]
       }, function (err, post1, post2) {
-        should.strictEqual(err, null);
+        assert.ifError(err);
 
         BlogPost
         .find({ _id: { $in: [post1._id, post2._id ] } })
-        .populate('fans', ['name'])
-        .run(function (err, blogposts) {
-          should.strictEqual(err, null);
+        .populate('fans', 'name')
+        .exec(function (err, blogposts) {
+          assert.ifError(err);
 
-          blogposts[0].fans[0].name.should.equal('Fan 1');
-          blogposts[0].fans[0].isInit('email').should.be.false;
-          blogposts[0].fans[1].name.should.equal('Fan 2');
-          blogposts[0].fans[1].isInit('email').should.be.false;
+          assert.equal(blogposts[0].fans[0].name,'Fan 1');
+          assert.equal(blogposts[0].fans[0].isInit('email'), false);
+          assert.equal(blogposts[0].fans[1].name,'Fan 2');
+          assert.equal(blogposts[0].fans[1].isInit('email'), false);
 
-          blogposts[1].fans[0].name.should.equal('Fan 2');
-          blogposts[1].fans[0].isInit('email').should.be.false;
-          blogposts[1].fans[1].name.should.equal('Fan 1');
-          blogposts[1].fans[1].isInit('email').should.be.false;
+          assert.equal(blogposts[1].fans[0].name,'Fan 2');
+          assert.equal(blogposts[1].fans[0].isInit('email'), false);
+          assert.equal(blogposts[1].fans[1].name,'Fan 1');
+          assert.equal(blogposts[1].fans[1].isInit('email'),false);
 
           blogposts[1].fans = [fan3, fan4];
 
           blogposts[1].save(function (err) {
-            should.strictEqual(err, null);
+            assert.ifError(err);
 
             BlogPost
-            .findById(blogposts[1]._id, [], { populate: ['fans'] })
-            .run(function (err, post) {
-              should.strictEqual(err, null);
+            .findById(blogposts[1]._id, '', { populate: ['fans'] })
+            .exec(function (err, post) {
+              assert.ifError(err);
 
-              post.fans[0].name.should.equal('Fan 3');
-              post.fans[1].name.should.equal('Fan 4');
+              assert.equal(post.fans[0].name,'Fan 3');
+              assert.equal(post.fans[1].name,'Fan 4');
 
               post.fans.splice(0, 1);
               post.save(function (err) {
-                should.strictEqual(err, null);
+                assert.ifError(err);
 
                 BlogPost
                 .findById(post._id)
                 .populate('fans')
                 .run(function (err, post) {
                   db.close();
-                  should.strictEqual(err, null);
-                  post.fans.length.should.equal(1);
-                  post.fans[0].name.should.equal('Fan 4');
+                  assert.ifError(err);
+                  assert.equal(post.fans.length,1);
+                  assert.equal(post.fans[0].name,'Fan 4');
+                  done();
                 });
               });
             });
@@ -787,18 +802,18 @@ module.exports = {
         });
       });
     });
-  },
+  })
 
-  'test populating subdocuments': function () {
+  it('populating sub docs', function(done){
     var db = start()
       , BlogPost = db.model('RefBlogPost', posts)
       , User = db.model('RefUser', users);
 
     User.create({ name: 'User 1' }, function (err, user1) {
-      should.strictEqual(err, null);
+      assert.ifError(err);
 
       User.create({ name: 'User 2' }, function (err, user2) {
-        should.strictEqual(err, null);
+        assert.ifError(err);
 
         BlogPost.create({
             title: 'Woot'
@@ -808,26 +823,27 @@ module.exports = {
               , { _creator: user2._id, content: 'Wha wha' }
             ]
         }, function (err, post) {
-          should.strictEqual(err, null);
+          assert.ifError(err);
 
           BlogPost
-            .findById(post._id)
-            .populate('_creator')
-            .populate('comments._creator')
-            .run(function (err, post) {
-              db.close();
-              should.strictEqual(err, null);
+          .findById(post._id)
+          .populate('_creator')
+          .populate('comments._creator')
+          .exec(function (err, post) {
+            db.close();
+            assert.ifError(err);
 
-              post._creator.name.should.equal('User 1');
-              post.comments[0]._creator.name.should.equal('User 1');
-              post.comments[1]._creator.name.should.equal('User 2');
-            });
+            assert.equal(post._creator.name,'User 1');
+            assert.equal(post.comments[0]._creator.name,'User 1');
+            assert.equal(post.comments[1]._creator.name,'User 2');
+            done();
+          });
         });
       });
     });
-  },
+  })
 
-  'test populating subdocuments partially': function () {
+  it('populating subdocuments partially', function(done){
     var db = start()
       , BlogPost = db.model('RefBlogPost', posts)
       , User = db.model('RefUser', users);
@@ -836,13 +852,13 @@ module.exports = {
         name  : 'User 1'
       , email : 'user1@learnboost.com'
     }, function (err, user1) {
-      should.strictEqual(err, null);
+      assert.ifError(err);
 
       User.create({
           name  : 'User 2'
         , email : 'user2@learnboost.com'
       }, function (err, user2) {
-        should.strictEqual(err, null);
+        assert.ifError(err);
 
         var post = BlogPost.create({
             title: 'Woot'
@@ -851,26 +867,28 @@ module.exports = {
               , { _creator: user2, content: 'Wha wha' }
             ]
         }, function (err, post) {
-          should.strictEqual(err, null);
+          assert.ifError(err);
 
           BlogPost
-            .findById(post._id)
-            .populate('comments._creator', ['email'])
-            .run(function (err, post) {
-              db.close();
-              should.strictEqual(err, null);
+          .findById(post._id)
+          .populate('comments._creator', 'email')
+          .exec(function (err, post) {
+            db.close();
+            assert.ifError(err);
 
-              post.comments[0]._creator.email.should.equal('user1@learnboost.com');
-              post.comments[0]._creator.isInit('name').should.be.false;
-              post.comments[1]._creator.email.should.equal('user2@learnboost.com');
-              post.comments[1]._creator.isInit('name').should.be.false;
-            });
+            assert.equal(post.comments[0]._creator.email,'user1@learnboost.com');
+            assert.equal(post.comments[0]._creator.isInit('name'), false);
+            assert.equal(post.comments[1]._creator.email,'user2@learnboost.com');
+            assert.equal(post.comments[1]._creator.isInit('name'), false);
+
+            done();
+          });
         });
       });
     });
-  },
+  })
 
-  'test populating subdocuments partially with conditions': function () {
+  it('populating subdocuments partially with conditions', function(done){
     var db = start()
       , BlogPost = db.model('RefBlogPost', posts)
       , User = db.model('RefUser', users);
@@ -879,13 +897,13 @@ module.exports = {
         name  : 'User 1'
       , email : 'user1@learnboost.com'
     }, function (err, user1) {
-      should.strictEqual(err, null);
+      assert.ifError(err);
 
       User.create({
           name  : 'User 2'
         , email : 'user2@learnboost.com'
       }, function (err, user2) {
-        should.strictEqual(err, null);
+        assert.ifError(err);
 
         var post = BlogPost.create({
             title: 'Woot'
@@ -894,26 +912,28 @@ module.exports = {
               , { _creator: user2, content: 'Wha wha' }
             ]
         }, function (err, post) {
-          should.strictEqual(err, null);
+          assert.ifError(err);
 
           BlogPost
-            .findById(post._id)
-            .populate('comments._creator', {'email': 1}, { name: /User/ })
-            .run(function (err, post) {
-              db.close();
-              should.strictEqual(err, null);
+          .findById(post._id)
+          .populate('comments._creator', {'email': 1}, { name: /User/ })
+          .exec(function (err, post) {
+            db.close();
+            assert.ifError(err);
 
-              post.comments[0]._creator.email.should.equal('user1@learnboost.com');
-              post.comments[0]._creator.isInit('name').should.be.false;
-              post.comments[1]._creator.email.should.equal('user2@learnboost.com');
-              post.comments[1]._creator.isInit('name').should.be.false;
-            });
+            assert.equal(post.comments[0]._creator.email,'user1@learnboost.com');
+            assert.equal(post.comments[0]._creator.isInit('name'),false);
+            assert.equal(post.comments[1]._creator.email,'user2@learnboost.com');
+            assert.equal(post.comments[1]._creator.isInit('name'), false);
+
+            done()
+          });
         });
       });
     });
-  },
+  })
 
-  'populating subdocs with invalid/missing subproperties': function () {
+  it('populating subdocs with invalid/missing subproperties', function(done){
     var db = start()
       , BlogPost = db.model('RefBlogPost', posts)
       , User = db.model('RefUser', users);
@@ -922,13 +942,13 @@ module.exports = {
         name  : 'T-100'
       , email : 'terminator100@learnboost.com'
     }, function (err, user1) {
-      should.strictEqual(err, null);
+      assert.ifError(err);
 
       User.create({
           name  : 'T-1000'
         , email : 'terminator1000@learnboost.com'
       }, function (err, user2) {
-        should.strictEqual(err, null);
+        assert.ifError(err);
 
         var post = BlogPost.create({
             title: 'Woot'
@@ -937,18 +957,18 @@ module.exports = {
               , { _creator: user2, content: 'Wha wha' }
             ]
         }, function (err, post) {
-          should.strictEqual(err, null);
+          assert.ifError(err);
 
           // invalid subprop
           BlogPost
           .findById(post._id)
           .populate('comments._idontexist', 'email')
-          .run(function (err, post) {
-            should.strictEqual(err, null);
-            should.exist(post);
-            post.comments.length.should.equal(2);
-            should.strictEqual(post.comments[0]._creator, null);
-            post.comments[1]._creator.toString().should.equal(user2.id);
+          .exec(function (err, post) {
+            assert.ifError(err);
+            assert.ok(post);
+            assert.equal(post.comments.length, 2);
+            assert.strictEqual(post.comments[0]._creator, null);
+            assert.equal(post.comments[1]._creator.toString(),user2.id);
 
             // subprop is null in a doc
             BlogPost
@@ -956,24 +976,25 @@ module.exports = {
             .populate('comments._creator', 'email')
             .run(function (err, post) {
               db.close();
-              should.strictEqual(err, null);
+              assert.ifError(err);
 
-              should.exist(post);
-              post.comments.length.should.equal(2);
-              should.strictEqual(post.comments[0]._creator, null);
-              should.strictEqual(post.comments[0].content, 'Woot woot');
-              post.comments[1]._creator.email.should.equal('terminator1000@learnboost.com');
-              post.comments[1]._creator.isInit('name').should.be.false;
-              post.comments[1].content.should.equal('Wha wha');
+              assert.ok(post);
+              assert.equal(post.comments.length,2);
+              assert.strictEqual(post.comments[0]._creator, null);
+              assert.strictEqual(post.comments[0].content, 'Woot woot');
+              assert.equal(post.comments[1]._creator.email,'terminator1000@learnboost.com');
+              assert.equal(post.comments[1]._creator.isInit('name'), false);
+              assert.equal(post.comments[1].content,'Wha wha');
+
+              done();
             });
           });
         });
       });
     });
-  },
+  })
 
-  // gh-481
-  'test populating subdocuments partially with empty array': function (beforeExit) {
+  it('populating subdocuments partially with empty array (gh-481)', function(done){
     var db = start()
       , BlogPost = db.model('RefBlogPost', posts)
       , worked = false;
@@ -982,58 +1003,55 @@ module.exports = {
         title: 'Woot'
       , comments: [] // EMPTY ARRAY
     }, function (err, post) {
-      should.strictEqual(err, null);
+      assert.ifError(err);
 
       BlogPost
       .findById(post._id)
       .populate('comments._creator', ['email'])
       .run(function (err, returned) {
         db.close();
-        worked = true;
-        should.strictEqual(err, null);
-        returned.id.should.equal(post.id);
+        assert.ifError(err);
+        assert.equal(returned.id,post.id);
+        done();
       });
     });
+  });
 
-    beforeExit(function () {
-      worked.should.be.true;
-    });
-  },
-
-  'populating subdocuments with array including nulls': function () {
+  it('populating subdocuments with array including nulls', function(done){
     var db = start()
       , BlogPost = db.model('RefBlogPost', posts)
       , User = db.model('RefUser', users)
 
     var user = new User({ name: 'hans zimmer' });
     user.save(function (err) {
-      should.strictEqual(err, null);
+      assert.ifError(err);
 
       var post = BlogPost.create({
           title: 'Woot'
         , fans: []
       }, function (err, post) {
-        should.strictEqual(err, null);
+        assert.ifError(err);
 
         // shove some uncasted vals
         BlogPost.collection.update({ _id: post._id }, { $set: { fans: [null, undefined, user.id, null] } }, function (err) {
-          should.strictEqual(err, undefined);
+          assert.ifError(err);
 
           BlogPost
           .findById(post._id)
           .populate('fans', ['name'])
           .run(function (err, returned) {
             db.close();
-            should.strictEqual(err, null);
-            returned.id.should.equal(post.id);
-            returned.fans.length.should.equal(1);
+            assert.ifError(err);
+            assert.equal(returned.id,post.id);
+            assert.equal(returned.fans.length,1);
+            done();
           });
         })
       });
     });
-  },
+  })
 
-  'populating more than one array at a time': function () {
+  it('populating more than one array at a time', function(done){
     var db = start()
       , User = db.model('RefUser', users)
       , M = db.model('PopMultiSubDocs', new Schema({
@@ -1051,7 +1069,7 @@ module.exports = {
     }, {
        name: 'Fan 3'
     }, function (err, fan1, fan2, fan3) {
-      should.strictEqual(err, null);
+      assert.ifError(err);
 
       M.create({
           users: [fan3]
@@ -1068,7 +1086,7 @@ module.exports = {
             , { _creator: fan1, content: 'world' }
           ]
       }, function (err, post1, post2) {
-        should.strictEqual(err, null);
+        assert.ifError(err);
 
         M.where('_id').in([post1, post2])
         .populate('fans', 'name', { gender: 'female' })
@@ -1076,37 +1094,39 @@ module.exports = {
         .populate('comments._creator', ['email'], { name: null })
         .run(function (err, posts) {
           db.close();
-          should.strictEqual(err, null);
+          assert.ifError(err);
 
-          should.exist(posts);
-          posts.length.should.equal(2);
+          assert.ok(posts);
+          assert.equal(posts.length,2);
           var p1 = posts[0];
           var p2 = posts[1];
-          should.strictEqual(p1.fans.length, 0);
-          should.strictEqual(p2.fans.length, 1);
-          p2.fans[0].name.should.equal('Fan 2');
-          p2.fans[0].isInit('email').should.be.false;
-          p2.fans[0].isInit('gender').should.be.false;
-          p1.comments.length.should.equal(2);
-          p2.comments.length.should.equal(2);
-          should.exist(p1.comments[0]._creator.email);
-          should.not.exist(p2.comments[0]._creator);
-          p1.comments[0]._creator.email.should.equal('fan1@learnboost.com');
-          p2.comments[1]._creator.email.should.equal('fan1@learnboost.com');
-          p1.comments[0]._creator.isInit('name').should.be.false;
-          p2.comments[1]._creator.isInit('name').should.be.false;
-          p1.comments[0].content.should.equal('bejeah!');
-          p2.comments[1].content.should.equal('world');
-          should.not.exist(p1.comments[1]._creator);
-          should.not.exist(p2.comments[0]._creator);
-          p1.comments[1].content.should.equal('chickfila');
-          p2.comments[0].content.should.equal('hello');
+          assert.strictEqual(p1.fans.length, 0);
+          assert.strictEqual(p2.fans.length, 1);
+          assert.equal(p2.fans[0].name,'Fan 2');
+          assert.equal(p2.fans[0].isInit('email'), false);
+          assert.equal(p2.fans[0].isInit('gender'), false);
+          assert.equal(p1.comments.length,2);
+          assert.equal(p2.comments.length,2);
+          assert.ok(p1.comments[0]._creator.email);
+          assert.ok(!p2.comments[0]._creator);
+          assert.equal(p1.comments[0]._creator.email,'fan1@learnboost.com');
+          assert.equal(p2.comments[1]._creator.email,'fan1@learnboost.com');
+          assert.equal(p1.comments[0]._creator.isInit('name'), false);
+          assert.equal(p2.comments[1]._creator.isInit('name'), false);
+          assert.equal(p1.comments[0].content,'bejeah!');
+          assert.equal(p2.comments[1].content,'world');
+          assert.ok(!p1.comments[1]._creator);
+          assert.ok(!p2.comments[0]._creator);
+          assert.equal(p1.comments[1].content,'chickfila');
+          assert.equal(p2.comments[0].content,'hello');
+
+          done();
         });
       });
     });
-  },
+  })
 
-  'populating multiple children of a sub-array at a time': function () {
+  it('populating multiple children of a sub-array at a time', function(done){
     var db = start()
       , User = db.model('RefUser', users)
       , BlogPost = db.model('RefBlogPost', posts)
@@ -1115,6 +1135,7 @@ module.exports = {
           , post: { type: ObjectId, ref: 'RefBlogPost' }
         })
       , I = db.model('PopMultiChildrenOfSubDocInner', Inner)
+
     var M = db.model('PopMultiChildrenOfSubDoc', new Schema({
             kids: [Inner]
         }))
@@ -1128,14 +1149,14 @@ module.exports = {
       , email  : 'fan2@learnboost.com'
       , gender : 'female'
     }, function (err, fan1, fan2) {
-      should.strictEqual(err, null);
+      assert.ifError(err);
 
       BlogPost.create({
           title     : 'woot'
       }, {
           title     : 'yay'
       }, function (err, post1, post2) {
-        should.strictEqual(err, null);
+        assert.ifError(err);
         M.create({
           kids: [
               { user: fan1, post: post1, y: 5 }
@@ -1143,89 +1164,93 @@ module.exports = {
           ]
         , x: 4
         }, function (err, m1) {
-          should.strictEqual(err, null);
+          assert.ifError(err);
 
           M.findById(m1)
           .populate('kids.user', ["name"])
           .populate('kids.post', ["title"], { title: "woot" })
           .run(function (err, o) {
             db.close();
-            should.strictEqual(err, null);
-            should.strictEqual(o.kids.length, 2);
+            assert.ifError(err);
+            assert.strictEqual(o.kids.length, 2);
             var k1 = o.kids[0];
             var k2 = o.kids[1];
-            should.strictEqual(true, !k2.post);
-            should.strictEqual(k1.user.name, "Fan 1");
-            should.strictEqual(k1.user.email, undefined);
-            should.strictEqual(k1.post.title, "woot");
-            should.strictEqual(k2.user.name, "Fan 2");
+            assert.strictEqual(true, !k2.post);
+            assert.strictEqual(k1.user.name, "Fan 1");
+            assert.strictEqual(k1.user.email, undefined);
+            assert.strictEqual(k1.post.title, "woot");
+            assert.strictEqual(k2.user.name, "Fan 2");
+
+            done();
           });
         });
       });
     });
-  },
+  })
 
-  'passing sort options to the populate method': function () {
+  it('passing sort options to the populate method', function(done){
     var db = start()
       , P = db.model('RefBlogPost', posts)
       , User = db.model('RefUser', users);
 
     User.create({ name: 'aaron', age: 10 }, { name: 'fan2', age: 8 }, { name: 'someone else', age: 3 },
     function (err, fan1, fan2, fan3) {
-      should.strictEqual(err, null);
+      assert.ifError(err);
 
       P.create({ fans: [fan2, fan3, fan1] }, function (err, post) {
-        should.strictEqual(err, null);
+        assert.ifError(err);
 
         P.findById(post)
         .populate('fans', null, null, { sort: 'name' })
-        .run(function (err, post) {
-          should.strictEqual(err, null);
+        .exec(function (err, post) {
+          assert.ifError(err);
 
-          post.fans.length.should.equal(3);
-          post.fans[0].name.should.equal('aaron');
-          post.fans[1].name.should.equal('fan2');
-          post.fans[2].name.should.equal('someone else');
+          assert.equal(post.fans.length,3);
+          assert.equal(post.fans[0].name,'aaron');
+          assert.equal(post.fans[1].name,'fan2');
+          assert.equal(post.fans[2].name,'someone else');
 
           P.findById(post)
           .populate('fans', 'name', null, { sort: [['name', -1]] })
-          .run(function (err, post) {
-            should.strictEqual(err, null);
+          .exec(function (err, post) {
+            assert.ifError(err);
 
-            post.fans.length.should.equal(3);
-            post.fans[2].name.should.equal('aaron');
-            should.strictEqual(undefined, post.fans[2].age)
-            post.fans[1].name.should.equal('fan2');
-            should.strictEqual(undefined, post.fans[1].age)
-            post.fans[0].name.should.equal('someone else');
-            should.strictEqual(undefined, post.fans[0].age)
+            assert.equal(post.fans.length,3);
+            assert.equal(post.fans[2].name,'aaron');
+            assert.strictEqual(undefined, post.fans[2].age)
+            assert.equal(post.fans[1].name,'fan2');
+            assert.strictEqual(undefined, post.fans[1].age)
+            assert.equal(post.fans[0].name,'someone else');
+            assert.strictEqual(undefined, post.fans[0].age)
 
             P.findById(post)
             .populate('fans', 'age', { age: { $gt: 3 }}, { sort: [['name', 'desc']] })
             .run(function (err, post) {
               db.close();
-              should.strictEqual(err, null);
+              assert.ifError(err);
 
-              post.fans.length.should.equal(2);
-              post.fans[1].age.valueOf().should.equal(10);
-              post.fans[0].age.valueOf().should.equal(8);
+              assert.equal(post.fans.length,2);
+              assert.equal(post.fans[1].age.valueOf(),10);
+              assert.equal(post.fans[0].age.valueOf(),8);
+
+              done();
             });
           });
         });
       });
     });
-  },
+  })
 
-  'refs should cast to ObjectId from hexstrings': function () {
+  it('refs should cast to ObjectId from hexstrings', function(){
     var BP = mongoose.model('RefBlogPost', BlogPost);
     var bp = new BP;
     bp._creator = new DocObjectId().toString();
-    bp._creator.should.be.an.instanceof(DocObjectId);
+    assert.ok(bp._creator instanceof DocObjectId);
     bp.set('_creator', new DocObjectId().toString());
-    bp._creator.should.be.an.instanceof(DocObjectId);
-  },
+    assert.ok(bp._creator instanceof DocObjectId);
+  })
 
-  'populate should work on String _ids': function () {
+  it('populate should work on String _ids', function(done){
     var db = start();
 
     var UserSchema = new Schema({
@@ -1244,24 +1269,25 @@ module.exports = {
     var alice = new User({_id: 'alice', name: "Alice"})
 
     alice.save(function (err) {
-      should.strictEqual(err, null);
+      assert.ifError(err);
 
       var note  = new Note({author: 'alice', body: "Buy Milk"});
       note.save(function (err) {
-        should.strictEqual(err, null);
+        assert.ifError(err);
 
         Note.findById(note.id).populate('author').run(function (err, note) {
           db.close();
-          should.strictEqual(err, null);
-          note.body.should.equal('Buy Milk');
-          should.exist(note.author);
-          note.author.name.should.equal('Alice');
+          assert.ifError(err);
+          assert.equal(note.body,'Buy Milk');
+          assert.ok(note.author);
+          assert.equal(note.author.name,'Alice');
+          done();
         });
       });
     })
-  },
+  });
 
-  'populate should work on Number _ids': function () {
+  it('populate should work on Number _ids', function(done){
     var db = start();
 
     var UserSchema = new Schema({
@@ -1280,25 +1306,25 @@ module.exports = {
     var alice = new User({_id: 2359, name: "Alice"})
 
     alice.save(function (err) {
-      should.strictEqual(err, null);
+      assert.ifError(err);
 
       var note = new Note({author: 2359, body: "Buy Milk"});
       note.save(function (err) {
-        should.strictEqual(err, null);
+        assert.ifError(err);
 
         Note.findById(note.id).populate('author').run(function (err, note) {
           db.close();
-          should.strictEqual(err, null);
-          note.body.should.equal('Buy Milk');
-          should.exist(note.author);
-          note.author.name.should.equal('Alice');
+          assert.ifError(err);
+          assert.equal(note.body,'Buy Milk');
+          assert.ok(note.author);
+          assert.equal(note.author.name,'Alice');
+          done();
         });
       });
     })
-  },
+  });
 
-  // gh-577
-  'required works on ref fields': function () {
+  it('required works on ref fields (gh-577)', function(done){
     var db = start();
 
     var userSchema = new Schema({
@@ -1331,7 +1357,7 @@ module.exports = {
     user.save(next);
 
     function next (err) {
-      should.strictEqual(null, err);
+      assert.strictEqual(null, err);
       if (--pending) return;
 
       var comment = new Comment({
@@ -1339,42 +1365,43 @@ module.exports = {
       });
 
       comment.save(function (err) {
-        should.equal('Validation failed', err && err.message);
-        err.errors.should.have.property('num');
-        err.errors.should.have.property('str');
-        err.errors.should.have.property('user');
-        err.errors.num.type.should.equal('required');
-        err.errors.str.type.should.equal('required');
-        err.errors.user.type.should.equal('required');
+        assert.equal('Validation failed', err && err.message);
+        assert.ok('num' in err.errors);
+        assert.ok('str' in err.errors);
+        assert.ok('user' in err.errors);
+        assert.equal(err.errors.num.type,'required');
+        assert.equal(err.errors.str.type,'required');
+        assert.equal(err.errors.user.type,'required');
 
         comment.user = user;
         comment.num = 1995;
         comment.str = 'my string';
 
         comment.save(function (err, comment) {
-          should.strictEqual(null, err);
+          assert.strictEqual(null, err);
 
           Comment
           .findById(comment.id)
           .populate('user')
           .populate('num')
           .populate('str')
-          .run(function (err, comment) {
-            should.strictEqual(err, null);
+          .exec(function (err, comment) {
+            assert.ifError(err);
 
             comment.set({text: 'test2'});
 
             comment.save(function (err, comment) {
               db.close();
-              should.strictEqual(err, null);
+              assert.ifError(err);
+              done();
             });
           });
         });
       });
     }
-  },
+  });
 
-  'populate works with schemas with both id and _id defined': function () {
+  it('populate works with schemas with both id and _id defined', function(done){
     var db =start()
       , S1 = new Schema({ id: String })
       , S2 = new Schema({ things: [{ type: ObjectId, ref: '_idAndid' }]})
@@ -1386,24 +1413,24 @@ module.exports = {
         { id: "The Tiger That Isn't" }
       , { id: "Users Guide To The Universe" }
       , function (err, a, b) {
-      should.strictEqual(null, err);
+      assert.ifError(err);
 
       var m2 = new M2({ things: [a, b]});
       m2.save(function (err) {
-        should.strictEqual(null, err);
-        M2.findById(m2).populate('things').run(function (err, doc) {
+        assert.ifError(err);
+        M2.findById(m2).populate('things').exec(function (err, doc) {
           db.close();
-          should.strictEqual(null, err);
-          doc.things.length.should.equal(2);
-          doc.things[0].id.should.equal("The Tiger That Isn't");
-          doc.things[1].id.should.equal("Users Guide To The Universe");
+          assert.ifError(err);
+          assert.equal(doc.things.length,2);
+          assert.equal(doc.things[0].id,"The Tiger That Isn't");
+          assert.equal(doc.things[1].id,"Users Guide To The Universe");
+          done();
         })
       });
     })
-  },
+  });
 
-  // gh-602
-  'Update works with populated arrays': function () {
+  it('Update works with populated arrays (gh-602)', function(done){
     var db = start()
       , BlogPost = db.model('RefBlogPost', posts)
       , User = db.model('RefUser', users)
@@ -1412,38 +1439,38 @@ module.exports = {
     var user2 = new User({ name: 'twin' });
 
     User.create({name:'aphex'},{name:'twin'}, function (err, u1, u2) {
-      should.strictEqual(err, null);
+      assert.ifError(err);
 
       var post = BlogPost.create({
           title: 'Woot'
         , fans: []
       }, function (err, post) {
-        should.strictEqual(err, null);
+        assert.ifError(err);
 
         var update = { fans: [u1, u2] };
         BlogPost.update({ _id: post }, update, function (err) {
-          should.strictEqual(err, null);
+          assert.ifError(err);
 
           // the original update doc should not be modified
-          ;('fans' in update).should.be.true;
-          ;('$set' in update).should.be.false;
-          update.fans[0].should.be.instanceof(mongoose.Document);
-          update.fans[1].should.be.instanceof(mongoose.Document);
+          assert.ok('fans' in update);
+          assert.ok(!('$set' in update));
+          assert.ok(update.fans[0] instanceof mongoose.Document);
+          assert.ok(update.fans[1] instanceof mongoose.Document);
 
           BlogPost.findById(post, function (err, post) {
             db.close();
-            should.strictEqual(err, null);
-            post.fans.length.should.equal(2);
-            post.fans[0].should.be.instanceof(DocObjectId);
-            post.fans[1].should.be.instanceof(DocObjectId);
+            assert.ifError(err);
+            assert.equal(post.fans.length,2);
+            assert.ok(post.fans[0] instanceof DocObjectId);
+            assert.ok(post.fans[1] instanceof DocObjectId);
+            done();
           });
         });
       });
     });
-  },
-  
-  // gh-675
-  'toJSON should also be called for refs': function () {
+  });
+
+  it('toJSON should also be called for refs (gh-675)', function(done){
     var db = start()
       , BlogPost = db.model('RefBlogPost', posts)
       , User = db.model('RefUser', users)
@@ -1466,31 +1493,31 @@ module.exports = {
         name  : 'Jerem'
       , email : 'jerem@jolicloud.com'
     }, function (err, creator) {
-      should.strictEqual(err, null);
+      assert.ifError(err);
 
       BlogPost.create({
           title     : 'Ping Pong'
         , _creator  : creator
       }, function (err, post) {
-        should.strictEqual(err, null);
+        assert.ifError(err);
 
         BlogPost
-          .findById(post._id)
-          .populate('_creator')
-          .run(function (err, post) {
-            db.close();
-            should.strictEqual(err, null);
+        .findById(post._id)
+        .populate('_creator')
+        .exec(function (err, post) {
+          db.close();
+          assert.ifError(err);
 
-            var json = post.toJSON();
-            json.was_in_to_json.should.equal(true);
-            json._creator.was_in_to_json.should.equal(true);
-          });
+          var json = post.toJSON();
+          assert.equal(true, json.was_in_to_json);
+          assert.equal(json._creator.was_in_to_json,true);
+          done();
+        });
       });
     });
-  },
+  });
 
-  // gh-686
-  'populate should work on Buffer _ids': function () {
+  it('populate should work on Buffer _ids (gh-686)', function(done){
     var db = start();
 
     var UserSchema = new Schema({
@@ -1509,20 +1536,22 @@ module.exports = {
     var alice = new User({_id: new mongoose.Types.Buffer('YWxpY2U=', 'base64'), name: "Alice"})
 
     alice.save(function (err) {
-      should.strictEqual(err, null);
+      assert.ifError(err);
 
       var note  = new Note({author: 'alice', body: "Buy Milk"});
       note.save(function (err) {
-        should.strictEqual(err, null);
+        assert.ifError(err);
 
         Note.findById(note.id).populate('author').run(function (err, note) {
           db.close();
-          should.strictEqual(err, null);
-          note.body.should.equal('Buy Milk');
-          should.exist(note.author);
-          note.author.name.should.equal('Alice');
+          assert.ifError(err);
+          assert.equal(note.body,'Buy Milk');
+          assert.ok(note.author);
+          assert.equal(note.author.name,'Alice');
+          done();
         });
       });
     })
-  }
-};
+  });
+
+});

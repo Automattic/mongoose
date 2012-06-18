@@ -5,6 +5,7 @@
 
 var start = require('./common')
   , should = require('should')
+  , assert = require('assert')
   , mongoose = require('./common').mongoose
   , Schema = mongoose.Schema
   , random = require('../lib/utils').random
@@ -116,7 +117,8 @@ module.exports = {
       should.equal(null, err, 'could not save splice test');
       A.findById(a._id, function (err, doc) {
         should.equal(null, err, 'error finding splice doc');
-        doc.numbers.splice(1, 1);
+        var removed = doc.numbers.splice(1, 1);
+        removed.should.eql([5]);
         doc.numbers.toObject().should.eql([4,6,7]);
         doc.save(function (err) {
           should.equal(null, err, 'could not save splice test');
@@ -146,27 +148,25 @@ module.exports = {
       A.findById(a._id, function (err, doc) {
         should.equal(null, err, 'error finding splice doc');
 
-        doc.types.splice(1, 1);
+        doc.types.$pop();
+
+        var removed = doc.types.splice(1, 1);
+        removed.length.should.eql(1);
+        removed[0].type.should.eql('boy');
 
         var obj = doc.types.toObject();
         obj[0].type.should.eql('bird');
         obj[1].type.should.eql('frog');
-        obj[2].type.should.eql('cloud');
 
         doc.save(function (err) {
           should.equal(null, err, 'could not save splice test');
           A.findById(a._id, function (err, doc) {
+            db.close();
             should.equal(null, err, 'error finding splice doc');
 
             var obj = doc.types.toObject();
             obj[0].type.should.eql('bird');
             obj[1].type.should.eql('frog');
-            obj[2].type.should.eql('cloud');
-
-            A.collection.drop(function (err) {
-              db.close();
-              should.strictEqual(err, null);
-            });
           });
         });
       });
@@ -201,12 +201,14 @@ module.exports = {
         nlen.should.equal(4);
         slen.should.equal(4);
 
+        doc.types.push({type:'worm'});
         var obj = doc.types.toObject();
         obj[0].type.should.eql('tree');
         obj[1].type.should.eql('bird');
         obj[2].type.should.eql('boy');
         obj[3].type.should.eql('frog');
         obj[4].type.should.eql('cloud');
+        obj[5].type.should.eql('worm');
 
         obj = doc.nums.toObject();
         obj[0].valueOf().should.equal(0);
@@ -232,6 +234,7 @@ module.exports = {
             obj[2].type.should.eql('boy');
             obj[3].type.should.eql('frog');
             obj[4].type.should.eql('cloud');
+            obj[5].type.should.eql('worm');
 
             obj = doc.nums.toObject();
             obj[0].valueOf().should.equal(0);
@@ -284,9 +287,11 @@ module.exports = {
         obj[1].type.should.eql('frog');
         obj[2].type.should.eql('cloud');
 
+        doc.nums.push(4);
         obj = doc.nums.toObject();
         obj[0].valueOf().should.equal(2);
         obj[1].valueOf().should.equal(3);
+        obj[2].valueOf().should.equal(4);
 
         obj = doc.strs.toObject();
         obj[0].should.equal('two');
@@ -306,10 +311,185 @@ module.exports = {
             obj = doc.nums.toObject();
             obj[0].valueOf().should.equal(2);
             obj[1].valueOf().should.equal(3);
+            obj[2].valueOf().should.equal(4);
 
             obj = doc.strs.toObject();
             obj[0].should.equal('two');
             obj[1].should.equal('three');
+          });
+        });
+      });
+    });
+  },
+
+  '#pop': function () {
+    var db = start()
+      , schema = new Schema({
+            types: [new Schema({ type: String })]
+          , nums: [Number]
+          , strs: [String]
+        })
+
+    var A = db.model('pop', schema, 'pop'+random());
+
+    var a = new A({
+        types: [{type:'bird'},{type:'boy'},{type:'frog'},{type:'cloud'}]
+      , nums: [1,2,3]
+      , strs: 'one two three'.split(' ')
+    });
+
+    a.save(function (err) {
+      should.equal(null, err);
+      A.findById(a._id, function (err, doc) {
+        should.equal(null, err);
+
+        var t = doc.types.pop();
+        var n = doc.nums.pop();
+        var s = doc.strs.pop();
+
+        t.type.should.equal('cloud');
+        n.should.equal(3);
+        s.should.equal('three');
+
+        var obj = doc.types.toObject();
+        obj[0].type.should.eql('bird');
+        obj[1].type.should.eql('boy');
+        obj[2].type.should.eql('frog');
+
+        doc.nums.push(4);
+        obj = doc.nums.toObject();
+        obj[0].valueOf().should.equal(1);
+        obj[1].valueOf().should.equal(2);
+        obj[2].valueOf().should.equal(4);
+
+        obj = doc.strs.toObject();
+        obj[0].should.equal('one');
+        obj[1].should.equal('two');
+
+        doc.save(function (err) {
+          should.equal(null, err);
+          A.findById(a._id, function (err, doc) {
+            db.close();
+            should.equal(null, err);
+
+            var obj = doc.types.toObject();
+            obj[0].type.should.eql('bird');
+            obj[1].type.should.eql('boy');
+            obj[2].type.should.eql('frog');
+
+            obj = doc.nums.toObject();
+            obj[0].valueOf().should.equal(1);
+            obj[1].valueOf().should.equal(2);
+            obj[2].valueOf().should.equal(4);
+
+            obj = doc.strs.toObject();
+            obj[0].should.equal('one');
+            obj[1].should.equal('two');
+          });
+        });
+      });
+    });
+  },
+
+  '#pull': function () {
+    var db= start();
+    var catschema = new Schema({ name: String })
+    var Cat = db.model('Cat', catschema);
+    var schema = new Schema({
+        a: [{ type: Schema.ObjectId, ref: 'Cat' }]
+    });
+    var A = db.model('TestPull', schema);
+    var cat  = new Cat({ name: 'peanut' });
+    cat.save(function (err) {
+      should.strictEqual(null, err);
+
+      var a = new A({ a: [cat._id] });
+      a.save(function (err) {
+        should.strictEqual(null, err);
+
+        A.findById(a, function (err, doc) {
+          db.close();
+          should.strictEqual(null, err);
+          doc.a.length.should.equal(1);
+          doc.a.pull(cat.id);
+          doc.a.length.should.equal(0);
+        });
+      });
+    });
+  },
+
+  '#$pop': function () {
+    var db= start();
+    var painting = new Schema({ colors: [] })
+    var Painting= db.model('Painting', painting);
+    var p = new Painting({ colors : ['blue', 'green', 'yellow'] });
+    p.save(function (err) {
+      should.strictEqual(null, err);
+
+      Painting.findById(p, function (err, doc) {
+        should.strictEqual(null, err);
+        assert.equal(3, doc.colors.length);
+        var color = doc.colors.$pop();
+        assert.equal(2, doc.colors.length);
+        assert.equal(color, 'yellow');
+        // MongoDB pop command can only be called once per save, each
+        // time only removing one element.
+        color = doc.colors.$pop();
+        assert.equal(color, undefined);
+        assert.equal(2, doc.colors.length);
+        assert.equal(false, '$set' in doc.colors._atomics, 'invalid $atomic op used');
+        doc.save(function (err) {
+          assert.equal(null, err);
+          var color = doc.colors.$pop();
+          assert.equal(1, doc.colors.length);
+          assert.equal(color, 'green');
+          doc.save(function (err) {
+            assert.equal(null, err);
+            Painting.findById(doc, function (err, doc) {
+              db.close();
+              should.strictEqual(null, err);
+              assert.equal(1, doc.colors.length);
+              assert.equal(doc.colors[0], 'blue')
+            });
+          });
+        });
+      });
+    });
+  },
+
+  '#$shift': function () {
+    // atomic shift uses $pop -1
+    var db= start();
+    var painting = new Schema({ colors: [] })
+    var Painting= db.model('Painting', painting);
+    var p = new Painting({ colors : ['blue', 'green', 'yellow'] });
+    p.save(function (err) {
+      should.strictEqual(null, err);
+
+      Painting.findById(p, function (err, doc) {
+        should.strictEqual(null, err);
+        assert.equal(3, doc.colors.length);
+        var color = doc.colors.$shift();
+        assert.equal(2, doc.colors.length);
+        assert.equal(color, 'blue');
+        // MongoDB pop command can only be called once per save, each
+        // time only removing one element.
+        color = doc.colors.$shift();
+        assert.equal(color, undefined);
+        assert.equal(2, doc.colors.length);
+        doc.save(function (err) {
+          assert.equal(null, err);
+          var color = doc.colors.$shift();
+          assert.equal(1, doc.colors.length);
+          assert.equal(color, 'green');
+          doc.save(function (err) {
+            assert.equal(null, err);
+            Painting.findById(doc, function (err, doc) {
+              db.close();
+              should.strictEqual(null, err);
+              assert.equal(1, doc.colors.length);
+              assert.equal(doc.colors[0], 'yellow')
+            });
           });
         });
       });
@@ -353,16 +533,16 @@ module.exports = {
 
     m.num.addToSet(3,4,5);
     m.num.length.should.equal(5);
-    m.str.$addToSet('four', 'five', 'two');
+    m.str.addToSet('four', 'five', 'two');
     m.str.length.should.equal(5);
     m.id.addToSet(id2, id3);
     m.id.length.should.equal(3);
-    m.doc.$addToSet(m.doc[0]);
+    m.doc.addToSet(m.doc[0]);
     m.doc.length.should.equal(2);
-    m.doc.$addToSet({ name: 'Waltz', arr: [1] }, m.doc[0]);
+    m.doc.addToSet({ name: 'Waltz', arr: [1] }, m.doc[0]);
     m.doc.length.should.equal(3);
     m.date.length.should.equal(2);
-    m.date.$addToSet(d1);
+    m.date.addToSet(d1);
     m.date.length.should.equal(2);
     m.date.addToSet(d3);
     m.date.length.should.equal(3);
@@ -404,15 +584,15 @@ module.exports = {
         // test single $addToSet
         m.num.addToSet(3,4,5,6);
         m.num.length.should.equal(6);
-        m.str.$addToSet('four', 'five', 'two', 'six');
+        m.str.addToSet('four', 'five', 'two', 'six');
         m.str.length.should.equal(6);
         m.id.addToSet(id2, id3, id4);
         m.id.length.should.equal(4);
 
-        m.date.$addToSet(d1, d3, d4);
+        m.date.addToSet(d1, d3, d4);
         m.date.length.should.equal(4);
 
-        m.doc.$addToSet(m.doc[0], { name: '8bit' });
+        m.doc.addToSet(m.doc[0], { name: '8bit' });
         m.doc.length.should.equal(4);
 
         m.save(function (err) {
@@ -458,15 +638,15 @@ module.exports = {
             // test multiple $addToSet
             m.num.addToSet(7,8);
             m.num.length.should.equal(8);
-            m.str.$addToSet('seven', 'eight');
+            m.str.addToSet('seven', 'eight');
             m.str.length.should.equal(8);
             m.id.addToSet(id5, id6);
             m.id.length.should.equal(6);
 
-            m.date.$addToSet(d5, d6);
+            m.date.addToSet(d5, d6);
             m.date.length.should.equal(6);
 
-            m.doc.$addToSet(m.doc[1], { name: 'BigBeat' }, { name: 'Funk' });
+            m.doc.addToSet(m.doc[1], { name: 'BigBeat' }, { name: 'Funk' });
             m.doc.length.should.equal(6);
 
             m.save(function (err) {
@@ -527,6 +707,42 @@ module.exports = {
     });
   },
 
+  '#nonAtomicPush': function () {
+    var db = start();
+    var U = db.model('User');
+    var ID = mongoose.Types.ObjectId;
+
+    var u = new U({ name: 'banana', pets: [new ID] });
+    u.pets.length.should.equal(1);
+    u.pets.nonAtomicPush(new ID);
+    u.pets.length.should.equal(2);
+    u.save(function (err) {
+      should.strictEqual(null, err);
+      U.findById(u._id, function (err) {
+        should.strictEqual(null, err);
+        u.pets.length.should.equal(2);
+        var id0 = u.pets[0];
+        var id1 = u.pets[1];
+        var id2 = new ID;
+        u.pets.pull(id0);
+        u.pets.nonAtomicPush(id2);
+        u.pets.length.should.equal(2);
+        u.pets[0].toString().should.equal(id1.toString());
+        u.pets[1].toString().should.equal(id2.toString());
+        u.save(function (err) {
+          should.strictEqual(null, err);
+          U.findById(u._id, function (err) {
+            db.close();
+            should.strictEqual(null, err);
+            u.pets.length.should.equal(2);
+            u.pets[0].toString().should.equal(id1.toString());
+            u.pets[1].toString().should.equal(id2.toString());
+          });
+        });
+      });
+    });
+  },
+
   'setting doc array should adjust path positions': function () {
     var db = start();
 
@@ -552,13 +768,16 @@ module.exports = {
         var x = [];
         x[1] = n[2];
         x[2] = n[1];
-        d.em1 = x.filter(Boolean);
+        x = x.filter(Boolean);
+        d.em1 = x;
 
         d.save(function (err) {
           should.strictEqual(null, err);
           D.findById(d, function (err, d) {
             db.close();
             should.strictEqual(null, err);
+            d.em1[0].name.should.eql('position two');
+            d.em1[1].name.should.eql('pos1');
           });
         });
       });
@@ -602,6 +821,68 @@ module.exports = {
             d.account.roles[1].should.equal('janitor');
             d.em.length.should.equal(1);
             d.em[0].name.should.equal('frida');
+          });
+        });
+      });
+    });
+  },
+
+  'nulls are allowed in number arrays': function () {
+    var db = start();
+    var schema = new Schema({ x: [Number] }, { collection: 'nullsareallowed'+random() });
+    var M = db.model('nullsareallowed', schema);
+    var m;
+    var threw = false;
+
+    m = new M({ x: [1, null, 3] });
+    m.save(function (err) {
+      should.strictEqual(null, err);
+
+      // undefined is not allowed
+      m = new M({ x: [1, undefined, 3] });
+      m.save(function (err) {
+        db.close();
+        should.exist(err);
+      });
+    });
+  },
+
+  // gh-842
+  'modifying sub-doc properties and manipulating the array works': function () {
+    var db= start();
+    var schema = new Schema({ em: [new Schema({ username: String })]});
+    var M = db.model('modifyingSubDocAndPushing', schema);
+    var m = new M({ em: [ { username: 'Arrietty' }]});
+
+    m.save(function (err) {
+      should.strictEqual(null, err);
+      M.findById(m, function (err, m) {
+        should.strictEqual(null, err);
+        m.em[0].username.should.eql('Arrietty');
+
+        m.em[0].username = 'Shawn';
+        m.em.push({ username: 'Homily' });
+        m.save(function (err) {
+          should.strictEqual(null, err);
+
+          M.findById(m, function (err, m) {
+            should.strictEqual(null, err);
+            m.em.length.should.equal(2);
+            m.em[0].username.should.eql('Shawn');
+            m.em[1].username.should.eql('Homily');
+
+            m.em[0].username = 'Arrietty';
+            m.em[1].remove();
+            m.save(function (err) {
+              should.strictEqual(null, err);
+
+              M.findById(m, function (err, m) {
+                db.close();
+                should.strictEqual(null, err);
+                m.em.length.should.equal(1);
+                m.em[0].username.should.eql('Arrietty');
+              });
+            });
           });
         });
       });

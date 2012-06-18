@@ -5,6 +5,7 @@
 
 var start = require('./common')
   , should = require('should')
+  , assert = require('assert')
   , mongoose = start.mongoose
   , random = require('../lib/utils').random
   , Query = require('../lib/query')
@@ -51,7 +52,8 @@ mongoose.model('BlogPostB', BlogPostB);
 var collection = 'blogposts_' + random();
 
 var ModSchema = new Schema({
-  num: Number
+    num: Number
+  , str: String
 });
 mongoose.model('Mod', ModSchema);
 
@@ -69,14 +71,14 @@ module.exports = {
     // query, fields
     BlogPostB.find({}, {}).should.be.an.instanceof(Query);
 
-    // query, fields (array)
-    BlogPostB.find({}, []).should.be.an.instanceof(Query);
+    // query, fields (empty string)
+    BlogPostB.find({}, '').should.be.an.instanceof(Query);
 
     // query, fields, options
     BlogPostB.find({}, {}, {}).should.be.an.instanceof(Query);
 
-    // query, fields (array), options
-    BlogPostB.find({}, [], {}).should.be.an.instanceof(Query);
+    // query, fields (null), options
+    BlogPostB.find({}, null, {}).should.be.an.instanceof(Query);
 
     db.close();
   },
@@ -91,14 +93,14 @@ module.exports = {
     // query, fields
     BlogPostB.findOne({}, {}).should.be.an.instanceof(Query);
 
-    // query, fields (array)
-    BlogPostB.findOne({}, []).should.be.an.instanceof(Query);
+    // query, fields (null)
+    BlogPostB.findOne({}, null).should.be.an.instanceof(Query);
 
     // query, fields, options
     BlogPostB.findOne({}, {}, {}).should.be.an.instanceof(Query);
 
-    // query, fields (array), options
-    BlogPostB.findOne({}, [], {}).should.be.an.instanceof(Query);
+    // query, fields (''), options
+    BlogPostB.findOne({}, '', {}).should.be.an.instanceof(Query);
 
     db.close();
   },
@@ -127,17 +129,17 @@ module.exports = {
     // query
     BlogPostB.find(q, fn).should.be.an.instanceof(Query);
 
-    // query, fields
+    // query, fields (object)
     BlogPostB.find(q, {}, fn).should.be.an.instanceof(Query);
 
-    // query, fields (array)
-    BlogPostB.find(q, [], fn).should.be.an.instanceof(Query);
+    // query, fields (null)
+    BlogPostB.find(q, null, fn).should.be.an.instanceof(Query);
 
     // query, fields, options
     BlogPostB.find(q, {}, {}, fn).should.be.an.instanceof(Query);
 
-    // query, fields (array), options
-    BlogPostB.find(q, [], {}, fn).should.be.an.instanceof(Query);
+    // query, fields (''), options
+    BlogPostB.find(q, '', {}, fn).should.be.an.instanceof(Query);
   },
 
   'test that query is executed where a callback for findOne': function () {
@@ -156,14 +158,14 @@ module.exports = {
     // query, fields
     BlogPostB.findOne(q, {}, fn).should.be.an.instanceof(Query);
 
-    // query, fields (array)
-    BlogPostB.findOne(q, [], fn).should.be.an.instanceof(Query);
+    // query, fields (empty string)
+    BlogPostB.findOne(q, '', fn).should.be.an.instanceof(Query);
 
     // query, fields, options
     BlogPostB.findOne(q, {}, {}, fn).should.be.an.instanceof(Query);
 
-    // query, fields (array), options
-    BlogPostB.findOne(q, [], {}, fn).should.be.an.instanceof(Query);
+    // query, fields (null), options
+    BlogPostB.findOne(q, null, {}, fn).should.be.an.instanceof(Query);
   },
 
   'test that count returns a Query': function () {
@@ -510,7 +512,7 @@ module.exports = {
         should.strictEqual(err, null);
 
         var query = NE.find({ 'b': id3.toString(), 'ids': { $ne: id1 }});
-        query.run(function (err, nes1) {
+        query.exec(function (err, nes1) {
           should.strictEqual(err, null);
           nes1.length.should.eql(1);
 
@@ -560,7 +562,7 @@ module.exports = {
         --queries || db.close();
       });
 
-      BlogPostB.findById(post.get('_id'), ['title'], function (err, doc) {
+      BlogPostB.findById(post.get('_id'), 'title', function (err, doc) {
         should.strictEqual(err, null);
         doc.isInit('title').should.be.true;
         doc.isInit('slug').should.be.false;
@@ -571,7 +573,7 @@ module.exports = {
         --queries || db.close();
       });
 
-      BlogPostB.findById(post.get('_id'), { slug: 0 }, function (err, doc) {
+      BlogPostB.findById(post.get('_id'), '-slug', function (err, doc) {
         should.strictEqual(err, null);
         doc.isInit('title').should.be.true;
         doc.isInit('slug').should.be.false;
@@ -593,7 +595,7 @@ module.exports = {
         --queries || db.close();
       });
 
-      BlogPostB.findById(post.get('_id'), ['slug'], function (err, doc) {
+      BlogPostB.findById(post.get('_id'), 'slug', function (err, doc) {
         should.strictEqual(err, null);
         doc.isInit('title').should.be.false;
         doc.isInit('slug').should.be.true;
@@ -612,10 +614,10 @@ module.exports = {
     BlogPostB.create({title: 'subset 1'}, function (err, created) {
       should.strictEqual(err, null);
       BlogPostB.findOne({title: 'subset 1'}, {title: 1, _id: 0}, function (err, found) {
+        db.close();
         should.strictEqual(err, null);
         should.strictEqual(undefined, found._id);
         found.title.should.equal('subset 1');
-        db.close();
       });
     });
   },
@@ -626,13 +628,13 @@ module.exports = {
     BlogPostB.create({title: 'subset 1', author: 'me'}, function (err, created) {
       should.strictEqual(err, null);
       BlogPostB.find({title: 'subset 1'}, {title: 1, _id: 0}, function (err, found) {
+        db.close();
         should.strictEqual(err, null);
         should.strictEqual(undefined, found[0]._id);
         found[0].title.should.equal('subset 1');
         should.strictEqual(undefined, found[0].def);
         should.strictEqual(undefined, found[0].author);
         should.strictEqual(false, Array.isArray(found[0].comments));
-        db.close();
       });
     });
   },
@@ -661,8 +663,7 @@ module.exports = {
     });
   },
 
-
-  'exluded fields should be undefined': function () {
+  'excluded fields should be undefined': function () {
     var db = start()
       , BlogPostB = db.model('BlogPostB', collection)
       , date = new Date
@@ -709,6 +710,29 @@ module.exports = {
     });
   },
 
+  // gh-870
+  'included fields should have defaults applied when no value exists in db': function () {
+    var db = start()
+      , BlogPostB = db.model('BlogPostB', collection)
+      , id = new DocumentObjectId
+
+    BlogPostB.collection.insert(
+        { _id: id, title: 'issue 870'}, function (err) {
+      should.strictEqual(err, null);
+
+      BlogPostB.findById(id, 'def comments', function (err, found) {
+        db.close();
+        should.strictEqual(err, null);
+        found._id.should.eql(id);
+        should.strictEqual(undefined, found.title);
+        should.strictEqual('kandinsky', found.def);
+        should.strictEqual(undefined, found.author);
+        should.strictEqual(true, Array.isArray(found.comments));
+        found.comments.length.should.equal(0);
+      });
+    });
+  },
+
   'test for find where partial initialization': function () {
     var db = start()
       , BlogPostB = db.model('BlogPostB', collection)
@@ -731,7 +755,7 @@ module.exports = {
         --queries || db.close();
       });
 
-      BlogPostB.find({ _id: post.get('_id') }, ['title'], function (err, docs) {
+      BlogPostB.find({ _id: post.get('_id') }, 'title', function (err, docs) {
         should.strictEqual(err, null);
         docs[0].isInit('title').should.be.true;
         docs[0].isInit('slug').should.be.false;
@@ -749,7 +773,7 @@ module.exports = {
         --queries || db.close();
       });
 
-      BlogPostB.find({ _id: post.get('_id') }, ['slug'], function (err, docs) {
+      BlogPostB.find({ _id: post.get('_id') }, 'slug', function (err, docs) {
         should.strictEqual(err, null);
         docs[0].isInit('title').should.be.false;
         docs[0].isInit('slug').should.be.true;
@@ -1083,7 +1107,7 @@ module.exports = {
     });
   },
 
-  'test finding where $or': function () {
+  'test finding where or()': function () {
     var db = start()
       , Mod = db.model('Mod', 'mods_' + random());
 
@@ -1116,7 +1140,7 @@ module.exports = {
       }
 
       function test3 () {
-        Mod.find({$or: [{num: 1}]}).$or([{ str: 'two' }]).run(function (err, found) {
+        Mod.find({$or: [{num: 1}]}).or([{ str: 'two' }]).exec(function (err, found) {
           if (err) console.error(err);
           done();
           should.strictEqual(err, null);
@@ -1164,7 +1188,7 @@ module.exports = {
       }
 
       function test3 () {
-        Mod.find({$nor: [{num: 2}]}).$nor([{ str: 'two' }]).run(function (err, found) {
+        Mod.find({$nor: [{num: 2}]}).nor([{ str: 'two' }]).exec(function (err, found) {
           done();
           should.strictEqual(err, null);
           found.should.have.length(1);
@@ -1239,10 +1263,10 @@ module.exports = {
 
     var doc = new B;
     doc.title='css3';
-    doc._delta().$set.title.should.equal('css3');
+    doc._delta()[1].$set.title.should.equal('css3');
     doc.title = undefined;
-    doc._delta().$unset.title.should.equal(1);
-    should.strictEqual(undefined, doc._delta().$set);
+    doc._delta()[1].$unset.title.should.equal(1);
+    should.strictEqual(undefined, doc._delta()[1].$set);
 
     doc.title='css3';
     doc.author = 'aaron';
@@ -1286,12 +1310,14 @@ module.exports = {
             b.comments[1].body.should.equal('cranberries');
 
             b.meta = undefined;
+            b.comments = undefined;
             b.save(function (err) {
               should.strictEqual(null, err);
               B.collection.findOne({ _id: b._id}, function (err, b) {
                 db.close();
                 should.strictEqual(null, err);
                 should.strictEqual(undefined, b.meta);
+                should.strictEqual(undefined, b.comments);
               });
             });
           });
@@ -1324,12 +1350,12 @@ module.exports = {
             found.id;
             found._id.should.eql(created._id);
 
-            BlogPostB.where('title').$regex(reg).findOne(function (err, found) {
+            BlogPostB.where('title').regex(reg).findOne(function (err, found) {
               should.strictEqual(err, null);
               found.id;
               found._id.should.eql(created._id);
 
-              BlogPostB.where('title').$regex(/^Next/).findOne(function (err, found) {
+              BlogPostB.where('title').regex(/^Next/).findOne(function (err, found) {
                 db.close();
                 should.strictEqual(err, null);
                 found.id;
@@ -1627,7 +1653,7 @@ module.exports = {
           should.strictEqual(err, null);
           BlogPostB
             .where('meta.visitors').gt(99).lt(301)
-            .sort('meta.visitors', -1)
+            .sort('-meta.visitors')
             .find( function (err, found) {
               should.strictEqual(err, null);
               found.should.have.length(3);
@@ -1676,65 +1702,6 @@ module.exports = {
     })
   },
 
-  'test streaming cursors with #each': function () {
-    var db = start()
-      , BlogPostB = db.model('BlogPostB', collection);
-
-    BlogPostB.create({title: "The Wrestler", tags: ["movie"]}, function (err, wrestler) {
-      should.strictEqual(err, null);
-      BlogPostB.create({title: "Black Swan", tags: ["movie"]}, function (err, blackswan) {
-        should.strictEqual(err, null);
-        BlogPostB.create({title: "Pi", tags: ["movie"]}, function (err, pi) {
-          should.strictEqual(err, null);
-          var found = {};
-          BlogPostB
-            .find({tags: "movie"})
-            .sort('title', -1)
-            .each(function (err, post) {
-              should.strictEqual(err, null);
-              if (post) found[post.title] = 1;
-              else {
-                found.should.have.property("The Wrestler", 1);
-                found.should.have.property("Black Swan", 1);
-                found.should.have.property("Pi", 1);
-                db.close();
-              }
-            });
-        });
-      });
-    });
-  },
-
-  'test streaming cursors with #each and manual iteration': function () {
-    var db = start()
-      , BlogPostB = db.model('BlogPostB', collection);
-
-    BlogPostB.create({title: "Bleu", tags: ["Krzysztof Kieślowski"]}, function (err, wrestler) {
-      should.strictEqual(err, null);
-      BlogPostB.create({title: "Blanc", tags: ["Krzysztof Kieślowski"]}, function (err, blackswan) {
-        should.strictEqual(err, null);
-        BlogPostB.create({title: "Rouge", tags: ["Krzysztof Kieślowski"]}, function (err, pi) {
-          should.strictEqual(err, null);
-          var found = {};
-          BlogPostB
-            .find({tags: "Krzysztof Kieślowski"})
-            .each(function (err, post, next) {
-              should.strictEqual(err, null);
-              if (post) {
-                found[post.title] = 1;
-                process.nextTick(next);
-              } else {
-                found.should.have.property("Bleu", 1);
-                found.should.have.property("Blanc", 1);
-                found.should.have.property("Rouge", 1);
-                db.close();
-              }
-            });
-        });
-      });
-    });
-  },
-
   '$gt, $lt, $lte, $gte work on strings': function () {
     var db = start()
     var D = db.model('D', new Schema({dt: String}), collection);
@@ -1753,7 +1720,7 @@ module.exports = {
 
       pending = 2;
 
-      D.find({ 'dt': { $gte: '2011-03-30', $lte: '2011-04-01' }}).sort('dt', 1).run(function (err, docs) {
+      D.find({ 'dt': { $gte: '2011-03-30', $lte: '2011-04-01' }}).sort('dt').exec(function (err, docs) {
         if (--pending) db.close();
         should.strictEqual(err, null);
         docs.length.should.eql(3);
@@ -1763,7 +1730,7 @@ module.exports = {
         docs.some(function (d) { return '2011-04-02' === d.dt }).should.be.false;
       });
 
-      D.find({ 'dt': { $gt: '2011-03-30', $lt: '2011-04-02' }}).sort('dt', 1).run(function (err, docs) {
+      D.find({ 'dt': { $gt: '2011-03-30', $lt: '2011-04-02' }}).sort('dt').exec(function (err, docs) {
         if (--pending) db.close();
         should.strictEqual(err, null);
         docs.length.should.eql(2);
@@ -2177,6 +2144,59 @@ module.exports = {
           });
         });
       });
+    });
+  },
+
+  'query with lean doc option - find' : function()  {
+    var db = start()
+    , BlogPostB = db.model('BlogPostB', collection)
+    , title = 'Wooooot ' + random();
+
+    var post = new BlogPostB();
+    post.set('title', title);
+
+    post.save(function (err) {
+      should.strictEqual(null, err);
+      BlogPostB.find({title : title}, null, { lean : true }, function(err, docs){
+        should.strictEqual(null, err);
+        should.equal(docs.length, 1);
+        should.strictEqual(docs[0] instanceof mongoose.Document, false);
+        db.close();
+      });
+    });
+  },
+
+  'query with lean doc option - findOne' : function()  {
+    var db = start()
+    , BlogPostB = db.model('BlogPostB', collection)
+    , title = 'Wooooot ' + random();
+
+    var post = new BlogPostB();
+    post.set('title', title);
+
+    post.save(function (err) {
+      should.strictEqual(null, err);
+      BlogPostB.findOne({title : title}, null, { lean : true }, function(err, doc){
+        should.strictEqual(null, err);
+        doc.should.not.be.equal(undefined);
+        should.strictEqual(doc instanceof mongoose.Document, false);
+        db.close();
+      });
+    });
+  },
+
+  'regex with options': function () {
+    var db = start()
+      , B = db.model('BlogPostB', collection)
+
+    var post = new B({ title: '$option queries' });
+    post.save(function (err) {
+      should.strictEqual(null, err);
+      B.findOne({ title: { $regex: ' QUERIES$', $options: 'i' }}, function (err, doc) {
+        db.close();
+        should.strictEqual(null, err, err && err.stack);
+        doc.id.should.eql(post.id);
+      })
     });
   }
 };

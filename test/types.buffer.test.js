@@ -78,11 +78,11 @@ module.exports = {
           t.sub.push({ name: 'Friday Friday' });
           t.save(function (err) {
             err.message.should.eql('Validation failed');
-            err.errors.buf.type.should.equal('required');
+            err.errors['sub.0.buf'].type.should.equal('required');
             t.sub[0].buf = new Buffer("well well");
             t.save(function (err) {
               err.message.should.eql('Validation failed');
-              err.errors.buf.type.should.equal('valid failed');
+              err.errors['sub.0.buf'].type.should.equal('valid failed');
 
               t.sub[0].buf = new Buffer("well well well");
               t.validate(function (err) {
@@ -342,7 +342,7 @@ module.exports = {
     function reset (model) {
       // internal
       model._activePaths.clear('modify');
-      model.schema.requiredPaths.forEach(function (path) {
+      model.schema.requiredPaths().forEach(function (path) {
         model._activePaths.require(path);
       });
     }

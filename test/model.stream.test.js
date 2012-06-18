@@ -134,7 +134,7 @@ function assignExports () { var o = {
       , finished = 0
       , i = 0
 
-    var stream = P.where('name').$exists().limit(10).only('_id').stream();
+    var stream = P.where('name').exists().limit(10).select('_id').stream();
 
     should.strictEqual(null, stream._destroyed);
     stream.readable.should.be.true;
@@ -205,7 +205,7 @@ function assignExports () { var o = {
       , filename = '/tmp/_mongoose_stream_out.txt'
       , out = fs.createWriteStream(filename)
 
-    var stream = P.find().sort('name', 1).limit(20).stream();
+    var stream = P.find().sort('name').limit(20).stream();
     stream.pipe(out);
 
     stream.on('error', done);
@@ -221,6 +221,39 @@ function assignExports () { var o = {
       ;/Aditya/.test(contents).should.be.true;
       ;/Agustin/.test(contents).should.be.true;
       fs.unlink(filename);
+    }
+  }
+
+, 'cursor stream with lean option': function () {
+    var db = start()
+      , P = db.model('PersonForStream', collection)
+      , i = 0
+      , closed = 0
+      , err
+  
+    var stream = P.find({},null, {lean : true}).stream();
+  
+    stream.on('data', function (doc) {
+      should.strictEqual(false, doc instanceof mongoose.Document);
+      i++;  
+    });
+  
+    stream.on('error', function (er) {
+      err = er;
+      done();
+    });
+  
+    stream.on('close', function () {
+      closed++;
+      done();
+    });
+  
+    function done () {
+      db.close();
+      should.strictEqual(undefined, err);
+      should.equal(i, names.length);
+      closed.should.equal(1);
+      stream._cursor.isClosed().should.be.true;
     }
   }
 }

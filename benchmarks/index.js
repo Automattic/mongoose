@@ -1,4 +1,11 @@
 Error.stackTraceLimit = Infinity;
+var out = process.argv.length < 3;
+function log () {
+  if (out) {
+    console.error.apply(console, arguments);
+  }
+}
+
 var mongoose = require('../')
   , Schema = mongoose.Schema;
 
@@ -25,6 +32,9 @@ var AllSchema = new Schema({
 
 var A = mongoose.model('A', AllSchema);
 
+var numdocs = 0;
+var totaltime = 0;
+
 // bench the normal way
 // the try building the doc into the document prototype
 // and using inheritance and bench that 
@@ -34,7 +44,7 @@ var A = mongoose.model('A', AllSchema);
 // them.
 
 function run (label, fn) {
-  console.error('running %s', label);
+  log('running %s', label);
   var started = process.memoryUsage();
   var start = new Date;
   var total = 10000;
@@ -47,9 +57,17 @@ function run (label, fn) {
       a._delta();
   }
   var time = (new Date - start)/1000;
-  console.error(label + ' took %d seconds for %d docs (%d dps)', time, total, total/time);
+  totaltime += time;
+  numdocs += total;
+  log(label + ' took %d seconds for %d docs (%d dps)', time, total, total/time);
   var used = process.memoryUsage();
-  console.error(((used.vsize - started.vsize) / 1048576)+' MB');
+  var res = {}
+  res.rss  = used.rss - started.rss;
+  res.heapTotal = used.heapTotal - started.heapTotal;
+  res.heapUsed = used.heapUsed - started.heapUsed;
+  log('change: ', res);
+  a = res = used = time = started = start = total = i = null
+  //console.error(((used.vsize - started.vsize) / 1048576)+' MB');
 }
 
 run('string', function () {
@@ -124,5 +142,6 @@ run('array of docs', function () {
 })
 
 //console.error(a.toObject({depopulate:true}));
+console.error('completed %d docs in %d seconds (%d dps)', numdocs, totaltime,numdocs/totaltime);
 
 // --trace-opt --trace-deopt --trace-bailout 

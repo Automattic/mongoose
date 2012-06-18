@@ -5,6 +5,7 @@
 
 var start = require('./common')
   , should = require('should')
+  , assert = require('assert')
   , mongoose = start.mongoose
   , random = require('../lib/utils').random
   , Query = require('../lib/query')
@@ -17,7 +18,6 @@ var start = require('./common')
   , DocumentObjectId = mongoose.Types.ObjectId
   , DocumentArray = mongoose.Types.DocumentArray
   , EmbeddedDocument = mongoose.Types.Embedded
-  , MongooseNumber = mongoose.Types.Number
   , MongooseArray = mongoose.Types.Array
   , MongooseError = mongoose.Error;
 
@@ -83,7 +83,7 @@ module.exports = {
     db.close();
   },
 
-  'modified getter should not throw': function () {
+  'isModified with no arg should not throw': function () {
     var db = start();
     var BlogPost = db.model('BlogPost', collection);
     var post = new BlogPost;
@@ -91,7 +91,7 @@ module.exports = {
 
     var threw = false;
     try {
-      post.modified;
+      post.isModified();
     } catch (err) {
       threw = true;
     }
@@ -427,7 +427,7 @@ module.exports = {
     post.get('date').should.be.an.instanceof(Date);
     post.get('meta').should.be.a('object');
     post.get('meta').date.should.be.an.instanceof(Date);
-    post.get('meta').visitors.should.be.an.instanceof(MongooseNumber);
+    post.get('meta').visitors.should.be.a('number');
     post.get('published').should.be.true;
 
     post.title.should.eql('Test');
@@ -435,7 +435,7 @@ module.exports = {
     post.date.should.be.an.instanceof(Date);
     post.meta.should.be.a('object');
     post.meta.date.should.be.an.instanceof(Date);
-    post.meta.visitors.should.be.an.instanceof(MongooseNumber);
+    post.meta.visitors.should.be.a('number');
     post.published.should.be.true;
 
     post.get('owners').should.be.an.instanceof(MongooseArray);
@@ -553,6 +553,31 @@ module.exports = {
         post.get('comments')[0].isNew.should.be.false;
         post.get('comments')[0].comments[0].isNew.should.be.false;
         db.close();
+      });
+    });
+  },
+
+  'isNew on parent and subdocs on failed inserts': function () {
+    var db = start()
+
+    var schema = new Schema({
+        name: { type: String, unique: true }
+      , em: [new Schema({ x: Number })]
+    }, { collection: 'testisnewonfail_'+random() });
+    var A = db.model('isNewOnFail', schema);
+    A.on('index', function () {
+      var a = new A({ name: 'i am new', em: [{ x: 1 }] });
+      a.save(function (err) {
+        should.strictEqual(null, err);
+        assert.equal(a.isNew, false);
+        assert.equal(a.em[0].isNew, false);
+        var b = new A({ name: 'i am new', em: [{x:2}] });
+        b.save(function (err) {
+          db.close();
+          assert.ok(err);
+          assert.equal(b.isNew, true);
+          assert.equal(b.em[0].isNew, true);
+        });
       });
     });
   },
@@ -691,7 +716,7 @@ module.exports = {
     var post = new BlogPost()
 
     post.isModified('owners').should.be.false;
-    post.get('owners').$push(new DocumentObjectId);
+    post.get('owners').push(new DocumentObjectId);
     post.isModified('owners').should.be.true;
 
     db.close();
@@ -752,8 +777,9 @@ module.exports = {
         postRead.isModified('numbers').should.be.false;
         postRead.isModified('owners').should.be.false;
         postRead.isModified('comments').should.be.false;
-        postRead.comments[2] = { title: 'index' };
-        postRead.comments = postRead.comments;
+        var arr = postRead.comments.slice();
+        arr[2] = postRead.comments.create({ title: 'index' });
+        postRead.comments = arr;
         postRead.isModified('comments').should.be.true;
     	});
     });
@@ -1250,8 +1276,12 @@ module.exports = {
   },
 
   'test validation in subdocuments': function(){
+
+    var Subsubdocs= new Schema({ required: { type: String, required: true }});
+
     var Subdocs = new Schema({
         required: { type: String, required: true }
+      , subs: [Subsubdocs]
     });
 
     mongoose.model('TestSubdocumentsValidation', new Schema({
@@ -1263,15 +1293,18 @@ module.exports = {
 
     var post = new TestSubdocumentsValidation();
 
-    post.get('items').push({ required: '' });
+    post.get('items').push({ required: '', subs: [{required: ''}] });
 
     post.save(function(err){
       err.should.be.an.instanceof(MongooseError);
       err.should.be.an.instanceof(ValidationError);
-      err.errors.required.should.be.an.instanceof(ValidatorError);
-      err.errors.required.message.should.eql('Validator "required" failed for path required');
+      err.errors['items.0.subs.0.required'].should.be.an.instanceof(ValidatorError);
+      err.errors['items.0.subs.0.required'].message.should.eql('Validator "required" failed for path required');
+      err.errors['items.0.required'].should.be.an.instanceof(ValidatorError);
+      err.errors['items.0.required'].message.should.eql('Validator "required" failed for path required');
 
       post.get('items')[0].set('required', true);
+      post.items[0].subs[0].set('required', true);
       post.save(function(err){
         should.strictEqual(err, null);
         db.close();
@@ -1834,99 +1867,12 @@ module.exports = {
     post.save( function (err) {
       BlogPost.findById( post.get('_id'), function (err, found) {
         found.get('numbers').length.should.equal(4);
-        found.get('numbers').$pull('3');
+        found.get('numbers').pull('3');
         found.save( function (err) {
           BlogPost.findById( found.get('_id'), function (err, found2) {
             found2.get('numbers').length.should.equal(3);
             db.close();
           });
-        });
-      });
-    });
-  },
-
-  'test updating numbers atomically': function () {
-    var db = start()
-      , BlogPost = db.model('BlogPost', collection)
-      , totalDocs = 4
-      , saveQueue = [];
-
-    var post = new BlogPost();
-    post.set('meta.visitors', 5);
-
-    post.save(function(err){
-      if (err) throw err;
-
-      BlogPost.findOne({ _id: post.get('_id') }, function(err, doc){
-        if (err) throw err;
-        doc.get('meta.visitors').increment();
-        doc.get('meta.visitors').valueOf().should.be.equal(6);
-        save(doc);
-      });
-
-      BlogPost.findOne({ _id: post.get('_id') }, function(err, doc){
-        if (err) throw err;
-        doc.get('meta.visitors').increment();
-        doc.get('meta.visitors').valueOf().should.be.equal(6);
-        save(doc);
-      });
-
-      BlogPost.findOne({ _id: post.get('_id') }, function(err, doc){
-        if (err) throw err;
-        doc.get('meta.visitors').increment();
-        doc.get('meta.visitors').valueOf().should.be.equal(6);
-        save(doc);
-      });
-
-      BlogPost.findOne({ _id: post.get('_id') }, function(err, doc){
-        if (err) throw err;
-        doc.get('meta.visitors').increment();
-        doc.get('meta.visitors').valueOf().should.be.equal(6);
-        save(doc);
-      });
-
-      function save(doc) {
-        saveQueue.push(doc);
-        if (saveQueue.length == 4)
-          saveQueue.forEach(function (doc) {
-            doc.save(function (err) {
-              if (err) throw err;
-              --totalDocs || complete();
-            });
-          });
-      };
-
-      function complete () {
-        BlogPost.findOne({ _id: post.get('_id') }, function (err, doc) {
-          if (err) throw err;
-          doc.get('meta.visitors').valueOf().should.be.equal(9);
-          db.close();
-        });
-      };
-    });
-  },
-
-  'test incrementing a number atomically with an arbitrary value': function () {
-    var db = start()
-      , BlogPost = db.model('BlogPost');
-
-    var post = new BlogPost();
-
-    post.meta.visitors = 0;
-
-    post.save(function (err) {
-      should.strictEqual(err, null);
-
-      post.meta.visitors.increment(50);
-
-      post.save(function (err) {
-        should.strictEqual(err, null);
-
-        BlogPost.findById(post._id, function (err, doc) {
-          should.strictEqual(err, null);
-
-          (+doc.meta.visitors).should.eql(50);
-          db.close();
         });
       });
     });
@@ -1948,13 +1894,13 @@ module.exports = {
         should.strictEqual(err, null);
 
         doc.meta.visitors -= 2;
-        
+
         doc.save(function (err) {
           should.strictEqual(err, null);
 
           BlogPost.findById(post._id, function (err, doc) {
             should.strictEqual(err, null);
-  
+
             (+doc.meta.visitors).should.eql(3);
             db.close();
           });
@@ -2153,8 +2099,7 @@ module.exports = {
 
     Temp.create({}, function (err, t) {
       t.nested.nums.push(1);
-      t.nested.nums.$pushAll([2, 3]);
-
+      t.nested.nums.push(2, 3);
       t.nested.nums.should.have.length(3);
 
       t.save( function (err) {
@@ -2180,10 +2125,10 @@ module.exports = {
     var Temp = db.model('NestedPushes', collection);
 
     Temp.create({nested: {nums: [1, 2, 3, 4, 5]}}, function (err, t) {
-      t.nested.nums.$pull(1);
-      t.nested.nums.$pull(2);
+      t.nested.nums.pull(1);
+      t.nested.nums.pull(2);
 
-      t._activePaths.stateOf('nested.nums').should.equal('modify');
+      t._activePaths.paths['nested.nums'].should.equal('modify');
       db.close();
 
     });
@@ -2201,7 +2146,7 @@ module.exports = {
     var Temp = db.model('NestedPushes', collection);
 
     Temp.create({nested: {nums: [1, 2, 3, 4, 5]}}, function (err, t) {
-      t.nested.nums.$pull(1);
+      t.nested.nums.pull(1);
 
       t.nested.nums.should.have.length(4);
 
@@ -2221,7 +2166,7 @@ module.exports = {
     var Temp = db.model('NestedPushes', collection);
 
     Temp.create({nested: {nums: [1, 2, 3, 4, 5]}}, function (err, t) {
-      t.nested.nums.$pullAll([1, 2, 3]);
+      t.nested.nums.pull(1, 2, 3);
 
       t.nested.nums.should.have.length(2);
 
@@ -2229,7 +2174,7 @@ module.exports = {
     });
   },
 
-  'test updating multiple Number $pulls as a single $pullAll': function () {
+  'test updating multiple Number pulls as a single pullAll': function () {
     var db = start()
       , schema = new Schema({
           nested: {
@@ -2241,8 +2186,8 @@ module.exports = {
     var Temp = db.model('NestedPushes', collection);
 
     Temp.create({nested: {nums: [1, 2, 3, 4, 5]}}, function (err, t) {
-      t.nested.nums.$pull(1);
-      t.nested.nums.$pull(2);
+      t.nested.nums.pull(1);
+      t.nested.nums.pull(2);
 
       t.nested.nums.should.have.length(3);
 
@@ -2269,8 +2214,8 @@ module.exports = {
     var Temp = db.model('NestedPushes', collection);
 
     Temp.create({nested: {nums: [1, 2, 3, 4, 5]}}, function (err, t) {
-      t.nested.nums.$pull(1);
-      t.nested.nums.$pullAll([2, 3]);
+      t.nested.nums.pull(1);
+      t.nested.nums.pull(2, 3);
 
       t.nested.nums.should.have.length(2);
 
@@ -2343,7 +2288,7 @@ module.exports = {
 
     mongoose.model('Temp', TempSchema);
     var Temp = db.model('Temp', collection);
-    
+
     var t = new Temp();
 
     t.save(function(err){
@@ -2772,7 +2717,7 @@ module.exports = {
             Array.isArray(doc.mixed).should.be.true;
             doc.mixed.push({ hello: 'world' });
             doc.mixed.push([ 'foo', 'bar' ]);
-            doc.commit('mixed');
+            doc.markModified('mixed');
 
             doc.save(function (err, doc) {
               should.strictEqual(err, null);
@@ -2830,7 +2775,7 @@ module.exports = {
     db.close();
   },
 
-  'test that we instantiate MongooseNumber in arrays': function () {
+  'test that we instantiate Numbers in arrays': function () {
     var db = start()
       , BlogPost = db.model('BlogPost', collection);
 
@@ -3199,11 +3144,18 @@ module.exports = {
     });
   },
 
-  'passing null in pre hook works': function () {
+  'passing undefined and null in pre hook works': function () {
     var db = start();
     var schema = new Schema({ name: String });
+    var called = 0;
 
     schema.pre('save', function (next) {
+      called++;
+      next(undefined); // <<-----
+    });
+
+    schema.pre('save', function (next) {
+      called++;
       next(null); // <<-----
     });
 
@@ -3212,9 +3164,9 @@ module.exports = {
 
     s.save(function (err) {
       db.close();
+      called.should.equal(2);
       should.strictEqual(null, err);
     });
-
   },
 
   'pre hooks called on all sub levels': function () {
@@ -3333,7 +3285,7 @@ module.exports = {
     });
   },
 
-  'test count querying via #run (aka #exec)': function () {
+  'test count querying via #exec': function () {
     var db = start()
       , BlogPost = db.model('BlogPost', collection);
 
@@ -3348,7 +3300,7 @@ module.exports = {
     });
   },
 
-  'test update querying via #run (aka #exec)': function () {
+  'test update querying via #exec': function () {
     var db = start()
       , BlogPost = db.model('BlogPost', collection);
 
@@ -3366,7 +3318,7 @@ module.exports = {
     });
   },
 
-  'test findOne querying via #run (aka #exec)': function () {
+  'test findOne querying via #exec': function () {
     var db = start()
       , BlogPost = db.model('BlogPost', collection);
 
@@ -3381,7 +3333,7 @@ module.exports = {
     });
   },
 
-  'test find querying via #run (aka #exec)': function () {
+  'test find querying via #exec': function () {
     var db = start()
       , BlogPost = db.model('BlogPost', collection);
 
@@ -3401,7 +3353,7 @@ module.exports = {
     });
   },
 
-  'test remove querying via #run (aka #exec)': function () {
+  'test remove querying via #exec': function () {
     var db = start()
       , BlogPost = db.model('BlogPost', collection);
 
@@ -3420,7 +3372,7 @@ module.exports = {
     });
   },
 
-  'test changing query at the last minute via #run(op, callback)': function () {
+  'test changing query at the last minute via #exec(op, callback)': function () {
     var db = start()
       , BlogPost = db.model('BlogPost', collection);
 
@@ -3436,7 +3388,7 @@ module.exports = {
     });
   },
 
-  'test count querying via #run (aka #exec) with promise': function () {
+  'test count querying via #exec with promise': function () {
     var db = start()
       , BlogPost = db.model('BlogPost', collection);
 
@@ -3452,14 +3404,14 @@ module.exports = {
     });
   },
 
-  'test update querying via #run (aka #exec) with promise': function () {
+  'test update querying via #exec with promise': function () {
     var db = start()
       , BlogPost = db.model('BlogPost', collection);
 
     BlogPost.create({title: 'interoperable update as promise 2'}, function (err, created) {
       should.strictEqual(err, null);
       var query = BlogPost.update({title: 'interoperable update as promise 2'}, {title: 'interoperable update as promise delta 2'});
-      var promise = query.run();
+      var promise = query.exec();
       promise.addBack(function (err) {
         should.strictEqual(err, null);
         BlogPost.count({title: 'interoperable update as promise delta 2'}, function (err, count) {
@@ -3471,7 +3423,7 @@ module.exports = {
     });
   },
 
-  'test findOne querying via #run (aka #exec) with promise': function () {
+  'test findOne querying via #exec with promise': function () {
     var db = start()
       , BlogPost = db.model('BlogPost', collection);
 
@@ -3487,7 +3439,7 @@ module.exports = {
     });
   },
 
-  'test find querying via #run (aka #exec) with promise': function () {
+  'test find querying via #exec with promise': function () {
     var db = start()
       , BlogPost = db.model('BlogPost', collection);
 
@@ -3497,7 +3449,7 @@ module.exports = {
       , function (err, createdOne, createdTwo) {
       should.strictEqual(err, null);
       var query = BlogPost.find({title: 'interoperable find as promise 2'});
-      var promise = query.run();
+      var promise = query.exec();
       promise.addBack(function (err, found) {
         should.strictEqual(err, null);
         found.length.should.equal(2);
@@ -3510,7 +3462,7 @@ module.exports = {
     });
   },
 
-  'test remove querying via #run (aka #exec) with promise': function () {
+  'test remove querying via #exec with promise': function () {
     var db = start()
       , BlogPost = db.model('BlogPost', collection);
 
@@ -3530,7 +3482,7 @@ module.exports = {
     });
   },
 
-  'test changing query at the last minute via #run(op) with promise': function () {
+  'test changing query at the last minute via #exec(op) with promise': function () {
     var db = start()
       , BlogPost = db.model('BlogPost', collection);
 
@@ -3588,8 +3540,8 @@ module.exports = {
     post.get('meta').date.should.be.an.instanceof(Date);
 
     post.meta.visitors = 2;
-    post.get('meta').visitors.should.be.an.instanceof(MongooseNumber);
-    post.meta.visitors.should.be.an.instanceof(MongooseNumber);
+    post.get('meta').visitors.should.be.a('number');
+    post.meta.visitors.should.be.a('number');
 
     var newmeta = {
         date: date - 2000
@@ -3600,8 +3552,8 @@ module.exports = {
 
     post.meta.date.should.be.an.instanceof(Date);
     post.get('meta').date.should.be.an.instanceof(Date);
-    post.meta.visitors.should.be.an.instanceof(MongooseNumber);
-    post.get('meta').visitors.should.be.an.instanceof(MongooseNumber);
+    post.meta.visitors.should.be.a('number');
+    post.get('meta').visitors.should.be.a('number');
     (+post.meta.date).should.eql(date - 2000);
     (+post.get('meta').date).should.eql(date - 2000);
     (+post.meta.visitors).should.eql(234);
@@ -3615,8 +3567,8 @@ module.exports = {
 
     post.meta.date.should.be.an.instanceof(Date);
     post.get('meta').date.should.be.an.instanceof(Date);
-    post.meta.visitors.should.be.an.instanceof(MongooseNumber);
-    post.get('meta').visitors.should.be.an.instanceof(MongooseNumber);
+    post.meta.visitors.should.be.a('number');
+    post.get('meta').visitors.should.be.a('number');
     (+post.meta.date).should.eql(date - 3000);
     (+post.get('meta').date).should.eql(date - 3000);
     (+post.meta.visitors).should.eql(4815162342);
@@ -3639,7 +3591,7 @@ module.exports = {
 
     var t = new T({ nest: null });
 
-    should.strictEqual(t.nest.st, null);
+    should.strictEqual(t.nest.st, undefined);
     t.nest = { st: "jsconf rules" };
     t.nest.toObject().should.eql({ st: "jsconf rules" });
     t.nest.st.should.eql("jsconf rules");
@@ -4053,7 +4005,7 @@ module.exports = {
         sub.name = "Hubot1";
         sub.name.should.equal("Hubot1");
         sub.isModified('name').should.be.true;
-        t.modified.should.be.true;
+        t.isModified().should.be.true;
 
         t.save(function (err) {
           should.strictEqual(null, err);
@@ -4066,10 +4018,10 @@ module.exports = {
             sub.mixed.w = 5;
             sub.mixed.w.should.equal(5);
             sub.isModified('mixed').should.be.false;
-            sub.commit('mixed');
+            sub.markModified('mixed');
             sub.isModified('mixed').should.be.true;
-            sub.modified.should.be.true;
-            t.modified.should.be.true;
+            sub.isModified().should.be.true;
+            t.isModified().should.be.true;
 
             t.save(function (err) {
               should.strictEqual(null, err);
@@ -4237,42 +4189,69 @@ module.exports = {
     db.close();
   },
 
-  'Model#save should emit an error on its db if a callback is not passed to it': function () {
+  'Model#save should throw errors if a callback is not passed': function () {
     var db = start();
 
     var DefaultErrSchema = new Schema({});
-
-    var err = "";
-
-    DefaultErrSchema.pre('save', function (next, fn) {
+    DefaultErrSchema.pre('save', function (next) {
       try {
         next(new Error);
       } catch (error) {
         // throws b/c nothing is listening to the error event
+        db.close();
         error.should.be.instanceof(Error);
-
-        db.on('error', function (err) {
-          db.close();
-          err.should.be.an.instanceof(Error);
-        });
-
-        next(new Error);
       }
     });
+    var DefaultErr = db.model('DefaultErr1', DefaultErrSchema, 'default_err_' + random());
+    new DefaultErr().save();
+  },
 
-    var DefaultErr = db.model('DefaultErr', DefaultErrSchema, 'default_err_' + random());
+  'Model#save should emit an error on its db if a callback is not passed to it': function () {
+    var db = start();
 
-    var e = new DefaultErr();
+    db.on('error', function (err) {
+      db.close();
+      err.should.be.an.instanceof(Error);
+    });
 
-    e.save();
+    var DefaultErrSchema = new Schema({});
+    DefaultErrSchema.pre('save', function (next) {
+      next(new Error);
+    });
+    var DefaultErr = db.model('DefaultErr2', DefaultErrSchema, 'default_err_' + random());
+    new DefaultErr().save();
+  },
+
+  // once hooks-js merges our fix this will pass
+  'calling next() after a thrown error should not work': function () {
+    var db = start();
+
+    var s = new Schema({});
+    s.methods.funky = function () {
+      should.strictEqual(false, true, 'reached unreachable code');
+    }
+
+    s.pre('funky', function (next) {
+      db.close();
+      try {
+        next(new Error);
+      } catch (error) {
+        error.should.be.instanceof(Error);
+        next();
+        // throws b/c nothing is listening to the error event
+      }
+    });
+    var Kaboom = db.model('wowNext2xAndThrow', s, 'next2xAndThrow' + random());
+    new Kaboom().funky();
   },
 
   'ensureIndex error should emit on the db': function () {
     var db = start();
 
     db.on('error', function (err) {
-      /^E11000 duplicate key error index:/.test(err.message).should.equal(true);
+      if (/connection closed/.test(err.message)) return;
       db.close();
+      assert.ok(/^E11000 duplicate key error index:/.test(err.message), err);
     });
 
     var schema = new Schema({ name: { type: String } })
@@ -4342,7 +4321,7 @@ module.exports = {
 
     InvalidateSchema = new Schema({
       prop: { type: String },
-    });
+    }, { strict: false });
 
     mongoose.model('InvalidateSchema', InvalidateSchema);
 
@@ -4652,5 +4631,59 @@ module.exports = {
         affected.should.equal(1);
       });
     });
+  },
+
+  // gh-742
+  'setting an unset default value is saved': function () {
+    var db = start();
+
+    var DefaultTestObject = db.model("defaultTestObject",
+      new Schema({
+        score:{type:Number, "default":55}
+      })
+    );
+
+    var myTest = new DefaultTestObject();
+
+    myTest.save(function (err, doc){
+      should.strictEqual(null, err);
+      should.equal(doc.score, 55);
+
+      DefaultTestObject.findById(doc._id, function (err, doc){
+        should.strictEqual(null, err);
+
+        doc.score = undefined; // unset
+        doc.save(function (err, doc, count){
+          should.strictEqual(null, err);
+
+          DefaultTestObject.findById(doc._id, function (err, doc){
+            should.strictEqual(null, err);
+
+            doc.score = 55;
+            doc.save(function (err, doc, count){
+              db.close();
+              should.strictEqual(null, err);
+              should.equal(doc.score, 55);
+              should.equal(count, 1);
+            });
+          });
+        });
+      });
+    })
+  },
+
+  'path is cast to correct value when retreived from db': function () {
+    var db = start();
+    var schema = new Schema({ title: { type: 'string', index: true }});
+    var T = db.model('T', schema);
+    T.collection.insert({ title: 234 }, {safe:true}, function (err) {
+      if (err) throw err;
+      T.findOne(function (err, doc) {
+        db.close();
+        if (err) throw err;
+        assert.equal('234', doc.title);
+      });
+    });
   }
+
 };

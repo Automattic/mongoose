@@ -5,6 +5,7 @@
 
 var mongoose = require('./common').mongoose
   , should = require('should')
+  , assert = require('assert')
   , Schema = mongoose.Schema
   , Document = mongoose.Document
   , SchemaType = mongoose.SchemaType
@@ -15,7 +16,6 @@ var mongoose = require('./common').mongoose
   , SchemaTypes = Schema.Types
   , DocumentObjectId = mongoose.Types.ObjectId
   , Mixed = SchemaTypes.Mixed
-  , MongooseNumber = mongoose.Types.Number
   , MongooseArray = mongoose.Types.Array
   , vm = require('vm')
 
@@ -37,9 +37,9 @@ TestDocument.prototype.__proto__ = Document.prototype;
  * Set a dummy schema to simulate compilation.
  */
 
-TestDocument.prototype.schema = new Schema({
+TestDocument.prototype.setSchema(new Schema({
     test    : String
-});
+}));
 
 /**
  * Test.
@@ -83,6 +83,51 @@ module.exports = {
     should.strictEqual(Ferret.path('unexistent'), undefined);
 
     Checkin.path('date').should.be.an.instanceof(SchemaTypes.Date);
+
+    // check strings
+    var Checkin1 = new Schema({
+        date      : 'date'
+      , location  : {
+            lat: 'number'
+          , lng: 'Number'
+        }
+    });
+
+    Checkin1.path('date').should.be.an.instanceof(SchemaTypes.Date);
+    Checkin1.path('location.lat').should.be.an.instanceof(SchemaTypes.Number);
+    Checkin1.path('location.lng').should.be.an.instanceof(SchemaTypes.Number);
+
+    var Ferret1 = new Schema({
+        name      : "string"
+      , owner     : "oid"
+      , fur       : { type: "string" }
+      , color     : { type: "String" }
+      , checkins  : [Checkin]
+      , friends   : Array
+      , likes     : "array"
+      , alive     : "Bool"
+      , alive1    : "bool"
+      , alive2    : "boolean"
+      , extra     : "mixed"
+      , obj       : "object"
+      , buf       : "buffer"
+      , Buf       : "Buffer"
+    });
+
+    Ferret1.path('name').should.be.an.instanceof(SchemaTypes.String);
+    Ferret1.path('owner').should.be.an.instanceof(SchemaTypes.ObjectId);
+    Ferret1.path('fur').should.be.an.instanceof(SchemaTypes.String);
+    Ferret1.path('color').should.be.an.instanceof(SchemaTypes.String);
+    Ferret1.path('checkins').should.be.an.instanceof(SchemaTypes.DocumentArray);
+    Ferret1.path('friends').should.be.an.instanceof(SchemaTypes.Array);
+    Ferret1.path('likes').should.be.an.instanceof(SchemaTypes.Array);
+    Ferret1.path('alive').should.be.an.instanceof(SchemaTypes.Boolean);
+    Ferret1.path('alive1').should.be.an.instanceof(SchemaTypes.Boolean);
+    Ferret1.path('alive2').should.be.an.instanceof(SchemaTypes.Boolean);
+    Ferret1.path('extra').should.be.an.instanceof(SchemaTypes.Mixed);
+    Ferret1.path('obj').should.be.an.instanceof(SchemaTypes.Mixed);
+    Ferret1.path('buf').should.be.an.instanceof(SchemaTypes.Buffer);
+    Ferret1.path('Buf').should.be.an.instanceof(SchemaTypes.Buffer);
   },
 
   'dot notation support for accessing paths': function(){
@@ -231,6 +276,21 @@ module.exports = {
     Test.path('simple').doValidate('a12', function(err){
       should.strictEqual(err, null);
     });
+
+    Test.path('simple').doValidate('', function(err){
+      should.strictEqual(err, null);
+    });
+    Test.path('simple').doValidate(null, function(err){
+      should.strictEqual(err, null);
+    });
+    Test.path('simple').doValidate(undefined, function(err){
+      should.strictEqual(err, null);
+    });
+    Test.path('simple').validators = [];
+    Test.path('simple').match(/[1-9]/);
+    Test.path('simple').doValidate(0, function(err){
+      err.should.be.an.instanceof(ValidatorError);
+    });
   },
 
   'test string casting': function(){
@@ -270,6 +330,11 @@ module.exports = {
     Tobi.path('friends').doValidate(1, function(err){
       err.should.be.an.instanceof(ValidatorError);
     });
+
+    // null is allowed
+    Tobi.path('friends').doValidate(null, function(err){
+      should.strictEqual(err, null);
+    });
   },
 
   'test number required validation': function(){
@@ -296,10 +361,10 @@ module.exports = {
     });
 
     // test String -> Number cast
-    Tobi.path('age').cast('0').should.be.an.instanceof(MongooseNumber);
+    Tobi.path('age').cast('0').should.be.a('number');
     (+Tobi.path('age').cast('0')).should.eql(0);
 
-    Tobi.path('age').cast(0).should.be.an.instanceof(MongooseNumber);
+    Tobi.path('age').cast(0).should.be.a('number');
     (+Tobi.path('age').cast(0)).should.eql(0);
   },
 
@@ -612,9 +677,30 @@ module.exports = {
     Tobi.path('name').setters.should.have.length(2);
   },
 
+  'test setter order': function(){
+    function extract (v, self) {
+      return (v && v._id)
+        ? v._id
+        : v
+    };
+
+    var Tobi = new Schema({
+        name: { type: Schema.ObjectId, set: extract }
+    });
+
+    var id = new DocumentObjectId
+      , sid = id.toString()
+      , _id = { _id: id };
+
+    Tobi.path('name').applySetters(sid, { a: 'b' }).toString().should.eql(sid);
+    Tobi.path('name').applySetters(_id, { a: 'b' }).toString().should.eql(sid);
+    Tobi.path('name').applySetters(id, { a: 'b' }).toString().should.eql(sid);
+  },
+
   'test setters scope': function(){
-    function lowercase (v) {
+    function lowercase (v, self) {
       this.a.should.eql('b');
+      self.path.should.eql('name');
       return v.toLowerCase();
     };
 
@@ -662,9 +748,24 @@ module.exports = {
     Tobi.path('name').applyGetters('test').should.eql('test woot');
   },
 
+  'test getter order': function(){
+    function format (v, self) {
+      return v
+        ? '$' + v
+        : v
+    };
+
+    var Tobi = new Schema({
+        name: { type: Number, get: format }
+    });
+
+    Tobi.path('name').applyGetters(30, { a: 'b' }).should.equal('$30');
+  },
+
   'test getters scope': function(){
-    function woot (v) {
+    function woot (v, self) {
       this.a.should.eql('b');
+      self.path.should.eql('name');
       return v.toLowerCase();
     };
 
@@ -677,15 +778,15 @@ module.exports = {
 
   'test setters casting': function(){
     function last (v) {
-      v.should.be.a('string');
-      v.should.eql('0');
+      v.should.be.a('number');
+      v.should.equal(0);
       return 'last';
     };
 
     function first (v) {
       return 0;
     };
-    
+
     var Tobi = new Schema({
         name: { type: String, set: last }
     });
@@ -696,15 +797,15 @@ module.exports = {
 
   'test getters casting': function(){
     function last (v) {
-      v.should.be.a('string');
-      v.should.eql('0');
+      v.should.be.a('number');
+      v.should.equal(0);
       return 'last';
     };
 
     function first (v) {
       return 0;
     };
-    
+
     var Tobi = new Schema({
         name: { type: String, get: last }
     });
@@ -787,14 +888,18 @@ module.exports = {
     var Tobi = new Schema({
         name: { type: String, index: true }
       , last: { type: Number, sparse: true }
+      , nope: { type: String, index: { background: false }}
     });
 
     Tobi.index({ firstname: 1, last: 1 }, { unique: true });
+    Tobi.index({ firstname: 1, nope: 1 }, { unique: true, background: false });
 
-    Tobi.indexes.should.eql([
-        [{ name: 1 }, {}]
-      , [{ last: 1 }, { sparse: true }]
-      , [{ firstname: 1, last: 1}, {unique: true}]
+    Tobi.indexes().should.eql([
+        [{ name: 1 }, { background: true }]
+      , [{ last: 1 }, { sparse: true, background :true }]
+      , [{ nope: 1 }, { background : false}]
+      , [{ firstname: 1, last: 1}, {unique: true, background: true }]
+      , [{ firstname: 1, nope: 1 }, { unique: true, background: false }]
     ]);
   },
 
@@ -856,6 +961,14 @@ module.exports = {
     should.strictEqual(undefined, schema.virtuals.id);
   },
 
+  'selected option': function () {
+    var s = new Schema({ thought: { type: String, select: false }});
+    s.path('thought').selected.should.be.false;
+
+    var a = new Schema({ thought: { type: String, select: true }});
+    a.path('thought').selected.should.be.true;
+  },
+
   'schema creation works with objects from other contexts': function () {
     var str = 'code = {' +
       '  name: String' +
@@ -891,12 +1004,18 @@ module.exports = {
     })
   },
 
-  'array of object literal missing a `type` is interpreted as Mixed': function () {
+  'array of object literal missing a type is interpreted as DocumentArray': function () {
+    var goose = new mongoose.Mongoose;
     var s = new Schema({
         arr: [
           { something: { type: String } }
         ]
     });
+    assert.ok(s.path('arr') instanceof SchemaTypes.DocumentArray);
+    var M = goose.model('objectliteralschema', s);
+    var m = new M({ arr: [ { something: 'wicked this way comes' }] });
+    assert.equal('wicked this way comes', m.arr[0].something);
+    assert.ok(m.arr[0]._id);
   },
 
   'helpful schema debugging msg': function () {

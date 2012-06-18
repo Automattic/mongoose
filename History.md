@@ -1,3 +1,80 @@
+2.6.5 / 2012-05-24
+===================
+
+  * fixed; do not save virtuals in Model.update (#894)
+  * added; missing $ prefixed query aliases (going away in 3.x) (#884) [timoxley]
+  * fixed; setting invalid paths in strict mode (#916)
+  * fixed; resetting isNew after insert failure (#837) [boutell]
+
+2.6.4 / 2012-05-15
+===================
+
+  * updated; backport string regex $options to 2.x
+  * updated; use driver 1.0.2 (performance improvements) (#914)
+  * fixed; calling MongooseDocumentArray#id when the doc has no _id (#897)
+
+2.6.3 / 2012-05-03
+===================
+
+  * fixed; repl-set connectivity issues during failover on MongoDB 2.0.1
+  * updated; driver to 1.0.0
+  * fixed; virtuals application of subdocs when using toObject({ virtuals: true }) (#889)
+  * fixed; MongooseArray#pull of ObjectId correctly updates the array itself (#881)
+
+2.6.1 / 2012-04-30
+===================
+
+  * fixed; connection assignment in mongoose#model (#853, #877)
+  * fixed; incorrect reported num of affected docs in update ops (#862)
+
+2.6.0 / 2012-04-19
+===================
+
+  * updated; hooks.js to 0.2.1
+  * fixed; issue with passing undefined to a hook callback. thanks to [chrisleishman] for reporting.
+  * fixed; updating/setting nested objects in strict schemas (#843) as reported by [kof]
+  * fixed; Query#{update,remove}() work without callbacks again (#788)
+  * fixed; modifying subdoc along with parent array $atomic op (#842)
+
+2.5.14 / 2012-04-13
+===================
+
+  * fixed; setting an unset default value (#742)
+  * fixed; doc.isSelected(otherpath) when only _id is selected (#730)
+  * updated; docs
+
+2.5.13 / 2012-03-22
+===================
+
+  * fixed; failing validation of unselected required paths (#730,#713)
+  * fixed; emitting connection error when only one listener (#759)
+  * fixed; MongooseArray#splice was not returning values (#784) [chrisleishman]
+
+2.5.12 / 2012-03-21
+===================
+
+  * fixed; honor the `safe` option in all ensureIndex calls
+  * updated; node-mongodb-native driver to 0.9.9-7
+
+2.5.11 / 2012-03-15
+===================
+
+  * added; introspection for getters/setters (#745)
+  * updated; node-mongodb-driver to 0.9.9-5
+  * added; tailable method to Query (#769) [holic]
+  * fixed; Number min/max validation of null (#764) [btamas]
+  * added; more flexible user/password connection options (#738) [KarneAsada]
+
+2.5.10 / 2012-03-06
+===================
+
+  * updated; node-mongodb-native driver to 0.9.9-4
+  * added; Query#comment()
+  * fixed; allow unsetting arrays
+  * fixed; hooking the set method of subdocuments (#746)
+  * fixed; edge case in hooks
+  * fixed; allow $id and $ref in queries (fixes compatibility with mongoose-dbref) (#749) [richtera]
+  * added; default path selection to SchemaTypes
 
 2.5.9 / 2012-02-22
 ===================

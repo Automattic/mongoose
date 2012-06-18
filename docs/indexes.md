@@ -38,6 +38,14 @@ Unique sparse indexes:
         name: { type: String, unique: true, sparse: true }
     })
 
+[Geospatial](http://www.mongodb.org/display/DOCS/Geospatial+Indexing) indexes:
+
+    var Point = new Schema({
+        location: {type: Array, index: "2d"}
+    })
+    
+Please note, that only the basic 2-dimensional array storage is supported for location data storage.
+
 Compound indexes are defined on the `Schema` itself.
 
     User.index({ first: 1, last: -1 }, { unique: true })

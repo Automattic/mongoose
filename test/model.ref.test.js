@@ -52,6 +52,7 @@ var posts = 'blogposts_' + random()
 
 mongoose.model('RefBlogPost', BlogPost);
 mongoose.model('RefUser', User);
+mongoose.model('RefAlternateUser', User);
 
 /**
  * Tests.
@@ -79,7 +80,7 @@ module.exports = {
         BlogPost
           .findById(post._id)
           .populate('_creator')
-          .run(function (err, post) {
+          .exec(function (err, post) {
             db.close();
             should.strictEqual(err, null);
 
@@ -123,7 +124,7 @@ module.exports = {
         BlogPost
           .findById(post._id)
           .populate('_creator')
-          .run(function (err, post) {
+          .exec(function (err, post) {
             db.close();
             err.should.be.an.instanceof(Error);
             err.message.should.equal('woot');
@@ -151,8 +152,8 @@ module.exports = {
 
         BlogPost
           .findById(post._id)
-          .populate('_creator', ['email'])
-          .run(function (err, post) {
+          .populate('_creator', 'email')
+          .exec(function (err, post) {
             db.close();
             should.strictEqual(err, null);
 
@@ -184,14 +185,14 @@ module.exports = {
         BlogPost
         .findById(post._id)
         .populate('_creator', 'email', { name: 'Peanut' })
-        .run(function (err, post) {
+        .exec(function (err, post) {
           should.strictEqual(err, null);
           should.strictEqual(post._creator, null);
 
           BlogPost
           .findById(post._id)
           .populate('_creator', 'email', { name: 'Banana' })
-          .run(function (err, post) {
+          .exec(function (err, post) {
             db.close();
             should.strictEqual(err, null);
             post._creator.should.be.an.instanceof(User);
@@ -223,7 +224,7 @@ module.exports = {
         BlogPost
           .findById(post._id)
           .populate('_creator')
-          .run(function (err, post) {
+          .exec(function (err, post) {
             should.strictEqual(err, null);
 
             post._creator.should.be.an.instanceof(User);
@@ -243,7 +244,7 @@ module.exports = {
                 BlogPost
                   .findById(post._id)
                   .populate('_creator')
-                  .run(function (err, post) {
+                  .exec(function (err, post) {
                     db.close();
                     should.strictEqual(err, null);
 
@@ -277,7 +278,7 @@ module.exports = {
         BlogPost
         .findById(post._id)
         .populate('_creator', {'name': 1})
-        .run(function (err, post) {
+        .exec(function (err, post) {
           should.strictEqual(err, null);
 
           post._creator.should.be.an.instanceof(User);
@@ -295,8 +296,8 @@ module.exports = {
 
               BlogPost
               .findById(post._id)
-              .populate('_creator', {email: 0})
-              .run(function (err, post) {
+              .populate('_creator', '-email')
+              .exec(function (err, post) {
                 db.close();
                 should.strictEqual(err, null);
 
@@ -342,7 +343,7 @@ module.exports = {
             BlogPost
               .find({ _id: { $in: [post1._id, post2._id ] } })
               .populate('fans')
-              .run(function (err, blogposts) {
+              .exec(function (err, blogposts) {
                 db.close();
                 should.strictEqual(err, null);
 
@@ -406,7 +407,7 @@ module.exports = {
             BlogPost
             .find({ $or: [{ _id: post1._id }, { _id: post2._id }] })
             .populate('fans')
-            .run(function (err, blogposts) {
+            .exec(function (err, blogposts) {
               db.close();
               err.should.be.an.instanceof(Error);
               err.message.should.equal('woot 2');
@@ -449,7 +450,7 @@ module.exports = {
             BlogPost
             .find({ _id: { $in: [post1._id, post2._id ] } })
             .populate('fans', 'name')
-            .run(function (err, blogposts) {
+            .exec(function (err, blogposts) {
               db.close();
               should.strictEqual(err, null);
 
@@ -510,7 +511,7 @@ module.exports = {
               BlogPost
               .find({ _id: { $in: [post1._id, post2._id ] } })
               .populate('fans', '', { gender: 'female', _id: { $in: [fan2] }})
-              .run(function (err, blogposts) {
+              .exec(function (err, blogposts) {
                 should.strictEqual(err, null);
 
                 blogposts[0].fans.length.should.equal(1);
@@ -526,7 +527,7 @@ module.exports = {
                 BlogPost
                 .find({ _id: { $in: [post1._id, post2._id ] } })
                 .populate('fans', false, { gender: 'female' })
-                .run(function (err, blogposts) {
+                .exec(function (err, blogposts) {
                   db.close();
                   should.strictEqual(err, null);
 
@@ -596,7 +597,7 @@ module.exports = {
               BlogPost
               .find({ _id: { $in: [post1._id, post2._id ] } })
               .populate('fans', undefined, { _id: fan3 })
-              .run(function (err, blogposts) {
+              .exec(function (err, blogposts) {
                 should.strictEqual(err, null);
 
                 blogposts[0].fans.length.should.equal(1);
@@ -614,7 +615,7 @@ module.exports = {
                 BlogPost
                 .find({ _id: { $in: [post1._id, post2._id ] } })
                 .populate('fans', 0, { gender: 'female' })
-                .run(function (err, blogposts) {
+                .exec(function (err, blogposts) {
                   db.close();
                   should.strictEqual(err, null);
 
@@ -685,7 +686,7 @@ module.exports = {
               BlogPost
               .find({ _id: { $in: [post1._id, post2._id ] } })
               .populate('fans', 'name email', { gender: 'female', age: 25 })
-              .run(function (err, blogposts) {
+              .exec(function (err, blogposts) {
                 db.close();
                 should.strictEqual(err, null);
 
@@ -710,7 +711,7 @@ module.exports = {
     });
   },
 
-  'test populating an array of refs, changing one, and removing one': function () {
+  'test populating an array of refs changing one and removing one': function () {
     var db = start()
       , BlogPost = db.model('RefBlogPost', posts)
       , User = db.model('RefUser', users);
@@ -741,8 +742,8 @@ module.exports = {
 
         BlogPost
         .find({ _id: { $in: [post1._id, post2._id ] } })
-        .populate('fans', ['name'])
-        .run(function (err, blogposts) {
+        .populate('fans', 'name')
+        .exec(function (err, blogposts) {
           should.strictEqual(err, null);
 
           blogposts[0].fans[0].name.should.equal('Fan 1');
@@ -761,8 +762,8 @@ module.exports = {
             should.strictEqual(err, null);
 
             BlogPost
-            .findById(blogposts[1]._id, [], { populate: ['fans'] })
-            .run(function (err, post) {
+            .findById(blogposts[1]._id, '', { populate: ['fans'] })
+            .exec(function (err, post) {
               should.strictEqual(err, null);
 
               post.fans[0].name.should.equal('Fan 3');
@@ -775,7 +776,7 @@ module.exports = {
                 BlogPost
                 .findById(post._id)
                 .populate('fans')
-                .run(function (err, post) {
+                .exec(function (err, post) {
                   db.close();
                   should.strictEqual(err, null);
                   post.fans.length.should.equal(1);
@@ -814,7 +815,7 @@ module.exports = {
             .findById(post._id)
             .populate('_creator')
             .populate('comments._creator')
-            .run(function (err, post) {
+            .exec(function (err, post) {
               db.close();
               should.strictEqual(err, null);
 
@@ -855,8 +856,8 @@ module.exports = {
 
           BlogPost
             .findById(post._id)
-            .populate('comments._creator', ['email'])
-            .run(function (err, post) {
+            .populate('comments._creator', 'email')
+            .exec(function (err, post) {
               db.close();
               should.strictEqual(err, null);
 
@@ -899,7 +900,7 @@ module.exports = {
           BlogPost
             .findById(post._id)
             .populate('comments._creator', {'email': 1}, { name: /User/ })
-            .run(function (err, post) {
+            .exec(function (err, post) {
               db.close();
               should.strictEqual(err, null);
 
@@ -943,7 +944,7 @@ module.exports = {
           BlogPost
           .findById(post._id)
           .populate('comments._idontexist', 'email')
-          .run(function (err, post) {
+          .exec(function (err, post) {
             should.strictEqual(err, null);
             should.exist(post);
             post.comments.length.should.equal(2);
@@ -954,7 +955,7 @@ module.exports = {
             BlogPost
             .findById(post._id)
             .populate('comments._creator', 'email')
-            .run(function (err, post) {
+            .exec(function (err, post) {
               db.close();
               should.strictEqual(err, null);
 
@@ -986,8 +987,8 @@ module.exports = {
 
       BlogPost
       .findById(post._id)
-      .populate('comments._creator', ['email'])
-      .run(function (err, returned) {
+      .populate('comments._creator', 'email')
+      .exec(function (err, returned) {
         db.close();
         worked = true;
         should.strictEqual(err, null);
@@ -1021,8 +1022,8 @@ module.exports = {
 
           BlogPost
           .findById(post._id)
-          .populate('fans', ['name'])
-          .run(function (err, returned) {
+          .populate('fans', 'name')
+          .exec(function (err, returned) {
             db.close();
             should.strictEqual(err, null);
             returned.id.should.equal(post.id);
@@ -1073,8 +1074,8 @@ module.exports = {
         M.where('_id').in([post1, post2])
         .populate('fans', 'name', { gender: 'female' })
         .populate('users', 'name', { gender: 'male' })
-        .populate('comments._creator', ['email'], { name: null })
-        .run(function (err, posts) {
+        .populate('comments._creator', 'email', { name: null })
+        .exec(function (err, posts) {
           db.close();
           should.strictEqual(err, null);
 
@@ -1146,9 +1147,9 @@ module.exports = {
           should.strictEqual(err, null);
 
           M.findById(m1)
-          .populate('kids.user', ["name"])
-          .populate('kids.post', ["title"], { title: "woot" })
-          .run(function (err, o) {
+          .populate('kids.user', "name")
+          .populate('kids.post', "title", { title: "woot" })
+          .exec(function (err, o) {
             db.close();
             should.strictEqual(err, null);
             should.strictEqual(o.kids.length, 2);
@@ -1179,7 +1180,7 @@ module.exports = {
 
         P.findById(post)
         .populate('fans', null, null, { sort: 'name' })
-        .run(function (err, post) {
+        .exec(function (err, post) {
           should.strictEqual(err, null);
 
           post.fans.length.should.equal(3);
@@ -1189,7 +1190,7 @@ module.exports = {
 
           P.findById(post)
           .populate('fans', 'name', null, { sort: [['name', -1]] })
-          .run(function (err, post) {
+          .exec(function (err, post) {
             should.strictEqual(err, null);
 
             post.fans.length.should.equal(3);
@@ -1202,7 +1203,7 @@ module.exports = {
 
             P.findById(post)
             .populate('fans', 'age', { age: { $gt: 3 }}, { sort: [['name', 'desc']] })
-            .run(function (err, post) {
+            .exec(function (err, post) {
               db.close();
               should.strictEqual(err, null);
 
@@ -1250,7 +1251,7 @@ module.exports = {
       note.save(function (err) {
         should.strictEqual(err, null);
 
-        Note.findById(note.id).populate('author').run(function (err, note) {
+        Note.findById(note.id).populate('author').exec(function (err, note) {
           db.close();
           should.strictEqual(err, null);
           note.body.should.equal('Buy Milk');
@@ -1286,7 +1287,7 @@ module.exports = {
       note.save(function (err) {
         should.strictEqual(err, null);
 
-        Note.findById(note.id).populate('author').run(function (err, note) {
+        Note.findById(note.id).populate('author').exec(function (err, note) {
           db.close();
           should.strictEqual(err, null);
           note.body.should.equal('Buy Milk');
@@ -1359,7 +1360,7 @@ module.exports = {
           .populate('user')
           .populate('num')
           .populate('str')
-          .run(function (err, comment) {
+          .exec(function (err, comment) {
             should.strictEqual(err, null);
 
             comment.set({text: 'test2'});
@@ -1391,7 +1392,7 @@ module.exports = {
       var m2 = new M2({ things: [a, b]});
       m2.save(function (err) {
         should.strictEqual(null, err);
-        M2.findById(m2).populate('things').run(function (err, doc) {
+        M2.findById(m2).populate('things').exec(function (err, doc) {
           db.close();
           should.strictEqual(null, err);
           doc.things.length.should.equal(2);
@@ -1477,7 +1478,7 @@ module.exports = {
         BlogPost
           .findById(post._id)
           .populate('_creator')
-          .run(function (err, post) {
+          .exec(function (err, post) {
             db.close();
             should.strictEqual(err, null);
 
@@ -1515,7 +1516,7 @@ module.exports = {
       note.save(function (err) {
         should.strictEqual(err, null);
 
-        Note.findById(note.id).populate('author').run(function (err, note) {
+        Note.findById(note.id).populate('author').exec(function (err, note) {
           db.close();
           should.strictEqual(err, null);
           note.body.should.equal('Buy Milk');
@@ -1524,5 +1525,38 @@ module.exports = {
         });
       });
     })
+  },
+
+  // gh-773
+  'test populating with custom model selection': function () {
+    var db = start()
+      , BlogPost = db.model('RefBlogPost', posts)
+      , User = db.model('RefAlternateUser', users);
+
+    User.create({
+        name  : 'Daniel'
+      , email : 'daniel.baulig@gmx.de'
+    }, function (err, creator) {
+      should.strictEqual(err, null);
+
+      BlogPost.create({
+          title     : 'woot'
+        , _creator  : creator
+      }, function (err, post) {
+        should.strictEqual(err, null);
+
+        BlogPost
+          .findById(post._id)
+          .populate('_creator', 'email', 'RefAlternateUser')
+          .exec(function (err, post) {
+            db.close();
+            should.strictEqual(err, null);
+
+            post._creator.should.be.an.instanceof(User);
+            post._creator.isInit('name').should.be.false;
+            post._creator.email.should.equal('daniel.baulig@gmx.de');
+          });
+      });
+    });
   }
 };

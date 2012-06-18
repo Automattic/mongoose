@@ -26,19 +26,19 @@ module.exports = {
   'should detect a path as required if it has been required': function () {
     var ar = new ActiveRoster();
     ar.require('hello');
-    ar.stateOf('hello').should.equal('require');
+    ar.paths['hello'].should.equal('require');
   },
 
   'should detect a path as inited if it has been inited': function () {
     var ar = new ActiveRoster();
     ar.init('hello');
-    ar.stateOf('hello').should.equal('init');
+    ar.paths['hello'].should.equal('init');
   },
 
   'should detect a path as modified': function () {
     var ar = new ActiveRoster();
     ar.modify('hello');
-    ar.stateOf('hello').should.equal('modify');
+    ar.paths['hello'].should.equal('modify');
   },
 
   'should remove a path from an old state upon a state change': function () {

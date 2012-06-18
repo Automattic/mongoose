@@ -4,11 +4,13 @@
  */
 
 var mongoose = require('./common').mongoose
+  , random = require('../lib/utils').random
   , MongooseArray = mongoose.Types.Array
   , MongooseDocumentArray = mongoose.Types.DocumentArray
   , EmbeddedDocument = require('../lib/types/embedded')
   , DocumentArray = require('../lib/types/documentarray')
   , Schema = mongoose.Schema
+  , assert = require('assert')
 
 /**
  * Setup.
@@ -33,7 +35,7 @@ function TestDoc (schema) {
       title: { type: String }
   });
 
-  Subdocument.prototype.schema = schema || SubSchema;
+  Subdocument.prototype.setSchema(schema || SubSchema);
 
   return Subdocument;
 }
@@ -103,6 +105,26 @@ module.exports = {
     var a = new MongooseDocumentArray([sub3]);
     a.id(id3).title.should.equal('rock-n-roll');
     a.id(sub3._id).title.should.equal('rock-n-roll');
+
+    // test with no _id
+    var NoId = new Schema({
+        title: { type: String }
+    }, { noId: true });
+
+    var Subdocument = TestDoc(NoId);
+
+    var sub4 = new Subdocument();
+    sub4.title = 'rock-n-roll';
+
+    var a = new MongooseDocumentArray([sub4])
+      , threw = false;
+    try {
+      a.id('i better not throw');
+    } catch (err) {
+      threw = err;
+    }
+    threw.should.equal(false);
+
   },
 
   'inspect works with bad data': function () {
@@ -127,6 +149,20 @@ module.exports = {
       console.error(err.stack);
     }
     threw.should.be.false;
+  },
+
+  'EmbeddedDocumentArray#create': function () {
+    var a = new MongooseDocumentArray([]);
+    assert.equal('function', typeof a.create);
+
+    var schema = new Schema({ docs: [new Schema({ name: 'string' })] });
+    var T = mongoose.model('embeddedDocument#create_test', schema, 'asdfasdfa'+ random());
+    var t = new T;
+    assert.equal('function', typeof t.docs.create);
+    var subdoc = t.docs.create({ name: 100 });
+    assert.ok(subdoc._id);
+    assert.equal(subdoc.name, '100');
+    assert.ok(subdoc instanceof EmbeddedDocument);
   }
 
 };

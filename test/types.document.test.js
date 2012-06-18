@@ -17,8 +17,18 @@ var should = require('should')
  * Setup.
  */
 
+function Dummy () {
+  mongoose.Document.call(this, {});
+}
+Dummy.prototype.__proto__ = mongoose.Document.prototype;
+Dummy.prototype.setSchema(new Schema)
+
 function Subdocument () {
-  EmbeddedDocument.call(this, {}, new DocumentArray);
+  var arr = new DocumentArray;
+  arr._path = 'jsconf.ar'
+  arr._parent = new Dummy;
+  arr[0] = this;
+  EmbeddedDocument.call(this, {}, arr);
 };
 
 /**
@@ -31,10 +41,10 @@ Subdocument.prototype.__proto__ = EmbeddedDocument.prototype;
  * Set schema.
  */
 
-Subdocument.prototype.schema = new Schema({
+Subdocument.prototype.setSchema(new Schema({
     test: { type: String, required: true }
   , work: { type: String, validate: /^good/ }
-});
+}));
 
 /**
  * Schema.
@@ -63,8 +73,9 @@ module.exports = {
       a.set('work', 'nope');
 
       a.save(function(err){
-        err.should.be.an.instanceof(ValidationError);
-        err.toString().should.eql('ValidationError: Validator "required" failed for path test, Validator failed for path work');
+        a.parent._validationError.should.be.an.instanceof(ValidationError);
+        a.parent.errors['jsconf.ar.0.work'].name.should.eql('ValidatorError');
+        a.parent._validationError.toString().should.eql('ValidationError: Validator "required" failed for path test, Validator failed for path work');
       });
     },
 

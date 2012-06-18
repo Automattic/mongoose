@@ -1,6 +1,7 @@
 
 var start = require('./common')
   , should = require('should')
+  , assert = require('assert')
   , random = require('../lib/utils').random
   , mongoose = start.mongoose
   , Mongoose = mongoose.Mongoose
@@ -9,12 +10,13 @@ var start = require('./common')
 var uri = process.env.MONGOOSE_SHARD_TEST_URI;
 
 if (!uri) {
-  console.log('\033[30m', '\n', 'You\'re not testing shards!'
+  console.log('\033[31m', '\n', 'You\'re not testing shards!'
             , '\n', 'Please set the MONGOOSE_SHARD_TEST_URI env variable.', '\n'
             , 'e.g: `mongodb://localhost:27017/database', '\n'
             , 'Sharding must already be enabled on your database'
             , '\033[39m');
 
+  // let expresso shut down this test
   exports.r = function expressoHack(){}
   return;
 }
@@ -29,8 +31,20 @@ var collection = 'shardperson_' + random();
 mongoose.model('ShardPerson', schema, collection);
 
 var db = start({ uri: uri });
+db.on('error', function (err) {
+  if (/failed to connect/.test(err)) {
+    err.message = 'Shard test error: '
+      + err.message
+      + '\n'
+      + '    Are you sure there is a db running at '
+      + uri + ' ?'
+      + '\n'
+  }
+  // let expresso shut down this test
+  exports.r = function expressoHack(){}
+  throw err;
+});
 db.on('open', function () {
-
   // set up a sharded test collection
   var P = db.model('ShardPerson', collection);
 
@@ -118,39 +132,39 @@ var tests = {
 
     P.create({ name: 'ryu', likes: ['street fighting']}, function (err, ryu) {
       --pending || db.close();
-      should.exist(err);
-      err.message.should.equal('tried to insert object with no valid shard key');
+      assert.ok(err);
+      /tried to insert object with no valid shard key/.test(err.message).should.be.true;
     });
 
-    P.create({ likes: ['street fighting']}, function (err, ryu) { should.exist(err);
+    P.create({ likes: ['street fighting']}, function (err, ryu) { assert.ok(err);
       --pending || db.close();
-      should.exist(err);
-      err.message.should.equal('tried to insert object with no valid shard key');
+      assert.ok(err);
+      /tried to insert object with no valid shard key/.test(err.message).should.be.true;
     });
 
-    P.create({ name: 'ryu' }, function (err, ryu) { should.exist(err);
+    P.create({ name: 'ryu' }, function (err, ryu) { assert.ok(err);
       --pending || db.close();
-      should.exist(err);
-      err.message.should.equal('tried to insert object with no valid shard key');
+      assert.ok(err);
+      /tried to insert object with no valid shard key/.test(err.message).should.be.true;
     });
 
-    P.create({ age: 49 }, function (err, ryu) { should.exist(err);
+    P.create({ age: 49 }, function (err, ryu) { assert.ok(err);
       --pending || db.close();
-      should.exist(err);
-      err.message.should.equal('tried to insert object with no valid shard key');
+      assert.ok(err);
+      /tried to insert object with no valid shard key/.test(err.message).should.be.true;
     });
 
     P.create({ likes: ['street fighting'], age: 8 }, function (err, ryu) {
       --pending || db.close();
-      should.exist(err);
-      err.message.should.equal('tried to insert object with no valid shard key');
+      assert.ok(err);
+      /tried to insert object with no valid shard key/.test(err.message).should.be.true;
     });
 
     var p = new P;
     p.save(function (err) {
       --pending || db.close();
-      should.exist(err);
-      err.message.should.equal('tried to insert object with no valid shard key');
+      assert.ok(err);
+      /tried to insert object with no valid shard key/.test(err.message).should.be.true;
     });
 
   },
@@ -162,19 +176,18 @@ var tests = {
     P.create({ name: 'ken', age: 27 }, function (err, ken) {
       should.strictEqual(null, err);
 
-      P.update({ _id: ken._id }, { likes: ['kicking', 'punching'] }, function (err) {
-        should.exist(err);
-        "right object doesn't have full shard key".should.equal(err.message);
+      P.update({ name: 'ken' }, { likes: ['kicking', 'punching'] }, function (err) {
+        /full shard key/.test(err.message).should.be.true;
 
         P.update({ _id: ken._id, name: 'ken' }, { likes: ['kicking', 'punching'] }, function (err) {
-          should.exist(err);
+          assert.ok(!err);
 
           P.update({ _id: ken._id, age: 27 }, { likes: ['kicking', 'punching'] }, function (err) {
-            should.exist(err);
+            assert.ok(!err);
 
             P.update({ age: 27 }, { likes: ['kicking', 'punching'] }, function (err) {
               db.close();
-              should.exist(err);
+              assert.ok(err);
             });
           });
         });
@@ -193,7 +206,7 @@ var tests = {
 
       chunli.age = 20;
       chunli.save(function (err) {
-        /^Can't modify shard key's value field/.test(err.message).should.be.true;
+        /^Can't modify shard key's value/.test(err.message).should.be.true;
 
         chunli._shardval.name.should.equal('chun li');
         chunli._shardval.age.should.equal(19);
@@ -207,7 +220,7 @@ var tests = {
           chunli.name='chuuuun liiiii';
           chunli.save(function (err) {
             db.close();
-            /^Can't modify shard key's value field/.test(err.message).should.be.true;
+            /^Can't modify shard key's value/.test(err.message).should.be.true;
           });
         });
       });

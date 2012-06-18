@@ -17,7 +17,6 @@ var start = require('./common')
   , DocumentObjectId = mongoose.Types.ObjectId
   , DocumentArray = mongoose.Types.DocumentArray
   , EmbeddedDocument = mongoose.Types.Embedded
-  , MongooseNumber = mongoose.Types.Number
   , MongooseArray = mongoose.Types.Array
   , MongooseError = mongoose.Error;
 
@@ -48,7 +47,7 @@ var BlogPost = new Schema({
   , numbers   : [Number]
   , owners    : [ObjectId]
   , comments  : [Comments]
-});
+}, { strict: false });
 
 BlogPost.virtual('titleWithAuthor')
   .get(function () {
@@ -68,18 +67,21 @@ BlogPost.static('woot', function(){
   return this;
 });
 
-mongoose.model('BlogPost', BlogPost);
+mongoose.model('BlogPostForUpdates', BlogPost);
 
 var collection = 'blogposts_' + random();
 
-var strictSchema = new Schema({ name: String }, { strict: true });
+var strictSchema = new Schema({ name: String, x: { nested: String }});
+strictSchema.virtual('foo').get(function () {
+  return 'i am a virtual FOO!'
+});
 mongoose.model('UpdateStrictSchema', strictSchema);
 
 module.exports = {
 
   'test updating documents': function () {
     var db = start()
-      , BlogPost = db.model('BlogPost', collection)
+      , BlogPost = db.model('BlogPostForUpdates', collection)
       , title = 'Tobi ' + random()
       , author = 'Brian ' + random()
       , newTitle = 'Woot ' + random()
@@ -453,7 +455,7 @@ module.exports = {
     }
 
     function update16 (post, ret) {
-      ret.comments.$pushAll([{body: 'hi'}, {body:'there'}]);
+      ret.comments.push({body: 'hi'}, {body:'there'});
       ret.save(function (err) {
         should.strictEqual(null, err);
         BlogPost.findById(post, function (err, ret) {
@@ -484,7 +486,39 @@ module.exports = {
     db.close();
 
     var doc = S.find()._castUpdate({ ignore: true });
-    Object.keys(doc.$set).length.should.equal(0);
+    should.eql(false, doc);
+    var doc = S.find()._castUpdate({ $unset: {x: 1}});
+    Object.keys(doc.$unset).length.should.equal(1);
+  },
+
+  'test updating numbers atomically': function () {
+    var db = start()
+      , BlogPost = db.model('BlogPostForUpdates', collection)
+      , totalDocs = 4
+      , saveQueue = [];
+
+    var post = new BlogPost();
+    post.set('meta.visitors', 5);
+
+    post.save(function(err){
+      if (err) throw err;
+
+      for (var i = 0; i < 4; ++i) {
+        BlogPost
+        .update({ _id: post._id }, { $inc: { 'meta.visitors': 1 }}, function (err) {
+          if (err) throw err;
+          --totalDocs || complete();
+        });
+      }
+
+      function complete () {
+        BlogPost.findOne({ _id: post.get('_id') }, function (err, doc) {
+          db.close();
+          if (err) throw err;
+          doc.get('meta.visitors').should.equal(9);
+        });
+      };
+    });
   },
 
   'Model.update should honor strict schemas': function () {
@@ -497,13 +531,23 @@ module.exports = {
 
       S.update({ _id: s._id }, { ignore: true }, function (err, affected) {
         should.strictEqual(null, err);
-        affected.should.equal(1);
+        affected.should.equal(0);
 
         S.findById(s._id, function (err, doc) {
-          db.close();
           should.strictEqual(null, err);
           should.not.exist(doc.ignore);
           should.not.exist(doc._doc.ignore);
+
+          S.update({ _id: s._id }, { name: 'Drukqs', foo: 'fooey' }, function (err, affected) {
+            should.strictEqual(null, err);
+            affected.should.equal(1);
+
+            S.findById(s._id, function (err, doc) {
+              db.close();
+              should.strictEqual(null, err);
+              should.not.exist(doc._doc.foo);
+            });
+          });
         });
       });
     });
@@ -511,7 +555,7 @@ module.exports = {
 
   'model.update passes number of affected documents': function () {
     var db = start()
-      , B = db.model('BlogPost', 'wwwwowowo'+random())
+      , B = db.model('BlogPostForUpdates', 'wwwwowowo'+random())
 
     B.create({ title: 'one'},{title:'two'},{title:'three'}, function (err) {
       should.strictEqual(null, err);

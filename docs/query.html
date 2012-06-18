@@ -224,7 +224,7 @@
 <pre><code>query
 .where('name', 'Space Ghost')
 .where('age').gte(21).lte(65)
-.run(callback)
+.exec(callback)
 </code></pre>
 
 <p>In this case, <code>gte()</code> and <code>lte()</code> operate on the previous path if not explicitly passed. The above query results in the following query expression:</p>
@@ -241,11 +241,11 @@
 
 <p><code>fn</code> can be either a function or a string.</p>
 
-<h2>Query#$or, Query#or</h2>
+<h2>Query#or</h2>
 
 <p>Specifies the <a href="http://www.mongodb.org/display/DOCS/Advanced+Queries#AdvancedQueries-%24or">$or</a> operator.</p>
 
-<pre><code>query.$or(array);
+<pre><code>query.or(array);
 </code></pre>
 
 <p><code>array</code> is an array of expressions.</p>
@@ -253,11 +253,11 @@
 <pre><code>query.or([{ color: 'blue' }, { color: 'red' }]);
 </code></pre>
 
-<h2>Query#$nor, Query#nor</h2>
+<h2>Query#nor</h2>
 
 <p>Specifies the <a href="http://www.mongodb.org/display/DOCS/Advanced+Queries#AdvancedQueries-%24nor">$nor</a> operator.</p>
 
-<pre><code>query.$nor(array);
+<pre><code>query.nor(array);
 </code></pre>
 
 <p><code>array</code> is an array of expressions.</p>
@@ -276,16 +276,16 @@
 query.where(path, val);
 </code></pre>
 
-<h2>Query#gt, Query#$gt</h2>
+<h2>Query#gt</h2>
 
 <p>Specifies a <a href="http://www.mongodb.org/display/DOCS/Advanced+Queries#AdvancedQueries-%3C%2C%3C%3D%2C%3E%2C%3E%3D">greater than</a> expression.</p>
 
-<pre><code>query.$gt(path, val);
+<pre><code>query.gt(path, val);
 </code></pre>
 
-<p><code>$gt</code> is also one of the methods with extra chaining sugar: when only one argument is passed, it uses the path used the last call to <code>where()</code>. Example:</p>
+<p><code>gt</code> is also one of the methods with extra chaining sugar: when only one argument is passed, it uses the path used the last call to <code>where()</code>. Example:</p>
 
-<pre><code>Model.where('age').$gt(21)
+<pre><code>Model.where('age').gt(21)
 </code></pre>
 
 <p>Results in:</p>
@@ -293,16 +293,16 @@ query.where(path, val);
 <pre><code>{ age: { $gt: 21 }}
 </code></pre>
 
-<h2>Query#gte, Query#$gte</h2>
+<h2>Query#gte</h2>
 
 <p>Specifies a <a href="http://www.mongodb.org/display/DOCS/Advanced+Queries#AdvancedQueries-%3C%2C%3C%3D%2C%3E%2C%3E%3D">greater than or equal to</a> expression.</p>
 
-<pre><code>query.$gte(path, val);
+<pre><code>query.gte(path, val);
 </code></pre>
 
-<p><code>$gte</code> is also one of the methods with extra chaining sugar: when only one argument is passed, it uses the path used the last call to <code>where()</code>. Example:</p>
+<p><code>gte</code> is also one of the methods with extra chaining sugar: when only one argument is passed, it uses the path used the last call to <code>where()</code>. Example:</p>
 
-<pre><code>Model.where('age').$gte(21)
+<pre><code>Model.where('age').gte(21)
 </code></pre>
 
 <p>Results in:</p>
@@ -310,16 +310,16 @@ query.where(path, val);
 <pre><code>{ age: { $gte: 21 }}
 </code></pre>
 
-<h2>Query#lt, Query#$lt</h2>
+<h2>Query#lt</h2>
 
 <p>Specifies a <a href="http://www.mongodb.org/display/DOCS/Advanced+Queries#AdvancedQueries-%3C%2C%3C%3D%2C%3E%2C%3E%3D">less than</a> expression.</p>
 
-<pre><code>query.$lt(path, val);
+<pre><code>query.lt(path, val);
 </code></pre>
 
-<p><code>$lt</code> is also one of the methods with extra chaining sugar: when only one argument is passed, it uses the path used the last call to <code>where()</code>. Example:</p>
+<p><code>lt</code> is also one of the methods with extra chaining sugar: when only one argument is passed, it uses the path used the last call to <code>where()</code>. Example:</p>
 
-<pre><code>Model.where('age').$lt(21)
+<pre><code>Model.where('age').lt(21)
 </code></pre>
 
 <p>Results in:</p>
@@ -327,16 +327,16 @@ query.where(path, val);
 <pre><code>{ age: { $lt: 21 }}
 </code></pre>
 
-<h2>Query#lte, Query#$lte</h2>
+<h2>Query#lte</h2>
 
 <p>Specifies a <a href="http://www.mongodb.org/display/DOCS/Advanced+Queries#AdvancedQueries-%3C%2C%3C%3D%2C%3E%2C%3E%3D">less than or equal to</a> expression.</p>
 
-<pre><code>query.$lte(path, val);
+<pre><code>query.lte(path, val);
 </code></pre>
 
-<p><code>$lte</code> is also one of the methods with extra chaining sugar: when only one argument is passed, it uses the path used the last call to <code>where()</code>. Example:</p>
+<p><code>lte</code> is also one of the methods with extra chaining sugar: when only one argument is passed, it uses the path used the last call to <code>where()</code>. Example:</p>
 
-<pre><code>Model.where('age').$lte(21)
+<pre><code>Model.where('age').lte(21)
 </code></pre>
 
 <p>Results in:</p>
@@ -344,11 +344,11 @@ query.where(path, val);
 <pre><code>{ age: { $lte: 21 }}
 </code></pre>
 
-<h2>Query#ne, Query#$ne, Query#notEqualTo</h2>
+<h2>Query#ne</h2>
 
 <p>Specifies the <a href="http://www.mongodb.org/display/DOCS/Advanced+Queries#AdvancedQueries-%24ne">$ne</a> operator.</p>
 
-<pre><code>query.$ne(path, val);
+<pre><code>query.ne(path, val);
 </code></pre>
 
 <p>These methods have extra sugar in that when only one argument is passed, the path in the last call to <code>where()</code> is used. Example:</p>
@@ -356,24 +356,19 @@ query.where(path, val);
 <pre><code>query.where('_id').ne('4ecf92f31993a52c58e07f6a')
 </code></pre>
 
-<p>and</p>
-
-<pre><code>query.notEqualTo('_id', '4ecf92f31993a52c58e07f6a')
-</code></pre>
-
-<p>both result in</p>
+<p>results in</p>
 
 <pre><code>{ _id: { $ne: ObjectId('4ecf92f31993a52c58e07f6a') }}
 </code></pre>
 
-<h2>Query#in, Query#$in</h2>
+<h2>Query#in</h2>
 
 <p>Specifies the <a href="http://www.mongodb.org/display/DOCS/Advanced+Queries#AdvancedQueries-%24in">$in</a> operator.</p>
 
-<pre><code>query.$in(path, array)
+<pre><code>query.in(path, array)
 </code></pre>
 
-<p>These methods have extra sugar in that when only one argument is passed, the path in the last call to <code>where()</code> is used.</p>
+<p>This method has extra sugar in that when only one argument is passed, the path in the last call to <code>where()</code> is used.</p>
 
 <pre><code>query.where('tags').in(['game', 'fun', 'holiday'])
 </code></pre>
@@ -383,14 +378,14 @@ query.where(path, val);
 <pre><code>{ tags: { $in: ['game', 'fun', 'holiday'] }}
 </code></pre>
 
-<h2>Query#nin, Query#$nin</h2>
+<h2>Query#nin</h2>
 
 <p>Specifies the <a href="http://www.mongodb.org/display/DOCS/Advanced+Queries#AdvancedQueries-%24nin">$nin</a> operator.</p>
 
-<pre><code>query.$nin(path, array)
+<pre><code>query.nin(path, array)
 </code></pre>
 
-<p>These methods have extra sugar in that when only one argument is passed, the path in the last call to <code>where()</code> is used.</p>
+<p>This method has extra sugar in that when only one argument is passed, the path in the last call to <code>where()</code> is used.</p>
 
 <pre><code>query.where('games').nin(['boring', 'lame'])
 </code></pre>
@@ -400,14 +395,14 @@ query.where(path, val);
 <pre><code>{ games: { $nin: ['boring', 'lame'] }}
 </code></pre>
 
-<h2>Query#all, Query#$all</h2>
+<h2>Query#all</h2>
 
 <p>Specifies the <a href="http://www.mongodb.org/display/DOCS/Advanced+Queries#AdvancedQueries-%24all">$all</a> operator.</p>
 
-<pre><code>query.$all(path, array)
+<pre><code>query.all(path, array)
 </code></pre>
 
-<p>These methods have extra sugar in that when only one argument is passed, the path in the last call to <code>where()</code> is used.</p>
+<p>This method has extra sugar in that when only one argument is passed, the path in the last call to <code>where()</code> is used.</p>
 
 <pre><code>query.where('games').all(['fun', 'exhausting'])
 </code></pre>
@@ -417,16 +412,16 @@ query.where(path, val);
 <pre><code>{ games: { $all: ['fun', 'exhausting'] }}
 </code></pre>
 
-<h2>Query#regex, Query#$regex</h2>
+<h2>Query#regex</h2>
 
 <p>Specifies the <a href="http://www.mongodb.org/display/DOCS/Advanced+Queries#AdvancedQueries-RegularExpressions">$regex</a> operator.</p>
 
 <pre><code>query.regex('name.first', /^a/i)
 </code></pre>
 
-<p>These methods have extra sugar in that when only one argument is passed, the path in the last call to <code>where()</code> is used.</p>
+<p>This method has extra sugar in that when only one argument is passed, the path in the last call to <code>where()</code> is used.</p>
 
-<pre><code>query.where('name.first').$regex(/^a/i)
+<pre><code>query.where('name.first').regex(/^a/i)
 </code></pre>
 
 <p>results in</p>
@@ -434,14 +429,14 @@ query.where(path, val);
 <pre><code>{ 'name.first': { $regex: /^a/i }}
 </code></pre>
 
-<h2>Query#size, Query#$size</h2>
+<h2>Query#size</h2>
 
 <p>Specifies the <a href="http://www.mongodb.org/display/DOCS/Advanced+Queries#AdvancedQueries-%24size">$size</a> operator.</p>
 
-<pre><code>query.$size(path, integer)
+<pre><code>query.size(path, integer)
 </code></pre>
 
-<p>These methods have extra sugar in that when only one argument is passed, the path in the last call to <code>where()</code> is used.</p>
+<p>This method has extra sugar in that when only one argument is passed, the path in the last call to <code>where()</code> is used.</p>
 
 <pre><code>query.size('comments', 2)
 query.where('comments').size(2)
@@ -452,7 +447,7 @@ query.where('comments').size(2)
 <pre><code>{ comments: { $size: 2 }}
 </code></pre>
 
-<h2>Query#mod, Query#$mod</h2>
+<h2>Query#mod</h2>
 
 <p>Specifies the <a href="http://www.mongodb.org/display/DOCS/Advanced+Queries#AdvancedQueries-%24mod">$mod</a> operator.</p>
 
@@ -461,7 +456,7 @@ query.mod(path, array)
 
 query.mod(path, 10, 1)
 
-query.where(path).$mod(10, 1)
+query.where(path).mod(10, 1)
 </code></pre>
 
 <p>all result in</p>
@@ -469,7 +464,7 @@ query.where(path).$mod(10, 1)
 <pre><code>{ path: { $mod: [10, 1] }}
 </code></pre>
 
-<h2>Query#exists, Query#$exists</h2>
+<h2>Query#exists</h2>
 
 <p>Specifies the <a href="http://www.mongodb.org/display/DOCS/Advanced+Queries#AdvancedQueries-%24exists">$exists</a> operator.</p>
 
@@ -506,7 +501,7 @@ query.where('occupation').exists(false);
 <pre><code>{ occupation: { $exists: false }}
 </code></pre>
 
-<h2>Query#elemMatch, Query#$elemMatch</h2>
+<h2>Query#elemMatch</h2>
 
 <p>Specifies the <a href="http://www.mongodb.org/display/DOCS/Advanced+Queries#AdvancedQueries-%24elemMatch">$elemMatch</a> operator.</p>
 
@@ -533,7 +528,7 @@ query.elemMatch(path, function)
 <pre><code>{ comments: { $elemMatch: { author: 'bnoguchi', votes: { $gte: 5 }}}}
 </code></pre>
 
-<h2>Query#within, Query#$within</h2>
+<h2>Query#within</h2>
 
 <pre><code>query.within.box
 query.within.center
@@ -541,19 +536,19 @@ query.within.center
 
 <p>todo</p>
 
-<h2>Query#box, Query#$box</h2>
+<h2>Query#box</h2>
 
 <p>todo</p>
 
-<h2>Query#center, Query#$center</h2>
+<h2>Query#center</h2>
 
 <p>todo</p>
 
-<h2>Query#centerSphere, Query#$centerSphere</h2>
+<h2>Query#centerSphere</h2>
 
 <p>todo</p>
 
-<h2>Query#near, Query#$near</h2>
+<h2>Query#near</h2>
 
 <p>Specifies the <a href="http://www.mongodb.org/display/DOCS/Geospatial+Indexing#GeospatialIndexing-Querying">$near</a> operator.</p>
 
@@ -570,7 +565,7 @@ query.where(path).$near(10, 1)
 <pre><code>{ path: { $near: [10, 1] }}
 </code></pre>
 
-<h2>Query#maxDistance, Query#$maxDistance</h2>
+<h2>Query#maxDistance</h2>
 
 <p>Specifies the <a href="http://www.mongodb.org/display/DOCS/Geospatial+Indexing#GeospatialIndexing-Querying">$maxDistance</a> operator.</p>
 
@@ -582,11 +577,11 @@ query.where(path).$near(10, 1)
 <pre><code>{ checkin: { $near: [40, -72], $maxDistance: 1 }}
 </code></pre>
 
-<h2>Query#select, Query#fields</h2>
+<h2>Query#select</h2>
 
 <p>Specifies which <a href="http://www.mongodb.org/display/DOCS/Retrieving+a+Subset+of+Fields">subset of fields</a> you want to return.</p>
 
-<pre><code>query.select('title', 'name')
+<pre><code>query.select('title name'})
 // only _id, title, and name fields will be populated in your docs
 </code></pre>
 
@@ -596,19 +591,9 @@ query.where(path).$near(10, 1)
 // return everything but age and contact
 </code></pre>
 
-<p>or space delimited string syntax:</p>
-
-<pre><code>query.fields('title name')
-// return title and name only
-</code></pre>
-
-<p>or pass an array of field names:</p>
-
-<pre><code>query.select(['title', 'name'])
-// return title and name only
-</code></pre>
-
 <h2>Query#only</h2>
+
+<p><em>deprecated</em></p>
 
 <p>Specifies a <a href="http://www.mongodb.org/display/DOCS/Retrieving+a+Subset+of+Fields">subset of fields</a> to return. This is like <code>select()</code> but this option only specifies which fields you want returned.</p>
 
@@ -619,6 +604,8 @@ query.only(['title', 'name'])
 
 <h2>Query#exclude</h2>
 
+<p><em>deprecated</em></p>
+
 <p>Specifies a <a href="http://www.mongodb.org/display/DOCS/Retrieving+a+Subset+of+Fields">subset of fields</a> to return. This is like <code>select()</code> but this option only specifies which fields you DO NOT want returned.</p>
 
 <pre><code>query.exclude('title name')
@@ -626,7 +613,7 @@ query.exclude('title', 'name')
 query.exclude(['title', 'name'])
 </code></pre>
 
-<h2>Query#slice, Query#$slice</h2>
+<h2>Query#slice</h2>
 
 <p>Retrieve a sub-range of elements in an array with the <a href="http://www.mongodb.org/display/DOCS/Retrieving+a+Subset+of+Fields#RetrievingaSubsetofFields-RetrievingaSubrangeofArrayElements">$slice</a> method.</p>
 
@@ -645,7 +632,7 @@ query.where('tags').slice(-5) // first 5 tags
 query.where('tags').slice([-20, 10]) // 20 from the end, limit 10
 </code></pre>
 
-<p><code>$slice</code> is also one of the methods with extra chaining sugar: when only one argument is passed, it uses the path used the last call to <code>where()</code>. Example:</p>
+<p><code>slice</code> is also one of the methods with extra chaining sugar: when only one argument is passed, it uses the path used the last call to <code>where()</code>. Example:</p>
 
 <pre><code>query.slice('tags', -5)
 </code></pre>
@@ -672,6 +659,8 @@ query.sort('path', 1, 'another.path', -1)
 
 <h2>Query#asc</h2>
 
+<p><em>deprecated</em></p>
+
 <p>Sorting sugar.</p>
 
 <pre><code>query.asc('path' [, paths])
@@ -688,6 +677,8 @@ query.sort('path', 1, 'another.path', -1)
 </code></pre>
 
 <h2>Query#desc</h2>
+
+<p><em>deprecated</em></p>
 
 <p>Sorting sugar.</p>
 
@@ -759,7 +750,7 @@ query.sort('path', 1, 'another.path', -1)
 
 <p>and you wanted to tell MongoDB to use that index for your query (in the off chance that MongoDB was not able to figure our that it should use it) you can give MongoDB a hint like so:</p>
 
-<pre><code>query.hint({ name: 1, title: 1}).run(callback)
+<pre><code>query.hint({ name: 1, title: 1}).exec(callback)
 </code></pre>
 
 <h2>Query#comment</h2>
@@ -777,6 +768,8 @@ query.sort('path', 1, 'another.path', -1)
 </code></pre>
 
 <h2>Query#findOne</h2>
+
+<p>Sends the findOne command to MongoDB.</p>
 
 <pre><code>query.findOne([callback])
 </code></pre>
@@ -819,7 +812,7 @@ query.sort('path', 1, 'another.path', -1)
 <pre><code>query.remove(callback)
 </code></pre>
 
-<h2>Query#run, Query#exec</h2>
+<h2>Query#exec</h2>
 
 <p>Executes the query passing the results to the optional <code>callback</code>.</p>
 
@@ -828,12 +821,14 @@ query.sort('path', 1, 'another.path', -1)
 
 <p>Typically used in chaining scenarios:</p>
 
-<pre><code>Model.findOne().where('points').$gt(1000).run(function (err, doc) {
+<pre><code>Model.findOne().where('points').$gt(1000).exec(function (err, doc) {
   if (err) ...
 });
 </code></pre>
 
 <h2>Query#each</h2>
+
+<p><em>deprecated</em></p>
 
 <p>A streaming cursor interface.</p>
 

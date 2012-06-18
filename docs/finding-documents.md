@@ -72,7 +72,7 @@ Creates a [Query](/docs/query.html) for this model. Handy when expressing comple
     .asc('age')
     .slaveOk()
     .hint({ age: 1, name: 1 })
-    .run(callback);
+    .exec(callback);
 
 ## Model.$where
 

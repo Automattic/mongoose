@@ -243,7 +243,7 @@ dog.findSimilarType(function (err, dogs) {
 .findSimilarType()
 .where('name': /rover/i)
 .limit(20)
-.run(function (err, rovers) {
+.exec(function (err, rovers) {
   if (err) ...
 })
 </code></pre>
@@ -253,7 +253,7 @@ dog.findSimilarType(function (err, dogs) {
 <p>Statics are pretty much the same as methods but allow for defining functions that exist directly on your Model.</p>
 
 <pre><code>AnimalSchema.statics.search = function search (name, cb) {
-  return this.where('name', new RegExp(name, 'i')).run(cb);
+  return this.where('name', new RegExp(name, 'i')).exec(cb);
 }
 
 Animal.search('Rover', function (err) {

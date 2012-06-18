@@ -260,7 +260,7 @@ aaron.save(function (err) {
 <pre><code>Story
 .findOne({ title: /Nintendo/i })
 .populate('_creator') // &lt;--
-.run(function (err, story) {
+.exec(function (err, story) {
   if (err) ..
   console.log('The creator is %s', story._creator.name);
   // prints "The creator is Aaron"
@@ -276,7 +276,7 @@ aaron.save(function (err) {
 <pre><code>Story
 .findOne({ title: /Nintendo/i })
 .populate('_creator', ['name']) // &lt;-- only return the Persons name
-.run(function (err, story) {
+.exec(function (err, story) {
   if (err) ..
 
   console.log('The creator is %s', story._creator.name);
@@ -313,7 +313,7 @@ aaron.save(function (err) {
 <pre><code>Person
 .findOne({ name: 'Aaron' })
 .populate('stories') // &lt;-- only works if you pushed refs to children
-.run(function (err, person) {
+.exec(function (err, person) {
   if (err) ..
 
   console.log('JSON for person is: ', person);
@@ -325,7 +325,7 @@ aaron.save(function (err) {
 <pre><code>Story
 .find({ _creator: aaron._id })
 .populate('_creator') // &lt;-- not really necessary
-.run(function (err, stories) {
+.exec(function (err, stories) {
   if (err) ..
 
   console.log('The stories JSON is an array: ', stories);
@@ -348,7 +348,7 @@ guille.save(function (err) {
     Story
     .findOne({ title: /Nintendo/i })
     .populate('_creator', ['name'])
-    .run(function (err, story) {
+    .exec(function (err, story) {
       if (err) ..
 
       console.log('The creator is %s', story._creator.name)

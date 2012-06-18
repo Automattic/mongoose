@@ -299,19 +299,7 @@ The driver being used defaults to [node-mongodb-native](https://github.com/chris
 
 ## Mongoose Plugins
 
-The following plugins are currently available for use with mongoose:
-
-- [mongoose-types](https://github.com/bnoguchi/mongoose-types) - Adds
-  several additional types (e.g., Email) that you can use in your
-  Schema declarations
-- [mongoose-auth](https://github.com/bnoguchi/mongoose-auth) - A drop in 
-  solution for your auth needs. Currently supports Password, Facebook,
-  Twitter, Github, and more.
-- [mongoose-joins](https://github.com/goulash1971/mongoose-joins) - Adds simple join support
-- [mongoose-dbref](https://github.com/goulash1971/mongoose-dbref) - An alternative DBRef option
-- [mongoose-flatmatcher](https://github.com/marksweiss/mongoose-flatmatcher) - A query pre-processor that maps flat name/value pairs to schemas 
-- [mongoose-ttl](https://github.com/aheckmann/mongoose-ttl) - TTL support
-- [mongoose-keywordize](https://github.com/aheckmann/mongoose-keywordize) - auto keywords generation
+Take a peek at the [plugins page](https://github.com/LearnBoost/mongoose/wiki/Plugins) to see contributions from the community. Add your own!
 
 ## Contributing to Mongoose
 

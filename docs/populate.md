@@ -51,7 +51,7 @@ So far we haven't done anything special. We've merely created a `Person` and a `
     Story
     .findOne({ title: /Nintendo/i })
     .populate('_creator') // <--
-    .run(function (err, story) {
+    .exec(function (err, story) {
       if (err) ..
       console.log('The creator is %s', story._creator.name);
       // prints "The creator is Aaron"
@@ -66,7 +66,7 @@ What if we only want a few specific fields returned for the query? This can be a
     Story
     .findOne({ title: /Nintendo/i })
     .populate('_creator', ['name']) // <-- only return the Persons name
-    .run(function (err, story) {
+    .exec(function (err, story) {
       if (err) ..
 
       console.log('The creator is %s', story._creator.name);
@@ -101,7 +101,7 @@ This allows you do a find & populate like:
     Person
     .findOne({ name: 'Aaron' })
     .populate('stories') // <-- only works if you pushed refs to children
-    .run(function (err, person) {
+    .exec(function (err, person) {
       if (err) ..
 
       console.log('JSON for person is: ', person);
@@ -112,7 +112,7 @@ However, it is debatable that you really want two sets of pointers as they may g
     Story
     .find({ _creator: aaron._id })
     .populate('_creator') // <-- not really necessary
-    .run(function (err, stories) {
+    .exec(function (err, stories) {
       if (err) ..
 
       console.log('The stories JSON is an array: ', stories);
@@ -134,7 +134,7 @@ Now that we have a story we realized that the `_creator` was incorrect. We can u
         Story
         .findOne({ title: /Nintendo/i })
         .populate('_creator', ['name'])
-        .run(function (err, story) {
+        .exec(function (err, story) {
           if (err) ..
 
           console.log('The creator is %s', story._creator.name)

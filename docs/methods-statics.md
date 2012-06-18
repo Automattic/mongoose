@@ -32,7 +32,7 @@ Note that we return what `.find()` returns in our method. The advantages are two
     .findSimilarType()
     .where('name': /rover/i)
     .limit(20)
-    .run(function (err, rovers) {
+    .exec(function (err, rovers) {
       if (err) ...
     })
 
@@ -41,7 +41,7 @@ Note that we return what `.find()` returns in our method. The advantages are two
 Statics are pretty much the same as methods but allow for defining functions that exist directly on your Model.
 
     AnimalSchema.statics.search = function search (name, cb) {
-      return this.where('name', new RegExp(name, 'i')).run(cb);
+      return this.where('name', new RegExp(name, 'i')).exec(cb);
     }
 
     Animal.search('Rover', function (err) {

@@ -731,9 +731,27 @@ query.sort('path', 1, 'another.path', -1)
 
 <h2>Query#slaveOk</h2>
 
-<p>Sets the <a href="http://www.mongodb.org/display/DOCS/Replica+Pairs#ReplicaPairs-Queryingtheslave">slaveOk</a> option.</p>
+<p>Sets the <a href="http://www.mongodb.org/display/DOCS/Replica+Pairs#ReplicaPairs-Queryingtheslave">slaveOk</a> option or <code>true</code> with no arguments.</p>
 
 <pre><code>query.slaveOk(Boolean)
+query.slaveOk() // equivalent to query.slaveOk(true)
+</code></pre>
+
+<h2>Query#tailable</h2>
+
+<p>Sets the <a href="http://www.mongodb.org/display/DOCS/Tailable+Cursors">tailable</a> option or <code>true</code> with no arguments.</p>
+
+<pre><code>query.tailable(Boolean)
+query.tailable() // equivalent to query.tailable(true)
+</code></pre>
+
+<p>Tailable queries can only be used on capped collections, can only return documents in their natural order, and never use indexes. Unless the cursor dies, a tailable <a href="/docs/querystream.html">QueryStream</a> will remain open and receive documents as they are inserted into the collection, much like the Unix <code>tail -f</code> command.</p>
+
+<pre><code>var stream = Model.find().tailable().stream();
+
+stream.on('data', function (doc) {
+    // do stuff
+});
 </code></pre>
 
 <h2>Query#hint</h2>

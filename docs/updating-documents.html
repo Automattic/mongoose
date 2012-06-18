@@ -236,6 +236,24 @@ Model.update(query, { $set: { name: 'jason borne' }}, options, callback)
 </code></pre>
 
 <p>This helps prevent accidentally overwriting all of your document(s) with <code>{ name: 'jason borne' }</code>.</p>
+
+<p>Also note: although values are casted to their appropriate types when using <code>update</code>, the following are <strong>not</strong> applied:</p>
+
+<ul>
+<li>defaults</li>
+<li>setters</li>
+<li>validators</li>
+<li>middleware triggered on <code>save</code></li>
+</ul>
+
+<p>If you want those features, please use the following convention rather than <code>update</code>:</p>
+
+<pre><code>Model.findOne({ name: 'borne' }, function (err, doc){
+  doc.name = 'jason borne';
+  doc.visits.$inc();
+  doc.save();
+});
+</code></pre>
         </div>
 
         <div id="footer">

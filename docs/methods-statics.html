@@ -222,7 +222,7 @@
 });
 
 AnimalSchema.methods.findSimilarType = function findSimilarType (cb) {
-  return this.find({ type: this.type }, cb);
+  return this.model('Animal').find({ type: this.type }, cb);
 };
 </code></pre>
 

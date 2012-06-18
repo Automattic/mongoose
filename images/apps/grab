@@ -11,12 +11,16 @@ func() {
     name=${BASH_REMATCH[2]}
 
     # send URL to the firefox session
-    firefox --width 1030 --height 768 $url &
+    # firefox --width 1030 --height 768 $url &
+    /Applications/Firefox.app/Contents/MacOS/firefox --width 1030 --height 768 $url &
     echo started firefox with $url
+    echo preparing screencapture ...
 
     # take a picture after waiting a bit for the load to finish
     sleep 4
-    gm import -window root -crop 1004x768+414+228 -resize 500x350 $name.png
+    # gm import -window root -crop 1004x768+414+228 -resize 500x350 $name.png
+    screencapture -wo $name.png
+    gm convert $name.png -crop 1004x768+0+80 -resize 500x350 $name.png
     echo grabbed screenshot $name.png
 }
 

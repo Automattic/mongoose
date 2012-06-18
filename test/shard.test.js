@@ -1,6 +1,5 @@
 
 var start = require('./common')
-  , should = require('should')
   , assert = require('assert')
   , random = require('../lib/utils').random
   , mongoose = start.mongoose
@@ -30,154 +29,169 @@ var schema = new Schema({
 var collection = 'shardperson_' + random();
 mongoose.model('ShardPerson', schema, collection);
 
-var db = start({ uri: uri });
-db.on('error', function (err) {
-  if (/failed to connect/.test(err)) {
-    err.message = 'Shard test error: '
-      + err.message
-      + '\n'
-      + '    Are you sure there is a db running at '
-      + uri + ' ?'
-      + '\n'
-  }
-  // let expresso shut down this test
-  exports.r = function expressoHack(){}
-  throw err;
-});
-db.on('open', function () {
-  // set up a sharded test collection
-  var P = db.model('ShardPerson', collection);
-
-  var cmd = {};
-  cmd.shardcollection = db.name + '.' + collection;
-  cmd.key = P.schema.options.shardkey;
-
-  P.db.db.executeDbAdminCommand(cmd,function (err, res) {
-    db.close();
-
-    if (err) throw err;
-
-    if (!(res && res.documents && res.documents[0] && res.documents[0].ok)) {
-      throw new Error('could not shard test collection ' + collection);
-    }
-
-    // assign exports to tell expresso to begin
-    Object.keys(tests).forEach(function (test) {
-      exports[test] = tests[test];
+var db;
+describe('shard', function(){
+  before(function (done) {
+    db = start({ uri: uri });
+    db.on('error', function (err) {
+      if (/failed to connect/.test(err)) {
+        err.message = 'Shard test error: '
+          + err.message
+          + '\n'
+          + '    Are you sure there is a db running at '
+          + uri + ' ?'
+          + '\n'
+      }
+      // let expresso shut down this test
+      throw err;
     });
+    db.on('open', function () {
+      // set up a sharded test collection
+      var P = db.model('ShardPerson', collection);
 
+      var cmd = {};
+      cmd.shardcollection = db.name + '.' + collection;
+      cmd.key = P.schema.options.shardkey;
+
+      P.db.db.executeDbAdminCommand(cmd,function (err, res) {
+        db.close();
+        assert.ifError(err);
+
+        if (!(res && res.documents && res.documents[0] && res.documents[0].ok)) {
+          throw new Error('could not shard test collection ' + collection);
+        }
+
+        done();
+      });
+    });
   });
-});
 
-var tests = {
-
-  'can read and write to a shard': function () {
+  it('can read and write to a shard', function (done) {
     var db = start({ uri:  uri })
     var P = db.model('ShardPerson', collection);
 
     P.create({ name: 'ryu', age: 25, likes: ['street fighting']}, function (err, ryu) {
-      should.strictEqual(null, err);
+      assert.ifError(err);
       P.findById(ryu._id, function (err, doc) {
         db.close();
-        should.strictEqual(null, err);
-        doc.id.should.equal(ryu.id);
+        assert.ifError(err);
+        assert.equal(doc.id,ryu.id);
+        done();
       });
     });
-  },
+  })
 
-  'save() and remove() works with shard keys transparently': function () {
+  it('save() and remove() works with shard keys transparently', function (done) {
     var db = start({ uri:  uri })
     var P = db.model('ShardPerson', collection);
 
     var zangief = new P({ name: 'Zangief', age: 33 });
     zangief.save(function (err) {
-      should.strictEqual(null, err);
+      assert.ifError(err);
 
-      zangief._shardval.name.should.equal('Zangief');
-      zangief._shardval.age.should.equal(33);
+      assert.equal(zangief._shardval.name, 'Zangief');
+      assert.equal(zangief._shardval.age, 33);
 
       P.findById(zangief._id, function (err, zang) {
-        should.strictEqual(null, err);
+        assert.ifError(err);
 
-        zang._shardval.name.should.equal('Zangief');
-        zang._shardval.age.should.equal(33);
+        assert.equal(zang._shardval.name, 'Zangief');
+        assert.equal(zang._shardval.age, 33);
 
         zang.likes = ['spinning', 'laughing'];
         zang.save(function (err) {
-          should.strictEqual(null, err);
+          assert.ifError(err);
 
-          zang._shardval.name.should.equal('Zangief');
-          zang._shardval.age.should.equal(33);
+          assert.equal(zang._shardval.name, 'Zangief');
+          assert.equal(zang._shardval.age, 33);
 
           zang.likes.addToSet('winning');
           zang.save(function (err) {
-            should.strictEqual(null, err);
-            zang._shardval.name.should.equal('Zangief');
-            zang._shardval.age.should.equal(33);
+            assert.ifError(err);
+            assert.equal(zang._shardval.name, 'Zangief');
+            assert.equal(zang._shardval.age, 33);
             zang.remove(function (err) {
               db.close();
-              should.strictEqual(null, err);
+              assert.ifError(err);
+              done();
             });
           });
         });
       });
     });
-  },
+  })
 
-  'inserting to a sharded collection without the full shard key fails': function () {
+  it('inserting to a sharded collection without the full shard key fails', function (done) {
     var db = start({ uri:  uri })
     var P = db.model('ShardPerson', collection);
 
     var pending = 6;
 
     P.create({ name: 'ryu', likes: ['street fighting']}, function (err, ryu) {
-      --pending || db.close();
       assert.ok(err);
-      /tried to insert object with no valid shard key/.test(err.message).should.be.true;
+      assert.ok(/tried to insert object with no valid shard key/.test(err.message));
+      if (!--pending) {
+        db.close();
+        done();
+      }
     });
 
     P.create({ likes: ['street fighting']}, function (err, ryu) { assert.ok(err);
-      --pending || db.close();
       assert.ok(err);
-      /tried to insert object with no valid shard key/.test(err.message).should.be.true;
+      assert.ok(/tried to insert object with no valid shard key/.test(err.message));
+      if (!--pending) {
+        db.close();
+        done();
+      }
     });
 
     P.create({ name: 'ryu' }, function (err, ryu) { assert.ok(err);
-      --pending || db.close();
       assert.ok(err);
-      /tried to insert object with no valid shard key/.test(err.message).should.be.true;
+      assert.ok(/tried to insert object with no valid shard key/.test(err.message));
+      if (!--pending) {
+        db.close();
+        done();
+      }
     });
 
     P.create({ age: 49 }, function (err, ryu) { assert.ok(err);
-      --pending || db.close();
       assert.ok(err);
-      /tried to insert object with no valid shard key/.test(err.message).should.be.true;
+      assert.ok(/tried to insert object with no valid shard key/.test(err.message));
+      if (!--pending) {
+        db.close();
+        done();
+      }
     });
 
     P.create({ likes: ['street fighting'], age: 8 }, function (err, ryu) {
-      --pending || db.close();
       assert.ok(err);
-      /tried to insert object with no valid shard key/.test(err.message).should.be.true;
+      assert.ok(/tried to insert object with no valid shard key/.test(err.message))
+      if (!--pending) {
+        db.close();
+        done();
+      }
     });
 
     var p = new P;
     p.save(function (err) {
-      --pending || db.close();
       assert.ok(err);
-      /tried to insert object with no valid shard key/.test(err.message).should.be.true;
+      assert.ok(/tried to insert object with no valid shard key/.test(err.message));
+      if (!--pending) {
+        db.close();
+        done();
+      }
     });
+  });
 
-  },
-
-  'updating a sharded collection without the full shard key fails': function () {
+  it('updating a sharded collection without the full shard key fails', function (done) {
     var db = start({ uri:  uri })
     var P = db.model('ShardPerson', collection);
 
     P.create({ name: 'ken', age: 27 }, function (err, ken) {
-      should.strictEqual(null, err);
+      assert.ifError(err);
 
       P.update({ name: 'ken' }, { likes: ['kicking', 'punching'] }, function (err) {
-        /full shard key/.test(err.message).should.be.true;
+        assert.ok(/full shard key/.test(err.message));
 
         P.update({ _id: ken._id, name: 'ken' }, { likes: ['kicking', 'punching'] }, function (err) {
           assert.ok(!err);
@@ -188,42 +202,45 @@ var tests = {
             P.update({ age: 27 }, { likes: ['kicking', 'punching'] }, function (err) {
               db.close();
               assert.ok(err);
+              done();
             });
           });
         });
       });
     });
-  },
+  })
 
-  'updating shard key values fails': function () {
+  it('updating shard key values fails', function (done) {
     var db = start({ uri:  uri })
     var P = db.model('ShardPerson', collection);
     P.create({ name: 'chun li', age: 19, likes: ['street fighting']}, function (err, chunli) {
-      should.strictEqual(null, err);
+      assert.ifError(err);
 
-      chunli._shardval.name.should.equal('chun li');
-      chunli._shardval.age.should.equal(19);
+      assert.equal(chunli._shardval.name, 'chun li');
+      assert.equal(chunli._shardval.age, 19);
 
       chunli.age = 20;
       chunli.save(function (err) {
-        /^Can't modify shard key's value/.test(err.message).should.be.true;
+        assert.ok(/^Can't modify shard key's value/.test(err.message));
 
-        chunli._shardval.name.should.equal('chun li');
-        chunli._shardval.age.should.equal(19);
+        assert.equal(chunli._shardval.name, 'chun li');
+        assert.equal(chunli._shardval.age, 19);
 
         P.findById(chunli._id, function (err, chunli) {
-          should.strictEqual(null, err);
+          assert.ifError(err);
 
-          chunli._shardval.name.should.equal('chun li');
-          chunli._shardval.age.should.equal(19);
+          assert.equal(chunli._shardval.name, 'chun li');
+          assert.equal(chunli._shardval.age, 19);
 
           chunli.name='chuuuun liiiii';
           chunli.save(function (err) {
             db.close();
-            /^Can't modify shard key's value/.test(err.message).should.be.true;
+            assert.ok(/^Can't modify shard key's value/.test(err.message));
+            done();
           });
         });
       });
     });
-  }
-}
+  });
+
+})

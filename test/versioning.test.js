@@ -50,9 +50,9 @@ var BlogPost = new Schema({
 
 mongoose.model('Versioning', BlogPost);
 
-module.exports = {
+describe('versioning', function(){
 
-  'versioning': function () {
+  it('works', function (done) {
     var db = start()
       , V = db.model('Versioning')
 
@@ -218,11 +218,8 @@ module.exports = {
       assert.ok(d[1].$inc, 'a $set of an array should trigger versioning');
       assert.ok(!d[1].$addToSet);
 
-      done();
-    }
-
-    function done () {
       db.close();
+      done();
     }
 
     function save (a, b, cb) {
@@ -253,9 +250,9 @@ module.exports = {
       }
     }
 
-  },
+  })
 
-  'versioning without version key': function () {
+  it('versioning without version key', function (done) {
     var db = start()
       , V = db.model('Versioning')
 
@@ -279,11 +276,12 @@ module.exports = {
         doc.comments[0].title = 'no version was included';
         var d = doc._delta();
         assert.ok(!d[0].__v, 'no version key was selected so should not be included');
+        done();
       })
     }
-  },
+  })
 
-  'version works with strict docs': function () {
+  it('version works with strict docs', function (done) {
     var db = start();
     var schema = new Schema({ str: ['string'] }, { strict: true, collection: 'versionstrict_'+random() });
     var M = db.model('VersionStrict', schema);
@@ -304,13 +302,14 @@ module.exports = {
             assert.equal(1, m._doc.__v);
             assert.equal(2, m.str.length);
             assert.ok(!~m.str.indexOf('death'));
+            done();
           })
         })
       });
     })
-  },
+  })
 
-  'version works with existing unversioned docs': function () {
+  it('version works with existing unversioned docs', function (done) {
     var db = start()
       , V = db.model('Versioning')
 
@@ -331,13 +330,14 @@ module.exports = {
             db.close();
             assert.ifError(err);
             assert.ok(d);
+            done();
           });
         });
       });
     });
-  },
+  })
 
-  'versionKey is configurable': function () {
+  it('versionKey is configurable', function (done) {
     var db =start();
     var schema = new Schema(
         { configured: 'bool' }
@@ -350,7 +350,8 @@ module.exports = {
         db.close();
         assert.ifError(err);
         assert.equal(0, v._doc.lolwat);
+        done();
       });
     });
-  }
-}
+  })
+})

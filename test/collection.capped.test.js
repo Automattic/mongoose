@@ -22,14 +22,12 @@ var coll = 'capped_' + random();
  * Test.
  */
 
-module.exports = {
-
-  'schema should have option size': function(){
+describe('collections: capped:', function(){
+  it('schemas should have option size', function(){
     assert.ok(capped.options.capped);
     assert.equal(1000, capped.options.capped.size);
-  },
-
-  'capped collection creation': function () {
+  })
+  it('creation', function(done){
     var db = start();
     var Capped = db.model('Capped', capped, coll);
     Capped.collection.isCapped(function (err, isCapped) {
@@ -43,11 +41,11 @@ module.exports = {
         assert.ifError(err);
         assert.ok(isCapped, 'should reuse the capped collection in the db');
         assert.equal(Capped.collection.name, Capped2.collection.name);
+        done();
       });
     });
-  },
-
-  'capped collection creation using a number': function () {
+  });
+  it('creation using a number', function(done){
     var db = start();
     var schema = new Schema({ key: 'string' }, { capped: 100 });
     var Capped = db.model('Capped3', schema);
@@ -79,6 +77,7 @@ module.exports = {
                   db.close();
                   assert.ok(err);
                   assert.equal(10101, err.code);
+                  done();
                 });
               });
             });
@@ -86,9 +85,8 @@ module.exports = {
         });
       });
     });
-  },
-
-  'attempting to use existing non-capped collection as capped errors': function () {
+  })
+  it('attempting to use existing non-capped collection as capped errors', function(done){
     var db = start();
     var opts = { safe: true }
     var conn = 'capped_existing_'+random();
@@ -104,6 +102,7 @@ module.exports = {
           clearTimeout(timer);
           db.close();
           assert.ok(/non-capped collection exists/.test(err));
+          done();
         });
 
         var C = db.model('CappedExisting', capped, conn);
@@ -113,6 +112,5 @@ module.exports = {
         }, 900);
       });
     });
-  }
-
-}
+  })
+})

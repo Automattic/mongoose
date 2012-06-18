@@ -2,13 +2,14 @@
 TESTS = $(shell find test/ -name '*.test.js')
 
 test:
+	@./node_modules/.bin/mocha --reporter list $(TESTFLAGS) $(TESTS)
+	@node test/dropdb.js
+
+test-old:
 	@NODE_ENV=test ./support/expresso/bin/expresso \
 		$(TESTFLAGS) \
 		$(TESTS)
 	@node test/dropdb.js
-
-test-cov:
-	@TESTFLAGS=--cov $(MAKE) test
 
 docs: docs/api.html
 

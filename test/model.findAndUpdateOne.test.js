@@ -4,7 +4,6 @@
  */
 
 var start = require('./common')
-  , should = require('should')
   , assert = require('assert')
   , mongoose = start.mongoose
   , random = require('../lib/utils').random
@@ -79,9 +78,8 @@ mongoose.model('UpdateOneStrictSchema', strictSchema);
 var strictThrowSchema = new Schema({ name: String }, { strict: 'throw'});
 mongoose.model('UpdateOneStrictThrowSchema', strictThrowSchema);
 
-module.exports = {
-
-  'findOneAndUpdate returns the edited document': function () {
+describe('model: findOneAndUpdate:', function(){
+  it('returns the edited document', function(done){
     var db = start()
       , M = db.model(modelname, collection)
       , title = 'Tobi ' + random()
@@ -102,26 +100,26 @@ module.exports = {
     post.comments = [{ body: 'been there' }, { body: 'done that' }];
 
     post.save(function (err) {
-      should.strictEqual(err, null);
+      assert.ifError(err);
       M.findById(post._id, function (err, cf) {
-        should.strictEqual(err, null);
-        cf.title.should.equal(title);
-        cf.author.should.equal(author);
-        cf.meta.visitors.valueOf().should.eql(0);
-        cf.date.should.eql(post.date);
-        cf.published.should.be.true;
-        cf.mixed.x.should.equal('ex');
-        cf.numbers.toObject().should.eql([4,5,6,7]);
-        cf.owners.length.should.equal(2);
-        cf.owners[0].toString().should.equal(id0.toString());
-        cf.owners[1].toString().should.equal(id1.toString());
-        cf.comments.length.should.equal(2);
-        cf.comments[0].body.should.eql('been there');
-        cf.comments[1].body.should.eql('done that');
-        should.exist(cf.comments[0]._id);
-        should.exist(cf.comments[1]._id);
-        cf.comments[0]._id.should.be.an.instanceof(DocumentObjectId)
-        cf.comments[1]._id.should.be.an.instanceof(DocumentObjectId);
+        assert.ifError(err);
+        assert.equal(title, cf.title);
+        assert.equal(author, cf.author);
+        assert.equal(0, cf.meta.visitors.valueOf());
+        assert.equal(post.date.toString(), cf.date);
+        assert.equal(true, cf.published);
+        assert.equal('ex', cf.mixed.x);
+        assert.deepEqual([4,5,6,7], cf.numbers.toObject());
+        assert.equal(2, cf.owners.length);
+        assert.equal(id0.toString(),cf.owners[0].toString() );
+        assert.equal(id1.toString(),cf.owners[1].toString() );
+        assert.equal(2, cf.comments.length);
+        assert.equal('been there', cf.comments[0].body);
+        assert.equal('done that', cf.comments[1].body);
+        assert.ok(cf.comments[0]._id);
+        assert.ok(cf.comments[1]._id);
+        assert.ok(cf.comments[0]._id instanceof DocumentObjectId);
+        assert.ok(cf.comments[1]._id instanceof DocumentObjectId);
 
         var update = {
             title: newTitle // becomes $set
@@ -136,31 +134,31 @@ module.exports = {
 
         M.findOneAndUpdate({ title: title }, update, function (err, up) {
           db.close();
-          should.strictEqual(err, null, err && err.stack);
+          assert.equal(err, null, err && err.stack);
 
-          up.title.should.equal(newTitle);
-          up.author.should.equal(author);
-          up.meta.visitors.valueOf().should.equal(2);
-          up.date.toString().should.equal(update.$set.date.toString());
-          up.published.should.eql(false);
-          up.mixed.x.should.equal('ECKS');
-          up.mixed.y.should.equal('why');
-          up.numbers.toObject().should.eql([5,7]);
-          up.owners.length.should.equal(1);
-          up.owners[0].toString().should.eql(id1.toString());
-          up.comments[0].body.should.equal('been there');
-          up.comments[1].body.should.equal('8');
-          should.exist(up.comments[0]._id);
-          should.exist(up.comments[1]._id);
-          up.comments[0]._id.should.be.an.instanceof(DocumentObjectId)
-          up.comments[1]._id.should.be.an.instanceof(DocumentObjectId);
+          assert.equal(newTitle, up.title);
+          assert.equal(author, up.author);
+          assert.equal(2, up.meta.visitors.valueOf());
+          assert.equal(update.$set.date.toString(),up.date.toString());
+          assert.equal(false, up.published);
+          assert.equal('ECKS', up.mixed.x);
+          assert.equal('why', up.mixed.y);
+          assert.deepEqual([5,7], up.numbers.toObject());
+          assert.equal(1, up.owners.length);
+          assert.equal(id1.toString(),up.owners[0].toString());
+          assert.equal('been there', up.comments[0].body);
+          assert.equal('8', up.comments[1].body);
+          assert.ok(up.comments[0]._id);
+          assert.ok(up.comments[1]._id);
+          assert.ok(up.comments[0]._id instanceof DocumentObjectId);
+          assert.ok(up.comments[1]._id instanceof DocumentObjectId);
+          done();
         });
       });
     });
+  });
 
-  },
-
-  'findOneAndUpdate returns the original document': function () {
+  it('returns the original document', function(done){
     var db = start()
       , M = db.model(modelname, collection)
       , title = 'Tobi ' + random()
@@ -181,9 +179,9 @@ module.exports = {
     post.comments = [{ body: 'been there' }, { body: 'done that' }];
 
     post.save(function (err) {
-      should.strictEqual(err, null);
+      assert.ifError(err);
       M.findById(post._id, function (err, cf) {
-        should.strictEqual(err, null);
+        assert.ifError(err);
 
         var update = {
             title: newTitle // becomes $set
@@ -198,31 +196,31 @@ module.exports = {
 
         M.findOneAndUpdate({ title: title }, update, { new: false }, function (err, up) {
           db.close();
-          should.strictEqual(err, null, err && err.stack);
+          assert.ifError(err);
 
-          up.title.should.equal(post.title);
-          up.author.should.equal(post.author);
-          up.meta.visitors.valueOf().should.equal(post.meta.visitors);
-          up.date.toString().should.equal(post.date.toString());
-          up.published.should.eql(post.published);
-          up.mixed.x.should.equal(post.mixed.x);
-          should.strictEqual(up.mixed.y, post.mixed.y);
-          up.numbers.toObject().should.eql(post.numbers.toObject());
-          up.owners.length.should.equal(post.owners.length);
-          up.owners[0].toString().should.eql(post.owners[0].toString());
-          up.comments[0].body.should.equal(post.comments[0].body);
-          up.comments[1].body.should.equal(post.comments[1].body);
-          should.exist(up.comments[0]._id);
-          should.exist(up.comments[1]._id);
-          up.comments[0]._id.should.be.an.instanceof(DocumentObjectId)
-          up.comments[1]._id.should.be.an.instanceof(DocumentObjectId);
+          assert.equal(post.title, up.title);
+          assert.equal(post.author, up.author);
+          assert.equal(post.meta.visitors, up.meta.visitors.valueOf());
+          assert.equal(up.date.toString(),post.date.toString());
+          assert.equal(up.published,post.published);
+          assert.equal(up.mixed.x,post.mixed.x);
+          assert.equal(up.mixed.y, post.mixed.y);
+          assert.deepEqual(up.numbers.toObject(), post.numbers.toObject());
+          assert.equal(up.owners.length, post.owners.length);
+          assert.equal(up.owners[0].toString(), post.owners[0].toString());
+          assert.equal(up.comments[0].body, post.comments[0].body);
+          assert.equal(up.comments[1].body, post.comments[1].body);
+          assert.ok(up.comments[0]._id);
+          assert.ok(up.comments[1]._id);
+          assert.ok(up.comments[0]._id instanceof DocumentObjectId);
+          assert.ok(up.comments[1]._id instanceof DocumentObjectId);
+          done();
         });
       });
     });
+  })
 
-  },
-
-  'findOneAndUpdate allows upserting': function () {
+  it('allows upserting', function(done){
     var db = start()
       , M = db.model(modelname, collection)
       , title = 'Tobi ' + random()
@@ -254,22 +252,23 @@ module.exports = {
 
     M.findOneAndUpdate({ title: title }, update, { upsert: true, new: true }, function (err, up) {
       db.close();
-      should.strictEqual(err, null, err && err.stack);
+      assert.ifError(err);
 
-      up.title.should.equal(newTitle);
-      up.meta.visitors.valueOf().should.equal(2);
-      up.date.toString().should.equal(update.$set.date.toString());
-      up.published.should.eql(update.published);
-      up.mixed.x.should.equal(update.mixed.x);
-      should.strictEqual(up.mixed.y, update.mixed.y);
-      Array.isArray(up.numbers).should.be.true;
-      Array.isArray(up.owners).should.be.true;
-      up.numbers.length.should.equal(0);
-      up.owners.length.should.equal(0);
+      assert.equal(newTitle, up.title);
+      assert.equal(2, up.meta.visitors.valueOf());
+      assert.equal(up.date.toString(),update.$set.date.toString());
+      assert.equal(update.published, up.published);
+      assert.deepEqual(update.mixed.x, up.mixed.x);
+      assert.strictEqual(up.mixed.y, update.mixed.y);
+      assert.ok(Array.isArray(up.numbers));
+      assert.ok(Array.isArray(up.owners));
+      assert.strictEqual(0, up.numbers.length);
+      assert.strictEqual(0, up.owners.length);
+      done();
     });
-  },
+  });
 
-  'options/conditions/doc are merged when no callback is passed': function () {
+  it('options/conditions/doc are merged when no callback is passed', function(){
     var db = start()
       , M = db.model(modelname, collection)
 
@@ -280,89 +279,91 @@ module.exports = {
 
     // Model.findOneAndUpdate
     query = M.findOneAndUpdate({ author: 'aaron' }, { $set: { date: now }}, { new: false, fields: 'author' });
-    should.strictEqual(false, query.options.new);
-    should.strictEqual(1, query._fields.author);
-    should.equal(now, query._updateArg.$set.date);
-    should.strictEqual('aaron', query._conditions.author);
+    assert.strictEqual(false, query.options.new);
+    assert.strictEqual(1, query._fields.author);
+    assert.equal(now, query._updateArg.$set.date);
+    assert.strictEqual('aaron', query._conditions.author);
 
     query = M.findOneAndUpdate({ author: 'aaron' }, { $set: { date: now }});
-    should.strictEqual(undefined, query.options.new);
-    should.equal(now, query._updateArg.$set.date);
-    should.strictEqual('aaron', query._conditions.author);
+    assert.strictEqual(undefined, query.options.new);
+    assert.equal(now, query._updateArg.$set.date);
+    assert.strictEqual('aaron', query._conditions.author);
 
     query = M.findOneAndUpdate({ $set: { date: now }});
-    should.strictEqual(undefined, query.options.new);
-    should.equal(now, query._updateArg.$set.date);
-    should.strictEqual(undefined, query._conditions.author);
+    assert.strictEqual(undefined, query.options.new);
+    assert.equal(now, query._updateArg.$set.date);
+    assert.strictEqual(undefined, query._conditions.author);
 
     query = M.findOneAndUpdate();
-    should.strictEqual(undefined, query.options.new);
-    should.equal(undefined, query._updateArg.date);
-    should.strictEqual(undefined, query._conditions.author);
+    assert.strictEqual(undefined, query.options.new);
+    assert.equal(undefined, query._updateArg.date);
+    assert.strictEqual(undefined, query._conditions.author);
 
     // Query.findOneAndUpdate
     query = M.where('author', 'aaron').findOneAndUpdate({ date: now });
-    should.strictEqual(undefined, query.options.new);
-    should.equal(now, query._updateArg.date);
-    should.strictEqual('aaron', query._conditions.author);
+    assert.strictEqual(undefined, query.options.new);
+    assert.equal(now, query._updateArg.date);
+    assert.strictEqual('aaron', query._conditions.author);
 
     query = M.find().findOneAndUpdate({ author: 'aaron' }, { date: now });
-    should.strictEqual(undefined, query.options.new);
-    should.equal(now, query._updateArg.date);
-    should.strictEqual('aaron', query._conditions.author);
+    assert.strictEqual(undefined, query.options.new);
+    assert.equal(now, query._updateArg.date);
+    assert.strictEqual('aaron', query._conditions.author);
 
     query = M.find().findOneAndUpdate({ date: now });
-    should.strictEqual(undefined, query.options.new);
-    should.equal(now, query._updateArg.date);
-    should.strictEqual(undefined, query._conditions.author);
+    assert.strictEqual(undefined, query.options.new);
+    assert.equal(now, query._updateArg.date);
+    assert.strictEqual(undefined, query._conditions.author);
 
     query = M.find().findOneAndUpdate();
-    should.strictEqual(undefined, query.options.new);
-    should.equal(undefined, query._updateArg.date);
-    should.strictEqual(undefined, query._conditions.author);
-  },
+    assert.strictEqual(undefined, query.options.new);
+    assert.equal(undefined, query._updateArg.date);
+    assert.strictEqual(undefined, query._conditions.author);
+  })
 
-  'findOneAndUpdate executes when a callback is passed': function () {
+  it('executes when a callback is passed', function(done){
     var db = start()
       , M = db.model(modelname, collection + random())
       , pending = 6
 
-    M.findOneAndUpdate({ name: 'aaron' }, { $set: { name: 'Aaron'}}, { new: false }, done);
-    M.findOneAndUpdate({ name: 'aaron' }, { $set: { name: 'Aaron'}}, done);
-    M.where().findOneAndUpdate({ name: 'aaron' }, { $set: { name: 'Aaron'}}, { new: false }, done);
-    M.where().findOneAndUpdate({ name: 'aaron' }, { $set: { name: 'Aaron'}}, done);
-    M.where().findOneAndUpdate({ $set: { name: 'Aaron'}}, done);
-    M.where('name', 'aaron').findOneAndUpdate({ $set: { name: 'Aaron'}}).findOneAndUpdate(done);
+    M.findOneAndUpdate({ name: 'aaron' }, { $set: { name: 'Aaron'}}, { new: false }, cb);
+    M.findOneAndUpdate({ name: 'aaron' }, { $set: { name: 'Aaron'}}, cb);
+    M.where().findOneAndUpdate({ name: 'aaron' }, { $set: { name: 'Aaron'}}, { new: false }, cb);
+    M.where().findOneAndUpdate({ name: 'aaron' }, { $set: { name: 'Aaron'}}, cb);
+    M.where().findOneAndUpdate({ $set: { name: 'Aaron'}}, cb);
+    M.where('name', 'aaron').findOneAndUpdate({ $set: { name: 'Aaron'}}).findOneAndUpdate(cb);
 
-    function done (err, doc) {
-      should.strictEqual(null, err);
-      should.strictEqual(null, doc); // not an upsert, no previously existing doc
+    function cb (err, doc) {
+      assert.ifError(err);
+      assert.strictEqual(null, doc); // not an upsert, no previously existing doc
       if (--pending) return;
       db.close();
+      done();
     }
-  },
+  });
 
-  'findOneAndUpdate executes when a callback is passed to a succeeding function': function() {
+  it('executes when a callback is passed to a succeeding function', function(done){
     var db = start()
       , M = db.model(modelname, collection + random())
       , pending = 6
 
-    M.findOneAndUpdate({ name: 'aaron' }, { $set: { name: 'Aaron'}}, { new: false }).exec(done);
-    M.findOneAndUpdate({ name: 'aaron' }, { $set: { name: 'Aaron'}}).exec(done);
-    M.where().findOneAndUpdate({ name: 'aaron' }, { $set: { name: 'Aaron'}}, { new: false }).exec(done);
-    M.where().findOneAndUpdate({ name: 'aaron' }, { $set: { name: 'Aaron'}}).exec(done);
-    M.where().findOneAndUpdate({ $set: { name: 'Aaron'}}).exec(done);
-    M.where('name', 'aaron').findOneAndUpdate({ $set: { name: 'Aaron'}}).exec(done);
+    M.findOneAndUpdate({ name: 'aaron' }, { $set: { name: 'Aaron'}}, { new: false }).exec(cb);
+    M.findOneAndUpdate({ name: 'aaron' }, { $set: { name: 'Aaron'}}).exec(cb);
+    M.where().findOneAndUpdate({ name: 'aaron' }, { $set: { name: 'Aaron'}}, { new: false }).exec(cb);
+    M.where().findOneAndUpdate({ name: 'aaron' }, { $set: { name: 'Aaron'}}).exec(cb);
+    M.where().findOneAndUpdate({ $set: { name: 'Aaron'}}).exec(cb);
+    M.where('name', 'aaron').findOneAndUpdate({ $set: { name: 'Aaron'}}).exec(cb);
 
-    function done (err, doc) {
-      should.strictEqual(null, err);
-      should.strictEqual(null, doc); // not an upsert, no previously existing doc
+    function cb (err, doc) {
+      assert.ifError(err);
+      assert.strictEqual(null, doc); // not an upsert, no previously existing doc
       if (--pending) return;
       db.close();
+      done();
     }
-  },
+  });
 
-  'Model.findOneAndUpdate(callback) throws': function () {
+  it('executing with only a callback throws', function(){
     var db = start()
       , M = db.model(modelname, collection)
       , err
@@ -374,10 +375,10 @@ module.exports = {
     }
 
     db.close();
-    ;/First argument must not be a function/.test(err).should.be.true;
-  },
+    assert.ok(/First argument must not be a function/.test(err));
+  });
 
-  'findOneAndUpdate updates numbers atomically': function () {
+  it('updates numbers atomically', function(done){
     var db = start()
       , BlogPost = db.model(modelname, collection)
       , totalDocs = 4
@@ -387,12 +388,12 @@ module.exports = {
     post.set('meta.visitors', 5);
 
     post.save(function(err){
-      if (err) throw err;
+      assert.ifError(err);
 
       for (var i = 0; i < 4; ++i) {
         BlogPost
         .findOneAndUpdate({ _id: post._id }, { $inc: { 'meta.visitors': 1 }}, function (err) {
-          if (err) throw err;
+          assert.ifError(err);
           --totalDocs || complete();
         });
       }
@@ -400,24 +401,25 @@ module.exports = {
       function complete () {
         BlogPost.findOne({ _id: post.get('_id') }, function (err, doc) {
           db.close();
-          if (err) throw err;
-          doc.get('meta.visitors').should.equal(9);
+          assert.ifError(err);
+          assert.equal(9, doc.get('meta.visitors'));
+          done();
         });
       };
     });
-  },
+  });
 
-  'Model.findOneAndUpdate should honor strict schemas': function () {
+  it('honors strict schemas', function(done){
     var db = start();
     var S = db.model('UpdateOneStrictSchema');
     var s = new S({ name: 'orange crush' });
 
     s.save(function (err) {
-      should.strictEqual(null, err);
+      assert.ifError(err);
 
       var name = Date.now();
       S.findOneAndUpdate({ name: name }, { ignore: true }, { upsert: true }, function (err, doc) {
-        should.strictEqual(null, err);
+        assert.ifError(err);
         assert.ok(doc);
         assert.ok(doc._id);
         assert.equal(undefined, doc.ignore);
@@ -425,30 +427,31 @@ module.exports = {
         assert.equal(name, doc.name);
 
         S.findOneAndUpdate({ _id: s._id }, { ignore: true }, { upsert: true }, function (err, doc) {
-          should.strictEqual(null, err);
-          should.not.exist(doc.ignore);
-          should.not.exist(doc._doc.ignore);
+          assert.ifError(err);
+          assert.ok(!doc.ignore);
+          assert.ok(!doc._doc.ignore);
           assert.equal('orange crush', doc.name, 'doc was not overwritten with {} during upsert');
 
           S.findOneAndUpdate({ _id: s._id }, { ignore: true }, function (err, doc) {
             db.close();
-            should.strictEqual(null, err);
-            should.not.exist(doc.ignore);
-            should.not.exist(doc._doc.ignore);
+            assert.ifError(err);
+            assert.ok(!doc.ignore);
+            assert.ok(!doc._doc.ignore);
             assert.equal('orange crush', doc.name);
+            done();
           });
         });
       });
     });
-  },
+  });
 
-  'Model.findOneAndUpdate should return errors strict:throw schemas': function () {
+  it('returns errors with strict:throw schemas', function(done){
     var db = start();
     var S = db.model('UpdateOneStrictThrowSchema');
     var s = new S({ name: 'orange crush' });
 
     s.save(function (err) {
-      should.strictEqual(null, err);
+      assert.ifError(err);
 
       var name = Date.now();
       S.findOneAndUpdate({ name: name }, { ignore: true }, { upsert: true }, function (err, doc) {
@@ -461,13 +464,15 @@ module.exports = {
           assert.ok(err);
           assert.ok(/not in schema/.test(err));
           assert.ok(!doc);
+          done();
         });
       });
     });
-  },
-  // by id
+  });
+});
 
-  'Model.findByIdAndUpdate(callback) throws': function () {
+describe('model: findByIdAndUpdate:', function(){
+  it('executing with just a callback throws', function(){
     var db = start()
       , M = db.model(modelname, collection)
       , err
@@ -479,44 +484,46 @@ module.exports = {
     }
 
     db.close();
-    ;/First argument must not be a function/.test(err).should.be.true;
-  },
+    assert.ok(/First argument must not be a function/.test(err));
+  });
 
-  'findByIdAndUpdate executes when a callback is passed': function () {
+  it('executes when a callback is passed', function(done){
     var db = start()
       , M = db.model(modelname, collection + random())
       , _id = new DocumentObjectId
       , pending = 2
 
-    M.findByIdAndUpdate(_id, { $set: { name: 'Aaron'}}, { new: false }, done);
-    M.findByIdAndUpdate(_id, { $set: { name: 'changed' }}, done);
+    M.findByIdAndUpdate(_id, { $set: { name: 'Aaron'}}, { new: false }, cb);
+    M.findByIdAndUpdate(_id, { $set: { name: 'changed' }}, cb);
 
-    function done (err, doc) {
-      should.strictEqual(null, err);
-      should.strictEqual(null, doc); // no previously existing doc
+    function cb (err, doc) {
+      assert.ifError(err);
+      assert.strictEqual(null, doc); // no previously existing doc
       if (--pending) return;
       db.close();
+      done();
     }
-  },
+  });
 
-  'findByIdAndUpdate executes when a callback is passed to a succeeding function': function () {
+  it('executes when a callback is passed to a succeeding function', function(done){
     var db = start()
       , M = db.model(modelname, collection + random())
       , _id = new DocumentObjectId
       , pending = 2
 
-    M.findByIdAndUpdate(_id, { $set: { name: 'Aaron'}}, { new: false }).exec(done);
-    M.findByIdAndUpdate(_id, { $set: { name: 'changed' }}).exec(done);
+    M.findByIdAndUpdate(_id, { $set: { name: 'Aaron'}}, { new: false }).exec(cb);
+    M.findByIdAndUpdate(_id, { $set: { name: 'changed' }}).exec(cb);
 
-    function done (err, doc) {
-      should.strictEqual(null, err);
-      should.strictEqual(null, doc); // no previously existing doc
+    function cb (err, doc) {
+      assert.ifError(err);
+      assert.strictEqual(null, doc); // no previously existing doc
       if (--pending) return;
       db.close();
+      done();
     }
-  },
+  })
 
-  'findByIdAndUpdate returns the original document': function () {
+  it('returns the original document', function(done){
     var db = start()
       , M = db.model(modelname, collection)
       , title = 'Tobi ' + random()
@@ -537,9 +544,9 @@ module.exports = {
     post.comments = [{ body: 'been there' }, { body: 'done that' }];
 
     post.save(function (err) {
-      should.strictEqual(err, null);
+      assert.ifError(err);
       M.findById(post._id, function (err, cf) {
-        should.strictEqual(err, null);
+        assert.ifError(err);
 
         var update = {
             title: newTitle // becomes $set
@@ -554,30 +561,31 @@ module.exports = {
 
         M.findByIdAndUpdate(post.id, update, { new: false }, function (err, up) {
           db.close();
-          should.strictEqual(err, null, err && err.stack);
+          assert.ifError(err);
 
-          up.title.should.equal(post.title);
-          up.author.should.equal(post.author);
-          up.meta.visitors.valueOf().should.equal(post.meta.visitors);
-          up.date.toString().should.equal(post.date.toString());
-          up.published.should.eql(post.published);
-          up.mixed.x.should.equal(post.mixed.x);
-          should.strictEqual(up.mixed.y, post.mixed.y);
-          up.numbers.toObject().should.eql(post.numbers.toObject());
-          up.owners.length.should.equal(post.owners.length);
-          up.owners[0].toString().should.eql(post.owners[0].toString());
-          up.comments[0].body.should.equal(post.comments[0].body);
-          up.comments[1].body.should.equal(post.comments[1].body);
-          should.exist(up.comments[0]._id);
-          should.exist(up.comments[1]._id);
-          up.comments[0]._id.should.be.an.instanceof(DocumentObjectId)
-          up.comments[1]._id.should.be.an.instanceof(DocumentObjectId);
+          assert.equal(up.title,post.title);
+          assert.equal(up.author,post.author);
+          assert.equal(up.meta.visitors.valueOf(), post.meta.visitors);
+          assert.equal(up.date.toString(), post.date.toString());
+          assert.equal(up.published, post.published);
+          assert.equal(up.mixed.x, post.mixed.x);
+          assert.strictEqual(up.mixed.y, post.mixed.y);
+          assert.deepEqual(up.numbers.toObject(), post.numbers.toObject());
+          assert.equal(up.owners.length, post.owners.length);
+          assert.equal(up.owners[0].toString(), post.owners[0].toString());
+          assert.equal(up.comments[0].body, post.comments[0].body);
+          assert.equal(up.comments[1].body, post.comments[1].body);
+          assert.ok(up.comments[0]._id);
+          assert.ok(up.comments[1]._id);
+          assert.ok(up.comments[0]._id instanceof DocumentObjectId)
+          assert.ok(up.comments[1]._id instanceof DocumentObjectId)
+          done();
         });
       });
     });
-  },
+  })
 
-  'findByIdAndUpdate: options/conditions/doc are merged when no callback is passed': function () {
+  it('options/conditions/doc are merged when no callback is passed', function(){
     var db = start()
       , M = db.model(modelname, collection)
       , _id = new DocumentObjectId
@@ -589,23 +597,23 @@ module.exports = {
 
     // Model.findByIdAndUpdate
     query = M.findByIdAndUpdate(_id, { $set: { date: now }}, { new: false, fields: 'author' });
-    should.strictEqual(false, query.options.new);
-    should.strictEqual(1, query._fields.author);
-    should.equal(now, query._updateArg.$set.date);
-    should.strictEqual(_id.toString(), query._conditions._id.toString());
+    assert.strictEqual(false, query.options.new);
+    assert.strictEqual(1, query._fields.author);
+    assert.equal(now, query._updateArg.$set.date);
+    assert.strictEqual(_id.toString(), query._conditions._id.toString());
 
     query = M.findByIdAndUpdate(_id, { $set: { date: now }});
-    should.strictEqual(undefined, query.options.new);
-    should.equal(now, query._updateArg.$set.date);
-    should.strictEqual(_id.toString(), query._conditions._id.toString());
+    assert.strictEqual(undefined, query.options.new);
+    assert.equal(now, query._updateArg.$set.date);
+    assert.strictEqual(_id.toString(), query._conditions._id.toString());
 
     query = M.findByIdAndUpdate(_id);
-    should.strictEqual(undefined, query.options.new);
-    should.strictEqual(_id, query._conditions._id);
+    assert.strictEqual(undefined, query.options.new);
+    assert.strictEqual(_id, query._conditions._id);
 
     query = M.findByIdAndUpdate();
-    should.strictEqual(undefined, query.options.new);
-    should.equal(undefined, query._updateArg.date);
-    should.strictEqual(undefined, query._conditions._id);
-  }
-}
+    assert.strictEqual(undefined, query.options.new);
+    assert.equal(undefined, query._updateArg.date);
+    assert.strictEqual(undefined, query._conditions._id);
+  });
+})

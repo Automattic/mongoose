@@ -13,9 +13,8 @@ var start = require('./common')
  * Test.
  */
 
-module.exports = {
-
-  'documentarray defaults should be preserved': function () {
+describe('schema.documentarray', function(){
+  it('defaults should be preserved', function(){
     var child = new Schema({ title: String })
 
     var schema1 = new Schema({ x: { type: [child], default: [{ title: 'Prometheus'}] }});
@@ -32,6 +31,5 @@ module.exports = {
       assert.equal(1, m.x.length);
       assert.equal('Prometheus', m.x[0].title);
     });
-  }
-
-};
+  })
+})

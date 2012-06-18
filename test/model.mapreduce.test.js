@@ -4,7 +4,6 @@
  */
 
 var start = require('./common')
-  //, should = require('should')
   , mongoose = start.mongoose
   , assert = require('assert')
   , random = require('../lib/utils').random
@@ -54,9 +53,8 @@ var BlogPost = new Schema({
 var collection = 'mapreduce_' + random();
 mongoose.model('MapReduce', BlogPost);
 
-module.exports = {
-
-  'test map reduce': function () {
+describe('model: mapreduce:', function(){
+  it('works', function(done){
     var db = start()
       , MR = db.model('MapReduce', collection)
 
@@ -68,7 +66,7 @@ module.exports = {
 
     //mongoose.set('debug', true);
     MR.create(docs, function (err) {
-      if (err) throw err;
+      assert.ifError(err);
 
       var o = {
           map: function () { emit(this.author, 1) }
@@ -76,7 +74,7 @@ module.exports = {
       }
 
       MR.mapReduce(o, function (err, ret, stats) {
-        if (err) throw err;
+        assert.ifError(err);
         assert.ok(Array.isArray(ret));
         assert.ok(stats);
         ret.forEach(function (res) {
@@ -93,7 +91,7 @@ module.exports = {
         }
 
         MR.mapReduce(o, function (err, ret, stats) {
-          if (err) throw err;
+          assert.ifError(err);
 
           assert.ok(Array.isArray(ret));
           assert.equal(1, ret.length);
@@ -113,7 +111,7 @@ module.exports = {
         }
 
         MR.mapReduce(o, function (err, ret, stats) {
-          if (err) throw err;
+          assert.ifError(err);
 
           // ret is a model
           assert.ok(!Array.isArray(ret));
@@ -122,7 +120,7 @@ module.exports = {
 
           // queries work
           ret.where('value').gt(1).sort({_id: 1}).exec(function (err, docs) {
-            if (err) throw err;
+            assert.ifError(err);
             assert.equal('aaron', docs[0]._id);
             assert.equal('brian', docs[1]._id);
             assert.equal('guillermo', docs[2]._id);
@@ -131,16 +129,16 @@ module.exports = {
             // update casting works
             ret.findOneAndUpdate({ _id: 'aaron' }, { published: true }, function (err, doc) {
               db.close();
-              if (err) throw err;
+              assert.ifError(err);
               assert.ok(doc);
               assert.equal('aaron', doc._id);
               assert.equal(true, doc.published);
+              done();
             });
           });
         });
       }
     });
 
-  }
-
-}
+  })
+});

@@ -242,8 +242,9 @@ module.exports = {
       err.should.be.an.instanceof(ValidatorError);
     });
 
+    // allow unsetting enums
     Test.path('complex').doValidate(undefined, function(err){
-      err.should.be.an.instanceof(ValidatorError);
+      assert.ifError(err);
     });
 
     Test.path('complex').doValidate(null, function(err){

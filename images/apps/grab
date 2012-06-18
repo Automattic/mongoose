@@ -17,7 +17,7 @@ func() {
     echo preparing screencapture ...
 
     # take a picture after waiting a bit for the load to finish
-    sleep 4
+    sleep 6
     # gm import -window root -crop 1004x768+414+228 -resize 500x350 $name.png
     screencapture -wo $name.png
     gm convert $name.png -crop 1004x768+0+80 -resize 500x350 $name.png

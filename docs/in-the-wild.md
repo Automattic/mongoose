@@ -74,4 +74,28 @@ Mongoose in the Wild
 
 <br>
 
+[Select Vids](http://selectvids.com) is a collection of amazing, funny, and creative videos for you to discover.
+
+[![Select Vids](/images/apps/selectvids.png)](http://selectvids.com)
+
+<br>
+
+[ShareLatex](http://www.sharelatex.com) is a real-time LaTeX collaboration tool.
+
+[![ShareLatex](/images/apps/sharelatex.png)](http://www.sharelatex.com)
+
+<br>
+
+[cldfy](https://cldfy.com) delivers mail to your app.
+
+[![cldfy](/images/apps/cldfy.png)](https://cldfy.com)
+
+<br>
+
+[nextdays](http://nextdays.com) let's you share plans with friends and discover what is happening around you.
+
+[![nextdays](/images/apps/nextdays.png)](http://nextdays.com)
+
+<br>
+
 The applications shown above are not listed in any specific order. To have your app added or removed please contact [aaronheckmann@gmail.com](mailto:aaron.heckmann+github@gmail.com).

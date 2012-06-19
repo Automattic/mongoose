@@ -1038,5 +1038,23 @@ module.exports = {
         });
       });
     });
+  },
+
+  'equals should return true if document ids are equal': function() {
+    var db = start()
+        , Tschema = new Schema({ name: String })
+        , T = db.model('documentEquality', Tschema);
+
+    var doc = new T({ name: "test" });
+    doc.save(function (err) {
+      should.not.exist(err);
+
+      T.findById(doc._id, function(err, foundDoc) {
+        should.not.exist(err);
+
+        doc.equals(foundDoc).should.equal(true);
+        db.close();
+      });
+    });
   }
 };

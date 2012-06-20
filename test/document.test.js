@@ -283,6 +283,24 @@ module.exports = {
     clone = doc.toObject();
     should.eql({}, clone.nested2);
     delete doc.schema.options.toObject;
+
+    // minimize via schema options
+    var minSchema = new Schema({
+      nest: {
+          a: { type: String }
+        , b: { type: Date }
+      }
+    }, { strict: true, minimize: false });
+
+    var Min = mongoose.model('min', minSchema);
+    var min = new Min();
+
+    clone = min.toObject({});
+    should.eql({}, clone.nest);
+
+    // override minimize with toObject() options
+    clone = min.toObject({ minimize: true });
+    should.equal(undefined, clone.nest);
   },
 
   'toJSON options': function () {
@@ -547,7 +565,7 @@ module.exports = {
       doc.test.should.equal('altered-me');
     });
   },
-  
+
   'test hooks system errors from a parallel hook': function(beforeExit){
     var doc = new TestDocument()
       , steps = 0
@@ -582,7 +600,7 @@ module.exports = {
       called.should.be.true;
     });
   },
-  
+
   'test that its not necessary to call the last next in the parallel chain':
   function(beforeExit){
     var doc = new TestDocument()
@@ -621,7 +639,7 @@ module.exports = {
       args[1].should.eql('test');
       called = true;
     }, 'test')
-    
+
     beforeExit(function () {
       called.should.be.true;
     });

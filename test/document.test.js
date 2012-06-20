@@ -287,8 +287,8 @@ module.exports = {
     // minimize via schema options
     var minSchema = new Schema({
       nest: {
-        a: { type: String },
-        b: { type: Date }
+          a: { type: String }
+        , b: { type: Date }
       }
     }, { strict: true, minimize: false });
 

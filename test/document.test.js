@@ -1040,16 +1040,34 @@ module.exports = {
     });
   },
 
-  'equals should return true if document ids are equal': function() {
+  'equals should return true if document ids are ObjectID and are equal': function() {
     var db = start()
-        , Tschema = new Schema({ name: String })
-        , T = db.model('documentEquality', Tschema);
+        , ObjectIdSchema = new Schema({ name: String })
+        , ObjectIdModel = db.model('objectIdEquality', ObjectIdSchema);
 
-    var doc = new T({ name: "test" });
+    var doc = new ObjectIdModel({ name: "test" });
     doc.save(function (err) {
       should.not.exist(err);
 
-      T.findById(doc._id, function(err, foundDoc) {
+      ObjectIdModel.findById(doc._id, function(err, foundDoc) {
+        should.not.exist(err);
+        doc.equals(foundDoc).should.equal(true);
+
+        db.close();
+      });
+    });
+  },
+
+  'equals should return true if document ids are String and are equal': function() {
+    var db = start()
+        , StringIdSchema = new Schema({  _id: { type: String, required: true}, name: String })
+        , StringIdModel = db.model('stringIdEquality', StringIdSchema, 'asdf' + require('../lib/utils').random());
+
+    var doc = new StringIdModel({ _id: "equalityTestId", name: "test" });
+    doc.save(function (err) {
+      should.not.exist(err);
+
+      StringIdModel.findById(doc._id, function(err, foundDoc) {
         should.not.exist(err);
 
         doc.equals(foundDoc).should.equal(true);

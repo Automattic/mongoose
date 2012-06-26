@@ -135,7 +135,7 @@ describe('shard', function(){
       }
     });
 
-    P.create({ likes: ['street fighting']}, function (err, ryu) { assert.ok(err);
+    P.create({ likes: ['street fighting']}, function (err, ryu) {
       assert.ok(err);
       assert.ok(/tried to insert object with no valid shard key/.test(err.message));
       if (!--pending) {
@@ -144,7 +144,7 @@ describe('shard', function(){
       }
     });
 
-    P.create({ name: 'ryu' }, function (err, ryu) { assert.ok(err);
+    P.create({ name: 'ryu' }, function (err, ryu) {
       assert.ok(err);
       assert.ok(/tried to insert object with no valid shard key/.test(err.message));
       if (!--pending) {
@@ -153,7 +153,7 @@ describe('shard', function(){
       }
     });
 
-    P.create({ age: 49 }, function (err, ryu) { assert.ok(err);
+    P.create({ age: 49 }, function (err, ryu) {
       assert.ok(err);
       assert.ok(/tried to insert object with no valid shard key/.test(err.message));
       if (!--pending) {

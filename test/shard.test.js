@@ -242,4 +242,16 @@ describe('shard', function(){
     });
   });
 
+  it('allows null shard key values', function (done) {
+    var db = start({ uri:  uri })
+    var P = db.model('ShardPerson', collection);
+
+    P.create({ name: null, age: 27 }, function (err, ken) {
+      assert.ifError(err);
+      P.findById(ken, function (err, ken) {
+        assert.ifError(err);
+        done();
+      });
+    });
+  });
 })

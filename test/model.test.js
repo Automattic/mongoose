@@ -3743,7 +3743,7 @@ describe('model', function(){
       var out = post.inspect();
       assert.ok(/meta: { visitors: 45 }/.test(out));
       assert.ok(/numbers: \[ 5, 6, 7 \]/.test(out));
-      assert.ok(/date: Wed, 18 May 2011 15:02:31 GMT/.test(out));
+      assert.ok(/Wed.+ 2011 \d\d:02:31 GMT/.test(out));
       assert.ok(!/activePaths:/.test(out));
       assert.ok(!/_atomics:/.test(out));
     });

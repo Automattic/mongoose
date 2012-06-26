@@ -658,4 +658,19 @@ describe('model: update:', function(){
     });
   })
 
+  it('handles $pull from Mixed arrays (gh-735)', function(done){
+    var db = start();
+    var schema = new Schema({ comments: [] });
+    var M = db.model('gh-735', schema, 'gh-735_'+random());
+    M.create({ comments: [{ name: 'node 0.8' }] }, function (err, doc) {
+      assert.ifError(err);
+      M.update({ _id: doc._id }, { $pull: { comments: { name: 'node 0.8' }}}, function (err, affected) {
+        assert.ifError(err);
+        assert.equal(1, affected);
+        db.close();
+        done();
+      });
+    });
+  });
+
 });

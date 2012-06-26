@@ -1,4 +1,12 @@
 
+2.7.1 / 2012-06-26
+===================
+
+  * fixed; sharding: when a document holds a null as a value of the shard key
+  * fixed; update() using $pull on an array of Mixed (gh-735)
+  * deprecated; MongooseNumber#{inc, increment, decrement} methods
+  * tests; now using mocha
+
 2.7.0 / 2012-06-14
 ===================
 

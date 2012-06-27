@@ -354,4 +354,28 @@ describe('versioning', function(){
       });
     });
   })
+
+  it('can be disabled', function(done){
+    var db = start();
+    var schema = Schema({ x: ['string'] }, { versionKey: false });
+    var M = db.model('disabledVersioning', schema, 's'+random());
+    M.create({ x: ['hi'] }, function (err, doc) {
+      assert.ifError(err);
+      assert.equal(false, '__v' in doc._doc);
+      doc.x.pull('hi');
+      doc.save(function (err) {
+        assert.ifError(err);
+        assert.equal(false, '__v' in doc._doc);
+
+        doc.set('x.0', 'updated');
+        var d = doc._delta()[0];
+        assert.equal(undefined, d.__v, 'version should not be added to where clause')
+
+        M.collection.findOne({ _id: doc._id }, function (err, doc) {
+          assert.equal(false, '__v' in doc);
+          done();
+        })
+      })
+    });
+  })
 })

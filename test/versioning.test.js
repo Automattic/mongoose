@@ -103,6 +103,7 @@ describe('versioning', function(){
     function test2 (err, a, b) {
       assert.ifError(err);
       assert.equal(a.meta.numbers.length, 5);
+      assert.equal(a._doc.__v, 2)
       a.meta.numbers.pull(10);
       b.meta.numbers.push(20);
       save(a, b, test3);
@@ -114,6 +115,7 @@ describe('versioning', function(){
       assert.equal(b.meta.numbers.length, 5);
       assert.equal(-1, a.meta.numbers.indexOf(10));
       assert.ok(~a.meta.numbers.indexOf(20));
+      assert.equal(a._doc.__v, 4)
 
       a.numbers.pull(3, 20);
 
@@ -124,15 +126,18 @@ describe('versioning', function(){
 
     function test4 (err, a, b) {
       assert.ok(/No matching document/.test(err), err);
+      assert.equal(a._doc.__v, 5)
       a.set('arr.0.0', 'updated');
-      var d = a._delta()[0];
-      assert.equal(a._doc.__v, d.__v, 'version should be added to where clause')
+      var d = a._delta();
+      assert.equal(a._doc.__v, d[0].__v, 'version should be added to where clause')
+      assert.ok(!('$inc' in d[1]));
       save(a,b,test5);
     }
 
     function test5 (err, a, b) {
       assert.ifError(err);
       assert.equal('updated', a.arr[0][0]);
+      assert.equal(a._doc.__v, 5);
       a.set('arr.0', 'not an array');
       // should overwrite a's changes, last write wins
       b.arr.pull(10);
@@ -145,6 +150,7 @@ describe('versioning', function(){
       assert.equal(a.arr.length, 2);
       assert.equal('updated', a.arr[0][0]);
       assert.equal('using set', a.arr[1]);
+      assert.equal(a._doc.__v, 6)
       b.set('arr.0', 'not an array');
       // should overwrite b's changes, last write wins
       // force a $set
@@ -159,6 +165,7 @@ describe('versioning', function(){
       assert.equal(a.arr.length, 2);
       assert.equal('updated', a.arr[0][0]);
       assert.equal('woot', a.arr[1]);
+      assert.equal(a._doc.__v, 7)
       a.meta.nested.$pop();
       b.meta.nested.$pop();
       save(a, b, test8);
@@ -167,6 +174,7 @@ describe('versioning', function(){
     function test8 (err, a, b) {
       assert.ok(/No matching document/.test(err), 'changes to b should not be applied');
       assert.equal(a.meta.nested.length, 3);
+      assert.equal(a._doc.__v, 8)
       a.meta.nested.push({ title: 'the' });
       a.meta.nested.push({ title: 'killing' });
       b.meta.nested.push({ title: 'biutiful' });
@@ -176,6 +184,7 @@ describe('versioning', function(){
     function test9 (err, a, b) {
       assert.ifError(err);
       assert.equal(6, a.meta.nested.length);
+      assert.equal(a._doc.__v, 10)
       // nested subdoc property changes should not trigger version increments
       a.meta.nested[2].title = 'two';
       b.meta.nested[0].title = 'zero';
@@ -188,7 +197,7 @@ describe('versioning', function(){
       assert.equal('two', b.meta.nested[2].title);
       assert.equal('zero', b.meta.nested[0].title);
       assert.equal('sub one', b.meta.nested[1].comments[0].title);
-
+      assert.equal(a._doc.__v, 10)
       assert.equal(3, a.mixed.arr.length);
       a.mixed.arr.push([10],{x:1},'woot');
       a.markModified('mixed.arr');
@@ -197,23 +206,37 @@ describe('versioning', function(){
 
     function test11 (err, a, b) {
       assert.ifError(err);
-      assert.equal(a._doc.__v, 6)
+      assert.equal(a._doc.__v, 11)
       assert.equal(6, a.mixed.arr.length);
       assert.equal(1, a.mixed.arr[4].x)
       assert.equal('woot', a.mixed.arr[5])
       assert.equal(10, a.mixed.arr[3][0])
 
+      a.comments.addToSet({ title: 'monkey' });
+      b.markModified('comments');
+
+      var d = b._delta();
+      assert.ok(d[1].$inc, 'a $set of an array should trigger versioning');
+
+      save(a, b, test12);
+    }
+
+    function test12 (err, a, b) {
+      assert.ok(/No matching document/.test(err), 'changes to b should not be applied');
+      assert.equal(5, a.comments.length);
+
       a.comments.addToSet({ title: 'aven' });
       a.comments.addToSet({ title: 'avengers' });
       var d = a._delta();
-      assert.equal(undefined, d[0].__v, 'version should not be included');
+
+      assert.equal(undefined, d[0].__v, 'version should not be included in where clause');
       assert.ok(!d[1].$set);
       assert.ok(d[1].$addToSet);
       assert.ok(d[1].$addToSet.comments);
 
       a.comments.$shift();
       var d = a._delta();
-      assert.equal(6, d[0].__v, 'version should be included in where clause');
+      assert.equal(12, d[0].__v, 'version should be included in where clause');
       assert.ok(d[1].$set, 'two differing atomic ops on same path should create a $set');
       assert.ok(d[1].$inc, 'a $set of an array should trigger versioning');
       assert.ok(!d[1].$addToSet);

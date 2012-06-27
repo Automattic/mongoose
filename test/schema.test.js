@@ -46,6 +46,11 @@ TestDocument.prototype.setSchema(new Schema({
  */
 
 describe('schema', function(){
+  it('can be created without the "new" keyword', function(){
+    var schema = Schema({ name: String });
+    assert.ok(schema instanceof Schema);
+  })
+
   it('supports different schematypes', function(){
     var Checkin = new Schema({
         date      : Date 

@@ -69,12 +69,12 @@ methods.push(function (a, cb) {
   a.bool = false;
   a.array.push(3);
   a.dates.push(new Date);
-  a.bools.$pushAll([true, false]);
-  a.docs.$addToSet({ title: 'woot' });
+  a.bools.push([true, false]);
+  a.docs.addToSet({ title: 'woot' });
   a.strings.remove("three");
-  a.numbers.$pull(72);
+  a.numbers.pull(72);
   a.objectids.$pop();
-  a.docs.$pullAll(a.docs);
+  a.docs.pull.apply(a.docs, a.docs);
   a.s.nest = "aooooooga";
 
   if (i%2)

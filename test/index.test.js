@@ -159,7 +159,7 @@ describe('mongoose module:', function(){
                 , '\n', 'Please set the MONGOOSE_SET_TEST_URI env variable.', '\n'
                 , 'e.g: `mongodb://localhost:27017/db,mongodb://localhost…`', '\n'
                 , '\033[39m');
-      return;
+      return done();
     }
 
     var mong = new Mongoose();
@@ -191,7 +191,7 @@ describe('mongoose module:', function(){
   it('goose.createConnection() to a replica set', function(done){
     var uri = process.env.MONGOOSE_SET_TEST_URI;
 
-    if (!uri) return;
+    if (!uri) return done();
 
     var mong = new Mongoose();
 

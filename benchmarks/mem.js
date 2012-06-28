@@ -39,16 +39,16 @@ methods.push(function (a, cb) {
   A.findById(a._id, cb);
 }); // 4.6 MB
 methods.push(function (a, cb) {
-  A.where('number', a.number).sort('_id', -1).limit(10).run(cb)
+  A.where('number', a.number).sort('-_id').limit(10).exec(cb)
 }); // 4.8 MB
 methods.push(function (a, cb) {
-  A.where('date', a.date).select('string').limit(10).run(cb)
+  A.where('date', a.date).select('string').limit(10).exec(cb)
 }); // 3.5 mb
 methods.push(function (a, cb) {
-  A.where('date', a.date).select('string', 'bool').asc('date').limit(10).run(cb)
+  A.where('date', a.date).select('string bool').sort('date').limit(10).exec(cb)
 }); // 3.5 MB
 methods.push(function (a, cb) {
-  A.find('date', a.date).where('array').$in(3).limit(10).run(cb)
+  A.where('date', a.date).where('array').in(3).limit(10).exec(cb)
 }); // 1.82 MB
 methods.push(function (a, cb) {
   A.update({ _id: a._id }, { $addToset: { array: "heeeeello" }}, cb);
@@ -57,7 +57,7 @@ methods.push(function (a, cb) {
   A.remove({ _id: a._id }, cb);
 }); // 3.32 MB
 methods.push(function (a, cb) {
-  A.find().where('objectids').exists().only('dates').limit(10).exec(cb);
+  A.find().where('objectids').exists().select('dates').limit(10).exec(cb);
 }); // 3.32 MB
 methods.push(function (a, cb) {
   A.count({ strings: a.strings[2], number: a.number }, cb);
@@ -69,12 +69,12 @@ methods.push(function (a, cb) {
   a.bool = false;
   a.array.push(3);
   a.dates.push(new Date);
-  a.bools.$pushAll([true, false]);
-  a.docs.$addToSet({ title: 'woot' });
+  a.bools.push([true, false]);
+  a.docs.addToSet({ title: 'woot' });
   a.strings.remove("three");
-  a.numbers.$pull(72);
+  a.numbers.pull(72);
   a.objectids.$pop();
-  a.docs.$pullAll(a.docs);
+  a.docs.pull.apply(a.docs, a.docs);
   a.s.nest = "aooooooga";
 
   if (i%2)
@@ -87,7 +87,7 @@ methods.push(function (a, cb) {
 
 var started = process.memoryUsage();
 var start = new Date;
-var total = 500;
+var total = 10000;
 var i = total;
 
 mongoose.connection.on('open', function () {
@@ -115,6 +115,7 @@ mongoose.connection.on('open', function () {
 
       a.save(function (err) {
         methods[Math.random()*methods.length|0](a, function () {
+          a= u =null;
           process.nextTick(cycle);
         })
       });
@@ -125,9 +126,9 @@ mongoose.connection.on('open', function () {
         //a._delta();
 
       if (!(i%50)) {
-        var u = process.memoryUsage();
-        console.error('rss: %d, vsize: %d, heapTotal: %d, heapUsed: %d',
-            u.rss, u.vsize, u.heapTotal, u.heapUsed);
+        //var u = process.memoryUsage();
+        //console.error('rss: %d, vsize: %d, heapTotal: %d, heapUsed: %d',
+            //u.rss, u.vsize, u.heapTotal, u.heapUsed);
       }
     })()
 
@@ -135,7 +136,13 @@ mongoose.connection.on('open', function () {
       var time= (new Date - start)/1000;
       console.error('took %d seconds for %d docs (%d dps)', time, total, total/time);
       var used = process.memoryUsage();
-      console.error(((used.vsize - started.vsize) / 1048576)+' MB');
+      //console.error(((used.vsize - started.vsize) / 1048576)+' MB');
+
+      var res = {}
+      res.rss  = used.rss - started.rss;
+      res.heapTotal = used.heapTotal - started.heapTotal;
+      res.heapUsed = used.heapUsed - started.heapUsed;
+      console.error('change: ', res);
 
       //console.error(a.toObject({depopulate:true}));
 

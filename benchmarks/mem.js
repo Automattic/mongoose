@@ -39,13 +39,13 @@ methods.push(function (a, cb) {
   A.findById(a._id, cb);
 }); // 4.6 MB
 methods.push(function (a, cb) {
-  A.where('number', a.number).sort('-_id').limit(10).exec(cb)
+  A.where('number', a.number).limit(10).exec(cb)
 }); // 4.8 MB
 methods.push(function (a, cb) {
   A.where('date', a.date).select('string').limit(10).exec(cb)
 }); // 3.5 mb
 methods.push(function (a, cb) {
-  A.where('date', a.date).select('string bool').sort('date').limit(10).exec(cb)
+  A.where('date', a.date).select('string bool').limit(10).exec(cb)
 }); // 3.5 MB
 methods.push(function (a, cb) {
   A.where('date', a.date).where('array').in(3).limit(10).exec(cb)

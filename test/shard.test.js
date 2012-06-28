@@ -28,6 +28,8 @@ var schema = new Schema({
 var collection = 'shardperson_' + random();
 mongoose.model('ShardPerson', schema, collection);
 
+var version;
+var greaterThan2x;
 var db;
 describe('shard', function(){
   before(function (done) {
@@ -60,7 +62,15 @@ describe('shard', function(){
           throw new Error('could not shard test collection ' + collection);
         }
 
-        done();
+        db.db.admin(function (err, admin) {
+          assert.ifError(err);
+          admin.serverStatus(function (err, info) {
+            assert.ifError(err);
+            version = info.version.split('.').map(function(n){return parseInt(n, 10) });
+            greaterThan2x = 2 < version[0];
+            done();
+          });
+        });
       });
     });
   });
@@ -190,13 +200,23 @@ describe('shard', function(){
       assert.ifError(err);
 
       P.update({ name: 'ken' }, { likes: ['kicking', 'punching'] }, function (err) {
-        assert.ok(/full shard key/.test(err.message));
+        assert.ok(/shard key/.test(err.message));
 
         P.update({ _id: ken._id, name: 'ken' }, { likes: ['kicking', 'punching'] }, function (err) {
-          assert.ok(!err);
+          // mongo 2.x returns: can't do non-multi update with query that doesn't have a valid shard key
+          if (greaterThan2x) {
+            assert.ok(!err, err);
+          } else {
+            assert.ok(/shard key/.test(err.message));
+          }
 
           P.update({ _id: ken._id, age: 27 }, { likes: ['kicking', 'punching'] }, function (err) {
-            assert.ok(!err);
+            // mongo 2.x returns: can't do non-multi update with query that doesn't have a valid shard key
+            if (greaterThan2x) {
+              assert.ok(!err, err);
+            } else {
+              assert.ok(/shard key/.test(err.message));
+            }
 
             P.update({ age: 27 }, { likes: ['kicking', 'punching'] }, function (err) {
               db.close();

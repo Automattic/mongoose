@@ -74,6 +74,28 @@ mongoose.model('BlogPost', BlogPost);
 var collection = 'blogposts_' + random();
 
 describe('model', function(){
+  describe('constructor', function(){
+    it('works without "new" keyword', function(){
+      var B = mongoose.model('BlogPost');
+      var b = B();
+      assert.ok(b instanceof B);
+      var db = start();
+      B = db.model('BlogPost');
+      db.close();
+      b = B();
+      assert.ok(b instanceof B);
+    })
+    it('works "new" keyword', function(){
+      var B = mongoose.model('BlogPost');
+      var b = new B();
+      assert.ok(b instanceof B);
+      var db = start();
+      B = db.model('BlogPost');
+      db.close();
+      b = new B();
+      assert.ok(b instanceof B);
+    })
+  })
   describe('isNew', function(){
     it('is true on instantiation', function(){
       var db = start()

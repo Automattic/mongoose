@@ -2710,6 +2710,23 @@ describe('model', function(){
         };
       });
     })
+
+    it('works with modified element properties + doc removal (gh-975)', function(done){
+      var db = start()
+        , B = db.model('BlogPost', collection)
+        , b = new B({ comments: [{ title: 'gh-975' }] });
+
+      b.save(function (err) {
+        assert.ifError(err);
+        b.comments[0].title = 'changed';
+        b.comments[0].remove();
+        b.save(function (err) {
+          assert.ifError(err);
+          db.close();
+          done();
+        });
+      })
+    })
   });
 
   it('updating an embedded document in an embedded array (gh-255)', function(done){

@@ -204,7 +204,6 @@ describe('shard', function(){
 
         P.update({ _id: ken._id, name: 'ken' }, { likes: ['kicking', 'punching'] }, function (err) {
           // mongo 2.x returns: can't do non-multi update with query that doesn't have a valid shard key
-          console.error(version);
           if (greaterThan2x) {
             assert.ok(!err, err);
           } else {

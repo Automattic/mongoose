@@ -3,3 +3,7 @@ lib-cov
 *.sw*
 node_modules/
 *.orig
+benchmarks/benchmarks
+benchmarks/benchmarks2
+benchmarks/benchmarks3
+benchmarks/v8.log

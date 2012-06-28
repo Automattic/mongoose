@@ -162,7 +162,7 @@ describe('connections:', function(){
 
   describe('missing protocols', function(){
     it('are allowed with replsets', function(){
-      var conn = mongoose.createConnection('localhost:12345,127.0.0.1:14326', function (err) {
+      var conn = mongoose.createSetConnection('localhost:12345,127.0.0.1:14326', function (err) {
         // force missing db error so we don't actually connect.
         assert.ok(err);
       });

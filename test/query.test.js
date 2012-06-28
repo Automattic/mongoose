@@ -76,6 +76,27 @@ describe('Query', function(){
       var query = new Query();
       query.where('name', 'guillermo');
       assert.deepEqual(query._conditions, {name: 'guillermo'});
+      query.where('a');
+      query.equals('b');
+      assert.deepEqual(query._conditions, {name: 'guillermo', a: 'b'});
+    })
+    it('throws if non-string path is passed', function(){
+      var query = new Query();
+      assert.throws(function () {
+        query.where({ name: 'aaron'});
+      });
+      assert.throws(function () {
+        query.where(50);
+      });
+      assert.throws(function () {
+        query.where([])
+      });
+    })
+    it('does not throw when 0 args passed', function () {
+      var query = new Query;
+      assert.doesNotThrow(function(){
+        query.where();
+      });
     })
   })
 

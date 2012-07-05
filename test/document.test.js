@@ -292,6 +292,14 @@ describe('document:', function(){
     assert.equal('Object', clone.nested2.constructor.name);
     assert.equal(0, Object.keys(clone.nested2).length);
     delete doc.schema.options.toObject;
+
+    doc.schema.options.minimize = false;
+    clone = doc.toObject();
+    assert.equal('Object', clone.nested2.constructor.name);
+    assert.equal(0, Object.keys(clone.nested2).length);
+    doc.schema.options.minimize = true;
+    clone = doc.toObject();
+    assert.equal(undefined, clone.nested2);
   })
 
   it('toJSON options', function(){

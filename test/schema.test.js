@@ -37,7 +37,7 @@ TestDocument.prototype.__proto__ = Document.prototype;
  * Set a dummy schema to simulate compilation.
  */
 
-TestDocument.prototype.setSchema(new Schema({
+TestDocument.prototype._setSchema(new Schema({
     test    : String
 }));
 
@@ -1127,6 +1127,7 @@ describe('schema', function(){
       assert.equal('wicked this way comes', m.arr[0].something);
       assert.ok(m.arr[0]._id);
     });
+
     it('of nested schemas should throw (gh-700)', function(){
       var a = new Schema({ title: String })
         , err
@@ -1140,5 +1141,76 @@ describe('schema', function(){
       assert.ok(err);
       assert.ok(/Did you try nesting Schemas/.test(err.message));
     });
+
   });
+
+  describe('conflicting property names', function(){
+    it('throws', function(){
+      var child = new Schema({ name: String });
+
+      assert.throws(function(){
+        new Schema({
+            on: String
+          , child: [child]
+        });
+      }, /`on` may not be used as a schema pathname/);
+
+      assert.throws(function(){
+        new Schema({
+            model: String
+        });
+      }, /`model` may not be used as a schema pathname/);
+
+      assert.throws(function(){
+        new Schema({
+           collection: String
+        });
+      }, /`collection` may not be used as a schema pathname/);
+
+      assert.throws(function(){
+        new Schema({
+            schema: String
+        });
+      }, /`schema` may not be used as a schema pathname/);
+
+      assert.throws(function(){
+        new Schema({
+            db: String
+        });
+      }, /`db` may not be used as a schema pathname/);
+
+      assert.throws(function(){
+        new Schema({
+            modelName: String
+        });
+      }, /`modelName` may not be used as a schema pathname/);
+
+      assert.throws(function(){
+        new Schema({
+            isNew: String
+        });
+      }, /`isNew` may not be used as a schema pathname/);
+
+      assert.throws(function(){
+        new Schema({
+            errors: String
+        });
+      }, /`errors` may not be used as a schema pathname/);
+
+      assert.throws(function(){
+        new Schema({
+            init: String
+        });
+      }, /`init` may not be used as a schema pathname/);
+
+      assert.doesNotThrow(function(){
+        Schema({ child: [{parent: String}] });
+      });
+
+      assert.doesNotThrow(function(){
+        Schema({ child: [{parentArray: String}] });
+      });
+
+    })
+  })
 });

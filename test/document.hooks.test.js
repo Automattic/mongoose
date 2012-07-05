@@ -54,7 +54,7 @@ var schema = new Schema({
     }
   , em: [em]
 });
-TestDocument.prototype.setSchema(schema);
+TestDocument.prototype._setSchema(schema);
 
 schema.virtual('nested.agePlus2').get(function (v) {
   return this.nested.age + 2;

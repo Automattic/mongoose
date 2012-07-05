@@ -21,7 +21,7 @@ function Dummy () {
   mongoose.Document.call(this, {});
 }
 Dummy.prototype.__proto__ = mongoose.Document.prototype;
-Dummy.prototype.setSchema(new Schema)
+Dummy.prototype._setSchema(new Schema)
 
 function Subdocument () {
   var arr = new DocumentArray;
@@ -41,7 +41,7 @@ Subdocument.prototype.__proto__ = EmbeddedDocument.prototype;
  * Set schema.
  */
 
-Subdocument.prototype.setSchema(new Schema({
+Subdocument.prototype._setSchema(new Schema({
     test: { type: String, required: true }
   , work: { type: String, validate: /^good/ }
 }));
@@ -73,9 +73,9 @@ describe('types.document', function(){
     a.set('work', 'nope');
 
     a.save(function(err){
-      assert.ok(a.parent._validationError instanceof ValidationError);
-      assert.equal(a.parent.errors['jsconf.ar.0.work'].name, 'ValidatorError');
-      assert.equal(a.parent._validationError.toString(), 'ValidationError: Validator "required" failed for path test, Validator failed for path work');
+      assert.ok(a.__parent._validationError instanceof ValidationError);
+      assert.equal(a.__parent.errors['jsconf.ar.0.work'].name, 'ValidatorError');
+      assert.equal(a.__parent._validationError.toString(), 'ValidationError: Validator "required" failed for path test, Validator failed for path work');
       done();
     });
   });

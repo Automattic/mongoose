@@ -785,9 +785,9 @@ describe('document:', function(){
   describe('#equals', function(){
     describe('should work', function(){
       var db = start();
-      var S = db.model('S', new Schema({ _id: String }));
-      var N = db.model('N', new Schema({ _id: Number }));
-      var O = db.model('O', new Schema({ _id: Schema.ObjectId }));
+      var S = db.model('equals-S', new Schema({ _id: String }));
+      var N = db.model('equals-N', new Schema({ _id: Number }));
+      var O = db.model('equals-O', new Schema({ _id: Schema.ObjectId }));
 
       it('with string _ids', function(){
         var s1 = new S({ _id: 'one' });

@@ -122,54 +122,7 @@ code .this { color: #19469D; }
 		</script>
 	</head>
 	<body>
-<table id="source"><tbody><tr><td><h1>Mongoose</h1><p>Expressive MongoDB for Node.JS</p></td><td></td></tr><tr class="filename"><td><h2 id="lib/collection.js"><a href="#">collection</a></h2></td><td>lib/collection.js</td></tr><tr class="code">
-<td class="docs">
-<p>Collection constructor</p>
-
-<h2></h2>
-
-<ul><li><p><strong>param</strong>: <em>String</em>  collection name</p></li><li><p><strong>param</strong>: <em>Collection</em>  connection object</p></li><li><p><strong>api</strong>: <em>public</em></p></li></ul>
-</td>
-<td class="code">
-<pre><code><span class="keyword">function</span> <span class="class">Collection</span> (<span class="variable">name</span>, <span class="variable">conn</span>) {
-  <span class="this">this</span>.<span class="variable">name</span> = <span class="variable">name</span>;
-  <span class="this">this</span>.<span class="variable">conn</span> = <span class="variable">conn</span>;
-  <span class="this">this</span>.<span class="variable">buffer</span> = <span class="variable">true</span>;
-  <span class="this">this</span>.<span class="variable">queue</span> = [];
-  <span class="keyword">if</span> (<span class="this">this</span>.<span class="variable">conn</span>.<span class="variable">readyState</span> == <span class="number integer">1</span>) <span class="this">this</span>.<span class="variable">onOpen</span>();
-};</code></pre>
-</td>
-</tr>
-<tr class="code">
-<td class="docs">
-<p>The collection name</p>
-
-<ul><li><p><strong>api</strong>: <em>public</em></p></li></ul>
-</td>
-<td class="code">
-<pre><code><span class="class">Collection</span>.<span class="variable">prototype</span>.<span class="variable">name</span>;</code></pre>
-</td>
-</tr>
-<tr class="code">
-<td class="docs">
-<p>The Connection instance</p>
-
-<ul><li><p><strong>api</strong>: <em>public</em></p></li></ul>
-</td>
-<td class="code">
-<pre><code><span class="class">Collection</span>.<span class="variable">prototype</span>.<span class="variable">conn</span>;</code></pre>
-</td>
-</tr>
-<tr class="code">
-<td class="docs">
-<p>Module exports.
- </p>
-</td>
-<td class="code">
-<pre><code><span class="variable">module</span>.<span class="variable">exports</span> = <span class="class">Collection</span>;
-</code></pre>
-</td>
-</tr><tr class="filename"><td><h2 id="lib/connection.js"><a href="#">connection</a></h2></td><td>lib/connection.js</td></tr><tr class="code">
+<table id="source"><tbody><tr><td><h1>Mongoose</h1><p>Expressive MongoDB for Node.JS</p></td><td></td></tr><tr class="filename"><td><h2 id="lib/connection.js"><a href="#">connection</a></h2></td><td>lib/connection.js</td></tr><tr class="code">
 <td class="docs">
 <p>Module dependencies.
  </p>
@@ -1378,17 +1331,6 @@ to JSON.stringify()</p>
 <span class="variable">exports</span>.<span class="class">Error</span> = <span class="class">DocumentError</span>;
 </code></pre>
 </td>
-</tr><tr class="filename"><td><h2 id="lib/drivers/node-mongodb-native/binary.js"><a href="#">binary</a></h2></td><td>lib/drivers/node-mongodb-native/binary.js</td></tr><tr class="code">
-<td class="docs">
-<p>Module dependencies.
- </p>
-</td>
-<td class="code">
-<pre><code><span class="keyword">var</span> <span class="class">Binary</span> = <span class="variable">require</span>(<span class="string">'mongodb'</span>).<span class="class">BSONPure</span>.<span class="class">Binary</span>;
-
-<span class="variable">module</span>.<span class="variable">exports</span> = <span class="variable">exports</span> = <span class="class">Binary</span>;
-</code></pre>
-</td>
 </tr><tr class="filename"><td><h2 id="lib/drivers/node-mongodb-native/collection.js"><a href="#">collection</a></h2></td><td>lib/drivers/node-mongodb-native/collection.js</td></tr><tr class="code">
 <td class="docs">
 <p>Module dependencies.
@@ -1480,36 +1422,6 @@ to JSON.stringify()</p>
 <pre><code><span class="variable">module</span>.<span class="variable">exports</span> = <span class="class">MongooseCollection</span>;
 </code></pre>
 </td>
-</tr><tr class="filename"><td><h2 id="lib/drivers/node-mongodb-native/connection.js"><a href="#">connection</a></h2></td><td>lib/drivers/node-mongodb-native/connection.js</td></tr><tr class="code">
-<td class="docs">
-<p>Module dependencies.
- </p>
-</td>
-<td class="code">
-<pre><code><span class="keyword">var</span> <span class="class">Connection</span> = <span class="variable">require</span>(<span class="string">'../../connection'</span>)
-  , <span class="variable">mongo</span> = <span class="variable">require</span>(<span class="string">'mongodb'</span>)
-  , <span class="class">Server</span> = <span class="variable">mongo</span>.<span class="class">Server</span>
-  , <span class="class">ReplSetServers</span> = <span class="variable">mongo</span>.<span class="class">ReplSetServers</span>;</code></pre>
-</td>
-</tr>
-<tr class="code">
-<td class="docs">
-<p>Inherits from Connection.
- </p>
-</td>
-<td class="code">
-<pre><code><span class="class">NativeConnection</span>.<span class="variable">prototype</span>.<span class="variable">__proto__</span> = <span class="class">Connection</span>.<span class="variable">prototype</span>;</code></pre>
-</td>
-</tr>
-<tr class="code">
-<td class="docs">
-<p>Module exports.
- </p>
-</td>
-<td class="code">
-<pre><code><span class="variable">module</span>.<span class="variable">exports</span> = <span class="class">NativeConnection</span>;
-</code></pre>
-</td>
 </tr><tr class="filename"><td><h2 id="lib/drivers/node-mongodb-native/objectid.js"><a href="#">objectid</a></h2></td><td>lib/drivers/node-mongodb-native/objectid.js</td></tr><tr class="code">
 <td class="docs">
 <p>Module dependencies.
@@ -1518,22 +1430,15 @@ to JSON.stringify()</p>
 <td class="code">
 <pre><code><span class="keyword">var</span> <span class="class">ObjectId</span> = <span class="variable">require</span>(<span class="string">'mongodb'</span>).<span class="class">BSONPure</span>.<span class="class">ObjectID</span>;</code></pre>
 </td>
-</tr><tr class="filename"><td><h2 id="lib/error.js"><a href="#">error</a></h2></td><td>lib/error.js</td></tr><tr class="code">
+</tr><tr class="filename"><td><h2 id="lib/drivers/node-mongodb-native/binary.js"><a href="#">binary</a></h2></td><td>lib/drivers/node-mongodb-native/binary.js</td></tr><tr class="code">
 <td class="docs">
-<p>Inherits from Error.
+<p>Module dependencies.
  </p>
 </td>
 <td class="code">
-<pre><code><span class="class">MongooseError</span>.<span class="variable">prototype</span>.<span class="variable">__proto__</span> = <span class="class">Error</span>.<span class="variable">prototype</span>;</code></pre>
-</td>
-</tr>
-<tr class="code">
-<td class="docs">
-<p>Module exports.
- </p>
-</td>
-<td class="code">
-<pre><code><span class="variable">module</span>.<span class="variable">exports</span> = <span class="class">MongooseError</span>;
+<pre><code><span class="keyword">var</span> <span class="class">Binary</span> = <span class="variable">require</span>(<span class="string">'mongodb'</span>).<span class="class">BSONPure</span>.<span class="class">Binary</span>;
+
+<span class="variable">module</span>.<span class="variable">exports</span> = <span class="variable">exports</span> = <span class="class">Binary</span>;
 </code></pre>
 </td>
 </tr><tr class="filename"><td><h2 id="lib/index.js"><a href="#">index</a></h2></td><td>lib/index.js</td></tr><tr class="code">
@@ -2486,85 +2391,52 @@ MyModel.update({ name: 'Tobi' }, { ferret: true }, { multi: true }, fn);</code><
   <span class="keyword">return</span> <span class="variable">query</span>.<span class="variable">update</span>(<span class="variable">doc</span>, <span class="variable">callback</span>);
 };</code></pre>
 </td>
-</tr><tr class="filename"><td><h2 id="lib/namedscope.js"><a href="#">namedscope</a></h2></td><td>lib/namedscope.js</td></tr><tr class="code">
+</tr><tr class="filename"><td><h2 id="lib/collection.js"><a href="#">collection</a></h2></td><td>lib/collection.js</td></tr><tr class="code">
 <td class="docs">
-<p>var Query = require('./query');
-function NamedScope () {}</p>
+<p>Collection constructor</p>
 
-<p>NamedScope.prototype.query;</p>
+<h2></h2>
 
-<p>NamedScope.prototype.where = function () {
-  var q = this.query || (this.query = new Query());
-  q.where.apply(q, arguments);
-  return q;
-};</p>
+<ul><li><p><strong>param</strong>: <em>String</em>  collection name</p></li><li><p><strong>param</strong>: <em>Collection</em>  connection object</p></li><li><p><strong>api</strong>: <em>public</em></p></li></ul>
 </td>
 <td class="code">
-<pre><code>*
- * <span class="class">Decorate</span>
- *
- * @<span class="variable">param</span> {<span class="class">NamedScope</span>} <span class="variable">target</span>
- * @<span class="variable">param</span> {<span class="class">Object</span>} <span class="variable">getters</span>
- * @<span class="variable">api</span> <span class="variable">private</span>
- </code></pre>
+<pre><code><span class="keyword">function</span> <span class="class">Collection</span> (<span class="variable">name</span>, <span class="variable">conn</span>) {
+  <span class="this">this</span>.<span class="variable">name</span> = <span class="variable">name</span>;
+  <span class="this">this</span>.<span class="variable">conn</span> = <span class="variable">conn</span>;
+  <span class="this">this</span>.<span class="variable">buffer</span> = <span class="variable">true</span>;
+  <span class="this">this</span>.<span class="variable">queue</span> = [];
+  <span class="keyword">if</span> (<span class="this">this</span>.<span class="variable">conn</span>.<span class="variable">readyState</span> == <span class="number integer">1</span>) <span class="this">this</span>.<span class="variable">onOpen</span>();
+};</code></pre>
 </td>
 </tr>
 <tr class="code">
 <td class="docs">
-<p>NamedScope.prototype.decorate = function (target, getters) {
-  var name = this.name
-    , block = this.block
-    , query = this.query;
-  if (block) {
-    if (block.length === 0) {
-      Object.defineProperty(target, name, {
-        get: getters.block0(block)
-      });
-    } else {
-      target[name] = getters.blockN(block);
-    }
-  } else {
-    Object.defineProperty(target, name, {
-      get: getters.basic(query)
-    });
-  }
-};</p>
+<p>The collection name</p>
 
-<p>NamedScope.prototype.compile = function (model) {
-  var allScopes = this.scopesByName
-    , scope;
-  for (var k in allScopes) {
-    scope = allScopes[k];
-    scope.decorate(model, {
-      block0: function (block) {
-        return function () {
-          var cquery = this.<em>cumulativeQuery || (this.</em>cumulativeQuery = new Query().bind(this));
-          block.call(cquery);
-          return this;
-        };
-      },
-      blockN: function (block) {
-        return function () {
-          var cquery = this.<em>cumulativeQuery || (this.</em>cumulativeQuery = new Query().bind(this));
-          block.apply(cquery, arguments);
-          return this;
-        };
-      },
-      basic: function (query) {
-        return function () {
-          var cquery = this.<em>cumulativeQuery || (this.</em>cumulativeQuery = new Query().bind(this));
-          cquery.find(query);
-          return this;
-        };
-      }
-    });
-  }
-};</p>
-
-<p>module.exports = NamedScope;</p>
+<ul><li><p><strong>api</strong>: <em>public</em></p></li></ul>
 </td>
 <td class="code">
+<pre><code><span class="class">Collection</span>.<span class="variable">prototype</span>.<span class="variable">name</span>;</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>The Connection instance</p>
 
+<ul><li><p><strong>api</strong>: <em>public</em></p></li></ul>
+</td>
+<td class="code">
+<pre><code><span class="class">Collection</span>.<span class="variable">prototype</span>.<span class="variable">conn</span>;</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Module exports.
+ </p>
+</td>
+<td class="code">
+<pre><code><span class="variable">module</span>.<span class="variable">exports</span> = <span class="class">Collection</span>;
+</code></pre>
 </td>
 </tr><tr class="filename"><td><h2 id="lib/promise.js"><a href="#">promise</a></h2></td><td>lib/promise.js</td></tr><tr class="code">
 <td class="docs">
@@ -2692,123 +2564,6 @@ success condition.</p>
 </td>
 <td class="code">
 <pre><code><span class="variable">module</span>.<span class="variable">exports</span> = <span class="class">Promise</span>;
-</code></pre>
-</td>
-</tr><tr class="filename"><td><h2 id="lib/querystream.js"><a href="#">querystream</a></h2></td><td>lib/querystream.js</td></tr><tr class="code">
-<td class="docs">
-<p>Module dependencies.
- </p>
-</td>
-<td class="code">
-<pre><code><span class="keyword">var</span> <span class="class">Stream</span> = <span class="variable">require</span>(<span class="string">'stream'</span>).<span class="class">Stream</span>
-<span class="keyword">var</span> <span class="variable">utils</span> = <span class="variable">require</span>(<span class="string">'./utils'</span>)</code></pre>
-</td>
-</tr>
-<tr class="code">
-<td class="docs">
-<p>QueryStream</p>
-
-<p>Returns a stream interface for the <code>query</code>.</p>
-
-<h2></h2>
-
-<ul><li><p><strong>param</strong>: <em>Query</em>  query</p></li><li><p><strong>return</strong>: <em>Stream</em> </p></li></ul>
-</td>
-<td class="code">
-<pre><code><span class="keyword">function</span> <span class="class">QueryStream</span> (<span class="variable">query</span>) {
-  <span class="class">Stream</span>.<span class="variable">call</span>(<span class="this">this</span>);
-
-  <span class="this">this</span>.<span class="variable">query</span> = <span class="variable">query</span>;
-  <span class="this">this</span>.<span class="variable">readable</span> = <span class="variable">true</span>;
-  <span class="this">this</span>.<span class="variable">paused</span> = <span class="variable">false</span>;
-  <span class="this">this</span>.<span class="variable">_cursor</span> = <span class="keyword">null</span>;
-  <span class="this">this</span>.<span class="variable">_destroyed</span> = <span class="keyword">null</span>;
-  <span class="this">this</span>.<span class="variable">_fields</span> = <span class="keyword">null</span>;
-  <span class="this">this</span>.<span class="variable">_ticks</span> = <span class="number integer">0</span>;
-  <span class="this">this</span>.<span class="variable">_inline</span> = <span class="class">T_INIT</span>;
-
-  <span class="comment">// give time to hook up events</span>
-  <span class="keyword">var</span> <span class="variable">self</span> = <span class="this">this</span>;
-  <span class="variable">process</span>.<span class="variable">nextTick</span>(<span class="keyword">function</span> () {
-    <span class="variable">self</span>.<span class="variable">_init</span>();
-  });
-}</code></pre>
-</td>
-</tr>
-<tr class="code">
-<td class="docs">
-<p>Flag stating whether or not this stream is readable.
- </p>
-</td>
-<td class="code">
-<pre><code><span class="class">QueryStream</span>.<span class="variable">prototype</span>.<span class="variable">readable</span>;</code></pre>
-</td>
-</tr>
-<tr class="code">
-<td class="docs">
-<p>Flag stating whether or not this stream is paused.
- </p>
-</td>
-<td class="code">
-<pre><code><span class="class">QueryStream</span>.<span class="variable">prototype</span>.<span class="variable">paused</span>;
-
-<span class="comment">// trampoline flags</span>
-<span class="keyword">var</span> <span class="class">T_INIT</span> = <span class="number integer">0</span>;
-<span class="keyword">var</span> <span class="class">T_IDLE</span> = <span class="number integer">1</span>;
-<span class="keyword">var</span> <span class="class">T_CONT</span> = <span class="number integer">2</span>;</code></pre>
-</td>
-</tr>
-<tr class="code">
-<td class="docs">
-<p>Pauses this stream.
- </p>
-</td>
-<td class="code">
-<pre><code><span class="class">QueryStream</span>.<span class="variable">prototype</span>.<span class="variable">pause</span> = <span class="keyword">function</span> () {
-  <span class="this">this</span>.<span class="variable">paused</span> = <span class="variable">true</span>;
-}</code></pre>
-</td>
-</tr>
-<tr class="code">
-<td class="docs">
-<p>Resumes this stream.
- </p>
-</td>
-<td class="code">
-<pre><code><span class="class">QueryStream</span>.<span class="variable">prototype</span>.<span class="variable">resume</span> = <span class="keyword">function</span> () {
-  <span class="this">this</span>.<span class="variable">paused</span> = <span class="variable">false</span>;
-  <span class="this">this</span>.<span class="variable">_next</span>();
-}</code></pre>
-</td>
-</tr>
-<tr class="code">
-<td class="docs">
-<p>Destroys the stream, closing the underlying
-cursor. No more events will be emitted.
- </p>
-</td>
-<td class="code">
-<pre><code><span class="class">QueryStream</span>.<span class="variable">prototype</span>.<span class="variable">destroy</span> = <span class="keyword">function</span> (<span class="variable">err</span>) {
-  <span class="keyword">if</span> (<span class="this">this</span>.<span class="variable">_destroyed</span>) <span class="keyword">return</span>;
-  <span class="this">this</span>.<span class="variable">_destroyed</span> = <span class="variable">true</span>;
-  <span class="this">this</span>.<span class="variable">readable</span> = <span class="variable">false</span>;
-
-  <span class="keyword">if</span> (<span class="this">this</span>.<span class="variable">_cursor</span>) {
-    <span class="this">this</span>.<span class="variable">_cursor</span>.<span class="variable">close</span>();
-  }
-
-  <span class="keyword">if</span> (<span class="variable">err</span>) {
-    <span class="this">this</span>.<span class="variable">emit</span>(<span class="string">'error'</span>, <span class="variable">err</span>);
-  }
-
-  <span class="this">this</span>.<span class="variable">emit</span>(<span class="string">'close'</span>);
-}
-
-<span class="comment">// TODO - maybe implement the -native raw option to pass binary?</span>
-<span class="comment">//QueryStream.prototype.setEncoding = function () {</span>
-<span class="comment">//}</span>
-
-<span class="variable">module</span>.<span class="variable">exports</span> = <span class="variable">exports</span> = <span class="class">QueryStream</span>;
 </code></pre>
 </td>
 </tr><tr class="filename"><td><h2 id="lib/query.js"><a href="#">query</a></h2></td><td>lib/query.js</td></tr><tr class="code">
@@ -3995,319 +3750,121 @@ allows you to iterate the cursor manually.</p>
 <span class="variable">module</span>.<span class="variable">exports</span>.<span class="class">QueryStream</span> = <span class="class">QueryStream</span>;
 </code></pre>
 </td>
-</tr><tr class="filename"><td><h2 id="lib/schema/array.js"><a href="#">array</a></h2></td><td>lib/schema/array.js</td></tr><tr class="code">
+</tr><tr class="filename"><td><h2 id="lib/querystream.js"><a href="#">querystream</a></h2></td><td>lib/querystream.js</td></tr><tr class="code">
 <td class="docs">
 <p>Module dependencies.
  </p>
 </td>
 <td class="code">
-<pre><code><span class="keyword">var</span> <span class="class">SchemaType</span> = <span class="variable">require</span>(<span class="string">'../schematype'</span>)
-  , <span class="class">CastError</span> = <span class="class">SchemaType</span>.<span class="class">CastError</span>
-  , <span class="class">NumberSchema</span> = <span class="variable">require</span>(<span class="string">'./number'</span>)
-  , <span class="class">Types</span> = {
-        <span class="class">Boolean</span>: <span class="variable">require</span>(<span class="string">'./boolean'</span>)
-      , <span class="class">Date</span>: <span class="variable">require</span>(<span class="string">'./date'</span>)
-      , <span class="class">Number</span>: <span class="class">ArrayNumberSchema</span>
-      , <span class="class">String</span>: <span class="variable">require</span>(<span class="string">'./string'</span>)
-      , <span class="class">ObjectId</span>: <span class="variable">require</span>(<span class="string">'./objectid'</span>)
-      , <span class="class">Buffer</span>: <span class="variable">require</span>(<span class="string">'./buffer'</span>)
-    }
-  , <span class="class">MongooseArray</span> = <span class="variable">require</span>(<span class="string">'../types'</span>).<span class="class">Array</span>
-  , <span class="class">Mixed</span> = <span class="variable">require</span>(<span class="string">'./mixed'</span>)
-  , <span class="class">Query</span> = <span class="variable">require</span>(<span class="string">'../query'</span>)
-  , <span class="variable">isMongooseObject</span> = <span class="variable">require</span>(<span class="string">'../utils'</span>).<span class="variable">isMongooseObject</span></code></pre>
+<pre><code><span class="keyword">var</span> <span class="class">Stream</span> = <span class="variable">require</span>(<span class="string">'stream'</span>).<span class="class">Stream</span>
+<span class="keyword">var</span> <span class="variable">utils</span> = <span class="variable">require</span>(<span class="string">'./utils'</span>)</code></pre>
 </td>
 </tr>
 <tr class="code">
 <td class="docs">
-<p>Inherits from SchemaType.
- </p>
-</td>
-<td class="code">
-<pre><code><span class="class">SchemaArray</span>.<span class="variable">prototype</span>.<span class="variable">__proto__</span> = <span class="class">SchemaType</span>.<span class="variable">prototype</span>;</code></pre>
-</td>
-</tr>
-<tr class="code">
-<td class="docs">
-<p>Module exports.
- </p>
-</td>
-<td class="code">
-<pre><code><span class="variable">module</span>.<span class="variable">exports</span> = <span class="class">SchemaArray</span>;
-</code></pre>
-</td>
-</tr><tr class="filename"><td><h2 id="lib/schema/boolean.js"><a href="#">boolean</a></h2></td><td>lib/schema/boolean.js</td></tr><tr class="code">
-<td class="docs">
-<p>Module dependencies.
- </p>
-</td>
-<td class="code">
-<pre><code><span class="keyword">var</span> <span class="class">SchemaType</span> = <span class="variable">require</span>(<span class="string">'../schematype'</span>);</code></pre>
-</td>
-</tr>
-<tr class="code">
-<td class="docs">
-<p>Inherits from SchemaType.
- </p>
-</td>
-<td class="code">
-<pre><code><span class="class">SchemaBoolean</span>.<span class="variable">prototype</span>.<span class="variable">__proto__</span> = <span class="class">SchemaType</span>.<span class="variable">prototype</span>;</code></pre>
-</td>
-</tr>
-<tr class="code">
-<td class="docs">
-<p>Module exports.
- </p>
-</td>
-<td class="code">
-<pre><code><span class="variable">module</span>.<span class="variable">exports</span> = <span class="class">SchemaBoolean</span>;
-</code></pre>
-</td>
-</tr><tr class="filename"><td><h2 id="lib/schema/buffer.js"><a href="#">buffer</a></h2></td><td>lib/schema/buffer.js</td></tr><tr class="code">
-<td class="docs">
-<p>Module dependencies.
- </p>
-</td>
-<td class="code">
-<pre><code><span class="keyword">var</span> <span class="class">SchemaType</span> = <span class="variable">require</span>(<span class="string">'../schematype'</span>)
-  , <span class="class">CastError</span> = <span class="class">SchemaType</span>.<span class="class">CastError</span>
-  , <span class="class">BufferNumberSchema</span> = <span class="keyword">function</span> () {}
-  , <span class="class">MongooseBuffer</span> = <span class="variable">require</span>(<span class="string">'../types'</span>).<span class="class">Buffer</span>
-  , <span class="class">Binary</span> = <span class="class">MongooseBuffer</span>.<span class="class">Binary</span>
-  , <span class="class">Query</span> = <span class="variable">require</span>(<span class="string">'../query'</span>);</code></pre>
-</td>
-</tr>
-<tr class="code">
-<td class="docs">
-<p>Inherits from SchemaType.
- </p>
-</td>
-<td class="code">
-<pre><code><span class="class">SchemaBuffer</span>.<span class="variable">prototype</span>.<span class="variable">__proto__</span> = <span class="class">SchemaType</span>.<span class="variable">prototype</span>;</code></pre>
-</td>
-</tr>
-<tr class="code">
-<td class="docs">
-<p>Module exports.
- </p>
-</td>
-<td class="code">
-<pre><code><span class="variable">module</span>.<span class="variable">exports</span> = <span class="class">SchemaBuffer</span>;
-</code></pre>
-</td>
-</tr><tr class="filename"><td><h2 id="lib/schema/date.js"><a href="#">date</a></h2></td><td>lib/schema/date.js</td></tr><tr class="code">
-<td class="docs">
-<p>Module requirements.
- </p>
-</td>
-<td class="code">
-<pre><code><span class="keyword">var</span> <span class="class">SchemaType</span> = <span class="variable">require</span>(<span class="string">'../schematype'</span>)
-  , <span class="class">CastError</span> = <span class="class">SchemaType</span>.<span class="class">CastError</span>;</code></pre>
-</td>
-</tr>
-<tr class="code">
-<td class="docs">
-<p>Inherits from SchemaType.
- </p>
-</td>
-<td class="code">
-<pre><code><span class="class">SchemaDate</span>.<span class="variable">prototype</span>.<span class="variable">__proto__</span> = <span class="class">SchemaType</span>.<span class="variable">prototype</span>;</code></pre>
-</td>
-</tr>
-<tr class="code">
-<td class="docs">
-<p>Module exports.
- </p>
-</td>
-<td class="code">
-<pre><code><span class="variable">module</span>.<span class="variable">exports</span> = <span class="class">SchemaDate</span>;
-</code></pre>
-</td>
-</tr><tr class="filename"><td><h2 id="lib/schema/documentarray.js"><a href="#">documentarray</a></h2></td><td>lib/schema/documentarray.js</td></tr><tr class="code">
-<td class="docs">
-<p>Module dependencies.
- </p>
-</td>
-<td class="code">
-<pre><code><span class="keyword">var</span> <span class="class">SchemaType</span> = <span class="variable">require</span>(<span class="string">'../schematype'</span>)
-  , <span class="class">ArrayType</span> = <span class="variable">require</span>(<span class="string">'./array'</span>)
-  , <span class="class">MongooseDocumentArray</span> = <span class="variable">require</span>(<span class="string">'../types/documentarray'</span>)
-  , <span class="class">Subdocument</span> = <span class="variable">require</span>(<span class="string">'../types/embedded'</span>)
-  , <span class="class">CastError</span> = <span class="class">SchemaType</span>.<span class="class">CastError</span>
-  , <span class="class">Document</span> = <span class="variable">require</span>(<span class="string">'../document'</span>);</code></pre>
-</td>
-</tr>
-<tr class="code">
-<td class="docs">
-<p>Inherits from ArrayType.
- </p>
-</td>
-<td class="code">
-<pre><code><span class="class">DocumentArray</span>.<span class="variable">prototype</span>.<span class="variable">__proto__</span> = <span class="class">ArrayType</span>.<span class="variable">prototype</span>;</code></pre>
-</td>
-</tr>
-<tr class="code">
-<td class="docs">
-<p>Module exports.
- </p>
-</td>
-<td class="code">
-<pre><code><span class="variable">module</span>.<span class="variable">exports</span> = <span class="class">DocumentArray</span>;
-</code></pre>
-</td>
-</tr><tr class="filename"><td><h2 id="lib/schema/index.js"><a href="#">index</a></h2></td><td>lib/schema/index.js</td></tr><tr class="code">
-<td class="docs">
-<p>Module exports.
- </p>
-</td>
-<td class="code">
-<pre><code><span class="variable">exports</span>.<span class="class">String</span> = <span class="variable">require</span>(<span class="string">'./string'</span>);
+<p>QueryStream</p>
 
-<span class="variable">exports</span>.<span class="class">Number</span> = <span class="variable">require</span>(<span class="string">'./number'</span>);
-
-<span class="variable">exports</span>.<span class="class">Boolean</span> = <span class="variable">require</span>(<span class="string">'./boolean'</span>);
-
-<span class="variable">exports</span>.<span class="class">DocumentArray</span> = <span class="variable">require</span>(<span class="string">'./documentarray'</span>);
-
-<span class="variable">exports</span>.<span class="class">Array</span> = <span class="variable">require</span>(<span class="string">'./array'</span>);
-
-<span class="variable">exports</span>.<span class="class">Buffer</span> = <span class="variable">require</span>(<span class="string">'./buffer'</span>);
-
-<span class="variable">exports</span>.<span class="class">Date</span> = <span class="variable">require</span>(<span class="string">'./date'</span>);
-
-<span class="variable">exports</span>.<span class="class">ObjectId</span> = <span class="variable">require</span>(<span class="string">'./objectid'</span>);
-
-<span class="variable">exports</span>.<span class="class">Mixed</span> = <span class="variable">require</span>(<span class="string">'./mixed'</span>);
-</code></pre>
-</td>
-</tr><tr class="filename"><td><h2 id="lib/schema/mixed.js"><a href="#">mixed</a></h2></td><td>lib/schema/mixed.js</td></tr><tr class="code">
-<td class="docs">
-<p>Module dependencies.
- </p>
-</td>
-<td class="code">
-<pre><code><span class="keyword">var</span> <span class="class">SchemaType</span> = <span class="variable">require</span>(<span class="string">'../schematype'</span>);</code></pre>
-</td>
-</tr>
-<tr class="code">
-<td class="docs">
-<p>Inherits from SchemaType.
- </p>
-</td>
-<td class="code">
-<pre><code><span class="class">Mixed</span>.<span class="variable">prototype</span>.<span class="variable">__proto__</span> = <span class="class">SchemaType</span>.<span class="variable">prototype</span>;</code></pre>
-</td>
-</tr>
-<tr class="code">
-<td class="docs">
-<p>Module exports.
- </p>
-</td>
-<td class="code">
-<pre><code><span class="variable">module</span>.<span class="variable">exports</span> = <span class="class">Mixed</span>;
-</code></pre>
-</td>
-</tr><tr class="filename"><td><h2 id="lib/schema/number.js"><a href="#">number</a></h2></td><td>lib/schema/number.js</td></tr><tr class="code">
-<td class="docs">
-<p>Module requirements.
- </p>
-</td>
-<td class="code">
-<pre><code><span class="keyword">var</span> <span class="class">SchemaType</span> = <span class="variable">require</span>(<span class="string">'../schematype'</span>)
-  , <span class="class">CastError</span> = <span class="class">SchemaType</span>.<span class="class">CastError</span>
-  , <span class="class">MongooseNumber</span> = <span class="variable">require</span>(<span class="string">'../types/number'</span>);</code></pre>
-</td>
-</tr>
-<tr class="code">
-<td class="docs">
-<p>Inherits from SchemaType.
- </p>
-</td>
-<td class="code">
-<pre><code><span class="class">SchemaNumber</span>.<span class="variable">prototype</span>.<span class="variable">__proto__</span> = <span class="class">SchemaType</span>.<span class="variable">prototype</span>;</code></pre>
-</td>
-</tr>
-<tr class="code">
-<td class="docs">
-<p>Sets a maximum number validator</p>
+<p>Returns a stream interface for the <code>query</code>.</p>
 
 <h2></h2>
 
-<ul><li><p><strong>param</strong>: <em>Number</em>  minimum number</p></li><li><p><strong>api</strong>: <em>public</em></p></li></ul>
+<ul><li><p><strong>param</strong>: <em>Query</em>  query</p></li><li><p><strong>return</strong>: <em>Stream</em> </p></li></ul>
 </td>
 <td class="code">
-<pre><code><span class="class">SchemaNumber</span>.<span class="variable">prototype</span>.<span class="variable">min</span> = <span class="keyword">function</span> (<span class="variable">value</span>, <span class="variable">message</span>) {
-  <span class="keyword">if</span> (<span class="this">this</span>.<span class="variable">minValidator</span>)
-    <span class="this">this</span>.<span class="variable">validators</span> = <span class="this">this</span>.<span class="variable">validators</span>.<span class="variable">filter</span>(<span class="keyword">function</span>(<span class="variable">v</span>){
-      <span class="keyword">return</span> <span class="variable">v</span>[<span class="number integer">1</span>] != <span class="string">'min'</span>;
-    });
-  <span class="keyword">if</span> (<span class="variable">value</span> != <span class="keyword">null</span>)
-    <span class="this">this</span>.<span class="variable">validators</span>.<span class="variable">push</span>([<span class="keyword">function</span>(<span class="variable">v</span>){
-      <span class="keyword">return</span> <span class="variable">v</span> === <span class="keyword">null</span> || <span class="variable">v</span> &<span class="variable">gt</span>;= <span class="variable">value</span>;
-    }, <span class="string">'min'</span>]);
-  <span class="keyword">return</span> <span class="this">this</span>;
-};</code></pre>
-</td>
-</tr>
-<tr class="code">
-<td class="docs">
-<p>Sets a maximum number validator</p>
+<pre><code><span class="keyword">function</span> <span class="class">QueryStream</span> (<span class="variable">query</span>) {
+  <span class="class">Stream</span>.<span class="variable">call</span>(<span class="this">this</span>);
 
-<h2></h2>
+  <span class="this">this</span>.<span class="variable">query</span> = <span class="variable">query</span>;
+  <span class="this">this</span>.<span class="variable">readable</span> = <span class="variable">true</span>;
+  <span class="this">this</span>.<span class="variable">paused</span> = <span class="variable">false</span>;
+  <span class="this">this</span>.<span class="variable">_cursor</span> = <span class="keyword">null</span>;
+  <span class="this">this</span>.<span class="variable">_destroyed</span> = <span class="keyword">null</span>;
+  <span class="this">this</span>.<span class="variable">_fields</span> = <span class="keyword">null</span>;
+  <span class="this">this</span>.<span class="variable">_ticks</span> = <span class="number integer">0</span>;
+  <span class="this">this</span>.<span class="variable">_inline</span> = <span class="class">T_INIT</span>;
 
-<ul><li><p><strong>param</strong>: <em>Number</em>  maximum number</p></li><li><p><strong>api</strong>: <em>public</em></p></li></ul>
-</td>
-<td class="code">
-<pre><code><span class="class">SchemaNumber</span>.<span class="variable">prototype</span>.<span class="variable">max</span> = <span class="keyword">function</span> (<span class="variable">value</span>, <span class="variable">message</span>) {
-  <span class="keyword">if</span> (<span class="this">this</span>.<span class="variable">maxValidator</span>)
-    <span class="this">this</span>.<span class="variable">validators</span> = <span class="this">this</span>.<span class="variable">validators</span>.<span class="variable">filter</span>(<span class="keyword">function</span>(<span class="variable">v</span>){
-      <span class="keyword">return</span> <span class="variable">v</span>[<span class="number integer">1</span>] != <span class="string">'max'</span>;
-    });
-  <span class="keyword">if</span> (<span class="variable">value</span> != <span class="keyword">null</span>)
-    <span class="this">this</span>.<span class="variable">validators</span>.<span class="variable">push</span>([<span class="this">this</span>.<span class="variable">maxValidator</span> = <span class="keyword">function</span>(<span class="variable">v</span>){
-      <span class="keyword">return</span> <span class="variable">v</span> === <span class="keyword">null</span> || <span class="variable">v</span> &<span class="variable">lt</span>;= <span class="variable">value</span>;
-    }, <span class="string">'max'</span>]);
-  <span class="keyword">return</span> <span class="this">this</span>;
-};</code></pre>
+  <span class="comment">// give time to hook up events</span>
+  <span class="keyword">var</span> <span class="variable">self</span> = <span class="this">this</span>;
+  <span class="variable">process</span>.<span class="variable">nextTick</span>(<span class="keyword">function</span> () {
+    <span class="variable">self</span>.<span class="variable">_init</span>();
+  });
+}</code></pre>
 </td>
 </tr>
 <tr class="code">
 <td class="docs">
-<p>Module exports.
+<p>Flag stating whether or not this stream is readable.
  </p>
 </td>
 <td class="code">
-<pre><code><span class="variable">module</span>.<span class="variable">exports</span> = <span class="class">SchemaNumber</span>;
-</code></pre>
-</td>
-</tr><tr class="filename"><td><h2 id="lib/schema/objectid.js"><a href="#">objectid</a></h2></td><td>lib/schema/objectid.js</td></tr><tr class="code">
-<td class="docs">
-<p>Module dependencies.
- </p>
-</td>
-<td class="code">
-<pre><code><span class="keyword">var</span> <span class="class">SchemaType</span> = <span class="variable">require</span>(<span class="string">'../schematype'</span>)
-  , <span class="class">CastError</span> = <span class="class">SchemaType</span>.<span class="class">CastError</span>
-  , <span class="variable">driver</span> = <span class="variable">global</span>.<span class="class">MONGOOSE_DRIVER_PATH</span> || <span class="string">'./../drivers/node-mongodb-native'</span>
-  , <span class="variable">oid</span> = <span class="variable">require</span>(<span class="string">'../types/objectid'</span>);</code></pre>
+<pre><code><span class="class">QueryStream</span>.<span class="variable">prototype</span>.<span class="variable">readable</span>;</code></pre>
 </td>
 </tr>
 <tr class="code">
 <td class="docs">
-<p>Inherits from SchemaType.
+<p>Flag stating whether or not this stream is paused.
  </p>
 </td>
 <td class="code">
-<pre><code><span class="class">ObjectId</span>.<span class="variable">prototype</span>.<span class="variable">__proto__</span> = <span class="class">SchemaType</span>.<span class="variable">prototype</span>;</code></pre>
+<pre><code><span class="class">QueryStream</span>.<span class="variable">prototype</span>.<span class="variable">paused</span>;
+
+<span class="comment">// trampoline flags</span>
+<span class="keyword">var</span> <span class="class">T_INIT</span> = <span class="number integer">0</span>;
+<span class="keyword">var</span> <span class="class">T_IDLE</span> = <span class="number integer">1</span>;
+<span class="keyword">var</span> <span class="class">T_CONT</span> = <span class="number integer">2</span>;</code></pre>
 </td>
 </tr>
 <tr class="code">
 <td class="docs">
-<p>Module exports.
+<p>Pauses this stream.
  </p>
 </td>
 <td class="code">
-<pre><code><span class="variable">module</span>.<span class="variable">exports</span> = <span class="class">ObjectId</span>;
+<pre><code><span class="class">QueryStream</span>.<span class="variable">prototype</span>.<span class="variable">pause</span> = <span class="keyword">function</span> () {
+  <span class="this">this</span>.<span class="variable">paused</span> = <span class="variable">true</span>;
+}</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Resumes this stream.
+ </p>
+</td>
+<td class="code">
+<pre><code><span class="class">QueryStream</span>.<span class="variable">prototype</span>.<span class="variable">resume</span> = <span class="keyword">function</span> () {
+  <span class="this">this</span>.<span class="variable">paused</span> = <span class="variable">false</span>;
+  <span class="this">this</span>.<span class="variable">_next</span>();
+}</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Destroys the stream, closing the underlying
+cursor. No more events will be emitted.
+ </p>
+</td>
+<td class="code">
+<pre><code><span class="class">QueryStream</span>.<span class="variable">prototype</span>.<span class="variable">destroy</span> = <span class="keyword">function</span> (<span class="variable">err</span>) {
+  <span class="keyword">if</span> (<span class="this">this</span>.<span class="variable">_destroyed</span>) <span class="keyword">return</span>;
+  <span class="this">this</span>.<span class="variable">_destroyed</span> = <span class="variable">true</span>;
+  <span class="this">this</span>.<span class="variable">readable</span> = <span class="variable">false</span>;
+
+  <span class="keyword">if</span> (<span class="this">this</span>.<span class="variable">_cursor</span>) {
+    <span class="this">this</span>.<span class="variable">_cursor</span>.<span class="variable">close</span>();
+  }
+
+  <span class="keyword">if</span> (<span class="variable">err</span>) {
+    <span class="this">this</span>.<span class="variable">emit</span>(<span class="string">'error'</span>, <span class="variable">err</span>);
+  }
+
+  <span class="this">this</span>.<span class="variable">emit</span>(<span class="string">'close'</span>);
+}
+
+<span class="comment">// TODO - maybe implement the -native raw option to pass binary?</span>
+<span class="comment">//QueryStream.prototype.setEncoding = function () {</span>
+<span class="comment">//}</span>
+
+<span class="variable">module</span>.<span class="variable">exports</span> = <span class="variable">exports</span> = <span class="class">QueryStream</span>;
 </code></pre>
 </td>
 </tr><tr class="filename"><td><h2 id="lib/schema/string.js"><a href="#">string</a></h2></td><td>lib/schema/string.js</td></tr><tr class="code">
@@ -4431,6 +3988,319 @@ allows you to iterate the cursor manually.</p>
 </td>
 <td class="code">
 <pre><code><span class="variable">module</span>.<span class="variable">exports</span> = <span class="class">SchemaString</span>;
+</code></pre>
+</td>
+</tr><tr class="filename"><td><h2 id="lib/error.js"><a href="#">error</a></h2></td><td>lib/error.js</td></tr><tr class="code">
+<td class="docs">
+<p>Inherits from Error.
+ </p>
+</td>
+<td class="code">
+<pre><code><span class="class">MongooseError</span>.<span class="variable">prototype</span>.<span class="variable">__proto__</span> = <span class="class">Error</span>.<span class="variable">prototype</span>;</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Module exports.
+ </p>
+</td>
+<td class="code">
+<pre><code><span class="variable">module</span>.<span class="variable">exports</span> = <span class="class">MongooseError</span>;
+</code></pre>
+</td>
+</tr><tr class="filename"><td><h2 id="lib/namedscope.js"><a href="#">namedscope</a></h2></td><td>lib/namedscope.js</td></tr><tr class="code">
+<td class="docs">
+<p>var Query = require('./query');
+function NamedScope () {}</p>
+
+<p>NamedScope.prototype.query;</p>
+
+<p>NamedScope.prototype.where = function () {
+  var q = this.query || (this.query = new Query());
+  q.where.apply(q, arguments);
+  return q;
+};</p>
+</td>
+<td class="code">
+<pre><code>*
+ * <span class="class">Decorate</span>
+ *
+ * @<span class="variable">param</span> {<span class="class">NamedScope</span>} <span class="variable">target</span>
+ * @<span class="variable">param</span> {<span class="class">Object</span>} <span class="variable">getters</span>
+ * @<span class="variable">api</span> <span class="variable">private</span>
+ </code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>NamedScope.prototype.decorate = function (target, getters) {
+  var name = this.name
+    , block = this.block
+    , query = this.query;
+  if (block) {
+    if (block.length === 0) {
+      Object.defineProperty(target, name, {
+        get: getters.block0(block)
+      });
+    } else {
+      target[name] = getters.blockN(block);
+    }
+  } else {
+    Object.defineProperty(target, name, {
+      get: getters.basic(query)
+    });
+  }
+};</p>
+
+<p>NamedScope.prototype.compile = function (model) {
+  var allScopes = this.scopesByName
+    , scope;
+  for (var k in allScopes) {
+    scope = allScopes[k];
+    scope.decorate(model, {
+      block0: function (block) {
+        return function () {
+          var cquery = this.<em>cumulativeQuery || (this.</em>cumulativeQuery = new Query().bind(this));
+          block.call(cquery);
+          return this;
+        };
+      },
+      blockN: function (block) {
+        return function () {
+          var cquery = this.<em>cumulativeQuery || (this.</em>cumulativeQuery = new Query().bind(this));
+          block.apply(cquery, arguments);
+          return this;
+        };
+      },
+      basic: function (query) {
+        return function () {
+          var cquery = this.<em>cumulativeQuery || (this.</em>cumulativeQuery = new Query().bind(this));
+          cquery.find(query);
+          return this;
+        };
+      }
+    });
+  }
+};</p>
+
+<p>module.exports = NamedScope;</p>
+</td>
+<td class="code">
+
+</td>
+</tr><tr class="filename"><td><h2 id="lib/schema/documentarray.js"><a href="#">documentarray</a></h2></td><td>lib/schema/documentarray.js</td></tr><tr class="code">
+<td class="docs">
+<p>Module dependencies.
+ </p>
+</td>
+<td class="code">
+<pre><code><span class="keyword">var</span> <span class="class">SchemaType</span> = <span class="variable">require</span>(<span class="string">'../schematype'</span>)
+  , <span class="class">ArrayType</span> = <span class="variable">require</span>(<span class="string">'./array'</span>)
+  , <span class="class">MongooseDocumentArray</span> = <span class="variable">require</span>(<span class="string">'../types/documentarray'</span>)
+  , <span class="class">Subdocument</span> = <span class="variable">require</span>(<span class="string">'../types/embedded'</span>)
+  , <span class="class">CastError</span> = <span class="class">SchemaType</span>.<span class="class">CastError</span>
+  , <span class="class">Document</span> = <span class="variable">require</span>(<span class="string">'../document'</span>);</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Inherits from ArrayType.
+ </p>
+</td>
+<td class="code">
+<pre><code><span class="class">DocumentArray</span>.<span class="variable">prototype</span>.<span class="variable">__proto__</span> = <span class="class">ArrayType</span>.<span class="variable">prototype</span>;</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Module exports.
+ </p>
+</td>
+<td class="code">
+<pre><code><span class="variable">module</span>.<span class="variable">exports</span> = <span class="class">DocumentArray</span>;
+</code></pre>
+</td>
+</tr><tr class="filename"><td><h2 id="lib/schema/mixed.js"><a href="#">mixed</a></h2></td><td>lib/schema/mixed.js</td></tr><tr class="code">
+<td class="docs">
+<p>Module dependencies.
+ </p>
+</td>
+<td class="code">
+<pre><code><span class="keyword">var</span> <span class="class">SchemaType</span> = <span class="variable">require</span>(<span class="string">'../schematype'</span>);</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Inherits from SchemaType.
+ </p>
+</td>
+<td class="code">
+<pre><code><span class="class">Mixed</span>.<span class="variable">prototype</span>.<span class="variable">__proto__</span> = <span class="class">SchemaType</span>.<span class="variable">prototype</span>;</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Module exports.
+ </p>
+</td>
+<td class="code">
+<pre><code><span class="variable">module</span>.<span class="variable">exports</span> = <span class="class">Mixed</span>;
+</code></pre>
+</td>
+</tr><tr class="filename"><td><h2 id="lib/drivers/node-mongodb-native/connection.js"><a href="#">connection</a></h2></td><td>lib/drivers/node-mongodb-native/connection.js</td></tr><tr class="code">
+<td class="docs">
+<p>Module dependencies.
+ </p>
+</td>
+<td class="code">
+<pre><code><span class="keyword">var</span> <span class="class">Connection</span> = <span class="variable">require</span>(<span class="string">'../../connection'</span>)
+  , <span class="variable">mongo</span> = <span class="variable">require</span>(<span class="string">'mongodb'</span>)
+  , <span class="class">Server</span> = <span class="variable">mongo</span>.<span class="class">Server</span>
+  , <span class="class">ReplSetServers</span> = <span class="variable">mongo</span>.<span class="class">ReplSetServers</span>;</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Inherits from Connection.
+ </p>
+</td>
+<td class="code">
+<pre><code><span class="class">NativeConnection</span>.<span class="variable">prototype</span>.<span class="variable">__proto__</span> = <span class="class">Connection</span>.<span class="variable">prototype</span>;</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Module exports.
+ </p>
+</td>
+<td class="code">
+<pre><code><span class="variable">module</span>.<span class="variable">exports</span> = <span class="class">NativeConnection</span>;
+</code></pre>
+</td>
+</tr><tr class="filename"><td><h2 id="lib/schema/index.js"><a href="#">index</a></h2></td><td>lib/schema/index.js</td></tr><tr class="code">
+<td class="docs">
+<p>Module exports.
+ </p>
+</td>
+<td class="code">
+<pre><code><span class="variable">exports</span>.<span class="class">String</span> = <span class="variable">require</span>(<span class="string">'./string'</span>);
+
+<span class="variable">exports</span>.<span class="class">Number</span> = <span class="variable">require</span>(<span class="string">'./number'</span>);
+
+<span class="variable">exports</span>.<span class="class">Boolean</span> = <span class="variable">require</span>(<span class="string">'./boolean'</span>);
+
+<span class="variable">exports</span>.<span class="class">DocumentArray</span> = <span class="variable">require</span>(<span class="string">'./documentarray'</span>);
+
+<span class="variable">exports</span>.<span class="class">Array</span> = <span class="variable">require</span>(<span class="string">'./array'</span>);
+
+<span class="variable">exports</span>.<span class="class">Buffer</span> = <span class="variable">require</span>(<span class="string">'./buffer'</span>);
+
+<span class="variable">exports</span>.<span class="class">Date</span> = <span class="variable">require</span>(<span class="string">'./date'</span>);
+
+<span class="variable">exports</span>.<span class="class">ObjectId</span> = <span class="variable">require</span>(<span class="string">'./objectid'</span>);
+
+<span class="variable">exports</span>.<span class="class">Mixed</span> = <span class="variable">require</span>(<span class="string">'./mixed'</span>);
+</code></pre>
+</td>
+</tr><tr class="filename"><td><h2 id="lib/schema/date.js"><a href="#">date</a></h2></td><td>lib/schema/date.js</td></tr><tr class="code">
+<td class="docs">
+<p>Module requirements.
+ </p>
+</td>
+<td class="code">
+<pre><code><span class="keyword">var</span> <span class="class">SchemaType</span> = <span class="variable">require</span>(<span class="string">'../schematype'</span>)
+  , <span class="class">CastError</span> = <span class="class">SchemaType</span>.<span class="class">CastError</span>;</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Inherits from SchemaType.
+ </p>
+</td>
+<td class="code">
+<pre><code><span class="class">SchemaDate</span>.<span class="variable">prototype</span>.<span class="variable">__proto__</span> = <span class="class">SchemaType</span>.<span class="variable">prototype</span>;</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Module exports.
+ </p>
+</td>
+<td class="code">
+<pre><code><span class="variable">module</span>.<span class="variable">exports</span> = <span class="class">SchemaDate</span>;
+</code></pre>
+</td>
+</tr><tr class="filename"><td><h2 id="lib/schema/buffer.js"><a href="#">buffer</a></h2></td><td>lib/schema/buffer.js</td></tr><tr class="code">
+<td class="docs">
+<p>Module dependencies.
+ </p>
+</td>
+<td class="code">
+<pre><code><span class="keyword">var</span> <span class="class">SchemaType</span> = <span class="variable">require</span>(<span class="string">'../schematype'</span>)
+  , <span class="class">CastError</span> = <span class="class">SchemaType</span>.<span class="class">CastError</span>
+  , <span class="class">BufferNumberSchema</span> = <span class="keyword">function</span> () {}
+  , <span class="class">MongooseBuffer</span> = <span class="variable">require</span>(<span class="string">'../types'</span>).<span class="class">Buffer</span>
+  , <span class="class">Binary</span> = <span class="class">MongooseBuffer</span>.<span class="class">Binary</span>
+  , <span class="class">Query</span> = <span class="variable">require</span>(<span class="string">'../query'</span>);</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Inherits from SchemaType.
+ </p>
+</td>
+<td class="code">
+<pre><code><span class="class">SchemaBuffer</span>.<span class="variable">prototype</span>.<span class="variable">__proto__</span> = <span class="class">SchemaType</span>.<span class="variable">prototype</span>;</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Module exports.
+ </p>
+</td>
+<td class="code">
+<pre><code><span class="variable">module</span>.<span class="variable">exports</span> = <span class="class">SchemaBuffer</span>;
+</code></pre>
+</td>
+</tr><tr class="filename"><td><h2 id="lib/schema/array.js"><a href="#">array</a></h2></td><td>lib/schema/array.js</td></tr><tr class="code">
+<td class="docs">
+<p>Module dependencies.
+ </p>
+</td>
+<td class="code">
+<pre><code><span class="keyword">var</span> <span class="class">SchemaType</span> = <span class="variable">require</span>(<span class="string">'../schematype'</span>)
+  , <span class="class">CastError</span> = <span class="class">SchemaType</span>.<span class="class">CastError</span>
+  , <span class="class">NumberSchema</span> = <span class="variable">require</span>(<span class="string">'./number'</span>)
+  , <span class="class">Types</span> = {
+        <span class="class">Boolean</span>: <span class="variable">require</span>(<span class="string">'./boolean'</span>)
+      , <span class="class">Date</span>: <span class="variable">require</span>(<span class="string">'./date'</span>)
+      , <span class="class">Number</span>: <span class="class">ArrayNumberSchema</span>
+      , <span class="class">String</span>: <span class="variable">require</span>(<span class="string">'./string'</span>)
+      , <span class="class">ObjectId</span>: <span class="variable">require</span>(<span class="string">'./objectid'</span>)
+      , <span class="class">Buffer</span>: <span class="variable">require</span>(<span class="string">'./buffer'</span>)
+    }
+  , <span class="class">MongooseArray</span> = <span class="variable">require</span>(<span class="string">'../types'</span>).<span class="class">Array</span>
+  , <span class="class">Mixed</span> = <span class="variable">require</span>(<span class="string">'./mixed'</span>)
+  , <span class="class">Query</span> = <span class="variable">require</span>(<span class="string">'../query'</span>)
+  , <span class="variable">isMongooseObject</span> = <span class="variable">require</span>(<span class="string">'../utils'</span>).<span class="variable">isMongooseObject</span></code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Inherits from SchemaType.
+ </p>
+</td>
+<td class="code">
+<pre><code><span class="class">SchemaArray</span>.<span class="variable">prototype</span>.<span class="variable">__proto__</span> = <span class="class">SchemaType</span>.<span class="variable">prototype</span>;</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Module exports.
+ </p>
+</td>
+<td class="code">
+<pre><code><span class="variable">module</span>.<span class="variable">exports</span> = <span class="class">SchemaArray</span>;
 </code></pre>
 </td>
 </tr><tr class="filename"><td><h2 id="lib/schema.js"><a href="#">schema</a></h2></td><td>lib/schema.js</td></tr><tr class="code">
@@ -5015,42 +4885,34 @@ if the path doesn't exist.</p>
 
 </code></pre>
 </td>
-</tr><tr class="filename"><td><h2 id="lib/schemadefault.js"><a href="#">schemadefault</a></h2></td><td>lib/schemadefault.js</td></tr><tr class="code">
+</tr><tr class="filename"><td><h2 id="lib/schema/objectid.js"><a href="#">objectid</a></h2></td><td>lib/schema/objectid.js</td></tr><tr class="code">
 <td class="docs">
 <p>Module dependencies.
  </p>
 </td>
 <td class="code">
-<pre><code><span class="keyword">var</span> <span class="class">Schema</span> = <span class="variable">require</span>(<span class="string">'./schema'</span>)</code></pre>
+<pre><code><span class="keyword">var</span> <span class="class">SchemaType</span> = <span class="variable">require</span>(<span class="string">'../schematype'</span>)
+  , <span class="class">CastError</span> = <span class="class">SchemaType</span>.<span class="class">CastError</span>
+  , <span class="variable">driver</span> = <span class="variable">global</span>.<span class="class">MONGOOSE_DRIVER_PATH</span> || <span class="string">'./../drivers/node-mongodb-native'</span>
+  , <span class="variable">oid</span> = <span class="variable">require</span>(<span class="string">'../types/objectid'</span>);</code></pre>
 </td>
 </tr>
 <tr class="code">
 <td class="docs">
-<p>Default model for querying the system.profiles
-collection (it only exists when profiling is
-enabled.
+<p>Inherits from SchemaType.
  </p>
 </td>
 <td class="code">
-<pre><code><span class="variable">exports</span>[<span class="string">'system.profile'</span>] = <span class="keyword">new</span> <span class="class">Schema</span>({
-    <span class="variable">ts</span>: <span class="class">Date</span>
-  , <span class="variable">info</span>: <span class="class">String</span> <span class="comment">// deprecated</span>
-  , <span class="variable">millis</span>: <span class="class">Number</span>
-  , <span class="variable">op</span>: <span class="class">String</span>
-  , <span class="variable">ns</span>: <span class="class">String</span>
-  , <span class="variable">query</span>: <span class="class">Schema</span>.<span class="class">Types</span>.<span class="class">Mixed</span>
-  , <span class="variable">updateobj</span>: <span class="class">Schema</span>.<span class="class">Types</span>.<span class="class">Mixed</span>
-  , <span class="variable">ntoreturn</span>: <span class="class">Number</span>
-  , <span class="variable">nreturned</span>: <span class="class">Number</span>
-  , <span class="variable">nscanned</span>: <span class="class">Number</span>
-  , <span class="variable">responseLength</span>: <span class="class">Number</span>
-  , <span class="variable">client</span>: <span class="class">String</span>
-  , <span class="variable">user</span>: <span class="class">String</span>
-  , <span class="variable">idhack</span>: <span class="class">Boolean</span>
-  , <span class="variable">scanAndOrder</span>: <span class="class">Boolean</span>
-  , <span class="variable">keyUpdates</span>: <span class="class">Number</span>
-  , <span class="variable">cursorid</span>: <span class="class">Number</span>
-}, { <span class="variable">noVirtualId</span>: <span class="variable">true</span>, <span class="variable">noId</span>: <span class="variable">true</span> });
+<pre><code><span class="class">ObjectId</span>.<span class="variable">prototype</span>.<span class="variable">__proto__</span> = <span class="class">SchemaType</span>.<span class="variable">prototype</span>;</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Module exports.
+ </p>
+</td>
+<td class="code">
+<pre><code><span class="variable">module</span>.<span class="variable">exports</span> = <span class="class">ObjectId</span>;
 </code></pre>
 </td>
 </tr><tr class="filename"><td><h2 id="lib/schematype.js"><a href="#">schematype</a></h2></td><td>lib/schematype.js</td></tr><tr class="code">
@@ -5299,13 +5161,513 @@ T.find().select({ x: 0 }).exec();</code></pre>
 <span class="variable">exports</span>.<span class="class">ValidatorError</span> = <span class="class">ValidatorError</span>;
 </code></pre>
 </td>
-</tr><tr class="filename"><td><h2 id="lib/statemachine.js"><a href="#">statemachine</a></h2></td><td>lib/statemachine.js</td></tr><tr class="code">
+</tr><tr class="filename"><td><h2 id="lib/schemadefault.js"><a href="#">schemadefault</a></h2></td><td>lib/schemadefault.js</td></tr><tr class="code">
 <td class="docs">
 <p>Module dependencies.
  </p>
 </td>
 <td class="code">
-<pre><code><span class="keyword">var</span> <span class="variable">utils</span> = <span class="variable">require</span>(<span class="string">'./utils'</span>);</code></pre>
+<pre><code><span class="keyword">var</span> <span class="class">Schema</span> = <span class="variable">require</span>(<span class="string">'./schema'</span>)</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Default model for querying the system.profiles
+collection (it only exists when profiling is
+enabled.
+ </p>
+</td>
+<td class="code">
+<pre><code><span class="variable">exports</span>[<span class="string">'system.profile'</span>] = <span class="keyword">new</span> <span class="class">Schema</span>({
+    <span class="variable">ts</span>: <span class="class">Date</span>
+  , <span class="variable">info</span>: <span class="class">String</span> <span class="comment">// deprecated</span>
+  , <span class="variable">millis</span>: <span class="class">Number</span>
+  , <span class="variable">op</span>: <span class="class">String</span>
+  , <span class="variable">ns</span>: <span class="class">String</span>
+  , <span class="variable">query</span>: <span class="class">Schema</span>.<span class="class">Types</span>.<span class="class">Mixed</span>
+  , <span class="variable">updateobj</span>: <span class="class">Schema</span>.<span class="class">Types</span>.<span class="class">Mixed</span>
+  , <span class="variable">ntoreturn</span>: <span class="class">Number</span>
+  , <span class="variable">nreturned</span>: <span class="class">Number</span>
+  , <span class="variable">nscanned</span>: <span class="class">Number</span>
+  , <span class="variable">responseLength</span>: <span class="class">Number</span>
+  , <span class="variable">client</span>: <span class="class">String</span>
+  , <span class="variable">user</span>: <span class="class">String</span>
+  , <span class="variable">idhack</span>: <span class="class">Boolean</span>
+  , <span class="variable">scanAndOrder</span>: <span class="class">Boolean</span>
+  , <span class="variable">keyUpdates</span>: <span class="class">Number</span>
+  , <span class="variable">cursorid</span>: <span class="class">Number</span>
+}, { <span class="variable">noVirtualId</span>: <span class="variable">true</span>, <span class="variable">noId</span>: <span class="variable">true</span> });
+</code></pre>
+</td>
+</tr><tr class="filename"><td><h2 id="lib/types/documentarray.js"><a href="#">documentarray</a></h2></td><td>lib/types/documentarray.js</td></tr><tr class="code">
+<td class="docs">
+<p>Module dependencies.
+ </p>
+</td>
+<td class="code">
+<pre><code><span class="keyword">var</span> <span class="class">MongooseArray</span> = <span class="variable">require</span>(<span class="string">'./array'</span>)
+  , <span class="variable">driver</span> = <span class="variable">global</span>.<span class="class">MONGOOSE_DRIVER_PATH</span> || <span class="string">'../drivers/node-mongodb-native'</span>
+  , <span class="class">ObjectId</span> = <span class="variable">require</span>(<span class="variable">driver</span> + <span class="string">'/objectid'</span>)
+  , <span class="class">ObjectIdSchema</span> = <span class="variable">require</span>(<span class="string">'../schema/objectid'</span>);</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Inherits from MongooseArray
+ </p>
+</td>
+<td class="code">
+<pre><code><span class="class">MongooseDocumentArray</span>.<span class="variable">prototype</span>.<span class="variable">__proto__</span> = <span class="class">MongooseArray</span>.<span class="variable">prototype</span>;</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Filters items by id</p>
+
+<h2></h2>
+
+<ul><li><p><strong>param</strong>: <em>Object</em>  id</p></li><li><p><strong>api</strong>: <em>public</em></p></li></ul>
+</td>
+<td class="code">
+<pre><code><span class="class">MongooseDocumentArray</span>.<span class="variable">prototype</span>.<span class="variable">id</span> = <span class="keyword">function</span> (<span class="variable">id</span>) {
+  <span class="keyword">var</span> <span class="variable">casted</span>
+    , <span class="variable">_id</span>;
+
+  <span class="keyword">try</span> {
+    <span class="variable">casted</span> = <span class="class">ObjectId</span>.<span class="variable">toString</span>(<span class="class">ObjectIdSchema</span>.<span class="variable">prototype</span>.<span class="variable">cast</span>.<span class="variable">call</span>({}, <span class="variable">id</span>));
+  } <span class="keyword">catch</span> (<span class="variable">e</span>) {
+    <span class="variable">casted</span> = <span class="keyword">null</span>;
+  }
+
+  <span class="keyword">for</span> (<span class="keyword">var</span> <span class="variable">i</span> = <span class="number integer">0</span>, <span class="variable">l</span> = <span class="this">this</span>.<span class="variable">length</span>; <span class="variable">i</span> &<span class="variable">lt</span>; <span class="variable">l</span>; <span class="variable">i</span>++) {
+    <span class="variable">_id</span> = <span class="this">this</span>[<span class="variable">i</span>].<span class="variable">get</span>(<span class="string">'_id'</span>);
+    <span class="keyword">if</span> (!(<span class="variable">_id</span> <span class="variable">instanceof</span> <span class="class">ObjectId</span>)) {
+      <span class="keyword">if</span> (<span class="class">String</span>(<span class="variable">id</span>) == <span class="variable">_id</span>)
+        <span class="keyword">return</span> <span class="this">this</span>[<span class="variable">i</span>];
+    } <span class="keyword">else</span> {
+      <span class="keyword">if</span> (<span class="variable">casted</span> == <span class="variable">_id</span>)
+        <span class="keyword">return</span> <span class="this">this</span>[<span class="variable">i</span>];
+    }
+  }
+
+  <span class="keyword">return</span> <span class="keyword">null</span>;
+};</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Returns an Array and converts any Document
+members toObject.</p>
+
+<h2></h2>
+
+<ul><li><p><strong>return</strong>: <em>Array</em> </p></li><li><p><strong>api</strong>: <em>public</em></p></li></ul>
+</td>
+<td class="code">
+<pre><code><span class="class">MongooseDocumentArray</span>.<span class="variable">prototype</span>.<span class="variable">toObject</span> = <span class="keyword">function</span> () {
+  <span class="keyword">return</span> <span class="this">this</span>.<span class="variable">map</span>(<span class="keyword">function</span> (<span class="variable">doc</span>) {
+    <span class="keyword">return</span> <span class="variable">doc</span> &<span class="variable">amp</span>;&<span class="variable">amp</span>; <span class="variable">doc</span>.<span class="variable">toObject</span>() || <span class="keyword">null</span>;
+  });
+};</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Helper for console.log</p>
+
+<ul><li><p><strong>api</strong>: <em>public</em></p></li></ul>
+</td>
+<td class="code">
+<pre><code><span class="class">MongooseDocumentArray</span>.<span class="variable">prototype</span>.<span class="variable">inspect</span> = <span class="keyword">function</span> () {
+  <span class="keyword">return</span> <span class="string">'['</span> + <span class="this">this</span>.<span class="variable">map</span>(<span class="keyword">function</span> (<span class="variable">doc</span>) {
+    <span class="keyword">return</span> <span class="variable">doc</span> &<span class="variable">amp</span>;&<span class="variable">amp</span>; <span class="variable">doc</span>.<span class="variable">inspect</span>() || <span class="string">'null'</span>;
+  }).<span class="variable">join</span>(<span class="string">'\n'</span>) + <span class="string">']'</span>;
+};</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Module exports.
+ </p>
+</td>
+<td class="code">
+<pre><code><span class="variable">module</span>.<span class="variable">exports</span> = <span class="class">MongooseDocumentArray</span>;
+</code></pre>
+</td>
+</tr><tr class="filename"><td><h2 id="lib/types/document.js"><a href="#">document</a></h2></td><td>lib/types/document.js</td></tr><tr class="code">
+<td class="docs">
+<p>Module dependencies.
+ </p>
+</td>
+<td class="code">
+<pre><code><span class="keyword">var</span> <span class="class">Document</span> = <span class="variable">require</span>(<span class="string">'../document'</span>)
+  , <span class="variable">inspect</span> = <span class="variable">require</span>(<span class="string">'util'</span>).<span class="variable">inspect</span>;</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Inherit from Document</p>
+
+<p> </p>
+</td>
+<td class="code">
+<pre><code><span class="class">EmbeddedDocument</span>.<span class="variable">prototype</span>.<span class="variable">__proto__</span> = <span class="class">Document</span>.<span class="variable">prototype</span>;</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Override set to mark the parent as modified</p>
+
+<ul><li><p><strong>api</strong>: <em>public</em></p></li></ul>
+</td>
+<td class="code">
+<pre><code><span class="keyword">var</span> <span class="variable">oldSet</span> = <span class="class">Document</span>.<span class="variable">prototype</span>.<span class="variable">set</span>;
+
+<span class="class">EmbeddedDocument</span>.<span class="variable">prototype</span>.<span class="variable">set</span> = <span class="keyword">function</span> (<span class="variable">path</span>) {
+  <span class="this">this</span>.<span class="variable">markModified</span>(<span class="variable">path</span>);
+  <span class="keyword">return</span> <span class="variable">oldSet</span>.<span class="variable">apply</span>(<span class="this">this</span>, <span class="variable">arguments</span>);
+};</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Save the subdocument</p>
+
+<ul><li><p><strong>api</strong>: <em>public</em></p></li></ul>
+</td>
+<td class="code">
+<pre><code><span class="class">EmbeddedDocument</span>.<span class="variable">prototype</span>.<span class="variable">save</span> = <span class="keyword">function</span>(<span class="variable">fn</span>) {
+  <span class="keyword">if</span> (<span class="variable">fn</span>)
+    <span class="variable">fn</span>(<span class="keyword">null</span>);
+  <span class="this">this</span>.<span class="variable">emit</span>(<span class="string">'save'</span>, <span class="this">this</span>);
+  <span class="keyword">return</span> <span class="this">this</span>;
+};</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Remove the subdocument</p>
+
+<ul><li><p><strong>api</strong>: <em>public</em></p></li></ul>
+</td>
+<td class="code">
+<pre><code><span class="class">EmbeddedDocument</span>.<span class="variable">prototype</span>.<span class="variable">remove</span> = <span class="keyword">function</span> (<span class="variable">fn</span>) {
+  <span class="keyword">var</span> <span class="variable">_id</span>;
+  <span class="keyword">if</span> (!<span class="this">this</span>.<span class="variable">willRemove</span>) {
+    <span class="variable">_id</span> = <span class="this">this</span>.<span class="variable">_doc</span>.<span class="variable">_id</span>;
+    <span class="keyword">if</span> (!<span class="variable">_id</span>) {
+      <span class="keyword">throw</span> <span class="keyword">new</span> <span class="class">Error</span>(<span class="string">'For your own good, Mongoose does not know '</span> + 
+                      <span class="string">'how to remove an EmbeddedDocument that has no _id'</span>);
+    }
+    <span class="this">this</span>.<span class="variable">parentArray</span>.$<span class="variable">pull</span>({ <span class="variable">_id</span>: <span class="variable">_id</span> });
+    <span class="this">this</span>.<span class="variable">willRemove</span> = <span class="variable">true</span>;
+  }
+
+  <span class="keyword">if</span> (<span class="variable">fn</span>)
+    <span class="variable">fn</span>(<span class="keyword">null</span>);
+
+  <span class="keyword">return</span> <span class="this">this</span>;
+};</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Helper for console.log</p>
+
+<ul><li><p><strong>api</strong>: <em>public</em></p></li></ul>
+</td>
+<td class="code">
+<pre><code><span class="class">EmbeddedDocument</span>.<span class="variable">prototype</span>.<span class="variable">inspect</span> = <span class="keyword">function</span> () {
+  <span class="keyword">return</span> <span class="variable">inspect</span>(<span class="this">this</span>.<span class="variable">toObject</span>());
+};</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Module exxports.
+ </p>
+</td>
+<td class="code">
+<pre><code><span class="variable">module</span>.<span class="variable">exports</span> = <span class="class">EmbeddedDocument</span>;
+</code></pre>
+</td>
+</tr><tr class="filename"><td><h2 id="lib/schema/number.js"><a href="#">number</a></h2></td><td>lib/schema/number.js</td></tr><tr class="code">
+<td class="docs">
+<p>Module requirements.
+ </p>
+</td>
+<td class="code">
+<pre><code><span class="keyword">var</span> <span class="class">SchemaType</span> = <span class="variable">require</span>(<span class="string">'../schematype'</span>)
+  , <span class="class">CastError</span> = <span class="class">SchemaType</span>.<span class="class">CastError</span>
+  , <span class="class">MongooseNumber</span> = <span class="variable">require</span>(<span class="string">'../types/number'</span>);</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Inherits from SchemaType.
+ </p>
+</td>
+<td class="code">
+<pre><code><span class="class">SchemaNumber</span>.<span class="variable">prototype</span>.<span class="variable">__proto__</span> = <span class="class">SchemaType</span>.<span class="variable">prototype</span>;</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Sets a maximum number validator</p>
+
+<h2></h2>
+
+<ul><li><p><strong>param</strong>: <em>Number</em>  minimum number</p></li><li><p><strong>api</strong>: <em>public</em></p></li></ul>
+</td>
+<td class="code">
+<pre><code><span class="class">SchemaNumber</span>.<span class="variable">prototype</span>.<span class="variable">min</span> = <span class="keyword">function</span> (<span class="variable">value</span>, <span class="variable">message</span>) {
+  <span class="keyword">if</span> (<span class="this">this</span>.<span class="variable">minValidator</span>)
+    <span class="this">this</span>.<span class="variable">validators</span> = <span class="this">this</span>.<span class="variable">validators</span>.<span class="variable">filter</span>(<span class="keyword">function</span>(<span class="variable">v</span>){
+      <span class="keyword">return</span> <span class="variable">v</span>[<span class="number integer">1</span>] != <span class="string">'min'</span>;
+    });
+  <span class="keyword">if</span> (<span class="variable">value</span> != <span class="keyword">null</span>)
+    <span class="this">this</span>.<span class="variable">validators</span>.<span class="variable">push</span>([<span class="keyword">function</span>(<span class="variable">v</span>){
+      <span class="keyword">return</span> <span class="variable">v</span> === <span class="keyword">null</span> || <span class="variable">v</span> &<span class="variable">gt</span>;= <span class="variable">value</span>;
+    }, <span class="string">'min'</span>]);
+  <span class="keyword">return</span> <span class="this">this</span>;
+};</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Sets a maximum number validator</p>
+
+<h2></h2>
+
+<ul><li><p><strong>param</strong>: <em>Number</em>  maximum number</p></li><li><p><strong>api</strong>: <em>public</em></p></li></ul>
+</td>
+<td class="code">
+<pre><code><span class="class">SchemaNumber</span>.<span class="variable">prototype</span>.<span class="variable">max</span> = <span class="keyword">function</span> (<span class="variable">value</span>, <span class="variable">message</span>) {
+  <span class="keyword">if</span> (<span class="this">this</span>.<span class="variable">maxValidator</span>)
+    <span class="this">this</span>.<span class="variable">validators</span> = <span class="this">this</span>.<span class="variable">validators</span>.<span class="variable">filter</span>(<span class="keyword">function</span>(<span class="variable">v</span>){
+      <span class="keyword">return</span> <span class="variable">v</span>[<span class="number integer">1</span>] != <span class="string">'max'</span>;
+    });
+  <span class="keyword">if</span> (<span class="variable">value</span> != <span class="keyword">null</span>)
+    <span class="this">this</span>.<span class="variable">validators</span>.<span class="variable">push</span>([<span class="this">this</span>.<span class="variable">maxValidator</span> = <span class="keyword">function</span>(<span class="variable">v</span>){
+      <span class="keyword">return</span> <span class="variable">v</span> === <span class="keyword">null</span> || <span class="variable">v</span> &<span class="variable">lt</span>;= <span class="variable">value</span>;
+    }, <span class="string">'max'</span>]);
+  <span class="keyword">return</span> <span class="this">this</span>;
+};</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Module exports.
+ </p>
+</td>
+<td class="code">
+<pre><code><span class="variable">module</span>.<span class="variable">exports</span> = <span class="class">SchemaNumber</span>;
+</code></pre>
+</td>
+</tr><tr class="filename"><td><h2 id="lib/types/index.js"><a href="#">index</a></h2></td><td>lib/types/index.js</td></tr><tr class="code">
+<td class="docs">
+<p>Module exports.
+ </p>
+</td>
+<td class="code">
+<pre><code><span class="variable">exports</span>.<span class="class">Array</span> = <span class="variable">require</span>(<span class="string">'./array'</span>);
+<span class="variable">exports</span>.<span class="class">Buffer</span> = <span class="variable">require</span>(<span class="string">'./buffer'</span>);
+
+<span class="variable">exports</span>.<span class="class">Document</span> = <span class="comment">// @deprecate</span>
+<span class="variable">exports</span>.<span class="class">Embedded</span> = <span class="variable">require</span>(<span class="string">'./embedded'</span>);
+
+<span class="variable">exports</span>.<span class="class">DocumentArray</span> = <span class="variable">require</span>(<span class="string">'./documentarray'</span>);
+<span class="variable">exports</span>.<span class="class">Number</span> = <span class="variable">require</span>(<span class="string">'./number'</span>);
+<span class="variable">exports</span>.<span class="class">ObjectId</span> = <span class="variable">require</span>(<span class="string">'./objectid'</span>);
+</code></pre>
+</td>
+</tr><tr class="filename"><td><h2 id="lib/types/objectid.js"><a href="#">objectid</a></h2></td><td>lib/types/objectid.js</td></tr><tr class="code">
+<td class="docs">
+<p>Access driver.
+ </p>
+</td>
+<td class="code">
+<pre><code><span class="keyword">var</span> <span class="variable">driver</span> = <span class="variable">global</span>.<span class="class">MONGOOSE_DRIVER_PATH</span> || <span class="string">'../drivers/node-mongodb-native'</span>;</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Module exports.
+ </p>
+</td>
+<td class="code">
+<pre><code><span class="variable">module</span>.<span class="variable">exports</span> = <span class="variable">require</span>(<span class="variable">driver</span> + <span class="string">'/objectid'</span>);
+</code></pre>
+</td>
+</tr><tr class="filename"><td><h2 id="lib/types/embedded.js"><a href="#">embedded</a></h2></td><td>lib/types/embedded.js</td></tr><tr class="code">
+<td class="docs">
+<p>Module dependencies.
+ </p>
+</td>
+<td class="code">
+<pre><code><span class="keyword">var</span> <span class="class">Document</span> = <span class="variable">require</span>(<span class="string">'../document'</span>)
+  , <span class="variable">inspect</span> = <span class="variable">require</span>(<span class="string">'util'</span>).<span class="variable">inspect</span>;</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Inherit from Document
+ </p>
+</td>
+<td class="code">
+<pre><code><span class="class">EmbeddedDocument</span>.<span class="variable">prototype</span>.<span class="variable">__proto__</span> = <span class="class">Document</span>.<span class="variable">prototype</span>;</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Noop. Does not actually save the doc to the db.</p>
+
+<ul><li><p><strong>api</strong>: <em>public</em></p></li></ul>
+</td>
+<td class="code">
+<pre><code><span class="class">EmbeddedDocument</span>.<span class="variable">prototype</span>.<span class="variable">save</span> = <span class="keyword">function</span>(<span class="variable">fn</span>) {
+  <span class="keyword">if</span> (<span class="variable">fn</span>)
+    <span class="variable">fn</span>(<span class="keyword">null</span>);
+  <span class="keyword">return</span> <span class="this">this</span>;
+};</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Remove the subdocument</p>
+
+<ul><li><p><strong>api</strong>: <em>public</em></p></li></ul>
+</td>
+<td class="code">
+<pre><code><span class="class">EmbeddedDocument</span>.<span class="variable">prototype</span>.<span class="variable">remove</span> = <span class="keyword">function</span> (<span class="variable">fn</span>) {
+  <span class="keyword">var</span> <span class="variable">_id</span>;
+  <span class="keyword">if</span> (!<span class="this">this</span>.<span class="variable">willRemove</span>) {
+    <span class="variable">_id</span> = <span class="this">this</span>.<span class="variable">_doc</span>.<span class="variable">_id</span>;
+    <span class="keyword">if</span> (!<span class="variable">_id</span>) {
+      <span class="keyword">throw</span> <span class="keyword">new</span> <span class="class">Error</span>(<span class="string">'For your own good, Mongoose does not know '</span> + 
+                      <span class="string">'how to remove an EmbeddedDocument that has no _id'</span>);
+    }
+    <span class="this">this</span>.<span class="variable">parentArray</span>.$<span class="variable">pull</span>({ <span class="variable">_id</span>: <span class="variable">_id</span> });
+    <span class="this">this</span>.<span class="variable">willRemove</span> = <span class="variable">true</span>;
+  }
+
+  <span class="keyword">if</span> (<span class="variable">fn</span>)
+    <span class="variable">fn</span>(<span class="keyword">null</span>);
+
+  <span class="keyword">return</span> <span class="this">this</span>;
+};</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Helper for console.log</p>
+
+<ul><li><p><strong>api</strong>: <em>public</em></p></li></ul>
+</td>
+<td class="code">
+<pre><code><span class="class">EmbeddedDocument</span>.<span class="variable">prototype</span>.<span class="variable">inspect</span> = <span class="keyword">function</span> () {
+  <span class="keyword">return</span> <span class="variable">inspect</span>(<span class="this">this</span>.<span class="variable">toObject</span>());
+};</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Module exports.
+ </p>
+</td>
+<td class="code">
+<pre><code><span class="variable">module</span>.<span class="variable">exports</span> = <span class="class">EmbeddedDocument</span>;
+</code></pre>
+</td>
+</tr><tr class="filename"><td><h2 id="lib/types/number.js"><a href="#">number</a></h2></td><td>lib/types/number.js</td></tr><tr class="code">
+<td class="docs">
+<p>Module dependencies.
+ </p>
+</td>
+<td class="code">
+<pre><code><span class="keyword">var</span> <span class="variable">utils</span> = <span class="variable">require</span>(<span class="string">'./../utils'</span>)</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Inherits from Number.
+ </p>
+</td>
+<td class="code">
+<pre><code><span class="class">MongooseNumber</span>.<span class="variable">prototype</span> = <span class="keyword">new</span> <span class="class">Number</span>();
+
+<span class="keyword">var</span> <span class="variable">depInc</span> = <span class="variable">utils</span>.<span class="variable">dep</span>(<span class="string">'MongooseNumber#$inc / MongooseNumber#increment'</span>, <span class="string">'Model.update() to get incrementation in v3'</span>);
+<span class="keyword">var</span> <span class="variable">depDec</span> = <span class="variable">utils</span>.<span class="variable">dep</span>(<span class="string">'MongooseNumber#decrement'</span>, <span class="string">'Model.update() to get decrementation in v3'</span>);</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Atomic increment</p>
+
+<ul><li><p><strong>api</strong>: <em>public</em></p></li></ul>
+</td>
+<td class="code">
+<pre><code><span class="keyword">function</span> <span class="variable">increment</span> (<span class="variable">value</span>) {
+  <span class="variable">depInc</span>();
+  <span class="keyword">var</span> <span class="variable">schema</span> = <span class="this">this</span>.<span class="variable">_parent</span>.<span class="variable">schema</span>.<span class="variable">path</span>(<span class="this">this</span>.<span class="variable">_path</span>)
+    , <span class="variable">value</span> = <span class="class">Number</span>(<span class="variable">value</span>) || <span class="number integer">1</span>;
+  <span class="keyword">if</span> (<span class="variable">isNaN</span>(<span class="variable">value</span>)) <span class="variable">value</span> = <span class="number integer">1</span>;
+  <span class="this">this</span>.<span class="variable">_parent</span>.<span class="variable">setValue</span>(<span class="this">this</span>.<span class="variable">_path</span>, <span class="variable">schema</span>.<span class="variable">cast</span>(<span class="this">this</span> + <span class="variable">value</span>));
+  <span class="this">this</span>.<span class="variable">_parent</span>.<span class="variable">getValue</span>(<span class="this">this</span>.<span class="variable">_path</span>).<span class="variable">_atomics</span>[<span class="string">'$inc'</span>] = <span class="variable">value</span> || <span class="number integer">1</span>;
+  <span class="this">this</span>.<span class="variable">_parent</span>.<span class="variable">_activePaths</span>.<span class="variable">modify</span>(<span class="this">this</span>.<span class="variable">_path</span>);
+  <span class="keyword">return</span> <span class="this">this</span>;
+};
+<span class="class">MongooseNumber</span>.<span class="variable">prototype</span>.$<span class="variable">inc</span> =
+<span class="class">MongooseNumber</span>.<span class="variable">prototype</span>.<span class="variable">increment</span> = <span class="variable">increment</span>;</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Returns true if we have to perform atomics for this, and no normal
+operations</p>
+
+<ul><li><p><strong>api</strong>: <em>public</em></p></li></ul>
+</td>
+<td class="code">
+<pre><code><span class="class">MongooseNumber</span>.<span class="variable">prototype</span>.<span class="variable">__defineGetter__</span>(<span class="string">'doAtomics'</span>, <span class="keyword">function</span> () {
+  <span class="keyword">return</span> <span class="class">Object</span>.<span class="variable">keys</span>(<span class="this">this</span>.<span class="variable">_atomics</span>).<span class="variable">length</span>;
+});</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Atomic decrement</p>
+
+<ul><li><p><strong>api</strong>: <em>public</em></p></li></ul>
+</td>
+<td class="code">
+<pre><code><span class="class">MongooseNumber</span>.<span class="variable">prototype</span>.<span class="variable">decrement</span> = <span class="keyword">function</span>(){
+  <span class="variable">depDec</span>();
+  <span class="this">this</span>.<span class="variable">increment</span>(-<span class="number integer">1</span>);
+};</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Re-declare toString (for <code>console.log</code>)</p>
+
+<ul><li><p><strong>api</strong>: <em>public</em></p></li></ul>
+</td>
+<td class="code">
+<pre><code><span class="class">MongooseNumber</span>.<span class="variable">prototype</span>.<span class="variable">inspect</span> =
+<span class="class">MongooseNumber</span>.<span class="variable">prototype</span>.<span class="variable">toString</span> = <span class="keyword">function</span> () {
+  <span class="keyword">return</span> <span class="class">String</span>(<span class="this">this</span>.<span class="variable">valueOf</span>());
+};</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Module exports
+ </p>
+</td>
+<td class="code">
+<pre><code><span class="variable">module</span>.<span class="variable">exports</span> = <span class="class">MongooseNumber</span>;
+</code></pre>
 </td>
 </tr><tr class="filename"><td><h2 id="lib/types/array.js"><a href="#">array</a></h2></td><td>lib/types/array.js</td></tr><tr class="code">
 <td class="docs">
@@ -5715,537 +6077,6 @@ it.</p>
 <pre><code><span class="variable">module</span>.<span class="variable">exports</span> = <span class="variable">exports</span> = <span class="class">MongooseArray</span>;
 </code></pre>
 </td>
-</tr><tr class="filename"><td><h2 id="lib/types/buffer.js"><a href="#">buffer</a></h2></td><td>lib/types/buffer.js</td></tr><tr class="code">
-<td class="docs">
-<p>Access driver.
- </p>
-</td>
-<td class="code">
-<pre><code><span class="keyword">var</span> <span class="variable">driver</span> = <span class="variable">global</span>.<span class="class">MONGOOSE_DRIVER_PATH</span> || <span class="string">'../drivers/node-mongodb-native'</span>;</code></pre>
-</td>
-</tr>
-<tr class="code">
-<td class="docs">
-<p>Module dependencies.
- </p>
-</td>
-<td class="code">
-<pre><code><span class="keyword">var</span> <span class="class">Binary</span> = <span class="variable">require</span>(<span class="variable">driver</span> + <span class="string">'/binary'</span>);</code></pre>
-</td>
-</tr>
-<tr class="code">
-<td class="docs">
-<p>Inherit from Buffer.
- </p>
-</td>
-<td class="code">
-<pre><code><span class="class">MongooseBuffer</span>.<span class="variable">prototype</span> = <span class="keyword">new</span> <span class="class">Buffer</span>(<span class="number integer">0</span>);</code></pre>
-</td>
-</tr>
-<tr class="code">
-<td class="docs">
-<p>Marks this buffer as modified.</p>
-
-<ul><li><strong>api</strong>: <em>public</em></li></ul>
-</td>
-<td class="code">
-<pre><code><span class="class">MongooseBuffer</span>.<span class="variable">prototype</span>.<span class="variable">_markModified</span> = <span class="keyword">function</span> () {
-  <span class="keyword">var</span> <span class="variable">parent</span> = <span class="this">this</span>.<span class="variable">_parent</span>;
-
-  <span class="keyword">if</span> (<span class="variable">parent</span>) {
-    <span class="variable">parent</span>.<span class="variable">markModified</span>(<span class="this">this</span>.<span class="variable">_path</span>);
-  }
-  <span class="keyword">return</span> <span class="this">this</span>;
-};</code></pre>
-</td>
-</tr>
-<tr class="code">
-<td class="docs">
-<p>Writes the buffer.</p>
-</td>
-<td class="code">
-<pre><code><span class="class">MongooseBuffer</span>.<span class="variable">prototype</span>.<span class="variable">write</span> = <span class="keyword">function</span> () {
-  <span class="keyword">var</span> <span class="variable">written</span> = <span class="class">Buffer</span>.<span class="variable">prototype</span>.<span class="variable">write</span>.<span class="variable">apply</span>(<span class="this">this</span>, <span class="variable">arguments</span>);
-
-  <span class="keyword">if</span> (<span class="variable">written</span> &<span class="variable">gt</span>; <span class="number integer">0</span>) {
-    <span class="this">this</span>.<span class="variable">_markModified</span>();
-  }
-
-  <span class="keyword">return</span> <span class="variable">written</span>;
-};</code></pre>
-</td>
-</tr>
-<tr class="code">
-<td class="docs">
-<p>Copy the buffer.</p>
-
-<h2>Note Buffer#copy will not mark target as modified so</h2>
-
-<p>you must copy from a MongooseBuffer for it to work
-as expected.</p>
-
-<p>Work around since copy modifies the target, not this.</p>
-</td>
-<td class="code">
-<pre><code><span class="class">MongooseBuffer</span>.<span class="variable">prototype</span>.<span class="variable">copy</span> = <span class="keyword">function</span> (<span class="variable">target</span>) {
-  <span class="keyword">var</span> <span class="variable">ret</span> = <span class="class">Buffer</span>.<span class="variable">prototype</span>.<span class="variable">copy</span>.<span class="variable">apply</span>(<span class="this">this</span>, <span class="variable">arguments</span>);
-
-  <span class="keyword">if</span> (<span class="variable">target</span> <span class="variable">instanceof</span> <span class="class">MongooseBuffer</span>) {
-    <span class="variable">target</span>.<span class="variable">_markModified</span>();
-  }
-
-  <span class="keyword">return</span> <span class="variable">ret</span>;
-};</code></pre>
-</td>
-</tr>
-<tr class="code">
-<td class="docs">
-<p>Compile other Buffer methods marking this buffer as modified.
- </p>
-</td>
-<td class="code">
-<pre><code>;(
-<span class="comment">// node &lt; 0.5</span>
-<span class="string">'writeUInt8 writeUInt16 writeUInt32 writeInt8 writeInt16 writeInt32 '</span> +
-<span class="string">'writeFloat writeDouble fill '</span> +
-<span class="string">'utf8Write binaryWrite asciiWrite set '</span> +
-
-<span class="comment">// node &gt;= 0.5</span>
-<span class="string">'writeUInt16LE writeUInt16BE writeUInt32LE writeUInt32BE '</span> +
-<span class="string">'writeInt16LE writeInt16BE writeInt32LE writeInt32BE '</span> +
-<span class="string">'writeFloatLE writeFloatBE writeDoubleLE writeDoubleBE'</span>
-).<span class="variable">split</span>(<span class="string">' '</span>).<span class="variable">forEach</span>(<span class="keyword">function</span> (<span class="variable">method</span>) {
-  <span class="keyword">if</span> (!<span class="class">Buffer</span>.<span class="variable">prototype</span>[<span class="variable">method</span>]) <span class="keyword">return</span>;
-  <span class="class">MongooseBuffer</span>.<span class="variable">prototype</span>[<span class="variable">method</span>] = <span class="keyword">new</span> <span class="class">Function</span>(
-    <span class="string">'var ret = Buffer.prototype.'</span>+<span class="variable">method</span>+<span class="string">'.apply(this, arguments);'</span> +
-    <span class="string">'this._markModified();'</span> +
-    <span class="string">'return ret;'</span>
-  )
-});</code></pre>
-</td>
-</tr>
-<tr class="code">
-<td class="docs">
-<p>Returns a Binary.</p>
-
-<h2></h2>
-
-<ul><li><p><strong>return</strong>: <em>Buffer</em> </p></li><li><p><strong>api</strong>: <em>public</em></p></li></ul>
-</td>
-<td class="code">
-<pre><code><span class="class">MongooseBuffer</span>.<span class="variable">prototype</span>.<span class="variable">toObject</span> = <span class="keyword">function</span> () {
-  <span class="keyword">return</span> <span class="keyword">new</span> <span class="class">Binary</span>(<span class="this">this</span>, <span class="variable">x00</span>);
-};</code></pre>
-</td>
-</tr>
-<tr class="code">
-<td class="docs">
-<p>Module exports.
- </p>
-</td>
-<td class="code">
-<pre><code><span class="class">MongooseBuffer</span>.<span class="class">Binary</span> = <span class="class">Binary</span>;
-
-<span class="variable">module</span>.<span class="variable">exports</span> = <span class="class">MongooseBuffer</span>;
-</code></pre>
-</td>
-</tr><tr class="filename"><td><h2 id="lib/types/document.js"><a href="#">document</a></h2></td><td>lib/types/document.js</td></tr><tr class="code">
-<td class="docs">
-<p>Module dependencies.
- </p>
-</td>
-<td class="code">
-<pre><code><span class="keyword">var</span> <span class="class">Document</span> = <span class="variable">require</span>(<span class="string">'../document'</span>)
-  , <span class="variable">inspect</span> = <span class="variable">require</span>(<span class="string">'util'</span>).<span class="variable">inspect</span>;</code></pre>
-</td>
-</tr>
-<tr class="code">
-<td class="docs">
-<p>Inherit from Document</p>
-
-<p> </p>
-</td>
-<td class="code">
-<pre><code><span class="class">EmbeddedDocument</span>.<span class="variable">prototype</span>.<span class="variable">__proto__</span> = <span class="class">Document</span>.<span class="variable">prototype</span>;</code></pre>
-</td>
-</tr>
-<tr class="code">
-<td class="docs">
-<p>Override set to mark the parent as modified</p>
-
-<ul><li><p><strong>api</strong>: <em>public</em></p></li></ul>
-</td>
-<td class="code">
-<pre><code><span class="keyword">var</span> <span class="variable">oldSet</span> = <span class="class">Document</span>.<span class="variable">prototype</span>.<span class="variable">set</span>;
-
-<span class="class">EmbeddedDocument</span>.<span class="variable">prototype</span>.<span class="variable">set</span> = <span class="keyword">function</span> (<span class="variable">path</span>) {
-  <span class="this">this</span>.<span class="variable">markModified</span>(<span class="variable">path</span>);
-  <span class="keyword">return</span> <span class="variable">oldSet</span>.<span class="variable">apply</span>(<span class="this">this</span>, <span class="variable">arguments</span>);
-};</code></pre>
-</td>
-</tr>
-<tr class="code">
-<td class="docs">
-<p>Save the subdocument</p>
-
-<ul><li><p><strong>api</strong>: <em>public</em></p></li></ul>
-</td>
-<td class="code">
-<pre><code><span class="class">EmbeddedDocument</span>.<span class="variable">prototype</span>.<span class="variable">save</span> = <span class="keyword">function</span>(<span class="variable">fn</span>) {
-  <span class="keyword">if</span> (<span class="variable">fn</span>)
-    <span class="variable">fn</span>(<span class="keyword">null</span>);
-  <span class="this">this</span>.<span class="variable">emit</span>(<span class="string">'save'</span>, <span class="this">this</span>);
-  <span class="keyword">return</span> <span class="this">this</span>;
-};</code></pre>
-</td>
-</tr>
-<tr class="code">
-<td class="docs">
-<p>Remove the subdocument</p>
-
-<ul><li><p><strong>api</strong>: <em>public</em></p></li></ul>
-</td>
-<td class="code">
-<pre><code><span class="class">EmbeddedDocument</span>.<span class="variable">prototype</span>.<span class="variable">remove</span> = <span class="keyword">function</span> (<span class="variable">fn</span>) {
-  <span class="keyword">var</span> <span class="variable">_id</span>;
-  <span class="keyword">if</span> (!<span class="this">this</span>.<span class="variable">willRemove</span>) {
-    <span class="variable">_id</span> = <span class="this">this</span>.<span class="variable">_doc</span>.<span class="variable">_id</span>;
-    <span class="keyword">if</span> (!<span class="variable">_id</span>) {
-      <span class="keyword">throw</span> <span class="keyword">new</span> <span class="class">Error</span>(<span class="string">'For your own good, Mongoose does not know '</span> + 
-                      <span class="string">'how to remove an EmbeddedDocument that has no _id'</span>);
-    }
-    <span class="this">this</span>.<span class="variable">parentArray</span>.$<span class="variable">pull</span>({ <span class="variable">_id</span>: <span class="variable">_id</span> });
-    <span class="this">this</span>.<span class="variable">willRemove</span> = <span class="variable">true</span>;
-  }
-
-  <span class="keyword">if</span> (<span class="variable">fn</span>)
-    <span class="variable">fn</span>(<span class="keyword">null</span>);
-
-  <span class="keyword">return</span> <span class="this">this</span>;
-};</code></pre>
-</td>
-</tr>
-<tr class="code">
-<td class="docs">
-<p>Helper for console.log</p>
-
-<ul><li><p><strong>api</strong>: <em>public</em></p></li></ul>
-</td>
-<td class="code">
-<pre><code><span class="class">EmbeddedDocument</span>.<span class="variable">prototype</span>.<span class="variable">inspect</span> = <span class="keyword">function</span> () {
-  <span class="keyword">return</span> <span class="variable">inspect</span>(<span class="this">this</span>.<span class="variable">toObject</span>());
-};</code></pre>
-</td>
-</tr>
-<tr class="code">
-<td class="docs">
-<p>Module exxports.
- </p>
-</td>
-<td class="code">
-<pre><code><span class="variable">module</span>.<span class="variable">exports</span> = <span class="class">EmbeddedDocument</span>;
-</code></pre>
-</td>
-</tr><tr class="filename"><td><h2 id="lib/types/documentarray.js"><a href="#">documentarray</a></h2></td><td>lib/types/documentarray.js</td></tr><tr class="code">
-<td class="docs">
-<p>Module dependencies.
- </p>
-</td>
-<td class="code">
-<pre><code><span class="keyword">var</span> <span class="class">MongooseArray</span> = <span class="variable">require</span>(<span class="string">'./array'</span>)
-  , <span class="variable">driver</span> = <span class="variable">global</span>.<span class="class">MONGOOSE_DRIVER_PATH</span> || <span class="string">'../drivers/node-mongodb-native'</span>
-  , <span class="class">ObjectId</span> = <span class="variable">require</span>(<span class="variable">driver</span> + <span class="string">'/objectid'</span>)
-  , <span class="class">ObjectIdSchema</span> = <span class="variable">require</span>(<span class="string">'../schema/objectid'</span>);</code></pre>
-</td>
-</tr>
-<tr class="code">
-<td class="docs">
-<p>Inherits from MongooseArray
- </p>
-</td>
-<td class="code">
-<pre><code><span class="class">MongooseDocumentArray</span>.<span class="variable">prototype</span>.<span class="variable">__proto__</span> = <span class="class">MongooseArray</span>.<span class="variable">prototype</span>;</code></pre>
-</td>
-</tr>
-<tr class="code">
-<td class="docs">
-<p>Filters items by id</p>
-
-<h2></h2>
-
-<ul><li><p><strong>param</strong>: <em>Object</em>  id</p></li><li><p><strong>api</strong>: <em>public</em></p></li></ul>
-</td>
-<td class="code">
-<pre><code><span class="class">MongooseDocumentArray</span>.<span class="variable">prototype</span>.<span class="variable">id</span> = <span class="keyword">function</span> (<span class="variable">id</span>) {
-  <span class="keyword">var</span> <span class="variable">casted</span>
-    , <span class="variable">_id</span>;
-
-  <span class="keyword">try</span> {
-    <span class="variable">casted</span> = <span class="class">ObjectId</span>.<span class="variable">toString</span>(<span class="class">ObjectIdSchema</span>.<span class="variable">prototype</span>.<span class="variable">cast</span>.<span class="variable">call</span>({}, <span class="variable">id</span>));
-  } <span class="keyword">catch</span> (<span class="variable">e</span>) {
-    <span class="variable">casted</span> = <span class="keyword">null</span>;
-  }
-
-  <span class="keyword">for</span> (<span class="keyword">var</span> <span class="variable">i</span> = <span class="number integer">0</span>, <span class="variable">l</span> = <span class="this">this</span>.<span class="variable">length</span>; <span class="variable">i</span> &<span class="variable">lt</span>; <span class="variable">l</span>; <span class="variable">i</span>++) {
-    <span class="variable">_id</span> = <span class="this">this</span>[<span class="variable">i</span>].<span class="variable">get</span>(<span class="string">'_id'</span>);
-    <span class="keyword">if</span> (!(<span class="variable">_id</span> <span class="variable">instanceof</span> <span class="class">ObjectId</span>)) {
-      <span class="keyword">if</span> (<span class="class">String</span>(<span class="variable">id</span>) == <span class="variable">_id</span>)
-        <span class="keyword">return</span> <span class="this">this</span>[<span class="variable">i</span>];
-    } <span class="keyword">else</span> {
-      <span class="keyword">if</span> (<span class="variable">casted</span> == <span class="variable">_id</span>)
-        <span class="keyword">return</span> <span class="this">this</span>[<span class="variable">i</span>];
-    }
-  }
-
-  <span class="keyword">return</span> <span class="keyword">null</span>;
-};</code></pre>
-</td>
-</tr>
-<tr class="code">
-<td class="docs">
-<p>Returns an Array and converts any Document
-members toObject.</p>
-
-<h2></h2>
-
-<ul><li><p><strong>return</strong>: <em>Array</em> </p></li><li><p><strong>api</strong>: <em>public</em></p></li></ul>
-</td>
-<td class="code">
-<pre><code><span class="class">MongooseDocumentArray</span>.<span class="variable">prototype</span>.<span class="variable">toObject</span> = <span class="keyword">function</span> () {
-  <span class="keyword">return</span> <span class="this">this</span>.<span class="variable">map</span>(<span class="keyword">function</span> (<span class="variable">doc</span>) {
-    <span class="keyword">return</span> <span class="variable">doc</span> &<span class="variable">amp</span>;&<span class="variable">amp</span>; <span class="variable">doc</span>.<span class="variable">toObject</span>() || <span class="keyword">null</span>;
-  });
-};</code></pre>
-</td>
-</tr>
-<tr class="code">
-<td class="docs">
-<p>Helper for console.log</p>
-
-<ul><li><p><strong>api</strong>: <em>public</em></p></li></ul>
-</td>
-<td class="code">
-<pre><code><span class="class">MongooseDocumentArray</span>.<span class="variable">prototype</span>.<span class="variable">inspect</span> = <span class="keyword">function</span> () {
-  <span class="keyword">return</span> <span class="string">'['</span> + <span class="this">this</span>.<span class="variable">map</span>(<span class="keyword">function</span> (<span class="variable">doc</span>) {
-    <span class="keyword">return</span> <span class="variable">doc</span> &<span class="variable">amp</span>;&<span class="variable">amp</span>; <span class="variable">doc</span>.<span class="variable">inspect</span>() || <span class="string">'null'</span>;
-  }).<span class="variable">join</span>(<span class="string">'\n'</span>) + <span class="string">']'</span>;
-};</code></pre>
-</td>
-</tr>
-<tr class="code">
-<td class="docs">
-<p>Module exports.
- </p>
-</td>
-<td class="code">
-<pre><code><span class="variable">module</span>.<span class="variable">exports</span> = <span class="class">MongooseDocumentArray</span>;
-</code></pre>
-</td>
-</tr><tr class="filename"><td><h2 id="lib/types/embedded.js"><a href="#">embedded</a></h2></td><td>lib/types/embedded.js</td></tr><tr class="code">
-<td class="docs">
-<p>Module dependencies.
- </p>
-</td>
-<td class="code">
-<pre><code><span class="keyword">var</span> <span class="class">Document</span> = <span class="variable">require</span>(<span class="string">'../document'</span>)
-  , <span class="variable">inspect</span> = <span class="variable">require</span>(<span class="string">'util'</span>).<span class="variable">inspect</span>;</code></pre>
-</td>
-</tr>
-<tr class="code">
-<td class="docs">
-<p>Inherit from Document
- </p>
-</td>
-<td class="code">
-<pre><code><span class="class">EmbeddedDocument</span>.<span class="variable">prototype</span>.<span class="variable">__proto__</span> = <span class="class">Document</span>.<span class="variable">prototype</span>;</code></pre>
-</td>
-</tr>
-<tr class="code">
-<td class="docs">
-<p>Noop. Does not actually save the doc to the db.</p>
-
-<ul><li><p><strong>api</strong>: <em>public</em></p></li></ul>
-</td>
-<td class="code">
-<pre><code><span class="class">EmbeddedDocument</span>.<span class="variable">prototype</span>.<span class="variable">save</span> = <span class="keyword">function</span>(<span class="variable">fn</span>) {
-  <span class="keyword">if</span> (<span class="variable">fn</span>)
-    <span class="variable">fn</span>(<span class="keyword">null</span>);
-  <span class="keyword">return</span> <span class="this">this</span>;
-};</code></pre>
-</td>
-</tr>
-<tr class="code">
-<td class="docs">
-<p>Remove the subdocument</p>
-
-<ul><li><p><strong>api</strong>: <em>public</em></p></li></ul>
-</td>
-<td class="code">
-<pre><code><span class="class">EmbeddedDocument</span>.<span class="variable">prototype</span>.<span class="variable">remove</span> = <span class="keyword">function</span> (<span class="variable">fn</span>) {
-  <span class="keyword">var</span> <span class="variable">_id</span>;
-  <span class="keyword">if</span> (!<span class="this">this</span>.<span class="variable">willRemove</span>) {
-    <span class="variable">_id</span> = <span class="this">this</span>.<span class="variable">_doc</span>.<span class="variable">_id</span>;
-    <span class="keyword">if</span> (!<span class="variable">_id</span>) {
-      <span class="keyword">throw</span> <span class="keyword">new</span> <span class="class">Error</span>(<span class="string">'For your own good, Mongoose does not know '</span> + 
-                      <span class="string">'how to remove an EmbeddedDocument that has no _id'</span>);
-    }
-    <span class="this">this</span>.<span class="variable">parentArray</span>.$<span class="variable">pull</span>({ <span class="variable">_id</span>: <span class="variable">_id</span> });
-    <span class="this">this</span>.<span class="variable">willRemove</span> = <span class="variable">true</span>;
-  }
-
-  <span class="keyword">if</span> (<span class="variable">fn</span>)
-    <span class="variable">fn</span>(<span class="keyword">null</span>);
-
-  <span class="keyword">return</span> <span class="this">this</span>;
-};</code></pre>
-</td>
-</tr>
-<tr class="code">
-<td class="docs">
-<p>Helper for console.log</p>
-
-<ul><li><p><strong>api</strong>: <em>public</em></p></li></ul>
-</td>
-<td class="code">
-<pre><code><span class="class">EmbeddedDocument</span>.<span class="variable">prototype</span>.<span class="variable">inspect</span> = <span class="keyword">function</span> () {
-  <span class="keyword">return</span> <span class="variable">inspect</span>(<span class="this">this</span>.<span class="variable">toObject</span>());
-};</code></pre>
-</td>
-</tr>
-<tr class="code">
-<td class="docs">
-<p>Module exports.
- </p>
-</td>
-<td class="code">
-<pre><code><span class="variable">module</span>.<span class="variable">exports</span> = <span class="class">EmbeddedDocument</span>;
-</code></pre>
-</td>
-</tr><tr class="filename"><td><h2 id="lib/types/index.js"><a href="#">index</a></h2></td><td>lib/types/index.js</td></tr><tr class="code">
-<td class="docs">
-<p>Module exports.
- </p>
-</td>
-<td class="code">
-<pre><code><span class="variable">exports</span>.<span class="class">Array</span> = <span class="variable">require</span>(<span class="string">'./array'</span>);
-<span class="variable">exports</span>.<span class="class">Buffer</span> = <span class="variable">require</span>(<span class="string">'./buffer'</span>);
-
-<span class="variable">exports</span>.<span class="class">Document</span> = <span class="comment">// @deprecate</span>
-<span class="variable">exports</span>.<span class="class">Embedded</span> = <span class="variable">require</span>(<span class="string">'./embedded'</span>);
-
-<span class="variable">exports</span>.<span class="class">DocumentArray</span> = <span class="variable">require</span>(<span class="string">'./documentarray'</span>);
-<span class="variable">exports</span>.<span class="class">Number</span> = <span class="variable">require</span>(<span class="string">'./number'</span>);
-<span class="variable">exports</span>.<span class="class">ObjectId</span> = <span class="variable">require</span>(<span class="string">'./objectid'</span>);
-</code></pre>
-</td>
-</tr><tr class="filename"><td><h2 id="lib/types/number.js"><a href="#">number</a></h2></td><td>lib/types/number.js</td></tr><tr class="code">
-<td class="docs">
-<p>Module dependencies.
- </p>
-</td>
-<td class="code">
-<pre><code><span class="keyword">var</span> <span class="variable">utils</span> = <span class="variable">require</span>(<span class="string">'./../utils'</span>)</code></pre>
-</td>
-</tr>
-<tr class="code">
-<td class="docs">
-<p>Inherits from Number.
- </p>
-</td>
-<td class="code">
-<pre><code><span class="class">MongooseNumber</span>.<span class="variable">prototype</span> = <span class="keyword">new</span> <span class="class">Number</span>();
-
-<span class="keyword">var</span> <span class="variable">depInc</span> = <span class="variable">utils</span>.<span class="variable">dep</span>(<span class="string">'MongooseNumber#$inc / MongooseNumber#increment'</span>, <span class="string">'Model.update() to get incrementation in v3'</span>);
-<span class="keyword">var</span> <span class="variable">depDec</span> = <span class="variable">utils</span>.<span class="variable">dep</span>(<span class="string">'MongooseNumber#decrement'</span>, <span class="string">'Model.update() to get decrementation in v3'</span>);</code></pre>
-</td>
-</tr>
-<tr class="code">
-<td class="docs">
-<p>Atomic increment</p>
-
-<ul><li><p><strong>api</strong>: <em>public</em></p></li></ul>
-</td>
-<td class="code">
-<pre><code><span class="keyword">function</span> <span class="variable">increment</span> (<span class="variable">value</span>) {
-  <span class="variable">depInc</span>();
-  <span class="keyword">var</span> <span class="variable">schema</span> = <span class="this">this</span>.<span class="variable">_parent</span>.<span class="variable">schema</span>.<span class="variable">path</span>(<span class="this">this</span>.<span class="variable">_path</span>)
-    , <span class="variable">value</span> = <span class="class">Number</span>(<span class="variable">value</span>) || <span class="number integer">1</span>;
-  <span class="keyword">if</span> (<span class="variable">isNaN</span>(<span class="variable">value</span>)) <span class="variable">value</span> = <span class="number integer">1</span>;
-  <span class="this">this</span>.<span class="variable">_parent</span>.<span class="variable">setValue</span>(<span class="this">this</span>.<span class="variable">_path</span>, <span class="variable">schema</span>.<span class="variable">cast</span>(<span class="this">this</span> + <span class="variable">value</span>));
-  <span class="this">this</span>.<span class="variable">_parent</span>.<span class="variable">getValue</span>(<span class="this">this</span>.<span class="variable">_path</span>).<span class="variable">_atomics</span>[<span class="string">'$inc'</span>] = <span class="variable">value</span> || <span class="number integer">1</span>;
-  <span class="this">this</span>.<span class="variable">_parent</span>.<span class="variable">_activePaths</span>.<span class="variable">modify</span>(<span class="this">this</span>.<span class="variable">_path</span>);
-  <span class="keyword">return</span> <span class="this">this</span>;
-};
-<span class="class">MongooseNumber</span>.<span class="variable">prototype</span>.$<span class="variable">inc</span> =
-<span class="class">MongooseNumber</span>.<span class="variable">prototype</span>.<span class="variable">increment</span> = <span class="variable">increment</span>;</code></pre>
-</td>
-</tr>
-<tr class="code">
-<td class="docs">
-<p>Returns true if we have to perform atomics for this, and no normal
-operations</p>
-
-<ul><li><p><strong>api</strong>: <em>public</em></p></li></ul>
-</td>
-<td class="code">
-<pre><code><span class="class">MongooseNumber</span>.<span class="variable">prototype</span>.<span class="variable">__defineGetter__</span>(<span class="string">'doAtomics'</span>, <span class="keyword">function</span> () {
-  <span class="keyword">return</span> <span class="class">Object</span>.<span class="variable">keys</span>(<span class="this">this</span>.<span class="variable">_atomics</span>).<span class="variable">length</span>;
-});</code></pre>
-</td>
-</tr>
-<tr class="code">
-<td class="docs">
-<p>Atomic decrement</p>
-
-<ul><li><p><strong>api</strong>: <em>public</em></p></li></ul>
-</td>
-<td class="code">
-<pre><code><span class="class">MongooseNumber</span>.<span class="variable">prototype</span>.<span class="variable">decrement</span> = <span class="keyword">function</span>(){
-  <span class="variable">depDec</span>();
-  <span class="this">this</span>.<span class="variable">increment</span>(-<span class="number integer">1</span>);
-};</code></pre>
-</td>
-</tr>
-<tr class="code">
-<td class="docs">
-<p>Re-declare toString (for <code>console.log</code>)</p>
-
-<ul><li><p><strong>api</strong>: <em>public</em></p></li></ul>
-</td>
-<td class="code">
-<pre><code><span class="class">MongooseNumber</span>.<span class="variable">prototype</span>.<span class="variable">inspect</span> =
-<span class="class">MongooseNumber</span>.<span class="variable">prototype</span>.<span class="variable">toString</span> = <span class="keyword">function</span> () {
-  <span class="keyword">return</span> <span class="class">String</span>(<span class="this">this</span>.<span class="variable">valueOf</span>());
-};</code></pre>
-</td>
-</tr>
-<tr class="code">
-<td class="docs">
-<p>Module exports
- </p>
-</td>
-<td class="code">
-<pre><code><span class="variable">module</span>.<span class="variable">exports</span> = <span class="class">MongooseNumber</span>;
-</code></pre>
-</td>
-</tr><tr class="filename"><td><h2 id="lib/types/objectid.js"><a href="#">objectid</a></h2></td><td>lib/types/objectid.js</td></tr><tr class="code">
-<td class="docs">
-<p>Access driver.
- </p>
-</td>
-<td class="code">
-<pre><code><span class="keyword">var</span> <span class="variable">driver</span> = <span class="variable">global</span>.<span class="class">MONGOOSE_DRIVER_PATH</span> || <span class="string">'../drivers/node-mongodb-native'</span>;</code></pre>
-</td>
-</tr>
-<tr class="code">
-<td class="docs">
-<p>Module exports.
- </p>
-</td>
-<td class="code">
-<pre><code><span class="variable">module</span>.<span class="variable">exports</span> = <span class="variable">require</span>(<span class="variable">driver</span> + <span class="string">'/objectid'</span>);
-</code></pre>
-</td>
 </tr><tr class="filename"><td><h2 id="lib/utils.js"><a href="#">utils</a></h2></td><td>lib/utils.js</td></tr><tr class="code">
 <td class="docs">
 <p>Module dependencies.
@@ -6519,6 +6350,175 @@ mongoose.set('dep warnings', false);
     <span class="variable">warn</span> = <span class="variable">true</span>;
   }
 });
+</code></pre>
+</td>
+</tr><tr class="filename"><td><h2 id="lib/schema/boolean.js"><a href="#">boolean</a></h2></td><td>lib/schema/boolean.js</td></tr><tr class="code">
+<td class="docs">
+<p>Module dependencies.
+ </p>
+</td>
+<td class="code">
+<pre><code><span class="keyword">var</span> <span class="class">SchemaType</span> = <span class="variable">require</span>(<span class="string">'../schematype'</span>);</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Inherits from SchemaType.
+ </p>
+</td>
+<td class="code">
+<pre><code><span class="class">SchemaBoolean</span>.<span class="variable">prototype</span>.<span class="variable">__proto__</span> = <span class="class">SchemaType</span>.<span class="variable">prototype</span>;</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Module exports.
+ </p>
+</td>
+<td class="code">
+<pre><code><span class="variable">module</span>.<span class="variable">exports</span> = <span class="class">SchemaBoolean</span>;
+</code></pre>
+</td>
+</tr><tr class="filename"><td><h2 id="lib/statemachine.js"><a href="#">statemachine</a></h2></td><td>lib/statemachine.js</td></tr><tr class="code">
+<td class="docs">
+<p>Module dependencies.
+ </p>
+</td>
+<td class="code">
+<pre><code><span class="keyword">var</span> <span class="variable">utils</span> = <span class="variable">require</span>(<span class="string">'./utils'</span>);</code></pre>
+</td>
+</tr><tr class="filename"><td><h2 id="lib/types/buffer.js"><a href="#">buffer</a></h2></td><td>lib/types/buffer.js</td></tr><tr class="code">
+<td class="docs">
+<p>Access driver.
+ </p>
+</td>
+<td class="code">
+<pre><code><span class="keyword">var</span> <span class="variable">driver</span> = <span class="variable">global</span>.<span class="class">MONGOOSE_DRIVER_PATH</span> || <span class="string">'../drivers/node-mongodb-native'</span>;</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Module dependencies.
+ </p>
+</td>
+<td class="code">
+<pre><code><span class="keyword">var</span> <span class="class">Binary</span> = <span class="variable">require</span>(<span class="variable">driver</span> + <span class="string">'/binary'</span>);</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Inherit from Buffer.
+ </p>
+</td>
+<td class="code">
+<pre><code><span class="class">MongooseBuffer</span>.<span class="variable">prototype</span> = <span class="keyword">new</span> <span class="class">Buffer</span>(<span class="number integer">0</span>);</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Marks this buffer as modified.</p>
+
+<ul><li><strong>api</strong>: <em>public</em></li></ul>
+</td>
+<td class="code">
+<pre><code><span class="class">MongooseBuffer</span>.<span class="variable">prototype</span>.<span class="variable">_markModified</span> = <span class="keyword">function</span> () {
+  <span class="keyword">var</span> <span class="variable">parent</span> = <span class="this">this</span>.<span class="variable">_parent</span>;
+
+  <span class="keyword">if</span> (<span class="variable">parent</span>) {
+    <span class="variable">parent</span>.<span class="variable">markModified</span>(<span class="this">this</span>.<span class="variable">_path</span>);
+  }
+  <span class="keyword">return</span> <span class="this">this</span>;
+};</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Writes the buffer.</p>
+</td>
+<td class="code">
+<pre><code><span class="class">MongooseBuffer</span>.<span class="variable">prototype</span>.<span class="variable">write</span> = <span class="keyword">function</span> () {
+  <span class="keyword">var</span> <span class="variable">written</span> = <span class="class">Buffer</span>.<span class="variable">prototype</span>.<span class="variable">write</span>.<span class="variable">apply</span>(<span class="this">this</span>, <span class="variable">arguments</span>);
+
+  <span class="keyword">if</span> (<span class="variable">written</span> &<span class="variable">gt</span>; <span class="number integer">0</span>) {
+    <span class="this">this</span>.<span class="variable">_markModified</span>();
+  }
+
+  <span class="keyword">return</span> <span class="variable">written</span>;
+};</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Copy the buffer.</p>
+
+<h2>Note Buffer#copy will not mark target as modified so</h2>
+
+<p>you must copy from a MongooseBuffer for it to work
+as expected.</p>
+
+<p>Work around since copy modifies the target, not this.</p>
+</td>
+<td class="code">
+<pre><code><span class="class">MongooseBuffer</span>.<span class="variable">prototype</span>.<span class="variable">copy</span> = <span class="keyword">function</span> (<span class="variable">target</span>) {
+  <span class="keyword">var</span> <span class="variable">ret</span> = <span class="class">Buffer</span>.<span class="variable">prototype</span>.<span class="variable">copy</span>.<span class="variable">apply</span>(<span class="this">this</span>, <span class="variable">arguments</span>);
+
+  <span class="keyword">if</span> (<span class="variable">target</span> <span class="variable">instanceof</span> <span class="class">MongooseBuffer</span>) {
+    <span class="variable">target</span>.<span class="variable">_markModified</span>();
+  }
+
+  <span class="keyword">return</span> <span class="variable">ret</span>;
+};</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Compile other Buffer methods marking this buffer as modified.
+ </p>
+</td>
+<td class="code">
+<pre><code>;(
+<span class="comment">// node &lt; 0.5</span>
+<span class="string">'writeUInt8 writeUInt16 writeUInt32 writeInt8 writeInt16 writeInt32 '</span> +
+<span class="string">'writeFloat writeDouble fill '</span> +
+<span class="string">'utf8Write binaryWrite asciiWrite set '</span> +
+
+<span class="comment">// node &gt;= 0.5</span>
+<span class="string">'writeUInt16LE writeUInt16BE writeUInt32LE writeUInt32BE '</span> +
+<span class="string">'writeInt16LE writeInt16BE writeInt32LE writeInt32BE '</span> +
+<span class="string">'writeFloatLE writeFloatBE writeDoubleLE writeDoubleBE'</span>
+).<span class="variable">split</span>(<span class="string">' '</span>).<span class="variable">forEach</span>(<span class="keyword">function</span> (<span class="variable">method</span>) {
+  <span class="keyword">if</span> (!<span class="class">Buffer</span>.<span class="variable">prototype</span>[<span class="variable">method</span>]) <span class="keyword">return</span>;
+  <span class="class">MongooseBuffer</span>.<span class="variable">prototype</span>[<span class="variable">method</span>] = <span class="keyword">new</span> <span class="class">Function</span>(
+    <span class="string">'var ret = Buffer.prototype.'</span>+<span class="variable">method</span>+<span class="string">'.apply(this, arguments);'</span> +
+    <span class="string">'this._markModified();'</span> +
+    <span class="string">'return ret;'</span>
+  )
+});</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Returns a Binary.</p>
+
+<h2></h2>
+
+<ul><li><p><strong>return</strong>: <em>Buffer</em> </p></li><li><p><strong>api</strong>: <em>public</em></p></li></ul>
+</td>
+<td class="code">
+<pre><code><span class="class">MongooseBuffer</span>.<span class="variable">prototype</span>.<span class="variable">toObject</span> = <span class="keyword">function</span> () {
+  <span class="keyword">return</span> <span class="keyword">new</span> <span class="class">Binary</span>(<span class="this">this</span>, <span class="variable">x00</span>);
+};</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Module exports.
+ </p>
+</td>
+<td class="code">
+<pre><code><span class="class">MongooseBuffer</span>.<span class="class">Binary</span> = <span class="class">Binary</span>;
+
+<span class="variable">module</span>.<span class="variable">exports</span> = <span class="class">MongooseBuffer</span>;
 </code></pre>
 </td>
 </tr><tr class="filename"><td><h2 id="lib/virtualtype.js"><a href="#">virtualtype</a></h2></td><td>lib/virtualtype.js</td></tr><tr class="code">

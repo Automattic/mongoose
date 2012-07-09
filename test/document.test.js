@@ -6,6 +6,7 @@
 var start = require('./common')
   , mongoose = start.mongoose
   , assert = require('assert')
+  , random = require('../lib/utils').random
   , Schema = mongoose.Schema
   , ObjectId = Schema.ObjectId
   , Document = require('../lib/document')
@@ -747,6 +748,37 @@ describe('document:', function(){
         });
       });
     });
+  })
+
+  it('#validate (gh-891)', function(done){
+    var db = start()
+      , schema = null
+      , called = false
+
+    var validate = [function(str){ called = true; return true }, 'BAM'];
+
+    schema = new Schema({
+        prop: { type: String, required: true, validate: validate }
+      , nick: { type: String, required: true }
+    });
+
+    var M = db.model('validateSchema', schema, 'validateschema_'+random());
+    var m = new M({ prop: 'gh891', nick: 'validation test' });
+    m.save(function (err) {
+      assert.ifError(err);
+      assert.equal(true, called);
+      called = false;
+      M.findById(m, 'nick', function (err, m) {
+        assert.equal(false, called);
+        assert.ifError(err);
+        m.nick = 'gh-891';
+        m.save(function (err) {
+          assert.equal(false, called);
+          assert.ifError(err);
+          done();
+        })
+      })
+    })
   })
 
   it('#invalidate', function(done){

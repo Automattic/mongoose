@@ -1441,7 +1441,7 @@ module.exports = {
       });
     });
   },
-  
+
   // gh-675
   'toJSON should also be called for refs': function () {
     var db = start()
@@ -1524,5 +1524,37 @@ module.exports = {
         });
       });
     })
+  },
+
+  'test populating with suffixes': function () {
+    var db = start()
+      , BlogPost = db.model('RefBlogPost', posts)
+      , User = db.model('RefUser', users)
+
+    User.create({
+       name  : 'Guillermo'
+     , email : 'rauchg@gmail.com'
+    }, function (err, creator) {
+      should.strictEqual(err, null);
+
+      BlogPost.create({
+          title     : 'woot'
+        , _creator  : creator
+      }, function (err, post) {
+        should.strictEqual(err, null);
+
+        BlogPost
+          .findById(post._id)
+          .populate('_creator', null, null, {suffix: '_obj'})
+          .run(function (err, post) {
+            db.close();
+            should.strictEqual(err, null);
+            post._creator.should.be.an.instanceof(DocObjectId);
+            post._creator_obj.should.be.an.instanceof(User);
+            post._creator_obj.name.should.equal('Guillermo');
+            post._creator_obj.email.should.equal('rauchg@gmail.com');
+        });
+      });
+    });
   }
 };

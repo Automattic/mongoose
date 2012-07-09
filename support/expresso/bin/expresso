@@ -5,7 +5,7 @@
  * Copyright(c) TJ Holowaychuk <tj@vision-media.ca>
  * (MIT Licensed)
  */
- 
+
 /**
  * Module dependencies.
  */
@@ -14,7 +14,7 @@ var assert = require('assert'),
     childProcess = require('child_process'),
     http = require('http'),
     path = require('path'),
-    sys = require('sys'),
+    sys = require('util'),
     cwd = process.cwd(),
     fs = require('fs'),
     defer;
@@ -41,13 +41,13 @@ var testcount = 0;
 /**
  * Whitelist of tests to run.
  */
- 
+
 var only = [];
 
 /**
  * Boring output.
  */
- 
+
 var boring = false;
 
 /**
@@ -536,7 +536,7 @@ function reportCoverage(cov) {
         if (name.match(/\.js$/)) {
             var file = cov[name];
             if ((file.coverage < 100) || !quiet) {
-               print('\n   [bold]{' + name + '}:'); 
+               print('\n   [bold]{' + name + '}:');
                print(file.source);
                sys.print('\n');
             }
@@ -551,11 +551,11 @@ function reportCoverage(cov) {
  */
 
 function populateCoverage(cov) {
-    cov.LOC = 
+    cov.LOC =
     cov.SLOC =
     cov.totalFiles =
     cov.totalHits =
-    cov.totalMisses = 
+    cov.totalMisses =
     cov.coverage = 0;
     for (var name in cov) {
         var file = cov[name];
@@ -601,7 +601,7 @@ function coverage(data, val) {
     for (var i = 0, len = data.length; i < len; ++i) {
         if (data[i] !== undefined && data[i] == val) ++n;
     }
-    return n;  
+    return n;
 }
 
 /**
@@ -764,7 +764,7 @@ function runSuite(title, tests, fn) {
                                     clearTimeout(id);
                                     next();
                                 });
-                            } 
+                            }
                         });
                     } else {
                         test(function(fn){

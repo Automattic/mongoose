@@ -284,20 +284,20 @@ describe('document:', function(){
     assert.equal(undefined, clone.nested2);
     clone = doc.toObject({ minimize: false });
     assert.equal('Object', clone.nested2.constructor.name);
-    assert.equal(0, Object.keys(clone.nested2).length);
+    assert.equal(1, Object.keys(clone.nested2).length);
     clone = doc.toObject('2');
     assert.equal(undefined, clone.nested2);
 
     doc.schema.options.toObject = { minimize: false };
     clone = doc.toObject();
     assert.equal('Object', clone.nested2.constructor.name);
-    assert.equal(0, Object.keys(clone.nested2).length);
+    assert.equal(1, Object.keys(clone.nested2).length);
     delete doc.schema.options.toObject;
 
     doc.schema.options.minimize = false;
     clone = doc.toObject();
     assert.equal('Object', clone.nested2.constructor.name);
-    assert.equal(0, Object.keys(clone.nested2).length);
+    assert.equal(1, Object.keys(clone.nested2).length);
     doc.schema.options.minimize = true;
     clone = doc.toObject();
     assert.equal(undefined, clone.nested2);
@@ -340,10 +340,10 @@ describe('document:', function(){
     doc.schema.options.toJSON = { minimize: false };
     clone = doc.toJSON();
     assert.equal('Object', clone.nested2.constructor.name);
-    assert.equal(0, Object.keys(clone.nested2).length);
+    assert.equal(1, Object.keys(clone.nested2).length);
     clone = doc.toJSON('8');
     assert.equal('Object', clone.nested2.constructor.name);
-    assert.equal(0, Object.keys(clone.nested2).length);
+    assert.equal(1, Object.keys(clone.nested2).length);
 
     // gh-852
     var arr = [doc]
@@ -355,7 +355,7 @@ describe('document:', function(){
     assert.equal(false, err);
     assert.ok(/nested2/.test(str));
     assert.equal('Object', clone.nested2.constructor.name);
-    assert.equal(0, Object.keys(clone.nested2).length);
+    assert.equal(1, Object.keys(clone.nested2).length);
 
     delete doc.schema.options.toJSON;
   });

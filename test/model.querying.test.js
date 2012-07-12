@@ -620,8 +620,8 @@ describe('model: querying:', function(){
       polySchema.sub('PolyB', schemaB);
 
       var poly = db.model('Poly', polySchema, collection)
-        , A = db.model('PolyA', schemaA, collection)
-        , B = db.model('PolyB', schemaB, collection);
+        , A = poly.sub('PolyA')
+        , B = poly.sub('PolyB');
 
       var newA = new A({ thingOne : 3 });
       var newB = new B({ thingTwo : 'four' });

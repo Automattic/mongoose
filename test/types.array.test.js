@@ -778,6 +778,56 @@ describe('types array', function(){
     });
   })
 
+  describe('sort()', function(){
+    it('order should be saved', function(done){
+      var db = start();
+      var M = db.model('ArraySortOrder', new Schema({ x: [Number] }));
+      var m = new M({ x: [1,4,3,2] });
+      m.save(function (err) {
+        assert.ifError(err);
+        M.findById(m, function (err, m) {
+          assert.ifError(err);
+
+          assert.equal(1, m.x[0]);
+          assert.equal(4, m.x[1]);
+          assert.equal(3, m.x[2]);
+          assert.equal(2, m.x[3]);
+
+          m.x.sort();
+
+          m.save(function (err) {
+            assert.ifError(err);
+            M.findById(m, function (err, m) {
+              assert.ifError(err);
+
+              assert.equal(1, m.x[0]);
+              assert.equal(2, m.x[1]);
+              assert.equal(3, m.x[2]);
+              assert.equal(4, m.x[3]);
+
+              m.x.sort(function(a,b){
+                return b > a;
+              })
+
+              m.save(function (err) {
+                assert.ifError(err);
+                M.findById(m, function (err, m) {
+                  assert.ifError(err);
+
+                  assert.equal(4, m.x[0]);
+                  assert.equal(3, m.x[1]);
+                  assert.equal(2, m.x[2]);
+                  assert.equal(1, m.x[3]);
+                  done();
+                })
+              })
+            })
+          })
+        });
+      })
+    })
+  })
+
   describe('setting a doc array', function(){
     it('should adjust path positions', function(done){
       var db = start();

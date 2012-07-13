@@ -303,7 +303,16 @@ describe('connections:', function(){
 
       var db= start({ uri: 'mongodb://whatever23939.localhost/noooope', noErrorListener: 1 });
     })
+
+    it('should occur without hanging when password with special chars is used (gh-460)', function (done) {
+      var db = mongoose.createConnection('mongodb://aaron:psw?@localhost/fake', function (err) {
+        assert.ok(err);
+        db.close();
+        done();
+      });
+    });
   })
+
   describe('.model()', function(){
     it('allows passing a schema', function(){
       var db = start();

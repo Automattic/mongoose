@@ -3820,9 +3820,7 @@ describe('model', function(){
               worked = true;
             });
 
-            process.nextTick(function () {
-              db.close();
-            });
+            db.db.close();
 
             setTimeout(function () {
               assert.ok(worked);

@@ -6,6 +6,7 @@
 var mongoose = require('../')
   , Mongoose = mongoose.Mongoose
   , Collection = mongoose.Collection
+  , assert = require('assert')
   , startTime = Date.now()
   , queryCount = 0
   , opened = 0
@@ -68,9 +69,10 @@ Collection.prototype.onClose = function(){
  */
 
 module.exports = function (options) {
+  options || (options = {});
   var uri;
 
-  if (options && options.uri) {
+  if (options.uri) {
     uri = options.uri;
     delete options.uri;
   } else {
@@ -78,7 +80,18 @@ module.exports = function (options) {
           'mongodb://localhost/mongoose_test'
   }
 
-  return mongoose.createConnection(uri, options);
+  var noErrorListener = !! options.noErrorListener;
+  delete options.noErrorListener;
+
+  var conn = mongoose.createConnection(uri, options);
+
+  if (noErrorListener) return conn;
+
+  conn.on('error', function (err) {
+    assert.ok(err);
+  });
+
+  return conn;
 };
 
 /**

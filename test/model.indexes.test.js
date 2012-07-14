@@ -152,6 +152,27 @@ describe('model', function(){
       });
     });
 
+    describe('auto creation', function(){
+      it('can be disabled', function(done){
+        var db = start();
+        var schema = new Schema({ name: { type: String, index: true }})
+        schema.set('autoIndex', false);
+
+        var Test = db.model('AutoIndexing', schema, "x"+random());
+        Test.on('index', function(err){
+          assert.ok(false, 'Model.ensureIndexes() was called');
+        });
+
+        setTimeout(function () {
+          Test.collection.getIndexes(function(err, indexes){
+            assert.ifError(err);
+            assert.equal(0, Object.keys(indexes).length);
+            done();
+          });
+        }, 100);
+      })
+    })
+
     it('can be manually triggered', function(done){
       var db = start();
       var schema = new Schema({ name: { type: String } })

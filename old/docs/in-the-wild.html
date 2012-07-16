@@ -1,0 +1,332 @@
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Mongoose ODM</title>
+    <style>
+      body {
+        background: url('/images/bg.png');
+        padding: 0 30px 30px;
+        margin-top: 0;
+      }
+
+      #wrap {
+        background: url('/images/pattern.png') no-repeat -134px -211px;
+        min-height: 600px;
+        padding-top: 30px;
+      }
+
+      #page {
+        width: 650px;
+        margin: auto;
+        position: relative;
+      }
+
+      #footer {
+        font: 13px Helvetica;
+        padding-top: 15px;
+        border-top: 1px solid #000;
+        color: #666;
+        margin-top: 25px;
+      }
+
+      #footer > div {
+        padding-top: 8px;
+        float: right;
+        text-align: right;
+        padding-bottom: 20px;
+      }
+
+      #content {
+        color: #111;
+        font: 15px Courier;
+      }
+
+      #content h1, #content h2, #content h3 {
+        text-shadow: 0 1px 0 #fff;
+      }
+
+      #announce {
+        background: #2A758A;
+        border: 10px solid black;
+        border-radius: 7px;
+        padding: 30px;
+        font-size: 125%;
+        color: white;
+        text-shadow: none;
+        font-family: Arial;
+      }
+
+      #announce a {
+        color: orange;
+        text-shadow: none;
+      }
+
+      pre {
+        background: rgba(255,255,255,.8);
+        border: 1px solid #c6c6c6;
+        padding: 10px;
+        border-radius: 3px;
+        box-shadow: 1px 3px 6px #ddd;
+      }
+
+      code {
+        background: rgba(255,255,255,.8);
+        border: 1px solid #c6c6c6;
+        color: #333;
+        border-radius: 3px
+      }
+
+      pre code {
+        border: 0 none;
+      }
+
+      form {
+        font: bold 12px Helvetica;
+        text-shadow: 0 1px 0 #fff;
+        float: left;
+        padding-bottom: 25px;
+      }
+
+      form img {
+        margin-right: 5px
+      }
+
+      #google-members-count {
+        vertical-align: top;
+        line-height: 32px;
+      }
+
+      h1 a {
+        background: url('/images/logo.png');
+        width: 404px;
+        height: 47px;
+        margin-bottom: 40px;
+        text-indent: -500em;
+        display: block;
+      }
+
+      a {
+        color: #2a758a;
+        text-shadow: 0 1px 0 #fff;
+        text-decoration: none;
+      }
+
+      a:hover {
+        opacity: 0.8;
+      }
+
+      #menu {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100%;
+        background-color: rgba(0,0,0,0.3);
+        font: bold 15px Helvetica;
+        border-right: 1px solid rgba(0,0,0,0.2);
+      }
+
+      #menu ul {
+        margin: 0;
+        padding: 50px 0;
+      }
+
+      #menu ul li {
+        list-style-type: none;
+        padding-left: 15px;
+        padding-right: 20px;
+      }
+
+      #menu ul li a {
+        color: #fff;
+        text-shadow: none;
+      }
+      #menu ul li a:hover {
+        text-decoration: underline;
+      }
+      #wild { margin-top: 10px; }
+    </style>
+
+    <script>
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-1122274-9']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();
+      
+      function getMembers(data){
+        if (!(data && data.query && data.query.results && data.query.results.p)) return;
+        var members = document.createElement('span');
+        members.id = 'google-members-count';
+        members.innerHTML = '('+ data.query.results.p +' members)';
+        document.getElementsByTagName('FORM')[0].insertBefore(members, document.getElementById('google-subscribe-input'));
+      };
+
+      window.onload = function(){
+        // lame jsonp
+        var script = document.createElement('script');
+        script.src = "http://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20html%20where%20url%3D%22http%3A%2F%2Fgroups.google.com%2Fgroup%2Fmongoose-orm%2Fabout%22%20and%20xpath%3D'%2F%2Fdiv%5B%40class%3D%5C'maincontbox%5C'%5D%2Ftable%2Ftr%5B1%5D%2Ftd%2Fp%5B1%5D'%0A&format=json&callback=getMembers";
+        document.head.appendChild(script);
+      };
+    </script>
+  </head>
+  <body>
+    <a href="http://github.com/learnboost/mongoose"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png" alt="Fork me on GitHub"></a>
+    <div id="wrap">
+      <div id="page">
+        <div id="menu">
+          <ul>
+            <li><a href="/">Home</a></li>
+            <li><a href="/docs/model-definition.html">Models/Schemas</a></li>
+            <li><a href="/docs/schematypes.html">Schema Types</a></li>
+            <li><a href="/docs/schema-options.html">Schema Options</a></li>
+            <li><a href="/docs/middleware.html">Middleware</a></li>
+            <li><a href="/docs/finding-documents.html">Finding Docs</a></li>
+            <li><a href="/docs/updating-documents.html">Updating Docs</a></li>
+            <li><a href="/docs/query.html">Queries</a></li>
+            <li><a href="/docs/querystream.html">Query Streams</a></li>
+            <li><a href="/docs/methods-statics.html">Methods &amp; Statics</a>
+            <li><a href="/docs/defaults.html">Defaults</a></li>
+            <li><a href="/docs/indexes.html">Indexes</a></li>
+            <li><a href="/docs/validation.html">Validation</a></li>
+            <li><a href="/docs/virtuals.html">Virtuals</a></li>
+            <li><a href="/docs/getters-setters.html">Getters / Setters</a></li>
+            <li><a href="/docs/embedded-documents.html">Embedded Docs</a></li>
+            <li><a href="/docs/populate.html">Populate (DBRef-like)</a></li>
+            <li><a href="/docs/plugins.html">Plugins</a></li>
+            <li><a href="/docs/errors.html">Errors</a></li>
+            <li><a href="/docs/migration-1x-2x.html">v1x - v2x Migration</a></li>
+            <li><a href="/docs/api.html">API</a></li>
+            <li id="wild"><a href="/docs/in-the-wild.html">Mongoose In The Wild</a></li>
+          </ul>
+        </div>
+
+        <h1><a href="/">Mongoose</a></h1>
+
+        <div id="content">
+          <!-- ANNOUNCE -->
+          <h1>Mongoose in the Wild</h1>
+
+<p><a href="https://www.learnboost.com">LearnBoost</a> is a free online gradebook, lesson planner, attendance, and reporting application for Teachers, Parents, and Students.</p>
+
+<p><a href="https://www.learnboost.com"><img src="/images/apps/learnboost.png" alt="LearnBoost" title="" /></a></p>
+
+<p><br></p>
+
+<p><a href="http://geekli.st">Geeklist</a> is an achievement-based social portfolio builder where all bad-ass code monkeys around the globe can communicate, brag, build their street cred and get found.</p>
+
+<p><a href="http://geekli.st"><img src="/images/apps/geeklist.png" alt="Geeklist" title="" /></a></p>
+
+<p><br></p>
+
+<p><a href="http://storify.com/">Storify</a> lets you curate social networks to build social stories, bringing together media scattered across the Web into a coherent narrative.</p>
+
+<p><a href="http://storify.com/"><img src="/images/apps/storify.png" alt="Storify" title="" /></a></p>
+
+<p><br></p>
+
+<p><a href="http://scottyapp.com">Scotty App</a> allows you to create data driven backends for your apps in minutes instead of weeks.</p>
+
+<p><a href="http://scottyapp.com"><img src="/images/apps/scotty.png" alt="Scotty App" title="" /></a></p>
+
+<p><br></p>
+
+<p><a href="https://bozuko.com">Bozuko</a> is an exciting customer rewards program.</p>
+
+<p><a href="https://bozuko.com"><img src="/images/apps/bozuko.png" alt="Bozuko" title="" /></a></p>
+
+<p><br></p>
+
+<p><a href="http://home.gtggolf.com">Grow The Game Golf</a> let's you think, act, and score your golf game like a pro with real-time scoring, live leaderboards and more.</p>
+
+<p><a href="http://home.gtggolf.com"><img src="/images/apps/gtggolf.png" alt="Grow The Game Golf" title="" /></a></p>
+
+<p><br></p>
+
+<p><a href="https://clickdummy.com">ClickDummy</a> is a rapid mockup prototyping application for designers and dummies.</p>
+
+<p><a href="https://clickdummy.com"><img src="/images/apps/clickdummy.png" alt="ClickDummy" title="" /></a></p>
+
+<p><br></p>
+
+<p><a href="http://calllistapp.com">Call List</a> helps you maintain a todo list for people you need to call.</p>
+
+<p><a href="http://calllistapp.com"><img src="/images/apps/calllist.png" alt="Call List" title="" /></a></p>
+
+<p><br></p>
+
+<p><a href="http://linkr.cc">Linkr</a> is a service for saving links for reading later.</p>
+
+<p><a href="http://linkr.cc"><img src="/images/apps/linkr.png" alt="Linkr" title="" /></a></p>
+
+<p><br></p>
+
+<p><a href="http://www.attictv.com/">AtticTV</a> is Music Television (MTV) for the web.</p>
+
+<p><a href="http://www.attictv.com/"><img src="/images/apps/attictv.png" alt="AtticTV" title="" /></a></p>
+
+<p><br></p>
+
+<p><a href="http://apps.newleafdigital.com/lists">Lists</a> is a service for saving links for reading later.</p>
+
+<p><a href="http://apps.newleafdigital.com/lists"><img src="/images/apps/lists.png" alt="Lists" title="" /></a></p>
+
+<p><br></p>
+
+<p><a href="https://localresponse.com">LocalResponse</a> helps marketers respond to real-time consumer intent.</p>
+
+<p><a href="https://localresponse.com"><img src="/images/apps/localreponse.png" alt="LocalResponse" title="" /></a></p>
+
+<p><br></p>
+
+<p><a href="http://selectvids.com">Select Vids</a> is a collection of amazing, funny, and creative videos for you to discover.</p>
+
+<p><a href="http://selectvids.com"><img src="/images/apps/selectvids.png" alt="Select Vids" title="" /></a></p>
+
+<p><br></p>
+
+<p><a href="http://www.sharelatex.com">ShareLatex</a> is a real-time LaTeX collaboration tool.</p>
+
+<p><a href="http://www.sharelatex.com"><img src="/images/apps/sharelatex.png" alt="ShareLatex" title="" /></a></p>
+
+<p><br></p>
+
+<p><a href="https://cldfy.com">cldfy</a> delivers mail to your app.</p>
+
+<p><a href="https://cldfy.com"><img src="/images/apps/cldfy.png" alt="cldfy" title="" /></a></p>
+
+<p><br></p>
+
+<p><a href="http://nextdays.com">nextdays</a> let's you share plans with friends and discover what is happening around you.</p>
+
+<p><a href="http://nextdays.com"><img src="/images/apps/nextdays.png" alt="nextdays" title="" /></a></p>
+
+<p><br></p>
+
+<p>The applications shown above are not listed in any specific order. To have your app added or removed please contact <a href="mailto:<a href='mailto:aaron.heckmann+github@gmail.com'>aaron.heckmann+github@gmail.com</a>"><a href='mailto:aaronheckmann@gmail.com'>aaronheckmann@gmail.com</a></a>.</p>
+        </div>
+
+        <div id="footer">
+
+          <form action="http://groups.google.com/group/mongoose-orm/boxsubscribe">
+           <a href="http://groups.google.com/group/mongoose-orm" id="google-subscribe-link"><img src="/images/groups.png" border="0"></a>
+           <span id="google-members-count">&nbsp;</span>
+           <div id="google-subscribe-input">
+             Email: <input type="text" name="email" id="google-subscribe-email">
+             <input type="submit" name="go" value="Subscribe">
+           </div>
+          </form>
+
+          <div>
+            Mongoose by <a href="http://github.com/learnboost">LearnBoost Labs</a>.<br>
+            Released under the MIT license.<br>
+            Copyright <a href="http://learnboost.com">LearnBoost 2011</a>.
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

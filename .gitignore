@@ -1,9 +1,5 @@
 lib-cov
-**.swp
-*.sw*
 node_modules/
-*.orig
-benchmarks/benchmarks
-benchmarks/benchmarks2
-benchmarks/benchmarks3
-benchmarks/v8.log
+*.swp
+*.swo
+.DS_Store

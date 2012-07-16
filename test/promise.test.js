@@ -3,165 +3,152 @@
  * Module dependencies.
  */
 
-var should = require('should')
-  , Promise = require('../lib/promise');
+var assert = require('assert')
+var Promise = require('../lib/promise');
 
 /**
  * Test.
  */
 
-module.exports = {
-
-  'test that events fire right away after complete()ing': function (beforeExit) {
+describe('promise', function(){
+  it('events fire right after complete()', function(){
     var promise = new Promise()
       , called = 0;
 
     promise.on('complete', function (a, b) {
-      a.should.eql('1');
-      b.should.eql('2');
+      assert.equal(a, '1');
+      assert.equal(b, '2');
       called++;
     });
 
     promise.complete('1', '2');
 
     promise.on('complete', function (a, b) {
-      a.should.eql('1');
-      b.should.eql('2');
+      assert.equal(a, '1');
+      assert.equal(b, '2');
       called++;
     });
 
-    beforeExit(function () {
-      called.should.eql(2);
-    });
-  },
+    assert.equal(2, called);
+  });
 
-  'test that events fire right away after error()ing': function (beforeExit) {
+  it('events first right after error()', function(){
     var promise = new Promise()
       , called = 0;
 
     promise.on('err', function (err) {
-      err.should.be.an.instanceof(Error);
+      assert.ok(err instanceof Error);
       called++;
     });
 
     promise.error(new Error('booyah'));
 
     promise.on('err', function (err) {
-      err.should.be.an.instanceof(Error);
+      assert.ok(err instanceof Error);
       called++;
     });
 
-    beforeExit(function () {
-      called.should.eql(2);
-    });
-  },
+    assert.equal(2, called);
+  });
 
-  'test errback+callback from constructor': function (beforeExit) {
-    var promise = new Promise(function (err) {
-          err.should.be.an.instanceof(Error);
-          called++;
-        })
-      , called = 0;
+  describe('errback+callback', function(){
+    it('from constructor works', function(){
+      var called = 0;
+      var promise = new Promise(function (err) {
+        assert.ok(err instanceof Error);
+        called++;
+      })
 
-    promise.error(new Error('dawg'));
+      promise.error(new Error('dawg'));
 
-    beforeExit(function () {
-      called.should.eql(1);
-    });
-  },
-
-  'test errback+callback after complete()ing': function (beforeExit) {
-    var promise = new Promise()
-      , called = 0;
-
-    promise.complete('woot');
-
-    promise.addBack(function (err, data){
-      data.should.eql('woot');
-      called++;
+      assert.equal(1, called);
     });
 
-    promise.addBack(function (err, data){
-      should.strictEqual(err, null);
-      called++;
-    });
+    it('after complete()', function(){
+      var promise = new Promise()
+        , called = 0;
 
-    beforeExit(function () {
-      called.should.eql(2);
-    });
-  },
+      promise.complete('woot');
 
-  'test errback+callback after error()ing': function (beforeExit) {
-    var promise = new Promise()
-      , called = 0;
+      promise.addBack(function (err, data){
+        assert.equal(data,'woot');
+        called++;
+      });
 
-    promise.error(new Error('woot'));
+      promise.addBack(function (err, data){
+        assert.strictEqual(err, null);
+        called++;
+      });
 
-    promise.addBack(function (err){
-      err.should.be.an.instanceof(Error);
-      called++;
-    });
+      assert.equal(2, called);
+    })
 
-    promise.addBack(function (err){
-      err.should.be.an.instanceof(Error);
-      called++;
-    });
+    it('after error()', function(){
+      var promise = new Promise()
+        , called = 0;
 
-    beforeExit(function () {
-      called.should.eql(2);
-    });
-  },
+      promise.error(new Error('woot'));
 
-  'test addCallback shortcut': function (beforeExit) {
-    var promise = new Promise()
-      , called = 0;
+      promise.addBack(function (err){
+        assert.ok(err instanceof Error);
+        called++;
+      });
 
-    promise.addCallback(function (woot) {
-      should.strictEqual(woot, undefined);
-      called++;
-    });
+      promise.addBack(function (err){
+        assert.ok(err instanceof Error);
+        called++;
+      });
+      assert.equal(2, called);
+    })
+  });
 
-    promise.complete();
+  describe('addCallback shortcut', function(){
+    it('works', function(){
+      var promise = new Promise()
+        , called = 0;
 
-    beforeExit(function () {
-      called.should.eql(1);
-    });
-  },
+      promise.addCallback(function (woot) {
+        assert.strictEqual(woot, undefined);
+        called++;
+      });
 
-  'test addErrback shortcut': function (beforeExit) {
+      promise.complete();
+
+      assert.equal(1, called);
+    })
+  })
+
+  describe('addErrback shortcut', function(){
     var promise = new Promise()
       , called = 0;
 
     promise.addErrback(function (err) {
-      err.should.be.an.instanceof(Error);
+      assert.ok(err instanceof Error);
       called++;
     });
 
     promise.error(new Error);
 
-    beforeExit(function () {
-      called.should.eql(1);
+    assert.equal(1, called);
+  });
+
+  describe('return values', function(){
+    it('on()', function(){
+      var promise = new Promise()
+      assert.ok(promise.on('jump', function(){}) instanceof Promise);
     });
-  },
 
-  'test return value of #on()': function () {
-    var promise = new Promise()
-    promise.on('jump', function(){}).should.be.an.instanceof(Promise);
-  },
-
-  'test return value of #addCallback()': function () {
-    var promise = new Promise()
-    promise.addCallback(function(){}).should.be.an.instanceof(Promise);
-  },
-
-  'test return value of #addErrback()': function () {
-    var promise = new Promise()
-    promise.addErrback(function(){}).should.be.an.instanceof(Promise);
-  },
-
-  'test return value of #addBack()': function () {
-    var promise = new Promise()
-    promise.addBack(function(){}).should.be.an.instanceof(Promise);
-  }
-
-};
+    it('addCallback()', function(){
+      var promise = new Promise()
+      assert.ok(promise.addCallback(function(){}) instanceof Promise);
+    })
+    it('addErrback()', function(){
+      var promise = new Promise()
+      assert.ok(promise.addErrback(function(){}) instanceof Promise);
+    })
+    it('addBack()', function(){
+      var promise = new Promise()
+      assert.ok(promise.addBack(function(){}) instanceof Promise);
+    })
+  })
+})

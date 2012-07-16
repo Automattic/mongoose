@@ -23,7 +23,7 @@ Board = new Schema({
 var start1 = new Date();
 var Board = mongoose.model('Board', Board);
 //var Cl = mongoose.model('Checklist', Checklist);
-var doc = JSON.parse(fs.readFileSync('bigboard.json'));
+var doc = JSON.parse(fs.readFileSync(__dirname + '/bigboard.json'));
 var time1 = (new Date - start1);
 console.error('reading from disk and parsing JSON took %d ms', time1);
 

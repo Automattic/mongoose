@@ -4,8 +4,8 @@
  */
 
 var start = require('./common')
-  , should = require('should')
   , mongoose = start.mongoose
+  , assert = require('assert')
   , random = require('../lib/utils').random
   , Query = require('../lib/query')
   , Schema = mongoose.Schema
@@ -24,7 +24,7 @@ var start = require('./common')
  * Setup.
  */
 
-var Comments = new Schema();
+var Comments = new Schema;
 
 Comments.add({
     title     : String
@@ -75,29 +75,29 @@ var collection = 'updateoneblogposts_' + random();
 var strictSchema = new Schema({ name: String }, { strict: true });
 mongoose.model('UpdateOneStrictSchema', strictSchema);
 
-module.exports = {
-
-  'findOneAndRemove returns the original document': function () {
+describe('model: findAndRemoveOne:', function(){
+  it('returns the original document', function(done){
     var db = start()
       , M = db.model(modelname, collection)
       , title = 'remove muah'
 
     var post = new M({ title: title });
     post.save(function (err) {
-      should.strictEqual(err, null);
+      assert.ifError(err);
       M.findOneAndRemove({ title: title }, function (err, doc) {
-        should.strictEqual(err, null);
-        doc.id.should.equal(post.id);
+        assert.ifError(err);
+        assert.equal(doc.id, post.id);
         M.findById(post.id, function (err, gone) {
           db.close();
-          should.strictEqual(err, null);
-          should.strictEqual(gone, null);
+          assert.ifError(err);
+          assert.equal(null, gone);
+          done();
         });
       });
     });
-  },
+  })
 
-  'findOneAndRemove: options/conditions/doc are merged when no callback is passed': function () {
+  it('options/conditions/doc are merged when no callback is passed', function(){
     var db = start()
       , M = db.model(modelname, collection)
 
@@ -108,53 +108,54 @@ module.exports = {
 
     // Model.findOneAndRemove
     query = M.findOneAndRemove({ author: 'aaron' }, { select: 'author' });
-    should.strictEqual(1, query._fields.author);
-    should.strictEqual('aaron', query._conditions.author);
+    assert.equal(1, query._fields.author);
+    assert.equal('aaron', query._conditions.author);
 
     query = M.findOneAndRemove({ author: 'aaron' });
-    should.strictEqual(undefined, query._fields);
-    should.strictEqual('aaron', query._conditions.author);
+    assert.equal(undefined, query._fields);
+    assert.equal('aaron', query._conditions.author);
 
     query = M.findOneAndRemove();
-    should.strictEqual(undefined, query.options.new);
-    should.strictEqual(undefined, query._fields);
-    should.strictEqual(undefined, query._conditions.author);
+    assert.equal(undefined, query.options.new);
+    assert.equal(undefined, query._fields);
+    assert.equal(undefined, query._conditions.author);
 
     // Query.findOneAndRemove
     query = M.where('author', 'aaron').findOneAndRemove({ date: now });
-    should.strictEqual(undefined, query._fields);
-    should.equal(now, query._conditions.date);
-    should.strictEqual('aaron', query._conditions.author);
+    assert.equal(undefined, query._fields);
+    assert.equal(now, query._conditions.date);
+    assert.equal('aaron', query._conditions.author);
 
     query = M.find().findOneAndRemove({ author: 'aaron' }, { select: 'author' });
-    should.strictEqual(1, query._fields.author);
-    should.strictEqual('aaron', query._conditions.author);
+    assert.equal(1, query._fields.author);
+    assert.equal('aaron', query._conditions.author);
 
     query = M.find().findOneAndRemove();
-    should.strictEqual(undefined, query._fields);
-    should.strictEqual(undefined, query._conditions.author);
-  },
+    assert.equal(undefined, query._fields);
+    assert.equal(undefined, query._conditions.author);
+  });
 
-  'findOneAndRemove executes when a callback is passed': function () {
+  it('executes when a callback is passed', function(done){
     var db = start()
       , M = db.model(modelname, collection + random())
       , pending = 5
 
-    M.findOneAndRemove({ name: 'aaron1' }, { select: 'name' }, done);
-    M.findOneAndRemove({ name: 'aaron1' }, done);
-    M.where().findOneAndRemove({ name: 'aaron1' }, { select: 'name' }, done);
-    M.where().findOneAndRemove({ name: 'aaron1' }, done);
-    M.where('name', 'aaron1').findOneAndRemove(done);
+    M.findOneAndRemove({ name: 'aaron1' }, { select: 'name' }, cb);
+    M.findOneAndRemove({ name: 'aaron1' }, cb);
+    M.where().findOneAndRemove({ name: 'aaron1' }, { select: 'name' }, cb);
+    M.where().findOneAndRemove({ name: 'aaron1' }, cb);
+    M.where('name', 'aaron1').findOneAndRemove(cb);
 
-    function done (err, doc) {
-      should.strictEqual(null, err);
-      should.strictEqual(null, doc); // no previously existing doc
+    function cb (err, doc) {
+      assert.ifError(err);
+      assert.equal(null, doc); // no previously existing doc
       if (--pending) return;
       db.close();
+      done();
     }
-  },
+  });
 
-  'Model.findOneAndRemove(callback) throws': function () {
+  it('executed with only a callback throws', function(){
     var db = start()
       , M = db.model(modelname, collection)
       , err
@@ -166,12 +167,13 @@ module.exports = {
     }
 
     db.close();
-    ;/First argument must not be a function/.test(err).should.be.true;
-  },
+    assert.ok(/First argument must not be a function/.test(err));
+  });
 
-  /// byid
+})
 
-  'Model.findByIdAndRemove(callback) throws': function () {
+describe('model: findByIdAndRemove:', function(){
+  it('executed with only a callback throws', function(){
     var db = start()
       , M = db.model(modelname, collection)
       , err
@@ -183,47 +185,49 @@ module.exports = {
     }
 
     db.close();
-    ;/First argument must not be a function/.test(err).should.be.true;
-  },
+    assert.ok(/First argument must not be a function/.test(err));
+  });
 
-  'findByIdAndRemove executes when a callback is passed': function () {
+  it('executes when a callback is passed', function(done){
     var db = start()
       , M = db.model(modelname, collection + random())
       , _id = new DocumentObjectId
       , pending = 2
 
-    M.findByIdAndRemove(_id, { select: 'name' }, done);
-    M.findByIdAndRemove(_id, done);
+    M.findByIdAndRemove(_id, { select: 'name' }, cb);
+    M.findByIdAndRemove(_id, cb);
 
-    function done (err, doc) {
-      should.strictEqual(null, err);
-      should.strictEqual(null, doc); // no previously existing doc
+    function cb (err, doc) {
+      assert.ifError(err);
+      assert.equal(null, doc); // no previously existing doc
       if (--pending) return;
       db.close();
+      done();
     }
-  },
+  });
 
-  'findByIdAndRemove returns the original document': function () {
+  it('returns the original document', function(done){
     var db = start()
       , M = db.model(modelname, collection)
       , title = 'remove muah pleez'
 
     var post = new M({ title: title });
     post.save(function (err) {
-      should.strictEqual(err, null);
+      assert.ifError(err);
       M.findByIdAndRemove(post.id, function (err, doc) {
-        should.strictEqual(err, null);
-        doc.id.should.equal(post.id);
+        assert.ifError(err);
+        assert.equal(doc.id, post.id);
         M.findById(post.id, function (err, gone) {
           db.close();
-          should.strictEqual(err, null);
-          should.strictEqual(gone, null);
+          assert.ifError(err);
+          assert.equal(null, gone);
+          done();
         });
       });
     });
-  },
+  });
 
-  'findByIdAndRemove: options/conditions/doc are merged when no callback is passed': function () {
+  it('options/conditions/doc are merged when no callback is passed', function(){
     var db = start()
       , M = db.model(modelname, collection)
       , _id = new DocumentObjectId
@@ -235,17 +239,16 @@ module.exports = {
 
     // Model.findByIdAndRemove
     query = M.findByIdAndRemove(_id, { select: 'author' });
-    should.strictEqual(1, query._fields.author);
-    should.strictEqual(_id.toString(), query._conditions._id.toString());
+    assert.equal(1, query._fields.author);
+    assert.equal(_id.toString(), query._conditions._id.toString());
 
     query = M.findByIdAndRemove(_id.toString());
-    should.strictEqual(undefined, query._fields);
-    should.strictEqual(_id.toString(), query._conditions._id);
+    assert.equal(undefined, query._fields);
+    assert.equal(_id.toString(), query._conditions._id);
 
     query = M.findByIdAndRemove();
-    should.strictEqual(undefined, query.options.new);
-    should.strictEqual(undefined, query._fields);
-    should.strictEqual(undefined, query._conditions._id);
-  }
-
-}
+    assert.equal(undefined, query.options.new);
+    assert.equal(undefined, query._fields);
+    assert.equal(undefined, query._conditions._id);
+  })
+})

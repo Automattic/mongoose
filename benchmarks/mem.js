@@ -39,13 +39,13 @@ methods.push(function (a, cb) {
   A.findById(a._id, cb);
 }); // 4.6 MB
 methods.push(function (a, cb) {
-  A.where('number', a.number).sort('-_id').limit(10).exec(cb)
+  A.where('number', a.number).limit(10).exec(cb)
 }); // 4.8 MB
 methods.push(function (a, cb) {
   A.where('date', a.date).select('string').limit(10).exec(cb)
 }); // 3.5 mb
 methods.push(function (a, cb) {
-  A.where('date', a.date).select('string bool').sort('date').limit(10).exec(cb)
+  A.where('date', a.date).select('string bool').limit(10).exec(cb)
 }); // 3.5 MB
 methods.push(function (a, cb) {
   A.where('date', a.date).where('array').in(3).limit(10).exec(cb)
@@ -69,12 +69,12 @@ methods.push(function (a, cb) {
   a.bool = false;
   a.array.push(3);
   a.dates.push(new Date);
-  a.bools.$pushAll([true, false]);
-  a.docs.$addToSet({ title: 'woot' });
+  a.bools.push([true, false]);
+  a.docs.addToSet({ title: 'woot' });
   a.strings.remove("three");
-  a.numbers.$pull(72);
+  a.numbers.pull(72);
   a.objectids.$pop();
-  a.docs.$pullAll(a.docs);
+  a.docs.pull.apply(a.docs, a.docs);
   a.s.nest = "aooooooga";
 
   if (i%2)

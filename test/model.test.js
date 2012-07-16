@@ -3687,9 +3687,7 @@ describe('model', function(){
               worked = true;
             });
 
-            process.nextTick(function () {
-              db.close();
-            });
+            db.db.close();
 
             setTimeout(function () {
               assert.ok(worked);
@@ -3823,7 +3821,7 @@ describe('model', function(){
       })
 
       it('should throw error when nothing is listening to db errors', function(done){
-        var db = start();
+        var db = start({ noErrorListener: 1 });
 
         var DefaultErrSchema = new Schema({});
         DefaultErrSchema.pre('save', function (next) {

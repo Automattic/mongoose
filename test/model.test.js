@@ -2984,13 +2984,17 @@ describe('model', function(){
     it('works', function(done){
       var Human = new Schema({
           name  : String
-        , email : { type: String, unique: true }
+        , email : { type: String, index: { unique: true, background: false }}
       });
 
       mongoose.model('SafeHuman', Human, true);
 
       var db = start()
         , Human = db.model('SafeHuman', 'safehuman' + random());
+
+      Human.on('index', function (err) {
+        assert.ifError(err);
+      });
 
       var me = new Human({
           name  : 'Guillermo Rauch'
@@ -3022,7 +3026,7 @@ describe('model', function(){
     it('can be disabled', function(done){
       var Human = new Schema({
           name  : String
-        , email : { type: String, unique: true }
+        , email : { type: String, index: { unique: true, background: false }}
       });
 
       // turn it off
@@ -3032,6 +3036,10 @@ describe('model', function(){
 
       var db = start()
         , Human = db.model('UnsafeHuman', 'unsafehuman' + random());
+
+      Human.on('index', function (err) {
+        assert.ifError(err);
+      });
 
       var me = new Human({
           name  : 'Guillermo Rauch'

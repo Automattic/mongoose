@@ -168,6 +168,7 @@ describe('model field selection', function(){
       BlogPostB.findById(id, 'def comments', function (err, found) {
         db.close();
         assert.ifError(err);
+        assert.ok(found);
         assert.equal(found._id.toString(), id);
         assert.strictEqual(undefined, found.title);
         assert.strictEqual('kandinsky', found.def);

@@ -2984,7 +2984,7 @@ describe('model', function(){
     it('works', function(done){
       var Human = new Schema({
           name  : String
-        , email : { type: String, unique: true }
+        , email : { type: String, index: { unique: true, background: false }}
       });
 
       mongoose.model('SafeHuman', Human, true);
@@ -2992,37 +2992,41 @@ describe('model', function(){
       var db = start()
         , Human = db.model('SafeHuman', 'safehuman' + random());
 
-      var me = new Human({
-          name  : 'Guillermo Rauch'
-        , email : 'rauchg@gmail.com'
-      });
-
-      me.save(function (err) {
+      Human.on('index', function (err) {
         assert.ifError(err);
+        var me = new Human({
+            name  : 'Guillermo Rauch'
+          , email : 'rauchg@gmail.com'
+        });
 
-        Human.findById(me._id, function (err, doc){
+        me.save(function (err) {
           assert.ifError(err);
-          assert.equal(doc.email,'rauchg@gmail.com');
 
-          var copycat = new Human({
-              name  : 'Lionel Messi'
-            , email : 'rauchg@gmail.com'
-          });
+          Human.findById(me._id, function (err, doc){
+            assert.ifError(err);
+            assert.equal(doc.email,'rauchg@gmail.com');
 
-          copycat.save(function (err) {
-            db.close();
-            assert.ok(/duplicate/.test(err.message));
-            assert.ok(err instanceof Error);
-            done();
+            var copycat = new Human({
+                name  : 'Lionel Messi'
+              , email : 'rauchg@gmail.com'
+            });
+
+            copycat.save(function (err) {
+              db.close();
+              assert.ok(/duplicate/.test(err.message));
+              assert.ok(err instanceof Error);
+              done();
+            });
           });
         });
       });
+
     });
 
     it('can be disabled', function(done){
       var Human = new Schema({
           name  : String
-        , email : { type: String, unique: true }
+        , email : { type: String, index: { unique: true, background: false }}
       });
 
       // turn it off
@@ -3032,6 +3036,10 @@ describe('model', function(){
 
       var db = start()
         , Human = db.model('UnsafeHuman', 'unsafehuman' + random());
+
+      Human.on('index', function (err) {
+        assert.ifError(err);
+      });
 
       var me = new Human({
           name  : 'Guillermo Rauch'
@@ -3687,9 +3695,7 @@ describe('model', function(){
               worked = true;
             });
 
-            process.nextTick(function () {
-              db.close();
-            });
+            db.db.close();
 
             setTimeout(function () {
               assert.ok(worked);
@@ -3823,7 +3829,7 @@ describe('model', function(){
       })
 
       it('should throw error when nothing is listening to db errors', function(done){
-        var db = start();
+        var db = start({ noErrorListener: 1 });
 
         var DefaultErrSchema = new Schema({});
         DefaultErrSchema.pre('save', function (next) {

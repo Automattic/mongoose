@@ -1,3 +1,146 @@
+
+3.0.0alpha2 / 2012-07-18
+=========================
+
+  * changed; index errors are now emitted on their model and passed to an optional callback (#984)
+  * fixed; specifying index along with sparse/unique option no longer overwrites (#1004)
+  * fixed; never swallow connection errors (#618)
+  * fixed; creating object from model with emded object no longer overwrites defaults [achurkin] (#859)
+  * fixed; stop needless validation of unchanged/unselected fields (#891)
+  * fixed; document#equals behavior of objectids (#974)
+  * fixed; honor the minimize schema option (#978)
+  * fixed; provide helpful error msgs when reserved schema path is used (#928)
+  * fixed; callback to conn#disconnect is optional (#875)
+  * fixed; handle missing protocols in connection urls (#987)
+  * fixed; validate args to query#where (#969)
+  * fixed; saving modified/removed subdocs (#975)
+  * fixed; update with $pull from Mixed array (#735)
+  * fixed; error with null shard key value
+  * fixed; allow unsetting enums (#967)
+  * added; support for manual index creation (#984)
+  * added; support for disabled auto-indexing (#984)
+  * added; support for preserving MongooseArray#sort changes (#752)
+  * added; emit state change events on connection
+  * added; support for specifying BSON subtype in MongooseBuffer#toObject [jcrugzz]
+  * added; support for disabled versioning (#977)
+  * added; implicit "new" support for models and Schemas
+
+3.0.0alpha1 / 2012-06-15
+=========================
+
+  * removed; doc#commit (use doc#markModified)
+  * removed; doc.modified getter (#950)
+  * removed; mongoose{connectSet,createSetConnection}. use connect,createConnection instead
+  * removed; query alias methods 1149804c
+  * removed; MongooseNumber
+  * changed; now creating indexes in background by default
+  * changed; strict mode now enabled by default (#952)
+  * changed; doc#modifiedPaths is now a method (#950)
+  * changed; getters no longer cast (#820); casting happens during set
+  * fixed; no need to pass updateArg to findOneAndUpdate (#931)
+  * fixed: utils.merge bug when merging nested non-objects. [treygriffith]
+  * fixed; strict:throw should produce errors in findAndModify (#963)
+  * fixed; findAndUpdate no longer overwrites document (#962)
+  * fixed; setting default DocumentArrays (#953)
+  * fixed; selection of _id with schema deselection (#954)
+  * fixed; ensure promise#error emits instanceof Error
+  * fixed; CursorStream: No stack overflow on any size result (#929)
+  * fixed; doc#remove now passes safe options
+  * fixed; invalid use of $set during $pop
+  * fixed; array#{$pop,$shift} mirror MongoDB behavior
+  * fixed; no longer test non-required vals in string match (#934)
+  * fixed; edge case with doc#inspect
+  * fixed; setter order (#665)
+  * fixed; setting invalid paths in strict mode (#916)
+  * fixed; handle docs without id in DocumentArray#id method (#897)
+  * fixed; do not save virtuals during model.update (#894)
+  * fixed; sub doc toObject virtuals application (#889)
+  * fixed; MongooseArray#pull of ObjectId (#881)
+  * fixed; handle passing db name with any repl set string
+  * fixed; default application of selected fields (#870)
+  * fixed; subdoc paths reported in validation errors (#725)
+  * fixed; incorrect reported num of affected docs in update ops (#862)
+  * fixed; connection assignment in Model#model (#853)
+  * fixed; stringifying arrays of docs (#852)
+  * fixed; modifying subdoc and parent array works (#842)
+  * fixed; passing undefined to next hook (#785)
+  * fixed; Query#{update,remove}() works without callbacks (#788)
+  * fixed; set/updating nested objects by parent pathname (#843)
+  * fixed; allow null in number arrays (#840)
+  * fixed; isNew on sub doc after insertion error (#837)
+  * fixed; if an insert fails, set isNew back to false [boutell]
+  * fixed; isSelected when only _id is selected (#730)
+  * fixed; setting an unset default value (#742)
+  * fixed; query#sort error messaging (#671)
+  * fixed; support for passing $options with $regex
+  * added; array of object literal notation in schema creates DocumentArrays
+  * added; gt,gte,lt,lte query support for arrays (#902)
+  * added; capped collection support (#938)
+  * added; document versioning support
+  * added; inclusion of deselected schema path (#786)
+  * added; non-atomic array#pop
+  * added; EmbeddedDocument constructor is now exposed in DocArray#create 7cf8beec
+  * added; mapReduce support (#678)
+  * added; support for a configurable minimize option #to{Object,JSON}(option) (#848)
+  * added; support for strict: `throws` [regality]
+  * added; support for named schema types (#795)
+  * added; to{Object,JSON} schema options (#805)
+  * added; findByIdAnd{Update,Remove}()
+  * added; findOneAnd{Update,Remove}()
+  * added; query.setOptions()
+  * added; instance.update() (#794)
+  * added; support specifying model in populate() [DanielBaulig]
+  * added; `lean` query option [gitfy]
+  * added; multi-atomic support to MongooseArray#nonAtomicPush
+  * added; support for $set + other $atomic ops on single array
+  * added; tests
+  * updated; driver to 1.0.2
+  * updated; query.sort() syntax to mirror query.select()
+  * updated; clearer cast error msg for array numbers
+  * updated; docs
+  * updated; doc.clone 3x faster (#950)
+  * updated; only create _id if necessary (#950)
+
+2.7.2 / 2012-07-18
+==================
+
+  * fixed; callback to conn#disconnect is optional (#875)
+  * fixed; handle missing protocols in connection urls (#987)
+  * fixed; saving modified/removed subdocs (#975)
+  * updated; tests
+
+2.7.1 / 2012-06-26
+===================
+
+  * fixed; sharding: when a document holds a null as a value of the shard key
+  * fixed; update() using $pull on an array of Mixed (gh-735)
+  * deprecated; MongooseNumber#{inc, increment, decrement} methods
+  * tests; now using mocha
+
+2.7.0 / 2012-06-14
+===================
+
+  * added; deprecation warnings to methods being removed in 3.x
+
+2.6.8 / 2012-06-14
+===================
+
+  * fixed; edge case when using 'options' as a path name (#961)
+
+2.6.7 / 2012-06-08
+===================
+
+  * fixed; ensure promise#error always emits instanceof Error
+  * fixed; selection of _id w/ another excluded path (#954)
+  * fixed; setting default DocumentArrays (#953)
+
+2.6.6 / 2012-06-06
+===================
+
+  * fixed; stack overflow in query stream with large result sets (#929)
+  * added; $gt, $gte, $lt, $lte support to arrays (#902)
+  * fixed; pass option `safe` along to doc#remove() calls
+
 2.6.5 / 2012-05-24
 ===================
 
@@ -20,6 +163,11 @@
   * updated; driver to 1.0.0
   * fixed; virtuals application of subdocs when using toObject({ virtuals: true }) (#889)
   * fixed; MongooseArray#pull of ObjectId correctly updates the array itself (#881)
+
+2.6.2 / 2012-04-30
+===================
+
+  * fixed; default field application of selected fields (#870)
 
 2.6.1 / 2012-04-30
 ===================

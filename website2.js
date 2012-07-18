@@ -1,3 +1,4 @@
+// render the home page
 
 var fs= require('fs')
 var jade = require('jade')

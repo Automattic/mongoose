@@ -1,3 +1,44 @@
+
+2.7.2 / 2012-07-18
+==================
+
+  * fixed; callback to conn#disconnect is optional (#875)
+  * fixed; handle missing protocols in connection urls (#987)
+  * fixed; saving modified/removed subdocs (#975)
+  * updated; tests
+
+2.7.1 / 2012-06-26
+===================
+
+  * fixed; sharding: when a document holds a null as a value of the shard key
+  * fixed; update() using $pull on an array of Mixed (gh-735)
+  * deprecated; MongooseNumber#{inc, increment, decrement} methods
+  * tests; now using mocha
+
+2.7.0 / 2012-06-14
+===================
+
+  * added; deprecation warnings to methods being removed in 3.x
+
+2.6.8 / 2012-06-14
+===================
+
+  * fixed; edge case when using 'options' as a path name (#961)
+
+2.6.7 / 2012-06-08
+===================
+
+  * fixed; ensure promise#error always emits instanceof Error
+  * fixed; selection of _id w/ another excluded path (#954)
+  * fixed; setting default DocumentArrays (#953)
+
+2.6.6 / 2012-06-06
+===================
+
+  * fixed; stack overflow in query stream with large result sets (#929)
+  * added; $gt, $gte, $lt, $lte support to arrays (#902)
+  * fixed; pass option `safe` along to doc#remove() calls
+
 2.6.5 / 2012-05-24
 ===================
 
@@ -20,6 +61,11 @@
   * updated; driver to 1.0.0
   * fixed; virtuals application of subdocs when using toObject({ virtuals: true }) (#889)
   * fixed; MongooseArray#pull of ObjectId correctly updates the array itself (#881)
+
+2.6.2 / 2012-04-30
+===================
+
+  * fixed; default field application of selected fields (#870)
 
 2.6.1 / 2012-04-30
 ===================

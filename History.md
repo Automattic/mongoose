@@ -1,4 +1,12 @@
 
+2.7.2 / 2012-07-18
+==================
+
+  * fixed; callback to conn#disconnect is optional (#875)
+  * fixed; handle missing protocols in connection urls (#987)
+  * fixed; saving modified/removed subdocs (#975)
+  * updated; tests
+
 2.7.1 / 2012-06-26
 ===================
 

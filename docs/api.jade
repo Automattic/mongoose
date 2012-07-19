@@ -64,12 +64,12 @@ html(lang='en')
         text-decoration: none;
       }
       #header .mongoose {
-        font-size: 146px;
+        font-size: 60px;
         font-weight: 100;
         text-indent: -23px;
         color: #fff;
         text-shadow: 18px 5px 6px #777, -6px 0px 2px #fff;
-        letter-spacing: -14px;
+        letter-spacing: -7px;
       }
   body.api
     a(href="http://github.com/learnboost/mongoose")
@@ -79,7 +79,6 @@ html(lang='en')
         h1
           a(href="https://github.com/learnboost/mongoose", target="blank")
             .mongoose Mongoose
-            .odm ODM
       #links
         ul
           each item in docs
@@ -87,10 +86,11 @@ html(lang='en')
               a(href="/docs/index.html")= item.title
               each method in item.json
                 if !method.ignore && !method.isPrivate
+                  if method.ctx
+                    h3= method.ctx.name
                   != method.description.full
-                if !method.ignore && !method.isPrivate
-                  :js
-                    #{method.code}
+                  - code = method.code;
+                  != hl(code)
 
     script.
       document.body.className = 'load';

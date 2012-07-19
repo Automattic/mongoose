@@ -2,6 +2,7 @@
 var fs= require('fs')
 var jade = require('jade')
 var package = require('./package')
+var hl = require('./docs/highlight')
 
 // add custom jade filters
 require('./docs/filters')(jade);
@@ -25,13 +26,14 @@ files.forEach(function (file) {
 function jadeify (filename, options) {
   options || (options = {});
   options.package = package;
+  options.hl = hl;
   jade.renderFile(filename, options, function (err, str) {
     if (err) return console.error(err.stack);
 
     var newfile = filename.replace('.jade', '.html')
     fs.writeFile(newfile, str, function (err) {
       if (err) return console.error('could not write', err.stack);
-      console.error('%s : rendered ', new Date, newfile);
+      console.log('%s : rendered ', new Date, newfile);
     });
   });
 }

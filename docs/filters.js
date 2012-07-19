@@ -5,7 +5,8 @@ module.exports = exports = function (jade) {
   // add highlighting filter to jade
 
   jade.filters.js = function (str) {
-    var ret = hl.highlight('javascript', str.replace(/\\n/g, '\n')).value;
+    str = str.replace(/\\n/g, '\n');
+    var ret = hl.highlight('javascript', str).value;
     var code = '<pre><code class="javascript">' + ret.replace(/\n/g, '\\n') + '</code></pre>';
     return code;
   }

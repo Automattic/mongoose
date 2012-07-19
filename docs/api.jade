@@ -1,0 +1,97 @@
+doctype html
+html(lang='en')
+  head
+    meta(charset='utf-8')
+    title Mongoose API v#{package.version}
+    link(href='http://fonts.googleapis.com/css?family=Anonymous+Pro:400,700|Droid+Sans+Mono|Open+Sans:400,700|Linden+Hill|Quattrocento:400,700|News+Cycle:400,700|Antic+Slab|Cabin+Condensed:400,700', rel='stylesheet', type='text/css')
+    link(href='/docs/css/default.css', rel='stylesheet', type='text/css')
+    style.
+      body {
+        background: #d8e2d8 url(/docs/images/square_bg.png); /* #D8E2D8 #B5F66E; /* #CEF6A4; */
+        font-family: 'Open Sans', Helvetica, Arial, FreeSans;
+        color: #333;
+        -webkit-font-smoothing: antialiased;
+        -webkit-text-size-adjust: 100%;
+        padding: 0;
+        margin: 0;
+      }
+      a {
+        color: #800;
+        -webkit-transition-property: opacity, -webkit-transform, color, background-color, padding, -webkit-box-shadow;
+        -webkit-transition-duration: 0.15s;
+        -webkit-transition-timing-function: ease-out;
+      }
+      a:hover {
+        opacity: 0.8;
+      }
+      #wrap {
+        width: 600px;
+        margin: 0 auto;
+        position:relative;
+      }
+      h1 {
+        font-family: 'Helvetica Nueue', Helvetica, Arial, FreeSans, sans-serif;
+        text-rendering: geometricPrecision;
+      }
+      pre {
+        background: rgba(255,255,255,.8);
+        border: 1px solid #bbb;
+        padding:5px;
+        border-radius: 3px;
+        box-shadow: 1px 3px 6px #ddd;
+      }
+      code {
+        background: rgba(255,255,255,.8);
+        border: 1px solid #c6c6c6;
+        color: #333;
+        border-radius: 3px
+      }
+      pre code {
+        border: 0 none;
+        padding: 1.2em;
+        font-size: 1.1em;
+      }
+      #header {
+        text-align: center;
+        position: relative;
+        padding-top: 40px;
+      }
+      #header h1 {
+        margin-top: 0;
+        margin-bottom: 0;
+      }
+      #header h1 a {
+        text-decoration: none;
+      }
+      #header .mongoose {
+        font-size: 146px;
+        font-weight: 100;
+        text-indent: -23px;
+        color: #fff;
+        text-shadow: 18px 5px 6px #777, -6px 0px 2px #fff;
+        letter-spacing: -14px;
+      }
+  body.api
+    a(href="http://github.com/learnboost/mongoose")
+      img(style="position: absolute; top: 0; right: 0; border: 0;", src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png", alt="Fork me on GitHub")
+    #wrap
+      #header
+        h1
+          a(href="https://github.com/learnboost/mongoose", target="blank")
+            .mongoose Mongoose
+            .odm ODM
+      #links
+        ul
+          each item in docs
+            li
+              a(href="/docs/index.html")= item.title
+              each method in item.json
+                if !method.ignore && !method.isPrivate
+                  != method.description.full
+                if !method.ignore && !method.isPrivate
+                  :js
+                    #{method.code}
+
+    script.
+      document.body.className = 'load';
+    include includes/googleanalytics

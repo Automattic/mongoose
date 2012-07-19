@@ -1,0 +1,4286 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><title>Mongoose API v3.0.0alpha2</title><link href="http://fonts.googleapis.com/css?family=Anonymous+Pro:400,700|Droid+Sans+Mono|Open+Sans:400,700|Linden+Hill|Quattrocento:400,700|News+Cycle:400,700|Antic+Slab|Cabin+Condensed:400,700" rel="stylesheet" type="text/css"><link href="/docs/css/default.css" rel="stylesheet" type="text/css"><style>body {
+  background: #d8e2d8 url(/docs/images/square_bg.png); /* #D8E2D8 #B5F66E; /* #CEF6A4; */
+  font-family: 'Open Sans', Helvetica, Arial, FreeSans;
+  color: #333;
+  -webkit-font-smoothing: antialiased;
+  -webkit-text-size-adjust: 100%;
+  padding: 0;
+  margin: 0;
+}
+a {
+  color: #800;
+  -webkit-transition-property: opacity, -webkit-transform, color, background-color, padding, -webkit-box-shadow;
+  -webkit-transition-duration: 0.15s;
+  -webkit-transition-timing-function: ease-out;
+}
+a:hover {
+  opacity: 0.8;
+}
+#wrap {
+  width: 600px;
+  margin: 0 auto;
+  position:relative;
+}
+h1 {
+  font-family: 'Helvetica Nueue', Helvetica, Arial, FreeSans, sans-serif;
+  text-rendering: geometricPrecision;
+}
+pre {
+  background: rgba(255,255,255,.8);
+  border: 1px solid #bbb;
+  padding:5px;
+  border-radius: 3px;
+  box-shadow: 1px 3px 6px #ddd;
+}
+code {
+  background: rgba(255,255,255,.8);
+  border: 1px solid #c6c6c6;
+  color: #333;
+  border-radius: 3px
+}
+pre code {
+  border: 0 none;
+  padding: 1.2em;
+  font-size: 1.1em;
+}
+#header {
+  text-align: center;
+  position: relative;
+  padding-top: 40px;
+}
+#header h1 {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+#header h1 a {
+  text-decoration: none;
+}
+#header .mongoose {
+  font-size: 146px;
+  font-weight: 100;
+  text-indent: -23px;
+  color: #fff;
+  text-shadow: 18px 5px 6px #777, -6px 0px 2px #fff;
+  letter-spacing: -14px;
+}</style></head><body class="api"><a href="http://github.com/learnboost/mongoose"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png" alt="Fork me on GitHub"></a><div id="wrap"><div id="header"><h1><a href="https://github.com/learnboost/mongoose" target="blank"><div class="mongoose">Mongoose</div><div class="odm">ODM</div></a></h1></div><div id="links"><ul><li><a href="/docs/index.html">lib/collection.js</a><p>Collection constructor</p><pre><code class="javascript">function Collection (name, conn, opts) {
+  this.name = name;
+  this.conn = conn;
+  this.buffer = true;
+  this.queue = [];
+
+  if ('number' == typeof opts) opts = { size: opts };
+  this.opts = opts || {};
+
+  if (STATES.connected == this.conn.readyState) {
+    this.onOpen();
+  }
+};
+</code></pre><p>The collection name</p><pre><code class="javascript">Collection.prototype.name;
+</code></pre><p>The Connection instance</p><pre><code class="javascript">Collection.prototype.conn;
+</code></pre><p>Module exports.</p><pre><code class="javascript">module.exports = Collection;
+</code></pre></li><li><a href="/docs/index.html">lib/connection.js</a><p>Protocol prefix regexp.</p><pre><code class="javascript">var rgxProtocol = /^(?:.)+:\/\//;
+</code></pre><p>Connection constructor. For practical reasons, a Connection equals a Db</p><pre><code class="javascript">function Connection (base) {
+  this.base = base;
+  this.collections = {};
+  this.models = {};
+  this.replica = false;
+  this.host = null;
+  this.port = null;
+  this.user = null;
+  this.pass = null;
+  this.name = null;
+  this.options = null;
+  this._readyState = STATES.disconnected;
+};
+</code></pre><p>Inherit from EventEmitter.</p><pre><code class="javascript">Connection.prototype.__proto__ = EventEmitter.prototype;
+</code></pre><h2>Connection ready state</h2>
+
+<p>0 = Disconnected<br /> 1 = Connected<br /> 2 = Connecting<br /> 3 = Disconnecting</p>
+
+<p>Each state change emits its associated event name.</p><pre><code class="javascript">Object.defineProperty(Connection.prototype, 'readyState', {
+    get: function(){ return this._readyState; }
+  , set: function (val) {
+      if (!(val in STATES)) {
+        throw new Error('Invalid connection state: ' + val);
+      }
+
+      this._readyState = val;
+      this.emit(STATES[val]);
+    }
+});
+</code></pre><p>A hash of the collections associated with this connection</p><pre><code class="javascript">Connection.prototype.collections;
+</code></pre><p>The mongodb.Db instance, set when the connection is opened</p><pre><code class="javascript">Connection.prototype.db;
+</code></pre><p>Establishes the connection</p>
+
+<p><code>options</code> is a hash with the following optional properties:</p>
+
+<p>options.db      - passed to the connection db instance<br />  options.server  - passed to the connection server instance(s)<br />  options.replset - passed to the connection ReplSetServer instance<br />  options.user    - username for authentication<br />  options.pass    - password for authentication</p>
+
+<p>Notes:</p>
+
+<p>Mongoose forces the db option <code>forceServerObjectId</code> false and cannot<br />  be overridden.</p>
+
+<p>Mongoose defaults the server <code>auto_reconnect</code> options to true which<br />  can be overridden.</p>
+
+<p>See the node-mongodb-native driver instance for options that it<br />  understands.</p><pre><code class="javascript">Connection.prototype.open = function (host, database, port, options, callback) {
+  var self = this
+    , uri;
+
+  if ('string' === typeof database) {
+    switch (arguments.length) {
+      case 2:
+        port = 27017;
+      case 3:
+        switch (typeof port) {
+          case 'function':
+            callback = port, port = 27017;
+            break;
+          case 'object':
+            options = port, port = 27017;
+            break;
+        }
+        break;
+      case 4:
+        if ('function' === typeof options)
+          callback = options, options = {};
+    }
+  } else {
+    switch (typeof database) {
+      case 'function':
+        callback = database, database = undefined;
+        break;
+      case 'object':
+        options = database;
+        database = undefined;
+        callback = port;
+        break;
+    }
+
+    if (!rgxProtocol.test(host)) {
+      host = 'mongodb://' + host;
+    }
+
+    uri = url.parse(host);
+    host = uri.hostname;
+    port = uri.port || 27017;
+    database = uri.pathname &amp;&amp; uri.pathname.replace(/\//g, '');
+  }
+
+  this.options = this.defaultOptions(options);
+
+  // make sure we can open
+  if (STATES.disconnected !== this.readyState) {
+    var err = new Error('Trying to open unclosed connection.');
+    err.state = this.readyState;
+    this.error(err, callback);
+    return this;
+  }
+
+  if (!host) {
+    this.error(new Error('Missing connection hostname.'), callback);
+    return this;
+  }
+
+  if (!database) {
+    this.error(new Error('Missing connection database.'), callback);
+    return this;
+  }
+
+  // handle authentication
+  if (uri &amp;&amp; uri.auth) {
+    var auth = uri.auth.split(':');
+    this.user = auth[0];
+    this.pass = auth[1];
+
+  // Check hostname for user/pass
+  } else if (/@/.test(host) &amp;&amp; /:/.test(host.split('@')[0])) {
+    host = host.split('@');
+    var auth = host.shift().split(':');
+    host = host.pop();
+    this.user = auth[0];
+    this.pass = auth[1];
+
+  // user/pass options
+  } else if (options &amp;&amp; options.user &amp;&amp; options.pass) {
+    this.user = options.user;
+    this.pass = options.pass;
+
+  } else {
+    this.user = this.pass = undefined;
+  }
+
+  this.name = database;
+  this.host = host;
+  this.port = port;
+
+  this._open(callback);
+  return this;
+};
+</code></pre><p>Connects to a replica set.</p>
+
+<p>Supply a comma-separted list of mongodb:// URIs. You only need to specify<br />the database name and/or auth to one of them.</p>
+
+<p>The options parameter is passed to the low level connection. See the<br />node-mongodb-native driver instance for detail.</p><pre><code class="javascript">Connection.prototype.openSet = function (uris, database, options, callback) {
+  var uris = uris.split(',')
+    , self = this;
+
+  switch (arguments.length) {
+    case 3:
+      this.name = database;
+      if ('function' === typeof options) callback = options, options = {};
+      break;
+    case 2:
+      switch (typeof database) {
+        case 'string':
+          this.name = database;
+        case 'function':
+          callback = database, database = null;
+          break;
+        case 'object':
+          options = database, database = null;
+          break;
+      }
+  }
+
+  this.options = options = this.defaultOptions(options);
+
+  if (uris.length &lt; 2) {
+    this.error(new Error('Please provide comma-separated URIs'), callback);
+    return this;
+  }
+
+  this.replica = true;
+  this.host = [];
+  this.port = [];
+
+  uris.forEach(function (uri) {
+    // handle missing protocols
+    if (!rgxProtocol.test(uri))
+      uri = 'mongodb://' + uri;
+
+    var uri = url.parse(uri);
+
+    self.host.push(uri.hostname);
+    self.port.push(uri.port || 27017);
+
+    if (!self.name &amp;&amp; uri.pathname &amp;&amp; uri.pathname.replace(/\//g, ''))
+      self.name = uri.pathname.replace(/\//g, '');
+
+    if (!self.user &amp;&amp; uri.auth) {
+      var auth = uri.auth.split(':');
+      self.user = auth[0];
+      self.pass = auth[1];
+    }
+  });
+
+  if (!this.name) {
+    this.error(new Error('No database name provided for replica set'), callback);
+    return this;
+  }
+
+  this._open(callback);
+  return this;
+};
+</code></pre><p>Closes the connection</p><pre><code class="javascript">Connection.prototype.close = function (callback) {
+  var self = this;
+
+  switch (this.readyState){
+    case 0: // disconnected
+      callback &amp;&amp; callback();
+      break;
+
+    case 1: // connected
+      this.readyState = STATES.disconnecting;
+      this.doClose(function(err){
+        if (err){
+          self.error(err, callback);
+        } else {
+          self.onClose();
+          callback &amp;&amp; callback();
+        }
+      });
+      break;
+
+    case 2: // connecting
+      this.once('open', function(){
+        self.close(callback);
+      });
+      break;
+
+    case 3: // disconnecting
+      if (!callback) break;
+      this.once('close', function () {
+        callback();
+      });
+      break;
+  }
+
+  return this;
+};
+</code></pre><p>Retrieves a collection, creating it if not cached.</p><pre><code class="javascript">Connection.prototype.collection = function (name, options) {
+  if (!(name in this.collections))
+    this.collections[name] = new Collection(name, this, options);
+  return this.collections[name];
+};
+</code></pre><p>Defines a model or retrieves it</p><pre><code class="javascript">Connection.prototype.model = function (name, schema, collection) {
+  if (!this.models[name]) {
+    var model = this.base.model(name, schema, collection, true)
+      , Model
+
+    if (this != model.prototype.db) {
+      // subclass model using this connection and collection name
+      Model = function Model (doc, fields, skipId) {
+        if (!(this instanceof Model))
+          return new Model(doc, fields, skipId);
+        model.call(this, doc, fields, skipId);
+      };
+
+      Model.__proto__ = model;
+      Model.prototype.__proto__ = model.prototype;
+      Model.db = Model.prototype.db = this;
+
+      // collection name discovery
+      if ('string' === typeof schema) {
+        collection = schema;
+      }
+
+      if (!collection) {
+        collection = model.prototype.schema.set('collection') || utils.toCollectionName(name);
+      }
+
+      var s = 'string' != typeof schema
+        ? schema
+        : model.prototype.schema;
+
+      Model.prototype.collection = this.collection(collection, s &amp;&amp; s.options.capped);
+      Model.collection = Model.prototype.collection;
+      Model.init();
+    }
+
+    this.models[name] = Model || model;
+  }
+
+  return this.models[name];
+};
+</code></pre><p>Set profiling level.</p><pre><code class="javascript">Connection.prototype.setProfiling = function (level, ms, callback) {
+  if (STATES.connected !== this.readyState) {
+    return this.on('open', this.setProfiling.bind(this, level, ms, callback));
+  }
+
+  if (!callback) callback = ms, ms = 100;
+
+  var cmd = {};
+
+  switch (level) {
+    case 0:
+    case 'off':
+      cmd.profile = 0;
+      break;
+    case 1:
+    case 'slow':
+      cmd.profile = 1;
+      if ('number' !== typeof ms) {
+        ms = parseInt(ms, 10);
+        if (isNaN(ms)) ms = 100;
+      }
+      cmd.slowms = ms;
+      break;
+    case 2:
+    case 'all':
+      cmd.profile = 2;
+      break;
+    default:
+      return callback(new Error('Invalid profiling level: '+ level));
+  }
+
+  this.db.executeDbCommand(cmd, function (err, resp) {
+    if (err) return callback(err);
+
+    var doc = resp.documents[0];
+
+    err = 1 === doc.ok
+      ? null
+      : new Error('Could not set profiling level to: '+ level)
+
+    callback(err, doc);
+  });
+};
+</code></pre><p>Noop.</p><pre><code class="javascript">function noop () {}
+</code></pre><p>Module exports.</p><pre><code class="javascript">Connection.STATES = STATES;
+module.exports = Connection;
+</code></pre></li><li><a href="/docs/index.html">lib/connectionstate.js</a></li><li><a href="/docs/index.html">lib/document.js</a><p>Inherit from EventEmitter.</p><pre><code class="javascript">Document.prototype.__proto__ = EventEmitter.prototype;
+</code></pre><p>Document schema as a nested structure.</p><pre><code class="javascript">Document.prototype.schema;
+</code></pre><p>Whether the document is new.</p><pre><code class="javascript">Document.prototype.isNew;
+</code></pre><p>Validation errors.</p><pre><code class="javascript">Document.prototype.errors;
+</code></pre><p>Init helper.</p><pre><code class="javascript">function init (self, obj, doc, prefix) {
+  prefix = prefix || '';
+
+  var keys = Object.keys(obj)
+    , len = keys.length
+    , schema
+    , path
+    , i;
+
+  while (len--) {
+    i = keys[len];
+    path = prefix + i;
+    schema = self.schema.path(path);
+
+    if (!schema &amp;&amp; obj[i] &amp;&amp; 'Object' === obj[i].constructor.name) {
+      // assume nested object
+      if (!doc[i]) {
+        doc[i] = {};
+      }
+      init(self, obj[i], doc[i], path + '.');
+    } else {
+      if (obj[i] === null) {
+        doc[i] = null;
+      } else if (obj[i] !== undefined) {
+        if (schema) {
+          self.try(function(){
+            doc[i] = schema.cast(obj[i], self, true);
+          });
+        } else {
+          doc[i] = obj[i];
+        }
+      }
+      // mark as hydrated
+      self._activePaths.init(path);
+    }
+  }
+};
+</code></pre><p>_storeShard</p>
+
+<p>Stores the current values of the shard keys<br />for use later in the doc.save() where clause.</p>
+
+<p>Shard key values do not / are not allowed to change.</p><pre><code class="javascript">Document.prototype._storeShard = function _storeShard () {
+  var key = this.schema.options.shardkey;
+  if (!(key &amp;&amp; 'Object' == key.constructor.name)) return;
+
+  var orig = this._shardval = {}
+    , paths = Object.keys(key)
+    , len = paths.length
+    , val
+
+  for (var i = 0; i &lt; len; ++i) {
+    val = this.getValue(paths[i]);
+    if (isMongooseObject(val)) {
+      orig[paths[i]] = val.toObject({ depopulate: true })
+    } else if (null != val &amp;&amp; val.valueOf) {
+      orig[paths[i]] = val.valueOf();
+    } else {
+      orig[paths[i]] = val;
+    }
+  }
+}
+</code></pre><p>Set up middleware support</p><pre><code class="javascript">for (var k in hooks) {
+  Document.prototype[k] = Document[k] = hooks[k];
+}
+</code></pre><p>update</p>
+
+<p>Sends an update command with this document _id as<br />the query selector.</p>
+
+<h2>Example</h2>
+
+<pre><code>weirdCar.update({$inc: {wheels:1}, fn);
+</code></pre>
+
+<h2>Valid options</h2>
+
+<ul>
+<li>safe (boolean) safe mode (defaults to value set in schema (true))</li>
+<li>upsert (boolean) whether to create the doc if it doesn't match (false)</li>
+</ul><pre><code class="javascript">Document.prototype.update = function update () {
+  var args = utils.args(arguments);
+  args.unshift({_id: this._id});
+  this.constructor.update.apply(this.constructor, args);
+}
+</code></pre><p>set</p>
+
+<p>Sets the value of a path, or many paths.</p>
+
+<h2>Examples</h2>
+
+<pre><code>// path, value
+doc.set(path, value)
+
+// object
+doc.set({
+    path  : value
+  , path2 : {
+       path  : value
+    }
+})
+
+// only-the-fly cast to number
+doc.set(path, value, Number)
+
+// only-the-fly cast to string
+doc.set(path, value, String)
+</code></pre><pre><code class="javascript">Document.prototype.set = function (path, val, type) {
+  var constructing = true === type
+    , adhoc = type &amp;&amp; true !== type
+    , adhocs
+
+  if (adhoc) {
+    adhocs = this._adhocPaths || (this._adhocPaths = {});
+    adhocs[path] = Schema.interpretAsType(path, type);
+  }
+
+  if ('string' !== typeof path) {
+    // new Document({ key: val })
+
+    if (null === path || undefined === path) {
+      var _ = path;
+      path = val;
+      val = _;
+
+    } else {
+      var prefix = val
+        ? val + '.'
+        : '';
+
+      if (path instanceof Document) path = path._doc;
+
+      var keys = Object.keys(path)
+        , i = keys.length
+        , pathtype
+        , key
+
+      while (i--) {
+        key = keys[i];
+        if (null != path[key] &amp;&amp; 'Object' === path[key].constructor.name
+          &amp;&amp; !(this._path(prefix + key) instanceof MixedSchema)) {
+          this.set(path[key], prefix + key, constructing);
+        } else if (this._strictMode) {
+          pathtype = this.schema.pathType(prefix + key);
+          if ('real' === pathtype || 'virtual' === pathtype) {
+            this.set(prefix + key, path[key], constructing);
+          } else if ('throw' == this._strictMode) {
+            throw new Error(&quot;Field `&quot; + key + &quot;` is not in schema.&quot;);
+          }
+        } else if (undefined !== path[key]) {
+          this.set(prefix + key, path[key], constructing);
+        }
+      }
+
+      return this;
+    }
+  }
+
+  // ensure _strict is honored for obj props
+  // docschema = new Schema({ path: { nest: 'string' }})
+  // doc.set('path', obj);
+  var pathType = this.schema.pathType(path);
+  if ('nested' == pathType &amp;&amp; val &amp;&amp; 'Object' == val.constructor.name) {
+    this.set(val, path, constructing);
+    return this;
+  }
+
+  var schema;
+  if ('adhocOrUndefined' == pathType &amp;&amp; this._strictMode) {
+    return this;
+  } else if ('virtual' == pathType) {
+    schema = this.schema.virtualpath(path);
+    schema.applySetters(val, this);
+    return this;
+  } else {
+    schema = this._path(path);
+  }
+
+  var parts = path.split('.')
+    , pathToMark
+
+  // When using the $set operator the path to the field must already exist.
+  // Else mongodb throws: &quot;LEFT_SUBFIELD only supports Object&quot;
+
+  if (parts.length &lt;= 1) {
+    pathToMark = path;
+  } else {
+    for (var i = 0; i &lt; parts.length; ++i) {
+      var part = parts[i];
+      var subpath = parts.slice(0, i).concat(part).join('.');
+      if (this.isDirectModified(subpath) // earlier prefixes that are already
+                                         // marked as dirty have precedence
+          || this.get(subpath) === null) {
+        pathToMark = subpath;
+        break;
+      }
+    }
+
+    if (!pathToMark) pathToMark = path;
+  }
+
+  if (!schema || null === val || undefined === val) {
+    this._set(pathToMark, path, constructing, parts, schema, val);
+    return this;
+  }
+
+  var self = this;
+
+  // if this doc is being constructed we should not
+  // trigger getters.
+  var priorVal = constructing
+    ? undefined
+    : this.get(path);
+
+  var shouldSet = this.try(function(){
+    var casted = schema.cast(val, self, false, priorVal);
+    val = schema.applySetters(casted, self);
+  });
+
+  if (shouldSet) {
+    this._set(pathToMark, path, constructing, parts, schema, val, priorVal);
+  }
+
+  return this;
+}
+</code></pre><p>_set</p>
+
+<p>Handles the actual setting of the value and marking<br />the path modified if appropriate.</p><pre><code class="javascript">Document.prototype._set = function (pathToMark, path, constructing, parts, schema, val, priorVal) {
+  if (this.isNew) {
+    this.markModified(pathToMark);
+  } else {
+
+    priorVal || (priorVal = this.get(path));
+
+    if (!this.isDirectModified(pathToMark)) {
+      if (undefined === val &amp;&amp; !this.isSelected(path)) {
+        // special case:
+        // when a path is not selected in a query its initial
+        // value will be undefined.
+        this.markModified(pathToMark, priorVal);
+      } else if (!deepEqual(val, priorVal)) {
+        this.markModified(pathToMark, priorVal);
+      } else if (!constructing &amp;&amp;
+                 null != val &amp;&amp;
+                 path in this._activePaths.states.default &amp;&amp;
+                 deepEqual(val, schema.getDefault(this, constructing))) {
+        // special case:
+        // a path with a default was $unset on the server
+        // and the user is setting it to the same value again
+        this.markModified(pathToMark, priorVal);
+      }
+    }
+  }
+
+  var obj = this._doc
+    , i = 0
+    , l = parts.length
+
+  for (; i &lt; l; i++) {
+    var next = i + 1
+      , last = next === l;
+
+    if (last) {
+      obj[parts[i]] = val;
+    } else {
+      if (obj[parts[i]] &amp;&amp; 'Object' === obj[parts[i]].constructor.name) {
+        obj = obj[parts[i]];
+      } else if (obj[parts[i]] &amp;&amp; Array.isArray(obj[parts[i]])) {
+        obj = obj[parts[i]];
+      } else {
+        obj = obj[parts[i]] = {};
+      }
+    }
+  }
+};
+</code></pre><p>get</p>
+
+<p>Returns the value of a path.</p>
+
+<h2>Example</h2>
+
+<pre><code>// path
+doc.get('age') // 47
+
+// dynamic casting to a string
+doc.get('age', String) // "47"
+</code></pre><pre><code class="javascript">Document.prototype.get = function (path, type) {
+  var adhocs;
+  if (type) {
+    adhocs = this._adhocPaths || (this._adhocPaths = {});
+    adhocs[path] = Schema.interpretAsType(path, type);
+  }
+
+  var schema = this._path(path) || this.schema.virtualpath(path)
+    , pieces = path.split('.')
+    , obj = this._doc;
+
+  for (var i = 0, l = pieces.length; i &lt; l; i++) {
+    obj = null == obj ? null : obj[pieces[i]];
+  }
+
+  if (schema) {
+    obj = schema.applyGetters(obj, this);
+  }
+
+  return obj;
+};
+</code></pre><p>markModified</p>
+
+<p>Marks that the path has pending changes to be written<br />to the db. Very helpful when using Mixed types.</p>
+
+<pre><code>doc.markModified('mixed.type');
+</code></pre><pre><code class="javascript">Document.prototype.markModified = function (path) {
+  this._activePaths.modify(path);
+};
+</code></pre><p>try</p>
+
+<p>Catches errors that occur during execution of fn and<br />stores them to later be passed when save() is executed.</p><pre><code class="javascript">Document.prototype.try = function (fn, scope) {
+  var res;
+  try {
+    fn.call(scope);
+    res = true;
+  } catch (e) {
+    this._error(e);
+    res = false;
+  }
+  return res;
+};
+</code></pre><p>modifiedPaths</p>
+
+<p>Returns the list of paths that have been modified.</p>
+
+<p>If we set <code>documents.0.title</code> to 'newTitle'<br />then <code>documents</code>, <code>documents.0</code>, and <code>documents.0.title</code><br />are modified.</p><pre><code class="javascript">Document.prototype.modifiedPaths = function () {
+  var directModifiedPaths = Object.keys(this._activePaths.states.modify);
+
+  return directModifiedPaths.reduce(function (list, path) {
+    var parts = path.split('.');
+    return list.concat(parts.reduce(function (chains, part, i) {
+      return chains.concat(parts.slice(0, i).concat(part).join('.'));
+    }, []));
+  }, []);
+};
+</code></pre><p>isModified</p>
+
+<p>If no path is given, returns is this document was modified.</p>
+
+<p>If a path is given, checks if a path or any full path<br />containing path as part of its path chain has been<br />directly modified.</p>
+
+<p>e.g., if we set <code>documents.0.title</code> to 'newTitle'<br />      then we have directly modified <code>documents.0.title</code><br />      but not directly modified <code>documents</code> or <code>documents.0</code>.<br />      Nonetheless, we still say <code>documents</code> and <code>documents.0</code><br />      are modified. They just are not considered direct modified.<br />      The distinction is important because we need to distinguish<br />      between what has been directly modified and what hasn't so<br />      that we can determine the MINIMUM set of dirty data<br />      that we want to send to MongoDB on a Document save.</p><pre><code class="javascript">Document.prototype.isModified = function (path) {
+  return path
+    ? !!~this.modifiedPaths().indexOf(path)
+    : this._activePaths.some('modify');
+  // TODO remove use of some()
+};
+</code></pre><p>isDirectModified</p>
+
+<p>Checks if a path has been directly set and modified. False if<br />the path is only part of a larger path that was directly set.</p>
+
+<p>e.g., if we set <code>documents.0.title</code> to 'newTitle'<br />      then we have directly modified <code>documents.0.title</code><br />      but not directly modified <code>documents</code> or <code>documents.0</code>.<br />      Nonetheless, we still say <code>documents</code> and <code>documents.0</code><br />      are modified. They just are not considered direct modified.<br />      The distinction is important because we need to distinguish<br />      between what has been directly modified and what hasn't so<br />      that we can determine the MINIMUM set of dirty data<br />      that we want to send to MongoDB on a Document save.</p><pre><code class="javascript">Document.prototype.isDirectModified = function (path) {
+  return (path in this._activePaths.states.modify);
+};
+</code></pre><p>isInit</p>
+
+<p>Checks if a certain path was initialized</p><pre><code class="javascript">Document.prototype.isInit = function (path) {
+  return (path in this._activePaths.states.init);
+};
+</code></pre><p>isSelected</p>
+
+<p>Checks if a path was selected in the source query which<br />initialize this document.</p>
+
+<pre><code>Thing.findOne().select('name').exec(function (err, doc) {
+   doc.isSelected('age') // false
+   doc.isSelected('name') //true
+</code></pre><pre><code class="javascript">Document.prototype.isSelected = function isSelected (path) {
+  if (this._selected) {
+
+    if ('_id' === path) {
+      return 0 !== this._selected._id;
+    }
+
+    var paths = Object.keys(this._selected)
+      , i = paths.length
+      , inclusive = false
+      , cur
+
+    if (1 === i &amp;&amp; '_id' === paths[0]) {
+      // only _id was selected.
+      return 0 === this._selected._id;
+    }
+
+    while (i--) {
+      cur = paths[i];
+      if ('_id' == cur) continue;
+      inclusive = !! this._selected[cur];
+      break;
+    }
+
+    if (path in this._selected) {
+      return inclusive;
+    }
+
+    i = paths.length;
+    var pathDot = path + '.';
+
+    while (i--) {
+      cur = paths[i];
+      if ('_id' == cur) continue;
+
+      if (0 === cur.indexOf(pathDot)) {
+        return inclusive;
+      }
+
+      if (0 === pathDot.indexOf(cur)) {
+        return inclusive;
+      }
+    }
+
+    return ! inclusive;
+  }
+
+  return true;
+}
+</code></pre><p>validate</p>
+
+<p>Executes appropriate validation rules for this document.</p><pre><code class="javascript">Document.prototype.validate = function (next) {
+  var self = this
+
+  // only validate required fields when necessary
+  var paths = Object.keys(this._activePaths.states.require).filter(function (path) {
+    if (!self.isSelected(path) &amp;&amp; !self.isModified(path)) return false;
+    return true;
+  });
+
+  paths = paths.concat(Object.keys(this._activePaths.states.init));
+  paths = paths.concat(Object.keys(this._activePaths.states.modify));
+
+  if (0 === paths.length) {
+    complete();
+    return this;
+  }
+
+  var validating = {}
+    , total = 0;
+
+  paths.forEach(validatePath);
+  return this;
+
+  function validatePath (path) {
+    if (validating[path]) return;
+
+    validating[path] = true;
+    total++;
+
+    process.nextTick(function(){
+      var p = self.schema.path(path);
+      if (!p) return --total || complete();
+
+      p.doValidate(self.getValue(path), function (err) {
+        if (err) self.invalidate(path, err);
+        --total || complete();
+      }, self);
+    });
+  }
+
+  function complete () {
+    next(self._validationError);
+    self._validationError = null;
+  }
+
+};
+</code></pre><p>invalidate</p>
+
+<p>Marks a path as invalid, causing validation to fail.</p><pre><code class="javascript">Document.prototype.invalidate = function (path, err) {
+  if (!this._validationError) {
+    this._validationError = new ValidationError(this);
+  }
+
+  if (!err || 'string' === typeof err) {
+    err = new ValidatorError(path, err);
+  }
+
+  this._validationError.errors[path] = err;
+}
+</code></pre><p>_reset</p>
+
+<p>Resets the internal atomics and modified state of this document.</p><pre><code class="javascript">Document.prototype._reset = function reset () {
+  var self = this;
+  DocumentArray || (DocumentArray = require('./types/documentarray'));
+
+  this._activePaths
+  .map('init', 'modify', function (i) {
+    return self.getValue(i);
+  })
+  .filter(function (val) {
+    return (val &amp;&amp; val instanceof DocumentArray &amp;&amp; val.length);
+  })
+  .forEach(function (array) {
+    array.forEach(function (doc) {
+      doc._reset();
+    });
+  });
+
+  // clear atomics
+  this._dirty().forEach(function (dirt) {
+    var type = dirt.value;
+    if (type &amp;&amp; type._atomics) {
+      type._atomics = {};
+    }
+  });
+
+  // Clear 'modify'('dirty') cache
+  this._activePaths.clear('modify');
+  var self = this;
+  this.schema.requiredPaths().forEach(function (path) {
+    self._activePaths.require(path);
+  });
+
+  return this;
+}
+</code></pre><p>toObject</p>
+
+<p>Converts this document into a plain javascript object<br />representation.</p>
+
+<h2>Available options</h2>
+
+<ul>
+<li>getters: apply all getters (path and virtual getters)</li>
+<li>virtuals: apply virtual getters (can override <code>getters</code> option)</li>
+<li>minimize: remove empty objects (defaults to true)</li>
+</ul>
+
+<h2>Example of only applying path getters</h2>
+
+<pre><code>doc.toObject({ getters: true, virtuals: false })
+</code></pre>
+
+<h2>Example of only applying virtual getters</h2>
+
+<pre><code>doc.toObject({ virtuals: true })
+</code></pre>
+
+<h2>Example of applying both path and virtual getters</h2>
+
+<pre><code>doc.toObject({ getters: true })
+</code></pre><pre><code class="javascript">Document.prototype.toObject = function (options) {
+  // When internally saving this document we always pass options,
+  // bypassing the custom schema options.
+  if (!(options &amp;&amp; 'Object' == options.constructor.name)) {
+    options = this.schema.options.toObject
+      ? clone(this.schema.options.toObject)
+      : {};
+  }
+
+  ;('minimize' in options) || (options.minimize = this.schema.options.minimize);
+
+  var ret = clone(this._doc, options);
+
+  if (options.virtuals || options.getters &amp;&amp; false !== options.virtuals) {
+    applyGetters(this, ret, 'virtuals', options);
+  }
+
+  if (options.getters) {
+    applyGetters(this, ret, 'paths', options);
+  }
+
+  return ret;
+};
+</code></pre><p>Applies virtuals properties to <code>json</code>.</p><pre><code class="javascript">function applyGetters (self, json, type, options) {
+  var schema = self.schema
+    , paths = Object.keys(schema[type])
+    , i = paths.length
+    , path
+
+  while (i--) {
+    path = paths[i];
+
+    var parts = path.split('.')
+      , plen = parts.length
+      , last = plen - 1
+      , branch = json
+      , part
+
+    for (var ii = 0; ii &lt; plen; ++ii) {
+      part = parts[ii];
+      if (ii === last) {
+        branch[part] = clone(self.get(path), options);
+      } else {
+        branch = branch[part] || (branch[part] = {});
+      }
+    }
+  }
+
+  return json;
+}
+</code></pre><p>toJSON</p>
+
+<p>The return value of this method is used in calls<br />to JSON.stringify(doc).</p><pre><code class="javascript">Document.prototype.toJSON = function (options) {
+  // check for object type since an array of documents
+  // being stringified passes array indexes instead
+  // of options objects. JSON.stringify([doc, doc])
+  if (!(options &amp;&amp; 'Object' == options.constructor.name)) {
+    options = this.schema.options.toJSON
+      ? clone(this.schema.options.toJSON)
+      : {};
+  }
+  options.json = true;
+  return this.toObject(options);
+};
+</code></pre><p>Helpers for console.log</p><pre><code class="javascript">Document.prototype.toString =
+Document.prototype.inspect = function (options) {
+  var opts = options &amp;&amp; 'Object' == options.constructor.name
+    ? options
+    : undefined
+  return inspect(this.toObject(opts));
+};
+</code></pre><p>equals</p>
+
+<p>Returns true if the Document stores the same data as doc.</p><pre><code class="javascript">Document.prototype.equals = function (doc) {
+  var tid = this.get('_id');
+  var docid = doc.get('_id');
+  return tid.equals
+    ? tid.equals(docid)
+    : tid === docid;
+};
+</code></pre><p>Module exports.</p><pre><code class="javascript">Document.ValidationError = ValidationError;
+module.exports = exports = Document;
+exports.Error = DocumentError;
+</code></pre></li><li><a href="/docs/index.html">lib/drivers/node-mongodb-native/binary.js</a></li><li><a href="/docs/index.html">lib/drivers/node-mongodb-native/collection.js</a><p>getIndexes</p>
+
+<p>Retreives information about this collections<br />indexes.</p><pre><code class="javascript">MongooseCollection.prototype.getIndexes =
+MongooseCollection.prototype.indexInformation;
+</code></pre><p>Module exports.</p><pre><code class="javascript">module.exports = MongooseCollection;
+</code></pre></li><li><a href="/docs/index.html">lib/drivers/node-mongodb-native/connection.js</a></li><li><a href="/docs/index.html">lib/drivers/node-mongodb-native/objectid.js</a></li><li><a href="/docs/index.html">lib/error.js</a><p>Inherits from Error.</p><pre><code class="javascript">MongooseError.prototype.__proto__ = Error.prototype;
+</code></pre><p>Module exports.</p><pre><code class="javascript">module.exports = MongooseError;
+</code></pre></li><li><a href="/docs/index.html">lib/errors/document.js</a><p>Inherits from MongooseError.</p><pre><code class="javascript">DocumentError.prototype.__proto__ = MongooseError.prototype;
+</code></pre><p>Module exports.</p><pre><code class="javascript">module.exports = exports = DocumentError;
+</code></pre></li><li><a href="/docs/index.html">lib/errors/validation.js</a><p>Inherits from MongooseError.</p><pre><code class="javascript">ValidationError.prototype.__proto__ = MongooseError.prototype;
+</code></pre><p>Module exports</p><pre><code class="javascript">module.exports = exports = ValidationError;
+</code></pre></li><li><a href="/docs/index.html">lib/index.js</a><p>Mongoose constructor. Most apps will only use one instance.</p><pre><code class="javascript">function Mongoose () {
+  this.connections = [];
+  this.plugins = [];
+  this.models = {};
+  this.modelSchemas = {};
+  this.options = {};
+  this.createConnection(); // default connection
+};
+</code></pre><p>Sets/gets mongoose options</p>
+
+<h2>Examples</h2>
+
+<p>mongoose.set('test') // returns the 'test' value<br />   mongoose.set('test', value) // sets the 'test' value</p><pre><code class="javascript">Mongoose.prototype.set =
+Mongoose.prototype.get = function (key, value) {
+  if (arguments.length == 1)
+    return this.options[key];
+  this.options[key] = value;
+  return this;
+};
+</code></pre><p>ReplSet connection string check.</p><pre><code class="javascript">var rgxReplSet = /^.+,.+$/;
+</code></pre><p>Creates a Connection instance.</p>
+
+<h2>Examples</h2>
+
+<p>// with mongodb:// URI<br />   db = mongoose.createConnection('mongodb://localhost:port/database');</p>
+
+<p>// with [host, database_name[, port] signature <br />   db = mongoose.createConnection('localhost', 'database', port)</p>
+
+<p>// initialize now, connect later<br />   db = mongoose.createConnection();<br />   db.open('localhost', 'database', port);</p><pre><code class="javascript">Mongoose.prototype.createConnection = function () {
+  var conn = new Connection(this);
+  this.connections.push(conn);
+
+  if (arguments.length) {
+    if (rgxReplSet.test(arguments[0])) {
+      conn.openSet.apply(conn, arguments);
+    } else {
+      conn.open.apply(conn, arguments);
+    }
+  }
+
+  return conn;
+};
+</code></pre><p>Connects the default mongoose connection</p><pre><code class="javascript">Mongoose.prototype.connect = function () {
+  var conn = this.connection;
+
+  if (rgxReplSet.test(arguments[0])) {
+    conn.openSet.apply(conn, arguments);
+  } else {
+    conn.open.apply(conn, arguments);
+  }
+
+  return this;
+};
+</code></pre><p>Disconnects from all connections.</p><pre><code class="javascript">Mongoose.prototype.disconnect = function (fn) {
+  var count = this.connections.length
+    , error
+
+  this.connections.forEach(function(conn){
+    conn.close(function(err){
+      if (error) return;
+
+      if (err) {
+        error = err;
+        if (fn) return fn(err);
+        throw err;
+      }
+
+      if (fn)
+        --count || fn();
+    });
+  });
+  return this;
+};
+</code></pre><p>Defines a model or retrieves it</p><pre><code class="javascript">Mongoose.prototype.model = function (name, schema, collection, skipInit) {
+  // normalize collection
+  if (!(schema instanceof Schema)) {
+    collection = schema;
+    schema = false;
+  }
+
+  if ('boolean' === typeof collection) {
+    skipInit = collection;
+    collection = null;
+  }
+
+  // look up models for the collection
+  if (!this.modelSchemas[name]) {
+    if (!schema &amp;&amp; name in SchemaDefaults) {
+      schema = SchemaDefaults[name];
+    }
+
+    if (schema) {
+      this.modelSchemas[name] = schema;
+      for (var i = 0, l = this.plugins.length; i &lt; l; i++) {
+        schema.plugin(this.plugins[i][0], this.plugins[i][1]);
+      }
+    } else {
+      throw new Error('Schema hasn\'t been registered for model &quot;' + name + '&quot;.\n'
+                    + 'Use mongoose.model(name, schema)');
+    }
+  }
+
+  if (!this.models[name]) {
+    schema || (schema = this.modelSchemas[name]);
+    collection || (collection = schema.set('collection') || format(name));
+
+    var model = Model.compile(name
+                        , this.modelSchemas[name]
+                        , collection
+                        , this.connection
+                        , this);
+
+    if (!skipInit) model.init();
+
+    this.models[name] = model;
+  }
+
+  return this.models[name];
+};
+</code></pre><p>Declares a plugin executed on Schemas. Equivalent to calling <code>.plugin(fn)</code><br />on each Schema you create.</p><pre><code class="javascript">Mongoose.prototype.plugin = function (fn, opts) {
+  this.plugins.push([fn, opts]);
+  return this;
+};
+</code></pre><p>Default connection</p><pre><code class="javascript">Mongoose.prototype.__defineGetter__('connection', function(){
+  return this.connections[0];
+});
+</code></pre><p>Driver depentend APIs</p><pre><code class="javascript">var driver = global.MONGOOSE_DRIVER_PATH || './drivers/node-mongodb-native';
+</code></pre><p>Connection</p><pre><code class="javascript">var Connection = require(driver + '/connection');
+</code></pre><p>Collection</p><pre><code class="javascript">var Collection = require(driver + '/collection');
+</code></pre><p>Export default singleton.</p><pre><code class="javascript">module.exports = exports = new Mongoose();
+</code></pre><p>Collection</p><pre><code class="javascript">exports.Collection = Collection;
+</code></pre><p>Connection</p><pre><code class="javascript">exports.Connection = Connection;
+</code></pre><p>Exports Mongoose version</p><pre><code class="javascript">exports.version = JSON.parse(
+  require('fs').readFileSync(__dirname + '/../package.json', 'utf8')
+).version;
+</code></pre><p>Export Mongoose constructor</p><pre><code class="javascript">exports.Mongoose = Mongoose;
+</code></pre><p>Export Schema constructor</p><pre><code class="javascript">exports.Schema = Schema;
+</code></pre><p>Export SchemaType constructor.</p><pre><code class="javascript">exports.SchemaType = SchemaType;
+</code></pre><p>Export VirtualType constructor.</p><pre><code class="javascript">exports.VirtualType = VirtualType;
+</code></pre><p>Export Schema types</p><pre><code class="javascript">exports.SchemaTypes = SchemaTypes;
+</code></pre><p>Export types</p><pre><code class="javascript">exports.Types = Types;
+</code></pre><p>Export Query</p><pre><code class="javascript">exports.Query = Query;
+</code></pre><p>Export Promise</p><pre><code class="javascript">exports.Promise = Promise;
+</code></pre><p>Export Model constructor</p><pre><code class="javascript">exports.Model = Model;
+</code></pre><p>Export Document constructor</p><pre><code class="javascript">exports.Document = Document;
+</code></pre><p>Export MongooseError</p><pre><code class="javascript">exports.Error = require('./error');
+</code></pre><p>Export driver</p><pre><code class="javascript">exports.mongo = require('mongodb');
+</code></pre></li><li><a href="/docs/index.html">lib/model.js</a><p>Model constructor</p><pre><code class="javascript">function Model (doc, fields, skipId) {
+  Document.call(this, doc, fields, skipId);
+};
+</code></pre><p>Inherits from Document.</p><pre><code class="javascript">Model.prototype.__proto__ = Document.prototype;
+</code></pre><p>Connection the model uses. Set by the Connection or if absent set to the<br />default mongoose connection;</p><pre><code class="javascript">Model.prototype.db;
+</code></pre><p>Collection the model uses. Set by Mongoose instance</p><pre><code class="javascript">Model.prototype.collection;
+</code></pre><p>Model name.</p><pre><code class="javascript">Model.prototype.modelName;
+</code></pre><p>Saves this document.</p><pre><code class="javascript">Model.prototype.save = function save (fn) {
+  var promise = new Promise(fn)
+    , complete = handleSave(promise, this)
+    , options = {}
+
+  if (this.schema.options.safe) {
+    options.safe = this.schema.options.safe;
+  }
+
+  if (this.isNew) {
+    // send entire doc
+    var obj = this.toObject({ depopulate: 1 });
+    this._version(true, obj);
+    this.collection.insert(obj, options, complete);
+    this._reset();
+    this.isNew = false;
+    this.emit('isNew', false);
+    // Make it possible to retry the insert
+    this._inserting = true;
+
+  } else {
+    // Make sure we don't treat it as a new object on error,
+    // since it already exists
+    this._inserting = false;
+
+    var delta = this._delta();
+    if (delta) {
+      var where = this._where(delta[0]);
+      this.collection.update(where, delta[1], options, complete);
+    } else {
+      complete(null);
+    }
+
+    this._reset();
+    this.emit('isNew', false);
+  }
+};
+</code></pre><p>operand</p>
+
+<p>Apply the operation to the delta (update) clause as<br />well as track versioning for our where clause.</p><pre><code class="javascript">function operand (self, where, delta, data, val, op) {
+  // delta
+  op || (op = '$set');
+  if (!delta[op]) delta[op] = {};
+  delta[op][data.path] = val;
+
+  // disabled versioning?
+  if (false === self.schema.options.versionKey) return;
+
+  // already marked for versioning?
+  if (VERSION_ALL === (VERSION_ALL &amp; self.__version)) return;
+
+  switch (op) {
+    case '$set':
+    case '$unset':
+    case '$pop':
+    case '$pull':
+    case '$pullAll':
+    case '$push':
+    case '$pushAll':
+    case '$addToSet':
+      break;
+    default:
+      // nothing to do
+      return;
+  }
+
+  // ensure updates sent with positional notation are
+  // editing the correct array element.
+  // only increment the version if an array position changes.
+  // modifying elements of an array is ok if position does not change.
+
+  if ('$push' == op || '$pushAll' == op || '$addToSet' == op) {
+    self.__version = VERSION_INC;
+  }
+  else if (/^\$p/.test(op)) {
+    // potentially changing array positions
+    self.increment();
+  }
+  else if (Array.isArray(val)) {
+    // $set an array
+    self.increment();
+  }
+  // now handling $set, $unset
+  else if (/\.\d+/.test(data.path)) {
+    // subpath of array
+    self.__version = VERSION_WHERE;
+  }
+}
+</code></pre><p>handleMongooseArray</p>
+
+<p>Compiles an update and where clause for an array.</p><pre><code class="javascript">function handleMongooseArray (self, where, delta, data, arr) {
+  if (delta.$set &amp;&amp; delta.$set[data.path]) {
+    // $set has precedence over other atomics
+    return;
+  }
+
+  var atomics = arr._atomics
+    , ops = Object.keys(atomics)
+    , schema = data.schema
+    , path = data.path
+    , i = ops.length
+    , val
+    , op;
+
+  if (0 === i) {
+    // $set
+    arr = arr.toObject({ depopulate: 1 });
+    return operand(self, where, delta, data, arr);
+  }
+
+  while (i--) {
+    op = ops[i];
+    val = atomics[op];
+    if (isMongooseObject(val)) {
+      val = val.toObject({ depopulate: 1 })
+    } else if (Array.isArray(val)) {
+      val = val.map(function (mem) {
+        return isMongooseObject(mem)
+          ? mem.toObject({ depopulate: 1 })
+          : mem;
+      })
+    }
+
+    if ('$addToSet' === op)
+      val = { $each: val };
+
+    operand(self, where, delta, data, val, op);
+  }
+}
+</code></pre><p>increment</p>
+
+<p>Signal that we desire an increment of<br />this documents version.</p><pre><code class="javascript">Model.prototype.increment = function increment () {
+  this.__version = VERSION_ALL;
+  return this;
+}
+</code></pre><p>_where</p>
+
+<p>Returns a query object which applies shardkeys if<br />they exist.</p><pre><code class="javascript">Model.prototype._where = function _where (where) {
+  where || (where = {});
+
+  var paths
+    , len
+
+  if (this._shardval) {
+    paths = Object.keys(this._shardval)
+    len = paths.length
+
+    for (var i = 0; i &lt; len; ++i) {
+      where[paths[i]] = this._shardval[paths[i]];
+    }
+  }
+
+  where._id = this._doc._id;
+  return where;
+}
+</code></pre><p>Remove the document</p><pre><code class="javascript">Model.prototype.remove = function remove (fn) {
+  if (this._removing) return this;
+
+  var promise = this._removing = new Promise(fn)
+    , where = this._where()
+    , self = this
+    , options = {}
+
+  if (this.schema.options.safe) {
+    options.safe = this.schema.options.safe;
+  }
+
+  this.collection.remove(where, options, tick(function (err) {
+    if (err) {
+      promise.error(err);
+      promise = self = self._removing = where = options = null;
+      return;
+    }
+    promise.complete();
+    self.emit('remove', self);
+    promise = self = where = options = null;
+  }));
+
+  return this;
+};
+</code></pre><p>Shortcut to access another model.</p><pre><code class="javascript">Model.prototype.model = function model (name) {
+  return this.db.model(name);
+};
+</code></pre><p>Give the constructor the ability to emit events.</p><pre><code class="javascript">for (var i in EventEmitter.prototype)
+  Model[i] = EventEmitter.prototype[i];
+</code></pre><p>ensureIndexes</p>
+
+<p>Sends <code>ensureIndex</code> commands to mongo for<br />each index declared in the schema.</p><pre><code class="javascript">Model.ensureIndexes = function ensureIndexes (cb) {
+  var indexes = this.schema.indexes();
+  if (!indexes.length) {
+    return cb &amp;&amp; cb();
+  }
+
+  var self = this
+    , safe = self.schema.options.safe
+    , count = indexes.length
+    , error
+
+  indexes.forEach(function (index) {
+    var options = index[1];
+    options.safe = safe;
+    self.collection.ensureIndex(index[0], options, tick(function (err) {
+      if (err) error = err;
+      if (--count) return;
+
+      self.emit('index', error);
+      cb &amp;&amp; cb(error);
+    }));
+  });
+}
+</code></pre><p>Document schema</p><pre><code class="javascript">Model.schema;
+</code></pre><p>Database instance the model uses.</p><pre><code class="javascript">Model.db;
+</code></pre><p>Collection the model uses.</p><pre><code class="javascript">Model.collection;
+</code></pre><p>Base Mongoose instance for the model.</p><pre><code class="javascript">Model.base;
+</code></pre><p>Module exports.</p><pre><code class="javascript">module.exports = exports = Model;
+
+Model.remove = function remove (conditions, callback) {
+  if ('function' === typeof conditions) {
+    callback = conditions;
+    conditions = {};
+  }
+
+  var query = new Query(conditions).bind(this, 'remove');
+
+  if ('undefined' === typeof callback)
+    return query;
+
+  this._applyNamedScope(query);
+  return query.remove(callback);
+};
+</code></pre><p>Finds documents</p>
+
+<h2>Examples</h2>
+
+<p>// retrieve only certain keys<br />   MyModel.find({ name: /john/i }, 'name friends', function () { })</p>
+
+<p>// pass options<br />   MyModel.find({ name: /john/i }, null, { skip: 10 } )</p><pre><code class="javascript">Model.find = function find (conditions, fields, options, callback) {
+  if ('function' == typeof conditions) {
+    callback = conditions;
+    conditions = {};
+    fields = null;
+    options = null;
+  } else if ('function' == typeof fields) {
+    callback = fields;
+    fields = null;
+    options = null;
+  } else if ('function' == typeof options) {
+    callback = options;
+    options = null;
+  }
+
+  var query = new Query(conditions, options);
+  query.bind(this, 'find');
+  query.select(fields);
+
+  if ('undefined' === typeof callback)
+    return query;
+
+  this._applyNamedScope(query);
+  return query.find(callback);
+};
+</code></pre><p>Finds by id</p><pre><code class="javascript">Model.findById = function findById (id, fields, options, callback) {
+  return this.findOne({ _id: id }, fields, options, callback);
+};
+</code></pre><p>Finds one document</p><pre><code class="javascript">Model.findOne = function findOne (conditions, fields, options, callback) {
+  if ('function' == typeof options) {
+    // TODO Handle all 3 of the following scenarios
+    // Hint: Only some of these scenarios are possible if cQuery is present
+    // Scenario: findOne(conditions, fields, callback);
+    // Scenario: findOne(fields, options, callback);
+    // Scenario: findOne(conditions, options, callback);
+    callback = options;
+    options = null;
+  } else if ('function' == typeof fields) {
+    // TODO Handle all 2 of the following scenarios
+    // Scenario: findOne(conditions, callback)
+    // Scenario: findOne(fields, callback)
+    // Scenario: findOne(options, callback);
+    callback = fields;
+    fields = null;
+    options = null;
+  } else if ('function' == typeof conditions) {
+    callback = conditions;
+    conditions = {};
+    fields = null;
+    options = null;
+  }
+
+  var query = new Query(conditions, options).select(fields).bind(this, 'findOne');
+
+  if ('undefined' == typeof callback)
+    return query;
+
+  this._applyNamedScope(query);
+  return query.findOne(callback);
+};
+</code></pre><p>Counts documents</p><pre><code class="javascript">Model.count = function count (conditions, callback) {
+  if ('function' === typeof conditions)
+    callback = conditions, conditions = {};
+
+  var query = new Query(conditions).bind(this, 'count');
+  if ('undefined' == typeof callback)
+    return query;
+
+  this._applyNamedScope(query);
+  return query.count(callback);
+};
+
+Model.distinct = function distinct (field, conditions, callback) {
+  var query = new Query(conditions).bind(this, 'distinct');
+  if ('undefined' == typeof callback) {
+    query._distinctArg = field;
+    return query;
+  }
+
+  this._applyNamedScope(query);
+  return query.distinct(field, callback);
+};
+</code></pre><p>where</p>
+
+<p>Creates a Query, applies the passed conditions, and<br />returns the Query.</p>
+
+<p>For example, instead of writing:</p>
+
+<pre><code>User.find({age: {$gte: 21, $lte: 65}}, callback);
+</code></pre>
+
+<p>we can instead write:</p>
+
+<pre><code>User.where('age').gte(21).lte(65).exec(callback);
+</code></pre>
+
+<p>Since the Query class also supports <code>where</code> you can<br />continue chaining:</p>
+
+<pre><code>User
+</code></pre>
+
+<p>.where('age').gte(21).lte(65)<br />   .where('name', /^b/i)<br />   ... etc</p><pre><code class="javascript">Model.where = function where (path, val) {
+  var q = new Query().bind(this, 'find');
+  return q.where.apply(q, arguments);
+};
+</code></pre><p>Sometimes you need to query for things in mongodb using a JavaScript<br />expression. You can do so via find({$where: javascript}), or you can<br />use the mongoose shortcut method $where via a Query chain or from<br />your mongoose Model.</p><pre><code class="javascript">Model.$where = function $where () {
+  var q = new Query().bind(this, 'find');
+  return q.$where.apply(q, arguments);
+};
+</code></pre><p>findOneAndUpdate</p>
+
+<p>Issues a mongodb findAndModify update command.</p>
+
+<p>Finds a matching document, updates it according to the <code>update</code><br />arg, passing any <code>options</code>, and returns the found document<br />(if any) to the callback. The query executes immediately if<br /><code>callback</code> is passed else a Query object is returned.</p>
+
+<h2>Available options</h2>
+
+<p><code>new</code>: bool - true to return the modified document rather than the original. defaults to true<br />  <code>upsert</code>: bool - creates the object if it doesn't exist. defaults to false.<br />  <code>sort</code>: if multiple docs are found by the conditions, sets the sort order to choose which doc to update</p>
+
+<h2>Examples</h2>
+
+<pre><code>A.findOneAndUpdate(conditions, update, options, callback) // executes
+A.findOneAndUpdate(conditions, update, options)  // returns Query
+A.findOneAndUpdate(conditions, update, callback) // executes
+A.findOneAndUpdate(conditions, update)           // returns Query
+A.findOneAndUpdate()                             // returns Query
+</code></pre><pre><code class="javascript">Model.findOneAndUpdate = function (conditions, update, options, callback) {
+  if ('function' == typeof options) {
+    callback = options;
+    options = null;
+  }
+  else if (1 === arguments.length) {
+    if ('function' == typeof conditions) {
+      var msg = 'Model.findOneAndUpdate(): First argument must not be a function.\n\n'
+              + '  ' + this.modelName + '.findOneAndUpdate(conditions, update, options, callback)\n'
+              + '  ' + this.modelName + '.findOneAndUpdate(conditions, update, options)\n'
+              + '  ' + this.modelName + '.findOneAndUpdate(conditions, update)\n'
+              + '  ' + this.modelName + '.findOneAndUpdate(update)\n'
+              + '  ' + this.modelName + '.findOneAndUpdate()\n';
+      throw new TypeError(msg)
+    }
+    update = conditions;
+    conditions = undefined;
+  }
+
+  var fields;
+  if (options &amp;&amp; options.fields) {
+    fields = options.fields;
+    options.fields = undefined;
+  }
+
+  var query = new Query(conditions, options);
+  query.select(fields);
+  query.bind(this, 'findOneAndUpdate', update);
+
+  if ('undefined' == typeof callback)
+    return query;
+
+  this._applyNamedScope(query);
+  return query.findOneAndUpdate(callback);
+}
+</code></pre><p>findByIdAndUpdate</p>
+
+<p>Issue a mongodb findAndModify update command by a documents id.</p><pre><code class="javascript">Model.findByIdAndUpdate = function (id, update, options, callback) {
+  var args;
+
+  if (1 === arguments.length) {
+    if ('function' == typeof id) {
+      var msg = 'Model.findByIdAndUpdate(): First argument must not be a function.\n\n'
+                + '  ' + this.modelName + '.findByIdAndUpdate(id, callback)\n'
+                + '  ' + this.modelName + '.findByIdAndUpdate(id)\n'
+                + '  ' + this.modelName + '.findByIdAndUpdate()\n';
+      throw new TypeError(msg)
+    }
+    return this.findOneAndUpdate({_id: id }, undefined);
+  }
+
+  args = utils.args(arguments, 1);
+  args.unshift({ _id: id });
+  return this.findOneAndUpdate.apply(this, args);
+}
+</code></pre><p>findOneAndRemove</p>
+
+<p>Issue a mongodb findAndModify remove command.</p>
+
+<p>Finds a matching document, removes it, passing the found<br />document (if any) to the callback. Executes immediately if <code>callback</code><br />is passed else a Query object is returned.</p>
+
+<h2>Available options</h2>
+
+<p><code>sort</code>: if multiple docs are found by the conditions, sets the sort order to choose which doc to update</p>
+
+<h2>Examples</h2>
+
+<pre><code>A.findOneAndRemove(conditions, options, callback) // executes
+A.findOneAndRemove(conditions, options)  // return Query
+A.findOneAndRemove(conditions, callback) // executes
+A.findOneAndRemove(conditions) // returns Query
+A.findOneAndRemove()           // returns Query
+</code></pre><pre><code class="javascript">Model.findOneAndRemove = function (conditions, options, callback) {
+  if (1 === arguments.length &amp;&amp; 'function' == typeof conditions) {
+    var msg = 'Model.findOneAndRemove(): First argument must not be a function.\n\n'
+              + '  ' + this.modelName + '.findOneAndRemove(conditions, callback)\n'
+              + '  ' + this.modelName + '.findOneAndRemove(conditions)\n'
+              + '  ' + this.modelName + '.findOneAndRemove()\n';
+    throw new TypeError(msg)
+  }
+
+  if ('function' == typeof options) {
+    callback = options;
+    options = undefined;
+  }
+
+  var fields;
+  if (options) {
+    fields = options.select;
+    options.select = undefined;
+  }
+
+  var query = new Query(conditions, options);
+  query.bind(this, 'findOneAndRemove');
+  query.select(fields);
+
+  if ('undefined' == typeof callback)
+    return query;
+
+  this._applyNamedScope(query);
+  return query.findOneAndRemove(callback);
+}
+</code></pre><p>findByIdAndRemove</p>
+
+<p>Issue a mongodb findAndModify remove command by a documents id.</p><pre><code class="javascript">Model.findByIdAndRemove = function (id, options, callback) {
+  if (1 === arguments.length &amp;&amp; 'function' == typeof id) {
+    var msg = 'Model.findByIdAndRemove(): First argument must not be a function.\n\n'
+              + '  ' + this.modelName + '.findByIdAndRemove(id, callback)\n'
+              + '  ' + this.modelName + '.findByIdAndRemove(id)\n'
+              + '  ' + this.modelName + '.findByIdAndRemove()\n';
+    throw new TypeError(msg)
+  }
+
+  return this.findOneAndRemove({ _id: id }, options, callback);
+}
+</code></pre><p>Shortcut for creating a new Document that is automatically saved<br />to the db if valid.</p><pre><code class="javascript">Model.create = function create (doc, fn) {
+  if (1 === arguments.length) {
+    return 'function' === typeof doc &amp;&amp; doc(null);
+  }
+
+  var self = this
+    , docs = [null]
+    , promise
+    , count
+    , args
+
+  if (Array.isArray(doc)) {
+    args = doc;
+  } else {
+    args = utils.args(arguments, 0, arguments.length - 1);
+    fn = arguments[arguments.length - 1];
+  }
+
+  if (0 === args.length) return fn(null);
+
+  promise = new Promise(fn);
+  count = args.length;
+
+  args.forEach(function (arg, i) {
+    var doc = new self(arg);
+    docs[i+1] = doc;
+    doc.save(function (err) {
+      if (err) return promise.error(err);
+      --count || fn.apply(null, docs);
+    });
+  });
+
+  // TODO
+  // utilize collection.insertAll for batch processing?
+};
+</code></pre><p>Updates documents.</p>
+
+<h2>Examples</h2>
+
+<pre><code>MyModel.update({ age: { $gt: 18 } }, { oldEnough: true }, fn);
+MyModel.update({ name: 'Tobi' }, { ferret: true }, { multi: true }, fn);
+</code></pre>
+
+<h2>Valid options</h2>
+
+<ul>
+<li>safe (boolean) safe mode (defaults to value set in schema (true))</li>
+<li>upsert (boolean) whether to create the doc if it doesn't match (false)</li>
+<li>multi (boolean) whether multiple documents should be updated (false)</li>
+</ul><pre><code class="javascript">Model.update = function update (conditions, doc, options, callback) {
+  if (arguments.length &lt; 4) {
+    if ('function' === typeof options) {
+      // Scenario: update(conditions, doc, callback)
+      callback = options;
+      options = null;
+    } else if ('function' === typeof doc) {
+      // Scenario: update(doc, callback);
+      callback = doc;
+      doc = conditions;
+      conditions = {};
+      options = null;
+    }
+  }
+
+  var query = new Query(conditions, options).bind(this, 'update', doc);
+
+  if ('undefined' == typeof callback)
+    return query;
+
+  this._applyNamedScope(query);
+  return query.update(doc, callback);
+};
+</code></pre><p>mapReduce</p>
+
+<p>Executes a mapReduce command. <code>o</code> is an object specifying<br />all mapReduce options as well as the map and reduce functions.<br />All options are delegated to the driver implementation.</p>
+
+<h2>Example</h2>
+
+<pre><code>var o = {};
+o.map = function () { emit(this.name, 1) }
+o.reduce = function (k, vals) { return vals.length }
+User.mapReduce(o, function (err, results) {
+  console.log(results)
+})
+</code></pre>
+
+<h2>Other options</h2>
+
+<p>(@see <a href='http://www.mongodb.org/display/DOCS/MapReduce'>http://www.mongodb.org/display/DOCS/MapReduce</a> for more details)<br />  - query {Object} query filter object.<br />  - limit {Number} max number of documents<br />  - keeptemp {Boolean, default:false} keep temporary data<br />  - finalize {Function} finalize function<br />  - scope {Object} scope variables exposed to map/reduce/finalize during execution<br />  - jsMode {Boolean, default:false} it is possible to make the execution stay in JS. Provided in MongoDB > 2.0.X<br />  - verbose {Boolean, default:false} provide statistics on job execution time.<br />  - out {Object, default: {inline:1}} sets the output target for the map reduce job.<br />     {inline:1} the results are returned in an array<br />     {replace: 'collectionName'} add the results to collectionName: the results replace the collection<br />     {reduce: 'collectionName'} add the results to collectionName: if dups are detected, uses the reducer / finalize functions<br />     {merge: 'collectionName'} add the results to collectionName: if dups exist the new docs overwrite the old</p>
+
+<p>If options.out is set to replace, merge, or reduce, a Model<br />instance is returned that can be used for further querying.<br />Queries run against this model are all executed with the <code>lean</code><br />option: meaning only the js object is returned and no<br />Mongoose magic is applied (getters, setters, etc).</p>
+
+<h2>Example</h2>
+
+<pre><code>var o = {};
+o.map = function () { emit(this.name, 1) }
+o.reduce = function (k, vals) { return vals.length }
+o.out = { replace: 'createdCollectionNameForResults' }
+o.verbose = true;
+User.mapReduce(o, function (err, model, stats) {
+  console.log('map reduce took %d ms', stats.processtime)
+  model.find().where('value').gt(10).exec(function (err, docs) {
+    console.log(docs);
+  });
+})
+</code></pre><pre><code class="javascript">Model.mapReduce = function mapReduce (o, callback) {
+  if ('function' != typeof callback) throw new Error('missing callback');
+
+  var self = this;
+
+  if (!Model.mapReduce.schema) {
+    var opts = { noId: true, noVirtualId: true, strict: false }
+    Model.mapReduce.schema = new Schema({}, opts);
+  }
+
+  if (!o.out) o.out = { inline: 1 };
+
+  o.map = String(o.map);
+  o.reduce = String(o.reduce);
+
+  this.collection.mapReduce(null, null, o, function (err, ret, stats) {
+    if (err) return callback(err);
+
+    if (ret.findOne &amp;&amp; ret.mapReduce) {
+      // returned a collection, convert to Model
+      var model = Model.compile(
+          '_mapreduce_' + ret.collectionName
+        , Model.mapReduce.schema
+        , ret.collectionName
+        , self.db
+        , self.base);
+
+      model._mapreduce = true;
+
+      return callback(err, model, stats);
+    }
+
+    callback(err, ret, stats);
+  });
+}
+</code></pre></li><li><a href="/docs/index.html">lib/namedscope.js</a></li><li><a href="/docs/index.html">lib/promise.js</a><p>Promise constructor.</p><pre><code class="javascript">function Promise (back) {
+  this.emitted = {};
+  if ('function' == typeof back)
+    this.addBack(back);
+};
+</code></pre><p>Inherits from EventEmitter.</p><pre><code class="javascript">Promise.prototype.__proto__ = EventEmitter.prototype;
+</code></pre><p>Adds an event or fires the callback right away.</p><pre><code class="javascript">Promise.prototype.on = function (event, callback) {
+  if (this.emitted[event])
+    callback.apply(this, this.emitted[event]);
+  else
+    EventEmitter.prototype.on.call(this, event, callback);
+
+  return this;
+};
+</code></pre><p>Shortcut for emitting complete event</p><pre><code class="javascript">Promise.prototype.complete = function () {
+  var args = util.args(arguments);
+  return this.emit.apply(this, ['complete'].concat(args));
+};
+</code></pre><p>Shortcut for emitting err event</p><pre><code class="javascript">Promise.prototype.error = function (err) {
+  if (!(err instanceof Error)) err = new Error(err);
+  return this.emit('err', err);
+};
+</code></pre><p>Shortcut for <code>.on('complete', fn)</code></p><pre><code class="javascript">Promise.prototype.addCallback = function (fn) {
+  return this.on('complete', fn);
+};
+</code></pre><p>Shortcut for <code>.on('err', fn)</code></p><pre><code class="javascript">Promise.prototype.addErrback = function (fn) {
+  return this.on('err', fn);
+};
+</code></pre><p>Sugar for handling cases where you may be<br />resolving to either an error condition or a <br />success condition.</p><pre><code class="javascript">Promise.prototype.resolve = function (err, val) {
+  if (err) return this.error(err);
+  return this.complete(val);
+};
+</code></pre><p>Module exports.</p><pre><code class="javascript">module.exports = Promise;
+</code></pre></li><li><a href="/docs/index.html">lib/query.js</a><p>setOptions</p>
+
+<p>Sets query options.</p><pre><code class="javascript">Query.prototype.setOptions = function (options, overwrite
+</code></pre><p>nternal</p><pre><code class="javascript">{
+  if (overwrite) {
+    options = this.options = options || {};
+    this.safe = options.safe
+
+    // normalize population options
+    var pop = this.options.populate;
+    this.options.populate = {};
+
+    if (pop &amp;&amp; Array.isArray(pop)) {
+      for (var i = 0, l = pop.length; i &lt; l; i++) {
+        this.options.populate[pop[i]] = {};
+      }
+    }
+
+    return this;
+  }
+
+  if (!(options &amp;&amp; 'Object' == options.constructor.name))
+    return this;
+
+  if ('safe' in options)
+    this.safe = options.safe;
+
+  // set arbitrary options
+  var methods = Object.keys(options)
+    , i = methods.length
+    , method
+
+  while (i--) {
+    method = methods[i];
+
+    // use methods if exist (safer option manipulation)
+    if ('function' == typeof this[method]) {
+      var args = Array.isArray(options[method])
+        ? options[method]
+        : [options[method]];
+      this[method].apply(this, args)
+    } else {
+      this.options[method] = options[method];
+    }
+  }
+  return this;
+}
+</code></pre><p>Binds this query to a model.</p><pre><code class="javascript">Query.prototype.bind = function bind (model, op, updateArg) {
+  this.model = model;
+  this.op = op;
+
+  if (model._mapreduce) this.options.lean = true;
+
+  if (op == 'update' || op == 'findOneAndUpdate') {
+    merge(this._updateArg, updateArg || {});
+  }
+
+  return this;
+};
+</code></pre><p>exec</p>
+
+<p>Executes the query returning a promise.</p>
+
+<h2>Examples</h2>
+
+<pre><code>query.exec();
+query.exec(callback);
+query.exec('update');
+query.exec('find', callback);
+</code></pre><pre><code class="javascript">Query.prototype.exec = function exec (op, callback) {
+  var promise = new Promise();
+
+  switch (typeof op) {
+    case 'function':
+      callback = op;
+      op = null;
+      break;
+    case 'string':
+      this.op = op;
+      break;
+  }
+
+  if (callback) promise.addBack(callback);
+
+  if (!this.op) {
+    promise.complete();
+    return promise;
+  }
+
+  if ('update' == this.op) {
+    this[this.op](this._updateArg, promise.resolve.bind(promise));
+    return promise;
+  }
+
+  if ('distinct' == this.op) {
+    this.distinct(this._distinctArg, promise.resolve.bind(promise));
+    return promise;
+  }
+
+  this[this.op](promise.resolve.bind(promise));
+  return promise;
+};
+</code></pre><p>Finds documents.</p><pre><code class="javascript">Query.prototype.find = function (criteria, callback) {
+  this.op = 'find';
+  if ('function' === typeof criteria) {
+    callback = criteria;
+    criteria = {};
+  } else if (criteria instanceof Query) {
+    // TODO Merge options, too
+    merge(this._conditions, criteria._conditions);
+  } else if (criteria instanceof Document) {
+    merge(this._conditions, criteria.toObject());
+  } else if (criteria &amp;&amp; 'Object' === criteria.constructor.name) {
+    merge(this._conditions, criteria);
+  }
+  if (!callback) return this;
+  return this.execFind(callback);
+};
+</code></pre><p>Casts obj, or if obj is not present, then this._conditions,<br />based on the model's schema.</p><pre><code class="javascript">Query.prototype.cast = function (model, obj) {
+  obj || (obj= this._conditions);
+
+  var schema = model.schema
+    , paths = Object.keys(obj)
+    , i = paths.length
+    , any$conditionals
+    , schematype
+    , nested
+    , path
+    , type
+    , val;
+
+  while (i--) {
+    path = paths[i];
+    val = obj[path];
+
+    if ('$or' === path || '$nor' === path) {
+      var k = val.length
+        , orComponentQuery;
+
+      while (k--) {
+        orComponentQuery = new Query(val[k]);
+        orComponentQuery.cast(model);
+        val[k] = orComponentQuery._conditions;
+      }
+
+    } else if (path === '$where') {
+      type = typeof val;
+
+      if ('string' !== type &amp;&amp; 'function' !== type) {
+        throw new Error(&quot;Must have a string or function for $where&quot;);
+      }
+
+      if ('function' === type) {
+        obj[path] = val.toString();
+      }
+
+      continue;
+
+    } else {
+
+      if (!schema) {
+        // no casting for Mixed types
+        continue;
+      }
+
+      schematype = schema.path(path);
+
+      if (!schematype) {
+        // Handle potential embedded array queries
+        var split = path.split('.')
+          , j = split.length
+          , pathFirstHalf
+          , pathLastHalf
+          , remainingConds
+          , castingQuery;
+
+        // Find the part of the var path that is a path of the Schema
+        while (j--) {
+          pathFirstHalf = split.slice(0, j).join('.');
+          schematype = schema.path(pathFirstHalf);
+          if (schematype) break;
+        }
+
+        // If a substring of the input path resolves to an actual real path...
+        if (schematype) {
+          // Apply the casting; similar code for $elemMatch in schema/array.js
+          if (schematype.caster &amp;&amp; schematype.caster.schema) {
+            remainingConds = {};
+            pathLastHalf = split.slice(j).join('.');
+            remainingConds[pathLastHalf] = val;
+            castingQuery = new Query(remainingConds);
+            castingQuery.cast(schematype.caster);
+            obj[path] = castingQuery._conditions[pathLastHalf];
+          } else {
+            obj[path] = val;
+          }
+        }
+
+      } else if (val === null || val === undefined) {
+        continue;
+      } else if ('Object' === val.constructor.name) {
+
+        any$conditionals = Object.keys(val).some(function (k) {
+          return k.charAt(0) === '$' &amp;&amp; k !== '$id' &amp;&amp; k !== '$ref';
+        });
+
+        if (!any$conditionals) {
+          obj[path] = schematype.castForQuery(val);
+        } else {
+
+          var ks = Object.keys(val)
+            , k = ks.length
+            , $cond;
+
+          while (k--) {
+            $cond = ks[k];
+            nested = val[$cond];
+
+            if ('$exists' === $cond) {
+              if ('boolean' !== typeof nested) {
+                throw new Error(&quot;$exists parameter must be Boolean&quot;);
+              }
+              continue;
+            }
+
+            if ('$type' === $cond) {
+              if ('number' !== typeof nested) {
+                throw new Error(&quot;$type parameter must be Number&quot;);
+              }
+              continue;
+            }
+
+            if ('$not' === $cond) {
+              this.cast(model, nested);
+            } else {
+              val[$cond] = schematype.castForQuery($cond, nested);
+            }
+          }
+        }
+      } else {
+        obj[path] = schematype.castForQuery(val);
+      }
+    }
+  }
+
+  return obj;
+};
+</code></pre><p>$where</p>
+
+<p>Sometimes you need to query for things in mongodb using a JavaScript<br />expression. You can do so via find({$where: javascript}), or you can<br />use the mongoose shortcut method $where via a Query chain or from<br />your mongoose Model.</p><pre><code class="javascript">Query.prototype.$where = function (js) {
+  this._conditions['$where'] = js;
+  return this;
+};
+</code></pre><p>where</p>
+
+<p>Sugar for query.find().</p>
+
+<p>For example, instead of writing:</p>
+
+<pre><code>User.find({age: {$gte: 21, $lte: 65}}, callback);
+</code></pre>
+
+<p>we can instead write:</p>
+
+<pre><code>User.where('age').gte(21).lte(65);
+</code></pre>
+
+<p>Moreover, you can also chain a bunch of these together:</p>
+
+<pre><code>User
+</code></pre>
+
+<p>.where('age').gte(21).lte(65)<br />   .where('name', /^b/i)        // All names that begin where b or B<br />   .where('friends').slice(10);</p><pre><code class="javascript">Query.prototype.where = function (path, val) {
+  if (!arguments.length) return this;
+
+  if ('string' != typeof path) {
+    throw new TypeError('path must be a string');
+  }
+
+  this._currPath = path;
+
+  if (2 === arguments.length) {
+    this._conditions[path] = val;
+  }
+
+  return this;
+};
+</code></pre><p><code>equals</code> sugar.</p>
+
+<pre><code>User.where('age').equals(49);
+</code></pre>
+
+<p>Same as</p>
+
+<pre><code>User.where('age', 49);
+</code></pre><pre><code class="javascript">Query.prototype.equals = function equals (val) {
+  var path = this._currPath;
+  if (!path) throw new Error('equals() must be used after where()');
+  this._conditions[path] = val;
+  return this;
+}
+</code></pre><p>or</p><pre><code class="javascript">Query.prototype.or = function or (array) {
+  var or = this._conditions.$or || (this._conditions.$or = []);
+  if (!Array.isArray(array)) array = [array];
+  or.push.apply(or, array);
+  return this;
+}
+</code></pre><p>nor</p><pre><code class="javascript">Query.prototype.nor = function nor (array) {
+  var nor = this._conditions.$nor || (this._conditions.$nor = []);
+  if (!Array.isArray(array)) array = [array];
+  nor.push.apply(nor, array);
+  return this;
+}
+</code></pre><p>gt, gte, lt, lte, ne, in, nin, all, regex, size, maxDistance</p>
+
+<p>Can be used on Numbers or Dates.</p>
+
+<pre><code>Thing.where('type').nin(array)
+</code></pre><pre><code class="javascript">'gt gte lt lte ne in nin all regex size maxDistance'.split(' ').forEach(function ($conditional) {
+  Query.prototype[$conditional] = function (path, val) {
+    if (arguments.length === 1) {
+      val = path;
+      path = this._currPath
+    }
+    var conds = this._conditions[path] || (this._conditions[path] = {});
+    conds['$' + $conditional] = val;
+    return this;
+  };
+});
+</code></pre><p>mod, near</p><pre><code class="javascript">;['mod', 'near'].forEach(function ($conditional) {
+  Query.prototype[$conditional] = function (path, val) {
+    if (arguments.length === 1) {
+      val = path;
+      path = this._currPath
+    } else if (arguments.length === 2 &amp;&amp; !Array.isArray(val)) {
+      val = utils.args(arguments);
+      path = this._currPath;
+    } else if (arguments.length === 3) {
+      val = utils.args(arguments, 1);
+    }
+    var conds = this._conditions[path] || (this._conditions[path] = {});
+    conds['$' + $conditional] = val;
+    return this;
+  };
+});
+</code></pre><p>exists</p><pre><code class="javascript">Query.prototype.exists = function (path, val) {
+  if (arguments.length === 0) {
+    path = this._currPath
+    val = true;
+  } else if (arguments.length === 1) {
+    if ('boolean' === typeof path) {
+      val = path;
+      path = this._currPath;
+    } else {
+      val = true;
+    }
+  }
+  var conds = this._conditions[path] || (this._conditions[path] = {});
+  conds['$exists'] = val;
+  return this;
+};
+</code></pre><p>elemMatch</p><pre><code class="javascript">Query.prototype.elemMatch = function (path, criteria) {
+  var block;
+  if ('Object' === path.constructor.name) {
+    criteria = path;
+    path = this._currPath;
+  } else if ('function' === typeof path) {
+    block = path;
+    path = this._currPath;
+  } else if ('Object' === criteria.constructor.name) {
+  } else if ('function' === typeof criteria) {
+    block = criteria;
+  } else {
+    throw new Error(&quot;Argument error&quot;);
+  }
+  var conds = this._conditions[path] || (this._conditions[path] = {});
+  if (block) {
+    criteria = new Query();
+    block(criteria);
+    conds['$elemMatch'] = criteria._conditions;
+  } else {
+    conds['$elemMatch'] = criteria;
+  }
+  return this;
+};
+
+// Spatial queries
+</code></pre><p>within</p>
+
+<h2>Example</h2>
+
+<pre><code>query.within.box()
+query.within.center()
+</code></pre><pre><code class="javascript">Object.defineProperty(Query.prototype, 'within', {
+  get: function () { return this }
+});
+</code></pre><p>box</p>
+
+<p>Specifies a $box query.</p>
+
+<h2>Example</h2>
+
+<pre><code>var lowerLeft = [40.73083, -73.99756]
+var upperRight= [40.741404,  -73.988135]
+query.where('loc').within.box({ ll: lowerLeft , ur: upperRight })
+</code></pre><pre><code class="javascript">Query.prototype.box = function (path, val) {
+  if (arguments.length === 1) {
+    val = path;
+    path = this._currPath;
+  }
+  var conds = this._conditions[path] || (this._conditions[path] = {});
+  conds['$within'] = { '$box': [val.ll, val.ur]  };
+  return this;
+};
+</code></pre><p>center</p>
+
+<p>Specifies a $center query.</p>
+
+<h2>Example</h2>
+
+<pre><code>var area = { center: [50, 50], radius: 10 }
+query.where('loc').within.center(area)
+</code></pre><pre><code class="javascript">Query.prototype.center = function (path, val) {
+  if (arguments.length === 1) {
+    val = path;
+    path = this._currPath;
+  }
+  var conds = this._conditions[path] || (this._conditions[path] = {});
+  conds['$within'] = { '$center': [val.center, val.radius]  };
+  return this;
+};
+</code></pre><p>centerSphere</p><pre><code class="javascript">Query.prototype.centerSphere = function (path, val) {
+  if (arguments.length === 1) {
+    val = path;
+    path = this._currPath;
+  }
+  var conds = this._conditions[path] || (this._conditions[path] = {});
+  conds['$within'] = { '$centerSphere': [val.center, val.radius]  };
+  return this;
+};
+</code></pre><p>select</p>
+
+<p>Specifies which fields to include or exclude from<br />the document that is returned from MongoDB.</p>
+
+<h2>Example</h2>
+
+<pre><code>query.select('a b -c');
+query.select({a: 1, b: 1, c: 0}); // useful if you have keys that start with "-"
+query.select('+path') // force inclusion of field excluded at schema level
+</code></pre><pre><code class="javascript">Query.prototype.select = function select (arg) {
+  if (!arg) return this;
+
+  var fields = this._fields || (this._fields = {});
+
+  if ('Object' === arg.constructor.name) {
+    Object.keys(arg).forEach(function (field) {
+      fields[field] = arg[field];
+    });
+  } else if (1 === arguments.length &amp;&amp; 'string' == typeof arg) {
+    arg.split(/\s+/).forEach(function (field) {
+      if (!field) return;
+      var include = '-' == field[0] ? 0 : 1;
+      if (include === 0) field = field.substring(1);
+      fields[field] = include;
+    });
+  } else {
+    throw new TypeError('Invalid select() argument. Must be a string or object.');
+  }
+
+  return this;
+};
+</code></pre><p>slice()</p><pre><code class="javascript">Query.prototype.slice = function (path, val) {
+  if (arguments.length === 1) {
+      val = path;
+      path = this._currPath
+  } else if (arguments.length === 2) {
+    if ('number' === typeof path) {
+      val = [path, val];
+      path = this._currPath;
+    }
+  } else if (arguments.length === 3) {
+    val = utils.args(arguments, 1);
+  }
+  var myFields = this._fields || (this._fields = {});
+  myFields[path] = { '$slice': val };
+  return this;
+};
+</code></pre><p>sort</p>
+
+<p>Sets the sort order. Accepts a single parameter, either an object or string.<br />If an object is passed values allowed are 'asc', 'desc', 'ascending', 'descending', 1, -1.<br />If a string is passed it must be a space delimited list of path names. The sort order of each path is ascending unless the path name is prefixed with <code>-</code> which will be treated as descending.</p>
+
+<h2>Examples</h2>
+
+<pre><code>// these are equivalent
+query.sort({ field: 'asc', test: -1 });
+query.sort('field -test');
+</code></pre><pre><code class="javascript">Query.prototype.sort = function (arg) {
+  if (!arg) return this;
+
+  var sort = this.options.sort || (this.options.sort = []);
+
+  if ('Object' === arg.constructor.name) {
+    Object.keys(arg).forEach(function (field) {
+      push(sort, field, arg[field]);
+    });
+  } else if (1 === arguments.length &amp;&amp; 'string' == typeof arg) {
+    arg.split(/\s+/).forEach(function (field) {
+      if (!field) return;
+      var ascend = '-' == field[0] ? -1 : 1;
+      if (ascend === -1) field = field.substring(1);
+      push(sort, field, ascend);
+    });
+  } else {
+    throw new TypeError('Invalid sort() argument. Must be a string or object.');
+  }
+
+  return this;
+};
+</code></pre><p>@ignore</p><pre><code class="javascript">function push (arr, field, value) {
+  var val = String(value || 1).toLowerCase();
+  if (!/^(?:ascending|asc|descending|desc|1|-1)$/.test(val)) {
+    if (Array.isArray(value)) value = '['+value+']';
+    throw new TypeError('Invalid sort value: {' + field + ': ' + value + ' }');
+  }
+  arr.push([field, value]);
+}
+</code></pre><p>limit, skip, maxscan, snapshot, batchSize, comment</p>
+
+<p>Sets these associated options.</p>
+
+<pre><code>query.comment('feed query');
+</code></pre><pre><code class="javascript">;['limit', 'skip', 'maxscan', 'snapshot', 'batchSize', 'comment'].forEach(function (method) {
+  Query.prototype[method] = function (v) {
+    this.options[method] = v;
+    return this;
+  };
+});
+</code></pre><p>hint</p>
+
+<p>Sets query hints.</p>
+
+<h2>Examples</h2>
+
+<pre><code>new Query().hint({ indexA: 1, indexB: -1})
+</code></pre><pre><code class="javascript">Query.prototype.hint = function (val) {
+  if (!val) return this;
+
+  var hint = this.options.hint || (this.options.hint = {});
+
+  if ('Object' === val.constructor.name) {
+    // must keep object keys in order so don't use Object.keys()
+    for (var k in val) {
+      hint[k] = val[k];
+    }
+  } else {
+    throw new TypeError('Invalid hint. ' + val);
+  }
+
+  return this;
+};
+</code></pre><p>slaveOk</p>
+
+<p>Sets slaveOk option.</p>
+
+<pre><code>new Query().slaveOk() &lt;== true
+new Query().slaveOk(true)
+new Query().slaveOk(false)
+</code></pre><pre><code class="javascript">Query.prototype.slaveOk = function (v) {
+  this.options.slaveOk = arguments.length ? !!v : true;
+  return this;
+};
+</code></pre><p>tailable</p>
+
+<p>Sets tailable option.</p>
+
+<pre><code>new Query().tailable() &lt;== true
+new Query().tailable(true)
+new Query().tailable(false)
+</code></pre><pre><code class="javascript">Query.prototype.tailable = function (v) {
+  this.options.tailable = arguments.length ? !!v : true;
+  return this;
+};
+</code></pre><p>findOne</p>
+
+<p>Casts the query, sends the findOne command to mongodb.<br />Upon receiving the document, we initialize a mongoose<br />document based on the returned document from mongodb,<br />and then we invoke a callback on our mongoose document.</p><pre><code class="javascript">Query.prototype.findOne = function (callback) {
+  this.op = 'findOne';
+
+  if (!callback) return this;
+
+  var model = this.model;
+  var promise = new Promise(callback);
+
+  try {
+    this.cast(model);
+  } catch (err) {
+    promise.error(err);
+    return this;
+  }
+
+  // apply default schematype path selections
+  this._applyPaths();
+
+  var self = this
+    , castQuery = this._conditions
+    , options = this._optionsForExec(model)
+
+  var fields = utils.clone(options.fields = this._fields);
+
+  model.collection.findOne(castQuery, options, tick(function (err, doc) {
+    if (err) return promise.error(err);
+    if (!doc) return promise.complete(null);
+
+    if (true === options.lean) return promise.complete(doc);
+
+    var casted = new model(undefined, fields, true);
+    casted.init(doc, self, function (err) {
+      if (err) return promise.error(err);
+      promise.complete(casted);
+    });
+  }));
+
+  return this;
+};
+</code></pre><p>count</p>
+
+<p>Casts this._conditions and sends a count<br />command to mongodb. Invokes a callback upon<br />receiving results</p><pre><code class="javascript">Query.prototype.count = function (callback) {
+  this.op = 'count';
+  var model = this.model;
+
+  try {
+    this.cast(model);
+  } catch (err) {
+    return callback(err);
+  }
+
+  var castQuery = this._conditions;
+  model.collection.count(castQuery, tick(callback));
+
+  return this;
+};
+</code></pre><p>distinct</p>
+
+<p>Casts this._conditions and sends a distinct<br />command to mongodb. Invokes a callback upon<br />receiving results</p><pre><code class="javascript">Query.prototype.distinct = function (field, callback) {
+  this.op = 'distinct';
+  var model = this.model;
+
+  try {
+    this.cast(model);
+  } catch (err) {
+    return callback(err);
+  }
+
+  var castQuery = this._conditions;
+  model.collection.distinct(field, castQuery, tick(callback));
+
+  return this;
+};
+</code></pre><p>These operators require casting docs<br />to real Documents for Update operations.</p><pre><code class="javascript">var castOps = {
+    $push: 1
+  , $pushAll: 1
+  , $addToSet: 1
+  , $set: 1
+};
+</code></pre><p>These operators should be cast to numbers instead<br />of their path schema type.</p><pre><code class="javascript">var numberOps = {
+    $pop: 1
+  , $unset: 1
+  , $inc: 1
+}
+</code></pre><p>update</p>
+
+<p>Casts the <code>doc</code> according to the model Schema and<br />sends an update command to MongoDB.</p>
+
+<p><em>All paths passed that are not $atomic operations<br />will become $set ops so we retain backwards compatibility.</em></p>
+
+<h2>Example</h2>
+
+<p><code>Model.update({..}, { title: 'remove words' }, ...)</code></p>
+
+<p>becomes</p>
+
+<p><code>Model.update({..}, { $set: { title: 'remove words' }}, ...)</code></p>
+
+<p><em>Passing an empty object <code>{}</code> as the doc will result<br />in a no-op. The update operation will be ignored and the<br />callback executed without sending the command to MongoDB so as<br />to prevent accidently overwritting the collection.</em></p><pre><code class="javascript">Query.prototype.update = function update (doc, callback) {
+  this.op = 'update';
+  this._updateArg = doc;
+
+  var model = this.model
+    , options = this._optionsForExec(model)
+    , fn = 'function' == typeof callback
+    , castedQuery
+    , castedDoc
+
+  castedQuery = castQuery(this);
+  if (castedQuery instanceof Error) {
+    if (fn) {
+      process.nextTick(callback.bind(null, castedQuery));
+      return this;
+    }
+    throw castedQuery;
+  }
+
+  castedDoc = castDoc(this);
+  if (!castedDoc) {
+    fn &amp;&amp; process.nextTick(callback.bind(null, null, 0));
+    return this;
+  }
+
+  if (castedDoc instanceof Error) {
+    if (fn) {
+      process.nextTick(callback.bind(null, castedDoc));
+      return this;
+    }
+    throw castedDoc;
+  }
+
+  if (!fn) {
+    delete options.safe;
+  }
+
+  model.collection.update(castedQuery, castedDoc, options, tick(callback));
+  return this;
+};
+</code></pre><p>Walk each path of obj and cast its values<br />according to its schema.</p><pre><code class="javascript">Query.prototype._walkUpdatePath = function _walkUpdatePath (obj, op, pref) {
+  var strict = this.model.schema.options.strict
+    , prefix = pref ? pref + '.' : ''
+    , keys = Object.keys(obj)
+    , i = keys.length
+    , hasKeys = false
+    , schema
+    , key
+    , val
+
+  while (i--) {
+    key = keys[i];
+    val = obj[key];
+
+    if (val &amp;&amp; 'Object' === val.constructor.name) {
+      // watch for embedded doc schemas
+      schema = this._getSchema(prefix + key);
+      if (schema &amp;&amp; schema.caster &amp;&amp; op in castOps) {
+        // embedded doc schema
+
+        if (strict &amp;&amp; !schema) {
+          // path is not in our strict schema
+          if ('throw' == strict) {
+            throw new Error('Field `' + key + '` is not in schema.');
+          } else {
+            // ignore paths not specified in schema
+            delete obj[key];
+          }
+        } else {
+          hasKeys = true;
+          if ('$each' in val) {
+            obj[key] = {
+                $each: this._castUpdateVal(schema, val.$each, op)
+            }
+          } else {
+            obj[key] = this._castUpdateVal(schema, val, op);
+          }
+        }
+      } else {
+        hasKeys |= this._walkUpdatePath(val, op, prefix + key);
+      }
+    } else {
+      schema = '$each' === key
+        ? this._getSchema(pref)
+        : this._getSchema(prefix + key);
+
+      var skip = strict &amp;&amp;
+                 !schema &amp;&amp;
+                 !/real|nested/.test(this.model.schema.pathType(prefix + key));
+
+      if (skip) {
+        if ('throw' == strict) {
+          throw new Error('Field `' + prefix + key + '` is not in schema.');
+        } else {
+          delete obj[key];
+        }
+      } else {
+        hasKeys = true;
+        obj[key] = this._castUpdateVal(schema, val, op, key);
+      }
+    }
+  }
+  return hasKeys;
+}
+</code></pre><p>Casts <code>val</code> according to <code>schema</code> and atomic <code>op</code>.</p><pre><code class="javascript">Query.prototype._castUpdateVal = function _castUpdateVal (schema, val, op, $conditional) {
+  if (!schema) {
+    // non-existing schema path
+    return op in numberOps
+      ? Number(val)
+      : val
+  }
+
+  if (schema.caster &amp;&amp; op in castOps &amp;&amp;
+    ('Object' === val.constructor.name || Array.isArray(val))) {
+    // Cast values for ops that add data to MongoDB.
+    // Ensures embedded documents get ObjectIds etc.
+    var tmp = schema.cast(val);
+
+    if (Array.isArray(val)) {
+      val = tmp;
+    } else {
+      val = tmp[0];
+    }
+  }
+
+  if (op in numberOps) return Number(val);
+  if (/^\$/.test($conditional)) return schema.castForQuery($conditional, val);
+  return schema.castForQuery(val)
+}
+</code></pre><p>Finds the schema for <code>path</code>. This is different than<br />calling <code>schema.path</code> as it also resolves paths with<br />positional selectors (something.$.another.$.path).</p><pre><code class="javascript">Query.prototype._getSchema = function _getSchema (path) {
+  var schema = this.model.schema
+    , pathschema = schema.path(path);
+
+  if (pathschema)
+    return pathschema;
+
+  // look for arrays
+  return (function search (parts, schema) {
+    var p = parts.length + 1
+      , foundschema
+      , trypath
+
+    while (p--) {
+      trypath = parts.slice(0, p).join('.');
+      foundschema = schema.path(trypath);
+      if (foundschema) {
+        if (foundschema.caster) {
+
+          // array of Mixed?
+          if (foundschema.caster instanceof Types.Mixed) {
+            return foundschema.caster;
+          }
+
+          // Now that we found the array, we need to check if there
+          // are remaining document paths to look up for casting.
+          // Also we need to handle array.$.path since schema.path
+          // doesn't work for that.
+          if (p !== parts.length) {
+            if ('$' === parts[p]) {
+              // comments.$.comments.$.title
+              return search(parts.slice(p+1), foundschema.schema);
+            } else {
+              // this is the last path of the selector
+              return search(parts.slice(p), foundschema.schema);
+            }
+          }
+        }
+        return foundschema;
+      }
+    }
+  })(path.split('.'), schema)
+}
+</code></pre><p>remove</p>
+
+<p>Casts the query, sends the remove command to<br />mongodb where the query contents, and then<br />invokes a callback upon receiving the command<br />result.</p><pre><code class="javascript">Query.prototype.remove = function (callback) {
+  this.op = 'remove';
+
+  var model = this.model
+    , options = this._optionsForExec(model)
+    , cb = 'function' == typeof callback
+
+  try {
+    this.cast(model);
+  } catch (err) {
+    if (cb) return callback(err);
+    throw err;
+  }
+
+  if (!cb) {
+    delete options.safe;
+  }
+
+  var castQuery = this._conditions;
+  model.collection.remove(castQuery, options, tick(callback));
+  return this;
+};
+</code></pre><p>findOneAndUpdate</p>
+
+<p>Issues a mongodb findAndModify update command.</p>
+
+<p>Finds a matching document, updates it according to the <code>update</code><br />arg, passing any <code>options</code>, and returns the found document<br />(if any) to the callback. The query executes immediately if<br /><code>callback</code> is passed else a Query object is returned.</p>
+
+<h2>Available options</h2>
+
+<p><code>new</code>: bool - true to return the modified document rather than the original. defaults to true<br />  <code>upsert</code>: bool - creates the object if it doesn't exist. defaults to false.<br />  <code>sort</code>: if multiple docs are found by the conditions, sets the sort order to choose which doc to update</p>
+
+<h2>Examples</h2>
+
+<pre><code>query.findOneAndUpdate(conditions, update, options, callback) // executes
+query.findOneAndUpdate(conditions, update, options)  // returns Query
+query.findOneAndUpdate(conditions, update, callback) // executes
+query.findOneAndUpdate(conditions, update)           // returns Query
+query.findOneAndUpdate(callback)                     // executes
+query.findOneAndUpdate()                             // returns Query
+</code></pre><pre><code class="javascript">Query.prototype.findOneAndUpdate = function (query, doc, options, callback) {
+  this.op = 'findOneAndUpdate';
+
+  switch (arguments.length) {
+    case 3:
+      if ('function' == typeof options)
+        callback = options, options = {};
+      break;
+    case 2:
+      if ('function' == typeof doc) {
+        callback = doc;
+        doc = query;
+        query = undefined;
+      }
+      options = undefined;
+      break;
+    case 1:
+      if ('function' == typeof query) {
+        callback = query;
+        query = options = doc = undefined;
+      } else {
+        doc = query;
+        query = options = undefined;
+      }
+  }
+
+  // apply query
+  if (query) {
+    if ('Object' === query.constructor.name) {
+      merge(this._conditions, query);
+    } else if (query instanceof Query) {
+      merge(this._conditions, query._conditions);
+    } else if (query instanceof Document) {
+      merge(this._conditions, query.toObject());
+    }
+  }
+
+  // apply doc
+  if (doc) {
+    merge(this._updateArg, doc);
+  }
+
+  // apply options
+  options &amp;&amp; this.setOptions(options);
+
+  if (!callback) return this;
+
+  return this._findAndModify('update', callback);
+}
+</code></pre><p>findOneAndRemove</p>
+
+<p>Issues a mongodb findAndModify remove command.</p>
+
+<p>Finds a matching document, removes it, passing the found<br />document (if any) to the callback. Executes immediately if <code>callback</code><br />is passed else a Query object is returned.</p>
+
+<h2>Available options</h2>
+
+<p><code>sort</code>: if multiple docs are found by the conditions, sets the sort order to choose which doc to update</p>
+
+<h2>Examples</h2>
+
+<pre><code>A.where().findOneAndRemove(conditions, options, callback) // executes
+A.where().findOneAndRemove(conditions, options)  // return Query
+A.where().findOneAndRemove(conditions, callback) // executes
+A.where().findOneAndRemove(conditions) // returns Query
+A.where().findOneAndRemove(callback)   // executes
+A.where().findOneAndRemove()           // returns Query
+</code></pre><pre><code class="javascript">Query.prototype.findOneAndRemove = function (conditions, options, callback) {
+  this.op = 'findOneAndRemove';
+
+  if ('function' == typeof options) {
+    callback = options;
+    options = undefined;
+  } else if ('function' == typeof conditions) {
+    callback = conditions;
+    conditions = undefined;
+  }
+
+  // apply conditions
+  if (conditions) {
+    if ('Object' === conditions.constructor.name) {
+      merge(this._conditions, conditions);
+    } else if (conditions instanceof Query) {
+      merge(this._conditions, conditions._conditions);
+    } else if (conditions instanceof Document) {
+      merge(this._conditions, conditions.toObject());
+    }
+  }
+
+  // apply options
+  options &amp;&amp; this.setOptions(options);
+
+  if (!callback) return this;
+
+  return this._findAndModify('remove', callback);
+}
+</code></pre><p>populate</p>
+
+<p>Sets population options.</p><pre><code class="javascript">Query.prototype.populate = function (path, fields, model, conditions, options) {
+  if ('string' !== typeof model) {
+    options = conditions;
+    conditions = model;
+    model = undefined;
+  }
+  // The order of fields/conditions args is opposite Model.find but
+  // necessary to keep backward compatibility (fields could be
+  // an array, string, or object literal).
+  this.options.populate[path] =
+    new PopulateOptions(fields, conditions, options, model);
+
+  return this;
+};
+</code></pre><p>Populate options constructor</p><pre><code class="javascript">function PopulateOptions (fields, conditions, options, model) {
+  this.conditions = conditions;
+  this.fields = fields;
+  this.options = options;
+  this.model = model;
+}
+
+// make it compatible with utils.clone
+PopulateOptions.prototype.constructor = Object;
+</code></pre><p>stream</p>
+
+<p>Returns a stream interface</p>
+
+<h2>Example</h2>
+
+<pre><code>Thing.find({ name: /^hello/ }).stream().pipe(res)
+</code></pre><pre><code class="javascript">Query.prototype.stream = function stream () {
+  return new QueryStream(this);
+}
+
+// helpers
+</code></pre><p>Exports.</p><pre><code class="javascript">module.exports = Query;
+module.exports.QueryStream = QueryStream;
+</code></pre></li><li><a href="/docs/index.html">lib/querystream.js</a><p>QueryStream</p>
+
+<p>Returns a stream interface for the <code>query</code>.</p><pre><code class="javascript">function QueryStream (query) {
+  Stream.call(this);
+
+  this.query = query;
+  this.readable = true;
+  this.paused = false;
+  this._cursor = null;
+  this._destroyed = null;
+  this._fields = null;
+  this._ticks = 0;
+  this._inline = T_INIT;
+
+  // give time to hook up events
+  var self = this;
+  process.nextTick(function () {
+    self._init();
+  });
+}
+</code></pre><p>Inherit from Stream</p><pre><code class="javascript">QueryStream.prototype.__proto__ = Stream.prototype;
+</code></pre><p>Flag stating whether or not this stream is readable.</p><pre><code class="javascript">QueryStream.prototype.readable;
+</code></pre><p>Flag stating whether or not this stream is paused.</p><pre><code class="javascript">QueryStream.prototype.paused;
+
+// trampoline flags
+var T_INIT = 0;
+var T_IDLE = 1;
+var T_CONT = 2;
+</code></pre><p>Initialize the query.</p><pre><code class="javascript">QueryStream.prototype._init = function () {
+  if (this._destroyed) return;
+
+  var query = this.query
+    , model = query.model
+    , options = query._optionsForExec(model)
+    , self = this
+
+  try {
+    query.cast(model);
+  } catch (err) {
+    return self.destroy(err);
+  }
+
+  self._fields = utils.clone(options.fields = query._fields);
+  
+  model.collection.find(query._conditions, options, function (err, cursor) {
+    if (err) return self.destroy(err);
+    self._cursor = cursor;
+    self._next();
+  });
+}
+</code></pre><p>Handle each document as its returned from the cursor<br />transforming the raw <code>doc</code> from -native into a model<br />instance.</p><pre><code class="javascript">QueryStream.prototype._onNextObject = function (err, doc) {
+  if (err) return this.destroy(err);
+
+  // when doc is null we hit the end of the cursor
+  if (!doc) {
+    return this.destroy();
+  }
+
+  if(this.query.options &amp;&amp; this.query.options.lean === true)  {
+    this.emit('data', doc);
+    this._next();
+    return;
+  } 
+  var instance = new this.query.model(undefined, this._fields);
+
+  // skip _id for pre-init hooks
+  delete instance._doc._id;
+
+  var self = this;
+  instance.init(doc, this.query, function (err) {
+    if (err) return self.destroy(err);
+    self.emit('data', instance);
+
+    // trampoline management
+    if (T_IDLE === self._inline) {
+      // no longer in trampoline. restart it.
+      self._next();
+    } else
+      // in a trampoline. tell __next that its
+      // ok to continue jumping.
+      self._inline = T_CONT;
+  });
+}
+</code></pre><p>Pauses this stream.</p><pre><code class="javascript">QueryStream.prototype.pause = function () {
+  this.paused = true;
+}
+</code></pre><p>Resumes this stream.</p><pre><code class="javascript">QueryStream.prototype.resume = function () {
+  this.paused = false;
+  this._next();
+}
+</code></pre><p>Destroys the stream, closing the underlying<br />cursor. No more events will be emitted.</p><pre><code class="javascript">QueryStream.prototype.destroy = function (err) {
+  if (this._destroyed) return;
+  this._destroyed = true;
+  this.readable = false;
+
+  if (this._cursor) {
+    this._cursor.close();
+  }
+
+  if (err) {
+    this.emit('error', err);
+  }
+
+  this.emit('close');
+}
+
+// TODO - maybe implement the -native raw option to pass binary?
+//QueryStream.prototype.setEncoding = function () {
+//}
+
+module.exports = exports = QueryStream;
+</code></pre></li><li><a href="/docs/index.html">lib/schema/array.js</a><p>Inherits from SchemaType.</p><pre><code class="javascript">SchemaArray.prototype.__proto__ = SchemaType.prototype;
+</code></pre><p>@ignore</p><pre><code class="javascript">function castToNumber (val) {
+  return Types.Number.prototype.cast.call(this, val);
+}
+
+SchemaArray.prototype.$conditionalHandlers = {
+    '$all': function handle$all (val) {
+      if (!Array.isArray(val)) {
+        val = [val];
+      }
+
+      val = val.map(function (v) {
+        if (v &amp;&amp; 'Object' === v.constructor.name) {
+          var o = {};
+          o[this.path] = v;
+          var query = new Query(o);
+          query.cast(this.casterConstructor);
+          return query._conditions[this.path];
+        }
+        return v;
+      }, this);
+
+      return this.castForQuery(val);
+    }
+  , '$elemMatch': function (val) {
+      var query = new Query(val);
+      query.cast(this.casterConstructor);
+      return query._conditions;
+    }
+  , '$size': castToNumber
+  , '$ne': SchemaArray.prototype.castForQuery
+  , '$in': SchemaArray.prototype.castForQuery
+  , '$nin': SchemaArray.prototype.castForQuery
+  , '$regex': SchemaArray.prototype.castForQuery
+  , '$near': SchemaArray.prototype.castForQuery
+  , '$nearSphere': SchemaArray.prototype.castForQuery
+  , '$gt': castToNumber
+  , '$gte': castToNumber
+  , '$lt': castToNumber
+  , '$lte': castToNumber
+  , '$within': function(val) {
+      var query = new Query(val);
+      query.cast(this.casterConstructor)
+      return query._conditions;
+    }
+  , '$maxDistance': castToNumber
+};
+</code></pre><p>Module exports.</p><pre><code class="javascript">module.exports = SchemaArray;
+</code></pre></li><li><a href="/docs/index.html">lib/schema/boolean.js</a><p>Inherits from SchemaType.</p><pre><code class="javascript">SchemaBoolean.prototype.__proto__ = SchemaType.prototype;
+</code></pre><p>Module exports.</p><pre><code class="javascript">module.exports = SchemaBoolean;
+</code></pre></li><li><a href="/docs/index.html">lib/schema/buffer.js</a><p>Inherits from SchemaType.</p><pre><code class="javascript">SchemaBuffer.prototype.__proto__ = SchemaType.prototype;
+</code></pre><p>Module exports.</p><pre><code class="javascript">module.exports = SchemaBuffer;
+</code></pre></li><li><a href="/docs/index.html">lib/schema/date.js</a><p>Inherits from SchemaType.</p><pre><code class="javascript">SchemaDate.prototype.__proto__ = SchemaType.prototype;
+</code></pre><p>Module exports.</p><pre><code class="javascript">module.exports = SchemaDate;
+</code></pre></li><li><a href="/docs/index.html">lib/schema/documentarray.js</a><p>Inherits from ArrayType.</p><pre><code class="javascript">DocumentArray.prototype.__proto__ = ArrayType.prototype;
+</code></pre><p>Module exports.</p><pre><code class="javascript">module.exports = DocumentArray;
+</code></pre></li><li><a href="/docs/index.html">lib/schema/index.js</a></li><li><a href="/docs/index.html">lib/schema/mixed.js</a><p>Inherits from SchemaType.</p><pre><code class="javascript">Mixed.prototype.__proto__ = SchemaType.prototype;
+</code></pre><p>Module exports.</p><pre><code class="javascript">module.exports = Mixed;
+</code></pre></li><li><a href="/docs/index.html">lib/schema/number.js</a><p>Inherits from SchemaType.</p><pre><code class="javascript">SchemaNumber.prototype.__proto__ = SchemaType.prototype;
+</code></pre><p>Sets a maximum number validator</p><pre><code class="javascript">SchemaNumber.prototype.min = function (value, message) {
+  if (this.minValidator)
+    this.validators = this.validators.filter(function(v){
+      return v[1] != 'min';
+    });
+  if (value != null)
+    this.validators.push([function(v){
+      return v === null || v &gt;= value;
+    }, 'min']);
+  return this;
+};
+</code></pre><p>Sets a maximum number validator</p><pre><code class="javascript">SchemaNumber.prototype.max = function (value, message) {
+  if (this.maxValidator)
+    this.validators = this.validators.filter(function(v){
+      return v[1] != 'max';
+    });
+  if (value != null)
+    this.validators.push([this.maxValidator = function(v){
+      return v === null || v &lt;= value;
+    }, 'max']);
+  return this;
+};
+</code></pre><p>Module exports.</p><pre><code class="javascript">module.exports = SchemaNumber;
+</code></pre></li><li><a href="/docs/index.html">lib/schema/objectid.js</a><p>Inherits from SchemaType.</p><pre><code class="javascript">ObjectId.prototype.__proto__ = SchemaType.prototype;
+</code></pre><p>Module exports.</p><pre><code class="javascript">module.exports = ObjectId;
+</code></pre></li><li><a href="/docs/index.html">lib/schema/string.js</a><p>Inherits from SchemaType.</p><pre><code class="javascript">SchemaString.prototype.__proto__ = SchemaType.prototype;
+</code></pre><p>Adds enumeration values</p><pre><code class="javascript">SchemaString.prototype.enum = function () {
+  var len = arguments.length;
+  if (!len || undefined === arguments[0] || false === arguments[0]) {
+    if (this.enumValidator){
+      this.enumValidator = false;
+      this.validators = this.validators.filter(function(v){
+        return v[1] != 'enum';
+      });
+    }
+    return;
+  }
+
+  for (var i = 0; i &lt; len; i++) {
+    if (undefined !== arguments[i]) {
+      this.enumValues.push(this.cast(arguments[i]));
+    }
+  }
+
+  if (!this.enumValidator) {
+    var values = this.enumValues;
+    this.enumValidator = function(v){
+      return undefined === v || ~values.indexOf(v);
+    };
+    this.validators.push([this.enumValidator, 'enum']);
+  }
+};
+</code></pre><p>Adds a lowercase setter</p><pre><code class="javascript">SchemaString.prototype.lowercase = function () {
+  return this.set(function (v) {
+    return v.toLowerCase();
+  });
+};
+</code></pre><p>Adds an uppercase setter</p><pre><code class="javascript">SchemaString.prototype.uppercase = function () {
+  return this.set(function (v) {
+    return v.toUpperCase();
+  });
+};
+</code></pre><p>Adds a trim setter</p><pre><code class="javascript">SchemaString.prototype.trim = function () {
+  return this.set(function (v) {
+    return v.trim();
+  });
+};
+</code></pre><p>Sets a regexp test</p><pre><code class="javascript">SchemaString.prototype.match = function match (regExp) {
+  this.validators.push([function(v){
+    return null != v &amp;&amp; '' !== v
+      ? regExp.test(v)
+      : true
+  }, 'regexp']);
+};
+</code></pre><p>Module exports.</p><pre><code class="javascript">module.exports = SchemaString;
+</code></pre></li><li><a href="/docs/index.html">lib/schema.js</a><p>Schema constructor.</p><pre><code class="javascript">function Schema (obj, options) {
+  if (!(this instanceof Schema))
+    return new Schema(obj, options);
+
+  this.paths = {};
+  this.subpaths = {};
+  this.virtuals = {};
+  this.nested = {};
+  this.inherits = {};
+  this.callQueue = [];
+  this._indexes = [];
+  this.methods = {};
+  this.statics = {};
+  this.tree = {};
+  this._requiredpaths = undefined;
+
+  // set options
+  this.options = utils.options({
+      safe: true
+    , strict: true
+    , capped: false // { size, max, autoIndexId }
+    , versionKey: '__v'
+    , minimize: true
+    , autoIndex: true
+  }, options);
+
+  // build paths
+  if (obj) {
+    this.add(obj);
+  }
+
+  if (!this.paths['_id'] &amp;&amp; !this.options.noId) {
+    this.add({ _id: {type: ObjectId, auto: true} });
+  }
+
+  if (!this.paths['id'] &amp;&amp; !this.options.noVirtualId) {
+    this.virtual('id').get(function () {
+      if (this.__id) {
+        return this.__id;
+      }
+
+      return this.__id = null == this._id
+        ? null
+        : this._id.toString();
+    });
+  }
+
+  delete this.options.noVirtualId;
+
+  // versioning not directly added to schema b/c we only want
+  // it in the top level document, not embedded ones.
+};
+</code></pre><p>Inherit from EventEmitter.</p><pre><code class="javascript">Schema.prototype.__proto__ = EventEmitter.prototype;
+</code></pre><p>Sets the keys</p><pre><code class="javascript">Schema.prototype.add = function add (obj, prefix) {
+  prefix = prefix || '';
+  for (var i in obj) {
+    if (null == obj[i]) {
+      throw new TypeError('Invalid value for schema path `'+ prefix + i +'`');
+    }
+
+    if (obj[i].constructor.name == 'Object' &amp;&amp; (!obj[i].type || obj[i].type.type)) {
+      if (Object.keys(obj[i]).length) {
+        // nested object { last: { name: String }}
+        this.nested[prefix + i] = true;
+        this.add(obj[i], prefix + i + '.');
+      }
+      else
+        this.path(prefix + i, obj[i]); // mixed type
+    } else
+      this.path(prefix + i, obj[i]);
+  }
+};
+</code></pre><p>Reserved document keys.</p>
+
+<p>Keys in this object are names that are rejected<br />in schema declarations b/c they conflict with<br />mongoose functionality.</p><pre><code class="javascript">var reserved = Object.create(null);
+reserved.on =
+reserved.db =
+reserved.init =
+reserved.model =
+reserved.isNew =
+reserved.errors =
+reserved.schema =
+reserved.modelName =
+reserved.collection = 1;
+</code></pre><p>Sets a path (if arity 2)<br />Gets a path (if arity 1)</p><pre><code class="javascript">Schema.prototype.path = function (path, obj) {
+  if (obj == undefined) {
+    if (this.paths[path]) return this.paths[path];
+    if (this.subpaths[path]) return this.subpaths[path];
+
+    // subpaths?
+    return /\.\d+\.?/.test(path)
+      ? getPositionalPath(this, path)
+      : undefined;
+  }
+
+  // some path names conflict with document methods
+  if (reserved[path]) {
+    throw new Error(&quot;`&quot; + path + &quot;` may not be used as a schema pathname&quot;);
+  }
+
+  // update the tree
+  var subpaths = path.split(/\./)
+    , last = subpaths.pop()
+    , branch = this.tree;
+
+  subpaths.forEach(function(path) {
+    if (!branch[path]) branch[path] = {};
+    branch = branch[path];
+  });
+
+  branch[last] = utils.clone(obj);
+
+  this.paths[path] = Schema.interpretAsType(path, obj);
+  return this;
+};
+</code></pre><p>Converts -- e.g., Number, [SomeSchema],<br />{ type: String, enum: ['m', 'f'] } -- into<br />the appropriate Mongoose Type, which we use<br />later for casting, validation, etc.</p><pre><code class="javascript">Schema.interpretAsType = function (path, obj) {
+  if (obj.constructor.name != 'Object')
+    obj = { type: obj };
+
+  // Get the type making sure to allow keys named &quot;type&quot;
+  // and default to mixed if not specified.
+  // { type: { type: String, default: 'freshcut' } }
+  var type = obj.type &amp;&amp; !obj.type.type
+    ? obj.type
+    : {};
+
+  if ('Object' == type.constructor.name || 'mixed' == type) {
+    return new Types.Mixed(path, obj);
+  }
+
+  if (Array.isArray(type) || Array == type || 'array' == type) {
+    // if it was specified through { type } look for `cast`
+    var cast = (Array == type || 'array' == type)
+      ? obj.cast
+      : type[0];
+
+    if (cast instanceof Schema) {
+      return new Types.DocumentArray(path, cast, obj);
+    }
+
+    if ('string' == typeof cast) {
+      cast = Types[cast.charAt(0).toUpperCase() + cast.substring(1)];
+    } else if (cast &amp;&amp; !cast.type
+                    &amp;&amp; 'Object' == cast.constructor.name
+                    &amp;&amp; Object.keys(cast).length) {
+      return new Types.DocumentArray(path, new Schema(cast), obj);
+    }
+
+    return new Types.Array(path, cast || Types.Mixed, obj);
+  }
+
+  var name = 'string' == typeof type
+    ? type
+    : type.name;
+
+  if (name) {
+    name = name.charAt(0).toUpperCase() + name.substring(1);
+  }
+
+  if (undefined == Types[name]) {
+    throw new TypeError('Undefined type at `' + path +
+        '`\n  Did you try nesting Schemas? ' +
+        'You can only nest using refs or arrays.');
+  }
+
+  return new Types[name](path, obj);
+};
+</code></pre><p>Iterates through the schema's paths, passing the path string and type object<br />to the callback.</p><pre><code class="javascript">Schema.prototype.eachPath = function (fn) {
+  var keys = Object.keys(this.paths)
+    , len = keys.length;
+
+  for (var i = 0; i &lt; len; ++i) {
+    fn(keys[i], this.paths[keys[i]]);
+  }
+
+  return this;
+};
+</code></pre><p>Returns an Array of path strings that are required.</p><pre><code class="javascript">Schema.prototype.requiredPaths = function requiredPaths () {
+  if (this._requiredpaths) return this._requiredpaths;
+
+  var paths = Object.keys(this.paths)
+    , i = paths.length
+    , ret = [];
+
+  while (i--) {
+    var path = paths[i];
+    if (this.paths[path].isRequired) ret.push(path);
+  }
+
+  return this._requiredpaths = ret;
+}
+</code></pre><p>Given a path, returns whether it is a real, virtual,<br />nested, or ad-hoc/undefined path.</p><pre><code class="javascript">Schema.prototype.pathType = function (path) {
+  if (path in this.paths) return 'real';
+  if (path in this.virtuals) return 'virtual';
+  if (path in this.nested) return 'nested';
+  if (path in this.subpaths) return 'real';
+
+  if (/\.\d+\.?/.test(path) &amp;&amp; getPositionalPath(this, path)) {
+    return 'real';
+  } else {
+    return 'adhocOrUndefined'
+  }
+};
+
+function getPositionalPath (self, path) {
+  var subpaths = path.split(/\.(\d+)\.?/).filter(Boolean);
+  if (subpaths.length &lt; 2) {
+    return self.paths[subpaths[0]];
+  }
+
+  var val = self.path(subpaths[0])
+    , last = subpaths.length - 1
+    , subpath;
+
+  for (var i = 1; i &lt; subpaths.length; ++i) {
+    var subpath = subpaths[i];
+
+    if (i === last &amp;&amp;
+        val &amp;&amp;
+        !val.schema &amp;&amp;
+        !/\D/.test(subpath) &amp;&amp;
+        val instanceof Types.Array) {
+      // StringSchema, NumberSchema, etc
+      val = val.caster;
+      continue;
+    }
+
+    // 'path.0.subpath'
+    if (!/\D/.test(subpath)) continue;
+    val = val.schema.path(subpath);
+  }
+
+  return self.subpaths[path] = val;
+}
+</code></pre><p>Defines a pre for the document</p><pre><code class="javascript">Schema.prototype.pre = function(){
+  return this.queue('pre', arguments);
+};
+</code></pre><p>Defines a post for the document</p><pre><code class="javascript">Schema.prototype.post = function(method, fn){
+  return this.queue('on', arguments);
+};
+</code></pre><p>Registers a plugin for this schema</p><pre><code class="javascript">Schema.prototype.plugin = function (fn, opts) {
+  fn(this, opts);
+  return this;
+};
+</code></pre><p>Adds a method</p><pre><code class="javascript">Schema.prototype.method = function (name, fn) {
+  if ('string' != typeof name)
+    for (var i in name)
+      this.methods[i] = name[i];
+  else
+    this.methods[name] = fn;
+  return this;
+};
+</code></pre><p>Defines a static method</p><pre><code class="javascript">Schema.prototype.static = function(name, fn) {
+  if ('string' != typeof name)
+    for (var i in name)
+      this.statics[i] = name[i];
+  else
+    this.statics[name] = fn;
+  return this;
+};
+</code></pre><p>Defines an index (most likely compound)</p>
+
+<h2>Example</h2>
+
+<p>schema.index({ first: 1, last: -1 })</p><pre><code class="javascript">Schema.prototype.index = function (fields, options) {
+  this._indexes.push([fields, options || {}]);
+  return this;
+};
+</code></pre><p>Sets/gets an option</p><pre><code class="javascript">Schema.prototype.set = function (key, value) {
+  if (arguments.length == 1)
+    return this.options[key];
+  this.options[key] = value;
+  return this;
+};
+</code></pre><p>Compiles indexes from fields and schema-level indexes</p><pre><code class="javascript">Schema.prototype.indexes = function () {
+  var indexes = []
+    , seenSchemas = [];
+
+  collectIndexes(this);
+
+  return indexes;
+
+  function collectIndexes (schema, prefix) {
+    if (~seenSchemas.indexOf(schema)) return;
+    seenSchemas.push(schema);
+
+    var index;
+    var paths = schema.paths;
+    prefix = prefix || '';
+
+    for (var i in paths) {
+      if (paths[i]) {
+        if (paths[i] instanceof Types.DocumentArray) {
+          collectIndexes(paths[i].schema, i + '.');
+        } else {
+          index = paths[i]._index;
+
+          if (index !== false &amp;&amp; index !== null){
+            var field = {};
+            field[prefix + i] = '2d' === index ? index : 1;
+            var options = 'Object' === index.constructor.name ? index : {};
+            if (!('background' in options)) options.background = true;
+            indexes.push([field, options]);
+          }
+        }
+      }
+    }
+
+    if (prefix) {
+      fixSubIndexPaths(schema, prefix);
+    } else {
+      schema._indexes.forEach(function (index) {
+        if (!('background' in index[1])) index[1].background = true;
+      });
+      indexes = indexes.concat(schema._indexes);
+    }
+  }
+</code></pre><p>Checks for indexes added to subdocs using Schema.index().<br />These indexes need their paths prefixed properly.</p>
+
+<p>schema._indexes = [ [indexObj, options], [indexObj, options] ..]</p><pre><code class="javascript">function fixSubIndexPaths (schema, prefix) {
+    var subindexes = schema._indexes
+      , len = subindexes.length
+      , indexObj
+      , newindex
+      , klen
+      , keys
+      , key
+      , i = 0
+      , j
+
+    for (i = 0; i &lt; len; ++i) {
+      indexObj = subindexes[i][0];
+      keys = Object.keys(indexObj);
+      klen = keys.length;
+      newindex = {};
+
+      // use forward iteration, order matters
+      for (j = 0; j &lt; klen; ++j) {
+        key = keys[j];
+        newindex[prefix + key] = indexObj[key];
+      }
+
+      indexes.push([newindex, subindexes[i][1]]);
+    }
+  }
+
+}
+</code></pre><p>Retrieves or creates the virtual type with the given name.</p><pre><code class="javascript">Schema.prototype.virtual = function (name, options) {
+  var virtuals = this.virtuals;
+  var parts = name.split('.');
+  return virtuals[name] = parts.reduce(function (mem, part, i) {
+    mem[part] || (mem[part] = (i === parts.length-1)
+                            ? new VirtualType(options)
+                            : {});
+    return mem[part];
+  }, this.tree);
+};
+</code></pre><p>Fetches the virtual type with the given name.<br />Should be distinct from virtual because virtual auto-defines a new VirtualType<br />if the path doesn't exist.</p><pre><code class="javascript">Schema.prototype.virtualpath = function (name) {
+  return this.virtuals[name];
+};
+
+Schema.prototype.namedScope = function (name, fn) {
+  var namedScopes = this.namedScopes || (this.namedScopes = new NamedScope)
+    , newScope = Object.create(namedScopes)
+    , allScopes = namedScopes.scopesByName || (namedScopes.scopesByName = {});
+  allScopes[name] = newScope;
+  newScope.name = name;
+  newScope.block = fn;
+  newScope.query = new Query();
+  newScope.decorate(namedScopes, {
+    block0: function (block) {
+      return function () {
+        block.call(this.query);
+        return this;
+      };
+    },
+    blockN: function (block) {
+      return function () {
+        block.apply(this.query, arguments);
+        return this;
+      };
+    },
+    basic: function (query) {
+      return function () {
+        this.query.find(query);
+        return this;
+      };
+    }
+  });
+  return newScope;
+};
+</code></pre><p>ObjectId schema identifier. Not an actual ObjectId, only used for Schemas.</p><pre><code class="javascript">function ObjectId () {
+  throw new Error('This is an abstract interface. Its only purpose is to mark '
+                + 'fields as ObjectId in the schema creation.');
+}
+</code></pre><p>Module exports.</p><pre><code class="javascript">module.exports = exports = Schema;
+
+// require down here because of reference issues
+exports.Types = Types = require('./schema/index');
+NamedScope = require('./namedscope')
+Query = require('./query');
+
+exports.ObjectId = ObjectId;
+</code></pre></li><li><a href="/docs/index.html">lib/schemadefault.js</a><p>Default model for querying the system.profiles<br />collection (it only exists when profiling is<br />enabled.</p><pre><code class="javascript">exports['system.profile'] = new Schema({
+    ts: Date
+  , info: String // deprecated
+  , millis: Number
+  , op: String
+  , ns: String
+  , query: Schema.Types.Mixed
+  , updateobj: Schema.Types.Mixed
+  , ntoreturn: Number
+  , nreturned: Number
+  , nscanned: Number
+  , responseLength: Number
+  , client: String
+  , user: String
+  , idhack: Boolean
+  , scanAndOrder: Boolean
+  , keyUpdates: Number
+  , cursorid: Number
+}, { noVirtualId: true, noId: true });
+</code></pre></li><li><a href="/docs/index.html">lib/schematype.js</a><p>SchemaType constructor</p><pre><code class="javascript">function SchemaType (path, options, instance) {
+  this.path = path;
+  this.instance = instance;
+  this.validators = [];
+  this.setters = [];
+  this.getters = [];
+  this.options = options;
+  this._index = null;
+  this.selected;
+
+  for (var i in options) if (this[i] &amp;&amp; 'function' == typeof this[i]) {
+    // { unique: true, index: true }
+    if ('index' == i &amp;&amp; this._index) continue;
+
+    var opts = Array.isArray(options[i])
+      ? options[i]
+      : [options[i]];
+
+    this[i].apply(this, opts);
+  }
+};
+</code></pre><p>Sets a default</p><pre><code class="javascript">SchemaType.prototype.default = function (val) {
+  if (1 === arguments.length) {
+    this.defaultValue = typeof val === 'function'
+      ? val
+      : this.cast(val);
+    return this;
+  } else if (arguments.length &gt; 1) {
+    this.defaultValue = utils.args(arguments);
+  }
+  return this.defaultValue;
+};
+</code></pre><p>Sets index. It can be a boolean or a hash of options</p>
+
+<h2>Example</h2>
+
+<p>Schema.path('my.path').index(true);<br />   Schema.path('my.path').index({ unique: true });</p>
+
+<p>"Direction doesn't matter for single key indexes"<br /><a href='http://www.mongodb.org/display/DOCS/Indexes#Indexes-CompoundKeysIndexes'>http://www.mongodb.org/display/DOCS/Indexes#Indexes-CompoundKeysIndexes</a></p><pre><code class="javascript">SchemaType.prototype.index = function (index) {
+  this._index = index;
+  return this;
+};
+</code></pre><p>Adds a setter</p><pre><code class="javascript">SchemaType.prototype.set = function (fn) {
+  if ('function' != typeof fn)
+    throw new Error('A setter must be a function.');
+  this.setters.push(fn);
+  return this;
+};
+</code></pre><p>Adds a getter</p><pre><code class="javascript">SchemaType.prototype.get = function (fn) {
+  if ('function' != typeof fn)
+    throw new Error('A getter must be a function.');
+  this.getters.push(fn);
+  return this;
+};
+</code></pre><h2>validate</h2>
+
+<p>Adds validators.</p>
+
+<h2>Examples</h2>
+
+<pre><code>function validator () { ... }
+
+var single = [validator, 'failed']
+new Schema({ name: { type: String, validate: single }});
+
+var many = [
+    { validator: validator, msg: 'uh oh' }
+  , { validator: fn, msg: 'failed' }
+]
+new Schema({ name: { type: String, validate: many }});
+</code></pre><pre><code class="javascript">SchemaType.prototype.validate = function (obj, error) {
+  if ('function' == typeof obj || obj &amp;&amp; 'RegExp' === obj.constructor.name) {
+    this.validators.push([obj, error]);
+    return this;
+  }
+
+  var i = arguments.length
+    , arg
+
+  while (i--) {
+    arg = arguments[i];
+    this.validators.push([arg.validator, arg.msg]);
+  }
+
+  return this;
+};
+</code></pre><p>Adds a required validator</p><pre><code class="javascript">SchemaType.prototype.required = function (required) {
+  var self = this;
+
+  function __checkRequired (v) {
+    // in here, `this` refers to the validating document.
+    // no validation when this path wasn't selected in the query.
+    if ('isSelected' in this &amp;&amp;
+        !this.isSelected(self.path) &amp;&amp;
+        !this.isModified(self.path)) return true;
+    return self.checkRequired(v);
+  }
+
+  if (false === required) {
+    this.isRequired = false;
+    this.validators = this.validators.filter(function (v) {
+      return v[0].name !== '__checkRequired';
+    });
+  } else {
+    this.isRequired = true;
+    this.validators.push([__checkRequired, 'required']);
+  }
+
+  return this;
+};
+</code></pre><h2>select</h2>
+
+<p>Set default select() behavior for this path. True if<br />this path should always be included in the results,<br />false if it should be excluded by default. This setting<br />can be overridden at the query level.</p>
+
+<pre><code>T = db.model('T', new Schema({ x: { type: String, select: true }}));
+T.find(..); // x will always be selected ..
+// .. unless overridden;
+T.find().select({ x: 0 }).exec();
+</code></pre><pre><code class="javascript">SchemaType.prototype.select = function select (val) {
+  this.selected = !! val;
+}
+</code></pre><p>Determines if value is a valid Reference.</p><pre><code class="javascript">SchemaType._isRef = function (self, value, init) {
+  if (init &amp;&amp; self.options &amp;&amp; self.options.ref) {
+    if (null == value) return true;
+    if (value._id &amp;&amp; value._id.constructor.name === self.instance) return true;
+  }
+
+  return false;
+}
+</code></pre><p>Inherits from MongooseError</p><pre><code class="javascript">ValidatorError.prototype.__proto__ = MongooseError.prototype;
+</code></pre><p>Inherits from MongooseError.</p><pre><code class="javascript">CastError.prototype.__proto__ = MongooseError.prototype;
+</code></pre><p>Module exports.</p><pre><code class="javascript">module.exports = exports = SchemaType;
+
+exports.CastError = CastError;
+
+exports.ValidatorError = ValidatorError;
+</code></pre></li><li><a href="/docs/index.html">lib/statemachine.js</a><p>StateMachine.ctor('state1', 'state2', ...)<br />A factory method for subclassing StateMachine.<br />The arguments are a list of states. For each state,<br />the constructor's prototype gets state transition<br />methods named after each state. These transition methods<br />place their path argument into the given state.</p><pre><code class="javascript">StateMachine.ctor = function () {
+  var states = utils.args(arguments);
+
+  var ctor = function () {
+    StateMachine.apply(this, arguments);
+    this.stateNames = states;
+
+    var i = states.length
+      , state;
+
+    while (i--) {
+      state = states[i];
+      this.states[state] = {};
+    }
+  };
+
+  ctor.prototype.__proto__ = StateMachine.prototype;
+
+  states.forEach(function (state) {
+    // Changes the `path`'s state to `state`.
+    ctor.prototype[state] = function (path) {
+      this._changeState(path, state);
+    }
+  });
+
+  return ctor;
+};
+</code></pre><p>Checks to see if at least one path is in the states passed in via <code>arguments</code><br />e.g., this.some('required', 'inited')</p><pre><code class="javascript">StateMachine.prototype.some = function some () {
+  var self = this;
+  var what = arguments.length ? arguments : this.stateNames;
+  return Array.prototype.some.call(what, function (state) {
+    return Object.keys(self.states[state]).length;
+  });
+}
+</code></pre><p>Iterates over the paths that belong to one of the parameter states.</p>
+
+<h2>The function profile can look like</h2>
+
+<p>this.forEach(state1, fn);         // iterates over all paths in state1<br />this.forEach(state1, state2, fn); // iterates over all paths in state1 or state2<br />this.forEach(fn);                 // iterates over all paths in all states</p><pre><code class="javascript">StateMachine.prototype.forEach = function forEach () {
+  this.forEach = this._iter('forEach');
+  return this.forEach.apply(this, arguments);
+}
+</code></pre><p>Maps over the paths that belong to one of the parameter states.</p>
+
+<h2>The function profile can look like</h2>
+
+<p>this.forEach(state1, fn);         // iterates over all paths in state1<br />this.forEach(state1, state2, fn); // iterates over all paths in state1 or state2<br />this.forEach(fn);                 // iterates over all paths in all states</p><pre><code class="javascript">StateMachine.prototype.map = function map () {
+  this.map = this._iter('map');
+  return this.map.apply(this, arguments);
+}
+</code></pre></li><li><a href="/docs/index.html">lib/types/array.js</a><p>Inherit from Array</p><pre><code class="javascript">MongooseArray.prototype = new Array;
+</code></pre><p>Marks this array as modified.<br />It is called during a nonAtomicPush, an atomic opteration,<br />or by an existing embedded document that is modified.</p>
+
+<p>If it bubbles up from an embedded document change,<br />then it takes the following arguments (otherwise, takes<br />0 arguments)</p><pre><code class="javascript">MongooseArray.prototype._markModified = function (embeddedDoc, embeddedPath) {
+  var parent = this._parent
+    , dirtyPath;
+
+  if (parent) {
+    if (arguments.length) {
+      // If an embedded doc bubbled up the change
+      dirtyPath = [this._path, this.indexOf(embeddedDoc), embeddedPath].join('.');
+    } else {
+      dirtyPath = this._path;
+    }
+    parent.markModified(dirtyPath);
+  }
+
+  return this;
+};
+</code></pre><p>Returns true if we have to perform atomics for this, and no normal<br />operations</p><pre><code class="javascript">MongooseArray.prototype.hasAtomics = function hasAtomics () {
+  if (!(this._atomics &amp;&amp; 'Object' === this._atomics.constructor.name)) {
+    return 0;
+  }
+
+  return Object.keys(this._atomics).length;
+}
+</code></pre><p>Pushes item/s to the array atomically. Overrides Array#push</p><pre><code class="javascript">MongooseArray.prototype.push = function () {
+  var values = [].map.call(arguments, this._cast, this)
+    , ret = [].push.apply(this, values);
+
+  // $pushAll might be fibbed (could be $push). But it makes it easier to
+  // handle what could have been $push, $pushAll combos
+  this._registerAtomic('$pushAll', values);
+  return ret;
+};
+</code></pre><p>Pushes item/s to the array non-atomically</p><pre><code class="javascript">MongooseArray.prototype.nonAtomicPush = function () {
+  var values = [].map.call(arguments, this._cast, this)
+    , ret = [].push.apply(this, values);
+  this._registerAtomic('$set', this);
+  return ret;
+};
+</code></pre><p>Pops the array atomically</p>
+
+<p>Only works once per doc.save(). Calling this mulitple<br />times on an array before saving sends the same command<br />as calling it once. See MongoDB docs.</p><pre><code class="javascript">MongooseArray.prototype.$pop = function () {
+  this._registerAtomic('$pop', 1);
+
+  // only allow popping once
+  if (this._popped) return;
+  this._popped = true;
+
+  return [].pop.call(this);
+};
+</code></pre><p>Non-atomically pops the array.</p>
+
+<p>Note: marks the <em>entire</em> array as modified which<br />will pass the entire thing to $set potentially<br />overwritting any changes that happen between<br />when you retrieved the object and when you save<br />it.</p><pre><code class="javascript">MongooseArray.prototype.pop = function () {
+  var ret = [].pop.call(this);
+  this._registerAtomic('$set', this);
+  return ret;
+};
+</code></pre><p>Atomically shifts the array.</p>
+
+<p>Only works once per doc.save(). Calling this mulitple<br />times on an array before saving sends the same command<br />as calling it once. See MongoDB docs.</p><pre><code class="javascript">MongooseArray.prototype.$shift = function $shift () {
+  this._registerAtomic('$pop', -1);
+
+  // only allow shifting once
+  if (this._shifted) return;
+  this._shifted = true;
+
+  return [].shift.call(this);
+};
+</code></pre><p>shift</p>
+
+<p>Non-atomically shifts the array.</p>
+
+<p>Note: marks the <em>entire</em> array as modified which<br />will pass the entire thing to $set potentially<br />overwritting any changes that happen between<br />when you retrieved the object and when you save<br />it.</p><pre><code class="javascript">MongooseArray.prototype.shift = function () {
+  var ret = [].shift.call(this);
+  this._registerAtomic('$set', this);
+  return ret;
+};
+</code></pre><p>remove</p>
+
+<p>Removes items from an array atomically</p>
+
+<h2>Examples</h2>
+
+<pre><code>doc.array.remove(ObjectId)
+doc.array.remove('tag 1', 'tag 2')
+</code></pre><pre><code class="javascript">MongooseArray.prototype.remove = function () {
+  var args = [].map.call(arguments, this._cast, this);
+  if (args.length == 1)
+    this.pull(args[0]);
+  else
+    this.pull.apply(this, args);
+  return args;
+};
+</code></pre><p>Pulls from the array</p><pre><code class="javascript">MongooseArray.prototype.pull = function () {
+  var values = [].map.call(arguments, this._cast, this)
+    , cur = this._parent.get(this._path)
+    , i = cur.length
+    , mem;
+
+  while (i--) {
+    mem = cur[i];
+    if (mem instanceof EmbeddedDocument) {
+      if (values.some(function (v) { return v.equals(mem); } )) {
+        [].splice.call(cur, i, 1);
+      }
+    } else if (~cur.indexOf.call(values, mem)) {
+      [].splice.call(cur, i, 1);
+    }
+  }
+
+  if (values[0] instanceof EmbeddedDocument) {
+    this._registerAtomic('$pullDocs', values.map( function (v) { return v._id; } ));
+  } else {
+    this._registerAtomic('$pullAll', values);
+  }
+
+  return this;
+};
+</code></pre><p>Splices the array.</p>
+
+<p>Note: marks the <em>entire</em> array as modified which<br />will pass the entire thing to $set potentially<br />overwritting any changes that happen on the db between<br />when you retrieved the object and when you save<br />it.</p><pre><code class="javascript">MongooseArray.prototype.splice = function () {
+  if (arguments.length) {
+    var ret = [].splice.apply(this, arguments);
+    this._registerAtomic('$set', this);
+  }
+  return ret;
+};
+</code></pre><p>Non-atomically unshifts onto the array.</p>
+
+<p>Note: marks the <em>entire</em> array as modified which<br />will pass the entire thing to $set potentially<br />overwritting any changes that happen between<br />when you retrieved the object and when you save<br />it.</p><pre><code class="javascript">MongooseArray.prototype.unshift = function () {
+  var values = [].map.call(arguments, this._cast, this);
+  [].unshift.apply(this, values);
+  this._registerAtomic('$set', this);
+  return this.length;
+};
+</code></pre><p>sort</p><pre><code class="javascript">MongooseArray.prototype.sort = function () {
+  var ret = [].sort.apply(this, arguments);
+  this._registerAtomic('$set', this);
+  return ret;
+}
+</code></pre><p>Adds values to the array if not already present.</p><pre><code class="javascript">MongooseArray.prototype.addToSet = function addToSet () {
+  var values = [].map.call(arguments, this._cast, this)
+    , added = []
+    , type = values[0] instanceof EmbeddedDocument ? 'doc' :
+             values[0] instanceof Date ? 'date' :
+             '';
+
+  values.forEach(function (v) {
+    var found;
+    switch (type) {
+      case 'doc':
+        found = this.some(function(doc){ return doc.equals(v) });
+        break;
+      case 'date':
+        var val = +v;
+        found = this.some(function(d){ return +d === val });
+        break;
+      default:
+        found = ~this.indexOf(v);
+    }
+
+    if (!found) {
+      [].push.call(this, v);
+      this._registerAtomic('$addToSet', v);
+      [].push.call(added, v);
+    }
+  }, this);
+
+  return added;
+};
+</code></pre><p>Returns an native js Array</p><pre><code class="javascript">MongooseArray.prototype.toObject = function (options) {
+  if (options &amp;&amp; options.depopulate &amp;&amp; this[0] instanceof Document) {
+    return this.map(function (doc) {
+      return doc._id;
+    });
+  }
+
+  // return this.slice()?
+  return this.map(function (doc) {
+    return doc;
+  });
+};
+</code></pre><p>Helper for console.log</p><pre><code class="javascript">MongooseArray.prototype.inspect = function () {
+  return '[' + this.map(function (doc) {
+    return ' ' + doc;
+  }) + ' ]';
+};
+</code></pre><p>Return the index of <code>obj</code> or <code>-1.</code></p><pre><code class="javascript">MongooseArray.prototype.indexOf = function indexOf (obj) {
+  if (obj instanceof ObjectId) obj = obj.toString();
+  for (var i = 0, len = this.length; i &lt; len; ++i) {
+    if (obj == this[i])
+      return i;
+  }
+  return -1;
+};
+</code></pre><p>Module exports.</p><pre><code class="javascript">module.exports = exports = MongooseArray;
+</code></pre></li><li><a href="/docs/index.html">lib/types/buffer.js</a><p>Inherit from Buffer.</p><pre><code class="javascript">MongooseBuffer.prototype = new Buffer(0);
+</code></pre><p>Marks this buffer as modified.</p><pre><code class="javascript">MongooseBuffer.prototype._markModified = function () {
+  var parent = this._parent;
+
+  if (parent) {
+    parent.markModified(this._path);
+  }
+  return this;
+};
+</code></pre><p>Writes the buffer.</p><pre><code class="javascript">MongooseBuffer.prototype.write = function () {
+  var written = Buffer.prototype.write.apply(this, arguments);
+
+  if (written &gt; 0) {
+    this._markModified();
+  }
+
+  return written;
+};
+</code></pre><p>Copy the buffer.</p>
+
+<p>Note: Buffer#copy will not mark target as modified so<br />you must copy from a MongooseBuffer for it to work<br />as expected.</p>
+
+<p>Work around since copy modifies the target, not this.</p><pre><code class="javascript">MongooseBuffer.prototype.copy = function (target) {
+  var ret = Buffer.prototype.copy.apply(this, arguments);
+
+  if (target instanceof MongooseBuffer) {
+    target._markModified();
+  }
+
+  return ret;
+};
+</code></pre><p>Compile other Buffer methods marking this buffer as modified.</p><pre><code class="javascript">;(
+// node &lt; 0.5
+'writeUInt8 writeUInt16 writeUInt32 writeInt8 writeInt16 writeInt32 ' +
+'writeFloat writeDouble fill ' +
+'utf8Write binaryWrite asciiWrite set ' +
+
+// node &gt;= 0.5
+'writeUInt16LE writeUInt16BE writeUInt32LE writeUInt32BE ' +
+'writeInt16LE writeInt16BE writeInt32LE writeInt32BE ' +
+'writeFloatLE writeFloatBE writeDoubleLE writeDoubleBE'
+).split(' ').forEach(function (method) {
+  if (!Buffer.prototype[method]) return;
+  MongooseBuffer.prototype[method] = new Function(
+    'var ret = Buffer.prototype.'+method+'.apply(this, arguments);' +
+    'this._markModified();' +
+    'return ret;'
+  )
+});
+</code></pre><p>Returns a Binary.</p><pre><code class="javascript">MongooseBuffer.prototype.toObject = function (subtype) {
+  subtype = typeof subtype !== 'undefined' ? subtype : 0x00
+  return new Binary(this, subtype);
+};
+</code></pre><p>Module exports.</p><pre><code class="javascript">MongooseBuffer.Binary = Binary;
+
+module.exports = MongooseBuffer;
+</code></pre></li><li><a href="/docs/index.html">lib/types/documentarray.js</a><p>Inherits from MongooseArray</p><pre><code class="javascript">MongooseDocumentArray.prototype.__proto__ = MongooseArray.prototype;
+</code></pre><p>Filters items by id</p><pre><code class="javascript">MongooseDocumentArray.prototype.id = function (id) {
+  var casted
+    , _id;
+
+  try {
+    casted = ObjectId.toString(ObjectIdSchema.prototype.cast.call({}, id));
+  } catch (e) {
+    casted = null;
+  }
+
+  for (var i = 0, l = this.length; i &lt; l; i++) {
+    _id = this[i].get('_id');
+    if (!(_id instanceof ObjectId)) {
+      if (String(id) == _id)
+        return this[i];
+    } else {
+      if (casted == _id)
+        return this[i];
+    }
+  }
+
+  return null;
+};
+</code></pre><p>Returns an Array and converts any Document<br />members toObject.</p><pre><code class="javascript">MongooseDocumentArray.prototype.toObject = function () {
+  return this.map(function (doc) {
+    return doc &amp;&amp; doc.toObject() || null;
+  });
+};
+</code></pre><p>Helper for console.log</p><pre><code class="javascript">MongooseDocumentArray.prototype.inspect = function () {
+  return '[' + this.map(function (doc) {
+    if (doc) {
+      return doc.inspect
+        ? doc.inspect()
+        : util.inspect(doc)
+    }
+    return 'null'
+  }).join('\n') + ']';
+};
+</code></pre><p>create</p>
+
+<p>Creates a subdocument casted to this schema.</p><pre><code class="javascript">MongooseDocumentArray.prototype.create = function (v) {
+  return new this._schema.casterConstructor(v);
+}
+</code></pre><p>Module exports.</p><pre><code class="javascript">module.exports = MongooseDocumentArray;
+</code></pre></li><li><a href="/docs/index.html">lib/types/embedded.js</a><p>Inherit from Document</p><pre><code class="javascript">EmbeddedDocument.prototype.__proto__ = Document.prototype;
+</code></pre><p>Noop. Does not actually save the doc to the db.</p><pre><code class="javascript">EmbeddedDocument.prototype.save = function(fn) {
+  if (fn)
+    fn(null);
+  return this;
+};
+</code></pre><p>Remove the subdocument</p><pre><code class="javascript">EmbeddedDocument.prototype.remove = function (fn) {
+  if (!this.__parentArray) return this;
+
+  var _id;
+  if (!this.willRemove) {
+    _id = this._doc._id;
+    if (!_id) {
+      throw new Error('For your own good, Mongoose does not know ' + 
+                      'how to remove an EmbeddedDocument that has no _id');
+    }
+    this.__parentArray.pull({ _id: _id });
+    this.willRemove = true;
+  }
+
+  if (fn)
+    fn(null);
+
+  return this;
+};
+</code></pre><p>Helper for console.log</p><pre><code class="javascript">EmbeddedDocument.prototype.inspect = function () {
+  return inspect(this.toObject());
+};
+</code></pre><p>Invalidate</p>
+
+<p>Report accurate embedded paths for invalidation.</p><pre><code class="javascript">EmbeddedDocument.prototype.invalidate = function (path, err) {
+  if (!this.__parent) return false;
+  var index = this.__parentArray.indexOf(this);
+  var parentPath = this.__parentArray._path;
+  var fullPath = [parentPath, index, path].join('.');
+  this.__parent.invalidate(fullPath, err);
+  return true;
+}
+</code></pre><p>Module exports.</p><pre><code class="javascript">module.exports = EmbeddedDocument;
+</code></pre></li><li><a href="/docs/index.html">lib/types/index.js</a></li><li><a href="/docs/index.html">lib/types/objectid.js</a></li><li><a href="/docs/index.html">lib/utils.js</a><p>Pluralization rules.</p><pre><code class="javascript">var rules = [
+  [/(m)an$/gi, '$1en'],
+  [/(pe)rson$/gi, '$1ople'],
+  [/(child)$/gi, '$1ren'],
+  [/^(ox)$/gi, '$1en'],
+  [/(ax|test)is$/gi, '$1es'],
+  [/(octop|vir)us$/gi, '$1i'],
+  [/(alias|status)$/gi, '$1es'],
+  [/(bu)s$/gi, '$1ses'],
+  [/(buffal|tomat|potat)o$/gi, '$1oes'],
+  [/([ti])um$/gi, '$1a'],
+  [/sis$/gi, 'ses'],
+  [/(?:([^f])fe|([lr])f)$/gi, '$1$2ves'],
+  [/(hive)$/gi, '$1s'],
+  [/([^aeiouy]|qu)y$/gi, '$1ies'],
+  [/(x|ch|ss|sh)$/gi, '$1es'],
+  [/(matr|vert|ind)ix|ex$/gi, '$1ices'],
+  [/([m|l])ouse$/gi, '$1ice'],
+  [/(quiz)$/gi, '$1zes'],
+  [/s$/gi, 's'],
+  [/$/gi, 's']
+];
+</code></pre><p>Uncountable words.</p><pre><code class="javascript">var uncountables = [
+  'advice',
+  'energy',
+  'excretion',
+  'digestion',
+  'cooperation',
+  'health',
+  'justice',
+  'labour',
+  'machinery',
+  'equipment',
+  'information',
+  'pollution',
+  'sewage',
+  'paper',
+  'money',
+  'species',
+  'series',
+  'rain',
+  'rice',
+  'fish',
+  'sheep',
+  'moose',
+  'deer',
+  'news'
+];
+</code></pre><p>Inherit from EventEmitter.</p><pre><code class="javascript">Events.prototype.__proto__ = EventEmitter.prototype;
+</code></pre><p>Add <code>once</code>.</p><pre><code class="javascript">Events.prototype.once = function (type, listener) {
+    var self = this;
+    self.on(type, function g(){
+      self.removeListener(type, g);
+      listener.apply(this, arguments);
+    });
+  };
+
+}
+
+exports.EventEmitter = Events;
+
+// Modified from node/lib/assert.js
+exports.deepEqual = function deepEqual (a, b) {
+  if (a === b) return true;
+
+  if (a instanceof Date &amp;&amp; b instanceof Date)
+    return a.getTime() === b.getTime();
+
+  if (a instanceof ObjectId &amp;&amp; b instanceof ObjectId) {
+    return a.toString() === b.toString();
+  }
+
+  if (typeof a !== 'object' &amp;&amp; typeof b !== 'object')
+    return a == b;
+
+  if (a === null || b === null || a === undefined || b === undefined)
+    return false
+
+  if (a.prototype !== b.prototype) return false;
+
+  // Handle MongooseNumbers
+  if (a instanceof Number &amp;&amp; b instanceof Number) {
+    return a.valueOf() === b.valueOf();
+  }
+
+  if (Buffer.isBuffer(a)) {
+    if (!Buffer.isBuffer(b)) return false;
+    if (a.length !== b.length) return false;
+    for (var i = 0, len = a.length; i &lt; len; ++i) {
+      if (a[i] !== b[i]) return false;
+    }
+    return true;
+  }
+
+  if (isMongooseObject(a)) a = a.toObject();
+  if (isMongooseObject(b)) b = b.toObject();
+
+  try {
+    var ka = Object.keys(a),
+        kb = Object.keys(b),
+        key, i;
+  } catch (e) {//happens when one is a string literal and the other isn't
+    return false;
+  }
+
+  // having the same number of owned properties (keys incorporates
+  // hasOwnProperty)
+  if (ka.length != kb.length)
+    return false;
+
+  //the same set of keys (although not necessarily the same order),
+  ka.sort();
+  kb.sort();
+
+  //~~~cheap key test
+  for (i = ka.length - 1; i &gt;= 0; i--) {
+    if (ka[i] != kb[i])
+      return false;
+  }
+
+  //equivalent values for every corresponding key, and
+  //~~~possibly expensive deep test
+  for (i = ka.length - 1; i &gt;= 0; i--) {
+    key = ka[i];
+    if (!deepEqual(a[key], b[key])) return false;
+  }
+
+  return true;
+};
+</code></pre><p>Merges <code>from</code> into <code>to</code> without overwriting<br />existing properties of <code>to</code>.</p><pre><code class="javascript">exports.merge = function merge (to, from) {
+  var keys = Object.keys(from)
+    , i = keys.length
+    , key
+
+  while (i--) {
+    key = keys[i];
+    if ('undefined' === typeof to[key]) {
+      to[key] = from[key];
+    } else {
+      merge(to[key], from[key]);
+    }
+  }
+};
+</code></pre><p>A faster Array.prototype.slice.call(arguments) alternative</p><pre><code class="javascript">exports.args = function (args, slice, sliceEnd) {
+  var ret = [];
+  var start = slice || 0;
+  var end = 3 === arguments.length
+    ? sliceEnd
+    : args.length;
+
+  for (var i = start; i &lt; end; ++i) {
+    ret[i - start] = args[i];
+  }
+
+  return ret;
+}
+</code></pre><p>Returns if <code>v</code> is a mongoose object that has<br />a <code>toObject()</code> method we can use. This is for<br />compatibility with libs like Date.js which do<br />foolish things to Natives.</p><pre><code class="javascript">var isMongooseObject = exports.isMongooseObject = function (v) {
+  Document || (Document = require('./document'));
+  MongooseArray || (MongooseArray = require('./types').Array);
+  MongooseBuffer || (MongooseBuffer = require('./types').Buffer);
+
+  return v instanceof Document ||
+         v instanceof MongooseArray ||
+         v instanceof MongooseBuffer
+}
+</code></pre></li><li><a href="/docs/index.html">lib/virtualtype.js</a><p>VirtualType constructor</p>
+
+<p>This is what mongoose uses to define virtual attributes via<br /><code>Schema.prototype.virtual</code></p><pre><code class="javascript">function VirtualType (options) {
+  this.getters = [];
+  this.setters = [];
+  this.options = options || {};
+}
+</code></pre><p>Adds a getter</p><pre><code class="javascript">VirtualType.prototype.get = function (fn) {
+  this.getters.push(fn);
+  return this;
+};
+</code></pre><p>Adds a setter</p><pre><code class="javascript">VirtualType.prototype.set = function (fn) {
+  this.setters.push(fn);
+  return this;
+};
+</code></pre><p>Applies getters</p><pre><code class="javascript">VirtualType.prototype.applyGetters = function (value, scope) {
+  var v = value;
+  for (var l = this.getters.length - 1; l &gt;= 0; l--){
+    v = this.getters[l].call(scope, v);
+  }
+  return v;
+};
+</code></pre><p>Applies setters</p><pre><code class="javascript">VirtualType.prototype.applySetters = function (value, scope) {
+  var v = value;
+  for (var l = this.setters.length - 1; l &gt;= 0; l--){
+    this.setters[l].call(scope, v);
+  }
+  return v;
+};
+
+module.exports = VirtualType;
+</code></pre></li></ul></div></div><script>document.body.className = 'load';</script><script>/*
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-1122274-9']);
+  _gaq.push(['_trackPageview']);
+  
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+  
+  // TODO
+  // get number of groups members?
+*/</script></body></html>

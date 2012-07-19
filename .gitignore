@@ -1,6 +1,7 @@
 lib-cov
-node_modules/
+**.swp
 *.sw*
+node_modules/
 *.orig
 benchmarks/benchmarks
 benchmarks/benchmarks2

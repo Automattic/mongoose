@@ -8,6 +8,9 @@ test:
 home:
 	./node_modules/jade/bin/jade < ./index.jade > ./index.html
 
+newsite:
+	./node_modules/dox/bin/dox < ./lib/collection.js > ./docs/collection.json
+
 site:
 	node website.js && node static.js
 

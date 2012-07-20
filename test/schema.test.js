@@ -1155,11 +1155,11 @@ describe('schema', function(){
         });
       }, /`on` may not be used as a schema pathname/);
 
-      assert.throws(function(){
+      assert.doesNotThrow(function(){
         new Schema({
             model: String
         });
-      }, /`model` may not be used as a schema pathname/);
+      });
 
       assert.throws(function(){
         new Schema({

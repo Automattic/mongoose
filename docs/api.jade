@@ -119,15 +119,19 @@ html(lang='en')
       .module {
         list-style: none;
         padding: 30px 0 30px 30px;
-        border: 10px solid #eee;
+        border-color: #eee;
+        border-width: 9px 10px;
+        border-style: solid;
         background-color: #fff;
-        /*background-color: #f5f5f5;*/
       }
       .module > * {
         max-width: 700px;
       }
       .method, .property {
         margin-bottom: 175px;
+      }
+      .property h3 span {
+        color: #444;
       }
       .sourcecode {
         display: none;
@@ -209,14 +213,11 @@ html(lang='en')
                       | )
                   else
                     h3 MISSING method name
-                  if method.inherits
-                    .inherits
-                      | inherits 
-                      = method.inherits
                   != method.description.summary
-                  span.showcode show code
-                  .sourcecode
-                    != hl(method.code)
+                  if method.code
+                    span.showcode show code
+                    .sourcecode
+                      != hl(method.code)
                   if method.params.length
                     .params
                       h4 Parameters:
@@ -238,27 +239,48 @@ html(lang='en')
                   if method.return
                     .returns
                       h4 Returns:
-                      span.types
-                        |  &lt;
-                        each type in method.return.types
-                          != linktype(type)
-                        | &gt; 
-                      span= method.return.description
+                      ul
+                        li
+                          span.types
+                            |  &lt;
+                            each type in method.return.types
+                              != linktype(type)
+                            | &gt; 
+                          span= method.return.description
+                  if method.inherits
+                    .inherits
+                      h4 Inherits:
+                      ul
+                        li
+                          != method.inherits
                   if method.see.length
                     .see
                       h4 See:
                       ul.see
                         each see in method.see
                           li
-                            a(href=see.url, title=see.title)= see.title
+                            href = see.url || '#' + see.local.replace('#', '-')
+                            a(href=href, title=see.title || see.local)= see.title || see.url || see.local
                   != method.description.body
                 hr(class= method.isPrivate ? 'private' : '')
             each property in item.props
               div.property(class= property.ignore || property.isPrivate ? 'private' : '')
                 construct = property.ctx.constructor
                 h3(id = construct + '-' + property.ctx.name)
-                  = construct + '#' + property.ctx.name
+                  = construct + '#'
+                  span= property.ctx.name
                 != property.description.full
+                if property.return
+                  .returns
+                    h4 Returns:
+                    ul
+                      li
+                        span.types
+                          |  &lt;
+                          each type in property.return.types
+                            != linktype(type)
+                          | &gt; 
+                        span= property.return.description
               hr
     script.
       document.body.className = 'load';

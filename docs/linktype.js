@@ -15,5 +15,5 @@ module.exports= function (type) {
   if (types[type]) {
     return '<a href="' + types[type] + '">' + type + '</a>';
   }
-  return type;
+  return '<a href="#' + type + '">' + type + '</a>';
 }

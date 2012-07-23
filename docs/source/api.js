@@ -26,7 +26,7 @@ function parse (docs) {
 
     var props = [];
     var methods = [];
-    var inherits = null;
+    var constructor = null;
 
     json.forEach(function (comment) {
       if (comment.description)
@@ -46,8 +46,29 @@ function parse (docs) {
           comment.ctx.name = tag.string;
           props.unshift(comment);
           break;
+        case 'method':
+          prop = false;
+          comment.ctx || (comment.ctx = {});
+          comment.ctx.name || (comment.ctx.name = tag.string);
+          comment.ctx.type = 'method';
+          comment.code = '';
+          break;
+        case 'memberOf':
+          prop = false;
+          comment.ctx || (comment.ctx = {});
+          comment.ctx.constructor = tag.parent;
+          break;
         case 'inherits':
-          inherits = tag.string;
+          if (/http/.test(tag.string)) {
+            var result = tag.string.split(' ');
+            var href = result.pop();
+            var title = result.join(' ');
+            comment.inherits = '<a href="'
+                     + href
+                     + '" title="' + title + '">' + title + '</a>';
+          } else {
+            comment.inherits = tag.string;
+          }
           comment.tags.splice(i, 1);
           break;
         case 'param':
@@ -65,13 +86,17 @@ function parse (docs) {
         }
       }
 
-      if (!prop)
-        methods.push(comment);
+      if (!prop) {
+        //if ('function' == comment.ctx.type)
+          //constructor = comment;
+        //else
+          methods.push(comment);
+      }
     });
 
     // add constructor to properties too
     methods.some(function (method) {
-      if (method.ctx && 'method' == method.ctx.type) {
+      if (method.ctx && 'method' == method.ctx.type && method.ctx.hasOwnProperty('constructor')) {
         props.forEach(function (prop) {
           prop.ctx.constructor = method.ctx.constructor;
         });
@@ -84,7 +109,6 @@ function parse (docs) {
         title: title
       , methods: methods
       , props: props
-      , inherits: inherits
     });
   });
 }

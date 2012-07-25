@@ -189,7 +189,12 @@ describe('versioning', function(){
       a.meta.nested[2].title = 'two';
       b.meta.nested[0].title = 'zero';
       b.meta.nested[1].comments[0].title = 'sub one';
-      save(a,b,test10);
+      save(a,b, function (err, _a, _b) {
+        assert.ifError(err);
+        assert.equal(a._doc.__v, 10)
+        assert.equal(b._doc.__v, 10)
+        test10(null, _a, _b);
+      });
     }
 
     function test10 (err, a, b) {

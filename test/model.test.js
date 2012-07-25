@@ -2608,12 +2608,17 @@ describe('model', function(){
 
       b.save(function (err) {
         assert.ifError(err);
+
         b.comments[0].title = 'changed';
-        b.comments[0].remove();
         b.save(function (err) {
           assert.ifError(err);
-          db.close();
-          done();
+
+          b.comments[0].remove();
+          b.save(function (err) {
+            assert.ifError(err);
+            db.close();
+            done();
+          })
         });
       })
     })

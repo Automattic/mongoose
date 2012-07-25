@@ -114,7 +114,20 @@ html(lang='en')
         padding: 0;
       }
       .private {
-        display: none;
+        /*display: none;*/
+      }
+      #docs .private h3:after {
+        content: "private";
+        background: #333;
+        color: #fff;
+        font-size: 11px;
+        line-height: 15px;
+        font-weight: normal;
+        padding: 0 2px;
+        border-radius: 3px;
+        border: 1px solid #333;
+        display: inline-block;
+        margin-left: 5px;
       }
       .module {
         list-style: none;
@@ -127,11 +140,20 @@ html(lang='en')
       .module > * {
         max-width: 700px;
       }
-      .method, .property {
+      .method, .property, .static {
         margin-bottom: 175px;
+      }
+      .method h3 a,
+      .static h3 a,
+      .property h3 a {
+        color: #333;
+        text-decoration: none;
       }
       .property h3 span {
         color: #444;
+      }
+      .description {
+        margin-top: 25px;
       }
       .sourcecode {
         display: none;
@@ -182,28 +204,54 @@ html(lang='en')
             each method in item.methods
               if method.ctx && !method.ignore
                 li(class= method.isPrivate ? 'private' : '')
-                  a(href='#' + method.ctx.constructor + '-' + method.ctx.name)= method.ctx.name
+                  case method.ctx.type
+                    when 'method'
+                      id = method.ctx.constructor + '-' + method.ctx.name
+                    when 'function'
+                      id = method.ctx.name
+                    default
+                      id = ''
+                  url = href(klass(item.title) + '_' + id)
+                  a(href='#' + url)= method.ctx.name
+            each stat in item.statics
+              if stat.ctx && !stat.ignore
+                li
+                  case stat.ctx.type
+                    when 'method'
+                      id = stat.ctx.receiver + '-' + stat.ctx.name
+                    when 'property'
+                      id = stat.ctx.receiver + '-' + stat.ctx.name
+                    when 'function'
+                      id = stat.ctx.name
+                  url = href(klass(item.title) + '_' + id)
+                  a(href='#' + url)= stat.ctx.name
             each property in item.props
               if property.ctx && !property.ignore
                 li
-                  a(href='#' + property.ctx.constructor + '-' + property.ctx.name)= property.ctx.name
+                  construct = property.ctx.receiver || property.ctx.constructor
+                  link = href(construct) + '-' + href(property.ctx.name)
+                  url = href(klass(item.title) + '_' + link)
+                  a(href='#' + url)= property.ctx.name
     #docs
       ul
         each item in docs
           li.module
             a(href=github + package.version + '/' + item.title)= item.title
             each method in item.methods
-              if !method.ignore
-                div.method(class= method.isPrivate ? 'private' : '')
-                  if method.ctx
-                    case method.ctx.type
-                      when 'method'
-                        id = method.ctx.constructor + '-' + method.ctx.name
-                        text = method.ctx.constructor + '#' + method.ctx.name
-                      when 'function'
-                        id = method.ctx.name
-                        text = method.ctx.name
-                    h3(id= id)
+              div.item.method(class= method.isPrivate ? 'private' : '')
+                if method.ctx
+                  case method.ctx.type
+                    when 'method'
+                      id = method.ctx.constructor + '-' + method.ctx.name
+                      text = method.ctx.constructor + '#' + method.ctx.name
+                    when 'function'
+                      id = method.ctx.name
+                      text = method.ctx.name
+                    default
+                      text = ''
+                  url = href(klass(item.title) + '_' + text)
+                  h3(id= url)
+                    a(href= '#' + url)
                       = text
                       | (
                       each tag, i in method.params
@@ -211,64 +259,152 @@ html(lang='en')
                         if i+1 < method.params.length
                           | , 
                       | )
-                  else
-                    h3 MISSING method name
-                  != method.description.summary
-                  if method.code
-                    span.showcode show code
-                    .sourcecode
-                      != hl(method.code)
-                  if method.params.length
-                    .params
-                      h4 Parameters:
-                      ul
-                        each tag in method.params
-                          li
-                            - if (!tag.name)
-                              - console.log(tag)
-                            code= tag.name
-                            if tag.types && tag.types.length
-                              span.types
-                                |  &lt;
-                                each type, i in tag.types
-                                  != linktype(type)
-                                  if i+1 < tag.types.length
-                                    | , 
-                                | &gt; 
-                            span= tag.description
-                  if method.return
-                    .returns
-                      h4 Returns:
-                      ul
+                else
+                  - console.log('\nmissing method name', method);
+                  h3 MISSING method name
+                != method.description.summary
+                if method.code
+                  span.showcode show code
+                  .sourcecode
+                    != hl(method.code)
+                if method.params.length
+                  .params
+                    h4 Parameters:
+                    ul
+                      each tag in method.params
                         li
-                          span.types
-                            |  &lt;
-                            each type in method.return.types
-                              != linktype(type)
-                            | &gt; 
-                          span= method.return.description
-                  if method.inherits
-                    .inherits
-                      h4 Inherits:
-                      ul
+                          - if (!tag.name)
+                            - console.log(tag)
+                          code= tag.name
+                          if tag.types && tag.types.length
+                            span.types
+                              |  &lt;
+                              each type, i in tag.types
+                                != linktype(type)
+                                if i+1 < tag.types.length
+                                  | , 
+                              | &gt; 
+                          span= tag.description
+                if method.return
+                  .returns
+                    h4 Returns:
+                    ul
+                      li
+                        span.types
+                          |  &lt;
+                          each type, i in method.return.types
+                            != linktype(type)
+                            if i+1 < method.return.types.length
+                              | , 
+                          | &gt; 
+                        span= method.return.description
+                if method.inherits
+                  .inherits
+                    h4 Inherits:
+                    ul
+                      li
+                        != method.inherits
+                if method.see.length
+                  .see
+                    h4 See:
+                    ul.see
+                      each see in method.see
                         li
-                          != method.inherits
-                  if method.see.length
-                    .see
-                      h4 See:
-                      ul.see
-                        each see in method.see
-                          li
-                            href = see.url || '#' + see.local.replace('#', '-')
-                            a(href=href, title=see.title || see.local)= see.title || see.url || see.local
+                          url = see.url || see.local
+                          a(href=url, title=see.title || see.local)= see.title || see.url || see.local
+                div.description
                   != method.description.body
-                hr(class= method.isPrivate ? 'private' : '')
+              hr(class= method.isPrivate ? 'private' : '')
+            each stat in item.statics
+              div.item.static(class= stat.isPrivate ? 'private' : '')
+                if stat.ctx
+                  case stat.ctx.type
+                    when 'method'
+                      id = stat.ctx.receiver + '-' + stat.ctx.name
+                      text = stat.ctx.receiver + '.' + stat.ctx.name
+                    when 'property'
+                      id = stat.ctx.receiver + '-' + stat.ctx.name
+                      text = stat.ctx.receiver + '.' + stat.ctx.name
+                    when 'function'
+                      id = stat.ctx.name
+                      text = stat.ctx.name
+                    default
+                      text = ''
+                  url = href(klass(item.title) + '_' + id)
+                  h3(id= url)
+                    a(href= '#' + url)
+                      = text
+                      if 'property' != stat.ctx.type
+                        | (
+                        each tag, i in stat.params
+                          code= tag.name
+                          if i+1 < stat.params.length
+                            | , 
+                        | )
+                else
+                  - console.log('\nmissing static name', stat);
+                  h3 MISSING stat name
+                != stat.description.summary
+                if stat.code
+                  span.showcode show code
+                  .sourcecode
+                    != hl(stat.code)
+                if stat.params.length
+                  .params
+                    h4 Parameters:
+                    ul
+                      each tag in stat.params
+                        li
+                          - if (!tag.name)
+                            - console.log(tag)
+                          code= tag.name
+                          if tag.types && tag.types.length
+                            span.types
+                              |  &lt;
+                              each type, i in tag.types
+                                != linktype(type)
+                                if i+1 < tag.types.length
+                                  | , 
+                              | &gt; 
+                          span= tag.description
+                if stat.return
+                  .returns
+                    h4 Returns:
+                    ul
+                      li
+                        span.types
+                          |  &lt;
+                          each type, i in stat.return.types
+                            != linktype(type)
+                            if i+1 < stat.return.types.length
+                              | , 
+                          | &gt; 
+                        span= stat.return.description
+                if stat.inherits
+                  .inherits
+                    h4 Inherits:
+                    ul
+                      li
+                        != stat.inherits
+                if stat.see.length
+                  .see
+                    h4 See:
+                    ul.see
+                      each see in stat.see
+                        li
+                          url = see.url || see.local
+                          a(href=href, title=see.title || see.local)= see.title || see.url || see.local
+                != stat.description.body
+              hr(class= stat.isPrivate ? 'private' : '')
             each property in item.props
-              div.property(class= property.ignore || property.isPrivate ? 'private' : '')
-                construct = property.ctx.constructor
-                h3(id = construct + '-' + property.ctx.name)
-                  = construct + '#'
-                  span= property.ctx.name
+              div.item.property(class= property.ignore || property.isPrivate ? 'private' : '')
+                construct = property.ctx.receiver || property.ctx.constructor
+                link = href(construct) + '-' + href(property.ctx.name)
+                url = href(klass(item.title) + '_' + link)
+                h3(id = url)
+                  a(href= '#' + url)
+                    = construct + '#'
+                    span= property.ctx.name
                 != property.description.full
                 if property.return
                   .returns
@@ -277,8 +413,10 @@ html(lang='en')
                       li
                         span.types
                           |  &lt;
-                          each type in property.return.types
+                          each type, i in property.return.types
                             != linktype(type)
+                            if i+1 < property.return.types.length
+                              | , 
                           | &gt; 
                         span= property.return.description
               hr
@@ -288,5 +426,5 @@ html(lang='en')
     script(src="/docs/js/zepto.min.js")
     script.
       $(".module").on("click", ".showcode", function (e) {
-        $(this).closest(".method").find(".sourcecode").first().toggle();
+        $(this).closest(".item").find(".sourcecode").first().toggle();
       });

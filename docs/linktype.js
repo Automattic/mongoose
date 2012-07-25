@@ -11,9 +11,39 @@ types.RegExp = 'https://developer.mozilla.org/en/JavaScript/Reference/Global_Obj
 types.Error = 'https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Error'
 types['undefined'] = 'https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/undefined'
 
+// mongoose
+types.ObjectId = '#types_objectid_ObjectId';
+types.MongooseDocumentArray = '#types_documentarray_MongooseDocumentArray';
+types.MongooseArray = '#types_array_MongooseArray';
+types.Binary = 'https://github.com/mongodb/js-bson/blob/master/lib/bson/binary.js';
+types.Query = '#query_Query';
+types.Document = '#document_Document';
+types.EmbeddedDocument = '#types_embedded_EmbeddedDocument';
+types.Document = '#document_Document';
+types.Model = '#model_Model';
+types.Connection = '#connection_Connection';
+types.Collection = '#collection_Collection';
+types.Schema = '#schema_Schema';
+types.Promise = '#promise_Promise';
+types.Mongoose = '#index_Mongoose';
+types.MongooseError = '#error_MongooseError';
+types.Type = '#schematype_SchemaType'; // ?
+types.SchemaType = '#schematype_SchemaType';
+types.SchemaArray = '#schema_array_SchemaArray';
+types.Mixed = '#schema_mixed_Mixed';
+types.VirtualType = '#virtualtype_VirtualType';
+types.MongooseBuffer = '#types_buffer_MongooseBuffer';
+types.Buffer = 'http://nodejs.org/api/buffer.html';
+
 module.exports= function (type) {
   if (types[type]) {
     return '<a href="' + types[type] + '">' + type + '</a>';
   }
   return '<a href="#' + type + '">' + type + '</a>';
+}
+
+module.exports.types = types;
+module.exports.type = function (str) {
+  if (types[str]) return types[str];
+  return str;
 }

@@ -4,6 +4,7 @@
 
 var fs = require('fs');
 var hl = require('highlight.js')
+var link = require('../linktype');
 
 module.exports = { docs: [], github: 'https://github.com/LearnBoost/mongoose/tree/' }
 var out = module.exports.docs;
@@ -26,6 +27,7 @@ function parse (docs) {
 
     var props = [];
     var methods = [];
+    var statics = [];
     var constructor = null;
 
     json.forEach(function (comment) {
@@ -58,6 +60,24 @@ function parse (docs) {
           comment.ctx || (comment.ctx = {});
           comment.ctx.constructor = tag.parent;
           break;
+        case 'static':
+          prop = false;
+          comment.ctx || (comment.ctx = {});
+          comment.ctx.name = tag.string;
+          comment.ctx.type = 'method';
+          break;
+        case 'receiver':
+          prop = false;
+          comment.ctx || (comment.ctx = {});
+          comment.ctx.receiver = tag.string;
+          break;
+        case 'constructor':
+          prop = false;
+          comment.ctx || (comment.ctx = {});
+          comment.ctx.name || (comment.ctx.name = tag.string);
+          comment.ctx.type = 'function';
+          comment.code = '';
+          break;
         case 'inherits':
           if (/http/.test(tag.string)) {
             var result = tag.string.split(' ');
@@ -67,7 +87,7 @@ function parse (docs) {
                      + href
                      + '" title="' + title + '">' + title + '</a>';
           } else {
-            comment.inherits = tag.string;
+            comment.inherits = link(tag.string);
           }
           comment.tags.splice(i, 1);
           break;
@@ -80,6 +100,16 @@ function parse (docs) {
           comment.tags.splice(i, 1);
           break;
         case 'see':
+          if (tag.local) {
+            var parts = tag.local.split(' ');
+            if (1 === parts.length) {
+              tag.url = link.type(parts[0]);
+              tag.title = parts[0];
+            } else {
+              tag.url = parts.pop();
+              tag.title = parts.join(' ');
+            }
+          }
           comment.see.unshift(tag);
           comment.tags.splice(i, 1);
           break;
@@ -94,6 +124,16 @@ function parse (docs) {
       }
     });
 
+    methods = methods.filter(ignored);
+    props = props.filter(ignored);
+
+    function ignored (method) {
+      if (method.ignore) return false;
+      return true;
+    }
+
+    if (0 === methods.length + props.length) return;
+
     // add constructor to properties too
     methods.some(function (method) {
       if (method.ctx && 'method' == method.ctx.type && method.ctx.hasOwnProperty('constructor')) {
@@ -105,10 +145,20 @@ function parse (docs) {
       return false;
     });
 
+    var len = methods.length;
+    while (len--) {
+      method = methods[len];
+      if (method.ctx && method.ctx.receiver) {
+        var stat = methods.splice(len, 1)[0];
+        statics.unshift(stat);
+      }
+    }
+
     out.push({
         title: title
       , methods: methods
       , props: props
+      , statics: statics
     });
   });
 }

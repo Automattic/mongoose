@@ -4,6 +4,8 @@ var jade = require('jade')
 var package = require('./package')
 var hl = require('./docs/highlight')
 var linktype = require('./docs/linktype')
+var href = require('./docs/href')
+var klass = require('./docs/klass')
 
 // add custom jade filters
 require('./docs/filters')(jade);
@@ -29,6 +31,8 @@ function jadeify (filename, options) {
   options.package = package;
   options.hl = hl;
   options.linktype = linktype;
+  options.href = href;
+  options.klass = klass;
   jade.renderFile(filename, options, function (err, str) {
     if (err) return console.error(err.stack);
 

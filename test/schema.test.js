@@ -1128,6 +1128,20 @@ describe('schema', function(){
       assert.ok(m.arr[0]._id);
     });
 
+    it('array of object literal with type.type is interpreted as DocumentArray', function(){
+      var goose = new mongoose.Mongoose;
+      var s = new Schema({
+          arr: [
+            { type: { type: String } }
+          ]
+      });
+      assert.ok(s.path('arr') instanceof SchemaTypes.DocumentArray);
+      var M = goose.model('objectliteralschema2', s);
+      var m = new M({ arr: [ { type: 'works' }] });
+      assert.equal('works', m.arr[0].type);
+      assert.ok(m.arr[0]._id);
+    });
+
     it('of nested schemas should throw (gh-700)', function(){
       var a = new Schema({ title: String })
         , err

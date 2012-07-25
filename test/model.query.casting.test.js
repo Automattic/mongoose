@@ -203,4 +203,19 @@ describe('model query casting', function(){
     });
   });
 
+  it('works when finding Boolean with $in (gh-998)', function (done) {
+    var db = start()
+      , B = db.model(modelName, collection);
+
+    var b = new B({ published: true });
+    b.save(function (err) {
+      assert.ifError(err);
+      B.find({ _id: b._id, boolean: { $in: [null, true] }}, function (err, doc) {
+        assert.ifError(err);
+        assert.ok(doc);
+        assert.equal(doc[0].id, b.id);
+        done();
+      });
+    })
+  })
 });

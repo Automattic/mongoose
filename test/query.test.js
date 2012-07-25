@@ -327,6 +327,7 @@ describe('Query', function(){
         assert.deepEqual(query._conditions, {gps: {$within: {$box: [[5, 25], [10, 30]]}}});
       })
     })
+
     describe('center', function(){
       it('not via where', function(){
         var query = new Query();

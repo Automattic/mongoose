@@ -2608,12 +2608,17 @@ describe('model', function(){
 
       b.save(function (err) {
         assert.ifError(err);
+
         b.comments[0].title = 'changed';
-        b.comments[0].remove();
         b.save(function (err) {
           assert.ifError(err);
-          db.close();
-          done();
+
+          b.comments[0].remove();
+          b.save(function (err) {
+            assert.ifError(err);
+            db.close();
+            done();
+          })
         });
       })
     })
@@ -4087,5 +4092,21 @@ describe('model', function(){
         });
       });
     });
+  })
+
+  describe('unsetting a default value', function(){
+    it('should be ignored (gh-758)', function(done){
+      var db = start();
+      var M = db.model('758', new Schema({ s: String, n: Number, a: Array }));
+      M.collection.insert({ }, { safe: true }, function (err) {
+        assert.ifError(err);
+        M.findOne(function (err, m) {
+          assert.ifError(err);
+          m.s = m.n = m.a = undefined;
+          assert.equal(undefined, m._delta());
+          done();
+        });
+      });
+    })
   })
 });

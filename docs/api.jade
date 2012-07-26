@@ -53,6 +53,7 @@ html(lang='en')
         padding: 1.2em;
         overflow-x: auto;
       }
+      h3 { padding-top: 35px; }
       h3 code {
         font-weight: normal;
       }
@@ -71,8 +72,9 @@ html(lang='en')
         list-style: square;
       }
       #header {
-        padding-top: 12px;
+        padding-top: 22px;
         padding-bottom: 25px;
+        text-transform: lowercase;
       }
       #header h1 {
         margin-top: 0;
@@ -85,7 +87,7 @@ html(lang='en')
         font-size: 50px;
         font-weight: 100;
         color: #fff;
-        text-shadow: 4px 4px 5px #777, -3px 0px 2px white;
+        text-shadow: 6px 4px 5px #777, -2px 0px 2px white;
         letter-spacing: -7px;
       }
       #links {
@@ -106,6 +108,23 @@ html(lang='en')
         margin: 0 0 30px 230px;
         overflow-x: hidden;
       }
+      #docs .controls {
+        padding: 5px 15px 5px 10px;
+        position: fixed;
+        background: #fff;
+        border: 3px solid #eee;
+        border-radius: 0 0 12px 0;
+        border-width: 0 3px 3px 10px;
+        width: 100%;
+        bottom: 0;
+        opacity: 0.75;
+        -webkit-transition-property: opacity;
+        -webkit-transition-duration: 0.15s;
+        -webkit-transition-timing-function: ease-out;
+      }
+      #docs .controls:hover {
+        opacity: .9;
+      }
       #docs p {
         word-wrap: break-word;
       }
@@ -114,7 +133,22 @@ html(lang='en')
         padding: 0;
       }
       .private {
-        /*display: none;*/
+        display: none;
+      }
+      .doclinks li.private a:before,
+      .doclinks .module.private a:before,
+      .doclinks item.private a:before {
+        content: "p";
+        background: #333;
+        color: #fff;
+        font-size: 11px;
+        line-height: 15px;
+        font-weight: normal;
+        padding: 0 2px;
+        border-radius: 3px;
+        border: 1px solid #333;
+        display: inline-block;
+        margin-right: 5px;
       }
       #docs .private h3:after {
         content: "private";
@@ -140,12 +174,10 @@ html(lang='en')
       .module > * {
         max-width: 700px;
       }
-      .method, .property, .static {
+      .item {
         margin-bottom: 175px;
       }
-      .method h3 a,
-      .static h3 a,
-      .property h3 a {
+      .item h3 a {
         color: #333;
         text-decoration: none;
       }
@@ -173,7 +205,34 @@ html(lang='en')
 
       }
       @media only screen and (max-width: 480px) {
-        #links { display: none; }
+        #forkbanner { display: none }
+        #header .mongoose {
+          font-size: 65px;
+          text-align: center;
+        }
+        #links {
+          position: static;
+          width: auto;
+          border: 0 none;
+          border-right: 0 none;
+          border-bottom: 1px solid #ddd;
+          background: -webkit-gradient(linear, left top, left bottom, from(transparent), color-stop(0.92, transparent), color-stop(0.9201, rgba(172,172,172, 0.0)), to(rgba(172,172,172, 0.4))), transparent;
+          padding: 15px 0;
+        }
+        #links, #links ul, #links li { -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box; }
+        #links ul { padding: 0 10px 0 0; }
+        #links li {
+          list-style: none;
+          display: inline-block;
+          width: 25%;
+          text-align: center;
+        }
+        #links .home, #links .support, #links .fork {
+          display: none;
+        }
+        .doclinks {
+          display: none;
+        }
         #docs { margin-left: 0; }
         .module {
           padding-left: 5px;
@@ -181,61 +240,71 @@ html(lang='en')
         }
       }
   body.api
-    a(href="http://github.com/learnboost/mongoose")
+    a#forkbanner(href="http://github.com/learnboost/mongoose")
       img(style="position: absolute; top: 0; right: 0; border: 0;", src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png", alt="Fork me on GitHub")
     #links
       #header
         h1
-          a(href="https://github.com/learnboost/mongoose", target="blank")
+          a(href="/index.html")
             .mongoose Mongoose
+      ul
+        li.home
+          a(href="/index.html") home
+        li.plugins plugins
+        li.changelog
+          a(href="http://github.com/learnboost/mongoose/tree/master/History.md") change log
+        li.support
+          a(href="/index.html#support") support
+        li.fork
+          a(href="http://github.com/learnboost/mongoose") fork
+        li.guide guide
+        li.contrib
+          a(href="http://github.com/learnboost/mongoose/contributors") contributors
+      hr
       .doclinks
-        ul
-          li plugins
-          li support
-          li home
-          li fork
-          li guide
-          li change log
-          li contributors
-        hr
         each item in docs
-          a.section(href='#' + item.title)= item.title
-          ul
-            each method in item.methods
-              if method.ctx && !method.ignore
-                li(class= method.isPrivate ? 'private' : '')
-                  case method.ctx.type
-                    when 'method'
-                      id = method.ctx.constructor + '-' + method.ctx.name
-                    when 'function'
-                      id = method.ctx.name
-                    default
-                      id = ''
-                  url = href(klass(item.title) + '_' + id)
-                  a(href='#' + url)= method.ctx.name
-            each stat in item.statics
-              if stat.ctx && !stat.ignore
-                li
-                  case stat.ctx.type
-                    when 'method'
-                      id = stat.ctx.receiver + '-' + stat.ctx.name
-                    when 'property'
-                      id = stat.ctx.receiver + '-' + stat.ctx.name
-                    when 'function'
-                      id = stat.ctx.name
-                  url = href(klass(item.title) + '_' + id)
-                  a(href='#' + url)= stat.ctx.name
-            each property in item.props
-              if property.ctx && !property.ignore
-                li
-                  construct = property.ctx.receiver || property.ctx.constructor
-                  link = href(construct) + '-' + href(property.ctx.name)
-                  url = href(klass(item.title) + '_' + link)
-                  a(href='#' + url)= property.ctx.name
+          .file(class=item.hasPublic ? '' : 'private')
+            a.section(href='#' + item.title)= item.title
+            ul
+              each method in item.methods
+                if method.ctx && !method.ignore
+                  li(class= method.isPrivate ? 'private' : '')
+                    case method.ctx.type
+                      when 'method'
+                        id = method.ctx.constructor + '-' + method.ctx.name
+                      when 'function'
+                        id = method.ctx.name
+                      default
+                        id = ''
+                    url = href(klass(item.title) + '_' + id)
+                    a(href='#' + url)= method.ctx.name
+              each stat in item.statics
+                if stat.ctx && !stat.ignore
+                  li
+                    case stat.ctx.type
+                      when 'method'
+                        id = stat.ctx.receiver + '-' + stat.ctx.name
+                      when 'property'
+                        id = stat.ctx.receiver + '-' + stat.ctx.name
+                      when 'function'
+                        id = stat.ctx.name
+                    url = href(klass(item.title) + '_' + id)
+                    a(href='#' + url)= stat.ctx.name
+              each property in item.props
+                if property.ctx && !property.ignore
+                  li
+                    construct = property.ctx.receiver || property.ctx.constructor
+                    link = href(construct) + '-' + href(property.ctx.name)
+                    url = href(klass(item.title) + '_' + link)
+                    a(href='#' + url)= property.ctx.name
     #docs
+      .controls
+        label
+          input(type='checkbox')
+          | private
       ul
         each item in docs
-          li.module
+          li.module(class=item.hasPublic ? '' : 'private')
             a(href=github + package.version + '/' + item.title)= item.title
             each method in item.methods
               div.item.method(class= method.isPrivate ? 'private' : '')
@@ -428,3 +497,6 @@ html(lang='en')
       $(".module").on("click", ".showcode", function (e) {
         $(this).closest(".item").find(".sourcecode").first().toggle();
       });
+      $("#docs .controls input").on("click", function (e) {
+        $(".private").toggle()
+      })

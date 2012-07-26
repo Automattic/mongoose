@@ -154,13 +154,26 @@ function parse (docs) {
       }
     }
 
+
     out.push({
         title: title
       , methods: methods
       , props: props
       , statics: statics
+      , hasPublic: hasPublic(methods, props, statics)
     });
   });
+}
+
+function hasPublic () {
+  for (var i = 0; i < arguments.length; ++i) {
+    var arr = arguments[i];
+    for (var j = 0; j < arr.length; ++j) {
+      var item = arr[j];
+      if (!item.ignore && !item.isPrivate) return true;
+    }
+  }
+  return false;
 }
 
 // add "class='language'" to our <pre><code> elements

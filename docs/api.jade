@@ -103,12 +103,12 @@ html(lang='en')
         border-right: 1px solid #ddd;
         background: -webkit-gradient(linear, left top, right top, from(transparent), color-stop(0.92, transparent), color-stop(0.9201, rgba(172,172,172, 0.0)), to(rgba(172,172,172, 0.4))), transparent;
       }
-      #docs {
+      #content {
         padding: 0;
         margin: 0 0 30px 230px;
         overflow-x: hidden;
       }
-      #docs .controls {
+      #content .controls {
         padding: 5px 15px 5px 10px;
         position: fixed;
         background: #fff;
@@ -122,13 +122,13 @@ html(lang='en')
         -webkit-transition-duration: 0.15s;
         -webkit-transition-timing-function: ease-out;
       }
-      #docs .controls:hover {
+      #content .controls:hover {
         opacity: .9;
       }
-      #docs p {
+      #content p {
         word-wrap: break-word;
       }
-      #docs > ul {
+      #content > ul {
         margin: 0;
         padding: 0;
       }
@@ -150,7 +150,7 @@ html(lang='en')
         display: inline-block;
         margin-right: 5px;
       }
-      #docs .private h3:after {
+      #content .private h3:after {
         content: "private";
         background: #333;
         color: #fff;
@@ -233,7 +233,7 @@ html(lang='en')
         .doclinks {
           display: none;
         }
-        #docs { margin-left: 0; }
+        #content { margin-left: 0; }
         .module {
           padding-left: 5px;
           border-width: 3px;
@@ -245,16 +245,16 @@ html(lang='en')
     #links
       #header
         h1
-          a(href="/index.html")
+          a(href="../index.html")
             .mongoose Mongoose
       ul
         li.home
-          a(href="/index.html") home
+          a(href="../index.html") home
         li.plugins plugins
         li.changelog
           a(href="http://github.com/learnboost/mongoose/tree/master/History.md") change log
         li.support
-          a(href="/index.html#support") support
+          a(href="../index.html#support") support
         li.fork
           a(href="http://github.com/learnboost/mongoose") fork
         li.guide guide
@@ -280,7 +280,7 @@ html(lang='en')
                     a(href='#' + url)= method.ctx.name
               each stat in item.statics
                 if stat.ctx && !stat.ignore
-                  li
+                  li(class= stat.isPrivate ? 'private' : '')
                     case stat.ctx.type
                       when 'method'
                         id = stat.ctx.receiver + '-' + stat.ctx.name
@@ -292,12 +292,12 @@ html(lang='en')
                     a(href='#' + url)= stat.ctx.name
               each property in item.props
                 if property.ctx && !property.ignore
-                  li
+                  li(class= property.isPrivate ? 'private' : '')
                     construct = property.ctx.receiver || property.ctx.constructor
                     link = href(construct) + '-' + href(property.ctx.name)
                     url = href(klass(item.title) + '_' + link)
                     a(href='#' + url)= property.ctx.name
-    #docs
+    #content
       .controls
         label
           input(type='checkbox')
@@ -329,7 +329,7 @@ html(lang='en')
                           | , 
                       | )
                 else
-                  - console.log('\nmissing method name', method);
+                  - // console.log('\nmissing method name', method);
                   h3 MISSING method name
                 != method.description.summary
                 if method.code
@@ -343,7 +343,7 @@ html(lang='en')
                       each tag in method.params
                         li
                           - if (!tag.name)
-                            - console.log(tag)
+                            - // console.log(tag)
                           code= tag.name
                           if tag.types && tag.types.length
                             span.types
@@ -411,7 +411,7 @@ html(lang='en')
                             | , 
                         | )
                 else
-                  - console.log('\nmissing static name', stat);
+                  - // console.log('\nmissing static name', stat);
                   h3 MISSING stat name
                 != stat.description.summary
                 if stat.code
@@ -425,7 +425,7 @@ html(lang='en')
                       each tag in stat.params
                         li
                           - if (!tag.name)
-                            - console.log(tag)
+                            - // console.log(tag)
                           code= tag.name
                           if tag.types && tag.types.length
                             span.types
@@ -462,7 +462,7 @@ html(lang='en')
                       each see in stat.see
                         li
                           url = see.url || see.local
-                          a(href=href, title=see.title || see.local)= see.title || see.url || see.local
+                          a(href=url, title=see.title || see.local)= see.title || see.url || see.local
                 != stat.description.body
               hr(class= stat.isPrivate ? 'private' : '')
             each property in item.props
@@ -497,6 +497,6 @@ html(lang='en')
       $(".module").on("click", ".showcode", function (e) {
         $(this).closest(".item").find(".sourcecode").first().toggle();
       });
-      $("#docs .controls input").on("click", function (e) {
+      $("#content .controls input").on("click", function (e) {
         $(".private").toggle()
       })

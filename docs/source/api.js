@@ -11,6 +11,7 @@ var out = module.exports.docs;
 
 var docs = fs.readFileSync(__dirname + '/_docs', 'utf8');
 parse(docs);
+order(out);
 
 function parse (docs) {
   docs.split(/^### /gm).forEach(function (chunk) {
@@ -197,4 +198,14 @@ function fix (str) {
           + hl.highlight(code[1], code[2]).value.trim()
           + $3;
   });
+}
+
+function order (docs) {
+  // want index first
+  for (var i = 0; i < docs.length; ++i) {
+    if ('lib/index.js' == docs[i].title) {
+      docs.unshift(docs.splice(i, 1)[0]);
+      break;
+    }
+  }
 }

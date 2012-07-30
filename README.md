@@ -299,7 +299,7 @@ The driver being used defaults to [node-mongodb-native](https://github.com/chris
 
 ## Mongoose Plugins
 
-Take a peek at the [plugins page](https://github.com/LearnBoost/mongoose/wiki/Plugins) to see contributions from the community. Add your own!
+Take a peek at the [plugins search site](http://mongooseplugins.herokuapp.com/) to see related modules from the community.
 
 ## Contributing to Mongoose
 

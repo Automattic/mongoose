@@ -27,31 +27,36 @@ describe('model', function(){
           name  : { type: String, index: true }
         , last  : String
         , email : String
+        , date  : Date
       });
 
       Indexed.index({ last: 1, email: 1 }, { unique: true });
+      Indexed.index({ date: 1 }, { expires: 10 });
 
       var db = start()
         , IndexedModel = db.model('IndexedModel', Indexed, 'indexedmodel' + random())
         , assertions = 0;
 
       IndexedModel.on('index', function(){
-        IndexedModel.collection.getIndexes(function(err, indexes){
+        IndexedModel.collection.getIndexes({full:true}, function(err, indexes){
           assert.ifError(err);
 
-          for (var i in indexes) {
-            indexes[i].forEach(function(index){
-              if (index[0] == 'name')
+          indexes.forEach(function (index) {
+            switch (index.name) {
+              case '_id_':
+              case 'name_1':
+              case 'last_1_email_1':
                 assertions++;
-              if (index[0] == 'last')
+                break;
+              case 'date_1':
                 assertions++;
-              if (index[0] == 'email')
-                assertions++;
-            });
-          }
+                assert.equal(index.expiresAfterSeconds, 10);
+                break;
+            }
+          });
 
           db.close();
-          assert.equal(3, assertions);
+          assert.equal(4, assertions);
           done();
         });
       });

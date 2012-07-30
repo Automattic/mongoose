@@ -24,6 +24,8 @@ function parse (docs) {
     if (!title || !(title = title.trim()))
       throw new Error('missing title');
 
+    title = title.replace(/^lib\//, '');
+
     var json = JSON.parse(chunk[2]);
 
     var props = [];
@@ -203,7 +205,7 @@ function fix (str) {
 function order (docs) {
   // want index first
   for (var i = 0; i < docs.length; ++i) {
-    if ('lib/index.js' == docs[i].title) {
+    if ('index.js' == docs[i].title) {
       docs.unshift(docs.splice(i, 1)[0]);
       break;
     }

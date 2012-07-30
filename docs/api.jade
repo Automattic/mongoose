@@ -135,6 +135,9 @@ html(lang='en')
       .private {
         display: none;
       }
+      .section {
+        font-size: 15px;
+      }
       .doclinks li.private a:before,
       .doclinks .module.private a:before,
       .doclinks item.private a:before {
@@ -264,7 +267,7 @@ html(lang='en')
       .doclinks
         each item in docs
           .file(class=item.hasPublic ? '' : 'private')
-            a.section(href='#' + item.title)= item.title
+            .section= item.title
             ul
               each method in item.methods
                 if method.ctx && !method.ignore

@@ -8,7 +8,9 @@ test:
 	@./node_modules/.bin/mocha --reporter list $(TESTFLAGS) $(TESTS)
 	@node test/dropdb.js
 
-docs: $(DOCFILE)
+docs: docclean gendocs
+
+gendocs: $(DOCFILE)
 
 $(DOCFILE): $(DOCS)
 	node website.js
@@ -24,4 +26,4 @@ docclean:
 	rm -f ./docs/*.{1,html,json}
 	rm -f ./docs/source/_docs
 
-.PHONY: test home site test-old docs docclean
+.PHONY: test site docs docclean gendocs

@@ -9,6 +9,7 @@ var start = require('./common')
   , DocumentObjectId = mongoose.Types.ObjectId
   , Schema = mongoose.Schema
   , assert = require('assert')
+  , random = require('../lib/utils').random
 
 var Comment = new Schema({
     text: String
@@ -758,7 +759,7 @@ describe('Query', function(){
     it('count, update, remove works', function(done){
       var db = start();
       var query = new Query();
-      var Product = db.model('Product');
+      var Product = db.model('Product', 'update_products_' + random());
       new Query().bind(Product, 'count').count();
       Product.create({ tags: 12345 }, function (err) {
         assert.ifError(err);

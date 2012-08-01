@@ -258,6 +258,8 @@ html(lang='en')
         li.fork
           a(href="http://github.com/learnboost/mongoose") fork
         li.guide guide
+        li.api
+          a(href="./api.html") api docs
         li.contrib
           a(href="http://github.com/learnboost/mongoose/contributors") contributors
         li.prior
@@ -352,7 +354,7 @@ html(lang='en')
           Kitten.find({ name: /fluff/i }, callback)
         p
           | This performs a case-insensitive search for all documents with a name property containing "fluff" and returns the results to the callback.
-        h3 Congradulations
+        h3 Congratulations
         p
           | That's the end of our quick start. We created a schema, added a custom document method, saved and queried kittens in MongoDB using Mongoose. Head over to the 
           a(href="guide.html") guide

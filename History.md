@@ -1,4 +1,10 @@
 
+2.7.3 / 2012-08-01
+==================
+
+  * fixed; boolean $in queries (#998)
+  * fixed field selection option on subdocs (#1022)
+
 2.7.2 / 2012-07-18
 ==================
 

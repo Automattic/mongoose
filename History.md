@@ -1,4 +1,20 @@
 
+3.0.0rc0 / 2012-08-01
+=====================
+
+  * fixed; allow subdoc literal declarations containing "type" pathname (#993)
+  * fixed; unsetting a default array (#758)
+  * fixed; boolean $in queries (#998)
+  * fixed; allow use of `options` as a pathname (#529)
+  * fixed; `model` is again a permitted schema path name
+  * fixed; field selection option on subdocs (#1022)
+  * fixed; handle another edge case with subdoc saving (#975)
+  * added; emit save err on model if listening
+  * added; MongoDB TTL collection support (#1006)
+  * added; $center options support
+  * added; $nearSphere and $polygon support
+  * updated; driver version to 1.1.2
+
 3.0.0alpha2 / 2012-07-18
 =========================
 

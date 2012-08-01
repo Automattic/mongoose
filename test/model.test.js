@@ -3833,7 +3833,26 @@ describe('model', function(){
         new DefaultErr().save();
       })
 
-      it('should throw error when nothing is listening to db errors', function(done){
+      it('should emit error on its Model when there are listeners', function(done){
+        var db = start();
+
+        var DefaultErrSchema = new Schema({});
+        DefaultErrSchema.pre('save', function (next) {
+          next(new Error);
+        });
+
+        var DefaultErr = db.model('DefaultErr3', DefaultErrSchema, 'default_err_' + random());
+
+        DefaultErr.on('error', function (err) {
+          db.close();
+          assert.ok(err instanceof Error);
+          done();
+        });
+
+        new DefaultErr().save();
+      })
+
+      it('should throw error when nothing is listening to db or Model errors', function(done){
         var db = start({ noErrorListener: 1 });
 
         var DefaultErrSchema = new Schema({});
@@ -3841,7 +3860,7 @@ describe('model', function(){
           try {
             next(new Error);
           } catch (error) {
-            // throws b/c nothing is listening to the error event
+            // throws b/c nothing is listening to the Model or db error event
             db.close();
             assert.ok(error instanceof Error);
             done();

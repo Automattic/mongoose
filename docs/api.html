@@ -1473,61 +1473,73 @@ doc.isDirectModified(<span class="string">'documents'</span>) <span class="comme
 }</code></pre></div><div class="description"></div></div><hr class="private"><div class="item method private"><h3 id="document_Document-_setSchema"><a href="#document_Document-_setSchema">Document#_setSchema(<code>schema</code>)</a></h3><p>Assigns/compiles <code>schema</code> into this documents prototype.</p><span class="showcode">show code</span><div class="sourcecode"><pre><code class="javascript">Document.prototype._setSchema = <span class="function"><span class="keyword">function</span> <span class="params">(schema)</span> {</span>
   compile(schema.tree, <span class="keyword">this</span>);
   <span class="keyword">this</span>.schema = schema;
-}</code></pre></div><div class="params"><h4>Parameters:</h4><ul><li><code>schema</code><span class="types"> &lt;<a href="#schema_Schema">Schema</a>&gt; </span><span></span></li></ul></div><div class="description"></div></div><hr class="private"><div class="item method private"><h3 id="document_Document-_registerHooks"><a href="#document_Document-_registerHooks">Document#_registerHooks()</a></h3><p>Register default hooks</p><span class="showcode">show code</span><div class="sourcecode"><pre><code class="javascript">Document.prototype._registerHooks = <span class="function"><span class="keyword">function</span> <span class="title">_registerHooks</span> <span class="params">()</span> {</span>
-  <span class="keyword">if</span> (!<span class="keyword">this</span>.save) <span class="keyword">return</span>;
+}</code></pre></div><div class="params"><h4>Parameters:</h4><ul><li><code>schema</code><span class="types"> &lt;<a href="#schema_Schema">Schema</a>&gt; </span><span></span></li></ul></div><div class="description"></div></div><hr class="private"><div class="item method private"><h3 id="document_Document-_registerHooks"><a href="#document_Document-_registerHooks">Document#_registerHooks()</a></h3><p>Register default hooks</p><span class="showcode">show code</span><div class="sourcecode"><pre><code class="javascript">Document.prototype._registerHooks = function _registerHooks () {
+  if (!this.save) return;
 
-  DocumentArray || (DocumentArray = require(<span class="string">'./types/documentarray'</span>));
+  DocumentArray || (DocumentArray = require('./types/documentarray'));
 
-  <span class="keyword">this</span>.pre(<span class="string">'save'</span>, <span class="function"><span class="keyword">function</span> <span class="params">(next)</span> {</span>
-    <span class="comment">// we keep the error semaphore to make sure we don't</span>
-    <span class="comment">// call `save` unnecessarily (we only need 1 error)</span>
-    <span class="keyword">var</span> subdocs = <span class="number">0</span>
-      , error = <span class="literal">false</span>
-      , self = <span class="keyword">this</span>;
+  this.pre('save', function (next) {
+    // we keep the error semaphore to make sure we don't
+    // call `save` unnecessarily (we only need 1 error)
+    var subdocs = 0
+      , error = false
+      , self = this;
 
-    <span class="comment">// check for DocumentArrays</span>
-    <span class="keyword">var</span> arrays = <span class="keyword">this</span>._activePaths
-    .map(<span class="string">'init'</span>, <span class="string">'modify'</span>, <span class="function"><span class="keyword">function</span> <span class="params">(i)</span> {</span>
-      <span class="keyword">return</span> self.getValue(i);
+    // check for DocumentArrays
+    var arrays = this._activePaths
+    .map('init', 'modify', function (i) {
+      return self.getValue(i);
     })
-    .filter(<span class="function"><span class="keyword">function</span> <span class="params">(val)</span> {</span>
-      <span class="keyword">return</span> (val &amp;&amp; val <span class="keyword">instanceof</span> DocumentArray &amp;&amp; val.length);
+    .filter(function (val) {
+      return (val &amp;&amp; val instanceof DocumentArray &amp;&amp; val.length);
     });
 
-    <span class="keyword">if</span> (!arrays.length)
-      <span class="keyword">return</span> next();
+    if (!arrays.length)
+      return next();
 
-    arrays.forEach(<span class="function"><span class="keyword">function</span> <span class="params">(array)</span> {</span>
+    arrays.forEach(function (array) {
       subdocs += array.length;
-      array.forEach(<span class="function"><span class="keyword">function</span> <span class="params">(value)</span> {</span>
-        <span class="keyword">if</span> (!error)
-          value.save(<span class="function"><span class="keyword">function</span> <span class="params">(err)</span> {</span>
-            <span class="keyword">if</span> (!error) {
-              <span class="keyword">if</span> (err) {
-                error = <span class="literal">true</span>;
+      array.forEach(function (value) {
+        if (!error)
+          value.save(function (err) {
+            if (!error) {
+              if (err) {
+                error = true;
                 next(err);
-              } <span class="keyword">else</span>
+              } else
                 --subdocs || next();
             }
           });
       });
     });
-  }, <span class="function"><span class="keyword">function</span> <span class="params">(err)</span> {</span>
-    <span class="keyword">this</span>.db.emit(<span class="string">'error'</span>, err);
-  }).pre(<span class="string">'save'</span>, <span class="function"><span class="keyword">function</span> <span class="title">checkForExistingErrors</span> <span class="params">(next)</span> {</span>
-    <span class="comment">// if any doc.set() calls failed</span>
-    <span class="keyword">if</span> (<span class="keyword">this</span>._saveError) {
-      next(<span class="keyword">this</span>._saveError);
-      <span class="keyword">this</span>._saveError = <span class="literal">null</span>;
-    } <span class="keyword">else</span> {
+  }, function (err) {
+    // emit on the Model if listening
+    if (this.constructor.listeners('error').length) {
+      this.constructor.emit('error', err);
+    } else {
+      // emit on the connection
+      if (!this.db.listeners('error').length) {
+        err.stack = 'No listeners detected, throwing. '
+                  + 'Consider adding an error listener to your connection.
+'
+                  + err.stack
+      }
+      this.db.emit('error', err);
+    }
+  }).pre('save', function checkForExistingErrors (next) {
+    // if any doc.set() calls failed
+    if (this._saveError) {
+      next(this._saveError);
+      this._saveError = null;
+    } else {
       next();
     }
-  }).pre(<span class="string">'save'</span>, <span class="function"><span class="keyword">function</span> <span class="title">validation</span> <span class="params">(next)</span> {</span>
-    <span class="keyword">return</span> <span class="keyword">this</span>.validate(next);
+  }).pre('save', function validation (next) {
+    return this.validate(next);
   });
 
-  <span class="comment">// add user defined queues</span>
-  <span class="keyword">this</span>._doQueue();
+  // add user defined queues
+  this._doQueue();
 };</code></pre></div><div class="description"></div></div><hr class="private"><div class="item method private"><h3 id="document_Document-_error"><a href="#document_Document-_error">Document#_error(<code>err</code>)</a></h3><p>Registers an error</p><span class="showcode">show code</span><div class="sourcecode"><pre><code class="javascript">Document.prototype._error = <span class="function"><span class="keyword">function</span> <span class="params">(err)</span> {</span>
   <span class="keyword">this</span>._saveError = err;
   <span class="keyword">return</span> <span class="keyword">this</span>;

@@ -900,34 +900,56 @@ describe('schema', function(){
         Tobi.path('name').unique(false);
         assert.deepEqual(Tobi.path('name')._index, { unique: false });
 
-        var T1 = new Schema({
+        var T, i;
+
+        T = new Schema({
             name: { type: String, sparse: true }
         });
-        assert.deepEqual(T1.path('name')._index, { sparse: true });
+        assert.deepEqual(T.path('name')._index, { sparse: true });
 
-        var T2 = new Schema({
+        T = new Schema({
             name: { type: String, unique: true }
         });
-        assert.deepEqual(T2.path('name')._index, { unique: true });
+        assert.deepEqual(T.path('name')._index, { unique: true });
 
-        var T3 = new Schema({
+        T = new Schema({
+            name: { type: String, expires:  '1.5m' }
+        });
+        assert.deepEqual(T.path('name')._index, { expiresAfterSeconds: 90 });
+
+        T = new Schema({
+            name: { type: String, expires:  200 }
+        });
+        assert.deepEqual(T.path('name')._index, { expiresAfterSeconds: 200 });
+
+        T = new Schema({
             name: { type: String, sparse: true, unique: true }
         });
-        assert.deepEqual(T3.path('name')._index, { sparse: true, unique: true });
+        assert.deepEqual(T.path('name')._index, { sparse: true, unique: true });
 
-        var T4 = new Schema({
+        T = new Schema({
             name: { type: String, unique: true, sparse: true }
         });
-        var i = T4.path('name')._index;
+        i = T.path('name')._index;
         assert.equal(true, i.unique);
         assert.equal(true, i.sparse);
 
-        var T5 = new Schema({
-            name: { type: String, index: { sparse: true, unique: true } }
+        T = new Schema({
+            name: { type: String, index: { sparse: true, unique: true, expiresAfterSeconds: 65 }}
         });
-        var i = T5.path('name')._index;
+        i = T.path('name')._index;
         assert.equal(true, i.unique);
         assert.equal(true, i.sparse);
+        assert.equal(65, i.expiresAfterSeconds);
+
+        T = new Schema({
+            name: { type: String, index: { sparse: true, unique: true, expires: '24h' }}
+        });
+        i = T.path('name')._index;
+        assert.equal(true, i.unique);
+        assert.equal(true, i.sparse);
+        assert.equal(60*60*24, i.expiresAfterSeconds);
+
       })
       it('compound', function(){
         var Tobi = new Schema({
@@ -936,14 +958,14 @@ describe('schema', function(){
           , nope: { type: String, index: { background: false }}
         });
 
-        Tobi.index({ firstname: 1, last: 1 }, { unique: true });
+        Tobi.index({ firstname: 1, last: 1 }, { unique: true, expires: '1h' });
         Tobi.index({ firstname: 1, nope: 1 }, { unique: true, background: false });
 
         assert.deepEqual(Tobi.indexes(), [
             [{ name: 1 }, { background: true }]
           , [{ last: 1 }, { sparse: true, background :true }]
           , [{ nope: 1 }, { background : false}]
-          , [{ firstname: 1, last: 1}, {unique: true, background: true }]
+          , [{ firstname: 1, last: 1}, {unique: true, expiresAfterSeconds: 60*60, background: true }]
           , [{ firstname: 1, nope: 1 }, { unique: true, background: false }]
         ]);
       });
@@ -1128,6 +1150,20 @@ describe('schema', function(){
       assert.ok(m.arr[0]._id);
     });
 
+    it('array of object literal with type.type is interpreted as DocumentArray', function(){
+      var goose = new mongoose.Mongoose;
+      var s = new Schema({
+          arr: [
+            { type: { type: String } }
+          ]
+      });
+      assert.ok(s.path('arr') instanceof SchemaTypes.DocumentArray);
+      var M = goose.model('objectliteralschema2', s);
+      var m = new M({ arr: [ { type: 'works' }] });
+      assert.equal('works', m.arr[0].type);
+      assert.ok(m.arr[0]._id);
+    });
+
     it('of nested schemas should throw (gh-700)', function(){
       var a = new Schema({ title: String })
         , err
@@ -1157,9 +1193,15 @@ describe('schema', function(){
 
       assert.throws(function(){
         new Schema({
+            options: String
+        });
+      }, /`options` may not be used as a schema pathname/);
+
+      assert.doesNotThrow(function(){
+        new Schema({
             model: String
         });
-      }, /`model` may not be used as a schema pathname/);
+      });
 
       assert.throws(function(){
         new Schema({

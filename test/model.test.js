@@ -2608,12 +2608,17 @@ describe('model', function(){
 
       b.save(function (err) {
         assert.ifError(err);
+
         b.comments[0].title = 'changed';
-        b.comments[0].remove();
         b.save(function (err) {
           assert.ifError(err);
-          db.close();
-          done();
+
+          b.comments[0].remove();
+          b.save(function (err) {
+            assert.ifError(err);
+            db.close();
+            done();
+          })
         });
       })
     })
@@ -3828,7 +3833,26 @@ describe('model', function(){
         new DefaultErr().save();
       })
 
-      it('should throw error when nothing is listening to db errors', function(done){
+      it('should emit error on its Model when there are listeners', function(done){
+        var db = start();
+
+        var DefaultErrSchema = new Schema({});
+        DefaultErrSchema.pre('save', function (next) {
+          next(new Error);
+        });
+
+        var DefaultErr = db.model('DefaultErr3', DefaultErrSchema, 'default_err_' + random());
+
+        DefaultErr.on('error', function (err) {
+          db.close();
+          assert.ok(err instanceof Error);
+          done();
+        });
+
+        new DefaultErr().save();
+      })
+
+      it('should throw error when nothing is listening to db or Model errors', function(done){
         var db = start({ noErrorListener: 1 });
 
         var DefaultErrSchema = new Schema({});
@@ -3836,7 +3860,7 @@ describe('model', function(){
           try {
             next(new Error);
           } catch (error) {
-            // throws b/c nothing is listening to the error event
+            // throws b/c nothing is listening to the Model or db error event
             db.close();
             assert.ok(error instanceof Error);
             done();
@@ -4087,5 +4111,21 @@ describe('model', function(){
         });
       });
     });
+  })
+
+  describe('unsetting a default value', function(){
+    it('should be ignored (gh-758)', function(done){
+      var db = start();
+      var M = db.model('758', new Schema({ s: String, n: Number, a: Array }));
+      M.collection.insert({ }, { safe: true }, function (err) {
+        assert.ifError(err);
+        M.findOne(function (err, m) {
+          assert.ifError(err);
+          m.s = m.n = m.a = undefined;
+          assert.equal(undefined, m._delta());
+          done();
+        });
+      });
+    })
   })
 });

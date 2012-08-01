@@ -7,3 +7,6 @@ benchmarks/benchmarks
 benchmarks/benchmarks2
 benchmarks/benchmarks3
 benchmarks/v8.log
+.DS_Store
+docs/*.json
+docs/source/_docs

@@ -270,40 +270,41 @@ html(lang='en')
       hr
       .doclinks
         each item in docs
-          .file(class=item.hasPublic ? '' : 'private')
-            .section= item.title
-            ul
-              each method in item.methods
-                if method.ctx && !method.ignore
-                  li(class= method.isPrivate ? 'private' : '')
-                    case method.ctx.type
-                      when 'method'
-                        id = method.ctx.constructor + '-' + method.ctx.name
-                      when 'function'
-                        id = method.ctx.name
-                      default
-                        id = ''
-                    url = href(klass(item.title) + '_' + id)
-                    a(href='#' + url)= method.ctx.name
-              each stat in item.statics
-                if stat.ctx && !stat.ignore
-                  li(class= stat.isPrivate ? 'private' : '')
-                    case stat.ctx.type
-                      when 'method'
-                        id = stat.ctx.receiver + '-' + stat.ctx.name
-                      when 'property'
-                        id = stat.ctx.receiver + '-' + stat.ctx.name
-                      when 'function'
-                        id = stat.ctx.name
-                    url = href(klass(item.title) + '_' + id)
-                    a(href='#' + url)= stat.ctx.name
-              each property in item.props
-                if property.ctx && !property.ignore
-                  li(class= property.isPrivate ? 'private' : '')
-                    construct = property.ctx.receiver || property.ctx.constructor
-                    link = href(construct) + '-' + href(property.ctx.name)
-                    url = href(klass(item.title) + '_' + link)
-                    a(href='#' + url)= property.ctx.name
+          unless 'intro.js' == item.title
+            .file(class=item.hasPublic ? '' : 'private')
+              .section= item.title
+              ul
+                each method in item.methods
+                  if method.ctx && !method.ignore
+                    li(class= method.isPrivate ? 'private' : '')
+                      case method.ctx.type
+                        when 'method'
+                          id = method.ctx.constructor + '-' + method.ctx.name
+                        when 'function'
+                          id = method.ctx.name
+                        default
+                          id = ''
+                      url = href(klass(item.title) + '_' + id)
+                      a(href='#' + url)= method.ctx.name
+                each stat in item.statics
+                  if stat.ctx && !stat.ignore
+                    li(class= stat.isPrivate ? 'private' : '')
+                      case stat.ctx.type
+                        when 'method'
+                          id = stat.ctx.receiver + '-' + stat.ctx.name
+                        when 'property'
+                          id = stat.ctx.receiver + '-' + stat.ctx.name
+                        when 'function'
+                          id = stat.ctx.name
+                      url = href(klass(item.title) + '_' + id)
+                      a(href='#' + url)= stat.ctx.name
+                each property in item.props
+                  if property.ctx && !property.ignore
+                    li(class= property.isPrivate ? 'private' : '')
+                      construct = property.ctx.receiver || property.ctx.constructor
+                      link = href(construct) + '-' + href(property.ctx.name)
+                      url = href(klass(item.title) + '_' + link)
+                      a(href='#' + url)= property.ctx.name
     #content
       .controls
         label
@@ -312,7 +313,8 @@ html(lang='en')
       ul
         each item in docs
           li.module(class=item.hasPublic ? '' : 'private')
-            a(href=github + package.version + '/' + item.title)= item.title
+            unless 'intro.js' == item.title
+              a(href=github + package.version + '/' + item.title)= item.title
             each method in item.methods
               div.item.method(class= method.isPrivate ? 'private' : '')
                 if method.ctx

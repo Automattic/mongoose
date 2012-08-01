@@ -135,6 +135,11 @@ function parse (docs) {
       return true;
     }
 
+    //if ('intro.js' == title) {
+      //out.push({ title
+    
+    //}
+
     if (0 === methods.length + props.length) return;
 
     // add constructor to properties too
@@ -156,7 +161,6 @@ function parse (docs) {
         statics.unshift(stat);
       }
     }
-
 
     out.push({
         title: title
@@ -205,9 +209,10 @@ function fix (str) {
 function order (docs) {
   // want index first
   for (var i = 0; i < docs.length; ++i) {
-    if ('index.js' == docs[i].title) {
+    if ('intro.js' == docs[i].title)
+      console.error(docs[i]);
+    if ('index.js' == docs[i].title || 'intro.js' == docs[i].title) {
       docs.unshift(docs.splice(i, 1)[0]);
-      break;
     }
   }
 }

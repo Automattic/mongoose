@@ -299,7 +299,7 @@ The driver being used defaults to [node-mongodb-native](https://github.com/chris
 
 ## Mongoose Plugins
 
-Take a peek at the [plugins search site](http://mongooseplugins.herokuapp.com/) to see related modules from the community.
+Take a peek at the [plugins search site](http://plugins.mongoosejs.com/) to see related modules from the community.
 
 ## Contributing to Mongoose
 

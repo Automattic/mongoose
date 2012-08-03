@@ -250,101 +250,143 @@ html(lang='en')
       include includes/nav
     #content
       .module
-        h2 Guide
+        h2 Schemas
         p
-          em
-            | First be sure you have 
-            a(href="http://www.mongodb.org/downloads") MongoDB
-            |  and 
-            a(href="http://nodejs.org/") Nodejs
-            |  installed.
+          | Everything in Mongoose starts with a Schema. If you haven't yet done so, please take a minute to read the 
+          a(href="./index.html") quickstart
+          |  to get an idea of how Mongoose works.
+        h3 Defining your schema
         p
-          | Now say we like fuzzy kittens and want to record every kitten we ever meet in MongoDB.
-          | The first thing we need to do is include mongoose in our project and open a connection.
+          | Each schema maps to a MongoDB collection and defines the shape of the documents within that collection.
         :js
-          var mongoose = require('mongoose')
-            , db = mongoose.createConnection('localhost', 'test');
-        p We have a pending connection object to the test database running on localhost. We now need to get notified if we connect successfully or if a connection error occurs:
-        :js
-          db.on('error', console.error.bind(console, 'connection error:'));
-          db.once('open', function () {
-            // yay!
-          });
-        p Once our connection opens, our callback will be called. For brevity, let's assume that all following code is within this callback.
-        p
-          | With Mongoose, everything is derived from a 
-          a(href="./api.html#schema_Schema") Schema
-          | . Let's get a reference to it and define our kittens.
-        :js
-          var kittySchema = new mongoose.Schema({
-              name: String
+          var blogSchema = new Schema({
+              title:  String
+            , author: String
+            , body:   String
+            , comments: [{ body: String, date: Date }]
+            , date: { type: Date, default: Date.now }
+            , hidden: Boolean
+            , meta: {
+                votes: Number
+              , favs:  Number
+            }
           })
         p
-          | So far so good. We've got a schema with one property, 
-          code name
-          | , which will be a 
-          code String
-          | . The next step is compiling our schema into a 
-          a(href="./api.html#model_Model") model
-          | .
-        :js
-          var Kitten = db.model('Kitten', kittySchema)
+          | Each key in our 
+          code blogSchema
+          |  defines a property in our documents which will be cast to its associated type. Keys may also be assigned nested objects containing further key/type definitions 
+          em (e.g. the `meta` property above).
+          |  For example, we've defined a 
+          code title
+          |  which will be cast to the 
+          a(href="./api.html#schema-string-js") String
+          |  
+          a(href="./api.html#schematype_SchemaType") SchemaType
+          |  and 
+          code date
+          |  which will be cast to a 
+          code Date
+          |  SchemaType.
         p
-          | A model is a class with which we construct documents.
-          | In this case, each document will be a kitten with properties and behaviors as declared in our schema.
-          | Let's create a kitten document representing the little guy we just met on the sidewalk outside:
+          | The permitted SchemaTypes are 
+          ul
+            li String
+            li Number
+            li Date
+            li Buffer
+            li Boolean
+            li Mixed
+            li ObjectId
+            li Array
+          | Read more about them 
+          a(href="./schematypes.html") here
+          | .
+        p
+          | Schemas not only define the structure of your document and casting of properties, they also define document 
+          a(href="#methods") instance methods
+          |, static 
+          a(href="#statics") Model methods
+          |, 
+          a(href="#indexes") compound indexes
+          |  and document lifecycle hooks called 
+          a(href="./middleware.html") middleware
+          |.
+        h3 Pluggable
+        p
+          | Schemas are 
+          a(href="./plugins.html") pluggable
+          |  which allows us to package up reusable features into 
+          a(href="http://plugins.mongoosejs.com") plugins
+          |  that can be shared with the community or just between your projects.
+        h3#methods Instance methods
+        p 
+          | Models are just fancy 
+          code constructor
+          |  functions. As such they can have prototype methods inherited by their instances. In the case of Mongoose, instances are 
+          code documents
+          |.
+        p
+          | Defining an instance method is easy.
         :js
-          var silence = new Kitten({ name: 'Silence' })
-          console.log(silence.name) // 'Silence'
-        p Kittens can meow, so let's take a look at how to add "speak" functionality to our documents:
-        :js
-          kittySchema.methods.speak = function () {
-            var greeting = this.name
-              ? 'Meow name is ' + this.name
-              : 'I don't have a name'
-            console.log(greeting);
+          var animalSchema = new Schema({ name: String, type: String });
+
+          animalSchema.methods.findSimilarTypes = function (cb) {
+            return this.model('Animal').find({ type: this.type }, cb);
           }
 
-          var Kitten = db.model('Kitten', kittySchema)
+          var Animal = mongoose.model('Animal', animalSchema);
         p
-          | Functions added to the 
-          code methods
-          |  property of a schema get compiled into the Model prototype and exposed on each document instance:
+          | Now all of our 
+          code animal
+          |  instances have a 
+          code findSimilarTypes
+          |  method available to it.
         :js
-          var fluffy = new Kitten({ name: 'fluffy' });
-          fluffy.speak() // "Meow name is fluffy"
-        p
-          | We have talking kittens! But we still haven't saved anything to MongoDB.
-          | Each document can be saved to the database by calling its 
-          code save
-          |  method. The first argument to the callback will be an error if any occured.
-        :js
-          fluffy.save(function (err) {
-            if (err) // TODO handle the error
-            console.log('meow')
-          });
-        p
-          | Say time goes by and we want to display all the kittens we've seen.
-          | We can access all of the kitten documents through our Kitten model.
-        :js
-          Kitten.find(function (err, kittens) {
-            if (err) // TODO handle err
-            console.log(kittens)
+          var dog = new Animal({ type: 'dog' })
+          dog.findSimilarTypes(function (err, dogs) {
+            console.log(dogs) // woof
           })
-        p
-          | We just logged all of the kittens in our db to the console.
-          | If we want to filter our kittens by name, Mongoose supports MongoDbs rich querying syntax.
+        h3#statics Statics
+        p 
+          | Adding static constructor methods to Models is simple as well. Continuing with our 
+          code animalSchema
+          |:
         :js
-          Kitten.find({ name: /fluff/i }, callback)
+          animalSchema.statics.findByName = function (name, cb) {
+            this.find({ name: new RegExp(name, 'i'), cb);
+          }
+
+          var Animal = mongoose.model('Animal', animalSchema);
+          Animal.findByName('fido', function (err, animals) {
+            console.log(animals);
+          })
+        h3#indexes Indexes
         p
-          | This performs a case-insensitive search for all documents with a name property containing "fluff" and returns the results to the callback.
-        h3 Congratulations
+          a(href="http://www.mongodb.org/display/DOCS/Indexes") Indexes
+          |  can be defined at the 
+          a(href="./api.html#schematype_SchemaType-index") path level
+          |  or the 
+          code schema
+          |  level. Defining indexes at the schema level is necessary when defining 
+          a(href="http://www.mongodb.org/display/DOCS/Indexes#Indexes-CompoundKeys", target="_blank") compound indexes
+          |.
+        :js
+          animalSchema.index({ name: 1, type: -1 });
         p
-          | That's the end of our quick start. We created a schema, added a custom document method, saved and queried kittens in MongoDB using Mongoose. Head over to the 
-          a(href="guide.html") guide
-          | , 
-          a(href="api.html") api docs
-          | , or read on for more quick start examples.
+          | When your application starts up, Mongoose automatically calls 
+          code ensureIndex
+          |  for each defined index. This behavior can be disabled by setting the 
+          code autoIndex
+          |  option of your schema to false.
+        :js
+          animalSchema.set('autoIndex', false)
+          // or
+          new Schema({..}, { autoIndex: false })
+        p
+          | See also the 
+          a(href="./api.html#model_Model-ensureIndexes")
+            code Model#ensureIndexes
+          |  method.
     script.
       document.body.className = 'load';
     include includes/googleanalytics

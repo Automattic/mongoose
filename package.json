@@ -1,12 +1,12 @@
 {
     "name": "mongoose"
   , "description": "Mongoose MongoDB ODM"
-  , "version": "3.0.0alpha2"
+  , "version": "3.0.0rc0"
   , "author": "Guillermo Rauch <guillermo@learnboost.com>"
   , "keywords": ["mongodb", "mongoose", "orm", "data", "datastore", "nosql", "odm", "sql"]
   , "dependencies": {
         "hooks": "0.2.1"
-      , "mongodb": "1.1.1"
+      , "mongodb": "1.1.2"
       , "ms": "0.1.0"
     }
   , "devDependencies": {

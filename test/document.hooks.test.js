@@ -297,9 +297,23 @@ describe('document: hooks:', function () {
     var s = new S({ name: "test" });
     s.e = [{ text: 'hi' }];
     s.save(function (err) {
-      db.close();
-      assert.ok(!err);
-      done();
+      assert.ifError(err);
+
+      S.findById(s.id, function (err ,s) {
+        assert.ifError(err);
+
+        s.e = [{ text: 'bye' }];
+        s.save(function (err) {
+          assert.ifError(err);
+
+          S.findById(s.id, function (err, s) {
+            db.close();
+            assert.ifError(err);
+            assert.equal('bye', s.e[0].text);
+            done();
+          })
+        })
+      })
     });
   });
 

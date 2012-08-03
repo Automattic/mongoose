@@ -2622,6 +2622,38 @@ describe('model', function(){
         });
       })
     })
+
+    it('updating an embedded document in an embedded array with set call', function(done) {
+      var db = start(),
+        BlogPost = db.model('BlogPost', collection);
+
+      BlogPost.create({
+        comments: [{
+          title: 'before-change'
+        }]
+      }, function(err, post) {
+        assert.ifError(err);
+        BlogPost.findById(post._id, function(err, found) {
+          assert.ifError(err);
+          assert.equal('before-change', found.comments[0].title);
+          var subDoc = [{
+            _id: found.comments[0]._id,
+            title: 'after-change'
+          }];
+          found.set('comments', subDoc);
+
+          found.save(function(err) {
+            assert.ifError(err);
+            BlogPost.findById(found._id, function(err, updated) {
+              db.close();
+              assert.ifError(err);
+              assert.equal('after-change', updated.comments[0].title);
+              done();
+            });
+          });
+        });
+      });
+    });
   });
 
   it('updating an embedded document in an embedded array (gh-255)', function(done){

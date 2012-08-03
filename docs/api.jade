@@ -296,7 +296,7 @@ html(lang='en')
       ul
         each item in docs
           li.module(class=item.hasPublic ? '' : 'private')
-            a(href=github + package.version + '/' + item.title)= item.title
+            a(href=github + package.version + '/' + item.title, id=item.title.replace(/[\.\/#]/g, '-'))= item.title
             each method in item.methods
               div.item.method(class= method.isPrivate ? 'private' : '')
                 if method.ctx

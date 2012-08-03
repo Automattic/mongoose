@@ -1,0 +1,350 @@
+doctype html
+html(lang='en')
+  head
+    meta(charset="utf-8")
+    meta(name="viewport", content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no")
+    title Mongoose Quick Start v#{package.version}
+    link(href='http://fonts.googleapis.com/css?family=Anonymous+Pro:400,700|Droid+Sans+Mono|Open+Sans:400,700|Linden+Hill|Quattrocento:400,700|News+Cycle:400,700|Antic+Slab|Cabin+Condensed:400,700', rel='stylesheet', type='text/css')
+    link(href='/docs/css/default.css', rel='stylesheet', type='text/css')
+    style.
+      body {
+        background: #d8e2d8 url(/docs/images/square_bg.png) fixed;
+        font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        color: #333;
+        -webkit-font-smoothing: antialiased;
+        -webkit-text-size-adjust: 100%;
+        padding: 0;
+        margin: 0;
+        font-size: 14px;
+        line-height: 22px;
+      }
+      a {
+        color: #800;
+        -webkit-transition-property: opacity, -webkit-transform, color, background-color, padding, -webkit-box-shadow;
+        -webkit-transition-duration: 0.15s;
+        -webkit-transition-timing-function: ease-out;
+      }
+      a:hover {
+        opacity: 0.8;
+      }
+      #wrap {
+      }
+      h1 {
+        font-family: 'Helvetica Nueue', Helvetica, Arial, FreeSans, sans-serif;
+        text-rendering: geometricPrecision;
+      }
+      pre {
+        background: rgba(255,255,255,.8);
+        border: 1px solid #bbb;
+        padding:5px;
+        border-radius: 3px;
+        box-shadow: 1px 3px 6px #ddd;
+      }
+      code {
+        background: rgba(255,255,255,.8);
+        color: #333;
+        border-radius: 3px;
+        font-size: 13px;
+        font-family: Monaco;
+        /*text-shadow: 1px 2px 2px #555;*/
+      }
+      pre code {
+        border: 0 none;
+        padding: 1.2em;
+        overflow-x: auto;
+      }
+      h3 { padding-top: 35px; }
+      h3 code {
+        font-weight: normal;
+      }
+      hr {
+        display: none;
+        height: 1px;
+        border: 0 none;
+        padding: 0;
+        margin: 90px 0;
+        background: -webkit-gradient(linear, left top, right top, from(rgba(57, 172, 57, 0.0)), color-stop(0.5, rgba(57, 172, 57, 0.33)), to(rgba(57, 172, 57, 0.0)))
+      }
+      .doclinks hr {
+        margin: 10px 0;
+      }
+      li {
+        list-style: square;
+      }
+      #header {
+        padding-top: 22px;
+        padding-bottom: 25px;
+        text-transform: lowercase;
+      }
+      #header h1 {
+        margin-top: 0;
+        margin-bottom: 0;
+      }
+      #header h1 a {
+        text-decoration: none;
+      }
+      #header .mongoose {
+        font-size: 50px;
+        font-weight: 100;
+        color: #fff;
+        text-shadow: 6px 4px 5px #777, -2px 0px 2px white;
+        letter-spacing: -7px;
+      }
+      #links {
+        position: fixed;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        width: 210px;
+        overflow-x: hidden;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        padding: 15px 0 30px 20px;
+        border-right: 1px solid #ddd;
+        background: -webkit-gradient(linear, left top, right top, from(transparent), color-stop(0.92, transparent), color-stop(0.9201, rgba(172,172,172, 0.0)), to(rgba(172,172,172, 0.4))), transparent;
+      }
+      #content {
+        padding: 0;
+        margin: 0 0 30px 230px;
+        overflow-x: hidden;
+      }
+      #content .controls {
+        padding: 5px 15px 5px 10px;
+        position: fixed;
+        background: #fff;
+        border: 3px solid #eee;
+        border-radius: 0 0 12px 0;
+        border-width: 0 3px 3px 10px;
+        width: 100%;
+        bottom: 0;
+        opacity: 0.75;
+        -webkit-transition-property: opacity;
+        -webkit-transition-duration: 0.15s;
+        -webkit-transition-timing-function: ease-out;
+      }
+      #content .controls:hover {
+        opacity: .9;
+      }
+      #content p {
+        word-wrap: break-word;
+      }
+      #content > ul {
+        margin: 0;
+        padding: 0;
+      }
+      .private {
+        display: none;
+      }
+      .doclinks li.private a:before,
+      .doclinks .module.private a:before,
+      .doclinks item.private a:before {
+        content: "p";
+        background: #333;
+        color: #fff;
+        font-size: 11px;
+        line-height: 15px;
+        font-weight: normal;
+        padding: 0 2px;
+        border-radius: 3px;
+        border: 1px solid #333;
+        display: inline-block;
+        margin-right: 5px;
+      }
+      #content .private h3:after {
+        content: "private";
+        background: #333;
+        color: #fff;
+        font-size: 11px;
+        line-height: 15px;
+        font-weight: normal;
+        padding: 0 2px;
+        border-radius: 3px;
+        border: 1px solid #333;
+        display: inline-block;
+        margin-left: 5px;
+      }
+      .module {
+        list-style: none;
+        padding: 30px 0 30px 30px;
+        border-color: #eee;
+        border-width: 9px 10px;
+        border-style: solid;
+        background-color: #fff;
+      }
+      .module > * {
+        max-width: 700px;
+      }
+      .item {
+        margin-bottom: 175px;
+      }
+      .item h3 a {
+        color: #333;
+        text-decoration: none;
+      }
+      .property h3 span {
+        color: #444;
+      }
+      .description {
+        margin-top: 25px;
+      }
+      .sourcecode {
+        display: none;
+      }
+      .showcode {
+        font-size: 12px;
+        cursor: pointer;
+        display: none;
+      }
+      .load .showcode {
+        display: block;
+      }
+      .types a {
+        text-decoration: none;
+      }
+      @media only screen and (device-width: 768px) {
+
+      }
+      @media only screen and (max-width: 480px) {
+        #forkbanner { display: none }
+        #header .mongoose {
+          font-size: 65px;
+          text-align: center;
+        }
+        #links {
+          position: static;
+          width: auto;
+          border: 0 none;
+          border-right: 0 none;
+          border-bottom: 1px solid #ddd;
+          background: -webkit-gradient(linear, left top, left bottom, from(transparent), color-stop(0.92, transparent), color-stop(0.9201, rgba(172,172,172, 0.0)), to(rgba(172,172,172, 0.4))), transparent;
+          padding: 15px 0;
+        }
+        #links, #links ul, #links li { -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box; }
+        #links ul { padding: 0 10px 0 0; }
+        #links li {
+          list-style: none;
+          display: inline-block;
+          width: 25%;
+          text-align: center;
+        }
+        #links .home, #links .support, #links .fork {
+          display: none;
+        }
+        .doclinks {
+          display: none;
+        }
+        #content { margin-left: 0; }
+        .module {
+          padding-left: 5px;
+          border-width: 3px;
+        }
+      }
+  body.api
+    a#forkbanner(href="http://github.com/learnboost/mongoose")
+      img(style="position: absolute; top: 0; right: 0; border: 0;", src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png", alt="Fork me on GitHub")
+    #links
+      #header
+        h1
+          a(href="../index.html")
+            .mongoose Mongoose
+      include includes/nav
+    #content
+      .module
+        h2 Guide
+        p
+          em
+            | First be sure you have 
+            a(href="http://www.mongodb.org/downloads") MongoDB
+            |  and 
+            a(href="http://nodejs.org/") Nodejs
+            |  installed.
+        p
+          | Now say we like fuzzy kittens and want to record every kitten we ever meet in MongoDB.
+          | The first thing we need to do is include mongoose in our project and open a connection.
+        :js
+          var mongoose = require('mongoose')
+            , db = mongoose.createConnection('localhost', 'test');
+        p We have a pending connection object to the test database running on localhost. We now need to get notified if we connect successfully or if a connection error occurs:
+        :js
+          db.on('error', console.error.bind(console, 'connection error:'));
+          db.once('open', function () {
+            // yay!
+          });
+        p Once our connection opens, our callback will be called. For brevity, let's assume that all following code is within this callback.
+        p
+          | With Mongoose, everything is derived from a 
+          a(href="./api.html#schema_Schema") Schema
+          | . Let's get a reference to it and define our kittens.
+        :js
+          var kittySchema = new mongoose.Schema({
+              name: String
+          })
+        p
+          | So far so good. We've got a schema with one property, 
+          code name
+          | , which will be a 
+          code String
+          | . The next step is compiling our schema into a 
+          a(href="./api.html#model_Model") model
+          | .
+        :js
+          var Kitten = db.model('Kitten', kittySchema)
+        p
+          | A model is a class with which we construct documents.
+          | In this case, each document will be a kitten with properties and behaviors as declared in our schema.
+          | Let's create a kitten document representing the little guy we just met on the sidewalk outside:
+        :js
+          var silence = new Kitten({ name: 'Silence' })
+          console.log(silence.name) // 'Silence'
+        p Kittens can meow, so let's take a look at how to add "speak" functionality to our documents:
+        :js
+          kittySchema.methods.speak = function () {
+            var greeting = this.name
+              ? 'Meow name is ' + this.name
+              : 'I don't have a name'
+            console.log(greeting);
+          }
+
+          var Kitten = db.model('Kitten', kittySchema)
+        p
+          | Functions added to the 
+          code methods
+          |  property of a schema get compiled into the Model prototype and exposed on each document instance:
+        :js
+          var fluffy = new Kitten({ name: 'fluffy' });
+          fluffy.speak() // "Meow name is fluffy"
+        p
+          | We have talking kittens! But we still haven't saved anything to MongoDB.
+          | Each document can be saved to the database by calling its 
+          code save
+          |  method. The first argument to the callback will be an error if any occured.
+        :js
+          fluffy.save(function (err) {
+            if (err) // TODO handle the error
+            console.log('meow')
+          });
+        p
+          | Say time goes by and we want to display all the kittens we've seen.
+          | We can access all of the kitten documents through our Kitten model.
+        :js
+          Kitten.find(function (err, kittens) {
+            if (err) // TODO handle err
+            console.log(kittens)
+          })
+        p
+          | We just logged all of the kittens in our db to the console.
+          | If we want to filter our kittens by name, Mongoose supports MongoDbs rich querying syntax.
+        :js
+          Kitten.find({ name: /fluff/i }, callback)
+        p
+          | This performs a case-insensitive search for all documents with a name property containing "fluff" and returns the results to the callback.
+        h3 Congratulations
+        p
+          | That's the end of our quick start. We created a schema, added a custom document method, saved and queried kittens in MongoDB using Mongoose. Head over to the 
+          a(href="guide.html") guide
+          | , 
+          a(href="api.html") api docs
+          | , or read on for more quick start examples.
+    script.
+      document.body.className = 'load';
+    include includes/googleanalytics

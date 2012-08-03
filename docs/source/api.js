@@ -3,8 +3,8 @@
  */
 
 var fs = require('fs');
+var link = require('../helpers/linktype');
 var hl = require('highlight.js')
-var link = require('../linktype');
 
 module.exports = { docs: [], github: 'https://github.com/LearnBoost/mongoose/tree/' }
 var out = module.exports.docs;

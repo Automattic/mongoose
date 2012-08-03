@@ -2,13 +2,13 @@
 var fs= require('fs')
 var jade = require('jade')
 var package = require('./package')
-var hl = require('./docs/highlight')
-var linktype = require('./docs/linktype')
-var href = require('./docs/href')
-var klass = require('./docs/klass')
+var hl = require('./docs/helpers/highlight')
+var linktype = require('./docs/helpers/linktype')
+var href = require('./docs/helpers/href')
+var klass = require('./docs/helpers/klass')
 
 // add custom jade filters
-require('./docs/filters')(jade);
+require('./docs/helpers/filters')(jade);
 
 var filemap = require('./docs/source');
 var files = Object.keys(filemap);

@@ -10,32 +10,30 @@ ul
     a(href="http://github.com/learnboost/mongoose") fork
   li.guide
     a(href="./guide.html") guide
-  if (locals.guide)
-    ul
-      li
-        a(href="./guide.html") schemas
-      li
-        a(href="./model.html") models
-      li
-        a(href="./document.html") documents
-      li
-        a(href="./query.html") queries
-      li
-        a(href="./indexing.html") indexes
-      li
-        a(href="./plugins.html") plugins
-      li
-        a(href="./middleware.html") middleware
-      li
-        a(href="./methods.html") methods
-      li
-        a(href="./statics.html") statics
-      li
-        a(href="./validation.html") validation
-      li
-        a(href="./populate.html") populate
-      li
-        a(href="./migration.html") migrating from 2.x
+    if (locals.guide)
+      ul
+        li
+          a(href="./guide.html") schemas
+        if (locals.schema)
+          ul
+            li
+              a(href="./schematypes.html") types
+        li
+          a(href="./model.html") models
+        li
+          a(href="./document.html") documents
+        li
+          a(href="./query.html") queries
+        li
+          a(href="./plugins.html") plugins
+        li
+          a(href="./middleware.html") middleware
+        li
+          a(href="./validation.html") validation
+        li
+          a(href="./populate.html") populate
+        li
+          a(href="./migration.html") migrating from 2.x
   li.api
     a(href="./api.html") api docs
   li.quickstart

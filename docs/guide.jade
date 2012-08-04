@@ -20,14 +20,14 @@ html(lang='en')
       .module
         h2 Schemas
         p
-          | Everything in Mongoose starts with a Schema. If you haven't yet done so, please take a minute to read the 
+          | If you haven't yet done so, please take a minute to read the 
           a(href="./index.html") quickstart
           |  to get an idea of how Mongoose works.
         :markdown
           This page covers `Schema` [definition](#definition), [plugins](#plugins), instance [methods](#methods), [statics](#statics), [indexes](#indexes), and `Schema` [options](#options). Let's start with `Schema` definition.
         h3#definition Defining your schema
         p
-          | Each schema maps to a MongoDB collection and defines the shape of the documents within that collection.
+          | Everything in Mongoose starts with a Schema. Each schema maps to a MongoDB collection and defines the shape of the documents within that collection.
         :js
           var blogSchema = new Schema({
               title:  String

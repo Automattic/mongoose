@@ -967,7 +967,8 @@ conn.on(<span class="string">'disconnected'</span>, callback);</code></pre></div
   <span class="keyword">if</span> (fn) fn(<span class="literal">null</span>);
   <span class="keyword">return</span> <span class="keyword">this</span>;
 };</code></pre></div><div class="params"><h4>Parameters:</h4><ul><li><code>doc</code><span class="types"> &lt;<a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Object">Object</a>&gt; </span><span>document returned by mongo</span></li><li><code>fn</code><span class="types"> &lt;<a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Date">Function</a>&gt; </span><span>callback</span></li></ul></div><div class="description"><p>Called internally after a document is returned from mongodb.</p></div></div><hr class="private"><div class="item method private"><h3 id="document_Document-_storeShard"><a href="#document_Document-_storeShard">Document#_storeShard()</a></h3><p>Stores the current values of the shard keys.</p><span class="showcode">show code</span><div class="sourcecode"><pre><code class="javascript">Document.prototype._storeShard = <span class="function"><span class="keyword">function</span> <span class="title">_storeShard</span> <span class="params">()</span> {</span>
-  <span class="keyword">var</span> key = <span class="keyword">this</span>.schema.options.shardkey;
+  <span class="comment">// backwards compat</span>
+  <span class="keyword">var</span> key = <span class="keyword">this</span>.schema.options.shardKey || <span class="keyword">this</span>.schema.options.shardkey;
   <span class="keyword">if</span> (!(key &amp;&amp; <span class="string">'Object'</span> == key.constructor.name)) <span class="keyword">return</span>;
 
   <span class="keyword">var</span> orig = <span class="keyword">this</span>._shardval = {}
@@ -1993,7 +1994,14 @@ doc.isDirectModified(<span class="string">'documents'</span>) <span class="comme
     <span class="keyword">this</span>._reset();
     <span class="keyword">this</span>.emit(<span class="string">'isNew'</span>, <span class="literal">false</span>);
   }
-};</code></pre></div><div class="params"><h4>Parameters:</h4><ul><li><code>[fn]</code><span class="types"> &lt;<a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Date">Function</a>&gt; </span><span>optional callback</span></li></ul></div><div class="see"><h4>See:</h4><ul class="see"><li><a href="Model#registerHooks" title="Model#registerHooks">Model#registerHooks</a></li></ul></div><div class="description"></div></div><hr class=""><div class="item method private"><h3 id="model_Model-_delta"><a href="#model_Model-_delta">Model#_delta()</a></h3><p>Produces a special query document of the modified properties used in updates.</p><span class="showcode">show code</span><div class="sourcecode"><pre><code class="javascript">Model.prototype._delta = <span class="function"><span class="keyword">function</span> <span class="title">_delta</span> <span class="params">()</span> {</span>
+};</code></pre></div><div class="params"><h4>Parameters:</h4><ul><li><code>[fn]</code><span class="types"> &lt;<a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Date">Function</a>&gt; </span><span>optional callback</span></li></ul></div><div class="see"><h4>See:</h4><ul class="see"><li><a href="Model#registerHooks" title="Model#registerHooks">Model#registerHooks</a></li></ul></div><div class="description"><h4>Example:</h4>
+
+<pre><code>product.sold = Date.now();
+product.save(<span class="function"><span class="keyword">function</span> <span class="params">(err, product)</span> {</span>
+  <span class="keyword">if</span> (err) ..
+})</code></pre>
+
+<p>The <code>fn</code> callback is optional. If no <code>fn</code> is passed and validation fails, the validation error will be emitted on the connection used to create this model.<br />However, if you desire more local error handling you can add an <code>error</code> listener to the model and handle errors there instead.</p></div></div><hr class=""><div class="item method private"><h3 id="model_Model-_delta"><a href="#model_Model-_delta">Model#_delta()</a></h3><p>Produces a special query document of the modified properties used in updates.</p><span class="showcode">show code</span><div class="sourcecode"><pre><code class="javascript">Model.prototype._delta = <span class="function"><span class="keyword">function</span> <span class="title">_delta</span> <span class="params">()</span> {</span>
   <span class="keyword">var</span> dirty = <span class="keyword">this</span>._dirty();
   <span class="keyword">if</span> (!dirty.length) <span class="keyword">return</span>;
 
@@ -2084,7 +2092,7 @@ doc.isDirectModified(<span class="string">'documents'</span>) <span class="comme
 
   where._id = <span class="keyword">this</span>._doc._id;
   <span class="keyword">return</span> where;
-}</code></pre></div><div class="description"></div></div><hr class="private"><div class="item method "><h3 id="model_Model-remove"><a href="#model_Model-remove">Model#remove(<code>[fn]</code>)</a></h3><p>Remove the document</p><span class="showcode">show code</span><div class="sourcecode"><pre><code class="javascript">Model.prototype.remove = <span class="function"><span class="keyword">function</span> <span class="title">remove</span> <span class="params">(fn)</span> {</span>
+}</code></pre></div><div class="description"></div></div><hr class="private"><div class="item method "><h3 id="model_Model-remove"><a href="#model_Model-remove">Model#remove(<code>[fn]</code>)</a></h3><p>Removes the document from the db.</p><span class="showcode">show code</span><div class="sourcecode"><pre><code class="javascript">Model.prototype.remove = <span class="function"><span class="keyword">function</span> <span class="title">remove</span> <span class="params">(fn)</span> {</span>
   <span class="keyword">if</span> (<span class="keyword">this</span>._removing) <span class="keyword">return</span> <span class="keyword">this</span>;
 
   <span class="keyword">var</span> promise = <span class="keyword">this</span>._removing = <span class="keyword">new</span> Promise(fn)
@@ -2108,7 +2116,14 @@ doc.isDirectModified(<span class="string">'documents'</span>) <span class="comme
   }));
 
   <span class="keyword">return</span> <span class="keyword">this</span>;
-};</code></pre></div><div class="params"><h4>Parameters:</h4><ul><li><code>[fn]</code><span class="types"> &lt;<a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Date">Function</a>&gt; </span><span>optional callback</span></li></ul></div><div class="description"></div></div><hr class=""><div class="item method private"><h3 id="model_Model-_registerHooks"><a href="#model_Model-_registerHooks">Model#_registerHooks()</a></h3><p>Register hooks override</p><span class="showcode">show code</span><div class="sourcecode"><pre><code class="javascript">Model.prototype._registerHooks = <span class="function"><span class="keyword">function</span> <span class="title">registerHooks</span> <span class="params">()</span> {</span>
+};</code></pre></div><div class="params"><h4>Parameters:</h4><ul><li><code>[fn]</code><span class="types"> &lt;<a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Date">Function</a>&gt; </span><span>optional callback</span></li></ul></div><div class="description"><h4>Example:</h4>
+
+<pre><code>product.remove(<span class="function"><span class="keyword">function</span> <span class="params">(err, product)</span> {</span>
+  <span class="keyword">if</span> (err) <span class="keyword">return</span> handleError(err);
+  Product.findById(product._id, <span class="function"><span class="keyword">function</span> <span class="params">(err, product)</span> {</span>
+    console.log(product) <span class="comment">// null</span>
+  })
+})</code></pre></div></div><hr class=""><div class="item method private"><h3 id="model_Model-_registerHooks"><a href="#model_Model-_registerHooks">Model#_registerHooks()</a></h3><p>Register hooks override</p><span class="showcode">show code</span><div class="sourcecode"><pre><code class="javascript">Model.prototype._registerHooks = <span class="function"><span class="keyword">function</span> <span class="title">registerHooks</span> <span class="params">()</span> {</span>
   Document.prototype._registerHooks.call(<span class="keyword">this</span>);
 };</code></pre></div><div class="description"></div></div><hr class="private"><div class="item method "><h3 id="model_Model-model"><a href="#model_Model-model">Model#model(<code>name</code>)</a></h3><p>Shortcut to access another model.</p><span class="showcode">show code</span><div class="sourcecode"><pre><code class="javascript">Model.prototype.model = <span class="function"><span class="keyword">function</span> <span class="title">model</span> <span class="params">(name)</span> {</span>
   <span class="keyword">return</span> <span class="keyword">this</span>.db.model(name);
@@ -4611,6 +4626,7 @@ m.validate(<span class="function"><span class="keyword">function</span> <span cl
     , versionKey: <span class="string">'__v'</span>
     , minimize: <span class="literal">true</span>
     , autoIndex: <span class="literal">true</span>
+    , shardKey: <span class="literal">null</span>
   }, options);
 
   <span class="comment">// build paths</span>
@@ -4980,6 +4996,8 @@ reserved.collection = <span class="number">1</span>;</code></pre></div><p>Keys i
   return new Types[name](path, obj);
 };</code></pre></div><div class="params"><h4>Parameters:</h4><ul><li><code>path</code><span class="types"> &lt;<a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/String">String</a>&gt; </span><span></span></li><li><code>obj</code><span class="types"> &lt;<a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Object">Object</a>&gt; </span><span>constructor</span></li></ul></div></div><hr class="private"><div class="item static "><h3 id="schema_Schema-Types"><a href="#schema_Schema-Types">Schema.Types</a></h3><p>The various Mongoose Schema Types.</p><span class="showcode">show code</span><div class="sourcecode"><pre><code class="javascript">Schema.Types = require(<span class="string">'./schema/index'</span>);</code></pre></div><h4>Example:</h4>
 
+<h4>Example:</h4>
+
 <pre><code><span class="keyword">var</span> mongoose = require(<span class="string">'mongoose'</span>);
 <span class="keyword">var</span> ObjectId = mongoose.Schema.Types.ObjectId;</code></pre>
 
@@ -4989,7 +5007,6 @@ reserved.collection = <span class="number">1</span>;</code></pre></div><p>Keys i
 <li>String</li>
 <li>Number</li>
 <li>Boolean | Bool</li>
-<li>DocumentArray</li>
 <li>Array</li>
 <li>Buffer</li>
 <li>Date</li>
@@ -5710,10 +5727,7 @@ console.log(added)     <span class="comment">// [5]</span></code></pre></div></d
     <span class="keyword">this</span>.__parentArray._markModified();
   } <span class="keyword">else</span>
     <span class="keyword">this</span>.__parentArray._markModified(<span class="keyword">this</span>, path);
-};
-
-<span class="comment">// TODO remove this</span>
-EmbeddedDocument.prototype.commit = EmbeddedDocument.markModified</code></pre></div><div class="params"><h4>Parameters:</h4><ul><li><code>path</code><span class="types"> &lt;<a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/String">String</a>&gt; </span><span>the path which changed</span></li></ul></div><div class="description"><h4>Example:</h4>
+};</code></pre></div><div class="params"><h4>Parameters:</h4><ul><li><code>path</code><span class="types"> &lt;<a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/String">String</a>&gt; </span><span>the path which changed</span></li></ul></div><div class="description"><h4>Example:</h4>
 
 <pre><code><span class="keyword">var</span> doc = blogpost.comments.id(hexstring);
 doc.mixed.type = <span class="string">'changed'</span>;

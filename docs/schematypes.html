@@ -46,7 +46,7 @@ person.markModified(<span class="string">'anything'</span>);
 person.save(); <span class="comment">// anything will now get saved</span></code></pre><h4>ObjectIds</h4><p>To specify a type of ObjectId, use <code>Schema.Types.ObjectId</code> in your declaration.</p><pre><code class="javascript"><span class="keyword">var</span> mongoose = require(<span class="string">'mongoose'</span>);
 <span class="keyword">var</span> ObjectId = mongoose.Schema.Types.ObjectId;
 <span class="keyword">var</span> Car = <span class="keyword">new</span> Schema({ driver: ObjectId })
-<span class="comment">// or just Schema.ObjectId for backwards compatibility with v2</span></code></pre><h4>Arrays</h4><p>Provide creation of arrays of <a href="./api.html#schema_Schema-Types">SchemaTypes</a> or <a href="./embedded.html">Embedded Documents</a>.</p><pre><code class="javascript"><span class="keyword">var</span> ToySchema = <span class="keyword">new</span> Schema({ name: String });
+<span class="comment">// or just Schema.ObjectId for backwards compatibility with v2</span></code></pre><h4>Arrays</h4><p>Provide creation of arrays of <a href="./api.html#schema_Schema-Types">SchemaTypes</a> or <a href="./subdocs.html">Sub-Documents</a>.</p><pre><code class="javascript"><span class="keyword">var</span> ToySchema = <span class="keyword">new</span> Schema({ name: String });
 <span class="keyword">var</span> ToyBox = <span class="keyword">new</span> Schema({
   toys: [ToySchema],
   buffers: [Buffer],

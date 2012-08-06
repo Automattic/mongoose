@@ -15,6 +15,7 @@
       , "dox": "0.3.1"
       , "jade": "0.26.3"
       , "highlight.js": "7.0.1"
+      , "markdown": "0.3.1"
     }
   , "directories": { "lib": "./lib/mongoose" }
   , "scripts": { "test": "make test" }

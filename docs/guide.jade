@@ -30,29 +30,34 @@ html(lang='en')
           | Everything in Mongoose starts with a Schema. Each schema maps to a MongoDB collection and defines the shape of the documents within that collection.
         :js
           var blogSchema = new Schema({
-              title:  String
-            , author: String
-            , body:   String
-            , comments: [{ body: String, date: Date }]
-            , date: { type: Date, default: Date.now }
-            , hidden: Boolean
-            , meta: {
-                votes: Number
-              , favs:  Number
+            title:  String,
+            author: String,
+            body:   String,
+            comments: [{ body: String, date: Date }],
+            date: { type: Date, default: Date.now },
+            hidden: Boolean,
+            meta: {
+              votes: Number,
+              favs:  Number
             }
           })
         p
+          em
+            | If you want to add additional keys later, use the 
+            a(href="./api.html#schema_Schema-add") Schema#add
+            |  method.
+        p 
           | Each key in our 
           code blogSchema
-          |  defines a property in our documents which will be cast to its associated type. Keys may also be assigned nested objects containing further key/type definitions 
+          |  defines a property in our documents which will be cast to its associated 
+          a(href="./api.html#schematype_SchemaType") SchemaType
+          |. Keys may also be assigned nested objects containing further key/type definitions 
           em (e.g. the `meta` property above).
           |  For example, we've defined a 
           code title
           |  which will be cast to the 
           a(href="./api.html#schema-string-js") String
-          |  
-          a(href="./api.html#schematype_SchemaType") SchemaType
-          |  and 
+          |  SchemaType and 
           code date
           |  which will be cast to a 
           code Date
@@ -81,7 +86,7 @@ html(lang='en')
           |  and document lifecycle hooks called 
           a(href="./middleware.html") middleware
           |.
-        h3#plugins Puggable
+        h3#plugins Pluggable
         p
           | Schemas are 
           a(href="./plugins.html") pluggable
@@ -90,10 +95,11 @@ html(lang='en')
           |  that can be shared with the community or just between your projects.
         h3#methods Instance methods
         p 
-          | Models are just fancy 
+          a(href="./models.html") Models
+          |  are just fancy 
           code constructor
           |  functions. As such they can have prototype methods inherited by their instances. In the case of Mongoose, instances are 
-          code documents
+          a(href="./documents.html") documents
           |.
         p
           | Defining an instance method is easy.
@@ -103,8 +109,6 @@ html(lang='en')
           animalSchema.methods.findSimilarTypes = function (cb) {
             return this.model('Animal').find({ type: this.type }, cb);
           }
-
-          var Animal = mongoose.model('Animal', animalSchema);
         p
           | Now all of our 
           code animal
@@ -112,7 +116,9 @@ html(lang='en')
           code findSimilarTypes
           |  method available to it.
         :js
+          var Animal = mongoose.model('Animal', animalSchema);
           var dog = new Animal({ type: 'dog' })
+
           dog.findSimilarTypes(function (err, dogs) {
             console.log(dogs) // woof
           })

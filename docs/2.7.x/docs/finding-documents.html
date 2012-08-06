@@ -227,7 +227,7 @@
 
 <h3>Retrieving only certain fields</h3>
 
-<pre><code>Model.find({}, ['first', 'last'], function (err, docs) {
+<pre><code>Model.find({}, 'first last', function (err, docs) {
   // docs is an array of partially-`init`d documents
   // defaults are still applied and will be "populated"
 })

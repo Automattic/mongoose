@@ -20,7 +20,7 @@ html(lang='en')
       .module
         h2 SchemaTypes
         p
-          | SchemaTypes handle definition of 
+          | SchemaTypes handle definition of path 
           a(href="./api.html#schematype_SchemaType-default") defaults
           |, 
           a(href="./api.html#schematype_SchemaType-validate") validation
@@ -32,7 +32,7 @@ html(lang='en')
           a(href="./api.html#schematype_SchemaType-select") field selection defaults
           |  for 
           a(href="./api.html#query-js") queries
-          |  and other general path characteristics for 
+          |  and other general characteristics for 
           a(href="./api.html#schema-string-js") Strings
           |  and 
           a(href="./api.html#schema-number-js") Numbers
@@ -53,11 +53,11 @@ html(lang='en')
         h4 Example
         :js
           var schema = new Schema({
-            name: String,
-            age:  Number,
-            updated: Date,
+            name:    String,
             binary:  Buffer,
             living:  Boolean,
+            updated: { type: Date, default: Date.now }
+            age:     { type: Number, min: 18, max: 65 }
             mixed:   Schema.Types.Mixed,
             _someId: Schema.Types.ObjectId,
             array:      [],
@@ -68,14 +68,16 @@ html(lang='en')
             ofBoolean:  [Boolean],
             ofMixed:    [Schema.Types.Mixed],
             ofObjectId: [Schema.Types.ObjectId],
-            nested: { stuff: String }
+            nested: {
+              stuff: { type: String, lowercase: true, trim: true }
+            }
           })
 
           // example use
 
-          var Model = mongoose.model('Model', schema);
+          var Thing = mongoose.model('Thing', schema);
 
-          var m = new Model;
+          var m = new Thing;
           m.name = 'Statue of Liberty'
           m.age = 125;
           m.updated = new Date;

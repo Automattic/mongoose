@@ -73,13 +73,20 @@ html(lang='en')
             if (err) return handleError(err)
             console.log('Success!');
           });
+        :markdown
+          Embedded docs may also be created without adding them to the array by using the [create](./api.html#types_documentarray_MongooseDocumentArray-create) method of MongooseArrays.
+        :js
+          var newdoc = post.children.create({ name: 'Aaron' });
 
         h3 Removing docs
         :markdown
-          Embedded document has it's own [remove](./api.html#types_embedded_EmbeddedDocument-remove) method.
+          Each embedded document has it's own [remove](./api.html#types_embedded_EmbeddedDocument-remove) method.
         :js
           var doc = parent.children.id(id).remove();
-          parent.save(callback);
+          parent.save(function (err) {
+            if (err) return handleError(err);
+            console.log('the embedded doc was removed')
+          });
 
         h4 Alternate syntax
         :markdown

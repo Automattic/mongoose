@@ -185,7 +185,7 @@ describe('mongoose module:', function(){
       return done();
     }
 
-    var mong = new Mongoose();
+    var mong = new Mongoose()
 
     mong.connect(uri, function (err) {
       assert.ifError(err);
@@ -205,10 +205,18 @@ describe('mongoose module:', function(){
           assert.ifError(err);
           assert.equal('aa', doc.test);
           mong.connection.close();
-          done();
+          complete();
         });
       });
     });
+
+    mong.connection.on('fullsetup', complete);
+
+    var pending = 2;
+    function complete () {
+      if (--pending) return;
+      done();
+    }
   });
 
   it('goose.createConnection() to a replica set', function(done){
@@ -236,10 +244,18 @@ describe('mongoose module:', function(){
           assert.ifError(err);
           assert.equal('aa', doc.test);
           conn.close();
-          done();
+          complete();
         });
       });
     });
+
+    conn.on('fullsetup', complete);
+
+    var pending = 2;
+    function complete () {
+      if (--pending) return;
+      done();
+    }
   });
 
   it('public exports', function(){

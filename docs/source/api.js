@@ -5,6 +5,7 @@
 var fs = require('fs');
 var link = require('../helpers/linktype');
 var hl = require('highlight.js')
+var md = require('markdown')
 
 module.exports = { docs: [], github: 'https://github.com/LearnBoost/mongoose/tree/' }
 var out = module.exports.docs;
@@ -116,14 +117,17 @@ function parse (docs) {
           comment.see.unshift(tag);
           comment.tags.splice(i, 1);
           break;
+        case 'event':
+          var str = tag.string.replace(/\\n/g, '\n');
+          tag.string = md.parse(str).replace(/\n/g, '\\n').replace(/'/g, '&#39;');
+          comment.events || (comment.events = []);
+          comment.events.unshift(tag);
+          comment.tags.splice(i, 1);
         }
       }
 
       if (!prop) {
-        //if ('function' == comment.ctx.type)
-          //constructor = comment;
-        //else
-          methods.push(comment);
+        methods.push(comment);
       }
     });
 

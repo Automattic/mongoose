@@ -66,7 +66,10 @@ html(lang='en')
           .select('name occupation')
           .exec(callback);
 
-        h3 Populating references to other documents
+        h3#refs References to other documents
+        :markdown
+          There are no joins in MongoDB but sometimes we still want references to documents in other collections. This is where [query#populate](./api.html#query_Query-populate) comes in. Read more [here](./populate.html).
+
         h3 Streaming
         :markdown
           Queries can be [streamed](http://nodejs.org/api/stream.html) from MongoDB to your application as well. Simply call the query's [stream](./api.html#query_Query-stream) method instead of [exec](./api.html#query_Query-exec) to return an instance of [QueryStream](./api.html#query_Query-stream).

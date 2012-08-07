@@ -1115,15 +1115,35 @@ describe('model', function(){
         assert.ok(err instanceof ValidationError);
         assert.ok(err.errors['items.0.subs.0.required'] instanceof ValidatorError);
         assert.equal(err.errors['items.0.subs.0.required'].message,'Validator "required" failed for path required');
-        assert.ok(err.errors['items.0.required'] instanceof ValidatorError);
-        assert.equal(err.errors['items.0.required'].message,'Validator "required" failed for path required');
+        assert.ok(post.errors['items.0.subs.0.required'] instanceof ValidatorError);
+        assert.equal(post.errors['items.0.subs.0.required'].message,'Validator "required" failed for path required');
 
-        post.get('items')[0].set('required', true);
+        assert.ok(!err.errors['items.0.required']);
+        assert.ok(!err.errors['items.0.required']);
+        assert.ok(!post.errors['items.0.required']);
+        assert.ok(!post.errors['items.0.required']);
+
         post.items[0].subs[0].set('required', true);
+        assert.equal(undefined, post._validationError);
+
         post.save(function(err){
-          db.close();
-          assert.ifError(err);
-          done();
+          assert.ok(err);
+          assert.ok(err.errors);
+          assert.ok(err.errors['items.0.required'] instanceof ValidatorError);
+          assert.equal(err.errors['items.0.required'].message,'Validator "required" failed for path required');
+
+          assert.ok(!err.errors['items.0.subs.0.required']);
+          assert.ok(!err.errors['items.0.subs.0.required']);
+          assert.ok(!post.errors['items.0.subs.0.required']);
+          assert.ok(!post.errors['items.0.subs.0.required']);
+
+          post.get('items')[0].set('required', true);
+          post.save(function(err){
+            db.close();
+            assert.ok(!post.errors);
+            assert.ifError(err);
+            done();
+          });
         });
       });
     });

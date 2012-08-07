@@ -1,4 +1,14 @@
 
+3.0.0 / 2012-08-07
+==================
+
+  * removed; old subdocument#commit method
+  * fixed; setting arrays of matching docs [6924cbc2]
+  * fixed; doc!remove event now emits in save order as save for consistency
+  * fixed; pre-save hooks no longer fire on subdocuments when validation fails
+  * added; subdoc#parent() and subdoc#parentArray() to access subdocument parent objects
+  * added; query#lean() helper
+
 3.0.0rc0 / 2012-08-01
 =====================
 

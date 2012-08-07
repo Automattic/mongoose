@@ -317,4 +317,30 @@ describe('document: hooks:', function () {
     });
   });
 
+  it('pre save hooks on sub-docs should not exec after validation errors', function(done){
+    var db = start();
+    var presave = false;
+
+    var child = new Schema({ text: { type: String, required: true }});
+
+    child.pre('save', function (next) {
+      presave = true;
+      next();
+    });
+
+    var schema = new Schema({
+        name: String
+      , e: [child]
+    });
+
+    var S = db.model('docArrayWithHookedSave', schema);
+    var s = new S({ name: 'hi', e: [{}] });
+    s.save(function (err) {
+      assert.ok(err);
+      assert.ok(err.errors['e.0.text']);
+      assert.equal(false, presave);
+      done();
+    });
+  })
+
 });

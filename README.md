@@ -289,9 +289,10 @@ You can find the [Dox](http://github.com/visionmedia/dox) generated API docs [he
 
 ## Getting support
 
-Please subscribe to the Google Groups [mailing list](http://groups.google.com/group/mongoose-orm).
-
-Join #mongoosejs on freenode.
+- Google Groups [mailing list](http://groups.google.com/group/mongoose-orm)
+- (irc) #mongoosejs on freenode
+- reporting [issues](https://github.com/learnboost/mongoose/issues/)
+- [10gen](http://www.mongodb.org/display/DOCS/Technical+Support)
 
 ## Driver access
 
@@ -305,13 +306,14 @@ Take a peek at the [plugins search site](http://plugins.mongoosejs.com/) to see 
 
 ### Cloning the repository
 
-Make a fork of `mongoose`, then clone it in your computer. The `v2.x` branch contains the current stable release, and the `master` branch the next upcoming major release.
+Make a fork of `mongoose`, then clone it in your computer. The `v3.x` branch is for v3 development, the `v2.x` branch is for v2 development, and the `master` branch the next upcoming major release.
 
 ### Guidelines
 
-- Please write inline documentation for new methods or class members.
-- Please write tests and make sure your tests pass.
-- Before starting to write code, look for existing tickets or create one for your specific issue (unless you're addressing something that's clearly broken). That way you avoid working on something that might not be of interest or that has been addressed already in a different branch.
+- Before starting to write code, look for existing [tickets](https://github.com/learnboost/mongoose/issues) or [create one](https://github.com/learnboost/mongoose/issues/new) for your specific issue. That way you avoid working on something that might not be of interest or that has been addressed already in a different branch.
+- Write inline documentation for new methods or class members.
+- Write tests and make sure they pass.
+- Follow the general coding style of the rest of the project (comma first, etc).
 
 ## Credits
 

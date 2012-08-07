@@ -1873,12 +1873,17 @@ describe('lean option:', function(){
 
     post.save(function (err) {
       assert.ifError(err);
-      BlogPostB.find({title : title}, null, { lean : true }, function(err, docs){
+      BlogPostB.find({title : title}).lean().exec(function(err, docs){
         assert.ifError(err);
         assert.equal(docs.length, 1);
         assert.strictEqual(docs[0] instanceof mongoose.Document, false);
-        db.close();
-        done();
+        BlogPostB.find({title : title}, null, { lean : true }, function(err, docs){
+          assert.ifError(err);
+          assert.equal(docs.length, 1);
+          assert.strictEqual(docs[0] instanceof mongoose.Document, false);
+          db.close();
+          done();
+        });
       });
     });
   });

@@ -235,7 +235,7 @@ describe('cursor stream:', function(){
       , closed = 0
       , err
 
-    var stream = P.find({},null, {lean : true}).stream();
+    var stream = P.find({}).lean().stream();
 
     stream.on('data', function (doc) {
       assert.strictEqual(false, doc instanceof mongoose.Document);

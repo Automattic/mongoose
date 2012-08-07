@@ -13,7 +13,8 @@ var start = require('./common')
   , CastError = SchemaType.CastError
   , ObjectId = Schema.ObjectId
   , MongooseBuffer = mongoose.Types.Buffer
-  , DocumentObjectId = mongoose.Types.ObjectId;
+  , DocumentObjectId = mongoose.Types.ObjectId
+  , PolymorphicSchema = mongoose.PolymorphicSchema;
 
 /**
  * Setup.
@@ -606,6 +607,75 @@ describe('model: querying:', function(){
       });
     });
 
+    it('handles polymorphic querying', function(done) {
+      var db = start()
+        , collection = 'poly_' + random()
+        , polySchema = new PolymorphicSchema({
+          type : { type : PolymorphicSchema.SchemaDeterminant }
+        })
+        , schemaA = new Schema({ thingOne : Number, type : { type : String, default : 'PolyA' } })
+        , schemaB = new Schema({ thingTwo : String, type : { type : String, default : 'PolyB' } });
+
+      polySchema.sub('PolyA', schemaA);
+      polySchema.sub('PolyB', schemaB);
+
+      var poly = db.model('Poly', polySchema, collection)
+        , A = poly.sub('PolyA')
+        , B = poly.sub('PolyB');
+
+      var newA = new A({ thingOne : 3 });
+      var newB = new B({ thingTwo : 'four' });
+
+      var queries = 3;
+      var finish = function(cb) {
+        return function(err, res) {
+          try {
+            assert.strictEqual(null, err, err && err.stack);
+            cb(res);
+          } catch(e) {
+            db.close();
+            throw e;
+          }
+
+          if (!--queries) {
+            db.close();
+            done();
+          }
+        };
+      };
+      function checkA(model) {
+        assert.ok(model instanceof A);
+        assert.strictEqual('PolyA', model.type);
+        assert.strictEqual(3, model.thingOne.valueOf());
+        assert.strictEqual(undefined, model.thingTwo);
+      }
+      function checkB(model) {
+        assert.ok(model instanceof B);
+        assert.strictEqual('PolyB', model.type);
+        assert.strictEqual(undefined, model.thingOne);
+        assert.strictEqual('four', model.thingTwo.valueOf());
+      }
+
+      newA.save(function(err) {
+        assert.ifError(err);
+        newB.save(function(err) {
+          assert.ifError(err);
+
+          poly.find({}, finish(function(models) {
+            assert.strictEqual(2, models.length);
+            var aIsFirst = models[0].thingOne ? true : false;
+            var foundA = models[ aIsFirst ? 0 : 1 ];
+            var foundB = models[ aIsFirst ? 1 : 0 ];
+
+            checkA(foundA);
+            checkB(foundB);
+          }));
+          poly.findOne({ thingOne: 3 }, finish(checkA));
+          poly.findById(newB.get('_id'), finish(checkB));
+
+        });
+      });
+    });
   });
 
   describe('findById', function () {

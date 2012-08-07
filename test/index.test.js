@@ -5,6 +5,7 @@ var url = require('url')
   , mongoose = start.mongoose
   , Mongoose = mongoose.Mongoose
   , Schema = mongoose.Schema
+  , PolymorphicSchema = mongoose.PolymorphicSchema
   , random = require('../lib/utils').random
   , collection = 'blogposts_' + random();
 
@@ -159,6 +160,25 @@ describe('mongoose module:', function(){
       var Numbered = mongoose.model('Numbered', schema, collection);
       var n3 = new Numbered({ number: 1234 });
       assert.equal(1234, n3.number.valueOf());
+    });
+    it('returns the polymorphic model at creation', function() {
+      var NamedSchema = new PolymorphicSchema({
+        _type : PolymorphicSchema.SchemaDeterminant,
+        name: String
+      });
+      NamedSchema.sub('Person', new Schema({
+        title: String
+      }));
+      NamedSchema.sub('Dog', new Schema({
+        breed: String
+      }));
+
+      var Named = mongoose.model('Named', NamedSchema);
+
+      var n1 = new Named();
+      assert.equal(n1.name, null);
+      var n2 = new Named({ name: 'Peter Bjorn' });
+      assert.equal(n2.name, 'Peter Bjorn');
     });
   });
 

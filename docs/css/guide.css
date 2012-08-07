@@ -104,6 +104,9 @@ li {
   border-right: 1px solid #ddd;
   background: -webkit-gradient(linear, left top, right top, from(transparent), color-stop(0.92, transparent), color-stop(0.9201, rgba(172,172,172, 0.0)), to(rgba(172,172,172, 0.4))), transparent;
 }
+#links .schematypes span {
+  display: none;
+}
 #content {
   padding: 0;
   margin: 0 0 0 230px;
@@ -215,6 +218,9 @@ li.guide ul {
     font-size: 65px;
     text-align: center;
   }
+  html, body, #content {
+    height: auto;
+  }
   #links {
     position: static;
     width: auto;
@@ -242,5 +248,37 @@ li.guide ul {
   .module {
     padding-left: 5px;
     border-width: 3px;
+  }
+  #links li.guide {
+    display: block;
+    width: 390px;
+    margin-bottom: 15px;
+  }
+  #links li.guide > a {
+    display: none;
+  }
+  #links li ul li {
+    width: 44%;
+    text-align: left;
+  }
+  #links li ul li ul li {
+    width: 95%;
+  }
+  #links .plugins,
+  #links .changelog {
+    display: none;
+  }
+  #links .schematypes span {
+    display: inline;
+  }
+  #links .double {
+    width: 332px;
+  }
+  #links .double > ul {
+    display: inline;
+    float: right;
+  }
+  #links .double > ul li {
+    width: 155px;
   }
 }

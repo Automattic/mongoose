@@ -13,20 +13,20 @@ ul
     a(href="./guide.html") guide
     if (locals.guide)
       ul
-        li
+        li.double
           a(href="./guide.html") schemas
-        if (locals.schema)
           ul
-            li
-              a(href="./schematypes.html") types
+            li.schematypes
+              a(href="./schematypes.html")
+                span schema
+                | types
+        li.double
+          a(href="./documents.html") documents
+          ul
+            li.subdocs
+              a(href="./subdocs.html") sub docs
         li
           a(href="./models.html") models
-        li
-          a(href="./documents.html") documents
-        if (locals.docs)
-          ul
-            li
-              a(href="./subdocs.html") sub docs
         li
           a(href="./queries.html") queries
         li

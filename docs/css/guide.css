@@ -1,4 +1,10 @@
-
+html, body, #content {
+  height: 100%;
+}
+.module {
+  min-height: 100%;
+  box-sizing: border-box;
+}
 body {
   background: #d8e2d8 url(/docs/images/square_bg.png) fixed;
   font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
@@ -44,6 +50,9 @@ pre code {
   border: 0 none;
   padding: 1.2em;
   overflow-x: auto;
+}
+h2 {
+  margin-top: 0;
 }
 h3 { padding-top: 35px; }
 h3 code {

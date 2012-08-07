@@ -96,7 +96,7 @@ html(lang='en')
           m.save(callback);
 
         h3 Usage notes:
-        h4 Mixed
+        h4#mixed Mixed
         p An "anything goes" SchemaType, its flexibility comes at a trade-off of it being harder to maintain. Mixed is available either through Schema.Types.Mixed or by passing an empty object literal. The following are equivalent:
         :js
           var Any = new Schema({ any: {} });
@@ -109,7 +109,7 @@ html(lang='en')
           person.anything = { x: [3, 4, { y: "changed" }] };
           person.markModified('anything');
           person.save(); // anything will now get saved
-        h4 ObjectIds
+        h4#objectids ObjectIds
         p
           | To specify a type of ObjectId, use 
           code Schema.Types.ObjectId
@@ -119,7 +119,7 @@ html(lang='en')
           var ObjectId = mongoose.Schema.Types.ObjectId;
           var Car = new Schema({ driver: ObjectId })
           // or just Schema.ObjectId for backwards compatibility with v2
-        h4 Arrays
+        h4#arrays Arrays
         p
           | Provide creation of arrays of 
           a(href="./api.html#schema_Schema-Types") SchemaTypes
@@ -146,7 +146,7 @@ html(lang='en')
           var Empty2 = new Schema({ any: Array });
           var Empty3 = new Schema({ any: [Schema.Types.Mixed] });
           var Empty4 = new Schema({ any: [{}] });
-        h3 Creating Custom Types
+        h3#customtypes Creating Custom Types
         p
           | Mongoose can also be extended with custom SchemaTypes. Search the 
           a(href="http://plugins.mongoosejs.com") plugins

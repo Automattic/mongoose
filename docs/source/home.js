@@ -15,4 +15,5 @@ images.forEach(function (line) {
 module.exports = {
     package: package
   , images: imgs
+  , title: 'ODM'
 }

@@ -97,17 +97,12 @@ thing.save(); <span class="comment">// { _somethingElse: 0, name: 'mongoose v3' 
 thing.save(); <span class="comment">// { name: 'no versioning please' }</span></code></pre><h4 id="autoIndex">option: autoIndex</h4><p>At application startup, Mongoose sends an <code>ensureIndex</code> command for each index declared in your <code>Schema</code>. As of Mongoose v3, indexes are created in the <code>background</code> by default. If you wish to disable the auto-creation feature and manually handle when indexes are created, set your <code>Schema</code>s <code>autoIndex</code> option to <code>false</code> and use the <a href="./api.html#model_Model-ensureIndexes">ensureIndexes</a> method on your model.</p><pre><code class="javascript"><span class="keyword">var</span> schema = <span class="keyword">new</span> Schema({..}, { autoIndex: <span class="literal">false</span> })
 <span class="keyword">var</span> Clock = db.model(<span class="string">'Clock'</span>, schema);
 Clock.ensureIndexes(callback);
-</code></pre></div></div><script>document.body.className = 'load';</script><script>/*
-  var _gaq = _gaq || [];
-  _gaq.push(['_setAccount', 'UA-1122274-9']);
-  _gaq.push(['_trackPageview']);
-  
-  (function() {
-    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-  })();
-  
-  // TODO
-  // get number of groups members?
-*/</script></body></html>
+</code></pre></div></div><script>document.body.className = 'load';</script><script>var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-1122274-9']);
+_gaq.push(['_trackPageview']);
+
+(function() {
+  var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+  ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+  var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+})();</script></body></html>

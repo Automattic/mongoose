@@ -4,7 +4,7 @@
  */
 
 var start = require('./common')
-  , should = require('should')
+  , assert = require('assert')
   , mongoose = require('./common').mongoose
   , Schema = mongoose.Schema
   , random = require('../lib/utils').random
@@ -37,25 +37,25 @@ var UserBuffer = new Schema({
  * Test.
  */
 
-module.exports = {
+describe('types.buffer', function(){
 
-  'test that a mongoose buffer behaves and quacks like an buffer': function(){
+  it('test that a mongoose buffer behaves and quacks like an buffer', function(){
     var a = new MongooseBuffer;
 
-    a.should.be.an.instanceof(Buffer);
-    a.should.be.an.instanceof(MongooseBuffer);
-    Buffer.isBuffer(a).should.be.true;
+    assert.ok(a instanceof Buffer);
+    assert.ok(a instanceof MongooseBuffer);
+    assert.equal(true, Buffer.isBuffer(a));
 
     var a = new MongooseBuffer([195, 188, 98, 101, 114]);
     var b = new MongooseBuffer("buffer shtuffs are neat");
     var c = new MongooseBuffer('aGVsbG8gd29ybGQ=', 'base64');
 
-    a.toString('utf8').should.equal('über');
-    b.toString('utf8').should.equal('buffer shtuffs are neat');
-    c.toString('utf8').should.equal('hello world');
-  },
+    assert.equal(a.toString('utf8'), 'über');
+    assert.equal(b.toString('utf8'), 'buffer shtuffs are neat');
+    assert.equal(c.toString('utf8'), 'hello world');
+  });
 
-  'buffer validation': function () {
+  it('buffer validation', function (done) {
     var db = start()
       , User = db.model('UserBuffer', UserBuffer, 'usersbuffer_' + random());
 
@@ -65,38 +65,39 @@ module.exports = {
       });
 
       t.validate(function (err) {
-        err.message.should.eql('Validation failed');
-        err.errors.required.type.should.equal('required');
+        assert.equal(err.message,'Validation failed');
+        assert.equal(err.errors.required.type,'required');
         t.required = 20;
         t.save(function (err) {
-          err.name.should.eql('CastError');
-          err.type.should.eql('buffer');
-          err.value.should.equal(20);
-          err.message.should.eql('Cast to buffer failed for value "20"');
+          assert.equal(err.name, 'CastError');
+          assert.equal(err.type, 'buffer');
+          assert.equal(err.value, 20);
+          assert.equal(err.message, 'Cast to buffer failed for value "20"');
           t.required = new Buffer("hello");
 
           t.sub.push({ name: 'Friday Friday' });
           t.save(function (err) {
-            err.message.should.eql('Validation failed');
-            err.errors.buf.type.should.equal('required');
+            assert.equal(err.message,'Validation failed');
+            assert.equal(err.errors['sub.0.buf'].type,'required');
             t.sub[0].buf = new Buffer("well well");
             t.save(function (err) {
-              err.message.should.eql('Validation failed');
-              err.errors.buf.type.should.equal('valid failed');
+              assert.equal(err.message,'Validation failed');
+              assert.equal(err.errors['sub.0.buf'].type,'valid failed');
 
               t.sub[0].buf = new Buffer("well well well");
               t.validate(function (err) {
                 db.close();
-                should.strictEqual(null, err);
+                assert.ifError(err);
+                done();
               });
             });
           });
         });
       });
-    })
-  },
+    });
+  });
 
-  'buffer storage': function(){
+  it('buffer storage', function(done){
     var db = start()
       , User = db.model('UserBuffer', UserBuffer, 'usersbuffer_' + random());
 
@@ -110,23 +111,24 @@ module.exports = {
       });
 
       tj.save(function (err) {
-        should.equal(null, err);
+        assert.ifError(err);
         User.find({}, function (err, users) {
           db.close();
-          should.equal(null, err);
-          users.should.have.length(1);
+          assert.ifError(err);
+          assert.equal(users.length, 1);
           var user = users[0];
           var base64 = sampleBuffer.toString('base64');
-          should.equal(base64,
+          assert.equal(base64,
                        user.serial.toString('base64'), 'buffer mismatch');
-          should.equal(base64,
+          assert.equal(base64,
                        user.required.toString('base64'), 'buffer mismatch');
+          done();
         });
       });
     });
-  },
+  });
 
-  'test write markModified': function(){
+  it('test write markModified', function(done){
     var db = start()
       , User = db.model('UserBuffer', UserBuffer, 'usersbuffer_' + random());
 
@@ -140,187 +142,195 @@ module.exports = {
       });
 
       tj.save(function (err) {
-        should.equal(null, err);
+        assert.ifError(err);
 
         tj.serial.write('aa', 1, 'ascii');
-        tj.isModified('serial').should.be.true;
+        assert.equal(true, tj.isModified('serial'));
 
         tj.save(function (err) {
-          should.equal(null, err);
+          assert.ifError(err);
 
           User.findById(tj._id, function (err, user) {
             db.close();
-            should.equal(null, err);
+            assert.ifError(err);
 
             var expectedBuffer = new Buffer([123, 97, 97, 42, 11]);
 
-            should.equal(expectedBuffer.toString('base64'),
+            assert.equal(expectedBuffer.toString('base64'),
                          user.serial.toString('base64'), 'buffer mismatch');
 
-            tj.isModified('required').should.be.false;
+            assert.equal(false, tj.isModified('required'));
             tj.serial.copy(tj.required, 1);
-            tj.isModified('required').should.be.true;
-            should.equal('e3thYSo=', tj.required.toString('base64'));
+            assert.equal(true, tj.isModified('required'));
+            assert.equal('e3thYSo=', tj.required.toString('base64'));
+
+            function not (tj) {
+              assert.equal(false, tj.isModified('required'))
+            }
+
+            function is (tj) {
+              assert.equal(true, tj.isModified('required'));
+            }
 
             // buffer method tests
             var fns = {
                 'writeUInt8': function () {
                   reset(tj);
-                  tj.isModified('required').should.be.false;
+                  not(tj);
                   tj.required.writeUInt8(0x3, 0, 'big');
-                  tj.isModified('required').should.be.true;
+                  is(tj);
                 }
               , 'writeUInt16': function () {
                   reset(tj);
-                  tj.isModified('required').should.be.false;
+                  not(tj);
                   tj.required.writeUInt16(0xbeef, 0, 'little');
-                  tj.isModified('required').should.be.true;
+                  is(tj);
                 }
               , 'writeUInt16LE': function () {
                   reset(tj);
-                  tj.isModified('required').should.be.false;
+                  not(tj);
                   tj.required.writeUInt16LE(0xbeef, 0);
-                  tj.isModified('required').should.be.true;
+                  is(tj);
                 }
               , 'writeUInt16BE': function () {
                   reset(tj);
-                  tj.isModified('required').should.be.false;
+                  not(tj);
                   tj.required.writeUInt16BE(0xbeef, 0);
-                  tj.isModified('required').should.be.true;
+                  is(tj);
                 }
               , 'writeUInt32': function () {
                   reset(tj);
-                  tj.isModified('required').should.be.false;
+                  not(tj);
                   tj.required.writeUInt32(0xfeedface, 0, 'little');
-                  tj.isModified('required').should.be.true;
+                  is(tj);
                 }
               , 'writeUInt32LE': function () {
                   reset(tj);
-                  tj.isModified('required').should.be.false;
+                  not(tj);
                   tj.required.writeUInt32LE(0xfeedface, 0);
-                  tj.isModified('required').should.be.true;
+                  is(tj);
                 }
               , 'writeUInt32BE': function () {
                   reset(tj);
-                  tj.isModified('required').should.be.false;
+                  not(tj);
                   tj.required.writeUInt32BE(0xfeedface, 0);
-                  tj.isModified('required').should.be.true;
+                  is(tj);
                 }
               , 'writeInt8': function () {
                   reset(tj);
-                  tj.isModified('required').should.be.false;
+                  not(tj);
                   tj.required.writeInt8(-5, 0, 'big');
-                  tj.isModified('required').should.be.true;
+                  is(tj);
                 }
               , 'writeInt16': function () {
                   reset(tj);
-                  tj.isModified('required').should.be.false;
+                  not(tj);
                   tj.required.writeInt16(0x0023, 2, 'little');
-                  tj.isModified('required').should.be.true;
-                  tj.required[2].should.eql(0x23);
-                  tj.required[3].should.eql(0x00);
+                  is(tj);
+                  assert.equal(tj.required[2], 0x23);
+                  assert.equal(tj.required[3], 0x00);
                 }
               , 'writeInt16LE': function () {
                   reset(tj);
-                  tj.isModified('required').should.be.false;
+                  not(tj);
                   tj.required.writeInt16LE(0x0023, 2);
-                  tj.isModified('required').should.be.true;
-                  tj.required[2].should.eql(0x23);
-                  tj.required[3].should.eql(0x00);
+                  is(tj);
+                  assert.equal(tj.required[2], 0x23);
+                  assert.equal(tj.required[3], 0x00);
                 }
               , 'writeInt16BE': function () {
                   reset(tj);
-                  tj.isModified('required').should.be.false;
+                  not(tj);
                   tj.required.writeInt16BE(0x0023, 2);
-                  tj.isModified('required').should.be.true;
+                  is(tj);
                 }
               , 'writeInt32': function () {
                   reset(tj);
-                  tj.isModified('required').should.be.false;
+                  not(tj);
                   tj.required.writeInt32(0x23, 0, 'big');
-                  tj.isModified('required').should.be.true;
-                  tj.required[0].should.eql(0x00);
-                  tj.required[1].should.eql(0x00);
-                  tj.required[2].should.eql(0x00);
-                  tj.required[3].should.eql(0x23);
+                  is(tj);
+                  assert.equal(tj.required[0], 0x00);
+                  assert.equal(tj.required[1], 0x00);
+                  assert.equal(tj.required[2], 0x00);
+                  assert.equal(tj.required[3], 0x23);
                   tj.required = new Buffer(8);
                 }
               , 'writeInt32LE': function () {
                   tj.required = new Buffer(8);
                   reset(tj);
-                  tj.isModified('required').should.be.false;
+                  not(tj);
                   tj.required.writeInt32LE(0x23, 0);
-                  tj.isModified('required').should.be.true;
+                  is(tj);
                 }
               , 'writeInt32BE': function () {
                   tj.required = new Buffer(8);
                   reset(tj);
-                  tj.isModified('required').should.be.false;
+                  not(tj);
                   tj.required.writeInt32BE(0x23, 0);
-                  tj.isModified('required').should.be.true;
-                  tj.required[0].should.eql(0x00);
-                  tj.required[1].should.eql(0x00);
-                  tj.required[2].should.eql(0x00);
-                  tj.required[3].should.eql(0x23);
+                  is(tj);
+                  assert.equal(tj.required[0], 0x00);
+                  assert.equal(tj.required[1], 0x00);
+                  assert.equal(tj.required[2], 0x00);
+                  assert.equal(tj.required[3], 0x23);
                 }
               , 'writeFloat': function () {
                   tj.required = new Buffer(16);
                   reset(tj);
-                  tj.isModified('required').should.be.false;
+                  not(tj);
                   tj.required.writeFloat(2.225073858507201e-308, 0, 'big');
-                  tj.isModified('required').should.be.true;
-                  tj.required[0].should.eql(0x00);
-                  tj.required[1].should.eql(0x0f);
-                  tj.required[2].should.eql(0xff);
-                  tj.required[3].should.eql(0xff);
-                  tj.required[4].should.eql(0xff);
-                  tj.required[5].should.eql(0xff);
-                  tj.required[6].should.eql(0xff);
-                  tj.required[7].should.eql(0xff);
+                  is(tj);
+                  assert.equal(tj.required[0], 0x00);
+                  assert.equal(tj.required[1], 0x0f);
+                  assert.equal(tj.required[2], 0xff);
+                  assert.equal(tj.required[3], 0xff);
+                  assert.equal(tj.required[4], 0xff);
+                  assert.equal(tj.required[5], 0xff);
+                  assert.equal(tj.required[6], 0xff);
+                  assert.equal(tj.required[7], 0xff);
                 }
               , 'writeFloatLE': function () {
                   tj.required = new Buffer(16);
                   reset(tj);
-                  tj.isModified('required').should.be.false;
+                  not(tj);
                   tj.required.writeFloatLE(2.225073858507201e-308, 0);
-                  tj.isModified('required').should.be.true;
+                  is(tj);
                 }
               , 'writeFloatBE': function () {
                   tj.required = new Buffer(16);
                   reset(tj);
-                  tj.isModified('required').should.be.false;
+                  not(tj);
                   tj.required.writeFloatBE(2.225073858507201e-308, 0);
-                  tj.isModified('required').should.be.true;
+                  is(tj);
                 }
               , 'writeDoubleLE': function () {
                   tj.required = new Buffer(8);
                   reset(tj);
-                  tj.isModified('required').should.be.false;
+                  not(tj);
                   tj.required.writeDoubleLE(0xdeadbeefcafebabe, 0);
-                  tj.isModified('required').should.be.true;
+                  is(tj);
                 }
               , 'writeDoubleBE': function () {
                   tj.required = new Buffer(8);
                   reset(tj);
-                  tj.isModified('required').should.be.false;
+                  not(tj);
                   tj.required.writeDoubleBE(0xdeadbeefcafebabe, 0);
-                  tj.isModified('required').should.be.true;
+                  is(tj);
                 }
               , 'fill': function () {
                   tj.required = new Buffer(8);
                   reset(tj);
-                  tj.isModified('required').should.be.false;
+                  not(tj);
                   tj.required.fill(0);
-                  tj.isModified('required').should.be.true;
+                  is(tj);
                   for (var i = 0; i < tj.required.length; i++) {
-                    tj.required[i].should.eql(0);
+                    assert.strictEqual(tj.required[i], 0);
                   }
                 }
               , 'set': function () {
                   reset(tj);
-                  tj.isModified('required').should.be.false;
+                  not(tj);
                   tj.required.set(0, 1);
-                  tj.isModified('required').should.be.true;
+                  is(tj);
                 }
             };
 
@@ -334,6 +344,7 @@ module.exports = {
                 fns[key]();
               }
             }
+            done();
           });
         });
       });
@@ -342,9 +353,10 @@ module.exports = {
     function reset (model) {
       // internal
       model._activePaths.clear('modify');
-      model.schema.requiredPaths.forEach(function (path) {
+      model.schema.requiredPaths().forEach(function (path) {
         model._activePaths.require(path);
       });
     }
-  }
-};
+  });
+
+})

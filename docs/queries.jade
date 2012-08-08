@@ -1,0 +1,76 @@
+doctype html
+html(lang='en')
+  head
+    meta(charset="utf-8")
+    meta(name="viewport", content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no")
+    title Mongoose Quick Start v#{package.version}
+    link(href='http://fonts.googleapis.com/css?family=Anonymous+Pro:400,700|Droid+Sans+Mono|Open+Sans:400,700|Linden+Hill|Quattrocento:400,700|News+Cycle:400,700|Antic+Slab|Cabin+Condensed:400,700', rel='stylesheet', type='text/css')
+    link(href='/docs/css/default.css', rel='stylesheet', type='text/css')
+    link(href='/docs/css/guide.css', rel='stylesheet', type='text/css')
+  body
+    a#forkbanner(href="http://github.com/learnboost/mongoose")
+      img(style="position: absolute; top: 0; right: 0; border: 0;", src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png", alt="Fork me on GitHub")
+    #links
+      #header
+        h1
+          a(href="../index.html")
+            .mongoose Mongoose
+      include includes/nav
+    #content
+      .module
+        h2 Queries
+        :markdown
+          Documents can be retrieved through several static helper methods of [models](./models.html).
+        :markdown
+          Any [model](./api.html#model_Model) method which [involves](./api.html#model_Model-find) [specifying](./api.html#model_Model-findById) [query](./api.html#model_Model-count) [conditions](./api.html#model_Model-update) can be executed two ways:
+
+          When a `callback` function:
+
+          - is passed, the operation will be executed immediately with the results passed to the callback.
+          - is not passed, an instance of [Query](./api.html#query-js) is returned, which provides a special `QueryBuilder` interface for you.
+
+          Let's take a look at what happens when passing a `callback`:
+        :js
+          var Person = db.model('Person', yourSchema);
+
+          // find each person with a last name matching 'Ghost', selecting the `name` and `occupation` fields
+          Person.findOne({ 'name.last': 'Ghost' }, 'name occupation', function (err, person) {
+            if (err) return handleError(err);
+            console.log('%s %s is a %s.', person.name.first, person.name.last, person.occupation) // Space Ghost is a talk show host.
+          })
+        :markdown
+          Here we see that the query was executed immediately and the results passed to our callback.
+          Now let's look at what happens when no `callback` is passed:
+        :js
+          // find each person with a last name matching 'Ghost'
+          var query = Person.findOne({ 'name.last': 'Ghost' });
+
+          // selecting the `name` and `occupation` fields
+          query.select('name occupation');
+
+          // execute the query at a later time
+          query.exec(function (err, person) {
+            if (err) return handleError(err);
+            console.log('%s %s is a %s.', person.name.first, person.name.last, person.occupation) // Space Ghost is a talk show host.
+          })
+        :markdown
+          An instance of [Query](./api.html#query-js) was returned which allows us to build up our query. Taking this example further:
+        :js
+          Person
+          .find({ occupation: /host/ })
+          .where('name.last').equals('Ghost')
+          .where('age').gt(17).lt(66)
+          .where('likes').in(['vaporizing', 'talking'])
+          .limit(10)
+          .sort('-occupation')
+          .select('name occupation')
+          .exec(callback);
+
+        h3#refs References to other documents
+        :markdown
+          There are no joins in MongoDB but sometimes we still want references to documents in other collections. This is where [query#populate](./api.html#query_Query-populate) comes in. Read more [here](./populate.html).
+
+        h3 Streaming
+        :markdown
+          Queries can be [streamed](http://nodejs.org/api/stream.html) from MongoDB to your application as well. Simply call the query's [stream](./api.html#query_Query-stream) method instead of [exec](./api.html#query_Query-exec) to return an instance of [QueryStream](./api.html#query_Query-stream).
+

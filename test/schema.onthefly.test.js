@@ -1,5 +1,5 @@
 var start = require('./common')
-  , should = require('should')
+  , assert = require('assert')
   , mongoose = start.mongoose
   , random = require('../lib/utils').random
   , Schema = mongoose.Schema
@@ -11,95 +11,98 @@ var start = require('./common')
 
 var DecoratedSchema = new Schema({
     title     : String
-});
+}, { strict: false });
 
 mongoose.model('Decorated', DecoratedSchema);
 
 var collection = 'decorated_' + random();
 
-module.exports = {
-  'setting on the fly schemas should cache the type schema and cast values appropriately': function () {
+describe('schema.onthefly', function(){
+  it('setting should cache the schema type and cast values appropriately', function () {
     var db = start()
       , Decorated = db.model('Decorated', collection);
 
+    db.close();
     var post = new Decorated();
     post.set('adhoc', '9', Number);
-    post.get('adhoc').valueOf().should.eql(9);
-    db.close();
-  },
+    assert.equal(9, post.get('adhoc').valueOf());
+  });
 
-  'on the fly schemas should be local to the particular document': function () {
+  it('should be local to the particular document', function () {
     var db = start()
       , Decorated = db.model('Decorated', collection);
 
+    db.close();
     var postOne = new Decorated();
     postOne.set('adhoc', '9', Number);
-    postOne._path('adhoc').should.not.equal(undefined);
+    assert.notStrictEqual(postOne._path('adhoc'),undefined);
 
     var postTwo = new Decorated();
-    postTwo._path('title').should.not.equal(undefined);
-    should.strictEqual(undefined, postTwo._path('adhoc'));
-    db.close();
-  },
+    assert.notStrictEqual(postTwo._path('title'),undefined);
+    assert.strictEqual(undefined, postTwo._path('adhoc'));
+  });
 
-  'querying a document that had an on the fly schema should work': function () {
+  it('querying a document that had an on the fly schema should work', function (done) {
     var db = start()
       , Decorated = db.model('Decorated', collection);
 
     var post = new Decorated({title: 'AD HOC'});
     // Interpret adhoc as a Number
     post.set('adhoc', '9', Number);
-    post.get('adhoc').valueOf().should.eql(9);
-    post.save( function (err) {
-      should.strictEqual(null, err);
+    assert.equal(9, post.get('adhoc').valueOf());
+    post.save(function (err) {
+      assert.ifError(err);
+      assert.strictEqual(null, err);
       Decorated.findById(post.id, function (err, found) {
         db.close();
-        should.strictEqual(null, err);
-        found.get('adhoc').should.eql(9);
+        assert.strictEqual(null, err);
+        assert.equal(9, found.get('adhoc'));
         // Interpret adhoc as a String instead of a Number now
-        found.get('adhoc', String).should.eql('9');
-        found.get('adhoc').should.eql('9');
+        assert.equal('9', found.get('adhoc', String));
+        assert.equal('9', found.get('adhoc'));
+        done();
       });
     });
-  },
+  });
 
-  'on the fly Embedded Array schemas should cast properly': function () {
+  it('on the fly Embedded Array schemas should cast properly', function () {
     var db = start()
       , Decorated = db.model('Decorated', collection);
 
+    db.close();
     var post = new Decorated();
     post.set('moderators', [{name: 'alex trebek'}], [new Schema({name: String})]);
-    post.get('moderators')[0].name.should.eql('alex trebek');
-    db.close();
-  },
+    assert.equal(post.get('moderators')[0].name,'alex trebek');
+  })
 
-  'on the fly Embedded Array schemas should get from a fresh queried document properly': function () {
+  it('on the fly Embedded Array schemas should get from a fresh queried document properly', function (done) {
     var db = start()
       , Decorated = db.model('Decorated', collection);
 
     var post = new Decorated()
       , ModeratorSchema = new Schema({name: String, ranking: Number});
     post.set('moderators', [{name: 'alex trebek', ranking: '1'}], [ModeratorSchema]);
-    post.get('moderators')[0].name.should.eql('alex trebek');
-    post.save( function (err) {
-      should.strictEqual(null, err);
+    assert.equal(post.get('moderators')[0].name,'alex trebek');
+    post.save(function (err) {
+      assert.ifError(err);
       Decorated.findById(post.id, function (err, found) {
         db.close();
-        should.strictEqual(null, err);
+        assert.ifError(err);
         var rankingPreCast = found.get('moderators')[0].ranking;
-        rankingPreCast.should.eql(1);
-        should.strictEqual(undefined, rankingPreCast.increment);
+        assert.equal(1, rankingPreCast);
+        assert.strictEqual(undefined, rankingPreCast.increment);
         var rankingPostCast = found.get('moderators', [ModeratorSchema])[0].ranking;
-        rankingPostCast.valueOf().should.equal(1);
-        rankingPostCast.increment.should.not.equal(undefined);
+        assert.equal(1, rankingPostCast);
 
         var NewModeratorSchema = new Schema({ name: String, ranking: String});
         rankingPostCast = found.get('moderators', [NewModeratorSchema])[0].ranking;
-        rankingPostCast.should.equal('1');
+        assert.equal(1, rankingPostCast);
+        done();
       });
     });
-  },
-  'should support on the fly nested documents': function () {
+  })
+
+  it('should support on the fly nested documents', function () {
     // TODO
-  }
-};
+  });
+})

@@ -4,8 +4,8 @@
  */
 
 var start = require('../../common')
+  , assert = require('assert')
   , mongoose = start.mongoose
-  , should = require('should')
   , Schema = mongoose.Schema;
 
 /**
@@ -20,45 +20,48 @@ mongoose.model('NativeDriverTest', new Schema({
  * Test.
  */
 
-module.exports = {
+describe('drivers: native:', function(){
 
-  'test that trying to implement a sparse index works': function () {
+  it('sparse index works', function(done){
     var db = start()
       , NativeTestCollection = db.model('NativeDriverTest');
 
     NativeTestCollection.collection.ensureIndex({ title: 1 }, { sparse: true }, function (err) {
-      should.strictEqual(!!err, false);
+      assert.ifError(err);
       NativeTestCollection.collection.getIndexes(function (err, indexes) {
         db.close();
-        should.strictEqual(!!err, false);
-        indexes.should.be.instanceof(Object);
-        indexes['title_1'].should.eql([['title', 1]]);
+        assert.ifError(err);
+        assert.ok(indexes instanceof Object);
+        assert.deepEqual(indexes.title_1, [['title', 1]]);
+        done();
       });
     });
-  },
+  });
 
-  'test that the -native traditional ensureIndex spec syntax for fields works': function () {
+  it('traditional ensureIndex spec syntax for fields works', function(done){
     var db = start()
       , NativeTestCollection = db.model('NativeDriverTest');
 
     NativeTestCollection.collection.ensureIndex([['a', 1]], function () {
       db.close();
+      done();
     });
-  },
+  });
 
-  'unique index fails passes error': function () {
+  it('unique index failure passes error', function(done){
     var db = start()
       , schema = new Schema({ title: String })
       , NativeTestCollection = db.model('NativeDriverTestUnique', schema)
 
     NativeTestCollection.create({ title: 'x' }, {title:'x'}, function (err) {
-      should.strictEqual(!!err, false);
+      assert.ifError(err);
 
-      NativeTestCollection.collection.ensureIndex({ title: 1 }, { unique: true }, function (err) {
-        ;/E11000 duplicate key error index/.test(err.message).should.equal(true);
-
+      NativeTestCollection.collection.ensureIndex({ title: 1 }, { unique: true, safe: true }, function (err) {
         db.close();
+        assert.ok(/E11000 duplicate key error index/.test(err.message));
+        done();
       });
     });
-  }
-};
+  })
+
+})

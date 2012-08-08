@@ -1,0 +1,88 @@
+doctype html
+html(lang='en')
+  head
+    meta(charset="utf-8")
+    meta(name="viewport", content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no")
+    title Mongoose Quick Start v#{package.version}
+    link(href='http://fonts.googleapis.com/css?family=Anonymous+Pro:400,700|Droid+Sans+Mono|Open+Sans:400,700|Linden+Hill|Quattrocento:400,700|News+Cycle:400,700|Antic+Slab|Cabin+Condensed:400,700', rel='stylesheet', type='text/css')
+    link(href='/docs/css/default.css', rel='stylesheet', type='text/css')
+    link(href='/docs/css/guide.css', rel='stylesheet', type='text/css')
+  body
+    a#forkbanner(href="http://github.com/learnboost/mongoose")
+      img(style="position: absolute; top: 0; right: 0; border: 0;", src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png", alt="Fork me on GitHub")
+    #links
+      #header
+        h1
+          a(href="../index.html")
+            .mongoose Mongoose
+      include includes/nav
+    #content
+      .module
+        h2 Middleware
+        p
+          | Middleware are functions which are passed control of flow during execution of 
+          a(href="./api.html#document_Document-init") init
+          |, 
+          a(href="./api.html#document_Document-validate") validate
+          |, 
+          a(href="./api.html#model_Model-save") save
+          |  and 
+          a(href="./api.html#model_Model-remove") remove
+          |  methods.
+        p 
+          | There are two types of middleware, serial and parallel.
+        h4 Serial
+        p
+          | Serial middleware are executed one after another, when each middleware calls 
+          code next
+        :js
+          var schema = new Schema(..);
+          schema.pre('save', function (next) {
+            // do stuff
+            next();
+          });
+        h4 Parallel
+        p
+          | Parallel middleware offer more fine-grained flow control.
+        :js
+          var schema = new Schema(..);
+          schema.pre('save', true, function (next, done) {
+            // calling next kicks off the next middleware in parallel
+            next();
+            doAsync(done);
+          });
+        p
+          | The hooked method, in this case 
+          code save
+          |, will not be executed until 
+          code done
+          |  is called by each middleware.
+        h4 Use Cases
+        p
+          | Middleware are useful for atomizing model logic and avoiding nested blocks of async code. Here are some other ideas:
+          ul
+            li complex validation
+            li
+              | removing dependent documents
+              ul
+                li (removing a user removes all his blogposts)
+            li asynchronous defaults
+            li asynchronous tasks that a certain action triggers
+              ul
+                li triggering custom events
+                li notifications
+        h4 Error handling
+        :markdown
+          If any middleware calls `next` or `done` with an `Error` instance, the flow is interrupted, and the error is passed to the callback.
+        :js
+          schema.pre('save', function (next) {
+            var err = new Error('something went wrong');
+            next(err);
+          });
+
+          // later...
+
+          myModel.save(function (err) {
+            console.log(err.message) // something went wrong
+          });
+

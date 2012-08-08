@@ -1,25 +1,29 @@
 
 TESTS = $(shell find test/ -name '*.test.js')
+DOCS_ = $(shell find lib/ -name '*.js')
+DOCS = $(DOCS_:.js=.json)
+DOCFILE = docs/source/_docs
 
 test:
-	@NODE_ENV=test ./support/expresso/bin/expresso \
-		$(TESTFLAGS) \
-		$(TESTS)
+	@./node_modules/.bin/mocha --reporter list $(TESTFLAGS) $(TESTS)
 	@node test/dropdb.js
 
-test-cov:
-	@TESTFLAGS=--cov $(MAKE) test
+docs: docclean gendocs
 
-docs: docs/api.html
+gendocs: $(DOCFILE)
 
-docs/api.html: lib/mongoose/*.js
-	dox \
-		--private \
-		--title Mongooose \
-		--desc "Expressive MongoDB for Node.JS" \
-		$(shell find lib/mongoose/* -type f) > $@
+$(DOCFILE): $(DOCS)
+	node website.js
+
+%.json: %.js
+	@echo "\n### $(patsubst lib//%,lib/%, $^)" >> $(DOCFILE)
+	./node_modules/dox/bin/dox < $^ >> $(DOCFILE)
+
+site:
+	node website.js --watch && node static.js
 
 docclean:
-	rm -f docs/*.{1,html}
+	rm -f ./docs/*.{1,html,json}
+	rm -f ./docs/source/_docs
 
-.PHONY: test test-cov docs docclean
+.PHONY: test site docs docclean gendocs

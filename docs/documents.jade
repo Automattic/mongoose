@@ -1,0 +1,55 @@
+doctype html
+html(lang='en')
+  head
+    meta(charset="utf-8")
+    meta(name="viewport", content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no")
+    title Mongoose Quick Start v#{package.version}
+    link(href='http://fonts.googleapis.com/css?family=Anonymous+Pro:400,700|Droid+Sans+Mono|Open+Sans:400,700|Linden+Hill|Quattrocento:400,700|News+Cycle:400,700|Antic+Slab|Cabin+Condensed:400,700', rel='stylesheet', type='text/css')
+    link(href='/docs/css/default.css', rel='stylesheet', type='text/css')
+    link(href='/docs/css/guide.css', rel='stylesheet', type='text/css')
+  body
+    a#forkbanner(href="http://github.com/learnboost/mongoose")
+      img(style="position: absolute; top: 0; right: 0; border: 0;", src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png", alt="Fork me on GitHub")
+    #links
+      #header
+        h1
+          a(href="../index.html")
+            .mongoose Mongoose
+      include includes/nav
+    #content
+      .module
+        h2 Documents
+        :markdown
+          Mongoose [documents](./api.html#document-js) represent a one-to-one mapping to documents as stored in MongoDB. Each document is an instance of its [Model](./models.html).
+        h3 Retreiving
+        :markdown
+          There are many ways to retreive documents from MongoDB. We won't cover that in this section. See the chapter on [querying](./queries.html) for detail.
+        h3 Updating
+        :markdown
+          There are a number of ways to update documents. We'll first look at a traditional approach using [findById](./api.html#model_Model-findById):
+        :js
+          Tank.findById(id, function (err, tank) {
+            if (err) return handleError(err);
+
+            tank.size = 'large';
+            tank.save(function (err) {
+              if (err) return handleError(err);
+              res.send(tank);
+            });
+          });
+        :markdown
+          This approach involves first retreiving the document from Mongo, then issuing an update command (triggered by calling `save`). However, if we don't need the document returned in our application and merely want to update a property in the database directly, [Model#update](./api.html#model_Model-update) is right for us:
+        :js
+          Tank.update({ _id: id }, { $set: { size: 'large' }}, callback);
+        :markdown
+          If we do need the document returned in our application there is another, often [better](./api.html#model_Model-findByIdAndUpdate), option:
+        :js
+          Tank.findByIdAndUpdate(id, { $set: { size: 'large' }}, function (err, tank) {
+            if (err) return handleError(err);
+            res.send(tank);
+          });
+        :markdown
+          The `findAndUpdate/Remove` static methods all make a change to at most one document, and return it with just one call to the database. There [are](./api.html#model_Model-findByIdAndRemove) [several](./api.html#model_Model-findOneAndUpdate) [variations](./api.html#model_Model-findOneAndRemove) on the [findAndModify](http://www.mongodb.org/display/DOCS/findAndModify+Command) theme. Read the [API](./api.html) docs for more detail.
+        h3 Validating
+        :markdown
+          Documents are validated before they are saved. Read the [api](./api.html#document_Document-validate) docs or the [validation](./validation.html) chapter for detail.

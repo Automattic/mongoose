@@ -4,11 +4,9 @@
  */
 
 var mongoose = require('../')
-  , should = require('should')
-  , Table = require('cli-table')
   , Mongoose = mongoose.Mongoose
   , Collection = mongoose.Collection
-  , Assertion = should.Assertion
+  , assert = require('assert')
   , startTime = Date.now()
   , queryCount = 0
   , opened = 0
@@ -28,6 +26,8 @@ var mongoose = require('../')
   , 'remove'
   , 'count'
   , 'distinct'
+  , 'isCapped'
+  , 'options'
 ].forEach(function (method) {
 
   var oldMethod = Collection.prototype[method];
@@ -62,42 +62,6 @@ Collection.prototype.onClose = function(){
 };
 
 /**
- * Assert that a connection is open or that mongoose connections are open.
- * Examples:
- *    mongoose.should.be.connected;
- *    db.should.be.connected;
- *
- * @api public
- */
-
-Assertion.prototype.__defineGetter__('connected', function(){
-  if (this.obj instanceof Mongoose)
-    this.obj.connections.forEach(function(connected){
-      c.should.be.connected;
-    });
-  else
-    this.obj.readyState.should.eql(1);
-});
-
-/**
- * Assert that a connection is closed or that a mongoose connections are closed.
- * Examples:
- *    mongoose.should.be.disconnected;
- *    db.should.be.disconnected;
- *
- * @api public
- */
-
-Assertion.prototype.__defineGetter__('disconnected', function(){
-  if (this.obj instanceof Mongoose)
-    this.obj.connections.forEach(function(){
-      c.should.be.disconnected;
-    });
-  else
-    this.obj.readyState.should.eql(0);
-});
-
-/**
  * Create a connection to the test database.
  * You can set the environmental variable MONGOOSE_TEST_URI to override this.
  *
@@ -105,9 +69,10 @@ Assertion.prototype.__defineGetter__('disconnected', function(){
  */
 
 module.exports = function (options) {
+  options || (options = {});
   var uri;
 
-  if (options && options.uri) {
+  if (options.uri) {
     uri = options.uri;
     delete options.uri;
   } else {
@@ -115,28 +80,19 @@ module.exports = function (options) {
           'mongodb://localhost/mongoose_test'
   }
 
-  return mongoose.createConnection(uri, options);
-};
+  var noErrorListener = !! options.noErrorListener;
+  delete options.noErrorListener;
 
-/**
- * Provide stats for tests
- */
+  var conn = mongoose.createConnection(uri, options);
 
-process.on('beforeExit', function(){
-  var table = new Table({
-      head: ['Stat', 'Time (ms)']
-    , colWidths: [23, 15]
+  if (noErrorListener) return conn;
+
+  conn.on('error', function (err) {
+    assert.ok(err);
   });
 
-  table.push(
-      ['Queries run', queryCount]
-    , ['Time ellapsed', Date.now() - startTime]
-    , ['Connections opened', opened]
-    , ['Connections closed', closed]
-  );
-
-  console.error(table.toString());
-});
+  return conn;
+};
 
 /**
  * Module exports.

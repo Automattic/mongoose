@@ -1,0 +1,16 @@
+{
+    "required": "{path} cannot be blank."
+  , "string": {
+        "match": "{path} is invalid."
+      , "enum": "{path} is not in the list."
+      , "cast": "{path} must be a string."
+    }
+  , "number": {
+        "min": "{path} is too small (minimum is {min})."
+      , "max": "{path} is too big (maximum is {max})."
+      , "cast": "{path} must be a number."
+    }
+  , "date": {
+      "cast": "{path} must be a valid date."
+    }
+}

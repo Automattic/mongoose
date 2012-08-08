@@ -1,116 +1,120 @@
 
 var start = require('./common')
   , mongoose = start.mongoose
+  , assert = require('assert')
   , Collection = require('../lib/collection');
 
-module.exports = {
-
-  'test buffering of commands until connection is established': function(beforeExit){
+describe('collections:', function(){
+  it('should buffer commands until connection is established', function(done){
     var db = mongoose.createConnection()
       , collection = db.collection('test-buffering-collection')
       , connected = false
-      , inserted = false;
+      , inserted = false
+      , pending = 2
 
-    collection.insert({ }, function(){
-      connected.should.be.true;
+    function finish () {
+      if (--pending) return;
+      assert.ok(connected);
+      assert.ok(inserted);
+      done();
+    }
+
+    collection.insert({ }, { safe: true }, function(){
+      assert.ok(connected);
       inserted = true;
       db.close();
+      finish();
     });
 
     var uri = 'mongodb://localhost/mongoose_test';
     db.open(process.env.MONGOOSE_TEST_URI || uri, function(err){
       connected = !err;
+      finish();
     });
+  })
 
-    beforeExit(function(){
-      connected.should.be.true;
-      inserted.should.be.true;
-    });
-  },
-
-  'test methods that should throw (unimplemented)': function () {
+  it('methods should that throw (unimplemented)', function(){
     var collection = new Collection('test', mongoose.connection)
       , thrown = false;
 
     try {
       collection.getIndexes();
     } catch (e) {
-      /unimplemented/.test(e.message).should.be.true;
+      assert.ok(/unimplemented/.test(e.message));
       thrown = true;
     }
 
-    thrown.should.be.true;
+    assert.ok(thrown);
     thrown = false;
 
     try {
       collection.update();
     } catch (e) {
-      /unimplemented/.test(e.message).should.be.true;
+      assert.ok(/unimplemented/.test(e.message));
       thrown = true;
     }
 
-    thrown.should.be.true;
+    assert.ok(thrown);
     thrown = false;
 
     try {
       collection.save();
     } catch (e) {
-      /unimplemented/.test(e.message).should.be.true;
+      assert.ok(/unimplemented/.test(e.message));
       thrown = true;
     }
 
-    thrown.should.be.true;
+    assert.ok(thrown);
     thrown = false;
 
     try {
       collection.insert();
     } catch (e) {
-      /unimplemented/.test(e.message).should.be.true;
+      assert.ok(/unimplemented/.test(e.message));
       thrown = true;
     }
 
-    thrown.should.be.true;
+    assert.ok(thrown);
     thrown = false;
 
     try {
       collection.find();
     } catch (e) {
-      /unimplemented/.test(e.message).should.be.true;
+      assert.ok(/unimplemented/.test(e.message));
       thrown = true;
     }
 
-    thrown.should.be.true;
+    assert.ok(thrown);
     thrown = false;
 
     try {
       collection.findOne();
     } catch (e) {
-      /unimplemented/.test(e.message).should.be.true;
+      assert.ok(/unimplemented/.test(e.message));
       thrown = true;
     }
 
-    thrown.should.be.true;
+    assert.ok(thrown);
     thrown = false;
 
     try {
       collection.findAndModify();
     } catch (e) {
-      /unimplemented/.test(e.message).should.be.true;
+      assert.ok(/unimplemented/.test(e.message));
       thrown = true;
     }
 
-    thrown.should.be.true;
+    assert.ok(thrown);
     thrown = false;
 
     try {
       collection.ensureIndex();
     } catch (e) {
-      /unimplemented/.test(e.message).should.be.true;
+      assert.ok(/unimplemented/.test(e.message));
       thrown = true;
     }
 
-    thrown.should.be.true;
+    assert.ok(thrown);
     thrown = false;
-  }
-
-};
+  })
+})

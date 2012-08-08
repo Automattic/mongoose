@@ -3,12 +3,16 @@
  * Module dependencies.
  */
 
-var mongoose = require('./common').mongoose
+var start = require('./common')
+  , mongoose = require('./common').mongoose
+  , random = require('../lib/utils').random
   , MongooseArray = mongoose.Types.Array
   , MongooseDocumentArray = mongoose.Types.DocumentArray
   , EmbeddedDocument = require('../lib/types/embedded')
   , DocumentArray = require('../lib/types/documentarray')
   , Schema = mongoose.Schema
+  , assert = require('assert')
+  , collection = 'types.documentarray_' + random()
 
 /**
  * Setup.
@@ -33,7 +37,7 @@ function TestDoc (schema) {
       title: { type: String }
   });
 
-  Subdocument.prototype.schema = schema || SubSchema;
+  Subdocument.prototype._setSchema(schema || SubSchema);
 
   return Subdocument;
 }
@@ -42,24 +46,23 @@ function TestDoc (schema) {
  * Test.
  */
 
-module.exports = {
-
-  'test that a mongoose array behaves and quacks like an array': function(){
+describe('types.documentarray', function(){
+  it('behaves and quakcs like an array', function(){
     var a = new MongooseDocumentArray();
 
-    a.should.be.an.instanceof(Array);
-    a.should.be.an.instanceof(MongooseArray);
-    a.should.be.an.instanceof(MongooseDocumentArray);
-    Array.isArray(a).should.be.true;
-    a._atomics.constructor.name.should.equal('Object');
-    'object'.should.eql(typeof a);
+    assert.ok(a instanceof Array);
+    assert.ok(a instanceof MongooseArray);
+    assert.ok(a instanceof MongooseDocumentArray);
+    assert.ok(Array.isArray(a));
+    assert.equal('Object', a._atomics.constructor.name);
+    assert.equal('object', typeof a);
 
     var b = new MongooseArray([1,2,3,4]);
-    'object'.should.eql(typeof b);
-    Object.keys(b.toObject()).length.should.equal(4);
-  },
+    assert.equal('object', typeof b);
+    assert.equal(Object.keys(b.toObject()).length,4);
+  });
 
-  '#id': function () {
+  it('#id', function(){
     var Subdocument = TestDoc();
 
     var sub1 = new Subdocument();
@@ -67,8 +70,8 @@ module.exports = {
     var id = sub1.id;
 
     var a = new MongooseDocumentArray([sub1]);
-    a.id(id).title.should.equal('Hello again to all my friends');
-    a.id(sub1._id).title.should.equal('Hello again to all my friends');
+    assert.equal(a.id(id).title, 'Hello again to all my friends');
+    assert.equal(a.id(sub1._id).title, 'Hello again to all my friends');
 
     // test with custom string _id
     var Custom = new Schema({
@@ -84,8 +87,8 @@ module.exports = {
     var id2 = sub2.id;
 
     var a = new MongooseDocumentArray([sub2]);
-    a.id(id2).title.should.equal('together we can play some rock-n-roll');
-    a.id(sub2._id).title.should.equal('together we can play some rock-n-roll');
+    assert.equal(a.id(id2).title, 'together we can play some rock-n-roll');
+    assert.equal(a.id(sub2._id).title, 'together we can play some rock-n-roll');
 
     // test with custom number _id
     var CustNumber = new Schema({
@@ -101,32 +104,119 @@ module.exports = {
     var id3 = sub3.id;
 
     var a = new MongooseDocumentArray([sub3]);
-    a.id(id3).title.should.equal('rock-n-roll');
-    a.id(sub3._id).title.should.equal('rock-n-roll');
-  },
+    assert.equal(a.id(id3).title, 'rock-n-roll');
+    assert.equal(a.id(sub3._id).title, 'rock-n-roll');
 
-  'inspect works with bad data': function () {
-    var threw = false;
-    var a = new MongooseDocumentArray([null]);
+    // test with no _id
+    var NoId = new Schema({
+        title: { type: String }
+    }, { noId: true });
+
+    var Subdocument = TestDoc(NoId);
+
+    var sub4 = new Subdocument();
+    sub4.title = 'rock-n-roll';
+
+    var a = new MongooseDocumentArray([sub4])
+      , threw = false;
     try {
-      a.inspect();
+      a.id('i better not throw');
     } catch (err) {
-      threw = true;
-      console.error(err.stack);
+      threw = err;
     }
-    threw.should.be.false;
-  },
+    assert.equal(false, threw);
 
-  'toObject works with bad data': function () {
-    var threw = false;
-    var a = new MongooseDocumentArray([null]);
-    try {
-      a.toObject();
-    } catch (err) {
-      threw = true;
-      console.error(err.stack);
-    }
-    threw.should.be.false;
-  }
+  })
 
-};
+  describe('inspect', function(){
+    it('works with bad data', function(){
+      var threw = false;
+      var a = new MongooseDocumentArray([null]);
+      try {
+        a.inspect();
+      } catch (err) {
+        threw = true;
+        console.error(err.stack);
+      }
+      assert.ok(!threw);
+    })
+  })
+
+  describe('toObject', function(){
+    it('works with bad data', function(){
+      var threw = false;
+      var a = new MongooseDocumentArray([null]);
+      try {
+        a.toObject();
+      } catch (err) {
+        threw = true;
+        console.error(err.stack);
+      }
+      assert.ok(!threw);
+    })
+  })
+
+  describe('EmbeddedDocumentArray', function(){
+    describe('create()', function(){
+      it('works', function(){
+        var a = new MongooseDocumentArray([]);
+        assert.equal('function', typeof a.create);
+
+        var schema = new Schema({ docs: [new Schema({ name: 'string' })] });
+        var T = mongoose.model('embeddedDocument#create_test', schema, 'asdfasdfa'+ random());
+        var t = new T;
+        assert.equal('function', typeof t.docs.create);
+        var subdoc = t.docs.create({ name: 100 });
+        assert.ok(subdoc._id);
+        assert.equal(subdoc.name, '100');
+        assert.ok(subdoc instanceof EmbeddedDocument);
+      })
+    })
+  })
+
+  it('#push should work on EmbeddedDocuments more than 2 levels deep', function (done) {
+    var Comments = new Schema;
+    Comments.add({
+        title     : String
+      , comments  : [Comments]
+    });
+    var BlogPost = new Schema({
+        title     : String
+      , comments  : [Comments]
+    });
+
+    var db = start()
+      , Post = db.model('docarray-BlogPost', BlogPost, collection)
+
+    var p =new Post({ title: "comment nesting" });
+    var c1 = p.comments.create({ title: "c1" });
+    var c2 = p.comments.create({ title: "c2" });
+    var c3 = p.comments.create({ title: "c3" });
+
+    p.comments.push(c1);
+    c1.comments.push(c2);
+    c2.comments.push(c3);
+
+    p.save(function (err) {
+      assert.ifError(err);
+
+      Post.findById(p._id, function (err, p) {
+        assert.ifError(err);
+
+        var c4= p.comments.create({ title: "c4" });
+        p.comments[0].comments[0].comments[0].comments.push(c4);
+        p.save(function (err) {
+          assert.ifError(err);
+
+          Post.findById(p._id, function (err, p) {
+            db.close();
+            assert.ifError(err);
+            assert.equal(p.comments[0].comments[0].comments[0].comments[0].title, 'c4');
+            done();
+          });
+        });
+      });
+    })
+  });
+
+})

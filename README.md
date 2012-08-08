@@ -4,7 +4,7 @@ Mongoose is a [MongoDB](http://www.mongodb.org/) object modeling tool designed t
 
 Defining a model is as easy as:
 
-    var Comments = new Schema({
+    var Comment = new Schema({
         title     : String
       , body      : String
       , date      : Date
@@ -16,7 +16,7 @@ Defining a model is as easy as:
       , body      : String
       , buf       : Buffer
       , date      : Date
-      , comments  : [Comments]
+      , comments  : [Comment]
       , meta      : {
           votes : Number
         , favs  : Number
@@ -289,9 +289,10 @@ You can find the [Dox](http://github.com/visionmedia/dox) generated API docs [he
 
 ## Getting support
 
-Please subscribe to the Google Groups [mailing list](http://groups.google.com/group/mongoose-orm).
-
-Join #mongoosejs on freenode.
+- Google Groups [mailing list](http://groups.google.com/group/mongoose-orm)
+- (irc) #mongoosejs on freenode
+- reporting [issues](https://github.com/learnboost/mongoose/issues/)
+- [10gen](http://www.mongodb.org/display/DOCS/Technical+Support)
 
 ## Driver access
 
@@ -299,31 +300,20 @@ The driver being used defaults to [node-mongodb-native](https://github.com/chris
 
 ## Mongoose Plugins
 
-The following plugins are currently available for use with mongoose:
-
-- [mongoose-types](https://github.com/bnoguchi/mongoose-types) - Adds
-  several additional types (e.g., Email) that you can use in your
-  Schema declarations
-- [mongoose-auth](https://github.com/bnoguchi/mongoose-auth) - A drop in 
-  solution for your auth needs. Currently supports Password, Facebook,
-  Twitter, Github, and more.
-- [mongoose-joins](https://github.com/goulash1971/mongoose-joins) - Adds simple join support
-- [mongoose-dbref](https://github.com/goulash1971/mongoose-dbref) - An alternative DBRef option
-- [mongoose-flatmatcher](https://github.com/marksweiss/mongoose-flatmatcher) - A query pre-processor that maps flat name/value pairs to schemas 
-- [mongoose-ttl](https://github.com/aheckmann/mongoose-ttl) - TTL support
-- [mongoose-keywordize](https://github.com/aheckmann/mongoose-keywordize) - auto keywords generation
+Take a peek at the [plugins search site](http://plugins.mongoosejs.com/) to see related modules from the community.
 
 ## Contributing to Mongoose
 
 ### Cloning the repository
 
-Make a fork of `mongoose`, then clone it in your computer. The `v2.x` branch contains the current stable release, and the `master` branch the next upcoming major release.
+Make a fork of `mongoose`, then clone it in your computer. The `v3.x` branch is for v3 development, the `v2.x` branch is for v2 development, and the `master` branch the next upcoming major release.
 
 ### Guidelines
 
-- Please write inline documentation for new methods or class members.
-- Please write tests and make sure your tests pass.
-- Before starting to write code, look for existing tickets or create one for your specific issue (unless you're addressing something that's clearly broken). That way you avoid working on something that might not be of interest or that has been addressed already in a different branch.
+- Before starting to write code, look for existing [tickets](https://github.com/learnboost/mongoose/issues) or [create one](https://github.com/learnboost/mongoose/issues/new) for your specific issue. That way you avoid working on something that might not be of interest or that has been addressed already in a different branch.
+- Write inline documentation for new methods or class members.
+- Write tests and make sure they pass.
+- Follow the general coding style of the rest of the project (comma first, etc).
 
 ## Credits
 

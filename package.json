@@ -1,22 +1,27 @@
 {
     "name": "mongoose"
   , "description": "Mongoose MongoDB ODM"
-  , "version": "2.5.7"
+  , "version": "3.0.0"
   , "author": "Guillermo Rauch <guillermo@learnboost.com>"
-  , "keywords": ["mongodb", "mongoose", "orm", "data", "datastore", "nosql"]
+  , "keywords": ["mongodb", "mongoose", "orm", "data", "datastore", "nosql", "odm", "sql"]
   , "dependencies": {
-        "hooks": "0.1.9"
-      , "mongodb": "0.9.7-3-5"
+        "hooks": "0.2.1"
+      , "mongodb": "1.1.2"
+      , "ms": "0.1.0"
     }
   , "devDependencies": {
-        "should": "0.2.1"
-      , "gleak": "0.2.1"
-      , "cli-table": "0.0.1"
+        "mocha": "*"
+      , "node-static": "0.5.9"
+      , "dox": "0.3.1"
+      , "jade": "0.26.3"
+      , "highlight.js": "7.0.1"
+      , "markdown": "0.3.1"
     }
   , "directories": { "lib": "./lib/mongoose" }
   , "scripts": { "test": "make test" }
   , "main": "./index.js"
   , "engines": { "node": ">= 0.4.0" }
+  , "publishConfig": { "tag": "3.0" }
   , "repository": {
         "type": "git"
       , "url": "git://github.com/LearnBoost/mongoose.git"

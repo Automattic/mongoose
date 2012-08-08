@@ -35,7 +35,7 @@ parent.save(<span class="function"><span class="keyword">function</span> <span c
   <span class="keyword">if</span> (err) <span class="keyword">return</span> handleError(err);
   console.log(<span class="string">'the sub-doc was removed'</span>)
 });
-</code></pre><h4 id="altsyntax">Alternate syntax</h4><p><em>New in v3</em> If you don&#39;t need access to the sub-document schema instance, you may also declare sub-docs by simply passing an object literal:</p><pre><code class="javascript"><span class="keyword">var</span> parentSchema = <span class="keyword">new</span> Schema({
+</code></pre><h4 id="altsyntax">Alternate declaration syntax</h4><p><em>New in v3</em> If you don&#39;t need access to the sub-document schema instance, you may also declare sub-docs by simply passing an object literal:</p><pre><code class="javascript"><span class="keyword">var</span> parentSchema = <span class="keyword">new</span> Schema({
   children: [{ name: <span class="string">'string'</span> }]
 })</code></pre></div></div><script>document.body.className = 'load';</script><script>var _gaq = _gaq || [];
 _gaq.push(['_setAccount', 'UA-1122274-9']);

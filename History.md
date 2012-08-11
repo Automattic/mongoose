@@ -1,4 +1,12 @@
 
+3.0.1 / 2012-08-11
+==================
+
+  * fixed; throw Error on bad validators (1044)
+  * fixed; typo in EmbeddedDocument#parentArray [lackac]
+  * fixed; repair mongoose.SchemaTypes alias
+  * updated; docs
+
 3.0.0 / 2012-08-07
 ==================
 

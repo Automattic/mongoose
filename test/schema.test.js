@@ -206,6 +206,32 @@ describe('schema', function(){
 
 
   describe('validation', function(){
+    it('invalid arguments are rejected (1044)', function(){
+      assert.throws(function () {
+        new Schema({
+            simple: { type: String, validate: 'nope' }
+        });
+      }, /Invalid validator/);
+
+      assert.throws(function () {
+        new Schema({
+            simple: { type: String, validate: ['nope'] }
+        });
+      }, /Invalid validator/);
+
+      assert.throws(function () {
+        new Schema({
+          simple: { type: String, validate: { nope: 1, msg: 'nope' } }
+        });
+      }, /Invalid validator/);
+
+      assert.throws(function () {
+        new Schema({
+          simple: { type: String, validate: [{ nope: 1, msg: 'nope' }, 'nope'] }
+        });
+      }, /Invalid validator/);
+    })
+
     it('string required', function(){
       var Test = new Schema({
           simple: String

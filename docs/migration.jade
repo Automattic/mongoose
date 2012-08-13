@@ -179,7 +179,7 @@ block content
   :markdown
     The `fields` method of [Query](./api.html#query-js) has been removed, it being mostly an alias for the [select](./api.html#query_Query-select) method anyway. The `select` method has slightly different arguments so read the [docs](./api.html#query_Query-select) to make sure your application is all set.
 
-    Because of the change to the `fields` method, the field selection argument for model methods like [findById](./api.html#model_Model-findById), [find](./api.html#model_Model-find), etc, is slightly different as well (no longer accepts arrays for example), so read the [docs](./api.html#query_Query-select) to make sure your application is all set.
+    Because of the change to the `fields` method, the field selection argument for [query.populate](./api.html#query_Query-populate) and model methods like [findById](./api.html#model_Model-findById), [find](./api.html#model_Model-find), etc, is slightly different as well (no longer accepts arrays for example), so read the [docs](./api.html#query_Query-select) to make sure your application is all set.
 
   h3 Connecting to ReplicaSets
   :markdown

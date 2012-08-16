@@ -3955,6 +3955,36 @@ describe('model', function(){
         done();
       });
     });
+
+    it('with positional notation on path not existing in schema (gh-1048)', function(done){
+      var db = start();
+
+      var M = db.model('backwardCompat-gh-1048', Schema({ name: 'string' }));
+      db.on('open', function () {
+        var o = {
+            name: 'gh-1048'
+          , _id: new mongoose.Types.ObjectId
+          , databases: {
+                0: { keys: 100, expires: 0}
+              , 15: {keys:1,expires:0}
+            }
+        };
+
+        M.collection.insert(o, { safe: true }, function (err) {
+          assert.ifError(err);
+          M.findById(o._id, function (err, doc) {
+            db.close();
+            assert.ifError(err);
+            assert.ok(doc);
+            assert.ok(doc._doc.databases);
+            assert.ok(doc._doc.databases['0']);
+            assert.ok(doc._doc.databases['15']);
+            assert.equal(undefined, doc.databases);
+            done();
+          })
+        })
+      });
+    })
   });
 
   describe('create()', function(){

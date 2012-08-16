@@ -672,4 +672,49 @@ describe('model: update:', function(){
     });
   });
 
+  it('handles $push with $ positionals (gh-1057)', function(done){
+    var db = start();
+
+    var taskSchema = new Schema({
+        name: String
+    })
+
+    var componentSchema = new Schema({
+        name: String
+      , tasks: [taskSchema]
+    });
+
+    var projectSchema = new Schema({
+        name: String
+      , components: [componentSchema]
+    });
+
+    var Project = db.model('1057-project', projectSchema, '1057-'+random());
+
+    Project.create({ name: 'my project' }, function (err, project) {
+      assert.ifError(err);
+      var pid = project.id;
+      var comp = project.components.create({ name: 'component' });
+      Project.update({ _id: pid }, { $push: { components: comp }}, function (err) {
+        assert.ifError(err);
+        var task = comp.tasks.create({ name: 'my task' });
+        Project.update({ _id: pid, 'components._id': comp._id }, { $push : { 'components.$.tasks': task }}, function (err) {
+          assert.ifError(err);
+          Project.findById(pid, function (err, proj) {
+            assert.ifError(err);
+            assert.ok(proj);
+            assert.equal(1, proj.components.length);
+            assert.equal('component', proj.components[0].name);
+            assert.equal(comp.id, proj.components[0].id);
+            assert.equal(1, proj.components[0].tasks.length);
+            assert.equal('my task', proj.components[0].tasks[0].name);
+            assert.equal(task.id, proj.components[0].tasks[0].id);
+            done();
+          })
+        });
+      });
+    });
+
+  })
+
 });

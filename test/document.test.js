@@ -58,6 +58,7 @@ var schema = new Schema({
         }
     }
   , em: [em]
+  , date: Date
 });
 TestDocument.prototype._setSchema(schema);
 
@@ -72,6 +73,14 @@ schema.path('nested.path').get(function (v) {
 });
 schema.path('nested.setr').set(function (v) {
   return v + ' setter';
+});
+
+var dateSetterCalled = false;
+schema.path('date').set(function (v) {
+  // should not have been cast to a Date yet
+  assert.equal('string', typeof v);
+  dateSetterCalled = true;
+  return v;
 });
 
 /**
@@ -846,6 +855,21 @@ describe('document:', function(){
       after(function () {
         db.close();
       })
+    })
+  })
+
+  describe('setter order', function(){
+    it('is applied correctly', function(){
+      var date = 'Thu Aug 16 2012 09:45:59 GMT-0700 (PDT)';
+      var d = new TestDocument();
+      dateSetterCalled = false;
+      d.date = date;
+      assert.ok(dateSetterCalled);
+      dateSetterCalled = false;
+      assert.ok(d._doc.date instanceof Date);
+      assert.ok(d.date instanceof Date);
+      assert.equal(d.date.toString(), date);
+      assert.equal(+d.date, +new Date(date));
     })
   })
 })

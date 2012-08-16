@@ -2,10 +2,10 @@ extends layout
 
 block content
   h2 Schemas
-  p
-    | If you haven't yet done so, please take a minute to read the 
-    a(href="./index.html") quickstart
-    |  to get an idea of how Mongoose works.
+  :markdown
+    If you haven't yet done so, please take a minute to read the [quickstart](./index.html) to get an idea of how Mongoose works.
+  :markdown
+    If you are migrating from 2.x to 3.x please take a moment to read the [migration guide](./migration.html).
   :markdown
     This page covers `Schema` [definition](#definition), [plugins](#plugins), instance [methods](#methods), [statics](#statics), [indexes](#indexes), [virtuals](#virtuals) and [options](#options). Let's start with `Schema` definition.
   h3#definition Defining your schema

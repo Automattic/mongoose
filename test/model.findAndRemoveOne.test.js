@@ -251,4 +251,93 @@ describe('model: findByIdAndRemove:', function(){
     assert.equal(undefined, query._fields);
     assert.equal(undefined, query._conditions._id);
   })
+
+  it('supports v3 select string syntax', function(){
+    var db = start()
+      , M = db.model(modelname, collection)
+      , _id = new DocumentObjectId
+
+    db.close();
+
+    var now = new Date
+      , query;
+
+    query = M.findByIdAndRemove(_id, { select: 'author -title' });
+    assert.strictEqual(1, query._fields.author);
+    assert.strictEqual(0, query._fields.title);
+
+    query = M.findOneAndRemove({}, { select: 'author -title' });
+    assert.strictEqual(1, query._fields.author);
+    assert.strictEqual(0, query._fields.title);
+  })
+
+  it('supports v3 select object syntax', function(){
+    var db = start()
+      , M = db.model(modelname, collection)
+      , _id = new DocumentObjectId
+
+    db.close();
+
+    var now = new Date
+      , query;
+
+    query = M.findByIdAndRemove(_id, { select: { author: 1, title: 0 }});
+    assert.strictEqual(1, query._fields.author);
+    assert.strictEqual(0, query._fields.title);
+
+    query = M.findOneAndRemove({}, { select: { author: 1, title: 0 }});
+    assert.strictEqual(1, query._fields.author);
+    assert.strictEqual(0, query._fields.title);
+  })
+
+  it('supports v3 sort string syntax', function(){
+    var db = start()
+      , M = db.model(modelname, collection)
+      , _id = new DocumentObjectId
+
+    db.close();
+
+    var now = new Date
+      , query;
+
+    query = M.findByIdAndRemove(_id, { sort: 'author -title' });
+    assert.equal(2, query.options.sort.length);
+    assert.equal('author', query.options.sort[0][0]);
+    assert.equal(1, query.options.sort[0][1]);
+    assert.equal('title', query.options.sort[1][0]);
+    assert.equal(-1, query.options.sort[1][1]);
+
+    query = M.findOneAndRemove({}, { sort: 'author -title' });
+    assert.equal(2, query.options.sort.length);
+    assert.equal('author', query.options.sort[0][0]);
+    assert.equal(1, query.options.sort[0][1]);
+    assert.equal('title', query.options.sort[1][0]);
+    assert.equal(-1, query.options.sort[1][1]);
+  })
+
+  it('supports v3 sort object syntax', function(){
+    var db = start()
+      , M = db.model(modelname, collection)
+      , _id = new DocumentObjectId
+
+    db.close();
+
+    var now = new Date
+      , query;
+
+    query = M.findByIdAndRemove(_id, { sort: { author: 1, title: -1 }});
+    assert.equal(2, query.options.sort.length);
+    assert.equal('author', query.options.sort[0][0]);
+    assert.equal(1, query.options.sort[0][1]);
+    assert.equal('title', query.options.sort[1][0]);
+    assert.equal(-1, query.options.sort[1][1]);
+
+    query = M.findOneAndRemove(_id, { sort: { author: 1, title: -1 }});
+    assert.equal(2, query.options.sort.length);
+    assert.equal('author', query.options.sort[0][0]);
+    assert.equal(1, query.options.sort[0][1]);
+    assert.equal('title', query.options.sort[1][0]);
+    assert.equal(-1, query.options.sort[1][1]);
+  });
+
 })

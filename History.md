@@ -1,4 +1,15 @@
 
+3.0.2 / 2012-08-17
+==================
+
+  * added; missing support for v3 sort/select syntax to findAndModify helpers (#1058)
+  * fixed; replset fullsetup event emission
+  * fixed; reconnected event for replsets
+  * fixed; server reconnection setting discovery
+  * fixed; compat with non-schema path props using positional notation (#1048)
+  * fixed; setter/casting order (#665)
+  * docs; updated
+
 3.0.1 / 2012-08-11
 ==================
 

@@ -32,8 +32,9 @@ var User = new Schema({
  */
 
 var Comment = new Schema({
-    _creator  : { type: ObjectId, ref: 'RefUser' }
-  , content   : String
+    asers   : [{ type: ObjectId, ref: 'RefUser' }]
+  , _creator : { type: ObjectId, ref: 'RefUser' }
+  , content  : String
 });
 
 /**
@@ -805,43 +806,87 @@ describe('model: ref:', function(){
     });
   })
 
-  it('populating sub docs', function(done){
-    var db = start()
-      , BlogPost = db.model('RefBlogPost', posts)
-      , User = db.model('RefUser', users);
+  describe('populating sub docs', function(){
+    it('works with findById', function(done){
+      var db = start()
+        , BlogPost = db.model('RefBlogPost', posts)
+        , User = db.model('RefUser', users);
 
-    User.create({ name: 'User 1' }, function (err, user1) {
-      assert.ifError(err);
+      User.create({ name: 'User 1' }, function (err, user1) {
+        assert.ifError(err);
 
-      User.create({ name: 'User 2' }, function (err, user2) {
+        User.create({ name: 'User 2' }, function (err, user2) {
+          assert.ifError(err);
+
+          BlogPost.create({
+              title: 'Woot'
+            , _creator: user1._id
+            , comments: [
+                  { _creator: user1._id, content: 'Woot woot' }
+                , { _creator: user2._id, content: 'Wha wha' }
+              ]
+          }, function (err, post) {
+            assert.ifError(err);
+
+            BlogPost
+            .findById(post._id)
+            .populate('_creator')
+            .populate('comments._creator')
+            .exec(function (err, post) {
+              db.close();
+              assert.ifError(err);
+
+              assert.equal(post._creator.name,'User 1');
+              assert.equal(post.comments[0]._creator.name,'User 1');
+              assert.equal(post.comments[1]._creator.name,'User 2');
+              done();
+            });
+          });
+        });
+      });
+    })
+
+    it('works when first doc returned has empty array for populated path (gh-1055)', function(done){
+      var db = start()
+        , BlogPost = db.model('RefBlogPost', posts)
+        , User = db.model('RefUser', users);
+
+      User.create({ name: 'gh-1055-1' }, { name: 'gh-1055-2' }, function (err, user1, user2) {
         assert.ifError(err);
 
         BlogPost.create({
-            title: 'Woot'
+            title: 'gh-1055 post1'
+          , _creator: user1._id
+          , comments: []
+        },{
+            title: 'gh-1055 post2'
           , _creator: user1._id
           , comments: [
-                { _creator: user1._id, content: 'Woot woot' }
-              , { _creator: user2._id, content: 'Wha wha' }
+                { _creator: user1._id, content: 'Woot woot', asers: [] }
+              , { _creator: user2._id, content: 'Wha wha', asers: [user1, user2] }
             ]
-        }, function (err, post) {
+        }, function (err, post1, post2) {
           assert.ifError(err);
 
+          var ran = false;
           BlogPost
-          .findById(post._id)
-          .populate('_creator')
+          .find({ title: /gh-1055/ })
+          .sort('title')
+          .select('comments')
           .populate('comments._creator')
-          .exec(function (err, post) {
-            db.close();
+          .populate('comments.asers')
+          .exec(function (err, posts) {
+            assert.equal(false, ran);
+            ran = true;
             assert.ifError(err);
-
-            assert.equal(post._creator.name,'User 1');
-            assert.equal(post.comments[0]._creator.name,'User 1');
-            assert.equal(post.comments[1]._creator.name,'User 2');
+            assert.ok(posts.length);
+            assert.ok(posts[1].comments[0]._creator);
+            assert.equal('gh-1055-1', posts[1].comments[0]._creator.name);
             done();
           });
         });
       });
-    });
+    })
   })
 
   it('populating subdocuments partially', function(done){

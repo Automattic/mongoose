@@ -1930,6 +1930,8 @@ doc.isDirectModified(<span class="string">'documents'</span>) <span class="comme
     <span class="keyword">var</span> keys = Object.keys(obj)
       , len = keys.length;
 
+    <span class="keyword">return</span> next();
+
     <span class="function"><span class="keyword">function</span> <span class="title">next</span> <span class="params">()</span> {</span>
       <span class="keyword">if</span> (--len &lt; <span class="number">0</span>) <span class="keyword">return</span> fn();
 
@@ -1937,6 +1939,7 @@ doc.isDirectModified(<span class="string">'documents'</span>) <span class="comme
         , path = prefix + i
         , schema = self.schema.path(path)
         , total = <span class="number">0</span>
+        , inline = <span class="literal">false</span>
         , poppath
 
       <span class="keyword">if</span> (!schema &amp;&amp; obj[i] &amp;&amp; <span class="string">'Object'</span> === obj[i].constructor.name) {
@@ -1953,6 +1956,8 @@ doc.isDirectModified(<span class="string">'documents'</span>) <span class="comme
 
       <span class="keyword">if</span> (poppath.sub) {
         obj[i].forEach(<span class="function"><span class="keyword">function</span> <span class="params">(subobj)</span> {</span>
+          inline = <span class="literal">true</span>;
+
           <span class="keyword">var</span> pkeys = Object.keys(poppath.sub)
             , pi = pkeys.length
             , key
@@ -1961,17 +1966,20 @@ doc.isDirectModified(<span class="string">'documents'</span>) <span class="comme
             key = pkeys[pi];
 
             <span class="keyword">if</span> (subobj[key]) (<span class="function"><span class="keyword">function</span> <span class="params">(key)</span> {</span>
-
               total++;
               self._populate(schema.schema.path(key), subobj[key], poppath.sub[key], done);
               <span class="function"><span class="keyword">function</span> <span class="title">done</span> <span class="params">(err, doc)</span> {</span>
                 <span class="keyword">if</span> (err) <span class="keyword">return</span> error(err);
                 subobj[key] = doc;
-                --total || next();
+                <span class="keyword">if</span> (--total &lt; <span class="number">1</span> &amp;&amp; !inline) {
+                  next();
+                }
               }
             })(key);
           }
         });
+
+        inline = <span class="literal">false</span>;
 
         <span class="keyword">if</span> (<span class="number">0</span> === total) <span class="keyword">return</span> next();
 
@@ -1983,8 +1991,6 @@ doc.isDirectModified(<span class="string">'documents'</span>) <span class="comme
         });
       }
     };
-
-    next();
   };
 
   <span class="function"><span class="keyword">function</span> <span class="title">error</span> <span class="params">(err)</span> {</span>
@@ -5237,7 +5243,7 @@ reserved.collection = <span class="number">1</span>;</code></pre></div><p>Keys i
 
     <span class="keyword">this</span>[i].apply(<span class="keyword">this</span>, opts);
   }
-};</code></pre></div><div class="params"><h4>Parameters:</h4><ul><li><code>path</code><span class="types"> &lt;<a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/String">String</a>&gt; </span><span></span></li><li><code>[options]</code><span class="types"> &lt;<a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Object">Object</a>&gt; </span><span></span></li><li><code>[instance]</code><span class="types"> &lt;<a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/String">String</a>&gt; </span><span></span></li></ul></div><div class="description"></div><hr class=""></div><div class="item method public"><h3 id="schematype_SchemaType-default"><a href="#schematype_SchemaType-default">SchemaType#default(<code>val</code>)</a></h3><p>Sets a default value for this schematype.</p><span class="showcode">show code</span><div class="sourcecode"><pre><code class="javascript">SchemaType.prototype.<span class="keyword">default</span> = <span class="function"><span class="keyword">function</span> <span class="params">(val)</span> {</span>
+};</code></pre></div><div class="params"><h4>Parameters:</h4><ul><li><code>path</code><span class="types"> &lt;<a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/String">String</a>&gt; </span><span></span></li><li><code>[options]</code><span class="types"> &lt;<a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Object">Object</a>&gt; </span><span></span></li><li><code>[instance]</code><span class="types"> &lt;<a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/String">String</a>&gt; </span><span></span></li></ul></div><div class="description"></div><hr class=""></div><div class="item method public"><h3 id="schematype_SchemaType-default"><a href="#schematype_SchemaType-default">SchemaType#default(<code>val</code>)</a></h3><p>Sets a default value for this SchemaType.</p><span class="showcode">show code</span><div class="sourcecode"><pre><code class="javascript">SchemaType.prototype.<span class="keyword">default</span> = <span class="function"><span class="keyword">function</span> <span class="params">(val)</span> {</span>
   <span class="keyword">if</span> (<span class="number">1</span> === arguments.length) {
     <span class="keyword">this</span>.defaultValue = <span class="keyword">typeof</span> val === <span class="string">'function'</span>
       ? val
@@ -5247,12 +5253,40 @@ reserved.collection = <span class="number">1</span>;</code></pre></div><p>Keys i
     <span class="keyword">this</span>.defaultValue = utils.args(arguments);
   }
   <span class="keyword">return</span> <span class="keyword">this</span>.defaultValue;
-};</code></pre></div><div class="params"><h4>Parameters:</h4><ul><li><code>val</code><span class="types"> &lt;<a href="#any">any</a>&gt; </span><span>default value</span></li></ul></div><div class="returns"><h4>Returns:</h4><ul><li><span class="types"> &lt;<a href="#schematype_SchemaType">SchemaType</a>, <a href="#defaultValue">defaultValue</a>&gt; </span><span></span></li></ul></div><div class="description"><h4>Example:</h4>
+};</code></pre></div><div class="params"><h4>Parameters:</h4><ul><li><code>val</code><span class="types"> &lt;<a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Function">Function</a>, <a href="#any">any</a>&gt; </span><span>the default value</span></li></ul></div><div class="returns"><h4>Returns:</h4><ul><li><span class="types"> &lt;<a href="#defaultValue">defaultValue</a>&gt; </span><span></span></li></ul></div><div class="description"><h4>Example:</h4>
 
-<pre><code><span class="keyword">var</span> s = <span class="keyword">new</span> Schema({ n: { type: Number, <span class="keyword">default</span>: <span class="number">10</span> })
-<span class="keyword">var</span> M = db.model(<span class="string">'M'</span>, s)
+<pre><code><span class="keyword">var</span> schema = <span class="keyword">new</span> Schema({ n: { type: Number, <span class="keyword">default</span>: <span class="number">10</span> })
+<span class="keyword">var</span> M = db.model(<span class="string">'M'</span>, schema)
 <span class="keyword">var</span> m = <span class="keyword">new</span> M;
-console.log(m.n) <span class="comment">// 10</span></code></pre></div><hr class=""></div><div class="item method public"><h3 id="schematype_SchemaType-index"><a href="#schematype_SchemaType-index">SchemaType#index(<code>options</code>)</a></h3><p>Declares the index options for this schematype.</p><span class="showcode">show code</span><div class="sourcecode"><pre><code class="javascript">SchemaType.prototype.index = <span class="function"><span class="keyword">function</span> <span class="params">(options)</span> {</span>
+console.log(m.n) <span class="comment">// 10</span></code></pre>
+
+<p>Defaults can be either <code>functions</code> which return the value to use as the default or the literal value itself. Either way, the value will be cast based on its schema type before being set during document creation.</p>
+
+<h4>Example:</h4>
+
+<pre><code><span class="comment">// values are cast:</span>
+<span class="keyword">var</span> schema = <span class="keyword">new</span> Schema({ aNumber: Number, <span class="keyword">default</span>: <span class="string">"4.815162342"</span> })
+<span class="keyword">var</span> M = db.model(<span class="string">'M'</span>, schema)
+<span class="keyword">var</span> m = <span class="keyword">new</span> M;
+console.log(m.aNumber) <span class="comment">// 4.815162342</span>
+
+<span class="comment">// default unique objects for Mixed types:</span>
+<span class="keyword">var</span> schema = <span class="keyword">new</span> Schema({ mixed: Schema.Types.Mixed });
+schema.path(<span class="string">'mixed'</span>).<span class="keyword">default</span>(<span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+  <span class="keyword">return</span> {};
+});
+
+<span class="comment">// if we don't use a function to return object literals for Mixed defaults,</span>
+<span class="comment">// each document will receive a reference to the same object literal creating</span>
+<span class="comment">// a "shared" object instance:</span>
+<span class="keyword">var</span> schema = <span class="keyword">new</span> Schema({ mixed: Schema.Types.Mixed });
+schema.path(<span class="string">'mixed'</span>).<span class="keyword">default</span>({});
+<span class="keyword">var</span> M = db.model(<span class="string">'M'</span>, schema);
+<span class="keyword">var</span> m1 = <span class="keyword">new</span> M;
+m1.mixed.added = <span class="number">1</span>;
+console.log(m1.mixed); <span class="comment">// { added: 1 }</span>
+<span class="keyword">var</span> m2 = <span class="keyword">new</span> M;
+console.log(m2.mixed); <span class="comment">// { added: 1 }</span></code></pre></div><hr class=""></div><div class="item method public"><h3 id="schematype_SchemaType-index"><a href="#schematype_SchemaType-index">SchemaType#index(<code>options</code>)</a></h3><p>Declares the index options for this schematype.</p><span class="showcode">show code</span><div class="sourcecode"><pre><code class="javascript">SchemaType.prototype.index = <span class="function"><span class="keyword">function</span> <span class="params">(options)</span> {</span>
   <span class="keyword">this</span>._index = options;
   utils.expires(<span class="keyword">this</span>._index);
   <span class="keyword">return</span> <span class="keyword">this</span>;

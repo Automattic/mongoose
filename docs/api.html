@@ -2404,7 +2404,40 @@ MyModel.find({ name: <span class="regexp">/john/i</span> }, <span class="literal
 A.findOneAndUpdate(conditions, update, options)  <span class="comment">// returns Query</span>
 A.findOneAndUpdate(conditions, update, callback) <span class="comment">// executes</span>
 A.findOneAndUpdate(conditions, update)           <span class="comment">// returns Query</span>
-A.findOneAndUpdate()                             <span class="comment">// returns Query</span></code></pre><hr class=""></div><div class="item static public"><h3 id="model_Model-findByIdAndUpdate"><a href="#model_Model-findByIdAndUpdate">Model.findByIdAndUpdate(<code>id</code>, <code>[update]</code>, <code>[options]</code>, <code>[callback]</code>)</a></h3><p>Issues a mongodb findAndModify update command by a documents id.</p><span class="showcode">show code</span><div class="sourcecode"><pre><code class="javascript">Model.findByIdAndUpdate = function (id, update, options, callback) {
+A.findOneAndUpdate()                             <span class="comment">// returns Query</span></code></pre>
+
+<h4>Note:</h4>
+
+<p>All top level update keys which are not <code>atomic</code> operation names are treated as set operations:</p>
+
+<h4>Example:</h4>
+
+<pre><code><span class="keyword">var</span> query = { name: <span class="string">'borne'</span> };
+Model.findOneAndUpdate(query, { name: <span class="string">'jason borne'</span> }, options, callback)
+
+<span class="comment">// is sent as</span>
+Model.findOneAndUpdate(query, { $set: { name: <span class="string">'jason borne'</span> }}, options, callback)</code></pre>
+
+<p>This helps prevent accidentally overwriting your document with <code>{ name: 'jason borne' }</code>.</p>
+
+<h4>Note:</h4>
+
+<p>Although values are cast to their appropriate types when using the findAndModify helpers, the following are <em>not</em> applied:</p>
+
+<ul>
+<li>defaults</li>
+<li>setters</li>
+<li>validators</li>
+<li>middleware</li>
+</ul>
+
+<p>If you need those features, use the traditional approach of first retrieving the document.</p>
+
+<pre><code>Model.findOne({ name: <span class="string">'borne'</span> }, <span class="function"><span class="keyword">function</span> <span class="params">(err, doc)</span> {</span>
+  <span class="keyword">if</span> (err) ..
+  doc.name = <span class="string">'jason borne'</span>;
+  doc.save(callback);
+})</code></pre><hr class=""></div><div class="item static public"><h3 id="model_Model-findByIdAndUpdate"><a href="#model_Model-findByIdAndUpdate">Model.findByIdAndUpdate(<code>id</code>, <code>[update]</code>, <code>[options]</code>, <code>[callback]</code>)</a></h3><p>Issues a mongodb findAndModify update command by a documents id.</p><span class="showcode">show code</span><div class="sourcecode"><pre><code class="javascript">Model.findByIdAndUpdate = function (id, update, options, callback) {
   var args;
 
   if (1 === arguments.length) {
@@ -2453,7 +2486,39 @@ A.findByIdAndUpdate()                     <span class="comment">// returns Query
 <li><code>new</code>: bool - true to return the modified document rather than the original. defaults to true</li>
 <li><code>upsert</code>: bool - creates the object if it doesn't exist. defaults to false.</li>
 <li><code>sort</code>: if multiple docs are found by the conditions, sets the sort order to choose which doc to update</li>
-</ul><hr class=""></div><div class="item static public"><h3 id="model_Model-findOneAndRemove"><a href="#model_Model-findOneAndRemove">Model.findOneAndRemove(<code>conditions</code>, <code>[options]</code>, <code>[callback]</code>)</a></h3><p>Issue a mongodb findAndModify remove command.</p><span class="showcode">show code</span><div class="sourcecode"><pre><code class="javascript">Model.findOneAndRemove = function (conditions, options, callback) {
+</ul>
+
+<h4>Note:</h4>
+
+<p>All top level update keys which are not <code>atomic</code> operation names are treated as set operations:</p>
+
+<h4>Example:</h4>
+
+<pre><code>Model.findByIdAndUpdate(id, { name: <span class="string">'jason borne'</span> }, options, callback)
+
+<span class="comment">// is sent as</span>
+Model.findByIdAndUpdate(id, { $set: { name: <span class="string">'jason borne'</span> }}, options, callback)</code></pre>
+
+<p>This helps prevent accidentally overwriting your document with <code>{ name: 'jason borne' }</code>.</p>
+
+<h4>Note:</h4>
+
+<p>Although values are cast to their appropriate types when using the findAndModify helpers, the following are <em>not</em> applied:</p>
+
+<ul>
+<li>defaults</li>
+<li>setters</li>
+<li>validators</li>
+<li>middleware</li>
+</ul>
+
+<p>If you need those features, use the traditional approach of first retrieving the document.</p>
+
+<pre><code>Model.findById(id, <span class="function"><span class="keyword">function</span> <span class="params">(err, doc)</span> {</span>
+  <span class="keyword">if</span> (err) ..
+  doc.name = <span class="string">'jason borne'</span>;
+  doc.save(callback);
+})</code></pre><hr class=""></div><div class="item static public"><h3 id="model_Model-findOneAndRemove"><a href="#model_Model-findOneAndRemove">Model.findOneAndRemove(<code>conditions</code>, <code>[options]</code>, <code>[callback]</code>)</a></h3><p>Issue a mongodb findAndModify remove command.</p><span class="showcode">show code</span><div class="sourcecode"><pre><code class="javascript">Model.findOneAndRemove = function (conditions, options, callback) {
   if (1 === arguments.length &amp;&amp; 'function' == typeof conditions) {
     var msg = 'Model.findOneAndRemove(): First argument must not be a function.
 

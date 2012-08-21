@@ -66,7 +66,7 @@ schema.virtual('nested.setAge').set(function (v) {
   this.nested.age = v;
 });
 schema.path('nested.path').get(function (v) {
-  return this.nested.age + (v ? v : '');
+  return (this.nested.age || '') + (v ? v : '');
 });
 schema.path('nested.setr').set(function (v) {
   return v + ' setter';
@@ -182,6 +182,13 @@ describe('document:', function(){
     doc.nested.age = 2;
     assert.equal(2,doc.nested.age);
     assert.ok(doc.isModified('nested.age'));
+
+    doc.nested = { path: 'overwrite the entire nested object' };
+    assert.equal(undefined, doc.nested.age);
+    assert.equal(1, Object.keys(doc._doc.nested).length);
+    assert.equal('overwrite the entire nested object', doc.nested.path);
+    assert.ok(doc.isModified('nested'));
+    assert.ok(doc.isModified('nested.path'));
   });
 
   it('test accessor of id', function(){
@@ -658,4 +665,87 @@ describe('document:', function(){
       });
     });
   });
+
+  describe('setter', function(){
+    describe('on nested paths', function(){
+      describe('using set(path, object)', function(){
+        it('overwrites the entire object', function(){
+          var doc = new TestDocument();
+
+          doc.init({
+              test    : 'Test'
+            , nested  : {
+                  age   : 5
+              }
+          });
+
+          doc.set('nested', { path: 'overwrite the entire nested object' });
+          assert.equal(undefined, doc.nested.age);
+          assert.equal(1, Object.keys(doc._doc.nested).length);
+          assert.equal('overwrite the entire nested object', doc.nested.path);
+          assert.ok(doc.isModified('nested'));
+          assert.ok(doc.isModified('nested.path'));
+
+          // vs merging using doc.set(object)
+          doc.set({ test: 'Test', nested: { age: 4 }});
+          assert.equal('4overwrite the entire nested object', doc.nested.path);
+          assert.equal(4, doc.nested.age);
+          assert.equal(2, Object.keys(doc._doc.nested).length);
+          assert.ok(doc.isModified('nested'));
+          assert.ok(doc.isModified('nested.path'));
+          assert.ok(doc.isModified('nested.age'));
+
+          var doc = new TestDocument();
+          doc.init({
+              test    : 'Test'
+            , nested  : {
+                  age   : 5
+              }
+          });
+
+          doc.set({ test: 'Test', nested: { age: 5 }});
+          assert.ok(!doc.isModified());
+          assert.ok(!doc.isModified('test'));
+          assert.ok(!doc.isModified('nested'));
+          assert.ok(!doc.isModified('nested.path'));
+          assert.ok(!doc.isModified('nested.age'));
+
+          doc.nested = { path: 'overwrite the entire nested object', age: 5 };
+          assert.equal(5, doc.nested.age);
+          assert.equal(2, Object.keys(doc._doc.nested).length);
+          assert.equal('5overwrite the entire nested object', doc.nested.path);
+          assert.ok(doc.isModified('nested'));
+          assert.ok(doc.isModified('nested.path'));
+          assert.ok(doc.isModified('nested.age'));
+
+          doc.nested.deep = { x: 'Hank and Marie' };
+          assert.equal(3, Object.keys(doc._doc.nested).length);
+          assert.equal('5overwrite the entire nested object', doc.nested.path);
+          assert.ok(doc.isModified('nested'));
+          assert.ok(doc.isModified('nested.path'));
+          assert.ok(doc.isModified('nested.age'));
+          assert.ok(doc.isModified('nested.deep'));
+          assert.equal('Hank and Marie', doc.nested.deep.x);
+
+          var doc = new TestDocument();
+          doc.init({
+              test    : 'Test'
+            , nested  : {
+                  age   : 5
+              }
+          });
+
+          doc.set('nested.deep', { x: 'Hank and Marie' });
+          assert.equal(2, Object.keys(doc._doc.nested).length);
+          assert.equal(1, Object.keys(doc._doc.nested.deep).length);
+          assert.ok(doc.isModified('nested'));
+          assert.ok(!doc.isModified('nested.path'));
+          assert.ok(!doc.isModified('nested.age'));
+          assert.ok(doc.isModified('nested.deep'));
+          assert.ok(doc.isModified('nested.deep.x'));
+          assert.equal('Hank and Marie', doc.nested.deep.x);
+        })
+      })
+    })
+  })
 })

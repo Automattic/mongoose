@@ -9,7 +9,7 @@
       , "mongodb": "1.1.4"
     }
   , "devDependencies": {
-        "mocha": "*"
+        "mocha": "1.3.2"
     }
   , "directories": { "lib": "./lib/mongoose" }
   , "scripts": { "test": "make test" }

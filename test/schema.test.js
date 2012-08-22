@@ -920,7 +920,34 @@ describe('schema', function(){
           name: String
       }, { noId: true });
       assert.equal(undefined, schema.path('_id'));
+    })
 
+    it('auto id', function(){
+      var schema = new Schema({
+          name: String
+      });
+      assert.ok(schema.virtualpath('id') instanceof mongoose.VirtualType);
+
+      var schema = new Schema({
+          name: String
+      }, { id: true });
+      assert.ok(schema.virtualpath('id') instanceof mongoose.VirtualType);
+
+      var schema = new Schema({
+          name: String
+      }, { id: false });
+      assert.equal(undefined, schema.virtualpath('id'));
+
+      // old options
+      var schema = new Schema({
+          name: String
+      }, { noVirtualId: false });
+      assert.ok(schema.virtualpath('id') instanceof mongoose.VirtualType);
+
+      var schema = new Schema({
+          name: String
+      }, { noVirtualId: true });
+      assert.equal(undefined, schema.virtualpath('id'));
     })
   });
 

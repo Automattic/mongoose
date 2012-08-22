@@ -199,7 +199,6 @@ describe('document:', function(){
     assert.equal(1, Object.keys(doc._doc.nested).length);
     assert.equal('overwrite the entire nested object', doc.nested.path);
     assert.ok(doc.isModified('nested'));
-    assert.ok(doc.isModified('nested.path'));
   });
 
   it('test accessor of id', function(){
@@ -898,7 +897,6 @@ describe('document:', function(){
           assert.equal(1, Object.keys(doc._doc.nested).length);
           assert.equal('overwrite the entire nested object', doc.nested.path);
           assert.ok(doc.isModified('nested'));
-          assert.ok(doc.isModified('nested.path'));
 
           // vs merging using doc.set(object)
           doc.set({ test: 'Test', nested: { age: 4 }});
@@ -906,8 +904,6 @@ describe('document:', function(){
           assert.equal(4, doc.nested.age);
           assert.equal(2, Object.keys(doc._doc.nested).length);
           assert.ok(doc.isModified('nested'));
-          assert.ok(doc.isModified('nested.path'));
-          assert.ok(doc.isModified('nested.age'));
 
           var doc = new TestDocument();
           doc.init({
@@ -921,7 +917,6 @@ describe('document:', function(){
           assert.ok(!doc.isModified());
           assert.ok(!doc.isModified('test'));
           assert.ok(!doc.isModified('nested'));
-          assert.ok(!doc.isModified('nested.path'));
           assert.ok(!doc.isModified('nested.age'));
 
           doc.nested = { path: 'overwrite the entire nested object', age: 5 };
@@ -929,16 +924,11 @@ describe('document:', function(){
           assert.equal(2, Object.keys(doc._doc.nested).length);
           assert.equal('5overwrite the entire nested object', doc.nested.path);
           assert.ok(doc.isModified('nested'));
-          assert.ok(doc.isModified('nested.path'));
-          assert.ok(doc.isModified('nested.age'));
 
           doc.nested.deep = { x: 'Hank and Marie' };
           assert.equal(3, Object.keys(doc._doc.nested).length);
           assert.equal('5overwrite the entire nested object', doc.nested.path);
           assert.ok(doc.isModified('nested'));
-          assert.ok(doc.isModified('nested.path'));
-          assert.ok(doc.isModified('nested.age'));
-          assert.ok(doc.isModified('nested.deep'));
           assert.equal('Hank and Marie', doc.nested.deep.x);
 
           var doc = new TestDocument();
@@ -956,7 +946,6 @@ describe('document:', function(){
           assert.ok(!doc.isModified('nested.path'));
           assert.ok(!doc.isModified('nested.age'));
           assert.ok(doc.isModified('nested.deep'));
-          assert.ok(doc.isModified('nested.deep.x'));
           assert.equal('Hank and Marie', doc.nested.deep.x);
         })
       })

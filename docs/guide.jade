@@ -224,6 +224,7 @@ block content
     - [shardKey](#shardKey)
     - [autoIndex](#autoIndex)
     - [_id](#_id)
+    - [id](#id)
 
   h4#safe option: safe
   :markdown
@@ -341,6 +342,22 @@ block content
     var Page = db.model('Page', schema);
     var p = new Page({ name: 'mongodb.org' });
     console.log(p); // { name: 'mongodb.org' }
+
+  h4#id option: id
+  :markdown
+    Mongoose assigns each of your schemas an `id` virtual getter by default which returns the documents `_id` field cast to a string, or in the case of ObjectIds, its hexString. If you don't want an `id` getter added to your schema, you may disable it passing this option at schema construction time.
+  :js
+    // default behavior
+    var schema = new Schema({ name: String });
+    var Page = db.model('Page', schema);
+    var p = new Page({ name: 'mongodb.org' });
+    console.log(p.id); // '50341373e894ad16347efe01'
+
+    // disabled id
+    var schema = new Schema({ name: String }, { id: false });
+    var Page = db.model('Page', schema);
+    var p = new Page({ name: 'mongodb.org' });
+    console.log(p.id); // undefined
 
 script.
 document.body.className = 'load';

@@ -1,4 +1,13 @@
 
+2.8.0 / 2012-08-23
+==================
+
+  * changed; fixed; retain virtual setter return values #1069
+  * changed; fixed; directly setting nested objects now overwrites instead of merging
+  * updated; driver to 1.1.4
+  * fixed; error on bad validators #1044
+  * fixed; query population edge case #1053 #1055 [jfremy](https://github.com/jfremy)
+
 2.7.4 / 2012-08-02
 ==================
 

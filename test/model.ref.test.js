@@ -870,7 +870,7 @@ describe('model: ref:', function(){
           var ran = false;
           BlogPost
           .find({ title: /gh-1055/ })
-          .sort('title')
+          .sort('title', 1)
           .select('comments')
           .populate('comments._creator')
           .populate('comments.asers')

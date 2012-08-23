@@ -1,4 +1,14 @@
 
+3.0.3 / 2012-08-23
+==================
+
+  * fixed use of nested paths beginning w/ numbers #1062
+  * fixed query population edge case #1053 #1055 [jfremy](https://github.com/jfremy)
+  * fixed simultaneous top and sub level array modifications #1073
+  * added id and _id schema option aliases + tests
+  * improve debug formatting to allow copy/paste logged queries into mongo shell [eknkc](https://github.com/eknkc)
+  * docs
+
 3.0.2 / 2012-08-17
 ==================
 

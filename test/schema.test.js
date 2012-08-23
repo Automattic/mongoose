@@ -204,7 +204,6 @@ describe('schema', function(){
     assert.equal(Test.path('mixed2').getDefault().length, 0);
   })
 
-
   describe('validation', function(){
     it('invalid arguments are rejected (1044)', function(){
       assert.throws(function () {
@@ -772,7 +771,6 @@ describe('schema', function(){
     });
 
     describe('string', function(){
-      console.error('\nTODO remove string lowercase/uppercase/trim setters before 3.0\n');
       it('lowercase', function(){
         var Tobi = new Schema({
             name: { type: String, lowercase: true }
@@ -895,6 +893,61 @@ describe('schema', function(){
 
       assert.ok(g);
       assert.equal(g.message,'A getter must be a function.');
+    })
+    it('auto _id', function(){
+      var schema = new Schema({
+          name: String
+      });
+      assert.ok(schema.path('_id') instanceof Schema.ObjectId);
+
+      var schema = new Schema({
+          name: String
+      }, { _id: true });
+      assert.ok(schema.path('_id') instanceof Schema.ObjectId);
+
+      var schema = new Schema({
+          name: String
+      }, { _id: false });
+      assert.equal(undefined, schema.path('_id'));
+
+      // old options
+      var schema = new Schema({
+          name: String
+      }, { noId: false });
+      assert.ok(schema.path('_id') instanceof Schema.ObjectId);
+
+      var schema = new Schema({
+          name: String
+      }, { noId: true });
+      assert.equal(undefined, schema.path('_id'));
+    })
+
+    it('auto id', function(){
+      var schema = new Schema({
+          name: String
+      });
+      assert.ok(schema.virtualpath('id') instanceof mongoose.VirtualType);
+
+      var schema = new Schema({
+          name: String
+      }, { id: true });
+      assert.ok(schema.virtualpath('id') instanceof mongoose.VirtualType);
+
+      var schema = new Schema({
+          name: String
+      }, { id: false });
+      assert.equal(undefined, schema.virtualpath('id'));
+
+      // old options
+      var schema = new Schema({
+          name: String
+      }, { noVirtualId: false });
+      assert.ok(schema.virtualpath('id') instanceof mongoose.VirtualType);
+
+      var schema = new Schema({
+          name: String
+      }, { noVirtualId: true });
+      assert.equal(undefined, schema.virtualpath('id'));
     })
   });
 
@@ -1019,6 +1072,8 @@ describe('schema', function(){
       assert.equal(true, Tobi.options.strict);
       assert.equal(false, Tobi.options.capped);
       assert.equal('__v', Tobi.options.versionKey);
+      assert.equal(null, Tobi.options.shardKey);
+      assert.equal(true, Tobi.options._id);
     });
 
     it('setting', function(){

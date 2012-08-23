@@ -221,7 +221,10 @@ block content
     - [strict](#strict)
     - [capped](#capped)
     - [versionKey](#versionKey)
+    - [shardKey](#shardKey)
     - [autoIndex](#autoIndex)
+    - [_id](#_id)
+    - [id](#id)
 
   h4#safe option: safe
   :markdown
@@ -271,7 +274,7 @@ block content
   :markdown
     _NOTE: in mongoose v2 the default was false._
 
-  h4#shardkey option: shardKey
+  h4#shardKey option: shardKey
   :markdown
     The `shardKey` option is used when we have a [sharded MongoDB architecture](http://www.mongodb.org/display/DOCS/Sharding+Introduction). Each sharded collection is given a shard key which must be present in all insert/update operations. We just need to set this schema option to the same shard key and we’ll be all set.
 
@@ -313,6 +316,7 @@ block content
     var Thing = db.model('Thing', schema);
     var thing = new Thing({ name: 'no versioning please' });
     thing.save(); // { name: 'no versioning please' }
+
   h4#autoIndex option: autoIndex
   :markdown
     At application startup, Mongoose sends an `ensureIndex` command for each index declared in your `Schema`. As of Mongoose v3, indexes are created in the `background` by default. If you wish to disable the auto-creation feature and manually handle when indexes are created, set your `Schema`s `autoIndex` option to `false` and use the [ensureIndexes](./api.html#model_Model-ensureIndexes) method on your model.
@@ -320,6 +324,40 @@ block content
     var schema = new Schema({..}, { autoIndex: false })
     var Clock = db.model('Clock', schema);
     Clock.ensureIndexes(callback);
+
+  h4#_id option: _id
+  :markdown
+    Mongoose assigns each of your schemas an `_id` field by default if one is not passed into the [Schema](/docs/api.html#schema-js) constructor. The type assiged is an [ObjectId](/docs/api.html#schema_Schema-Types) to coincide with MongoDBs default behavior. If you don't want an `_id` added to your schema at all, you may disable it using this option.
+
+    Pass this option during schema construction to prevent documents from getting an auto `_id` created.
+  :js
+    // default behavior
+    var schema = new Schema({ name: String });
+    var Page = db.model('Page', schema);
+    var p = new Page({ name: 'mongodb.org' });
+    console.log(p); // { _id: '50341373e894ad16347efe01', name: 'mongodb.org' }
+
+    // disabled _id
+    var schema = new Schema({ name: String }, { _id: false });
+    var Page = db.model('Page', schema);
+    var p = new Page({ name: 'mongodb.org' });
+    console.log(p); // { name: 'mongodb.org' }
+
+  h4#id option: id
+  :markdown
+    Mongoose assigns each of your schemas an `id` virtual getter by default which returns the documents `_id` field cast to a string, or in the case of ObjectIds, its hexString. If you don't want an `id` getter added to your schema, you may disable it passing this option at schema construction time.
+  :js
+    // default behavior
+    var schema = new Schema({ name: String });
+    var Page = db.model('Page', schema);
+    var p = new Page({ name: 'mongodb.org' });
+    console.log(p.id); // '50341373e894ad16347efe01'
+
+    // disabled id
+    var schema = new Schema({ name: String }, { id: false });
+    var Page = db.model('Page', schema);
+    var p = new Page({ name: 'mongodb.org' });
+    console.log(p.id); // undefined
 
 script.
 document.body.className = 'load';

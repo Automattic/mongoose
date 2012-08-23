@@ -717,4 +717,21 @@ describe('model: update:', function(){
 
   })
 
+  it('handles nested paths starting with numbers (gh-1062)', function(done){
+    var db = start()
+    var schema = Schema({ counts: Schema.Types.Mixed });
+    var M = db.model('gh-1062', schema, '1062-'+random());
+    M.create({ counts: {} }, function (err, m) {
+      assert.ifError(err);
+      M.update({}, { $inc: { 'counts.1': 1, 'counts.1a': 10 }}, function (err, updated) {
+        assert.ifError(err);
+        M.findById(m, function (err, doc) {
+          assert.ifError(err);
+          assert.equal(1, doc.counts['1']);
+          assert.equal(10, doc.counts['1a']);
+          done();
+        });
+      });
+    })
+  })
 });

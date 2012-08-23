@@ -729,7 +729,6 @@ describe('model: update:', function(){
           assert.ifError(err);
           assert.equal(1, doc.counts['1']);
           assert.equal(10, doc.counts['1a']);
-          console.log(doc);
           done();
         });
       });

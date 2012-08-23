@@ -1534,6 +1534,31 @@ describe('model', function(){
       post.set('titleWithAuthor', 'Huckleberry Finn by Mark Twain')
       assert.equal(post.get('title'),'Huckleberry Finn');
       assert.equal(post.get('author'),'Mark Twain');
+
+      // return values
+      var schema = new Schema({ name: String, name2: String });
+      var virtualName = schema.virtual('virtualname');
+      virtualName.set(function (v) {
+        this.name = v.substring(11);
+      }).set(function (v) {
+        return v.toUpperCase();
+      });
+
+      var virtualName2 = schema.virtual('virtualname2');
+      virtualName2.set(function (v) {
+        this.name2 = v.substring(11);
+      }).set(function (v) {
+        // undefined return values are ignored
+        v.toUpperCase();
+      });
+
+      var M = db.model('virtual-set', schema);
+      var m = new M;
+      m.virtualname = "my name is hal"
+      m.virtualname2 = "my name is hal";
+
+      assert.equal('HAL', m.name);
+      assert.equal('hal', m.name2);
     });
 
     it('should not be saved to the db', function(done){

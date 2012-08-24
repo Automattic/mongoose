@@ -5454,9 +5454,43 @@ schema.expires(<span class="string">'7d'</span>);</code></pre></div><hr class=""
   <span class="keyword">return</span> val.charAt(<span class="number">0</span>).toUpperCase() + val.substring(<span class="number">1</span>);
 }
 
-<span class="keyword">var</span> s = <span class="keyword">new</span> Schema({ name: { type: String, set: capitalize })
-<span class="comment">// or</span>
-Schema.path(<span class="string">'name'</span>).set(capitalize);</code></pre></div><hr class=""></div><div class="item method public"><h3 id="schematype_SchemaType-get"><a href="#schematype_SchemaType-get">SchemaType#get(<code>fn</code>)</a></h3><p>Adds a getter to this schematype.</p><span class="showcode">show code</span><div class="sourcecode"><pre><code class="javascript">SchemaType.prototype.get = <span class="function"><span class="keyword">function</span> <span class="params">(fn)</span> {</span>
+<span class="comment">// defining within the schema</span>
+<span class="keyword">var</span> s = <span class="keyword">new</span> Schema({ name: { type: String, set: capitalize }})
+
+<span class="comment">// or by retreiving its SchemaType</span>
+<span class="keyword">var</span> s = <span class="keyword">new</span> Schema({ name: String })
+s.path(<span class="string">'name'</span>).set(capitalize)</code></pre>
+
+<p>Setters allow you to transform the data before it gets to the raw mongodb document and is set as a value on an actual key.</p>
+
+<p>Suppose you are implementing user registration for a website. Users provide an email and password, which gets saved to mongodb. The email is a string that you will want to normalize to lower case, in order to avoid one email having more than one account -- e.g., otherwise, <a href='mailto:avenue@q.com'>avenue@q.com</a> can be registered for 2 accounts via <a href='mailto:avenue@q.com'>avenue@q.com</a> and <a href='mailto:AvEnUe@Q.CoM'>AvEnUe@Q.CoM</a>.</p>
+
+<p>You can set up email lower case normalization easily via a Mongoose setter.</p>
+
+<pre><code>function toLower (v) {
+  return v.toLowerCase();
+}
+
+var UserSchema = new Schema({
+  email: { type: String, set: toLower }
+})
+
+var User = db.model('User', UserSchema)
+
+var user = new User({email: '<a href='mailto:AVENUE@Q.COM'>AVENUE@Q.COM</a>'})
+console.log(user.email); // '<a href='mailto:avenue@q.com'>avenue@q.com</a>'
+
+// or
+var user = new User
+user.email = '<a href='mailto:Avenue@Q.com'>Avenue@Q.com</a>'
+console.log(user.email) // '<a href='mailto:avenue@q.com'>avenue@q.com</a>'
+</code></pre>
+
+<p>As you can see above, setters allow you to transform the data before it gets to the raw mongodb document and is set as a value on an actual key.</p>
+
+<p><em>NOTE: we could have also just used the built-in <code>lowercase: true</code> SchemaType option instead of defining our own function.</em></p>
+
+<pre><code><span class="keyword">new</span> Schema({ email: { type: String, lowercase: <span class="literal">true</span> }})</code></pre></div><hr class=""></div><div class="item method public"><h3 id="schematype_SchemaType-get"><a href="#schematype_SchemaType-get">SchemaType#get(<code>fn</code>)</a></h3><p>Adds a getter to this schematype.</p><span class="showcode">show code</span><div class="sourcecode"><pre><code class="javascript">SchemaType.prototype.get = <span class="function"><span class="keyword">function</span> <span class="params">(fn)</span> {</span>
   <span class="keyword">if</span> (<span class="string">'function'</span> != <span class="keyword">typeof</span> fn)
     <span class="keyword">throw</span> <span class="keyword">new</span> Error(<span class="string">'A getter must be a function.'</span>);
   <span class="keyword">this</span>.getters.push(fn);
@@ -5468,9 +5502,30 @@ Schema.path(<span class="string">'name'</span>).set(capitalize);</code></pre></d
   <span class="keyword">return</span> (val.getMonth() + <span class="number">1</span>) + <span class="string">"/"</span> + val.getDate() + <span class="string">"/"</span> + val.getFullYear();
 }
 
+<span class="comment">// defining within the schema</span>
 <span class="keyword">var</span> s = <span class="keyword">new</span> Schema({ born: { type: Date, get: dob })
-<span class="comment">// or</span>
-Schema.path(<span class="string">'name'</span>).get(dob);</code></pre></div><hr class=""></div><div class="item method public"><h3 id="schematype_SchemaType-validate"><a href="#schematype_SchemaType-validate">SchemaType#validate(<code>obj</code>, <code>[error]</code>)</a></h3><p>Adds validator(s) for this document path.</p><span class="showcode">show code</span><div class="sourcecode"><pre><code class="javascript">SchemaType.prototype.validate = <span class="function"><span class="keyword">function</span> <span class="params">(obj, error)</span> {</span>
+
+<span class="comment">// or by retreiving its SchemaType</span>
+<span class="keyword">var</span> s = <span class="keyword">new</span> Schema({ born: Date })
+s.path(<span class="string">'born'</span>).get(dob)</code></pre>
+
+<p>Getters allow you to transform the representation of the data as it travels from the raw mongodb document to the value that you see.</p>
+
+<p>Suppose you are storing credit card numbers and you want to hide everything except the last 4 digits to the mongoose user. You can do so by defining a getter in the following way:</p>
+
+<pre><code><span class="function"><span class="keyword">function</span> <span class="title">obfuscate</span> <span class="params">(cc)</span> {</span>
+  <span class="keyword">return</span> <span class="string">'****-****-****-'</span> + cc.slice(cc.length-<span class="number">4</span>, cc.length);
+}
+
+<span class="keyword">var</span> AccountSchema = <span class="keyword">new</span> Schema({
+  creditCardNumber: { type: String, get: obfuscate }
+});
+
+<span class="keyword">var</span> Account = db.model(<span class="string">'Account'</span>, AccountSchema);
+
+Account.findById(id, <span class="function"><span class="keyword">function</span> <span class="params">(err, found)</span> {</span>
+  console.log(found.creditCardNumber); <span class="comment">// '****-****-****-1234'</span>
+});</code></pre></div><hr class=""></div><div class="item method public"><h3 id="schematype_SchemaType-validate"><a href="#schematype_SchemaType-validate">SchemaType#validate(<code>obj</code>, <code>[error]</code>)</a></h3><p>Adds validator(s) for this document path.</p><span class="showcode">show code</span><div class="sourcecode"><pre><code class="javascript">SchemaType.prototype.validate = <span class="function"><span class="keyword">function</span> <span class="params">(obj, error)</span> {</span>
   <span class="keyword">if</span> (<span class="string">'function'</span> == <span class="keyword">typeof</span> obj || obj &amp;&amp; <span class="string">'RegExp'</span> === obj.constructor.name) {
     <span class="keyword">this</span>.validators.push([obj, error]);
     <span class="keyword">return</span> <span class="keyword">this</span>;

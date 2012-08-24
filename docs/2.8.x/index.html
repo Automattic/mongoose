@@ -1,0 +1,592 @@
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Mongoose ODM</title>
+    <style>
+      body {
+        background: url('/docs/2.8.x/images/bg.png');
+        padding: 0 30px 30px;
+        margin-top: 0;
+      }
+
+      #wrap {
+        background: url('/docs/2.8.x/images/pattern.png') no-repeat -134px -211px;
+        min-height: 600px;
+        padding-top: 30px;
+      }
+
+      #page {
+        width: 650px;
+        margin: auto;
+        position: relative;
+      }
+
+      #footer {
+        font: 13px Helvetica;
+        padding-top: 15px;
+        border-top: 1px solid #000;
+        color: #666;
+        margin-top: 25px;
+      }
+
+      #footer > div {
+        padding-top: 8px;
+        float: right;
+        text-align: right;
+        padding-bottom: 20px;
+      }
+
+      #content {
+        color: #111;
+        font: 15px Courier;
+      }
+
+      #content h1, #content h2, #content h3 {
+        text-shadow: 0 1px 0 #fff;
+      }
+
+      #announce {
+        background: #2A758A;
+        border: 10px solid black;
+        border-radius: 7px;
+        padding: 30px;
+        font-size: 125%;
+        color: white;
+        text-shadow: none;
+        font-family: Arial;
+      }
+
+      #announce a {
+        color: orange;
+        text-shadow: none;
+      }
+
+      pre {
+        background: rgba(255,255,255,.8);
+        border: 1px solid #c6c6c6;
+        padding: 10px;
+        border-radius: 3px;
+        box-shadow: 1px 3px 6px #ddd;
+      }
+
+      code {
+        background: rgba(255,255,255,.8);
+        border: 1px solid #c6c6c6;
+        color: #333;
+        border-radius: 3px
+      }
+
+      pre code {
+        border: 0 none;
+      }
+
+      form {
+        font: bold 12px Helvetica;
+        text-shadow: 0 1px 0 #fff;
+        float: left;
+        padding-bottom: 25px;
+      }
+
+      form img {
+        margin-right: 5px
+      }
+
+      #google-members-count {
+        vertical-align: top;
+        line-height: 32px;
+      }
+
+      h1 a {
+        background: url('/docs/2.8.x/images/logo.png');
+        width: 404px;
+        height: 47px;
+        margin-bottom: 40px;
+        text-indent: -500em;
+        display: block;
+      }
+
+      a {
+        color: #2a758a;
+        text-shadow: 0 1px 0 #fff;
+        text-decoration: none;
+      }
+
+      a:hover {
+        opacity: 0.8;
+      }
+
+      #menu {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100%;
+        background-color: rgba(0,0,0,0.3);
+        font: bold 15px Helvetica;
+        border-right: 1px solid rgba(0,0,0,0.2);
+      }
+
+      #menu ul {
+        margin: 0;
+        padding: 50px 0;
+      }
+
+      #menu ul li {
+        list-style-type: none;
+        padding-left: 15px;
+        padding-right: 20px;
+      }
+
+      #menu ul li a {
+        color: #fff;
+        text-shadow: none;
+      }
+      #menu ul li a:hover {
+        text-decoration: underline;
+      }
+      #wild { margin-top: 10px; }
+    </style>
+
+    <script>
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-1122274-9']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();
+      
+      function getMembers(data){
+        if (!(data && data.query && data.query.results && data.query.results.p)) return;
+        var members = document.createElement('span');
+        members.id = 'google-members-count';
+        members.innerHTML = '('+ data.query.results.p +' members)';
+        document.getElementsByTagName('FORM')[0].insertBefore(members, document.getElementById('google-subscribe-input'));
+      };
+
+      window.onload = function(){
+        // lame jsonp
+        var script = document.createElement('script');
+        script.src = "http://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20html%20where%20url%3D%22http%3A%2F%2Fgroups.google.com%2Fgroup%2Fmongoose-orm%2Fabout%22%20and%20xpath%3D'%2F%2Fdiv%5B%40class%3D%5C'maincontbox%5C'%5D%2Ftable%2Ftr%5B1%5D%2Ftd%2Fp%5B1%5D'%0A&format=json&callback=getMembers";
+        document.head.appendChild(script);
+      };
+    </script>
+  </head>
+  <body>
+    <a href="http://github.com/learnboost/mongoose"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png" alt="Fork me on GitHub"></a>
+    <div id="wrap">
+      <div id="page">
+        <div id="menu">
+          <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="docs/model-definition.html">Models/Schemas</a></li>
+            <li><a href="docs/schematypes.html">Schema Types</a></li>
+            <li><a href="docs/schema-options.html">Schema Options</a></li>
+            <li><a href="docs/middleware.html">Middleware</a></li>
+            <li><a href="docs/finding-documents.html">Finding Docs</a></li>
+            <li><a href="docs/updating-documents.html">Updating Docs</a></li>
+            <li><a href="docs/query.html">Queries</a></li>
+            <li><a href="docs/querystream.html">Query Streams</a></li>
+            <li><a href="docs/methods-statics.html">Methods &amp; Statics</a>
+            <li><a href="docs/defaults.html">Defaults</a></li>
+            <li><a href="docs/indexes.html">Indexes</a></li>
+            <li><a href="docs/validation.html">Validation</a></li>
+            <li><a href="docs/virtuals.html">Virtuals</a></li>
+            <li><a href="docs/getters-setters.html">Getters / Setters</a></li>
+            <li><a href="docs/embedded-documents.html">Embedded Docs</a></li>
+            <li><a href="docs/populate.html">Populate (DBRef-like)</a></li>
+            <li><a href="docs/plugins.html">Plugins</a></li>
+            <li><a href="docs/errors.html">Errors</a></li>
+            <li><a href="docs/migration-1x-2x.html">v1x - v2x Migration</a></li>
+            <li><a href="docs/api.html">API</a></li>
+          </ul>
+        </div>
+
+        <h1><a href="index.html">Mongoose</a></h1>
+
+        <div id="content">
+          <h1>Mongoose 2.8.x</h1>
+
+<div id="announce"><strong>08-23-2012: Mongoose 2.8 is out</strong> with a few bug fixes, a couple of which cause a slight change in behavior from previous 2.x versions.
+  Check out the <a href="https://groups.google.com/d/topic/mongoose-orm/UVx4xdufz-I/discussion">release notes</a> for details.
+</div>
+          <h2>What's Mongoose?</h2>
+
+<p>Mongoose is a <a href="http://www.mongodb.org/">MongoDB</a> object modeling tool designed to work in an asynchronous environment.</p>
+
+<p>Defining a model is as easy as:</p>
+
+<pre><code>var Comments = new Schema({
+    title     : String
+  , body      : String
+  , date      : Date
+});
+
+var BlogPost = new Schema({
+    author    : ObjectId
+  , title     : String
+  , body      : String
+  , buf       : Buffer
+  , date      : Date
+  , comments  : [Comments]
+  , meta      : {
+      votes : Number
+    , favs  : Number
+  }
+});
+
+var Post = mongoose.model('BlogPost', BlogPost);
+</code></pre>
+
+<h2>Installation</h2>
+
+<p>The recommended way is through the excellent <a href="http://www.npmjs.org/">NPM</a>:</p>
+
+<pre><code>$ npm install mongoose
+</code></pre>
+
+<p>Otherwise, you can check it in your repository and then expose it:</p>
+
+<pre><code>$ git clone git://github.com/LearnBoost/mongoose.git node_modules/mongoose/
+</code></pre>
+
+<p>And install dependency modules written on <code>package.json</code>.</p>
+
+<p>Then you can <code>require</code> it:</p>
+
+<pre><code>require('mongoose')
+</code></pre>
+
+<h2>Connecting to MongoDB</h2>
+
+<p>First, we need to define a connection. If your app uses only one database, you should use <code>mongose.connect</code>. If you need to create additional connections, use <code>mongoose.createConnection</code>.</p>
+
+<p>Both <code>connect</code> and <code>createConnection</code> take a <code>mongodb://</code> URI, or the parameters <code>host, database, port, options</code>.</p>
+
+<pre><code>var mongoose = require('mongoose');
+
+mongoose.connect('mongodb://localhost/my_database');
+</code></pre>
+
+<p>Once connected, the <code>open</code> event is fired on the <code>Connection</code> instance. If you're using <code>mongoose.connect</code>, the <code>Connection</code> is <code>mongoose.connection</code>. Otherwise, <code>mongoose.createConnection</code> return value is a <code>Connection</code>.</p>
+
+<p><strong>Important!</strong> Mongoose buffers all the commands until it's connected to the database. This means that you don't have to wait until it connects to MongoDB in order to define models, run queries, etc.</p>
+
+<h2>Defining a Model</h2>
+
+<p>Models are defined through the <code>Schema</code> interface. </p>
+
+<pre><code>var Schema = mongoose.Schema
+  , ObjectId = Schema.ObjectId;
+
+var BlogPost = new Schema({
+    author    : ObjectId
+  , title     : String
+  , body      : String
+  , date      : Date
+});
+</code></pre>
+
+<p>Aside from defining the structure of your documents and the types of data you're storing, a Schema handles the definition of:</p>
+
+<ul>
+<li><a href="docs/validation.html">Validators</a> (async and sync)</li>
+<li><a href="docs/schematypes.html">Defaults</a></li>
+<li><a href="docs/getters-setters.html">Getters</a></li>
+<li><a href="docs/getters-setters.html">Setters</a></li>
+<li><a href="docs/indexes.html">Indexes</a></li>
+<li><a href="docs/middleware.html">Middleware</a></li>
+<li><a href="docs/methods-statics.html">Methods</a> definition</li>
+<li><a href="docs/methods-statics.html">Statics</a> definition</li>
+<li><a href="docs/plugins.html">Plugins</a></li>
+<li><a href="docs/populate.html">DBRefs</a></li>
+</ul>
+
+<p>The following example shows some of these features:</p>
+
+<pre><code>var Comment = new Schema({
+    name  :  { type: String, default: 'hahaha' }
+  , age   :  { type: Number, min: 18, index: true }
+  , bio   :  { type: String, match: /[a-z]/ }
+  , date  :  { type: Date, default: Date.now }
+  , buff  :  Buffer
+});
+
+// a setter
+Comment.path('name').set(function (v) {
+  return capitalize(v);
+});
+
+// middleware
+Comment.pre('save', function (next) {
+  notify(this.get('email'));
+  next();
+});
+</code></pre>
+
+<p>Take a look at the example in <code>examples/schema.js</code> for an end-to-end example of a typical setup.</p>
+
+<h2>Accessing a Model</h2>
+
+<p>Once we define a model through <code>mongoose.model('ModelName', mySchema)</code>, we can access it through the same function</p>
+
+<pre><code>var myModel = mongoose.model('ModelName');
+</code></pre>
+
+<p>Or just do it all at once</p>
+
+<pre><code>var MyModel = mongoose.model('ModelName', mySchema);
+</code></pre>
+
+<p>We can then instantiate it, and save it:</p>
+
+<pre><code>var instance = new MyModel();
+instance.my.key = 'hello';
+instance.save(function (err) {
+  //
+});
+</code></pre>
+
+<p>Or we can find documents from the same collection</p>
+
+<pre><code>MyModel.find({}, function (err, docs) {
+  // docs.forEach
+});
+</code></pre>
+
+<p>You can also <code>findOne</code>, <code>findById</code>, <code>update</code>, etc. For more details check out <a href="docs/finding-documents.html">this link</a>.</p>
+
+<p><strong>Important!</strong> If you opened a separate connection using <code>mongoose.createConnection()</code> but attempt to access the model through <code>mongoose.model('ModelName')</code> it will not work as expected since it is not hooked up to an active db connection. In this case access your model through the connection you created:</p>
+
+<pre><code>var conn = mongoose.createConnection('your connection string');
+var MyModel = conn.model('ModelName', schema);
+var m = new MyModel;
+m.save() // works
+
+vs
+
+var conn = mongoose.createConnection('your connection string');
+var MyModel = mongoose.model('ModelName', schema);
+var m = new MyModel;
+m.save() // does not work b/c the default connection object was never connected
+</code></pre>
+
+<h2>Embedded Documents</h2>
+
+<p>In the first example snippet, we defined a key in the Schema that looks like:</p>
+
+<pre><code>comments: [Comments]
+</code></pre>
+
+<p>Where <code>Comments</code> is a <code>Schema</code> we created. This means that creating embedded documents is as simple as:</p>
+
+<pre><code>// retrieve my model
+var BlogPost = mongoose.model('BlogPost');
+
+// create a blog post
+var post = new BlogPost();
+
+// create a comment
+post.comments.push({ title: 'My comment' });
+
+post.save(function (err) {
+  if (!err) console.log('Success!');
+});
+</code></pre>
+
+<p>The same goes for removing them:</p>
+
+<pre><code>BlogPost.findById(myId, function (err, post) {
+  if (!err) {
+    post.comments[0].remove();
+    post.save(function (err) {
+      // do something
+    });
+  }
+});
+</code></pre>
+
+<p>Embedded documents enjoy all the same features as your models. Defaults, validators, middleware. Whenever an error occurs, it's bubbled to the <code>save()</code> error callback, so error handling is a snap!</p>
+
+<p>Mongoose interacts with your embedded documents in arrays <em>atomically</em>, out of the box.</p>
+
+<h2>Middleware</h2>
+
+<p>Middleware is one of the most exciting features about Mongoose. Middleware takes away all the pain of nested callbacks.</p>
+
+<p>Middleware are defined at the Schema level and are applied for the methods <code>init</code> (when a document is initialized with data from MongoDB), <code>save</code> (when a document or embedded document is saved).</p>
+
+<p>There's two types of middleware:</p>
+
+<ul>
+<li><p>Serial<br />Serial middleware are defined like:</p>
+
+<pre><code>.pre(method, function (next, methodArg1, methodArg2, ...) {
+  // ...
+})
+</code></pre>
+
+<p>They're executed one after the other, when each middleware calls <code>next</code>.</p>
+
+<p>You can also intercept the <code>method</code>'s incoming arguments via your middleware -- notice <code>methodArg1</code>, <code>methodArg2</code>, etc in the <code>pre</code> definition above. See section "Intercepting and mutating method arguments" below.</p></li>
+<li><p>Parallel<br />Parallel middleware offer more fine-grained flow control, and are defined like:</p>
+
+<pre><code>.pre(method, true, function (next, done, methodArg1, methodArg2) {
+  // ...
+})
+</code></pre>
+
+<p>Parallel middleware can <code>next()</code> immediately, but the final argument will be called when all the parallel middleware have called <code>done()</code>.</p></li>
+</ul>
+
+<h3>Error handling</h3>
+
+<p>If any middleware calls <code>next</code> or <code>done</code> with an <code>Error</code> instance, the flow is interrupted, and the error is passed to the function passed as an argument.</p>
+
+<p>For example:</p>
+
+<pre><code>schema.pre('save', function (next) {
+  // something goes wrong
+  next(new Error('something went wrong'));
+});
+
+// later...
+
+myModel.save(function (err) {
+  // err can come from a middleware
+});
+</code></pre>
+
+<h3>Intercepting and mutating method arguments</h3>
+
+<p>You can intercept method arguments via middleware.</p>
+
+<p>For example, this would allow you to broadcast changes about your Documents every time someone <code>set</code>s a path in your Document to a new value:</p>
+
+<pre><code>schema.pre('set', function (next, path, val, typel) {
+  // `this` is the current Document
+  this.emit('set', path, val);
+
+  // Pass control to the next pre
+  next();
+});
+</code></pre>
+
+<p>Moreover, you can mutate the incoming <code>method</code> arguments so that subsequent middleware see different values for those arguments. To do so, just pass the new values to <code>next</code>:</p>
+
+<pre><code>.pre(method, function firstPre (next, methodArg1, methodArg2) {
+  // Mutate methodArg1
+  next("altered-" + methodArg1.toString(), methodArg2);
+})
+
+// pre declaration is chainable
+.pre(method, function secondPre (next, methodArg1, methodArg2) {
+  console.log(methodArg1);
+  // =&gt; 'altered-originalValOfMethodArg1' 
+
+  console.log(methodArg2);
+  // =&gt; 'originalValOfMethodArg2' 
+
+  // Passing no arguments to `next` automatically passes along the current argument values
+  // i.e., the following `next()` is equivalent to `next(methodArg1, methodArg2)`
+  // and also equivalent to, with the example method arg 
+  // values, `next('altered-originalValOfMethodArg1', 'originalValOfMethodArg2')`
+  next();
+})
+</code></pre>
+
+<h3>Schema gotcha</h3>
+
+<p><code>type</code>, when used in a schema has special meaning within Mongoose. If your schema requires using <code>type</code> as a nested property you must use object notation:</p>
+
+<pre><code>new Schema({
+    broken: { type: Boolean }
+  , asset : {
+        name: String
+      , type: String // uh oh, it broke. asset will be interpreted as String
+    }
+});
+
+new Schema({
+    works: { type: Boolean }
+  , asset : {
+        name: String
+      , type: { type: String } // works. asset is an object with a type property
+    }
+});
+</code></pre>
+
+<h2>API docs</h2>
+
+<p>You can find the <a href="http://github.com/visionmedia/dox">Dox</a> generated API docs <a href="docs/api.html">here</a>.</p>
+
+<h2>Getting support</h2>
+
+<p>Please subscribe to the Google Groups <a href="http://groups.google.com/group/mongoose-orm">mailing list</a>.</p>
+
+<p>Join #mongoosejs on freenode.</p>
+
+<h2>Driver access</h2>
+
+<p>The driver being used defaults to <a href="https://github.com/mongodb/node-mongodb-native">node-mongodb-native</a> and is directly accessible through <code>YourModel.collection</code>. <strong>Note</strong>: using the driver directly bypasses all Mongoose power-tools like validation, getters, setters, hooks, etc.</p>
+
+<h2>Mongoose Plugins</h2>
+
+<p>Take a peek at the <a href="https://github.com/LearnBoost/mongoose/wiki/Plugins">plugins page</a> to see contributions from the community. Add your own!</p>
+
+<h2>Contributing to Mongoose</h2>
+
+<h3>Cloning the repository</h3>
+
+<p>Make a fork of <code>mongoose</code>, then clone it in your computer. The <code>v2.x</code> branch contains the current stable release, and the <code>master</code> branch the next upcoming major release.</p>
+
+<h3>Guidelines</h3>
+
+<ul>
+<li>Please write inline documentation for new methods or class members.</li>
+<li>Please write tests and make sure your tests pass.</li>
+<li>Before starting to write code, look for existing tickets or create one for your specific issue (unless you're addressing something that's clearly broken). That way you avoid working on something that might not be of interest or that has been addressed already in a different branch.</li>
+</ul>
+
+<h2>Credits</h2>
+
+<ul>
+<li>Guillermo Rauch - <a href='mailto:guillermo@learnboost.com'>guillermo@learnboost.com</a> - <a href="http://github.com/guille">Guille</a></li>
+<li>Nathan White - <a href="http://github.com/nw/">nw</a></li>
+<li>Brian Noguchi - <a href="https://github.com/bnoguchi">bnoguchi</a></li>
+<li>Aaron Heckmann - <a href="https://github.com/aheckmann">aheckmann</a></li>
+</ul>
+
+<h2>License</h2>
+
+<p>Copyright (c) 2010-2012 LearnBoost &lt;<a href='mailto:dev@learnboost.com'>dev@learnboost.com</a>&gt;</p>
+
+<p>Permission is hereby granted, free of charge, to any person obtaining<br />a copy of this software and associated documentation files (the<br />'Software'), to deal in the Software without restriction, including<br />without limitation the rights to use, copy, modify, merge, publish,<br />distribute, sublicense, and/or sell copies of the Software, and to<br />permit persons to whom the Software is furnished to do so, subject to<br />the following conditions:</p>
+
+<p>The above copyright notice and this permission notice shall be<br />included in all copies or substantial portions of the Software.</p>
+
+<p>THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND,<br />EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF<br />MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.<br />IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY<br />CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,<br />TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE<br />SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</p>
+        </div>
+
+        <div id="footer">
+
+          <form action="http://groups.google.com/group/mongoose-orm/boxsubscribe">
+           <a href="http://groups.google.com/group/mongoose-orm" id="google-subscribe-link"><img src="/docs/2.8.x/images/groups.png" border="0"></a>
+           <span id="google-members-count">&nbsp;</span>
+           <div id="google-subscribe-input">
+             Email: <input type="text" name="email" id="google-subscribe-email">
+             <input type="submit" name="go" value="Subscribe">
+           </div>
+          </form>
+
+          <div>
+            Mongoose by <a href="http://github.com/learnboost">LearnBoost Labs</a>.<br>
+            Released under the MIT license.<br>
+            Copyright <a href="http://learnboost.com">LearnBoost 2011</a>.
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

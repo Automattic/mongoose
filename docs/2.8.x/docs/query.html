@@ -1,0 +1,912 @@
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Mongoose ODM</title>
+    <style>
+      body {
+        background: url('/docs/2.7.x/images/bg.png');
+        padding: 0 30px 30px;
+        margin-top: 0;
+      }
+
+      #wrap {
+        background: url('/docs/2.7.x/images/pattern.png') no-repeat -134px -211px;
+        min-height: 600px;
+        padding-top: 30px;
+      }
+
+      #page {
+        width: 650px;
+        margin: auto;
+        position: relative;
+      }
+
+      #footer {
+        font: 13px Helvetica;
+        padding-top: 15px;
+        border-top: 1px solid #000;
+        color: #666;
+        margin-top: 25px;
+      }
+
+      #footer > div {
+        padding-top: 8px;
+        float: right;
+        text-align: right;
+        padding-bottom: 20px;
+      }
+
+      #content {
+        color: #111;
+        font: 15px Courier;
+      }
+
+      #content h1, #content h2, #content h3 {
+        text-shadow: 0 1px 0 #fff;
+      }
+
+      #announce {
+        background: #2A758A;
+        border: 10px solid black;
+        border-radius: 7px;
+        padding: 30px;
+        font-size: 125%;
+        color: white;
+        text-shadow: none;
+        font-family: Arial;
+      }
+
+      #announce a {
+        color: orange;
+        text-shadow: none;
+      }
+
+      pre {
+        background: rgba(255,255,255,.8);
+        border: 1px solid #c6c6c6;
+        padding: 10px;
+        border-radius: 3px;
+        box-shadow: 1px 3px 6px #ddd;
+      }
+
+      code {
+        background: rgba(255,255,255,.8);
+        border: 1px solid #c6c6c6;
+        color: #333;
+        border-radius: 3px
+      }
+
+      pre code {
+        border: 0 none;
+      }
+
+      form {
+        font: bold 12px Helvetica;
+        text-shadow: 0 1px 0 #fff;
+        float: left;
+        padding-bottom: 25px;
+      }
+
+      form img {
+        margin-right: 5px
+      }
+
+      #google-members-count {
+        vertical-align: top;
+        line-height: 32px;
+      }
+
+      h1 a {
+        background: url('/docs/2.7.x/images/logo.png');
+        width: 404px;
+        height: 47px;
+        margin-bottom: 40px;
+        text-indent: -500em;
+        display: block;
+      }
+
+      a {
+        color: #2a758a;
+        text-shadow: 0 1px 0 #fff;
+        text-decoration: none;
+      }
+
+      a:hover {
+        opacity: 0.8;
+      }
+
+      #menu {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100%;
+        background-color: rgba(0,0,0,0.3);
+        font: bold 15px Helvetica;
+        border-right: 1px solid rgba(0,0,0,0.2);
+      }
+
+      #menu ul {
+        margin: 0;
+        padding: 50px 0;
+      }
+
+      #menu ul li {
+        list-style-type: none;
+        padding-left: 15px;
+        padding-right: 20px;
+      }
+
+      #menu ul li a {
+        color: #fff;
+        text-shadow: none;
+      }
+      #menu ul li a:hover {
+        text-decoration: underline;
+      }
+      #wild { margin-top: 10px; }
+    </style>
+
+    <script>
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-1122274-9']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();
+      
+      function getMembers(data){
+        if (!(data && data.query && data.query.results && data.query.results.p)) return;
+        var members = document.createElement('span');
+        members.id = 'google-members-count';
+        members.innerHTML = '('+ data.query.results.p +' members)';
+        document.getElementsByTagName('FORM')[0].insertBefore(members, document.getElementById('google-subscribe-input'));
+      };
+
+      window.onload = function(){
+        // lame jsonp
+        var script = document.createElement('script');
+        script.src = "http://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20html%20where%20url%3D%22http%3A%2F%2Fgroups.google.com%2Fgroup%2Fmongoose-orm%2Fabout%22%20and%20xpath%3D'%2F%2Fdiv%5B%40class%3D%5C'maincontbox%5C'%5D%2Ftable%2Ftr%5B1%5D%2Ftd%2Fp%5B1%5D'%0A&format=json&callback=getMembers";
+        document.head.appendChild(script);
+      };
+    </script>
+  </head>
+  <body>
+    <a href="http://github.com/learnboost/mongoose"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png" alt="Fork me on GitHub"></a>
+    <div id="wrap">
+      <div id="page">
+        <div id="menu">
+          <ul>
+            <li><a href="../index.html">Home</a></li>
+            <li><a href="model-definition.html">Models/Schemas</a></li>
+            <li><a href="schematypes.html">Schema Types</a></li>
+            <li><a href="schema-options.html">Schema Options</a></li>
+            <li><a href="middleware.html">Middleware</a></li>
+            <li><a href="finding-documents.html">Finding Docs</a></li>
+            <li><a href="updating-documents.html">Updating Docs</a></li>
+            <li><a href="query.html">Queries</a></li>
+            <li><a href="querystream.html">Query Streams</a></li>
+            <li><a href="methods-statics.html">Methods &amp; Statics</a>
+            <li><a href="defaults.html">Defaults</a></li>
+            <li><a href="indexes.html">Indexes</a></li>
+            <li><a href="validation.html">Validation</a></li>
+            <li><a href="virtuals.html">Virtuals</a></li>
+            <li><a href="getters-setters.html">Getters / Setters</a></li>
+            <li><a href="embedded-documents.html">Embedded Docs</a></li>
+            <li><a href="populate.html">Populate (DBRef-like)</a></li>
+            <li><a href="plugins.html">Plugins</a></li>
+            <li><a href="errors.html">Errors</a></li>
+            <li><a href="migration-1x-2x.html">v1x - v2x Migration</a></li>
+            <li><a href="api.html">API</a></li>
+          </ul>
+        </div>
+
+        <h1><a href="../index.html">Mongoose</a></h1>
+
+        <div id="content">
+          <!-- ANNOUNCE -->
+          <h1>Queries</h1>
+
+<p>A <code>Query</code> is what is returned when calling many <code>Model</code> <a href="finding-documents.html">methods</a>. These <code>Query</code> objects provide a chaining api to specify search terms, cursor options, hints, and other behavior.</p>
+
+<h2>Query#where</h2>
+
+<p>Lets you specify query terms with sugar.</p>
+
+<pre><code>query.where(path [, val])
+</code></pre>
+
+<p><code>path</code> is a valid document path. <code>val</code> is optional. Its useful to omit <code>val</code> when used in conjunction with other query methods. For example:</p>
+
+<pre><code>query
+.where('name', 'Space Ghost')
+.where('age').gte(21).lte(65)
+.exec(callback)
+</code></pre>
+
+<p>In this case, <code>gte()</code> and <code>lte()</code> operate on the previous path if not explicitly passed. The above query results in the following query expression:</p>
+
+<pre><code>{ name: 'Space Ghost', age: { $gte: 21, $lte: 65 }}
+</code></pre>
+
+<h2>Query#$where</h2>
+
+<p>Specifies the javascript function to run on MongoDB on each document scanned. See the <a href="http://www.mongodb.org/display/DOCS/Advanced+Queries#AdvancedQueries-JavascriptExpressionsand%7B%7B%24where%7D%7D">MongoDB docs</a> for details.</p>
+
+<pre><code>Model.find().$where(fn)
+</code></pre>
+
+<p><code>fn</code> can be either a function or a string.</p>
+
+<h2>Query#or</h2>
+
+<p>Specifies the <a href="http://www.mongodb.org/display/DOCS/Advanced+Queries#AdvancedQueries-%24or">$or</a> operator.</p>
+
+<pre><code>query.or(array);
+</code></pre>
+
+<p><code>array</code> is an array of expressions.</p>
+
+<pre><code>query.or([{ color: 'blue' }, { color: 'red' }]);
+</code></pre>
+
+<h2>Query#nor</h2>
+
+<p>Specifies the <a href="http://www.mongodb.org/display/DOCS/Advanced+Queries#AdvancedQueries-%24nor">$nor</a> operator.</p>
+
+<pre><code>query.nor(array);
+</code></pre>
+
+<p><code>array</code> is an array of expressions.</p>
+
+<pre><code>query.nor([{ color: 'daffodil yellow' }, { color: 'atomic tangerine' }]);
+</code></pre>
+
+<h2>Query#equals</h2>
+
+<p>Assigns <code>val</code> to the last path used in <code>where()</code>.</p>
+
+<pre><code>query.where(path).equals(val)
+
+// same as
+
+query.where(path, val);
+</code></pre>
+
+<h2>Query#gt</h2>
+
+<p>Specifies a <a href="http://www.mongodb.org/display/DOCS/Advanced+Queries#AdvancedQueries-%3C%2C%3C%3D%2C%3E%2C%3E%3D">greater than</a> expression.</p>
+
+<pre><code>query.gt(path, val);
+</code></pre>
+
+<p><code>gt</code> is also one of the methods with extra chaining sugar: when only one argument is passed, it uses the path used the last call to <code>where()</code>. Example:</p>
+
+<pre><code>Model.where('age').gt(21)
+</code></pre>
+
+<p>Results in:</p>
+
+<pre><code>{ age: { $gt: 21 }}
+</code></pre>
+
+<h2>Query#gte</h2>
+
+<p>Specifies a <a href="http://www.mongodb.org/display/DOCS/Advanced+Queries#AdvancedQueries-%3C%2C%3C%3D%2C%3E%2C%3E%3D">greater than or equal to</a> expression.</p>
+
+<pre><code>query.gte(path, val);
+</code></pre>
+
+<p><code>gte</code> is also one of the methods with extra chaining sugar: when only one argument is passed, it uses the path used the last call to <code>where()</code>. Example:</p>
+
+<pre><code>Model.where('age').gte(21)
+</code></pre>
+
+<p>Results in:</p>
+
+<pre><code>{ age: { $gte: 21 }}
+</code></pre>
+
+<h2>Query#lt</h2>
+
+<p>Specifies a <a href="http://www.mongodb.org/display/DOCS/Advanced+Queries#AdvancedQueries-%3C%2C%3C%3D%2C%3E%2C%3E%3D">less than</a> expression.</p>
+
+<pre><code>query.lt(path, val);
+</code></pre>
+
+<p><code>lt</code> is also one of the methods with extra chaining sugar: when only one argument is passed, it uses the path used the last call to <code>where()</code>. Example:</p>
+
+<pre><code>Model.where('age').lt(21)
+</code></pre>
+
+<p>Results in:</p>
+
+<pre><code>{ age: { $lt: 21 }}
+</code></pre>
+
+<h2>Query#lte</h2>
+
+<p>Specifies a <a href="http://www.mongodb.org/display/DOCS/Advanced+Queries#AdvancedQueries-%3C%2C%3C%3D%2C%3E%2C%3E%3D">less than or equal to</a> expression.</p>
+
+<pre><code>query.lte(path, val);
+</code></pre>
+
+<p><code>lte</code> is also one of the methods with extra chaining sugar: when only one argument is passed, it uses the path used the last call to <code>where()</code>. Example:</p>
+
+<pre><code>Model.where('age').lte(21)
+</code></pre>
+
+<p>Results in:</p>
+
+<pre><code>{ age: { $lte: 21 }}
+</code></pre>
+
+<h2>Query#ne</h2>
+
+<p>Specifies the <a href="http://www.mongodb.org/display/DOCS/Advanced+Queries#AdvancedQueries-%24ne">$ne</a> operator.</p>
+
+<pre><code>query.ne(path, val);
+</code></pre>
+
+<p>These methods have extra sugar in that when only one argument is passed, the path in the last call to <code>where()</code> is used. Example:</p>
+
+<pre><code>query.where('_id').ne('4ecf92f31993a52c58e07f6a')
+</code></pre>
+
+<p>results in</p>
+
+<pre><code>{ _id: { $ne: ObjectId('4ecf92f31993a52c58e07f6a') }}
+</code></pre>
+
+<h2>Query#in</h2>
+
+<p>Specifies the <a href="http://www.mongodb.org/display/DOCS/Advanced+Queries#AdvancedQueries-%24in">$in</a> operator.</p>
+
+<pre><code>query.in(path, array)
+</code></pre>
+
+<p>This method has extra sugar in that when only one argument is passed, the path in the last call to <code>where()</code> is used.</p>
+
+<pre><code>query.where('tags').in(['game', 'fun', 'holiday'])
+</code></pre>
+
+<p>results in</p>
+
+<pre><code>{ tags: { $in: ['game', 'fun', 'holiday'] }}
+</code></pre>
+
+<h2>Query#nin</h2>
+
+<p>Specifies the <a href="http://www.mongodb.org/display/DOCS/Advanced+Queries#AdvancedQueries-%24nin">$nin</a> operator.</p>
+
+<pre><code>query.nin(path, array)
+</code></pre>
+
+<p>This method has extra sugar in that when only one argument is passed, the path in the last call to <code>where()</code> is used.</p>
+
+<pre><code>query.where('games').nin(['boring', 'lame'])
+</code></pre>
+
+<p>results in</p>
+
+<pre><code>{ games: { $nin: ['boring', 'lame'] }}
+</code></pre>
+
+<h2>Query#all</h2>
+
+<p>Specifies the <a href="http://www.mongodb.org/display/DOCS/Advanced+Queries#AdvancedQueries-%24all">$all</a> operator.</p>
+
+<pre><code>query.all(path, array)
+</code></pre>
+
+<p>This method has extra sugar in that when only one argument is passed, the path in the last call to <code>where()</code> is used.</p>
+
+<pre><code>query.where('games').all(['fun', 'exhausting'])
+</code></pre>
+
+<p>results in</p>
+
+<pre><code>{ games: { $all: ['fun', 'exhausting'] }}
+</code></pre>
+
+<h2>Query#regex</h2>
+
+<p>Specifies the <a href="http://www.mongodb.org/display/DOCS/Advanced+Queries#AdvancedQueries-RegularExpressions">$regex</a> operator.</p>
+
+<pre><code>query.regex('name.first', /^a/i)
+</code></pre>
+
+<p>This method has extra sugar in that when only one argument is passed, the path in the last call to <code>where()</code> is used.</p>
+
+<pre><code>query.where('name.first').regex(/^a/i)
+</code></pre>
+
+<p>results in</p>
+
+<pre><code>{ 'name.first': { $regex: /^a/i }}
+</code></pre>
+
+<h2>Query#size</h2>
+
+<p>Specifies the <a href="http://www.mongodb.org/display/DOCS/Advanced+Queries#AdvancedQueries-%24size">$size</a> operator.</p>
+
+<pre><code>query.size(path, integer)
+</code></pre>
+
+<p>This method has extra sugar in that when only one argument is passed, the path in the last call to <code>where()</code> is used.</p>
+
+<pre><code>query.size('comments', 2)
+query.where('comments').size(2)
+</code></pre>
+
+<p>both result in</p>
+
+<pre><code>{ comments: { $size: 2 }}
+</code></pre>
+
+<h2>Query#mod</h2>
+
+<p>Specifies the <a href="http://www.mongodb.org/display/DOCS/Advanced+Queries#AdvancedQueries-%24mod">$mod</a> operator.</p>
+
+<pre><code>var array = [10, 1]
+query.mod(path, array)
+
+query.mod(path, 10, 1)
+
+query.where(path).mod(10, 1)
+</code></pre>
+
+<p>all result in</p>
+
+<pre><code>{ path: { $mod: [10, 1] }}
+</code></pre>
+
+<h2>Query#exists</h2>
+
+<p>Specifies the <a href="http://www.mongodb.org/display/DOCS/Advanced+Queries#AdvancedQueries-%24exists">$exists</a> operator.</p>
+
+<pre><code>query.exists(path, Boolean)
+</code></pre>
+
+<p>These methods have extra sugar in that when only one argument is passed, the path from the last call to <code>where()</code> is used.</p>
+
+<p>Given the following query,</p>
+
+<pre><code>var query = Model.find();
+</code></pre>
+
+<p>the following queries</p>
+
+<pre><code>query.exists('occupation');
+query.exists('occupation', true);
+query.where('occupation').exists();
+</code></pre>
+
+<p>all result in</p>
+
+<pre><code>{ occupation: { $exists: true }}
+</code></pre>
+
+<p>Another example:</p>
+
+<pre><code>query.exists('occupation', false)
+query.where('occupation').exists(false);
+</code></pre>
+
+<p>result in</p>
+
+<pre><code>{ occupation: { $exists: false }}
+</code></pre>
+
+<h2>Query#elemMatch</h2>
+
+<p>Specifies the <a href="http://www.mongodb.org/display/DOCS/Advanced+Queries#AdvancedQueries-%24elemMatch">$elemMatch</a> operator.</p>
+
+<pre><code>query.elemMatch(path, criteria)
+query.where(path).elemMatch(criteria)
+</code></pre>
+
+<p>Functions can also be passed so you can further use query sugar to declare the expression:</p>
+
+<pre><code>query.where(path).elemMatch(function)
+query.elemMatch(path, function)
+</code></pre>
+
+<p>In this case a <code>query</code> is passed as the only argument into the function.</p>
+
+<pre><code>query.where('comments').elemMatch(function (elem) {
+  elem.where('author', 'bnoguchi')
+  elem.where('votes').gte(5);
+});
+</code></pre>
+
+<p>Results in</p>
+
+<pre><code>{ comments: { $elemMatch: { author: 'bnoguchi', votes: { $gte: 5 }}}}
+</code></pre>
+
+<h2>Query#within</h2>
+
+<pre><code>query.within.box
+query.within.center
+</code></pre>
+
+<p>todo</p>
+
+<h2>Query#box</h2>
+
+<p>todo</p>
+
+<h2>Query#center</h2>
+
+<p>todo</p>
+
+<h2>Query#centerSphere</h2>
+
+<p>todo</p>
+
+<h2>Query#near</h2>
+
+<p>Specifies the <a href="http://www.mongodb.org/display/DOCS/Geospatial+Indexing#GeospatialIndexing-Querying">$near</a> operator.</p>
+
+<pre><code>var array = [10, 1]
+query.near(path, array)
+
+query.near(path, 10, 1)
+
+query.where(path).$near(10, 1)
+</code></pre>
+
+<p>all result in</p>
+
+<pre><code>{ path: { $near: [10, 1] }}
+</code></pre>
+
+<h2>Query#maxDistance</h2>
+
+<p>Specifies the <a href="http://www.mongodb.org/display/DOCS/Geospatial+Indexing#GeospatialIndexing-Querying">$maxDistance</a> operator.</p>
+
+<pre><code>query.where('checkin').near([40, -72]).maxDistance(1);
+</code></pre>
+
+<p>results in</p>
+
+<pre><code>{ checkin: { $near: [40, -72], $maxDistance: 1 }}
+</code></pre>
+
+<h2>Query#select</h2>
+
+<p>Specifies which <a href="http://www.mongodb.org/display/DOCS/Retrieving+a+Subset+of+Fields">subset of fields</a> you want to return.</p>
+
+<pre><code>query.select('title name'})
+// only _id, title, and name fields will be populated in your docs
+</code></pre>
+
+<p>You can also use object syntax:</p>
+
+<pre><code>query.select({ age: 0, contact: 0 })
+// return everything but age and contact
+</code></pre>
+
+<h2>Query#only</h2>
+
+<p><em>deprecated</em></p>
+
+<p>Specifies a <a href="http://www.mongodb.org/display/DOCS/Retrieving+a+Subset+of+Fields">subset of fields</a> to return. This is like <code>select()</code> but this option only specifies which fields you want returned.</p>
+
+<pre><code>query.only('title name')
+query.only('title', 'name')
+query.only(['title', 'name'])
+</code></pre>
+
+<h2>Query#exclude</h2>
+
+<p><em>deprecated</em></p>
+
+<p>Specifies a <a href="http://www.mongodb.org/display/DOCS/Retrieving+a+Subset+of+Fields">subset of fields</a> to return. This is like <code>select()</code> but this option only specifies which fields you DO NOT want returned.</p>
+
+<pre><code>query.exclude('title name')
+query.exclude('title', 'name')
+query.exclude(['title', 'name'])
+</code></pre>
+
+<h2>Query#slice</h2>
+
+<p>Retrieve a sub-range of elements in an array with the <a href="http://www.mongodb.org/display/DOCS/Retrieving+a+Subset+of+Fields#RetrievingaSubsetofFields-RetrievingaSubrangeofArrayElements">$slice</a> method.</p>
+
+<pre><code>query.slice(path, val)
+</code></pre>
+
+<p><code>val</code> can be a Number:</p>
+
+<pre><code>query.where('tags').slice(5) // last 5 tags
+query.where('tags').slice(-5) // first 5 tags
+</code></pre>
+
+<p>or an Array.</p>
+
+<pre><code>query.where('tags').slice([20, 10]) // skip 20, limit 10
+query.where('tags').slice([-20, 10]) // 20 from the end, limit 10
+</code></pre>
+
+<p><code>slice</code> is also one of the methods with extra chaining sugar: when only one argument is passed, it uses the path used the last call to <code>where()</code>. Example:</p>
+
+<pre><code>query.slice('tags', -5)
+</code></pre>
+
+<p>is the same as</p>
+
+<pre><code>query.where('tags').slice(-5)
+</code></pre>
+
+<h2>Query#populate</h2>
+
+<p>Specifies the paths to be populated. See in-depth docs <a href="populate.html">here</a>.</p>
+
+<h1>Sorting</h1>
+
+<h2>Query#sort</h2>
+
+<p>Sets the <a href="http://www.mongodb.org/display/DOCS/Advanced+Queries#AdvancedQueries-%7B%7Bsort%28%29%7D%7D">sort</a> path and direction.</p>
+
+<pre><code>query.sort('path', 1)
+query.sort('path', -1)
+query.sort('path', 1, 'another.path', -1)
+</code></pre>
+
+<h2>Query#asc</h2>
+
+<p><em>deprecated</em></p>
+
+<p>Sorting sugar.</p>
+
+<pre><code>query.asc('path' [, paths])
+</code></pre>
+
+<p>Each string <code>path</code> argument will be added to the sort ascending <a href="http://www.mongodb.org/display/DOCS/Advanced+Queries#AdvancedQueries-%7B%7Bsort%28%29%7D%7D">clause</a>.</p>
+
+<pre><code>query.asc('title', 'name');
+</code></pre>
+
+<p>Is the same as</p>
+
+<pre><code>query.sort('title', 1).sort('name', 1);
+</code></pre>
+
+<h2>Query#desc</h2>
+
+<p><em>deprecated</em></p>
+
+<p>Sorting sugar.</p>
+
+<pre><code>query.desc('path' [, paths])
+</code></pre>
+
+<p>Each string <code>path</code> argument will be added to the sort descending <a href="http://www.mongodb.org/display/DOCS/Advanced+Queries#AdvancedQueries-%7B%7Bsort%28%29%7D%7D">clause</a>.</p>
+
+<pre><code>query.desc('title', 'name');
+</code></pre>
+
+<p>Is the same as</p>
+
+<pre><code>query.sort('title', -1, 'name', -1);
+</code></pre>
+
+<h1>Options</h1>
+
+<h2>Query#limit</h2>
+
+<p>The <a href="http://www.mongodb.org/display/DOCS/Advanced+Queries#AdvancedQueries-%7B%7Blimit%28%29%7D%7D">limit</a> method specifies the max number of documents to return.</p>
+
+<pre><code>query.limit(20).skip(10)
+</code></pre>
+
+<h2>Query#skip</h2>
+
+<p>The <a href="http://www.mongodb.org/display/DOCS/Advanced+Queries#AdvancedQueries-%7B%7Bskip%28%29%7D%7D">skip</a> method specifies at which document the database should begin returning results.</p>
+
+<pre><code>query.skip(10).limit(20)
+</code></pre>
+
+<h2>Query#maxscan</h2>
+
+<p>Limits the number of documents to <a href="http://www.mongodb.org/display/DOCS/Advanced+Queries#AdvancedQueries-%24maxScan">scan</a>. <br />    query.maxscan(Number)</p>
+
+<h2>Query#snapshot</h2>
+
+<p>The <a href="http://www.mongodb.org/display/DOCS/Advanced+Queries#AdvancedQueries-%7B%7Bsnapshot%28%29%7D%7D">snapshot</a> method indicates the use of snapshot mode for the query.</p>
+
+<pre><code>query.snapshot(Boolean)
+</code></pre>
+
+<h2>Query#batchSize</h2>
+
+<p>Sets the numer of documents to return per database query. For example, if we were qeurying for 10000 docs and streaming them to the client, we may want to limit the number of documents retrieved per cursor iteration to reduce memory consuption (all docs are held in memory during iteration). Setting <code>batchSize</code> to, say, 100, would mean that the cursor would be pulling only 100 documents at a time from MongoDB.</p>
+
+<pre><code>query.batchSize(Number)
+</code></pre>
+
+<h2>Query#slaveOk</h2>
+
+<p>Sets the <a href="http://www.mongodb.org/display/DOCS/Replica+Pairs#ReplicaPairs-Queryingtheslave">slaveOk</a> option or <code>true</code> with no arguments.</p>
+
+<pre><code>query.slaveOk(Boolean)
+query.slaveOk() // equivalent to query.slaveOk(true)
+</code></pre>
+
+<h2>Query#tailable</h2>
+
+<p>Sets the <a href="http://www.mongodb.org/display/DOCS/Tailable+Cursors">tailable</a> option or <code>true</code> with no arguments.</p>
+
+<pre><code>query.tailable(Boolean)
+query.tailable() // equivalent to query.tailable(true)
+</code></pre>
+
+<p>Tailable queries can only be used on capped collections, can only return documents in their natural order, and never use indexes. Unless the cursor dies, a tailable <a href="querystream.html">QueryStream</a> will remain open and receive documents as they are inserted into the collection, much like the Unix <code>tail -f</code> command.</p>
+
+<pre><code>var stream = Model.find().tailable().stream();
+
+stream.on('data', function (doc) {
+    // do stuff
+});
+</code></pre>
+
+<h2>Query#hint</h2>
+
+<p>Specifies the <a href="http://www.mongodb.org/display/DOCS/Optimization#Optimization-Hint">hint</a> option for MongoDB.</p>
+
+<pre><code>query.hint(indexName)
+</code></pre>
+
+<p>If your schema has an index like</p>
+
+<pre><code>Thing.index({ name: 1, title: 1 })
+</code></pre>
+
+<p>and you wanted to tell MongoDB to use that index for your query (in the off chance that MongoDB was not able to figure our that it should use it) you can give MongoDB a hint like so:</p>
+
+<pre><code>query.hint({ name: 1, title: 1}).exec(callback)
+</code></pre>
+
+<h2>Query#comment</h2>
+
+<p>Sets the <a href="http://www.mongodb.org/display/DOCS/Advanced+Queries#AdvancedQueries-%24comment">comment</a> option.</p>
+
+<pre><code>query.comment(String)
+</code></pre>
+
+<h1>Executing</h1>
+
+<h2>Query#find</h2>
+
+<pre><code>query.find(criteria [, callback])
+</code></pre>
+
+<h2>Query#findOne</h2>
+
+<p>Sends the findOne command to MongoDB.</p>
+
+<pre><code>query.findOne([callback])
+</code></pre>
+
+<h2>Query#count</h2>
+
+<p>Sends the count command to MongoDB.</p>
+
+<pre><code>query.count(callback)
+</code></pre>
+
+<h2>Query#distinct</h2>
+
+<p>Casts <code>field</code> and sends a distinct command to MongoDB.</p>
+
+<pre><code>query.distinct(field, callback)
+</code></pre>
+
+<h2>Query#update</h2>
+
+<p>Casts the <code>doc</code> according to the model Schema and sends an update command to MongoDB.</p>
+
+<pre><code>query.update(doc, callback)
+</code></pre>
+
+<p><em>All paths passed that are not $atomic operations will become $set ops so we retain backwards compatibility.</em></p>
+
+<pre><code>query.update({..}, { title: 'remove words' }, ...)
+</code></pre>
+
+<p>becomes</p>
+
+<pre><code>query.update({..}, { $set: { title: 'remove words' }}, ...)
+</code></pre>
+
+<h2>Query#remove</h2>
+
+<p>Casts the query, then sends the remove command to MongoDB.</p>
+
+<pre><code>query.remove(callback)
+</code></pre>
+
+<h2>Query#exec</h2>
+
+<p>Executes the query passing the results to the optional <code>callback</code>.</p>
+
+<pre><code>query.exec([callback])
+</code></pre>
+
+<p>Typically used in chaining scenarios:</p>
+
+<pre><code>Model.findOne().where('points').$gt(1000).exec(function (err, doc) {
+  if (err) ...
+});
+</code></pre>
+
+<h2>Query#each</h2>
+
+<p><em>deprecated</em></p>
+
+<p>A streaming cursor interface.</p>
+
+<p><em>2.4.0 introduces the query.stream() method which is a more 'node-like' way of streaming records and provides better cursor management. It is recommended that you use query.stream in place of query.each.</em></p>
+
+<pre><code>query.each(callback);
+</code></pre>
+
+<p>The <code>callback</code> is called repeatedly for each document found as its streamed. If an error occurs streaming stops.</p>
+
+<pre><code>query.each(function (err, user) {
+  if (err) return res.end("aww, received an error. all done.");
+  if (user) {
+    res.write(user.name + '\n')
+  } else {
+    res.end("reached end of cursor. all done.");
+  }
+});
+</code></pre>
+
+<p>A third parameter may also be used in the callback which allows you to iterate the cursor manually.</p>
+
+<pre><code>query.each(function (err, user, next) {
+  if (err) return res.end("aww, received an error. all done.");
+  if (user) {
+    res.write(user.name + '\n')
+    doSomethingAsync(next);
+  } else {
+    res.end("reached end of cursor. all done.");
+  }
+});
+</code></pre>
+
+<h2>Query#stream</h2>
+
+<p>Returns a <a href="querystream.html">QueryStream</a> for the query.</p>
+
+<pre><code>Model.find({}).stream().pipe(writeStream)
+</code></pre>
+
+<p>See the <a href="querystream.html">QueryStream</a> docs for details.</p>
+        </div>
+
+        <div id="footer">
+
+          <form action="http://groups.google.com/group/mongoose-orm/boxsubscribe">
+           <a href="http://groups.google.com/group/mongoose-orm" id="google-subscribe-link"><img src="/docs/2.7.x/images/groups.png" border="0"></a>
+           <span id="google-members-count">&nbsp;</span>
+           <div id="google-subscribe-input">
+             Email: <input type="text" name="email" id="google-subscribe-email">
+             <input type="submit" name="go" value="Subscribe">
+           </div>
+          </form>
+
+          <div>
+            Mongoose by <a href="http://github.com/learnboost">LearnBoost Labs</a>.<br>
+            Released under the MIT license.<br>
+            Copyright <a href="http://learnboost.com">LearnBoost 2011</a>.
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

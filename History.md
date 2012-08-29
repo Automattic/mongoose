@@ -1,3 +1,8 @@
+2.8.1 / 2012-08-29
+==================
+
+  * updated; driver to 1.1.5
+  * fixed; simultaneous top and sub level array modifications (#1073)
 
 2.8.0 / 2012-08-23
 ==================

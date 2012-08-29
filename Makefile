@@ -20,7 +20,7 @@ $(DOCFILE): $(DOCS)
 	./node_modules/dox/bin/dox < $^ >> $(DOCFILE)
 
 site:
-	node website.js --watch && node static.js
+	node website.js && node static.js
 
 docclean:
 	rm -f ./docs/*.{1,html,json}

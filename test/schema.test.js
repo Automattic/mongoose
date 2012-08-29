@@ -1120,6 +1120,34 @@ describe('schema', function(){
         assert.strictEqual(undefined, schema.virtuals.id);
       });
     });
+
+    describe('getter', function(){
+      it('scope', function(){
+        var Tobi = new Schema;
+
+        Tobi.virtual('name').get(function (v, self) {
+          assert.equal('b', this.a);
+          assert.equal('name', self.path);
+          return v.toLowerCase();
+        })
+
+        assert.equal('yep', Tobi.virtualpath('name').applyGetters('YEP', { a: 'b' }));
+      })
+    })
+
+    describe('setter', function(){
+      it('scope', function(){
+        var Tobi = new Schema;
+
+        Tobi.virtual('name').set(function (v, self) {
+          assert.equal('b', this.a);
+          assert.equal('name', self.path);
+          return v.toLowerCase();
+        })
+
+        assert.equal('yep', Tobi.virtualpath('name').applySetters('YEP', { a: 'b' }));
+      })
+    })
   });
 
   describe('other contexts', function(){

@@ -1918,6 +1918,15 @@ describe('model', function(){
           assert.ifError(err);
 
           t.nest = { st: "jsconf rules", yep: "it does" };
+
+          // check that entire `nest` object is being $set
+          var u = t._delta()[1];
+          assert.ok(u.$set);
+          assert.ok(u.$set.nest);
+          assert.equal(2, Object.keys(u.$set.nest).length);
+          assert.ok(u.$set.nest.yep);
+          assert.ok(u.$set.nest.st);
+
           t.save(function (err) {
             assert.ifError(err);
 

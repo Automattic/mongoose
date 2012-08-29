@@ -1,11 +1,22 @@
 
+3.1.0 / 2012-08-29
+==================
+
+  * changed; fixed; directly setting nested objects now overwrites entire object (previously incorrectly merged them)
+  * added; read pref support (mongodb 2.2) 205a709c
+  * added; aggregate support (mongodb 2.2) f3a5bd3d
+  * added; virtual {g,s}etter introspection (#1070)
+  * updated; docs [brettz9](https://github.com/brettz9)
+  * updated; driver to 1.1.5
+  * fixed; retain virtual setter return values (#1069)
+
 3.0.3 / 2012-08-23
 ==================
 
-  * fixed use of nested paths beginning w/ numbers #1062
-  * fixed query population edge case #1053 #1055 [jfremy](https://github.com/jfremy)
-  * fixed simultaneous top and sub level array modifications #1073
-  * added id and _id schema option aliases + tests
+  * fixed; use of nested paths beginning w/ numbers #1062
+  * fixed; query population edge case #1053 #1055 [jfremy](https://github.com/jfremy)
+  * fixed; simultaneous top and sub level array modifications #1073
+  * added; id and _id schema option aliases + tests
   * improve debug formatting to allow copy/paste logged queries into mongo shell [eknkc](https://github.com/eknkc)
   * docs
 

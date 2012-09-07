@@ -2,7 +2,7 @@
 TESTS = $(shell find test/ -name '*.test.js')
 
 test:
-	@./node_modules/.bin/mocha --reporter list $(TESTFLAGS) $(TESTS)
+	@./node_modules/.bin/mocha --reporter dot $(TESTFLAGS) $(TESTS)
 	@node test/dropdb.js
 
 test-old:

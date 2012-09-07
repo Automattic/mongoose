@@ -10,6 +10,7 @@ var start = require('./common')
   , StateMachine = require('../lib/statemachine')
   , ObjectId = require('../lib/types/objectid')
   , MongooseBuffer = require('../lib/types/buffer')
+  , ReadPref = mongoose.mongo.ReadPreference
   , assert = require('assert')
 
 /**
@@ -191,6 +192,36 @@ describe('utils', function(){
     assert.ok(!utils.deepEqual(a, e))
     assert.ok(!utils.deepEqual(a, []))
     assert.ok(!utils.deepEqual([], a))
+  })
+
+  it('#readPref', function(){
+    var r = utils.readPref('p');
+    assert.equal('primary', r.mode);
+    var r = utils.readPref('primary');
+    assert.equal('primary', r.mode);
+
+    var r = utils.readPref('pp');
+    assert.equal('primaryPrefered', r.mode);
+    var r = utils.readPref('primaryPrefered');
+    assert.equal('primaryPrefered', r.mode);
+
+    var r = utils.readPref('s');
+    assert.equal('secondary', r.mode);
+    var r = utils.readPref('secondary');
+    assert.equal('secondary', r.mode);
+
+    var r = utils.readPref('sp');
+    assert.equal('secondaryPrefered', r.mode);
+    var r = utils.readPref('secondaryPrefered');
+    assert.equal('secondaryPrefered', r.mode);
+
+    var r = utils.readPref('n');
+    assert.equal('nearest', r.mode);
+    var r = utils.readPref('nearest');
+    assert.equal('nearest', r.mode);
+
+    var r = utils.readPref('explode');
+    assert.equal(false, r.isValid(r.model));
   })
 })
 

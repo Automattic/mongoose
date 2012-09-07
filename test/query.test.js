@@ -992,6 +992,27 @@ describe('Query', function(){
           assert.equal(query.options.readPreference.tags[1].s, 2);
         });
       })
+
+      describe('inherits its models schema read option', function(){
+        var schema, M;
+        before(function () {
+          schema = new Schema({}, { read: 'p' });
+          M = mongoose.model('schemaOptionReadPrefWithQuery', schema);
+        })
+
+        it('if not set in query', function(){
+          var options = M.where()._optionsForExec(M);
+          assert.ok(options.readPreference instanceof P);
+          assert.equal(options.readPreference.mode, 'primary');
+        })
+
+        it('if set in query', function(){
+          var options = M.where().read('s')._optionsForExec(M);
+          assert.ok(options.readPreference instanceof P);
+          assert.equal(options.readPreference.mode, 'secondary');
+        })
+
+      })
     })
   })
 

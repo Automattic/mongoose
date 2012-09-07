@@ -53,13 +53,18 @@ describe('cursor stream:', function(){
       , closed = 0
       , paused = 0
       , resumed = 0
+      , seen = {}
       , err
 
-    var stream = P.find({}).stream();
+    var stream = P.find().batchSize(3).stream();
 
     stream.on('data', function (doc) {
       assert.strictEqual(true, !! doc.name);
       assert.strictEqual(true, !! doc._id);
+
+      // no dup docs emitted
+      assert.ok(!seen[doc.id]);
+      seen[doc.id] = 1;
 
       if (paused > 0 && 0 === resumed) {
         err = new Error('data emitted during pause');
@@ -130,6 +135,8 @@ describe('cursor stream:', function(){
   });
 
   it('destroying a stream stops it', function(done){
+    //this.slow(300);
+
     var db = start()
       , P = db.model('PersonForStream', collection)
       , finished = 0
@@ -167,6 +174,8 @@ describe('cursor stream:', function(){
   });
 
   it('errors', function(done){
+    //this.slow(300);
+
     var db = start({ server: { auto_reconnect: false }})
       , P = db.model('PersonForStream', collection)
       , finished = 0

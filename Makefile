@@ -2,7 +2,7 @@
 TESTS = $(shell find test/ -name '*.test.js')
 
 test:
-	@./node_modules/.bin/mocha $(T) $(TESTS)
+	@time ./node_modules/.bin/mocha $(T) $(TESTS)
 	@node test/dropdb.js
 
 test-old:

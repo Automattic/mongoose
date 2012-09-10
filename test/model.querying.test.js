@@ -1559,6 +1559,8 @@ describe('model: querying:', function(){
     });
 
     it('with Dates', function(done){
+      this.timeout(3000);
+      // this.slow(2000);
       var db = start()
 
       var SSchema = new Schema({ d: Date });

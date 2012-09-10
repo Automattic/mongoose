@@ -704,4 +704,34 @@ describe('model: findByIdAndUpdate:', function(){
     assert.equal('title', query.options.sort[1][0]);
     assert.equal(-1, query.options.sort[1][1]);
   });
+
+  it('supports $elemMatch with $in (gh-1091 gh-1100)', function(done){
+    var db = start()
+
+    var postSchema = new Schema({
+        ids: [{type: Schema.ObjectId}]
+      , title: String
+    });
+
+    var B = db.model('gh-1091+1100', postSchema);
+    var _id1 = new mongoose.Types.ObjectId;
+    var _id2 = new mongoose.Types.ObjectId;
+
+    B.create({ ids: [_id1, _id2] }, function (err, doc) {
+      assert.ifError(err);
+
+      B
+      .findByIdAndUpdate(doc._id, { title: 'woot' })
+      .select({ title: 1, ids: { $elemMatch: { $in: [_id2.toString()] }}})
+      .exec(function (err, found) {
+        assert.ifError(err);
+        assert.ok(found);
+        assert.equal(found.id, doc.id);
+        assert.equal('woot', found.title);
+        assert.equal(1, found.ids.length);
+        assert.equal(_id2.toString(), found.ids[0].toString());
+        done();
+      });
+    })
+  })
 })

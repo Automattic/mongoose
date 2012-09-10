@@ -5,7 +5,7 @@ DOCS = $(DOCS_:.js=.json)
 DOCFILE = docs/source/_docs
 
 test:
-	@./node_modules/.bin/mocha $(T) $(TESTS)
+	@time ./node_modules/.bin/mocha $(T) $(TESTS)
 	@node test/dropdb.js
 
 docs: ghpages docclean gendocs

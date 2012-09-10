@@ -217,16 +217,96 @@ block content
   :markdown
     Valid options:
 
-    - [safe](#safe)
-    - [strict](#strict)
-    - [capped](#capped)
-    - [versionKey](#versionKey)
-    - [shardKey](#shardKey)
     - [autoIndex](#autoIndex)
-    - [toObject](#toObject)
-    - [toJSON](#toJSON)
-    - [_id](#_id)
+    - [capped](#capped)
     - [id](#id)
+    - [_id](#_id)
+    - [read](#read)
+    - [safe](#safe)
+    - [shardKey](#shardKey)
+    - [strict](#strict)
+    - [toJSON](#toJSON)
+    - [toObject](#toObject)
+    - [versionKey](#versionKey)
+
+  h4#autoIndex option: autoIndex
+  :markdown
+    At application startup, Mongoose sends an `ensureIndex` command for each index declared in your `Schema`. As of Mongoose v3, indexes are created in the `background` by default. If you wish to disable the auto-creation feature and manually handle when indexes are created, set your `Schema`s `autoIndex` option to `false` and use the [ensureIndexes](./api.html#model_Model-ensureIndexes) method on your model.
+  :js
+    var schema = new Schema({..}, { autoIndex: false })
+    var Clock = db.model('Clock', schema);
+    Clock.ensureIndexes(callback);
+
+  h4#capped option: capped
+  :markdown
+    Mongoose supports MongoDBs [capped](http://www.mongodb.org/display/DOCS/Capped+Collections) collections. To specify the underlying MongoDB collection be `capped`, set the `capped` option to the maximum size of the collection in [bytes](http://www.mongodb.org/display/DOCS/Capped+Collections#CappedCollections-size.).
+  :js
+    new Schema({..}, { capped: 1024 })
+  :markdown
+    The `capped` option may also be set to an object if you want to pass additional options like [max](http://www.mongodb.org/display/DOCS/Capped+Collections#CappedCollections-max) or [autoIndexId](http://www.mongodb.org/display/DOCS/Capped+Collections#CappedCollections-autoIndexId). In this case you must explicitly pass the `size` option which is required.
+  :js
+    new Schema({..}, { capped: { size: 1024, max: 1000, autoIndexId: true })
+
+  h4#id option: id
+  :markdown
+    Mongoose assigns each of your schemas an `id` virtual getter by default which returns the documents `_id` field cast to a string, or in the case of ObjectIds, its hexString. If you don't want an `id` getter added to your schema, you may disable it passing this option at schema construction time.
+  :js
+    // default behavior
+    var schema = new Schema({ name: String });
+    var Page = db.model('Page', schema);
+    var p = new Page({ name: 'mongodb.org' });
+    console.log(p.id); // '50341373e894ad16347efe01'
+
+    // disabled id
+    var schema = new Schema({ name: String }, { id: false });
+    var Page = db.model('Page', schema);
+    var p = new Page({ name: 'mongodb.org' });
+    console.log(p.id); // undefined
+
+  h4#_id option: _id
+  :markdown
+    Mongoose assigns each of your schemas an `_id` field by default if one is not passed into the [Schema](/docs/api.html#schema-js) constructor. The type assiged is an [ObjectId](/docs/api.html#schema_Schema-Types) to coincide with MongoDBs default behavior. If you don't want an `_id` added to your schema at all, you may disable it using this option.
+
+    Pass this option during schema construction to prevent documents from getting an auto `_id` created.
+  :js
+    // default behavior
+    var schema = new Schema({ name: String });
+    var Page = db.model('Page', schema);
+    var p = new Page({ name: 'mongodb.org' });
+    console.log(p); // { _id: '50341373e894ad16347efe01', name: 'mongodb.org' }
+
+    // disabled _id
+    var schema = new Schema({ name: String }, { _id: false });
+    var Page = db.model('Page', schema);
+    var p = new Page({ name: 'mongodb.org' });
+    console.log(p); // { name: 'mongodb.org' }
+
+  h4#read option: read
+  :markdown
+    Allows setting [query#read](/docs/api.html#query_Query-read) options at the schema level, providing us a way to apply default [ReadPreferences](http://docs.mongodb.org/manual/applications/replication/#replica-set-read-preference) to all queries derived from a model.
+
+  :js
+    var schema = new Schema({..}, { read: 'primary' })            // also aliased as 'p'
+    var schema = new Schema({..}, { read: 'primaryPreferred' })   // aliased as 'pp'
+    var schema = new Schema({..}, { read: 'secondary' })          // aliased as 's'
+    var schema = new Schema({..}, { read: 'secondaryPreferred' }) // aliased as 'sp'
+    var schema = new Schema({..}, { read: 'nearest' })            // aliased as 'n'
+
+  :markdown
+    The alias of each pref is also permitted so instead of having to type out 'secondaryPreferred' and getting the spelling wrong, we can simply pass 'pp'.
+
+    The read option also allows us to specify _tag sets_. These tell the [driver](https://github.com/mongodb/node-mongodb-native/) from which members of the replica-set it should attempt to read. Read more about tag sets [here](http://docs.mongodb.org/manual/applications/replication/#tag-sets) and [here](http://mongodb.github.com/node-mongodb-native/driver-articles/anintroductionto1_1and2_2.html#read-preferences).
+
+    _NOTE: if you specify the read pref 'nearest', you must also pass the [strategy](http://mongodb.github.com/node-mongodb-native/api-generated/replset.html?highlight=strategy) option when connecting or your reads will not behave predictably:_
+
+  :js
+    // pings the replset members periodically to track network latency
+    // now `nearest` works as intended
+    var options = { replset: { strategy: 'ping' }};
+    mongoose.connect(uri, options);
+
+    var schema = new Schema({..}, { read: ['n', { disk: 'ssd' }] });
+    mongoose.model('JellyBean', schema);
 
   h4#safe option: safe
   :markdown
@@ -245,6 +325,16 @@ block content
   :js
     var safe = { w: "majority", wtimeout: 10000 };
     new Schema({ .. }, { safe: safe })
+
+  h4#shardKey option: shardKey
+  :markdown
+    The `shardKey` option is used when we have a [sharded MongoDB architecture](http://www.mongodb.org/display/DOCS/Sharding+Introduction). Each sharded collection is given a shard key which must be present in all insert/update operations. We just need to set this schema option to the same shard key and we’ll be all set.
+
+  :js
+    new Schema({ .. }, { shardkey: { tag: 1, name: 1 }})
+
+  :markdown
+    _Note that Mongoose does not send the `shardcollection` command for you. You must configure your shards yourself._
 
   h4#strict option: strict
   :markdown
@@ -276,25 +366,34 @@ block content
   :markdown
     _NOTE: in mongoose v2 the default was false._
 
-  h4#shardKey option: shardKey
+  h4#toJSON option: toJSON
   :markdown
-    The `shardKey` option is used when we have a [sharded MongoDB architecture](http://www.mongodb.org/display/DOCS/Sharding+Introduction). Each sharded collection is given a shard key which must be present in all insert/update operations. We just need to set this schema option to the same shard key and we’ll be all set.
-
+    Exactly the same as the [toObject](#toObject) option but only applies when the documents `toJSON` method is called.
   :js
-    new Schema({ .. }, { shardkey: { tag: 1, name: 1 }})
+    var schema = new Schema({ name: String });
+    schema.path('name').get(function (v) {
+      return v + ' is my name';
+    });
+    schema.set('toJSON', { getters: true });
+    var M = mongoose.model('Person', schema);
+    var m = new M({ name: 'Max Headroom' });
+    console.log(m.toObject()); // { _id: 504e0cd7dd992d9be2f20b6f, name: 'Max Headroom' }
+    console.log(m.toJSON()); // { _id: 504e0cd7dd992d9be2f20b6f, name: 'Max Headroom is my name' }
+    // since we know toJSON is called whenever a js object is stringified:
+    console.log(JSON.stringify(m)); // { "_id": "504e0cd7dd992d9be2f20b6f", "name": "Max Headroom is my name" }
 
+  h4#toObject option: toObject
   :markdown
-    _Note that Mongoose does not send the `shardcollection` command for you. You must configure your shards yourself._
-
-  h4#capped option: capped
-  :markdown
-    Mongoose supports MongoDBs [capped](http://www.mongodb.org/display/DOCS/Capped+Collections) collections. To specify the underlying MongoDB collection be `capped`, set the `capped` option to the maximum size of the collection in [bytes](http://www.mongodb.org/display/DOCS/Capped+Collections#CappedCollections-size.).
+    Documents have a [toObject](/docs/api.html#document_Document-toObject) method which converts the mongoose document into a plain javascript object. This method accepts a few options. Instead of applying these options on a per-document basis we may declare the options here and have it applied to all of this schemas documents by default.
   :js
-    new Schema({..}, { capped: 1024 })
-  :markdown
-    The `capped` option may also be set to an object if you want to pass additional options like [max](http://www.mongodb.org/display/DOCS/Capped+Collections#CappedCollections-max) or [autoIndexId](http://www.mongodb.org/display/DOCS/Capped+Collections#CappedCollections-autoIndexId). In this case you must explicitly pass the `size` option which is required.
-  :js
-    new Schema({..}, { capped: { size: 1024, max: 1000, autoIndexId: true })
+    var schema = new Schema({ name: String });
+    schema.path('name').get(function (v) {
+      return v + ' is my name';
+    });
+    schema.set('toObject', { getters: true });
+    var M = mongoose.model('Person', schema);
+    var m = new M({ name: 'Max Headroom' });
+    console.log(m.toObject()); // { _id: 504e0cd7dd992d9be2f20b6f, name: 'Max Headroom is my name' }
 
   h4#versionKey option: versionKey
   :markdown
@@ -319,76 +418,6 @@ block content
     var thing = new Thing({ name: 'no versioning please' });
     thing.save(); // { name: 'no versioning please' }
 
-  h4#autoIndex option: autoIndex
-  :markdown
-    At application startup, Mongoose sends an `ensureIndex` command for each index declared in your `Schema`. As of Mongoose v3, indexes are created in the `background` by default. If you wish to disable the auto-creation feature and manually handle when indexes are created, set your `Schema`s `autoIndex` option to `false` and use the [ensureIndexes](./api.html#model_Model-ensureIndexes) method on your model.
-  :js
-    var schema = new Schema({..}, { autoIndex: false })
-    var Clock = db.model('Clock', schema);
-    Clock.ensureIndexes(callback);
-
-  h4#toObject option: toObject
-  :markdown
-    Documents have a [toObject](/docs/api.html#document_Document-toObject) method which converts the mongoose document into a plain javascript object. This method accepts a few options. Instead of applying these options on a per-document basis we may declare the options here and have it applied to all of this schemas documents by default.
-  :js
-    var schema = new Schema({ name: String });
-    schema.path('name').get(function (v) {
-      return v + ' is my name';
-    });
-    schema.set('toObject', { getters: true });
-    var M = mongoose.model('Person', schema);
-    var m = new M({ name: 'Max Headroom' });
-    console.log(m.toObject()); // { _id: 504e0cd7dd992d9be2f20b6f, name: 'Max Headroom is my name' }
-
-  h4#toJSON option: toJSON
-  :markdown
-    Exactly the same as the `toObject` option but only applies when the documents `toJSON` method is called.
-  :js
-    var schema = new Schema({ name: String });
-    schema.path('name').get(function (v) {
-      return v + ' is my name';
-    });
-    schema.set('toJSON', { getters: true });
-    var M = mongoose.model('Person', schema);
-    var m = new M({ name: 'Max Headroom' });
-    console.log(m.toObject()); // { _id: 504e0cd7dd992d9be2f20b6f, name: 'Max Headroom' }
-    console.log(m.toJSON()); // { _id: 504e0cd7dd992d9be2f20b6f, name: 'Max Headroom is my name' }
-    // since we know toJSON is called whenever a js object is stringified:
-    console.log(JSON.stringify(m)); // { "_id": "504e0cd7dd992d9be2f20b6f", "name": "Max Headroom is my name" }
-
-  h4#_id option: _id
-  :markdown
-    Mongoose assigns each of your schemas an `_id` field by default if one is not passed into the [Schema](/docs/api.html#schema-js) constructor. The type assiged is an [ObjectId](/docs/api.html#schema_Schema-Types) to coincide with MongoDBs default behavior. If you don't want an `_id` added to your schema at all, you may disable it using this option.
-
-    Pass this option during schema construction to prevent documents from getting an auto `_id` created.
-  :js
-    // default behavior
-    var schema = new Schema({ name: String });
-    var Page = db.model('Page', schema);
-    var p = new Page({ name: 'mongodb.org' });
-    console.log(p); // { _id: '50341373e894ad16347efe01', name: 'mongodb.org' }
-
-    // disabled _id
-    var schema = new Schema({ name: String }, { _id: false });
-    var Page = db.model('Page', schema);
-    var p = new Page({ name: 'mongodb.org' });
-    console.log(p); // { name: 'mongodb.org' }
-
-  h4#id option: id
-  :markdown
-    Mongoose assigns each of your schemas an `id` virtual getter by default which returns the documents `_id` field cast to a string, or in the case of ObjectIds, its hexString. If you don't want an `id` getter added to your schema, you may disable it passing this option at schema construction time.
-  :js
-    // default behavior
-    var schema = new Schema({ name: String });
-    var Page = db.model('Page', schema);
-    var p = new Page({ name: 'mongodb.org' });
-    console.log(p.id); // '50341373e894ad16347efe01'
-
-    // disabled id
-    var schema = new Schema({ name: String }, { id: false });
-    var Page = db.model('Page', schema);
-    var p = new Page({ name: 'mongodb.org' });
-    console.log(p.id); // undefined
 
   h3#next Next Up
   :markdown

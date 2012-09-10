@@ -58,11 +58,12 @@ describe('model: mapreduce:', function(){
     var db = start()
       , MR = db.model('MapReduce', collection)
 
+    var id = new mongoose.Types.ObjectId;
     var authors = 'aaron guillermo brian nathan'.split(' ');
     var num = 10;
     var docs = [];
     for (var i = 0; i< num; ++i)
-      docs.push({ author: authors[i%authors.length] });
+      docs.push({ author: authors[i%authors.length], owners: [id], published: true });
 
     //mongoose.set('debug', true);
     MR.create(docs, function (err) {
@@ -87,7 +88,7 @@ describe('model: mapreduce:', function(){
         var o = {
             map: function () { emit(this.author, 1) }
           , reduce: function (k, vals) { return vals.length }
-          , query: { author: 'aaron' }
+          , query: { author: 'aaron', published: 1, owners: id }
         }
 
         MR.mapReduce(o, function (err, ret, stats) {

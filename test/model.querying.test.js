@@ -607,6 +607,23 @@ describe('model: querying:', function(){
       });
     });
 
+    it('works with $elemMatch and $in combo (gh-1100)', function(done){
+      var db = start()
+        , BlogPostB = db.model('BlogPostB', collection)
+        , id1 = new DocumentObjectId
+        , id2 = new DocumentObjectId
+
+      BlogPostB.create({owners: [id1, id2]}, function (err, created) {
+        assert.ifError(err);
+        BlogPostB.findOne({owners: {'$elemMatch': { $in: [id2.toString()] }}}, function (err, found) {
+          db.close();
+          assert.ifError(err);
+          assert.ok(found);
+          assert.equal(created.id, found.id);
+          done();
+        });
+      });
+    })
   });
 
   describe('findById', function () {
@@ -956,24 +973,19 @@ describe('model: querying:', function(){
       });
     });
 
-    it('works with $elemMatch', function(done){
+    it('works with $elemMatch (gh-1100)', function(done){
       var db = start()
         , BlogPostB = db.model('BlogPostB', collection)
-        , dateAnchor = +new Date;
+        , id1 = new DocumentObjectId
+        , id2 = new DocumentObjectId
 
-      BlogPostB.create({comments: [{title: 'elemMatch', date: dateAnchor + 5}]}, function (err, createdAfter) {
+      BlogPostB.create({owners: [id1, id2]}, function (err, createdAfter) {
         assert.ifError(err);
-        BlogPostB.create({comments: [{title: 'elemMatch', date: dateAnchor - 5}]}, function (err, createdBefore) {
+        BlogPostB.find({owners: {'$elemMatch': { $in: [id2.toString()] }}}, function (err, found) {
+          db.close();
           assert.ifError(err);
-          BlogPostB.find({'comments': {'$elemMatch': {title: 'elemMatch', date: {$gt: dateAnchor}}}}, 
-            function (err, found) {
-              assert.ifError(err);
-              assert.equal(1, found.length);
-              assert.equal(found[0]._id.toString(), createdAfter._id);
-              db.close();
-              done();
-            }
-          );
+          assert.equal(1, found.length);
+          done();
         });
       });
     })
@@ -1559,6 +1571,8 @@ describe('model: querying:', function(){
     });
 
     it('with Dates', function(done){
+      this.timeout(3000);
+      // this.slow(2000);
       var db = start()
 
       var SSchema = new Schema({ d: Date });

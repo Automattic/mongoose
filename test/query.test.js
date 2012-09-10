@@ -840,7 +840,7 @@ describe('Query', function(){
     it('should retain key order', function(){
       // this is important for query hints
       var hint = { x: 1, y: 1, z: 1 };
-      var a = JSON.stringify({ hint: hint, safe: true});
+      var a = JSON.stringify({ hint: hint, batchSize: 1000, safe: true});
 
       var q = new Query;
       q.hint(hint);
@@ -991,6 +991,27 @@ describe('Query', function(){
           assert.equal(query.options.readPreference.tags[1].dc, 'jp');
           assert.equal(query.options.readPreference.tags[1].s, 2);
         });
+      })
+
+      describe('inherits its models schema read option', function(){
+        var schema, M;
+        before(function () {
+          schema = new Schema({}, { read: 'p' });
+          M = mongoose.model('schemaOptionReadPrefWithQuery', schema);
+        })
+
+        it('if not set in query', function(){
+          var options = M.where()._optionsForExec(M);
+          assert.ok(options.readPreference instanceof P);
+          assert.equal(options.readPreference.mode, 'primary');
+        })
+
+        it('if set in query', function(){
+          var options = M.where().read('s')._optionsForExec(M);
+          assert.ok(options.readPreference instanceof P);
+          assert.equal(options.readPreference.mode, 'secondary');
+        })
+
       })
     })
   })

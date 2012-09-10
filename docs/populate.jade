@@ -131,7 +131,7 @@ block content
 
         Story
         .findOne({ title: /timex/i })
-        .populate('_creator', ['name'])
+        .populate('_creator', 'name')
         .exec(function (err, story) {
           if (err) return handleError(err);
 
@@ -140,9 +140,24 @@ block content
         })
       })
     })
+
   h4 NOTE:
   :markdown
     The documents returned from calling [populate](./api.html#query_Query-populate) become fully functional, `remove`able, `save`able documents. Do not confuse them with [sub docs](./subdocs.html). Take caution when calling its remove method because you'll be removing it from the database, not just the array.
+
+  h4 NOTE:
+  :markdown
+    _Field selection_ in v3 is slightly different than v2. Arrays of fields are no longer accepted.
+
+  :js
+    // this works
+    Story.findOne(..).populate('_creator', 'name age').exec(..);
+
+    // this doesn't
+    Story.findOne(..).populate('_creator', ['name', 'age']).exec(..);
+
+  :markdown
+    See the [migration guide](./migration.html#fields) for more detail.
 
   h3#next Next Up
   :markdown

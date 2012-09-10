@@ -228,4 +228,40 @@ describe('cursor stream:', function(){
     }
   })
 
+  it('supports $elemMatch with $in (gh-1091)', function(done){
+    this.timeout(3000);
+
+    var db = start()
+
+    var postSchema = new Schema({
+        ids: [{type: Schema.ObjectId}]
+      , title: String
+    });
+
+    var B = db.model('gh-1100-stream', postSchema);
+    var _id1 = new mongoose.Types.ObjectId;
+    var _id2 = new mongoose.Types.ObjectId;
+
+    B.create({ ids: [_id1, _id2] }, function (err, doc) {
+      assert.ifError(err);
+
+      var error;
+
+      var stream = B.find({ _id: doc._id })
+        .select({ title: 1, ids: { $elemMatch: { $in: [_id2.toString()] }}})
+        .stream();
+
+      stream.on('data', function (found) {
+        assert.equal(found.id, doc.id);
+        assert.equal(1, found.ids.length);
+        assert.equal(_id2.toString(), found.ids[0].toString());
+      })
+      .on('error', function (err) {
+        error = err;
+      })
+      .on('close', function () {
+        done(error);
+      })
+    })
+  })
 });

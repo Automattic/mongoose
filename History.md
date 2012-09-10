@@ -1,4 +1,16 @@
 
+2.8.3 / 2012-09-10
+==================
+
+  * fixed; $elemMatch+$in with field selection #1091
+  * fixed; properly cast $elemMatch+$in conditions #1100
+  * fixed; default field application of subdocs #1027
+  * fixed; several querystream() issues #1092
+  * fixed; ensure no documents are emitted after querystream#destroy
+  * fixed; allow ne(boolean) again #1093
+  * updated; driver to 1.1.7
+  * default query batchSize to 1000
+
 2.8.2 / 2012-08-31
 ==================
 

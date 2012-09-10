@@ -249,4 +249,46 @@ describe('model field selection', function(){
       });
     });
   });
+
+  it('casts elemMatch args (gh-1100)', function(done){
+    // mongodb 2.2 support
+    var db = start()
+
+    var postSchema = new Schema({
+       ids: [{type: Schema.ObjectId}]
+    });
+
+    var B = db.model('gh-1100', postSchema);
+    var _id1 = new mongoose.Types.ObjectId;
+    var _id2 = new mongoose.Types.ObjectId;
+
+    //mongoose.set('debug', true);
+    B.create({ ids: [_id1, _id2] }, function (err, doc) {
+      assert.ifError(err);
+
+      B
+      .findById(doc._id)
+      .select({ ids: { $elemMatch: { $in: [_id2.toString()] }}})
+      .exec(function (err, found) {
+        assert.ifError(err);
+        assert.ok(found);
+        assert.equal(found.id, doc.id);
+        assert.equal(1, found.ids.length);
+        assert.equal(_id2.toString(), found.ids[0].toString());
+
+        B
+        .find({ _id: doc._id })
+        .select({ ids: { $elemMatch: { $in: [_id2.toString()] }}})
+        .exec(function (err, found) {
+          assert.ifError(err);
+          assert.ok(found.length);
+          found = found[0];
+          assert.equal(found.id, doc.id);
+          assert.equal(1, found.ids.length);
+          assert.equal(_id2.toString(), found.ids[0].toString());
+          done();
+        })
+      })
+    })
+  })
 })

@@ -646,6 +646,20 @@ describe('Query', function(){
       assert.ok(params.numbers instanceof Array);
       assert.equal(params.numbers[0], 10000);
     })
+
+    it('an $elemMatch with $in works (gh-1100)', function(){
+      var query = new Query();
+      var db = start();
+      var Product = db.model('Product');
+      db.close();
+      var ids = [String(new DocumentObjectId), String(new DocumentObjectId)];
+      var params = { ids: { $elemMatch: { $in: ids }}};
+      query.cast(Product, params);
+      assert.ok(params.ids.$elemMatch.$in[0] instanceof DocumentObjectId);
+      assert.ok(params.ids.$elemMatch.$in[1] instanceof DocumentObjectId);
+      assert.deepEqual(params.ids.$elemMatch.$in[0].toString(), ids[0]);
+      assert.deepEqual(params.ids.$elemMatch.$in[1].toString(), ids[1]);
+    })
   })
 
   describe('distinct', function(){

@@ -8,7 +8,7 @@ test:
 	@./node_modules/.bin/mocha $(T) $(TESTS)
 	@node test/dropdb.js
 
-docs: docclean gendocs
+docs: ghpages docclean gendocs
 
 gendocs: $(DOCFILE)
 
@@ -21,6 +21,9 @@ $(DOCFILE): $(DOCS)
 
 site:
 	node website.js && node static.js
+
+ghpages:
+	git checkout gh-pages && git merge master
 
 docclean:
 	rm -f ./docs/*.{1,html,json}

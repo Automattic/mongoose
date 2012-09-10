@@ -249,7 +249,7 @@ describe('model field selection', function(){
     });
   });
 
-  it('casts elemMatch args (gh-1100)', function(done){
+  it('casts elemMatch args (gh-1091)', function(done){
     // mongodb 2.2 support
     var db = start()
 
@@ -257,11 +257,10 @@ describe('model field selection', function(){
        ids: [{type: Schema.ObjectId}]
     });
 
-    var B = db.model('gh-1100', postSchema);
+    var B = db.model('gh-1091', postSchema);
     var _id1 = new mongoose.Types.ObjectId;
     var _id2 = new mongoose.Types.ObjectId;
 
-    //mongoose.set('debug', true);
     B.create({ ids: [_id1, _id2] }, function (err, doc) {
       assert.ifError(err);
 

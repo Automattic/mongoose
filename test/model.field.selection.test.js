@@ -175,7 +175,7 @@ describe('model field selection', function(){
       , id = new DocumentObjectId
 
     BlogPostB.collection.insert(
-        { _id: id, title: 'issue 870'}, function (err) {
+        { _id: id, title: 'issue 870'}, { safe: true }, function (err) {
       assert.ifError(err);
 
       BlogPostB.findById(id, 'def comments', function (err, found) {

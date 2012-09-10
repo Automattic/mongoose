@@ -290,7 +290,7 @@ describe('cursor stream:', function(){
 
       var error;
 
-      var stream = B.find(doc._id)
+      var stream = B.find({ _id: doc._id })
         .select({ title: 1, ids: { $elemMatch: { $in: [_id2.toString()] }}})
         .stream();
 
@@ -302,7 +302,7 @@ describe('cursor stream:', function(){
       .on('error', function (err) {
         error = err;
       })
-      .on('end', function () {
+      .on('close', function () {
         done(error);
       })
     })

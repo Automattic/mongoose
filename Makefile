@@ -20,7 +20,7 @@ $(DOCFILE): $(DOCS)
 	./node_modules/dox/bin/dox < $^ >> $(DOCFILE)
 
 site:
-	node website.js && node static.js
+	node website.js && node server.js
 
 ghpages:
 	git checkout gh-pages && git merge master

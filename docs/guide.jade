@@ -23,7 +23,7 @@ block content
         votes: Number,
         favs:  Number
       }
-    })
+    });
   p
     em
       | If you want to add additional keys later, use the 
@@ -100,11 +100,11 @@ block content
     |  method available to it.
   :js
     var Animal = mongoose.model('Animal', animalSchema);
-    var dog = new Animal({ type: 'dog' })
+    var dog = new Animal({ type: 'dog' });
 
     dog.findSimilarTypes(function (err, dogs) {
-      console.log(dogs) // woof
-    })
+      console.log(dogs); // woof
+    });
   h3#statics Statics
   p 
     | Adding static constructor methods to Models is simple as well. Continuing with our 
@@ -112,13 +112,13 @@ block content
     |:
   :js
     animalSchema.statics.findByName = function (name, cb) {
-      this.find({ name: new RegExp(name, 'i'), cb);
+      this.find({ name: new RegExp(name, 'i') }, cb);
     }
 
     var Animal = mongoose.model('Animal', animalSchema);
     Animal.findByName('fido', function (err, animals) {
       console.log(animals);
-    })
+    });
   h3#indexes Indexes
   p
     a(href="http://www.mongodb.org/display/DOCS/Indexes") Indexes
@@ -144,9 +144,9 @@ block content
     code autoIndex
     |  option of your schema to false.
   :js
-    animalSchema.set('autoIndex', false)
+    animalSchema.set('autoIndex', false);
     // or
-    new Schema({..}, { autoIndex: false })
+    new Schema({..}, { autoIndex: false });
   p
     | See also the 
     a(href="./api.html#model_Model-ensureIndexes")
@@ -178,11 +178,11 @@ block content
   :js
     personSchema.virtual('name.full').get(function () {
       return this.name.first + ' ' + this.name.last;
-    })
+    });
   :markdown
     Now, when we access our virtual full name property, our getter function will be invoked and the value returned:
   :js
-    console.log('%s is insane', bad.name.full) // Walter White is insane
+    console.log('%s is insane', bad.name.full); // Walter White is insane
   :markdown
     It would also be nice to be able to set `this.name.first` and `this.name.last` by setting `this.name.full`. For example, if we wanted to change `bad`'s `name.first` and `name.last` to 'Breaking' and 'Bad' respectively, it'd be nice to just:
   :js
@@ -194,12 +194,12 @@ block content
       var split = name.split(' ');
       this.name.first = split[0];
       this.name.last = split[1];
-    })
+    });
 
     ...
 
     mad.name.full = 'Breaking Bad';
-    console.log(mad.name.first) // Breaking
+    console.log(mad.name.first); // Breaking
   :markdown
     If you need attributes that you can get and set but that are not themselves persisted to MongoDB, virtual attributes is the Mongoose feature for you.
 
@@ -233,7 +233,7 @@ block content
   :markdown
     At application startup, Mongoose sends an `ensureIndex` command for each index declared in your `Schema`. As of Mongoose v3, indexes are created in the `background` by default. If you wish to disable the auto-creation feature and manually handle when indexes are created, set your `Schema`s `autoIndex` option to `false` and use the [ensureIndexes](./api.html#model_Model-ensureIndexes) method on your model.
   :js
-    var schema = new Schema({..}, { autoIndex: false })
+    var schema = new Schema({..}, { autoIndex: false });
     var Clock = db.model('Clock', schema);
     Clock.ensureIndexes(callback);
 
@@ -241,11 +241,11 @@ block content
   :markdown
     Mongoose supports MongoDBs [capped](http://www.mongodb.org/display/DOCS/Capped+Collections) collections. To specify the underlying MongoDB collection be `capped`, set the `capped` option to the maximum size of the collection in [bytes](http://www.mongodb.org/display/DOCS/Capped+Collections#CappedCollections-size.).
   :js
-    new Schema({..}, { capped: 1024 })
+    new Schema({..}, { capped: 1024 });
   :markdown
     The `capped` option may also be set to an object if you want to pass additional options like [max](http://www.mongodb.org/display/DOCS/Capped+Collections#CappedCollections-max) or [autoIndexId](http://www.mongodb.org/display/DOCS/Capped+Collections#CappedCollections-autoIndexId). In this case you must explicitly pass the `size` option which is required.
   :js
-    new Schema({..}, { capped: { size: 1024, max: 1000, autoIndexId: true })
+    new Schema({..}, { capped: { size: 1024, max: 1000, autoIndexId: true } });
 
   h4#id option: id
   :markdown
@@ -286,11 +286,11 @@ block content
     Allows setting [query#read](/docs/api.html#query_Query-read) options at the schema level, providing us a way to apply default [ReadPreferences](http://docs.mongodb.org/manual/applications/replication/#replica-set-read-preference) to all queries derived from a model.
 
   :js
-    var schema = new Schema({..}, { read: 'primary' })            // also aliased as 'p'
-    var schema = new Schema({..}, { read: 'primaryPreferred' })   // aliased as 'pp'
-    var schema = new Schema({..}, { read: 'secondary' })          // aliased as 's'
-    var schema = new Schema({..}, { read: 'secondaryPreferred' }) // aliased as 'sp'
-    var schema = new Schema({..}, { read: 'nearest' })            // aliased as 'n'
+    var schema = new Schema({..}, { read: 'primary' });            // also aliased as 'p'
+    var schema = new Schema({..}, { read: 'primaryPreferred' });   // aliased as 'pp'
+    var schema = new Schema({..}, { read: 'secondary' });          // aliased as 's'
+    var schema = new Schema({..}, { read: 'secondaryPreferred' }); // aliased as 'sp'
+    var schema = new Schema({..}, { read: 'nearest' });            // aliased as 'n'
 
   :markdown
     The alias of each pref is also permitted so instead of having to type out 'secondaryPreferred' and getting the spelling wrong, we can simply pass 'pp'.
@@ -314,7 +314,7 @@ block content
 
   :js
     var safe = true;
-    new Schema({ .. }, { safe: safe })
+    new Schema({ .. }, { safe: safe });
 
   :markdown
     By default this is set to `true` for all schemas which guarentees that any occurring error gets passed back to our callback.
@@ -324,7 +324,7 @@ block content
 
   :js
     var safe = { w: "majority", wtimeout: 10000 };
-    new Schema({ .. }, { safe: safe })
+    new Schema({ .. }, { safe: safe });
 
   h4#shardKey option: shardKey
   :markdown
@@ -345,12 +345,12 @@ block content
     var thingSchema = new Schema({..})
     var Thing = db.model('Thing', schemaSchema);
     var thing = new Thing({ iAmNotInTheSchema: true });
-    thing.save() // iAmNotInTheSchema is not saved to the db
+    thing.save(); // iAmNotInTheSchema is not saved to the db
 
     // set to false..
     var thingSchema = new Schema({..}, { strict: false });
     var thing = new Thing({ iAmNotInTheSchema: true });
-    thing.save() // iAmNotInTheSchema is now saved to the db!!
+    thing.save(); // iAmNotInTheSchema is now saved to the db!!
 
   :markdown
     This value can be overridden at the model instance level by passing a second boolean argument:
@@ -413,7 +413,7 @@ block content
   :markdown
     Document versioning can also be disabled by setting the `versionKey` to false. _DO NOT disable versioning unless you [know what you are doing](http://aaronheckmann.posterous.com/mongoose-v3-part-1-versioning)._
   :js
-    new Schema({..}, { versionKey: false })
+    new Schema({..}, { versionKey: false });
     var Thing = db.model('Thing', schema);
     var thing = new Thing({ name: 'no versioning please' });
     thing.save(); // { name: 'no versioning please' }

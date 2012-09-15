@@ -755,6 +755,31 @@ describe('Query', function(){
       assert.deepEqual(params.ids.$elemMatch.$in[0].toString(), ids[0]);
       assert.deepEqual(params.ids.$elemMatch.$in[1].toString(), ids[1]);
     })
+
+    it('inequality operators for an array', function() {
+      var query = new Query();
+      var db = start();
+      var Product = db.model('Product');
+      var Comment = db.model('Comment');
+      db.close();
+
+      var id = new DocumentObjectId;
+      var castedComment = { _id: id, text: 'hello there' };
+      var comment = new Comment(castedComment);
+
+      var params = {
+          ids: { $gt: id }
+        , comments: { $gt: comment }
+        , strings: { $gt: 'Hi there' }
+        , numbers: { $gt: 10000 }
+      };
+
+      query.cast(Product, params);
+      assert.equal(params.ids.$gt, id);
+      assert.deepEqual(params.comments.$gt, castedComment);
+      assert.equal(params.strings.$gt, 'Hi there');
+      assert.equal(params.numbers.$gt, 10000);
+    })
   })
 
   describe('distinct', function(){

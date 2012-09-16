@@ -108,7 +108,7 @@ describe('types array', function(){
           });
         });
       }
-        
+
     })
   })
 
@@ -982,6 +982,36 @@ describe('types array', function(){
       });
     });
   })
+
+  it('pushing top level arrays and subarrays works (gh-1073)', function(done){
+    var db= start();
+    var schema = new Schema({ em: [new Schema({ sub: [String] })]});
+    var M = db.model('gh1073', schema);
+    var m = new M({ em: [ { sub: [] }]});
+    m.save(function (err) {
+      M.findById(m, function (err, m) {
+        assert.ifError(err);
+
+        m.em[m.em.length-1].sub.push("a");
+        m.em.push({ sub: [] });
+
+        assert.equal(2, m.em.length);
+        assert.equal(1, m.em[0].sub.length);
+
+        m.save(function (err) {
+          assert.ifError(err);
+
+          M.findById(m, function (err, m) {
+            assert.ifError(err);
+            assert.equal(2, m.em.length);
+            assert.equal(1, m.em[0].sub.length);
+            assert.equal('a', m.em[0].sub[0]);
+            done();
+          });
+        });
+      });
+    });
+  });
 
   describe('default type', function(){
     it('casts to Mixed', function(){

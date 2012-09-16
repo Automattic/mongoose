@@ -5,10 +5,10 @@ DOCS = $(DOCS_:.js=.json)
 DOCFILE = docs/source/_docs
 
 test:
-	@./node_modules/.bin/mocha --reporter list $(TESTFLAGS) $(TESTS)
+	@time ./node_modules/.bin/mocha $(T) $(TESTS)
 	@node test/dropdb.js
 
-docs: docclean gendocs
+docs: ghpages docclean gendocs
 
 gendocs: $(DOCFILE)
 
@@ -20,7 +20,10 @@ $(DOCFILE): $(DOCS)
 	./node_modules/dox/bin/dox < $^ >> $(DOCFILE)
 
 site:
-	node website.js --watch && node static.js
+	node website.js && node static.js
+
+ghpages:
+	git checkout gh-pages && git merge master
 
 docclean:
 	rm -f ./docs/*.{1,html,json}

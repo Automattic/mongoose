@@ -1918,6 +1918,15 @@ describe('model', function(){
           assert.ifError(err);
 
           t.nest = { st: "jsconf rules", yep: "it does" };
+
+          // check that entire `nest` object is being $set
+          var u = t._delta()[1];
+          assert.ok(u.$set);
+          assert.ok(u.$set.nest);
+          assert.equal(2, Object.keys(u.$set.nest).length);
+          assert.ok(u.$set.nest.yep);
+          assert.ok(u.$set.nest.st);
+
           t.save(function (err) {
             assert.ifError(err);
 
@@ -3545,7 +3554,7 @@ describe('model', function(){
           , {title: 'interoperable find as promise 2'}
           , function (err, createdOne, createdTwo) {
           assert.ifError(err);
-          var query = BlogPost.find({title: 'interoperable find as promise 2'});
+          var query = BlogPost.find({title: 'interoperable find as promise 2'}).sort('_id');
           var promise = query.exec();
           promise.addBack(function (err, found) {
             db.close();
@@ -3955,6 +3964,36 @@ describe('model', function(){
         done();
       });
     });
+
+    it('with positional notation on path not existing in schema (gh-1048)', function(done){
+      var db = start();
+
+      var M = db.model('backwardCompat-gh-1048', Schema({ name: 'string' }));
+      db.on('open', function () {
+        var o = {
+            name: 'gh-1048'
+          , _id: new mongoose.Types.ObjectId
+          , databases: {
+                0: { keys: 100, expires: 0}
+              , 15: {keys:1,expires:0}
+            }
+        };
+
+        M.collection.insert(o, { safe: true }, function (err) {
+          assert.ifError(err);
+          M.findById(o._id, function (err, doc) {
+            db.close();
+            assert.ifError(err);
+            assert.ok(doc);
+            assert.ok(doc._doc.databases);
+            assert.ok(doc._doc.databases['0']);
+            assert.ok(doc._doc.databases['15']);
+            assert.equal(undefined, doc.databases);
+            done();
+          })
+        })
+      });
+    })
   });
 
   describe('create()', function(){

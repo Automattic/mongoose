@@ -53,13 +53,18 @@ describe('cursor stream:', function(){
       , closed = 0
       , paused = 0
       , resumed = 0
+      , seen = {}
       , err
 
-    var stream = P.find({}).stream();
+    var stream = P.find().batchSize(3).stream();
 
     stream.on('data', function (doc) {
       assert.strictEqual(true, !! doc.name);
       assert.strictEqual(true, !! doc._id);
+
+      // no dup docs emitted
+      assert.ok(!seen[doc.id]);
+      seen[doc.id] = 1;
 
       if (paused > 0 && 0 === resumed) {
         err = new Error('data emitted during pause');
@@ -130,6 +135,8 @@ describe('cursor stream:', function(){
   });
 
   it('destroying a stream stops it', function(done){
+    //this.slow(300);
+
     var db = start()
       , P = db.model('PersonForStream', collection)
       , finished = 0
@@ -167,6 +174,8 @@ describe('cursor stream:', function(){
   });
 
   it('errors', function(done){
+    //this.slow(300);
+
     var db = start({ server: { auto_reconnect: false }})
       , P = db.model('PersonForStream', collection)
       , finished = 0
@@ -261,4 +270,41 @@ describe('cursor stream:', function(){
       done();
     }
   });
+
+  it('supports $elemMatch with $in (gh-1091)', function(done){
+    this.timeout(3000);
+
+    var db = start()
+
+    var postSchema = new Schema({
+        ids: [{type: Schema.ObjectId}]
+      , title: String
+    });
+
+    var B = db.model('gh-1100-stream', postSchema);
+    var _id1 = new mongoose.Types.ObjectId;
+    var _id2 = new mongoose.Types.ObjectId;
+
+    B.create({ ids: [_id1, _id2] }, function (err, doc) {
+      assert.ifError(err);
+
+      var error;
+
+      var stream = B.find({ _id: doc._id })
+        .select({ title: 1, ids: { $elemMatch: { $in: [_id2.toString()] }}})
+        .stream();
+
+      stream.on('data', function (found) {
+        assert.equal(found.id, doc.id);
+        assert.equal(1, found.ids.length);
+        assert.equal(_id2.toString(), found.ids[0].toString());
+      })
+      .on('error', function (err) {
+        error = err;
+      })
+      .on('close', function () {
+        done(error);
+      })
+    })
+  })
 });

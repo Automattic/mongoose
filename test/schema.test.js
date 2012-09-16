@@ -17,6 +17,7 @@ var start = require('./common')
   , DocumentObjectId = mongoose.Types.ObjectId
   , Mixed = SchemaTypes.Mixed
   , MongooseArray = mongoose.Types.Array
+  , ReadPref = require('mongodb').ReadPreference
   , vm = require('vm')
 
 /**
@@ -204,8 +205,33 @@ describe('schema', function(){
     assert.equal(Test.path('mixed2').getDefault().length, 0);
   })
 
-
   describe('validation', function(){
+    it('invalid arguments are rejected (1044)', function(){
+      assert.throws(function () {
+        new Schema({
+            simple: { type: String, validate: 'nope' }
+        });
+      }, /Invalid validator/);
+
+      assert.throws(function () {
+        new Schema({
+            simple: { type: String, validate: ['nope'] }
+        });
+      }, /Invalid validator/);
+
+      assert.throws(function () {
+        new Schema({
+          simple: { type: String, validate: { nope: 1, msg: 'nope' } }
+        });
+      }, /Invalid validator/);
+
+      assert.throws(function () {
+        new Schema({
+          simple: { type: String, validate: [{ nope: 1, msg: 'nope' }, 'nope'] }
+        });
+      }, /Invalid validator/);
+    })
+
     it('string required', function(){
       var Test = new Schema({
           simple: String
@@ -746,7 +772,6 @@ describe('schema', function(){
     });
 
     describe('string', function(){
-      console.error('\nTODO remove string lowercase/uppercase/trim setters before 3.0\n');
       it('lowercase', function(){
         var Tobi = new Schema({
             name: { type: String, lowercase: true }
@@ -869,6 +894,61 @@ describe('schema', function(){
 
       assert.ok(g);
       assert.equal(g.message,'A getter must be a function.');
+    })
+    it('auto _id', function(){
+      var schema = new Schema({
+          name: String
+      });
+      assert.ok(schema.path('_id') instanceof Schema.ObjectId);
+
+      var schema = new Schema({
+          name: String
+      }, { _id: true });
+      assert.ok(schema.path('_id') instanceof Schema.ObjectId);
+
+      var schema = new Schema({
+          name: String
+      }, { _id: false });
+      assert.equal(undefined, schema.path('_id'));
+
+      // old options
+      var schema = new Schema({
+          name: String
+      }, { noId: false });
+      assert.ok(schema.path('_id') instanceof Schema.ObjectId);
+
+      var schema = new Schema({
+          name: String
+      }, { noId: true });
+      assert.equal(undefined, schema.path('_id'));
+    })
+
+    it('auto id', function(){
+      var schema = new Schema({
+          name: String
+      });
+      assert.ok(schema.virtualpath('id') instanceof mongoose.VirtualType);
+
+      var schema = new Schema({
+          name: String
+      }, { id: true });
+      assert.ok(schema.virtualpath('id') instanceof mongoose.VirtualType);
+
+      var schema = new Schema({
+          name: String
+      }, { id: false });
+      assert.equal(undefined, schema.virtualpath('id'));
+
+      // old options
+      var schema = new Schema({
+          name: String
+      }, { noVirtualId: false });
+      assert.ok(schema.virtualpath('id') instanceof mongoose.VirtualType);
+
+      var schema = new Schema({
+          name: String
+      }, { noVirtualId: true });
+      assert.equal(undefined, schema.virtualpath('id'));
     })
   });
 
@@ -993,6 +1073,9 @@ describe('schema', function(){
       assert.equal(true, Tobi.options.strict);
       assert.equal(false, Tobi.options.capped);
       assert.equal('__v', Tobi.options.versionKey);
+      assert.equal(null, Tobi.options.shardKey);
+      assert.equal(null, Tobi.options.read);
+      assert.equal(true, Tobi.options._id);
     });
 
     it('setting', function(){
@@ -1004,6 +1087,135 @@ describe('schema', function(){
 
       assert.equal('b', Tobi.options.a);
       assert.equal(Tobi.options.safe, false);
+      assert.equal(null, Tobi.options.read);
+
+      var tags = [{ x: 1 }];
+
+      Tobi.set('read', 'n');
+      assert.ok(Tobi.options.read instanceof ReadPref);
+      assert.equal('nearest', Tobi.options.read.mode);
+
+      Tobi.set('read', 'n', tags);
+      assert.equal('nearest', Tobi.options.read.mode);
+      assert.ok(Array.isArray(Tobi.options.read.tags));
+      assert.equal(1, Tobi.options.read.tags.length);
+      assert.equal(1, Tobi.options.read.tags[0].x);
+
+      Tobi.set('read', ['n', tags]);
+      assert.equal('nearest', Tobi.options.read.mode);
+      assert.ok(Array.isArray(Tobi.options.read.tags));
+      assert.equal(1, Tobi.options.read.tags.length);
+      assert.equal(1, Tobi.options.read.tags[0].x);
+
+      Tobi = Schema({}, { read: 'p' });
+      assert.ok(Tobi.options.read instanceof ReadPref);
+      assert.equal('primary', Tobi.options.read.mode);
+
+      Tobi = Schema({}, { read: ['p', tags] });
+      assert.ok(Tobi.options.read instanceof ReadPref);
+      assert.equal('primary', Tobi.options.read.mode);
+      assert.ok(Array.isArray(Tobi.options.read.tags));
+      assert.equal(1, Tobi.options.read.tags.length);
+      assert.equal(1, Tobi.options.read.tags[0].x);
+
+      Tobi = Schema({}, { read: 'primary' });
+      assert.ok(Tobi.options.read instanceof ReadPref);
+      assert.equal('primary', Tobi.options.read.mode);
+
+      Tobi = Schema({}, { read: ['primary', tags] });
+      assert.ok(Tobi.options.read instanceof ReadPref);
+      assert.equal('primary', Tobi.options.read.mode);
+      assert.ok(Array.isArray(Tobi.options.read.tags));
+      assert.equal(1, Tobi.options.read.tags.length);
+      assert.equal(1, Tobi.options.read.tags[0].x);
+
+      Tobi = Schema({}, { read: 's' });
+      assert.ok(Tobi.options.read instanceof ReadPref);
+      assert.equal('secondary', Tobi.options.read.mode);
+
+      Tobi = Schema({}, { read: ['s', tags] });
+      assert.ok(Tobi.options.read instanceof ReadPref);
+      assert.equal('secondary', Tobi.options.read.mode);
+      assert.ok(Array.isArray(Tobi.options.read.tags));
+      assert.equal(1, Tobi.options.read.tags.length);
+      assert.equal(1, Tobi.options.read.tags[0].x);
+
+      Tobi = Schema({}, { read: 'secondary' });
+      assert.ok(Tobi.options.read instanceof ReadPref);
+      assert.equal('secondary', Tobi.options.read.mode);
+
+      Tobi = Schema({}, { read: ['secondary', tags] });
+      assert.ok(Tobi.options.read instanceof ReadPref);
+      assert.equal('secondary', Tobi.options.read.mode);
+      assert.ok(Array.isArray(Tobi.options.read.tags));
+      assert.equal(1, Tobi.options.read.tags.length);
+      assert.equal(1, Tobi.options.read.tags[0].x);
+
+      Tobi = Schema({}, { read: 'pp' });
+      assert.ok(Tobi.options.read instanceof ReadPref);
+      assert.equal('primaryPrefered', Tobi.options.read.mode);
+
+      Tobi = Schema({}, { read: ['pp', tags] });
+      assert.ok(Tobi.options.read instanceof ReadPref);
+      assert.equal('primaryPrefered', Tobi.options.read.mode);
+      assert.ok(Array.isArray(Tobi.options.read.tags));
+      assert.equal(1, Tobi.options.read.tags.length);
+      assert.equal(1, Tobi.options.read.tags[0].x);
+
+      Tobi = Schema({}, { read: 'primaryPrefered'});
+      assert.ok(Tobi.options.read instanceof ReadPref);
+      assert.equal('primaryPrefered', Tobi.options.read.mode);
+
+      Tobi = Schema({}, { read: ['primaryPrefered', tags]});
+      assert.ok(Tobi.options.read instanceof ReadPref);
+      assert.equal('primaryPrefered', Tobi.options.read.mode);
+      assert.ok(Array.isArray(Tobi.options.read.tags));
+      assert.equal(1, Tobi.options.read.tags.length);
+      assert.equal(1, Tobi.options.read.tags[0].x);
+
+      Tobi = Schema({}, { read: 'sp' });
+      assert.ok(Tobi.options.read instanceof ReadPref);
+      assert.equal('secondaryPrefered', Tobi.options.read.mode);
+
+      Tobi = Schema({}, { read: ['sp', tags] });
+      assert.ok(Tobi.options.read instanceof ReadPref);
+      assert.equal('secondaryPrefered', Tobi.options.read.mode);
+      assert.ok(Array.isArray(Tobi.options.read.tags));
+      assert.equal(1, Tobi.options.read.tags.length);
+      assert.equal(1, Tobi.options.read.tags[0].x);
+
+      Tobi = Schema({}, { read: 'secondaryPrefered'});
+      assert.ok(Tobi.options.read instanceof ReadPref);
+      assert.equal('secondaryPrefered', Tobi.options.read.mode);
+
+      Tobi = Schema({}, { read: ['secondaryPrefered', tags]});
+      assert.ok(Tobi.options.read instanceof ReadPref);
+      assert.equal('secondaryPrefered', Tobi.options.read.mode);
+      assert.ok(Array.isArray(Tobi.options.read.tags));
+      assert.equal(1, Tobi.options.read.tags.length);
+      assert.equal(1, Tobi.options.read.tags[0].x);
+
+      Tobi = Schema({}, { read: 'n'});
+      assert.ok(Tobi.options.read instanceof ReadPref);
+      assert.equal('nearest', Tobi.options.read.mode);
+
+      Tobi = Schema({}, { read: ['n', tags]});
+      assert.ok(Tobi.options.read instanceof ReadPref);
+      assert.equal('nearest', Tobi.options.read.mode);
+      assert.ok(Array.isArray(Tobi.options.read.tags));
+      assert.equal(1, Tobi.options.read.tags.length);
+      assert.equal(1, Tobi.options.read.tags[0].x);
+
+      Tobi = Schema({}, { read: 'nearest'});
+      assert.ok(Tobi.options.read instanceof ReadPref);
+      assert.equal('nearest', Tobi.options.read.mode);
+
+      Tobi = Schema({}, { read: ['nearest', tags]});
+      assert.ok(Tobi.options.read instanceof ReadPref);
+      assert.equal('nearest', Tobi.options.read.mode);
+      assert.ok(Array.isArray(Tobi.options.read.tags));
+      assert.equal(1, Tobi.options.read.tags.length);
+      assert.equal(1, Tobi.options.read.tags[0].x);
     });
   });
 
@@ -1039,6 +1251,34 @@ describe('schema', function(){
         assert.strictEqual(undefined, schema.virtuals.id);
       });
     });
+
+    describe('getter', function(){
+      it('scope', function(){
+        var Tobi = new Schema;
+
+        Tobi.virtual('name').get(function (v, self) {
+          assert.equal('b', this.a);
+          assert.equal('name', self.path);
+          return v.toLowerCase();
+        })
+
+        assert.equal('yep', Tobi.virtualpath('name').applyGetters('YEP', { a: 'b' }));
+      })
+    })
+
+    describe('setter', function(){
+      it('scope', function(){
+        var Tobi = new Schema;
+
+        Tobi.virtual('name').set(function (v, self) {
+          assert.equal('b', this.a);
+          assert.equal('name', self.path);
+          return v.toLowerCase();
+        })
+
+        assert.equal('yep', Tobi.virtualpath('name').applySetters('YEP', { a: 'b' }));
+      })
+    })
   });
 
   describe('other contexts', function(){

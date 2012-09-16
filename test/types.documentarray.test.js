@@ -126,6 +126,25 @@ describe('types.documentarray', function(){
     }
     assert.equal(false, threw);
 
+    // test the _id option, noId is deprecated
+    var NoId = new Schema({
+        title: { type: String }
+    }, { _id: false });
+
+    var Subdocument = TestDoc(NoId);
+
+    var sub4 = new Subdocument();
+    sub4.title = 'rock-n-roll';
+
+    var a = new MongooseDocumentArray([sub4])
+      , threw = false;
+    try {
+      a.id('i better not throw');
+    } catch (err) {
+      threw = err;
+    }
+    assert.equal(false, threw);
+
   })
 
   describe('inspect', function(){

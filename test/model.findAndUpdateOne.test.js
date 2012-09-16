@@ -616,4 +616,122 @@ describe('model: findByIdAndUpdate:', function(){
     assert.equal(undefined, query._updateArg.date);
     assert.strictEqual(undefined, query._conditions._id);
   });
+
+  it('supports v3 select string syntax', function(){
+    var db = start()
+      , M = db.model(modelname, collection)
+      , _id = new DocumentObjectId
+
+    db.close();
+
+    var now = new Date
+      , query;
+
+    query = M.findByIdAndUpdate(_id, { $set: { date: now }}, { select: 'author -title' });
+    assert.strictEqual(1, query._fields.author);
+    assert.strictEqual(0, query._fields.title);
+
+    query = M.findOneAndUpdate({}, { $set: { date: now }}, { select: 'author -title' });
+    assert.strictEqual(1, query._fields.author);
+    assert.strictEqual(0, query._fields.title);
+  })
+
+  it('supports v3 select object syntax', function(){
+    var db = start()
+      , M = db.model(modelname, collection)
+      , _id = new DocumentObjectId
+
+    db.close();
+
+    var now = new Date
+      , query;
+
+    query = M.findByIdAndUpdate(_id, { $set: { date: now }}, { select: { author: 1, title: 0 }});
+    assert.strictEqual(1, query._fields.author);
+    assert.strictEqual(0, query._fields.title);
+
+    query = M.findOneAndUpdate({}, { $set: { date: now }}, { select: { author: 1, title: 0 }});
+    assert.strictEqual(1, query._fields.author);
+    assert.strictEqual(0, query._fields.title);
+  })
+
+  it('supports v3 sort string syntax', function(){
+    var db = start()
+      , M = db.model(modelname, collection)
+      , _id = new DocumentObjectId
+
+    db.close();
+
+    var now = new Date
+      , query;
+
+    query = M.findByIdAndUpdate(_id, { $set: { date: now }}, { sort: 'author -title' });
+    assert.equal(2, query.options.sort.length);
+    assert.equal('author', query.options.sort[0][0]);
+    assert.equal(1, query.options.sort[0][1]);
+    assert.equal('title', query.options.sort[1][0]);
+    assert.equal(-1, query.options.sort[1][1]);
+
+    query = M.findOneAndUpdate({}, { $set: { date: now }}, { sort: 'author -title' });
+    assert.equal(2, query.options.sort.length);
+    assert.equal('author', query.options.sort[0][0]);
+    assert.equal(1, query.options.sort[0][1]);
+    assert.equal('title', query.options.sort[1][0]);
+    assert.equal(-1, query.options.sort[1][1]);
+  })
+
+  it('supports v3 sort object syntax', function(){
+    var db = start()
+      , M = db.model(modelname, collection)
+      , _id = new DocumentObjectId
+
+    db.close();
+
+    var now = new Date
+      , query;
+
+    query = M.findByIdAndUpdate(_id, { $set: { date: now }}, { sort: { author: 1, title: -1 }});
+    assert.equal(2, query.options.sort.length);
+    assert.equal('author', query.options.sort[0][0]);
+    assert.equal(1, query.options.sort[0][1]);
+    assert.equal('title', query.options.sort[1][0]);
+    assert.equal(-1, query.options.sort[1][1]);
+
+    query = M.findOneAndUpdate(_id, { $set: { date: now }}, { sort: { author: 1, title: -1 }});
+    assert.equal(2, query.options.sort.length);
+    assert.equal('author', query.options.sort[0][0]);
+    assert.equal(1, query.options.sort[0][1]);
+    assert.equal('title', query.options.sort[1][0]);
+    assert.equal(-1, query.options.sort[1][1]);
+  });
+
+  it('supports $elemMatch with $in (gh-1091 gh-1100)', function(done){
+    var db = start()
+
+    var postSchema = new Schema({
+        ids: [{type: Schema.ObjectId}]
+      , title: String
+    });
+
+    var B = db.model('gh-1091+1100', postSchema);
+    var _id1 = new mongoose.Types.ObjectId;
+    var _id2 = new mongoose.Types.ObjectId;
+
+    B.create({ ids: [_id1, _id2] }, function (err, doc) {
+      assert.ifError(err);
+
+      B
+      .findByIdAndUpdate(doc._id, { title: 'woot' })
+      .select({ title: 1, ids: { $elemMatch: { $in: [_id2.toString()] }}})
+      .exec(function (err, found) {
+        assert.ifError(err);
+        assert.ok(found);
+        assert.equal(found.id, doc.id);
+        assert.equal('woot', found.title);
+        assert.equal(1, found.ids.length);
+        assert.equal(_id2.toString(), found.ids[0].toString());
+        done();
+      });
+    })
+  })
 })

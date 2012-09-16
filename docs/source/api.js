@@ -7,7 +7,12 @@ var link = require('../helpers/linktype');
 var hl = require('highlight.js')
 var md = require('markdown')
 
-module.exports = { docs: [], github: 'https://github.com/LearnBoost/mongoose/tree/' }
+module.exports = {
+    docs: []
+  , github: 'https://github.com/LearnBoost/mongoose/tree/'
+  , title: 'API docs'
+}
+
 var out = module.exports.docs;
 
 var docs = fs.readFileSync(__dirname + '/_docs', 'utf8');

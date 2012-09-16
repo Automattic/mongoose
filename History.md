@@ -1,3 +1,66 @@
+3.1.2 / 2012-09-10
+==================
+
+  * added; ReadPreferrence schema option #1097
+  * updated; driver to 1.1.7
+  * updated; default query batchSize to 1000
+  * fixed; we now cast the mapReduce query option #1095
+  * fixed; $elemMatch+$in with field selection #1091
+  * fixed; properly cast $elemMatch+$in conditions #1100
+  * fixed; default field application of subdocs #1027
+  * fixed; querystream prematurely dying #1092
+  * fixed; querystream never resumes when paused at getMore boundries #1092
+  * fixed; querystream occasionally emits data events after destroy #1092
+  * fixed; remove unnecessary ObjectId creation in querystream
+  * fixed; allow ne(boolean) again #1093
+  * docs; add populate/field selection syntax notes
+  * docs; add toObject/toJSON options detail
+  * docs; `read` schema option
+
+3.1.1 / 2012-08-31
+==================
+
+  * updated; driver to 1.1.6
+
+3.1.0 / 2012-08-29
+==================
+
+  * changed; fixed; directly setting nested objects now overwrites entire object (previously incorrectly merged them)
+  * added; read pref support (mongodb 2.2) 205a709c
+  * added; aggregate support (mongodb 2.2) f3a5bd3d
+  * added; virtual {g,s}etter introspection (#1070)
+  * updated; docs [brettz9](https://github.com/brettz9)
+  * updated; driver to 1.1.5
+  * fixed; retain virtual setter return values (#1069)
+
+3.0.3 / 2012-08-23
+==================
+
+  * fixed; use of nested paths beginning w/ numbers #1062
+  * fixed; query population edge case #1053 #1055 [jfremy](https://github.com/jfremy)
+  * fixed; simultaneous top and sub level array modifications #1073
+  * added; id and _id schema option aliases + tests
+  * improve debug formatting to allow copy/paste logged queries into mongo shell [eknkc](https://github.com/eknkc)
+  * docs
+
+3.0.2 / 2012-08-17
+==================
+
+  * added; missing support for v3 sort/select syntax to findAndModify helpers (#1058)
+  * fixed; replset fullsetup event emission
+  * fixed; reconnected event for replsets
+  * fixed; server reconnection setting discovery
+  * fixed; compat with non-schema path props using positional notation (#1048)
+  * fixed; setter/casting order (#665)
+  * docs; updated
+
+3.0.1 / 2012-08-11
+==================
+
+  * fixed; throw Error on bad validators (1044)
+  * fixed; typo in EmbeddedDocument#parentArray [lackac]
+  * fixed; repair mongoose.SchemaTypes alias
+  * updated; docs
 
 3.0.0 / 2012-08-07
 ==================

@@ -218,4 +218,20 @@ describe('model query casting', function(){
       });
     })
   })
+
+  it('works when finding Boolean with $ne (gh-1093)', function (done) {
+    var db = start()
+      , B = db.model(modelName, collection + random());
+
+    var b = new B({ published: false });
+    b.save(function (err) {
+      assert.ifError(err);
+      B.find().ne('published', true).exec(function (err, doc) {
+        assert.ifError(err);
+        assert.ok(doc);
+        assert.equal(doc[0].id, b.id);
+        done();
+      });
+    })
+  })
 });

@@ -56,24 +56,37 @@ describe('model field selection', function(){
       , BlogPostB = db.model(modelName, collection)
       , date = new Date
 
-    BlogPostB.create({title: 'subset 1', author: 'me', meta: { date: date }}, function (err, created) {
+    var doc = {
+        title: 'subset 1'
+      , author: 'me'
+      , comments: [{ title: 'first comment', date: new Date }, { title: '2nd', date: new Date }]
+      , meta: { date: date }
+    };
+
+    BlogPostB.create(doc, function (err, created) {
       assert.ifError(err);
+
       var id = created.id;
-      BlogPostB.findById(created.id, {title: 0, 'meta.date': 0, owners: 0}, function (err, found) {
+      BlogPostB.findById(id, {title: 0, 'meta.date': 0, owners: 0, 'comments.user': 0}, function (err, found) {
         db.close();
         assert.ifError(err);
         assert.equal(found._id.toString(), created._id);
         assert.strictEqual(undefined, found.title);
         assert.strictEqual('kandinsky', found.def);
         assert.strictEqual('me', found.author);
-        assert.strictEqual(true, Array.isArray(found.comments));
+        assert.strictEqual(true, Array.isArray(found.numbers));
         assert.equal(undefined, found.meta.date);
-        assert.equal(found.comments.length, 0);
+        assert.equal(found.numbers.length, 0);
         assert.equal(undefined, found.owners);
+        assert.strictEqual(true, Array.isArray(found.comments));
+        assert.equal(found.comments.length, 2);
+        found.comments.forEach(function (comment) {
+          assert.equal(undefined, comment.user);
+        })
         done();
       });
     });
-  })
+  });
 
   it('excluded fields should be undefined and defaults applied to other fields', function(done){
     var db = start()
@@ -162,7 +175,7 @@ describe('model field selection', function(){
       , id = new DocumentObjectId
 
     BlogPostB.collection.insert(
-        { _id: id, title: 'issue 870'}, function (err) {
+        { _id: id, title: 'issue 870'}, { safe: true }, function (err) {
       assert.ifError(err);
 
       BlogPostB.findById(id, 'def comments', function (err, found) {
@@ -180,4 +193,102 @@ describe('model field selection', function(){
     });
   });
 
+  it('including subdoc field excludes other subdoc fields (gh-1027)', function(done){
+    var db = start()
+      , BlogPostB = db.model(modelName, collection)
+
+    BlogPostB.create({ comments: [{title: 'a'}, {title:'b'}] }, function (err, doc) {
+      assert.ifError(err);
+
+      BlogPostB.findById(doc._id).select('_id comments.title').exec(function (err, found) {
+        db.close();
+        assert.ifError(err);
+        assert.ok(found);
+        assert.equal(found._id.toString(), doc._id.toString());
+        assert.strictEqual(undefined, found.title);
+        assert.strictEqual(true, Array.isArray(found.comments));
+        found.comments.forEach(function (comment) {
+          assert.equal(undefined, comment.body);
+          assert.equal(undefined, comment.comments);
+          assert.equal(undefined, comment._id);
+          assert.ok(!!comment.title);
+        });
+        done();
+      });
+    });
+  });
+
+  it('excluding nested subdoc fields (gh-1027)', function(done){
+    var db = start()
+      , BlogPostB = db.model(modelName, collection)
+
+    BlogPostB.create({ title: 'top', comments: [{title: 'a',body:'body'}, {title:'b', body:'body',comments: [{title:'c'}]}] }, function (err, doc) {
+      assert.ifError(err);
+
+      BlogPostB.findById(doc._id).select('-_id -comments.title -comments.comments.comments -numbers').exec(function (err, found) {
+        db.close();
+        assert.ifError(err);
+        assert.ok(found);
+        assert.equal(undefined, found._id);
+        assert.strictEqual('top', found.title);
+        assert.equal(undefined, found.numbers);
+        assert.strictEqual(true, Array.isArray(found.comments));
+        found.comments.forEach(function (comment) {
+          assert.equal(undefined, comment.title);
+          assert.equal('body', comment.body);
+          assert.strictEqual(true, Array.isArray(comment.comments));
+          assert.ok(comment._id);
+          comment.comments.forEach(function (comment) {
+            assert.equal('c', comment.title);
+            assert.equal(undefined, comment.body);
+            assert.equal(undefined, comment.comments);
+            assert.ok(comment._id);
+          });
+        });
+        done();
+      });
+    });
+  });
+
+  it('casts elemMatch args (gh-1091)', function(done){
+    // mongodb 2.2 support
+    var db = start()
+
+    var postSchema = new Schema({
+       ids: [{type: Schema.ObjectId}]
+    });
+
+    var B = db.model('gh-1091', postSchema);
+    var _id1 = new mongoose.Types.ObjectId;
+    var _id2 = new mongoose.Types.ObjectId;
+
+    //mongoose.set('debug', true);
+    B.create({ ids: [_id1, _id2] }, function (err, doc) {
+      assert.ifError(err);
+
+      B
+      .findById(doc._id)
+      .select({ ids: { $elemMatch: { $in: [_id2.toString()] }}})
+      .exec(function (err, found) {
+        assert.ifError(err);
+        assert.ok(found);
+        assert.equal(found.id, doc.id);
+        assert.equal(1, found.ids.length);
+        assert.equal(_id2.toString(), found.ids[0].toString());
+
+        B
+        .find({ _id: doc._id })
+        .select({ ids: { $elemMatch: { $in: [_id2.toString()] }}})
+        .exec(function (err, found) {
+          assert.ifError(err);
+          assert.ok(found.length);
+          found = found[0];
+          assert.equal(found.id, doc.id);
+          assert.equal(1, found.ids.length);
+          assert.equal(_id2.toString(), found.ids[0].toString());
+          done();
+        })
+      })
+    })
+  })
 })

@@ -10,6 +10,9 @@ var klass = require('./docs/helpers/klass')
 // add custom jade filters
 require('./docs/helpers/filters')(jade);
 
+// clean up version for ui
+package.version = package.version.replace(/-pre$/, '');
+
 var filemap = require('./docs/source');
 var files = Object.keys(filemap);
 

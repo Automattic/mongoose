@@ -5418,7 +5418,12 @@ reserved.options =
 reserved.modelName =
 reserved.collection = <span class="number">1</span>;</code></pre></div><p>Keys in this object are names that are rejected in schema declarations b/c they conflict with mongoose functionality. Using these key name will throw an error.</p>
 
-<pre><code>on, db, init, isNew, errors, schema, options, modelName, collection</code></pre><hr class=""></div><div class="item static private"><h3 id="schema_Schema-interpretAsType"><a href="#schema_Schema-interpretAsType">Schema.interpretAsType(<code>path</code>, <code>obj</code>)</a></h3><p>Converts type arguments into Mongoose Types.</p><span class="showcode">show code</span><div class="sourcecode"><pre><code class="javascript">Schema.interpretAsType = function (path, obj) {
+<pre><code>on, db, init, isNew, errors, schema, options, modelName, collection</code></pre>
+
+<p><em>NOTE:</em> Use of these terms as method names is permitted, but play at your own risk, as they may be existing mongoose document methods you are stomping on.</p>
+
+<pre><code><span class="keyword">var</span> schema = <span class="keyword">new</span> Schema(..);
+ schema.methods.init = <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>} <span class="comment">// potentially breaking</span></code></pre><hr class=""></div><div class="item static private"><h3 id="schema_Schema-interpretAsType"><a href="#schema_Schema-interpretAsType">Schema.interpretAsType(<code>path</code>, <code>obj</code>)</a></h3><p>Converts type arguments into Mongoose Types.</p><span class="showcode">show code</span><div class="sourcecode"><pre><code class="javascript">Schema.interpretAsType = function (path, obj) {
   if (obj.constructor.name != 'Object')
     obj = { type: obj };
 

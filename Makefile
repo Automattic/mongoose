@@ -5,6 +5,7 @@ DOCS = $(DOCS_:.js=.json)
 DOCFILE = docs/source/_docs
 
 test:
+	@node test/dropdb.js
 	@time ./node_modules/.bin/mocha $(T) $(TESTS)
 	@node test/dropdb.js
 

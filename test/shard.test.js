@@ -56,7 +56,6 @@ describe('shard', function(){
       cmd.key = P.schema.options.shardkey;
 
       P.db.db.executeDbAdminCommand(cmd,function (err, res) {
-        db.close();
         assert.ifError(err);
 
         if (!(res && res.documents && res.documents[0] && res.documents[0].ok)) {
@@ -68,6 +67,7 @@ describe('shard', function(){
         db.db.admin(function (err, admin) {
           assert.ifError(err);
           admin.serverStatus(function (err, info) {
+            db.close();
             assert.ifError(err);
             version = info.version.split('.').map(function(n){return parseInt(n, 10) });
             greaterThan20x = 2 < version[0] || 2==version[0] && 0<version[0];
@@ -282,6 +282,7 @@ describe('shard', function(){
     var db = start({ uri:  uri })
     var P = db.model('ShardPerson', collection);
     P.collection.drop(function (err) {
+      db.close();
       done();
     });
   });

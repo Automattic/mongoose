@@ -112,8 +112,7 @@ By setting <code>safe</code> to something else like <code>{ j: 1, w: 2, wtimeout
 <p>There are other write concerns like <code>{ w: &quot;majority&quot; }</code> too. See the MongoDB <a href="http://www.mongodb.org/display/DOCS/getLastError+Command">docs</a> for more details.</p><pre><code class="javascript"><span class="keyword">var</span> safe = { w: <span class="string">"majority"</span>, wtimeout: <span class="number">10000</span> };
 <span class="keyword">new</span> Schema({ .. }, { safe: safe });
 </code></pre><h4 id="shardKey">option: shardKey</h4><p>The <code>shardKey</code> option is used when we have a <a href="http://www.mongodb.org/display/DOCS/Sharding+Introduction">sharded MongoDB architecture</a>. Each sharded collection is given a shard key which must be present in all insert/update operations. We just need to set this schema option to the same shard key and we’ll be all set.</p><pre><code class="javascript"><span class="keyword">new</span> Schema({ .. }, { shardkey: { tag: <span class="number">1</span>, name: <span class="number">1</span> }})
-</code></pre><p><em>Note that Mongoose does not send the <code>shardcollection</code> command for you. You must configure your shards yourself.</em></p><h4 id="strict">option: strict</h4><p>The strict option, (enabled by default), ensures that values added to our model instance that were not specified in our schema do not get saved to the db.
-<em>NOTE: do not set to false unless you have good reason.</em></p><pre><code class="javascript"><span class="keyword">var</span> thingSchema = <span class="keyword">new</span> Schema({..})
+</code></pre><p><em>Note that Mongoose does not send the <code>shardcollection</code> command for you. You must configure your shards yourself.</em></p><h4 id="strict">option: strict</h4><p>The strict option, (enabled by default), ensures that values passed to our model constructor that were not specified in our schema do not get saved to the db.</p><pre><code class="javascript"><span class="keyword">var</span> thingSchema = <span class="keyword">new</span> Schema({..})
 <span class="keyword">var</span> Thing = db.model(<span class="string">'Thing'</span>, schemaSchema);
 <span class="keyword">var</span> thing = <span class="keyword">new</span> Thing({ iAmNotInTheSchema: <span class="literal">true</span> });
 thing.save(); <span class="comment">// iAmNotInTheSchema is not saved to the db</span>
@@ -122,10 +121,24 @@ thing.save(); <span class="comment">// iAmNotInTheSchema is not saved to the db<
 <span class="keyword">var</span> thingSchema = <span class="keyword">new</span> Schema({..}, { strict: <span class="literal">false</span> });
 <span class="keyword">var</span> thing = <span class="keyword">new</span> Thing({ iAmNotInTheSchema: <span class="literal">true</span> });
 thing.save(); <span class="comment">// iAmNotInTheSchema is now saved to the db!!</span>
+</code></pre><p>This also affects the use of <code>doc.set()</code> to set a property value.</p><pre><code class="javascript"><span class="keyword">var</span> thingSchema = <span class="keyword">new</span> Schema({..})
+<span class="keyword">var</span> Thing = db.model(<span class="string">'Thing'</span>, schemaSchema);
+<span class="keyword">var</span> thing = <span class="keyword">new</span> Thing;
+thing.set(<span class="string">'iAmNotInTheSchema'</span>, <span class="literal">true</span>);
+thing.save(); <span class="comment">// iAmNotInTheSchema is not saved to the db</span>
 </code></pre><p>This value can be overridden at the model instance level by passing a second boolean argument:</p><pre><code class="javascript"><span class="keyword">var</span> Thing = db.model(<span class="string">'Thing'</span>);
 <span class="keyword">var</span> thing = <span class="keyword">new</span> Thing(doc, <span class="literal">true</span>);  <span class="comment">// enables strict mode</span>
 <span class="keyword">var</span> thing = <span class="keyword">new</span> Thing(doc, <span class="literal">false</span>); <span class="comment">// disables strict mode</span>
-</code></pre><p>The <code>strict</code> option may also be set to <code>&quot;throw&quot;</code> which will cause errors to be produced instead of ignoring the bad data.</p><p><em>NOTE: in mongoose v2 the default was false.</em></p><h4 id="toJSON">option: toJSON</h4><p>Exactly the same as the <a href="#toObject">toObject</a> option but only applies when the documents <code>toJSON</code> method is called.</p><pre><code class="javascript"><span class="keyword">var</span> schema = <span class="keyword">new</span> Schema({ name: String });
+</code></pre><p>The <code>strict</code> option may also be set to <code>&quot;throw&quot;</code> which will cause errors to be produced instead of dropping the bad data.</p><p><em>NOTE: do not set to false unless you have good reason.</em></p>
+
+<p><em>NOTE: in mongoose v2 the default was false.</em></p>
+
+<p><em>NOTE: Any key/val set on the instance that does not exist in your schema is always ignored, regardless of schema option.</em></p><pre><code class="javascript"><span class="keyword">var</span> thingSchema = <span class="keyword">new</span> Schema({..})
+<span class="keyword">var</span> Thing = db.model(<span class="string">'Thing'</span>, schemaSchema);
+<span class="keyword">var</span> thing = <span class="keyword">new</span> Thing;
+thing.iAmNotInTheSchema = <span class="literal">true</span>;
+thing.save(); <span class="comment">// iAmNotInTheSchema is never saved to the db</span>
+</code></pre><h4 id="toJSON">option: toJSON</h4><p>Exactly the same as the <a href="#toObject">toObject</a> option but only applies when the documents <code>toJSON</code> method is called.</p><pre><code class="javascript"><span class="keyword">var</span> schema = <span class="keyword">new</span> Schema({ name: String });
 schema.path(<span class="string">'name'</span>).get(<span class="function"><span class="keyword">function</span> <span class="params">(v)</span> {</span>
   <span class="keyword">return</span> v + <span class="string">' is my name'</span>;
 });

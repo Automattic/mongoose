@@ -723,6 +723,58 @@ describe('Query', function(){
     });
   })
 
+  describe('populate', function(){
+    it('converts to PopulateOptions objects', function(done){
+      var q = new Query();
+      var o = {
+          path: 'yellow.brick'
+        , match: { bricks: { $lt: 1000 }}
+        , select: undefined
+        , model: undefined
+        , options: undefined
+      }
+      q.populate(o);
+      assert.deepEqual(o, q.options.populate['yellow.brick']);
+      done();
+    })
+
+    it('overwrites duplicate paths', function(done){
+      var q = new Query();
+      var o = {
+          path: 'yellow.brick'
+        , match: { bricks: { $lt: 1000 }}
+        , select: undefined
+        , model: undefined
+        , options: undefined
+      }
+      q.populate(o);
+      assert.equal(1, Object.keys(q.options.populate).length);
+      assert.deepEqual(o, q.options.populate['yellow.brick']);
+      q.populate('yellow.brick');
+      assert.equal(1, Object.keys(q.options.populate).length);
+      o.match = undefined;
+      assert.deepEqual(o, q.options.populate['yellow.brick']);
+      done();
+    })
+
+    it('accepts space delimited strings', function(done){
+      var q = new Query();
+      q.populate('yellow.brick dirt');
+      var o = {
+          path: 'yellow.brick'
+        , match: undefined
+        , select: undefined
+        , model: undefined
+        , options: undefined
+      }
+      assert.equal(2, Object.keys(q.options.populate).length);
+      assert.deepEqual(o, q.options.populate['yellow.brick']);
+      o.path = 'dirt';
+      assert.deepEqual(o, q.options.populate['dirt']);
+      done();
+    })
+  })
+
   describe('an empty query', function(){
     it('should not throw', function(done){
       var query = new Query();
@@ -1206,7 +1258,7 @@ describe('Query', function(){
       q.setOptions({ read: ['s', [{dc:'eu'}]]});
 
       assert.equal(q.options.thing, 'cat');
-      assert.deepEqual(q.options.populate.fans, { fields: undefined, conditions: undefined, options: undefined, model: undefined });
+      assert.deepEqual(q.options.populate[0], { path: 'fans', select: undefined, match: undefined, options: undefined, model: undefined });
       assert.equal(q.options.batchSize, 10);
       assert.equal(q.options.limit, 4);
       assert.equal(q.options.skip, 3);

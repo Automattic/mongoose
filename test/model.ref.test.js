@@ -6,7 +6,8 @@
 var start = require('./common')
   , assert = require('assert')
   , mongoose = start.mongoose
-  , random = require('../lib/utils').random
+  , utils = require('../lib/utils')
+  , random = utils.random
   , Schema = mongoose.Schema
   , ObjectId = Schema.ObjectId
   , DocObjectId = mongoose.Types.ObjectId
@@ -60,6 +61,7 @@ mongoose.model('RefAlternateUser', User);
  */
 
 describe('model: ref:', function(){
+  return;
   it('populating a single ref', function(done){
     var db = start()
       , BlogPost = db.model('RefBlogPost', posts)
@@ -1633,5 +1635,127 @@ describe('model: ref:', function(){
         });
       });
     });
+  })
+
+  describe('specifying all params using an object', function(){
+    var db, B, User;
+    var post;
+
+    before(function (done) {
+      db = start()
+      B = db.model('RefBlogPost')
+      User = db.model('RefAlternateUser');
+
+      User.create({
+          name  : 'use an object'
+        , email : 'fo-real@objects.r.fun'
+        }
+      , { name: 'yup' }
+      , { name: 'not here' }
+      , function (err, fan1, fan2, fan3) {
+        assert.ifError(err);
+
+        B.create({
+            title: 'woot'
+          , fans: [fan1, fan2, fan3]
+        }, function (err, post_) {
+          assert.ifError(err);
+          post = post_;
+          done();
+        })
+      })
+    })
+
+    after(function(done){
+      db.close(done)
+    })
+
+    it('works', function(done){
+      B.findById(post._id)
+      .populate({
+          path: 'fans'
+        , select: 'name'
+        , model: 'RefAlternateUser'
+        , match: { name: /u/ }
+        , options: { sort: {'name': -1} }
+      })
+      .exec(function (err, post) {
+        db.close();
+        assert.ifError(err);
+
+        assert.ok(Array.isArray(post.fans));
+        assert.equal(2, post.fans.length);
+        assert.ok(post.fans[0] instanceof User);
+        assert.ok(post.fans[1] instanceof User);
+        assert.equal(post.fans[0].isInit('name'), true);
+        assert.equal(post.fans[1].isInit('name'), true);
+        assert.equal(post.fans[0].isInit('email'), false);
+        assert.equal(post.fans[1].isInit('email'), false);
+        assert.equal(post.fans[0].name,'yup');
+        assert.equal(post.fans[1].name,'use an object');
+
+        done();
+      });
+    })
+
+  })
+
+  describe('population of individual document', function(){
+    console.log('fixme: model.ref.test.js + 1703');
+    return;
+
+    var db, B, User;
+    var user1, user2, post, _id;
+
+    before(function(done){
+      db = start()
+      B = db.model('RefBlogPost', posts)
+      User = db.model('RefAlternateUser', users);
+
+      _id = new mongoose.Types.ObjectId;
+
+      User.create({
+          name  : 'Phoenix'
+        , email : 'phx@az.com'
+        , blogposts: [_id]
+      }, {
+          name  : 'Newark'
+        , email : 'ewr@nj.com'
+        , blogposts: [_id]
+      }, function (err, u1, u2) {
+        assert.ifError(err);
+
+        user1 = u1;
+        user2 = u2;
+
+        B.create({
+            title     : 'the how and why'
+          , _creator  : user1
+          , fans: [user1, user2]
+        }, function (err, p) {
+          assert.ifError(err);
+          post = p
+          done();
+        });
+      });
+    });
+
+    after(function(done){
+      db.close(done);
+    })
+
+    it('works', function(done){
+      var ret = utils.populate({ path: '_creator', model: 'RefAlternateUser' })
+      var opts = {};
+      opts[ret[0]] = ret[1];
+
+      B.populate(post, opts, function (err, post) {
+        assert.ifError(err);
+        assert.ok(post);
+        assert.ok(post._creator instanceof User);
+        assert.equal('Phoenix', post._creator.name);
+        done()
+      });
+    })
   })
 });

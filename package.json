@@ -11,6 +11,7 @@
       , "sliced": "0.0.3"
       , "muri": "0.3.0"
       , "mpromise": "0.2.0"
+      , "mpath": "0.0.1"
     }
   , "devDependencies": {
         "mocha": "1.8.1"

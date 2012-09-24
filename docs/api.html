@@ -259,7 +259,7 @@ li {
 
 <pre><code>mongoose.set(<span class="string">'test'</span>, value) <span class="comment">// sets the 'test' option to `value`</span></code></pre></div><hr class=""></div><div class="item method public"><h3 id="index_Mongoose-get"><a href="#index_Mongoose-get">Mongoose#get(<code>key</code>)</a></h3><p>Gets mongoose options</p><div class="params"><h4>Parameters:</h4><ul><li><code>key</code><span class="types"> &lt;<a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/String">String</a>&gt; </span><span></span></li></ul></div><div class="description"><h4>Example:</h4>
 
-<pre><code>mongoose.get(<span class="string">'test'</span>) <span class="comment">// returns the 'test' value</span></code></pre></div><hr class=""></div><div class="item method public"><h3 id="index_Mongoose-createConnection"><a href="#index_Mongoose-createConnection">Mongoose#createConnection(<code>[uri]</code>)</a></h3><p>Creates a Connection instance.</p><span class="showcode">show code</span><div class="sourcecode"><pre><code class="javascript">Mongoose.prototype.createConnection = <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+<pre><code>mongoose.get(<span class="string">'test'</span>) <span class="comment">// returns the 'test' value</span></code></pre></div><hr class=""></div><div class="item method public"><h3 id="index_Mongoose-createConnection"><a href="#index_Mongoose-createConnection">Mongoose#createConnection(<code>[uri]</code>, <code>[options]</code>)</a></h3><p>Creates a Connection instance.</p><span class="showcode">show code</span><div class="sourcecode"><pre><code class="javascript">Mongoose.prototype.createConnection = <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
   <span class="keyword">var</span> conn = <span class="keyword">new</span> Connection(<span class="keyword">this</span>);
   <span class="keyword">this</span>.connections.push(conn);
 
@@ -272,20 +272,36 @@ li {
   }
 
   <span class="keyword">return</span> conn;
-};</code></pre></div><div class="params"><h4>Parameters:</h4><ul><li><code>[uri]</code><span class="types"> &lt;<a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/String">String</a>&gt; </span><span>a mongodb:// URI</span></li></ul></div><div class="returns"><h4>Returns:</h4><ul><li><span class="types"> &lt;<a href="#connection_Connection">Connection</a>&gt; </span><span>the created Connection object</span></li></ul></div><div class="description"><h4>Example:</h4>
+};</code></pre></div><div class="params"><h4>Parameters:</h4><ul><li><code>[uri]</code><span class="types"> &lt;<a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/String">String</a>&gt; </span><span>a mongodb:// URI</span></li><li><code>[options]</code><span class="types"> &lt;<a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Object">Object</a>&gt; </span><span>options to pass to the driver</span></li></ul></div><div class="returns"><h4>Returns:</h4><ul><li><span class="types"> &lt;<a href="#connection_Connection">Connection</a>&gt; </span><span>the created Connection object</span></li></ul></div><div class="see"><h4>See:</h4><ul class="see"><li><a href="#connection_Connection-open" title="Connection#open">Connection#open</a></li><li><a href="#connection_Connection-openSet" title="Connection#openSet">Connection#openSet</a></li></ul></div><div class="description"><p>Each <code>connection</code> instance maps to a single database. This method is helpful when mangaging multiple db connections.</p>
+
+<p>If arguments are passed, they are proxied to either <a href="#connection_Connection-open">Connection#open</a> or <a href="#connection_Connection-openSet">Connection#openSet</a> appropriately. This means we can pass <code>db</code>, <code>server</code>, and <code>replset</code> options to the driver.</p>
+
+<h4>Example:</h4>
 
 <pre><code><span class="comment">// with mongodb:// URI</span>
-db = mongoose.createConnection(<span class="string">'mongodb://localhost:port/database'</span>);
+db = mongoose.createConnection(<span class="string">'mongodb://user:pass@localhost:port/database'</span>);
+
+<span class="comment">// and options</span>
+<span class="keyword">var</span> opts = { db: { native_parser: <span class="literal">true</span> }}
+db = mongoose.createConnection(<span class="string">'mongodb://user:pass@localhost:port/database'</span>, opts);
 
 <span class="comment">// replica sets</span>
-db = mongoose.createConnection(<span class="string">'mongodb://localhost:port/database,mongodb://anotherhost:port,mongodb://yetanother:port'</span>);
+db = mongoose.createConnection(<span class="string">'mongodb://user:pass@localhost:port/database,mongodb://anotherhost:port,mongodb://yetanother:port'</span>);
+
+<span class="comment">// and options</span>
+<span class="keyword">var</span> opts = { replset: { strategy: <span class="string">'ping'</span>, rs_name: <span class="string">'testSet'</span> }}
+db = mongoose.createConnection(<span class="string">'mongodb://user:pass@localhost:port/database,mongodb://anotherhost:port,mongodb://yetanother:port'</span>, opts);
 
 <span class="comment">// with [host, database_name[, port] signature</span>
 db = mongoose.createConnection(<span class="string">'localhost'</span>, <span class="string">'database'</span>, port)
 
+<span class="comment">// and options</span>
+<span class="keyword">var</span> opts = { server: { auto_reconnect: <span class="literal">false</span> }, user: <span class="string">'username'</span>, pass: <span class="string">'mypassword'</span> }
+db = mongoose.createConnection(<span class="string">'localhost'</span>, <span class="string">'database'</span>, port, opts)
+
 <span class="comment">// initialize now, connect later</span>
 db = mongoose.createConnection();
-db.open(<span class="string">'localhost'</span>, <span class="string">'database'</span>, port);</code></pre></div><hr class=""></div><div class="item method public"><h3 id="index_Mongoose-connect"><a href="#index_Mongoose-connect">Mongoose#connect()</a></h3><p>Opens the default mongoose connection.</p><span class="showcode">show code</span><div class="sourcecode"><pre><code class="javascript">Mongoose.prototype.connect = <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+db.open(<span class="string">'localhost'</span>, <span class="string">'database'</span>, port, [opts]);</code></pre></div><hr class=""></div><div class="item method public"><h3 id="index_Mongoose-connect"><a href="#index_Mongoose-connect">Mongoose#connect()</a></h3><p>Opens the default mongoose connection.</p><span class="showcode">show code</span><div class="sourcecode"><pre><code class="javascript">Mongoose.prototype.connect = <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
   <span class="keyword">var</span> conn = <span class="keyword">this</span>.connection;
 
   <span class="keyword">if</span> (rgxReplSet.test(arguments[<span class="number">0</span>])) {
@@ -295,7 +311,7 @@ db.open(<span class="string">'localhost'</span>, <span class="string">'database'
   }
 
   <span class="keyword">return</span> <span class="keyword">this</span>;
-};</code></pre></div><div class="returns"><h4>Returns:</h4><ul><li><span class="types"> &lt;<a href="#index_Mongoose">Mongoose</a>&gt; </span><span>this</span></li></ul></div><div class="see"><h4>See:</h4><ul class="see"><li><a href="Mongoose#createConnection" title="Mongoose#createConnection">Mongoose#createConnection</a></li></ul></div><div class="description"><p>If arguments are passed, they are proxied to either <a href="#connection_Connection-open">Connection#open</a> or <a href="#connection_Connection-openSet">Connection#openSet</a> appropriately.</p></div><hr class=""></div><div class="item method public"><h3 id="index_Mongoose-disconnect"><a href="#index_Mongoose-disconnect">Mongoose#disconnect(<code>[fn]</code>)</a></h3><p>Disconnects all connections.</p><span class="showcode">show code</span><div class="sourcecode"><pre><code class="javascript">Mongoose.prototype.disconnect = <span class="function"><span class="keyword">function</span> <span class="params">(fn)</span> {</span>
+};</code></pre></div><div class="returns"><h4>Returns:</h4><ul><li><span class="types"> &lt;<a href="#index_Mongoose">Mongoose</a>&gt; </span><span>this</span></li></ul></div><div class="see"><h4>See:</h4><ul class="see"><li><a href="#index_Mongoose-createConnection" title="Mongoose#createConnection">Mongoose#createConnection</a></li></ul></div><div class="description"><p>If arguments are passed, they are proxied to either <a href="#connection_Connection-open">Connection#open</a> or <a href="#connection_Connection-openSet">Connection#openSet</a> appropriately.</p></div><hr class=""></div><div class="item method public"><h3 id="index_Mongoose-disconnect"><a href="#index_Mongoose-disconnect">Mongoose#disconnect(<code>[fn]</code>)</a></h3><p>Disconnects all connections.</p><span class="showcode">show code</span><div class="sourcecode"><pre><code class="javascript">Mongoose.prototype.disconnect = <span class="function"><span class="keyword">function</span> <span class="params">(fn)</span> {</span>
   <span class="keyword">var</span> count = <span class="keyword">this</span>.connections.length
     , error
 

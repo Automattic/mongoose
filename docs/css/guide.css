@@ -110,7 +110,6 @@ li {
 #content {
   padding: 0;
   margin: 0 0 0 230px;
-  overflow-x: hidden;
 }
 #content .controls {
   padding: 5px 15px 5px 10px;

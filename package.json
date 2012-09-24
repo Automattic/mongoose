@@ -10,7 +10,7 @@
       , "ms": "0.1.0"
     }
   , "devDependencies": {
-        "mocha": "*"
+        "mocha": "1.4.2"
       , "node-static": "0.5.9"
       , "dox": "0.3.1"
       , "jade": "0.26.3"

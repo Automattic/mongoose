@@ -154,12 +154,9 @@ h2 a {
     text-align: center;
     font-size: 65px;
     font-weight: 100;
-    color: #fff;
-    text-shadow: 6px 4px 5px #777, -2px 0px 2px white;
     letter-spacing: -7px;
   }
   .load #header .mongoose {
-    text-shadow: 6px 4px 5px #777, -2px 0px 2px white;
     letter-spacing: -7px;
   }
   .tagline {

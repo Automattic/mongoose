@@ -117,7 +117,7 @@ describe('types array', function(){
     it('works', function(done){
       var collection = 'splicetest-number' + random();
       var db = start()
-        , schema = new Schema({ numbers: Array })
+        , schema = new Schema({ numbers: [Number] })
         , A = db.model('splicetestNumber', schema, collection);
 
       var a = new A({ numbers: [4,5,6,7] });
@@ -125,14 +125,15 @@ describe('types array', function(){
         assert.ifError(err);
         A.findById(a._id, function (err, doc) {
           assert.ifError(err);
-          var removed = doc.numbers.splice(1, 1);
+          var removed = doc.numbers.splice(1, 1, "10");
           assert.deepEqual(removed, [5]);
-          assert.deepEqual(doc.numbers.toObject(),[4,6,7]);
+          assert.equal('number', typeof doc.numbers[1]);
+          assert.deepEqual(doc.numbers.toObject(),[4,10,6,7]);
           doc.save(function (err) {
             assert.ifError(err);
             A.findById(a._id, function (err, doc) {
               assert.ifError(err);
-              assert.deepEqual(doc.numbers.toObject(), [4,6,7]);
+              assert.deepEqual(doc.numbers.toObject(), [4,10,6,7]);
 
               A.collection.drop(function (err) {
                 db.close();

@@ -1,4 +1,13 @@
 
+2.9.0 / 2012-09-27
+==================
+
+  * fixed; QueryStream#resume within same tick as pause() #1116
+  * fixed; array casting with splice() #1123
+  * fixed; default array construction edge case #1108
+  * fixed; query casting for inequalities in arrays #1101 [dpatti](https://github.com/dpatti)
+  * tests; add test for array validators
+
 2.8.3 / 2012-09-10
 ==================
 

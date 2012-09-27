@@ -66,7 +66,9 @@ describe('cursor stream:', function(){
         return cb();
       }
 
-      if (++i === 3) {
+      ++i;
+
+      if (i === 3) {
         assert.equal(false, stream.paused);
         stream.pause();
         assert.equal(true, stream.paused);
@@ -78,6 +80,11 @@ describe('cursor stream:', function(){
           stream.resume();
           assert.equal(false, stream.paused);
         }, 20);
+      } else if (i === 4) {
+        stream.pause();
+        assert.equal(true, stream.paused);
+        stream.resume();
+        assert.equal(false, stream.paused);
       }
     });
 

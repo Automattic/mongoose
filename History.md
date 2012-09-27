@@ -1,3 +1,18 @@
+
+3.2.0 / 2012-09-27
+==================
+
+  * added; direct array index assignment with casting support `doc.array.set(index, value)`
+  * fixed; QueryStream#resume within same tick as pause() #1116
+  * fixed; default value validatation #1109
+  * fixed; array splice() not casting #1123
+  * fixed; default array construction edge case #1108
+  * fixed; query casting for inequalities in arrays #1101 [dpatti](https://github.com/dpatti)
+  * tests; added
+  * website; more documentation
+  * website; fixed layout issue #1111 [SlashmanX](https://github.com/SlashmanX)
+  * website; refactored [guille](https://github.com/guille)
+
 3.1.2 / 2012-09-10
 ==================
 

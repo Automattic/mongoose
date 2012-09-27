@@ -817,10 +817,10 @@ describe('document:', function(){
         var M = db.model('validateSchema-array1', schema, collection);
         var m = new M({ name: 'gh1109-1' });
         m.save(function (err) {
-          assert.ok(/"required" failed for path arr/.test(err));
+          assert.ok(/ValidationError: Arr cannot be blank./.test(err.toString()));
           m.arr = [];
           m.save(function (err) {
-            assert.ok(/"required" failed for path arr/.test(err));
+            assert.ok(/ValidationError: Arr cannot be blank./.test(err.toString()));
             m.arr.push('works');
             m.save(function (err) {
               assert.ifError(err);
@@ -860,7 +860,7 @@ describe('document:', function(){
         })
       })
 
-      it('with both required + custom validator', function(){
+      it('with both required + custom validator', function(done){
         function validator (val) {
           called = true;
           return val && val.length > 1
@@ -877,7 +877,7 @@ describe('document:', function(){
         var M = db.model('validateSchema-array3', schema, collection);
         var m = new M({ name: 'gh1109-3' });
         m.save(function (err) {
-          assert.ok(/"required" failed for path arr/.test(err));
+          assert.ok(/ValidationError: Arr cannot be blank./.test(err));
           m.arr.push({nice: true});
           m.save(function (err) {
             assert.ok(/"BAM" failed for path arr/.test(err));

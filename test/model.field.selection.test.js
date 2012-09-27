@@ -291,4 +291,23 @@ describe('model field selection', function(){
       })
     })
   })
+
+  it('selecting an array of docs applies defaults properly (gh-1108)', function(done){
+    var db = start()
+      , M = db.model(modelName, collection)
+
+    var m = new M({ title: '1108', comments: [{body:'yay'}] });
+    m.comments[0].comments = undefined;
+    m.save(function (err, doc) {
+      assert.ifError(err);
+      M.findById(doc._id).select('comments').exec(function (err, found) {
+        db.close();
+        assert.ifError(err);
+        assert.ok(Array.isArray(found.comments));
+        assert.equal(1, found.comments.length);
+        assert.ok(Array.isArray(found.comments[0].comments));
+        done();
+      })
+    });
+  })
 })

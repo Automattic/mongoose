@@ -12,6 +12,9 @@ var mongoose = require('../')
   , opened = 0
   , closed = 0;
 
+if (process.env.D === '1')
+  mongoose.set('debug', true);
+
 /**
  * Override all Collection related queries to keep count
  */

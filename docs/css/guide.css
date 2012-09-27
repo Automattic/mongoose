@@ -85,11 +85,10 @@ li {
   text-decoration: none;
 }
 #header .mongoose {
-  font-size: 50px;
+  font-size: 48px;
   font-weight: 100;
   color: #fff;
-  text-shadow: 6px 4px 5px #777, -2px 0px 2px white;
-  letter-spacing: -7px;
+  letter-spacing: -5px;
 }
 #links {
   position: fixed;
@@ -110,7 +109,6 @@ li {
 #content {
   padding: 0;
   margin: 0 0 0 230px;
-  overflow-x: hidden;
 }
 #content .controls {
   padding: 5px 15px 5px 10px;

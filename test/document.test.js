@@ -765,34 +765,131 @@ describe('document:', function(){
     });
   })
 
-  it('#validate (gh-891)', function(done){
-    var db = start()
-      , schema = null
-      , called = false
+  describe('#validate', function(){
+    var collection = 'validateschema_'+random();
 
-    var validate = [function(str){ called = true; return true }, 'BAM'];
+    it('works (gh-891)', function(done){
+      var db = start()
+        , schema = null
+        , called = false
 
-    schema = new Schema({
-        prop: { type: String, required: true, validate: validate }
-      , nick: { type: String, required: true }
-    });
+      var validate = [function(str){ called = true; return true }, 'BAM'];
 
-    var M = db.model('validateSchema', schema, 'validateschema_'+random());
-    var m = new M({ prop: 'gh891', nick: 'validation test' });
-    m.save(function (err) {
-      assert.ifError(err);
-      assert.equal(true, called);
-      called = false;
-      M.findById(m, 'nick', function (err, m) {
-        assert.equal(false, called);
+      schema = new Schema({
+          prop: { type: String, required: true, validate: validate }
+        , nick: { type: String, required: true }
+      });
+
+      var M = db.model('validateSchema', schema, collection);
+      var m = new M({ prop: 'gh891', nick: 'validation test' });
+      m.save(function (err) {
         assert.ifError(err);
-        m.nick = 'gh-891';
-        m.save(function (err) {
+        assert.equal(true, called);
+        called = false;
+        M.findById(m, 'nick', function (err, m) {
           assert.equal(false, called);
           assert.ifError(err);
-          done();
+          m.nick = 'gh-891';
+          m.save(function (err) {
+            assert.equal(false, called);
+            assert.ifError(err);
+            done();
+          })
         })
       })
+    })
+
+    describe('works on arrays', function(){
+      var db;
+      before(function(done){
+        db = start()
+        done();
+      })
+      after(function(done){
+        db.close(done)
+      })
+
+      it('with required', function(done){
+        var schema = new Schema({
+            name: String
+          , arr : { type: [], required: true}
+        });
+        var M = db.model('validateSchema-array1', schema, collection);
+        var m = new M({ name: 'gh1109-1' });
+        m.save(function (err) {
+          assert.ok(/"required" failed for path arr/.test(err));
+          m.arr = [];
+          m.save(function (err) {
+            assert.ok(/"required" failed for path arr/.test(err));
+            m.arr.push('works');
+            m.save(function (err) {
+              assert.ifError(err);
+              done();
+            })
+          })
+        })
+      })
+
+      it('with custom validator', function(done){
+        var called = false;
+
+        function validator (val) {
+          called = true;
+          return val && val.length > 1
+        }
+
+        var validate = [validator, 'BAM'];
+
+        var schema = new Schema({
+            arr : { type: [], validate: validate }
+        });
+
+        var M = db.model('validateSchema-array2', schema, collection);
+        var m = new M({ name: 'gh1109-2', arr: [1] });
+        assert.equal(false, called);
+        m.save(function (err) {
+          assert.ok(/"BAM" failed for path arr/.test(err));
+          assert.equal(true, called);
+          m.arr.push(2);
+          called = false;
+          m.save(function (err) {
+            assert.equal(true, called);
+            assert.ifError(err);
+            done()
+          })
+        })
+      })
+
+      it('with both required + custom validator', function(){
+        function validator (val) {
+          called = true;
+          return val && val.length > 1
+        }
+
+        var validate = [validator, 'BAM'];
+
+        var called = false;
+
+        var schema = new Schema({
+          arr : { type: [], required: true, validate: validate }
+        });
+
+        var M = db.model('validateSchema-array3', schema, collection);
+        var m = new M({ name: 'gh1109-3' });
+        m.save(function (err) {
+          assert.ok(/"required" failed for path arr/.test(err));
+          m.arr.push({nice: true});
+          m.save(function (err) {
+            assert.ok(/"BAM" failed for path arr/.test(err));
+            m.arr.push(95);
+            m.save(function (err) {
+              assert.ifError(err);
+              done()
+            })
+          })
+        })
+      })
+
     })
   })
 

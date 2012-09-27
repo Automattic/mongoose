@@ -71,7 +71,9 @@ describe('cursor stream:', function(){
         return cb();
       }
 
-      if (++i === 3) {
+      ++i;
+
+      if (i === 3) {
         assert.equal(false, stream.paused);
         stream.pause();
         assert.equal(true, stream.paused);
@@ -83,6 +85,11 @@ describe('cursor stream:', function(){
           stream.resume();
           assert.equal(false, stream.paused);
         }, 20);
+      } else if (i === 4) {
+        stream.pause();
+        assert.equal(true, stream.paused);
+        stream.resume();
+        assert.equal(false, stream.paused);
       }
     });
 
@@ -249,6 +256,21 @@ describe('cursor stream:', function(){
     stream.on('data', function (doc) {
       assert.strictEqual(false, doc instanceof mongoose.Document);
       i++;
+
+      if (1 === i) {
+        stream.pause();
+        assert.equal(true, stream.paused);
+        stream.resume();
+        assert.equal(false, stream.paused);
+      } else if (2 === i) {
+        stream.pause();
+        assert.equal(true, stream.paused);
+        process.nextTick(function () {
+          assert.equal(true, stream.paused);
+          stream.resume();
+          assert.equal(false, stream.paused);
+        })
+      }
     });
 
     stream.on('error', function (er) {

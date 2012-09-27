@@ -860,7 +860,7 @@ describe('document:', function(){
         })
       })
 
-      it('with both required + custom validator', function(){
+      it('with both required + custom validator', function(done){
         function validator (val) {
           called = true;
           return val && val.length > 1

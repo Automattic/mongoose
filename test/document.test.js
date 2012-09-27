@@ -744,7 +744,7 @@ describe('document:', function(){
             t.req = undefined;
             t.save(function (err) {
               err = String(err);
-              var invalid  = /Validator "required" failed for path req/.test(err);
+              var invalid = /ValidationError: Req cannot be blank\./.test(err);
               assert.ok(invalid);
               t.req = 'it works again'
               t.save(function (err) {

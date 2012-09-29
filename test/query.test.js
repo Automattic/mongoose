@@ -879,7 +879,7 @@ describe('Query', function(){
     it('should retain key order', function(){
       // this is important for query hints
       var hint = { x: 1, y: 1, z: 1 };
-      var a = JSON.stringify({ hint: hint, batchSize: 1000, safe: true});
+      var a = JSON.stringify({ hint: hint, safe: true});
 
       var q = new Query;
       q.hint(hint);

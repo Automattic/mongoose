@@ -1,4 +1,9 @@
 
+2.9.1 / 2012-09-28
+==================
+
+  * fixed; remove query batchSize option default of 1000 https://github.com/learnboost/mongoose/commit/3edaa8651
+
 2.9.0 / 2012-09-27
 ==================
 

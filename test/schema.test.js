@@ -998,12 +998,12 @@ describe('schema', function(){
         T = new Schema({
             name: { type: String, expires:  '1.5m' }
         });
-        assert.deepEqual(T.path('name')._index, { expiresAfterSeconds: 90 });
+        assert.deepEqual(T.path('name')._index, { expireAfterSeconds: 90 });
 
         T = new Schema({
             name: { type: String, expires:  200 }
         });
-        assert.deepEqual(T.path('name')._index, { expiresAfterSeconds: 200 });
+        assert.deepEqual(T.path('name')._index, { expireAfterSeconds: 200 });
 
         T = new Schema({
             name: { type: String, sparse: true, unique: true }
@@ -1018,12 +1018,12 @@ describe('schema', function(){
         assert.equal(true, i.sparse);
 
         T = new Schema({
-            name: { type: String, index: { sparse: true, unique: true, expiresAfterSeconds: 65 }}
+            name: { type: String, index: { sparse: true, unique: true, expireAfterSeconds: 65 }}
         });
         i = T.path('name')._index;
         assert.equal(true, i.unique);
         assert.equal(true, i.sparse);
-        assert.equal(65, i.expiresAfterSeconds);
+        assert.equal(65, i.expireAfterSeconds);
 
         T = new Schema({
             name: { type: String, index: { sparse: true, unique: true, expires: '24h' }}
@@ -1031,7 +1031,7 @@ describe('schema', function(){
         i = T.path('name')._index;
         assert.equal(true, i.unique);
         assert.equal(true, i.sparse);
-        assert.equal(60*60*24, i.expiresAfterSeconds);
+        assert.equal(60*60*24, i.expireAfterSeconds);
 
       })
       it('compound', function(){
@@ -1048,7 +1048,7 @@ describe('schema', function(){
             [{ name: 1 }, { background: true }]
           , [{ last: 1 }, { sparse: true, background :true }]
           , [{ nope: 1 }, { background : false}]
-          , [{ firstname: 1, last: 1}, {unique: true, expiresAfterSeconds: 60*60, background: true }]
+          , [{ firstname: 1, last: 1}, {unique: true, expireAfterSeconds: 60*60, background: true }]
           , [{ firstname: 1, nope: 1 }, { unique: true, background: false }]
         ]);
       });

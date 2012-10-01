@@ -50,7 +50,7 @@ describe('model', function(){
                 break;
               case 'date_1':
                 assertions++;
-                assert.equal(index.expiresAfterSeconds, 10);
+                assert.equal(index.expireAfterSeconds, 10);
                 break;
             }
           });

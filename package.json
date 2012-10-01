@@ -8,7 +8,7 @@
         "hooks": "0.2.1"
       , "mongodb": "1.1.7"
       , "ms": "0.1.0"
-      , "sliced": "0.0.1"
+      , "sliced": "0.0.3"
     }
   , "devDependencies": {
         "mocha": "1.4.2"

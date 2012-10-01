@@ -778,6 +778,7 @@ describe('schema', function(){
         });
 
         assert.equal('what', Tobi.path('name').applySetters('WHAT'));
+        assert.equal('1977', Tobi.path('name').applySetters(1977));
       });
       it('uppercase', function(){
         var Tobi = new Schema({
@@ -785,6 +786,7 @@ describe('schema', function(){
         });
 
         assert.equal('WHAT', Tobi.path('name').applySetters('what'));
+        assert.equal('1977', Tobi.path('name').applySetters(1977));
       });
       it('trim', function(){
         var Tobi = new Schema({
@@ -792,6 +794,7 @@ describe('schema', function(){
         });
 
         assert.equal('WHAT', Tobi.path('name').applySetters('  what   '));
+        assert.equal('1977', Tobi.path('name').applySetters(1977));
       });
     });
 

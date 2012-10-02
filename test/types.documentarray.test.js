@@ -191,6 +191,52 @@ describe('types.documentarray', function(){
         assert.ok(subdoc instanceof EmbeddedDocument);
       })
     })
+
+    describe('push()', function(){
+      it('does not re-cast instances of its embedded doc xxxxxx', function(done){
+        var db = start();
+
+        var child = new Schema({ name: String, date: Date });
+        child.pre('save', function (next) {
+          this.date = new Date;
+          next();
+        });
+        var schema = Schema({ children: [child] });
+        var M = db.model('embeddedDocArray-push-re-cast', schema, 'edarecast-'+random());
+        var m = new M;
+        m.save(function (err) {
+          assert.ifError(err);
+          M.findById(m._id, function (err, doc) {
+            assert.ifError(err);
+            var c = doc.children.create({ name: 'first' })
+            assert.equal(undefined, c.date);
+            doc.children.push(c);
+            assert.equal(undefined, c.date);
+            doc.save(function (err) {
+              assert.ifError(err);
+              assert.ok(doc.children[doc.children.length-1].date);
+              assert.equal(c.date, doc.children[doc.children.length-1].date);
+
+              doc.children.push(c);
+              doc.children.push(c);
+
+              doc.save(function (err) {
+                assert.ifError(err);
+                M.findById(m._id, function (err, doc) {
+                  db.close()
+                  assert.ifError(err);
+                  assert.equal(3, doc.children.length);
+                  doc.children.forEach(function (child) {
+                    assert.equal(doc.children[0].id, child.id);
+                  })
+                  done();
+                })
+              })
+            })
+          })
+        })
+      })
+    })
   })
 
   it('#push should work on EmbeddedDocuments more than 2 levels deep', function (done) {

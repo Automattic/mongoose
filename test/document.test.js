@@ -744,7 +744,7 @@ describe('document:', function(){
             t.req = undefined;
             t.save(function (err) {
               err = String(err);
-              var invalid  = /Validator "required" failed for path req/.test(err);
+              var invalid = /ValidationError: Req cannot be blank\./.test(err);
               assert.ok(invalid);
               t.req = 'it works again'
               t.save(function (err) {
@@ -817,10 +817,10 @@ describe('document:', function(){
         var M = db.model('validateSchema-array1', schema, collection);
         var m = new M({ name: 'gh1109-1' });
         m.save(function (err) {
-          assert.ok(/"required" failed for path arr/.test(err));
+          assert.ok(/ValidationError: Arr cannot be blank./.test(err.toString()));
           m.arr = [];
           m.save(function (err) {
-            assert.ok(/"required" failed for path arr/.test(err));
+            assert.ok(/ValidationError: Arr cannot be blank./.test(err.toString()));
             m.arr.push('works');
             m.save(function (err) {
               assert.ifError(err);
@@ -877,7 +877,7 @@ describe('document:', function(){
         var M = db.model('validateSchema-array3', schema, collection);
         var m = new M({ name: 'gh1109-3' });
         m.save(function (err) {
-          assert.ok(/"required" failed for path arr/.test(err));
+          assert.ok(/ValidationError: Arr cannot be blank./.test(err));
           m.arr.push({nice: true});
           m.save(function (err) {
             assert.ok(/"BAM" failed for path arr/.test(err));

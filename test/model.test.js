@@ -1114,9 +1114,9 @@ describe('model', function(){
         assert.ok(err instanceof MongooseError);
         assert.ok(err instanceof ValidationError);
         assert.ok(err.errors['items.0.subs.0.required'] instanceof ValidatorError);
-        assert.equal(err.errors['items.0.subs.0.required'].message,'Validator "required" failed for path required');
+        assert.equal(err.errors['items.0.subs.0.required'].message,'Required cannot be blank.');
         assert.ok(post.errors['items.0.subs.0.required'] instanceof ValidatorError);
-        assert.equal(post.errors['items.0.subs.0.required'].message,'Validator "required" failed for path required');
+        assert.equal(post.errors['items.0.subs.0.required'].message,'Required cannot be blank.');
 
         assert.ok(!err.errors['items.0.required']);
         assert.ok(!err.errors['items.0.required']);
@@ -1130,7 +1130,7 @@ describe('model', function(){
           assert.ok(err);
           assert.ok(err.errors);
           assert.ok(err.errors['items.0.required'] instanceof ValidatorError);
-          assert.equal(err.errors['items.0.required'].message,'Validator "required" failed for path required');
+          assert.equal(err.errors['items.0.required'].message,'Required cannot be blank.');
 
           assert.ok(!err.errors['items.0.subs.0.required']);
           assert.ok(!err.errors['items.0.subs.0.required']);

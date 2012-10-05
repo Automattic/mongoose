@@ -137,16 +137,15 @@ block content
     |.
   :js
     animalSchema.index({ name: 1, type: -1 });
-  p
-    | When your application starts up, Mongoose automatically calls 
-    code ensureIndex
-    |  for each defined index. It is recommended this behavior be disabled in production by setting the 
-    code autoIndex
-    |  option of your schema to false.
+
+  :markdown
+    When your application starts up, Mongoose automatically calls `ensureIndex` for each defined index. It is recommended this behavior be disabled in production by setting the `autoIndex` option of your schema to `false`.
+
   :js
     animalSchema.set('autoIndex', false);
     // or
     new Schema({..}, { autoIndex: false });
+
   p
     | See also the 
     a(href="./api.html#model_Model-ensureIndexes")

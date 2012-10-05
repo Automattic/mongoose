@@ -393,7 +393,7 @@ block content
     schema.path('name').get(function (v) {
       return v + ' is my name';
     });
-    schema.set('toJSON', { getters: true });
+    schema.set('toJSON', { getters: true, virtuals: false });
     var M = mongoose.model('Person', schema);
     var m = new M({ name: 'Max Headroom' });
     console.log(m.toObject()); // { _id: 504e0cd7dd992d9be2f20b6f, name: 'Max Headroom' }

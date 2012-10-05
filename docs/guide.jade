@@ -140,7 +140,7 @@ block content
   p
     | When your application starts up, Mongoose automatically calls 
     code ensureIndex
-    |  for each defined index. This behavior can be disabled by setting the 
+    |  for each defined index. It is recommended this behavior be disabled in production by setting the 
     code autoIndex
     |  option of your schema to false.
   :js
@@ -151,7 +151,7 @@ block content
     | See also the 
     a(href="./api.html#model_Model-ensureIndexes")
       code Model#ensureIndexes
-    |  method.
+    |  method for more details.
 
   h3#virtuals Virtuals
   :markdown

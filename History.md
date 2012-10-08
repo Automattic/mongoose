@@ -1,4 +1,22 @@
 
+3.2.2 / 2012-10-08
+==================
+
+  * updated; driver to 1.1.10 #1143
+  * updated; use sliced 0.0.3
+  * fixed; do not recast embedded docs unnecessarily
+  * fixed; expires schema option helper #1132
+  * fixed; built in string setters #1131
+  * fixed; debug output for Dates/ObjectId properties #1129
+  * docs; fixed Javascript syntax error in example [olalonde](https://github.com/olalonde)
+  * docs; fix toJSON example #1137
+  * docs; add ensureIndex production notes
+  * docs; fix spelling
+  * docs; add blogposts about v3
+  * website; updated
+  * removed; undocumented inGroupsOf util
+  * tests; added
+
 3.2.1 / 2012-09-28
 ==================
 

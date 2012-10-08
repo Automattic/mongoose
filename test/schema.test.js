@@ -714,7 +714,6 @@ describe('schema', function(){
     });
 
     describe('string', function(){
-      console.error('\nTODO remove string lowercase/uppercase/trim setters before 3.0\n');
       it('lowercase', function(){
         var Tobi = new Schema({
             name: { type: String, lowercase: true }

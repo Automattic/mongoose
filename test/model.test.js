@@ -3948,6 +3948,31 @@ describe('model', function(){
         });
       });
     })
+    it('saved changes made within callback of a previous no-op save gh-1139', function(done){
+      var db = start()
+        , B = db.model('BlogPost', collection);
+
+      var post = new B({ title: 'first' });
+      post.save(function (err) {
+        assert.ifError(err);
+
+        // no op
+        post.save(function (err) {
+          assert.ifError(err);
+
+          post.title = 'changed';
+          post.save(function (err) {
+            assert.ifError(err);
+
+            B.findById(post, function (err, doc) {
+              assert.ifError(err);
+              assert.equal('changed', doc.title);
+              done();
+            })
+          })
+        })
+      })
+    })
   });
 
   describe('backward compatibility', function(){

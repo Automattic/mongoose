@@ -3,6 +3,7 @@
 ### Bugfixes
 
 - Before starting to write code, look for existing [tickets](https://github.com/learnboost/mongoose/issues) or [create one](https://github.com/learnboost/mongoose/issues/new) for your specific issue. That way you avoid working on something that might not be of interest or that has been addressed already in a different branch.
+  - _The source of this project is written in javascript, not coffeescript, therefore your bug reports should be written with javascript too_. 
 - Fork the [repo](https://github.com/learnboost/mongoose) _or_ for small documentation changes, navigate to the source on github and click the [Edit](https://github.com/blog/844-forking-with-the-edit-button) button.
 - Follow the general coding style of the rest of the project:
   - 2 space tabs

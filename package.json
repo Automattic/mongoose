@@ -22,7 +22,6 @@
   , "scripts": { "test": "make test" }
   , "main": "./index.js"
   , "engines": { "node": ">= 0.4.0" }
-  , "publishConfig": { "tag": "3.0" }
   , "bugs": {
         "url":"https://github.com/learnboost/mongoose/issues/new"
       , "email": "https://groups.google.com/group/mongoose-orm"

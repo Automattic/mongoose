@@ -10,8 +10,8 @@ var klass = require('./docs/helpers/klass')
 // add custom jade filters
 require('./docs/helpers/filters')(jade);
 
-// use last release
-package.version = getVersion();
+// clean up version for ui
+package.version = package.version.replace(/-pre$/, '');
 
 var filemap = require('./docs/source');
 var files = Object.keys(filemap);
@@ -45,16 +45,4 @@ function jadeify (filename, options) {
       console.log('%s : rendered ', new Date, newfile);
     });
   });
-}
-
-function getVersion () {
-  var hist = fs.readFileSync('./History.md','utf8').replace(/\r/g, '\n').split('\n');
-  for (var i = 0; i < hist.length; ++i) {
-    var line = (hist[i] || '').trim();
-    if (!line) continue;
-    var match = /^\s*([^\s]+)\s/.exec(line);
-    if (match && match[1])
-      return match[1];
-  }
-  throw new Error('no match found');
 }

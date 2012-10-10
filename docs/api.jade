@@ -499,10 +499,20 @@ html(lang='en')
       document.body.className = 'load';
     include includes/googleanalytics
     script(src="/docs/js/zepto.min.js")
+    script(src="/docs/js/cookies.min.js")
     script.
       $(".module").on("click", ".showcode", function (e) {
         $(this).closest(".item").find(".sourcecode").first().toggle();
       });
       $("#content .controls input").on("click", function (e) {
         $(".private").toggle()
-      })
+        var checked = $(this).prop('checked');
+        Cookies.set('prv', checked);
+      });
+      ;(function(){
+        var checked = 'true' === Cookies.get('prv');
+        if (checked) {
+          $("#content .controls input").prop('checked', 'checked');
+          $(".private").show()
+        }
+      })()

@@ -9,17 +9,34 @@ var url = require('url')
   , collection = 'blogposts_' + random();
 
 describe('mongoose module:', function(){
-  it('default connection works', function(done){
-    var db = mongoose.connection
-      , uri = 'mongodb://localhost/mongoose_test'
+  describe('default connection works', function(){
+    it('without options', function(done){
+      var goose = new Mongoose;
+      var db = goose.connection
+        , uri = 'mongodb://localhost/mongoose_test'
 
-    mongoose.connect(process.env.MONGOOSE_TEST_URI || uri);
+      goose.connect(process.env.MONGOOSE_TEST_URI || uri);
 
-    db.on('open', function(){
-      db.close(function () {
-        done();
+      db.on('open', function(){
+        db.close(function () {
+          done();
+        });
       });
-    });
+    })
+
+    it('with options', function(done){
+      var goose = new Mongoose;
+      var db = goose.connection
+        , uri = 'mongodb://localhost/mongoose_test'
+
+      goose.connect(process.env.MONGOOSE_TEST_URI || uri, {db:{safe:false}});
+
+      db.on('open', function(){
+        db.close(function () {
+          done();
+        });
+      });
+    })
   });
 
   it('{g,s}etting options', function(){

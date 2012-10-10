@@ -174,6 +174,32 @@ describe('mongoose module:', function(){
     });
   });
 
+  describe('connecting with a signature of uri, options, function', function(){
+    it('with single mongod', function(done){
+      var mong = new Mongoose()
+        , uri = process.env.MONGOOSE_TEST_URI || 'mongodb://localhost/mongoose_test';
+
+      mong.connect(uri, { db: { safe: false }}, function (err) {
+        assert.ifError(err);
+        mong.connection.close();
+        done();
+      });
+    })
+
+    it('with replset', function(done){
+      var mong = new Mongoose()
+        , uri = process.env.MONGOOSE_SET_TEST_URI
+
+      if (!uri) return done();
+
+      mong.connect(uri, { db: { safe: false }}, function (err) {
+        assert.ifError(err);
+        mong.connection.close();
+        done();
+      });
+    })
+  });
+
   it('goose.connect() to a replica set', function(done){
     var uri = process.env.MONGOOSE_SET_TEST_URI;
 

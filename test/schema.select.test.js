@@ -32,11 +32,10 @@ describe('schema select option', function(){
       assert.equal(s.name, 'the excluded');
       assert.equal(s.docs[0].name, 'test');
 
-      var pending = 3;
+      var pending = 5;
       function cb (err, s) {
         if (!--pending) {
           db.close();
-          done();
         }
 
         if (Array.isArray(s)) s = s[0];
@@ -44,11 +43,19 @@ describe('schema select option', function(){
         assert.equal(false, s.isSelected('name'));
         assert.equal(false, s.isSelected('docs.name'));
         assert.strictEqual(undefined, s.name);
+
+        if (0 === pending) {
+          done();
+        }
       }
 
       S.findById(s).select('-thin -docs.bool').exec(cb);
       S.find({ _id: s._id }).select('thin docs.bool').exec(cb);
       S.findById(s, cb);
+      S.findOneAndUpdate({ _id: s._id }, { name: 'changed' }, function (err, s) {
+        cb(err, s);
+        S.findOneAndRemove({ _id: s._id }, cb);
+      });
     });
   });
 
@@ -67,119 +74,196 @@ describe('schema select option', function(){
       assert.equal(s.name, 'the included');
       assert.equal(s.docs[0].name, 'test');
 
-      var pending = 2;
+      var pending = 4;
       function cb (err, s) {
         if (!--pending) {
           db.close();
-          done();
         }
         if (Array.isArray(s)) s = s[0];
         assert.strictEqual(null, err);
         assert.strictEqual(true, s.isSelected('name'));
         assert.strictEqual(true, s.isSelected('docs.name'));
         assert.equal(s.name, 'the included');
+
+        if (0 === pending) {
+          done();
+        }
       }
 
       S.findById(s).select('-thin -docs.bool').exec(cb);
       S.find({ _id: s._id }).select('thin docs.bool').exec(cb);
+      S.findOneAndUpdate({ _id: s._id }, { thin: false }, function (err, s) {
+        cb(err, s);
+        S.findOneAndRemove({ _id: s._id }, cb);
+      });
     });
   });
 
-  it('overriding schematype select options', function (done) {
-    var db =start()
+  describe('overriding schematype select options', function (done) {
+    var db, selected, excluded, S, E;
 
-    var selected = new Schema({
-        thin: Boolean
-      , name: { type: String, select: true }
-      , docs: [new Schema({ name: { type: String, select: true }, bool: Boolean })]
-    });
-    var excluded = new Schema({
-        thin: Boolean
-      , name: { type: String, select: false }
-      , docs: [new Schema({ name: { type: String, select: false }, bool: Boolean})]
-    });
+    before(function(){
+      db =start()
 
-    var S = db.model('OverriddingSelectedBySchemaType', selected);
-    var E = db.model('OverriddingExcludedBySchemaType', excluded);
-
-    var pending = 4;
-
-    S.create({ thin: true, name: 'the included', docs: [{name:'test',bool: true}] },function (err, s) {
-      assert.ifError(err);
-      assert.equal(s.name, 'the included');
-      assert.equal(s.docs[0].name, 'test');
-
-      S.find({ _id: s._id }).select('thin name docs.bool docs.name').exec(function (err, s) {
-        if (!--pending) {
-          db.close();
-          done();
-        }
-        s = s[0];
-        assert.ifError(err);
-        assert.strictEqual(true, s.isSelected('name'));
-        assert.strictEqual(true, s.isSelected('thin'));
-        assert.strictEqual(true, s.isSelected('docs.name'));
-        assert.strictEqual(true, s.isSelected('docs.bool'));
-        assert.equal(s.name, 'the included');
-        assert.equal(s.docs[0].name, 'test');
-        assert.ok(s.thin);
-        assert.ok(s.docs[0].bool);
+      selected = new Schema({
+          thin: Boolean
+        , name: { type: String, select: true }
+        , docs: [new Schema({ name: { type: String, select: true }, bool: Boolean })]
+      });
+      excluded = new Schema({
+          thin: Boolean
+        , name: { type: String, select: false }
+        , docs: [new Schema({ name: { type: String, select: false }, bool: Boolean})]
       });
 
-      S.findById(s).select('-name -docs.name').exec(function (err, s) {
-        if (!--pending) {
-          db.close();
-          done();
-        }
-        assert.strictEqual(null, err);
-        assert.equal(false, s.isSelected('name'))
-        assert.equal(true, s.isSelected('thin'))
-        assert.equal(false, s.isSelected('docs.name'))
-        assert.equal(true, s.isSelected('docs.bool'))
-        assert.strictEqual(undefined, s.name);
-        assert.strictEqual(undefined, s.docs[0].name);
-        assert.equal(true, s.thin);
-        assert.equal(true, s.docs[0].bool);
-      });
+      S = db.model('OverriddingSelectedBySchemaType', selected);
+      E = db.model('OverriddingExcludedBySchemaType', excluded);
     });
 
-    E.create({ thin: true, name: 'the excluded',docs:[{name:'test',bool:true}] },function (err, e) {
-      assert.ifError(err);
-      assert.equal(e.name, 'the excluded');
-      assert.equal(e.docs[0].name, 'test');
+    after(function(done){
+      db.close(done)
+    })
 
-      E.find({ _id: e._id }).select('thin name docs.name docs.bool').exec(function (err, e) {
-        if (!--pending) {
-          db.close();
-          done();
-        }
-        e = e[0];
-        assert.strictEqual(null, err);
-        assert.equal(true, e.isSelected('name'));
-        assert.equal(true, e.isSelected('thin'));
-        assert.equal(true, e.isSelected('docs.name'));
-        assert.equal(true, e.isSelected('docs.bool'));
-        assert.equal(e.name, 'the excluded');
-        assert.equal(e.docs[0].name, 'test');
-        assert.ok(e.thin);
-        assert.ok(e.docs[0].bool);
+    describe('works', function(){
+      describe('for inclusions', function(done){
+        var s;
+        before(function(done){
+          S.create({ thin: true, name: 'the included', docs: [{name:'test',bool: true}] },function (err, s_) {
+            assert.ifError(err);
+            s = s_;
+            assert.equal(s.name, 'the included');
+            assert.equal(s.docs[0].name, 'test');
+            done();
+          });
+        })
+        it('with find', function(done){
+          S.find({ _id: s._id }).select('thin name docs.bool docs.name').exec(function (err, s) {
+            assert.ifError(err);
+            s = s[0];
+            assert.strictEqual(true, s.isSelected('name'));
+            assert.strictEqual(true, s.isSelected('thin'));
+            assert.strictEqual(true, s.isSelected('docs.name'));
+            assert.strictEqual(true, s.isSelected('docs.bool'));
+            assert.equal(s.name, 'the included');
+            assert.equal(s.docs[0].name, 'test');
+            assert.ok(s.thin);
+            assert.ok(s.docs[0].bool);
+            done();
+          });
+        })
+        it('for findById', function(done){
+          S.findById(s).select('-name -docs.name').exec(function (err, s) {
+            assert.strictEqual(null, err);
+            assert.equal(false, s.isSelected('name'))
+            assert.equal(true, s.isSelected('thin'))
+            assert.equal(false, s.isSelected('docs.name'))
+            assert.equal(true, s.isSelected('docs.bool'))
+            assert.strictEqual(undefined, s.name);
+            assert.strictEqual(undefined, s.docs[0].name);
+            assert.equal(true, s.thin);
+            assert.equal(true, s.docs[0].bool);
+            done();
+          });
+        });
+        it('with findOneAndUpdate', function(done){
+          S.findOneAndUpdate({ _id: s._id }, { name: 'changed' }).select('thin name docs.bool docs.name').exec(function (err, s) {
+            assert.ifError(err);
+            assert.strictEqual(true, s.isSelected('name'));
+            assert.strictEqual(true, s.isSelected('thin'));
+            assert.strictEqual(true, s.isSelected('docs.name'));
+            assert.strictEqual(true, s.isSelected('docs.bool'));
+            assert.equal(s.name, 'changed');
+            assert.equal(s.docs[0].name, 'test');
+            assert.ok(s.thin);
+            assert.ok(s.docs[0].bool);
+            done();
+          });
+        })
+        it('for findByIdAndUpdate', function(done){
+          S.findByIdAndUpdate(s, { thin: false }).select('-name -docs.name').exec(function (err, s) {
+            assert.strictEqual(null, err);
+            assert.equal(false, s.isSelected('name'))
+            assert.equal(true, s.isSelected('thin'))
+            assert.equal(false, s.isSelected('docs.name'))
+            assert.equal(true, s.isSelected('docs.bool'))
+            assert.strictEqual(undefined, s.name);
+            assert.strictEqual(undefined, s.docs[0].name);
+            assert.equal(false, s.thin);
+            assert.equal(true, s.docs[0].bool);
+            done();
+          });
+        });
       });
 
-      E.findById(e).select('-name -docs.name').exec(function (err, e) {
-        if (!--pending) {
-          db.close();
-          done();
-        }
-        assert.strictEqual(null, err);
-        assert.equal(e.isSelected('name'),false)
-        assert.equal(e.isSelected('thin'), true);
-        assert.equal(e.isSelected('docs.name'),false)
-        assert.equal(e.isSelected('docs.bool'), true);
-        assert.strictEqual(undefined, e.name);
-        assert.strictEqual(undefined, e.docs[0].name);
-        assert.strictEqual(true, e.thin);
-        assert.strictEqual(true, e.docs[0].bool);
-      });
+      describe('for exclusions', function(){
+        var e;
+        before(function(done){
+          E.create({ thin: true, name: 'the excluded',docs:[{name:'test',bool:true}] },function (err, e_) {
+            e = e_;
+            assert.ifError(err);
+            assert.equal(e.name, 'the excluded');
+            assert.equal(e.docs[0].name, 'test');
+            done();
+          })
+        })
+        it('with find', function(done){
+          E.find({ _id: e._id }).select('thin name docs.name docs.bool').exec(function (err, e) {
+            e = e[0];
+            assert.strictEqual(null, err);
+            assert.equal(true, e.isSelected('name'));
+            assert.equal(true, e.isSelected('thin'));
+            assert.equal(true, e.isSelected('docs.name'));
+            assert.equal(true, e.isSelected('docs.bool'));
+            assert.equal(e.name, 'the excluded');
+            assert.equal(e.docs[0].name, 'test');
+            assert.ok(e.thin);
+            assert.ok(e.docs[0].bool);
+            done();
+          });
+        })
+        it('with findById', function(done){
+          E.findById(e).select('-name -docs.name').exec(function (err, e) {
+            assert.strictEqual(null, err);
+            assert.equal(e.isSelected('name'),false)
+            assert.equal(e.isSelected('thin'), true);
+            assert.equal(e.isSelected('docs.name'),false)
+            assert.equal(e.isSelected('docs.bool'), true);
+            assert.strictEqual(undefined, e.name);
+            assert.strictEqual(undefined, e.docs[0].name);
+            assert.strictEqual(true, e.thin);
+            assert.strictEqual(true, e.docs[0].bool);
+            done();
+          });
+        })
+        it('with findOneAndUpdate', function(done){
+          E.findOneAndUpdate({ _id: e._id }, { name: 'changed' }).select('thin name docs.name docs.bool').exec(function (err, e) {
+            assert.strictEqual(null, err);
+            assert.equal(true, e.isSelected('name'));
+            assert.equal(true, e.isSelected('thin'));
+            assert.equal(true, e.isSelected('docs.name'));
+            assert.equal(true, e.isSelected('docs.bool'));
+            assert.equal(e.name, 'changed');
+            assert.equal(e.docs[0].name, 'test');
+            assert.ok(e.thin);
+            assert.ok(e.docs[0].bool);
+            done();
+          });
+        })
+        it('with findOneAndRemove', function(done){
+          E.findOneAndRemove({ _id: e._id }).select('-name -docs.name').exec(function (err, e) {
+            assert.strictEqual(null, err);
+            assert.equal(e.isSelected('name'),false)
+            assert.equal(e.isSelected('thin'), true);
+            assert.equal(e.isSelected('docs.name'),false)
+            assert.equal(e.isSelected('docs.bool'), true);
+            assert.strictEqual(undefined, e.name);
+            assert.strictEqual(undefined, e.docs[0].name);
+            assert.strictEqual(true, e.thin);
+            assert.strictEqual(true, e.docs[0].bool);
+            done();
+          });
+        })
+      })
     });
   })
 

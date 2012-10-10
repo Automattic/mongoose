@@ -75,7 +75,7 @@ var collection = 'updateoneblogposts_' + random();
 var strictSchema = new Schema({ name: String }, { strict: true });
 mongoose.model('UpdateOneStrictSchema', strictSchema);
 
-describe('model: findAndRemoveOne:', function(){
+describe('model: findOneAndRemove:', function(){
   it('returns the original document', function(done){
     var db = start()
       , M = db.model(modelname, collection)

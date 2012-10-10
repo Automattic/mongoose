@@ -1,4 +1,16 @@
 
+3.3.0 / 2012-10-10
+==================
+
+  * fixed; passing options as 2nd arg to connect() #1144
+  * fixed; race condition after no-op save #1139
+  * fixed; schema field selection application in findAndModify #1150
+  * fixed; directly setting arrays #1126
+  * updated; driver to 1.1.11
+  * updated; collection pluralization rules [mrickard](https://github.com/mrickard)
+  * tests; added
+  * docs; updated
+
 3.2.2 / 2012-10-08
 ==================
 

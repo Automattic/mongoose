@@ -1877,7 +1877,7 @@ describe('geo-spatial', function(){
 });
 
 describe('lean option:', function(){
-   it('find', function(done){
+  it('find', function(done){
     var db = start()
       , BlogPostB = db.model('BlogPostB', collection)
       , title = 'Wooooot ' + random();

@@ -1,0 +1,284 @@
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Mongoose ODM</title>
+    <style>
+      body {
+        background: url('/docs/2.7.x/images/bg.png');
+        padding: 0 30px 30px;
+        margin-top: 0;
+      }
+
+      #wrap {
+        background: url('/docs/2.7.x/images/pattern.png') no-repeat -134px -211px;
+        min-height: 600px;
+        padding-top: 30px;
+      }
+
+      #page {
+        width: 650px;
+        margin: auto;
+        position: relative;
+      }
+
+      #footer {
+        font: 13px Helvetica;
+        padding-top: 15px;
+        border-top: 1px solid #000;
+        color: #666;
+        margin-top: 25px;
+      }
+
+      #footer > div {
+        padding-top: 8px;
+        float: right;
+        text-align: right;
+        padding-bottom: 20px;
+      }
+
+      #content {
+        color: #111;
+        font: 15px Courier;
+      }
+
+      #content h1, #content h2, #content h3 {
+        text-shadow: 0 1px 0 #fff;
+      }
+
+      #announce {
+        background: #2A758A;
+        border: 10px solid black;
+        border-radius: 7px;
+        padding: 30px;
+        font-size: 125%;
+        color: white;
+        text-shadow: none;
+        font-family: Arial;
+      }
+
+      #announce a {
+        color: orange;
+        text-shadow: none;
+      }
+
+      pre {
+        background: rgba(255,255,255,.8);
+        border: 1px solid #c6c6c6;
+        padding: 10px;
+        border-radius: 3px;
+        box-shadow: 1px 3px 6px #ddd;
+      }
+
+      code {
+        background: rgba(255,255,255,.8);
+        border: 1px solid #c6c6c6;
+        color: #333;
+        border-radius: 3px
+      }
+
+      pre code {
+        border: 0 none;
+      }
+
+      form {
+        font: bold 12px Helvetica;
+        text-shadow: 0 1px 0 #fff;
+        float: left;
+        padding-bottom: 25px;
+      }
+
+      form img {
+        margin-right: 5px
+      }
+
+      #google-members-count {
+        vertical-align: top;
+        line-height: 32px;
+      }
+
+      h1 a {
+        background: url('/docs/2.7.x/images/logo.png');
+        width: 404px;
+        height: 47px;
+        margin-bottom: 40px;
+        text-indent: -500em;
+        display: block;
+      }
+
+      a {
+        color: #2a758a;
+        text-shadow: 0 1px 0 #fff;
+        text-decoration: none;
+      }
+
+      a:hover {
+        opacity: 0.8;
+      }
+
+      #menu {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100%;
+        background-color: rgba(0,0,0,0.3);
+        font: bold 15px Helvetica;
+        border-right: 1px solid rgba(0,0,0,0.2);
+      }
+
+      #menu ul {
+        margin: 0;
+        padding: 50px 0;
+      }
+
+      #menu ul li {
+        list-style-type: none;
+        padding-left: 15px;
+        padding-right: 20px;
+      }
+
+      #menu ul li a {
+        color: #fff;
+        text-shadow: none;
+      }
+      #menu ul li a:hover {
+        text-decoration: underline;
+      }
+      #wild { margin-top: 10px; }
+    </style>
+
+    <script>
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-1122274-9']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();
+      
+      function getMembers(data){
+        if (!(data && data.query && data.query.results && data.query.results.p)) return;
+        var members = document.createElement('span');
+        members.id = 'google-members-count';
+        members.innerHTML = '('+ data.query.results.p +' members)';
+        document.getElementsByTagName('FORM')[0].insertBefore(members, document.getElementById('google-subscribe-input'));
+      };
+
+      window.onload = function(){
+        // lame jsonp
+        var script = document.createElement('script');
+        script.src = "http://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20html%20where%20url%3D%22http%3A%2F%2Fgroups.google.com%2Fgroup%2Fmongoose-orm%2Fabout%22%20and%20xpath%3D'%2F%2Fdiv%5B%40class%3D%5C'maincontbox%5C'%5D%2Ftable%2Ftr%5B1%5D%2Ftd%2Fp%5B1%5D'%0A&format=json&callback=getMembers";
+        document.head.appendChild(script);
+      };
+    </script>
+  </head>
+  <body>
+    <a href="http://github.com/learnboost/mongoose"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png" alt="Fork me on GitHub"></a>
+    <div id="wrap">
+      <div id="page">
+        <div id="menu">
+          <ul>
+            <li><a href="../index.html">Home</a></li>
+            <li><a href="model-definition.html">Models/Schemas</a></li>
+            <li><a href="schematypes.html">Schema Types</a></li>
+            <li><a href="schema-options.html">Schema Options</a></li>
+            <li><a href="middleware.html">Middleware</a></li>
+            <li><a href="finding-documents.html">Finding Docs</a></li>
+            <li><a href="updating-documents.html">Updating Docs</a></li>
+            <li><a href="query.html">Queries</a></li>
+            <li><a href="querystream.html">Query Streams</a></li>
+            <li><a href="methods-statics.html">Methods &amp; Statics</a>
+            <li><a href="defaults.html">Defaults</a></li>
+            <li><a href="indexes.html">Indexes</a></li>
+            <li><a href="validation.html">Validation</a></li>
+            <li><a href="virtuals.html">Virtuals</a></li>
+            <li><a href="getters-setters.html">Getters / Setters</a></li>
+            <li><a href="embedded-documents.html">Embedded Docs</a></li>
+            <li><a href="populate.html">Populate (DBRef-like)</a></li>
+            <li><a href="plugins.html">Plugins</a></li>
+            <li><a href="errors.html">Errors</a></li>
+            <li><a href="migration-1x-2x.html">v1x - v2x Migration</a></li>
+            <li><a href="api.html">API</a></li>
+          </ul>
+        </div>
+
+        <h1><a href="../index.html">Mongoose</a></h1>
+
+        <div id="content">
+          <!-- ANNOUNCE -->
+          <h1>Getters and Setters</h1>
+
+<p>Getters and setters help you change how you get and set the attributes defined by the keys and values in the underlying raw document.</p>
+
+<h2>Setters</h2>
+
+<p>Setters allow you to transform the mongoose document's data before it gets to the raw mongodb document and is set as a value on an actual key.</p>
+
+<p>Suppose you are implementing user registration for a website. User provide an email and password, which gets saved to mongodb. The email is a string that you will want to normalize to lower case, in order to avoid one email having more than one account -- e.g., otherwise, <a href='mailto:avenue@q.com'>avenue@q.com</a> can be registered for 2 accounts via <a href='mailto:avenue@q.com'>avenue@q.com</a> and <a href='mailto:AvEnUe@Q.CoM'>AvEnUe@Q.CoM</a>.</p>
+
+<p>You can set up email lower case normalization easily via a Mongoose setter. Note in the following snippet that setters (and also getters) are defined in the <code>Schema</code>:</p>
+
+<pre><code>function toLower (v) {
+  return v.toLowerCase();
+}
+
+var UserSchema = new Schema({
+  email: { type: String, set: toLower } 
+});
+
+var User = mongoose.model('User', UserSchema);
+var user = new User({email: '<a href='mailto:AVENUE@Q.COM'>AVENUE@Q.COM</a>'});
+
+console.log(user.email); // '<a href='mailto:avenue@q.com'>avenue@q.com</a>'
+</code></pre>
+
+<p>As you can see above, setters allow you to transform the data before it gets to the raw mongodb document and is set as a value on an actual key.</p>
+
+<h2>Getters</h2>
+
+<p>Getters allow you to transform the representation of the data as it travels from the raw mongodb document to the value that you see.</p>
+
+<p>Suppose you are storing credit card numbers and you want to hide everything except the last 4 digits to the mongoose user.  You can do so by defining a getter in the following way (again, notice that getters are defined in the <code>Schema</code>):</p>
+
+<pre><code>function obfuscate (cc) {
+  return '****-****-****-' + cc.slice(cc.length-4, cc.length);
+}
+
+var AccountSchema = new Schema({
+  creditCardNumber: { type: String, get: obfuscate }
+});
+
+var Account = mongoose.model('Account', AccountSchema);
+
+Account.findById( someId, function (err, found) {
+  console.log(found.creditCardNumber); // '****-****-****-1234'
+});
+</code></pre>
+
+<h2>Summary</h2>
+
+<p>Setters are intended to modify the underlying raw data. Getters are intended to transform (but not modify at the raw data level) the underlying raw data into something that the user expects to see. They are both defined in the <code>Schema</code> definition.</p>
+        </div>
+
+        <div id="footer">
+
+          <form action="http://groups.google.com/group/mongoose-orm/boxsubscribe">
+           <a href="http://groups.google.com/group/mongoose-orm" id="google-subscribe-link"><img src="/docs/2.7.x/images/groups.png" border="0"></a>
+           <span id="google-members-count">&nbsp;</span>
+           <div id="google-subscribe-input">
+             Email: <input type="text" name="email" id="google-subscribe-email">
+             <input type="submit" name="go" value="Subscribe">
+           </div>
+          </form>
+
+          <div>
+            Mongoose by <a href="http://github.com/learnboost">LearnBoost Labs</a>.<br>
+            Released under the MIT license.<br>
+            Copyright <a href="http://learnboost.com">LearnBoost 2011</a>.
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

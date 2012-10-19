@@ -12,6 +12,10 @@ body {
   font-weight: bold;
   font-size: 20px;
 }
+#production:target::before {
+  content: "";
+  font-size: inherit;
+}
 a {
   color: #800;
   -webkit-transition-property: opacity, -webkit-transform, color, background-color, padding, -webkit-box-shadow;

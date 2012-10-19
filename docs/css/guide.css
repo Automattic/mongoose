@@ -1,6 +1,12 @@
 html, body, #content {
   height: 100%;
 }
+:target::before {
+  content: ">>> ";
+  color: #1371C9;
+  font-weight: bold;
+  font-size: 20px;
+}
 .module {
   min-height: 100%;
   box-sizing: border-box;

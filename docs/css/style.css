@@ -6,6 +6,12 @@ body {
   padding: 0;
   margin: 0;
 }
+:target::before {
+  content: ">>> ";
+  color: #1371C9;
+  font-weight: bold;
+  font-size: 20px;
+}
 a {
   color: #800;
   -webkit-transition-property: opacity, -webkit-transform, color, background-color, padding, -webkit-box-shadow;

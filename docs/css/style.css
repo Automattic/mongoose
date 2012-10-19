@@ -130,11 +130,15 @@ h2 a {
   list-style: none;
   overflow: hidden;
   display: inline-block;
-  height: 133px;
+  height: 114px;
 }
 #production img {
   width: 180px;
   margin: 10px;
+}
+#production img#mcds {
+  width: 134px;
+  margin: 10px 25px;
 }
 #production a {
   -webkit-transition-property: opacity;
@@ -209,7 +213,7 @@ h2 a {
     opacity: 1;
   }
   #production img {
-    width: 100%;
+    width: 175px;
   }
   .addyourown, .addyourown a {
     width: 100%;

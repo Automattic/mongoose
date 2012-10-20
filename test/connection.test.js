@@ -342,5 +342,24 @@ describe('connections:', function(){
       done();
     });
   })
+
+  describe('openSet', function(){
+    it('accepts uris, dbname, options', function(done){
+      var m = new mongoose.Mongoose;
+      var uris = process.env.MONGOOSE_SET_TEST_URI;
+      if (!uris) return done();
+
+      m.connection.on('error', done);
+      m.connection.on('open', function () {
+        m.connection.close(done);
+      });
+
+      try {
+        m.connect(uris, 'mongoose_test', { server: { auto_reconnect: true }});
+      } catch (err) {
+        done(err);
+      }
+    })
+  })
 })
 

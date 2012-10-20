@@ -1,0 +1,8 @@
+extends layout
+
+block content
+  h2 Prior Release Documentation
+  ul
+    each release in releases
+      li
+        a(href=release.url)= release.version

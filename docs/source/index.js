@@ -2,6 +2,7 @@
 exports['index.jade'] = require('./home')
 exports['docs/api.jade'] = require('./api')
 exports['docs/index.jade'] = { title: 'Getting Started' }
+exports['docs/production.jade'] = require('./production')
 exports['docs/prior.jade'] = require('./prior')
 exports['docs/guide.jade'] = { guide: true, schema: true, title: 'Schemas' }
 exports['docs/schematypes.jade'] = { guide: true, schema: true, title: 'SchemaTypes' }

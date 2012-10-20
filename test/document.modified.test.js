@@ -156,7 +156,7 @@ describe('document modified', function(){
       assert.equal(true, post.isModified('title'));
 
       assert.equal(false, post.isModified('date'));
-      post.set('date', new Date(post.date + 1));
+      post.set('date', new Date(post.date + 10));
       assert.equal(true, post.isModified('date'));
 
       assert.equal(false, post.isModified('meta.date'));

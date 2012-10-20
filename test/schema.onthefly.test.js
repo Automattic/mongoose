@@ -60,6 +60,22 @@ describe('schema.onthefly', function(){
         // Interpret adhoc as a String instead of a Number now
         assert.equal('9', found.get('adhoc', String));
         assert.equal('9', found.get('adhoc'));
+
+        // set adhoc as an Object
+        found.set('adhoc', '3', Object);
+        assert.equal('string', typeof found.get('adhoc'));
+        found.set('adhoc', 3, Object);
+        assert.equal('number', typeof found.get('adhoc'));
+
+        found.set('adhoc', ['hello'], Object);
+        assert.ok(Array.isArray(found.get('adhoc')));
+        found.set('adhoc', ['hello'], {});
+        assert.ok(Array.isArray(found.get('adhoc')));
+
+        found.set('adhoc', 3, String);
+        assert.equal('string', typeof found.get('adhoc'));
+        found.set('adhoc', 3, Object);
+        assert.equal('number', typeof found.get('adhoc'));
         done();
       });
     });

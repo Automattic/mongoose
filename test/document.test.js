@@ -1009,6 +1009,21 @@ describe('document:', function(){
               }
           });
 
+          // vs merging using doc.set(path, object, {merge: true})
+          doc.set('nested', { path: 'did not overwrite the nested object' }, {merge: true});
+          assert.equal('5did not overwrite the nested object', doc.nested.path);
+          assert.equal(5, doc.nested.age);
+          assert.equal(3, Object.keys(doc._doc.nested).length);
+          assert.ok(doc.isModified('nested'));
+
+          var doc = new TestDocument();
+          doc.init({
+              test    : 'Test'
+            , nested  : {
+                  age   : 5
+              }
+          });
+
           doc.set({ test: 'Test', nested: { age: 5 }});
           assert.ok(!doc.isModified());
           assert.ok(!doc.isModified('test'));

@@ -1,4 +1,10 @@
 
+3.3.1 / 2012-10-11
+==================
+
+  * fixed; allow goose.connect(uris, dbname, opts) #1144
+  * docs; persist API private checked state across page loads
+
 3.3.0 / 2012-10-10
 ==================
 

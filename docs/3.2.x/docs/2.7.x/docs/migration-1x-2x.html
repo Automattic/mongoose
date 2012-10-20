@@ -1,0 +1,364 @@
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Mongoose ODM</title>
+    <style>
+      body {
+        background: url('/docs/2.7.x/images/bg.png');
+        padding: 0 30px 30px;
+        margin-top: 0;
+      }
+
+      #wrap {
+        background: url('/docs/2.7.x/images/pattern.png') no-repeat -134px -211px;
+        min-height: 600px;
+        padding-top: 30px;
+      }
+
+      #page {
+        width: 650px;
+        margin: auto;
+        position: relative;
+      }
+
+      #footer {
+        font: 13px Helvetica;
+        padding-top: 15px;
+        border-top: 1px solid #000;
+        color: #666;
+        margin-top: 25px;
+      }
+
+      #footer > div {
+        padding-top: 8px;
+        float: right;
+        text-align: right;
+        padding-bottom: 20px;
+      }
+
+      #content {
+        color: #111;
+        font: 15px Courier;
+      }
+
+      #content h1, #content h2, #content h3 {
+        text-shadow: 0 1px 0 #fff;
+      }
+
+      #announce {
+        background: #2A758A;
+        border: 10px solid black;
+        border-radius: 7px;
+        padding: 30px;
+        font-size: 125%;
+        color: white;
+        text-shadow: none;
+        font-family: Arial;
+      }
+
+      #announce a {
+        color: orange;
+        text-shadow: none;
+      }
+
+      pre {
+        background: rgba(255,255,255,.8);
+        border: 1px solid #c6c6c6;
+        padding: 10px;
+        border-radius: 3px;
+        box-shadow: 1px 3px 6px #ddd;
+      }
+
+      code {
+        background: rgba(255,255,255,.8);
+        border: 1px solid #c6c6c6;
+        color: #333;
+        border-radius: 3px
+      }
+
+      pre code {
+        border: 0 none;
+      }
+
+      form {
+        font: bold 12px Helvetica;
+        text-shadow: 0 1px 0 #fff;
+        float: left;
+        padding-bottom: 25px;
+      }
+
+      form img {
+        margin-right: 5px
+      }
+
+      #google-members-count {
+        vertical-align: top;
+        line-height: 32px;
+      }
+
+      h1 a {
+        background: url('/docs/2.7.x/images/logo.png');
+        width: 404px;
+        height: 47px;
+        margin-bottom: 40px;
+        text-indent: -500em;
+        display: block;
+      }
+
+      a {
+        color: #2a758a;
+        text-shadow: 0 1px 0 #fff;
+        text-decoration: none;
+      }
+
+      a:hover {
+        opacity: 0.8;
+      }
+
+      #menu {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100%;
+        background-color: rgba(0,0,0,0.3);
+        font: bold 15px Helvetica;
+        border-right: 1px solid rgba(0,0,0,0.2);
+      }
+
+      #menu ul {
+        margin: 0;
+        padding: 50px 0;
+      }
+
+      #menu ul li {
+        list-style-type: none;
+        padding-left: 15px;
+        padding-right: 20px;
+      }
+
+      #menu ul li a {
+        color: #fff;
+        text-shadow: none;
+      }
+      #menu ul li a:hover {
+        text-decoration: underline;
+      }
+      #wild { margin-top: 10px; }
+    </style>
+
+    <script>
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-1122274-9']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();
+      
+      function getMembers(data){
+        if (!(data && data.query && data.query.results && data.query.results.p)) return;
+        var members = document.createElement('span');
+        members.id = 'google-members-count';
+        members.innerHTML = '('+ data.query.results.p +' members)';
+        document.getElementsByTagName('FORM')[0].insertBefore(members, document.getElementById('google-subscribe-input'));
+      };
+
+      window.onload = function(){
+        // lame jsonp
+        var script = document.createElement('script');
+        script.src = "http://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20html%20where%20url%3D%22http%3A%2F%2Fgroups.google.com%2Fgroup%2Fmongoose-orm%2Fabout%22%20and%20xpath%3D'%2F%2Fdiv%5B%40class%3D%5C'maincontbox%5C'%5D%2Ftable%2Ftr%5B1%5D%2Ftd%2Fp%5B1%5D'%0A&format=json&callback=getMembers";
+        document.head.appendChild(script);
+      };
+    </script>
+  </head>
+  <body>
+    <a href="http://github.com/learnboost/mongoose"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png" alt="Fork me on GitHub"></a>
+    <div id="wrap">
+      <div id="page">
+        <div id="menu">
+          <ul>
+            <li><a href="../index.html">Home</a></li>
+            <li><a href="model-definition.html">Models/Schemas</a></li>
+            <li><a href="schematypes.html">Schema Types</a></li>
+            <li><a href="schema-options.html">Schema Options</a></li>
+            <li><a href="middleware.html">Middleware</a></li>
+            <li><a href="finding-documents.html">Finding Docs</a></li>
+            <li><a href="updating-documents.html">Updating Docs</a></li>
+            <li><a href="query.html">Queries</a></li>
+            <li><a href="querystream.html">Query Streams</a></li>
+            <li><a href="methods-statics.html">Methods &amp; Statics</a>
+            <li><a href="defaults.html">Defaults</a></li>
+            <li><a href="indexes.html">Indexes</a></li>
+            <li><a href="validation.html">Validation</a></li>
+            <li><a href="virtuals.html">Virtuals</a></li>
+            <li><a href="getters-setters.html">Getters / Setters</a></li>
+            <li><a href="embedded-documents.html">Embedded Docs</a></li>
+            <li><a href="populate.html">Populate (DBRef-like)</a></li>
+            <li><a href="plugins.html">Plugins</a></li>
+            <li><a href="errors.html">Errors</a></li>
+            <li><a href="migration-1x-2x.html">v1x - v2x Migration</a></li>
+            <li><a href="api.html">API</a></li>
+          </ul>
+        </div>
+
+        <h1><a href="../index.html">Mongoose</a></h1>
+
+        <div id="content">
+          <!-- ANNOUNCE -->
+          <h1>Migrating from v1.x to 2.x</h1>
+
+<p>Migrating from <strong>v1.x</strong> to <strong>2.x</strong> brings with it a few changes to be aware of.</p>
+
+<h2>Auto-reconnect</h2>
+
+<p>Previously the <code>auto_reconnect</code> option of the node-mongodb-driver defaulted to false. It now defaults to true so if your connection drops while your app is running the driver will continue retrying until it can connect again.</p>
+
+<h2>Private props</h2>
+
+<p>Several internal instance props have had name changes so its more obvious that they are not intended for public use. Namely <code>instance.doc</code> has changed to <code>instance._doc</code> since it contains the structure Mongoose relies on to operate properly and should only be manipulated with caution.</p>
+
+<p>Here are the relavent changes:</p>
+
+<pre><code>var thing = new Thing;
+
+thing.doc             -&gt; thing._doc
+thing.activePaths     -&gt; thing._activePaths
+thing.saveError       -&gt; thing._saveError
+thing.validationError -&gt; thing._validationError
+</code></pre>
+
+<h2>Circular refs in getters</h2>
+
+<p>Previously Mongoose exibited very odd behavior with getters:</p>
+
+<pre><code>toy.color.color.color.color ... // actually worked!
+</code></pre>
+
+<p>Obviously this was wrong and has now been fixed.</p>
+
+<pre><code>toy.color.color // undefined
+</code></pre>
+
+<h2>Getter / Setter scope</h2>
+
+<p>Nested getter/setter scopes were set incorrectly since version 1.7 or so. This has been fixed. In your getter/setter, <code>this</code> now properly refers to the instance.</p>
+
+<pre><code>var SongSchema = new Schema({
+    title: String
+  , detail: {
+        format: String
+    }
+});
+
+SongSchema.path('detail.format').get(function () {
+  console.log(this !== this.detail) // true, used to be false
+});
+</code></pre>
+
+<p>You may not have noticed this bug since the circular getters previously masked (<em>mostly</em>) this bad behavior.</p>
+
+<h2>Setters application</h2>
+
+<p>Setters are no longer applied when the doc returns from the db (bug). It caused problems for folks trying to use setters for passwords / salts resulting in doubly hashed passwords after queries.</p>
+
+<pre><code>UserSchema.path('password').set(function (val) {
+  // now only runs when you change `user.password`
+  // not when the doc returns from the db
+});
+</code></pre>
+
+<h2>Query#bind</h2>
+
+<p>If you were using the <code>Query</code> object directly and calling its <code>bind</code> method, the v1.x behavior cloned the query and returned the new one. This is no longer the case. The query is now simply bound and returns itself.</p>
+
+<h2>Multiple collection support removed</h2>
+
+<p>In 1.x Mongoose had support for multiple collection names per model. This was an edge case and support for it has been removed.</p>
+
+<h2>Compat.js removed</h2>
+
+<p>Backward compatibility with verions 0.x has been removed.</p>
+
+<pre><code>require('mongoose').compat = true // no longer does anything
+</code></pre>
+
+<h2>Utils.erase removed</h2>
+
+<p>We removed utils.erase since it was unused in the project. If you were using it you'll need to copy it from the 1.x branch into your own.</p>
+
+<h2>Error handling</h2>
+
+<p>Previously, the error returned after failed validation contained an <code>errors</code> object which was a hash of path keys to error message values. Now the Error returned is more helpful. Instead of the <code>errors</code> object containing string values it holds the actual ValidatorError. Each ValidatorError has a <code>type</code> and <code>path</code> property providing us with a little more error handling flexibility.</p>
+
+<pre><code>var ToySchema = new Schema({
+    color: String
+  , name: String
+});
+
+var Toy = db.model('Toy', ToySchema);
+
+Toy.schema.path('name').validate(function (value) {
+  return /blue|green|white|red|orange|periwinkel/i.test(value);
+}, 'Invalid color');
+
+var toy = new Toy({ color: 'grease'});
+
+toy.save(function (err) {
+  // previous behavior (v1x):
+
+  console.log(err.errors.color)
+  // prints 'Validator "Invalid color" failed for path color'
+
+  // new v2x behavior - err.errors.color is a ValidatorError object
+
+  console.log(err.errors.color.message)
+  // prints 'Validator "Invalid color" failed for path color'
+
+  // you can get v1 behavior back by casting error.color toString
+
+  console.log(String(err.errors.color))
+  // prints 'Validator "Invalid color" failed for path color'
+
+  console.log(err.errors.color.type);
+  // prints "Invalid color"
+
+  console.log(err.errors.color.path)
+  // prints "color"
+
+  console.log(err.name)
+  // prints "ValidationError"
+
+  console.log(err.message)
+  // prints "Validation failed"
+});
+</code></pre>
+
+<p>BTW, the <code>err.errors</code> object is also available on the model instance.</p>
+
+<pre><code>toy.errors.color.message === err.errors.color.message
+</code></pre>
+        </div>
+
+        <div id="footer">
+
+          <form action="http://groups.google.com/group/mongoose-orm/boxsubscribe">
+           <a href="http://groups.google.com/group/mongoose-orm" id="google-subscribe-link"><img src="/docs/2.7.x/images/groups.png" border="0"></a>
+           <span id="google-members-count">&nbsp;</span>
+           <div id="google-subscribe-input">
+             Email: <input type="text" name="email" id="google-subscribe-email">
+             <input type="submit" name="go" value="Subscribe">
+           </div>
+          </form>
+
+          <div>
+            Mongoose by <a href="http://github.com/learnboost">LearnBoost Labs</a>.<br>
+            Released under the MIT license.<br>
+            Copyright <a href="http://learnboost.com">LearnBoost 2011</a>.
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

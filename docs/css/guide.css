@@ -10,6 +10,7 @@ html, body, #content {
 .module {
   min-height: 100%;
   box-sizing: border-box;
+  overflow-x: hidden;
 }
 body {
   background: #d8e2d8 url(/docs/images/square_bg.png) fixed;
@@ -59,6 +60,12 @@ pre code {
 }
 h2 {
   margin-top: 0;
+}
+h2 a {
+  font-size: 12px;
+  position: relative;
+  bottom: 3px;
+  font-weight: normal;
 }
 h3 { padding-top: 35px; }
 h3 code {
@@ -211,6 +218,20 @@ li {
 }
 li.guide ul {
   padding-left: 16px;
+}
+
+ul.inthewild {
+  margin: 30px 0 0 -30px;
+  padding: 0;
+  width: 125%;
+  max-width: 125%;
+}
+ul.inthewild li {
+  display: inline-block;
+  list-style: none;
+}
+ul.inthewild img {
+  width: 200px;
 }
 
 @media only screen and (device-width: 768px) {

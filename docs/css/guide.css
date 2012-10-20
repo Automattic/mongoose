@@ -235,9 +235,27 @@ ul.inthewild img {
 }
 
 @media only screen and (device-width: 768px) {
-
+  ul.inthewild {
+    margin-left: 0px;
+  }
 }
+
 @media only screen and (max-width: 480px) {
+  ul.inthewild {
+    margin-left: 0px;
+  }
+  ul.inthewild li {
+    margin: 5px;
+    border-width: 2px 2px 0 2px;
+    border-style: solid;
+    border-color: #eee;
+  }
+  ul.inthewild li img {
+    width: 140px;
+  }
+  h2 a {
+    white-space: nowrap;
+  }
   #forkbanner { display: none }
   #header .mongoose {
     font-size: 65px;

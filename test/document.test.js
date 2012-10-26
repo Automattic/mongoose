@@ -330,7 +330,20 @@ describe('document:', function(){
           , cool  : DocumentObjectId.fromString('4c6c2d6240ced95d0e00003c')
           , path  : 'my path'
         }
+      , hiddenField1 : 'hidden data 1'
+      , hiddenField2 : 'hidden data 2'
       , nested2: {}
+      , nested3 : { hideMe: 'nested hidden data', hideMeDeep: { amI: 'hidden?' } }
+      , nested4: [
+          { secret: 'shh', notSecret: 'ok la' }
+          , { secret: 'shh', notSecret: 'ok la2' }
+          , { secret: 'shh', notSecret: 'ok la3' }
+          , { secret: 'shh', notSecret: 'ok la4' }
+      ]
+      , nested5: [
+          { ok: 'not secret...', veryDeepSecret: { secret: 'shh', ok: 'ok!' } }
+          , { ok: 'not secret...', veryDeepSecret: { secret: 'shh', ok: 'ok!' } }
+      ]
     });
 
     // override to check if toJSON gets fired
@@ -339,8 +352,18 @@ describe('document:', function(){
       return {};
     }
 
-    doc.schema.options.toJSON = { virtuals: true };
+    var pathsToHide = 'hiddenField1 hiddenField2 nested3.hideMe nested3.hideMeDeep.amI nested4.secret nested5.veryDeepSecret.secret';
+    doc.schema.options.toJSON = { virtuals: true, hide: pathsToHide };
     var clone = doc.toJSON();
+    assert.equal(undefined, clone.hiddenField1);
+    assert.equal(undefined, clone.hiddenField2);
+    assert.equal(undefined, clone.nested3.hideMe);
+    clone.nested4.forEach(function(obj) {
+      assert.equal(undefined, obj.secret);
+    });
+    clone.nested5.forEach(function(obj) {
+      assert.equal(undefined, obj.veryDeepSecret.secret);
+    });
     assert.equal('test', clone.test);
     assert.ok(clone.oids instanceof Array);
     assert.equal(5, clone.nested.age);

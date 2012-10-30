@@ -424,6 +424,15 @@ describe('Query', function(){
 
       assert.ok(!threw);
     })
+    it('works with overwriting previous object args (1176)', function(done){
+      var q = new Query();
+      assert.doesNotThrow(function(){
+        q.find({ age: { $lt: 30 }});
+        q.find({ age: 20 }); // overwrite
+      })
+      assert.deepEqual({ age: 20 }, q._conditions)
+      done();
+    })
   })
 
   describe('size', function(){

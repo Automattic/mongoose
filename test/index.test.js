@@ -203,7 +203,7 @@ describe('mongoose module:', function(){
       });
     })
 
-    it('with replset', function(done){
+    it('with replica set', function(done){
       var mong = new Mongoose()
         , uri = process.env.MONGOOSE_SET_TEST_URI
 

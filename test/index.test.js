@@ -39,7 +39,7 @@ describe('mongoose module:', function(){
     })
   });
 
-  it('{g,s}etting options', function(){
+  it('{g,s}etting options', function(done){
     var mongoose = new Mongoose();
 
     mongoose.set('a', 'b');
@@ -48,9 +48,10 @@ describe('mongoose module:', function(){
     assert.equal('b', mongoose.get('a'));
     assert.equal('b', mongoose.set('a'));
     assert.equal('c', mongoose.get('long option'));
+    done();
   });
 
-  it('declaring global plugins', function(){
+  it('declaring global plugins', function(done){
     var mong = new Mongoose()
       , schema = new Schema()
       , called = 0;
@@ -68,6 +69,7 @@ describe('mongoose module:', function(){
     mong.model('GlobalPlugins', schema);
 
     assert.equal(2, called);
+    done()
   })
 
   describe('disconnection of all connections', function(){
@@ -114,7 +116,7 @@ describe('mongoose module:', function(){
         mong.disconnect();
       });
 
-      it('properly handles errors', function(){
+      it('properly handles errors', function(done){
         var mong = new Mongoose()
           , uri = 'mongodb://localhost/mongoose_test'
 
@@ -133,6 +135,7 @@ describe('mongoose module:', function(){
           failure = err;
         }
         assert.equal('bam', failure.message);
+        done();
       })
     });
 
@@ -151,7 +154,7 @@ describe('mongoose module:', function(){
   });
 
   describe('model()', function(){
-    it('accessing a model that hasn\'t been defined', function(){
+    it('accessing a model that hasn\'t been defined', function(done){
       var mong = new Mongoose()
         , thrown = false;
 
@@ -163,8 +166,9 @@ describe('mongoose module:', function(){
       }
 
       assert.equal(true, thrown);
+      done()
     });
-    it('returns the model at creation', function(){
+    it('returns the model at creation', function(done){
       var Named = mongoose.model('Named', new Schema({ name: String }));
       var n1 = new Named();
       assert.equal(n1.name, null);
@@ -175,6 +179,7 @@ describe('mongoose module:', function(){
       var Numbered = mongoose.model('Numbered', schema, collection);
       var n3 = new Numbered({ number: 1234 });
       assert.equal(1234, n3.number.valueOf());
+      done()
     });
   });
 
@@ -301,7 +306,7 @@ describe('mongoose module:', function(){
     }
   });
 
-  it('public exports', function(){
+  it('public exports', function(done){
     assert.equal('string', typeof mongoose.version);
     assert.equal('function', typeof mongoose.Collection);
     assert.equal('function', typeof mongoose.Connection);
@@ -311,6 +316,7 @@ describe('mongoose module:', function(){
     assert.equal('function', typeof mongoose.Promise);
     assert.equal('function', typeof mongoose.Model);
     assert.equal('function', typeof mongoose.Document);
+    done()
   })
 
 });

@@ -268,7 +268,7 @@ describe('model: findOneAndUpdate:', function(){
     });
   });
 
-  it('options/conditions/doc are merged when no callback is passed', function(){
+  it('options/conditions/doc are merged when no callback is passed', function(done){
     var db = start()
       , M = db.model(modelname, collection)
 
@@ -319,6 +319,7 @@ describe('model: findOneAndUpdate:', function(){
     assert.strictEqual(undefined, query.options.new);
     assert.equal(undefined, query._updateArg.date);
     assert.strictEqual(undefined, query._conditions.author);
+    done();
   })
 
   it('executes when a callback is passed', function(done){
@@ -363,7 +364,7 @@ describe('model: findOneAndUpdate:', function(){
     }
   });
 
-  it('executing with only a callback throws', function(){
+  it('executing with only a callback throws', function(done){
     var db = start()
       , M = db.model(modelname, collection)
       , err
@@ -376,6 +377,7 @@ describe('model: findOneAndUpdate:', function(){
 
     db.close();
     assert.ok(/First argument must not be a function/.test(err));
+    done();
   });
 
   it('updates numbers atomically', function(done){
@@ -472,7 +474,7 @@ describe('model: findOneAndUpdate:', function(){
 });
 
 describe('model: findByIdAndUpdate:', function(){
-  it('executing with just a callback throws', function(){
+  it('executing with just a callback throws', function(done){
     var db = start()
       , M = db.model(modelname, collection)
       , err
@@ -485,6 +487,7 @@ describe('model: findByIdAndUpdate:', function(){
 
     db.close();
     assert.ok(/First argument must not be a function/.test(err));
+    done();
   });
 
   it('executes when a callback is passed', function(done){
@@ -585,7 +588,7 @@ describe('model: findByIdAndUpdate:', function(){
     });
   })
 
-  it('options/conditions/doc are merged when no callback is passed', function(){
+  it('options/conditions/doc are merged when no callback is passed', function(done){
     var db = start()
       , M = db.model(modelname, collection)
       , _id = new DocumentObjectId
@@ -615,9 +618,10 @@ describe('model: findByIdAndUpdate:', function(){
     assert.strictEqual(undefined, query.options.new);
     assert.equal(undefined, query._updateArg.date);
     assert.strictEqual(undefined, query._conditions._id);
+    done();
   });
 
-  it('supports v3 select string syntax', function(){
+  it('supports v3 select string syntax', function(done){
     var db = start()
       , M = db.model(modelname, collection)
       , _id = new DocumentObjectId
@@ -634,9 +638,10 @@ describe('model: findByIdAndUpdate:', function(){
     query = M.findOneAndUpdate({}, { $set: { date: now }}, { select: 'author -title' });
     assert.strictEqual(1, query._fields.author);
     assert.strictEqual(0, query._fields.title);
+    done();
   })
 
-  it('supports v3 select object syntax', function(){
+  it('supports v3 select object syntax', function(done){
     var db = start()
       , M = db.model(modelname, collection)
       , _id = new DocumentObjectId
@@ -653,9 +658,10 @@ describe('model: findByIdAndUpdate:', function(){
     query = M.findOneAndUpdate({}, { $set: { date: now }}, { select: { author: 1, title: 0 }});
     assert.strictEqual(1, query._fields.author);
     assert.strictEqual(0, query._fields.title);
+    done();
   })
 
-  it('supports v3 sort string syntax', function(){
+  it('supports v3 sort string syntax', function(done){
     var db = start()
       , M = db.model(modelname, collection)
       , _id = new DocumentObjectId
@@ -678,9 +684,10 @@ describe('model: findByIdAndUpdate:', function(){
     assert.equal(1, query.options.sort[0][1]);
     assert.equal('title', query.options.sort[1][0]);
     assert.equal(-1, query.options.sort[1][1]);
+    done();
   })
 
-  it('supports v3 sort object syntax', function(){
+  it('supports v3 sort object syntax', function(done){
     var db = start()
       , M = db.model(modelname, collection)
       , _id = new DocumentObjectId
@@ -703,6 +710,7 @@ describe('model: findByIdAndUpdate:', function(){
     assert.equal(1, query.options.sort[0][1]);
     assert.equal('title', query.options.sort[1][0]);
     assert.equal(-1, query.options.sort[1][1]);
+    done();
   });
 
   it('supports $elemMatch with $in (gh-1091 gh-1100)', function(done){

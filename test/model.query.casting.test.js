@@ -159,7 +159,7 @@ describe('model query casting', function(){
     });
   });
 
-  it('works when finding by Date (gh-204)', function(){
+  it('works when finding by Date (gh-204)', function(done){
     var db = start()
       , P = db.model(modelName, collection);
 
@@ -181,6 +181,7 @@ describe('model query casting', function(){
             db.close();
             assert.ifError(err);
             assert.strictEqual(doc.meta.date, null);
+            done();
           });
         });
       });

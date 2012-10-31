@@ -47,7 +47,7 @@ function TestDoc (schema) {
  */
 
 describe('types.documentarray', function(){
-  it('behaves and quakcs like an array', function(){
+  it('behaves and quakcs like an array', function(done){
     var a = new MongooseDocumentArray();
 
     assert.ok(a instanceof Array);
@@ -60,9 +60,10 @@ describe('types.documentarray', function(){
     var b = new MongooseArray([1,2,3,4]);
     assert.equal('object', typeof b);
     assert.equal(Object.keys(b.toObject()).length,4);
+    done();
   });
 
-  it('#id', function(){
+  it('#id', function(done){
     var Subdocument = TestDoc();
 
     var sub1 = new Subdocument();
@@ -145,10 +146,11 @@ describe('types.documentarray', function(){
     }
     assert.equal(false, threw);
 
+    done();
   })
 
   describe('inspect', function(){
-    it('works with bad data', function(){
+    it('works with bad data', function(done){
       var threw = false;
       var a = new MongooseDocumentArray([null]);
       try {
@@ -158,11 +160,12 @@ describe('types.documentarray', function(){
         console.error(err.stack);
       }
       assert.ok(!threw);
+      done();
     })
   })
 
   describe('toObject', function(){
-    it('works with bad data', function(){
+    it('works with bad data', function(done){
       var threw = false;
       var a = new MongooseDocumentArray([null]);
       try {
@@ -172,12 +175,13 @@ describe('types.documentarray', function(){
         console.error(err.stack);
       }
       assert.ok(!threw);
+      done();
     })
   })
 
   describe('EmbeddedDocumentArray', function(){
     describe('create()', function(){
-      it('works', function(){
+      it('works', function(done){
         var a = new MongooseDocumentArray([]);
         assert.equal('function', typeof a.create);
 
@@ -189,6 +193,7 @@ describe('types.documentarray', function(){
         assert.ok(subdoc._id);
         assert.equal(subdoc.name, '100');
         assert.ok(subdoc instanceof EmbeddedDocument);
+        done();
       })
     })
 

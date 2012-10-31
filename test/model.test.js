@@ -75,7 +75,7 @@ var collection = 'blogposts_' + random();
 
 describe('model', function(){
   describe('constructor', function(){
-    it('works without "new" keyword', function(){
+    it('works without "new" keyword', function(done){
       var B = mongoose.model('BlogPost');
       var b = B();
       assert.ok(b instanceof B);
@@ -84,8 +84,9 @@ describe('model', function(){
       db.close();
       b = B();
       assert.ok(b instanceof B);
+      done();
     })
-    it('works "new" keyword', function(){
+    it('works "new" keyword', function(done){
       var B = mongoose.model('BlogPost');
       var b = new B();
       assert.ok(b instanceof B);
@@ -94,16 +95,18 @@ describe('model', function(){
       db.close();
       b = new B();
       assert.ok(b instanceof B);
+      done();
     })
   })
   describe('isNew', function(){
-    it('is true on instantiation', function(){
+    it('is true on instantiation', function(done){
       var db = start()
         , BlogPost = db.model('BlogPost', collection);
 
       db.close();
       var post = new BlogPost;
       assert.equal(true, post.isNew);
+      done();
     });
 
     it('on parent and subdocs on failed inserts', function(done){
@@ -136,15 +139,16 @@ describe('model', function(){
   });
 
   describe('schema', function(){
-    it('should exist', function(){
+    it('should exist', function(done){
       var db = start()
         , BlogPost = db.model('BlogPost', collection);
 
       db.close();
       assert.ok(BlogPost.schema instanceof Schema);
       assert.ok(BlogPost.prototype.schema instanceof Schema);
+      done();
     });
-    it('emits init event', function(){
+    it('emits init event', function(done){
       var db = start()
         , schema = new Schema({ name: String })
         , model
@@ -156,11 +160,12 @@ describe('model', function(){
       var Named = db.model('EmitInitOnSchema', schema);
       db.close();
       assert.equal(model,Named);
+      done();
     });
   });
 
   describe('structure', function(){
-    it('default when instantiated', function(){
+    it('default when instantiated', function(done){
       var db = start()
         , BlogPost = db.model('BlogPost', collection);
 
@@ -187,11 +192,12 @@ describe('model', function(){
       assert.ok(post.get('owners') instanceof MongooseArray);
       assert.ok(post.get('comments') instanceof DocumentArray);
       assert.ok(post.get('nested.array') instanceof MongooseArray);
+      done();
     });
 
     describe('array', function(){
       describe('defaults', function(){
-        it('to a non-empty array', function(){
+        it('to a non-empty array', function(done){
           var db = start()
             , DefaultArraySchema = new Schema({
                   arr: {type: Array, cast: String, default: ['a', 'b', 'c']}
@@ -207,9 +213,10 @@ describe('model', function(){
           assert.equal(arr.get('arr')[2],'c');
           assert.equal(arr.get('single').length, 1)
           assert.equal(arr.get('single')[0],'a');
+          done()
         });
 
-        it('empty', function(){
+        it('empty', function(done){
           var db = start()
             , DefaultZeroCardArraySchema = new Schema({
                 arr: {type: Array, cast: String, default: []}
@@ -222,11 +229,12 @@ describe('model', function(){
           assert.equal(arr.get('arr').length, 0);
           assert.equal(arr.arr.length, 0);
           assert.equal(arr.auto.length, 0);
+          done();
         });
       });
     })
 
-    it('a hash with one null value', function(){
+    it('a hash with one null value', function(done){
       var db = start()
         , BlogPost = db.model('BlogPost', collection);
 
@@ -235,6 +243,7 @@ describe('model', function(){
       });
       db.close();
       assert.strictEqual(null, post.title);
+      done();
     });
 
     it('when saved', function(done){
@@ -288,7 +297,7 @@ describe('model', function(){
     })
 
     describe('init', function(){
-      it('works', function(){
+      it('works', function(done){
         var db = start()
           , BlogPost = db.model('BlogPost', collection);
 
@@ -342,9 +351,10 @@ describe('model', function(){
         assert.ok(post.comments instanceof DocumentArray);
         assert.ok(post.comments[0] instanceof EmbeddedDocument);
         assert.ok(post.comments[1] instanceof EmbeddedDocument);
+        done();
       })
 
-      it('partially', function(){
+      it('partially', function(done){
         var db = start()
           , BlogPost = db.model('BlogPost', collection);
 
@@ -368,9 +378,10 @@ describe('model', function(){
 
         assert.ok(post.get('owners') instanceof MongooseArray);
         assert.ok(post.get('comments') instanceof DocumentArray);
+        done();
       })
 
-      it('with partial hash', function(){
+      it('with partial hash', function(done){
         var db = start()
           , BlogPost = db.model('BlogPost', collection);
 
@@ -383,9 +394,10 @@ describe('model', function(){
         });
 
         assert.equal(5, post.get('meta.visitors').valueOf());
+        done();
       });
 
-      it('isNew on embedded documents', function(){
+      it('isNew on embedded documents', function(done){
         var db = start()
           , BlogPost = db.model('BlogPost', collection);
 
@@ -398,6 +410,7 @@ describe('model', function(){
         });
 
         assert.equal(false, post.get('comments')[0].isNew);
+        done();
       })
 
       it('isNew on embedded documents after saving', function(done){
@@ -426,7 +439,7 @@ describe('model', function(){
     });
   });
 
-  it('collection name can be specified through schema', function(){
+  it('collection name can be specified through schema', function(done){
     var schema = new Schema({ name: String }, { collection: 'users1' });
     var Named = mongoose.model('CollectionNamedInSchema1', schema);
     assert.equal(Named.prototype.collection.name,'users1');
@@ -436,6 +449,7 @@ describe('model', function(){
     var Named2 = db.model('CollectionNamedInSchema2', users2schema);
     db.close();
     assert.equal(Named2.prototype.collection.name,'users2');
+    done();
   });
 
   it('saving a model with a null value should perpetuate that null value to the db', function(done){
@@ -560,16 +574,17 @@ describe('model', function(){
   });
 
   describe('methods', function(){
-    it('can be defined', function(){
+    it('can be defined', function(done){
       var db = start()
         , BlogPost = db.model('BlogPost', collection);
 
       db.close();
       var post = new BlogPost();
       assert.equal(post, post.cool());
+      done();
     })
 
-    it('can be defined on embedded documents', function(){
+    it('can be defined on embedded documents', function(done){
       var db = start();
       var ChildSchema = new Schema({ name: String });
       ChildSchema.method('talk', function () {
@@ -590,16 +605,18 @@ describe('model', function(){
       var p = new ParentA();
       p.children.push({});
       assert.equal('function', typeof p.children[0].talk);
+      done();
     })
   })
 
   describe('statics', function(){
-    it('can be defined', function(){
+    it('can be defined', function(done){
       var db = start()
         , BlogPost = db.model('BlogPost', collection);
 
       db.close();
       assert.equal(BlogPost, BlogPost.woot());
+      done();
     });
   });
 
@@ -741,7 +758,7 @@ describe('model', function(){
       });
     });
 
-    it('$pull', function(){
+    it('$pull', function(done){
       var db = start()
         , BlogPost = db.model('BlogPost', collection)
         , post = new BlogPost();
@@ -749,6 +766,7 @@ describe('model', function(){
       db.close();
       post.get('numbers').push('3');
       assert.equal(post.get('numbers')[0], 3);
+      done();
     });
 
     it('$push', function(done){
@@ -1308,7 +1326,7 @@ describe('model', function(){
       });
     });
 
-    it('when required is set to false', function(){
+    it('when required is set to false', function(done){
       function validator () {
         return true;
       }
@@ -1324,6 +1342,7 @@ describe('model', function(){
 
       db.close();
       assert.equal(false, post.schema.path('result').isRequired);
+      done();
     })
 
     describe('middleware', function(){
@@ -1479,7 +1498,7 @@ describe('model', function(){
   });
 
   describe('defaults application', function(){
-    it('works', function(){
+    it('works', function(done){
       var now = Date.now();
 
       mongoose.model('TestDefaults', new Schema({
@@ -1493,9 +1512,10 @@ describe('model', function(){
       var post = new TestDefaults;
       assert.ok(post.get('date') instanceof Date);
       assert.equal(+post.get('date'), now);
+      done()
     });
 
-    it('nested', function(){
+    it('nested', function(done){
       var now = Date.now();
 
       mongoose.model('TestNestedDefaults', new Schema({
@@ -1511,9 +1531,10 @@ describe('model', function(){
       db.close();
       assert.ok(post.get('nested.date') instanceof Date);
       assert.equal(+post.get('nested.date'), now);
+      done();
     })
 
-    it('subdocument', function(){
+    it('subdocument', function(done){
       var now = Date.now();
 
       var Items = new Schema({
@@ -1532,6 +1553,7 @@ describe('model', function(){
       post.get('items').push({});
       assert.ok(post.get('items')[0].get('date') instanceof Date);
       assert.equal(+post.get('items')[0].get('date'), now);
+      done();
     });
 
     it('allows nulls', function(done){
@@ -1555,7 +1577,7 @@ describe('model', function(){
   });
 
   describe('virtuals', function(){
-    it('getters', function(){
+    it('getters', function(done){
       var db = start()
         , BlogPost = db.model('BlogPost', collection)
         , post = new BlogPost({
@@ -1566,9 +1588,10 @@ describe('model', function(){
       db.close();
       assert.equal(post.get('titleWithAuthor'), 'Letters from Earth by Mark Twain');
       assert.equal(post.titleWithAuthor,'Letters from Earth by Mark Twain');
+      done();
     });
 
-    it('set()', function(){
+    it('set()', function(done){
       var db = start()
         , BlogPost = db.model('BlogPost', collection)
         , post = new BlogPost();
@@ -1577,6 +1600,7 @@ describe('model', function(){
       post.set('titleWithAuthor', 'Huckleberry Finn by Mark Twain')
       assert.equal(post.get('title'),'Huckleberry Finn');
       assert.equal(post.get('author'),'Mark Twain');
+      done();
     });
 
     it('should not be saved to the db', function(done){
@@ -1601,7 +1625,7 @@ describe('model', function(){
       });
     });
 
-    it('nested', function(){
+    it('nested', function(done){
       var db = start()
         , PersonSchema = new Schema({
             name: {
@@ -1642,6 +1666,7 @@ describe('model', function(){
       person.name.full = 'Michael Sorrentino';
       assert.equal(person.name.first,'Michael');
       assert.equal(person.name.last,'Sorrentino');
+      done();
     });
   });
 
@@ -1675,7 +1700,7 @@ describe('model', function(){
   });
 
   describe('getters', function(){
-    it('with same name on embedded docs do not class', function(){
+    it('with same name on embedded docs do not class', function(done){
       var Post = new Schema({
           title   : String
         , author  : { name : String }
@@ -1697,9 +1722,10 @@ describe('model', function(){
       assert.equal(post.author.name,'A');
       assert.equal(post.subject.name,'B');
       assert.equal(post.author.name,'A');
+      done();
     });
 
-    it('should not be triggered at construction (gh-685)', function(){
+    it('should not be triggered at construction (gh-685)', function(done){
       var db = start()
         , called = false
 
@@ -1733,9 +1759,10 @@ describe('model', function(){
       assert.equal(true, called);
       assert.equal(100, num.valueOf());
       assert.equal(50, b.getValue('number').valueOf());
+      done();
     })
 
-    it('with type defined with { type: Native } (gh-190)', function(){
+    it('with type defined with { type: Native } (gh-190)', function(done){
       var schema = new Schema({
           date: { type: Date }
       });
@@ -1749,10 +1776,11 @@ describe('model', function(){
       db.close();
       post.set('date', Date.now());
       assert.ok(post.date instanceof Date);
+      done()
     });
 
     describe('nested', function(){
-      it('works', function(){
+      it('works', function(done){
         var schema = new Schema({
           first: {
             second: [Number]
@@ -1767,9 +1795,10 @@ describe('model', function(){
         db.close();
         assert.equal('object', typeof doc.first);
         assert.ok(doc.first.second instanceof MongooseArray);
+        done()
       });
 
-      it('works with object literals', function(){
+      it('works with object literals', function(done){
         var db = start()
           , BlogPost = db.model('BlogPost', collection);
 
@@ -1845,6 +1874,7 @@ describe('model', function(){
         assert.equal((+post.get('meta').date),date - 3000);
         assert.equal((+post.meta.visitors),4815162342);
         assert.equal((+post.get('meta').visitors),4815162342);
+        done();
       })
 
       it('object property access works when root initd with null', function(done){
@@ -2972,7 +3002,7 @@ describe('model', function(){
     });
   });
 
-  it('populating mixed data from the constructor (gh-200)', function(){
+  it('populating mixed data from the constructor (gh-200)', function(done){
     var db = start()
       , BlogPost = db.model('BlogPost');
 
@@ -2990,6 +3020,7 @@ describe('model', function(){
     assert.equal('test', post.mixed.type);
     assert.equal('rules', post.mixed.github);
     assert.equal(3, post.mixed.nested.number);
+    done()
   })
 
   it('"type" is allowed as a key', function(done){
@@ -3254,7 +3285,7 @@ describe('model', function(){
         })
       })
 
-      it('should not work when calling next() after a thrown error', function(){
+      it('should not work when calling next() after a thrown error', function(done){
         var db = start();
 
         var s = new Schema({});
@@ -3274,6 +3305,7 @@ describe('model', function(){
         });
         var Kaboom = db.model('wowNext2xAndThrow', s, 'next2xAndThrow' + random());
         new Kaboom().funky();
+        done();
       });
 
     });
@@ -3608,7 +3640,7 @@ describe('model', function(){
   });
 
   describe('profiling', function(){
-    it('system.profile is a default model', function(){
+    it('system.profile is a default model', function(done){
       var Profile = mongoose.model('system.profile');
       assert.equal('object', typeof Profile.schema.paths.ts);
       assert.equal('object', typeof Profile.schema.paths.info);
@@ -3666,6 +3698,7 @@ describe('model', function(){
       delete db.base.modelSchemas['system.profile']
       delete db.base.models['system.profile']
       delete db.models['system.profile'];
+      done();
     });
 
     it('level can be set', function(done){
@@ -3694,7 +3727,7 @@ describe('model', function(){
   });
 
   describe('console.log', function(){
-    it('hides private props', function(){
+    it('hides private props', function(done){
       var db = start()
         , BlogPost = db.model('BlogPost', collection);
 
@@ -3726,11 +3759,12 @@ describe('model', function(){
       assert.ok(/Wed.+ 2011 \d\d:02:31 GMT/.test(out));
       assert.ok(!/activePaths:/.test(out));
       assert.ok(!/_atomics:/.test(out));
+      done();
     });
   })
 
   describe('pathnames', function(){
-    it('named path can be used', function(){
+    it('named path can be used', function(done){
       var db = start()
         , P = db.model('pathnametest', new Schema({ path: String }))
       db.close();
@@ -3743,6 +3777,7 @@ describe('model', function(){
       }
 
       assert.ok(!threw);
+      done();
     })
   })
 

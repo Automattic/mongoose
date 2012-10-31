@@ -11,7 +11,7 @@ var Promise = require('../lib/promise');
  */
 
 describe('promise', function(){
-  it('events fire right after complete()', function(){
+  it('events fire right after complete()', function(done){
     var promise = new Promise()
       , called = 0;
 
@@ -30,9 +30,10 @@ describe('promise', function(){
     });
 
     assert.equal(2, called);
+    done();
   });
 
-  it('events first right after error()', function(){
+  it('events first right after error()', function(done){
     var promise = new Promise()
       , called = 0;
 
@@ -49,10 +50,11 @@ describe('promise', function(){
     });
 
     assert.equal(2, called);
+    done()
   });
 
   describe('errback+callback', function(){
-    it('from constructor works', function(){
+    it('from constructor works', function(done){
       var called = 0;
       var promise = new Promise(function (err) {
         assert.ok(err instanceof Error);
@@ -62,9 +64,10 @@ describe('promise', function(){
       promise.error(new Error('dawg'));
 
       assert.equal(1, called);
+      done();
     });
 
-    it('after complete()', function(){
+    it('after complete()', function(done){
       var promise = new Promise()
         , called = 0;
 
@@ -81,9 +84,10 @@ describe('promise', function(){
       });
 
       assert.equal(2, called);
+      done();
     })
 
-    it('after error()', function(){
+    it('after error()', function(done){
       var promise = new Promise()
         , called = 0;
 
@@ -99,11 +103,12 @@ describe('promise', function(){
         called++;
       });
       assert.equal(2, called);
+      done();
     })
   });
 
   describe('addCallback shortcut', function(){
-    it('works', function(){
+    it('works', function(done){
       var promise = new Promise()
         , called = 0;
 
@@ -115,40 +120,47 @@ describe('promise', function(){
       promise.complete();
 
       assert.equal(1, called);
+      done();
     })
   })
 
   describe('addErrback shortcut', function(){
-    var promise = new Promise()
-      , called = 0;
+    it('works', function(done){
+      var promise = new Promise()
+        , called = 0;
 
-    promise.addErrback(function (err) {
-      assert.ok(err instanceof Error);
-      called++;
-    });
+      promise.addErrback(function (err) {
+        assert.ok(err instanceof Error);
+        called++;
+      });
 
-    promise.error(new Error);
-
-    assert.equal(1, called);
+      promise.error(new Error);
+      assert.equal(1, called);
+      done();
+    })
   });
 
   describe('return values', function(){
-    it('on()', function(){
+    it('on()', function(done){
       var promise = new Promise()
       assert.ok(promise.on('jump', function(){}) instanceof Promise);
+      done()
     });
 
-    it('addCallback()', function(){
+    it('addCallback()', function(done){
       var promise = new Promise()
       assert.ok(promise.addCallback(function(){}) instanceof Promise);
+      done();
     })
-    it('addErrback()', function(){
+    it('addErrback()', function(done){
       var promise = new Promise()
       assert.ok(promise.addErrback(function(){}) instanceof Promise);
+      done();
     })
-    it('addBack()', function(){
+    it('addBack()', function(done){
       var promise = new Promise()
       assert.ok(promise.addBack(function(){}) instanceof Promise);
+      done();
     })
   })
 })

@@ -123,7 +123,7 @@ describe('document modified', function(){
   });
 
   describe('isModified', function(){
-    it('should not throw with no argument', function(){
+    it('should not throw with no argument', function(done){
       var db = start();
       var BlogPost = db.model(modelName, collection);
       var post = new BlogPost;
@@ -137,9 +137,10 @@ describe('document modified', function(){
       }
 
       assert.equal(false, threw);
+      done();
     });
 
-    it('when modifying keys', function(){
+    it('when modifying keys', function(done){
       var db = start()
         , BlogPost = db.model(modelName, collection);
 
@@ -160,9 +161,10 @@ describe('document modified', function(){
       assert.equal(true, post.isModified('date'));
 
       assert.equal(false, post.isModified('meta.date'));
+      done();
     })
 
-    it('setting a key identically to its current value should not dirty the key', function(){
+    it('setting a key identically to its current value should not dirty the key', function(done){
       var db = start()
         , BlogPost = db.model(modelName, collection);
 
@@ -177,10 +179,11 @@ describe('document modified', function(){
       assert.equal(false, post.isModified('title'));
       post.set('title', 'Test');
       assert.equal(false, post.isModified('title'));
+      done();
     })
 
     describe('on DocumentArray', function(){
-      it('work', function () {
+      it('work', function (done) {
         var db = start()
           , BlogPost = db.model(modelName, collection);
 
@@ -200,8 +203,9 @@ describe('document modified', function(){
         assert.equal(true, post.isDirectModified('comments.0.title'));
 
         db.close();
+        done();
       })
-      it('with accessors', function(){
+      it('with accessors', function(done){
         var db = start()
           , BlogPost = db.model(modelName, collection);
 
@@ -220,11 +224,12 @@ describe('document modified', function(){
         assert.equal(true, post.isDirectModified('comments.0.body'));
 
         db.close();
+        done();
       })
     })
 
     describe('on MongooseArray', function(){
-      it('atomic methods', function(){
+      it('atomic methods', function(done){
         // COMPLETEME
         var db = start()
           , BlogPost = db.model(modelName, collection);
@@ -234,8 +239,9 @@ describe('document modified', function(){
         assert.equal(false, post.isModified('owners'));
         post.get('owners').push(new DocumentObjectId);
         assert.equal(true, post.isModified('owners'));
+        done();
       });
-      it('native methods', function(){
+      it('native methods', function(done){
         // COMPLETEME
         var db = start()
           , BlogPost = db.model(modelName, collection);
@@ -243,6 +249,7 @@ describe('document modified', function(){
         db.close();
         var post = new BlogPost;
         assert.equal(false, post.isModified('owners'));
+        done();
       });
     });
 

@@ -8,7 +8,7 @@ var start = require('./common')
   , mongoose = start.mongoose
 
 describe('document: throws:', function(){
-  it('test document throws mode fails with extra fields', function () {
+  it('test document throws mode fails with extra fields', function (done) {
     var db = mongoose.createConnection("mongodb://localhost/test-crash");
 
     // Simple schema with throws option
@@ -32,6 +32,7 @@ describe('document: throws:', function(){
     }
 
     db.close();
+    done();
 
   });
 })

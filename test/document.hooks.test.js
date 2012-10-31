@@ -222,7 +222,7 @@ describe('document: hooks:', function () {
     });
   });
 
-  it('mutating incoming args via middleware', function(){
+  it('mutating incoming args via middleware', function(done){
     var doc = new TestDocument();
 
     doc.pre('set', function(next, path, val){
@@ -231,6 +231,7 @@ describe('document: hooks:', function () {
 
     doc.set('test', 'me');
     assert.equal('altered-me', doc.test);
+    done();
   });
 
   it('test hooks system errors from a parallel hook', function(done){

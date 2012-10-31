@@ -23,9 +23,10 @@ var coll = 'capped_' + random();
  */
 
 describe('collections: capped:', function(){
-  it('schemas should have option size', function(){
+  it('schemas should have option size', function(done){
     assert.ok(capped.options.capped);
     assert.equal(1000, capped.options.capped.size);
+    done();
   })
   it('creation', function(done){
     var db = start();

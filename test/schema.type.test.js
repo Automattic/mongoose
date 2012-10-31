@@ -8,15 +8,16 @@ var mongoose = require('./common').mongoose
   , Schema = mongoose.Schema
 
 describe('schematype', function(){
-  it('honors the selected option', function(){
+  it('honors the selected option', function(done){
     var s = new Schema({ thought: { type: String, select: false }});
     assert.equal(false, s.path('thought').selected);
 
     var a = new Schema({ thought: { type: String, select: true }});
     assert.equal(true, a.path('thought').selected);
+    done();
   })
 
-  it('properly handles specifying index in combination with unique or sparse', function(){
+  it('properly handles specifying index in combination with unique or sparse', function(done){
     var s = new Schema({ name: { type: String, index: true, unique: true }});
     assert.deepEqual(s.path('name')._index, { unique: true });
     var s = new Schema({ name: { type: String, unique: true, index: true }});
@@ -25,5 +26,6 @@ describe('schematype', function(){
     assert.deepEqual(s.path('name')._index, { sparse: true });
     var s = new Schema({ name: { type: String, sparse: true, index: true }});
     assert.deepEqual(s.path('name')._index, { sparse: true });
+    done();
   })
 })

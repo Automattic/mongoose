@@ -97,7 +97,7 @@ describe('model: findOneAndRemove:', function(){
     });
   })
 
-  it('options/conditions/doc are merged when no callback is passed', function(){
+  it('options/conditions/doc are merged when no callback is passed', function(done){
     var db = start()
       , M = db.model(modelname, collection)
 
@@ -133,6 +133,7 @@ describe('model: findOneAndRemove:', function(){
     query = M.find().findOneAndRemove();
     assert.equal(undefined, query._fields);
     assert.equal(undefined, query._conditions.author);
+    done()
   });
 
   it('executes when a callback is passed', function(done){
@@ -155,7 +156,7 @@ describe('model: findOneAndRemove:', function(){
     }
   });
 
-  it('executed with only a callback throws', function(){
+  it('executed with only a callback throws', function(done){
     var db = start()
       , M = db.model(modelname, collection)
       , err
@@ -168,12 +169,13 @@ describe('model: findOneAndRemove:', function(){
 
     db.close();
     assert.ok(/First argument must not be a function/.test(err));
+    done();
   });
 
 })
 
 describe('model: findByIdAndRemove:', function(){
-  it('executed with only a callback throws', function(){
+  it('executed with only a callback throws', function(done){
     var db = start()
       , M = db.model(modelname, collection)
       , err
@@ -186,6 +188,7 @@ describe('model: findByIdAndRemove:', function(){
 
     db.close();
     assert.ok(/First argument must not be a function/.test(err));
+    done();
   });
 
   it('executes when a callback is passed', function(done){
@@ -227,7 +230,7 @@ describe('model: findByIdAndRemove:', function(){
     });
   });
 
-  it('options/conditions/doc are merged when no callback is passed', function(){
+  it('options/conditions/doc are merged when no callback is passed', function(done){
     var db = start()
       , M = db.model(modelname, collection)
       , _id = new DocumentObjectId
@@ -250,9 +253,10 @@ describe('model: findByIdAndRemove:', function(){
     assert.equal(undefined, query.options.new);
     assert.equal(undefined, query._fields);
     assert.equal(undefined, query._conditions._id);
+    done();
   })
 
-  it('supports v3 select string syntax', function(){
+  it('supports v3 select string syntax', function(done){
     var db = start()
       , M = db.model(modelname, collection)
       , _id = new DocumentObjectId
@@ -269,9 +273,10 @@ describe('model: findByIdAndRemove:', function(){
     query = M.findOneAndRemove({}, { select: 'author -title' });
     assert.strictEqual(1, query._fields.author);
     assert.strictEqual(0, query._fields.title);
+    done();
   })
 
-  it('supports v3 select object syntax', function(){
+  it('supports v3 select object syntax', function(done){
     var db = start()
       , M = db.model(modelname, collection)
       , _id = new DocumentObjectId
@@ -288,9 +293,10 @@ describe('model: findByIdAndRemove:', function(){
     query = M.findOneAndRemove({}, { select: { author: 1, title: 0 }});
     assert.strictEqual(1, query._fields.author);
     assert.strictEqual(0, query._fields.title);
+    done();
   })
 
-  it('supports v3 sort string syntax', function(){
+  it('supports v3 sort string syntax', function(done){
     var db = start()
       , M = db.model(modelname, collection)
       , _id = new DocumentObjectId
@@ -313,9 +319,10 @@ describe('model: findByIdAndRemove:', function(){
     assert.equal(1, query.options.sort[0][1]);
     assert.equal('title', query.options.sort[1][0]);
     assert.equal(-1, query.options.sort[1][1]);
+    done();
   })
 
-  it('supports v3 sort object syntax', function(){
+  it('supports v3 sort object syntax', function(done){
     var db = start()
       , M = db.model(modelname, collection)
       , _id = new DocumentObjectId
@@ -338,6 +345,7 @@ describe('model: findByIdAndRemove:', function(){
     assert.equal(1, query.options.sort[0][1]);
     assert.equal('title', query.options.sort[1][0]);
     assert.equal(-1, query.options.sort[1][1]);
+    done();
   });
 
 })

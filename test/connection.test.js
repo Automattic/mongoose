@@ -21,7 +21,7 @@ describe('connections:', function(){
     db.close(done);
   })
 
-  it('should accept valid arguments', function(){
+  it('should accept valid arguments', function(done){
     var db = mongoose.createConnection('mongodb://localhost/fake');
     db.on('error', function(err){});
     assert.equal('object', typeof db.options);
@@ -170,25 +170,27 @@ describe('connections:', function(){
     assert.equal(undefined, db.pass);
     assert.equal(undefined, db.user);
     db.close();
+    done();
   });
 
   describe('missing protocols', function(){
-    it('are allowed with replsets', function(){
+    it('are allowed with replsets', function(done){
       var conn = mongoose.createConnection('localhost:12345,127.0.0.1:14326', function (err) {
         // force missing db error so we don't actually connect.
         assert.ok(err);
       });
       assert.deepEqual(['localhost', '127.0.0.1'], conn.host);
       assert.deepEqual([12345, 14326], conn.port);
+      done();
     })
-    it('are allowed with single connections', function(){
+    it('are allowed with single connections', function(done){
       var conn = mongoose.createConnection();
       conn.doOpen = function(){};
       conn.open('localhost:12345/woot');
       assert.deepEqual('localhost', conn.host);
       assert.deepEqual(12345, conn.port);
+      done();
     })
-
   });
 
   describe('connect callbacks', function(){
@@ -314,7 +316,7 @@ describe('connections:', function(){
   })
 
   describe('.model()', function(){
-    it('allows passing a schema', function(){
+    it('allows passing a schema', function(done){
       var db = start();
       var MyModel = db.model('MyModelasdf', new Schema({
           name: String
@@ -326,12 +328,15 @@ describe('connections:', function(){
 
       var m = new MyModel({name:'aaron'});
       assert.equal('aaron', m.name);
+      done();
     })
-    it('should properly assign the db', function(){
+
+    it('should properly assign the db', function(done){
       var A = mongoose.model('testing853a', new Schema({x:String}), 'testing853-1');
       var B = mongoose.model('testing853b', new Schema({x:String}), 'testing853-2');
       var C = B.model('testing853a');
       assert.ok(C == A);
+      done();
     })
   })
 

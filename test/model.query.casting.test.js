@@ -234,4 +234,13 @@ describe('model query casting', function(){
       });
     })
   })
+
+  it('properly casts $and (gh-1180)', function (done) {
+    var db = start()
+      , B = db.model(modelName, collection + random())
+      , result = B.find({}).cast(B, {$and:[{date:'1987-03-17T20:00:00.000Z'}, {_id:'000000000000000000000000'}]});
+        assert.ok(result.$and[0].date instanceof Date);
+        assert.ok(result.$and[1]._id instanceof DocumentObjectId);
+      done();
+  })
 });

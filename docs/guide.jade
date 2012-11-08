@@ -408,6 +408,9 @@ block content
     // since we know toJSON is called whenever a js object is stringified:
     console.log(JSON.stringify(m)); // { "_id": "504e0cd7dd992d9be2f20b6f", "name": "Max Headroom is my name" }
 
+  :markdown
+    To see all available `toJSON/toObject` options, read [this](/docs/api.html#document_Document-toObject).
+
   h4#toObject option: toObject
   :markdown
     Documents have a [toObject](/docs/api.html#document_Document-toObject) method which converts the mongoose document into a plain javascript object. This method accepts a few options. Instead of applying these options on a per-document basis we may declare the options here and have it applied to all of this schemas documents by default.
@@ -423,6 +426,9 @@ block content
     var M = mongoose.model('Person', schema);
     var m = new M({ name: 'Max Headroom' });
     console.log(m); // { _id: 504e0cd7dd992d9be2f20b6f, name: 'Max Headroom is my name' }
+
+  :markdown
+    To see all available `toObject` options, read [this](/docs/api.html#document_Document-toObject).
 
   h4#versionKey option: versionKey
   :markdown

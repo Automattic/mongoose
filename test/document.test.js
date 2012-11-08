@@ -321,6 +321,75 @@ describe('document:', function(){
     doc.schema.options.minimize = true;
     clone = doc.toObject();
     assert.equal(undefined, clone.nested2);
+
+    // transform
+    doc.schema.options.toObject = {};
+    doc.schema.options.toObject.transform = function xform (doc, ret, options) {
+
+      if ('function' == typeof doc.ownerDocument)
+        // ignore embedded docs
+        return;
+
+      delete ret.em;
+      delete ret.numbers;
+      delete ret.oids;
+      ret._id = ret._id.toString();
+    }
+
+    clone = doc.toObject();
+    assert.equal(doc.id, clone._id);
+    assert.ok(undefined === clone.em);
+    assert.ok(undefined === clone.numbers);
+    assert.ok(undefined === clone.oids);
+    assert.equal('test', clone.test);
+    assert.equal(5, clone.nested.age);
+
+    // transform with return value
+    var out = { myid: doc._id.toString() }
+    doc.schema.options.toObject.transform = function (doc, ret, options) {
+      if ('function' == typeof doc.ownerDocument)
+        // ignore embedded docs
+        return;
+
+      return { myid: ret._id.toString() }
+    }
+
+    clone = doc.toObject();
+    assert.deepEqual(out, clone);
+
+    // ignored transform with inline options
+    clone = doc.toObject({ x: 1 });
+    assert.ok(!('myid' in clone));
+    assert.equal('test', clone.test);
+    assert.ok(clone.oids instanceof Array);
+    assert.equal(5, clone.nested.age);
+    assert.equal(DocumentObjectId.toString(clone.nested.cool),'4c6c2d6240ced95d0e00003c');
+    assert.equal('my path', clone.nested.path);
+    assert.equal('Object', clone.em[0].constructor.name);
+
+    // applied transform when inline transform is true
+    clone = doc.toObject({ x: 1, transform: true });
+    assert.deepEqual(out, clone);
+
+    // transform passed inline
+    function xform (self, doc, opts) {
+      opts.fields.split(' ').forEach(function (field) {
+        delete doc[field];
+      });
+    }
+    clone = doc.toObject({
+        transform: xform
+      , fields: '_id em numbers oids nested'
+    });
+    assert.equal('test', doc.test);
+    assert.ok(undefined === clone.em);
+    assert.ok(undefined === clone.numbers);
+    assert.ok(undefined === clone.oids);
+    assert.ok(undefined === clone._id);
+    assert.ok(undefined === clone.nested);
+
+    // all done
+    delete doc.schema.options.toObject;
     done();
   })
 
@@ -378,6 +447,73 @@ describe('document:', function(){
     assert.equal('Object', clone.nested2.constructor.name);
     assert.equal(1, Object.keys(clone.nested2).length);
 
+    // transform
+    doc.schema.options.toJSON = {};
+    doc.schema.options.toJSON.transform = function xform (doc, ret, options) {
+      if ('function' == typeof doc.ownerDocument)
+        // ignore embedded docs
+        return;
+
+      delete ret.em;
+      delete ret.numbers;
+      delete ret.oids;
+      ret._id = ret._id.toString();
+    }
+
+    clone = doc.toJSON();
+    assert.equal(doc.id, clone._id);
+    assert.ok(undefined === clone.em);
+    assert.ok(undefined === clone.numbers);
+    assert.ok(undefined === clone.oids);
+    assert.equal('test', clone.test);
+    assert.equal(5, clone.nested.age);
+
+    // transform with return value
+    var out = { myid: doc._id.toString() }
+    doc.schema.options.toJSON.transform = function (doc, ret, options) {
+      if ('function' == typeof doc.ownerDocument)
+        // ignore embedded docs
+        return;
+
+      return { myid: ret._id.toString() }
+    }
+
+    clone = doc.toJSON();
+    assert.deepEqual(out, clone);
+
+    // ignored transform with inline options
+    clone = doc.toJSON({ x: 1 });
+    assert.ok(!('myid' in clone));
+    assert.equal('test', clone.test);
+    assert.ok(clone.oids instanceof Array);
+    assert.equal(5, clone.nested.age);
+    assert.equal(DocumentObjectId.toString(clone.nested.cool),'4c6c2d6240ced95d0e00003c');
+    assert.equal('my path', clone.nested.path);
+    assert.equal('Object', clone.em[0].constructor.name);
+
+    // applied transform when inline transform is true
+    clone = doc.toJSON({ x: 1, transform: true });
+    assert.deepEqual(out, clone);
+
+    // transform passed inline
+    function xform (self, doc, opts) {
+      opts.fields.split(' ').forEach(function (field) {
+        delete doc[field];
+      });
+    }
+    clone = doc.toJSON({
+        transform: xform
+      , fields: '_id em numbers oids nested'
+    });
+    assert.equal('test', doc.test);
+    assert.ok(undefined === clone.em);
+    assert.ok(undefined === clone.numbers);
+    assert.ok(undefined === clone.oids);
+    assert.ok(undefined === clone._id);
+    assert.ok(undefined === clone.nested);
+    assert.ok(undefined === clone.myid);
+
+    // all done
     delete doc.schema.options.toJSON;
     done();
   });

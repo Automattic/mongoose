@@ -1385,8 +1385,20 @@ describe('schema', function(){
       assert.throws(function () {
         s.add({ age: { x: Number }}, 'name.');
       }, /Cannot set nested path/)
-
       assert.equal(false, ('age' in o.name));
+
+      var o = { name: 'string' }
+      var s = new Schema(o);
+
+      assert.throws(function () {
+        s.add({ age: Number }, 'name.');
+      }, /Cannot set nested path/)
+
+      assert.throws(function () {
+        s.add({ age: { x: Number }}, 'name.');
+      }, /Cannot set nested path/)
+
+      assert.equal('string', o.name);
       done();
     });
 

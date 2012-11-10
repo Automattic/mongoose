@@ -1,4 +1,10 @@
 
+2.9.3 / 2012-11-10
+==================
+
+  * updated; driver to 1.1.11
+  * fixed; overwriting of query arguments #1176
+
 2.9.2 / 2012-10-08
 ==================
 

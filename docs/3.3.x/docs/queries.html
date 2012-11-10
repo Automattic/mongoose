@@ -1,0 +1,41 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>Mongoose Queries v3.3.1</title><link href="http://fonts.googleapis.com/css?family=Anonymous+Pro:400,700|Droid+Sans+Mono|Open+Sans:400,700|Linden+Hill|Quattrocento:400,700|News+Cycle:400,700|Antic+Slab|Cabin+Condensed:400,700" rel="stylesheet" type="text/css"><link href="/docs/css/default.css" rel="stylesheet" type="text/css"><link href="/docs/css/guide.css" rel="stylesheet" type="text/css"></head><body><a id="forkbanner" href="http://github.com/learnboost/mongoose"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png" alt="Fork me on GitHub"></a><div id="links"><div id="header"><h1><a href="../index.html"><div class="mongoose">Mongoose</div></a></h1></div><ul><li class="home"><a href="../index.html">home</a></li><li class="faq"><a href="./faq.html">FAQ</a></li><li class="plugins"><a href="http://plugins.mongoosejs.com">plugins</a></li><li class="changelog"><a href="http://github.com/learnboost/mongoose/tree/master/History.md">change log</a></li><li class="support"><a href="../index.html#support">support</a></li><li class="fork"><a href="http://github.com/learnboost/mongoose">fork</a></li><li class="guide"><a href="./guide.html">guide</a><ul><li class="double"><a href="./guide.html">schemas</a><ul><li class="schematypes"><a href="./schematypes.html"><span>schema</span>types</a></li></ul></li><li><a href="./models.html">models</a></li><li class="double"><a href="./documents.html">documents</a><ul><li class="subdocs"><a href="./subdocs.html">sub docs</a></li></ul></li><li><a href="./queries.html">queries</a></li><li><a href="./validation.html">validation</a></li><li><a href="./middleware.html">middleware</a></li><li><a href="./populate.html">population</a></li><li><a href="./connections.html">connections</a></li><li><a href="./plugins.html">plugins</a></li><li><a href="https://github.com/LearnBoost/mongoose/blob/master/CONTRIBUTING.md">contributing</a></li><li><a href="./migration.html">migrating from 2.x</a></li></ul></li><li class="api"><a href="./api.html">API docs</a></li><li class="quickstart"><a href="./index.html">quick start</a></li><li class="contrib"><a href="http://github.com/learnboost/mongoose/contributors">contributors</a></li><li class="prior"><a href="./prior.html">prior releases</a></li></ul></div><div id="content"><div class="module"><h2>Queries</h2><p>Documents can be retrieved through several static helper methods of <a href="./models.html">models</a>.</p><p>Any <a href="./api.html#model_Model">model</a> method which <a href="./api.html#model_Model-find">involves</a> <a href="./api.html#model_Model-findById">specifying</a> <a href="./api.html#model_Model-count">query</a> <a href="./api.html#model_Model-update">conditions</a> can be executed two ways:</p>
+
+<p>When a <code>callback</code> function:</p>
+
+<ul><li>is passed, the operation will be executed immediately with the results passed to the callback.</li><li>is not passed, an instance of <a href="./api.html#query-js">Query</a> is returned, which provides a special <code>QueryBuilder</code> interface for you.</li></ul>
+
+<p>Let&#39;s take a look at what happens when passing a <code>callback</code>:</p><pre><code class="javascript"><span class="keyword">var</span> Person = db.model(<span class="string">'Person'</span>, yourSchema);
+
+<span class="comment">// find each person with a last name matching 'Ghost', selecting the `name` and `occupation` fields</span>
+Person.findOne({ <span class="string">'name.last'</span>: <span class="string">'Ghost'</span> }, <span class="string">'name occupation'</span>, <span class="function"><span class="keyword">function</span> <span class="params">(err, person)</span> {</span>
+  <span class="keyword">if</span> (err) <span class="keyword">return</span> handleError(err);
+  console.log(<span class="string">'%s %s is a %s.'</span>, person.name.first, person.name.last, person.occupation) <span class="comment">// Space Ghost is a talk show host.</span>
+})</code></pre><p>Here we see that the query was executed immediately and the results passed to our callback.
+Now let&#39;s look at what happens when no <code>callback</code> is passed:</p><pre><code class="javascript"><span class="comment">// find each person with a last name matching 'Ghost'</span>
+<span class="keyword">var</span> query = Person.findOne({ <span class="string">'name.last'</span>: <span class="string">'Ghost'</span> });
+
+<span class="comment">// selecting the `name` and `occupation` fields</span>
+query.select(<span class="string">'name occupation'</span>);
+
+<span class="comment">// execute the query at a later time</span>
+query.exec(<span class="function"><span class="keyword">function</span> <span class="params">(err, person)</span> {</span>
+  <span class="keyword">if</span> (err) <span class="keyword">return</span> handleError(err);
+  console.log(<span class="string">'%s %s is a %s.'</span>, person.name.first, person.name.last, person.occupation) <span class="comment">// Space Ghost is a talk show host.</span>
+})</code></pre><p>An instance of <a href="./api.html#query-js">Query</a> was returned which allows us to build up our query. Taking this example further:</p><pre><code class="javascript">Person
+.find({ occupation: <span class="regexp">/host/</span> })
+.where(<span class="string">'name.last'</span>).equals(<span class="string">'Ghost'</span>)
+.where(<span class="string">'age'</span>).gt(<span class="number">17</span>).lt(<span class="number">66</span>)
+.where(<span class="string">'likes'</span>).<span class="keyword">in</span>([<span class="string">'vaporizing'</span>, <span class="string">'talking'</span>])
+.limit(<span class="number">10</span>)
+.sort(<span class="string">'-occupation'</span>)
+.select(<span class="string">'name occupation'</span>)
+.exec(callback);
+</code></pre><h3 id="refs">References to other documents</h3><p>There are no joins in MongoDB but sometimes we still want references to documents in other collections. This is where <a href="./api.html#query_Query-populate">query#populate</a> comes in. Read more <a href="./populate.html">here</a>.</p><h3>Streaming</h3><p>Queries can be <a href="http://nodejs.org/api/stream.html">streamed</a> from MongoDB to your application as well. Simply call the query&#39;s <a href="./api.html#query_Query-stream">stream</a> method instead of <a href="./api.html#query_Query-exec">exec</a> to return an instance of <a href="./api.html#querystream_QueryStream">QueryStream</a>.</p><h3 id="next">Next Up</h3><p>Now that we&#39;ve covered <code>Queries</code>, let&#39;s take a look at <a href="/docs/validation.html">validation</a>.</p></div></div><script>document.body.className = 'load';</script><script>var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-1122274-9']);
+_gaq.push(['_trackPageview']);
+
+(function() {
+  var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+  ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+  var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+})();</script></body></html>

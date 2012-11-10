@@ -1,4 +1,20 @@
 
+3.4.0 / 2012-11-10
+==================
+
+  * added; support for generic toJSON/toObject transforms #1160 #1020 #1197
+  * added; doc.set() merge support #1148 [NuORDER](https://github.com/NuORDER)
+  * added; query#add support #1188 [aleclofabbro](https://github.com/aleclofabbro)
+  * changed; adding invalid nested paths to non-objects throws 4216f14
+  * changed; fixed; stop invalid function cloning (internal fix)
+  * fixed; add query $and casting support #1180 [anotheri](https://github.com/anotheri)
+  * fixed; overwriting of query arguments #1176
+  * docs; fix expires examples
+  * docs; transforms
+  * docs; schema `collection` option docs [hermanjunge](https://github.com/hermanjunge)
+  * website; updated
+  * tests; added
+
 3.3.1 / 2012-10-11
 ==================
 

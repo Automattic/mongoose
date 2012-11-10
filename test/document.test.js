@@ -98,7 +98,7 @@ TestDocument.prototype.hooksTest = function(fn){
 
 describe('document:', function(){
 
-  it('test shortcut getters', function(){
+  it('test shortcut getters', function(done){
     var doc = new TestDocument();
     doc.init({
         test    : 'test'
@@ -172,9 +172,10 @@ describe('document:', function(){
     assert.equal(DocumentObjectId.toString(doc2.nested.cool), '4cf70857337498f95900001c');
 
     assert.ok(doc.oids !== doc2.oids);
+    done();
   });
 
-  it('test shortcut setters', function(){
+  it('test shortcut setters', function(done){
     var doc = new TestDocument();
 
     doc.init({
@@ -199,20 +200,23 @@ describe('document:', function(){
     assert.equal(1, Object.keys(doc._doc.nested).length);
     assert.equal('overwrite the entire nested object', doc.nested.path);
     assert.ok(doc.isModified('nested'));
+    done();
   });
 
-  it('test accessor of id', function(){
+  it('test accessor of id', function(done){
     var doc = new TestDocument();
     assert.ok(doc._id instanceof DocumentObjectId);
+    done();
   });
 
-  it('test shortcut of id hexString', function(){
+  it('test shortcut of id hexString', function(done){
     var doc = new TestDocument()
       , _id = doc._id.toString();
     assert.equal('string', typeof doc.id);
+    done();
   });
 
-  it('test toObject clone', function(){
+  it('test toObject clone', function(done){
     var doc = new TestDocument();
     doc.init({
         test    : 'test'
@@ -234,9 +238,10 @@ describe('document:', function(){
     assert.equal(doc._doc.nested._marked, undefined);
     assert.equal(doc._doc.nested.age._marked, undefined);
     assert.equal(doc._doc.nested.cool._marked, undefined);
+    done();
   });
 
-  it('toObject options', function(){
+  it('toObject options', function(done){
     var doc = new TestDocument();
 
     doc.init({
@@ -316,9 +321,79 @@ describe('document:', function(){
     doc.schema.options.minimize = true;
     clone = doc.toObject();
     assert.equal(undefined, clone.nested2);
+
+    // transform
+    doc.schema.options.toObject = {};
+    doc.schema.options.toObject.transform = function xform (doc, ret, options) {
+
+      if ('function' == typeof doc.ownerDocument)
+        // ignore embedded docs
+        return;
+
+      delete ret.em;
+      delete ret.numbers;
+      delete ret.oids;
+      ret._id = ret._id.toString();
+    }
+
+    clone = doc.toObject();
+    assert.equal(doc.id, clone._id);
+    assert.ok(undefined === clone.em);
+    assert.ok(undefined === clone.numbers);
+    assert.ok(undefined === clone.oids);
+    assert.equal('test', clone.test);
+    assert.equal(5, clone.nested.age);
+
+    // transform with return value
+    var out = { myid: doc._id.toString() }
+    doc.schema.options.toObject.transform = function (doc, ret, options) {
+      if ('function' == typeof doc.ownerDocument)
+        // ignore embedded docs
+        return;
+
+      return { myid: ret._id.toString() }
+    }
+
+    clone = doc.toObject();
+    assert.deepEqual(out, clone);
+
+    // ignored transform with inline options
+    clone = doc.toObject({ x: 1 });
+    assert.ok(!('myid' in clone));
+    assert.equal('test', clone.test);
+    assert.ok(clone.oids instanceof Array);
+    assert.equal(5, clone.nested.age);
+    assert.equal(DocumentObjectId.toString(clone.nested.cool),'4c6c2d6240ced95d0e00003c');
+    assert.equal('my path', clone.nested.path);
+    assert.equal('Object', clone.em[0].constructor.name);
+
+    // applied transform when inline transform is true
+    clone = doc.toObject({ x: 1, transform: true });
+    assert.deepEqual(out, clone);
+
+    // transform passed inline
+    function xform (self, doc, opts) {
+      opts.fields.split(' ').forEach(function (field) {
+        delete doc[field];
+      });
+    }
+    clone = doc.toObject({
+        transform: xform
+      , fields: '_id em numbers oids nested'
+    });
+    assert.equal('test', doc.test);
+    assert.ok(undefined === clone.em);
+    assert.ok(undefined === clone.numbers);
+    assert.ok(undefined === clone.oids);
+    assert.ok(undefined === clone._id);
+    assert.ok(undefined === clone.nested);
+
+    // all done
+    delete doc.schema.options.toObject;
+    done();
   })
 
-  it('toJSON options', function(){
+  it('toJSON options', function(done){
     var doc = new TestDocument();
 
     doc.init({
@@ -372,10 +447,78 @@ describe('document:', function(){
     assert.equal('Object', clone.nested2.constructor.name);
     assert.equal(1, Object.keys(clone.nested2).length);
 
+    // transform
+    doc.schema.options.toJSON = {};
+    doc.schema.options.toJSON.transform = function xform (doc, ret, options) {
+      if ('function' == typeof doc.ownerDocument)
+        // ignore embedded docs
+        return;
+
+      delete ret.em;
+      delete ret.numbers;
+      delete ret.oids;
+      ret._id = ret._id.toString();
+    }
+
+    clone = doc.toJSON();
+    assert.equal(doc.id, clone._id);
+    assert.ok(undefined === clone.em);
+    assert.ok(undefined === clone.numbers);
+    assert.ok(undefined === clone.oids);
+    assert.equal('test', clone.test);
+    assert.equal(5, clone.nested.age);
+
+    // transform with return value
+    var out = { myid: doc._id.toString() }
+    doc.schema.options.toJSON.transform = function (doc, ret, options) {
+      if ('function' == typeof doc.ownerDocument)
+        // ignore embedded docs
+        return;
+
+      return { myid: ret._id.toString() }
+    }
+
+    clone = doc.toJSON();
+    assert.deepEqual(out, clone);
+
+    // ignored transform with inline options
+    clone = doc.toJSON({ x: 1 });
+    assert.ok(!('myid' in clone));
+    assert.equal('test', clone.test);
+    assert.ok(clone.oids instanceof Array);
+    assert.equal(5, clone.nested.age);
+    assert.equal(DocumentObjectId.toString(clone.nested.cool),'4c6c2d6240ced95d0e00003c');
+    assert.equal('my path', clone.nested.path);
+    assert.equal('Object', clone.em[0].constructor.name);
+
+    // applied transform when inline transform is true
+    clone = doc.toJSON({ x: 1, transform: true });
+    assert.deepEqual(out, clone);
+
+    // transform passed inline
+    function xform (self, doc, opts) {
+      opts.fields.split(' ').forEach(function (field) {
+        delete doc[field];
+      });
+    }
+    clone = doc.toJSON({
+        transform: xform
+      , fields: '_id em numbers oids nested'
+    });
+    assert.equal('test', doc.test);
+    assert.ok(undefined === clone.em);
+    assert.ok(undefined === clone.numbers);
+    assert.ok(undefined === clone.oids);
+    assert.ok(undefined === clone._id);
+    assert.ok(undefined === clone.nested);
+    assert.ok(undefined === clone.myid);
+
+    // all done
     delete doc.schema.options.toJSON;
+    done();
   });
 
-  it('jsonifying an object', function(){
+  it('jsonifying an object', function(done){
     var doc = new TestDocument({ test: 'woot' })
       , oidString = DocumentObjectId.toString(doc._id);
 
@@ -387,6 +530,7 @@ describe('document:', function(){
 
     assert.equal('woot', obj.test);
     assert.equal(obj._id, oidString);
+    done();
   });
 
   it('calling update on document should relay to its model (gh-794)', function(done){
@@ -417,28 +561,31 @@ describe('document:', function(){
 
   });
 
-  it('toObject should not set undefined values to null', function(){
+  it('toObject should not set undefined values to null', function(done){
     var doc = new TestDocument()
       , obj = doc.toObject();
 
     delete obj._id;
     assert.deepEqual(obj, { numbers: [], oids: [], em: [] });
+    done();
   })
 
   describe('Errors', function(){
-    it('MongooseErrors should be instances of Error (gh-209)', function(){
+    it('MongooseErrors should be instances of Error (gh-209)', function(done){
       var MongooseError = require('../lib/error')
         , err = new MongooseError("Some message");
       assert.ok(err instanceof Error);
+      done();
     });
-    it('ValidationErrors should be instances of Error', function(){
+    it('ValidationErrors should be instances of Error', function(done){
       var ValidationError = Document.ValidationError
         , err = new ValidationError(new TestDocument);
       assert.ok(err instanceof Error);
+      done();
     });
   });
 
-  it('methods on embedded docs should work', function(){
+  it('methods on embedded docs should work', function(done){
     var db = start()
       , ESchema = new Schema({ name: String })
 
@@ -466,9 +613,10 @@ describe('document:', function(){
     assert.equal('function', typeof p.embed[0].test);
     assert.equal('function', typeof E.ten);
     assert.equal('apple butter', p.embed[0].test());
+    done();
   });
 
-  it('setting a positional path does not cast value to array', function(){
+  it('setting a positional path does not cast value to array', function(done){
     var doc = new TestDocument;
     doc.init({ numbers: [1,3] });
     assert.equal(1, doc.numbers[0]);
@@ -476,9 +624,10 @@ describe('document:', function(){
     doc.set('numbers.1', 2);
     assert.equal(1, doc.numbers[0]);
     assert.equal(2, doc.numbers[1]);
+    done();
   });
 
-  it('no maxListeners warning should occur', function(){
+  it('no maxListeners warning should occur', function(done){
     var db = start();
 
     var traced = false;
@@ -509,9 +658,10 @@ describe('document:', function(){
     var s = new S({ title: "test" });
     db.close();
     assert.equal(false, traced);
+    done();
   });
 
-  it('isSelected()', function(){
+  it('isSelected()', function(done){
     var doc = new TestDocument();
 
     doc.init({
@@ -722,9 +872,10 @@ describe('document:', function(){
     assert.ok(doc.isSelected('em.title'));
     assert.ok(doc.isSelected('em.body'));
     assert.ok(doc.isSelected('em.nonpath'));
+    done();
   })
 
-  it('unselected required fields should pass validation', function(){
+  it('unselected required fields should pass validation', function(done){
     var db = start()
       , Tschema = new Schema({ name: String, req: { type: String, required: true }})
       , T = db.model('unselectedRequiredFieldValidation', Tschema);
@@ -763,6 +914,7 @@ describe('document:', function(){
         });
       });
     });
+    done();
   })
 
   describe('#validate', function(){
@@ -933,17 +1085,19 @@ describe('document:', function(){
       var N = db.model('equals-N', new Schema({ _id: Number }));
       var O = db.model('equals-O', new Schema({ _id: Schema.ObjectId }));
 
-      it('with string _ids', function(){
+      it('with string _ids', function(done){
         var s1 = new S({ _id: 'one' });
         var s2 = new S({ _id: 'one' });
         assert.ok(s1.equals(s2));
+        done();
       })
-      it('with number _ids', function(){
+      it('with number _ids', function(done){
         var n1 = new N({ _id: 0 });
         var n2 = new N({ _id: 0 });
         assert.ok(n1.equals(n2));
+        done();
       })
-      it('with ObjectId _ids', function(){
+      it('with ObjectId _ids', function(done){
         var id = new mongoose.Types.ObjectId;
         var o1 = new O({ _id: id });
         var o2 = new O({ _id: id });
@@ -953,6 +1107,7 @@ describe('document:', function(){
         o1 = new O({ _id: id });
         o2 = new O({ _id: id });
         assert.ok(o1.equals(o2));
+        done();
       })
 
       after(function () {
@@ -963,7 +1118,7 @@ describe('document:', function(){
 
   describe('setter', function(){
     describe('order', function(){
-      it('is applied correctly', function(){
+      it('is applied correctly', function(done){
         var date = 'Thu Aug 16 2012 09:45:59 GMT-0700';
         var d = new TestDocument();
         dateSetterCalled = false;
@@ -973,12 +1128,13 @@ describe('document:', function(){
         assert.ok(d._doc.date instanceof Date);
         assert.ok(d.date instanceof Date);
         assert.equal(+d.date, +new Date(date));
+        done();
       })
     })
 
     describe('on nested paths', function(){
       describe('using set(path, object)', function(){
-        it('overwrites the entire object', function(){
+        it('overwrites the entire object', function(done){
           var doc = new TestDocument();
 
           doc.init({
@@ -1058,6 +1214,7 @@ describe('document:', function(){
           assert.ok(!doc.isModified('nested.age'));
           assert.ok(doc.isModified('nested.deep'));
           assert.equal('Hank and Marie', doc.nested.deep.x);
+          done();
         })
       })
     })

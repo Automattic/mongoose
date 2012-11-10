@@ -1,0 +1,39 @@
+#!/bin/bash
+
+#make sure firefox launches in the bottom right corner of the window
+
+# read URLs from a data file in a loop
+#regex='([^[:space:]]+)[[:space:]]*(.*)'
+regex='([^[:space:]]+)[|]([^|]+)[|](.*)'
+
+func() {
+    [[ $1 =~ $regex ]]
+    url=${BASH_REMATCH[1]}
+    #                               remove middle space,  lowercase
+    name=`echo ${BASH_REMATCH[2]} | tr -d '[[:space:]]' | tr '[A-Z]' '[a-z]'`
+    desc=${BASH_REMATCH[3]}
+
+    # send URL to the firefox session
+    # firefox --width 1030 --height 768 $url &
+    /Applications/Firefox.app/Contents/MacOS/firefox --width 1030 --height 768 $url &
+    echo started firefox with $url
+    echo preparing screencapture ...
+
+    # take a picture after waiting a bit for the load to finish
+    sleep 6
+    # gm import -window root -crop 1004x768+414+228 -resize 500x350 $name.png
+    screencapture -wo $name.png
+    gm convert $name.png -crop 1004x768+0+80 -resize 200x140 $name.png
+    echo grabbed screenshot $name.png
+}
+
+if [ $1 ]
+then
+  func "$1 $2"
+else
+    while read line
+    do
+        func $line
+    done < urls
+fi
+

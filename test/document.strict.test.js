@@ -85,7 +85,7 @@ describe('document: strict mode:', function(){
       done();
     });
   })
-  it('nested doc', function(){
+  it('nested doc', function(done){
     var db = start();
 
     var lax = new Schema({
@@ -122,6 +122,7 @@ describe('document: strict mode:', function(){
     assert.ok(!('hack' in s.name));
     assert.ok(!s.name.hack);
     assert.ok(!s.shouldnt);
+    done();
   })
   it('sub doc', function(done){
     var db = start();
@@ -172,7 +173,7 @@ describe('document: strict mode:', function(){
     });
   })
 
-  it('virtuals', function(){
+  it('virtuals', function(done){
     var db = start();
 
     var getCount = 0
@@ -210,5 +211,6 @@ describe('document: strict mode:', function(){
 
     assert.equal(1, getCount);
     assert.equal(2, setCount);
+    done();
   })
 })

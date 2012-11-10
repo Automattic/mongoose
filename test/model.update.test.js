@@ -578,7 +578,7 @@ describe('model: update:', function(){
   });
 
   describe('honors strict schemas', function(){
-    it('(gh-699)', function(){
+    it('(gh-699)', function(done){
       var db = start();
       var S = db.model('UpdateStrictSchema');
       db.close();
@@ -587,6 +587,7 @@ describe('model: update:', function(){
       assert.equal(false, doc);
       var doc = S.find()._castUpdate({ $unset: {x: 1}});
       assert.equal(1, Object.keys(doc.$unset).length);
+      done();
     });
 
     it('works', function(done){

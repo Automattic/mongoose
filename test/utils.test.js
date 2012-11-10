@@ -24,100 +24,113 @@ var ActiveRoster = StateMachine.ctor('require', 'init', 'modify');
  */
 
 describe('utils', function(){
-  it('should detect a path as required if it has been required', function () {
-    var ar = new ActiveRoster();
-    ar.require('hello');
-    assert.equal(ar.paths['hello'],'require');
-  })
+  describe('ActiveRoster', function(){
+    it('should detect a path as required if it has been required', function (done) {
+      var ar = new ActiveRoster();
+      ar.require('hello');
+      assert.equal(ar.paths['hello'],'require');
+      done();
+    })
 
-  it('should detect a path as inited if it has been inited', function () {
-    var ar = new ActiveRoster();
-    ar.init('hello');
-    assert.equal(ar.paths['hello'],'init');
-  })
+    it('should detect a path as inited if it has been inited', function (done) {
+      var ar = new ActiveRoster();
+      ar.init('hello');
+      assert.equal(ar.paths['hello'],'init');
+      done();
+    })
 
-  it('should detect a path as modified', function () {
-    var ar = new ActiveRoster();
-    ar.modify('hello');
-    assert.equal(ar.paths['hello'],'modify');
-  })
+    it('should detect a path as modified', function (done) {
+      var ar = new ActiveRoster();
+      ar.modify('hello');
+      assert.equal(ar.paths['hello'],'modify');
+      done();
+    })
 
-  it('should remove a path from an old state upon a state change', function () {
-    var ar = new ActiveRoster();
-    ar.init('hello');
-    ar.modify('hello');
-    assert.ok(!ar.states.init.hasOwnProperty('hello'));
-    assert.ok(ar.states.modify.hasOwnProperty('hello'));
-  })
+    it('should remove a path from an old state upon a state change', function (done) {
+      var ar = new ActiveRoster();
+      ar.init('hello');
+      ar.modify('hello');
+      assert.ok(!ar.states.init.hasOwnProperty('hello'));
+      assert.ok(ar.states.modify.hasOwnProperty('hello'));
+      done();
+    })
 
-  it('forEach should be able to iterate through the paths belonging to one state', function () {
-    var ar = new ActiveRoster();
-    ar.init('hello');
-    ar.init('goodbye');
-    ar.modify('world');
-    ar.require('foo');
-    ar.forEach('init', function (path) {
-      assert.ok(~['hello', 'goodbye'].indexOf(path));
-    });
-  })
+    it('forEach should be able to iterate through the paths belonging to one state', function (done) {
+      var ar = new ActiveRoster();
+      ar.init('hello');
+      ar.init('goodbye');
+      ar.modify('world');
+      ar.require('foo');
+      ar.forEach('init', function (path) {
+        assert.ok(~['hello', 'goodbye'].indexOf(path));
+      });
+      done();
+    })
 
-  it('forEach should be able to iterate through the paths in the union of two or more states', function () {
-    var ar = new ActiveRoster();
-    ar.init('hello');
-    ar.init('goodbye');
-    ar.modify('world');
-    ar.require('foo');
-    ar.forEach('modify', 'require', function (path) {
-      assert.ok(~['world', 'foo'].indexOf(path));
-    });
-  })
+    it('forEach should be able to iterate through the paths in the union of two or more states', function (done) {
+      var ar = new ActiveRoster();
+      ar.init('hello');
+      ar.init('goodbye');
+      ar.modify('world');
+      ar.require('foo');
+      ar.forEach('modify', 'require', function (path) {
+        assert.ok(~['world', 'foo'].indexOf(path));
+      });
+      done();
+    })
 
-  it('forEach should iterate through all paths that have any state if given no state arguments', function () {
-    var ar = new ActiveRoster();
-    ar.init('hello');
-    ar.init('goodbye');
-    ar.modify('world');
-    ar.require('foo');
-    ar.forEach(function (path) {
-      assert.ok(~['hello', 'goodbye','world', 'foo'].indexOf(path));
-    });
-  })
+    it('forEach should iterate through all paths that have any state if given no state arguments', function (done) {
+      var ar = new ActiveRoster();
+      ar.init('hello');
+      ar.init('goodbye');
+      ar.modify('world');
+      ar.require('foo');
+      ar.forEach(function (path) {
+        assert.ok(~['hello', 'goodbye','world', 'foo'].indexOf(path));
+      });
+      done();
+    })
 
-  it('should be able to detect if at least one path exists in a set of states', function () {
-    var ar = new ActiveRoster();
-    ar.init('hello');
-    ar.modify('world');
-    assert.ok(ar.some('init'));
-    assert.ok(ar.some('modify'));
-    assert.ok(!ar.some('require'));
-    assert.ok(ar.some('init', 'modify'));
-    assert.ok(ar.some('init', 'require'));
-    assert.ok(ar.some('modify', 'require'));
-  })
+    it('should be able to detect if at least one path exists in a set of states', function (done) {
+      var ar = new ActiveRoster();
+      ar.init('hello');
+      ar.modify('world');
+      assert.ok(ar.some('init'));
+      assert.ok(ar.some('modify'));
+      assert.ok(!ar.some('require'));
+      assert.ok(ar.some('init', 'modify'));
+      assert.ok(ar.some('init', 'require'));
+      assert.ok(ar.some('modify', 'require'));
+      done();
+    })
 
-  it('should be able to `map` over the set of paths in a given state', function () {
-    var ar = new ActiveRoster();
-    ar.init('hello');
-    ar.modify('world');
-    ar.require('iAmTheWalrus');
-    var suffixedPaths = ar.map('init', 'modify', function (path) {
-      return path + '-suffix';
-    });
-    assert.deepEqual(suffixedPaths,['hello-suffix', 'world-suffix']);
-  })
+    it('should be able to `map` over the set of paths in a given state', function (done) {
+      var ar = new ActiveRoster();
+      ar.init('hello');
+      ar.modify('world');
+      ar.require('iAmTheWalrus');
+      var suffixedPaths = ar.map('init', 'modify', function (path) {
+        return path + '-suffix';
+      });
+      assert.deepEqual(suffixedPaths,['hello-suffix', 'world-suffix']);
+      done();
+    })
 
-  it("should `map` over all states' paths if no states are specified in a `map` invocation", function () {
-    var ar = new ActiveRoster();
-    ar.init('hello');
-    ar.modify('world');
-    ar.require('iAmTheWalrus');
-    var suffixedPaths = ar.map(function (path) {
-      return path + '-suffix';
-    });
-    assert.deepEqual(suffixedPaths,['iAmTheWalrus-suffix', 'hello-suffix', 'world-suffix']);
-  })
+    it("should `map` over all states' paths if no states are specified in a `map` invocation", function (done) {
+      var ar = new ActiveRoster();
+      ar.init('hello');
+      ar.modify('world');
+      ar.require('iAmTheWalrus');
+      var suffixedPaths = ar.map(function (path) {
+        return path + '-suffix';
+      });
+      assert.deepEqual(suffixedPaths,['iAmTheWalrus-suffix', 'hello-suffix', 'world-suffix']);
+      done();
+    })
 
-  it('test utils.options', function () {
+  });
+
+  it('utils.options', function (done) {
     var o = { a: 1, b: 2, c: 3, 0: 'zero1' };
     var defaults = { b: 10, d: 20, 0: 'zero2' };
     var result = utils.options(defaults, o);
@@ -138,9 +151,10 @@ describe('utils', function(){
 
     // same object
     assert.notEqual(defaults, result2);
+    done();
   })
 
-  it('test deepEquals on ObjectIds', function () {
+  it('deepEquals on ObjectIds', function (done) {
     var s = (new ObjectId).toString();
 
     var a = new ObjectId(s)
@@ -149,9 +163,10 @@ describe('utils', function(){
     assert.ok(utils.deepEqual(a, b));
     assert.ok(utils.deepEqual(a, a));
     assert.ok(!utils.deepEqual(a, new ObjectId));
+    done();
   })
 
-  it('deepEquals on MongooseDocumentArray works', function () {
+  it('deepEquals on MongooseDocumentArray works', function (done) {
     var db = start()
       , A = new Schema({ a: String })
       , M = db.model('deepEqualsOnMongooseDocArray', new Schema({
@@ -175,10 +190,11 @@ describe('utils', function(){
 
     m2.set(m1.toObject());
     assert.ok(utils.deepEqual(m1.a1, m2.a1))
+    done();
   })
 
   // gh-688
-  it('deepEquals with MongooseBuffer', function () {
+  it('deepEquals with MongooseBuffer', function (done) {
     var str = "this is the day";
     var a = new MongooseBuffer(str);
     var b = new MongooseBuffer(str);
@@ -192,9 +208,10 @@ describe('utils', function(){
     assert.ok(!utils.deepEqual(a, e))
     assert.ok(!utils.deepEqual(a, []))
     assert.ok(!utils.deepEqual([], a))
+    done();
   })
 
-  it('#readPref', function(){
+  it('#readPref', function(done){
     var r = utils.readPref('p');
     assert.equal('primary', r.mode);
     var r = utils.readPref('primary');
@@ -222,6 +239,7 @@ describe('utils', function(){
 
     var r = utils.readPref('explode');
     assert.equal(false, r.isValid(r.model));
+    done();
   })
 })
 

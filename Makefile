@@ -6,7 +6,7 @@ DOCFILE = docs/source/_docs
 
 test:
 	@node test/dropdb.js
-	@time ./node_modules/.bin/mocha $(T) $(TESTS)
+	@time ./node_modules/.bin/mocha $(T) --async-only $(TESTS)
 	@node test/dropdb.js
 
 docs: ghpages docclean gendocs

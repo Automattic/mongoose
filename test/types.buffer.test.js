@@ -39,7 +39,7 @@ var UserBuffer = new Schema({
 
 describe('types.buffer', function(){
 
-  it('test that a mongoose buffer behaves and quacks like an buffer', function(){
+  it('test that a mongoose buffer behaves and quacks like an buffer', function(done){
     var a = new MongooseBuffer;
 
     assert.ok(a instanceof Buffer);
@@ -53,6 +53,7 @@ describe('types.buffer', function(){
     assert.equal(a.toString('utf8'), 'über');
     assert.equal(b.toString('utf8'), 'buffer shtuffs are neat');
     assert.equal(c.toString('utf8'), 'hello world');
+    done();
   });
 
   it('buffer validation', function (done) {

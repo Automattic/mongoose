@@ -1287,13 +1287,14 @@ describe('model: ref:', function(){
     });
   })
 
-  it('refs should cast to ObjectId from hexstrings', function(){
+  it('refs should cast to ObjectId from hexstrings', function(done){
     var BP = mongoose.model('RefBlogPost', BlogPost);
     var bp = new BP;
     bp._creator = new DocObjectId().toString();
     assert.ok(bp._creator instanceof DocObjectId);
     bp.set('_creator', new DocObjectId().toString());
     assert.ok(bp._creator instanceof DocObjectId);
+    done();
   })
 
   it('populate should work on String _ids', function(done){

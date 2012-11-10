@@ -10,7 +10,7 @@ var start = require('./common')
 
 describe('schematype', function(){
   describe('boolean', function(){
-    it('null default is permitted (gh-523)', function(){
+    it('null default is permitted (gh-523)', function(done){
       var db = start()
         , s1 = new Schema({ b: { type: Boolean, default: null }})
         , M1 = db.model('NullDateDefaultIsAllowed1', s1)
@@ -27,6 +27,7 @@ describe('schematype', function(){
       assert.strictEqual(false, m2.b);
       var m3 = new M3;
       assert.strictEqual(true, m3.b);
+      done();
     })
   })
 })

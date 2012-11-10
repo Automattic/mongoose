@@ -59,7 +59,7 @@ mongoose.model('Mod', ModSchema);
 var geoSchema = new Schema({ loc: { type: [Number], index: '2d'}});
 
 describe('model: querying:', function(){
-  it('find returns a Query', function(){
+  it('find returns a Query', function(done){
     var db = start()
       , BlogPostB = db.model('BlogPostB', collection);
 
@@ -79,9 +79,10 @@ describe('model: querying:', function(){
     assert.ok(BlogPostB.find({}, null, {}) instanceof Query);
 
     db.close();
+    done();
   });
 
-  it('findOne returns a Query', function(){
+  it('findOne returns a Query', function(done){
     var db = start()
       , BlogPostB = db.model('BlogPostB', collection);
 
@@ -101,6 +102,7 @@ describe('model: querying:', function(){
     assert.ok(BlogPostB.findOne({}, null, {}) instanceof Query);
 
     db.close();
+    done();
   });
 
   it('an empty find does not hang', function(done){
@@ -172,11 +174,12 @@ describe('model: querying:', function(){
   });
 
   describe('count', function(){
-    it('returns a Query', function(){
+    it('returns a Query', function(done){
       var db = start()
         , BlogPostB = db.model('BlogPostB', collection);
       assert.ok(BlogPostB.count({}) instanceof Query);
       db.close();
+      done();
     });
 
     it('Query executes when you pass a callback', function(done){
@@ -226,12 +229,13 @@ describe('model: querying:', function(){
   });
 
   describe('distinct', function(){
-    it('returns a Query', function(){
+    it('returns a Query', function(done){
       var db = start()
         , BlogPostB = db.model('BlogPostB', collection);
 
       assert.ok(BlogPostB.distinct('title', {}) instanceof Query);
       db.close();
+      done();
     });
 
     it('executes when you pass a callback', function(done){
@@ -253,13 +257,14 @@ describe('model: querying:', function(){
   });
 
   describe('update', function(){
-    it('returns a Query', function(){
+    it('returns a Query', function(done){
       var db = start()
         , BlogPostB = db.model('BlogPostB', collection);
 
       assert.ok(BlogPostB.update({}, {}) instanceof Query);
       assert.ok(BlogPostB.update({}, {}, {}) instanceof Query);
       db.close();
+      done();
     });
 
     it('Query executes when you pass a callback', function(done){
@@ -1611,6 +1616,53 @@ describe('model: querying:', function(){
       });
     });
   });
+
+  describe('and', function(){
+    it('works with queries gh-1188', function(done){
+      var db = start();
+      var B = db.model('BlogPostB');
+
+      B.create({ title: 'and operator', published: false, author: 'Me' }, function (err, doc) {
+        assert.ifError(err);
+
+        B.find({ $and: [{ title: 'and operator' }] }, function (err, docs) {
+          assert.ifError(err);
+          assert.equal(1, docs.length);
+
+          B.find({ $and: [{ title: 'and operator' }, { published: true }] }, function (err, docs) {
+            assert.ifError(err);
+            assert.equal(0, docs.length);
+
+            B.find({ $and: [{ title: 'and operator' }, { published: false }] }, function (err, docs) {
+              assert.ifError(err);
+              assert.equal(1, docs.length);
+
+              var query = B.find()
+              query.and([
+                  { title: 'and operator', published: false }
+                , { author: 'Me' }
+              ])
+              query.exec(function (err, docs) {
+                assert.ifError(err);
+                assert.equal(1, docs.length);
+
+                var query = B.find()
+                query.and([
+                    { title: 'and operator', published: false }
+                  , { author: 'You' }
+                ])
+                query.exec(function (err, docs) {
+                  assert.ifError(err);
+                  assert.equal(0, docs.length);
+                  done();
+                });
+              });
+            });
+          });
+        });
+      })
+    })
+  })
 });
 
 describe('buffers', function(){

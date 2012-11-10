@@ -1,0 +1,119 @@
+doctype html
+html(lang='en')
+  head
+    meta(charset="utf-8")
+    meta(name="viewport", content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no")
+    title Mongoose Quick Start v#{package.version}
+    link(href='http://fonts.googleapis.com/css?family=Anonymous+Pro:400,700|Droid+Sans+Mono|Open+Sans:400,700|Linden+Hill|Quattrocento:400,700|News+Cycle:400,700|Antic+Slab|Cabin+Condensed:400,700', rel='stylesheet', type='text/css')
+    link(href='/docs/css/default.css', rel='stylesheet', type='text/css')
+    link(href='/docs/css/guide.css', rel='stylesheet', type='text/css')
+    style.
+  body.api
+    a#forkbanner(href="http://github.com/learnboost/mongoose")
+      img(style="position: absolute; top: 0; right: 0; border: 0;", src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png", alt="Fork me on GitHub")
+    #links
+      #header
+        h1
+          a(href="../index.html")
+            .mongoose Mongoose
+      include includes/nav
+    #content
+      .module
+        h2 Getting Started
+        p
+          em
+            | First be sure you have 
+            a(href="http://www.mongodb.org/downloads") MongoDB
+            |  and 
+            a(href="http://nodejs.org/") Nodejs
+            |  installed.
+        p
+          | Now say we like fuzzy kittens and want to record every kitten we ever meet in MongoDB.
+          | The first thing we need to do is include mongoose in our project and open a connection.
+        :js
+          var mongoose = require('mongoose')
+            , db = mongoose.createConnection('localhost', 'test');
+        p We have a pending connection object to the test database running on localhost. We now need to get notified if we connect successfully or if a connection error occurs:
+        :js
+          db.on('error', console.error.bind(console, 'connection error:'));
+          db.once('open', function () {
+            // yay!
+          });
+        p Once our connection opens, our callback will be called. For brevity, let's assume that all following code is within this callback.
+        p
+          | With Mongoose, everything is derived from a 
+          a(href="./api.html#schema_Schema") Schema
+          | . Let's get a reference to it and define our kittens.
+        :js
+          var kittySchema = new mongoose.Schema({
+              name: String
+          })
+        p
+          | So far so good. We've got a schema with one property, 
+          code name
+          | , which will be a 
+          code String
+          | . The next step is compiling our schema into a 
+          a(href="./api.html#model_Model") model
+          | .
+        :js
+          var Kitten = db.model('Kitten', kittySchema)
+        p
+          | A model is a class with which we construct documents.
+          | In this case, each document will be a kitten with properties and behaviors as declared in our schema.
+          | Let's create a kitten document representing the little guy we just met on the sidewalk outside:
+        :js
+          var silence = new Kitten({ name: 'Silence' })
+          console.log(silence.name) // 'Silence'
+        p Kittens can meow, so let's take a look at how to add "speak" functionality to our documents:
+        :js
+          kittySchema.methods.speak = function () {
+            var greeting = this.name
+              ? "Meow name is " + this.name
+              : "I don't have a name"
+            console.log(greeting);
+          }
+
+          var Kitten = db.model('Kitten', kittySchema)
+        p
+          | Functions added to the 
+          code methods
+          |  property of a schema get compiled into the Model prototype and exposed on each document instance:
+        :js
+          var fluffy = new Kitten({ name: 'fluffy' });
+          fluffy.speak() // "Meow name is fluffy"
+        p
+          | We have talking kittens! But we still haven't saved anything to MongoDB.
+          | Each document can be saved to the database by calling its 
+          code save
+          |  method. The first argument to the callback will be an error if any occured.
+        :js
+          fluffy.save(function (err) {
+            if (err) // TODO handle the error
+            console.log('meow')
+          });
+        p
+          | Say time goes by and we want to display all the kittens we've seen.
+          | We can access all of the kitten documents through our Kitten model.
+        :js
+          Kitten.find(function (err, kittens) {
+            if (err) // TODO handle err
+            console.log(kittens)
+          })
+        p
+          | We just logged all of the kittens in our db to the console.
+          | If we want to filter our kittens by name, Mongoose supports MongoDbs rich querying syntax.
+        :js
+          Kitten.find({ name: /fluff/i }, callback)
+        p
+          | This performs a case-insensitive search for all documents with a name property containing "fluff" and returns the results to the callback.
+        h3 Congratulations
+        p
+          | That's the end of our quick start. We created a schema, added a custom document method, saved and queried kittens in MongoDB using Mongoose. Head over to the 
+          a(href="guide.html") guide
+          | , or 
+          a(href="api.html") api docs
+          |  for more.
+    script.
+      document.body.className = 'load';
+    include includes/googleanalytics

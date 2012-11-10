@@ -30,17 +30,18 @@ mongoose.model('Pet', Pet);
  */
 
 describe('types array', function(){
-  it('behaves and quacks like an Array', function(){
+  it('behaves and quacks like an Array', function(done){
     var a = new MongooseArray;
 
     assert.ok(a instanceof Array);
     assert.ok(a instanceof MongooseArray);
     assert.equal(true, Array.isArray(a));
     assert.deepEqual(a._atomics.constructor, Object);
+    done();
   });
 
   describe('hasAtomics', function(){
-    it('does not throw', function(){
+    it('does not throw', function(done){
       var b = new MongooseArray([12,3,4,5]).filter(Boolean);
       var threw = false;
 
@@ -61,6 +62,7 @@ describe('types array', function(){
       }
 
       assert.ok(!threw);
+      done();
     });
 
   })
@@ -1329,7 +1331,7 @@ describe('types array', function(){
   });
 
   describe('default type', function(){
-    it('casts to Mixed', function(){
+    it('casts to Mixed', function(done){
       var db = start()
         , DefaultArraySchema = new Schema({
             num1: Array
@@ -1366,6 +1368,7 @@ describe('types array', function(){
       }
 
       assert.equal(threw2, false);
+      done();
     })
   })
 

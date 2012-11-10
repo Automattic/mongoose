@@ -18,7 +18,7 @@ mongoose.model('Decorated', DecoratedSchema);
 var collection = 'decorated_' + random();
 
 describe('schema.onthefly', function(){
-  it('setting should cache the schema type and cast values appropriately', function () {
+  it('setting should cache the schema type and cast values appropriately', function (done) {
     var db = start()
       , Decorated = db.model('Decorated', collection);
 
@@ -26,9 +26,10 @@ describe('schema.onthefly', function(){
     var post = new Decorated();
     post.set('adhoc', '9', Number);
     assert.equal(9, post.get('adhoc').valueOf());
+    done();
   });
 
-  it('should be local to the particular document', function () {
+  it('should be local to the particular document', function (done) {
     var db = start()
       , Decorated = db.model('Decorated', collection);
 
@@ -40,6 +41,7 @@ describe('schema.onthefly', function(){
     var postTwo = new Decorated();
     assert.notStrictEqual(postTwo._path('title'),undefined);
     assert.strictEqual(undefined, postTwo._path('adhoc'));
+    done();
   });
 
   it('querying a document that had an on the fly schema should work', function (done) {
@@ -81,7 +83,7 @@ describe('schema.onthefly', function(){
     });
   });
 
-  it('on the fly Embedded Array schemas should cast properly', function () {
+  it('on the fly Embedded Array schemas should cast properly', function (done) {
     var db = start()
       , Decorated = db.model('Decorated', collection);
 
@@ -89,6 +91,7 @@ describe('schema.onthefly', function(){
     var post = new Decorated();
     post.set('moderators', [{name: 'alex trebek'}], [new Schema({name: String})]);
     assert.equal(post.get('moderators')[0].name,'alex trebek');
+    done();
   })
 
   it('on the fly Embedded Array schemas should get from a fresh queried document properly', function (done) {
@@ -118,7 +121,8 @@ describe('schema.onthefly', function(){
     });
   })
 
-  it('should support on the fly nested documents', function () {
+  it('should support on the fly nested documents', function (done) {
     // TODO
+    done();
   });
 })

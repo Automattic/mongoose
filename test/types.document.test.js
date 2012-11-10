@@ -80,14 +80,15 @@ describe('types.document', function(){
     });
   });
 
-  it('objects can be passed to #set', function () {
+  it('objects can be passed to #set', function (done) {
     var a = new Subdocument();
     a.set({ test: 'paradiddle', work: 'good flam'});
     assert.equal(a.test, 'paradiddle');
     assert.equal(a.work, 'good flam');
+    done();
   })
 
-  it('Subdocuments can be passed to #set', function () {
+  it('Subdocuments can be passed to #set', function (done) {
     var a = new Subdocument();
     a.set({ test: 'paradiddle', work: 'good flam'});
     assert.equal(a.test, 'paradiddle');
@@ -96,9 +97,10 @@ describe('types.document', function(){
     b.set(a);
     assert.equal(b.test, 'paradiddle');
     assert.equal(b.work, 'good flam');
+    done();
   })
 
-  it('cached _ids', function () {
+  it('cached _ids', function (done) {
     var db = start();
     var Movie = db.model('Movie');
     db.close();
@@ -117,6 +119,7 @@ describe('types.document', function(){
     assert.strictEqual(true, m.__id !== m2.__id);
     assert.strictEqual(true, m.id !== m2.id);
     assert.strictEqual(true, m.__id !== m2.__id);
+    done();
   });
 
   it('Subdocument#remove (gh-531)', function (done) {

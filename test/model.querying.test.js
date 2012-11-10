@@ -1616,6 +1616,53 @@ describe('model: querying:', function(){
       });
     });
   });
+
+  describe('and', function(){
+    it('works with queries gh-1188', function(done){
+      var db = start();
+      var B = db.model('BlogPostB');
+
+      B.create({ title: 'and operator', published: false, author: 'Me' }, function (err, doc) {
+        assert.ifError(err);
+
+        B.find({ $and: [{ title: 'and operator' }] }, function (err, docs) {
+          assert.ifError(err);
+          assert.equal(1, docs.length);
+
+          B.find({ $and: [{ title: 'and operator' }, { published: true }] }, function (err, docs) {
+            assert.ifError(err);
+            assert.equal(0, docs.length);
+
+            B.find({ $and: [{ title: 'and operator' }, { published: false }] }, function (err, docs) {
+              assert.ifError(err);
+              assert.equal(1, docs.length);
+
+              var query = B.find()
+              query.and([
+                  { title: 'and operator', published: false }
+                , { author: 'Me' }
+              ])
+              query.exec(function (err, docs) {
+                assert.ifError(err);
+                assert.equal(1, docs.length);
+
+                var query = B.find()
+                query.and([
+                    { title: 'and operator', published: false }
+                  , { author: 'You' }
+                ])
+                query.exec(function (err, docs) {
+                  assert.ifError(err);
+                  assert.equal(0, docs.length);
+                  done();
+                });
+              });
+            });
+          });
+        });
+      })
+    })
+  })
 });
 
 describe('buffers', function(){

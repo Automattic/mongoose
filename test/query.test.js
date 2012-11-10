@@ -704,6 +704,25 @@ describe('Query', function(){
     });
   })
 
+  describe('and', function(){
+    it('works', function(done){
+      var query = new Query;
+      query.find({ $and: [{x:1},{y:2}] });
+      assert.equal(query._conditions.$and.length, 2);
+      query.and([{z:"We're under attack"}, {w:47}]);
+      assert.equal(query._conditions.$and.length, 4);
+      assert.equal(query._conditions.$and[3].w, 47);
+      query.and({a:"phew"});
+      assert.equal(query._conditions.$and.length, 5);
+      assert.equal(query._conditions.$and[0].x, 1);
+      assert.equal(query._conditions.$and[1].y, 2);
+      assert.equal(query._conditions.$and[2].z, "We're under attack");
+      assert.equal(query._conditions.$and[3].w, 47);
+      assert.equal(query._conditions.$and[4].a, "phew");
+      done();
+    });
+  })
+
   describe('an empty query', function(){
     it('should not throw', function(done){
       var query = new Query();

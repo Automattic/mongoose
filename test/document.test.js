@@ -1220,4 +1220,61 @@ describe('document:', function(){
     })
 
   })
+  
+  describe('#markNotModified', function(){
+    it('works', function(done){
+      var db = start();
+      
+      var schema = new Schema({
+          f : String
+        , g : [String]
+      });
+      schema.pre('save', function(next){
+        this.markNotModified('g');
+        if (this.isModified('f') && 'string' === typeof this.f){
+          this.g = this.f.split(' ');
+        }
+        next();
+      });
+      var Model = db.model('markNotModifiedDoc', schema);
+      
+      var d = new Model({ f : 'generate 1'});
+      
+      d.save(function(err, doc){
+        assert.ifError(err);
+        Model.findOne({ _id : doc._id }, function(err, doc){
+          assert.ifError(err);
+          
+          doc.set({ g : ['bypass'] });
+          doc.save(function(err, doc){
+            assert.ifError(err);
+            Model.findOne({ _id : doc._id }, function(err, doc){
+              assert.ifError(err);
+            
+              assert.equal(2, doc.g.length);
+              assert.equal('generate', doc.g[0]);
+              assert.equal('1', doc.g[1]);
+          
+              doc.set({ f : 'generate number two'});
+              doc.save(function(err, doc){
+                assert.ifError(err);
+                Model.findOne({ _id : doc._id }, function(err, doc){
+                  assert.ifError(err);
+                  
+                  assert.equal(3, doc.g.length);
+                  assert.equal('generate', doc.g[0]);
+                  assert.equal('number', doc.g[1]);
+                  assert.equal('two', doc.g[2]);
+                  done();
+                });
+              });
+            });
+          });
+        });
+      });
+    });
+  });
+  
+  
+  
 })

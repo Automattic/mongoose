@@ -227,6 +227,7 @@ describe('versioning', function(){
     }
 
     function test12 (err, a, b) {
+      assert.ok(err instanceof VersionError);
       assert.ok(/No matching document/.test(err), 'changes to b should not be applied');
       assert.equal(5, a.comments.length);
 

@@ -61,7 +61,7 @@ Once connected, the `open` event is fired on the `Connection` instance. If you'r
 
 ## Defining a Model
 
-Models are defined through the `Schema` interface. 
+Models are defined through the `Schema` interface.
 
     var Schema = mongoose.Schema
       , ObjectId = Schema.ObjectId;
@@ -255,14 +255,14 @@ Moreover, you can mutate the incoming `method` arguments so that subsequent midd
     // pre declaration is chainable
     .pre(method, function secondPre (next, methodArg1, methodArg2) {
       console.log(methodArg1);
-      // => 'altered-originalValOfMethodArg1' 
-      
+      // => 'altered-originalValOfMethodArg1'
+
       console.log(methodArg2);
-      // => 'originalValOfMethodArg2' 
-      
+      // => 'originalValOfMethodArg2'
+
       // Passing no arguments to `next` automatically passes along the current argument values
       // i.e., the following `next()` is equivalent to `next(methodArg1, methodArg2)`
-      // and also equivalent to, with the example method arg 
+      // and also equivalent to, with the example method arg
       // values, `next('altered-originalValOfMethodArg1', 'originalValOfMethodArg2')`
       next();
     })

@@ -16,10 +16,10 @@ var start = require('./common')
   , EmbeddedDocument = mongoose.Types.Embedded
   , MongooseArray = mongoose.Types.Array
   , MongooseError = mongoose.Error
-  , CastError = mongoose.Errors.CastError
-  , ValidatorError = mongoose.Errors.ValidatorError
-  , ValidationError = mongoose.Errors.ValidationError
-  , VersionError = mongoose.Errors.VersionError
+  , CastError = mongoose.Error.CastError
+  , ValidatorError = mongoose.Error.ValidatorError
+  , ValidationError = mongoose.Error.ValidationError
+  , VersionError = mongoose.Error.VersionError
   ;
 
 /**

@@ -316,12 +316,12 @@ describe('mongoose module:', function(){
     assert.equal('function', typeof mongoose.Promise);
     assert.equal('function', typeof mongoose.Model);
     assert.equal('function', typeof mongoose.Document);
-    assert.equal('Object', mongoose.Errors.constructor.name);
-    assert.equal('function', typeof mongoose.Errors.CastError);
-    assert.equal('function', typeof mongoose.Errors.DocumentError);
-    assert.equal('function', typeof mongoose.Errors.ValidationError);
-    assert.equal('function', typeof mongoose.Errors.ValidatorError);
-    assert.equal('function', typeof mongoose.Errors.VersionError);
+    assert.equal('function', typeof mongoose.Error);
+    assert.equal('function', typeof mongoose.Error.CastError);
+    assert.equal('function', typeof mongoose.Error.DocumentError);
+    assert.equal('function', typeof mongoose.Error.ValidationError);
+    assert.equal('function', typeof mongoose.Error.ValidatorError);
+    assert.equal('function', typeof mongoose.Error.VersionError);
     done()
   })
 

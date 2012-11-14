@@ -1697,6 +1697,30 @@ describe('model', function(){
         });
       });
     });
+
+    describe('when called multiple times', function(){
+      it('always executes the passed callback gh-1210', function(done){
+        var db = start()
+          , collection = 'blogposts_' + random()
+          , BlogPost = db.model('BlogPost', collection)
+          , post = new BlogPost();
+
+        post.save(function (err) {
+          assert.ifError(err);
+
+          var pending = 2;
+
+          post.remove(function () {
+            if (--pending) return;
+            done();
+          });
+          post.remove(function () {
+            if (--pending) return;
+            done();
+          });
+        });
+      })
+    })
   });
 
   describe('getters', function(){

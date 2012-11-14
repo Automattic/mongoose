@@ -10,15 +10,17 @@ var start = require('./common')
   , Query = require('../lib/query')
   , Schema = mongoose.Schema
   , SchemaType = mongoose.SchemaType
-  , CastError = SchemaType.CastError
-  , ValidatorError = SchemaType.ValidatorError
-  , ValidationError = mongoose.Document.ValidationError
-  , ObjectId = Schema.ObjectId
+  , ObjectId = mongoose.Schema.Types.ObjectId
   , DocumentObjectId = mongoose.Types.ObjectId
   , DocumentArray = mongoose.Types.DocumentArray
   , EmbeddedDocument = mongoose.Types.Embedded
   , MongooseArray = mongoose.Types.Array
-  , MongooseError = mongoose.Error;
+  , MongooseError = mongoose.Error
+  , CastError = mongoose.Errors.CastError
+  , ValidatorError = mongoose.Errors.ValidatorError
+  , ValidationError = mongoose.Errors.ValidationError
+  , VersionError = mongoose.Errors.VersionError
+  ;
 
 /**
  * Setup.

@@ -466,6 +466,22 @@ describe('schema', function(){
       done();
     });
 
+    it('multiple errors', function(done){
+      var MultipleTest = new Schema({
+          testProperty: { type: Number, required: true, min: 1, max: 5 } 
+      });
+      
+      MultipleTest.path('testProperty').doValidate(undefined, function (err) {
+        assert.ok(err instanceof Array);
+        assert.equal(true, Array.isArray(err));
+        assert.equal(err.length, 3);
+        for (var i = 0; i < err.length; i += 1) {
+          assert.ok(err[i] instanceof ValidatorError);
+        };
+        done();
+      });
+    });
+
     describe('async', function(){
       it('works', function(done){
         var executed = 0;

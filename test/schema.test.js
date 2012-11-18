@@ -12,6 +12,7 @@ var start = require('./common')
   , VirtualType = mongoose.VirtualType
   , ObjectId = Schema.ObjectId
   , ValidatorError = SchemaType.ValidatorError
+  , ValidatorCollectionError = SchemaType.ValidatorCollectionError
   , CastError = SchemaType.CastError
   , SchemaTypes = Schema.Types
   , DocumentObjectId = mongoose.Types.ObjectId
@@ -472,11 +473,11 @@ describe('schema', function(){
       });
       
       MultipleTest.path('testProperty').doValidate(undefined, function (err) {
-        assert.ok(err instanceof Array);
-        assert.equal(true, Array.isArray(err));
-        assert.equal(err.length, 3);
-        for (var i = 0; i < err.length; i += 1) {
-          assert.ok(err[i] instanceof ValidatorError);
+        assert.ok(err instanceof ValidatorCollectionError);
+        assert.equal(true, Array.isArray(err.errors));
+        assert.equal(err.errors.length, 3);
+        for (var i = 0; i < err.errors.length; i += 1) {
+          assert.ok(err.errors[i] instanceof ValidatorError);
         };
         done();
       });

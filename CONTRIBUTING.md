@@ -1,9 +1,14 @@
 ## Contributing to Mongoose
 
-### Bugfixes
+### Reporting bugs
 
-- Before starting to write code, look for existing [tickets](https://github.com/learnboost/mongoose/issues) or [create one](https://github.com/learnboost/mongoose/issues/new) for your specific issue. That way you avoid working on something that might not be of interest or that has been addressed already in a different branch.
-  - _The source of this project is written in javascript, not coffeescript, therefore your bug reports should be written with javascript too_. 
+- Before opening a new issue, look for existing [issues](https://github.com/learnboost/mongoose/issues) to avoid duplication. If the issue does not yet exist, [create one](https://github.com/learnboost/mongoose/issues/new).
+  - _The source of this project is written in javascript, not coffeescript, therefore your bug reports should be written in javascript_. 
+
+### Fixing bugs / Adding features
+
+- Before starting to write code, look for existing [issues](https://github.com/learnboost/mongoose/issues). That way you avoid working on something that might not be of interest or that has been addressed already in a different branch. You can create a new issue [here](https://github.com/learnboost/mongoose/issues/new).
+  - _The source of this project is written in javascript, not coffeescript, therefore your bug reports should be written in javascript_. 
 - Fork the [repo](https://github.com/learnboost/mongoose) _or_ for small documentation changes, navigate to the source on github and click the [Edit](https://github.com/blog/844-forking-with-the-edit-button) button.
 - Follow the general coding style of the rest of the project:
   - 2 space tabs
@@ -15,7 +20,7 @@
     - `for (..) {`
     - `while (..) {`
     - `function (err) {`
-- Write tests and make sure they pass (execute `make test` from the cmd line to run the test suite).
+- Write tests and make sure they pass (execute `make test` from the command line to run the test suite).
 
 ### Documentation
 

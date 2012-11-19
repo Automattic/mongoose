@@ -11,7 +11,6 @@ var start = require('./common')
   , SchemaType = mongoose.SchemaType
   , VirtualType = mongoose.VirtualType
   , ValidatorError = mongoose.Error.ValidatorError
-  , ValidatorCollectionError = mongoose.Error.ValidatorCollectionError
   , SchemaTypes = Schema.Types
   , ObjectId = SchemaTypes.ObjectId
   , Mixed = SchemaTypes.Mixed
@@ -472,7 +471,7 @@ describe('schema', function(){
       });
       
       MultipleTest.path('testProperty').doValidate(undefined, function (err) {
-        assert.ok(err instanceof ValidatorCollectionError);
+        assert.ok(err instanceof ValidatorError);
         assert.equal(true, Array.isArray(err.errors));
         assert.equal(err.errors.length, 3);
         for (var i = 0; i < err.errors.length; i += 1) {

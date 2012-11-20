@@ -27,13 +27,20 @@ html(lang='en')
             |  and 
             a(href="http://nodejs.org/") Nodejs
             |  installed.
-        p
-          | Now say we like fuzzy kittens and want to record every kitten we ever meet in MongoDB.
-          | The first thing we need to do is include mongoose in our project and open a connection.
+        :markdown
+          Next install Mongoose from the command line using `npm`:
+
+            $ npm install mongoose
+        :markdown
+          Now say we like fuzzy kittens and want to record every kitten we ever meet in MongoDB.
+          The first thing we need to do is include mongoose in our project and open a connection to the `test` database on our locally running instance of MongoDB.
+
+            $ vim getting-started.js
         :js
-          var mongoose = require('mongoose')
-            , db = mongoose.createConnection('localhost', 'test');
-        p We have a pending connection object to the test database running on localhost. We now need to get notified if we connect successfully or if a connection error occurs:
+          var mongoose = require('mongoose');
+          var db = mongoose.createConnection('mongodb://localhost/test');
+        :markdown
+          We have a pending connection object to the test database running on localhost. We now need to get notified if we connect successfully or if a connection error occurs:
         :js
           db.on('error', console.error.bind(console, 'connection error:'));
           db.once('open', function () {

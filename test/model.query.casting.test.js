@@ -11,7 +11,7 @@ var start = require('./common')
   , Schema = mongoose.Schema
   , SchemaType = mongoose.SchemaType
   , CastError = SchemaType.CastError
-  , ObjectId = Schema.ObjectId
+  , ObjectId = Schema.Types.ObjectId
   , MongooseBuffer = mongoose.Types.Buffer
   , DocumentObjectId = mongoose.Types.ObjectId;
 

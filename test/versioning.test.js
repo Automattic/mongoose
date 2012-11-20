@@ -10,15 +10,17 @@ var start = require('./common')
   , Query = require('../lib/query')
   , Schema = mongoose.Schema
   , SchemaType = mongoose.SchemaType
-  , CastError = SchemaType.CastError
-  , ValidatorError = SchemaType.ValidatorError
-  , ValidationError = mongoose.Document.ValidationError
-  , ObjectId = Schema.ObjectId
+  , ObjectId = mongoose.Schema.Types.ObjectId
   , DocumentObjectId = mongoose.Types.ObjectId
   , DocumentArray = mongoose.Types.DocumentArray
   , EmbeddedDocument = mongoose.Types.Embedded
   , MongooseArray = mongoose.Types.Array
-  , MongooseError = mongoose.Error;
+  , MongooseError = mongoose.Error
+  , CastError = mongoose.Error.CastError
+  , ValidatorError = mongoose.Error.ValidatorError
+  , ValidationError = mongoose.Error.ValidationError
+  , VersionError = mongoose.Error.VersionError
+  ;
 
 /**
  * Setup.
@@ -227,6 +229,7 @@ describe('versioning', function(){
     }
 
     function test12 (err, a, b) {
+      assert.ok(err instanceof VersionError);
       assert.ok(/No matching document/.test(err), 'changes to b should not be applied');
       assert.equal(5, a.comments.length);
 

@@ -53,13 +53,6 @@ var ModSchema = new Schema({
     num: Number
   , str: String
 });
-
-// register init middleware
-var initialized = [];
-ModSchema.pre('init', function (next, instance) {
-  initialized.push(instance);
-  next();
-});
 mongoose.model('Mod', ModSchema);
 
 var geoSchema = new Schema({ loc: { type: [Number], index: '2d'}});
@@ -1093,8 +1086,17 @@ describe('model: querying:', function(){
       Mod.create({num: 1}, {num: 2}, {num: 3}, function (err, one, two, three) {
         assert.ifError(err);
 
-        initialized = []
+        // register init extension
+        var initialized = [];
+        var originalInit = mongoose.Model.prototype.init;
+        mongoose.Model.prototype.init = function () {
+          originalInit.apply(this, arguments);
+          initialized.push(this);
+        };
+        // find some models
         Mod.find().sort({field: 'asc', num: 1}).exec(function (err, found) {
+          assert.ifError(err);
+
           assert.equal(3, found.length);
           assert.equal(found[0]._id.toString(), one._id);
           assert.equal(found[1]._id.toString(), two._id);
@@ -1103,6 +1105,9 @@ describe('model: querying:', function(){
           assert.equal(found[0]._id.toString(), one._id);
           assert.equal(found[1]._id.toString(), two._id);
           assert.equal(found[2]._id.toString(), three._id);
+
+          // restore original init
+          mongoose.Model.prototype.init = originalInit;
           done();
         });
       });

@@ -627,7 +627,41 @@ describe('model: querying:', function(){
           done();
         });
       });
-    })
+    });
+
+    it('execute init hooks on result', function (done){
+      var db = start()
+        , BlogPostB = db.model('BlogPostB', collection)
+        , title = 'Wooooot ' + random();
+
+      var post = new BlogPostB();
+      post.set('title', title);
+
+      post.save(function (err) {
+        assert.ifError(err);
+      
+        // register init extension
+        var initialized = false;
+        var originalInit = mongoose.Model.prototype.init;
+        mongoose.Model.prototype.init = function () {
+          originalInit.apply(this, arguments);
+          initialized = true;
+        };
+
+        BlogPostB.findOne({ title: title }, function (err, doc) {
+          assert.ifError(err);
+          assert.equal(title, doc.get('title'));
+          assert.equal(false, doc.isNew);
+          assert.equal(true, initialized);
+          
+          // restore original init
+          mongoose.Model.prototype.init = originalInit;
+          
+          db.close();
+          done();
+        });
+      });
+    });
   });
 
   describe('findById', function () {

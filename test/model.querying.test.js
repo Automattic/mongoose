@@ -627,7 +627,41 @@ describe('model: querying:', function(){
           done();
         });
       });
-    })
+    });
+
+    it('execute init hooks on result', function (done){
+      var db = start()
+        , BlogPostB = db.model('BlogPostB', collection)
+        , title = 'Wooooot ' + random();
+
+      var post = new BlogPostB();
+      post.set('title', title);
+
+      post.save(function (err) {
+        assert.ifError(err);
+      
+        // register init extension
+        var initialized = false;
+        var originalInit = mongoose.Model.prototype.init;
+        mongoose.Model.prototype.init = function () {
+          originalInit.apply(this, arguments);
+          initialized = true;
+        };
+
+        BlogPostB.findOne({ title: title }, function (err, doc) {
+          assert.ifError(err);
+          assert.equal(title, doc.get('title'));
+          assert.equal(false, doc.isNew);
+          assert.equal(true, initialized);
+          
+          // restore original init
+          mongoose.Model.prototype.init = originalInit;
+          
+          db.close();
+          done();
+        });
+      });
+    });
   });
 
   describe('findById', function () {
@@ -1078,6 +1112,41 @@ describe('model: querying:', function(){
         }
       });
     })
+
+    it('execute init hooks on results', function (done){
+      var db = start()
+        , Mod = db.model('Mod');
+
+      Mod.create({num: 1}, {num: 2}, {num: 3}, function (err, one, two, three) {
+        assert.ifError(err);
+
+        // register init extension
+        var initialized = [];
+        var originalInit = mongoose.Model.prototype.init;
+        mongoose.Model.prototype.init = function () {
+          originalInit.apply(this, arguments);
+          initialized.push(this);
+        };
+        // find some models
+        Mod.find().sort({field: 'asc', num: 1}).exec(function (err, found) {
+          assert.ifError(err);
+
+          assert.equal(3, found.length);
+          assert.equal(found[0]._id.toString(), one._id);
+          assert.equal(found[1]._id.toString(), two._id);
+          assert.equal(found[2]._id.toString(), three._id);
+          assert.equal(3, initialized.length);
+          assert.equal(found[0]._id.toString(), one._id);
+          assert.equal(found[1]._id.toString(), two._id);
+          assert.equal(found[2]._id.toString(), three._id);
+
+          // restore original init
+          mongoose.Model.prototype.init = originalInit;
+          done();
+        });
+      });
+
+    });
 
     it('where $ne', function(done){
       var db = start()

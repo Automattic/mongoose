@@ -338,6 +338,81 @@ describe('connections:', function(){
       assert.ok(C == A);
       done();
     })
+
+    it('prevents overwriting pre-existing models', function(done){
+      var db = start();
+      var name = 'gh-1209-a';
+      db.model(name, new Schema);
+
+      assert.throws(function () {
+        db.model(name, new Schema);
+      }, /Cannot overwrite `gh-1209-a` model/);
+
+      done();
+    })
+
+    it('allows passing identical name + schema args', function(done){
+      var db = start();
+      var name = 'gh-1209-b';
+      var schema = new Schema;
+
+      db.model(name, schema);
+      assert.doesNotThrow(function () {
+        db.model(name, schema);
+      });
+
+      done();
+    })
+
+    it('throws on unknown model name', function(done){
+      var db = start();
+      assert.throws(function () {
+        db.model('iDoNotExist!');
+      }, /Schema hasn't been registered/);
+
+      done();
+    })
+
+    it('uses the passed schema when global model exists with same name (gh-1209)', function(done){
+      var s1 = new Schema({ one: String });
+      var s2 = new Schema({ two: Number });
+
+      var db = start();
+
+      var A = mongoose.model('gh-1209-a', s1);
+      var B = db.model('gh-1209-a', s2);
+
+      assert.ok(A.schema != B.schema);
+      assert.ok(A.schema.paths.one);
+      assert.ok(B.schema.paths.two);
+      assert.ok(!B.schema.paths.one);
+      assert.ok(!A.schema.paths.two);
+
+      // reset
+      delete db.models['gh-1209-a'];
+      var C = db.model('gh-1209-a');
+      assert.ok(C.schema == A.schema);
+
+      done();
+    })
+
+    describe('passing collection name', function(){
+      describe('when model name already exists', function(){
+        it('returns a new uncached model', function(done){
+          var db = start();
+          var s1 = new Schema({ a: [] });
+          var name = 'non-cached-collection-name';
+          var A = db.model(name, s1);
+          var B = db.model(name);
+          var C = db.model(name, 'alternate');
+          assert.ok(A.collection.name == B.collection.name);
+          assert.ok(A.collection.name != C.collection.name);
+          assert.ok(db.models[name].collection.name != C.collection.name);
+          assert.ok(db.models[name].collection.name == A.collection.name);
+          done();
+        })
+      })
+    })
   })
 
   it('error event fires with one listener', function(done){

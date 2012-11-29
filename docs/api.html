@@ -273,7 +273,7 @@ li {
   <span class="keyword">return</span> conn;
 };</code></pre></div><div class="params"><h4>Parameters:</h4><ul><li><code>[uri]</code><span class="types"> &lt;<a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/String">String</a>&gt; </span><span>a mongodb:// URI</span></li><li><code>[options]</code><span class="types"> &lt;<a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Object">Object</a>&gt; </span><span>options to pass to the driver</span></li></ul></div><div class="returns"><h4>Returns:</h4><ul><li><span class="types"> &lt;<a href="#connection_Connection">Connection</a>&gt; </span><span>the created Connection object</span></li></ul></div><div class="see"><h4>See:</h4><ul class="see"><li><a href="#connection_Connection-open" title="Connection#open">Connection#open</a></li><li><a href="#connection_Connection-openSet" title="Connection#openSet">Connection#openSet</a></li></ul></div><div class="description"><p>Each <code>connection</code> instance maps to a single database. This method is helpful when mangaging multiple db connections.</p>
 
-<p>If arguments are passed, they are proxied to either <a href="#connection_Connection-open">Connection#open</a> or <a href="#connection_Connection-openSet">Connection#openSet</a> appropriately. This means we can pass <code>db</code>, <code>server</code>, and <code>replset</code> options to the driver.</p>
+<p>If arguments are passed, they are proxied to either <a href="#connection_Connection-open">Connection#open</a> or <a href="#connection_Connection-openSet">Connection#openSet</a> appropriately. This means we can pass <code>db</code>, <code>server</code>, and <code>replset</code> options to the driver. <em>Note that the <code>safe</code> option specified in your schema will overwrite the <code>safe</code> db option specified here unless you set your schemas <code>safe</code> option to <code>undefined</code>. See <a href="/docs/guide.html#safe">this</a> for more information.</em></p>
 
 <h4>Example:</h4>
 
@@ -330,7 +330,6 @@ db.open(<span class="string">'localhost'</span>, <span class="string">'database'
   });
   <span class="keyword">return</span> <span class="keyword">this</span>;
 };</code></pre></div><div class="params"><h4>Parameters:</h4><ul><li><code>[fn]</code><span class="types"> &lt;<a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Function">Function</a>&gt; </span><span>called after all connection close.</span></li></ul></div><div class="returns"><h4>Returns:</h4><ul><li><span class="types"> &lt;<a href="#index_Mongoose">Mongoose</a>&gt; </span><span>this</span></li></ul></div><div class="description"></div><hr class=""></div><div class="item method public"><h3 id="index_Mongoose-model"><a href="#index_Mongoose-model">Mongoose#model(<code>name</code>, <code>[schema]</code>, <code>[collection]</code>, <code>[skipInit]</code>)</a></h3><p>Defines a model or retrieves it.</p><span class="showcode">show code</span><div class="sourcecode"><pre><code class="javascript">Mongoose.prototype.model = function (name, schema, collection, skipInit) {
-  // normalize collection
   if (!(schema instanceof Schema)) {
     collection = schema;
     schema = false;
@@ -2372,7 +2371,9 @@ db.on(<span class="string">'error'</span>, handleError);</code></pre>
   Document.prototype._registerHooks.call(<span class="keyword">this</span>);
 };</code></pre></div><div class="description"></div><hr class="private"></div><div class="item method public"><h3 id="model_Model-model"><a href="#model_Model-model">Model#model(<code>name</code>)</a></h3><p>Returns another Model instance.</p><span class="showcode">show code</span><div class="sourcecode"><pre><code class="javascript">Model.prototype.model = <span class="function"><span class="keyword">function</span> <span class="title">model</span> <span class="params">(name)</span> {</span>
   <span class="keyword">return</span> <span class="keyword">this</span>.db.model(name);
-};</code></pre></div><div class="params"><h4>Parameters:</h4><ul><li><code>name</code><span class="types"> &lt;<a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/String">String</a>&gt; </span><span>model name</span></li></ul></div><div class="description"><h4>Example:</h4>
+};
+
+<span class="comment">// Model (class) features</span></code></pre></div><div class="params"><h4>Parameters:</h4><ul><li><code>name</code><span class="types"> &lt;<a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/String">String</a>&gt; </span><span>model name</span></li></ul></div><div class="description"><h4>Example:</h4>
 
 <pre><code><span class="keyword">var</span> doc = <span class="keyword">new</span> Tank;
 doc.model(<span class="string">'User'</span>).findById(id, callback);</code></pre></div><hr class=""></div><div class="item method public"><h3 id="model_Model-%24where"><a href="#model_Model-%24where">Model#$where(<code>argument</code>)</a></h3><p>Creates a <code>Query</code> and specifies a <code>$where</code> condition.</p><div class="params"><h4>Parameters:</h4><ul><li><code>argument</code><span class="types"> &lt;<a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/String">String</a>, <a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Function">Function</a>&gt; </span><span>is a javascript string or anonymous function</span></li></ul></div><div class="returns"><h4>Returns:</h4><ul><li><span class="types"> &lt;<a href="#query-js">Query</a>&gt; </span><span></span></li></ul></div><div class="see"><h4>See:</h4><ul class="see"><li><a href="#query_Query-%24where" title="Query.$where">Query.$where</a></li></ul></div><div class="description"><p>Sometimes you need to query for things in mongodb using a JavaScript expression. You can do so via <code>find({ $where: javascript })</code>, or you can use the mongoose shortcut method $where via a Query chain or from your mongoose Model.</p>
@@ -2480,18 +2481,9 @@ MyModel.find({ name: <span class="regexp">/john/i</span> }, <span class="literal
 
 <pre><code>Adventure.findById(id, callback);</code></pre><hr class=""></div><div class="item static public"><h3 id="model_Model-findOne"><a href="#model_Model-findOne">Model.findOne(<code>conditions</code>, <code>[fields]</code>, <code>[options]</code>, <code>[callback]</code>)</a></h3><p>Finds one document.</p><span class="showcode">show code</span><div class="sourcecode"><pre><code class="javascript">Model.findOne = <span class="function"><span class="keyword">function</span> <span class="title">findOne</span> <span class="params">(conditions, fields, options, callback)</span> {</span>
   <span class="keyword">if</span> (<span class="string">'function'</span> == <span class="keyword">typeof</span> options) {
-    <span class="comment">// TODO Handle all 3 of the following scenarios</span>
-    <span class="comment">// Hint: Only some of these scenarios are possible if cQuery is present</span>
-    <span class="comment">// Scenario: findOne(conditions, fields, callback);</span>
-    <span class="comment">// Scenario: findOne(fields, options, callback);</span>
-    <span class="comment">// Scenario: findOne(conditions, options, callback);</span>
     callback = options;
     options = <span class="literal">null</span>;
   } <span class="keyword">else</span> <span class="keyword">if</span> (<span class="string">'function'</span> == <span class="keyword">typeof</span> fields) {
-    <span class="comment">// TODO Handle all 2 of the following scenarios</span>
-    <span class="comment">// Scenario: findOne(conditions, callback)</span>
-    <span class="comment">// Scenario: findOne(fields, callback)</span>
-    <span class="comment">// Scenario: findOne(options, callback);</span>
     callback = fields;
     fields = <span class="literal">null</span>;
     options = <span class="literal">null</span>;

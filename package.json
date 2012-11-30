@@ -30,4 +30,5 @@
         "type": "git"
       , "url": "git://github.com/LearnBoost/mongoose.git"
     }
+  , "homepage": "http://mongoosejs.com"
 }

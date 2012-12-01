@@ -9,7 +9,7 @@
       , "mongodb": "1.2.0"
       , "ms": "0.1.0"
       , "sliced": "0.0.3"
-      , "muri": "0.0.2"
+      , "muri": "0.0.4"
     }
   , "devDependencies": {
         "mocha": "1.4.2"

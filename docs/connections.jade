@@ -12,11 +12,14 @@ block content
     This is the minimum needed to connect the `myapp` database running locally on the default port (27017). We may also specify several more parameters in the `uri` depending on your environment:
 
   :js
-    mongoose.connect('mongodb://username:password@host:port/database');
+    mongoose.connect('mongodb://username:password@host:port/database?options...');
+
+  :markdown
+    See the [mongodb connection string spec](http://docs.mongodb.org/manual/reference/connection-string/) for more detail.
 
   h3 Options
   :markdown
-    The `connect` method also accepts an `options` object which will be passed on to the underlying driver.
+    The `connect` method also accepts an `options` object which will be passed on to the underlying driver. All options included here take precedence over options passed in the connection string.
 
   :js
     mongoose.connect(uri, options);
@@ -41,7 +44,7 @@ block content
     The same method is used to connect to a replica set but instead of passing a single `uri` we pass a comma delimited list of `uri`s.
 
   :js
-    mongoose.connect('mongodb://username:password@host:port/database,mongodb://username:password@host:port,mongodb://username:password@host:port' [, options]);
+    mongoose.connect('mongodb://username:password@host:port/database,mongodb://username:password@host:port,mongodb://username:password@host:port?options...' [, options]);
 
   :markdown
     _NOTE: The `database` need only be specified in one of the `uri`s._
@@ -58,7 +61,12 @@ block content
     Each `connection`, whether created with `mongoose.connect` or `mongoose.createConnection` are all backed by an internal configurable connection pool defaulting to a size of 5. Adjust the pool size using your connection options:
 
   :js
+    var uri = 'mongodb://localhost/test';
     mongoose.createConnection(uri, { server: { poolSize: 10 }});
+
+    // or
+    var uri = 'mongodb://localhost/test?poolSize=10';
+    mongoose.createConnection(uri);
 
   h3#next Next Up
   :markdown

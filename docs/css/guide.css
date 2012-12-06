@@ -220,8 +220,10 @@ li.guide ul {
 
 .important {
   background-color: #FBFF94;
+  margin-left: 5px;
+}
+.important p {
   padding: 22px;
-  margin-right: -11px;
 }
 
 ul.inthewild {

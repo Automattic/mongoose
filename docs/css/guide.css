@@ -218,6 +218,12 @@ li.guide ul {
   padding-left: 16px;
 }
 
+.important {
+  background-color: #FBFF94;
+  padding: 22px;
+  margin-right: -11px;
+}
+
 ul.inthewild {
   margin: 30px 0 0 -30px;
   padding: 0;

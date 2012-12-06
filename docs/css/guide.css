@@ -32,8 +32,6 @@ a {
 a:hover {
   opacity: 0.8;
 }
-#wrap {
-}
 h1 {
   font-family: 'Helvetica Nueue', Helvetica, Arial, FreeSans, sans-serif;
   text-rendering: geometricPrecision;

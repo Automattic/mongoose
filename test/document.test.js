@@ -1216,6 +1216,17 @@ describe('document:', function(){
           done();
         })
       })
+
+      describe('when overwriting with a document instance', function(){
+        it('does not cause StackOverflows (gh-1234)', function(done){
+          var doc = new TestDocument({ nested: { age: 35 }});
+          doc.nested = doc.nested;
+          assert.doesNotThrow(function () {
+            doc.nested.age;
+          });
+          done();
+        })
+      })
     })
 
   })

@@ -25,9 +25,8 @@ describe('crash: (gh-407)', function(){
     }, function (err) {
       db.close();
 
-      // should is acting strange
       try {
-        assert.equal('Invalid ObjectId', err.message);
+        assert.equal('Cast to ObjectId failed for value "" at path "_id"', err.message);
       } catch (er) {
         console.error(err);
         throw er;

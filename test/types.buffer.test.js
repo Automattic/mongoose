@@ -73,7 +73,7 @@ describe('types.buffer', function(){
           assert.equal(err.name, 'CastError');
           assert.equal(err.type, 'buffer');
           assert.equal(err.value, 20);
-          assert.equal(err.message, 'Cast to buffer failed for value "20"');
+          assert.equal(err.message, 'Cast to buffer failed for value "20" at path "required"');
           t.required = new Buffer("hello");
 
           t.sub.push({ name: 'Friday Friday' });

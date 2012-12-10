@@ -587,7 +587,7 @@ describe('schema', function(){
         var M = db.model('castingStringArrayWithUndefined', schema);
         M.find({ arr: { $in: [undefined] }}, function (err) {
           db.close();
-          assert.equal(err && err.message, 'Cast to string failed for value "undefined"');
+          assert.equal(err && err.message, 'Cast to string failed for value "undefined" at path "arr"');
           done();
         });
       });

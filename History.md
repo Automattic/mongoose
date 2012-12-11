@@ -1,4 +1,42 @@
 
+3.5.0 / 2012-12-10
+==================
+
+  * added; paths to CastErrors #1239
+  * added; support for mongodb connection string spec #1187
+  * added; post validate event
+  * added; Schema#get (to retrieve schema options)
+  * added; VersionError #1071
+  * added; npmignore [hidekiy](https://github.com/hidekiy)
+  * update; driver to 1.2.3
+  * fixed; stackoverflow in setter #1234
+  * fixed; utils.isObject()
+  * fixed; do not clobber user specified driver writeConern #1227
+  * fixed; always pass current document to post hooks
+  * fixed; throw error when user attempts to overwrite a model
+  * fixed; connection.model only caches on connection #1209
+  * fixed; respect conn.model() creation when matching global model exists #1209
+  * fixed; passing model name + collection name now always honors collection name
+  * fixed; setting virtual field to an empty object #1154
+  * fixed; subclassed MongooseErrors exposure, now available in mongoose.Error.xxxx
+  * fixed; model.remove() ignoring callback when executed twice [daeq](https://github.com/daeq) #1210
+  * docs; add collection option to schema api docs #1222
+  * docs; NOTE about db safe options
+  * docs; add post hooks docs
+  * docs; connection string options
+  * docs; middleware is not executed with Model.remove #1241
+  * docs; {g,s}etter introspection #777
+  * docs; update validation docs
+  * docs; add link to plugins page
+  * docs; clarify error returned by unique indexes #1225
+  * docs; more detail about disabling autoIndex behavior
+  * docs; add homepage section to package (npm docs mongoose)
+  * docs; more detail around collection name pluralization #1193
+  * website; add .important css
+  * website; update models page
+  * website; update getting started
+  * website; update quick start
+
 3.4.0 / 2012-11-10
 ==================
 

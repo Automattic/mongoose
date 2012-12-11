@@ -11,7 +11,7 @@
   * update; driver to 1.2.3
   * fixed; stackoverflow in setter #1234
   * fixed; utils.isObject()
-  * fixed; do not clobber user specified driver writeConern #1227
+  * fixed; do not clobber user specified driver writeConcern #1227
   * fixed; always pass current document to post hooks
   * fixed; throw error when user attempts to overwrite a model
   * fixed; connection.model only caches on connection #1209

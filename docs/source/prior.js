@@ -6,7 +6,7 @@ module.exports = exports = {
     title: ''
   , releases: releases.map(function (version) {
       return {
-          url: version + '/'
+          url: '/docs/' + version + '/'
         , version: version
       }
     })

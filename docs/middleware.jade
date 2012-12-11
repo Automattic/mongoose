@@ -2,22 +2,15 @@ extends layout
 
 block content
   h2 Middleware
-  p
-    | Middleware are functions which are passed control of flow during execution of 
-    a(href="./api.html#document_Document-init") init
-    |, 
-    a(href="./api.html#document_Document-validate") validate
-    |, 
-    a(href="./api.html#model_Model-save") save
-    |  and 
-    a(href="./api.html#model_Model-remove") remove
-    |  methods.
-  p 
-    | There are two types of middleware, serial and parallel.
+  :markdown
+    Middleware are functions which are passed control of flow during execution of [init](./api.html#document_Document-init), [validate](./api.html#document_Document-validate), [save](./api.html#model_Model-save) and [remove](./api.html#model_Model-remove) methods. There are two types of middleware, `pre` and [post](#post). Let's start with `pre`.
+
+  h3 Pre
+  :markdown
+    There are two types of `pre` middleware, serial and parallel.
   h4 Serial
-  p
-    | Serial middleware are executed one after another, when each middleware calls 
-    code next
+  :markdown
+    Serial middleware are executed one after another, when each middleware calls `next`.
   :js
     var schema = new Schema(..);
     schema.pre('save', function (next) {
@@ -34,12 +27,8 @@ block content
       next();
       doAsync(done);
     });
-  p
-    | The hooked method, in this case 
-    code save
-    |, will not be executed until 
-    code done
-    |  is called by each middleware.
+  :markdown
+    The hooked method, in this case `save`, will not be executed until `done` is called by each middleware.
   h4 Use Cases
   p
     | Middleware are useful for atomizing model logic and avoiding nested blocks of async code. Here are some other ideas:
@@ -68,6 +57,24 @@ block content
     myModel.save(function (err) {
       console.log(err.message) // something went wrong
     });
+
+  h3#post Post middleware
+  :markdown
+    [post](/docs/api.html#schema_Schema-post) middleware are executed _after_ the hooked method and all of its `pre` middleware have completed. `post` middleware do not directly receive flow control, e.g. no `next` or `done` callbacks are passed to it. `post` hooks are a way to register traditional event listeners for these methods.
+
+  :js
+    schema.post('init', function (doc) {
+      console.log('%s has been initialized from the db', doc._id);
+    })
+    schema.post('validate', function (doc) {
+      console.log('%s has been validated (but not saved yet)', doc._id);
+    })
+    schema.post('save', function (doc) {
+      console.log('%s has been saved', doc._id);
+    })
+    schema.post('remove', function (doc) {
+      console.log('%s has been removed', doc._id);
+    })
 
   h3#next Next Up
   :markdown

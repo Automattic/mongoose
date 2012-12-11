@@ -32,8 +32,6 @@ a {
 a:hover {
   opacity: 0.8;
 }
-#wrap {
-}
 h1 {
   font-family: 'Helvetica Nueue', Helvetica, Arial, FreeSans, sans-serif;
   text-rendering: geometricPrecision;
@@ -218,6 +216,14 @@ li {
 }
 li.guide ul {
   padding-left: 16px;
+}
+
+.important {
+  background-color: #FBFF94;
+  margin-left: 5px;
+}
+.important p {
+  padding: 22px;
 }
 
 ul.inthewild {

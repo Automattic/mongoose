@@ -2369,8 +2369,7 @@ describe('model', function(){
           }
         });
 
-    mongoose.model('NestedPushes', schema);
-    var Temp = db.model('NestedPushes', collection);
+    var Temp = db.model('NestedPushes', schema, collection);
 
     Temp.create({}, function (err, t) {
       assert.ifError(err);
@@ -2399,8 +2398,7 @@ describe('model', function(){
           }
         });
 
-    mongoose.model('NestedPushes', schema);
-    var Temp = db.model('NestedPushes', collection);
+    var Temp = db.model('NestedPushes', schema, collection);
 
     Temp.create({nested: {nums: [1, 2, 3, 4, 5]}}, function (err, t) {
       assert.ifError(err);
@@ -2420,8 +2418,7 @@ describe('model', function(){
           }
         });
 
-    mongoose.model('NestedPushes', schema);
-    var Temp = db.model('NestedPushes', collection);
+    var Temp = db.model('NestedPushes', schema, collection);
 
     Temp.create({nested: {nums: [1, 2, 3, 4, 5]}}, function (err, t) {
       assert.ifError(err);

@@ -138,19 +138,18 @@ block content
   :js
     animalSchema.index({ name: 1, type: -1 });
 
-  :markdown
-    When your application starts up, Mongoose automatically calls `ensureIndex` for each defined index. It is recommended this behavior be disabled in production by setting the `autoIndex` option of your schema to `false`.
+  .important
+    :markdown
+      When your application starts up, Mongoose automatically calls `ensureIndex` for each defined index in your schema.
+      While nice for development, it is recommended this behavior be disabled in production since index creation can cause a [significant performance impact](http://docs.mongodb.org/manual/core/indexes/#index-creation-operations). Disable the behavior by setting the `autoIndex` option of your schema to `false`.
 
   :js
     animalSchema.set('autoIndex', false);
     // or
     new Schema({..}, { autoIndex: false });
 
-  p
-    | See also the 
-    a(href="./api.html#model_Model-ensureIndexes")
-      code Model#ensureIndexes
-    |  method for more details.
+  :markdown
+    See also the [Model#ensureIndexes](./api.html#model_Model-ensureIndexes) method.
 
   h3#virtuals Virtuals
   :markdown

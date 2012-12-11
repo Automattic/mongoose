@@ -1,14 +1,15 @@
 {
     "name": "mongoose"
   , "description": "Mongoose MongoDB ODM"
-  , "version": "3.4.0"
+  , "version": "3.5.0"
   , "author": "Guillermo Rauch <guillermo@learnboost.com>"
   , "keywords": ["mongodb", "mongoose", "orm", "data", "datastore", "nosql", "odm", "sql", "db", "database"]
   , "dependencies": {
         "hooks": "0.2.1"
-      , "mongodb": "1.2.0"
+      , "mongodb": "1.2.3"
       , "ms": "0.1.0"
       , "sliced": "0.0.3"
+      , "muri": "0.0.4"
     }
   , "devDependencies": {
         "mocha": "1.4.2"
@@ -30,4 +31,5 @@
         "type": "git"
       , "url": "git://github.com/LearnBoost/mongoose.git"
     }
+  , "homepage": "http://mongoosejs.com"
 }

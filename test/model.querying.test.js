@@ -877,10 +877,10 @@ describe('model: querying:', function(){
             assert.equal(1, nes1.length);
 
             NE.find({ b: { $ne: [1] }}, function (err, nes2) {
-              assert.equal("Invalid ObjectId", err.message);
+              assert.equal("Cast to ObjectId failed for value \"1\" at path \"b\"", err.message);
 
               NE.find({ b: { $ne: 4 }}, function (err, nes3) {
-                assert.equal("Invalid ObjectId", err.message);
+                assert.equal("Cast to ObjectId failed for value \"4\" at path \"b\"", err.message);
 
                 NE.find({ b: id3, ids: { $ne: id4 }}, function (err, nes4) {
                   db.close();
@@ -1689,7 +1689,7 @@ describe('buffers', function(){
           assert.equal(rb.block.toString('utf8'),'buffer shtuffs are neat');
 
           Test.findOne({ block: /buffer/i }, function (err, rb) {
-            assert.equal(err.message, 'Cast to buffer failed for value "/buffer/i"')
+            assert.equal(err.message, 'Cast to buffer failed for value "/buffer/i" at path "block"')
             Test.findOne({ block: [195, 188, 98, 101, 114] }, function (err, rb) {
               assert.ifError(err);
               assert.equal(rb.block.toString('utf8'),'über');

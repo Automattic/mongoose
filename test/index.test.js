@@ -168,6 +168,7 @@ describe('mongoose module:', function(){
       assert.equal(true, thrown);
       done()
     });
+
     it('returns the model at creation', function(done){
       var Named = mongoose.model('Named', new Schema({ name: String }));
       var n1 = new Named();
@@ -181,6 +182,55 @@ describe('mongoose module:', function(){
       assert.equal(1234, n3.number.valueOf());
       done()
     });
+
+    it('prevents overwriting pre-existing models', function(done){
+      var m = new Mongoose;
+      m.model('A', new Schema);
+
+      assert.throws(function () {
+        m.model('A', new Schema);
+      }, /Cannot overwrite `A` model/);
+
+      done();
+    })
+
+    it('allows passing identical name + schema args', function(done){
+      var m = new Mongoose;
+      var schema = new Schema;
+      m.model('A', schema);
+
+      assert.doesNotThrow(function () {
+        m.model('A', schema);
+      });
+
+      done();
+    })
+
+    it('throws on unknown model name', function(done){
+      assert.throws(function () {
+        mongoose.model('iDoNotExist!');
+      }, /Schema hasn't been registered/);
+
+      done();
+    })
+
+    describe('passing collection name', function(){
+      describe('when model name already exists', function(){
+        it('returns a new uncached model', function(done){
+          var m = new Mongoose;
+          var s1 = new Schema({ a: [] });
+          var name = 'non-cached-collection-name';
+          var A = m.model(name, s1);
+          var B = m.model(name);
+          var C = m.model(name, 'alternate');
+          assert.ok(A.collection.name == B.collection.name);
+          assert.ok(A.collection.name != C.collection.name);
+          assert.ok(m.models[name].collection.name != C.collection.name);
+          assert.ok(m.models[name].collection.name == A.collection.name);
+          done();
+        })
+      })
+    })
   });
 
   it('connecting with a signature of host, database, function', function(done){

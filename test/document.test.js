@@ -110,7 +110,6 @@ describe('document:', function(){
         }
     });
 
-    ////
     assert.equal('test', doc.test);
     assert.ok(doc.oids instanceof Array);
     assert.equal(doc.nested.age, 5);
@@ -1217,7 +1216,58 @@ describe('document:', function(){
           done();
         })
       })
+
+      describe('when overwriting with a document instance', function(){
+        it('does not cause StackOverflows (gh-1234)', function(done){
+          var doc = new TestDocument({ nested: { age: 35 }});
+          doc.nested = doc.nested;
+          assert.doesNotThrow(function () {
+            doc.nested.age;
+          });
+          done();
+        })
+      })
     })
 
+  })
+
+  describe('virtual', function(){
+    describe('setter', function(){
+      var val;
+      var M;
+
+      before(function(done){
+        var schema = new mongoose.Schema({ v: Number });
+        schema.virtual('thang').set(function (v) {
+          val = v;
+        });
+
+        var db = start();
+        M = db.model('gh-1154', schema);
+        db.close();
+        done();
+      })
+
+      it('works with objects', function(done){
+        var m = new M({ thang: {}});
+        assert.deepEqual({}, val);
+        done();
+      })
+      it('works with arrays', function(done){
+        var m = new M({ thang: []});
+        assert.deepEqual([], val);
+        done();
+      })
+      it('works with numbers', function(done){
+        var m = new M({ thang: 4});
+        assert.deepEqual(4, val);
+        done();
+      })
+      it('works with strings', function(done){
+        var m = new M({ thang: '3'});
+        assert.deepEqual('3', val);
+        done();
+      })
+    })
   })
 })

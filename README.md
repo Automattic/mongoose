@@ -29,6 +29,8 @@ Defining a model is as easy as:
 
 [mongoosejs.com](http://mongoosejs.com/)
 
+## Try it live
+<a href="https://runnable.com/#learnboost/mongoose/code.js/launch" target="_blank"><img src="https://runnable.com/external/styles/assets/runnablebtn.png" style="width:67px;height:25px;"></a>
 ## Installation
 
 The recommended way is through the excellent [NPM](http://www.npmjs.org/):

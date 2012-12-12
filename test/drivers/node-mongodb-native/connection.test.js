@@ -52,5 +52,30 @@ describe('drivers: native:', function(){
 
       done();
     })
+    it('defaults w to 1', function(done){
+      var m = new mongoose.Mongoose;
+
+      var c = m.createConnection('localhost', { db: { journal: 1 }});
+      c.close();
+      assert.ok(!('w' in c.options.db));
+
+      c= m.createConnection('localhost', { db: { fsync: true }});
+      c.close();
+      assert.ok(!('w' in c.options.db));
+
+      c = m.createConnection('localhost', { db: { safe: true }});
+      c.close();
+      assert.ok(!('w' in c.options.db));
+
+      c = m.createConnection('localhost', { db: { safe: { j: 1 }}});
+      c.close();
+      assert.ok(!('w' in c.options.db));
+
+      c = m.createConnection('localhost', { db: { w: 0 }});
+      c.close();
+      assert.equal(0, c.options.db.w);
+
+      done();
+    })
   })
 })

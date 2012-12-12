@@ -47,7 +47,7 @@ function TestDoc (schema) {
  */
 
 describe('types.documentarray', function(){
-  it('behaves and quakcs like an array', function(done){
+  it('behaves and quacks like an array', function(done){
     var a = new MongooseDocumentArray();
 
     assert.ok(a instanceof Array);

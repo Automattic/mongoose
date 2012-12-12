@@ -2134,7 +2134,8 @@ doc.toObject({ hide: <span class="string">'secret _id'</span>, transform: <span 
   o.db.forceServerObjectId = <span class="literal">false</span>;
 
   <span class="comment">// default safe using new nomenclature</span>
-  <span class="keyword">if</span> (!(o.db.journal || o.db.fsync || o.db.safe || <span class="string">'w'</span> <span class="keyword">in</span> o.db)) {
+  <span class="keyword">if</span> (!(<span class="string">'journal'</span> <span class="keyword">in</span> o.db || <span class="string">'j'</span> <span class="keyword">in</span> o.db ||
+        <span class="string">'fsync'</span> <span class="keyword">in</span> o.db || <span class="string">'safe'</span> <span class="keyword">in</span> o.db || <span class="string">'w'</span> <span class="keyword">in</span> o.db)) {
     o.db.w = <span class="number">1</span>;
   }
 
@@ -4922,7 +4923,9 @@ Events.find().stream().pipe(format).pipe(res);</code></pre>
     <span class="keyword">var</span> caster = cast.name <span class="keyword">in</span> Types ? Types[cast.name] : cast;
     <span class="keyword">this</span>.casterConstructor = caster;
     <span class="keyword">this</span>.caster = <span class="keyword">new</span> caster(<span class="literal">null</span>, castOptions);
-    <span class="keyword">this</span>.caster.path = key;
+    <span class="keyword">if</span> (!(<span class="keyword">this</span>.caster <span class="keyword">instanceof</span> EmbeddedDoc)) {
+      <span class="keyword">this</span>.caster.path = key;
+    }
   }
 
   SchemaType.call(<span class="keyword">this</span>, key, options);

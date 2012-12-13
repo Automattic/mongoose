@@ -1,4 +1,15 @@
 
+3.5.1 / 2012-12-12
+==================
+
+  * fixed; regression when using subdoc with `path` as pathname #1245 [daeq](https://github.com/daeq)
+  * fixed; safer db option checks
+  * updated; driver to 1.2.5
+  * website; add more examples
+  * website; clean up old docs
+  * website; fix prev release urls
+  * docs; clarify streaming with HTTP responses
+
 3.5.0 / 2012-12-10
 ==================
 

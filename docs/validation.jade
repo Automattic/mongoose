@@ -29,7 +29,7 @@ block content
       name: String
     });
 
-    var Toy = db.model('Toy', toySchema);
+    var Toy = mongoose.model('Toy', toySchema);
 
     Toy.schema.path('color').validate(function (value) {
       return /blue|green|white|red|orange|periwinkel/i.test(value);

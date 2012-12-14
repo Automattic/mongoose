@@ -7,15 +7,14 @@ block content
 
   h3 Compiling your first model
   :js
-    var db = mongoose.createConnection(..);
     var schema = new mongoose.Schema({ name: 'string', size: 'string' });
-    var Tank = db.model('Tank', schema);
+    var Tank = mongoose.model('Tank', schema);
 
   h3 Constructing documents
   :markdown
     [Documents](./documents.html) are instances of our model. Creating them and saving to the database is easy:
   :js
-    var Tank = db.model('Tank', yourSchema);
+    var Tank = mongoose.model('Tank', yourSchema);
 
     var small = new Tank({ size: 'small' });
     small.save(function (err) {
@@ -29,6 +28,10 @@ block content
       if (err) return handleError(err);
       // saved!
     })
+  :markdown
+    Note that no tanks will be created/removed until the connection your model uses is open. In this case we are using `mongoose.model()` so let's open the default mongoose connection:
+  :js
+    mongoose.connect('localhost', 'gettingstarted');
 
   h3 Querying
   :markdown

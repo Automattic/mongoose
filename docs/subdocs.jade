@@ -14,7 +14,7 @@ block content
   :markdown
     Sub-documents enjoy all the same features as normal [documents](./api.html#document-js). The only difference is that they are not saved individually, they are saved whenever their top-level parent document is saved.
   :js
-    var Parent = db.model('Parent', parentSchema);
+    var Parent = mongoose.model('Parent', parentSchema);
     var parent = new Parent({ children: [{ name: 'Matt' }, { name: 'Sarah' }] })
     parent.children[0].name = 'Matthew';
     parent.save(callback);
@@ -43,7 +43,7 @@ block content
   :markdown
     MongooseArray methods such as [push](./api.html#types_array_MongooseArray-push), [unshift](./api.html#types_array_MongooseArray-unshift), [addToSet](./api.html#types_array_MongooseArray-addToSet), and others cast arguments to their proper types transparently:
   :js
-    var Parent = db.model('Parent');
+    var Parent = mongoose.model('Parent');
     var parent = new Parent;
 
     // create a comment

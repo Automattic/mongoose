@@ -14,7 +14,7 @@ block content
 
     Let's take a look at what happens when passing a `callback`:
   :js
-    var Person = db.model('Person', yourSchema);
+    var Person = mongoose.model('Person', yourSchema);
 
     // find each person with a last name matching 'Ghost', selecting the `name` and `occupation` fields
     Person.findOne({ 'name.last': 'Ghost' }, 'name occupation', function (err, person) {

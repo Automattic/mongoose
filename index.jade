@@ -31,10 +31,10 @@ html(lang='en')
       #example
         :js
           var mongoose = require('mongoose');
-          var db = mongoose.createConnection('localhost', 'test');
+          mongoose.connect('localhost', 'test');
 
           var schema = mongoose.Schema({ name: 'string' });
-          var Cat = db.model('Cat', schema);
+          var Cat = mongoose.model('Cat', schema);
 
           var kitty = new Cat({ name: 'Zildjian' });
           kitty.save(function (err) {

@@ -460,9 +460,8 @@ describe('document.populate', function(){
   })
 
   describe('sub-level properties', function(){
-    it('with string arg XXX', function(done){
+    it('with string arg', function(done){
       B.findById(post, function (err, post) {
-        console.log('     1');
         post.populate('comments._creator', function (err, post) {
           assert.ifError(err);
           assert.equal(2, post.comments.length);

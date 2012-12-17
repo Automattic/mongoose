@@ -2,7 +2,7 @@
 3.5.2 / 2012-12-17
 ==================
 
-  * fixed; using auth with replica sets
+  * fixed; using auth with replica sets #1253
 
 3.5.1 / 2012-12-12
 ==================

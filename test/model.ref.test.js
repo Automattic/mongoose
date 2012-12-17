@@ -1701,9 +1701,6 @@ describe('model: ref:', function(){
   })
 
   describe('population of individual document', function(){
-    console.log('fixme: model.ref.test.js + 1703');
-    return;
-
     var db, B, User;
     var user1, user2, post, _id;
 

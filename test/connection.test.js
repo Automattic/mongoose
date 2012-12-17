@@ -624,6 +624,32 @@ describe('connections:', function(){
         done(err);
       }
     })
+    describe('auth', function(){
+      it('from uri', function(done){
+        var uris = process.env.MONGOOSE_SET_TEST_URI;
+        if (!uris) return done();
+
+        var db = mongoose.createConnection();
+        db.openSet('mongodb://aaron:psw@localhost:27000,b,c', { server: { auto_reconnect: false }});
+        db.on('error', function(err){});
+        assert.equal('aaron', db.user);
+        assert.equal('psw', db.pass);
+        db.close();
+        done();
+      })
+      it('form options', function(done){
+        var uris = process.env.MONGOOSE_SET_TEST_URI;
+        if (!uris) return done();
+
+        var db = mongoose.createConnection();
+        db.openSet('mongodb://aaron:psw@localhost:27000,b,c', { user: 'tester', pass: 'testpsw' });
+        db.on('error', function(err){});
+        assert.equal('tester', db.user);
+        assert.equal('testpsw', db.pass);
+        db.close();
+        done();
+      })
+    })
   })
 })
 

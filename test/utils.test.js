@@ -241,5 +241,11 @@ describe('utils', function(){
     assert.equal(false, r.isValid(r.model));
     done();
   })
+
+  it('array.flatten', function(done){
+    var orig = [0,[1,2,[3,4,[5,[6]],7],8],9];
+    assert.deepEqual([0,1,2,3,4,5,6,7,8,9], utils.array.flatten(orig));
+    done();
+  })
 })
 

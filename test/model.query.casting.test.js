@@ -251,6 +251,22 @@ describe('model query casting', function(){
 
   describe('$near', function(){
     this.slow(900);
+    it('with arrays', function(done){
+      var db = start()
+        , Test = db.model('Geo4', geoSchemaArray, "y"+random());
+
+      Test.create({ loc: [ 10, 20 ]}, { loc: [ 40, 90 ]}, function (err) {
+        assert.ifError(err);
+        setTimeout(function () {
+          Test.find({ loc: { $near: ['30', '40'] }}, function (err, docs) {
+            db.close();
+            assert.ifError(err);
+            assert.equal(2, docs.length);
+            done()
+          });
+        }, 100);
+      });
+    });
     it('with objects', function(done){
       var db = start()
         , Test = db.model('Geo5', geoSchemaObject, "y"+random());
@@ -289,6 +305,22 @@ describe('model query casting', function(){
   })
   describe('$nearSphere', function(){
     this.slow(900);
+    it('with arrays', function(done){
+      var db = start()
+        , Test = db.model('Geo4', geoSchemaArray, "y"+random());
+
+      Test.create({ loc: [ 10, 20 ]}, { loc: [ 40, 90 ]}, function (err) {
+        assert.ifError(err);
+        setTimeout(function () {
+          Test.find({ loc: { $nearSphere: ['30', '40'] }}, function (err, docs) {
+            db.close();
+            assert.ifError(err);
+            assert.equal(2, docs.length);
+            done()
+          });
+        }, 100);
+      });
+    });
     it('with objects', function(done){
       var db = start()
         , Test = db.model('Geo5', geoSchemaObject, "y"+random());
@@ -328,6 +360,22 @@ describe('model query casting', function(){
   describe('$within', function(){
     this.slow(900);
     describe('$centerSphere', function(){
+      it('with arrays', function(done){
+        var db = start()
+          , Test = db.model('Geo4', geoSchemaArray, "y"+random());
+
+        Test.create({ loc: [ 10, 20 ]}, { loc: [ 40, 90 ]}, function (err) {
+          assert.ifError(err);
+          setTimeout(function () {
+            Test.find({ loc: { $within: { $centerSphere: [['11', '20'], '0.4'] }}}, function (err, docs) {
+              db.close();
+              assert.ifError(err);
+              assert.equal(1, docs.length);
+              done()
+            });
+          }, 100);
+        });
+      });
 
       it('with objects', function(done){
         var db = start()
@@ -368,6 +416,22 @@ describe('model query casting', function(){
     })
 
     describe('$center', function(){
+      it('with arrays', function(done){
+        var db = start()
+          , Test = db.model('Geo4', geoSchemaArray, "y"+random());
+
+        Test.create({ loc: [ 10, 20 ]}, { loc: [ 40, 90 ]}, function (err) {
+          assert.ifError(err);
+          setTimeout(function () {
+            Test.find({ loc: { $within: { $center: [['11', '20'], '1'] }}}, function (err, docs) {
+              db.close();
+              assert.ifError(err);
+              assert.equal(1, docs.length);
+              done()
+            });
+          }, 100);
+        });
+      });
 
       it('with objects', function(done){
         var db = start()
@@ -408,6 +472,22 @@ describe('model query casting', function(){
     })
 
     describe('$polygon', function(){
+      it('with arrays', function(done){
+        var db = start()
+          , Test = db.model('Geo4', geoSchemaArray, "y"+random());
+
+        Test.create({ loc: [ 10, 20 ]}, { loc: [ 40, 90 ]}, function (err) {
+          assert.ifError(err);
+          setTimeout(function () {
+            Test.find({ loc: { $within: { $polygon: [['8', '1'], ['8', '100'],['50','100'],['50','1']] }}}, function (err, docs) {
+              db.close();
+              assert.ifError(err);
+              assert.equal(2, docs.length);
+              done()
+            });
+          }, 100);
+        });
+      });
 
       it('with objects', function(done){
         var db = start()
@@ -448,6 +528,23 @@ describe('model query casting', function(){
     })
 
     describe('$box', function(){
+      it('with arrays', function(done){
+
+        var db = start()
+          , Test = db.model('Geo4', geoSchemaArray, "y"+random());
+
+        Test.create({ loc: [ 10, 20 ]}, { loc: [ 40, 90 ]}, function (err) {
+          assert.ifError(err);
+          setTimeout(function () {
+            Test.find({ loc: { $within: { $box: [['8', '1'], ['50','100']] }}}, function (err, docs) {
+              db.close();
+              assert.ifError(err);
+              assert.equal(2, docs.length);
+              done()
+            });
+          }, 100);
+        });
+      });
 
       it('with objects', function(done){
         var db = start()

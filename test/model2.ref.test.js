@@ -21,7 +21,7 @@ var start = require('./common')
 
 function validate(field){
   return [ function(v){ 
-    console.log("Field %s is %s", field, v.length);
+    console.log("Validation happening! Field %s's length is %s", field, v.length);
     return !v.length || v.length < 25; 
   },"Validation failed for field " + field ]
 }
@@ -74,6 +74,13 @@ var One = new Schema({
   h: { type: Schema.Types.ObjectId, ref: 'Two' },
 
   i: [{ type: Schema.Types.ObjectId, ref: 'Two' }],
+
+/*
+  j: [{
+        a: { type: Schema.Types.ObjectId, ref: 'Two' },
+        b: [Two]
+      }],
+*/
 
 });
 
@@ -178,18 +185,41 @@ describe('model: ref:', function(){
           a: 'One/h/a/b > Two/b/a [R2]',
           b: 'One/h/a/b > Two/b/b [R2]',
         },
-      }
+      },
+
+/*
+      j: [{ 
+        a: 'something',
+        b: [
+             { a: 'One/j/b > Two/a [2]',
+               b: {
+                 a: 'One/j/b > Two/b/a [2]',
+                 b: 'One/j/b > Two/b/b [2]',
+                 c: {
+                 }
+               }
+             }
+           ]
+        }],
+*/
+      
+
+
     }, function(err){
       assert.ifError(err);
 
       var t = new Two();
-      t.a =  "Two/a";
-      t.b =  { a: 'Two/a/a', b: 'Two/a/b' }
+      t.a =  "Two/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
+      t.b =  { a: 'Two/a/aaaaaaa', b: 'Two/a/b' }
 
       // One.findOneAndUpdate({}, { a:'One/a UPDATEDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD' } , function( err) {
       // One.findOneAndUpdate({}, { $set: { c: { a: { a: 'Test2' } } } }, function( err) {
       // One.findOneAndUpdate({}, { $push: { 'f1.b': t }  }, function( err) {
-      One.findOneAndUpdate({}, { $set: { 'f1': { b: [ t, t, t ]   }  }}, function( err) {
+      One.findOneAndUpdate({}, { $set: { 'f1': { a: "pppppp", b: [ t, t, t ]   }  }}, function( err) {
+      // One.findOneAndUpdate({}, { $set: { 'g': [ 'oneeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee', 'two', 'three' ] } } , function( err) {
+
+
+       }  , function( err) {
         assert.ifError(err);
 
         console.log("OK");
@@ -197,7 +227,6 @@ describe('model: ref:', function(){
       });
 
     });
-
 
 /*
     One.create({name:'aphex'},{name:'twin'}, function (err, u1, u2) {

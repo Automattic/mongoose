@@ -75,12 +75,10 @@ var One = new Schema({
 
   i: [{ type: Schema.Types.ObjectId, ref: 'Two' }],
 
-/*
   j: [{
-        a: { type: Schema.Types.ObjectId, ref: 'Two' },
+        a: { type: String,  validate: validate('One/g')  },
         b: [Two]
       }],
-*/
 
 });
 
@@ -187,22 +185,17 @@ describe('model: ref:', function(){
         },
       },
 
-/*
-      j: [{ 
+      j:[{ 
         a: 'something',
-        b: [
-             { a: 'One/j/b > Two/a [2]',
-               b: {
-                 a: 'One/j/b > Two/b/a [2]',
-                 b: 'One/j/b > Two/b/b [2]',
-                 c: {
-                 }
-               }
+        b: [{ a: 'One/j/b > Two/a [2]',
+              b: {
+                a: 'One/j/b > Two/b/a [2]',
+                b: 'One/j/b > Two/b/b [2]',
+                c: {
+                }
              }
-           ]
+           }]
         }],
-*/
-      
 
 
     }, function(err){
@@ -215,8 +208,32 @@ describe('model: ref:', function(){
       // One.findOneAndUpdate({}, { a:'One/a UPDATEDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD' } , function( err) {
       // One.findOneAndUpdate({}, { $set: { c: { a: { a: 'Test2' } } } }, function( err) {
       // One.findOneAndUpdate({}, { $push: { 'f1.b': t }  }, function( err) {
-      One.findOneAndUpdate({}, { $set: { 'f1': { a: "pppppp", b: [ t, t, t ]   }  }}, function( err) {
-      // One.findOneAndUpdate({}, { $set: { 'g': [ 'oneeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee', 'two', 'three' ] } } , function( err) {
+      //One.findOneAndUpdate({}, { $set: { 'f1': { a: "pppppp", b: [ t, t, t ]   }  }}, function( err) {
+      //One.findOneAndUpdate({}, { $set: { 'g': [ 'oneeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee', 'two', 'three' ] } } , function( err) {
+      One.findOneAndUpdate({}, { $push: { 'j': {
+        a: 'something',
+        b: [
+           { a: 'One/j/b > Two/a [2]',
+              b: {
+                a: 'Onoooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooe/j/b > Two/b/a [2]',
+                b: 'One/j/b > Two/b/b [2]',
+                c: {
+                }
+             }
+           },
+
+           { a: 'One/j/b > Two/a [2]',
+              b: {
+                a: 'TTTTTTTTWWWWWWWWWWOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO/j/b > Two/b/a [2]',
+                b: 'One/j/b > Two/b/b [2]',
+                c: {
+                }
+             }
+           },
+           ]
+        }
+
+} } , function( err) {
 
 
        }  , function( err) {
@@ -226,7 +243,7 @@ describe('model: ref:', function(){
 
       });
 
-    });
+    }); 
 
 /*
     One.create({name:'aphex'},{name:'twin'}, function (err, u1, u2) {

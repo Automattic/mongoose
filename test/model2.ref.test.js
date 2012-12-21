@@ -202,21 +202,27 @@ describe('model: ref:', function(){
       assert.ifError(err);
 
       var t = new Two();
-      t.a =  "Two/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
+      t.a =  "Twoaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/aaaaa";
       t.b =  { a: 'Two/a/aaaaaaa', b: 'Two/a/b' }
 
       // One.findOneAndUpdate({}, { a:'One/a UPDATEDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD' } , function( err) {
       // One.findOneAndUpdate({}, { $set: { c: { a: { a: 'Test2' } } } }, function( err) {
       // One.findOneAndUpdate({}, { $push: { 'f1.b': t }  }, function( err) {
-      //One.findOneAndUpdate({}, { $set: { 'f1': { a: "pppppp", b: [ t, t, t ]   }  }}, function( err) {
-      //One.findOneAndUpdate({}, { $set: { 'g': [ 'oneeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee', 'two', 'three' ] } } , function( err) {
-      One.findOneAndUpdate({}, { $push: { 'j': {
+      One.findOneAndUpdate({}, { $set: { 'f1': { a: "ppppppppppppppppppppppppppppppppppppppppppppp", b: [ t, t, t ]   }  }}, { enableValidation: true }
+
+
+      //One.findOneAndUpdate({}, { $set: { 'g': [ 'oneeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee', 'two', 'threeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee' ] } } 
+
+
+
+      /* GOOD #1 */
+      /*One.findOneAndUpdate({}, { $push: { 'j': {
         a: 'something',
         b: [
            { a: 'One/j/b > Two/a [2]',
               b: {
-                a: 'Onoooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooe/j/b > Two/b/a [2]',
-                b: 'One/j/b > Two/b/b [2]',
+                a: 'Oooe/j/b > Two/b/a [2]',
+                b: 'OBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBne/j/b > Two/b/b [2]',
                 c: {
                 }
              }
@@ -224,7 +230,7 @@ describe('model: ref:', function(){
 
            { a: 'One/j/b > Two/a [2]',
               b: {
-                a: 'TTTTTTTTWWWWWWWWWWOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO/j/b > Two/b/a [2]',
+                a: 'AAAAAAAAAAAAAAAAAAAAAAAAAA TOOO/j/b > Two/b/a [2]',
                 b: 'One/j/b > Two/b/b [2]',
                 c: {
                 }
@@ -232,8 +238,10 @@ describe('model: ref:', function(){
            },
            ]
         }
+      }}, { enableValidation: true } 
+*/
 
-} } , function( err) {
+ , function( err) {
 
 
        }  , function( err) {

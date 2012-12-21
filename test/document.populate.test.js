@@ -462,11 +462,13 @@ describe('document.populate', function(){
   describe('sub-level properties', function(){
     it('with string arg', function(done){
       B.findById(post, function (err, post) {
+        var id0 = post.comments[0]._creator;
+        var id1 = post.comments[1]._creator;
         post.populate('comments._creator', function (err, post) {
           assert.ifError(err);
           assert.equal(2, post.comments.length);
-          assert.equal('Phoenix', post.comments[0]._creator.name);
-          assert.equal('Newark', post.comments[1]._creator.name);
+          assert.equal(id0, post.comments[0]._creator.id);
+          assert.equal(id1, post.comments[1]._creator.id);
           done();
         })
       })

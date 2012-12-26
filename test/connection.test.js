@@ -91,6 +91,22 @@ describe('connections:', function(){
     done();
   })
 
+  it('should accept unix domain sockets', function(done){
+    var db = mongoose.createConnection('mongodb://aaron:psw@/tmp/mongodb-27017.sock/fake', { server: { auto_reconnect: false }});
+    db.on('error', function(err){});
+    assert.equal('object', typeof db.options);
+    assert.equal('object', typeof db.options.server);
+    assert.equal(false, db.options.server.auto_reconnect);
+    assert.equal('object', typeof db.options.db);
+    assert.equal(false, db.options.db.forceServerObjectId);
+    assert.equal('fake', db.name);
+    assert.equal('/tmp/mongodb-27017.sock', db.host);
+    assert.equal('psw', db.pass);
+    assert.equal('aaron', db.user);
+    db.close();
+    done();
+  })
+
   describe('should accept separated args with options', function(){
     it('works', function(done){
       var db = mongoose.createConnection('127.0.0.1', 'faker', 28000, { server: { auto_reconnect: true }});
@@ -623,6 +639,51 @@ describe('connections:', function(){
       } catch (err) {
         done(err);
       }
+    })
+    describe('auth', function(){
+      it('from uri', function(done){
+        var uris = process.env.MONGOOSE_SET_TEST_URI;
+        if (!uris) return done();
+
+        var db = mongoose.createConnection();
+        db.openSet('mongodb://aaron:psw@localhost:27000,b,c', { server: { auto_reconnect: false }});
+        db.on('error', function(err){});
+        assert.equal('aaron', db.user);
+        assert.equal('psw', db.pass);
+        db.close();
+        done();
+      })
+      it('form options', function(done){
+        var uris = process.env.MONGOOSE_SET_TEST_URI;
+        if (!uris) return done();
+
+        var db = mongoose.createConnection();
+        db.openSet('mongodb://aaron:psw@localhost:27000,b,c', { user: 'tester', pass: 'testpsw' });
+        db.on('error', function(err){});
+        assert.equal('tester', db.user);
+        assert.equal('testpsw', db.pass);
+        db.close();
+        done();
+      })
+    })
+
+    it('handles unix domain sockets', function(done){
+      var url = 'mongodb://aaron:psw@/tmp/mongodb-27018.sock,/tmp/mongodb-27019.sock/fake';
+      var db = mongoose.createConnection(url, { server: { auto_reconnect: false }});
+      db.on('error', function(err){});
+      assert.equal('object', typeof db.options);
+      assert.equal('object', typeof db.options.server);
+      assert.equal(false, db.options.server.auto_reconnect);
+      assert.equal('object', typeof db.options.db);
+      assert.equal(false, db.options.db.forceServerObjectId);
+      assert.equal('fake', db.name);
+      assert.ok(Array.isArray(db.hosts));
+      assert.equal('/tmp/mongodb-27018.sock', db.hosts[0].ipc);
+      assert.equal('/tmp/mongodb-27019.sock', db.hosts[1].ipc);
+      assert.equal('psw', db.pass);
+      assert.equal('aaron', db.user);
+      db.close();
+      done();
     })
   })
 })

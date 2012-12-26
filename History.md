@@ -1,4 +1,18 @@
 
+3.5.3 / 2012-12-26
+==================
+
+  * added; support for geo object notation #1257
+  * fixed; $within query casting with arrays
+  * fixed; unix domain socket support #1254
+  * updated; driver to 1.2.7
+  * updated; muri to 0.0.5
+
+3.5.2 / 2012-12-17
+==================
+
+  * fixed; using auth with replica sets #1253
+
 3.5.1 / 2012-12-12
 ==================
 

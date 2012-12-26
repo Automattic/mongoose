@@ -1,10 +1,3 @@
-html, body, #content {
-  height: 100%;
-}
-.module {
-  min-height: 100%;
-  box-sizing: border-box;
-}
 body {
   background: #d8e2d8 url(/docs/images/square_bg.png) fixed;
   font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
@@ -44,26 +37,24 @@ code {
   border-radius: 3px;
   font-size: 13px;
   font-family: Monaco;
-  /*text-shadow: 1px 2px 2px #555;*/
 }
 pre code {
   border: 0 none;
   padding: 1.2em;
   overflow-x: auto;
 }
-h2 {
-  margin-top: 0;
+h3 {
+  padding: 20px 15px;
+  margin-left: -15px;
 }
-h3 { padding-top: 35px; }
 h3 code {
   font-weight: normal;
 }
 hr {
-  display: none;
   height: 1px;
   border: 0 none;
   padding: 0;
-  margin: 90px 0;
+  margin: 60px 0;
   background: -webkit-gradient(linear, left top, right top, from(rgba(57, 172, 57, 0.0)), color-stop(0.5, rgba(57, 172, 57, 0.33)), to(rgba(57, 172, 57, 0.0)))
 }
 .doclinks hr {
@@ -85,11 +76,10 @@ li {
   text-decoration: none;
 }
 #header .mongoose {
-  font-size: 50px;
+  font-size: 48px;
   font-weight: 100;
   color: #fff;
-  text-shadow: 6px 4px 5px #777, -2px 0px 2px white;
-  letter-spacing: -7px;
+  letter-spacing: -5px;
 }
 #links {
   position: fixed;
@@ -103,12 +93,12 @@ li {
   border-right: 1px solid #ddd;
   background: -webkit-gradient(linear, left top, right top, from(transparent), color-stop(0.92, transparent), color-stop(0.9201, rgba(172,172,172, 0.0)), to(rgba(172,172,172, 0.4))), transparent;
 }
-#links .schematypes span {
-  display: none;
+#links hr {
+  margin: 32px 0;
 }
 #content {
   padding: 0;
-  margin: 0 0 0 230px;
+  margin: 0 0 30px 230px;
   overflow-x: hidden;
 }
 #content .controls {
@@ -137,6 +127,9 @@ li {
 }
 .private {
   display: none;
+}
+.section {
+  font-size: 15px;
 }
 .doclinks li.private a:before,
 .doclinks .module.private a:before,
@@ -168,7 +161,7 @@ li {
 }
 .module {
   list-style: none;
-  padding: 30px 0 0 30px;
+  padding: 30px 0 30px 30px;
   border-color: #eee;
   border-width: 9px 10px;
   border-style: solid;
@@ -177,8 +170,11 @@ li {
 .module > * {
   max-width: 700px;
 }
-.item {
-  margin-bottom: 175px;
+.item:last-child {
+  margin-bottom: 90px;
+}
+.item:last-child > hr {
+  display: none;
 }
 .item h3 a {
   color: #333;
@@ -204,10 +200,6 @@ li {
 .types a {
   text-decoration: none;
 }
-li.guide ul {
-  padding-left: 16px;
-}
-
 @media only screen and (device-width: 768px) {
 
 }
@@ -217,9 +209,6 @@ li.guide ul {
     font-size: 65px;
     text-align: center;
   }
-  html, body, #content {
-    height: auto;
-  }
   #links {
     position: static;
     width: auto;
@@ -228,6 +217,9 @@ li.guide ul {
     border-bottom: 1px solid #ddd;
     background: -webkit-gradient(linear, left top, left bottom, from(transparent), color-stop(0.92, transparent), color-stop(0.9201, rgba(172,172,172, 0.0)), to(rgba(172,172,172, 0.4))), transparent;
     padding: 15px 0;
+  }
+  #links hr {
+    display: none;
   }
   #links, #links ul, #links li { -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box; }
   #links ul { padding: 0 10px 0 0; }
@@ -248,36 +240,5 @@ li.guide ul {
     padding-left: 5px;
     border-width: 3px;
   }
-  #links li.guide {
-    display: block;
-    width: 390px;
-    margin-bottom: 15px;
-  }
-  #links li.guide > a {
-    display: none;
-  }
-  #links li ul li {
-    width: 44%;
-    text-align: left;
-  }
-  #links li ul li ul li {
-    width: 95%;
-  }
-  #links .plugins,
-  #links .changelog {
-    display: none;
-  }
-  #links .schematypes span {
-    display: inline;
-  }
-  #links .double {
-    width: 332px;
-  }
-  #links .double > ul {
-    display: inline;
-    float: right;
-  }
-  #links .double > ul li {
-    width: 155px;
-  }
+  .controls { display: none; }
 }

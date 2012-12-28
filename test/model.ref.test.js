@@ -1847,5 +1847,85 @@ describe('model: ref:', function(){
     })
   })
 
+  describe('populating combined with lean (gh-1260)', function(){
+    it('with findOne', function(done){
+      var db = start()
+        , BlogPost = db.model('RefBlogPost', posts + random())
+        , User = db.model('RefUser', users + random())
 
+      User.create({
+          name  : 'Guillermo'
+        , email : 'rauchg@gmail.com'
+      }, function (err, creator) {
+        assert.ifError(err);
+
+        BlogPost.create({
+            title     : 'woot'
+          , _creator  : creator
+        }, function (err, post) {
+          assert.ifError(err);
+
+          BlogPost
+          .findById(post._id)
+          .lean()
+          .populate('_creator')
+          .exec(function (err, post) {
+            db.close();
+            assert.ifError(err);
+
+            assert.ok(utils.isObject(post._creator));
+            assert.equal(post._creator.name, 'Guillermo');
+            assert.equal(post._creator.email, 'rauchg@gmail.com');
+            done();
+          });
+        });
+      });
+    })
+
+    it('with find', function(done){
+      var db = start()
+        , BlogPost = db.model('RefBlogPost', posts + random())
+        , User = db.model('RefUser', users + random());
+
+      User.create({
+          name  : 'Fan 1'
+        , email : 'fan1@learnboost.com'
+      }, {
+          name  : 'Fan 2'
+        , email : 'fan2@learnboost.com'
+      }, function (err, fan1, fan2) {
+        assert.ifError(err);
+
+        BlogPost.create({
+            title : 'Woot'
+          , fans  : [fan1, fan2]
+        }, {
+            title : 'Woot2'
+          , fans  : [fan2, fan1]
+        }, function (err, post1, post2) {
+          assert.ifError(err);
+
+          BlogPost
+          .find({ _id: { $in: [post1._id, post2._id ] } })
+          .populate('fans')
+          .lean()
+          .exec(function (err, blogposts) {
+            db.close();
+            assert.ifError(err);
+
+            assert.equal(blogposts[0].fans[0].name,'Fan 1');
+            assert.equal(blogposts[0].fans[0].email,'fan1@learnboost.com');
+            assert.equal(blogposts[0].fans[1].name,'Fan 2');
+            assert.equal(blogposts[0].fans[1].email,'fan2@learnboost.com');
+
+            assert.equal(blogposts[1].fans[0].name,'Fan 2');
+            assert.equal(blogposts[1].fans[0].email,'fan2@learnboost.com');
+            assert.equal(blogposts[1].fans[1].name,'Fan 1');
+            assert.equal(blogposts[1].fans[1].email,'fan1@learnboost.com');
+            done();
+          });
+        });
+      });
+    })
+  })
 });

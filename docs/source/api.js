@@ -9,7 +9,7 @@ var md = require('markdown')
 
 module.exports = {
     docs: []
-  , github: 'https://github.com/LearnBoost/mongoose/tree/'
+  , github: 'https://github.com/LearnBoost/mongoose/blob/'
   , title: 'API docs'
 }
 
@@ -29,8 +29,6 @@ function parse (docs) {
 
     if (!title || !(title = title.trim()))
       throw new Error('missing title');
-
-    title = title.replace(/^lib\//, '');
 
     var json = JSON.parse(chunk[2]);
 

@@ -686,7 +686,7 @@ describe('connections:', function(){
       done();
     })
 
-    it('can reopen a disconnected replica set', function(done) {
+    it('can reopen a disconnected replica set (gh-1263)', function(done) {
       var uris = process.env.MONGOOSE_SET_TEST_URI;
       if (!uris) return done();
 
@@ -701,7 +701,9 @@ describe('connections:', function(){
           conn.close(function(err) {
             if (err) return done(err);
 
-            conn.openSet(uris, 'mongoose_test', {}, done);
+            conn.openSet(uris, 'mongoose_test', {}, function(){
+              conn.close(done);
+            });
           });
         });
       } catch (err) {

@@ -685,6 +685,31 @@ describe('connections:', function(){
       db.close();
       done();
     })
+
+    it('can reopen a disconnected replica set (gh-1263)', function(done) {
+      var uris = process.env.MONGOOSE_SET_TEST_URI;
+      if (!uris) return done();
+
+      var conn = mongoose.createConnection();
+
+      conn.on('error', done);
+
+      try {
+        conn.openSet(uris, 'mongoose_test', {}, function(err) {
+          if (err) return done(err);
+
+          conn.close(function(err) {
+            if (err) return done(err);
+
+            conn.openSet(uris, 'mongoose_test', {}, function(){
+              conn.close(done);
+            });
+          });
+        });
+      } catch (err) {
+        done(err);
+      }
+    })
   })
 })
 

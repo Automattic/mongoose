@@ -270,4 +270,9 @@ html(lang='en')
           $("#content .controls input").prop('checked', 'checked');
           $(".private").show()
         }
+        $("#links, #content").on("click", "a", function (e) {
+          if (_gaq && this.hash) {
+            _gaq.push(['_trackEvent', 'anchor', 'click', this.hash])
+          }
+        })
       })()

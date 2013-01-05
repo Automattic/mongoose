@@ -10,6 +10,7 @@ test:
 	@node test/dropdb.js
 
 docs: ghpages docclean gendocs
+docs_from_master: docclean gendocs
 
 gendocs: $(DOCFILE)
 
@@ -30,4 +31,4 @@ docclean:
 	rm -f ./docs/*.{1,html,json}
 	rm -f ./docs/source/_docs
 
-.PHONY: test site docs docclean gendocs
+.PHONY: test site docs docclean gendocs docs_from_master

@@ -32,7 +32,7 @@ query.exec(<span class="function"><span class="keyword">function</span> <span cl
 .exec(callback);
 </code></pre><h3 id="refs">References to other documents</h3><p>There are no joins in MongoDB but sometimes we still want references to documents in other collections. This is where <a href="./api.html#query_Query-populate">query#populate</a> comes in. Read more <a href="./populate.html">here</a>.</p><h3>Streaming</h3><p>Queries can be <a href="http://nodejs.org/api/stream.html">streamed</a> from MongoDB to your application as well. Simply call the query&#39;s <a href="./api.html#query_Query-stream">stream</a> method instead of <a href="./api.html#query_Query-exec">exec</a> to return an instance of <a href="./api.html#querystream_QueryStream">QueryStream</a>.</p><h3 id="next">Next Up</h3><p>Now that we&#39;ve covered <code>Queries</code>, let&#39;s take a look at <a href="/docs/validation.html">validation</a>.</p></div></div><script>document.body.className = 'load';</script><script>var _gaq = _gaq || [];
 _gaq.push(['_setAccount', 'UA-1122274-9']);
-_gaq.push(['_trackPageview']);
+_gaq.push(['_trackPageview', location.pathname + location.search + location.hash]);
 
 (function() {
   var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;

@@ -1797,10 +1797,10 @@ doc.toObject({ hide: <span class="string">'secret _id'</span>, transform: <span 
     }
   })
 }</code></pre></div><div class="params"><h4>Parameters:</h4><ul><li><code>fn</code><span class="types"> &lt;<a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Function">Function</a>&gt; </span><span></span></li></ul></div><div class="returns"><h4>Returns:</h4><ul><li><span class="types"> &lt;<a href="#connection_Connection">Connection</a>&gt; </span><span>this</span></li></ul></div><div class="description"></div><hr class="private"></div><div class="item method private"><h3 id="drivers_node-mongodb-native_connection_NativeConnection-doOpenSet"><a href="#drivers_node-mongodb-native_connection_NativeConnection-doOpenSet">NativeConnection#doOpenSet(<code>fn</code>)</a></h3><p>Opens a connection to a MongoDB ReplicaSet.</p><span class="showcode">show code</span><div class="sourcecode"><pre><code class="javascript">NativeConnection.prototype.doOpenSet = <span class="function"><span class="keyword">function</span> <span class="params">(fn)</span> {</span>
-  <span class="keyword">if</span> (!<span class="keyword">this</span>.db) {
-    <span class="keyword">var</span> servers = []
-      , self = <span class="keyword">this</span>
+  <span class="keyword">var</span> servers = []
+    , self = <span class="keyword">this</span>;
 
+  <span class="keyword">if</span> (!<span class="keyword">this</span>.db) {
     <span class="keyword">this</span>.hosts.forEach(<span class="function"><span class="keyword">function</span> <span class="params">(server)</span> {</span>
       <span class="keyword">var</span> host = server.host || server.ipc;
       <span class="keyword">var</span> port = server.port || <span class="number">27017</span>;
@@ -5685,6 +5685,7 @@ reserved.errors =
 reserved.schema =
 reserved.options =
 reserved.modelName =
+reserved._pres = reserved._posts = <span class="comment">// hooks.js</span>
 reserved.collection = <span class="number">1</span>;</code></pre></div><p>Keys in this object are names that are rejected in schema declarations b/c they conflict with mongoose functionality. Using these key name will throw an error.</p>
 
 <pre><code>on, db, init, isNew, errors, schema, options, modelName, collection</code></pre>
@@ -7073,7 +7074,7 @@ virtual.set(<span class="function"><span class="keyword">function</span> <span c
   <span class="keyword">return</span> v;
 };</code></pre></div><div class="params"><h4>Parameters:</h4><ul><li><code>value</code><span class="types"> &lt;<a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Object">Object</a>&gt; </span><span></span></li><li><code>scope</code><span class="types"> &lt;<a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Object">Object</a>&gt; </span><span></span></li></ul></div><div class="returns"><h4>Returns:</h4><ul><li><span class="types"> &lt;<a href="#any">any</a>&gt; </span><span>the value after applying all setters</span></li></ul></div><div class="description"></div><hr class=""></div></li></ul></div><script>document.body.className = 'load';</script><script>var _gaq = _gaq || [];
 _gaq.push(['_setAccount', 'UA-1122274-9']);
-_gaq.push(['_trackPageview']);
+_gaq.push(['_trackPageview', location.pathname + location.search + location.hash]);
 
 (function() {
   var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
@@ -7093,4 +7094,9 @@ $("#content .controls input").on("click", function (e) {
     $("#content .controls input").prop('checked', 'checked');
     $(".private").show()
   }
+  $("#links, #content").on("click", "a", function (e) {
+    if (_gaq && this.hash) {
+      _gaq.push(['_trackEvent', 'anchor', 'click', this.hash])
+    }
+  })
 })()</script></body></html>

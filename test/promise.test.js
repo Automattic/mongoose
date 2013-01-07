@@ -33,7 +33,7 @@ describe('promise', function(){
     done();
   });
 
-  it('events first right after error()', function(done){
+  it('events fire right after error()', function(done){
     var promise = new Promise()
       , called = 0;
 
@@ -161,6 +161,30 @@ describe('promise', function(){
       var promise = new Promise()
       assert.ok(promise.addBack(function(){}) instanceof Promise);
       done();
+    })
+  })
+
+  describe('casting errors', function(){
+    describe('error()', function(){
+      it('casts arguments to Error', function(done){
+        var p = new Promise(function (err) {
+          assert.ok(err instanceof Error);
+          assert.equal('3', err.message);
+          done();
+        });
+
+        p.error(3);
+      })
+    })
+    describe('reject()', function(){
+      it('does not cast arguments to Error', function(done){
+        var p = new Promise(function (err, arg) {
+          assert.equal(3, err);
+          done();
+        });
+
+        p.reject(3);
+      })
     })
   })
 })

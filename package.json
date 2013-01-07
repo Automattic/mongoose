@@ -18,6 +18,7 @@
       , "jade": "0.26.3"
       , "highlight.js": "7.0.1"
       , "markdown": "0.3.1"
+      , "promises-aplus-tests": ">= 1.0.2"
     }
   , "directories": { "lib": "./lib/mongoose" }
   , "scripts": { "test": "make test" }

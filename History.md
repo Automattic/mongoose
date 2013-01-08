@@ -1,4 +1,12 @@
 
+3.5.4 / 2013-01-07
+==================
+
+  * changed; "_pres" & "_posts" are now reserved pathnames #1261
+  * updated; driver to 1.2.8
+  * fixed; exception when reopening a replica set. #1263 [ethankan](https://github.com/ethankan)
+  * website; updated
+
 3.5.3 / 2012-12-26
 ==================
 

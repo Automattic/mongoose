@@ -6,11 +6,8 @@ DOCFILE = docs/source/_docs
 
 test:
 	@node test/dropdb.js
-	@./node_modules/.bin/mocha $(T) --async-only $(TESTS) && echo "testing promises-A+ implementation ..." && make test-promises-A
+	@./node_modules/.bin/mocha $(T) --async-only $(TESTS)
 	@node test/dropdb.js
-
-test-promises-A:
-	@node test/promises-A.js
 
 docs: ghpages docclean gendocs
 docs_from_master: docclean gendocs

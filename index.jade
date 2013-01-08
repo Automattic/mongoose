@@ -10,7 +10,7 @@ html(lang='en')
   body
     a#forkbanner(href="http://github.com/learnboost/mongoose")
       img(style="position: absolute; top: 0; right: 0; border: 0;", src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png", alt="Fork me on GitHub")
-    #wrap
+    #wrap.homepage
       #header
         h1
           a(href="https://github.com/learnboost/mongoose", target="blank")
@@ -26,8 +26,6 @@ html(lang='en')
             a(href="docs/guide.html") Docs
           li
             a(href="http://plugins.mongoosejs.com") Plugins
-      p.blurb.
-        <a href="docs/middleware.html">Flexible</a>, <a href="docs/guide.html">schema based</a> and <a href="docs/queries.html">feature-rich</a>, mongoose solves common problems for <a href="#production">real-world</a> applications.
       #example
         :js
           var mongoose = require('mongoose');
@@ -84,7 +82,7 @@ html(lang='en')
           li
             a(href="https://bozuko.com/", alt="Bozuko")
               img(src="docs/images/apps/h_bozuko.jpg", alt="Bozuko")
-    p#footer Licensed under MIT. Copyright 2011-1012 <a href="http://learnboost.com">LearnBoost</a>.
+    p#footer Licensed under MIT. Copyright 2011-1013 <a href="http://learnboost.com">LearnBoost</a>.
     script.
       document.body.className = 'load';
     include docs/includes/googleanalytics

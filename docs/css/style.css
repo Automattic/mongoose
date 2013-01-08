@@ -223,3 +223,7 @@ h2 a {
     width: 100%;
   }
 }
+
+#wrap.homepage #install code, #wrap.homepage #example code {
+  font-size: 13px;
+}

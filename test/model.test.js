@@ -3657,6 +3657,46 @@ describe('model', function(){
           });
         });
       });
+
+      it('are thenable', function(done){
+        var db = start()
+          , B = db.model('BlogPost', collection)
+
+        var peopleSchema = Schema({ name: String, likes: ['ObjectId'] })
+        var P = db.model('promise-BP-people', peopleSchema, random());
+        B.create(
+            { title: 'then promise 1' }
+          , { title: 'then promise 2' }
+          , { title: 'then promise 3' }
+          , function (err, d1, d2, d3) {
+          assert.ifError(err);
+
+          P.create(
+              { name: 'brandon', likes: [d1] }
+            , { name: 'ben', likes: [d2] }
+            , { name: 'bernie', likes: [d3] }
+            , function (err, brandon, ben, bernie) {
+            assert.ifError(err);
+
+            var promise = B.find({ title: /^then promise/ }).select('_id').exec();
+            promise.then(function (blogs) {
+              var ids = blogs.map(function (m) {
+                return m._id;
+              });
+              return P.where('likes').in(ids).exec();
+            }).then(function (people) {
+              assert.equal(3, people.length);
+              return people;
+            }).then(function (people) {
+              db.close();
+              done();
+            }, function (err) {
+              db.close();
+              done(new Error(err));
+            });
+          })
+        })
+      })
     });
   });
 

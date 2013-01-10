@@ -215,6 +215,8 @@ function order (docs) {
   for (var i = 0; i < docs.length; ++i) {
     if ('index.js' == docs[i].title) {
       docs.unshift(docs.splice(i, 1)[0]);
+    } else if ('collection.js' == docs[i].title) {
+      docs.push(docs.splice(i, 1)[0]);
     }
   }
 }

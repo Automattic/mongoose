@@ -13,7 +13,7 @@
       , "mpromise": "0.2.0"
     }
   , "devDependencies": {
-        "mocha": "1.7.4"
+        "mocha": "1.8.1"
       , "node-static": "0.5.9"
       , "dox": "0.3.1"
       , "jade": "0.26.3"

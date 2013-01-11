@@ -532,7 +532,7 @@ describe('connections:', function(){
       db.close();
       assert.ok(!db.options);
     })
-    it('should use admin db if not specified', function(done){
+    it('should use test db if not specified', function(done){
       var db = mongoose.createConnection('mongodb://localhost', function (err) {
         done();
       });
@@ -541,7 +541,7 @@ describe('connections:', function(){
       assert.equal(true, db.options.server.auto_reconnect);
       assert.equal('object', typeof db.options.db);
       assert.equal(false, db.options.db.forceServerObjectId);
-      assert.equal('admin', db.name);
+      assert.equal('test', db.name);
       assert.equal('localhost', db.host);
       assert.equal(27017, db.port);
       db.close();

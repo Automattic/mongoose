@@ -1,4 +1,3 @@
-
 /**
  * Module dependencies.
  */
@@ -693,10 +692,16 @@ describe('schema', function(){
       assert.equal(false, Animal.path('isFerret').cast(false));
       assert.equal(false, Animal.path('isFerret').cast(0));
       assert.equal(false, Animal.path('isFerret').cast('0'));
+      assert.equal(false, Animal.path('isFerret').cast('false'));
+      assert.equal(false, Animal.path('isFerret').cast('False'));
+      assert.equal(false, Animal.path('isFerret').cast('FALSE'));
       assert.equal(true, Animal.path('isFerret').cast({}));
       assert.equal(true, Animal.path('isFerret').cast(true));
       assert.equal(true, Animal.path('isFerret').cast(1));
       assert.equal(true, Animal.path('isFerret').cast('1'));
+      assert.equal(true, Animal.path('isFerret').cast('true'));
+      assert.equal(true, Animal.path('isFerret').cast('True'));
+      assert.equal(true, Animal.path('isFerret').cast('TRUE'));
       done();
     });
   });

@@ -602,6 +602,14 @@ describe('connections:', function(){
       var db= start({ uri: 'mongodb://whatever23939.localhost/noooope', noErrorListener: 1 });
     })
 
+    it('event fires with one listener', function(done){
+      var db= start({ uri: 'mongodb://localasdfads/fakeeee', noErrorListener: 1 })
+      db.on('error', function () {
+        // this callback has no params which triggered the bug #759
+        done();
+      });
+    })
+
     it('should occur without hanging when password with special chars is used (gh-460)', function (done) {
       var db = mongoose.createConnection('mongodb://aaron:psw?@localhost/fake', function (err) {
         assert.ok(err);
@@ -711,13 +719,6 @@ describe('connections:', function(){
     })
   })
 
-  it('error event fires with one listener', function(done){
-    var db= start({ uri: 'mongodb://localasdfads/fakeeee', noErrorListener: 1 })
-    db.on('error', function () {
-      // this callback has no params which triggered the bug #759
-      done();
-    });
-  })
 
   describe('openSet', function(){
     it('accepts uris, dbname, options', function(done){

@@ -107,6 +107,102 @@ describe('connections:', function(){
     done();
   })
 
+  describe('re-opening a closed connection', function(){
+    var mongos = process.env.MONGOOSE_SHARD_TEST_URI;
+    if (!mongos) return;
+
+    var mongod = 'mongodb://localhost:27017';
+
+    var repl1 = process.env.MONGOOSE_SET_TEST_URI;
+    var repl2 = repl1.split(',');
+    repl2.push(repl2.shift());
+    repl2 = repl2.join(',');
+
+    describe('with different host/port', function(){
+      it('non-replica set', function(done){
+        var db = mongoose.createConnection();
+
+        db.open(mongod, function (err) {
+          if (err) return done(err);
+
+          var port1 = db.port;
+          var db1 = db.db;
+
+          db.close(function (err) {
+            if (err) return done(err);
+
+            db.open(mongos, function (err) {
+              if (err) return done(err);
+
+              assert.notEqual(port1, db.port);
+              assert.ok(db1 !== db.db);
+              assert.ok(db1.serverConfig.port != db.db.serverConfig.port);
+
+              var port2 = db.port;
+              var db2 = db.db;
+
+              db.close(function (err) {
+
+                db.open(mongod, function (err) {
+                  if (err) return done(err);
+
+                  assert.notEqual(port2, db.port);
+                  assert.ok(db2 !== db.db);
+                  assert.ok(db2.serverConfig.port != db.db.serverConfig.port);
+
+                  db.close(done);
+                });
+              });
+            });
+          });
+        });
+      })
+
+      it('replica set', function(done){
+        var db = mongoose.createConnection();
+
+        db.openSet(repl1, function (err) {
+          if (err) return done(err);
+
+          var hosts = db.hosts.slice();
+          var db1 = db.db;
+
+          db.close(function (err) {
+            if (err) return done(err);
+
+            db.openSet(repl2, function (err) {
+              if (err) return done(err);
+
+              db.hosts.forEach(function (host, i) {
+                assert.notEqual(host.port, hosts[i].port);
+              });
+              assert.ok(db1 !== db.db);
+
+              hosts = db.hosts.slice();
+              var db2 = db.db;
+
+              db.close(function (err) {
+                if (err) return done(err);
+
+                db.openSet(repl1, function (err) {
+                  if (err) return done(err);
+
+                  db.hosts.forEach(function (host, i) {
+                    assert.notEqual(host.port, hosts[i].port);
+                  });
+                  assert.ok(db2 !== db.db);
+
+                  db.close();
+                  done();
+                });
+              });
+            });
+          });
+        });
+      })
+    })
+  })
+
   describe('should accept separated args with options', function(){
     it('works', function(done){
       var db = mongoose.createConnection('127.0.0.1', 'faker', 28000, { server: { auto_reconnect: true }});
@@ -712,4 +808,3 @@ describe('connections:', function(){
     })
   })
 })
-

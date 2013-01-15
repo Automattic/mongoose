@@ -78,15 +78,30 @@ block content
       console.log('The creators age is %s', story._creator.age);
       // prints "The creators age is null'
     })
+
   h3 Query conditions for populate
   :markdown
-    What if we wanted to populate our fans array based on their age, and return, at most, any 5 of them?
+    What if we wanted to populate our fans array based on their age, select just their names, and return at most, any 5 of them?
   :js
     Story
     .find(...)
-    .populate('fans', null, { age: { $gte: 21 }}, { limit: 5 })
+    .populate('fans', 'name', { age: { $gte: 21 }}, { limit: 5 })
+    .exec()
   :markdown
     Done. `Conditions` and `options` for populate queries are passed as the third and fourth arguments respectively.
+
+    Alternatively we may simply pass all options in one go:
+  :js
+    Story
+    .find(...)
+    .populate({
+        path: 'fans'
+      , match: { age: { $gte: 21 }}
+      , select: 'name'
+      , options: { limit: 5 }
+    })
+    .exec()
+
   h3 Refs to children
   :markdown
     We may find however, if we use the `aaron` object, we are unable to get a list of the stories. This is because no `story` objects were ever 'pushed' on to `aaron.stories`.
@@ -131,7 +146,7 @@ block content
 
         Story
         .findOne({ title: /timex/i })
-        .populate('_creator', 'name')
+        .populate({ path: '_creator', select: 'name' })
         .exec(function (err, story) {
           if (err) return handleError(err);
 
@@ -150,7 +165,7 @@ block content
     _Field selection_ in v3 is slightly different than v2. Arrays of fields are no longer accepted.
 
   :js
-    // this works
+    // this works in v3
     Story.findOne(..).populate('_creator', 'name age').exec(..);
 
     // this doesn't

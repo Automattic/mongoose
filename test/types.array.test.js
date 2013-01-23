@@ -1373,24 +1373,42 @@ describe('types array', function(){
   })
 
   describe('removing from an array atomically using MongooseArray#remove', function(){
-    it('works', function(done){
-      var db = start()
-        , BlogPost = db.model('BlogPost', collection);
+    var db;
+    var B;
 
-      var post = new BlogPost();
+    before(function(done){
+      var schema = Schema({
+          numbers: ['number']
+        , numberIds: [{ _id: 'number', name: 'string' }]
+        , stringIds: [{ _id: 'string', name: 'string' }]
+        , bufferIds: [{ _id: 'buffer', name: 'string' }]
+        , oidIds:    [{ name: 'string' }]
+      })
+
+      db = start();
+      B = db.model('BlogPost', schema);
+      done();
+    })
+
+    after(function(done){
+      db.close(done);
+    })
+
+    it('works', function(done){
+      var post = new B;
       post.numbers.push(1, 2, 3);
 
       post.save(function (err) {
         assert.ifError(err);
 
-        BlogPost.findById(post._id, function (err, doc) {
+        B.findById(post._id, function (err, doc) {
           assert.ifError(err);
 
           doc.numbers.remove('1');
           doc.save(function (err) {
             assert.ifError(err);
 
-            BlogPost.findById(post.get('_id'), function (err, doc) {
+            B.findById(post.get('_id'), function (err, doc) {
               assert.ifError(err);
 
               assert.equal(doc.numbers.length, 2);
@@ -1399,8 +1417,7 @@ describe('types array', function(){
               doc.save(function (err) {
                 assert.ifError(err);
 
-                BlogPost.findById(post._id, function (err, doc) {
-                  db.close();
+                B.findById(post._id, function (err, doc) {
                   assert.ifError(err);
                   assert.equal(0, doc.numbers.length);
                   done();
@@ -1410,6 +1427,97 @@ describe('types array', function(){
           });
         });
       });
+    })
+
+    describe('with subdocs', function(){
+      function docs (arr) {
+        return arr.map(function (val) {
+          return { _id: val }
+        });
+      }
+
+      it('supports passing strings', function(done){
+        var post = new B({ stringIds: docs('a b c d'.split(' ')) })
+        post.save(function (err) {
+          assert.ifError(err);
+          B.findById(post, function (err, post) {
+            assert.ifError(err);
+            post.stringIds.remove('b');
+            post.save(function (err) {
+              assert.ifError(err);
+              B.findById(post, function (err, post) {
+                assert.ifError(err);
+                assert.equal(3, post.stringIds.length);
+                assert.ok(!post.stringIds.id('b'));
+                done();
+              })
+            })
+          })
+        })
+      })
+      it('supports passing numbers', function(done){
+        var post = new B({ numberIds: docs([1,2,3,4]) })
+        post.save(function (err) {
+          assert.ifError(err);
+          B.findById(post, function (err, post) {
+            assert.ifError(err);
+            post.numberIds.remove(2,4);
+            post.save(function (err) {
+              assert.ifError(err);
+              B.findById(post, function (err, post) {
+                assert.ifError(err);
+                assert.equal(2, post.numberIds.length);
+                assert.ok(!post.numberIds.id(2));
+                assert.ok(!post.numberIds.id(4));
+                done();
+              })
+            })
+          })
+        })
+      })
+      it('supports passing objectids', function(done){
+        var OID = mongoose.Types.ObjectId;
+        var a = new OID;
+        var b = new OID;
+        var c = new OID;
+        var post = new B({ oidIds: docs([a,b,c]) })
+        post.save(function (err) {
+          assert.ifError(err);
+          B.findById(post, function (err, post) {
+            assert.ifError(err);
+            post.oidIds.remove(a,c);
+            post.save(function (err) {
+              assert.ifError(err);
+              B.findById(post, function (err, post) {
+                assert.ifError(err);
+                assert.equal(1, post.oidIds.length);
+                assert.ok(!post.oidIds.id(a));
+                assert.ok(!post.oidIds.id(c));
+                done();
+              })
+            })
+          })
+        })
+      })
+      it('supports passing buffers', function(done){
+        var post = new B({ bufferIds: docs(['a','b','c','d']) })
+        post.save(function (err) {
+          assert.ifError(err);
+          B.findById(post, function (err, post) {
+            assert.ifError(err);
+            post.bufferIds.remove(new Buffer('a'));
+            post.save(function (err) {
+              assert.ifError(err);
+              B.findById(post, function (err, post) {
+                assert.ifError(err);
+                assert.equal(3, post.bufferIds.length);
+                assert.ok(!post.bufferIds.id(new Buffer('a')));
+                done();
+              })
+            })
+          })
+        })
+      })
     })
   })
 })

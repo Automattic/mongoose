@@ -86,7 +86,7 @@ Aside from defining the structure of your documents and the types of data you're
 * [Methods](http://mongoosejs.com/docs/guide.html#methods) definition
 * [Statics](http://mongoosejs.com/docs/guide.html#statics) definition
 * [Plugins](http://mongoosejs.com/docs/plugins.html)
-* [psuedo-JOINs](http://mongoosejs.com/docs/populate.html)
+* [pseudo-JOINs](http://mongoosejs.com/docs/populate.html)
 
 The following example shows some of these features:
 

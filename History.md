@@ -1,4 +1,17 @@
 
+3.5.5 / 2013-01-29
+==================
+
+  * updated; driver to 1.2.11
+  * removed; old node < 0.6x shims
+  * fixed; documents with Buffer _ids equality
+  * fixed; MongooseBuffer properly casts numbers
+  * fixed; reopening closed connection on alt host/port #1287
+  * docs; fixed typo in Readme #1298 [rened](https://github.com/rened)
+  * docs; fixed typo in migration docs [Prinzhorn](https://github.com/Prinzhorn)
+  * docs; fixed incorrect annotation in SchemaNumber#min [bilalq](https://github.com/bilalq)
+  * docs; updated
+
 3.5.4 / 2013-01-07
 ==================
 

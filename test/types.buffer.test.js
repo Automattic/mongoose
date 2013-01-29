@@ -39,7 +39,7 @@ var UserBuffer = new Schema({
 
 describe('types.buffer', function(){
 
-  it('test that a mongoose buffer behaves and quacks like an buffer', function(done){
+  it('test that a mongoose buffer behaves and quacks like a buffer', function(done){
     var a = new MongooseBuffer;
 
     assert.ok(a instanceof Buffer);
@@ -49,10 +49,12 @@ describe('types.buffer', function(){
     var a = new MongooseBuffer([195, 188, 98, 101, 114]);
     var b = new MongooseBuffer("buffer shtuffs are neat");
     var c = new MongooseBuffer('aGVsbG8gd29ybGQ=', 'base64');
+    var d = new MongooseBuffer(0);
 
     assert.equal(a.toString('utf8'), 'über');
     assert.equal(b.toString('utf8'), 'buffer shtuffs are neat');
     assert.equal(c.toString('utf8'), 'hello world');
+    assert.equal(d.toString('utf8'), '');
     done();
   });
 
@@ -68,12 +70,13 @@ describe('types.buffer', function(){
       t.validate(function (err) {
         assert.equal(err.message,'Validation failed');
         assert.equal(err.errors.required.type,'required');
-        t.required = 20;
+        t.required = {x:[20]}
         t.save(function (err) {
+          assert.ok(err);
           assert.equal(err.name, 'CastError');
           assert.equal(err.type, 'buffer');
-          assert.equal(err.value, 20);
-          assert.equal(err.message, 'Cast to buffer failed for value "20" at path "required"');
+          assert.equal(err.message, 'Cast to buffer failed for value "[object Object]" at path "required"');
+          assert.deepEqual(err.value, {x:[20]});
           t.required = new Buffer("hello");
 
           t.sub.push({ name: 'Friday Friday' });

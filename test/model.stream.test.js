@@ -29,7 +29,7 @@ var Person = new Schema({
 mongoose.model('PersonForStream', Person);
 var collection = 'personforstream_' + random();
 
-describe('cursor stream:', function(){
+describe('query stream:', function(){
   before(function (done) {
     var db = start()
       , P = db.model('PersonForStream', collection)

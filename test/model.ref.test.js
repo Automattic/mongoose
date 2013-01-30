@@ -524,18 +524,15 @@ describe('model: ref:', function(){
               .exec(function (err, blogposts) {
                 assert.ifError(err);
 
-                //assert.equal(blogposts[0].fans.length, 1);
-                assert.equal(blogposts[0].fans.length, 3); // changed, retain all unfound ids
+                assert.equal(blogposts[0].fans.length, 1);
+                assert.equal(blogposts[0].fans[0].gender, 'female');
+                assert.equal(blogposts[0].fans[0].name,'Fan 2');
+                assert.equal(blogposts[0].fans[0].email,'fan2@learnboost.com');
 
-                assert.equal(blogposts[0].fans[1].gender, 'female');
-                assert.equal(blogposts[0].fans[1].name,'Fan 2');
-                assert.equal(blogposts[0].fans[1].email,'fan2@learnboost.com');
-
-                //assert.equal(blogposts[1].fans.length, 1);
-                assert.equal(blogposts[1].fans.length, 3); // changed, retain unfound ids
-                assert.equal(blogposts[1].fans[1].gender,'female');
-                assert.equal(blogposts[1].fans[1].name,'Fan 2');
-                assert.equal(blogposts[1].fans[1].email,'fan2@learnboost.com');
+                assert.equal(blogposts[1].fans.length, 1);
+                assert.equal(blogposts[1].fans[0].gender,'female');
+                assert.equal(blogposts[1].fans[0].name,'Fan 2');
+                assert.equal(blogposts[1].fans[0].email,'fan2@learnboost.com');
 
                 BlogPost
                 .find({ _id: { $in: [post1._id, post2._id ] } })
@@ -544,25 +541,21 @@ describe('model: ref:', function(){
                   db.close();
                   assert.ifError(err);
 
-                  //assert.strictEqual(blogposts[0].fans.length, 2);
-                  assert.strictEqual(blogposts[0].fans.length, 3); // changed, retain all unfound ids
-                  assert.equal(blogposts[0].fans[0], fan1.id);
+                  assert.strictEqual(blogposts[0].fans.length, 2);
+                  assert.equal(blogposts[0].fans[0].gender,'female');
+                  assert.equal(blogposts[0].fans[0].name,'Fan 2');
+                  assert.equal(blogposts[0].fans[0].email,'fan2@learnboost.com');
                   assert.equal(blogposts[0].fans[1].gender,'female');
-                  assert.equal(blogposts[0].fans[1].name,'Fan 2');
-                  assert.equal(blogposts[0].fans[1].email,'fan2@learnboost.com');
-                  assert.equal(blogposts[0].fans[2].gender,'female');
-                  assert.equal(blogposts[0].fans[2].name,'Fan 3');
-                  assert.equal(blogposts[0].fans[2].email,'fan3@learnboost.com');
+                  assert.equal(blogposts[0].fans[1].name,'Fan 3');
+                  assert.equal(blogposts[0].fans[1].email,'fan3@learnboost.com');
 
-                  //assert.strictEqual(blogposts[1].fans.length, 2);
-                  assert.strictEqual(blogposts[1].fans.length, 3); // changed, retain all unfound ids
+                  assert.strictEqual(blogposts[1].fans.length, 2);
                   assert.equal(blogposts[1].fans[0].gender,'female');
                   assert.equal(blogposts[1].fans[0].name,'Fan 3');
                   assert.equal(blogposts[1].fans[0].email,'fan3@learnboost.com');
                   assert.equal(blogposts[1].fans[1].gender,'female');
                   assert.equal(blogposts[1].fans[1].name,'Fan 2');
                   assert.equal(blogposts[1].fans[1].email,'fan2@learnboost.com');
-                  assert.equal(blogposts[1].fans[2], fan1.id);
 
                   done();
                 });
@@ -619,23 +612,17 @@ describe('model: ref:', function(){
               .exec(function (err, blogposts) {
                 assert.ifError(err);
 
-                //assert.equal(blogposts[0].fans.length, 1);
-                assert.equal(blogposts[0].fans.length, 3); // changed, retain unfound ids
-                assert.equal(blogposts[0].fans[0],fan1.id);
-                assert.equal(blogposts[0].fans[1],fan2.id);
-                assert.equal(blogposts[0].fans[2].gender,'female');
-                assert.equal(blogposts[0].fans[2].name,'Fan 3');
-                assert.equal(blogposts[0].fans[2].email,'fan3@learnboost.com');
-                assert.equal(blogposts[0].fans[2].age, 25);
+                assert.equal(blogposts[0].fans.length, 1);
+                assert.equal(blogposts[0].fans[0].gender,'female');
+                assert.equal(blogposts[0].fans[0].name,'Fan 3');
+                assert.equal(blogposts[0].fans[0].email,'fan3@learnboost.com');
+                assert.equal(blogposts[0].fans[0].age, 25);
 
-                //assert.equal(blogposts[1].fans.length,1);
-                assert.equal(blogposts[1].fans.length,3); // changed, retain unfound ids
+                assert.equal(blogposts[1].fans.length,1);
                 assert.equal(blogposts[1].fans[0].gender,'female');
                 assert.equal(blogposts[1].fans[0].name,'Fan 3');
                 assert.equal(blogposts[1].fans[0].email,'fan3@learnboost.com');
                 assert.equal(blogposts[1].fans[0].age, 25);
-                assert.equal(blogposts[1].fans[1],fan2.id);
-                assert.equal(blogposts[1].fans[2],fan1.id);
 
                 BlogPost
                 .find({ _id: { $in: [post1._id, post2._id ] } })
@@ -644,19 +631,16 @@ describe('model: ref:', function(){
                   db.close();
                   assert.ifError(err);
 
-                  //assert.equal(blogposts[0].fans.length, 2);
-                  assert.equal(blogposts[0].fans.length, 3); // changed, retain ids
-                  assert.equal(blogposts[0].fans[0], fan1.id);
-                  assert.equal(blogposts[0].fans[1].gender,'female');
-                  assert.equal(blogposts[0].fans[1].name,'Fan 2');
-                  assert.equal(blogposts[0].fans[1].email, 'fan2@learnboost.com');
-                  assert.equal(blogposts[0].fans[2].gender, 'female');
-                  assert.equal(blogposts[0].fans[2].name, 'Fan 3');
-                  assert.equal(blogposts[0].fans[2].email, 'fan3@learnboost.com');
-                  assert.equal(blogposts[0].fans[2].age, 25);
+                  assert.equal(blogposts[0].fans.length, 2);
+                  assert.equal(blogposts[0].fans[0].gender,'female');
+                  assert.equal(blogposts[0].fans[0].name,'Fan 2');
+                  assert.equal(blogposts[0].fans[0].email, 'fan2@learnboost.com');
+                  assert.equal(blogposts[0].fans[1].gender, 'female');
+                  assert.equal(blogposts[0].fans[1].name, 'Fan 3');
+                  assert.equal(blogposts[0].fans[1].email, 'fan3@learnboost.com');
+                  assert.equal(blogposts[0].fans[1].age, 25);
 
-                  //assert.equal(blogposts[1].fans.length, 2);
-                  assert.equal(blogposts[1].fans.length, 3); // changed, retain ids
+                  assert.equal(blogposts[1].fans.length, 2);
                   assert.equal(blogposts[1].fans[0].gender, 'female');
                   assert.equal(blogposts[1].fans[0].name, 'Fan 3');
                   assert.equal(blogposts[1].fans[0].email, 'fan3@learnboost.com');
@@ -664,7 +648,6 @@ describe('model: ref:', function(){
                   assert.equal(blogposts[1].fans[1].gender, 'female');
                   assert.equal(blogposts[1].fans[1].name, 'Fan 2');
                   assert.equal(blogposts[1].fans[1].email, 'fan2@learnboost.com');
-                  assert.equal(blogposts[1].fans[2], fan1.id);
 
                   done();
                 });
@@ -721,25 +704,19 @@ describe('model: ref:', function(){
                 db.close();
                 assert.ifError(err);
 
-                //assert.strictEqual(blogposts[0].fans.length, 1);
-                assert.strictEqual(blogposts[0].fans.length, 3); // changed, retain ids
-                assert.equal(blogposts[0].fans[0],fan1.id);
-                assert.equal(blogposts[0].fans[1],fan2.id);
-                assert.equal(blogposts[0].fans[2].name,'Fan 3');
-                assert.equal(blogposts[0].fans[2].email,'fan3@learnboost.com');
-                assert.equal(blogposts[0].fans[2].isInit('email'), true)
-                assert.equal(blogposts[0].fans[2].isInit('gender'), false);
-                assert.equal(blogposts[0].fans[2].isInit('age'), false);
+                assert.strictEqual(blogposts[0].fans.length, 1);
+                assert.equal(blogposts[0].fans[0].name,'Fan 3');
+                assert.equal(blogposts[0].fans[0].email,'fan3@learnboost.com');
+                assert.equal(blogposts[0].fans[0].isInit('email'), true)
+                assert.equal(blogposts[0].fans[0].isInit('gender'), false);
+                assert.equal(blogposts[0].fans[0].isInit('age'), false);
 
-                //assert.strictEqual(blogposts[1].fans.length, 1);
-                assert.strictEqual(blogposts[1].fans.length, 3); // changed, retain ids
+                assert.strictEqual(blogposts[1].fans.length, 1);
                 assert.equal(blogposts[1].fans[0].name,'Fan 3');
                 assert.equal(blogposts[1].fans[0].email,'fan3@learnboost.com');
                 assert.equal(blogposts[1].fans[0].isInit('email'), true);
                 assert.equal(blogposts[1].fans[0].isInit('gender'), false);
                 assert.equal(blogposts[1].fans[0].isInit('age'), false)
-                assert.equal(blogposts[1].fans[1],fan2.id);
-                assert.equal(blogposts[1].fans[2],fan1.id);
 
                 done()
               });
@@ -1113,8 +1090,7 @@ describe('model: ref:', function(){
             db.close();
             assert.ifError(err);
             assert.equal(returned.id,post.id);
-            //assert.equal(returned.fans.length, 1); // changed, retain the un-found elements
-            assert.equal(returned.fans.length, 4);
+            assert.equal(returned.fans.length, 1);
             done();
           });
         })
@@ -1171,10 +1147,7 @@ describe('model: ref:', function(){
           assert.equal(posts.length,2);
           var p1 = posts[0];
           var p2 = posts[1];
-
-          //assert.strictEqual(p1.fans.length, 0);
-          assert.strictEqual(p1.fans.length, 1); // changed, retain the id that wasn't found
-
+          assert.strictEqual(p1.fans.length, 0);
           assert.strictEqual(p2.fans.length, 1);
           assert.equal(p2.fans[0].name,'Fan 2');
           assert.equal(p2.fans[0].isInit('email'), false);
@@ -1182,23 +1155,15 @@ describe('model: ref:', function(){
           assert.equal(p1.comments.length,2);
           assert.equal(p2.comments.length,2);
           assert.ok(p1.comments[0]._creator.email);
-
-          //assert.ok(!p2.comments[0]._creator); // changed, retain unfound id
-          assert.equal(fan3.id, p2.comments[0]._creator); // changed, retain unfound id
-
+          assert.ok(!p2.comments[0]._creator);
           assert.equal(p1.comments[0]._creator.email,'fan1@learnboost.com');
           assert.equal(p2.comments[1]._creator.email,'fan1@learnboost.com');
           assert.equal(p1.comments[0]._creator.isInit('name'), false);
           assert.equal(p2.comments[1]._creator.isInit('name'), false);
           assert.equal(p1.comments[0].content,'bejeah!');
           assert.equal(p2.comments[1].content,'world');
-
-          //assert.ok(!p1.comments[1]._creator);
-          assert.equal(fan2.id, p1.comments[1]._creator); // changed, retain unfound id
-
-          //assert.ok(!p2.comments[0]._creator);
-          assert.ok(fan3.id, p2.comments[0]._creator); // changed, retain unfound id
-
+          assert.ok(!p1.comments[1]._creator);
+          assert.ok(!p2.comments[0]._creator);
           assert.equal(p1.comments[1].content,'chickfila');
           assert.equal(p2.comments[0].content,'hello');
 
@@ -1257,8 +1222,7 @@ describe('model: ref:', function(){
             assert.strictEqual(o.kids.length, 2);
             var k1 = o.kids[0];
             var k2 = o.kids[1];
-            //assert.strictEqual(true, !k2.post);
-            assert.strictEqual(post2.id, String(k2.post)); // changed, retain unfound ids
+            assert.strictEqual(true, !k2.post);
             assert.strictEqual(k1.user.name, "Fan 1");
             assert.strictEqual(k1.user.email, undefined);
             assert.strictEqual(k1.post.title, "woot");
@@ -1721,18 +1685,15 @@ describe('model: ref:', function(){
         assert.ifError(err);
 
         assert.ok(Array.isArray(post.fans));
-        //assert.equal(2, post.fans.length);
-        assert.equal(3, post.fans.length); // changed, retain unfound ids
+        assert.equal(2, post.fans.length);
         assert.ok(post.fans[0] instanceof User);
         assert.ok(post.fans[1] instanceof User);
-        assert.ok(post.fans[2] instanceof DocObjectId);
         assert.equal(post.fans[0].isInit('name'), true);
         assert.equal(post.fans[1].isInit('name'), true);
         assert.equal(post.fans[0].isInit('email'), false);
         assert.equal(post.fans[1].isInit('email'), false);
         assert.equal(post.fans[0].name,'yup');
         assert.equal(post.fans[1].name,'use an object');
-        assert.equal(String(post.fans[2]), fan3id);
 
         done();
       });

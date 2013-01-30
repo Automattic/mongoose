@@ -1585,5 +1585,23 @@ describe('schema', function(){
 
       done();
     })
+
+    it('permits _scope to be used (gh-1184)', function(done){
+      var db = start();
+      var child = new Schema({ _scope: Schema.ObjectId });
+      var C = db.model('scope', child);
+      var c= new C;
+      c.save(function (err) {
+        db.close();
+        assert.ifError(err);
+        try {
+          c._scope;
+        } catch (e) {
+          err = e;
+        }
+        assert.ifError(err);
+        done();
+      })
+    })
   })
 });

@@ -152,19 +152,19 @@ describe('document.populate', function(){
         B.findById(post, function (err, post) {
           assert.ifError(err);
           post.populate('_creator');
-          assert.equal(1, Object.keys(post.__populate).length);
-          assert.ok('_creator' in post.__populate);
+          assert.equal(1, Object.keys(post.$__.populate).length);
+          assert.ok('_creator' in post.$__.populate);
           post.populate('_creator');
-          assert.equal(1, Object.keys(post.__populate).length);
-          assert.ok('_creator' in post.__populate);
+          assert.equal(1, Object.keys(post.$__.populate).length);
+          assert.ok('_creator' in post.$__.populate);
           post.populate('_creator fans');
-          assert.equal(2, Object.keys(post.__populate).length);
-          assert.ok('_creator' in post.__populate);
-          assert.ok('fans' in post.__populate);
+          assert.equal(2, Object.keys(post.$__.populate).length);
+          assert.ok('_creator' in post.$__.populate);
+          assert.ok('fans' in post.$__.populate);
           post.populate({ path: '_creator' });
-          assert.equal(2, Object.keys(post.__populate).length);
-          assert.ok('_creator' in post.__populate);
-          assert.ok('fans' in post.__populate);
+          assert.equal(2, Object.keys(post.$__.populate).length);
+          assert.ok('_creator' in post.$__.populate);
+          assert.ok('fans' in post.$__.populate);
           done();
         })
       })
@@ -172,12 +172,12 @@ describe('document.populate', function(){
         B.findById(post, function (err, post) {
           assert.ifError(err);
           post.populate('_creator');
-          assert.equal(1, Object.keys(post.__populate).length);
-          assert.equal(undefined, post.__populate._creator.select);
+          assert.equal(1, Object.keys(post.$__.populate).length);
+          assert.equal(undefined, post.$__.populate._creator.select);
           post.populate({ path: '_creator', select: 'name' });
-          assert.equal(1, Object.keys(post.__populate).length);
-          assert.ok('_creator' in post.__populate);
-          assert.equal('name', post.__populate._creator.select);
+          assert.equal(1, Object.keys(post.$__.populate).length);
+          assert.ok('_creator' in post.$__.populate);
+          assert.equal('name', post.$__.populate._creator.select);
           done();
         })
       })
@@ -190,7 +190,7 @@ describe('document.populate', function(){
         var creator_id = post._creator;
         post.populate('_creator', function (err, post_) {
           assert.ifError(err);
-          assert.ok(!post.__populate);
+          assert.ok(!post.$__.populate);
           assert.ok(post._creator);
           assert.equal(String(creator_id), String(post._creator._id));
           done();

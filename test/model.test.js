@@ -1142,7 +1142,7 @@ describe('model', function(){
         assert.ok(!post.errors['items.0.required']);
 
         post.items[0].subs[0].set('required', true);
-        assert.equal(undefined, post._validationError);
+        assert.equal(undefined, post.$__.validationError);
 
         post.save(function(err){
           assert.ok(err);
@@ -2404,7 +2404,7 @@ describe('model', function(){
       assert.ifError(err);
       t.nested.nums.pull(1);
       t.nested.nums.pull(2);
-      assert.equal(t._activePaths.paths['nested.nums'],'modify');
+      assert.equal(t.$__.activePaths.paths['nested.nums'],'modify');
       db.close();
       done();
     });

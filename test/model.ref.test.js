@@ -1064,6 +1064,29 @@ describe('model: ref:', function(){
     });
   });
 
+  it('populating subdocuments partially with null array', function(done){
+    var db = start()
+      , BlogPost = db.model('RefBlogPost', posts)
+      , worked = false;
+
+    var post = BlogPost.create({
+        title: 'Woot'
+      , comments: null
+    }, function (err, post) {
+      assert.ifError(err);
+
+      BlogPost
+      .findById(post._id)
+      .populate('comments._creator')
+      .exec(function (err, returned) {
+        db.close();
+        assert.ifError(err);
+        assert.equal(returned.id, post.id);
+        done();
+      });
+    });
+  });
+
   it('populating subdocuments with array including nulls', function(done){
     var db = start()
       , BlogPost = db.model('RefBlogPost', posts)
@@ -1773,6 +1796,9 @@ describe('model: ref:', function(){
             assert.equal(post.fans[0].name, user1.name);
             assert.equal(post.fans[1].name, user2.name);
 
+            assert.equal(String(post._creator._id), String(post.populated('_creator')));
+            assert.ok(Array.isArray(post.populated('fans')));
+
             B.populate(doc, [{ path: '_creator', model: 'RefAlternateUser' }, { path: 'fans', model: 'RefAlternateUser' }], function (err, post) {
               assert.ifError(err);
               assert.ok(post);
@@ -1781,6 +1807,14 @@ describe('model: ref:', function(){
               assert.equal(2, post.fans.length);
               assert.equal(post.fans[0].name, user1.name);
               assert.equal(post.fans[1].name, user2.name);
+              assert.ok(Array.isArray(post.populated('fans')));
+              assert.equal(
+                  String(post.fans[0]._id)
+                , String(post.populated('fans')[0]));
+              assert.equal(
+                  String(post.fans[1]._id)
+                , String(post.populated('fans')[1]));
+
               done()
             });
           });

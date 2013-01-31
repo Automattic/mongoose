@@ -9,7 +9,7 @@ var md = require('markdown')
 
 module.exports = {
     docs: []
-  , github: 'https://github.com/LearnBoost/mongoose/tree/'
+  , github: 'https://github.com/LearnBoost/mongoose/blob/'
   , title: 'API docs'
 }
 
@@ -25,13 +25,12 @@ function parse (docs) {
 
     chunk = chunk.split(/^([^\n]+)\n/);
 
-    var title = chunk[1];
+    var fulltitle = chunk[1];
 
-    if (!title || !(title = title.trim()))
+    if (!fulltitle || !(fulltitle = fulltitle.trim()))
       throw new Error('missing title');
 
-    title = title.replace(/^lib\//, '');
-
+    var title = fulltitle.replace(/^lib\//, '');
     var json = JSON.parse(chunk[2]);
 
     var props = [];
@@ -73,7 +72,7 @@ function parse (docs) {
           prop = false;
           comment.ctx || (comment.ctx = {});
           comment.ctx.name = tag.string;
-          comment.ctx.type = 'method';
+          comment.ctx.type = 'static';
           break;
         case 'receiver':
           prop = false;
@@ -168,6 +167,8 @@ function parse (docs) {
 
     out.push({
         title: title
+      , fulltitle: fulltitle
+      , cleantitle: title.replace(/[\.\/#]/g, '-')
       , methods: methods
       , props: props
       , statics: statics

@@ -149,7 +149,7 @@ block content
     new Schema({..}, { autoIndex: false });
 
   :markdown
-    See also the [Model#ensureIndexes](./api.html#model_Model-ensureIndexes) method.
+    See also the [Model#ensureIndexes](./api.html#model_Model.ensureIndexes) method.
 
   h3#virtuals Virtuals
   :markdown
@@ -230,7 +230,7 @@ block content
 
   h4#autoIndex option: autoIndex
   :markdown
-    At application startup, Mongoose sends an `ensureIndex` command for each index declared in your `Schema`. As of Mongoose v3, indexes are created in the `background` by default. If you wish to disable the auto-creation feature and manually handle when indexes are created, set your `Schema`s `autoIndex` option to `false` and use the [ensureIndexes](./api.html#model_Model-ensureIndexes) method on your model.
+    At application startup, Mongoose sends an `ensureIndex` command for each index declared in your `Schema`. As of Mongoose v3, indexes are created in the `background` by default. If you wish to disable the auto-creation feature and manually handle when indexes are created, set your `Schema`s `autoIndex` option to `false` and use the [ensureIndexes](./api.html#model_Model.ensureIndexes) method on your model.
   :js
     var schema = new Schema({..}, { autoIndex: false });
     var Clock = mongoose.model('Clock', schema);
@@ -248,7 +248,7 @@ block content
 
   h4#collection option: collection
   :markdown
-    Mongoose by default produces a collection name by passing the model name to the [utils.toCollectionName](./api.html#utils.toCollectionName) method. This method pluralizes the name. Set this option if you need a different name for your collection.
+    Mongoose by default produces a collection name by passing the model name to the [utils.toCollectionName](./api.html#utils_exports.toCollectionName) method. This method pluralizes the name. Set this option if you need a different name for your collection.
   :js
     var dataSchema = new Schema({..}, { collection: 'data' });
 
@@ -270,7 +270,7 @@ block content
 
   h4#_id option: _id
   :markdown
-    Mongoose assigns each of your schemas an `_id` field by default if one is not passed into the [Schema](/docs/api.html#schema-js) constructor. The type assiged is an [ObjectId](/docs/api.html#schema_Schema-Types) to coincide with MongoDBs default behavior. If you don't want an `_id` added to your schema at all, you may disable it using this option.
+    Mongoose assigns each of your schemas an `_id` field by default if one is not passed into the [Schema](/docs/api.html#schema-js) constructor. The type assiged is an [ObjectId](/docs/api.html#schema_Schema.Types) to coincide with MongoDBs default behavior. If you don't want an `_id` added to your schema at all, you may disable it using this option.
 
     Pass this option during schema construction to prevent documents from getting an auto `_id` created.
   :js

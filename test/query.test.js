@@ -732,6 +732,7 @@ describe('Query', function(){
         , select: undefined
         , model: undefined
         , options: undefined
+        , _docs: {}
       }
       q.populate(o);
       assert.deepEqual(o, q.options.populate['yellow.brick']);
@@ -746,6 +747,7 @@ describe('Query', function(){
         , select: undefined
         , model: undefined
         , options: undefined
+        , _docs: {}
       }
       q.populate(o);
       assert.equal(1, Object.keys(q.options.populate).length);
@@ -766,6 +768,7 @@ describe('Query', function(){
         , select: undefined
         , model: undefined
         , options: undefined
+        , _docs: {}
       }
       assert.equal(2, Object.keys(q.options.populate).length);
       assert.deepEqual(o, q.options.populate['yellow.brick']);
@@ -1258,7 +1261,7 @@ describe('Query', function(){
       q.setOptions({ read: ['s', [{dc:'eu'}]]});
 
       assert.equal(q.options.thing, 'cat');
-      assert.deepEqual(q.options.populate.fans, { path: 'fans', select: undefined, match: undefined, options: undefined, model: undefined });
+      assert.deepEqual(q.options.populate.fans, { path: 'fans', select: undefined, match: undefined, options: undefined, model: undefined, _docs: {} });
       assert.equal(q.options.batchSize, 10);
       assert.equal(q.options.limit, 4);
       assert.equal(q.options.skip, 3);

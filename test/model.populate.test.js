@@ -60,7 +60,7 @@ mongoose.model('RefAlternateUser', User);
  * Tests.
  */
 
-describe('model: ref:', function(){
+describe('model: populate:', function(){
   it('populating a single ref', function(done){
     var db = start()
       , BlogPost = db.model('RefBlogPost', posts)
@@ -1840,6 +1840,7 @@ describe('model: ref:', function(){
         });
       })
     })
+
   })
 
   describe('populating combined with lean (gh-1260)', function(){
@@ -1923,4 +1924,86 @@ describe('model: ref:', function(){
       });
     })
   })
+
+  describe('records paths and _ids used in population', function(){
+    var db;
+    var B;
+    var U;
+    var u1, u2;
+    var b1, b2
+
+    before(function(done){
+      db = start()
+      B = db.model('RefBlogPost', posts + random())
+      U = db.model('RefUser', users + random());
+
+      U.create({
+          name  : 'Fan 1'
+        , email : 'fan1@learnboost.com'
+      }, {
+          name  : 'Fan 2'
+        , email : 'fan2@learnboost.com'
+      }, function (err, fan1, fan2) {
+        assert.ifError(err);
+        u1 = fan1;
+        u2 = fan2;
+
+        B.create({
+            title : 'Woot'
+          , fans  : [fan1, fan2]
+          , _creator: fan1
+        }, {
+            title : 'Woot2'
+          , fans  : [fan2, fan1]
+          , _creator: fan2
+        }, function (err, post1, post2) {
+          assert.ifError(err);
+          b1 = post1;
+          b2 = post2;
+          done();
+        });
+      });
+    })
+
+    after(function(){
+      db.close()
+    })
+
+    it('with findOne', function(done){
+      B.findById(b1).populate('fans _creator').exec(function (err, doc) {
+        assert.ifError(err);
+        assert.ok(Array.isArray(doc.populated('fans')));
+        assert.equal(2, doc.populated('fans').length);
+        assert.equal(doc.populated('fans')[0], String(u1._id));
+        assert.equal(doc.populated('fans')[1], String(u2._id));
+        assert.equal(doc.populated('_creator'), String(u1._id));
+        done();
+      })
+    })
+
+    it('with find', function(done){
+      B.find().populate('fans _creator').exec(function (err, docs) {
+        assert.ifError(err);
+        assert.equal(2, docs.length);
+
+        var doc1 = docs[0];
+        var doc2 = docs[1];
+
+        assert.ok(Array.isArray(doc1.populated('fans')));
+        assert.equal(2, doc1.populated('fans').length);
+        assert.equal(doc1.populated('fans')[0], String(u1._id));
+        assert.equal(doc1.populated('fans')[1], String(u2._id));
+        assert.equal(doc1.populated('_creator'), String(u1._id));
+
+        assert.ok(Array.isArray(doc2.populated('fans')));
+        assert.equal(2, doc2.populated('fans').length);
+        assert.equal(doc2.populated('fans')[0], String(u2._id));
+        assert.equal(doc2.populated('fans')[1], String(u1._id));
+        assert.equal(doc2.populated('_creator'), String(u2._id));
+        done();
+      })
+    })
+  })
+
+
 });

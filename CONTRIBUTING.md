@@ -4,6 +4,7 @@
 
 - Before opening a new issue, look for existing [issues](https://github.com/learnboost/mongoose/issues) to avoid duplication. If the issue does not yet exist, [create one](https://github.com/learnboost/mongoose/issues/new).
   - _The source of this project is written in javascript, not coffeescript, therefore your bug reports should be written in javascript_. 
+  - In general, adding a "+1" comment to an existing issue does little to help get it resolved. A better way is to submit a well documented pull request with clean code and passing tests.
 
 ### Fixing bugs / Adding features
 
@@ -33,3 +34,7 @@ If you'd like to preview your documentation changes, first commit your changes t
 ### Plugins website
 
 The [plugins](http://plugins.mongoosejs.com/) site is also an [open source project](https://github.com/aheckmann/mongooseplugins) that you can get involved with. Feel free to fork and improve it as well!
+
+### Sharing your projects
+
+All are welcome to share their creations which use mongoose on our [tumbler](http://mongoosejs.tumblr.com/). Just fill out the [simple submission form](http://mongoosejs.tumblr.com/submit).

@@ -20,7 +20,7 @@ html(lang='en')
       .doclinks
         each item in docs
           .file(class=item.hasPublic ? '' : 'private')
-            a.section(href='#' + item.title.replace(/[\.\/#]/g, '-'))= item.title
+            a.section(href='#' + item.cleantitle)= item.title
             ul
               each method in item.methods
                 if method.ctx && !method.ignore
@@ -39,9 +39,9 @@ html(lang='en')
                   li(class= stat.isPrivate ? 'private' : '')
                     case stat.ctx.type
                       when 'method'
-                        id = stat.ctx.receiver + '-' + stat.ctx.name
+                        id = stat.ctx.receiver + '.' + stat.ctx.name
                       when 'property'
-                        id = stat.ctx.receiver + '-' + stat.ctx.name
+                        id = stat.ctx.receiver + '.' + stat.ctx.name
                       when 'function'
                         id = stat.ctx.name
                     url = href(klass(item.title) + '_' + id)
@@ -61,7 +61,7 @@ html(lang='en')
       ul
         each item in docs
           li.module(class=item.hasPublic ? '' : 'private')
-            a(href=github + package.version + '/' + item.title, id=item.title.replace(/[\.\/#]/g, '-'))= item.title
+            a(href=github + package.version + '/' + item.fulltitle, id=item.cleantitle)= item.title
             each method in item.methods
               div.item.method(class= method.isPrivate ? 'private' : 'public')
                 if method.ctx
@@ -150,10 +150,13 @@ html(lang='en')
                 if stat.ctx
                   case stat.ctx.type
                     when 'method'
-                      id = stat.ctx.receiver + '-' + stat.ctx.name
+                      id = stat.ctx.receiver + '.' + stat.ctx.name
+                      text = stat.ctx.receiver + '.' + stat.ctx.name
+                    when 'static'
+                      id = stat.ctx.receiver + '.' + stat.ctx.name
                       text = stat.ctx.receiver + '.' + stat.ctx.name
                     when 'property'
-                      id = stat.ctx.receiver + '-' + stat.ctx.name
+                      id = stat.ctx.receiver + '.' + stat.ctx.name
                       text = stat.ctx.receiver + '.' + stat.ctx.name
                     when 'function'
                       id = stat.ctx.name

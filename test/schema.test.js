@@ -1043,12 +1043,12 @@ describe('schema', function(){
         assert.deepEqual(T.path('name')._index, { unique: true });
 
         T = new Schema({
-            name: { type: String, expires:  '1.5m' }
+            name: { type: Date, expires:  '1.5m' }
         });
         assert.deepEqual(T.path('name')._index, { expireAfterSeconds: 90 });
 
         T = new Schema({
-            name: { type: String, expires:  200 }
+            name: { type: Date, expires:  200 }
         });
         assert.deepEqual(T.path('name')._index, { expireAfterSeconds: 200 });
 
@@ -1073,7 +1073,7 @@ describe('schema', function(){
         assert.equal(65, i.expireAfterSeconds);
 
         T = new Schema({
-            name: { type: String, index: { sparse: true, unique: true, expires: '24h' }}
+            name: { type: Date, index: { sparse: true, unique: true, expires: '24h' }}
         });
         i = T.path('name')._index;
         assert.equal(true, i.unique);

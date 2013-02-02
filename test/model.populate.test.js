@@ -2089,8 +2089,20 @@ describe('model: populate:', function(){
           doc.fans.addToSet(_id);
           assert.equal(doc.fans[7], _id);
 
-          done();
+          doc.save(function (err) {
+            assert.ifError(err);
+            B.findById(b1).exec(function (err, doc) {
+              assert.ifError(err);
+              assert.equal(8, doc.fans.length);
+              assert.equal(doc.fans[0], user8.id);
+              assert.equal(doc.fans[5], user7.id);
+              assert.equal(doc.fans[6], null);
+              assert.equal(doc.fans[7], String(_id));
+              done();
+            })
+          })
         })
+        // TODO test setting _id directly
         // TODO test with Buffer, Number, String _ids too
       })
     })

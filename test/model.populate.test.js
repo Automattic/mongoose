@@ -2005,5 +2005,94 @@ describe('model: populate:', function(){
     })
   })
 
+  describe('setting populated paths (gh-570)', function(){
+    var db;
+    var B;
+    var U;
+    var u1, u2;
+    var b1, b2
 
+    before(function(done){
+      db = start()
+      B = db.model('RefBlogPost', posts + random())
+      U = db.model('RefUser', users + random());
+
+      U.create({
+          name  : 'Fan 1'
+        , email : 'fan1@learnboost.com'
+      }, {
+          name  : 'Fan 2'
+        , email : 'fan2@learnboost.com'
+      }, function (err, fan1, fan2) {
+        assert.ifError(err);
+        u1 = fan1;
+        u2 = fan2;
+
+        B.create({
+            title : 'Woot'
+          , fans  : [fan1, fan2]
+          , _creator: fan1
+        }, {
+            title : 'Woot2'
+          , fans  : [fan2, fan1]
+          , _creator: fan2
+        }, function (err, post1, post2) {
+          assert.ifError(err);
+          b1 = post1;
+          b2 = post2;
+          done();
+        });
+      });
+    })
+
+    after(function(){
+      db.close()
+    })
+
+    describe('should not cast to _id', function(){
+      it('if a document', function(done){
+        B.findById(b1).populate('fans _creator').exec(function (err, doc) {
+          assert.ifError(err);
+
+          var user3 = new U({ name: 'user3' });
+          doc.fans.push(user3);
+          assert.equal(doc.fans[2], user3);
+
+          var user4 = new U({ name: 'user4' });
+          doc.fans.nonAtomicPush(user4);
+          assert.equal(doc.fans[3], user4);
+
+          var user5 = new U({ name: 'user5' });
+          doc.fans.splice(2, 1, user5);
+          assert.equal(doc.fans[2], user5);
+
+          var user6 = new U({ name: 'user6' });
+          doc.fans.unshift(user6);
+          assert.equal(doc.fans[0], user6);
+
+          var user7 = new U({ name: 'user7' });
+          doc.fans.addToSet(user7);
+          assert.equal(doc.fans[5], user7);
+
+          doc.fans.forEach(function (doc) {
+            assert.ok(doc instanceof U);
+          })
+
+          var user8 = new U({ name: 'user8' });
+          doc.fans.set(0, user8);
+          assert.equal(doc.fans[0], user8);
+
+          doc.fans.push(null);
+          assert.equal(doc.fans[6], null);
+
+          var _id = new DocObjectId;
+          doc.fans.addToSet(_id);
+          assert.equal(doc.fans[7], _id);
+
+          done();
+        })
+        // TODO test with Buffer, Number, String _ids too
+      })
+    })
+  })
 });

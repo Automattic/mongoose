@@ -2006,104 +2006,142 @@ describe('model: populate:', function(){
   })
 
   describe('setting populated paths (gh-570)', function(){
-    var db;
-    var B;
-    var U;
-    var u1, u2;
-    var b1, b2
+    var types = {
+        'ObjectId': DocObjectId
+      , 'String': String
+      , 'Number': Number
+      , 'Buffer': Buffer
+    }
 
-    before(function(done){
-      db = start()
-      B = db.model('RefBlogPost', posts + random())
-      U = db.model('RefUser', users + random());
+    var construct = {};
+    construct.String = random;
+    construct.ObjectId = DocObjectId;
+    construct.Number = random;
+    construct.Buffer = function () {
+      return new Buffer(random());
+    }
 
-      U.create({
-          name  : 'Fan 1'
-        , email : 'fan1@learnboost.com'
-      }, {
-          name  : 'Fan 2'
-        , email : 'fan2@learnboost.com'
-      }, function (err, fan1, fan2) {
-        assert.ifError(err);
-        u1 = fan1;
-        u2 = fan2;
+    Object.keys(types).forEach(function (id) {
+      describe('should not cast to _id of type ' + id, function(){
+        var ID = types[id];
+        var db;
+        var B, U;
+        var u1, u2;
+        var b1, b2
 
-        B.create({
-            title : 'Woot'
-          , fans  : [fan1, fan2]
-          , _creator: fan1
-        }, {
-            title : 'Woot2'
-          , fans  : [fan2, fan1]
-          , _creator: fan2
-        }, function (err, post1, post2) {
-          assert.ifError(err);
-          b1 = post1;
-          b2 = post2;
-          done();
-        });
-      });
-    })
+        before(function(done){
+          var refuser = 'RefUser-'+id;
+          var bSchema = Schema({
+              title: String
+            , fans: [{type: id, ref: refuser }]
+            , _creator: { type: id, ref: refuser }
+          });
 
-    after(function(){
-      db.close()
-    })
+          var uSchema = Schema({
+              _id: id
+            , name: String
+            , email: String
+          });
 
-    describe('should not cast to _id', function(){
-      it('if a document', function(done){
-        B.findById(b1).populate('fans _creator').exec(function (err, doc) {
-          assert.ifError(err);
+          db = start()
+          B = db.model('RefBlogPost-'+id, bSchema, posts + random())
+          U = db.model('RefUser-'+id, uSchema, users + random());
 
-          var user3 = new U({ name: 'user3' });
-          doc.fans.push(user3);
-          assert.equal(doc.fans[2], user3);
-
-          var user4 = new U({ name: 'user4' });
-          doc.fans.nonAtomicPush(user4);
-          assert.equal(doc.fans[3], user4);
-
-          var user5 = new U({ name: 'user5' });
-          doc.fans.splice(2, 1, user5);
-          assert.equal(doc.fans[2], user5);
-
-          var user6 = new U({ name: 'user6' });
-          doc.fans.unshift(user6);
-          assert.equal(doc.fans[0], user6);
-
-          var user7 = new U({ name: 'user7' });
-          doc.fans.addToSet(user7);
-          assert.equal(doc.fans[5], user7);
-
-          doc.fans.forEach(function (doc) {
-            assert.ok(doc instanceof U);
-          })
-
-          var user8 = new U({ name: 'user8' });
-          doc.fans.set(0, user8);
-          assert.equal(doc.fans[0], user8);
-
-          doc.fans.push(null);
-          assert.equal(doc.fans[6], null);
-
-          var _id = new DocObjectId;
-          doc.fans.addToSet(_id);
-          assert.equal(doc.fans[7], _id);
-
-          doc.save(function (err) {
+          U.create({
+              _id: construct[id]()
+            , name  : 'Fan 1'
+            , email : 'fan1@learnboost.com'
+          }, {
+              _id: construct[id]()
+            , name  : 'Fan 2'
+            , email : 'fan2@learnboost.com'
+          }, function (err, fan1, fan2) {
             assert.ifError(err);
-            B.findById(b1).exec(function (err, doc) {
+            u1 = fan1;
+            u2 = fan2;
+
+            B.create({
+                title : 'Woot'
+              , fans  : [fan1, fan2]
+              , _creator: fan1
+            }, {
+                title : 'Woot2'
+              , fans  : [fan2, fan1]
+              , _creator: fan2
+            }, function (err, post1, post2) {
               assert.ifError(err);
-              assert.equal(8, doc.fans.length);
-              assert.equal(doc.fans[0], user8.id);
-              assert.equal(doc.fans[5], user7.id);
-              assert.equal(doc.fans[6], null);
-              assert.equal(doc.fans[7], String(_id));
+              b1 = post1;
+              b2 = post2;
               done();
+            });
+          });
+        })
+
+        after(function(done){
+          db.close(done)
+        })
+
+        function user (name) {
+          return new U({ _id: construct[id](), name: name });
+        }
+
+        it('if a document', function(done){
+          B.findById(b1).populate('fans _creator').exec(function (err, doc) {
+            assert.ifError(err);
+
+            var user3 = user('user3');
+            doc.fans.push(user3);
+            assert.equal(doc.fans[2], user3);
+
+            var user4 = user('user4');
+            doc.fans.nonAtomicPush(user4);
+            assert.equal(doc.fans[3], user4);
+
+            var user5 = user('user5');
+            doc.fans.splice(2, 1, user5);
+            assert.equal(doc.fans[2], user5);
+
+            var user6 = user('user6');
+            doc.fans.unshift(user6);
+            assert.equal(doc.fans[0], user6);
+
+            var user7 = user('user7');
+            doc.fans.addToSet(user7);
+            assert.equal(doc.fans[5], user7);
+
+            doc.fans.forEach(function (doc) {
+              assert.ok(doc instanceof U);
+            })
+
+            var user8 = user('user8');
+            doc.fans.set(0, user8);
+            assert.equal(doc.fans[0], user8);
+
+            doc.fans.push(null);
+            assert.equal(doc.fans[6], null);
+
+            var _id = construct[id]();
+            doc.fans.addToSet(_id);
+            if (Buffer.isBuffer(_id)) {
+              assert.equal(doc.fans[7].toString('utf8'), _id.toString('utf8'));
+            } else {
+              assert.equal(doc.fans[7], _id);
+            }
+
+            doc.save(function (err) {
+              assert.ifError(err);
+              B.findById(b1).exec(function (err, doc) {
+                assert.ifError(err);
+                assert.equal(8, doc.fans.length);
+                assert.equal(doc.fans[0], user8.id);
+                assert.equal(doc.fans[5], user7.id);
+                assert.equal(doc.fans[6], null);
+                assert.equal(doc.fans[7], String(_id));
+                done();
+              })
             })
           })
         })
-        // TODO test setting _id directly
-        // TODO test with Buffer, Number, String _ids too
       })
     })
   })

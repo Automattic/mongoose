@@ -2128,6 +2128,15 @@ describe('model: populate:', function(){
               assert.equal(doc.fans[7], _id);
             }
 
+            assert.equal(doc._creator.email, u1.email);
+
+            doc._creator = null;
+            assert.equal(null, doc._creator);
+
+            var creator = user('creator');
+            doc._creator = creator;
+            assert.equal(doc._creator, creator);
+
             doc.save(function (err) {
               assert.ifError(err);
               B.findById(b1).exec(function (err, doc) {

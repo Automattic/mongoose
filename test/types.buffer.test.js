@@ -363,4 +363,21 @@ describe('types.buffer', function(){
     }
   });
 
+  it('can be set to null', function(done){
+    var db = start()
+      , User = db.model('UserBuffer', UserBuffer, 'usersbuffer_' + random());
+    var user = new User({ array: [null], required: new Buffer(1) });
+    user.save(function (err, doc) {
+      assert.ifError(err);
+      User.findById(doc, function (err, doc) {
+        db.close();
+        assert.ifError(err);
+        assert.equal(1, doc.array.length);
+        assert.equal(null, doc.array[0]);
+        done();
+      })
+    })
+
+  })
+
 })

@@ -1,4 +1,33 @@
 
+3.6.0rc0 / 2013-02-03
+======================
+
+  * changed; cast 'true'/'false' to boolean #1282 [mgrach](https://github.com/mgrach)
+  * changed; Buffer arrays can now contain nulls
+  * fixed; properly pass subtype to Binary in MongooseBuffer
+  * fixed; casting _id from document with non-ObjectId _id
+  * fixed; specifying schema type edge case { path: [{type: "String" }] }
+  * fixed; typo in schemdate #1329 [jplock](https://github.com/jplock)
+  * refactor; move expires index to SchemaDate #1328
+  * refactor; internal document properties #1171 #1184
+  * added; performance improvements to populate() [263ece9](https://github.com/LearnBoost/mongoose/commit/263ece9)
+  * added; allow adding uncasted docs to populated arrays and properties #570
+  * added; doc#populated(path) stores original populated _ids
+  * added; lean population #1260
+  * added; query.populate() now accepts an options object
+  * added; document#populate(opts, callback)
+  * added; Model.populate(docs, opts, callback)
+  * added; support for rich nested path population
+  * added; doc.array.remove(value) subdoc with _id value support #1278
+  * added; optionally allow non-strict sets and updates
+  * added; promises/A+ comformancy with [mpromise](https://github.com/aheckmann/mpromise)
+  * added; promise#then
+  * added; promise#end
+  * updated; mocha 1.8.1
+  * updated; muri to 0.3.0
+  * updated; mpath to 0.1.1
+  * updated; docs
+
 3.5.5 / 2013-01-29
 ==================
 

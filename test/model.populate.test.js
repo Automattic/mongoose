@@ -2146,6 +2146,7 @@ describe('model: populate:', function(){
                 assert.equal(doc.fans[5], user7.id);
                 assert.equal(doc.fans[6], null);
                 assert.equal(doc.fans[7], String(_id));
+                assert.equal(String(doc._creator), creator._id);
                 done();
               })
             })

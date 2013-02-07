@@ -36,7 +36,7 @@ code {
   color: #333;
   border-radius: 3px;
   font-size: 13px;
-  font-family: Monaco;
+  font-family: Consolas, "Liberation Mono", Courier, monospace;
 }
 pre code {
   border: 0 none;

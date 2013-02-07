@@ -22,7 +22,7 @@
   , "directories": { "lib": "./lib/mongoose" }
   , "scripts": { "test": "make test" }
   , "main": "./index.js"
-  , "engines": { "node": ">= 0.4.0" }
+  , "engines": { "node": ">=0.6.19" }
   , "bugs": {
         "url":"https://github.com/learnboost/mongoose/issues/new"
       , "email": "https://groups.google.com/group/mongoose-orm"

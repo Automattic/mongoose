@@ -2155,4 +2155,88 @@ describe('model: populate:', function(){
       })
     })
   })
+
+  describe('deselecting _id', function(){
+    var db, C, U, u1, c1, c2;
+    before(function(done){
+      db = start();
+
+      C = db.model('Comment', Schema({
+          body: 'string'
+      }));
+
+      U = db.model('User', Schema({
+          name: 'string'
+        , comments: [{ type: Schema.ObjectId, ref: 'Comment' }]
+      }));
+
+      C.create({ body: 'comment 1', }, { body: 'comment 2' }, function (err, c1_, c2_) {
+        assert.ifError(err);
+        c1 = c1_;
+        c2 = c2_;
+
+        U.create({ name: 'u1', comments: [c1, c2] }, function (err, u) {
+          assert.ifError(err);
+          u1 = u;
+          done();
+        });
+      });
+    })
+
+    after(function(done){
+      db.close(done)
+    })
+
+    describe('in a subdocument', function(){
+      it('works', function(done){
+        U.find().populate('comments', { _id: 0 }).exec(function (err, docs) {
+          assert.ifError(err);
+
+          var doc = docs[0];
+          assert.equal(2, doc.comments.length);
+          doc.comments.forEach(function (d) {
+            assert.equal(undefined, d._id);
+            assert.ok(d.body.length);
+            assert.equal('number', typeof d._doc.__v);
+          });
+
+          U.findOne().populate('comments', '-_id').exec(function (err, doc) {
+            assert.ifError(err);
+            assert.equal(2, doc.comments.length);
+            doc.comments.forEach(function (d) {
+              assert.equal(undefined, d._id);
+              assert.ok(d.body.length);
+              assert.equal('number', typeof d._doc.__v);
+            });
+            done();
+          })
+        })
+      })
+
+      it('with lean', function(done){
+        U.find().lean().populate({ path: 'comments', select: { _id: 0 }, options: { lean: true }}).exec(function (err, docs) {
+          assert.ifError(err);
+
+          var doc = docs[0];
+          assert.equal(2, doc.comments.length);
+          doc.comments.forEach(function (d) {
+            assert.ok(!('_id' in d));
+            assert.ok(d.body.length);
+            assert.equal('number', typeof d.__v);
+          });
+
+          U.findOne().lean().populate('comments', '-_id', null, { lean: true}).exec(function (err, doc) {
+            assert.ifError(err);
+            assert.equal(2, doc.comments.length);
+            doc.comments.forEach(function (d) {
+              assert.ok(!('_id' in d));
+              assert.ok(d.body.length);
+              assert.equal('number', typeof d.__v);
+            });
+            done();
+          })
+        })
+      })
+    })
+  })
 });

@@ -49,7 +49,7 @@ pre {
 code {
   color: #333;
   font-size: 11px;
-  font-family: Monaco;
+  font-family: Consolas, "Liberation Mono", Courier, monospace;
 }
 pre code {
   border: 0 none;

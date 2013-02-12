@@ -717,8 +717,25 @@ describe('connections:', function(){
         })
       })
     })
-  })
 
+    describe('passing object literal schemas', function(){
+      it('works', function(done){
+        var db = start();
+        var A = db.model('A', { n: [{ age: 'number' }]});
+        var a = new A({ n: [{ age: '47' }] });
+        assert.strictEqual(47, a.n[0].age);
+        a.save(function (err) {
+          assert.ifError(err);
+          A.findById(a, function (err, doc) {
+            db.close();
+            assert.ifError(err);
+            assert.strictEqual(47, a.n[0].age);
+            done();
+          })
+        })
+      })
+    })
+  })
 
   describe('openSet', function(){
     it('accepts uris, dbname, options', function(done){

@@ -231,6 +231,16 @@ describe('mongoose module:', function(){
         })
       })
     })
+
+    describe('passing object literal schemas', function(){
+      it('works', function(done){
+        var m = new Mongoose;
+        var A = m.model('A', { n: [{ age: 'number' }]});
+        var a = new A({ n: [{ age: '47' }] });
+        assert.strictEqual(47, a.n[0].age);
+        done()
+      })
+    })
   });
 
   it('connecting with a signature of host, database, function', function(done){

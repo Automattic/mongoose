@@ -53,6 +53,12 @@ var BlogPost = new Schema({
 mongoose.model('Versioning', BlogPost);
 
 describe('versioning', function(){
+  it('is only added to parent schema (gh-1265)', function(done){
+    assert.ok(BlogPost.path('__v'));
+    assert.ok(!BlogPost.path('comments').__v);
+    assert.ok(!BlogPost.path('meta.nested').__v);
+    done();
+  })
 
   it('works', function (done) {
     var db = start()

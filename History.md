@@ -1,4 +1,23 @@
 
+3.5.6 / 2013-02-14
+==================
+
+  * updated; driver to 1.2.12
+  * fixed; properly pass Binary subtype
+  * fixed; add EventEmitter props to reserved paths #1338
+  * fixed; use correct node engine version
+  * fixed; display empty docs as {} in log output #953 follow up
+  * improved; "bad $within $box argument" error message
+  * populate; add unscientific benchmark
+  * website; add stack overflow to help section
+  * website; use better code font #1336 [risseraka](https://github.com/risseraka)
+  * website; clarify where help is available
+  * website; fix source code links #1272 [floatingLomas](https://github.com/floatingLomas)
+  * docs; be specific about _id schema option #1103
+  * docs; add ensureIndex error handling example
+  * docs; README
+  * docs; CONTRIBUTING.md
+
 3.5.5 / 2013-01-29
 ==================
 

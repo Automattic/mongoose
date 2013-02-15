@@ -313,11 +313,23 @@ describe('document.populate', function(){
     });
   });
 
-  it('of non-existant property', function(done){
+  it('a property not in schema', function(done){
     B.findById(post, function (err, post) {
-      post.populate('idontexist', function (err, post) {
-        assert.ifError(err);
-        done();
+      assert.ifError(err);
+      post.populate('idontexist', function (err) {
+        assert.ok(err);
+
+        // stuff an ad-hoc value in
+        post.setValue('idontexist', user1._id);
+
+        // populate the non-schema value by passing an explicit model
+        post.populate({ path: 'idontexist', model: 'doc.populate.u' }, function (err, post) {
+          assert.ifError(err);
+          assert.ok(post);
+          assert.equal(post.get('idontexist')._id, user1._id.toString());
+          assert.equal(post.get('idontexist').name, 'Phoenix');
+          done();
+        });
       });
     });
   })

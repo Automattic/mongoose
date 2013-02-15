@@ -1006,35 +1006,55 @@ describe('model: populate:', function(){
         }, function (err, post) {
           assert.ifError(err);
 
-          // invalid subprop
+          // non-existant subprop
           BlogPost
           .findById(post._id)
           .populate('comments._idontexist', 'email')
-          .exec(function (err, post) {
-            assert.ifError(err);
-            assert.ok(post);
-            assert.equal(post.comments.length, 2);
-            assert.strictEqual(post.comments[0]._creator, null);
-            assert.equal(post.comments[1]._creator.toString(),user2.id);
+          .exec(function (err) {
+            assert.ok(err);
 
-            // subprop is null in a doc
-            BlogPost
-            .findById(post._id)
-            .populate('comments._creator', 'email')
-            .exec(function (err, post) {
-              db.close();
+            // add a non-schema property to the document.
+            BlogPost.collection.update(
+                { _id: post._id }
+              , { $set: { 'comments.0._idontexist': user2._id }}, function (err) {
               assert.ifError(err);
 
-              assert.ok(post.comments);
-              assert.equal(post.comments.length,2);
-              assert.strictEqual(post.comments[0]._creator, null);
-              assert.strictEqual(post.comments[0].content, 'Woot woot');
-              assert.equal(post.comments[1]._creator.email,'terminator1000@learnboost.com');
-              assert.equal(post.comments[1]._creator.isInit('name'), false);
-              assert.equal(post.comments[1].content,'Wha wha');
+              // allow population of unknown property by passing model name.
+              // helpful when populating mapReduce results too.
+              BlogPost
+              .findById(post._id)
+              .populate('comments._idontexist', 'email', 'RefUser')
+              .exec(function (err, post) {
+                assert.ifError(err);
+                assert.ok(post);
+                assert.equal(post.comments.length, 2);
+                assert.ok(post.comments[0].get('_idontexist'));
+                assert.equal(String(post.comments[0].get('_idontexist')._id), user2.id);
+                assert.equal(post.comments[0].get('_idontexist').email, 'terminator1000@learnboost.com');
+                assert.equal(post.comments[0].get('_idontexist').isInit('name'), false);
+                assert.strictEqual(post.comments[0]._creator, null);
+                assert.equal(post.comments[1]._creator.toString(),user2.id);
 
-              done();
-            });
+                // subprop is null in a doc
+                BlogPost
+                .findById(post._id)
+                .populate('comments._creator', 'email')
+                .exec(function (err, post) {
+                  db.close();
+                  assert.ifError(err);
+
+                  assert.ok(post.comments);
+                  assert.equal(post.comments.length,2);
+                  assert.strictEqual(post.comments[0]._creator, null);
+                  assert.strictEqual(post.comments[0].content, 'Woot woot');
+                  assert.equal(post.comments[1]._creator.email,'terminator1000@learnboost.com');
+                  assert.equal(post.comments[1]._creator.isInit('name'), false);
+                  assert.equal(post.comments[1].content,'Wha wha');
+
+                  done();
+                });
+              });
+            })
           });
         });
       });

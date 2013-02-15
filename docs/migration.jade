@@ -189,8 +189,10 @@ block content
     To connect to a [ReplicaSet](http://www.mongodb.org/display/DOCS/Replica+Sets) you no longer use the separate `connectSet` or `createSetConnection` methods. Both [mongoose.connect](./api.html#index_Mongoose-connect) and [mongoose.createConnection](./api.html#index_Mongoose-createConnection) are now smart enough to just do the right thing with your connection string. If you really want to bring `connectSet` and `createSetConnection` back use [this module](https://github.com/aheckmann/mongoose-v2-compat).
 
   h3 Schemas
+  .important
+    :markdown
+      Schemas are now [strict](./guide.html#strict) by default. This means that if you depended on saving fields not defined in the schema, you may lose data unless you set this back to false.
   :markdown
-    - are now [strict](./guide.html#strict) by default.
     - Arrays of [object literal](./subdocs.html#altsyntax) now creates document arrays instead of arrays of [Mixed](./schematypes.html#mixed).
     - Indexes are now created in [background](./guide.html#autoIndex) by default.
     - Index errors are now emitted on their model instead of the connection. See issue [#984](https://github.com/LearnBoost/mongoose/issues/984).

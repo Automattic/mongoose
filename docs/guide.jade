@@ -272,7 +272,7 @@ block content
   :markdown
     Mongoose assigns each of your schemas an `_id` field by default if one is not passed into the [Schema](/docs/api.html#schema-js) constructor. The type assiged is an [ObjectId](/docs/api.html#schema_Schema.Types) to coincide with MongoDBs default behavior. If you don't want an `_id` added to your schema at all, you may disable it using this option.
 
-    Pass this option during schema construction to prevent documents from getting an auto `_id` created.
+    Pass this option during schema construction to prevent documents from getting an `_id` auto created by Mongoose (parent documents will still have an `_id` created by MongoDB when inserted).
   :js
     // default behavior
     var schema = new Schema({ name: String });
@@ -285,6 +285,14 @@ block content
     var Page = mongoose.model('Page', schema);
     var p = new Page({ name: 'mongodb.org' });
     console.log(p); // { name: 'mongodb.org' }
+    // MongoDB will create the _id when inserted
+    p.save(function (err) {
+      if (err) return handleError(err);
+      Page.findById(p, function (err, doc) {
+        if (err) return handleError(err);
+        console.log(doc); // { name: 'mongodb.org', _id: '50341373e894ad16347efe12' }
+      })
+    })
 
   h4#read option: read
   :markdown

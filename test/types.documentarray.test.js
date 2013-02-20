@@ -296,6 +296,12 @@ describe('types.documentarray', function(){
       var subdoc = t.docs[t.docs.length-1];
       subdoc.invalidate('name', 'boo boo', '%');
 
+      subdoc = t.docs.create({ name: 'yep' });
+      assert.throws(function(){
+        // has no parent array
+        subdoc.invalidate('name', 'crap', 47);
+      }, /^Error: Unable to invalidate a subdocument/);
+
       t.validate(function (err) {
         var e = t.errors['docs.0.name'];
         assert.ok(e);

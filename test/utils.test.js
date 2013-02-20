@@ -241,5 +241,21 @@ describe('utils', function(){
     assert.equal(false, r.isValid(r.model));
     done();
   })
+
+  describe('clone', function(){
+    it('retains RegExp options gh-1355', function(done){
+      var a = new RegExp('hello', 'igm');
+      assert.ok(a.global);
+      assert.ok(a.ignoreCase);
+      assert.ok(a.multiline);
+
+      var b = utils.clone(a);
+      assert.equal(b.source, a.source);
+      assert.equal(a.global, b.global);
+      assert.equal(a.ignoreCase, b.ignoreCase);
+      assert.equal(a.multiline, b.multiline);
+      done();
+    })
+  })
 })
 

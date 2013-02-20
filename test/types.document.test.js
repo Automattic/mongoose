@@ -75,7 +75,7 @@ describe('types.document', function(){
     a.save(function(err){
       assert.ok(a.__parent.$__.validationError instanceof ValidationError);
       assert.equal(a.__parent.errors['jsconf.ar.0.work'].name, 'ValidatorError');
-      assert.equal(a.__parent.$__.validationError.toString(), 'ValidationError: Validator "required" failed for path test, Validator failed for path work');
+      assert.equal(a.__parent.$__.validationError.toString(), 'ValidationError: Validator "required" failed for path test with value ``, Validator failed for path work with value `nope`');
       done();
     });
   });

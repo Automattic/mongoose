@@ -350,6 +350,9 @@ describe('schema', function(){
 
       Tobi.path('friends').doValidate(100, function(err){
         assert.ok(err instanceof ValidatorError);
+        assert.equal('friends', err.path);
+        assert.equal('max', err.type);
+        assert.equal(100, err.value);
       });
 
       Tobi.path('friends').doValidate(1, function(err){

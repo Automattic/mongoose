@@ -928,8 +928,8 @@ describe('model', function(){
         assert.ok(err instanceof MongooseError);
         assert.ok(err instanceof ValidationError);
         assert.ok(err.errors.simple instanceof ValidatorError);
-        assert.equal(err.errors.simple.message,'Validator "must be abc" failed for path simple');
-        assert.equal(post.errors.simple.message,'Validator "must be abc" failed for path simple');
+        assert.equal(err.errors.simple.message,'Validator "must be abc" failed for path simple with value ``');
+        assert.equal(post.errors.simple.message,'Validator "must be abc" failed for path simple with value ``');
 
         post.set('simple', 'abc');
         post.save(function(err){
@@ -952,7 +952,7 @@ describe('model', function(){
       var doc = new IntrospectionValidation({name: 'hi'});
       doc.save( function (err) {
         db.close();
-        assert.equal(err.errors.name.message,"Validator \"Name cannot be greater than 1 character\" failed for path name");
+        assert.equal(err.errors.name.message, "Validator \"Name cannot be greater than 1 character\" failed for path name with value `hi`");
         assert.equal(err.name,"ValidationError");
         assert.equal(err.message,"Validation failed");
         done();
@@ -1010,17 +1010,17 @@ describe('model', function(){
         assert.ok(err.errors.password instanceof ValidatorError);
         assert.ok(err.errors.email instanceof ValidatorError);
         assert.ok(err.errors.username instanceof ValidatorError);
-        assert.equal(err.errors.password.message,'Validator failed for path password');
-        assert.equal(err.errors.email.message,'Validator failed for path email');
-        assert.equal(err.errors.username.message,'Validator failed for path username');
+        assert.equal(err.errors.password.message,'Validator failed for path password with value `short`');
+        assert.equal(err.errors.email.message,'Validator failed for path email with value `too`');
+        assert.equal(err.errors.username.message,'Validator failed for path username with value `nope`');
 
         assert.equal(Object.keys(post.errors).length, 3);
         assert.ok(post.errors.password instanceof ValidatorError);
         assert.ok(post.errors.email instanceof ValidatorError);
         assert.ok(post.errors.username instanceof ValidatorError);
-        assert.equal(post.errors.password.message,'Validator failed for path password');
-        assert.equal(post.errors.email.message,'Validator failed for path email');
-        assert.equal(post.errors.username.message,'Validator failed for path username');
+        assert.equal(post.errors.password.message,'Validator failed for path password with value `short`');
+        assert.equal(post.errors.email.message,'Validator failed for path email with value `too`');
+        assert.equal(post.errors.username.message,'Validator failed for path username with value `nope`');
         done();
       });
     });
@@ -1136,9 +1136,9 @@ describe('model', function(){
         assert.ok(err instanceof MongooseError);
         assert.ok(err instanceof ValidationError);
         assert.ok(err.errors['items.0.subs.0.required'] instanceof ValidatorError);
-        assert.equal(err.errors['items.0.subs.0.required'].message,'Validator "required" failed for path required');
+        assert.equal(err.errors['items.0.subs.0.required'].message,'Validator "required" failed for path required with value ``');
         assert.ok(post.errors['items.0.subs.0.required'] instanceof ValidatorError);
-        assert.equal(post.errors['items.0.subs.0.required'].message,'Validator "required" failed for path required');
+        assert.equal(post.errors['items.0.subs.0.required'].message,'Validator "required" failed for path required with value ``');
 
         assert.ok(!err.errors['items.0.required']);
         assert.ok(!err.errors['items.0.required']);
@@ -1152,7 +1152,7 @@ describe('model', function(){
           assert.ok(err);
           assert.ok(err.errors);
           assert.ok(err.errors['items.0.required'] instanceof ValidatorError);
-          assert.equal(err.errors['items.0.required'].message,'Validator "required" failed for path required');
+          assert.equal(err.errors['items.0.required'].message,'Validator "required" failed for path required with value ``');
 
           assert.ok(!err.errors['items.0.subs.0.required']);
           assert.ok(!err.errors['items.0.subs.0.required']);
@@ -1194,7 +1194,7 @@ describe('model', function(){
           assert.ok(err instanceof MongooseError);
           assert.ok(err instanceof ValidationError);
           assert.ok(err.errors.async instanceof ValidatorError);
-          assert.equal(err.errors.async.message,'Validator "async validator" failed for path async');
+          assert.equal(err.errors.async.message,'Validator "async validator" failed for path async with value `test`');
           assert.equal(true, executed);
           executed = false;
 
@@ -3502,9 +3502,9 @@ describe('model', function(){
         query.exec(function (err, found) {
           db.close();
           assert.ifError(err);
-          assert.equal(found.length,2);
-          assert.equal(found[0]._id.id,createdOne._id.id);
-          assert.equal(found[1]._id.id,createdTwo._id.id);
+          assert.equal(found.length, 2);
+          assert.equal(found[0]._id.id, createdOne._id.id);
+          assert.equal(found[1]._id.id, createdTwo._id.id);
           done();
         });
       });

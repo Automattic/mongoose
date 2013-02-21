@@ -91,6 +91,7 @@ h2 a {
   font-size: 25px;
   text-shadow: 1px 1px #f8f8f8;
   text-align: center;
+  margin: 7px 0;
 }
 .blurb {
   text-align: center;
@@ -103,7 +104,7 @@ h2 a {
   color: #800;
 }
 #links {
-  margin: 30px 10px 46px;
+  margin: 50px 10px 20px;
   text-align: center;
   position: relative;
 }
@@ -126,6 +127,25 @@ h2 a {
   text-decoration: none;
   text-transform: lowercase;
   text-shadow: 1px 1px 7px #222;
+}
+#follow {
+  margin-bottom: 38px;
+  margin-left: 109px;
+}
+#follow ul {
+  height: 26px;
+}
+#follow li {
+  display: inline-block;
+  font-size: 12px;
+  margin-right: 12px;
+}
+#follow #version {
+  margin: 0 29px 0 10px;
+}
+#follow #version span {
+  position: relative;
+  top: -4px;
 }
 #production ul {
   padding: 0;
@@ -201,7 +221,13 @@ h2 a {
     padding: 7px 34px;
     font-size: 15px;
   }
-  #docs { margin-left: 0; }
+  #follow, #docs { margin-left: 0; }
+  #follow ul { padding-left: 15px }
+  #follow li { margin-right: 0px }
+  #follow #version {
+    margin-left: 5px;
+    margin-right: 15px;
+  }
   .module {
     padding-left: 5px;
     border-width: 3px;

@@ -23,9 +23,17 @@ html(lang='en')
       #links
         ul
           li
-            a(href="docs/guide.html") Docs
+            a(href="docs/guide.html") Read the Docs
           li
-            a(href="http://plugins.mongoosejs.com") Plugins
+            a(href="http://plugins.mongoosejs.com") Discover Plugins
+      #follow
+        ul
+          li
+            iframe(class="github-btn", src="http://ghbtns.com/github-btn.html?user=learnboost&amp;repo=mongoose&amp;type=watch&amp;count=true", allowtransparency="true", frameborder="0", scrolling="0", width="100px", height="20px")
+          li#version
+            span Version #{package.version}
+          li
+            iframe(class="github-btn", src="http://ghbtns.com/github-btn.html?user=learnboost&amp;repo=mongoose&amp;type=fork&amp;count=true", allowtransparency="true", frameborder="0", scrolling="0", width="100px", height="20px")
       #example
         :js
           var mongoose = require('mongoose');
@@ -60,6 +68,11 @@ html(lang='en')
           li
             a(href="http://www.mongodb.org/display/DOCS/Technical+Support") 10gen
           li irc: #mongoosejs on freenode
+      #changelog
+        h2 Changelog
+        ul
+          li
+            a(href="https://github.com/learnboost/mongoose/blob/master/History.md") Changelog
       #production
         h2
           | Production

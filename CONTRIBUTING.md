@@ -3,6 +3,8 @@
 ### Reporting bugs
 
 - Before opening a new issue, look for existing [issues](https://github.com/learnboost/mongoose/issues) to avoid duplication. If the issue does not yet exist, [create one](https://github.com/learnboost/mongoose/issues/new).
+  - Please describe the issue you are experiencing, along with any associated stack trace.
+  - Please post code that reproduces the issue, the version of mongoose, node version, and mongodb version.
   - _The source of this project is written in javascript, not coffeescript, therefore your bug reports should be written in javascript_. 
   - In general, adding a "+1" comment to an existing issue does little to help get it resolved. A better way is to submit a well documented pull request with clean code and passing tests.
 

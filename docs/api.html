@@ -6939,8 +6939,13 @@ doc.markModified(<span class="string">'mixed.type'</span>);</code></pre></div><h
   <span class="keyword">if</span> (<span class="string">'Date'</span> === obj.constructor.name)
     <span class="keyword">return</span> <span class="keyword">new</span> obj.constructor(+obj);
 
-  <span class="keyword">if</span> (<span class="string">'RegExp'</span> === obj.constructor.name)
-    <span class="keyword">return</span> <span class="keyword">new</span> RegExp(obj.source);
+  <span class="keyword">if</span> (<span class="string">'RegExp'</span> === obj.constructor.name) {
+    <span class="keyword">var</span> flags = [];
+    <span class="keyword">if</span> (obj.global) flags.push(<span class="string">'g'</span>);
+    <span class="keyword">if</span> (obj.multiline) flags.push(<span class="string">'m'</span>);
+    <span class="keyword">if</span> (obj.ignoreCase) flags.push(<span class="string">'i'</span>);
+    <span class="keyword">return</span> <span class="keyword">new</span> RegExp(obj.source, flags.join(<span class="string">''</span>));
+  }
 
   <span class="keyword">if</span> (obj <span class="keyword">instanceof</span> ObjectId)
     <span class="keyword">return</span> <span class="keyword">new</span> ObjectId(obj.id);

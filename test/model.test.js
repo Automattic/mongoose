@@ -647,10 +647,14 @@ describe('model', function(){
       assert.equal(false, threw);
 
       post.save(function(err){
-        db.close();
         assert.ok(err instanceof MongooseError);
         assert.ok(err instanceof CastError);
-        done();
+        post.date = new Date;
+        post.save(function (err) {
+          db.close();
+          assert.ifError(err);
+          done();
+        })
       });
     })
     it('nested error', function(done){

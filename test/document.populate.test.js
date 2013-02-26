@@ -317,7 +317,7 @@ describe('document.populate', function(){
     B.findById(post, function (err, post) {
       assert.ifError(err);
       post.populate('idontexist', function (err) {
-        assert.ok(err);
+        assert.ifError(err);
 
         // stuff an ad-hoc value in
         post.setValue('idontexist', user1._id);

@@ -1011,7 +1011,7 @@ describe('model: populate:', function(){
           .findById(post._id)
           .populate('comments._idontexist', 'email')
           .exec(function (err) {
-            assert.ok(err);
+            assert.ifError(err);
 
             // add a non-schema property to the document.
             BlogPost.collection.update(

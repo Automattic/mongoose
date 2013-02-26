@@ -1928,7 +1928,7 @@ describe('geo-spatial', function(){
     })
   })
 
-  describe('2dsphere XXX', function(){
+  describe('2dsphere', function(){
     // mongodb 2.4
 
     var schema2dsphere = new Schema({ loc: { type: [Number], index: '2dsphere'}});

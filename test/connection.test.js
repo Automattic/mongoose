@@ -825,4 +825,28 @@ describe('connections:', function(){
       }
     })
   })
+
+  describe('modelNames()', function(){
+    it('returns names of all models registered on it', function(done){
+      var m = new mongoose.Mongoose;
+      m.model('root', { x: String });
+      m.model('another', { x: String });
+
+      var db = m.createConnection();
+      db.model('something', { x: String });
+
+      var names = db.modelNames();
+      assert.ok(Array.isArray(names));
+      assert.equal(1, names.length);
+      assert.equal('something', names[0]);
+
+      names = m.modelNames();
+      assert.ok(Array.isArray(names));
+      assert.equal(2, names.length);
+      assert.equal('root', names[0]);
+      assert.equal('another', names[1]);
+
+      done();
+    })
+  })
 })

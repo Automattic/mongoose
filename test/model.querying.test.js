@@ -1936,7 +1936,6 @@ describe('geo-spatial', function(){
     var geoSchema = new Schema({ line: { type: { type: String }, coordinates: []}});
     geoSchema.index({ line: '2dsphere' });
 
-
     var mongo24_or_greater = false;
     before(function(done){
       start.mongodVersion(function (err, version) {
@@ -2055,8 +2054,9 @@ describe('geo-spatial', function(){
     })
   })
 
-  describe('hashed', function(){
+  describe('hashed indexes', function(){
     var mongo24_or_greater = false;
+
     before(function(done){
       start.mongodVersion(function (err, version) {
         if (err) return done(err);
@@ -2066,47 +2066,42 @@ describe('geo-spatial', function(){
       })
     })
 
-    it('indexes work', function(done){
+    it('work', function(done){
       if (!mongo24_or_greater) return done();
-
       var db = start();
-      var hashSchema = new Schema({ t: { type: String, index: 'hashed' }});
-      var H = db.model('Hashed', hashSchema);
-      H.on('index', function (err) {
-        assert.ifError(err);
-        H.collection.getIndexes(function (err, indexes) {
+      var schemas = [];
+      schemas[0] = new Schema({ t: { type: String, index: 'hashed' }});
+      schemas[1] = new Schema({ t: { type: String, index: 'hashed', sparse: true }});
+      schemas[2] = new Schema({ t: { type: String, index: { type: 'hashed', sparse: true }}});
+
+      var pending = schemas.length;
+
+      schemas.forEach(function (schema, i) {
+        var H = db.model('Hashed' + i, schema);
+        H.on('index', function (err) {
           assert.ifError(err);
-          assert.ok(indexes.t_hashed);
-          H.create({ t: 'hashing' }, function (err, doc) {
+          H.collection.getIndexes({ full: true }, function (err, indexes) {
             assert.ifError(err);
-            assert.ok(doc);
-            done();
+
+            var found = indexes.some(function (index) {
+              return 'hashed' === index.key.t;
+            })
+            assert.ok(found);
+
+            H.create({ t: 'hashing' }, { }, function (err, doc1, doc2) {
+              assert.ifError(err);
+              assert.ok(doc1);
+              assert.ok(doc2);
+              complete();
+            })
           })
         })
       })
+
+      function complete () {
+        if (0 === --pending) done();
+      }
     })
-
-    it('+ sparse indexes work', function(done){
-      if (!mongo24_or_greater) return done();
-
-      var db = start();
-      var hashSchema = new Schema({ t: { type: String, index: 'hashed', sparse: true }});
-      var H = db.model('Hashed', hashSchema);
-      H.on('index', function (err) {
-        assert.ifError(err);
-        H.collection.getIndexes(function (err, indexes) {
-          assert.ifError(err);
-          assert.ok(indexes.t_hashed);
-          H.create({ t: 'hashing' }, { }, function (err, doc1, doc2) {
-            assert.ifError(err);
-            assert.ok(doc1);
-            assert.ok(doc2);
-            done();
-          })
-        })
-      })
-    })
-
   })
 });
 

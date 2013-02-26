@@ -732,4 +732,33 @@ describe('model: update:', function(){
       });
     })
   })
+
+  it('allows $setOnInsert operator', function(done){
+    var db = start()
+    var schema = Schema({ name: String, age: Number, x: String });
+    var M = db.model('setoninsert-' + random(), schema);
+
+    var match = { name: 'set on insert' };
+    var op = { $setOnInsert: { age: 47 }, x: 'inserted' };
+    M.update(match, op, { upsert: true }, function (err, updated) {
+      assert.ifError(err);
+      M.findOne(function (err, doc) {
+        assert.ifError(err);
+        assert.equal(47, doc.age);
+        assert.equal('set on insert', doc.name);
+
+        var match = { name: 'set on insert' };
+        var op = { $setOnInsert: { age: 108 }, name: 'changed' };
+        M.update(match, op, { upsert: true }, function (err, updated) {
+          assert.ifError(err);
+
+          M.findOne(function (err, doc) {
+            assert.equal(47, doc.age);
+            assert.equal('changed', doc.name);
+            done();
+          });
+        });
+      });
+    })
+  })
 });

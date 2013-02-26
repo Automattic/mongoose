@@ -1943,6 +1943,7 @@ describe('geo-spatial', function(){
         if (err) throw err;
 
         mongo24_or_greater = 2 < version[0] || (2 == version[0] && 4 <= version[1]);
+        if (!mongo24_or_greater) console.log('not testing mongodb 2.4 features');
         done();
       })
     })
@@ -2052,6 +2053,60 @@ describe('geo-spatial', function(){
         })
       });
     })
+  })
+
+  describe('hashed', function(){
+    var mongo24_or_greater = false;
+    before(function(done){
+      start.mongodVersion(function (err, version) {
+        if (err) return done(err);
+        mongo24_or_greater = 2 < version[0] || (2 == version[0] && 4 <= version[1]);
+        if (!mongo24_or_greater) console.log('not testing mongodb 2.4 features');
+        done();
+      })
+    })
+
+    it('indexes work', function(done){
+      if (!mongo24_or_greater) return done();
+
+      var db = start();
+      var hashSchema = new Schema({ t: { type: String, index: 'hashed' }});
+      var H = db.model('Hashed', hashSchema);
+      H.on('index', function (err) {
+        assert.ifError(err);
+        H.collection.getIndexes(function (err, indexes) {
+          assert.ifError(err);
+          assert.ok(indexes.t_hashed);
+          H.create({ t: 'hashing' }, function (err, doc) {
+            assert.ifError(err);
+            assert.ok(doc);
+            done();
+          })
+        })
+      })
+    })
+
+    it('+ sparse indexes work', function(done){
+      if (!mongo24_or_greater) return done();
+
+      var db = start();
+      var hashSchema = new Schema({ t: { type: String, index: 'hashed', sparse: true }});
+      var H = db.model('Hashed', hashSchema);
+      H.on('index', function (err) {
+        assert.ifError(err);
+        H.collection.getIndexes(function (err, indexes) {
+          assert.ifError(err);
+          assert.ok(indexes.t_hashed);
+          H.create({ t: 'hashing' }, { }, function (err, doc1, doc2) {
+            assert.ifError(err);
+            assert.ok(doc1);
+            assert.ok(doc2);
+            done();
+          })
+        })
+      })
+    })
+
   })
 });
 

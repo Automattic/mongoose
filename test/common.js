@@ -79,8 +79,7 @@ module.exports = function (options) {
     uri = options.uri;
     delete options.uri;
   } else {
-    uri = process.env.MONGOOSE_TEST_URI ||
-          'mongodb://localhost/mongoose_test'
+    uri = module.exports.uri;
   }
 
   var noErrorListener = !! options.noErrorListener;
@@ -96,6 +95,12 @@ module.exports = function (options) {
 
   return conn;
 };
+
+/*!
+ * testing uri
+ */
+
+module.exports.uri = process.env.MONGOOSE_TEST_URI || 'mongodb://localhost/mongoose_test';
 
 /**
  * expose mongoose

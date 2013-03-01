@@ -3849,13 +3849,14 @@ describe('model', function(){
   describe('auto_reconnect', function(){
     describe('if disabled', function(){
       describe('with mongo down', function(){
-        it('should pass an error', function(done){
+        it('and no command buffering should pass an error', function(done){
           var db = start({ server: { auto_reconnect: false }});
-          var T = db.model('Thing', new Schema({ type: String }));
+          var schema = Schema({ type: String }, { bufferCommands: false });
+          var T = db.model('Thing', schema);
           db.on('open', function () {
             var t = new T({ type: "monster" });
-
             var worked = false;
+
             t.save(function (err) {
               assert.equal(err.message, 'no open connections');
               worked = true;
@@ -3866,7 +3867,7 @@ describe('model', function(){
             setTimeout(function () {
               assert.ok(worked);
               done();
-            }, 500);
+            }, 100);
           });
         });
       });

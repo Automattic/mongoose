@@ -733,7 +733,7 @@ describe('model: update:', function(){
     })
   })
 
-  describe('mongodb 2.4 features XXX', function(){
+  describe('mongodb 2.4 features', function(){
     var mongo24_or_greater = false;
 
     before(function(done){

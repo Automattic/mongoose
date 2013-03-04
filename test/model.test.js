@@ -4128,6 +4128,47 @@ describe('model', function(){
         })
       });
     })
+
+    it('should use $set when subdoc changed before pulling (gh-1303)', function(done){
+      var db = start()
+        , B = db.model('BlogPost', 'gh-1303-'+random());
+
+      B.create(
+          { title: 'gh-1303', comments: [{body:'a'},{body:'b'},{body:'c'}] }
+        , function (err, b) {
+
+        assert.ifError(err);
+        B.findById(b._id, function (err, b) {
+          assert.ifError(err);
+
+          b.comments[2].body = 'changed';
+          b.comments.pull(b.comments[1]);
+
+          assert.equal(2, b.comments.length);
+          assert.equal('a', b.comments[0].body);
+          assert.equal('changed', b.comments[1].body);
+
+          var d = b._delta()[1];
+          assert.ok('$set' in d, 'invalid delta ' + JSON.stringify(d));
+          assert.ok(Array.isArray(d.$set.comments));
+          assert.equal(d.$set.comments.length, 2);
+
+          b.save(function (err) {
+            assert.ifError(err);
+
+            B.findById(b._id, function (err, b) {
+              db.close();
+              assert.ifError(err);
+              assert.ok(Array.isArray(b.comments));
+              assert.equal(2, b.comments.length);
+              assert.equal('a', b.comments[0].body);
+              assert.equal('changed', b.comments[1].body);
+              done();
+            })
+          })
+        })
+      })
+    })
   })
 
   describe('backward compatibility', function(){

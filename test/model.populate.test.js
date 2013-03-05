@@ -243,6 +243,8 @@ describe('model: populate:', function(){
             assert.ifError(err);
 
             post._creator = newCreator._id;
+            assert.equal(newCreator._id, String(post._creator));
+
             post.save(function (err) {
               assert.ifError(err);
 
@@ -1679,6 +1681,77 @@ describe('model: populate:', function(){
     });
   })
 
+  describe('specifying a custom model without specifying a ref in schema', function(done){
+    it('with String _id', function(done){
+      var db = start();
+      var A = db.model('A', { name: String, _id: String });
+      var B = db.model('B', { other: String });
+      A.create({ name: 'hello', _id: 'first' }, function (err, a) {
+        if (err) return done(err);
+        B.create({ other: a._id }, function (err, b) {
+          if (err) return done(err);
+          B.findById(b._id).populate({ path: 'other', model: 'A' }).exec(function (err, b) {
+            db.close();
+            if (err) return done(err);
+            assert.equal('hello', b.other.name);
+            done();
+          })
+        })
+      })
+    })
+    it('with Number _id', function(done){
+      var db = start();
+      var A = db.model('A', { name: String, _id: Number });
+      var B = db.model('B', { other: Number });
+      A.create({ name: 'hello', _id: 3 }, function (err, a) {
+        if (err) return done(err);
+        B.create({ other: a._id }, function (err, b) {
+          if (err) return done(err);
+          B.findById(b._id).populate({ path: 'other', model: 'A' }).exec(function (err, b) {
+            db.close();
+            if (err) return done(err);
+            assert.equal('hello', b.other.name);
+            done();
+          })
+        })
+      })
+    })
+    it('with Buffer _id', function(done){
+      var db = start();
+      var A = db.model('A', { name: String, _id: Buffer });
+      var B = db.model('B', { other: Buffer });
+      A.create({ name: 'hello', _id: new Buffer('x') }, function (err, a) {
+        if (err) return done(err);
+        B.create({ other: a._id }, function (err, b) {
+          if (err) return done(err);
+          B.findById(b._id).populate({ path: 'other', model: 'A' }).exec(function (err, b) {
+            db.close();
+            if (err) return done(err);
+            assert.equal('hello', b.other.name);
+            done();
+          })
+        })
+      })
+    })
+    it('with ObjectId _id', function(done){
+      var db = start();
+      var A = db.model('A', { name: String });
+      var B = db.model('B', { other: Schema.ObjectId });
+      A.create({ name: 'hello' }, function (err, a) {
+        if (err) return done(err);
+        B.create({ other: a._id }, function (err, b) {
+          if (err) return done(err);
+          B.findById(b._id).populate({ path: 'other', model: 'A' }).exec(function (err, b) {
+            db.close();
+            if (err) return done(err);
+            assert.equal('hello', b.other.name);
+            done();
+          })
+        })
+      })
+    })
+  })
+
   describe('specifying all params using an object', function(){
     var db, B, User;
     var post;
@@ -2025,157 +2098,6 @@ describe('model: populate:', function(){
     })
   })
 
-  describe('setting populated paths (gh-570)', function(){
-    var types = {
-        'ObjectId': DocObjectId
-      , 'String': String
-      , 'Number': Number
-      , 'Buffer': Buffer
-    }
-
-    var construct = {};
-    construct.String = random;
-    construct.ObjectId = DocObjectId;
-    construct.Number = random;
-    construct.Buffer = function () {
-      return new Buffer(random());
-    }
-
-    Object.keys(types).forEach(function (id) {
-      describe('should not cast to _id of type ' + id, function(){
-        var ID = types[id];
-        var db;
-        var B, U;
-        var u1, u2;
-        var b1, b2
-
-        before(function(done){
-          var refuser = 'RefUser-'+id;
-          var bSchema = Schema({
-              title: String
-            , fans: [{type: id, ref: refuser }]
-            , _creator: { type: id, ref: refuser }
-          });
-
-          var uSchema = Schema({
-              _id: id
-            , name: String
-            , email: String
-          });
-
-          db = start()
-          B = db.model('RefBlogPost-'+id, bSchema, posts + random())
-          U = db.model('RefUser-'+id, uSchema, users + random());
-
-          U.create({
-              _id: construct[id]()
-            , name  : 'Fan 1'
-            , email : 'fan1@learnboost.com'
-          }, {
-              _id: construct[id]()
-            , name  : 'Fan 2'
-            , email : 'fan2@learnboost.com'
-          }, function (err, fan1, fan2) {
-            assert.ifError(err);
-            u1 = fan1;
-            u2 = fan2;
-
-            B.create({
-                title : 'Woot'
-              , fans  : [fan1, fan2]
-              , _creator: fan1
-            }, {
-                title : 'Woot2'
-              , fans  : [fan2, fan1]
-              , _creator: fan2
-            }, function (err, post1, post2) {
-              assert.ifError(err);
-              b1 = post1;
-              b2 = post2;
-              done();
-            });
-          });
-        })
-
-        after(function(done){
-          db.close(done)
-        })
-
-        function user (name) {
-          return new U({ _id: construct[id](), name: name });
-        }
-
-        it('if a document', function(done){
-          B.findById(b1).populate('fans _creator').exec(function (err, doc) {
-            assert.ifError(err);
-
-            var user3 = user('user3');
-            doc.fans.push(user3);
-            assert.deepEqual(doc.fans[2].toObject(), user3.toObject());
-
-            var user4 = user('user4');
-            doc.fans.nonAtomicPush(user4);
-            assert.deepEqual(doc.fans[3].toObject(), user4.toObject());
-
-            var user5 = user('user5');
-            doc.fans.splice(2, 1, user5);
-            assert.deepEqual(doc.fans[2].toObject(), user5.toObject());
-
-            var user6 = user('user6');
-            doc.fans.unshift(user6);
-            assert.deepEqual(doc.fans[0].toObject(), user6.toObject());
-
-            var user7 = user('user7');
-            doc.fans.addToSet(user7);
-            assert.deepEqual(doc.fans[5].toObject(), user7.toObject());
-
-            doc.fans.forEach(function (doc) {
-              assert.ok(doc instanceof U);
-            })
-
-            var user8 = user('user8');
-            doc.fans.set(0, user8);
-            assert.deepEqual(doc.fans[0].toObject(), user8.toObject());
-
-            doc.fans.push(null);
-            assert.equal(doc.fans[6], null);
-
-            var _id = construct[id]();
-            doc.fans.addToSet(_id);
-            if (Buffer.isBuffer(_id)) {
-              assert.equal(doc.fans[7]._id.toString('utf8'), _id.toString('utf8'));
-            } else {
-              assert.equal(doc.fans[7]._id, String(_id));
-            }
-
-            assert.equal(doc._creator.email, u1.email);
-
-            doc._creator = null;
-            assert.equal(null, doc._creator);
-
-            var creator = user('creator');
-            doc._creator = creator;
-            assert.deepEqual(doc._creator.toObject(), creator.toObject());
-
-            doc.save(function (err) {
-              assert.ifError(err);
-              B.findById(b1).exec(function (err, doc) {
-                assert.ifError(err);
-                assert.equal(8, doc.fans.length);
-                assert.equal(doc.fans[0], user8.id);
-                assert.equal(doc.fans[5], user7.id);
-                assert.equal(doc.fans[6], null);
-                assert.equal(doc.fans[7], String(_id));
-                assert.equal(String(doc._creator), creator._id);
-                done();
-              })
-            })
-          })
-        })
-      })
-    })
-  })
-
   describe('deselecting _id', function(){
     var db, C, U, u1, c1, c2;
     before(function(done){
@@ -2259,4 +2181,5 @@ describe('model: populate:', function(){
       })
     })
   })
+
 });

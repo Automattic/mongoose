@@ -2111,23 +2111,23 @@ describe('model: populate:', function(){
 
             var user3 = user('user3');
             doc.fans.push(user3);
-            assert.equal(doc.fans[2], user3);
+            assert.deepEqual(doc.fans[2].toObject(), user3.toObject());
 
             var user4 = user('user4');
             doc.fans.nonAtomicPush(user4);
-            assert.equal(doc.fans[3], user4);
+            assert.deepEqual(doc.fans[3].toObject(), user4.toObject());
 
             var user5 = user('user5');
             doc.fans.splice(2, 1, user5);
-            assert.equal(doc.fans[2], user5);
+            assert.deepEqual(doc.fans[2].toObject(), user5.toObject());
 
             var user6 = user('user6');
             doc.fans.unshift(user6);
-            assert.equal(doc.fans[0], user6);
+            assert.deepEqual(doc.fans[0].toObject(), user6.toObject());
 
             var user7 = user('user7');
             doc.fans.addToSet(user7);
-            assert.equal(doc.fans[5], user7);
+            assert.deepEqual(doc.fans[5].toObject(), user7.toObject());
 
             doc.fans.forEach(function (doc) {
               assert.ok(doc instanceof U);
@@ -2135,7 +2135,7 @@ describe('model: populate:', function(){
 
             var user8 = user('user8');
             doc.fans.set(0, user8);
-            assert.equal(doc.fans[0], user8);
+            assert.deepEqual(doc.fans[0].toObject(), user8.toObject());
 
             doc.fans.push(null);
             assert.equal(doc.fans[6], null);
@@ -2143,9 +2143,9 @@ describe('model: populate:', function(){
             var _id = construct[id]();
             doc.fans.addToSet(_id);
             if (Buffer.isBuffer(_id)) {
-              assert.equal(doc.fans[7].toString('utf8'), _id.toString('utf8'));
+              assert.equal(doc.fans[7]._id.toString('utf8'), _id.toString('utf8'));
             } else {
-              assert.equal(doc.fans[7], _id);
+              assert.equal(doc.fans[7]._id, String(_id));
             }
 
             assert.equal(doc._creator.email, u1.email);
@@ -2155,7 +2155,7 @@ describe('model: populate:', function(){
 
             var creator = user('creator');
             doc._creator = creator;
-            assert.equal(doc._creator, creator);
+            assert.deepEqual(doc._creator.toObject(), creator.toObject());
 
             doc.save(function (err) {
               assert.ifError(err);

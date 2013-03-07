@@ -1,6 +1,7 @@
 
 var mongoose = require('../');
 var Schema = mongoose.Schema;
+var docs = process.argv[2] ? process.argv[2] | 0 : 100;
 
 var A = mongoose.model('A', Schema({ name: 'string' }));
 
@@ -23,7 +24,6 @@ mongoose.connect('localhost', 'benchmark-populate', function (err) {
   A.create({ name: 'wooooooooooooooooooooooooooooooooooooooooot' }, function (err, a) {
     if (err) return done(err);
 
-    var docs = 100;
     var pending = docs;
     for (var i = 0; i < pending; ++i) {
       var b = new B({

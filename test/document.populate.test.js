@@ -61,8 +61,7 @@ var schema = new Schema({
   , em: [em]
   , date: Date
 });
-TestDocument.prototype._setSchema(schema);
-
+TestDocument.prototype.$__setSchema(schema);
 
 /**
  * User schema.

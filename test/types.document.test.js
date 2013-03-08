@@ -21,7 +21,7 @@ function Dummy () {
   mongoose.Document.call(this, {});
 }
 Dummy.prototype.__proto__ = mongoose.Document.prototype;
-Dummy.prototype._setSchema(new Schema)
+Dummy.prototype.$__setSchema(new Schema)
 
 function Subdocument () {
   var arr = new DocumentArray;
@@ -41,7 +41,7 @@ Subdocument.prototype.__proto__ = EmbeddedDocument.prototype;
  * Set schema.
  */
 
-Subdocument.prototype._setSchema(new Schema({
+Subdocument.prototype.$__setSchema(new Schema({
     test: { type: String, required: true }
   , work: { type: String, validate: /^good/ }
 }));

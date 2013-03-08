@@ -36,7 +36,7 @@ TestDocument.prototype.__proto__ = Document.prototype;
  * Set a dummy schema to simulate compilation.
  */
 
-TestDocument.prototype._setSchema(new Schema({
+TestDocument.prototype.$__setSchema(new Schema({
     test    : String
 }));
 

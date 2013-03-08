@@ -1978,7 +1978,7 @@ describe('model', function(){
           t.nest = { st: "jsconf rules", yep: "it does" };
 
           // check that entire `nest` object is being $set
-          var u = t._delta()[1];
+          var u = t.$__delta()[1];
           assert.ok(u.$set);
           assert.ok(u.$set.nest);
           assert.equal(2, Object.keys(u.$set.nest).length);
@@ -4104,7 +4104,7 @@ describe('model', function(){
           b.numbers = [];
           b.numbers.push(3);
 
-          var d = b._delta()[1];
+          var d = b.$__delta()[1];
           assert.ok('$set' in d, 'invalid delta ' + JSON.stringify(d));
           assert.ok(Array.isArray(d.$set.numbers));
           assert.equal(d.$set.numbers.length, 1);
@@ -4120,7 +4120,7 @@ describe('model', function(){
               assert.equal(3, b.numbers[0]);
 
               b.numbers = [3];
-              var d = b._delta();
+              var d = b.$__delta();
               assert.ok(!d);
 
               b.numbers = [4];
@@ -4161,7 +4161,7 @@ describe('model', function(){
           assert.equal('a', b.comments[0].body);
           assert.equal('changed', b.comments[1].body);
 
-          var d = b._delta()[1];
+          var d = b.$__delta()[1];
           assert.ok('$set' in d, 'invalid delta ' + JSON.stringify(d));
           assert.ok(Array.isArray(d.$set.comments));
           assert.equal(d.$set.comments.length, 2);
@@ -4374,10 +4374,10 @@ describe('model', function(){
 
     var doc = new B;
     doc.title='css3';
-    assert.equal(doc._delta()[1].$set.title,'css3');
+    assert.equal(doc.$__delta()[1].$set.title,'css3');
     doc.title = undefined;
-    assert.equal(doc._delta()[1].$unset.title,1);
-    assert.strictEqual(undefined, doc._delta()[1].$set);
+    assert.equal(doc.$__delta()[1].$unset.title,1);
+    assert.strictEqual(undefined, doc.$__delta()[1].$set);
 
     doc.title='css3';
     doc.author = 'aaron';
@@ -4447,7 +4447,7 @@ describe('model', function(){
         M.findOne(function (err, m) {
           assert.ifError(err);
           m.s = m.n = m.a = undefined;
-          assert.equal(undefined, m._delta());
+          assert.equal(undefined, m.$__delta());
           done();
         });
       });

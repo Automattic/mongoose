@@ -37,7 +37,7 @@ function TestDoc (schema) {
       title: { type: String }
   });
 
-  Subdocument.prototype._setSchema(schema || SubSchema);
+  Subdocument.prototype.$__setSchema(schema || SubSchema);
 
   return Subdocument;
 }

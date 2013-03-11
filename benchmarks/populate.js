@@ -34,7 +34,7 @@ mongoose.connect('localhost', 'benchmark-populate', function (err) {
         if (err) return done(err);
         --pending;
         if (0 === pending) {
-          console.log('inserted %d docs. beginning test ...', docs);
+          //console.log('inserted %d docs. beginning test ...', docs);
           start = Date.now();
           test();
         }

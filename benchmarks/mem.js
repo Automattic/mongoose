@@ -79,8 +79,13 @@ methods.push(function (a, cb) {
 
   if (i%2)
   a.toObject({ depopulate: true });
-  else
-  a._delta();
+  else {
+    if (a._delta) {
+      a._delta();
+    } else {
+      a.$__delta();
+    }
+  }
 
   cb();
 });
@@ -125,26 +130,23 @@ mongoose.connection.on('open', function () {
       //else
         //a._delta();
 
-      if (!(i%50)) {
+      //if (!(i%50)) {
         //var u = process.memoryUsage();
         //console.error('rss: %d, vsize: %d, heapTotal: %d, heapUsed: %d',
             //u.rss, u.vsize, u.heapTotal, u.heapUsed);
-      }
+      //}
     })()
 
     function done () {
-      var time= (new Date - start)/1000;
-      console.error('took %d seconds for %d docs (%d dps)', time, total, total/time);
+      var time= (new Date - start);
       var used = process.memoryUsage();
-      //console.error(((used.vsize - started.vsize) / 1048576)+' MB');
 
       var res = {}
       res.rss  = used.rss - started.rss;
       res.heapTotal = used.heapTotal - started.heapTotal;
       res.heapUsed = used.heapUsed - started.heapUsed;
-      console.error('change: ', res);
 
-      //console.error(a.toObject({depopulate:true}));
+      console.error('took %d ms for %d docs (%d dps)', time, total, total/(time/1000), 'change: ', res);
 
       mongoose.connection.db.dropDatabase(function () {
         mongoose.connection.close();

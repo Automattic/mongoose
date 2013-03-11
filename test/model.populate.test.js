@@ -2179,7 +2179,7 @@ describe('model: populate:', function(){
             assert.equal('number', typeof d._doc.__v);
           });
 
-          U.findOne().populate('comments', '-_id').exec(function (err, doc) {
+          U.findOne().populate('comments', 'name -_id').exec(function (err, doc) {
             assert.ifError(err);
             assert.equal(2, doc.comments.length);
             doc.comments.forEach(function (d) {
@@ -2187,7 +2187,16 @@ describe('model: populate:', function(){
               assert.ok(d.body.length);
               assert.equal('number', typeof d._doc.__v);
             });
-            done();
+            U.findOne().populate('comments', '-_id').exec(function (err, doc) {
+              assert.ifError(err);
+              assert.equal(2, doc.comments.length);
+              doc.comments.forEach(function (d) {
+                assert.equal(undefined, d._id);
+                assert.ok(d.body.length);
+                assert.equal('number', typeof d._doc.__v);
+              });
+              done();
+            })
           })
         })
       })

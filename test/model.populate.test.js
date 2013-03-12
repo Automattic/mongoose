@@ -2002,6 +2002,7 @@ describe('model: populate:', function(){
             assert.ok(utils.isObject(post._creator));
             assert.equal(post._creator.name, 'Guillermo');
             assert.equal(post._creator.email, 'rauchg@gmail.com');
+            assert.equal('undefined', typeof post._creator.update);
             done();
           });
         });
@@ -2041,13 +2042,17 @@ describe('model: populate:', function(){
 
             assert.equal(blogposts[0].fans[0].name,'Fan 1');
             assert.equal(blogposts[0].fans[0].email,'fan1@learnboost.com');
+            assert.equal('undefined', typeof blogposts[0].fans[0].update);
             assert.equal(blogposts[0].fans[1].name,'Fan 2');
             assert.equal(blogposts[0].fans[1].email,'fan2@learnboost.com');
+            assert.equal('undefined', typeof blogposts[0].fans[1].update);
 
             assert.equal(blogposts[1].fans[0].name,'Fan 2');
             assert.equal(blogposts[1].fans[0].email,'fan2@learnboost.com');
+            assert.equal('undefined', typeof blogposts[1].fans[0].update);
             assert.equal(blogposts[1].fans[1].name,'Fan 1');
             assert.equal(blogposts[1].fans[1].email,'fan1@learnboost.com');
+            assert.equal('undefined', typeof blogposts[1].fans[1].update);
             done();
           });
         });

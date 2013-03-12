@@ -532,8 +532,8 @@ describe('connections:', function(){
       db.close();
       assert.ok(!db.options);
     })
-    it('should use admin db if not specified', function(done){
-      var db = mongoose.createConnection('mongodb://localhost', function (err) {
+    it('should use admin db if not specified and user/pass specified', function(done){
+      var db = mongoose.createConnection('mongodb://u:p@localhost', function (err) {
         done();
       });
       assert.equal('object', typeof db.options);

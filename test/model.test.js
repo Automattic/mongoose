@@ -647,10 +647,14 @@ describe('model', function(){
       assert.equal(false, threw);
 
       post.save(function(err){
-        db.close();
         assert.ok(err instanceof MongooseError);
         assert.ok(err instanceof CastError);
-        done();
+        post.date = new Date;
+        post.save(function (err) {
+          db.close();
+          assert.ifError(err);
+          done();
+        })
       });
     })
     it('nested error', function(done){
@@ -2696,8 +2700,21 @@ describe('model', function(){
           b.comments[0].remove();
           b.save(function (err) {
             assert.ifError(err);
-            db.close();
-            done();
+
+            B.findByIdAndUpdate({ _id: b._id }, { $set: { comments: [{ title: 'a' }] }}, function (err, doc) {
+              assert.ifError(err);
+              doc.comments[0].title = 'differ';
+              doc.comments[0].remove();
+              doc.save(function (err) {
+                assert.ifError(err);
+                B.findById(doc._id, function (err, doc) {
+                  db.close();
+                  assert.ifError(err);
+                  assert.equal(0, doc.comments.length);
+                  done();
+                })
+              })
+            })
           })
         });
       })

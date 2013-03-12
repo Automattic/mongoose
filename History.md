@@ -1,4 +1,23 @@
 
+3.5.8 / 2013-03-12
+==================
+
+  * added; auth option in connection [geoah](https://github.com/geoah)
+  * fixed; CastError race condition
+  * docs; add note about stream compatibility with node 0.8
+
+3.5.7 / 2013-02-22
+==================
+
+  * updated; driver to 1.2.13
+  * updated; muri to 0.3.1 #1347
+  * fixed; utils.clone retains RegExp opts #1355
+  * fixed; deepEquals RegExp support
+  * tests; fix a connection test
+  * website; clean up docs [afshinm](https://github.com/afshinm)
+  * website; update homepage
+  * website; migragtion: emphasize impact of strict docs #1264
+
 3.5.6 / 2013-02-14
 ==================
 

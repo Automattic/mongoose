@@ -755,7 +755,7 @@ describe('model: update:', function(){
       var M = db.model('setoninsert-' + random(), schema);
 
       var match = { name: 'set on insert' };
-      var op = { $setOnInsert: { age: 47 }, x: 'inserted' };
+      var op = { $setOnInsert: { age: '47' }, x: 'inserted' };
       M.update(match, op, { upsert: true }, function (err, updated) {
         assert.ifError(err);
         M.findOne(function (err, doc) {

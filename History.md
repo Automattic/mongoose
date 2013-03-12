@@ -1,4 +1,47 @@
 
+3.6.0rc1 / 2013-03-12
+======================
+
+  * refactor; rename private methods to something unusable as doc properties
+  * added; {mongoose,db}.modelNames()
+  * added; $push w/ $slice,$sort support (MongoDB 2.4)
+  * added; hashed index type (MongoDB 2.4)
+  * added; support for mongodb 2.4 geojson (MongoDB 2.4)
+  * added; value at time of validation error
+  * added; support for object literal schemas
+  * added; bufferCommands schema option
+  * added; allow auth option in connections #1360 [geoah](https://github.com/geoah)
+  * fixed; lean population #1382
+  * fixed; empty object mixed defaults #1380
+  * fixed; populate w/ deselected _id using string syntax
+  * fixed; attempted save of divergent populated arrays #1334 related
+  * fixed; better error msg when attempting toObject as property name
+  * fixed; non population buffer casting from doc
+  * fixed; setting populated paths #570
+  * fixed; casting when added docs to populated arrays #570
+  * fixed; prohibit updating arrays selected with $elemMatch #1334
+  * fixed; pull / set subdoc combination #1303
+  * fixed; multiple bg index creation #1365
+  * fixed; manual reconnection to single mongod
+  * fixed; Constructor / version exposure #1124
+  * fixed; CastError race condition
+  * fixed; no longer swallowing misuse of subdoc#invalidate()
+  * fixed; utils.clone retains RegExp opts
+  * fixed; population of non-schema property
+  * fixed; allow updating versionKey #1265
+  * fixed; add EventEmitter props to reserved paths #1338
+  * fixed; can now deselect populated doc _ids #1331
+  * updated; muri to 0.3.1
+  * updated; driver to 1.2.12
+  * updated; mpromise to 0.2.1
+  * deprecated; connection#setProfiling
+  * deprecated; pluralization will die in 4.x
+  * docs; Buffer -> mongodb.Binary #1363
+  * docs; auth options
+  * docs; improved
+  * website; add news section
+  * benchmark; make adjustable
+
 3.5.7 / 2013-02-22
 ==================
 

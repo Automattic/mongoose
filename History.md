@@ -1,4 +1,11 @@
 
+3.5.8 / 2013-03-12
+==================
+
+  * added; auth option in connection [geoah](https://github.com/geoah)
+  * fixed; CastError race condition
+  * docs; add note about stream compatibility with node 0.8
+
 3.5.7 / 2013-02-22
 ==================
 

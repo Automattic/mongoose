@@ -793,7 +793,7 @@ describe('model: update:', function(){
 
         var op = { $push: { n: {
             $each: [{x:10},{x:4}, {x:1}]
-          , $slice: -1
+          , $slice: '-1'
           , $sort: { x:1 }
         }}}
 

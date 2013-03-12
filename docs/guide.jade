@@ -346,7 +346,7 @@ block content
     The `shardKey` option is used when we have a [sharded MongoDB architecture](http://www.mongodb.org/display/DOCS/Sharding+Introduction). Each sharded collection is given a shard key which must be present in all insert/update operations. We just need to set this schema option to the same shard key and we’ll be all set.
 
   :js
-    new Schema({ .. }, { shardkey: { tag: 1, name: 1 }})
+    new Schema({ .. }, { shardKey: { tag: 1, name: 1 }})
 
   :markdown
     _Note that Mongoose does not send the `shardcollection` command for you. You must configure your shards yourself._

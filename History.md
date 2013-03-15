@@ -1,4 +1,17 @@
 
+3.5.9 / 2013-03-15
+==================
+
+  * updated; driver to 1.2.14
+  * added; support for authSource driver option (mongodb 2.4)
+  * added; QueryStream transform option (node 0.10 helper)
+  * fixed; backport for saving required populated buffers
+  * fixed; pull / set subdoc combination #1303
+  * fixed; multiple bg index creation #1365
+  * test; added for saveable required populated buffers
+  * test; added for #1365
+  * test; add authSource test
+
 3.5.8 / 2013-03-12
 ==================
 

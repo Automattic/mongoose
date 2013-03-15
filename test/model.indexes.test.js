@@ -195,5 +195,48 @@ describe('model', function(){
         done();
       });
     })
+
+    it('do not trigger "MongoError: cannot add index with a background operation in progress" (gh-1365) LONG', function(done){
+      this.timeout(45000);
+
+      var db = start({ uri: 'mongodb://localhost/mongoose_test_indexing'});
+
+      var schema = Schema({
+          name: { type:String, index: true }
+        , furryness: { type:Number, index: true }
+      }, { autoIndex: false })
+
+      schema.index({ name:1, furryness:1})
+
+      var K = db.model('Kitten', schema);
+      K.on('index', function (err) {
+        assert.ifError(err);
+        db.close(done);
+      })
+
+      var neededKittens = 30000;
+
+      db.on('open', function () {
+        K.count({}, function (err, n) {
+          assert.ifError(err);
+          if (n >= neededKittens) return index();
+          var pending = neededKittens - n;
+          for (var i = n; i < neededKittens; ++i) (function(i){
+            K.create({ name: 'kitten'+i, furryness: i }, function (err) {
+              assert.ifError(err);
+              if (--pending) return;
+              index();
+            });
+          })(i);
+        })
+
+        function index () {
+          K.collection.dropAllIndexes(function (err) {
+            assert.ifError(err);
+            K.ensureIndexes();
+          })
+        }
+      })
+    })
   });
 });

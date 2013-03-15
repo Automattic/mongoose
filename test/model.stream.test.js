@@ -223,11 +223,12 @@ describe('query stream:', function(){
       , filename = '/tmp/_mongoose_stream_out.txt'
       , out = fs.createWriteStream(filename)
 
-    var stream = P.find().sort('name').limit(20).stream();
+    var opts = { transform: JSON.stringify }
+    var stream = P.find().sort('name').limit(20).stream(opts);
     stream.pipe(out);
 
     stream.on('error', cb);
-    stream.on('close', cb);
+    out.on('close', cb);
 
     function cb (err) {
       db.close();

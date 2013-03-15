@@ -1601,6 +1601,43 @@ describe('model: ref:', function(){
     })
   });
 
+  it('populated Buffer _ids should be requireable', function(done){
+    var db = start();
+
+    var UserSchema = new Schema({
+        _id: Buffer
+      , name: String
+    })
+
+    var NoteSchema = new Schema({
+        author: { type: Buffer, ref: 'UserWithBufferId', required: true }
+      , body: String
+    })
+
+    var User = db.model('UserWithBufferId', UserSchema, random())
+    var Note = db.model('NoteWithBufferId', NoteSchema, random())
+
+    var alice = new User({_id: new mongoose.Types.Buffer('YWxpY2U=', 'base64'), name: "Alice"})
+
+    alice.save(function (err) {
+      assert.ifError(err);
+
+      var note = new Note({author: 'alice', body: "Buy Milk"});
+      note.save(function (err) {
+        assert.ifError(err);
+
+        Note.findById(note.id).populate('author').exec(function (err, note) {
+          assert.ifError(err);
+          note.save(function (err) {
+            db.close();
+            assert.ifError(err);
+            done();
+          })
+        });
+      });
+    })
+  });
+
   it('populating with custom model selection (gh-773)', function(done){
     var db = start()
       , BlogPost = db.model('RefBlogPost', posts)

@@ -19,7 +19,9 @@ html(lang='en')
       include includes/nav
     #content
       .module
+        gcse:search
         block content
     script.
       document.body.className = 'load';
+    include includes/googlesearch
     include includes/googleanalytics

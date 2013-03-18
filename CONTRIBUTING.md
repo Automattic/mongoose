@@ -27,7 +27,7 @@ If you have a question about Mongoose (not a bug report) please post it to eithe
     - `for (..) {`
     - `while (..) {`
     - `function (err) {`
-- Write tests and make sure they pass
+- Write tests and make sure they pass (tests are in the [test](https://github.com/LearnBoost/mongoose/tree/master/test) directory).
 
 ### Running the tests
 - Open a terminal and navigate to the root of the project

@@ -35,9 +35,11 @@ types.Mixed = '#schema_mixed_Mixed';
 types.VirtualType = '#virtualtype_VirtualType';
 types.MongooseBuffer = '#types_buffer_MongooseBuffer';
 types.Buffer = 'http://nodejs.org/api/buffer.html';
+types.any = 'nolink';
 
 module.exports= function (type) {
   if (types[type]) {
+    if ('nolink' == types[type]) return 'T';
     return '<a href="' + types[type] + '">' + type + '</a>';
   }
   return '<a href="#' + type + '">' + type + '</a>';

@@ -1,0 +1,43 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>Mongoose Quick Start v3.5.9</title><link href="http://fonts.googleapis.com/css?family=Anonymous+Pro:400,700|Droid+Sans+Mono|Open+Sans:400,700|Linden+Hill|Quattrocento:400,700|News+Cycle:400,700|Antic+Slab|Cabin+Condensed:400,700" rel="stylesheet" type="text/css"><link href="/docs/css/default.css" rel="stylesheet" type="text/css"><link href="/docs/css/guide.css" rel="stylesheet" type="text/css"><style></style></head><body class="api"><a id="forkbanner" href="http://github.com/learnboost/mongoose"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png" alt="Fork me on GitHub"></a><div id="links"><div id="header"><h1><a href="../index.html"><div class="mongoose">Mongoose</div></a></h1></div><ul><li class="home"><a href="../index.html">home</a></li><li class="faq"><a href="./faq.html">FAQ</a></li><li class="plugins"><a href="http://plugins.mongoosejs.com">plugins</a></li><li class="changelog"><a href="http://github.com/learnboost/mongoose/tree/master/History.md">change log</a></li><li class="support"><a href="../index.html#support">support</a></li><li class="fork"><a href="http://github.com/learnboost/mongoose">fork</a></li><li class="guide"><a href="./guide.html">guide</a></li><li class="api"><a href="./api.html">API docs</a></li><li class="quickstart"><a href="./index.html">quick start</a></li><li class="contrib"><a href="http://github.com/learnboost/mongoose/contributors">contributors</a></li><li class="prior"><a href="./prior.html">prior releases</a></li></ul></div><div id="content"><div class="module"><h2>Getting Started</h2><p><em>First be sure you have <a href="http://www.mongodb.org/downloads">MongoDB</a> and <a href="http://nodejs.org/">Node.js</a> installed.</em></p>
+
+<p>Next install Mongoose from the command line using <code>npm</code>:</p>
+
+<pre><code>$ npm install mongoose</code></pre><p>Now say we like fuzzy kittens and want to record every kitten we ever meet in MongoDB.
+The first thing we need to do is include mongoose in our project and open a connection to the <code>test</code> database on our locally running instance of MongoDB.</p><pre><code class="javascript"><span class="comment">// getting-started.js</span>
+<span class="keyword">var</span> mongoose = require(<span class="string">'mongoose'</span>);
+mongoose.connect(<span class="string">'mongodb://localhost/test'</span>);</code></pre><p>We have a pending connection to the test database running on localhost. We now need to get notified if we connect successfully or if a connection error occurs:</p><pre><code class="javascript"><span class="keyword">var</span> db = mongoose.connection;
+db.on(<span class="string">'error'</span>, console.error.bind(console, <span class="string">'connection error:'</span>));
+db.once(<span class="string">'open'</span>, <span class="function"><span class="keyword">function</span> <span class="title">callback</span> <span class="params">()</span> {</span>
+  <span class="comment">// yay!</span>
+});</code></pre><p>Once our connection opens, our callback will be called. For brevity, let&#39;s assume that all following code is within this callback.</p><p>With Mongoose, everything is derived from a <a href="/docs/guide.html">Schema</a>. Let&#39;s get a reference to it and define our kittens.</p><pre><code class="javascript"><span class="keyword">var</span> kittySchema = mongoose.Schema({
+    name: String
+})</code></pre><p>So far so good. We&#39;ve got a schema with one property, <code>name</code>, which will be a  <code>String</code>. The next step is compiling our schema into a <a href="/docs/models.html">Model</a>.</p><pre><code class="javascript"><span class="keyword">var</span> Kitten = mongoose.model(<span class="string">'Kitten'</span>, kittySchema)</code></pre><p>A model is a class with which we construct documents.
+In this case, each document will be a kitten with properties and behaviors as declared in our schema.
+Let&#39;s create a kitten document representing the little guy we just met on the sidewalk outside:</p><pre><code class="javascript"><span class="keyword">var</span> silence = <span class="keyword">new</span> Kitten({ name: <span class="string">'Silence'</span> })
+console.log(silence.name) <span class="comment">// 'Silence'</span></code></pre><p>Kittens can meow, so let&#39;s take a look at how to add &quot;speak&quot; functionality to our documents:</p><pre><code class="javascript"><span class="comment">// NOTE: methods must be added to the schema before compiling it with mongoose.model()</span>
+kittySchema.methods.speak = <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+  <span class="keyword">var</span> greeting = <span class="keyword">this</span>.name
+    ? <span class="string">"Meow name is "</span> + <span class="keyword">this</span>.name
+    : <span class="string">"I don't have a name"</span>
+  console.log(greeting);
+}
+
+<span class="keyword">var</span> Kitten = mongoose.model(<span class="string">'Kitten'</span>, kittySchema)</code></pre><p>Functions added to the <code>methods</code> property of a schema get compiled into the <code>Model</code> prototype and exposed on each document instance:</p><pre><code class="javascript"><span class="keyword">var</span> fluffy = <span class="keyword">new</span> Kitten({ name: <span class="string">'fluffy'</span> });
+fluffy.speak() <span class="comment">// "Meow name is fluffy"</span></code></pre><p>We have talking kittens! But we still haven&#39;t saved anything to MongoDB.
+Each document can be saved to the database by calling its <a href="/docs/api.html#model_Model-save">save</a> method. The first argument to the callback will be an error if any occured.</p><pre><code class="javascript">fluffy.save(<span class="function"><span class="keyword">function</span> <span class="params">(err, fluffy)</span> {</span>
+  <span class="keyword">if</span> (err) <span class="comment">// TODO handle the error</span>
+  fluffy.speak();
+});</code></pre><p>Say time goes by and we want to display all the kittens we&#39;ve seen.
+We can access all of the kitten documents through our Kitten <a href="/docs/models.html">model</a>.</p><pre><code class="javascript">Kitten.find(<span class="function"><span class="keyword">function</span> <span class="params">(err, kittens)</span> {</span>
+  <span class="keyword">if</span> (err) <span class="comment">// TODO handle err</span>
+  console.log(kittens)
+})</code></pre><p>We just logged all of the kittens in our db to the console.
+If we want to filter our kittens by name, Mongoose supports MongoDBs rich <a href="/docs/queries.html">querying</a> syntax.</p><pre><code class="javascript">Kitten.find({ name: <span class="regexp">/^Fluff/</span> }, callback)</code></pre><p>This performs a search for all documents with a name property that begins with &quot;Fluff&quot; and returns the results to the callback.</p><h3>Congratulations</h3><p>That&#39;s the end of our quick start. We created a schema, added a custom document method, saved and queried kittens in MongoDB using Mongoose. Head over to the <a href="guide.html">guide</a>, or <a href="api.html">API docs</a> for more.</p></div></div><script>document.body.className = 'load';</script><script>var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-1122274-9']);
+_gaq.push(['_trackPageview', location.pathname + location.search + location.hash]);
+
+(function() {
+  var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+  ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+  var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+})();</script></body></html>

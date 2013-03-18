@@ -79,8 +79,7 @@ module.exports = function (options) {
     uri = options.uri;
     delete options.uri;
   } else {
-    uri = process.env.MONGOOSE_TEST_URI ||
-          'mongodb://localhost/mongoose_test'
+    uri = module.exports.uri;
   }
 
   var noErrorListener = !! options.noErrorListener;
@@ -97,8 +96,35 @@ module.exports = function (options) {
   return conn;
 };
 
+/*!
+ * testing uri
+ */
+
+module.exports.uri = process.env.MONGOOSE_TEST_URI || 'mongodb://localhost/mongoose_test';
+
 /**
- * Module exports.
+ * expose mongoose
  */
 
 module.exports.mongoose = mongoose;
+
+/**
+ * expose mongod version helper
+ */
+
+module.exports.mongodVersion = function (cb) {
+  var db = module.exports();
+
+  db.on('error', cb);
+
+  db.on('open', function () {
+    db.db.admin(function (err, admin) {
+      if (err) return cb(err);
+      admin.serverStatus(function (err, info) {
+        if (err) return cb(err);
+        var version = info.version.split('.').map(function(n){return parseInt(n, 10) });
+        cb(null, version);
+      });
+    });
+  })
+}

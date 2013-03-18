@@ -12,6 +12,7 @@ require('http').createServer(function (req, res) {
       }
     });
   });
+  req.resume();
 }).listen(8088);
 
 console.error('now listening on localhost:8088');

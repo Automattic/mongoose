@@ -1,4 +1,5 @@
 
+
 /**
  * Module dependencies.
  */
@@ -10,7 +11,7 @@ var Promise = require('../lib/promise');
  * Test.
  */
 
-describe('promise', function(){
+describe('Promise', function(){
   it('events fire right after complete()', function(done){
     var promise = new Promise()
       , called = 0;
@@ -33,7 +34,7 @@ describe('promise', function(){
     done();
   });
 
-  it('events first right after error()', function(done){
+  it('events fire right after error()', function(done){
     var promise = new Promise()
       , called = 0;
 
@@ -42,7 +43,7 @@ describe('promise', function(){
       called++;
     });
 
-    promise.error(new Error('booyah'));
+    promise.error('booyah');
 
     promise.on('err', function (err) {
       assert.ok(err instanceof Error);
@@ -53,15 +54,36 @@ describe('promise', function(){
     done()
   });
 
-  describe('errback+callback', function(){
+  it('events fire right after reject()', function(done){
+    var promise = new Promise()
+      , called = 0;
+
+    promise.on('err', function (err) {
+      assert.equal(9, err);
+      called++;
+    });
+
+    promise.reject(9);
+
+    promise.on('err', function (err) {
+      assert.equal(9, err);
+      called++;
+    });
+
+    assert.equal(2, called);
+    done()
+  });
+
+  describe('addBack()', function(){
     it('from constructor works', function(done){
       var called = 0;
+
       var promise = new Promise(function (err) {
         assert.ok(err instanceof Error);
         called++;
       })
 
-      promise.error(new Error('dawg'));
+      promise.reject(new Error('dawg'));
 
       assert.equal(1, called);
       done();
@@ -107,7 +129,7 @@ describe('promise', function(){
     })
   });
 
-  describe('addCallback shortcut', function(){
+  describe('addCallback() shortcut', function(){
     it('works', function(done){
       var promise = new Promise()
         , called = 0;
@@ -117,7 +139,7 @@ describe('promise', function(){
         called++;
       });
 
-      promise.complete();
+      promise.fulfill();
 
       assert.equal(1, called);
       done();
@@ -134,7 +156,7 @@ describe('promise', function(){
         called++;
       });
 
-      promise.error(new Error);
+      promise.reject(new Error);
       assert.equal(1, called);
       done();
     })
@@ -161,6 +183,31 @@ describe('promise', function(){
       var promise = new Promise()
       assert.ok(promise.addBack(function(){}) instanceof Promise);
       done();
+    })
+  })
+
+  describe('casting errors', function(){
+    describe('error()', function(){
+      it('casts arguments to Error', function(done){
+        var p = new Promise(function (err) {
+          assert.ok(err instanceof Error);
+          assert.equal('3', err.message);
+          done();
+        });
+
+        p.error(3);
+      })
+    })
+
+    describe('reject()', function(){
+      it('does not cast arguments to Error', function(done){
+        var p = new Promise(function (err, arg) {
+          assert.equal(3, err);
+          done();
+        });
+
+        p.reject(3);
+      })
     })
   })
 })

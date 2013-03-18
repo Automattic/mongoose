@@ -55,6 +55,7 @@ describe('model: mapreduce:', function(){
     var db = start()
       , MR = db.model('MapReduce', collection)
 
+    var magicID;
     var id = new mongoose.Types.ObjectId;
     var authors = 'aaron guillermo brian nathan'.split(' ');
     var num = 10;
@@ -62,9 +63,10 @@ describe('model: mapreduce:', function(){
     for (var i = 0; i< num; ++i)
       docs.push({ author: authors[i%authors.length], owners: [id], published: true });
 
-    //mongoose.set('debug', true);
-    MR.create(docs, function (err) {
+    MR.create(docs, function (err, a, b) {
       assert.ifError(err);
+
+      magicID = b._id;
 
       var o = {
           map: function () { emit(this.author, 1) }
@@ -103,8 +105,9 @@ describe('model: mapreduce:', function(){
 
       function modeling () {
         var o = {
-            map: function () { emit(this.author, 1) }
-          , reduce: function (k, vals) { return vals.length }
+            map: function () { emit(this.author, { own: magicID }) }
+          , scope: { magicID: magicID }
+          , reduce: function (k, vals) { return { own: vals[0].own, count: vals.length }}
           , out: { replace: '_mapreduce_test_' + random() }
         }
 
@@ -117,7 +120,7 @@ describe('model: mapreduce:', function(){
           assert.equal('function', typeof ret.mapReduce);
 
           // queries work
-          ret.where('value').gt(1).sort({_id: 1}).exec(function (err, docs) {
+          ret.where('value.count').gt(1).sort({_id: 1}).exec(function (err, docs) {
             assert.ifError(err);
             assert.equal('aaron', docs[0]._id);
             assert.equal('brian', docs[1]._id);
@@ -126,12 +129,21 @@ describe('model: mapreduce:', function(){
 
             // update casting works
             ret.findOneAndUpdate({ _id: 'aaron' }, { published: true }, function (err, doc) {
-              db.close();
               assert.ifError(err);
               assert.ok(doc);
               assert.equal('aaron', doc._id);
               assert.equal(true, doc.published);
-              done();
+
+              // ad-hoc population works
+              ret
+              .findOne({ _id: 'aaron' })
+              .populate({ path: 'value.own', model: 'MapReduce' })
+              .exec(function (err, doc) {
+                db.close();
+                assert.ifError(err);
+                assert.equal('guillermo', doc.value.own.author);
+                done();
+              })
             });
           });
         });

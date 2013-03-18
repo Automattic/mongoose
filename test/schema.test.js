@@ -1,4 +1,3 @@
-
 /**
  * Module dependencies.
  */
@@ -37,7 +36,7 @@ TestDocument.prototype.__proto__ = Document.prototype;
  * Set a dummy schema to simulate compilation.
  */
 
-TestDocument.prototype._setSchema(new Schema({
+TestDocument.prototype.$__setSchema(new Schema({
     test    : String
 }));
 
@@ -351,6 +350,9 @@ describe('schema', function(){
 
       Tobi.path('friends').doValidate(100, function(err){
         assert.ok(err instanceof ValidatorError);
+        assert.equal('friends', err.path);
+        assert.equal('max', err.type);
+        assert.equal(100, err.value);
       });
 
       Tobi.path('friends').doValidate(1, function(err){
@@ -693,10 +695,12 @@ describe('schema', function(){
       assert.equal(false, Animal.path('isFerret').cast(false));
       assert.equal(false, Animal.path('isFerret').cast(0));
       assert.equal(false, Animal.path('isFerret').cast('0'));
+      assert.equal(false, Animal.path('isFerret').cast('false'));
       assert.equal(true, Animal.path('isFerret').cast({}));
       assert.equal(true, Animal.path('isFerret').cast(true));
       assert.equal(true, Animal.path('isFerret').cast(1));
       assert.equal(true, Animal.path('isFerret').cast('1'));
+      assert.equal(true, Animal.path('isFerret').cast('true'));
       done();
     });
   });
@@ -1042,12 +1046,12 @@ describe('schema', function(){
         assert.deepEqual(T.path('name')._index, { unique: true });
 
         T = new Schema({
-            name: { type: String, expires:  '1.5m' }
+            name: { type: Date, expires:  '1.5m' }
         });
         assert.deepEqual(T.path('name')._index, { expireAfterSeconds: 90 });
 
         T = new Schema({
-            name: { type: String, expires:  200 }
+            name: { type: Date, expires:  200 }
         });
         assert.deepEqual(T.path('name')._index, { expireAfterSeconds: 200 });
 
@@ -1072,7 +1076,7 @@ describe('schema', function(){
         assert.equal(65, i.expireAfterSeconds);
 
         T = new Schema({
-            name: { type: String, index: { sparse: true, unique: true, expires: '24h' }}
+            name: { type: Date, index: { sparse: true, unique: true, expires: '24h' }}
         });
         i = T.path('name')._index;
         assert.equal(true, i.unique);
@@ -1583,6 +1587,24 @@ describe('schema', function(){
       });
 
       done();
+    })
+
+    it('permits _scope to be used (gh-1184)', function(done){
+      var db = start();
+      var child = new Schema({ _scope: Schema.ObjectId });
+      var C = db.model('scope', child);
+      var c= new C;
+      c.save(function (err) {
+        db.close();
+        assert.ifError(err);
+        try {
+          c._scope;
+        } catch (e) {
+          err = e;
+        }
+        assert.ifError(err);
+        done();
+      })
     })
   })
 });

@@ -1,4 +1,86 @@
 
+3.6.0 / 2013-03-18
+==================
+
+  * changed; cast 'true'/'false' to boolean #1282 [mgrach](https://github.com/mgrach)
+  * changed; Buffer arrays can now contain nulls
+  * added; QueryStream transform option
+  * added; support for authSource driver option
+  * added; {mongoose,db}.modelNames()
+  * added; $push w/ $slice,$sort support (MongoDB 2.4)
+  * added; hashed index type (MongoDB 2.4)
+  * added; support for mongodb 2.4 geojson (MongoDB 2.4)
+  * added; value at time of validation error
+  * added; support for object literal schemas
+  * added; bufferCommands schema option
+  * added; allow auth option in connections #1360 [geoah](https://github.com/geoah)
+  * added; performance improvements to populate() [263ece9](https://github.com/LearnBoost/mongoose/commit/263ece9)
+  * added; allow adding uncasted docs to populated arrays and properties #570
+  * added; doc#populated(path) stores original populated _ids
+  * added; lean population #1260
+  * added; query.populate() now accepts an options object
+  * added; document#populate(opts, callback)
+  * added; Model.populate(docs, opts, callback)
+  * added; support for rich nested path population
+  * added; doc.array.remove(value) subdoc with _id value support #1278
+  * added; optionally allow non-strict sets and updates
+  * added; promises/A+ comformancy with [mpromise](https://github.com/aheckmann/mpromise)
+  * added; promise#then
+  * added; promise#end
+  * fixed; use of `model` as doc property
+  * fixed; lean population #1382
+  * fixed; empty object mixed defaults #1380
+  * fixed; populate w/ deselected _id using string syntax
+  * fixed; attempted save of divergent populated arrays #1334 related
+  * fixed; better error msg when attempting toObject as property name
+  * fixed; non population buffer casting from doc
+  * fixed; setting populated paths #570
+  * fixed; casting when added docs to populated arrays #570
+  * fixed; prohibit updating arrays selected with $elemMatch #1334
+  * fixed; pull / set subdoc combination #1303
+  * fixed; multiple bg index creation #1365
+  * fixed; manual reconnection to single mongod
+  * fixed; Constructor / version exposure #1124
+  * fixed; CastError race condition
+  * fixed; no longer swallowing misuse of subdoc#invalidate()
+  * fixed; utils.clone retains RegExp opts
+  * fixed; population of non-schema property
+  * fixed; allow updating versionKey #1265
+  * fixed; add EventEmitter props to reserved paths #1338
+  * fixed; can now deselect populated doc _ids #1331
+  * fixed; properly pass subtype to Binary in MongooseBuffer
+  * fixed; casting _id from document with non-ObjectId _id
+  * fixed; specifying schema type edge case { path: [{type: "String" }] }
+  * fixed; typo in schemdate #1329 [jplock](https://github.com/jplock)
+  * updated; driver to 1.2.14
+  * updated; muri to 0.3.1
+  * updated; mpromise to 0.2.1
+  * updated; mocha 1.8.1
+  * updated; mpath to 0.1.1
+  * deprecated; pluralization will die in 4.x
+  * refactor; rename private methods to something unusable as doc properties
+  * refactor MongooseArray#remove
+  * refactor; move expires index to SchemaDate #1328
+  * refactor; internal document properties #1171 #1184
+  * tests; added
+  * docs; indexes
+  * docs; validation
+  * docs; populate
+  * docs; populate
+  * docs; add note about stream compatibility with node 0.8
+  * docs; fix for private names
+  * docs; Buffer -> mongodb.Binary #1363
+  * docs; auth options
+  * docs; improved
+  * website; update FAQ
+  * website; add more api links
+  * website; add 3.5.x docs to prior releases
+  * website; Change mongoose-types to an active repo [jackdbernier](https://github.com/jackdbernier)
+  * website; compat with node 0.10
+  * website; add news section
+  * website; use T for generic type
+  * benchmark; make adjustable
+
 3.5.9 / 2013-03-15
 ==================
 
@@ -11,6 +93,48 @@
   * test; added for saveable required populated buffers
   * test; added for #1365
   * test; add authSource test
+
+3.6.0rc1 / 2013-03-12
+======================
+
+  * refactor; rename private methods to something unusable as doc properties
+  * added; {mongoose,db}.modelNames()
+  * added; $push w/ $slice,$sort support (MongoDB 2.4)
+  * added; hashed index type (MongoDB 2.4)
+  * added; support for mongodb 2.4 geojson (MongoDB 2.4)
+  * added; value at time of validation error
+  * added; support for object literal schemas
+  * added; bufferCommands schema option
+  * added; allow auth option in connections #1360 [geoah](https://github.com/geoah)
+  * fixed; lean population #1382
+  * fixed; empty object mixed defaults #1380
+  * fixed; populate w/ deselected _id using string syntax
+  * fixed; attempted save of divergent populated arrays #1334 related
+  * fixed; better error msg when attempting toObject as property name
+  * fixed; non population buffer casting from doc
+  * fixed; setting populated paths #570
+  * fixed; casting when added docs to populated arrays #570
+  * fixed; prohibit updating arrays selected with $elemMatch #1334
+  * fixed; pull / set subdoc combination #1303
+  * fixed; multiple bg index creation #1365
+  * fixed; manual reconnection to single mongod
+  * fixed; Constructor / version exposure #1124
+  * fixed; CastError race condition
+  * fixed; no longer swallowing misuse of subdoc#invalidate()
+  * fixed; utils.clone retains RegExp opts
+  * fixed; population of non-schema property
+  * fixed; allow updating versionKey #1265
+  * fixed; add EventEmitter props to reserved paths #1338
+  * fixed; can now deselect populated doc _ids #1331
+  * updated; muri to 0.3.1
+  * updated; driver to 1.2.12
+  * updated; mpromise to 0.2.1
+  * deprecated; pluralization will die in 4.x
+  * docs; Buffer -> mongodb.Binary #1363
+  * docs; auth options
+  * docs; improved
+  * website; add news section
+  * benchmark; make adjustable
 
 3.5.8 / 2013-03-12
 ==================
@@ -49,6 +173,35 @@
   * docs; add ensureIndex error handling example
   * docs; README
   * docs; CONTRIBUTING.md
+
+3.6.0rc0 / 2013-02-03
+======================
+
+  * changed; cast 'true'/'false' to boolean #1282 [mgrach](https://github.com/mgrach)
+  * changed; Buffer arrays can now contain nulls
+  * fixed; properly pass subtype to Binary in MongooseBuffer
+  * fixed; casting _id from document with non-ObjectId _id
+  * fixed; specifying schema type edge case { path: [{type: "String" }] }
+  * fixed; typo in schemdate #1329 [jplock](https://github.com/jplock)
+  * refactor; move expires index to SchemaDate #1328
+  * refactor; internal document properties #1171 #1184
+  * added; performance improvements to populate() [263ece9](https://github.com/LearnBoost/mongoose/commit/263ece9)
+  * added; allow adding uncasted docs to populated arrays and properties #570
+  * added; doc#populated(path) stores original populated _ids
+  * added; lean population #1260
+  * added; query.populate() now accepts an options object
+  * added; document#populate(opts, callback)
+  * added; Model.populate(docs, opts, callback)
+  * added; support for rich nested path population
+  * added; doc.array.remove(value) subdoc with _id value support #1278
+  * added; optionally allow non-strict sets and updates
+  * added; promises/A+ comformancy with [mpromise](https://github.com/aheckmann/mpromise)
+  * added; promise#then
+  * added; promise#end
+  * updated; mocha 1.8.1
+  * updated; muri to 0.3.0
+  * updated; mpath to 0.1.1
+  * updated; docs
 
 3.5.5 / 2013-01-29
 ==================

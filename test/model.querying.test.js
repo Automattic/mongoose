@@ -1854,76 +1854,254 @@ describe('backwards compatibility', function(){
 });
 
 describe('geo-spatial', function(){
-  it('$near (gh-309)', function(done){
-    var db = start()
-      , Test = db.model('Geo1', geoSchema, 'geospatial'+random());
+  describe('2d', function(){
+    it('$near (gh-309)', function(done){
+      var db = start()
+        , Test = db.model('Geo1', geoSchema, 'geospatial'+random());
 
-    Test.create({ loc: [ 10, 20 ]}, { loc: [ 40, 90 ]}, function (err) {
-      assert.ifError(err);
-      setTimeout(function () {
-        Test.find({ loc: { $near: [30, 40] }}, function (err, docs) {
-          db.close();
-          assert.ifError(err);
-          assert.equal(2, docs.length);
-          done();
-        });
-      }, 100);
-    });
-  });
-
-  it('$within arrays (gh-586)', function(done){
-    var db = start()
-      , Test = db.model('Geo2', geoSchema, collection + 'geospatial');
-
-    Test.create({ loc: [ 35, 50 ]}, { loc: [ -40, -90 ]}, function (err) {
-      assert.ifError(err);
-      setTimeout(function () {
-        Test.find({ loc: { '$within': { '$box': [[30,40], [40,60]] }}}, function (err, docs) {
-          db.close();
-          assert.ifError(err);
-          assert.equal(1, docs.length);
-          done()
-        });
-      }, 100);
-    });
-  });
-
-  it('$nearSphere with arrays (gh-610)', function(done){
-    var db = start()
-      , Test = db.model('Geo3', geoSchema, "y"+random());
-
-    Test.create({ loc: [ 10, 20 ]}, { loc: [ 40, 90 ]}, function (err) {
-      assert.ifError(err);
-      setTimeout(function () {
-        Test.find({ loc: { $nearSphere: [30, 40] }}, function (err, docs) {
-          db.close();
-          assert.ifError(err);
-          assert.equal(2, docs.length);
-          done()
-        });
-      }, 100);
-    });
-  });
-
-  it('$maxDistance with arrays', function(done){
-    var db = start()
-      , Test = db.model('Geo4', geoSchema, "x"+random());
-
-    Test.create({ loc: [ 20, 80 ]}, { loc: [ 25, 30 ]}, function (err, docs) {
-      assert.ifError(err);
-      setTimeout(function () {
-        Test.find({ loc: { $near: [25, 31], $maxDistance: 1 }}, function (err, docs) {
-          assert.ifError(err);
-          assert.equal(1, docs.length);
-          Test.find({ loc: { $near: [25, 32], $maxDistance: 1 }}, function (err, docs) {
+      Test.create({ loc: [ 10, 20 ]}, { loc: [ 40, 90 ]}, function (err) {
+        assert.ifError(err);
+        setTimeout(function () {
+          Test.find({ loc: { $near: [30, 40] }}, function (err, docs) {
             db.close();
             assert.ifError(err);
-            assert.equal(0, docs.length);
+            assert.equal(2, docs.length);
             done();
           });
-        });
-      }, 100);
+        }, 100);
+      });
     });
+
+    it('$within arrays (gh-586)', function(done){
+      var db = start()
+        , Test = db.model('Geo2', geoSchema, collection + 'geospatial');
+
+      Test.create({ loc: [ 35, 50 ]}, { loc: [ -40, -90 ]}, function (err) {
+        assert.ifError(err);
+        setTimeout(function () {
+          Test.find({ loc: { '$within': { '$box': [[30,40], [40,60]] }}}, function (err, docs) {
+            db.close();
+            assert.ifError(err);
+            assert.equal(1, docs.length);
+            done()
+          });
+        }, 100);
+      });
+    });
+
+    it('$nearSphere with arrays (gh-610)', function(done){
+      var db = start()
+        , Test = db.model('Geo3', geoSchema, "y"+random());
+
+      Test.create({ loc: [ 10, 20 ]}, { loc: [ 40, 90 ]}, function (err) {
+        assert.ifError(err);
+        setTimeout(function () {
+          Test.find({ loc: { $nearSphere: [30, 40] }}, function (err, docs) {
+            db.close();
+            assert.ifError(err);
+            assert.equal(2, docs.length);
+            done()
+          });
+        }, 100);
+      });
+    });
+
+    it('$maxDistance with arrays', function(done){
+      var db = start()
+        , Test = db.model('Geo4', geoSchema, "x"+random());
+
+      Test.create({ loc: [ 20, 80 ]}, { loc: [ 25, 30 ]}, function (err, docs) {
+        assert.ifError(err);
+        setTimeout(function () {
+          Test.find({ loc: { $near: [25, 31], $maxDistance: 1 }}, function (err, docs) {
+            assert.ifError(err);
+            assert.equal(1, docs.length);
+            Test.find({ loc: { $near: [25, 32], $maxDistance: 1 }}, function (err, docs) {
+              db.close();
+              assert.ifError(err);
+              assert.equal(0, docs.length);
+              done();
+            });
+          });
+        }, 100);
+      });
+    })
+  })
+
+  describe('2dsphere', function(){
+    // mongodb 2.4
+
+    var schema2dsphere = new Schema({ loc: { type: [Number], index: '2dsphere'}});
+
+    var geoSchema = new Schema({ line: { type: { type: String }, coordinates: []}});
+    geoSchema.index({ line: '2dsphere' });
+
+    var mongo24_or_greater = false;
+    before(function(done){
+      start.mongodVersion(function (err, version) {
+        if (err) throw err;
+
+        mongo24_or_greater = 2 < version[0] || (2 == version[0] && 4 <= version[1]);
+        if (!mongo24_or_greater) console.log('not testing mongodb 2.4 features');
+        done();
+      })
+    })
+
+    it('index is allowed in schema', function(done){
+      if (!mongo24_or_greater) return done();
+
+      var ok = schema2dsphere.indexes().some(function (index) {
+        return '2dsphere' == index[0].loc
+      });
+      assert.ok(ok);
+      done();
+    })
+
+    describe('$geometry', function(){
+      it('Polygon', function(done){
+        if (!mongo24_or_greater) return done();
+
+        var db = start()
+          , Test = db.model('2dsphere-polygon', schema2dsphere, 'geospatial'+random());
+
+        Test.on('index', function (err) {
+          assert.ifError(err);
+
+          Test.create({ loc: [ 0, 0 ]}, function (err, created) {
+            assert.ifError(err);
+
+            var geojsonPoly = { type: 'Polygon', coordinates: [[[-5,-5], ['-5',5], [5,5], [5,-5],[-5,'-5']]] }
+
+            Test.find({ loc: { $within: { $geometry: geojsonPoly }}}, function (err, docs) {
+              assert.ifError(err);
+              assert.equal(1, docs.length);
+              assert.equal(created.id, docs[0].id);
+
+              Test.where('loc').within.geometry(geojsonPoly).exec(function (err, docs) {
+                assert.ifError(err);
+                assert.equal(1, docs.length);
+                assert.equal(created.id, docs[0].id);
+                done()
+              })
+            })
+          })
+        })
+      });
+    })
+
+    describe('$geoIntersects', function(){
+      it('LineString', function(done){
+        if (!mongo24_or_greater) return done();
+
+        var db = start()
+          , Test = db.model('2dsphere-geo', geoSchema, 'geospatial'+random());
+
+        Test.on('index', function (err) {
+          assert.ifError(err);
+
+          Test.create({ line: { type:'LineString', coordinates: [[-178.0, 10.0],[178.0,10.0]] }}, function (err, created) {
+            assert.ifError(err);
+
+            var geojsonLine = { type: 'LineString', coordinates: [[180.0, 11.0], [180.0, '9.00']] }
+
+            Test.find({ line: { $geoIntersects: { $geometry: geojsonLine }}}, function (err, docs) {
+              assert.ifError(err);
+              assert.equal(1, docs.length);
+              assert.equal(created.id, docs[0].id);
+
+              Test.where('line').intersects.geometry(geojsonLine).findOne(function (err, doc) {
+                assert.ifError(err);
+                assert.equal(created.id, doc.id);
+                done();
+              })
+            })
+          })
+
+        })
+      });
+    })
+
+    describe('$near', function(){
+      it('Point', function(done){
+        if (!mongo24_or_greater) return done();
+
+        var db = start()
+          , Test = db.model('2dsphere-geo', geoSchema, 'geospatial'+random());
+
+        Test.on('index', function (err) {
+          assert.ifError(err);
+
+          Test.create({ line: { type:'Point', coordinates: [-179.0, 0.0] }}, function (err, created) {
+            assert.ifError(err);
+
+            var geojsonPoint = { type: 'Point', coordinates: [-179.0, 0.0] }
+
+            Test.find({ line: { $near: geojsonPoint }}, function (err, docs) {
+              assert.ifError(err);
+              assert.equal(1, docs.length);
+              assert.equal(created.id, docs[0].id);
+
+              Test.find({ line: { $near: { $geometry: geojsonPoint }, $maxDistance: '50'}}, function (err, docs) {
+                assert.ifError(err);
+                assert.equal(1, docs.length);
+                assert.equal(created.id, docs[0].id);
+                done();
+              })
+            })
+          })
+        })
+      });
+    })
+  })
+
+  describe('hashed indexes', function(){
+    var mongo24_or_greater = false;
+
+    before(function(done){
+      start.mongodVersion(function (err, version) {
+        if (err) return done(err);
+        mongo24_or_greater = 2 < version[0] || (2 == version[0] && 4 <= version[1]);
+        if (!mongo24_or_greater) console.log('not testing mongodb 2.4 features');
+        done();
+      })
+    })
+
+    it('work', function(done){
+      if (!mongo24_or_greater) return done();
+      var db = start();
+      var schemas = [];
+      schemas[0] = new Schema({ t: { type: String, index: 'hashed' }});
+      schemas[1] = new Schema({ t: { type: String, index: 'hashed', sparse: true }});
+      schemas[2] = new Schema({ t: { type: String, index: { type: 'hashed', sparse: true }}});
+
+      var pending = schemas.length;
+
+      schemas.forEach(function (schema, i) {
+        var H = db.model('Hashed' + i, schema);
+        H.on('index', function (err) {
+          assert.ifError(err);
+          H.collection.getIndexes({ full: true }, function (err, indexes) {
+            assert.ifError(err);
+
+            var found = indexes.some(function (index) {
+              return 'hashed' === index.key.t;
+            })
+            assert.ok(found);
+
+            H.create({ t: 'hashing' }, { }, function (err, doc1, doc2) {
+              assert.ifError(err);
+              assert.ok(doc1);
+              assert.ok(doc2);
+              complete();
+            })
+          })
+        })
+      })
+
+      function complete () {
+        if (0 === --pending) done();
+      }
+    })
   })
 });
 

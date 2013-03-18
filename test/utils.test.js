@@ -257,5 +257,27 @@ describe('utils', function(){
       done();
     })
   })
+
+  it('array.flatten', function(done){
+    var orig = [0,[1,2,[3,4,[5,[6]],7],8],9];
+    assert.deepEqual([0,1,2,3,4,5,6,7,8,9], utils.array.flatten(orig));
+    done();
+  })
+
+  describe('clone', function(){
+    it('retains RegExp options gh-1355', function(done){
+      var a = new RegExp('hello', 'igm');
+      assert.ok(a.global);
+      assert.ok(a.ignoreCase);
+      assert.ok(a.multiline);
+
+      var b = utils.clone(a);
+      assert.equal(b.source, a.source);
+      assert.equal(a.global, b.global);
+      assert.equal(a.ignoreCase, b.ignoreCase);
+      assert.equal(a.multiline, b.multiline);
+      done();
+    })
+  })
 })
 

@@ -732,4 +732,84 @@ describe('model: update:', function(){
       });
     })
   })
+
+  describe('mongodb 2.4 features', function(){
+    var mongo24_or_greater = false;
+
+    before(function(done){
+      start.mongodVersion(function (err, version) {
+        assert.ifError(err);
+        mongo24_or_greater = 2 < version[0] || (2 == version[0] && 4 <= version[1]);
+        done();
+      })
+    })
+
+    it('$setOnInsert operator', function(done){
+      if (!mongo24_or_greater) {
+        console.log('not testing mongodb 2.4 $setOnInsert feature');
+        return done();
+      }
+
+      var db = start()
+      var schema = Schema({ name: String, age: Number, x: String });
+      var M = db.model('setoninsert-' + random(), schema);
+
+      var match = { name: 'set on insert' };
+      var op = { $setOnInsert: { age: '47' }, x: 'inserted' };
+      M.update(match, op, { upsert: true }, function (err, updated) {
+        assert.ifError(err);
+        M.findOne(function (err, doc) {
+          assert.ifError(err);
+          assert.equal(47, doc.age);
+          assert.equal('set on insert', doc.name);
+
+          var match = { name: 'set on insert' };
+          var op = { $setOnInsert: { age: 108 }, name: 'changed' };
+          M.update(match, op, { upsert: true }, function (err, updated) {
+            assert.ifError(err);
+
+            M.findOne(function (err, doc) {
+              assert.equal(47, doc.age);
+              assert.equal('changed', doc.name);
+              done();
+            });
+          });
+        });
+      })
+    })
+
+    it('push with $slice', function(done){
+      if (!mongo24_or_greater) {
+        console.log('not testing mongodb 2.4 $push with $slice feature');
+        return done();
+      }
+
+      var db = start()
+      var schema = Schema({ name: String, n: [{ x: Number }] });
+      var M = db.model('setoninsert-' + random(), schema);
+
+      M.create({ name: '2.4' }, function (err, created) {
+        assert.ifError(err);
+
+        var op = { $push: { n: {
+            $each: [{x:10},{x:4}, {x:1}]
+          , $slice: '-1'
+          , $sort: { x:1 }
+        }}}
+
+        M.update({ _id: created._id }, op, function (err) {
+          assert.ifError(err);
+          M.findById(created._id, function (err, doc) {
+            assert.ifError(err);
+            assert.equal(created.id, doc.id)
+            assert.equal(1, doc.n.length);
+            assert.equal(10, doc.n[0].x);
+            done()
+          })
+        })
+      })
+    })
+  })
+
+
 });

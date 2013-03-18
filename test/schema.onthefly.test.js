@@ -36,11 +36,11 @@ describe('schema.onthefly', function(){
     db.close();
     var postOne = new Decorated();
     postOne.set('adhoc', '9', Number);
-    assert.notStrictEqual(postOne._path('adhoc'),undefined);
+    assert.notStrictEqual(postOne.$__path('adhoc'),undefined);
 
     var postTwo = new Decorated();
-    assert.notStrictEqual(postTwo._path('title'),undefined);
-    assert.strictEqual(undefined, postTwo._path('adhoc'));
+    assert.notStrictEqual(postTwo.$__path('title'),undefined);
+    assert.strictEqual(undefined, postTwo.$__path('adhoc'));
     done();
   });
 

@@ -231,6 +231,16 @@ describe('mongoose module:', function(){
         })
       })
     })
+
+    describe('passing object literal schemas', function(){
+      it('works', function(done){
+        var m = new Mongoose;
+        var A = m.model('A', { n: [{ age: 'number' }]});
+        var a = new A({ n: [{ age: '47' }] });
+        assert.strictEqual(47, a.n[0].age);
+        done()
+      })
+    })
   });
 
   it('connecting with a signature of host, database, function', function(done){
@@ -356,23 +366,34 @@ describe('mongoose module:', function(){
     }
   });
 
-  it('public exports', function(done){
-    assert.equal('string', typeof mongoose.version);
-    assert.equal('function', typeof mongoose.Collection);
-    assert.equal('function', typeof mongoose.Connection);
-    assert.equal('function', typeof mongoose.Schema);
-    assert.equal('function', typeof mongoose.SchemaType);
-    assert.equal('function', typeof mongoose.Query);
-    assert.equal('function', typeof mongoose.Promise);
-    assert.equal('function', typeof mongoose.Model);
-    assert.equal('function', typeof mongoose.Document);
-    assert.equal('function', typeof mongoose.Error);
-    assert.equal('function', typeof mongoose.Error.CastError);
-    assert.equal('function', typeof mongoose.Error.DocumentError);
-    assert.equal('function', typeof mongoose.Error.ValidationError);
-    assert.equal('function', typeof mongoose.Error.ValidatorError);
-    assert.equal('function', typeof mongoose.Error.VersionError);
-    done()
+  describe('exports', function(){
+    function test (mongoose) {
+      assert.equal('string', typeof mongoose.version);
+      assert.equal('function', typeof mongoose.Mongoose);
+      assert.equal('function', typeof mongoose.Collection);
+      assert.equal('function', typeof mongoose.Connection);
+      assert.equal('function', typeof mongoose.Schema);
+      assert.equal('function', typeof mongoose.SchemaType);
+      assert.equal('function', typeof mongoose.Query);
+      assert.equal('function', typeof mongoose.Promise);
+      assert.equal('function', typeof mongoose.Model);
+      assert.equal('function', typeof mongoose.Document);
+      assert.equal('function', typeof mongoose.Error);
+      assert.equal('function', typeof mongoose.Error.CastError);
+      assert.equal('function', typeof mongoose.Error.DocumentError);
+      assert.equal('function', typeof mongoose.Error.ValidationError);
+      assert.equal('function', typeof mongoose.Error.ValidatorError);
+      assert.equal('function', typeof mongoose.Error.VersionError);
+    }
+
+    it('of module', function(done){
+      test(mongoose);
+      done();
+    })
+    it('of new Mongoose instances', function(done){
+      test(new mongoose.Mongoose);
+      done();
+    })
   })
 
 });

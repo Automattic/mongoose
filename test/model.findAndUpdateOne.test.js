@@ -76,7 +76,7 @@ var strictThrowSchema = new Schema({ name: String }, { strict: 'throw'});
 mongoose.model('UpdateOneStrictThrowSchema', strictThrowSchema);
 
 describe('model: findOneAndUpdate:', function(){
-  it('returns the edited document', function(done){
+  it('WWW returns the edited document', function(done){
     var db = start()
       , M = db.model(modelname, collection)
       , title = 'Tobi ' + random()

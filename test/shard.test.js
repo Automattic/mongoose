@@ -101,27 +101,27 @@ describe('shard', function(){
     zangief.save(function (err) {
       assert.ifError(err);
 
-      assert.equal(zangief._shardval.name, 'Zangief');
-      assert.equal(zangief._shardval.age, 33);
+      assert.equal(zangief.$__.shardval.name, 'Zangief');
+      assert.equal(zangief.$__.shardval.age, 33);
 
       P.findById(zangief._id, function (err, zang) {
         assert.ifError(err);
 
-        assert.equal(zang._shardval.name, 'Zangief');
-        assert.equal(zang._shardval.age, 33);
+        assert.equal(zang.$__.shardval.name, 'Zangief');
+        assert.equal(zang.$__.shardval.age, 33);
 
         zang.likes = ['spinning', 'laughing'];
         zang.save(function (err) {
           assert.ifError(err);
 
-          assert.equal(zang._shardval.name, 'Zangief');
-          assert.equal(zang._shardval.age, 33);
+          assert.equal(zang.$__.shardval.name, 'Zangief');
+          assert.equal(zang.$__.shardval.age, 33);
 
           zang.likes.addToSet('winning');
           zang.save(function (err) {
             assert.ifError(err);
-            assert.equal(zang._shardval.name, 'Zangief');
-            assert.equal(zang._shardval.age, 33);
+            assert.equal(zang.$__.shardval.name, 'Zangief');
+            assert.equal(zang.$__.shardval.age, 33);
             zang.remove(function (err) {
               db.close();
               assert.ifError(err);
@@ -238,21 +238,21 @@ describe('shard', function(){
     P.create({ name: 'chun li', age: 19, likes: ['street fighting']}, function (err, chunli) {
       assert.ifError(err);
 
-      assert.equal(chunli._shardval.name, 'chun li');
-      assert.equal(chunli._shardval.age, 19);
+      assert.equal(chunli.$__.shardval.name, 'chun li');
+      assert.equal(chunli.$__.shardval.age, 19);
 
       chunli.age = 20;
       chunli.save(function (err) {
         assert.ok(/^Can't modify shard key's value/.test(err.message));
 
-        assert.equal(chunli._shardval.name, 'chun li');
-        assert.equal(chunli._shardval.age, 19);
+        assert.equal(chunli.$__.shardval.name, 'chun li');
+        assert.equal(chunli.$__.shardval.age, 19);
 
         P.findById(chunli._id, function (err, chunli) {
           assert.ifError(err);
 
-          assert.equal(chunli._shardval.name, 'chun li');
-          assert.equal(chunli._shardval.age, 19);
+          assert.equal(chunli.$__.shardval.name, 'chun li');
+          assert.equal(chunli.$__.shardval.age, 19);
 
           chunli.name='chuuuun liiiii';
           chunli.save(function (err) {

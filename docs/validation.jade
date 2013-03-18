@@ -22,7 +22,7 @@ block content
     Custom validation is declared by passing a validation `function` and an error type to your `SchemaType`s validate method. Read the [API](./api.html#schematype_SchemaType-validate) docs for details on custom validators, async validators, and more.
   h3 Validation errors
   :markdown
-    Errors returned after failed validation contain an `errors` object holding the actual `ValidatorErrors`. Each [ValidatorError](./api.html#errors-validation-js) has a `type` and `path` property providing us with a little more error handling flexibility.
+    Errors returned after failed validation contain an `errors` object holding the actual `ValidatorErrors`. Each [ValidatorError](./api.html#errors-validation-js) has a `type`, `path`, and `value` property providing us with a little more error handling flexibility.
   :js
     var toySchema = new Schema({
       color: String,
@@ -40,10 +40,11 @@ block content
     toy.save(function (err) {
       // err.errors.color is a ValidatorError object
 
-      console.log(err.errors.color.message) // prints 'Validator "Invalid color" failed for path color'
-      console.log(String(err.errors.color)) // prints 'Validator "Invalid color" failed for path color'
-      console.log(err.errors.color.type) // prints "Invalid color"
-      console.log(err.errors.color.path) // prints "color"
+      console.log(err.errors.color.message) // prints 'Validator "Invalid color" failed for path color with value `grease`'
+      console.log(String(err.errors.color)) // prints 'Validator "Invalid color" failed for path color with value `grease`'
+      console.log(err.errors.color.type)  // prints "Invalid color"
+      console.log(err.errors.color.path)  // prints "color"
+      console.log(err.errors.color.value) // prints "grease"
       console.log(err.name) // prints "ValidationError"
       console.log(err.message) // prints "Validation failed"
     });

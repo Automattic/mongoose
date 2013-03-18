@@ -129,7 +129,7 @@ block content
     | 
     a(href="./api.html#schematype_SchemaType-sparse") path
     | 
-    a(href="./api.html#schematype_SchemaType-expires") level
+    a(href="./api.html#schema_date_SchemaDate-expires") level
     |  or the 
     code schema
     |  level. Defining indexes at the schema level is necessary when defining 
@@ -235,6 +235,12 @@ block content
     var schema = new Schema({..}, { autoIndex: false });
     var Clock = mongoose.model('Clock', schema);
     Clock.ensureIndexes(callback);
+
+  h4#bufferCommands option: bufferCommands
+  :markdown
+    When running with the drivers `autoReconnect` option disabled and connected to a single `mongod` (non-replica-set), mongoose buffers commands when the connection goes down until you manually reconnect. To disable mongoose buffering under these conditions, set this option to `false`.
+  :js
+    var schema = new Schema({..}, { bufferCommands: false });
 
   h4#capped option: capped
   :markdown
@@ -346,7 +352,7 @@ block content
     The `shardKey` option is used when we have a [sharded MongoDB architecture](http://www.mongodb.org/display/DOCS/Sharding+Introduction). Each sharded collection is given a shard key which must be present in all insert/update operations. We just need to set this schema option to the same shard key and we’ll be all set.
 
   :js
-    new Schema({ .. }, { shardkey: { tag: 1, name: 1 }})
+    new Schema({ .. }, { shardKey: { tag: 1, name: 1 }})
 
   :markdown
     _Note that Mongoose does not send the `shardcollection` command for you. You must configure your shards yourself._

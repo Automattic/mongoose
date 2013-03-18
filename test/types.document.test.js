@@ -21,7 +21,7 @@ function Dummy () {
   mongoose.Document.call(this, {});
 }
 Dummy.prototype.__proto__ = mongoose.Document.prototype;
-Dummy.prototype._setSchema(new Schema)
+Dummy.prototype.$__setSchema(new Schema)
 
 function Subdocument () {
   var arr = new DocumentArray;
@@ -41,7 +41,7 @@ Subdocument.prototype.__proto__ = EmbeddedDocument.prototype;
  * Set schema.
  */
 
-Subdocument.prototype._setSchema(new Schema({
+Subdocument.prototype.$__setSchema(new Schema({
     test: { type: String, required: true }
   , work: { type: String, validate: /^good/ }
 }));
@@ -73,9 +73,9 @@ describe('types.document', function(){
     a.set('work', 'nope');
 
     a.save(function(err){
-      assert.ok(a.__parent._validationError instanceof ValidationError);
+      assert.ok(a.__parent.$__.validationError instanceof ValidationError);
       assert.equal(a.__parent.errors['jsconf.ar.0.work'].name, 'ValidatorError');
-      assert.equal(a.__parent._validationError.toString(), 'ValidationError: Validator "required" failed for path test, Validator failed for path work');
+      assert.equal(a.__parent.$__.validationError.toString(), 'ValidationError: Validator "required" failed for path test with value ``, Validator failed for path work with value `nope`');
       done();
     });
   });
@@ -106,19 +106,19 @@ describe('types.document', function(){
     db.close();
     var m = new Movie;
 
-    assert.equal(m.id, m.__id);
+    assert.equal(m.id, m.$__._id);
     var old = m.id;
     m._id = new mongoose.Types.ObjectId;
-    assert.equal(m.id, m.__id);
-    assert.strictEqual(true, old !== m.__id);
+    assert.equal(m.id, m.$__._id);
+    assert.strictEqual(true, old !== m.$__._id);
 
     var m2= new Movie;
     delete m2._doc._id;
     m2.init({ _id: new mongoose.Types.ObjectId });
-    assert.equal(m2.id, m2.__id);
-    assert.strictEqual(true, m.__id !== m2.__id);
+    assert.equal(m2.id, m2.$__._id);
+    assert.strictEqual(true, m.$__._id !== m2.$__._id);
     assert.strictEqual(true, m.id !== m2.id);
-    assert.strictEqual(true, m.__id !== m2.__id);
+    assert.strictEqual(true, m.$__._id !== m2.$__._id);
     done();
   });
 

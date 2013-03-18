@@ -39,13 +39,13 @@ describe('document: strict mode:', function(){
     var Strict = db.model('Strict', strict);
 
     var l = new Lax({content: 'sample', rouge: 'data'});
-    assert.equal(false, l._strictMode);
+    assert.equal(false, l.$__.strictMode);
     l = l.toObject();
     assert.equal('sample', l.content);
     assert.equal('data', l.rouge);
 
     var s = new Strict({content: 'sample', rouge: 'data'});
-    assert.equal(true, s._strictMode);
+    assert.equal(true, s.$__.strictMode);
     s = s.toObject();
     assert.ok('ts' in s);
     assert.equal('sample', s.content);
@@ -54,7 +54,7 @@ describe('document: strict mode:', function(){
 
     // instance override
     var instance = new Lax({content: 'sample', rouge: 'data'}, true);
-    assert.ok(instance._strictMode);
+    assert.ok(instance.$__.strictMode);
     instance = instance.toObject();
     assert.equal('sample', instance.content);
     assert.ok(!instance.rouge);
@@ -62,7 +62,7 @@ describe('document: strict mode:', function(){
 
     // hydrate works as normal, but supports the schema level flag.
     var s2 = new Strict({content: 'sample', rouge: 'data'}, false);
-    assert.equal(false, s2._strictMode);
+    assert.equal(false, s2.$__.strictMode);
     s2 = s2.toObject();
     assert.ok('ts' in s2);
     assert.equal('sample', s2.content);
@@ -141,14 +141,14 @@ describe('document: strict mode:', function(){
     var Strict = db.model('EmbeddedStrict', new Schema({ dox: [strict] }, { strict: false }), 'embdoc'+random());
 
     var l = new Lax({ dox: [{content: 'sample', rouge: 'data'}] });
-    assert.equal(false, l.dox[0]._strictMode);
+    assert.equal(false, l.dox[0].$__.strictMode);
     l = l.dox[0].toObject();
     assert.equal('sample', l.content);
     assert.equal('data', l.rouge);
     assert.ok(l.rouge);
 
     var s = new Strict({ dox: [{content: 'sample', rouge: 'data'}] });
-    assert.equal(true, s.dox[0]._strictMode);
+    assert.equal(true, s.dox[0].$__.strictMode);
     s = s.dox[0].toObject();
     assert.ok('ts' in s);
     assert.equal('sample', s.content);
@@ -212,5 +212,82 @@ describe('document: strict mode:', function(){
     assert.equal(1, getCount);
     assert.equal(2, setCount);
     done();
+  })
+
+  it('can be overridden during set()', function(done){
+    var db = start();
+
+    var strict = new Schema({
+        bool: Boolean
+    });
+
+    var Strict = db.model('Strict', strict);
+    var s = new Strict({ bool: true });
+
+    // insert non-schema property
+    var doc = s.toObject();
+    doc.notInSchema = true;
+
+    Strict.collection.insert(doc, { w: 1 }, function (err) {
+      assert.ifError(err);
+      Strict.findById(doc._id, function (err, doc) {
+        assert.ifError(err);
+        assert.equal(true, doc._doc.bool);
+        assert.equal(true, doc._doc.notInSchema);
+        doc.bool = undefined;
+        doc.set('notInSchema', undefined, { strict: false });
+        doc.save(function (err) {
+          Strict.findById(doc._id, function (err, doc) {
+            db.close();
+            assert.ifError(err);
+            assert.equal(undefined, doc._doc.bool);
+            assert.equal(undefined, doc._doc.notInSchema);
+            done();
+          });
+        })
+      })
+    })
+  })
+
+  it('can be overridden during update()', function(done){
+    var db = start();
+
+    var strict = new Schema({
+        bool: Boolean
+    });
+
+    var Strict = db.model('Strict', strict);
+    var s = new Strict({ bool: true });
+
+    // insert non-schema property
+    var doc = s.toObject();
+    doc.notInSchema = true;
+
+    Strict.collection.insert(doc, { w: 1 }, function (err) {
+      assert.ifError(err);
+
+      Strict.findById(doc._id, function (err, doc) {
+        assert.ifError(err);
+        assert.equal(true, doc._doc.bool);
+        assert.equal(true, doc._doc.notInSchema);
+
+        Strict.update(
+            { _id: doc._id }
+          , { $unset: { bool: 1, notInSchema: 1 }}
+          , { strict: false, w: 1 }
+          , function (err) {
+
+          assert.ifError(err);
+
+          Strict.findById(doc._id, function (err, doc) {
+            db.close();
+            assert.ifError(err);
+            assert.equal(undefined, doc._doc.bool);
+            assert.equal(undefined, doc._doc.notInSchema);
+            done();
+          });
+        })
+      })
+    })
   })
 })

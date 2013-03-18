@@ -1,5 +1,9 @@
 ## Contributing to Mongoose
 
+### STOP!
+
+If you have a question about Mongoose (not a bug report) please post it to either [StackOverflow](http://stackoverflow.com/questions/tagged/mongoose), our [Google Group](http://groups.google.com/group/mongoose-orm), or on the #mongoosejs irc channel on freenode.
+
 ### Reporting bugs
 
 - Before opening a new issue, look for existing [issues](https://github.com/learnboost/mongoose/issues) to avoid duplication. If the issue does not yet exist, [create one](https://github.com/learnboost/mongoose/issues/new).
@@ -23,7 +27,12 @@
     - `for (..) {`
     - `while (..) {`
     - `function (err) {`
-- Write tests and make sure they pass (execute `make test` from the command line to run the test suite).
+- Write tests and make sure they pass (tests are in the [test](https://github.com/LearnBoost/mongoose/tree/master/test) directory).
+
+### Running the tests
+- Open a terminal and navigate to the root of the project
+- execute `npm install` to install the necessary dependencies
+- execute `make test` to run the tests
 
 ### Documentation
 

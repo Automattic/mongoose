@@ -53,6 +53,12 @@ var BlogPost = new Schema({
 mongoose.model('Versioning', BlogPost);
 
 describe('versioning', function(){
+  it('is only added to parent schema (gh-1265)', function(done){
+    assert.ok(BlogPost.path('__v'));
+    assert.ok(!BlogPost.path('comments').__v);
+    assert.ok(!BlogPost.path('meta.nested').__v);
+    done();
+  })
 
   it('works', function (done) {
     var db = start()
@@ -130,7 +136,7 @@ describe('versioning', function(){
       assert.ok(/No matching document/.test(err), err);
       assert.equal(a._doc.__v, 5)
       a.set('arr.0.0', 'updated');
-      var d = a._delta();
+      var d = a.$__delta();
       assert.equal(a._doc.__v, d[0].__v, 'version should be added to where clause')
       assert.ok(!('$inc' in d[1]));
       save(a,b,test5);
@@ -222,7 +228,7 @@ describe('versioning', function(){
       a.comments.addToSet({ title: 'monkey' });
       b.markModified('comments');
 
-      var d = b._delta();
+      var d = b.$__delta();
       assert.ok(d[1].$inc, 'a $set of an array should trigger versioning');
 
       save(a, b, test12);
@@ -235,7 +241,7 @@ describe('versioning', function(){
 
       a.comments.addToSet({ title: 'aven' });
       a.comments.addToSet({ title: 'avengers' });
-      var d = a._delta();
+      var d = a.$__delta();
 
       assert.equal(undefined, d[0].__v, 'version should not be included in where clause');
       assert.ok(!d[1].$set);
@@ -243,7 +249,7 @@ describe('versioning', function(){
       assert.ok(d[1].$addToSet.comments);
 
       a.comments.$shift();
-      var d = a._delta();
+      var d = a.$__delta();
       assert.equal(12, d[0].__v, 'version should be included in where clause');
       assert.ok(d[1].$set, 'two differing atomic ops on same path should create a $set');
       assert.ok(d[1].$inc, 'a $set of an array should trigger versioning');
@@ -305,7 +311,7 @@ describe('versioning', function(){
         db.close();
         assert.ifError(err);
         doc.comments[0].title = 'no version was included';
-        var d = doc._delta();
+        var d = doc.$__delta();
         assert.ok(!d[0].__v, 'no version key was selected so should not be included');
         done();
       })
@@ -350,7 +356,7 @@ describe('versioning', function(){
         assert.ifError(err);
         assert.ok(!d._doc.__v);
         d.numbers.splice(1, 1, 10);
-        var o = d._delta();
+        var o = d.$__delta();
         assert.equal(undefined, o[0].__v);
         assert.ok(o[1].$inc);
         assert.equal(1, o[1].$inc.__v);
@@ -399,7 +405,7 @@ describe('versioning', function(){
         assert.equal(false, '__v' in doc._doc);
 
         doc.set('x.0', 'updated');
-        var d = doc._delta()[0];
+        var d = doc.$__delta()[0];
         assert.equal(undefined, d.__v, 'version should not be added to where clause')
 
         M.collection.findOne({ _id: doc._id }, function (err, doc) {

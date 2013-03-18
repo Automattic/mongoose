@@ -717,8 +717,25 @@ describe('connections:', function(){
         })
       })
     })
-  })
 
+    describe('passing object literal schemas', function(){
+      it('works', function(done){
+        var db = start();
+        var A = db.model('A', { n: [{ age: 'number' }]});
+        var a = new A({ n: [{ age: '47' }] });
+        assert.strictEqual(47, a.n[0].age);
+        a.save(function (err) {
+          assert.ifError(err);
+          A.findById(a, function (err, doc) {
+            db.close();
+            assert.ifError(err);
+            assert.strictEqual(47, a.n[0].age);
+            done();
+          })
+        })
+      })
+    })
+  })
 
   describe('openSet', function(){
     it('accepts uris, dbname, options', function(done){
@@ -806,6 +823,30 @@ describe('connections:', function(){
       } catch (err) {
         done(err);
       }
+    })
+  })
+
+  describe('modelNames()', function(){
+    it('returns names of all models registered on it', function(done){
+      var m = new mongoose.Mongoose;
+      m.model('root', { x: String });
+      m.model('another', { x: String });
+
+      var db = m.createConnection();
+      db.model('something', { x: String });
+
+      var names = db.modelNames();
+      assert.ok(Array.isArray(names));
+      assert.equal(1, names.length);
+      assert.equal('something', names[0]);
+
+      names = m.modelNames();
+      assert.ok(Array.isArray(names));
+      assert.equal(2, names.length);
+      assert.equal('root', names[0]);
+      assert.equal('another', names[1]);
+
+      done();
     })
   })
 })

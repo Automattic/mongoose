@@ -47,7 +47,6 @@
   * updated; muri to 0.3.1
   * updated; driver to 1.2.12
   * updated; mpromise to 0.2.1
-  * deprecated; connection#setProfiling
   * deprecated; pluralization will die in 4.x
   * docs; Buffer -> mongodb.Binary #1363
   * docs; auth options

@@ -1,0 +1,200 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>Mongoose Schemas v3.5.9</title><link href="http://fonts.googleapis.com/css?family=Anonymous+Pro:400,700|Droid+Sans+Mono|Open+Sans:400,700|Linden+Hill|Quattrocento:400,700|News+Cycle:400,700|Antic+Slab|Cabin+Condensed:400,700" rel="stylesheet" type="text/css"><link href="css/default.css" rel="stylesheet" type="text/css"><link href="css/guide.css" rel="stylesheet" type="text/css"></head><body><a id="forkbanner" href="http://github.com/learnboost/mongoose"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png" alt="Fork me on GitHub"></a><div id="links"><div id="header"><h1><a href="../index.html"><div class="mongoose">Mongoose</div></a></h1></div><ul><li class="home"><a href="../index.html">home</a></li><li class="faq"><a href="./faq.html">FAQ</a></li><li class="plugins"><a href="http://plugins.mongoosejs.com">plugins</a></li><li class="changelog"><a href="http://github.com/learnboost/mongoose/tree/master/History.md">change log</a></li><li class="support"><a href="../index.html#support">support</a></li><li class="fork"><a href="http://github.com/learnboost/mongoose">fork</a></li><li class="guide"><a href="./guide.html">guide</a><ul><li class="double"><a href="./guide.html">schemas</a><ul><li class="schematypes"><a href="./schematypes.html"><span>schema</span>types</a></li></ul></li><li><a href="./models.html">models</a></li><li class="double"><a href="./documents.html">documents</a><ul><li class="subdocs"><a href="./subdocs.html">sub docs</a></li></ul></li><li><a href="./queries.html">queries</a></li><li><a href="./validation.html">validation</a></li><li><a href="./middleware.html">middleware</a></li><li><a href="./populate.html">population</a></li><li><a href="./connections.html">connections</a></li><li><a href="./plugins.html">plugins</a></li><li><a href="https://github.com/LearnBoost/mongoose/blob/master/CONTRIBUTING.md">contributing</a></li><li><a href="./migration.html">migrating from 2.x</a></li></ul></li><li class="api"><a href="./api.html">API docs</a></li><li class="quickstart"><a href="./index.html">quick start</a></li><li class="contrib"><a href="http://github.com/learnboost/mongoose/contributors">contributors</a></li><li class="prior"><a href="./prior.html">prior releases</a></li></ul></div><div id="content"><div class="module"><h2>Schemas</h2><div class="important"><p>If you haven&#39;t yet done so, please take a minute to read the <a href="./index.html">quickstart</a> to get an idea of how Mongoose works.
+If you are migrating from 2.x to 3.x please take a moment to read the <a href="./migration.html">migration guide</a>.</p></div><p>This page covers <code>Schema</code> <a href="#definition">definition</a>, <a href="#plugins">plugins</a>, instance <a href="#methods">methods</a>, <a href="#statics">statics</a>, <a href="#indexes">indexes</a>, <a href="#virtuals">virtuals</a> and <a href="#options">options</a>. Let&#39;s start with <code>Schema</code> definition.</p><h3 id="definition">Defining your schema</h3><p>Everything in Mongoose starts with a Schema. Each schema maps to a MongoDB collection and defines the shape of the documents within that collection.</p><pre><code class="javascript"><span class="keyword">var</span> blogSchema = <span class="keyword">new</span> Schema({
+  title:  String,
+  author: String,
+  body:   String,
+  comments: [{ body: String, date: Date }],
+  date: { type: Date, <span class="keyword">default</span>: Date.now },
+  hidden: Boolean,
+  meta: {
+    votes: Number,
+    favs:  Number
+  }
+});</code></pre><p><em>If you want to add additional keys later, use the <a href="./api.html#schema_Schema-add">Schema#add</a> method.</em></p><p> 
+Each key in our <code>blogSchema</code> defines a property in our documents which will be cast to its associated <a href="./api.html#schematype_SchemaType">SchemaType</a>.  For example, we've defined a <code>title</code> which will be cast to the <a href="./api.html#schema-string-js">String</a> SchemaType and <code>date</code> which will be cast to a <code>Date</code> SchemaType.
+Keys may also be assigned nested objects containing further key/type definitions <em>(e.g. the `meta` property above).</em></p><p>The permitted SchemaTypes are <ul><li>String</li><li>Number</li><li>Date</li><li>Buffer</li><li>Boolean</li><li>Mixed</li><li>ObjectId</li><li>Array</li></ul>Read more about them <a href="./schematypes.html">here</a>.</p><p>Schemas not only define the structure of your document and casting of properties, they also define document <a href="#methods">instance methods</a>, static <a href="#statics">Model methods</a>, <a href="#indexes">compound indexes</a> and document lifecycle hooks called <a href="./middleware.html">middleware</a>.</p><h3 id="plugins">Pluggable</h3><p>Schemas are <a href="./plugins.html">pluggable</a> which allows us to package up reusable features into <a href="http://plugins.mongoosejs.com">plugins</a> that can be shared with the community or just between your projects.</p><h3 id="methods">Instance methods</h3><p> <a href="./models.html">Models</a> are just fancy <code>constructor</code> functions. As such they can have prototype methods inherited by their instances. In the case of Mongoose, instances are <a href="./documents.html">documents</a>.</p><p>Defining an instance method is easy.</p><pre><code class="javascript"><span class="keyword">var</span> animalSchema = <span class="keyword">new</span> Schema({ name: String, type: String });
+
+animalSchema.methods.findSimilarTypes = <span class="function"><span class="keyword">function</span> <span class="params">(cb)</span> {</span>
+  <span class="keyword">return</span> <span class="keyword">this</span>.model(<span class="string">'Animal'</span>).find({ type: <span class="keyword">this</span>.type }, cb);
+}</code></pre><p>Now all of our <code>animal</code> instances have a <code>findSimilarTypes</code> method available to it.</p><pre><code class="javascript"><span class="keyword">var</span> Animal = mongoose.model(<span class="string">'Animal'</span>, animalSchema);
+<span class="keyword">var</span> dog = <span class="keyword">new</span> Animal({ type: <span class="string">'dog'</span> });
+
+dog.findSimilarTypes(<span class="function"><span class="keyword">function</span> <span class="params">(err, dogs)</span> {</span>
+  console.log(dogs); <span class="comment">// woof</span>
+});</code></pre><h3 id="statics">Statics</h3><p> 
+Adding static constructor methods to Models is simple as well. Continuing with our <code>animalSchema</code>:</p><pre><code class="javascript">animalSchema.statics.findByName = <span class="function"><span class="keyword">function</span> <span class="params">(name, cb)</span> {</span>
+  <span class="keyword">this</span>.find({ name: <span class="keyword">new</span> RegExp(name, <span class="string">'i'</span>) }, cb);
+}
+
+<span class="keyword">var</span> Animal = mongoose.model(<span class="string">'Animal'</span>, animalSchema);
+Animal.findByName(<span class="string">'fido'</span>, <span class="function"><span class="keyword">function</span> <span class="params">(err, animals)</span> {</span>
+  console.log(animals);
+});</code></pre><h3 id="indexes">Indexes</h3><p><a href="http://www.mongodb.org/display/DOCS/Indexes">Indexes</a> can be defined <a href="./api.html#schematype_SchemaType-index">at</a> <a href="./api.html#schematype_SchemaType-unique">the</a> <a href="./api.html#schematype_SchemaType-sparse">path</a> <a href="./api.html#schematype_SchemaType-expires">level</a> or the <code>schema</code> level. Defining indexes at the schema level is necessary when defining <a href="http://www.mongodb.org/display/DOCS/Indexes#Indexes-CompoundKeys" target="_blank">compound indexes</a>.</p><pre><code class="javascript">animalSchema.index({ name: <span class="number">1</span>, type: -<span class="number">1</span> });
+</code></pre><div class="important"><p>When your application starts up, Mongoose automatically calls <code>ensureIndex</code> for each defined index in your schema.
+While nice for development, it is recommended this behavior be disabled in production since index creation can cause a <a href="http://docs.mongodb.org/manual/core/indexes/#index-creation-operations">significant performance impact</a>. Disable the behavior by setting the <code>autoIndex</code> option of your schema to <code>false</code>.</p></div><pre><code class="javascript">animalSchema.set(<span class="string">'autoIndex'</span>, <span class="literal">false</span>);
+<span class="comment">// or</span>
+<span class="keyword">new</span> Schema({..}, { autoIndex: <span class="literal">false</span> });
+</code></pre><p>See also the <a href="./api.html#model_Model.ensureIndexes">Model#ensureIndexes</a> method.</p><h3 id="virtuals">Virtuals</h3><p><a href="./api.html#schema_Schema-virtual">Virtual</a> attributes are attributes that are convenient to have around but that do not get persisted to MongoDB.</p><pre><code class="javascript"><span class="keyword">var</span> personSchema = <span class="keyword">new</span> Schema({
+  name: {
+    first: String,
+    last: String
+  }
+});
+
+<span class="keyword">var</span> Person = mongoose.model(<span class="string">'Person'</span>, personSchema);
+
+<span class="keyword">var</span> bad = <span class="keyword">new</span> Person({
+    name: { first: <span class="string">'Walter'</span>, last: <span class="string">'White'</span> }
+});</code></pre><p>Suppose we want to log the full name of <code>bad</code>. We could do this manually like so:</p><pre><code class="javascript">console.log(bad.name.first + <span class="string">' '</span> + bad.name.last); <span class="comment">// Walter White</span></code></pre><p>Or we could add a <code>virtual</code> attribute <a href="./api.html#virtualtype_VirtualType-get">getter</a> to our <code>personSchema</code> so we don&#39;t need to write out this string concatenation mess each time:</p><pre><code class="javascript">personSchema.virtual(<span class="string">'name.full'</span>).get(<span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+  <span class="keyword">return</span> <span class="keyword">this</span>.name.first + <span class="string">' '</span> + <span class="keyword">this</span>.name.last;
+});</code></pre><p>Now, when we access our virtual full name property, our getter function will be invoked and the value returned:</p><pre><code class="javascript">console.log(<span class="string">'%s is insane'</span>, bad.name.full); <span class="comment">// Walter White is insane</span></code></pre><p>It would also be nice to be able to set <code>this.name.first</code> and <code>this.name.last</code> by setting <code>this.name.full</code>. For example, if we wanted to change <code>bad</code>&#39;s <code>name.first</code> and <code>name.last</code> to &#39;Breaking&#39; and &#39;Bad&#39; respectively, it&#39;d be nice to just:</p><pre><code class="javascript">bad.name.full = <span class="string">'Breaking Bad'</span>;</code></pre><p>Mongoose let&#39;s you do this as well through its virtual attribute <a href="./api.html#virtualtype_VirtualType-set">setters</a>:</p><pre><code class="javascript">personSchema.virtual(<span class="string">'name.full'</span>).set(<span class="function"><span class="keyword">function</span> <span class="params">(name)</span> {</span>
+  <span class="keyword">var</span> split = name.split(<span class="string">' '</span>);
+  <span class="keyword">this</span>.name.first = split[<span class="number">0</span>];
+  <span class="keyword">this</span>.name.last = split[<span class="number">1</span>];
+});
+
+...
+
+mad.name.full = <span class="string">'Breaking Bad'</span>;
+console.log(mad.name.first); <span class="comment">// Breaking</span></code></pre><p>If you need attributes that you can get and set but that are not themselves persisted to MongoDB, virtual attributes is the Mongoose feature for you.</p><h3 id="options">Options</h3><p><code>Schema</code>s have a few configurable options which can be passed to the constructor or <code>set</code> directly:</p><pre><code class="javascript"><span class="keyword">new</span> Schema({..}, options);
+
+<span class="comment">// or</span>
+
+<span class="keyword">var</span> schema = <span class="keyword">new</span> Schema({..});
+schema.set(option, value);
+</code></pre><p>Valid options:</p>
+
+<ul><li><a href="#autoIndex">autoIndex</a></li><li><a href="#capped">capped</a></li><li><a href="#collection">collection</a></li><li><a href="#id">id</a></li><li><a href="#_id">_id</a></li><li><a href="#read">read</a></li><li><a href="#safe">safe</a></li><li><a href="#shardKey">shardKey</a></li><li><a href="#strict">strict</a></li><li><a href="#toJSON">toJSON</a></li><li><a href="#toObject">toObject</a></li><li><a href="#versionKey">versionKey</a></li></ul><h4 id="autoIndex">option: autoIndex</h4><p>At application startup, Mongoose sends an <code>ensureIndex</code> command for each index declared in your <code>Schema</code>. As of Mongoose v3, indexes are created in the <code>background</code> by default. If you wish to disable the auto-creation feature and manually handle when indexes are created, set your <code>Schema</code>s <code>autoIndex</code> option to <code>false</code> and use the <a href="./api.html#model_Model.ensureIndexes">ensureIndexes</a> method on your model.</p><pre><code class="javascript"><span class="keyword">var</span> schema = <span class="keyword">new</span> Schema({..}, { autoIndex: <span class="literal">false</span> });
+<span class="keyword">var</span> Clock = mongoose.model(<span class="string">'Clock'</span>, schema);
+Clock.ensureIndexes(callback);
+</code></pre><h4 id="capped">option: capped</h4><p>Mongoose supports MongoDBs <a href="http://www.mongodb.org/display/DOCS/Capped+Collections">capped</a> collections. To specify the underlying MongoDB collection be <code>capped</code>, set the <code>capped</code> option to the maximum size of the collection in <a href="http://www.mongodb.org/display/DOCS/Capped+Collections#CappedCollections-size.">bytes</a>.</p><pre><code class="javascript"><span class="keyword">new</span> Schema({..}, { capped: <span class="number">1024</span> });</code></pre><p>The <code>capped</code> option may also be set to an object if you want to pass additional options like <a href="http://www.mongodb.org/display/DOCS/Capped+Collections#CappedCollections-max">max</a> or <a href="http://www.mongodb.org/display/DOCS/Capped+Collections#CappedCollections-autoIndexId">autoIndexId</a>. In this case you must explicitly pass the <code>size</code> option which is required.</p><pre><code class="javascript"><span class="keyword">new</span> Schema({..}, { capped: { size: <span class="number">1024</span>, max: <span class="number">1000</span>, autoIndexId: <span class="literal">true</span> } });
+</code></pre><h4 id="collection">option: collection</h4><p>Mongoose by default produces a collection name by passing the model name to the <a href="./api.html#utils_exports.toCollectionName">utils.toCollectionName</a> method. This method pluralizes the name. Set this option if you need a different name for your collection.</p><pre><code class="javascript"><span class="keyword">var</span> dataSchema = <span class="keyword">new</span> Schema({..}, { collection: <span class="string">'data'</span> });
+</code></pre><h4 id="id">option: id</h4><p>Mongoose assigns each of your schemas an <code>id</code> virtual getter by default which returns the documents <code>_id</code> field cast to a string, or in the case of ObjectIds, its hexString. If you don&#39;t want an <code>id</code> getter added to your schema, you may disable it passing this option at schema construction time.</p><pre><code class="javascript"><span class="comment">// default behavior</span>
+<span class="keyword">var</span> schema = <span class="keyword">new</span> Schema({ name: String });
+<span class="keyword">var</span> Page = mongoose.model(<span class="string">'Page'</span>, schema);
+<span class="keyword">var</span> p = <span class="keyword">new</span> Page({ name: <span class="string">'mongodb.org'</span> });
+console.log(p.id); <span class="comment">// '50341373e894ad16347efe01'</span>
+
+<span class="comment">// disabled id</span>
+<span class="keyword">var</span> schema = <span class="keyword">new</span> Schema({ name: String }, { id: <span class="literal">false</span> });
+<span class="keyword">var</span> Page = mongoose.model(<span class="string">'Page'</span>, schema);
+<span class="keyword">var</span> p = <span class="keyword">new</span> Page({ name: <span class="string">'mongodb.org'</span> });
+console.log(p.id); <span class="comment">// undefined</span>
+</code></pre><h4 id="_id">option: _id</h4><p>Mongoose assigns each of your schemas an <code>_id</code> field by default if one is not passed into the <a href="/docs/api.html#schema-js">Schema</a> constructor. The type assiged is an <a href="/docs/api.html#schema_Schema.Types">ObjectId</a> to coincide with MongoDBs default behavior. If you don&#39;t want an <code>_id</code> added to your schema at all, you may disable it using this option.</p>
+
+<p>Pass this option during schema construction to prevent documents from getting an <code>_id</code> auto created by Mongoose (parent documents will still have an <code>_id</code> created by MongoDB when inserted).</p><pre><code class="javascript"><span class="comment">// default behavior</span>
+<span class="keyword">var</span> schema = <span class="keyword">new</span> Schema({ name: String });
+<span class="keyword">var</span> Page = mongoose.model(<span class="string">'Page'</span>, schema);
+<span class="keyword">var</span> p = <span class="keyword">new</span> Page({ name: <span class="string">'mongodb.org'</span> });
+console.log(p); <span class="comment">// { _id: '50341373e894ad16347efe01', name: 'mongodb.org' }</span>
+
+<span class="comment">// disabled _id</span>
+<span class="keyword">var</span> schema = <span class="keyword">new</span> Schema({ name: String }, { _id: <span class="literal">false</span> });
+<span class="keyword">var</span> Page = mongoose.model(<span class="string">'Page'</span>, schema);
+<span class="keyword">var</span> p = <span class="keyword">new</span> Page({ name: <span class="string">'mongodb.org'</span> });
+console.log(p); <span class="comment">// { name: 'mongodb.org' }</span>
+<span class="comment">// MongoDB will create the _id when inserted</span>
+p.save(<span class="function"><span class="keyword">function</span> <span class="params">(err)</span> {</span>
+  <span class="keyword">if</span> (err) <span class="keyword">return</span> handleError(err);
+  Page.findById(p, <span class="function"><span class="keyword">function</span> <span class="params">(err, doc)</span> {</span>
+    <span class="keyword">if</span> (err) <span class="keyword">return</span> handleError(err);
+    console.log(doc); <span class="comment">// { name: 'mongodb.org', _id: '50341373e894ad16347efe12' }</span>
+  })
+})
+</code></pre><h4 id="read">option: read</h4><p>Allows setting <a href="/docs/api.html#query_Query-read">query#read</a> options at the schema level, providing us a way to apply default <a href="http://docs.mongodb.org/manual/applications/replication/#replica-set-read-preference">ReadPreferences</a> to all queries derived from a model.</p><pre><code class="javascript"><span class="keyword">var</span> schema = <span class="keyword">new</span> Schema({..}, { read: <span class="string">'primary'</span> });            <span class="comment">// also aliased as 'p'</span>
+<span class="keyword">var</span> schema = <span class="keyword">new</span> Schema({..}, { read: <span class="string">'primaryPreferred'</span> });   <span class="comment">// aliased as 'pp'</span>
+<span class="keyword">var</span> schema = <span class="keyword">new</span> Schema({..}, { read: <span class="string">'secondary'</span> });          <span class="comment">// aliased as 's'</span>
+<span class="keyword">var</span> schema = <span class="keyword">new</span> Schema({..}, { read: <span class="string">'secondaryPreferred'</span> }); <span class="comment">// aliased as 'sp'</span>
+<span class="keyword">var</span> schema = <span class="keyword">new</span> Schema({..}, { read: <span class="string">'nearest'</span> });            <span class="comment">// aliased as 'n'</span>
+</code></pre><p>The alias of each pref is also permitted so instead of having to type out &#39;secondaryPreferred&#39; and getting the spelling wrong, we can simply pass &#39;sp&#39;.</p>
+
+<p>The read option also allows us to specify <em>tag sets</em>. These tell the <a href="https://github.com/mongodb/node-mongodb-native/">driver</a> from which members of the replica-set it should attempt to read. Read more about tag sets <a href="http://docs.mongodb.org/manual/applications/replication/#tag-sets">here</a> and <a href="http://mongodb.github.com/node-mongodb-native/driver-articles/anintroductionto1_1and2_2.html#read-preferences">here</a>.</p>
+
+<p><em>NOTE: if you specify the read pref &#39;nearest&#39;, you must also pass the <a href="http://mongodb.github.com/node-mongodb-native/api-generated/replset.html?highlight=strategy">strategy</a> option when connecting or your reads will not behave predictably:</em></p><pre><code class="javascript"><span class="comment">// pings the replset members periodically to track network latency</span>
+<span class="comment">// now `nearest` works as intended</span>
+<span class="keyword">var</span> options = { replset: { strategy: <span class="string">'ping'</span> }};
+mongoose.connect(uri, options);
+
+<span class="keyword">var</span> schema = <span class="keyword">new</span> Schema({..}, { read: [<span class="string">'n'</span>, { disk: <span class="string">'ssd'</span> }] });
+mongoose.model(<span class="string">'JellyBean'</span>, schema);
+</code></pre><h4 id="safe">option: safe</h4><p>This option is passed to MongoDB with all operations and let&#39;s us specify if errors should be returned to our callbacks as well as tune write behavior.</p><pre><code class="javascript"><span class="keyword">var</span> safe = <span class="literal">true</span>;
+<span class="keyword">new</span> Schema({ .. }, { safe: safe });
+</code></pre><p>By default this is set to <code>true</code> for all schemas which guarentees that any occurring error gets passed back to our callback.
+By setting <code>safe</code> to something else like <code>{ j: 1, w: 2, wtimeout: 10000 }</code> we can guarantee the write was committed to the MongoDB journal (j: 1), at least 2 replicas (w: 2), and that the write will timeout if it takes longer than 10 seconds (wtimeout: 10000). Errors will still be passed to our callback.</p>
+
+<p>**NOTE: this setting overrides any setting specified by passing db options while <a href="/docs/api.html#index_Mongoose-createConnection">creating a connection</a>.</p>
+
+<p>There are other write concerns like <code>{ w: &quot;majority&quot; }</code> too. See the MongoDB <a href="http://www.mongodb.org/display/DOCS/getLastError+Command">docs</a> for more details.</p><pre><code class="javascript"><span class="keyword">var</span> safe = { w: <span class="string">"majority"</span>, wtimeout: <span class="number">10000</span> };
+<span class="keyword">new</span> Schema({ .. }, { safe: safe });
+</code></pre><h4 id="shardKey">option: shardKey</h4><p>The <code>shardKey</code> option is used when we have a <a href="http://www.mongodb.org/display/DOCS/Sharding+Introduction">sharded MongoDB architecture</a>. Each sharded collection is given a shard key which must be present in all insert/update operations. We just need to set this schema option to the same shard key and we’ll be all set.</p><pre><code class="javascript"><span class="keyword">new</span> Schema({ .. }, { shardkey: { tag: <span class="number">1</span>, name: <span class="number">1</span> }})
+</code></pre><p><em>Note that Mongoose does not send the <code>shardcollection</code> command for you. You must configure your shards yourself.</em></p><h4 id="strict">option: strict</h4><p>The strict option, (enabled by default), ensures that values passed to our model constructor that were not specified in our schema do not get saved to the db.</p><pre><code class="javascript"><span class="keyword">var</span> thingSchema = <span class="keyword">new</span> Schema({..})
+<span class="keyword">var</span> Thing = mongoose.model(<span class="string">'Thing'</span>, schemaSchema);
+<span class="keyword">var</span> thing = <span class="keyword">new</span> Thing({ iAmNotInTheSchema: <span class="literal">true</span> });
+thing.save(); <span class="comment">// iAmNotInTheSchema is not saved to the db</span>
+
+<span class="comment">// set to false..</span>
+<span class="keyword">var</span> thingSchema = <span class="keyword">new</span> Schema({..}, { strict: <span class="literal">false</span> });
+<span class="keyword">var</span> thing = <span class="keyword">new</span> Thing({ iAmNotInTheSchema: <span class="literal">true</span> });
+thing.save(); <span class="comment">// iAmNotInTheSchema is now saved to the db!!</span>
+</code></pre><p>This also affects the use of <code>doc.set()</code> to set a property value.</p><pre><code class="javascript"><span class="keyword">var</span> thingSchema = <span class="keyword">new</span> Schema({..})
+<span class="keyword">var</span> Thing = mongoose.model(<span class="string">'Thing'</span>, schemaSchema);
+<span class="keyword">var</span> thing = <span class="keyword">new</span> Thing;
+thing.set(<span class="string">'iAmNotInTheSchema'</span>, <span class="literal">true</span>);
+thing.save(); <span class="comment">// iAmNotInTheSchema is not saved to the db</span>
+</code></pre><p>This value can be overridden at the model instance level by passing a second boolean argument:</p><pre><code class="javascript"><span class="keyword">var</span> Thing = mongoose.model(<span class="string">'Thing'</span>);
+<span class="keyword">var</span> thing = <span class="keyword">new</span> Thing(doc, <span class="literal">true</span>);  <span class="comment">// enables strict mode</span>
+<span class="keyword">var</span> thing = <span class="keyword">new</span> Thing(doc, <span class="literal">false</span>); <span class="comment">// disables strict mode</span>
+</code></pre><p>The <code>strict</code> option may also be set to <code>&quot;throw&quot;</code> which will cause errors to be produced instead of dropping the bad data.</p><p><em>NOTE: do not set to false unless you have good reason.</em></p>
+
+<p><em>NOTE: in mongoose v2 the default was false.</em></p>
+
+<p><em>NOTE: Any key/val set on the instance that does not exist in your schema is always ignored, regardless of schema option.</em></p><pre><code class="javascript"><span class="keyword">var</span> thingSchema = <span class="keyword">new</span> Schema({..})
+<span class="keyword">var</span> Thing = mongoose.model(<span class="string">'Thing'</span>, schemaSchema);
+<span class="keyword">var</span> thing = <span class="keyword">new</span> Thing;
+thing.iAmNotInTheSchema = <span class="literal">true</span>;
+thing.save(); <span class="comment">// iAmNotInTheSchema is never saved to the db</span>
+</code></pre><h4 id="toJSON">option: toJSON</h4><p>Exactly the same as the <a href="#toObject">toObject</a> option but only applies when the documents <code>toJSON</code> method is called.</p><pre><code class="javascript"><span class="keyword">var</span> schema = <span class="keyword">new</span> Schema({ name: String });
+schema.path(<span class="string">'name'</span>).get(<span class="function"><span class="keyword">function</span> <span class="params">(v)</span> {</span>
+  <span class="keyword">return</span> v + <span class="string">' is my name'</span>;
+});
+schema.set(<span class="string">'toJSON'</span>, { getters: <span class="literal">true</span>, virtuals: <span class="literal">false</span> });
+<span class="keyword">var</span> M = mongoose.model(<span class="string">'Person'</span>, schema);
+<span class="keyword">var</span> m = <span class="keyword">new</span> M({ name: <span class="string">'Max Headroom'</span> });
+console.log(m.toObject()); <span class="comment">// { _id: 504e0cd7dd992d9be2f20b6f, name: 'Max Headroom' }</span>
+console.log(m.toJSON()); <span class="comment">// { _id: 504e0cd7dd992d9be2f20b6f, name: 'Max Headroom is my name' }</span>
+<span class="comment">// since we know toJSON is called whenever a js object is stringified:</span>
+console.log(JSON.stringify(m)); <span class="comment">// { "_id": "504e0cd7dd992d9be2f20b6f", "name": "Max Headroom is my name" }</span>
+</code></pre><p>To see all available <code>toJSON/toObject</code> options, read <a href="/docs/api.html#document_Document-toObject">this</a>.</p><h4 id="toObject">option: toObject</h4><p>Documents have a <a href="/docs/api.html#document_Document-toObject">toObject</a> method which converts the mongoose document into a plain javascript object. This method accepts a few options. Instead of applying these options on a per-document basis we may declare the options here and have it applied to all of this schemas documents by default.</p>
+
+<p>To have all virtuals show up in your <code>console.log</code> output, set the <code>toObject</code> option to <code>{ getters: true }</code>:</p><pre><code class="javascript"><span class="keyword">var</span> schema = <span class="keyword">new</span> Schema({ name: String });
+schema.path(<span class="string">'name'</span>).get(<span class="function"><span class="keyword">function</span> <span class="params">(v)</span> {</span>
+  <span class="keyword">return</span> v + <span class="string">' is my name'</span>;
+});
+schema.set(<span class="string">'toObject'</span>, { getters: <span class="literal">true</span> });
+<span class="keyword">var</span> M = mongoose.model(<span class="string">'Person'</span>, schema);
+<span class="keyword">var</span> m = <span class="keyword">new</span> M({ name: <span class="string">'Max Headroom'</span> });
+console.log(m); <span class="comment">// { _id: 504e0cd7dd992d9be2f20b6f, name: 'Max Headroom is my name' }</span>
+</code></pre><p>To see all available <code>toObject</code> options, read <a href="/docs/api.html#document_Document-toObject">this</a>.</p><h4 id="versionKey">option: versionKey</h4><p>The <code>versionKey</code> is a property set on each document when first created by Mongoose. This keys value contains the internal <a href="http://aaronheckmann.posterous.com/mongoose-v3-part-1-versioning">revision</a> of the document. The name of this document property is configurable. The default is <code>__v</code>. If this conflicts with your application you can configure as such:</p><pre><code class="javascript"><span class="keyword">var</span> schema = <span class="keyword">new</span> Schema({ name: <span class="string">'string'</span> });
+<span class="keyword">var</span> Thing = mongoose.model(<span class="string">'Thing'</span>, schema);
+<span class="keyword">var</span> thing = <span class="keyword">new</span> Thing({ name: <span class="string">'mongoose v3'</span> });
+thing.save(); <span class="comment">// { __v: 0, name: 'mongoose v3' }</span>
+
+<span class="comment">// customized versionKey</span>
+<span class="keyword">new</span> Schema({..}, { versionKey: <span class="string">'_somethingElse'</span> })
+<span class="keyword">var</span> Thing = mongoose.model(<span class="string">'Thing'</span>, schema);
+<span class="keyword">var</span> thing = <span class="keyword">new</span> Thing({ name: <span class="string">'mongoose v3'</span> });
+thing.save(); <span class="comment">// { _somethingElse: 0, name: 'mongoose v3' }</span>
+</code></pre><p>Document versioning can also be disabled by setting the <code>versionKey</code> to false. <em>DO NOT disable versioning unless you <a href="http://aaronheckmann.posterous.com/mongoose-v3-part-1-versioning">know what you are doing</a>.</em></p><pre><code class="javascript"><span class="keyword">new</span> Schema({..}, { versionKey: <span class="literal">false</span> });
+<span class="keyword">var</span> Thing = mongoose.model(<span class="string">'Thing'</span>, schema);
+<span class="keyword">var</span> thing = <span class="keyword">new</span> Thing({ name: <span class="string">'no versioning please'</span> });
+thing.save(); <span class="comment">// { name: 'no versioning please' }</span>
+
+</code></pre><h3 id="next">Next Up</h3><p>Now that we&#39;ve covered <code>Schemas</code>, let&#39;s take a look at <a href="/docs/schematypes.html">SchemaTypes</a>.</p></div></div><script>document.body.className = 'load';</script><script>var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-1122274-9']);
+_gaq.push(['_trackPageview', location.pathname + location.search + location.hash]);
+
+(function() {
+  var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+  ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+  var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+})();</script></body></html>

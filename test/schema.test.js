@@ -1511,6 +1511,27 @@ describe('schema', function(){
       done();
     });
 
+    it('does not alter original argument (gh-1364)', function(done){
+      var schema = {
+          ids: [{ type: Schema.ObjectId, ref: 'something' }]
+        , a: { type: Array }
+        , b: Array
+        , c: [Date]
+        , d: { type: 'Boolean' }
+        , e: [{ a: String, b: [{ type: { type: Buffer }, x: Number }] }]
+      };
+
+      new Schema(schema);
+      assert.equal(6, Object.keys(schema).length);
+      assert.deepEqual([{ type: Schema.ObjectId, ref: 'something' }], schema.ids);
+      assert.deepEqual({ type: Array }, schema.a);
+      assert.deepEqual(Array, schema.b);
+      assert.deepEqual([Date], schema.c);
+      assert.deepEqual({ type: 'Boolean' }, schema.d);
+      assert.deepEqual([{ a: String, b: [{ type: { type: Buffer }, x: Number }] }], schema.e);
+
+      done();
+    })
   });
 
   describe('conflicting property names', function(){

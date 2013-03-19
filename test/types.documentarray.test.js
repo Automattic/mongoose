@@ -240,6 +240,16 @@ describe('types.documentarray', function(){
         })
       })
     })
+    it('corrects #ownerDocument() if value was created with array.create() (gh-1385)', function(done){
+      var mg = new mongoose.Mongoose;
+      var M = mg.model('1385', { docs: [{ name: String }] });
+      var m = new M;
+      var doc = m.docs.create({ name: 'test 1385' });
+      assert.notEqual(String(doc.ownerDocument()._id), String(m._id));
+      m.docs.push(doc);
+      assert.equal(doc.ownerDocument()._id, String(m._id));
+      done();
+    })
   })
 
   it('#push should work on EmbeddedDocuments more than 2 levels deep', function (done) {

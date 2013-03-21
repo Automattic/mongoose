@@ -4278,7 +4278,7 @@ stream.on(<span class="string">'data'</span>, <span class="function"><span class
 <h4>Valid options</h4>
 
 <ul>
-<li>transform: optional function which accepts a mongoose document. The return value of the function will be emitted.</li>
+<li><code>transform</code>: optional function which accepts a mongoose document. The return value of the function will be emitted on <code>data</code>.</li>
 </ul>
 
 <h4>Example</h4>
@@ -4298,7 +4298,7 @@ stream.pipe(writeStream);</code></pre></div><hr class=""></div><div class="item 
 
 <pre><code>query.within.box()
 query.within.center()
-query.within.geometry()</code></pre><div class="returns"><h4>Returns:</h4><ul><li><span class="types"> &lt;<a href="#query-js">Query</a>&gt; </span><span>this</span></li></ul></div><hr class=""></div></li><li class="module "><a href="https://github.com/LearnBoost/mongoose/blob/3.6.0/lib/querystream.js" id="querystream-js">querystream.js</a><div class="item method public"><h3 id="querystream_QueryStream"><a href="#querystream_QueryStream">QueryStream(<code>query</code>)</a></h3><p>Provides a Node.js 0.8 style <a href="http://nodejs.org/docs/v0.8.21/api/stream.html#stream_readable_stream">ReadStream</a> interface for Queries.</p><span class="showcode">show code</span><div class="sourcecode"><pre><code class="javascript"><span class="function"><span class="keyword">function</span> <span class="title">QueryStream</span> <span class="params">(query, options)</span> {</span>
+query.within.geometry()</code></pre><div class="returns"><h4>Returns:</h4><ul><li><span class="types"> &lt;<a href="#query-js">Query</a>&gt; </span><span>this</span></li></ul></div><hr class=""></div></li><li class="module "><a href="https://github.com/LearnBoost/mongoose/blob/3.6.0/lib/querystream.js" id="querystream-js">querystream.js</a><div class="item method public"><h3 id="querystream_QueryStream"><a href="#querystream_QueryStream">QueryStream(<code>query</code>, <code>[options]</code>)</a></h3><p>Provides a Node.js 0.8 style <a href="http://nodejs.org/docs/v0.8.21/api/stream.html#stream_readable_stream">ReadStream</a> interface for Queries.</p><span class="showcode">show code</span><div class="sourcecode"><pre><code class="javascript"><span class="function"><span class="keyword">function</span> <span class="title">QueryStream</span> <span class="params">(query, options)</span> {</span>
   Stream.call(<span class="keyword">this</span>);
 
   <span class="keyword">this</span>.query = query;
@@ -4319,7 +4319,7 @@ query.within.geometry()</code></pre><div class="returns"><h4>Returns:</h4><ul><l
   process.nextTick(<span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
     self._init();
   });
-}</code></pre></div><div class="params"><h4>Parameters:</h4><ul><li><code>query</code><span class="types"> &lt;<a href="#query-js">Query</a>&gt; </span><span></span></li></ul></div><div class="inherits"><h4>Inherits:</h4><ul><li><a href="http://nodejs.org/docs/v0.8.21/api/stream.html#stream_readable_stream" title="NodeJS Stream">NodeJS Stream</a></li></ul></div><div class="events"><h4>Events:</h4><ul><li><p><code>data</code>: emits a single Mongoose document</p></li><li><p><code>error</code>: emits when an error occurs during streaming. This will emit <em>before</em> the <code>close</code> event.</p></li><li><p><code>close</code>: emits when the stream reaches the end of the cursor or an error occurs, or the stream is manually <code>destroy</code>ed. After this event, no more events are emitted.</p></li></ul></div><div class="description"><pre><code><span class="keyword">var</span> stream = Model.find().stream();
+}</code></pre></div><div class="params"><h4>Parameters:</h4><ul><li><code>query</code><span class="types"> &lt;<a href="#query-js">Query</a>&gt; </span><span></span></li><li><code>[options]</code><span class="types"> &lt;<a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Object">Object</a>&gt; </span><span></span></li></ul></div><div class="inherits"><h4>Inherits:</h4><ul><li><a href="http://nodejs.org/docs/v0.8.21/api/stream.html#stream_readable_stream" title="NodeJS Stream">NodeJS Stream</a></li></ul></div><div class="events"><h4>Events:</h4><ul><li><p><code>data</code>: emits a single Mongoose document</p></li><li><p><code>error</code>: emits when an error occurs during streaming. This will emit <em>before</em> the <code>close</code> event.</p></li><li><p><code>close</code>: emits when the stream reaches the end of the cursor or an error occurs, or the stream is manually <code>destroy</code>ed. After this event, no more events are emitted.</p></li></ul></div><div class="description"><pre><code><span class="keyword">var</span> stream = Model.find().stream();
 
 stream.on(<span class="string">'data'</span>, <span class="function"><span class="keyword">function</span> <span class="params">(doc)</span> {</span>
   <span class="comment">// do something with the mongoose document</span>
@@ -4332,6 +4332,18 @@ stream.on(<span class="string">'data'</span>, <span class="function"><span class
 <p>The stream interface allows us to simply "plug-in" to other <em>Node.js 0.8</em> style write streams.</p>
 
 <pre><code>Model.where(<span class="string">'created'</span>).gte(twoWeeksAgo).stream().pipe(writeStream);</code></pre>
+
+<h4>Valid options</h4>
+
+<ul>
+<li><code>transform</code>: optional function which accepts a mongoose document. The return value of the function will be emitted on <code>data</code>.</li>
+</ul>
+
+<h4>Example</h4>
+
+<pre><code><span class="comment">// JSON.stringify all documents before emitting</span>
+<span class="keyword">var</span> stream = Thing.find().stream({ transform: JSON.stringify });
+stream.pipe(writeStream);</code></pre>
 
 <p><em>NOTE: plugging into an HTTP response will *not* work out of the box. Those streams expect only strings or buffers to be emitted, so first formatting our documents as strings/buffers is necessary.</em></p>
 

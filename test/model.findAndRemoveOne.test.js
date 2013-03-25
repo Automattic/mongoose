@@ -345,4 +345,27 @@ describe('model: findByIdAndRemove:', function(){
     done();
   });
 
+  it('supports population (gh-1395)', function(done){
+    var db = start();
+    var M = db.model('A', { name: String });
+    var N = db.model('B', { a: { type: Schema.ObjectId, ref: 'A' }, i: Number})
+
+    M.create({ name: 'i am an A' }, function (err, a) {
+      if (err) return done(err);
+      N.create({ a: a._id, i: 10 }, function (err, b) {
+        if (err) return done(err);
+
+        N.findOneAndRemove({ _id: b._id }, { select: 'a -_id' })
+        .populate('a')
+        .exec(function (err, doc) {
+          if (err) return done(err);
+          assert.ok(doc);
+          assert.equal(undefined, doc._id);
+          assert.ok(doc.a);
+          assert.equal(doc.a.name, 'i am an A');
+          done();
+        })
+      })
+    })
+  })
 })

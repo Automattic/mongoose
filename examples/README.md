@@ -10,6 +10,7 @@ To run:
 Goal is to show:
 
 - global schemas
+- GeoJSON schemas / use
 - text search
 - storing schemas as json
 - lean querires

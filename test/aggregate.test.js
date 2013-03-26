@@ -190,12 +190,12 @@ describe('Aggregate', function() {
     });
   });
 
-  describe('cast', function() {
+  describe('bind', function() {
     it('works', function(done) {
       var aggregate = new Aggregate()
         , model = { foo: 42 };
       
-      assert.equal(aggregate.cast(model), aggregate);
+      assert.equal(aggregate.bind(model), aggregate);
       assert.equal(aggregate._model, model);
       
       done();
@@ -208,7 +208,7 @@ describe('Aggregate', function() {
       
       setupData(function (db) {
         aggregate
-          .cast(db.model('Employee'))
+          .bind(db.model('Employee'))
           .project({ sal: 1, sal_k: { $divide: [ "$sal", 1000 ] } })
           .exec(function (err, docs) {
             assert.ifError(err);
@@ -226,7 +226,7 @@ describe('Aggregate', function() {
       
       setupData(function (db) {
         aggregate
-          .cast(db.model('Employee'))
+          .bind(db.model('Employee'))
           .group({ _id: "$dept" })
           .exec(function (err, docs) {
             var depts;
@@ -248,7 +248,7 @@ describe('Aggregate', function() {
 
       setupData(function (db) {
         aggregate
-          .cast(db.model('Employee'))
+          .bind(db.model('Employee'))
           .skip(1)
           .exec(function (err, docs) {
             assert.ifError(err);
@@ -264,7 +264,7 @@ describe('Aggregate', function() {
 
       setupData(function (db) {
         aggregate
-          .cast(db.model('Employee'))
+          .bind(db.model('Employee'))
           .limit(3)
           .exec(function (err, docs) {
             assert.ifError(err);

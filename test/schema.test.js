@@ -1534,8 +1534,8 @@ describe('schema', function(){
     })
   });
 
-  describe('conflicting property names', function(){
-    it('throws', function(done){
+  describe('property names', function(){
+    it('that conflict throw', function(done){
       var child = new Schema({ name: String });
 
       assert.throws(function(){
@@ -1550,12 +1550,6 @@ describe('schema', function(){
             options: String
         });
       }, /`options` may not be used as a schema pathname/);
-
-      assert.doesNotThrow(function(){
-        new Schema({
-            model: String
-        });
-      });
 
       assert.throws(function(){
         new Schema({
@@ -1599,6 +1593,18 @@ describe('schema', function(){
         });
       }, /`init` may not be used as a schema pathname/);
 
+      done();
+    })
+
+    it('that do not conflict do not throw', function(done){
+      var child = new Schema({ name: String });
+
+      assert.doesNotThrow(function(){
+        new Schema({
+            model: String
+        });
+      });
+
       assert.doesNotThrow(function(){
         Schema({ child: [{parent: String}] });
       });
@@ -1607,10 +1613,22 @@ describe('schema', function(){
         Schema({ child: [{parentArray: String}] });
       });
 
+      assert.doesNotThrow(function(){
+        var s = Schema({ docs: [{ path: String }] });
+        var M = mongoose.model('gh-1245', s);
+        var m = new M({ docs: [{ path: 'works' }] });
+      });
+
+      assert.doesNotThrow(function () {
+        var s = Schema({ setMaxListeners: String });
+        var M = mongoose.model('setMaxListeners-as-property-name', s);
+        var m = new M({ setMaxListeners: 'works' });
+      })
+
       done();
     })
 
-    it('permits _scope to be used (gh-1184)', function(done){
+    it('permit _scope to be used (gh-1184)', function(done){
       var db = start();
       var child = new Schema({ _scope: Schema.ObjectId });
       var C = db.model('scope', child);

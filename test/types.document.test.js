@@ -195,11 +195,4 @@ describe('types.document', function(){
     });
   });
 
-  it('`path` can be used as a path (gh-1245)', function(done){
-    var sub = Schema({ path: String });
-    var s = Schema({ els: [sub] });
-    var M = mongoose.model('gh-1245', s);
-    var m = new M({ els: [{ path: 'what' }] });
-    done();
-  })
 });

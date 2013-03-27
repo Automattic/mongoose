@@ -2147,12 +2147,12 @@ describe('model: populate:', function(){
 
       C = db.model('Comment', Schema({
           body: 'string'
-      }));
+      }), 'comments_' + random());
 
       U = db.model('User', Schema({
           name: 'string'
         , comments: [{ type: Schema.ObjectId, ref: 'Comment' }]
-      }));
+      }), 'users_' + random());
 
       C.create({ body: 'comment 1', }, { body: 'comment 2' }, function (err, c1_, c2_) {
         assert.ifError(err);

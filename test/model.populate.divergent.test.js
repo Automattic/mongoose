@@ -91,7 +91,7 @@ describe('model: populate: divergent arrays', function(){
 
   function testFails (fn) {
     test(function (err) {
-      assert.ok(err instanceof DivergentArrayError);
+      assert.ok(err instanceof DivergentArrayError, 'non-divergent error: ' + err);
       assert.ok(/\sarray/.test(err.message));
     }, fn);
   }

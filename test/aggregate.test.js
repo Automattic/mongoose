@@ -1,3 +1,6 @@
+/*jshint node:true, laxcomma: true */
+"use strict";
+
 /**
  * Module dependencies
  */
@@ -16,6 +19,7 @@ var EmployeeSchema = new Schema({
     name: String
   , sal: Number
   , dept: String
+  , customers: [String]
 });
 
 var Employee = mongoose.model('Employee', EmployeeSchema);
@@ -23,10 +27,10 @@ var Employee = mongoose.model('Employee', EmployeeSchema);
 function setupData(callback) {
   var saved = 0
     , emps = [
-        { name: "Alice", sal: 18000, dept: "sales" }
-	  , { name: "Bob", sal: 15000, dept: "sales" }
+        { name: "Alice", sal: 18000, dept: "sales", customers: [ 'Eve', 'Fred' ] }
+	  , { name: "Bob", sal: 15000, dept: "sales", customers: [ 'Gary', 'Herbert', 'Isaac' ] }
 	  , { name: "Carol", sal: 14000, dept: "r&d" }
-	  , { name: "Dave", sal: 14000, dept: "r&d" }
+	  , { name: "Dave", sal: 14500, dept: "r&d" }
     ]
     , db = start()
     , Employee = db.model('Employee');
@@ -189,7 +193,84 @@ describe('Aggregate', function() {
       done();
     });
   });
-
+  
+  describe('unwind', function() {
+    it('("field")', function(done) {
+      var aggregate = new Aggregate();
+      
+      assert.equal(aggregate.unwind("field"), aggregate);
+      assert.deepEqual(aggregate._pipeline, [{ $unwind: "$field" }]);
+      
+      aggregate.unwind("a", "b", "c");
+      assert.deepEqual(aggregate._pipeline, [
+        { $unwind: "$field" }
+      , { $unwind: "$a" }
+      , { $unwind: "$b" }
+      , { $unwind: "$c" }
+      ]);
+      
+      done();
+    });
+  });
+  
+  describe('match', function() {
+    it('works', function(done) {
+      var aggregate = new Aggregate();
+      
+      assert.equal(aggregate.match({ a: 1 }), aggregate);
+      assert.deepEqual(aggregate._pipeline, [{ $match: { a: 1 } }]);
+      
+      aggregate.match({ b: 2 });
+      assert.deepEqual(aggregate._pipeline, [{ $match: { a: 1 } }, { $match: { b: 2 } }]);
+      
+      done();
+    });
+  });
+  
+  describe('sort', function() {
+    it('(object)', function(done) {
+      var aggregate = new Aggregate();
+      
+      assert.equal(aggregate.sort({ a: 1, b: 'asc', c: 'descending' }), aggregate);
+      assert.deepEqual(aggregate._pipeline, [{ $sort: { a: 1, b: 1, c: -1 } }]);
+      
+      aggregate.sort({ b: 'desc' });
+      assert.deepEqual(aggregate._pipeline, [{ $sort: { a: 1, b: 1, c: -1 } }, { $sort: { b: -1 } }]);
+      
+      done();
+    });
+    
+    it('(string)', function(done) {
+      var aggregate = new Aggregate();
+      
+      aggregate.sort(" a b   -c  ");
+      assert.deepEqual(aggregate._pipeline, [{ $sort: { a: 1, b: 1, c: -1 } }]);
+      
+      aggregate.sort("b");
+      assert.deepEqual(aggregate._pipeline, [{ $sort: { a: 1, b: 1, c: -1 } }, { $sort: { b: 1 } }]);
+      
+      done();
+    });
+    
+    it('("a","b","c")', function(done) {
+      assert.throws(function() {
+        var aggregate = new Aggregate();
+        aggregate.sort("a", "b", "c");
+      }, /Invalid sort/);
+      
+      done();
+    });
+    
+    it('["a","b","c"]', function(done) {
+      assert.throws(function() {
+        var aggregate = new Aggregate();
+        aggregate.sort(["a", "b", "c"]);
+      }, /Invalid sort/);
+      
+      done();
+    });
+  });
+  
   describe('bind', function() {
     it('works', function(done) {
       var aggregate = new Aggregate()
@@ -274,7 +355,77 @@ describe('Aggregate', function() {
           });
       });
     });
-
+    
+    it('unwind', function(done) {
+      var aggregate = new Aggregate();
+      
+      setupData(function (db) {
+        aggregate
+          .bind(db.model('Employee'))
+          .unwind('customers')
+          .exec(function (err, docs) {
+            assert.ifError(err);
+            assert.equal(docs.length, 5);
+            
+            clearData(db, function() { done(); });
+          });
+      });
+    });
+    
+    it('match', function(done) {
+      var aggregate = new Aggregate();
+      
+      setupData(function (db) {
+        aggregate
+          .bind(db.model('Employee'))
+          .match({ sal: { $gt: 15000 } })
+          .exec(function (err, docs) {
+            assert.ifError(err);
+            assert.equal(docs.length, 1);
+            
+            clearData(db, function() { done(); });
+          });
+      });
+    });
+    
+    it('sort', function(done) {
+      var aggregate = new Aggregate();
+      
+      setupData(function (db) {
+        aggregate
+          .bind(db.model('Employee'))
+          .sort("sal")
+          .exec(function (err, docs) {
+            assert.ifError(err);
+            assert.equal(docs[0].sal, 14000);
+            
+            clearData(db, function() { done(); });
+          });
+      });
+    });
+	
+	it('complex pipeline', function(done) {
+      var aggregate = new Aggregate();
+      
+      setupData(function (db) {
+        aggregate
+          .bind(db.model('Employee'))
+          .match({ sal: { $lt: 16000 } })
+          .unwind('customers')
+          .project({ emp: "$name", cust: "$customers" })
+          .sort('-cust')
+          .skip(2)
+          .exec(function (err, docs) {
+            assert.ifError(err);
+            assert.equal(docs.length, 1);
+            assert.equal(docs[0].cust, 'Gary');
+            assert.equal(docs[0].emp, 'Bob');
+            
+            clearData(db, function() { done(); });
+          });
+      });
+	});
+	
     it('error when empty pipeline', function(done) {
       var aggregate = new Aggregate()
         , callback;
@@ -286,8 +437,8 @@ describe('Aggregate', function() {
       };
       
       aggregate.exec(callback);
-  	});
-  	
+    });
+
     it('error when not bound to a model', function(done) {
       var aggregate = new Aggregate()
         , callback;

@@ -2177,7 +2177,8 @@ describe('model: populate:', function(){
           assert.ifError(err);
 
           var doc = docs[0];
-          assert.equal(2, doc.comments.length);
+          assert.ok(Array.isArray(doc.comments), 'comments should be an array: ' + JSON.stringify(doc));
+          assert.equal(2, doc.comments.length, 'invalid comments length for ' + JSON.stringify(doc));
           doc.comments.forEach(function (d) {
             assert.equal(undefined, d._id);
             assert.ok(d.body.length);

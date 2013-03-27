@@ -1619,6 +1619,12 @@ describe('schema', function(){
         var m = new M({ docs: [{ path: 'works' }] });
       });
 
+      assert.doesNotThrow(function () {
+        var s = Schema({ setMaxListeners: String });
+        var M = mongoose.model('setMaxListeners-as-property-name', s);
+        var m = new M({ setMaxListeners: 'works' });
+      })
+
       done();
     })
 

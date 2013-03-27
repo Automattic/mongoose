@@ -1,4 +1,25 @@
 
+3.6.1 / 2013-03-27
+==================
+
+  * added; populate support to findAndModify varients #1395
+  * added; text index type to schematypes
+  * expose allowed index types as Schema.indexTypes
+  * fixed; use of `setMaxListeners` as path
+  * fixed; regression in node 0.6 on docs with > 10 arrays
+  * fixed; do not alter schema arguments #1364
+  * fixed; subdoc#ownerDocument() #1385
+  * website; change search id
+  * website; add search from google [jackdbernier](https://github.com/jackdbernier)
+  * website; fix link
+  * website; add 3.5.x docs release
+  * website; fix link
+  * docs; fix geometry
+  * docs; hide internal constructor
+  * docs; aggregation does not cast arguments #1399
+  * docs; querystream options
+  * examples; added for population
+
 3.6.0 / 2013-03-18
 ==================
 

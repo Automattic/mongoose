@@ -111,12 +111,11 @@ p.save(<span class="function"><span class="keyword">function</span> <span class=
 
 <p>The read option also allows us to specify <em>tag sets</em>. These tell the <a href="https://github.com/mongodb/node-mongodb-native/">driver</a> from which members of the replica-set it should attempt to read. Read more about tag sets <a href="http://docs.mongodb.org/manual/applications/replication/#tag-sets">here</a> and <a href="http://mongodb.github.com/node-mongodb-native/driver-articles/anintroductionto1_1and2_2.html#read-preferences">here</a>.</p>
 
-<p><em>NOTE: if you specify the read pref &#39;nearest&#39;, you must also pass the <a href="http://mongodb.github.com/node-mongodb-native/api-generated/replset.html?highlight=strategy">strategy</a> option when connecting or your reads will not behave predictably:</em></p><pre><code class="javascript"><span class="comment">// pings the replset members periodically to track network latency</span>
-<span class="comment">// now `nearest` works as intended</span>
+<p><em>NOTE: you may also specify the driver read pref <a href="http://mongodb.github.com/node-mongodb-native/api-generated/replset.html?highlight=strategy">strategy</a> option when connecting:</em></p><pre><code class="javascript"><span class="comment">// pings the replset members periodically to track network latency</span>
 <span class="keyword">var</span> options = { replset: { strategy: <span class="string">'ping'</span> }};
 mongoose.connect(uri, options);
 
-<span class="keyword">var</span> schema = <span class="keyword">new</span> Schema({..}, { read: [<span class="string">'n'</span>, { disk: <span class="string">'ssd'</span> }] });
+<span class="keyword">var</span> schema = <span class="keyword">new</span> Schema({..}, { read: [<span class="string">'nearest'</span>, { disk: <span class="string">'ssd'</span> }] });
 mongoose.model(<span class="string">'JellyBean'</span>, schema);
 </code></pre><h4 id="safe">option: safe</h4><p>This option is passed to MongoDB with all operations and let&#39;s us specify if errors should be returned to our callbacks as well as tune write behavior.</p><pre><code class="javascript"><span class="keyword">var</span> safe = <span class="literal">true</span>;
 <span class="keyword">new</span> Schema({ .. }, { safe: safe });

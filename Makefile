@@ -33,7 +33,7 @@ site:
 	node website.js && node static.js
 
 ghpages:
-	git checkout gh-pages && git merge master
+	git checkout gh-pages && git merge 3.6.x
 
 docclean:
 	rm -f ./docs/*.{1,html,json}

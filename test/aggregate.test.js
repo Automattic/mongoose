@@ -56,25 +56,29 @@ describe('Aggregate', function() {
     it('(pipeline)', function(done) {
       var aggregate = new Aggregate();
       
-      assert.equal(aggregate.append({ a: 1 }, { b: 2 }, { c: 3 }), aggregate);
-      assert.deepEqual(aggregate._pipeline, [{ a: 1 }, { b: 2 }, { c: 3 }]);
+      assert.equal(aggregate.append({ $a: 1 }, { $b: 2 }, { $c: 3 }), aggregate);
+      assert.deepEqual(aggregate._pipeline, [{ $a: 1 }, { $b: 2 }, { $c: 3 }]);
       
-      aggregate.append({ d: 4 }, { c: 5 });
-      assert.deepEqual(aggregate._pipeline, [{ a: 1 }, { b: 2 }, { c: 3 }, { d: 4 }, { c: 5 }]);
+      aggregate.append({ $d: 4 }, { $c: 5 });
+      assert.deepEqual(aggregate._pipeline, [{ $a: 1 }, { $b: 2 }, { $c: 3 }, { $d: 4 }, { $c: 5 }]);
       
       done();
     });
     
-    it('throws if non-object parameter is passed', function(done) {
+    it('throws if non-operator parameter is passed', function(done) {
       var aggregate = new Aggregate()
         , regexp = /Arguments must be aggregate pipeline operators/;
       
       assert.throws(function() {
-        aggregate.append({ a: 1 }, "string");
+        aggregate.append({ $a: 1 }, "string");
       }, regexp);
       
       assert.throws(function() {
-        aggregate.append({ a: 1 }, ["array"]);
+        aggregate.append({ $a: 1 }, ["array"]);
+      }, regexp);
+      
+      assert.throws(function() {
+        aggregate.append({ $a: 1 }, { a: 1 });
       }, regexp);
       
       done();
@@ -87,6 +91,12 @@ describe('Aggregate', function() {
         aggregate.append();
       });
       
+      done();
+    });
+    
+    it('called from constructor', function(done) {
+      var aggregate = new Aggregate({ $a: 1 }, { $b: 2 }, { $c: 3 });
+      assert.deepEqual(aggregate._pipeline, [{ $a: 1 }, { $b: 2 }, { $c: 3 }]);
       done();
     });
   });
@@ -263,6 +273,20 @@ describe('Aggregate', function() {
         var aggregate = new Aggregate();
         aggregate.sort(["a", "b", "c"]);
       }, /Invalid sort/);
+      
+      done();
+    });
+  });
+  
+  describe('geoNear', function() {
+    it('works', function(done) {
+      var aggregate = new Aggregate();
+      
+      assert.equal(aggregate.geoNear({ a: 1 }), aggregate);
+      assert.deepEqual(aggregate._pipeline, [{ $geoNear: { a: 1 } }]);
+      
+      aggregate.geoNear({ b: 2 });
+      assert.deepEqual(aggregate._pipeline, [{ $geoNear: { a: 1 } }, { $geoNear: { b: 2 } }]);
       
       done();
     });

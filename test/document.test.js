@@ -532,33 +532,42 @@ describe('document:', function(){
     done();
   });
 
-  it('calling update on document should relay to its model (gh-794)', function(done){
-    var db = start();
-    var Docs = new Schema({text:String});
-    var docs = db.model('docRelayUpdate', Docs);
-    var d = new docs({text:'A doc'});
-    var called = false;
-    d.save(function () {
-      var oldUpdate = docs.update;
-      docs.update = function (query, operation) {
-        assert.equal(1, Object.keys(query).length);
-        assert.equal(query._id, d._id);
-        assert.equal(1, Object.keys(operation).length);
-        assert.equal(1, Object.keys(operation.$set).length);
-        assert.equal(operation.$set.text, 'A changed doc');
-        called = true;
-        docs.update = oldUpdate;
-        oldUpdate.apply(docs, arguments);
-      };
-      d.update({$set :{text: 'A changed doc'}}, function (err) {
-        db.close();
-        assert.ifError(err);
-        assert.equal(true, called);
-        done();
+  describe('#update', function(){
+    it('returns a Query', function(done){
+      var mg = new mongoose.Mongoose;
+      var M = mg.model('doc#update', { s: String });
+      var doc = new M;
+      assert.ok(doc.update() instanceof mongoose.Query);
+      done();
+    })
+    it('calling update on document should relay to its model (gh-794)', function(done){
+      var db = start();
+      var Docs = new Schema({text:String});
+      var docs = db.model('docRelayUpdate', Docs);
+      var d = new docs({text:'A doc'});
+      var called = false;
+      d.save(function () {
+        var oldUpdate = docs.update;
+        docs.update = function (query, operation) {
+          assert.equal(1, Object.keys(query).length);
+          assert.equal(query._id, d._id);
+          assert.equal(1, Object.keys(operation).length);
+          assert.equal(1, Object.keys(operation.$set).length);
+          assert.equal(operation.$set.text, 'A changed doc');
+          called = true;
+          docs.update = oldUpdate;
+          oldUpdate.apply(docs, arguments);
+        };
+        d.update({$set :{text: 'A changed doc'}}, function (err) {
+          db.close();
+          assert.ifError(err);
+          assert.equal(true, called);
+          done();
+        });
       });
-    });
 
-  });
+    });
+  })
 
   it('toObject should not set undefined values to null', function(done){
     var doc = new TestDocument()

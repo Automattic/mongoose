@@ -1,4 +1,11 @@
 
+3.6.2 / 2013-03-29
+==================
+
+  * fixed; corrupted sub-doc array #1408
+  * fixed; document#update returns a Query #1397
+  * docs; readpref strategy
+
 3.6.1 / 2013-03-27
 ==================
 

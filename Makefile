@@ -39,4 +39,4 @@ docclean:
 	rm -f ./docs/*.{1,html,json}
 	rm -f ./docs/source/_docs
 
-.PHONY: test site docs docclean gendocs docs_from_master
+.PHONY: test test-short test-long ghpages site docs docclean gendocs docs_from_master

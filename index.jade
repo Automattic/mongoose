@@ -37,20 +37,15 @@ html(lang='en')
       #example
         :js
           var mongoose = require('mongoose');
-          mongoose.connect('localhost', 'test');
+          mongoose.connect('mongodb://localhost/test');
 
-          var schema = mongoose.Schema({ name: 'string' });
-          var Cat = mongoose.model('Cat', schema);
+          var Cat = mongoose.model('Cat', { name: String });
 
           var kitty = new Cat({ name: 'Zildjian' });
           kitty.save(function (err) {
             if (err) // ...
             console.log('meow');
           });
-      #install
-        h2 Installation
-        :bash
-          $ npm install mongoose
       #getstarted
         h2 Getting Started
         ul

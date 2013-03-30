@@ -14,6 +14,7 @@ Goal is to show:
 - text search
 - storing schemas as json
 - lean querires
+- statics
 - methods and statics on subdocs
 - custom types
 - querybuilder

@@ -252,6 +252,14 @@ html(lang='en')
                               | , 
                           | &gt; 
                         span= property.return.description
+                if property.see.length
+                  .see
+                    h4 See:
+                    ul.see
+                      each see in property.see
+                        li
+                          url = see.url || see.local
+                          a(href=url, title=see.title || see.local)= see.title || see.url || see.local
                 hr(class= property.isPrivate ? 'private' : '')
     script.
       document.body.className = 'load';

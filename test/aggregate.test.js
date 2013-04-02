@@ -101,14 +101,14 @@ describe('Aggregate', function() {
     });
   });
 
-  describe('select', function() {
+  describe('project', function() {
     it('(object)', function(done) {
       var aggregate = new Aggregate();
 
-      assert.equal(aggregate.select({ a: 1, b: 1, c: 0 }), aggregate);
+      assert.equal(aggregate.project({ a: 1, b: 1, c: 0 }), aggregate);
       assert.deepEqual(aggregate._pipeline, [{ $project: { a: 1, b: 1, c: 0 } }]);
 
-      aggregate.select({ b: 1 });
+      aggregate.project({ b: 1 });
       assert.deepEqual(aggregate._pipeline, [{ $project: { a: 1, b: 1, c: 0 } }, { $project: { b: 1 } }]);
 
       done();
@@ -117,10 +117,10 @@ describe('Aggregate', function() {
     it('(string)', function(done) {
       var aggregate = new Aggregate();
 
-      aggregate.select(" a b   -c  ");
+      aggregate.project(" a b   -c  ");
       assert.deepEqual(aggregate._pipeline, [{ $project: { a: 1, b: 1, c: 0 } }]);
 
-      aggregate.select("b");
+      aggregate.project("b");
       assert.deepEqual(aggregate._pipeline, [{ $project: { a: 1, b: 1, c: 0 } }, { $project: { b: 1 } }]);
 
       done();
@@ -129,8 +129,8 @@ describe('Aggregate', function() {
     it('("a","b","c")', function(done) {
       assert.throws(function() {
         var aggregate = new Aggregate();
-        aggregate.select("a", "b", "c");
-      }, /Invalid select/);
+        aggregate.project("a", "b", "c");
+      }, /Invalid project/);
 
       done();
     });
@@ -138,22 +138,8 @@ describe('Aggregate', function() {
     it('["a","b","c"]', function(done) {
       assert.throws(function() {
         var aggregate = new Aggregate();
-        aggregate.select(["a", "b", "c"]);
-      }, /Invalid select/);
-
-      done();
-    });
-  });
-
-  describe('project', function() {
-    it('works', function(done) {
-      var aggregate = new Aggregate();
-
-      assert.equal(aggregate.project({ a: 1, b: 2 }), aggregate);
-      assert.deepEqual(aggregate._pipeline, [{ $project: { a: 1, b: 2 } }]);
-
-      aggregate.project({ c: 3 });
-      assert.deepEqual(aggregate._pipeline, [{ $project: { a: 1, b: 2 } }, { $project: { c: 3 } }]);
+        aggregate.project(["a", "b", "c"]);
+      }, /Invalid project/);
 
       done();
     });

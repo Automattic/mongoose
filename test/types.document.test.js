@@ -52,6 +52,7 @@ Subdocument.prototype.$__setSchema(new Schema({
 
 var RatingSchema = new Schema({
     stars: Number
+  , description: { source: { url: String, time: Date }}
 });
 
 var MovieSchema = new Schema({
@@ -194,5 +195,60 @@ describe('types.document', function(){
       });
     });
   });
+
+  describe('setting nested objects', function(){
+    it('works (gh-1394)', function(done){
+      var db = start();
+      var Movie = db.model('Movie');
+
+      Movie.create({
+          title: 'Life of Pi'
+        , ratings: [{
+              description: {
+                  source: {
+                      url: 'http://www.imdb.com/title/tt0454876/'
+                    , time: new Date
+                  }
+              }
+          }]
+      }, function (err, movie) {
+        assert.ifError(err);
+
+        Movie.findById(movie, function (err, movie) {
+          assert.ifError(err);
+
+          assert.ok(movie.ratings[0].description.source.time instanceof Date);
+          movie.ratings[0].description.source = { url: 'http://www.lifeofpimovie.com/' };
+
+          movie.save(function (err) {
+            assert.ifError(err);
+
+            Movie.findById(movie, function (err, movie) {
+              assert.ifError(err);
+
+              assert.equal('http://www.lifeofpimovie.com/', movie.ratings[0].description.source.url);
+
+              // overwritten date
+              assert.equal(undefined, movie.ratings[0].description.source.time);
+
+              var newDate = new Date;
+              movie.ratings[0].set('description.source.time', newDate, { merge: true });
+              movie.save(function (err) {
+                assert.ifError(err);
+
+                Movie.findById(movie, function (err, movie) {
+                  assert.ifError(err);
+                  assert.equal(String(newDate), movie.ratings[0].description.source.time);
+                  // url not overwritten using merge
+                  assert.equal('http://www.lifeofpimovie.com/', movie.ratings[0].description.source.url);
+                  done();
+                });
+              });
+            });
+          })
+        });
+      });
+    })
+  })
 
 });

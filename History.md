@@ -1,3 +1,8 @@
+3.5.10 / 2013-04-02
+==================
+
+  * fixed; setting subdocuments deeply nested fields #1394
+  * fixed; do not alter schema arguments #1364
 
 3.6.2 / 2013-03-29
 ==================

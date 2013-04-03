@@ -177,6 +177,28 @@ describe('types.documentarray', function(){
       assert.ok(!threw);
       done();
     })
+    it('passes options to its documents (gh-1415)', function(done){
+      var subSchema = new Schema({
+          title: { type: String }
+      });
+
+      subSchema.set('toObject', {
+        transform: function (doc, ret, options) {
+          // this should only be called because custom options are
+          // passed during MongooseArray#toObject() calls
+          ret.changed = 123;
+          return ret;
+        }
+      })
+
+      var db = mongoose.createConnection();
+      var M = db.model('gh-1415', { docs: [subSchema] });
+      var m = new M;
+      m.docs.push({ docs: [{ title: 'hello' }] });
+      var delta = m.$__delta()[1];
+      assert.equal(undefined, delta.$pushAll.docs[0].changed);
+      done();
+    })
   })
 
   describe('create()', function(){

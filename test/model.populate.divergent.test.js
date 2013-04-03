@@ -30,8 +30,8 @@ describe('model: populate: divergent arrays', function(){
 
   before(function(done){
     db = start();
-    C = db.model("Child", { _id: Number, name: String });
-    M = db.model("Parent", { array: { type: [{ type: Number, ref: 'Child' }] }});
+    C = db.model("Child", { _id: Number, name: String }, 'child-'+random());
+    M = db.model("Parent", { array: { type: [{ type: Number, ref: 'Child' }] }}, 'parent-'+random());
 
     C.create(
         { _id: 0, name: 'zero' }

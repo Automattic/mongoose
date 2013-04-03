@@ -1,4 +1,13 @@
 
+3.6.4 / 2013-04-03
+==================
+
+  * fixed; +field conflict with $slice #1370
+  * fixed; nested deselection conflict #1333
+  * fixed; RangeError in ValidationError.toString() #1296
+  * fixed; do not save user defined transforms #1415
+  * tests; fix race condition
+
 3.6.3 / 2013-04-02
 ==================
 

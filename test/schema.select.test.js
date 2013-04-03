@@ -266,6 +266,28 @@ describe('schema select option', function(){
     });
   })
 
+  describe('exclusion in root schema should override child schema', function (done) {
+    it('works (gh-1333)', function(done){
+      var m = new mongoose.Mongoose();
+      var child = new Schema({
+          name1: {type:String, select: false}
+        , name2: {type:String, select: true}
+      });
+      var selected = new Schema({
+          docs: { type: [child], select: false }
+      });
+      var M = m.model('gh-1333-deselect', selected);
+
+      var query = M.findOne();
+      query._applyPaths();
+      assert.equal(1, Object.keys(query._fields).length);
+      assert.equal(undefined, query._fields['docs.name1']);
+      assert.equal(undefined, query._fields['docs.name2']);
+      assert.equal(0, query._fields.docs);
+      done();
+    })
+  })
+
   it('forcing inclusion of a deselected schema path works', function (done) {
     var db = start();
     var excluded = new Schema({

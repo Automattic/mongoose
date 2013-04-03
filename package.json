@@ -21,6 +21,7 @@
     }
   , "directories": { "lib": "./lib/mongoose" }
   , "scripts": { "test": "make test" }
+  , "publishConfig": { "tag": "3.5.x" }
   , "main": "./index.js"
   , "engines": { "node": ">=0.6.19" }
   , "bugs": {

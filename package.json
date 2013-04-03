@@ -1,7 +1,7 @@
 {
     "name": "mongoose"
   , "description": "Mongoose MongoDB ODM"
-  , "version": "3.6.4"
+  , "version": "3.6.5-pre"
   , "author": "Guillermo Rauch <guillermo@learnboost.com>"
   , "keywords": ["mongodb", "mongoose", "orm", "data", "datastore", "nosql", "odm", "sql", "db", "database"]
   , "dependencies": {

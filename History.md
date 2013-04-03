@@ -1,4 +1,12 @@
 
+3.5.11 / 2013-04-03
+==================
+
+  * fixed; +field conflict with $slice #1370
+  * fixed; RangeError in ValidationError.toString() #1296
+  * fixed; nested deselection conflict #1333
+  * remove time from Makefile
+
 3.5.10 / 2013-04-02
 ==================
 

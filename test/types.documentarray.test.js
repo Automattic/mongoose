@@ -184,7 +184,7 @@ describe('types.documentarray', function(){
 
       subSchema.set('toObject', {
         transform: function (doc, ret, options) {
-          // this should only be called because custom options are
+          // this should not be called because custom options are
           // passed during MongooseArray#toObject() calls
           ret.changed = 123;
           return ret;

@@ -73,7 +73,7 @@ mongoose.model('BlogPost', BlogPost);
 
 var collection = 'blogposts_' + random();
 
-describe('model', function(){
+describe('Model', function(){
   describe('constructor', function(){
     it('works without "new" keyword', function(done){
       var B = mongoose.model('BlogPost');

@@ -73,7 +73,7 @@ mongoose.model('BlogPost', BlogPost);
 
 var collection = 'blogposts_' + random();
 
-describe('model', function(){
+describe('Model', function(){
   describe('constructor', function(){
     it('works without "new" keyword', function(done){
       var B = mongoose.model('BlogPost');
@@ -1674,7 +1674,7 @@ describe('model', function(){
     });
   });
 
-  describe('remove()', function(){
+  describe('.remove()', function(){
     it('works', function(done){
       var db = start()
         , collection = 'blogposts_' + random()
@@ -1701,6 +1701,35 @@ describe('model', function(){
         });
       });
     });
+  })
+
+  describe('#remove()', function(){
+    var db, B;
+
+    before(function(){
+      db = start()
+      B = db.model('BlogPost', 'blogposts_'+random())
+    })
+
+    after(function(done){
+      db.close(done);
+    })
+
+    it('passes the removed document (gh-1419)', function(done){
+      B.create({}, function (err, post) {
+        assert.ifError(err);
+        B.findById(post, function (err, found) {
+          assert.ifError(err);
+
+          found.remove(function (err, doc) {
+            assert.ifError(err);
+            assert.ok(doc);
+            assert.ok(doc.equals(found));
+            done();
+          })
+        })
+      })
+    })
 
     describe('when called multiple times', function(){
       it('always executes the passed callback gh-1210', function(done){

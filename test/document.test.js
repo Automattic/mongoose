@@ -105,7 +105,7 @@ describe('document:', function(){
       , oids    : []
       , nested  : {
             age   : 5
-          , cool  : DocumentObjectId.fromString('4c6c2d6240ced95d0e00003c')
+          , cool  : DocumentObjectId.createFromHexString('4c6c2d6240ced95d0e00003c')
           , path  : 'my path'
         }
     });
@@ -113,7 +113,7 @@ describe('document:', function(){
     assert.equal('test', doc.test);
     assert.ok(doc.oids instanceof Array);
     assert.equal(doc.nested.age, 5);
-    assert.equal(DocumentObjectId.toString(doc.nested.cool), '4c6c2d6240ced95d0e00003c');
+    assert.equal(doc.nested.cool.toString(), '4c6c2d6240ced95d0e00003c');
     assert.equal(7, doc.nested.agePlus2);
     assert.equal('5my path', doc.nested.path);
     doc.nested.setAge = 10;
@@ -127,7 +127,7 @@ describe('document:', function(){
       , oids    : []
       , nested  : {
             age   : 2
-          , cool  : DocumentObjectId.fromString('4cf70857337498f95900001c')
+          , cool  : DocumentObjectId.createFromHexString('4cf70857337498f95900001c')
           , deep  : { x: 'yay' }
         }
     });
@@ -168,7 +168,7 @@ describe('document:', function(){
     assert.equal(doc2.nested2.yup.yup, "Yesiree");
     assert.equal(150, doc2.nested2.yup.age);
 
-    assert.equal(DocumentObjectId.toString(doc2.nested.cool), '4cf70857337498f95900001c');
+    assert.equal(doc2.nested.cool.toString(), '4cf70857337498f95900001c');
 
     assert.ok(doc.oids !== doc2.oids);
     done();
@@ -249,7 +249,7 @@ describe('document:', function(){
       , em: [{title:'asdf'}]
       , nested  : {
             age   : 5
-          , cool  : DocumentObjectId.fromString('4c6c2d6240ced95d0e00003c')
+          , cool  : DocumentObjectId.createFromHexString('4c6c2d6240ced95d0e00003c')
           , path  : 'my path'
         }
       , nested2: {}
@@ -260,7 +260,7 @@ describe('document:', function(){
     assert.equal(clone.test, 'test');
     assert.ok(clone.oids instanceof Array);
     assert.equal(5, clone.nested.age);
-    assert.equal(DocumentObjectId.toString(clone.nested.cool), '4c6c2d6240ced95d0e00003c');
+    assert.equal(clone.nested.cool.toString(), '4c6c2d6240ced95d0e00003c');
     assert.equal('5my path', clone.nested.path);
     assert.equal(undefined, clone.nested.agePlus2);
     assert.equal(undefined, clone.em[0].works);
@@ -270,7 +270,7 @@ describe('document:', function(){
     assert.equal('test', clone.test);
     assert.ok(clone.oids instanceof Array);
     assert.equal(5, clone.nested.age);
-    assert.equal(DocumentObjectId.toString(clone.nested.cool), '4c6c2d6240ced95d0e00003c');
+    assert.equal(clone.nested.cool.toString(), '4c6c2d6240ced95d0e00003c');
     assert.equal('my path', clone.nested.path);
     assert.equal(7, clone.nested.agePlus2);
     assert.equal(clone.em[0].works, 'em virtual works');
@@ -280,7 +280,7 @@ describe('document:', function(){
     assert.equal('test', clone.test);
     assert.ok(clone.oids instanceof Array);
     assert.equal(5, clone.nested.age);
-    assert.equal(DocumentObjectId.toString(clone.nested.cool),'4c6c2d6240ced95d0e00003c');
+    assert.equal(clone.nested.cool.toString(),'4c6c2d6240ced95d0e00003c');
     assert.equal('5my path', clone.nested.path);
     assert.equal(7, clone.nested.agePlus2);
     assert.equal('em virtual works', clone.em[0].works);
@@ -291,7 +291,7 @@ describe('document:', function(){
     assert.equal('test', clone.test);
     assert.ok(clone.oids instanceof Array);
     assert.equal(5, clone.nested.age);
-    assert.equal(DocumentObjectId.toString(clone.nested.cool),'4c6c2d6240ced95d0e00003c');
+    assert.equal(clone.nested.cool.toString(),'4c6c2d6240ced95d0e00003c');
 
     assert.equal('my path', clone.nested.path);
     assert.equal(7, clone.nested.agePlus2);
@@ -362,7 +362,7 @@ describe('document:', function(){
     assert.equal('test', clone.test);
     assert.ok(clone.oids instanceof Array);
     assert.equal(5, clone.nested.age);
-    assert.equal(DocumentObjectId.toString(clone.nested.cool),'4c6c2d6240ced95d0e00003c');
+    assert.equal(clone.nested.cool.toString(),'4c6c2d6240ced95d0e00003c');
     assert.equal('my path', clone.nested.path);
     assert.equal('Object', clone.em[0].constructor.name);
 
@@ -401,7 +401,7 @@ describe('document:', function(){
       , em: [{title:'asdf'}]
       , nested  : {
             age   : 5
-          , cool  : DocumentObjectId.fromString('4c6c2d6240ced95d0e00003c')
+          , cool  : DocumentObjectId.createFromHexString('4c6c2d6240ced95d0e00003c')
           , path  : 'my path'
         }
       , nested2: {}
@@ -418,7 +418,7 @@ describe('document:', function(){
     assert.equal('test', clone.test);
     assert.ok(clone.oids instanceof Array);
     assert.equal(5, clone.nested.age);
-    assert.equal(DocumentObjectId.toString(clone.nested.cool),'4c6c2d6240ced95d0e00003c');
+    assert.equal(clone.nested.cool.toString(),'4c6c2d6240ced95d0e00003c');
     assert.equal('my path', clone.nested.path);
     assert.equal(7, clone.nested.agePlus2);
     assert.equal('Object', clone.em[0].constructor.name);
@@ -486,7 +486,7 @@ describe('document:', function(){
     assert.equal('test', clone.test);
     assert.ok(clone.oids instanceof Array);
     assert.equal(5, clone.nested.age);
-    assert.equal(DocumentObjectId.toString(clone.nested.cool),'4c6c2d6240ced95d0e00003c');
+    assert.equal(clone.nested.cool.toString(),'4c6c2d6240ced95d0e00003c');
     assert.equal('my path', clone.nested.path);
     assert.equal('Object', clone.em[0].constructor.name);
 
@@ -519,7 +519,7 @@ describe('document:', function(){
 
   it('jsonifying an object', function(done){
     var doc = new TestDocument({ test: 'woot' })
-      , oidString = DocumentObjectId.toString(doc._id);
+      , oidString = doc._id.toString();
 
     // convert to json string
     var json = JSON.stringify(doc);
@@ -677,7 +677,7 @@ describe('document:', function(){
       , numbers : [4,5,6,7]
       , nested  : {
             age   : 5
-          , cool  : DocumentObjectId.fromString('4c6c2d6240ced95d0e00003c')
+          , cool  : DocumentObjectId.createFromHexString('4c6c2d6240ced95d0e00003c')
           , path  : 'my path'
           , deep  : { x: 'a string' }
         }
@@ -782,7 +782,7 @@ describe('document:', function(){
       , numbers : [4,5,6,7]
       , nested  : {
             age   : 5
-          , cool  : DocumentObjectId.fromString('4c6c2d6240ced95d0e00003c')
+          , cool  : DocumentObjectId.createFromHexString('4c6c2d6240ced95d0e00003c')
           , path  : 'my path'
           , deep  : { x: 'a string' }
         }
@@ -819,7 +819,7 @@ describe('document:', function(){
       , numbers : [4,5,6,7]
       , nested  : {
             age   : 5
-          , cool  : DocumentObjectId.fromString('4c6c2d6240ced95d0e00003c')
+          , cool  : DocumentObjectId.createFromHexString('4c6c2d6240ced95d0e00003c')
           , path  : 'my path'
           , deep  : { x: 'a string' }
         }

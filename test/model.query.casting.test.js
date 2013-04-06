@@ -62,7 +62,7 @@ describe('model query casting', function(){
       , title = 'Loki ' + random();
 
     var post = new BlogPostB()
-      , id = DocumentObjectId.toString(post.get('_id'));
+      , id = post.get('_id').toString()
 
     post.set('title', title);
 
@@ -121,7 +121,7 @@ describe('model query casting', function(){
       , BlogPostB = db.model(modelName, collection);
 
     var post = new BlogPostB()
-      , id = DocumentObjectId.toString(post._id);
+      , id = post._id.toString()
 
     post.save(function (err) {
       assert.ifError(err);
@@ -129,7 +129,7 @@ describe('model query casting', function(){
       BlogPostB.findOne({ _id: { $in: [id] } }, function (err, doc) {
         assert.ifError(err);
 
-        assert.equal(DocumentObjectId.toString(doc._id), id);
+        assert.equal(doc._id.toString(), id);
         db.close();
         done();
       });
@@ -177,7 +177,7 @@ describe('model query casting', function(){
       P.findOne({ _id: post._id, 'meta.date': { $lte: Date.now() } }, function (err, doc) {
         assert.ifError(err);
 
-        assert.equal(DocumentObjectId.toString(doc._id), DocumentObjectId.toString(post._id));
+        assert.equal(doc._id.toString(), post._id.toString());
         doc.meta.date = null;
         doc.save(function (err) {
           assert.ifError(err);

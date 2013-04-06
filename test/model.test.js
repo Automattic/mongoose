@@ -2886,7 +2886,7 @@ describe('Model', function(){
           assert.equal(doc.comments.id(subdoc1.get('_id')).title,'woot');
 
           // test with a string
-          var id = DocumentObjectId.toString(subdoc2._id);
+          var id = subdoc2._id.toString();
           assert.equal(doc.comments.id(id).title,'aaaa');
           done();
         });

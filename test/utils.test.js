@@ -218,9 +218,11 @@ describe('utils', function(){
     assert.equal('primary', r.mode);
 
     var r = utils.readPref('pp');
-    assert.equal('primaryPrefered', r.mode);
-    var r = utils.readPref('primaryPrefered');
-    assert.equal('primaryPrefered', r.mode);
+    assert.ok(r.isValid());
+    assert.equal('primaryPreferred', r.mode);
+    var r = utils.readPref('primaryPreferred');
+    assert.ok(r.isValid());
+    assert.equal('primaryPreferred', r.mode);
 
     var r = utils.readPref('s');
     assert.equal('secondary', r.mode);
@@ -228,9 +230,11 @@ describe('utils', function(){
     assert.equal('secondary', r.mode);
 
     var r = utils.readPref('sp');
-    assert.equal('secondaryPrefered', r.mode);
-    var r = utils.readPref('secondaryPrefered');
-    assert.equal('secondaryPrefered', r.mode);
+    assert.ok(r.isValid());
+    assert.equal('secondaryPreferred', r.mode);
+    var r = utils.readPref('secondaryPreferred');
+    assert.ok(r.isValid());
+    assert.equal('secondaryPreferred', r.mode);
 
     var r = utils.readPref('n');
     assert.equal('nearest', r.mode);
@@ -238,7 +242,7 @@ describe('utils', function(){
     assert.equal('nearest', r.mode);
 
     var r = utils.readPref('explode');
-    assert.equal(false, r.isValid(r.model));
+    assert.equal(false, r.isValid());
     done();
   })
 

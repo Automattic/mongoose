@@ -1213,54 +1213,64 @@ describe('schema', function(){
 
       Tobi = Schema({}, { read: 'pp' });
       assert.ok(Tobi.options.read instanceof ReadPref);
-      assert.equal('primaryPrefered', Tobi.options.read.mode);
+      assert.ok(Tobi.options.read.isValid());
+      assert.equal('primaryPreferred', Tobi.options.read.mode);
 
       Tobi = Schema({}, { read: ['pp', tags] });
       assert.ok(Tobi.options.read instanceof ReadPref);
-      assert.equal('primaryPrefered', Tobi.options.read.mode);
+      assert.ok(Tobi.options.read.isValid());
+      assert.equal('primaryPreferred', Tobi.options.read.mode);
       assert.ok(Array.isArray(Tobi.options.read.tags));
       assert.equal(1, Tobi.options.read.tags.length);
       assert.equal(1, Tobi.options.read.tags[0].x);
 
-      Tobi = Schema({}, { read: 'primaryPrefered'});
+      Tobi = Schema({}, { read: 'primaryPreferred'});
       assert.ok(Tobi.options.read instanceof ReadPref);
-      assert.equal('primaryPrefered', Tobi.options.read.mode);
+      assert.ok(Tobi.options.read.isValid());
+      assert.equal('primaryPreferred', Tobi.options.read.mode);
 
-      Tobi = Schema({}, { read: ['primaryPrefered', tags]});
+      Tobi = Schema({}, { read: ['primaryPreferred', tags]});
       assert.ok(Tobi.options.read instanceof ReadPref);
-      assert.equal('primaryPrefered', Tobi.options.read.mode);
+      assert.ok(Tobi.options.read.isValid());
+      assert.equal('primaryPreferred', Tobi.options.read.mode);
       assert.ok(Array.isArray(Tobi.options.read.tags));
       assert.equal(1, Tobi.options.read.tags.length);
       assert.equal(1, Tobi.options.read.tags[0].x);
 
       Tobi = Schema({}, { read: 'sp' });
       assert.ok(Tobi.options.read instanceof ReadPref);
-      assert.equal('secondaryPrefered', Tobi.options.read.mode);
+      assert.ok(Tobi.options.read.isValid());
+      assert.equal('secondaryPreferred', Tobi.options.read.mode);
 
       Tobi = Schema({}, { read: ['sp', tags] });
       assert.ok(Tobi.options.read instanceof ReadPref);
-      assert.equal('secondaryPrefered', Tobi.options.read.mode);
+      assert.ok(Tobi.options.read.isValid());
+      assert.equal('secondaryPreferred', Tobi.options.read.mode);
       assert.ok(Array.isArray(Tobi.options.read.tags));
       assert.equal(1, Tobi.options.read.tags.length);
       assert.equal(1, Tobi.options.read.tags[0].x);
 
-      Tobi = Schema({}, { read: 'secondaryPrefered'});
+      Tobi = Schema({}, { read: 'secondaryPreferred'});
       assert.ok(Tobi.options.read instanceof ReadPref);
-      assert.equal('secondaryPrefered', Tobi.options.read.mode);
+      assert.ok(Tobi.options.read.isValid());
+      assert.equal('secondaryPreferred', Tobi.options.read.mode);
 
-      Tobi = Schema({}, { read: ['secondaryPrefered', tags]});
+      Tobi = Schema({}, { read: ['secondaryPreferred', tags]});
       assert.ok(Tobi.options.read instanceof ReadPref);
-      assert.equal('secondaryPrefered', Tobi.options.read.mode);
+      assert.ok(Tobi.options.read.isValid());
+      assert.equal('secondaryPreferred', Tobi.options.read.mode);
       assert.ok(Array.isArray(Tobi.options.read.tags));
       assert.equal(1, Tobi.options.read.tags.length);
       assert.equal(1, Tobi.options.read.tags[0].x);
 
       Tobi = Schema({}, { read: 'n'});
       assert.ok(Tobi.options.read instanceof ReadPref);
+      assert.ok(Tobi.options.read.isValid());
       assert.equal('nearest', Tobi.options.read.mode);
 
       Tobi = Schema({}, { read: ['n', tags]});
       assert.ok(Tobi.options.read instanceof ReadPref);
+      assert.ok(Tobi.options.read.isValid());
       assert.equal('nearest', Tobi.options.read.mode);
       assert.ok(Array.isArray(Tobi.options.read.tags));
       assert.equal(1, Tobi.options.read.tags.length);
@@ -1268,10 +1278,12 @@ describe('schema', function(){
 
       Tobi = Schema({}, { read: 'nearest'});
       assert.ok(Tobi.options.read instanceof ReadPref);
+      assert.ok(Tobi.options.read.isValid());
       assert.equal('nearest', Tobi.options.read.mode);
 
       Tobi = Schema({}, { read: ['nearest', tags]});
       assert.ok(Tobi.options.read instanceof ReadPref);
+      assert.ok(Tobi.options.read.isValid());
       assert.equal('nearest', Tobi.options.read.mode);
       assert.ok(Array.isArray(Tobi.options.read.tags));
       assert.equal(1, Tobi.options.read.tags.length);

@@ -1163,42 +1163,52 @@ describe('Query', function(){
           var query = new Query();
           query.read('primary');
           assert.ok(query.options.readPreference instanceof P);
+          assert.ok(query.options.readPreference.isValid());
           assert.equal(query.options.readPreference.mode, 'primary');
 
           query.read('p');
           assert.ok(query.options.readPreference instanceof P);
+          assert.ok(query.options.readPreference.isValid());
           assert.equal(query.options.readPreference.mode, 'primary');
 
-          query.read('primaryPrefered');
+          query.read('primaryPreferred');
           assert.ok(query.options.readPreference instanceof P);
-          assert.equal(query.options.readPreference.mode, 'primaryPrefered');
+          assert.ok(query.options.readPreference.isValid());
+          assert.equal(query.options.readPreference.mode, 'primaryPreferred');
 
           query.read('pp');
           assert.ok(query.options.readPreference instanceof P);
-          assert.equal(query.options.readPreference.mode, 'primaryPrefered');
+          assert.ok(query.options.readPreference.isValid());
+          assert.equal(query.options.readPreference.mode, 'primaryPreferred');
 
           query.read('secondary');
           assert.ok(query.options.readPreference instanceof P);
+          assert.ok(query.options.readPreference.isValid());
           assert.equal(query.options.readPreference.mode, 'secondary');
 
           query.read('s');
           assert.ok(query.options.readPreference instanceof P);
+          assert.ok(query.options.readPreference.isValid());
           assert.equal(query.options.readPreference.mode, 'secondary');
 
-          query.read('secondaryPrefered');
+          query.read('secondaryPreferred');
           assert.ok(query.options.readPreference instanceof P);
-          assert.equal(query.options.readPreference.mode, 'secondaryPrefered');
+          assert.ok(query.options.readPreference.isValid());
+          assert.equal(query.options.readPreference.mode, 'secondaryPreferred');
 
           query.read('sp');
           assert.ok(query.options.readPreference instanceof P);
-          assert.equal(query.options.readPreference.mode, 'secondaryPrefered');
+          assert.ok(query.options.readPreference.isValid());
+          assert.equal(query.options.readPreference.mode, 'secondaryPreferred');
 
           query.read('nearest');
           assert.ok(query.options.readPreference instanceof P);
+          assert.ok(query.options.readPreference.isValid());
           assert.equal(query.options.readPreference.mode, 'nearest');
 
           query.read('n');
           assert.ok(query.options.readPreference instanceof P);
+          assert.ok(query.options.readPreference.isValid());
           assert.equal(query.options.readPreference.mode, 'nearest');
 
           done();
@@ -1210,9 +1220,10 @@ describe('Query', function(){
           var query = new Query();
           var tags = [{ dc: 'sf', s: 1}, { dc: 'jp', s: 2 }]
 
-          query.read('p', tags);
+          query.read('pp', tags);
           assert.ok(query.options.readPreference instanceof P);
-          assert.equal(query.options.readPreference.mode, 'primary');
+          assert.ok(query.options.readPreference.isValid());
+          assert.equal(query.options.readPreference.mode, 'primaryPreferred');
           assert.ok(Array.isArray(query.options.readPreference.tags));
           assert.equal(query.options.readPreference.tags[0].dc, 'sf');
           assert.equal(query.options.readPreference.tags[0].s, 1);

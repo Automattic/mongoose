@@ -98,81 +98,90 @@ TestDocument.prototype.hooksTest = function(fn){
 
 describe('document:', function(){
 
-  it('test shortcut getters', function(done){
-    var doc = new TestDocument();
-    doc.init({
-        test    : 'test'
-      , oids    : []
-      , nested  : {
-            age   : 5
-          , cool  : DocumentObjectId.createFromHexString('4c6c2d6240ced95d0e00003c')
-          , path  : 'my path'
-        }
+  describe('shortcut getters', function(){
+    it('return undefined for properties with a null/undefined parent object (gh-1326)', function(done){
+      var doc = new TestDocument;
+      doc.init({ nested: null });
+      assert.strictEqual(undefined, doc.nested.age);
+      done();
+    })
+
+    it('work', function(done){
+      var doc = new TestDocument();
+      doc.init({
+          test    : 'test'
+        , oids    : []
+        , nested  : {
+              age   : 5
+            , cool  : DocumentObjectId.createFromHexString('4c6c2d6240ced95d0e00003c')
+            , path  : 'my path'
+          }
+      });
+
+      assert.equal('test', doc.test);
+      assert.ok(doc.oids instanceof Array);
+      assert.equal(doc.nested.age, 5);
+      assert.equal(String(doc.nested.cool), '4c6c2d6240ced95d0e00003c');
+      assert.equal(7, doc.nested.agePlus2);
+      assert.equal('5my path', doc.nested.path);
+      doc.nested.setAge = 10;
+      assert.equal(10, doc.nested.age);
+      doc.nested.setr = 'set it';
+      assert.equal(doc.getValue('nested.setr'), 'set it setter');
+
+      var doc2 = new TestDocument();
+      doc2.init({
+          test    : 'toop'
+        , oids    : []
+        , nested  : {
+              age   : 2
+            , cool  : DocumentObjectId.createFromHexString('4cf70857337498f95900001c')
+            , deep  : { x: 'yay' }
+          }
+      });
+
+      assert.equal('toop', doc2.test);
+      assert.ok(doc2.oids instanceof Array);
+      assert.equal(doc2.nested.age, 2);
+
+      // GH-366
+      assert.equal(doc2.nested.bonk, undefined);
+      assert.equal(doc2.nested.nested, undefined);
+      assert.equal(doc2.nested.test, undefined);
+      assert.equal(doc2.nested.age.test, undefined);
+      assert.equal(doc2.nested.age.nested, undefined);
+      assert.equal(doc2.oids.nested, undefined);
+      assert.equal(doc2.nested.deep.x, 'yay');
+      assert.equal(doc2.nested.deep.nested, undefined);
+      assert.equal(doc2.nested.deep.cool, undefined);
+      assert.equal(doc2.nested2.yup.nested, undefined);
+      assert.equal(doc2.nested2.yup.nested2, undefined);
+      assert.equal(doc2.nested2.yup.yup, undefined);
+      assert.equal(doc2.nested2.yup.age, undefined);
+      assert.equal('object', typeof doc2.nested2.yup);
+
+      doc2.nested2.yup = {
+          age: 150
+        , yup: "Yesiree"
+        , nested: true
+      };
+
+      assert.equal(doc2.nested2.nested, undefined);
+      assert.equal(doc2.nested2.yup.nested, true);
+      assert.equal(doc2.nested2.yup.yup, "Yesiree");
+      assert.equal(doc2.nested2.yup.age, 150);
+      doc2.nested2.nested = "y";
+      assert.equal(doc2.nested2.nested, "y");
+      assert.equal(doc2.nested2.yup.nested, true);
+      assert.equal(doc2.nested2.yup.yup, "Yesiree");
+      assert.equal(150, doc2.nested2.yup.age);
+
+      assert.equal(String(doc2.nested.cool), '4cf70857337498f95900001c');
+
+      assert.ok(doc.oids !== doc2.oids);
+      done();
     });
-
-    assert.equal('test', doc.test);
-    assert.ok(doc.oids instanceof Array);
-    assert.equal(doc.nested.age, 5);
-    assert.equal(doc.nested.cool.toString(), '4c6c2d6240ced95d0e00003c');
-    assert.equal(7, doc.nested.agePlus2);
-    assert.equal('5my path', doc.nested.path);
-    doc.nested.setAge = 10;
-    assert.equal(10, doc.nested.age);
-    doc.nested.setr = 'set it';
-    assert.equal(doc.getValue('nested.setr'), 'set it setter');
-
-    var doc2 = new TestDocument();
-    doc2.init({
-        test    : 'toop'
-      , oids    : []
-      , nested  : {
-            age   : 2
-          , cool  : DocumentObjectId.createFromHexString('4cf70857337498f95900001c')
-          , deep  : { x: 'yay' }
-        }
-    });
-
-    assert.equal('toop', doc2.test);
-    assert.ok(doc2.oids instanceof Array);
-    assert.equal(doc2.nested.age, 2);
-
-    // GH-366
-    assert.equal(doc2.nested.bonk, undefined);
-    assert.equal(doc2.nested.nested, undefined);
-    assert.equal(doc2.nested.test, undefined);
-    assert.equal(doc2.nested.age.test, undefined);
-    assert.equal(doc2.nested.age.nested, undefined);
-    assert.equal(doc2.oids.nested, undefined);
-    assert.equal(doc2.nested.deep.x, 'yay');
-    assert.equal(doc2.nested.deep.nested, undefined);
-    assert.equal(doc2.nested.deep.cool, undefined);
-    assert.equal(doc2.nested2.yup.nested, undefined);
-    assert.equal(doc2.nested2.yup.nested2, undefined);
-    assert.equal(doc2.nested2.yup.yup, undefined);
-    assert.equal(doc2.nested2.yup.age, undefined);
-    assert.equal('object', typeof doc2.nested2.yup);
-
-    doc2.nested2.yup = {
-        age: 150
-      , yup: "Yesiree"
-      , nested: true
-    };
-
-    assert.equal(doc2.nested2.nested, undefined);
-    assert.equal(doc2.nested2.yup.nested, true);
-    assert.equal(doc2.nested2.yup.yup, "Yesiree");
-    assert.equal(doc2.nested2.yup.age, 150);
-    doc2.nested2.nested = "y";
-    assert.equal(doc2.nested2.nested, "y");
-    assert.equal(doc2.nested2.yup.nested, true);
-    assert.equal(doc2.nested2.yup.yup, "Yesiree");
-    assert.equal(150, doc2.nested2.yup.age);
-
-    assert.equal(doc2.nested.cool.toString(), '4cf70857337498f95900001c');
-
-    assert.ok(doc.oids !== doc2.oids);
-    done();
-  });
+  })
 
   it('test shortcut setters', function(done){
     var doc = new TestDocument();

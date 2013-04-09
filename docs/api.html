@@ -6658,7 +6658,8 @@ doc.save() <span class="comment">// change is not saved</span></code></pre></div
   <span class="keyword">return</span> <span class="keyword">new</span> <span class="keyword">this</span>._schema.casterConstructor(value, <span class="keyword">this</span>);
 };</code></pre></div><div class="description"></div><hr class="private"></div><div class="item method public"><h3 id="types_documentarray_MongooseDocumentArray-id"><a href="#types_documentarray_MongooseDocumentArray-id">MongooseDocumentArray#id(<code>id</code>)</a></h3><p>Searches array items for the first document with a matching _id.</p><span class="showcode">show code</span><div class="sourcecode"><pre><code class="javascript">MongooseDocumentArray.prototype.id = <span class="function"><span class="keyword">function</span> <span class="params">(id)</span> {</span>
   <span class="keyword">var</span> casted
-    , _id;
+    , sid
+    , _id
 
   <span class="keyword">try</span> {
     casted = ObjectId.toString(ObjectIdSchema.prototype.cast.call({}, id));
@@ -6669,7 +6670,8 @@ doc.save() <span class="comment">// change is not saved</span></code></pre></div
   <span class="keyword">for</span> (<span class="keyword">var</span> i = <span class="number">0</span>, l = <span class="keyword">this</span>.length; i &lt; l; i++) {
     _id = <span class="keyword">this</span>[i].get(<span class="string">'_id'</span>);
     <span class="keyword">if</span> (!(_id <span class="keyword">instanceof</span> ObjectId)) {
-      <span class="keyword">if</span> (String(id) == _id)
+      sid || (sid = String(id));
+      <span class="keyword">if</span> (sid == _id)
         <span class="keyword">return</span> <span class="keyword">this</span>[i];
     } <span class="keyword">else</span> {
       <span class="keyword">if</span> (casted == _id)

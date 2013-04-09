@@ -17,7 +17,7 @@ block content
   :markdown
     See the [mongodb connection string spec](http://docs.mongodb.org/manual/reference/connection-string/) for more detail.
 
-  h3 Options
+  h3#options Options
   :markdown
     The `connect` method also accepts an `options` object which will be passed on to the underlying driver. All options included here take precedence over options passed in the connection string.
 
@@ -59,7 +59,7 @@ block content
     options.server.socketOptions = options.replset.socketOptions = { keepAlive: 1 };
     mongoose.connect(uri, options);
 
-  h3 ReplicaSet Connections
+  h3#replicaset_connections ReplicaSet Connections
   :markdown
     The same method is used to connect to a replica set but instead of passing a single `uri` we pass a comma delimited list of `uri`s.
 
@@ -69,14 +69,14 @@ block content
   :markdown
     _NOTE: The `database` need only be specified in one of the `uri`s._
 
-  h3 Multiple connections
+  h3#multiple_connections Multiple connections
   :markdown
     So far we've seen how to connect to MongoDB using Mongoose's default connection. At times we may need multiple connections open to Mongo, each with different read/write settings, or maybe just to different databases for example. In these cases we can utilize `mongoose.createConnection()` which accepts all the arguments already discussed and returns a fresh connection for you.
 
   :js
     var conn = mongoose.createConnection('uri,uri,uri...', options);
 
-  h3 Connection pools
+  h3#connection_pools Connection pools
   :markdown
     Each `connection`, whether created with `mongoose.connect` or `mongoose.createConnection` are all backed by an internal configurable connection pool defaulting to a size of 5. Adjust the pool size using your connection options:
 

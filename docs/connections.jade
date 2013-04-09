@@ -81,11 +81,15 @@ block content
     Each `connection`, whether created with `mongoose.connect` or `mongoose.createConnection` are all backed by an internal configurable connection pool defaulting to a size of 5. Adjust the pool size using your connection options:
 
   :js
+    // single server
     var uri = 'mongodb://localhost/test';
-    mongoose.createConnection(uri, { server: { poolSize: 10 }});
+    mongoose.createConnection(uri, { server: { poolSize: 4 }});
 
-    // or
-    var uri = 'mongodb://localhost/test?poolSize=10';
+    // for a replica set
+    mongoose.createConnection(uri, { replset: { poolSize: 4 }});
+
+    // passing the option in the URI works with single or replica sets
+    var uri = 'mongodb://localhost/test?poolSize=4';
     mongoose.createConnection(uri);
 
   h3#next Next Up

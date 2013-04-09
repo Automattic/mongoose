@@ -10,12 +10,12 @@ doc.save();
 <span class="comment">// if running a version less than 3.2.0, you must mark the array modified before saving.</span>
 doc.array[<span class="number">3</span>] = <span class="string">'changed'</span>;
 doc.markModified(<span class="string">'array'</span>);
-doc.save();</code></pre><hr><p><strong>Q</strong>. Why doesn&#39;t mongoose allow me to directly assign schemas to paths?</p><pre><code class="javascript"><span class="keyword">var</span> userSchema = <span class="keyword">new</span> Schema({ name: String });
+doc.save();</code></pre><hr id="assign_schemas_to_paths"><p><strong>Q</strong>. Why doesn&#39;t mongoose allow me to directly assign schemas to paths?</p><pre><code class="javascript"><span class="keyword">var</span> userSchema = <span class="keyword">new</span> Schema({ name: String });
 <span class="keyword">new</span> Schema({ user: userSchema })</code></pre><p><strong>A</strong>. Schemas have a one-to-one mapping with documents. Documents have <code>save</code> and <code>remove</code> methods along with their own <code>pre</code> and <code>post</code> hooks which would lead to code like the following:</p><pre><code class="javascript">doc.user.save();  <span class="comment">// ?</span>
 doc.user.remove();<span class="comment">// ?</span>
-doc.save()</code></pre><p>We&#39;ve felt that this api would be more confusing than helpful. The counter argument is that arrays of sub-documents already have this functionality, but at best this too leads to confusion (calling <code>save</code> on a sub-document is a no-op and exists only to support <code>pre</code> save hooks). In the future this is likely to be revisited.</p><hr><p><strong>Q</strong>. How can I enable debugging?</p>
+doc.save()</code></pre><p>We&#39;ve felt that this api would be more confusing than helpful. The counter argument is that arrays of sub-documents already have this functionality, but at best this too leads to confusion (calling <code>save</code> on a sub-document is a no-op and exists only to support <code>pre</code> save hooks). In the future this is likely to be revisited.</p><hr id="enable_debugging"><p><strong>Q</strong>. How can I enable debugging?</p>
 
-<p><strong>A</strong>. Set the <code>debug</code> option to <code>true</code>:</p><pre><code class="javascript">mongoose.set(<span class="string">'debug'</span>, <span class="literal">true</span>)</code></pre><p>All executed collection methods will log output of their arguments to your console.</p><hr><p><strong>Q</strong>. My <code>save()</code> callback never executes. What am I doing wrong?</p>
+<p><strong>A</strong>. Set the <code>debug</code> option to <code>true</code>:</p><pre><code class="javascript">mongoose.set(<span class="string">'debug'</span>, <span class="literal">true</span>)</code></pre><p>All executed collection methods will log output of their arguments to your console.</p><hr id="callback_never_executes"><p><strong>Q</strong>. My <code>save()</code> callback never executes. What am I doing wrong?</p>
 
 <p><strong>A</strong>. All <code>collection</code> actions (insert, remove, queries, etc) are queued until the <code>connection</code> opens. It is likely that an error occurred while attempting to connect. Try adding an error handler to your connection.</p><pre><code class="javascript"><span class="comment">// if connecting on the default mongoose connection</span>
 mongoose.connect(..);
@@ -23,8 +23,9 @@ mongoose.connection.on(<span class="string">'error'</span>, handleError);
 
 <span class="comment">// if connecting on a separate connection</span>
 <span class="keyword">var</span> conn = mongoose.createConnection(..);
-conn.on(<span class="string">'error'</span>, handleError);
-</code></pre><hr><p><strong>Something to add?</strong></p>
+conn.on(<span class="string">'error'</span>, handleError);</code></pre><hr id="creating_connections"><p><strong>Q</strong>. Should I create/destroy a new connection for each database operation?</p>
+
+<p><strong>A</strong>. No. Open your connection when your application starts up and leave it open until the application shuts down.</p><hr><p><strong>Something to add?</strong></p>
 
 <p>If you&#39;d like to contribute to this page, please <a href="https://github.com/learnboost/mongoose/tree/master/docs/faq.jade">visit it</a> on github and use the <a href="https://github.com/blog/844-forking-with-the-edit-button">Edit</a> button to send a pull request.</p><br></div></div><script>document.body.className = 'load';</script><script>;(function() {
   var cx = '012173159455227967368:uvscsuqjovs';

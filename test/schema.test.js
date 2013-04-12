@@ -1658,4 +1658,62 @@ describe('schema', function(){
       })
     })
   })
+
+  describe('pathType()', function(){
+    var schema;
+
+    before(function(){
+      schema = Schema({
+          n: String
+        , nest: { thing: { nests: Boolean }}
+        , docs:[{ x: [{ y:String }] }]
+        , mixed: {}
+      })
+    })
+
+    describe('when called on an explicit real path', function(){
+      it('returns "real"', function(done){
+        assert.equal('real', schema.pathType('n'));
+        assert.equal('real', schema.pathType('nest.thing.nests'));
+        assert.equal('real', schema.pathType('docs'));
+        assert.equal('real', schema.pathType('docs.0.x'));
+        assert.equal('real', schema.pathType('docs.0.x.3.y'));
+        assert.equal('real', schema.pathType('mixed'));
+        done();
+      })
+    })
+    describe('when called on a virtual', function(){
+      it('returns virtual', function(done){
+        assert.equal('virtual', schema.pathType('id'));
+        done();
+      })
+    })
+    describe('when called on nested structure', function(){
+      it('returns nested', function(done){
+        assert.equal('nested', schema.pathType('nest'));
+        assert.equal('nested', schema.pathType('nest.thing'));
+        done();
+      })
+    })
+    describe('when called on undefined path', function(){
+      it('returns adHocOrUndefined', function(done){
+        assert.equal('adhocOrUndefined', schema.pathType('mixed.what'));
+        assert.equal('adhocOrUndefined', schema.pathType('mixed.4'));
+        assert.equal('adhocOrUndefined', schema.pathType('mixed.4.thing'));
+        assert.equal('adhocOrUndefined', schema.pathType('mixed.4a.thing'));
+        assert.equal('adhocOrUndefined', schema.pathType('mixed.4.9.thing'));
+        assert.equal('adhocOrUndefined', schema.pathType('n.3'));
+        assert.equal('adhocOrUndefined', schema.pathType('n.3a'));
+        assert.equal('adhocOrUndefined', schema.pathType('n.3.four'));
+        assert.equal('adhocOrUndefined', schema.pathType('n.3.4'));
+        assert.equal('adhocOrUndefined', schema.pathType('n.3.4a'));
+        assert.equal('adhocOrUndefined', schema.pathType('nest.x'));
+        assert.equal('adhocOrUndefined', schema.pathType('nest.thing.x'));
+        assert.equal('adhocOrUndefined', schema.pathType('nest.thing.nests.9'));
+        assert.equal('adhocOrUndefined', schema.pathType('nest.thing.nests.9a'));
+        assert.equal('adhocOrUndefined', schema.pathType('nest.thing.nests.a'));
+        done();
+      })
+    })
+  })
 });

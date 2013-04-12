@@ -1110,6 +1110,13 @@ describe('Query', function(){
         assert.equal(false, query.options.tailable);
         done();
       })
+      it('supports passing the `await` option', function(done){
+        var query = new Query();
+        query.tailable({ awaitdata: true });
+        assert.equal(true, query.options.tailable);
+        assert.equal(true, query.options.awaitdata);
+        done();
+      })
     });
 
     describe('comment', function(){

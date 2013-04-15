@@ -34,7 +34,7 @@ If you have a question about Mongoose (not a bug report) please post it to eithe
 - execute `npm install` to install the necessary dependencies
 - execute `make test` to run the tests (we're using [mocha](http://visionmedia.github.com/mocha/))
   - or to execute a single test `T="-g 'some regexp that matches the test description'" make test`
-  - any mocha flags can be specified with T="..."
+  - any mocha flags can be specified with `T="..."`
 
 ### Documentation
 

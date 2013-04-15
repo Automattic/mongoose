@@ -1,4 +1,21 @@
 
+3.6.5 / 2013-04-15
+==================
+
+  * fixed; strict:throw edge case using .set(path, val)
+  * fixed; schema.pathType() on some numbericAlpha paths
+  * fixed; numbericAlpha path versioning
+  * fixed; setting nested mixed paths #1418
+  * fixed; setting nested objects with null prop #1326
+  * fixed; regression in v3.6 population performance #1426 [vedmalex](https://github.com/vedmalex)
+  * fixed; read pref typos #1422 [kyano](https://github.com/kyano)
+  * docs; fix method example
+  * website; update faq
+  * website; add more deep links
+  * website; update poolSize docs
+  * website; add 3.6 release notes
+  * website; note about keepAlive
+
 3.6.4 / 2013-04-03
 ==================
 

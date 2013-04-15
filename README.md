@@ -29,11 +29,11 @@ Check out the [plugins search site](http://plugins.mongoosejs.com/) to see hundr
 
 ## Contributors
 
-View all 80+ [contributors](https://github.com/learnboost/mongoose/graphs/contributors).
+View all 90+ [contributors](https://github.com/learnboost/mongoose/graphs/contributors).
 
 ## Get Involved
 
-Stand up and be counted as a [contributor](https://github.com/LearnBoost/mongoose/blob/master/CONTRIBUTING.md) to mongoose too!
+Stand up and be counted as a [contributor](https://github.com/LearnBoost/mongoose/blob/master/CONTRIBUTING.md) too!
 
 ## Overview
 

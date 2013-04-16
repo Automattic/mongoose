@@ -32,10 +32,11 @@ html(lang='en')
         :js
           // getting-started.js
           var mongoose = require('mongoose');
-          var db = mongoose.createConnection('mongodb://localhost/test');
+          mongoose.connect('mongodb://localhost/test');
         :markdown
-          We have a pending connection object to the test database running on localhost. We now need to get notified if we connect successfully or if a connection error occurs:
+          We have a pending connection to the test database running on localhost. We now need to get notified if we connect successfully or if a connection error occurs:
         :js
+          var db = mongoose.connection;
           db.on('error', console.error.bind(console, 'connection error:'));
           db.once('open', function callback () {
             // yay!
@@ -45,13 +46,13 @@ html(lang='en')
         :markdown
           With Mongoose, everything is derived from a [Schema](/docs/guide.html). Let's get a reference to it and define our kittens.
         :js
-          var kittySchema = new mongoose.Schema({
+          var kittySchema = mongoose.Schema({
               name: String
           })
         :markdown
           So far so good. We've got a schema with one property, `name`, which will be a  `String`. The next step is compiling our schema into a [Model](/docs/models.html).
         :js
-          var Kitten = db.model('Kitten', kittySchema)
+          var Kitten = mongoose.model('Kitten', kittySchema)
         :markdown
           A model is a class with which we construct documents.
           In this case, each document will be a kitten with properties and behaviors as declared in our schema.
@@ -62,6 +63,7 @@ html(lang='en')
         :markdown
           Kittens can meow, so let's take a look at how to add "speak" functionality to our documents:
         :js
+          // NOTE: methods must be added to the schema before compiling it with mongoose.model()
           kittySchema.methods.speak = function () {
             var greeting = this.name
               ? "Meow name is " + this.name
@@ -69,7 +71,7 @@ html(lang='en')
             console.log(greeting);
           }
 
-          var Kitten = db.model('Kitten', kittySchema)
+          var Kitten = mongoose.model('Kitten', kittySchema)
         :markdown
           Functions added to the `methods` property of a schema get compiled into the `Model` prototype and exposed on each document instance:
         :js

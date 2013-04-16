@@ -76,7 +76,7 @@ var strictThrowSchema = new Schema({ name: String }, { strict: 'throw'});
 mongoose.model('UpdateOneStrictThrowSchema', strictThrowSchema);
 
 describe('model: findOneAndUpdate:', function(){
-  it('returns the edited document', function(done){
+  it('WWW returns the edited document', function(done){
     var db = start()
       , M = db.model(modelname, collection)
       , title = 'Tobi ' + random()
@@ -737,6 +737,29 @@ describe('model: findByIdAndUpdate:', function(){
         assert.equal(_id2.toString(), found.ids[0].toString());
         done();
       });
+    })
+  })
+
+  it('supports population (gh-1395)', function(done){
+    var db = start();
+    var M = db.model('A', { name: String });
+    var N = db.model('B', { a: { type: Schema.ObjectId, ref: 'A' }, i: Number})
+
+    M.create({ name: 'i am an A' }, function (err, a) {
+      if (err) return done(err);
+      N.create({ a: a._id, i: 10 }, function (err, b) {
+        if (err) return done(err);
+
+        N.findOneAndUpdate({ _id: b._id }, { $inc: { i: 1 }})
+        .populate('a')
+        .exec(function (err, doc) {
+          if (err) return done(err);
+          assert.ok(doc);
+          assert.ok(doc.a);
+          assert.equal(doc.a.name, 'i am an A');
+          done();
+        })
+      })
     })
   })
 })

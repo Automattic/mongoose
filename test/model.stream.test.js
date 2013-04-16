@@ -29,7 +29,7 @@ var Person = new Schema({
 mongoose.model('PersonForStream', Person);
 var collection = 'personforstream_' + random();
 
-describe('cursor stream:', function(){
+describe('query stream:', function(){
   before(function (done) {
     var db = start()
       , P = db.model('PersonForStream', collection)
@@ -141,7 +141,7 @@ describe('cursor stream:', function(){
   });
 
   it('destroying a stream stops it', function(done){
-    //this.slow(300);
+    this.slow(300);
 
     var db = start()
       , P = db.model('PersonForStream', collection)
@@ -180,7 +180,7 @@ describe('cursor stream:', function(){
   });
 
   it('errors', function(done){
-    //this.slow(300);
+    this.slow(300);
 
     var db = start({ server: { auto_reconnect: false }})
       , P = db.model('PersonForStream', collection)
@@ -223,11 +223,12 @@ describe('cursor stream:', function(){
       , filename = '/tmp/_mongoose_stream_out.txt'
       , out = fs.createWriteStream(filename)
 
-    var stream = P.find().sort('name').limit(20).stream();
+    var opts = { transform: JSON.stringify }
+    var stream = P.find().sort('name').limit(20).stream(opts);
     stream.pipe(out);
 
     stream.on('error', cb);
-    stream.on('close', cb);
+    out.on('close', cb);
 
     function cb (err) {
       db.close();
@@ -327,5 +328,46 @@ describe('cursor stream:', function(){
         done(error);
       })
     })
+  })
+
+  it('supports population (gh-1411)', function(done){
+    var db = start();
+
+    var barSchema = Schema({
+      value: Number
+    });
+
+    var fooSchema = Schema({
+      bar: { type: "ObjectId", ref: "Bar" }
+    });
+
+    var Foo = db.model('Foo', fooSchema);
+    var Bar = db.model('Bar', barSchema);
+    var found = [];
+
+    Bar.create({ value: 2 }, { value: 3 }, function(err, bar1, bar2){
+      if (err) return complete(err);
+
+      Foo.create({ bar: bar1 }, { bar: bar2 }, function(err){
+        if (err) return complete(err);
+
+        Foo.find().populate("bar").stream()
+        .on('data', function(foo){
+          found.push(foo.bar.value);
+        })
+        .on('end', complete)
+        .on('error', complete);
+      });
+    });
+
+    function complete (err) {
+      if (!err) {
+        assert.ok(~found.indexOf(2));
+        assert.ok(~found.indexOf(3));
+      }
+      db.close(function () {
+        done(err);
+      })
+    }
   })
 });

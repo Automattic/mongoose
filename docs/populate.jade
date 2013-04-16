@@ -1,43 +1,47 @@
 extends layout
 
 block content
-  h2 Query Population
+  h2 Population
   :markdown
-    There are no joins in MongoDB but sometimes we still want references to documents in other collections. This is where [query#populate](./api.html#query_Query-populate) comes in.
+    There are no joins in MongoDB but sometimes we still want references to documents in other collections. This is where population comes in.
 
-    `ObjectIds` can refer to another document in a collection within our database and be `populate()`d when querying:
+    Population is the process of automatically replacing the specified paths in the document with document(s) from other collection(s). We may populate a single document, multiple documents, plain object, multiple plain objects, or all objects returned from a query. Let's look at some examples.
   :js
     var mongoose = require('mongoose')
       , Schema = mongoose.Schema
 
-    var PersonSchema = new Schema({
+    var personSchema = Schema({
+      _id     : Number,
       name    : String,
       age     : Number,
       stories : [{ type: Schema.Types.ObjectId, ref: 'Story' }]
     });
 
-    var StorySchema = new Schema({
-      _creator : { type: Schema.Types.ObjectId, ref: 'Person' },
+    var storySchema = Schema({
+      _creator : { type: Number, ref: 'Person' },
       title    : String,
-      fans     : [{ type: Schema.Types.ObjectId, ref: 'Person' }]
+      fans     : [{ type: Number, ref: 'Person' }]
     });
 
-    var Story  = mongoose.model('Story', StorySchema);
-    var Person = mongoose.model('Person', PersonSchema);
+    var Story  = mongoose.model('Story', storySchema);
+    var Person = mongoose.model('Person', personSchema);
   :markdown
-    So far we've created two `models`. Our `Person` model has it's `stories` field set to an array of `ObjectId`s. The `ref` option is what tells Mongoose in which model to look, in our case the `Story` model. All `_id`s we store here must be document _ids from the `Story` model. We also added a `_creator` `ObjectId` to our `Story` schema which refers to a single `Person`.
+    So far we've created two [Models](./models.html). Our `Person` model has it's `stories` field set to an array of `ObjectId`s. The `ref` option is what tells Mongoose which model to use during population, in our case the `Story` model. All `_id`s we store here must be document `_id`s from the `Story` model. We also declared the `Story` `_creator` property as a `Number`, the same type as the `_id` used in the `personSchema`. It is important to match the type of `_id` to the type of ref.
+  .important
+    :markdown
+      **Note**: `ObjectId`, `Number`, `String`, and `Buffer` are valid for use as refs.
   h3 Saving refs
   :markdown
-    Saving refs to other documents works the same way you normally save objectids, just assign an `ObjectId`:
+    Saving refs to other documents works the same way you normally save properties, just assign the `_id` value:
   :js
-    var aaron = new Person({ name: 'Aaron', age: 100 });
+    var aaron = new Person({ _id: 0, name: 'Aaron', age: 100 });
 
     aaron.save(function (err) {
       if (err) return handleError(err);
 
       var story1 = new Story({
         title: "Once upon a timex.",
-        _creator: aaron._id    // assign an ObjectId
+        _creator: aaron._id    // assign the _id from the person
       });
 
       story1.save(function (err) {
@@ -47,24 +51,26 @@ block content
     })
   h3 Population
   :markdown
-    So far we haven't done anything special. We've merely created a `Person` and a `Story`. Now let's take a look at populating our story's `_creator`:
+    So far we haven't done anything much different. We've merely created a `Person` and a `Story`. Now let's take a look at populating our story's `_creator` using the query builder:
   :js
     Story
-    .findOne({ title: /timex/ })
+    .findOne({ title: 'Once upon a timex.' })
     .populate('_creator')
     .exec(function (err, story) {
       if (err) return handleError(err);
-      console.log('The creator is %s', story._creator.name); // prints "The creator is Aaron"
+      console.log('The creator is %s', story._creator.name);
+      // prints "The creator is Aaron"
     })
-
   :markdown
-    Populated paths are no longer set to their original `ObjectId`s, their value is replaced with the mongoose document returned from the database by performing a separate query before returning the results.
+    Populated paths are no longer set to their original `_id` , their value is replaced with the mongoose document returned from the database by performing a separate query before returning the results.
 
-    Arrays of `ObjectId` refs work the same way. Just call the [populate](./api.html#query_Query-populate) method on the query and an array of documents will be returned _in place_ of the `ObjectIds`.
-
+    Arrays of refs work the same way. Just call the [populate](./api.html#query_Query-populate) method on the query and an array of documents will be returned _in place_ of the original `_id`s.
+  .important
+    :markdown
+      **Note**: mongoose >= 3.6 exposes the original `_ids` used during population through the [document#populated()](./api.html#document_Document-populated) method.
   h3 Field selection
   :markdown
-    What if we only want a few specific fields returned for the query? This can be accomplished by passing the usual [field name syntax](./api.html#query_Query-select) as the second argument to the populate method:
+    What if we only want a few specific fields returned for the populated documents? This can be accomplished by passing the usual [field name syntax](./api.html#query_Query-select) as the second argument to the populate method:
   :js
     Story
     .findOne({ title: /timex/i })
@@ -78,23 +84,44 @@ block content
       console.log('The creators age is %s', story._creator.age);
       // prints "The creators age is null'
     })
-  h3 Query conditions for populate
+  h3 Populating multiple paths
   :markdown
-    What if we wanted to populate our fans array based on their age, and return, at most, any 5 of them?
+    What if we wanted to populate multiple paths at the same time?
   :js
     Story
     .find(...)
-    .populate('fans', null, { age: { $gte: 21 }}, { limit: 5 })
+    .populate('fans author') // space delimited path names
+    .exec()
+  .important
+    :markdown
+      In **mongoose >= 3.6**, we can pass a space delimited string of path names to populate. Before 3.6 you must execute the `populate()` method multiple times.
+  :js
+    Story
+    .find(...)
+    .populate('fans')
+    .populate('author')
+    .exec()
+  h3 Query conditions and other options
   :markdown
-    Done. `Conditions` and `options` for populate queries are passed as the third and fourth arguments respectively.
+    What if we wanted to populate our fans array based on their age, select just their names, and return at most, any 5 of them?
+  :js
+    Story
+    .find(...)
+    .populate({
+      path: 'fans',
+      match: { age: { $gte: 21 }},
+      select: 'name -_id',
+      options: { limit: 5 }
+    })
+    .exec()
   h3 Refs to children
   :markdown
-    We may find however, if we use the `aaron` object, we are unable to get a list of the stories. This is because no `story` objects were ever 'pushed' on to `aaron.stories`.
+    We may find however, if we use the `aaron` object, we are unable to get a list of the stories. This is because no `story` objects were ever 'pushed' onto `aaron.stories`.
 
-    There are two perspectives to this story. First, it's nice to have `aaron` know which are his stories.
+    There are two perspectives here. First, it's nice to have `aaron` know which stories are his.
   :js
     aaron.stories.push(story1);
-    aaron.save();
+    aaron.save(callback);
   :markdown
     This allows us to perform a `find` and `populate` combo:
   :js
@@ -105,12 +132,12 @@ block content
       if (err) return handleError(err);
       console.log(person);
     })
-  :markdown
-    However, it is debatable that we really want two sets of pointers as they may get out of sync. So we could instead merely `find()` the documents we are interested in.
+  .important
+    :markdown
+      It is debatable that we really want two sets of pointers as they may get out of sync. Instead we could skip populating and directly `find()` the stories we are interested in.
   :js
     Story
     .find({ _creator: aaron._id })
-    .populate('_creator') // not really necessary
     .exec(function (err, stories) {
       if (err) return handleError(err);
       console.log('The stories are an array: ', stories);
@@ -118,20 +145,23 @@ block content
 
   h3 Updating refs
   :markdown
-    Now that we have a `story` we realized that the `_creator` was incorrect. We can update `ObjectId` refs the same as any other property through the magic of Mongooses internal casting:
+    Now that we have a `story` we realized that the `_creator` was incorrect. We can update refs the same as any other property through Mongooses internal casting:
   :js
     var guille = new Person({ name: 'Guillermo' });
     guille.save(function (err) {
       if (err) return handleError(err);
 
-      story._creator = guille; // or guille._id
+      story._creator = guille;
+      console.log(story._creator.name);
+      // prints "Guillermo" in mongoose >= 3.6
+      // see https://github.com/LearnBoost/mongoose/wiki/3.6-release-notes
 
       story.save(function (err) {
         if (err) return handleError(err);
 
         Story
         .findOne({ title: /timex/i })
-        .populate('_creator', 'name')
+        .populate({ path: '_creator', select: 'name' })
         .exec(function (err, story) {
           if (err) return handleError(err);
 
@@ -141,23 +171,29 @@ block content
       })
     })
 
-  h4 NOTE:
-  :markdown
-    The documents returned from calling [populate](./api.html#query_Query-populate) become fully functional, `remove`able, `save`able documents. Do not confuse them with [sub docs](./subdocs.html). Take caution when calling its remove method because you'll be removing it from the database, not just the array.
+  .important
+    :markdown
+      The documents returned from [query population](./api.html#query_Query-populate) become fully functional, `remove`able, `save`able documents unless the [lean](./api.html#query_Query-lean) option is specified. Do not confuse them with [sub docs](./subdocs.html). Take caution when calling its remove method because you'll be removing it from the database, not just the array.
 
-  h4 NOTE:
+  h3#populate_an_existing_mongoose_document Populating an existing document
   :markdown
-    _Field selection_ in v3 is slightly different than v2. Arrays of fields are no longer accepted.
+    If we have an existing mongoose document and want to populate some of its paths, **mongoose >= 3.6** supports the [document#populate()](./api.html#document_Document-populate) method.
+
+  h3#populate_multiple_documents Populating multiple existing documents
+  :markdown
+    If we have one or many mongoose documents or even plain objects (_like [mapReduce](./api.html#model_Model.mapReduce) output_), we may populate them using the [Model.populate()](./api.html#model_Model.populate) method available in **mongoose >= 3.6**. This is what `document#populate()` and `query#populate()` use to populate documents.
+
+  h3 Field selection difference from v2 to v3
+  .important
+    :markdown
+      Field selection in v3 is slightly different than v2. Arrays of fields are no longer accepted. See the [migration guide](./migration.html#fields) and the example below for more detail.
 
   :js
-    // this works
+    // this works in v3
     Story.findOne(..).populate('_creator', 'name age').exec(..);
 
     // this doesn't
     Story.findOne(..).populate('_creator', ['name', 'age']).exec(..);
-
-  :markdown
-    See the [migration guide](./migration.html#fields) for more detail.
 
   h3#next Next Up
   :markdown

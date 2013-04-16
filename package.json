@@ -1,28 +1,31 @@
 {
     "name": "mongoose"
   , "description": "Mongoose MongoDB ODM"
-  , "version": "3.5.0"
+  , "version": "3.6.5-pre"
   , "author": "Guillermo Rauch <guillermo@learnboost.com>"
   , "keywords": ["mongodb", "mongoose", "orm", "data", "datastore", "nosql", "odm", "sql", "db", "database"]
   , "dependencies": {
         "hooks": "0.2.1"
-      , "mongodb": "1.2.3"
+      , "mongodb": "1.2.14"
       , "ms": "0.1.0"
       , "sliced": "0.0.3"
-      , "muri": "0.0.4"
+      , "muri": "0.3.1"
+      , "mpromise": "0.2.1"
+      , "mpath": "0.1.1"
     }
   , "devDependencies": {
-        "mocha": "1.4.2"
+        "mocha": "1.8.1"
       , "node-static": "0.5.9"
       , "dox": "0.3.1"
       , "jade": "0.26.3"
       , "highlight.js": "7.0.1"
       , "markdown": "0.3.1"
+      , "promises-aplus-tests": ">= 1.0.2"
     }
   , "directories": { "lib": "./lib/mongoose" }
   , "scripts": { "test": "make test" }
   , "main": "./index.js"
-  , "engines": { "node": ">= 0.4.0" }
+  , "engines": { "node": ">=0.6.19" }
   , "bugs": {
         "url":"https://github.com/learnboost/mongoose/issues/new"
       , "email": "https://groups.google.com/group/mongoose-orm"

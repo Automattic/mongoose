@@ -8,6 +8,7 @@ var start = require('./common')
   , assert = require('assert')
   , random = require('../lib/utils').random
   , Query = require('../lib/query')
+  , Aggregate = require('../lib/aggregate')
   , Schema = mongoose.Schema
   , SchemaType = mongoose.SchemaType
   , ObjectId = Schema.Types.ObjectId
@@ -67,7 +68,8 @@ describe('model aggregate', function(){
         assert.equal(maxAge, res[0].maxAge);
         done();
       });
-    })
+    });
+
     it('with arrays', function(done){
       this.timeout(4000);
 
@@ -79,6 +81,29 @@ describe('model aggregate', function(){
         assert.equal(maxAge, res[0].maxAge);
         done();
       });
-    })
+    });
+
+	it('with Aggregate syntax', function(done) {
+	  this.timeout(4000);
+
+	  var promise = A.aggregate()
+	    .group(group.$group)
+	    .project(project.$project)
+	    .exec(function (err, res) {
+          assert.ifError(err);
+          assert.ok(promise instanceof mongoose.Promise);
+          assert.ok(res);
+          assert.equal(1, res.length);
+          assert.ok('maxAge' in res[0]);
+          assert.equal(maxAge, res[0].maxAge);
+          done();
+        });
+	});
+
+	it('when returning Aggregate', function(done) {
+	  assert(A.aggregate(group) instanceof Aggregate);
+
+	  done();
+	});
   })
 });

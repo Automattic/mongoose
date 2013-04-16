@@ -99,7 +99,6 @@ li {
   width: 210px;
   overflow-x: hidden;
   overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
   padding: 15px 0 30px 20px;
   border-right: 1px solid #ddd;
   background: -webkit-gradient(linear, left top, right top, from(transparent), color-stop(0.92, transparent), color-stop(0.9201, rgba(172,172,172, 0.0)), to(rgba(172,172,172, 0.4))), transparent;

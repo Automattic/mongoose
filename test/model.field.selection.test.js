@@ -249,43 +249,81 @@ describe('model field selection', function(){
     });
   });
 
-  it('casts elemMatch args (gh-1091)', function(done){
+  describe('with $elemMatch projection', function(){
     // mongodb 2.2 support
-    var db = start()
 
-    var postSchema = new Schema({
-       ids: [{type: Schema.ObjectId}]
-    });
+    it('casts elemMatch args (gh-1091)', function(done){
+      var db = start()
 
-    var B = db.model('gh-1091', postSchema);
-    var _id1 = new mongoose.Types.ObjectId;
-    var _id2 = new mongoose.Types.ObjectId;
+      var postSchema = new Schema({
+         ids: [{type: Schema.ObjectId}]
+      });
 
-    //mongoose.set('debug', true);
-    B.create({ ids: [_id1, _id2] }, function (err, doc) {
-      assert.ifError(err);
+      var B = db.model('gh-1091', postSchema);
+      var _id1 = new mongoose.Types.ObjectId;
+      var _id2 = new mongoose.Types.ObjectId;
 
-      B
-      .findById(doc._id)
-      .select({ ids: { $elemMatch: { $in: [_id2.toString()] }}})
-      .exec(function (err, found) {
+      B.create({ ids: [_id1, _id2] }, function (err, doc) {
         assert.ifError(err);
-        assert.ok(found);
-        assert.equal(found.id, doc.id);
-        assert.equal(1, found.ids.length);
-        assert.equal(_id2.toString(), found.ids[0].toString());
 
         B
-        .find({ _id: doc._id })
+        .findById(doc._id)
         .select({ ids: { $elemMatch: { $in: [_id2.toString()] }}})
         .exec(function (err, found) {
           assert.ifError(err);
-          assert.ok(found.length);
-          found = found[0];
+          assert.ok(found);
           assert.equal(found.id, doc.id);
           assert.equal(1, found.ids.length);
           assert.equal(_id2.toString(), found.ids[0].toString());
-          done();
+
+          B
+          .find({ _id: doc._id })
+          .select({ ids: { $elemMatch: { $in: [_id2.toString()] }}})
+          .exec(function (err, found) {
+            assert.ifError(err);
+            assert.ok(found.length);
+            found = found[0];
+            assert.equal(found.id, doc.id);
+            assert.equal(1, found.ids.length);
+            assert.equal(_id2.toString(), found.ids[0].toString());
+            done();
+          })
+        })
+      })
+    })
+
+    it('disallows saving modified elemMatch paths (gh-1334)', function(done){
+      var db = start()
+
+      var postSchema = new Schema({
+           ids:  [{type: Schema.ObjectId}]
+         , ids2: [{type: Schema.ObjectId}]
+      });
+
+      var B = db.model('gh-1334', postSchema);
+      var _id1 = new mongoose.Types.ObjectId;
+      var _id2 = new mongoose.Types.ObjectId;
+
+      B.create({ ids: [_id1, _id2], ids2: [_id2, _id1] }, function (err, doc) {
+        assert.ifError(err);
+
+        B
+        .findById(doc._id)
+        .select({ ids: { $elemMatch:  { $in: [_id2.toString()] }}})
+        .select({ ids2: { $elemMatch: { $in: [_id1.toString()] }}})
+        .exec(function (err, found) {
+          assert.ifError(err);
+          assert.equal(1, found.ids.length);
+          assert.equal(1, found.ids2.length);
+          found.ids = [];
+          found.ids2.set(0, _id2);
+          found.save(function (err) {
+            db.close();
+            assert.ok(/\$elemMatch projection/.test(err));
+            assert.ok(/ ids/.test(err));
+            assert.ok(/ ids2/.test(err));
+            done()
+          })
         })
       })
     })

@@ -37,7 +37,7 @@ function TestDoc (schema) {
       title: { type: String }
   });
 
-  Subdocument.prototype._setSchema(schema || SubSchema);
+  Subdocument.prototype.$__setSchema(schema || SubSchema);
 
   return Subdocument;
 }
@@ -47,7 +47,7 @@ function TestDoc (schema) {
  */
 
 describe('types.documentarray', function(){
-  it('behaves and quakcs like an array', function(done){
+  it('behaves and quacks like an array', function(done){
     var a = new MongooseDocumentArray();
 
     assert.ok(a instanceof Array);
@@ -177,70 +177,100 @@ describe('types.documentarray', function(){
       assert.ok(!threw);
       done();
     })
+    it('passes options to its documents (gh-1415)', function(done){
+      var subSchema = new Schema({
+          title: { type: String }
+      });
+
+      subSchema.set('toObject', {
+        transform: function (doc, ret, options) {
+          // this should not be called because custom options are
+          // passed during MongooseArray#toObject() calls
+          ret.changed = 123;
+          return ret;
+        }
+      })
+
+      var db = mongoose.createConnection();
+      var M = db.model('gh-1415', { docs: [subSchema] });
+      var m = new M;
+      m.docs.push({ docs: [{ title: 'hello' }] });
+      var delta = m.$__delta()[1];
+      assert.equal(undefined, delta.$pushAll.docs[0].changed);
+      done();
+    })
   })
 
-  describe('EmbeddedDocumentArray', function(){
-    describe('create()', function(){
-      it('works', function(done){
-        var a = new MongooseDocumentArray([]);
-        assert.equal('function', typeof a.create);
+  describe('create()', function(){
+    it('works', function(done){
+      var a = new MongooseDocumentArray([]);
+      assert.equal('function', typeof a.create);
 
-        var schema = new Schema({ docs: [new Schema({ name: 'string' })] });
-        var T = mongoose.model('embeddedDocument#create_test', schema, 'asdfasdfa'+ random());
-        var t = new T;
-        assert.equal('function', typeof t.docs.create);
-        var subdoc = t.docs.create({ name: 100 });
-        assert.ok(subdoc._id);
-        assert.equal(subdoc.name, '100');
-        assert.ok(subdoc instanceof EmbeddedDocument);
-        done();
-      })
+      var schema = new Schema({ docs: [new Schema({ name: 'string' })] });
+      var T = mongoose.model('embeddedDocument#create_test', schema, 'asdfasdfa'+ random());
+      var t = new T;
+      assert.equal('function', typeof t.docs.create);
+      var subdoc = t.docs.create({ name: 100 });
+      assert.ok(subdoc._id);
+      assert.equal(subdoc.name, '100');
+      assert.ok(subdoc instanceof EmbeddedDocument);
+      done();
     })
+  })
 
-    describe('push()', function(){
-      it('does not re-cast instances of its embedded doc xxxxxx', function(done){
-        var db = start();
+  describe('push()', function(){
+    it('does not re-cast instances of its embedded doc', function(done){
+      var db = start();
 
-        var child = new Schema({ name: String, date: Date });
-        child.pre('save', function (next) {
-          this.date = new Date;
-          next();
-        });
-        var schema = Schema({ children: [child] });
-        var M = db.model('embeddedDocArray-push-re-cast', schema, 'edarecast-'+random());
-        var m = new M;
-        m.save(function (err) {
+      var child = new Schema({ name: String, date: Date });
+      child.pre('save', function (next) {
+        this.date = new Date;
+        next();
+      });
+      var schema = Schema({ children: [child] });
+      var M = db.model('embeddedDocArray-push-re-cast', schema, 'edarecast-'+random());
+      var m = new M;
+      m.save(function (err) {
+        assert.ifError(err);
+        M.findById(m._id, function (err, doc) {
           assert.ifError(err);
-          M.findById(m._id, function (err, doc) {
+          var c = doc.children.create({ name: 'first' })
+          assert.equal(undefined, c.date);
+          doc.children.push(c);
+          assert.equal(undefined, c.date);
+          doc.save(function (err) {
             assert.ifError(err);
-            var c = doc.children.create({ name: 'first' })
-            assert.equal(undefined, c.date);
+            assert.ok(doc.children[doc.children.length-1].date);
+            assert.equal(c.date, doc.children[doc.children.length-1].date);
+
             doc.children.push(c);
-            assert.equal(undefined, c.date);
+            doc.children.push(c);
+
             doc.save(function (err) {
               assert.ifError(err);
-              assert.ok(doc.children[doc.children.length-1].date);
-              assert.equal(c.date, doc.children[doc.children.length-1].date);
-
-              doc.children.push(c);
-              doc.children.push(c);
-
-              doc.save(function (err) {
+              M.findById(m._id, function (err, doc) {
+                db.close()
                 assert.ifError(err);
-                M.findById(m._id, function (err, doc) {
-                  db.close()
-                  assert.ifError(err);
-                  assert.equal(3, doc.children.length);
-                  doc.children.forEach(function (child) {
-                    assert.equal(doc.children[0].id, child.id);
-                  })
-                  done();
+                assert.equal(3, doc.children.length);
+                doc.children.forEach(function (child) {
+                  assert.equal(doc.children[0].id, child.id);
                 })
+                done();
               })
             })
           })
         })
       })
+    })
+    it('corrects #ownerDocument() if value was created with array.create() (gh-1385)', function(done){
+      var mg = new mongoose.Mongoose;
+      var M = mg.model('1385', { docs: [{ name: String }] });
+      var m = new M;
+      var doc = m.docs.create({ name: 'test 1385' });
+      assert.notEqual(String(doc.ownerDocument()._id), String(m._id));
+      m.docs.push(doc);
+      assert.equal(doc.ownerDocument()._id, String(m._id));
+      done();
     })
   })
 
@@ -289,4 +319,44 @@ describe('types.documentarray', function(){
     })
   });
 
+  describe('invalidate()', function(){
+    it('works', function(done){
+      var schema = Schema({ docs: [{ name: 'string' }] });
+      var T = mongoose.model('embeddedDocument#invalidate_test', schema, 'asdfasdfa'+ random());
+      var t = new T;
+      t.docs.push({ name: 100 });
+      var subdoc = t.docs[t.docs.length-1];
+      subdoc.invalidate('name', 'boo boo', '%');
+
+      subdoc = t.docs.create({ name: 'yep' });
+      assert.throws(function(){
+        // has no parent array
+        subdoc.invalidate('name', 'crap', 47);
+      }, /^Error: Unable to invalidate a subdocument/);
+
+      t.validate(function (err) {
+        var e = t.errors['docs.0.name'];
+        assert.ok(e);
+        assert.equal(e.path, 'docs.0.name');
+        assert.equal(e.type, 'boo boo');
+        assert.equal(e.value, '%');
+        done();
+      })
+    })
+
+    it('handles validation failures', function(done){
+      var db = start();
+      var nested = Schema({ v: { type: Number, max: 30 }});
+      var schema = Schema({
+          docs: [nested]
+      }, { collection: 'embedded-invalidate-'+random() });
+      var M = db.model('embedded-invalidate', schema);
+      var m = new M({ docs: [{ v: 900 }] });
+      m.save(function (err) {
+        db.close();
+        assert.equal(900, err.errors['docs.0.v'].value);
+        done();
+      });
+    })
+  })
 })

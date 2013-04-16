@@ -21,7 +21,7 @@ function Dummy () {
   mongoose.Document.call(this, {});
 }
 Dummy.prototype.__proto__ = mongoose.Document.prototype;
-Dummy.prototype._setSchema(new Schema)
+Dummy.prototype.$__setSchema(new Schema)
 
 function Subdocument () {
   var arr = new DocumentArray;
@@ -41,7 +41,7 @@ Subdocument.prototype.__proto__ = EmbeddedDocument.prototype;
  * Set schema.
  */
 
-Subdocument.prototype._setSchema(new Schema({
+Subdocument.prototype.$__setSchema(new Schema({
     test: { type: String, required: true }
   , work: { type: String, validate: /^good/ }
 }));
@@ -52,6 +52,7 @@ Subdocument.prototype._setSchema(new Schema({
 
 var RatingSchema = new Schema({
     stars: Number
+  , description: { source: { url: String, time: Date }}
 });
 
 var MovieSchema = new Schema({
@@ -73,9 +74,9 @@ describe('types.document', function(){
     a.set('work', 'nope');
 
     a.save(function(err){
-      assert.ok(a.__parent._validationError instanceof ValidationError);
+      assert.ok(a.__parent.$__.validationError instanceof ValidationError);
       assert.equal(a.__parent.errors['jsconf.ar.0.work'].name, 'ValidatorError');
-      assert.equal(a.__parent._validationError.toString(), 'ValidationError: Validator "required" failed for path test, Validator failed for path work');
+      assert.equal(a.__parent.$__.validationError.toString(), 'ValidationError: Validator "required" failed for path test with value ``, Validator failed for path work with value `nope`');
       done();
     });
   });
@@ -106,19 +107,19 @@ describe('types.document', function(){
     db.close();
     var m = new Movie;
 
-    assert.equal(m.id, m.__id);
+    assert.equal(m.id, m.$__._id);
     var old = m.id;
     m._id = new mongoose.Types.ObjectId;
-    assert.equal(m.id, m.__id);
-    assert.strictEqual(true, old !== m.__id);
+    assert.equal(m.id, m.$__._id);
+    assert.strictEqual(true, old !== m.$__._id);
 
     var m2= new Movie;
     delete m2._doc._id;
     m2.init({ _id: new mongoose.Types.ObjectId });
-    assert.equal(m2.id, m2.__id);
-    assert.strictEqual(true, m.__id !== m2.__id);
+    assert.equal(m2.id, m2.$__._id);
+    assert.strictEqual(true, m.$__._id !== m2.$__._id);
     assert.strictEqual(true, m.id !== m2.id);
-    assert.strictEqual(true, m.__id !== m2.__id);
+    assert.strictEqual(true, m.$__._id !== m2.$__._id);
     done();
   });
 
@@ -194,4 +195,60 @@ describe('types.document', function(){
       });
     });
   });
+
+  describe('setting nested objects', function(){
+    it('works (gh-1394)', function(done){
+      var db = start();
+      var Movie = db.model('Movie');
+
+      Movie.create({
+          title: 'Life of Pi'
+        , ratings: [{
+              description: {
+                  source: {
+                      url: 'http://www.imdb.com/title/tt0454876/'
+                    , time: new Date
+                  }
+              }
+          }]
+      }, function (err, movie) {
+        assert.ifError(err);
+
+        Movie.findById(movie, function (err, movie) {
+          assert.ifError(err);
+
+          assert.ok(movie.ratings[0].description.source.time instanceof Date);
+          movie.ratings[0].description.source = { url: 'http://www.lifeofpimovie.com/' };
+
+          movie.save(function (err) {
+            assert.ifError(err);
+
+            Movie.findById(movie, function (err, movie) {
+              assert.ifError(err);
+
+              assert.equal('http://www.lifeofpimovie.com/', movie.ratings[0].description.source.url);
+
+              // overwritten date
+              assert.equal(undefined, movie.ratings[0].description.source.time);
+
+              var newDate = new Date;
+              movie.ratings[0].set('description.source.time', newDate, { merge: true });
+              movie.save(function (err) {
+                assert.ifError(err);
+
+                Movie.findById(movie, function (err, movie) {
+                  assert.ifError(err);
+                  assert.equal(String(newDate), movie.ratings[0].description.source.time);
+                  // url not overwritten using merge
+                  assert.equal('http://www.lifeofpimovie.com/', movie.ratings[0].description.source.url);
+                  done();
+                });
+              });
+            });
+          })
+        });
+      });
+    })
+  })
+
 });

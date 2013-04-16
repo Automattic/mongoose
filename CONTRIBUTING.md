@@ -1,9 +1,16 @@
 ## Contributing to Mongoose
 
+### STOP!
+
+If you have a question about Mongoose (not a bug report) please post it to either [StackOverflow](http://stackoverflow.com/questions/tagged/mongoose), our [Google Group](http://groups.google.com/group/mongoose-orm), or on the #mongoosejs irc channel on freenode.
+
 ### Reporting bugs
 
 - Before opening a new issue, look for existing [issues](https://github.com/learnboost/mongoose/issues) to avoid duplication. If the issue does not yet exist, [create one](https://github.com/learnboost/mongoose/issues/new).
+  - Please describe the issue you are experiencing, along with any associated stack trace.
+  - Please post code that reproduces the issue, the version of mongoose, node version, and mongodb version.
   - _The source of this project is written in javascript, not coffeescript, therefore your bug reports should be written in javascript_. 
+  - In general, adding a "+1" comment to an existing issue does little to help get it resolved. A better way is to submit a well documented pull request with clean code and passing tests.
 
 ### Fixing bugs / Adding features
 
@@ -20,7 +27,14 @@
     - `for (..) {`
     - `while (..) {`
     - `function (err) {`
-- Write tests and make sure they pass (execute `make test` from the command line to run the test suite).
+- Write tests and make sure they pass (tests are in the [test](https://github.com/LearnBoost/mongoose/tree/master/test) directory).
+
+### Running the tests
+- Open a terminal and navigate to the root of the project
+- execute `npm install` to install the necessary dependencies
+- execute `make test` to run the tests (we're using [mocha](http://visionmedia.github.com/mocha/))
+  - or to execute a single test `T="-g 'some regexp that matches the test description'" make test`
+  - any mocha flags can be specified with `T="..."`
 
 ### Documentation
 
@@ -33,3 +47,7 @@ If you'd like to preview your documentation changes, first commit your changes t
 ### Plugins website
 
 The [plugins](http://plugins.mongoosejs.com/) site is also an [open source project](https://github.com/aheckmann/mongooseplugins) that you can get involved with. Feel free to fork and improve it as well!
+
+### Sharing your projects
+
+All are welcome to share their creations which use mongoose on our [tumbler](http://mongoosejs.tumblr.com/). Just fill out the [simple submission form](http://mongoosejs.tumblr.com/submit).

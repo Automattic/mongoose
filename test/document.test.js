@@ -60,7 +60,7 @@ var schema = new Schema({
   , em: [em]
   , date: Date
 });
-TestDocument.prototype._setSchema(schema);
+TestDocument.prototype.$__setSchema(schema);
 
 schema.virtual('nested.agePlus2').get(function (v) {
   return this.nested.age + 2;
@@ -98,81 +98,90 @@ TestDocument.prototype.hooksTest = function(fn){
 
 describe('document:', function(){
 
-  it('test shortcut getters', function(done){
-    var doc = new TestDocument();
-    doc.init({
-        test    : 'test'
-      , oids    : []
-      , nested  : {
-            age   : 5
-          , cool  : DocumentObjectId.fromString('4c6c2d6240ced95d0e00003c')
-          , path  : 'my path'
-        }
+  describe('shortcut getters', function(){
+    it('return undefined for properties with a null/undefined parent object (gh-1326)', function(done){
+      var doc = new TestDocument;
+      doc.init({ nested: null });
+      assert.strictEqual(undefined, doc.nested.age);
+      done();
+    })
+
+    it('work', function(done){
+      var doc = new TestDocument();
+      doc.init({
+          test    : 'test'
+        , oids    : []
+        , nested  : {
+              age   : 5
+            , cool  : DocumentObjectId.createFromHexString('4c6c2d6240ced95d0e00003c')
+            , path  : 'my path'
+          }
+      });
+
+      assert.equal('test', doc.test);
+      assert.ok(doc.oids instanceof Array);
+      assert.equal(doc.nested.age, 5);
+      assert.equal(String(doc.nested.cool), '4c6c2d6240ced95d0e00003c');
+      assert.equal(7, doc.nested.agePlus2);
+      assert.equal('5my path', doc.nested.path);
+      doc.nested.setAge = 10;
+      assert.equal(10, doc.nested.age);
+      doc.nested.setr = 'set it';
+      assert.equal(doc.getValue('nested.setr'), 'set it setter');
+
+      var doc2 = new TestDocument();
+      doc2.init({
+          test    : 'toop'
+        , oids    : []
+        , nested  : {
+              age   : 2
+            , cool  : DocumentObjectId.createFromHexString('4cf70857337498f95900001c')
+            , deep  : { x: 'yay' }
+          }
+      });
+
+      assert.equal('toop', doc2.test);
+      assert.ok(doc2.oids instanceof Array);
+      assert.equal(doc2.nested.age, 2);
+
+      // GH-366
+      assert.equal(doc2.nested.bonk, undefined);
+      assert.equal(doc2.nested.nested, undefined);
+      assert.equal(doc2.nested.test, undefined);
+      assert.equal(doc2.nested.age.test, undefined);
+      assert.equal(doc2.nested.age.nested, undefined);
+      assert.equal(doc2.oids.nested, undefined);
+      assert.equal(doc2.nested.deep.x, 'yay');
+      assert.equal(doc2.nested.deep.nested, undefined);
+      assert.equal(doc2.nested.deep.cool, undefined);
+      assert.equal(doc2.nested2.yup.nested, undefined);
+      assert.equal(doc2.nested2.yup.nested2, undefined);
+      assert.equal(doc2.nested2.yup.yup, undefined);
+      assert.equal(doc2.nested2.yup.age, undefined);
+      assert.equal('object', typeof doc2.nested2.yup);
+
+      doc2.nested2.yup = {
+          age: 150
+        , yup: "Yesiree"
+        , nested: true
+      };
+
+      assert.equal(doc2.nested2.nested, undefined);
+      assert.equal(doc2.nested2.yup.nested, true);
+      assert.equal(doc2.nested2.yup.yup, "Yesiree");
+      assert.equal(doc2.nested2.yup.age, 150);
+      doc2.nested2.nested = "y";
+      assert.equal(doc2.nested2.nested, "y");
+      assert.equal(doc2.nested2.yup.nested, true);
+      assert.equal(doc2.nested2.yup.yup, "Yesiree");
+      assert.equal(150, doc2.nested2.yup.age);
+
+      assert.equal(String(doc2.nested.cool), '4cf70857337498f95900001c');
+
+      assert.ok(doc.oids !== doc2.oids);
+      done();
     });
-
-    assert.equal('test', doc.test);
-    assert.ok(doc.oids instanceof Array);
-    assert.equal(doc.nested.age, 5);
-    assert.equal(DocumentObjectId.toString(doc.nested.cool), '4c6c2d6240ced95d0e00003c');
-    assert.equal(7, doc.nested.agePlus2);
-    assert.equal('5my path', doc.nested.path);
-    doc.nested.setAge = 10;
-    assert.equal(10, doc.nested.age);
-    doc.nested.setr = 'set it';
-    assert.equal(doc.getValue('nested.setr'), 'set it setter');
-
-    var doc2 = new TestDocument();
-    doc2.init({
-        test    : 'toop'
-      , oids    : []
-      , nested  : {
-            age   : 2
-          , cool  : DocumentObjectId.fromString('4cf70857337498f95900001c')
-          , deep  : { x: 'yay' }
-        }
-    });
-
-    assert.equal('toop', doc2.test);
-    assert.ok(doc2.oids instanceof Array);
-    assert.equal(doc2.nested.age, 2);
-
-    // GH-366
-    assert.equal(doc2.nested.bonk, undefined);
-    assert.equal(doc2.nested.nested, undefined);
-    assert.equal(doc2.nested.test, undefined);
-    assert.equal(doc2.nested.age.test, undefined);
-    assert.equal(doc2.nested.age.nested, undefined);
-    assert.equal(doc2.oids.nested, undefined);
-    assert.equal(doc2.nested.deep.x, 'yay');
-    assert.equal(doc2.nested.deep.nested, undefined);
-    assert.equal(doc2.nested.deep.cool, undefined);
-    assert.equal(doc2.nested2.yup.nested, undefined);
-    assert.equal(doc2.nested2.yup.nested2, undefined);
-    assert.equal(doc2.nested2.yup.yup, undefined);
-    assert.equal(doc2.nested2.yup.age, undefined);
-    assert.equal('object', typeof doc2.nested2.yup);
-
-    doc2.nested2.yup = {
-        age: 150
-      , yup: "Yesiree"
-      , nested: true
-    };
-
-    assert.equal(doc2.nested2.nested, undefined);
-    assert.equal(doc2.nested2.yup.nested, true);
-    assert.equal(doc2.nested2.yup.yup, "Yesiree");
-    assert.equal(doc2.nested2.yup.age, 150);
-    doc2.nested2.nested = "y";
-    assert.equal(doc2.nested2.nested, "y");
-    assert.equal(doc2.nested2.yup.nested, true);
-    assert.equal(doc2.nested2.yup.yup, "Yesiree");
-    assert.equal(150, doc2.nested2.yup.age);
-
-    assert.equal(DocumentObjectId.toString(doc2.nested.cool), '4cf70857337498f95900001c');
-
-    assert.ok(doc.oids !== doc2.oids);
-    done();
-  });
+  })
 
   it('test shortcut setters', function(done){
     var doc = new TestDocument();
@@ -249,7 +258,7 @@ describe('document:', function(){
       , em: [{title:'asdf'}]
       , nested  : {
             age   : 5
-          , cool  : DocumentObjectId.fromString('4c6c2d6240ced95d0e00003c')
+          , cool  : DocumentObjectId.createFromHexString('4c6c2d6240ced95d0e00003c')
           , path  : 'my path'
         }
       , nested2: {}
@@ -260,7 +269,7 @@ describe('document:', function(){
     assert.equal(clone.test, 'test');
     assert.ok(clone.oids instanceof Array);
     assert.equal(5, clone.nested.age);
-    assert.equal(DocumentObjectId.toString(clone.nested.cool), '4c6c2d6240ced95d0e00003c');
+    assert.equal(clone.nested.cool.toString(), '4c6c2d6240ced95d0e00003c');
     assert.equal('5my path', clone.nested.path);
     assert.equal(undefined, clone.nested.agePlus2);
     assert.equal(undefined, clone.em[0].works);
@@ -270,7 +279,7 @@ describe('document:', function(){
     assert.equal('test', clone.test);
     assert.ok(clone.oids instanceof Array);
     assert.equal(5, clone.nested.age);
-    assert.equal(DocumentObjectId.toString(clone.nested.cool), '4c6c2d6240ced95d0e00003c');
+    assert.equal(clone.nested.cool.toString(), '4c6c2d6240ced95d0e00003c');
     assert.equal('my path', clone.nested.path);
     assert.equal(7, clone.nested.agePlus2);
     assert.equal(clone.em[0].works, 'em virtual works');
@@ -280,7 +289,7 @@ describe('document:', function(){
     assert.equal('test', clone.test);
     assert.ok(clone.oids instanceof Array);
     assert.equal(5, clone.nested.age);
-    assert.equal(DocumentObjectId.toString(clone.nested.cool),'4c6c2d6240ced95d0e00003c');
+    assert.equal(clone.nested.cool.toString(),'4c6c2d6240ced95d0e00003c');
     assert.equal('5my path', clone.nested.path);
     assert.equal(7, clone.nested.agePlus2);
     assert.equal('em virtual works', clone.em[0].works);
@@ -291,7 +300,7 @@ describe('document:', function(){
     assert.equal('test', clone.test);
     assert.ok(clone.oids instanceof Array);
     assert.equal(5, clone.nested.age);
-    assert.equal(DocumentObjectId.toString(clone.nested.cool),'4c6c2d6240ced95d0e00003c');
+    assert.equal(clone.nested.cool.toString(),'4c6c2d6240ced95d0e00003c');
 
     assert.equal('my path', clone.nested.path);
     assert.equal(7, clone.nested.agePlus2);
@@ -362,7 +371,7 @@ describe('document:', function(){
     assert.equal('test', clone.test);
     assert.ok(clone.oids instanceof Array);
     assert.equal(5, clone.nested.age);
-    assert.equal(DocumentObjectId.toString(clone.nested.cool),'4c6c2d6240ced95d0e00003c');
+    assert.equal(clone.nested.cool.toString(),'4c6c2d6240ced95d0e00003c');
     assert.equal('my path', clone.nested.path);
     assert.equal('Object', clone.em[0].constructor.name);
 
@@ -401,7 +410,7 @@ describe('document:', function(){
       , em: [{title:'asdf'}]
       , nested  : {
             age   : 5
-          , cool  : DocumentObjectId.fromString('4c6c2d6240ced95d0e00003c')
+          , cool  : DocumentObjectId.createFromHexString('4c6c2d6240ced95d0e00003c')
           , path  : 'my path'
         }
       , nested2: {}
@@ -418,7 +427,7 @@ describe('document:', function(){
     assert.equal('test', clone.test);
     assert.ok(clone.oids instanceof Array);
     assert.equal(5, clone.nested.age);
-    assert.equal(DocumentObjectId.toString(clone.nested.cool),'4c6c2d6240ced95d0e00003c');
+    assert.equal(clone.nested.cool.toString(),'4c6c2d6240ced95d0e00003c');
     assert.equal('my path', clone.nested.path);
     assert.equal(7, clone.nested.agePlus2);
     assert.equal('Object', clone.em[0].constructor.name);
@@ -486,7 +495,7 @@ describe('document:', function(){
     assert.equal('test', clone.test);
     assert.ok(clone.oids instanceof Array);
     assert.equal(5, clone.nested.age);
-    assert.equal(DocumentObjectId.toString(clone.nested.cool),'4c6c2d6240ced95d0e00003c');
+    assert.equal(clone.nested.cool.toString(),'4c6c2d6240ced95d0e00003c');
     assert.equal('my path', clone.nested.path);
     assert.equal('Object', clone.em[0].constructor.name);
 
@@ -519,7 +528,7 @@ describe('document:', function(){
 
   it('jsonifying an object', function(done){
     var doc = new TestDocument({ test: 'woot' })
-      , oidString = DocumentObjectId.toString(doc._id);
+      , oidString = doc._id.toString();
 
     // convert to json string
     var json = JSON.stringify(doc);
@@ -532,33 +541,42 @@ describe('document:', function(){
     done();
   });
 
-  it('calling update on document should relay to its model (gh-794)', function(done){
-    var db = start();
-    var Docs = new Schema({text:String});
-    var docs = db.model('docRelayUpdate', Docs);
-    var d = new docs({text:'A doc'});
-    var called = false;
-    d.save(function () {
-      var oldUpdate = docs.update;
-      docs.update = function (query, operation) {
-        assert.equal(1, Object.keys(query).length);
-        assert.equal(query._id, d._id);
-        assert.equal(1, Object.keys(operation).length);
-        assert.equal(1, Object.keys(operation.$set).length);
-        assert.equal(operation.$set.text, 'A changed doc');
-        called = true;
-        docs.update = oldUpdate;
-        oldUpdate.apply(docs, arguments);
-      };
-      d.update({$set :{text: 'A changed doc'}}, function (err) {
-        db.close();
-        assert.ifError(err);
-        assert.equal(true, called);
-        done();
+  describe('#update', function(){
+    it('returns a Query', function(done){
+      var mg = new mongoose.Mongoose;
+      var M = mg.model('doc#update', { s: String });
+      var doc = new M;
+      assert.ok(doc.update() instanceof mongoose.Query);
+      done();
+    })
+    it('calling update on document should relay to its model (gh-794)', function(done){
+      var db = start();
+      var Docs = new Schema({text:String});
+      var docs = db.model('docRelayUpdate', Docs);
+      var d = new docs({text:'A doc'});
+      var called = false;
+      d.save(function () {
+        var oldUpdate = docs.update;
+        docs.update = function (query, operation) {
+          assert.equal(1, Object.keys(query).length);
+          assert.equal(query._id, d._id);
+          assert.equal(1, Object.keys(operation).length);
+          assert.equal(1, Object.keys(operation.$set).length);
+          assert.equal(operation.$set.text, 'A changed doc');
+          called = true;
+          docs.update = oldUpdate;
+          oldUpdate.apply(docs, arguments);
+        };
+        d.update({$set :{text: 'A changed doc'}}, function (err) {
+          db.close();
+          assert.ifError(err);
+          assert.equal(true, called);
+          done();
+        });
       });
-    });
 
-  });
+    });
+  })
 
   it('toObject should not set undefined values to null', function(done){
     var doc = new TestDocument()
@@ -668,7 +686,7 @@ describe('document:', function(){
       , numbers : [4,5,6,7]
       , nested  : {
             age   : 5
-          , cool  : DocumentObjectId.fromString('4c6c2d6240ced95d0e00003c')
+          , cool  : DocumentObjectId.createFromHexString('4c6c2d6240ced95d0e00003c')
           , path  : 'my path'
           , deep  : { x: 'a string' }
         }
@@ -773,7 +791,7 @@ describe('document:', function(){
       , numbers : [4,5,6,7]
       , nested  : {
             age   : 5
-          , cool  : DocumentObjectId.fromString('4c6c2d6240ced95d0e00003c')
+          , cool  : DocumentObjectId.createFromHexString('4c6c2d6240ced95d0e00003c')
           , path  : 'my path'
           , deep  : { x: 'a string' }
         }
@@ -810,7 +828,7 @@ describe('document:', function(){
       , numbers : [4,5,6,7]
       , nested  : {
             age   : 5
-          , cool  : DocumentObjectId.fromString('4c6c2d6240ced95d0e00003c')
+          , cool  : DocumentObjectId.createFromHexString('4c6c2d6240ced95d0e00003c')
           , path  : 'my path'
           , deep  : { x: 'a string' }
         }
@@ -1083,6 +1101,7 @@ describe('document:', function(){
       var S = db.model('equals-S', new Schema({ _id: String }));
       var N = db.model('equals-N', new Schema({ _id: Number }));
       var O = db.model('equals-O', new Schema({ _id: Schema.ObjectId }));
+      var B = db.model('equals-B', new Schema({ _id: Buffer }));
 
       it('with string _ids', function(done){
         var s1 = new S({ _id: 'one' });
@@ -1106,6 +1125,12 @@ describe('document:', function(){
         o1 = new O({ _id: id });
         o2 = new O({ _id: id });
         assert.ok(o1.equals(o2));
+        done();
+      })
+      it('with Buffer _ids', function(done){
+        var n1 = new B({ _id: 0 });
+        var n2 = new B({ _id: 0 });
+        assert.ok(n1.equals(n2));
         done();
       })
 

@@ -10,7 +10,7 @@ html(lang='en')
   body
     a#forkbanner(href="http://github.com/learnboost/mongoose")
       img(style="position: absolute; top: 0; right: 0; border: 0;", src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png", alt="Fork me on GitHub")
-    #wrap
+    #wrap.homepage
       #header
         h1
           a(href="https://github.com/learnboost/mongoose", target="blank")
@@ -23,28 +23,29 @@ html(lang='en')
       #links
         ul
           li
-            a(href="docs/guide.html") Docs
+            a(href="docs/guide.html") Read the Docs
           li
-            a(href="http://plugins.mongoosejs.com") Plugins
-      p.blurb.
-        <a href="docs/middleware.html">Flexible</a>, <a href="docs/guide.html">schema based</a> and <a href="docs/queries.html">feature-rich</a>, mongoose solves common problems for <a href="#production">real-world</a> applications.
+            a(href="http://plugins.mongoosejs.com") Discover Plugins
+      #follow
+        ul
+          li
+            iframe(class="github-btn", src="http://ghbtns.com/github-btn.html?user=learnboost&amp;repo=mongoose&amp;type=watch&amp;count=true", allowtransparency="true", frameborder="0", scrolling="0", width="100px", height="20px")
+          li#version
+            span Version #{package.version}
+          li
+            iframe(class="github-btn", src="http://ghbtns.com/github-btn.html?user=learnboost&amp;repo=mongoose&amp;type=fork&amp;count=true", allowtransparency="true", frameborder="0", scrolling="0", width="100px", height="20px")
       #example
         :js
           var mongoose = require('mongoose');
-          var db = mongoose.createConnection('localhost', 'test');
+          mongoose.connect('mongodb://localhost/test');
 
-          var schema = mongoose.Schema({ name: 'string' });
-          var Cat = db.model('Cat', schema);
+          var Cat = mongoose.model('Cat', { name: String });
 
           var kitty = new Cat({ name: 'Zildjian' });
           kitty.save(function (err) {
             if (err) // ...
             console.log('meow');
           });
-      #install
-        h2 Installation
-        :bash
-          $ npm install mongoose
       #getstarted
         h2 Getting Started
         ul
@@ -53,18 +54,32 @@ html(lang='en')
       #support
         h2 Support
         ul
-          li irc: #mongoosejs on freenode
           li
-            a(href="http://groups.google.com/group/mongoose-orm") google group
+            a(href="http://stackoverflow.com/questions/tagged/mongoose") Stack Overflow
           li
             a(href="https://github.com/learnboost/mongoose/issues/") bug reports
           li
+            a(href="http://groups.google.com/group/mongoose-orm") help forum
+          li
             a(href="http://www.mongodb.org/display/DOCS/Technical+Support") 10gen
+          li irc: #mongoosejs on freenode
+      #announcements
+        h2 News
+        ul
+          li
+            a(href="https://twitter.com/mongoosejs") @mongoosejs
+          li
+            a(href="http://groups.google.com/group/mongoose-orm") Google Group
+      #changelog
+        h2 Changelog
+        ul
+          li
+            a(href="https://github.com/learnboost/mongoose/blob/master/History.md") Changelog
       #production
         h2
           | Production
           | 
-          a(href='docs/production.html', title='More production examples') View More
+          a(href='http://mongoosejs.tumblr.com/', target='_blank', title='More production examples') View More
         ul
           li
             a(href="http://storify.com/", alt="Storify")
@@ -84,7 +99,7 @@ html(lang='en')
           li
             a(href="https://bozuko.com/", alt="Bozuko")
               img(src="docs/images/apps/h_bozuko.jpg", alt="Bozuko")
-    p#footer Licensed under MIT. Copyright 2011-1012 <a href="http://learnboost.com">LearnBoost</a>.
+    p#footer Licensed under MIT. Copyright 2011-1013 <a href="http://learnboost.com">LearnBoost</a>.
     script.
       document.body.className = 'load';
     include docs/includes/googleanalytics

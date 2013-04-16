@@ -723,6 +723,61 @@ describe('Query', function(){
     });
   })
 
+  describe('populate', function(){
+    it('converts to PopulateOptions objects', function(done){
+      var q = new Query();
+      var o = {
+          path: 'yellow.brick'
+        , match: { bricks: { $lt: 1000 }}
+        , select: undefined
+        , model: undefined
+        , options: undefined
+        , _docs: {}
+      }
+      q.populate(o);
+      assert.deepEqual(o, q.options.populate['yellow.brick']);
+      done();
+    })
+
+    it('overwrites duplicate paths', function(done){
+      var q = new Query();
+      var o = {
+          path: 'yellow.brick'
+        , match: { bricks: { $lt: 1000 }}
+        , select: undefined
+        , model: undefined
+        , options: undefined
+        , _docs: {}
+      }
+      q.populate(o);
+      assert.equal(1, Object.keys(q.options.populate).length);
+      assert.deepEqual(o, q.options.populate['yellow.brick']);
+      q.populate('yellow.brick');
+      assert.equal(1, Object.keys(q.options.populate).length);
+      o.match = undefined;
+      assert.deepEqual(o, q.options.populate['yellow.brick']);
+      done();
+    })
+
+    it('accepts space delimited strings', function(done){
+      var q = new Query();
+      q.populate('yellow.brick dirt');
+      var o = {
+          path: 'yellow.brick'
+        , match: undefined
+        , select: undefined
+        , model: undefined
+        , options: undefined
+        , _docs: {}
+      }
+      assert.equal(2, Object.keys(q.options.populate).length);
+      assert.deepEqual(o, q.options.populate['yellow.brick']);
+      o.path = 'dirt';
+      assert.deepEqual(o, q.options.populate['dirt']);
+      done();
+    })
+  })
+
   describe('an empty query', function(){
     it('should not throw', function(done){
       var query = new Query();
@@ -1055,6 +1110,13 @@ describe('Query', function(){
         assert.equal(false, query.options.tailable);
         done();
       })
+      it('supports passing the `await` option', function(done){
+        var query = new Query();
+        query.tailable({ awaitdata: true });
+        assert.equal(true, query.options.tailable);
+        assert.equal(true, query.options.awaitdata);
+        done();
+      })
     });
 
     describe('comment', function(){
@@ -1108,42 +1170,52 @@ describe('Query', function(){
           var query = new Query();
           query.read('primary');
           assert.ok(query.options.readPreference instanceof P);
+          assert.ok(query.options.readPreference.isValid());
           assert.equal(query.options.readPreference.mode, 'primary');
 
           query.read('p');
           assert.ok(query.options.readPreference instanceof P);
+          assert.ok(query.options.readPreference.isValid());
           assert.equal(query.options.readPreference.mode, 'primary');
 
-          query.read('primaryPrefered');
+          query.read('primaryPreferred');
           assert.ok(query.options.readPreference instanceof P);
-          assert.equal(query.options.readPreference.mode, 'primaryPrefered');
+          assert.ok(query.options.readPreference.isValid());
+          assert.equal(query.options.readPreference.mode, 'primaryPreferred');
 
           query.read('pp');
           assert.ok(query.options.readPreference instanceof P);
-          assert.equal(query.options.readPreference.mode, 'primaryPrefered');
+          assert.ok(query.options.readPreference.isValid());
+          assert.equal(query.options.readPreference.mode, 'primaryPreferred');
 
           query.read('secondary');
           assert.ok(query.options.readPreference instanceof P);
+          assert.ok(query.options.readPreference.isValid());
           assert.equal(query.options.readPreference.mode, 'secondary');
 
           query.read('s');
           assert.ok(query.options.readPreference instanceof P);
+          assert.ok(query.options.readPreference.isValid());
           assert.equal(query.options.readPreference.mode, 'secondary');
 
-          query.read('secondaryPrefered');
+          query.read('secondaryPreferred');
           assert.ok(query.options.readPreference instanceof P);
-          assert.equal(query.options.readPreference.mode, 'secondaryPrefered');
+          assert.ok(query.options.readPreference.isValid());
+          assert.equal(query.options.readPreference.mode, 'secondaryPreferred');
 
           query.read('sp');
           assert.ok(query.options.readPreference instanceof P);
-          assert.equal(query.options.readPreference.mode, 'secondaryPrefered');
+          assert.ok(query.options.readPreference.isValid());
+          assert.equal(query.options.readPreference.mode, 'secondaryPreferred');
 
           query.read('nearest');
           assert.ok(query.options.readPreference instanceof P);
+          assert.ok(query.options.readPreference.isValid());
           assert.equal(query.options.readPreference.mode, 'nearest');
 
           query.read('n');
           assert.ok(query.options.readPreference instanceof P);
+          assert.ok(query.options.readPreference.isValid());
           assert.equal(query.options.readPreference.mode, 'nearest');
 
           done();
@@ -1155,9 +1227,10 @@ describe('Query', function(){
           var query = new Query();
           var tags = [{ dc: 'sf', s: 1}, { dc: 'jp', s: 2 }]
 
-          query.read('p', tags);
+          query.read('pp', tags);
           assert.ok(query.options.readPreference instanceof P);
-          assert.equal(query.options.readPreference.mode, 'primary');
+          assert.ok(query.options.readPreference.isValid());
+          assert.equal(query.options.readPreference.mode, 'primaryPreferred');
           assert.ok(Array.isArray(query.options.readPreference.tags));
           assert.equal(query.options.readPreference.tags[0].dc, 'sf');
           assert.equal(query.options.readPreference.tags[0].s, 1);
@@ -1206,7 +1279,7 @@ describe('Query', function(){
       q.setOptions({ read: ['s', [{dc:'eu'}]]});
 
       assert.equal(q.options.thing, 'cat');
-      assert.deepEqual(q.options.populate.fans, { fields: undefined, conditions: undefined, options: undefined, model: undefined });
+      assert.deepEqual(q.options.populate.fans, { path: 'fans', select: undefined, match: undefined, options: undefined, model: undefined, _docs: {} });
       assert.equal(q.options.batchSize, 10);
       assert.equal(q.options.limit, 4);
       assert.equal(q.options.skip, 3);

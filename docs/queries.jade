@@ -5,7 +5,7 @@ block content
   :markdown
     Documents can be retrieved through several static helper methods of [models](./models.html).
   :markdown
-    Any [model](./api.html#model_Model) method which [involves](./api.html#model_Model-find) [specifying](./api.html#model_Model-findById) [query](./api.html#model_Model-count) [conditions](./api.html#model_Model-update) can be executed two ways:
+    Any [model](./api.html#model_Model) method which [involves](./api.html#model_Model.find) [specifying](./api.html#model_Model.findById) [query](./api.html#model_Model.count) [conditions](./api.html#model_Model.update) can be executed two ways:
 
     When a `callback` function:
 
@@ -14,7 +14,7 @@ block content
 
     Let's take a look at what happens when passing a `callback`:
   :js
-    var Person = db.model('Person', yourSchema);
+    var Person = mongoose.model('Person', yourSchema);
 
     // find each person with a last name matching 'Ghost', selecting the `name` and `occupation` fields
     Person.findOne({ 'name.last': 'Ghost' }, 'name occupation', function (err, person) {
@@ -51,11 +51,11 @@ block content
 
   h3#refs References to other documents
   :markdown
-    There are no joins in MongoDB but sometimes we still want references to documents in other collections. This is where [query#populate](./api.html#query_Query-populate) comes in. Read more [here](./populate.html).
+    There are no joins in MongoDB but sometimes we still want references to documents in other collections. This is where [population](./populate.html) comes in. Read more about how to include documents from other collections in your query results [here](./api.html#query_Query-populate).
 
   h3 Streaming
   :markdown
-    Queries can be [streamed](http://nodejs.org/api/stream.html) from MongoDB to your application as well. Simply call the query's [stream](./api.html#query_Query-stream) method instead of [exec](./api.html#query_Query-exec) to return an instance of [QueryStream](./api.html#querystream_QueryStream).
+    Queries can be [streamed](http://nodejs.org/api/stream.html) from MongoDB to your application as well. Simply call the query's [stream](./api.html#query_Query-stream) method instead of [exec](./api.html#query_Query-exec) to return an instance of [QueryStream](./api.html#querystream_QueryStream). Note: QueryStreams are Node.js 0.8 style read streams not Node.js 0.10 style.
 
   h3#next Next Up
   :markdown

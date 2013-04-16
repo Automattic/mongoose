@@ -1,4 +1,326 @@
 
+3.6.5 / 2013-04-15
+==================
+
+  * fixed; strict:throw edge case using .set(path, val)
+  * fixed; schema.pathType() on some numbericAlpha paths
+  * fixed; numbericAlpha path versioning
+  * fixed; setting nested mixed paths #1418
+  * fixed; setting nested objects with null prop #1326
+  * fixed; regression in v3.6 population performance #1426 [vedmalex](https://github.com/vedmalex)
+  * fixed; read pref typos #1422 [kyano](https://github.com/kyano)
+  * docs; fix method example
+  * website; update faq
+  * website; add more deep links
+  * website; update poolSize docs
+  * website; add 3.6 release notes
+  * website; note about keepAlive
+
+3.6.4 / 2013-04-03
+==================
+
+  * fixed; +field conflict with $slice #1370
+  * fixed; nested deselection conflict #1333
+  * fixed; RangeError in ValidationError.toString() #1296
+  * fixed; do not save user defined transforms #1415
+  * tests; fix race condition
+
+3.6.3 / 2013-04-02
+==================
+
+  * fixed; setting subdocuments deeply nested fields #1394
+  * fixed; regression: populated streams #1411
+  * docs; mention hooks/validation with findAndModify
+  * docs; mention auth
+  * docs; add more links
+  * examples; add document methods example
+  * website; display "see" links for properties
+  * website; clean up homepage
+
+3.5.10 / 2013-04-02
+==================
+
+  * fixed; setting subdocuments deeply nested fields #1394
+  * fixed; do not alter schema arguments #1364
+
+3.6.2 / 2013-03-29
+==================
+
+  * fixed; corrupted sub-doc array #1408
+  * fixed; document#update returns a Query #1397
+  * docs; readpref strategy
+
+3.6.1 / 2013-03-27
+==================
+
+  * added; populate support to findAndModify varients #1395
+  * added; text index type to schematypes
+  * expose allowed index types as Schema.indexTypes
+  * fixed; use of `setMaxListeners` as path
+  * fixed; regression in node 0.6 on docs with > 10 arrays
+  * fixed; do not alter schema arguments #1364
+  * fixed; subdoc#ownerDocument() #1385
+  * website; change search id
+  * website; add search from google [jackdbernier](https://github.com/jackdbernier)
+  * website; fix link
+  * website; add 3.5.x docs release
+  * website; fix link
+  * docs; fix geometry
+  * docs; hide internal constructor
+  * docs; aggregation does not cast arguments #1399
+  * docs; querystream options
+  * examples; added for population
+
+3.6.0 / 2013-03-18
+==================
+
+  * changed; cast 'true'/'false' to boolean #1282 [mgrach](https://github.com/mgrach)
+  * changed; Buffer arrays can now contain nulls
+  * added; QueryStream transform option
+  * added; support for authSource driver option
+  * added; {mongoose,db}.modelNames()
+  * added; $push w/ $slice,$sort support (MongoDB 2.4)
+  * added; hashed index type (MongoDB 2.4)
+  * added; support for mongodb 2.4 geojson (MongoDB 2.4)
+  * added; value at time of validation error
+  * added; support for object literal schemas
+  * added; bufferCommands schema option
+  * added; allow auth option in connections #1360 [geoah](https://github.com/geoah)
+  * added; performance improvements to populate() [263ece9](https://github.com/LearnBoost/mongoose/commit/263ece9)
+  * added; allow adding uncasted docs to populated arrays and properties #570
+  * added; doc#populated(path) stores original populated _ids
+  * added; lean population #1260
+  * added; query.populate() now accepts an options object
+  * added; document#populate(opts, callback)
+  * added; Model.populate(docs, opts, callback)
+  * added; support for rich nested path population
+  * added; doc.array.remove(value) subdoc with _id value support #1278
+  * added; optionally allow non-strict sets and updates
+  * added; promises/A+ comformancy with [mpromise](https://github.com/aheckmann/mpromise)
+  * added; promise#then
+  * added; promise#end
+  * fixed; use of `model` as doc property
+  * fixed; lean population #1382
+  * fixed; empty object mixed defaults #1380
+  * fixed; populate w/ deselected _id using string syntax
+  * fixed; attempted save of divergent populated arrays #1334 related
+  * fixed; better error msg when attempting toObject as property name
+  * fixed; non population buffer casting from doc
+  * fixed; setting populated paths #570
+  * fixed; casting when added docs to populated arrays #570
+  * fixed; prohibit updating arrays selected with $elemMatch #1334
+  * fixed; pull / set subdoc combination #1303
+  * fixed; multiple bg index creation #1365
+  * fixed; manual reconnection to single mongod
+  * fixed; Constructor / version exposure #1124
+  * fixed; CastError race condition
+  * fixed; no longer swallowing misuse of subdoc#invalidate()
+  * fixed; utils.clone retains RegExp opts
+  * fixed; population of non-schema property
+  * fixed; allow updating versionKey #1265
+  * fixed; add EventEmitter props to reserved paths #1338
+  * fixed; can now deselect populated doc _ids #1331
+  * fixed; properly pass subtype to Binary in MongooseBuffer
+  * fixed; casting _id from document with non-ObjectId _id
+  * fixed; specifying schema type edge case { path: [{type: "String" }] }
+  * fixed; typo in schemdate #1329 [jplock](https://github.com/jplock)
+  * updated; driver to 1.2.14
+  * updated; muri to 0.3.1
+  * updated; mpromise to 0.2.1
+  * updated; mocha 1.8.1
+  * updated; mpath to 0.1.1
+  * deprecated; pluralization will die in 4.x
+  * refactor; rename private methods to something unusable as doc properties
+  * refactor MongooseArray#remove
+  * refactor; move expires index to SchemaDate #1328
+  * refactor; internal document properties #1171 #1184
+  * tests; added
+  * docs; indexes
+  * docs; validation
+  * docs; populate
+  * docs; populate
+  * docs; add note about stream compatibility with node 0.8
+  * docs; fix for private names
+  * docs; Buffer -> mongodb.Binary #1363
+  * docs; auth options
+  * docs; improved
+  * website; update FAQ
+  * website; add more api links
+  * website; add 3.5.x docs to prior releases
+  * website; Change mongoose-types to an active repo [jackdbernier](https://github.com/jackdbernier)
+  * website; compat with node 0.10
+  * website; add news section
+  * website; use T for generic type
+  * benchmark; make adjustable
+
+3.5.9 / 2013-03-15
+==================
+
+  * updated; driver to 1.2.14
+  * added; support for authSource driver option (mongodb 2.4)
+  * added; QueryStream transform option (node 0.10 helper)
+  * fixed; backport for saving required populated buffers
+  * fixed; pull / set subdoc combination #1303
+  * fixed; multiple bg index creation #1365
+  * test; added for saveable required populated buffers
+  * test; added for #1365
+  * test; add authSource test
+
+3.6.0rc1 / 2013-03-12
+======================
+
+  * refactor; rename private methods to something unusable as doc properties
+  * added; {mongoose,db}.modelNames()
+  * added; $push w/ $slice,$sort support (MongoDB 2.4)
+  * added; hashed index type (MongoDB 2.4)
+  * added; support for mongodb 2.4 geojson (MongoDB 2.4)
+  * added; value at time of validation error
+  * added; support for object literal schemas
+  * added; bufferCommands schema option
+  * added; allow auth option in connections #1360 [geoah](https://github.com/geoah)
+  * fixed; lean population #1382
+  * fixed; empty object mixed defaults #1380
+  * fixed; populate w/ deselected _id using string syntax
+  * fixed; attempted save of divergent populated arrays #1334 related
+  * fixed; better error msg when attempting toObject as property name
+  * fixed; non population buffer casting from doc
+  * fixed; setting populated paths #570
+  * fixed; casting when added docs to populated arrays #570
+  * fixed; prohibit updating arrays selected with $elemMatch #1334
+  * fixed; pull / set subdoc combination #1303
+  * fixed; multiple bg index creation #1365
+  * fixed; manual reconnection to single mongod
+  * fixed; Constructor / version exposure #1124
+  * fixed; CastError race condition
+  * fixed; no longer swallowing misuse of subdoc#invalidate()
+  * fixed; utils.clone retains RegExp opts
+  * fixed; population of non-schema property
+  * fixed; allow updating versionKey #1265
+  * fixed; add EventEmitter props to reserved paths #1338
+  * fixed; can now deselect populated doc _ids #1331
+  * updated; muri to 0.3.1
+  * updated; driver to 1.2.12
+  * updated; mpromise to 0.2.1
+  * deprecated; pluralization will die in 4.x
+  * docs; Buffer -> mongodb.Binary #1363
+  * docs; auth options
+  * docs; improved
+  * website; add news section
+  * benchmark; make adjustable
+
+3.5.8 / 2013-03-12
+==================
+
+  * added; auth option in connection [geoah](https://github.com/geoah)
+  * fixed; CastError race condition
+  * docs; add note about stream compatibility with node 0.8
+
+3.5.7 / 2013-02-22
+==================
+
+  * updated; driver to 1.2.13
+  * updated; muri to 0.3.1 #1347
+  * fixed; utils.clone retains RegExp opts #1355
+  * fixed; deepEquals RegExp support
+  * tests; fix a connection test
+  * website; clean up docs [afshinm](https://github.com/afshinm)
+  * website; update homepage
+  * website; migragtion: emphasize impact of strict docs #1264
+
+3.5.6 / 2013-02-14
+==================
+
+  * updated; driver to 1.2.12
+  * fixed; properly pass Binary subtype
+  * fixed; add EventEmitter props to reserved paths #1338
+  * fixed; use correct node engine version
+  * fixed; display empty docs as {} in log output #953 follow up
+  * improved; "bad $within $box argument" error message
+  * populate; add unscientific benchmark
+  * website; add stack overflow to help section
+  * website; use better code font #1336 [risseraka](https://github.com/risseraka)
+  * website; clarify where help is available
+  * website; fix source code links #1272 [floatingLomas](https://github.com/floatingLomas)
+  * docs; be specific about _id schema option #1103
+  * docs; add ensureIndex error handling example
+  * docs; README
+  * docs; CONTRIBUTING.md
+
+3.6.0rc0 / 2013-02-03
+======================
+
+  * changed; cast 'true'/'false' to boolean #1282 [mgrach](https://github.com/mgrach)
+  * changed; Buffer arrays can now contain nulls
+  * fixed; properly pass subtype to Binary in MongooseBuffer
+  * fixed; casting _id from document with non-ObjectId _id
+  * fixed; specifying schema type edge case { path: [{type: "String" }] }
+  * fixed; typo in schemdate #1329 [jplock](https://github.com/jplock)
+  * refactor; move expires index to SchemaDate #1328
+  * refactor; internal document properties #1171 #1184
+  * added; performance improvements to populate() [263ece9](https://github.com/LearnBoost/mongoose/commit/263ece9)
+  * added; allow adding uncasted docs to populated arrays and properties #570
+  * added; doc#populated(path) stores original populated _ids
+  * added; lean population #1260
+  * added; query.populate() now accepts an options object
+  * added; document#populate(opts, callback)
+  * added; Model.populate(docs, opts, callback)
+  * added; support for rich nested path population
+  * added; doc.array.remove(value) subdoc with _id value support #1278
+  * added; optionally allow non-strict sets and updates
+  * added; promises/A+ comformancy with [mpromise](https://github.com/aheckmann/mpromise)
+  * added; promise#then
+  * added; promise#end
+  * updated; mocha 1.8.1
+  * updated; muri to 0.3.0
+  * updated; mpath to 0.1.1
+  * updated; docs
+
+3.5.5 / 2013-01-29
+==================
+
+  * updated; driver to 1.2.11
+  * removed; old node < 0.6x shims
+  * fixed; documents with Buffer _ids equality
+  * fixed; MongooseBuffer properly casts numbers
+  * fixed; reopening closed connection on alt host/port #1287
+  * docs; fixed typo in Readme #1298 [rened](https://github.com/rened)
+  * docs; fixed typo in migration docs [Prinzhorn](https://github.com/Prinzhorn)
+  * docs; fixed incorrect annotation in SchemaNumber#min [bilalq](https://github.com/bilalq)
+  * docs; updated
+
+3.5.4 / 2013-01-07
+==================
+
+  * changed; "_pres" & "_posts" are now reserved pathnames #1261
+  * updated; driver to 1.2.8
+  * fixed; exception when reopening a replica set. #1263 [ethankan](https://github.com/ethankan)
+  * website; updated
+
+3.5.3 / 2012-12-26
+==================
+
+  * added; support for geo object notation #1257
+  * fixed; $within query casting with arrays
+  * fixed; unix domain socket support #1254
+  * updated; driver to 1.2.7
+  * updated; muri to 0.0.5
+
+3.5.2 / 2012-12-17
+==================
+
+  * fixed; using auth with replica sets #1253
+
+3.5.1 / 2012-12-12
+==================
+
+  * fixed; regression when using subdoc with `path` as pathname #1245 [daeq](https://github.com/daeq)
+  * fixed; safer db option checks
+  * updated; driver to 1.2.5
+  * website; add more examples
+  * website; clean up old docs
+  * website; fix prev release urls
+  * docs; clarify streaming with HTTP responses
+
 3.5.0 / 2012-12-10
 ==================
 
@@ -11,7 +333,7 @@
   * update; driver to 1.2.3
   * fixed; stackoverflow in setter #1234
   * fixed; utils.isObject()
-  * fixed; do not clobber user specified driver writeConern #1227
+  * fixed; do not clobber user specified driver writeConcern #1227
   * fixed; always pass current document to post hooks
   * fixed; throw error when user attempts to overwrite a model
   * fixed; connection.model only caches on connection #1209

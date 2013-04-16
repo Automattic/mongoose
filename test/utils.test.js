@@ -218,9 +218,11 @@ describe('utils', function(){
     assert.equal('primary', r.mode);
 
     var r = utils.readPref('pp');
-    assert.equal('primaryPrefered', r.mode);
-    var r = utils.readPref('primaryPrefered');
-    assert.equal('primaryPrefered', r.mode);
+    assert.ok(r.isValid());
+    assert.equal('primaryPreferred', r.mode);
+    var r = utils.readPref('primaryPreferred');
+    assert.ok(r.isValid());
+    assert.equal('primaryPreferred', r.mode);
 
     var r = utils.readPref('s');
     assert.equal('secondary', r.mode);
@@ -228,9 +230,11 @@ describe('utils', function(){
     assert.equal('secondary', r.mode);
 
     var r = utils.readPref('sp');
-    assert.equal('secondaryPrefered', r.mode);
-    var r = utils.readPref('secondaryPrefered');
-    assert.equal('secondaryPrefered', r.mode);
+    assert.ok(r.isValid());
+    assert.equal('secondaryPreferred', r.mode);
+    var r = utils.readPref('secondaryPreferred');
+    assert.ok(r.isValid());
+    assert.equal('secondaryPreferred', r.mode);
 
     var r = utils.readPref('n');
     assert.equal('nearest', r.mode);
@@ -238,8 +242,46 @@ describe('utils', function(){
     assert.equal('nearest', r.mode);
 
     var r = utils.readPref('explode');
-    assert.equal(false, r.isValid(r.model));
+    assert.equal(false, r.isValid());
     done();
+  })
+
+  describe('clone', function(){
+    it('retains RegExp options gh-1355', function(done){
+      var a = new RegExp('hello', 'igm');
+      assert.ok(a.global);
+      assert.ok(a.ignoreCase);
+      assert.ok(a.multiline);
+
+      var b = utils.clone(a);
+      assert.equal(b.source, a.source);
+      assert.equal(a.global, b.global);
+      assert.equal(a.ignoreCase, b.ignoreCase);
+      assert.equal(a.multiline, b.multiline);
+      done();
+    })
+  })
+
+  it('array.flatten', function(done){
+    var orig = [0,[1,2,[3,4,[5,[6]],7],8],9];
+    assert.deepEqual([0,1,2,3,4,5,6,7,8,9], utils.array.flatten(orig));
+    done();
+  })
+
+  describe('clone', function(){
+    it('retains RegExp options gh-1355', function(done){
+      var a = new RegExp('hello', 'igm');
+      assert.ok(a.global);
+      assert.ok(a.ignoreCase);
+      assert.ok(a.multiline);
+
+      var b = utils.clone(a);
+      assert.equal(b.source, a.source);
+      assert.equal(a.global, b.global);
+      assert.equal(a.ignoreCase, b.ignoreCase);
+      assert.equal(a.multiline, b.multiline);
+      done();
+    })
   })
 })
 

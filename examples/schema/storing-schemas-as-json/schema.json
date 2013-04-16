@@ -1,0 +1,8 @@
+{
+  "count": "number",
+  "unit": "number",
+  "description": "string",
+  "links": ["string"],
+  "created": "date",
+  "additive": "boolean"
+}

@@ -6,8 +6,8 @@ Mongoose is a [MongoDB](http://www.mongodb.org/) object modeling tool designed t
 
 [mongoosejs.com](http://mongoosejs.com/)
 
-## Try it live
-<a href="https://runnable.com/#learnboost/mongoose/code.js/launch" target="_blank"><img src="https://runnable.com/external/styles/assets/runnablebtn.png" style="width:67px;height:25px;"></a>
+## Live Examples
+<a href="https://runnable.com/mongoose" target="_blank"><img src="https://runnable.com/external/styles/assets/runnablebtn.png" style="width:67px;height:25px;"></a>
 
 ## Support
 

@@ -37,6 +37,12 @@ var Comment = new Schema({
   , content  : String
 });
 
+Comment.pre('save', function(next) {
+  //This will result in having a copy of the User inside the Comment document
+  //instead of just a reference.
+  this.populate('_creator', next);
+});
+
 /**
  * Blog post schema.
  */

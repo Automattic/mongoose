@@ -2152,6 +2152,7 @@ describe('model: populate:', function(){
       U = db.model('User', Schema({
           name: 'string'
         , comments: [{ type: Schema.ObjectId, ref: 'Comment' }]
+        , comment: { type: Schema.ObjectId, ref: 'Comment' }
       }), 'users_' + random());
 
       C.create({ body: 'comment 1', }, { body: 'comment 2' }, function (err, c1_, c2_) {
@@ -2159,7 +2160,10 @@ describe('model: populate:', function(){
         c1 = c1_;
         c2 = c2_;
 
-        U.create({ name: 'u1', comments: [c1, c2] }, function (err, u) {
+        U.create(
+            { name: 'u1', comments: [c1, c2], comment: c1 }
+          , { name: 'u2', comment: c2 }
+          , function (err, u) {
           assert.ifError(err);
           u1 = u;
           done();
@@ -2173,7 +2177,7 @@ describe('model: populate:', function(){
 
     describe('in a subdocument', function(){
       it('works', function(done){
-        U.find().populate('comments', { _id: 0 }).exec(function (err, docs) {
+        U.find({name:'u1'}).populate('comments', { _id: 0 }).exec(function (err, docs) {
           assert.ifError(err);
 
           var doc = docs[0];
@@ -2185,7 +2189,7 @@ describe('model: populate:', function(){
             assert.equal('number', typeof d._doc.__v);
           });
 
-          U.findOne().populate('comments', 'name -_id').exec(function (err, doc) {
+          U.findOne({name:'u1'}).populate('comments', 'name -_id').exec(function (err, doc) {
             assert.ifError(err);
             assert.equal(2, doc.comments.length);
             doc.comments.forEach(function (d) {
@@ -2193,7 +2197,7 @@ describe('model: populate:', function(){
               assert.ok(d.body.length);
               assert.equal('number', typeof d._doc.__v);
             });
-            U.findOne().populate('comments', '-_id').exec(function (err, doc) {
+            U.findOne({name:'u1'}).populate('comments', '-_id').exec(function (err, doc) {
               assert.ifError(err);
               assert.equal(2, doc.comments.length);
               doc.comments.forEach(function (d) {
@@ -2208,7 +2212,7 @@ describe('model: populate:', function(){
       })
 
       it('with lean', function(done){
-        U.find().lean().populate({ path: 'comments', select: { _id: 0 }, options: { lean: true }}).exec(function (err, docs) {
+        U.find({name:'u1'}).lean().populate({ path: 'comments', select: { _id: 0 }, options: { lean: true }}).exec(function (err, docs) {
           assert.ifError(err);
 
           var doc = docs[0];
@@ -2219,7 +2223,7 @@ describe('model: populate:', function(){
             assert.equal('number', typeof d.__v);
           });
 
-          U.findOne().lean().populate('comments', '-_id', null, { lean: true}).exec(function (err, doc) {
+          U.findOne({name:'u1'}).lean().populate('comments', '-_id', null, { lean: true}).exec(function (err, doc) {
             assert.ifError(err);
             assert.equal(2, doc.comments.length);
             doc.comments.forEach(function (d) {
@@ -2229,6 +2233,30 @@ describe('model: populate:', function(){
             });
             done();
           })
+        })
+      })
+    })
+
+    describe('of documents being populated', function(){
+      it('still works (gh-1441)', function(done){
+
+        U.find()
+          .select('-_id comment name')
+          .populate('comment', { _id: 0 }).exec(function (err, docs) {
+
+          assert.ifError(err);
+          assert.equal(2, docs.length);
+
+          docs.forEach(function (doc) {
+            assert.ok(doc.comment && doc.comment.body);
+            if ('u1' == doc.name) {
+              assert.equal('comment 1', doc.comment.body);
+            } else {
+              assert.equal('comment 2', doc.comment.body);
+            }
+          })
+
+          done();
         })
       })
     })

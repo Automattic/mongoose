@@ -1,4 +1,16 @@
 
+3.6.7 / 2013-04-19
+==================
+
+  * fixed; population regression in 3.6.6 #1444
+
+3.6.6 / 2013-04-18
+==================
+
+  * fixed; saving populated new documents #1442
+  * fixed; population regession in 3.6.5 #1441
+  * website; fix copyright #1439
+
 3.6.5 / 2013-04-15
 ==================
 

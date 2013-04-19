@@ -7,6 +7,7 @@ var start = require('./common')
   , assert = require('assert')
   , mongoose = start.mongoose
   , Schema = mongoose.Schema
+  , random = require('../lib/utils').random;
 
 /**
  * Test.
@@ -839,17 +840,14 @@ describe('connections:', function(){
         assert.ok(s instanceof mongoose.mongo.Mongos);
         assert.equal(2, s.servers.length);
 
-        var M = m.model('TestMultipleMongos', { name: String });
+        var M = m.model('TestMultipleMongos', { name: String }, 'test-multi-mongos-' + random());
         M.create({ name: 'works' }, function (err, d) {
           assert.ifError(err);
 
           M.findOne({ name: 'works' }, function (err, doc) {
             assert.ifError(err);
             assert.equal(doc.id, d.id);
-
-            m.connection.db.dropDatabase(function(){
-              m.disconnect(done);
-            });
+            m.disconnect(done);
           })
         })
       })

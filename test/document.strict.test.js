@@ -126,6 +126,7 @@ describe('document: strict mode:', function(){
     assert.ok(!s.shouldnt);
     done();
   })
+
   it('sub doc', function(done){
     var db = start();
 

@@ -1859,72 +1859,100 @@ describe('geo-spatial', function(){
       var db = start()
         , Test = db.model('Geo1', geoSchema, 'geospatial'+random());
 
-      Test.create({ loc: [ 10, 20 ]}, { loc: [ 40, 90 ]}, function (err) {
-        assert.ifError(err);
-        setTimeout(function () {
-          Test.find({ loc: { $near: [30, 40] }}, function (err, docs) {
-            db.close();
-            assert.ifError(err);
-            assert.equal(2, docs.length);
-            done();
-          });
-        }, 100);
-      });
+      var pending = 2;
+      function complete (err) {
+        if (complete.ran) return;
+        if (err) return done(complete.ran = err);
+        --pending || test();
+      }
+
+      Test.on('index', complete);
+      Test.create({ loc: [ 10, 20 ]}, { loc: [ 40, 90 ]}, complete);
+
+      function test () {
+        Test.find({ loc: { $near: [30, 40] }}, function (err, docs) {
+          db.close();
+          assert.ifError(err);
+          assert.equal(2, docs.length);
+          done();
+        });
+      }
     });
 
     it('$within arrays (gh-586)', function(done){
       var db = start()
         , Test = db.model('Geo2', geoSchema, collection + 'geospatial');
 
-      Test.create({ loc: [ 35, 50 ]}, { loc: [ -40, -90 ]}, function (err) {
-        assert.ifError(err);
-        setTimeout(function () {
-          Test.find({ loc: { '$within': { '$box': [[30,40], [40,60]] }}}, function (err, docs) {
-            db.close();
-            assert.ifError(err);
-            assert.equal(1, docs.length);
-            done()
-          });
-        }, 100);
-      });
+      var pending = 2;
+      function complete (err) {
+        if (complete.ran) return;
+        if (err) return done(complete.ran = err);
+        --pending || test();
+      }
+
+      Test.on('index', complete);
+      Test.create({ loc: [ 35, 50 ]}, { loc: [ -40, -90 ]}, complete);
+
+      function test () {
+        Test.find({ loc: { '$within': { '$box': [[30,40], [40,60]] }}}, function (err, docs) {
+          db.close();
+          assert.ifError(err);
+          assert.equal(1, docs.length);
+          done()
+        });
+      }
     });
 
     it('$nearSphere with arrays (gh-610)', function(done){
       var db = start()
         , Test = db.model('Geo3', geoSchema, "y"+random());
 
-      Test.create({ loc: [ 10, 20 ]}, { loc: [ 40, 90 ]}, function (err) {
-        assert.ifError(err);
-        setTimeout(function () {
-          Test.find({ loc: { $nearSphere: [30, 40] }}, function (err, docs) {
-            db.close();
-            assert.ifError(err);
-            assert.equal(2, docs.length);
-            done()
-          });
-        }, 100);
-      });
+      var pending = 2;
+      function complete (err) {
+        if (complete.ran) return;
+        if (err) return done(complete.ran = err);
+        --pending || test();
+      }
+
+      Test.on('index', complete);
+      Test.create({ loc: [ 10, 20 ]}, { loc: [ 40, 90 ]}, complete);
+
+      function test () {
+        Test.find({ loc: { $nearSphere: [30, 40] }}, function (err, docs) {
+          db.close();
+          assert.ifError(err);
+          assert.equal(2, docs.length);
+          done()
+        });
+      }
     });
 
     it('$maxDistance with arrays', function(done){
       var db = start()
         , Test = db.model('Geo4', geoSchema, "x"+random());
 
-      Test.create({ loc: [ 20, 80 ]}, { loc: [ 25, 30 ]}, function (err, docs) {
-        assert.ifError(err);
-        setTimeout(function () {
-          Test.find({ loc: { $near: [25, 31], $maxDistance: 1 }}, function (err, docs) {
+      var pending = 2;
+      function complete (err) {
+        if (complete.ran) return;
+        if (err) return done(complete.ran = err);
+        --pending || test();
+      }
+
+      Test.on('index', complete);
+      Test.create({ loc: [ 20, 80 ]}, { loc: [ 25, 30 ]}, complete);
+
+      function test () {
+        Test.find({ loc: { $near: [25, 31], $maxDistance: 1 }}, function (err, docs) {
+          assert.ifError(err);
+          assert.equal(1, docs.length);
+          Test.find({ loc: { $near: [25, 32], $maxDistance: 1 }}, function (err, docs) {
+            db.close();
             assert.ifError(err);
-            assert.equal(1, docs.length);
-            Test.find({ loc: { $near: [25, 32], $maxDistance: 1 }}, function (err, docs) {
-              db.close();
-              assert.ifError(err);
-              assert.equal(0, docs.length);
-              done();
-            });
+            assert.equal(0, docs.length);
+            done();
           });
-        }, 100);
-      });
+        });
+      }
     })
   })
 

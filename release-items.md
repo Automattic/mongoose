@@ -1,4 +1,3 @@
-
 ## mongoose release procedure
 
 1.  tests must pass
@@ -6,7 +5,7 @@
 3.  update History.md using `git changelog` or similar. list the related ticket(s) #<TICKET_NUMBER> as well as a link to the github user who fixed it if applicable.
 4.  git commit -m 'release x.x.x'
 5.  git tag x.x.x
-6.  git push origin <BRANCH> --tags && npm publish
+6.  git push origin BRANCH --tags && npm publish
 7.  update mongoosejs.com (see "updating the website" below)
 8.  announce to google groups - include the relevant change log and links to issues
 9.  tweet google group announcement from [@mongoosejs](https://twitter.com/mongoosejs)

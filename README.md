@@ -24,8 +24,8 @@ Check out the [plugins search site](http://plugins.mongoosejs.com/) to see hundr
 
 View all 90+ [contributors](https://github.com/learnboost/mongoose/graphs/contributors). Stand up and be counted as a [contributor](https://github.com/LearnBoost/mongoose/blob/master/CONTRIBUTING.md) too!
 
-## Try it live
-<a href="https://runnable.com/#learnboost/mongoose/code.js/launch" target="_blank"><img src="https://runnable.com/external/styles/assets/runnablebtn.png" style="width:67px;height:25px;"></a>
+## Live Examples
+<a href="https://runnable.com/mongoose" target="_blank"><img src="https://runnable.com/external/styles/assets/runnablebtn.png" style="width:67px;height:25px;"></a>
 
 ## Installation
 

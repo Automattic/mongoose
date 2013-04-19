@@ -3213,21 +3213,25 @@ describe('Model', function(){
       me.save(function (err) {
         assert.ifError(err);
 
-        Human.findById(me._id, function (err, doc){
-          assert.ifError(err);
-          assert.equal(doc.email,'rauchg@gmail.com');
-
-          var copycat = new Human({
-              name  : 'Lionel Messi'
-            , email : 'rauchg@gmail.com'
-          });
-
-          copycat.save(function (err) {
-            db.close();
+        // no confirmation the write occured b/c we disabled safe.
+        // wait a little bit to ensure the doc exists in the db
+        setTimeout(function(){
+          Human.findById(me._id, function (err, doc){
             assert.ifError(err);
-            done();
+            assert.equal(doc.email,'rauchg@gmail.com');
+
+            var copycat = new Human({
+                name  : 'Lionel Messi'
+              , email : 'rauchg@gmail.com'
+            });
+
+            copycat.save(function (err) {
+              db.close();
+              assert.ifError(err);
+              done();
+            });
           });
-        });
+        }, 100);
       });
     });
   });

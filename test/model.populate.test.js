@@ -2262,4 +2262,40 @@ describe('model: populate:', function(){
     })
   })
 
+  it('maps results back to correct document (gh-1444)', function(done){
+    var db = start();
+
+    var articleSchema = new Schema({
+        body: String,
+        mediaAttach: {type: Schema.ObjectId, ref : '1444-Media'},
+        author: String
+    });
+    var Article = db.model('1444-Article', articleSchema);
+
+    var mediaSchema = new Schema({
+        filename: String
+    });
+    var Media = db.model('1444-Media', mediaSchema);
+
+    Media.create({ filename: 'one' }, function (err, media) {
+      assert.ifError(err);
+
+      Article.create(
+          {body: 'body1', author: 'a'}
+        , {body: 'body2', author: 'a', mediaAttach: media._id}
+        , {body: 'body3', author: 'a'}, function (err) {
+        if (err) return done(err);
+
+        Article.find().populate('mediaAttach').exec(function (err, docs) {
+          db.close();
+          assert.ifError(err);
+
+          var a2 = docs.filter(function(d){return 'body2' == d.body})[0];
+          assert.equal(a2.mediaAttach.id, media.id);
+
+          done();
+        });
+      });
+    });
+  })
 });

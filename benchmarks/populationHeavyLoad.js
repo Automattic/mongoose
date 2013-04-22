@@ -634,7 +634,20 @@ var db = mongoose.createConnection('localhost', 'HeavyLoad', function (err) {
       // qry.sum = sum;
       // qry.avg = sum / rsLen;
     }
-    console.log(finalResults);
+    console.log();
+
+    console.log('reasonable results:', {
+        rowCnt: 25,
+        dicCnt: 100,
+        turns: 5,
+        'findOne lean=true': 34,
+        'findAll lean=true': 241.2,
+        'findOne lean=false': 84,
+        'findAll lean=false': 325 });
+
+    console.log();
+    console.log('actual results', finalResults);
+
     mongoose.disconnect();
   };
   var updated = {};

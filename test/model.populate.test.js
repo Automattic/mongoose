@@ -2308,8 +2308,8 @@ describe('model: populate:', function(){
         author: String
     }, {strict:false});
     var Article = db.model('1453-Article', articleSchema);
-    debugger
-    db.db.collection(Article.collection.name).insert({body:'body111', author:'a'}, function(){console.log(arguments)})
+    db.db.collection(Article.collection.name).insert({body:'body111', author:'a'}, function(){});
+
     var mediaSchema = new Schema({
         filename: String
     });

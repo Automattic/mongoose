@@ -4263,48 +4263,6 @@ describe('Model', function(){
     })
   });
 
-  describe('create()', function(){
-    it('accepts an array', function(done){
-      var db = start()
-        , BlogPost = db.model('BlogPost', collection);
-
-      BlogPost.create([{ title: 'hi'}, { title: 'bye'}], function (err, post1, post2) {
-        db.close();
-        assert.strictEqual(err, null);
-        assert.ok(post1.get('_id') instanceof DocumentObjectId);
-        assert.ok(post2.get('_id') instanceof DocumentObjectId);
-
-        assert.equal(post1.title,'hi');
-        assert.equal(post2.title,'bye');
-        done();
-      });
-    });
-
-    it('fires callback when passed 0 docs', function(done){
-      var db = start()
-        , BlogPost = db.model('BlogPost', collection);
-
-      BlogPost.create(function (err, a) {
-        db.close();
-        assert.strictEqual(err, null);
-        assert.ok(!a);
-        done();
-      });
-    });
-
-    it('fires callback when empty array passed', function(done){
-      var db = start()
-        , BlogPost = db.model('BlogPost', collection);
-
-      BlogPost.create([], function (err, a) {
-        db.close();
-        assert.strictEqual(err, null);
-        assert.ok(!a);
-        done();
-      });
-    });
-  });
-
   describe('non-schema adhoc property assignments', function(){
     it('are not saved', function(done){
       var db = start()

@@ -2298,4 +2298,42 @@ describe('model: populate:', function(){
       });
     });
   })
+
+  it('maps results back to correct document (gh-1453)', function(done){
+    var db = start();
+
+    var articleSchema = new Schema({
+        body: String,
+        mediaAttach: [{type: Schema.ObjectId, ref : '1453-Media'}],
+        author: String
+    }, {strict:false});
+    var Article = db.model('1453-Article', articleSchema);
+    db.db.collection(Article.collection.name).insert({body:'body111', author:'a'}, function(){});
+
+    var mediaSchema = new Schema({
+        filename: String
+    });
+    var Media = db.model('1453-Media', mediaSchema);
+
+    Media.create({ filename: 'one' }, function (err, media) {
+      assert.ifError(err);
+      db.db.collection
+      Article.create(
+          {body: 'body1', author: 'a'}
+        , {body: 'body2', author: 'a', mediaAttach: [media._id]}
+        , {body: 'body3', author: 'a'}, function (err) {
+        if (err) return done(err);
+        Article.find().populate('mediaAttach').lean().exec(function (err, docs) {
+          db.close();
+          assert.ifError(err);
+
+          var a1 = docs.filter(function(d){return 'body111' == d.body})[0];
+          assert.ok(Array.isArray(a1.mediaAttach));
+
+          done();
+        });
+      });
+    });
+  })
+
 });

@@ -89,11 +89,15 @@ describe('schema select option', function(){
         }
       }
 
-      S.findById(s).select('-thin -docs.bool').exec(cb);
-      S.find({ _id: s._id }).select('thin docs.bool').exec(cb);
-      S.findOneAndUpdate({ _id: s._id }, { thin: false }, function (err, s) {
-        cb(err, s);
-        S.findOneAndRemove({ _id: s._id }, cb);
+      S.findById(s).select('-thin -docs.bool').exec(function (err, res) {
+        cb(err, res);
+        S.find({ _id: s._id }).select('thin docs.bool').exec(function(err, res) {
+          cb(err, res);
+          S.findOneAndUpdate({ _id: s._id }, { thin: false }, function (err, s) {
+            cb(err, s);
+            S.findOneAndRemove({ _id: s._id }, cb);
+          });
+        });
       });
     });
   });

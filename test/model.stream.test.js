@@ -205,7 +205,7 @@ describe('query stream:', function(){
     function cb (err) {
       ++finished;
       setTimeout(function () {
-        assert.equal('no open connections', err.message);
+        assert.ok(/no open connections|Connection was destroyed by application/.test(err.message), err.message);
         assert.equal(i, 5);
         assert.equal(1, closed);
         assert.equal(1, finished);

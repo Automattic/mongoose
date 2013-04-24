@@ -3830,7 +3830,7 @@ describe('model', function(){
 
             var worked = false;
             t.save(function (err) {
-              assert.equal(err.message, 'no open connections');
+              assert.ok(/no open connections|Connection was destroyed by application/.test(err.message));
               worked = true;
             });
 

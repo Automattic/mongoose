@@ -1,7 +1,5 @@
 var start = require('./common')
 var db = start();
-db.on('open', function () {
-  db.db.dropDatabase(function () {
-    process.exit();
-  });
+db.once('open', function () {
+  db.db.dropDatabase(process.exit);
 });

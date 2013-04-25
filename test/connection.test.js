@@ -7,6 +7,7 @@ var start = require('./common')
   , assert = require('assert')
   , mongoose = start.mongoose
   , Schema = mongoose.Schema
+  , random = require('../lib/utils').random;
 
 /**
  * Test.
@@ -698,6 +699,17 @@ describe('connections:', function(){
       assert.ok(C.schema == A.schema);
 
       done();
+    })
+
+    describe('get existing model with not existing collection in db', function(){
+      it('must return exiting collection with all collection options', function(done){
+        mongoose.model('some-th-1458', new Schema({test:String},{capped:{size:1000, max:10}}));
+        var db = start();
+        var m = db.model('some-th-1458');
+        assert.equal(m.collection.opts.capped.size, 1000);
+        assert.equal(m.collection.opts.capped.max, 10);
+        done();
+      })
     })
 
     describe('passing collection name', function(){

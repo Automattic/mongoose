@@ -1,4 +1,11 @@
 
+3.6.8 / 2013-04-25
+==================
+
+  * updated; driver to 1.3.0
+  * fixed; connection.model should retain options #1458 [vedmalex](https://github.com/vedmalex)
+  * tests; 4-5 seconds faster
+
 3.6.7 / 2013-04-19
 ==================
 

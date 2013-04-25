@@ -734,4 +734,20 @@ describe('model query casting', function(){
       })
     })
   })
+
+  describe('$options', function(){
+    it('works on arrays gh-1462', function(done){
+      var opts = {};
+      opts.toString = function () {
+        return 'img'
+      }
+
+      var db = start()
+        , B = db.model(modelName, collection + random())
+        , result = B.find({}).cast(B, { tags: {$regex:/a/, $options: opts}});
+
+      assert.equal('img', result.tags.$options);
+      done();
+    })
+  })
 });

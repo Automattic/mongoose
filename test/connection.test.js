@@ -705,8 +705,8 @@ describe('connections:', function(){
         mongoose.model('some-th-1458', new Schema({test:String},{capped:{size:1000, max:10}}));
         var db = start();
         var m = db.model('some-th-1458');
-        assert.equal(m.collection.opts.capped.size, 1000);
-        assert.equal(m.collection.opts.capped.max, 10);
+        assert.equal(m.collection.opts.size, 1000);
+        assert.equal(m.collection.opts.max, 10);
         done();
       })
     })

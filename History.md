@@ -56,12 +56,6 @@
   * website; display "see" links for properties
   * website; clean up homepage
 
-3.5.10 / 2013-04-02
-==================
-
-  * fixed; setting subdocuments deeply nested fields #1394
-  * fixed; do not alter schema arguments #1364
-
 3.6.2 / 2013-03-29
 ==================
 
@@ -172,19 +166,6 @@
   * website; use T for generic type
   * benchmark; make adjustable
 
-3.5.9 / 2013-03-15
-==================
-
-  * updated; driver to 1.2.14
-  * added; support for authSource driver option (mongodb 2.4)
-  * added; QueryStream transform option (node 0.10 helper)
-  * fixed; backport for saving required populated buffers
-  * fixed; pull / set subdoc combination #1303
-  * fixed; multiple bg index creation #1365
-  * test; added for saveable required populated buffers
-  * test; added for #1365
-  * test; add authSource test
-
 3.6.0rc1 / 2013-03-12
 ======================
 
@@ -227,6 +208,69 @@
   * website; add news section
   * benchmark; make adjustable
 
+3.6.0rc0 / 2013-02-03
+======================
+
+  * changed; cast 'true'/'false' to boolean #1282 [mgrach](https://github.com/mgrach)
+  * changed; Buffer arrays can now contain nulls
+  * fixed; properly pass subtype to Binary in MongooseBuffer
+  * fixed; casting _id from document with non-ObjectId _id
+  * fixed; specifying schema type edge case { path: [{type: "String" }] }
+  * fixed; typo in schemdate #1329 [jplock](https://github.com/jplock)
+  * refactor; move expires index to SchemaDate #1328
+  * refactor; internal document properties #1171 #1184
+  * added; performance improvements to populate() [263ece9](https://github.com/LearnBoost/mongoose/commit/263ece9)
+  * added; allow adding uncasted docs to populated arrays and properties #570
+  * added; doc#populated(path) stores original populated _ids
+  * added; lean population #1260
+  * added; query.populate() now accepts an options object
+  * added; document#populate(opts, callback)
+  * added; Model.populate(docs, opts, callback)
+  * added; support for rich nested path population
+  * added; doc.array.remove(value) subdoc with _id value support #1278
+  * added; optionally allow non-strict sets and updates
+  * added; promises/A+ comformancy with [mpromise](https://github.com/aheckmann/mpromise)
+  * added; promise#then
+  * added; promise#end
+  * updated; mocha 1.8.1
+  * updated; muri to 0.3.0
+  * updated; mpath to 0.1.1
+  * updated; docs
+
+3.5.12 / 2013-04-25
+===================
+
+  * updated; driver to 1.3.0
+  * fixed; connection.model should retain options #1458 [vedmalex](https://github.com/vedmalex)
+  * fixed; read pref typos #1422 [kyano](https://github.com/kyano)
+
+3.5.11 / 2013-04-03
+==================
+
+  * fixed; +field conflict with $slice #1370
+  * fixed; RangeError in ValidationError.toString() #1296
+  * fixed; nested deselection conflict #1333
+  * remove time from Makefile
+
+3.5.10 / 2013-04-02
+==================
+
+  * fixed; setting subdocuments deeply nested fields #1394
+  * fixed; do not alter schema arguments #1364
+
+3.5.9 / 2013-03-15
+==================
+
+  * updated; driver to 1.2.14
+  * added; support for authSource driver option (mongodb 2.4)
+  * added; QueryStream transform option (node 0.10 helper)
+  * fixed; backport for saving required populated buffers
+  * fixed; pull / set subdoc combination #1303
+  * fixed; multiple bg index creation #1365
+  * test; added for saveable required populated buffers
+  * test; added for #1365
+  * test; add authSource test
+
 3.5.8 / 2013-03-12
 ==================
 
@@ -264,35 +308,6 @@
   * docs; add ensureIndex error handling example
   * docs; README
   * docs; CONTRIBUTING.md
-
-3.6.0rc0 / 2013-02-03
-======================
-
-  * changed; cast 'true'/'false' to boolean #1282 [mgrach](https://github.com/mgrach)
-  * changed; Buffer arrays can now contain nulls
-  * fixed; properly pass subtype to Binary in MongooseBuffer
-  * fixed; casting _id from document with non-ObjectId _id
-  * fixed; specifying schema type edge case { path: [{type: "String" }] }
-  * fixed; typo in schemdate #1329 [jplock](https://github.com/jplock)
-  * refactor; move expires index to SchemaDate #1328
-  * refactor; internal document properties #1171 #1184
-  * added; performance improvements to populate() [263ece9](https://github.com/LearnBoost/mongoose/commit/263ece9)
-  * added; allow adding uncasted docs to populated arrays and properties #570
-  * added; doc#populated(path) stores original populated _ids
-  * added; lean population #1260
-  * added; query.populate() now accepts an options object
-  * added; document#populate(opts, callback)
-  * added; Model.populate(docs, opts, callback)
-  * added; support for rich nested path population
-  * added; doc.array.remove(value) subdoc with _id value support #1278
-  * added; optionally allow non-strict sets and updates
-  * added; promises/A+ comformancy with [mpromise](https://github.com/aheckmann/mpromise)
-  * added; promise#then
-  * added; promise#end
-  * updated; mocha 1.8.1
-  * updated; muri to 0.3.0
-  * updated; mpath to 0.1.1
-  * updated; docs
 
 3.5.5 / 2013-01-29
 ==================

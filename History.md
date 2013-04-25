@@ -1,4 +1,11 @@
 
+3.5.12 / 2013-04-25
+==================
+
+  * updated; driver to 1.3.0
+  * fixed; connection.model should retain options #1458 [vedmalex](https://github.com/vedmalex)
+  * fixed; read pref typos #1422 [kyano](https://github.com/kyano)
+
 3.5.11 / 2013-04-03
 ==================
 

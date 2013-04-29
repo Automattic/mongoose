@@ -5792,25 +5792,7 @@ console.log(m.n) <span class="comment">// 10</span></code></pre>
 <span class="keyword">var</span> schema = <span class="keyword">new</span> Schema({ aNumber: Number, <span class="keyword">default</span>: <span class="string">"4.815162342"</span> })
 <span class="keyword">var</span> M = db.model(<span class="string">'M'</span>, schema)
 <span class="keyword">var</span> m = <span class="keyword">new</span> M;
-console.log(m.aNumber) <span class="comment">// 4.815162342</span>
-
-<span class="comment">// default unique objects for Mixed types:</span>
-<span class="keyword">var</span> schema = <span class="keyword">new</span> Schema({ mixed: Schema.Types.Mixed });
-schema.path(<span class="string">'mixed'</span>).<span class="keyword">default</span>(<span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
-  <span class="keyword">return</span> {};
-});
-
-<span class="comment">// if we don't use a function to return object literals for Mixed defaults,</span>
-<span class="comment">// each document will receive a reference to the same object literal creating</span>
-<span class="comment">// a "shared" object instance:</span>
-<span class="keyword">var</span> schema = <span class="keyword">new</span> Schema({ mixed: Schema.Types.Mixed });
-schema.path(<span class="string">'mixed'</span>).<span class="keyword">default</span>({});
-<span class="keyword">var</span> M = db.model(<span class="string">'M'</span>, schema);
-<span class="keyword">var</span> m1 = <span class="keyword">new</span> M;
-m1.mixed.added = <span class="number">1</span>;
-console.log(m1.mixed); <span class="comment">// { added: 1 }</span>
-<span class="keyword">var</span> m2 = <span class="keyword">new</span> M;
-console.log(m2.mixed); <span class="comment">// { added: 1 }</span></code></pre></div><hr class=""></div><div class="item method public"><h3 id="schematype_SchemaType-index"><a href="#schematype_SchemaType-index">SchemaType#index(<code>options</code>)</a></h3><p>Declares the index options for this schematype.</p><span class="showcode">show code</span><div class="sourcecode"><pre><code class="javascript">SchemaType.prototype.index = <span class="function"><span class="keyword">function</span> <span class="params">(options)</span> {</span>
+console.log(m.aNumber, <span class="keyword">typeof</span> m.aNumber) <span class="comment">// 4.815162342 "number"</span></code></pre></div><hr class=""></div><div class="item method public"><h3 id="schematype_SchemaType-index"><a href="#schematype_SchemaType-index">SchemaType#index(<code>options</code>)</a></h3><p>Declares the index options for this schematype.</p><span class="showcode">show code</span><div class="sourcecode"><pre><code class="javascript">SchemaType.prototype.index = <span class="function"><span class="keyword">function</span> <span class="params">(options)</span> {</span>
   <span class="keyword">this</span>._index = options;
   utils.expires(<span class="keyword">this</span>._index);
   <span class="keyword">return</span> <span class="keyword">this</span>;

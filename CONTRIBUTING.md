@@ -1,7 +1,5 @@
 ## Contributing to Mongoose
 
-### STOP!
-
 If you have a question about Mongoose (not a bug report) please post it to either [StackOverflow](http://stackoverflow.com/questions/tagged/mongoose), our [Google Group](http://groups.google.com/group/mongoose-orm), or on the #mongoosejs irc channel on freenode.
 
 ### Reporting bugs

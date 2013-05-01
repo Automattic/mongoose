@@ -2298,4 +2298,62 @@ describe('model: populate:', function(){
       });
     });
   })
+
+  describe('leaves Documents within Mixed properties alone (gh-1471)', function(){
+    var db;
+    var Cat;
+    var Litter;
+
+    before(function(){
+      db = start();
+      Cat = db.model('cats', new Schema({ name: String }));
+      var litterSchema = new Schema({name: String, cats: {}, o: {}, a: []});
+      Litter = db.model('litters', litterSchema);
+    });
+
+    after(function(done){
+      db.close(done);
+    });
+
+    it('when saving new docs', function(done){
+      Cat.create({name:'new1'},{name:'new2'},{name:'new3'}, function (err, a, b, c) {
+        if (err) return done(err);
+
+        Litter.create({
+            name: 'new'
+          , cats:[a]
+          , o: b
+          , a: [c]
+        }, confirm(done));
+      })
+    })
+
+    it('when saving existing docs 5T5', function(done){
+      Cat.create({name:'ex1'},{name:'ex2'},{name:'ex3'}, function (err, a, b, c) {
+        if (err) return done(err);
+
+        Litter.create({name:'existing'}, function (err, doc) {
+          doc.cats = [a];
+          doc.o = b;
+          doc.a = [c]
+          doc.save(confirm(done));
+        });
+      });
+    })
+
+    function confirm (done) {
+      return function (err, litter) {
+        if (err) return done(err);
+        Litter.findById(litter).lean().exec(function (err, doc) {
+          if (err) return done(err);
+          assert.ok(doc.o._id);
+          assert.ok(doc.cats[0]);
+          assert.ok(doc.cats[0]._id);
+          assert.ok(doc.a[0]);
+          assert.ok(doc.a[0]._id);
+          done();
+        })
+      }
+    }
+  })
 });

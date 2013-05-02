@@ -1,4 +1,12 @@
 
+3.6.9 / 2013-05-02
+==================
+
+  * fixed; depopulation of mixed documents #1471
+  * fixed; use of $options in array #1462
+  * tests; fix race condition
+  * docs; fix default example
+
 3.6.8 / 2013-04-25
 ==================
 

@@ -446,7 +446,7 @@ block content
 
   h4#versionKey option: versionKey
   :markdown
-    The `versionKey` is a property set on each document when first created by Mongoose. This keys value contains the internal [revision](http://aaronheckmann.posterous.com/mongoose-v3-part-1-versioning) of the document. The name of this document property is configurable. The default is `__v`. If this conflicts with your application you can configure as such:
+    The `versionKey` is a property set on each document when first created by Mongoose. This keys value contains the internal [revision](http://aaronheckmann.tumblr.com/post/48943525537/mongoose-v3-part-1-versioning) of the document. The name of this document property is configurable. The default is `__v`. If this conflicts with your application you can configure as such:
   :js
     var schema = new Schema({ name: 'string' });
     var Thing = mongoose.model('Thing', schema);
@@ -460,7 +460,7 @@ block content
     thing.save(); // { _somethingElse: 0, name: 'mongoose v3' }
 
   :markdown
-    Document versioning can also be disabled by setting the `versionKey` to false. _DO NOT disable versioning unless you [know what you are doing](http://aaronheckmann.posterous.com/mongoose-v3-part-1-versioning)._
+    Document versioning can also be disabled by setting the `versionKey` to false. _DO NOT disable versioning unless you [know what you are doing](http://aaronheckmann.tumblr.com/post/48943525537/mongoose-v3-part-1-versioning)._
   :js
     new Schema({..}, { versionKey: false });
     var Thing = mongoose.model('Thing', schema);

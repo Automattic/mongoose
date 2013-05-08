@@ -428,4 +428,31 @@ describe('versioning', function(){
       done();
     })
   })
+
+  describe('doc.increment()', function(){
+    it('works without any other changes (gh-1475)', function(done){
+      var db = start()
+        , V = db.model('Versioning')
+
+      var doc = new V;
+      doc.save(function (err) {
+        assert.ifError(err);
+        assert.equal(0, doc.__v);
+
+        doc.increment();
+
+        doc.save(function (err) {
+          assert.ifError(err);
+
+          assert.equal(1, doc.__v);
+
+          V.findById(doc, function (err, doc) {
+            assert.ifError(err);
+            assert.equal(1, doc.__v);
+            done();
+          })
+        })
+      })
+    })
+  })
 })

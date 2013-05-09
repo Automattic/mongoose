@@ -363,6 +363,11 @@ describe('schema', function(){
       Tobi.path('friends').doValidate(null, function(err){
         assert.ifError(err);
       });
+
+      Tobi.path('friends').min();
+      Tobi.path('friends').max();
+
+      assert.equal(Tobi.path('friends').validators.length, 0);
       done();
     });
 

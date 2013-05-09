@@ -253,6 +253,12 @@
   * updated; mpath to 0.1.1
   * updated; docs
 
+3.5.13 / 2013-05-09
+==================
+
+  * update driver to 1.3.3
+  * fixed; use of $options in array #1462
+
 3.5.12 / 2013-04-25
 ===================
 

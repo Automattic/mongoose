@@ -1,4 +1,12 @@
 
+3.6.10 / 2013-05-09
+==================
+
+  * update driver to 1.3.3
+  * fixed; increment() works without other changes #1475
+  * website; fix links to posterous
+  * docs; fix link #1472
+
 3.6.9 / 2013-05-02
 ==================
 

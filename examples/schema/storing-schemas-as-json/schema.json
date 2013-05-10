@@ -4,5 +4,6 @@
   "description": "string",
   "links": ["string"],
   "created": "date",
-  "additive": "boolean"
+  "additive": "boolean",
+  "user_id": "ObjectId"
 }

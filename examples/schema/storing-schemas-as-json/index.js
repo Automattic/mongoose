@@ -20,6 +20,7 @@ var threeFour = new TimeSignature({
   , additive: false
   , created: new Date
   , links: ["http://en.wikipedia.org/wiki/Time_signature"]
+  , user_id: "518d31a0ef32bbfa853a9814"
 });
 
 // print its description

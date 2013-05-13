@@ -260,6 +260,23 @@ describe('utils', function(){
       assert.equal(a.multiline, b.multiline);
       done();
     })
+
+    it('clones objects created with Object.create(null)', function(done){
+      var o = Object.create(null);
+      o.a = 0;
+      o.b = '0';
+      o.c = 1;
+      o.d = '1';
+
+      var out = utils.clone(o);
+      assert.strictEqual(0, out.a);
+      assert.strictEqual('0', out.b);
+      assert.strictEqual(1, out.c);
+      assert.strictEqual('1', out.d);
+      assert.equal(4, Object.keys(out).length);
+
+      done();
+    })
   })
 
   it('array.flatten', function(done){

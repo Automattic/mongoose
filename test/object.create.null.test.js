@@ -98,14 +98,10 @@ describe('is compatible with object created using Object.create(null) (gh-1484)'
     f.g = date;
     m.set('f', f);
 
-    var thing = Object.create(null);
-    thing.h = 'yes';
-    m.set('h.obj.thing', thing);
-
     assert.equal(9, m.b.c);
     assert.equal('hi i am a string', m.b.d[0].e);
     assert.equal(date, m.f.g);
-    assert.deepEqual('yes', m.h.obj.thing.h);
+
     done();
   })
 

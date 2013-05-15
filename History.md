@@ -1,4 +1,15 @@
 
+3.6.11 / 2013-05-15
+===================
+
+  * updated; driver to 1.3.5
+  * fixed; compat w/ Object.create(null) #1484 #1485
+  * fixed; cloning objects w/ missing constructors
+  * fixed; prevent multiple min number validators #1481 [nrako](https://github.com/nrako)
+  * docs; add doc.increment() example
+  * docs; add $size example
+  * docs; add "distinct" example
+
 3.6.10 / 2013-05-09
 ==================
 

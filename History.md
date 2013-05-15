@@ -264,6 +264,14 @@
   * updated; mpath to 0.1.1
   * updated; docs
 
+3.5.14 / 2013-05-15
+===================
+
+  * updated; driver to 1.3.5
+  * fixed; compat w/ Object.create(null) #1484 #1485
+  * fixed; cloning objects missing constructors
+  * fixed; prevent multiple min number validators #1481 [nrako](https://github.com/nrako]
+
 3.5.13 / 2013-05-09
 ==================
 

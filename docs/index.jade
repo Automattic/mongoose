@@ -52,7 +52,7 @@ html(lang='en')
         :markdown
           So far so good. We've got a schema with one property, `name`, which will be a  `String`. The next step is compiling our schema into a [Model](/docs/models.html).
         :js
-          var Kitten = mongoose.model('Kitten', kittySchema)
+          var Kitten = db.model('Kitten', kittySchema)
         :markdown
           A model is a class with which we construct documents.
           In this case, each document will be a kitten with properties and behaviors as declared in our schema.

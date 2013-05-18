@@ -38,7 +38,7 @@ block content
     Finding documents is easy with Mongoose, which supports the [rich](http://www.mongodb.org/display/DOCS/Advanced+Queries) query syntax of MongoDB. Documents can be retreived using each `models` [find](./api.html#model_Model.find), [findById](./api.html#model_Model.findById), [findOne](./api.html#model_Model.findOne), or [where](./api.html#model_Model.where) static methods.
 
   :js
-    Tank.find({ type: 'small' }).where('createdDate').gt(oneYearAgo).exec(callback);
+    Tank.find({ size: 'small' }).where('createdDate').gt(oneYearAgo).exec(callback);
   :markdown
     See the chapter on [querying](./queries.html) for more details on how to use the [Query](./api.html#query-js) api.
   h3 Removing

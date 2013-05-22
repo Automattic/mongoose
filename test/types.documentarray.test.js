@@ -149,12 +149,11 @@ describe('types.documentarray', function(){
     assert.equal(false, threw);
 
     // test when _id is a populated document
-
     var Custom = new Schema({
         title: { type: String }
     });
 
-    var Custom1 = new Schema({});
+    var Custom1 = new Schema({}, { id: false });
 
     var Subdocument = TestDoc(Custom);
     var Subdocument1 = TestDoc(Custom1);
@@ -162,7 +161,7 @@ describe('types.documentarray', function(){
     var sub = new Subdocument1();
     var sub1 = new Subdocument1();
     sub.title = 'Hello again to all my friends';
-    var id = sub1.id;
+    var id = sub1._id.toString();
     setValue('_id', sub1 , sub);
 
     var a = new MongooseDocumentArray([sub]);

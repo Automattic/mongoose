@@ -6,11 +6,13 @@
 var start = require('./common')
   , mongoose = require('./common').mongoose
   , random = require('../lib/utils').random
+  , setValue = require('../lib/utils').setValue
   , MongooseArray = mongoose.Types.Array
   , MongooseDocumentArray = mongoose.Types.DocumentArray
   , EmbeddedDocument = require('../lib/types/embedded')
   , DocumentArray = require('../lib/types/documentarray')
   , Schema = mongoose.Schema
+  , ObjectId = Schema.ObjectId
   , assert = require('assert')
   , collection = 'types.documentarray_' + random()
 
@@ -145,6 +147,25 @@ describe('types.documentarray', function(){
       threw = err;
     }
     assert.equal(false, threw);
+
+    // test when _id is a populated document
+    var Custom = new Schema({
+        title: { type: String }
+    });
+
+    var Custom1 = new Schema({}, { id: false });
+
+    var Subdocument = TestDoc(Custom);
+    var Subdocument1 = TestDoc(Custom1);
+
+    var sub = new Subdocument1();
+    var sub1 = new Subdocument1();
+    sub.title = 'Hello again to all my friends';
+    var id = sub1._id.toString();
+    setValue('_id', sub1 , sub);
+
+    var a = new MongooseDocumentArray([sub]);
+    assert.equal(a.id(id).title, 'Hello again to all my friends');
 
     done();
   })

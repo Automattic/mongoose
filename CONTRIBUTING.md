@@ -12,6 +12,13 @@ If you have a question about Mongoose (not a bug report) please post it to eithe
   - _The source of this project is written in javascript, not coffeescript, therefore your bug reports should be written in javascript_. 
   - In general, adding a "+1" comment to an existing issue does little to help get it resolved. A better way is to submit a well documented pull request with clean code and passing tests.
 
+### Requesting new features
+
+- Before opening a new issue, look for existing [issues](https://github.com/learnboost/mongoose/issues) to avoid duplication. If the issue does not yet exist, [create one](https://github.com/learnboost/mongoose/issues/new).
+- Please describe a use case for it
+- it would be ideal to include test cases as well
+- In general, adding a "+1" comment to an existing issue does little to help get it resolved. A better way is to submit a well documented pull request with clean code and passing tests.
+
 ### Fixing bugs / Adding features
 
 - Before starting to write code, look for existing [issues](https://github.com/learnboost/mongoose/issues). That way you avoid working on something that might not be of interest or that has been addressed already in a different branch. You can create a new issue [here](https://github.com/learnboost/mongoose/issues/new).

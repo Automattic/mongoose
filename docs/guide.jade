@@ -288,9 +288,15 @@ block content
 
     // disabled _id
     var schema = new Schema({ name: String }, { _id: false });
+
+    // Don't set _id to false after schema construction as in
+    // var schema = new Schema({ name: String });
+    // schema.set('_id', false);
+
     var Page = mongoose.model('Page', schema);
     var p = new Page({ name: 'mongodb.org' });
     console.log(p); // { name: 'mongodb.org' }
+
     // MongoDB will create the _id when inserted
     p.save(function (err) {
       if (err) return handleError(err);

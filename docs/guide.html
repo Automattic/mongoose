@@ -91,9 +91,15 @@ console.log(p); <span class="comment">// { _id: '50341373e894ad16347efe01', name
 
 <span class="comment">// disabled _id</span>
 <span class="keyword">var</span> schema = <span class="keyword">new</span> Schema({ name: String }, { _id: <span class="literal">false</span> });
+
+<span class="comment">// Don't set _id to false after schema construction as in</span>
+<span class="comment">// var schema = new Schema({ name: String });</span>
+<span class="comment">// schema.set('_id', false);</span>
+
 <span class="keyword">var</span> Page = mongoose.model(<span class="string">'Page'</span>, schema);
 <span class="keyword">var</span> p = <span class="keyword">new</span> Page({ name: <span class="string">'mongodb.org'</span> });
 console.log(p); <span class="comment">// { name: 'mongodb.org' }</span>
+
 <span class="comment">// MongoDB will create the _id when inserted</span>
 p.save(<span class="function"><span class="keyword">function</span> <span class="params">(err)</span> {</span>
   <span class="keyword">if</span> (err) <span class="keyword">return</span> handleError(err);

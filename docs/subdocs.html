@@ -21,15 +21,15 @@ parent.save(<span class="function"><span class="keyword">function</span> <span c
 <span class="keyword">var</span> parent = <span class="keyword">new</span> Parent;
 
 <span class="comment">// create a comment</span>
-post.children.push({ name: <span class="string">'Liesl'</span> });
-<span class="keyword">var</span> doc = post.children[<span class="number">0</span>];
-console.log(doc) <span class="comment">// { _id: '501d86090d371bab2c0341c5', name: 'Liesl' }</span>
-doc.isNew; <span class="comment">// true</span>
+parent.children.push({ name: <span class="string">'Liesl'</span> });
+<span class="keyword">var</span> subdoc = parent.children[<span class="number">0</span>];
+console.log(subdoc) <span class="comment">// { _id: '501d86090d371bab2c0341c5', name: 'Liesl' }</span>
+subdoc.isNew; <span class="comment">// true</span>
 
-post.save(<span class="function"><span class="keyword">function</span> <span class="params">(err)</span> {</span>
+parent.save(<span class="function"><span class="keyword">function</span> <span class="params">(err)</span> {</span>
   <span class="keyword">if</span> (err) <span class="keyword">return</span> handleError(err)
   console.log(<span class="string">'Success!'</span>);
-});</code></pre><p>Sub-docs may also be created without adding them to the array by using the <a href="./api.html#types_documentarray_MongooseDocumentArray-create">create</a> method of MongooseArrays.</p><pre><code class="javascript"><span class="keyword">var</span> newdoc = post.children.create({ name: <span class="string">'Aaron'</span> });
+});</code></pre><p>Sub-docs may also be created without adding them to the array by using the <a href="./api.html#types_documentarray_MongooseDocumentArray-create">create</a> method of MongooseArrays.</p><pre><code class="javascript"><span class="keyword">var</span> newdoc = parent.children.create({ name: <span class="string">'Aaron'</span> });
 </code></pre><h3>Removing docs</h3><p>Each sub-document has it&#39;s own <a href="./api.html#types_embedded_EmbeddedDocument-remove">remove</a> method.</p><pre><code class="javascript"><span class="keyword">var</span> doc = parent.children.id(id).remove();
 parent.save(<span class="function"><span class="keyword">function</span> <span class="params">(err)</span> {</span>
   <span class="keyword">if</span> (err) <span class="keyword">return</span> handleError(err);

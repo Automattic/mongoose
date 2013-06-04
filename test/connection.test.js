@@ -604,7 +604,8 @@ describe('connections:', function(){
     })
 
     it('event fires with one listener', function(done){
-      var db= start({ uri: 'mongodb://localasdfads/fakeeee', noErrorListener: 1 })
+      this.timeout(1000);
+      var db= start({ uri: 'mongodb://localasdfads/fakeeee?connectTimeoutMS=500', noErrorListener: 1 })
       db.on('error', function () {
         // this callback has no params which triggered the bug #759
         done();
@@ -612,7 +613,8 @@ describe('connections:', function(){
     })
 
     it('should occur without hanging when password with special chars is used (gh-460)', function (done) {
-      var db = mongoose.createConnection('mongodb://aaron:psw?@localhost/fake', function (err) {
+      this.timeout(1000);
+      var db = mongoose.createConnection('mongodb://aaron:ps#w@localhost/fake?connectTimeoutMS=500', function (err) {
         assert.ok(err);
         db.close();
         done();

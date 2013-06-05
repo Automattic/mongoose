@@ -1,5 +1,5 @@
 
-var Schema = require('mongoose').Schema;
+var Schema = require('../../../lib').Schema;
 var mySchema = Schema({ name: String });
 
 // db is global

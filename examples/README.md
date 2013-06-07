@@ -9,7 +9,7 @@ To run:
 
 Goal is to show:
 
-- global schemas
+- ~~global schemas~~
 - GeoJSON schemas / use (with crs)
 - text search
 - lean querires

@@ -19,7 +19,7 @@ Goal is to show:
 - methods and statics on subdocs
 - custom types
 - querybuilder
-- promises
+- ~~promises~~
 - accessing driver collection, db
 - connecting to replica sets
 - connecting to sharded clusters

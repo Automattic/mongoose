@@ -3,7 +3,7 @@
   "private": "true",
   "version": "0.0.0",
   "description": "deps for map reduce example",
-  "main": "promise.js",
+  "main": "mapreduce.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },

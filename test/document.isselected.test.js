@@ -308,6 +308,30 @@ describe('document', function(){
     assert.ok(doc.isSelected('em.body'));
     assert.ok(doc.isSelected('em.nonpath'));
 
+    var selection = {
+        '_id': 1,
+        'n': 1
+    }
+
+    doc = new TestDocument(undefined, selection);
+    doc.init({
+        test    : 'test'
+      , numbers : [4,5,6,7]
+      , nested  : {
+            age   : 5
+          , cool  : DocumentObjectId.createFromHexString('4c6c2d6240ced95d0e00003c')
+          , path  : 'my path'
+          , deep  : { x: 'a string' }
+        }
+      , notapath: 'i am not in the schema'
+    });
+
+    assert.ok(doc.isSelected('_id'));
+    assert.ok(doc.isSelected('n'));
+    assert.ok(!doc.isSelected('nested'));
+    assert.ok(!doc.isSelected('nested.age'));
+    assert.ok(!doc.isSelected('numbers'));
+
     done();
   })
 })

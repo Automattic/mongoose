@@ -870,7 +870,7 @@ describe('model: querying:', function(){
       });
     });
 
-    it.only('works when comparing $ne with single value against an array', function(done){
+    it('works when comparing $ne with single value against an array', function(done){
       var db = start();
       var schema = new Schema({
           ids: [Schema.ObjectId]

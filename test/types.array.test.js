@@ -1521,6 +1521,12 @@ describe('types array', function(){
     })
   })
   describe('multidimensional arrays', function() {
+    function save (doc, cb) {
+      doc.save(function (err) {
+        if (err) return cb(err);
+        doc.constructor.findById(doc._id, cb);
+      })
+    }
     it('works', function(done) {
       var a = new MongooseArray([ [[1,2],[3,4]], [[5,6],[7,8]] ]);
 
@@ -1564,6 +1570,44 @@ describe('types array', function(){
           done();
         });
       });
+    });
+    it('works with buffers', function(done) {
+      var db = start();
+
+      var schema = new Schema({ arr : [[Buffer]] });
+      var B = db.model('B', schema);
+
+      var m = new B({ arr: [[[0], new Buffer(1)], [[0], new Buffer(1)]] });
+      save(m, function (err, doc) {
+        assert.ifError(err);
+        assert.equal(2, doc.arr.length);
+        assert.ok(doc.arr[0][0] instanceof MongooseBuffer);
+        assert.ok(doc.arr[0][1] instanceof MongooseBuffer);
+        assert.ok(doc.arr[1][0] instanceof MongooseBuffer);
+        assert.ok(doc.arr[1][1] instanceof MongooseBuffer);
+        doc.arr.set(0, [[0], "nice"]);
+        assert.equal(2, doc.arr.length);
+        assert.ok(doc.arr[0][1] instanceof MongooseBuffer);
+        assert.equal("nice", doc.arr[0][1].toString('utf8'));
+        doc.arr.set(doc.arr.length, [[11]]);
+        assert.equal(3, doc.arr.length);
+        assert.equal(11, doc.arr[2][0][0]);
+
+        save(doc, function (err, doc) {
+          assert.ifError(err);
+          assert.equal(3, doc.arr.length);
+          assert.ok(doc.arr[0][0] instanceof MongooseBuffer);
+          assert.ok(doc.arr[0][1] instanceof MongooseBuffer);
+          assert.ok(doc.arr[1][0] instanceof MongooseBuffer);
+          assert.ok(doc.arr[1][1] instanceof MongooseBuffer);
+          assert.ok(doc.arr[2][0] instanceof MongooseBuffer);
+          assert.equal('\u0000', doc.arr[0][0].toString());
+          assert.equal("nice", doc.arr[0][1].toString());
+          assert.equal(11, doc.arr[2][0][0]);
+          done();
+        });
+      });
+
     });
   });
 })

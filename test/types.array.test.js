@@ -1525,6 +1525,8 @@ describe('types array', function(){
       var a = new MongooseArray([ [[1,2],[3,4]], [[5,6],[7,8]] ]);
 
       assert.ok(a instanceof MongooseArray);
+      assert.ok(a[0] instanceof Array);
+      assert.ok(a[0][0] instanceof Array);
       done();
     });
     it('supports indexing', function(done) {
@@ -1533,6 +1535,35 @@ describe('types array', function(){
       
       assert.equal(a[0][0][0], 1);
       done();
+    });
+    it('works like it should with the database', function(done) {
+      var db = start();
+
+      var schema = new Schema({ mult : [[Number]] });
+
+      var M = mongoose.model('M', schema);
+
+      var test = new M({ mult : [[1,2],[3,4]]});
+
+      test.mult.push([5,6]);
+      test.save(function (err) {
+        assert.ifError(err);
+
+        M.find({}, function(err, results) {
+          assert.ifError(err);
+
+          assert.equal(results.length, 1);
+          var val = results[0];
+          assert.equal(val[0][0], 1);
+          assert.equal(val[0][1], 2);
+          assert.equal(val[1][0], 3);
+          assert.equal(val[1][1], 4);
+          assert.equal(val[2][0], 5);
+          assert.equal(val[2][1], 1);
+
+          done();
+        });
+      });
     });
   });
 })

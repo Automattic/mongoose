@@ -484,7 +484,7 @@ describe('types array', function(){
         });
       });
     });
-    
+
   })
 
   describe('$pop()', function(){
@@ -1530,9 +1530,9 @@ describe('types array', function(){
       done();
     });
     it('supports indexing', function(done) {
-      
+
       var a = new MongooseArray([ [[1,2],[3,4]], [[5,6],[7,8]] ]);
-      
+
       assert.equal(a[0][0][0], 1);
       done();
     });
@@ -1541,7 +1541,7 @@ describe('types array', function(){
 
       var schema = new Schema({ mult : [[Number]] });
 
-      var M = mongoose.model('M', schema);
+      var M = db.model('M', schema);
 
       var test = new M({ mult : [[1,2],[3,4]]});
 
@@ -1554,12 +1554,12 @@ describe('types array', function(){
 
           assert.equal(results.length, 1);
           var val = results[0];
-          assert.equal(val[0][0], 1);
-          assert.equal(val[0][1], 2);
-          assert.equal(val[1][0], 3);
-          assert.equal(val[1][1], 4);
-          assert.equal(val[2][0], 5);
-          assert.equal(val[2][1], 1);
+          assert.equal(val.mult[0][0], 1);
+          assert.equal(val.mult[0][1], 2);
+          assert.equal(val.mult[1][0], 3);
+          assert.equal(val.mult[1][1], 4);
+          assert.equal(val.mult[2][0], 5);
+          assert.equal(val.mult[2][1], 6);
 
           done();
         });

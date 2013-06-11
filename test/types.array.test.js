@@ -1520,5 +1520,20 @@ describe('types array', function(){
       })
     })
   })
+  describe('multidimensional arrays', function() {
+    it('works', function(done) {
+      var a = new MongooseArray([ [[1,2],[3,4]], [[5,6],[7,8]] ]);
+
+      assert.ok(a instanceof MongooseArray);
+      done();
+    });
+    it('supports indexing', function(done) {
+      
+      var a = new MongooseArray([ [[1,2],[3,4]], [[5,6],[7,8]] ]);
+      
+      assert.equal(a[0][0][0], 1);
+      done();
+    });
+  });
 })
 

@@ -870,7 +870,7 @@ describe('model: querying:', function(){
       });
     });
 
-    it('works when comparing $ne with single value against an array', function(done){
+    it.only('works when comparing $ne with single value against an array', function(done){
       var db = start();
       var schema = new Schema({
           ids: [Schema.ObjectId]
@@ -895,7 +895,7 @@ describe('model: querying:', function(){
             assert.equal(1, nes1.length);
 
             NE.find({ b: { $ne: [1] }}, function (err, nes2) {
-              assert.equal("Cast to ObjectId failed for value \"1\" at path \"b\"", err.message);
+              assert.equal("Cast to ObjectId failed for value \"[1]\" at path \"b\"", err.message);
 
               NE.find({ b: { $ne: 4 }}, function (err, nes3) {
                 assert.equal("Cast to ObjectId failed for value \"4\" at path \"b\"", err.message);

@@ -1609,7 +1609,7 @@ describe('types array', function(){
       });
 
     });
-    it.only('works with sub-docs', function(done){
+    it('works with sub-docs', function(done){
       var db = start();
       var D = db.model('arraySetSubDocs', Schema({ arr: [[{ name: String}]] }));
       var m = new D({ arr: [[{name:'aaron'}, {name:'moombahton '}],[{name: 'EJ'},{name:'emily'}]] });

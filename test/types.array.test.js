@@ -1631,7 +1631,6 @@ describe('types array', function(){
 
         save(doc, function (err, doc) {
           assert.ifError(err);
-
           // validate
           assert.equal(3, doc.arr.length);
           assert.equal(2, doc.arr[0].length);
@@ -1689,8 +1688,8 @@ describe('types array', function(){
               assert.strictEqual("7", doc.arr[7][0].name);
               assert.strictEqual("8", doc.arr[7][1].name);
               assert.equal(null, doc.arr[8]);
-              assert.equal('temple of doom', doc.arr[10][0].name);
-              assert.equal('jones', doc.arr[10][1].name);
+              assert.equal('temple of doom', doc.arr[9][0].name);
+              assert.equal('jones', doc.arr[9][1].name);
 
               done();
 

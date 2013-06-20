@@ -75,7 +75,7 @@ strictSchema.virtual('foo').get(function () {
 mongoose.model('UpdateStrictSchema', strictSchema);
 
 
-describe('model: update:', function(){
+describe.only('model: update:', function(){
   var post
     , title = 'Tobi ' + random()
     , author = 'Brian ' + random()
@@ -180,7 +180,8 @@ describe('model: update:', function(){
 
               BlogPost.update({ _id: post._id }, update3, function (err) {
                 assert.ok(err);
-                assert.ok(/Invalid atomic update value/.test(err.message));
+
+                assert.ok(/Invalid atomic update value for \$pull\. Expected an object, received string/.test(err.message));
 
                 var update4 = {
                     $inc: { idontexist: 1 }
@@ -454,7 +455,7 @@ describe('model: update:', function(){
         db.close();
         assert.ifError(err);
         assert.equal(2, ret.comments.length, 2);
-        assert.equal(ret.comments[0].body, 'worked great');
+        assert.equal(ret.comments[0].body, 'been there');
         assert.equal(ret.comments[1].body, '9000');
         assert.equal(ret.comments[0].comments[0].date.toString(), new Date('11/5/2011').toString())
         assert.equal(ret.comments[1].comments.length, 0);
@@ -803,6 +804,7 @@ describe('model: update:', function(){
             assert.ifError(err);
             assert.equal(created.id, doc.id)
             assert.equal(1, doc.n.length);
+            console.log(doc);
             assert.equal(10, doc.n[0].x);
             done()
           })

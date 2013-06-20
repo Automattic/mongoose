@@ -12,7 +12,8 @@ var start = require('./common')
   , SchemaType = mongoose.SchemaType
   , ObjectId = Schema.Types.ObjectId
   , MongooseBuffer = mongoose.Types.Buffer
-  , DocumentObjectId = mongoose.Types.ObjectId;
+  , DocumentObjectId = mongoose.Types.ObjectId
+  , MongooseQuery = require('../lib/mongoosequery');
 
 /**
  * Setup.
@@ -63,42 +64,42 @@ describe('model: querying:', function(){
       , BlogPostB = db.model('BlogPostB', collection);
 
     // query
-    assert.ok(BlogPostB.find({}) instanceof Query);
+    assert.ok(BlogPostB.find({}) instanceof MongooseQuery);
 
     // query, fields
-    assert.ok(BlogPostB.find({}, {}) instanceof Query);
+    assert.ok(BlogPostB.find({}, {}) instanceof MongooseQuery);
 
     // query, fields (empty string)
-    assert.ok(BlogPostB.find({}, '') instanceof Query);
+    assert.ok(BlogPostB.find({}, '') instanceof MongooseQuery);
 
     // query, fields, options
-    assert.ok(BlogPostB.find({}, {}, {}) instanceof Query);
+    assert.ok(BlogPostB.find({}, {}, {}) instanceof MongooseQuery);
 
     // query, fields (null), options
-    assert.ok(BlogPostB.find({}, null, {}) instanceof Query);
+    assert.ok(BlogPostB.find({}, null, {}) instanceof MongooseQuery);
 
     db.close();
     done();
   });
 
-  it('findOne returns a Query', function(done){
+  it('findOne returns a MongooseQuery', function(done){
     var db = start()
       , BlogPostB = db.model('BlogPostB', collection);
 
     // query
-    assert.ok(BlogPostB.findOne({}) instanceof Query);
+    assert.ok(BlogPostB.findOne({}) instanceof MongooseQuery);
 
     // query, fields
-    assert.ok(BlogPostB.findOne({}, {}) instanceof Query);
+    assert.ok(BlogPostB.findOne({}, {}) instanceof MongooseQuery);
 
     // query, fields (empty string)
-    assert.ok(BlogPostB.findOne({}, '') instanceof Query);
+    assert.ok(BlogPostB.findOne({}, '') instanceof MongooseQuery);
 
     // query, fields, options
-    assert.ok(BlogPostB.findOne({}, {}, {}) instanceof Query);
+    assert.ok(BlogPostB.findOne({}, {}, {}) instanceof MongooseQuery);
 
     // query, fields (null), options
-    assert.ok(BlogPostB.findOne({}, null, {}) instanceof Query);
+    assert.ok(BlogPostB.findOne({}, null, {}) instanceof MongooseQuery);
 
     db.close();
     done();
@@ -129,19 +130,19 @@ describe('model: querying:', function(){
     };
 
     // query
-    assert.ok(BlogPostB.find(q, fn) instanceof Query);
+    assert.ok(BlogPostB.find(q, fn) instanceof MongooseQuery);
 
     // query, fields (object)
-    assert.ok(BlogPostB.find(q, {}, fn) instanceof Query);
+    assert.ok(BlogPostB.find(q, {}, fn) instanceof MongooseQuery);
 
     // query, fields (null)
-    assert.ok(BlogPostB.find(q, null, fn) instanceof Query);
+    assert.ok(BlogPostB.find(q, null, fn) instanceof MongooseQuery);
 
     // query, fields, options
-    assert.ok(BlogPostB.find(q, {}, {}, fn) instanceof Query);
+    assert.ok(BlogPostB.find(q, {}, {}, fn) instanceof MongooseQuery);
 
     // query, fields (''), options
-    assert.ok(BlogPostB.find(q, '', {}, fn) instanceof Query);
+    assert.ok(BlogPostB.find(q, '', {}, fn) instanceof MongooseQuery);
   });
 
   it('query is executed where a callback for findOne', function(done){
@@ -157,31 +158,31 @@ describe('model: querying:', function(){
     };
 
     // query
-    assert.ok(BlogPostB.findOne(q, fn) instanceof Query);
+    assert.ok(BlogPostB.findOne(q, fn) instanceof MongooseQuery);
 
     // query, fields
-    assert.ok(BlogPostB.findOne(q, {}, fn) instanceof Query);
+    assert.ok(BlogPostB.findOne(q, {}, fn) instanceof MongooseQuery);
 
     // query, fields (empty string)
-    assert.ok(BlogPostB.findOne(q, '', fn) instanceof Query);
+    assert.ok(BlogPostB.findOne(q, '', fn) instanceof MongooseQuery);
 
     // query, fields, options
-    assert.ok(BlogPostB.findOne(q, {}, {}, fn) instanceof Query);
+    assert.ok(BlogPostB.findOne(q, {}, {}, fn) instanceof MongooseQuery);
 
     // query, fields (null), options
-    assert.ok(BlogPostB.findOne(q, null, {}, fn) instanceof Query);
+    assert.ok(BlogPostB.findOne(q, null, {}, fn) instanceof MongooseQuery);
   });
 
   describe('count', function(){
-    it('returns a Query', function(done){
+    it('returns a MongooseQuery', function(done){
       var db = start()
         , BlogPostB = db.model('BlogPostB', collection);
-      assert.ok(BlogPostB.count({}) instanceof Query);
+      assert.ok(BlogPostB.count({}) instanceof MongooseQuery);
       db.close();
       done();
     });
 
-    it('Query executes when you pass a callback', function(done){
+    it('MongooseQuery executes when you pass a callback', function(done){
       var db = start()
         , BlogPostB = db.model('BlogPostB', collection)
         , pending = 2
@@ -192,8 +193,8 @@ describe('model: querying:', function(){
         done();
       };
 
-      assert.ok(BlogPostB.count({}, fn) instanceof Query);
-      assert.ok(BlogPostB.count(fn) instanceof Query);
+      assert.ok(BlogPostB.count({}, fn) instanceof MongooseQuery);
+      assert.ok(BlogPostB.count(fn) instanceof MongooseQuery);
     });
 
     it('counts documents', function(done){
@@ -232,7 +233,7 @@ describe('model: querying:', function(){
       var db = start()
         , BlogPostB = db.model('BlogPostB', collection);
 
-      assert.ok(BlogPostB.distinct('title', {}) instanceof Query);
+      assert.ok(BlogPostB.distinct('title', {}) instanceof MongooseQuery);
       db.close();
       done();
     });
@@ -250,7 +251,7 @@ describe('model: querying:', function(){
           db.close();
           done();
         });
-        assert.ok(query instanceof Query);
+        assert.ok(query instanceof MongooseQuery);
       });
     });
 
@@ -270,17 +271,17 @@ describe('model: querying:', function(){
   });
 
   describe('update', function(){
-    it('returns a Query', function(done){
+    it('returns a MongooseQuery', function(done){
       var db = start()
         , BlogPostB = db.model('BlogPostB', collection);
 
-      assert.ok(BlogPostB.update({}, {}) instanceof Query);
-      assert.ok(BlogPostB.update({}, {}, {}) instanceof Query);
+      assert.ok(BlogPostB.update({}, {}) instanceof MongooseQuery);
+      assert.ok(BlogPostB.update({}, {}, {}) instanceof MongooseQuery);
       db.close();
       done();
     });
 
-    it('Query executes when you pass a callback', function(done){
+    it('MongooseQuery executes when you pass a callback', function(done){
       var db = start()
         , BlogPostB = db.model('BlogPostB', collection)
         , count = 2;
@@ -291,8 +292,8 @@ describe('model: querying:', function(){
         done();
       };
 
-      assert.ok(BlogPostB.update({title: random()}, {}, fn) instanceof Query);
-      assert.ok(BlogPostB.update({title: random()}, {}, {}, fn) instanceof Query);
+      assert.ok(BlogPostB.update({title: random()}, {}, fn) instanceof MongooseQuery);
+      assert.ok(BlogPostB.update({title: random()}, {}, {}, fn) instanceof MongooseQuery);
     })
   });
 
@@ -2023,7 +2024,7 @@ describe('geo-spatial', function(){
               assert.equal(1, docs.length);
               assert.equal(created.id, docs[0].id);
 
-              Test.where('loc').within.geometry(geojsonPoly).exec(function (err, docs) {
+              Test.where('loc').within().geometry(geojsonPoly).exec(function (err, docs) {
                 assert.ifError(err);
                 assert.equal(1, docs.length);
                 assert.equal(created.id, docs[0].id);
@@ -2055,7 +2056,7 @@ describe('geo-spatial', function(){
               assert.equal(1, docs.length);
               assert.equal(created.id, docs[0].id);
 
-              Test.where('line').intersects.geometry(geojsonLine).findOne(function (err, doc) {
+              Test.where('line').intersects().geometry(geojsonLine).findOne(function (err, doc) {
                 assert.ifError(err);
                 assert.equal(created.id, doc.id);
                 done();

@@ -75,7 +75,7 @@ strictSchema.virtual('foo').get(function () {
 mongoose.model('UpdateStrictSchema', strictSchema);
 
 
-describe.only('model: update:', function(){
+describe('model: update:', function(){
   var post
     , title = 'Tobi ' + random()
     , author = 'Brian ' + random()
@@ -438,7 +438,7 @@ describe.only('model: update:', function(){
     });
   });
 
-  it('works with nested positional notation', function(done){
+  it.only('works with nested positional notation', function(done){
     var db = start()
       , BlogPost = db.model('BlogPostForUpdates', collection)
 
@@ -455,7 +455,7 @@ describe.only('model: update:', function(){
         db.close();
         assert.ifError(err);
         assert.equal(2, ret.comments.length, 2);
-        assert.equal(ret.comments[0].body, 'been there');
+        assert.equal(ret.comments[0].body, 'worked great');
         assert.equal(ret.comments[1].body, '9000');
         assert.equal(ret.comments[0].comments[0].date.toString(), new Date('11/5/2011').toString())
         assert.equal(ret.comments[1].comments.length, 0);
@@ -804,7 +804,6 @@ describe.only('model: update:', function(){
             assert.ifError(err);
             assert.equal(created.id, doc.id)
             assert.equal(1, doc.n.length);
-            console.log(doc);
             assert.equal(10, doc.n[0].x);
             done()
           })

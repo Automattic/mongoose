@@ -438,7 +438,7 @@ describe('model: update:', function(){
     });
   });
 
-  it.only('works with nested positional notation', function(done){
+  it('works with nested positional notation', function(done){
     var db = start()
       , BlogPost = db.model('BlogPostForUpdates', collection)
 

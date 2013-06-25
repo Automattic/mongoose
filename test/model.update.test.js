@@ -639,7 +639,7 @@ describe('model: update:', function(){
 
   it('updates a number to null (gh-640)', function(done){
     var db = start()
-    var B = db.model('BlogPostB')
+    var B = db.model('BlogPostForUpdates', 'wwwwowowo'+random());
     var b = new B({ meta: { visitors: null }});
     b.save(function (err) {
       assert.ifError(err);

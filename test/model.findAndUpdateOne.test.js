@@ -278,43 +278,43 @@ describe('model: findOneAndUpdate:', function(){
     query = M.findOneAndUpdate({ author: 'aaron' }, { $set: { date: now }}, { new: false, fields: 'author' });
     assert.strictEqual(false, query.options.new);
     assert.strictEqual(1, query._fields.author);
-    assert.equal(now, query._updateArg.$set.date);
+    assert.equal(now.toString(), query._update.$set.date.toString());
     assert.strictEqual('aaron', query._conditions.author);
 
     query = M.findOneAndUpdate({ author: 'aaron' }, { $set: { date: now }});
     assert.strictEqual(undefined, query.options.new);
-    assert.equal(now, query._updateArg.$set.date);
+    assert.equal(now.toString(), query._update.$set.date.toString());
     assert.strictEqual('aaron', query._conditions.author);
 
     query = M.findOneAndUpdate({ $set: { date: now }});
     assert.strictEqual(undefined, query.options.new);
-    assert.equal(now, query._updateArg.$set.date);
+    assert.equal(now.toString(), query._update.$set.date.toString());
     assert.strictEqual(undefined, query._conditions.author);
 
     query = M.findOneAndUpdate();
     assert.strictEqual(undefined, query.options.new);
-    assert.equal(undefined, query._updateArg.date);
+    assert.equal(undefined, query._update);
     assert.strictEqual(undefined, query._conditions.author);
 
     // Query.findOneAndUpdate
     query = M.where('author', 'aaron').findOneAndUpdate({ date: now });
     assert.strictEqual(undefined, query.options.new);
-    assert.equal(now, query._updateArg.date);
+    assert.equal(now.toString(), query._update.date.toString());
     assert.strictEqual('aaron', query._conditions.author);
 
     query = M.find().findOneAndUpdate({ author: 'aaron' }, { date: now });
     assert.strictEqual(undefined, query.options.new);
-    assert.equal(now, query._updateArg.date);
+    assert.equal(now.toString(), query._update.date.toString());
     assert.strictEqual('aaron', query._conditions.author);
 
     query = M.find().findOneAndUpdate({ date: now });
     assert.strictEqual(undefined, query.options.new);
-    assert.equal(now, query._updateArg.date);
+    assert.equal(now.toString(), query._update.date.toString());
     assert.strictEqual(undefined, query._conditions.author);
 
     query = M.find().findOneAndUpdate();
     assert.strictEqual(undefined, query.options.new);
-    assert.equal(undefined, query._updateArg.date);
+    assert.equal(undefined, query._update);
     assert.strictEqual(undefined, query._conditions.author);
     done();
   })
@@ -599,12 +599,12 @@ describe('model: findByIdAndUpdate:', function(){
     query = M.findByIdAndUpdate(_id, { $set: { date: now }}, { new: false, fields: 'author' });
     assert.strictEqual(false, query.options.new);
     assert.strictEqual(1, query._fields.author);
-    assert.equal(now, query._updateArg.$set.date);
+    assert.equal(now.toString(), query._update.$set.date.toString());
     assert.strictEqual(_id.toString(), query._conditions._id.toString());
 
     query = M.findByIdAndUpdate(_id, { $set: { date: now }});
     assert.strictEqual(undefined, query.options.new);
-    assert.equal(now, query._updateArg.$set.date);
+    assert.equal(now.toString(), query._update.$set.date.toString());
     assert.strictEqual(_id.toString(), query._conditions._id.toString());
 
     query = M.findByIdAndUpdate(_id);
@@ -613,7 +613,7 @@ describe('model: findByIdAndUpdate:', function(){
 
     query = M.findByIdAndUpdate();
     assert.strictEqual(undefined, query.options.new);
-    assert.equal(undefined, query._updateArg.date);
+    assert.equal(undefined, query._update);
     assert.strictEqual(undefined, query._conditions._id);
     done();
   });

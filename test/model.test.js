@@ -2807,9 +2807,9 @@ describe('Model', function(){
 
   it('updating an embedded array document to an Object value (gh-334)', function(done){
     var db = start()
-      , SubSchema = new Schema({ 
-          name : String , 
-          subObj : { subName : String } 
+      , SubSchema = new Schema({
+          name : String ,
+          subObj : { subName : String }
         });
     var GH334Schema = new Schema ({ name : String , arrData : [ SubSchema] });
 

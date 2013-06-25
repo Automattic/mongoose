@@ -8,9 +8,7 @@ var start = require('./common')
   , mongoose = require('./common').mongoose
   , Schema = mongoose.Schema
   , random = require('../lib/utils').random
-  , MongooseBuffer = mongoose.Types.Buffer;
-
-// can't index Buffer fields yet
+  , MongooseBuffer = mongoose.Types.Buffer
 
 function valid (v) {
   return !v || v.length > 10;

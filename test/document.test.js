@@ -14,7 +14,8 @@ var start = require('./common')
   , SchemaType = mongoose.SchemaType
   , ValidatorError = SchemaType.ValidatorError
   , ValidationError = mongoose.Document.ValidationError
-  , MongooseError = mongoose.Error;
+  , MongooseError = mongoose.Error
+  , MongooseQuery = require('../lib/mongoosequery');
 
 /**
  * Test Document constructor.
@@ -546,7 +547,7 @@ describe('document', function(){
       var mg = new mongoose.Mongoose;
       var M = mg.model('doc#update', { s: String });
       var doc = new M;
-      assert.ok(doc.update() instanceof mongoose.Query);
+      assert.ok(doc.update() instanceof MongooseQuery);
       done();
     })
     it('calling update on document should relay to its model (gh-794)', function(done){

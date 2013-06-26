@@ -1,4 +1,23 @@
 
+3.6.12 / 2013-06-25
+===================
+
+  * updated; driver to 1.3.10
+  * updated; clearer capped collection error message #1509 [bitmage](https://github.com/bitmage)
+  * fixed; MongooseBuffer subtype loss during casting #1517 [zedgu](https://github.com/zedgu)
+  * fixed; docArray#id when doc.id is disabled #1492
+  * fixed; docArray#id now supports matches on populated arrays #1492 [pgherveou](https://github.com/pgherveou)
+  * website; fix example
+  * website; improve _id disabling example
+  * website; fix typo #1494 [dejj](https://github.com/dejj)
+  * docs; added a 'Requesting new features' section #1504 [shovon](https://github.com/shovon)
+  * docs; improve subtypes description
+  * docs; clarify _id disabling
+  * docs: display by alphabetical order the methods list #1508 [nicolasleger](https://github.com/nicolasleger)
+  * tests; refactor isSelected checks
+  * tests; remove pointless test
+  * tests; fixed timeouts
+
 3.6.11 / 2013-05-15
 ===================
 

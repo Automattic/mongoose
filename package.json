@@ -1,7 +1,7 @@
 {
     "name": "mongoose"
   , "description": "Elegant MongoDB object modeling for Node.js"
-  , "version": "3.6.12-pre"
+  , "version": "3.6.12"
   , "author": "Guillermo Rauch <guillermo@learnboost.com>"
   , "keywords": ["mongodb", "document", "model", "schema", "database", "odm", "data", "datastore", "query", "nosql", "orm", "db"]
   , "dependencies": {

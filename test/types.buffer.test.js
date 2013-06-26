@@ -408,16 +408,9 @@ describe('types.buffer', function(){
       done();
     })
 
-    it('method works', function(done){
-      var b = new B({ buf: new Buffer('hi') });
-      b.buf.subtype(128);
-      assert.strictEqual(128, b.buf._subtype);
-      done();
-    })
-
     it('is stored', function(done){
       var b = new B({ buf: new Buffer('hi') });
-      b.buf.subtype(128);
+      b.buf._subtype = 128;
       b.save(function (err) {
         if (err) return done(err);
         B.findById(b, function (err, doc) {
@@ -428,25 +421,17 @@ describe('types.buffer', function(){
       })
     })
 
-    it('changes are retained', function(done){
-      var b = new B({ buf: new Buffer('hi') });
-      b.buf.subtype(128);
+    it('is stored from a Binary', function(done){
+      var b = new B({ buf: new MongooseBuffer('hi').toObject(128) });
       b.save(function (err) {
         if (err) return done(err);
         B.findById(b, function (err, doc) {
           if (err) return done(err);
           assert.equal(128, doc.buf._subtype);
-          doc.buf.subtype(0);
-          doc.save(function (err) {
-            if (err) return done(err);
-            B.findById(b, function (err, doc) {
-              if (err) return done(err);
-              assert.strictEqual(0, doc.buf._subtype);
-              done();
-            })
-          })
+          done();
         })
       })
     })
+
   })
 })

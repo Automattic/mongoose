@@ -486,7 +486,7 @@ describe.only('MongooseQuery', function(){
     })
     it('with no args', function(done){
       var threw = false;
-      var q = new Query();
+      var q = new MongooseQuery(p1.collection);
 
       try {
         q.find();
@@ -498,7 +498,7 @@ describe.only('MongooseQuery', function(){
       done();
     })
     it('works with overwriting previous object args (1176)', function(done){
-      var q = new Query();
+      var q = new MongooseQuery(p1.collection);
       assert.doesNotThrow(function(){
         q.find({ age: { $lt: 30 }});
         q.find({ age: 20 }); // overwrite
@@ -676,18 +676,11 @@ describe.only('MongooseQuery', function(){
       var query = new MongooseQuery(p1.collection);
       query.sort('a -c b');
       assert.deepEqual(query.options.sort, [['a', 1], ['c', -1], ['b', 1]]);
-      query = new Query();
+      query = new MongooseQuery(p1.collection);
       query.sort({'a': 1, 'c': -1, 'b': 'asc', e: 'descending', f: 'ascending'});
       assert.deepEqual(query.options.sort, [['a', 1], ['c', -1], ['b', 'asc'], ['e', 'descending'], ['f', 'ascending']]);
-      query = new Query();
+      query = new MongooseQuery(p1.collection);
       var e;
-      try {
-        query.sort(['a', 1]);
-      } catch (err) {
-        e= err;
-      }
-      assert.ok(e, 'uh oh. no error was thrown');
-      assert.equal(e.message, 'Invalid sort() argument. Must be a string or object.');
 
       e= undefined;
       try {
@@ -696,7 +689,7 @@ describe.only('MongooseQuery', function(){
         e= err;
       }
       assert.ok(e, 'uh oh. no error was thrown');
-      assert.equal(e.message, 'Invalid sort() argument. Must be a string or object.');
+      assert.equal(e.message, 'sort() only takes 1 Argument');
       done();
     })
   })
@@ -738,7 +731,7 @@ describe.only('MongooseQuery', function(){
 
   describe('populate', function(){
     it('converts to PopulateOptions objects', function(done){
-      var q = new Query();
+      var q = new MongooseQuery(p1.collection);
       var o = {
           path: 'yellow.brick'
         , match: { bricks: { $lt: 1000 }}
@@ -748,12 +741,12 @@ describe.only('MongooseQuery', function(){
         , _docs: {}
       }
       q.populate(o);
-      assert.deepEqual(o, q.options.populate['yellow.brick']);
+      assert.deepEqual(o, q._mongooseOptions.populate['yellow.brick']);
       done();
     })
 
     it('overwrites duplicate paths', function(done){
-      var q = new Query();
+      var q = new MongooseQuery(p1.collection);
       var o = {
           path: 'yellow.brick'
         , match: { bricks: { $lt: 1000 }}
@@ -763,17 +756,17 @@ describe.only('MongooseQuery', function(){
         , _docs: {}
       }
       q.populate(o);
-      assert.equal(1, Object.keys(q.options.populate).length);
-      assert.deepEqual(o, q.options.populate['yellow.brick']);
+      assert.equal(1, Object.keys(q._mongooseOptions.populate).length);
+      assert.deepEqual(o, q._mongooseOptions.populate['yellow.brick']);
       q.populate('yellow.brick');
-      assert.equal(1, Object.keys(q.options.populate).length);
+      assert.equal(1, Object.keys(q._mongooseOptions.populate).length);
       o.match = undefined;
-      assert.deepEqual(o, q.options.populate['yellow.brick']);
+      assert.deepEqual(o, q._mongooseOptions.populate['yellow.brick']);
       done();
     })
 
     it('accepts space delimited strings', function(done){
-      var q = new Query();
+      var q = new MongooseQuery(p1.collection);
       q.populate('yellow.brick dirt');
       var o = {
           path: 'yellow.brick'
@@ -783,10 +776,10 @@ describe.only('MongooseQuery', function(){
         , options: undefined
         , _docs: {}
       }
-      assert.equal(2, Object.keys(q.options.populate).length);
-      assert.deepEqual(o, q.options.populate['yellow.brick']);
+      assert.equal(2, Object.keys(q._mongooseOptions.populate).length);
+      assert.deepEqual(o, q._mongooseOptions.populate['yellow.brick']);
       o.path = 'dirt';
-      assert.deepEqual(o, q.options.populate['dirt']);
+      assert.deepEqual(o, q._mongooseOptions.populate['dirt']);
       done();
     })
   })
@@ -974,7 +967,7 @@ describe.only('MongooseQuery', function(){
       var db = start();
       var query = new MongooseQuery(p1.collection);
       var Product = db.model('Product');
-      var q = new Query().bind(Product, 'distinct').distinct('blah', function(){
+      var q = new MongooseQuery(p1.collection, {}, Product).distinct('blah', function(){
         db.close();
       })
       assert.equal(q.op,'distinct');
@@ -987,7 +980,7 @@ describe.only('MongooseQuery', function(){
       var db = start();
       var query = new MongooseQuery(p1.collection);
       var Product = db.model('Product', 'update_products_' + random());
-      new Query().bind(Product, 'count').count();
+      new MongooseQuery(p1.collection, {}, Product).count();
       Product.create({ tags: 12345 }, function (err) {
         assert.ifError(err);
         var time = 20;
@@ -1018,7 +1011,7 @@ describe.only('MongooseQuery', function(){
       var db = start();
       var query = new MongooseQuery(p1.collection);
       var Product = db.model('Product');
-      var q = new Query().bind(Product, 'distinct');
+      var q = new MongooseQuery(p1.collection, {}, Product).distinct();
       assert.equal(q.op,'distinct');
       q.findOne();
       assert.equal(q.op,'findOne');
@@ -1144,12 +1137,12 @@ describe.only('MongooseQuery', function(){
 
     describe('hint', function(){
       it('works', function(done){
-        var query2 = new Query();
+        var query2 = new MongooseQuery(p1.collection);
         query2.hint({'indexAttributeA': 1, 'indexAttributeB': -1});
         assert.deepEqual(query2.options.hint, {'indexAttributeA': 1, 'indexAttributeB': -1});
 
         assert.throws(function(){
-          var query3 = new Query();
+          var query3 = new MongooseQuery(p1.collection);
           query3.hint('indexAttributeA');
         }, /Invalid hint./);
 

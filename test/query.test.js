@@ -981,7 +981,7 @@ describe('Query', function(){
         Product.find({ tags: 12345 }).update({ $set: { tags: 123456 }});
 
         setTimeout(function(){
-          Product.find({ tags: 123456 }, function (err, p) {
+          Product.find({ tags: 12345 }, function (err, p) {
             assert.ifError(err);
             assert.equal(1, p.length);
 

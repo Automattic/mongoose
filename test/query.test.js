@@ -32,7 +32,7 @@ var p1;
  * Test.
  */
 
-describe.only('MongooseQuery', function(){
+describe('MongooseQuery', function(){
   before(function(){
     var Prod = mongoose.model('Product');
     p1 = new Prod();
@@ -967,10 +967,11 @@ describe.only('MongooseQuery', function(){
       var db = start();
       var query = new MongooseQuery(p1.collection);
       var Product = db.model('Product');
-      var q = new MongooseQuery(p1.collection, {}, Product).distinct('blah', function(){
+      var prod = new Product({});
+      var q = new MongooseQuery(prod.collection, {}, Product).distinct('blah', function(){
+        assert.equal(q.op,'distinct');
         db.close();
       })
-      assert.equal(q.op,'distinct');
       done();
     })
   })
@@ -1009,14 +1010,18 @@ describe.only('MongooseQuery', function(){
   describe('findOne', function(){
     it('sets the op', function(done){
       var db = start();
-      var query = new MongooseQuery(p1.collection);
       var Product = db.model('Product');
-      var q = new MongooseQuery(p1.collection, {}, Product).distinct();
-      assert.equal(q.op,'distinct');
-      q.findOne();
-      assert.equal(q.op,'findOne');
-      db.close();
-      done();
+      var prod = new Product({});
+      var q = new MongooseQuery(prod.collection, {}, Product).distinct();
+      // use a timeout here because we have to wait for the connection to start
+      // before any ops will get set
+      setTimeout(function() {
+        assert.equal(q.op,'distinct');
+        q.findOne();
+        assert.equal(q.op,'findOne');
+        db.close();
+        done();
+      }, 50);
     });
   });
 

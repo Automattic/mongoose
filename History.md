@@ -1,4 +1,11 @@
 
+3.6.13 / 2013-06-27
+===================
+
+  * fixed; calling model.distinct without conditions #1541
+  * fixed; regression in Query#count() #1542
+  * now working on 3.6.13
+
 3.6.12 / 2013-06-25
 ===================
 

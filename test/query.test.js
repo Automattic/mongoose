@@ -374,12 +374,6 @@ describe('MongooseQuery', function(){
 
   describe('within', function(){
     describe('box', function(){
-      it.skip('not via where', function(done){
-        var query = new MongooseQuery(p1.collection);
-        query.within().box('gps', {ll: [5, 25], ur: [10, 30]});
-        assert.deepEqual(query._conditions, {gps: {$within: {$box: [[5, 25], [10, 30]]}}});
-        done();
-      })
       it('via where', function(done){
         var query = new MongooseQuery(p1.collection);
         query.where('gps').within().box({ll: [5, 25], ur: [10, 30]});
@@ -389,12 +383,6 @@ describe('MongooseQuery', function(){
     })
 
     describe('center', function(){
-      it.skip('not via where', function(done){
-        var query = new MongooseQuery(p1.collection);
-        query.within().center('gps', {center: [5, 25], radius: 5});
-        assert.deepEqual(query._conditions, {gps: {$within: {$center: [[5, 25], 5]}}});
-        done();
-      })
       it('via where', function(done){
         var query = new MongooseQuery(p1.collection);
         query.where('gps').within().center({center: [5, 25], radius: 5});
@@ -404,12 +392,6 @@ describe('MongooseQuery', function(){
     })
 
     describe('centerSphere', function(){
-      it.skip('not via where', function(done){
-        var query = new MongooseQuery(p1.collection);
-        query.within().centerSphere('gps', {center: [5, 25], radius: 5});
-        assert.deepEqual(query._conditions, {gps: {$within: {$centerSphere: [[5, 25], 5]}}});
-        done();
-      })
       it('via where', function(done){
         var query = new MongooseQuery(p1.collection);
         query.where('gps').within().centerSphere({center: [5, 25], radius: 5});
@@ -419,12 +401,6 @@ describe('MongooseQuery', function(){
     })
 
     describe('polygon', function(){
-      it.skip('not via where', function(done){
-        var query = new MongooseQuery(p1.collection);
-        query.within().polygon('gps', [[ 10, 20 ], [ 10, 40 ], [ 30, 40 ], [ 30, 20 ]]);
-        assert.deepEqual(query._conditions, {gps: {$within: {$polygon:[[ 10, 20 ], [ 10, 40 ], [ 30, 40 ], [ 30, 20 ]] }}});
-        done();
-      })
       it('via where', function(done){
         var query = new MongooseQuery(p1.collection);
         query.where('gps').within().polygon({ a: { x: 10, y: 20 }, b: { x: 15, y: 25 }, c: { x: 20, y: 20 }});

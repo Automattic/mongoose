@@ -253,6 +253,20 @@ describe('model: querying:', function(){
         assert.ok(query instanceof Query);
       });
     });
+
+    it('permits excluding conditions gh-1541', function(done){
+      var db = start();
+      var Address = new Schema({ zip: String });
+      Address = db.model('Address', Address, 'addresses_' + random());
+      Address.create({ zip: '10010'}, { zip: '10010'}, { zip: '99701'}, function (err, a1, a2, a3) {
+        assert.ifError(err);
+        var query = Address.distinct('zip', function (err, results) {
+          assert.ifError(err);
+          assert.deepEqual(results, ['10010', '99701']);
+          db.close(done);
+        });
+      });
+    })
   });
 
   describe('update', function(){

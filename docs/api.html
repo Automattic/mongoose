@@ -2282,7 +2282,23 @@ Adventure.findOne({ type: <span class="string">'iphone'</span> }).select(<span c
 A.findOneAndRemove(conditions, options)  <span class="comment">// return Query</span>
 A.findOneAndRemove(conditions, callback) <span class="comment">// executes</span>
 A.findOneAndRemove(conditions) <span class="comment">// returns Query</span>
-A.findOneAndRemove()           <span class="comment">// returns Query</span></code></pre><hr class=""></div><div class="item static public"><h3 id="model_Model.findOneAndUpdate"><a href="#model_Model.findOneAndUpdate">Model.findOneAndUpdate(<code>[conditions]</code>, <code>[update]</code>, <code>[options]</code>, <code>[callback]</code>)</a></h3><p>Issues a mongodb findAndModify update command.</p><span class="showcode">show code</span><div class="sourcecode"><pre><code class="javascript">Model.findOneAndUpdate = function (conditions, update, options, callback) {
+A.findOneAndRemove()           <span class="comment">// returns Query</span></code></pre>
+
+<p>Although values are cast to their appropriate types when using the findAndModify helpers, the following are <em>not</em> applied:</p>
+
+<ul>
+<li>defaults</li>
+<li>setters</li>
+<li>validators</li>
+<li>middleware</li>
+</ul>
+
+<p>If you need those features, use the traditional approach of first retrieving the document.</p>
+
+<pre><code>Model.findById(id, <span class="function"><span class="keyword">function</span> <span class="params">(err, doc)</span> {</span>
+  <span class="keyword">if</span> (err) ..
+  doc.remove(callback);
+})</code></pre><hr class=""></div><div class="item static public"><h3 id="model_Model.findOneAndUpdate"><a href="#model_Model.findOneAndUpdate">Model.findOneAndUpdate(<code>[conditions]</code>, <code>[update]</code>, <code>[options]</code>, <code>[callback]</code>)</a></h3><p>Issues a mongodb findAndModify update command.</p><span class="showcode">show code</span><div class="sourcecode"><pre><code class="javascript">Model.findOneAndUpdate = function (conditions, update, options, callback) {
   if ('function' == typeof options) {
     callback = options;
     options = null;

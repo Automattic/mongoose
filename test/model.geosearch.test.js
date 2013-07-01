@@ -99,7 +99,7 @@ describe('model', function(){
         });
       }
     });
-    it.only('throws the correct error messages', function (done) {
+    it('throws the correct error messages', function (done) {
 
       var db = start();
       var Geo = db.model('Geo');

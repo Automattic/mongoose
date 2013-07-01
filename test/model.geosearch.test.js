@@ -99,7 +99,7 @@ describe('model', function(){
         });
       }
     });
-    it('throws the correct error messages', function (done) {
+    it.only('throws the correct error messages', function (done) {
 
       var db = start();
       var Geo = db.model('Geo');
@@ -139,11 +139,10 @@ describe('model', function(){
 
               assert.ok(threw);
               Geo.geoSearch({ type : "test" }, { near : [1,2] }, function (err, res) {
-                assert.ifError(err);
-                assert.ok(res);
+                assert.ok(err);
 
-                assert.equal(res.ok, 0);
-                assert.equal(res.errmsg, "exception: maxDistance needs a number");
+                assert.equal(err.ok, 0);
+                assert.equal(err.errmsg, "exception: maxDistance needs a number");
                 done();
               });
             });

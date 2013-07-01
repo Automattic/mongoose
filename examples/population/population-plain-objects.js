@@ -1,5 +1,5 @@
 
-var mongoose = require('mongoose')
+var mongoose = require('../../lib')
 var Schema = mongoose.Schema;
 
 console.log('Running mongoose version %s', mongoose.version);

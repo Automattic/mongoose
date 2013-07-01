@@ -1,6 +1,6 @@
 
 var assert = require('assert')
-var mongoose = require('../');
+var mongoose = require('../../lib');
 var Schema = mongoose.Schema;
 var ObjectId = mongoose.Types.ObjectId;
 

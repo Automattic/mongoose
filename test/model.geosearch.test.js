@@ -21,7 +21,7 @@ schema.index({ "pos" : "geoHaystack", type : 1},{ bucketSize : 1});
 mongoose.model('Geo', schema);
 
 describe('model', function(){
-  describe.only('geoSearch', function () {
+  describe('geoSearch', function () {
     it('works', function (done) {
 
       var db = start();

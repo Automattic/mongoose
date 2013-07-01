@@ -141,8 +141,7 @@ describe('model', function(){
               Geo.geoSearch({ type : "test" }, { near : [1,2] }, function (err, res) {
                 assert.ok(err);
 
-                assert.equal(err.ok, 0);
-                assert.equal(err.errmsg, "exception: maxDistance needs a number");
+                assert.equal(err.message, "exception: maxDistance needs a number Code: 13319");
                 done();
               });
             });

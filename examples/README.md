@@ -1,4 +1,3 @@
-
 This directory contains runnable sample mongoose programs.
 
 To run:
@@ -13,7 +12,7 @@ Goal is to show:
 
 - ~~global schemas~~
 - ~~GeoJSON schemas / use (with crs)~~
-- text search
+- text search (once MongoDB removes the "Experimental/beta" label)
 - ~~lean queries~~
 - ~~statics~~
 - methods and statics on subdocs

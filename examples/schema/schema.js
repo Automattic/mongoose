@@ -3,7 +3,7 @@
  * Module dependencies.
  */
 
-var mongoose = require('mongoose')
+var mongoose = require('../../lib')
   , Schema = mongoose.Schema;
 
 /**

@@ -27,7 +27,7 @@ Goal is to show:
 - on the fly schemas
 - storing files
 - ~~map reduce~~
-- aggregation
+- ~~aggregation~~
 - advanced hooks
 - using $elemMatch to return a subset of an array
 - query casting

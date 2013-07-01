@@ -26,7 +26,7 @@ Goal is to show:
 - enabling a fail fast mode
 - on the fly schemas
 - storing files
-- map reduce
+- ~~map reduce~~
 - aggregation
 - advanced hooks
 - using $elemMatch to return a subset of an array

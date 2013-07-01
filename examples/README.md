@@ -21,7 +21,7 @@ Goal is to show:
 - ~~querybuilder~~
 - ~~promises~~
 - accessing driver collection, db
-- connecting to replica sets
+- ~~connecting to replica sets~~
 - connecting to sharded clusters
 - enabling a fail fast mode
 - on the fly schemas

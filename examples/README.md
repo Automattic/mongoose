@@ -18,7 +18,7 @@ Goal is to show:
 - ~~statics~~
 - methods and statics on subdocs
 - custom types
-- querybuilder
+- ~~querybuilder~~
 - promises
 - accessing driver collection, db
 - connecting to replica sets

@@ -12,7 +12,7 @@ To run:
 Goal is to show:
 
 - ~~global schemas~~
-- GeoJSON schemas / use (with crs)
+- ~~GeoJSON schemas / use (with crs)~~
 - text search
 - ~~lean queries~~
 - ~~statics~~

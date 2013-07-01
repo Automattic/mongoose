@@ -33,7 +33,7 @@ Goal is to show:
 - upserts
 - pagination
 - express + mongoose session handling
-- group by (use aggregation)
+- ~~group by (use aggregation)~~
 - authentication
 - schema migration techniques
 - converting documents to plain objects (show transforms)

@@ -24,23 +24,22 @@ var data = [
 ];
 
 
-// to connect to a replica set, pass in the replSet option with the rs_name set
-// to the replica set id. Then specify the uris of the mongod instances in the
-// connect method as demonstrated below.
+// to connect to a replica set, pass in the comma delimited uri and optionally
+// any connection options such as the rs_name.
 var opts = {
   replSet : { rs_name : "rs0" }
 };
-mongoose.connect('mongodb://localhost:27018/persons, localhost:27019/persons, localhost:27020/persons', opts, function (err) {
+mongoose.connect('mongodb://localhost:27018/persons,localhost:27019,localhost:27020', opts, function (err) {
   if (err) throw err;
 
   // create all of the dummy people
   async.each(data, function (item, cb) {
       Person.create(item, cb);
     }, function (err) {
-     
+
       // create and delete some data
       var prom = Person.find({age : { $lt : 1000 }}).exec();
-      
+
       prom.then(function (people) {
         console.log("young people: %s", people);
       }).then(cleanup);

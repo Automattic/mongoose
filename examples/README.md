@@ -14,7 +14,7 @@ Goal is to show:
 - ~~global schemas~~
 - GeoJSON schemas / use (with crs)
 - text search
-- lean querires
+- ~~lean queries~~
 - ~~statics~~
 - methods and statics on subdocs
 - custom types

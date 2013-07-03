@@ -762,4 +762,29 @@ describe('model: findByIdAndUpdate:', function(){
       })
     })
   })
+  it('returns null when doing an upsert & new=false gh-1533', function (done) {
+    var db = start();
+
+    var thingSchema = new Schema({
+        _id: String,
+        flag: {
+            type: Boolean,
+            "default": false
+        }
+    });
+
+    var Thing = db.model('Thing', thingSchema);
+    var key = 'some-id';
+
+    Thing.findOneAndUpdate({_id: key}, {$set: {flag: false}}, {upsert: true, "new": false}).exec(function(err, thing) {
+        assert.ifError(err);
+        assert.equal(null, thing);
+        Thing.findOneAndUpdate({_id: key}, {$set: {flag: false}}, {upsert: true, "new": false}).exec(function (err, thing2) {
+          assert.ifError(err);
+          assert.equal(key, thing2.id);
+          assert.equal(false, thing2.flag);
+          done();
+        });
+    });
+  });
 })

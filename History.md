@@ -1,4 +1,14 @@
 
+3.6.14 / 2013-07-05
+===================
+
+  * updated; driver to 1.3.11
+  * fixed; issue with findOneAndUpdate not returning null on upserts #1533 [ebensing](https://github.com/ebensing)
+  * fixed; missing return statement in SchemaArray#$geoIntersects() #1498 [bsrykt](https://github.com/bsrykt)
+  * fixed; wrong isSelected() behavior #1521 [kyano](https://github.com/kyano)
+  * docs; note about toObject behavior during save()
+  * docs; add callbacks details #1547 [nikmartin](https://github.com/nikmartin)
+
 3.6.13 / 2013-06-27
 ===================
 

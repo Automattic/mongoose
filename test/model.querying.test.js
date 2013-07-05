@@ -1978,6 +1978,10 @@ describe('geo-spatial', function(){
     var geoSchema = new Schema({ line: { type: { type: String }, coordinates: []}});
     geoSchema.index({ line: '2dsphere' });
 
+    var geoMultiSchema = new Schema({ geom: [{ type: { type: String }, coordinates: []}]});
+    // see mongodb issue SERVER-8907
+    // geoMultiSchema.index({ geom: '2dsphere' });
+
     var mongo24_or_greater = false;
     before(function(done){
       start.mongodVersion(function (err, version) {
@@ -2059,6 +2063,58 @@ describe('geo-spatial', function(){
             })
           })
 
+        })
+      });
+
+      it('MultiLineString', function(done){
+        if (!mongo24_or_greater) return done();
+
+        var db = start()
+          , Test = db.model('2dsphere-geo-multi1', geoMultiSchema, 'geospatial'+random());
+
+        Test.create({ geom: [{ type:'LineString', coordinates: [[-178.0, 10.0],[178.0,10.0]] },
+                             { type:'LineString', coordinates: [[-178.0, 5.0],[178.0,5.0]] } ]}, function (err, created) {
+          assert.ifError(err);
+
+          var geojsonLine = { type: 'LineString', coordinates: [[180.0, 11.0], [180.0, '9.00']] }
+
+          Test.find({ geom: { $geoIntersects: { $geometry: geojsonLine }}}, function (err, docs) {
+            assert.ifError(err);
+            assert.equal(1, docs.length);
+            assert.equal(created.id, docs[0].id);
+
+            Test.where('geom').intersects.geometry(geojsonLine).findOne(function (err, doc) {
+              assert.ifError(err);
+              assert.equal(created.id, doc.id);
+              done();
+            })
+          })
+        })
+      });
+
+      it('MultiPolygon', function(done){
+        if (!mongo24_or_greater) return done();
+
+        var db = start()
+          , Test = db.model('2dsphere-geo-multi2', geoMultiSchema, 'geospatial'+random());
+
+        Test.create({ geom: [{ type: "Polygon", coordinates: [[ [28.7,41],[29.2,40.9],[29.1,41.3],[28.7,41] ]] },
+                             { type: "Polygon", coordinates: [[ [-1,-1],[1,-1],[1,1],[-1,1],[-1,-1] ]] }]}, function (err, created) {
+          assert.ifError(err);
+
+          var geojsonPolygon = { type: 'Polygon', coordinates: [[ [26,36],[45,36],[45,42],[26,42],[26,36] ]] }
+
+          Test.find({ geom: { $geoIntersects: { $geometry: geojsonPolygon }}}, function (err, docs) {
+            assert.ifError(err);
+            assert.equal(1, docs.length);
+            assert.equal(created.id, docs[0].id);
+
+            Test.where('geom').intersects.geometry(geojsonPolygon).findOne(function (err, doc) {
+              assert.ifError(err);
+              assert.equal(created.id, doc.id);
+              done();
+            })
+          })
         })
       });
     })

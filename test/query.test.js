@@ -378,7 +378,7 @@ describe('MongooseQuery', function(){
         var query = new MongooseQuery(p1.collection);
         query.where('gps').within().box({ll: [5, 25], ur: [10, 30]});
         var match = {gps: {$within: {$box: [[5, 25], [10, 30]]}}};
-        if (MongooseQuery.use$geoWithin()) {
+        if (MongooseQuery.use$geoWithin) {
           match.gps.$geoWithin = match.gps.$within;
           delete match.gps["$within"];
         }
@@ -392,7 +392,7 @@ describe('MongooseQuery', function(){
         var query = new MongooseQuery(p1.collection);
         query.where('gps').within().center({center: [5, 25], radius: 5});
         var match = {gps: {$within: {$center: [[5, 25], 5]}}};
-        if (MongooseQuery.use$geoWithin()) {
+        if (MongooseQuery.use$geoWithin) {
           match.gps.$geoWithin = match.gps.$within;
           delete match.gps["$within"];
         }
@@ -406,7 +406,7 @@ describe('MongooseQuery', function(){
         var query = new MongooseQuery(p1.collection);
         query.where('gps').within().centerSphere({center: [5, 25], radius: 5});
         var match = {gps: {$within: {$centerSphere: [[5, 25], 5]}}};
-        if (MongooseQuery.use$geoWithin()) {
+        if (MongooseQuery.use$geoWithin) {
           match.gps.$geoWithin = match.gps.$within;
           delete match.gps["$within"];
         }
@@ -420,7 +420,7 @@ describe('MongooseQuery', function(){
         var query = new MongooseQuery(p1.collection);
         query.where('gps').within().polygon({ a: { x: 10, y: 20 }, b: { x: 15, y: 25 }, c: { x: 20, y: 20 }});
         var match = {gps: {$within: {$polygon: [{ a: { x: 10, y: 20 }, b: { x: 15, y: 25 }, c: { x: 20, y: 20 }}] }}};
-        if (MongooseQuery.use$geoWithin()) {
+        if (MongooseQuery.use$geoWithin) {
           match.gps.$geoWithin = match.gps.$within;
           delete match.gps["$within"];
         }

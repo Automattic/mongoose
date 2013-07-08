@@ -1499,6 +1499,27 @@ describe('Model', function(){
         });
       })
     })
+
+    describe('unique fields', function () {
+      it ('are validated before save', function (done) {
+        var db = start();
+        var uniqueSchema = new Schema({ uniqueField: { type: String, unique: true }, normalField: {type: String }});
+        var UniqueObject = db.model('UniqueObject', uniqueSchema);
+
+        new UniqueObject({ uniqueField: 'foo', normalField: 'bar' }).save(function (err) {
+          assert.strictEqual(null, err);
+          new UniqueObject({ uniqueField: 'foo', normalField: 'bar' }).save(function (err) {
+            assert.strictEqual('duplicate', err.errors.uniqueField.type);
+            assert.strictEqual('uniqueField', err.errors.uniqueField.path);
+            assert.strictEqual('foo', err.errors.uniqueField.value);
+            assert.strictEqual('undefined', typeof err.errors.normalField);
+
+            db.close();
+            done();
+          });
+        });
+      });
+    });
   });
 
   describe('defaults application', function(){

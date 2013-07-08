@@ -2084,7 +2084,7 @@ describe('geo-spatial', function(){
             assert.equal(1, docs.length);
             assert.equal(created.id, docs[0].id);
 
-            Test.where('geom').intersects.geometry(geojsonLine).findOne(function (err, doc) {
+            Test.where('geom').intersects().geometry(geojsonLine).findOne(function (err, doc) {
               assert.ifError(err);
               assert.equal(created.id, doc.id);
               done();
@@ -2110,7 +2110,7 @@ describe('geo-spatial', function(){
             assert.equal(1, docs.length);
             assert.equal(created.id, docs[0].id);
 
-            Test.where('geom').intersects.geometry(geojsonPolygon).findOne(function (err, doc) {
+            Test.where('geom').intersects().geometry(geojsonPolygon).findOne(function (err, doc) {
               assert.ifError(err);
               assert.equal(created.id, doc.id);
               done();

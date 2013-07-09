@@ -673,6 +673,15 @@ describe('MongooseQuery', function(){
       query = new MongooseQuery(p1.collection);
       var e;
 
+      try {
+        query.sort(['a',1]);
+      } catch (err) {
+        e = err;
+      }
+
+      assert.ok(e, 'uh oh. no error was thrown');
+      assert.equal(e.message, 'Invalid sort() argument.');
+
       e= undefined;
       try {
         query.sort('a', 1, 'c', -1, 'b', 1);

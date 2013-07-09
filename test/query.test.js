@@ -1170,8 +1170,8 @@ describe('MongooseQuery', function(){
       });
     })
 
-    describe.skip('read', function(){
-      var P = mongoose.mongo.ReadPreference;
+    describe('read', function(){
+      var P = mongoose.mquery.utils.mongo.ReadPreference;
 
       describe('without tags', function(){
         it('works', function(done){

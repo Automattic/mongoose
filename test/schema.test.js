@@ -15,7 +15,7 @@ var start = require('./common')
   , Mixed = SchemaTypes.Mixed
   , DocumentObjectId = mongoose.Types.ObjectId
   , MongooseArray = mongoose.Types.Array
-  , ReadPref = require('mongodb').ReadPreference
+  , ReadPref = require('mquery').utils.mongo.ReadPreference
   , vm = require('vm')
 
 /**
@@ -53,7 +53,7 @@ describe('schema', function(){
 
   it('supports different schematypes', function(done){
     var Checkin = new Schema({
-        date      : Date 
+        date      : Date
       , location  : {
             lat: Number
           , lng: Number

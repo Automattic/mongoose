@@ -7,12 +7,12 @@ var start = require('./common')
   , assert = require('assert')
   , mongoose = start.mongoose
   , random = require('../lib/utils').random
-  , Query = require('../lib/query')
   , Schema = mongoose.Schema
   , SchemaType = mongoose.SchemaType
   , ObjectId = Schema.Types.ObjectId
   , MongooseBuffer = mongoose.Types.Buffer
-  , DocumentObjectId = mongoose.Types.ObjectId;
+  , DocumentObjectId = mongoose.Types.ObjectId
+  , Query = require('../lib/mongoosequery');
 
 /**
  * Setup.
@@ -2023,7 +2023,7 @@ describe('geo-spatial', function(){
               assert.equal(1, docs.length);
               assert.equal(created.id, docs[0].id);
 
-              Test.where('loc').within.geometry(geojsonPoly).exec(function (err, docs) {
+              Test.where('loc').within().geometry(geojsonPoly).exec(function (err, docs) {
                 assert.ifError(err);
                 assert.equal(1, docs.length);
                 assert.equal(created.id, docs[0].id);
@@ -2055,7 +2055,7 @@ describe('geo-spatial', function(){
               assert.equal(1, docs.length);
               assert.equal(created.id, docs[0].id);
 
-              Test.where('line').intersects.geometry(geojsonLine).findOne(function (err, doc) {
+              Test.where('line').intersects().geometry(geojsonLine).findOne(function (err, doc) {
                 assert.ifError(err);
                 assert.equal(created.id, doc.id);
                 done();
@@ -2083,7 +2083,7 @@ describe('geo-spatial', function(){
             assert.equal(1, docs.length);
             assert.equal(created.id, docs[0].id);
 
-            Test.where('geom').intersects.geometry(geojsonLine).findOne(function (err, doc) {
+            Test.where('geom').intersects().geometry(geojsonLine).findOne(function (err, doc) {
               assert.ifError(err);
               assert.equal(created.id, doc.id);
               done();
@@ -2109,7 +2109,7 @@ describe('geo-spatial', function(){
             assert.equal(1, docs.length);
             assert.equal(created.id, docs[0].id);
 
-            Test.where('geom').intersects.geometry(geojsonPolygon).findOne(function (err, doc) {
+            Test.where('geom').intersects().geometry(geojsonPolygon).findOne(function (err, doc) {
               assert.ifError(err);
               assert.equal(created.id, doc.id);
               done();

@@ -7,7 +7,7 @@ var start = require('./common')
   , assert = require('assert')
   , mongoose = start.mongoose
   , random = require('../lib/utils').random
-  , Query = require('../lib/query')
+  , Query = require('../lib/mongoosequery')
   , Schema = mongoose.Schema
   , SchemaType = mongoose.SchemaType
   , ObjectId = Schema.Types.ObjectId
@@ -180,7 +180,8 @@ describe('model: update:', function(){
 
               BlogPost.update({ _id: post._id }, update3, function (err) {
                 assert.ok(err);
-                assert.ok(/Invalid atomic update value/.test(err.message));
+
+                assert.ok(/Invalid atomic update value for \$pull\. Expected an object, received string/.test(err.message));
 
                 var update4 = {
                     $inc: { idontexist: 1 }
@@ -638,7 +639,7 @@ describe('model: update:', function(){
 
   it('updates a number to null (gh-640)', function(done){
     var db = start()
-    var B = db.model('BlogPostB')
+    var B = db.model('BlogPostForUpdates', 'wwwwowowo'+random());
     var b = new B({ meta: { visitors: null }});
     b.save(function (err) {
       assert.ifError(err);

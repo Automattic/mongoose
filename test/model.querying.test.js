@@ -12,7 +12,7 @@ var start = require('./common')
   , ObjectId = Schema.Types.ObjectId
   , MongooseBuffer = mongoose.Types.Buffer
   , DocumentObjectId = mongoose.Types.ObjectId
-  , Query = require('../lib/mongoosequery');
+  , Query = require('../lib/query');
 
 /**
  * Setup.

@@ -9,7 +9,7 @@ var start = require('./common')
   , Schema = mongoose.Schema
   , assert = require('assert')
   , random = require('../lib/utils').random
-  , Query = require('../lib/mongoosequery');
+  , Query = require('../lib/query');
 
 var Comment = new Schema({
     text: String

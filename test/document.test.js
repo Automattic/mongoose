@@ -15,7 +15,7 @@ var start = require('./common')
   , ValidatorError = SchemaType.ValidatorError
   , ValidationError = mongoose.Document.ValidationError
   , MongooseError = mongoose.Error
-  , Query = require('../lib/mongoosequery');
+  , Query = require('../lib/query');
 
 /**
  * Test Document constructor.

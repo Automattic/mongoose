@@ -317,12 +317,6 @@ describe('MongooseQuery', function(){
       assert.deepEqual(query._conditions, {checkin: {$near: [40, -72]}});
       done()
     })
-    it('not via where, where { center : [lat, long]} param', function(done){
-      var query = new MongooseQuery(p1.collection);
-      query.near('checkin', { center : [40, -72]});
-      assert.deepEqual(query._conditions, {checkin: {$near: [40, -72]}});
-      done();
-    })
     it('not via where, where [lat, long] param', function(done){
       var query = new MongooseQuery(p1.collection);
       query.near('checkin', [40, -72]);

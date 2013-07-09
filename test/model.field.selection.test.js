@@ -6,7 +6,7 @@ var start = require('./common')
   , assert = require('assert')
   , mongoose = start.mongoose
   , random = require('../lib/utils').random
-  , Query = require('../lib/query')
+  , Query = require('../lib/mongoosequery')
   , Schema = mongoose.Schema
   , SchemaType = mongoose.SchemaType
   , ObjectId = Schema.Types.ObjectId
@@ -144,7 +144,7 @@ describe('model field selection', function(){
     });
   })
 
-  it('works with subset of fields excluding emebedded doc _id (gh-541)', function(done){ 
+  it('works with subset of fields excluding emebedded doc _id (gh-541)', function(done){
     var db = start()
       , BlogPostB = db.model(modelName, collection);
 

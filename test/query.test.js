@@ -4,13 +4,12 @@
  */
 
 var start = require('./common')
-  , Query = require('../lib/query')
   , mongoose = start.mongoose
   , DocumentObjectId = mongoose.Types.ObjectId
   , Schema = mongoose.Schema
   , assert = require('assert')
   , random = require('../lib/utils').random
-  , MongooseQuery = require('../lib/mongoosequery');
+  , Query = require('../lib/mongoosequery');
 
 var Comment = new Schema({
     text: String
@@ -32,21 +31,21 @@ var p1;
  * Test.
  */
 
-describe('MongooseQuery', function(){
+describe('Query', function(){
   before(function(){
     var Prod = mongoose.model('Product');
     p1 = new Prod();
   })
   describe('select', function(){
     it('(object)', function(done){
-      var query = new MongooseQuery(p1.collection);
+      var query = new Query(p1.collection);
       query.select({a: 1, b: 1, c: 0});
       assert.deepEqual(query._fields,{a: 1, b: 1, c: 0});
       done();
     })
 
     it('(string)', function (done) {
-      var query = new MongooseQuery(p1.collection);
+      var query = new Query(p1.collection);
       query.select(" a  b -c ");
       assert.deepEqual(query._fields,{a: 1, b: 1, c: 0});
       done()
@@ -54,7 +53,7 @@ describe('MongooseQuery', function(){
 
     it('("a","b","c")', function(done){
       assert.throws(function () {
-        var query = new MongooseQuery(p1.collection);
+        var query = new Query(p1.collection);
         query.select('a', 'b', 'c');
       }, /Invalid select/);
       done();
@@ -62,14 +61,14 @@ describe('MongooseQuery', function(){
 
     it('["a","b","c"]', function(done){
       assert.throws(function () {
-        var query = new MongooseQuery(p1.collection);
+        var query = new Query(p1.collection);
         query.select(['a', 'b', 'c']);
       }, /Invalid select/);
       done();
     })
 
     it('should not overwrite fields set in prior calls', function(done){
-      var query = new MongooseQuery(p1.collection);
+      var query = new Query(p1.collection);
       query.select('a');
       assert.deepEqual(query._fields,{a: 1});
       query.select('b');
@@ -84,7 +83,7 @@ describe('MongooseQuery', function(){
 
   describe('where', function(){
     it('works', function(done){
-      var query = new MongooseQuery(p1.collection);
+      var query = new Query(p1.collection);
       query.where('name', 'guillermo');
       assert.deepEqual(query._conditions, {name: 'guillermo'});
       query.where('a');
@@ -93,7 +92,7 @@ describe('MongooseQuery', function(){
       done();
     })
     it('throws if non-string or non-object path is passed', function(done){
-      var query = new MongooseQuery(p1.collection);
+      var query = new Query(p1.collection);
       assert.throws(function () {
         query.where(50);
       });
@@ -103,7 +102,7 @@ describe('MongooseQuery', function(){
       done()
     })
     it('does not throw when 0 args passed', function (done) {
-      var query = new MongooseQuery(p1.collection);
+      var query = new Query(p1.collection);
       assert.doesNotThrow(function(){
         query.where();
       });
@@ -113,7 +112,7 @@ describe('MongooseQuery', function(){
 
   describe('equals', function(){
     it('works', function(done){
-      var query = new MongooseQuery(p1.collection);
+      var query = new Query(p1.collection);
       query.where('name').equals('guillermo');
       assert.deepEqual(query._conditions, {name: 'guillermo'});
       done();
@@ -122,13 +121,13 @@ describe('MongooseQuery', function(){
 
   describe('gte', function(){
     it('with 2 args', function(done){
-      var query = new MongooseQuery(p1.collection);
+      var query = new Query(p1.collection);
       query.gte('age', 18);
       assert.deepEqual(query._conditions, {age: {$gte: 18}});
       done();
     })
     it('with 1 arg', function(done){
-      var query = new MongooseQuery(p1.collection);
+      var query = new Query(p1.collection);
       query.where("age").gte(18);
       assert.deepEqual(query._conditions, {age: {$gte: 18}});
       done()
@@ -137,13 +136,13 @@ describe('MongooseQuery', function(){
 
   describe('gt', function(){
     it('with 1 arg', function(done){
-      var query = new MongooseQuery(p1.collection);
+      var query = new Query(p1.collection);
       query.where("age").gt(17);
       assert.deepEqual(query._conditions, {age: {$gt: 17}});
       done();
     })
     it('with 2 args', function(done){
-      var query = new MongooseQuery(p1.collection);
+      var query = new Query(p1.collection);
       query.gt('age', 17);
       assert.deepEqual(query._conditions, {age: {$gt: 17}});
       done();
@@ -152,13 +151,13 @@ describe('MongooseQuery', function(){
 
   describe('lte', function(){
     it('with 1 arg', function(done){
-      var query = new MongooseQuery(p1.collection);
+      var query = new Query(p1.collection);
       query.where("age").lte(65);
       assert.deepEqual(query._conditions, {age: {$lte: 65}});
       done();
     })
     it('with 2 args', function(done){
-      var query = new MongooseQuery(p1.collection);
+      var query = new Query(p1.collection);
       query.lte('age', 65);
       assert.deepEqual(query._conditions, {age: {$lte: 65}});
       done();
@@ -167,13 +166,13 @@ describe('MongooseQuery', function(){
 
   describe('lt', function(){
     it('with 1 arg', function(done){
-      var query = new MongooseQuery(p1.collection);
+      var query = new Query(p1.collection);
       query.where("age").lt(66);
       assert.deepEqual(query._conditions, {age: {$lt: 66}});
       done();
     })
     it('with 2 args', function(done){
-      var query = new MongooseQuery(p1.collection);
+      var query = new Query(p1.collection);
       query.lt('age', 66);
       assert.deepEqual(query._conditions, {age: {$lt: 66}});
       done();
@@ -183,7 +182,7 @@ describe('MongooseQuery', function(){
   describe('combined', function(){
     describe('lt and gt', function(){
       it('works', function(done){
-        var query = new MongooseQuery(p1.collection);
+        var query = new Query(p1.collection);
         query.where("age").lt(66).gt(17);
         assert.deepEqual(query._conditions, {age: {$lt: 66, $gt: 17}});
         done();
@@ -193,7 +192,7 @@ describe('MongooseQuery', function(){
 
   describe('tl on one path and gt on another', function(){
     it('works', function(done){
-      var query = new MongooseQuery(p1.collection);
+      var query = new Query(p1.collection);
       query
         .where("age").lt(66)
         .where("height").gt(5);
@@ -204,13 +203,13 @@ describe('MongooseQuery', function(){
 
   describe('ne', function(){
     it('with 1 arg', function(done){
-      var query = new MongooseQuery(p1.collection);
+      var query = new Query(p1.collection);
       query.where("age").ne(21);
       assert.deepEqual(query._conditions, {age: {$ne: 21}});
       done();
     })
     it('with 2 args', function(done){
-      var query = new MongooseQuery(p1.collection);
+      var query = new Query(p1.collection);
       query.ne('age', 21);
       assert.deepEqual(query._conditions, {age: {$ne: 21}});
       done();
@@ -219,25 +218,25 @@ describe('MongooseQuery', function(){
 
   describe('in', function(){
     it('with 1 arg', function(done){
-      var query = new MongooseQuery(p1.collection);
+      var query = new Query(p1.collection);
       query.where("age").in([21, 25, 30]);
       assert.deepEqual(query._conditions, {age: {$in: [21, 25, 30]}});
       done();
     })
     it('with 2 args', function(done){
-      var query = new MongooseQuery(p1.collection);
+      var query = new Query(p1.collection);
       query.in('age', [21, 25, 30]);
       assert.deepEqual(query._conditions, {age: {$in: [21, 25, 30]}});
       done();
     })
     it('where a non-array value no via where', function(done){
-      var query = new MongooseQuery(p1.collection);
+      var query = new Query(p1.collection);
       query.in('age', 21);
       assert.deepEqual(query._conditions, {age: {$in: 21}});
       done()
     })
     it('where a non-array value via where', function(done){
-      var query = new MongooseQuery(p1.collection);
+      var query = new Query(p1.collection);
       query.where('age').in(21);
       assert.deepEqual(query._conditions, {age: {$in: 21}});
       done()
@@ -246,25 +245,25 @@ describe('MongooseQuery', function(){
 
   describe('nin', function(){
     it('with 1 arg', function(done){
-      var query = new MongooseQuery(p1.collection);
+      var query = new Query(p1.collection);
       query.where("age").nin([21, 25, 30]);
       assert.deepEqual(query._conditions, {age: {$nin: [21, 25, 30]}});
       done();
     })
     it('with 2 args', function(done){
-      var query = new MongooseQuery(p1.collection);
+      var query = new Query(p1.collection);
       query.nin('age', [21, 25, 30]);
       assert.deepEqual(query._conditions, {age: {$nin: [21, 25, 30]}});
       done();
     })
     it('with a non-array value not via where', function(done){
-      var query = new MongooseQuery(p1.collection);
+      var query = new Query(p1.collection);
       query.nin('age', 21);
       assert.deepEqual(query._conditions, {age: {$nin: 21}});
       done();
     })
     it('with a non-array value via where', function(done){
-      var query = new MongooseQuery(p1.collection);
+      var query = new Query(p1.collection);
       query.where('age').nin(21);
       assert.deepEqual(query._conditions, {age: {$nin: 21}});
       done();
@@ -273,25 +272,25 @@ describe('MongooseQuery', function(){
 
   describe('mod', function(){
     it('not via where, where [a, b] param', function(done){
-      var query = new MongooseQuery(p1.collection);
+      var query = new Query(p1.collection);
       query.mod('age', [5, 2]);
       assert.deepEqual(query._conditions, {age: {$mod: [5, 2]}});
       done()
     })
     it('not via where, where a and b params', function(done){
-      var query = new MongooseQuery(p1.collection);
+      var query = new Query(p1.collection);
       query.mod('age', 5, 2);
       assert.deepEqual(query._conditions, {age: {$mod: [5, 2]}});
       done()
     })
     it('via where, where [a, b] param', function(done){
-      var query = new MongooseQuery(p1.collection);
+      var query = new Query(p1.collection);
       query.where("age").mod([5, 2]);
       assert.deepEqual(query._conditions, {age: {$mod: [5, 2]}});
       done();
     })
     it('via where, where a and b params', function(done){
-      var query = new MongooseQuery(p1.collection);
+      var query = new Query(p1.collection);
       query.where("age").mod(5, 2);
       assert.deepEqual(query._conditions, {age: {$mod: [5, 2]}});
       done()
@@ -300,31 +299,31 @@ describe('MongooseQuery', function(){
 
   describe('near', function(){
     it('via where, where { center :[lat, long]} param', function(done){
-      var query = new MongooseQuery(p1.collection);
+      var query = new Query(p1.collection);
       query.where('checkin').near({ center : [40, -72]});
       assert.deepEqual(query._conditions, {checkin: {$near: [40, -72]}});
       done();
     })
     it('via where, where [lat, long] param', function(done){
-      var query = new MongooseQuery(p1.collection);
+      var query = new Query(p1.collection);
       query.where('checkin').near([40, -72]);
       assert.deepEqual(query._conditions, {checkin: {$near: [40, -72]}});
       done();
     })
     it('via where, where lat and long params', function(done){
-      var query = new MongooseQuery(p1.collection);
+      var query = new Query(p1.collection);
       query.where('checkin').near(40, -72);
       assert.deepEqual(query._conditions, {checkin: {$near: [40, -72]}});
       done()
     })
     it('not via where, where [lat, long] param', function(done){
-      var query = new MongooseQuery(p1.collection);
+      var query = new Query(p1.collection);
       query.near('checkin', [40, -72]);
       assert.deepEqual(query._conditions, {checkin: {$near: [40, -72]}});
       done();
     })
     it('not via where, where lat and long params', function(done){
-      var query = new MongooseQuery(p1.collection);
+      var query = new Query(p1.collection);
       query.near('checkin', 40, -72);
       assert.deepEqual(query._conditions, {checkin: {$near: [40, -72]}});
       done();
@@ -333,25 +332,25 @@ describe('MongooseQuery', function(){
 
   describe('nearSphere', function(){
     it('via where, where [lat, long] param', function(done){
-      var query = new MongooseQuery(p1.collection);
+      var query = new Query(p1.collection);
       query.where('checkin').nearSphere([40, -72]);
       assert.deepEqual(query._conditions, {checkin: {$nearSphere: [40, -72]}});
       done();
     })
     it('via where, where lat and long params', function(done){
-      var query = new MongooseQuery(p1.collection);
+      var query = new Query(p1.collection);
       query.where('checkin').nearSphere(40, -72);
       assert.deepEqual(query._conditions, {checkin: {$nearSphere: [40, -72]}});
       done()
     })
     it('not via where, where [lat, long] param', function(done){
-      var query = new MongooseQuery(p1.collection);
+      var query = new Query(p1.collection);
       query.nearSphere('checkin', [40, -72]);
       assert.deepEqual(query._conditions, {checkin: {$nearSphere: [40, -72]}});
       done()
     })
     it('not via where, where lat and long params', function(done){
-      var query = new MongooseQuery(p1.collection);
+      var query = new Query(p1.collection);
       query.nearSphere('checkin', 40, -72);
       assert.deepEqual(query._conditions, {checkin: {$nearSphere: [40, -72]}});
       done();
@@ -360,7 +359,7 @@ describe('MongooseQuery', function(){
 
   describe('maxDistance', function(){
     it('via where', function(done){
-      var query = new MongooseQuery(p1.collection);
+      var query = new Query(p1.collection);
       query.where('checkin').near([40, -72]).maxDistance(1);
       assert.deepEqual(query._conditions, {checkin: {$near: [40, -72], $maxDistance: 1}});
       done();
@@ -370,10 +369,10 @@ describe('MongooseQuery', function(){
   describe('within', function(){
     describe('box', function(){
       it('via where', function(done){
-        var query = new MongooseQuery(p1.collection);
+        var query = new Query(p1.collection);
         query.where('gps').within().box({ll: [5, 25], ur: [10, 30]});
         var match = {gps: {$within: {$box: [[5, 25], [10, 30]]}}};
-        if (MongooseQuery.use$geoWithin) {
+        if (Query.use$geoWithin) {
           match.gps.$geoWithin = match.gps.$within;
           delete match.gps["$within"];
         }
@@ -384,10 +383,10 @@ describe('MongooseQuery', function(){
 
     describe('center', function(){
       it('via where', function(done){
-        var query = new MongooseQuery(p1.collection);
+        var query = new Query(p1.collection);
         query.where('gps').within().center({center: [5, 25], radius: 5});
         var match = {gps: {$within: {$center: [[5, 25], 5]}}};
-        if (MongooseQuery.use$geoWithin) {
+        if (Query.use$geoWithin) {
           match.gps.$geoWithin = match.gps.$within;
           delete match.gps["$within"];
         }
@@ -398,10 +397,10 @@ describe('MongooseQuery', function(){
 
     describe('centerSphere', function(){
       it('via where', function(done){
-        var query = new MongooseQuery(p1.collection);
+        var query = new Query(p1.collection);
         query.where('gps').within().centerSphere({center: [5, 25], radius: 5});
         var match = {gps: {$within: {$centerSphere: [[5, 25], 5]}}};
-        if (MongooseQuery.use$geoWithin) {
+        if (Query.use$geoWithin) {
           match.gps.$geoWithin = match.gps.$within;
           delete match.gps["$within"];
         }
@@ -412,10 +411,10 @@ describe('MongooseQuery', function(){
 
     describe('polygon', function(){
       it('via where', function(done){
-        var query = new MongooseQuery(p1.collection);
+        var query = new Query(p1.collection);
         query.where('gps').within().polygon({ a: { x: 10, y: 20 }, b: { x: 15, y: 25 }, c: { x: 20, y: 20 }});
         var match = {gps: {$within: {$polygon: [{ a: { x: 10, y: 20 }, b: { x: 15, y: 25 }, c: { x: 20, y: 20 }}] }}};
-        if (MongooseQuery.use$geoWithin) {
+        if (Query.use$geoWithin) {
           match.gps.$geoWithin = match.gps.$within;
           delete match.gps["$within"];
         }
@@ -427,26 +426,26 @@ describe('MongooseQuery', function(){
 
   describe('exists', function(){
     it('0 args via where', function(done){
-      var query = new MongooseQuery(p1.collection);
+      var query = new Query(p1.collection);
       query.where("username").exists();
       assert.deepEqual(query._conditions, {username: {$exists: true}});
       done();
     })
     it('1 arg via where', function(done){
-      var query = new MongooseQuery(p1.collection);
+      var query = new Query(p1.collection);
       query.where("username").exists(false);
       assert.deepEqual(query._conditions, {username: {$exists: false}});
       done();
     })
     it('where 1 argument not via where', function(done){
-      var query = new MongooseQuery(p1.collection);
+      var query = new Query(p1.collection);
       query.exists('username');
       assert.deepEqual(query._conditions, {username: {$exists: true}});
       done();
     })
 
     it('where 2 args not via where', function(done){
-      var query = new MongooseQuery(p1.collection);
+      var query = new Query(p1.collection);
       query.exists("username", false);
       assert.deepEqual(query._conditions, {username: {$exists: false}});
       done();
@@ -455,13 +454,13 @@ describe('MongooseQuery', function(){
 
   describe('all', function(){
     it('via where', function(done){
-      var query = new MongooseQuery(p1.collection);
+      var query = new Query(p1.collection);
       query.where('pets').all(['dog', 'cat', 'ferret']);
       assert.deepEqual(query._conditions, {pets: {$all: ['dog', 'cat', 'ferret']}});
       done();
     })
     it('not via where', function(done){
-      var query = new MongooseQuery(p1.collection);
+      var query = new Query(p1.collection);
       query.all('pets', ['dog', 'cat', 'ferret']);
       assert.deepEqual(query._conditions, {pets: {$all: ['dog', 'cat', 'ferret']}});
       done();
@@ -470,14 +469,14 @@ describe('MongooseQuery', function(){
 
   describe('find', function(){
     it('strict array equivalence condition v', function(done){
-      var query = new MongooseQuery(p1.collection);
+      var query = new Query(p1.collection);
       query.find({'pets': ['dog', 'cat', 'ferret']});
       assert.deepEqual(query._conditions, {pets: ['dog', 'cat', 'ferret']});
       done();
     })
     it('with no args', function(done){
       var threw = false;
-      var q = new MongooseQuery(p1.collection);
+      var q = new Query(p1.collection);
 
       try {
         q.find();
@@ -489,7 +488,7 @@ describe('MongooseQuery', function(){
       done();
     })
     it('works with overwriting previous object args (1176)', function(done){
-      var q = new MongooseQuery(p1.collection);
+      var q = new Query(p1.collection);
       assert.doesNotThrow(function(){
         q.find({ age: { $lt: 30 }});
         q.find({ age: 20 }); // overwrite
@@ -501,13 +500,13 @@ describe('MongooseQuery', function(){
 
   describe('size', function(){
     it('via where', function(done){
-      var query = new MongooseQuery(p1.collection);
+      var query = new Query(p1.collection);
       query.where('collection').size(5);
       assert.deepEqual(query._conditions, {collection: {$size: 5}});
       done();
     })
     it('not via where', function(done){
-      var query = new MongooseQuery(p1.collection);
+      var query = new Query(p1.collection);
       query.size('collection', 5);
       assert.deepEqual(query._conditions, {collection: {$size: 5}});
       done();
@@ -516,73 +515,73 @@ describe('MongooseQuery', function(){
 
   describe('slice', function(){
     it('where and positive limit param', function(done){
-      var query = new MongooseQuery(p1.collection);
+      var query = new Query(p1.collection);
       query.where('collection').slice(5);
       assert.deepEqual(query._fields, {collection: {$slice: 5}});
       done();
     })
     it('where just negative limit param', function(done){
-      var query = new MongooseQuery(p1.collection);
+      var query = new Query(p1.collection);
       query.where('collection').slice(-5);
       assert.deepEqual(query._fields, {collection: {$slice: -5}});
       done();
     })
     it('where [skip, limit] param', function (done) {
-      var query = new MongooseQuery(p1.collection);
+      var query = new Query(p1.collection);
       query.where('collection').slice([14, 10]); // Return the 15th through 25th
       assert.deepEqual(query._fields, {collection: {$slice: [14, 10]}});
       done();
     })
     it('where skip and limit params', function(done){
-      var query = new MongooseQuery(p1.collection);
+      var query = new Query(p1.collection);
       query.where('collection').slice(14, 10); // Return the 15th through 25th
       assert.deepEqual(query._fields, {collection: {$slice: [14, 10]}});
       done();
     })
     it('where just positive limit param', function(done){
-      var query = new MongooseQuery(p1.collection);
+      var query = new Query(p1.collection);
       query.where('collection').slice(5);
       assert.deepEqual(query._fields, {collection: {$slice: 5}});
       done();
     })
     it('where just negative limit param', function(done){
-      var query = new MongooseQuery(p1.collection);
+      var query = new Query(p1.collection);
       query.where('collection').slice(-5);
       assert.deepEqual(query._fields, {collection: {$slice: -5}});
       done();
     })
     it('where the [skip, limit] param', function(done){
-      var query = new MongooseQuery(p1.collection);
+      var query = new Query(p1.collection);
       query.where('collection').slice([14, 10]); // Return the 15th through 25th
       assert.deepEqual(query._fields, {collection: {$slice: [14, 10]}});
       done();
     })
     it('where the skip and limit params', function(done){
-      var query = new MongooseQuery(p1.collection);
+      var query = new Query(p1.collection);
       query.where('collection').slice(14, 10); // Return the 15th through 25th
       assert.deepEqual(query._fields, {collection: {$slice: [14, 10]}});
       done();
     })
     it('not via where, with just positive limit param', function(done){
-      var query = new MongooseQuery(p1.collection);
+      var query = new Query(p1.collection);
       query.slice('collection', 5);
       assert.deepEqual(query._fields, {collection: {$slice: 5}});
       done();
     })
     it('not via where, where just negative limit param', function(done){
-      var query = new MongooseQuery(p1.collection);
+      var query = new Query(p1.collection);
       query.slice('collection', -5);
       assert.deepEqual(query._fields, {collection: {$slice: -5}});
       done();
     })
     it('not via where, where [skip, limit] param', function(done){
-      var query = new MongooseQuery(p1.collection);
+      var query = new Query(p1.collection);
       query.slice('collection', [14, 10]); // Return the 15th through 25th
       assert.deepEqual(query._fields, {collection: {$slice: [14, 10]}});
       done();
     })
     it('not via where, where skip and limit params', function(done){
-      var query = new MongooseQuery(p1.collection);
+      var query = new Query(p1.collection);
       query.slice('collection', 14, 10); // Return the 15th through 25th
       assert.deepEqual(query._fields, {collection: {$slice: [14, 10]}});
       done();
@@ -592,13 +591,13 @@ describe('MongooseQuery', function(){
   describe('elemMatch', function(){
     describe('not via where', function(){
       it('works', function(done){
-        var query = new MongooseQuery(p1.collection);
+        var query = new Query(p1.collection);
         query.elemMatch('comments', {author: 'bnoguchi', votes: {$gte: 5}});
         assert.deepEqual(query._conditions, {comments: {$elemMatch: {author: 'bnoguchi', votes: {$gte: 5}}}});
         done();
       })
       it('where block notation', function(done){
-        var query = new MongooseQuery(p1.collection);
+        var query = new Query(p1.collection);
         query.elemMatch('comments', function (elem) {
           elem.where('author', 'bnoguchi')
           elem.where('votes').gte(5);
@@ -609,13 +608,13 @@ describe('MongooseQuery', function(){
     })
     describe('via where', function(){
       it('works', function(done){
-        var query = new MongooseQuery(p1.collection);
+        var query = new Query(p1.collection);
         query.where('comments').elemMatch({author: 'bnoguchi', votes: {$gte: 5}});
         assert.deepEqual(query._conditions, {comments: {$elemMatch: {author: 'bnoguchi', votes: {$gte: 5}}}});
         done();
       })
       it('where block notation', function(done){
-        var query = new MongooseQuery(p1.collection);
+        var query = new Query(p1.collection);
         query.where('comments').elemMatch(function (elem) {
           elem.where('author', 'bnoguchi')
           elem.where('votes').gte(5);
@@ -628,7 +627,7 @@ describe('MongooseQuery', function(){
 
   describe('$where', function(){
     it('function arg', function(done){
-      var query = new MongooseQuery(p1.collection);
+      var query = new Query(p1.collection);
       function filter () {
         return this.lastName === this.firstName;
       }
@@ -637,7 +636,7 @@ describe('MongooseQuery', function(){
       done();
     })
     it('string arg', function(done){
-      var query = new MongooseQuery(p1.collection);
+      var query = new Query(p1.collection);
       query.$where('this.lastName === this.firstName');
       assert.deepEqual(query._conditions, {$where: 'this.lastName === this.firstName'});
       done();
@@ -646,7 +645,7 @@ describe('MongooseQuery', function(){
 
   describe('limit', function(){
     it('works', function(done){
-      var query = new MongooseQuery(p1.collection);
+      var query = new Query(p1.collection);
       query.limit(5);
       assert.equal(query.options.limit,5);
       done();
@@ -655,7 +654,7 @@ describe('MongooseQuery', function(){
 
   describe('skip', function(){
     it('works', function(done){
-      var query = new MongooseQuery(p1.collection);
+      var query = new Query(p1.collection);
       query.skip(9);
       assert.equal(query.options.skip,9);
       done();
@@ -664,13 +663,13 @@ describe('MongooseQuery', function(){
 
   describe('sort', function(){
     it('works', function(done){
-      var query = new MongooseQuery(p1.collection);
+      var query = new Query(p1.collection);
       query.sort('a -c b');
       assert.deepEqual(query.options.sort, [['a', 1], ['c', -1], ['b', 1]]);
-      query = new MongooseQuery(p1.collection);
+      query = new Query(p1.collection);
       query.sort({'a': 1, 'c': -1, 'b': 'asc', e: 'descending', f: 'ascending'});
       assert.deepEqual(query.options.sort, [['a', 1], ['c', -1], ['b', 'asc'], ['e', 'descending'], ['f', 'ascending']]);
-      query = new MongooseQuery(p1.collection);
+      query = new Query(p1.collection);
       var e;
 
       try {
@@ -731,7 +730,7 @@ describe('MongooseQuery', function(){
 
   describe('populate', function(){
     it('converts to PopulateOptions objects', function(done){
-      var q = new MongooseQuery(p1.collection);
+      var q = new Query(p1.collection);
       var o = {
           path: 'yellow.brick'
         , match: { bricks: { $lt: 1000 }}
@@ -746,7 +745,7 @@ describe('MongooseQuery', function(){
     })
 
     it('overwrites duplicate paths', function(done){
-      var q = new MongooseQuery(p1.collection);
+      var q = new Query(p1.collection);
       var o = {
           path: 'yellow.brick'
         , match: { bricks: { $lt: 1000 }}
@@ -766,7 +765,7 @@ describe('MongooseQuery', function(){
     })
 
     it('accepts space delimited strings', function(done){
-      var q = new MongooseQuery(p1.collection);
+      var q = new Query(p1.collection);
       q.populate('yellow.brick dirt');
       var o = {
           path: 'yellow.brick'
@@ -786,7 +785,7 @@ describe('MongooseQuery', function(){
 
   describe('an empty query', function(){
     it('should not throw', function(done){
-      var query = new MongooseQuery(p1.collection);
+      var query = new Query(p1.collection);
       var threw = false;
 
       try {
@@ -802,7 +801,7 @@ describe('MongooseQuery', function(){
 
   describe('casting', function(){
     it('to an array of mixed', function(done){
-      var query = new MongooseQuery(p1.collection);
+      var query = new Query(p1.collection);
       var db = start();
       var Product = db.model('Product');
       db.close();
@@ -813,7 +812,7 @@ describe('MongooseQuery', function(){
     })
 
     it('find $ne should not cast single value to array for schematype of Array', function(done){
-      var query = new MongooseQuery(p1.collection);
+      var query = new Query(p1.collection);
       var db = start();
       var Product = db.model('Product');
       var Comment = db.model('Comment');
@@ -859,7 +858,7 @@ describe('MongooseQuery', function(){
     })
 
     it('subdocument array with $ne: null should not throw', function(done){
-      var query = new MongooseQuery(p1.collection);
+      var query = new Query(p1.collection);
       var db = start();
       var Product = db.model('Product');
       var Comment = db.model('Comment');
@@ -875,7 +874,7 @@ describe('MongooseQuery', function(){
     })
 
     it('find should not cast single value to array for schematype of Array', function(done){
-      var query = new MongooseQuery(p1.collection);
+      var query = new Query(p1.collection);
       var db = start();
       var Product = db.model('Product');
       var Comment = db.model('Comment');
@@ -921,7 +920,7 @@ describe('MongooseQuery', function(){
     })
 
     it('an $elemMatch with $in works (gh-1100)', function(done){
-      var query = new MongooseQuery(p1.collection);
+      var query = new Query(p1.collection);
       var db = start();
       var Product = db.model('Product');
       db.close();
@@ -936,7 +935,7 @@ describe('MongooseQuery', function(){
     })
 
     it('inequality operators for an array', function(done) {
-      var query = new MongooseQuery(p1.collection);
+      var query = new Query(p1.collection);
       var db = start();
       var Product = db.model('Product');
       var Comment = db.model('Comment');
@@ -965,10 +964,10 @@ describe('MongooseQuery', function(){
   describe('distinct', function(){
     it('op', function(done){
       var db = start();
-      var query = new MongooseQuery(p1.collection);
+      var query = new Query(p1.collection);
       var Product = db.model('Product');
       var prod = new Product({});
-      var q = new MongooseQuery(prod.collection, {}, Product).distinct('blah', function(){
+      var q = new Query(prod.collection, {}, Product).distinct('blah', function(){
         assert.equal(q.op,'distinct');
         db.close();
       })
@@ -979,9 +978,9 @@ describe('MongooseQuery', function(){
   describe('without a callback', function(){
     it('count, update, remove works', function(done){
       var db = start();
-      var query = new MongooseQuery(p1.collection);
+      var query = new Query(p1.collection);
       var Product = db.model('Product', 'update_products_' + random());
-      new MongooseQuery(p1.collection, {}, Product).count();
+      new Query(p1.collection, {}, Product).count();
       Product.create({ tags: 12345 }, function (err) {
         assert.ifError(err);
         var time = 20;
@@ -1012,7 +1011,7 @@ describe('MongooseQuery', function(){
       var db = start();
       var Product = db.model('Product');
       var prod = new Product({});
-      var q = new MongooseQuery(prod.collection, {}, Product).distinct();
+      var q = new Query(prod.collection, {}, Product).distinct();
       // use a timeout here because we have to wait for the connection to start
       // before any ops will get set
       setTimeout(function() {
@@ -1082,7 +1081,7 @@ describe('MongooseQuery', function(){
   describe('options', function(){
     describe('maxscan', function(){
       it('works', function(done){
-        var query = new MongooseQuery(p1.collection);
+        var query = new Query(p1.collection);
         query.maxscan(100);
         assert.equal(query.options.maxScan,100);
         done();
@@ -1091,15 +1090,15 @@ describe('MongooseQuery', function(){
 
     describe('slaveOk', function(){
       it('works', function(done){
-        var query = new MongooseQuery(p1.collection);
+        var query = new Query(p1.collection);
         query.slaveOk();
         assert.equal(true, query.options.slaveOk);
 
-        var query = new MongooseQuery(p1.collection);
+        var query = new Query(p1.collection);
         query.slaveOk(true);
         assert.equal(true, query.options.slaveOk);
 
-        var query = new MongooseQuery(p1.collection);
+        var query = new Query(p1.collection);
         query.slaveOk(false);
         assert.equal(false, query.options.slaveOk);
         done();
@@ -1108,21 +1107,21 @@ describe('MongooseQuery', function(){
 
     describe('tailable', function(){
       it('works', function(done){
-        var query = new MongooseQuery(p1.collection);
+        var query = new Query(p1.collection);
         query.tailable();
         assert.equal(true, query.options.tailable);
 
-        var query = new MongooseQuery(p1.collection);
+        var query = new Query(p1.collection);
         query.tailable(true);
         assert.equal(true, query.options.tailable);
 
-        var query = new MongooseQuery(p1.collection);
+        var query = new Query(p1.collection);
         query.tailable(false);
         assert.equal(false, query.options.tailable);
         done();
       })
       it('supports passing the `await` option', function(done){
-        var query = new MongooseQuery(p1.collection);
+        var query = new Query(p1.collection);
         query.tailable({ awaitdata: true });
         assert.equal(true, query.options.tailable);
         assert.equal(true, query.options.awaitdata);
@@ -1142,12 +1141,12 @@ describe('MongooseQuery', function(){
 
     describe('hint', function(){
       it('works', function(done){
-        var query2 = new MongooseQuery(p1.collection);
+        var query2 = new Query(p1.collection);
         query2.hint({'indexAttributeA': 1, 'indexAttributeB': -1});
         assert.deepEqual(query2.options.hint, {'indexAttributeA': 1, 'indexAttributeB': -1});
 
         assert.throws(function(){
-          var query3 = new MongooseQuery(p1.collection);
+          var query3 = new Query(p1.collection);
           query3.hint('indexAttributeA');
         }, /Invalid hint./);
 
@@ -1157,7 +1156,7 @@ describe('MongooseQuery', function(){
 
     describe('snapshot', function(){
       it('works', function(done){
-        var query = new MongooseQuery(p1.collection);
+        var query = new Query(p1.collection);
         query.snapshot(true);
         assert.equal(true, query.options.snapshot);
         done();
@@ -1166,7 +1165,7 @@ describe('MongooseQuery', function(){
 
     describe('batchSize', function(){
       it('works', function(done){
-        var query = new MongooseQuery(p1.collection);
+        var query = new Query(p1.collection);
         query.batchSize(10);
         assert.equal(query.options.batchSize,10);
         done();
@@ -1178,7 +1177,7 @@ describe('MongooseQuery', function(){
 
       describe('without tags', function(){
         it('works', function(done){
-          var query = new MongooseQuery(p1.collection);
+          var query = new Query(p1.collection);
           query.read('primary');
           assert.ok(query.options.readPreference instanceof P);
           assert.ok(query.options.readPreference.isValid());
@@ -1235,7 +1234,7 @@ describe('MongooseQuery', function(){
 
       describe('with tags', function(){
         it('works', function(done){
-          var query = new MongooseQuery(p1.collection);
+          var query = new Query(p1.collection);
           var tags = [{ dc: 'sf', s: 1}, { dc: 'jp', s: 2 }]
 
           query.read('pp', tags);
@@ -1290,7 +1289,7 @@ describe('MongooseQuery', function(){
       q.setOptions({ read: ['s', [{dc:'eu'}]]});
 
       assert.equal(q.options.thing, 'cat');
-      assert.deepEqual(q.options.populate.fans, { path: 'fans', select: undefined, match: undefined, options: undefined, model: undefined, _docs: {} });
+      assert.deepEqual(q._mongooseOptions.populate.fans, { path: 'fans', select: undefined, match: undefined, options: undefined, model: undefined, _docs: {} });
       assert.equal(q.options.batchSize, 10);
       assert.equal(q.options.limit, 4);
       assert.equal(q.options.skip, 3);

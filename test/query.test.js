@@ -55,16 +55,17 @@ describe('MongooseQuery', function(){
     it('("a","b","c")', function(done){
       assert.throws(function () {
         var query = new MongooseQuery(p1.collection);
-        query.select(function () {});
+        query.select('a', 'b', 'c');
       }, /Invalid select/);
       done();
     })
 
     it('["a","b","c"]', function(done){
-      var query = new MongooseQuery(p1.collection);
-      query.select(['a', 'b', 'c']);
-      assert.deepEqual(query._fields,{a: 1, b: 1, c: 1});
-      done()
+      assert.throws(function () {
+        var query = new MongooseQuery(p1.collection);
+        query.select(['a', 'b', 'c']);
+      }, /Invalid select/);
+      done();
     })
 
     it('should not overwrite fields set in prior calls', function(done){
@@ -1169,7 +1170,7 @@ describe('MongooseQuery', function(){
       });
     })
 
-    describe('read', function(){
+    describe.skip('read', function(){
       var P = mongoose.mongo.ReadPreference;
 
       describe('without tags', function(){

@@ -840,6 +840,36 @@ describe('connections:', function(){
     })
   })
 
+  describe('connecting to multiple mongos nodes (gh-1037)', function(){
+    var mongos = process.env.MONGOOSE_MULTI_MONGOS_TEST_URI;
+    if (!mongos) return console.log('Not testing multi-mongos support');
+
+    it('works', function(done){
+      var m = new mongoose.Mongoose;
+      m.connect(mongos, { mongos: true }, function (err) {
+        assert.ifError(err);
+
+        var s = m.connection.db.serverConfig;
+        assert.ok(s instanceof mongoose.mongo.Mongos);
+        assert.equal(2, s.servers.length);
+
+        var M = m.model('TestMultipleMongos', { name: String });
+        M.create({ name: 'works' }, function (err, d) {
+          assert.ifError(err);
+
+          M.findOne({ name: 'works' }, function (err, doc) {
+            assert.ifError(err);
+            assert.equal(doc.id, d.id);
+
+            m.connection.db.dropDatabase(function(){
+              m.disconnect(done);
+            });
+          })
+        })
+      })
+    })
+  })
+
   describe('modelNames()', function(){
     it('returns names of all models registered on it', function(done){
       var m = new mongoose.Mongoose;

@@ -845,6 +845,8 @@ describe('connections:', function(){
     if (!mongos) return console.log('Not testing multi-mongos support');
 
     it('works', function(done){
+      this.timeout(3000);
+
       var m = new mongoose.Mongoose;
       m.connect(mongos, { mongos: true }, function (err) {
         assert.ifError(err);

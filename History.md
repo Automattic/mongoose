@@ -1,4 +1,13 @@
 
+3.6.15 / 2013-07-16
+==================
+
+  * added; mongos failover support #1037
+  * updated; make schematype return vals return self #1580
+  * docs; add note to model.update #571
+  * docs; document third param to document.save callback #1536
+  * tests; tweek mongos test timeout
+
 3.6.14 / 2013-07-05
 ===================
 

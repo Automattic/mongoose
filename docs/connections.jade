@@ -33,6 +33,7 @@ block content
          user    - username for authentication (if not specified in uri)
          pass    - password for authentication (if not specified in uri)
          auth    - options for authentication
+         mongos  - Boolean - if true, enables High Availability support if connecting to multiple mongos
     Example:
   :js
     var options = {
@@ -68,6 +69,12 @@ block content
 
   :markdown
     _NOTE: The `database` need only be specified in one of the `uri`s._
+
+  h3#mongos_connections Multi-mongos support
+  :markdown
+    High availability over multiple `mongos` instances is also supported. Pass a connection string for your `mongos` instances and set the `mongos` option to true:
+  :js
+    mongoose.connect('mongodb://mongosA:27501,mongosB:27501', { mongos: true }, cb);
 
   h3#multiple_connections Multiple connections
   :markdown

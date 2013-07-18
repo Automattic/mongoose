@@ -18,7 +18,7 @@
   <span class="keyword">for</span> (<span class="keyword">var</span> i = <span class="number">0</span>, l = <span class="keyword">this</span>.plugins.length; i &lt; l; i++) {
     schema.plugin(<span class="keyword">this</span>.plugins[i][<span class="number">0</span>], <span class="keyword">this</span>.plugins[i][<span class="number">1</span>]);
   }
-}</code></pre></div><div class="params"><h4>Parameters:</h4><ul><li><code>schema</code><span class="types"> &lt;<a href="#schema_Schema">Schema</a>&gt; </span><span></span></li></ul></div><div class="description"></div><hr class="private"></div><div class="item method public"><h3 id="index_Mongoose-connect"><a href="#index_Mongoose-connect">Mongoose#connect()</a></h3><p>Opens the default mongoose connection.</p><span class="showcode">show code</span><div class="sourcecode"><pre><code class="javascript">Mongoose.prototype.connect = <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+}</code></pre></div><div class="params"><h4>Parameters:</h4><ul><li><code>schema</code><span class="types"> &lt;<a href="#schema_Schema">Schema</a>&gt; </span><span></span></li></ul></div><div class="description"></div><hr class="private"></div><div class="item method public"><h3 id="index_Mongoose-connect"><a href="#index_Mongoose-connect">Mongoose#connect(<code>uri(s)</code>, <code>[options]</code>, <code>[callback]</code>)</a></h3><p>Opens the default mongoose connection.</p><span class="showcode">show code</span><div class="sourcecode"><pre><code class="javascript">Mongoose.prototype.connect = <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
   <span class="keyword">var</span> conn = <span class="keyword">this</span>.connection;
 
   <span class="keyword">if</span> (rgxReplSet.test(arguments[<span class="number">0</span>])) {
@@ -28,9 +28,25 @@
   }
 
   <span class="keyword">return</span> <span class="keyword">this</span>;
-};</code></pre></div><div class="returns"><h4>Returns:</h4><ul><li><span class="types"> &lt;<a href="#index_Mongoose">Mongoose</a>&gt; </span><span>this</span></li></ul></div><div class="see"><h4>See:</h4><ul class="see"><li><a href="#index_Mongoose-createConnection" title="Mongoose#createConnection">Mongoose#createConnection</a></li></ul></div><div class="description"><p>If arguments are passed, they are proxied to either <a href="#connection_Connection-open">Connection#open</a> or <a href="#connection_Connection-openSet">Connection#openSet</a> appropriately.</p>
+};</code></pre></div><div class="params"><h4>Parameters:</h4><ul><li><code>uri(s)</code><span class="types"> &lt;<a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/String">String</a>&gt; </span><span></span></li><li><code>[options]</code><span class="types"> &lt;<a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Object">Object</a>&gt; </span><span></span></li><li><code>[callback]</code><span class="types"> &lt;<a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Function">Function</a>&gt; </span><span></span></li></ul></div><div class="returns"><h4>Returns:</h4><ul><li><span class="types"> &lt;<a href="#index_Mongoose">Mongoose</a>&gt; </span><span>this</span></li></ul></div><div class="see"><h4>See:</h4><ul class="see"><li><a href="#index_Mongoose-createConnection" title="Mongoose#createConnection">Mongoose#createConnection</a></li></ul></div><div class="description"><p>If arguments are passed, they are proxied to either <a href="#connection_Connection-open">Connection#open</a> or <a href="#connection_Connection-openSet">Connection#openSet</a> appropriately.</p>
 
-<p><em>Options passed take precedence over options included in connection strings.</em></p></div><hr class=""></div><div class="item method public"><h3 id="index_Mongoose-createConnection"><a href="#index_Mongoose-createConnection">Mongoose#createConnection(<code>[uri]</code>, <code>[options]</code>)</a></h3><p>Creates a Connection instance.</p><span class="showcode">show code</span><div class="sourcecode"><pre><code class="javascript">Mongoose.prototype.createConnection = <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+<p><em>Options passed take precedence over options included in connection strings.</em></p>
+
+<h4>Example:</h4>
+
+<pre><code>mongoose.connect(<span class="string">'mongodb://user:pass@localhost:port/database'</span>);
+
+<span class="comment">// replica sets</span>
+<span class="keyword">var</span> uri = <span class="string">'mongodb://user:pass@localhost:port/database,mongodb://anotherhost:port,mongodb://yetanother:port'</span>;
+mongoose.connect(uri);
+
+<span class="comment">// with options</span>
+mongoose.connect(uri, options);
+
+<span class="comment">// connecting to multiple mongos</span>
+<span class="keyword">var</span> uri = <span class="string">'mongodb://hostA:27501,hostB:27501'</span>;
+<span class="keyword">var</span> opts = { mongos: <span class="literal">true</span> };
+mongoose.connect(uri, opts);</code></pre></div><hr class=""></div><div class="item method public"><h3 id="index_Mongoose-createConnection"><a href="#index_Mongoose-createConnection">Mongoose#createConnection(<code>[uri]</code>, <code>[options]</code>)</a></h3><p>Creates a Connection instance.</p><span class="showcode">show code</span><div class="sourcecode"><pre><code class="javascript">Mongoose.prototype.createConnection = <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
   <span class="keyword">var</span> conn = <span class="keyword">new</span> Connection(<span class="keyword">this</span>);
   <span class="keyword">this</span>.connections.push(conn);
 
@@ -475,13 +491,18 @@ replset - passed to the connection ReplSetServer instance
 user    - username for authentication
 pass    - password for authentication
 auth    - options for authentication (see <a href='http://mongodb.github.com/node-mongodb-native/api-generated/db.html#authenticate'>http://mongodb.github.com/node-mongodb-native/api-generated/db.html#authenticate</a>)
+mongos  - Boolean - if true, enables High Availability support for mongos
 </code></pre>
-
-<p><em>Options passed take precedence over options included in connection strings.</em></p>
 
 <h4>Notes:</h4>
 
-<p>Mongoose forces the db option <code>forceServerObjectId</code> false and cannot be overridden.<br />Mongoose defaults the server <code>auto_reconnect</code> options to true which can be overridden.<br />See the node-mongodb-native driver instance for options that it understands.</p></div><hr class=""></div><div class="item method private"><h3 id="connection_Connection-error"><a href="#connection_Connection-error">Connection#error(<code>err</code>, <code>callback</code>)</a></h3><p>error</p><span class="showcode">show code</span><div class="sourcecode"><pre><code class="javascript">Connection.prototype.error = <span class="function"><span class="keyword">function</span> <span class="params">(err, callback)</span> {</span>
+<p><em>If connecting to multiple mongos servers, set the <code>mongos</code> option to true.</em></p>
+
+<pre><code>conn.open(<span class="string">'mongodb://mongosA:27501,mongosB:27501'</span>, { mongos: <span class="literal">true</span> }, cb);</code></pre>
+
+<p>Mongoose forces the db option <code>forceServerObjectId</code> false and cannot be overridden.<br />Mongoose defaults the server <code>auto_reconnect</code> options to true which can be overridden.<br />See the node-mongodb-native driver instance for options that it understands.</p>
+
+<p><em>Options passed take precedence over options included in connection strings.</em></p></div><hr class=""></div><div class="item method private"><h3 id="connection_Connection-error"><a href="#connection_Connection-error">Connection#error(<code>err</code>, <code>callback</code>)</a></h3><p>error</p><span class="showcode">show code</span><div class="sourcecode"><pre><code class="javascript">Connection.prototype.error = <span class="function"><span class="keyword">function</span> <span class="params">(err, callback)</span> {</span>
   <span class="keyword">if</span> (callback) <span class="keyword">return</span> callback(err);
   <span class="keyword">this</span>.emit(<span class="string">'error'</span>, err);
 }</code></pre></div><div class="params"><h4>Parameters:</h4><ul><li><code>err</code><span class="types"> &lt;<a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Error">Error</a>&gt; </span><span></span></li><li><code>callback</code><span class="types"> &lt;<a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Function">Function</a>&gt; </span><span>optional</span></li></ul></div><div class="description"><p>Graceful error handling, passes error to callback<br />if available, else emits error on the connection.</p></div><hr class="private"></div><div class="item method private"><h3 id="connection_Connection-_open"><a href="#connection_Connection-_open">Connection#_open(<code>callback</code>)</a></h3><p>Handles opening the connection with the appropriate method based on connection type.</p><span class="showcode">show code</span><div class="sourcecode"><pre><code class="javascript">Connection.prototype._open = <span class="function"><span class="keyword">function</span> <span class="params">(callback)</span> {</span>
@@ -1698,7 +1719,7 @@ doc.toObject({ hide: <span class="string">'secret _id'</span>, transform: <span 
 
 <pre><code>Blog.$where(<span class="string">'this.comments.length &amp;gt; 5'</span>).exec(<span class="function"><span class="keyword">function</span> <span class="params">(err, docs)</span> {</span>});</code></pre></div><hr class=""></div><div class="item method public"><h3 id="model_Model"><a href="#model_Model">Model(<code>doc</code>)</a></h3><p>Model constructor</p><span class="showcode">show code</span><div class="sourcecode"><pre><code class="javascript"><span class="function"><span class="keyword">function</span> <span class="title">Model</span> <span class="params">(doc, fields, skipId)</span> {</span>
   Document.call(<span class="keyword">this</span>, doc, fields, skipId);
-};</code></pre></div><div class="params"><h4>Parameters:</h4><ul><li><code>doc</code><span class="types"> &lt;<a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Object">Object</a>&gt; </span><span>values to with which to create the document</span></li></ul></div><div class="inherits"><h4>Inherits:</h4><ul><li><a href="#document_Document">Document</a></li></ul></div><div class="events"><h4>Events:</h4><ul><li><p><code>error</code>: If listening to this Model event, it is emitted when a document was saved without passing a callback and an <code>error</code> occurred. If not listening, the event bubbles to the connection used to create this Model.</p></li><li><p><code>index</code>: Emitted after <code>Model#ensureIndexes</code> completes. If an error occurred it is passed with the event.</p></li></ul></div><div class="description"></div><hr class=""></div><div class="item method public"><h3 id="model_Model-increment"><a href="#model_Model-increment">Model#increment()</a></h3><p>Signal that we desire an increment of this documents version.</p><span class="showcode">show code</span><div class="sourcecode"><pre><code class="javascript">Model.prototype.increment = <span class="function"><span class="keyword">function</span> <span class="title">increment</span> <span class="params">()</span> {</span>
+};</code></pre></div><div class="params"><h4>Parameters:</h4><ul><li><code>doc</code><span class="types"> &lt;<a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Object">Object</a>&gt; </span><span>values with which to create the document</span></li></ul></div><div class="inherits"><h4>Inherits:</h4><ul><li><a href="#document_Document">Document</a></li></ul></div><div class="events"><h4>Events:</h4><ul><li><p><code>error</code>: If listening to this event, it is emitted when a document was saved without passing a callback and an <code>error</code> occurred. If not listening, the event bubbles to the connection used to create this Model.</p></li><li><p><code>index</code>: Emitted after <code>Model#ensureIndexes</code> completes. If an error occurred it is passed with the event.</p></li></ul></div><div class="description"><p>Provides the interface to MongoDB collections as well as creates document instances.</p></div><hr class=""></div><div class="item method public"><h3 id="model_Model-increment"><a href="#model_Model-increment">Model#increment()</a></h3><p>Signal that we desire an increment of this documents version.</p><span class="showcode">show code</span><div class="sourcecode"><pre><code class="javascript">Model.prototype.increment = <span class="function"><span class="keyword">function</span> <span class="title">increment</span> <span class="params">()</span> {</span>
   <span class="keyword">this</span>.$__.version = VERSION_ALL;
   <span class="keyword">return</span> <span class="keyword">this</span>;
 }</code></pre></div><div class="see"><h4>See:</h4><ul class="see"><li><a href="http://mongoosejs.com/docs/guide.html#versionKey" title="versionKeys">versionKeys</a></li></ul></div><div class="description"><h4>Example:</h4>

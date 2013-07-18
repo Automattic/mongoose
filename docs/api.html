@@ -1307,6 +1307,7 @@ doc.set(path, value, { strict: <span class="literal">false</span> });</code></pr
 <h4>Example</h4>
 
 <pre><code><span class="comment">// specify the transform schema option</span>
+<span class="keyword">if</span> (!schema.options.toObject) schema.options.toObject = {};
 schema.options.toObject.transform = <span class="function"><span class="keyword">function</span> <span class="params">(doc, ret, options)</span> {</span>
   <span class="comment">// remove the _id of every document before returning the result</span>
   <span class="keyword">delete</span> ret._id;
@@ -1320,7 +1321,8 @@ doc.toObject(); <span class="comment">// { name: 'Wreck-it Ralph' }</span></code
 
 <p>With transformations we can do a lot more than remove properties. We can even return completely new customized objects:</p>
 
-<pre><code>schema.options.toObject.transform = <span class="function"><span class="keyword">function</span> <span class="params">(doc, ret, options)</span> {</span>
+<pre><code><span class="keyword">if</span> (!schema.options.toObject) schema.options.toObject = {};
+schema.options.toObject.transform = <span class="function"><span class="keyword">function</span> <span class="params">(doc, ret, options)</span> {</span>
   <span class="keyword">return</span> { movie: ret.name }
 }
 
@@ -1343,7 +1345,8 @@ doc.toObject({ transform: xform }); <span class="comment">// { inline: 'Wreck-it
 
 <p><em>Note: if you call <code>toObject</code> and pass any options, the transform declared in your schema options will <strong>not</strong> be applied. To force its application pass <code>transform: true</code></em></p>
 
-<pre><code>schema.options.toObject.hide = <span class="string">'_id'</span>;
+<pre><code><span class="keyword">if</span> (!schema.options.toObject) schema.options.toObject = {};
+schema.options.toObject.hide = <span class="string">'_id'</span>;
 schema.options.toObject.transform = <span class="function"><span class="keyword">function</span> <span class="params">(doc, ret, options)</span> {</span>
   <span class="keyword">if</span> (options.hide) {
     options.hide.split(<span class="string">' '</span>).forEach(<span class="function"><span class="keyword">function</span> <span class="params">(prop)</span> {</span>

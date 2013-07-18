@@ -33,7 +33,7 @@ block content
          user    - username for authentication (if not specified in uri)
          pass    - password for authentication (if not specified in uri)
          auth    - options for authentication
-         mongos  - Boolean - if true, enables High Availability support if connecting to multiple mongos
+         mongos  - Boolean - if true, enables High Availability support for mongos
     Example:
   :js
     var options = {
@@ -82,6 +82,9 @@ block content
 
   :js
     var conn = mongoose.createConnection('uri,uri,uri...', options);
+
+  :markdown
+    This [connection](./api.html#connection_Connection) object can then be used for creating and retrieving [models](./api.html#model_Model) that are scoped only to this specific connection.
 
   h3#connection_pools Connection pools
   :markdown

@@ -33,6 +33,7 @@ block content
          user    - username for authentication (if not specified in uri)
          pass    - password for authentication (if not specified in uri)
          auth    - options for authentication
+         mongos  - Boolean - if true, enables High Availability support for mongos
     Example:
   :js
     var options = {
@@ -69,12 +70,21 @@ block content
   :markdown
     _NOTE: The `database` need only be specified in one of the `uri`s._
 
+  h3#mongos_connections Multi-mongos support
+  :markdown
+    High availability over multiple `mongos` instances is also supported. Pass a connection string for your `mongos` instances and set the `mongos` option to true:
+  :js
+    mongoose.connect('mongodb://mongosA:27501,mongosB:27501', { mongos: true }, cb);
+
   h3#multiple_connections Multiple connections
   :markdown
     So far we've seen how to connect to MongoDB using Mongoose's default connection. At times we may need multiple connections open to Mongo, each with different read/write settings, or maybe just to different databases for example. In these cases we can utilize `mongoose.createConnection()` which accepts all the arguments already discussed and returns a fresh connection for you.
 
   :js
     var conn = mongoose.createConnection('uri,uri,uri...', options);
+
+  :markdown
+    This [connection](./api.html#connection_Connection) object can then be used for creating and retrieving [models](./api.html#model_Model) that are scoped only to this specific connection.
 
   h3#connection_pools Connection pools
   :markdown

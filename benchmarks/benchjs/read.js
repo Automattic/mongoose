@@ -5,8 +5,8 @@ var Benchmark = require('benchmark');
 var suite = new Benchmark.Suite();
 
 var Schema = mongoose.Schema;
-var mongo = require('mongodb');
 var ObjectId = Schema.Types.ObjectId;
+var mongo = require('mongodb');
 var utils = require('../../lib/utils.js');
 
 // to make things work in the way the are normally described online...
@@ -16,7 +16,7 @@ var utils = require('../../lib/utils.js');
  */
 
 /**
- * These are all the benchmark tests for updating data
+ * These are all the benchmark tests for reading data
  */
 
 
@@ -98,11 +98,10 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function (err) {
       address : " Nowhere-ville USA"
     };
 
-    // this is for some of the update tests below
-    var testBp;
     // insert all of the data here
     var count = 4000;
     for (var i=0; i < 1000; i++) {
+      data.age = Math.floor(Math.random() * 50);
       User.create(data, function (err, u) {
         if (err) throw err;
         mIds.push(u.id);
@@ -110,13 +109,13 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function (err) {
       });
       var nData = utils.clone(data);
       user.insert(nData, function (err, res) {
+        if (err) throw err;
         dIds.push(res[0]._id);
         --count || next();
       });
       BlogPost.create(blogData, function (err, bp) {
         if (err) throw err;
         bmIds.push(bp.id);
-        testBp = bp;
         --count || next();
       });
 
@@ -176,119 +175,99 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function (err) {
       });
     }
 
-    suite.add('Update - Mongoose - Basic', {
+    suite.add('Read - Mongoose - Basic', {
       defer : true,
       fn : function (deferred) {
-        User.update({ _id : getNextmId() }, { age : 2, $push : { likes : "metal" }}, function (err) {
+        User.findOne({ _id : getNextmId()}, function (err) {
           if (err) throw err;
           deferred.resolve();
         });
       }
-    }).add('Update - Driver - Basic', {
+    }).add('Read - Driver - Basic', {
       defer : true,
       fn : function (deferred) {
-        user.update({ _id : getNextdId() }, { $set : { age : 2 }, $push : { likes : "metal" }}, function (err) {
+        user.find({ _id : getNextdId() }, function (err, cursor) {
           if (err) throw err;
-          deferred.resolve();
-        });
-      }
-    }).add('Update - Mongoose - Embedded Docs', {
-      defer : true,
-      fn : function (deferred) {
-
-        BlogPost.findOne({ _id : getNextbmId() }, function (err, bp) {
-          if (err) throw err;
-          bp.comments[3].title = "this is a new title";
-          bp.comments[0].date = new Date();
-          bp.comments.push(commentData);
-          bp.save(function (err) {
+          cursor.toArray(function (err) {
             if (err) throw err;
             deferred.resolve();
           });
         });
       }
-    }).add('Update - Driver - Embdedded Docs', {
+    }).add('Read - Mongoose - With lean', {
+      defer : true,
+      fn : function (deferred) {
+        User.findOne({ _id : getNextmId()}, {}, { lean : true}, function (err) {
+          if (err) throw err;
+          deferred.resolve();
+        });
+      }
+    }).add('Read - Mongoose - Multiple Items', {
+      defer : true,
+      fn : function (deferred) {
+        var ids = [];
+        for (var i=0; i < 25; i++) {
+          ids.push(getNextmId());
+        }
+        User.find({ _id : { $in : ids }}, function (err) {
+          if (err) throw err;
+          deferred.resolve();
+        });
+      }
+    }).add('Read - Driver - Multiple Items', {
+      defer : true,
+      fn : function (deferred) {
+        var ids = [];
+        for (var i=0; i < 25; i++) {
+          ids.push(getNextdId());
+        }
+        user.find({ _id : { $in : ids }}, function (err, cursor) {
+          if (err) throw err;
+          cursor.toArray(function (err) {
+            if (err) throw err;
+            deferred.resolve();
+          });
+        });
+      }
+    }).add('Read - Mongoose - Non-index', {
+      defer : true,
+      fn : function (deferred) {
+        var age = Math.floor(Math.random() * 50);
+
+        User.find({ age : age }, function (err) {
+          if (err) throw err;
+          deferred.resolve();
+        });
+      }
+    }).add('Read - Driver - Non-index', {
+      defer : true,
+      fn : function (deferred) {
+        var age = Math.floor(Math.random() * 50);
+
+        user.find({ age : age }, function (err, cursor) {
+          if (err) throw err;
+          cursor.toArray(function (err) {
+            if (err) throw err;
+            deferred.resolve();
+          });
+        });
+      }
+    }).add('Read - Mongoose - Embedded Docs', {
+      defer : true,
+      fn : function (deferred) {
+
+        BlogPost.find({ _id : getNextbmId()}, function (err) {
+          if (err) throw err;
+          deferred.resolve();
+        });
+      }
+    }).add('Read - Driver - Embedded Docs', {
       defer : true,
       fn : function (deferred) {
 
         blogpost.find({ _id : getNextbdId() }, function (err, cursor) {
           if (err) throw err;
-          cursor.toArray(function (err, res) {
-            if (err) throw err;
-            var bp = res[0];
-            bp.comments[3].title = "this is a new title";
-            bp.comments[0].date = new Date();
-            bp.comments.push(commentData);
-            blogpost.save(bp, function (err) {
-              if (err) throw err;
-              deferred.resolve();
-            });
-          });
-        });
-      }
-    }).add('Update - Mongoose - Multiple Documents', {
-      defer : true,
-      fn : function (deferred) {
-        var ids = [];
-        for (var i=0; i < 50; i++) {
-          ids.push(getNextmId());
-        }
-        User.update({ _id : { $in : ids} }, { age : 2, $push : { likes : "metal" }}, function (err) {
-          if (err) throw err;
-          deferred.resolve();
-        });
-      }
-    }).add('Update - Driver - Multiple Documents', {
-      defer : true,
-      fn : function (deferred) {
-        var ids = [];
-        for (var i=0; i < 50; i++) {
-          ids.push(getNextdId());
-        }
-        user.update({ _id : { $in : ids} }, { $set : { age : 2 }, $push : { likes : "metal" }}, function (err) {
-          if (err) throw err;
-          deferred.resolve();
-        });
-      }
-    }).add('Update - Mongoose - $pop and push', {
-      defer : true,
-      fn : function (deferred) {
-        testBp.comments.push(commentData);
-        testBp.comments.$shift();
-        testBp.save(function (err) {
-          if (err) throw err;
-          deferred.resolve();
-        });
-      }
-    }).add('Update - Mongoose - Array Maniuplation, parallel ops', {
-      defer : true,
-      fn : function (deferred) {
-        var done = false;
-        BlogPost.update({ _id : testBp.id }, { $pop : { comments : -1 }}, function (err) {
-          if (err) throw err;
-          done && deferred.resolve();
-          done = true;
-        });
-        BlogPost.update({ _id : testBp.id }, { $push : { comments : commentData }}, function (err) {
-          if (err) throw err;
-          done && deferred.resolve();
-          done = true;
-        });
-      }
-    }).add('Update - Mongoose - findOneAndModify', {
-      defer : true,
-      fn : function (deferred) {
-        BlogPost.findOneAndUpdate({ _id : getNextbmId() }, { $set : { age : 2 }, $push : { likes : "metal" }}, function (err) {
-          if (err) throw err;
-          deferred.resolve();
-        });
-      }
-    }).add('Update - Mongoose - find and update, separate ops', {
-      defer : true,
-      fn : function (deferred) {
-        BlogPost.findOne({ _id : getNextbmId() }, function (err, bp) {
-          if (err) throw err;
-          bp.update({ $set : { age : 2 }, $push : { likes : "metal" }}, function (err) {
+          cursor.toArray(function (err) {
             if (err) throw err;
             deferred.resolve();
           });
@@ -304,13 +283,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function (err) {
       });
     });
     function next() {
-      for (var i=0; i < 100; i++) {
-        testBp.comments.push(commentData);
-      }
-      testBp.save(function (err) {
-        if (err) throw err;
-        suite.run({ async : true });
-      });
+      suite.run({ async : true });
     }
   });
 });

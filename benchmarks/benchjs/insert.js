@@ -6,6 +6,8 @@ var suite = new Benchmark.Suite();
 
 var Schema = mongoose.Schema;
 var mongo = require('mongodb');
+var utils = require('../../lib/utils.js');
+var ObjectId = Schema.Types.ObjectId;
 
 // to make things work in the way the are normally described online...
 /*
@@ -23,56 +25,129 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function (err) {
   mongo.connect('mongodb://localhost/mongoose-bench', function (err, db) {
     if (err) throw err;
 
+    var Comments = new Schema;
+    Comments.add({
+        title     : String
+      , date      : Date
+      , body      : String
+      , comments  : [Comments]
+    });
 
-    function setup() {
-      var UserSchema = new Schema({
-        name : String,
-        age: Number,
-        likes: [String],
-        address: String
-      });
+    var BlogPost = new Schema({
+        title     : String
+      , author    : String
+      , slug      : String
+      , date      : Date
+      , meta      : {
+            date      : Date
+          , visitors  : Number
+        }
+      , published : Boolean
+      , mixed     : {}
+      , numbers   : [Number]
+      , tags      : [String]
+      , owners    : [ObjectId]
+      , comments  : [Comments]
+      , def       : { type: String, default: 'kandinsky' }
+    });
 
-      mongoose.model('User', UserSchema);
+    var blogData = {
+      title : 'dummy post',
+      author : 'somebody',
+      slug : 'test.post',
+      date : new Date(),
+      meta : { date : new Date(), visitors: 9001},
+      published : true,
+      mixed : { thisIsRandom : true },
+      numbers : [1,2,7,10,23432],
+      tags : ['test', 'BENCH', 'things', 'more things'],
+      def : 'THANGS!!!',
+      comments : []
+    };
+    var commentData = {
+      title : 'test comment',
+      date : new Date(),
+      body : 'this be some crazzzyyyyy text that would go in a comment',
+      comments : [{ title : 'second level', date : new Date(), body : 'texttt'}]
+    };
+    for (var i=0; i < 5; i++) {
+      blogData.comments.push(commentData);
     }
+    var data = {
+      name : "name",
+      age : 0,
+      likes : ["dogs", "cats", "pizza"],
+      address : " Nowhere-ville USA"
+    };
+
+    var UserSchema = new Schema({
+      name : String,
+      age: Number,
+      likes: [String],
+      address: String
+    });
+
+    var User = mongoose.model('User', UserSchema);
+    var BlogPost = mongoose.model('BlogPost', BlogPost);
+    var user = db.collection('user');
+    var blogpost = db.collection('blogpost');
 
     function closeDB() {
-      var User = mongoose.model('User');
-      var user = db.collection('user');
+      var dm = false;
+      var dd = false;
       User.remove(function () {
-        mongoose.disconnect();
+        dm && mongoose.disconnect();
+        dm = true;
       });
       user.remove({}, function (err) {
         if (err) throw err;
-        db.close();
+        dd && db.close();
+        dd = true;
+      });
+      BlogPost.remove(function () {
+        dm && mongoose.disconnect();
+        dm = true;
+      });
+      blogpost.remove({}, function (err) {
+        if (err) throw err;
+        dd && db.close();
+        dd = true;
       });
     }
 
-    suite.on('start', setup).add('Insert - Mongoose', {
+    suite.add('Insert - Mongoose - Basic', {
       defer : true,
       fn : function (deferred) {
-        var User = mongoose.model('User');
-        var data = {
-          name : "name",
-          age : 0,
-          likes : ["dogs", "cats", "pizza"],
-          address : " Nowhere-ville USA"
-        };
-        User.create(data, function (err) {
+        var nData = utils.clone(data);
+        User.create(nData, function (err) {
           if (err) throw err;
           deferred.resolve();
         });
       }
-    }).add('Insert - Driver', {
+    }).add('Insert - Driver - Basic', {
       defer : true,
       fn : function (deferred) {
-        var user = db.collection('user');
-        var data = {
-          name : "name",
-          age : 0,
-          likes : ["dogs", "cats", "pizza"],
-          address : " Nowhere-ville USA"
-        };
-        user.insert(data, function (err) {
+        var nData = utils.clone(data);
+        user.insert(nData, function (err) {
+          if (err) throw err;
+          deferred.resolve();
+        });
+      }
+    }).add('Insert - Mongoose - Embedded Docs', {
+      defer : true,
+      fn : function (deferred) {
+        var bp = utils.clone(blogData);
+        BlogPost.create(bp, function (err) {
+          if (err) throw err;
+          deferred.resolve();
+        });
+      }
+    }).add('Insert - Driver - Embedded Docs', {
+      defer : true,
+      fn : function (deferred) {
+
+        var bp = utils.clone(blogData);
+        blogpost.insert(bp, function (err) {
           if (err) throw err;
           deferred.resolve();
         });

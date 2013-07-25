@@ -102,12 +102,14 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function (err) {
     // insert all of the data here
     var count = 5;
     for (var i=0; i < blog.length; i++) {
-      BlogPost.create(blog[i], function (err, bl) {
-        if (err) throw err;
-        console.log(bl.id);
-        blog[i] = bl;
-        --count || next();
-      });
+      // use some closure magic to make sure we retain the index
+      (function(c) {
+        BlogPost.create(blog[c], function (err, bl) {
+          if (err) throw err;
+          blog[c] = bl;
+          --count || next();
+        });
+      })(i);
     }
 
   }
@@ -120,8 +122,14 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function (err) {
   }
 
   function closeDB() {
+    var close = false;
     BlogPost.remove(function () {
-      mongoose.disconnect();
+      close && mongoose.disconnect();
+      close = true;
+    });
+    Comments.remove(function () {
+      close && mongoose.disconnect();
+      close = true;
     });
   }
 
@@ -170,9 +178,15 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function (err) {
     console.log(String(evt.target));
   }).on('complete', function () {
     closeDB();
+    var outObj = {};
     this.forEach(function (item) {
-      console.log(item.name);
+      var out = {};
+      out.stats = item.stats;
+      delete out.stats.sample;
+      out.ops = item.hz;
+      outObj[item.name.replace(/\s/g, "")] = out;
     });
+    console.log(outObj);
   });
   function next() {
     suite.run({ async : true });

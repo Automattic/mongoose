@@ -120,7 +120,15 @@ suite.add('Casting - Embedded Docs - 0 Docs', {
   console.log(String(evt.target));
 }).on('complete', function () {
   this.forEach(function (item) {
-    console.log(item.name);
+    var outObj = {};
+    this.forEach(function (item) {
+      var out = {};
+      out.stats = item.stats;
+      delete out.stats.sample;
+      out.ops = item.hz;
+      outObj[item.name.replace(/\s/g, "")] = out;
+    });
+    console.log(outObj);
   });
 }).run({ async : true });
 

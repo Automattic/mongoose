@@ -299,9 +299,15 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function (err) {
       console.log(String(evt.target));
     }).on('complete', function () {
       closeDB();
+      var outObj = {};
       this.forEach(function (item) {
-        console.log(item.name);
+        var out = {};
+        out.stats = item.stats;
+        delete out.stats.sample;
+        out.ops = item.hz;
+        outObj[item.name.replace(/\s/g, "")] = out;
       });
+      console.log(outObj);
     });
     function next() {
       for (var i=0; i < 100; i++) {

@@ -186,12 +186,9 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function (err) {
     }).add('Read - Driver - Basic', {
       defer : true,
       fn : function (deferred) {
-        user.find({ _id : getNextdId() }, function (err, cursor) {
+        user.findOne({ _id : getNextdId() }, function (err, cursor) {
           if (err) throw err;
-          cursor.toArray(function (err) {
-            if (err) throw err;
-            deferred.resolve();
-          });
+          deferred.resolve();
         });
       }
     }).add('Read - Mongoose - With lean', {

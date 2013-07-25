@@ -179,7 +179,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function (err) {
     suite.add('Update - Mongoose - Basic', {
       defer : true,
       fn : function (deferred) {
-        User.update({ _id : getNextmId() }, { age : 2, $push : { likes : "metal" }}, function (err) {
+        User.update({ _id : getNextmId() }, { $set : { age : 2 }, $push : { likes : "metal" }}, function (err) {
           if (err) throw err;
           deferred.resolve();
         });
@@ -201,6 +201,10 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function (err) {
           bp.comments[3].title = "this is a new title";
           bp.comments[0].date = new Date();
           bp.comments.push(commentData);
+          // save in Mongoose behaves differently than it does in the driver.
+          // The driver will send the full document, while mongoose will check
+          // and only update fields that have been changed. This is meant to
+          // illustrate that difference between the two
           bp.save(function (err) {
             if (err) throw err;
             deferred.resolve();
@@ -211,18 +215,14 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function (err) {
       defer : true,
       fn : function (deferred) {
 
-        blogpost.find({ _id : getNextbdId() }, function (err, cursor) {
+        blogpost.findOne({ _id : getNextbdId() }, function (err, bp) {
           if (err) throw err;
-          cursor.toArray(function (err, res) {
+          bp.comments[3].title = "this is a new title";
+          bp.comments[0].date = new Date();
+          bp.comments.push(commentData);
+          blogpost.save(bp, function (err) {
             if (err) throw err;
-            var bp = res[0];
-            bp.comments[3].title = "this is a new title";
-            bp.comments[0].date = new Date();
-            bp.comments.push(commentData);
-            blogpost.save(bp, function (err) {
-              if (err) throw err;
-              deferred.resolve();
-            });
+            deferred.resolve();
           });
         });
       }
@@ -233,7 +233,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function (err) {
         for (var i=0; i < 50; i++) {
           ids.push(getNextmId());
         }
-        User.update({ _id : { $in : ids} }, { age : 2, $push : { likes : "metal" }}, function (err) {
+        User.update({ _id : { $in : ids} }, { $set : { age : 2 } , $push : { likes : "metal" }}, function (err) {
           if (err) throw err;
           deferred.resolve();
         });

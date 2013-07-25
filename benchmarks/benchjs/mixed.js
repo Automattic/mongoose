@@ -175,7 +175,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function (err) {
       });
     }
 
-    suite.add('Mixed - Mongoose - Heavy Read, low write', {
+    suite.add('Multi-Op - Mongoose - Heavy Read, low write', {
       defer : true,
       fn : function (deferred) {
         var count = 150;
@@ -194,17 +194,14 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function (err) {
           });
         }
       }
-    }).add('Mixed - Driver - Heavy Read, low write', {
+    }).add('Multi-Op - Driver - Heavy Read, low write', {
       defer : true,
       fn : function (deferred) {
         var count = 150;
         for (var i=0; i < 140; i++) {
-          user.find({ _id : getNextdId() }, function (err, cursor) {
+          user.findOne({ _id : getNextdId() }, function (err, cursor) {
             if (err) throw err;
-            cursor.toArray(function (err) {
-              if (err) throw err;
-              --count || deferred.resolve();
-            });
+            --count || deferred.resolve();
           });
         }
 
@@ -216,7 +213,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function (err) {
           });
         }
       }
-    }).add('Mixed - Mongoose - Embedded Docs - Heavy Read, low write', {
+    }).add('Multi-Op - Mongoose - Embedded Docs - Heavy Read, low write', {
       defer : true,
       fn : function (deferred) {
         var count = 150;
@@ -235,17 +232,14 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function (err) {
           });
         }
       }
-    }).add('Mixed - Driver - Embedded Docs - Heavy Read, low write', {
+    }).add('Multi-Op - Driver - Embedded Docs - Heavy Read, low write', {
       defer : true,
       fn : function (deferred) {
         var count = 150;
         for (var i=0; i < 140; i++) {
-          blogpost.find({ _id : getNextbdId() }, function (err, cursor) {
+          blogpost.findOne({ _id : getNextbdId() }, function (err, cursor) {
             if (err) throw err;
-            cursor.toArray(function (err) {
-              if (err) throw err;
-              --count || deferred.resolve();
-            });
+            --count || deferred.resolve();
           });
         }
 
@@ -257,7 +251,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function (err) {
           });
         }
       }
-    }).add('Mixed - Mongoose - Heavy Write, low read', {
+    }).add('Multi-Op - Mongoose - Heavy Write, low read', {
       defer : true,
       fn : function (deferred) {
         var count = 150;
@@ -276,17 +270,14 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function (err) {
           });
         }
       }
-    }).add('Mixed - Driver - Heavy Write, low read', {
+    }).add('Multi-Op - Driver - Heavy Write, low read', {
       defer : true,
       fn : function (deferred) {
         var count = 150;
         for (var i=0; i < 10; i++) {
-          user.find({ _id : getNextdId() }, function (err, cursor) {
+          user.findOne({ _id : getNextdId() }, function (err, cursor) {
             if (err) throw err;
-            cursor.toArray(function (err) {
-              if (err) throw err;
-              --count || deferred.resolve();
-            });
+            --count || deferred.resolve();
           });
         }
 
@@ -298,7 +289,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function (err) {
           });
         }
       }
-    }).add('Mixed - Mongoose - Embedded Docs - Heavy Write, low read', {
+    }).add('Multi-Op - Mongoose - Embedded Docs - Heavy Write, low read', {
       defer : true,
       fn : function (deferred) {
         var count = 150;
@@ -317,17 +308,14 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function (err) {
           });
         }
       }
-    }).add('Mixed - Driver - Embedded Docs - Heavy Write, low read', {
+    }).add('Multi-Op - Driver - Embedded Docs - Heavy Write, low read', {
       defer : true,
       fn : function (deferred) {
         var count = 150;
         for (var i=0; i < 10; i++) {
-          blogpost.find({ _id : getNextbdId() }, function (err, cursor) {
+          blogpost.findOne({ _id : getNextbdId() }, function (err, cursor) {
             if (err) throw err;
-            cursor.toArray(function (err) {
-              if (err) throw err;
-              --count || deferred.resolve();
-            });
+            --count || deferred.resolve();
           });
         }
 
@@ -339,7 +327,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function (err) {
           });
         }
       }
-    }).add('Mixed - Mongoose - Embedded Docs - Read/write/update', {
+    }).add('Multi-Op - Mongoose - Embedded Docs - Read/write/update', {
       defer : true,
       fn : function (deferred) {
         var count = 150;
@@ -370,29 +358,26 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function (err) {
           });
         }
       }
-    }).add('Mixed - Driver - Embedded Docs - Read/write/update', {
+    }).add('Multi-Op - Driver - Embedded Docs - Read/write/update', {
       defer : true,
       fn : function (deferred) {
         var count = 150;
         var updates = 0;
         for (var i=0; i < 140; i++) {
-          blogpost.find({ _id : getNextbdId() }, function (err, cursor) {
+          blogpost.findOne({ _id : getNextbdId() }, function (err, bp) {
             if (err) throw err;
-            cursor.toArray(function (err, bps) {
-              if (updates < 20) {
-                updates++;
-                var bp = bps[0];
-                bp.author = "soemthing new";
-                bp.comments.push(commentData);
-                bp.title = "something newerrrr";
-                blogpost.save(bp, function (err) {
-                  if (err) throw err;
-                  --count || deferred.resolve();
-                });
-              } else {
+            if (updates < 20) {
+              updates++;
+              bp.author = "soemthing new";
+              bp.comments.push(commentData);
+              bp.title = "something newerrrr";
+              blogpost.save(bp, function (err) {
+                if (err) throw err;
                 --count || deferred.resolve();
-              }
-            });
+              });
+            } else {
+              --count || deferred.resolve();
+            }
           });
         }
 

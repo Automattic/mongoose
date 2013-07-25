@@ -296,18 +296,22 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function (err) {
       }
     })
     .on('cycle', function (evt) {
-      console.log(String(evt.target));
+      if (process.env.MONGOOSE_DEV) {
+        console.log(String(evt.target));
+      }
     }).on('complete', function () {
       closeDB();
-      var outObj = {};
-      this.forEach(function (item) {
-        var out = {};
-        out.stats = item.stats;
-        delete out.stats.sample;
-        out.ops = item.hz;
-        outObj[item.name.replace(/\s/g, "")] = out;
-      });
-      console.log(outObj);
+      if (!process.env.MONGOOSE_DEV) {
+        var outObj = {};
+        this.forEach(function (item) {
+          var out = {};
+          out.stats = item.stats;
+          delete out.stats.sample;
+          out.ops = item.hz;
+          outObj[item.name.replace(/\s/g, "")] = out;
+        });
+        console.log(outObj);
+      }
     });
     function next() {
       for (var i=0; i < 100; i++) {

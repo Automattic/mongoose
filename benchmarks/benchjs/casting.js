@@ -117,18 +117,22 @@ suite.add('Casting - Embedded Docs - 0 Docs', {
   }
 })
 .on('cycle', function (evt) {
-  console.log(String(evt.target));
+  if (process.env.MONGOOSE_DEV) {
+    console.log(String(evt.target));
+  }
 }).on('complete', function () {
   this.forEach(function (item) {
-    var outObj = {};
-    this.forEach(function (item) {
-      var out = {};
-      out.stats = item.stats;
-      delete out.stats.sample;
-      out.ops = item.hz;
-      outObj[item.name.replace(/\s/g, "")] = out;
-    });
-    console.log(outObj);
+    if (!process.env.MONGOOSE_DEV) {
+      var outObj = {};
+      this.forEach(function (item) {
+        var out = {};
+        out.stats = item.stats;
+        delete out.stats.sample;
+        out.ops = item.hz;
+        outObj[item.name.replace(/\s/g, "")] = out;
+      });
+      console.log(outObj);
+    }
   });
 }).run({ async : true });
 

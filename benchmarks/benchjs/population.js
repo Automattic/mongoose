@@ -20,7 +20,7 @@ var utils = require('../../lib/utils.js');
  */
 
 
-mongoose.connect('mongodb://localhost/mongoose-bench', function (err) {
+mongoose.connect('mongodb://localhost/mongoose-bench-pop', function (err) {
   if (err) throw err;
 
   var commentSchema = new Schema;
@@ -271,39 +271,9 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function (err) {
 
 
   function closeDB() {
-    var close = 11;
-    BlogPost.remove(function () {
-      --close || mongoose.disconnect();
-    });
-    Comments.remove(function () {
-      --close || mongoose.disconnect();
-    });
-    Dummy1.remove(function () {
-      --close || mongoose.disconnect();
-    });
-    Dummy2.remove(function () {
-      --close || mongoose.disconnect();
-    });
-    Dummy3.remove(function () {
-      --close || mongoose.disconnect();
-    });
-    Dummy4.remove(function () {
-      --close || mongoose.disconnect();
-    });
-    Dummy5.remove(function () {
-      --close || mongoose.disconnect();
-    });
-    Dummy6.remove(function () {
-      --close || mongoose.disconnect();
-    });
-    Dummy7.remove(function () {
-      --close || mongoose.disconnect();
-    });
-    Dummy8.remove(function () {
-      --close || mongoose.disconnect();
-    });
-    Dummy9.remove(function () {
-      --close || mongoose.disconnect();
+    // just a bit simpler...
+    mongoose.connection.db.dropDatabase(function () {
+      mongoose.disconnect();
     });
   }
 

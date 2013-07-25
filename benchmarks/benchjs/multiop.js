@@ -179,152 +179,149 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function (err) {
       defer : true,
       fn : function (deferred) {
         var count = 150;
-        for (var i=0; i < 140; i++) {
+        for (var i=0; i < 150; i++) {
           User.findOne({ _id : getNextmId() }, function (err, res) {
             if (err) throw err;
             --count || deferred.resolve();
           });
+          if (i%15 == 0) {
+            var nData = utils.clone(data);
+            User.create(nData, function (err, res) {
+              if (err) throw err;
+              --count || deferred.resolve();
+            });
+          }
         }
 
-        for (var i=0; i < 10; i++) {
-          var nData = utils.clone(data);
-          User.create(nData, function (err, res) {
-            if (err) throw err;
-            --count || deferred.resolve();
-          });
-        }
       }
     }).add('Multi-Op - Driver - Heavy Read, low write', {
       defer : true,
       fn : function (deferred) {
         var count = 150;
-        for (var i=0; i < 140; i++) {
+        for (var i=0; i < 150; i++) {
           user.findOne({ _id : getNextdId() }, function (err, cursor) {
             if (err) throw err;
             --count || deferred.resolve();
           });
-        }
-
-        for (var i=0; i < 10; i++) {
-          var nData = utils.clone(data);
-          user.insert(nData, function (err, res) {
-            if (err) throw err;
-            --count || deferred.resolve();
-          });
+          if (i%15 == 0) {
+            var nData = utils.clone(data);
+            user.insert(nData, function (err, res) {
+              if (err) throw err;
+              --count || deferred.resolve();
+            });
+          }
         }
       }
     }).add('Multi-Op - Mongoose - Embedded Docs - Heavy Read, low write', {
       defer : true,
       fn : function (deferred) {
         var count = 150;
-        for (var i=0; i < 140; i++) {
+        for (var i=0; i < 150; i++) {
           BlogPost.findOne({ _id : getNextbmId() }, function (err, res) {
             if (err) throw err;
             --count || deferred.resolve();
           });
-        }
-
-        for (var i=0; i < 10; i++) {
-          var nData = utils.clone(blogData);
-          BlogPost.create(nData, function (err, res) {
-            if (err) throw err;
-            --count || deferred.resolve();
-          });
+          if (i%15 == 0) {
+            var nData = utils.clone(blogData);
+            BlogPost.create(nData, function (err, res) {
+              if (err) throw err;
+              --count || deferred.resolve();
+            });
+          }
         }
       }
     }).add('Multi-Op - Driver - Embedded Docs - Heavy Read, low write', {
       defer : true,
       fn : function (deferred) {
         var count = 150;
-        for (var i=0; i < 140; i++) {
+        for (var i=0; i < 150; i++) {
           blogpost.findOne({ _id : getNextbdId() }, function (err, cursor) {
             if (err) throw err;
             --count || deferred.resolve();
           });
-        }
-
-        for (var i=0; i < 10; i++) {
-          var nData = utils.clone(blogData);
-          blogpost.insert(nData, function (err, res) {
-            if (err) throw err;
-            --count || deferred.resolve();
-          });
+          if (i%15 == 0) {
+            var nData = utils.clone(blogData);
+            blogpost.insert(nData, function (err, res) {
+              if (err) throw err;
+              --count || deferred.resolve();
+            });
+          }
         }
       }
     }).add('Multi-Op - Mongoose - Heavy Write, low read', {
       defer : true,
       fn : function (deferred) {
         var count = 150;
-        for (var i=0; i < 10; i++) {
-          User.findOne({ _id : getNextmId() }, function (err, res) {
-            if (err) throw err;
-            --count || deferred.resolve();
-          });
-        }
 
-        for (var i=0; i < 140; i++) {
+        for (var i=0; i < 150; i++) {
           var nData = utils.clone(data);
           User.create(nData, function (err, res) {
             if (err) throw err;
             --count || deferred.resolve();
           });
+          if (i%15 == 0) {
+            User.findOne({ _id : getNextmId() }, function (err, res) {
+              if (err) throw err;
+              --count || deferred.resolve();
+            });
+          }
         }
       }
     }).add('Multi-Op - Driver - Heavy Write, low read', {
       defer : true,
       fn : function (deferred) {
         var count = 150;
-        for (var i=0; i < 10; i++) {
-          user.findOne({ _id : getNextdId() }, function (err, cursor) {
-            if (err) throw err;
-            --count || deferred.resolve();
-          });
-        }
 
-        for (var i=0; i < 140; i++) {
+        for (var i=0; i < 150; i++) {
           var nData = utils.clone(data);
           user.insert(nData, function (err, res) {
             if (err) throw err;
             --count || deferred.resolve();
           });
+          if (i%15 == 0) {
+            user.findOne({ _id : getNextdId() }, function (err, cursor) {
+              if (err) throw err;
+              --count || deferred.resolve();
+            });
+          }
         }
       }
     }).add('Multi-Op - Mongoose - Embedded Docs - Heavy Write, low read', {
       defer : true,
       fn : function (deferred) {
         var count = 150;
-        for (var i=0; i < 10; i++) {
-          BlogPost.findOne({ _id : getNextbmId() }, function (err, res) {
-            if (err) throw err;
-            --count || deferred.resolve();
-          });
-        }
 
-        for (var i=0; i < 140; i++) {
+        for (var i=0; i < 150; i++) {
           var nData = utils.clone(blogData);
           BlogPost.create(nData, function (err, res) {
             if (err) throw err;
             --count || deferred.resolve();
           });
+          if (i%15 == 0) {
+            BlogPost.findOne({ _id : getNextbmId() }, function (err, res) {
+              if (err) throw err;
+              --count || deferred.resolve();
+            });
+          }
         }
       }
     }).add('Multi-Op - Driver - Embedded Docs - Heavy Write, low read', {
       defer : true,
       fn : function (deferred) {
         var count = 150;
-        for (var i=0; i < 10; i++) {
-          blogpost.findOne({ _id : getNextbdId() }, function (err, cursor) {
-            if (err) throw err;
-            --count || deferred.resolve();
-          });
-        }
 
-        for (var i=0; i < 140; i++) {
+        for (var i=0; i < 150; i++) {
           var nData = utils.clone(blogData);
           blogpost.insert(nData, function (err, res) {
             if (err) throw err;
             --count || deferred.resolve();
           });
+          if (i%15 == 0) {
+            blogpost.findOne({ _id : getNextbdId() }, function (err, cursor) {
+              if (err) throw err;
+              --count || deferred.resolve();
+            });
+          }
         }
       }
     }).add('Multi-Op - Mongoose - Embedded Docs - Read/write/update', {
@@ -332,7 +329,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function (err) {
       fn : function (deferred) {
         var count = 150;
         var updates = 0;
-        for (var i=0; i < 140; i++) {
+        for (var i=0; i < 150; i++) {
           BlogPost.findOne({ _id : getNextbmId() }, function (err, res) {
             if (err) throw err;
             if (updates < 20) {
@@ -348,14 +345,13 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function (err) {
               --count || deferred.resolve();
             }
           });
-        }
-
-        for (var i=0; i < 10; i++) {
-          var nData = utils.clone(blogData);
-          BlogPost.create(nData, function (err, res) {
-            if (err) throw err;
-            --count || deferred.resolve();
-          });
+          if (i%15 == 0) {
+            var nData = utils.clone(blogData);
+            BlogPost.create(nData, function (err, res) {
+              if (err) throw err;
+              --count || deferred.resolve();
+            });
+          }
         }
       }
     }).add('Multi-Op - Driver - Embedded Docs - Read/write/update', {
@@ -363,7 +359,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function (err) {
       fn : function (deferred) {
         var count = 150;
         var updates = 0;
-        for (var i=0; i < 140; i++) {
+        for (var i=0; i < 150; i++) {
           blogpost.findOne({ _id : getNextbdId() }, function (err, bp) {
             if (err) throw err;
             if (updates < 20) {
@@ -379,14 +375,13 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function (err) {
               --count || deferred.resolve();
             }
           });
-        }
-
-        for (var i=0; i < 10; i++) {
-          var nData = utils.clone(blogData);
-          blogpost.insert(nData, function (err, res) {
-            if (err) throw err;
-            --count || deferred.resolve();
-          });
+          if (i%15 == 0) {
+            var nData = utils.clone(blogData);
+            blogpost.insert(nData, function (err, res) {
+              if (err) throw err;
+              --count || deferred.resolve();
+            });
+          }
         }
       }
     })

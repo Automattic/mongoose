@@ -267,12 +267,18 @@ describe('schema', function(){
 
     it('string enum', function(done){
       var Test = new Schema({
-          complex: { type: String, enum: ['a', 'b', undefined, 'c', null] }
+          complex: { type: String, enum: ['a', 'b', undefined, 'c', null] },
+          sugar: ['a', undefined,  'b', 'c', null]
       });
 
       assert.ok(Test.path('complex') instanceof SchemaTypes.String);
       assert.deepEqual(Test.path('complex').enumValues,['a', 'b', 'c', null]);
       assert.equal(Test.path('complex').validators.length, 1)
+
+      // syntax sugar
+      assert.ok(Test.path('sugar') instanceof SchemaTypes.String);
+      assert.deepEqual(Test.path('sugar').enumValues,['a', 'b', 'c', null]);
+      assert.equal(Test.path('sugar').validators.length, 1)
 
       Test.path('complex').enum('d', 'e');
 

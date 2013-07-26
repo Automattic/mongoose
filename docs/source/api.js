@@ -213,6 +213,12 @@ function fix (str) {
 
 function order (docs) {
   var sortByCtxName = function (a, b) {
+    if (!a.ctx) {
+      console.error('missing ctx', a);
+    }
+    if (!b.ctx) {
+      console.error('missing ctx', b);
+    }
     return a.ctx.name.localeCompare(b.ctx.name);
   };
 

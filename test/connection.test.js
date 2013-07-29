@@ -892,4 +892,67 @@ describe('connections:', function(){
       done();
     })
   })
+
+  describe('connection pool sharing: ', function () {
+    it('works', function (done) {
+      var db = mongoose.createConnection('mongodb://localhost/mongoose1');
+
+      var db2 = db.openNewDb('mongoose2');
+
+      assert.equal(db2.name, 'mongoose2');
+      assert.equal(db.name, 'mongoose1');
+
+      assert.equal(db.port, db2.port);
+      assert.equal(db.replica, db2.replica);
+      assert.equal(db.hosts, db2.hosts);
+      assert.equal(db.host, db2.host);
+      assert.equal(db.port, db2.port);
+      assert.equal(db.user, db2.user);
+      assert.equal(db.pass, db2.pass);
+      assert.deepEqual(db.options, db2.options);
+
+      done();
+    });
+    it('saves correctly', function (done) {
+      var db = start();
+      var db2 = db.openNewDb('mongoose-test-2');
+
+      var schema = new Schema({
+        body : String,
+        thing : Number
+      });
+
+      var m1 = db.model('testMod', schema);
+      var m2 = db2.model('testMod', schema);
+
+      m1.create({ body : 'this is some text', thing : 1 }, function (err, i1) {
+        assert.ifError(err);
+        m2.create({ body : 'this is another body', thing : 2 }, function (err, i2) {
+          assert.ifError(err);
+
+          m1.count(function (err, num) {
+            assert.ifError(err);
+            assert.equal(num, 1);
+
+            m2.count(function (err, num) {
+              assert.ifError(err);
+              assert.equal(num, 1);
+              done();
+            });
+          });
+        });
+      });
+    });
+
+    it('closes correctly for all dbs', function (done) {
+      var db = start();
+      var db2 = db.openNewDb('mongoose-test-2');
+
+      db2.on('close', function () {
+        done();
+      });
+      db.close();
+
+    });
+  });
 })

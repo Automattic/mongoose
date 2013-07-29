@@ -913,7 +913,6 @@ describe('connections:', function(){
 
       done();
     });
-
     it('saves correctly', function (done) {
       var db = start();
       var db2 = db.useDb('mongoose-test-2');

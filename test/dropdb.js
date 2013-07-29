@@ -4,15 +4,17 @@ db.once('open', function () {
 
   // drop the default test database
   db.db.dropDatabase(function () {
+    var db2 = db.openNewDb('mongoose-test-2');
+    db2.db.dropDatabase(function() {
+      // drop mongos test db if exists
+      var mongos = process.env.MONGOOSE_MULTI_MONGOS_TEST_URI;
+      if (!mongos) return process.exit();
 
-    // drop mongos test db if exists
-    var mongos = process.env.MONGOOSE_MULTI_MONGOS_TEST_URI;
-    if (!mongos) return process.exit();
 
-
-    var db = start({ uri: mongos, mongos: true });
-    db.once('open', function () {
-      db.db.dropDatabase(process.exit);
-    })
+      var db = start({ uri: mongos, mongos: true });
+      db.once('open', function () {
+        db.db.dropDatabase(process.exit);
+      });
+    });
   });
 });

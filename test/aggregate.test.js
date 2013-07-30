@@ -264,14 +264,14 @@ describe('Aggregate', function() {
     });
   });
 
-  describe('geoNear', function() {
+  describe('near', function() {
     it('works', function(done) {
       var aggregate = new Aggregate();
 
-      assert.equal(aggregate.geoNear({ a: 1 }), aggregate);
+      assert.equal(aggregate.near({ a: 1 }), aggregate);
       assert.deepEqual(aggregate._pipeline, [{ $geoNear: { a: 1 } }]);
 
-      aggregate.geoNear({ b: 2 });
+      aggregate.near({ b: 2 });
       assert.deepEqual(aggregate._pipeline, [{ $geoNear: { a: 1 } }, { $geoNear: { b: 2 } }]);
 
       done();

@@ -19,6 +19,7 @@ test-long:
 
 docs: ghpages docclean gendocs
 docs_from_master: docclean gendocs
+docs_unstable: docclean master gendocs copytmp gitreset ghpages copyunstable
 
 gendocs: $(DOCFILE)
 
@@ -35,8 +36,24 @@ site:
 ghpages:
 	git checkout gh-pages && git merge 3.6.x
 
+master:
+	git checkout master
+
 docclean:
 	rm -f ./docs/*.{1,html,json}
 	rm -f ./docs/source/_docs
 
-.PHONY: test test-short test-long ghpages site docs docclean gendocs docs_from_master
+copytmp:
+	mkdir -p ./tmp
+	cp -R ./docs/*.html ./tmp
+
+gitreset:
+	git checkout -- ./docs
+	git checkout -- ./index.html
+
+copyunstable:
+	mkdir -p ./docs/unstable
+	cp -R ./tmp/* ./docs/unstable/
+	rm -rf ./tmp
+
+.PHONY: test test-short test-long ghpages site docs docclean gendocs docs_from_master docs_unstable master copytmp copyunstable gitreset

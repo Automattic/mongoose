@@ -44,14 +44,14 @@ function setupData(callback) {
 }
 
 function clearData(db, callback) {
-  db.model('Employee').find({}).remove(callback);
+  db.model('Employee').remove(callback);
 }
 
 /**
  * Test.
  */
 
-describe('Aggregate', function() {
+describe('aggregate', function() {
   describe('append', function() {
     it('(pipeline)', function(done) {
       var aggregate = new Aggregate();
@@ -459,5 +459,24 @@ describe('Aggregate', function() {
       aggregate.skip(0);
       aggregate.exec(callback);
     });
+
+    it('handles aggregation options', function(done){
+      setupData(function (db) {
+        var m = db.model('Employee');
+        var match = { $match: { sal: { $gt: 15000 }}};
+        var pref = 'primaryPreferred';
+        var aggregate = m.aggregate(match).read(pref);
+
+        assert.equal(aggregate.options.readPreference.mode, pref);
+
+        aggregate
+          .exec(function (err, docs) {
+            assert.ifError(err);
+            assert.equal(1, docs.length);
+            assert.equal(docs[0].sal, 18000);
+            clearData(db, done);
+          });
+      });
+    })
   });
 });

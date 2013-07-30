@@ -12,6 +12,7 @@ require('./docs/helpers/filters')(jade);
 
 // use last release
 package.version = getVersion();
+package.unstable = getUnstable(package.version);
 
 var filemap = require('./docs/source');
 var files = Object.keys(filemap);
@@ -57,4 +58,15 @@ function getVersion () {
       return match[1];
   }
   throw new Error('no match found');
+}
+
+function getUnstable(ver) {
+  ver = ver.replace("-pre");
+  var spl = ver.split('.');
+  spl = spl.map(function (i) {
+    return parseInt(i);
+  });
+  spl[1]++;
+  spl[2] = "x";
+  return spl.join('.');
 }

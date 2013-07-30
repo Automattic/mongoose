@@ -130,7 +130,7 @@ h2 a {
 }
 #follow {
   margin-bottom: 38px;
-  margin-left: 109px;
+  margin-left: 20px;
 }
 #follow ul {
   height: 26px;
@@ -252,4 +252,8 @@ h2 a {
 
 #wrap.homepage #install code, #wrap.homepage #example code {
   font-size: 13px;
+}
+
+.unstable {
+  padding-left: 180px;
 }

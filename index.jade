@@ -31,9 +31,16 @@ html(lang='en')
           li
             iframe(class="github-btn", src="http://ghbtns.com/github-btn.html?user=learnboost&amp;repo=mongoose&amp;type=watch&amp;count=true", allowtransparency="true", frameborder="0", scrolling="0", width="100px", height="20px")
           li#version
-            span Version #{package.version}
+            span 
+              strong Stable: 
+              | Version #{package.version} 
+              strong Unstable: 
+              | Version #{package.unstable}
           li
             iframe(class="github-btn", src="http://ghbtns.com/github-btn.html?user=learnboost&amp;repo=mongoose&amp;type=fork&amp;count=true", allowtransparency="true", frameborder="0", scrolling="0", width="100px", height="20px")
+        ul
+          li.unstable
+            a(href="https://github.com/LearnBoost/mongoose/wiki/Development-%28unstable%29-branch-details") Get Unstable Release
       #example
         :js
           var mongoose = require('mongoose');

@@ -2,36 +2,40 @@
 3.7.0-pre / 2013-07-XX
 =====================
 
-  * added; publicly expose connection states #1585
-  * added; $geoWithin support #1529 $1455 [ebensing](https://github.com/ebensing)
-  * changed; query.within -> query.within()
-  * changed; query.intersects -> query.intersects()
-  * updated; integrate mquery #1562 [ebensing](https://github.com/ebensing)
-  * bump driver to 1.3.11
-  * added; model.geoNear support #1563 [ebensing](https://github.com/ebensing)
-  * added; model.geoSearch support #1560 [ebensing](https://github.com/ebensing)
-  * website; server.js -> static.js #1546 [nikmartin](https://github.com/nikmartin)
-  * added; MongooseBuffer#subtype method
-  * fixed; MongooseBuffer subtype loss during casting [zedgu](https://github.com/zedgu)
-  * docs; fixed up the README and examples [ebensing](https://github.com/ebensing)
+  * changed; query.within getter is now a method -> query.within()
+  * changed; query.intersects getter is now a method -> query.intersects()
   * deprecated; promise#addBack (use promise#onResolve)
   * deprecated; promise#complete (use promise#fulfill)
   * deprecated; promise#addCallback (use promise#onFulFill)
   * deprecated; promise#addErrback (use promise#onReject)
-  * docs; fix readme spelling #1483 [yorchopolis](https://github.com/yorchopolis)
-  * added; model.create returns a promise #1340
-  * updated; mpromise 0.2.2
+  * deprecated; query.nearSphere() (use query.near)
+  * removed; namedscope (broken) #679 #642 #455 #379
+  * added; benchmarks [ebensing](https://github.com/ebensing)
+  * added; publicly exposed connection states #1585
+  * added; $geoWithin support #1529 $1455 [ebensing](https://github.com/ebensing)
+  * added; query method chain validation
+  * added; model.update `overwrite` option
+  * added; model.geoNear() support #1563 [ebensing](https://github.com/ebensing)
+  * added; model.geoSearch() support #1560 [ebensing](https://github.com/ebensing)
+  * added; MongooseBuffer#subtype()
+  * added; model.create() now returns a promise #1340
+  * added; support for `awaitdata` query option
+  * added; pass the doc to model.remove() callback #1419 [JoeWagner](https://github.com/JoeWagner)
+  * added; aggregation query builder #1404 [njoyard](https://github.com/njoyard)
+  * updated; integrate mquery #1562 [ebensing](https://github.com/ebensing)
+  * updated; error msg in doc.save() #1595
+  * updated; bump driver to 1.3.12
+  * updated; mpromise 0.3.0
+  * updated; sliced 0.0.5
+  * tests; fix sharding tests for MongoDB 2.4.5
   * tests; now 4-5 seconds faster
-  * fix copyright #1439
   * tests; fix race condition
-  * website; update faq
-  * website; add deep links
-  * website; update poolSize docs
-  * added; support for awaitdata query option
-  * examples; improved and expanded
-  * added; model.remove method callback now passed the doc #1419 [JoeWagner](https://github.com/JoeWagner)
-  * added; aggregation builder #1404 [njoyard](https://github.com/njoyard)
-  * fixed; populated streams
+  * docs; fix readme spelling #1483 [yorchopolis](https://github.com/yorchopolis)
+  * docs; fixed up the README and examples [ebensing](https://github.com/ebensing)
+  * website; many improvements
+  * website; fix copyright #1439
+  * website; server.js -> static.js #1546 [nikmartin](https://github.com/nikmartin)
+  * examples; improved and expanded [ebensing](https://github.com/ebensing)
 
 3.6.15 / 2013-07-16
 ==================

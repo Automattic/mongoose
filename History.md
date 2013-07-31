@@ -24,7 +24,7 @@
   * added; aggregation query builder #1404 [njoyard](https://github.com/njoyard)
   * updated; integrate mquery #1562 [ebensing](https://github.com/ebensing)
   * updated; error msg in doc.save() #1595
-  * updated; bump driver to 1.3.13
+  * updated; bump driver to 1.3.12
   * updated; mpromise 0.3.0
   * updated; sliced 0.0.5
   * tests; fix sharding tests for MongoDB 2.4.5

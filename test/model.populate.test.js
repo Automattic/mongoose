@@ -2357,3 +2357,73 @@ describe('model: populate:', function(){
     }
   })
 });
+
+describe('model: deep populate:', function(){
+
+  // For issue 601
+  it('populating nested subdocuments from other models', function(done){
+    var db = start()
+      , BlogPost = db.model('RefBlogPost', posts)
+      , User = db.model('RefUser', users);
+
+    User.create({
+        name  : 'User 1'
+      , email : 'user1@learnboost.com'
+    }, function (err, user1) {
+      assert.ifError(err);
+
+      User.create({
+          name  : 'User 2'
+        , email : 'user2@learnboost.com'
+        , blogposts : []
+      }, function (err, user2) {
+        assert.ifError(err);
+
+        var post = BlogPost.create({
+            title: 'Woot'
+          , _creator: user2
+          , comments: [
+                { _creator: user1, content: 'Woot woot' }
+              , { _creator: user2, content: 'Wha wha' }
+            ]
+        }, function (err, post) {
+          assert.ifError(err);
+
+          user2
+          .update({blogposts: [post]})
+          .exec(function (err, res) {
+            assert.ifError(err);
+
+            User
+            .findById(user2._id)
+            .populate('blogposts')
+            .exec(function (err, user2) {
+              assert.ifError(err);
+
+              assert.equal(user2.blogposts[0].title,'Woot');
+
+              BlogPost
+              .findById(post._id)
+              // Currently yields: TypeError: Cannot read property 'ref' of undefined
+              .populate('comments comments._creator comments._creator.blogposts comments._creator.blogposts.comments')
+              // This has the same problem, and maybe more:
+              //.populate('comments comments.$._creator comments.$._creator.blogposts comments.$._creator.blogposts.$.comments')
+              .exec(function (err, post) {
+                db.close();
+                assert.ifError(err);
+
+                assert.equal(post.comments[1].content,'Wha wha');
+                assert.equal(post.comments[1]._creator.blogposts[0].comments[1].content,'Wha wha');
+
+                done();
+              });
+
+            });
+
+          });
+        });
+      });
+    });
+  })
+
+});

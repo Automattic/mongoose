@@ -26,7 +26,7 @@ var cName = 'Comment' + random();
 mongoose.model(prodName, Product);
 mongoose.model(cName, Comment);
 
-describe('Query: ', function(){
+describe('Query:', function(){
   describe('toConstructor', function () {
     it('creates a query', function (done) {
       var db = start();
@@ -111,7 +111,7 @@ describe('Query: ', function(){
 
       var nq = prodC(null, { limit : 3 });
       assert.deepEqual(nq._mongooseOptions, { lean : true, limit : 3 });
-      assert.deepEqual(nq.options, { sort : [['title', 1]], limit : 3 });
+      assert.deepEqual(nq.options, { sort : { 'title': 1 }, limit : 3 });
       done();
     })
 

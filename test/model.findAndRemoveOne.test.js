@@ -304,18 +304,14 @@ describe('model: findByIdAndRemove:', function(){
       , query;
 
     query = M.findByIdAndRemove(_id, { sort: 'author -title' });
-    assert.equal(2, query.options.sort.length);
-    assert.equal('author', query.options.sort[0][0]);
-    assert.equal(1, query.options.sort[0][1]);
-    assert.equal('title', query.options.sort[1][0]);
-    assert.equal(-1, query.options.sort[1][1]);
+    assert.equal(2, Object.keys(query.options.sort).length);
+    assert.equal(1, query.options.sort.author);
+    assert.equal(-1, query.options.sort.title);
 
     query = M.findOneAndRemove({}, { sort: 'author -title' });
-    assert.equal(2, query.options.sort.length);
-    assert.equal('author', query.options.sort[0][0]);
-    assert.equal(1, query.options.sort[0][1]);
-    assert.equal('title', query.options.sort[1][0]);
-    assert.equal(-1, query.options.sort[1][1]);
+    assert.equal(2, Object.keys(query.options.sort).length);
+    assert.equal(1, query.options.sort.author);
+    assert.equal(-1, query.options.sort.title);
     done();
   })
 
@@ -330,18 +326,14 @@ describe('model: findByIdAndRemove:', function(){
       , query;
 
     query = M.findByIdAndRemove(_id, { sort: { author: 1, title: -1 }});
-    assert.equal(2, query.options.sort.length);
-    assert.equal('author', query.options.sort[0][0]);
-    assert.equal(1, query.options.sort[0][1]);
-    assert.equal('title', query.options.sort[1][0]);
-    assert.equal(-1, query.options.sort[1][1]);
+    assert.equal(2, Object.keys(query.options.sort).length);
+    assert.equal(1, query.options.sort.author);
+    assert.equal(-1, query.options.sort.title);
 
     query = M.findOneAndRemove(_id, { sort: { author: 1, title: -1 }});
-    assert.equal(2, query.options.sort.length);
-    assert.equal('author', query.options.sort[0][0]);
-    assert.equal(1, query.options.sort[0][1]);
-    assert.equal('title', query.options.sort[1][0]);
-    assert.equal(-1, query.options.sort[1][1]);
+    assert.equal(2, Object.keys(query.options.sort).length);
+    assert.equal(1, query.options.sort.author);
+    assert.equal(-1, query.options.sort.title);
     done();
   });
 

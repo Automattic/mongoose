@@ -669,18 +669,14 @@ describe('model: findByIdAndUpdate:', function(){
       , query;
 
     query = M.findByIdAndUpdate(_id, { $set: { date: now }}, { sort: 'author -title' });
-    assert.equal(2, query.options.sort.length);
-    assert.equal('author', query.options.sort[0][0]);
-    assert.equal(1, query.options.sort[0][1]);
-    assert.equal('title', query.options.sort[1][0]);
-    assert.equal(-1, query.options.sort[1][1]);
+    assert.equal(2, Object.keys(query.options.sort).length);
+    assert.equal(1, query.options.sort.author);
+    assert.equal(-1, query.options.sort.title);
 
     query = M.findOneAndUpdate({}, { $set: { date: now }}, { sort: 'author -title' });
-    assert.equal(2, query.options.sort.length);
-    assert.equal('author', query.options.sort[0][0]);
-    assert.equal(1, query.options.sort[0][1]);
-    assert.equal('title', query.options.sort[1][0]);
-    assert.equal(-1, query.options.sort[1][1]);
+    assert.equal(2, Object.keys(query.options.sort).length);
+    assert.equal(1, query.options.sort.author);
+    assert.equal(-1, query.options.sort.title);
     done();
   })
 
@@ -695,18 +691,14 @@ describe('model: findByIdAndUpdate:', function(){
       , query;
 
     query = M.findByIdAndUpdate(_id, { $set: { date: now }}, { sort: { author: 1, title: -1 }});
-    assert.equal(2, query.options.sort.length);
-    assert.equal('author', query.options.sort[0][0]);
-    assert.equal(1, query.options.sort[0][1]);
-    assert.equal('title', query.options.sort[1][0]);
-    assert.equal(-1, query.options.sort[1][1]);
+    assert.equal(2, Object.keys(query.options.sort).length);
+    assert.equal(1, query.options.sort.author);
+    assert.equal(-1, query.options.sort.title);
 
     query = M.findOneAndUpdate(_id, { $set: { date: now }}, { sort: { author: 1, title: -1 }});
-    assert.equal(2, query.options.sort.length);
-    assert.equal('author', query.options.sort[0][0]);
-    assert.equal(1, query.options.sort[0][1]);
-    assert.equal('title', query.options.sort[1][0]);
-    assert.equal(-1, query.options.sort[1][1]);
+    assert.equal(2, Object.keys(query.options.sort).length);
+    assert.equal(1, query.options.sort.author);
+    assert.equal(-1, query.options.sort.title);
     done();
   });
 

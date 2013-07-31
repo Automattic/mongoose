@@ -676,10 +676,10 @@ describe('Query', function(){
     it('works', function(done){
       var query = new Query({}, {}, null, p1.collection);
       query.sort('a -c b');
-      assert.deepEqual(query.options.sort, [['a', 1], ['c', -1], ['b', 1]]);
+      assert.deepEqual(query.options.sort, {'a': 1 , 'c': -1,'b': 1});
       query = new Query({}, {}, null, p1.collection);
       query.sort({'a': 1, 'c': -1, 'b': 'asc', e: 'descending', f: 'ascending'});
-      assert.deepEqual(query.options.sort, [['a', 1], ['c', -1], ['b', 'asc'], ['e', 'descending'], ['f', 'ascending']]);
+      assert.deepEqual(query.options.sort, {'a': 1, 'c': -1, 'b': 1, 'e': -1, 'f': 1});
       query = new Query({}, {}, null, p1.collection);
       var e;
 
@@ -1304,11 +1304,9 @@ describe('Query', function(){
       assert.equal(q.options.batchSize, 10);
       assert.equal(q.options.limit, 4);
       assert.equal(q.options.skip, 3);
-      assert.equal(q.options.sort.length, 2);
-      assert.equal(q.options.sort[0][0], 'blah');
-      assert.equal(q.options.sort[0][1], -1);
-      assert.equal(q.options.sort[1][0], 'woot');
-      assert.equal(q.options.sort[1][1], -1);
+      assert.equal(Object.keys(q.options.sort).length, 2);
+      assert.equal(q.options.sort.blah, -1);
+      assert.equal(q.options.sort.woot, -1);
       assert.equal(q.options.hint.index1, 1);
       assert.equal(q.options.hint.index2, -1);
       assert.equal(q.options.readPreference.mode, 'secondary');

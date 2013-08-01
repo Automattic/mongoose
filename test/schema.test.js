@@ -1549,6 +1549,32 @@ describe('schema', function(){
 
       done();
     })
+    it('properly gets value of plain objects when dealing with refs (gh-1606)', function (done) {
+      var db = start();
+      var el = new Schema({ title : String });
+      var so = new Schema({
+        title : String,
+        obj : { type : Schema.Types.ObjectId, ref : 'Element' }
+      });
+
+      var Element = db.model('Element', el);
+      var Some = db.model('Some', so);
+
+      var ele = new Element({ title : 'thing' });
+
+      ele.save(function (err) {
+        assert.ifError(err);
+        var s = new Some({ obj : ele.toObject() });
+        s.save(function (err) {
+          assert.ifError(err);
+          Some.findOne({ _id : s.id }, function (err, ss) {
+            assert.ifError(err);
+            assert.equal(ss.obj, ele.id);
+            done();
+          });
+        });
+      });
+    });
   });
 
   describe('property names', function(){

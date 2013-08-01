@@ -368,15 +368,20 @@ describe('Query', function(){
 
   describe('within', function(){
     describe('box', function(){
-      it('not via where', function(done){
-        var query = new Query({}, {}, null, p1.collection);
-        query.within().box('gps', {ll: [5, 25], ur: [10, 30]});
-        assert.deepEqual(query._conditions, {gps: {$within: {$box: [[5, 25], [10, 30]]}}});
-        done();
-      })
       it('via where', function(done){
         var query = new Query({}, {}, null, p1.collection);
         query.where('gps').within().box({ll: [5, 25], ur: [10, 30]});
+        var match = {gps: {$within: {$box: [[5, 25], [10, 30]]}}};
+        if (Query.use$geoWithin) {
+          match.gps.$geoWithin = match.gps.$within;
+          delete match.gps["$within"];
+        }
+        assert.deepEqual(query._conditions, match);
+        done();
+      })
+      it('via where, no object', function(done){
+        var query = new Query({}, {}, null, p1.collection);
+        query.where('gps').within().box([5, 25], [10, 30]);
         var match = {gps: {$within: {$box: [[5, 25], [10, 30]]}}};
         if (Query.use$geoWithin) {
           match.gps.$geoWithin = match.gps.$within;

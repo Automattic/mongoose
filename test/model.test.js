@@ -4121,6 +4121,18 @@ describe('Model', function(){
       })
     })
 
+    it('rejects new documents that have no _id set (1595)', function(done){
+      var db = start();
+      var s = new Schema({ _id: { type: String }});
+      var B = db.model('1595', s);
+      var b = new B;
+      b.save(function(err){
+        db.close();
+        assert.ok(err);
+        assert.ok(/must have an _id/.test(err));
+        done();
+      })
+    })
   });
 
   describe('_delta()', function(){

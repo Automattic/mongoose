@@ -3,6 +3,12 @@ var static = require('node-static');
 var server = new static.Server('.', { cache: 0 });
 
 require('http').createServer(function (req, res) {
+  if ('/favicon.ico' == req.url) {
+    req.destroy();
+    res.statusCode = 204
+    return res.end();
+  }
+
   req.on('end', function () {
     server.serve(req, res, function (err) {
       if (err) {

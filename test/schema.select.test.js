@@ -142,6 +142,7 @@ describe('schema select option', function(){
         it('with find', function(done){
           S.find({ _id: s._id }).select('thin name docs.bool docs.name').exec(function (err, s) {
             assert.ifError(err);
+            assert.ok(s && s.length > 0, 'no document found');
             s = s[0];
             assert.strictEqual(true, s.isSelected('name'));
             assert.strictEqual(true, s.isSelected('thin'));

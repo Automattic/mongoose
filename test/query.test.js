@@ -328,6 +328,18 @@ describe('Query', function(){
       assert.deepEqual(query._conditions, {checkin: {$near: [40, -72]}});
       done();
     })
+    it('via where, where GeoJSON param', function(done){
+      var query = new Query({}, {}, null, p1.collection);
+      query.where('loc').near({ center : { type : 'Point', coordinates : [40, -72 ]}});
+      assert.deepEqual(query._conditions, {loc: {$near: { $geometry : { type : 'Point', coordinates : [40, -72] }}}});
+      done();
+    })
+    it('not via where, where GeoJSON param', function(done){
+      var query = new Query({}, {}, null, p1.collection);
+      query.near('loc', { center : { type : 'Point', coordinates : [40, -72 ]}});
+      assert.deepEqual(query._conditions, {loc: {$near: { $geometry : { type : 'Point', coordinates : [40, -72] }}}});
+      done();
+    })
   })
 
   describe('nearSphere', function(){

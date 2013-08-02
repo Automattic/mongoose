@@ -1,6 +1,7 @@
 
 var static = require('node-static');
 var server = new static.Server('.', { cache: 0 });
+var open = require('open')
 
 require('http').createServer(function (req, res) {
   if ('/favicon.ico' == req.url) {
@@ -21,4 +22,5 @@ require('http').createServer(function (req, res) {
   req.resume();
 }).listen(8088);
 
-console.error('now listening on localhost:8088');
+console.error('now listening on http://localhost:8088');
+open('http://localhost:8088');

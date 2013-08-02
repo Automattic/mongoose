@@ -129,8 +129,8 @@ h2 a {
   text-shadow: 1px 1px 7px #222;
 }
 #follow {
-  margin-bottom: 38px;
-  margin-left: 20px;
+  margin-bottom: 66px;
+  margin-left: 109px;
 }
 #follow ul {
   height: 26px;
@@ -146,6 +146,15 @@ h2 a {
 #follow #version span {
   position: relative;
   top: -4px;
+}
+#what {
+  margin-bottom: 32px;
+}
+#example {
+  margin-bottom: 32px;
+}
+.what {
+  font-size: 19px;
 }
 #production ul {
   padding: 0;

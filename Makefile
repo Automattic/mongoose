@@ -18,7 +18,7 @@ test-long:
 	@./node_modules/.bin/mocha $(T) -g LONG --async-only $(TESTS)
 
 docs: ghpages docclean gendocs
-docs_from_master: docclean gendocs
+docs_from_current_branch: docclean gendocs
 docs_unstable: docclean_unstable master gendocs copytmp gitreset ghpages copyunstable
 
 gendocs: $(DOCFILE)

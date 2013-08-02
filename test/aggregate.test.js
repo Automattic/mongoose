@@ -433,13 +433,14 @@ describe('aggregate', function() {
       });
 	});
 
-    describe('error when empty pipeline', function(done) {
+    describe('error when empty pipeline', function() {
       it('without a callback', function(done){
         var agg = new Aggregate;
         var promise = agg.exec();
         assert.ok(promise instanceof mongoose.Promise);
         promise.onResolve(function(err){
           assert.ok(err);
+          assert.equal(err.message, "Aggregate has empty pipeline");
           done();
         })
       })
@@ -458,18 +459,30 @@ describe('aggregate', function() {
       })
     });
 
-    it('error when not bound to a model', function(done) {
-      var aggregate = new Aggregate()
-        , callback;
+    describe('error when not bound to a model', function() {
+      it('with callback', function(done){
+        var aggregate = new Aggregate()
+          , callback;
 
-      callback = function(err, docs) {
-        assert(err);
-        assert.equal(err.message, "Aggregate not bound to any Model");
-        done();
-      };
+        callback = function(err, docs) {
+          assert(err);
+          assert.equal(err.message, "Aggregate not bound to any Model");
+          done();
+        };
 
-      aggregate.skip(0);
-      aggregate.exec(callback);
+        aggregate.skip(0);
+        aggregate.exec(callback);
+      })
+      it('without callback', function(done){
+        var agg = new Aggregate;
+        var promise = agg.limit(3).exec();
+        assert.ok(promise instanceof mongoose.Promise);
+        promise.onResolve(function(err){
+          assert.ok(err);
+          assert.equal(err.message, "Aggregate not bound to any Model");
+          done();
+        })
+      })
     });
 
     it('handles aggregation options', function(done){

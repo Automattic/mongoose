@@ -19,7 +19,7 @@ test-long:
 
 docs: ghpages docclean gendocs
 docs_from_master: docclean gendocs
-docs_unstable: docclean master gendocs copytmp gitreset ghpages copyunstable
+docs_unstable: docclean_unstable master gendocs copytmp gitreset ghpages copyunstable
 
 gendocs: $(DOCFILE)
 
@@ -43,6 +43,9 @@ docclean:
 	rm -f ./docs/*.{1,html,json}
 	rm -f ./docs/source/_docs
 
+docclean_unstable:
+	rm -f ./docs/unstable/*
+
 copytmp:
 	mkdir -p ./tmp
 	cp -R ./docs/*.html ./tmp
@@ -56,4 +59,4 @@ copyunstable:
 	cp -R ./tmp/* ./docs/unstable/
 	rm -rf ./tmp
 
-.PHONY: test test-short test-long ghpages site docs docclean gendocs docs_from_master docs_unstable master copytmp copyunstable gitreset
+.PHONY: test test-short test-long ghpages site docs docclean gendocs docs_from_master docs_unstable master copytmp copyunstable gitreset docclean_unstable

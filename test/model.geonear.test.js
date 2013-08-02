@@ -22,8 +22,6 @@ function getModel (db) {
 describe('model', function(){
   describe('geoNear', function () {
     it('works with legacy coordinate points', function (done) {
-      this.timeout(5000);
-
       var db = start();
       var Geo = getModel(db);
       assert.ok(Geo.geoNear instanceof Function);
@@ -39,14 +37,19 @@ describe('model', function(){
         var count = geos.length;
 
         for (var i=0; i < geos.length; i++) {
-          geos[i].save(function () {
+          geos[i].save(function (err) {
+            if (done.err) return;
+            if (err) return done(done.err = err);
             --count || next();
           });
         }
 
         function next() {
           Geo.geoNear([9,9], { spherical : true, maxDistance : .1 }, function (err, results, stats) {
-            assert.ifError(err);
+            if (err) {
+              db.close();
+              return done(err);
+            }
 
             assert.equal(1, results.results.length);
             assert.equal(1, results.ok);
@@ -67,8 +70,6 @@ describe('model', function(){
     });
 
     it('works with GeoJSON coordinate points', function (done) {
-      this.timeout(5000);
-
       var db = start();
       var Geo = getModel(db);
       assert.ok(Geo.geoNear instanceof Function);
@@ -92,7 +93,10 @@ describe('model', function(){
         function next() {
           var pnt = { type : "Point", coordinates : [9,9] };
           Geo.geoNear(pnt, { spherical : true, maxDistance : .1 }, function (err, results, stats) {
-            assert.ifError(err);
+            if (err) {
+              db.close();
+              return done(err);
+            }
 
             assert.equal(1, results.results.length);
             assert.equal(1, results.ok);
@@ -113,8 +117,6 @@ describe('model', function(){
     });
 
     it('works with lean', function (done) {
-      this.timeout(5000);
-
       var db = start();
       var Geo = getModel(db);
       assert.ok(Geo.geoNear instanceof Function);
@@ -138,7 +140,10 @@ describe('model', function(){
         function next() {
           var pnt = { type : "Point", coordinates : [9,9] };
           Geo.geoNear(pnt, { spherical : true, maxDistance : .1, lean : true }, function (err, results, stats) {
-            assert.ifError(err);
+            if (err) {
+              db.close();
+              return done(err);
+            }
 
             assert.equal(1, results.results.length);
             assert.equal(1, results.ok);

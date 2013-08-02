@@ -450,7 +450,7 @@ describe('aggregate', function() {
           , callback;
 
         callback = function(err, docs) {
-          assert(err);
+          assert.ok(err);
           assert.equal(err.message, "Aggregate has empty pipeline");
           done();
         };
@@ -465,7 +465,7 @@ describe('aggregate', function() {
           , callback;
 
         callback = function(err, docs) {
-          assert(err);
+          assert.ok(err);
           assert.equal(err.message, "Aggregate not bound to any Model");
           done();
         };

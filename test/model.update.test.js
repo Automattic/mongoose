@@ -811,6 +811,40 @@ describe('model: update:', function(){
       })
     })
   })
+  it('handles positional operators with referenced docs, gh-1572', function(done){
+    var db = start();
+    var el = new Schema({ title : String, thing : { type : String }});
 
+    var so = new Schema({
+      title : String,
+      obj : [{ type : Schema.Types.ObjectId, ref : 'Element' }]
+    });
 
+    var Element = db.model('Element' + random(), el);
+    var Some = db.model('Some' + random(), so);
+
+    var ele = new Element({ title : 'thing', thing : 'testing' });
+    var ele2 = new Element({ title : 'thing2' });
+    ele.save(function (err) {
+      assert.ifError(err);
+
+      var s = new Some({ obj : [ele]});
+
+      s.save(function (err) {
+        assert.ifError(err);
+
+        Some.update({ _id : s.id, obj : ele.id }, { $set : { "obj.$" : ele2.id }}, function(err) {
+          assert.ifError(err);
+
+          Some.findById(s.id, function (err, ss) {
+            assert.ifError(err);
+
+            assert.equal(ss.obj[0], ele2.id);
+            done();
+          });
+
+        });
+      });
+    });
+  })
 });

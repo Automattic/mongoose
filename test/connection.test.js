@@ -117,7 +117,7 @@ describe('connections:', function(){
     var repl1 = process.env.MONGOOSE_SET_TEST_URI;
     var repl2 = repl1.split(',');
     repl2.push(repl2.shift());
-    repl2 = repl2.join(',');
+    repl2 = 'mongodb://' + repl2.join(',');
 
     describe('with different host/port', function(){
       it('non-replica set', function(done){

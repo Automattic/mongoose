@@ -433,17 +433,29 @@ describe('aggregate', function() {
       });
 	});
 
-    it('error when empty pipeline', function(done) {
-      var aggregate = new Aggregate()
-        , callback;
+    describe('error when empty pipeline', function(done) {
+      it('without a callback', function(done){
+        var agg = new Aggregate;
+        var promise = agg.exec();
+        assert.ok(promise instanceof mongoose.Promise);
+        promise.onResolve(function(err){
+          assert.ok(err);
+          done();
+        })
+      })
 
-      callback = function(err, docs) {
-        assert(err);
-        assert.equal(err.message, "Aggregate has empty pipeline");
-        done();
-      };
+      it('with a callback', function(done){
+        var aggregate = new Aggregate()
+          , callback;
 
-      aggregate.exec(callback);
+        callback = function(err, docs) {
+          assert(err);
+          assert.equal(err.message, "Aggregate has empty pipeline");
+          done();
+        };
+
+        aggregate.exec(callback);
+      })
     });
 
     it('error when not bound to a model', function(done) {

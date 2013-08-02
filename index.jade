@@ -31,74 +31,91 @@ html(lang='en')
           li
             iframe(class="github-btn", src="http://ghbtns.com/github-btn.html?user=learnboost&amp;repo=mongoose&amp;type=watch&amp;count=true", allowtransparency="true", frameborder="0", scrolling="0", width="100px", height="20px")
           li#version
-            span Version #{package.version}
+            span
+              | Version #{package.version}
           li
             iframe(class="github-btn", src="http://ghbtns.com/github-btn.html?user=learnboost&amp;repo=mongoose&amp;type=fork&amp;count=true", allowtransparency="true", frameborder="0", scrolling="0", width="100px", height="20px")
-      #example
-        :js
-          var mongoose = require('mongoose');
-          mongoose.connect('mongodb://localhost/test');
+      #inner
+        #what
+          p.what
+            | Let's face it, 
+            strong writing custom MongoDB validation, casting and business logic boilerplate is a drag
+            | . That's why we wrote Mongoose. 
+        #example
+          :js
+            var mongoose = require('mongoose');
+            mongoose.connect('mongodb://localhost/test');
 
-          var Cat = mongoose.model('Cat', { name: String });
+            var Cat = mongoose.model('Cat', { name: String });
 
-          var kitty = new Cat({ name: 'Zildjian' });
-          kitty.save(function (err) {
-            if (err) // ...
-            console.log('meow');
-          });
-      #getstarted
-        h2 Getting Started
-        ul
-          li
-            a(href="docs/index.html") quick start guide
-      #support
-        h2 Support
-        ul
-          li
-            a(href="http://stackoverflow.com/questions/tagged/mongoose") Stack Overflow
-          li
-            a(href="https://github.com/learnboost/mongoose/issues/") bug reports
-          li
-            a(href="http://groups.google.com/group/mongoose-orm") help forum
-          li
-            a(href="http://www.mongodb.org/display/DOCS/Technical+Support") 10gen
-          li irc: #mongoosejs on freenode
-      #announcements
-        h2 News
-        ul
-          li
-            a(href="https://twitter.com/mongoosejs") @mongoosejs
-          li
-            a(href="http://groups.google.com/group/mongoose-orm") Google Group
-      #changelog
-        h2 Changelog
-        ul
-          li
-            a(href="https://github.com/learnboost/mongoose/blob/master/History.md") Changelog
-      #production
-        h2
-          | Production
-          | 
-          a(href='http://mongoosejs.tumblr.com/', target='_blank', title='More production examples') View More
-        ul
-          li
-            a(href="http://storify.com/", alt="Storify")
-              img(src="docs/images/apps/h_storify.jpg", alt="Storify")
-          li
-            a(href="https://learnboost.com/", alt="LearnBoost")
-              img(src="docs/images/apps/h_learnboost.png", alt="LearnBoost")
-          li
-            a(href="http://geekli.st", alt="GeekList")
-              img(src="docs/images/apps/h_geeklist.png", alt="GeekList")
-          li
-            a(href="http://yourquestions.mcdonalds.ca/", alt="McDonalds")
-              img#mcds(src="docs/images/apps/h_mcds.png", alt="McDonalds")
-          li
-            a(href="http://www.shoejitsu.com/", alt="ShoeJitsu")
-              img(src="docs/images/apps/h_shoejitsu.png", alt="ShoeJitsu")
-          li
-            a(href="https://bozuko.com/", alt="Bozuko")
-              img(src="docs/images/apps/h_bozuko.jpg", alt="Bozuko")
+            var kitty = new Cat({ name: 'Zildjian' });
+            kitty.save(function (err) {
+              if (err) // ...
+              console.log('meow');
+            });
+        p.what Mongoose provides a straight-forward, schema-based solution to modeling your application data and includes built-in type casting, validation, query building, business logic hooks and more, out of the box.
+        #getstarted
+          h2 Getting Started
+          ul
+            li
+              a(href="docs/index.html") quick start guide
+        #support
+          h2 Support
+          ul
+            li
+              a(href="http://stackoverflow.com/questions/tagged/mongoose") Stack Overflow
+            li
+              a(href="https://github.com/learnboost/mongoose/issues/") bug reports
+            li
+              a(href="http://groups.google.com/group/mongoose-orm") help forum
+            li
+              a(href="http://www.mongodb.org/display/DOCS/Technical+Support") 10gen
+            li irc: #mongoosejs on freenode
+        #announcements
+          h2 News
+          ul
+            li
+              a(href="https://twitter.com/mongoosejs") @mongoosejs
+            li
+              a(href="http://groups.google.com/group/mongoose-orm") Google Group
+        #changelog
+          h2 Changelog
+          ul
+            li
+              a(href="https://github.com/learnboost/mongoose/blob/master/History.md") Changelog
+        #unstable
+          h2 Unstable
+          ul
+            li
+              span
+                | The latest 
+                em unstable 
+                | release is version #{package.unstable}. 
+              a(href="https://github.com/LearnBoost/mongoose/wiki/Development-%28unstable%29-branch-details") What is an unstable release?
+        #production
+          h2
+            | Production
+            | 
+            a(href='http://mongoosejs.tumblr.com/', target='_blank', title='More production examples') View More
+          ul
+            li
+              a(href="http://storify.com/", alt="Storify")
+                img(src="docs/images/apps/h_storify.jpg", alt="Storify")
+            li
+              a(href="https://learnboost.com/", alt="LearnBoost")
+                img(src="docs/images/apps/h_learnboost.png", alt="LearnBoost")
+            li
+              a(href="http://geekli.st", alt="GeekList")
+                img(src="docs/images/apps/h_geeklist.png", alt="GeekList")
+            li
+              a(href="http://yourquestions.mcdonalds.ca/", alt="McDonalds")
+                img#mcds(src="docs/images/apps/h_mcds.png", alt="McDonalds")
+            li
+              a(href="http://www.shoejitsu.com/", alt="ShoeJitsu")
+                img(src="docs/images/apps/h_shoejitsu.png", alt="ShoeJitsu")
+            li
+              a(href="https://bozuko.com/", alt="Bozuko")
+                img(src="docs/images/apps/h_bozuko.jpg", alt="Bozuko")
     p#footer Licensed under MIT. Copyright 2011 <a href="http://learnboost.com">LearnBoost</a>.
     script.
       document.body.className = 'load';

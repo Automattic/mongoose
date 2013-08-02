@@ -32,5 +32,46 @@ describe('schema.documentarray', function(){
       assert.equal('Prometheus', m.x[0].title);
     });
     done();
-  })
-})
+  });
+
+  it('should be able to cope with new documentarray-data in a changed schema', function (done) {
+    var db = start();
+    var schema = new Schema({
+      foobars: [{
+        foo: { type: String, required: true },
+        bar: { type: String }
+      }]
+    });
+    var FoobarsContainer = db.model('FoobarsContainer', schema);
+    var doc = new FoobarsContainer({ foobars: [{foo: 'foo1'}, {foo: 'foo2'}]});
+    doc.save(function (err) {
+      assert.ifError(err);
+
+      //now, consider over time the schema changes due to application changes...
+      db = start();
+      schema =  new Schema({
+        foobars: [{
+          //foo is _NO_LONGER_ required
+          foo: { type: String },
+          //bar _IS_ required
+          bar: { type: String, required: true }
+        }]
+      });
+      FoobarsContainer = db.model('FoobarsContainer', schema);
+      FoobarsContainer.findOne({}, function (err, oldDoc) {
+        assert.ifError(err);
+
+        //the oldDoc is not valid in the new schema, but we overwrite the invalid data with some new, valid data
+        oldDoc.set({
+          foorbars: [{bar: 'bar1'}]
+        });
+
+        oldDoc.save(function (err) {
+          //should not throw ValidationError: the new data should be valid?
+          assert.ifError(err);
+          done();
+        });
+      });
+    });
+  });
+});

@@ -57,6 +57,8 @@ gitreset:
 copyunstable:
 	mkdir -p ./docs/unstable
 	cp -R ./tmp/* ./docs/unstable/
+	cp -R ./docs/css ./docs/unstable/
+	cp -R ./docs/js ./docs/unstable/
 	rm -rf ./tmp
 
 .PHONY: test test-short test-long ghpages site docs docclean gendocs docs_from_master docs_unstable master copytmp copyunstable gitreset docclean_unstable

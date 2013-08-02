@@ -22,6 +22,8 @@ function getModel (db) {
 describe('model', function(){
   describe('geoNear', function () {
     it('works with legacy coordinate points', function (done) {
+      this.timeout(5000);
+
       var db = start();
       var Geo = getModel(db);
       assert.ok(Geo.geoNear instanceof Function);
@@ -65,6 +67,7 @@ describe('model', function(){
     });
 
     it('works with GeoJSON coordinate points', function (done) {
+      this.timeout(5000);
 
       var db = start();
       var Geo = getModel(db);
@@ -110,6 +113,7 @@ describe('model', function(){
     });
 
     it('works with lean', function (done) {
+      this.timeout(5000);
 
       var db = start();
       var Geo = getModel(db);

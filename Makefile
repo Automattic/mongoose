@@ -44,11 +44,18 @@ docclean:
 	rm -f ./docs/source/_docs
 
 docclean_unstable:
-	rm -f ./docs/unstable/*
+	rm -rf ./docs/unstable/*
+	rm -f ./docs/source/_docs
 
 copytmp:
-	mkdir -p ./tmp
-	cp -R ./docs/*.html ./tmp
+	mkdir -p ./tmp/docs/css
+	mkdir -p ./tmp/docs/js
+	mkdir -p ./tmp/docs/images
+	cp -R ./docs/*.html ./tmp/docs
+	cp -R ./docs/css/*.css ./tmp/docs/css
+	cp -R ./docs/js/*.js ./tmp/docs/js
+	cp -R ./docs/images/* ./tmp/docs/images
+	cp index.html ./tmp
 
 gitreset:
 	git checkout -- ./docs
@@ -57,8 +64,6 @@ gitreset:
 copyunstable:
 	mkdir -p ./docs/unstable
 	cp -R ./tmp/* ./docs/unstable/
-	cp -R ./docs/css ./docs/unstable/
-	cp -R ./docs/js ./docs/unstable/
 	rm -rf ./tmp
 
 .PHONY: test test-short test-long ghpages site docs docclean gendocs docs_from_master docs_unstable master copytmp copyunstable gitreset docclean_unstable

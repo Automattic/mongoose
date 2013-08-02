@@ -20,7 +20,20 @@ function getModel (db) {
 }
 
 describe('model', function(){
+  var mongo24_or_greater = false;
+  before(function(done){
+    start.mongodVersion(function (err, version) {
+      if (err) throw err;
+
+      mongo24_or_greater = 2 < version[0] || (2 == version[0] && 4 <= version[1]);
+      if (!mongo24_or_greater) console.log('not testing mongodb 2.4 features');
+      done();
+    })
+  })
+
   describe('geoNear', function () {
+    if (!mongo24_or_greater) return;
+
     it('works with legacy coordinate points', function (done) {
       var db = start();
       var Geo = getModel(db);

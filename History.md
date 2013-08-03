@@ -9,7 +9,10 @@
   * deprecated; promise#addCallback (use promise#onFulFill)
   * deprecated; promise#addErrback (use promise#onReject)
   * deprecated; query.nearSphere() (use query.near)
-  * removed; namedscope (broken) #679 #642 #455 #379
+  * deprecated; query.center() (use query.circle)
+  * deprecated; query.centerSphere() (use query.circle)
+  * deprecated; query#slaveOk (use query#read)
+  * removed; namedscope (undocumented and broken) #679 #642 #455 #379
   * added; benchmarks [ebensing](https://github.com/ebensing)
   * added; publicly exposed connection states #1585
   * added; $geoWithin support #1529 $1455 [ebensing](https://github.com/ebensing)
@@ -20,11 +23,11 @@
   * added; MongooseBuffer#subtype()
   * added; model.create() now returns a promise #1340
   * added; support for `awaitdata` query option
-  * added; pass the doc to model.remove() callback #1419 [JoeWagner](https://github.com/JoeWagner)
+  * added; pass the doc to doc.remove() callback #1419 [JoeWagner](https://github.com/JoeWagner)
   * added; aggregation query builder #1404 [njoyard](https://github.com/njoyard)
   * updated; integrate mquery #1562 [ebensing](https://github.com/ebensing)
   * updated; error msg in doc.save() #1595
-  * updated; bump driver to 1.3.12
+  * updated; bump driver to 1.3.15
   * updated; mpromise 0.3.0
   * updated; sliced 0.0.5
   * tests; fix sharding tests for MongoDB 2.4.5
@@ -32,6 +35,7 @@
   * tests; fix race condition
   * docs; fix readme spelling #1483 [yorchopolis](https://github.com/yorchopolis)
   * docs; fixed up the README and examples [ebensing](https://github.com/ebensing)
+  * website; add unstable docs
   * website; many improvements
   * website; fix copyright #1439
   * website; server.js -> static.js #1546 [nikmartin](https://github.com/nikmartin)

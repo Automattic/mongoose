@@ -1,7 +1,7 @@
 {
     "name": "mongoose"
   , "description": "Mongoose MongoDB ODM"
-  , "version": "3.7.0-pre"
+  , "version": "3.7.0"
   , "author": "Guillermo Rauch <guillermo@learnboost.com>"
   , "keywords": ["mongodb", "document", "model", "schema", "database", "odm", "data", "datastore", "query", "nosql", "orm", "db"]
   , "dependencies": {
@@ -29,6 +29,7 @@
     }
   , "directories": { "lib": "./lib/mongoose" }
   , "scripts": { "test": "make test" }
+  , "publishConfig": { "tag": "unstable" }
   , "main": "./index.js"
   , "engines": { "node": ">=0.6.19" }
   , "bugs": {

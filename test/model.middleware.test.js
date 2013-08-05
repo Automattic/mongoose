@@ -196,4 +196,35 @@ describe('model middleware', function(){
       })
     });
   })
+  it('doesn\'t emit save events when a document is not sent to the db (gh-475)', function(done){
+    var db = start();
+    var ts = new Schema({
+      title : String,
+      num : Number
+    });
+    var count = 0;
+    ts.post('save', function () {
+      count++;
+    });
+
+    var Test = db.model('Test' + random(), ts);
+
+    var t = new Test({ title : 'testing'});
+    t.save(function (err) {
+      assert.ifError(err);
+      assert.equal(count, 1);
+
+      t.num = 1;
+      t.save(function (err) {
+        assert.ifError(err);
+        assert.equal(count, 2);
+
+        t.save(function (err) {
+          assert.ifError(err);
+          assert.equal(count, 2);
+          done();
+        });
+      });
+    });
+  })
 });

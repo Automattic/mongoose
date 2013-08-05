@@ -541,6 +541,37 @@ describe('document', function(){
     assert.equal(obj._id, oidString);
     done();
   });
+  it('jsonifying an object\'s populated items works (gh-1376)', function(done){
+    var db = start();
+    var userSchema, User, groupSchema, Group;
+
+    userSchema = Schema({name: String});
+    // includes virtual path when 'toJSON'
+    userSchema.set('toJSON', {getters: true});
+    userSchema.virtual('hello').get(function() {
+      return 'Hello, ' + this.name;
+    });
+    User = db.model('User', userSchema);
+
+    groupSchema = Schema({
+      name: String,
+      _users: [{type: Schema.ObjectId, ref: 'User'}]
+    });
+
+    Group = db.model('Group', groupSchema);
+
+    User.create({name: 'Alice'}, {name: 'Bob'}, function(err, alice, bob) {
+      assert.ifError(err);
+
+      new Group({name: 'mongoose', _users: [alice, bob]}).save(function(err, group) {
+        Group.findById(group).populate('_users').exec(function(err, group) {
+          assert.ifError(err);
+          assert.ok(group.toJSON()._users[0].hello);
+          done();
+        });
+      });
+    });
+  })
 
   describe('#update', function(){
     it('returns a Query', function(done){

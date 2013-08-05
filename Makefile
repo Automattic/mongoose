@@ -3,6 +3,7 @@ TESTS = $(shell find test/ -name '*.test.js')
 DOCS_ = $(shell find lib/ -name '*.js')
 DOCS = $(DOCS_:.js=.json)
 DOCFILE = docs/source/_docs
+STABLE_BRANCH = 3.6.x
 
 test:
 	@node test/dropdb.js
@@ -17,9 +18,10 @@ test-short:
 test-long:
 	@./node_modules/.bin/mocha $(T) -g LONG --async-only $(TESTS)
 
-docs: ghpages docclean gendocs
+docs: ghpages merge_stable docclean gendocs
+docs_all: docs_unstable docs
 docs_from_current_branch: docclean gendocs
-docs_unstable: docclean_unstable master gendocs copytmp gitreset ghpages copyunstable
+docs_unstable: master docclean_unstable gendocs copytmp gitreset ghpages copyunstable
 
 gendocs: $(DOCFILE)
 
@@ -33,8 +35,11 @@ $(DOCFILE): $(DOCS)
 site:
 	node website.js && node static.js
 
+merge_stable:
+	git merge $(STABLE_BRANCH)
+
 ghpages:
-	git checkout gh-pages && git merge 3.6.x
+	git checkout gh-pages
 
 master:
 	git checkout master

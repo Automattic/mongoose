@@ -1,6 +1,6 @@
 
-3.7.0-pre / 2013-07-XX
-=====================
+3.7.0 (unstable) / 2013-08-05
+===================
 
   * changed; query.within getter is now a method -> query.within()
   * changed; query.intersects getter is now a method -> query.intersects()

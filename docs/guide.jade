@@ -346,6 +346,8 @@ block content
   :markdown
     By default this is set to `true` for all schemas which guarentees that any occurring error gets passed back to our callback.
     By setting `safe` to something else like `{ j: 1, w: 2, wtimeout: 10000 }` we can guarantee the write was committed to the MongoDB journal (j: 1), at least 2 replicas (w: 2), and that the write will timeout if it takes longer than 10 seconds (wtimeout: 10000). Errors will still be passed to our callback.
+    
+    NOTE: In 3.6.x, you also need to turn [versioning](#versionKey) off. In 3.7.x and above, versioning will **automatically be disabled** when `safe` is set to `false`
 
     **NOTE: this setting overrides any setting specified by passing db options while [creating a connection](/docs/api.html#index_Mongoose-createConnection).
 

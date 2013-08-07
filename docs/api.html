@@ -1766,7 +1766,7 @@ doc.model(<span class="string">'User'</span>).findById(id, callback);</code></pr
   <span class="keyword">return</span> <span class="keyword">this</span>;
 };</code></pre></div><div class="params"><h4>Parameters:</h4><ul><li><code>[fn]</code><span class="types"> &lt;<a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Function">Function</a>&gt; </span><span>optional callback</span></li></ul></div><div class="description"><h4>Example:</h4>
 
-<pre><code>product.remove(<span class="function"><span class="keyword">function</span> <span class="params">(err, product)</span> {</span>
+<pre><code>product.remove(<span class="function"><span class="keyword">function</span> <span class="params">(err)</span> {</span>
   <span class="keyword">if</span> (err) <span class="keyword">return</span> handleError(err);
   Product.findById(product._id, <span class="function"><span class="keyword">function</span> <span class="params">(err, product)</span> {</span>
     console.log(product) <span class="comment">// null</span>

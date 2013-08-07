@@ -893,7 +893,7 @@ describe('connections:', function(){
     })
   })
 
-  describe('connection pool sharing: ', function () {
+  describe.only('connection pool sharing: ', function () {
     it('works', function (done) {
       var db = mongoose.createConnection('mongodb://localhost/mongoose1');
 
@@ -930,13 +930,15 @@ describe('connections:', function(){
         m2.create({ body : 'this is another body', thing : 2 }, function (err, i2) {
           assert.ifError(err);
 
-          m1.count(function (err, num) {
+          m1.findById(i1.id, function (err, item1) {
             assert.ifError(err);
-            assert.equal(num, 1);
+            assert.equal(item1.body, 'this is some text');
+            assert.equal(item1.thing, 1);
 
-            m2.count(function (err, num) {
+            m2.findById(i2.id, function (err, item2) {
               assert.ifError(err);
-              assert.equal(num, 1);
+              assert.equal(item2.body, 'this is another body');
+              assert.equal(item2.thing, 2);
               done();
             });
           });
@@ -944,7 +946,130 @@ describe('connections:', function(){
       });
     });
 
-    it('closes correctly for all dbs', function (done) {
+    it('emits connecting events on both', function (done) {
+      var db = mongoose.createConnection();
+      var db2 = db.openNewDb('mongoose-test-2');
+      var hit = false;
+      db2.on('connecting', function () {
+        hit && done();
+        hit = true;
+      });
+      db.on('connecting', function () {
+        hit && done();
+        hit = true;
+      });
+
+      db.open(start.uri);
+
+    });
+
+    it('emits connected events on both', function (done) {
+      var db = mongoose.createConnection();
+      var db2 = db.openNewDb('mongoose-test-2');
+      var hit = false;
+      db2.on('connected', function () {
+        hit && done();
+        hit = true;
+      });
+      db.on('connected', function () {
+        hit && done();
+        hit = true;
+      });
+
+      db.open(start.uri);
+
+    });
+
+    it('emits open events on both', function (done) {
+      var db = mongoose.createConnection();
+      var db2 = db.openNewDb('mongoose-test-2');
+      var hit = false;
+      db2.on('open', function () {
+        hit && done();
+        hit = true;
+      });
+      db.on('open', function () {
+        hit && done();
+        hit = true;
+      });
+
+      db.open(start.uri);
+
+    });
+
+    it('emits disconnecting events on both, closing initial db', function (done) {
+      var db = mongoose.createConnection();
+      var db2 = db.openNewDb('mongoose-test-2');
+      var hit = false;
+      db2.on('disconnecting', function () {
+        hit && done();
+        hit = true;
+      });
+      db.on('disconnecting', function () {
+        hit && done();
+        hit = true;
+      });
+      db.on('open', function () {
+        db.close();
+      });
+      db.open(start.uri);
+    });
+
+    it('emits disconnecting events on both, closing secondary db', function (done) {
+      var db = mongoose.createConnection();
+      var db2 = db.openNewDb('mongoose-test-2');
+      var hit = false;
+      db2.on('disconnecting', function () {
+        hit && done();
+        hit = true;
+      });
+      db.on('disconnecting', function () {
+        hit && done();
+        hit = true;
+      });
+      db.on('open', function () {
+        db2.close();
+      });
+      db.open(start.uri);
+    });
+
+    it('emits disconnected events on both, closing initial db', function (done) {
+      var db = mongoose.createConnection();
+      var db2 = db.openNewDb('mongoose-test-2');
+      var hit = false;
+      db2.on('disconnected', function () {
+        hit && done();
+        hit = true;
+      });
+      db.on('disconnected', function () {
+        hit && done();
+        hit = true;
+      });
+      db.on('open', function () {
+        db.close();
+      });
+      db.open(start.uri);
+    });
+
+    it('emits disconnected events on both, closing secondary db', function (done) {
+      var db = mongoose.createConnection();
+      var db2 = db.openNewDb('mongoose-test-2');
+      var hit = false;
+      db2.on('disconnected', function () {
+        hit && done();
+        hit = true;
+      });
+      db.on('disconnected', function () {
+        hit && done();
+        hit = true;
+      });
+      db.on('open', function () {
+        db2.close();
+      });
+      db.open(start.uri);
+    });
+
+    it('closes correctly for all dbs, closing initial db', function (done) {
       var db = start();
       var db2 = db.openNewDb('mongoose-test-2');
 
@@ -952,6 +1077,17 @@ describe('connections:', function(){
         done();
       });
       db.close();
+
+    });
+
+    it('closes correctly for all dbs, closing secondary db', function (done) {
+      var db = start();
+      var db2 = db.openNewDb('mongoose-test-2');
+
+      db.on('close', function () {
+        done();
+      });
+      db2.close();
 
     });
   });

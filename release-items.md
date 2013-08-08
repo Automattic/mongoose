@@ -11,10 +11,22 @@
 9.  tweet google group announcement from [@mongoosejs](https://twitter.com/mongoosejs)
 10. announce on #mongoosejs irc room
 11. change package.json version to next patch version suffixed with '-pre' and commit "now working on x.x.x"
+12. if this is a stable release, update the unstable History.md with the changelog
 
 ## updating the website
 
+For 3.6.x:
+
+0. Change to the 3.6.x branch
 1. execute `make docs` (when this process completes you'll be on the gh-pages branch)
 2. `git add docs/*.html index.html`
+3. `git commit -m 'website; regen <x.x.x>'`
+4. `git push origin gh-pages`
+
+For unstable:
+
+0. Change to the master branch
+1. execute `make docs_unstable` (when this process completes you'll be on the gh-pages branch)
+2. `git add docs/unstable/docs/*.html index.html`
 3. `git commit -m 'website; regen <x.x.x>'`
 4. `git push origin gh-pages`

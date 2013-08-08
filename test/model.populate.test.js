@@ -1946,6 +1946,18 @@ describe('model: populate:', function(){
       db.close(done);
     })
 
+    describe('returns', function(){
+      it('a promise', function(done){
+        var p = B.populate(post1, '_creator');
+        assert.ok(p instanceof mongoose.Promise);
+        p.then(success, done).end();
+        function success (doc) {
+          assert.ok(doc);
+          done();
+        }
+      })
+    })
+
     describe('of individual document', function(){
       it('works', function(done){
         var ret = utils.populate({ path: '_creator', model: 'RefAlternateUser' })

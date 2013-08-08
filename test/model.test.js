@@ -3549,8 +3549,8 @@ describe('Model', function(){
           db.close();
           assert.ifError(err);
           assert.equal(found.length, 2);
-          assert.equal(found[0]._id.id, createdOne._id.id);
-          assert.equal(found[1]._id.id, createdTwo._id.id);
+          assert.equal(String(found[0]._id), String(createdOne._id));
+          assert.equal(String(found[1]._id), String(createdTwo._id));
           done();
         });
       });

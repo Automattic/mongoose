@@ -733,6 +733,28 @@ describe('model: update:', function(){
     })
   })
 
+  it('handles positional operators with referenced docs (gh-1572)', function(done){
+    var db = start();
+
+    var so = new Schema({ title : String, obj : [String] });
+    var Some = db.model('Some' + random(), so);
+
+    Some.create({ obj: ['a','b','c'] }, function (err, s) {
+      assert.ifError(err);
+
+      Some.update({ _id: s._id, obj: 'b' }, { $set: { "obj.$" : 2 }}, function(err) {
+        assert.ifError(err);
+
+        Some.findById(s._id, function (err, ss) {
+          assert.ifError(err);
+
+          assert.strictEqual(ss.obj[1], '2');
+          done();
+        });
+      });
+    });
+  })
+
   describe('mongodb 2.4 features', function(){
     var mongo24_or_greater = false;
 
@@ -810,6 +832,5 @@ describe('model: update:', function(){
       })
     })
   })
-
 
 });

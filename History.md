@@ -1,4 +1,18 @@
 
+3.6.16 / 2013-08-08
+===================
+
+  * added; publicly expose connection states #1585
+  * fixed; limit applies to individual items on population #1490 [ebensing](https://github.com/ebensing)
+  * fixed; positional operator casting in updates #1572 [ebensing](https://github.com/ebensing)
+  * updated; MongoDB driver to 1.3.17
+  * updated; sliced to 0.0.5
+  * website; tweak homepage
+  * tests; fixed + added
+  * docs; fix some examples
+  * docs; multi-mongos support details
+  * docs; auto open browser after starting static server
+
 3.6.15 / 2013-07-16
 ==================
 

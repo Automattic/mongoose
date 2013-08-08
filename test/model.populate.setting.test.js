@@ -316,4 +316,65 @@ describe('model: populate:', function(){
       })
     })
   })
+  it('limit should apply to each item, not in aggregate (gh-1490)', function(done){
+    var db = start();
+    var sB = new Schema({
+        name            : String
+    });
+    var name = 'b' + random();
+    var sJ = new Schema({
+        b    : [{ type: Schema.Types.ObjectId, ref: name }]
+    });
+    var B = db.model(name, sB);
+    var J = db.model('j' + random(), sJ);
+
+    var b1 = new B({ name : 'thing1'});
+    var b2 = new B({ name : 'thing2'});
+    var b3 = new B({ name : 'thing3'});
+    var b4 = new B({ name : 'thing4'});
+    var b5 = new B({ name : 'thing5'});
+
+    var j1 = new J({ b : [b1.id, b2.id, b5.id]});
+    var j2 = new J({ b : [b3.id, b4.id, b5.id]});
+
+    var count = 7;
+
+    b1.save(function (err) {
+      if (err) throw err;
+      --count || next();
+    });
+    b2.save(function (err) {
+      if (err) throw err;
+      --count || next();
+    });
+    b3.save(function (err) {
+      if (err) throw err;
+      --count || next();
+    });
+    b4.save(function (err) {
+      if (err) throw err;
+      --count || next();
+    });
+    b5.save(function (err) {
+      if (err) throw err;
+      --count || next();
+    });
+    j1.save(function (err) {
+      if (err) throw err;
+      --count || next();
+    });
+    j2.save(function (err) {
+      if (err) throw err;
+      --count || next();
+    });
+
+    function next() {
+      J.find().populate({ path: 'b', options : { limit : 2 } }).exec(function (err, j) {
+        assert.equal(j.length, 2);
+        assert.equal(j[0].b.length, 2);
+        assert.equal(j[1].b.length, 2);
+        done();
+      });
+    }
+  })
 })

@@ -3602,7 +3602,7 @@ describe('Model', function(){
           assert.ifError(err);
           var query = BlogPost.count({title: 'interoperable count as promise 2'});
           var promise = query.exec();
-          promise.addBack(function (err, count) {
+          promise.onResolve(function (err, count) {
             db.close();
             assert.ifError(err);
             assert.equal(1, count);
@@ -3619,7 +3619,7 @@ describe('Model', function(){
           assert.ifError(err);
           var query = BlogPost.update({title: 'interoperable update as promise 2'}, {title: 'interoperable update as promise delta 2'});
           var promise = query.exec();
-          promise.addBack(function (err) {
+          promise.onResolve(function (err) {
             assert.ifError(err);
             BlogPost.count({title: 'interoperable update as promise delta 2'}, function (err, count) {
               db.close();
@@ -3639,7 +3639,7 @@ describe('Model', function(){
           assert.ifError(err);
           var query = BlogPost.findOne({title: 'interoperable findOne as promise 2'});
           var promise = query.exec();
-          promise.addBack(function (err, found) {
+          promise.onResolve(function (err, found) {
             db.close();
             assert.ifError(err);
             assert.equal(found.id,created.id);
@@ -3659,7 +3659,7 @@ describe('Model', function(){
           assert.ifError(err);
           var query = BlogPost.find({title: 'interoperable find as promise 2'}).sort('_id');
           var promise = query.exec();
-          promise.addBack(function (err, found) {
+          promise.onResolve(function (err, found) {
             db.close();
             assert.ifError(err);
             assert.equal(found.length,2);
@@ -3680,7 +3680,7 @@ describe('Model', function(){
           assert.ifError(err);
           var query = BlogPost.remove({title: 'interoperable remove as promise 2'});
           var promise = query.exec();
-          promise.addBack(function (err) {
+          promise.onResolve(function (err) {
             assert.ifError(err);
             BlogPost.count({title: 'interoperable remove as promise 2'}, function (err, count) {
               db.close();
@@ -3699,7 +3699,7 @@ describe('Model', function(){
           assert.ifError(err);
           var query = BlogPost.count({title: 'interoperable ad-hoc as promise 2'});
           var promise = query.exec('findOne');
-          promise.addBack(function (err, found) {
+          promise.onResolve(function (err, found) {
             db.close();
             assert.ifError(err);
             assert.equal(found._id.id,created._id.id);

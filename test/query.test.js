@@ -1035,6 +1035,69 @@ describe('Query', function(){
     });
   });
 
+  describe('remove', function(){
+    it('handles cast errors async', function(done){
+      var db = start();
+      var Product = db.model('Product');
+
+      assert.doesNotThrow(function(){
+        Product.where({ numbers: [[[]]] }).remove(function (err) {
+          db.close();
+          assert.ok(err);
+          done();
+        })
+      })
+    })
+
+    it('supports a single conditions arg', function(done){
+      var db = start();
+      var Product = db.model('Product');
+
+      Product.create({ strings: ['remove-single-condition'] }).then(function(p){
+        db.close();
+        var q = Product.where().remove({ strings: 'remove-single-condition' });
+        assert.ok(q instanceof mongoose.Query);
+        done();
+      }, done).end();
+    })
+
+    it('supports a single callback arg', function(done){
+      var db = start();
+      var Product = db.model('Product');
+      var val = 'remove-single-callback';
+
+      Product.create({ strings: [val] }).then(function(p){
+        Product.where({ strings: val }).remove(function (err) {
+          assert.ifError(err);
+          Product.findOne({ strings: val }, function (err, doc) {
+            db.close();
+            assert.ifError(err);
+            assert.ok(!doc);
+            done();
+          })
+        })
+      }, done).end();
+    })
+
+    it('supports conditions and callback args', function(done){
+      var db = start();
+      var Product = db.model('Product');
+      var val = 'remove-cond-and-callback';
+
+      Product.create({ strings: [val] }).then(function(p){
+        Product.where().remove({ strings: val }, function (err) {
+          assert.ifError(err);
+          Product.findOne({ strings: val }, function (err, doc) {
+            db.close();
+            assert.ifError(err);
+            assert.ok(!doc);
+            done();
+          })
+        })
+      }, done).end();
+    })
+  })
+
   describe('querying/updating with model instance containing embedded docs should work (#454)', function(){
     it('works', function(done){
       var db = start();

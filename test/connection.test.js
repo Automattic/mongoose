@@ -892,4 +892,203 @@ describe('connections:', function(){
       done();
     })
   })
+
+  describe.only('connection pool sharing: ', function () {
+    it('works', function (done) {
+      var db = mongoose.createConnection('mongodb://localhost/mongoose1');
+
+      var db2 = db.openNewDb('mongoose2');
+
+      assert.equal(db2.name, 'mongoose2');
+      assert.equal(db.name, 'mongoose1');
+
+      assert.equal(db.port, db2.port);
+      assert.equal(db.replica, db2.replica);
+      assert.equal(db.hosts, db2.hosts);
+      assert.equal(db.host, db2.host);
+      assert.equal(db.port, db2.port);
+      assert.equal(db.user, db2.user);
+      assert.equal(db.pass, db2.pass);
+      assert.deepEqual(db.options, db2.options);
+
+      done();
+    });
+    it('saves correctly', function (done) {
+      var db = start();
+      var db2 = db.openNewDb('mongoose-test-2');
+
+      var schema = new Schema({
+        body : String,
+        thing : Number
+      });
+
+      var m1 = db.model('testMod', schema);
+      var m2 = db2.model('testMod', schema);
+
+      m1.create({ body : 'this is some text', thing : 1 }, function (err, i1) {
+        assert.ifError(err);
+        m2.create({ body : 'this is another body', thing : 2 }, function (err, i2) {
+          assert.ifError(err);
+
+          m1.findById(i1.id, function (err, item1) {
+            assert.ifError(err);
+            assert.equal(item1.body, 'this is some text');
+            assert.equal(item1.thing, 1);
+
+            m2.findById(i2.id, function (err, item2) {
+              assert.ifError(err);
+              assert.equal(item2.body, 'this is another body');
+              assert.equal(item2.thing, 2);
+              done();
+            });
+          });
+        });
+      });
+    });
+
+    it('emits connecting events on both', function (done) {
+      var db = mongoose.createConnection();
+      var db2 = db.openNewDb('mongoose-test-2');
+      var hit = false;
+      db2.on('connecting', function () {
+        hit && done();
+        hit = true;
+      });
+      db.on('connecting', function () {
+        hit && done();
+        hit = true;
+      });
+
+      db.open(start.uri);
+
+    });
+
+    it('emits connected events on both', function (done) {
+      var db = mongoose.createConnection();
+      var db2 = db.openNewDb('mongoose-test-2');
+      var hit = false;
+      db2.on('connected', function () {
+        hit && done();
+        hit = true;
+      });
+      db.on('connected', function () {
+        hit && done();
+        hit = true;
+      });
+
+      db.open(start.uri);
+
+    });
+
+    it('emits open events on both', function (done) {
+      var db = mongoose.createConnection();
+      var db2 = db.openNewDb('mongoose-test-2');
+      var hit = false;
+      db2.on('open', function () {
+        hit && done();
+        hit = true;
+      });
+      db.on('open', function () {
+        hit && done();
+        hit = true;
+      });
+
+      db.open(start.uri);
+
+    });
+
+    it('emits disconnecting events on both, closing initial db', function (done) {
+      var db = mongoose.createConnection();
+      var db2 = db.openNewDb('mongoose-test-2');
+      var hit = false;
+      db2.on('disconnecting', function () {
+        hit && done();
+        hit = true;
+      });
+      db.on('disconnecting', function () {
+        hit && done();
+        hit = true;
+      });
+      db.on('open', function () {
+        db.close();
+      });
+      db.open(start.uri);
+    });
+
+    it('emits disconnecting events on both, closing secondary db', function (done) {
+      var db = mongoose.createConnection();
+      var db2 = db.openNewDb('mongoose-test-2');
+      var hit = false;
+      db2.on('disconnecting', function () {
+        hit && done();
+        hit = true;
+      });
+      db.on('disconnecting', function () {
+        hit && done();
+        hit = true;
+      });
+      db.on('open', function () {
+        db2.close();
+      });
+      db.open(start.uri);
+    });
+
+    it('emits disconnected events on both, closing initial db', function (done) {
+      var db = mongoose.createConnection();
+      var db2 = db.openNewDb('mongoose-test-2');
+      var hit = false;
+      db2.on('disconnected', function () {
+        hit && done();
+        hit = true;
+      });
+      db.on('disconnected', function () {
+        hit && done();
+        hit = true;
+      });
+      db.on('open', function () {
+        db.close();
+      });
+      db.open(start.uri);
+    });
+
+    it('emits disconnected events on both, closing secondary db', function (done) {
+      var db = mongoose.createConnection();
+      var db2 = db.openNewDb('mongoose-test-2');
+      var hit = false;
+      db2.on('disconnected', function () {
+        hit && done();
+        hit = true;
+      });
+      db.on('disconnected', function () {
+        hit && done();
+        hit = true;
+      });
+      db.on('open', function () {
+        db2.close();
+      });
+      db.open(start.uri);
+    });
+
+    it('closes correctly for all dbs, closing initial db', function (done) {
+      var db = start();
+      var db2 = db.openNewDb('mongoose-test-2');
+
+      db2.on('close', function () {
+        done();
+      });
+      db.close();
+
+    });
+
+    it('closes correctly for all dbs, closing secondary db', function (done) {
+      var db = start();
+      var db2 = db.openNewDb('mongoose-test-2');
+
+      db.on('close', function () {
+        done();
+      });
+      db2.close();
+
+    });
+  });
 })

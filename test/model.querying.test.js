@@ -2248,5 +2248,53 @@ describe('lean option:', function(){
       });
     });
   });
+  it('properly casts nested and/or queries (gh-676)', function(done){
+    var sch = new Schema({
+      num : Number,
+      subdoc : { title : String, num : Number }
+    });
 
+    var M = mongoose.model('andor' + random(), sch);
+
+    var cond = {
+      $and : [
+        { $or : [ { num : '23' }, { 'subdoc.num' : '45' } ] },
+        { $and : [ { 'subdoc.title' : 233 }, { num : '345' } ] }
+      ]
+    };
+    var q = M.find(cond);
+    assert.equal('number', typeof q._conditions.$and[0].$or[0].num);
+    assert.equal('number', typeof q._conditions.$and[0].$or[1]['subdoc.num']);
+    assert.equal('string', typeof q._conditions.$and[1].$and[0]['subdoc.title']);
+    assert.equal('number', typeof q._conditions.$and[1].$and[1].num);
+    done();
+  })
+  it('properly casts deeply nested and/or queries (gh-676)', function(done){
+    var sch = new Schema({
+      num : Number,
+      subdoc : { title : String, num : Number }
+    });
+
+    var M = mongoose.model('andor' + random(), sch);
+
+    var cond = {
+      $and : [
+        { $or : [
+            { $and : [
+                { $or : [
+                    { num : '12345' },
+                    { 'subdoc.num' : '56789' }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    };
+    var q = M.find(cond);
+    assert.equal('number', typeof q._conditions.$and[0].$or[0].$and[0].$or[0].num);
+    assert.equal('number', typeof q._conditions.$and[0].$or[0].$and[0].$or[1]['subdoc.num']);
+    done();
+  })
 })

@@ -6,7 +6,7 @@
   , "keywords": ["mongodb", "document", "model", "schema", "database", "odm", "data", "datastore", "query", "nosql", "orm", "db"]
   , "dependencies": {
         "hooks": "0.2.1"
-      , "mongodb": "1.3.17"
+      , "mongodb": "1.3.18"
       , "ms": "0.1.0"
       , "sliced": "0.0.5"
       , "muri": "0.3.1"

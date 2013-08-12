@@ -833,7 +833,8 @@ describe('model: update:', function(){
       })
     })
   })
-  describe.only('{overwrite : true}', function () {
+
+  describe('{overwrite : true}', function () {
     it('overwrite works', function(done){
       var db = start()
       var schema = new Schema({ mixed: {} });

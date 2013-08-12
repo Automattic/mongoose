@@ -963,16 +963,22 @@ describe('connections:', function(){
       var db = mongoose.createConnection();
       var db2 = db.openNewDb('mongoose-test-2');
       var hit = false;
+
       db2.on('connecting', function () {
-        hit && done();
+        hit && close();
         hit = true;
       });
+
       db.on('connecting', function () {
-        hit && done();
+        hit && close();
         hit = true;
       });
 
       db.open(start.uri);
+
+      function close () {
+        db.close(done);
+      }
 
     });
 
@@ -980,16 +986,21 @@ describe('connections:', function(){
       var db = mongoose.createConnection();
       var db2 = db.openNewDb('mongoose-test-2');
       var hit = false;
+
       db2.on('connected', function () {
-        hit && done();
+        hit && close();
         hit = true;
       });
       db.on('connected', function () {
-        hit && done();
+        hit && close();
         hit = true;
       });
 
       db.open(start.uri);
+
+      function close () {
+        db.close(done);
+      }
 
     });
 
@@ -998,16 +1009,19 @@ describe('connections:', function(){
       var db2 = db.openNewDb('mongoose-test-2');
       var hit = false;
       db2.on('open', function () {
-        hit && done();
+        hit && close();
         hit = true;
       });
       db.on('open', function () {
-        hit && done();
+        hit && close();
         hit = true;
       });
 
       db.open(start.uri);
 
+      function close () {
+        db.close(done);
+      }
     });
 
     it('emits disconnecting events on both, closing initial db', function (done) {

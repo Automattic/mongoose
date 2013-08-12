@@ -893,7 +893,7 @@ describe('connections:', function(){
     })
   })
 
-  describe.only('connection pool sharing: ', function () {
+  describe('connection pool sharing: ', function () {
     it('works', function (done) {
       var db = mongoose.createConnection('mongodb://localhost/mongoose1');
 

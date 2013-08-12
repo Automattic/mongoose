@@ -913,6 +913,7 @@ describe('connections:', function(){
 
       done();
     });
+
     it('saves correctly', function (done) {
       var db = start();
       var db2 = db.openNewDb('mongoose-test-2');
@@ -939,7 +940,19 @@ describe('connections:', function(){
               assert.ifError(err);
               assert.equal(item2.body, 'this is another body');
               assert.equal(item2.thing, 2);
-              done();
+
+              // validate the doc doesn't exist in the other db
+              m1.findById(i2.id, function (err, nothing) {
+                assert.ifError(err);
+                assert.strictEqual(null, nothing);
+
+                m2.findById(i1.id, function (err, nothing) {
+                  assert.ifError(err);
+                  assert.strictEqual(null, nothing);
+
+                  db2.close(done)
+                })
+              })
             });
           });
         });

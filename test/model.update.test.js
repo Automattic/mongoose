@@ -833,5 +833,70 @@ describe('model: update:', function(){
       })
     })
   })
+  describe.only('{overwrite : true}', function () {
+    it('overwrite works', function(done){
+      var db = start()
+      var schema = new Schema({ mixed: {} });
+      var M = db.model('updatesmixed-' + random(), schema);
 
+      M.create({ mixed: 'something' }, function (err, created) {
+        assert.ifError(err);
+
+        M.update({ _id: created._id }, { mixed: {} }, { overwrite : true }, function (err) {
+          assert.ifError(err);
+          M.findById(created._id, function (err, doc) {
+            assert.ifError(err);
+            assert.equal(created.id, doc.id)
+            assert.equal(typeof doc.mixed, 'object');
+            assert.equal(Object.keys(doc.mixed).length, 0);
+            done()
+          })
+        })
+      })
+    })
+
+    it('overwrites all properties', function(done){
+      var db = start();
+      var sch = new Schema({ title : String, subdoc : { name : String, num : Number }});
+
+      var M = db.model('updateover'+random(), sch);
+
+      M.create({ subdoc : { name : 'that', num : 1 } }, function (err, doc) {
+        assert.ifError(err);
+
+        M.update({ _id : doc.id }, { title : 'something!' }, { overwrite : true }, function (err) {
+          assert.ifError(err);
+          M.findById(doc.id, function (err, doc) {
+            assert.ifError(err);
+            assert.equal(doc.title, 'something!');
+            assert.equal(doc.subdoc.name, undefined);
+            assert.equal(doc.subdoc.num, undefined);
+            done();
+          });
+        });
+      });
+    })
+
+    it('allows users to blow it up', function(done){
+      var db = start();
+      var sch = new Schema({ title : String, subdoc : { name : String, num : Number }});
+
+      var M = db.model('updateover'+random(), sch);
+
+      M.create({ subdoc : { name : 'that', num : 1, title : 'hello' } }, function (err, doc) {
+        assert.ifError(err);
+
+        M.update({ _id : doc.id }, {}, { overwrite : true }, function (err) {
+          assert.ifError(err);
+          M.findById(doc.id, function (err, doc) {
+            assert.ifError(err);
+            assert.equal(doc.title, undefined);
+            assert.equal(doc.subdoc.name, undefined);
+            assert.equal(doc.subdoc.num, undefined);
+            done();
+          });
+        });
+      });
+    })
+  });
 });

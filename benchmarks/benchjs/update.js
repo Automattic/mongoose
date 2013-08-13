@@ -260,7 +260,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function (err) {
           deferred.resolve();
         });
       }
-    }).add('Update - Mongoose - Array Maniuplation, parallel ops', {
+    }).add('Update - Mongoose - Array Manipulation, parallel ops', {
       defer : true,
       fn : function (deferred) {
         var done = false;

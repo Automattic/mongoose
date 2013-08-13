@@ -293,7 +293,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench-pop', function (err) {
         deferred.resolve();
       });
     }
-  }).add('Populate - 100 value', {
+  }).add('Populate - 100 values', {
     defer : true,
     fn : function (deferred) {
       blog[1].populate('comments', function (err) {
@@ -301,7 +301,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench-pop', function (err) {
         deferred.resolve();
       });
     }
-  }).add('Populate - 1000 value', {
+  }).add('Populate - 1000 values', {
     defer : true,
     fn : function (deferred) {
       blog[2].populate('comments', function (err) {
@@ -309,7 +309,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench-pop', function (err) {
         deferred.resolve();
       });
     }
-  }).add('Populate - 10000 value', {
+  }).add('Populate - 10000 values', {
     defer : true,
     fn : function (deferred) {
       blog[3].populate('comments', function (err) {

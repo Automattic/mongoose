@@ -3520,8 +3520,8 @@ describe('model', function(){
           db.close();
           assert.ifError(err);
           assert.equal(found.length, 2);
-          assert.equal(found[0]._id.id, createdOne._id.id);
-          assert.equal(found[1]._id.id, createdTwo._id.id);
+          assert.equal(String(found[0]._id), String(createdOne._id));
+          assert.equal(String(found[1]._id), String(createdTwo._id));
           done();
         });
       });
@@ -4456,5 +4456,33 @@ describe('model', function(){
         });
       });
     })
+  })
+
+  it('allow for object passing to ref paths (gh-1606)', function(done){
+    var db = start();
+    var schA = new Schema({ title : String });
+    var schma = new Schema({
+      thing : { type : Schema.Types.ObjectId, ref : 'A' },
+      subdoc : {
+        some : String,
+        thing : [{ type : Schema.Types.ObjectId, ref : 'A' }]
+      }
+    });
+
+    var M1 = db.model('A', schA);
+    var M2 = db.model('A2', schma);
+    var a = new M1({ title : 'hihihih' }).toObject();
+    var thing = new M2({
+      thing : a,
+      subdoc : {
+        title : 'blah',
+        thing : [a]
+      }
+    });
+
+    assert.equal(thing.thing, a._id);
+    assert.equal(thing.subdoc.thing[0], a._id);
+
+    done();
   })
 });

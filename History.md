@@ -1,4 +1,11 @@
 
+3.6.17 / 2013-08-13
+===================
+
+  * updated; driver to 1.3.18 (fixes memory leak)
+  * fixed; casting ref docs on creation #1606
+  * docs; query options
+
 3.6.16 / 2013-08-08
 ===================
 

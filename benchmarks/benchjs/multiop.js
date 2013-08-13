@@ -324,7 +324,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function (err) {
           }
         }
       }
-    }).add('Multi-Op - Mongoose - Embedded Docs - Read/write/update', {
+    }).add('Multi-Op - Mongoose - Embedded Docs - Read-write-update', {
       defer : true,
       fn : function (deferred) {
         var count = 150;
@@ -354,7 +354,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function (err) {
           }
         }
       }
-    }).add('Multi-Op - Driver - Embedded Docs - Read/write/update', {
+    }).add('Multi-Op - Driver - Embedded Docs - Read-write-update', {
       defer : true,
       fn : function (deferred) {
         var count = 150;

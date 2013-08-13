@@ -1,4 +1,29 @@
 
+3.7.1 (unstable) / 2013-08-13
+=============================
+
+  * updated; driver to 1.3.18 (fixes memory leak)
+  * added; connection.useDb() #1124 [ebensing](https://github.com/ebensing)
+  * added; promise support to model.mapReduce()
+  * added; promise support to model.ensureIndexes()
+  * added; promise support to model.populate()
+  * fixed; casting ref docs on creation #1606 [ebensing](https://github.com/ebensing)
+  * fixed; model.update "overwrite" option works as documented
+  * fixed; query#remove() works as documented
+  * fixed; "limit" correctly applies to individual items on population #1490 [ebensing](https://github.com/ebensing)
+  * fixed; issue with positional operator on ref docs #1572 [ebensing](https://github.com/ebensing)
+  * fixed; benchmarks to actually output valid json
+  * tests; added for nested and/or queries
+  * tests; close some test connections
+  * tests; validate db contents
+  * tests; remove .only
+  * tests; close some test connections
+  * tests; validate db contents
+  * tests; remove .only
+  * tests; replace deprecated method names
+  * tests; convert id to string
+  * docs; promise.fulfill()
+
 3.7.0 (unstable) / 2013-08-05
 ===================
 

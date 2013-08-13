@@ -897,7 +897,7 @@ describe('connections:', function(){
     it('works', function (done) {
       var db = mongoose.createConnection('mongodb://localhost/mongoose1');
 
-      var db2 = db.openNewDb('mongoose2');
+      var db2 = db.useDb('mongoose2');
 
       assert.equal(db2.name, 'mongoose2');
       assert.equal(db.name, 'mongoose1');
@@ -916,7 +916,7 @@ describe('connections:', function(){
 
     it('saves correctly', function (done) {
       var db = start();
-      var db2 = db.openNewDb('mongoose-test-2');
+      var db2 = db.useDb('mongoose-test-2');
 
       var schema = new Schema({
         body : String,
@@ -961,7 +961,7 @@ describe('connections:', function(){
 
     it('emits connecting events on both', function (done) {
       var db = mongoose.createConnection();
-      var db2 = db.openNewDb('mongoose-test-2');
+      var db2 = db.useDb('mongoose-test-2');
       var hit = false;
 
       db2.on('connecting', function () {
@@ -984,7 +984,7 @@ describe('connections:', function(){
 
     it('emits connected events on both', function (done) {
       var db = mongoose.createConnection();
-      var db2 = db.openNewDb('mongoose-test-2');
+      var db2 = db.useDb('mongoose-test-2');
       var hit = false;
 
       db2.on('connected', function () {
@@ -1006,7 +1006,7 @@ describe('connections:', function(){
 
     it('emits open events on both', function (done) {
       var db = mongoose.createConnection();
-      var db2 = db.openNewDb('mongoose-test-2');
+      var db2 = db.useDb('mongoose-test-2');
       var hit = false;
       db2.on('open', function () {
         hit && close();
@@ -1026,7 +1026,7 @@ describe('connections:', function(){
 
     it('emits disconnecting events on both, closing initial db', function (done) {
       var db = mongoose.createConnection();
-      var db2 = db.openNewDb('mongoose-test-2');
+      var db2 = db.useDb('mongoose-test-2');
       var hit = false;
       db2.on('disconnecting', function () {
         hit && done();
@@ -1044,7 +1044,7 @@ describe('connections:', function(){
 
     it('emits disconnecting events on both, closing secondary db', function (done) {
       var db = mongoose.createConnection();
-      var db2 = db.openNewDb('mongoose-test-2');
+      var db2 = db.useDb('mongoose-test-2');
       var hit = false;
       db2.on('disconnecting', function () {
         hit && done();
@@ -1062,7 +1062,7 @@ describe('connections:', function(){
 
     it('emits disconnected events on both, closing initial db', function (done) {
       var db = mongoose.createConnection();
-      var db2 = db.openNewDb('mongoose-test-2');
+      var db2 = db.useDb('mongoose-test-2');
       var hit = false;
       db2.on('disconnected', function () {
         hit && done();
@@ -1080,7 +1080,7 @@ describe('connections:', function(){
 
     it('emits disconnected events on both, closing secondary db', function (done) {
       var db = mongoose.createConnection();
-      var db2 = db.openNewDb('mongoose-test-2');
+      var db2 = db.useDb('mongoose-test-2');
       var hit = false;
       db2.on('disconnected', function () {
         hit && done();
@@ -1098,7 +1098,7 @@ describe('connections:', function(){
 
     it('closes correctly for all dbs, closing initial db', function (done) {
       var db = start();
-      var db2 = db.openNewDb('mongoose-test-2');
+      var db2 = db.useDb('mongoose-test-2');
 
       db2.on('close', function () {
         done();
@@ -1109,7 +1109,7 @@ describe('connections:', function(){
 
     it('closes correctly for all dbs, closing secondary db', function (done) {
       var db = start();
-      var db2 = db.openNewDb('mongoose-test-2');
+      var db2 = db.useDb('mongoose-test-2');
 
       db.on('close', function () {
         done();

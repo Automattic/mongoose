@@ -274,6 +274,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench-pop', function (err) {
     // just a bit simpler...
     mongoose.connection.db.dropDatabase(function () {
       mongoose.disconnect();
+      process.exit();
     });
   }
 

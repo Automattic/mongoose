@@ -154,25 +154,9 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function (err) {
     }
 
     function closeDB() {
-      var dm = false;
-      var dd = false;
-      User.remove(function () {
-        dm && mongoose.disconnect();
-        dm = true;
-      });
-      user.remove({}, function (err) {
-        if (err) throw err;
-        dd && db.close();
-        dd = true;
-      });
-      BlogPost.remove(function () {
-        dm && mongoose.disconnect();
-        dm = true;
-      });
-      blogpost.remove({}, function (err) {
-        if (err) throw err;
-        dd && db.close();
-        dd = true;
+      mongoose.connection.db.dropDatabase(function () {
+        mongoose.disconnect();
+        process.exit();
       });
     }
 

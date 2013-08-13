@@ -4456,6 +4456,7 @@ describe('Model', function(){
       });
     })
   })
+
   it('allow for object passing to ref paths (gh-1606)', function(done){
     var db = start();
     var schA = new Schema({ title : String });

@@ -1549,6 +1549,7 @@ describe('schema', function(){
 
       done();
     })
+
     it('properly gets value of plain objects when dealing with refs (gh-1606)', function (done) {
       var db = start();
       var el = new Schema({ title : String });

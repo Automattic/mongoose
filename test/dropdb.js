@@ -4,7 +4,7 @@ db.once('open', function () {
 
   // drop the default test database
   db.db.dropDatabase(function () {
-    var db2 = db.openNewDb('mongoose-test-2');
+    var db2 = db.useDb('mongoose-test-2');
     db2.db.dropDatabase(function() {
       // drop mongos test db if exists
       var mongos = process.env.MONGOOSE_MULTI_MONGOS_TEST_URI;

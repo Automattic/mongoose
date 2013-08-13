@@ -323,6 +323,20 @@
   * updated; mpath to 0.1.1
   * updated; docs
 
+3.5.16 / 2013-08-13
+===================
+
+  * updated; driver to 1.3.18
+
+3.5.15 / 2013-07-26
+==================
+
+  * updated; sliced to 0.0.5
+  * updated; driver to 1.3.12
+  * fixed; regression in Query#count() due to driver change
+  * tests; fixed timeouts
+  * tests; handle differing test uris
+
 3.5.14 / 2013-05-15
 ===================
 

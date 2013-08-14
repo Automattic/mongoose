@@ -262,7 +262,9 @@ describe('model: querying:', function(){
         assert.ifError(err);
         var query = Address.distinct('zip', function (err, results) {
           assert.ifError(err);
-          assert.deepEqual(results, ['10010', '99701']);
+          assert.equal(2, results.length);
+          assert.ok(results.indexOf('10010') > -1);
+          assert.ok(results.indexOf('99701') > -1);
           db.close(done);
         });
       });

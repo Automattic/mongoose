@@ -245,9 +245,11 @@ describe('model: querying:', function(){
       Address.create({ zip: '10010'}, { zip: '10010'}, { zip: '99701'}, function (err, a1, a2, a3) {
         assert.strictEqual(null, err);
         var query = Address.distinct('zip', {}, function (err, results) {
-          assert.ifError(err);
-          assert.deepEqual(results, ['10010', '99701']);
           db.close();
+          assert.ifError(err);
+          assert.equal(2, results.length);
+          assert.ok(results.indexOf('10010') > -1);
+          assert.ok(results.indexOf('99701') > -1);
           done();
         });
         assert.ok(query instanceof Query);

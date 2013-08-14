@@ -3515,7 +3515,7 @@ describe('model', function(){
         , {title: 'interoperable find as promise'}
         , function (err, createdOne, createdTwo) {
         assert.ifError(err);
-        var query = BlogPost.find({title: 'interoperable find as promise'});
+        var query = BlogPost.find({title: 'interoperable find as promise'}).sort('_id')
         query.exec(function (err, found) {
           db.close();
           assert.ifError(err);

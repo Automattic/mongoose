@@ -1065,8 +1065,17 @@ describe('model: querying:', function(){
             cb();
             assert.ifError(err);
             assert.equal(2, found.length);
-            assert.equal(found[0]._id.toString(), one._id);
-            assert.equal(found[1]._id.toString(), two._id);
+
+            var found1 = false;
+            var found2 = false;
+
+            found.forEach(function (doc) {
+              if (doc.id == one.id) found1 = true;
+              else if (doc.id == two.id) found2 = true;
+            })
+
+            assert.ok(found1);
+            assert.ok(found2);
           });
         }
 
@@ -1084,8 +1093,17 @@ describe('model: querying:', function(){
             cb();
             assert.ifError(err);
             assert.equal(2, found.length);
-            assert.equal(found[0]._id.toString(), one._id);
-            assert.equal(found[1]._id.toString(), two._id);
+
+            var found1 = false;
+            var found2 = false;
+
+            found.forEach(function (doc) {
+              if (doc.id == one.id) found1 = true;
+              else if (doc.id == two.id) found2 = true;
+            })
+
+            assert.ok(found1);
+            assert.ok(found2);
           });
         }
 

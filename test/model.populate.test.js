@@ -2175,7 +2175,7 @@ describe('model: populate:', function(){
     })
 
     it('with find', function(done){
-      B.find().populate('fans _creator').exec(function (err, docs) {
+      B.find().sort('title').populate('fans _creator').exec(function (err, docs) {
         assert.ifError(err);
         assert.equal(2, docs.length);
 
@@ -2184,6 +2184,7 @@ describe('model: populate:', function(){
 
         assert.ok(Array.isArray(doc1.populated('fans')));
         assert.equal(2, doc1.populated('fans').length);
+
         assert.equal(doc1.populated('fans')[0], String(u1._id));
         assert.equal(doc1.populated('fans')[1], String(u2._id));
         assert.equal(doc1.populated('_creator'), String(u1._id));

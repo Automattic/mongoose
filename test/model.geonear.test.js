@@ -203,32 +203,51 @@ describe('model', function(){
                   assert.ok(e);
                   assert.equal(e.message, "Must pass either a legacy coordinate array or GeoJSON Point to geoNear");
 
-                  try {
-                    Geo.geoNear({ type : "test" }, { near : [1,2] }, []);
-                  } catch(e) {
-                    threw = true;
-                    assert.ok(e);
-                    assert.equal(e.message, "Must pass a callback to geoNear");
-                  }
-
-                  assert.ok(threw);
-                  threw = false;
-
-                  try {
-                    Geo.geoNear({ type : "test" }, { near : [1,2] });
-                  } catch(e) {
-                    threw = true;
-                    assert.ok(e);
-                    assert.equal(e.message, "Must pass a callback to geoNear");
-                  }
-
-                  assert.ok(threw);
                   done();
                 });
               });
             });
           });
         });
+      });
+    });
+    it('returns a promise (gh-1614)', function(done){
+      var db = start();
+      var Geo = getModel(db);
+
+      var pnt = { type : "Point", coordinates : [9,9] };
+      var prom = Geo.geoNear(pnt, { spherical : true, maxDistance : .1 }, function (err, results, stats) {
+      });
+      assert.ok(prom instanceof mongoose.Promise);
+      db.close();
+      done();
+    })
+
+    it('allows not passing a callback (gh-1614)', function (done) {
+      var db = start();
+      var Geo = getModel(db);
+      var g = new Geo({ pos : [10,10], type : "place"});
+      g.save(function (err) {
+        assert.ifError(err);
+
+        var pnt = { type : "Point", coordinates : [9,9] };
+        var promise;
+        assert.doesNotThrow(function() {
+          promise = Geo.geoNear(pnt, { spherical : true, maxDistance : 100000 });
+        });
+
+        function validate(ret, stat) {
+          assert.equal(1, ret.results.length);
+          assert.equal(ret.results[0].coordinates, [9,9]);
+          assert.ok(stat);
+        }
+
+        function finish() {
+          db.close(done);
+        }
+
+        promise.then(validate, assert.ifError).then(finish).end();
+
       });
     });
   });

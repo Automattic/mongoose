@@ -1828,7 +1828,11 @@ describe('buffers', function(){
         cb();
         assert.ifError(err);
         assert.equal(2, tests.length);
-        assert.equal(tests[0].block.toString('utf8'),'über');
+        var ret = {};
+        ret[tests[0].block.toString('utf8')] = 1;
+        ret[tests[1].block.toString('utf8')] = 1;
+
+        assert.ok(ret['über'] !== undefined);
       });
 
       Test.find({ block: { $lte: 'buffer shtuffs are neat' }}, function (err, tests) {

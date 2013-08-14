@@ -70,6 +70,7 @@ BlogPost.static('woot', function(){
 });
 
 mongoose.model('BlogPost', BlogPost);
+var bpSchema = BlogPost;
 
 var collection = 'blogposts_' + random();
 
@@ -3486,7 +3487,7 @@ describe('Model', function(){
   describe('#exec()', function(){
     it('count()', function(done){
       var db = start()
-        , BlogPost = db.model('BlogPost', collection);
+        , BlogPost = db.model('BlogPost'+random(), bpSchema);
 
       BlogPost.create({title: 'interoperable count as promise'}, function (err, created) {
         assert.ifError(err);
@@ -3501,8 +3502,9 @@ describe('Model', function(){
     });
 
     it('update()', function(done){
+      var col = 'BlogPost'+random();
       var db = start()
-        , BlogPost = db.model('BlogPost', collection);
+        , BlogPost = db.model(col, bpSchema);
 
       BlogPost.create({title: 'interoperable update as promise'}, function (err, created) {
         assert.ifError(err);
@@ -3521,7 +3523,7 @@ describe('Model', function(){
 
     it('findOne()', function(done){
       var db = start()
-        , BlogPost = db.model('BlogPost', collection);
+        , BlogPost = db.model('BlogPost'+random(), bpSchema);
 
       BlogPost.create({title: 'interoperable findOne as promise'}, function (err, created) {
         assert.ifError(err);
@@ -3537,7 +3539,7 @@ describe('Model', function(){
 
     it('find()', function(done){
       var db = start()
-        , BlogPost = db.model('BlogPost', collection);
+        , BlogPost = db.model('BlogPost'+random(), bpSchema);
 
       BlogPost.create(
           {title: 'interoperable find as promise'}
@@ -3549,8 +3551,11 @@ describe('Model', function(){
           db.close();
           assert.ifError(err);
           assert.equal(found.length, 2);
-          assert.equal(String(found[0]._id), String(createdOne._id));
-          assert.equal(String(found[1]._id), String(createdTwo._id));
+          var ids = {};
+          ids[String(found[0]._id)] = 1;
+          ids[String(found[1]._id)] = 1;
+          assert.ok(String(createdOne._id) in ids);
+          assert.ok(String(createdTwo._id) in ids);
           done();
         });
       });
@@ -3558,7 +3563,7 @@ describe('Model', function(){
 
     it('remove()', function(done){
       var db = start()
-        , BlogPost = db.model('BlogPost', collection);
+        , BlogPost = db.model('BlogPost'+random(), bpSchema);
 
       BlogPost.create(
           {title: 'interoperable remove as promise'}
@@ -3578,7 +3583,7 @@ describe('Model', function(){
 
     it('op can be changed', function(done){
       var db = start()
-        , BlogPost = db.model('BlogPost', collection)
+        , BlogPost = db.model('BlogPost'+random(), bpSchema)
         , title = 'interop ad-hoc as promise';
 
       BlogPost.create({title: title }, function (err, created) {
@@ -3596,7 +3601,7 @@ describe('Model', function(){
     describe('promises', function(){
       it('count()', function(done){
         var db = start()
-          , BlogPost = db.model('BlogPost', collection);
+          , BlogPost = db.model('BlogPost'+random(), bpSchema);
 
         BlogPost.create({title: 'interoperable count as promise 2'}, function (err, created) {
           assert.ifError(err);
@@ -3612,8 +3617,9 @@ describe('Model', function(){
       });
 
       it('update()', function(done){
+      var col = 'BlogPost'+random();
         var db = start()
-          , BlogPost = db.model('BlogPost', collection);
+          , BlogPost = db.model(col, bpSchema);
 
         BlogPost.create({title: 'interoperable update as promise 2'}, function (err, created) {
           assert.ifError(err);
@@ -3633,7 +3639,7 @@ describe('Model', function(){
 
       it('findOne()', function(done){
         var db = start()
-          , BlogPost = db.model('BlogPost', collection);
+          , BlogPost = db.model('BlogPost'+random(), bpSchema);
 
         BlogPost.create({title: 'interoperable findOne as promise 2'}, function (err, created) {
           assert.ifError(err);
@@ -3650,7 +3656,7 @@ describe('Model', function(){
 
       it('find()', function(done){
         var db = start()
-          , BlogPost = db.model('BlogPost', collection);
+          , BlogPost = db.model('BlogPost'+random(), bpSchema);
 
         BlogPost.create(
             {title: 'interoperable find as promise 2'}
@@ -3672,7 +3678,7 @@ describe('Model', function(){
 
       it('remove()', function(done){
         var db = start()
-          , BlogPost = db.model('BlogPost', collection);
+          , BlogPost = db.model('BlogPost'+random(), bpSchema);
 
         BlogPost.create(
             {title: 'interoperable remove as promise 2'}
@@ -3693,7 +3699,7 @@ describe('Model', function(){
 
       it('are compatible with op modification on the fly', function(done){
         var db = start()
-          , BlogPost = db.model('BlogPost', collection);
+          , BlogPost = db.model('BlogPost' + random(), bpSchema);
 
         BlogPost.create({title: 'interoperable ad-hoc as promise 2'}, function (err, created) {
           assert.ifError(err);
@@ -3710,7 +3716,7 @@ describe('Model', function(){
 
       it('are thenable', function(done){
         var db = start()
-          , B = db.model('BlogPost', collection)
+          , B = db.model('BlogPost' + random(), bpSchema)
 
         var peopleSchema = Schema({ name: String, likes: ['ObjectId'] })
         var P = db.model('promise-BP-people', peopleSchema, random());

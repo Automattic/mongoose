@@ -1680,24 +1680,19 @@ describe('Model', function(){
       var db = start()
         , collection = 'blogposts_' + random()
         , BlogPost = db.model('BlogPost', collection)
-        , post = new BlogPost();
 
-      post.save(function (err) {
+      BlogPost.create({ title: 1 }, { title: 2 }, function (err) {
         assert.ifError(err);
 
-        BlogPost.find({}, function (err, found) {
+        BlogPost.remove({ title: 1 }, function (err) {
           assert.ifError(err);
-          assert.equal(1, found.length);
 
-          BlogPost.remove({}, function (err) {
+          BlogPost.find({}, function (err, found) {
+            db.close();
             assert.ifError(err);
-
-            BlogPost.find({}, function (err, found2) {
-              db.close();
-              assert.ifError(err);
-              assert.equal(0, found2.length);
-              done();
-            });
+            assert.equal(1, found.length);
+            assert.equal('2', found[0].title);
+            done();
           });
         });
       });

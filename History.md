@@ -1,4 +1,12 @@
 
+3.7.2 (unstable) / 2013-08-15
+==================
+
+  * fixed; model.remove() removes only what is necessary #1649
+  * fixed; update() now only runs with cb or explicit true #1644
+  * tests; race conditions in tests
+  * website; update guide
+
 3.7.1 (unstable) / 2013-08-13
 =============================
 

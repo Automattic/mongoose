@@ -201,5 +201,82 @@ describe('model', function() {
         });
       });
     });
+
+
+
+    describe('findOneAndUpdate', function() {
+      it('does not update models of other types', function(done) {
+        var baseEvent  = new BaseEvent({ name: 'Base event' });
+        var impressionEvent = new ImpressionEvent({ name: 'Impression event' });
+        var conversionEvent = new ConversionEvent({ name: 'Conversion event', revenue: 1.337 });
+
+        baseEvent.save(function(err) {
+          assert.ifError(err);
+          impressionEvent.save(function(err) {
+            assert.ifError(err);
+            conversionEvent.save(function(err) {
+              assert.ifError(err);
+              var query = ConversionEvent.findOneAndUpdate({ name: 'Impression event' }, { $set: { name: 'Impression event - updated'}});
+              assert.deepEqual(query._conditions, { name: 'Impression event', __t: 'model-discriminator-querying-conversion' });
+              query.exec(function(err, document) {
+                assert.ifError(err);
+                assert.equal(document, null);
+                done();
+              });
+            });
+          });
+        });
+      });
+
+      it('updates models of its own type', function(done) {
+        var baseEvent  = new BaseEvent({ name: 'Base event' });
+        var impressionEvent = new ImpressionEvent({ name: 'Impression event' });
+        var conversionEvent = new ConversionEvent({ name: 'Conversion event', revenue: 1.337 });
+
+        baseEvent.save(function(err) {
+          assert.ifError(err);
+          impressionEvent.save(function(err) {
+            assert.ifError(err);
+            conversionEvent.save(function(err) {
+              assert.ifError(err);
+              var query = ConversionEvent.findOneAndUpdate({ name: 'Conversion event' }, { $set: { name: 'Conversion event - updated'}});
+              assert.deepEqual(query._conditions, { name: 'Conversion event', __t: 'model-discriminator-querying-conversion' });
+              query.exec(function(err, document) {
+                assert.ifError(err);
+                var expected = conversionEvent.toJSON();
+                expected.name = 'Conversion event - updated';
+                assert.deepEqual(document.toJSON(), expected);
+                done();
+              });
+            });
+          });
+        });
+      });
+
+      it('base model modifies any event type', function(done) {
+        var baseEvent  = new BaseEvent({ name: 'Base event' });
+        var impressionEvent = new ImpressionEvent({ name: 'Impression event' });
+        var conversionEvent = new ConversionEvent({ name: 'Conversion event', revenue: 1.337 });
+
+        baseEvent.save(function(err) {
+          assert.ifError(err);
+          impressionEvent.save(function(err) {
+            assert.ifError(err);
+            conversionEvent.save(function(err) {
+              assert.ifError(err);
+              var query = BaseEvent.findOneAndUpdate({ name: 'Conversion event' }, { $set: { name: 'Conversion event - updated'}});
+              assert.deepEqual(query._conditions, { name: 'Conversion event' });
+              query.exec(function(err, document) {
+                assert.ifError(err);
+                var expected = conversionEvent.toJSON();
+                expected.name = 'Conversion event - updated';
+                assert.deepEqual(document.toJSON(), expected);
+                done();
+              });
+            });
+          });
+        });
+      });
+    });
   });
 });

@@ -30,7 +30,7 @@ describe('model', function(){
       assert.ok(Geo.geoSearch instanceof Function);
 
       Geo.on('index', function(err){
-        if (err) return done(err);
+        assert.ifError(err);
 
         var geos = [];
         geos[0] = new Geo({ pos : [10,10], type : "place"});
@@ -40,7 +40,8 @@ describe('model', function(){
         var count = geos.length;
 
         for (var i=0; i < geos.length; i++) {
-          geos[i].save(function () {
+          geos[i].save(function (err) {
+            assert.ifError(err);
             --count || next();
           });
         }
@@ -56,10 +57,7 @@ describe('model', function(){
             assert.equal(results[0].pos[1], 10);
             assert.equal(results[0].id, geos[0].id);
             assert.ok(results[0] instanceof Geo);
-            Geo.remove(function () {
-              db.close();
-              done();
-            });
+            done();
           });
         }
       });
@@ -71,7 +69,7 @@ describe('model', function(){
       assert.ok(Geo.geoSearch instanceof Function);
 
       Geo.on('index', function(err){
-        if (err) return done(err);
+        assert.ifError(err);
 
         var geos = [];
         geos[0] = new Geo({ pos : [10,10], type : "place"});
@@ -81,7 +79,8 @@ describe('model', function(){
         var count = geos.length;
 
         for (var i=0; i < geos.length; i++) {
-          geos[i].save(function () {
+          geos[i].save(function (err) {
+            assert.ifError(err);
             --count || next();
           });
         }
@@ -98,10 +97,7 @@ describe('model', function(){
             assert.equal(results[0]._id, geos[0].id);
             assert.strictEqual(results[0].id, undefined);
             assert.ok(!(results[0] instanceof Geo));
-            Geo.remove(function () {
-              db.close();
-              done();
-            });
+            done();
           });
         }
       });
@@ -113,7 +109,7 @@ describe('model', function(){
       assert.ok(Geo.geoSearch instanceof Function);
 
       Geo.on('index', function(err){
-        if (err) return done(err);
+        assert.ifError(err);
 
         var g = new Geo({ pos : [10,10], type : "place"});
         g.save(function() {

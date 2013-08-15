@@ -55,9 +55,13 @@ describe('model', function() {
         var conversionEvent = new ConversionEvent({ name: 'Conversion event', revenue: 1.337 });
 
         baseEvent.save(function(err) {
+          assert.ifError(err);
           impressionEvent.save(function(err) {
+            assert.ifError(err);
             conversionEvent.save(function(err) {
+              assert.ifError(err);
               BaseEvent.find({}, function(err, docs) {
+                assert.ifError(err);
                 assert.ok(docs[0] instanceof BaseEvent);
                 assert.ok(docs[0].schema instanceof BaseSchema);
                 assert.equal(docs[0].name, 'Base event');
@@ -85,15 +89,18 @@ describe('model', function() {
         var conversionEvent2 = new ConversionEvent({ name: 'Conversion event 2', revenue: 2 });
 
         impressionEvent.save(function(err) {
+          assert.ifError(err);
           conversionEvent1.save(function(err) {
+            assert.ifError(err);
               conversionEvent2.save(function(err) {
+                assert.ifError(err);
                 // doesn't find anything since we're querying for an impression id
                 var query = ConversionEvent.find({ _id: impressionEvent._id });
                 assert.equal(query.op, 'find');
                 assert.deepEqual(query._conditions, { _id: impressionEvent._id, __t: 'model-discriminator-querying-conversion' });
 
                 query.exec(function(err, documents) {
-                assert.equal(err, null);
+                assert.ifError(err);
                 assert.equal(documents.length, 0);
 
                 // now find one with no criteria given and ensure it gets added to _conditions
@@ -101,7 +108,7 @@ describe('model', function() {
                 assert.deepEqual(query._conditions, { __t: 'model-discriminator-querying-conversion' });
                 assert.equal(query.op, 'find');
                 query.exec(function(err, documents) {
-                  assert.equal(err, null);
+                  assert.ifError(err);
                   assert.equal(documents.length, 2);
 
                   assert.ok(documents[0] instanceof ConversionEvent);
@@ -125,16 +132,21 @@ describe('model', function() {
         var conversionEvent = new ConversionEvent({ name: 'Conversion event', revenue: 1.337 });
 
         baseEvent.save(function(err) {
+          assert.ifError(err);
           impressionEvent.save(function(err) {
+            assert.ifError(err);
             conversionEvent.save(function(err) {
+              assert.ifError(err);
               // finds & hydrates BaseEvent
               BaseEvent.findOne({ _id: baseEvent._id }, function(err, event) {
+                assert.ifError(err);
                 assert.ok(event instanceof BaseEvent);
                 assert.ok(event.schema instanceof BaseSchema);
                 assert.equal(event.name, 'Base event');
 
                 // finds & hydrates ImpressionEvent
                 BaseEvent.findOne({ _id: impressionEvent._id }, function(err, event) {
+                  assert.ifError(err);
                   assert.ok(event instanceof ImpressionEvent);
                   assert.equal(event.schema, ImpressionEventSchema);
                   assert.ok(event.schema instanceof BaseSchema);
@@ -142,6 +154,7 @@ describe('model', function() {
 
                   // finds & hydrates ConversionEvent
                   BaseEvent.findOne({ _id: conversionEvent._id }, function(err, event) {
+                    assert.ifError(err);
                     assert.ok(event instanceof ConversionEvent);
                     assert.equal(event.schema, ConversionEventSchema);
                     assert.ok(event.schema instanceof BaseSchema);
@@ -160,14 +173,16 @@ describe('model', function() {
         var conversionEvent = new ConversionEvent({ name: 'Conversion event', revenue: 2 });
 
         impressionEvent.save(function(err) {
+          assert.ifError(err);
           conversionEvent.save(function(err) {
+            assert.ifError(err);
             // doesn't find anything since we're querying for an impression id
             var query = ConversionEvent.findOne({ _id: impressionEvent._id });
             assert.equal(query.op, 'findOne');
             assert.deepEqual(query._conditions, { _id: impressionEvent._id, __t: 'model-discriminator-querying-conversion' });
 
             query.exec(function(err, document) {
-              assert.equal(err, null);
+              assert.ifError(err);
               assert.equal(document, null);
 
               // now find one with no criteria given and ensure it gets added to _conditions
@@ -176,7 +191,7 @@ describe('model', function() {
               assert.deepEqual(query._conditions, { __t: 'model-discriminator-querying-conversion' });
 
               query.exec(function(err, document) {
-                assert.equal(err, null);
+                assert.ifError(err);
                 assert.ok(document instanceof ConversionEvent);
                 assert.equal(document.__t, 'model-discriminator-querying-conversion');
                 done();

@@ -32,6 +32,7 @@ describe('model', function(){
   describe('geoNear', function () {
 
     it('works with legacy coordinate points', function (done) {
+      if (!mongo24_or_greater) return done();
       var db = start();
       var Geo = getModel(db);
       assert.ok(Geo.geoNear instanceof Function);
@@ -72,6 +73,7 @@ describe('model', function(){
     });
 
     it('works with GeoJSON coordinate points', function (done) {
+      if (!mongo24_or_greater) return done();
       var db = start();
       var Geo = getModel(db);
       assert.ok(Geo.geoNear instanceof Function);
@@ -112,6 +114,7 @@ describe('model', function(){
     });
 
     it('works with lean', function (done) {
+      if (!mongo24_or_greater) return done();
       var db = start();
       var Geo = getModel(db);
       assert.ok(Geo.geoNear instanceof Function);
@@ -152,6 +155,7 @@ describe('model', function(){
     });
 
     it('throws the correct error messages', function (done) {
+      if (!mongo24_or_greater) return done();
 
       var db = start();
       var Geo = getModel(db);
@@ -187,6 +191,7 @@ describe('model', function(){
       });
     });
     it('returns a promise (gh-1614)', function(done){
+      if (!mongo24_or_greater) return done();
       var db = start();
       var Geo = getModel(db);
 
@@ -199,31 +204,35 @@ describe('model', function(){
     })
 
     it('allows not passing a callback (gh-1614)', function (done) {
+      if (!mongo24_or_greater) return done();
       var db = start();
       var Geo = getModel(db);
-      var g = new Geo({ coordinates : [10,10], type : "Point"});
-      g.save(function (err) {
+      Geo.on('index', function(err) {
         assert.ifError(err);
+        var g = new Geo({ coordinates : [10,10], type : "Point"});
+        g.save(function (err) {
+          assert.ifError(err);
 
-        var pnt = { type : "Point", coordinates : [9,9] };
-        var promise;
-        assert.doesNotThrow(function() {
-          promise = Geo.geoNear(pnt, { spherical : true, maxDistance : 100000 });
+          var pnt = { type : "Point", coordinates : [9,9] };
+          var promise;
+          assert.doesNotThrow(function() {
+            promise = Geo.geoNear(pnt, { spherical : true, maxDistance : 100000 });
+          });
+
+          function validate(ret, stat) {
+            assert.equal(1, ret.length);
+            assert.equal(ret[0].obj.coordinates[0], 10);
+            assert.equal(ret[0].obj.coordinates[1], 10);
+            assert.ok(stat);
+          }
+
+          function finish() {
+            db.close(done);
+          }
+
+          promise.then(validate, assert.ifError).then(finish).end();
+
         });
-
-        function validate(ret, stat) {
-          assert.equal(1, ret.length);
-          assert.equal(ret[0].obj.coordinates[0], 10);
-          assert.equal(ret[0].obj.coordinates[1], 10);
-          assert.ok(stat);
-        }
-
-        function finish() {
-          db.close(done);
-        }
-
-        promise.then(validate, assert.ifError).then(finish).end();
-
       });
     });
   });

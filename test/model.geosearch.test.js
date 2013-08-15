@@ -151,27 +151,29 @@ describe('model', function(){
     it('allows not passing a callback (gh-1614)', function (done) {
       var db = start();
       var Geo = getModel(db);
-      var g = new Geo({ pos : [10,10], type : "place"});
-      g.save(function (err) {
+      Geo.on('index', function(err){
         assert.ifError(err);
+        var g = new Geo({ pos : [10,10], type : "place"});
+        g.save(function (err) {
+          assert.ifError(err);
 
-        var promise;
-        assert.doesNotThrow(function() {
-          promise = Geo.geoSearch({ type : "place" }, { near : [9,9], maxDistance : 5 });
+          var promise;
+          assert.doesNotThrow(function() {
+            promise = Geo.geoSearch({ type : "place" }, { near : [9,9], maxDistance : 5 });
+          });
+          function validate(ret, stat) {
+            assert.equal(1, ret.length);
+            assert.equal(ret[0].pos[0], 10);
+            assert.equal(ret[0].pos[1], 10);
+            assert.ok(stat);
+          }
+
+          function finish() {
+            db.close(done);
+          }
+          promise.then(validate, assert.ifError).then(finish).end();
+
         });
-        function validate(ret, stat) {
-          assert.equal(1, ret.length);
-          assert.equal(ret[0].pos[0], 10);
-          assert.equal(ret[0].pos[1], 10);
-          assert.ok(stat);
-        }
-
-        function finish() {
-          db.close(done);
-        }
-
-        promise.then(validate, assert.ifError).then(finish).end();
-
       });
     });
   });

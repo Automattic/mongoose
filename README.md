@@ -32,6 +32,10 @@ View all 90+ [contributors](https://github.com/learnboost/mongoose/graphs/contri
 First install [node.js](http://nodejs.org/) and [mongodb](http://www.mongodb.org/downloads). Then:
 
     $ npm install mongoose
+    
+## Stablility
+
+The current stable branch is [3.6.x](https://github.com/LearnBoost/mongoose/tree/3.6.x). New (unstable) development always occurs on the [master](https://github.com/LearnBoost/mongoose/tree/master) branch.
 
 ## Overview
 

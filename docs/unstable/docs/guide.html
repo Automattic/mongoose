@@ -39,7 +39,7 @@ animalSchema.statics.findByName = <span class="function"><span class="keyword">f
 Animal.findByName(<span class="string">'fido'</span>, <span class="function"><span class="keyword">function</span> <span class="params">(err, animals)</span> {</span>
   console.log(animals);
 });
-</code></pre><h3 id="indexes">Indexes</h3><p>MongoDB supports <a href="http://www.mongodb.org/manual/core/indexes/">secondary indexes</a>.
+</code></pre><h3 id="indexes">Indexes</h3><p>MongoDB supports <a href="http://docs.mongodb.org/manual/indexes/">secondary indexes</a>.
 With mongoose, we define these indexes within our <code>Schema</code> <a href="./api.html#schematype_SchemaType-index">at</a> <a href="./api.html#schematype_SchemaType-unique">the</a> <a href="./api.html#schematype_SchemaType-sparse">path</a> <a href="./api.html#schema_date_SchemaDate-expires">level</a> or the <code>schema</code> level.
 Defining indexes at the schema level is necessary when creating 
 <a href="http://www.mongodb.org/display/DOCS/Indexes#Indexes-CompoundKeys">compound indexes</a>.</p><pre><code class="javascript"><span class="keyword">var</span> animalSchema = <span class="keyword">new</span> Schema({

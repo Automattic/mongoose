@@ -101,5 +101,17 @@ describe('model', function() {
       );
       done();
     });
+
+    it('throws error when discriminator when discriminator with taken name is added', function(done) {
+      var Foo = db.model('model-discriminator-foo', new Schema({}), 'model-discriminator-'+random());
+      Foo.discriminator('model-discriminator-taken', new Schema());
+      assert.throws(
+        function() {
+          Foo.discriminator('model-discriminator-taken', new Schema());
+        },
+        /Discriminator with name "model-discriminator-taken" already exists/
+      );
+      done();
+    });
   });
 });

@@ -6,17 +6,17 @@ DOCFILE = docs/source/_docs
 STABLE_BRANCH = 3.6.x
 
 test:
-	@node test/dropdb.js
-	@./node_modules/.bin/mocha $(T) --async-only $(TESTS)
-	@node test/dropdb.js
+	@MONGOOSE_DISABLE_STABILITY_WARNING=1 node test/dropdb.js
+	@MONGOOSE_DISABLE_STABILITY_WARNING=1 ./node_modules/.bin/mocha $(T) --async-only $(TESTS)
+	@MONGOOSE_DISABLE_STABILITY_WARNING=1 node test/dropdb.js
 
 test-short:
-	@node test/dropdb.js
-	@./node_modules/.bin/mocha $(T) -g LONG -i --async-only $(TESTS)
-	@node test/dropdb.js
+	@MONGOOSE_DISABLE_STABILITY_WARNING=1 node test/dropdb.js
+	@MONGOOSE_DISABLE_STABILITY_WARNING=1 ./node_modules/.bin/mocha $(T) -g LONG -i --async-only $(TESTS)
+	@MONGOOSE_DISABLE_STABILITY_WARNING=1 node test/dropdb.js
 
 test-long:
-	@./node_modules/.bin/mocha $(T) -g LONG --async-only $(TESTS)
+	@MONGOOSE_DISABLE_STABILITY_WARNING=1 ./node_modules/.bin/mocha $(T) -g LONG --async-only $(TESTS)
 
 docs: ghpages merge_stable docclean gendocs
 docs_all: docs_unstable docs

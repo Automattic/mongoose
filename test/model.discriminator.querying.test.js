@@ -60,22 +60,19 @@ describe('model', function() {
             assert.ifError(err);
             conversionEvent.save(function(err) {
               assert.ifError(err);
-              BaseEvent.find({}, function(err, docs) {
+              BaseEvent.find({}).sort('name').exec(function(err, docs) {
                 assert.ifError(err);
                 assert.ok(docs[0] instanceof BaseEvent);
-                assert.ok(docs[0].schema instanceof BaseSchema);
                 assert.equal(docs[0].name, 'Base event');
 
-                assert.ok(docs[1] instanceof ImpressionEvent);
-                assert.equal(docs[1].schema, ImpressionEventSchema);
-                assert.ok(docs[1].schema instanceof BaseSchema);
-                assert.equal(docs[1].name, 'Impression event');
+                assert.ok(docs[1] instanceof ConversionEvent);
+                assert.equal(docs[1].schema, ConversionEventSchema);
+                assert.equal(docs[1].name, 'Conversion event');
+                assert.equal(docs[1].revenue, 1.337);
 
-                assert.ok(docs[2] instanceof ConversionEvent);
-                assert.equal(docs[2].schema, ConversionEventSchema);
-                assert.ok(docs[2].schema instanceof BaseSchema);
-                assert.equal(docs[2].name, 'Conversion event');
-                assert.equal(docs[2].revenue, 1.337);
+                assert.ok(docs[2] instanceof ImpressionEvent);
+                assert.equal(docs[2].schema, ImpressionEventSchema);
+                assert.equal(docs[2].name, 'Impression event');
                 done();
               });
             });
@@ -92,14 +89,13 @@ describe('model', function() {
           assert.ifError(err);
           conversionEvent1.save(function(err) {
             assert.ifError(err);
-              conversionEvent2.save(function(err) {
-                assert.ifError(err);
-                // doesn't find anything since we're querying for an impression id
-                var query = ConversionEvent.find({ _id: impressionEvent._id });
-                assert.equal(query.op, 'find');
-                assert.deepEqual(query._conditions, { _id: impressionEvent._id, __t: 'model-discriminator-querying-conversion' });
-
-                query.exec(function(err, documents) {
+            conversionEvent2.save(function(err) {
+              assert.ifError(err);
+              // doesn't find anything since we're querying for an impression id
+              var query = ConversionEvent.find({ _id: impressionEvent._id });
+              assert.equal(query.op, 'find');
+              assert.deepEqual(query._conditions, { _id: impressionEvent._id, __t: 'model-discriminator-querying-conversion' });
+              query.exec(function(err, documents) {
                 assert.ifError(err);
                 assert.equal(documents.length, 0);
 
@@ -141,7 +137,6 @@ describe('model', function() {
               BaseEvent.findOne({ _id: baseEvent._id }, function(err, event) {
                 assert.ifError(err);
                 assert.ok(event instanceof BaseEvent);
-                assert.ok(event.schema instanceof BaseSchema);
                 assert.equal(event.name, 'Base event');
 
                 // finds & hydrates ImpressionEvent
@@ -149,7 +144,6 @@ describe('model', function() {
                   assert.ifError(err);
                   assert.ok(event instanceof ImpressionEvent);
                   assert.equal(event.schema, ImpressionEventSchema);
-                  assert.ok(event.schema instanceof BaseSchema);
                   assert.equal(event.name, 'Impression event');
 
                   // finds & hydrates ConversionEvent
@@ -157,7 +151,6 @@ describe('model', function() {
                     assert.ifError(err);
                     assert.ok(event instanceof ConversionEvent);
                     assert.equal(event.schema, ConversionEventSchema);
-                    assert.ok(event.schema instanceof BaseSchema);
                     assert.equal(event.name, 'Conversion event');
                     done();
                   });
@@ -201,8 +194,6 @@ describe('model', function() {
         });
       });
     });
-
-
 
     describe('findOneAndUpdate', function() {
       it('does not update models of other types', function(done) {

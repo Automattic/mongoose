@@ -793,7 +793,7 @@ describe('schema', function(){
       assert.equal(true, Tobi.options.strict);
       assert.equal(false, Tobi.options.capped);
       assert.equal('__v', Tobi.options.versionKey);
-      assert.equal(null, Tobi.options.discriminatorKey);
+      assert.equal('__t', Tobi.options.discriminatorKey);
       assert.equal(null, Tobi.options.shardKey);
       assert.equal(null, Tobi.options.read);
       assert.equal(true, Tobi.options._id);

@@ -275,12 +275,12 @@ describe('versioning', function(){
       function lookup () {
         var a1, b1;
         V.findById(a, function (err, a_) {
-          if (err) e = err;
+          if (err && !e) e = err;
           a1 = a_;
           a1 && b1 && cb(e, a1, b1);
         });
         V.findById(b, function (err, b_) {
-          if (err) e = err;
+          if (err && !e) e = err;
           b1 = b_;
           a1 && b1 && cb(e, a1, b1);
         });

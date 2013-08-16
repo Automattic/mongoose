@@ -269,5 +269,66 @@ describe('model', function() {
         });
       });
     });
+
+    describe('population/reference mapping', function() {
+      it('populates and hydrates correct models', function(done) {
+        var vehicleSchema = new Schema();
+        var carSchema = new Schema({ speed: Number });
+        var busSchema = new Schema({ speed: Number });
+
+        var userSchema = new Schema({
+            vehicles: [{ type: Schema.Types.ObjectId, ref: 'ModelDiscriminatorPopulationVehicle' }]
+          , favoriteVehicle: { type: Schema.Types.ObjectId, ref: 'ModelDiscriminatorPopulationVehicle' }
+          , favoriteBus: { type: Schema.Types.ObjectId, ref: 'ModelDiscriminatorPopulationBus' }
+        });
+
+        var Vehicle = db.model('ModelDiscriminatorPopulationVehicle', vehicleSchema)
+          , Car = Vehicle.discriminator('ModelDiscriminatorPopulationCar', carSchema)
+          , Bus = Vehicle.discriminator('ModelDiscriminatorPopulationBus', busSchema)
+          , User = db.model('ModelDiscriminatorPopulationUser', userSchema);
+
+        Vehicle.create({}, function(err, vehicle) {
+          assert.ifError(err);
+          Car.create({ speed: 160 }, function(err, car) {
+            Bus.create({ speed: 80 }, function(err, bus) {
+              assert.ifError(err);
+              User.create({ vehicles: [vehicle._id, car._id, bus._id], favoriteVehicle: car._id, favoriteBus: bus._id }, function(err) {
+                assert.ifError(err);
+                User.findOne({}).populate('vehicles favoriteVehicle favoriteBus').exec(function(err, user) {
+                  assert.ifError(err);
+
+                  var expected = {
+                      __v: 0
+                    , _id: user._id
+                    , vehicles: [
+                        { _id: vehicle._id, __v: 0 }
+                      , { _id: car._id, speed: 160, __v: 0, __t: 'ModelDiscriminatorPopulationCar' }
+                      , { _id: bus._id, speed: 80, __v: 0, __t: 'ModelDiscriminatorPopulationBus' }
+                    ]
+                    , favoriteVehicle: { _id: car._id, speed: 160, __v: 0, __t: 'ModelDiscriminatorPopulationCar' }
+                    , favoriteBus: { _id: bus._id, speed: 80, __v: 0, __t: 'ModelDiscriminatorPopulationBus' }
+                  };
+
+                  assert.deepEqual(user.toJSON(), expected);
+                  assert.ok(user.vehicles[0] instanceof Vehicle);
+                  assert.ok(!(user.vehicles[0] instanceof Car));
+                  assert.ok(!(user.vehicles[0] instanceof Bus));
+
+                  assert.ok(user.vehicles[1] instanceof Car);
+                  assert.ok(!(user.vehicles[1] instanceof Bus));
+
+                  assert.ok(user.vehicles[2] instanceof Bus);
+                  assert.ok(!(user.vehicles[2] instanceof Car));
+
+                  assert.ok(user.favoriteVehicle instanceof Car);
+                  assert.ok(user.favoriteBus instanceof Bus);
+                  done();
+                });
+              });
+            });
+          });
+        });
+      });
+    });
   });
 });

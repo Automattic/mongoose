@@ -35,7 +35,7 @@ describe('Query:', function(){
 
       assert.ok(prodQ() instanceof Query);
 
-      done();
+      db.close(done);
     });
 
     it('copies all the right values', function (done) {
@@ -55,7 +55,8 @@ describe('Query:', function(){
       assert.deepEqual(prodQ.model, prodC().model);
       assert.deepEqual(prodQ.mongooseCollection, prodC().mongooseCollection);
       assert.deepEqual(prodQ._mongooseOptions, prodC()._mongooseOptions);
-      done();
+
+      db.close(done);
     });
 
     it('gets expected results', function (done) {
@@ -66,6 +67,7 @@ describe('Query:', function(){
         var prodC = Product.find({ title : /test/ }).toConstructor();
 
         prodC().exec(function (err, results) {
+          db.close();
           assert.ifError(err);
           assert.equal(results.length, 1);
           assert.equal(p.title, results[0].title);
@@ -92,19 +94,20 @@ describe('Query:', function(){
             assert.equal(res.length, 1);
 
             prodC().exec(function (err, res) {
+              db.close();
               assert.ifError(err);
               assert.equal(res.length, 2);
               done();
             });
           });
         });
-
       });
     });
 
     it('options get merged properly', function(done){
       var db = start();
       var Product = db.model(prodName);
+      db.close();
 
       var prodC = Product.find({ title : /blah/ }).setOptions({ sort : 'title', lean : true });
       prodC = prodC.toConstructor();
@@ -118,6 +121,7 @@ describe('Query:', function(){
     it('creates subclasses of mquery', function(done) {
       var db = start();
       var Product = db.model(prodName);
+      db.close();
 
       var opts = { safe: { w: 'majority' }, readPreference: 'p' };
       var match = { title: 'test', count: { $gt: 101 }};

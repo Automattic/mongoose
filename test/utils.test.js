@@ -300,5 +300,37 @@ describe('utils', function(){
       done();
     })
   })
+
+  describe('merge', function(){
+    it('merges two objects together without overriding properties & methods', function(done){
+      function To() {
+        this.name = 'to';
+        this.toProperty = true;
+      }
+      To.prototype.getName = function() {};
+      To.prototype.toMethod = function() {};
+
+      function From() {
+        this.name = 'from';
+        this.fromProperty = true;
+      }
+      From.prototype.getName = function() {};
+      From.prototype.fromMethod = function() {};
+
+      var to = new To();
+      var from = new From();
+
+      utils.merge(to, from);
+
+      assert.equal(to.name, 'to');
+      assert.equal(to.toProperty, true);
+      assert.equal(to.fromProperty, true);
+      assert.ok(to.getName === To.prototype.getName);
+      assert.ok(to.toMethod === To.prototype.toMethod);
+      assert.equal(to.fomMethod, From.prototype.fomMethod);
+
+      done();
+    })
+  })
 })
 

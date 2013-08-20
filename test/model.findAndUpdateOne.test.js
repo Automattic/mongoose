@@ -779,4 +779,25 @@ describe('model: findByIdAndUpdate:', function(){
         });
     });
   });
+
+  it('allows properties to be set to null gh-1643', function (done) {
+    var db = start();
+
+    var thingSchema = new Schema({
+      name:[String]
+    });
+
+    var Thing = db.model('Thing', thingSchema);
+
+    Thing.create({name:["Test"]}, function (err, thing) {
+      if (err) return done(err);
+      Thing.findOneAndUpdate({ _id: thing._id }, {name:null})
+        .exec(function (err, doc) {
+          if (err) return done(err);
+          assert.ok(doc);
+          assert.equal(doc.name, null);
+          done();
+      });
+    });
+  });
 })

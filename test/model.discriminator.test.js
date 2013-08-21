@@ -11,8 +11,43 @@ var start = require('./common')
 /**
  * Setup
  */
-var PersonSchema = new Schema({ name: String });
-var EmployeeSchema = new Schema({ name: String, department: String });
+var PersonSchema = new Schema({
+    name: { first: String, last: String }
+  , gender: String
+}, { collection: 'model-discriminator-'+random() });
+PersonSchema.index({ name: 1 });
+PersonSchema.methods.getFullName = function() {
+  return this.name.first + ' ' + this.name.last;
+};
+PersonSchema.statics.findByGender = function(gender, cb) {};
+PersonSchema.virtual('name.full').get(function () {
+  return this.name.first + ' ' + this.name.last;
+});
+PersonSchema.virtual('name.full').set(function (name) {
+  var split = name.split(' ');
+  this.name.first = split[0];
+  this.name.last = split[1];
+});
+PersonSchema.path('gender').validate(function(value) {
+  return /[A-Z]/.test(value);
+}, 'Invalid name');
+PersonSchema.post('save', function (next) {
+  next();
+});
+
+var EmployeeSchema = new Schema({ department: String }, { collection: 'should-be-overridden' });
+EmployeeSchema.index({ department: 1 });
+EmployeeSchema.methods.getDepartment = function() {
+  return this.department;
+};
+EmployeeSchema.statics.findByDepartment = function(department, cb) {};
+EmployeeSchema.path('department').validate(function(value) {
+  return /[a-zA-Z]/.test(value);
+}, 'Invalid name');
+var employeeSchemaPreSaveFn = function (next) {
+  next();
+};
+EmployeeSchema.pre('save', employeeSchemaPreSaveFn);
 
 describe('model', function() {
   describe('discriminator()', function() {
@@ -20,7 +55,7 @@ describe('model', function() {
 
     before(function(){
       db = start();
-      Person = db.model('model-discriminator-person', PersonSchema, 'model-discriminator-'+random());
+      Person = db.model('model-discriminator-person', PersonSchema);
       Employee = Person.discriminator('model-discriminator-employee', EmployeeSchema);
     });
 
@@ -112,6 +147,78 @@ describe('model', function() {
         /Discriminator with name "model-discriminator-taken" already exists/
       );
       done();
+    });
+
+    describe('root schema inheritance', function() {
+      it('inherits field mappings', function(done) {
+        assert.strictEqual(Employee.schema.path('name'), Person.schema.path('name'));
+        assert.strictEqual(Employee.schema.path('gender'), Person.schema.path('gender'));
+        assert.equal(Person.schema.paths.department, undefined);
+        done();
+      });
+
+      it('inherits validators', function(done) {
+        assert.strictEqual(Employee.schema.path('gender').validators, PersonSchema.path('gender').validators);
+        assert.strictEqual(Employee.schema.path('department').validators, EmployeeSchema.path('department').validators);
+        done();
+      });
+
+      it('does not inherit and override fields that exist', function(done) {
+        var FemaleSchema = new Schema({ gender: { type: String, default: 'F' }})
+          , Female = Person.discriminator('model-discriminator-female', FemaleSchema);
+
+        var gender = Female.schema.paths.gender;
+
+        assert.notStrictEqual(gender, Person.schema.paths.gender);
+        assert.equal(gender.instance, 'String');
+        assert.equal(gender.options.default, 'F');
+        done();
+      });
+
+      it('inherits methods', function(done) {
+        var employee = new Employee();
+        assert.strictEqual(employee.getFullName, PersonSchema.methods.getFullName);
+        assert.strictEqual(employee.getDepartment, EmployeeSchema.methods.getDepartment);
+        assert.equal((new Person).getDepartment, undefined);
+        done();
+      });
+
+      it('inherits statics', function(done) {
+        assert.strictEqual(Employee.findByGender, EmployeeSchema.statics.findByGender);
+        assert.strictEqual(Employee.findByDepartment, EmployeeSchema.statics.findByDepartment);
+        assert.equal(Person.findByDepartment, undefined);
+        done();
+      });
+
+      it('inherits virtual (g.s)etters', function(done) {
+        var employee = new Employee();
+        employee.name.full = 'John Doe';
+        assert.equal(employee.name.full, 'John Doe');
+        done();
+      });
+
+      it('merges callQueue with base queue defined before discriminator types callQueue', function(done) {
+        assert.equal(Employee.schema.callQueue.length, 2);
+        // PersonSchema.post('save')
+        assert.strictEqual(Employee.schema.callQueue[0], Person.schema.callQueue[0]);
+
+        // EmployeeSchema.pre('save')
+        assert.strictEqual(Employee.schema.callQueue[1][0], 'pre');
+        assert.strictEqual(Employee.schema.callQueue[1][1]['0'], 'save');
+        assert.strictEqual(Employee.schema.callQueue[1][1]['1'], employeeSchemaPreSaveFn);
+        done();
+      });
+
+      it('does not inherit indexes', function(done) {
+        assert.deepEqual(Person.schema.indexes(), [[{ name: 1 }, { background: true, safe: undefined }]]);
+        assert.deepEqual(Employee.schema.indexes(), [[{ department: 1 }, { background: true, safe: undefined }]]);
+        done();
+      });
+
+      it('gets options overridden by root options', function(done) {
+        assert.equal(Employee.schema.options, Person.schema.options);
+        done();
+      });
     });
   });
 });

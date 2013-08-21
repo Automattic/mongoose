@@ -117,7 +117,7 @@ suite.add('Casting - Embedded Docs - 0 Docs', {
   }
 })
 .on('cycle', function (evt) {
-  if (process.env.MONGOOSE_DEV) {
+  if (process.env.MONGOOSE_DEV || process.env.PULL_REQUEST) {
     console.log(String(evt.target));
   }
 }).on('complete', function () {

@@ -235,5 +235,30 @@ describe('model', function(){
         });
       });
     });
+    it('promise fulfill even when no results returned', function(done){
+      if (!mongo24_or_greater) return done();
+      var db = start();
+      var Geo = getModel(db);
+      Geo.on('index', function(err) {
+        assert.ifError(err);
+        var g = new Geo({ coordinates : [10,10], type : "Point"});
+        g.save(function (err) {
+          assert.ifError(err);
+
+          var pnt = { type : "Point", coordinates : [1000,1000] };
+          var promise;
+          assert.doesNotThrow(function() {
+            promise = Geo.geoNear(pnt, { spherical : true, maxDistance : 1 });
+          });
+
+          function finish() {
+            db.close(done);
+          }
+
+          promise.then(finish).end();
+
+        });
+      });
+    })
   });
 });

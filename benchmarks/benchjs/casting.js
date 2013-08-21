@@ -121,7 +121,7 @@ suite.add('Casting - Embedded Docs - 0 Docs', {
     console.log(String(evt.target));
   }
 }).on('complete', function () {
-  if (!process.env.MONGOOSE_DEV) {
+  if (!process.env.MONGOOSE_DEV && !process.env.PULL_REQUEST) {
     var outObj = {};
     this.forEach(function (item) {
       var out = {};

@@ -69,6 +69,15 @@ describe('model', function() {
       done();
     });
 
+    it('is instance of root', function(done) {
+      var employee = new Employee();
+      assert.ok(employee instanceof Person);
+      assert.ok(employee instanceof Employee);
+      assert.strictEqual(employee.__proto__.constructor, Employee);
+      assert.strictEqual(employee.__proto__.__proto__.constructor, Person);
+      done();
+    });
+
     it('sets schema root discriminator mapping', function(done) {
       assert.deepEqual(PersonSchema.discriminatorMapping, { key: '__t', value: null, isRoot: true });
       done();

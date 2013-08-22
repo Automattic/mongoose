@@ -4480,9 +4480,10 @@ describe('model', function(){
 
     done();
   })
-  it('setters trigger on null values (gh-1445)', function(done){
 
+  it('setters trigger on null values (gh-1445)', function(done){
     var db = start();
+    db.close();
 
     var OrderSchema = new Schema({
       total: {
@@ -4496,11 +4497,7 @@ describe('model', function(){
 
     var Order = db.model('order'+random(), OrderSchema);
     var o = new Order({ total : null });
-
-    o.save(function (err, o) {
-      assert.ifError(err);
-      assert.equal(o.total, 10);
-      done();
-    });
+    assert.equal(o.total, 10);
+     done();
   })
 });

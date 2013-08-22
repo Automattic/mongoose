@@ -1,4 +1,20 @@
 
+3.6.18 (stable) / 2013-08-22
+===================
+
+  * updated; warn when using an unstable version of mongoose
+  * updated; mocha to 1.12.0
+  * updated; mongodb driver to 1.3.19 (fix error swallowing behavior)
+  * fixed; setters not firing on null values #1445 [ebensing](https://github.com/ebensing)
+  * fixed; properly exclude subdocument fields #1280 [ebensing](https://github.com/ebensing)
+  * fixed; cast error in findAndModify #1643 [aheuermann](https://github.com/aheuermann)
+  * website; update guide
+  * website; added documentation for safe:false and versioning interaction
+  * docs; mention that middleware dont run on Models
+  * docs; fix indexes link
+  * make; suppress warning msg in test
+  * tests; moar
+
 3.6.17 / 2013-08-13
 ===================
 

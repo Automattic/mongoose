@@ -454,10 +454,17 @@ describe('versioning', function(){
     })
   })
 
-  it('versioning is off when { safe : false } is set (gh-1520)', function(done){
-    var schema1 = new Schema({ title : String}, { safe : false });
-
-    assert.equal(schema1.options.versionKey, false);
-    done();
+  describe('versioning is off', function(){
+    it('when { safe : false } is set (gh-1520)', function(done){
+      var schema1 = new Schema({ title : String}, { safe : false });
+      assert.equal(schema1.options.versionKey, false);
+      done();
+    })
+    it('when { safe : { w: 0 }} is set (gh-1520)', function(done){
+      var schema1 = new Schema({ title : String}, { safe : { w: 0 } });
+      assert.equal(schema1.options.versionKey, false);
+      done();
+    })
   })
+
 })

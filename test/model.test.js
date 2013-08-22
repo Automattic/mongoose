@@ -4495,13 +4495,14 @@ describe('Model', function(){
         type: Number,
         default: 0,
         set: function (value) {
-          return (value || 0) + 10;
+          assert.strictEqual(null, value);
+          return 10;
         }
       }
     });
 
     var Order = db.model('order'+random(), OrderSchema);
-    var o = new Order({ total : null });
+    var o = new Order({ total: null });
     assert.equal(o.total, 10);
      done();
   })

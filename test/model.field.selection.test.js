@@ -347,7 +347,8 @@ describe('model field selection', function(){
       })
     });
   })
-  it.only('appropriately filters subdocuments based on properties (gh-1280)', function(done){
+
+  it('appropriately filters subdocuments based on properties (gh-1280)', function(done){
     var db = start();
     var RouteSchema = new Schema ({
       stations:   {
@@ -383,18 +384,19 @@ describe('model field selection', function(){
         points : [ { name : "rawr" }]
       }
     };
+
     Route.create(item, function (err, i) {
       assert.ifError(err);
+
       Route.findById(i.id).select('-stations').exec(function (err, res) {
         assert.ifError(err);
-        // not sure why I have to test it like this? res.stations is acting
-        // weird...
         assert.ok(res.stations.toString() === "undefined");
+
         Route.findById(i.id).select('-stations.start -stations.end').exec(function (err, res) {
           assert.ifError(err);
-          assert.ok(res.stations.start.toString() === "undefined");
-          assert.ok(res.stations.end.toString() === "undefined");
-          assert.ok(res.stations.points);
+          assert.equal(res.stations.start.toString(), "undefined");
+          assert.equal(res.stations.end.toString(), "undefined");
+          assert.ok(Array.isArray(res.stations.points));
           done();
         });
       });

@@ -1919,37 +1919,6 @@ describe('geo-spatial', function(){
       }
     });
 
-    it('$near works with GeoJSON (gh-1482)', function (done) {
-      var geoJSONSchema = new Schema({ loc : { type : { type : String }, coordinates : [Number] } });
-      geoJSONSchema.index({ loc : '2dsphere' });
-      var name = 'geospatial'+random();
-      var db = start()
-        , Test = db.model('Geo1', geoJSONSchema, name);
-
-      var pending = 2;
-      function complete (err) {
-        if (complete.ran) return;
-        if (err) return done(complete.ran = err);
-        --pending || test();
-      }
-
-      Test.on('index', complete);
-      Test.create({ loc: { type : 'Point', coordinates :[ 10, 20 ]}}, { loc: {
-        type : 'Point', coordinates: [ 40, 90 ]}}, complete);
-
-      function test () {
-        // $maxDistance is in meters... so even though they aren't that far off
-        // in lat/long, need an incredibly high number here
-        Test.where('loc').near({ center : { type : 'Point', coordinates :
-          [11,20]}, maxDistance : 1000000 }).exec(function (err, docs) {
-          db.close();
-          assert.ifError(err);
-          assert.equal(1, docs.length);
-          done();
-        });
-      }
-    });
-
     it('$within arrays (gh-586)', function(done){
       var db = start()
         , Test = db.model('Geo2', geoSchema, collection + 'geospatial');
@@ -2206,6 +2175,40 @@ describe('geo-spatial', function(){
           })
         })
       });
+
+      it('works with GeoJSON (gh-1482)', function (done) {
+        if (!mongo24_or_greater) return done();
+
+        var geoJSONSchema = new Schema({ loc : { type : { type : String }, coordinates : [Number] } });
+        geoJSONSchema.index({ loc : '2dsphere' });
+        var name = 'geospatial'+random();
+        var db = start()
+          , Test = db.model('Geo1', geoJSONSchema, name);
+
+        var pending = 2;
+        function complete (err) {
+          if (complete.ran) return;
+          if (err) return done(complete.ran = err);
+          --pending || test();
+        }
+
+        Test.on('index', complete);
+        Test.create({ loc: { type : 'Point', coordinates :[ 10, 20 ]}}, { loc: {
+          type : 'Point', coordinates: [ 40, 90 ]}}, complete);
+
+        function test () {
+          // $maxDistance is in meters... so even though they aren't that far off
+          // in lat/long, need an incredibly high number here
+          Test.where('loc').near({ center : { type : 'Point', coordinates :
+            [11,20]}, maxDistance : 1000000 }).exec(function (err, docs) {
+            db.close();
+            assert.ifError(err);
+            assert.equal(1, docs.length);
+            done();
+          });
+        }
+      });
+
     })
   })
 

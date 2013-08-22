@@ -453,4 +453,11 @@ describe('versioning', function(){
       })
     })
   })
+
+  it('versioning is off when { safe : false } is set (gh-1520)', function(done){
+    var schema1 = new Schema({ title : String}, { safe : false });
+
+    assert.equal(schema1.options.versionKey, false);
+    done();
+  })
 })

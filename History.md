@@ -1,4 +1,31 @@
 
+3.7.3 (unstable) / 2013-08-22
+=============================
+
+  * updated; warn when using an unstable version
+  * updated; mquery to 0.3.1
+  * updated; mocha to 1.12.0
+  * updated; mongodb driver to 1.3.19 (fix error swallowing behavior)
+  * changed; no longer offically supporting node 0.6.x
+  * added; support for GeoJSON to Query#near [ebensing](https://github.com/ebensing)
+  * added; stand-alone base query support - query.toConstructor() [ebensing](https://github.com/ebensing)
+  * added; promise support to geoSearch #1614 [ebensing](https://github.com/ebensing)
+  * added; promise support for geoNear #1614 [ebensing](https://github.com/ebensing)
+  * fixed; setters not firing on null values #1445 [ebensing](https://github.com/ebensing)
+  * fixed; handle another versioning edge case #1520
+  * fixed; excluding subdocument fields #1280 [ebensing](https://github.com/ebensing)
+  * fixed; allow array properties to be set to null with findOneAndUpdate [aheuermann](https://github.com/aheuermann)
+  * fixed; subdocuments now use own toJSON opts #1376 [ebensing](https://github.com/ebensing)
+  * fixed; model#geoNear fulfills promise when results empty #1658 [ebensing](https://github.com/ebensing)
+  * fixed; utils.merge no longer overrides props and methods #1655 [j](https://github.com/j)
+  * fixed; subdocuments now use their own transform #1412 [ebensing](https://github.com/ebensing)
+  * make; suppress warning msg in test
+  * docs; state which branch is stable/unstable
+  * docs; mention that middleware does not run on Models
+  * tests; add script for continuously running tests
+  * tests; fixed versioning tests
+  * benchmarks; updated for pull requests
+
 3.7.2 (unstable) / 2013-08-15
 ==================
 

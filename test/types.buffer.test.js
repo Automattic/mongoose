@@ -84,7 +84,8 @@ describe('types.buffer', function(){
             t.sub[0].buf = new Buffer("well well");
             t.save(function (err) {
               assert.equal(err.message,'Validation failed');
-              assert.equal(err.errors['sub.0.buf'].type,'valid failed');
+              assert.equal(err.errors['sub.0.buf'].type,'user defined');
+              assert.equal(err.errors['sub.0.buf'].message,'valid failed');
 
               t.sub[0].buf = new Buffer("well well well");
               t.validate(function (err) {

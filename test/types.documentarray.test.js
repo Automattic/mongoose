@@ -398,7 +398,8 @@ describe('types.documentarray', function(){
         var e = t.errors['docs.0.name'];
         assert.ok(e);
         assert.equal(e.path, 'docs.0.name');
-        assert.equal(e.type, 'boo boo');
+        assert.equal(e.type, 'user defined');
+        assert.equal(e.message, 'boo boo');
         assert.equal(e.value, '%');
         done();
       })

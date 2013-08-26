@@ -730,7 +730,7 @@ describe('document', function(){
             t.req = undefined;
             t.save(function (err) {
               err = String(err);
-              var invalid  = /Validator "required" failed for path req/.test(err);
+              var invalid  = /Path `req` is required./.test(err);
               assert.ok(invalid);
               t.req = 'it works again'
               t.save(function (err) {
@@ -804,10 +804,10 @@ describe('document', function(){
         var M = db.model('validateSchema-array1', schema, collection);
         var m = new M({ name: 'gh1109-1' });
         m.save(function (err) {
-          assert.ok(/"required" failed for path arr/.test(err));
+          assert.ok(/Path `arr` is required/.test(err));
           m.arr = [];
           m.save(function (err) {
-            assert.ok(/"required" failed for path arr/.test(err));
+            assert.ok(/Path `arr` is required/.test(err));
             m.arr.push('works');
             m.save(function (err) {
               assert.ifError(err);
@@ -835,7 +835,7 @@ describe('document', function(){
         var m = new M({ name: 'gh1109-2', arr: [1] });
         assert.equal(false, called);
         m.save(function (err) {
-          assert.ok(/"BAM" failed for path arr/.test(err));
+          assert.equal('ValidationError: BAM', String(err));
           assert.equal(true, called);
           m.arr.push(2);
           called = false;
@@ -864,10 +864,10 @@ describe('document', function(){
         var M = db.model('validateSchema-array3', schema, collection);
         var m = new M({ name: 'gh1109-3' });
         m.save(function (err) {
-          assert.ok(/"required" failed for path arr/.test(err));
+          assert.equal(err.errors.arr.message, 'Path `arr` is required.');
           m.arr.push({nice: true});
           m.save(function (err) {
-            assert.ok(/"BAM" failed for path arr/.test(err));
+            assert.equal(String(err), 'ValidationError: BAM');
             m.arr.push(95);
             m.save(function (err) {
               assert.ifError(err);
@@ -895,14 +895,14 @@ describe('document', function(){
     Post = db.model('InvalidateSchema');
     post = new Post();
     post.set({baz: 'val'});
-    post.invalidate('baz', 'reason');
+    post.invalidate('baz', 'validation failed for path {PATH}');
 
     post.save(function(err){
       assert.ok(err instanceof MongooseError);
       assert.ok(err instanceof ValidationError);
       assert.ok(err.errors.baz instanceof ValidatorError);
-      assert.equal(err.errors.baz.message,'Validator "reason" failed for path baz');
-      assert.equal(err.errors.baz.type,'reason');
+      assert.equal(err.errors.baz.message,'validation failed for path baz');
+      assert.equal(err.errors.baz.type,'user defined');
       assert.equal(err.errors.baz.path,'baz');
 
       post.save(function(err){

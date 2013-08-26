@@ -1125,6 +1125,15 @@ describe('schema', function(){
 
       assert.equal(true, called);
       done();
+    });
+
+    it('pushes plugin to plugins array', function(done) {
+      var Toby = new Schema(),
+          plugin = function(schema) {};
+
+      Toby.plugin(plugin);
+      assert.strictEqual(plugin, Toby.plugins[0]);
+      done();
     })
   });
 

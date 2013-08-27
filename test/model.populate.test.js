@@ -238,7 +238,7 @@ describe('model: populate:', function(){
 
           User.create({
               name  : 'Aaron'
-            , email : 'aaron.heckmann@10gen.com'
+            , email : 'aaron.heckmann@gmail.com'
           }, function (err, newCreator) {
             assert.ifError(err);
 
@@ -255,7 +255,7 @@ describe('model: populate:', function(){
                 db.close();
                 assert.ifError(err);
                 assert.equal(post._creator.name,'Aaron');
-                assert.equal(post._creator.email,'aaron.heckmann@10gen.com');
+                assert.equal(post._creator.email,'aaron.heckmann@gmail.com');
                 done();
               });
             });

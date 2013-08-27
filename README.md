@@ -14,7 +14,7 @@ Mongoose is a [MongoDB](http://www.mongodb.org/) object modeling tool designed t
   - [Stack Overflow](http://stackoverflow.com/questions/tagged/mongoose)
   - [bug reports](https://github.com/learnboost/mongoose/issues/)
   - [help forum](http://groups.google.com/group/mongoose-orm)
-  - [10gen support](http://www.mongodb.org/display/DOCS/Technical+Support)
+  - [MongoDB support](http://www.mongodb.org/display/DOCS/Technical+Support)
   - (irc) #mongoosejs on freenode
 
 ## Installation

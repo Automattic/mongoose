@@ -895,7 +895,7 @@ describe('model: querying:', function(){
             assert.equal(1, nes1.length);
 
             NE.find({ b: { $ne: [1] }}, function (err, nes2) {
-              assert.equal("Cast to ObjectId failed for value \"1\" at path \"b\"", err.message);
+              assert.equal("Cast to ObjectId failed for value \"[1]\" at path \"b\"", err.message);
 
               NE.find({ b: { $ne: 4 }}, function (err, nes3) {
                 assert.equal("Cast to ObjectId failed for value \"4\" at path \"b\"", err.message);

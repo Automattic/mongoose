@@ -2035,7 +2035,7 @@ describe('Model', function(){
 
         mongoose.model('MySchema', new Schema({
           nested: {
-            arrays: []
+            arrays: [[]]
           }
         }));
 

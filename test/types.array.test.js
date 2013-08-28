@@ -484,7 +484,7 @@ describe('types array', function(){
         });
       });
     });
-    
+
   })
 
   describe('$pop()', function(){
@@ -1520,5 +1520,184 @@ describe('types array', function(){
       })
     })
   })
+  describe('multidimensional arrays', function() {
+    function save (doc, cb) {
+      doc.save(function (err) {
+        if (err) return cb(err);
+        doc.constructor.findById(doc._id, cb);
+      })
+    }
+    it('works', function(done) {
+      var a = new MongooseArray([ [[1,2],[3,4]], [[5,6],[7,8]] ]);
+
+      assert.ok(a instanceof MongooseArray);
+      assert.ok(a[0] instanceof Array);
+      assert.ok(a[0][0] instanceof Array);
+      done();
+    });
+    it('supports indexing', function(done) {
+
+      var a = new MongooseArray([ [[1,2],[3,4]], [[5,6],[7,8]] ]);
+
+      assert.equal(a[0][0][0], 1);
+      done();
+    });
+    it('works like it should with the database', function(done) {
+      var db = start();
+
+      var schema = new Schema({ mult : [[Number]] });
+
+      var M = db.model('M', schema);
+
+      var test = new M({ mult : [[1,2],[3,4]]});
+
+      test.mult.push([5,6]);
+      test.save(function (err) {
+        assert.ifError(err);
+
+        M.find({}, function(err, results) {
+          assert.ifError(err);
+
+          assert.equal(results.length, 1);
+          var val = results[0];
+          assert.equal(val.mult[0][0], 1);
+          assert.equal(val.mult[0][1], 2);
+          assert.equal(val.mult[1][0], 3);
+          assert.equal(val.mult[1][1], 4);
+          assert.equal(val.mult[2][0], 5);
+          assert.equal(val.mult[2][1], 6);
+
+          done();
+        });
+      });
+    });
+    it('works with buffers', function(done) {
+      var db = start();
+
+      var schema = new Schema({ arr : [[Buffer]] });
+      var B = db.model('B', schema);
+
+      var m = new B({ arr: [[[0], new Buffer(1)], [[0], new Buffer(1)]] });
+      save(m, function (err, doc) {
+        assert.ifError(err);
+        assert.equal(2, doc.arr.length);
+        assert.ok(doc.arr[0][0] instanceof MongooseBuffer);
+        assert.ok(doc.arr[0][1] instanceof MongooseBuffer);
+        assert.ok(doc.arr[1][0] instanceof MongooseBuffer);
+        assert.ok(doc.arr[1][1] instanceof MongooseBuffer);
+        doc.arr.set(0, [[0], "nice"]);
+        assert.equal(2, doc.arr.length);
+        assert.ok(doc.arr[0][1] instanceof MongooseBuffer);
+        assert.equal("nice", doc.arr[0][1].toString('utf8'));
+        doc.arr.set(doc.arr.length, [[11]]);
+        assert.equal(3, doc.arr.length);
+        assert.equal(11, doc.arr[2][0][0]);
+
+        save(doc, function (err, doc) {
+          assert.ifError(err);
+          assert.equal(3, doc.arr.length);
+          assert.ok(doc.arr[0][0] instanceof MongooseBuffer);
+          assert.ok(doc.arr[0][1] instanceof MongooseBuffer);
+          assert.ok(doc.arr[1][0] instanceof MongooseBuffer);
+          assert.ok(doc.arr[1][1] instanceof MongooseBuffer);
+          assert.ok(doc.arr[2][0] instanceof MongooseBuffer);
+          assert.equal('\u0000', doc.arr[0][0].toString());
+          assert.equal("nice", doc.arr[0][1].toString());
+          assert.equal(11, doc.arr[2][0][0]);
+          done();
+        });
+      });
+
+    });
+    it('works with sub-docs', function(done){
+      var db = start();
+      var D = db.model('arraySetSubDocs', Schema({ arr: [[{ name: String}]] }));
+      var m = new D({ arr: [[{name:'aaron'}, {name:'moombahton '}],[{name: 'EJ'},{name:'emily'}]] });
+      save(m, function (err, doc) {
+        assert.ifError(err);
+        assert.equal(2, doc.arr.length);
+        assert.equal(2, doc.arr[0].length);
+        assert.equal(2, doc.arr[1].length);
+        doc.arr.set(0, [{name:'vdrums'}, {name:'dave'}]);
+        assert.equal(2, doc.arr.length);
+        assert.equal(2, doc.arr[0].length);
+        assert.equal(2, doc.arr[1].length);
+        assert.equal('vdrums', doc.arr[0][0].name);
+        assert.equal('dave', doc.arr[0][1].name);
+        doc.arr.set(doc.arr.length, [{name:"Restrepo"},{name:'chip'}]);
+        assert.equal(3, doc.arr.length);
+        assert.equal("Restrepo", doc.arr[2][0].name);
+        assert.equal("chip", doc.arr[2][1].name);
+
+        save(doc, function (err, doc) {
+          assert.ifError(err);
+          // validate
+          assert.equal(3, doc.arr.length);
+          assert.equal(2, doc.arr[0].length);
+          assert.equal(2, doc.arr[1].length);
+          assert.equal(2, doc.arr[2].length);
+          assert.equal('vdrums', doc.arr[0][0].name);
+          assert.equal('dave', doc.arr[0][1].name);
+          assert.equal("EJ", doc.arr[1][0].name);
+          assert.equal("emily", doc.arr[1][1].name);
+          assert.equal("Restrepo", doc.arr[2][0].name);
+          assert.equal("chip", doc.arr[2][1].name);
+
+          doc.arr.set(10, [{ name: 'temple of doom' }, {name : 'jones'}])
+          assert.equal(11, doc.arr.length);
+          assert.equal('temple of doom', doc.arr[10][0].name);
+          assert.equal('jones', doc.arr[10][1].name);
+          assert.equal(null, doc.arr[9]);
+
+          save(doc, function (err, doc) {
+            assert.ifError(err);
+
+            // validate
+            assert.equal(11, doc.arr.length);
+            assert.equal(2, doc.arr[0].length);
+            assert.equal(2, doc.arr[1].length);
+            assert.equal(2, doc.arr[2].length);
+            assert.equal(2, doc.arr[10].length);
+            assert.equal('vdrums', doc.arr[0][0].name);
+            assert.equal('dave', doc.arr[0][1].name);
+            assert.equal("EJ", doc.arr[1][0].name);
+            assert.equal("emily", doc.arr[1][1].name);
+            assert.equal("Restrepo", doc.arr[2][0].name);
+            assert.equal("chip", doc.arr[2][1].name);
+            assert.equal(null, doc.arr[3]);
+            assert.equal(null, doc.arr[9]);
+            assert.equal('temple of doom', doc.arr[10][0].name);
+            assert.equal('jones', doc.arr[10][1].name);
+
+            doc.arr.remove(doc.arr[0]);
+            doc.arr.set(7, [{ name: 7 }, { name : 8}])
+            assert.strictEqual("7", doc.arr[7][0].name);
+            assert.strictEqual("8", doc.arr[7][1].name);
+            assert.equal(10, doc.arr.length);
+
+            save(doc, function (err, doc) {
+              assert.ifError(err);
+
+              assert.equal(10, doc.arr.length);
+              assert.equal("EJ", doc.arr[0][0].name);
+              assert.equal("emily", doc.arr[0][1].name);
+              assert.equal("Restrepo", doc.arr[1][0].name);
+              assert.equal("chip", doc.arr[1][1].name);
+              assert.equal(null, doc.arr[2]);
+              assert.ok(doc.arr[7]);
+              assert.strictEqual("7", doc.arr[7][0].name);
+              assert.strictEqual("8", doc.arr[7][1].name);
+              assert.equal(null, doc.arr[8]);
+              assert.equal('temple of doom', doc.arr[9][0].name);
+              assert.equal('jones', doc.arr[9][1].name);
+
+              done();
+
+            });
+          });
+        });
+      });
+    });
+  });
 })
 

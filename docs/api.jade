@@ -88,10 +88,6 @@ html(lang='en')
                   - // console.log('\nmissing method name', method);
                   h3 MISSING method name
                 != method.description.summary
-                if method.code
-                  span.showcode show code
-                  .sourcecode
-                    != hl(method.code)
                 if method.params.length
                   .params
                     h4 Parameters:
@@ -144,6 +140,10 @@ html(lang='en')
                           a(href=url, title=see.title || see.local)= see.title || see.url || see.local
                 div.description
                   != method.description.body
+                if method.code
+                  span.showcode show code
+                  .sourcecode
+                    != hl(method.code)
                 hr(class= method.isPrivate ? 'private' : '')
             each stat in item.statics
               div.item.static(class= stat.isPrivate ? 'private' : 'public')

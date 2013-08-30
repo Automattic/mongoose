@@ -239,6 +239,10 @@ html(lang='en')
                     = construct + '#'
                     span= property.ctx.name
                 != property.description.full
+                if property.code
+                  span.showcode show code
+                  .sourcecode
+                    != hl(property.code)
                 if property.return
                   .returns
                     h4 Returns:

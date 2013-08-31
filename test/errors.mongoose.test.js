@@ -16,5 +16,12 @@ describe('MongooseError', function(){
       assert.equal(expect, actual);
       done();
     })
+    it('throws when no message is passed', function(done){
+      var err = new mongoose.Error;
+      assert.throws(function () {
+        err.formatMessage(undefined, 'a', 'b', 'c');
+      }, /message is required/)
+      done();
+    })
   })
 })

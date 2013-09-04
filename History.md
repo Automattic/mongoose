@@ -1,4 +1,10 @@
 
+3.6.19 / 2013-09-04
+==================
+
+  * fixed; population field selection w/ strings #1669
+  * docs; Date method caveats #1598
+
 3.6.18 (stable) / 2013-08-22
 ===================
 

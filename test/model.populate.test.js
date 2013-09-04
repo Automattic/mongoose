@@ -2205,7 +2205,7 @@ describe('model: populate:', function(){
       db = start();
 
       C = db.model('Comment', Schema({
-          body: 'string'
+          body: 'string', title: String
       }), 'comments_' + random());
 
       U = db.model('User', Schema({
@@ -2214,7 +2214,7 @@ describe('model: populate:', function(){
         , comment: { type: Schema.ObjectId, ref: 'Comment' }
       }), 'users_' + random());
 
-      C.create({ body: 'comment 1', }, { body: 'comment 2' }, function (err, c1_, c2_) {
+      C.create({ body: 'comment 1', title: '1' }, { body: 'comment 2', title: 2 }, function (err, c1_, c2_) {
         assert.ifError(err);
         c1 = c1_;
         c2 = c2_;
@@ -2248,21 +2248,23 @@ describe('model: populate:', function(){
             assert.equal('number', typeof d._doc.__v);
           });
 
-          U.findOne({name:'u1'}).populate('comments', 'name -_id').exec(function (err, doc) {
+          U.findOne({name:'u1'}).populate('comments', 'title -_id').exec(function (err, doc) {
             assert.ifError(err);
             assert.equal(2, doc.comments.length);
             doc.comments.forEach(function (d) {
               assert.equal(undefined, d._id);
-              assert.ok(d.body.length);
-              assert.equal('number', typeof d._doc.__v);
+              assert.ok(d.title.length);
+              assert.equal(undefined, d.body);
+              assert.equal(typeof d._doc.__v, 'undefined');
             });
             U.findOne({name:'u1'}).populate('comments', '-_id').exec(function (err, doc) {
               assert.ifError(err);
               assert.equal(2, doc.comments.length);
               doc.comments.forEach(function (d) {
                 assert.equal(undefined, d._id);
+                assert.ok(d.title.length);
                 assert.ok(d.body.length);
-                assert.equal('number', typeof d._doc.__v);
+                assert.equal(typeof d._doc.__v, 'number');
               });
               done();
             })

@@ -40,7 +40,15 @@ m.ofBuffer.pop();
 m.ofMixed = [<span class="number">1</span>, [], <span class="string">'three'</span>, { four: <span class="number">5</span> }];
 m.nested.stuff = <span class="string">'good'</span>;
 m.save(callback);
-</code></pre><h3>Usage notes:</h3><h4 id="mixed">Mixed</h4><p>An "anything goes" SchemaType, its flexibility comes at a trade-off of it being harder to maintain. Mixed is available either through Schema.Types.Mixed or by passing an empty object literal. The following are equivalent:</p><pre><code class="javascript"><span class="keyword">var</span> Any = <span class="keyword">new</span> Schema({ any: {} });
+</code></pre><h3>Usage notes:</h3><h4 id="Dates">Dates</h4><p><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date">Built-in <code>Date</code> methods</a> are <a href="https://github.com/LearnBoost/mongoose/issues/1598"><strong>not</strong> hooked into</a> the mongoose change tracking logic which in English means that if you use a <code>Date</code> in your document and modify it with a method like <code>setMonth()</code>, mongoose will be unaware of this change and <code>doc.save()</code> will not persist this modification. If you must modify <code>Date</code> types using built-in methods, tell mongoose about the change with <code>doc.markModified(&#39;pathToYourDate&#39;)</code> before saving.</p><pre><code class="javascript"><span class="keyword">var</span> Assignment = mongoose.model(<span class="string">'Assignment'</span>, { dueDate: Date });
+Assignment.findOne(<span class="function"><span class="keyword">function</span> <span class="params">(err, doc)</span> {</span>
+  doc.dueDate.setMonth(<span class="number">3</span>);
+  doc.save(callback) <span class="comment">// THIS DOES NOT SAVE YOUR CHANGE</span>
+  
+  doc.markModified(<span class="string">'dueDate'</span>);
+  doc.save(callback) <span class="comment">// works</span>
+})
+</code></pre><h4 id="mixed">Mixed</h4><p>An "anything goes" SchemaType, its flexibility comes at a trade-off of it being harder to maintain. Mixed is available either through Schema.Types.Mixed or by passing an empty object literal. The following are equivalent:</p><pre><code class="javascript"><span class="keyword">var</span> Any = <span class="keyword">new</span> Schema({ any: {} });
 <span class="keyword">var</span> Any = <span class="keyword">new</span> Schema({ any: Schema.Types.Mixed });</code></pre><p>Since it is a schema-less type, you can change the value to anything else you like, but Mongoose loses the ability to auto detect and save those changes. To "tell" Mongoose that the value of a Mixed type has changed, call the <code>.markModified(path)</code> method of the document passing the path to the Mixed type you just changed.</p><pre><code class="javascript">person.anything = { x: [<span class="number">3</span>, <span class="number">4</span>, { y: <span class="string">"changed"</span> }] };
 person.markModified(<span class="string">'anything'</span>);
 person.save(); <span class="comment">// anything will now get saved</span></code></pre><h4 id="objectids">ObjectIds</h4><p>To specify a type of ObjectId, use <code>Schema.Types.ObjectId</code> in your declaration.</p><pre><code class="javascript"><span class="keyword">var</span> mongoose = require(<span class="string">'mongoose'</span>);

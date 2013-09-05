@@ -1,5 +1,5 @@
 
-3.6.19 / 2013-09-04
+3.6.19 (stable) / 2013-09-04
 ==================
 
   * fixed; population field selection w/ strings #1669

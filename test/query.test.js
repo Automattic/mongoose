@@ -367,6 +367,33 @@ describe('Query', function(){
       assert.deepEqual(query._conditions, {checkin: {$nearSphere: [40, -72]}});
       done();
     })
+
+    it('via where, with object', function(done){
+      var query = new Query({}, {}, null, p1.collection);
+      query.where('checkin').nearSphere({ center: [20,23], maxDistance: 2 });
+      assert.deepEqual(query._conditions, {checkin: {$nearSphere: [20,23],$maxDistance:2}});
+      done();
+    })
+
+    it('via where, where GeoJSON param', function(done){
+      var query = new Query({}, {}, null, p1.collection);
+      query.where('numbers').nearSphere({ center : { type : 'Point', coordinates : [40, -72 ]}});
+      assert.deepEqual(query._conditions, {numbers: {$nearSphere: { $geometry : { type : 'Point', coordinates : [40, -72] }}}});
+      assert.doesNotThrow(function () {
+        query.cast(p1.constructor);
+      })
+      done();
+    })
+
+    it('with path, with GeoJSON', function(done){
+      var query = new Query({}, {}, null, p1.collection);
+      query.nearSphere('numbers', { center : { type : 'Point', coordinates : [40, -72 ]}});
+      assert.deepEqual(query._conditions, {numbers: {$nearSphere: { $geometry : { type : 'Point', coordinates : [40, -72] }}}});
+      assert.doesNotThrow(function () {
+        query.cast(p1.constructor);
+      })
+      done();
+    })
   })
 
   describe('maxDistance', function(){

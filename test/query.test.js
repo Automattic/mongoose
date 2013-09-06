@@ -330,11 +330,14 @@ describe('Query', function(){
     })
     it('via where, where GeoJSON param', function(done){
       var query = new Query({}, {}, null, p1.collection);
-      query.where('loc').near({ center : { type : 'Point', coordinates : [40, -72 ]}});
-      assert.deepEqual(query._conditions, {loc: {$near: { $geometry : { type : 'Point', coordinates : [40, -72] }}}});
+      query.where('numbers').near({ center : { type : 'Point', coordinates : [40, -72 ]}});
+      assert.deepEqual(query._conditions, {numbers: {$near: { $geometry : { type : 'Point', coordinates : [40, -72] }}}});
+      assert.doesNotThrow(function () {
+        query.cast(p1.constructor);
+      })
       done();
     })
-    it('not via where, where GeoJSON param', function(done){
+    it('with path, where GeoJSON param', function(done){
       var query = new Query({}, {}, null, p1.collection);
       query.near('loc', { center : { type : 'Point', coordinates : [40, -72 ]}});
       assert.deepEqual(query._conditions, {loc: {$near: { $geometry : { type : 'Point', coordinates : [40, -72] }}}});

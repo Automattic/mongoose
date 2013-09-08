@@ -38,7 +38,7 @@ PersonSchema.post('save', function (next) {
 PersonSchema.set('toObject', { getters: true, virtuals: true });
 PersonSchema.set('toJSON',   { getters: true, virtuals: true });
 
-var EmployeeSchema = new Schema({ department: String }, { collection: 'should-be-overridden' });
+var EmployeeSchema = new Schema({ department: String });
 EmployeeSchema.index({ department: 1 });
 EmployeeSchema.methods.getDepartment = function() {
   return this.department;
@@ -174,6 +174,19 @@ describe('model', function() {
         assert.notDeepEqual(Employee.schema.get('toJSON'), Person.schema.get('toJSON'));
         assert.deepEqual(Employee.schema.get('toJSON'), { getters: false, virtuals: true });
         done();
+      });
+
+      it('is not customizable', function(done) {
+          var errorMessage
+            , CustomizedSchema = new Schema({}, { capped: true });
+          try {
+              Person.discriminator('model-discriminator-custom', CustomizedSchema);
+          } catch (e) {
+              errorMessage = e.message
+          }
+
+          assert.equal(errorMessage, 'Discriminator options are not customizable (except toJSON & toObject)');
+          done();
       });
     });
 

@@ -6,6 +6,7 @@ var start = require('./common')
   , mongoose = start.mongoose
   , Schema = mongoose.Schema
   , assert = require('assert')
+  , clone = require('../lib/utils').clone
   , random = require('../lib/utils').random;
 
 /**
@@ -34,6 +35,8 @@ PersonSchema.path('gender').validate(function(value) {
 PersonSchema.post('save', function (next) {
   next();
 });
+PersonSchema.set('toObject', { getters: true, virtuals: true });
+PersonSchema.set('toJSON',   { getters: true, virtuals: true });
 
 var EmployeeSchema = new Schema({ department: String }, { collection: 'should-be-overridden' });
 EmployeeSchema.index({ department: 1 });
@@ -48,6 +51,8 @@ var employeeSchemaPreSaveFn = function (next) {
   next();
 };
 EmployeeSchema.pre('save', employeeSchemaPreSaveFn);
+EmployeeSchema.set('toObject', { getters: true, virtuals: false });
+EmployeeSchema.set('toJSON',   { getters: false, virtuals: true });
 
 describe('model', function() {
   describe('discriminator()', function() {
@@ -158,6 +163,20 @@ describe('model', function() {
       done();
     });
 
+    describe('options', function() {
+      it('allows toObject to be overridden', function(done) {
+        assert.notDeepEqual(Employee.schema.get('toObject'), Person.schema.get('toObject'));
+        assert.deepEqual(Employee.schema.get('toObject'), { getters: true, virtuals: false });
+        done();
+      });
+
+      it('allows toObject to be overridden', function(done) {
+        assert.notDeepEqual(Employee.schema.get('toJSON'), Person.schema.get('toJSON'));
+        assert.deepEqual(Employee.schema.get('toJSON'), { getters: false, virtuals: true });
+        done();
+      });
+    });
+
     describe('root schema inheritance', function() {
       it('inherits field mappings', function(done) {
         assert.strictEqual(Employee.schema.path('name'), Person.schema.path('name'));
@@ -224,8 +243,16 @@ describe('model', function() {
         done();
       });
 
-      it('gets options overridden by root options', function(done) {
-        assert.equal(Employee.schema.options, Person.schema.options);
+      it('gets options overridden by root options except toJSON and toObject', function(done) {
+        var personOptions = clone(Person.schema.options)
+          , employeeOptions = clone(Employee.schema.options);
+
+        delete personOptions.toJSON;
+        delete personOptions.toObject;
+        delete employeeOptions.toJSON;
+        delete employeeOptions.toObject;
+
+        assert.deepEqual(personOptions, employeeOptions);
         done();
       });
     });

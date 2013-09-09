@@ -920,6 +920,7 @@ describe('document', function(){
       var N = db.model('equals-N', new Schema({ _id: Number }));
       var O = db.model('equals-O', new Schema({ _id: Schema.ObjectId }));
       var B = db.model('equals-B', new Schema({ _id: Buffer }));
+      var M = db.model('equals-I', new Schema({ name: String }, { _id: false }));
 
       it('with string _ids', function(done){
         var s1 = new S({ _id: 'one' });
@@ -949,6 +950,14 @@ describe('document', function(){
         var n1 = new B({ _id: 0 });
         var n2 = new B({ _id: 0 });
         assert.ok(n1.equals(n2));
+        done();
+      })
+      it('with _id disabled (gh-1687)', function(done){
+        var m1 = new M;
+        var m2 = new M;
+        assert.doesNotThrow(function () {
+          m1.equals(m2)
+        });
         done();
       })
 

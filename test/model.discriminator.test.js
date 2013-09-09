@@ -170,7 +170,7 @@ describe('model', function() {
         done();
       });
 
-      it('allows toObject to be overridden', function(done) {
+      it('allows toJSON to be overridden', function(done) {
         assert.notDeepEqual(Employee.schema.get('toJSON'), Person.schema.get('toJSON'));
         assert.deepEqual(Employee.schema.get('toJSON'), { getters: false, virtuals: true });
         done();

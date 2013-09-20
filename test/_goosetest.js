@@ -1,5 +1,5 @@
 
-var mongoose = require('mongoose');
+var mongoose = require('../../');
 var Schema = mongoose.Schema;
 var assert = require('assert')
 

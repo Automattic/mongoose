@@ -1972,21 +1972,10 @@ describe('model: populate:', function(){
     })
 
     describe('a document already populated', function(){
-      it('works', function(done){
-        B.findById(post1._id, function (err, doc) {
-          assert.ifError(err);
-          B.populate(doc, [{ path: '_creator', model: 'RefAlternateUser' }, { path: 'fans', model: 'RefAlternateUser' }], function (err, post) {
+      describe('when paths are not modified', function(){
+        it('works', function(done){
+          B.findById(post1._id, function (err, doc) {
             assert.ifError(err);
-            assert.ok(post);
-            assert.ok(post._creator instanceof User);
-            assert.equal('Phoenix', post._creator.name);
-            assert.equal(2, post.fans.length);
-            assert.equal(post.fans[0].name, user1.name);
-            assert.equal(post.fans[1].name, user2.name);
-
-            assert.equal(String(post._creator._id), String(post.populated('_creator')));
-            assert.ok(Array.isArray(post.populated('fans')));
-
             B.populate(doc, [{ path: '_creator', model: 'RefAlternateUser' }, { path: 'fans', model: 'RefAlternateUser' }], function (err, post) {
               assert.ifError(err);
               assert.ok(post);
@@ -1995,18 +1984,73 @@ describe('model: populate:', function(){
               assert.equal(2, post.fans.length);
               assert.equal(post.fans[0].name, user1.name);
               assert.equal(post.fans[1].name, user2.name);
-              assert.ok(Array.isArray(post.populated('fans')));
-              assert.equal(
-                  String(post.fans[0]._id)
-                , String(post.populated('fans')[0]));
-              assert.equal(
-                  String(post.fans[1]._id)
-                , String(post.populated('fans')[1]));
 
-              done()
+              assert.equal(String(post._creator._id), String(post.populated('_creator')));
+              assert.ok(Array.isArray(post.populated('fans')));
+
+              B.populate(doc, [{ path: '_creator', model: 'RefAlternateUser' }, { path: 'fans', model: 'RefAlternateUser' }], function (err, post) {
+                assert.ifError(err);
+                assert.ok(post);
+                assert.ok(post._creator instanceof User);
+                assert.equal('Phoenix', post._creator.name);
+                assert.equal(2, post.fans.length);
+                assert.equal(post.fans[0].name, user1.name);
+                assert.equal(post.fans[1].name, user2.name);
+                assert.ok(Array.isArray(post.populated('fans')));
+                assert.equal(
+                    String(post.fans[0]._id)
+                  , String(post.populated('fans')[0]));
+                assert.equal(
+                    String(post.fans[1]._id)
+                  , String(post.populated('fans')[1]));
+
+                done()
+              });
             });
           });
-        });
+        })
+      })
+      describe('when paths are modified', function(){
+        it('works', function(done){
+          B.findById(post1._id, function (err, doc) {
+            assert.ifError(err);
+            B.populate(doc, [{ path: '_creator', model: 'RefAlternateUser' }, { path: 'fans', model: 'RefAlternateUser' }], function (err, post) {
+              assert.ifError(err);
+              assert.ok(post);
+              assert.ok(post._creator instanceof User);
+              assert.equal('Phoenix', post._creator.name);
+              assert.equal(2, post.fans.length);
+              assert.equal(post.fans[0].name, user1.name);
+              assert.equal(post.fans[1].name, user2.name);
+
+              assert.equal(String(post._creator._id), String(post.populated('_creator')));
+              assert.ok(Array.isArray(post.populated('fans')));
+
+              // modify the paths
+              doc.markModified('_creator');
+              doc.markModified('fans');
+
+              B.populate(doc, [{ path: '_creator', model: 'RefAlternateUser' }, { path: 'fans', model: 'RefAlternateUser' }], function (err, post) {
+                assert.ifError(err);
+                assert.ok(post);
+                assert.ok(post._creator instanceof User);
+                assert.equal('Phoenix', post._creator.name);
+                assert.equal(2, post.fans.length);
+                assert.equal(post.fans[0].name, user1.name);
+                assert.equal(post.fans[1].name, user2.name);
+                assert.ok(Array.isArray(post.populated('fans')));
+                assert.equal(
+                    String(post.fans[0]._id)
+                  , String(post.populated('fans')[0]));
+                assert.equal(
+                    String(post.fans[1]._id)
+                  , String(post.populated('fans')[1]));
+
+                done()
+              });
+            });
+          });
+        })
       })
     })
 

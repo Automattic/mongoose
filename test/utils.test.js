@@ -285,22 +285,6 @@ describe('utils', function(){
     done();
   })
 
-  describe('clone', function(){
-    it('retains RegExp options gh-1355', function(done){
-      var a = new RegExp('hello', 'igm');
-      assert.ok(a.global);
-      assert.ok(a.ignoreCase);
-      assert.ok(a.multiline);
-
-      var b = utils.clone(a);
-      assert.equal(b.source, a.source);
-      assert.equal(a.global, b.global);
-      assert.equal(a.ignoreCase, b.ignoreCase);
-      assert.equal(a.multiline, b.multiline);
-      done();
-    })
-  })
-
   describe('merge', function(){
     it('merges two objects together without overriding properties & methods', function(done){
       function To() {
@@ -332,5 +316,32 @@ describe('utils', function(){
       done();
     })
   })
+
+  describe('pluralize (gh-1703)', function(){
+    it('should not pluralize _temp_', function(done){
+      var db = start();
+
+      var ASchema = new Schema ({
+          value: { type: Schema.Types.Mixed }
+      });
+
+      var collectionName = '_temp_';
+      var A = db.model(collectionName, ASchema);
+      assert.equal(A.collection.name, collectionName);
+      done();
+    });
+    it('should pluralize _temp', function(done){
+      var db = start();
+
+      var ASchema = new Schema ({
+          value: { type: Schema.Types.Mixed }
+      });
+
+      var collectionName = '_temp';
+      var A = db.model(collectionName, ASchema);
+      assert.equal(A.collection.name, collectionName + 's');
+      done();
+    })
+  });
 })
 

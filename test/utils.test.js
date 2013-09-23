@@ -347,7 +347,7 @@ describe('utils', function(){
 
       var ASchema = new Schema ({
           value: { type: Schema.Types.Mixed }
-      }, {pluralize:false});
+      }, {pluralization:false});
 
       var collectionName = 'singular';
       var A = db.model(collectionName, ASchema);
@@ -359,7 +359,7 @@ describe('utils', function(){
 
       var ASchema = new Schema ({
           value: { type: Schema.Types.Mixed }
-      }, {pluralize:true});
+      }, {pluralization:true});
 
       var collectionName = 'singular';
       var A = db.model(collectionName, ASchema);

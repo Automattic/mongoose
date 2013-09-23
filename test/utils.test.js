@@ -341,7 +341,31 @@ describe('utils', function(){
       var A = db.model(collectionName, ASchema);
       assert.equal(A.collection.name, collectionName + 's');
       done();
-    })
+    });
+    it('should not pluralize when option set', function(done){
+      var db = start();
+
+      var ASchema = new Schema ({
+          value: { type: Schema.Types.Mixed }
+      }, {pluralize:false});
+
+      var collectionName = 'singular';
+      var A = db.model(collectionName, ASchema);
+      assert.equal(A.collection.name, collectionName);
+      done();
+    });
+    it('should pluralize when option set', function(done){
+      var db = start();
+
+      var ASchema = new Schema ({
+          value: { type: Schema.Types.Mixed }
+      }, {pluralize:true});
+
+      var collectionName = 'singular';
+      var A = db.model(collectionName, ASchema);
+      assert.equal(A.collection.name, collectionName + 's');
+      done();
+    });
   });
-})
+});
 

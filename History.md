@@ -101,6 +101,14 @@
   * website; server.js -> static.js #1546 [nikmartin](https://github.com/nikmartin)
   * examples; improved and expanded [ebensing](https://github.com/ebensing)
 
+3.6.20 (stable) / 2013-09-23
+===================
+
+ * fixed; repopulating modified populated paths #1697
+ * fixed; doc.equals w/ _id false #1687
+ * fixed; strict mode warning #1686
+ * docs; near/nearSphere
+
 3.6.19 (stable) / 2013-09-04
 ==================
 

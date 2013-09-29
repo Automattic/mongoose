@@ -341,7 +341,66 @@ describe('utils', function(){
       var A = db.model(collectionName, ASchema);
       assert.equal(A.collection.name, collectionName + 's');
       done();
-    })
+    });
+    it('should pluralize by default', function(done){
+      var db = start();
+
+      // don't set anything
+      //db.base.set('pluralization', false);
+
+      var ASchema = new Schema ({value: String});
+
+      var collectionName = 'singular';
+      var A = db.model(collectionName, ASchema);
+      assert.equal(A.collection.name, collectionName + 's');
+      done();
+    });
+    it('should not pluralize when global option set to true', function(done){
+      var db = start();
+
+      // set to false
+      db.base.set('pluralization', false);
+
+      var ASchema = new Schema ({value: String});
+
+      var collectionName = 'singular';
+      var A = db.model(collectionName, ASchema);
+      assert.equal(A.collection.name, collectionName);
+      done();
+    });
+    it('should not pluralize when global option set to false', function(done){
+      var db = start();
+      db.base.set('pluralization', false);
+
+      var ASchema = new Schema ({value: String});
+
+      var collectionName = 'singular';
+      var A = db.model(collectionName, ASchema);
+      assert.equal(A.collection.name, collectionName);
+      done();
+    });
+    it('should pluralize when local option set to true', function(done){
+      var db = start();
+      db.base.set('pluralization', false);
+
+      var ASchema = new Schema ({value: String}, {pluralization: true});
+
+      var collectionName = 'singular';
+      var A = db.model(collectionName, ASchema);
+      assert.equal(A.collection.name, collectionName + 's');
+      done();
+    });
+    it('should not pluralize when local option set to false', function(done){
+      var db = start();
+      db.base.set('pluralization', true);
+
+      var ASchema = new Schema ({value: String}, {pluralization: false});
+
+      var collectionName = 'singular';
+      var A = db.model(collectionName, ASchema);
+      assert.equal(A.collection.name, collectionName);
+      done();
+    });
   });
-})
+});
 

@@ -1,4 +1,29 @@
 
+3.7.4 (unstable) / 2013-10-01
+=============================
+
+ * updated; mquery to 0.3.2
+ * removed; mongoose.Error.DocumentError (never used)
+ * added; custom error msgs for built-in validators #747
+ * added; discriminator support #1647 #1003 [j](https://github.com/j)
+ * added; support disabled collection name pluralization #1350 #1707 [refack](https://github.com/refack)
+ * fixed; do not pluralize model names not ending with letters #1703 [refack](https://github.com/refack)
+ * fixed; repopulating modified populated paths #1697
+ * fixed; doc.equals() when _id option is set to false #1687
+ * fixed; strict mode warnings #1686
+ * fixed; $near GeoJSON casting #1683
+ * fixed; nearSphere GeoJSON query builder
+ * fixed; population field selection w/ strings #1669
+ * docs; custom validator messages
+ * docs; 10gen -> MongoDB
+ * docs; add Date method caveats #1598
+ * docs; more validation details
+ * website; add "show code" for properties
+ * website; move "show code" links down
+ * tests; refactor 1703
+ * tests; add test generator
+ * tests; validate formatMessage() throws
+
 3.7.3 (unstable) / 2013-08-22
 =============================
 

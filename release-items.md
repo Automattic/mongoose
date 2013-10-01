@@ -27,6 +27,6 @@ For unstable:
 
 0. Change to the master branch
 1. execute `make docs_unstable` (when this process completes you'll be on the gh-pages branch)
-2. `git add docs/unstable/docs/*.html index.html`
+2. `git add docs/unstable/docs/*.html docs/unstable/index.html`
 3. `git commit -m 'website; regen <x.x.x>'`
 4. `git push origin gh-pages`

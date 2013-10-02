@@ -468,6 +468,19 @@ describe('schema', function(){
       done();
     });
 
+    describe('array', function(){
+      it('object setters will be applied for each object in array', function(done) {
+        var Tobi = new Schema({
+          names: [{type: String, lowercase: true, trim: true}]
+        });
+        assert.equal(typeof Tobi.path('names').applySetters(['   whaT', 'WoOt  '])[0], 'string');
+        assert.equal(typeof Tobi.path('names').applySetters(['   whaT', 'WoOt  '])[1], 'string');
+        assert.equal(Tobi.path('names').applySetters(['   whaT', 'WoOt  '])[0], 'what');
+        assert.equal(Tobi.path('names').applySetters(['   whaT', 'WoOt  '])[1], 'woot');
+        done();
+      });
+    });
+
     describe('string', function(){
       it('lowercase', function(done){
         var Tobi = new Schema({

@@ -297,6 +297,35 @@ describe('Model', function(){
       });
     })
 
+
+    it('when saved using the promise not the callback', function(done){
+      var db = start()
+        , BlogPost = db.model('BlogPost', collection);
+
+      var post = new BlogPost();
+      var p = post.save();
+      p.onResolve(function(err, post){
+        assert.ifError(err);
+        assert.ok(post.get('_id') instanceof DocumentObjectId);
+
+        assert.equal(undefined, post.get('title'));
+        assert.equal(undefined, post.get('slug'));
+        assert.equal(undefined, post.get('date'));
+        assert.equal(undefined, post.get('published'));
+
+        assert.equal(typeof post.get('meta'), 'object');
+        assert.deepEqual(post.get('meta'),{});
+        assert.equal(undefined, post.get('meta.date'));
+        assert.equal(undefined, post.get('meta.visitors'));
+
+        assert.ok(post.get('owners') instanceof MongooseArray);
+        assert.ok(post.get('comments') instanceof DocumentArray);
+        db.close();
+        done();
+      });
+    })
+
+
     describe('init', function(){
       it('works', function(done){
         var db = start()

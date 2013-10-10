@@ -1141,10 +1141,8 @@ describe('Model', function(){
         assert.ok(post.errors['items.0.subs.0.required'] instanceof ValidatorError);
         assert.equal(post.errors['items.0.subs.0.required'].message,'Path `required` is required.');
 
-        assert.ok(!err.errors['items.0.required']);
-        assert.ok(!err.errors['items.0.required']);
-        assert.ok(!post.errors['items.0.required']);
-        assert.ok(!post.errors['items.0.required']);
+        assert.ok(err.errors['items.0.required']);
+        assert.ok(post.errors['items.0.required']);
 
         post.items[0].subs[0].set('required', true);
         assert.equal(undefined, post.$__.validationError);

@@ -73,7 +73,7 @@ describe('types.document', function(){
     a.set('test', '');
     a.set('work', 'nope');
 
-    a.save(function(err){
+    a.save().onReject(function(err){
       assert.ok(a.__parent.$__.validationError instanceof ValidationError);
       assert.equal(a.__parent.errors['jsconf.ar.0.work'].name, 'ValidatorError');
       assert.equal(a.__parent.$__.validationError.toString(), 'ValidationError: Path `test` is required., Validator failed for path `work` with value `nope`');

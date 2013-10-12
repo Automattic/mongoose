@@ -721,6 +721,8 @@ describe('Model', function(){
         done();
       });
     });
+
+
     it('subdocument error', function(done){
       var db = start()
         , BlogPost = db.model('BlogPost', collection)
@@ -742,6 +744,8 @@ describe('Model', function(){
         done();
       });
     });
+
+
     it('subdocument error when adding a subdoc', function(done){
       var db = start()
         , BlogPost = db.model('BlogPost', collection)
@@ -766,6 +770,7 @@ describe('Model', function(){
         done();
       });
     });
+
 
     it('updates', function(done){
       var db = start()
@@ -2468,6 +2473,30 @@ describe('Model', function(){
     });
   })
 
+
+  it('activePaths should be updated for nested modifieds as promise', function(done){
+    var db = start()
+      , schema = new Schema({
+          nested: {
+            nums: [Number]
+          }
+        });
+
+    var Temp = db.model('NestedPushes', schema, collection);
+
+    var p1 = Temp.create({nested: {nums: [1, 2, 3, 4, 5]}});
+    p1.onResolve(function (err, t) {
+      assert.ifError(err);
+      t.nested.nums.pull(1);
+      t.nested.nums.pull(2);
+      assert.equal(t.$__.activePaths.paths['nested.nums'],'modify');
+      db.close();
+      done();
+    });
+  })
+
+
+
   it('$pull should affect what you see in an array before a save', function(done){
     var db = start()
       , schema = new Schema({
@@ -3324,7 +3353,7 @@ describe('Model', function(){
         });
       });
 
-      it('error on any sub level', function(done){
+      it.skip('error on any sub level', function(done){
         var db = start();
 
         var grandSchema = new Schema({ name : String });
@@ -4151,6 +4180,7 @@ describe('Model', function(){
       })
     })
 
+
     it('rejects new documents that have no _id set (1595)', function(done){
       var db = start();
       var s = new Schema({ _id: { type: String }});
@@ -4164,6 +4194,7 @@ describe('Model', function(){
       })
     })
   });
+
 
   describe('_delta()', function(){
     it('should overwrite arrays when directly set (gh-1126)', function(done){

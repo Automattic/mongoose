@@ -1761,6 +1761,68 @@ describe('Model', function(){
       })
     })
 
+    it('works as a promise', function(done){
+      B.create({}, function (err, post) {
+        assert.ifError(err);
+        B.findById(post, function (err, found) {
+          assert.ifError(err);
+
+          found.remove().onResolve(function (err, doc) {
+            assert.ifError(err);
+            assert.ok(doc);
+            assert.ok(doc.equals(found));
+            done();
+          })
+        })
+      })
+    })
+
+    it('works as a promise with a hook', function(done){
+      var called = 0;
+      var RHS = new Schema({
+        name: String
+      });
+      RHS.pre('remove', function (next) {
+        called++;
+        return next();
+      });
+
+      var RH = db.model('RH', RHS, 'RH_'+random())
+
+      RH.create({name: 'to be removed'}, function (err, post) {
+        assert.ifError(err);
+        assert.ok(post);
+        RH.findById(post, function (err, found) {
+          assert.ifError(err);
+          assert.ok(found);
+
+          found.remove().onResolve(function (err, doc) {
+            assert.ifError(err);
+            assert.equal(called, 1);
+            assert.ok(doc);
+            assert.ok(doc.equals(found));
+            done();
+          })
+        })
+      })
+    })
+
+    it('passes the removed document (gh-1419)', function(done){
+      B.create({}, function (err, post) {
+        assert.ifError(err);
+        B.findById(post, function (err, found) {
+          assert.ifError(err);
+
+          found.remove(function (err, doc) {
+            assert.ifError(err);
+            assert.ok(doc);
+            assert.ok(doc.equals(found));
+            done();
+          })
+        })
+      })
+    })
+
     describe('when called multiple times', function(){
       it('always executes the passed callback gh-1210', function(done){
         var db = start()

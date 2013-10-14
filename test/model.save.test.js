@@ -36,14 +36,15 @@ describe('model', function () {
       var schema = new mongoose.Schema({"name": String}, {"capped": true, "collection": "bugDemo", "capped": {"size": 2048, "max": 3}, "strict": false});
       var Bug = db.model('Bug', schema);
 
+      var preException = 0, postException = 0, errSentinal = new Error("error from user callback");
+
       Bug.db.on('error', function(err) {
         assert.equal(1, preException, "Code run once before throwing");
         assert.equal(0, postException, "Code never run after throwing");
         assert.ok(err);
+        assert.equal(err, err);
         done();
       });
-
-      var preException = 0, postException = 0;
       var b = Bug.create([{name: "MongoDb1"}, {name: "MongoDb2"}, {name: "MongoDb3"}], function (e, r) {
         if (e) return console.error(e);
 
@@ -51,7 +52,7 @@ describe('model', function () {
 
         return stream.on('data', function (doc) {
           preException++;
-          console.log(dies); // It dies here
+          throw errSentinal;
           postException++;
         });
 

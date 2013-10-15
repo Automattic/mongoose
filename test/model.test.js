@@ -1414,8 +1414,8 @@ describe('Model', function(){
 
           post.set('baz', 'good');
           post.save(function(err){
+            assert.ifError(err);
             db.close();
-            assert.strictEqual(err, null);
             done();
           });
         });
@@ -1456,8 +1456,8 @@ describe('Model', function(){
 
           post.set('prop', 'good');
           post.save(function(err){
+            assert.ifError(err);
             db.close();
-            assert.strictEqual(err, null);
             done();
           });
         });
@@ -1527,8 +1527,8 @@ describe('Model', function(){
           });
 
           post.save(function(err){
+            assert.ifError(err);
             db.close();
-            assert.strictEqual(err, null);
             done();
           });
         });
@@ -3380,6 +3380,37 @@ describe('Model', function(){
         });
       });
 
+
+      it('with an async waterfall', function(done){
+        var db = start();
+        var schema = new Schema({ name: String });
+        var called = 0;
+
+        schema.pre('save', true, function (next, done) {
+          called++;
+          process.nextTick(function () {
+            next();
+            done();
+          });
+        });
+
+        schema.pre('save', function (next) {
+          called++;
+          return next();
+        });
+
+        var S = db.model('S', schema, collection);
+        var s = new S({name: 'zupa'});
+
+        s.save().onResolve(function (err) {
+          db.close();
+          assert.ifError(err);
+          assert.equal(2, called);
+          done();
+        });
+      });
+
+
       it('called on all sub levels', function(done){
         var db = start();
 
@@ -3415,7 +3446,8 @@ describe('Model', function(){
         });
       });
 
-      it.skip('error on any sub level', function(done){
+
+      it('error on any sub level', function(done){
         var db = start();
 
         var grandSchema = new Schema({ name : String });

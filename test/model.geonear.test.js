@@ -11,7 +11,7 @@ var start = require('./common')
  */
 
 var schema = new Schema({
-  pos : { type: [Number], index: '2dsphere' },
+  coordinates : { type: [Number], index: '2dsphere' },
   type: String
 });
 
@@ -24,77 +24,68 @@ describe('model', function(){
   before(function(done){
     start.mongodVersion(function (err, version) {
       if (err) throw err;
-
       mongo24_or_greater = 2 < version[0] || (2 == version[0] && 4 <= version[1]);
       if (!mongo24_or_greater) console.log('not testing mongodb 2.4 features');
       done();
     })
   })
-
   describe('geoNear', function () {
-    if (!mongo24_or_greater) return;
 
     it('works with legacy coordinate points', function (done) {
+      if (!mongo24_or_greater) return done();
       var db = start();
       var Geo = getModel(db);
       assert.ok(Geo.geoNear instanceof Function);
 
       Geo.on('index', function(err){
-        if (err) return done(err);
+        assert.ifError(err);
 
         var geos = [];
-        geos[0] = new Geo({ pos : [10,10], type : "place"});
-        geos[1] = new Geo({ pos : [15,5], type : "place"});
-        geos[2] = new Geo({ pos : [20,15], type : "house"});
-        geos[3] = new Geo({ pos : [1,-1], type : "house"});
+        geos[0] = new Geo({ coordinates : [10,10], type : "Point"});
+        geos[1] = new Geo({ coordinates : [15,5], type : "Point"});
+        geos[2] = new Geo({ coordinates : [20,15], type : "Point"});
+        geos[3] = new Geo({ coordinates : [1,-1], type : "Point"});
         var count = geos.length;
 
         for (var i=0; i < geos.length; i++) {
           geos[i].save(function (err) {
-            if (done.err) return;
-            if (err) return done(done.err = err);
+            assert.ifError(err);
             --count || next();
           });
         }
 
         function next() {
           Geo.geoNear([9,9], { spherical : true, maxDistance : .1 }, function (err, results, stats) {
-            if (err) {
-              db.close();
-              return done(err);
-            }
+            assert.ifError(err);
 
-            assert.equal(1, results.results.length);
-            assert.equal(1, results.ok);
+            assert.equal(1, results.length);
 
-            assert.equal(results.results[0].obj.type, 'place');
-            assert.equal(results.results[0].obj.pos.length, 2);
-            assert.equal(results.results[0].obj.pos[0], 10);
-            assert.equal(results.results[0].obj.pos[1], 10);
-            assert.equal(results.results[0].obj.id, geos[0].id);
-            assert.ok(results.results[0].obj instanceof Geo);
-            Geo.remove(function () {
-              db.close();
-              done();
-            });
+            assert.equal(results[0].obj.type, 'Point');
+            assert.equal(results[0].obj.coordinates.length, 2);
+            assert.equal(results[0].obj.coordinates[0], 10);
+            assert.equal(results[0].obj.coordinates[1], 10);
+            assert.equal(results[0].obj.id, geos[0].id);
+            assert.ok(results[0].obj instanceof Geo);
+            done();
           });
         }
       });
     });
 
     it('works with GeoJSON coordinate points', function (done) {
+      if (!mongo24_or_greater) return done();
       var db = start();
       var Geo = getModel(db);
       assert.ok(Geo.geoNear instanceof Function);
 
       Geo.on('index', function(err){
-        if (err) return done(err);
+        assert.ifError(err);
 
         var geos = [];
-        geos[0] = new Geo({ pos : [10,10], type : "place"});
-        geos[1] = new Geo({ pos : [15,5], type : "place"});
-        geos[2] = new Geo({ pos : [20,15], type : "house"});
-        geos[3] = new Geo({ pos : [1,-1], type : "house"});
+        geos[0] = new Geo({ coordinates : [10,10], type : "Point"});
+        geos[1] = new Geo({ coordinates : [15,5], type : "Point"});
+        geos[2] = new Geo({ coordinates : [20,15], type : "Point"});
+        geos[3] = new Geo({ coordinates : [1,-1], type : "Point"});
         var count = geos.length;
 
         for (var i=0; i < geos.length; i++) {
@@ -106,42 +97,36 @@ describe('model', function(){
         function next() {
           var pnt = { type : "Point", coordinates : [9,9] };
           Geo.geoNear(pnt, { spherical : true, maxDistance : .1 }, function (err, results, stats) {
-            if (err) {
-              db.close();
-              return done(err);
-            }
+            assert.ifError(err);
 
-            assert.equal(1, results.results.length);
-            assert.equal(1, results.ok);
+            assert.equal(1, results.length);
 
-            assert.equal(results.results[0].obj.type, 'place');
-            assert.equal(results.results[0].obj.pos.length, 2);
-            assert.equal(results.results[0].obj.pos[0], 10);
-            assert.equal(results.results[0].obj.pos[1], 10);
-            assert.equal(results.results[0].obj.id, geos[0].id);
-            assert.ok(results.results[0].obj instanceof Geo);
-            Geo.remove(function () {
-              db.close();
-              done();
-            });
+            assert.equal(results[0].obj.type, 'Point');
+            assert.equal(results[0].obj.coordinates.length, 2);
+            assert.equal(results[0].obj.coordinates[0], 10);
+            assert.equal(results[0].obj.coordinates[1], 10);
+            assert.equal(results[0].obj.id, geos[0].id);
+            assert.ok(results[0].obj instanceof Geo);
+            done();
           });
         }
       });
     });
 
     it('works with lean', function (done) {
+      if (!mongo24_or_greater) return done();
       var db = start();
       var Geo = getModel(db);
       assert.ok(Geo.geoNear instanceof Function);
 
       Geo.on('index', function(err){
-        if (err) return done(err);
+        assert.ifError(err);
 
         var geos = [];
-        geos[0] = new Geo({ pos : [10,10], type : "place"});
-        geos[1] = new Geo({ pos : [15,5], type : "place"});
-        geos[2] = new Geo({ pos : [20,15], type : "house"});
-        geos[3] = new Geo({ pos : [1,-1], type : "house"});
+        geos[0] = new Geo({ coordinates : [10,10], type : "Point"});
+        geos[1] = new Geo({ coordinates : [15,5], type : "Point"});
+        geos[2] = new Geo({ coordinates : [20,15], type : "Point"});
+        geos[3] = new Geo({ coordinates : [1,-1], type : "Point"});
         var count = geos.length;
 
         for (var i=0; i < geos.length; i++) {
@@ -153,38 +138,32 @@ describe('model', function(){
         function next() {
           var pnt = { type : "Point", coordinates : [9,9] };
           Geo.geoNear(pnt, { spherical : true, maxDistance : .1, lean : true }, function (err, results, stats) {
-            if (err) {
-              db.close();
-              return done(err);
-            }
+            assert.ifError(err);
 
-            assert.equal(1, results.results.length);
-            assert.equal(1, results.ok);
+            assert.equal(1, results.length);
 
-            assert.equal(results.results[0].obj.type, 'place');
-            assert.equal(results.results[0].obj.pos.length, 2);
-            assert.equal(results.results[0].obj.pos[0], 10);
-            assert.equal(results.results[0].obj.pos[1], 10);
-            assert.equal(results.results[0].obj._id, geos[0].id);
-            assert.ok(!(results.results[0].obj instanceof Geo));
-            Geo.remove(function () {
-              db.close();
-              done();
-            });
+            assert.equal(results[0].obj.type, 'Point');
+            assert.equal(results[0].obj.coordinates.length, 2);
+            assert.equal(results[0].obj.coordinates[0], 10);
+            assert.equal(results[0].obj.coordinates[1], 10);
+            assert.equal(results[0].obj._id, geos[0].id);
+            assert.ok(!(results[0].obj instanceof Geo));
+            done();
           });
         }
       });
     });
 
     it('throws the correct error messages', function (done) {
+      if (!mongo24_or_greater) return done();
 
       var db = start();
       var Geo = getModel(db);
 
       Geo.on('index', function(err){
-        if (err) return done(err);
+        assert.ifError(err);
 
-        var g = new Geo({ pos : [10,10], type : "place"});
+        var g = new Geo({ coordinates : [10,10], type : "place"});
         g.save(function() {
           var threw = false;
           Geo.geoNear("1,2", {}, function (e) {
@@ -203,26 +182,6 @@ describe('model', function(){
                   assert.ok(e);
                   assert.equal(e.message, "Must pass either a legacy coordinate array or GeoJSON Point to geoNear");
 
-                  try {
-                    Geo.geoNear({ type : "test" }, { near : [1,2] }, []);
-                  } catch(e) {
-                    threw = true;
-                    assert.ok(e);
-                    assert.equal(e.message, "Must pass a callback to geoNear");
-                  }
-
-                  assert.ok(threw);
-                  threw = false;
-
-                  try {
-                    Geo.geoNear({ type : "test" }, { near : [1,2] });
-                  } catch(e) {
-                    threw = true;
-                    assert.ok(e);
-                    assert.equal(e.message, "Must pass a callback to geoNear");
-                  }
-
-                  assert.ok(threw);
                   done();
                 });
               });
@@ -231,5 +190,75 @@ describe('model', function(){
         });
       });
     });
+    it('returns a promise (gh-1614)', function(done){
+      if (!mongo24_or_greater) return done();
+      var db = start();
+      var Geo = getModel(db);
+
+      var pnt = { type : "Point", coordinates : [9,9] };
+      var prom = Geo.geoNear(pnt, { spherical : true, maxDistance : .1 }, function (err, results, stats) {
+      });
+      assert.ok(prom instanceof mongoose.Promise);
+      db.close();
+      done();
+    })
+
+    it('allows not passing a callback (gh-1614)', function (done) {
+      if (!mongo24_or_greater) return done();
+      var db = start();
+      var Geo = getModel(db);
+      Geo.on('index', function(err) {
+        assert.ifError(err);
+        var g = new Geo({ coordinates : [10,10], type : "Point"});
+        g.save(function (err) {
+          assert.ifError(err);
+
+          var pnt = { type : "Point", coordinates : [9,9] };
+          var promise;
+          assert.doesNotThrow(function() {
+            promise = Geo.geoNear(pnt, { spherical : true, maxDistance : 100000 });
+          });
+
+          function validate(ret, stat) {
+            assert.equal(1, ret.length);
+            assert.equal(ret[0].obj.coordinates[0], 10);
+            assert.equal(ret[0].obj.coordinates[1], 10);
+            assert.ok(stat);
+          }
+
+          function finish() {
+            db.close(done);
+          }
+
+          promise.then(validate, assert.ifError).then(finish).end();
+
+        });
+      });
+    });
+    it('promise fulfill even when no results returned', function(done){
+      if (!mongo24_or_greater) return done();
+      var db = start();
+      var Geo = getModel(db);
+      Geo.on('index', function(err) {
+        assert.ifError(err);
+        var g = new Geo({ coordinates : [10,10], type : "Point"});
+        g.save(function (err) {
+          assert.ifError(err);
+
+          var pnt = { type : "Point", coordinates : [1000,1000] };
+          var promise;
+          assert.doesNotThrow(function() {
+            promise = Geo.geoNear(pnt, { spherical : true, maxDistance : 1 });
+          });
+
+          function finish() {
+            db.close(done);
+          }
+
+          promise.then(finish).end();
+
+        });
+      });
+    })
   });
 });

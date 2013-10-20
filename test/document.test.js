@@ -541,6 +541,37 @@ describe('document', function(){
     assert.equal(obj._id, oidString);
     done();
   });
+  it('jsonifying an object\'s populated items works (gh-1376)', function(done){
+    var db = start();
+    var userSchema, User, groupSchema, Group;
+
+    userSchema = Schema({name: String});
+    // includes virtual path when 'toJSON'
+    userSchema.set('toJSON', {getters: true});
+    userSchema.virtual('hello').get(function() {
+      return 'Hello, ' + this.name;
+    });
+    User = db.model('User', userSchema);
+
+    groupSchema = Schema({
+      name: String,
+      _users: [{type: Schema.ObjectId, ref: 'User'}]
+    });
+
+    Group = db.model('Group', groupSchema);
+
+    User.create({name: 'Alice'}, {name: 'Bob'}, function(err, alice, bob) {
+      assert.ifError(err);
+
+      new Group({name: 'mongoose', _users: [alice, bob]}).save(function(err, group) {
+        Group.findById(group).populate('_users').exec(function(err, group) {
+          assert.ifError(err);
+          assert.ok(group.toJSON()._users[0].hello);
+          done();
+        });
+      });
+    });
+  })
 
   describe('#update', function(){
     it('returns a Query', function(done){
@@ -699,7 +730,7 @@ describe('document', function(){
             t.req = undefined;
             t.save(function (err) {
               err = String(err);
-              var invalid  = /Validator "required" failed for path req/.test(err);
+              var invalid  = /Path `req` is required./.test(err);
               assert.ok(invalid);
               t.req = 'it works again'
               t.save(function (err) {
@@ -773,10 +804,10 @@ describe('document', function(){
         var M = db.model('validateSchema-array1', schema, collection);
         var m = new M({ name: 'gh1109-1' });
         m.save(function (err) {
-          assert.ok(/"required" failed for path arr/.test(err));
+          assert.ok(/Path `arr` is required/.test(err));
           m.arr = [];
           m.save(function (err) {
-            assert.ok(/"required" failed for path arr/.test(err));
+            assert.ok(/Path `arr` is required/.test(err));
             m.arr.push('works');
             m.save(function (err) {
               assert.ifError(err);
@@ -804,7 +835,7 @@ describe('document', function(){
         var m = new M({ name: 'gh1109-2', arr: [1] });
         assert.equal(false, called);
         m.save(function (err) {
-          assert.ok(/"BAM" failed for path arr/.test(err));
+          assert.equal('ValidationError: BAM', String(err));
           assert.equal(true, called);
           m.arr.push(2);
           called = false;
@@ -833,10 +864,10 @@ describe('document', function(){
         var M = db.model('validateSchema-array3', schema, collection);
         var m = new M({ name: 'gh1109-3' });
         m.save(function (err) {
-          assert.ok(/"required" failed for path arr/.test(err));
+          assert.equal(err.errors.arr.message, 'Path `arr` is required.');
           m.arr.push({nice: true});
           m.save(function (err) {
-            assert.ok(/"BAM" failed for path arr/.test(err));
+            assert.equal(String(err), 'ValidationError: BAM');
             m.arr.push(95);
             m.save(function (err) {
               assert.ifError(err);
@@ -864,14 +895,14 @@ describe('document', function(){
     Post = db.model('InvalidateSchema');
     post = new Post();
     post.set({baz: 'val'});
-    post.invalidate('baz', 'reason');
+    post.invalidate('baz', 'validation failed for path {PATH}');
 
     post.save(function(err){
       assert.ok(err instanceof MongooseError);
       assert.ok(err instanceof ValidationError);
       assert.ok(err.errors.baz instanceof ValidatorError);
-      assert.equal(err.errors.baz.message,'Validator "reason" failed for path baz');
-      assert.equal(err.errors.baz.type,'reason');
+      assert.equal(err.errors.baz.message,'validation failed for path baz');
+      assert.equal(err.errors.baz.type,'user defined');
       assert.equal(err.errors.baz.path,'baz');
 
       post.save(function(err){
@@ -889,6 +920,7 @@ describe('document', function(){
       var N = db.model('equals-N', new Schema({ _id: Number }));
       var O = db.model('equals-O', new Schema({ _id: Schema.ObjectId }));
       var B = db.model('equals-B', new Schema({ _id: Buffer }));
+      var M = db.model('equals-I', new Schema({ name: String }, { _id: false }));
 
       it('with string _ids', function(done){
         var s1 = new S({ _id: 'one' });
@@ -918,6 +950,14 @@ describe('document', function(){
         var n1 = new B({ _id: 0 });
         var n2 = new B({ _id: 0 });
         assert.ok(n1.equals(n2));
+        done();
+      })
+      it('with _id disabled (gh-1687)', function(done){
+        var m1 = new M;
+        var m2 = new M;
+        assert.doesNotThrow(function () {
+          m1.equals(m2)
+        });
         done();
       })
 

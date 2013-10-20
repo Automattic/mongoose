@@ -274,6 +274,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench-pop', function (err) {
     // just a bit simpler...
     mongoose.connection.db.dropDatabase(function () {
       mongoose.disconnect();
+      process.exit();
     });
   }
 
@@ -336,12 +337,12 @@ mongoose.connect('mongodb://localhost/mongoose-bench-pop', function (err) {
   })
 
   .on('cycle', function (evt) {
-    if (process.env.MONGOOSE_DEV) {
+    if (process.env.MONGOOSE_DEV || process.env.PULL_REQUEST) {
       console.log(String(evt.target));
     }
   }).on('complete', function () {
     closeDB();
-    if (!process.env.MONGOOSE_DEV) {
+    if (!process.env.MONGOOSE_DEV && !process.env.PULL_REQUEST) {
       var outObj = {};
       this.forEach(function (item) {
         var out = {};

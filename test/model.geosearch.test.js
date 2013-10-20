@@ -30,7 +30,7 @@ describe('model', function(){
       assert.ok(Geo.geoSearch instanceof Function);
 
       Geo.on('index', function(err){
-        if (err) return done(err);
+        assert.ifError(err);
 
         var geos = [];
         geos[0] = new Geo({ pos : [10,10], type : "place"});
@@ -40,7 +40,8 @@ describe('model', function(){
         var count = geos.length;
 
         for (var i=0; i < geos.length; i++) {
-          geos[i].save(function () {
+          geos[i].save(function (err) {
+            assert.ifError(err);
             --count || next();
           });
         }
@@ -48,19 +49,15 @@ describe('model', function(){
         function next() {
           Geo.geoSearch({ type : "place" }, { near : [9,9], maxDistance : 5 }, function (err, results, stats) {
             assert.ifError(err);
-            assert.equal(1, results.results.length);
-            assert.equal(1, results.ok);
+            assert.equal(1, results.length);
 
-            assert.equal(results.results[0].type, 'place');
-            assert.equal(results.results[0].pos.length, 2);
-            assert.equal(results.results[0].pos[0], 10);
-            assert.equal(results.results[0].pos[1], 10);
-            assert.equal(results.results[0].id, geos[0].id);
-            assert.ok(results.results[0] instanceof Geo);
-            Geo.remove(function () {
-              db.close();
-              done();
-            });
+            assert.equal(results[0].type, 'place');
+            assert.equal(results[0].pos.length, 2);
+            assert.equal(results[0].pos[0], 10);
+            assert.equal(results[0].pos[1], 10);
+            assert.equal(results[0].id, geos[0].id);
+            assert.ok(results[0] instanceof Geo);
+            done();
           });
         }
       });
@@ -72,7 +69,7 @@ describe('model', function(){
       assert.ok(Geo.geoSearch instanceof Function);
 
       Geo.on('index', function(err){
-        if (err) return done(err);
+        assert.ifError(err);
 
         var geos = [];
         geos[0] = new Geo({ pos : [10,10], type : "place"});
@@ -82,7 +79,8 @@ describe('model', function(){
         var count = geos.length;
 
         for (var i=0; i < geos.length; i++) {
-          geos[i].save(function () {
+          geos[i].save(function (err) {
+            assert.ifError(err);
             --count || next();
           });
         }
@@ -90,20 +88,16 @@ describe('model', function(){
         function next() {
           Geo.geoSearch({ type : "place" }, { near : [9,9], maxDistance : 5, lean : true }, function (err, results, stats) {
             assert.ifError(err);
-            assert.equal(1, results.results.length);
-            assert.equal(1, results.ok);
+            assert.equal(1, results.length);
 
-            assert.equal(results.results[0].type, 'place');
-            assert.equal(results.results[0].pos.length, 2);
-            assert.equal(results.results[0].pos[0], 10);
-            assert.equal(results.results[0].pos[1], 10);
-            assert.equal(results.results[0]._id, geos[0].id);
-            assert.strictEqual(results.results[0].id, undefined);
-            assert.ok(!(results.results[0] instanceof Geo));
-            Geo.remove(function () {
-              db.close();
-              done();
-            });
+            assert.equal(results[0].type, 'place');
+            assert.equal(results[0].pos.length, 2);
+            assert.equal(results[0].pos[0], 10);
+            assert.equal(results[0].pos[1], 10);
+            assert.equal(results[0]._id, geos[0].id);
+            assert.strictEqual(results[0].id, undefined);
+            assert.ok(!(results[0] instanceof Geo));
+            done();
           });
         }
       });
@@ -115,7 +109,7 @@ describe('model', function(){
       assert.ok(Geo.geoSearch instanceof Function);
 
       Geo.on('index', function(err){
-        if (err) return done(err);
+        assert.ifError(err);
 
         var g = new Geo({ pos : [10,10], type : "place"});
         g.save(function() {
@@ -132,26 +126,6 @@ describe('model', function(){
                 assert.ok(e);
                 assert.equal(e.message, "near option must be an array [x, y]");
 
-                try {
-                  Geo.geoSearch({ type : "test" }, { near : [1,2] }, []);
-                } catch(e) {
-                  threw = true;
-                  assert.ok(e);
-                  assert.equal(e.message, "Must pass a callback to geoSearch");
-                }
-
-                assert.ok(threw);
-                threw = false;
-
-                try {
-                  Geo.geoSearch({ type : "test" }, { near : [1,2] });
-                } catch(e) {
-                  threw = true;
-                  assert.ok(e);
-                  assert.equal(e.message, "Must pass a callback to geoSearch");
-                }
-
-                assert.ok(threw);
                 Geo.geoSearch({ type : "test" }, { near : [1,2] }, function (err, res) {
                   assert.ok(err);
                   assert.ok(/maxDistance needs a number/.test(err));
@@ -160,6 +134,45 @@ describe('model', function(){
               });
             });
           });
+        });
+      });
+    });
+    it('returns a promise (gh-1614)', function(done){
+      var db = start();
+      var Geo = getModel(db);
+
+      var prom = Geo.geoSearch({ type : "place" }, { near : [9,9], maxDistance : 5 }, function (err, results, stats) {
+      });
+      assert.ok(prom instanceof mongoose.Promise);
+      db.close();
+      done();
+    })
+
+    it('allows not passing a callback (gh-1614)', function (done) {
+      var db = start();
+      var Geo = getModel(db);
+      Geo.on('index', function(err){
+        assert.ifError(err);
+        var g = new Geo({ pos : [10,10], type : "place"});
+        g.save(function (err) {
+          assert.ifError(err);
+
+          var promise;
+          assert.doesNotThrow(function() {
+            promise = Geo.geoSearch({ type : "place" }, { near : [9,9], maxDistance : 5 });
+          });
+          function validate(ret, stat) {
+            assert.equal(1, ret.length);
+            assert.equal(ret[0].pos[0], 10);
+            assert.equal(ret[0].pos[1], 10);
+            assert.ok(stat);
+          }
+
+          function finish() {
+            db.close(done);
+          }
+          promise.then(validate, assert.ifError).then(finish).end();
+
         });
       });
     });

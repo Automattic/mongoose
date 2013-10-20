@@ -245,9 +245,11 @@ describe('model: querying:', function(){
       Address.create({ zip: '10010'}, { zip: '10010'}, { zip: '99701'}, function (err, a1, a2, a3) {
         assert.strictEqual(null, err);
         var query = Address.distinct('zip', {}, function (err, results) {
-          assert.ifError(err);
-          assert.deepEqual(results, ['10010', '99701']);
           db.close();
+          assert.ifError(err);
+          assert.equal(2, results.length);
+          assert.ok(results.indexOf('10010') > -1);
+          assert.ok(results.indexOf('99701') > -1);
           done();
         });
         assert.ok(query instanceof Query);
@@ -262,7 +264,9 @@ describe('model: querying:', function(){
         assert.ifError(err);
         var query = Address.distinct('zip', function (err, results) {
           assert.ifError(err);
-          assert.deepEqual(results, ['10010', '99701']);
+          assert.equal(2, results.length);
+          assert.ok(results.indexOf('10010') > -1);
+          assert.ok(results.indexOf('99701') > -1);
           db.close(done);
         });
       });
@@ -1061,8 +1065,17 @@ describe('model: querying:', function(){
             cb();
             assert.ifError(err);
             assert.equal(2, found.length);
-            assert.equal(found[0]._id.toString(), one._id);
-            assert.equal(found[1]._id.toString(), two._id);
+
+            var found1 = false;
+            var found2 = false;
+
+            found.forEach(function (doc) {
+              if (doc.id == one.id) found1 = true;
+              else if (doc.id == two.id) found2 = true;
+            })
+
+            assert.ok(found1);
+            assert.ok(found2);
           });
         }
 
@@ -1080,8 +1093,17 @@ describe('model: querying:', function(){
             cb();
             assert.ifError(err);
             assert.equal(2, found.length);
-            assert.equal(found[0]._id.toString(), one._id);
-            assert.equal(found[1]._id.toString(), two._id);
+
+            var found1 = false;
+            var found2 = false;
+
+            found.forEach(function (doc) {
+              if (doc.id == one.id) found1 = true;
+              else if (doc.id == two.id) found2 = true;
+            })
+
+            assert.ok(found1);
+            assert.ok(found2);
           });
         }
 
@@ -1806,7 +1828,11 @@ describe('buffers', function(){
         cb();
         assert.ifError(err);
         assert.equal(2, tests.length);
-        assert.equal(tests[0].block.toString('utf8'),'über');
+        var ret = {};
+        ret[tests[0].block.toString('utf8')] = 1;
+        ret[tests[1].block.toString('utf8')] = 1;
+
+        assert.ok(ret['über'] !== undefined);
       });
 
       Test.find({ block: { $lte: 'buffer shtuffs are neat' }}, function (err, tests) {
@@ -2149,6 +2175,40 @@ describe('geo-spatial', function(){
           })
         })
       });
+
+      it('works with GeoJSON (gh-1482)', function (done) {
+        if (!mongo24_or_greater) return done();
+
+        var geoJSONSchema = new Schema({ loc : { type : { type : String }, coordinates : [Number] } });
+        geoJSONSchema.index({ loc : '2dsphere' });
+        var name = 'geospatial'+random();
+        var db = start()
+          , Test = db.model('Geo1', geoJSONSchema, name);
+
+        var pending = 2;
+        function complete (err) {
+          if (complete.ran) return;
+          if (err) return done(complete.ran = err);
+          --pending || test();
+        }
+
+        Test.on('index', complete);
+        Test.create({ loc: { type : 'Point', coordinates :[ 10, 20 ]}}, { loc: {
+          type : 'Point', coordinates: [ 40, 90 ]}}, complete);
+
+        function test () {
+          // $maxDistance is in meters... so even though they aren't that far off
+          // in lat/long, need an incredibly high number here
+          Test.where('loc').near({ center : { type : 'Point', coordinates :
+            [11,20]}, maxDistance : 1000000 }).exec(function (err, docs) {
+            db.close();
+            assert.ifError(err);
+            assert.equal(1, docs.length);
+            done();
+          });
+        }
+      });
+
     })
   })
 

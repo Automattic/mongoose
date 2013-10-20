@@ -13,7 +13,7 @@ Mongoose is a [MongoDB](http://www.mongodb.org/) object modeling tool designed t
   - [Stack Overflow](http://stackoverflow.com/questions/tagged/mongoose)
   - [bug reports](https://github.com/learnboost/mongoose/issues/)
   - [help forum](http://groups.google.com/group/mongoose-orm)
-  - [10gen support](http://www.mongodb.org/display/DOCS/Technical+Support)
+  - [MongoDB support](http://www.mongodb.org/display/DOCS/Technical+Support)
   - (irc) #mongoosejs on freenode
 
 ## Plugins
@@ -32,6 +32,10 @@ View all 90+ [contributors](https://github.com/learnboost/mongoose/graphs/contri
 First install [node.js](http://nodejs.org/) and [mongodb](http://www.mongodb.org/downloads). Then:
 
     $ npm install mongoose
+    
+## Stablility
+
+The current stable branch is [3.6.x](https://github.com/LearnBoost/mongoose/tree/3.6.x). New (unstable) development always occurs on the [master](https://github.com/LearnBoost/mongoose/tree/master) branch.
 
 ## Overview
 

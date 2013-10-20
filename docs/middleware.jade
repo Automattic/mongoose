@@ -3,7 +3,8 @@ extends layout
 block content
   h2 Middleware
   :markdown
-    Middleware are functions which are passed control of flow during execution of [init](./api.html#document_Document-init), [validate](./api.html#document_Document-validate), [save](./api.html#model_Model-save) and [remove](./api.html#model_Model-remove) methods. There are two types of middleware, `pre` and [post](#post). Let's start with `pre`.
+    Middleware are functions which are passed control of flow during execution of document [init](./api.html#document_Document-init), [validate](./api.html#document_Document-validate), [save](./api.html#model_Model-save) and [remove](./api.html#model_Model-remove) methods. Middleware are executed at the document level, not the Model level.
+    There are two types of middleware, `pre` and [post](#post). Let's start with `pre`.
 
   h3 Pre
   :markdown
@@ -54,7 +55,7 @@ block content
 
     // later...
 
-    myModel.save(function (err) {
+    myDoc.save(function (err) {
       console.log(err.message) // something went wrong
     });
 

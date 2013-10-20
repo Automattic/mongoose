@@ -328,6 +328,21 @@ describe('Query', function(){
       assert.deepEqual(query._conditions, {checkin: {$near: [40, -72]}});
       done();
     })
+    it('via where, where GeoJSON param', function(done){
+      var query = new Query({}, {}, null, p1.collection);
+      query.where('numbers').near({ center : { type : 'Point', coordinates : [40, -72 ]}});
+      assert.deepEqual(query._conditions, {numbers: {$near: { $geometry : { type : 'Point', coordinates : [40, -72] }}}});
+      assert.doesNotThrow(function () {
+        query.cast(p1.constructor);
+      })
+      done();
+    })
+    it('with path, where GeoJSON param', function(done){
+      var query = new Query({}, {}, null, p1.collection);
+      query.near('loc', { center : { type : 'Point', coordinates : [40, -72 ]}});
+      assert.deepEqual(query._conditions, {loc: {$near: { $geometry : { type : 'Point', coordinates : [40, -72] }}}});
+      done();
+    })
   })
 
   describe('nearSphere', function(){
@@ -353,6 +368,33 @@ describe('Query', function(){
       var query = new Query({}, {}, null, p1.collection);
       query.nearSphere('checkin', 40, -72);
       assert.deepEqual(query._conditions, {checkin: {$nearSphere: [40, -72]}});
+      done();
+    })
+
+    it('via where, with object', function(done){
+      var query = new Query({}, {}, null, p1.collection);
+      query.where('checkin').nearSphere({ center: [20,23], maxDistance: 2 });
+      assert.deepEqual(query._conditions, {checkin: {$nearSphere: [20,23],$maxDistance:2}});
+      done();
+    })
+
+    it('via where, where GeoJSON param', function(done){
+      var query = new Query({}, {}, null, p1.collection);
+      query.where('numbers').nearSphere({ center : { type : 'Point', coordinates : [40, -72 ]}});
+      assert.deepEqual(query._conditions, {numbers: {$nearSphere: { $geometry : { type : 'Point', coordinates : [40, -72] }}}});
+      assert.doesNotThrow(function () {
+        query.cast(p1.constructor);
+      })
+      done();
+    })
+
+    it('with path, with GeoJSON', function(done){
+      var query = new Query({}, {}, null, p1.collection);
+      query.nearSphere('numbers', { center : { type : 'Point', coordinates : [40, -72 ]}});
+      assert.deepEqual(query._conditions, {numbers: {$nearSphere: { $geometry : { type : 'Point', coordinates : [40, -72] }}}});
+      assert.doesNotThrow(function () {
+        query.cast(p1.constructor);
+      })
       done();
     })
   })
@@ -676,10 +718,10 @@ describe('Query', function(){
     it('works', function(done){
       var query = new Query({}, {}, null, p1.collection);
       query.sort('a -c b');
-      assert.deepEqual(query.options.sort, [['a', 1], ['c', -1], ['b', 1]]);
+      assert.deepEqual(query.options.sort, {'a': 1 , 'c': -1,'b': 1});
       query = new Query({}, {}, null, p1.collection);
       query.sort({'a': 1, 'c': -1, 'b': 'asc', e: 'descending', f: 'ascending'});
-      assert.deepEqual(query.options.sort, [['a', 1], ['c', -1], ['b', 'asc'], ['e', 'descending'], ['f', 'ascending']]);
+      assert.deepEqual(query.options.sort, {'a': 1, 'c': -1, 'b': 1, 'e': -1, 'f': 1});
       query = new Query({}, {}, null, p1.collection);
       var e;
 
@@ -1367,11 +1409,9 @@ describe('Query', function(){
       assert.equal(q.options.batchSize, 10);
       assert.equal(q.options.limit, 4);
       assert.equal(q.options.skip, 3);
-      assert.equal(q.options.sort.length, 2);
-      assert.equal(q.options.sort[0][0], 'blah');
-      assert.equal(q.options.sort[0][1], -1);
-      assert.equal(q.options.sort[1][0], 'woot');
-      assert.equal(q.options.sort[1][1], -1);
+      assert.equal(Object.keys(q.options.sort).length, 2);
+      assert.equal(q.options.sort.blah, -1);
+      assert.equal(q.options.sort.woot, -1);
       assert.equal(q.options.hint.index1, 1);
       assert.equal(q.options.hint.index2, -1);
       assert.equal(q.options.readPreference.mode, 'secondary');

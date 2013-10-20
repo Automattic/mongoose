@@ -669,18 +669,14 @@ describe('model: findByIdAndUpdate:', function(){
       , query;
 
     query = M.findByIdAndUpdate(_id, { $set: { date: now }}, { sort: 'author -title' });
-    assert.equal(2, query.options.sort.length);
-    assert.equal('author', query.options.sort[0][0]);
-    assert.equal(1, query.options.sort[0][1]);
-    assert.equal('title', query.options.sort[1][0]);
-    assert.equal(-1, query.options.sort[1][1]);
+    assert.equal(2, Object.keys(query.options.sort).length);
+    assert.equal(1, query.options.sort.author);
+    assert.equal(-1, query.options.sort.title);
 
     query = M.findOneAndUpdate({}, { $set: { date: now }}, { sort: 'author -title' });
-    assert.equal(2, query.options.sort.length);
-    assert.equal('author', query.options.sort[0][0]);
-    assert.equal(1, query.options.sort[0][1]);
-    assert.equal('title', query.options.sort[1][0]);
-    assert.equal(-1, query.options.sort[1][1]);
+    assert.equal(2, Object.keys(query.options.sort).length);
+    assert.equal(1, query.options.sort.author);
+    assert.equal(-1, query.options.sort.title);
     done();
   })
 
@@ -695,18 +691,14 @@ describe('model: findByIdAndUpdate:', function(){
       , query;
 
     query = M.findByIdAndUpdate(_id, { $set: { date: now }}, { sort: { author: 1, title: -1 }});
-    assert.equal(2, query.options.sort.length);
-    assert.equal('author', query.options.sort[0][0]);
-    assert.equal(1, query.options.sort[0][1]);
-    assert.equal('title', query.options.sort[1][0]);
-    assert.equal(-1, query.options.sort[1][1]);
+    assert.equal(2, Object.keys(query.options.sort).length);
+    assert.equal(1, query.options.sort.author);
+    assert.equal(-1, query.options.sort.title);
 
     query = M.findOneAndUpdate(_id, { $set: { date: now }}, { sort: { author: 1, title: -1 }});
-    assert.equal(2, query.options.sort.length);
-    assert.equal('author', query.options.sort[0][0]);
-    assert.equal(1, query.options.sort[0][1]);
-    assert.equal('title', query.options.sort[1][0]);
-    assert.equal(-1, query.options.sort[1][1]);
+    assert.equal(2, Object.keys(query.options.sort).length);
+    assert.equal(1, query.options.sort.author);
+    assert.equal(-1, query.options.sort.title);
     done();
   });
 
@@ -785,6 +777,27 @@ describe('model: findByIdAndUpdate:', function(){
           assert.equal(false, thing2.flag);
           done();
         });
+    });
+  });
+
+  it('allows properties to be set to null gh-1643', function (done) {
+    var db = start();
+
+    var thingSchema = new Schema({
+      name:[String]
+    });
+
+    var Thing = db.model('Thing', thingSchema);
+
+    Thing.create({name:["Test"]}, function (err, thing) {
+      if (err) return done(err);
+      Thing.findOneAndUpdate({ _id: thing._id }, {name:null})
+        .exec(function (err, doc) {
+          if (err) return done(err);
+          assert.ok(doc);
+          assert.equal(doc.name, null);
+          done();
+      });
     });
   });
 })

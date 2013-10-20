@@ -95,12 +95,12 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function (err) {
       }
     })
     .on('cycle', function (evt) {
-      if (process.env.MONGOOSE_DEV) {
+      if (process.env.MONGOOSE_DEV || process.env.PULL_REQUEST) {
         console.log(String(evt.target));
       }
     }).on('complete', function () {
       closeDB();
-      if (!process.env.MONGOOSE_DEV) {
+      if (!process.env.MONGOOSE_DEV && !process.env.PULL_REQUEST) {
         var outObj = {};
         this.forEach(function (item) {
           var out = {};

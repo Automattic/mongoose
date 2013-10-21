@@ -311,6 +311,8 @@ describe('document', function(){
     // minimize
     clone = doc.toObject({ minimize: true });
     assert.equal(undefined, clone.nested2);
+    clone = doc.toObject({ minimize: true, getters: true });
+    assert.equal(undefined, clone.nested2);
     clone = doc.toObject({ minimize: false });
     assert.equal('Object', clone.nested2.constructor.name);
     assert.equal(1, Object.keys(clone.nested2).length);

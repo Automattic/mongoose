@@ -3402,7 +3402,8 @@ describe('Model', function(){
         var S = db.model('S', schema, collection);
         var s = new S({name: 'zupa'});
 
-        s.save().onResolve(function (err) {
+        var p = s.save();
+        p.onResolve(function (err) {
           db.close();
           assert.ifError(err);
           assert.equal(2, called);
@@ -3470,7 +3471,7 @@ describe('Model', function(){
         var S = db.model('presave_hook_error', schema, 'presave_hook_error');
         var s = new S({ name : 'a' , child : [ { name : 'b', grand : [{ name : 'c'}] } ]});
 
-        s.save(function (err, doc) {
+        s.save(function (err) {
           db.close();
           assert.ok(err instanceof Error);
           assert.equal(err.message,'Error 101');
@@ -3540,7 +3541,7 @@ describe('Model', function(){
           , post = undefined;
 
         schema.post('save', function (arg) {
-          assert.equal(arg.id,post.id)
+          assert.equal(arg.id, post.id)
           save = true;
         });
 

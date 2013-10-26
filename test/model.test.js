@@ -723,7 +723,7 @@ describe('Model', function(){
     });
 
 
-    it('subdocument error', function(done){
+    it('subdocument cast error', function(done){
       var db = start()
         , BlogPost = db.model('BlogPost', collection)
         , threw = false;
@@ -741,6 +741,32 @@ describe('Model', function(){
         db.close();
         assert.ok(err instanceof MongooseError);
         assert.ok(err instanceof CastError);
+        done();
+      });
+    });
+
+
+    it('subdocument validation error', function(done){
+      function failingvalidator(val) {
+        return false;
+      }
+
+      var db = start()
+        , subs = new Schema({
+          str: {
+            type: String, validate: failingvalidator
+          }
+        })
+        , BlogPost = db.model('BlogPost', {subs: [subs]})
+
+      var post = new BlogPost()
+      post.init({
+        subs: [ { str: 'gaga' } ]
+      });
+
+      post.save(function(err){
+        db.close();
+        assert.ok(err instanceof ValidationError);
         done();
       });
     });

@@ -947,9 +947,52 @@ describe('document', function(){
         assert.equal(count, post.controls.length);
         done();
       });
+    });
+
+
+    it("validator should run in parallel", function (done) {
+      // we set the time out to be double that of the validator - 1 (so that running in serial will be greater then that)
+      this.timeout(1000);
+      var db = start(),
+        count = 0;
+
+      var SchemaWithValidator = new Schema ({
+        preference: {
+          type: String
+          , required: true
+          , validate: function validator (value, done) {count++; setTimeout(done.bind(null, true), 500);}
+        }
+      });
+
+      var MWSV = db.model('mwv', new Schema({subs: [SchemaWithValidator]}));
+      var m = new MWSV({
+        subs: [
+          {
+            preference: "xx"
+          }
+          ,
+          {
+            preference: "yy"
+          }
+          ,
+          {
+            preference: "1"
+          }
+          ,
+          {
+            preference: "2"
+          }
+        ]
+      });
+
+      m.save(function (err) {
+        assert.ifError(err);
+        assert.equal(count, 4);
+        done();
+      });
     })
 
-  })
+  });
 
   it('#invalidate', function(done){
     var db = start()

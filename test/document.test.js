@@ -880,6 +880,75 @@ describe('document', function(){
       })
 
     })
+
+    it("validator should run only once gh-1743", function (done) {
+      var count = 0
+        , db = start()
+
+      var Control = new Schema({
+        test: {
+          type: String
+          , validate: function ( value, done ) {
+            count++;
+            return done( true );
+          }
+        }
+      });
+      var PostSchema = new Schema({
+        controls: [Control]
+      });
+
+      var Post = db.model('post', PostSchema);
+
+      var post = new Post({
+        controls: [{
+          test: "xx"
+        }]
+      });
+
+      post.save(function () {
+        assert.equal(count, 1);
+        done();
+      });
+    })
+
+    it("validator should run only once per sub-doc gh-1743", function (done) {
+      var count = 0
+        , db = start()
+
+      var Control = new Schema({
+        test: {
+          type: String
+          , validate: function ( value, done ) {
+            count++;
+            return done( true );
+          }
+        }
+      });
+      var PostSchema = new Schema({
+        controls: [Control]
+      });
+
+      var Post = db.model('post', PostSchema);
+
+      var post = new Post({
+        controls: [
+          {
+            test: "xx"
+          }
+          ,
+          {
+            test: "yy"
+          }
+        ]
+      });
+
+      post.save(function () {
+        assert.equal(count, post.controls.length);
+        done();
+      });
+    })
+
   })
 
   it('#invalidate', function(done){

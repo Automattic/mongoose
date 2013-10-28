@@ -3583,16 +3583,13 @@ describe('Model', function(){
 
     describe('post', function(){
       it('works', function(done){
-        var schema = new Schema({
-                title: String
-            })
+        var schema = new Schema({title: String})
           , save = false
           , remove = false
-          , init = false
-          , post = undefined;
+          , init = false;
 
         schema.post('save', function (arg) {
-          assert.equal(arg.id, post.id)
+          assert.equal(arg.id, post.id);
           save = true;
         });
 
@@ -3601,41 +3598,31 @@ describe('Model', function(){
         });
 
         schema.post('remove', function (arg) {
-          assert.equal(arg.id,post.id)
+          assert.equal(arg.id,post.id);
           remove = true;
         });
 
-        mongoose.model('PostHookTest', schema);
-
         var db = start()
-          , BlogPost = db.model('PostHookTest');
+          , BlogPost = db.model('PostHookTest', schema);
 
-        post = new BlogPost();
+        var post = new BlogPost();
 
         post.save(function (err) {
-          process.nextTick(function () {
+          assert.ifError(err);
+          assert.ok(save);
+          BlogPost.findById(post._id, function (err, doc) {
             assert.ifError(err);
-            assert.ok(save);
-            BlogPost.findById(post._id, function (err, doc) {
-              process.nextTick(function () {
-                assert.ifError(err);
-                assert.ok(init);
-
-                doc.remove(function (err) {
-                  process.nextTick(function () {
-                    db.close();
-                    assert.ifError(err);
-                    assert.ok(remove);
-                    done();
-                  });
-                });
-              });
+            assert.ok(init);
+            doc.remove(function (err) {
+              db.close();
+              assert.ifError(err);
+              assert.ok(remove);
+              done();
             });
           });
-
         });
-
       });
+
 
       it('on embedded docs', function(done){
         var save = false,

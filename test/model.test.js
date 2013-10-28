@@ -1871,6 +1871,31 @@ describe('Model', function(){
           });
         });
       })
+
+
+      it('should run schema post hook only once', function(done){
+        var db = start()
+          , schema = new Schema({name: String});
+
+        schema.post('remove', function (doc) {
+          done();
+        })
+
+        var RemoveHooks = db.model('RemoveHooks', schema)
+          , post = new RemoveHooks({name:"hello"})
+
+        post.save(function (err) {
+          assert.ifError(err);
+          post.remove(function (err, doc) {
+            assert.ifError(err);
+            assert.ok(doc);
+            post.remove(function (err, doc1) {
+              assert.ifError(err);
+              assert.ok(doc1);
+            });
+          });
+        });
+      })
     })
   });
 

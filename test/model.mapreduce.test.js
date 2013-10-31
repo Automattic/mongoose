@@ -149,6 +149,55 @@ describe('model: mapreduce:', function(){
         });
       }
     });
-
   })
+
+  describe('promises (gh-1628)', function () {
+    it('are returned', function(done){
+      var db = start()
+        , MR = db.model('MapReduce', collection)
+
+      var o = {
+          map: function () {}
+        , reduce: function () { return 'test' }
+      }
+
+      var promise = MR.mapReduce(o, function(){});
+      assert.ok(promise instanceof mongoose.Promise);
+
+      db.close();
+      done();
+    });
+
+    it('allow not passing a callback', function(done){
+      var db = start()
+        , MR = db.model('MapReduce', collection)
+
+      var o = {
+          map: function () { emit(this.author, 1) }
+        , reduce: function (k, vals) { return vals.length }
+        , query: { author: 'aaron', published: 1 }
+      }
+
+      function validate (ret, stats) {
+        assert.ok(Array.isArray(ret));
+        assert.equal(1, ret.length);
+        assert.equal('aaron', ret[0]._id);
+        assert.equal(3, ret[0].value);
+        assert.ok(stats);
+      }
+
+      function finish () {
+        db.close(done);
+      }
+
+      var promise;
+
+      assert.doesNotThrow(function(){
+        promise = MR.mapReduce(o);
+      })
+
+      promise.then(validate, assert.ifError).then(finish).end();
+    })
+
+  });
 });

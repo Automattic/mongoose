@@ -175,27 +175,6 @@ describe('model', function(){
       })
     })
 
-    it('can be manually triggered', function(done){
-      var db = start();
-      var schema = new Schema({ name: { type: String } })
-        , Test = db.model('ManualIndexing', schema, "x"+random());
-
-      assert.equal('function', typeof Test.ensureIndexes);
-
-      Test.schema.index({ name: 1 }, { sparse: true });
-
-      var called = false;
-      Test.on('index', function(err){
-        called= true;
-      });
-
-      Test.ensureIndexes(function (err) {
-        assert.ifError(err);
-        assert.ok(called);
-        done();
-      });
-    })
-
     it('do not trigger "MongoError: cannot add index with a background operation in progress" (gh-1365) LONG', function(done){
       this.timeout(45000);
 
@@ -236,6 +215,42 @@ describe('model', function(){
             K.ensureIndexes();
           })
         }
+      })
+    })
+
+    describe('model.ensureIndexes()', function(done){
+      it('is a function', function(done){
+        var schema = mongoose.Schema({ x: 'string' });
+        var Test = mongoose.createConnection().model('ensureIndexes-'+random, schema);
+        assert.equal('function', typeof Test.ensureIndexes);
+        done();
+      })
+
+      it('returns a Promise', function(done){
+        var schema = mongoose.Schema({ x: 'string' });
+        var Test = mongoose.createConnection().model('ensureIndexes-'+random, schema);
+        var p = Test.ensureIndexes();
+        assert.ok(p instanceof mongoose.Promise);
+        done();
+      })
+
+      it('creates indexes', function(done){
+        var db = start();
+        var schema = new Schema({ name: { type: String } })
+          , Test = db.model('ManualIndexing', schema, "x"+random());
+
+        Test.schema.index({ name: 1 }, { sparse: true });
+
+        var called = false;
+        Test.on('index', function(err){
+          called= true;
+        });
+
+        Test.ensureIndexes(function (err) {
+          assert.ifError(err);
+          assert.ok(called);
+          done();
+        });
       })
     })
   });

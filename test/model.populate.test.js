@@ -1303,7 +1303,7 @@ describe('model: populate:', function(){
           assert.equal(post.fans[2].name,'someone else');
 
           P.findById(post)
-          .populate('fans', 'name', null, { sort: [['name', -1]] })
+          .populate('fans', 'name', null, { sort: {'name':-1} })
           .exec(function (err, post) {
             assert.ifError(err);
 
@@ -1316,7 +1316,7 @@ describe('model: populate:', function(){
             assert.strictEqual(undefined, post.fans[0].age)
 
             P.findById(post)
-            .populate('fans', 'age', { age: { $gt: 3 }}, { sort: [['name', 'desc']] })
+            .populate('fans', 'age', { age: { $gt: 3 }}, { sort: {'name': 'desc'} })
             .exec(function (err, post) {
               db.close();
               assert.ifError(err);
@@ -1944,6 +1944,18 @@ describe('model: populate:', function(){
 
     after(function(done){
       db.close(done);
+    })
+
+    describe('returns', function(){
+      it('a promise', function(done){
+        var p = B.populate(post1, '_creator');
+        assert.ok(p instanceof mongoose.Promise);
+        p.then(success, done).end();
+        function success (doc) {
+          assert.ok(doc);
+          done();
+        }
+      })
     })
 
     describe('of individual document', function(){

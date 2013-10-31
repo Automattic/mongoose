@@ -262,15 +262,13 @@ describe('versioning', function(){
     function save (a, b, cb) {
       var pending = 2;
       var e;
+      // make sure that a saves before b
       a.save(function (err) {
         if (err) e = err;
-        if (--pending) return;
-        lookup();
-      });
-      b.save(function (err) {
-        if (err) e = err;
-        if (--pending) return;
-        lookup();
+        b.save(function (err) {
+          if (err) e = err;
+          lookup();
+        });
       });
       function lookup () {
         var a1, b1;
@@ -455,4 +453,18 @@ describe('versioning', function(){
       })
     })
   })
+
+  describe('versioning is off', function(){
+    it('when { safe : false } is set (gh-1520)', function(done){
+      var schema1 = new Schema({ title : String}, { safe : false });
+      assert.equal(schema1.options.versionKey, false);
+      done();
+    })
+    it('when { safe : { w: 0 }} is set (gh-1520)', function(done){
+      var schema1 = new Schema({ title : String}, { safe : { w: 0 } });
+      assert.equal(schema1.options.versionKey, false);
+      done();
+    })
+  })
+
 })

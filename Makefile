@@ -3,7 +3,7 @@ TESTS = $(shell find test/ -name '*.test.js')
 DOCS_ = $(shell find lib/ -name '*.js')
 DOCS = $(DOCS_:.js=.json)
 DOCFILE = docs/source/_docs
-STABLE_BRANCH = 3.6.x
+STABLE_BRANCH = 3.8.x
 
 test:
 	@MONGOOSE_DISABLE_STABILITY_WARNING=1 node test/dropdb.js
@@ -71,4 +71,4 @@ copyunstable:
 	cp -R ./tmp/* ./docs/unstable/
 	rm -rf ./tmp
 
-.PHONY: test test-short test-long ghpages site docs docclean gendocs docs_from_master
+.PHONY: test test-short test-long ghpages site docs docclean gendocs docs_from_master docs_unstable master copytmp copyunstable gitreset docclean_unstable

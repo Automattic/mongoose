@@ -14,7 +14,8 @@ var start = require('./common')
   , SchemaType = mongoose.SchemaType
   , ValidatorError = SchemaType.ValidatorError
   , ValidationError = mongoose.Document.ValidationError
-  , MongooseError = mongoose.Error;
+  , MongooseError = mongoose.Error
+  , Query = require('../lib/query');
 
 /**
  * Test Document constructor.
@@ -258,7 +259,7 @@ describe('document', function(){
       , em: [{title:'asdf'}]
       , nested  : {
             age   : 5
-          , cool  : DocumentObjectId.fromString('4c6c2d6240ced95d0e00003c')
+          , cool  : DocumentObjectId.createFromHexString('4c6c2d6240ced95d0e00003c')
           , path  : 'my path'
         }
       , nested2: {}
@@ -269,7 +270,7 @@ describe('document', function(){
     assert.equal(clone.test, 'test');
     assert.ok(clone.oids instanceof Array);
     assert.equal(5, clone.nested.age);
-    assert.equal(DocumentObjectId.toString(clone.nested.cool), '4c6c2d6240ced95d0e00003c');
+    assert.equal(clone.nested.cool.toString(), '4c6c2d6240ced95d0e00003c');
     assert.equal('5my path', clone.nested.path);
     assert.equal(undefined, clone.nested.agePlus2);
     assert.equal(undefined, clone.em[0].works);
@@ -279,7 +280,7 @@ describe('document', function(){
     assert.equal('test', clone.test);
     assert.ok(clone.oids instanceof Array);
     assert.equal(5, clone.nested.age);
-    assert.equal(DocumentObjectId.toString(clone.nested.cool), '4c6c2d6240ced95d0e00003c');
+    assert.equal(clone.nested.cool.toString(), '4c6c2d6240ced95d0e00003c');
     assert.equal('my path', clone.nested.path);
     assert.equal(7, clone.nested.agePlus2);
     assert.equal(clone.em[0].works, 'em virtual works');
@@ -289,7 +290,7 @@ describe('document', function(){
     assert.equal('test', clone.test);
     assert.ok(clone.oids instanceof Array);
     assert.equal(5, clone.nested.age);
-    assert.equal(DocumentObjectId.toString(clone.nested.cool),'4c6c2d6240ced95d0e00003c');
+    assert.equal(clone.nested.cool.toString(),'4c6c2d6240ced95d0e00003c');
     assert.equal('5my path', clone.nested.path);
     assert.equal(7, clone.nested.agePlus2);
     assert.equal('em virtual works', clone.em[0].works);
@@ -300,7 +301,7 @@ describe('document', function(){
     assert.equal('test', clone.test);
     assert.ok(clone.oids instanceof Array);
     assert.equal(5, clone.nested.age);
-    assert.equal(DocumentObjectId.toString(clone.nested.cool),'4c6c2d6240ced95d0e00003c');
+    assert.equal(clone.nested.cool.toString(),'4c6c2d6240ced95d0e00003c');
 
     assert.equal('my path', clone.nested.path);
     assert.equal(7, clone.nested.agePlus2);
@@ -309,6 +310,8 @@ describe('document', function(){
 
     // minimize
     clone = doc.toObject({ minimize: true });
+    assert.equal(undefined, clone.nested2);
+    clone = doc.toObject({ minimize: true, getters: true });
     assert.equal(undefined, clone.nested2);
     clone = doc.toObject({ minimize: false });
     assert.equal('Object', clone.nested2.constructor.name);
@@ -371,7 +374,7 @@ describe('document', function(){
     assert.equal('test', clone.test);
     assert.ok(clone.oids instanceof Array);
     assert.equal(5, clone.nested.age);
-    assert.equal(DocumentObjectId.toString(clone.nested.cool),'4c6c2d6240ced95d0e00003c');
+    assert.equal(clone.nested.cool.toString(),'4c6c2d6240ced95d0e00003c');
     assert.equal('my path', clone.nested.path);
     assert.equal('Object', clone.em[0].constructor.name);
 
@@ -410,7 +413,7 @@ describe('document', function(){
       , em: [{title:'asdf'}]
       , nested  : {
             age   : 5
-          , cool  : DocumentObjectId.fromString('4c6c2d6240ced95d0e00003c')
+          , cool  : DocumentObjectId.createFromHexString('4c6c2d6240ced95d0e00003c')
           , path  : 'my path'
         }
       , nested2: {}
@@ -427,7 +430,7 @@ describe('document', function(){
     assert.equal('test', clone.test);
     assert.ok(clone.oids instanceof Array);
     assert.equal(5, clone.nested.age);
-    assert.equal(DocumentObjectId.toString(clone.nested.cool),'4c6c2d6240ced95d0e00003c');
+    assert.equal(clone.nested.cool.toString(),'4c6c2d6240ced95d0e00003c');
     assert.equal('my path', clone.nested.path);
     assert.equal(7, clone.nested.agePlus2);
     assert.equal('Object', clone.em[0].constructor.name);
@@ -495,7 +498,7 @@ describe('document', function(){
     assert.equal('test', clone.test);
     assert.ok(clone.oids instanceof Array);
     assert.equal(5, clone.nested.age);
-    assert.equal(DocumentObjectId.toString(clone.nested.cool),'4c6c2d6240ced95d0e00003c');
+    assert.equal(clone.nested.cool.toString(),'4c6c2d6240ced95d0e00003c');
     assert.equal('my path', clone.nested.path);
     assert.equal('Object', clone.em[0].constructor.name);
 
@@ -528,7 +531,7 @@ describe('document', function(){
 
   it('jsonifying an object', function(done){
     var doc = new TestDocument({ test: 'woot' })
-      , oidString = DocumentObjectId.toString(doc._id);
+      , oidString = doc._id.toString();
 
     // convert to json string
     var json = JSON.stringify(doc);
@@ -540,13 +543,44 @@ describe('document', function(){
     assert.equal(obj._id, oidString);
     done();
   });
+  it('jsonifying an object\'s populated items works (gh-1376)', function(done){
+    var db = start();
+    var userSchema, User, groupSchema, Group;
+
+    userSchema = Schema({name: String});
+    // includes virtual path when 'toJSON'
+    userSchema.set('toJSON', {getters: true});
+    userSchema.virtual('hello').get(function() {
+      return 'Hello, ' + this.name;
+    });
+    User = db.model('User', userSchema);
+
+    groupSchema = Schema({
+      name: String,
+      _users: [{type: Schema.ObjectId, ref: 'User'}]
+    });
+
+    Group = db.model('Group', groupSchema);
+
+    User.create({name: 'Alice'}, {name: 'Bob'}, function(err, alice, bob) {
+      assert.ifError(err);
+
+      new Group({name: 'mongoose', _users: [alice, bob]}).save(function(err, group) {
+        Group.findById(group).populate('_users').exec(function(err, group) {
+          assert.ifError(err);
+          assert.ok(group.toJSON()._users[0].hello);
+          done();
+        });
+      });
+    });
+  })
 
   describe('#update', function(){
     it('returns a Query', function(done){
       var mg = new mongoose.Mongoose;
       var M = mg.model('doc#update', { s: String });
       var doc = new M;
-      assert.ok(doc.update() instanceof mongoose.Query);
+      assert.ok(doc.update() instanceof Query);
       done();
     })
     it('calling update on document should relay to its model (gh-794)', function(done){
@@ -698,7 +732,7 @@ describe('document', function(){
             t.req = undefined;
             t.save(function (err) {
               err = String(err);
-              var invalid  = /Validator "required" failed for path req/.test(err);
+              var invalid  = /Path `req` is required./.test(err);
               assert.ok(invalid);
               t.req = 'it works again'
               t.save(function (err) {
@@ -772,10 +806,10 @@ describe('document', function(){
         var M = db.model('validateSchema-array1', schema, collection);
         var m = new M({ name: 'gh1109-1' });
         m.save(function (err) {
-          assert.ok(/"required" failed for path arr/.test(err));
+          assert.ok(/Path `arr` is required/.test(err));
           m.arr = [];
           m.save(function (err) {
-            assert.ok(/"required" failed for path arr/.test(err));
+            assert.ok(/Path `arr` is required/.test(err));
             m.arr.push('works');
             m.save(function (err) {
               assert.ifError(err);
@@ -803,7 +837,7 @@ describe('document', function(){
         var m = new M({ name: 'gh1109-2', arr: [1] });
         assert.equal(false, called);
         m.save(function (err) {
-          assert.ok(/"BAM" failed for path arr/.test(err));
+          assert.equal('ValidationError: BAM', String(err));
           assert.equal(true, called);
           m.arr.push(2);
           called = false;
@@ -832,10 +866,10 @@ describe('document', function(){
         var M = db.model('validateSchema-array3', schema, collection);
         var m = new M({ name: 'gh1109-3' });
         m.save(function (err) {
-          assert.ok(/"required" failed for path arr/.test(err));
+          assert.equal(err.errors.arr.message, 'Path `arr` is required.');
           m.arr.push({nice: true});
           m.save(function (err) {
-            assert.ok(/"BAM" failed for path arr/.test(err));
+            assert.equal(String(err), 'ValidationError: BAM');
             m.arr.push(95);
             m.save(function (err) {
               assert.ifError(err);
@@ -863,14 +897,14 @@ describe('document', function(){
     Post = db.model('InvalidateSchema');
     post = new Post();
     post.set({baz: 'val'});
-    post.invalidate('baz', 'reason');
+    post.invalidate('baz', 'validation failed for path {PATH}');
 
     post.save(function(err){
       assert.ok(err instanceof MongooseError);
       assert.ok(err instanceof ValidationError);
       assert.ok(err.errors.baz instanceof ValidatorError);
-      assert.equal(err.errors.baz.message,'Validator "reason" failed for path baz');
-      assert.equal(err.errors.baz.type,'reason');
+      assert.equal(err.errors.baz.message,'validation failed for path baz');
+      assert.equal(err.errors.baz.type,'user defined');
       assert.equal(err.errors.baz.path,'baz');
 
       post.save(function(err){

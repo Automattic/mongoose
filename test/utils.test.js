@@ -285,20 +285,129 @@ describe('utils', function(){
     done();
   })
 
-  describe('clone', function(){
-    it('retains RegExp options gh-1355', function(done){
-      var a = new RegExp('hello', 'igm');
-      assert.ok(a.global);
-      assert.ok(a.ignoreCase);
-      assert.ok(a.multiline);
+  describe('merge', function(){
+    it('merges two objects together without overriding properties & methods', function(done){
+      function To() {
+        this.name = 'to';
+        this.toProperty = true;
+      }
+      To.prototype.getName = function() {};
+      To.prototype.toMethod = function() {};
 
-      var b = utils.clone(a);
-      assert.equal(b.source, a.source);
-      assert.equal(a.global, b.global);
-      assert.equal(a.ignoreCase, b.ignoreCase);
-      assert.equal(a.multiline, b.multiline);
+      function From() {
+        this.name = 'from';
+        this.fromProperty = true;
+      }
+      From.prototype.getName = function() {};
+      From.prototype.fromMethod = function() {};
+
+      var to = new To();
+      var from = new From();
+
+      utils.merge(to, from);
+
+      assert.equal(to.name, 'to');
+      assert.equal(to.toProperty, true);
+      assert.equal(to.fromProperty, true);
+      assert.ok(to.getName === To.prototype.getName);
+      assert.ok(to.toMethod === To.prototype.toMethod);
+      assert.equal(to.fomMethod, From.prototype.fomMethod);
+
       done();
     })
   })
-})
+
+  describe('pluralize', function(){
+    it('should not pluralize _temp_ (gh-1703)', function(done){
+      var db = start();
+
+      var ASchema = new Schema ({
+          value: { type: Schema.Types.Mixed }
+      });
+
+      var collectionName = '_temp_';
+      var A = db.model(collectionName, ASchema);
+      assert.equal(A.collection.name, collectionName);
+      done();
+    });
+    it('should pluralize _temp (gh-1703)', function(done){
+      var db = start();
+
+      var ASchema = new Schema ({
+          value: { type: Schema.Types.Mixed }
+      });
+
+      var collectionName = '_temp';
+      var A = db.model(collectionName, ASchema);
+      assert.equal(A.collection.name, collectionName + 's');
+      done();
+    });
+    describe('option (gh-1707)', function(){
+      it('should pluralize by default', function(done){
+        var db = start();
+        var ASchema = new Schema ({value: String});
+
+        var collectionName = 'singular';
+        var A = db.model(collectionName, ASchema);
+        assert.equal(A.collection.name, collectionName + 's');
+        done();
+      });
+      it('should pluralize when global option set to true', function(done){
+        var db = start();
+        db.base.set('pluralization', true);
+
+        var ASchema = new Schema ({value: String});
+
+        var collectionName = 'singular';
+        var A = db.model(collectionName, ASchema);
+        assert.equal(A.collection.name, collectionName + 's');
+        done();
+      });
+      it('should not pluralize when global option set to false', function(done){
+        var db = start();
+        db.base.set('pluralization', false);
+
+        var ASchema = new Schema ({value: String});
+
+        var collectionName = 'singular';
+        var A = db.model(collectionName, ASchema);
+        assert.equal(A.collection.name, collectionName);
+        done();
+      });
+      it('should pluralize when local option set to true', function(done){
+        var db = start();
+        db.base.set('pluralization', false);
+
+        // override
+        var ASchema = new Schema ({value: String}, {pluralization: true});
+
+        var collectionName = 'singular';
+        var A = db.model(collectionName, ASchema);
+        assert.equal(A.collection.name, collectionName + 's');
+        done();
+      });
+      it('should not pluralize when local option set to false and global is true', function(done){
+        var db = start();
+        db.base.set('pluralization', true);
+
+        var ASchema = new Schema ({value: String}, {pluralization: false});
+
+        var collectionName = 'singular';
+        var A = db.model(collectionName, ASchema);
+        assert.equal(A.collection.name, collectionName);
+        done();
+      });
+      it('should not pluralize when local option set to false and global not set', function(done){
+        var db = start();
+
+        var ASchema = new Schema ({value: String}, {pluralization: false});
+
+        var collectionName = 'singular';
+        var A = db.model(collectionName, ASchema);
+        assert.equal(A.collection.name, collectionName);
+        done();
+      });
+    })
+  });
+});
 

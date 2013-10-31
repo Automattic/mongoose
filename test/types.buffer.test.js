@@ -84,7 +84,8 @@ describe('types.buffer', function(){
             t.sub[0].buf = new Buffer("well well");
             t.save(function (err) {
               assert.equal(err.message,'Validation failed');
-              assert.equal(err.errors['sub.0.buf'].type,'valid failed');
+              assert.equal(err.errors['sub.0.buf'].type,'user defined');
+              assert.equal(err.errors['sub.0.buf'].message,'valid failed');
 
               t.sub[0].buf = new Buffer("well well well");
               t.validate(function (err) {
@@ -408,9 +409,16 @@ describe('types.buffer', function(){
       done();
     })
 
+    it('method works', function(done){
+      var b = new B({ buf: new Buffer('hi') });
+      b.buf.subtype(128);
+      assert.strictEqual(128, b.buf._subtype);
+      done();
+    })
+
     it('is stored', function(done){
       var b = new B({ buf: new Buffer('hi') });
-      b.buf._subtype = 128;
+      b.buf.subtype(128);
       b.save(function (err) {
         if (err) return done(err);
         B.findById(b, function (err, doc) {
@@ -421,17 +429,25 @@ describe('types.buffer', function(){
       })
     })
 
-    it('is stored from a Binary', function(done){
-      var b = new B({ buf: new MongooseBuffer('hi').toObject(128) });
+    it('changes are retained', function(done){
+      var b = new B({ buf: new Buffer('hi') });
+      b.buf.subtype(128);
       b.save(function (err) {
         if (err) return done(err);
         B.findById(b, function (err, doc) {
           if (err) return done(err);
           assert.equal(128, doc.buf._subtype);
-          done();
+          doc.buf.subtype(0);
+          doc.save(function (err) {
+            if (err) return done(err);
+            B.findById(b, function (err, doc) {
+              if (err) return done(err);
+              assert.strictEqual(0, doc.buf._subtype);
+              done();
+            })
+          })
         })
       })
     })
-
   })
 })

@@ -32,6 +32,7 @@ describe('schema select option', function(){
       assert.equal(s.docs[0].name, 'test');
 
       var pending = 5;
+      var item = s;
       function cb (err, s) {
         if (!--pending) {
           db.close();
@@ -42,7 +43,10 @@ describe('schema select option', function(){
         assert.equal(false, s.isSelected('name'));
         assert.equal(false, s.isSelected('docs.name'));
         assert.strictEqual(undefined, s.name);
-
+        // we need to make sure this executes absolutely last.
+        if (pending === 1) {
+          S.findOneAndRemove({ _id : item._id }, cb);
+        }
         if (0 === pending) {
           done();
         }
@@ -51,10 +55,7 @@ describe('schema select option', function(){
       S.findById(s).select('-thin -docs.bool').exec(cb);
       S.find({ _id: s._id }).select('thin docs.bool').exec(cb);
       S.findById(s, cb);
-      S.findOneAndUpdate({ _id: s._id }, { name: 'changed' }, function (err, s) {
-        cb(err, s);
-        S.findOneAndRemove({ _id: s._id }, cb);
-      });
+      S.findOneAndUpdate({ _id: s._id }, { name: 'changed' }, cb);
     });
   });
 
@@ -89,11 +90,15 @@ describe('schema select option', function(){
         }
       }
 
-      S.findById(s).select('-thin -docs.bool').exec(cb);
-      S.find({ _id: s._id }).select('thin docs.bool').exec(cb);
-      S.findOneAndUpdate({ _id: s._id }, { thin: false }, function (err, s) {
-        cb(err, s);
-        S.findOneAndRemove({ _id: s._id }, cb);
+      S.findById(s).select('-thin -docs.bool').exec(function (err, res) {
+        cb(err, res);
+        S.find({ _id: s._id }).select('thin docs.bool').exec(function(err, res) {
+          cb(err, res);
+          S.findOneAndUpdate({ _id: s._id }, { thin: false }, function (err, s) {
+            cb(err, s);
+            S.findOneAndRemove({ _id: s._id }, cb);
+          });
+        });
       });
     });
   });
@@ -138,6 +143,7 @@ describe('schema select option', function(){
         it('with find', function(done){
           S.find({ _id: s._id }).select('thin name docs.bool docs.name').exec(function (err, s) {
             assert.ifError(err);
+            assert.ok(s && s.length > 0, 'no document found');
             s = s[0];
             assert.strictEqual(true, s.isSelected('name'));
             assert.strictEqual(true, s.isSelected('thin'));

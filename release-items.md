@@ -15,7 +15,7 @@
 
 ## updating the website
 
-For 3.6.x:
+For 3.8.x:
 
 0. Change to the 3.6.x branch
 1. execute `make docs` (when this process completes you'll be on the gh-pages branch)

@@ -263,6 +263,7 @@ describe('document', function(){
           , path  : 'my path'
         }
       , nested2: {}
+      , date: new Date
     });
 
     var clone = doc.toObject({ getters: true, virtuals: false });
@@ -274,6 +275,7 @@ describe('document', function(){
     assert.equal('5my path', clone.nested.path);
     assert.equal(undefined, clone.nested.agePlus2);
     assert.equal(undefined, clone.em[0].works);
+    assert.ok(clone.date instanceof Date);
 
     clone = doc.toObject({ virtuals: true });
 

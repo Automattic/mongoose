@@ -7,6 +7,7 @@ var start = require('./common')
   , assert = require('assert')
   , mongoose = start.mongoose
   , Schema = mongoose.Schema
+  , random = require('../lib/utils').random;
 
 /**
  * Test.
@@ -114,9 +115,9 @@ describe('connections:', function(){
     var mongod = 'mongodb://localhost:27017';
 
     var repl1 = process.env.MONGOOSE_SET_TEST_URI;
-    var repl2 = repl1.split(',');
+    var repl2 = repl1.replace("mongodb://", "").split(',');
     repl2.push(repl2.shift());
-    repl2 = repl2.join(',');
+    repl2 = "mongodb://" + repl2.join(',');
 
     describe('with different host/port', function(){
       it('non-replica set', function(done){
@@ -603,7 +604,8 @@ describe('connections:', function(){
     })
 
     it('event fires with one listener', function(done){
-      var db= start({ uri: 'mongodb://localasdfads/fakeeee', noErrorListener: 1 })
+      this.timeout(1000);
+      var db= start({ uri: 'mongodb://localasdfads/fakeeee?connectTimeoutMS=500', noErrorListener: 1 })
       db.on('error', function () {
         // this callback has no params which triggered the bug #759
         done();
@@ -611,7 +613,8 @@ describe('connections:', function(){
     })
 
     it('should occur without hanging when password with special chars is used (gh-460)', function (done) {
-      var db = mongoose.createConnection('mongodb://aaron:psw?@localhost/fake', function (err) {
+      this.timeout(1000);
+      var db = mongoose.createConnection('mongodb://aaron:ps#w@localhost/fake?connectTimeoutMS=500', function (err) {
         assert.ok(err);
         db.close();
         done();
@@ -698,6 +701,17 @@ describe('connections:', function(){
       assert.ok(C.schema == A.schema);
 
       done();
+    })
+
+    describe('get existing model with not existing collection in db', function(){
+      it('must return exiting collection with all collection options', function(done){
+        mongoose.model('some-th-1458', new Schema({test:String},{capped:{size:1000, max:10}}));
+        var db = start();
+        var m = db.model('some-th-1458');
+        assert.equal(m.collection.opts.capped.size, 1000);
+        assert.equal(m.collection.opts.capped.max, 10);
+        done();
+      })
     })
 
     describe('passing collection name', function(){
@@ -826,6 +840,35 @@ describe('connections:', function(){
     })
   })
 
+  describe('connecting to multiple mongos nodes (gh-1037)', function(){
+    var mongos = process.env.MONGOOSE_MULTI_MONGOS_TEST_URI;
+    if (!mongos) return console.log('Not testing multi-mongos support');
+
+    it('works', function(done){
+      this.timeout(3000);
+
+      var m = new mongoose.Mongoose;
+      m.connect(mongos, { mongos: true }, function (err) {
+        assert.ifError(err);
+
+        var s = m.connection.db.serverConfig;
+        assert.ok(s instanceof mongoose.mongo.Mongos);
+        assert.equal(2, s.servers.length);
+
+        var M = m.model('TestMultipleMongos', { name: String }, 'test-multi-mongos-' + random());
+        M.create({ name: 'works' }, function (err, d) {
+          assert.ifError(err);
+
+          M.findOne({ name: 'works' }, function (err, doc) {
+            assert.ifError(err);
+            assert.equal(doc.id, d.id);
+            m.disconnect(done);
+          })
+        })
+      })
+    })
+  })
+
   describe('modelNames()', function(){
     it('returns names of all models registered on it', function(done){
       var m = new mongoose.Mongoose;
@@ -849,4 +892,229 @@ describe('connections:', function(){
       done();
     })
   })
+
+  describe('connection pool sharing: ', function () {
+    it('works', function (done) {
+      var db = mongoose.createConnection('mongodb://localhost/mongoose1');
+
+      var db2 = db.useDb('mongoose2');
+
+      assert.equal(db2.name, 'mongoose2');
+      assert.equal(db.name, 'mongoose1');
+
+      assert.equal(db.port, db2.port);
+      assert.equal(db.replica, db2.replica);
+      assert.equal(db.hosts, db2.hosts);
+      assert.equal(db.host, db2.host);
+      assert.equal(db.port, db2.port);
+      assert.equal(db.user, db2.user);
+      assert.equal(db.pass, db2.pass);
+      assert.deepEqual(db.options, db2.options);
+
+      done();
+    });
+
+    it('saves correctly', function (done) {
+      var db = start();
+      var db2 = db.useDb('mongoose-test-2');
+
+      var schema = new Schema({
+        body : String,
+        thing : Number
+      });
+
+      var m1 = db.model('testMod', schema);
+      var m2 = db2.model('testMod', schema);
+
+      m1.create({ body : 'this is some text', thing : 1 }, function (err, i1) {
+        assert.ifError(err);
+        m2.create({ body : 'this is another body', thing : 2 }, function (err, i2) {
+          assert.ifError(err);
+
+          m1.findById(i1.id, function (err, item1) {
+            assert.ifError(err);
+            assert.equal(item1.body, 'this is some text');
+            assert.equal(item1.thing, 1);
+
+            m2.findById(i2.id, function (err, item2) {
+              assert.ifError(err);
+              assert.equal(item2.body, 'this is another body');
+              assert.equal(item2.thing, 2);
+
+              // validate the doc doesn't exist in the other db
+              m1.findById(i2.id, function (err, nothing) {
+                assert.ifError(err);
+                assert.strictEqual(null, nothing);
+
+                m2.findById(i1.id, function (err, nothing) {
+                  assert.ifError(err);
+                  assert.strictEqual(null, nothing);
+
+                  db2.close(done)
+                })
+              })
+            });
+          });
+        });
+      });
+    });
+
+    it('emits connecting events on both', function (done) {
+      var db = mongoose.createConnection();
+      var db2 = db.useDb('mongoose-test-2');
+      var hit = false;
+
+      db2.on('connecting', function () {
+        hit && close();
+        hit = true;
+      });
+
+      db.on('connecting', function () {
+        hit && close();
+        hit = true;
+      });
+
+      db.open(start.uri);
+
+      function close () {
+        db.close(done);
+      }
+    });
+
+    it('emits connected events on both', function (done) {
+      var db = mongoose.createConnection();
+      var db2 = db.useDb('mongoose-test-2');
+      var hit = false;
+
+      db2.on('connected', function () {
+        hit && close();
+        hit = true;
+      });
+      db.on('connected', function () {
+        hit && close();
+        hit = true;
+      });
+
+      db.open(start.uri);
+
+      function close () {
+        db.close(done);
+      }
+
+    });
+
+    it('emits open events on both', function (done) {
+      var db = mongoose.createConnection();
+      var db2 = db.useDb('mongoose-test-2');
+      var hit = false;
+      db2.on('open', function () {
+        hit && close();
+        hit = true;
+      });
+      db.on('open', function () {
+        hit && close();
+        hit = true;
+      });
+
+      db.open(start.uri);
+
+      function close () {
+        db.close(done);
+      }
+    });
+
+    it('emits disconnecting events on both, closing initial db', function (done) {
+      var db = mongoose.createConnection();
+      var db2 = db.useDb('mongoose-test-2');
+      var hit = false;
+      db2.on('disconnecting', function () {
+        hit && done();
+        hit = true;
+      });
+      db.on('disconnecting', function () {
+        hit && done();
+        hit = true;
+      });
+      db.on('open', function () {
+        db.close();
+      });
+      db.open(start.uri);
+    });
+
+    it('emits disconnecting events on both, closing secondary db', function (done) {
+      var db = mongoose.createConnection();
+      var db2 = db.useDb('mongoose-test-2');
+      var hit = false;
+      db2.on('disconnecting', function () {
+        hit && done();
+        hit = true;
+      });
+      db.on('disconnecting', function () {
+        hit && done();
+        hit = true;
+      });
+      db.on('open', function () {
+        db2.close();
+      });
+      db.open(start.uri);
+    });
+
+    it('emits disconnected events on both, closing initial db', function (done) {
+      var db = mongoose.createConnection();
+      var db2 = db.useDb('mongoose-test-2');
+      var hit = false;
+      db2.on('disconnected', function () {
+        hit && done();
+        hit = true;
+      });
+      db.on('disconnected', function () {
+        hit && done();
+        hit = true;
+      });
+      db.on('open', function () {
+        db.close();
+      });
+      db.open(start.uri);
+    });
+
+    it('emits disconnected events on both, closing secondary db', function (done) {
+      var db = mongoose.createConnection();
+      var db2 = db.useDb('mongoose-test-2');
+      var hit = false;
+      db2.on('disconnected', function () {
+        hit && done();
+        hit = true;
+      });
+      db.on('disconnected', function () {
+        hit && done();
+        hit = true;
+      });
+      db.on('open', function () {
+        db2.close();
+      });
+      db.open(start.uri);
+    });
+
+    it('closes correctly for all dbs, closing initial db', function (done) {
+      var db = start();
+      var db2 = db.useDb('mongoose-test-2');
+
+      db2.on('close', function () {
+        done();
+      });
+      db.close();
+
+    });
+
+    it('closes correctly for all dbs, closing secondary db', function (done) {
+      var db = start();
+      var db2 = db.useDb('mongoose-test-2');
+
+      db.on('close', function () {
+        done();
+      });
+      db2.close();
+
+    });
+  });
 })

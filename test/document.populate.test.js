@@ -485,4 +485,22 @@ describe('document.populate', function(){
       })
     })
   })
+
+  describe('of new document', function(){
+    it('should save just the populated _id (gh-1442)', function(done){
+      var b = new B({ _creator: user1 });
+      b.populate('_creator', function (err, b) {
+        if (err) return done(err);
+        assert.equal('Phoenix', b._creator.name);
+        b.save(function (err) {
+          assert.ifError(err);
+          B.collection.findOne({ _id: b._id }, function (err, b) {
+            assert.ifError(err);
+            assert.equal(b._creator, String(user1._id));
+            done();
+          })
+        })
+      })
+    })
+  })
 });

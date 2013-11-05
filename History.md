@@ -1,4 +1,408 @@
 
+3.8.0 / 2013-10-31
+==================
+
+ * updated; warn when using an unstable version
+ * updated; error message returned in doc.save() #1595
+ * updated; mongodb driver to 1.3.19 (fix error swallowing behavior)
+ * updated; mquery to 0.3.2
+ * updated; mocha to 1.12.0
+ * updated; mpromise 0.3.0
+ * updated; sliced 0.0.5
+ * removed; mongoose.Error.DocumentError (never used)
+ * removed; namedscope (undocumented and broken) #679 #642 #455 #379
+ * changed; no longer offically supporting node 0.6.x
+ * changed; query.within getter is now a method -> query.within()
+ * changed; query.intersects getter is now a method -> query.intersects()
+ * added; custom error msgs for built-in validators #747
+ * added; discriminator support #1647 #1003 [j](https://github.com/j)
+ * added; support disabled collection name pluralization #1350 #1707 [refack](https://github.com/refack)
+ * added; support for GeoJSON to Query#near [ebensing](https://github.com/ebensing)
+ * added; stand-alone base query support - query.toConstructor() [ebensing](https://github.com/ebensing)
+ * added; promise support to geoSearch #1614 [ebensing](https://github.com/ebensing)
+ * added; promise support for geoNear #1614 [ebensing](https://github.com/ebensing)
+ * added; connection.useDb() #1124 [ebensing](https://github.com/ebensing)
+ * added; promise support to model.mapReduce()
+ * added; promise support to model.ensureIndexes()
+ * added; promise support to model.populate()
+ * added; benchmarks [ebensing](https://github.com/ebensing)
+ * added; publicly exposed connection states #1585
+ * added; $geoWithin support #1529 $1455 [ebensing](https://github.com/ebensing)
+ * added; query method chain validation
+ * added; model.update `overwrite` option
+ * added; model.geoNear() support #1563 [ebensing](https://github.com/ebensing)
+ * added; model.geoSearch() support #1560 [ebensing](https://github.com/ebensing)
+ * added; MongooseBuffer#subtype()
+ * added; model.create() now returns a promise #1340
+ * added; support for `awaitdata` query option
+ * added; pass the doc to doc.remove() callback #1419 [JoeWagner](https://github.com/JoeWagner)
+ * added; aggregation query builder #1404 [njoyard](https://github.com/njoyard)
+ * fixed; document.toObject when using `minimize` and `getters` options #1607 [JedWatson](https://github.com/JedWatson)
+ * fixed; Mixed types can now be required #1722 [Reggino](https://github.com/Reggino)
+ * fixed; do not pluralize model names not ending with letters #1703 [refack](https://github.com/refack)
+ * fixed; repopulating modified populated paths #1697
+ * fixed; doc.equals() when _id option is set to false #1687
+ * fixed; strict mode warnings #1686
+ * fixed; $near GeoJSON casting #1683
+ * fixed; nearSphere GeoJSON query builder
+ * fixed; population field selection w/ strings #1669
+ * fixed; setters not firing on null values #1445 [ebensing](https://github.com/ebensing)
+ * fixed; handle another versioning edge case #1520
+ * fixed; excluding subdocument fields #1280 [ebensing](https://github.com/ebensing)
+ * fixed; allow array properties to be set to null with findOneAndUpdate [aheuermann](https://github.com/aheuermann)
+ * fixed; subdocuments now use own toJSON opts #1376 [ebensing](https://github.com/ebensing)
+ * fixed; model#geoNear fulfills promise when results empty #1658 [ebensing](https://github.com/ebensing)
+ * fixed; utils.merge no longer overrides props and methods #1655 [j](https://github.com/j)
+ * fixed; subdocuments now use their own transform #1412 [ebensing](https://github.com/ebensing)
+ * fixed; model.remove() removes only what is necessary #1649
+ * fixed; update() now only runs with cb or explicit true #1644
+ * fixed; casting ref docs on creation #1606 [ebensing](https://github.com/ebensing)
+ * fixed; model.update "overwrite" option works as documented
+ * fixed; query#remove() works as documented
+ * fixed; "limit" correctly applies to individual items on population #1490 [ebensing](https://github.com/ebensing)
+ * fixed; issue with positional operator on ref docs #1572 [ebensing](https://github.com/ebensing)
+ * fixed; benchmarks to actually output valid json
+ * deprecated; promise#addBack (use promise#onResolve)
+ * deprecated; promise#complete (use promise#fulfill)
+ * deprecated; promise#addCallback (use promise#onFulFill)
+ * deprecated; promise#addErrback (use promise#onReject)
+ * deprecated; query.nearSphere() (use query.near)
+ * deprecated; query.center() (use query.circle)
+ * deprecated; query.centerSphere() (use query.circle)
+ * deprecated; query#slaveOk (use query#read)
+ * docs; custom validator messages
+ * docs; 10gen -> MongoDB
+ * docs; add Date method caveats #1598
+ * docs; more validation details
+ * docs; state which branch is stable/unstable
+ * docs; mention that middleware does not run on Models
+ * docs; promise.fulfill()
+ * docs; fix readme spelling #1483 [yorchopolis](https://github.com/yorchopolis)
+ * docs; fixed up the README and examples [ebensing](https://github.com/ebensing)
+ * website; add "show code" for properties
+ * website; move "show code" links down
+ * website; update guide
+ * website; add unstable docs
+ * website; many improvements
+ * website; fix copyright #1439
+ * website; server.js -> static.js #1546 [nikmartin](https://github.com/nikmartin)
+ * tests; refactor 1703
+ * tests; add test generator
+ * tests; validate formatMessage() throws
+ * tests; add script for continuously running tests
+ * tests; fixed versioning tests
+ * tests; race conditions in tests
+ * tests; added for nested and/or queries
+ * tests; close some test connections
+ * tests; validate db contents
+ * tests; remove .only
+ * tests; close some test connections
+ * tests; validate db contents
+ * tests; remove .only
+ * tests; replace deprecated method names
+ * tests; convert id to string
+ * tests; fix sharding tests for MongoDB 2.4.5
+ * tests; now 4-5 seconds faster
+ * tests; fix race condition
+ * make; suppress warning msg in test
+ * benchmarks; updated for pull requests
+ * examples; improved and expanded [ebensing](https://github.com/ebensing)
+
+3.7.4 (unstable) / 2013-10-01
+=============================
+
+ * updated; mquery to 0.3.2
+ * removed; mongoose.Error.DocumentError (never used)
+ * added; custom error msgs for built-in validators #747
+ * added; discriminator support #1647 #1003 [j](https://github.com/j)
+ * added; support disabled collection name pluralization #1350 #1707 [refack](https://github.com/refack)
+ * fixed; do not pluralize model names not ending with letters #1703 [refack](https://github.com/refack)
+ * fixed; repopulating modified populated paths #1697
+ * fixed; doc.equals() when _id option is set to false #1687
+ * fixed; strict mode warnings #1686
+ * fixed; $near GeoJSON casting #1683
+ * fixed; nearSphere GeoJSON query builder
+ * fixed; population field selection w/ strings #1669
+ * docs; custom validator messages
+ * docs; 10gen -> MongoDB
+ * docs; add Date method caveats #1598
+ * docs; more validation details
+ * website; add "show code" for properties
+ * website; move "show code" links down
+ * tests; refactor 1703
+ * tests; add test generator
+ * tests; validate formatMessage() throws
+
+3.7.3 (unstable) / 2013-08-22
+=============================
+
+  * updated; warn when using an unstable version
+  * updated; mquery to 0.3.1
+  * updated; mocha to 1.12.0
+  * updated; mongodb driver to 1.3.19 (fix error swallowing behavior)
+  * changed; no longer offically supporting node 0.6.x
+  * added; support for GeoJSON to Query#near [ebensing](https://github.com/ebensing)
+  * added; stand-alone base query support - query.toConstructor() [ebensing](https://github.com/ebensing)
+  * added; promise support to geoSearch #1614 [ebensing](https://github.com/ebensing)
+  * added; promise support for geoNear #1614 [ebensing](https://github.com/ebensing)
+  * fixed; setters not firing on null values #1445 [ebensing](https://github.com/ebensing)
+  * fixed; handle another versioning edge case #1520
+  * fixed; excluding subdocument fields #1280 [ebensing](https://github.com/ebensing)
+  * fixed; allow array properties to be set to null with findOneAndUpdate [aheuermann](https://github.com/aheuermann)
+  * fixed; subdocuments now use own toJSON opts #1376 [ebensing](https://github.com/ebensing)
+  * fixed; model#geoNear fulfills promise when results empty #1658 [ebensing](https://github.com/ebensing)
+  * fixed; utils.merge no longer overrides props and methods #1655 [j](https://github.com/j)
+  * fixed; subdocuments now use their own transform #1412 [ebensing](https://github.com/ebensing)
+  * make; suppress warning msg in test
+  * docs; state which branch is stable/unstable
+  * docs; mention that middleware does not run on Models
+  * tests; add script for continuously running tests
+  * tests; fixed versioning tests
+  * benchmarks; updated for pull requests
+
+3.7.2 (unstable) / 2013-08-15
+==================
+
+  * fixed; model.remove() removes only what is necessary #1649
+  * fixed; update() now only runs with cb or explicit true #1644
+  * tests; race conditions in tests
+  * website; update guide
+
+3.7.1 (unstable) / 2013-08-13
+=============================
+
+  * updated; driver to 1.3.18 (fixes memory leak)
+  * added; connection.useDb() #1124 [ebensing](https://github.com/ebensing)
+  * added; promise support to model.mapReduce()
+  * added; promise support to model.ensureIndexes()
+  * added; promise support to model.populate()
+  * fixed; casting ref docs on creation #1606 [ebensing](https://github.com/ebensing)
+  * fixed; model.update "overwrite" option works as documented
+  * fixed; query#remove() works as documented
+  * fixed; "limit" correctly applies to individual items on population #1490 [ebensing](https://github.com/ebensing)
+  * fixed; issue with positional operator on ref docs #1572 [ebensing](https://github.com/ebensing)
+  * fixed; benchmarks to actually output valid json
+  * tests; added for nested and/or queries
+  * tests; close some test connections
+  * tests; validate db contents
+  * tests; remove .only
+  * tests; close some test connections
+  * tests; validate db contents
+  * tests; remove .only
+  * tests; replace deprecated method names
+  * tests; convert id to string
+  * docs; promise.fulfill()
+
+3.7.0 (unstable) / 2013-08-05
+===================
+
+  * changed; query.within getter is now a method -> query.within()
+  * changed; query.intersects getter is now a method -> query.intersects()
+  * deprecated; promise#addBack (use promise#onResolve)
+  * deprecated; promise#complete (use promise#fulfill)
+  * deprecated; promise#addCallback (use promise#onFulFill)
+  * deprecated; promise#addErrback (use promise#onReject)
+  * deprecated; query.nearSphere() (use query.near)
+  * deprecated; query.center() (use query.circle)
+  * deprecated; query.centerSphere() (use query.circle)
+  * deprecated; query#slaveOk (use query#read)
+  * removed; namedscope (undocumented and broken) #679 #642 #455 #379
+  * added; benchmarks [ebensing](https://github.com/ebensing)
+  * added; publicly exposed connection states #1585
+  * added; $geoWithin support #1529 $1455 [ebensing](https://github.com/ebensing)
+  * added; query method chain validation
+  * added; model.update `overwrite` option
+  * added; model.geoNear() support #1563 [ebensing](https://github.com/ebensing)
+  * added; model.geoSearch() support #1560 [ebensing](https://github.com/ebensing)
+  * added; MongooseBuffer#subtype()
+  * added; model.create() now returns a promise #1340
+  * added; support for `awaitdata` query option
+  * added; pass the doc to doc.remove() callback #1419 [JoeWagner](https://github.com/JoeWagner)
+  * added; aggregation query builder #1404 [njoyard](https://github.com/njoyard)
+  * updated; integrate mquery #1562 [ebensing](https://github.com/ebensing)
+  * updated; error msg in doc.save() #1595
+  * updated; bump driver to 1.3.15
+  * updated; mpromise 0.3.0
+  * updated; sliced 0.0.5
+  * tests; fix sharding tests for MongoDB 2.4.5
+  * tests; now 4-5 seconds faster
+  * tests; fix race condition
+  * docs; fix readme spelling #1483 [yorchopolis](https://github.com/yorchopolis)
+  * docs; fixed up the README and examples [ebensing](https://github.com/ebensing)
+  * website; add unstable docs
+  * website; many improvements
+  * website; fix copyright #1439
+  * website; server.js -> static.js #1546 [nikmartin](https://github.com/nikmartin)
+  * examples; improved and expanded [ebensing](https://github.com/ebensing)
+
+3.6.20 (stable) / 2013-09-23
+===================
+
+ * fixed; repopulating modified populated paths #1697
+ * fixed; doc.equals w/ _id false #1687
+ * fixed; strict mode warning #1686
+ * docs; near/nearSphere
+
+3.6.19 (stable) / 2013-09-04
+==================
+
+  * fixed; population field selection w/ strings #1669
+  * docs; Date method caveats #1598
+
+3.6.18 (stable) / 2013-08-22
+===================
+
+  * updated; warn when using an unstable version of mongoose
+  * updated; mocha to 1.12.0
+  * updated; mongodb driver to 1.3.19 (fix error swallowing behavior)
+  * fixed; setters not firing on null values #1445 [ebensing](https://github.com/ebensing)
+  * fixed; properly exclude subdocument fields #1280 [ebensing](https://github.com/ebensing)
+  * fixed; cast error in findAndModify #1643 [aheuermann](https://github.com/aheuermann)
+  * website; update guide
+  * website; added documentation for safe:false and versioning interaction
+  * docs; mention that middleware dont run on Models
+  * docs; fix indexes link
+  * make; suppress warning msg in test
+  * tests; moar
+
+3.6.17 / 2013-08-13
+===================
+
+  * updated; driver to 1.3.18 (fixes memory leak)
+  * fixed; casting ref docs on creation #1606
+  * docs; query options
+
+3.6.16 / 2013-08-08
+===================
+
+  * added; publicly expose connection states #1585
+  * fixed; limit applies to individual items on population #1490 [ebensing](https://github.com/ebensing)
+  * fixed; positional operator casting in updates #1572 [ebensing](https://github.com/ebensing)
+  * updated; MongoDB driver to 1.3.17
+  * updated; sliced to 0.0.5
+  * website; tweak homepage
+  * tests; fixed + added
+  * docs; fix some examples
+  * docs; multi-mongos support details
+  * docs; auto open browser after starting static server
+
+3.6.15 / 2013-07-16
+==================
+
+  * added; mongos failover support #1037
+  * updated; make schematype return vals return self #1580
+  * docs; add note to model.update #571
+  * docs; document third param to document.save callback #1536
+  * tests; tweek mongos test timeout
+
+3.6.14 / 2013-07-05
+===================
+
+  * updated; driver to 1.3.11
+  * fixed; issue with findOneAndUpdate not returning null on upserts #1533 [ebensing](https://github.com/ebensing)
+  * fixed; missing return statement in SchemaArray#$geoIntersects() #1498 [bsrykt](https://github.com/bsrykt)
+  * fixed; wrong isSelected() behavior #1521 [kyano](https://github.com/kyano)
+  * docs; note about toObject behavior during save()
+  * docs; add callbacks details #1547 [nikmartin](https://github.com/nikmartin)
+
+3.6.13 / 2013-06-27
+===================
+
+  * fixed; calling model.distinct without conditions #1541
+  * fixed; regression in Query#count() #1542
+  * now working on 3.6.13
+
+3.6.12 / 2013-06-25
+===================
+
+  * updated; driver to 1.3.10
+  * updated; clearer capped collection error message #1509 [bitmage](https://github.com/bitmage)
+  * fixed; MongooseBuffer subtype loss during casting #1517 [zedgu](https://github.com/zedgu)
+  * fixed; docArray#id when doc.id is disabled #1492
+  * fixed; docArray#id now supports matches on populated arrays #1492 [pgherveou](https://github.com/pgherveou)
+  * website; fix example
+  * website; improve _id disabling example
+  * website; fix typo #1494 [dejj](https://github.com/dejj)
+  * docs; added a 'Requesting new features' section #1504 [shovon](https://github.com/shovon)
+  * docs; improve subtypes description
+  * docs; clarify _id disabling
+  * docs: display by alphabetical order the methods list #1508 [nicolasleger](https://github.com/nicolasleger)
+  * tests; refactor isSelected checks
+  * tests; remove pointless test
+  * tests; fixed timeouts
+
+3.6.11 / 2013-05-15
+===================
+
+  * updated; driver to 1.3.5
+  * fixed; compat w/ Object.create(null) #1484 #1485
+  * fixed; cloning objects w/ missing constructors
+  * fixed; prevent multiple min number validators #1481 [nrako](https://github.com/nrako)
+  * docs; add doc.increment() example
+  * docs; add $size example
+  * docs; add "distinct" example
+
+3.6.10 / 2013-05-09
+==================
+
+  * update driver to 1.3.3
+  * fixed; increment() works without other changes #1475
+  * website; fix links to posterous
+  * docs; fix link #1472
+
+3.6.9 / 2013-05-02
+==================
+
+  * fixed; depopulation of mixed documents #1471
+  * fixed; use of $options in array #1462
+  * tests; fix race condition
+  * docs; fix default example
+
+3.6.8 / 2013-04-25
+==================
+
+  * updated; driver to 1.3.0
+  * fixed; connection.model should retain options #1458 [vedmalex](https://github.com/vedmalex)
+  * tests; 4-5 seconds faster
+
+3.6.7 / 2013-04-19
+==================
+
+  * fixed; population regression in 3.6.6 #1444
+
+3.6.6 / 2013-04-18
+==================
+
+  * fixed; saving populated new documents #1442
+  * fixed; population regession in 3.6.5 #1441
+  * website; fix copyright #1439
+
+3.6.5 / 2013-04-15
+==================
+
+  * fixed; strict:throw edge case using .set(path, val)
+  * fixed; schema.pathType() on some numbericAlpha paths
+  * fixed; numbericAlpha path versioning
+  * fixed; setting nested mixed paths #1418
+  * fixed; setting nested objects with null prop #1326
+  * fixed; regression in v3.6 population performance #1426 [vedmalex](https://github.com/vedmalex)
+  * fixed; read pref typos #1422 [kyano](https://github.com/kyano)
+  * docs; fix method example
+  * website; update faq
+  * website; add more deep links
+  * website; update poolSize docs
+  * website; add 3.6 release notes
+  * website; note about keepAlive
+
+3.6.4 / 2013-04-03
+==================
+
+  * fixed; +field conflict with $slice #1370
+  * fixed; nested deselection conflict #1333
+  * fixed; RangeError in ValidationError.toString() #1296
+  * fixed; do not save user defined transforms #1415
+  * tests; fix race condition
+
 3.6.3 / 2013-04-02
 ==================
 
@@ -10,12 +414,6 @@
   * examples; add document methods example
   * website; display "see" links for properties
   * website; clean up homepage
-
-3.5.10 / 2013-04-02
-==================
-
-  * fixed; setting subdocuments deeply nested fields #1394
-  * fixed; do not alter schema arguments #1364
 
 3.6.2 / 2013-03-29
 ==================
@@ -127,19 +525,6 @@
   * website; use T for generic type
   * benchmark; make adjustable
 
-3.5.9 / 2013-03-15
-==================
-
-  * updated; driver to 1.2.14
-  * added; support for authSource driver option (mongodb 2.4)
-  * added; QueryStream transform option (node 0.10 helper)
-  * fixed; backport for saving required populated buffers
-  * fixed; pull / set subdoc combination #1303
-  * fixed; multiple bg index creation #1365
-  * test; added for saveable required populated buffers
-  * test; added for #1365
-  * test; add authSource test
-
 3.6.0rc1 / 2013-03-12
 ======================
 
@@ -182,6 +567,97 @@
   * website; add news section
   * benchmark; make adjustable
 
+3.6.0rc0 / 2013-02-03
+======================
+
+  * changed; cast 'true'/'false' to boolean #1282 [mgrach](https://github.com/mgrach)
+  * changed; Buffer arrays can now contain nulls
+  * fixed; properly pass subtype to Binary in MongooseBuffer
+  * fixed; casting _id from document with non-ObjectId _id
+  * fixed; specifying schema type edge case { path: [{type: "String" }] }
+  * fixed; typo in schemdate #1329 [jplock](https://github.com/jplock)
+  * refactor; move expires index to SchemaDate #1328
+  * refactor; internal document properties #1171 #1184
+  * added; performance improvements to populate() [263ece9](https://github.com/LearnBoost/mongoose/commit/263ece9)
+  * added; allow adding uncasted docs to populated arrays and properties #570
+  * added; doc#populated(path) stores original populated _ids
+  * added; lean population #1260
+  * added; query.populate() now accepts an options object
+  * added; document#populate(opts, callback)
+  * added; Model.populate(docs, opts, callback)
+  * added; support for rich nested path population
+  * added; doc.array.remove(value) subdoc with _id value support #1278
+  * added; optionally allow non-strict sets and updates
+  * added; promises/A+ comformancy with [mpromise](https://github.com/aheckmann/mpromise)
+  * added; promise#then
+  * added; promise#end
+  * updated; mocha 1.8.1
+  * updated; muri to 0.3.0
+  * updated; mpath to 0.1.1
+  * updated; docs
+
+3.5.16 / 2013-08-13
+===================
+
+  * updated; driver to 1.3.18
+
+3.5.15 / 2013-07-26
+==================
+
+  * updated; sliced to 0.0.5
+  * updated; driver to 1.3.12
+  * fixed; regression in Query#count() due to driver change
+  * tests; fixed timeouts
+  * tests; handle differing test uris
+
+3.5.14 / 2013-05-15
+===================
+
+  * updated; driver to 1.3.5
+  * fixed; compat w/ Object.create(null) #1484 #1485
+  * fixed; cloning objects missing constructors
+  * fixed; prevent multiple min number validators #1481 [nrako](https://github.com/nrako)
+
+3.5.13 / 2013-05-09
+==================
+
+  * update driver to 1.3.3
+  * fixed; use of $options in array #1462
+
+3.5.12 / 2013-04-25
+===================
+
+  * updated; driver to 1.3.0
+  * fixed; connection.model should retain options #1458 [vedmalex](https://github.com/vedmalex)
+  * fixed; read pref typos #1422 [kyano](https://github.com/kyano)
+
+3.5.11 / 2013-04-03
+==================
+
+  * fixed; +field conflict with $slice #1370
+  * fixed; RangeError in ValidationError.toString() #1296
+  * fixed; nested deselection conflict #1333
+  * remove time from Makefile
+
+3.5.10 / 2013-04-02
+==================
+
+  * fixed; setting subdocuments deeply nested fields #1394
+  * fixed; do not alter schema arguments #1364
+
+3.5.9 / 2013-03-15
+==================
+
+  * updated; driver to 1.2.14
+  * added; support for authSource driver option (mongodb 2.4)
+  * added; QueryStream transform option (node 0.10 helper)
+  * fixed; backport for saving required populated buffers
+  * fixed; pull / set subdoc combination #1303
+  * fixed; multiple bg index creation #1365
+  * test; added for saveable required populated buffers
+  * test; added for #1365
+  * test; add authSource test
+
 3.5.8 / 2013-03-12
 ==================
 
@@ -219,35 +695,6 @@
   * docs; add ensureIndex error handling example
   * docs; README
   * docs; CONTRIBUTING.md
-
-3.6.0rc0 / 2013-02-03
-======================
-
-  * changed; cast 'true'/'false' to boolean #1282 [mgrach](https://github.com/mgrach)
-  * changed; Buffer arrays can now contain nulls
-  * fixed; properly pass subtype to Binary in MongooseBuffer
-  * fixed; casting _id from document with non-ObjectId _id
-  * fixed; specifying schema type edge case { path: [{type: "String" }] }
-  * fixed; typo in schemdate #1329 [jplock](https://github.com/jplock)
-  * refactor; move expires index to SchemaDate #1328
-  * refactor; internal document properties #1171 #1184
-  * added; performance improvements to populate() [263ece9](https://github.com/LearnBoost/mongoose/commit/263ece9)
-  * added; allow adding uncasted docs to populated arrays and properties #570
-  * added; doc#populated(path) stores original populated _ids
-  * added; lean population #1260
-  * added; query.populate() now accepts an options object
-  * added; document#populate(opts, callback)
-  * added; Model.populate(docs, opts, callback)
-  * added; support for rich nested path population
-  * added; doc.array.remove(value) subdoc with _id value support #1278
-  * added; optionally allow non-strict sets and updates
-  * added; promises/A+ comformancy with [mpromise](https://github.com/aheckmann/mpromise)
-  * added; promise#then
-  * added; promise#end
-  * updated; mocha 1.8.1
-  * updated; muri to 0.3.0
-  * updated; mpath to 0.1.1
-  * updated; docs
 
 3.5.5 / 2013-01-29
 ==================

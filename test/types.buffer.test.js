@@ -8,9 +8,7 @@ var start = require('./common')
   , mongoose = require('./common').mongoose
   , Schema = mongoose.Schema
   , random = require('../lib/utils').random
-  , MongooseBuffer = mongoose.Types.Buffer;
-
-// can't index Buffer fields yet
+  , MongooseBuffer = mongoose.Types.Buffer
 
 function valid (v) {
   return !v || v.length > 10;
@@ -86,7 +84,8 @@ describe('types.buffer', function(){
             t.sub[0].buf = new Buffer("well well");
             t.save(function (err) {
               assert.equal(err.message,'Validation failed');
-              assert.equal(err.errors['sub.0.buf'].type,'valid failed');
+              assert.equal(err.errors['sub.0.buf'].type,'user defined');
+              assert.equal(err.errors['sub.0.buf'].message,'valid failed');
 
               t.sub[0].buf = new Buffer("well well well");
               t.validate(function (err) {
@@ -380,4 +379,75 @@ describe('types.buffer', function(){
 
   })
 
+  describe('#toObject', function(){
+    it('retains custom subtypes', function(done){
+      var buf = new MongooseBuffer(0);
+      var out = buf.toObject(2);
+      // validate the drivers Binary type output retains the option
+      assert.equal(out.sub_type, 2);
+      done();
+    })
+  })
+
+  describe('subtype', function(){
+    var db, bufferSchema, B;
+
+    before(function(done){
+      db = start();
+      bufferSchema = new Schema({ buf: Buffer });
+      B = db.model('1571', bufferSchema);
+      done();
+    })
+
+    after(function(done){
+      db.close(done);
+    })
+
+    it('default value', function(done){
+      var b = new B({ buf: new Buffer('hi') });
+      assert.strictEqual(0, b.buf._subtype);
+      done();
+    })
+
+    it('method works', function(done){
+      var b = new B({ buf: new Buffer('hi') });
+      b.buf.subtype(128);
+      assert.strictEqual(128, b.buf._subtype);
+      done();
+    })
+
+    it('is stored', function(done){
+      var b = new B({ buf: new Buffer('hi') });
+      b.buf.subtype(128);
+      b.save(function (err) {
+        if (err) return done(err);
+        B.findById(b, function (err, doc) {
+          if (err) return done(err);
+          assert.equal(128, doc.buf._subtype);
+          done();
+        })
+      })
+    })
+
+    it('changes are retained', function(done){
+      var b = new B({ buf: new Buffer('hi') });
+      b.buf.subtype(128);
+      b.save(function (err) {
+        if (err) return done(err);
+        B.findById(b, function (err, doc) {
+          if (err) return done(err);
+          assert.equal(128, doc.buf._subtype);
+          doc.buf.subtype(0);
+          doc.save(function (err) {
+            if (err) return done(err);
+            B.findById(b, function (err, doc) {
+              if (err) return done(err);
+              assert.strictEqual(0, doc.buf._subtype);
+              done();
+            })
+          })
+        })
+      })
+    })
+  })
 })

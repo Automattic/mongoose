@@ -25,15 +25,16 @@ describe('document: strict mode:', function(){
   it('should work', function(done){
     var db = start();
 
-    var lax = new Schema({
+    var raw = {
         ts  : { type: Date, default: Date.now }
       , content: String
-    }, { strict: false });
+      , mixed: {}
+      , deepMixed: { '4a': {}}
+      , arrayMixed: []
+    };
 
-    var strict = new Schema({
-        ts  : { type: Date, default: Date.now }
-      , content: String
-    });
+    var lax = new Schema(raw, { strict: false });
+    var strict = new Schema(raw);
 
     var Lax = db.model('Lax', lax);
     var Strict = db.model('Strict', strict);
@@ -41,6 +42,7 @@ describe('document: strict mode:', function(){
     var l = new Lax({content: 'sample', rouge: 'data'});
     assert.equal(false, l.$__.strictMode);
     l = l.toObject();
+    assert.ok('ts' in l);
     assert.equal('sample', l.content);
     assert.equal('data', l.rouge);
 
@@ -124,6 +126,7 @@ describe('document: strict mode:', function(){
     assert.ok(!s.shouldnt);
     done();
   })
+
   it('sub doc', function(done){
     var db = start();
 
@@ -289,5 +292,77 @@ describe('document: strict mode:', function(){
         })
       })
     })
+  })
+
+  describe('"throws" mode', function(){
+    it('throws on set() of unknown property', function(done){
+      var schema = Schema({ n: String, docs:[{x:[{y:String}]}] });
+      schema.set('strict', 'throw')
+      var M = mongoose.model('throwStrictSet', schema, 'tss_'+random());
+      var m = new M;
+
+      var badField = /Field `[\w\.]+` is not in schema/;
+
+      assert.throws(function(){
+        m.set('unknown.stuff.is.here', 3);
+      }, badField);
+
+      assert.throws(function(){
+        m.set('n.something', 3);
+      }, badField);
+
+      assert.throws(function(){
+        m.set('n.3', 3);
+      }, badField);
+
+      assert.throws(function(){
+        m.set('z', 3);
+      }, badField);
+
+      assert.throws(function(){
+        m.set('docs.z', 3);
+      }, badField);
+
+      assert.throws(function(){
+        m.set('docs.0.z', 3);
+      }, badField);
+
+      assert.throws(function(){
+        m.set('docs.0.x.z', 3);
+      }, badField);
+
+      assert.throws(function(){
+        m.set('docs.0.x.4.z', 3);
+      }, badField);
+
+      assert.throws(function(){
+        m.set('docs.0.x.4.y.z', 3);
+      }, badField);
+
+      done();
+    })
+
+    it('fails with extra fields', function (done) {
+      var m = new mongoose.Mongoose;
+
+      // Simple schema with throws option
+      var FooSchema = new mongoose.Schema({
+          name: { type: String }
+      }, {strict: "throw"});
+
+      // Create the model
+      var Foo = m.model('Foo', FooSchema);
+
+      assert.doesNotThrow(function(){
+        new Foo({name: 'bar'});
+      })
+
+      assert.throws(function(){
+        // The extra baz field should throw
+        new Foo({name: 'bar', baz: 'bam'});
+      }, /Field `baz` is not in schema/);
+
+      done();
+    });
   })
 })

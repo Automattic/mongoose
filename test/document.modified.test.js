@@ -304,5 +304,46 @@ describe('document modified', function(){
         });
       });
     })
+
+    it('should support setting mixed paths by string (gh-1418)', function(done){
+      var db = start();
+      var BlogPost = db.model('1418', new Schema({ mixed: {} }))
+      var b = new BlogPost;
+      b.init({ mixed: {} });
+
+      var path = 'mixed.path';
+      assert.ok(!b.isModified(path));
+
+      b.set(path, 3);
+      assert.ok(b.isModified(path));
+      assert.equal(3, b.get(path));
+
+      b = new BlogPost;
+      b.init({ mixed: {} });
+      path = 'mixed.9a';
+      b.set(path, 4);
+      assert.ok(b.isModified(path));
+      assert.equal(4, b.get(path));
+
+      b = new BlogPost({ mixed: {} })
+      b.save(function (err) {
+        assert.ifError(err);
+
+        path = 'mixed.9a.x';
+        b.set(path, 8);
+        assert.ok(b.isModified(path));
+        assert.equal(8, b.get(path));
+
+        b.save(function (err) {
+          assert.ifError(err);
+          BlogPost.findById(b, function (err, doc) {
+            db.close();
+            assert.ifError(err);
+            assert.equal(8, doc.get(path));
+            done();
+          })
+        })
+      });
+    })
   });
 })

@@ -212,12 +212,29 @@ function fix (str) {
 }
 
 function order (docs) {
+  var sortByCtxName = function (a, b) {
+    if (!a.ctx) {
+      console.error('missing ctx', a);
+    }
+    if (!b.ctx) {
+      console.error('missing ctx', b);
+    }
+    return a.ctx.name.localeCompare(b.ctx.name);
+  };
+
   // want index first
   for (var i = 0; i < docs.length; ++i) {
-    if ('index.js' == docs[i].title) {
+    var doc = docs[i];
+
+    if ('index.js' == doc.title) {
       docs.unshift(docs.splice(i, 1)[0]);
-    } else if ('collection.js' == docs[i].title) {
+    } else if ('collection.js' == doc.title) {
       docs.push(docs.splice(i, 1)[0]);
     }
+
+    // sort methods, statics and properties alphabetically
+    doc.methods.sort(sortByCtxName);
+    doc.statics.sort(sortByCtxName);
+    doc.props.sort(sortByCtxName);
   }
 }

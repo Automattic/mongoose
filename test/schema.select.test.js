@@ -32,6 +32,7 @@ describe('schema select option', function(){
       assert.equal(s.docs[0].name, 'test');
 
       var pending = 5;
+      var item = s;
       function cb (err, s) {
         if (!--pending) {
           db.close();
@@ -42,7 +43,10 @@ describe('schema select option', function(){
         assert.equal(false, s.isSelected('name'));
         assert.equal(false, s.isSelected('docs.name'));
         assert.strictEqual(undefined, s.name);
-
+        // we need to make sure this executes absolutely last.
+        if (pending === 1) {
+          S.findOneAndRemove({ _id : item._id }, cb);
+        }
         if (0 === pending) {
           done();
         }
@@ -51,10 +55,7 @@ describe('schema select option', function(){
       S.findById(s).select('-thin -docs.bool').exec(cb);
       S.find({ _id: s._id }).select('thin docs.bool').exec(cb);
       S.findById(s, cb);
-      S.findOneAndUpdate({ _id: s._id }, { name: 'changed' }, function (err, s) {
-        cb(err, s);
-        S.findOneAndRemove({ _id: s._id }, cb);
-      });
+      S.findOneAndUpdate({ _id: s._id }, { name: 'changed' }, cb);
     });
   });
 
@@ -89,11 +90,15 @@ describe('schema select option', function(){
         }
       }
 
-      S.findById(s).select('-thin -docs.bool').exec(cb);
-      S.find({ _id: s._id }).select('thin docs.bool').exec(cb);
-      S.findOneAndUpdate({ _id: s._id }, { thin: false }, function (err, s) {
-        cb(err, s);
-        S.findOneAndRemove({ _id: s._id }, cb);
+      S.findById(s).select('-thin -docs.bool').exec(function (err, res) {
+        cb(err, res);
+        S.find({ _id: s._id }).select('thin docs.bool').exec(function(err, res) {
+          cb(err, res);
+          S.findOneAndUpdate({ _id: s._id }, { thin: false }, function (err, s) {
+            cb(err, s);
+            S.findOneAndRemove({ _id: s._id }, cb);
+          });
+        });
       });
     });
   });
@@ -138,6 +143,7 @@ describe('schema select option', function(){
         it('with find', function(done){
           S.find({ _id: s._id }).select('thin name docs.bool docs.name').exec(function (err, s) {
             assert.ifError(err);
+            assert.ok(s && s.length > 0, 'no document found');
             s = s[0];
             assert.strictEqual(true, s.isSelected('name'));
             assert.strictEqual(true, s.isSelected('thin'));
@@ -266,40 +272,53 @@ describe('schema select option', function(){
     });
   })
 
-  it('forcing inclusion of a deselected schema path works', function (done) {
-    var db = start();
-    var excluded = new Schema({
-        thin: Boolean
-      , name: { type: String, select: false }
-      , docs: [new Schema({ name: { type: String, select: false },  bool: Boolean })]
-    });
+  describe('exclusion in root schema should override child schema', function (done) {
+    it('works (gh-1333)', function(done){
+      var m = new mongoose.Mongoose();
+      var child = new Schema({
+          name1: {type:String, select: false}
+        , name2: {type:String, select: true}
+      });
+      var selected = new Schema({
+          docs: { type: [child], select: false }
+      });
+      var M = m.model('gh-1333-deselect', selected);
 
-    var M = db.model('ForcedInclusionOfPath', excluded);
-    M.create({ thin: false, name: '1 meter', docs:[{name:'test', bool:false}] }, function (err, d) {
-      assert.ifError(err);
+      var query = M.findOne();
+      query._applyPaths();
+      assert.equal(1, Object.keys(query._fields).length);
+      assert.equal(undefined, query._fields['docs.name1']);
+      assert.equal(undefined, query._fields['docs.name2']);
+      assert.equal(0, query._fields.docs);
+      done();
+    })
+  })
 
-      M.findById(d)
-      .select('+name +docs.name')
-      .exec(function (err, doc) {
+  describe('forcing inclusion of a deselected schema path', function () {
+    it('works', function (done) {
+      var db = start();
+      var excluded = new Schema({
+          thin: Boolean
+        , name: { type: String, select: false }
+        , docs: [new Schema({ name: { type: String, select: false },  bool: Boolean })]
+      });
+
+      var M = db.model('ForcedInclusionOfPath', excluded);
+      M.create({ thin: false, name: '1 meter', docs:[{name:'test', bool:false}] }, function (err, d) {
         assert.ifError(err);
-        assert.equal(false, doc.thin);
-        assert.equal('1 meter', doc.name);
-        assert.equal(false, doc.docs[0].bool);
-        assert.equal('test', doc.docs[0].name);
-        assert.equal(d.id, doc.id);
 
         M.findById(d)
-        .select('+name -thin +docs.name -docs.bool')
+        .select('+name +docs.name')
         .exec(function (err, doc) {
           assert.ifError(err);
-          assert.equal(undefined, doc.thin);
+          assert.equal(false, doc.thin);
           assert.equal('1 meter', doc.name);
-          assert.equal(undefined, doc.docs[0].bool);
+          assert.equal(false, doc.docs[0].bool);
           assert.equal('test', doc.docs[0].name);
           assert.equal(d.id, doc.id);
 
           M.findById(d)
-          .select('-thin +name -docs.bool +docs.name')
+          .select('+name -thin +docs.name -docs.bool')
           .exec(function (err, doc) {
             assert.ifError(err);
             assert.equal(undefined, doc.thin);
@@ -309,21 +328,49 @@ describe('schema select option', function(){
             assert.equal(d.id, doc.id);
 
             M.findById(d)
-            .select('-thin -docs.bool')
+            .select('-thin +name -docs.bool +docs.name')
             .exec(function (err, doc) {
-              db.close();
               assert.ifError(err);
               assert.equal(undefined, doc.thin);
-              assert.equal(undefined, doc.name);
+              assert.equal('1 meter', doc.name);
               assert.equal(undefined, doc.docs[0].bool);
-              assert.equal(undefined, doc.docs[0].name);
+              assert.equal('test', doc.docs[0].name);
               assert.equal(d.id, doc.id);
-              done();
+
+              M.findById(d)
+              .select('-thin -docs.bool')
+              .exec(function (err, doc) {
+                db.close();
+                assert.ifError(err);
+                assert.equal(undefined, doc.thin);
+                assert.equal(undefined, doc.name);
+                assert.equal(undefined, doc.docs[0].bool);
+                assert.equal(undefined, doc.docs[0].name);
+                assert.equal(d.id, doc.id);
+                done();
+              });
             });
           });
         });
       });
     });
+
+    it('works with query.slice (gh-1370)', function(done){
+      var db = start();
+      var M = db.model("1370", new Schema({ many: { type: [String], select: false }}));
+
+      M.create({ many: ["1", "2", "3", "4", "5"] }, function (err) {
+        if (err) return done(err);
+
+        var query = M.findOne().select("+many").where("many").slice(2);
+
+        query.exec(function (err, doc) {
+          if (err) return done(err);
+          assert.equal(2, doc.many.length);
+          done();
+        });
+      });
+    })
   });
 
   it('conflicting schematype path selection should not error', function (done) {

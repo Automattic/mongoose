@@ -22,7 +22,13 @@ block content
       console.log('%s %s is a %s.', person.name.first, person.name.last, person.occupation) // Space Ghost is a talk show host.
     })
   :markdown
-    Here we see that the query was executed immediately and the results passed to our callback.
+    Here we see that the query was executed immediately and the results passed to our callback. All callbacks in Mongoose use the pattern:
+    `callback(error, result)`. If an error occurs executing the query, the `error` parameter will contain an error document, and `result` 
+    will be null. If the query is successful, the `error` parameter will be null, and the `result` will be populated with the results of the query.
+  .important
+    :markdown
+      Anywhere a callback is passed to a function in Mongoose, the callback follows the pattern `callback(error, results)`.
+  :markdown
     Now let's look at what happens when no `callback` is passed:
   :js
     // find each person with a last name matching 'Ghost'

@@ -47,19 +47,19 @@ block content
     var parent = new Parent;
 
     // create a comment
-    post.children.push({ name: 'Liesl' });
-    var doc = post.children[0];
-    console.log(doc) // { _id: '501d86090d371bab2c0341c5', name: 'Liesl' }
-    doc.isNew; // true
+    parent.children.push({ name: 'Liesl' });
+    var subdoc = parent.children[0];
+    console.log(subdoc) // { _id: '501d86090d371bab2c0341c5', name: 'Liesl' }
+    subdoc.isNew; // true
 
-    post.save(function (err) {
+    parent.save(function (err) {
       if (err) return handleError(err)
       console.log('Success!');
     });
   :markdown
     Sub-docs may also be created without adding them to the array by using the [create](./api.html#types_documentarray_MongooseDocumentArray-create) method of MongooseArrays.
   :js
-    var newdoc = post.children.create({ name: 'Aaron' });
+    var newdoc = parent.children.create({ name: 'Aaron' });
 
   h3 Removing docs
   :markdown

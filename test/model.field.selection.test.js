@@ -144,7 +144,7 @@ describe('model field selection', function(){
     });
   })
 
-  it('works with subset of fields excluding emebedded doc _id (gh-541)', function(done){ 
+  it('works with subset of fields excluding emebedded doc _id (gh-541)', function(done){
     var db = start()
       , BlogPostB = db.model(modelName, collection);
 
@@ -345,6 +345,61 @@ describe('model field selection', function(){
         assert.ok(Array.isArray(found.comments[0].comments));
         done();
       })
+    });
+  })
+
+  it('appropriately filters subdocuments based on properties (gh-1280)', function(done){
+    var db = start();
+    var RouteSchema = new Schema ({
+      stations:   {
+        start: {
+          name:   { type: String },
+          loc:    { type: [Number], index: '2d' }
+        },
+        end: {
+          name:   { type: String },
+          loc:    { type: [Number], index: '2d' }
+        },
+        points: [
+          {
+            name:   { type: String },
+            loc:    { type: [Number], index: '2d' },
+          }
+        ]
+      }
+    });
+
+    var Route = db.model('Route' + random(), RouteSchema);
+
+    var item = {
+      stations : {
+        start : {
+          name : "thing",
+          loc : [1,2]
+        },
+        end : {
+          name : "thingend",
+          loc : [2,3]
+        },
+        points : [ { name : "rawr" }]
+      }
+    };
+
+    Route.create(item, function (err, i) {
+      assert.ifError(err);
+
+      Route.findById(i.id).select('-stations').exec(function (err, res) {
+        assert.ifError(err);
+        assert.ok(res.stations.toString() === "undefined");
+
+        Route.findById(i.id).select('-stations.start -stations.end').exec(function (err, res) {
+          assert.ifError(err);
+          assert.equal(res.stations.start.toString(), "undefined");
+          assert.equal(res.stations.end.toString(), "undefined");
+          assert.ok(Array.isArray(res.stations.points));
+          done();
+        });
+      });
     });
   })
 })

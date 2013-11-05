@@ -3,7 +3,8 @@ extends layout
 block content
   h2 Middleware
   :markdown
-    Middleware are functions which are passed control of flow during execution of [init](./api.html#document_Document-init), [validate](./api.html#document_Document-validate), [save](./api.html#model_Model-save) and [remove](./api.html#model_Model-remove) methods. There are two types of middleware, `pre` and [post](#post). Let's start with `pre`.
+    Middleware are functions which are passed control of flow during execution of document [init](./api.html#document_Document-init), [validate](./api.html#document_Document-validate), [save](./api.html#model_Model-save) and [remove](./api.html#model_Model-remove) methods. Middleware are executed at the document level, not the Model level.
+    There are two types of middleware, `pre` and [post](#post). Let's start with `pre`.
 
   h3 Pre
   :markdown
@@ -54,7 +55,7 @@ block content
 
     // later...
 
-    myModel.save(function (err) {
+    myDoc.save(function (err) {
       console.log(err.message) // something went wrong
     });
 
@@ -75,7 +76,12 @@ block content
     schema.post('remove', function (doc) {
       console.log('%s has been removed', doc._id);
     })
-
+  
+  h3#notes Notes on findAndUpdate()
+  `pre` and `post` are not called for update operations executed directly on the database, including `Model.update`,`.findByIdAndUpdate`,`.findOneAndUpdate`, `.findOneAndRemove`,and `.findByIdAndRemove`.  
+  
+  In order to utilize `pre` or `post` middleware, you should `find()` the document, and call the `init`, `validate`, `save`, or `remove` functions on the document.  See [explanation](http://github.com/LearnBoost/mongoose/issues/964).
+  
   h3#next Next Up
   :markdown
     Now that we've covered `middleware`, let's take a look at Mongooses approach to faking JOINs with its query [population](/docs/populate.html) helper.

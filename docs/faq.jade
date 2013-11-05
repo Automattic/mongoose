@@ -25,7 +25,7 @@ block content
     doc.array[3] = 'changed';
     doc.markModified('array');
     doc.save();
-  hr
+  hr#assign_schemas_to_paths
   :markdown
     **Q**. Why doesn't mongoose allow me to directly assign schemas to paths?
   :js
@@ -39,7 +39,7 @@ block content
     doc.save()
   :markdown
     We've felt that this api would be more confusing than helpful. The counter argument is that arrays of sub-documents already have this functionality, but at best this too leads to confusion (calling `save` on a sub-document is a no-op and exists only to support `pre` save hooks). In the future this is likely to be revisited.
-  hr
+  hr#enable_debugging
   :markdown
     **Q**. How can I enable debugging?
 
@@ -48,7 +48,7 @@ block content
     mongoose.set('debug', true)
   :markdown
     All executed collection methods will log output of their arguments to your console.
-  hr
+  hr#callback_never_executes
   :markdown
     **Q**. My `save()` callback never executes. What am I doing wrong?
 
@@ -61,6 +61,11 @@ block content
     // if connecting on a separate connection
     var conn = mongoose.createConnection(..);
     conn.on('error', handleError);
+  hr#creating_connections
+  :markdown
+    **Q**. Should I create/destroy a new connection for each database operation?
+
+    **A**. No. Open your connection when your application starts up and leave it open until the application shuts down.
 
   hr
   :markdown

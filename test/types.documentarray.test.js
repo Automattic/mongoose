@@ -6,11 +6,13 @@
 var start = require('./common')
   , mongoose = require('./common').mongoose
   , random = require('../lib/utils').random
+  , setValue = require('../lib/utils').setValue
   , MongooseArray = mongoose.Types.Array
   , MongooseDocumentArray = mongoose.Types.DocumentArray
   , EmbeddedDocument = require('../lib/types/embedded')
   , DocumentArray = require('../lib/types/documentarray')
   , Schema = mongoose.Schema
+  , ObjectId = Schema.ObjectId
   , assert = require('assert')
   , collection = 'types.documentarray_' + random()
 
@@ -146,6 +148,25 @@ describe('types.documentarray', function(){
     }
     assert.equal(false, threw);
 
+    // test when _id is a populated document
+    var Custom = new Schema({
+        title: { type: String }
+    });
+
+    var Custom1 = new Schema({}, { id: false });
+
+    var Subdocument = TestDoc(Custom);
+    var Subdocument1 = TestDoc(Custom1);
+
+    var sub = new Subdocument1();
+    var sub1 = new Subdocument1();
+    sub.title = 'Hello again to all my friends';
+    var id = sub1._id.toString();
+    setValue('_id', sub1 , sub);
+
+    var a = new MongooseDocumentArray([sub]);
+    assert.equal(a.id(id).title, 'Hello again to all my friends');
+
     done();
   })
 
@@ -175,6 +196,67 @@ describe('types.documentarray', function(){
         console.error(err.stack);
       }
       assert.ok(!threw);
+      done();
+    })
+    it('passes options to its documents (gh-1415)', function(done){
+      var subSchema = new Schema({
+          title: { type: String }
+      });
+
+      subSchema.set('toObject', {
+        transform: function (doc, ret, options) {
+          // this should not be called because custom options are
+          // passed during MongooseArray#toObject() calls
+          ret.changed = 123;
+          return ret;
+        }
+      })
+
+      var db = mongoose.createConnection();
+      var M = db.model('gh-1415', { docs: [subSchema] });
+      var m = new M;
+      m.docs.push({ docs: [{ title: 'hello' }] });
+      var delta = m.$__delta()[1];
+      assert.equal(undefined, delta.$pushAll.docs[0].changed);
+      done();
+    })
+    it('uses the correct transform (gh-1412)', function(done){
+      var db = start();
+      var FirstSchema = new Schema({
+        second: [SecondSchema],
+      });
+
+      FirstSchema.set('toObject', {
+      transform: function first(doc, ret, options) {
+          ret.firstToObject = true;
+          return ret;
+        },
+      });
+
+      var SecondSchema = new Schema({});
+
+      SecondSchema.set('toObject', {
+        transform: function second(doc, ret, options) {
+          ret.secondToObject = true;
+          return ret;
+        },
+      });
+
+      var First = db.model('first', FirstSchema);
+      var Second = db.model('second', SecondSchema);
+
+      var first = new First({
+      });
+
+      first.second.push(new Second());
+      first.second.push(new Second());
+      var obj = first.toObject();
+
+      assert.ok(obj.firstToObject);
+      assert.ok(obj.second[0].secondToObject);
+      assert.ok(obj.second[1].secondToObject);
+      assert.ok(!obj.second[0].firstToObject);
+      assert.ok(!obj.second[1].firstToObject);
       done();
     })
   })
@@ -316,7 +398,8 @@ describe('types.documentarray', function(){
         var e = t.errors['docs.0.name'];
         assert.ok(e);
         assert.equal(e.path, 'docs.0.name');
-        assert.equal(e.type, 'boo boo');
+        assert.equal(e.type, 'user defined');
+        assert.equal(e.message, 'boo boo');
         assert.equal(e.value, '%');
         done();
       })

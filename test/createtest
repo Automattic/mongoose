@@ -1,0 +1,17 @@
+#!/bin/bash
+# copy our _goosetest.js to another filename passed on the cmd line
+# and replace all occurances of {NAME} with the filename too.
+test $# -ne 1 && echo "usage: createtest scriptname" && exit 0;
+
+# EDITOR must be set
+test -e $EDITOR && echo "Please set your EDITOR environment variable" && exit 0;
+
+# does the file they are about to create exist?
+if test -e triage/$1.js; then
+  # do not overwrite. open for editing.
+  $EDITOR triage/$1.js
+else
+  # create
+  cat _goosetest.js | sed "s/{NAME}/$1/g" >> triage/$1.js
+  $EDITOR triage/$1.js
+fi

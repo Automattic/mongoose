@@ -30,7 +30,7 @@ schema.post(<span class="string">'save'</span>, <span class="function"><span cla
 schema.post(<span class="string">'remove'</span>, <span class="function"><span class="keyword">function</span> <span class="params">(doc)</span> {</span>
   console.log(<span class="string">'%s has been removed'</span>, doc._id);
 })
-</code></pre><h3 id="next">Next Up</h3><p>Now that we&#39;ve covered <code>middleware</code>, let&#39;s take a look at Mongooses approach to faking JOINs with its query <a href="/docs/populate.html">population</a> helper.</p></div></div><script>document.body.className = 'load';</script><script>;(function() {
+</code></pre><h3 id="notes">Notes on findAndUpdate()</h3>`pre` and `post` are not called for update operations executed directly on the database, including `Model.update`,`.findByIdAndUpdate`,`.findOneAndUpdate`, `.findOneAndRemove`,and `.findByIdAndRemove`.<In>order to utilize `pre` or `post` middleware, you should `find()` the document, and call the `init`, `validate`, `save`, or `remove` functions on the document.  See [explanation](http://github.com/LearnBoost/mongoose/issues/964).</In><h3 id="next">Next Up</h3><p>Now that we&#39;ve covered <code>middleware</code>, let&#39;s take a look at Mongooses approach to faking JOINs with its query <a href="/docs/populate.html">population</a> helper.</p></div></div><script>document.body.className = 'load';</script><script>;(function() {
   var cx = '012173159455227967368:uvscsuqjovs';
   var gcse = document.createElement('script');
   gcse.type = 'text/javascript';

@@ -33,7 +33,7 @@
   , "engines": { "node": ">=0.6.19" }
   , "bugs": {
         "url":"https://github.com/learnboost/mongoose/issues/new"
-      , "email": "https://groups.google.com/group/mongoose-orm"
+      , "email": "mongoose-orm@googlegroups.com"
     }
   , "repository": {
         "type": "git"

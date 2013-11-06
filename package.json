@@ -1,16 +1,21 @@
 {
     "name": "mongoose"
-  , "description": "Mongoose MongoDB ODM"
+  , "description": "Mongoose ODM"
   , "version": "4.0.0-pre"
+  , "publishConfig": {"tag": "v4"}
   , "author": "Guillermo Rauch <guillermo@learnboost.com>"
   , "keywords": ["mongodb", "document", "model", "schema", "database", "odm", "data", "datastore", "query", "nosql", "orm", "db"]
   , "dependencies": {
     }
   , "devDependencies": {
-        "mocha": "1.12.0"
+        "mocha": "1.14.0"
+      , "istanbul": "0.1.44"
     }
   , "directories": { "lib": "./lib/mongoose" }
-  , "scripts": { "test": "make test" }
+  , "scripts": {
+        "test": "node ./node_modules/mocha/bin/_mocha"
+      , "cover": "node ./node_modules/istanbul/lib/cli.js cover ./node_modules/mocha/bin/_mocha"
+    }
   , "main": "./index.js"
   , "engines": { "node": ">=0.11.4" }
   , "bugs": {

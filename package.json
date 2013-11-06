@@ -1,6 +1,6 @@
 {
     "name": "mongoose"
-  , "description": "Mongoose ODM"
+  , "description": "Mongoose MongoDB ODM"
   , "version": "4.0.0-pre"
   , "publishConfig": {"tag": "v4"}
   , "author": "Guillermo Rauch <guillermo@learnboost.com>"

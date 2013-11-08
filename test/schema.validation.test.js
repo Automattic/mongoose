@@ -459,5 +459,46 @@ describe('schema', function(){
         })
       })
     })
+
+    describe('types', function(){
+      describe('are customizable', function(){
+        it('for single custom validators', function(done){
+          function validate () {
+            return false;
+          }
+          var validator = [validate, '{PATH} failed validation ({VALUE})', 'customType'];
+
+          var schema = new Schema({ x: { type: [], validate: validator }});
+          var M = mongoose.model('custom-validator-'+random(), schema);
+
+          var m = new M({ x: [3,4,5,6] });
+
+          m.validate(function (err) {
+            assert.equal('x failed validation (3,4,5,6)', String(err.errors.x));
+            assert.equal('customType', err.errors.x.type);
+            done();
+          })
+        })
+
+        it('for many custom validators', function(done){
+          function validate () {
+            return false;
+          }
+          var validator = [
+              { validator: validate, msg: '{PATH} failed validation ({VALUE})', 'customType'}
+          ]
+          var schema = new Schema({ x: { type: [], validate: validator }});
+          var M = mongoose.model('custom-validator-'+random(), schema);
+
+          var m = new M({ x: [3,4,5,6] });
+
+          m.validate(function (err) {
+            assert.equal('x failed validation (3,4,5,6)', String(err.errors.x));
+            assert.equal('customType', err.errors.x.type);
+            done();
+          })
+        })
+      })
+    })
   });
 });

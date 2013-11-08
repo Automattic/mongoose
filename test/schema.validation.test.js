@@ -485,7 +485,7 @@ describe('schema', function(){
             return false;
           }
           var validator = [
-              { validator: validate, msg: '{PATH} failed validation ({VALUE})', 'customType'}
+              { validator: validate, msg: '{PATH} failed validation ({VALUE})', type: 'customType'}
           ]
           var schema = new Schema({ x: { type: [], validate: validator }});
           var M = mongoose.model('custom-validator-'+random(), schema);

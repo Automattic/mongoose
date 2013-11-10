@@ -67,7 +67,49 @@ describe('model', function(){
         assert.ok(p instanceof mongoose.Promise);
         done();
       });
-    })
+    });
+
+    it('creates in parallel', function(done){
+      // we set the time out to be double that of the validator - 1 (so that running in serial will be greater then that)
+      this.timeout(1000);
+      var db = start()
+        , countPre = 0
+        , countPost = 0
+
+      var SchemaWithPreSaveHook = new Schema ({
+        preference: String
+      });
+      SchemaWithPreSaveHook.pre('save', true, function hook (next, done) {
+        setTimeout(function () {
+          countPre++;
+          next();
+          done();
+        }, 500);
+      });
+      SchemaWithPreSaveHook.post('save', function () {
+        countPost++
+      });
+      var MWPSH = db.model('mwpsh', SchemaWithPreSaveHook);
+      MWPSH.create([
+        {preference: "xx"}
+        ,
+        {preference: "yy"}
+        ,
+        {preference: "1"}
+        ,
+        {preference: "2"}
+      ], function (err, doc1, doc2, doc3, doc4) {
+        assert.ifError(err);
+        assert.ok(doc1);
+        assert.ok(doc2);
+        assert.ok(doc3);
+        assert.ok(doc4);
+        assert.equal(countPre, 4);
+        assert.equal(countPost, 4);
+        done();
+      });
+    });
+
 
     describe('callback is optional', function(){
       it('with one doc', function(done){

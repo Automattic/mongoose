@@ -880,7 +880,119 @@ describe('document', function(){
       })
 
     })
-  })
+
+    it("validator should run only once gh-1743", function (done) {
+      var count = 0
+        , db = start()
+
+      var Control = new Schema({
+        test: {
+          type: String
+          , validate: function ( value, done ) {
+            count++;
+            return done( true );
+          }
+        }
+      });
+      var PostSchema = new Schema({
+        controls: [Control]
+      });
+
+      var Post = db.model('post', PostSchema);
+
+      var post = new Post({
+        controls: [{
+          test: "xx"
+        }]
+      });
+
+      post.save(function () {
+        assert.equal(count, 1);
+        done();
+      });
+    })
+
+    it("validator should run only once per sub-doc gh-1743", function (done) {
+      var count = 0
+        , db = start()
+
+      var Control = new Schema({
+        test: {
+          type: String
+          , validate: function ( value, done ) {
+            count++;
+            return done( true );
+          }
+        }
+      });
+      var PostSchema = new Schema({
+        controls: [Control]
+      });
+
+      var Post = db.model('post', PostSchema);
+
+      var post = new Post({
+        controls: [
+          {
+            test: "xx"
+          }
+          ,
+          {
+            test: "yy"
+          }
+        ]
+      });
+
+      post.save(function () {
+        assert.equal(count, post.controls.length);
+        done();
+      });
+    });
+
+
+    it("validator should run in parallel", function (done) {
+      // we set the time out to be double that of the validator - 1 (so that running in serial will be greater then that)
+      this.timeout(1000);
+      var db = start(),
+        count = 0;
+
+      var SchemaWithValidator = new Schema ({
+        preference: {
+          type: String
+          , required: true
+          , validate: function validator (value, done) {count++; setTimeout(done.bind(null, true), 500);}
+        }
+      });
+
+      var MWSV = db.model('mwv', new Schema({subs: [SchemaWithValidator]}));
+      var m = new MWSV({
+        subs: [
+          {
+            preference: "xx"
+          }
+          ,
+          {
+            preference: "yy"
+          }
+          ,
+          {
+            preference: "1"
+          }
+          ,
+          {
+            preference: "2"
+          }
+        ]
+      });
+
+      m.save(function (err) {
+        assert.ifError(err);
+        assert.equal(count, 4);
+        done();
+      });
+    })
+
+  });
 
   it('#invalidate', function(done){
     var db = start()

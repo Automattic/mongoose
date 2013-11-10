@@ -1,4 +1,4 @@
-
+Error.stackTraceLimit = Infinity;
 /**
  * Test dependencies.
  */
@@ -296,6 +296,35 @@ describe('Model', function(){
         cb();
       });
     })
+
+
+    it('when saved using the promise not the callback', function(done){
+      var db = start()
+        , BlogPost = db.model('BlogPost', collection);
+
+      var post = new BlogPost();
+      var p = post.save();
+      p.onResolve(function(err, post){
+        assert.ifError(err);
+        assert.ok(post.get('_id') instanceof DocumentObjectId);
+
+        assert.equal(undefined, post.get('title'));
+        assert.equal(undefined, post.get('slug'));
+        assert.equal(undefined, post.get('date'));
+        assert.equal(undefined, post.get('published'));
+
+        assert.equal(typeof post.get('meta'), 'object');
+        assert.deepEqual(post.get('meta'),{});
+        assert.equal(undefined, post.get('meta.date'));
+        assert.equal(undefined, post.get('meta.visitors'));
+
+        assert.ok(post.get('owners') instanceof MongooseArray);
+        assert.ok(post.get('comments') instanceof DocumentArray);
+        db.close();
+        done();
+      });
+    })
+
 
     describe('init', function(){
       it('works', function(done){
@@ -692,7 +721,9 @@ describe('Model', function(){
         done();
       });
     });
-    it('subdocument error', function(done){
+
+
+    it('subdocument cast error', function(done){
       var db = start()
         , BlogPost = db.model('BlogPost', collection)
         , threw = false;
@@ -713,6 +744,34 @@ describe('Model', function(){
         done();
       });
     });
+
+
+    it('subdocument validation error', function(done){
+      function failingvalidator(val) {
+        return false;
+      }
+
+      var db = start()
+        , subs = new Schema({
+          str: {
+            type: String, validate: failingvalidator
+          }
+        })
+        , BlogPost = db.model('BlogPost', {subs: [subs]})
+
+      var post = new BlogPost()
+      post.init({
+        subs: [ { str: 'gaga' } ]
+      });
+
+      post.save(function(err){
+        db.close();
+        assert.ok(err instanceof ValidationError);
+        done();
+      });
+    });
+
+
     it('subdocument error when adding a subdoc', function(done){
       var db = start()
         , BlogPost = db.model('BlogPost', collection)
@@ -737,6 +796,7 @@ describe('Model', function(){
         done();
       });
     });
+
 
     it('updates', function(done){
       var db = start()
@@ -1141,10 +1201,8 @@ describe('Model', function(){
         assert.ok(post.errors['items.0.subs.0.required'] instanceof ValidatorError);
         assert.equal(post.errors['items.0.subs.0.required'].message,'Path `required` is required.');
 
-        assert.ok(!err.errors['items.0.required']);
-        assert.ok(!err.errors['items.0.required']);
-        assert.ok(!post.errors['items.0.required']);
-        assert.ok(!post.errors['items.0.required']);
+        assert.ok(err.errors['items.0.required']);
+        assert.ok(post.errors['items.0.required']);
 
         post.items[0].subs[0].set('required', true);
         assert.equal(undefined, post.$__.validationError);
@@ -1382,8 +1440,8 @@ describe('Model', function(){
 
           post.set('baz', 'good');
           post.save(function(err){
+            assert.ifError(err);
             db.close();
-            assert.strictEqual(err, null);
             done();
           });
         });
@@ -1424,8 +1482,8 @@ describe('Model', function(){
 
           post.set('prop', 'good');
           post.save(function(err){
+            assert.ifError(err);
             db.close();
-            assert.strictEqual(err, null);
             done();
           });
         });
@@ -1495,8 +1553,8 @@ describe('Model', function(){
           });
 
           post.save(function(err){
+            assert.ifError(err);
             db.close();
-            assert.strictEqual(err, null);
             done();
           });
         });
@@ -1729,6 +1787,68 @@ describe('Model', function(){
       })
     })
 
+    it('works as a promise', function(done){
+      B.create({}, function (err, post) {
+        assert.ifError(err);
+        B.findById(post, function (err, found) {
+          assert.ifError(err);
+
+          found.remove().onResolve(function (err, doc) {
+            assert.ifError(err);
+            assert.ok(doc);
+            assert.ok(doc.equals(found));
+            done();
+          })
+        })
+      })
+    })
+
+    it('works as a promise with a hook', function(done){
+      var called = 0;
+      var RHS = new Schema({
+        name: String
+      });
+      RHS.pre('remove', function (next) {
+        called++;
+        return next();
+      });
+
+      var RH = db.model('RH', RHS, 'RH_'+random())
+
+      RH.create({name: 'to be removed'}, function (err, post) {
+        assert.ifError(err);
+        assert.ok(post);
+        RH.findById(post, function (err, found) {
+          assert.ifError(err);
+          assert.ok(found);
+
+          found.remove().onResolve(function (err, doc) {
+            assert.ifError(err);
+            assert.equal(called, 1);
+            assert.ok(doc);
+            assert.ok(doc.equals(found));
+            done();
+          })
+        })
+      })
+    })
+
+    it('passes the removed document (gh-1419)', function(done){
+      B.create({}, function (err, post) {
+        assert.ifError(err);
+        B.findById(post, function (err, found) {
+          assert.ifError(err);
+
+          found.remove(function (err, doc) {
+            assert.ifError(err);
+            assert.ok(doc);
+            assert.ok(doc.equals(found));
+            done();
+          })
+        })
+      })
+    })
+
     describe('when called multiple times', function(){
       it('always executes the passed callback gh-1210', function(done){
         var db = start()
@@ -1748,6 +1868,31 @@ describe('Model', function(){
           post.remove(function () {
             if (--pending) return;
             done();
+          });
+        });
+      })
+
+
+      it('should run schema post hook only once', function(done){
+        var db = start()
+          , schema = new Schema({name: String});
+
+        schema.post('remove', function (doc) {
+          done();
+        })
+
+        var RemoveHooks = db.model('RemoveHooks', schema)
+          , post = new RemoveHooks({name:"hello"})
+
+        post.save(function (err) {
+          assert.ifError(err);
+          post.remove(function (err, doc) {
+            assert.ifError(err);
+            assert.ok(doc);
+            post.remove(function (err, doc1) {
+              assert.ifError(err);
+              assert.ok(doc1);
+            });
           });
         });
       })
@@ -2440,6 +2585,30 @@ describe('Model', function(){
       done();
     });
   })
+
+
+  it('activePaths should be updated for nested modifieds as promise', function(done){
+    var db = start()
+      , schema = new Schema({
+          nested: {
+            nums: [Number]
+          }
+        });
+
+    var Temp = db.model('NestedPushes', schema, collection);
+
+    var p1 = Temp.create({nested: {nums: [1, 2, 3, 4, 5]}});
+    p1.onResolve(function (err, t) {
+      assert.ifError(err);
+      t.nested.nums.pull(1);
+      t.nested.nums.pull(2);
+      assert.equal(t.$__.activePaths.paths['nested.nums'],'modify');
+      db.close();
+      done();
+    });
+  })
+
+
 
   it('$pull should affect what you see in an array before a save', function(done){
     var db = start()
@@ -3262,6 +3431,38 @@ describe('Model', function(){
         });
       });
 
+
+      it('with an async waterfall', function(done){
+        var db = start();
+        var schema = new Schema({ name: String });
+        var called = 0;
+
+        schema.pre('save', true, function (next, done) {
+          called++;
+          process.nextTick(function () {
+            next();
+            done();
+          });
+        });
+
+        schema.pre('save', function (next) {
+          called++;
+          return next();
+        });
+
+        var S = db.model('S', schema, collection);
+        var s = new S({name: 'zupa'});
+
+        var p = s.save();
+        p.onResolve(function (err) {
+          db.close();
+          assert.ifError(err);
+          assert.equal(2, called);
+          done();
+        });
+      });
+
+
       it('called on all sub levels', function(done){
         var db = start();
 
@@ -3297,6 +3498,7 @@ describe('Model', function(){
         });
       });
 
+
       it('error on any sub level', function(done){
         var db = start();
 
@@ -3320,7 +3522,7 @@ describe('Model', function(){
         var S = db.model('presave_hook_error', schema, 'presave_hook_error');
         var s = new S({ name : 'a' , child : [ { name : 'b', grand : [{ name : 'c'}] } ]});
 
-        s.save(function (err, doc) {
+        s.save(function (err) {
           db.close();
           assert.ok(err instanceof Error);
           assert.equal(err.message,'Error 101');
@@ -3381,16 +3583,13 @@ describe('Model', function(){
 
     describe('post', function(){
       it('works', function(done){
-        var schema = new Schema({
-                title: String
-            })
+        var schema = new Schema({title: String})
           , save = false
           , remove = false
-          , init = false
-          , post = undefined;
+          , init = false;
 
         schema.post('save', function (arg) {
-          assert.equal(arg.id,post.id)
+          assert.equal(arg.id, post.id);
           save = true;
         });
 
@@ -3399,41 +3598,31 @@ describe('Model', function(){
         });
 
         schema.post('remove', function (arg) {
-          assert.equal(arg.id,post.id)
+          assert.equal(arg.id,post.id);
           remove = true;
         });
 
-        mongoose.model('PostHookTest', schema);
-
         var db = start()
-          , BlogPost = db.model('PostHookTest');
+          , BlogPost = db.model('PostHookTest', schema);
 
-        post = new BlogPost();
+        var post = new BlogPost();
 
         post.save(function (err) {
-          process.nextTick(function () {
+          assert.ifError(err);
+          assert.ok(save);
+          BlogPost.findById(post._id, function (err, doc) {
             assert.ifError(err);
-            assert.ok(save);
-            BlogPost.findById(post._id, function (err, doc) {
-              process.nextTick(function () {
-                assert.ifError(err);
-                assert.ok(init);
-
-                doc.remove(function (err) {
-                  process.nextTick(function () {
-                    db.close();
-                    assert.ifError(err);
-                    assert.ok(remove);
-                    done();
-                  });
-                });
-              });
+            assert.ok(init);
+            doc.remove(function (err) {
+              db.close();
+              assert.ifError(err);
+              assert.ok(remove);
+              done();
             });
           });
-
         });
-
       });
+
 
       it('on embedded docs', function(done){
         var save = false,
@@ -4124,6 +4313,7 @@ describe('Model', function(){
       })
     })
 
+
     it('rejects new documents that have no _id set (1595)', function(done){
       var db = start();
       var s = new Schema({ _id: { type: String }});
@@ -4137,6 +4327,7 @@ describe('Model', function(){
       })
     })
   });
+
 
   describe('_delta()', function(){
     it('should overwrite arrays when directly set (gh-1126)', function(done){

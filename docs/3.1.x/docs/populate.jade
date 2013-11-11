@@ -118,7 +118,7 @@ block content
 
   h3 Updating refs
   :markdown
-    Now that we have a `story` we realized that the `_creator` was incorrect. We can update `ObjectId` refs the same as any other property through the magic of Mongooses internal casting:
+    Now that we have a `story` we realized that the `_creator` was incorrect. We can update `ObjectId` refs the same as any other property through the magic of Mongoose's internal casting:
   :js
     var guille = new Person({ name: 'Guillermo' });
     guille.save(function (err) {

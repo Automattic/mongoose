@@ -4509,3 +4509,28 @@ describe('Model', function(){
      done();
   })
 });
+
+it('2dsphere index doesn\'t require value (gh-1668)', function (done) {
+  var db = start();
+  var locationSchema = new Schema({
+    text: String,
+    location: {type: [Number], index: '2dsphere'}
+  });
+  
+  mongoose.model('location', locationSchema);
+  var location = db.model('location', collection);
+  var loc1 = new location({
+    text: 'location text',
+    location: [1,0]
+  });
+  var loc2 = new location({text: 'location text'});
+  
+  loc1.save(function (err) {
+    assert.ifError(err);
+    loc2.save(function (err) {
+      assert.ifError(err);
+      db.close();
+      done();
+    });
+  });
+});

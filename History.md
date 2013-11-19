@@ -1,4 +1,16 @@
 
+3.8.1 / 2013-11-19
+==================
+
+ * fixed; mishandling of Dates with minimize/getters #1764
+ * fixed; Normalize bugs.email, so `npm` will shut up #1769 [refack](https://github.com/refack)
+ * docs; Improve the grammar where "lets us" was used #1777 [alexyoung](https://github.com/alexyoung)
+ * docs; Fix some grammatical issues in the documentation #1777 [alexyoung](https://github.com/alexyoung)
+ * docs; fix Query api exposure
+ * docs; fix return description
+ * docs; Added Notes on findAndUpdate() #1750 [sstadelman](https://github.com/sstadelman)
+ * docs; Update version number in README #1762 [Fodi69](https://github.com/Fodi69)
+
 3.8.0 / 2013-10-31
 ==================
 

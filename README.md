@@ -2,7 +2,7 @@
 
 Mongoose is a [MongoDB](http://www.mongodb.org/) object modeling tool designed to work in an asynchronous environment.
 
-[![Build Status](https://travis-ci.org/LearnBoost/mongoose.png?branch=3.6.x)](https://travis-ci.org/LearnBoost/mongoose)
+[![Build Status](https://travis-ci.org/LearnBoost/mongoose.png?branch=3.8.x)](https://travis-ci.org/LearnBoost/mongoose)
 
 ## Documentation
 
@@ -22,7 +22,7 @@ Check out the [plugins search site](http://plugins.mongoosejs.com/) to see hundr
 
 ## Contributors
 
-View all 90+ [contributors](https://github.com/learnboost/mongoose/graphs/contributors). Stand up and be counted as a [contributor](https://github.com/LearnBoost/mongoose/blob/master/CONTRIBUTING.md) too!
+View all 100+ [contributors](https://github.com/learnboost/mongoose/graphs/contributors). Stand up and be counted as a [contributor](https://github.com/LearnBoost/mongoose/blob/master/CONTRIBUTING.md) too!
 
 ## Live Examples
 <a href="https://runnable.com/mongoose" target="_blank"><img src="https://runnable.com/external/styles/assets/runnablebtn.png" style="width:67px;height:25px;"></a>
@@ -35,7 +35,7 @@ First install [node.js](http://nodejs.org/) and [mongodb](http://www.mongodb.org
     
 ## Stablility
 
-The current stable branch is [3.6.x](https://github.com/LearnBoost/mongoose/tree/3.6.x). New (unstable) development always occurs on the [master](https://github.com/LearnBoost/mongoose/tree/master) branch.
+The current stable branch is [3.8.x](https://github.com/LearnBoost/mongoose/tree/3.8.x). New (unstable) development always occurs on the [master](https://github.com/LearnBoost/mongoose/tree/master) branch.
 
 ## Overview
 

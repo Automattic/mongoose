@@ -4508,4 +4508,130 @@ describe('Model', function(){
     assert.equal(o.total, 10);
      done();
   })
+
+  describe('Skip setting default value for Geospatial-indexed fields', function () {
+
+    it('2dsphere indexed field with value is saved', function (done) {
+      var db = start();
+      var PersonSchema = new Schema({
+        name: String,
+        loc: {
+          type: [Number],
+          index: '2dsphere'
+        }
+      });
+
+      var Person = db.model('Person', PersonSchema);
+      var loc = [ 0.3, 51.4 ];
+      var p = new Person({
+        name: 'Jimmy Page',
+        loc: loc
+      });
+
+      p.save(function (err) {
+        assert.ifError(err);
+
+        Person.findById(p._id, function (err, personDoc) {
+          assert.ifError(err);
+
+          assert.equal(personDoc.loc[0], loc[0]);
+          assert.equal(personDoc.loc[1], loc[1]);
+          db.close();
+          done();
+        });
+      });
+    });
+
+    it('2dsphere indexed field without value is saved (gh-1668)', function (done) {
+      var db = start();
+      var PersonSchema = new Schema({
+        name: String,
+        loc: {
+          type: [Number],
+          index: '2dsphere'
+        }
+      });
+
+      var Person = db.model('Person', PersonSchema);
+      var p = new Person({
+        name: 'Jimmy Page'
+      });
+
+      p.save(function (err) {
+        assert.ifError(err);
+
+        Person.findById(p._id, function (err, personDoc) {
+          assert.ifError(err);
+
+          assert.equal(undefined, personDoc.loc);
+          db.close();
+          done();
+        });
+      });
+    });
+
+    it('Doc with 2dsphere indexed field without initial value can be updated', function (done) {
+      var db = start();
+      var PersonSchema = new Schema({
+        name: String,
+        loc: {
+          type: [Number],
+          index: '2dsphere'
+        }
+      });
+
+      var Person = db.model('Person', PersonSchema);
+      var p = new Person({
+        name: 'Jimmy Page'
+      });
+
+      p.save(function (err) {
+        assert.ifError(err);
+
+        var updates = {
+          $set: {
+            loc: [ 0.3, 51.4 ]
+          }
+        };
+
+        Person.findByIdAndUpdate(p._id, updates, function (err, personDoc) {
+          assert.ifError(err);
+
+          assert.equal(personDoc.loc[0], updates.$set.loc[0]);
+          assert.equal(personDoc.loc[1], updates.$set.loc[1]);
+          db.close();
+          done();
+        });
+      });
+    });
+
+    it('2d indexed field without value is saved', function (done) {
+      var db = start();
+      var PersonSchema = new Schema({
+        name: String,
+        loc: {
+          type: [Number],
+          index: '2d'
+        }
+      });
+
+      var Person = db.model('Person', PersonSchema);
+      var p = new Person({
+        name: 'Jimmy Page'
+      });
+
+      p.save(function (err) {
+        assert.ifError(err);
+
+        Person.findById(p._id, function (err, personDoc) {
+          assert.ifError(err);
+
+          assert.equal(undefined, personDoc.loc);
+          db.close();
+          done();
+        });
+      });
+    });
+  });
+
 });

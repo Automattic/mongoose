@@ -119,6 +119,49 @@ describe('model', function() {
           });
         });
       });
+
+      it('hydrates streams', function(done) {
+        var baseEvent  = new BaseEvent({ name: 'Base event' });
+        var impressionEvent = new ImpressionEvent({ name: 'Impression event' });
+        var conversionEvent = new ConversionEvent({ name: 'Conversion event', revenue: 1.337 });
+
+        baseEvent.save(function(err) {
+          assert.ifError(err);
+          impressionEvent.save(function(err) {
+            assert.ifError(err);
+            conversionEvent.save(function(err) {
+              assert.ifError(err);
+              var stream = BaseEvent.find({}).sort('name').stream();
+
+              stream.on('data', function(doc) {
+                switch(doc.name) {
+                  case 'Base event':
+                    assert.ok(doc instanceof BaseEvent);
+                    break;
+                  case 'Impression event':
+                    assert.ok(doc instanceof BaseEvent);
+                    assert.ok(doc instanceof ImpressionEvent);
+                    break;
+                  case 'Conversion event':
+                    assert.ok(doc instanceof BaseEvent);
+                    assert.ok(doc instanceof ConversionEvent);
+                    break;
+                  default:
+
+                }
+              });
+
+              stream.on('error', function (err) {
+                assert.ifError(err);
+              });
+
+              stream.on('close', function() {
+                done();
+              });
+            });
+          });
+        });
+      });
     });
 
     describe('findOne', function() {

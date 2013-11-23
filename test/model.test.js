@@ -4631,11 +4631,12 @@ describe('Model', function(){
 
     it('2dsphere field without value but with schema default is saved', function (done) {
       var db = start();
+      var loc = [ 0, 1 ];
       var PersonSchema = new Schema({
         name: String,
         loc: {
           type: [Number],
-          default: [ 0, 0 ],
+          default: loc,
           index: '2dsphere'
         }
       });
@@ -4647,8 +4648,15 @@ describe('Model', function(){
 
       p.save(function (err) {
         assert.ifError(err);
-        db.close();
-        done();
+
+        Person.findById(p._id, function (err, personDoc) {
+          assert.ifError(err);
+
+          assert.equal(loc[0], personDoc.loc[0]);
+          assert.equal(loc[1], personDoc.loc[1]);
+          db.close();
+          done();
+        });
       });
     });
 

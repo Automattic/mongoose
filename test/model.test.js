@@ -4605,6 +4605,53 @@ describe('Model', function(){
       });
     });
 
+    it('2dsphere indexed required field without value is rejected', function (done) {
+      var db = start();
+      var PersonSchema = new Schema({
+        name: String,
+        loc: {
+          type: [Number],
+          required: true,
+          index: '2dsphere'
+        }
+      });
+
+      var Person = db.model('Person', PersonSchema);
+      var p = new Person({
+        name: 'Jimmy Page'
+      });
+
+      p.save(function (err) {
+        assert.ok(err instanceof MongooseError);
+        assert.ok(err instanceof ValidationError);
+        db.close();
+        done();
+      });
+    });
+
+    it('2dsphere field without value but with schema default is saved', function (done) {
+      var db = start();
+      var PersonSchema = new Schema({
+        name: String,
+        loc: {
+          type: [Number],
+          default: [ 0, 0 ],
+          index: '2dsphere'
+        }
+      });
+
+      var Person = db.model('Person', PersonSchema);
+      var p = new Person({
+        name: 'Jimmy Page'
+      });
+
+      p.save(function (err) {
+        assert.ifError(err);
+        db.close();
+        done();
+      });
+    });
+
     it('2d indexed field without value is saved', function (done) {
       var db = start();
       var PersonSchema = new Schema({

@@ -4758,6 +4758,41 @@ describe('Model', function(){
         });
       });
     });
+
+    it('Compound index on field earlier declared with 2dsphere index is saved', function (done) {
+      var db = start();
+      var PersonSchema = new Schema({
+        name: String,
+        type: String,
+        slug: { type: String, index: { unique: true } },
+        loc:  { type: [Number] },
+        tags: { type: [String], index: true }
+      });
+
+      PersonSchema.index({ loc: '2dsphere' });
+      PersonSchema.index({ name: 1, loc: -1 });
+
+      var Person = db.model('Person_9', PersonSchema);
+      var p = new Person({
+        name: 'Jimmy Page',
+        type: 'musician',
+        slug: 'ledzep-1',
+        tags: [ 'guitarist' ]
+      });
+
+      p.save(function (err) {
+        assert.ifError(err);
+
+        Person.findById(p._id, function (err, personDoc) {
+          assert.ifError(err);
+
+          assert.equal('Jimmy Page', personDoc.name);
+          assert.equal(undefined, personDoc.loc);
+          db.close();
+          done();
+        });
+      });
+    });
   });
 
 });

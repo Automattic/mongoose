@@ -4509,7 +4509,7 @@ describe('Model', function(){
      done();
   })
 
-  describe('Skip setting default value for Geospatial-indexed fields', function () {
+  describe('Skip setting default value for Geospatial-indexed fields (gh-1668)', function () {
 
     it('2dsphere indexed field with value is saved', function (done) {
       var db = start();
@@ -4521,7 +4521,7 @@ describe('Model', function(){
         }
       });
 
-      var Person = db.model('Person', PersonSchema);
+      var Person = db.model('Person_1', PersonSchema);
       var loc = [ 0.3, 51.4 ];
       var p = new Person({
         name: 'Jimmy Page',
@@ -4552,7 +4552,7 @@ describe('Model', function(){
         }
       });
 
-      var Person = db.model('Person', PersonSchema);
+      var Person = db.model('Person_2', PersonSchema);
       var p = new Person({
         name: 'Jimmy Page'
       });
@@ -4563,7 +4563,44 @@ describe('Model', function(){
         Person.findById(p._id, function (err, personDoc) {
           assert.ifError(err);
 
-          assert.equal(undefined, personDoc.loc);
+          assert.equal(personDoc.name, 'Jimmy Page');
+          assert.equal(personDoc.loc, undefined);
+          db.close();
+          done();
+        });
+      });
+    });
+
+    it('2dsphere indexed field in subdoc without value is saved', function (done) {
+      var db = start();
+      var PersonSchema = new Schema({
+        name: { type: String, required: true },
+        nested: {
+          tag: String,
+          loc: {
+            type: [Number]
+          }
+        }
+      });
+
+      PersonSchema.index({ 'nested.loc': '2dsphere' });
+
+      var Person = db.model('Person_3', PersonSchema);
+      var p = new Person({
+        name: 'Jimmy Page'
+      });
+
+      p.nested.tag = 'guitarist';
+
+      p.save(function (err) {
+        assert.ifError(err);
+
+        Person.findById(p._id, function (err, personDoc) {
+          assert.ifError(err);
+
+          assert.equal(personDoc.name, 'Jimmy Page');
+          assert.equal(personDoc.nested.tag, 'guitarist');
+          assert.equal(personDoc.nested.loc, undefined);
           db.close();
           done();
         });
@@ -4580,7 +4617,7 @@ describe('Model', function(){
         }
       });
 
-      var Person = db.model('Person', PersonSchema);
+      var Person = db.model('Person_4', PersonSchema);
       var p = new Person({
         name: 'Jimmy Page'
       });
@@ -4616,7 +4653,7 @@ describe('Model', function(){
         }
       });
 
-      var Person = db.model('Person', PersonSchema);
+      var Person = db.model('Person_5', PersonSchema);
       var p = new Person({
         name: 'Jimmy Page'
       });
@@ -4641,7 +4678,7 @@ describe('Model', function(){
         }
       });
 
-      var Person = db.model('Person', PersonSchema);
+      var Person = db.model('Person_6', PersonSchema);
       var p = new Person({
         name: 'Jimmy Page'
       });
@@ -4670,7 +4707,7 @@ describe('Model', function(){
         }
       });
 
-      var Person = db.model('Person', PersonSchema);
+      var Person = db.model('Person_7', PersonSchema);
       var p = new Person({
         name: 'Jimmy Page'
       });
@@ -4681,6 +4718,40 @@ describe('Model', function(){
         Person.findById(p._id, function (err, personDoc) {
           assert.ifError(err);
 
+          assert.equal(undefined, personDoc.loc);
+          db.close();
+          done();
+        });
+      });
+    });
+
+    it('Compound index with 2dsphere field without value is saved', function (done) {
+      var db = start();
+      var PersonSchema = new Schema({
+        name: String,
+        type: String,
+        slug: { type: String, index: { unique: true } },
+        loc:  { type: [Number] },
+        tags: { type: [String], index: true }
+      });
+
+      PersonSchema.index({ name: 1, loc: '2dsphere' });
+
+      var Person = db.model('Person_8', PersonSchema);
+      var p = new Person({
+        name: 'Jimmy Page',
+        type: 'musician',
+        slug: 'ledzep-1',
+        tags: [ 'guitarist' ]
+      });
+
+      p.save(function (err) {
+        assert.ifError(err);
+
+        Person.findById(p._id, function (err, personDoc) {
+          assert.ifError(err);
+
+          assert.equal('Jimmy Page', personDoc.name);
           assert.equal(undefined, personDoc.loc);
           db.close();
           done();

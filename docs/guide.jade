@@ -246,6 +246,7 @@ block content
     - [toJSON](#toJSON)
     - [toObject](#toObject)
     - [versionKey](#versionKey)
+    - [discriminatorKey](#discriminatorKey)
 
   h4#autoIndex option: autoIndex
   :markdown
@@ -496,6 +497,70 @@ block content
     var Thing = mongoose.model('Thing', schema);
     var thing = new Thing({ name: 'no versioning please' });
     thing.save(); // { name: 'no versioning please' }
+
+  h4#discriminatorKey option: discriminatorKey
+  :markdown
+    If the schema is using discriminator mapping, the `discriminatorKey` option may be used to change the name of the internal document property used to determine which model to properly hydrate the document to.  See [Discriminator Mapping](#discriminatorMapping)
+  :js
+    var employeeSchema = new Schema({..});
+    var managerSchema = new Schema({..});
+    var Employee = mongoose.model('Employee', employeeSchema);
+    var Manager = Employee.discriminator('Manager', managerSchema);
+    var manager = new Manager({..});
+    manager.save(); // { __t: 'Manager', .. }
+
+    // customized discriminatorKey
+    var employeeSchema = new Schema({..}, { discriminatorKey: '_type' })
+    var Employee = mongoose.model('Employee', employeeSchema);
+    var Manager = Employee.discriminator('Manager', managerSchema);
+    var manager = new Manager({..});
+    manager.save(); // { _type: 'Manager', .. }
+
+  h3#discriminatorMapping Discriminator Mapping
+  p
+    | Discriminator mapped documents is a powerful use-case in MongoDB.  Each discriminator schema
+    | can contain it's own logic (methods, validation, etc..)
+  p
+    | Using it is simple:
+
+  :js
+    var personSchema = new Schema({ name: String };
+    personSchema.methods.getName = function() {
+      return this.name;
+    };
+
+    var employeeSchema = new Schema({ hourlyWage: Number });
+    employeeSchema.methods.getHourlyWage = function() {
+      return this.hourlyWage;
+    };
+
+    var managerSchema = new Schema({ salary: Number });
+    managerSchema.methods.getSalary = function() {
+      return this.salary;
+    };
+
+    var Person = mongoose.model('Person', personSchema);
+    var Employee = Person.discriminator('Employee', employeeSchema);
+    var Manager = Person.discriminator('Manager', managerSchema);
+
+    var employee = new Employee({ name: 'John', hourlyWage: 13.37 });
+    employee.save(); // { __t: 'Employee', name: 'John', hourlyWage: 13.37 }
+
+    var manager = new Manager({ name: 'Joe', salary: 133,700 });
+    manager.save(); // { __t: 'Manager', name: 'Joe', salary: 133,700 }
+
+    // hydration properly inherits from proper model
+    Person.find({}, function(err, docs) {
+        assert.ok(docs[0] instanceof Person);   // true
+        assert.ok(docs[0] instanceof Employee); // true
+        docs[0].getName();                      // John
+        docs[0].getHourlyWage();                // 13.37
+
+        assert.ok(docs[1] instanceof Person);   // true
+        assert.ok(docs[1] instanceof Manager);  // true
+        docs[1].getName();                      // Joe
+        docs[1].getSalary();                    // 133,700
+    });
 
   h3#plugins Pluggable
   p

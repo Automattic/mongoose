@@ -33,7 +33,7 @@ First install [node.js](http://nodejs.org/) and [mongodb](http://www.mongodb.org
 
     $ npm install mongoose
     
-## Stablility
+## Stability
 
 The current stable branch is [3.8.x](https://github.com/LearnBoost/mongoose/tree/3.8.x). New (unstable) development always occurs on the [master](https://github.com/LearnBoost/mongoose/tree/master) branch.
 

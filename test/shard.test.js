@@ -48,8 +48,7 @@ describe('shard', function(){
           + uri + ' ?'
           + '\n'
       }
-      // let expresso shut down this test
-      throw err;
+      return done(err);
     });
     db.on('open', function () {
       // set up a sharded test collection
@@ -67,11 +66,12 @@ describe('shard', function(){
           assert.ifError(err);
 
           if (!(res && res.documents && res.documents[0] && res.documents[0].ok)) {
-            throw new Error('could not shard test collection '
+            err = new Error('could not shard test collection '
                 + collection + '\n'
                 + res.documents[0].errmsg +'\n'
                 + 'Make sure to use a different database than what '
                 + 'is used for the MULTI_MONGOS_TEST' );
+            return done(err);
           }
 
           db.db.admin(function (err, admin) {

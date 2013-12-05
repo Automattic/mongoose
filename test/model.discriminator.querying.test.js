@@ -286,7 +286,79 @@ describe('model', function() {
         });
       });
 
+      it('hydrates correct model when fields selection set', function(done) {
+        var baseEvent  = new BaseEvent({ name: 'Base event' });
+        var impressionEvent = new ImpressionEvent({ name: 'Impression event' });
+        var conversionEvent = new ConversionEvent({ name: 'Conversion event', revenue: 1.337 });
+
+        baseEvent.save(function(err) {
+          assert.ifError(err);
+          impressionEvent.save(function(err) {
+            assert.ifError(err);
+            conversionEvent.save(function(err) {
+              assert.ifError(err);
+              // finds & hydrates BaseEvent
+              BaseEvent.findOne({ _id: baseEvent._id }, 'name', function(err, event) {
+                assert.ifError(err);
+                assert.ok(event instanceof BaseEvent);
+                assert.equal(event.name, 'Base event');
+
+                // finds & hydrates ImpressionEvent
+                BaseEvent.findOne({ _id: impressionEvent._id }, 'name', function(err, event) {
+                  assert.ifError(err);
+                  assert.ok(event instanceof ImpressionEvent);
+                  assert.equal(event.schema, ImpressionEventSchema);
+                  assert.equal(event.name, 'Impression event');
+
+                  // finds & hydrates ConversionEvent
+                  BaseEvent.findOne({ _id: conversionEvent._id }, 'name', function(err, event) {
+                    assert.ifError(err);
+                    assert.ok(event instanceof ConversionEvent);
+                    assert.equal(event.schema, ConversionEventSchema);
+                    assert.equal(event.name, 'Conversion event');
+                    done();
+                  });
+                });
+              });
+            });
+          });
+        });
+      });
+
       it('discriminator model only finds a document of its type', function(done) {
+        var impressionEvent = new ImpressionEvent({ name: 'Impression event' });
+        var conversionEvent = new ConversionEvent({ name: 'Conversion event', revenue: 2 });
+
+        impressionEvent.save(function(err) {
+          assert.ifError(err);
+          conversionEvent.save(function(err) {
+            assert.ifError(err);
+            // doesn't find anything since we're querying for an impression id
+            var query = ConversionEvent.findOne({ _id: impressionEvent._id });
+            assert.equal(query.op, 'findOne');
+            assert.deepEqual(query._conditions, { _id: impressionEvent._id, __t: 'model-discriminator-querying-conversion' });
+
+            query.exec(function(err, document) {
+              assert.ifError(err);
+              assert.equal(document, null);
+
+              // now find one with no criteria given and ensure it gets added to _conditions
+              var query = ConversionEvent.findOne();
+              assert.equal(query.op, 'findOne');
+              assert.deepEqual(query._conditions, { __t: 'model-discriminator-querying-conversion' });
+
+              query.exec(function(err, document) {
+                assert.ifError(err);
+                assert.ok(document instanceof ConversionEvent);
+                assert.equal(document.__t, 'model-discriminator-querying-conversion');
+                done();
+              });
+            });
+          });
+        });
+      });
+
+      it('discriminator model only finds a document of its type when fields selection set', function(done) {
         var impressionEvent = new ImpressionEvent({ name: 'Impression event' });
         var conversionEvent = new ConversionEvent({ name: 'Conversion event', revenue: 2 });
 

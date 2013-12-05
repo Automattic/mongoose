@@ -92,6 +92,36 @@ describe('model', function() {
         });
       });
 
+      it('hydrates correct models when fields selection set', function(done) {
+        var baseEvent  = new BaseEvent({ name: 'Base event' });
+        var impressionEvent = new ImpressionEvent({ name: 'Impression event' });
+        var conversionEvent = new ConversionEvent({ name: 'Conversion event', revenue: 1.337 });
+
+        baseEvent.save(function(err) {
+          assert.ifError(err);
+          impressionEvent.save(function(err) {
+            assert.ifError(err);
+            conversionEvent.save(function(err) {
+              assert.ifError(err);
+              BaseEvent.find({}, 'name').sort('name').exec(function(err, docs) {
+                assert.ifError(err);
+                assert.ok(docs[0] instanceof BaseEvent);
+                assert.equal(docs[0].name, 'Base event');
+
+                assert.ok(docs[1] instanceof ConversionEvent);
+                assert.equal(docs[1].schema, ConversionEventSchema);
+                assert.equal(docs[1].name, 'Conversion event');
+
+                assert.ok(docs[2] instanceof ImpressionEvent);
+                assert.equal(docs[2].schema, ImpressionEventSchema);
+                assert.equal(docs[2].name, 'Impression event');
+                done();
+              });
+            });
+          });
+        });
+      });
+
       it('discriminator model only finds documents of its type', function(done) {
         var impressionEvent = new ImpressionEvent({ name: 'Impression event' });
         var conversionEvent1 = new ConversionEvent({ name: 'Conversion event 1', revenue: 1 });

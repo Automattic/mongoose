@@ -7,7 +7,8 @@ var start = require('./common')
   , Schema = mongoose.Schema
   , assert = require('assert')
   , random = require('../lib/utils').random
-  , util = require('util');
+  , util = require('util')
+  , async = require('async');
 
 
 /**
@@ -39,9 +40,20 @@ describe('model', function() {
     });
 
     afterEach(function(done) {
-      BaseEvent.remove({}, function() {
-        done();
-      })
+      async.series(
+        [
+          function removeBaseEvent(next) {
+            BaseEvent.remove(next);
+          },
+          function removeImpressionEvent(next) {
+            ImpressionEvent.remove(next);
+          },
+          function removeConversionEvent(next) {
+            ConversionEvent.remove(next);
+          }
+        ],
+        done
+      );
     });
 
     after(function(done) {

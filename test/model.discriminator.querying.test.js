@@ -162,6 +162,46 @@ describe('model', function() {
         });
       });
 
+      it('discriminator model only finds documents of its type when fields selection set', function(done) {
+        var impressionEvent = new ImpressionEvent({ name: 'Impression event' });
+        var conversionEvent1 = new ConversionEvent({ name: 'Conversion event 1', revenue: 1 });
+        var conversionEvent2 = new ConversionEvent({ name: 'Conversion event 2', revenue: 2 });
+
+        impressionEvent.save(function(err) {
+          assert.ifError(err);
+          conversionEvent1.save(function(err) {
+            assert.ifError(err);
+            conversionEvent2.save(function(err) {
+              assert.ifError(err);
+              // doesn't find anything since we're querying for an impression id
+              var query = ConversionEvent.find({ _id: impressionEvent._id }, 'name');
+              assert.equal(query.op, 'find');
+              assert.deepEqual(query._conditions, { _id: impressionEvent._id, __t: 'model-discriminator-querying-conversion' });
+              query.exec(function(err, documents) {
+                assert.ifError(err);
+                assert.equal(documents.length, 0);
+
+                // now find one with no criteria given and ensure it gets added to _conditions
+                var query = ConversionEvent.find({}, 'name');
+                assert.deepEqual(query._conditions, { __t: 'model-discriminator-querying-conversion' });
+                assert.equal(query.op, 'find');
+                query.exec(function(err, documents) {
+                  assert.ifError(err);
+                  assert.equal(documents.length, 2);
+
+                  assert.ok(documents[0] instanceof ConversionEvent);
+                  assert.equal(documents[0].__t, 'model-discriminator-querying-conversion');
+
+                  assert.ok(documents[1] instanceof ConversionEvent);
+                  assert.equal(documents[1].__t, 'model-discriminator-querying-conversion');
+                  done();
+                });
+              });
+            });
+          });
+        });
+      });
+
       it('hydrates streams', function(done) {
         var baseEvent  = new BaseEvent({ name: 'Base event' });
         var impressionEvent = new ImpressionEvent({ name: 'Impression event' });

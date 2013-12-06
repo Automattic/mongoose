@@ -39,5 +39,6 @@
         "type": "git"
       , "url": "git://github.com/LearnBoost/mongoose.git"
     }
+  , "publishConfig": { "tag": "unstable" }
   , "homepage": "http://mongoosejs.com"
 }

@@ -67,11 +67,12 @@ describe('shard', function(){
           assert.ifError(err);
 
           if (!(res && res.documents && res.documents[0] && res.documents[0].ok)) {
-            throw new Error('could not shard test collection '
+            done( new Error('could not shard test collection '
                 + collection + '\n'
                 + res.documents[0].errmsg +'\n'
                 + 'Make sure to use a different database than what '
-                + 'is used for the MULTI_MONGOS_TEST' );
+                + 'is used for the MULTI_MONGOS_TEST' ) );
+            return;
           }
 
           db.db.admin(function (err, admin) {

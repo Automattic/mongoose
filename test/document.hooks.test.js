@@ -404,4 +404,53 @@ describe('document: hooks:', function () {
     });
   })
 
+  it("pre save hooks should run in parallel", function (done) {
+    // we set the time out to be double that of the validator - 1 (so that running in serial will be greater then that)
+    this.timeout(1000);
+    var db = start(),
+      count = 0
+
+    var SchemaWithPreSaveHook = new Schema ({
+      preference: String
+    });
+    SchemaWithPreSaveHook.pre('save', true, function hook (next, done) {
+      setTimeout(function () {
+        count++;
+        next();
+        if (count == 3) {
+          done(new Error("gaga"));
+        } else {
+          done();
+        }
+      }, 500);
+    });
+
+    var MWPSH = db.model('mwpsh', new Schema({subs: [SchemaWithPreSaveHook]}));
+    var m = new MWPSH({
+      subs: [
+        {
+          preference: "xx"
+        }
+        ,
+        {
+          preference: "yy"
+        }
+        ,
+        {
+          preference: "1"
+        }
+        ,
+        {
+          preference: "2"
+        }
+      ]
+    });
+
+    m.save(function (err) {
+      assert.equal(err.message, "gaga");
+      assert.equal(count, 4);
+      done();
+    });
+  })
+
 });

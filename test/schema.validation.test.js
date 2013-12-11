@@ -51,7 +51,8 @@ describe('schema', function(){
 
     it('string enum', function(done){
       var Test = new Schema({
-          complex: { type: String, enum: ['a', 'b', undefined, 'c', null] }
+          complex: { type: String, enum: ['a', 'b', undefined, 'c', null] },
+          state: { type: String }
       });
 
       assert.ok(Test.path('complex') instanceof SchemaTypes.String);
@@ -61,6 +62,15 @@ describe('schema', function(){
       Test.path('complex').enum('d', 'e');
 
       assert.deepEqual(Test.path('complex').enumValues, ['a', 'b', 'c', null, 'd', 'e']);
+      
+      // with SchemaTypes validate method
+      Test.path('state').enum({
+        values: 'opening open closing closed'.split(' '),
+        message: 'enum validator failed for path `{PATH}` with value `{VALUE}`'
+      });
+      
+      assert.equal(Test.path('state').validators.length, 1);
+      assert.deepEqual(Test.path('state').enumValues, ['opening', 'open', 'closing', 'closed']);
 
       Test.path('complex').doValidate('x', function(err){
         assert.ok(err instanceof ValidatorError);
@@ -77,7 +87,19 @@ describe('schema', function(){
 
       Test.path('complex').doValidate('da', function(err){
         assert.ok(err instanceof ValidatorError);
-      })
+      });
+      
+      Test.path('state').doValidate('x', function(err){
+        assert.ok(err instanceof ValidatorError);
+      });
+      
+      Test.path('state').doValidate('opening', function(err){
+        assert.ifError(err);
+      });
+      
+      Test.path('state').doValidate('open', function(err){
+        assert.ifError(err);
+      });
 
       done();
     })

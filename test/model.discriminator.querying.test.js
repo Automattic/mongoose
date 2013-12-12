@@ -111,6 +111,7 @@ describe('model', function() {
                 assert.ok(docs[1] instanceof ConversionEvent);
                 assert.equal(docs[1].schema, ConversionEventSchema);
                 assert.equal(docs[1].name, 'Conversion event');
+                assert.equal(docs[1].revenue, undefined);
 
                 assert.ok(docs[2] instanceof ImpressionEvent);
                 assert.equal(docs[2].schema, ImpressionEventSchema);
@@ -316,6 +317,7 @@ describe('model', function() {
                     assert.ok(event instanceof ConversionEvent);
                     assert.equal(event.schema, ConversionEventSchema);
                     assert.equal(event.name, 'Conversion event');
+                    assert.equal(event.revenue, undefined);
                     done();
                   });
                 });

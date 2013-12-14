@@ -1,4 +1,15 @@
 
+3.8.2 / 2013-12-14
+==================
+
+ * fixed; enum validation of multiple values #1778 [heroicyang](https://github.com/heroicyang)
+ * fixed; global var leak #1803
+ * fixed; post remove now fires on subdocs #1810
+ * fixed; no longer set default empty array for geospatial-indexed fields #1668 [shirish87](https://github.com/shirish87)
+ * fixed; model.stream() not hydrating discriminators correctly #1792 [j](https://github.com/j)
+ * docs: Stablility -> Stability [nikmartin](https://github.com/nikmartin)
+ * tests; improve shard error handling
+
 3.8.1 / 2013-11-19
 ==================
 

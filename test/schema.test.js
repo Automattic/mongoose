@@ -141,6 +141,9 @@ describe('schema', function(){
       , age   : Number
     });
 
+    // check for global variable leak
+    assert.equal('undefined', typeof errorMessage);
+
     var Person = new Schema({
         name      : String
       , raccoons  : [Racoon]

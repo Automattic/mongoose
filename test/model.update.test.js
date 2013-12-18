@@ -900,4 +900,26 @@ describe('model: update:', function(){
       });
     })
   });
+
+  it('casts empty arrays', function(done) {
+    var db = start();
+
+    var so = new Schema({ arr: [] });
+    var Some = db.model('1838-' + random(), so);
+
+    Some.create({ arr: ['a'] }, function (err, s) {
+      if (err) return done(err);
+
+      Some.update({ _id: s._id }, { arr: [] }, function(err) {
+        if (err) return done(err);
+        Some.findById(s._id, function(err, doc) {
+          db.close();
+          if (err) return done(err);
+          assert.ok(Array.isArray(doc.arr));
+          assert.strictEqual(0, doc.arr.length);
+          done();
+        });
+      });
+    });
+  });
 });

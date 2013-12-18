@@ -1508,9 +1508,9 @@ describe('model: populate:', function(){
         assert.ok('num' in err.errors);
         assert.ok('str' in err.errors);
         assert.ok('user' in err.errors);
-        assert.equal(err.errors.num.type,'required');
-        assert.equal(err.errors.str.type,'required');
-        assert.equal(err.errors.user.type,'required');
+        assert.equal(err.errors.num.kind,'required');
+        assert.equal(err.errors.str.kind,'required');
+        assert.equal(err.errors.user.kind,'required');
 
         comment.user = user;
         comment.num = 1995;

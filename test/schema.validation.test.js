@@ -157,7 +157,7 @@ describe('schema', function(){
       Tobi.path('friends').doValidate(100, function(err){
         assert.ok(err instanceof ValidatorError);
         assert.equal('friends', err.path);
-        assert.equal('max', err.type);
+        assert.equal('max', err.kind);
         assert.equal(100, err.value);
       });
 
@@ -475,7 +475,7 @@ describe('schema', function(){
 
           m.validate(function (err) {
             assert.equal('x failed validation (3,4,5,6)', String(err.errors.x));
-            assert.equal('user defined', err.errors.x.type);
+            assert.equal('user defined', err.errors.x.kind);
             done();
           })
         })

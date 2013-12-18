@@ -1435,7 +1435,7 @@ describe('Model', function(){
         post.save(function(err){
           assert.ok(err instanceof MongooseError);
           assert.ok(err instanceof ValidationError);
-          assert.equal(err.errors.baz.type,'user defined');
+          assert.equal(err.errors.baz.kind,'user defined');
           assert.equal(err.errors.baz.path,'baz');
 
           post.set('baz', 'good');
@@ -1477,7 +1477,7 @@ describe('Model', function(){
         post.save(function(err){
           assert.ok(err instanceof MongooseError);
           assert.ok(err instanceof ValidationError);
-          assert.equal(err.errors.prop.type,'user defined');
+          assert.equal(err.errors.prop.kind,'user defined');
           assert.equal(err.errors.prop.path,'prop');
 
           post.set('prop', 'good');
@@ -1531,18 +1531,18 @@ describe('Model', function(){
           assert.ok(err instanceof ValidationError);
           assert.equal(4, Object.keys(err.errors).length);
           assert.ok(err.errors.baz instanceof ValidatorError);
-          assert.equal(err.errors.baz.type,'user defined');
+          assert.equal(err.errors.baz.kind,'user defined');
           assert.equal(err.errors.baz.path,'baz');
           assert.ok(err.errors.abc instanceof ValidatorError);
-          assert.equal(err.errors.abc.type,'user defined');
+          assert.equal(err.errors.abc.kind,'user defined');
           assert.equal(err.errors.abc.message,'must be abc');
           assert.equal(err.errors.abc.path,'abc');
           assert.ok(err.errors.test instanceof ValidatorError);
           assert.equal(err.errors.test.message,'must also be abc');
-          assert.equal(err.errors.test.type,'user defined');
+          assert.equal(err.errors.test.kind,'user defined');
           assert.equal(err.errors.test.path,'test');
           assert.ok(err.errors.required instanceof ValidatorError);
-          assert.equal(err.errors.required.type,'required');
+          assert.equal(err.errors.required.kind,'required');
           assert.equal(err.errors.required.path,'required');
 
           post.set({

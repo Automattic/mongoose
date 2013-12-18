@@ -1018,7 +1018,7 @@ describe('document', function(){
       assert.ok(err instanceof ValidationError);
       assert.ok(err.errors.baz instanceof ValidatorError);
       assert.equal(err.errors.baz.message,'validation failed for path baz');
-      assert.equal(err.errors.baz.type,'user defined');
+      assert.equal(err.errors.baz.kind,'user defined');
       assert.equal(err.errors.baz.path,'baz');
 
       post.save(function(err){

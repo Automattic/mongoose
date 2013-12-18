@@ -211,12 +211,28 @@ describe('model', function() {
         });
       };
 
-      it('discriminator model only finds documents of its type when fields selection set as string', function(done) {
+      it('discriminator model only finds documents of its type when fields selection set as string inclusive', function(done) {
         checkDiscriminatorModelsFindDocumentsOfItsType('name', done);
       });
 
-      it('discriminator model only finds documents of its type when fields selection set as object', function(done) {
+      it('discriminator model only finds documents of its type when fields selection set as string exclusive', function(done) {
+        checkDiscriminatorModelsFindDocumentsOfItsType('-revenue', done);
+      });
+
+      it('discriminator model only finds documents of its type when fields selection set as empty string', function(done) {
+        checkDiscriminatorModelsFindDocumentsOfItsType('', done);
+      });
+
+      it('discriminator model only finds documents of its type when fields selection set as object inclusive', function(done) {
         checkDiscriminatorModelsFindDocumentsOfItsType({name: 1}, done);
+      });
+
+      it('discriminator model only finds documents of its type when fields selection set as object exclusive', function(done) {
+        checkDiscriminatorModelsFindDocumentsOfItsType({revenue: 0}, done);
+      });
+
+      it('discriminator model only finds documents of its type when fields selection set as empty object', function(done) {
+        checkDiscriminatorModelsFindDocumentsOfItsType({}, done);
       });
 
       it('hydrates streams', function(done) {
@@ -303,7 +319,7 @@ describe('model', function() {
         });
       });
 
-      var checkHydratesCorrectModels = function(fields, done) {
+      var checkHydratesCorrectModels = function(fields, done, checkUndefinedRevenue) {
         var baseEvent  = new BaseEvent({ name: 'Base event' });
         var impressionEvent = new ImpressionEvent({ name: 'Impression event' });
         var conversionEvent = new ConversionEvent({ name: 'Conversion event', revenue: 1.337 });
@@ -333,7 +349,9 @@ describe('model', function() {
                     assert.ok(event instanceof ConversionEvent);
                     assert.equal(event.schema, ConversionEventSchema);
                     assert.equal(event.name, 'Conversion event');
-                    assert.equal(event.revenue, undefined);
+                    if (checkUndefinedRevenue === true) {
+                      assert.equal(event.revenue, undefined);
+                    }
                     done();
                   });
                 });
@@ -343,12 +361,28 @@ describe('model', function() {
         });
       };
 
-      it('hydrates correct model when fields selection set as string', function(done) {
-        checkHydratesCorrectModels('name', done);
+      it('hydrates correct model when fields selection set as string inclusive', function(done) {
+        checkHydratesCorrectModels('name', done, true);
       });
 
-      it('hydrates correct model when fields selection set as object', function(done) {
-        checkHydratesCorrectModels({name: 1}, done);
+      it('hydrates correct model when fields selection set as string exclusive', function(done) {
+        checkHydratesCorrectModels('-revenue', done, true);
+      });
+
+      it('hydrates correct model when fields selection set as empty string', function(done) {
+        checkHydratesCorrectModels('', done);
+      });
+
+      it('hydrates correct model when fields selection set as object inclusive', function(done) {
+        checkHydratesCorrectModels({name: 1}, done, true);
+      });
+
+      it('hydrates correct model when fields selection set as object exclusive', function(done) {
+        checkHydratesCorrectModels({revenue: 0}, done, true);
+      });
+
+      it('hydrates correct model when fields selection set as empty object', function(done) {
+        checkHydratesCorrectModels({}, done);
       });
 
       it('discriminator model only finds a document of its type', function(done) {
@@ -417,12 +451,28 @@ describe('model', function() {
         });
       }
 
-      it('discriminator model only finds a document of its type when fields selection set as string', function(done) {
+      it('discriminator model only finds a document of its type when fields selection set as string inclusive', function(done) {
         checkDiscriminatorModelsFindOneDocumentOfItsType('name', done);
       });
 
-      it('discriminator model only finds a document of its type when fields selection set as object', function(done) {
+      it('discriminator model only finds a document of its type when fields selection set as string exclusive', function(done) {
+        checkDiscriminatorModelsFindOneDocumentOfItsType('-revenue', done);
+      });
+
+      it('discriminator model only finds a document of its type when fields selection set as empty string', function(done) {
+        checkDiscriminatorModelsFindOneDocumentOfItsType('', done);
+      });
+
+      it('discriminator model only finds a document of its type when fields selection set as object inclusive', function(done) {
         checkDiscriminatorModelsFindOneDocumentOfItsType({name: 1}, done);
+      });
+
+      it('discriminator model only finds a document of its type when fields selection set as object exclusive', function(done) {
+        checkDiscriminatorModelsFindOneDocumentOfItsType({revenue: 0}, done);
+      });
+
+      it('discriminator model only finds a document of its type when fields selection set as empty object', function(done) {
+        checkDiscriminatorModelsFindOneDocumentOfItsType({}, done);
       });
     });
 

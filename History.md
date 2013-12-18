@@ -1,4 +1,10 @@
 
+3.8.3 / 2013-12-17
+==================
+
+ * fixed; setting empty array with model.update #1838
+ * docs; fix url
+
 3.8.2 / 2013-12-14
 ==================
 

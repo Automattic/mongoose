@@ -151,6 +151,22 @@ describe('model: mapreduce:', function(){
     });
   })
 
+  it('withholds stats with false verbosity', function(done){
+    var db = start()
+      , MR = db.model('MapReduce', collection)
+
+    var o = {
+        map: function () {}
+      , reduce: function () { return 'test' }
+      , verbose: false
+    }
+
+    MR.mapReduce(o, function (err, results, stats){
+      assert.equal('undefined', typeof stats);
+      done();
+    });
+  });
+
   describe('promises (gh-1628)', function () {
     it('are returned', function(done){
       var db = start()

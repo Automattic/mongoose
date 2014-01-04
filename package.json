@@ -10,7 +10,7 @@
       , "ms": "0.1.0"
       , "sliced": "0.0.5"
       , "muri": "0.3.1"
-      , "mpromise": "0.3.0"
+      , "mpromise": "0.4.3"
       , "mpath": "0.1.1"
       , "regexp-clone": "0.0.1"
       , "mquery" : "0.3.2"

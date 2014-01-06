@@ -1443,4 +1443,48 @@ describe('Query', function(){
       done();
     })
   })
+
+  describe('fieldsAreInclusive', function(){
+    it('should not be inclusive when no select set', function(done){
+      var q = new Query;
+      assert.equal(false, q.fieldsAreInclusive());
+      done();
+    })
+    it('should not be inclusive when selecting with empty object', function(done){
+      var q = new Query;
+      q.select({});
+      assert.equal(false, q.fieldsAreInclusive());
+      done();
+    })
+    it('should not be inclusive when selecting with empty string', function(done){
+      var q = new Query;
+      q.select('');
+      assert.equal(false, q.fieldsAreInclusive());
+      done();
+    })
+    it('should be inclusive when selecting with object and inclusive fields', function(done){
+      var q = new Query;
+      q.select({foo: 1, bar: 1});
+      assert.equal(true, q.fieldsAreInclusive());
+      done();
+    })
+    it('should be inclusive when selecting with string and inclusive fields', function(done){
+      var q = new Query;
+      q.select('foo bar');
+      assert.equal(true, q.fieldsAreInclusive());
+      done();
+    })
+    it('should not be inclusive when selecting with object and exclusive fields', function(done){
+      var q = new Query;
+      q.select({foo: 0, bar: 0});
+      assert.equal(false, q.fieldsAreInclusive());
+      done();
+    })
+    it('should not be inclusive when selecting with string and exclusive fields', function(done){
+      var q = new Query;
+      q.select('-foo -bar');
+      assert.equal(false, q.fieldsAreInclusive());
+      done();
+    })
+  })
 })

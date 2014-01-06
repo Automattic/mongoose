@@ -26,6 +26,7 @@
       , "tbd": "0.6.4"
       , "benchmark" : "1.0.0"
       , "open": "0.0.3"
+      , "async": "0.2.5"
     }
   , "directories": { "lib": "./lib/mongoose" }
   , "scripts": { "test": "make test" }

@@ -1486,5 +1486,17 @@ describe('Query', function(){
       assert.equal(false, q.fieldsAreInclusive());
       done();
     })
+    it('should not be inclusive when selecting with object and mixing inclusive/exclusive fields', function(done){
+      var q = new Query;
+      q.select({foo: 1, bar: 0});
+      assert.equal(false, q.fieldsAreInclusive());
+      done();
+    })
+    it('should not be inclusive when selecting with string and mixing inclusive/exclusive fields', function(done){
+      var q = new Query;
+      q.select('foo -bar');
+      assert.equal(false, q.fieldsAreInclusive());
+      done();
+    })
   })
 })

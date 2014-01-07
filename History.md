@@ -1,4 +1,14 @@
 
+3.8.4 / 2014-01-07
+==================
+
+ * updated; mongodb driver to 1.3.23
+ * updated; mquery to 0.4.1
+ * updated; mpromise to 0.4.3
+ * fixed; discriminators now work when selecting fields #1820 [daemon1981](https://github.com/daemon1981)
+ * fixed; geoSearch with no results timeout #1846 [ghartnett](https://github.com/ghartnett)
+ * fixed; infitite recursion in ValidationError #1834 [chetverikov](https://github.com/chetverikov)
+
 3.8.3 / 2013-12-17
 ==================
 

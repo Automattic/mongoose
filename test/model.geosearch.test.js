@@ -57,7 +57,12 @@ describe('model', function(){
             assert.equal(results[0].pos[1], 10);
             assert.equal(results[0].id, geos[0].id);
             assert.ok(results[0] instanceof Geo);
-            done();
+
+            Geo.geoSearch({ type : "place" }, { near : [40,40], maxDistance : 5 }, function (err, results, stats) {
+              assert.ifError(err);
+              assert.equal(0, results.length);
+              done();
+            });
           });
         }
       });

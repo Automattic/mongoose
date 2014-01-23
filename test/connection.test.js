@@ -335,8 +335,8 @@ describe('connections:', function(){
         assert.equal(false, db.options.server.auto_reconnect);
         assert.equal(2, db.options.server.poolSize);
         assert.equal(false, db.options.server.slave_ok);
-        assert.equal(true, db.options.server.socketOptions.ssl);
-        assert.equal(true, db.options.replset.socketOptions.ssl);
+        assert.equal(true, db.options.server.ssl);
+        assert.equal(true, db.options.replset.ssl);
         assert.equal(10, db.options.server.socketOptions.socketTimeoutMS);
         assert.equal(10, db.options.replset.socketOptions.socketTimeoutMS);
         assert.equal(12, db.options.server.socketOptions.connectTimeoutMS);
@@ -376,8 +376,8 @@ describe('connections:', function(){
         assert.equal(false, db.options.server.auto_reconnect);
         assert.equal(3, db.options.server.poolSize);
         assert.equal(false, db.options.server.slave_ok);
-        assert.equal(true, db.options.server.socketOptions.ssl);
-        assert.equal(true, db.options.replset.socketOptions.ssl);
+        assert.equal(true, db.options.server.ssl);
+        assert.equal(true, db.options.replset.ssl);
         assert.equal(10, db.options.server.socketOptions.socketTimeoutMS);
         assert.equal(10, db.options.replset.socketOptions.socketTimeoutMS);
         assert.equal(12, db.options.server.socketOptions.connectTimeoutMS);
@@ -419,8 +419,8 @@ describe('connections:', function(){
         assert.equal(false, db.options.server.auto_reconnect);
         assert.equal(2, db.options.server.poolSize);
         assert.equal(false, db.options.server.slave_ok);
-        assert.equal(true, db.options.server.socketOptions.ssl);
-        assert.equal(true, db.options.replset.socketOptions.ssl);
+        assert.equal(true, db.options.server.ssl);
+        assert.equal(true, db.options.replset.ssl);
         assert.equal(10, db.options.server.socketOptions.socketTimeoutMS);
         assert.equal(10, db.options.replset.socketOptions.socketTimeoutMS);
         assert.equal(12, db.options.server.socketOptions.connectTimeoutMS);
@@ -456,8 +456,8 @@ describe('connections:', function(){
         assert.equal(80, db.options.db.wtimeoutMS);
         assert.equal(2, db.options.server.poolSize);
         assert.equal(false, db.options.server.slave_ok);
-        assert.equal(true, db.options.server.socketOptions.ssl);
-        assert.equal(true, db.options.replset.socketOptions.ssl);
+        assert.equal(true, db.options.server.ssl);
+        assert.equal(true, db.options.replset.ssl);
         assert.equal(10, db.options.server.socketOptions.socketTimeoutMS);
         assert.equal(10, db.options.replset.socketOptions.socketTimeoutMS);
         assert.equal(12, db.options.server.socketOptions.connectTimeoutMS);

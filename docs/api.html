@@ -4785,7 +4785,7 @@ Events.find().stream().pipe(format).pipe(res);</code></pre>
   <span class="keyword">var</span> date;
 
   <span class="comment">// support for timestamps</span>
-  <span class="keyword">if</span> (value <span class="keyword">instanceof</span> Number || <span class="string">'number'</span> == <span class="keyword">typeof</span> value 
+  <span class="keyword">if</span> (value <span class="keyword">instanceof</span> Number || <span class="string">'number'</span> == <span class="keyword">typeof</span> value
       || String(value) == Number(value))
     date = <span class="keyword">new</span> Date(Number(value));
 
@@ -5719,8 +5719,8 @@ Schema.path(<span class="string">'my.path'</span>).index({ unique: <span class="
   <span class="keyword">return</span> <span class="keyword">this</span>;
 };</code></pre></div><div class="params"><h4>Parameters:</h4><ul><li><code>bool</code><span class="types"> &lt;<a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Boolean">Boolean</a>&gt; </span><span></span></li></ul></div><div class="returns"><h4>Returns:</h4><ul><li><span class="types"> &lt;<a href="#schematype_SchemaType">SchemaType</a>&gt; </span><span>this</span></li></ul></div><div class="description"><h4>Examples:</h4>
 
-<pre><code><span class="keyword">var</span> s = <span class="keyword">new</span> Schema({ name: { type: String, unique: <span class="literal">true</span> })
-Schema.path(<span class="string">'name'</span>).index({ unique: <span class="literal">true</span> });</code></pre></div><hr class=""></div><div class="item method public"><h3 id="schematype_SchemaType-sparse"><a href="#schematype_SchemaType-sparse">SchemaType#sparse(<code>bool</code>)</a></h3><p>Declares a sparse index.</p><span class="showcode">show code</span><div class="sourcecode"><pre><code class="javascript">SchemaType.prototype.sparse = <span class="function"><span class="keyword">function</span> <span class="params">(bool)</span> {</span>
+<pre><code><span class="keyword">var</span> s = <span class="keyword">new</span> Schema({ name: { type: String, unique: <span class="literal">true</span> });
+s.path(<span class="string">'name'</span>).index({ unique: <span class="literal">true</span> });</code></pre></div><hr class=""></div><div class="item method public"><h3 id="schematype_SchemaType-sparse"><a href="#schematype_SchemaType-sparse">SchemaType#sparse(<code>bool</code>)</a></h3><p>Declares a sparse index.</p><span class="showcode">show code</span><div class="sourcecode"><pre><code class="javascript">SchemaType.prototype.sparse = <span class="function"><span class="keyword">function</span> <span class="params">(bool)</span> {</span>
   <span class="keyword">if</span> (!<span class="keyword">this</span>._index || <span class="string">'Object'</span> !== <span class="keyword">this</span>._index.constructor.name) {
     <span class="keyword">this</span>._index = {};
   }
@@ -6542,7 +6542,7 @@ doc.markModified(<span class="string">'mixed.type'</span>);</code></pre></div><h
   <span class="keyword">if</span> (!<span class="keyword">this</span>.willRemove) {
     _id = <span class="keyword">this</span>._doc._id;
     <span class="keyword">if</span> (!_id) {
-      <span class="keyword">throw</span> <span class="keyword">new</span> Error(<span class="string">'For your own good, Mongoose does not know '</span> + 
+      <span class="keyword">throw</span> <span class="keyword">new</span> Error(<span class="string">'For your own good, Mongoose does not know '</span> +
                       <span class="string">'how to remove an EmbeddedDocument that has no _id'</span>);
     }
     <span class="keyword">this</span>.__parentArray.pull({ _id: _id });

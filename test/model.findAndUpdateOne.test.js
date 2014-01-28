@@ -800,4 +800,18 @@ describe('model: findByIdAndUpdate:', function(){
       });
     });
   });
+
+  it('honors the overwrite option (gh-1809)', function(done) {
+    var db = start();
+    var M = db.model('1809', { name: String, change: Boolean });
+    M.create({ name: 'first' }, function(err, doc) {
+      if (err) return done(err);
+      M.findByIdAndUpdate(doc._id, { change: true }, { overwrite: true }, function(err, doc) {
+        if (err) return done(err);
+        assert.ok(doc.change);
+        assert.equal(undefined, doc.name);
+        done();
+      });
+    });
+  });
 })

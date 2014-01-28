@@ -1,4 +1,10 @@
 
+3.8.5 / 2014-01-23
+==================
+
+ * fixed; ssl setting when using URI #1882
+ * fixed; findByIdAndUpdate now respects the overwrite option #1809 [owenallenaz](https://github.com/owenallenaz)
+
 3.8.4 / 2014-01-07
 ==================
 

@@ -1289,7 +1289,7 @@ describe('Query', function(){
     })
 
     describe('read', function(){
-      var P = mongoose.mquery.utils.mongo.ReadPreference;
+      var P = mongoose.mongo.ReadPreference;
 
       describe('without tags', function(){
         it('works', function(done){

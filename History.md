@@ -3,7 +3,7 @@
 ==================
 
  * fixed; sending safe/read options in Query#exec #1895
- * fixed; findOneAnd..() with sort #1882
+ * fixed; findOneAnd..() with sort #1887
 
 3.8.6 / 2014-01-30
 ==================

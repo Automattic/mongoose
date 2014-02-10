@@ -1387,6 +1387,35 @@ describe('Query', function(){
           done();
         })
 
+        it('and sends it though the driver', function(done) {
+          var db = start();
+          var options = { read: 'secondary', safe: { w: 'majority' }};
+          var schema = Schema({ name: String }, options);
+          var M  = db.model(random(), schema);
+          var q = M.find();
+
+          // stub the internal query options call
+          var getopts = q._optionsForExec;
+          q._optionsForExec = function(model) {
+            q._optionsForExec = getopts;
+
+            var ret = getopts.call(this, model);
+
+            assert.ok(ret.readPreference);
+            assert.equal('secondary', ret.readPreference.mode);
+            assert.deepEqual({ w: 'majority' }, ret.safe);
+            called = true;
+
+            return ret;
+          }
+
+          q.exec(function(err, res) {
+            if (err) return done(err);
+            assert.ok(called);
+            done();
+          });
+        });
+
       })
     })
   })

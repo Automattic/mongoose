@@ -6430,7 +6430,23 @@ schema.path(<span class="string">'name'</span>, Number) <span class="comment">//
 };</code></pre></div><hr class=""></div><div class="item method public"><h3 id="schema_Schema-plugin"><a href="#schema_Schema-plugin">Schema#plugin(<code>plugin</code>, <code>opts</code>)</a></h3><p>Registers a plugin for this schema.</p><div class="params"><h4>Parameters:</h4><ul><li><code>plugin</code><span class="types"> &lt;<a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Function">Function</a>&gt; </span><span>callback</span></li><li><code>opts</code><span class="types"> &lt;<a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Object">Object</a>&gt; </span><span></span></li></ul></div><div class="see"><h4>See:</h4><ul class="see"><li><a href="plugins" title="plugins">plugins</a></li></ul></div><div class="description"></div><span class="showcode">show code</span><div class="sourcecode"><pre><code class="javascript">Schema.prototype.plugin = <span class="function"><span class="keyword">function</span> <span class="params">(fn, opts)</span> {</span>
   fn(<span class="keyword">this</span>, opts);
   <span class="keyword">return</span> <span class="keyword">this</span>;
-};</code></pre></div><hr class=""></div><div class="item method public"><h3 id="schema_Schema-post"><a href="#schema_Schema-post">Schema#post(<code>method</code>, <code>fn</code>)</a></h3><p>Defines a post for the document</p><div class="params"><h4>Parameters:</h4><ul><li><code>method</code><span class="types"> &lt;<a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/String">String</a>&gt; </span><span>name of the method to hook</span></li><li><code>fn</code><span class="types"> &lt;<a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Function">Function</a>&gt; </span><span>callback</span></li></ul></div><div class="see"><h4>See:</h4><ul class="see"><li><a href="https://github.com/bnoguchi/hooks-js/tree/31ec571cef0332e21121ee7157e0cf9728572cc3" title="hooks.js">hooks.js</a></li></ul></div><div class="description"><p>Post hooks fire <code>on</code> the event emitted from document instances of Models compiled from this schema.</p>
+};</code></pre></div><div class="params"><h4>Parameters:</h4><ul><li><code>name</code><span class="types"> &lt;<a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/String">String</a>&gt; </span><span>name of the document method to call later</span></li><li><code>args</code><span class="types"> &lt;<a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array">Array</a>&gt; </span><span>arguments to pass to the method</span></li></ul></div><div class="description"></div><hr class="private"></div><div class="item method public"><h3 id="schema_Schema-pre"><a href="#schema_Schema-pre">Schema#pre(<code>method</code>, <code>callback</code>)</a></h3><p>Defines a pre hook for the document.</p><span class="showcode">show code</span><div class="sourcecode"><pre><code class="javascript">Schema.prototype.pre = <span class="keyword">function</span>(){
+  <span class="keyword">return</span> <span class="keyword">this</span>.queue(<span class="string">'pre'</span>, arguments);
+};</code></pre></div><div class="params"><h4>Parameters:</h4><ul><li><code>method</code><span class="types"> &lt;<a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/String">String</a>&gt; </span><span></span></li><li><code>callback</code><span class="types"> &lt;<a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Function">Function</a>&gt; </span><span></span></li></ul></div><div class="see"><h4>See:</h4><ul class="see"><li><a href="https://github.com/bnoguchi/hooks-js/tree/31ec571cef0332e21121ee7157e0cf9728572cc3" title="hooks.js">hooks.js</a></li></ul></div><div class="description"><h4>Example</h4>
+
+<pre><code><span class="keyword">var</span> toySchema = <span class="keyword">new</span> Schema(..);
+
+toySchema.pre(<span class="string">'save'</span>, <span class="function"><span class="keyword">function</span> <span class="params">(next)</span> {</span>
+  <span class="keyword">if</span> (!<span class="keyword">this</span>.created) <span class="keyword">this</span>.created = <span class="keyword">new</span> Date;
+  next();
+})
+
+toySchema.pre(<span class="string">'validate'</span>, <span class="function"><span class="keyword">function</span> <span class="params">(next)</span> {</span>
+  <span class="keyword">if</span> (<span class="keyword">this</span>.name != <span class="string">'Woody'</span>) <span class="keyword">this</span>.name = <span class="string">'Woody'</span>;
+  next();
+})</code></pre></div><hr class=""></div><div class="item method public"><h3 id="schema_Schema-post"><a href="#schema_Schema-post">Schema#post(<code>method</code>, <code>fn</code>)</a></h3><p>Defines a post hook for the document.</p><span class="showcode">show code</span><div class="sourcecode"><pre><code class="javascript">Schema.prototype.post = <span class="keyword">function</span>(method, fn){
+  <span class="keyword">return</span> <span class="keyword">this</span>.queue(<span class="string">'on'</span>, arguments);
+};</code></pre></div><div class="params"><h4>Parameters:</h4><ul><li><code>method</code><span class="types"> &lt;<a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/String">String</a>&gt; </span><span>name of the method to hook</span></li><li><code>fn</code><span class="types"> &lt;<a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Function">Function</a>&gt; </span><span>callback</span></li></ul></div><div class="see"><h4>See:</h4><ul class="see"><li><a href="https://github.com/bnoguchi/hooks-js/tree/31ec571cef0332e21121ee7157e0cf9728572cc3" title="hooks.js">hooks.js</a></li></ul></div><div class="description"><p>Post hooks fire <code>on</code> the event emitted from document instances of Models compiled from this schema.</p>
 
 <pre><code><span class="keyword">var</span> schema = <span class="keyword">new</span> Schema(..);
 schema.post(<span class="string">'save'</span>, <span class="function"><span class="keyword">function</span> <span class="params">(doc)</span> {</span>
@@ -7951,9 +7967,4 @@ $("#content .controls input").on("click", function (e) {
     $("#content .controls input").prop('checked', 'checked');
     $(".private").show()
   }
-  $("#links, #content").on("click", "a", function (e) {
-    if (_gaq && this.hash) {
-      _gaq.push(['_trackEvent', 'anchor', 'click', this.hash])
-    }
-  })
 })()</script></body></html>

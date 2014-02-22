@@ -1,9 +1,20 @@
 
+3.8.8 / 2014-02-22
+==================
+
+ * fixed; saving Buffers #1914
+ * updated; expose connection states for user-land #1926 [yorkie](https://github.com/yorkie)
+ * updated; mquery to 0.5.3
+ * updated; added get / set to reserved path list #1903 [tstrimple](https://github.com/tstrimple)
+ * docs; README code highlighting, syntax fixes #1930 [IonicaBizau](https://github.com/IonicaBizau)
+ * docs; fixes link in the doc at #1925 [kapeels](https://github.com/kapeels)
+ * docs; add a missed word 'hook' for the description of the post-hook api #1924 [ipoval](https://github.com/ipoval)
+
 3.8.7 / 2014-02-09
 ==================
 
  * fixed; sending safe/read options in Query#exec #1895
- * fixed; findOneAnd..() with sort #1882
+ * fixed; findOneAnd..() with sort #1887
 
 3.8.6 / 2014-01-30
 ==================

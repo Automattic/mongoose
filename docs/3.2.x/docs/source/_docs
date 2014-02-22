@@ -12226,8 +12226,8 @@
       }
     ],
     "description": {
-      "full": "<p>Defines a post for the document</p>\n\n<p>Post hooks fire <code>on</code> the event emitted from document instances of Models compiled from this schema.</p>\n\n<pre><code>var schema = new Schema(..);\nschema.post('save', function () {\n  console.log('this fired after a document was saved');\n});\n\nvar Model = mongoose.model('Model', schema);\n\nvar m = new Model(..);\nm.save(function (err) {\n  console.log('this fires after the `post` hook');\n});\n</code></pre>",
-      "summary": "<p>Defines a post for the document</p>",
+      "full": "<p>Defines a post hook for the document.</p>\n\n<p>Post hooks fire <code>on</code> the event emitted from document instances of Models compiled from this schema.</p>\n\n<pre><code>var schema = new Schema(..);\nschema.post('save', function () {\n  console.log('this fired after a document was saved');\n});\n\nvar Model = mongoose.model('Model', schema);\n\nvar m = new Model(..);\nm.save(function (err) {\n  console.log('this fires after the `post` hook');\n});\n</code></pre>",
+      "summary": "<p>Defines a post hook for the document.</p>",
       "body": "<p>Post hooks fire <code>on</code> the event emitted from document instances of Models compiled from this schema.</p>\n\n<pre><code>var schema = new Schema(..);\nschema.post('save', function () {\n  console.log('this fired after a document was saved');\n});\n\nvar Model = mongoose.model('Model', schema);\n\nvar m = new Model(..);\nm.save(function (err) {\n  console.log('this fires after the `post` hook');\n});\n</code></pre>"
     },
     "isPrivate": false,

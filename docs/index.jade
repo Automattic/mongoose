@@ -82,7 +82,7 @@ html(lang='en')
           Each document can be saved to the database by calling its [save](/docs/api.html#model_Model-save) method. The first argument to the callback will be an error if any occured.
         :js
           fluffy.save(function (err, fluffy) {
-            if (err) // TODO handle the error
+            if (err) return console.error(err);
             fluffy.speak();
           });
         :markdown
@@ -90,7 +90,7 @@ html(lang='en')
           We can access all of the kitten documents through our Kitten [model](/docs/models.html).
         :js
           Kitten.find(function (err, kittens) {
-            if (err) // TODO handle err
+            if (err) return console.error(err);
             console.log(kittens)
           })
         :markdown

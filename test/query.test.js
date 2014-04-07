@@ -9,6 +9,7 @@ var start = require('./common')
   , Schema = mongoose.Schema
   , assert = require('assert')
   , random = require('../lib/utils').random
+  , mongodb = require('mongodb')
   , Query = require('../lib/query');
 
 var Comment = new Schema({
@@ -1289,7 +1290,7 @@ describe('Query', function(){
     })
 
     describe('read', function(){
-      var P = mongoose.mquery.utils.mongo.ReadPreference;
+      var P = mongodb.ReadPreference;
 
       describe('without tags', function(){
         it('works', function(done){

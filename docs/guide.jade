@@ -245,6 +245,7 @@ block content
     - [strict](#strict)
     - [toJSON](#toJSON)
     - [toObject](#toObject)
+    - [validateBeforeSave](#validateBeforeSave)
     - [versionKey](#versionKey)
 
   h4#autoIndex option: autoIndex
@@ -470,6 +471,26 @@ block content
     var M = mongoose.model('Person', schema);
     var m = new M({ name: 'Max Headroom' });
     console.log(m); // { _id: 504e0cd7dd992d9be2f20b6f, name: 'Max Headroom is my name' }
+
+  :markdown
+    To see all available `toObject` options, read [this](/docs/api.html#document_Document-toObject).
+    
+  h4#validateOnSave option: validateOnSave
+  :markdown
+    By default, documents are automatically validated before they are saved to the database. This is to prevent saving an invalid document. If you want to handle validation manually, and be able to save objects which don't pass validation, you can set validateOnSave to false.
+
+  :js
+    var schema = new Schema({ name: String });
+    schema.set('validateOnSave', false);
+    schema.path('name').validate(function (value) {
+        return v != null;
+    });
+    var M = mongoose.model('Person', schema);
+    var m = new M({ name: null });
+    m.validate(function(err) {
+        console.log(err); // Will tell you that null is not allowed.
+    });
+    m.save(); // Succeeds despite being invalid
 
   :markdown
     To see all available `toObject` options, read [this](/docs/api.html#document_Document-toObject).

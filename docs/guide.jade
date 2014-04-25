@@ -492,9 +492,6 @@ block content
     });
     m.save(); // Succeeds despite being invalid
 
-  :markdown
-    To see all available `toObject` options, read [this](/docs/api.html#document_Document-toObject).
-
   h4#versionKey option: versionKey
   :markdown
     The `versionKey` is a property set on each document when first created by Mongoose. This keys value contains the internal [revision](http://aaronheckmann.tumblr.com/post/48943525537/mongoose-v3-part-1-versioning) of the document. The name of this document property is configurable. The default is `__v`. If this conflicts with your application you can configure as such:

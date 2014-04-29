@@ -67,9 +67,6 @@ block content
   :js
     mongoose.connect('mongodb://username:password@host:port,username:password@host:port,username:password@host:port/database?options...' [, options]);
 
-  :markdown
-    _NOTE: The `database` need only be specified in one of the `uri`s._
-
   h3#mongos_connections Multi-mongos support
   :markdown
     High availability over multiple `mongos` instances is also supported. Pass a connection string for your `mongos` instances and set the `mongos` option to true:

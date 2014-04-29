@@ -36,6 +36,15 @@ describe('Query', function(){
     var Prod = mongoose.model('Product');
     p1 = new Prod();
   })
+  describe('constructor', function(){
+    it('should not corrupt options', function(done){
+      var opts = {};
+      var query = new Query({}, opts, null, p1.collection);
+      assert.notEqual(opts, query._mongooseOptions);
+      done();
+    })
+  })
+
   describe('select', function(){
     it('(object)', function(done){
       var query = new Query({}, {}, null, p1.collection);

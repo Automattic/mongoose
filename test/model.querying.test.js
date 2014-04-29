@@ -2165,7 +2165,7 @@ describe('geo-spatial', function(){
               assert.equal(1, docs.length);
               assert.equal(created.id, docs[0].id);
 
-              Test.find({ line: { $near: { $geometry: geojsonPoint }, $maxDistance: '50'}}, function (err, docs) {
+              Test.find({ line: { $near: { $geometry: geojsonPoint, $maxDistance: 50 } } }, function (err, docs) {
                 assert.ifError(err);
                 assert.equal(1, docs.length);
                 assert.equal(created.id, docs[0].id);

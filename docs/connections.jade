@@ -65,10 +65,7 @@ block content
     The same method is used to connect to a replica set but instead of passing a single `uri` we pass a comma delimited list of `uri`s.
 
   :js
-    mongoose.connect('mongodb://username:password@host:port/database,mongodb://username:password@host:port,mongodb://username:password@host:port?options...' [, options]);
-
-  :markdown
-    _NOTE: The `database` need only be specified in one of the `uri`s._
+    mongoose.connect('mongodb://username:password@host:port,username:password@host:port,username:password@host:port/database?options...' [, options]);
 
   h3#mongos_connections Multi-mongos support
   :markdown

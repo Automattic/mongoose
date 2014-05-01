@@ -218,6 +218,8 @@ block content
     console.log(mad.name.last);  // Bad
 
   :markdown
+    Virtual property setters are applied before other validation. So the example above would still work even if the `first` and `last` name fields were required.
+
     If you need attributes that you can get and set but that are not themselves persisted to MongoDB, virtual attributes is the Mongoose feature for you.
 
   h3#options Options

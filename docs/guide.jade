@@ -196,6 +196,9 @@ block content
     console.log('%s is insane', bad.name.full); // Walter White is insane
 
   :markdown
+    Note that if the resulting record is converted to an object or JSON, virtuals are not included by default.
+    Pass `virtuals : true` to either [toObject()](./api.html#document_Document-toObject) or to toJSON() to have them returned. 
+
     It would also be nice to be able to set `this.name.first` and `this.name.last` by setting `this.name.full`. For example, if we wanted to change `bad`'s `name.first` and `name.last` to 'Breaking' and 'Bad' respectively, it'd be nice to just:
 
   :js

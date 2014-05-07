@@ -425,13 +425,13 @@ describe('model: findOneAndUpdate:', function(){
         assert.equal(undefined, doc._doc.ignore);
         assert.equal(name, doc.name);
 
-        S.findOneAndUpdate({ _id: s._id }, { ignore: true }, { upsert: true }, function (err, doc) {
+        S.findOneAndUpdate({ name: 'orange crush' }, { ignore: true }, { upsert: true }, function (err, doc) {
           assert.ifError(err);
           assert.ok(!doc.ignore);
           assert.ok(!doc._doc.ignore);
-          assert.equal('orange crush', doc.name, 'doc was not overwritten with {} during upsert');
+          assert.equal('orange crush', doc.name);
 
-          S.findOneAndUpdate({ _id: s._id }, { ignore: true }, function (err, doc) {
+          S.findOneAndUpdate({ name: 'orange crush' }, { ignore: true }, function (err, doc) {
             db.close();
             assert.ifError(err);
             assert.ok(!doc.ignore);

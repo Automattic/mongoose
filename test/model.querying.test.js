@@ -58,6 +58,16 @@ mongoose.model('Mod', ModSchema);
 var geoSchema = new Schema({ loc: { type: [Number], index: '2d'}});
 
 describe('model: querying:', function(){
+  var mongo26_or_greater = false;
+  before(function(done){
+    start.mongodVersion(function (err, version) {
+      if (err) throw err;
+      mongo26_or_greater = 2 < version[0] || (2 == version[0] && 6 <= version[1]);
+      if (!mongo26_or_greater) console.log('not testing mongodb 2.6 features');
+      done();
+    })
+  })
+
   it('find returns a Query', function(done){
     var db = start()
       , BlogPostB = db.model('BlogPostB', collection);
@@ -1429,7 +1439,44 @@ describe('model: querying:', function(){
         });
       }
 
-    })
+    });
+
+    it('works with text search', function(done) {
+      if (!mongo26_or_greater) {
+        return done();
+      }
+
+      var db = start()
+        , blogPost = db.model('BlogPostB', collection);
+
+      blogPost.collection.ensureIndex({ title : 'text' }, function(error, res) {
+        assert.ifError(error);
+        var a = new blogPost({ title : 'querying in mongoose' });
+        var b = new blogPost({ title : 'text search in mongoose' });
+        a.save(function(error) {
+          assert.ifError(error);
+          b.save(function(error) {
+            assert.ifError(error);
+            blogPost.
+              find({ $text : { $search : 'text search' } }, { score : { $meta: "textScore" } }).
+              limit(2).
+              exec(function(error, documents) {
+                assert.ifError(error);
+                assert.equal(1, documents.length);
+                assert.equal('text search in mongoose', documents[0].title);
+                a.remove(function(error) {
+                  assert.ifError(error);
+                  b.remove(function(error) {
+                    assert.ifError(error);
+                    db.close();
+                    done();
+                  });
+                });
+              });
+          });
+        });
+      });
+    });
   });
 
   describe('limit', function(){
@@ -1508,7 +1555,39 @@ describe('model: querying:', function(){
           });
         });
       });
-    })
+    });
+    it('handles sorting by text score', function(done) {
+      if (!mongo26_or_greater) {
+        return done();
+      }
+
+      var db = start()
+        , blogPost = db.model('BlogPostB', collection);
+
+      blogPost.collection.ensureIndex({ title : 'text' }, function(error, res) {
+        assert.ifError(error);
+        var a = new blogPost({ title : 'searching in mongoose' });
+        var b = new blogPost({ title : 'text search in mongoose' });
+        a.save(function(error) {
+          assert.ifError(error);
+          b.save(function(error) {
+            assert.ifError(error);
+            blogPost.
+              find({ $text : { $search : 'text search' } }, { score : { $meta: "textScore" } }).
+              sort({ score : { $meta : 'textScore' } }).
+              limit(2).
+              exec(function(error, documents) {
+                assert.ifError(error);
+                assert.equal(2, documents.length);
+                assert.equal('text search in mongoose', documents[0].title);
+                assert.equal('searching in mongoose', documents[1].title);
+                db.close();
+                done();
+              });
+          });
+        });
+      });
+    });
   });
 
   describe('nested mixed "x.y.z"', function(){
@@ -2165,7 +2244,7 @@ describe('geo-spatial', function(){
               assert.equal(1, docs.length);
               assert.equal(created.id, docs[0].id);
 
-              Test.find({ line: { $near: { $geometry: geojsonPoint }, $maxDistance: '50'}}, function (err, docs) {
+              Test.find({ line: { $near: { $geometry: geojsonPoint, $maxDistance: 50 } } }, function (err, docs) {
                 assert.ifError(err);
                 assert.equal(1, docs.length);
                 assert.equal(created.id, docs[0].id);

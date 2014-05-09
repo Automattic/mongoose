@@ -1,3 +1,12 @@
+3.8.9 / 2014-05-08
+==================
+
+ * updated; mquery to 0.7.0
+ * updated; node-mongodb-native to 1.4.3
+ * fixed; $near failing against MongoDB 2.6
+ * fixed; relying on .options() to determine if collection exists
+ * fixed; $out aggregate helper
+ * fixed; all test failures against MongoDB 2.6.1, with caveat #2065
 
 3.8.8 / 2014-02-22
 ==================

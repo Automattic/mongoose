@@ -48,14 +48,14 @@ describe('collections: capped:', function(){
   });
   it('creation using a number', function(done){
     var db = start();
-    var schema = new Schema({ key: 'string' }, { capped: 100 });
+    var schema = new Schema({ key: 'string' }, { capped: 8192 });
     var Capped = db.model('Capped3', schema);
     Capped.collection.options(function (err, options) {
       assert.ifError(err);
       assert.ok(options.capped, 'should create a capped collection');
-      assert.equal(100, options.size);
+      assert.equal(8192, options.size);
       var s = '';
-      for (var i = 0; i < 3800; ++i) s+='A';
+      for (var i = 0; i < 4096 + 2000; ++i) s+='A';
       Capped.create({ key: s }, function (err, doc) {
         assert.ifError(err);
         var id = doc.id;

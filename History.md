@@ -1,3 +1,50 @@
+3.8.9 / 2014-05-08
+==================
+
+ * updated; mquery to 0.7.0
+ * updated; node-mongodb-native to 1.4.3
+ * fixed; $near failing against MongoDB 2.6
+ * fixed; relying on .options() to determine if collection exists
+ * fixed; $out aggregate helper
+ * fixed; all test failures against MongoDB 2.6.1, with caveat #2065
+
+3.8.8 / 2014-02-22
+==================
+
+ * fixed; saving Buffers #1914
+ * updated; expose connection states for user-land #1926 [yorkie](https://github.com/yorkie)
+ * updated; mquery to 0.5.3
+ * updated; added get / set to reserved path list #1903 [tstrimple](https://github.com/tstrimple)
+ * docs; README code highlighting, syntax fixes #1930 [IonicaBizau](https://github.com/IonicaBizau)
+ * docs; fixes link in the doc at #1925 [kapeels](https://github.com/kapeels)
+ * docs; add a missed word 'hook' for the description of the post-hook api #1924 [ipoval](https://github.com/ipoval)
+
+3.8.7 / 2014-02-09
+==================
+
+ * fixed; sending safe/read options in Query#exec #1895
+ * fixed; findOneAnd..() with sort #1887
+
+3.8.6 / 2014-01-30
+==================
+
+ * fixed; setting readPreferences #1895
+
+3.8.5 / 2014-01-23
+==================
+
+ * fixed; ssl setting when using URI #1882
+ * fixed; findByIdAndUpdate now respects the overwrite option #1809 [owenallenaz](https://github.com/owenallenaz)
+
+3.8.4 / 2014-01-07
+==================
+
+ * updated; mongodb driver to 1.3.23
+ * updated; mquery to 0.4.1
+ * updated; mpromise to 0.4.3
+ * fixed; discriminators now work when selecting fields #1820 [daemon1981](https://github.com/daemon1981)
+ * fixed; geoSearch with no results timeout #1846 [ghartnett](https://github.com/ghartnett)
+ * fixed; infitite recursion in ValidationError #1834 [chetverikov](https://github.com/chetverikov)
 
 3.8.3 / 2013-12-17
 ==================

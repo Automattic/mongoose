@@ -36,6 +36,15 @@ describe('Query', function(){
     var Prod = mongoose.model('Product');
     p1 = new Prod();
   })
+  describe('constructor', function(){
+    it('should not corrupt options', function(done){
+      var opts = {};
+      var query = new Query({}, opts, null, p1.collection);
+      assert.notEqual(opts, query._mongooseOptions);
+      done();
+    })
+  })
+
   describe('select', function(){
     it('(object)', function(done){
       var query = new Query({}, {}, null, p1.collection);
@@ -1289,7 +1298,7 @@ describe('Query', function(){
     })
 
     describe('read', function(){
-      var P = mongoose.mquery.utils.mongo.ReadPreference;
+      var P = mongoose.mongo.ReadPreference;
 
       describe('without tags', function(){
         it('works', function(done){
@@ -1386,6 +1395,35 @@ describe('Query', function(){
           assert.equal(options.readPreference.mode, 'secondary');
           done();
         })
+
+        it('and sends it though the driver', function(done) {
+          var db = start();
+          var options = { read: 'secondary', safe: { w: 'majority' }};
+          var schema = Schema({ name: String }, options);
+          var M  = db.model(random(), schema);
+          var q = M.find();
+
+          // stub the internal query options call
+          var getopts = q._optionsForExec;
+          q._optionsForExec = function(model) {
+            q._optionsForExec = getopts;
+
+            var ret = getopts.call(this, model);
+
+            assert.ok(ret.readPreference);
+            assert.equal('secondary', ret.readPreference.mode);
+            assert.deepEqual({ w: 'majority' }, ret.safe);
+            called = true;
+
+            return ret;
+          }
+
+          q.exec(function(err, res) {
+            if (err) return done(err);
+            assert.ok(called);
+            done();
+          });
+        });
 
       })
     })

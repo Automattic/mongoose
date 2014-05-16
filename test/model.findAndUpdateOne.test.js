@@ -8,6 +8,7 @@ var start = require('./common')
   , mongoose = start.mongoose
   , random = require('../lib/utils').random
   , Query = require('../lib/query')
+  , Utils = require('../lib/utils')
   , Schema = mongoose.Schema
   , SchemaType = mongoose.SchemaType
   , ObjectId = Schema.Types.ObjectId
@@ -15,7 +16,8 @@ var start = require('./common')
   , DocumentArray = mongoose.Types.DocumentArray
   , EmbeddedDocument = mongoose.Types.Embedded
   , MongooseArray = mongoose.Types.Array
-  , MongooseError = mongoose.Error;
+  , MongooseError = mongoose.Error
+  , _ = require('underscore');
 
 /**
  * Setup.
@@ -425,13 +427,13 @@ describe('model: findOneAndUpdate:', function(){
         assert.equal(undefined, doc._doc.ignore);
         assert.equal(name, doc.name);
 
-        S.findOneAndUpdate({ _id: s._id }, { ignore: true }, { upsert: true }, function (err, doc) {
+        S.findOneAndUpdate({ name: 'orange crush' }, { ignore: true }, { upsert: true }, function (err, doc) {
           assert.ifError(err);
           assert.ok(!doc.ignore);
           assert.ok(!doc._doc.ignore);
-          assert.equal('orange crush', doc.name, 'doc was not overwritten with {} during upsert');
+          assert.equal('orange crush', doc.name);
 
-          S.findOneAndUpdate({ _id: s._id }, { ignore: true }, function (err, doc) {
+          S.findOneAndUpdate({ name: 'orange crush' }, { ignore: true }, function (err, doc) {
             db.close();
             assert.ifError(err);
             assert.ok(!doc.ignore);
@@ -661,12 +663,10 @@ describe('model: findByIdAndUpdate:', function(){
   it('supports v3 sort string syntax', function(done){
     var db = start()
       , M = db.model(modelname, collection)
-      , _id = new DocumentObjectId
 
-    db.close();
-
-    var now = new Date
-      , query;
+    var now = new Date;
+    var _id = new DocumentObjectId;
+    var query;
 
     query = M.findByIdAndUpdate(_id, { $set: { date: now }}, { sort: 'author -title' });
     assert.equal(2, Object.keys(query.options.sort).length);
@@ -677,7 +677,24 @@ describe('model: findByIdAndUpdate:', function(){
     assert.equal(2, Object.keys(query.options.sort).length);
     assert.equal(1, query.options.sort.author);
     assert.equal(-1, query.options.sort.title);
-    done();
+
+    // gh-1887
+    M.create(
+        { title: 1, meta: {visitors: 0}}
+      , { title: 2, meta: {visitors: 10}}
+      , { title: 3, meta: {visitors: 5}}
+      , function (err, a,b,c) {
+      if (err) return done(err);
+
+      M.findOneAndUpdate({}, { title: 'changed' })
+      .sort({ 'meta.visitors': -1 })
+      .exec(function(err, doc) {
+        if (err) return done(err);
+        db.close();
+        assert.equal(10, doc.meta.visitors);
+        done();
+      });
+    });
   })
 
   it('supports v3 sort object syntax', function(done){
@@ -699,6 +716,7 @@ describe('model: findByIdAndUpdate:', function(){
     assert.equal(2, Object.keys(query.options.sort).length);
     assert.equal(1, query.options.sort.author);
     assert.equal(-1, query.options.sort.title);
+
     done();
   });
 
@@ -797,6 +815,60 @@ describe('model: findByIdAndUpdate:', function(){
           assert.ok(doc);
           assert.equal(doc.name, null);
           done();
+      });
+    });
+  });
+
+  it('honors the overwrite option (gh-1809)', function(done) {
+    var db = start();
+    var M = db.model('1809', { name: String, change: Boolean });
+    M.create({ name: 'first' }, function(err, doc) {
+      if (err) return done(err);
+      M.findByIdAndUpdate(doc._id, { change: true }, { overwrite: true }, function(err, doc) {
+        if (err) return done(err);
+        assert.ok(doc.change);
+        assert.equal(undefined, doc.name);
+        done();
+      });
+    });
+  });
+
+  it('can do deep equals on object id after findOneAndUpdate (gh-2070)', function(done) {
+    var db = start();
+
+    var accountSchema = Schema({
+      name: String,
+      contacts: [{
+        account: { type: Schema.Types.ObjectId, ref: 'Account'},
+        name: String
+      }]
+    });
+
+    var Account = db.model('2070', accountSchema);
+
+    var a1 = new Account({ name: 'parent' });
+    var a2 = new Account({ name: 'child' });
+
+    a1.save(function(error, a1) {
+      assert.ifError(error);
+      a2.save(function(error, a2) {
+        assert.ifError(error);
+        Account.findOneAndUpdate(
+          { name: 'parent' },
+          { $push: { contacts: { account: a2._id, name: 'child' } } },
+          { 'new': true },
+          function(error, doc) {
+            assert.ifError(error);
+            assert.ok(Utils.deepEqual(doc.contacts[0].account, a2._id));
+            assert.ok(_.isEqual(doc.contacts[0].account, a2._id));
+
+            Account.findOne({ name : 'parent' }, function(error, doc) {
+              assert.ifError(error);
+              assert.ok(Utils.deepEqual(doc.contacts[0].account, a2._id));
+              assert.ok(_.isEqual(doc.contacts[0].account, a2._id));
+              done();
+            });
+          });
       });
     });
   });

@@ -170,7 +170,7 @@ describe('model: update:', function(){
 
           BlogPost.update({ _id: post._id }, update2, function (err) {
             assert.ok(err);
-            assert.ok(/^can't append to array/.test(err.message));
+            assert.ok(err.message.length > 0);
             BlogPost.findById(post, function (err, p) {
               assert.ifError(err);
 
@@ -833,6 +833,48 @@ describe('model: update:', function(){
       })
     })
   })
+
+  describe('mongodb 2.6 features', function() {
+    var mongo26_or_greater = false;
+
+    before(function(done) {
+      start.mongodVersion(function (err, version) {
+        assert.ifError(err);
+        mongo26_or_greater = 2 < version[0] || (2 == version[0] && 6 <= version[1]);
+        done();
+      });
+    });
+
+    it('supports $position', function(done) {
+      if (!mongo26_or_greater) {
+        return done();
+      }
+
+      var db = start();
+      var schema = Schema({ name: String, n: [{ x: Number }] });
+      var M = db.model('setoninsert-' + random(), schema);
+
+      var m = new M({ name: '2.6', n: [{ x : 0 }] });
+      m.save(function(error, m) {
+        assert.ifError(error);
+        assert.equal(1, m.n.length);
+        M.update(
+           { name: '2.6' },
+           { $push: { n: { $each: [{x: 2}, {x: 1}], $position: 0 } } },
+           function(error) {
+             assert.ifError(error);
+             M.findOne({ name: '2.6' }, function(error, m) {
+               assert.ifError(error);
+               assert.equal(3, m.n.length);
+               assert.equal(2, m.n[0].x);
+               assert.equal(1, m.n[1].x);
+               assert.equal(0, m.n[2].x);
+               done();
+             });
+           });
+      });
+    });
+  });
 
   describe('{overwrite : true}', function () {
     it('overwrite works', function(done){

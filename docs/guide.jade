@@ -156,7 +156,7 @@ block content
 
   h3#virtuals Virtuals
   :markdown
-    [Virtuals](./api.html#schema_Schema-virtual) are document properties that are convenient to have around but that do not get persisted to MongoDB.
+    [Virtuals](./api.html#schema_Schema-virtual) are document properties that you can get and set but that do not get persisted to MongoDB. The getters are useful for formatting or combining fields, while settings are useful for de-composing a single value into multiple values for storage.
 
   :js
     // define a schema
@@ -196,6 +196,9 @@ block content
     console.log('%s is insane', bad.name.full); // Walter White is insane
 
   :markdown
+    Note that if the resulting record is converted to an object or JSON, virtuals are not included by default.
+    Pass `virtuals : true` to either [toObject()](./api.html#document_Document-toObject) or to toJSON() to have them returned. 
+
     It would also be nice to be able to set `this.name.first` and `this.name.last` by setting `this.name.full`. For example, if we wanted to change `bad`'s `name.first` and `name.last` to 'Breaking' and 'Bad' respectively, it'd be nice to just:
 
   :js
@@ -218,7 +221,9 @@ block content
     console.log(mad.name.last);  // Bad
 
   :markdown
-    If you need attributes that you can get and set but that are not themselves persisted to MongoDB, virtual attributes is the Mongoose feature for you.
+    Virtual property setters are applied before other validation. So the example above would still work even if the `first` and `last` name fields were required.
+
+    Only non-virtual properties work as part of queries and for field selection.
 
   h3#options Options
   :markdown
@@ -245,6 +250,7 @@ block content
     - [strict](#strict)
     - [toJSON](#toJSON)
     - [toObject](#toObject)
+    - [validateBeforeSave](#validateBeforeSave)
     - [versionKey](#versionKey)
 
   h4#autoIndex option: autoIndex
@@ -473,6 +479,23 @@ block content
 
   :markdown
     To see all available `toObject` options, read [this](/docs/api.html#document_Document-toObject).
+    
+  h4#validateBeforeSave option: validateBeforeSave
+  :markdown
+    By default, documents are automatically validated before they are saved to the database. This is to prevent saving an invalid document. If you want to handle validation manually, and be able to save objects which don't pass validation, you can set validateBeforeSave to false.
+
+  :js
+    var schema = new Schema({ name: String });
+    schema.set('validateBeforeSave', false);
+    schema.path('name').validate(function (value) {
+        return v != null;
+    });
+    var M = mongoose.model('Person', schema);
+    var m = new M({ name: null });
+    m.validate(function(err) {
+        console.log(err); // Will tell you that null is not allowed.
+    });
+    m.save(); // Succeeds despite being invalid
 
   h4#versionKey option: versionKey
   :markdown

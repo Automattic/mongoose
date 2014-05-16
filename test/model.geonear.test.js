@@ -241,14 +241,14 @@ describe('model', function(){
       var Geo = getModel(db);
       Geo.on('index', function(err) {
         assert.ifError(err);
-        var g = new Geo({ coordinates : [10,10], type : "Point"});
+        var g = new Geo({ coordinates : [1,1], type : "Point"});
         g.save(function (err) {
           assert.ifError(err);
 
-          var pnt = { type : "Point", coordinates : [1000,1000] };
+          var pnt = { type : "Point", coordinates : [90, 45] };
           var promise;
           assert.doesNotThrow(function() {
-            promise = Geo.geoNear(pnt, { spherical : true, maxDistance : 1 });
+            promise = Geo.geoNear(pnt, { spherical : true, maxDistance : 0.1 });
           });
 
           function finish() {

@@ -15,7 +15,7 @@ var start = require('./common')
   , Mixed = SchemaTypes.Mixed
   , DocumentObjectId = mongoose.Types.ObjectId
   , MongooseArray = mongoose.Types.Array
-  , ReadPref = require('mquery').utils.mongo.ReadPreference
+  , ReadPref = mongoose.mongo.ReadPreference
   , vm = require('vm')
 
 /**

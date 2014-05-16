@@ -497,7 +497,7 @@ describe('schema', function(){
 
           m.validate(function (err) {
             assert.equal('x failed validation (3,4,5,6)', String(err.errors.x));
-            assert.equal('customType', err.errors.x.type);
+            assert.equal('customType', err.errors.x.kind);
             done();
           })
         })
@@ -516,7 +516,7 @@ describe('schema', function(){
 
           m.validate(function (err) {
             assert.equal('x failed validation (3,4,5,6)', String(err.errors.x));
-            assert.equal('customType', err.errors.x.type);
+            assert.equal('customType', err.errors.x.kind);
             done();
           })
         })

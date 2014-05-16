@@ -475,13 +475,13 @@ block content
   :markdown
     To see all available `toObject` options, read [this](/docs/api.html#document_Document-toObject).
     
-  h4#validateOnSave option: validateOnSave
+  h4#validateBeforeSave option: validateBeforeSave
   :markdown
-    By default, documents are automatically validated before they are saved to the database. This is to prevent saving an invalid document. If you want to handle validation manually, and be able to save objects which don't pass validation, you can set validateOnSave to false.
+    By default, documents are automatically validated before they are saved to the database. This is to prevent saving an invalid document. If you want to handle validation manually, and be able to save objects which don't pass validation, you can set validateBeforeSave to false.
 
   :js
     var schema = new Schema({ name: String });
-    schema.set('validateOnSave', false);
+    schema.set('validateBeforeSave', false);
     schema.path('name').validate(function (value) {
         return v != null;
     });

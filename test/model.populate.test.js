@@ -61,6 +61,37 @@ mongoose.model('RefAlternateUser', User);
  */
 
 describe('model: populate:', function(){
+  it('populating array of object', function(done){
+    var db = start()
+      , BlogPost = db.model('RefBlogPost', posts)
+      , User = db.model('RefUser', users);
+
+    User.create({ name: 'User 1' }, function (err, user1) {
+      assert.ifError(err);
+
+      User.create({ name: 'User 2' }, function (err, user2) {
+        assert.ifError(err);
+
+        BlogPost.create({
+          title: 'Woot'
+          , _creator: user1._id
+          , comments: [
+            { _creator: user1._id, content: 'Woot woot' }
+            , { _creator: user2._id, content: 'Wha wha' }
+          ]
+        }, function (err, post) {
+          assert.ifError(err);
+
+          assert.doesNotThrow(function(){
+            post.populate('comments', function(){});
+          });
+          
+          done();
+        });
+      });
+    });
+  });
+
   it('populating a single ref', function(done){
     var db = start()
       , BlogPost = db.model('RefBlogPost', posts)

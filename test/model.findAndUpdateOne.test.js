@@ -8,6 +8,7 @@ var start = require('./common')
   , mongoose = start.mongoose
   , random = require('../lib/utils').random
   , Query = require('../lib/query')
+  , Utils = require('../lib/utils')
   , Schema = mongoose.Schema
   , SchemaType = mongoose.SchemaType
   , ObjectId = Schema.Types.ObjectId
@@ -15,7 +16,8 @@ var start = require('./common')
   , DocumentArray = mongoose.Types.DocumentArray
   , EmbeddedDocument = mongoose.Types.Embedded
   , MongooseArray = mongoose.Types.Array
-  , MongooseError = mongoose.Error;
+  , MongooseError = mongoose.Error
+  , _ = require('underscore');
 
 /**
  * Setup.
@@ -827,6 +829,46 @@ describe('model: findByIdAndUpdate:', function(){
         assert.ok(doc.change);
         assert.equal(undefined, doc.name);
         done();
+      });
+    });
+  });
+
+  it('can do deep equals on object id after findOneAndUpdate (gh-2070)', function(done) {
+    var db = start();
+
+    var accountSchema = Schema({
+      name: String,
+      contacts: [{
+        account: { type: Schema.Types.ObjectId, ref: 'Account'},
+        name: String
+      }]
+    });
+
+    var Account = db.model('2070', accountSchema);
+
+    var a1 = new Account({ name: 'parent' });
+    var a2 = new Account({ name: 'child' });
+
+    a1.save(function(error, a1) {
+      assert.ifError(error);
+      a2.save(function(error, a2) {
+        assert.ifError(error);
+        Account.findOneAndUpdate(
+          { name: 'parent' },
+          { $push: { contacts: { account: a2._id, name: 'child' } } },
+          { 'new': true },
+          function(error, doc) {
+            assert.ifError(error);
+            assert.ok(Utils.deepEqual(doc.contacts[0].account, a2._id));
+            assert.ok(_.isEqual(doc.contacts[0].account, a2._id));
+
+            Account.findOne({ name : 'parent' }, function(error, doc) {
+              assert.ifError(error);
+              assert.ok(Utils.deepEqual(doc.contacts[0].account, a2._id));
+              assert.ok(_.isEqual(doc.contacts[0].account, a2._id));
+              done();
+            });
+          });
       });
     });
   });

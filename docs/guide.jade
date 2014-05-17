@@ -398,7 +398,7 @@ block content
 
   :js
     var thingSchema = new Schema({..})
-    var Thing = mongoose.model('Thing', schemaSchema);
+    var Thing = mongoose.model('Thing', thingSchema);
     var thing = new Thing({ iAmNotInTheSchema: true });
     thing.save(); // iAmNotInTheSchema is not saved to the db
 
@@ -412,7 +412,7 @@ block content
 
   :js
     var thingSchema = new Schema({..})
-    var Thing = mongoose.model('Thing', schemaSchema);
+    var Thing = mongoose.model('Thing', thingSchema);
     var thing = new Thing;
     thing.set('iAmNotInTheSchema', true);
     thing.save(); // iAmNotInTheSchema is not saved to the db
@@ -437,7 +437,7 @@ block content
 
   :js
     var thingSchema = new Schema({..})
-    var Thing = mongoose.model('Thing', schemaSchema);
+    var Thing = mongoose.model('Thing', thingSchema);
     var thing = new Thing;
     thing.iAmNotInTheSchema = true;
     thing.save(); // iAmNotInTheSchema is never saved to the db

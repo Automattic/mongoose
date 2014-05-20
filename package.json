@@ -1,12 +1,12 @@
 {
     "name": "mongoose"
   , "description": "Mongoose MongoDB ODM"
-  , "version": "3.8.10-pre"
+  , "version": "3.8.10"
   , "author": "Guillermo Rauch <guillermo@learnboost.com>"
   , "keywords": ["mongodb", "document", "model", "schema", "database", "odm", "data", "datastore", "query", "nosql", "orm", "db"]
   , "dependencies": {
-        "hooks": "0.2.1"
-      , "mongodb": "1.4.3"
+        "mongodb": "1.4.4"
+      , "hooks": "0.2.1"
       , "ms": "0.1.0"
       , "sliced": "0.0.5"
       , "muri": "0.3.1"
@@ -27,6 +27,7 @@
       , "benchmark" : "1.0.0"
       , "open": "0.0.3"
       , "async": "0.2.5"
+      , "underscore": "1.5.2"
     }
   , "directories": { "lib": "./lib/mongoose" }
   , "scripts": { "test": "make test" }

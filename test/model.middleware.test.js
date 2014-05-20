@@ -38,13 +38,11 @@ describe('model middleware', function(){
       called++;
     });
 
-    schema.post('save', function(obj, next){
-      setTimeout(function(){
-        assert.equal(obj.title,'Little Green Running Hood');
-        assert.equal(0, called);
-        called++;
-        next();
-      }, 0);
+    schema.post('save', function (obj) {
+      assert.equal(obj.title,'Little Green Running Hood');
+      assert.equal(2, called);
+      db.close();
+      done();
     });
 
     var db = start()
@@ -54,12 +52,8 @@ describe('model middleware', function(){
 
     test.save(function(err){
       assert.ifError(err);
-      assert.equal(test.title,'Little Green Running Hood');
-      assert.equal(3, called);
-      db.close();
-      done();
     });
-  });
+  })
 
   it('works', function(done){
     var schema = new Schema({

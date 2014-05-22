@@ -1,3 +1,14 @@
+3.8.10 / 2014-05-20
+==================
+
+ * updated; node-mongodb-native to 1.4.4
+ * fixed; _.isEqual false negatives bug in js-bson #2070
+ * fixed; missing check for schema.options #2014
+ * fixed; missing support for $position #2024
+ * fixed; options object corruption #2049
+ * fixed; improvements to virtuals docs #2055
+ * fixed; added `domain` to reserved keywords #2052 #1338
+
 3.8.9 / 2014-05-08
 ==================
 

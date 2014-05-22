@@ -1,3 +1,13 @@
+3.9.0 (unstable) / 2014-05-22
+==================
+ * changed; added `domain` to reserved keywords #1338 #2052 [antoinepairet](https://github.com/antoinepairet)
+ * added; asynchronous post hooks #1977 #2081 [chopachom](https://github.com/chopachom) [JasonGhent](https://github.com/JasonGhent)
+ * added; using model for population, cross-db populate [mihai-chiorean](https://github.com/mihai-chiorean)
+ * added; can define a type for schema validators
+ * added; `doc.remove()` returns a promise #1619 [refack](https://github.com/refack)
+ * added; internal promises for hooks, pre-save hooks run in parallel #1732 [refack](https://github.com/refack)
+ * fixed; geoSearch hanging when no results returned #1846 [ghartnett](https://github.com/ghartnett)
+
 3.8.11 / 2014-05-22
 ==================
  * updated; node-mongodb-native to 1.4.5

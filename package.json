@@ -1,11 +1,11 @@
 {
     "name": "mongoose"
   , "description": "Mongoose MongoDB ODM"
-  , "version": "3.8.10"
+  , "version": "3.8.11"
   , "author": "Guillermo Rauch <guillermo@learnboost.com>"
   , "keywords": ["mongodb", "document", "model", "schema", "database", "odm", "data", "datastore", "query", "nosql", "orm", "db"]
   , "dependencies": {
-        "mongodb": "1.4.4"
+        "mongodb": "1.4.5"
       , "hooks": "0.2.1"
       , "ms": "0.1.0"
       , "sliced": "0.0.5"

@@ -39,6 +39,7 @@ var em = new Schema({ title: String, body: String });
 em.virtual('works').get(function () {
   return 'em virtual works'
 });
+mongoose.model('FooBar', new Schema({ title: String }));
 var schema = new Schema({
     test    : String
   , oids    : [ObjectId]
@@ -59,6 +60,10 @@ var schema = new Schema({
         }
     }
   , em: [em]
+  , pop : {
+        type: ObjectId
+      , ref: 'FooBar'
+    }
   , date: Date
 });
 TestDocument.prototype.$__setSchema(schema);
@@ -74,6 +79,9 @@ schema.path('nested.path').get(function (v) {
 });
 schema.path('nested.setr').set(function (v) {
   return v + ' setter';
+});
+schema.path('pop').get(function (v) {
+  return v.title;
 });
 
 var dateSetterCalled = false;
@@ -117,6 +125,7 @@ describe('document', function(){
             , cool  : DocumentObjectId.createFromHexString('4c6c2d6240ced95d0e00003c')
             , path  : 'my path'
           }
+        , pop     : new mongoose.models.FooBar({ title: 'a title' })
       });
 
       assert.equal('test', doc.test);
@@ -125,6 +134,7 @@ describe('document', function(){
       assert.equal(String(doc.nested.cool), '4c6c2d6240ced95d0e00003c');
       assert.equal(7, doc.nested.agePlus2);
       assert.equal('5my path', doc.nested.path);
+      assert.equal('a title', doc.pop);
       doc.nested.setAge = 10;
       assert.equal(10, doc.nested.age);
       doc.nested.setr = 'set it';

@@ -81,6 +81,8 @@ schema.path('nested.setr').set(function (v) {
   return v + ' setter';
 });
 schema.path('pop').get(function (v) {
+  if (!v) return null;
+
   return v.title;
 });
 

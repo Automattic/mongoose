@@ -128,3 +128,32 @@ module.exports.mongodVersion = function (cb) {
     });
   })
 }
+
+function dropDBs(done) {
+  var db = module.exports();
+  db.once('open', function () {
+
+    // drop the default test database
+    db.db.dropDatabase(function () {
+      var db2 = db.useDb('mongoose-test-2');
+      db2.db.dropDatabase(function () {
+        // drop mongos test db if exists
+        var mongos = process.env.MONGOOSE_MULTI_MONGOS_TEST_URI;
+        if (!mongos) return done();
+
+
+        var db = start({ uri: mongos, mongos: true });
+        db.once('open', function () {
+          db.db.dropDatabase(done);
+        });
+      });
+    });
+  });
+}
+
+before(function (done) {
+  dropDBs(done);
+});
+after(function (done) {
+  dropDBs(done);
+});

@@ -1069,8 +1069,33 @@ describe('document', function(){
           assert.ok(!doc.isModified('nested.age'));
           assert.ok(doc.isModified('nested.deep'));
           assert.equal('Hank and Marie', doc.nested.deep.x);
+          
           done();
         })
+
+        it('gh-1954', function(done){
+          var schema = new Schema({
+            schedule: [ new Schema({open: Number, close: Number}) ]
+          });
+
+          var M = mongoose.model('Blog', schema);
+
+          var doc = new M({
+            schedule: [{
+              open: 1000,
+              close: 1900
+            }]
+          });
+
+          doc.set('schedule.0.open', 1100);
+          assert.ok(doc.schedule);
+          assert.equal('MongooseDocumentArray', doc.schedule.constructor.name);
+          assert.equal('EmbeddedDocument', doc.schedule[0].constructor.name);
+          assert.equal(1100, doc.schedule[0].open);
+          assert.equal(1900, doc.schedule[0].close);
+
+          done();
+        });
       })
 
       describe('when overwriting with a document instance', function(){

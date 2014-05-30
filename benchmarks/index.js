@@ -51,10 +51,15 @@ function run (label, fn) {
   var i = total;
   while (i--) {
     a = fn();
-    if (i%2)
+    if (i%2) {
       a.toObject({ depopulate: true });
-    else
-      a._delta();
+    } else {
+      if (a._delta) {
+        a._delta();
+      } else {
+        a.$__delta();
+      }
+    }
   }
   var time = (new Date - start)/1000;
   totaltime += time;

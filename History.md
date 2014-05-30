@@ -1,3 +1,12 @@
+3.8.12 / 2014-05-30
+==================
+ * fixed; single-server reconnect event fires #1672
+ * fixed; sub-docs not saved when pushed into populated array #1794
+ * fixed; .set() sometimes converts embedded docs to pojos #1954 [archangel-irk](https://github.com/archangel-irk)
+ * fixed; sub-doc changes not getting persisted to db after save #2082
+ * fixed; custom getter might cause mongoose to mistakenly think a path is dirty #2100 [pgherveou](https://github.com/pgherveou)
+ * fixed; chainable helper for allowDiskUse option in aggregation #2114
+
 3.8.11 / 2014-05-22
 ==================
  * updated; node-mongodb-native to 1.4.5

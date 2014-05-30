@@ -490,9 +490,10 @@ describe('aggregate', function() {
         var m = db.model('Employee');
         var match = { $match: { sal: { $gt: 15000 }}};
         var pref = 'primaryPreferred';
-        var aggregate = m.aggregate(match).read(pref);
+        var aggregate = m.aggregate(match).read(pref).allowDiskUse(true);
 
         assert.equal(aggregate.options.readPreference.mode, pref);
+        assert.equal(aggregate.options.allowDiskUse, true);
 
         aggregate
           .exec(function (err, docs) {

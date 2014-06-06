@@ -487,20 +487,31 @@ describe('aggregate', function() {
 
     it('handles aggregation options', function(done){
       setupData(function (db) {
-        var m = db.model('Employee');
-        var match = { $match: { sal: { $gt: 15000 }}};
-        var pref = 'primaryPreferred';
-        var aggregate = m.aggregate(match).read(pref);
+        start.mongodVersion(function (err, version) {
+          if (err) throw err;
+          mongo26_or_greater = 2 < version[0] || (2 == version[0] && 6 <= version[1]);
 
-        assert.equal(aggregate.options.readPreference.mode, pref);
+          var m = db.model('Employee');
+          var match = { $match: { sal: { $gt: 15000 }}};
+          var pref = 'primaryPreferred';
+          var aggregate = m.aggregate(match).read(pref);
+          if (mongo26_or_greater) {
+            aggregate.allowDiskUse(true);
+          }
 
-        aggregate
-          .exec(function (err, docs) {
-            assert.ifError(err);
-            assert.equal(1, docs.length);
-            assert.equal(docs[0].sal, 18000);
-            clearData(db, done);
-          });
+          assert.equal(aggregate.options.readPreference.mode, pref);
+          if (mongo26_or_greater) {
+            assert.equal(aggregate.options.allowDiskUse, true);
+          }
+
+          aggregate
+            .exec(function (err, docs) {
+              assert.ifError(err);
+              assert.equal(1, docs.length);
+              assert.equal(docs[0].sal, 18000);
+              clearData(db, done);
+            });
+        });
       });
     })
   });

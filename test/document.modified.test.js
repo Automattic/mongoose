@@ -51,6 +51,12 @@ var BlogPost = new Schema({
 });
 
 BlogPost
+.path('title')
+.get(function(v) {
+  if (v) return v.toUpperCase();
+});
+
+BlogPost
 .virtual('titleWithAuthor')
 .get(function () {
   return this.get('title') + ' by ' + this.get('author');

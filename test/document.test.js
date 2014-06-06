@@ -790,6 +790,64 @@ describe('document', function(){
       })
     })
 
+    it('can return a promise', function(done) {
+      var db = start()
+        , schema = null
+        , called = false
+
+      var validate = [function(str){ called = true; return true }, 'BAM'];
+
+      schema = new Schema({
+          prop: { type: String, required: true, validate: validate }
+        , nick: { type: String, required: true }
+      });
+
+      var M = db.model('validateSchemaPromise', schema, collection);
+      var m = new M({ prop: 'gh891', nick: 'validation test' });
+      var mBad = new M({ prop: 'other' });
+
+      var promise = m.validate();
+      promise.then(function(err) {
+        var promise2 = mBad.validate();
+        promise2.onReject(function(err) {
+          assert.ok(!!err);
+          clearTimeout(timeout);
+          db.close();
+          done();
+        });
+      });
+
+      var timeout = setTimeout(function() {
+        db.close();
+        throw new Error("Promise not fulfilled!");
+      }, 500);
+    });
+
+    it('returns a promise when there are no validators', function(done) {
+      var db = start()
+        , schema = null
+        , called = false
+
+      schema = new Schema({ _id : String });
+
+      var M = db.model('validateSchemaPromise2', schema, collection);
+      var m = new M();
+
+      var promise = m.validate();
+      promise.then(function() {
+        clearTimeout(timeout);
+        db.close();
+        done();
+      });
+
+      var timeout = setTimeout(function() {
+        if (!fulfilled) {
+          db.close();
+          throw new Error("Promise not fulfilled!");
+        }
+      }, 500);
+    });
+
     describe('works on arrays', function(){
       var db;
       before(function(done){

@@ -417,7 +417,6 @@ describe('model: findOneAndUpdate:', function(){
 
     s.save(function (err) {
       assert.ifError(err);
-
       var name = Date.now();
       S.findOneAndUpdate({ name: name }, { ignore: true }, { upsert: true }, function (err, doc) {
         assert.ifError(err);
@@ -426,13 +425,11 @@ describe('model: findOneAndUpdate:', function(){
         assert.equal(undefined, doc.ignore);
         assert.equal(undefined, doc._doc.ignore);
         assert.equal(name, doc.name);
-
         S.findOneAndUpdate({ name: 'orange crush' }, { ignore: true }, { upsert: true }, function (err, doc) {
           assert.ifError(err);
           assert.ok(!doc.ignore);
           assert.ok(!doc._doc.ignore);
           assert.equal('orange crush', doc.name);
-
           S.findOneAndUpdate({ name: 'orange crush' }, { ignore: true }, function (err, doc) {
             db.close();
             assert.ifError(err);
@@ -871,5 +868,25 @@ describe('model: findByIdAndUpdate:', function(){
           });
       });
     });
+  });
+
+  it('adds __v on upsert (gh-2122)', function(done) {
+    var db = start();
+
+    var accountSchema = Schema({
+      name: String,
+    });
+
+    var Account = db.model('2122', accountSchema);
+
+    Account.findOneAndUpdate(
+      { name: 'account' },
+      { },
+      { upsert: true, new: true },
+      function(error, doc) {
+        assert.ifError(error);
+        assert.equal(0, doc.__v);
+        done();
+      });
   });
 })

@@ -30,7 +30,7 @@
       , "underscore": "1.5.2"
     }
   , "directories": { "lib": "./lib/mongoose" }
-  , "scripts": { "test": "set MONGOOSE_DISABLE_STABILITY_WARNING=1 && mocha --async-only test/**/*.test.js" }
+  , "scripts": { "test": "make test" }
   , "main": "./index.js"
   , "engines": { "node": ">=0.6.19" }
   , "bugs": {

@@ -8,6 +8,7 @@ var start = require('./common')
   , mongoose = start.mongoose
   , random = require('../lib/utils').random
   , Query = require('../lib/query')
+  , Utils = require('../lib/utils')
   , Schema = mongoose.Schema
   , SchemaType = mongoose.SchemaType
   , ObjectId = Schema.Types.ObjectId
@@ -15,7 +16,8 @@ var start = require('./common')
   , DocumentArray = mongoose.Types.DocumentArray
   , EmbeddedDocument = mongoose.Types.Embedded
   , MongooseArray = mongoose.Types.Array
-  , MongooseError = mongoose.Error;
+  , MongooseError = mongoose.Error
+  , _ = require('underscore');
 
 /**
  * Setup.
@@ -415,7 +417,6 @@ describe('model: findOneAndUpdate:', function(){
 
     s.save(function (err) {
       assert.ifError(err);
-
       var name = Date.now();
       S.findOneAndUpdate({ name: name }, { ignore: true }, { upsert: true }, function (err, doc) {
         assert.ifError(err);
@@ -424,13 +425,11 @@ describe('model: findOneAndUpdate:', function(){
         assert.equal(undefined, doc.ignore);
         assert.equal(undefined, doc._doc.ignore);
         assert.equal(name, doc.name);
-
         S.findOneAndUpdate({ name: 'orange crush' }, { ignore: true }, { upsert: true }, function (err, doc) {
           assert.ifError(err);
           assert.ok(!doc.ignore);
           assert.ok(!doc._doc.ignore);
           assert.equal('orange crush', doc.name);
-
           S.findOneAndUpdate({ name: 'orange crush' }, { ignore: true }, function (err, doc) {
             db.close();
             assert.ifError(err);
@@ -829,5 +828,65 @@ describe('model: findByIdAndUpdate:', function(){
         done();
       });
     });
+  });
+
+  it('can do deep equals on object id after findOneAndUpdate (gh-2070)', function(done) {
+    var db = start();
+
+    var accountSchema = Schema({
+      name: String,
+      contacts: [{
+        account: { type: Schema.Types.ObjectId, ref: 'Account'},
+        name: String
+      }]
+    });
+
+    var Account = db.model('2070', accountSchema);
+
+    var a1 = new Account({ name: 'parent' });
+    var a2 = new Account({ name: 'child' });
+
+    a1.save(function(error, a1) {
+      assert.ifError(error);
+      a2.save(function(error, a2) {
+        assert.ifError(error);
+        Account.findOneAndUpdate(
+          { name: 'parent' },
+          { $push: { contacts: { account: a2._id, name: 'child' } } },
+          { 'new': true },
+          function(error, doc) {
+            assert.ifError(error);
+            assert.ok(Utils.deepEqual(doc.contacts[0].account, a2._id));
+            assert.ok(_.isEqual(doc.contacts[0].account, a2._id));
+
+            Account.findOne({ name : 'parent' }, function(error, doc) {
+              assert.ifError(error);
+              assert.ok(Utils.deepEqual(doc.contacts[0].account, a2._id));
+              assert.ok(_.isEqual(doc.contacts[0].account, a2._id));
+              done();
+            });
+          });
+      });
+    });
+  });
+
+  it('adds __v on upsert (gh-2122)', function(done) {
+    var db = start();
+
+    var accountSchema = Schema({
+      name: String,
+    });
+
+    var Account = db.model('2122', accountSchema);
+
+    Account.findOneAndUpdate(
+      { name: 'account' },
+      { },
+      { upsert: true, new: true },
+      function(error, doc) {
+        assert.ifError(error);
+        assert.equal(0, doc.__v);
+        done();
+      });
   });
 })

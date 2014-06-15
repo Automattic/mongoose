@@ -156,7 +156,7 @@ block content
 
   h3#virtuals Virtuals
   :markdown
-    [Virtuals](./api.html#schema_Schema-virtual) are document properties that are convenient to have around but that do not get persisted to MongoDB.
+    [Virtuals](./api.html#schema_Schema-virtual) are document properties that you can get and set but that do not get persisted to MongoDB. The getters are useful for formatting or combining fields, while settings are useful for de-composing a single value into multiple values for storage.
 
   :js
     // define a schema
@@ -196,6 +196,9 @@ block content
     console.log('%s is insane', bad.name.full); // Walter White is insane
 
   :markdown
+    Note that if the resulting record is converted to an object or JSON, virtuals are not included by default.
+    Pass `virtuals : true` to either [toObject()](./api.html#document_Document-toObject) or to toJSON() to have them returned. 
+
     It would also be nice to be able to set `this.name.first` and `this.name.last` by setting `this.name.full`. For example, if we wanted to change `bad`'s `name.first` and `name.last` to 'Breaking' and 'Bad' respectively, it'd be nice to just:
 
   :js
@@ -218,7 +221,9 @@ block content
     console.log(mad.name.last);  // Bad
 
   :markdown
-    If you need attributes that you can get and set but that are not themselves persisted to MongoDB, virtual attributes is the Mongoose feature for you.
+    Virtual property setters are applied before other validation. So the example above would still work even if the `first` and `last` name fields were required.
+
+    Only non-virtual properties work as part of queries and for field selection.
 
   h3#options Options
   :markdown
@@ -392,7 +397,7 @@ block content
 
   :js
     var thingSchema = new Schema({..})
-    var Thing = mongoose.model('Thing', schemaSchema);
+    var Thing = mongoose.model('Thing', thingSchema);
     var thing = new Thing({ iAmNotInTheSchema: true });
     thing.save(); // iAmNotInTheSchema is not saved to the db
 
@@ -406,7 +411,7 @@ block content
 
   :js
     var thingSchema = new Schema({..})
-    var Thing = mongoose.model('Thing', schemaSchema);
+    var Thing = mongoose.model('Thing', thingSchema);
     var thing = new Thing;
     thing.set('iAmNotInTheSchema', true);
     thing.save(); // iAmNotInTheSchema is not saved to the db
@@ -431,7 +436,7 @@ block content
 
   :js
     var thingSchema = new Schema({..})
-    var Thing = mongoose.model('Thing', schemaSchema);
+    var Thing = mongoose.model('Thing', thingSchema);
     var thing = new Thing;
     thing.iAmNotInTheSchema = true;
     thing.save(); // iAmNotInTheSchema is never saved to the db

@@ -93,6 +93,13 @@ TestDocument.prototype.hooksTest = function(fn){
   fn(null, arguments);
 };
 
+var childSchema = new Schema({ counter: Number });
+
+var parentSchema = new Schema({
+  name: String,
+  children: [childSchema]
+});
+
 /**
  * Test.
  */
@@ -1069,8 +1076,33 @@ describe('document', function(){
           assert.ok(!doc.isModified('nested.age'));
           assert.ok(doc.isModified('nested.deep'));
           assert.equal('Hank and Marie', doc.nested.deep.x);
+          
           done();
         })
+
+        it('gh-1954', function(done){
+          var schema = new Schema({
+            schedule: [ new Schema({open: Number, close: Number}) ]
+          });
+
+          var M = mongoose.model('Blog', schema);
+
+          var doc = new M({
+            schedule: [{
+              open: 1000,
+              close: 1900
+            }]
+          });
+
+          doc.set('schedule.0.open', 1100);
+          assert.ok(doc.schedule);
+          assert.equal('MongooseDocumentArray', doc.schedule.constructor.name);
+          assert.equal('EmbeddedDocument', doc.schedule[0].constructor.name);
+          assert.equal(1100, doc.schedule[0].open);
+          assert.equal(1900, doc.schedule[0].close);
+
+          done();
+        });
       })
 
       describe('when overwriting with a document instance', function(){
@@ -1125,5 +1157,34 @@ describe('document', function(){
         done();
       })
     })
-  })
+  });
+
+  describe('gh-2082', function() {
+    it('works', function(done) {
+      var db = start();
+      var Parent = db.model('gh2082', parentSchema, 'gh2082');
+
+      var parent = new Parent({name: 'Hello'});
+      parent.save(function(err, parent) {
+        assert.ifError(err);
+        parent.children.push( {counter: 0} );
+        parent.save(function(err, parent) {
+          assert.ifError(err);
+          parent.children[0].counter += 1;
+          parent.save(function(err, parent) {
+            assert.ifError(err);
+            parent.children[0].counter += 1;
+            parent.save(function(err, parent) {
+              assert.ifError(err);
+              Parent.findOne({}, function(error, parent) {
+                assert.ifError(error);
+                assert.equal(2, parent.children[0].counter);
+                done();
+              });
+            });
+          });
+        });
+      });
+    });
+  });
 })

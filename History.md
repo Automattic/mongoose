@@ -1,3 +1,37 @@
+3.8.12 / 2014-05-30
+==================
+ * fixed; single-server reconnect event fires #1672
+ * fixed; sub-docs not saved when pushed into populated array #1794
+ * fixed; .set() sometimes converts embedded docs to pojos #1954 [archangel-irk](https://github.com/archangel-irk)
+ * fixed; sub-doc changes not getting persisted to db after save #2082
+ * fixed; custom getter might cause mongoose to mistakenly think a path is dirty #2100 [pgherveou](https://github.com/pgherveou)
+ * fixed; chainable helper for allowDiskUse option in aggregation #2114
+
+3.8.11 / 2014-05-22
+==================
+ * updated; node-mongodb-native to 1.4.5
+ * reverted; #2052, fixes #2097
+
+3.8.10 / 2014-05-20
+==================
+
+ * updated; node-mongodb-native to 1.4.4
+ * fixed; _.isEqual false negatives bug in js-bson #2070
+ * fixed; missing check for schema.options #2014
+ * fixed; missing support for $position #2024
+ * fixed; options object corruption #2049
+ * fixed; improvements to virtuals docs #2055
+ * fixed; added `domain` to reserved keywords #2052 #1338
+
+3.8.9 / 2014-05-08
+==================
+
+ * updated; mquery to 0.7.0
+ * updated; node-mongodb-native to 1.4.3
+ * fixed; $near failing against MongoDB 2.6
+ * fixed; relying on .options() to determine if collection exists
+ * fixed; $out aggregate helper
+ * fixed; all test failures against MongoDB 2.6.1, with caveat #2065
 
 3.8.8 / 2014-02-22
 ==================

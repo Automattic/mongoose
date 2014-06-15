@@ -1,64 +1,46 @@
 {
-  "name": "mongoose",
-  "description": "Mongoose MongoDB ODM",
-  "version": "3.8.9-pre",
-  "author": "Guillermo Rauch <guillermo@learnboost.com>",
-  "keywords": [
-    "mongodb",
-    "document",
-    "model",
-    "schema",
-    "database",
-    "odm",
-    "data",
-    "datastore",
-    "query",
-    "nosql",
-    "orm",
-    "db"
-  ],
-  "dependencies": {
-    "hooks": "0.2.1",
-    "mongodb": "1.4.3",
-    "ms": "0.1.0",
-    "sliced": "0.0.5",
-    "muri": "0.3.1",
-    "mpromise": "0.4.3",
-    "mpath": "0.1.1",
-    "regexp-clone": "0.0.1",
-    "mquery": "0.7.0",
-    "dtrace-provider": "~0.2.8"
-  },
-  "devDependencies": {
-    "mocha": "1.12.0",
-    "node-static": "0.5.9",
-    "dox": "0.3.1",
-    "jade": "0.26.3",
-    "highlight.js": "7.0.1",
-    "markdown": "0.3.1",
-    "promises-aplus-tests": ">= 1.0.2",
-    "tbd": "0.6.4",
-    "benchmark": "1.0.0",
-    "open": "0.0.3",
-    "async": "0.2.5"
-  },
-  "directories": {
-    "lib": "./lib/mongoose"
-  },
-  "scripts": {
-    "test": "make test"
-  },
-  "main": "./index.js",
-  "engines": {
-    "node": ">=0.6.19"
-  },
-  "bugs": {
-    "url": "https://github.com/learnboost/mongoose/issues/new",
-    "email": "mongoose-orm@googlegroups.com"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git://github.com/LearnBoost/mongoose.git"
-  },
-  "homepage": "http://mongoosejs.com"
+    "name": "mongoose"
+  , "description": "Mongoose MongoDB ODM"
+  , "version": "3.8.13-pre"
+  , "author": "Guillermo Rauch <guillermo@learnboost.com>"
+  , "keywords": ["mongodb", "document", "model", "schema", "database", "odm", "data", "datastore", "query", "nosql", "orm", "db"]
+  , "dependencies": {
+        "mongodb": "1.4.5"
+      , "hooks": "0.2.1"
+      , "ms": "0.1.0"
+      , "sliced": "0.0.5"
+      , "muri": "0.3.1"
+      , "mpromise": "0.4.3"
+      , "mpath": "0.1.1"
+      , "regexp-clone": "0.0.1"
+      , "mquery" : "0.8.0"
+      , "dtrace-provider": "~0.2.8"
+    }
+  , "devDependencies": {
+        "mocha": "1.12.0"
+      , "node-static": "0.5.9"
+      , "dox": "0.3.1"
+      , "jade": "0.26.3"
+      , "highlight.js": "7.0.1"
+      , "markdown": "0.3.1"
+      , "promises-aplus-tests": ">= 1.0.2"
+      , "tbd": "0.6.4"
+      , "benchmark" : "1.0.0"
+      , "open": "0.0.3"
+      , "async": "0.2.5"
+      , "underscore": "1.5.2"
+    }
+  , "directories": { "lib": "./lib/mongoose" }
+  , "scripts": { "test": "make test" }
+  , "main": "./index.js"
+  , "engines": { "node": ">=0.6.19" }
+  , "bugs": {
+        "url":"https://github.com/learnboost/mongoose/issues/new"
+      , "email": "mongoose-orm@googlegroups.com"
+    }
+  , "repository": {
+        "type": "git"
+      , "url": "git://github.com/LearnBoost/mongoose.git"
+    }
+  , "homepage": "http://mongoosejs.com"
 }

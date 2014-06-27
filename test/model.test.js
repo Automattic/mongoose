@@ -911,6 +911,27 @@ describe('Model', function(){
       });
     });
 
+    it('should use validate on save', function(done){
+      mongoose.model('Dog', new Schema({
+        isCanine: {
+          validate: [function(val){
+            return !!val;
+          }, 'mamalType validation failed.']
+        }
+      }));
+
+      var db = start()
+        , Dog = mongoose.model('Dog')
+        , dog = new Dog({isCanine: false});
+
+      dog.save(function(err){
+        assert.ok(err instanceof MongooseError);
+        assert.ok(err instanceof ValidationError);
+        db.close();
+        done();
+      });
+    });
+
     it('custom messaging', function(done){
       function validate (val) {
         return val === 'abc';

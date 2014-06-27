@@ -874,6 +874,35 @@ describe('model: update:', function(){
            });
       });
     });
+
+    it('supports $currentDate', function(done) {
+      if (!mongo26_or_greater) {
+        return done();
+      }
+
+      var db = start();
+      var schema = Schema({ name: String, lastModified: Date, lastModifiedTS: Date });
+      var M = db.model('gh-2019', schema);
+
+      var m = new M({ name: '2.6' });
+      m.save(function(error, m) {
+        assert.ifError(error);
+        var before = Date.now();
+        M.update(
+           { name: '2.6' },
+           { $currentDate: { lastModified: true, lastModifiedTS: { $type: 'timestamp' } } },
+           function(error) {
+             assert.ifError(error);
+             M.findOne({ name: '2.6' }, function(error, m) {
+               var after = Date.now();
+               assert.ifError(error);
+               assert.ok(m.lastModified.getTime() >= before);
+               assert.ok(m.lastModified.getTime() <= after);
+               done();
+             });
+           });
+      });
+    });
   });
 
   describe('{overwrite : true}', function () {

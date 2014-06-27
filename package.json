@@ -14,6 +14,7 @@
       , "mpath": "0.1.1"
       , "regexp-clone": "0.0.1"
       , "mquery" : "0.8.0"
+      , "dtrace-provider": "~0.2.8"
     }
   , "devDependencies": {
         "mocha": "1.12.0"

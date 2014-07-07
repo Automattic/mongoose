@@ -756,6 +756,31 @@ describe('model: update:', function(){
     });
   })
 
+  it('use .where for update condition (gh-2170)', function(done){
+    var db = start();
+    var so = new Schema({ num : Number });
+    var Some = db.model('gh-2170' + random(), so);
+
+    Some.create([ {num: 1}, {num: 1} ], function(err, doc0, doc1){
+      assert.ifError(err);
+      var sId0 = doc0._id;
+      var sId1 = doc1._id;
+      Some.where({_id: sId0}).update({}, {$set: {num: '99'}}, {multi: true}, function(err, cnt){
+        assert.ifError(err);
+        assert.equal(1, cnt);
+        Some.findById(sId0, function(err, doc0_1){
+          assert.ifError(err);
+          assert.equal(99, doc0_1.num);
+          Some.findById(sId1, function(err, doc1_1){
+            assert.ifError(err);
+            assert.equal(1, doc1_1.num);
+            done();
+          });
+        });
+      });
+    });
+  })
+
   describe('mongodb 2.4 features', function(){
     var mongo24_or_greater = false;
 

@@ -27,6 +27,7 @@ var Product = new Schema({
 mongoose.model('Product', Product);
 mongoose.model('Comment', Comment);
 var p1;
+
 /**
  * Test.
  */
@@ -405,7 +406,7 @@ describe('Query', function(){
         query.cast(p1.constructor);
       })
       done();
-    })
+    });
   })
 
   describe('maxDistance', function(){

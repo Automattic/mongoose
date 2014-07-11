@@ -2046,6 +2046,48 @@ describe('geo-spatial', function(){
       }
     });
 
+    it('$nearSphere with invalid coordinate does not crash (gh-1874)', function(done) {
+      var geoSchema = new Schema({
+        loc: {
+          type: { type: String },
+          coordinates: { type: [Number], index: '2dsphere' }
+        }
+      });
+      var db = start()
+        , Test = db.model('gh1874', geoSchema, 'gh1874');
+
+      var pending = 2;
+      var complete = function(err) {
+        if (complete.ran) return;
+        if (err) return done(complete.ran = err);
+        --pending || test();
+      }
+
+      Test.on('index', complete);
+      Test.create(
+        { loc: { coordinates: [ 30, 41 ] } },
+        { loc: { coordinates: [ 31, 40 ] } },
+        complete);
+
+      var test = function() {
+        var q = new Query({}, {}, null, Test.collection);
+        q.find({
+          'loc': {
+            $nearSphere: {
+              $geometry: { type: 'Point', coordinates: [30, 40] },
+              $maxDistance: 10000000
+            }
+          }
+        });
+
+        assert.doesNotThrow(function () {
+          q.cast(Test);
+        });
+
+        done();
+      }
+    });
+
     it('$maxDistance with arrays', function(done){
       var db = start()
         , Test = db.model('Geo4', geoSchema, "x"+random());

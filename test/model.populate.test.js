@@ -124,7 +124,7 @@ describe('model: populate:', function(){
         });
       });
     });
-  })
+  });
 
   it('across DBs', function(done) {
     var db = start()
@@ -2353,6 +2353,7 @@ describe('model: populate:', function(){
           assert.equal(2, doc.comments.length, 'invalid comments length for ' + JSON.stringify(doc));
           doc.comments.forEach(function (d) {
             assert.equal(undefined, d._id);
+            assert.equal(-1, Object.keys(d._doc).indexOf('_id'));
             assert.ok(d.body.length);
             assert.equal('number', typeof d._doc.__v);
           });
@@ -2362,6 +2363,7 @@ describe('model: populate:', function(){
             assert.equal(2, doc.comments.length);
             doc.comments.forEach(function (d) {
               assert.equal(undefined, d._id);
+              assert.equal(-1, Object.keys(d._doc).indexOf('_id'));
               assert.ok(d.title.length);
               assert.equal(undefined, d.body);
               assert.equal(typeof d._doc.__v, 'undefined');
@@ -2371,6 +2373,7 @@ describe('model: populate:', function(){
               assert.equal(2, doc.comments.length);
               doc.comments.forEach(function (d) {
                 assert.equal(undefined, d._id);
+                assert.equal(-1, Object.keys(d._doc).indexOf('_id'));
                 assert.ok(d.title.length);
                 assert.ok(d.body.length);
                 assert.equal(typeof d._doc.__v, 'number');

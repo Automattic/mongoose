@@ -1,7 +1,7 @@
 {
     "name": "mongoose"
   , "description": "Mongoose MongoDB ODM"
-  , "version": "3.8.12"
+  , "version": "3.8.13"
   , "author": "Guillermo Rauch <guillermo@learnboost.com>"
   , "keywords": ["mongodb", "document", "model", "schema", "database", "odm", "data", "datastore", "query", "nosql", "orm", "db"]
   , "dependencies": {
@@ -13,7 +13,7 @@
       , "mpromise": "0.4.3"
       , "mpath": "0.1.1"
       , "regexp-clone": "0.0.1"
-      , "mquery" : "0.7.0"
+      , "mquery" : "0.8.0"
     }
   , "devDependencies": {
         "mocha": "1.12.0"

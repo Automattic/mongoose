@@ -419,5 +419,26 @@ describe('types.documentarray', function(){
         done();
       });
     })
+
+    it('removes attached event listeners when creating new doc array', function(done) {
+      var db = start();
+      var nested = Schema({ v: { type: Number }});
+      var schema = Schema({
+          docs: [nested]
+      }, { collection: 'gh-2159' });
+      var M = db.model('gh-2159', schema);
+      M.create({ docs: [{v: 900}] }, function(error, m) {
+        m.shouldPrint = true;
+        assert.ifError(error);
+        var numListeners = m._events.save.length;
+        assert.ok(numListeners > 0);
+        m.docs = [{ v: 9000 }];
+        m.save(function(error, m) {
+          assert.ifError(error);
+          assert.equal(numListeners, m._events.save.length);
+          done();
+        });
+      });
+    });
   })
 })

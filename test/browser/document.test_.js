@@ -5,11 +5,11 @@ em.virtual('works').get(function () {
 
 var schema = new mongoose.Schema({
   test    : String,
-  oids    : [mongoose.Schema.ObjectId],
+  oids    : [mongoose.Schema.Types.ObjectId],
   numbers : [Number],
   nested  : {
     age   : Number,
-    cool  : mongoose.Schema.ObjectId,
+    cool  : mongoose.Schema.Types.ObjectId,
     deep  : { x: String },
     path  : String,
     setr  : String

@@ -67,3 +67,6 @@ copyunstable:
 	rm -rf ./tmp
 
 .PHONY: test test-short test-long ghpages site docs docclean gendocs docs_from_master docs_unstable master copytmp copyunstable gitreset docclean_unstable
+
+browser:
+	./node_modules/browserify/bin/cmd.js -o mongoose.browser.js lib/browser.js

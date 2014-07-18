@@ -7,7 +7,7 @@ var assert = require('assert');
 var mongoose = start.mongoose;
 
 describe('document unit tests', function() {
-  it('should handle shard keys properly (gh-2127)', function() {
+  it('should handle shard keys properly (gh-2127)', function(done) {
     var mockSchema = {
       options: {
         shardKey: { date: 1 } 
@@ -24,5 +24,8 @@ describe('document unit tests', function() {
 
     d.$__storeShard();
     assert.equal(currentTime, d.$__.shardval.date);
+    process.nextTick(function() {
+      done();
+    });
   });
 });

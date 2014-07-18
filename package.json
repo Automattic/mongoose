@@ -43,4 +43,5 @@
     }
   , "publishConfig": { "tag": "unstable" }
   , "homepage": "http://mongoosejs.com"
+  , "browser": "lib/browser.js"
 }

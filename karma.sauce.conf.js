@@ -5,7 +5,7 @@ module.exports = function(config) {
       browserName: 'chrome',
       version: '35'
     },
-    /*sl_safari_6: {
+    sl_safari_6: {
       base: 'SauceLabs',
       browserName: 'safari',
       platform: 'OS X 10.8',
@@ -22,27 +22,27 @@ module.exports = function(config) {
       browserName: 'internet explorer',
       platform: 'Windows 7',
       version: '9'
-    },*/
-    /*sl_ie_10: {
+    },
+    sl_ie_10: {
       base: 'SauceLabs',
       browserName: 'internet explorer',
       platform: 'Windows 7',
       version: '10'
-    },*/
+    },
     sl_ie_11: {
       base: 'SauceLabs',
       browserName: 'internet explorer',
       platform: 'Windows 7',
       version: '11'
     },
-    /*sl_android_43: {
+    sl_android_43: {
       base: 'SauceLabs',
       browserName: 'android',
       platform: 'Linux',
       version: '4.3',
       deviceName: 'Android',
       'device-orientation': 'portrait'
-    }*/
+    }
   };
 
   config.set({

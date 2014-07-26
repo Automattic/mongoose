@@ -1092,7 +1092,101 @@ describe('model: populate:', function(){
         });
       });
     });
-  })
+  });
+
+  it('properly handles limit per document (gh-2151)', function(done) {
+    var db = start();
+    var ObjectId = mongoose.Types.ObjectId;
+
+    var user = new Schema({
+      name: String,
+      friends: [{
+        type: Schema.ObjectId,
+        ref: 'gh-2151-1'
+      }]
+    });
+    var User = db.model('gh-2151-1', user, 'gh-2151-1');
+
+    var blogpost = Schema({
+      title: String,
+      tags: [String],
+      author: {
+        type: Schema.ObjectId,
+        ref: 'gh-2151-1'
+      }
+    })
+    var BlogPost = db.model('gh-2151-2', blogpost, 'gh-2151-2');
+
+    var userIds = [new ObjectId, new ObjectId, new ObjectId, new ObjectId];
+    var users = [];
+
+    users.push({
+      _id: userIds[0],
+      name: 'mary',
+      friends: [userIds[1], userIds[2], userIds[3]]
+    });
+    users.push({
+      _id: userIds[1],
+      name: 'bob',
+      friends: [userIds[0], userIds[2], userIds[3]]
+    });
+    users.push({
+      _id: userIds[2],
+      name: 'joe',
+      friends: [userIds[0], userIds[1], userIds[3]]
+    });
+    users.push({
+      _id: userIds[3],
+      name: 'sally',
+      friends: [userIds[0], userIds[1], userIds[2]]
+    });
+
+    User.create(users, function(err, docs) {
+      assert.ifError(err);
+
+      var blogposts = [];
+      blogposts.push({
+        title: 'blog 1',
+        tags: ['fun', 'cool'],
+        author: userIds[3]
+      });
+      blogposts.push({
+        title: 'blog 2',
+        tags: ['cool'],
+        author: userIds[1]
+      });
+      blogposts.push({
+        title: 'blog 3',
+        tags: ['fun', 'odd'],
+        author: userIds[2]
+      });
+
+      BlogPost.create(blogposts, function(err, docs) {
+        assert.ifError(err);
+
+        BlogPost.
+          find({ tags: 'fun' }).
+          lean().
+          populate('author').
+          exec(function(err, docs) {
+            assert.ifError(err);
+            var opts = {
+              path: 'author.friends',
+              select: 'name',
+              options: { limit: 1 }
+            };
+
+            BlogPost.populate(docs, opts, function(err, docs) {
+              assert.ifError(err);
+              assert.equal(2, docs.length);
+              assert.equal(1, docs[0].author.friends.length);
+              assert.equal(1, docs[1].author.friends.length);
+              done();
+            })
+          });
+      });
+    });
+  });
 
   it('populating subdocuments partially with empty array (gh-481)', function(done){
     var db = start()

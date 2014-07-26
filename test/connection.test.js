@@ -873,7 +873,8 @@ describe('connections:', function(){
     it('returns names of all models registered on it', function(done){
       var m = new mongoose.Mongoose;
       m.model('root', { x: String });
-      m.model('another', { x: String });
+      var another = m.model('another', { x: String });
+      another.discriminator('discriminated', new Schema({ x: String }));
 
       var db = m.createConnection();
       db.model('something', { x: String });
@@ -885,9 +886,10 @@ describe('connections:', function(){
 
       names = m.modelNames();
       assert.ok(Array.isArray(names));
-      assert.equal(2, names.length);
+      assert.equal(3, names.length);
       assert.equal('root', names[0]);
       assert.equal('another', names[1]);
+      assert.equal('discriminated', names[2]);
 
       done();
     })

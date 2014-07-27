@@ -2532,6 +2532,55 @@ describe('model: populate:', function(){
     });
   })
 
+  it.only('DynRef', function(done){
+    var db = start();
+
+    var ReviewSchema = new Schema({
+      text: String
+      , item: {
+        id: { type: Number, refPath: 'item.type'},
+        type: { type: String }
+      }
+    });
+
+    var NoteSchema = new Schema({
+      _id: Number
+      , body: String
+    });
+    var Review = db.model('DynRefReview', ReviewSchema, 'DynRefReview');
+    var Note = db.model('DynRefNote', NoteSchema, 'DynRefNote');
+    var Place = db.model('DynRefPlace', NoteSchema, 'DynRefPlace');
+
+    var note = new Note({_id: 2359, body: 'qweqwe'});
+    var place = new Place({_id: 2460, body: 'qweqwe'});
+
+    note.save(function (err) {
+      assert.ifError(err);
+
+      place.save(function (err) {
+        assert.ifError(err);
+
+        var reviewForNote = new Review({text: "gergergre", item: {id: 2359, type: 'DynRefNote'}});
+        var reviewForPlace = new Review({text: "erogkerpog", item: {id: 2460, type: 'DynRefPlace'}});
+
+        reviewForNote.save(function (err) {
+          assert.ifError(err);
+          reviewForPlace.save(function (err) {
+            assert.ifError(err);
+
+            Review.find({}).populate('item.id').exec(function(err, result){
+              db.close();
+              assert.ifError(err);
+              assert.equal(2, result.length);
+              assert.equal(2359, result[0].item.id._id);
+              assert.equal(2460, result[1].item.id._id);
+              done();
+            });
+          });
+        });
+      });
+    })
+  });
   describe('leaves Documents within Mixed properties alone (gh-1471)', function(){
     var db;
     var Cat;

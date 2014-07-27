@@ -1,3 +1,28 @@
+3.8.14 / 2014-07-26
+==================
+ * fixed; stringifying MongooseArray shows nested arrays #2002
+ * fixed; use populated doc schema in toObject and toJSON by default #2035
+ * fixed; dont crash on arrays containing null #2140
+ * fixed; model.update w/ upsert has same return values on .exec and promise #2143
+ * fixed; better handling for populate limit with multiple documents #2151
+ * fixed; dont prevent users from adding weights to text index #2183
+ * fixed; helper for aggregation cursor #2187
+ * updated; node-mongodb-native to 1.4.7
+
+3.8.13 / 2014-07-15
+==================
+ * fixed; memory leak with isNew events #2159
+ * fixed; docs for overwrite option for update() #2144
+ * fixed; storeShard() handles dates properly #2127
+ * fixed; sub-doc changes not getting persisted to db after save #2082
+ * fixed; populate with _id: 0 actually removes _id instead of setting to undefined #2123
+ * fixed; save versionKey on findOneAndUpdate w/ upsert #2122
+ * fixed; fix typo in 2.8 docs #2120 [shakirullahi](https://github.com/shakirullahi)
+ * fixed; support maxTimeMs #2102 [yuukinajima](https://github.com/yuukinajima)
+ * fixed; support $currentDate #2019
+ * fixed; $addToSet handles objects without _ids properly #1973
+ * fixed; dont crash on invalid nearSphere query #1874
+
 3.8.12 / 2014-05-30
 ==================
  * fixed; single-server reconnect event fires #1672

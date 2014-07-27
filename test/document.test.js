@@ -411,7 +411,51 @@ describe('document', function(){
     // all done
     delete doc.schema.options.toObject;
     done();
-  })
+  });
+
+  it('doesnt clobber child schema options when called with no params (gh-2035)', function(done) {
+    var db = start();
+    var userSchema = new Schema({
+      firstName: String,
+      lastName: String,
+      password: String
+    });
+
+    userSchema.virtual('fullName').get(function () {
+      return this.firstName + ' ' + this.lastName;
+    });
+
+    userSchema.set('toObject', { virtuals: false });
+
+    var postSchema = new Schema({
+      owner: { type: Schema.Types.ObjectId, ref: 'gh-2035-user' },
+      content: String
+    });
+
+    postSchema.virtual('capContent').get(function () {
+      return this.content.toUpperCase();
+    });
+
+    postSchema.set('toObject', { virtuals: true });
+    var User = db.model('gh-2035-user', userSchema, 'gh-2035-user');
+    var Post = db.model('gh-2035-post', postSchema, 'gh-2035-post');
+
+    var user = new User({ firstName: 'Joe', lastName: 'Smith', password: 'password' });
+
+    user.save(function (err, savedUser) {
+      assert.ifError(err);
+      var post = new Post({ owner: savedUser._id, content: 'lorem ipsum' });
+      post.save(function (err, savedPost) {
+        assert.ifError(err);
+        Post.findById(savedPost._id).populate('owner').exec(function (err, newPost) {
+          assert.ifError(err);
+          var obj = newPost.toObject();
+          assert.equal(obj.owner.fullName, undefined);
+          db.close(done);
+        });
+      });
+    });
+  });
 
   it('toJSON options', function(done){
     var doc = new TestDocument();

@@ -139,6 +139,21 @@ describe('Model', function(){
     })
   });
 
+  it('gh-2140', function(done) {
+    var db = start();
+    var S = new Schema({
+      field: [{text: String}]
+    });
+
+    var Model = db.model('gh-2140', S, 'gh-2140');
+    var s = new Model();
+    s.field = [null];
+    s.field = [{text: 'text'}];
+
+    assert.ok(s.field[0]);
+    done();
+  });
+
   describe('schema', function(){
     it('should exist', function(done){
       var db = start()
@@ -4759,6 +4774,7 @@ describe('Model', function(){
       });
     });
 
+    
     it('Compound index on field earlier declared with 2dsphere index is saved', function (done) {
       var db = start();
       var PersonSchema = new Schema({

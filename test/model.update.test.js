@@ -756,6 +756,31 @@ describe('model: update:', function(){
     });
   })
 
+  it('use .where for update condition (gh-2170)', function(done){
+    var db = start();
+    var so = new Schema({ num : Number });
+    var Some = db.model('gh-2170' + random(), so);
+
+    Some.create([ {num: 1}, {num: 1} ], function(err, doc0, doc1){
+      assert.ifError(err);
+      var sId0 = doc0._id;
+      var sId1 = doc1._id;
+      Some.where({_id: sId0}).update({}, {$set: {num: '99'}}, {multi: true}, function(err, cnt){
+        assert.ifError(err);
+        assert.equal(1, cnt);
+        Some.findById(sId0, function(err, doc0_1){
+          assert.ifError(err);
+          assert.equal(99, doc0_1.num);
+          Some.findById(sId1, function(err, doc1_1){
+            assert.ifError(err);
+            assert.equal(1, doc1_1.num);
+            done();
+          });
+        });
+      });
+    });
+  })
+
   describe('mongodb 2.4 features', function(){
     var mongo24_or_greater = false;
 
@@ -869,6 +894,35 @@ describe('model: update:', function(){
                assert.equal(2, m.n[0].x);
                assert.equal(1, m.n[1].x);
                assert.equal(0, m.n[2].x);
+               done();
+             });
+           });
+      });
+    });
+
+    it('supports $currentDate', function(done) {
+      if (!mongo26_or_greater) {
+        return done();
+      }
+
+      var db = start();
+      var schema = Schema({ name: String, lastModified: Date, lastModifiedTS: Date });
+      var M = db.model('gh-2019', schema);
+
+      var m = new M({ name: '2.6' });
+      m.save(function(error, m) {
+        assert.ifError(error);
+        var before = Date.now();
+        M.update(
+           { name: '2.6' },
+           { $currentDate: { lastModified: true, lastModifiedTS: { $type: 'timestamp' } } },
+           function(error) {
+             assert.ifError(error);
+             M.findOne({ name: '2.6' }, function(error, m) {
+               var after = Date.now();
+               assert.ifError(error);
+               assert.ok(m.lastModified.getTime() >= before);
+               assert.ok(m.lastModified.getTime() <= after);
                done();
              });
            });

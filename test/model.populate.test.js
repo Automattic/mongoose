@@ -2532,55 +2532,99 @@ describe('model: populate:', function(){
     });
   })
 
-  it.only('DynRef', function(done){
-    var db = start();
+  describe.only('DynRef', function(){
+    var db;
 
-    var ReviewSchema = new Schema({
-      text: String
-      , item: {
-        id: { type: Number, refPath: 'item.type'},
-        type: { type: String }
-      }
-    });
+    before(function( done ){
+      db = start();
 
-    var NoteSchema = new Schema({
-      _id: Number
-      , body: String
-    });
-    var Review = db.model('DynRefReview', ReviewSchema, 'DynRefReview');
-    var Note = db.model('DynRefNote', NoteSchema, 'DynRefNote');
-    var Place = db.model('DynRefPlace', NoteSchema, 'DynRefPlace');
+      var ReviewSchema = new Schema({
+            _id: Number,
+            text: String,
+            item: {
+              id: { type: Number, refPath: 'item.type'},
+              type: { type: String }
+            }
+          })
+        , ArrayPopulate = new Schema({
+            items: [{
+              item: { type: mongoose.SchemaTypes.Mixed, refPath: 'items.type'},
+              type: { type: String }
+            }]
+          })
+        , AnotherSchema = new Schema({
+            _id: Number,
+            body: String,
+            array: Array,
+            bool: Boolean,
+            nest: {
+              string: String,
+              array: Array
+            },
+            mixed: {}
+          })
+        , Review = db.model('DynRefReview', ReviewSchema, 'DynRefReview')
+        , Note = db.model('DynRefNote', AnotherSchema, 'DynRefNote')
+        , Place = db.model('DynRefPlace', AnotherSchema, 'DynRefPlace')
+        , Another = db.model('DynRefAnother', AnotherSchema, 'DynRefAnother')
+        , ArrayPop = db.model('DynRefArrayPopulate', ArrayPopulate, 'DynRefArrayPopulate');
 
-    var note = new Note({_id: 2359, body: 'qweqwe'});
-    var place = new Place({_id: 2460, body: 'qweqwe'});
-
-    note.save(function (err) {
-      assert.ifError(err);
-
-      place.save(function (err) {
+      Place.create({_id: 11, body: "wefwef"},{_id: 12, body: "rthrth"},{_id: 13, body: "o.i.io."}, function(err){
         assert.ifError(err);
-
-        var reviewForNote = new Review({text: "gergergre", item: {id: 2359, type: 'DynRefNote'}});
-        var reviewForPlace = new Review({text: "erogkerpog", item: {id: 2460, type: 'DynRefPlace'}});
-
-        reviewForNote.save(function (err) {
+        Note.create({_id: 21, body: "ergerg"},{_id: 22, body: "rhtrhryj"},{_id: 23, body: "kyukuk"}, function(err){
           assert.ifError(err);
-          reviewForPlace.save(function (err) {
-            assert.ifError(err);
-
-            Review.find({}).populate('item.id').exec(function(err, result){
-              db.close();
+          Review.create(
+            {_id: 31, text: 'safadv', item: { id: 11, type: 'DynRefPlace'}},
+            {_id: 32, text: 'rthrt', item: { id: 12, type: 'DynRefPlace'}},
+            {_id: 33, text: 'tmtyj', item: { id: 13, type: 'DynRefPlace'}},
+            {_id: 34, text: 'yukilui', item: { id: 21, type: 'DynRefNote'}},
+            {_id: 35, text: 'h4545t', item: { id: 22, type: 'DynRefNote'}},
+            {_id: 36, text: 'regeg45', item: { id: 23, type: 'DynRefNote'}}, function(err, a){
               assert.ifError(err);
-              assert.equal(2, result.length);
-              assert.equal(2359, result[0].item.id._id);
-              assert.equal(2460, result[1].item.id._id);
-              done();
+              ArrayPop.create({
+                items: [
+                    {item: 32, type: 'DynRefReview'},
+                    {item: 12, type: 'DynRefPlace'},
+                    {item: 21, type: 'DynRefNote'}
+                ]
+              }, function(err){
+                assert.ifError(err);
+                done();
+              });
             });
-          });
         });
       });
-    })
+    });
+
+    after(function(done){
+      db.close(done);
+    });
+
+    it('Simple populate', function(done){
+      db.model('DynRefReview').find({}).populate('item.id').exec(function(err, result){
+        assert.ifError(err);
+        assert.equal(6, result.length);
+        assert.equal(11, result[0].item.id._id);
+        assert.equal(12, result[1].item.id._id);
+        assert.equal(13, result[2].item.id._id);
+        assert.equal(21, result[3].item.id._id);
+        assert.equal(22, result[4].item.id._id);
+        assert.equal(23, result[5].item.id._id);
+        done();
+      });
+    });
+
+    it('Array populate', function(done){
+      db.model('DynRefArrayPopulate').find({}).populate('items.item').exec(function(err, result){
+        assert.ifError(err);
+        assert.equal(32, result[0].items[0].item._id);
+        assert.equal(12, result[0].items[1].item._id);
+        assert.equal(21, result[0].items[2].item._id);
+        done();
+      });
+    });
   });
+
   describe('leaves Documents within Mixed properties alone (gh-1471)', function(){
     var db;
     var Cat;

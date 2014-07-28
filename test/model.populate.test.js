@@ -2532,7 +2532,7 @@ describe('model: populate:', function(){
     });
   })
 
-  describe.only('DynRef', function(){
+  describe('DynRef', function(){
     var db;
 
     before(function( done ){

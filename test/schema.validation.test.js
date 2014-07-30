@@ -204,7 +204,7 @@ describe('schema', function(){
         done();
       });
 
-      it.only('string conditional required', function (done) {
+      it('string conditional required', function (done) {
         var Test = new Schema({
             simple: String
         });

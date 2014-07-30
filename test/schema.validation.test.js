@@ -156,7 +156,7 @@ describe('schema', function(){
       Tobi.path('friends').doValidate(100, function(err){
         assert.ok(err instanceof ValidatorError);
         assert.equal('friends', err.path);
-        assert.equal('max', err.type);
+        assert.equal('max', err.kind);
         assert.equal(100, err.value);
       });
 
@@ -199,6 +199,56 @@ describe('schema', function(){
 
         Test.path('simple').doValidate('woot', function(err){
           assert.ifError(err);
+        });
+
+        done();
+      });
+
+      it('string conditional required', function (done) {
+        var Test = new Schema({
+            simple: String
+        });
+
+        var required = true,
+            isRequired = function () {
+                return required;
+            };
+
+        Test.path('simple').required(isRequired);
+        assert.equal(Test.path('simple').validators.length, 1);
+
+        Test.path('simple').doValidate(null, function (err) {
+            assert.ok(err instanceof ValidatorError);
+        });
+
+        Test.path('simple').doValidate(undefined, function (err) {
+            assert.ok(err instanceof ValidatorError);
+        });
+
+        Test.path('simple').doValidate('', function (err) {
+            assert.ok(err instanceof ValidatorError);
+        });
+
+        Test.path('simple').doValidate('woot', function (err) {
+            assert.ifError(err);
+        });
+
+        required = false;
+
+        Test.path('simple').doValidate(null, function (err) {
+            assert.ifError(err);
+        });
+
+        Test.path('simple').doValidate(undefined, function (err) {
+            assert.ifError(err);
+        });
+
+        Test.path('simple').doValidate('', function (err) {
+            assert.ifError(err);
+        });
+
+        Test.path('simple').doValidate('woot', function (err) {
+            assert.ifError(err);
         });
 
         done();
@@ -474,7 +524,48 @@ describe('schema', function(){
 
           m.validate(function (err) {
             assert.equal('x failed validation (3,4,5,6)', String(err.errors.x));
-            assert.equal('user defined', err.errors.x.type);
+            assert.equal('user defined', err.errors.x.kind);
+            done();
+          })
+        })
+      })
+    })
+
+    describe('types', function(){
+      describe('are customizable', function(){
+        it('for single custom validators', function(done){
+          function validate () {
+            return false;
+          }
+          var validator = [validate, '{PATH} failed validation ({VALUE})', 'customType'];
+
+          var schema = new Schema({ x: { type: [], validate: validator }});
+          var M = mongoose.model('custom-validator-'+random(), schema);
+
+          var m = new M({ x: [3,4,5,6] });
+
+          m.validate(function (err) {
+            assert.equal('x failed validation (3,4,5,6)', String(err.errors.x));
+            assert.equal('customType', err.errors.x.kind);
+            done();
+          })
+        })
+
+        it('for many custom validators', function(done){
+          function validate () {
+            return false;
+          }
+          var validator = [
+              { validator: validate, msg: '{PATH} failed validation ({VALUE})', type: 'customType'}
+          ]
+          var schema = new Schema({ x: { type: [], validate: validator }});
+          var M = mongoose.model('custom-validator-'+random(), schema);
+
+          var m = new M({ x: [3,4,5,6] });
+
+          m.validate(function (err) {
+            assert.equal('x failed validation (3,4,5,6)', String(err.errors.x));
+            assert.equal('customType', err.errors.x.kind);
             done();
           })
         })

@@ -56,6 +56,7 @@ mongoose.model('RefBlogPost', BlogPost);
 mongoose.model('RefUser', User);
 mongoose.model('RefAlternateUser', User);
 
+
 /**
  * Tests.
  */
@@ -124,6 +125,39 @@ describe('model: populate:', function(){
       });
     });
   });
+
+  it('across DBs', function(done) {
+    var db = start()
+      , db2 = db.useDb('mongoose_test2')
+      , BlogPost = db.model('RefBlogPost', posts + '2')
+      , User = db2.model('RefUser', users + '2');
+
+    User.create({
+      name: 'Guillermo'
+      , email: 'rauchg@gmail.com'
+    }, function (err, creator) {
+      assert.ifError(err);
+
+      BlogPost.create({
+        title    : 'woot'
+        , _creator : creator._id
+      }, function (err, post) {
+        assert.ifError(err);
+        BlogPost
+        .findById(post._id)
+        .populate('_creator', 'name', User)
+        .exec(function (err, post) {
+          db2.db.dropDatabase(function() {
+            db.close();
+            db2.close();
+            assert.ifError(err);
+            assert.ok(post._creator.name == 'Guillermo');
+            done();
+          })
+        });
+      });
+    })
+  })
 
   it('an error in single ref population propagates', function(done){
     var db = start()
@@ -1633,9 +1667,9 @@ describe('model: populate:', function(){
         assert.ok('num' in err.errors);
         assert.ok('str' in err.errors);
         assert.ok('user' in err.errors);
-        assert.equal(err.errors.num.type,'required');
-        assert.equal(err.errors.str.type,'required');
-        assert.equal(err.errors.user.type,'required');
+        assert.equal(err.errors.num.kind,'required');
+        assert.equal(err.errors.str.kind,'required');
+        assert.equal(err.errors.user.kind,'required');
 
         comment.user = user;
         comment.num = 1995;

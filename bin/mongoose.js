@@ -13,7 +13,7 @@ exports.Document = function(obj, schema, skipId) {
   this.init(obj);
 };
 
-exports.Document.prototype.__proto__ = coreDocument.prototype;
+exports.Document.prototype = new coreDocument(null, null, null, true);
 
 // Small hacks to make browserify include variable-path requires
 require('./drivers/node-mongodb-native/binary');
@@ -261,6 +261,12 @@ function Document (obj, fields, skipId, skipInit) {
   }
 }
 
+/*!
+ * Inherit from EventEmitter.
+ */
+
+utils.decorate(Document.prototype, EventEmitter.prototype);
+
 Document.prototype.initConstructor = function(obj, fields, skipId) {
   this.$__ = new InternalCache;
   this.isNew = true;
@@ -291,12 +297,6 @@ Document.prototype.initConstructor = function(obj, fields, skipId) {
   this.$__registerHooksFromSchema();
 
 };
-
-/*!
- * Inherit from EventEmitter.
- */
-
-Document.prototype.__proto__ = EventEmitter.prototype;
 
 /**
  * The documents schema.

@@ -23,18 +23,18 @@ module.exports = function(config) {
       platform: 'Windows 7',
       version: '9'
     },*/
-    /*sl_ie_10: {
+    sl_ie_10: {
       base: 'SauceLabs',
       browserName: 'internet explorer',
       platform: 'Windows 7',
       version: '10'
-    },*/
-    sl_ie_11: {
+    },
+    /*sl_ie_11: {
       base: 'SauceLabs',
       browserName: 'internet explorer',
       platform: 'Windows 7',
       version: '11'
-    },
+    },*/
     /*sl_android_43: {
       base: 'SauceLabs',
       browserName: 'android',

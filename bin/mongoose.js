@@ -3,7 +3,6 @@ exports.Schema = require('./schema');
 exports.Types = require('./types');
 exports.SchemaType = require('./schematype.js');
 
-var utils = require('./utils');
 var coreDocument = require('./document');
 
 exports.Document = function(obj, schema, skipId) {
@@ -14,7 +13,7 @@ exports.Document = function(obj, schema, skipId) {
   this.init(obj);
 };
 
-utils.decorate(exports.Document.prototype, coreDocument.prototype);
+exports.Document.prototype.__proto__ = coreDocument.prototype;
 
 // Small hacks to make browserify include variable-path requires
 require('./drivers/node-mongodb-native/binary');
@@ -23,7 +22,7 @@ if (typeof window !== 'undefined') {
   window.mongoose = module.exports;
 }
 
-},{"./document":3,"./drivers/node-mongodb-native/binary":4,"./schema":17,"./schematype.js":28,"./types":34,"./utils":36}],2:[function(require,module,exports){
+},{"./document":3,"./drivers/node-mongodb-native/binary":4,"./schema":17,"./schematype.js":28,"./types":34}],2:[function(require,module,exports){
 var utils = require('./utils');
 var Types = require('./schema/index');
 
@@ -256,7 +255,13 @@ var EventEmitter = require('events').EventEmitter
  * @api private
  */
 
-function Document (obj, fields, skipId) {
+function Document (obj, fields, skipId, skipInit) {
+  if (!skipInit) {
+    this.initConstructor(obj, fields, skipId);
+  }
+}
+
+Document.prototype.initConstructor = function(obj, fields, skipId) {
   this.$__ = new InternalCache;
   this.isNew = true;
   this.errors = undefined;
@@ -284,13 +289,14 @@ function Document (obj, fields, skipId) {
   }
 
   this.$__registerHooksFromSchema();
-}
+
+};
 
 /*!
  * Inherit from EventEmitter.
  */
 
-utils.decorate(Document.prototype, EventEmitter.prototype);
+Document.prototype.__proto__ = EventEmitter.prototype;
 
 /**
  * The documents schema.
@@ -827,6 +833,7 @@ Document.prototype.$__shouldModify = function (
 
 Document.prototype.$__set = function (
     pathToMark, path, constructing, parts, schema, val, priorVal) {
+  Embedded = Embedded || require('./types/embedded');
 
   var shouldModify = this.$__shouldModify.apply(this, arguments);
 
@@ -853,7 +860,7 @@ Document.prototype.$__set = function (
     } else {
       if (obj[parts[i]] && 'Object' === utils.getFunctionName(obj[parts[i]].constructor)) {
         obj = obj[parts[i]];
-      } else if (obj[parts[i]] && 'EmbeddedDocument' === utils.getFunctionName(obj[parts[i]].constructor)) {  
+      } else if (obj[parts[i]] && obj[parts[i]] instanceof Embedded) {  
         obj = obj[parts[i]];
       } else if (obj[parts[i]] && Array.isArray(obj[parts[i]])) {
         obj = obj[parts[i]];
@@ -4071,6 +4078,7 @@ function SchemaBoolean (path, options) {
 /*!
  * Inherits from SchemaType.
  */
+
 utils.decorate(SchemaBoolean.prototype, SchemaType.prototype);
 
 /**
@@ -4171,7 +4179,6 @@ function SchemaBuffer (key, options) {
 /*!
  * Inherits from SchemaType.
  */
-
 utils.decorate(SchemaBuffer.prototype, SchemaType.prototype);
 
 /**
@@ -4338,7 +4345,6 @@ function SchemaDate (key, options) {
 /*!
  * Inherits from SchemaType.
  */
-
 utils.decorate(SchemaDate.prototype, SchemaType.prototype);
 
 /**
@@ -4492,8 +4498,8 @@ var SchemaType = require('../schematype')
   , ArrayType = require('./array')
   , MongooseDocumentArray = require('../types/documentarray')
   , Subdocument = require('../types/embedded')
-  , utils = require('../utils')
   , Document = require('../document');
+var utils = require('../utils.js');
 
 /**
  * SubdocsArray SchemaType constructor
@@ -4509,17 +4515,16 @@ function DocumentArray (key, schema, options) {
 
   // compile an embedded document for this schema
   function EmbeddedDocument () {
+    this.$__setSchema(schema);
+    // apply methods
+    for (var i in schema.methods) {
+      this[i] = schema.methods[i];
+    }
     Subdocument.apply(this, arguments);
   }
 
-  utils.decorate(EmbeddedDocument.prototype, Subdocument.prototype);
-  EmbeddedDocument.prototype.$__setSchema(schema);
+  EmbeddedDocument.prototype = Subdocument.prototype;
   EmbeddedDocument.schema = schema;
-
-  // apply methods
-  for (var i in schema.methods) {
-    EmbeddedDocument.prototype[i] = schema.methods[i];
-  }
 
   // apply statics
   for (var i in schema.statics)
@@ -4679,7 +4684,7 @@ function scopePaths (array, fields, init) {
 
 module.exports = DocumentArray;
 
-},{"../document":3,"../schematype":28,"../types/documentarray":32,"../types/embedded":33,"../utils":36,"./array":18}],23:[function(require,module,exports){
+},{"../document":3,"../schematype":28,"../types/documentarray":32,"../types/embedded":33,"../utils.js":36,"./array":18}],23:[function(require,module,exports){
 
 /*!
  * Module exports.
@@ -4822,7 +4827,6 @@ function SchemaNumber (key, options) {
 /*!
  * Inherits from SchemaType.
  */
-
 utils.decorate(SchemaNumber.prototype, SchemaType.prototype);
 
 /**
@@ -5082,7 +5086,6 @@ function ObjectId (key, options) {
 /*!
  * Inherits from SchemaType.
  */
-
 utils.decorate(ObjectId.prototype, SchemaType.prototype);
 
 /**
@@ -6344,7 +6347,7 @@ StateMachine.ctor = function () {
     }
   };
 
-  utils.decorate(ctor.prototype, StateMachine.prototype);
+  ctor.prototype.__proto__ = StateMachine.prototype;
 
   states.forEach(function (state) {
     // Changes the `path`'s state to `state`.
@@ -7446,7 +7449,7 @@ function MongooseDocumentArray (values, path, doc) {
   // Values always have to be passed to the constructor to initialize, since
   // otherwise MongooseArray#push will mark the array as modified to the parent.
   arr.push.apply(arr, values);
-  utils.decorate(arr, MongooseDocumentArray.prototype);
+  arr.__proto__ = MongooseDocumentArray.prototype;
 
   arr._atomics = {};
   arr.validators = [];
@@ -7470,7 +7473,7 @@ function MongooseDocumentArray (values, path, doc) {
  * Inherits from MongooseArray
  */
 
-utils.decorate(MongooseDocumentArray.prototype, MongooseArray.prototype);
+MongooseDocumentArray.prototype.__proto__ = MongooseArray.prototype;
 
 /**
  * Overrides MongooseArray#cast
@@ -7623,7 +7626,6 @@ module.exports = MongooseDocumentArray;
 var Document = require('../document')
   , inspect = require('util').inspect
   , Promise = require('../promise')
-  , utils = require('../utils')
 
 /**
  * EmbeddedDocument constructor.
@@ -7656,7 +7658,7 @@ function EmbeddedDocument (obj, parentArr, skipId, fields) {
  * Inherit from Document
  */
 
-utils.decorate(EmbeddedDocument.prototype, Document.prototype);
+EmbeddedDocument.prototype = new Document(null, null, null, true);
 
 /**
  * Marks the embedded doc modified.
@@ -7886,7 +7888,7 @@ EmbeddedDocument.prototype.parentArray = function () {
 
 module.exports = EmbeddedDocument;
 
-},{"../document":3,"../promise":16,"../utils":36,"util":45}],34:[function(require,module,exports){
+},{"../document":3,"../promise":16,"util":45}],34:[function(require,module,exports){
 
 /*!
  * Module exports.
@@ -8623,7 +8625,7 @@ exports.decorate = function(destination, source) {
   for (var key in source) {
     destination[key] = source[key];
   }
-}
+};
 
 
 }).call(this,require("FWaASH"),require("buffer").Buffer)
@@ -8749,22 +8751,35 @@ exports.INSPECT_MAX_BYTES = 50
 Buffer.poolSize = 8192
 
 /**
- * If `Buffer._useTypedArrays`:
+ * If `TYPED_ARRAY_SUPPORT`:
  *   === true    Use Uint8Array implementation (fastest)
- *   === false   Use Object implementation (compatible down to IE6)
+ *   === false   Use Object implementation (most compatible, even IE6)
+ *
+ * Browsers that support typed arrays are IE 10+, Firefox 4+, Chrome 7+, Safari 5.1+,
+ * Opera 11.6+, iOS 4.2+.
+ *
+ * Note:
+ *
+ * - Implementation must support adding new properties to `Uint8Array` instances.
+ *   Firefox 4-29 lacked support, fixed in Firefox 30+.
+ *   See: https://bugzilla.mozilla.org/show_bug.cgi?id=695438.
+ *
+ *  - Chrome 9-10 is missing the `TypedArray.prototype.subarray` function.
+ *
+ *  - IE10 has a broken `TypedArray.prototype.subarray` function which returns arrays of
+ *    incorrect length in some situations.
+ *
+ * We detect these buggy browsers and set `TYPED_ARRAY_SUPPORT` to `false` so they will
+ * get the Object implementation, which is slower but will work correctly.
  */
-Buffer._useTypedArrays = (function () {
-  // Detect if browser supports Typed Arrays. Supported browsers are IE 10+, Firefox 4+,
-  // Chrome 7+, Safari 5.1+, Opera 11.6+, iOS 4.2+. If the browser does not support adding
-  // properties to `Uint8Array` instances, then that's the same as no `Uint8Array` support
-  // because we need to be able to add all the node Buffer API methods. This is an issue
-  // in Firefox 4-29. Now fixed: https://bugzilla.mozilla.org/show_bug.cgi?id=695438
+var TYPED_ARRAY_SUPPORT = (function () {
   try {
     var buf = new ArrayBuffer(0)
     var arr = new Uint8Array(buf)
     arr.foo = function () { return 42 }
-    return 42 === arr.foo() &&
-        typeof arr.subarray === 'function' // Chrome 9-10 lack `subarray`
+    return 42 === arr.foo() && // typed array instances can be augmented
+        typeof arr.subarray === 'function' && // chrome 9-10 lack `subarray`
+        new Uint8Array(1).subarray(1, 1).byteLength === 0 // ie10 has broken `subarray`
   } catch (e) {
     return false
   }
@@ -8788,28 +8803,23 @@ function Buffer (subject, encoding, noZero) {
 
   var type = typeof subject
 
-  // Workaround: node's base64 implementation allows for non-padded strings
-  // while base64-js does not.
-  if (encoding === 'base64' && type === 'string') {
-    subject = stringtrim(subject)
-    while (subject.length % 4 !== 0) {
-      subject = subject + '='
-    }
-  }
-
   // Find the length
   var length
   if (type === 'number')
-    length = coerce(subject)
-  else if (type === 'string')
+    length = subject > 0 ? subject >>> 0 : 0
+  else if (type === 'string') {
+    if (encoding === 'base64')
+      subject = base64clean(subject)
     length = Buffer.byteLength(subject, encoding)
-  else if (type === 'object')
-    length = coerce(subject.length) // assume that object is array-like
-  else
+  } else if (type === 'object' && subject !== null) { // assume object is array-like
+    if (subject.type === 'Buffer' && isArray(subject.data))
+      subject = subject.data
+    length = +subject.length > 0 ? Math.floor(+subject.length) : 0
+  } else
     throw new Error('First argument needs to be a number, array or string.')
 
   var buf
-  if (Buffer._useTypedArrays) {
+  if (TYPED_ARRAY_SUPPORT) {
     // Preferred: Return an augmented `Uint8Array` instance for best performance
     buf = Buffer._augment(new Uint8Array(length))
   } else {
@@ -8820,7 +8830,7 @@ function Buffer (subject, encoding, noZero) {
   }
 
   var i
-  if (Buffer._useTypedArrays && typeof subject.byteLength === 'number') {
+  if (TYPED_ARRAY_SUPPORT && typeof subject.byteLength === 'number') {
     // Speed optimization -- use set if we're copying from a typed array
     buf._set(subject)
   } else if (isArrayish(subject)) {
@@ -8834,7 +8844,7 @@ function Buffer (subject, encoding, noZero) {
     }
   } else if (type === 'string') {
     buf.write(subject, 0, encoding)
-  } else if (type === 'number' && !Buffer._useTypedArrays && !noZero) {
+  } else if (type === 'number' && !TYPED_ARRAY_SUPPORT && !noZero) {
     for (i = 0; i < length; i++) {
       buf[i] = 0
     }
@@ -8866,7 +8876,7 @@ Buffer.isEncoding = function (encoding) {
 }
 
 Buffer.isBuffer = function (b) {
-  return !!(b !== null && b !== undefined && b._isBuffer)
+  return !!(b != null && b._isBuffer)
 }
 
 Buffer.byteLength = function (str, encoding) {
@@ -9141,7 +9151,7 @@ Buffer.prototype.copy = function (target, target_start, start, end) {
 
   var len = end - start
 
-  if (len < 100 || !Buffer._useTypedArrays) {
+  if (len < 100 || !TYPED_ARRAY_SUPPORT) {
     for (var i = 0; i < len; i++) {
       target[i + target_start] = this[i + start]
     }
@@ -9213,10 +9223,29 @@ function utf16leSlice (buf, start, end) {
 
 Buffer.prototype.slice = function (start, end) {
   var len = this.length
-  start = clamp(start, len, 0)
-  end = clamp(end, len, len)
+  start = ~~start
+  end = end === undefined ? len : ~~end
 
-  if (Buffer._useTypedArrays) {
+  if (start < 0) {
+    start += len;
+    if (start < 0)
+      start = 0
+  } else if (start > len) {
+    start = len
+  }
+
+  if (end < 0) {
+    end += len
+    if (end < 0)
+      end = 0
+  } else if (end > len) {
+    end = len
+  }
+
+  if (end < start)
+    end = start
+
+  if (TYPED_ARRAY_SUPPORT) {
     return Buffer._augment(this.subarray(start, end))
   } else {
     var sliceLen = end - start
@@ -9675,7 +9704,7 @@ Buffer.prototype.inspect = function () {
  */
 Buffer.prototype.toArrayBuffer = function () {
   if (typeof Uint8Array !== 'undefined') {
-    if (Buffer._useTypedArrays) {
+    if (TYPED_ARRAY_SUPPORT) {
       return (new Buffer(this)).buffer
     } else {
       var buf = new Uint8Array(this.length)
@@ -9751,28 +9780,21 @@ Buffer._augment = function (arr) {
   return arr
 }
 
+var INVALID_BASE64_RE = /[^+\/0-9A-z]/g
+
+function base64clean (str) {
+  // Node strips out invalid characters like \n and \t from the string, base64-js does not
+  str = stringtrim(str).replace(INVALID_BASE64_RE, '')
+  // Node allows for non-padded base64 strings (missing trailing ===), base64-js does not
+  while (str.length % 4 !== 0) {
+    str = str + '='
+  }
+  return str
+}
+
 function stringtrim (str) {
   if (str.trim) return str.trim()
   return str.replace(/^\s+|\s+$/g, '')
-}
-
-// slice(start, end)
-function clamp (index, len, defaultValue) {
-  if (typeof index !== 'number') return defaultValue
-  index = ~~index;  // Coerce to integer.
-  if (index >= len) return len
-  if (index >= 0) return index
-  index += len
-  if (index >= 0) return index
-  return 0
-}
-
-function coerce (length) {
-  // Coerce length to a number (possibly NaN), round up
-  // in case it's fractional (e.g. 123.456) then do a
-  // double negate to coerce a NaN to 0. Easy, right?
-  length = ~~Math.ceil(+length)
-  return length < 0 ? 0 : length
 }
 
 function isArray (subject) {

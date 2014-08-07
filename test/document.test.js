@@ -15,6 +15,7 @@ var start = require('./common')
   , ValidatorError = SchemaType.ValidatorError
   , ValidationError = mongoose.Document.ValidationError
   , MongooseError = mongoose.Error
+  , EmbeddedDocument = require('../lib/types/embedded')
   , Query = require('../lib/query');
 
 /**
@@ -1308,10 +1309,11 @@ describe('document', function(){
             }]
           });
 
+          assert.ok(doc.schedule[0] instanceof EmbeddedDocument);
           doc.set('schedule.0.open', 1100);
           assert.ok(doc.schedule);
           assert.equal('MongooseDocumentArray', doc.schedule.constructor.name);
-          assert.equal('EmbeddedDocument', doc.schedule[0].constructor.name);
+          assert.ok(doc.schedule[0] instanceof EmbeddedDocument);
           assert.equal(1100, doc.schedule[0].open);
           assert.equal(1900, doc.schedule[0].close);
 

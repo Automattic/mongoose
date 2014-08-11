@@ -389,7 +389,7 @@ describe('query stream:', function(){
       User.find().stream().on('data', function(doc) {
         assert.equal(undefined, doc.password);
         db.close(function() {
-          test.done();
+          done();
         });
       });
     });

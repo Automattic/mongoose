@@ -900,18 +900,15 @@ describe('model: findByIdAndUpdate:', function(){
 
     TestModel.create({ a: 1, b: 0, ticks: [{ name: 'eggs' }, { name: 'bacon' }, { name: 'coffee' }] }, function(error) {
       assert.ifError(error);
-
       TestModel.findOneAndUpdate(
         { a: 1 },
         {
-          $set: {
-            $pull: {
-              ticks: {
-                $or: [
-                  { name: 'eggs' },
-                  { name: 'bacon' }
-                ]
-              }
+          $pull: {
+            ticks: {
+              $or: [
+                { name: 'eggs' },
+                { name: 'bacon' }
+              ]
             }
           }
         },

@@ -6,7 +6,7 @@ exports.SchemaType = require('./schematype.js');
 var coreDocument = require('./document');
 
 exports.Document = function(obj, schema, skipId) {
-  this.schema = schema;
+  this.$__setSchema(schema);
 
   coreDocument.apply(this, obj, !!skipId);
 
@@ -1278,7 +1278,7 @@ Document.prototype.$__reset = function reset () {
     return self.getValue(i);
   })
   .filter(function (val) {
-    return val && val instanceof DocumentArray && val.length;
+    return val && val instanceof Array && val.isMongooseDocumentArray && val.length;
   })
   .forEach(function (array) {
     var i = array.length;
@@ -1478,7 +1478,7 @@ Document.prototype.$__getArrayPathsToValidate = function () {
       return this.getValue(i);
     }.bind(this))
     .filter(function (val) {
-      return val && val instanceof DocumentArray && val.length;
+      return val && val instanceof Array && val.isMongooseDocumentArray && val.length;
     }).reduce(function(seed, array) {
       return seed.concat(array);
     }, [])

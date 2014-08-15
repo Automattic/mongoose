@@ -53,7 +53,7 @@ describe('browser:document', function() {
 
     var doc = new mongoose.Document(obj, schema);
 
-    assert.equal('test', doc.get('test'));
+    assert.equal('test', doc.test);
     assert.ok(doc.get('oids') instanceof Array);
     assert.equal(doc.get('nested.age'), 5);
     assert.equal(String(doc.get('nested.cool')), '4c6c2d6240ced95d0e00003c');

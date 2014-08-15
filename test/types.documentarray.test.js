@@ -53,8 +53,8 @@ describe('types.documentarray', function(){
     var a = new MongooseDocumentArray();
 
     assert.ok(a instanceof Array);
-    assert.ok(a instanceof MongooseArray);
-    assert.ok(a instanceof MongooseDocumentArray);
+    assert.ok(a.isMongooseArray);
+    assert.ok(a.isMongooseDocumentArray);
     assert.ok(Array.isArray(a));
     assert.equal('Object', a._atomics.constructor.name);
     assert.equal('object', typeof a);

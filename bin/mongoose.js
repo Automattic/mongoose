@@ -2150,6 +2150,13 @@ function MongooseError (msg) {
 };
 
 /*!
+ * Inherits from Error.
+ */
+
+MongooseError.prototype = Object.create(Error.prototype);
+MongooseError.prototype.constructor = Error;
+
+/*!
  * Formats error messages
  */
 
@@ -2160,12 +2167,6 @@ MongooseError.prototype.formatMessage = function (msg, path, type, val) {
             .replace(/{VALUE}/, String(val||''))
             .replace(/{TYPE}/, type || 'declared type');
 }
-
-/*!
- * Inherits from Error.
- */
-
-MongooseError.prototype.__proto__ = Error.prototype;
 
 /*!
  * Module exports.

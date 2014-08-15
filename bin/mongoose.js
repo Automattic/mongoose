@@ -2144,7 +2144,7 @@ module.exports = exports = ObjectId;
 
 function MongooseError (msg) {
   Error.call(this);
-  Error.captureStackTrace(this, arguments.callee);
+  Error.captureStackTrace && Error.captureStackTrace(this, arguments.callee);
   this.message = msg;
   this.name = 'MongooseError';
 };
@@ -2217,7 +2217,7 @@ var MongooseError = require('../error.js');
 
 function CastError (type, value, path) {
   MongooseError.call(this, 'Cast to ' + type + ' failed for value "' + value + '" at path "' + path + '"');
-  Error.captureStackTrace(this, arguments.callee);
+  Error.captureStackTrace && Error.captureStackTrace(this, arguments.callee);
   this.name = 'CastError';
   this.kind = type;
   this.value = value;
@@ -2264,7 +2264,7 @@ function DivergentArrayError (paths) {
           // TODO write up a docs page (FAQ) and link to it
 
   MongooseError.call(this, msg);
-  Error.captureStackTrace(this, arguments.callee);
+  Error.captureStackTrace && Error.captureStackTrace(this, arguments.callee);
   this.name = 'DivergentArrayError';
 };
 
@@ -2339,7 +2339,7 @@ function MissingSchemaError (name) {
   var msg = 'Schema hasn\'t been registered for model "' + name + '".\n'
           + 'Use mongoose.model(name, schema)';
   MongooseError.call(this, msg);
-  Error.captureStackTrace(this, arguments.callee);
+  Error.captureStackTrace && Error.captureStackTrace(this, arguments.callee);
   this.name = 'MissingSchemaError';
 };
 
@@ -2372,7 +2372,7 @@ var MongooseError = require('../error.js');
 
 function OverwriteModelError (name) {
   MongooseError.call(this, 'Cannot overwrite `' + name + '` model once compiled.');
-  Error.captureStackTrace(this, arguments.callee);
+  Error.captureStackTrace && Error.captureStackTrace(this, arguments.callee);
   this.name = 'OverwriteModelError';
 };
 
@@ -2407,7 +2407,7 @@ var MongooseError = require('../error.js')
 
 function ValidationError (instance) {
   MongooseError.call(this, "Validation failed");
-  Error.captureStackTrace(this, arguments.callee);
+  Error.captureStackTrace && Error.captureStackTrace(this, arguments.callee);
   this.name = 'ValidationError';
   this.errors = instance.errors = {};
 };
@@ -2464,7 +2464,7 @@ function ValidatorError (path, msg, type, val) {
   if (!msg) msg = errorMessages.general.default;
   var message = this.formatMessage(msg, path, type, val);
   MongooseError.call(this, message);
-  Error.captureStackTrace(this, arguments.callee);
+  Error.captureStackTrace && Error.captureStackTrace(this, arguments.callee);
   this.name = 'ValidatorError';
   this.path = path;
   this.kind = type;
@@ -2510,7 +2510,7 @@ var MongooseError = require('../error.js');
 
 function VersionError () {
   MongooseError.call(this, 'No matching document found.');
-  Error.captureStackTrace(this, arguments.callee);
+  Error.captureStackTrace && Error.captureStackTrace(this, arguments.callee);
   this.name = 'VersionError';
 };
 

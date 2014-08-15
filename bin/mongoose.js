@@ -842,7 +842,7 @@ Document.prototype.$__set = function (
 
     // handle directly setting arrays (gh-1126)
     MongooseArray || (MongooseArray = require('./types/array'));
-    if (val instanceof MongooseArray) {
+    if (val && val.isMongooseArray) {
       val._registerAtomic('$set', val);
     }
   }
@@ -1501,12 +1501,13 @@ Document.prototype.$__getAllSubdocs = function () {
   function docReducer(seed, path) {
     var val = this[path];
     if (val instanceof Embedded) seed.push(val);
-    if (val instanceof DocumentArray)
+    if (val && val.isMongooseDocumentArray) {
       val.forEach(function _docReduce(doc) {
         if (!doc || !doc._doc) return;
         if (doc instanceof Embedded) seed.push(doc);
         seed = Object.keys(doc._doc).reduce(docReducer.bind(doc._doc), seed);
       });
+    }
     return seed;
   }
 
@@ -3831,7 +3832,7 @@ SchemaArray.prototype.cast = function (value, doc, init) {
       }
     }
 
-    if (!(value instanceof MongooseArray)) {
+    if (!(value && value.isMongooseArray)) {
       value = new MongooseArray(value, this.path, doc);
     }
 
@@ -4614,7 +4615,7 @@ DocumentArray.prototype.cast = function (value, doc, init, prev) {
     return this.cast([value], doc, init, prev);
   }
 
-  if (!(value instanceof MongooseDocumentArray)) {
+  if (!(value && value.isMongooseDocumentArray)) {
     value = new MongooseDocumentArray(value, this.path, doc);
     if (prev && prev._handlers) {
       for (var key in prev._handlers) {
@@ -8369,8 +8370,8 @@ exports.isMongooseObject = function (v) {
   MongooseBuffer || (MongooseBuffer = require('./types').Buffer);
 
   return v instanceof Document ||
-         v instanceof MongooseArray ||
-         v instanceof MongooseBuffer
+         (v && v.isMongooseArray) ||
+         v instanceof MongooseBuffer;
 }
 var isMongooseObject = exports.isMongooseObject;
 

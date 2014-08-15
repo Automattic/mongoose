@@ -118,3 +118,30 @@ describe('browser:document', function() {
       done();
   });
 });
+
+describe('browser:validate', function() {
+  it('works', function(done) {
+    var called = false;
+    var validate = [function(str){ called = true; return true }, 'BAM'];
+
+    schema = new mongoose.Schema({
+      prop: { type: String, required: true, validate: validate },
+      nick: { type: String, required: true }
+    });
+
+    var doc = new mongoose.Document({}, schema);
+    doc.validate(function(error) {
+      assert.ok(!!error);
+      assert.ok(called);
+      assert.equal('Path `prop` is required.', error.errors['prop'].message);
+      assert.equal('Path `nick` is required.', error.errors['nick'].message);
+
+      doc.prop = 'Bacon';
+      doc.validate(function(error) {
+        assert.ok(!error.errors['prop']);
+        assert.equal('Path `nick` is required.', error.errors['nick'].message);
+        done();  
+      });
+    });
+  });
+});

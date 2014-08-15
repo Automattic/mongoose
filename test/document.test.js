@@ -1312,7 +1312,7 @@ describe('document', function(){
           assert.ok(doc.schedule[0] instanceof EmbeddedDocument);
           doc.set('schedule.0.open', 1100);
           assert.ok(doc.schedule);
-          assert.equal('MongooseDocumentArray', doc.schedule.constructor.name);
+          assert.ok(doc.schedule.isMongooseDocumentArray);
           assert.ok(doc.schedule[0] instanceof EmbeddedDocument);
           assert.equal(1100, doc.schedule[0].open);
           assert.equal(1900, doc.schedule[0].close);

@@ -189,10 +189,10 @@ describe('Model', function(){
       assert.equal(1, Object.keys(post.get('nested')).length);
       assert.ok(Array.isArray(post.get('nested').array));
 
-      assert.ok(post.get('numbers') instanceof MongooseArray);
-      assert.ok(post.get('owners') instanceof MongooseArray);
-      assert.ok(post.get('comments') instanceof DocumentArray);
-      assert.ok(post.get('nested.array') instanceof MongooseArray);
+      assert.ok(post.get('numbers').isMongooseArray);
+      assert.ok(post.get('owners').isMongooseArray);
+      assert.ok(post.get('comments').isMongooseDocumentArray);
+      assert.ok(post.get('nested.array').isMongooseArray);
       done();
     });
 
@@ -272,8 +272,8 @@ describe('Model', function(){
         assert.equal(undefined, post.get('meta.date'));
         assert.equal(undefined, post.get('meta.visitors'));
 
-        assert.ok(post.get('owners') instanceof MongooseArray);
-        assert.ok(post.get('comments') instanceof DocumentArray);
+        assert.ok(post.get('owners').isMongooseArray);
+        assert.ok(post.get('comments').isMongooseDocumentArray);
         cb();
       });
 
@@ -291,8 +291,8 @@ describe('Model', function(){
         assert.equal(undefined, post.get('meta.date'));
         assert.equal(undefined, post.get('meta.visitors'));
 
-        assert.ok(post.get('owners') instanceof MongooseArray);
-        assert.ok(post.get('comments') instanceof DocumentArray);
+        assert.ok(post.get('owners').isMongooseArray);
+        assert.ok(post.get('comments').isMongooseDocumentArray);
         cb();
       });
     })
@@ -318,8 +318,8 @@ describe('Model', function(){
         assert.equal(undefined, post.get('meta.date'));
         assert.equal(undefined, post.get('meta.visitors'));
 
-        assert.ok(post.get('owners') instanceof MongooseArray);
-        assert.ok(post.get('comments') instanceof DocumentArray);
+        assert.ok(post.get('owners').isMongooseArray);
+        assert.ok(post.get('comments').isMongooseDocumentArray);
         db.close();
         done();
       });
@@ -366,19 +366,19 @@ describe('Model', function(){
         assert.equal(typeof post.meta.visitors,'number');
         assert.equal(post.published, true);
 
-        assert.ok(post.get('owners') instanceof MongooseArray);
+        assert.ok(post.get('owners').isMongooseArray);
         assert.ok(post.get('owners')[0] instanceof DocumentObjectId);
         assert.ok(post.get('owners')[1] instanceof DocumentObjectId);
 
-        assert.ok(post.owners instanceof MongooseArray);
+        assert.ok(post.owners.isMongooseArray);
         assert.ok(post.owners[0] instanceof DocumentObjectId);
         assert.ok(post.owners[1] instanceof DocumentObjectId);
 
-        assert.ok(post.get('comments') instanceof DocumentArray);
+        assert.ok(post.get('comments').isMongooseDocumentArray);
         assert.ok(post.get('comments')[0] instanceof EmbeddedDocument);
         assert.ok(post.get('comments')[1] instanceof EmbeddedDocument);
 
-        assert.ok(post.comments instanceof DocumentArray);
+        assert.ok(post.comments.isMongooseDocumentArray);
         assert.ok(post.comments[0] instanceof EmbeddedDocument);
         assert.ok(post.comments[1] instanceof EmbeddedDocument);
         done();
@@ -406,8 +406,8 @@ describe('Model', function(){
         assert.equal(undefined, post.get('meta.visitors'));
         assert.equal(undefined, post.get('published'));
 
-        assert.ok(post.get('owners') instanceof MongooseArray);
-        assert.ok(post.get('comments') instanceof DocumentArray);
+        assert.ok(post.get('owners').isMongooseArray);
+        assert.ok(post.get('comments').isMongooseDocumentArray);
         done();
       })
 
@@ -1969,7 +1969,7 @@ describe('Model', function(){
 
         db.close();
         assert.equal('object', typeof doc.first);
-        assert.ok(doc.first.second instanceof MongooseArray);
+        assert.ok(doc.first.second.isMongooseArray);
         done()
       });
 

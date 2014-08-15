@@ -2228,7 +2228,9 @@ function CastError (type, value, path) {
  * Inherits from MongooseError.
  */
 
-CastError.prototype.__proto__ = MongooseError.prototype;
+CastError.prototype = Object.create(MongooseError.prototype);
+CastError.prototype.constructor = MongooseError;
+
 
 /*!
  * exports
@@ -2270,7 +2272,9 @@ function DivergentArrayError (paths) {
  * Inherits from MongooseError.
  */
 
-DivergentArrayError.prototype.__proto__ = MongooseError.prototype;
+DivergentArrayError.prototype = Object.create(MongooseError.prototype);
+DivergentArrayError.prototype.constructor = MongooseError;
+
 
 /*!
  * exports
@@ -2343,7 +2347,8 @@ function MissingSchemaError (name) {
  * Inherits from MongooseError.
  */
 
-MissingSchemaError.prototype.__proto__ = MongooseError.prototype;
+MissingSchemaError.prototype = Object.create(MongooseError.prototype);
+MissingSchemaError.prototype.constructor = MongooseError;
 
 /*!
  * exports
@@ -2375,7 +2380,8 @@ function OverwriteModelError (name) {
  * Inherits from MongooseError.
  */
 
-OverwriteModelError.prototype.__proto__ = MongooseError.prototype;
+OverwriteModelError.prototype = Object.create(MongooseError.prototype);
+OverwriteModelError.prototype.constructor = MongooseError;
 
 /*!
  * exports
@@ -2406,6 +2412,14 @@ function ValidationError (instance) {
   this.errors = instance.errors = {};
 };
 
+/*!
+ * Inherits from MongooseError.
+ */
+
+ValidationError.prototype = Object.create(MongooseError.prototype);
+ValidationError.prototype.constructor = MongooseError;
+
+
 /**
  * Console.log helper
  */
@@ -2421,12 +2435,6 @@ ValidationError.prototype.toString = function () {
 
   return ret + msgs.join(', ');
 };
-
-/*!
- * Inherits from MongooseError.
- */
-
-ValidationError.prototype.__proto__ = MongooseError.prototype;
 
 /*!
  * Module exports
@@ -2464,18 +2472,20 @@ function ValidatorError (path, msg, type, val) {
 };
 
 /*!
+ * Inherits from MongooseError
+ */
+
+ValidatorError.prototype = Object.create(MongooseError.prototype);
+ValidatorError.prototype.constructor = MongooseError;
+
+
+/*!
  * toString helper
  */
 
 ValidatorError.prototype.toString = function () {
   return this.message;
 }
-
-/*!
- * Inherits from MongooseError
- */
-
-ValidatorError.prototype.__proto__ = MongooseError.prototype;
 
 /*!
  * exports
@@ -2508,7 +2518,8 @@ function VersionError () {
  * Inherits from MongooseError.
  */
 
-VersionError.prototype.__proto__ = MongooseError.prototype;
+VersionError.prototype = Object.create(MongooseError.prototype);
+VersionError.prototype.constructor = MongooseError;
 
 /*!
  * exports

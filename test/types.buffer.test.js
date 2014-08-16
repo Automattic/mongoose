@@ -41,7 +41,7 @@ describe('types.buffer', function(){
     var a = new MongooseBuffer;
 
     assert.ok(a instanceof Buffer);
-    assert.ok(a instanceof MongooseBuffer);
+    assert.ok(a.isMongooseBuffer);
     assert.equal(true, Buffer.isBuffer(a));
 
     var a = new MongooseBuffer([195, 188, 98, 101, 114]);

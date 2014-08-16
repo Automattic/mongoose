@@ -2899,8 +2899,8 @@ function idGetter () {
 /*!
  * Inherit from EventEmitter.
  */
-
-Schema.prototype.__proto__ = EventEmitter.prototype;
+Schema.prototype = Object.create( EventEmitter.prototype );
+Schema.prototype.constructor = Schema;
 
 /**
  * Schema as flat paths
@@ -4258,7 +4258,7 @@ SchemaBuffer.prototype.cast = function (value, doc, init) {
   }
 
   if (Buffer.isBuffer(value)) {
-    if (!(value instanceof MongooseBuffer)) {
+    if (!(value.MongooseBuffer)) {
       value = new MongooseBuffer(value, [this.path, doc]);
     }
 
@@ -7188,7 +7188,8 @@ var driver = global.MONGOOSE_DRIVER_PATH || '../drivers/node-mongodb-native';
  * Module dependencies.
  */
 
-var Binary = require('../drivers/node-mongodb-native/binary');
+var Binary = require('../drivers/node-mongodb-native/binary')
+  , utils = require('../utils');
 
 /**
  * Mongoose Buffer constructor.
@@ -7226,7 +7227,8 @@ function MongooseBuffer (value, encode, offset) {
   }
 
   var buf = new Buffer(val, encoding, offset);
-  buf.__proto__ = MongooseBuffer.prototype;
+  utils.decorate( buf, MongooseBuffer.mixin );
+  buf.isMongooseBuffer = true;
 
   // make sure these internal props don't show up in Object.keys()
   Object.defineProperties(buf, {
@@ -7243,80 +7245,83 @@ function MongooseBuffer (value, encode, offset) {
 
   buf._subtype = 0;
   return buf;
-};
+}
 
 /*!
  * Inherit from Buffer.
  */
 
-MongooseBuffer.prototype = new Buffer(0);
+//MongooseBuffer.prototype = new Buffer(0);
 
-/**
- * Parent owner document
- *
- * @api private
- * @property _parent
- */
+MongooseBuffer.mixin = {
 
-MongooseBuffer.prototype._parent;
+  /**
+   * Parent owner document
+   *
+   * @api private
+   * @property _parent
+   */
 
-/**
- * Default subtype for the Binary representing this Buffer
- *
- * @api private
- * @property _subtype
- */
+  _parent: undefined,
 
-MongooseBuffer.prototype._subtype;
+  /**
+   * Default subtype for the Binary representing this Buffer
+   *
+   * @api private
+   * @property _subtype
+   */
 
-/**
- * Marks this buffer as modified.
- *
- * @api private
- */
+  _subtype: undefined,
 
-MongooseBuffer.prototype._markModified = function () {
-  var parent = this._parent;
+  /**
+   * Marks this buffer as modified.
+   *
+   * @api private
+   */
 
-  if (parent) {
-    parent.markModified(this._path);
+  _markModified: function () {
+    var parent = this._parent;
+
+    if (parent) {
+      parent.markModified(this._path);
+    }
+    return this;
+  },
+
+  /**
+   * Writes the buffer.
+   */
+
+  write: function () {
+    var written = Buffer.prototype.write.apply(this, arguments);
+
+    if (written > 0) {
+      this._markModified();
+    }
+
+    return written;
+  },
+
+  /**
+   * Copies the buffer.
+   *
+   * ####Note:
+   *
+   * `Buffer#copy` does not mark `target` as modified so you must copy from a `MongooseBuffer` for it to work as expected. This is a work around since `copy` modifies the target, not this.
+   *
+   * @return {MongooseBuffer}
+   * @param {Buffer} target
+   */
+
+  copy: function (target) {
+    var ret = Buffer.prototype.copy.apply(this, arguments);
+
+    if (target && target.isMongooseBuffer) {
+      target._markModified();
+    }
+
+    return ret;
   }
-  return this;
-};
-
-/**
-* Writes the buffer.
-*/
-
-MongooseBuffer.prototype.write = function () {
-  var written = Buffer.prototype.write.apply(this, arguments);
-
-  if (written > 0) {
-    this._markModified();
-  }
-
-  return written;
-};
-
-/**
- * Copies the buffer.
- *
- * ####Note:
- *
- * `Buffer#copy` does not mark `target` as modified so you must copy from a `MongooseBuffer` for it to work as expected. This is a work around since `copy` modifies the target, not this.
- *
- * @return {MongooseBuffer}
- * @param {Buffer} target
- */
-
-MongooseBuffer.prototype.copy = function (target) {
-  var ret = Buffer.prototype.copy.apply(this, arguments);
-
-  if (target instanceof MongooseBuffer) {
-    target._markModified();
-  }
-
-  return ret;
 };
 
 /*!
@@ -7335,7 +7340,7 @@ MongooseBuffer.prototype.copy = function (target) {
 'writeFloatLE writeFloatBE writeDoubleLE writeDoubleBE'
 ).split(' ').forEach(function (method) {
   if (!Buffer.prototype[method]) return;
-  MongooseBuffer.prototype[method] = new Function(
+  MongooseBuffer.mixin[method] = new Function(
     'var ret = Buffer.prototype.'+method+'.apply(this, arguments);' +
     'this._markModified();' +
     'return ret;'
@@ -7363,7 +7368,7 @@ MongooseBuffer.prototype.copy = function (target) {
  * @api public
  */
 
-MongooseBuffer.prototype.toObject = function (options) {
+MongooseBuffer.mixin.toObject = function (options) {
   var subtype = 'number' == typeof options
     ? options
     : (this._subtype || 0);
@@ -7377,7 +7382,7 @@ MongooseBuffer.prototype.toObject = function (options) {
  * @return {Boolean}
  */
 
-MongooseBuffer.prototype.equals = function (other) {
+MongooseBuffer.mixin.equals = function (other) {
   if (!Buffer.isBuffer(other)) {
     return false;
   }
@@ -7391,7 +7396,7 @@ MongooseBuffer.prototype.equals = function (other) {
   }
 
   return true;
-}
+};
 
 /**
  * Sets the subtype option and marks the buffer modified.
@@ -7413,7 +7418,7 @@ MongooseBuffer.prototype.equals = function (other) {
  * @api public
  */
 
-MongooseBuffer.prototype.subtype = function (subtype) {
+MongooseBuffer.mixin.subtype = function (subtype) {
   if ('number' != typeof subtype) {
     throw new TypeError('Invalid subtype. Expected a number');
   }
@@ -7423,7 +7428,7 @@ MongooseBuffer.prototype.subtype = function (subtype) {
   }
 
   this._subtype = subtype;
-}
+};
 
 /*!
  * Module exports.
@@ -7434,7 +7439,7 @@ MongooseBuffer.Binary = Binary;
 module.exports = MongooseBuffer;
 
 }).call(this,typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer)
-},{"../drivers/node-mongodb-native/binary":4,"buffer":38}],32:[function(require,module,exports){
+},{"../drivers/node-mongodb-native/binary":4,"../utils":36,"buffer":38}],32:[function(require,module,exports){
 (function (Buffer){
 /*!
  * Module dependencies.
@@ -8383,7 +8388,7 @@ exports.isMongooseObject = function (v) {
 
   return v instanceof Document ||
          (v && v.isMongooseArray) ||
-         v instanceof MongooseBuffer;
+         (v && v.isMongooseBuffer);
 }
 var isMongooseObject = exports.isMongooseObject;
 

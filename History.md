@@ -1,3 +1,13 @@
+3.8.15 / 2014-08-17
+==================
+ * fixed; Replica set connection string example in docs #2246
+ * fixed; bubble up parseError event #2229
+ * fixed; removed buggy populate cache #2176
+ * fixed; dont $inc versionKey if its being $set #1933
+ * fixed; cast $or and $and in $pull #1932
+ * fixed; properly cast to schema in stream() #1862
+ * fixed; memory leak in nested objects #1565 #2211 [devongovett](https://github.com/devongovett)
+
 3.8.14 / 2014-07-26
 ==================
  * fixed; stringifying MongooseArray shows nested arrays #2002

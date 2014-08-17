@@ -20,7 +20,7 @@ describe('connections:', function(){
 
     assert.equal(0, db.readyState);
     db.close(done);
-  })
+  });
 
   it('should accept mongodb://localhost/fake', function(done){
     var db = mongoose.createConnection('mongodb://localhost/fake');
@@ -49,7 +49,7 @@ describe('connections:', function(){
     assert.equal(27000, db.port);
     db.close();
     done();
-  })
+  });
 
   it('should accept mongodb://aaron:psw@localhost:27000/fake', function(done){
     var db = mongoose.createConnection('mongodb://aaron:psw@localhost:27000/fake');
@@ -66,7 +66,7 @@ describe('connections:', function(){
     assert.equal(27000, db.port);
     db.close();
     done();
-  })
+  });
 
   it('should accept mongodb://aaron:psw@localhost:27000/fake with db options', function(done){
     var db = mongoose.createConnection('mongodb://aaron:psw@localhost:27000/fake', { db: { forceServerObjectId: true }});
@@ -78,7 +78,7 @@ describe('connections:', function(){
     assert.equal(false, db.options.db.forceServerObjectId);
     db.close();
     done();
-  })
+  });
 
   it('should accept mongodb://aaron:psw@localhost:27000/fake with server options', function(done){
     var db = mongoose.createConnection('mongodb://aaron:psw@localhost:27000/fake', { server: { auto_reconnect: false }});
@@ -90,7 +90,7 @@ describe('connections:', function(){
     assert.equal(false, db.options.db.forceServerObjectId);
     db.close();
     done();
-  })
+  });
 
   it('should accept unix domain sockets', function(done){
     var db = mongoose.createConnection('mongodb://aaron:psw@/tmp/mongodb-27017.sock/fake', { server: { auto_reconnect: false }});
@@ -106,7 +106,7 @@ describe('connections:', function(){
     assert.equal('aaron', db.user);
     db.close();
     done();
-  })
+  });
 
   describe('re-opening a closed connection', function(){
     var mongos = process.env.MONGOOSE_SHARD_TEST_URI;
@@ -157,7 +157,7 @@ describe('connections:', function(){
             });
           });
         });
-      })
+      });
 
       it('replica set', function(done){
         var db = mongoose.createConnection();
@@ -200,9 +200,9 @@ describe('connections:', function(){
             });
           });
         });
-      })
-    })
-  })
+      });
+    });
+  });
 
   describe('should accept separated args with options', function(){
     it('works', function(done){
@@ -231,7 +231,7 @@ describe('connections:', function(){
       assert.equal(1, db.options.blah);
       db.close();
       done();
-    })
+    });
 
     it('including user/pass', function(done){
       var db = mongoose.createConnection('localhost', 'fake', 27000, {user: 'aaron', pass: 'psw'});
@@ -248,7 +248,7 @@ describe('connections:', function(){
       assert.equal('aaron', db.user);
       db.close();
       done();
-    })
+    });
 
     it('but fails when passing user and no pass', function(done){
       var db = mongoose.createConnection('localhost', 'fake', 27000, {user: 'no_pass'});
@@ -265,8 +265,8 @@ describe('connections:', function(){
       assert.equal(undefined, db.user);
       db.close();
       done();
-    })
-  })
+    });
+  });
 
   describe('should accept separated args without options', function(){
     it('works', function(done){
@@ -294,7 +294,7 @@ describe('connections:', function(){
       assert.equal(27017, db.port);
       db.close();
       done();
-    })
+    });
     it('and accept user/pass in hostname', function(done){
       var db = mongoose.createConnection('aaron:psw@localhost', 'fake', 27000);
       db.on('error', function(err){});
@@ -310,7 +310,7 @@ describe('connections:', function(){
       assert.equal('aaron', db.user);
       db.close();
       done();
-    })
+    });
   });
 
   describe('querystring options', function(){
@@ -355,7 +355,7 @@ describe('connections:', function(){
         assert.deepEqual([{ dc: 'ny', rack: 1 }, { dc: 'sf' }], db.options.db.read_preference_tags);
         assert.equal(false, db.options.db.forceServerObjectId);
         done();
-      })
+      });
       it('mixed with passed options', function(done){
         var conn = 'mongodb://localhost/fake?poolSize=2'
                  + '&slaveOk=false&ssl=true&socketTimeoutMS=10&connectTimeoutMS=12'
@@ -397,8 +397,8 @@ describe('connections:', function(){
         assert.equal(false, db.options.db.forceServerObjectId);
 
         done();
-      })
-    })
+      });
+    });
     describe('for non replica sets', function(){
       it('work', function(done){
         var conn = 'mongodb://localhost/fake?autoReconnect=false&poolSize=2'
@@ -436,7 +436,7 @@ describe('connections:', function(){
         assert.equal(80, db.options.db.wtimeoutMS);
         assert.equal(false, db.options.db.forceServerObjectId);
         done();
-      })
+      });
       it('mixed with passed options', function(done){
         var conn = 'mongodb://localhost/fake?autoReconnect=false&poolSize=2'
                  + '&slaveOk=false&ssl=true&socketTimeoutMS=10&connectTimeoutMS=12'
@@ -472,9 +472,9 @@ describe('connections:', function(){
         assert.equal(true, db.options.db.journal);
         assert.equal(false, db.options.db.forceServerObjectId);
         done();
-      })
-    })
-  })
+      });
+    });
+  });
 
   describe('missing protocols', function(){
     it('are allowed with replsets', function(done){
@@ -486,7 +486,7 @@ describe('connections:', function(){
       assert.deepEqual(null, conn.host);
       assert.deepEqual(null, conn.port);
       setTimeout(done,10);
-    })
+    });
     it('are allowed with single connections', function(done){
       var conn = mongoose.createConnection();
       conn.doOpen = function(){};
@@ -494,7 +494,7 @@ describe('connections:', function(){
       assert.deepEqual('localhost', conn.host);
       assert.deepEqual(12345, conn.port);
       done();
-    })
+    });
   });
 
   describe('connect callbacks', function(){
@@ -532,7 +532,7 @@ describe('connections:', function(){
       });
       db.close();
       assert.ok(!db.options);
-    })
+    });
     it('should use admin db if not specified and user/pass specified', function(done){
       var db = mongoose.createConnection('mongodb://u:p@localhost', function (err) {
         done();
@@ -546,7 +546,7 @@ describe('connections:', function(){
       assert.equal('localhost', db.host);
       assert.equal(27017, db.port);
       db.close();
-    })
+    });
     it('should fire when individual args are passed', function(done){
       var db = mongoose.createConnection('127.0.0.1', 'faker', 28000, { server: { auto_reconnect: false }},function(){
         done();
@@ -574,7 +574,7 @@ describe('connections:', function(){
       assert.equal('127.0.0.1', db.host);
       assert.equal(28000, db.port);
       db.close();
-    })
+    });
     it('should fire when default port utilized', function(done){
       var db = mongoose.createConnection('127.0.0.1', 'faker', done);
       assert.equal('object', typeof db.options);
@@ -586,7 +586,7 @@ describe('connections:', function(){
       assert.equal('127.0.0.1', db.host);
       assert.equal(27017, db.port);
       db.close();
-    })
+    });
   });
 
   describe('errors', function(){
@@ -601,7 +601,7 @@ describe('connections:', function(){
       }
 
       var db= start({ uri: 'mongodb://whatever23939.localhost/noooope', noErrorListener: 1 });
-    })
+    });
 
     it('event fires with one listener', function(done){
       this.timeout(1000);
@@ -610,7 +610,7 @@ describe('connections:', function(){
         // this callback has no params which triggered the bug #759
         done();
       });
-    })
+    });
 
     it('should occur without hanging when password with special chars is used (gh-460)', function (done) {
       this.timeout(1000);
@@ -620,7 +620,7 @@ describe('connections:', function(){
         done();
       });
     });
-  })
+  });
 
   describe('.model()', function(){
     it('allows passing a schema', function(done){
@@ -636,7 +636,7 @@ describe('connections:', function(){
       var m = new MyModel({name:'aaron'});
       assert.equal('aaron', m.name);
       done();
-    })
+    });
 
     it('should properly assign the db', function(done){
       var A = mongoose.model('testing853a', new Schema({x:String}), 'testing853-1');
@@ -644,7 +644,7 @@ describe('connections:', function(){
       var C = B.model('testing853a');
       assert.ok(C == A);
       done();
-    })
+    });
 
     it('prevents overwriting pre-existing models', function(done){
       var db = start();
@@ -656,7 +656,7 @@ describe('connections:', function(){
       }, /Cannot overwrite `gh-1209-a` model/);
 
       done();
-    })
+    });
 
     it('allows passing identical name + schema args', function(done){
       var db = start();
@@ -669,7 +669,7 @@ describe('connections:', function(){
       });
 
       done();
-    })
+    });
 
     it('throws on unknown model name', function(done){
       var db = start();
@@ -678,7 +678,7 @@ describe('connections:', function(){
       }, /Schema hasn't been registered/);
 
       done();
-    })
+    });
 
     it('uses the passed schema when global model exists with same name (gh-1209)', function(done){
       var s1 = new Schema({ one: String });
@@ -701,7 +701,7 @@ describe('connections:', function(){
       assert.ok(C.schema == A.schema);
 
       done();
-    })
+    });
 
     describe('get existing model with not existing collection in db', function(){
       it('must return exiting collection with all collection options', function(done){
@@ -711,8 +711,8 @@ describe('connections:', function(){
         assert.equal(m.collection.opts.capped.size, 1000);
         assert.equal(m.collection.opts.capped.max, 10);
         done();
-      })
-    })
+      });
+    });
 
     describe('passing collection name', function(){
       describe('when model name already exists', function(){
@@ -728,9 +728,9 @@ describe('connections:', function(){
           assert.ok(db.models[name].collection.name != C.collection.name);
           assert.ok(db.models[name].collection.name == A.collection.name);
           done();
-        })
-      })
-    })
+        });
+      });
+    });
 
     describe('passing object literal schemas', function(){
       it('works', function(done){
@@ -745,11 +745,11 @@ describe('connections:', function(){
             assert.ifError(err);
             assert.strictEqual(47, a.n[0].age);
             done();
-          })
-        })
-      })
-    })
-  })
+          });
+        });
+      });
+    });
+  });
 
   describe('openSet', function(){
     it('accepts uris, dbname, options', function(done){
@@ -767,7 +767,7 @@ describe('connections:', function(){
       } catch (err) {
         done(err);
       }
-    })
+    });
     describe('auth', function(){
       it('from uri', function(done){
         var uris = process.env.MONGOOSE_SET_TEST_URI;
@@ -780,7 +780,7 @@ describe('connections:', function(){
         assert.equal('psw', db.pass);
         db.close();
         done();
-      })
+      });
       it('form options', function(done){
         var uris = process.env.MONGOOSE_SET_TEST_URI;
         if (!uris) return done();
@@ -792,8 +792,8 @@ describe('connections:', function(){
         assert.equal('testpsw', db.pass);
         db.close();
         done();
-      })
-    })
+      });
+    });
 
     it('handles unix domain sockets', function(done){
       var url = 'mongodb://aaron:psw@/tmp/mongodb-27018.sock,/tmp/mongodb-27019.sock/fake';
@@ -812,7 +812,7 @@ describe('connections:', function(){
       assert.equal('aaron', db.user);
       db.close();
       done();
-    })
+    });
 
     it('can reopen a disconnected replica set (gh-1263)', function(done) {
       var uris = process.env.MONGOOSE_SET_TEST_URI;
@@ -837,8 +837,8 @@ describe('connections:', function(){
       } catch (err) {
         done(err);
       }
-    })
-  })
+    });
+  });
 
   describe('connecting to multiple mongos nodes (gh-1037)', function(){
     var mongos = process.env.MONGOOSE_MULTI_MONGOS_TEST_URI;
@@ -863,17 +863,18 @@ describe('connections:', function(){
             assert.ifError(err);
             assert.equal(doc.id, d.id);
             m.disconnect(done);
-          })
-        })
-      })
-    })
-  })
+          });
+        });
+      });
+    });
+  });
 
   describe('modelNames()', function(){
     it('returns names of all models registered on it', function(done){
       var m = new mongoose.Mongoose;
       m.model('root', { x: String });
-      m.model('another', { x: String });
+      var another = m.model('another', { x: String });
+      another.discriminator('discriminated', new Schema({ x: String }));
 
       var db = m.createConnection();
       db.model('something', { x: String });
@@ -885,13 +886,14 @@ describe('connections:', function(){
 
       names = m.modelNames();
       assert.ok(Array.isArray(names));
-      assert.equal(2, names.length);
+      assert.equal(3, names.length);
       assert.equal('root', names[0]);
       assert.equal('another', names[1]);
+      assert.equal('discriminated', names[2]);
 
       done();
-    })
-  })
+    });
+  });
 
   describe('connection pool sharing: ', function () {
     it('works', function (done) {
@@ -951,7 +953,7 @@ describe('connections:', function(){
                   assert.strictEqual(null, nothing);
 
                   db2.close(done)
-                })
+                });
               })
             });
           });
@@ -1117,4 +1119,4 @@ describe('connections:', function(){
 
     });
   });
-})
+});

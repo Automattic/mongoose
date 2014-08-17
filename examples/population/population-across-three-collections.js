@@ -8,7 +8,7 @@ var ObjectId = mongoose.Types.ObjectId;
  * Connect to the db
  */
 
-var dbname = 'testing_populateAdInfinitum_' + require('../lib/utils').random()
+var dbname = 'testing_populateAdInfinitum_' + require('../../lib/utils').random()
 mongoose.connect('localhost', dbname);
 mongoose.connection.on('error', function() {
   console.error('connection error', arguments);

@@ -1,3 +1,14 @@
+3.8.14 / 2014-07-26
+==================
+ * fixed; stringifying MongooseArray shows nested arrays #2002
+ * fixed; use populated doc schema in toObject and toJSON by default #2035
+ * fixed; dont crash on arrays containing null #2140
+ * fixed; model.update w/ upsert has same return values on .exec and promise #2143
+ * fixed; better handling for populate limit with multiple documents #2151
+ * fixed; dont prevent users from adding weights to text index #2183
+ * fixed; helper for aggregation cursor #2187
+ * updated; node-mongodb-native to 1.4.7
+
 3.8.13 / 2014-07-15
 ==================
  * fixed; memory leak with isNew events #2159

@@ -1383,6 +1383,19 @@ function compile (tree, proto, prefix) {
   }
 };
 
+// gets descriptors for all properties of `object`
+// makes all properties non-enumerable to match previous behavior to #2211
+function getOwnPropertyDescriptors(object) {
+  var result = {};
+  
+  Object.getOwnPropertyNames(object).forEach(function(key) {
+    result[key] = Object.getOwnPropertyDescriptor(object, key);
+    result[key].enumerable = false;
+  });
+  
+  return result;
+}
+
 /*!
  * Defines the accessor named prop on the incoming prototype.
  */
@@ -1395,12 +1408,13 @@ function define (prop, subprops, prototype, prefix, keys) {
 
     Object.defineProperty(prototype, prop, {
         enumerable: true
+      , configurable: true
       , get: function () {
           if (!this.$__.getters)
             this.$__.getters = {};
 
           if (!this.$__.getters[path]) {
-            var nested = Object.create(this);
+            var nested = Object.create(Object.getPrototypeOf(this), getOwnPropertyDescriptors(this));
 
             // save scope for nested getters/setters
             if (!prefix) nested.$__.scope = this;
@@ -1440,6 +1454,7 @@ function define (prop, subprops, prototype, prefix, keys) {
 
     Object.defineProperty(prototype, prop, {
         enumerable: true
+      , configurable: true
       , get: function ( ) { return this.get.call(this.$__.scope || this, path); }
       , set: function (v) { return this.set.call(this.$__.scope || this, path, v); }
     });
@@ -2652,6 +2667,25 @@ Promise.prototype.error = function (err) {
 }
 
 /**
+ * Resolves this promise to a rejected state if `err` is passed or a fulfilled state if no `err` is passed.
+ *
+ * If the promise has already been fulfilled or rejected, not action is taken.
+ *
+ * `err` will be cast to an Error if not already instanceof Error.
+ *
+ * _NOTE: overrides [mpromise#resolve](https://github.com/aheckmann/mpromise#resolve) to provide error casting._
+ *
+ * @param {Error} [err] error or null
+ * @param {Object} [val] value to fulfill the promise with
+ * @api public
+ */
+
+Promise.prototype.resolve = function (err) {
+  if (err) return this.error(err);
+  return this.fulfill.apply(this, Array.prototype.slice.call(arguments, 1));
+};
+
+/**
  * Adds a single function as a listener to both err and complete.
  *
  * It will be executed with traditional node.js argument position when the promise is resolved.
@@ -2879,6 +2913,34 @@ function Schema (obj, options) {
   var autoid = !this.paths['id'] && (!this.options.noVirtualId && this.options.id);
   if (autoid) {
     this.virtual('id').get(idGetter);
+  }
+
+  // adds updatedAt and createdAt timestamps to documents if enabled
+  var timestamps = this.options.timestamps;
+  if (timestamps) {
+    var createdAt = timestamps.createdAt || 'createdAt'
+      , updatedAt = timestamps.updatedAt || 'updatedAt'
+      , schemaAdditions = {};
+
+    schemaAdditions[updatedAt] = Date;
+
+    if (!this.paths[createdAt]) {
+      schemaAdditions[createdAt] = Date;
+    }
+
+    this.add(schemaAdditions);
+
+    this.pre('save', function (next) {
+      var defaultTimestamp = new Date();
+
+      if (!this[createdAt]){
+        this[createdAt] = auto_id ? this._id.getTimestamp() : defaultTimestamp;
+      }
+
+      this[updatedAt] = this.isNew ? this[createdAt] : defaultTimestamp;
+
+      next();
+    });
   }
 }
 
@@ -4042,6 +4104,18 @@ handle.$all = cast$all;
 handle.$options = String;
 handle.$elemMatch = cast$elemMatch;
 handle.$geoIntersects = cast$geoIntersects;
+handle.$or = handle.$and = function(val) {
+  if (!Array.isArray(val)) {
+    throw new TypeError('conditional $or/$and require array');
+  }
+
+  var ret = [];
+  for (var i = 0; i < val.length; ++i) {
+    ret.push(cast(this.casterConstructor.schema, val[i]));
+  }
+
+  return ret;
+};
 
 handle.$near =
 handle.$nearSphere = cast$near;
@@ -4645,7 +4719,11 @@ DocumentArray.prototype.cast = function (value, doc, init, prev) {
         subdoc = new this.casterConstructor(null, value, true, selected);
         value[i] = subdoc.init(value[i]);
       } else {
-        if (prev && (subdoc = prev.id(value[i]._id))) {
+        try {
+          subdoc = prev.id(value[i]._id);
+        } catch(e) {}
+
+        if (prev && subdoc) {
           // handle resetting doc with existing id but differing data
           // doc.array = [{ doc: 'val' }]
           subdoc.set(value[i]);
@@ -6096,7 +6174,8 @@ SchemaType.prototype.required = function (required, message) {
     if ('isSelected' in this &&
         !this.isSelected(self.path) &&
         !this.isModified(self.path)) return true;
-    return self.checkRequired(v, this);
+    return (('function' === typeof required) && !required.apply(this)) ||
+        self.checkRequired(v, this);
   }
 
   if ('string' == typeof required) {

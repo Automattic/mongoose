@@ -1231,4 +1231,24 @@ describe('document', function(){
       });
     });
   });
+
+  describe('gh-1933', function() {
+    it('works', function(done) {
+      var db = start();
+      var M = db.model('gh1933', new Schema({ id: String, field: Number }), 'gh1933');
+
+      M.create({}, function(error) {
+        assert.ifError(error);
+        M.findOne({}, function(error, doc) {
+          assert.ifError(error);
+          doc.__v = 123;
+          doc.field = 5;//.push({ _id: '123', type: '456' });
+          doc.save(function(error) {
+            assert.ifError(error);
+            done();
+          });
+        });
+      });
+    });
+  });
 })

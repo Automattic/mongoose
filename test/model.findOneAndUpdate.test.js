@@ -889,4 +889,38 @@ describe('model: findByIdAndUpdate:', function(){
         done();
       });
   });
+
+  it('works with nested schemas and $pull+$or (gh-1932)', function(done) {
+    var db = start();
+
+    var TickSchema = Schema({ name: String });
+    var TestSchema = Schema({ a: Number, b: Number, ticks: [TickSchema] });
+
+    var TestModel = db.model('gh-1932', TestSchema, 'gh-1932');
+
+    TestModel.create({ a: 1, b: 0, ticks: [{ name: 'eggs' }, { name: 'bacon' }, { name: 'coffee' }] }, function(error) {
+      assert.ifError(error);
+      TestModel.findOneAndUpdate(
+        { a: 1 },
+        {
+          $pull: {
+            ticks: {
+              $or: [
+                { name: 'eggs' },
+                { name: 'bacon' }
+              ]
+            }
+          }
+        },
+        function(error) {
+          assert.ifError(error);
+          TestModel.findOne({}, function(error, doc) {
+            assert.ifError(error);
+            assert.equal(1, doc.ticks.length);
+            assert.equal('coffee', doc.ticks[0].name);
+            done();
+          });
+        });
+    });
+  });
 })

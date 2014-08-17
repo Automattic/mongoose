@@ -5,7 +5,7 @@ DOCFILE = docs/source/_docs
 STABLE_BRANCH = 3.8.x
 
 test:
-	@MONGOOSE_DISABLE_STABILITY_WARNING=1 ./node_modules/.bin/mocha $(T) --async-only test/**/*.test.js
+	@MONGOOSE_DISABLE_STABILITY_WARNING=1 ./node_modules/.bin/mocha $(T) --async-only test/*.test.js
 
 test-short:
 	@MONGOOSE_DISABLE_STABILITY_WARNING=1 ./node_modules/.bin/mocha $(T) -g LONG -i --async-only test/**/*.test.js
@@ -67,3 +67,6 @@ copyunstable:
 	rm -rf ./tmp
 
 .PHONY: test test-short test-long ghpages site docs docclean gendocs docs_from_master docs_unstable master copytmp copyunstable gitreset docclean_unstable
+
+browser:
+	./node_modules/browserify/bin/cmd.js -o ./bin/mongoose.js lib/browser.js

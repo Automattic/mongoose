@@ -11,3 +11,4 @@ Makefile
 CNAME
 index.html
 index.jade
+bin/

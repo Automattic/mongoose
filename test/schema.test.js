@@ -195,7 +195,7 @@ describe('schema', function(){
     assert.equal(Test.path('array').getDefault(new TestDocument)[3], 4);
     assert.equal(Test.path('arrayX').getDefault(new TestDocument)[0], 9);
     assert.equal(typeof Test.path('arrayFn').defaultValue, 'function');
-    assert.ok(Test.path('arrayFn').getDefault(new TestDocument) instanceof MongooseArray);
+    assert.ok(Test.path('arrayFn').getDefault(new TestDocument).isMongooseArray);
     done();
   })
 

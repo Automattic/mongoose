@@ -16,20 +16,26 @@
       , "mquery" : "0.8.0"
     }
   , "devDependencies": {
-        "mocha": "1.20.0"
-      , "node-static": "0.5.9"
-      , "dox": "0.3.1"
-      , "jade": "0.26.3"
-      , "highlight.js": "7.0.1"
-      , "markdown": "0.3.1"
-      , "tbd": "0.6.4"
+        "async": "0.2.5"
       , "benchmark" : "1.0.0"
+      , "browserify": "4.1"
+      , "dox": "0.3.1"
+      , "highlight.js": "7.0.1"
+      , "jade": "0.26.3"
+      , "karma": "0.12.16"
+      , "karma-chai": "0.1.0"
+      , "karma-mocha": "0.1.4"
+      , "karma-chrome-launcher": "0.1.4"
+      , "karma-sauce-launcher": "0.2.8"
+      , "markdown": "0.3.1"
+      , "mocha": "1.20.0"
+      , "node-static": "0.5.9"
       , "open": "0.0.3"
-      , "async": "0.2.5"
+      , "tbd": "0.6.4"
       , "underscore": "1.5.2"
     }
   , "directories": { "lib": "./lib/mongoose" }
-  , "scripts": { "test": "set MONGOOSE_DISABLE_STABILITY_WARNING=1 && mocha --async-only test/**/*.test.js" }
+  , "scripts": { "test": "set MONGOOSE_DISABLE_STABILITY_WARNING=1 && mocha --async-only test/*.test.js" }
   , "main": "./index.js"
   , "engines": { "node": ">=0.6.19" }
   , "bugs": {
@@ -42,4 +48,5 @@
     }
   , "publishConfig": { "tag": "unstable" }
   , "homepage": "http://mongoosejs.com"
+  , "browser": "lib/browser.js"
 }

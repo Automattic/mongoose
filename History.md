@@ -1,3 +1,10 @@
+3.9.1 / 2014-08-17
+==================
+ * added; alpha version of browser-side schema validation #2254
+ * added; support passing a function to schemas `required` field #2247
+ * added; support for setting updatedAt and createdAt timestamps #2227
+ * added; document.validate() returns a promise #2131
+
 3.8.15 / 2014-08-17
 ==================
  * fixed; Replica set connection string example in docs #2246

@@ -1278,7 +1278,6 @@ describe('document', function(){
 
         c2.name = 'updated 2';
         p.children = [c2];
-        p.$__.activePaths.ignore('children.1.name');
         p.save(function(error, doc) {
           assert.ifError(error);
           assert.equal(1, doc.children.length);

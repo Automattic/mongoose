@@ -836,6 +836,7 @@ Document.prototype.$__set = function (
   Embedded = Embedded || require('./types/embedded');
 
   var shouldModify = this.$__shouldModify.apply(this, arguments);
+  var _this = this;
 
   if (shouldModify) {
     this.markModified(pathToMark, val);
@@ -844,6 +845,14 @@ Document.prototype.$__set = function (
     MongooseArray || (MongooseArray = require('./types/array'));
     if (val && val.isMongooseArray) {
       val._registerAtomic('$set', val);
+
+      // Small hack for gh-1638: if we're overwriting the entire array, ignore
+      // paths that were modified before the array overwrite
+      this.$__.activePaths.forEach(function(modifiedPath) {
+        if (modifiedPath.indexOf(path) === 0 && modifiedPath !== path) {
+          _this.$__.activePaths.ignore(modifiedPath);
+        }
+      });
     }
   }
 
@@ -2548,7 +2557,7 @@ module.exports = VersionError;
  */
 
 var StateMachine = require('./statemachine')
-var ActiveRoster = StateMachine.ctor('require', 'modify', 'init', 'default')
+var ActiveRoster = StateMachine.ctor('require', 'modify', 'init', 'default', 'ignore');
 
 module.exports = exports = InternalCache;
 
@@ -6110,10 +6119,11 @@ SchemaType.prototype.validate = function (obj, message, type) {
     return this;
   }
 
-  var i = arguments.length
-    , arg
+  var i
+    , length
+    , arg;
 
-  while (i--) {
+  for (i=0, length=arguments.length; i<length; i++) {
     arg = arguments[i];
     if (!(arg && 'Object' == arg.constructor.name)) {
       var msg = 'Invalid validator. Received (' + typeof arg + ') '
@@ -7780,14 +7790,14 @@ EmbeddedDocument.prototype.markModified = function (path) {
   if (!this.__parentArray) return;
 
   this.$__.activePaths.modify(path);
-
   if (this.isNew) {
     // Mark the WHOLE parent array as modified
     // if this is a new document (i.e., we are initializing
     // a document),
     this.__parentArray._markModified();
-  } else
+  } else {
     this.__parentArray._markModified(this, path);
+  }
 };
 
 /**
@@ -12814,7 +12824,7 @@ var packElement = function(name, value, checkKeys, buffer, index, serializeFunct
         return index;
       } else if(value instanceof Long || value instanceof Timestamp || value['_bsontype'] == 'Long' || value['_bsontype'] == 'Timestamp') {
         // Write the type
-        buffer[index++] = value instanceof Long ? BSON.BSON_DATA_LONG : BSON.BSON_DATA_TIMESTAMP;
+        buffer[index++] = value instanceof Long || value['_bsontype'] == 'Long' ? BSON.BSON_DATA_LONG : BSON.BSON_DATA_TIMESTAMP;
         // Number of written bytes
         var numberOfWrittenBytes = supportsBuffer ? buffer.write(name, index, 'utf8') : writeToTypedArray(buffer, name, index);
         // Encode the name

@@ -1480,6 +1480,17 @@ describe('Query', function(){
       var q = new Query;
       assert.equal(false, !!q._castUpdate({}));
       done();
-    })
-  })
+    });
+  });
+
+  describe('gh-1950', function() {
+    it('ignores sort when passed to count', function(done) {
+      var db = start();
+      var Product = db.model('Product', 'Product_setOptions_test');
+      Product.find().sort({ _id: 1 }).count({}).exec(function(error) {
+        assert.ifError(error);
+        done();
+      });
+    });
+  });
 })

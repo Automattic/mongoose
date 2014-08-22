@@ -438,6 +438,48 @@ describe('schema', function(){
         });
       });
 
+      it('multiple sequence', function(done) {
+        var validator1Executed = false
+          ,validator2Executed = false;
+
+        function validator1 (value, fn) {
+          setTimeout(function(){
+            validator1Executed = true;
+            assert.ok(!validator2Executed);
+            fn(value === true);
+          }, 5);
+        };
+
+        function validator2 (value, fn) {
+          setTimeout(function(){
+            validator2Executed  = true;
+            assert.ok(validator1Executed);
+            fn(value === true);
+            done();
+          }, 5);
+        };
+
+        var Animal = new Schema({
+          ferret: {
+            type: Boolean,
+            validate: [
+              {
+                'validator': validator1,
+                'msg': 'validator1'
+              },
+              {
+                'validator': validator2,
+                'msg': 'validator2'
+              }
+            ]
+          }
+        });
+
+        Animal.path('ferret').doValidate(true, function(err){
+          assert.ifError(err);
+        });
+      });
+
       it('scope', function(done){
         var called = false;
         function validator (value, fn) {

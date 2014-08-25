@@ -5,7 +5,7 @@
   , "author": "Guillermo Rauch <guillermo@learnboost.com>"
   , "keywords": ["mongodb", "document", "model", "schema", "database", "odm", "data", "datastore", "query", "nosql", "orm", "db"]
   , "dependencies": {
-        "mongodb": "1.4.7"
+        "mongodb": "1.4.8"
       , "hooks": "0.2.1"
       , "ms": "0.1.0"
       , "sliced": "0.0.5"
@@ -15,7 +15,7 @@
       , "regexp-clone": "0.0.1"
       , "mquery" : "0.8.0"
     }
-  , "devDependencies": {
+  , "devDependencies": { 
         "mocha": "1.12.0"
       , "node-static": "0.5.9"
       , "dox": "0.3.1"

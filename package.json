@@ -15,7 +15,7 @@
       , "regexp-clone": "0.0.1"
       , "mquery" : "0.8.0"
     }
-  , "devDependencies": { 
+  , "devDependencies": {
         "mocha": "1.12.0"
       , "node-static": "0.5.9"
       , "dox": "0.3.1"

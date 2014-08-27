@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Mongoose browser debug</title>
+    <script src="mongoose.js"></script>
+</head>
+<body>
+<script>
+    console.log( window.mongoose );
+
+    var schema = new mongoose.Schema({
+        prop: { type: String, required: true },
+        nick: { type: String, required: true }
+    });
+</script>
+</body>
+</html>

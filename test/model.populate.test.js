@@ -923,6 +923,45 @@ describe('model: populate:', function(){
     })
   })
 
+  it('clears cache when array has been re-assigned (gh-2176)', function(done) {
+    var db = start();
+    var BlogPost = db.model('RefBlogPost', posts, 'gh-2176-1');
+    var User = db.model('RefUser', users, 'gh-2176-2');
+
+    User.create({ name: 'aaron' }, { name: 'val' }, function (err, user1, user2) {
+      assert.ifError(err);
+
+      BlogPost.create(
+        {
+          title: 'gh-2176',
+          _creator: user1._id,
+          comments: []
+        },
+        function (err, post1) {
+          assert.ifError(err);
+          BlogPost.
+            find({ title: 'gh-2176' }).
+            populate('_creator').
+            exec(function(error, posts) {
+              assert.ifError(error);
+              assert.equal(1, posts.length);
+              assert.equal('aaron', posts[0]._creator.name);
+              posts[0]._creator = user2;
+              assert.equal('val', posts[0]._creator.name);
+              posts[0].save(function(error, post) {
+                assert.ifError(error);
+                assert.equal('val', post._creator.name);
+                posts[0].populate('_creator', function(error, doc) {
+                  assert.ifError(error);
+                  assert.equal('val', doc._creator.name);
+                  done();
+                });
+              });
+            });
+        });
+    });
+  });
+
   it('populating subdocuments partially', function(done){
     var db = start()
       , BlogPost = db.model('RefBlogPost', posts)
@@ -2085,13 +2124,15 @@ describe('model: populate:', function(){
 
     describe('of individual document', function(){
       it('works', function(done){
-        var ret = utils.populate({ path: '_creator', model: 'RefAlternateUser' })
-        B.populate(post1, ret, function (err, post) {
-          assert.ifError(err);
-          assert.ok(post);
-          assert.ok(post._creator instanceof User);
-          assert.equal('Phoenix', post._creator.name);
-          done()
+        B.findById(post1._id, function(error, post1) {
+          var ret = utils.populate({ path: '_creator', model: 'RefAlternateUser' })
+          B.populate(post1, ret, function (err, post) {
+            assert.ifError(err);
+            assert.ok(post);
+            assert.ok(post._creator instanceof User);
+            assert.equal('Phoenix', post._creator.name);
+            done();
+          });
         });
       })
     })
@@ -2179,24 +2220,29 @@ describe('model: populate:', function(){
       })
     })
 
-    describe('of multiple documents', function(){
-      it('works', function(done){
-        post1._creator = post1._creator._id;
-        var ret = utils.populate({ path: '_creator', model: 'RefAlternateUser' })
-        B.populate([post1, post2], ret, function (err, posts) {
-          assert.ifError(err);
-          assert.ok(posts);
-          assert.equal(2, posts.length);
-          var p1 = posts[0];
-          var p2 = posts[1];
-          assert.ok(p1._creator instanceof User);
-          assert.equal('Phoenix', p1._creator.name);
-          assert.ok(p2._creator instanceof User);
-          assert.equal('Newark', p2._creator.name);
-          done()
+    describe('of multiple documents', function() {
+      it('works', function(done) {
+        B.findById(post1._id, function(error, post1) {
+          assert.ifError(error);
+          B.findById(post2._id, function(error, post2) {
+            assert.ifError(error);
+            var ret = utils.populate({ path: '_creator', model: 'RefAlternateUser' });
+            B.populate([post1, post2], ret, function (err, posts) {
+              assert.ifError(err);
+              assert.ok(posts);
+              assert.equal(2, posts.length);
+              var p1 = posts[0];
+              var p2 = posts[1];
+              assert.ok(p1._creator instanceof User);
+              assert.equal('Phoenix', p1._creator.name);
+              assert.ok(p2._creator instanceof User);
+              assert.equal('Newark', p2._creator.name);
+              done();
+            });
+          });
         });
-      })
-    })
+      });
+    });
 
   })
 

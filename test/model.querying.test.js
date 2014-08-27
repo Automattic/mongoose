@@ -2015,9 +2015,13 @@ describe('geo-spatial', function(){
       function test () {
         Test.find({ loc: { '$within': { '$box': [[30,40], [40,60]] }}}, function (err, docs) {
           db.close();
-          assert.ifError(err);
-          assert.equal(1, docs.length);
-          done()
+          try {
+            assert.ifError(err);
+            assert.equal(1, docs.length);
+            done();
+          } catch (e) {
+            done(e);
+          }
         });
       }
     });

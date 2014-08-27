@@ -68,6 +68,7 @@ MongooseError.DivergentArrayError = require('./error/divergentArray')
 exports.Error = require('./Error');
 exports.Schema = require('./schema');
 exports.Types = require('./types');
+exports.VirtualType = require('./virtualtype');
 exports.SchemaType = require('./schematype.js');
 exports.utils = require('./utils.js');
 
@@ -97,7 +98,7 @@ if (typeof window !== 'undefined') {
   window.mongoose = module.exports;
 }
 
-},{"./Error":1,"./document":4,"./drivers/node-mongodb-native/binary":5,"./schema":18,"./schematype.js":29,"./types":35,"./utils.js":37}],3:[function(require,module,exports){
+},{"./Error":1,"./document":4,"./drivers/node-mongodb-native/binary":5,"./schema":18,"./schematype.js":29,"./types":35,"./utils.js":37,"./virtualtype":38}],3:[function(require,module,exports){
 var utils = require('./utils');
 var Types = require('./schema/index');
 

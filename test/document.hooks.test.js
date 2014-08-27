@@ -9,6 +9,7 @@ var start = require('./common')
   , Schema = mongoose.Schema
   , ObjectId = Schema.ObjectId
   , Document = require('../lib/document')
+  , EmbeddedDocument = require('../lib/types/embedded')
   , DocumentObjectId = mongoose.Types.ObjectId;
 
 /**
@@ -402,6 +403,87 @@ describe('document: hooks:', function () {
         });
       });
     });
-  })
+  });
+
+  it('post save hooks on subdocuments work (gh-915)', function(done) {
+
+    var doneCalled = false;
+    var _done = function(e) {
+      if (!doneCalled) {
+        doneCalled = true;
+        done(e);
+      }
+    };
+    var db = start();
+    var called = { post: 0 };
+
+    var subSchema = new Schema({
+      name: String
+    });
+
+    subSchema.post('save', function(doc) {
+      called.post++;
+      try {
+        assert.ok(doc instanceof EmbeddedDocument);
+      }
+      catch (e) {
+        _done(e);
+      }
+    });
+
+    var postSaveHooks = new Schema({
+      subs: [subSchema]
+    });
+
+    var M = db.model('post-save-hooks-sub', postSaveHooks);
+
+    var m = new M({ subs: [
+      { name: 'mee' },
+      { name: 'moo' }
+    ] });
+
+    m.save(function(err) {
+
+      try {
+
+        assert.ifError(err);
+        assert.equal(2, called.post);
+        called.post = 0;
+
+        M.findById(m, function(err, doc) {
+
+          try {
+
+            assert.ifError(err);
+
+            doc.subs.push({ name: 'maa' });
+
+            doc.save(function(err) {
+
+              try {
+
+                assert.ifError(err);
+                assert.equal(3, called.post);
+
+                _done();
+              }
+              catch (e) {
+                _done(e);
+              }
+
+            });
+
+          }
+          catch (e) {
+            _done(e);
+          }
+        });
+
+      }
+      catch (e) {
+        _done(e);
+      }
+    });
+  });
 
 });

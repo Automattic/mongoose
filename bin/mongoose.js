@@ -72,24 +72,7 @@ exports.VirtualType = require('./virtualtype');
 exports.SchemaType = require('./schematype.js');
 exports.utils = require('./utils.js');
 
-var coreDocument = require('./document');
-
-exports.Document = function Document( obj, schema, skipId ) {
-  if ( !(this instanceof Document) )
-    return new Document( obj, schema, skipId );
-
-  if ( !schema ){
-    throw new exports.Error.MissingSchemaError();
-  }
-
-  this.$__setSchema(schema);
-
-  coreDocument.apply(this, obj, !!skipId);
-
-  this.init(obj);
-};
-
-exports.Document.prototype = new coreDocument(null, null, null, true);
+exports.Document = require('./document');
 
 // Small hacks to make browserify include variable-path requires
 require('./drivers/node-mongodb-native/binary');
@@ -305,6 +288,7 @@ var EventEmitter = require('events').EventEmitter
   , MongooseError = require('./error')
   , MixedSchema = require('./schema/mixed')
   , Schema = require('./schema')
+  , ObjectId = require('./types/objectid')
   , ValidatorError = require('./schematype').ValidatorError
   , utils = require('./utils')
   , clone = utils.clone
@@ -331,9 +315,72 @@ var EventEmitter = require('events').EventEmitter
  * @api private
  */
 
-function Document (obj, fields, skipId, skipInit) {
-  if (!skipInit) {
-    this.initConstructor(obj, fields, skipId);
+function Document (obj, schema, fields, skipId, skipInit) {
+  if ( !(this instanceof Document) )
+    return new Document( obj, schema, fields, skipId, skipInit );
+
+
+  if (utils.isObject(schema) && !(schema instanceof Schema)) {
+    schema = new Schema(schema);
+  }
+
+  // When creating EmbeddedDocument, it already has the schema and he doesn't need the _id
+  schema = this.schema || schema;
+
+  // Generate ObjectId if it is missing, but it requires a scheme
+  if ( !this.schema && schema.options._id ){
+    obj = obj || {};
+
+    if ( obj._id === undefined ){
+      obj._id = new ObjectId();
+    }
+  }
+
+  if ( !schema ){
+    throw new MongooseError.MissingSchemaError();
+  }
+
+  this.$__setSchema(schema);
+
+  this.$__ = new InternalCache;
+  this.isNew = true;
+  this.errors = undefined;
+
+  //var schema = this.schema;
+
+  if ('boolean' === typeof fields) {
+    this.$__.strictMode = fields;
+    fields = undefined;
+  } else {
+    this.$__.strictMode = this.schema.options && this.schema.options.strict;
+    this.$__.selected = fields;
+  }
+
+  var required = this.schema.requiredPaths();
+  for (var i = 0; i < required.length; ++i) {
+    this.$__.activePaths.require(required[i]);
+  }
+
+  setMaxListeners.call(this, 0);
+  this._doc = this.$__buildDoc(obj, fields, skipId);
+
+  /*if (obj) {
+    this.set(obj, undefined, true);
+  }*/
+
+  if ( !skipInit && obj ){
+    this.init( obj );
+  }
+
+  this.$__registerHooksFromSchema();
+
+  // apply methods
+  for ( var m in schema.methods ){
+    this[ m ] = schema.methods[ m ];
+  }
+  // apply statics
+  for ( var s in schema.statics ){
+    this[ s ] = schema.statics[ s ];
   }
 }
 
@@ -342,37 +389,6 @@ function Document (obj, fields, skipId, skipInit) {
  */
 Document.prototype = Object.create( EventEmitter.prototype );
 Document.prototype.constructor = Document;
-
-Document.prototype.initConstructor = function(obj, fields, skipId) {
-  this.$__ = new InternalCache;
-  this.isNew = true;
-  this.errors = undefined;
-
-  var schema = this.schema;
-
-  if ('boolean' === typeof fields) {
-    this.$__.strictMode = fields;
-    fields = undefined;
-  } else {
-    this.$__.strictMode = schema.options && schema.options.strict;
-    this.$__.selected = fields;
-  }
-
-  var required = schema.requiredPaths();
-  for (var i = 0; i < required.length; ++i) {
-    this.$__.activePaths.require(required[i]);
-  }
-
-  setMaxListeners.call(this, 0);
-  this._doc = this.$__buildDoc(obj, fields, skipId);
-
-  if (obj) {
-    this.set(obj, undefined, true);
-  }
-
-  this.$__registerHooksFromSchema();
-
-};
 
 /**
  * The documents schema.
@@ -513,7 +529,7 @@ Document.prototype.$__buildDoc = function (obj, fields, skipId) {
         doc_ = doc_[piece] || (doc_[piece] = {});
       }
     }
-  };
+  }
 
   return doc;
 };
@@ -600,7 +616,7 @@ function init (self, obj, doc, prefix) {
       self.$__.activePaths.init(path);
     }
   }
-};
+}
 
 /**
  * Stores the current values of the shard keys.
@@ -1471,6 +1487,7 @@ function define (prop, subprops, prototype, prefix, keys) {
 
     Object.defineProperty(prototype, prop, {
         enumerable: true
+      , configurable: true
       , get: function () {
           if (!this.$__.getters)
             this.$__.getters = {};
@@ -1516,11 +1533,12 @@ function define (prop, subprops, prototype, prefix, keys) {
 
     Object.defineProperty(prototype, prop, {
         enumerable: true
+      , configurable: true
       , get: function ( ) { return this.get.call(this.$__.scope || this, path); }
       , set: function (v) { return this.set.call(this.$__.scope || this, path, v); }
     });
   }
-};
+}
 
 /**
  * Assigns/compiles `schema` into this documents prototype.
@@ -1534,7 +1552,7 @@ function define (prop, subprops, prototype, prefix, keys) {
 Document.prototype.$__setSchema = function (schema) {
   compile(schema.tree, this);
   this.schema = schema;
-}
+};
 
 
 /**
@@ -2051,7 +2069,7 @@ Document.prototype.equals = function (doc) {
   return tid && tid.equals
     ? tid.equals(docid)
     : tid === docid;
-}
+};
 
 /**
  * Populates document references, executing the `callback` when complete.
@@ -2182,7 +2200,7 @@ Document.ValidationError = ValidationError;
 module.exports = exports = Document;
 
 }).call(this,require("FWaASH"))
-},{"./error":7,"./internal":16,"./promise":17,"./schema":18,"./schema/mixed":25,"./schematype":29,"./types/array":31,"./types/documentarray":33,"./types/embedded":34,"./utils":37,"FWaASH":44,"events":42,"hooks":47,"util":46}],5:[function(require,module,exports){
+},{"./error":7,"./internal":16,"./promise":17,"./schema":18,"./schema/mixed":25,"./schematype":29,"./types/array":31,"./types/documentarray":33,"./types/embedded":34,"./types/objectid":36,"./utils":37,"FWaASH":44,"events":42,"hooks":47,"util":46}],5:[function(require,module,exports){
 
 /*!
  * Module dependencies.
@@ -7717,13 +7735,13 @@ function EmbeddedDocument (obj, parentArr, skipId, fields) {
   this.on('isNew', function (val) {
     self.isNew = val;
   });
-};
+}
 
 /*!
  * Inherit from Document
  */
-
-EmbeddedDocument.prototype = new Document(null, null, null, true);
+EmbeddedDocument.prototype = Object.create( Document.prototype );
+EmbeddedDocument.prototype.constructor = EmbeddedDocument;
 
 /**
  * Marks the embedded doc modified.

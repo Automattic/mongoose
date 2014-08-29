@@ -922,7 +922,6 @@ describe('schema', function(){
       assert.ok(s.path('arr') instanceof SchemaTypes.DocumentArray);
       var m = new mongoose.Document({ arr: [ { type: 'works' }] }, s);
       assert.equal('works', m.arr[0].type);
-      console.log( m.arr[0] );
       assert.ok(m.arr[0]._id);
       done();
     });

@@ -1751,7 +1751,7 @@ describe('model: querying:', function(){
               assert.ifError(err);
               assert.equal(1, docs.length);
 
-              var query = B.find()
+              var query = B.find();
               query.and([
                 { title: 'and operator', published: false },
                 { author: 'Me' }
@@ -1774,6 +1774,16 @@ describe('model: querying:', function(){
             });
           });
         });
+      });
+    });
+
+    it('works with nested query selectors gh-1884', function(done) {
+      var db = start();
+      var B = db.model('gh1884', { a: String, b: String }, 'gh1884');
+
+      B.remove({ $and: [{ a: 'coffee' }, { b: { $in: ['bacon', 'eggs'] } }] }, function(error) {
+        assert.ifError(error);
+        done();
       });
     });
   });

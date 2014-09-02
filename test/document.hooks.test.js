@@ -443,46 +443,20 @@ describe('document: hooks:', function () {
     ] });
 
     m.save(function(err) {
+      assert.ifError(err);
+      assert.equal(2, called.post);
+      called.post = 0;
 
-      try {
-
+      M.findById(m, function(err, doc) {
         assert.ifError(err);
-        assert.equal(2, called.post);
-        called.post = 0;
+        doc.subs.push({ name: 'maa' });
+        doc.save(function(err) {
+          assert.ifError(err);
+          assert.equal(3, called.post);
 
-        M.findById(m, function(err, doc) {
-
-          try {
-
-            assert.ifError(err);
-
-            doc.subs.push({ name: 'maa' });
-
-            doc.save(function(err) {
-
-              try {
-
-                assert.ifError(err);
-                assert.equal(3, called.post);
-
-                _done();
-              }
-              catch (e) {
-                _done(e);
-              }
-
-            });
-
-          }
-          catch (e) {
-            _done(e);
-          }
+          _done();
         });
-
-      }
-      catch (e) {
-        _done(e);
-      }
+      });
     });
   });
 

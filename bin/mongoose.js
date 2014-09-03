@@ -64,7 +64,7 @@ MongooseError.MissingSchemaError = require('./error/missingSchema')
 MongooseError.DivergentArrayError = require('./error/divergentArray')
 
 
-},{"./error/cast":8,"./error/divergentArray":9,"./error/messages":10,"./error/missingSchema":11,"./error/overwriteModel":12,"./error/validation":13,"./error/validator":14,"./error/version":15}],2:[function(require,module,exports){
+},{"./error/cast":9,"./error/divergentArray":10,"./error/messages":11,"./error/missingSchema":12,"./error/overwriteModel":13,"./error/validation":14,"./error/validator":15,"./error/version":16}],2:[function(require,module,exports){
 exports.Error = require('./Error');
 exports.Schema = require('./schema');
 exports.Types = require('./types');
@@ -72,7 +72,7 @@ exports.VirtualType = require('./virtualtype');
 exports.SchemaType = require('./schematype.js');
 exports.utils = require('./utils.js');
 
-exports.Document = require('./document');
+exports.Document = require('./browserDocument');
 
 // Small hacks to make browserify include variable-path requires
 require('./drivers/node-mongodb-native/binary');
@@ -81,7 +81,1930 @@ if (typeof window !== 'undefined') {
   window.mongoose = module.exports;
 }
 
-},{"./Error":1,"./document":4,"./drivers/node-mongodb-native/binary":5,"./schema":18,"./schematype.js":29,"./types":35,"./utils.js":37,"./virtualtype":38}],3:[function(require,module,exports){
+},{"./Error":1,"./browserDocument":3,"./drivers/node-mongodb-native/binary":6,"./schema":19,"./schematype.js":30,"./types":36,"./utils.js":38,"./virtualtype":39}],3:[function(require,module,exports){
+(function (process){
+/*!
+ * Module dependencies.
+ */
+
+var EventEmitter = require('events').EventEmitter
+  , setMaxListeners = EventEmitter.prototype.setMaxListeners
+  , MongooseError = require('./error')
+  , MixedSchema = require('./schema/mixed')
+  , Schema = require('./schema')
+  , ObjectId = require('./types/objectid')
+  , ValidatorError = require('./schematype').ValidatorError
+  , utils = require('./utils')
+  , clone = utils.clone
+  , isMongooseObject = utils.isMongooseObject
+  , inspect = require('util').inspect
+  , ValidationError = MongooseError.ValidationError
+  , InternalCache = require('./internal')
+  , deepEqual = utils.deepEqual
+  , hooks = require('hooks')
+  , Promise = require('./promise')
+  , DocumentArray
+  , MongooseArray
+  , Embedded
+
+/**
+ * Document constructor.
+ *
+ * @param {Object} obj the values to set
+ * @param {Object} [fields] optional object containing the fields which were selected in the query returning this document and any populated paths data
+ * @param {Boolean} [skipId] bool, should we auto create an ObjectId _id
+ * @inherits NodeJS EventEmitter http://nodejs.org/api/events.html#events_class_events_eventemitter
+ * @event `init`: Emitted on a document after it has was retreived from the db and fully hydrated by Mongoose.
+ * @event `save`: Emitted when the document is successfully saved
+ * @api private
+ */
+
+function Document (obj, schema, fields, skipId, skipInit) {
+  if ( !(this instanceof Document) )
+    return new Document( obj, schema, fields, skipId, skipInit );
+
+
+  if (utils.isObject(schema) && !(schema instanceof Schema)) {
+    schema = new Schema(schema);
+  }
+
+  // When creating EmbeddedDocument, it already has the schema and he doesn't need the _id
+  schema = this.schema || schema;
+
+  // Generate ObjectId if it is missing, but it requires a scheme
+  if ( !this.schema && schema.options._id ){
+    obj = obj || {};
+
+    if ( obj._id === undefined ){
+      obj._id = new ObjectId();
+    }
+  }
+
+  if ( !schema ){
+    throw new MongooseError.MissingSchemaError();
+  }
+
+  this.$__setSchema(schema);
+
+  this.$__ = new InternalCache;
+  this.isNew = true;
+  this.errors = undefined;
+
+  //var schema = this.schema;
+
+  if ('boolean' === typeof fields) {
+    this.$__.strictMode = fields;
+    fields = undefined;
+  } else {
+    this.$__.strictMode = this.schema.options && this.schema.options.strict;
+    this.$__.selected = fields;
+  }
+
+  var required = this.schema.requiredPaths();
+  for (var i = 0; i < required.length; ++i) {
+    this.$__.activePaths.require(required[i]);
+  }
+
+  setMaxListeners.call(this, 0);
+  this._doc = this.$__buildDoc(obj, fields, skipId);
+
+  /*if (obj) {
+    this.set(obj, undefined, true);
+  }*/
+
+  if ( !skipInit && obj ){
+    this.init( obj );
+  }
+
+  this.$__registerHooksFromSchema();
+
+  // apply methods
+  for ( var m in schema.methods ){
+    this[ m ] = schema.methods[ m ];
+  }
+  // apply statics
+  for ( var s in schema.statics ){
+    this[ s ] = schema.statics[ s ];
+  }
+}
+
+/*!
+ * Inherit from EventEmitter.
+ */
+Document.prototype = Object.create( EventEmitter.prototype );
+Document.prototype.constructor = Document;
+
+/**
+ * The documents schema.
+ *
+ * @api public
+ * @property schema
+ */
+
+Document.prototype.schema;
+
+/**
+ * Boolean flag specifying if the document is new.
+ *
+ * @api public
+ * @property isNew
+ */
+
+Document.prototype.isNew;
+
+/**
+ * The string version of this documents _id.
+ *
+ * ####Note:
+ *
+ * This getter exists on all documents by default. The getter can be disabled by setting the `id` [option](/docs/guide.html#id) of its `Schema` to false at construction time.
+ *
+ *     new Schema({ name: String }, { id: false });
+ *
+ * @api public
+ * @see Schema options /docs/guide.html#options
+ * @property id
+ */
+
+Document.prototype.id;
+
+/**
+ * Hash containing current validation errors.
+ *
+ * @api public
+ * @property errors
+ */
+
+Document.prototype.errors;
+
+/**
+ * Builds the default doc structure
+ *
+ * @param {Object} obj
+ * @param {Object} [fields]
+ * @param {Boolean} [skipId]
+ * @return {Object}
+ * @api private
+ * @method $__buildDoc
+ * @memberOf Document
+ */
+
+Document.prototype.$__buildDoc = function (obj, fields, skipId) {
+  var doc = {}
+    , self = this
+    , exclude
+    , keys
+    , key
+    , ki
+
+  // determine if this doc is a result of a query with
+  // excluded fields
+  if (fields && 'Object' === utils.getFunctionName(fields.constructor)) {
+    keys = Object.keys(fields);
+    ki = keys.length;
+
+    while (ki--) {
+      if ('_id' !== keys[ki]) {
+        exclude = 0 === fields[keys[ki]];
+        break;
+      }
+    }
+  }
+
+  var paths = Object.keys(this.schema.paths)
+    , plen = paths.length
+    , ii = 0
+
+  for (; ii < plen; ++ii) {
+    var p = paths[ii];
+
+    if ('_id' == p) {
+      if (skipId) continue;
+      if (obj && '_id' in obj) continue;
+    }
+
+    var type = this.schema.paths[p]
+      , path = p.split('.')
+      , len = path.length
+      , last = len-1
+      , curPath = ''
+      , doc_ = doc
+      , i = 0
+
+    for (; i < len; ++i) {
+      var piece = path[i]
+        , def
+
+      // support excluding intermediary levels
+      if (exclude) {
+        curPath += piece;
+        if (curPath in fields) break;
+        curPath += '.';
+      }
+
+      if (i === last) {
+        if (fields) {
+          if (exclude) {
+            // apply defaults to all non-excluded fields
+            if (p in fields) continue;
+
+            def = type.getDefault(self, true);
+            if ('undefined' !== typeof def) {
+              doc_[piece] = def;
+              self.$__.activePaths.default(p);
+            }
+
+          } else if (p in fields) {
+            // selected field
+            def = type.getDefault(self, true);
+            if ('undefined' !== typeof def) {
+              doc_[piece] = def;
+              self.$__.activePaths.default(p);
+            }
+          }
+        } else {
+          def = type.getDefault(self, true);
+          if ('undefined' !== typeof def) {
+            doc_[piece] = def;
+            self.$__.activePaths.default(p);
+          }
+        }
+      } else {
+        doc_ = doc_[piece] || (doc_[piece] = {});
+      }
+    }
+  }
+
+  return doc;
+};
+
+/**
+ * Initializes the document without setters or marking anything modified.
+ *
+ * Called internally after a document is returned from mongodb.
+ *
+ * @param {Object} doc document returned by mongo
+ * @param {Function} fn callback
+ * @api private
+ */
+
+Document.prototype.init = function (doc, opts, fn) {
+  // do not prefix this method with $__ since its
+  // used by public hooks
+
+  if ('function' == typeof opts) {
+    fn = opts;
+    opts = null;
+  }
+
+  this.isNew = false;
+
+  // handle docs with populated paths
+  if (doc._id && opts && opts.populated && opts.populated.length) {
+    var id = String(doc._id);
+    for (var i = 0; i < opts.populated.length; ++i) {
+      var item = opts.populated[i];
+      this.populated(item.path, item._docs[id], item);
+    }
+  }
+
+  init(this, doc, this._doc);
+  this.$__storeShard();
+
+  this.emit('init', this);
+  if (fn) fn(null);
+  return this;
+};
+
+/*!
+ * Init helper.
+ *
+ * @param {Object} self document instance
+ * @param {Object} obj raw mongodb doc
+ * @param {Object} doc object we are initializing
+ * @api private
+ */
+
+function init (self, obj, doc, prefix) {
+  prefix = prefix || '';
+
+  var keys = Object.keys(obj)
+    , len = keys.length
+    , schema
+    , path
+    , i;
+
+  while (len--) {
+    i = keys[len];
+    path = prefix + i;
+    schema = self.schema.path(path);
+
+    if (!schema && utils.isObject(obj[i]) &&
+        (!obj[i].constructor || 'Object' == utils.getFunctionName(obj[i].constructor))) {
+      // assume nested object
+      if (!doc[i]) doc[i] = {};
+      init(self, obj[i], doc[i], path + '.');
+    } else {
+      if (obj[i] === null) {
+        doc[i] = null;
+      } else if (obj[i] !== undefined) {
+        if (schema) {
+          self.$__try(function(){
+            doc[i] = schema.cast(obj[i], self, true);
+          });
+        } else {
+          doc[i] = obj[i];
+        }
+      }
+      // mark as hydrated
+      self.$__.activePaths.init(path);
+    }
+  }
+}
+
+/**
+ * Stores the current values of the shard keys.
+ *
+ * ####Note:
+ *
+ * _Shard key values do not / are not allowed to change._
+ *
+ * @api private
+ * @method $__storeShard
+ * @memberOf Document
+ */
+
+Document.prototype.$__storeShard = function () {
+  // backwards compat
+  var key = this.schema.options.shardKey || this.schema.options.shardkey;
+  if (!(key && 'Object' == utils.getFunctionName(key.constructor))) return;
+
+  var orig = this.$__.shardval = {}
+    , paths = Object.keys(key)
+    , len = paths.length
+    , val
+
+  for (var i = 0; i < len; ++i) {
+    val = this.getValue(paths[i]);
+    if (isMongooseObject(val)) {
+      orig[paths[i]] = val.toObject({ depopulate: true })
+    } else if (null != val &&
+        val.valueOf &&
+        // Explicitly don't take value of dates
+        (!val.constructor || utils.getFunctionName(val.constructor) !== 'Date')) {
+      orig[paths[i]] = val.valueOf();
+    } else {
+      orig[paths[i]] = val;
+    }
+  }
+}
+
+/*!
+ * Set up middleware support
+ */
+
+for (var k in hooks) {
+  Document.prototype[k] = Document[k] = hooks[k];
+}
+
+/**
+ * Sends an update command with this document `_id` as the query selector.
+ *
+ * ####Example:
+ *
+ *     weirdCar.update({$inc: {wheels:1}}, { w: 1 }, callback);
+ *
+ * ####Valid options:
+ *
+ *  - same as in [Model.update](#model_Model.update)
+ *
+ * @see Model.update #model_Model.update
+ * @param {Object} doc
+ * @param {Object} options
+ * @param {Function} callback
+ * @return {Query}
+ * @api public
+ */
+
+Document.prototype.update = function update () {
+  var args = utils.args(arguments);
+  args.unshift({_id: this._id});
+  return this.constructor.update.apply(this.constructor, args);
+}
+
+/**
+ * Sets the value of a path, or many paths.
+ *
+ * ####Example:
+ *
+ *     // path, value
+ *     doc.set(path, value)
+ *
+ *     // object
+ *     doc.set({
+ *         path  : value
+ *       , path2 : {
+ *            path  : value
+ *         }
+ *     })
+ *
+ *     // only-the-fly cast to number
+ *     doc.set(path, value, Number)
+ *
+ *     // only-the-fly cast to string
+ *     doc.set(path, value, String)
+ *
+ *     // changing strict mode behavior
+ *     doc.set(path, value, { strict: false });
+ *
+ * @param {String|Object} path path or object of key/vals to set
+ * @param {Any} val the value to set
+ * @param {Schema|String|Number|Buffer|etc..} [type] optionally specify a type for "on-the-fly" attributes
+ * @param {Object} [options] optionally specify options that modify the behavior of the set
+ * @api public
+ */
+
+Document.prototype.set = function (path, val, type, options) {
+  if (type && 'Object' == utils.getFunctionName(type.constructor)) {
+    options = type;
+    type = undefined;
+  }
+
+  var merge = options && options.merge
+    , adhoc = type && true !== type
+    , constructing = true === type
+    , adhocs
+
+  var strict = options && 'strict' in options
+    ? options.strict
+    : this.$__.strictMode;
+
+  if (adhoc) {
+    adhocs = this.$__.adhocPaths || (this.$__.adhocPaths = {});
+    adhocs[path] = Schema.interpretAsType(path, type);
+  }
+
+  if ('string' !== typeof path) {
+    // new Document({ key: val })
+
+    if (null === path || undefined === path) {
+      var _ = path;
+      path = val;
+      val = _;
+
+    } else {
+      var prefix = val
+        ? val + '.'
+        : '';
+
+      if (path instanceof Document) path = path._doc;
+
+      var keys = Object.keys(path)
+        , i = keys.length
+        , pathtype
+        , key
+
+
+      while (i--) {
+        key = keys[i];
+        pathtype = this.schema.pathType(prefix + key);
+        if (null != path[key]
+            // need to know if plain object - no Buffer, ObjectId, ref, etc
+            && utils.isObject(path[key])
+            && (!path[key].constructor || 'Object' == utils.getFunctionName(path[key].constructor))
+            && 'virtual' != pathtype
+            && !(this.$__path(prefix + key) instanceof MixedSchema)
+            && !(this.schema.paths[key] && this.schema.paths[key].options.ref)
+          ) {
+          this.set(path[key], prefix + key, constructing);
+        } else if (strict) {
+          if ('real' === pathtype || 'virtual' === pathtype) {
+            this.set(prefix + key, path[key], constructing);
+          } else if ('throw' == strict) {
+            throw new Error("Field `" + key + "` is not in schema.");
+          }
+        } else if (undefined !== path[key]) {
+          this.set(prefix + key, path[key], constructing);
+        }
+      }
+
+      return this;
+    }
+  }
+
+  // ensure _strict is honored for obj props
+  // docschema = new Schema({ path: { nest: 'string' }})
+  // doc.set('path', obj);
+  var pathType = this.schema.pathType(path);
+  if ('nested' == pathType && val && utils.isObject(val) &&
+      (!val.constructor || 'Object' == utils.getFunctionName(val.constructor))) {
+    if (!merge) this.setValue(path, null);
+    this.set(val, path, constructing);
+    return this;
+  }
+
+  var schema;
+  var parts = path.split('.');
+
+  if ('adhocOrUndefined' == pathType && strict) {
+
+    // check for roots that are Mixed types
+    var mixed;
+
+    for (var i = 0; i < parts.length; ++i) {
+      var subpath = parts.slice(0, i+1).join('.');
+      schema = this.schema.path(subpath);
+      if (schema instanceof MixedSchema) {
+        // allow changes to sub paths of mixed types
+        mixed = true;
+        break;
+      }
+    }
+
+    if (!mixed) {
+      if ('throw' == strict) {
+        throw new Error("Field `" + path + "` is not in schema.");
+      }
+      return this;
+    }
+
+  } else if ('virtual' == pathType) {
+    schema = this.schema.virtualpath(path);
+    schema.applySetters(val, this);
+    return this;
+  } else {
+    schema = this.$__path(path);
+  }
+
+  var pathToMark;
+
+  // When using the $set operator the path to the field must already exist.
+  // Else mongodb throws: "LEFT_SUBFIELD only supports Object"
+
+  if (parts.length <= 1) {
+    pathToMark = path;
+  } else {
+    for (var i = 0; i < parts.length; ++i) {
+      var subpath = parts.slice(0, i+1).join('.');
+      if (this.isDirectModified(subpath) // earlier prefixes that are already
+                                         // marked as dirty have precedence
+          || this.get(subpath) === null) {
+        pathToMark = subpath;
+        break;
+      }
+    }
+
+    if (!pathToMark) pathToMark = path;
+  }
+
+  // if this doc is being constructed we should not trigger getters
+  var priorVal = constructing
+    ? undefined
+    : this.getValue(path);
+
+  if (!schema || undefined === val) {
+    this.$__set(pathToMark, path, constructing, parts, schema, val, priorVal);
+    return this;
+  }
+
+  var self = this;
+  var shouldSet = this.$__try(function(){
+    val = schema.applySetters(val, self, false, priorVal);
+  });
+
+  if (shouldSet) {
+    this.$__set(pathToMark, path, constructing, parts, schema, val, priorVal);
+  }
+
+  return this;
+}
+
+/**
+ * Determine if we should mark this change as modified.
+ *
+ * @return {Boolean}
+ * @api private
+ * @method $__shouldModify
+ * @memberOf Document
+ */
+
+Document.prototype.$__shouldModify = function (
+    pathToMark, path, constructing, parts, schema, val, priorVal) {
+
+  if (this.isNew) return true;
+
+  if (undefined === val && !this.isSelected(path)) {
+    // when a path is not selected in a query, its initial
+    // value will be undefined.
+    return true;
+  }
+
+  if (undefined === val && path in this.$__.activePaths.states.default) {
+    // we're just unsetting the default value which was never saved
+    return false;
+  }
+
+  if (!deepEqual(val, priorVal || this.get(path))) {
+    return true;
+  }
+
+  if (!constructing &&
+      null != val &&
+      path in this.$__.activePaths.states.default &&
+      deepEqual(val, schema.getDefault(this, constructing))) {
+    // a path with a default was $unset on the server
+    // and the user is setting it to the same value again
+    return true;
+  }
+  return false;
+}
+
+/**
+ * Handles the actual setting of the value and marking the path modified if appropriate.
+ *
+ * @api private
+ * @method $__set
+ * @memberOf Document
+ */
+
+Document.prototype.$__set = function (
+    pathToMark, path, constructing, parts, schema, val, priorVal) {
+  Embedded = Embedded || require('./types/embedded');
+
+  var shouldModify = this.$__shouldModify.apply(this, arguments);
+
+  if (shouldModify) {
+    this.markModified(pathToMark, val);
+
+    // handle directly setting arrays (gh-1126)
+    MongooseArray || (MongooseArray = require('./types/array'));
+    if (val && val.isMongooseArray) {
+      val._registerAtomic('$set', val);
+    }
+  }
+
+  var obj = this._doc
+    , i = 0
+    , l = parts.length
+
+  for (; i < l; i++) {
+    var next = i + 1
+      , last = next === l;
+
+    if (last) {
+      obj[parts[i]] = val;
+    } else {
+      if (obj[parts[i]] && 'Object' === utils.getFunctionName(obj[parts[i]].constructor)) {
+        obj = obj[parts[i]];
+      } else if (obj[parts[i]] && obj[parts[i]] instanceof Embedded) {
+        obj = obj[parts[i]];
+      } else if (obj[parts[i]] && Array.isArray(obj[parts[i]])) {
+        obj = obj[parts[i]];
+      } else {
+        obj = obj[parts[i]] = {};
+      }
+    }
+  }
+}
+
+/**
+ * Gets a raw value from a path (no getters)
+ *
+ * @param {String} path
+ * @api private
+ */
+
+Document.prototype.getValue = function (path) {
+  return utils.getValue(path, this._doc);
+}
+
+/**
+ * Sets a raw value for a path (no casting, setters, transformations)
+ *
+ * @param {String} path
+ * @param {Object} value
+ * @api private
+ */
+
+Document.prototype.setValue = function (path, val) {
+  utils.setValue(path, val, this._doc);
+  return this;
+}
+
+/**
+ * Returns the value of a path.
+ *
+ * ####Example
+ *
+ *     // path
+ *     doc.get('age') // 47
+ *
+ *     // dynamic casting to a string
+ *     doc.get('age', String) // "47"
+ *
+ * @param {String} path
+ * @param {Schema|String|Number|Buffer|etc..} [type] optionally specify a type for on-the-fly attributes
+ * @api public
+ */
+
+Document.prototype.get = function (path, type) {
+  var adhocs;
+  if (type) {
+    adhocs = this.$__.adhocPaths || (this.$__.adhocPaths = {});
+    adhocs[path] = Schema.interpretAsType(path, type);
+  }
+
+  var schema = this.$__path(path) || this.schema.virtualpath(path)
+    , pieces = path.split('.')
+    , obj = this._doc;
+
+  for (var i = 0, l = pieces.length; i < l; i++) {
+    obj = undefined === obj || null === obj
+      ? undefined
+      : obj[pieces[i]];
+  }
+
+  if (schema) {
+    obj = schema.applyGetters(obj, this);
+  }
+
+  return obj;
+};
+
+/**
+ * Returns the schematype for the given `path`.
+ *
+ * @param {String} path
+ * @api private
+ * @method $__path
+ * @memberOf Document
+ */
+
+Document.prototype.$__path = function (path) {
+  var adhocs = this.$__.adhocPaths
+    , adhocType = adhocs && adhocs[path];
+
+  if (adhocType) {
+    return adhocType;
+  } else {
+    return this.schema.path(path);
+  }
+};
+
+/**
+ * Marks the path as having pending changes to write to the db.
+ *
+ * _Very helpful when using [Mixed](./schematypes.html#mixed) types._
+ *
+ * ####Example:
+ *
+ *     doc.mixed.type = 'changed';
+ *     doc.markModified('mixed.type');
+ *     doc.save() // changes to mixed.type are now persisted
+ *
+ * @param {String} path the path to mark modified
+ * @api public
+ */
+
+Document.prototype.markModified = function (path) {
+  this.$__.activePaths.modify(path);
+}
+
+/**
+ * Catches errors that occur during execution of `fn` and stores them to later be passed when `save()` is executed.
+ *
+ * @param {Function} fn function to execute
+ * @param {Object} scope the scope with which to call fn
+ * @api private
+ * @method $__try
+ * @memberOf Document
+ */
+
+Document.prototype.$__try = function (fn, scope) {
+  var res;
+  try {
+    fn.call(scope);
+    res = true;
+  } catch (e) {
+    this.$__error(e);
+    res = false;
+  }
+  return res;
+};
+
+/**
+ * Returns the list of paths that have been modified.
+ *
+ * @return {Array}
+ * @api public
+ */
+
+Document.prototype.modifiedPaths = function () {
+  var directModifiedPaths = Object.keys(this.$__.activePaths.states.modify);
+
+  return directModifiedPaths.reduce(function (list, path) {
+    var parts = path.split('.');
+    return list.concat(parts.reduce(function (chains, part, i) {
+      return chains.concat(parts.slice(0, i).concat(part).join('.'));
+    }, []));
+  }, []);
+};
+
+/**
+ * Returns true if this document was modified, else false.
+ *
+ * If `path` is given, checks if a path or any full path containing `path` as part of its path chain has been modified.
+ *
+ * ####Example
+ *
+ *     doc.set('documents.0.title', 'changed');
+ *     doc.isModified()                    // true
+ *     doc.isModified('documents')         // true
+ *     doc.isModified('documents.0.title') // true
+ *     doc.isDirectModified('documents')   // false
+ *
+ * @param {String} [path] optional
+ * @return {Boolean}
+ * @api public
+ */
+
+Document.prototype.isModified = function (path) {
+  return path
+    ? !!~this.modifiedPaths().indexOf(path)
+    : this.$__.activePaths.some('modify');
+};
+
+/**
+ * Returns true if `path` was directly set and modified, else false.
+ *
+ * ####Example
+ *
+ *     doc.set('documents.0.title', 'changed');
+ *     doc.isDirectModified('documents.0.title') // true
+ *     doc.isDirectModified('documents') // false
+ *
+ * @param {String} path
+ * @return {Boolean}
+ * @api public
+ */
+
+Document.prototype.isDirectModified = function (path) {
+  return (path in this.$__.activePaths.states.modify);
+};
+
+/**
+ * Checks if `path` was initialized.
+ *
+ * @param {String} path
+ * @return {Boolean}
+ * @api public
+ */
+
+Document.prototype.isInit = function (path) {
+  return (path in this.$__.activePaths.states.init);
+};
+
+/**
+ * Checks if `path` was selected in the source query which initialized this document.
+ *
+ * ####Example
+ *
+ *     Thing.findOne().select('name').exec(function (err, doc) {
+ *        doc.isSelected('name') // true
+ *        doc.isSelected('age')  // false
+ *     })
+ *
+ * @param {String} path
+ * @return {Boolean}
+ * @api public
+ */
+
+Document.prototype.isSelected = function isSelected (path) {
+  if (this.$__.selected) {
+
+    if ('_id' === path) {
+      return 0 !== this.$__.selected._id;
+    }
+
+    var paths = Object.keys(this.$__.selected)
+      , i = paths.length
+      , inclusive = false
+      , cur
+
+    if (1 === i && '_id' === paths[0]) {
+      // only _id was selected.
+      return 0 === this.$__.selected._id;
+    }
+
+    while (i--) {
+      cur = paths[i];
+      if ('_id' == cur) continue;
+      inclusive = !! this.$__.selected[cur];
+      break;
+    }
+
+    if (path in this.$__.selected) {
+      return inclusive;
+    }
+
+    i = paths.length;
+    var pathDot = path + '.';
+
+    while (i--) {
+      cur = paths[i];
+      if ('_id' == cur) continue;
+
+      if (0 === cur.indexOf(pathDot)) {
+        return inclusive;
+      }
+
+      if (0 === pathDot.indexOf(cur + '.')) {
+        return inclusive;
+      }
+    }
+
+    return ! inclusive;
+  }
+
+  return true;
+}
+
+/**
+ * Executes registered validation rules for this document.
+ *
+ * ####Note:
+ *
+ * This method is called `pre` save and if a validation rule is violated, [save](#model_Model-save) is aborted and the error is returned to your `callback`.
+ *
+ * ####Example:
+ *
+ *     doc.validate(function (err) {
+ *       if (err) handleError(err);
+ *       else // validation passed
+ *     });
+ *
+ * @param {Function} optional cb called after validation completes, passing an error if one occurred
+ * @return {Promise} Promise
+ * @api public
+ */
+
+Document.prototype.validate = function (cb) {
+  var self = this;
+
+  var promise = new Promise(cb);
+
+  // only validate required fields when necessary
+  var paths = Object.keys(this.$__.activePaths.states.require).filter(function (path) {
+    if (!self.isSelected(path) && !self.isModified(path)) return false;
+    return true;
+  });
+
+  paths = paths.concat(Object.keys(this.$__.activePaths.states.init));
+  paths = paths.concat(Object.keys(this.$__.activePaths.states.modify));
+  paths = paths.concat(Object.keys(this.$__.activePaths.states.default));
+
+  if (0 === paths.length) {
+    process.nextTick(function() {
+      complete();
+    });
+    return promise;
+  }
+
+  var validating = {}
+    , total = 0;
+
+  paths.forEach(validatePath);
+  return promise;
+
+  function validatePath (path) {
+    if (validating[path]) return;
+
+    validating[path] = true;
+    total++;
+
+    process.nextTick(function(){
+      var p = self.schema.path(path);
+      if (!p) return --total || complete();
+
+      var val = self.getValue(path);
+      p.doValidate(val, function (err) {
+        if (err) {
+          self.invalidate(
+              path
+            , err
+            , undefined
+            , true // embedded docs
+            );
+        }
+        --total || complete();
+      }, self);
+    });
+  }
+
+  function complete () {
+    var err = self.$__.validationError;
+    self.$__.validationError = undefined;
+    self.emit('validate', self);
+    if (err) {
+      promise.reject(err);
+    } else {
+      promise.fulfill();
+    }
+  }
+};
+
+/**
+ * Marks a path as invalid, causing validation to fail.
+ *
+ * The `errorMsg` argument will become the message of the `ValidationError`.
+ *
+ * The `value` argument (if passed) will be available through the `ValidationError.value` property.
+ *
+ *     doc.invalidate('size', 'must be less than 20', 14);
+
+ *     doc.validate(function (err) {
+ *       console.log(err)
+ *       // prints
+ *       { message: 'Validation failed',
+ *         name: 'ValidationError',
+ *         errors:
+ *          { size:
+ *             { message: 'must be less than 20',
+ *               name: 'ValidatorError',
+ *               path: 'size',
+ *               type: 'user defined',
+ *               value: 14 } } }
+ *     })
+ *
+ * @param {String} path the field to invalidate
+ * @param {String|Error} errorMsg the error which states the reason `path` was invalid
+ * @param {Object|String|Number|any} value optional invalid value
+ * @api public
+ */
+
+Document.prototype.invalidate = function (path, err, val) {
+  if (!this.$__.validationError) {
+    this.$__.validationError = new ValidationError(this);
+  }
+
+  if (!err || 'string' === typeof err) {
+    err = new ValidatorError(path, err, 'user defined', val)
+  }
+
+  if (this.$__.validationError == err) return;
+
+  this.$__.validationError.errors[path] = err;
+}
+
+/**
+ * Resets the internal modified state of this document.
+ *
+ * @api private
+ * @return {Document}
+ * @method $__reset
+ * @memberOf Document
+ */
+
+Document.prototype.$__reset = function reset () {
+  var self = this;
+  DocumentArray || (DocumentArray = require('./types/documentarray'));
+
+  this.$__.activePaths
+  .map('init', 'modify', function (i) {
+    return self.getValue(i);
+  })
+  .filter(function (val) {
+    return val && val instanceof Array && val.isMongooseDocumentArray && val.length;
+  })
+  .forEach(function (array) {
+    var i = array.length;
+    while (i--) {
+      var doc = array[i];
+      if (!doc) continue;
+      doc.$__reset();
+    }
+  });
+
+  // clear atomics
+  this.$__dirty().forEach(function (dirt) {
+    var type = dirt.value;
+    if (type && type._atomics) {
+      type._atomics = {};
+    }
+  });
+
+  // Clear 'modify'('dirty') cache
+  this.$__.activePaths.clear('modify');
+  this.$__.validationError = undefined;
+  this.errors = undefined;
+  var self = this;
+  this.schema.requiredPaths().forEach(function (path) {
+    self.$__.activePaths.require(path);
+  });
+
+  return this;
+}
+
+/**
+ * Returns this documents dirty paths / vals.
+ *
+ * @api private
+ * @method $__dirty
+ * @memberOf Document
+ */
+
+Document.prototype.$__dirty = function () {
+  var self = this;
+
+  var all = this.$__.activePaths.map('modify', function (path) {
+    return { path: path
+           , value: self.getValue(path)
+           , schema: self.$__path(path) };
+  });
+
+  // Sort dirty paths in a flat hierarchy.
+  all.sort(function (a, b) {
+    return (a.path < b.path ? -1 : (a.path > b.path ? 1 : 0));
+  });
+
+  // Ignore "foo.a" if "foo" is dirty already.
+  var minimal = []
+    , lastPath
+    , top;
+
+  all.forEach(function (item, i) {
+    if (item.path.indexOf(lastPath) !== 0) {
+      lastPath = item.path + '.';
+      minimal.push(item);
+      top = item;
+    } else {
+      // special case for top level MongooseArrays
+      if (top.value && top.value._atomics && top.value.hasAtomics()) {
+        // the `top` array itself and a sub path of `top` are being modified.
+        // the only way to honor all of both modifications is through a $set
+        // of entire array.
+        top.value._atomics = {};
+        top.value._atomics.$set = top.value;
+      }
+    }
+  });
+
+  top = lastPath = null;
+  return minimal;
+}
+
+/*!
+ * Compiles schemas.
+ */
+
+function compile (tree, proto, prefix) {
+  var keys = Object.keys(tree)
+    , i = keys.length
+    , limb
+    , key;
+
+  while (i--) {
+    key = keys[i];
+    limb = tree[key];
+
+    define(key
+        , (('Object' === utils.getFunctionName(limb.constructor)
+               && Object.keys(limb).length)
+               && (!limb.type || limb.type.type)
+               ? limb
+               : null)
+        , proto
+        , prefix
+        , keys);
+  }
+};
+
+/*!
+ * Defines the accessor named prop on the incoming prototype.
+ */
+
+function define (prop, subprops, prototype, prefix, keys) {
+  var prefix = prefix || ''
+    , path = (prefix ? prefix + '.' : '') + prop;
+
+  if (subprops) {
+
+    Object.defineProperty(prototype, prop, {
+        enumerable: true
+      , configurable: true
+      , get: function () {
+          if (!this.$__.getters)
+            this.$__.getters = {};
+
+          if (!this.$__.getters[path]) {
+            var nested = Object.create(this);
+
+            // save scope for nested getters/setters
+            if (!prefix) nested.$__.scope = this;
+
+            // shadow inherited getters from sub-objects so
+            // thing.nested.nested.nested... doesn't occur (gh-366)
+            var i = 0
+              , len = keys.length;
+
+            for (; i < len; ++i) {
+              // over-write the parents getter without triggering it
+              Object.defineProperty(nested, keys[i], {
+                  enumerable: false   // It doesn't show up.
+                , writable: true      // We can set it later.
+                , configurable: true  // We can Object.defineProperty again.
+                , value: undefined    // It shadows its parent.
+              });
+            }
+
+            nested.toObject = function () {
+              return this.get(path);
+            };
+
+            compile(subprops, nested, path);
+            this.$__.getters[path] = nested;
+          }
+
+          return this.$__.getters[path];
+        }
+      , set: function (v) {
+          if (v instanceof Document) v = v.toObject();
+          return (this.$__.scope || this).set(path, v);
+        }
+    });
+
+  } else {
+
+    Object.defineProperty(prototype, prop, {
+        enumerable: true
+      , configurable: true
+      , get: function ( ) { return this.get.call(this.$__.scope || this, path); }
+      , set: function (v) { return this.set.call(this.$__.scope || this, path, v); }
+    });
+  }
+}
+
+/**
+ * Assigns/compiles `schema` into this documents prototype.
+ *
+ * @param {Schema} schema
+ * @api private
+ * @method $__setSchema
+ * @memberOf Document
+ */
+
+Document.prototype.$__setSchema = function (schema) {
+  compile(schema.tree, this);
+  this.schema = schema;
+};
+
+
+/**
+ * Get active path that were changed and are arrays
+ *
+ * @api private
+ * @method $__getArrayPathsToValidate
+ * @memberOf Document
+ */
+
+Document.prototype.$__getArrayPathsToValidate = function () {
+  DocumentArray || (DocumentArray = require('./types/documentarray'));
+
+  // validate all document arrays.
+  return this.$__.activePaths
+    .map('init', 'modify', function (i) {
+      return this.getValue(i);
+    }.bind(this))
+    .filter(function (val) {
+      return val && val instanceof Array && val.isMongooseDocumentArray && val.length;
+    }).reduce(function(seed, array) {
+      return seed.concat(array);
+    }, [])
+    .filter(function (doc) {return doc});
+};
+
+
+/**
+ * Get all subdocs (by bfs)
+ *
+ * @api private
+ * @method $__getAllSubdocs
+ * @memberOf Document
+ */
+
+Document.prototype.$__getAllSubdocs = function () {
+  DocumentArray || (DocumentArray = require('./types/documentarray'));
+  Embedded = Embedded || require('./types/embedded');
+
+  function docReducer(seed, path) {
+    var val = this[path];
+    if (val instanceof Embedded) seed.push(val);
+    if (val && val.isMongooseDocumentArray) {
+      val.forEach(function _docReduce(doc) {
+        if (!doc || !doc._doc) return;
+        if (doc instanceof Embedded) seed.push(doc);
+        seed = Object.keys(doc._doc).reduce(docReducer.bind(doc._doc), seed);
+      });
+    }
+    return seed;
+  }
+
+  var subDocs = Object.keys(this._doc).reduce(docReducer.bind(this), []);
+
+  return subDocs;
+};
+
+
+/**
+ * Handle generic save stuff.
+ * to solve #1446 use use hierarchy instead of hooks
+ *
+ * @api private
+ * @method $__presaveValidate
+ * @memberOf Document
+ */
+
+Document.prototype.$__presaveValidate = function $__presaveValidate() {
+  // if any doc.set() calls failed
+
+  var docs = this.$__getArrayPathsToValidate();
+
+  var e2 = docs.map(function (doc) {
+    return doc.$__presaveValidate();
+  });
+  var e1 = [this.$__.saveError].concat(e2);
+  var err = e1.filter(function (x) {return x})[0];
+  this.$__.saveError = null;
+
+  return err;
+};
+
+
+/**
+ * Registers an error
+ *
+ * @param {Error} err
+ * @api private
+ * @method $__error
+ * @memberOf Document
+ */
+
+Document.prototype.$__error = function (err) {
+  this.$__.saveError = err;
+  return this;
+};
+
+/**
+ * Executes methods queued from the Schema definition
+ *
+ * @api private
+ * @method $__registerHooksFromSchema
+ * @memberOf Document
+ */
+
+Document.prototype.$__registerHooksFromSchema = function () {
+  Embedded = Embedded || require('./types/embedded');
+
+  var self = this;
+  var q = self.schema && self.schema.callQueue;
+  if (!q.length) return self;
+
+  // we are only interested in 'pre' hooks, and group by point-cut
+  var toWrap = q.reduce(function (seed, pair) {
+    var args = [].slice.call(pair[1]);
+    var pointCut = pair[0] === 'on' ? 'post' : args[0];
+    if (!(pointCut in seed)) seed[pointCut] = [];
+    seed[pointCut].push(args);
+    return seed;
+  }, {post: []});
+
+  // 'post' hooks are simpler
+  toWrap.post.forEach(function (args) {
+    self.on.apply(self, args);
+  });
+  delete toWrap.post;
+
+  Object.keys(toWrap).forEach(function (pointCut) {
+
+    // skip weird handlers
+    if (~"set ".indexOf(pointCut)) {
+      toWrap[pointCut].forEach(function (args) {
+        self.pre.apply(self, args);
+      });
+      return;
+    }
+
+    // this is so we can wrap everything into a promise;
+    var newName = ('$__original_' + pointCut);
+    self[newName] = self[pointCut];
+    self[pointCut] = function wrappedPointCut () {
+      var args = [].slice.call(arguments);
+      var lastArg = args.pop();
+
+      var wrapingPromise = new Promise;
+      wrapingPromise.end();
+      if (typeof lastArg == 'function') {
+        wrapingPromise.onResolve(lastArg);
+      }
+      if (!(this instanceof Embedded) && !wrapingPromise.hasRejectListeners()) {
+        wrapingPromise.onReject(self.$__handleReject.bind(self));
+      }
+      args.push(function () {
+        return wrapingPromise.resolve.apply(wrapingPromise, arguments);
+      });
+
+      // fire original
+      self[newName].apply(self, args);
+      return wrapingPromise;
+    };
+
+    toWrap[pointCut].forEach(function (args) {
+      args[0] = newName;
+      self.pre.apply(self, args);
+    });
+  })
+  return self;
+};
+
+
+Document.prototype.$__handleReject = function handleReject(err) {
+  // emit on the Model if listening
+  if (this.listeners('error').length) {
+    this.emit('error', err);
+  } else if (this.constructor.listeners && this.constructor.listeners('error').length) {
+    this.constructor.emit('error', err);
+  } else if (this.listeners && this.listeners('error').length) {
+    this.emit('error', err);
+  } else if (this.db) {
+    // emit on the connection
+    if (!this.db.listeners('error').length) {
+      err.stack = 'No listeners detected, throwing. Consider adding an error listener to your connection.\n' + err.stack
+    }
+    this.db.emit('error', err);
+  } else {
+    throw err;
+  }
+}
+
+
+
+/**
+ * Converts this document into a plain javascript object, ready for storage in MongoDB.
+ *
+ * Buffers are converted to instances of [mongodb.Binary](http://mongodb.github.com/node-mongodb-native/api-bson-generated/binary.html) for proper storage.
+ *
+ * ####Options:
+ *
+ * - `getters` apply all getters (path and virtual getters)
+ * - `virtuals` apply virtual getters (can override `getters` option)
+ * - `minimize` remove empty objects (defaults to true)
+ * - `transform` a transform function to apply to the resulting document before returning
+ * - `depopulate` depopulate any populated paths, replacing them with their original refs (defaults to false)
+ *
+ * ####Getters/Virtuals
+ *
+ * Example of only applying path getters
+ *
+ *     doc.toObject({ getters: true, virtuals: false })
+ *
+ * Example of only applying virtual getters
+ *
+ *     doc.toObject({ virtuals: true })
+ *
+ * Example of applying both path and virtual getters
+ *
+ *     doc.toObject({ getters: true })
+ *
+ * To apply these options to every document of your schema by default, set your [schemas](#schema_Schema) `toObject` option to the same argument.
+ *
+ *     schema.set('toObject', { virtuals: true })
+ *
+ * ####Transform
+ *
+ * We may need to perform a transformation of the resulting object based on some criteria, say to remove some sensitive information or return a custom object. In this case we set the optional `transform` function.
+ *
+ * Transform functions receive three arguments
+ *
+ *     function (doc, ret, options) {}
+ *
+ * - `doc` The mongoose document which is being converted
+ * - `ret` The plain object representation which has been converted
+ * - `options` The options in use (either schema options or the options passed inline)
+ *
+ * ####Example
+ *
+ *     // specify the transform schema option
+ *     if (!schema.options.toObject) schema.options.toObject = {};
+ *     schema.options.toObject.transform = function (doc, ret, options) {
+ *       // remove the _id of every document before returning the result
+ *       delete ret._id;
+ *     }
+ *
+ *     // without the transformation in the schema
+ *     doc.toObject(); // { _id: 'anId', name: 'Wreck-it Ralph' }
+ *
+ *     // with the transformation
+ *     doc.toObject(); // { name: 'Wreck-it Ralph' }
+ *
+ * With transformations we can do a lot more than remove properties. We can even return completely new customized objects:
+ *
+ *     if (!schema.options.toObject) schema.options.toObject = {};
+ *     schema.options.toObject.transform = function (doc, ret, options) {
+ *       return { movie: ret.name }
+ *     }
+ *
+ *     // without the transformation in the schema
+ *     doc.toObject(); // { _id: 'anId', name: 'Wreck-it Ralph' }
+ *
+ *     // with the transformation
+ *     doc.toObject(); // { movie: 'Wreck-it Ralph' }
+ *
+ * _Note: if a transform function returns `undefined`, the return value will be ignored._
+ *
+ * Transformations may also be applied inline, overridding any transform set in the options:
+ *
+ *     function xform (doc, ret, options) {
+ *       return { inline: ret.name, custom: true }
+ *     }
+ *
+ *     // pass the transform as an inline option
+ *     doc.toObject({ transform: xform }); // { inline: 'Wreck-it Ralph', custom: true }
+ *
+ * _Note: if you call `toObject` and pass any options, the transform declared in your schema options will __not__ be applied. To force its application pass `transform: true`_
+ *
+ *     if (!schema.options.toObject) schema.options.toObject = {};
+ *     schema.options.toObject.hide = '_id';
+ *     schema.options.toObject.transform = function (doc, ret, options) {
+ *       if (options.hide) {
+ *         options.hide.split(' ').forEach(function (prop) {
+ *           delete ret[prop];
+ *         });
+ *       }
+ *     }
+ *
+ *     var doc = new Doc({ _id: 'anId', secret: 47, name: 'Wreck-it Ralph' });
+ *     doc.toObject();                                        // { secret: 47, name: 'Wreck-it Ralph' }
+ *     doc.toObject({ hide: 'secret _id' });                  // { _id: 'anId', secret: 47, name: 'Wreck-it Ralph' }
+ *     doc.toObject({ hide: 'secret _id', transform: true }); // { name: 'Wreck-it Ralph' }
+ *
+ * Transforms are applied to the document _and each of its sub-documents_. To determine whether or not you are currently operating on a sub-document you might use the following guard:
+ *
+ *     if ('function' == typeof doc.ownerDocument) {
+ *       // working with a sub doc
+ *     }
+ *
+ * Transforms, like all of these options, are also available for `toJSON`.
+ *
+ * See [schema options](/docs/guide.html#toObject) for some more details.
+ *
+ * _During save, no custom options are applied to the document before being sent to the database._
+ *
+ * @param {Object} [options]
+ * @return {Object} js object
+ * @see mongodb.Binary http://mongodb.github.com/node-mongodb-native/api-bson-generated/binary.html
+ * @api public
+ */
+
+Document.prototype.toObject = function (options) {
+  if (options && options.depopulate && this.$__.wasPopulated) {
+    // populated paths that we set to a document
+    return clone(this._id, options);
+  }
+
+  // When internally saving this document we always pass options,
+  // bypassing the custom schema options.
+  var optionsParameter = options;
+  if (!(options && 'Object' == utils.getFunctionName(options.constructor)) ||
+      (options && options._useSchemaOptions)) {
+    options = this.schema.options.toObject
+      ? clone(this.schema.options.toObject)
+      : {};
+  }
+
+  ;('minimize' in options) || (options.minimize = this.schema.options.minimize);
+  if (!optionsParameter) {
+    options._useSchemaOptions = true;
+  }
+
+  var ret = clone(this._doc, options);
+
+  if (options.virtuals || options.getters && false !== options.virtuals) {
+    applyGetters(this, ret, 'virtuals', options);
+  }
+
+  if (options.getters) {
+    applyGetters(this, ret, 'paths', options);
+    // applyGetters for paths will add nested empty objects;
+    // if minimize is set, we need to remove them.
+    if (options.minimize) {
+      ret = minimize(ret) || {};
+    }
+  }
+
+  // In the case where a subdocument has its own transform function, we need to
+  // check and see if the parent has a transform (options.transform) and if the
+  // child schema has a transform (this.schema.options.toObject) In this case,
+  // we need to adjust options.transform to be the child schema's transform and
+  // not the parent schema's
+  if (true === options.transform ||
+      (this.schema.options.toObject && options.transform)) {
+    var opts = options.json
+      ? this.schema.options.toJSON
+      : this.schema.options.toObject;
+    if (opts) {
+      options.transform = opts.transform;
+    }
+  }
+
+  if ('function' == typeof options.transform) {
+    var xformed = options.transform(this, ret, options);
+    if ('undefined' != typeof xformed) ret = xformed;
+  }
+
+  return ret;
+};
+
+/*!
+ * Minimizes an object, removing undefined values and empty objects
+ *
+ * @param {Object} object to minimize
+ * @return {Object}
+ */
+
+function minimize (obj) {
+  var keys = Object.keys(obj)
+    , i = keys.length
+    , hasKeys
+    , key
+    , val
+
+  while (i--) {
+    key = keys[i];
+    val = obj[key];
+
+    if (utils.isObject(val)) {
+      obj[key] = minimize(val);
+    }
+
+    if (undefined === obj[key]) {
+      delete obj[key];
+      continue;
+    }
+
+    hasKeys = true;
+  }
+
+  return hasKeys
+    ? obj
+    : undefined;
+}
+
+/*!
+ * Applies virtuals properties to `json`.
+ *
+ * @param {Document} self
+ * @param {Object} json
+ * @param {String} type either `virtuals` or `paths`
+ * @return {Object} `json`
+ */
+
+function applyGetters (self, json, type, options) {
+  var schema = self.schema
+    , paths = Object.keys(schema[type])
+    , i = paths.length
+    , path
+
+  while (i--) {
+    path = paths[i];
+
+    var parts = path.split('.')
+      , plen = parts.length
+      , last = plen - 1
+      , branch = json
+      , part
+
+    for (var ii = 0; ii < plen; ++ii) {
+      part = parts[ii];
+      if (ii === last) {
+        branch[part] = clone(self.get(path), options);
+      } else {
+        branch = branch[part] || (branch[part] = {});
+      }
+    }
+  }
+
+  return json;
+}
+
+/**
+ * The return value of this method is used in calls to JSON.stringify(doc).
+ *
+ * This method accepts the same options as [Document#toObject](#document_Document-toObject). To apply the options to every document of your schema by default, set your [schemas](#schema_Schema) `toJSON` option to the same argument.
+ *
+ *     schema.set('toJSON', { virtuals: true })
+ *
+ * See [schema options](/docs/guide.html#toJSON) for details.
+ *
+ * @param {Object} options
+ * @return {Object}
+ * @see Document#toObject #document_Document-toObject
+ * @api public
+ */
+
+Document.prototype.toJSON = function (options) {
+  // check for object type since an array of documents
+  // being stringified passes array indexes instead
+  // of options objects. JSON.stringify([doc, doc])
+  // The second check here is to make sure that populated documents (or
+  // subdocuments) use their own options for `.toJSON()` instead of their
+  // parent's
+  if (!(options && 'Object' == utils.getFunctionName(options.constructor))
+      || ((!options || options.json) && this.schema.options.toJSON)) {
+    options = this.schema.options.toJSON
+      ? clone(this.schema.options.toJSON)
+      : {};
+  }
+  options.json = true;
+
+  return this.toObject(options);
+};
+
+/**
+ * Helper for console.log
+ *
+ * @api public
+ */
+
+Document.prototype.inspect = function (options) {
+  var opts = options && 'Object' == utils.getFunctionName(options.constructor) ? options :
+      this.schema.options.toObject ? clone(this.schema.options.toObject) :
+      {};
+  opts.minimize = false;
+  return inspect(this.toObject(opts));
+};
+
+/**
+ * Helper for console.log
+ *
+ * @api public
+ * @method toString
+ */
+
+Document.prototype.toString = Document.prototype.inspect;
+
+/**
+ * Returns true if the Document stores the same data as doc.
+ *
+ * Documents are considered equal when they have matching `_id`s, unless neither
+ * document has an `_id`, in which case this function falls back to using
+ * `deepEqual()`.
+ *
+ * @param {Document} doc a document to compare
+ * @return {Boolean}
+ * @api public
+ */
+
+Document.prototype.equals = function (doc) {
+  var tid = this.get('_id');
+  var docid = doc.get('_id');
+  if (!tid && !docid) {
+    return deepEqual(this, doc);
+  }
+  return tid && tid.equals
+    ? tid.equals(docid)
+    : tid === docid;
+};
+
+/**
+ * Populates document references, executing the `callback` when complete.
+ *
+ * ####Example:
+ *
+ *     doc
+ *     .populate('company')
+ *     .populate({
+ *       path: 'notes',
+ *       match: /airline/,
+ *       select: 'text',
+ *       model: 'modelName'
+ *       options: opts
+ *     }, function (err, user) {
+ *       assert(doc._id == user._id) // the document itself is passed
+ *     })
+ *
+ *     // summary
+ *     doc.populate(path)               // not executed
+ *     doc.populate(options);           // not executed
+ *     doc.populate(path, callback)     // executed
+ *     doc.populate(options, callback); // executed
+ *     doc.populate(callback);          // executed
+ *
+ *
+ * ####NOTE:
+ *
+ * Population does not occur unless a `callback` is passed.
+ * Passing the same path a second time will overwrite the previous path options.
+ * See [Model.populate()](#model_Model.populate) for explaination of options.
+ *
+ * @see Model.populate #model_Model.populate
+ * @param {String|Object} [path] The path to populate or an options object
+ * @param {Function} [callback] When passed, population is invoked
+ * @api public
+ * @return {Document} this
+ */
+
+Document.prototype.populate = function populate () {
+  if (0 === arguments.length) return this;
+
+  var pop = this.$__.populate || (this.$__.populate = {});
+  var args = utils.args(arguments);
+  var fn;
+
+  if ('function' == typeof args[args.length-1]) {
+    fn = args.pop();
+  }
+
+  // allow `doc.populate(callback)`
+  if (args.length) {
+    // use hash to remove duplicate paths
+    var res = utils.populate.apply(null, args);
+    for (var i = 0; i < res.length; ++i) {
+      pop[res[i].path] = res[i];
+    }
+  }
+
+  if (fn) {
+    var paths = utils.object.vals(pop);
+    this.$__.populate = undefined;
+    this.constructor.populate(this, paths, fn);
+  }
+
+  return this;
+}
+
+/**
+ * Gets _id(s) used during population of the given `path`.
+ *
+ * ####Example:
+ *
+ *     Model.findOne().populate('author').exec(function (err, doc) {
+ *       console.log(doc.author.name)         // Dr.Seuss
+ *       console.log(doc.populated('author')) // '5144cf8050f071d979c118a7'
+ *     })
+ *
+ * If the path was not populated, undefined is returned.
+ *
+ * @param {String} path
+ * @return {Array|ObjectId|Number|Buffer|String|undefined}
+ * @api public
+ */
+
+Document.prototype.populated = function (path, val, options) {
+  // val and options are internal
+
+  if (null == val) {
+    if (!this.$__.populated) return undefined;
+    var v = this.$__.populated[path];
+    if (v) return v.value;
+    return undefined;
+  }
+
+  // internal
+
+  if (true === val) {
+    if (!this.$__.populated) return undefined;
+    return this.$__.populated[path];
+  }
+
+  this.$__.populated || (this.$__.populated = {});
+  this.$__.populated[path] = { value: val, options: options };
+  return val;
+}
+
+/**
+ * Returns the full path to this document.
+ *
+ * @param {String} [path]
+ * @return {String}
+ * @api private
+ * @method $__fullPath
+ * @memberOf Document
+ */
+
+Document.prototype.$__fullPath = function (path) {
+  // overridden in SubDocuments
+  return path || '';
+}
+
+/*!
+ * Module exports.
+ */
+
+Document.ValidationError = ValidationError;
+module.exports = exports = Document;
+
+}).call(this,require("FWaASH"))
+},{"./error":8,"./internal":17,"./promise":18,"./schema":19,"./schema/mixed":26,"./schematype":30,"./types/array":32,"./types/documentarray":34,"./types/embedded":35,"./types/objectid":37,"./utils":38,"FWaASH":45,"events":43,"hooks":48,"util":47}],4:[function(require,module,exports){
 var utils = require('./utils');
 var Types = require('./schema/index');
 
@@ -277,7 +2200,7 @@ var cast = module.exports = function(schema, obj) {
 
   return obj;
 }
-},{"./schema/index":24,"./utils":37}],4:[function(require,module,exports){
+},{"./schema/index":25,"./utils":38}],5:[function(require,module,exports){
 (function (process){
 /*!
  * Module dependencies.
@@ -315,48 +2238,22 @@ var EventEmitter = require('events').EventEmitter
  * @api private
  */
 
-function Document (obj, schema, fields, skipId, skipInit) {
-  if ( !(this instanceof Document) )
-    return new Document( obj, schema, fields, skipId, skipInit );
-
-
-  if (utils.isObject(schema) && !(schema instanceof Schema)) {
-    schema = new Schema(schema);
-  }
-
-  // When creating EmbeddedDocument, it already has the schema and he doesn't need the _id
-  schema = this.schema || schema;
-
-  // Generate ObjectId if it is missing, but it requires a scheme
-  if ( !this.schema && schema.options._id ){
-    obj = obj || {};
-
-    if ( obj._id === undefined ){
-      obj._id = new ObjectId();
-    }
-  }
-
-  if ( !schema ){
-    throw new MongooseError.MissingSchemaError();
-  }
-
-  this.$__setSchema(schema);
-
+function Document (obj, fields, skipId) {
   this.$__ = new InternalCache;
   this.isNew = true;
   this.errors = undefined;
 
-  //var schema = this.schema;
+  var schema = this.schema;
 
   if ('boolean' === typeof fields) {
     this.$__.strictMode = fields;
     fields = undefined;
   } else {
-    this.$__.strictMode = this.schema.options && this.schema.options.strict;
+    this.$__.strictMode = schema.options && schema.options.strict;
     this.$__.selected = fields;
   }
 
-  var required = this.schema.requiredPaths();
+  var required = schema.requiredPaths();
   for (var i = 0; i < required.length; ++i) {
     this.$__.activePaths.require(required[i]);
   }
@@ -364,24 +2261,11 @@ function Document (obj, schema, fields, skipId, skipInit) {
   setMaxListeners.call(this, 0);
   this._doc = this.$__buildDoc(obj, fields, skipId);
 
-  /*if (obj) {
+  if (obj) {
     this.set(obj, undefined, true);
-  }*/
-
-  if ( !skipInit && obj ){
-    this.init( obj );
   }
 
   this.$__registerHooksFromSchema();
-
-  // apply methods
-  for ( var m in schema.methods ){
-    this[ m ] = schema.methods[ m ];
-  }
-  // apply statics
-  for ( var s in schema.statics ){
-    this[ s ] = schema.statics[ s ];
-  }
 }
 
 /*!
@@ -2200,7 +4084,7 @@ Document.ValidationError = ValidationError;
 module.exports = exports = Document;
 
 }).call(this,require("FWaASH"))
-},{"./error":7,"./internal":16,"./promise":17,"./schema":18,"./schema/mixed":25,"./schematype":29,"./types/array":31,"./types/documentarray":33,"./types/embedded":34,"./types/objectid":36,"./utils":37,"FWaASH":44,"events":42,"hooks":47,"util":46}],5:[function(require,module,exports){
+},{"./error":8,"./internal":17,"./promise":18,"./schema":19,"./schema/mixed":26,"./schematype":30,"./types/array":32,"./types/documentarray":34,"./types/embedded":35,"./types/objectid":37,"./utils":38,"FWaASH":45,"events":43,"hooks":48,"util":47}],6:[function(require,module,exports){
 
 /*!
  * Module dependencies.
@@ -2210,7 +4094,7 @@ var Binary = require('mongodb/node_modules/bson').Binary;
 
 module.exports = exports = Binary;
 
-},{"mongodb/node_modules/bson":51}],6:[function(require,module,exports){
+},{"mongodb/node_modules/bson":52}],7:[function(require,module,exports){
 
 /*!
  * [node-mongodb-native](https://github.com/mongodb/node-mongodb-native) ObjectId
@@ -2227,9 +4111,9 @@ var ObjectId = require('mongodb/node_modules/bson').ObjectID;
 module.exports = exports = ObjectId;
 
 
-},{"mongodb/node_modules/bson":51}],7:[function(require,module,exports){
+},{"mongodb/node_modules/bson":52}],8:[function(require,module,exports){
 module.exports=require(1)
-},{"./error/cast":8,"./error/divergentArray":9,"./error/messages":10,"./error/missingSchema":11,"./error/overwriteModel":12,"./error/validation":13,"./error/validator":14,"./error/version":15}],8:[function(require,module,exports){
+},{"./error/cast":9,"./error/divergentArray":10,"./error/messages":11,"./error/missingSchema":12,"./error/overwriteModel":13,"./error/validation":14,"./error/validator":15,"./error/version":16}],9:[function(require,module,exports){
 /*!
  * Module dependencies.
  */
@@ -2268,7 +4152,7 @@ CastError.prototype.constructor = MongooseError;
 
 module.exports = CastError;
 
-},{"../error.js":7}],9:[function(require,module,exports){
+},{"../error.js":8}],10:[function(require,module,exports){
 
 /*!
  * Module dependencies.
@@ -2312,7 +4196,7 @@ DivergentArrayError.prototype.constructor = MongooseError;
 
 module.exports = DivergentArrayError;
 
-},{"../error.js":7}],10:[function(require,module,exports){
+},{"../error.js":8}],11:[function(require,module,exports){
 
 /**
  * The default built-in validator error messages. These may be customized.
@@ -2351,7 +4235,7 @@ msg.String.enum = "`{VALUE}` is not a valid enum value for path `{PATH}`.";
 msg.String.match = "Path `{PATH}` is invalid ({VALUE}).";
 
 
-},{}],11:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 
 /*!
  * Module dependencies.
@@ -2386,7 +4270,7 @@ MissingSchemaError.prototype.constructor = MongooseError;
 
 module.exports = MissingSchemaError;
 
-},{"../error.js":7}],12:[function(require,module,exports){
+},{"../error.js":8}],13:[function(require,module,exports){
 
 /*!
  * Module dependencies.
@@ -2419,7 +4303,7 @@ OverwriteModelError.prototype.constructor = MongooseError;
 
 module.exports = OverwriteModelError;
 
-},{"../error.js":7}],13:[function(require,module,exports){
+},{"../error.js":8}],14:[function(require,module,exports){
 
 /*!
  * Module requirements
@@ -2472,7 +4356,7 @@ ValidationError.prototype.toString = function () {
 
 module.exports = exports = ValidationError;
 
-},{"../error.js":7}],14:[function(require,module,exports){
+},{"../error.js":8}],15:[function(require,module,exports){
 /*!
  * Module dependencies.
  */
@@ -2523,7 +4407,7 @@ ValidatorError.prototype.toString = function () {
 
 module.exports = ValidatorError;
 
-},{"../error.js":7}],15:[function(require,module,exports){
+},{"../error.js":8}],16:[function(require,module,exports){
 
 /*!
  * Module dependencies.
@@ -2557,7 +4441,7 @@ VersionError.prototype.constructor = MongooseError;
 
 module.exports = VersionError;
 
-},{"../error.js":7}],16:[function(require,module,exports){
+},{"../error.js":8}],17:[function(require,module,exports){
 /*!
  * Dependencies
  */
@@ -2590,7 +4474,7 @@ function InternalCache () {
   this.fullPath = undefined;
 }
 
-},{"./statemachine":30}],17:[function(require,module,exports){
+},{"./statemachine":31}],18:[function(require,module,exports){
 /*!
  * Module dependencies
  */
@@ -2824,7 +4708,7 @@ Promise.prototype.addErrback = Promise.prototype.onReject;
 
 module.exports = Promise;
 
-},{"mpromise":64}],18:[function(require,module,exports){
+},{"mpromise":65}],19:[function(require,module,exports){
 /*!
  * Module dependencies.
  */
@@ -3764,7 +5648,7 @@ Schema.Types = MongooseTypes = require('./schema/index');
 var ObjectId = exports.ObjectId = MongooseTypes.ObjectId;
 
 
-},{"./schema/index":24,"./utils":37,"./virtualtype":38,"events":42}],19:[function(require,module,exports){
+},{"./schema/index":25,"./utils":38,"./virtualtype":39,"events":43}],20:[function(require,module,exports){
 /*!
  * Module dependencies.
  */
@@ -4125,7 +6009,7 @@ handle.$lte = SchemaArray.prototype.castForQuery;
 
 module.exports = SchemaArray;
 
-},{"../cast":3,"../schematype":29,"../types":35,"../utils":37,"./boolean":20,"./buffer":21,"./date":22,"./mixed":25,"./number":26,"./objectid":27,"./string":28}],20:[function(require,module,exports){
+},{"../cast":4,"../schematype":30,"../types":36,"../utils":38,"./boolean":21,"./buffer":22,"./date":23,"./mixed":26,"./number":27,"./objectid":28,"./string":29}],21:[function(require,module,exports){
 /*!
  * Module dependencies.
  */
@@ -4221,7 +6105,7 @@ SchemaBoolean.prototype.castForQuery = function ($conditional, val) {
 
 module.exports = SchemaBoolean;
 
-},{"../schematype":29,"../utils":37}],21:[function(require,module,exports){
+},{"../schematype":30,"../utils":38}],22:[function(require,module,exports){
 (function (Buffer){
 /*!
  * Module dependencies.
@@ -4392,7 +6276,7 @@ SchemaBuffer.prototype.castForQuery = function ($conditional, val) {
 module.exports = SchemaBuffer;
 
 }).call(this,require("buffer").Buffer)
-},{"../schematype":29,"../types":35,"../utils":37,"./../document":4,"buffer":39}],22:[function(require,module,exports){
+},{"../schematype":30,"../types":36,"../utils":38,"./../document":5,"buffer":40}],23:[function(require,module,exports){
 /*!
  * Module requirements.
  */
@@ -4561,7 +6445,7 @@ SchemaDate.prototype.castForQuery = function ($conditional, val) {
 
 module.exports = SchemaDate;
 
-},{"../schematype":29,"../utils":37}],23:[function(require,module,exports){
+},{"../schematype":30,"../utils":38}],24:[function(require,module,exports){
 
 /*!
  * Module dependencies.
@@ -4757,7 +6641,7 @@ function scopePaths (array, fields, init) {
 
 module.exports = DocumentArray;
 
-},{"../document":4,"../schematype":29,"../types/documentarray":33,"../types/embedded":34,"../utils.js":37,"./array":19}],24:[function(require,module,exports){
+},{"../document":5,"../schematype":30,"../types/documentarray":34,"../types/embedded":35,"../utils.js":38,"./array":20}],25:[function(require,module,exports){
 
 /*!
  * Module exports.
@@ -4787,7 +6671,7 @@ exports.Oid = exports.ObjectId;
 exports.Object = exports.Mixed;
 exports.Bool = exports.Boolean;
 
-},{"./array":19,"./boolean":20,"./buffer":21,"./date":22,"./documentarray":23,"./mixed":25,"./number":26,"./objectid":27,"./string":28}],25:[function(require,module,exports){
+},{"./array":20,"./boolean":21,"./buffer":22,"./date":23,"./documentarray":24,"./mixed":26,"./number":27,"./objectid":28,"./string":29}],26:[function(require,module,exports){
 
 /*!
  * Module dependencies.
@@ -4872,7 +6756,7 @@ Mixed.prototype.castForQuery = function ($cond, val) {
 
 module.exports = Mixed;
 
-},{"../schematype":29,"../utils":37}],26:[function(require,module,exports){
+},{"../schematype":30,"../utils":38}],27:[function(require,module,exports){
 (function (Buffer){
 /*!
  * Module requirements.
@@ -5132,7 +7016,7 @@ SchemaNumber.prototype.castForQuery = function ($conditional, val) {
 module.exports = SchemaNumber;
 
 }).call(this,require("buffer").Buffer)
-},{"../error":7,"../schematype":29,"../utils":37,"./../document":4,"buffer":39}],27:[function(require,module,exports){
+},{"../error":8,"../schematype":30,"../utils":38,"./../document":5,"buffer":40}],28:[function(require,module,exports){
 (function (Buffer){
 /*!
  * Module dependencies.
@@ -5321,7 +7205,7 @@ function resetId (v) {
 module.exports = ObjectId;
 
 }).call(this,require("buffer").Buffer)
-},{"../schematype":29,"../types/objectid":36,"../utils":37,"./../document":4,"buffer":39}],28:[function(require,module,exports){
+},{"../schematype":30,"../types/objectid":37,"../utils":38,"./../document":5,"buffer":40}],29:[function(require,module,exports){
 (function (Buffer){
 
 /*!
@@ -5681,7 +7565,7 @@ SchemaString.prototype.castForQuery = function ($conditional, val) {
 module.exports = SchemaString;
 
 }).call(this,require("buffer").Buffer)
-},{"../error":7,"../schematype":29,"../utils":37,"./../document":4,"buffer":39}],29:[function(require,module,exports){
+},{"../error":8,"../schematype":30,"../utils":38,"./../document":5,"buffer":40}],30:[function(require,module,exports){
 (function (Buffer){
 /*!
  * Module dependencies.
@@ -6373,7 +8257,7 @@ exports.CastError = CastError;
 exports.ValidatorError = ValidatorError;
 
 }).call(this,require("buffer").Buffer)
-},{"./error":7,"./utils":37,"buffer":39}],30:[function(require,module,exports){
+},{"./error":8,"./utils":38,"buffer":40}],31:[function(require,module,exports){
 
 /*!
  * Module dependencies.
@@ -6554,7 +8438,7 @@ StateMachine.prototype.map = function map () {
 }
 
 
-},{"./utils":37}],31:[function(require,module,exports){
+},{"./utils":38}],32:[function(require,module,exports){
 (function (Buffer){
 
 /*!
@@ -7234,7 +9118,7 @@ MongooseArray.mixin.remove = MongooseArray.mixin.pull;
 module.exports = exports = MongooseArray;
 
 }).call(this,require("buffer").Buffer)
-},{"../document":4,"../utils":37,"./embedded":34,"./objectid":36,"buffer":39}],32:[function(require,module,exports){
+},{"../document":5,"../utils":38,"./embedded":35,"./objectid":37,"buffer":40}],33:[function(require,module,exports){
 (function (global,Buffer){
 
 /*!
@@ -7498,7 +9382,7 @@ MongooseBuffer.Binary = Binary;
 module.exports = MongooseBuffer;
 
 }).call(this,typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer)
-},{"../drivers/node-mongodb-native/binary":5,"../utils":37,"buffer":39}],33:[function(require,module,exports){
+},{"../drivers/node-mongodb-native/binary":6,"../utils":38,"buffer":40}],34:[function(require,module,exports){
 (function (Buffer){
 /*!
  * Module dependencies.
@@ -7701,7 +9585,7 @@ MongooseDocumentArray.mixin.notify = function notify (event) {
 module.exports = MongooseDocumentArray;
 
 }).call(this,require("buffer").Buffer)
-},{"../document":4,"../drivers/node-mongodb-native/objectid":6,"../schema/objectid":27,"../utils":37,"./array":31,"buffer":39,"util":46}],34:[function(require,module,exports){
+},{"../document":5,"../drivers/node-mongodb-native/objectid":7,"../schema/objectid":28,"../utils":38,"./array":32,"buffer":40,"util":47}],35:[function(require,module,exports){
 /*!
  * Module dependencies.
  */
@@ -7971,7 +9855,7 @@ EmbeddedDocument.prototype.parentArray = function () {
 
 module.exports = EmbeddedDocument;
 
-},{"../document":4,"../promise":17,"util":46}],35:[function(require,module,exports){
+},{"../document":5,"../promise":18,"util":47}],36:[function(require,module,exports){
 
 /*!
  * Module exports.
@@ -7986,7 +9870,7 @@ exports.Embedded = require('./embedded');
 exports.DocumentArray = require('./documentarray');
 exports.ObjectId = require('./objectid');
 
-},{"./array":31,"./buffer":32,"./documentarray":33,"./embedded":34,"./objectid":36}],36:[function(require,module,exports){
+},{"./array":32,"./buffer":33,"./documentarray":34,"./embedded":35,"./objectid":37}],37:[function(require,module,exports){
 (function (global){
 
 /*!
@@ -8010,7 +9894,7 @@ module.exports = ObjectId;
 
 
 }).call(this,typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"../drivers/node-mongodb-native/objectid":6}],37:[function(require,module,exports){
+},{"../drivers/node-mongodb-native/objectid":7}],38:[function(require,module,exports){
 (function (process,Buffer){
 /*!
  * Module dependencies.
@@ -8441,7 +10325,7 @@ exports.tick = function tick (callback) {
  */
 
 exports.isMongooseObject = function (v) {
-  Document || (Document = require('./document'));
+  Document || (Document = require('./browserDocument'));
   MongooseArray || (MongooseArray = require('./types').Array);
   MongooseBuffer || (MongooseBuffer = require('./types').Buffer);
 
@@ -8712,7 +10596,7 @@ exports.decorate = function(destination, source) {
 
 
 }).call(this,require("FWaASH"),require("buffer").Buffer)
-},{"./document":4,"./types":35,"./types/objectid":36,"FWaASH":44,"buffer":39,"mongodb/lib/mongodb/connection/read_preference":48,"mpath":62,"ms":66,"regexp-clone":67,"sliced":68}],38:[function(require,module,exports){
+},{"./browserDocument":3,"./types":36,"./types/objectid":37,"FWaASH":45,"buffer":40,"mongodb/lib/mongodb/connection/read_preference":49,"mpath":63,"ms":67,"regexp-clone":68,"sliced":69}],39:[function(require,module,exports){
 
 /**
  * VirtualType constructor
@@ -8817,7 +10701,7 @@ VirtualType.prototype.applySetters = function (value, scope) {
 
 module.exports = VirtualType;
 
-},{}],39:[function(require,module,exports){
+},{}],40:[function(require,module,exports){
 /*!
  * The buffer module from node.js, for the browser.
  *
@@ -9988,7 +11872,7 @@ function assert (test, message) {
   if (!test) throw new Error(message || 'Failed assertion')
 }
 
-},{"base64-js":40,"ieee754":41}],40:[function(require,module,exports){
+},{"base64-js":41,"ieee754":42}],41:[function(require,module,exports){
 var lookup = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
 
 ;(function (exports) {
@@ -10110,7 +11994,7 @@ var lookup = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
 	exports.fromByteArray = uint8ToBase64
 }(typeof exports === 'undefined' ? (this.base64js = {}) : exports))
 
-},{}],41:[function(require,module,exports){
+},{}],42:[function(require,module,exports){
 exports.read = function(buffer, offset, isLE, mLen, nBytes) {
   var e, m,
       eLen = nBytes * 8 - mLen - 1,
@@ -10196,7 +12080,7 @@ exports.write = function(buffer, value, offset, isLE, mLen, nBytes) {
   buffer[offset + i - d] |= s * 128;
 };
 
-},{}],42:[function(require,module,exports){
+},{}],43:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -10256,10 +12140,8 @@ EventEmitter.prototype.emit = function(type) {
       er = arguments[1];
       if (er instanceof Error) {
         throw er; // Unhandled 'error' event
-      } else {
-        throw TypeError('Uncaught, unspecified "error" event.');
       }
-      return false;
+      throw TypeError('Uncaught, unspecified "error" event.');
     }
   }
 
@@ -10501,7 +12383,7 @@ function isUndefined(arg) {
   return arg === void 0;
 }
 
-},{}],43:[function(require,module,exports){
+},{}],44:[function(require,module,exports){
 if (typeof Object.create === 'function') {
   // implementation from standard node.js 'util' module
   module.exports = function inherits(ctor, superCtor) {
@@ -10526,7 +12408,7 @@ if (typeof Object.create === 'function') {
   }
 }
 
-},{}],44:[function(require,module,exports){
+},{}],45:[function(require,module,exports){
 // shim for using process in browser
 
 var process = module.exports = {};
@@ -10591,14 +12473,14 @@ process.chdir = function (dir) {
     throw new Error('process.chdir is not supported');
 };
 
-},{}],45:[function(require,module,exports){
+},{}],46:[function(require,module,exports){
 module.exports = function isBuffer(arg) {
   return arg && typeof arg === 'object'
     && typeof arg.copy === 'function'
     && typeof arg.fill === 'function'
     && typeof arg.readUInt8 === 'function';
 }
-},{}],46:[function(require,module,exports){
+},{}],47:[function(require,module,exports){
 (function (process,global){
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -11188,7 +13070,7 @@ function hasOwnProperty(obj, prop) {
 }
 
 }).call(this,require("FWaASH"),typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./support/isBuffer":45,"FWaASH":44,"inherits":43}],47:[function(require,module,exports){
+},{"./support/isBuffer":46,"FWaASH":45,"inherits":44}],48:[function(require,module,exports){
 // TODO Add in pre and post skipping options
 module.exports = {
   /**
@@ -11364,7 +13246,7 @@ function once (fn, scope) {
   };
 }
 
-},{}],48:[function(require,module,exports){
+},{}],49:[function(require,module,exports){
 /**
  * A class representation of the Read Preference.
  *
@@ -11432,7 +13314,7 @@ ReadPreference.NEAREST = 'nearest'
  * @ignore
  */
 exports.ReadPreference  = ReadPreference;
-},{}],49:[function(require,module,exports){
+},{}],50:[function(require,module,exports){
 /**
  * Module dependencies.
  */
@@ -11777,7 +13659,7 @@ Binary.SUBTYPE_USER_DEFINED = 128;
 exports.Binary = Binary;
 
 
-},{"buffer":39}],50:[function(require,module,exports){
+},{"buffer":40}],51:[function(require,module,exports){
 (function (process){
 /**
  * Binary Parser.
@@ -12166,7 +14048,7 @@ BinaryParser.Buffer = BinaryParserBuffer;
 exports.BinaryParser = BinaryParser;
 
 }).call(this,require("FWaASH"))
-},{"FWaASH":44,"util":46}],51:[function(require,module,exports){
+},{"FWaASH":45,"util":47}],52:[function(require,module,exports){
 (function (Buffer){
 var Long = require('./long').Long
   , Double = require('./double').Double
@@ -13719,7 +15601,7 @@ exports.MinKey = MinKey;
 exports.MaxKey = MaxKey;
 
 }).call(this,require("buffer").Buffer)
-},{"./binary":49,"./binary_parser":50,"./code":52,"./db_ref":53,"./double":54,"./float_parser":55,"./long":56,"./max_key":57,"./min_key":58,"./objectid":59,"./symbol":60,"./timestamp":61,"buffer":39}],52:[function(require,module,exports){
+},{"./binary":50,"./binary_parser":51,"./code":53,"./db_ref":54,"./double":55,"./float_parser":56,"./long":57,"./max_key":58,"./min_key":59,"./objectid":60,"./symbol":61,"./timestamp":62,"buffer":40}],53:[function(require,module,exports){
 /**
  * A class representation of the BSON Code type.
  *
@@ -13745,7 +15627,7 @@ Code.prototype.toJSON = function() {
 }
 
 exports.Code = Code;
-},{}],53:[function(require,module,exports){
+},{}],54:[function(require,module,exports){
 /**
  * A class representation of the BSON DBRef type.
  *
@@ -13777,7 +15659,7 @@ DBRef.prototype.toJSON = function() {
 }
 
 exports.DBRef = DBRef;
-},{}],54:[function(require,module,exports){
+},{}],55:[function(require,module,exports){
 /**
  * A class representation of the BSON Double type.
  *
@@ -13811,7 +15693,7 @@ Double.prototype.toJSON = function() {
 }
 
 exports.Double = Double;
-},{}],55:[function(require,module,exports){
+},{}],56:[function(require,module,exports){
 // Copyright (c) 2008, Fair Oaks Labs, Inc.
 // All rights reserved.
 // 
@@ -13933,7 +15815,7 @@ var writeIEEE754 = function(buffer, value, offset, endian, mLen, nBytes) {
 
 exports.readIEEE754 = readIEEE754;
 exports.writeIEEE754 = writeIEEE754;
-},{}],56:[function(require,module,exports){
+},{}],57:[function(require,module,exports){
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -14788,7 +16670,7 @@ Long.TWO_PWR_24_ = Long.fromInt(1 << 24);
  * Expose.
  */
 exports.Long = Long;
-},{}],57:[function(require,module,exports){
+},{}],58:[function(require,module,exports){
 /**
  * A class representation of the BSON MaxKey type.
  *
@@ -14802,7 +16684,7 @@ function MaxKey() {
 }
 
 exports.MaxKey = MaxKey;
-},{}],58:[function(require,module,exports){
+},{}],59:[function(require,module,exports){
 /**
  * A class representation of the BSON MinKey type.
  *
@@ -14816,7 +16698,7 @@ function MinKey() {
 }
 
 exports.MinKey = MinKey;
-},{}],59:[function(require,module,exports){
+},{}],60:[function(require,module,exports){
 (function (process){
 /**
  * Module dependencies.
@@ -15084,7 +16966,7 @@ exports.ObjectID = ObjectID;
 exports.ObjectId = ObjectID;
 
 }).call(this,require("FWaASH"))
-},{"./binary_parser":50,"FWaASH":44}],60:[function(require,module,exports){
+},{"./binary_parser":51,"FWaASH":45}],61:[function(require,module,exports){
 /**
  * A class representation of the BSON Symbol type.
  *
@@ -15133,7 +17015,7 @@ Symbol.prototype.toJSON = function() {
 }
 
 exports.Symbol = Symbol;
-},{}],61:[function(require,module,exports){
+},{}],62:[function(require,module,exports){
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -15987,10 +17869,10 @@ Timestamp.TWO_PWR_24_ = Timestamp.fromInt(1 << 24);
  * Expose.
  */
 exports.Timestamp = Timestamp;
-},{}],62:[function(require,module,exports){
+},{}],63:[function(require,module,exports){
 module.exports = exports = require('./lib');
 
-},{"./lib":63}],63:[function(require,module,exports){
+},{"./lib":64}],64:[function(require,module,exports){
 
 /**
  * Returns the value of object `o` at the given `path`.
@@ -16175,10 +18057,10 @@ function K (v) {
   return v;
 }
 
-},{}],64:[function(require,module,exports){
+},{}],65:[function(require,module,exports){
 module.exports = exports = require('./lib/promise');
 
-},{"./lib/promise":65}],65:[function(require,module,exports){
+},{"./lib/promise":66}],66:[function(require,module,exports){
 (function (process){
 'use strict';
 
@@ -16642,7 +18524,7 @@ Promise.hook = function(arr) {
 module.exports = Promise;
 
 }).call(this,require("FWaASH"))
-},{"FWaASH":44,"events":42}],66:[function(require,module,exports){
+},{"FWaASH":45,"events":43}],67:[function(require,module,exports){
 /**
 
 # ms.js
@@ -16679,7 +18561,7 @@ No more painful `setTimeout(fn, 60 * 4 * 3 * 2 * 1 * Infinity * NaN * '☃')`.
   g.top ? g.ms = ms : module.exports = ms;
 })(this);
 
-},{}],67:[function(require,module,exports){
+},{}],68:[function(require,module,exports){
 
 var toString = Object.prototype.toString;
 
@@ -16701,10 +18583,10 @@ module.exports = exports = function (regexp) {
 }
 
 
-},{}],68:[function(require,module,exports){
+},{}],69:[function(require,module,exports){
 module.exports = exports = require('./lib/sliced');
 
-},{"./lib/sliced":69}],69:[function(require,module,exports){
+},{"./lib/sliced":70}],70:[function(require,module,exports){
 
 /**
  * An Array.prototype.slice.call(arguments) alternative

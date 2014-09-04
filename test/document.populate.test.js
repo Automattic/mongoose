@@ -503,4 +503,52 @@ describe('document.populate', function(){
       })
     })
   })
+
+  describe('gh-2214', function() {
+    it('should return a real document array when populating', function(done) {
+      var db = start();
+
+      Car = db.model('gh-2214-1', {
+        color: String,
+        model: String
+      });
+
+      Person = db.model('gh-2214-2', {
+        name: String,
+        cars: [
+          {
+            type: Schema.Types.ObjectId,
+            ref: 'gh-2214-1'
+          }
+        ]
+      });
+
+      var car, joe;
+      joe = new Person({
+        name: "Joe"
+      });
+      car = new Car({
+        model: "BMW",
+        color: "red"
+      });
+      joe.cars.push(car);
+
+      return joe.save(function() {
+        return car.save(function() {
+          return Person.findById(joe.id, function(err, joe) {
+            return joe.populate("cars", function(err) {
+              car = new Car({
+                model: "BMW",
+                color: "black"
+              });
+              joe.cars.push(car);
+              assert.ok(joe.isModified('cars'));
+              db.close();
+              done();
+            });
+          });
+        });
+      });
+    });
+  });
 });

@@ -29,6 +29,7 @@ describe('model', function(){
       done();
     })
   })
+
   describe('geoNear', function () {
 
     it('works with legacy coordinate points', function (done) {
@@ -96,7 +97,7 @@ describe('model', function(){
 
         function next() {
           var pnt = { type : "Point", coordinates : [9,9] };
-          Geo.geoNear(pnt, { spherical : true, maxDistance : .1 }, function (err, results, stats) {
+          Geo.geoNear(pnt, { spherical : true, maxDistance : 100*1609 }, function (err, results, stats) {
             assert.ifError(err);
 
             assert.equal(1, results.length);
@@ -137,7 +138,7 @@ describe('model', function(){
 
         function next() {
           var pnt = { type : "Point", coordinates : [9,9] };
-          Geo.geoNear(pnt, { spherical : true, maxDistance : .1, lean : true }, function (err, results, stats) {
+          Geo.geoNear(pnt, { spherical : true, maxDistance : 100*1609, lean : true }, function (err, results, stats) {
             assert.ifError(err);
 
             assert.equal(1, results.length);

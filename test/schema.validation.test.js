@@ -553,10 +553,10 @@ describe('schema', function(){
           })
         })
 
-        it('for custom validators', function(done){
-          function validate () {
+        it('for custom validators', function(done) {
+          var validate = function() {
             return false;
-          }
+          };
           var validator = [validate, '{PATH} failed validation ({VALUE})'];
 
           var schema = new Schema({ x: { type: [], validate: validator }});
@@ -568,8 +568,28 @@ describe('schema', function(){
             assert.equal('x failed validation (3,4,5,6)', String(err.errors.x));
             assert.equal('user defined', err.errors.x.kind);
             done();
-          })
-        })
+          });
+        });
+
+        it('supports custom properties (gh-2132)', function(done) {
+          var schema = new Schema({
+            x: {
+              type: String,
+              validate: [{
+                validator: function() { return false; },
+                message: 'Error code {CODE}',
+                code: 25
+              }]
+            }
+          });
+          var M = mongoose.model('gh-2132', schema, 'gh-2132');
+
+          var m = new M({ x: 'a' });
+          m.validate(function(err) {
+            assert.equal('Error code 25', err.errors.x.toString());
+            assert.equal(25, err.errors.x.properties.errorCode);
+          });
+        });
       })
     })
 

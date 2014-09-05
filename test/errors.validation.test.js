@@ -14,8 +14,8 @@ var assert = require('assert')
   , ValidationError = mongoose.Document.ValidationError
 
 describe('ValidationError', function(){
-  describe('#infiniteRecursion', function(){
-    it('does not cause RangeError (gh-1834)', function(done){
+  describe('#infiniteRecursion', function() {
+    it('does not cause RangeError (gh-1834)', function(done) {
       var SubSchema
         , M
         , model;
@@ -46,8 +46,8 @@ describe('ValidationError', function(){
     })
   });
 
-  describe('#toString', function(){
-    it('does not cause RangeError (gh-1296)', function(done){
+  describe('#toString', function() {
+    it('does not cause RangeError (gh-1296)', function(done) {
       var ASchema = new Schema({
           key: {type: String, required: true}
         , value: {type:String, required: true}
@@ -67,5 +67,16 @@ describe('ValidationError', function(){
         done();
       });
     })
-  })
+  });
+
+  describe('formatMessage', function() {
+    it('replaces properties in a message', function(done) {
+      var props = { base: 'eggs', topping: 'bacon' };
+      var message = 'I had {BASE} and {TOPPING} for breakfast';
+
+      var result = ValidatorError.prototype.formatMessage(message, props);
+      assert.equal('I had eggs and bacon for breakfast', result);
+      done();
+    });
+  });
 });

@@ -4368,7 +4368,7 @@ SchemaBuffer.prototype.cast = function (value, doc, init) {
     }
 
     // lazy load
-    Document || (Document = require('./../browserDocument'));
+    Document || (Document = require('./../document'));
 
     if (value instanceof Document) {
       value.$__.wasPopulated = true;
@@ -4475,7 +4475,7 @@ SchemaBuffer.prototype.castForQuery = function ($conditional, val) {
 module.exports = SchemaBuffer;
 
 }).call(this,require("buffer").Buffer)
-},{"../schematype":30,"../types":36,"../utils":38,"./../browserDocument":3,"buffer":40}],23:[function(require,module,exports){
+},{"../schematype":30,"../types":36,"../utils":38,"./../document":5,"buffer":40}],23:[function(require,module,exports){
 /*!
  * Module requirements.
  */
@@ -4654,7 +4654,7 @@ var SchemaType = require('../schematype')
   , ArrayType = require('./array')
   , MongooseDocumentArray = require('../types/documentarray')
   , Subdocument = require('../types/embedded')
-  , Document = require('../browserDocument');
+  , Document = require('../document');
 var utils = require('../utils.js');
 
 /**
@@ -4840,7 +4840,7 @@ function scopePaths (array, fields, init) {
 
 module.exports = DocumentArray;
 
-},{"../browserDocument":3,"../schematype":30,"../types/documentarray":34,"../types/embedded":35,"../utils.js":38,"./array":20}],25:[function(require,module,exports){
+},{"../document":5,"../schematype":30,"../types/documentarray":34,"../types/embedded":35,"../utils.js":38,"./array":20}],25:[function(require,module,exports){
 
 /*!
  * Module exports.
@@ -5116,7 +5116,7 @@ SchemaNumber.prototype.cast = function (value, doc, init) {
     }
 
     // lazy load
-    Document || (Document = require('./../browserDocument'));
+    Document || (Document = require('./../document'));
 
     if (value instanceof Document) {
       value.$__.wasPopulated = true;
@@ -5215,7 +5215,7 @@ SchemaNumber.prototype.castForQuery = function ($conditional, val) {
 module.exports = SchemaNumber;
 
 }).call(this,require("buffer").Buffer)
-},{"../error":8,"../schematype":30,"../utils":38,"./../browserDocument":3,"buffer":40}],28:[function(require,module,exports){
+},{"../error":8,"../schematype":30,"../utils":38,"./../document":5,"buffer":40}],28:[function(require,module,exports){
 (function (Buffer){
 /*!
  * Module dependencies.
@@ -5294,7 +5294,7 @@ ObjectId.prototype.cast = function (value, doc, init) {
     }
 
     // lazy load
-    Document || (Document = require('./../browserDocument'));
+    Document || (Document = require('./../document'));
 
     if (value instanceof Document) {
       value.$__.wasPopulated = true;
@@ -5404,7 +5404,7 @@ function resetId (v) {
 module.exports = ObjectId;
 
 }).call(this,require("buffer").Buffer)
-},{"../schematype":30,"../types/objectid":37,"../utils":38,"./../browserDocument":3,"buffer":40}],29:[function(require,module,exports){
+},{"../schematype":30,"../types/objectid":37,"../utils":38,"./../document":5,"buffer":40}],29:[function(require,module,exports){
 (function (Buffer){
 
 /*!
@@ -5664,7 +5664,7 @@ SchemaString.prototype.cast = function (value, doc, init) {
     }
 
     // lazy load
-    Document || (Document = require('./../browserDocument'));
+    Document || (Document = require('./../document'));
 
     if (value instanceof Document) {
       value.$__.wasPopulated = true;
@@ -5764,7 +5764,7 @@ SchemaString.prototype.castForQuery = function ($conditional, val) {
 module.exports = SchemaString;
 
 }).call(this,require("buffer").Buffer)
-},{"../error":8,"../schematype":30,"../utils":38,"./../browserDocument":3,"buffer":40}],30:[function(require,module,exports){
+},{"../error":8,"../schematype":30,"../utils":38,"./../document":5,"buffer":40}],30:[function(require,module,exports){
 (function (Buffer){
 /*!
  * Module dependencies.
@@ -6645,7 +6645,7 @@ StateMachine.prototype.map = function map () {
  */
 
 var EmbeddedDocument = require('./embedded');
-var Document = require('../browserDocument');
+var Document = require('../document');
 var ObjectId = require('./objectid');
 var utils = require('../utils');
 var isMongooseObject = utils.isMongooseObject;
@@ -7317,7 +7317,7 @@ MongooseArray.mixin.remove = MongooseArray.mixin.pull;
 module.exports = exports = MongooseArray;
 
 }).call(this,require("buffer").Buffer)
-},{"../browserDocument":3,"../utils":38,"./embedded":35,"./objectid":37,"buffer":40}],33:[function(require,module,exports){
+},{"../document":5,"../utils":38,"./embedded":35,"./objectid":37,"buffer":40}],33:[function(require,module,exports){
 (function (global,Buffer){
 
 /*!
@@ -7592,7 +7592,7 @@ var MongooseArray = require('./array')
   , ObjectIdSchema = require('../schema/objectid')
   , utils = require('../utils')
   , util = require('util')
-  , Document = require('../browserDocument')
+  , Document = require('../document')
 
 /**
  * DocumentArray constructor
@@ -7784,12 +7784,12 @@ MongooseDocumentArray.mixin.notify = function notify (event) {
 module.exports = MongooseDocumentArray;
 
 }).call(this,require("buffer").Buffer)
-},{"../browserDocument":3,"../drivers/node-mongodb-native/objectid":7,"../schema/objectid":28,"../utils":38,"./array":32,"buffer":40,"util":47}],35:[function(require,module,exports){
+},{"../document":5,"../drivers/node-mongodb-native/objectid":7,"../schema/objectid":28,"../utils":38,"./array":32,"buffer":40,"util":47}],35:[function(require,module,exports){
 /*!
  * Module dependencies.
  */
 
-var Document = require('../browserDocument')
+var Document = require('../document')
   , inspect = require('util').inspect
   , Promise = require('../promise')
 
@@ -8054,7 +8054,7 @@ EmbeddedDocument.prototype.parentArray = function () {
 
 module.exports = EmbeddedDocument;
 
-},{"../browserDocument":3,"../promise":18,"util":47}],36:[function(require,module,exports){
+},{"../document":5,"../promise":18,"util":47}],36:[function(require,module,exports){
 
 /*!
  * Module exports.
@@ -8524,14 +8524,14 @@ exports.tick = function tick (callback) {
  */
 
 exports.isMongooseObject = function (v) {
-  Document || (Document = require('./browserDocument'));
+  Document || (Document = require('./document'));
   MongooseArray || (MongooseArray = require('./types').Array);
   MongooseBuffer || (MongooseBuffer = require('./types').Buffer);
 
   return v instanceof Document ||
          (v && v.isMongooseArray) ||
          (v && v.isMongooseBuffer);
-}
+};
 var isMongooseObject = exports.isMongooseObject;
 
 /*!
@@ -8553,7 +8553,7 @@ exports.expires = function expires (object) {
   }
   object.expireAfterSeconds = when;
   delete object.expires;
-}
+};
 
 /*!
  * Converts arguments to ReadPrefs the driver
@@ -8589,7 +8589,7 @@ exports.readPref = function readPref (pref, tags) {
   }
 
   return new ReadPref(pref, tags);
-}
+};
 
 /*!
  * Populate options constructor
@@ -8795,7 +8795,7 @@ exports.decorate = function(destination, source) {
 
 
 }).call(this,require("FWaASH"),require("buffer").Buffer)
-},{"./browserDocument":3,"./types":36,"./types/objectid":37,"FWaASH":45,"buffer":40,"mongodb/lib/mongodb/connection/read_preference":49,"mpath":63,"ms":67,"regexp-clone":68,"sliced":69}],39:[function(require,module,exports){
+},{"./document":5,"./types":36,"./types/objectid":37,"FWaASH":45,"buffer":40,"mongodb/lib/mongodb/connection/read_preference":49,"mpath":63,"ms":67,"regexp-clone":68,"sliced":69}],39:[function(require,module,exports){
 
 /**
  * VirtualType constructor

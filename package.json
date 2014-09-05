@@ -19,6 +19,7 @@
         "async": "0.2.5"
       , "benchmark" : "1.0.0"
       , "browserify": "4.1"
+      , "browserify-transform-tools": "1.2.1"
       , "dox": "0.3.1"
       , "highlight.js": "7.0.1"
       , "jade": "0.26.3"

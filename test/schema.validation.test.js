@@ -577,8 +577,8 @@ describe('schema', function(){
               type: String,
               validate: [{
                 validator: function() { return false; },
-                message: 'Error code {CODE}',
-                code: 25
+                msg: 'Error code {ERRORCODE}',
+                errorCode: 25
               }]
             }
           });
@@ -588,6 +588,7 @@ describe('schema', function(){
           m.validate(function(err) {
             assert.equal('Error code 25', err.errors.x.toString());
             assert.equal(25, err.errors.x.properties.errorCode);
+            done();
           });
         });
       })

@@ -1,19 +1,78 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-exports.Schema = require('./schema');
-exports.Types = require('./types');
-exports.SchemaType = require('./schematype.js');
 
-var coreDocument = require('./document');
+/**
+ * MongooseError constructor
+ *
+ * @param {String} msg Error message
+ * @inherits Error https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Error
+ */
 
-exports.Document = function(obj, schema, skipId) {
-  this.$__setSchema(schema);
-
-  coreDocument.apply(this, obj, !!skipId);
-
-  this.init(obj);
+function MongooseError (msg) {
+  Error.call(this);
+  Error.captureStackTrace && Error.captureStackTrace(this, arguments.callee);
+  this.message = msg;
+  this.name = 'MongooseError';
 };
 
-exports.Document.prototype = new coreDocument(null, null, null, true);
+/*!
+ * Inherits from Error.
+ */
+
+MongooseError.prototype = Object.create(Error.prototype);
+MongooseError.prototype.constructor = Error;
+
+/*!
+ * Formats error messages
+ */
+
+MongooseError.prototype.formatMessage = function (msg, path, type, val) {
+  if (!msg) throw new TypeError('message is required');
+
+  return msg.replace(/{PATH}/, path)
+            .replace(/{VALUE}/, String(val||''))
+            .replace(/{TYPE}/, type || 'declared type');
+}
+
+/*!
+ * Module exports.
+ */
+
+module.exports = exports = MongooseError;
+
+/**
+ * The default built-in validator error messages.
+ *
+ * @see Error.messages #error_messages_MongooseError-messages
+ * @api public
+ */
+
+MongooseError.messages = require('./error/messages');
+
+// backward compat
+MongooseError.Messages = MongooseError.messages;
+
+/*!
+ * Expose subclasses
+ */
+
+MongooseError.CastError = require('./error/cast');
+MongooseError.ValidationError = require('./error/validation')
+MongooseError.ValidatorError = require('./error/validator')
+MongooseError.VersionError =require('./error/version')
+MongooseError.OverwriteModelError = require('./error/overwriteModel')
+MongooseError.MissingSchemaError = require('./error/missingSchema')
+MongooseError.DivergentArrayError = require('./error/divergentArray')
+
+
+},{"./error/cast":9,"./error/divergentArray":10,"./error/messages":11,"./error/missingSchema":12,"./error/overwriteModel":13,"./error/validation":14,"./error/validator":15,"./error/version":16}],2:[function(require,module,exports){
+exports.Error = require('./Error');
+exports.Schema = require('./schema');
+exports.Types = require('./types');
+exports.VirtualType = require('./virtualtype');
+exports.SchemaType = require('./schematype.js');
+exports.utils = require('./utils.js');
+
+exports.Document = require('./browserDocument');
 
 // Small hacks to make browserify include variable-path requires
 require('./drivers/node-mongodb-native/binary');
@@ -22,7 +81,129 @@ if (typeof window !== 'undefined') {
   window.mongoose = module.exports;
 }
 
-},{"./document":3,"./drivers/node-mongodb-native/binary":4,"./schema":17,"./schematype.js":28,"./types":34}],2:[function(require,module,exports){
+},{"./Error":1,"./browserDocument":3,"./drivers/node-mongodb-native/binary":6,"./schema":19,"./schematype.js":30,"./types":36,"./utils.js":38,"./virtualtype":39}],3:[function(require,module,exports){
+/*!
+ * Module dependencies.
+ */
+
+var NodeJSDocument = require('./document')
+  , EventEmitter = require('events').EventEmitter
+  , setMaxListeners = EventEmitter.prototype.setMaxListeners
+  , MongooseError = require('./error')
+  , MixedSchema = require('./schema/mixed')
+  , Schema = require('./schema')
+  , ObjectId = require('./types/objectid')
+  , ValidatorError = require('./schematype').ValidatorError
+  , utils = require('./utils')
+  , clone = utils.clone
+  , isMongooseObject = utils.isMongooseObject
+  , inspect = require('util').inspect
+  , ValidationError = MongooseError.ValidationError
+  , InternalCache = require('./internal')
+  , deepEqual = utils.deepEqual
+  , hooks = require('hooks')
+  , Promise = require('./promise')
+  , DocumentArray
+  , MongooseArray
+  , Embedded
+
+/**
+ * Document constructor.
+ *
+ * @param {Object} obj the values to set
+ * @param {Object} [fields] optional object containing the fields which were selected in the query returning this document and any populated paths data
+ * @param {Boolean} [skipId] bool, should we auto create an ObjectId _id
+ * @inherits NodeJS EventEmitter http://nodejs.org/api/events.html#events_class_events_eventemitter
+ * @event `init`: Emitted on a document after it has was retreived from the db and fully hydrated by Mongoose.
+ * @event `save`: Emitted when the document is successfully saved
+ * @api private
+ */
+
+function Document (obj, schema, fields, skipId, skipInit) {
+  if ( !(this instanceof Document) )
+    return new Document( obj, schema, fields, skipId, skipInit );
+
+
+  if (utils.isObject(schema) && !(schema instanceof Schema)) {
+    schema = new Schema(schema);
+  }
+
+  // When creating EmbeddedDocument, it already has the schema and he doesn't need the _id
+  schema = this.schema || schema;
+
+  // Generate ObjectId if it is missing, but it requires a scheme
+  if ( !this.schema && schema.options._id ){
+    obj = obj || {};
+
+    if ( obj._id === undefined ){
+      obj._id = new ObjectId();
+    }
+  }
+
+  if ( !schema ){
+    throw new MongooseError.MissingSchemaError();
+  }
+
+  this.$__setSchema(schema);
+
+  this.$__ = new InternalCache;
+  this.isNew = true;
+  this.errors = undefined;
+
+  //var schema = this.schema;
+
+  if ('boolean' === typeof fields) {
+    this.$__.strictMode = fields;
+    fields = undefined;
+  } else {
+    this.$__.strictMode = this.schema.options && this.schema.options.strict;
+    this.$__.selected = fields;
+  }
+
+  var required = this.schema.requiredPaths();
+  for (var i = 0; i < required.length; ++i) {
+    this.$__.activePaths.require(required[i]);
+  }
+
+  setMaxListeners.call(this, 0);
+  this._doc = this.$__buildDoc(obj, fields, skipId);
+
+  /*if (obj) {
+    this.set(obj, undefined, true);
+  }*/
+
+  if ( !skipInit && obj ){
+    this.init( obj );
+  }
+
+  this.$__registerHooksFromSchema();
+
+  // apply methods
+  for ( var m in schema.methods ){
+    this[ m ] = schema.methods[ m ];
+  }
+  // apply statics
+  for ( var s in schema.statics ){
+    this[ s ] = schema.statics[ s ];
+  }
+}
+
+/*!
+ * Inherit from EventEmitter.
+ */
+Document.prototype = Object.create( NodeJSDocument.prototype );
+Document.prototype.constructor = Document;
+
+
+
+/*!
+ * Module exports.
+ */
+
+Document.ValidationError = ValidationError;
+module.exports = exports = Document;
+
+},{"./document":5,"./error":8,"./internal":17,"./promise":18,"./schema":19,"./schema/mixed":26,"./schematype":30,"./types/objectid":37,"./utils":38,"events":43,"hooks":48,"util":47}],4:[function(require,module,exports){
 var utils = require('./utils');
 var Types = require('./schema/index');
 
@@ -218,7 +399,7 @@ var cast = module.exports = function(schema, obj) {
 
   return obj;
 }
-},{"./schema/index":23,"./utils":36}],3:[function(require,module,exports){
+},{"./schema/index":25,"./utils":38}],5:[function(require,module,exports){
 (function (process){
 /*!
  * Module dependencies.
@@ -229,6 +410,7 @@ var EventEmitter = require('events').EventEmitter
   , MongooseError = require('./error')
   , MixedSchema = require('./schema/mixed')
   , Schema = require('./schema')
+  , ObjectId = require('./types/objectid')
   , ValidatorError = require('./schematype').ValidatorError
   , utils = require('./utils')
   , clone = utils.clone
@@ -255,19 +437,7 @@ var EventEmitter = require('events').EventEmitter
  * @api private
  */
 
-function Document (obj, fields, skipId, skipInit) {
-  if (!skipInit) {
-    this.initConstructor(obj, fields, skipId);
-  }
-}
-
-/*!
- * Inherit from EventEmitter.
- */
-Document.prototype = Object.create( EventEmitter.prototype );
-Document.prototype.constructor = Document;
-
-Document.prototype.initConstructor = function(obj, fields, skipId) {
+function Document (obj, fields, skipId) {
   this.$__ = new InternalCache;
   this.isNew = true;
   this.errors = undefined;
@@ -295,8 +465,13 @@ Document.prototype.initConstructor = function(obj, fields, skipId) {
   }
 
   this.$__registerHooksFromSchema();
+}
 
-};
+/*!
+ * Inherit from EventEmitter.
+ */
+Document.prototype = Object.create( EventEmitter.prototype );
+Document.prototype.constructor = Document;
 
 /**
  * The documents schema.
@@ -437,7 +612,7 @@ Document.prototype.$__buildDoc = function (obj, fields, skipId) {
         doc_ = doc_[piece] || (doc_[piece] = {});
       }
     }
-  };
+  }
 
   return doc;
 };
@@ -524,7 +699,7 @@ function init (self, obj, doc, prefix) {
       self.$__.activePaths.init(path);
     }
   }
-};
+}
 
 /**
  * Stores the current values of the shard keys.
@@ -1468,7 +1643,7 @@ function define (prop, subprops, prototype, prefix, keys) {
       , set: function (v) { return this.set.call(this.$__.scope || this, path, v); }
     });
   }
-};
+}
 
 /**
  * Assigns/compiles `schema` into this documents prototype.
@@ -1482,7 +1657,7 @@ function define (prop, subprops, prototype, prefix, keys) {
 Document.prototype.$__setSchema = function (schema) {
   compile(schema.tree, this);
   this.schema = schema;
-}
+};
 
 
 /**
@@ -1999,7 +2174,7 @@ Document.prototype.equals = function (doc) {
   return tid && tid.equals
     ? tid.equals(docid)
     : tid === docid;
-}
+};
 
 /**
  * Populates document references, executing the `callback` when complete.
@@ -2130,7 +2305,7 @@ Document.ValidationError = ValidationError;
 module.exports = exports = Document;
 
 }).call(this,require("FWaASH"))
-},{"./error":6,"./internal":15,"./promise":16,"./schema":17,"./schema/mixed":24,"./schematype":28,"./types/array":30,"./types/documentarray":32,"./types/embedded":33,"./utils":36,"FWaASH":43,"events":41,"hooks":46,"util":45}],4:[function(require,module,exports){
+},{"./error":8,"./internal":17,"./promise":18,"./schema":19,"./schema/mixed":26,"./schematype":30,"./types/array":32,"./types/documentarray":34,"./types/embedded":35,"./types/objectid":37,"./utils":38,"FWaASH":45,"events":43,"hooks":48,"util":47}],6:[function(require,module,exports){
 
 /*!
  * Module dependencies.
@@ -2140,7 +2315,7 @@ var Binary = require('mongodb/node_modules/bson').Binary;
 
 module.exports = exports = Binary;
 
-},{"mongodb/node_modules/bson":50}],5:[function(require,module,exports){
+},{"mongodb/node_modules/bson":52}],7:[function(require,module,exports){
 
 /*!
  * [node-mongodb-native](https://github.com/mongodb/node-mongodb-native) ObjectId
@@ -2157,73 +2332,9 @@ var ObjectId = require('mongodb/node_modules/bson').ObjectID;
 module.exports = exports = ObjectId;
 
 
-},{"mongodb/node_modules/bson":50}],6:[function(require,module,exports){
-
-/**
- * MongooseError constructor
- *
- * @param {String} msg Error message
- * @inherits Error https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Error
- */
-
-function MongooseError (msg) {
-  Error.call(this);
-  Error.captureStackTrace && Error.captureStackTrace(this, arguments.callee);
-  this.message = msg;
-  this.name = 'MongooseError';
-};
-
-/*!
- * Inherits from Error.
- */
-
-MongooseError.prototype = Object.create(Error.prototype);
-MongooseError.prototype.constructor = Error;
-
-/*!
- * Formats error messages
- */
-
-MongooseError.prototype.formatMessage = function (msg, path, type, val) {
-  if (!msg) throw new TypeError('message is required');
-
-  return msg.replace(/{PATH}/, path)
-            .replace(/{VALUE}/, String(val||''))
-            .replace(/{TYPE}/, type || 'declared type');
-}
-
-/*!
- * Module exports.
- */
-
-module.exports = exports = MongooseError;
-
-/**
- * The default built-in validator error messages.
- *
- * @see Error.messages #error_messages_MongooseError-messages
- * @api public
- */
-
-MongooseError.messages = require('./error/messages');
-
-// backward compat
-MongooseError.Messages = MongooseError.messages;
-
-/*!
- * Expose subclasses
- */
-
-MongooseError.CastError = require('./error/cast');
-MongooseError.ValidationError = require('./error/validation')
-MongooseError.ValidatorError = require('./error/validator')
-MongooseError.VersionError =require('./error/version')
-MongooseError.OverwriteModelError = require('./error/overwriteModel')
-MongooseError.MissingSchemaError = require('./error/missingSchema')
-MongooseError.DivergentArrayError = require('./error/divergentArray')
-
-
-},{"./error/cast":7,"./error/divergentArray":8,"./error/messages":9,"./error/missingSchema":10,"./error/overwriteModel":11,"./error/validation":12,"./error/validator":13,"./error/version":14}],7:[function(require,module,exports){
+},{"mongodb/node_modules/bson":52}],8:[function(require,module,exports){
+module.exports=require(1)
+},{"./error/cast":9,"./error/divergentArray":10,"./error/messages":11,"./error/missingSchema":12,"./error/overwriteModel":13,"./error/validation":14,"./error/validator":15,"./error/version":16}],9:[function(require,module,exports){
 /*!
  * Module dependencies.
  */
@@ -2262,7 +2373,7 @@ CastError.prototype.constructor = MongooseError;
 
 module.exports = CastError;
 
-},{"../error.js":6}],8:[function(require,module,exports){
+},{"../error.js":8}],10:[function(require,module,exports){
 
 /*!
  * Module dependencies.
@@ -2306,7 +2417,7 @@ DivergentArrayError.prototype.constructor = MongooseError;
 
 module.exports = DivergentArrayError;
 
-},{"../error.js":6}],9:[function(require,module,exports){
+},{"../error.js":8}],11:[function(require,module,exports){
 
 /**
  * The default built-in validator error messages. These may be customized.
@@ -2345,7 +2456,7 @@ msg.String.enum = "`{VALUE}` is not a valid enum value for path `{PATH}`.";
 msg.String.match = "Path `{PATH}` is invalid ({VALUE}).";
 
 
-},{}],10:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 
 /*!
  * Module dependencies.
@@ -2365,7 +2476,7 @@ function MissingSchemaError (name) {
   MongooseError.call(this, msg);
   Error.captureStackTrace && Error.captureStackTrace(this, arguments.callee);
   this.name = 'MissingSchemaError';
-};
+}
 
 /*!
  * Inherits from MongooseError.
@@ -2380,7 +2491,7 @@ MissingSchemaError.prototype.constructor = MongooseError;
 
 module.exports = MissingSchemaError;
 
-},{"../error.js":6}],11:[function(require,module,exports){
+},{"../error.js":8}],13:[function(require,module,exports){
 
 /*!
  * Module dependencies.
@@ -2413,7 +2524,7 @@ OverwriteModelError.prototype.constructor = MongooseError;
 
 module.exports = OverwriteModelError;
 
-},{"../error.js":6}],12:[function(require,module,exports){
+},{"../error.js":8}],14:[function(require,module,exports){
 
 /*!
  * Module requirements
@@ -2466,7 +2577,7 @@ ValidationError.prototype.toString = function () {
 
 module.exports = exports = ValidationError;
 
-},{"../error.js":6}],13:[function(require,module,exports){
+},{"../error.js":8}],15:[function(require,module,exports){
 /*!
  * Module dependencies.
  */
@@ -2517,7 +2628,7 @@ ValidatorError.prototype.toString = function () {
 
 module.exports = ValidatorError;
 
-},{"../error.js":6}],14:[function(require,module,exports){
+},{"../error.js":8}],16:[function(require,module,exports){
 
 /*!
  * Module dependencies.
@@ -2551,7 +2662,7 @@ VersionError.prototype.constructor = MongooseError;
 
 module.exports = VersionError;
 
-},{"../error.js":6}],15:[function(require,module,exports){
+},{"../error.js":8}],17:[function(require,module,exports){
 /*!
  * Dependencies
  */
@@ -2584,7 +2695,7 @@ function InternalCache () {
   this.fullPath = undefined;
 }
 
-},{"./statemachine":29}],16:[function(require,module,exports){
+},{"./statemachine":31}],18:[function(require,module,exports){
 /*!
  * Module dependencies
  */
@@ -2837,7 +2948,7 @@ Promise.prototype.addErrback = Promise.prototype.onReject;
 
 module.exports = Promise;
 
-},{"mpromise":63}],17:[function(require,module,exports){
+},{"mpromise":65}],19:[function(require,module,exports){
 /*!
  * Module dependencies.
  */
@@ -3777,7 +3888,7 @@ Schema.Types = MongooseTypes = require('./schema/index');
 var ObjectId = exports.ObjectId = MongooseTypes.ObjectId;
 
 
-},{"./schema/index":23,"./utils":36,"./virtualtype":37,"events":41}],18:[function(require,module,exports){
+},{"./schema/index":25,"./utils":38,"./virtualtype":39,"events":43}],20:[function(require,module,exports){
 /*!
  * Module dependencies.
  */
@@ -4150,7 +4261,7 @@ handle.$lte = SchemaArray.prototype.castForQuery;
 
 module.exports = SchemaArray;
 
-},{"../cast":2,"../schematype":28,"../types":34,"../utils":36,"./boolean":19,"./buffer":20,"./date":21,"./mixed":24,"./number":25,"./objectid":26,"./string":27}],19:[function(require,module,exports){
+},{"../cast":4,"../schematype":30,"../types":36,"../utils":38,"./boolean":21,"./buffer":22,"./date":23,"./mixed":26,"./number":27,"./objectid":28,"./string":29}],21:[function(require,module,exports){
 /*!
  * Module dependencies.
  */
@@ -4246,7 +4357,7 @@ SchemaBoolean.prototype.castForQuery = function ($conditional, val) {
 
 module.exports = SchemaBoolean;
 
-},{"../schematype":28,"../utils":36}],20:[function(require,module,exports){
+},{"../schematype":30,"../utils":38}],22:[function(require,module,exports){
 (function (Buffer){
 /*!
  * Module dependencies.
@@ -4417,7 +4528,7 @@ SchemaBuffer.prototype.castForQuery = function ($conditional, val) {
 module.exports = SchemaBuffer;
 
 }).call(this,require("buffer").Buffer)
-},{"../schematype":28,"../types":34,"../utils":36,"./../document":3,"buffer":38}],21:[function(require,module,exports){
+},{"../schematype":30,"../types":36,"../utils":38,"./../document":5,"buffer":40}],23:[function(require,module,exports){
 /*!
  * Module requirements.
  */
@@ -4586,7 +4697,7 @@ SchemaDate.prototype.castForQuery = function ($conditional, val) {
 
 module.exports = SchemaDate;
 
-},{"../schematype":28,"../utils":36}],22:[function(require,module,exports){
+},{"../schematype":30,"../utils":38}],24:[function(require,module,exports){
 
 /*!
  * Module dependencies.
@@ -4786,7 +4897,7 @@ function scopePaths (array, fields, init) {
 
 module.exports = DocumentArray;
 
-},{"../document":3,"../schematype":28,"../types/documentarray":32,"../types/embedded":33,"../utils.js":36,"./array":18}],23:[function(require,module,exports){
+},{"../document":5,"../schematype":30,"../types/documentarray":34,"../types/embedded":35,"../utils.js":38,"./array":20}],25:[function(require,module,exports){
 
 /*!
  * Module exports.
@@ -4816,7 +4927,7 @@ exports.Oid = exports.ObjectId;
 exports.Object = exports.Mixed;
 exports.Bool = exports.Boolean;
 
-},{"./array":18,"./boolean":19,"./buffer":20,"./date":21,"./documentarray":22,"./mixed":24,"./number":25,"./objectid":26,"./string":27}],24:[function(require,module,exports){
+},{"./array":20,"./boolean":21,"./buffer":22,"./date":23,"./documentarray":24,"./mixed":26,"./number":27,"./objectid":28,"./string":29}],26:[function(require,module,exports){
 
 /*!
  * Module dependencies.
@@ -4901,7 +5012,7 @@ Mixed.prototype.castForQuery = function ($cond, val) {
 
 module.exports = Mixed;
 
-},{"../schematype":28,"../utils":36}],25:[function(require,module,exports){
+},{"../schematype":30,"../utils":38}],27:[function(require,module,exports){
 (function (Buffer){
 /*!
  * Module requirements.
@@ -5161,7 +5272,7 @@ SchemaNumber.prototype.castForQuery = function ($conditional, val) {
 module.exports = SchemaNumber;
 
 }).call(this,require("buffer").Buffer)
-},{"../error":6,"../schematype":28,"../utils":36,"./../document":3,"buffer":38}],26:[function(require,module,exports){
+},{"../error":8,"../schematype":30,"../utils":38,"./../document":5,"buffer":40}],28:[function(require,module,exports){
 (function (Buffer){
 /*!
  * Module dependencies.
@@ -5350,7 +5461,7 @@ function resetId (v) {
 module.exports = ObjectId;
 
 }).call(this,require("buffer").Buffer)
-},{"../schematype":28,"../types/objectid":35,"../utils":36,"./../document":3,"buffer":38}],27:[function(require,module,exports){
+},{"../schematype":30,"../types/objectid":37,"../utils":38,"./../document":5,"buffer":40}],29:[function(require,module,exports){
 (function (Buffer){
 
 /*!
@@ -5710,7 +5821,7 @@ SchemaString.prototype.castForQuery = function ($conditional, val) {
 module.exports = SchemaString;
 
 }).call(this,require("buffer").Buffer)
-},{"../error":6,"../schematype":28,"../utils":36,"./../document":3,"buffer":38}],28:[function(require,module,exports){
+},{"../error":8,"../schematype":30,"../utils":38,"./../document":5,"buffer":40}],30:[function(require,module,exports){
 (function (Buffer){
 /*!
  * Module dependencies.
@@ -6403,7 +6514,7 @@ exports.CastError = CastError;
 exports.ValidatorError = ValidatorError;
 
 }).call(this,require("buffer").Buffer)
-},{"./error":6,"./utils":36,"buffer":38}],29:[function(require,module,exports){
+},{"./error":8,"./utils":38,"buffer":40}],31:[function(require,module,exports){
 
 /*!
  * Module dependencies.
@@ -6584,7 +6695,7 @@ StateMachine.prototype.map = function map () {
 }
 
 
-},{"./utils":36}],30:[function(require,module,exports){
+},{"./utils":38}],32:[function(require,module,exports){
 (function (Buffer){
 
 /*!
@@ -7264,7 +7375,7 @@ MongooseArray.mixin.remove = MongooseArray.mixin.pull;
 module.exports = exports = MongooseArray;
 
 }).call(this,require("buffer").Buffer)
-},{"../document":3,"../utils":36,"./embedded":33,"./objectid":35,"buffer":38}],31:[function(require,module,exports){
+},{"../document":5,"../utils":38,"./embedded":35,"./objectid":37,"buffer":40}],33:[function(require,module,exports){
 (function (global,Buffer){
 
 /*!
@@ -7528,7 +7639,7 @@ MongooseBuffer.Binary = Binary;
 module.exports = MongooseBuffer;
 
 }).call(this,typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer)
-},{"../drivers/node-mongodb-native/binary":4,"../utils":36,"buffer":38}],32:[function(require,module,exports){
+},{"../drivers/node-mongodb-native/binary":6,"../utils":38,"buffer":40}],34:[function(require,module,exports){
 (function (Buffer){
 /*!
  * Module dependencies.
@@ -7731,7 +7842,7 @@ MongooseDocumentArray.mixin.notify = function notify (event) {
 module.exports = MongooseDocumentArray;
 
 }).call(this,require("buffer").Buffer)
-},{"../document":3,"../drivers/node-mongodb-native/objectid":5,"../schema/objectid":26,"../utils":36,"./array":30,"buffer":38,"util":45}],33:[function(require,module,exports){
+},{"../document":5,"../drivers/node-mongodb-native/objectid":7,"../schema/objectid":28,"../utils":38,"./array":32,"buffer":40,"util":47}],35:[function(require,module,exports){
 /*!
  * Module dependencies.
  */
@@ -7765,13 +7876,13 @@ function EmbeddedDocument (obj, parentArr, skipId, fields) {
   this.on('isNew', function (val) {
     self.isNew = val;
   });
-};
+}
 
 /*!
  * Inherit from Document
  */
-
-EmbeddedDocument.prototype = new Document(null, null, null, true);
+EmbeddedDocument.prototype = Object.create( Document.prototype );
+EmbeddedDocument.prototype.constructor = EmbeddedDocument;
 
 /**
  * Marks the embedded doc modified.
@@ -8001,7 +8112,7 @@ EmbeddedDocument.prototype.parentArray = function () {
 
 module.exports = EmbeddedDocument;
 
-},{"../document":3,"../promise":16,"util":45}],34:[function(require,module,exports){
+},{"../document":5,"../promise":18,"util":47}],36:[function(require,module,exports){
 
 /*!
  * Module exports.
@@ -8016,7 +8127,7 @@ exports.Embedded = require('./embedded');
 exports.DocumentArray = require('./documentarray');
 exports.ObjectId = require('./objectid');
 
-},{"./array":30,"./buffer":31,"./documentarray":32,"./embedded":33,"./objectid":35}],35:[function(require,module,exports){
+},{"./array":32,"./buffer":33,"./documentarray":34,"./embedded":35,"./objectid":37}],37:[function(require,module,exports){
 (function (global){
 
 /*!
@@ -8040,7 +8151,7 @@ module.exports = ObjectId;
 
 
 }).call(this,typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"../drivers/node-mongodb-native/objectid":5}],36:[function(require,module,exports){
+},{"../drivers/node-mongodb-native/objectid":7}],38:[function(require,module,exports){
 (function (process,Buffer){
 /*!
  * Module dependencies.
@@ -8478,7 +8589,7 @@ exports.isMongooseObject = function (v) {
   return v instanceof Document ||
          (v && v.isMongooseArray) ||
          (v && v.isMongooseBuffer);
-}
+};
 var isMongooseObject = exports.isMongooseObject;
 
 /*!
@@ -8500,7 +8611,7 @@ exports.expires = function expires (object) {
   }
   object.expireAfterSeconds = when;
   delete object.expires;
-}
+};
 
 /*!
  * Converts arguments to ReadPrefs the driver
@@ -8536,7 +8647,7 @@ exports.readPref = function readPref (pref, tags) {
   }
 
   return new ReadPref(pref, tags);
-}
+};
 
 /*!
  * Populate options constructor
@@ -8742,7 +8853,7 @@ exports.decorate = function(destination, source) {
 
 
 }).call(this,require("FWaASH"),require("buffer").Buffer)
-},{"./document":3,"./types":34,"./types/objectid":35,"FWaASH":43,"buffer":38,"mongodb/lib/mongodb/connection/read_preference":47,"mpath":61,"ms":65,"regexp-clone":66,"sliced":67}],37:[function(require,module,exports){
+},{"./document":5,"./types":36,"./types/objectid":37,"FWaASH":45,"buffer":40,"mongodb/lib/mongodb/connection/read_preference":49,"mpath":63,"ms":67,"regexp-clone":68,"sliced":69}],39:[function(require,module,exports){
 
 /**
  * VirtualType constructor
@@ -8847,7 +8958,7 @@ VirtualType.prototype.applySetters = function (value, scope) {
 
 module.exports = VirtualType;
 
-},{}],38:[function(require,module,exports){
+},{}],40:[function(require,module,exports){
 /*!
  * The buffer module from node.js, for the browser.
  *
@@ -10018,7 +10129,7 @@ function assert (test, message) {
   if (!test) throw new Error(message || 'Failed assertion')
 }
 
-},{"base64-js":39,"ieee754":40}],39:[function(require,module,exports){
+},{"base64-js":41,"ieee754":42}],41:[function(require,module,exports){
 var lookup = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
 
 ;(function (exports) {
@@ -10140,7 +10251,7 @@ var lookup = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
 	exports.fromByteArray = uint8ToBase64
 }(typeof exports === 'undefined' ? (this.base64js = {}) : exports))
 
-},{}],40:[function(require,module,exports){
+},{}],42:[function(require,module,exports){
 exports.read = function(buffer, offset, isLE, mLen, nBytes) {
   var e, m,
       eLen = nBytes * 8 - mLen - 1,
@@ -10226,7 +10337,7 @@ exports.write = function(buffer, value, offset, isLE, mLen, nBytes) {
   buffer[offset + i - d] |= s * 128;
 };
 
-},{}],41:[function(require,module,exports){
+},{}],43:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -10286,10 +10397,8 @@ EventEmitter.prototype.emit = function(type) {
       er = arguments[1];
       if (er instanceof Error) {
         throw er; // Unhandled 'error' event
-      } else {
-        throw TypeError('Uncaught, unspecified "error" event.');
       }
-      return false;
+      throw TypeError('Uncaught, unspecified "error" event.');
     }
   }
 
@@ -10531,7 +10640,7 @@ function isUndefined(arg) {
   return arg === void 0;
 }
 
-},{}],42:[function(require,module,exports){
+},{}],44:[function(require,module,exports){
 if (typeof Object.create === 'function') {
   // implementation from standard node.js 'util' module
   module.exports = function inherits(ctor, superCtor) {
@@ -10556,7 +10665,7 @@ if (typeof Object.create === 'function') {
   }
 }
 
-},{}],43:[function(require,module,exports){
+},{}],45:[function(require,module,exports){
 // shim for using process in browser
 
 var process = module.exports = {};
@@ -10621,14 +10730,14 @@ process.chdir = function (dir) {
     throw new Error('process.chdir is not supported');
 };
 
-},{}],44:[function(require,module,exports){
+},{}],46:[function(require,module,exports){
 module.exports = function isBuffer(arg) {
   return arg && typeof arg === 'object'
     && typeof arg.copy === 'function'
     && typeof arg.fill === 'function'
     && typeof arg.readUInt8 === 'function';
 }
-},{}],45:[function(require,module,exports){
+},{}],47:[function(require,module,exports){
 (function (process,global){
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -11218,7 +11327,7 @@ function hasOwnProperty(obj, prop) {
 }
 
 }).call(this,require("FWaASH"),typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./support/isBuffer":44,"FWaASH":43,"inherits":42}],46:[function(require,module,exports){
+},{"./support/isBuffer":46,"FWaASH":45,"inherits":44}],48:[function(require,module,exports){
 // TODO Add in pre and post skipping options
 module.exports = {
   /**
@@ -11394,7 +11503,7 @@ function once (fn, scope) {
   };
 }
 
-},{}],47:[function(require,module,exports){
+},{}],49:[function(require,module,exports){
 /**
  * A class representation of the Read Preference.
  *
@@ -11462,7 +11571,7 @@ ReadPreference.NEAREST = 'nearest'
  * @ignore
  */
 exports.ReadPreference  = ReadPreference;
-},{}],48:[function(require,module,exports){
+},{}],50:[function(require,module,exports){
 /**
  * Module dependencies.
  */
@@ -11807,7 +11916,7 @@ Binary.SUBTYPE_USER_DEFINED = 128;
 exports.Binary = Binary;
 
 
-},{"buffer":38}],49:[function(require,module,exports){
+},{"buffer":40}],51:[function(require,module,exports){
 (function (process){
 /**
  * Binary Parser.
@@ -12196,7 +12305,7 @@ BinaryParser.Buffer = BinaryParserBuffer;
 exports.BinaryParser = BinaryParser;
 
 }).call(this,require("FWaASH"))
-},{"FWaASH":43,"util":45}],50:[function(require,module,exports){
+},{"FWaASH":45,"util":47}],52:[function(require,module,exports){
 (function (Buffer){
 var Long = require('./long').Long
   , Double = require('./double').Double
@@ -13749,7 +13858,7 @@ exports.MinKey = MinKey;
 exports.MaxKey = MaxKey;
 
 }).call(this,require("buffer").Buffer)
-},{"./binary":48,"./binary_parser":49,"./code":51,"./db_ref":52,"./double":53,"./float_parser":54,"./long":55,"./max_key":56,"./min_key":57,"./objectid":58,"./symbol":59,"./timestamp":60,"buffer":38}],51:[function(require,module,exports){
+},{"./binary":50,"./binary_parser":51,"./code":53,"./db_ref":54,"./double":55,"./float_parser":56,"./long":57,"./max_key":58,"./min_key":59,"./objectid":60,"./symbol":61,"./timestamp":62,"buffer":40}],53:[function(require,module,exports){
 /**
  * A class representation of the BSON Code type.
  *
@@ -13775,7 +13884,7 @@ Code.prototype.toJSON = function() {
 }
 
 exports.Code = Code;
-},{}],52:[function(require,module,exports){
+},{}],54:[function(require,module,exports){
 /**
  * A class representation of the BSON DBRef type.
  *
@@ -13807,7 +13916,7 @@ DBRef.prototype.toJSON = function() {
 }
 
 exports.DBRef = DBRef;
-},{}],53:[function(require,module,exports){
+},{}],55:[function(require,module,exports){
 /**
  * A class representation of the BSON Double type.
  *
@@ -13841,7 +13950,7 @@ Double.prototype.toJSON = function() {
 }
 
 exports.Double = Double;
-},{}],54:[function(require,module,exports){
+},{}],56:[function(require,module,exports){
 // Copyright (c) 2008, Fair Oaks Labs, Inc.
 // All rights reserved.
 // 
@@ -13963,7 +14072,7 @@ var writeIEEE754 = function(buffer, value, offset, endian, mLen, nBytes) {
 
 exports.readIEEE754 = readIEEE754;
 exports.writeIEEE754 = writeIEEE754;
-},{}],55:[function(require,module,exports){
+},{}],57:[function(require,module,exports){
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -14818,7 +14927,7 @@ Long.TWO_PWR_24_ = Long.fromInt(1 << 24);
  * Expose.
  */
 exports.Long = Long;
-},{}],56:[function(require,module,exports){
+},{}],58:[function(require,module,exports){
 /**
  * A class representation of the BSON MaxKey type.
  *
@@ -14832,7 +14941,7 @@ function MaxKey() {
 }
 
 exports.MaxKey = MaxKey;
-},{}],57:[function(require,module,exports){
+},{}],59:[function(require,module,exports){
 /**
  * A class representation of the BSON MinKey type.
  *
@@ -14846,7 +14955,7 @@ function MinKey() {
 }
 
 exports.MinKey = MinKey;
-},{}],58:[function(require,module,exports){
+},{}],60:[function(require,module,exports){
 (function (process){
 /**
  * Module dependencies.
@@ -15114,7 +15223,7 @@ exports.ObjectID = ObjectID;
 exports.ObjectId = ObjectID;
 
 }).call(this,require("FWaASH"))
-},{"./binary_parser":49,"FWaASH":43}],59:[function(require,module,exports){
+},{"./binary_parser":51,"FWaASH":45}],61:[function(require,module,exports){
 /**
  * A class representation of the BSON Symbol type.
  *
@@ -15163,7 +15272,7 @@ Symbol.prototype.toJSON = function() {
 }
 
 exports.Symbol = Symbol;
-},{}],60:[function(require,module,exports){
+},{}],62:[function(require,module,exports){
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -16017,10 +16126,10 @@ Timestamp.TWO_PWR_24_ = Timestamp.fromInt(1 << 24);
  * Expose.
  */
 exports.Timestamp = Timestamp;
-},{}],61:[function(require,module,exports){
+},{}],63:[function(require,module,exports){
 module.exports = exports = require('./lib');
 
-},{"./lib":62}],62:[function(require,module,exports){
+},{"./lib":64}],64:[function(require,module,exports){
 
 /**
  * Returns the value of object `o` at the given `path`.
@@ -16205,10 +16314,10 @@ function K (v) {
   return v;
 }
 
-},{}],63:[function(require,module,exports){
+},{}],65:[function(require,module,exports){
 module.exports = exports = require('./lib/promise');
 
-},{"./lib/promise":64}],64:[function(require,module,exports){
+},{"./lib/promise":66}],66:[function(require,module,exports){
 (function (process){
 'use strict';
 
@@ -16672,7 +16781,7 @@ Promise.hook = function(arr) {
 module.exports = Promise;
 
 }).call(this,require("FWaASH"))
-},{"FWaASH":43,"events":41}],65:[function(require,module,exports){
+},{"FWaASH":45,"events":43}],67:[function(require,module,exports){
 /**
 
 # ms.js
@@ -16709,7 +16818,7 @@ No more painful `setTimeout(fn, 60 * 4 * 3 * 2 * 1 * Infinity * NaN * '☃')`.
   g.top ? g.ms = ms : module.exports = ms;
 })(this);
 
-},{}],66:[function(require,module,exports){
+},{}],68:[function(require,module,exports){
 
 var toString = Object.prototype.toString;
 
@@ -16731,10 +16840,10 @@ module.exports = exports = function (regexp) {
 }
 
 
-},{}],67:[function(require,module,exports){
+},{}],69:[function(require,module,exports){
 module.exports = exports = require('./lib/sliced');
 
-},{"./lib/sliced":68}],68:[function(require,module,exports){
+},{"./lib/sliced":70}],70:[function(require,module,exports){
 
 /**
  * An Array.prototype.slice.call(arguments) alternative
@@ -16769,4 +16878,4 @@ module.exports = function (args, slice, sliceEnd) {
 }
 
 
-},{}]},{},[1])
+},{}]},{},[2])

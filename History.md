@@ -1,3 +1,11 @@
+3.8.16 / 2014-09-08
+==================
+ * fixed; properly remove modified array paths if array has been overwritten #1638
+ * fixed; key check errors #1884
+ * fixed; make sure populate on an array always returns a Mongoose array #2214
+ * fixed; SSL connections with node 0.11 #2234
+ * fixed; return sensible strings for promise errors #2239
+
 3.8.15 / 2014-08-17
 ==================
  * fixed; Replica set connection string example in docs #2246

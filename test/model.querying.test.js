@@ -1732,39 +1732,39 @@ describe('model: querying:', function(){
   });
 
   describe('and', function(){
-    it('works with queries gh-1188', function(done){
+    it('works with queries gh-1188', function(done) {
       var db = start();
       var B = db.model('BlogPostB');
 
-      B.create({ title: 'and operator', published: false, author: 'Me' }, function (err, doc) {
+      B.create({ title: 'and operator', published: false, author: 'Me' }, function(err, doc) {
         assert.ifError(err);
 
-        B.find({ $and: [{ title: 'and operator' }] }, function (err, docs) {
+        B.find({ $and: [{ title: 'and operator' }] }, function(err, docs) {
           assert.ifError(err);
           assert.equal(1, docs.length);
 
-          B.find({ $and: [{ title: 'and operator' }, { published: true }] }, function (err, docs) {
+          B.find({ $and: [{ title: 'and operator' }, { published: true }] }, function(err, docs) {
             assert.ifError(err);
             assert.equal(0, docs.length);
 
-            B.find({ $and: [{ title: 'and operator' }, { published: false }] }, function (err, docs) {
+            B.find({ $and: [{ title: 'and operator' }, { published: false }] }, function(err, docs) {
               assert.ifError(err);
               assert.equal(1, docs.length);
 
-              var query = B.find()
+              var query = B.find();
               query.and([
-                  { title: 'and operator', published: false }
-                , { author: 'Me' }
-              ])
+                { title: 'and operator', published: false },
+                { author: 'Me' }
+              ]);
               query.exec(function (err, docs) {
                 assert.ifError(err);
                 assert.equal(1, docs.length);
 
                 var query = B.find()
                 query.and([
-                    { title: 'and operator', published: false }
-                  , { author: 'You' }
-                ])
+                  { title: 'and operator', published: false },
+                  { author: 'You' }
+                ]);
                 query.exec(function (err, docs) {
                   assert.ifError(err);
                   assert.equal(0, docs.length);
@@ -1774,9 +1774,19 @@ describe('model: querying:', function(){
             });
           });
         });
-      })
-    })
-  })
+      });
+    });
+
+    it('works with nested query selectors gh-1884', function(done) {
+      var db = start();
+      var B = db.model('gh1884', { a: String, b: String }, 'gh1884');
+
+      B.remove({ $and: [{ a: 'coffee' }, { b: { $in: ['bacon', 'eggs'] } }] }, function(error) {
+        assert.ifError(error);
+        done();
+      });
+    });
+  });
 });
 
 describe('buffers', function(){
@@ -2017,7 +2027,7 @@ describe('geo-spatial', function(){
           db.close();
           assert.ifError(err);
           assert.equal(1, docs.length);
-          done()
+          done();
         });
       }
     });

@@ -1251,4 +1251,39 @@ describe('document', function(){
       });
     });
   });
+
+  describe('gh-1638', function() {
+    it('works', function(done) {
+      var ItemChildSchema = new mongoose.Schema({
+        name: { type: String, required: true, default: "hello" },
+      });
+
+      var ItemParentSchema = new mongoose.Schema({
+        children: [ItemChildSchema]
+      });
+
+      var db = start();
+      var ItemParent = db.model('gh-1638-1', ItemParentSchema, 'gh-1638-1');
+      var ItemChild = db.model('gh-1638-2', ItemChildSchema, 'gh-1638-2');
+
+      var c1 = new ItemChild({ name: 'first child' });
+      var c2 = new ItemChild({ name: 'second child' });
+
+      var p = new ItemParent({
+        children: [c1, c2]
+      });
+
+      p.save(function(error) {
+        assert.ifError(error);
+
+        c2.name = 'updated 2';
+        p.children = [c2];
+        p.save(function(error, doc) {
+          assert.ifError(error);
+          assert.equal(1, doc.children.length);
+          done();
+        });
+      });
+    });
+  });
 })

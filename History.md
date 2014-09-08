@@ -1,3 +1,10 @@
+3.9.2 / 2014-09-08
+==================
+ * added; test coverage for browser component #2255
+ * added; in-order execution of validators #2243
+ * added; custom fields for validators #2132
+ * removed; exception thrown when find() used with count() #1950
+
 3.8.16 / 2014-09-08
 ==================
  * fixed; properly remove modified array paths if array has been overwritten #1638

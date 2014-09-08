@@ -1,15 +1,18 @@
+var Schema = mongoose.Schema
+  , ObjectId = mongoose.Schema.Types.ObjectId;
+
 var em = new mongoose.Schema({ title: String, body: String });
 em.virtual('works').get(function () {
   return 'em virtual works'
 });
 
-var schema = new mongoose.Schema({
+var schema = new Schema({
   test    : String,
-  oids    : [mongoose.Schema.Types.ObjectId],
-  numbers : [Number],
+  oids    : [ ObjectId ],
+  numbers : [ Number ],
   nested  : {
     age   : Number,
-    cool  : mongoose.Schema.Types.ObjectId,
+    cool  : ObjectId,
     deep  : { x: String },
     path  : String,
     setr  : String
@@ -124,7 +127,7 @@ describe('browser:validate', function() {
     var called = false;
     var validate = [function(str){ called = true; return true }, 'BAM'];
 
-    schema = new mongoose.Schema({
+    schema = new Schema({
       prop: { type: String, required: true, validate: validate },
       nick: { type: String, required: true }
     });
@@ -142,6 +145,55 @@ describe('browser:validate', function() {
         assert.equal('Path `nick` is required.', error.errors['nick'].message);
         done();  
       });
+    });
+  });
+});
+
+describe('#equals', function(){
+  describe('should work', function(){
+    var S = new Schema({ _id: String });
+    var N = new Schema({ _id: Number });
+    var O = new Schema({ _id: Schema.ObjectId });
+    //var B = new Schema({ _id: Buffer });
+    var M = new Schema({ name: String }, { _id: false });
+
+    it('with string _ids', function(done){
+      var s1 = new mongoose.Document({ _id: 'one' }, S);
+      var s2 = new mongoose.Document({ _id: 'one' }, S);
+      assert.ok(s1.equals(s2));
+      done();
+    });
+    it('with number _ids', function(done){
+      var n1 = new mongoose.Document({ _id: 0 }, N);
+      var n2 = new mongoose.Document({ _id: 0 }, N);
+      assert.ok(n1.equals(n2));
+      done();
+    });
+    it('with ObjectId _ids', function(done){
+      var id = new mongoose.Types.ObjectId;
+      var o1 = new mongoose.Document({ _id: id }, O);
+      var o2 = new mongoose.Document({ _id: id }, O);
+      assert.ok(o1.equals(o2));
+
+      id = String(new mongoose.Types.ObjectId);
+      o1 = new mongoose.Document({ _id: id }, O);
+      o2 = new mongoose.Document({ _id: id }, O);
+      assert.ok(o1.equals(o2));
+      done();
+    });
+    /*it('with Buffer _ids', function(done){
+      var n1 = new mongoose.Document({ _id: 0 }, B);
+      var n2 = new mongoose.Document({ _id: 0 }, B);
+      assert.ok(n1.equals(n2));
+      done();
+    });*/
+    it('with _id disabled (gh-1687)', function(done){
+      var m1 = new mongoose.Document({}, M);
+      var m2 = new mongoose.Document({}, M);
+      assert.doesNotThrow(function () {
+        m1.equals(m2)
+      });
+      done();
     });
   });
 });

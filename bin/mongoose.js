@@ -3958,7 +3958,7 @@ function SchemaArray (key, cast, options) {
   if (cast) {
     var castOptions = {};
 
-    if ('Object' === cast.constructor.name) {
+    if ('Object' === utils.getFunctionName(cast.constructor)) {
       if (cast.type) {
         // support { type: Woot }
         castOptions = utils.clone(cast); // do not alter user arguments
@@ -3972,7 +3972,7 @@ function SchemaArray (key, cast, options) {
     // support { type: 'String' }
     var name = 'string' == typeof cast
       ? cast
-      : cast.name;
+      : utils.getFunctionName(cast);
 
     var caster = name in Types
       ? Types[name]
@@ -8449,7 +8449,7 @@ exports.clone = function clone (obj, options) {
   }
 
   if (obj.constructor) {
-    switch (obj.constructor.name) {
+    switch (exports.getFunctionName(obj.constructor)) {
       case 'Object':
         return cloneObject(obj, options);
       case 'Date':

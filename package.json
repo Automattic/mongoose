@@ -4,6 +4,7 @@
   , "version": "3.9.3-pre"
   , "author": "Guillermo Rauch <guillermo@learnboost.com>"
   , "keywords": ["mongodb", "document", "model", "schema", "database", "odm", "data", "datastore", "query", "nosql", "orm", "db"]
+  , "license": "MIT"
   , "dependencies": {
         "hooks": "0.3.2"
       , "mongodb": "1.4.9"

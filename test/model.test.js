@@ -651,7 +651,21 @@ describe('Model', function(){
       p.children.push({});
       assert.equal('function', typeof p.children[0].talk);
       done();
-    })
+    });
+
+    it('can be defined with nested key', function(done) {
+      var db = start();
+      var NestedKeySchema = new Schema({});
+      NestedKeySchema.method('foo', {
+        bar: function(){
+          return this;
+        }
+      });
+      var NestedKey = db.model('NestedKey', NestedKeySchema);
+      var n = new NestedKey();
+      assert.equal(n, n.foo.bar())
+      done();
+    });
   })
 
   describe('statics', function(){

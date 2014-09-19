@@ -4828,7 +4828,7 @@ describe('Model', function(){
       parent.save(function(err, it) {
         assert.ifError(err);
         parent.children.push({name: 'another child'});
-        Parent.findByIdAndUpdate(it._id, {$set: { children: parent.children } }, function(err, affected) {
+        Parent.findByIdAndUpdate(it._id, { $set: { children: parent.children } }, function(err, affected) {
           assert.ifError(err);
           done();
         });

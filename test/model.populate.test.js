@@ -2635,4 +2635,32 @@ describe('model: populate:', function(){
       }
     }
   })
+
+  describe('gh-2252', function() {
+    it('handles skip', function(done) {
+      var db = start();
+
+      var movieSchema = new Schema({});
+      var categorySchema = new Schema({ movies: [{ type: ObjectId, ref: 'gh-2252-1' }] });
+
+      var Movie = db.model('gh-2252-1', movieSchema);
+      var Category = db.model('gh-2252-2', categorySchema);
+
+      Movie.create({}, {}, {}, function(error) {
+        assert.ifError(error);
+        Movie.find({}, function(error, docs) {
+          assert.ifError(error);
+          assert.equal(docs.length, 3);
+          Category.create({ movies: [docs[0]._id, docs[1]._id, docs[2]._id] }, function(error) {
+            assert.ifError(error);
+            Category.findOne({}).populate({ path: 'movies', options: { limit: 2, skip: 1 } }).exec(function(error, category) {
+              assert.ifError(error);
+              assert.equal(2, category.movies.length);
+              done();
+            });
+          });
+        });
+      });
+    });
+  });
 });

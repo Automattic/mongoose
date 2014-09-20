@@ -20,7 +20,6 @@
       , "benchmark" : "1.0.0"
       , "browserify": "4.1"
       , "browserify-transform-tools": "1.2.1"
-      , "buffer": "2.7.0"
       , "co": "3.1.0"
       , "dox": "0.3.1"
       , "highlight.js": "7.0.1"

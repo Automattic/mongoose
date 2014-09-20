@@ -3,8 +3,7 @@
  * Module dependencies.
  */
 
-var Schema = mongoose.Schema
-  , MongooseBuffer = mongoose.Types.Buffer;
+var MongooseBuffer = mongoose.Types.Buffer;
 
 /**
  * Test.

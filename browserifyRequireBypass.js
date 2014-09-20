@@ -11,15 +11,6 @@ module.exports = transformTools.makeRequireTransform('requireTransform',
       name: 'document',
       to: 'browserDocument',
       exclude: ['browserDocument']
-    },{
-      name: 'objectid',
-      to: 'browserObjectid',
-      exclude: ['/lib/schema/index', '/lib/schema/array', '/bson'],
-      not: '/schema/objectid'
-    },{
-      name: 'buffer',
-      to: 'browserBuffer',
-      exclude: ['/lib/schema/index', '/lib/schema/array']
     }];
 
     var newPath;

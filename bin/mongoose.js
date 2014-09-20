@@ -1,4 +1,5 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+(function (Buffer){
 exports.Error = require('./error');
 exports.Schema = require('./schema');
 exports.Types = require('./types');
@@ -10,9 +11,11 @@ exports.Document = require('./browserDocument');
 
 if (typeof window !== 'undefined') {
   window.mongoose = module.exports;
+  window.Buffer = Buffer;
 }
 
-},{"./browserDocument":2,"./error":7,"./schema":18,"./schematype.js":29,"./types":35,"./utils.js":37,"./virtualtype":38}],2:[function(require,module,exports){
+}).call(this,require("buffer").Buffer)
+},{"./browserDocument":2,"./error":7,"./schema":18,"./schematype.js":29,"./types":35,"./utils.js":37,"./virtualtype":38,"buffer":39}],2:[function(require,module,exports){
 /*!
  * Module dependencies.
  */

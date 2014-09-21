@@ -1018,4 +1018,21 @@ describe('model: update:', function(){
       });
     });
   });
+
+  it('applies defaults on upsert (gh-860)', function(done) {
+    var db = start();
+
+    var s = new Schema({ topping: { type: String, default: 'bacon' }, base: String });
+    var Breakfast = db.model('gh-860-0', s);
+
+    Breakfast.update({}, { base: 'eggs' }, { upsert: true }, function(error) {
+      assert.ifError(error);
+      Breakfast.findOne({}, function(error, breakfast) {
+        assert.ifError(error);
+        assert.equal('eggs', breakfast.base);
+        assert.equal('bacon', breakfast.topping);
+        done();
+      });
+    });
+  });
 });

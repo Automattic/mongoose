@@ -8,7 +8,6 @@
   , "dependencies": {
         "hooks": "0.3.2"
       , "mongodb": "1.4.9"
-      , "mongo-query": "0.5.2"
       , "ms": "0.1.0"
       , "sliced": "0.0.5"
       , "muri": "0.3.1"
@@ -16,10 +15,10 @@
       , "mpath": "0.1.1"
       , "regexp-clone": "0.0.1"
       , "mquery" : "1.0.0"
+      , "async": "0.9.0"
     }
   , "devDependencies": {
-        "async": "0.2.5"
-      , "benchmark" : "1.0.0"
+        "benchmark" : "1.0.0"
       , "browserify": "4.1"
       , "co": "3.1.0"
       , "dox": "0.3.1"

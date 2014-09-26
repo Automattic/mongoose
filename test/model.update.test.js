@@ -1069,4 +1069,25 @@ describe('model: update:', function(){
       });
     });
   });
+
+  it('runs validators if theyre set', function(done) {
+    var db = start();
+
+    var s = new Schema({
+      topping: { type: String, validate: function(v) { return false; } },
+      base: { type: String, validate: function(v) { return true; } }
+    });
+    var Breakfast = db.model('gh-860-3', s);
+
+    Breakfast.update({}, { topping: 'bacon', base: 'eggs' }, { upsert: true, runValidators: true }, function(error) {
+      assert.ok(!!error);
+      assert.equal(1, error.length);
+      assert.equal('Validator failed for path `topping` with value `bacon`', error[0].message);
+      Breakfast.findOne({}, function(error, breakfast) {
+        assert.ifError(error);
+        assert.ok(!breakfast);
+        done();
+      });
+    });
+  });
 });

@@ -1035,4 +1035,38 @@ describe('model: update:', function(){
       });
     });
   });
+
+  it('doesnt set default on upsert if query sets it', function(done) {
+    var db = start();
+
+    var s = new Schema({ topping: { type: String, default: 'bacon' }, base: String });
+    var Breakfast = db.model('gh-860-1', s);
+
+    Breakfast.update({ topping: 'sausage' }, { base: 'eggs' }, { upsert: true }, function(error) {
+      assert.ifError(error);
+      Breakfast.findOne({}, function(error, breakfast) {
+        assert.ifError(error);
+        assert.equal('eggs', breakfast.base);
+        assert.equal('sausage', breakfast.topping);
+        done();
+      });
+    });
+  });
+
+  it('properly sets default on upsert if query wont set it', function(done) {
+    var db = start();
+
+    var s = new Schema({ topping: { type: String, default: 'bacon' }, base: String });
+    var Breakfast = db.model('gh-860-2', s);
+
+    Breakfast.update({ topping: { $ne: 'bacon' } }, { base: 'eggs' }, { upsert: true }, function(error) {
+      assert.ifError(error);
+      Breakfast.findOne({}, function(error, breakfast) {
+        assert.ifError(error);
+        assert.equal('eggs', breakfast.base);
+        assert.equal('bacon', breakfast.topping);
+        done();
+      });
+    });
+  });
 });

@@ -1025,7 +1025,8 @@ describe('model: update:', function(){
     var s = new Schema({ topping: { type: String, default: 'bacon' }, base: String });
     var Breakfast = db.model('gh-860-0', s);
 
-    Breakfast.update({}, { base: 'eggs' }, { upsert: true }, function(error) {
+    var updateOptions = { upsert: true, setDefaultsOnInsert: true };
+    Breakfast.update({}, { base: 'eggs' }, updateOptions, function(error) {
       assert.ifError(error);
       Breakfast.findOne({}, function(error, breakfast) {
         assert.ifError(error);
@@ -1042,7 +1043,8 @@ describe('model: update:', function(){
     var s = new Schema({ topping: { type: String, default: 'bacon' }, base: String });
     var Breakfast = db.model('gh-860-1', s);
 
-    Breakfast.update({ topping: 'sausage' }, { base: 'eggs' }, { upsert: true }, function(error) {
+    var updateOptions = { upsert: true, setDefaultsOnInsert: true };
+    Breakfast.update({ topping: 'sausage' }, { base: 'eggs' }, updateOptions, function(error) {
       assert.ifError(error);
       Breakfast.findOne({}, function(error, breakfast) {
         assert.ifError(error);
@@ -1059,7 +1061,8 @@ describe('model: update:', function(){
     var s = new Schema({ topping: { type: String, default: 'bacon' }, base: String });
     var Breakfast = db.model('gh-860-2', s);
 
-    Breakfast.update({ topping: { $ne: 'bacon' } }, { base: 'eggs' }, { upsert: true }, function(error) {
+    var updateOptions = { upsert: true, setDefaultsOnInsert: true };
+    Breakfast.update({ topping: { $ne: 'sausage' } }, { base: 'eggs' }, updateOptions, function(error) {
       assert.ifError(error);
       Breakfast.findOne({}, function(error, breakfast) {
         assert.ifError(error);
@@ -1079,10 +1082,13 @@ describe('model: update:', function(){
     });
     var Breakfast = db.model('gh-860-3', s);
 
-    Breakfast.update({}, { topping: 'bacon', base: 'eggs' }, { upsert: true, runValidators: true }, function(error) {
+    var updateOptions = { upsert: true, setDefaultsOnInsert: true, runValidators: true };
+    Breakfast.update({}, { topping: 'bacon', base: 'eggs' }, updateOptions, function(error) {
       assert.ok(!!error);
-      assert.equal(1, error.length);
-      assert.equal('Validator failed for path `topping` with value `bacon`', error[0].message);
+      assert.equal(1, Object.keys(error.errors).length);
+      assert.deepEqual('topping', Object.keys(error.errors)[0]);
+      assert.equal('Validator failed for path `topping` with value `bacon`',
+        error.errors['topping'].message);
       Breakfast.findOne({}, function(error, breakfast) {
         assert.ifError(error);
         assert.ok(!breakfast);

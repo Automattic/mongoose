@@ -69,4 +69,4 @@ copyunstable:
 .PHONY: test test-short test-long ghpages site docs docclean gendocs docs_from_master docs_unstable master copytmp copyunstable gitreset docclean_unstable
 
 browser:
-	./node_modules/browserify/bin/cmd.js -g ./browserifyRequireBypass.js -o ./bin/mongoose.js lib/browser.js
+	./node_modules/browserify/bin/cmd.js -o ./bin/mongoose.js lib/browser.js

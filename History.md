@@ -1,3 +1,10 @@
+3.8.17 / 2014-09-29
+==================
+ * fixed; use schema options retainKeyOrder in save() #2274
+ * fixed; fix skip in populate when limit is set #2252
+ * fixed; fix stack overflow when passing MongooseArray to findAndModify #2214
+ * fixed; optimize .length usage in populate #2289
+
 3.8.16 / 2014-09-08
 ==================
  * fixed; properly remove modified array paths if array has been overwritten #1638

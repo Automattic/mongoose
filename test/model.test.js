@@ -4811,4 +4811,28 @@ describe('Model', function(){
     });
   });
 
+  describe('gh-1920', function() {
+    it('doesnt crash', function(done) {
+      var db = start();
+
+      var parentSchema = new Schema({
+        children: [new Schema({
+          name: String,
+        })]
+      });
+
+      var Parent = db.model('gh-1920', parentSchema);
+
+      var parent = new Parent();
+      parent.children.push({name: 'child name'});
+      parent.save(function(err, it) {
+        assert.ifError(err);
+        parent.children.push({name: 'another child'});
+        Parent.findByIdAndUpdate(it._id, { $set: { children: parent.children } }, function(err, affected) {
+          assert.ifError(err);
+          done();
+        });
+      });
+    });
+  });
 });

@@ -278,7 +278,7 @@ describe('schema', function(){
         , dates       : [Date]
         , numbers     : [Number]
         , strings     : [String]
-        //, buffers     : [Buffer]
+        , buffers     : [Buffer]
         , nocast      : []
         , mixed       : [Mixed]
       });
@@ -306,10 +306,10 @@ describe('schema', function(){
       assert.equal(typeof strings[1], 'string');
       assert.equal('123', strings[1]);
 
-      /*var buffers = Loki.path('buffers').cast(['\0\0\0', new Buffer("abc")]);
+      var buffers = Loki.path('buffers').cast(['\0\0\0', new Buffer("abc")]);
 
-      assert.ok(buffers[0] instanceof Buffer);
-      assert.ok(buffers[1] instanceof Buffer);*/
+      assert.ok(Buffer.isBuffer(buffers[0]));
+      assert.ok(Buffer.isBuffer(buffers[1]));
 
       var nocasts = Loki.path('nocast').cast(['test', 123]);
 

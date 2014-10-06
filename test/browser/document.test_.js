@@ -154,7 +154,7 @@ describe('#equals', function(){
     var S = new Schema({ _id: String });
     var N = new Schema({ _id: Number });
     var O = new Schema({ _id: Schema.ObjectId });
-    //var B = new Schema({ _id: Buffer });
+    var B = new Schema({ _id: Buffer });
     var M = new Schema({ name: String }, { _id: false });
 
     it('with string _ids', function(done){
@@ -181,12 +181,12 @@ describe('#equals', function(){
       assert.ok(o1.equals(o2));
       done();
     });
-    /*it('with Buffer _ids', function(done){
+    it('with Buffer _ids', function(done){
       var n1 = new mongoose.Document({ _id: 0 }, B);
       var n2 = new mongoose.Document({ _id: 0 }, B);
       assert.ok(n1.equals(n2));
       done();
-    });*/
+    });
     it('with _id disabled (gh-1687)', function(done){
       var m1 = new mongoose.Document({}, M);
       var m2 = new mongoose.Document({}, M);

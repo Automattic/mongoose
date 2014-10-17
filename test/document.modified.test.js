@@ -311,6 +311,52 @@ describe('document modified', function(){
       });
     })
 
+    it('should let you set ref paths (gh-1530)', function(done) {
+      var db = start();
+
+      var parentSchema = new Schema({
+        child: { type: Schema.Types.ObjectId, ref: 'gh-1530-2' } 
+      });
+      var Parent = db.model('gh-1530-1', parentSchema);
+      var childSchema = new Schema({
+        name: String
+      });
+
+      var preCalls = 0;
+      childSchema.pre('save', function(next) {
+        ++preCalls;
+        next();
+      });
+
+      var postCalls = 0;
+      childSchema.post('save', function(doc, next) {
+        ++postCalls;
+        next();
+      });
+      var Child = db.model('gh-1530-2', childSchema);
+
+      var p = new Parent();
+      var c = new Child({ name: 'Luke' });
+      p.child = c;
+      assert.equal(p.child.name, 'Luke');
+
+      p.save(function(error) {
+        assert.ifError(error);
+        Parent.findOne({}, function(error, p) {
+          assert.ifError(error);
+          assert.ok(p.child);
+          assert.ok(typeof p.child.name === 'undefined');
+          assert.equal(1, preCalls);
+          assert.equal(1, postCalls);
+          Child.findOne({ name: 'Luke' }, function(error, child) {
+            assert.ifError(error);
+            assert.ok(!!child);
+            done();
+          });
+        });
+      });
+    });
+
     it('should support setting mixed paths by string (gh-1418)', function(done){
       var db = start();
       var BlogPost = db.model('1418', new Schema({ mixed: {} }))

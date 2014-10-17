@@ -321,11 +321,22 @@ describe('document modified', function(){
       var childSchema = new Schema({
         name: String
       });
+
+      var preCalls = 0;
+      childSchema.pre('save', function(next) {
+        ++preCalls;
+        next();
+      });
+
+      var postCalls = 0;
+      childSchema.post('save', function(doc, next) {
+        ++postCalls;
+        next();
+      });
       var Child = db.model('gh-1530-2', childSchema);
 
       var p = new Parent();
       var c = new Child({ name: 'Luke' });
-      //p.populated('child', c);
       p.child = c;
       assert.equal(p.child.name, 'Luke');
 
@@ -335,7 +346,13 @@ describe('document modified', function(){
           assert.ifError(error);
           assert.ok(p.child);
           assert.ok(typeof p.child.name === 'undefined');
-          done();
+          assert.equal(1, preCalls);
+          assert.equal(1, postCalls);
+          Child.findOne({ name: 'Luke' }, function(error, child) {
+            assert.ifError(error);
+            assert.ok(!!child);
+            done();
+          });
         });
       });
     });

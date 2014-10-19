@@ -133,7 +133,7 @@ Document.prototype.constructor = Document;
 Document.ValidationError = ValidationError;
 module.exports = exports = Document;
 
-},{"./document":4,"./error":8,"./internal":17,"./promise":18,"./schema":19,"./schema/mixed":26,"./schematype":30,"./types/objectid":37,"./utils":38,"events":44,"hooks":49,"util":48}],3:[function(require,module,exports){
+},{"./document":4,"./error":8,"./internal":17,"./promise":18,"./schema":19,"./schema/mixed":26,"./schematype":30,"./types/objectid":37,"./utils":38,"events":43,"hooks":48,"util":47}],3:[function(require,module,exports){
 var utils = require('./utils');
 var Types = require('./schema/index');
 
@@ -877,7 +877,15 @@ Document.prototype.set = function (path, val, type, options) {
   }
 
   var self = this;
-  var shouldSet = this.$__try(function(){
+  var shouldSet = this.$__try(function() {
+    // If the user is trying to set a ref path to a document with
+    // the correct model name, treat it as populated
+    if (schema.options &&
+        schema.options.ref &&
+        val instanceof Document &&
+        schema.options.ref === val.constructor.modelName) {
+      self.populated(path, val);
+    }
     val = schema.applySetters(val, self, false, priorVal);
   });
 
@@ -1634,11 +1642,11 @@ Document.prototype.$__getAllSubdocs = function () {
 
   function docReducer(seed, path) {
     var val = this[path];
-    if (val instanceof Embedded) seed.push(val);
+    if (val instanceof Embedded || (val instanceof Document && val._id)) seed.push(val);
     if (val && val.isMongooseDocumentArray) {
       val.forEach(function _docReduce(doc) {
         if (!doc || !doc._doc) return;
-        if (doc instanceof Embedded) seed.push(doc);
+        if (doc instanceof Embedded || (val instanceof Document && val._id)) seed.push(doc);
         seed = Object.keys(doc._doc).reduce(docReducer.bind(doc._doc), seed);
       });
     }
@@ -1902,9 +1910,13 @@ Document.prototype.$__handleReject = function handleReject(err) {
  */
 
 Document.prototype.toObject = function (options) {
-  if (options && options.depopulate && this.$__.wasPopulated) {
+  if (options && options.depopulate && !options._skipDepopulateTopLevel && this.$__.wasPopulated) {
     // populated paths that we set to a document
     return clone(this._id, options);
+  }
+
+  if (options && options._skipDepopulateTopLevel) {
+    options.skipDepopulateOne = false;
   }
 
   // When internally saving this document we always pass options,
@@ -2240,7 +2252,7 @@ Document.ValidationError = ValidationError;
 module.exports = exports = Document;
 
 }).call(this,require("FWaASH"))
-},{"./error":8,"./internal":17,"./promise":18,"./schema":19,"./schema/mixed":26,"./schematype":30,"./types/array":32,"./types/documentarray":34,"./types/embedded":35,"./types/objectid":37,"./utils":38,"FWaASH":46,"events":44,"hooks":49,"util":48}],5:[function(require,module,exports){
+},{"./error":8,"./internal":17,"./promise":18,"./schema":19,"./schema/mixed":26,"./schematype":30,"./types/array":32,"./types/documentarray":34,"./types/embedded":35,"./types/objectid":37,"./utils":38,"FWaASH":45,"events":43,"hooks":48,"util":47}],5:[function(require,module,exports){
 'use strict';
 
 /*!
@@ -2271,7 +2283,7 @@ var Binary = require('mongodb/node_modules/bson').Binary;
 
 module.exports = exports = Binary;
 
-},{"mongodb/node_modules/bson":53}],7:[function(require,module,exports){
+},{"mongodb/node_modules/bson":52}],7:[function(require,module,exports){
 
 /*!
  * [node-mongodb-native](https://github.com/mongodb/node-mongodb-native) ObjectId
@@ -2288,7 +2300,7 @@ var ObjectId = require('mongodb/node_modules/bson').ObjectID;
 module.exports = exports = ObjectId;
 
 
-},{"mongodb/node_modules/bson":53}],8:[function(require,module,exports){
+},{"mongodb/node_modules/bson":52}],8:[function(require,module,exports){
 
 /**
  * MongooseError constructor
@@ -2552,7 +2564,10 @@ function ValidationError (instance) {
   MongooseError.call(this, "Validation failed");
   Error.captureStackTrace && Error.captureStackTrace(this, arguments.callee);
   this.name = 'ValidationError';
-  this.errors = instance.errors = {};
+  this.errors = {};
+  if (instance) {
+    instance.errors = this.errors;
+  }
 };
 
 /*!
@@ -2980,7 +2995,7 @@ Promise.prototype.addErrback = Promise.prototype.onReject;
 
 module.exports = Promise;
 
-},{"mpromise":66,"util":48}],19:[function(require,module,exports){
+},{"mpromise":65,"util":47}],19:[function(require,module,exports){
 /*!
  * Module dependencies.
  */
@@ -3920,7 +3935,7 @@ Schema.Types = MongooseTypes = require('./schema/index');
 var ObjectId = exports.ObjectId = MongooseTypes.ObjectId;
 
 
-},{"./schema/index":25,"./utils":38,"./virtualtype":39,"events":44}],20:[function(require,module,exports){
+},{"./schema/index":25,"./utils":38,"./virtualtype":39,"events":43}],20:[function(require,module,exports){
 /*!
  * Module dependencies.
  */
@@ -5721,11 +5736,12 @@ SchemaString.prototype.match = function match (regExp, message) {
 
   var msg = message || errorMessages.String.match;
 
-  function matchValidator (v){
-    return null != v && '' !== v
+  var matchValidator = function(v) {
+    var ret = ((null != v && '' !== v)
       ? regExp.test(v)
-      : true
-  }
+      : true);
+    return ret;
+  };
 
   this.validators.push({ validator: matchValidator, message: msg, type: 'regexp' });
   return this;
@@ -5919,7 +5935,7 @@ function SchemaType (path, options, instance) {
  * ####Example:
  *
  *     // values are cast:
- *     var schema = new Schema({ aNumber: Number, default: "4.815162342" })
+ *     var schema = new Schema({ aNumber: { type: Number, default: 4.815162342 }})
  *     var M = db.model('M', schema)
  *     var m = new M;
  *     console.log(m.aNumber) // 4.815162342
@@ -7906,7 +7922,7 @@ MongooseDocumentArray.mixin.notify = function notify (event) {
 module.exports = MongooseDocumentArray;
 
 }).call(this,require("buffer").Buffer)
-},{"../document":4,"../schema/objectid":28,"../utils":38,"./array":32,"./objectid":37,"buffer":40,"util":48}],35:[function(require,module,exports){
+},{"../document":4,"../schema/objectid":28,"../utils":38,"./array":32,"./objectid":37,"buffer":40,"util":47}],35:[function(require,module,exports){
 /*!
  * Module dependencies.
  */
@@ -8176,7 +8192,7 @@ EmbeddedDocument.prototype.parentArray = function () {
 
 module.exports = EmbeddedDocument;
 
-},{"../document_provider":5,"../promise":18,"util":48}],36:[function(require,module,exports){
+},{"../document_provider":5,"../promise":18,"util":47}],36:[function(require,module,exports){
 
 /*!
  * Module exports.
@@ -8915,9 +8931,40 @@ exports.decorate = function(destination, source) {
   }
 };
 
+/**
+ * merges to with a copy of from
+ *
+ * @param {Object} to
+ * @param {Object} from
+ * @api private
+ */
+
+exports.mergeClone = function(to, from) {
+  var keys = Object.keys(from)
+    , i = keys.length
+    , key
+
+  while (i--) {
+    key = keys[i];
+    if ('undefined' === typeof to[key]) {
+      // make sure to retain key order here because of a bug handling the $each
+      // operator in mongodb 2.4.4
+      to[key] = exports.clone(from[key], { retainKeyOrder : 1});
+    } else {
+      if (exports.isObject(from[key])) {
+        exports.mergeClone(to[key], from[key]);
+      } else {
+        // make sure to retain key order here because of a bug handling the
+        // $each operator in mongodb 2.4.4
+        to[key] = exports.clone(from[key], { retainKeyOrder : 1});
+      }
+    }
+  }
+}
+
 
 }).call(this,require("FWaASH"),require("buffer").Buffer)
-},{"./document":4,"./types":36,"./types/objectid":37,"FWaASH":46,"buffer":40,"mongodb/lib/mongodb/connection/read_preference":50,"mpath":64,"ms":68,"regexp-clone":69,"sliced":70}],39:[function(require,module,exports){
+},{"./document":4,"./types":36,"./types/objectid":37,"FWaASH":45,"buffer":40,"mongodb/lib/mongodb/connection/read_preference":49,"mpath":63,"ms":67,"regexp-clone":68,"sliced":69}],39:[function(require,module,exports){
 
 /**
  * VirtualType constructor
@@ -9032,17 +9079,14 @@ module.exports = VirtualType;
 
 var base64 = require('base64-js')
 var ieee754 = require('ieee754')
-var isArray = require('is-array')
 
 exports.Buffer = Buffer
 exports.SlowBuffer = Buffer
 exports.INSPECT_MAX_BYTES = 50
-Buffer.poolSize = 8192 // not used by this implementation
-
-var kMaxLength = 0x3fffffff
+Buffer.poolSize = 8192
 
 /**
- * If `Buffer.TYPED_ARRAY_SUPPORT`:
+ * If `TYPED_ARRAY_SUPPORT`:
  *   === true    Use Uint8Array implementation (fastest)
  *   === false   Use Object implementation (most compatible, even IE6)
  *
@@ -9060,10 +9104,10 @@ var kMaxLength = 0x3fffffff
  *  - IE10 has a broken `TypedArray.prototype.subarray` function which returns arrays of
  *    incorrect length in some situations.
  *
- * We detect these buggy browsers and set `Buffer.TYPED_ARRAY_SUPPORT` to `false` so they will
+ * We detect these buggy browsers and set `TYPED_ARRAY_SUPPORT` to `false` so they will
  * get the Object implementation, which is slower but will work correctly.
  */
-Buffer.TYPED_ARRAY_SUPPORT = (function () {
+var TYPED_ARRAY_SUPPORT = (function () {
   try {
     var buf = new ArrayBuffer(0)
     var arr = new Uint8Array(buf)
@@ -9107,14 +9151,10 @@ function Buffer (subject, encoding, noZero) {
       subject = subject.data
     length = +subject.length > 0 ? Math.floor(+subject.length) : 0
   } else
-    throw new TypeError('must start with number, buffer, array or string')
-
-  if (this.length > kMaxLength)
-    throw new RangeError('Attempt to allocate Buffer larger than maximum ' +
-      'size: 0x' + kMaxLength.toString(16) + ' bytes')
+    throw new Error('First argument needs to be a number, array or string.')
 
   var buf
-  if (Buffer.TYPED_ARRAY_SUPPORT) {
+  if (TYPED_ARRAY_SUPPORT) {
     // Preferred: Return an augmented `Uint8Array` instance for best performance
     buf = Buffer._augment(new Uint8Array(length))
   } else {
@@ -9125,7 +9165,7 @@ function Buffer (subject, encoding, noZero) {
   }
 
   var i
-  if (Buffer.TYPED_ARRAY_SUPPORT && typeof subject.byteLength === 'number') {
+  if (TYPED_ARRAY_SUPPORT && typeof subject.byteLength === 'number') {
     // Speed optimization -- use set if we're copying from a typed array
     buf._set(subject)
   } else if (isArrayish(subject)) {
@@ -9139,7 +9179,7 @@ function Buffer (subject, encoding, noZero) {
     }
   } else if (type === 'string') {
     buf.write(subject, 0, encoding)
-  } else if (type === 'number' && !Buffer.TYPED_ARRAY_SUPPORT && !noZero) {
+  } else if (type === 'number' && !TYPED_ARRAY_SUPPORT && !noZero) {
     for (i = 0; i < length; i++) {
       buf[i] = 0
     }
@@ -9148,25 +9188,8 @@ function Buffer (subject, encoding, noZero) {
   return buf
 }
 
-Buffer.isBuffer = function (b) {
-  return !!(b != null && b._isBuffer)
-}
-
-Buffer.compare = function (a, b) {
-  if (!Buffer.isBuffer(a) || !Buffer.isBuffer(b))
-    throw new TypeError('Arguments must be Buffers')
-
-  var x = a.length
-  var y = b.length
-  for (var i = 0, len = Math.min(x, y); i < len && a[i] === b[i]; i++) {}
-  if (i !== len) {
-    x = a[i]
-    y = b[i]
-  }
-  if (x < y) return -1
-  if (y < x) return 1
-  return 0
-}
+// STATIC METHODS
+// ==============
 
 Buffer.isEncoding = function (encoding) {
   switch (String(encoding).toLowerCase()) {
@@ -9187,8 +9210,43 @@ Buffer.isEncoding = function (encoding) {
   }
 }
 
+Buffer.isBuffer = function (b) {
+  return !!(b != null && b._isBuffer)
+}
+
+Buffer.byteLength = function (str, encoding) {
+  var ret
+  str = str.toString()
+  switch (encoding || 'utf8') {
+    case 'hex':
+      ret = str.length / 2
+      break
+    case 'utf8':
+    case 'utf-8':
+      ret = utf8ToBytes(str).length
+      break
+    case 'ascii':
+    case 'binary':
+    case 'raw':
+      ret = str.length
+      break
+    case 'base64':
+      ret = base64ToBytes(str).length
+      break
+    case 'ucs2':
+    case 'ucs-2':
+    case 'utf16le':
+    case 'utf-16le':
+      ret = str.length * 2
+      break
+    default:
+      throw new Error('Unknown encoding')
+  }
+  return ret
+}
+
 Buffer.concat = function (list, totalLength) {
-  if (!isArray(list)) throw new TypeError('Usage: Buffer.concat(list[, length])')
+  assert(isArray(list), 'Usage: Buffer.concat(list[, length])')
 
   if (list.length === 0) {
     return new Buffer(0)
@@ -9214,118 +9272,26 @@ Buffer.concat = function (list, totalLength) {
   return buf
 }
 
-Buffer.byteLength = function (str, encoding) {
-  var ret
-  str = str + ''
-  switch (encoding || 'utf8') {
-    case 'ascii':
-    case 'binary':
-    case 'raw':
-      ret = str.length
-      break
-    case 'ucs2':
-    case 'ucs-2':
-    case 'utf16le':
-    case 'utf-16le':
-      ret = str.length * 2
-      break
-    case 'hex':
-      ret = str.length >>> 1
-      break
-    case 'utf8':
-    case 'utf-8':
-      ret = utf8ToBytes(str).length
-      break
-    case 'base64':
-      ret = base64ToBytes(str).length
-      break
-    default:
-      ret = str.length
+Buffer.compare = function (a, b) {
+  assert(Buffer.isBuffer(a) && Buffer.isBuffer(b), 'Arguments must be Buffers')
+  var x = a.length
+  var y = b.length
+  for (var i = 0, len = Math.min(x, y); i < len && a[i] === b[i]; i++) {}
+  if (i !== len) {
+    x = a[i]
+    y = b[i]
   }
-  return ret
-}
-
-// pre-set for values that may exist in the future
-Buffer.prototype.length = undefined
-Buffer.prototype.parent = undefined
-
-// toString(encoding, start=0, end=buffer.length)
-Buffer.prototype.toString = function (encoding, start, end) {
-  var loweredCase = false
-
-  start = start >>> 0
-  end = end === undefined || end === Infinity ? this.length : end >>> 0
-
-  if (!encoding) encoding = 'utf8'
-  if (start < 0) start = 0
-  if (end > this.length) end = this.length
-  if (end <= start) return ''
-
-  while (true) {
-    switch (encoding) {
-      case 'hex':
-        return hexSlice(this, start, end)
-
-      case 'utf8':
-      case 'utf-8':
-        return utf8Slice(this, start, end)
-
-      case 'ascii':
-        return asciiSlice(this, start, end)
-
-      case 'binary':
-        return binarySlice(this, start, end)
-
-      case 'base64':
-        return base64Slice(this, start, end)
-
-      case 'ucs2':
-      case 'ucs-2':
-      case 'utf16le':
-      case 'utf-16le':
-        return utf16leSlice(this, start, end)
-
-      default:
-        if (loweredCase)
-          throw new TypeError('Unknown encoding: ' + encoding)
-        encoding = (encoding + '').toLowerCase()
-        loweredCase = true
-    }
+  if (x < y) {
+    return -1
   }
-}
-
-Buffer.prototype.equals = function (b) {
-  if(!Buffer.isBuffer(b)) throw new TypeError('Argument must be a Buffer')
-  return Buffer.compare(this, b) === 0
-}
-
-Buffer.prototype.inspect = function () {
-  var str = ''
-  var max = exports.INSPECT_MAX_BYTES
-  if (this.length > 0) {
-    str = this.toString('hex', 0, max).match(/.{2}/g).join(' ')
-    if (this.length > max)
-      str += ' ... '
+  if (y < x) {
+    return 1
   }
-  return '<Buffer ' + str + '>'
+  return 0
 }
 
-Buffer.prototype.compare = function (b) {
-  if (!Buffer.isBuffer(b)) throw new TypeError('Argument must be a Buffer')
-  return Buffer.compare(this, b)
-}
-
-// `get` will be removed in Node 0.13+
-Buffer.prototype.get = function (offset) {
-  console.log('.get() is deprecated. Access using array indexes instead.')
-  return this.readUInt8(offset)
-}
-
-// `set` will be removed in Node 0.13+
-Buffer.prototype.set = function (v, offset) {
-  console.log('.set() is deprecated. Access using array indexes instead.')
-  return this.writeUInt8(v, offset)
-}
+// BUFFER INSTANCE METHODS
+// =======================
 
 function hexWrite (buf, string, offset, length) {
   offset = Number(offset) || 0
@@ -9341,14 +9307,14 @@ function hexWrite (buf, string, offset, length) {
 
   // must be an even number of digits
   var strLen = string.length
-  if (strLen % 2 !== 0) throw new Error('Invalid hex string')
+  assert(strLen % 2 === 0, 'Invalid hex string')
 
   if (length > strLen / 2) {
     length = strLen / 2
   }
   for (var i = 0; i < length; i++) {
     var byte = parseInt(string.substr(i * 2, 2), 16)
-    if (isNaN(byte)) throw new Error('Invalid hex string')
+    assert(!isNaN(byte), 'Invalid hex string')
     buf[offset + i] = byte
   }
   return i
@@ -9430,7 +9396,48 @@ Buffer.prototype.write = function (string, offset, length, encoding) {
       ret = utf16leWrite(this, string, offset, length)
       break
     default:
-      throw new TypeError('Unknown encoding: ' + encoding)
+      throw new Error('Unknown encoding')
+  }
+  return ret
+}
+
+Buffer.prototype.toString = function (encoding, start, end) {
+  var self = this
+
+  encoding = String(encoding || 'utf8').toLowerCase()
+  start = Number(start) || 0
+  end = (end === undefined) ? self.length : Number(end)
+
+  // Fastpath empty strings
+  if (end === start)
+    return ''
+
+  var ret
+  switch (encoding) {
+    case 'hex':
+      ret = hexSlice(self, start, end)
+      break
+    case 'utf8':
+    case 'utf-8':
+      ret = utf8Slice(self, start, end)
+      break
+    case 'ascii':
+      ret = asciiSlice(self, start, end)
+      break
+    case 'binary':
+      ret = binarySlice(self, start, end)
+      break
+    case 'base64':
+      ret = base64Slice(self, start, end)
+      break
+    case 'ucs2':
+    case 'ucs-2':
+    case 'utf16le':
+    case 'utf-16le':
+      ret = utf16leSlice(self, start, end)
+      break
+    default:
+      throw new Error('Unknown encoding')
   }
   return ret
 }
@@ -9439,6 +9446,52 @@ Buffer.prototype.toJSON = function () {
   return {
     type: 'Buffer',
     data: Array.prototype.slice.call(this._arr || this, 0)
+  }
+}
+
+Buffer.prototype.equals = function (b) {
+  assert(Buffer.isBuffer(b), 'Argument must be a Buffer')
+  return Buffer.compare(this, b) === 0
+}
+
+Buffer.prototype.compare = function (b) {
+  assert(Buffer.isBuffer(b), 'Argument must be a Buffer')
+  return Buffer.compare(this, b)
+}
+
+// copy(targetBuffer, targetStart=0, sourceStart=0, sourceEnd=buffer.length)
+Buffer.prototype.copy = function (target, target_start, start, end) {
+  var source = this
+
+  if (!start) start = 0
+  if (!end && end !== 0) end = this.length
+  if (!target_start) target_start = 0
+
+  // Copy 0 bytes; we're done
+  if (end === start) return
+  if (target.length === 0 || source.length === 0) return
+
+  // Fatal error conditions
+  assert(end >= start, 'sourceEnd < sourceStart')
+  assert(target_start >= 0 && target_start < target.length,
+      'targetStart out of bounds')
+  assert(start >= 0 && start < source.length, 'sourceStart out of bounds')
+  assert(end >= 0 && end <= source.length, 'sourceEnd out of bounds')
+
+  // Are we oob?
+  if (end > this.length)
+    end = this.length
+  if (target.length - target_start < end - start)
+    end = target.length - target_start + start
+
+  var len = end - start
+
+  if (len < 100 || !TYPED_ARRAY_SUPPORT) {
+    for (var i = 0; i < len; i++) {
+      target[i + target_start] = this[i + start]
+    }
+  } else {
+    target._set(this.subarray(start, start + len), target_start)
   }
 }
 
@@ -9527,7 +9580,7 @@ Buffer.prototype.slice = function (start, end) {
   if (end < start)
     end = start
 
-  if (Buffer.TYPED_ARRAY_SUPPORT) {
+  if (TYPED_ARRAY_SUPPORT) {
     return Buffer._augment(this.subarray(start, end))
   } else {
     var sliceLen = end - start
@@ -9539,275 +9592,365 @@ Buffer.prototype.slice = function (start, end) {
   }
 }
 
-/*
- * Need to make sure that buffer isn't trying to write out of bounds.
- */
-function checkOffset (offset, ext, length) {
-  if ((offset % 1) !== 0 || offset < 0)
-    throw new RangeError('offset is not uint')
-  if (offset + ext > length)
-    throw new RangeError('Trying to access beyond buffer length')
+// `get` will be removed in Node 0.13+
+Buffer.prototype.get = function (offset) {
+  console.log('.get() is deprecated. Access using array indexes instead.')
+  return this.readUInt8(offset)
+}
+
+// `set` will be removed in Node 0.13+
+Buffer.prototype.set = function (v, offset) {
+  console.log('.set() is deprecated. Access using array indexes instead.')
+  return this.writeUInt8(v, offset)
 }
 
 Buffer.prototype.readUInt8 = function (offset, noAssert) {
-  if (!noAssert)
-    checkOffset(offset, 1, this.length)
+  if (!noAssert) {
+    assert(offset !== undefined && offset !== null, 'missing offset')
+    assert(offset < this.length, 'Trying to read beyond buffer length')
+  }
+
+  if (offset >= this.length)
+    return
+
   return this[offset]
 }
 
+function readUInt16 (buf, offset, littleEndian, noAssert) {
+  if (!noAssert) {
+    assert(typeof littleEndian === 'boolean', 'missing or invalid endian')
+    assert(offset !== undefined && offset !== null, 'missing offset')
+    assert(offset + 1 < buf.length, 'Trying to read beyond buffer length')
+  }
+
+  var len = buf.length
+  if (offset >= len)
+    return
+
+  var val
+  if (littleEndian) {
+    val = buf[offset]
+    if (offset + 1 < len)
+      val |= buf[offset + 1] << 8
+  } else {
+    val = buf[offset] << 8
+    if (offset + 1 < len)
+      val |= buf[offset + 1]
+  }
+  return val
+}
+
 Buffer.prototype.readUInt16LE = function (offset, noAssert) {
-  if (!noAssert)
-    checkOffset(offset, 2, this.length)
-  return this[offset] | (this[offset + 1] << 8)
+  return readUInt16(this, offset, true, noAssert)
 }
 
 Buffer.prototype.readUInt16BE = function (offset, noAssert) {
-  if (!noAssert)
-    checkOffset(offset, 2, this.length)
-  return (this[offset] << 8) | this[offset + 1]
+  return readUInt16(this, offset, false, noAssert)
+}
+
+function readUInt32 (buf, offset, littleEndian, noAssert) {
+  if (!noAssert) {
+    assert(typeof littleEndian === 'boolean', 'missing or invalid endian')
+    assert(offset !== undefined && offset !== null, 'missing offset')
+    assert(offset + 3 < buf.length, 'Trying to read beyond buffer length')
+  }
+
+  var len = buf.length
+  if (offset >= len)
+    return
+
+  var val
+  if (littleEndian) {
+    if (offset + 2 < len)
+      val = buf[offset + 2] << 16
+    if (offset + 1 < len)
+      val |= buf[offset + 1] << 8
+    val |= buf[offset]
+    if (offset + 3 < len)
+      val = val + (buf[offset + 3] << 24 >>> 0)
+  } else {
+    if (offset + 1 < len)
+      val = buf[offset + 1] << 16
+    if (offset + 2 < len)
+      val |= buf[offset + 2] << 8
+    if (offset + 3 < len)
+      val |= buf[offset + 3]
+    val = val + (buf[offset] << 24 >>> 0)
+  }
+  return val
 }
 
 Buffer.prototype.readUInt32LE = function (offset, noAssert) {
-  if (!noAssert)
-    checkOffset(offset, 4, this.length)
-
-  return ((this[offset]) |
-      (this[offset + 1] << 8) |
-      (this[offset + 2] << 16)) +
-      (this[offset + 3] * 0x1000000)
+  return readUInt32(this, offset, true, noAssert)
 }
 
 Buffer.prototype.readUInt32BE = function (offset, noAssert) {
-  if (!noAssert)
-    checkOffset(offset, 4, this.length)
-
-  return (this[offset] * 0x1000000) +
-      ((this[offset + 1] << 16) |
-      (this[offset + 2] << 8) |
-      this[offset + 3])
+  return readUInt32(this, offset, false, noAssert)
 }
 
 Buffer.prototype.readInt8 = function (offset, noAssert) {
-  if (!noAssert)
-    checkOffset(offset, 1, this.length)
-  if (!(this[offset] & 0x80))
-    return (this[offset])
-  return ((0xff - this[offset] + 1) * -1)
+  if (!noAssert) {
+    assert(offset !== undefined && offset !== null,
+        'missing offset')
+    assert(offset < this.length, 'Trying to read beyond buffer length')
+  }
+
+  if (offset >= this.length)
+    return
+
+  var neg = this[offset] & 0x80
+  if (neg)
+    return (0xff - this[offset] + 1) * -1
+  else
+    return this[offset]
+}
+
+function readInt16 (buf, offset, littleEndian, noAssert) {
+  if (!noAssert) {
+    assert(typeof littleEndian === 'boolean', 'missing or invalid endian')
+    assert(offset !== undefined && offset !== null, 'missing offset')
+    assert(offset + 1 < buf.length, 'Trying to read beyond buffer length')
+  }
+
+  var len = buf.length
+  if (offset >= len)
+    return
+
+  var val = readUInt16(buf, offset, littleEndian, true)
+  var neg = val & 0x8000
+  if (neg)
+    return (0xffff - val + 1) * -1
+  else
+    return val
 }
 
 Buffer.prototype.readInt16LE = function (offset, noAssert) {
-  if (!noAssert)
-    checkOffset(offset, 2, this.length)
-  var val = this[offset] | (this[offset + 1] << 8)
-  return (val & 0x8000) ? val | 0xFFFF0000 : val
+  return readInt16(this, offset, true, noAssert)
 }
 
 Buffer.prototype.readInt16BE = function (offset, noAssert) {
-  if (!noAssert)
-    checkOffset(offset, 2, this.length)
-  var val = this[offset + 1] | (this[offset] << 8)
-  return (val & 0x8000) ? val | 0xFFFF0000 : val
+  return readInt16(this, offset, false, noAssert)
+}
+
+function readInt32 (buf, offset, littleEndian, noAssert) {
+  if (!noAssert) {
+    assert(typeof littleEndian === 'boolean', 'missing or invalid endian')
+    assert(offset !== undefined && offset !== null, 'missing offset')
+    assert(offset + 3 < buf.length, 'Trying to read beyond buffer length')
+  }
+
+  var len = buf.length
+  if (offset >= len)
+    return
+
+  var val = readUInt32(buf, offset, littleEndian, true)
+  var neg = val & 0x80000000
+  if (neg)
+    return (0xffffffff - val + 1) * -1
+  else
+    return val
 }
 
 Buffer.prototype.readInt32LE = function (offset, noAssert) {
-  if (!noAssert)
-    checkOffset(offset, 4, this.length)
-
-  return (this[offset]) |
-      (this[offset + 1] << 8) |
-      (this[offset + 2] << 16) |
-      (this[offset + 3] << 24)
+  return readInt32(this, offset, true, noAssert)
 }
 
 Buffer.prototype.readInt32BE = function (offset, noAssert) {
-  if (!noAssert)
-    checkOffset(offset, 4, this.length)
+  return readInt32(this, offset, false, noAssert)
+}
 
-  return (this[offset] << 24) |
-      (this[offset + 1] << 16) |
-      (this[offset + 2] << 8) |
-      (this[offset + 3])
+function readFloat (buf, offset, littleEndian, noAssert) {
+  if (!noAssert) {
+    assert(typeof littleEndian === 'boolean', 'missing or invalid endian')
+    assert(offset + 3 < buf.length, 'Trying to read beyond buffer length')
+  }
+
+  return ieee754.read(buf, offset, littleEndian, 23, 4)
 }
 
 Buffer.prototype.readFloatLE = function (offset, noAssert) {
-  if (!noAssert)
-    checkOffset(offset, 4, this.length)
-  return ieee754.read(this, offset, true, 23, 4)
+  return readFloat(this, offset, true, noAssert)
 }
 
 Buffer.prototype.readFloatBE = function (offset, noAssert) {
-  if (!noAssert)
-    checkOffset(offset, 4, this.length)
-  return ieee754.read(this, offset, false, 23, 4)
+  return readFloat(this, offset, false, noAssert)
+}
+
+function readDouble (buf, offset, littleEndian, noAssert) {
+  if (!noAssert) {
+    assert(typeof littleEndian === 'boolean', 'missing or invalid endian')
+    assert(offset + 7 < buf.length, 'Trying to read beyond buffer length')
+  }
+
+  return ieee754.read(buf, offset, littleEndian, 52, 8)
 }
 
 Buffer.prototype.readDoubleLE = function (offset, noAssert) {
-  if (!noAssert)
-    checkOffset(offset, 8, this.length)
-  return ieee754.read(this, offset, true, 52, 8)
+  return readDouble(this, offset, true, noAssert)
 }
 
 Buffer.prototype.readDoubleBE = function (offset, noAssert) {
-  if (!noAssert)
-    checkOffset(offset, 8, this.length)
-  return ieee754.read(this, offset, false, 52, 8)
-}
-
-function checkInt (buf, value, offset, ext, max, min) {
-  if (!Buffer.isBuffer(buf)) throw new TypeError('buffer must be a Buffer instance')
-  if (value > max || value < min) throw new TypeError('value is out of bounds')
-  if (offset + ext > buf.length) throw new TypeError('index out of range')
+  return readDouble(this, offset, false, noAssert)
 }
 
 Buffer.prototype.writeUInt8 = function (value, offset, noAssert) {
-  value = +value
-  offset = offset >>> 0
-  if (!noAssert)
-    checkInt(this, value, offset, 1, 0xff, 0)
-  if (!Buffer.TYPED_ARRAY_SUPPORT) value = Math.floor(value)
+  if (!noAssert) {
+    assert(value !== undefined && value !== null, 'missing value')
+    assert(offset !== undefined && offset !== null, 'missing offset')
+    assert(offset < this.length, 'trying to write beyond buffer length')
+    verifuint(value, 0xff)
+  }
+
+  if (offset >= this.length) return
+
   this[offset] = value
   return offset + 1
 }
 
-function objectWriteUInt16 (buf, value, offset, littleEndian) {
-  if (value < 0) value = 0xffff + value + 1
-  for (var i = 0, j = Math.min(buf.length - offset, 2); i < j; i++) {
-    buf[offset + i] = (value & (0xff << (8 * (littleEndian ? i : 1 - i)))) >>>
-      (littleEndian ? i : 1 - i) * 8
+function writeUInt16 (buf, value, offset, littleEndian, noAssert) {
+  if (!noAssert) {
+    assert(value !== undefined && value !== null, 'missing value')
+    assert(typeof littleEndian === 'boolean', 'missing or invalid endian')
+    assert(offset !== undefined && offset !== null, 'missing offset')
+    assert(offset + 1 < buf.length, 'trying to write beyond buffer length')
+    verifuint(value, 0xffff)
   }
+
+  var len = buf.length
+  if (offset >= len)
+    return
+
+  for (var i = 0, j = Math.min(len - offset, 2); i < j; i++) {
+    buf[offset + i] =
+        (value & (0xff << (8 * (littleEndian ? i : 1 - i)))) >>>
+            (littleEndian ? i : 1 - i) * 8
+  }
+  return offset + 2
 }
 
 Buffer.prototype.writeUInt16LE = function (value, offset, noAssert) {
-  value = +value
-  offset = offset >>> 0
-  if (!noAssert)
-    checkInt(this, value, offset, 2, 0xffff, 0)
-  if (Buffer.TYPED_ARRAY_SUPPORT) {
-    this[offset] = value
-    this[offset + 1] = (value >>> 8)
-  } else objectWriteUInt16(this, value, offset, true)
-  return offset + 2
+  return writeUInt16(this, value, offset, true, noAssert)
 }
 
 Buffer.prototype.writeUInt16BE = function (value, offset, noAssert) {
-  value = +value
-  offset = offset >>> 0
-  if (!noAssert)
-    checkInt(this, value, offset, 2, 0xffff, 0)
-  if (Buffer.TYPED_ARRAY_SUPPORT) {
-    this[offset] = (value >>> 8)
-    this[offset + 1] = value
-  } else objectWriteUInt16(this, value, offset, false)
-  return offset + 2
+  return writeUInt16(this, value, offset, false, noAssert)
 }
 
-function objectWriteUInt32 (buf, value, offset, littleEndian) {
-  if (value < 0) value = 0xffffffff + value + 1
-  for (var i = 0, j = Math.min(buf.length - offset, 4); i < j; i++) {
-    buf[offset + i] = (value >>> (littleEndian ? i : 3 - i) * 8) & 0xff
+function writeUInt32 (buf, value, offset, littleEndian, noAssert) {
+  if (!noAssert) {
+    assert(value !== undefined && value !== null, 'missing value')
+    assert(typeof littleEndian === 'boolean', 'missing or invalid endian')
+    assert(offset !== undefined && offset !== null, 'missing offset')
+    assert(offset + 3 < buf.length, 'trying to write beyond buffer length')
+    verifuint(value, 0xffffffff)
   }
+
+  var len = buf.length
+  if (offset >= len)
+    return
+
+  for (var i = 0, j = Math.min(len - offset, 4); i < j; i++) {
+    buf[offset + i] =
+        (value >>> (littleEndian ? i : 3 - i) * 8) & 0xff
+  }
+  return offset + 4
 }
 
 Buffer.prototype.writeUInt32LE = function (value, offset, noAssert) {
-  value = +value
-  offset = offset >>> 0
-  if (!noAssert)
-    checkInt(this, value, offset, 4, 0xffffffff, 0)
-  if (Buffer.TYPED_ARRAY_SUPPORT) {
-    this[offset + 3] = (value >>> 24)
-    this[offset + 2] = (value >>> 16)
-    this[offset + 1] = (value >>> 8)
-    this[offset] = value
-  } else objectWriteUInt32(this, value, offset, true)
-  return offset + 4
+  return writeUInt32(this, value, offset, true, noAssert)
 }
 
 Buffer.prototype.writeUInt32BE = function (value, offset, noAssert) {
-  value = +value
-  offset = offset >>> 0
-  if (!noAssert)
-    checkInt(this, value, offset, 4, 0xffffffff, 0)
-  if (Buffer.TYPED_ARRAY_SUPPORT) {
-    this[offset] = (value >>> 24)
-    this[offset + 1] = (value >>> 16)
-    this[offset + 2] = (value >>> 8)
-    this[offset + 3] = value
-  } else objectWriteUInt32(this, value, offset, false)
-  return offset + 4
+  return writeUInt32(this, value, offset, false, noAssert)
 }
 
 Buffer.prototype.writeInt8 = function (value, offset, noAssert) {
-  value = +value
-  offset = offset >>> 0
-  if (!noAssert)
-    checkInt(this, value, offset, 1, 0x7f, -0x80)
-  if (!Buffer.TYPED_ARRAY_SUPPORT) value = Math.floor(value)
-  if (value < 0) value = 0xff + value + 1
-  this[offset] = value
+  if (!noAssert) {
+    assert(value !== undefined && value !== null, 'missing value')
+    assert(offset !== undefined && offset !== null, 'missing offset')
+    assert(offset < this.length, 'Trying to write beyond buffer length')
+    verifsint(value, 0x7f, -0x80)
+  }
+
+  if (offset >= this.length)
+    return
+
+  if (value >= 0)
+    this.writeUInt8(value, offset, noAssert)
+  else
+    this.writeUInt8(0xff + value + 1, offset, noAssert)
   return offset + 1
 }
 
-Buffer.prototype.writeInt16LE = function (value, offset, noAssert) {
-  value = +value
-  offset = offset >>> 0
-  if (!noAssert)
-    checkInt(this, value, offset, 2, 0x7fff, -0x8000)
-  if (Buffer.TYPED_ARRAY_SUPPORT) {
-    this[offset] = value
-    this[offset + 1] = (value >>> 8)
-  } else objectWriteUInt16(this, value, offset, true)
+function writeInt16 (buf, value, offset, littleEndian, noAssert) {
+  if (!noAssert) {
+    assert(value !== undefined && value !== null, 'missing value')
+    assert(typeof littleEndian === 'boolean', 'missing or invalid endian')
+    assert(offset !== undefined && offset !== null, 'missing offset')
+    assert(offset + 1 < buf.length, 'Trying to write beyond buffer length')
+    verifsint(value, 0x7fff, -0x8000)
+  }
+
+  var len = buf.length
+  if (offset >= len)
+    return
+
+  if (value >= 0)
+    writeUInt16(buf, value, offset, littleEndian, noAssert)
+  else
+    writeUInt16(buf, 0xffff + value + 1, offset, littleEndian, noAssert)
   return offset + 2
+}
+
+Buffer.prototype.writeInt16LE = function (value, offset, noAssert) {
+  return writeInt16(this, value, offset, true, noAssert)
 }
 
 Buffer.prototype.writeInt16BE = function (value, offset, noAssert) {
-  value = +value
-  offset = offset >>> 0
-  if (!noAssert)
-    checkInt(this, value, offset, 2, 0x7fff, -0x8000)
-  if (Buffer.TYPED_ARRAY_SUPPORT) {
-    this[offset] = (value >>> 8)
-    this[offset + 1] = value
-  } else objectWriteUInt16(this, value, offset, false)
-  return offset + 2
+  return writeInt16(this, value, offset, false, noAssert)
+}
+
+function writeInt32 (buf, value, offset, littleEndian, noAssert) {
+  if (!noAssert) {
+    assert(value !== undefined && value !== null, 'missing value')
+    assert(typeof littleEndian === 'boolean', 'missing or invalid endian')
+    assert(offset !== undefined && offset !== null, 'missing offset')
+    assert(offset + 3 < buf.length, 'Trying to write beyond buffer length')
+    verifsint(value, 0x7fffffff, -0x80000000)
+  }
+
+  var len = buf.length
+  if (offset >= len)
+    return
+
+  if (value >= 0)
+    writeUInt32(buf, value, offset, littleEndian, noAssert)
+  else
+    writeUInt32(buf, 0xffffffff + value + 1, offset, littleEndian, noAssert)
+  return offset + 4
 }
 
 Buffer.prototype.writeInt32LE = function (value, offset, noAssert) {
-  value = +value
-  offset = offset >>> 0
-  if (!noAssert)
-    checkInt(this, value, offset, 4, 0x7fffffff, -0x80000000)
-  if (Buffer.TYPED_ARRAY_SUPPORT) {
-    this[offset] = value
-    this[offset + 1] = (value >>> 8)
-    this[offset + 2] = (value >>> 16)
-    this[offset + 3] = (value >>> 24)
-  } else objectWriteUInt32(this, value, offset, true)
-  return offset + 4
+  return writeInt32(this, value, offset, true, noAssert)
 }
 
 Buffer.prototype.writeInt32BE = function (value, offset, noAssert) {
-  value = +value
-  offset = offset >>> 0
-  if (!noAssert)
-    checkInt(this, value, offset, 4, 0x7fffffff, -0x80000000)
-  if (value < 0) value = 0xffffffff + value + 1
-  if (Buffer.TYPED_ARRAY_SUPPORT) {
-    this[offset] = (value >>> 24)
-    this[offset + 1] = (value >>> 16)
-    this[offset + 2] = (value >>> 8)
-    this[offset + 3] = value
-  } else objectWriteUInt32(this, value, offset, false)
-  return offset + 4
-}
-
-function checkIEEE754 (buf, value, offset, ext, max, min) {
-  if (value > max || value < min) throw new TypeError('value is out of bounds')
-  if (offset + ext > buf.length) throw new TypeError('index out of range')
+  return writeInt32(this, value, offset, false, noAssert)
 }
 
 function writeFloat (buf, value, offset, littleEndian, noAssert) {
-  if (!noAssert)
-    checkIEEE754(buf, value, offset, 4, 3.4028234663852886e+38, -3.4028234663852886e+38)
+  if (!noAssert) {
+    assert(value !== undefined && value !== null, 'missing value')
+    assert(typeof littleEndian === 'boolean', 'missing or invalid endian')
+    assert(offset !== undefined && offset !== null, 'missing offset')
+    assert(offset + 3 < buf.length, 'Trying to write beyond buffer length')
+    verifIEEE754(value, 3.4028234663852886e+38, -3.4028234663852886e+38)
+  }
+
+  var len = buf.length
+  if (offset >= len)
+    return
+
   ieee754.write(buf, value, offset, littleEndian, 23, 4)
   return offset + 4
 }
@@ -9821,8 +9964,19 @@ Buffer.prototype.writeFloatBE = function (value, offset, noAssert) {
 }
 
 function writeDouble (buf, value, offset, littleEndian, noAssert) {
-  if (!noAssert)
-    checkIEEE754(buf, value, offset, 8, 1.7976931348623157E+308, -1.7976931348623157E+308)
+  if (!noAssert) {
+    assert(value !== undefined && value !== null, 'missing value')
+    assert(typeof littleEndian === 'boolean', 'missing or invalid endian')
+    assert(offset !== undefined && offset !== null, 'missing offset')
+    assert(offset + 7 < buf.length,
+        'Trying to write beyond buffer length')
+    verifIEEE754(value, 1.7976931348623157E+308, -1.7976931348623157E+308)
+  }
+
+  var len = buf.length
+  if (offset >= len)
+    return
+
   ieee754.write(buf, value, offset, littleEndian, 52, 8)
   return offset + 8
 }
@@ -9835,56 +9989,20 @@ Buffer.prototype.writeDoubleBE = function (value, offset, noAssert) {
   return writeDouble(this, value, offset, false, noAssert)
 }
 
-// copy(targetBuffer, targetStart=0, sourceStart=0, sourceEnd=buffer.length)
-Buffer.prototype.copy = function (target, target_start, start, end) {
-  var source = this
-
-  if (!start) start = 0
-  if (!end && end !== 0) end = this.length
-  if (!target_start) target_start = 0
-
-  // Copy 0 bytes; we're done
-  if (end === start) return
-  if (target.length === 0 || source.length === 0) return
-
-  // Fatal error conditions
-  if (end < start) throw new TypeError('sourceEnd < sourceStart')
-  if (target_start < 0 || target_start >= target.length)
-    throw new TypeError('targetStart out of bounds')
-  if (start < 0 || start >= source.length) throw new TypeError('sourceStart out of bounds')
-  if (end < 0 || end > source.length) throw new TypeError('sourceEnd out of bounds')
-
-  // Are we oob?
-  if (end > this.length)
-    end = this.length
-  if (target.length - target_start < end - start)
-    end = target.length - target_start + start
-
-  var len = end - start
-
-  if (len < 100 || !Buffer.TYPED_ARRAY_SUPPORT) {
-    for (var i = 0; i < len; i++) {
-      target[i + target_start] = this[i + start]
-    }
-  } else {
-    target._set(this.subarray(start, start + len), target_start)
-  }
-}
-
 // fill(value, start=0, end=buffer.length)
 Buffer.prototype.fill = function (value, start, end) {
   if (!value) value = 0
   if (!start) start = 0
   if (!end) end = this.length
 
-  if (end < start) throw new TypeError('end < start')
+  assert(end >= start, 'end < start')
 
   // Fill 0 bytes; we're done
   if (end === start) return
   if (this.length === 0) return
 
-  if (start < 0 || start >= this.length) throw new TypeError('start out of bounds')
-  if (end < 0 || end > this.length) throw new TypeError('end out of bounds')
+  assert(start >= 0 && start < this.length, 'start out of bounds')
+  assert(end >= 0 && end <= this.length, 'end out of bounds')
 
   var i
   if (typeof value === 'number') {
@@ -9902,13 +10020,26 @@ Buffer.prototype.fill = function (value, start, end) {
   return this
 }
 
+Buffer.prototype.inspect = function () {
+  var out = []
+  var len = this.length
+  for (var i = 0; i < len; i++) {
+    out[i] = toHex(this[i])
+    if (i === exports.INSPECT_MAX_BYTES) {
+      out[i + 1] = '...'
+      break
+    }
+  }
+  return '<Buffer ' + out.join(' ') + '>'
+}
+
 /**
  * Creates a new `ArrayBuffer` with the *copied* memory of the buffer instance.
  * Added in Node 0.12. Only available in browsers that support ArrayBuffer.
  */
 Buffer.prototype.toArrayBuffer = function () {
   if (typeof Uint8Array !== 'undefined') {
-    if (Buffer.TYPED_ARRAY_SUPPORT) {
+    if (TYPED_ARRAY_SUPPORT) {
       return (new Buffer(this)).buffer
     } else {
       var buf = new Uint8Array(this.length)
@@ -9918,7 +10049,7 @@ Buffer.prototype.toArrayBuffer = function () {
       return buf.buffer
     }
   } else {
-    throw new TypeError('Buffer.toArrayBuffer not supported in this browser')
+    throw new Error('Buffer.toArrayBuffer not supported in this browser')
   }
 }
 
@@ -10001,6 +10132,12 @@ function stringtrim (str) {
   return str.replace(/^\s+|\s+$/g, '')
 }
 
+function isArray (subject) {
+  return (Array.isArray || function (subject) {
+    return Object.prototype.toString.call(subject) === '[object Array]'
+  })(subject)
+}
+
 function isArrayish (subject) {
   return isArray(subject) || Buffer.isBuffer(subject) ||
       subject && typeof subject === 'object' &&
@@ -10074,7 +10211,36 @@ function decodeUtf8Char (str) {
   }
 }
 
-},{"base64-js":41,"ieee754":42,"is-array":43}],41:[function(require,module,exports){
+/*
+ * We have to make sure that the value is a valid integer. This means that it
+ * is non-negative. It has no fractional component and that it does not
+ * exceed the maximum allowed value.
+ */
+function verifuint (value, max) {
+  assert(typeof value === 'number', 'cannot write a non-number as a number')
+  assert(value >= 0, 'specified a negative value for writing an unsigned value')
+  assert(value <= max, 'value is larger than maximum value for type')
+  assert(Math.floor(value) === value, 'value has a fractional component')
+}
+
+function verifsint (value, max, min) {
+  assert(typeof value === 'number', 'cannot write a non-number as a number')
+  assert(value <= max, 'value larger than maximum allowed value')
+  assert(value >= min, 'value smaller than minimum allowed value')
+  assert(Math.floor(value) === value, 'value has a fractional component')
+}
+
+function verifIEEE754 (value, max, min) {
+  assert(typeof value === 'number', 'cannot write a non-number as a number')
+  assert(value <= max, 'value larger than maximum allowed value')
+  assert(value >= min, 'value smaller than minimum allowed value')
+}
+
+function assert (test, message) {
+  if (!test) throw new Error(message || 'Failed assertion')
+}
+
+},{"base64-js":41,"ieee754":42}],41:[function(require,module,exports){
 var lookup = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
 
 ;(function (exports) {
@@ -10283,41 +10449,6 @@ exports.write = function(buffer, value, offset, isLE, mLen, nBytes) {
 };
 
 },{}],43:[function(require,module,exports){
-
-/**
- * isArray
- */
-
-var isArray = Array.isArray;
-
-/**
- * toString
- */
-
-var str = Object.prototype.toString;
-
-/**
- * Whether or not the given `val`
- * is an array.
- *
- * example:
- *
- *        isArray([]);
- *        // > true
- *        isArray(arguments);
- *        // > false
- *        isArray('');
- *        // > false
- *
- * @param {mixed} val
- * @return {bool}
- */
-
-module.exports = isArray || function (val) {
-  return !! val && '[object Array]' == str.call(val);
-};
-
-},{}],44:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -10377,8 +10508,10 @@ EventEmitter.prototype.emit = function(type) {
       er = arguments[1];
       if (er instanceof Error) {
         throw er; // Unhandled 'error' event
+      } else {
+        throw TypeError('Uncaught, unspecified "error" event.');
       }
-      throw TypeError('Uncaught, unspecified "error" event.');
+      return false;
     }
   }
 
@@ -10620,7 +10753,7 @@ function isUndefined(arg) {
   return arg === void 0;
 }
 
-},{}],45:[function(require,module,exports){
+},{}],44:[function(require,module,exports){
 if (typeof Object.create === 'function') {
   // implementation from standard node.js 'util' module
   module.exports = function inherits(ctor, superCtor) {
@@ -10645,7 +10778,7 @@ if (typeof Object.create === 'function') {
   }
 }
 
-},{}],46:[function(require,module,exports){
+},{}],45:[function(require,module,exports){
 // shim for using process in browser
 
 var process = module.exports = {};
@@ -10710,14 +10843,14 @@ process.chdir = function (dir) {
     throw new Error('process.chdir is not supported');
 };
 
-},{}],47:[function(require,module,exports){
+},{}],46:[function(require,module,exports){
 module.exports = function isBuffer(arg) {
   return arg && typeof arg === 'object'
     && typeof arg.copy === 'function'
     && typeof arg.fill === 'function'
     && typeof arg.readUInt8 === 'function';
 }
-},{}],48:[function(require,module,exports){
+},{}],47:[function(require,module,exports){
 (function (process,global){
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -11307,7 +11440,7 @@ function hasOwnProperty(obj, prop) {
 }
 
 }).call(this,require("FWaASH"),typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./support/isBuffer":47,"FWaASH":46,"inherits":45}],49:[function(require,module,exports){
+},{"./support/isBuffer":46,"FWaASH":45,"inherits":44}],48:[function(require,module,exports){
 // TODO Add in pre and post skipping options
 module.exports = {
   /**
@@ -11483,7 +11616,7 @@ function once (fn, scope) {
   };
 }
 
-},{}],50:[function(require,module,exports){
+},{}],49:[function(require,module,exports){
 /**
  * A class representation of the Read Preference.
  *
@@ -11551,7 +11684,7 @@ ReadPreference.NEAREST = 'nearest'
  * @ignore
  */
 exports.ReadPreference  = ReadPreference;
-},{}],51:[function(require,module,exports){
+},{}],50:[function(require,module,exports){
 /**
  * Module dependencies.
  */
@@ -11896,7 +12029,7 @@ Binary.SUBTYPE_USER_DEFINED = 128;
 exports.Binary = Binary;
 
 
-},{"buffer":40}],52:[function(require,module,exports){
+},{"buffer":40}],51:[function(require,module,exports){
 (function (process){
 /**
  * Binary Parser.
@@ -12285,7 +12418,7 @@ BinaryParser.Buffer = BinaryParserBuffer;
 exports.BinaryParser = BinaryParser;
 
 }).call(this,require("FWaASH"))
-},{"FWaASH":46,"util":48}],53:[function(require,module,exports){
+},{"FWaASH":45,"util":47}],52:[function(require,module,exports){
 (function (Buffer){
 var Long = require('./long').Long
   , Double = require('./double').Double
@@ -12515,12 +12648,7 @@ BSON.calculateObjectSize = function calculateObjectSize(object, serializeFunctio
  */
 function calculateElement(name, value, serializeFunctions) {
   var isBuffer = typeof Buffer !== 'undefined';
-  
-  // If we have toBSON defined, override the current object
-  if(value && value.toBSON){
-        value = value.toBSON();
-  }
-  
+
   switch(typeof value) {
     case 'string':
       return 1 + (!isBuffer ? numberOfBytes(name) : Buffer.byteLength(name, 'utf8')) + 1 + 4 + (!isBuffer ? numberOfBytes(value) : Buffer.byteLength(value, 'utf8')) + 1;
@@ -12631,12 +12759,6 @@ BSON.serializeWithBufferAndIndex = function serializeWithBufferAndIndex(object, 
  * @api private
  */
 var serializeObject = function(object, checkKeys, buffer, index, serializeFunctions) {
-  if(object.toBSON) {
-    if(typeof object.toBSON != 'function') throw new Error("toBSON is not a function");
-    object = object.toBSON();
-    if(object != null && typeof object != 'object') throw new Error("toBSON function did not return an object");
-  }
-
   // Process the object
   if(Array.isArray(object)) {
     for(var i = 0; i < object.length; i++) {
@@ -12725,12 +12847,6 @@ var supportsBuffer = typeof Buffer != 'undefined';
  * @api private
  */
 var packElement = function(name, value, checkKeys, buffer, index, serializeFunctions) {
-	
-  // If we have toBSON defined, override the current object
-  if(value && value.toBSON){
-        value = value.toBSON();
-  }
-  
   var startIndex = index;
 
   switch(typeof value) {
@@ -12930,7 +13046,7 @@ var packElement = function(name, value, checkKeys, buffer, index, serializeFunct
         return index;
       } else if(value instanceof Long || value instanceof Timestamp || value['_bsontype'] == 'Long' || value['_bsontype'] == 'Timestamp') {
         // Write the type
-        buffer[index++] = value instanceof Long || value['_bsontype'] == 'Long' ? BSON.BSON_DATA_LONG : BSON.BSON_DATA_TIMESTAMP;
+        buffer[index++] = value instanceof Long ? BSON.BSON_DATA_LONG : BSON.BSON_DATA_TIMESTAMP;
         // Number of written bytes
         var numberOfWrittenBytes = supportsBuffer ? buffer.write(name, index, 'utf8') : writeToTypedArray(buffer, name, index);
         // Encode the name
@@ -13855,7 +13971,7 @@ exports.MinKey = MinKey;
 exports.MaxKey = MaxKey;
 
 }).call(this,require("buffer").Buffer)
-},{"./binary":51,"./binary_parser":52,"./code":54,"./db_ref":55,"./double":56,"./float_parser":57,"./long":58,"./max_key":59,"./min_key":60,"./objectid":61,"./symbol":62,"./timestamp":63,"buffer":40}],54:[function(require,module,exports){
+},{"./binary":50,"./binary_parser":51,"./code":53,"./db_ref":54,"./double":55,"./float_parser":56,"./long":57,"./max_key":58,"./min_key":59,"./objectid":60,"./symbol":61,"./timestamp":62,"buffer":40}],53:[function(require,module,exports){
 /**
  * A class representation of the BSON Code type.
  *
@@ -13864,8 +13980,9 @@ exports.MaxKey = MaxKey;
  * @param {Object} [scope] an optional scope for the function.
  * @return {Code}
  */
-var Code = function Code(code, scope) {
+function Code(code, scope) {
   if(!(this instanceof Code)) return new Code(code, scope);
+  
   this._bsontype = 'Code';
   this.code = code;
   this.scope = scope == null ? {} : scope;
@@ -13880,7 +13997,7 @@ Code.prototype.toJSON = function() {
 }
 
 exports.Code = Code;
-},{}],55:[function(require,module,exports){
+},{}],54:[function(require,module,exports){
 /**
  * A class representation of the BSON DBRef type.
  *
@@ -13912,7 +14029,7 @@ DBRef.prototype.toJSON = function() {
 }
 
 exports.DBRef = DBRef;
-},{}],56:[function(require,module,exports){
+},{}],55:[function(require,module,exports){
 /**
  * A class representation of the BSON Double type.
  *
@@ -13946,7 +14063,7 @@ Double.prototype.toJSON = function() {
 }
 
 exports.Double = Double;
-},{}],57:[function(require,module,exports){
+},{}],56:[function(require,module,exports){
 // Copyright (c) 2008, Fair Oaks Labs, Inc.
 // All rights reserved.
 // 
@@ -14068,7 +14185,7 @@ var writeIEEE754 = function(buffer, value, offset, endian, mLen, nBytes) {
 
 exports.readIEEE754 = readIEEE754;
 exports.writeIEEE754 = writeIEEE754;
-},{}],58:[function(require,module,exports){
+},{}],57:[function(require,module,exports){
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -14923,7 +15040,7 @@ Long.TWO_PWR_24_ = Long.fromInt(1 << 24);
  * Expose.
  */
 exports.Long = Long;
-},{}],59:[function(require,module,exports){
+},{}],58:[function(require,module,exports){
 /**
  * A class representation of the BSON MaxKey type.
  *
@@ -14937,7 +15054,7 @@ function MaxKey() {
 }
 
 exports.MaxKey = MaxKey;
-},{}],60:[function(require,module,exports){
+},{}],59:[function(require,module,exports){
 /**
  * A class representation of the BSON MinKey type.
  *
@@ -14951,7 +15068,7 @@ function MinKey() {
 }
 
 exports.MinKey = MinKey;
-},{}],61:[function(require,module,exports){
+},{}],60:[function(require,module,exports){
 (function (process){
 /**
  * Module dependencies.
@@ -14986,7 +15103,7 @@ var ObjectID = function ObjectID(id) {
   var valid = ObjectID.isValid(id);
 
   // Throw an error if it's not a valid setup
-  if(!valid && id != null){
+  if(!valid){
     throw new Error("Argument passed in must be a single String of 12 bytes or a string of 24 hex characters");
   } else if(valid && typeof id == 'string' && id.length == 24) {
     return ObjectID.createFromHexString(id);
@@ -15001,14 +15118,8 @@ var ObjectID = function ObjectID(id) {
   if(ObjectID.cacheHexString) this.__id = this.toHexString();
 };
 
-// Allow usage of ObjectId as well as ObjectID
+// Allow usage of ObjectId aswell as ObjectID
 var ObjectId = ObjectID;
-
-// Precomputed hex table enables speedy hex string conversion
-var hexTable = [];
-for (var i = 0; i < 256; i++) {
-  hexTable[i] = (i <= 15 ? '0' : '') + i.toString(16);
-}
 
 /**
 * Return the ObjectID id as a 24 byte hex string representation
@@ -15019,10 +15130,16 @@ for (var i = 0; i < 256; i++) {
 ObjectID.prototype.toHexString = function() {
   if(ObjectID.cacheHexString && this.__id) return this.__id;
 
-  var hexString = '';
+  var hexString = ''
+    , number
+    , value;
 
-  for (var i = 0; i < this.id.length; i++) {
-    hexString += hexTable[this.id.charCodeAt(i)];
+  for (var index = 0, len = this.id.length; index < len; index++) {
+    value = BinaryParser.toByte(this.id[index]);
+    number = value <= 15
+      ? '0' + value.toString(16)
+      : value.toString(16);
+    hexString = hexString + number;
   }
 
   if(ObjectID.cacheHexString) this.__id = hexString;
@@ -15187,9 +15304,7 @@ ObjectID.createFromHexString = function createFromHexString (hexString) {
 * @api public
 */
 ObjectID.isValid = function isValid(id) {
-  if(id == null) return false;
-
-  if(id != null && 'number' != typeof id && (id.length != 12 && id.length != 24)) {
+  if (id != null && 'number' != typeof id && (id.length != 12 && id.length != 24)) {
     return false;
   } else {
     // Check specifically for hex correctness
@@ -15221,7 +15336,7 @@ exports.ObjectID = ObjectID;
 exports.ObjectId = ObjectID;
 
 }).call(this,require("FWaASH"))
-},{"./binary_parser":52,"FWaASH":46}],62:[function(require,module,exports){
+},{"./binary_parser":51,"FWaASH":45}],61:[function(require,module,exports){
 /**
  * A class representation of the BSON Symbol type.
  *
@@ -15270,7 +15385,7 @@ Symbol.prototype.toJSON = function() {
 }
 
 exports.Symbol = Symbol;
-},{}],63:[function(require,module,exports){
+},{}],62:[function(require,module,exports){
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -16124,10 +16239,10 @@ Timestamp.TWO_PWR_24_ = Timestamp.fromInt(1 << 24);
  * Expose.
  */
 exports.Timestamp = Timestamp;
-},{}],64:[function(require,module,exports){
+},{}],63:[function(require,module,exports){
 module.exports = exports = require('./lib');
 
-},{"./lib":65}],65:[function(require,module,exports){
+},{"./lib":64}],64:[function(require,module,exports){
 
 /**
  * Returns the value of object `o` at the given `path`.
@@ -16312,10 +16427,10 @@ function K (v) {
   return v;
 }
 
-},{}],66:[function(require,module,exports){
+},{}],65:[function(require,module,exports){
 module.exports = exports = require('./lib/promise');
 
-},{"./lib/promise":67}],67:[function(require,module,exports){
+},{"./lib/promise":66}],66:[function(require,module,exports){
 (function (process){
 'use strict';
 
@@ -16779,7 +16894,7 @@ Promise.hook = function(arr) {
 module.exports = Promise;
 
 }).call(this,require("FWaASH"))
-},{"FWaASH":46,"events":44}],68:[function(require,module,exports){
+},{"FWaASH":45,"events":43}],67:[function(require,module,exports){
 /**
 
 # ms.js
@@ -16816,7 +16931,7 @@ No more painful `setTimeout(fn, 60 * 4 * 3 * 2 * 1 * Infinity * NaN * '☃')`.
   g.top ? g.ms = ms : module.exports = ms;
 })(this);
 
-},{}],69:[function(require,module,exports){
+},{}],68:[function(require,module,exports){
 
 var toString = Object.prototype.toString;
 
@@ -16838,10 +16953,10 @@ module.exports = exports = function (regexp) {
 }
 
 
-},{}],70:[function(require,module,exports){
+},{}],69:[function(require,module,exports){
 module.exports = exports = require('./lib/sliced');
 
-},{"./lib/sliced":71}],71:[function(require,module,exports){
+},{"./lib/sliced":70}],70:[function(require,module,exports){
 
 /**
  * An Array.prototype.slice.call(arguments) alternative

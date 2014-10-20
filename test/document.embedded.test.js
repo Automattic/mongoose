@@ -182,6 +182,25 @@ describe('saving', function () {
       });
     });
 
+    it('should leave the doc as not modified when saving each modified embedded document', function (done) {
+      saveSampleDocument(function (err, db, M, doc) {
+        assert.ifError(err);
+        doc.cats[0].name = changedName;
+        doc.cats[1].name = changedName;
+        assert.equal(doc.isModified(), true);
+        doc.cats[0].save(function (err) {
+          assert.ifError(err);
+          assert.equal(doc.isModified(), true);
+          doc.cats[1].save(function (err) {
+            db.close();
+            assert.ifError(err);
+            assert.equal(doc.isModified(), false);
+            done();
+          });
+        });
+      });
+    });
+
     it('should include an error in the callback function when is new', function (done) {
       var db = start()
         , M = db.model(modelName);

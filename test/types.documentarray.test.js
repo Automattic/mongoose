@@ -220,8 +220,17 @@ describe('types.documentarray', function(){
       assert.equal(undefined, delta.$pushAll.docs[0].changed);
       done();
     })
-    it('uses the correct transform (gh-1412)', function(done){
+    it('uses the correct transform (gh-1412)', function(done) {
       var db = start();
+      var SecondSchema = new Schema({});
+
+      SecondSchema.set('toObject', {
+        transform: function second(doc, ret, options) {
+          ret.secondToObject = true;
+          return ret;
+        },
+      });
+
       var FirstSchema = new Schema({
         second: [SecondSchema],
       });
@@ -229,15 +238,6 @@ describe('types.documentarray', function(){
       FirstSchema.set('toObject', {
       transform: function first(doc, ret, options) {
           ret.firstToObject = true;
-          return ret;
-        },
-      });
-
-      var SecondSchema = new Schema({});
-
-      SecondSchema.set('toObject', {
-        transform: function second(doc, ret, options) {
-          ret.secondToObject = true;
           return ret;
         },
       });

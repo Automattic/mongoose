@@ -342,6 +342,7 @@ describe('document modified', function(){
 
       p.save(function(error) {
         assert.ifError(error);
+        assert.equal(p.child.name, 'Luke');
         Parent.findOne({}, function(error, p) {
           assert.ifError(error);
           assert.ok(p.child);

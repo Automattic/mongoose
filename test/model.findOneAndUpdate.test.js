@@ -1014,12 +1014,143 @@ describe('model: findByIdAndUpdate:', function(){
         updateOptions,
         function(error, breakfast) {
           assert.ok(!!error);
+          assert.ok(!breakfast);
           assert.equal(1, Object.keys(error.errors).length);
           assert.equal('topping', Object.keys(error.errors)[0]);
           assert.equal('Validator failed for path `topping` with value `bacon`',
             error.errors['topping'].message);
 
           assert.ok(!breakfast);
+          db.close();
+          done();
+        });
+    });
+
+    it('validators handle $unset and $setOnInsert', function(done) {
+      var db = start();
+
+      var s = new Schema({
+        steak: { type: String, required: true },
+        eggs: { type: String, validate: function(v) { return false; } }
+      });
+      var Breakfast = db.model('fam-gh-860-4', s);
+
+      var updateOptions = { runValidators: true };
+      Breakfast.findOneAndUpdate(
+        {},
+        { $unset: { steak: '' }, $setOnInsert: { eggs: 'softboiled' } },
+        updateOptions,
+        function(error, breakfast) {
+          assert.ok(!!error);
+          assert.ok(!breakfast);
+          assert.equal(2, Object.keys(error.errors).length);
+          assert.ok(Object.keys(error.errors).indexOf('eggs') != -1);
+          assert.ok(Object.keys(error.errors).indexOf('steak') != -1);
+          assert.equal('Validator failed for path `eggs` with value `softboiled`',
+            error.errors['eggs'].message);
+          assert.equal('Path `steak` is required.',
+            error.errors['steak'].message);
+          db.close();
+          done();
+        });
+    });
+
+    it('min/max, enum, and regex built-in validators work', function(done) {
+      var db = start();
+
+      var s = new Schema({
+        steak: { type: String, enum: ['ribeye', 'sirloin'] },
+        eggs: { type: Number, min: 4, max: 6 },
+        bacon: { type: String, match: /strips/ }
+      });
+      var Breakfast = db.model('fam-gh-860-5', s);
+
+      var updateOptions = { runValidators: true };
+      Breakfast.findOneAndUpdate(
+        {},
+        { $set: { steak: 'ribeye', eggs: 3, bacon: '3 strips' } },
+        updateOptions,
+        function(error) {
+          assert.ok(!!error);
+          assert.equal(1, Object.keys(error.errors).length);
+          assert.equal('eggs', Object.keys(error.errors)[0]);
+          assert.equal('Path `eggs` (3) is less than minimum allowed value (4).',
+            error.errors['eggs'].message);
+
+          Breakfast.findOneAndUpdate(
+            {},
+            { $set: { steak: 'tofu', eggs: 5, bacon: '3 strips' } },
+            updateOptions,
+            function(error) {
+              assert.ok(!!error);
+              assert.equal(1, Object.keys(error.errors).length);
+              assert.equal('steak', Object.keys(error.errors)[0]);
+              assert.equal('`tofu` is not a valid enum value for path `steak`.',
+                error.errors['steak']);
+
+
+              Breakfast.findOneAndUpdate(
+                {},
+                { $set: { steak: 'sirloin', eggs: 6, bacon: 'none' } },
+                updateOptions,
+                function(error) {
+                  assert.ok(!!error);
+                  assert.equal(1, Object.keys(error.errors).length);
+                  assert.equal('bacon', Object.keys(error.errors)[0]);
+                  assert.equal('Path `bacon` is invalid (none).',
+                    error.errors['bacon'].message);
+
+                  db.close();
+                  done();
+                });
+            });
+        });
+    });
+
+    it('multiple validation errors', function(done) {
+      var db = start();
+
+      var s = new Schema({
+        steak: { type: String, enum: ['ribeye', 'sirloin'] },
+        eggs: { type: Number, min: 4, max: 6 },
+        bacon: { type: String, match: /strips/ }
+      });
+      var Breakfast = db.model('fam-gh-860-6', s);
+
+      var updateOptions = { runValidators: true };
+      Breakfast.findOneAndUpdate(
+        {},
+        { $set: { steak: 'tofu', eggs: 2, bacon: '3 strips' } },
+        updateOptions,
+        function(error, breakfast) {
+          assert.ok(!!error);
+          assert.equal(2, Object.keys(error.errors).length);
+          assert.ok(Object.keys(error.errors).indexOf('steak') !== -1);
+          assert.ok(Object.keys(error.errors).indexOf('eggs') !== -1);
+          assert.ok(!breakfast);
+          db.close();
+          done();
+        });
+    });
+
+    it('validators ignore $inc', function(done) {
+      var db = start();
+
+      var s = new Schema({
+        steak: { type: String, required: true },
+        eggs: { type: Number, min: 4 }
+      });
+      var Breakfast = db.model('fam-gh-860-7', s);
+
+      var updateOptions = { runValidators: true, upsert: true };
+      Breakfast.findOneAndUpdate(
+        {},
+        { $inc: { eggs: 1 } },
+        updateOptions,
+        function(error, breakfast) {
+          assert.ifError(error);
+          assert.ok(!!breakfast);
+          assert.equal(1, breakfast.eggs);
           db.close();
           done();
         });

@@ -405,6 +405,33 @@ describe('document: hooks:', function () {
     });
   });
 
+  it('can set nested schema to undefined in pre save (gh-1335)', function(done) {
+    var db = start();
+    var FooSchema = new Schema({});
+    var Foo = db.model('gh-1335-1', FooSchema);
+    var BarSchema = new Schema({
+      foos: [FooSchema]
+    });
+    var Bar = db.model('gh-1335-2', BarSchema);
+
+    var b = new Bar();
+    b.pre('save', function(next) {
+      if (this.isNew && 0 === this.foos.length) {
+        this.foos = undefined;
+      }
+      next();
+    });
+
+    b.save(function(error, dbBar) {
+      assert.ifError(error);
+      assert.ok(!dbBar.foos);
+      assert.equal(typeof dbBar.foos, 'undefined');
+      assert.ok(!b.foos);
+      assert.equal(typeof b.foos, 'undefined');
+      done();
+    });
+  });
+
   it('post save hooks on subdocuments work (gh-915)', function(done) {
 
     var doneCalled = false;

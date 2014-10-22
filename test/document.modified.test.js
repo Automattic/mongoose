@@ -350,6 +350,41 @@ describe('document modified', function(){
           })
         })
       });
-    })
+    });
+
+    it('should mark multi-level nested schemas as modified (gh-1754)', function(done) {
+      var db = start();
+
+      var grandChildSchema = Schema({
+        name : String
+      });
+
+      var childSchema = Schema({
+       name : String,
+       grandChild : [grandChildSchema]
+      });
+
+      var parentSchema = Schema({
+        name : String,
+        child : [childSchema]
+      });
+
+      var Parent = db.model('gh-1754', parentSchema);
+      Parent.create(
+        { child: [{ name: 'Brian', grandChild: [{ name: 'Jake' }] }] },
+        function(error, p) {
+          assert.ifError(error);
+          assert.ok(p);
+          assert.equal(1, p.child.length);
+          assert.equal(1, p.child[0].grandChild.length);
+          p.child[0].grandChild[0].name = 'Jason';
+          assert.ok(p.isModified('child.0.grandChild.0.name'));
+          p.save(function(error, inDb) {
+            assert.ifError(error); 
+            assert.equal('Jason', inDb.child[0].grandChild[0].name);
+            done();
+          });
+        });
+    });
   });
 })

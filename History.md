@@ -1,3 +1,7 @@
+3.8.18 / 2014-10-22
+==================
+ * fixed; Dont use all toObject options in save #2340 [chetverikov](https://github.com/chetverikov)
+
 3.8.17 / 2014-09-29
 ==================
  * fixed; use schema options retainKeyOrder in save() #2274

@@ -259,15 +259,27 @@ describe('schema', function(){
       });
     });
 
-    it('date', function(done){
-      var Loki = new Schema({
-          birth_date: { type: Date }
-      });
+    describe('date', function(done){
+      it('works', function(done){
+        var Loki = new Schema({
+            birth_date: { type: Date }
+        });
 
-      assert.ok(Loki.path('birth_date').cast(1294525628301) instanceof Date);
-      assert.ok(Loki.path('birth_date').cast('8/24/2000') instanceof Date);
-      assert.ok(Loki.path('birth_date').cast(new Date) instanceof Date);
-      done();
+        assert.ok(Loki.path('birth_date').cast(1294525628301) instanceof Date);
+        assert.ok(Loki.path('birth_date').cast('8/24/2000') instanceof Date);
+        assert.ok(Loki.path('birth_date').cast(new Date) instanceof Date);
+        done();
+      });
+      it('casts undefined to "undefined"', function(done){
+        var db= require('./common')();
+        var schema = new Schema({ arr: [Date] });
+        var M = db.model('castingDateArrayWithUndefined', schema);
+        M.find({ arr: { $in: [undefined] }}, function (err) {
+          db.close();
+          assert.equal(err && err.message, 'Cast to date failed for value "undefined" at path "arr"');
+          done();
+        });
+      });
     });
 
     it('objectid', function(done){

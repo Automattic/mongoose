@@ -1,3 +1,9 @@
+3.9.4 / 2014-10-25
+==================
+ * fixed; statics no longer can be overwritten #2343 [nkcmr](https://github.com/chetverikov)
+ * added; ability to set single populated paths to documents #1530
+ * added; setDefaultsOnInsert and runValidator options for findOneAndUpdate() #860
+
 3.8.18 / 2014-10-22
 ==================
  * fixed; Dont use all toObject options in save #2340 [chetverikov](https://github.com/chetverikov)

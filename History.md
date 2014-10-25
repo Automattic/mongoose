@@ -1,3 +1,7 @@
+3.8.18 / 2014-10-22
+==================
+ * fixed; Dont use all toObject options in save #2340 [chetverikov](https://github.com/chetverikov)
+
 3.9.3 / 2014-10-01
 =================
  * added; support for virtuals that return objects #2294

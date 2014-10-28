@@ -152,34 +152,34 @@ describe('shard', function(){
 
     P.create({ name: 'ryu', likes: ['street fighting']}, function (err, ryu) {
       assert.ok(err);
-      assert.ok(/tried to insert object with no valid shard key/.test(err.message));
+      assert.ok(err.message);
       if (!--pending) {
         db.close();
         done();
       }
     });
 
-    P.create({ likes: ['street fighting']}, function (err, ryu) { assert.ok(err);
+    P.create({ likes: ['street fighting']}, function (err, ryu) {
       assert.ok(err);
-      assert.ok(/tried to insert object with no valid shard key/.test(err.message));
+      assert.ok(err.message);
       if (!--pending) {
         db.close();
         done();
       }
     });
 
-    P.create({ name: 'ryu' }, function (err, ryu) { assert.ok(err);
+    P.create({ name: 'ryu' }, function (err, ryu) {
       assert.ok(err);
-      assert.ok(/tried to insert object with no valid shard key/.test(err.message));
+      assert.ok(err.message);
       if (!--pending) {
         db.close();
         done();
       }
     });
 
-    P.create({ age: 49 }, function (err, ryu) { assert.ok(err);
+    P.create({ age: 49 }, function (err, ryu) {
       assert.ok(err);
-      assert.ok(/tried to insert object with no valid shard key/.test(err.message));
+      assert.ok(err.message);
       if (!--pending) {
         db.close();
         done();
@@ -188,7 +188,7 @@ describe('shard', function(){
 
     P.create({ likes: ['street fighting'], age: 8 }, function (err, ryu) {
       assert.ok(err);
-      assert.ok(/tried to insert object with no valid shard key/.test(err.message))
+      assert.ok(err.message);
       if (!--pending) {
         db.close();
         done();
@@ -198,7 +198,7 @@ describe('shard', function(){
     var p = new P;
     p.save(function (err) {
       assert.ok(err);
-      assert.ok(/tried to insert object with no valid shard key/.test(err.message));
+      assert.ok(err.message);
       if (!--pending) {
         db.close();
         done();
@@ -254,7 +254,7 @@ describe('shard', function(){
 
       chunli.age = 20;
       chunli.save(function (err) {
-        assert.ok(/^Can't modify shard key's value/.test(err.message));
+        assert.ok(/^After applying the update to the document/.test(err.message));
 
         assert.equal(chunli.$__.shardval.name, 'chun li');
         assert.equal(chunli.$__.shardval.age, 19);
@@ -268,7 +268,7 @@ describe('shard', function(){
           chunli.name='chuuuun liiiii';
           chunli.save(function (err) {
             db.close();
-            assert.ok(/^Can't modify shard key's value/.test(err.message));
+            assert.ok(/^After applying the update to the document/.test(err.message));
             done();
           });
         });

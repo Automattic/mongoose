@@ -1,4 +1,5 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+(function (Buffer){
 exports.Error = require('./error');
 exports.Schema = require('./schema');
 exports.Types = require('./types');
@@ -8,14 +9,13 @@ exports.utils = require('./utils.js');
 
 exports.Document = require('./document_provider.js')();
 
-// Small hacks to make browserify include variable-path requires
-require('./drivers/node-mongodb-native/binary');
-
 if (typeof window !== 'undefined') {
   window.mongoose = module.exports;
+  window.Buffer = Buffer;
 }
 
-},{"./document_provider.js":5,"./drivers/node-mongodb-native/binary":6,"./error":8,"./schema":19,"./schematype.js":30,"./types":36,"./utils.js":38,"./virtualtype":39}],2:[function(require,module,exports){
+}).call(this,require("buffer").Buffer)
+},{"./document_provider.js":5,"./error":8,"./schema":19,"./schematype.js":30,"./types":36,"./utils.js":38,"./virtualtype":39,"buffer":40}],2:[function(require,module,exports){
 /*!
  * Module dependencies.
  */
@@ -877,7 +877,15 @@ Document.prototype.set = function (path, val, type, options) {
   }
 
   var self = this;
-  var shouldSet = this.$__try(function(){
+  var shouldSet = this.$__try(function() {
+    // If the user is trying to set a ref path to a document with
+    // the correct model name, treat it as populated
+    if (schema.options &&
+        schema.options.ref &&
+        val instanceof Document &&
+        schema.options.ref === val.constructor.modelName) {
+      self.populated(path, val);
+    }
     val = schema.applySetters(val, self, false, priorVal);
   });
 
@@ -1634,11 +1642,11 @@ Document.prototype.$__getAllSubdocs = function () {
 
   function docReducer(seed, path) {
     var val = this[path];
-    if (val instanceof Embedded) seed.push(val);
+    if (val instanceof Embedded || (val instanceof Document && val._id)) seed.push(val);
     if (val && val.isMongooseDocumentArray) {
       val.forEach(function _docReduce(doc) {
         if (!doc || !doc._doc) return;
-        if (doc instanceof Embedded) seed.push(doc);
+        if (doc instanceof Embedded || (val instanceof Document && val._id)) seed.push(doc);
         seed = Object.keys(doc._doc).reduce(docReducer.bind(doc._doc), seed);
       });
     }
@@ -1902,9 +1910,13 @@ Document.prototype.$__handleReject = function handleReject(err) {
  */
 
 Document.prototype.toObject = function (options) {
-  if (options && options.depopulate && this.$__.wasPopulated) {
+  if (options && options.depopulate && !options._skipDepopulateTopLevel && this.$__.wasPopulated) {
     // populated paths that we set to a document
     return clone(this._id, options);
+  }
+
+  if (options && options._skipDepopulateTopLevel) {
+    options.skipDepopulateOne = false;
   }
 
   // When internally saving this document we always pass options,
@@ -2250,7 +2262,7 @@ var Document = require('./document.js');
 var BrowserDocument = require('./browserDocument.js');
 
 /**
- * Returns the Document constructor for the current context 
+ * Returns the Document constructor for the current context
  *
  * @api private
  */
@@ -2261,7 +2273,6 @@ module.exports = function() {
     return Document;
   }
 };
-
 },{"./browserDocument.js":2,"./document.js":4}],6:[function(require,module,exports){
 
 /*!
@@ -2553,7 +2564,10 @@ function ValidationError (instance) {
   MongooseError.call(this, "Validation failed");
   Error.captureStackTrace && Error.captureStackTrace(this, arguments.callee);
   this.name = 'ValidationError';
-  this.errors = instance.errors = {};
+  this.errors = {};
+  if (instance) {
+    instance.errors = this.errors;
+  }
 };
 
 /*!
@@ -5336,7 +5350,7 @@ var SchemaType = require('../schematype')
 
 function ObjectId (key, options) {
   SchemaType.call(this, key, options, 'ObjectID');
-};
+}
 
 /*!
  * Inherits from SchemaType.
@@ -5722,11 +5736,12 @@ SchemaString.prototype.match = function match (regExp, message) {
 
   var msg = message || errorMessages.String.match;
 
-  function matchValidator (v){
-    return null != v && '' !== v
+  var matchValidator = function(v) {
+    var ret = ((null != v && '' !== v)
       ? regExp.test(v)
-      : true
-  }
+      : true);
+    return ret;
+  };
 
   this.validators.push({ validator: matchValidator, message: msg, type: 'regexp' });
   return this;
@@ -5920,7 +5935,7 @@ function SchemaType (path, options, instance) {
  * ####Example:
  *
  *     // values are cast:
- *     var schema = new Schema({ aNumber: Number, default: "4.815162342" })
+ *     var schema = new Schema({ aNumber: { type: Number, default: 4.815162342 }})
  *     var M = db.model('M', schema)
  *     var m = new M;
  *     console.log(m.aNumber) // 4.815162342
@@ -7702,7 +7717,7 @@ module.exports = MongooseBuffer;
  */
 
 var MongooseArray = require('./array')
-  , ObjectId = require('../drivers/node-mongodb-native/objectid')
+  , ObjectId = require('./objectid')
   , ObjectIdSchema = require('../schema/objectid')
   , utils = require('../utils')
   , util = require('util')
@@ -7907,7 +7922,7 @@ MongooseDocumentArray.mixin.notify = function notify (event) {
 module.exports = MongooseDocumentArray;
 
 }).call(this,require("buffer").Buffer)
-},{"../document":4,"../drivers/node-mongodb-native/objectid":7,"../schema/objectid":28,"../utils":38,"./array":32,"buffer":40,"util":47}],35:[function(require,module,exports){
+},{"../document":4,"../schema/objectid":28,"../utils":38,"./array":32,"./objectid":37,"buffer":40,"util":47}],35:[function(require,module,exports){
 /*!
  * Module dependencies.
  */
@@ -8915,6 +8930,37 @@ exports.decorate = function(destination, source) {
     destination[key] = source[key];
   }
 };
+
+/**
+ * merges to with a copy of from
+ *
+ * @param {Object} to
+ * @param {Object} from
+ * @api private
+ */
+
+exports.mergeClone = function(to, from) {
+  var keys = Object.keys(from)
+    , i = keys.length
+    , key
+
+  while (i--) {
+    key = keys[i];
+    if ('undefined' === typeof to[key]) {
+      // make sure to retain key order here because of a bug handling the $each
+      // operator in mongodb 2.4.4
+      to[key] = exports.clone(from[key], { retainKeyOrder : 1});
+    } else {
+      if (exports.isObject(from[key])) {
+        exports.mergeClone(to[key], from[key]);
+      } else {
+        // make sure to retain key order here because of a bug handling the
+        // $each operator in mongodb 2.4.4
+        to[key] = exports.clone(from[key], { retainKeyOrder : 1});
+      }
+    }
+  }
+}
 
 
 }).call(this,require("FWaASH"),require("buffer").Buffer)
@@ -10462,8 +10508,10 @@ EventEmitter.prototype.emit = function(type) {
       er = arguments[1];
       if (er instanceof Error) {
         throw er; // Unhandled 'error' event
+      } else {
+        throw TypeError('Uncaught, unspecified "error" event.');
       }
-      throw TypeError('Uncaught, unspecified "error" event.');
+      return false;
     }
   }
 
@@ -12600,12 +12648,7 @@ BSON.calculateObjectSize = function calculateObjectSize(object, serializeFunctio
  */
 function calculateElement(name, value, serializeFunctions) {
   var isBuffer = typeof Buffer !== 'undefined';
-  
-  // If we have toBSON defined, override the current object
-  if(value && value.toBSON){
-        value = value.toBSON();
-  }
-  
+
   switch(typeof value) {
     case 'string':
       return 1 + (!isBuffer ? numberOfBytes(name) : Buffer.byteLength(name, 'utf8')) + 1 + 4 + (!isBuffer ? numberOfBytes(value) : Buffer.byteLength(value, 'utf8')) + 1;
@@ -12716,12 +12759,6 @@ BSON.serializeWithBufferAndIndex = function serializeWithBufferAndIndex(object, 
  * @api private
  */
 var serializeObject = function(object, checkKeys, buffer, index, serializeFunctions) {
-  if(object.toBSON) {
-    if(typeof object.toBSON != 'function') throw new Error("toBSON is not a function");
-    object = object.toBSON();
-    if(object != null && typeof object != 'object') throw new Error("toBSON function did not return an object");
-  }
-
   // Process the object
   if(Array.isArray(object)) {
     for(var i = 0; i < object.length; i++) {
@@ -12810,12 +12847,6 @@ var supportsBuffer = typeof Buffer != 'undefined';
  * @api private
  */
 var packElement = function(name, value, checkKeys, buffer, index, serializeFunctions) {
-	
-  // If we have toBSON defined, override the current object
-  if(value && value.toBSON){
-        value = value.toBSON();
-  }
-  
   var startIndex = index;
 
   switch(typeof value) {
@@ -13015,7 +13046,7 @@ var packElement = function(name, value, checkKeys, buffer, index, serializeFunct
         return index;
       } else if(value instanceof Long || value instanceof Timestamp || value['_bsontype'] == 'Long' || value['_bsontype'] == 'Timestamp') {
         // Write the type
-        buffer[index++] = value instanceof Long || value['_bsontype'] == 'Long' ? BSON.BSON_DATA_LONG : BSON.BSON_DATA_TIMESTAMP;
+        buffer[index++] = value instanceof Long ? BSON.BSON_DATA_LONG : BSON.BSON_DATA_TIMESTAMP;
         // Number of written bytes
         var numberOfWrittenBytes = supportsBuffer ? buffer.write(name, index, 'utf8') : writeToTypedArray(buffer, name, index);
         // Encode the name
@@ -13949,8 +13980,9 @@ exports.MaxKey = MaxKey;
  * @param {Object} [scope] an optional scope for the function.
  * @return {Code}
  */
-var Code = function Code(code, scope) {
+function Code(code, scope) {
   if(!(this instanceof Code)) return new Code(code, scope);
+  
   this._bsontype = 'Code';
   this.code = code;
   this.scope = scope == null ? {} : scope;
@@ -15071,7 +15103,7 @@ var ObjectID = function ObjectID(id) {
   var valid = ObjectID.isValid(id);
 
   // Throw an error if it's not a valid setup
-  if(!valid && id != null){
+  if(!valid){
     throw new Error("Argument passed in must be a single String of 12 bytes or a string of 24 hex characters");
   } else if(valid && typeof id == 'string' && id.length == 24) {
     return ObjectID.createFromHexString(id);
@@ -15086,14 +15118,8 @@ var ObjectID = function ObjectID(id) {
   if(ObjectID.cacheHexString) this.__id = this.toHexString();
 };
 
-// Allow usage of ObjectId as well as ObjectID
+// Allow usage of ObjectId aswell as ObjectID
 var ObjectId = ObjectID;
-
-// Precomputed hex table enables speedy hex string conversion
-var hexTable = [];
-for (var i = 0; i < 256; i++) {
-  hexTable[i] = (i <= 15 ? '0' : '') + i.toString(16);
-}
 
 /**
 * Return the ObjectID id as a 24 byte hex string representation
@@ -15104,10 +15130,16 @@ for (var i = 0; i < 256; i++) {
 ObjectID.prototype.toHexString = function() {
   if(ObjectID.cacheHexString && this.__id) return this.__id;
 
-  var hexString = '';
+  var hexString = ''
+    , number
+    , value;
 
-  for (var i = 0; i < this.id.length; i++) {
-    hexString += hexTable[this.id.charCodeAt(i)];
+  for (var index = 0, len = this.id.length; index < len; index++) {
+    value = BinaryParser.toByte(this.id[index]);
+    number = value <= 15
+      ? '0' + value.toString(16)
+      : value.toString(16);
+    hexString = hexString + number;
   }
 
   if(ObjectID.cacheHexString) this.__id = hexString;
@@ -15272,9 +15304,7 @@ ObjectID.createFromHexString = function createFromHexString (hexString) {
 * @api public
 */
 ObjectID.isValid = function isValid(id) {
-  if(id == null) return false;
-
-  if(id != null && 'number' != typeof id && (id.length != 12 && id.length != 24)) {
+  if (id != null && 'number' != typeof id && (id.length != 12 && id.length != 24)) {
     return false;
   } else {
     // Check specifically for hex correctness

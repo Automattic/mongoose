@@ -137,6 +137,19 @@ describe('model', function(){
           done();
         }, done).end();
       })
+
+      it('and should reject promise on error', function(done){
+        var p = B.create({ title: 'optional callback 4' });
+        p.then(function (doc) {
+          var p2 = B.create({ _id: doc._id });
+          p2.then(function () {
+            assert(false);
+          }, function (err) {
+            assert(err);
+            done();
+          }).end();
+        }, done).end();
+      })
     })
   });
 })

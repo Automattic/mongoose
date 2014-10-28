@@ -1,3 +1,26 @@
+3.9.4 / 2014-10-25
+==================
+ * fixed; statics no longer can be overwritten #2343 [nkcmr](https://github.com/chetverikov)
+ * added; ability to set single populated paths to documents #1530
+ * added; setDefaultsOnInsert and runValidator options for findOneAndUpdate() #860
+
+3.8.18 / 2014-10-22
+==================
+ * fixed; Dont use all toObject options in save #2340 [chetverikov](https://github.com/chetverikov)
+
+3.9.3 / 2014-10-01
+=================
+ * added; support for virtuals that return objects #2294
+ * added; ability to manually hydrate POJOs into mongoose objects #2292
+ * added; setDefaultsOnInsert and runValidator options for update() #860
+
+3.8.17 / 2014-09-29
+==================
+ * fixed; use schema options retainKeyOrder in save() #2274
+ * fixed; fix skip in populate when limit is set #2252
+ * fixed; fix stack overflow when passing MongooseArray to findAndModify #2214
+ * fixed; optimize .length usage in populate #2289
+
 3.9.2 / 2014-09-08
 ==================
  * added; test coverage for browser component #2255

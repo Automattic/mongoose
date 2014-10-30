@@ -1492,5 +1492,14 @@ describe('Query', function(){
         done();
       });
     });
+
+    it('ignores count when passed to sort', function(done) {
+      var db = start();
+      var Product = db.model('Product', 'Product_setOptions_test');
+      Product.find().count({}).sort({ _id: 1 }).exec(function(error) {
+        assert.ifError(error);
+        done();
+      });
+    });
   });
 })

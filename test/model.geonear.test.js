@@ -19,6 +19,25 @@ function getModel (db) {
   return db.model('GeoNear', schema, 'geonear'+random());
 }
 
+// Helper to convert numeric degrees (units of latitude and longitude) to radians
+// https://gist.github.com/schoenobates/3827144
+function degToRadians(d) {
+  return d * Math.PI / 180;
+}
+
+// Helper to convert radians to meters
+// http://docs.mongodb.org/manual/tutorial/calculate-distances-using-spherical-geometry-with-2d-geospatial-indexes/
+function radiansToMeters(r) {
+  return r * 6371 * 1000;
+}
+
+// Helper to convert numeric degrees to meters
+// when first argument is an array [x,y] (legacy), MongoDB uses radians for distance calculation
+// when first argument is a GeoJSON point, MongoDB uses meters for distance calculation
+function degToMeters(d) {
+  return radiansToMeters(degToRadians(d));
+}
+
 describe('model', function(){
   var mongo24_or_greater = false;
   before(function(done){
@@ -55,7 +74,8 @@ describe('model', function(){
         }
 
         function next() {
-          Geo.geoNear([9,9], { spherical : true, maxDistance : .1 }, function (err, results, stats) {
+          // using legacy coordinates -- maxDistance units in radians
+          Geo.geoNear([9,9], { spherical : true, maxDistance : degToRadians(2) }, function (err, results, stats) {
             assert.ifError(err);
 
             assert.equal(1, results.length);
@@ -96,7 +116,7 @@ describe('model', function(){
 
         function next() {
           var pnt = { type : "Point", coordinates : [9,9] };
-          Geo.geoNear(pnt, { spherical : true, maxDistance : .1 }, function (err, results, stats) {
+          Geo.geoNear(pnt, { spherical : true, maxDistance : degToMeters(2) }, function (err, results, stats) {
             assert.ifError(err);
 
             assert.equal(1, results.length);
@@ -137,7 +157,7 @@ describe('model', function(){
 
         function next() {
           var pnt = { type : "Point", coordinates : [9,9] };
-          Geo.geoNear(pnt, { spherical : true, maxDistance : .1, lean : true }, function (err, results, stats) {
+          Geo.geoNear(pnt, { spherical : true, maxDistance : degToMeters(2), lean : true }, function (err, results, stats) {
             assert.ifError(err);
 
             assert.equal(1, results.length);
@@ -196,7 +216,8 @@ describe('model', function(){
       var Geo = getModel(db);
 
       var pnt = { type : "Point", coordinates : [9,9] };
-      var prom = Geo.geoNear(pnt, { spherical : true, maxDistance : .1 }, function (err, results, stats) {
+      // using GeoJSON point
+      var prom = Geo.geoNear(pnt, { spherical : true, maxDistance : degToMeters(2) }, function (err, results, stats) {
       });
       assert.ok(prom instanceof mongoose.Promise);
       db.close();
@@ -216,7 +237,7 @@ describe('model', function(){
           var pnt = { type : "Point", coordinates : [9,9] };
           var promise;
           assert.doesNotThrow(function() {
-            promise = Geo.geoNear(pnt, { spherical : true, maxDistance : 100000 });
+            promise = Geo.geoNear(pnt, { spherical : true, maxDistance : degToMeters(2) });
           });
 
           function validate(ret, stat) {
@@ -248,7 +269,7 @@ describe('model', function(){
           var pnt = { type : "Point", coordinates : [90, 45] };
           var promise;
           assert.doesNotThrow(function() {
-            promise = Geo.geoNear(pnt, { spherical : true, maxDistance : 0.1 });
+            promise = Geo.geoNear(pnt, { spherical : true, maxDistance : degToMeters(2) });
           });
 
           function finish() {

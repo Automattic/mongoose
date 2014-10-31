@@ -99,7 +99,6 @@ describe('Documents in ES6', function() {
       } catch(e) {
         error = e;
       }
-
       assert.ifError(error);
       assert.equal('eggs & bacon', result.description);
 
@@ -114,6 +113,39 @@ describe('Documents in ES6', function() {
       assert.ok(error);
       assert.ok(error instanceof ValidationError);
 
+      done();
+    })();
+  });
+
+  it('update() works with co and yield', function(done) {
+    co(function*() {
+      var schema = new Schema({
+        steak: String,
+        eggs: String
+      });
+
+      var Breakfast = db.model('breakfast', schema, getCollectionName());
+
+      var breakfast = new Breakfast({});
+      var error;
+
+      try {
+        yield breakfast.update({ steak: 'Ribeye', eggs: 'Scrambled' }, { upsert: true }).exec();
+      } catch(e) {
+        error = e;
+      }
+
+      assert.ifError(error);
+      var result;
+      try {
+        result = yield Breakfast.findOne().exec();
+      } catch(e) {
+        error = e;
+      }
+      assert.ifError(error);
+      assert.equal(breakfast._id.toString(), result._id.toString());
+      assert.equal('Ribeye', result.steak);
+      assert.equal('Scrambled', result.eggs);
       done();
     })();
   });

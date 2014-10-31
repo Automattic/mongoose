@@ -19,23 +19,17 @@ function getModel (db) {
   return db.model('GeoNear', schema, 'geonear'+random());
 }
 
-// Helper to convert numeric degrees (units of latitude and longitude) to radians
-// https://gist.github.com/schoenobates/3827144
-function degToRadians(d) {
-  return d * Math.PI / 180;
-}
+var testLocations = {
+    MONGODB_NYC_OFFICE :     [-73.987732, 40.757471]
+  , BRYANT_PART_NY :         [-73.983677, 40.753628]
+  , EAST_HARLEM_SHOP :       [-73.93831, 40.794963]
+  , CENTRAL_PARK_ZOO :       [-73.972299, 40.767732]
+  , PORT_AUTHORITY_STATION : [-73.990147, 40.757253]
+};
 
-// Helper to convert radians to meters
-// http://docs.mongodb.org/manual/tutorial/calculate-distances-using-spherical-geometry-with-2d-geospatial-indexes/
-function radiansToMeters(r) {
-  return r * 6371 * 1000;
-}
-
-// Helper to convert numeric degrees to meters
-// when first argument is an array [x,y] (legacy), MongoDB uses radians for distance calculation
-// when first argument is a GeoJSON point, MongoDB uses meters for distance calculation
-function degToMeters(d) {
-  return radiansToMeters(degToRadians(d));
+// convert meters to radians for use as legacy coordinates
+function metersToRadians(m) {
+  return m / (6371 * 1000);
 }
 
 describe('model', function(){
@@ -60,10 +54,14 @@ describe('model', function(){
         assert.ifError(err);
 
         var geos = [];
-        geos[0] = new Geo({ coordinates : [10,10], type : "Point"});
-        geos[1] = new Geo({ coordinates : [15,5], type : "Point"});
-        geos[2] = new Geo({ coordinates : [20,15], type : "Point"});
-        geos[3] = new Geo({ coordinates : [1,-1], type : "Point"});
+        geos[0] = new Geo({ coordinates : testLocations.MONGODB_NYC_OFFICE
+                            , type : "Point"});
+        geos[1] = new Geo({ coordinates : testLocations.BRANT_PARK_NY
+                            , type : "Point"});
+        geos[2] = new Geo({ coordinates : testLocations.EAST_HARLEM_SHOP
+                            , type : "Point"});
+        geos[3] = new Geo({ coordinates : testLocations.CENTRAL_PARK_ZOO
+                            , type : "Point"});
         var count = geos.length;
 
         for (var i=0; i < geos.length; i++) {
@@ -75,15 +73,15 @@ describe('model', function(){
 
         function next() {
           // using legacy coordinates -- maxDistance units in radians
-          Geo.geoNear([9,9], { spherical : true, maxDistance : degToRadians(2) }, function (err, results, stats) {
+          Geo.geoNear(testLocations.PORT_AUTHORITY_STATION, { spherical : true, maxDistance : metersToRadians(300)  }, function (err, results, stats) {
             assert.ifError(err);
 
             assert.equal(1, results.length);
 
             assert.equal(results[0].obj.type, 'Point');
             assert.equal(results[0].obj.coordinates.length, 2);
-            assert.equal(results[0].obj.coordinates[0], 10);
-            assert.equal(results[0].obj.coordinates[1], 10);
+            assert.equal(results[0].obj.coordinates[0], testLocations.MONGODB_NYC_OFFICE[0]);
+            assert.equal(results[0].obj.coordinates[1], testLocations.MONGODB_NYC_OFFICE[1]);
             assert.equal(results[0].obj.id, geos[0].id);
             assert.ok(results[0].obj instanceof Geo);
             done();
@@ -102,10 +100,14 @@ describe('model', function(){
         assert.ifError(err);
 
         var geos = [];
-        geos[0] = new Geo({ coordinates : [10,10], type : "Point"});
-        geos[1] = new Geo({ coordinates : [15,5], type : "Point"});
-        geos[2] = new Geo({ coordinates : [20,15], type : "Point"});
-        geos[3] = new Geo({ coordinates : [1,-1], type : "Point"});
+        geos[0] = new Geo({ coordinates : testLocations.MONGODB_NYC_OFFICE
+                            , type : "Point"});
+        geos[1] = new Geo({ coordinates : testLocations.BRANT_PARK_NY
+                            , type : "Point"});
+        geos[2] = new Geo({ coordinates : testLocations.EAST_HARLEM_SHOP
+                            , type : "Point"});
+        geos[3] = new Geo({ coordinates : testLocations.CENTRAL_PARK_ZOO
+                            , type : "Point"});
         var count = geos.length;
 
         for (var i=0; i < geos.length; i++) {
@@ -115,16 +117,16 @@ describe('model', function(){
         }
 
         function next() {
-          var pnt = { type : "Point", coordinates : [9,9] };
-          Geo.geoNear(pnt, { spherical : true, maxDistance : degToMeters(2) }, function (err, results, stats) {
+          var pnt = { type : "Point", coordinates : testLocations.PORT_AUTHORITY_STATION };
+          Geo.geoNear(pnt, { spherical : true, maxDistance : 300 }, function (err, results, stats) {
             assert.ifError(err);
 
             assert.equal(1, results.length);
 
             assert.equal(results[0].obj.type, 'Point');
             assert.equal(results[0].obj.coordinates.length, 2);
-            assert.equal(results[0].obj.coordinates[0], 10);
-            assert.equal(results[0].obj.coordinates[1], 10);
+            assert.equal(results[0].obj.coordinates[0], testLocations.MONGODB_NYC_OFFICE[0]);
+            assert.equal(results[0].obj.coordinates[1], testLocations.MONGODB_NYC_OFFICE[1]);
             assert.equal(results[0].obj.id, geos[0].id);
             assert.ok(results[0].obj instanceof Geo);
             done();
@@ -143,10 +145,14 @@ describe('model', function(){
         assert.ifError(err);
 
         var geos = [];
-        geos[0] = new Geo({ coordinates : [10,10], type : "Point"});
-        geos[1] = new Geo({ coordinates : [15,5], type : "Point"});
-        geos[2] = new Geo({ coordinates : [20,15], type : "Point"});
-        geos[3] = new Geo({ coordinates : [1,-1], type : "Point"});
+        geos[0] = new Geo({ coordinates : testLocations.MONGODB_NYC_OFFICE
+                            , type : "Point"});
+        geos[1] = new Geo({ coordinates : testLocations.BRANT_PARK_NY
+                            , type : "Point"});
+        geos[2] = new Geo({ coordinates : testLocations.EAST_HARLEM_SHOP
+                            , type : "Point"});
+        geos[3] = new Geo({ coordinates : testLocations.CENTRAL_PARK_ZOO
+                            , type : "Point"});
         var count = geos.length;
 
         for (var i=0; i < geos.length; i++) {
@@ -156,16 +162,16 @@ describe('model', function(){
         }
 
         function next() {
-          var pnt = { type : "Point", coordinates : [9,9] };
-          Geo.geoNear(pnt, { spherical : true, maxDistance : degToMeters(2), lean : true }, function (err, results, stats) {
+          var pnt = { type : "Point", coordinates : testLocations.PORT_AUTHORITY_STATION };
+          Geo.geoNear(pnt, { spherical : true, maxDistance : 300, lean : true }, function (err, results, stats) {
             assert.ifError(err);
 
             assert.equal(1, results.length);
 
             assert.equal(results[0].obj.type, 'Point');
             assert.equal(results[0].obj.coordinates.length, 2);
-            assert.equal(results[0].obj.coordinates[0], 10);
-            assert.equal(results[0].obj.coordinates[1], 10);
+            assert.equal(results[0].obj.coordinates[0], testLocations.MONGODB_NYC_OFFICE[0]);
+            assert.equal(results[0].obj.coordinates[1], testLocations.MONGODB_NYC_OFFICE[1]);
             assert.equal(results[0].obj._id, geos[0].id);
             assert.ok(!(results[0].obj instanceof Geo));
             done();
@@ -215,9 +221,9 @@ describe('model', function(){
       var db = start();
       var Geo = getModel(db);
 
-      var pnt = { type : "Point", coordinates : [9,9] };
+      var pnt = { type : "Point", coordinates : testLocations.PORT_AUTHORITY_STATION };
       // using GeoJSON point
-      var prom = Geo.geoNear(pnt, { spherical : true, maxDistance : degToMeters(2) }, function (err, results, stats) {
+      var prom = Geo.geoNear(pnt, { spherical : true, maxDistance : 300 }, function (err, results, stats) {
       });
       assert.ok(prom instanceof mongoose.Promise);
       db.close();
@@ -230,20 +236,20 @@ describe('model', function(){
       var Geo = getModel(db);
       Geo.on('index', function(err) {
         assert.ifError(err);
-        var g = new Geo({ coordinates : [10,10], type : "Point"});
+        var g = new Geo({ coordinates : testLocations.MONGODB_NYC_OFFICE, type : "Point"});
         g.save(function (err) {
           assert.ifError(err);
 
-          var pnt = { type : "Point", coordinates : [9,9] };
+          var pnt = { type : "Point", coordinates : testLocations.PORT_AUTHORITY_STATION };
           var promise;
           assert.doesNotThrow(function() {
-            promise = Geo.geoNear(pnt, { spherical : true, maxDistance : degToMeters(2) });
+            promise = Geo.geoNear(pnt, { spherical : true, maxDistance : 300 });
           });
 
           function validate(ret, stat) {
             assert.equal(1, ret.length);
-            assert.equal(ret[0].obj.coordinates[0], 10);
-            assert.equal(ret[0].obj.coordinates[1], 10);
+            assert.equal(ret[0].obj.coordinates[0], testLocations.MONGODB_NYC_OFFICE[0]);
+            assert.equal(ret[0].obj.coordinates[1], testLocations.MONGODB_NYC_OFFICE[1]);
             assert.ok(stat);
           }
 
@@ -269,7 +275,7 @@ describe('model', function(){
           var pnt = { type : "Point", coordinates : [90, 45] };
           var promise;
           assert.doesNotThrow(function() {
-            promise = Geo.geoNear(pnt, { spherical : true, maxDistance : degToMeters(2) });
+            promise = Geo.geoNear(pnt, { spherical : true, maxDistance : 1000 });
           });
 
           function finish() {

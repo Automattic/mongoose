@@ -8,8 +8,11 @@ var assert = require('assert');
 /**
  *  Asynchronous document functions return
  *  [promises](https://www.npmjs.org/package/mpromise), and so are compatible
- *  with the ES6 `yield` keyword and libraries like
- *  [co](https://www.npmjs.org/package/co)
+ *  with the [ES6 `yield` keyword](http://mzl.la/1gSa8Gu) and libraries like
+ *  [co](https://www.npmjs.org/package/co).
+ *
+ *  Note that the `yield` keyword is currently only supported in NodeJS 0.11.x
+ *  with the `--harmony` flag.
  */
 describe('Documents in ES6', function() {
   var db;
@@ -112,6 +115,60 @@ describe('Documents in ES6', function() {
 
       assert.ok(error);
       assert.ok(error instanceof ValidationError);
+
+      done();
+    })();
+  });
+
+  it('populate() *requires* execPopulate() to work with the yield keyword', function(done) {
+    /**
+     *  Because the `populate()` function supports chaining, it's difficult
+     *  to determine when the chain is 'done'. Therefore, you need to call
+     *  `execPopulate()` to use `populate()` with `yield`.
+     */
+    co(function*() {
+      var error;
+      var breakfastCollectionName = getCollectionName();
+      var foodCollectionName = getCollectionName();
+      var breakfastSchema = new Schema({
+        foods: [{ type: mongoose.Schema.ObjectId, ref: foodCollectionName }],
+      });
+
+      var foodSchema = new Schema({
+        name: String
+      });
+
+      var Food = db.model(foodCollectionName, foodSchema, foodCollectionName);
+      var Breakfast = db.model(breakfastCollectionName, breakfastSchema, breakfastCollectionName);
+
+      var bacon = new Food({ name: 'bacon' });
+      var eggs = new Food({ name: 'eggs' });
+      var goodBreakfast = new Breakfast({ foods: [bacon, eggs] });
+
+      try {
+        yield [bacon.save(), eggs.save(), goodBreakfast.save()];
+      } catch(e) {
+        error = e;
+      }
+
+      var result;
+      try {
+        result = yield Breakfast.findOne().exec();
+      } catch(e) {
+        error = e;
+      }
+      assert.ifError(error);
+      assert.equal(2, result.foods.length);
+
+      try {
+        result = yield result.populate('foods').execPopulate();
+      } catch(e) {
+        error = e;
+      }
+      assert.ifError(error);
+      assert.equal(2, result.foods.length);
+      assert.equal('bacon', result.foods[0].name);
+      assert.equal('eggs', result.foods[1].name);
 
       done();
     })();

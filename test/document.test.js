@@ -1490,4 +1490,34 @@ describe('document', function(){
       });
     });
   });
+
+  describe('gh-2434', function() {
+    it('will save the new value', function(done) {
+      var ItemSchema = new mongoose.Schema({
+        st: Number,
+        s: []
+      });
+
+      var db = start();
+      var Item = db.model('gh-2434', ItemSchema, 'gh-2434');
+
+      var item = new Item({ st: 1 });
+
+      item.save(function(error) {
+        assert.ifError(error);
+        item.st = 3;
+        item.s = [];
+        item.save(function(error) {
+          assert.ifError(error);
+          // item.st is 3 but may not be saved to DB
+          Item.findById(item._id, function(error, doc) {
+            assert.ifError(error);
+            assert.equal(3, doc.st);
+            done();
+          });
+        });
+      });
+    });
+  });
+
 })

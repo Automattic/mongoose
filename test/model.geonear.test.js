@@ -56,7 +56,7 @@ describe('model', function(){
         var geos = [];
         geos[0] = new Geo({ coordinates : testLocations.MONGODB_NYC_OFFICE
                             , type : "Point"});
-        geos[1] = new Geo({ coordinates : testLocations.BRANT_PARK_NY
+        geos[1] = new Geo({ coordinates : testLocations.BRYANT_PARK_NY
                             , type : "Point"});
         geos[2] = new Geo({ coordinates : testLocations.EAST_HARLEM_SHOP
                             , type : "Point"});

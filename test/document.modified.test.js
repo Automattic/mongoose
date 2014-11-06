@@ -343,16 +343,25 @@ describe('document modified', function(){
       p.save(function(error) {
         assert.ifError(error);
         assert.equal(p.child.name, 'Luke');
+        var originalParent = p;
         Parent.findOne({}, function(error, p) {
           assert.ifError(error);
           assert.ok(p.child);
           assert.ok(typeof p.child.name === 'undefined');
-          assert.equal(1, preCalls);
-          assert.equal(1, postCalls);
+          assert.equal(0, preCalls);
+          assert.equal(0, postCalls);
           Child.findOne({ name: 'Luke' }, function(error, child) {
             assert.ifError(error);
-            assert.ok(!!child);
-            done();
+            assert.ok(!child);
+            originalParent.child.save(function(error) {
+              assert.ifError(error);
+              Child.findOne({ name: 'Luke' }, function(error, child) {
+                assert.ifError(error);
+                assert.ok(child);
+                assert.equal(child._id.toString(), p.child.toString());
+                done();
+              });
+            });
           });
         });
       });

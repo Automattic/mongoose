@@ -6,6 +6,7 @@ var Schema = mongoose.Schema
   , SchemaTypes = Schema.Types
   , ObjectId = SchemaTypes.ObjectId
   , Mixed = SchemaTypes.Mixed
+  , Buffer = SchemaTypes.Buffer
   , DocumentObjectId = mongoose.Types.ObjectId
   , MongooseArray = mongoose.Types.Array
 

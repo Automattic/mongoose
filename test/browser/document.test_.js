@@ -154,7 +154,7 @@ describe('#equals', function(){
     var S = new Schema({ _id: String });
     var N = new Schema({ _id: Number });
     var O = new Schema({ _id: Schema.ObjectId });
-    var B = new Schema({ _id: Buffer });
+    var B = new Schema({ _id: mongoose.Schema.Types.Buffer });
     var M = new Schema({ name: String }, { _id: false });
 
     it('with string _ids', function(done){

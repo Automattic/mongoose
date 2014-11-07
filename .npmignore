@@ -12,3 +12,4 @@ CNAME
 index.html
 index.jade
 bin/
+karma.*.js

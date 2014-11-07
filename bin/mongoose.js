@@ -3053,6 +3053,7 @@ Promise.prototype.addErrback = Promise.prototype.onReject;
 module.exports = Promise;
 
 },{"mpromise":66,"util":48}],19:[function(require,module,exports){
+(function (Buffer){
 /*!
  * Module dependencies.
  */
@@ -3442,11 +3443,16 @@ Schema.interpretAsType = function (path, obj) {
     return new MongooseTypes.Array(path, cast || MongooseTypes.Mixed, obj);
   }
 
-  var name = 'string' == typeof type
-    ? type
-    // If not string, `type` is a function. Outside of IE, function.name
-    // gives you the function name. In IE, you need to compute it
-    : type.schemaName || utils.getFunctionName(type);
+  var name;
+  if (Buffer.isBuffer(type)) {
+    name = 'Buffer';
+  } else {
+    name = 'string' == typeof type
+      ? type
+      // If not string, `type` is a function. Outside of IE, function.name
+      // gives you the function name. In IE, you need to compute it
+      : type.schemaName || utils.getFunctionName(type);
+  }
 
   if (name) {
     name = name.charAt(0).toUpperCase() + name.substring(1);
@@ -3996,7 +4002,8 @@ Schema.Types = MongooseTypes = require('./schema/index');
 var ObjectId = exports.ObjectId = MongooseTypes.ObjectId;
 
 
-},{"./schema/index":25,"./utils":38,"./virtualtype":39,"events":44}],20:[function(require,module,exports){
+}).call(this,require("buffer").Buffer)
+},{"./schema/index":25,"./utils":38,"./virtualtype":39,"buffer":40,"events":44}],20:[function(require,module,exports){
 /*!
  * Module dependencies.
  */
@@ -4581,6 +4588,10 @@ SchemaBuffer.prototype.cast = function (value, doc, init) {
   // documents
   if (value && value._id) {
     value = value._id;
+  }
+
+  if (value && value.isMongooseBuffer) {
+    return value;
   }
 
   if (Buffer.isBuffer(value)) {

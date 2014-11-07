@@ -1,3 +1,5 @@
+var underlyingBuffer = Buffer;
+
 var Schema = mongoose.Schema
   , Document = mongoose.Document
   , SchemaType = mongoose.SchemaType
@@ -307,10 +309,10 @@ describe('schema', function(){
       assert.equal(typeof strings[1], 'string');
       assert.equal('123', strings[1]);
 
-      var buffers = Loki.path('buffers').cast(['\0\0\0', new Buffer("abc")]);
+      var buffers = Loki.path('buffers').cast(['\0\0\0', new underlyingBuffer("abc")]);
 
-      assert.ok(Buffer.isBuffer(buffers[0]));
-      assert.ok(Buffer.isBuffer(buffers[1]));
+      assert.ok(underlyingBuffer.isBuffer(buffers[0]));
+      assert.ok(underlyingBuffer.isBuffer(buffers[1]));
 
       var nocasts = Loki.path('nocast').cast(['test', 123]);
 

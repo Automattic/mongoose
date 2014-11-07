@@ -630,9 +630,27 @@ describe('schema', function(){
             assert.equal('x failed validation (3,4,5,6)', String(err.errors.x));
             assert.equal('customType', err.errors.x.kind);
             done();
-          })
-        })
-      })
-    })
+          });
+        });
+      });
+    });
+
+    it('should clear validator errors (gh-2302)', function(done) {
+      var userSchema = new Schema({ name: { type: String, required: true } });
+      var User = mongoose.model('gh-2302', userSchema, 'gh-2302');
+
+      var user = new User();
+      user.validate(function(err) {
+        assert.ok(err);
+        assert.ok(user.errors);
+        assert.ok(user.errors['name']);
+        user.name = 'bacon';
+        user.validate(function(err) {
+          assert.ok(!err);
+          assert.ok(!user.errors['name']);
+          done();
+        });
+      });
+    });
   });
 });

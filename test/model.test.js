@@ -74,6 +74,62 @@ var bpSchema = BlogPost;
 
 var collection = 'blogposts_' + random();
 
+describe('Model', function() {
+  var db, Test;
+
+  before(function() {
+    db = start();
+    var testSchema = new Schema({
+      _id: {
+        first_name: {type: String},
+        age: {type: Number}
+      },
+      last_name: {type: String},
+      doc_embed: {
+        some: {type: String}
+      }
+
+    });
+    Test = db.model('test-schema', testSchema);
+  });
+
+  after(function() {
+    db.close();
+  });
+
+  it('can be created using _id as embedded document', function(done) {
+    var t = new Test({
+      _id: {
+        first_name: "Daniel",
+        age: 21
+      },
+      last_name: "Alabi",
+      doc_embed: {
+        some: "a"
+      }
+    });
+
+    t.save(function(err) {
+      assert.ifError(err);
+      Test.findOne({}, function(err, doc) {
+        assert.ifError(err);
+
+        assert.ok('last_name' in doc);
+        assert.ok('_id' in doc);
+        assert.ok('first_name' in doc._id);
+        assert.equal("Daniel", doc._id.first_name);
+        assert.ok('age' in doc._id);
+        assert.equal(21, doc._id.age);
+
+        assert.ok('doc_embed' in doc);
+        assert.ok('some' in doc.doc_embed);
+        assert.equal("a", doc.doc_embed.some);
+        done();
+      });
+    });
+  });
+});
+
 describe('Model', function(){
   describe('constructor', function(){
     it('works without "new" keyword', function(done){
@@ -576,7 +632,6 @@ describe('Model', function(){
         name: 'test'
       , _id: 35
     });
-
     instance.save(function (err) {
       assert.ifError(err);
 

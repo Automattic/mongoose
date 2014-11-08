@@ -3053,6 +3053,7 @@ Promise.prototype.addErrback = Promise.prototype.onReject;
 module.exports = Promise;
 
 },{"mpromise":66,"util":48}],19:[function(require,module,exports){
+(function (Buffer){
 /*!
  * Module dependencies.
  */
@@ -3442,18 +3443,23 @@ Schema.interpretAsType = function (path, obj) {
     return new MongooseTypes.Array(path, cast || MongooseTypes.Mixed, obj);
   }
 
-  var name = 'string' == typeof type
-    ? type
-    // If not string, `type` is a function. Outside of IE, function.name
-    // gives you the function name. In IE, you need to compute it
-    : utils.getFunctionName(type);
+  var name;
+  if (Buffer.isBuffer(type)) {
+    name = 'Buffer';
+  } else {
+    name = 'string' == typeof type
+      ? type
+      // If not string, `type` is a function. Outside of IE, function.name
+      // gives you the function name. In IE, you need to compute it
+      : type.schemaName || utils.getFunctionName(type);
+  }
 
   if (name) {
     name = name.charAt(0).toUpperCase() + name.substring(1);
   }
 
   if (undefined == MongooseTypes[name]) {
-    throw new TypeError('Undefined type at `' + path +
+    throw new TypeError('Undefined type `' + name + '` at `' + path +
         '`\n  Did you try nesting Schemas? ' +
         'You can only nest using refs or arrays.');
   }
@@ -3996,7 +4002,8 @@ Schema.Types = MongooseTypes = require('./schema/index');
 var ObjectId = exports.ObjectId = MongooseTypes.ObjectId;
 
 
-},{"./schema/index":25,"./utils":38,"./virtualtype":39,"events":44}],20:[function(require,module,exports){
+}).call(this,require("buffer").Buffer)
+},{"./schema/index":25,"./utils":38,"./virtualtype":39,"buffer":40,"events":44}],20:[function(require,module,exports){
 /*!
  * Module dependencies.
  */
@@ -4075,7 +4082,15 @@ function SchemaArray (key, cast, options) {
     var arr = fn ? defaultArr() : defaultArr || [];
     return new MongooseArray(arr, self.path, this);
   });
-};
+}
+
+/**
+ * This schema type's name, to defend against minifiers that mangle
+ * function names.
+ *
+ * @api private
+ */
+SchemaArray.schemaName = 'Array';
 
 /*!
  * Inherits from SchemaType.
@@ -4388,7 +4403,15 @@ var utils = require('../utils');
 
 function SchemaBoolean (path, options) {
   SchemaType.call(this, path, options);
-};
+}
+
+/**
+ * This schema type's name, to defend against minifiers that mangle
+ * function names.
+ *
+ * @api private
+ */
+SchemaBoolean.schemaName = 'Boolean';
 
 /*!
  * Inherits from SchemaType.
@@ -4489,7 +4512,15 @@ var SchemaType = require('../schematype')
 
 function SchemaBuffer (key, options) {
   SchemaType.call(this, key, options, 'Buffer');
-};
+}
+
+/**
+ * This schema type's name, to defend against minifiers that mangle
+ * function names.
+ *
+ * @api private
+ */
+SchemaBuffer.schemaName = 'Buffer';
 
 /*!
  * Inherits from SchemaType.
@@ -4557,6 +4588,10 @@ SchemaBuffer.prototype.cast = function (value, doc, init) {
   // documents
   if (value && value._id) {
     value = value._id;
+  }
+
+  if (value && value.isMongooseBuffer) {
+    return value;
   }
 
   if (Buffer.isBuffer(value)) {
@@ -4656,7 +4691,15 @@ var utils = require('../utils');
 
 function SchemaDate (key, options) {
   SchemaType.call(this, key, options);
-};
+}
+
+/**
+ * This schema type's name, to defend against minifiers that mangle
+ * function names.
+ *
+ * @api private
+ */
+SchemaDate.schemaName = 'Date';
 
 /*!
  * Inherits from SchemaType.
@@ -4862,6 +4905,14 @@ function DocumentArray (key, schema, options) {
     return new MongooseDocumentArray(arr, path, this);
   });
 };
+
+/**
+ * This schema type's name, to defend against minifiers that mangle
+ * function names.
+ *
+ * @api private
+ */
+DocumentArray.schemaName = 'DocumentArray';
 
 /*!
  * Inherits from ArrayType.
@@ -5070,7 +5121,15 @@ function Mixed (path, options) {
   }
 
   SchemaType.call(this, path, options);
-};
+}
+
+/**
+ * This schema type's name, to defend against minifiers that mangle
+ * function names.
+ *
+ * @api private
+ */
+Mixed.schemaName = 'Mixed';
 
 /*!
  * Inherits from SchemaType.
@@ -5143,7 +5202,15 @@ var SchemaType = require('../schematype')
 
 function SchemaNumber (key, options) {
   SchemaType.call(this, key, options, 'Number');
-};
+}
+
+/**
+ * This schema type's name, to defend against minifiers that mangle
+ * function names.
+ *
+ * @api private
+ */
+SchemaNumber.schemaName = 'Number';
 
 /*!
  * Inherits from SchemaType.
@@ -5413,6 +5480,14 @@ function ObjectId (key, options) {
   SchemaType.call(this, key, options, 'ObjectID');
 }
 
+/**
+ * This schema type's name, to defend against minifiers that mangle
+ * function names.
+ *
+ * @api private
+ */
+ObjectId.schemaName = 'ObjectId';
+
 /*!
  * Inherits from SchemaType.
  */
@@ -5604,6 +5679,14 @@ function SchemaString (key, options) {
   this.regExp = null;
   SchemaType.call(this, key, options, 'String');
 };
+
+/**
+ * This schema type's name, to defend against minifiers that mangle
+ * function names.
+ *
+ * @api private
+ */
+SchemaString.schemaName = 'String';
 
 /*!
  * Inherits from SchemaType.

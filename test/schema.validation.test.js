@@ -647,7 +647,7 @@ describe('schema', function(){
         user.name = 'bacon';
         user.validate(function(err) {
           assert.ok(!err);
-          assert.ok(!user.errors['name']);
+          assert.ok(!user.errors);
           done();
         });
       });

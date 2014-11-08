@@ -12,7 +12,7 @@ module.exports = function(config) {
 
     // list of files / patterns to load in the browser
     files: [
-      './bin/mongoose.js',
+      './bin/mongoose.min.js',
       './test/browser/*.js'
     ],
 

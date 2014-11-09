@@ -1,3 +1,10 @@
+3.8.19 / 2014-11-09
+===================
+ * fixed; make sure to not override subdoc _ids on find #2276 [alabid](https://github.com/alabid)
+ * fixed; exception when comparing two documents when one lacks _id #2333 [slawo](https://github.com/slawo)
+ * fixed; getters for properties with non-strict schemas #2439 [alabid](https://github.com/alabid)
+ * fixed; inconsistent URI format in docs #2414 [sr527](https://github.com/sr527)
+
 3.8.18 / 2014-10-22
 ==================
  * fixed; Dont use all toObject options in save #2340 [chetverikov](https://github.com/chetverikov)

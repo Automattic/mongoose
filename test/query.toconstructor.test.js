@@ -80,9 +80,10 @@ describe('Query:', function(){
       var db = start();
       var Product = db.model(prodName);
 
-      Product.create([{ title : 'moar thing' }, {title : 'second thing' }], function (err, prod) {
+      Product.create([{ title : 'moar thing' }, {title : 'second thing' }], function (err, prods) {
         assert.ifError(err);
-
+        assert.equal(prods.length, 2);
+        var prod = prods[0];
         var prodC = Product.find({ title : /thing/ }).toConstructor();
 
         prodC().exec(function (err, results) {

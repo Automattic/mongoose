@@ -155,7 +155,7 @@ describe('model', function() {
                 ImpressionEvent.findById(impressionEvent._id, function(err, doc) {
                   assert.ifError(err);
                   assert.ok(doc);
-                  assert.equal(impressionEvent.__t, doc.__t)
+                  assert.equal(impressionEvent.__t, doc.__t);
 
                   // via ConversionEvent model discriminator -- should not be present
                   ConversionEvent.findById(impressionEvent._id, function(err, doc) {
@@ -488,7 +488,7 @@ describe('model', function() {
             });
           });
         });
-      }
+      };
 
       it('discriminator model only finds a document of its type when fields selection set as string inclusive', function(done) {
         checkDiscriminatorModelsFindOneDocumentOfItsType('name', done);
@@ -646,6 +646,90 @@ describe('model', function() {
                 });
               });
             });
+          });
+        });
+      });
+    });
+
+    describe('aggregate', function() {
+      var impressionEvent, conversionEvent, ignoredImpressionEvent;
+
+      beforeEach(function(done) {
+        impressionEvent = new ImpressionEvent({ name: 'Test Event' });
+        conversionEvent = new ConversionEvent({ name: 'Test Event', revenue: 10 });
+        ignoredImpressionEvent = new ImpressionEvent({ name: 'Ignored Event' });
+
+        async.forEach(
+          [impressionEvent, conversionEvent, ignoredImpressionEvent],
+          function (doc, cb) {
+            doc.save(cb);
+          },
+          done
+        );
+      });
+
+      describe('using "RootModel#aggregate"', function() {
+        it('to aggregate documents of all discriminators', function(done) {
+          var aggregate = BaseEvent.aggregate([
+            { $match: { name: 'Test Event' } },
+          ]);
+
+          aggregate.exec(function(err, docs) {
+            assert.ifError(err);
+            assert.deepEqual(aggregate._pipeline, [
+              { $match: { name: 'Test Event' } },
+            ]);
+            assert.equal(docs.length, 2);
+            done();
+          });
+        });
+      });
+
+      describe('using "ModelDiscriminator#aggregate"', function() {
+        it('only aggregates documents of the appropriate discriminator', function(done) {
+          var aggregate = ImpressionEvent.aggregate([
+            { $group: { _id: '$__t', count: { $sum: 1 } } },
+          ]);
+
+          aggregate.exec(function(err, result) {
+            assert.ifError(err);
+
+            // Discriminator `$match` pipeline step was added on the
+            // `exec` step. The reasoning for this is to not let
+            // aggregations with empty pipelines, but that are over
+            // discriminators be executed
+            assert.deepEqual(aggregate._pipeline, [
+              { $match: { __t: 'model-discriminator-querying-impression' } },
+              { $group: { _id: '$__t', count: { $sum: 1 } } },
+            ]);
+
+            assert.equal(result.length, 1);
+            assert.deepEqual(result, [
+              { _id: 'model-discriminator-querying-impression', count: 2 }
+            ]);
+            done();
+          });
+        });
+
+        it('merges the first pipeline stages if applicable', function(done) {
+          var aggregate = ImpressionEvent.aggregate([
+            { $match: { name: 'Test Event' } },
+          ]);
+
+          aggregate.exec(function(err, result) {
+            assert.ifError(err);
+
+            // Discriminator `$match` pipeline step was added on the
+            // `exec` step. The reasoning for this is to not let
+            // aggregations with empty pipelines, but that are over
+            // discriminators be executed
+            assert.deepEqual(aggregate._pipeline, [
+              { $match: { __t: 'model-discriminator-querying-impression', name: 'Test Event' } },
+            ]);
+
+            assert.equal(result.length, 1);
+            assert.equal(result[0]._id, impressionEvent.id);
+            done();
           });
         });
       });

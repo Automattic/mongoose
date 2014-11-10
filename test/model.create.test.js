@@ -32,10 +32,14 @@ describe('model', function(){
       db.close(done);
     })
 
-    it('accepts an array', function(done){
-      B.create([{ title: 'hi'}, { title: 'bye'}], function (err, post1, post2) {
+    it('accepts an array and returns an array', function(done){
+      B.create([{ title: 'hi'}, { title: 'bye'}], function (err, posts) {
         assert.ifError(err);
 
+        assert.ok(posts instanceof Array);
+        assert.equal(posts.length, 2);
+        var post1 = posts[0];
+        var post2 = posts[1];
         assert.ok(post1.get('_id') instanceof DocumentObjectId);
         assert.equal(post1.title,'hi');
 
@@ -98,8 +102,15 @@ describe('model', function(){
         {preference: "1"}
         ,
         {preference: "2"}
-      ], function (err, doc1, doc2, doc3, doc4) {
+      ], function (err, docs) {
         assert.ifError(err);
+
+        assert.ok(docs instanceof Array);
+        assert.equal(docs.length, 4);
+        var doc1 = docs[0];
+        var doc2 = docs[1];
+        var doc3 = docs[2];
+        var doc4 = docs[3];
         assert.ok(doc1);
         assert.ok(doc2);
         assert.ok(doc3);
@@ -131,7 +142,11 @@ describe('model', function(){
 
       it('with array of docs', function(done){
         var p = B.create([{ title: 'optional callback3' }, { title: '3' }]);
-        p.then(function (doc1, doc2) {
+        p.then(function (docs) {
+          assert.ok(docs instanceof Array);
+          assert.equal(docs.length, 2);
+          var doc1 = docs[0];
+          var doc2 = docs[1];
           assert.equal('optional callback3', doc1.title);
           assert.equal('3', doc2.title);
           done();

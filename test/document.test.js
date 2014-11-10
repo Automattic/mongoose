@@ -447,6 +447,51 @@ describe('document', function(){
     });
   });
 
+  it('does not apply toObject functions of subdocuments to root document', function( done ){
+
+    var subdocSchema = new Schema({
+      test: String,
+      wow: String
+    });
+
+    subdocSchema.options.toObject = {};
+    subdocSchema.options.toObject.transform = function (doc, ret, options) {
+      delete ret.wow;
+    };
+
+    var docSchema = new Schema({
+      foo: String,
+      wow: Boolean,
+      sub: [subdocSchema]
+    });
+
+    var db = start()
+      , Doc = db.model('Doc', docSchema)
+      , Subdoc = db.model('Subdoc', subdocSchema);
+
+    Doc.create({
+      foo: 'someString',
+      wow: true,
+      sub: [{
+        test: 'someOtherString',
+        wow: 'thisIsAString'
+      }]
+    }, function( err, doc ){
+
+        var obj = doc.toObject({
+          transform: function (doc, ret) {
+            ret.phew = 'new';
+          }
+        });
+
+        assert.equal(obj.phew, 'new');
+        assert.ok(!doc.sub.wow);
+
+        done();
+    });
+
+  });
+
   it('doesnt clobber child schema options when called with no params (gh-2035)', function(done) {
     var db = start();
     var userSchema = new Schema({

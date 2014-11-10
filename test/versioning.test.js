@@ -467,4 +467,27 @@ describe('versioning', function(){
     })
   })
 
+  it('gh-1898', function(done) {
+    var db = start();
+    var schema = new Schema({ tags: [String], name: String });
+
+    var M = db.model('gh-1898', schema, 'gh-1898');
+
+    var m = new M({ tags: ['eggs'] });
+
+    m.save(function(err) {
+      assert.ifError(err);
+
+      m.tags.push('bacon');
+      m.name = 'breakfast';
+      m.tags[0] = 'eggs';
+      m.markModified('tags.0');
+
+      assert.equal(m.$__where(m.$__delta()[0]).__v, 0);
+      assert.equal(m.$__delta()[1].$inc.__v, 1);
+      db.close();
+      done();
+    });
+  });
+
 })

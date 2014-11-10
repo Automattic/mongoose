@@ -1,3 +1,13 @@
+3.9.5 / 2014-11-10
+===================
+ * added; ability to disable autoIndex on a per-connection basis #1875 [sr527](https://github.com/sr527)
+ * fixed; `geoNear()` no longer enforces legacy coordinate pairs - supports GeoJSON #1987 [alabid](https://github.com/alabid)
+ * fixed; browser component works when minified with mangled variable names #2302
+ * fixed; `doc.errors` now cleared before `validate()` called #2302
+ * added; `execPopulate()` function to make `doc.populate()` compatible with promises #2317
+ * fixed; `count()` no longer throws an error when used with `sort()` #2374
+ * fixed; `save()` no longer recursively calls `save()` on populated fields #2418
+
 3.8.19 / 2014-11-09
 ===================
  * fixed; make sure to not override subdoc _ids on find #2276 [alabid](https://github.com/alabid)

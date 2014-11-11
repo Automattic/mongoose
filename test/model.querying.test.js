@@ -1479,21 +1479,20 @@ describe('model: querying:', function(){
         });
       });
 
-      it ('works when text search is called by a schema', function(done) {
+      it('works when text search is called by a schema', function(done) {
         var db = start();
 
-        var exampleSchema = new Schema({title: String, name: {type: String, text : true } , large_text: String});
+        var exampleSchema = new Schema({
+          title: String,
+          name: {type: String, text: true },
+          large_text: String
+        });
 
         indexes = exampleSchema.indexes();
         assert.equal(indexes[0][1].text, true);
         done();
-
       });
-
-
     });
-
-
   });
 
   describe('limit', function(){

@@ -652,5 +652,26 @@ describe('schema', function(){
         });
       });
     });
+
+    it('should allow an array of enums (gh-661)', function(done) {
+      var validBreakfastFoods = ['bacon', 'eggs', 'steak', 'coffee', 'butter'];
+      var breakfastSchema = new Schema({
+        foods: [{ type: String, enum: validBreakfastFoods }]
+      });
+      var Breakfast = mongoose.model('gh-661', breakfastSchema, 'gh-661');
+
+      var goodBreakfast = new Breakfast({ foods: ['eggs', 'bacon'] });
+      goodBreakfast.validate(function(error) {
+        assert.ifError(error);
+
+        var badBreakfast = new Breakfast({ foods: ['tofu', 'waffles', 'coffee'] });
+        //badBreakfast.markModified('foods.0');
+        badBreakfast.validate(function(error) {
+          assert.ok(error);
+
+          done();
+        });
+      });
+    });
   });
 });

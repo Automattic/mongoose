@@ -572,6 +572,54 @@ describe('Model', function(){
     });
   });
 
+  it ('saves subdocuments middleware correctly', function(done){
+    var db = start();g
+
+    var child_hook;
+    var parent_hook;
+    var childSchema = new Schema({
+      name: String
+    });
+
+    childSchema.pre('save', function(next) {
+      child_hook = this.name;
+      next();
+    })
+
+    var parentSchema = new Schema({
+      name: String,
+      children: [childSchema]
+    });
+
+    parentSchema.pre('save', function(next) {
+      parent_hook = this.name;
+      next();
+    })
+
+    var Parent = db.model('doc', parentSchema);
+
+    var parent = new Parent({
+      name: 'Bob',
+      children: [{
+        name: 'Mary'
+      }]
+    });
+
+    parent.save(function (err, parent) {
+      assert.equal(parent_hook, "Bob");
+      assert.equal(child_hook, "Mary")
+      assert.ifError(err);
+      parent.children[0].name = 'Jane';
+      parent.save(function(err){
+        assert.equal(child_hook, "Jane");
+        assert.ifError(err);
+        done();
+      });
+
+    });
+
+  });
+
   it('instantiating a model with a hash that maps to at least 1 undefined value', function(done){
     var db = start()
       , BlogPost = db.model('BlogPost', collection);

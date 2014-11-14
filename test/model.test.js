@@ -573,7 +573,7 @@ describe('Model', function(){
   });
 
   it ('saves subdocuments middleware correctly', function(done){
-    var db = start();g
+    var db = start();
 
     var child_hook;
     var parent_hook;

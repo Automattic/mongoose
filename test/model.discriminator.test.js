@@ -6,6 +6,7 @@ var start = require('./common')
   , mongoose = start.mongoose
   , Schema = mongoose.Schema
   , assert = require('assert')
+  , util = require('util')
   , clone = require('../lib/utils').clone
   , random = require('../lib/utils').random;
 
@@ -80,6 +81,36 @@ describe('model', function() {
       assert.ok(employee instanceof Employee);
       assert.strictEqual(employee.__proto__.constructor, Employee);
       assert.strictEqual(employee.__proto__.__proto__.constructor, Person);
+      done();
+    });
+
+    it('can define static and instance methods', function(done) {
+      function BossBaseSchema() {
+        Schema.apply(this, arguments);
+
+        this.add({
+          name: String,
+          createdAt: Date
+        });
+      }
+      util.inherits(BossBaseSchema, Schema);
+
+      var PersonSchema = new BossBaseSchema();
+      var BossSchema = new BossBaseSchema({ department: String });
+      BossSchema.methods.myName = function(){
+        return this.name;
+      };
+      BossSchema.statics.currentPresident = function(){
+        return 'obama';
+      };
+      var Person = db.model('Person', PersonSchema);
+      var Boss = Person.discriminator('Boss', BossSchema);
+
+      var boss = new Boss({name:'Bernenke'});
+      assert.equal(boss.myName(), 'Bernenke');
+      assert.equal(boss.notInstanceMethod, undefined);
+      assert.equal(Boss.currentPresident(), 'obama');
+      assert.equal(Boss.notStaticMethod, undefined);
       done();
     });
 

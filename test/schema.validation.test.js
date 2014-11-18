@@ -46,7 +46,7 @@ describe('schema', function(){
       }, /Invalid validator/);
 
       done();
-    })
+    });
 
     it('string enum', function(done){
       var Test = new Schema({
@@ -56,7 +56,7 @@ describe('schema', function(){
 
       assert.ok(Test.path('complex') instanceof SchemaTypes.String);
       assert.deepEqual(Test.path('complex').enumValues,['a', 'b', 'c', null]);
-      assert.equal(Test.path('complex').validators.length, 1)
+      assert.equal(Test.path('complex').validators.length, 1);
 
       Test.path('complex').enum('d', 'e');
 
@@ -101,7 +101,7 @@ describe('schema', function(){
       });
 
       done();
-    })
+    });
 
     it('string regexp', function(done){
       var Test = new Schema({
@@ -420,8 +420,8 @@ describe('schema', function(){
             assert.ifError(err);
           });
           done();
-      })
-    })
+      });
+    });
 
     describe('async', function(){
       it('works', function(done){
@@ -433,7 +433,7 @@ describe('schema', function(){
             fn(value === true);
             if (2 === executed) done();
           }, 5);
-        };
+        }
 
         var Animal = new Schema({
             ferret: { type: Boolean, validate: validator }
@@ -457,7 +457,7 @@ describe('schema', function(){
             fn(value === true);
             if (2 === executed) done();
           }, 5);
-        };
+        }
 
         var Animal = new Schema({
           ferret: {
@@ -490,7 +490,7 @@ describe('schema', function(){
             assert.ok(!validator2Executed);
             fn(value === true);
           }, 5);
-        };
+        }
 
         function validator2 (value, fn) {
           setTimeout(function(){
@@ -499,7 +499,7 @@ describe('schema', function(){
             fn(value === true);
             done();
           }, 5);
-        };
+        }
 
         var Animal = new Schema({
           ferret: {
@@ -531,7 +531,7 @@ describe('schema', function(){
             called = true;
             fn(true);
           }, 5);
-        };
+        }
 
         var Animal = new Schema({
             ferret: { type: Boolean, validate: validator }
@@ -542,8 +542,8 @@ describe('schema', function(){
           assert.equal(true, called);
           done();
         }, { a: 'b' });
-      })
-    })
+      });
+    });
 
     describe('messages', function(){
       describe('are customizable', function(){
@@ -592,8 +592,8 @@ describe('schema', function(){
               a.numMin0 = a.numMax0 = a.numMin1 = a.numMax1 = 15;
               a.validate(done);
             });
-          })
-        })
+          });
+        });
 
         it('for custom validators', function(done) {
           var validate = function() {
@@ -633,8 +633,8 @@ describe('schema', function(){
             done();
           });
         });
-      })
-    })
+      });
+    });
 
     describe('types', function(){
       describe('are customizable', function(){
@@ -653,8 +653,8 @@ describe('schema', function(){
             assert.equal('x failed validation (3,4,5,6)', String(err.errors.x));
             assert.equal('customType', err.errors.x.kind);
             done();
-          })
-        })
+          });
+        });
 
         it('for many custom validators', function(done){
           function validate () {
@@ -662,7 +662,7 @@ describe('schema', function(){
           }
           var validator = [
               { validator: validate, msg: '{PATH} failed validation ({VALUE})', type: 'customType'}
-          ]
+          ];
           var schema = new Schema({ x: { type: [], validate: validator }});
           var M = mongoose.model('custom-validator-'+random(), schema);
 

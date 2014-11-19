@@ -1361,7 +1361,7 @@ Document.prototype.isSelected = function isSelected (path) {
   }
 
   return true;
-}
+};
 
 /**
  * Executes registered validation rules for this document.
@@ -1440,6 +1440,26 @@ Document.prototype.validate = function (cb) {
     }
   }
 };
+
+/**
+ * Executes registered validation rules (skipping asynchronous validators) for this document.
+ *
+ * ####Note:
+ *
+ * This method is useful if you need synchronous validation.
+ *
+ * ####Example:
+ *
+ *     var err = doc.validateSync();
+ *     if ( err ){
+ *       handleError( err );
+ *     } else {
+ *       // validation passed
+ *     }
+ *
+ * @return {MongooseError|undefined} MongooseError if there are errors during validation, or undefined if there is no error.
+ * @api public
+ */
 
 Document.prototype.validateSync = function () {
   var self = this;
@@ -5103,9 +5123,18 @@ DocumentArray.prototype.doValidate = function (array, fn, scope) {
   }, scope);
 };
 
-DocumentArray.prototype.doValidateSync = function (array, scope) {
-  var self = this;
+/**
+ * Performs local validations first, then validations on each embedded doc.
+ *
+ * ####Note:
+ *
+ * This method ignores the asynchronous validators.
+ *
+ * @return {MongooseError|undefined}
+ * @api private
+ */
 
+DocumentArray.prototype.doValidateSync = function (array, scope) {
   var schemaTypeError = SchemaType.prototype.doValidateSync.call(this, array, scope);
   if (schemaTypeError) return schemaTypeError;
 
@@ -6825,7 +6854,7 @@ SchemaType.prototype.applyGetters = function (value, scope) {
 SchemaType.prototype.select = function select (val) {
   this.selected = !! val;
   return this;
-}
+};
 
 /**
  * Performs a validation of `value` using the validators declared for this SchemaType.
@@ -6880,6 +6909,19 @@ SchemaType.prototype.doValidate = function (value, fn, scope) {
     }
   });
 };
+
+/**
+ * Performs a validation of `value` using the validators declared for this SchemaType.
+ *
+ * ####Note:
+ *
+ * This method ignores the asynchronous validators.
+ *
+ * @param {any} value
+ * @param {Object} scope
+ * @return {MongooseError|undefined}
+ * @api private
+ */
 
 SchemaType.prototype.doValidateSync = function (value, scope) {
   var err = null

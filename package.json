@@ -16,9 +16,10 @@
     "regexp-clone": "0.0.1",
     "mquery" : "1.0.0",
     "async": "0.9.0"
-  }
+  },
   "devDependencies": {
-    "benchmark" : "1.0.0",
+    "acquit": "0.0.2",
+    "benchmark": "1.0.0",
     "browserify": "4.1",
     "co": "3.1.0",
     "dox": "0.3.1",
@@ -30,13 +31,14 @@
     "karma-chrome-launcher": "0.1.4",
     "karma-sauce-launcher": "0.2.8",
     "markdown": "0.3.1",
+    "marked": "0.3.2",
     "mocha": "1.20.0",
     "node-static": "0.5.9",
     "open": "0.0.3",
     "tbd": "0.6.4",
     "uglify-js": "2.4.15",
     "underscore": "1.5.2"
-  }
+  },
   "directories": { "lib": "./lib/mongoose" },
   "scripts": { "test": "set MONGOOSE_DISABLE_STABILITY_WARNING=1 && mocha --async-only test/*.test.js" },
   "main": "./index.js",
@@ -44,11 +46,11 @@
   "bugs": {
     "url":"https://github.com/learnboost/mongoose/issues/new",
     "email": "mongoose-orm@googlegroups.com"
-  }
+  },
   "repository": {
     "type": "git",
     "url": "git://github.com/LearnBoost/mongoose.git"
-  }
+  },
   "publishConfig": { "tag": "unstable" },
   "homepage": "http://mongoosejs.com",
   "browser": "lib/browser.js"

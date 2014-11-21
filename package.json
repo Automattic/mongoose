@@ -31,6 +31,7 @@
     "karma-chrome-launcher": "0.1.4",
     "karma-sauce-launcher": "0.2.8",
     "markdown": "0.3.1",
+    "marked": "0.3.2",
     "mocha": "1.20.0",
     "node-static": "0.5.9",
     "open": "0.0.3",

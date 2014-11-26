@@ -150,6 +150,64 @@ describe('model middleware', function(){
     });
   });
 
+  it('gh-1829', function(done) {
+    var childSchema = new mongoose.Schema({
+      name: String,
+    });
+
+    var childPreCalls = 0;
+    var childPreCallsByName = {};
+    var parentPreCalls = 0;
+
+    childSchema.pre('save', function(next) {
+      childPreCallsByName[this.name] = childPreCallsByName[this.name] || 0;
+      ++childPreCallsByName[this.name];
+      ++childPreCalls;
+      next();
+    });
+
+    var parentSchema = new mongoose.Schema({
+      name: String,
+      children: [childSchema],
+    });
+
+    parentSchema.pre('save', function(next) {
+      ++parentPreCalls;
+      next();
+    });
+
+    var db = start();
+    var Parent = db.model('gh-1829', parentSchema, 'gh-1829');
+
+    var parent = new Parent({
+      name: 'Han',
+      children: [
+        { name: 'Jaina' },
+        { name: 'Jacen' }
+      ]
+    });
+
+    parent.save(function(error) {
+      assert.ifError(error);
+      assert.equal(2, childPreCalls);
+      assert.equal(1, childPreCallsByName['Jaina']);
+      assert.equal(1, childPreCallsByName['Jacen']);
+      assert.equal(1, parentPreCalls);
+      parent.children[0].name = 'Anakin';
+      parent.save(function(error) {
+        assert.ifError(error);
+        assert.equal(4, childPreCalls);
+        assert.equal(1, childPreCallsByName['Anakin']);
+        assert.equal(1, childPreCallsByName['Jaina']);
+        assert.equal(2, childPreCallsByName['Jacen']);
+
+        assert.equal(2, parentPreCalls);
+        db.close();
+        done();
+      });
+    });
+  });
+
   it('validate + remove', function(done){
     var schema = new Schema({
         title: String

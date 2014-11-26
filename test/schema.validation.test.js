@@ -694,5 +694,32 @@ describe('schema', function(){
         });
       });
     });
+
+    it('should allow an array of enums (gh-661)', function(done) {
+      var validBreakfastFoods = ['bacon', 'eggs', 'steak', 'coffee', 'butter'];
+      var breakfastSchema = new Schema({
+        foods: [{ type: String, enum: validBreakfastFoods }]
+      });
+      var Breakfast = mongoose.model('gh-661', breakfastSchema, 'gh-661');
+
+      var goodBreakfast = new Breakfast({ foods: ['eggs', 'bacon'] });
+      goodBreakfast.validate(function(error) {
+        assert.ifError(error);
+
+        var badBreakfast = new Breakfast({ foods: ['tofu', 'waffles', 'coffee'] });
+        badBreakfast.validate(function(error) {
+          assert.ok(error);
+          assert.ok(error.errors['foods.0']);
+          assert.equal(error.errors['foods.0'].message,
+            '`tofu` is not a valid enum value for path `foods`.');
+          assert.ok(error.errors['foods.1']);
+          assert.equal(error.errors['foods.1'].message,
+            '`waffles` is not a valid enum value for path `foods`.');
+          assert.ok(!error.errors['foods.2']);
+
+          done();
+        });
+      });
+    });
   });
 });

@@ -707,9 +707,15 @@ describe('schema', function(){
         assert.ifError(error);
 
         var badBreakfast = new Breakfast({ foods: ['tofu', 'waffles', 'coffee'] });
-        //badBreakfast.markModified('foods.0');
         badBreakfast.validate(function(error) {
           assert.ok(error);
+          assert.ok(error.errors['foods.0']);
+          assert.equal(error.errors['foods.0'].message,
+            '`tofu` is not a valid enum value for path `foods`.');
+          assert.ok(error.errors['foods.1']);
+          assert.equal(error.errors['foods.1'].message,
+            '`waffles` is not a valid enum value for path `foods`.');
+          assert.ok(!error.errors['foods.2']);
 
           done();
         });

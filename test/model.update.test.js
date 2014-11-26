@@ -761,8 +761,11 @@ describe('model: update:', function(){
     var so = new Schema({ num : Number });
     var Some = db.model('gh-2170' + random(), so);
 
-    Some.create([ {num: 1}, {num: 1} ], function(err, doc0, doc1){
+    Some.create([ {num: 1}, {num: 1} ], function(err, docs) {
       assert.ifError(err);
+      assert.equal(docs.length, 2);
+      var doc0 = docs[0];
+      var doc1 = docs[1];
       var sId0 = doc0._id;
       var sId1 = doc1._id;
       Some.where({_id: sId0}).update({}, {$set: {num: '99'}}, {multi: true}, function(err, cnt){

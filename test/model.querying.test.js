@@ -1441,40 +1441,56 @@ describe('model: querying:', function(){
 
     });
 
-    it('works with text search', function(done) {
-      if (!mongo26_or_greater) {
-        return done();
-      }
+    describe ('text search indexes', function(){
+      it('works with text search ensure indexes ', function(done) {
+        if (!mongo26_or_greater) {
+          return done();
+        }
 
-      var db = start()
-        , blogPost = db.model('BlogPostB', collection);
+        var db = start()
+          , blogPost = db.model('BlogPostB', collection);
 
-      blogPost.collection.ensureIndex({ title : 'text' }, function(error, res) {
-        assert.ifError(error);
-        var a = new blogPost({ title : 'querying in mongoose' });
-        var b = new blogPost({ title : 'text search in mongoose' });
-        a.save(function(error) {
+        blogPost.collection.ensureIndex({ title : 'text' }, function(error, res) {
           assert.ifError(error);
-          b.save(function(error) {
+          var a = new blogPost({ title : 'querying in mongoose' });
+          var b = new blogPost({ title : 'text search in mongoose' });
+          a.save(function(error) {
             assert.ifError(error);
-            blogPost.
-              find({ $text : { $search : 'text search' } }, { score : { $meta: "textScore" } }).
-              limit(2).
-              exec(function(error, documents) {
-                assert.ifError(error);
-                assert.equal(1, documents.length);
-                assert.equal('text search in mongoose', documents[0].title);
-                a.remove(function(error) {
+            b.save(function(error) {
+              assert.ifError(error);
+              blogPost.
+                find({ $text : { $search : 'text search' } }, { score : { $meta: "textScore" } }).
+                limit(2).
+                exec(function(error, documents) {
                   assert.ifError(error);
-                  b.remove(function(error) {
+                  assert.equal(1, documents.length);
+                  assert.equal('text search in mongoose', documents[0].title);
+                  a.remove(function(error) {
                     assert.ifError(error);
-                    db.close();
-                    done();
+                    b.remove(function(error) {
+                      assert.ifError(error);
+                      db.close();
+                      done();
+                    });
                   });
                 });
-              });
+            });
           });
         });
+      });
+
+      it('works when text search is called by a schema', function(done) {
+        var db = start();
+
+        var exampleSchema = new Schema({
+          title: String,
+          name: {type: String, text: true },
+          large_text: String
+        });
+
+        indexes = exampleSchema.indexes();
+        assert.equal(indexes[0][1].text, true);
+        done();
       });
     });
   });

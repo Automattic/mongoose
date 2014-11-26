@@ -70,3 +70,9 @@ copyunstable:
 
 browser:
 	./node_modules/browserify/bin/cmd.js -o ./bin/mongoose.js lib/browser.js
+
+browser_debug:
+	./node_modules/browserify/bin/cmd.js -o ./bin/mongoose.debug.js lib/browser.js -d
+
+test_browser:
+	./node_modules/karma/bin/karma start karma.local.conf.js

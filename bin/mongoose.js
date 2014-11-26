@@ -1,13 +1,97 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 (function (Buffer){
+/**
+ * The [MongooseError](#error_MongooseError) constructor.
+ *
+ * @method Error
+ * @api public
+ */
+
 exports.Error = require('./error');
+
+/**
+ * The Mongoose [Schema](#schema_Schema) constructor
+ *
+ * ####Example:
+ *
+ *     var mongoose = require('mongoose');
+ *     var Schema = mongoose.Schema;
+ *     var CatSchema = new Schema(..);
+ *
+ * @method Schema
+ * @api public
+ */
+
 exports.Schema = require('./schema');
+
+/**
+ * The various Mongoose Types.
+ *
+ * ####Example:
+ *
+ *     var mongoose = require('mongoose');
+ *     var array = mongoose.Types.Array;
+ *
+ * ####Types:
+ *
+ * - [ObjectId](#types-objectid-js)
+ * - [Buffer](#types-buffer-js)
+ * - [SubDocument](#types-embedded-js)
+ * - [Array](#types-array-js)
+ * - [DocumentArray](#types-documentarray-js)
+ *
+ * Using this exposed access to the `ObjectId` type, we can construct ids on demand.
+ *
+ *     var ObjectId = mongoose.Types.ObjectId;
+ *     var id1 = new ObjectId;
+ *
+ * @property Types
+ * @api public
+ */
 exports.Types = require('./types');
+
+/**
+ * The Mongoose [VirtualType](#virtualtype_VirtualType) constructor
+ *
+ * @method VirtualType
+ * @api public
+ */
 exports.VirtualType = require('./virtualtype');
+
+/**
+ * The various Mongoose SchemaTypes.
+ *
+ * ####Note:
+ *
+ * _Alias of mongoose.Schema.Types for backwards compatibility._
+ *
+ * @property SchemaTypes
+ * @see Schema.SchemaTypes #schema_Schema.Types
+ * @api public
+ */
+
 exports.SchemaType = require('./schematype.js');
+
+/**
+ * Internal utils
+ *
+ * @property utils
+ * @api private
+ */
+
 exports.utils = require('./utils.js');
 
+/**
+ * The Mongoose browser [Document](#document-js) constructor.
+ *
+ * @method Document
+ * @api public
+ */
 exports.Document = require('./document_provider.js')();
+
+/*!
+ * Module exports.
+ */
 
 if (typeof window !== 'undefined') {
   window.mongoose = module.exports;
@@ -134,8 +218,21 @@ Document.ValidationError = ValidationError;
 module.exports = exports = Document;
 
 },{"./document":4,"./error":8,"./internal":17,"./promise":18,"./schema":19,"./schema/mixed":26,"./schematype":30,"./types/objectid":37,"./utils":38,"events":44,"hooks":49,"util":48}],3:[function(require,module,exports){
+/*!
+ * Module dependencies.
+ */
+
 var utils = require('./utils');
 var Types = require('./schema/index');
+
+/**
+ * Handles internal casting for queries
+ *
+ * @param {Schema} schema
+ * @param {Object obj Object to cast
+ * @method cast
+ * @api private
+ */
 
 var cast = module.exports = function(schema, obj) {
   var paths = Object.keys(obj)
@@ -152,8 +249,8 @@ var cast = module.exports = function(schema, obj) {
     val = obj[path];
 
     if ('$or' === path || '$nor' === path || '$and' === path) {
-      var k = val.length
-        , orComponentQuery;
+      var k = val.length;
+      var orComponentQuery;
 
       while (k--) {
         val[k] = cast(schema, val[k]);
@@ -329,6 +426,7 @@ var cast = module.exports = function(schema, obj) {
 
   return obj;
 }
+
 },{"./schema/index":25,"./utils":38}],4:[function(require,module,exports){
 (function (process){
 /*!
@@ -972,7 +1070,7 @@ Document.prototype.$__set = function (
       // Small hack for gh-1638: if we're overwriting the entire array, ignore
       // paths that were modified before the array overwrite
       this.$__.activePaths.forEach(function(modifiedPath) {
-        if (modifiedPath.indexOf(path) === 0 && modifiedPath !== path) {
+        if (modifiedPath.indexOf(path + '.') === 0) {
           _this.$__.activePaths.ignore(modifiedPath);
         }
       });
@@ -1263,7 +1361,7 @@ Document.prototype.isSelected = function isSelected (path) {
   }
 
   return true;
-}
+};
 
 /**
  * Executes registered validation rules for this document.
@@ -1286,7 +1384,6 @@ Document.prototype.isSelected = function isSelected (path) {
 
 Document.prototype.validate = function (cb) {
   var self = this;
-
   var promise = new Promise(cb);
 
   // only validate required fields when necessary
@@ -1325,12 +1422,7 @@ Document.prototype.validate = function (cb) {
       var val = self.getValue(path);
       p.doValidate(val, function (err) {
         if (err) {
-          self.invalidate(
-              path
-            , err
-            , undefined
-            , true // embedded docs
-            );
+          self.invalidate(path, err, undefined, true);
         }
         --total || complete();
       }, self);
@@ -1347,6 +1439,63 @@ Document.prototype.validate = function (cb) {
       promise.fulfill();
     }
   }
+};
+
+/**
+ * Executes registered validation rules (skipping asynchronous validators) for this document.
+ *
+ * ####Note:
+ *
+ * This method is useful if you need synchronous validation.
+ *
+ * ####Example:
+ *
+ *     var err = doc.validateSync();
+ *     if ( err ){
+ *       handleError( err );
+ *     } else {
+ *       // validation passed
+ *     }
+ *
+ * @return {MongooseError|undefined} MongooseError if there are errors during validation, or undefined if there is no error.
+ * @api public
+ */
+
+Document.prototype.validateSync = function () {
+  var self = this;
+
+  // only validate required fields when necessary
+  var paths = Object.keys(this.$__.activePaths.states.require).filter(function (path) {
+    if (!self.isSelected(path) && !self.isModified(path)) return false;
+    return true;
+  });
+
+  paths = paths.concat(Object.keys(this.$__.activePaths.states.init));
+  paths = paths.concat(Object.keys(this.$__.activePaths.states.modify));
+  paths = paths.concat(Object.keys(this.$__.activePaths.states.default));
+
+  var validating = {};
+
+  paths.forEach(function (path) {
+    if (validating[path]) return;
+
+    validating[path] = true;
+
+    var p = self.schema.path(path);
+    if (!p) return;
+
+    var val = self.getValue(path);
+    var err = p.doValidateSync( val, self );
+    if ( err ){
+      self.invalidate(path, err, undefined, true);
+    }
+  });
+
+  var err = self.$__.validationError;
+  self.$__.validationError = undefined;
+  self.emit('validate', self);
+
+  return err;
 };
 
 /**
@@ -1945,6 +2094,10 @@ Document.prototype.toObject = function (options) {
     options._useSchemaOptions = true;
   }
 
+  // remember the root transform function
+  // to save it from being overwritten by sub-transform functions
+  var originalTransform = options.transform;
+
   var ret = clone(this._doc, options);
 
   if (options.virtuals || options.getters && false !== options.virtuals) {
@@ -1973,6 +2126,8 @@ Document.prototype.toObject = function (options) {
     if (opts) {
       options.transform = opts.transform;
     }
+  } else {
+    options.transform = originalTransform;
   }
 
   if ('function' == typeof options.transform) {
@@ -3128,8 +3283,12 @@ function Schema (obj, options) {
     this.add(obj);
   }
 
+  // check if _id's value is a subdocument (gh-2276)
+  var _idSubDoc = obj && obj._id && utils.isObject(obj._id);
+
   // ensure the documents get an auto _id unless disabled
-  var auto_id = !this.paths['_id'] && (!this.options.noId && this.options._id);
+  var auto_id = !this.paths['_id'] && (!this.options.noId && this.options._id) && !_idSubDoc;
+
   if (auto_id) {
     this.add({ _id: {type: Schema.ObjectId, auto: true} });
   }
@@ -3167,6 +3326,11 @@ function Schema (obj, options) {
       next();
     });
   }
+
+  this.pre('validate', function(next) {
+    delete this.errors;
+    next();
+  });
 }
 
 /*!
@@ -4904,7 +5068,7 @@ function DocumentArray (key, schema, options) {
     if (!Array.isArray(arr)) arr = [arr];
     return new MongooseDocumentArray(arr, path, this);
   });
-};
+}
 
 /**
  * This schema type's name, to defend against minifiers that mangle
@@ -4927,8 +5091,6 @@ DocumentArray.prototype.constructor = DocumentArray;
  */
 
 DocumentArray.prototype.doValidate = function (array, fn, scope) {
-  var self = this;
-
   SchemaType.prototype.doValidate.call(this, array, function (err) {
     if (err) return fn(err);
 
@@ -4952,8 +5114,6 @@ DocumentArray.prototype.doValidate = function (array, fn, scope) {
       ;(function (i) {
         doc.validate(function (err) {
           if (err && !error) {
-            // rewrite the key
-            err.key = self.key + '.' + i + '.' + err.key;
             return fn(error = err);
           }
           --count || fn();
@@ -4961,6 +5121,47 @@ DocumentArray.prototype.doValidate = function (array, fn, scope) {
       })(i);
     }
   }, scope);
+};
+
+/**
+ * Performs local validations first, then validations on each embedded doc.
+ *
+ * ####Note:
+ *
+ * This method ignores the asynchronous validators.
+ *
+ * @return {MongooseError|undefined}
+ * @api private
+ */
+
+DocumentArray.prototype.doValidateSync = function (array, scope) {
+  var schemaTypeError = SchemaType.prototype.doValidateSync.call(this, array, scope);
+  if (schemaTypeError) return schemaTypeError;
+
+  var count = array && array.length
+    , resultError = null;
+
+  if (!count) return;
+
+  // handle sparse arrays, do not use array.forEach which does not
+  // iterate over sparse elements yet reports array.length including
+  // them :(
+
+  for (var i = 0, len = count; i < len; ++i) {
+    // only first error
+    if ( resultError ) break;
+    // sidestep sparse entries
+    var doc = array[i];
+    if (!doc) continue;
+
+    var subdocValidateError = doc.validateSync();
+
+    if (subdocValidateError) {
+      resultError = subdocValidateError;
+    }
+  }
+
+  return resultError;
 };
 
 /**
@@ -6177,6 +6378,29 @@ SchemaType.prototype.unique = function (bool) {
 };
 
 /**
+ * Declares a full text index.
+ *
+ * ###Example:
+ *
+ *      var s = new Schema({name : {type: String, text : true })
+ *      Schema.path('name').index({text : true});
+ * @param bool
+ * @return {SchemaType} this
+ * @api public
+ */
+
+SchemaType.prototype.text = function(bool) {
+  if (null == this._index || 'boolean' == typeof this._index) {
+    this._index = {};
+  } else if ('string' == typeof this._index) {
+    this._index = { type: this._index };
+  }
+
+  this._index.text = bool;
+  return this;
+};
+
+/**
  * Declares a sparse index.
  *
  * ####Example:
@@ -6630,7 +6854,7 @@ SchemaType.prototype.applyGetters = function (value, scope) {
 SchemaType.prototype.select = function select (val) {
   this.selected = !! val;
   return this;
-}
+};
 
 /**
  * Performs a validation of `value` using the validators declared for this SchemaType.
@@ -6658,6 +6882,7 @@ SchemaType.prototype.doValidate = function (value, fn, scope) {
     }
   };
 
+  var self = this;
   this.validators.forEach(function (v) {
     var validator = v.validator;
     var message = v.message;
@@ -6670,6 +6895,10 @@ SchemaType.prototype.doValidate = function (value, fn, scope) {
     if (validator instanceof RegExp) {
       validate(validator.test(value), validatorProperties);
     } else if ('function' === typeof validator) {
+      if (value === undefined && !self.isRequired) {
+        validate(true, validatorProperties);
+        return;
+      }
       if (2 === validator.length) {
         validator.call(scope, value, function (ok) {
           validate(ok, validatorProperties);
@@ -6679,6 +6908,59 @@ SchemaType.prototype.doValidate = function (value, fn, scope) {
       }
     }
   });
+};
+
+/**
+ * Performs a validation of `value` using the validators declared for this SchemaType.
+ *
+ * ####Note:
+ *
+ * This method ignores the asynchronous validators.
+ *
+ * @param {any} value
+ * @param {Object} scope
+ * @return {MongooseError|undefined}
+ * @api private
+ */
+
+SchemaType.prototype.doValidateSync = function (value, scope) {
+  var err = null
+    , path = this.path
+    , count = this.validators.length;
+
+  if (!count) return null;
+
+  var validate = function(ok, validatorProperties) {
+    if (err) return;
+    if (ok === undefined || ok) {
+
+    } else {
+      err = new ValidatorError(validatorProperties);
+    }
+  };
+
+  var self = this;
+  if (value === undefined && !self.isRequired) {
+    return null;
+  }
+
+  this.validators.forEach(function (v) {
+    var validator = v.validator;
+    var validatorProperties = utils.clone(v);
+    validatorProperties.path = path;
+    validatorProperties.value = value;
+
+    if (validator instanceof RegExp) {
+      validate(validator.test(value), validatorProperties);
+    } else if ('function' === typeof validator) {
+      // if not async validators
+      if (2 !== validator.length) {
+        validate(validator.call(scope, value), validatorProperties);
+      }
+    }
+  });
+
+  return err;
 };
 
 /**
@@ -6982,6 +7264,7 @@ MongooseArray.mixin = {
    *
    * @param {any} value
    * @return value the casted value
+   * @method _cast
    * @api private
    */
 
@@ -7027,6 +7310,7 @@ MongooseArray.mixin = {
    *
    * @param {EmbeddedDocument} embeddedDoc the embedded doc that invoked this method on the Array
    * @param {String} embeddedPath the path which changed in the embeddedDoc
+   * @method _markModified
    * @api private
    */
 
@@ -7057,6 +7341,7 @@ MongooseArray.mixin = {
    *
    * @param {Array} op operation
    * @param {any} val
+   * @method _registerAtomic
    * @api private
    */
 
@@ -7153,6 +7438,7 @@ MongooseArray.mixin = {
    *
    * @api private
    * @return {Number}
+   * @method hasAtomics
    */
 
   hasAtomics: function hasAtomics () {
@@ -7168,6 +7454,7 @@ MongooseArray.mixin = {
    *
    * @param {Object} [args...]
    * @api public
+   * @method push
    */
 
   push: function () {
@@ -7190,6 +7477,7 @@ MongooseArray.mixin = {
    *
    * @param {any} [args...]
    * @api public
+   * @method nonAtomicPush
    */
 
   nonAtomicPush: function () {
@@ -7231,6 +7519,7 @@ MongooseArray.mixin = {
    * @method $pop
    * @memberOf MongooseArray
    * @see mongodb http://www.mongodb.org/display/DOCS/Updating/#Updating-%24pop
+   * @method $pop
    */
 
   $pop: function () {
@@ -7253,6 +7542,7 @@ MongooseArray.mixin = {
    *
    * @see MongooseArray#$pop #types_array_MongooseArray-%24pop
    * @api public
+   * @method pop
    */
 
   pop: function () {
@@ -7321,6 +7611,7 @@ MongooseArray.mixin = {
    * _marks the entire array as modified, which if saved, will store it as a `$set` operation, potentially overwritting any changes that happen between when you retrieved the object and when you save it._
    *
    * @api public
+   * @method shift
    */
 
   shift: function () {
@@ -7353,6 +7644,7 @@ MongooseArray.mixin = {
    * @param {any} [args...]
    * @see mongodb http://www.mongodb.org/display/DOCS/Updating/#Updating-%24pull
    * @api public
+   * @method pull
    */
 
   pull: function () {
@@ -7390,6 +7682,7 @@ MongooseArray.mixin = {
    * _marks the entire array as modified, which if saved, will store it as a `$set` operation, potentially overwritting any changes that happen between when you retrieved the object and when you save it._
    *
    * @api public
+   * @method splice
    */
 
   splice: function splice () {
@@ -7418,6 +7711,7 @@ MongooseArray.mixin = {
    * _marks the entire array as modified, which if saved, will store it as a `$set` operation, potentially overwritting any changes that happen between when you retrieved the object and when you save it._
    *
    * @api public
+   * @method unshift
    */
 
   unshift: function () {
@@ -7436,6 +7730,7 @@ MongooseArray.mixin = {
    * _marks the entire array as modified, which if saved, will store it as a `$set` operation, potentially overwritting any changes that happen between when you retrieved the object and when you save it._
    *
    * @api public
+   * @method sort
    */
 
   sort: function () {
@@ -7458,6 +7753,7 @@ MongooseArray.mixin = {
    * @param {any} [args...]
    * @return {Array} the values that were added
    * @api public
+   * @method addToSet
    */
 
   addToSet: function addToSet () {
@@ -7515,6 +7811,7 @@ MongooseArray.mixin = {
    *
    * @return {Array} this
    * @api public
+   * @method set
    */
 
   set: function set (i, val) {
@@ -7529,6 +7826,7 @@ MongooseArray.mixin = {
    * @param {Object} options
    * @return {Array}
    * @api public
+   * @method toObject
    */
 
   toObject: function (options) {
@@ -7547,6 +7845,7 @@ MongooseArray.mixin = {
    * Helper for console.log
    *
    * @api public
+   * @method inspect
    */
 
   inspect: function () {
@@ -7559,6 +7858,7 @@ MongooseArray.mixin = {
    * @param {Object} obj the item to look for
    * @return {Number}
    * @api public
+   * @method indexOf
    */
 
   indexOf: function indexOf (obj) {
@@ -7692,6 +7992,7 @@ MongooseBuffer.mixin = {
    * Marks this buffer as modified.
    *
    * @api private
+   * @method _markModified
    */
 
   _markModified: function () {
@@ -7705,6 +8006,9 @@ MongooseBuffer.mixin = {
 
   /**
    * Writes the buffer.
+   *
+   * @api public
+   * @method write
    */
 
   write: function () {
@@ -7726,6 +8030,7 @@ MongooseBuffer.mixin = {
    *
    * @return {MongooseBuffer}
    * @param {Buffer} target
+   * @method copy
    */
 
   copy: function (target) {
@@ -7781,6 +8086,7 @@ MongooseBuffer.mixin = {
  * @param {Hex} [subtype]
  * @return {Binary}
  * @api public
+ * @method toObject
  */
 
 MongooseBuffer.mixin.toObject = function (options) {
@@ -7795,6 +8101,7 @@ MongooseBuffer.mixin.toObject = function (options) {
  *
  * @param {Buffer} other
  * @return {Boolean}
+ * @method equals
  */
 
 MongooseBuffer.mixin.equals = function (other) {
@@ -7831,6 +8138,7 @@ MongooseBuffer.mixin.equals = function (other) {
  * @see http://bsonspec.org/#/specification
  * @param {Hex} subtype
  * @api public
+ * @method subtype
  */
 
 MongooseBuffer.mixin.subtype = function (subtype) {
@@ -7917,6 +8225,7 @@ MongooseDocumentArray.mixin = Object.create( MongooseArray.mixin );
 /**
  * Overrides MongooseArray#cast
  *
+ * @method _cast
  * @api private
  */
 
@@ -7951,6 +8260,7 @@ MongooseDocumentArray.mixin._cast = function (value) {
  * @return {EmbeddedDocument|null} the subdocument or null if not found.
  * @param {ObjectId|String|Number|Buffer} id
  * @TODO cast to the _id based on schema for proper comparison
+ * @method id
  * @api public
  */
 
@@ -7992,6 +8302,7 @@ MongooseDocumentArray.mixin.id = function (id) {
  *
  * @param {Object} [options] optional options to pass to each documents `toObject` method call during conversion
  * @return {Array}
+ * @method toObject
  * @api public
  */
 
@@ -8004,6 +8315,7 @@ MongooseDocumentArray.mixin.toObject = function (options) {
 /**
  * Helper for console.log
  *
+ * @method inspect
  * @api public
  */
 
@@ -8024,6 +8336,7 @@ MongooseDocumentArray.mixin.inspect = function () {
  * This is the same subdocument constructor used for casting.
  *
  * @param {Object} obj the value to cast to this arrays SubDocument schema
+ * @method create
  * @api public
  */
 
@@ -8036,6 +8349,7 @@ MongooseDocumentArray.mixin.create = function (obj) {
  *
  * @param {String} event
  * @return {Function}
+ * @method notify
  * @api private
  */
 

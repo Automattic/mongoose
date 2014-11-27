@@ -428,7 +428,7 @@ var cast = module.exports = function(schema, obj) {
 }
 
 },{"./schema/index":25,"./utils":38}],4:[function(require,module,exports){
-(function (process){
+(function (process,Buffer){
 /*!
  * Module dependencies.
  */
@@ -1406,6 +1406,18 @@ Document.prototype.validate = function (cb) {
   var validating = {}
     , total = 0;
 
+  // gh-661: if a whole array is modified, make sure to run validation on all
+  // the children as well
+  for (var i = 0; i < paths.length; ++i) {
+    var path = paths[i];
+    var val = self.getValue(path);
+    if (val instanceof Array && !Buffer.isBuffer(val)) {
+      var numElements = val.length;
+      for (var j = 0; j < numElements; ++j) {
+        paths.push(path + '.' + j);
+      }
+    }
+  }
   paths.forEach(validatePath);
   return promise;
 
@@ -2463,8 +2475,8 @@ Document.prototype.$__fullPath = function (path) {
 Document.ValidationError = ValidationError;
 module.exports = exports = Document;
 
-}).call(this,require("FWaASH"))
-},{"./error":8,"./internal":17,"./promise":18,"./schema":19,"./schema/mixed":26,"./schematype":30,"./types/array":32,"./types/documentarray":34,"./types/embedded":35,"./types/objectid":37,"./utils":38,"FWaASH":46,"events":44,"hooks":49,"util":48}],5:[function(require,module,exports){
+}).call(this,require("FWaASH"),require("buffer").Buffer)
+},{"./error":8,"./internal":17,"./promise":18,"./schema":19,"./schema/mixed":26,"./schematype":30,"./types/array":32,"./types/documentarray":34,"./types/embedded":35,"./types/objectid":37,"./utils":38,"FWaASH":46,"buffer":40,"events":44,"hooks":49,"util":48}],5:[function(require,module,exports){
 'use strict';
 
 /*!

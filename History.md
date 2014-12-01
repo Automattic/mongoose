@@ -1,3 +1,11 @@
+3.8.20 / 2014-12-01
+===================
+ * fixed; recursive readPref #2490 [kjvalencik](https://github.com/kjvalencik)
+ * fixed; make sure to copy parameters to update() before modifying #2406 [alabid](https://github.com/alabid)
+ * fixed; unclear documentation about query callbacks #2319
+ * fixed; setting a schema-less field to an empty object #2314 [alabid](https://github.com/alabid)
+ * fixed; registering statics and methods for discriminators #2167 [alabid](https://github.com/alabid)
+
 3.9.5 / 2014-11-10
 ===================
  * added; ability to disable autoIndex on a per-connection basis #1875 [sr527](https://github.com/sr527)

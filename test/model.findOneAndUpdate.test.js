@@ -157,6 +157,72 @@ describe('model: findOneAndUpdate:', function(){
     });
   });
 
+  describe('will correctly', function() {
+    var db, ItemParentModel, ItemChildModel;
+
+    before(function() {
+      db = start();
+      var itemSpec = new Schema({
+        item_id: {
+          type: ObjectId, required: true, default: function() {return new DocumentObjectId();}
+        },
+        address: {
+          street: String,
+          zipcode: String
+        },
+        age: Number
+      }, {_id: false});
+      var itemSchema = new Schema({
+        items: [itemSpec],
+      });
+      ItemParentModel = db.model('ItemParentModel', itemSchema);
+      ItemChildModel = db.model('ItemChildModel', itemSpec);
+    });
+
+    after(function() {
+      db.close();
+    });
+
+    it('update subdocument in array item', function(done) {
+      var item1 = new ItemChildModel({
+        address: {
+          street: "times square",
+          zipcode: "10036"
+        }
+      });
+      var item2 = new ItemChildModel({
+        address: {
+          street: "bryant park",
+          zipcode: "10030"
+        }
+      });
+      var item3 = new ItemChildModel({
+        address: {
+          street: "queens",
+          zipcode: "1002?"
+        }
+      });
+      var itemParent = new ItemParentModel({items:[item1, item2, item3]});
+      itemParent.save(function(err) {
+        assert.ifError(err);
+        ItemParentModel.findOneAndUpdate(
+          {"_id": itemParent._id, "items.item_id": item1.item_id},
+          {"$set":{ "items.$.address":{}}},
+          {new: true},
+          function(err, updatedDoc) {
+            assert.ifError(err);
+            assert.ok(updatedDoc.items);
+            assert.ok(updatedDoc.items instanceof Array);
+            assert.ok(updatedDoc.items.length, 3);
+            assert.ok(Utils.isObject(updatedDoc.items[0].address));
+            assert.ok(Object.keys(updatedDoc.items[0].address).length, 0);
+            done();
+          }
+        );
+      });
+    });
+  });
+
   it('returns the original document', function(done){
     var db = start()
       , M = db.model(modelname, collection)

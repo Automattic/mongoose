@@ -1,3 +1,11 @@
+3.8.20 / 2014-12-01
+===================
+ * fixed; recursive readPref #2490 [kjvalencik](https://github.com/kjvalencik)
+ * fixed; make sure to copy parameters to update() before modifying #2406 [alabid](https://github.com/alabid)
+ * fixed; unclear documentation about query callbacks #2319
+ * fixed; setting a schema-less field to an empty object #2314 [alabid](https://github.com/alabid)
+ * fixed; registering statics and methods for discriminators #2167 [alabid](https://github.com/alabid)
+
 3.8.19 / 2014-11-09
 ===================
  * fixed; make sure to not override subdoc _ids on find #2276 [alabid](https://github.com/alabid)

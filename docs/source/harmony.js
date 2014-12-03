@@ -2,8 +2,11 @@ var fs = require('fs');
 var acquit = require('acquit');
 var marked = require('marked');
 
-var blocks = acquit.parse(
+var docTests = acquit.parse(
   fs.readFileSync('test/harmony/document.test_.js').toString());
+var queryTests = acquit.parse(
+  fs.readFileSync('test/harmony/query.test_.js').toString());
+blocks = docTests.concat(queryTests);
 
 var trimEachLine = function(str) {
   var lines = str.split('\n');

@@ -1132,8 +1132,8 @@ describe('model: update:', function(){
       Breakfast.update({}, { $unset: { steak: '' }, $setOnInsert: { eggs: 'softboiled' } }, updateOptions, function(error) {
         assert.ok(!!error);
         assert.equal(2, Object.keys(error.errors).length);
-        assert.equal('eggs', Object.keys(error.errors)[0]);
-        assert.equal('steak', Object.keys(error.errors)[1]);
+        assert.ok(Object.keys(error.errors).indexOf('eggs') !== -1);
+        assert.ok(Object.keys(error.errors).indexOf('steak') !== -1);
         assert.equal('Validator failed for path `eggs` with value `softboiled`',
           error.errors['eggs'].message);
         assert.equal('Path `steak` is required.',

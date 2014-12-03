@@ -1151,7 +1151,7 @@ describe('Model', function(){
         db.close();
         assert.equal(err.errors.name.message, 'Name cannot be greater than 1 character for path "name" with value `hi`');
         assert.equal(err.name,"ValidationError");
-        assert.equal(err.message,"Validation failed");
+        assert.ok(/^Validation failed: Name cannot be greater/.test(err.message));
         done();
       });
     });

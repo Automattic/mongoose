@@ -1668,7 +1668,7 @@ describe('model: populate:', function(){
       });
 
       comment.save(function (err) {
-        assert.equal('Validation failed', err && err.message);
+        assert.equal('CommentWithRequiredField validation failed', err && err.message);
         assert.ok('num' in err.errors);
         assert.ok('str' in err.errors);
         assert.ok('user' in err.errors);

@@ -68,13 +68,13 @@ describe('types.buffer', function(){
       t.validate(function (err) {
         assert.equal(err.message,'Validation failed');
         assert.equal(err.errors.required.kind,'required');
-        t.required = {x:[20]}
+        t.required = {x:[20]};
         t.save(function (err) {
           assert.ok(err);
-          assert.equal(err.name, 'CastError');
-          assert.equal(err.kind, 'buffer');
-          assert.equal(err.message, 'Cast to buffer failed for value "[object Object]" at path "required"');
-          assert.deepEqual(err.value, {x:[20]});
+          assert.equal(err.name, 'ValidationError');
+          assert.equal(err.errors.required.kind, 'cast');
+          assert.equal(err.errors.required.message, 'Cast to buffer failed for value "[object Object]" at path "required"');
+          assert.deepEqual(err.errors.required.value, {x:[20]});
           t.required = new Buffer("hello");
 
           t.sub.push({ name: 'Friday Friday' });

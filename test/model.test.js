@@ -5160,19 +5160,21 @@ describe('Model', function(){
         unique:  6
       });
 
-      u1.save(function(err) {
-        assert.ifError(err);
-        assert.ok(!u1.isModified('changer'));
-        u2.save(function(err) {
+      Unique.on('index', function() {
+        u1.save(function(err) {
           assert.ifError(err);
-          assert.ok(!u2.isModified('changer'));
-          u2.changer = 'b';
-          u2.unique = 5;
-          assert.ok(u2.isModified('changer'));
+          assert.ok(!u1.isModified('changer'));
           u2.save(function(err) {
-            assert.ok(err);
+            assert.ifError(err);
+            assert.ok(!u2.isModified('changer'));
+            u2.changer = 'b';
+            u2.unique = 5;
             assert.ok(u2.isModified('changer'));
-            done();
+            u2.save(function(err) {
+              assert.ok(err);
+              assert.ok(u2.isModified('changer'));
+              done();
+            });
           });
         });
       });

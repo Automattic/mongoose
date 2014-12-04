@@ -68,12 +68,12 @@ mongoose.model('Movie', MovieSchema);
 
 describe('types.document', function(){
 
-  it('test that save fires errors', function(done){
+  it('test that validate sets errors', function(done){
     var a = new Subdocument();
     a.set('test', '');
     a.set('work', 'nope');
 
-    a.save(function(err){
+    a.validate(function(err){
       assert.ok(a.__parent.$__.validationError instanceof ValidationError);
       assert.equal(a.__parent.errors['jsconf.ar.0.work'].name, 'ValidatorError');
       assert.equal(a.__parent.$__.validationError.toString(), 'ValidationError: Path `test` is required., Validator failed for path `work` with value `nope`');

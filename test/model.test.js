@@ -1,4 +1,4 @@
-
+Error.stackTraceLimit = Infinity;
 /**
  * Test dependencies.
  */
@@ -10,7 +10,6 @@ var start = require('./common')
   , Query = require('../lib/query')
   , Schema = mongoose.Schema
   , SchemaType = mongoose.SchemaType
-  , CastError = mongoose.Error.CastError
   , ValidatorError = mongoose.Error.ValidatorError
   , ValidationError = mongoose.Error.ValidationError
   , ObjectId = Schema.Types.ObjectId
@@ -73,6 +72,62 @@ mongoose.model('BlogPost', BlogPost);
 var bpSchema = BlogPost;
 
 var collection = 'blogposts_' + random();
+
+describe('Model', function() {
+  var db, Test;
+
+  before(function() {
+    db = start();
+    var testSchema = new Schema({
+      _id: {
+        first_name: {type: String},
+        age: {type: Number}
+      },
+      last_name: {type: String},
+      doc_embed: {
+        some: {type: String}
+      }
+
+    });
+    Test = db.model('test-schema', testSchema);
+  });
+
+  after(function() {
+    db.close();
+  });
+
+  it('can be created using _id as embedded document', function(done) {
+    var t = new Test({
+      _id: {
+        first_name: "Daniel",
+        age: 21
+      },
+      last_name: "Alabi",
+      doc_embed: {
+        some: "a"
+      }
+    });
+
+    t.save(function(err) {
+      assert.ifError(err);
+      Test.findOne({}, function(err, doc) {
+        assert.ifError(err);
+
+        assert.ok('last_name' in doc);
+        assert.ok('_id' in doc);
+        assert.ok('first_name' in doc._id);
+        assert.equal("Daniel", doc._id.first_name);
+        assert.ok('age' in doc._id);
+        assert.equal(21, doc._id.age);
+
+        assert.ok('doc_embed' in doc);
+        assert.ok('some' in doc.doc_embed);
+        assert.equal("a", doc.doc_embed.some);
+        done();
+      });
+    });
+  });
+});
 
 describe('Model', function(){
   describe('constructor', function(){
@@ -204,10 +259,10 @@ describe('Model', function(){
       assert.equal(1, Object.keys(post.get('nested')).length);
       assert.ok(Array.isArray(post.get('nested').array));
 
-      assert.ok(post.get('numbers') instanceof MongooseArray);
-      assert.ok(post.get('owners') instanceof MongooseArray);
-      assert.ok(post.get('comments') instanceof DocumentArray);
-      assert.ok(post.get('nested.array') instanceof MongooseArray);
+      assert.ok(post.get('numbers').isMongooseArray);
+      assert.ok(post.get('owners').isMongooseArray);
+      assert.ok(post.get('comments').isMongooseDocumentArray);
+      assert.ok(post.get('nested.array').isMongooseArray);
       done();
     });
 
@@ -287,8 +342,8 @@ describe('Model', function(){
         assert.equal(undefined, post.get('meta.date'));
         assert.equal(undefined, post.get('meta.visitors'));
 
-        assert.ok(post.get('owners') instanceof MongooseArray);
-        assert.ok(post.get('comments') instanceof DocumentArray);
+        assert.ok(post.get('owners').isMongooseArray);
+        assert.ok(post.get('comments').isMongooseDocumentArray);
         cb();
       });
 
@@ -306,11 +361,40 @@ describe('Model', function(){
         assert.equal(undefined, post.get('meta.date'));
         assert.equal(undefined, post.get('meta.visitors'));
 
-        assert.ok(post.get('owners') instanceof MongooseArray);
-        assert.ok(post.get('comments') instanceof DocumentArray);
+        assert.ok(post.get('owners').isMongooseArray);
+        assert.ok(post.get('comments').isMongooseDocumentArray);
         cb();
       });
     })
+
+
+    it('when saved using the promise not the callback', function(done){
+      var db = start()
+        , BlogPost = db.model('BlogPost', collection);
+
+      var post = new BlogPost();
+      var p = post.save();
+      p.onResolve(function(err, post){
+        assert.ifError(err);
+        assert.ok(post.get('_id') instanceof DocumentObjectId);
+
+        assert.equal(undefined, post.get('title'));
+        assert.equal(undefined, post.get('slug'));
+        assert.equal(undefined, post.get('date'));
+        assert.equal(undefined, post.get('published'));
+
+        assert.equal(typeof post.get('meta'), 'object');
+        assert.deepEqual(post.get('meta'),{});
+        assert.equal(undefined, post.get('meta.date'));
+        assert.equal(undefined, post.get('meta.visitors'));
+
+        assert.ok(post.get('owners').isMongooseArray);
+        assert.ok(post.get('comments').isMongooseDocumentArray);
+        db.close();
+        done();
+      });
+    })
+
 
     describe('init', function(){
       it('works', function(done){
@@ -352,19 +436,19 @@ describe('Model', function(){
         assert.equal(typeof post.meta.visitors,'number');
         assert.equal(post.published, true);
 
-        assert.ok(post.get('owners') instanceof MongooseArray);
+        assert.ok(post.get('owners').isMongooseArray);
         assert.ok(post.get('owners')[0] instanceof DocumentObjectId);
         assert.ok(post.get('owners')[1] instanceof DocumentObjectId);
 
-        assert.ok(post.owners instanceof MongooseArray);
+        assert.ok(post.owners.isMongooseArray);
         assert.ok(post.owners[0] instanceof DocumentObjectId);
         assert.ok(post.owners[1] instanceof DocumentObjectId);
 
-        assert.ok(post.get('comments') instanceof DocumentArray);
+        assert.ok(post.get('comments').isMongooseDocumentArray);
         assert.ok(post.get('comments')[0] instanceof EmbeddedDocument);
         assert.ok(post.get('comments')[1] instanceof EmbeddedDocument);
 
-        assert.ok(post.comments instanceof DocumentArray);
+        assert.ok(post.comments.isMongooseDocumentArray);
         assert.ok(post.comments[0] instanceof EmbeddedDocument);
         assert.ok(post.comments[1] instanceof EmbeddedDocument);
         done();
@@ -392,8 +476,8 @@ describe('Model', function(){
         assert.equal(undefined, post.get('meta.visitors'));
         assert.equal(undefined, post.get('published'));
 
-        assert.ok(post.get('owners') instanceof MongooseArray);
-        assert.ok(post.get('comments') instanceof DocumentArray);
+        assert.ok(post.get('owners').isMongooseArray);
+        assert.ok(post.get('comments').isMongooseDocumentArray);
         done();
       })
 
@@ -487,6 +571,54 @@ describe('Model', function(){
     });
   });
 
+  it ('saves subdocuments middleware correctly', function(done){
+    var db = start();
+
+    var child_hook;
+    var parent_hook;
+    var childSchema = new Schema({
+      name: String
+    });
+
+    childSchema.pre('save', function(next) {
+      child_hook = this.name;
+      next();
+    })
+
+    var parentSchema = new Schema({
+      name: String,
+      children: [childSchema]
+    });
+
+    parentSchema.pre('save', function(next) {
+      parent_hook = this.name;
+      next();
+    })
+
+    var Parent = db.model('doc', parentSchema);
+
+    var parent = new Parent({
+      name: 'Bob',
+      children: [{
+        name: 'Mary'
+      }]
+    });
+
+    parent.save(function (err, parent) {
+      assert.equal(parent_hook, "Bob");
+      assert.equal(child_hook, "Mary")
+      assert.ifError(err);
+      parent.children[0].name = 'Jane';
+      parent.save(function(err){
+        assert.equal(child_hook, "Jane");
+        assert.ifError(err);
+        done();
+      });
+
+    });
+
+  });
+
   it('instantiating a model with a hash that maps to at least 1 undefined value', function(done){
     var db = start()
       , BlogPost = db.model('BlogPost', collection);
@@ -547,7 +679,6 @@ describe('Model', function(){
         name: 'test'
       , _id: 35
     });
-
     instance.save(function (err) {
       assert.ifError(err);
 
@@ -622,7 +753,21 @@ describe('Model', function(){
       p.children.push({});
       assert.equal('function', typeof p.children[0].talk);
       done();
-    })
+    });
+
+    it('can be defined with nested key', function(done) {
+      var db = start();
+      var NestedKeySchema = new Schema({});
+      NestedKeySchema.method('foo', {
+        bar: function(){
+          return this;
+        }
+      });
+      var NestedKey = db.model('NestedKey', NestedKeySchema);
+      var n = new NestedKey();
+      assert.equal(n, n.foo.bar())
+      done();
+    });
   })
 
   describe('statics', function(){
@@ -636,7 +781,7 @@ describe('Model', function(){
     });
   });
 
-  describe('casting', function(){
+  describe('casting as validation errors', function(){
     it('error', function(done){
       var db = start()
         , BlogPost = db.model('BlogPost', collection)
@@ -646,7 +791,10 @@ describe('Model', function(){
 
       try {
         post.init({
+          date: 'Test',
+          meta: {
             date: 'Test'
+          }
         });
       } catch(e){
         threw = true;
@@ -664,8 +812,10 @@ describe('Model', function(){
 
       post.save(function(err){
         assert.ok(err instanceof MongooseError);
-        assert.ok(err instanceof CastError);
+        assert.ok(err instanceof ValidationError);
+        assert.equal(2, Object.keys(err.errors).length);
         post.date = new Date;
+        post.meta.date = new Date;
         post.save(function (err) {
           db.close();
           assert.ifError(err);
@@ -694,7 +844,7 @@ describe('Model', function(){
 
       try {
         post.set('meta.date', 'Test');
-      } catch(e){
+      } catch(e) {
         threw = true;
       }
 
@@ -703,11 +853,13 @@ describe('Model', function(){
       post.save(function(err){
         db.close();
         assert.ok(err instanceof MongooseError);
-        assert.ok(err instanceof CastError);
+        assert.ok(err instanceof ValidationError);
         done();
       });
     });
-    it('subdocument error', function(done){
+
+
+    it('subdocument cast error', function(done){
       var db = start()
         , BlogPost = db.model('BlogPost', collection)
         , threw = false;
@@ -724,10 +876,38 @@ describe('Model', function(){
       post.save(function(err){
         db.close();
         assert.ok(err instanceof MongooseError);
-        assert.ok(err instanceof CastError);
+        assert.ok(err instanceof ValidationError);
         done();
       });
     });
+
+
+    it('subdocument validation error', function(done){
+      function failingvalidator(val) {
+        return false;
+      }
+
+      var db = start()
+        , subs = new Schema({
+          str: {
+            type: String, validate: failingvalidator
+          }
+        })
+        , BlogPost = db.model('BlogPost', {subs: [subs]})
+
+      var post = new BlogPost()
+      post.init({
+        subs: [ { str: 'gaga' } ]
+      });
+
+      post.save(function(err){
+        db.close();
+        assert.ok(err instanceof ValidationError);
+        done();
+      });
+    });
+
+
     it('subdocument error when adding a subdoc', function(done){
       var db = start()
         , BlogPost = db.model('BlogPost', collection)
@@ -748,10 +928,11 @@ describe('Model', function(){
       post.save(function(err){
         db.close();
         assert.ok(err instanceof MongooseError);
-        assert.ok(err instanceof CastError);
+        assert.ok(err instanceof ValidationError);
         done();
       });
     });
+
 
     it('updates', function(done){
       var db = start()
@@ -1156,10 +1337,8 @@ describe('Model', function(){
         assert.ok(post.errors['items.0.subs.0.required'] instanceof ValidatorError);
         assert.equal(post.errors['items.0.subs.0.required'].message,'Path `required` is required.');
 
-        assert.ok(!err.errors['items.0.required']);
-        assert.ok(!err.errors['items.0.required']);
-        assert.ok(!post.errors['items.0.required']);
-        assert.ok(!post.errors['items.0.required']);
+        assert.ok(err.errors['items.0.required']);
+        assert.ok(post.errors['items.0.required']);
 
         post.items[0].subs[0].set('required', true);
         assert.equal(undefined, post.$__.validationError);
@@ -1392,13 +1571,13 @@ describe('Model', function(){
         post.save(function(err){
           assert.ok(err instanceof MongooseError);
           assert.ok(err instanceof ValidationError);
-          assert.equal(err.errors.baz.type,'user defined');
+          assert.equal(err.errors.baz.kind,'user defined');
           assert.equal(err.errors.baz.path,'baz');
 
           post.set('baz', 'good');
           post.save(function(err){
+            assert.ifError(err);
             db.close();
-            assert.strictEqual(err, null);
             done();
           });
         });
@@ -1434,13 +1613,13 @@ describe('Model', function(){
         post.save(function(err){
           assert.ok(err instanceof MongooseError);
           assert.ok(err instanceof ValidationError);
-          assert.equal(err.errors.prop.type,'user defined');
+          assert.equal(err.errors.prop.kind,'user defined');
           assert.equal(err.errors.prop.path,'prop');
 
           post.set('prop', 'good');
           post.save(function(err){
+            assert.ifError(err);
             db.close();
-            assert.strictEqual(err, null);
             done();
           });
         });
@@ -1488,18 +1667,18 @@ describe('Model', function(){
           assert.ok(err instanceof ValidationError);
           assert.equal(4, Object.keys(err.errors).length);
           assert.ok(err.errors.baz instanceof ValidatorError);
-          assert.equal(err.errors.baz.type,'user defined');
+          assert.equal(err.errors.baz.kind,'user defined');
           assert.equal(err.errors.baz.path,'baz');
           assert.ok(err.errors.abc instanceof ValidatorError);
-          assert.equal(err.errors.abc.type,'user defined');
+          assert.equal(err.errors.abc.kind,'user defined');
           assert.equal(err.errors.abc.message,'must be abc');
           assert.equal(err.errors.abc.path,'abc');
           assert.ok(err.errors.test instanceof ValidatorError);
           assert.equal(err.errors.test.message,'must also be abc');
-          assert.equal(err.errors.test.type,'user defined');
+          assert.equal(err.errors.test.kind,'user defined');
           assert.equal(err.errors.test.path,'test');
           assert.ok(err.errors.required instanceof ValidatorError);
-          assert.equal(err.errors.required.type,'required');
+          assert.equal(err.errors.required.kind,'required');
           assert.equal(err.errors.required.path,'required');
 
           post.set({
@@ -1510,8 +1689,8 @@ describe('Model', function(){
           });
 
           post.save(function(err){
+            assert.ifError(err);
             db.close();
-            assert.strictEqual(err, null);
             done();
           });
         });
@@ -1744,6 +1923,68 @@ describe('Model', function(){
       })
     })
 
+    it('works as a promise', function(done){
+      B.create({}, function (err, post) {
+        assert.ifError(err);
+        B.findById(post, function (err, found) {
+          assert.ifError(err);
+
+          found.remove().onResolve(function (err, doc) {
+            assert.ifError(err);
+            assert.ok(doc);
+            assert.ok(doc.equals(found));
+            done();
+          })
+        })
+      })
+    })
+
+    it('works as a promise with a hook', function(done){
+      var called = 0;
+      var RHS = new Schema({
+        name: String
+      });
+      RHS.pre('remove', function (next) {
+        called++;
+        return next();
+      });
+
+      var RH = db.model('RH', RHS, 'RH_'+random())
+
+      RH.create({name: 'to be removed'}, function (err, post) {
+        assert.ifError(err);
+        assert.ok(post);
+        RH.findById(post, function (err, found) {
+          assert.ifError(err);
+          assert.ok(found);
+
+          found.remove().onResolve(function (err, doc) {
+            assert.ifError(err);
+            assert.equal(called, 1);
+            assert.ok(doc);
+            assert.ok(doc.equals(found));
+            done();
+          })
+        })
+      })
+    })
+
+    it('passes the removed document (gh-1419)', function(done){
+      B.create({}, function (err, post) {
+        assert.ifError(err);
+        B.findById(post, function (err, found) {
+          assert.ifError(err);
+
+          found.remove(function (err, doc) {
+            assert.ifError(err);
+            assert.ok(doc);
+            assert.ok(doc.equals(found));
+            done();
+          })
+        })
+      })
+    })
+
     describe('when called multiple times', function(){
       it('always executes the passed callback gh-1210', function(done){
         var db = start()
@@ -1864,7 +2105,7 @@ describe('Model', function(){
 
         db.close();
         assert.equal('object', typeof doc.first);
-        assert.ok(doc.first.second instanceof MongooseArray);
+        assert.ok(doc.first.second.isMongooseArray);
         done()
       });
 
@@ -2455,6 +2696,30 @@ describe('Model', function(){
       done();
     });
   })
+
+
+  it('activePaths should be updated for nested modifieds as promise', function(done){
+    var db = start()
+      , schema = new Schema({
+          nested: {
+            nums: [Number]
+          }
+        });
+
+    var Temp = db.model('NestedPushes', schema, collection);
+
+    var p1 = Temp.create({nested: {nums: [1, 2, 3, 4, 5]}});
+    p1.onResolve(function (err, t) {
+      assert.ifError(err);
+      t.nested.nums.pull(1);
+      t.nested.nums.pull(2);
+      assert.equal(t.$__.activePaths.paths['nested.nums'],'modify');
+      db.close();
+      done();
+    });
+  })
+
+
 
   it('$pull should affect what you see in an array before a save', function(done){
     var db = start()
@@ -3306,6 +3571,38 @@ describe('Model', function(){
         });
       });
 
+
+      it('with an async waterfall', function(done){
+        var db = start();
+        var schema = new Schema({ name: String });
+        var called = 0;
+
+        schema.pre('save', true, function (next, done) {
+          called++;
+          process.nextTick(function () {
+            next();
+            done();
+          });
+        });
+
+        schema.pre('save', function (next) {
+          called++;
+          return next();
+        });
+
+        var S = db.model('S', schema, collection);
+        var s = new S({name: 'zupa'});
+
+        var p = s.save();
+        p.onResolve(function (err) {
+          db.close();
+          assert.ifError(err);
+          assert.equal(2, called);
+          done();
+        });
+      });
+
+
       it('called on all sub levels', function(done){
         var db = start();
 
@@ -3341,6 +3638,7 @@ describe('Model', function(){
         });
       });
 
+
       it('error on any sub level', function(done){
         var db = start();
 
@@ -3364,7 +3662,7 @@ describe('Model', function(){
         var S = db.model('presave_hook_error', schema, 'presave_hook_error');
         var s = new S({ name : 'a' , child : [ { name : 'b', grand : [{ name : 'c'}] } ]});
 
-        s.save(function (err, doc) {
+        s.save(function (err) {
           db.close();
           assert.ok(err instanceof Error);
           assert.equal(err.message,'Error 101');
@@ -3434,7 +3732,7 @@ describe('Model', function(){
           , post = undefined;
 
         schema.post('save', function (arg) {
-          assert.equal(arg.id,post.id)
+          assert.equal(arg.id, post.id)
           save = true;
         });
 
@@ -4168,6 +4466,7 @@ describe('Model', function(){
       })
     })
 
+
     it('rejects new documents that have no _id set (1595)', function(done){
       var db = start();
       var s = new Schema({ _id: { type: String }});
@@ -4181,6 +4480,7 @@ describe('Model', function(){
       })
     })
   });
+
 
   describe('_delta()', function(){
     it('should overwrite arrays when directly set (gh-1126)', function(done){

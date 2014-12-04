@@ -63,9 +63,11 @@ describe('model: mapreduce:', function(){
     for (var i = 0; i< num; ++i)
       docs.push({ author: authors[i%authors.length], owners: [id], published: true });
 
-    MR.create(docs, function (err, a, b) {
+    MR.create(docs, function (err, insertedDocs) {
       assert.ifError(err);
 
+      var a = insertedDocs[0];
+      var b = insertedDocs[1];
       magicID = b._id;
 
       var o = {

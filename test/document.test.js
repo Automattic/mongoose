@@ -15,6 +15,7 @@ var start = require('./common')
   , ValidatorError = SchemaType.ValidatorError
   , ValidationError = mongoose.Document.ValidationError
   , MongooseError = mongoose.Error
+  , EmbeddedDocument = require('../lib/types/embedded')
   , Query = require('../lib/query');
 
 /**
@@ -446,6 +447,51 @@ describe('document', function(){
     });
   });
 
+  it('does not apply toObject functions of subdocuments to root document', function( done ){
+
+    var subdocSchema = new Schema({
+      test: String,
+      wow: String
+    });
+
+    subdocSchema.options.toObject = {};
+    subdocSchema.options.toObject.transform = function (doc, ret, options) {
+      delete ret.wow;
+    };
+
+    var docSchema = new Schema({
+      foo: String,
+      wow: Boolean,
+      sub: [subdocSchema]
+    });
+
+    var db = start()
+      , Doc = db.model('Doc', docSchema)
+      , Subdoc = db.model('Subdoc', subdocSchema);
+
+    Doc.create({
+      foo: 'someString',
+      wow: true,
+      sub: [{
+        test: 'someOtherString',
+        wow: 'thisIsAString'
+      }]
+    }, function( err, doc ){
+
+        var obj = doc.toObject({
+          transform: function (doc, ret) {
+            ret.phew = 'new';
+          }
+        });
+
+        assert.equal(obj.phew, 'new');
+        assert.ok(!doc.sub.wow);
+
+        done();
+    });
+
+  });
+
   it('doesnt clobber child schema options when called with no params (gh-2035)', function(done) {
     var db = start();
     var userSchema = new Schema({
@@ -844,15 +890,15 @@ describe('document', function(){
     var collection = 'validateschema_'+random();
 
     it('works (gh-891)', function(done){
-      var db = start()
-        , schema = null
-        , called = false
+      var db = start();
+      var schema = null;
+      var called = false;
 
       var validate = [function(str){ called = true; return true }, 'BAM'];
 
       schema = new Schema({
-          prop: { type: String, required: true, validate: validate }
-        , nick: { type: String, required: true }
+        prop: { type: String, required: true, validate: validate },
+        nick: { type: String, required: true }
       });
 
       var M = db.model('validateSchema', schema, collection);
@@ -869,25 +915,85 @@ describe('document', function(){
             assert.equal(false, called);
             assert.ifError(err);
             done();
-          })
-        })
-      })
-    })
+          });
+        });
+      });
+    });
 
-    describe('works on arrays', function(){
-      var db;
-      before(function(done){
-        db = start()
+    it('can return a promise', function(done) {
+      var db = start();
+      var schema = null;
+      var called = false;
+
+      var validate = [function(str){ called = true; return true }, 'BAM'];
+
+      schema = new Schema({
+        prop: { type: String, required: true, validate: validate },
+        nick: { type: String, required: true }
+      });
+
+      var M = db.model('validateSchemaPromise', schema, collection);
+      var m = new M({ prop: 'gh891', nick: 'validation test' });
+      var mBad = new M({ prop: 'other' });
+
+      var promise = m.validate();
+      promise.then(function(err) {
+        var promise2 = mBad.validate();
+        promise2.onReject(function(err) {
+          assert.ok(!!err);
+          clearTimeout(timeout);
+          db.close();
+          done();
+        });
+      });
+
+      var timeout = setTimeout(function() {
+        db.close();
+        throw new Error("Promise not fulfilled!");
+      }, 500);
+    });
+
+    it('returns a promise when there are no validators', function(done) {
+      var db = start();
+      var schema = null;
+      var called = false;
+
+      schema = new Schema({ _id : String });
+
+      var M = db.model('validateSchemaPromise2', schema, collection);
+      var m = new M();
+
+      var promise = m.validate();
+      promise.then(function() {
+        clearTimeout(timeout);
+        db.close();
         done();
-      })
-      after(function(done){
-        db.close(done)
-      })
+      });
 
-      it('with required', function(done){
+      var timeout = setTimeout(function() {
+        if (!fulfilled) {
+          db.close();
+          throw new Error("Promise not fulfilled!");
+        }
+      }, 500);
+    });
+
+    describe('works on arrays', function() {
+      var db;
+
+      before(function(done) {
+        db = start();
+        done();
+      });
+
+      after(function(done) {
+        db.close(done);
+      });
+
+      it('with required', function(done) {
         var schema = new Schema({
-            name: String
-          , arr : { type: [], required: true}
+          name: String,
+          arr : { type: [], required: true }
         });
         var M = db.model('validateSchema-array1', schema, collection);
         var m = new M({ name: 'gh1109-1' });
@@ -900,12 +1006,12 @@ describe('document', function(){
             m.save(function (err) {
               assert.ifError(err);
               done();
-            })
-          })
-        })
-      })
+            });
+          });
+        });
+      });
 
-      it('with custom validator', function(done){
+      it('with custom validator', function(done) {
         var called = false;
 
         function validator (val) {
@@ -916,7 +1022,7 @@ describe('document', function(){
         var validate = [validator, 'BAM'];
 
         var schema = new Schema({
-            arr : { type: [], validate: validate }
+          arr : { type: [], validate: validate }
         });
 
         var M = db.model('validateSchema-array2', schema, collection);
@@ -930,10 +1036,10 @@ describe('document', function(){
           m.save(function (err) {
             assert.equal(true, called);
             assert.ifError(err);
-            done()
-          })
-        })
-      })
+            done();
+          });
+        });
+      });
 
       it('with both required + custom validator', function(done){
         function validator (val) {
@@ -959,24 +1065,133 @@ describe('document', function(){
             m.arr.push(95);
             m.save(function (err) {
               assert.ifError(err);
-              done()
-            })
-          })
-        })
-      })
+              done();
+            });
+          });
+        });
+      });
+    });
 
-    })
-  })
+    it("validator should run only once gh-1743", function (done) {
+      var count = 0;
+      var db = start();
 
-  it('#invalidate', function(done){
-    var db = start()
-      , InvalidateSchema = null
-      , Post = null
-      , post = null;
+      var Control = new Schema({
+        test: {
+          type: String,
+          validate: function (value, done) {
+            count++;
+            return done(true);
+          }
+        }
+      });
+      var PostSchema = new Schema({
+        controls: [Control]
+      });
 
-    InvalidateSchema = new Schema({
-      prop: { type: String },
-    }, { strict: false });
+      var Post = db.model('post', PostSchema);
+
+      var post = new Post({
+        controls: [{
+          test: "xx"
+        }]
+      });
+
+      post.save(function () {
+        assert.equal(count, 1);
+        done();
+      });
+    });
+
+    it("validator should run only once per sub-doc gh-1743", function (done) {
+      var count = 0;
+      var db = start();
+
+      var Control = new Schema({
+        test: {
+          type: String,
+          validate: function (value, done) {
+            count++;
+            return done(true);
+          }
+        }
+      });
+      var PostSchema = new Schema({
+        controls: [Control]
+      });
+
+      var Post = db.model('post', PostSchema);
+
+      var post = new Post({
+        controls: [
+          {
+            test: "xx"
+          },
+          {
+            test: "yy"
+          }
+        ]
+      });
+
+      post.save(function() {
+        assert.equal(count, post.controls.length);
+        done();
+      });
+    });
+
+
+    it("validator should run in parallel", function(done) {
+      // we set the time out to be double that of the validator - 1 (so that running in serial will be greater then that)
+      this.timeout(1000);
+      var db = start();
+      var count = 0;
+
+      var SchemaWithValidator = new Schema({
+        preference: {
+          type: String,
+          required: true,
+          validate: function validator(value, done) {
+            count++;
+            setTimeout(done.bind(null, true), 500);
+          }
+        }
+      });
+
+      var MWSV = db.model('mwv', new Schema({subs: [SchemaWithValidator]}));
+      var m = new MWSV({
+        subs: [
+          {
+            preference: "xx"
+          },
+          {
+            preference: "yy"
+          },
+          {
+            preference: "1"
+          },
+          {
+            preference: "2"
+          }
+        ]
+      });
+
+      m.save(function(err) {
+        assert.ifError(err);
+        assert.equal(count, 4);
+        done();
+      });
+    });
+
+  });
+
+  it('#invalidate', function(done) {
+    var db = start();
+    var InvalidateSchema = null;
+    var Post = null;
+    var post = null;
+
+    InvalidateSchema = new Schema({ prop: { type: String } },
+      { strict: false });
 
     mongoose.model('InvalidateSchema', InvalidateSchema);
 
@@ -985,15 +1200,15 @@ describe('document', function(){
     post.set({baz: 'val'});
     post.invalidate('baz', 'validation failed for path {PATH}');
 
-    post.save(function(err){
+    post.save(function(err) {
       assert.ok(err instanceof MongooseError);
       assert.ok(err instanceof ValidationError);
       assert.ok(err.errors.baz instanceof ValidatorError);
       assert.equal(err.errors.baz.message,'validation failed for path baz');
-      assert.equal(err.errors.baz.type,'user defined');
+      assert.equal(err.errors.baz.kind,'user defined');
       assert.equal(err.errors.baz.path,'baz');
 
-      post.save(function(err){
+      post.save(function(err) {
         db.close();
         assert.strictEqual(err, null);
         done();
@@ -1001,8 +1216,8 @@ describe('document', function(){
     });
   });
 
-  describe('#equals', function(){
-    describe('should work', function(){
+  describe('#equals', function() {
+    describe('should work', function() {
       var db = start();
       var S = db.model('equals-S', new Schema({ _id: String }));
       var N = db.model('equals-N', new Schema({ _id: Number }));
@@ -1010,19 +1225,19 @@ describe('document', function(){
       var B = db.model('equals-B', new Schema({ _id: Buffer }));
       var M = db.model('equals-I', new Schema({ name: String }, { _id: false }));
 
-      it('with string _ids', function(done){
+      it('with string _ids', function(done) {
         var s1 = new S({ _id: 'one' });
         var s2 = new S({ _id: 'one' });
         assert.ok(s1.equals(s2));
         done();
-      })
-      it('with number _ids', function(done){
+      });
+      it('with number _ids', function(done) {
         var n1 = new N({ _id: 0 });
         var n2 = new N({ _id: 0 });
         assert.ok(n1.equals(n2));
         done();
-      })
-      it('with ObjectId _ids', function(done){
+      });
+      it('with ObjectId _ids', function(done) {
         var id = new mongoose.Types.ObjectId;
         var o1 = new O({ _id: id });
         var o2 = new O({ _id: id });
@@ -1033,27 +1248,27 @@ describe('document', function(){
         o2 = new O({ _id: id });
         assert.ok(o1.equals(o2));
         done();
-      })
-      it('with Buffer _ids', function(done){
+      });
+      it('with Buffer _ids', function(done) {
         var n1 = new B({ _id: 0 });
         var n2 = new B({ _id: 0 });
         assert.ok(n1.equals(n2));
         done();
-      })
-      it('with _id disabled (gh-1687)', function(done){
+      });
+      it('with _id disabled (gh-1687)', function(done) {
         var m1 = new M;
         var m2 = new M;
         assert.doesNotThrow(function () {
           m1.equals(m2)
         });
         done();
-      })
+      });
 
-      after(function () {
+      after(function() {
         db.close();
-      })
-    })
-  })
+      });
+    });
+  });
 
   describe('setter', function(){
     describe('order', function(){
@@ -1171,10 +1386,11 @@ describe('document', function(){
             }]
           });
 
+          assert.ok(doc.schedule[0] instanceof EmbeddedDocument);
           doc.set('schedule.0.open', 1100);
           assert.ok(doc.schedule);
-          assert.equal('MongooseDocumentArray', doc.schedule.constructor.name);
-          assert.equal('EmbeddedDocument', doc.schedule[0].constructor.name);
+          assert.ok(doc.schedule.isMongooseDocumentArray);
+          assert.ok(doc.schedule[0] instanceof EmbeddedDocument);
           assert.equal(1100, doc.schedule[0].open);
           assert.equal(1900, doc.schedule[0].close);
 

@@ -131,39 +131,78 @@ describe('model', function() {
         checkHydratesCorrectModels({name: 1}, done);
       });
 
-      it('discriminator model only finds documents of its type', function(done) {
-        var impressionEvent = new ImpressionEvent({ name: 'Impression event' });
-        var conversionEvent1 = new ConversionEvent({ name: 'Conversion event 1', revenue: 1 });
-        var conversionEvent2 = new ConversionEvent({ name: 'Conversion event 2', revenue: 2 });
+      describe('discriminator model only finds documents of its type', function() {
+        var impressionEvent, conversionEvent1, conversionEvent2;
 
-        impressionEvent.save(function(err) {
-          assert.ifError(err);
-          conversionEvent1.save(function(err) {
-            assert.ifError(err);
-            conversionEvent2.save(function(err) {
+        before(function() {
+          impressionEvent = new ImpressionEvent({ name: 'Impression event' });
+          conversionEvent1 = new ConversionEvent({ name: 'Conversion event 1', revenue: 1 });
+          conversionEvent2 = new ConversionEvent({ name: 'Conversion event 2', revenue: 2 });
+        });
+
+        describe('using "ModelDiscriminator#findById"', function() {
+          it('to find a document of the appropriate discriminator', function(done) {
+            impressionEvent.save(function(err) {
               assert.ifError(err);
-              // doesn't find anything since we're querying for an impression id
-              var query = ConversionEvent.find({ _id: impressionEvent._id });
-              assert.equal(query.op, 'find');
-              assert.deepEqual(query._conditions, { _id: impressionEvent._id, __t: 'model-discriminator-querying-conversion' });
-              query.exec(function(err, documents) {
+
+              // via BaseEvent model
+              BaseEvent.findById(impressionEvent._id, function(err, doc) {
                 assert.ifError(err);
-                assert.equal(documents.length, 0);
+                assert.ok(doc);
+                assert.equal(impressionEvent.__t, doc.__t);
 
-                // now find one with no criteria given and ensure it gets added to _conditions
-                var query = ConversionEvent.find();
-                assert.deepEqual(query._conditions, { __t: 'model-discriminator-querying-conversion' });
-                assert.equal(query.op, 'find');
-                query.exec(function(err, documents) {
+                // via ImpressionEvent model discriminator -- should be present
+                ImpressionEvent.findById(impressionEvent._id, function(err, doc) {
                   assert.ifError(err);
-                  assert.equal(documents.length, 2);
+                  assert.ok(doc);
+                  assert.equal(impressionEvent.__t, doc.__t);
 
-                  assert.ok(documents[0] instanceof ConversionEvent);
-                  assert.equal(documents[0].__t, 'model-discriminator-querying-conversion');
+                  // via ConversionEvent model discriminator -- should not be present
+                  ConversionEvent.findById(impressionEvent._id, function(err, doc) {
+                    assert.ifError(err);
+                    assert.ok(!doc);
 
-                  assert.ok(documents[1] instanceof ConversionEvent);
-                  assert.equal(documents[1].__t, 'model-discriminator-querying-conversion');
-                  done();
+                    done();
+                  });
+                });
+              });
+            });
+          });
+        });
+
+        describe('using "ModelDiscriminator#find"', function() {
+          it('to find documents of the appropriate discriminator', function(done) {
+            impressionEvent.save(function(err) {
+              assert.ifError(err);
+              conversionEvent1.save(function(err) {
+                assert.ifError(err);
+                conversionEvent2.save(function(err) {
+                  assert.ifError(err);
+                  // doesn't find anything since we're querying for an impression id
+                  var query = ConversionEvent.find({ _id: impressionEvent._id });
+                  assert.equal(query.op, 'find');
+                  assert.deepEqual(query._conditions, { _id: impressionEvent._id, __t: 'model-discriminator-querying-conversion' });
+                  query.exec(function(err, documents) {
+                    assert.ifError(err);
+                    assert.equal(documents.length, 0);
+
+                    // now find one with no criteria given and ensure it gets added to _conditions
+                    var query = ConversionEvent.find();
+                    assert.deepEqual(query._conditions, { __t: 'model-discriminator-querying-conversion' });
+                    assert.equal(query.op, 'find');
+                    query.exec(function(err, documents) {
+                      assert.ifError(err);
+                      assert.equal(documents.length, 2);
+
+                      assert.ok(documents[0] instanceof ConversionEvent);
+                      assert.equal(documents[0].__t, 'model-discriminator-querying-conversion');
+
+                      assert.ok(documents[1] instanceof ConversionEvent);
+                      assert.equal(documents[1].__t, 'model-discriminator-querying-conversion');
+
+                      done();
+                    });
+                  });
                 });
               });
             });
@@ -449,7 +488,7 @@ describe('model', function() {
             });
           });
         });
-      }
+      };
 
       it('discriminator model only finds a document of its type when fields selection set as string inclusive', function(done) {
         checkDiscriminatorModelsFindOneDocumentOfItsType('name', done);
@@ -607,6 +646,90 @@ describe('model', function() {
                 });
               });
             });
+          });
+        });
+      });
+    });
+
+    describe('aggregate', function() {
+      var impressionEvent, conversionEvent, ignoredImpressionEvent;
+
+      beforeEach(function(done) {
+        impressionEvent = new ImpressionEvent({ name: 'Test Event' });
+        conversionEvent = new ConversionEvent({ name: 'Test Event', revenue: 10 });
+        ignoredImpressionEvent = new ImpressionEvent({ name: 'Ignored Event' });
+
+        async.forEach(
+          [impressionEvent, conversionEvent, ignoredImpressionEvent],
+          function (doc, cb) {
+            doc.save(cb);
+          },
+          done
+        );
+      });
+
+      describe('using "RootModel#aggregate"', function() {
+        it('to aggregate documents of all discriminators', function(done) {
+          var aggregate = BaseEvent.aggregate([
+            { $match: { name: 'Test Event' } },
+          ]);
+
+          aggregate.exec(function(err, docs) {
+            assert.ifError(err);
+            assert.deepEqual(aggregate._pipeline, [
+              { $match: { name: 'Test Event' } },
+            ]);
+            assert.equal(docs.length, 2);
+            done();
+          });
+        });
+      });
+
+      describe('using "ModelDiscriminator#aggregate"', function() {
+        it('only aggregates documents of the appropriate discriminator', function(done) {
+          var aggregate = ImpressionEvent.aggregate([
+            { $group: { _id: '$__t', count: { $sum: 1 } } },
+          ]);
+
+          aggregate.exec(function(err, result) {
+            assert.ifError(err);
+
+            // Discriminator `$match` pipeline step was added on the
+            // `exec` step. The reasoning for this is to not let
+            // aggregations with empty pipelines, but that are over
+            // discriminators be executed
+            assert.deepEqual(aggregate._pipeline, [
+              { $match: { __t: 'model-discriminator-querying-impression' } },
+              { $group: { _id: '$__t', count: { $sum: 1 } } },
+            ]);
+
+            assert.equal(result.length, 1);
+            assert.deepEqual(result, [
+              { _id: 'model-discriminator-querying-impression', count: 2 }
+            ]);
+            done();
+          });
+        });
+
+        it('merges the first pipeline stages if applicable', function(done) {
+          var aggregate = ImpressionEvent.aggregate([
+            { $match: { name: 'Test Event' } },
+          ]);
+
+          aggregate.exec(function(err, result) {
+            assert.ifError(err);
+
+            // Discriminator `$match` pipeline step was added on the
+            // `exec` step. The reasoning for this is to not let
+            // aggregations with empty pipelines, but that are over
+            // discriminators be executed
+            assert.deepEqual(aggregate._pipeline, [
+              { $match: { __t: 'model-discriminator-querying-impression', name: 'Test Event' } },
+            ]);
+
+            assert.equal(result.length, 1);
+            assert.equal(result[0]._id, impressionEvent.id);
+            done();
           });
         });
       });

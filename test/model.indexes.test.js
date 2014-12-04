@@ -157,7 +157,7 @@ describe('model', function(){
     describe('auto creation', function(){
       it('can be disabled', function(done){
         var db = start();
-        var schema = new Schema({ name: { type: String, index: true }})
+        var schema = new Schema({ name: { type: String, index: true }});
         schema.set('autoIndex', false);
 
         var Test = db.model('AutoIndexing', schema, "x"+random());
@@ -172,8 +172,46 @@ describe('model', function(){
             done();
           });
         }, 100);
-      })
-    })
+      });
+
+      describe('global autoIndexes (gh-1875)', function(){
+
+        it ('will create indexes as a default', function(done){
+          var db = start();
+          var schema = new Schema({name : {type: String, index: true}});
+          var Test = db.model('GlobalAutoIndex', schema, "x"+random());
+          Test.on('index', function(err){
+            assert.ok(true, 'Model.ensureIndexes() was called')
+          });
+
+          setTimeout(function () {
+            Test.collection.getIndexes(function(err, indexes){
+              assert.ifError(err);
+              assert.equal(2, Object.keys(indexes).length);
+              done();
+            });
+          }, 100);
+        });
+
+        it ('will not create indexes if the global auto index is false and schema option isnt set (gh-1875)', function(done){
+          var db = start({config: {autoIndex : false}});
+          var schema = new Schema({name : {type: String, index: true}});
+          var Test = db.model('GlobalAutoIndex', schema, "x"+random());
+          Test.on('index', function(err){
+            assert.ok(false, 'Model.ensureIndexes() was called')
+          });
+
+          setTimeout(function () {
+            Test.collection.getIndexes(function(err, indexes){
+              assert.ifError(err);
+              assert.equal(0, Object.keys(indexes).length);
+              done();
+            });
+          }, 100);
+
+        });
+      });
+    });
 
     it('do not trigger "MongoError: cannot add index with a background operation in progress" (gh-1365) LONG', function(done){
       this.timeout(45000);
@@ -191,7 +229,7 @@ describe('model', function(){
       K.on('index', function (err) {
         assert.ifError(err);
         db.close(done);
-      })
+      });
 
       var neededKittens = 30000;
 
@@ -216,7 +254,8 @@ describe('model', function(){
           })
         }
       })
-    })
+    });
+
 
     describe('model.ensureIndexes()', function(done){
       it('is a function', function(done){
@@ -224,7 +263,7 @@ describe('model', function(){
         var Test = mongoose.createConnection().model('ensureIndexes-'+random, schema);
         assert.equal('function', typeof Test.ensureIndexes);
         done();
-      })
+      });
 
       it('returns a Promise', function(done){
         var schema = mongoose.Schema({ x: 'string' });
@@ -232,7 +271,7 @@ describe('model', function(){
         var p = Test.ensureIndexes();
         assert.ok(p instanceof mongoose.Promise);
         done();
-      })
+      });
 
       it('creates indexes', function(done){
         var db = start();

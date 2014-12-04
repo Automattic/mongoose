@@ -22,71 +22,100 @@ var start = require('./common')
   , MongooseError = mongoose.Error;
 
 describe('document: strict mode:', function(){
-  it('should work', function(done){
-    var db = start();
+  describe('should work', function(){
+    var db, Lax, Strict;
 
-    var raw = {
+    before(function() {
+      db = start();
+
+      var raw = {
         ts  : { type: Date, default: Date.now }
-      , content: String
-      , mixed: {}
-      , deepMixed: { '4a': {}}
-      , arrayMixed: []
-    };
+        , content: String
+        , mixed: {}
+        , deepMixed: { '4a': {}}
+        , arrayMixed: []
+      };
 
-    var lax = new Schema(raw, { strict: false });
-    var strict = new Schema(raw);
+      var lax = new Schema(raw, { strict: false });
+      var strict = new Schema(raw);
 
-    var Lax = db.model('Lax', lax);
-    var Strict = db.model('Strict', strict);
+      Lax = db.model('Lax', lax);
+      Strict = db.model('Strict', strict);
+    });
 
-    var l = new Lax({content: 'sample', rouge: 'data'});
-    assert.equal(false, l.$__.strictMode);
-    l = l.toObject();
-    assert.ok('ts' in l);
-    assert.equal('sample', l.content);
-    assert.equal('data', l.rouge);
+    it('when creating models with non-strict schemas', function(done) {
+      var l = new Lax({content: 'sample', rouge: 'data'});
+      assert.equal(false, l.$__.strictMode);
 
-    var s = new Strict({content: 'sample', rouge: 'data'});
-    assert.equal(true, s.$__.strictMode);
-    s = s.toObject();
-    assert.ok('ts' in s);
-    assert.equal('sample', s.content);
-    assert.ok(!('rouge' in s));
-    assert.ok(!s.rouge);
-
-    // instance override
-    var instance = new Lax({content: 'sample', rouge: 'data'}, true);
-    assert.ok(instance.$__.strictMode);
-    instance = instance.toObject();
-    assert.equal('sample', instance.content);
-    assert.ok(!instance.rouge);
-    assert.ok('ts' in instance);
-
-    // hydrate works as normal, but supports the schema level flag.
-    var s2 = new Strict({content: 'sample', rouge: 'data'}, false);
-    assert.equal(false, s2.$__.strictMode);
-    s2 = s2.toObject();
-    assert.ok('ts' in s2);
-    assert.equal('sample', s2.content);
-    assert.ok('rouge' in s2);
-
-    // testing init
-    var s3 = new Strict();
-    s3.init({content: 'sample', rouge: 'data'});
-    var s3obj = s3.toObject();
-    assert.equal('sample', s3.content);
-    assert.ok(!('rouge' in s3));
-    assert.ok(!s3.rouge);
-
-    // strict on create
-    Strict.create({content: 'sample2', rouge: 'data'}, function(err, doc){
-      db.close();
-      assert.equal('sample2', doc.content);
-      assert.ok(!('rouge' in doc));
-      assert.ok(!doc.rouge);
+      lo = l.toObject();
+      assert.ok('ts' in l);
+      assert.ok('ts' in lo);
+      assert.equal('sample', l.content);
+      assert.equal('sample', lo.content);
+      assert.equal('data', l.rouge);
+      assert.equal('data', lo.rouge);
       done();
     });
-  })
+
+    it('when creating models with strict schemas', function(done) {
+      var s = new Strict({content: 'sample', rouge: 'data'});
+      assert.equal(true, s.$__.strictMode);
+
+      so = s.toObject();
+      assert.ok('ts' in s);
+      assert.ok('ts' in so);
+      assert.equal('sample', s.content);
+      assert.equal('sample', so.content);
+      assert.ok(!('rouge' in s));
+      assert.ok(!('rouge' in so));
+      assert.ok(!s.rouge);
+      assert.ok(!so.rouge);
+      done();
+    });
+
+    it('when overriding strictness', function(done) {
+      // instance override
+      var instance = new Lax({content: 'sample', rouge: 'data'}, true);
+      assert.ok(instance.$__.strictMode);
+
+      instance = instance.toObject();
+      assert.equal('sample', instance.content);
+      assert.ok(!instance.rouge);
+      assert.ok('ts' in instance);
+
+      // hydrate works as normal, but supports the schema level flag.
+      var s2 = new Strict({content: 'sample', rouge: 'data'}, false);
+      assert.equal(false, s2.$__.strictMode);
+      s2 = s2.toObject();
+      assert.ok('ts' in s2);
+      assert.equal('sample', s2.content);
+      assert.ok('rouge' in s2);
+
+      // testing init
+      var s3 = new Strict();
+      s3.init({content: 'sample', rouge: 'data'});
+      var s3obj = s3.toObject();
+      assert.equal('sample', s3.content);
+      assert.ok(!('rouge' in s3));
+      assert.ok(!s3.rouge);
+      done();
+    });
+
+    it('when using Model#create', function(done) {
+      // strict on create
+      Strict.create({content: 'sample2', rouge: 'data'}, function(err, doc){
+        assert.equal('sample2', doc.content);
+        assert.ok(!('rouge' in doc));
+        assert.ok(!doc.rouge);
+        done();
+      });
+    });
+
+    after(function() {
+      db.close();
+    });
+  });
+
   it('nested doc', function(done){
     var db = start();
 

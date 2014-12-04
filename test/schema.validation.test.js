@@ -46,7 +46,7 @@ describe('schema', function(){
       }, /Invalid validator/);
 
       done();
-    })
+    });
 
     it('string enum', function(done){
       var Test = new Schema({
@@ -56,7 +56,7 @@ describe('schema', function(){
 
       assert.ok(Test.path('complex') instanceof SchemaTypes.String);
       assert.deepEqual(Test.path('complex').enumValues,['a', 'b', 'c', null]);
-      assert.equal(Test.path('complex').validators.length, 1)
+      assert.equal(Test.path('complex').validators.length, 1);
 
       Test.path('complex').enum('d', 'e');
 
@@ -101,7 +101,7 @@ describe('schema', function(){
       });
 
       done();
-    })
+    });
 
     it('string regexp', function(done){
       var Test = new Schema({
@@ -140,40 +140,82 @@ describe('schema', function(){
         assert.ok(err instanceof ValidatorError);
       });
       done();
-    })
+    });
 
-    it('number min and max', function(done){
-      var Tobi = new Schema({
+    describe('non-required fields', function() {
+      describe('are validated correctly', function() {
+        var db, Person;
+
+        before(function() {
+          db = start();
+          var PersonSchema = new Schema({
+            name: { type: String },
+            num_cars: {type: Number, min: 20}
+          });
+          Person = db.model('person-schema-validation-test', PersonSchema);
+        });
+
+        after(function() {
+          db.close();
+        });
+
+        it('and can be set to "undefined" (gh-1594)', function(done) {
+          var p = new Person({name: 'Daniel'});
+          p.num_cars = 25;
+
+          p.save(function(err) {
+            assert.ifError(err);
+            assert.equal(p.num_cars, 25);
+            p.num_cars = undefined;
+
+            p.save(function(err) {
+              assert.ifError(err);
+              assert.equal(p.num_cars, undefined);
+              p.num_cars = 5;
+
+              p.save(function(err) {
+                // validation should still work for non-undefined values
+                assert.ok(err);
+                done();
+              })
+            });
+          });
+        });
+      });
+
+      it('number min and max', function(done){
+        var Tobi = new Schema({
           friends: { type: Number, max: 15, min: 5 }
+        });
+
+        assert.equal(Tobi.path('friends').validators.length, 2);
+
+        Tobi.path('friends').doValidate(10, function(err){
+          assert.ifError(err);
+        });
+
+        Tobi.path('friends').doValidate(100, function(err){
+          assert.ok(err instanceof ValidatorError);
+          assert.equal('friends', err.path);
+          assert.equal('max', err.kind);
+          assert.equal(100, err.value);
+        });
+
+        Tobi.path('friends').doValidate(1, function(err){
+          assert.ok(err instanceof ValidatorError);
+        });
+
+        // null is allowed
+        Tobi.path('friends').doValidate(null, function(err){
+          assert.ifError(err);
+        });
+
+        Tobi.path('friends').min();
+        Tobi.path('friends').max();
+
+        assert.equal(Tobi.path('friends').validators.length, 0);
+        done();
       });
-
-      assert.equal(Tobi.path('friends').validators.length, 2);
-
-      Tobi.path('friends').doValidate(10, function(err){
-        assert.ifError(err);
-      });
-
-      Tobi.path('friends').doValidate(100, function(err){
-        assert.ok(err instanceof ValidatorError);
-        assert.equal('friends', err.path);
-        assert.equal('max', err.type);
-        assert.equal(100, err.value);
-      });
-
-      Tobi.path('friends').doValidate(1, function(err){
-        assert.ok(err instanceof ValidatorError);
-      });
-
-      // null is allowed
-      Tobi.path('friends').doValidate(null, function(err){
-        assert.ifError(err);
-      });
-
-      Tobi.path('friends').min();
-      Tobi.path('friends').max();
-
-      assert.equal(Tobi.path('friends').validators.length, 0);
-      done();
     });
 
     describe('required', function(){
@@ -199,6 +241,56 @@ describe('schema', function(){
 
         Test.path('simple').doValidate('woot', function(err){
           assert.ifError(err);
+        });
+
+        done();
+      });
+
+      it('string conditional required', function (done) {
+        var Test = new Schema({
+            simple: String
+        });
+
+        var required = true,
+            isRequired = function () {
+                return required;
+            };
+
+        Test.path('simple').required(isRequired);
+        assert.equal(Test.path('simple').validators.length, 1);
+
+        Test.path('simple').doValidate(null, function (err) {
+            assert.ok(err instanceof ValidatorError);
+        });
+
+        Test.path('simple').doValidate(undefined, function (err) {
+            assert.ok(err instanceof ValidatorError);
+        });
+
+        Test.path('simple').doValidate('', function (err) {
+            assert.ok(err instanceof ValidatorError);
+        });
+
+        Test.path('simple').doValidate('woot', function (err) {
+            assert.ifError(err);
+        });
+
+        required = false;
+
+        Test.path('simple').doValidate(null, function (err) {
+            assert.ifError(err);
+        });
+
+        Test.path('simple').doValidate(undefined, function (err) {
+            assert.ifError(err);
+        });
+
+        Test.path('simple').doValidate('', function (err) {
+            assert.ifError(err);
+        });
+
+        Test.path('simple').doValidate('woot', function (err) {
+            assert.ifError(err);
         });
 
         done();
@@ -328,8 +420,8 @@ describe('schema', function(){
             assert.ifError(err);
           });
           done();
-      })
-    })
+      });
+    });
 
     describe('async', function(){
       it('works', function(done){
@@ -341,7 +433,7 @@ describe('schema', function(){
             fn(value === true);
             if (2 === executed) done();
           }, 5);
-        };
+        }
 
         var Animal = new Schema({
             ferret: { type: Boolean, validate: validator }
@@ -365,7 +457,7 @@ describe('schema', function(){
             fn(value === true);
             if (2 === executed) done();
           }, 5);
-        };
+        }
 
         var Animal = new Schema({
           ferret: {
@@ -388,6 +480,48 @@ describe('schema', function(){
         });
       });
 
+      it('multiple sequence', function(done) {
+        var validator1Executed = false
+          ,validator2Executed = false;
+
+        function validator1 (value, fn) {
+          setTimeout(function(){
+            validator1Executed = true;
+            assert.ok(!validator2Executed);
+            fn(value === true);
+          }, 5);
+        }
+
+        function validator2 (value, fn) {
+          setTimeout(function(){
+            validator2Executed  = true;
+            assert.ok(validator1Executed);
+            fn(value === true);
+            done();
+          }, 5);
+        }
+
+        var Animal = new Schema({
+          ferret: {
+            type: Boolean,
+            validate: [
+              {
+                'validator': validator1,
+                'msg': 'validator1'
+              },
+              {
+                'validator': validator2,
+                'msg': 'validator2'
+              }
+            ]
+          }
+        });
+
+        Animal.path('ferret').doValidate(true, function(err){
+          assert.ifError(err);
+        });
+      });
+
       it('scope', function(done){
         var called = false;
         function validator (value, fn) {
@@ -397,7 +531,7 @@ describe('schema', function(){
             called = true;
             fn(true);
           }, 5);
-        };
+        }
 
         var Animal = new Schema({
             ferret: { type: Boolean, validate: validator }
@@ -408,8 +542,8 @@ describe('schema', function(){
           assert.equal(true, called);
           done();
         }, { a: 'b' });
-      })
-    })
+      });
+    });
 
     describe('messages', function(){
       describe('are customizable', function(){
@@ -458,13 +592,13 @@ describe('schema', function(){
               a.numMin0 = a.numMax0 = a.numMin1 = a.numMax1 = 15;
               a.validate(done);
             });
-          })
-        })
+          });
+        });
 
-        it('for custom validators', function(done){
-          function validate () {
+        it('for custom validators', function(done) {
+          var validate = function() {
             return false;
-          }
+          };
           var validator = [validate, '{PATH} failed validation ({VALUE})'];
 
           var schema = new Schema({ x: { type: [], validate: validator }});
@@ -474,11 +608,118 @@ describe('schema', function(){
 
           m.validate(function (err) {
             assert.equal('x failed validation (3,4,5,6)', String(err.errors.x));
-            assert.equal('user defined', err.errors.x.type);
+            assert.equal('user defined', err.errors.x.kind);
             done();
-          })
-        })
-      })
-    })
+          });
+        });
+
+        it('supports custom properties (gh-2132)', function(done) {
+          var schema = new Schema({
+            x: {
+              type: String,
+              validate: [{
+                validator: function() { return false; },
+                msg: 'Error code {ERRORCODE}',
+                errorCode: 25
+              }]
+            }
+          });
+          var M = mongoose.model('gh-2132', schema, 'gh-2132');
+
+          var m = new M({ x: 'a' });
+          m.validate(function(err) {
+            assert.equal('Error code 25', err.errors.x.toString());
+            assert.equal(25, err.errors.x.properties.errorCode);
+            done();
+          });
+        });
+      });
+    });
+
+    describe('types', function(){
+      describe('are customizable', function(){
+        it('for single custom validators', function(done){
+          function validate () {
+            return false;
+          }
+          var validator = [validate, '{PATH} failed validation ({VALUE})', 'customType'];
+
+          var schema = new Schema({ x: { type: [], validate: validator }});
+          var M = mongoose.model('custom-validator-'+random(), schema);
+
+          var m = new M({ x: [3,4,5,6] });
+
+          m.validate(function (err) {
+            assert.equal('x failed validation (3,4,5,6)', String(err.errors.x));
+            assert.equal('customType', err.errors.x.kind);
+            done();
+          });
+        });
+
+        it('for many custom validators', function(done){
+          function validate () {
+            return false;
+          }
+          var validator = [
+              { validator: validate, msg: '{PATH} failed validation ({VALUE})', type: 'customType'}
+          ];
+          var schema = new Schema({ x: { type: [], validate: validator }});
+          var M = mongoose.model('custom-validator-'+random(), schema);
+
+          var m = new M({ x: [3,4,5,6] });
+
+          m.validate(function (err) {
+            assert.equal('x failed validation (3,4,5,6)', String(err.errors.x));
+            assert.equal('customType', err.errors.x.kind);
+            done();
+          });
+        });
+      });
+    });
+
+    it('should clear validator errors (gh-2302)', function(done) {
+      var userSchema = new Schema({ name: { type: String, required: true } });
+      var User = mongoose.model('gh-2302', userSchema, 'gh-2302');
+
+      var user = new User();
+      user.validate(function(err) {
+        assert.ok(err);
+        assert.ok(user.errors);
+        assert.ok(user.errors['name']);
+        user.name = 'bacon';
+        user.validate(function(err) {
+          assert.ok(!err);
+          assert.ok(!user.errors);
+          done();
+        });
+      });
+    });
+
+    it('should allow an array of enums (gh-661)', function(done) {
+      var validBreakfastFoods = ['bacon', 'eggs', 'steak', 'coffee', 'butter'];
+      var breakfastSchema = new Schema({
+        foods: [{ type: String, enum: validBreakfastFoods }]
+      });
+      var Breakfast = mongoose.model('gh-661', breakfastSchema, 'gh-661');
+
+      var goodBreakfast = new Breakfast({ foods: ['eggs', 'bacon'] });
+      goodBreakfast.validate(function(error) {
+        assert.ifError(error);
+
+        var badBreakfast = new Breakfast({ foods: ['tofu', 'waffles', 'coffee'] });
+        badBreakfast.validate(function(error) {
+          assert.ok(error);
+          assert.ok(error.errors['foods.0']);
+          assert.equal(error.errors['foods.0'].message,
+            '`tofu` is not a valid enum value for path `foods`.');
+          assert.ok(error.errors['foods.1']);
+          assert.equal(error.errors['foods.1'].message,
+            '`waffles` is not a valid enum value for path `foods`.');
+          assert.ok(!error.errors['foods.2']);
+
+          done();
+        });
+      });
+    });
   });
 });

@@ -6,7 +6,9 @@ var docTests = acquit.parse(
   fs.readFileSync('test/harmony/document.test_.js').toString());
 var queryTests = acquit.parse(
   fs.readFileSync('test/harmony/query.test_.js').toString());
-blocks = docTests.concat(queryTests);
+var modelTests = acquit.parse(
+  fs.readFileSync('test/harmony/model.test_.js').toString());
+blocks = docTests.concat(queryTests).concat(modelTests);
 
 var trimEachLine = function(str) {
   var lines = str.split('\n');

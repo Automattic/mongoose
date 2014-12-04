@@ -5074,7 +5074,7 @@ describe('Model', function(){
       });
     });
 
-    
+
     it('Compound index on field earlier declared with 2dsphere index is saved', function (done) {
       var db = start();
       var PersonSchema = new Schema({
@@ -5131,6 +5131,51 @@ describe('Model', function(){
         Parent.findByIdAndUpdate(it._id, { $set: { children: parent.children } }, function(err, affected) {
           assert.ifError(err);
           done();
+        });
+      });
+    });
+  });
+
+  describe('save failure', function() {
+    it('doesnt reset "modified" status for fields', function(done) {
+      var db = start();
+
+      var UniqueSchema = new Schema({
+        changer: String,
+        unique: {
+          type: Number,
+          unique: true
+        }
+      });
+
+      var Unique = db.model('Unique', UniqueSchema);
+
+      var u1 = new Unique({
+        changer: 'a',
+        unique:  5
+      });
+
+      var u2 = new Unique({
+        changer: 'a',
+        unique:  6
+      });
+
+      Unique.on('index', function() {
+        u1.save(function(err) {
+          assert.ifError(err);
+          assert.ok(!u1.isModified('changer'));
+          u2.save(function(err) {
+            assert.ifError(err);
+            assert.ok(!u2.isModified('changer'));
+            u2.changer = 'b';
+            u2.unique = 5;
+            assert.ok(u2.isModified('changer'));
+            u2.save(function(err) {
+              assert.ok(err);
+              assert.ok(u2.isModified('changer'));
+              done();
+            });
+          });
         });
       });
     });

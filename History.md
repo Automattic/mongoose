@@ -1,3 +1,15 @@
+3.9.6 / 2014-12-05
+===================
+ * added; correctly run validators on each element of array when entire array is modified #661 #1227
+ * added; castErrors in validation #1013 [jondavidjohn](https://github.com/jondavidjohn)
+ * added; specify text indexes in schema fields #1401 [sr527](https://github.com/sr527)
+ * added; ability to set field with validators to undefined #1594 [alabid](https://github.com/alabid)
+ * added; .create() returns an array when passed an array #1746 [alabid](https://github.com/alabid)
+ * added; test suite and docs for use with co and yield #2177 #2474
+ * fixed; subdocument toObject() transforms #2447 [chmanie](https://github.com/chmanie)
+ * fixed; Model.create() with save errors #2484
+ * added; pass options to .save() and .remove() #2494 [jondavidjohn](https://github.com/jondavidjohn)
+
 3.8.20 / 2014-12-01
 ===================
  * fixed; recursive readPref #2490 [kjvalencik](https://github.com/kjvalencik)

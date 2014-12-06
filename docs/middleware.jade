@@ -78,9 +78,10 @@ block content
     })
 
   h3#notes Notes on findAndUpdate()
-  `pre` and `post` are not called for update operations executed directly on the database, including `Model.update`,`.findByIdAndUpdate`,`.findOneAndUpdate`, `.findOneAndRemove`,and `.findByIdAndRemove`.
+  :markdown
+    `pre` and `post` are not called for update operations executed directly on the database, including `Model.update`,`.findByIdAndUpdate`,`.findOneAndUpdate`, `.findOneAndRemove`,and `.findByIdAndRemove`.
 
-  In order to utilize `pre` or `post` middleware, you should `find()` the document, and call the `init`, `validate`, `save`, or `remove` functions on the document.  See [explanation](http://github.com/LearnBoost/mongoose/issues/964).
+    In order to utilize `pre` or `post` middleware, you should `find()` the document, and call the `init`, `validate`, `save`, or `remove` functions on the document.  See [explanation](http://github.com/LearnBoost/mongoose/issues/964).
 
   h3#next Next Up
   :markdown

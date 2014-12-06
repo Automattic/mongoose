@@ -797,6 +797,64 @@ describe('document', function(){
       })
     })
 
+    it('can return a promise', function(done) {
+      var db = start()
+        , schema = null
+        , called = false
+
+      var validate = [function(str){ called = true; return true }, 'BAM'];
+
+      schema = new Schema({
+          prop: { type: String, required: true, validate: validate }
+        , nick: { type: String, required: true }
+      });
+
+      var M = db.model('validateSchemaPromise', schema, collection);
+      var m = new M({ prop: 'gh891', nick: 'validation test' });
+      var mBad = new M({ prop: 'other' });
+
+      var promise = m.validate();
+      promise.then(function(err) {
+        var promise2 = mBad.validate();
+        promise2.onReject(function(err) {
+          assert.ok(!!err);
+          clearTimeout(timeout);
+          db.close();
+          done();
+        });
+      });
+
+      var timeout = setTimeout(function() {
+        db.close();
+        throw new Error("Promise not fulfilled!");
+      }, 500);
+    });
+
+    it('returns a promise when there are no validators', function(done) {
+      var db = start()
+        , schema = null
+        , called = false
+
+      schema = new Schema({ _id : String });
+
+      var M = db.model('validateSchemaPromise2', schema, collection);
+      var m = new M();
+
+      var promise = m.validate();
+      promise.then(function() {
+        clearTimeout(timeout);
+        db.close();
+        done();
+      });
+
+      var timeout = setTimeout(function() {
+        if (!fulfilled) {
+          db.close();
+          throw new Error("Promise not fulfilled!");
+        }
+      }, 500);
+    });
+
     describe('works on arrays', function(){
       var db;
       before(function(done){
@@ -889,7 +947,119 @@ describe('document', function(){
       })
 
     })
-  })
+
+    it("validator should run only once gh-1743", function (done) {
+      var count = 0
+        , db = start()
+
+      var Control = new Schema({
+        test: {
+          type: String
+          , validate: function ( value, done ) {
+            count++;
+            return done( true );
+          }
+        }
+      });
+      var PostSchema = new Schema({
+        controls: [Control]
+      });
+
+      var Post = db.model('post', PostSchema);
+
+      var post = new Post({
+        controls: [{
+          test: "xx"
+        }]
+      });
+
+      post.save(function () {
+        assert.equal(count, 1);
+        done();
+      });
+    })
+
+    it("validator should run only once per sub-doc gh-1743", function (done) {
+      var count = 0
+        , db = start()
+
+      var Control = new Schema({
+        test: {
+          type: String
+          , validate: function ( value, done ) {
+            count++;
+            return done( true );
+          }
+        }
+      });
+      var PostSchema = new Schema({
+        controls: [Control]
+      });
+
+      var Post = db.model('post', PostSchema);
+
+      var post = new Post({
+        controls: [
+          {
+            test: "xx"
+          }
+          ,
+          {
+            test: "yy"
+          }
+        ]
+      });
+
+      post.save(function () {
+        assert.equal(count, post.controls.length);
+        done();
+      });
+    });
+
+
+    it("validator should run in parallel", function (done) {
+      // we set the time out to be double that of the validator - 1 (so that running in serial will be greater then that)
+      this.timeout(1000);
+      var db = start(),
+        count = 0;
+
+      var SchemaWithValidator = new Schema ({
+        preference: {
+          type: String
+          , required: true
+          , validate: function validator (value, done) {count++; setTimeout(done.bind(null, true), 500);}
+        }
+      });
+
+      var MWSV = db.model('mwv', new Schema({subs: [SchemaWithValidator]}));
+      var m = new MWSV({
+        subs: [
+          {
+            preference: "xx"
+          }
+          ,
+          {
+            preference: "yy"
+          }
+          ,
+          {
+            preference: "1"
+          }
+          ,
+          {
+            preference: "2"
+          }
+        ]
+      });
+
+      m.save(function (err) {
+        assert.ifError(err);
+        assert.equal(count, 4);
+        done();
+      });
+    })
+
+  });
 
   it('#invalidate', function(done){
     var db = start()
@@ -913,7 +1083,7 @@ describe('document', function(){
       assert.ok(err instanceof ValidationError);
       assert.ok(err.errors.baz instanceof ValidatorError);
       assert.equal(err.errors.baz.message,'validation failed for path baz');
-      assert.equal(err.errors.baz.type,'user defined');
+      assert.equal(err.errors.baz.kind,'user defined');
       assert.equal(err.errors.baz.path,'baz');
 
       post.save(function(err){

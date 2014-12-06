@@ -78,7 +78,7 @@ console.log(p.id); <span class="comment">// '50341373e894ad16347efe01'</span>
 <span class="keyword">var</span> Page = db.model(<span class="string">'Page'</span>, schema);
 <span class="keyword">var</span> p = <span class="keyword">new</span> Page({ name: <span class="string">'mongodb.org'</span> });
 console.log(p.id); <span class="comment">// undefined</span>
-</code></pre><h4 id="_id">option: _id</h4><p>Mongoose assigns each of your schemas an <code>_id</code> field by default if one is not passed into the <a href="/docs/api.html#schema-js">Schema</a> constructor. The type assiged is an <a href="/docs/api.html#schema_Schema-Types">ObjectId</a> to coincide with MongoDBs default behavior. If you don&#39;t want an <code>_id</code> added to your schema at all, you may disable it using this option.</p>
+</code></pre><h4 id="_id">option: _id</h4><p>Mongoose assigns each of your schemas an <code>_id</code> field by default if one is not passed into the <a href="/docs/api.html#schema-js">Schema</a> constructor. The type assigned is an <a href="/docs/api.html#schema_Schema-Types">ObjectId</a> to coincide with MongoDBs default behavior. If you don&#39;t want an <code>_id</code> added to your schema at all, you may disable it using this option.</p>
 
 <p>Pass this option during schema construction to prevent documents from getting an auto <code>_id</code> created.</p><pre><code class="javascript"><span class="comment">// default behavior</span>
 <span class="keyword">var</span> schema = <span class="keyword">new</span> Schema({ name: String });

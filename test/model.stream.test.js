@@ -215,22 +215,19 @@ describe('query stream:', function(){
         done();
       }, 100)
     }
-  })
+  });
 
-  it('pipe', function(done){
+  it('pipe', function(done) {
     var db = start()
       , P = db.model('PersonForStream', collection)
       , filename = '/tmp/_mongoose_stream_out.txt'
-      , out = fs.createWriteStream(filename)
+      , out = fs.createWriteStream(filename);
 
-    var opts = { transform: JSON.stringify }
+    var opts = { transform: JSON.stringify };
     var stream = P.find().sort('name').limit(20).stream(opts);
     stream.pipe(out);
 
-    stream.on('error', cb);
-    out.on('close', cb);
-
-    function cb (err) {
+    var cb = function(err) {
       db.close();
       assert.ifError(err);
       var contents = fs.readFileSync(filename, 'utf8');
@@ -241,19 +238,22 @@ describe('query stream:', function(){
       assert.ok(/Agustin/.test(contents));
       fs.unlink(filename);
       done();
-    }
-  })
+    };
 
-  it('lean', function(done){
+    stream.on('error', cb);
+    out.on('close', cb);
+  });
+
+  it('lean', function(done) {
     var db = start()
       , P = db.model('PersonForStream', collection)
       , i = 0
       , closed = 0
-      , err
+      , err;
 
     var stream = P.find({}).lean().stream();
 
-    stream.on('data', function (doc) {
+    stream.on('data', function(doc) {
       assert.strictEqual(false, doc instanceof mongoose.Document);
       i++;
 
@@ -283,20 +283,20 @@ describe('query stream:', function(){
       cb();
     });
 
-    function cb () {
+    var cb = function() {
       db.close();
       assert.strictEqual(undefined, err);
       assert.equal(i, names.length);
       assert.equal(1, closed);
       assert.equal(true, stream._cursor.isClosed());
       done();
-    }
+    };
   });
 
-  it('supports $elemMatch with $in (gh-1091)', function(done){
+  it('supports $elemMatch with $in (gh-1091)', function(done) {
     this.timeout(3000);
 
-    var db = start()
+    var db = start();
 
     var postSchema = new Schema({
         ids: [{type: Schema.ObjectId}]
@@ -307,7 +307,7 @@ describe('query stream:', function(){
     var _id1 = new mongoose.Types.ObjectId;
     var _id2 = new mongoose.Types.ObjectId;
 
-    B.create({ ids: [_id1, _id2] }, function (err, doc) {
+    B.create({ ids: [_id1, _id2] }, function(err, doc) {
       assert.ifError(err);
 
       var error;
@@ -316,21 +316,22 @@ describe('query stream:', function(){
         .select({ title: 1, ids: { $elemMatch: { $in: [_id2.toString()] }}})
         .stream();
 
-      stream.on('data', function (found) {
-        assert.equal(found.id, doc.id);
-        assert.equal(1, found.ids.length);
-        assert.equal(_id2.toString(), found.ids[0].toString());
-      })
-      .on('error', function (err) {
-        error = err;
-      })
-      .on('close', function () {
-        done(error);
-      })
-    })
-  })
+      stream.
+        on('data', function (found) {
+          assert.equal(found.id, doc.id);
+          assert.equal(1, found.ids.length);
+          assert.equal(_id2.toString(), found.ids[0].toString());
+        }).
+        on('error', function (err) {
+          error = err;
+        }).
+        on('close', function () {
+          done(error);
+        });
+    });
+  });
 
-  it('supports population (gh-1411)', function(done){
+  it('supports population (gh-1411)', function(done) {
     var db = start();
 
     var barSchema = Schema({
@@ -345,29 +346,52 @@ describe('query stream:', function(){
     var Bar = db.model('Bar', barSchema);
     var found = [];
 
-    Bar.create({ value: 2 }, { value: 3 }, function(err, bar1, bar2){
+    Bar.create({ value: 2 }, { value: 3 }, function(err, bar1, bar2) {
       if (err) return complete(err);
 
-      Foo.create({ bar: bar1 }, { bar: bar2 }, function(err){
+      Foo.create({ bar: bar1 }, { bar: bar2 }, function(err) {
         if (err) return complete(err);
 
-        Foo.find().populate("bar").stream()
-        .on('data', function(foo){
-          found.push(foo.bar.value);
-        })
-        .on('end', complete)
-        .on('error', complete);
+        Foo.
+          find().
+          populate('bar').
+          stream().
+          on('data', function(foo) {
+            found.push(foo.bar.value);
+          }).
+          on('end', complete).
+          on('error', complete);
       });
     });
 
-    function complete (err) {
+    var complete = function(err) {
       if (!err) {
         assert.ok(~found.indexOf(2));
         assert.ok(~found.indexOf(3));
       }
       db.close(function () {
         done(err);
-      })
-    }
-  })
+      });
+    };
+  });
+
+  it('respects schema options (gh-1862)', function(done) {
+    var db = start();
+
+    var schema = Schema({
+      fullname: { type: String },
+      password: { type: String, select: false },
+    });
+
+    var User = db.model('gh-1862', schema, 'gh-1862');
+    User.create({ fullname: 'val', password: 'taco' }, function(error) {
+      assert.ifError(error);
+      User.find().stream().on('data', function(doc) {
+        assert.equal(undefined, doc.password);
+        db.close(function() {
+          done();
+        });
+      });
+    });
+  });
 });

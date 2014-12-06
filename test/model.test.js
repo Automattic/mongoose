@@ -10,7 +10,6 @@ var start = require('./common')
   , Query = require('../lib/query')
   , Schema = mongoose.Schema
   , SchemaType = mongoose.SchemaType
-  , CastError = mongoose.Error.CastError
   , ValidatorError = mongoose.Error.ValidatorError
   , ValidationError = mongoose.Error.ValidationError
   , ObjectId = Schema.Types.ObjectId
@@ -73,6 +72,62 @@ mongoose.model('BlogPost', BlogPost);
 var bpSchema = BlogPost;
 
 var collection = 'blogposts_' + random();
+
+describe('Model', function() {
+  var db, Test;
+
+  before(function() {
+    db = start();
+    var testSchema = new Schema({
+      _id: {
+        first_name: {type: String},
+        age: {type: Number}
+      },
+      last_name: {type: String},
+      doc_embed: {
+        some: {type: String}
+      }
+
+    });
+    Test = db.model('test-schema', testSchema);
+  });
+
+  after(function() {
+    db.close();
+  });
+
+  it('can be created using _id as embedded document', function(done) {
+    var t = new Test({
+      _id: {
+        first_name: "Daniel",
+        age: 21
+      },
+      last_name: "Alabi",
+      doc_embed: {
+        some: "a"
+      }
+    });
+
+    t.save(function(err) {
+      assert.ifError(err);
+      Test.findOne({}, function(err, doc) {
+        assert.ifError(err);
+
+        assert.ok('last_name' in doc);
+        assert.ok('_id' in doc);
+        assert.ok('first_name' in doc._id);
+        assert.equal("Daniel", doc._id.first_name);
+        assert.ok('age' in doc._id);
+        assert.equal(21, doc._id.age);
+
+        assert.ok('doc_embed' in doc);
+        assert.ok('some' in doc.doc_embed);
+        assert.equal("a", doc.doc_embed.some);
+        done();
+      });
+    });
+  });
+});
 
 describe('Model', function(){
   describe('constructor', function(){
@@ -139,6 +194,21 @@ describe('Model', function(){
     })
   });
 
+  it('gh-2140', function(done) {
+    var db = start();
+    var S = new Schema({
+      field: [{text: String}]
+    });
+
+    var Model = db.model('gh-2140', S, 'gh-2140');
+    var s = new Model();
+    s.field = [null];
+    s.field = [{text: 'text'}];
+
+    assert.ok(s.field[0]);
+    done();
+  });
+
   describe('schema', function(){
     it('should exist', function(done){
       var db = start()
@@ -189,10 +259,10 @@ describe('Model', function(){
       assert.equal(1, Object.keys(post.get('nested')).length);
       assert.ok(Array.isArray(post.get('nested').array));
 
-      assert.ok(post.get('numbers') instanceof MongooseArray);
-      assert.ok(post.get('owners') instanceof MongooseArray);
-      assert.ok(post.get('comments') instanceof DocumentArray);
-      assert.ok(post.get('nested.array') instanceof MongooseArray);
+      assert.ok(post.get('numbers').isMongooseArray);
+      assert.ok(post.get('owners').isMongooseArray);
+      assert.ok(post.get('comments').isMongooseDocumentArray);
+      assert.ok(post.get('nested.array').isMongooseArray);
       done();
     });
 
@@ -272,8 +342,8 @@ describe('Model', function(){
         assert.equal(undefined, post.get('meta.date'));
         assert.equal(undefined, post.get('meta.visitors'));
 
-        assert.ok(post.get('owners') instanceof MongooseArray);
-        assert.ok(post.get('comments') instanceof DocumentArray);
+        assert.ok(post.get('owners').isMongooseArray);
+        assert.ok(post.get('comments').isMongooseDocumentArray);
         cb();
       });
 
@@ -291,8 +361,8 @@ describe('Model', function(){
         assert.equal(undefined, post.get('meta.date'));
         assert.equal(undefined, post.get('meta.visitors'));
 
-        assert.ok(post.get('owners') instanceof MongooseArray);
-        assert.ok(post.get('comments') instanceof DocumentArray);
+        assert.ok(post.get('owners').isMongooseArray);
+        assert.ok(post.get('comments').isMongooseDocumentArray);
         cb();
       });
     })
@@ -318,8 +388,8 @@ describe('Model', function(){
         assert.equal(undefined, post.get('meta.date'));
         assert.equal(undefined, post.get('meta.visitors'));
 
-        assert.ok(post.get('owners') instanceof MongooseArray);
-        assert.ok(post.get('comments') instanceof DocumentArray);
+        assert.ok(post.get('owners').isMongooseArray);
+        assert.ok(post.get('comments').isMongooseDocumentArray);
         db.close();
         done();
       });
@@ -366,19 +436,19 @@ describe('Model', function(){
         assert.equal(typeof post.meta.visitors,'number');
         assert.equal(post.published, true);
 
-        assert.ok(post.get('owners') instanceof MongooseArray);
+        assert.ok(post.get('owners').isMongooseArray);
         assert.ok(post.get('owners')[0] instanceof DocumentObjectId);
         assert.ok(post.get('owners')[1] instanceof DocumentObjectId);
 
-        assert.ok(post.owners instanceof MongooseArray);
+        assert.ok(post.owners.isMongooseArray);
         assert.ok(post.owners[0] instanceof DocumentObjectId);
         assert.ok(post.owners[1] instanceof DocumentObjectId);
 
-        assert.ok(post.get('comments') instanceof DocumentArray);
+        assert.ok(post.get('comments').isMongooseDocumentArray);
         assert.ok(post.get('comments')[0] instanceof EmbeddedDocument);
         assert.ok(post.get('comments')[1] instanceof EmbeddedDocument);
 
-        assert.ok(post.comments instanceof DocumentArray);
+        assert.ok(post.comments.isMongooseDocumentArray);
         assert.ok(post.comments[0] instanceof EmbeddedDocument);
         assert.ok(post.comments[1] instanceof EmbeddedDocument);
         done();
@@ -406,8 +476,8 @@ describe('Model', function(){
         assert.equal(undefined, post.get('meta.visitors'));
         assert.equal(undefined, post.get('published'));
 
-        assert.ok(post.get('owners') instanceof MongooseArray);
-        assert.ok(post.get('comments') instanceof DocumentArray);
+        assert.ok(post.get('owners').isMongooseArray);
+        assert.ok(post.get('comments').isMongooseDocumentArray);
         done();
       })
 
@@ -501,6 +571,54 @@ describe('Model', function(){
     });
   });
 
+  it ('saves subdocuments middleware correctly', function(done){
+    var db = start();
+
+    var child_hook;
+    var parent_hook;
+    var childSchema = new Schema({
+      name: String
+    });
+
+    childSchema.pre('save', function(next) {
+      child_hook = this.name;
+      next();
+    })
+
+    var parentSchema = new Schema({
+      name: String,
+      children: [childSchema]
+    });
+
+    parentSchema.pre('save', function(next) {
+      parent_hook = this.name;
+      next();
+    })
+
+    var Parent = db.model('doc', parentSchema);
+
+    var parent = new Parent({
+      name: 'Bob',
+      children: [{
+        name: 'Mary'
+      }]
+    });
+
+    parent.save(function (err, parent) {
+      assert.equal(parent_hook, "Bob");
+      assert.equal(child_hook, "Mary")
+      assert.ifError(err);
+      parent.children[0].name = 'Jane';
+      parent.save(function(err){
+        assert.equal(child_hook, "Jane");
+        assert.ifError(err);
+        done();
+      });
+
+    });
+
+  });
+
   it('instantiating a model with a hash that maps to at least 1 undefined value', function(done){
     var db = start()
       , BlogPost = db.model('BlogPost', collection);
@@ -561,7 +679,6 @@ describe('Model', function(){
         name: 'test'
       , _id: 35
     });
-
     instance.save(function (err) {
       assert.ifError(err);
 
@@ -636,7 +753,21 @@ describe('Model', function(){
       p.children.push({});
       assert.equal('function', typeof p.children[0].talk);
       done();
-    })
+    });
+
+    it('can be defined with nested key', function(done) {
+      var db = start();
+      var NestedKeySchema = new Schema({});
+      NestedKeySchema.method('foo', {
+        bar: function(){
+          return this;
+        }
+      });
+      var NestedKey = db.model('NestedKey', NestedKeySchema);
+      var n = new NestedKey();
+      assert.equal(n, n.foo.bar())
+      done();
+    });
   })
 
   describe('statics', function(){
@@ -650,7 +781,7 @@ describe('Model', function(){
     });
   });
 
-  describe('casting', function(){
+  describe('casting as validation errors', function(){
     it('error', function(done){
       var db = start()
         , BlogPost = db.model('BlogPost', collection)
@@ -660,7 +791,10 @@ describe('Model', function(){
 
       try {
         post.init({
+          date: 'Test',
+          meta: {
             date: 'Test'
+          }
         });
       } catch(e){
         threw = true;
@@ -678,8 +812,10 @@ describe('Model', function(){
 
       post.save(function(err){
         assert.ok(err instanceof MongooseError);
-        assert.ok(err instanceof CastError);
+        assert.ok(err instanceof ValidationError);
+        assert.equal(2, Object.keys(err.errors).length);
         post.date = new Date;
+        post.meta.date = new Date;
         post.save(function (err) {
           db.close();
           assert.ifError(err);
@@ -708,7 +844,7 @@ describe('Model', function(){
 
       try {
         post.set('meta.date', 'Test');
-      } catch(e){
+      } catch(e) {
         threw = true;
       }
 
@@ -717,7 +853,7 @@ describe('Model', function(){
       post.save(function(err){
         db.close();
         assert.ok(err instanceof MongooseError);
-        assert.ok(err instanceof CastError);
+        assert.ok(err instanceof ValidationError);
         done();
       });
     });
@@ -740,7 +876,7 @@ describe('Model', function(){
       post.save(function(err){
         db.close();
         assert.ok(err instanceof MongooseError);
-        assert.ok(err instanceof CastError);
+        assert.ok(err instanceof ValidationError);
         done();
       });
     });
@@ -792,7 +928,7 @@ describe('Model', function(){
       post.save(function(err){
         db.close();
         assert.ok(err instanceof MongooseError);
-        assert.ok(err instanceof CastError);
+        assert.ok(err instanceof ValidationError);
         done();
       });
     });
@@ -1015,7 +1151,7 @@ describe('Model', function(){
         db.close();
         assert.equal(err.errors.name.message, 'Name cannot be greater than 1 character for path "name" with value `hi`');
         assert.equal(err.name,"ValidationError");
-        assert.equal(err.message,"Validation failed");
+        assert.equal(err.message,"IntrospectionValidation validation failed");
         done();
       });
     });
@@ -1969,7 +2105,7 @@ describe('Model', function(){
 
         db.close();
         assert.equal('object', typeof doc.first);
-        assert.ok(doc.first.second instanceof MongooseArray);
+        assert.ok(doc.first.second.isMongooseArray);
         done()
       });
 
@@ -4938,6 +5074,7 @@ describe('Model', function(){
       });
     });
 
+
     it('Compound index on field earlier declared with 2dsphere index is saved', function (done) {
       var db = start();
       var PersonSchema = new Schema({
@@ -4974,4 +5111,73 @@ describe('Model', function(){
     });
   });
 
+  describe('gh-1920', function() {
+    it('doesnt crash', function(done) {
+      var db = start();
+
+      var parentSchema = new Schema({
+        children: [new Schema({
+          name: String,
+        })]
+      });
+
+      var Parent = db.model('gh-1920', parentSchema);
+
+      var parent = new Parent();
+      parent.children.push({name: 'child name'});
+      parent.save(function(err, it) {
+        assert.ifError(err);
+        parent.children.push({name: 'another child'});
+        Parent.findByIdAndUpdate(it._id, { $set: { children: parent.children } }, function(err, affected) {
+          assert.ifError(err);
+          done();
+        });
+      });
+    });
+  });
+
+  describe('save failure', function() {
+    it('doesnt reset "modified" status for fields', function(done) {
+      var db = start();
+
+      var UniqueSchema = new Schema({
+        changer: String,
+        unique: {
+          type: Number,
+          unique: true
+        }
+      });
+
+      var Unique = db.model('Unique', UniqueSchema);
+
+      var u1 = new Unique({
+        changer: 'a',
+        unique:  5
+      });
+
+      var u2 = new Unique({
+        changer: 'a',
+        unique:  6
+      });
+
+      Unique.on('index', function() {
+        u1.save(function(err) {
+          assert.ifError(err);
+          assert.ok(!u1.isModified('changer'));
+          u2.save(function(err) {
+            assert.ifError(err);
+            assert.ok(!u2.isModified('changer'));
+            u2.changer = 'b';
+            u2.unique = 5;
+            assert.ok(u2.isModified('changer'));
+            u2.save(function(err) {
+              assert.ok(err);
+              assert.ok(u2.isModified('changer'));
+              done();
+            });
+          });
+        });
+      });
+    });
+  });
 });

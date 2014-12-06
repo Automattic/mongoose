@@ -323,11 +323,33 @@ describe('model field selection', function(){
             assert.ok(/ ids/.test(err));
             assert.ok(/ ids2/.test(err));
             done()
-          })
-        })
-      })
-    })
-  })
+          });
+        });
+      });
+    });
+
+    it('works with $ positional in select (gh-2031)', function(done) {
+      var db = start();
+
+      var postSchema = new Schema({
+         tags: [{ tag: String, count: 0 }]
+      });
+
+      var Post = db.model('gh-2031', postSchema, 'gh-2031');
+      Post.create({ tags: [{ tag: 'bacon', count: 2 }, { tag: 'eggs', count: 3 }] }, function(error, post) {
+        assert.ifError(error);
+        Post.findOne({ 'tags.tag': 'eggs' }, { 'tags.$': 1 }, function(error, post) {
+          assert.ifError(error);
+          post.tags[0].count = 1;
+          post.save(function(error, post) {
+            assert.ok(error);
+            db.close();
+            done();
+          });
+        });
+      });
+    });
+  });
 
   it('selecting an array of docs applies defaults properly (gh-1108)', function(done){
     var db = start()

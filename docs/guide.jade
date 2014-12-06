@@ -117,7 +117,7 @@ block content
   :js
     // assign a function to the "statics" object of our animalSchema
     animalSchema.statics.findByName = function (name, cb) {
-      this.find({ name: new RegExp(name, 'i') }, cb);
+      return this.find({ name: new RegExp(name, 'i') }, cb);
     }
 
     var Animal = mongoose.model('Animal', animalSchema);
@@ -156,7 +156,7 @@ block content
 
   h3#virtuals Virtuals
   :markdown
-    [Virtuals](./api.html#schema_Schema-virtual) are document properties that you can get and set but that do not get persisted to MongoDB. The getters are useful for formatting or combining fields, while settings are useful for de-composing a single value into multiple values for storage.
+    [Virtuals](./api.html#schema_Schema-virtual) are document properties that you can get and set but that do not get persisted to MongoDB. The getters are useful for formatting or combining fields, while setters are useful for de-composing a single value into multiple values for storage.
 
   :js
     // define a schema

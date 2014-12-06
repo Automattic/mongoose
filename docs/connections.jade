@@ -65,10 +65,7 @@ block content
     The same method is used to connect to a replica set but instead of passing a single `uri` we pass a comma delimited list of `uri`s.
 
   :js
-    mongoose.connect('mongodb://username:password@host:port/database,mongodb://username:password@host:port,mongodb://username:password@host:port?options...' [, options]);
-
-  :markdown
-    _NOTE: The `database` need only be specified in one of the `uri`s._
+    mongoose.connect('mongodb://[username:password@]host1[:port1][,host2[:port2],...[,hostN[:portN]]][/[database][?options]]' [, options]);
 
   h3#mongos_connections Multi-mongos support
   :markdown
@@ -81,7 +78,7 @@ block content
     So far we've seen how to connect to MongoDB using Mongoose's default connection. At times we may need multiple connections open to Mongo, each with different read/write settings, or maybe just to different databases for example. In these cases we can utilize `mongoose.createConnection()` which accepts all the arguments already discussed and returns a fresh connection for you.
 
   :js
-    var conn = mongoose.createConnection('uri,uri,uri...', options);
+    var conn = mongoose.createConnection('mongodb://[username:password@]host1[:port1][,host2[:port2],...[,hostN[:portN]]][/[database][?options]]', options);
 
   :markdown
     This [connection](./api.html#connection_Connection) object can then be used for creating and retrieving [models](./api.html#model_Model) that are scoped only to this specific connection.

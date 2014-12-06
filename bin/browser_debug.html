@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Mongoose browser debug</title>
+    <script src="mongoose.debug.js"></script>
+</head>
+<body>
+<script>
+    //console.log( window.mongoose );
+
+    function syncValidator (val) {
+        console.log( 'syncValidator', val == 'sync' );
+        return val == 'sync';
+    }
+
+    function asyncValidator (val, respond) {
+        console.log( 'asyncValidator', val == 'nick' );
+        setTimeout(function(  ){
+            respond( val == 'nick' );
+            console.warn( doc.$__.validationError );
+        }, 0);
+    }
+
+    var sync = [syncValidator, 'Uh oh, {PATH} does not equal "sync".'];
+    var async = [asyncValidator, 'failed'];
+
+    var sub = new mongoose.Schema({
+        title: { type: String, required: true },
+        sync: { type: String, /*required: true,*/ validate: sync },
+        async: { type: String, /*required: true,*/ validate: async }
+    });
+    var schema = new mongoose.Schema({
+        mike: { type: String, required: true },
+        sync: { type: String, /*required: true,*/ validate: sync },
+        async: { type: String, /*required: true,*/ validate: async },
+        subs: [ sub ]
+    });
+
+    var doc = new mongoose.Document({
+        //mike: 'sdf',
+        sync: 'syn',
+        async: 'asd',
+        subs: [{
+
+        },{
+
+        }]
+    }, schema);
+
+    /*doc.validate(function( err ){
+        console.log( err );
+    });*/
+    var err = doc.validateSync();
+
+    console.info( err );
+    console.log( err.errors.mike );
+    console.log( err.errors.sync );
+    console.log( err.errors.async );
+
+</script>
+</body>
+</html>

@@ -45,6 +45,56 @@ TestDocument.prototype.$__setSchema(new Schema({
  */
 
 describe('schema', function(){
+  describe('nested fields with same name', function() {
+    var db, NestedModel;
+
+    before(function() {
+      db = start();
+      var NestedSchema = new Schema({
+        a: {
+          b: {
+            c: {type: String},
+            d: {type: String}
+          }
+        },
+        b: {type: String}
+      });
+      NestedModel = db.model('Nested', NestedSchema);
+    });
+
+    after(function() {
+      db.close();
+    });
+
+    it('don\'t disappear', function(done) {
+      var n = new NestedModel({
+        a: {
+          b: {
+            c:'foo',
+            d:'bar'}
+        }, b:'foobar'
+      });
+
+      n.save(function(err) {
+        assert.ifError(err);
+        NestedModel.findOne({_id :n._id}, function(err, nm) {
+          assert.ifError(err);
+
+          // make sure no field has disappeared
+          assert.ok(nm.a);
+          assert.ok(nm.a.b);
+          assert.ok(nm.a.b.c);
+          assert.ok(nm.a.b.d);
+          assert.equal(nm.a.b.c, n.a.b.c);
+          assert.equal(nm.a.b.d, n.a.b.d);
+
+          done();
+        });
+      });
+    });
+  });
+
+
   it('can be created without the "new" keyword', function(done){
     var schema = Schema({ name: String });
     assert.ok(schema instanceof Schema);
@@ -195,7 +245,7 @@ describe('schema', function(){
     assert.equal(Test.path('array').getDefault(new TestDocument)[3], 4);
     assert.equal(Test.path('arrayX').getDefault(new TestDocument)[0], 9);
     assert.equal(typeof Test.path('arrayFn').defaultValue, 'function');
-    assert.ok(Test.path('arrayFn').getDefault(new TestDocument) instanceof MongooseArray);
+    assert.ok(Test.path('arrayFn').getDefault(new TestDocument).isMongooseArray);
     done();
   })
 
@@ -686,13 +736,13 @@ describe('schema', function(){
       var Tobi = new Schema();
 
       Tobi.pre('save', function(){});
-      assert.equal(1, Tobi.callQueue.length);
-
-      Tobi.post('save', function(){});
       assert.equal(2, Tobi.callQueue.length);
 
-      Tobi.pre('save', function(){});
+      Tobi.post('save', function(){});
       assert.equal(3, Tobi.callQueue.length);
+
+      Tobi.pre('save', function(){});
+      assert.equal(4, Tobi.callQueue.length);
       done();
     });
   });

@@ -1441,40 +1441,56 @@ describe('model: querying:', function(){
 
     });
 
-    it('works with text search', function(done) {
-      if (!mongo26_or_greater) {
-        return done();
-      }
+    describe ('text search indexes', function(){
+      it('works with text search ensure indexes ', function(done) {
+        if (!mongo26_or_greater) {
+          return done();
+        }
 
-      var db = start()
-        , blogPost = db.model('BlogPostB', collection);
+        var db = start()
+          , blogPost = db.model('BlogPostB', collection);
 
-      blogPost.collection.ensureIndex({ title : 'text' }, function(error, res) {
-        assert.ifError(error);
-        var a = new blogPost({ title : 'querying in mongoose' });
-        var b = new blogPost({ title : 'text search in mongoose' });
-        a.save(function(error) {
+        blogPost.collection.ensureIndex({ title : 'text' }, function(error, res) {
           assert.ifError(error);
-          b.save(function(error) {
+          var a = new blogPost({ title : 'querying in mongoose' });
+          var b = new blogPost({ title : 'text search in mongoose' });
+          a.save(function(error) {
             assert.ifError(error);
-            blogPost.
-              find({ $text : { $search : 'text search' } }, { score : { $meta: "textScore" } }).
-              limit(2).
-              exec(function(error, documents) {
-                assert.ifError(error);
-                assert.equal(1, documents.length);
-                assert.equal('text search in mongoose', documents[0].title);
-                a.remove(function(error) {
+            b.save(function(error) {
+              assert.ifError(error);
+              blogPost.
+                find({ $text : { $search : 'text search' } }, { score : { $meta: "textScore" } }).
+                limit(2).
+                exec(function(error, documents) {
                   assert.ifError(error);
-                  b.remove(function(error) {
+                  assert.equal(1, documents.length);
+                  assert.equal('text search in mongoose', documents[0].title);
+                  a.remove(function(error) {
                     assert.ifError(error);
-                    db.close();
-                    done();
+                    b.remove(function(error) {
+                      assert.ifError(error);
+                      db.close();
+                      done();
+                    });
                   });
                 });
-              });
+            });
           });
         });
+      });
+
+      it('works when text search is called by a schema', function(done) {
+        var db = start();
+
+        var exampleSchema = new Schema({
+          title: String,
+          name: {type: String, text: true },
+          large_text: String
+        });
+
+        indexes = exampleSchema.indexes();
+        assert.equal(indexes[0][1].text, true);
+        done();
       });
     });
   });
@@ -1732,39 +1748,39 @@ describe('model: querying:', function(){
   });
 
   describe('and', function(){
-    it('works with queries gh-1188', function(done){
+    it('works with queries gh-1188', function(done) {
       var db = start();
       var B = db.model('BlogPostB');
 
-      B.create({ title: 'and operator', published: false, author: 'Me' }, function (err, doc) {
+      B.create({ title: 'and operator', published: false, author: 'Me' }, function(err, doc) {
         assert.ifError(err);
 
-        B.find({ $and: [{ title: 'and operator' }] }, function (err, docs) {
+        B.find({ $and: [{ title: 'and operator' }] }, function(err, docs) {
           assert.ifError(err);
           assert.equal(1, docs.length);
 
-          B.find({ $and: [{ title: 'and operator' }, { published: true }] }, function (err, docs) {
+          B.find({ $and: [{ title: 'and operator' }, { published: true }] }, function(err, docs) {
             assert.ifError(err);
             assert.equal(0, docs.length);
 
-            B.find({ $and: [{ title: 'and operator' }, { published: false }] }, function (err, docs) {
+            B.find({ $and: [{ title: 'and operator' }, { published: false }] }, function(err, docs) {
               assert.ifError(err);
               assert.equal(1, docs.length);
 
-              var query = B.find()
+              var query = B.find();
               query.and([
-                  { title: 'and operator', published: false }
-                , { author: 'Me' }
-              ])
+                { title: 'and operator', published: false },
+                { author: 'Me' }
+              ]);
               query.exec(function (err, docs) {
                 assert.ifError(err);
                 assert.equal(1, docs.length);
 
                 var query = B.find()
                 query.and([
-                    { title: 'and operator', published: false }
-                  , { author: 'You' }
-                ])
+                  { title: 'and operator', published: false },
+                  { author: 'You' }
+                ]);
                 query.exec(function (err, docs) {
                   assert.ifError(err);
                   assert.equal(0, docs.length);
@@ -1774,9 +1790,19 @@ describe('model: querying:', function(){
             });
           });
         });
-      })
-    })
-  })
+      });
+    });
+
+    it('works with nested query selectors gh-1884', function(done) {
+      var db = start();
+      var B = db.model('gh1884', { a: String, b: String }, 'gh1884');
+
+      B.remove({ $and: [{ a: 'coffee' }, { b: { $in: ['bacon', 'eggs'] } }] }, function(error) {
+        assert.ifError(error);
+        done();
+      });
+    });
+  });
 });
 
 describe('buffers', function(){
@@ -2017,7 +2043,7 @@ describe('geo-spatial', function(){
           db.close();
           assert.ifError(err);
           assert.equal(1, docs.length);
-          done()
+          done();
         });
       }
     });

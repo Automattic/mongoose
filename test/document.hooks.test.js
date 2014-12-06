@@ -9,6 +9,7 @@ var start = require('./common')
   , Schema = mongoose.Schema
   , ObjectId = Schema.ObjectId
   , Document = require('../lib/document')
+  , EmbeddedDocument = require('../lib/types/embedded')
   , DocumentObjectId = mongoose.Types.ObjectId;
 
 /**
@@ -402,7 +403,89 @@ describe('document: hooks:', function () {
         });
       });
     });
-  })
+  });
+
+  it('can set nested schema to undefined in pre save (gh-1335)', function(done) {
+    var db = start();
+    var FooSchema = new Schema({});
+    var Foo = db.model('gh-1335-1', FooSchema);
+    var BarSchema = new Schema({
+      foos: [FooSchema]
+    });
+    var Bar = db.model('gh-1335-2', BarSchema);
+
+    var b = new Bar();
+    b.pre('save', function(next) {
+      if (this.isNew && 0 === this.foos.length) {
+        this.foos = undefined;
+      }
+      next();
+    });
+
+    b.save(function(error, dbBar) {
+      assert.ifError(error);
+      assert.ok(!dbBar.foos);
+      assert.equal(typeof dbBar.foos, 'undefined');
+      assert.ok(!b.foos);
+      assert.equal(typeof b.foos, 'undefined');
+      done();
+    });
+  });
+
+  it('post save hooks on subdocuments work (gh-915)', function(done) {
+
+    var doneCalled = false;
+    var _done = function(e) {
+      if (!doneCalled) {
+        doneCalled = true;
+        done(e);
+      }
+    };
+    var db = start();
+    var called = { post: 0 };
+
+    var subSchema = new Schema({
+      name: String
+    });
+
+    subSchema.post('save', function(doc) {
+      called.post++;
+      try {
+        assert.ok(doc instanceof EmbeddedDocument);
+      }
+      catch (e) {
+        _done(e);
+      }
+    });
+
+    var postSaveHooks = new Schema({
+      subs: [subSchema]
+    });
+
+    var M = db.model('post-save-hooks-sub', postSaveHooks);
+
+    var m = new M({ subs: [
+      { name: 'mee' },
+      { name: 'moo' }
+    ] });
+
+    m.save(function(err) {
+      assert.ifError(err);
+      assert.equal(2, called.post);
+      called.post = 0;
+
+      M.findById(m, function(err, doc) {
+        assert.ifError(err);
+        doc.subs.push({ name: 'maa' });
+        doc.save(function(err) {
+          assert.ifError(err);
+          assert.equal(3, called.post);
+
+          _done();
+        });
+      });
+    });
+  });
 
   it("pre save hooks should run in parallel", function (done) {
     // we set the time out to be double that of the validator - 1 (so that running in serial will be greater then that)

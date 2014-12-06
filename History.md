@@ -1,3 +1,120 @@
+3.9.6 / 2014-12-05
+===================
+ * added; correctly run validators on each element of array when entire array is modified #661 #1227
+ * added; castErrors in validation #1013 [jondavidjohn](https://github.com/jondavidjohn)
+ * added; specify text indexes in schema fields #1401 [sr527](https://github.com/sr527)
+ * added; ability to set field with validators to undefined #1594 [alabid](https://github.com/alabid)
+ * added; .create() returns an array when passed an array #1746 [alabid](https://github.com/alabid)
+ * added; test suite and docs for use with co and yield #2177 #2474
+ * fixed; subdocument toObject() transforms #2447 [chmanie](https://github.com/chmanie)
+ * fixed; Model.create() with save errors #2484
+ * added; pass options to .save() and .remove() #2494 [jondavidjohn](https://github.com/jondavidjohn)
+
+3.8.20 / 2014-12-01
+===================
+ * fixed; recursive readPref #2490 [kjvalencik](https://github.com/kjvalencik)
+ * fixed; make sure to copy parameters to update() before modifying #2406 [alabid](https://github.com/alabid)
+ * fixed; unclear documentation about query callbacks #2319
+ * fixed; setting a schema-less field to an empty object #2314 [alabid](https://github.com/alabid)
+ * fixed; registering statics and methods for discriminators #2167 [alabid](https://github.com/alabid)
+
+3.9.5 / 2014-11-10
+===================
+ * added; ability to disable autoIndex on a per-connection basis #1875 [sr527](https://github.com/sr527)
+ * fixed; `geoNear()` no longer enforces legacy coordinate pairs - supports GeoJSON #1987 [alabid](https://github.com/alabid)
+ * fixed; browser component works when minified with mangled variable names #2302
+ * fixed; `doc.errors` now cleared before `validate()` called #2302
+ * added; `execPopulate()` function to make `doc.populate()` compatible with promises #2317
+ * fixed; `count()` no longer throws an error when used with `sort()` #2374
+ * fixed; `save()` no longer recursively calls `save()` on populated fields #2418
+
+3.8.19 / 2014-11-09
+===================
+ * fixed; make sure to not override subdoc _ids on find #2276 [alabid](https://github.com/alabid)
+ * fixed; exception when comparing two documents when one lacks _id #2333 [slawo](https://github.com/slawo)
+ * fixed; getters for properties with non-strict schemas #2439 [alabid](https://github.com/alabid)
+ * fixed; inconsistent URI format in docs #2414 [sr527](https://github.com/sr527)
+
+3.9.4 / 2014-10-25
+==================
+ * fixed; statics no longer can be overwritten #2343 [nkcmr](https://github.com/chetverikov)
+ * added; ability to set single populated paths to documents #1530
+ * added; setDefaultsOnInsert and runValidator options for findOneAndUpdate() #860
+
+3.8.18 / 2014-10-22
+==================
+ * fixed; Dont use all toObject options in save #2340 [chetverikov](https://github.com/chetverikov)
+
+3.9.3 / 2014-10-01
+=================
+ * added; support for virtuals that return objects #2294
+ * added; ability to manually hydrate POJOs into mongoose objects #2292
+ * added; setDefaultsOnInsert and runValidator options for update() #860
+
+3.8.17 / 2014-09-29
+==================
+ * fixed; use schema options retainKeyOrder in save() #2274
+ * fixed; fix skip in populate when limit is set #2252
+ * fixed; fix stack overflow when passing MongooseArray to findAndModify #2214
+ * fixed; optimize .length usage in populate #2289
+
+3.9.2 / 2014-09-08
+==================
+ * added; test coverage for browser component #2255
+ * added; in-order execution of validators #2243
+ * added; custom fields for validators #2132
+ * removed; exception thrown when find() used with count() #1950
+
+3.8.16 / 2014-09-08
+==================
+ * fixed; properly remove modified array paths if array has been overwritten #1638
+ * fixed; key check errors #1884
+ * fixed; make sure populate on an array always returns a Mongoose array #2214
+ * fixed; SSL connections with node 0.11 #2234
+ * fixed; return sensible strings for promise errors #2239
+
+3.9.1 / 2014-08-17
+==================
+ * added; alpha version of browser-side schema validation #2254
+ * added; support passing a function to schemas `required` field #2247
+ * added; support for setting updatedAt and createdAt timestamps #2227
+ * added; document.validate() returns a promise #2131
+
+3.8.15 / 2014-08-17
+==================
+ * fixed; Replica set connection string example in docs #2246
+ * fixed; bubble up parseError event #2229
+ * fixed; removed buggy populate cache #2176
+ * fixed; dont $inc versionKey if its being $set #1933
+ * fixed; cast $or and $and in $pull #1932
+ * fixed; properly cast to schema in stream() #1862
+ * fixed; memory leak in nested objects #1565 #2211 [devongovett](https://github.com/devongovett)
+
+3.8.14 / 2014-07-26
+==================
+ * fixed; stringifying MongooseArray shows nested arrays #2002
+ * fixed; use populated doc schema in toObject and toJSON by default #2035
+ * fixed; dont crash on arrays containing null #2140
+ * fixed; model.update w/ upsert has same return values on .exec and promise #2143
+ * fixed; better handling for populate limit with multiple documents #2151
+ * fixed; dont prevent users from adding weights to text index #2183
+ * fixed; helper for aggregation cursor #2187
+ * updated; node-mongodb-native to 1.4.7
+
+3.8.13 / 2014-07-15
+==================
+ * fixed; memory leak with isNew events #2159
+ * fixed; docs for overwrite option for update() #2144
+ * fixed; storeShard() handles dates properly #2127
+ * fixed; sub-doc changes not getting persisted to db after save #2082
+ * fixed; populate with _id: 0 actually removes _id instead of setting to undefined #2123
+ * fixed; save versionKey on findOneAndUpdate w/ upsert #2122
+ * fixed; fix typo in 2.8 docs #2120 [shakirullahi](https://github.com/shakirullahi)
+ * fixed; support maxTimeMs #2102 [yuukinajima](https://github.com/yuukinajima)
+ * fixed; support $currentDate #2019
+ * fixed; $addToSet handles objects without _ids properly #1973
+ * fixed; dont crash on invalid nearSphere query #1874
+
 3.8.12 / 2014-05-30
 ==================
  * fixed; single-server reconnect event fires #1672

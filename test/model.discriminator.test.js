@@ -6,6 +6,7 @@ var start = require('./common')
   , mongoose = start.mongoose
   , Schema = mongoose.Schema
   , assert = require('assert')
+  , util = require('util')
   , clone = require('../lib/utils').clone
   , random = require('../lib/utils').random;
 
@@ -80,6 +81,36 @@ describe('model', function() {
       assert.ok(employee instanceof Employee);
       assert.strictEqual(employee.__proto__.constructor, Employee);
       assert.strictEqual(employee.__proto__.__proto__.constructor, Person);
+      done();
+    });
+
+    it('can define static and instance methods', function(done) {
+      function BossBaseSchema() {
+        Schema.apply(this, arguments);
+
+        this.add({
+          name: String,
+          createdAt: Date
+        });
+      }
+      util.inherits(BossBaseSchema, Schema);
+
+      var PersonSchema = new BossBaseSchema();
+      var BossSchema = new BossBaseSchema({ department: String });
+      BossSchema.methods.myName = function(){
+        return this.name;
+      };
+      BossSchema.statics.currentPresident = function(){
+        return 'obama';
+      };
+      var Person = db.model('Person', PersonSchema);
+      var Boss = Person.discriminator('Boss', BossSchema);
+
+      var boss = new Boss({name:'Bernenke'});
+      assert.equal(boss.myName(), 'Bernenke');
+      assert.equal(boss.notInstanceMethod, undefined);
+      assert.equal(Boss.currentPresident(), 'obama');
+      assert.equal(Boss.notStaticMethod, undefined);
       done();
     });
 
@@ -239,14 +270,14 @@ describe('model', function() {
       });
 
       it('merges callQueue with base queue defined before discriminator types callQueue', function(done) {
-        assert.equal(Employee.schema.callQueue.length, 2);
+        assert.equal(Employee.schema.callQueue.length, 4);
         // PersonSchema.post('save')
         assert.strictEqual(Employee.schema.callQueue[0], Person.schema.callQueue[0]);
 
         // EmployeeSchema.pre('save')
-        assert.strictEqual(Employee.schema.callQueue[1][0], 'pre');
-        assert.strictEqual(Employee.schema.callQueue[1][1]['0'], 'save');
-        assert.strictEqual(Employee.schema.callQueue[1][1]['1'], employeeSchemaPreSaveFn);
+        assert.strictEqual(Employee.schema.callQueue[3][0], 'pre');
+        assert.strictEqual(Employee.schema.callQueue[3][1]['0'], 'save');
+        assert.strictEqual(Employee.schema.callQueue[3][1]['1'], employeeSchemaPreSaveFn);
         done();
       });
 

@@ -29,10 +29,10 @@ block content
     - [Number](./api.html#schema-number-js)
     - [Date](./api.html#schema-date-js)
     - [Buffer](./api.html#schema-buffer-js)
-    - [Boolean](./api.html#schema-boolean-js)
-    - [Mixed](./api.html#schema-mixed-js)
+    - Boolean
+    - Mixed
     - [Objectid](./api.html#schema-objectid-js)
-    - [Array](./api.html#schema-array-js)
+    - Array
   h4 Example
   :js
     var schema = new Schema({
@@ -66,7 +66,7 @@ block content
     m.updated = new Date;
     m.binary = new Buffer(0);
     m.living = false;
-    m.mixed = {[ any: { thing: 'i want' } ]};
+    m.mixed = { any: { thing: 'i want' } };
     m.markModified('mixed');
     m._someId = new mongoose.Types.ObjectId;
     m.array.push(1);

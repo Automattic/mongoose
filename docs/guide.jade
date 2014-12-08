@@ -301,7 +301,7 @@ block content
 
   h4#_id option: _id
   :markdown
-    Mongoose assigns each of your schemas an `_id` field by default if one is not passed into the [Schema](/docs/api.html#schema-js) constructor. The type assiged is an [ObjectId](/docs/api.html#schema_Schema.Types) to coincide with MongoDBs default behavior. If you don't want an `_id` added to your schema at all, you may disable it using this option.
+    Mongoose assigns each of your schemas an `_id` field by default if one is not passed into the [Schema](/docs/api.html#schema-js) constructor. The type assigned is an [ObjectId](/docs/api.html#schema_Schema.Types) to coincide with MongoDBs default behavior. If you don't want an `_id` added to your schema at all, you may disable it using this option.
 
     Pass this option *during schema construction* to prevent documents from getting an `_id` created by Mongoose (parent documents will still have an `_id` created by MongoDB when inserted). _Passing the option later using `Schema.set('_id', false)` will not work. See issue [#1512](https://github.com/LearnBoost/mongoose/issues/1512)._
   :js

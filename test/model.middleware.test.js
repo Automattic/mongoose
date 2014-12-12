@@ -18,6 +18,28 @@ var start = require('./common')
   , MongooseError = mongoose.Error;
 
 
+describe('query middleware (gh-2138)', function() {
+  it('pre find', function(done) {
+    var schema = new Schema({
+      title: String
+    });
+
+    var count = 0;
+    schema.pre('find', function(next) {
+      ++count;
+    });
+
+    var db = start();
+    var M = db.model('gh-2138', schema, 'gh-2138');
+
+    M.find({ x: 1 }, function(error) {
+      assert.ifError(error);
+      assert.equal(1, count);
+      db.close(done);
+    });
+  });
+});
+
 describe('model middleware', function(){
   it('post save', function(done){
     var schema = new Schema({

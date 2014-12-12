@@ -27,6 +27,7 @@ describe('query middleware (gh-2138)', function() {
     var count = 0;
     schema.pre('find', function(next) {
       ++count;
+      next();
     });
 
     var db = start();
@@ -36,6 +37,82 @@ describe('query middleware (gh-2138)', function() {
       assert.ifError(error);
       assert.equal(1, count);
       db.close(done);
+    });
+  });
+
+  it('post find', function(done) {
+    var schema = new Schema({
+      title: String,
+      author: String
+    });
+
+    var count = 0;
+    schema.pre('find', function(next) {
+      ++count;
+      next();
+    });
+
+    var postCount = 0;
+    schema.post('find', function(results, next) {
+      assert.equal(1, results.length);
+      assert.equal('Val', results[0].author);
+      ++postCount;
+      next();
+    });
+
+    var db = start();
+    var M = db.model('gh-2138', schema, 'gh-2138');
+
+    M.remove({}, function(error) {
+      assert.ifError(error);
+      M.create([{ title: 'Professional AngularJS', author: 'Val' }], function(error) {
+        assert.ifError(error);
+        M.find({ title: 'Professional AngularJS' }, function(error, docs) {
+          assert.ifError(error);
+          assert.equal(1, count);
+          assert.equal(1, postCount);
+          assert.equal(1, docs.length);
+          db.close(done);
+        });
+      });
+    });
+  });
+
+  it('chain', function(done) {
+    var schema = new Schema({
+      title: String,
+      author: String
+    });
+
+    var count = 0;
+    schema.pre('find', function(next) {
+      ++count;
+      next();
+    });
+
+    var postCount = 0;
+    schema.post('find', function(results, next) {
+      assert.equal(1, results.length);
+      assert.equal('Val', results[0].author);
+      ++postCount;
+      next();
+    });
+
+    var db = start();
+    var M = db.model('gh-2138', schema, 'gh-2138');
+
+    M.remove({}, function(error) {
+      assert.ifError(error);
+      M.create([{ title: 'Professional AngularJS', author: 'Val' }], function(error) {
+        assert.ifError(error);
+        M.find({ title: 'Professional AngularJS' }).exec(function(error, docs) {
+          assert.ifError(error);
+          assert.equal(1, count);
+          assert.equal(1, postCount);
+          assert.equal(1, docs.length);
+          db.close(done);
+        });
+      });
     });
   });
 });

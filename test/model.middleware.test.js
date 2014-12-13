@@ -17,7 +17,6 @@ var start = require('./common')
   , MongooseArray = mongoose.Types.Array
   , MongooseError = mongoose.Error;
 
-
 describe('model middleware', function(){
   it('post save', function(done){
     var schema = new Schema({

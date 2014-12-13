@@ -7,24 +7,48 @@ describe('query middleware', function() {
   var db;
   var schema;
   var Author;
+  var Publisher;
 
   beforeEach(function(done) {
     schema = new Schema({
       title: String,
-      author: String
+      author: String,
+      publisher: { type: Schema.ObjectId, ref: 'gh-2138-1' }
+    });
+
+    var publisherSchema = new Schema({
+      name: String
     });
 
     db = start();
 
     Author = db.model('gh-2138', schema, 'gh-2138');
+    Publisher = db.model('gh-2138-1', publisherSchema, 'gh-2138-1');
 
     Author.remove({}, function(error) {
       if (error) {
         return done(error);
       }
-      var doc = { title: 'Professional AngularJS', author: 'Val' };
-      Author.create(doc, function(error) {
-        done(error);
+
+      Publisher.remove({}, function(error) {
+        if (error) {
+          return done(error);
+        }
+        Publisher.create({ name: 'Wiley' }, function(error, publisher) {
+          if (error) {
+            return done(error);
+          }
+
+          var doc = {
+            title: 'Professional AngularJS',
+            author: 'Val',
+            publisher: publisher._id
+          };
+
+          Author.create(doc, function(error) {
+            done(error);
+          });
+        });
       });
     });
   });
@@ -90,7 +114,55 @@ describe('query middleware', function() {
     });
   });
 
-  /*it('has separate pre-findOne() and post-findOne() hooks', function(done) {
-    
-  });*/
+  it('has separate pre-findOne() and post-findOne() hooks', function(done) {
+    var count = 0;
+    schema.pre('findOne', function(next) {
+      ++count;
+      next();
+    });
+
+    var postCount = 0;
+    schema.post('findOne', function(result, next) {
+      assert.equal('Val', result.author);
+      ++postCount;
+      next();
+    });
+
+    Author.findOne({ title: 'Professional AngularJS' }).exec(function(error, doc) {
+      assert.ifError(error);
+      assert.equal(1, count);
+      assert.equal(1, postCount);
+      assert.equal('Val', doc.author);
+      done();
+    });
+  });
+
+  it('can populate in pre hook', function(done) {
+    schema.pre('findOne', function(next) {
+      this.populate('publisher');
+      next();
+    });
+
+    Author.findOne({ title: 'Professional AngularJS' }).exec(function(error, doc) {
+      assert.ifError(error);
+      assert.equal('Val', doc.author);
+      assert.equal('Wiley', doc.publisher.name);
+      done();
+    });
+  });
+
+  it('can populate in post hook', function(done) {
+    schema.post('findOne', function(doc, next) {
+      doc.populate('publisher', function(error) {
+        next(error);
+      });
+    });
+
+    Author.findOne({ title: 'Professional AngularJS' }).exec(function(error, doc) {
+      assert.ifError(error);
+      assert.equal('Val', doc.author);
+      assert.equal('Wiley', doc.publisher.name);
+      done();
+    });
+  });
 });

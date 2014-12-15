@@ -432,12 +432,12 @@ describe('types.documentarray', function(){
       M.create({ docs: [{v: 900}] }, function(error, m) {
         m.shouldPrint = true;
         assert.ifError(error);
-        var numListeners = m._events.save.length;
+        var numListeners = m.listeners('save').length;
         assert.ok(numListeners > 0);
         m.docs = [{ v: 9000 }];
         m.save(function(error, m) {
           assert.ifError(error);
-          assert.equal(numListeners, m._events.save.length);
+          assert.equal(numListeners, m.listeners('save').length);
           done();
         });
       });

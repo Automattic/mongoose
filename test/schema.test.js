@@ -1314,12 +1314,6 @@ describe('schema', function(){
 
       assert.throws(function(){
         new Schema({
-            options: String
-        });
-      }, /`options` may not be used as a schema pathname/);
-
-      assert.throws(function(){
-        new Schema({
            collection: String
         });
       }, /`collection` may not be used as a schema pathname/);

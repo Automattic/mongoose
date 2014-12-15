@@ -13,7 +13,8 @@ describe('query middleware', function() {
     schema = new Schema({
       title: String,
       author: String,
-      publisher: { type: Schema.ObjectId, ref: 'gh-2138-1' }
+      publisher: { type: Schema.ObjectId, ref: 'gh-2138-1' },
+      options: String
     });
 
     var publisherSchema = new Schema({
@@ -42,7 +43,8 @@ describe('query middleware', function() {
           var doc = {
             title: 'Professional AngularJS',
             author: 'Val',
-            publisher: publisher._id
+            publisher: publisher._id,
+            options: 'bacon'
           };
 
           Author.create(doc, function(error) {
@@ -78,6 +80,7 @@ describe('query middleware', function() {
     schema.post('find', function(results, next) {
       assert.equal(1, results.length);
       assert.equal('Val', results[0].author);
+      assert.equal('bacon', results[0].options);
       ++postCount;
       next();
     });

@@ -53,7 +53,7 @@ describe('ValidationError', function(){
         , model;
 
       MinSchema = new Schema({
-        appointmentDate : { type: Date, min: Date.now() }
+        appointmentDate : { type: Date, min: Date.now }
       });
 
       M = mongoose.model('MinSchema', MinSchema);

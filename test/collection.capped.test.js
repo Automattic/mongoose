@@ -65,7 +65,7 @@ describe('collections: capped:', function(){
           var c = new Capped({ key: s });
           c.save(function (err, doc, num) {
             assert.ifError(err);
-            assert.equal(1, num);
+            assert.equal(1, num.result.n);
             Capped.find(function (err, docs) {
               assert.ifError(err);
               assert.equal(1, docs.length);

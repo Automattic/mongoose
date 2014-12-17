@@ -1263,8 +1263,7 @@ describe('Model', function(){
 
       TestP.collection.insert({ a: null, previous: null}, {}, function (err, f) {
         assert.ifError(err);
-
-        TestP.findOne({_id: f[0]._id}, function (err, found) {
+        TestP.findOne({_id: f.ops[0]._id}, function (err, found) {
           assert.ifError(err);
           assert.equal(false, found.isNew);
           assert.strictEqual(found.get('previous'), null);
@@ -4314,12 +4313,12 @@ describe('Model', function(){
       var s = new S({ name: 'aaron' });
       s.save(function (err, doc, affected) {
         assert.ifError(err);
-        assert.equal(1, affected);
+        assert.equal(1, affected.result.n);
         s.name = 'heckmanananananana';
         s.save(function (err, doc, affected) {
           db.close();
           assert.ifError(err);
-          assert.equal(1, affected);
+          assert.equal(1, affected.result.n);
           done();
         });
       });
@@ -4573,11 +4572,11 @@ describe('Model', function(){
               assert.ifError(err);
 
               doc.score = 55;
-              doc.save(function (err, doc, count){
+              doc.save(function (err, doc, count) {
                 db.close();
                 assert.ifError(err);
                 assert.equal(doc.score, 55);
-                assert.equal(count, 1);
+                assert.equal(count.result.n, 1);
                 done();
               });
             });

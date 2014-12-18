@@ -1,3 +1,9 @@
+3.8.21 / 2014-12-18
+===================
+ * fixed; syntax in index.jade #2517 [elderbas](https://github.com/elderbas)
+ * fixed; writable statics #2510 #2528
+ * fixed; overwrite and explicit $set casting #2515
+
 3.8.20 / 2014-12-01
 ===================
  * fixed; recursive readPref #2490 [kjvalencik](https://github.com/kjvalencik)

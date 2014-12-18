@@ -3249,8 +3249,37 @@ describe('Model', function(){
     });
   });
 
-  describe('hooks', function(){
-    describe('pre', function(){
+  describe('hooks', function() {
+    describe('pre', function() {
+      it('can pass non-error values to the next middleware', function(done) {
+        var db = start();
+        var schema =  new Schema({ name: String });
+
+        schema.pre('save', function(next) {
+          next('hey there');
+        }).pre('save', function(next, message) {
+          assert.ok(message);
+          assert.equal(message, 'hey there');
+          next();
+        }).pre('save', function(next) {
+          // just throw error
+          next(new Error('error string'));
+        }).pre('save', function(next) {
+          // don't call since error thrown in previous save
+          assert.ok(false);
+          next('don\'t call me');
+        });
+        var S = db.model('S', schema, collection);
+        var s = new S({ name: 'angelina' });
+
+        s.save(function(err) {
+          db.close();
+          assert.ok(err);
+          assert.equal(err.message, 'error string');
+          done();
+        });
+      });
+
       it('with undefined and null', function(done){
         var db = start();
         var schema = new Schema({ name: String });

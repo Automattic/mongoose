@@ -1031,4 +1031,27 @@ describe('model: update:', function(){
       });
     });
   });
+
+  it('works with $set and overwrite (gh-2515)', function(done) {
+    var db = start();
+
+    var schema = new Schema({ breakfast: String });
+    var M = db.model('gh-2515', schema);
+
+    M.create({ breakfast: 'bacon' }, function(error, doc) {
+      assert.ifError(error);
+      M.update(
+        { _id: doc._id },
+        { $set: { breakfast: 'eggs' } },
+        { overwrite: true },
+        function(error) {
+          assert.ifError(error);
+          M.findOne({ _id: doc._id }, function(error, doc) {
+            assert.ifError(error);
+            assert.equal(doc.breakfast, 'eggs');
+            db.close(done);
+          });
+        });
+    });
+  });
 });

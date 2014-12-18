@@ -1,0 +1,15 @@
+extends layout
+
+block content
+  each block in acquitBlocks
+    h2 !{block.contents}
+    if block.comments && block.comments.length
+      | !{block.comments[0]}
+
+    each it in block.blocks
+      h4 !{it.contents}
+      if it.comments && it.comments.length
+        | !{it.comments[0]}
+
+      :js
+        #{it.code}

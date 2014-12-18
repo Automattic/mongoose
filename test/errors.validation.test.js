@@ -69,7 +69,7 @@ describe('ValidationError', function(){
 
         //should pass validation
         model.validate(function(err) {
-          assert.equal(err, null, 'min Date validation failed');
+          assert.equal(err, null);
           done();  
         });
       });

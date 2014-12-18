@@ -165,6 +165,7 @@ function Document (obj, schema, fields, skipId, skipInit) {
   this.$__setSchema(schema);
 
   this.$__ = new InternalCache;
+  this.$__.emitter = new EventEmitter();
   this.isNew = true;
   this.errors = undefined;
 
@@ -203,9 +204,9 @@ function Document (obj, schema, fields, skipId, skipInit) {
 }
 
 /*!
- * Inherit from EventEmitter.
+ * Inherit from the NodeJS document
  */
-Document.prototype = Object.create( NodeJSDocument.prototype );
+Document.prototype = Object.create(NodeJSDocument.prototype);
 Document.prototype.constructor = Document;
 
 
@@ -467,6 +468,7 @@ var EventEmitter = require('events').EventEmitter
 
 function Document (obj, fields, skipId) {
   this.$__ = new InternalCache;
+  this.$__.emitter = new EventEmitter();
   this.isNew = true;
   this.errors = undefined;
 
@@ -485,7 +487,7 @@ function Document (obj, fields, skipId) {
     this.$__.activePaths.require(required[i]);
   }
 
-  setMaxListeners.call(this, 0);
+  this.$__.emitter.setMaxListeners(0);
   this._doc = this.$__buildDoc(obj, fields, skipId);
 
   if (obj) {
@@ -507,9 +509,18 @@ function Document (obj, fields, skipId) {
 }
 
 /*!
- * Inherit from EventEmitter.
+ * Document exposes the NodeJS event emitter API, so you can use
+ * `on`, `once`, etc.
  */
-Document.prototype = Object.create( EventEmitter.prototype );
+utils.each(
+  ['on', 'once', 'emit', 'listeners', 'removeListener', 'setMaxListeners',
+    'removeAllListeners'],
+  function(emitterFn) {
+    Document.prototype[emitterFn] = function() {
+      return this.$__.emitter[emitterFn].apply(this.$__.emitter, arguments);
+    };
+  });
+
 Document.prototype.constructor = Document;
 
 /**
@@ -727,9 +738,16 @@ function init (self, obj, doc, prefix) {
         doc[i] = null;
       } else if (obj[i] !== undefined) {
         if (schema) {
-          self.$__try(function(){
+          try {
             doc[i] = schema.cast(obj[i], self, true);
-          });
+          } catch (e) {
+            self.invalidate(e.path, new ValidatorError({
+              path: e.path,
+              message: e.message,
+              type: 'cast',
+              value: e.value
+            }));
+          }
         } else {
           doc[i] = obj[i];
         }
@@ -984,18 +1002,27 @@ Document.prototype.set = function (path, val, type, options) {
     return this;
   }
 
-  var self = this;
-  var shouldSet = this.$__try(function() {
+  var shouldSet = true;
+
+  try {
     // If the user is trying to set a ref path to a document with
     // the correct model name, treat it as populated
     if (schema.options &&
         schema.options.ref &&
         val instanceof Document &&
         schema.options.ref === val.constructor.modelName) {
-      self.populated(path, val);
+      this.populated(path, val);
     }
-    val = schema.applySetters(val, self, false, priorVal);
-  });
+    val = schema.applySetters(val, this, false, priorVal);
+  } catch (e) {
+    this.invalidate(e.path, new ValidatorError({
+      path: e.path,
+      message: e.message,
+      type: 'cast',
+      value: e.value
+    }));
+    shouldSet = false;
+  }
 
   if (shouldSet) {
     this.$__set(pathToMark, path, constructing, parts, schema, val, priorVal);
@@ -1203,28 +1230,6 @@ Document.prototype.$__path = function (path) {
 Document.prototype.markModified = function (path) {
   this.$__.activePaths.modify(path);
 }
-
-/**
- * Catches errors that occur during execution of `fn` and stores them to later be passed when `save()` is executed.
- *
- * @param {Function} fn function to execute
- * @param {Object} scope the scope with which to call fn
- * @api private
- * @method $__try
- * @memberOf Document
- */
-
-Document.prototype.$__try = function (fn, scope) {
-  var res;
-  try {
-    fn.call(scope);
-    res = true;
-  } catch (e) {
-    this.$__error(e);
-    res = false;
-  }
-  return res;
-};
 
 /**
  * Returns the list of paths that have been modified.
@@ -1543,6 +1548,8 @@ Document.prototype.invalidate = function (path, err, val) {
   if (!this.$__.validationError) {
     this.$__.validationError = new ValidationError(this);
   }
+
+  if (this.$__.validationError.errors[path]) return;
 
   if (!err || 'string' === typeof err) {
     err = new ValidatorError({
@@ -2507,7 +2514,7 @@ var Binary = require('mongodb/node_modules/bson').Binary;
 
 module.exports = exports = Binary;
 
-},{"mongodb/node_modules/bson":53}],7:[function(require,module,exports){
+},{"mongodb/node_modules/bson":54}],7:[function(require,module,exports){
 
 /*!
  * [node-mongodb-native](https://github.com/mongodb/node-mongodb-native) ObjectId
@@ -2524,7 +2531,7 @@ var ObjectId = require('mongodb/node_modules/bson').ObjectID;
 module.exports = exports = ObjectId;
 
 
-},{"mongodb/node_modules/bson":53}],8:[function(require,module,exports){
+},{"mongodb/node_modules/bson":54}],8:[function(require,module,exports){
 
 /**
  * MongooseError constructor
@@ -2695,6 +2702,10 @@ msg.Number = {};
 msg.Number.min = "Path `{PATH}` ({VALUE}) is less than minimum allowed value ({MIN}).";
 msg.Number.max = "Path `{PATH}` ({VALUE}) is more than maximum allowed value ({MAX}).";
 
+msg.Date = {};
+msg.Date.min = "Path `{PATH}` ({VALUE}) is before minimum allowed value ({MIN}).";
+msg.Date.max = "Path `{PATH}` ({VALUE}) is after maximum allowed value ({MAX}).";
+
 msg.String = {};
 msg.String.enum = "`{VALUE}` is not a valid enum value for path `{PATH}`.";
 msg.String.match = "Path `{PATH}` is invalid ({VALUE}).";
@@ -2774,7 +2785,7 @@ module.exports = OverwriteModelError;
  * Module requirements
  */
 
-var MongooseError = require('../error.js')
+var MongooseError = require('../error.js');
 
 /**
  * Document Validation Error
@@ -2785,14 +2796,18 @@ var MongooseError = require('../error.js')
  */
 
 function ValidationError (instance) {
-  MongooseError.call(this, "Validation failed");
+  if (instance && instance.constructor.name === 'model') {
+    MongooseError.call(this, instance.constructor.modelName + " validation failed");
+  } else {
+    MongooseError.call(this, "Validation failed");
+  }
   Error.captureStackTrace && Error.captureStackTrace(this, arguments.callee);
   this.name = 'ValidationError';
   this.errors = {};
   if (instance) {
     instance.errors = this.errors;
   }
-};
+}
 
 /*!
  * Inherits from MongooseError.
@@ -2813,7 +2828,7 @@ ValidationError.prototype.toString = function () {
   Object.keys(this.errors).forEach(function (key) {
     if (this == this.errors[key]) return;
     msgs.push(String(this.errors[key]));
-  }, this)
+  }, this);
 
   return ret + msgs.join(', ');
 };
@@ -3219,7 +3234,7 @@ Promise.prototype.addErrback = Promise.prototype.onReject;
 
 module.exports = Promise;
 
-},{"mpromise":66,"util":48}],19:[function(require,module,exports){
+},{"mpromise":67,"util":48}],19:[function(require,module,exports){
 (function (Buffer){
 /*!
  * Module dependencies.
@@ -3229,6 +3244,9 @@ var EventEmitter = require('events').EventEmitter
   , VirtualType = require('./virtualtype')
   , utils = require('./utils')
   , MongooseTypes;
+
+var Kareem = require('kareem');
+var IS_QUERY_HOOK = { find: true, findOne: true };
 
 /**
  * Schema constructor.
@@ -3287,6 +3305,11 @@ function Schema (obj, options) {
   this._requiredpaths = undefined;
   this.discriminatorMapping = undefined;
   this._indexedpaths = undefined;
+
+  this.s = {
+    hooks: new Kareem(),
+    queryHooks: IS_QUERY_HOOK
+  };
 
   this.options = this.defaultOptions(options);
 
@@ -3499,6 +3522,7 @@ Schema.prototype.add = function add (obj, prefix) {
 Schema.reserved = Object.create(null);
 var reserved = Schema.reserved;
 reserved.on =
+reserved.once =
 reserved.db =
 reserved.set =
 reserved.get =
@@ -3506,13 +3530,10 @@ reserved.init =
 reserved.isNew =
 reserved.errors =
 reserved.schema =
-reserved.options =
 reserved.modelName =
 reserved.collection =
 reserved.toObject =
-reserved.domain =
 reserved.emit =    // EventEmitter
-reserved._events = // EventEmitter
 reserved._pres = reserved._posts = 1 // hooks.js
 
 /**
@@ -3802,7 +3823,12 @@ Schema.prototype.queue = function(name, args){
  * @api public
  */
 
-Schema.prototype.pre = function(){
+Schema.prototype.pre = function() {
+  var name = arguments[0];
+  if (IS_QUERY_HOOK[name]) {
+    this.s.hooks.pre.apply(this.s.hooks, arguments);
+    return this;
+  }
   return this.queue('pre', arguments);
 };
 
@@ -3829,10 +3855,16 @@ Schema.prototype.pre = function(){
  * @api public
  */
 
-Schema.prototype.post = function(method, fn){
+Schema.prototype.post = function(method, fn) {
+  if (IS_QUERY_HOOK[method]) {
+    this.s.hooks.post.apply(this.s.hooks, arguments);
+    return this;
+  }
   // assuming that all callbacks with arity < 2 are synchronous post hooks
-  if (fn.length < 2)
+  if (fn.length < 2) {
     return this.queue('on', arguments);
+  }
+
   return this.queue('post', [arguments[0], function(next){
     // wrap original function so that the callback goes last,
     // for compatibility with old code that is using synchronous post hooks
@@ -4179,7 +4211,7 @@ var ObjectId = exports.ObjectId = MongooseTypes.ObjectId;
 
 
 }).call(this,require("buffer").Buffer)
-},{"./schema/index":25,"./utils":38,"./virtualtype":39,"buffer":40,"events":44}],20:[function(require,module,exports){
+},{"./schema/index":25,"./utils":38,"./virtualtype":39,"buffer":40,"events":44,"kareem":50}],20:[function(require,module,exports){
 /*!
  * Module dependencies.
  */
@@ -4852,9 +4884,10 @@ module.exports = SchemaBuffer;
  * Module requirements.
  */
 
-var SchemaType = require('../schematype');
-var CastError = SchemaType.CastError;
-var utils = require('../utils');
+var SchemaType = require('../schematype')
+  , CastError = SchemaType.CastError
+  , errorMessages = require('../error').messages
+  , utils = require('../utils');
 
 /**
  * Date SchemaType constructor.
@@ -4932,6 +4965,116 @@ SchemaDate.prototype.expires = function (when) {
 
 SchemaDate.prototype.checkRequired = function (value) {
   return value instanceof Date;
+};
+
+/**
+ * Sets a minimum date validator.
+ *
+ * ####Example:
+ *
+ *     var s = new Schema({ d: { type: Date, min: Date('1970-01-01') })
+ *     var M = db.model('M', s)
+ *     var m = new M({ d: Date('1969-12-31') })
+ *     m.save(function (err) {
+ *       console.error(err) // validator error
+ *       m.d = Date('2014-12-08');
+ *       m.save() // success
+ *     })
+ *
+ *     // custom error messages
+ *     // We can also use the special {MIN} token which will be replaced with the invalid value
+ *     var min = [Date('1970-01-01'), 'The value of path `{PATH}` ({VALUE}) is beneath the limit ({MIN}).'];
+ *     var schema = new Schema({ d: { type: Date, min: min })
+ *     var M = mongoose.model('M', schema);
+ *     var s= new M({ d: Date('1969-12-31') });
+ *     s.validate(function (err) {
+ *       console.log(String(err)) // ValidationError: The value of path `d` (1969-12-31) is before the limit (1970-01-01).
+ *     })
+ *
+ * @param {Date} value minimum date
+ * @param {String} [message] optional custom error message
+ * @return {SchemaType} this
+ * @see Customized Error Messages #error_messages_MongooseError-messages
+ * @api public
+ */
+
+SchemaDate.prototype.min = function (value, message) {
+  if (this.minValidator) {
+    this.validators = this.validators.filter(function (v) {
+      return v.validator != this.minValidator;
+    }, this);
+  }
+
+  if (value) {
+    var msg = message || errorMessages.Date.min;
+    msg = msg.replace(/{MIN}/, (value === Date.now ? 'Date.now()' : this.cast(value).toString()));
+    var self = this;
+    this.validators.push({
+      validator: this.minValidator = function (val) {
+        var min = (value === Date.now ? value() : self.cast(value));
+        return val === null || val.valueOf() >= min.valueOf();
+      },
+      message: msg,
+      type: 'min'
+    });
+  }
+
+  return this;
+};
+
+/**
+ * Sets a maximum date validator.
+ *
+ * ####Example:
+ *
+ *     var s = new Schema({ d: { type: Date, max: Date('2014-01-01') })
+ *     var M = db.model('M', s)
+ *     var m = new M({ d: Date('2014-12-08') })
+ *     m.save(function (err) {
+ *       console.error(err) // validator error
+ *       m.d = Date('2013-12-31');
+ *       m.save() // success
+ *     })
+ *
+ *     // custom error messages
+ *     // We can also use the special {MAX} token which will be replaced with the invalid value
+ *     var max = [Date('2014-01-01'), 'The value of path `{PATH}` ({VALUE}) exceeds the limit ({MAX}).'];
+ *     var schema = new Schema({ d: { type: Date, max: max })
+ *     var M = mongoose.model('M', schema);
+ *     var s= new M({ d: Date('2014-12-08') });
+ *     s.validate(function (err) {
+ *       console.log(String(err)) // ValidationError: The value of path `d` (2014-12-08) exceeds the limit (2014-01-01).
+ *     })
+ *
+ * @param {Date} maximum date
+ * @param {String} [message] optional custom error message
+ * @return {SchemaType} this
+ * @see Customized Error Messages #error_messages_MongooseError-messages
+ * @api public
+ */
+
+SchemaDate.prototype.max = function (value, message) {
+  if (this.maxValidator) {
+    this.validators = this.validators.filter(function(v){
+      return v.validator != this.maxValidator;
+    }, this);
+  }
+
+  if (value) {
+    var msg = message || errorMessages.Date.max;
+    msg = msg.replace(/{MAX}/, (value === Date.now ? 'Date.now()' : this.cast(value).toString()));
+    var self = this;
+    this.validators.push({
+      validator: this.maxValidator = function(val) {
+        var max = (value === Date.now ? value() : self.cast(value));
+        return val === null || val.valueOf() <= max.valueOf();
+      },
+      message: msg,
+      type: 'max'
+    });
+  }
+
+  return this;
 };
 
 /**
@@ -5024,7 +5167,7 @@ SchemaDate.prototype.castForQuery = function ($conditional, val) {
 
 module.exports = SchemaDate;
 
-},{"../schematype":30,"../utils":38}],24:[function(require,module,exports){
+},{"../error":8,"../schematype":30,"../utils":38}],24:[function(require,module,exports){
 
 /*!
  * Module dependencies.
@@ -7308,7 +7451,13 @@ MongooseArray.mixin = {
         value = { _id: value };
       }
 
-      value = new Model(value);
+      // gh-2399
+      // we should cast model only when it's not a discriminator
+      var isDisc = value.schema && value.schema.discriminatorMapping &&
+        value.schema.discriminatorMapping.key !== undefined;
+      if (!isDisc) {
+        value = new Model(value);
+      }
       return this._schema.caster.cast(value, this._parent, true)
     }
 
@@ -9178,6 +9327,10 @@ exports.readPref = function readPref (pref, tags) {
     pref = pref[0];
   }
 
+  if (pref instanceof ReadPref) {
+    return pref;
+  }
+
   switch (pref) {
     case 'p':
       pref = 'primary';
@@ -9430,11 +9583,25 @@ exports.mergeClone = function(to, from) {
       }
     }
   }
-}
+};
+
+/**
+ * Executes a function on each element of an array (like _.each)
+ *
+ * @param {Array} arr
+ * @param {Function} fn
+ * @api private
+ */
+
+exports.each = function(arr, fn) {
+  for (var i = 0; i < arr.length; ++i) {
+    fn(arr[i]);
+  }
+};
 
 
 }).call(this,require("FWaASH"),require("buffer").Buffer)
-},{"./document":4,"./types":36,"./types/objectid":37,"FWaASH":46,"buffer":40,"mongodb/lib/mongodb/connection/read_preference":50,"mpath":64,"ms":68,"regexp-clone":69,"sliced":70}],39:[function(require,module,exports){
+},{"./document":4,"./types":36,"./types/objectid":37,"FWaASH":46,"buffer":40,"mongodb/lib/mongodb/connection/read_preference":51,"mpath":65,"ms":68,"regexp-clone":69,"sliced":70}],39:[function(require,module,exports){
 
 /**
  * VirtualType constructor
@@ -9891,7 +10058,7 @@ function base64Write (buf, string, offset, length) {
 }
 
 function utf16leWrite (buf, string, offset, length) {
-  var charsWritten = blitBuffer(utf16leToBytes(string), buf, offset, length)
+  var charsWritten = blitBuffer(utf16leToBytes(string), buf, offset, length, 2)
   return charsWritten
 }
 
@@ -10575,7 +10742,8 @@ function base64ToBytes (str) {
   return base64.toByteArray(str)
 }
 
-function blitBuffer (src, dst, offset, length) {
+function blitBuffer (src, dst, offset, length, unitSize) {
+  if (unitSize) length -= length % unitSize;
   for (var i = 0; i < length; i++) {
     if ((i + offset >= dst.length) || (i >= src.length))
       break
@@ -12002,6 +12170,210 @@ function once (fn, scope) {
 }
 
 },{}],50:[function(require,module,exports){
+(function (process){
+'use strict';
+
+function Kareem() {
+  this._pres = {};
+  this._posts = {};
+}
+
+Kareem.prototype.execPre = function(name, context, callback) {
+  var pres = this._pres[name] || [];
+  var numPres = pres.length;
+  var numAsyncPres = pres.numAsync || 0;
+  var currentPre = 0;
+  var asyncPresLeft = numAsyncPres;
+  var done = false;
+
+  if (!numPres) {
+    return process.nextTick(function() {
+      callback();
+    });
+  }
+
+  var next = function() {
+    var pre = pres[currentPre];
+
+    if (pre.isAsync) {
+      pre.fn.call(
+        context,
+        function(error) {
+          if (error) {
+            if (done) {
+              return;
+            }
+            done = true;
+            return callback(error);
+          }
+
+          ++currentPre;
+          next();
+        },
+        function(error) {
+          if (error) {
+            if (done) {
+              return;
+            }
+            done = true;
+            return callback(error);
+          }
+
+          if (0 === --numAsyncPres) {
+            return callback();
+          } 
+        });
+    } else if (pre.fn.length > 0) {
+      pre.fn.call(context, function(error) {
+        if (error) {
+          if (done) {
+            return;
+          }
+          done = true;
+          return callback(error);
+        }
+
+        if (++currentPre >= numPres) {
+          if (asyncPresLeft > 0) {
+            // Leave parallel hooks to run
+            return;
+          } else {
+            return callback();
+          }
+        }
+
+        next();
+      });
+    } else {
+      pre.fn.call(context);
+      if (++currentPre >= numPres) {
+        if (asyncPresLeft > 0) {
+          // Leave parallel hooks to run
+          return;
+        } else {
+          return process.nextTick(function() {
+            callback()
+          });
+        }
+      }
+      next();
+    }
+  };
+
+  next();
+};
+
+Kareem.prototype.execPost = function(name, context, args, callback) {
+  var posts = this._posts[name] || [];
+  var numPosts = posts.length;
+  var currentPost = 0;
+  var done = false;
+
+  if (!numPosts) {
+    return process.nextTick(function() {
+      callback.apply(null, [undefined].concat(args));
+    });
+  }
+
+  var next = function() {
+    var post = posts[currentPost];
+
+    if (post.length > args.length) {
+      post.apply(context, args.concat(function(error) {
+        if (error) {
+          if (done) {
+            return;
+          }
+          return callback(error);
+        }
+
+        if (++currentPost >= numPosts) {
+          return callback.apply(null, [undefined].concat(args));
+        }
+
+        next();
+      }));
+    } else {
+      post.apply(context, args);
+
+      if (++currentPost >= numPosts) {
+        return callback.apply(null, [undefined].concat(args));
+      }
+
+      next();
+    }
+  };
+
+  next();
+};
+
+Kareem.prototype.wrap = function(name, fn, context, args) {
+  var lastArg = (args.length > 0 ? args[args.length - 1] : null);
+  var _this = this;
+
+  this.execPre(name, context, function(error) {
+    if (error) {
+      if (typeof lastArg === 'function') {
+        return lastArg(error);
+      }
+      return;
+    }
+
+    var end = (typeof lastArg === 'function' ? args.length - 1 : args.length);
+
+    fn.apply(context, args.slice(0, end).concat(function() {
+      if (arguments[0]) {
+        // Assume error
+        return typeof lastArg === 'function' ?
+          lastArg(arguments[0]) :
+          undefined;
+      }
+
+      var argsWithoutError = Array.prototype.slice.call(arguments, 1);
+      _this.execPost(name, context, argsWithoutError, function() {
+        if (arguments[0]) {
+          return typeof lastArg === 'function' ?
+            lastArg(arguments[0]) :
+            undefined;
+        }
+
+        return typeof lastArg === 'function' ?
+          lastArg.apply(context, arguments) :
+          undefined;
+      });
+    }));
+  });
+};
+
+Kareem.prototype.pre = function(name, isAsync, fn, error) {
+  if ('boolean' !== typeof arguments[1]) {
+    error = fn;
+    fn = isAsync;
+    isAsync = false;
+  }
+
+  this._pres[name] = this._pres[name] || [];
+  var pres = this._pres[name];
+
+  if (isAsync) {
+    pres.numAsync = pres.numAsync || 0;
+    ++pres.numAsync;
+  }
+
+  pres.push({ fn: fn, isAsync: isAsync });
+
+  return this;
+};
+
+Kareem.prototype.post = function(name, fn) {
+  (this._posts[name] = this._posts[name] || []).push(fn);
+  return this;
+};
+
+module.exports = Kareem;
+
+}).call(this,require("FWaASH"))
+},{"FWaASH":46}],51:[function(require,module,exports){
 /**
  * A class representation of the Read Preference.
  *
@@ -12069,45 +12441,14 @@ ReadPreference.NEAREST = 'nearest'
  * @ignore
  */
 exports.ReadPreference  = ReadPreference;
-},{}],51:[function(require,module,exports){
+},{}],52:[function(require,module,exports){
 /**
  * Module dependencies.
+ * @ignore
  */
 if(typeof window === 'undefined') { 
   var Buffer = require('buffer').Buffer; // TODO just use global Buffer
 }
-
-// Binary default subtype
-var BSON_BINARY_SUBTYPE_DEFAULT = 0;
-
-/**
- * @ignore
- * @api private
- */
-var writeStringToArray = function(data) {
-  // Create a buffer
-  var buffer = typeof Uint8Array != 'undefined' ? new Uint8Array(new ArrayBuffer(data.length)) : new Array(data.length);
-  // Write the content to the buffer
-  for(var i = 0; i < data.length; i++) {
-    buffer[i] = data.charCodeAt(i);
-  }  
-  // Write the string to the buffer
-  return buffer;
-}
-
-/**
- * Convert Array ot Uint8Array to Binary String
- *
- * @ignore
- * @api private
- */
-var convertArraytoUtf8BinaryString = function(byteArray, startIndex, endIndex) {
-  var result = "";
-  for(var i = startIndex; i < endIndex; i++) {
-   result = result + String.fromCharCode(byteArray[i]);
-  }
-  return result;  
-};
 
 /**
  * A class representation of the BSON Binary type.
@@ -12120,10 +12461,10 @@ var convertArraytoUtf8BinaryString = function(byteArray, startIndex, endIndex) {
  *  - **BSON.BSON_BINARY_SUBTYPE_MD5**, BSON md5 type.
  *  - **BSON.BSON_BINARY_SUBTYPE_USER_DEFINED**, BSON user defined type.
  *
- * @class Represents the Binary BSON type.
+ * @class Represents a BSON Binary type.
  * @param {Buffer} buffer a buffer object containing the binary data.
  * @param {Number} [subType] the option binary type.
- * @return {Grid}
+ * @return {Binary}
  */
 function Binary(buffer, subType) {
   if(!(this instanceof Binary)) return new Binary(buffer, subType);
@@ -12169,8 +12510,8 @@ function Binary(buffer, subType) {
 /**
  * Updates this binary with byte_value.
  *
- * @param {Character} byte_value a single byte we wish to write.
- * @api public
+ * @method
+ * @param {string} byte_value a single byte we wish to write.
  */
 Binary.prototype.put = function put(byte_value) {
   // If it's a string and a has more than one character throw an error
@@ -12222,9 +12563,10 @@ Binary.prototype.put = function put(byte_value) {
 /**
  * Writes a buffer or string to the binary.
  *
- * @param {Buffer|String} string a string or buffer to be written to the Binary BSON object.
- * @param {Number} offset specify the binary of where to write the content.
- * @api public
+ * @method
+ * @param {(Buffer|string)} string a string or buffer to be written to the Binary BSON object.
+ * @param {number} offset specify the binary of where to write the content.
+ * @return {null}
  */
 Binary.prototype.write = function write(string, offset) {
   offset = typeof offset == 'number' ? offset : this.position;
@@ -12276,10 +12618,10 @@ Binary.prototype.write = function write(string, offset) {
 /**
  * Reads **length** bytes starting at **position**.
  *
- * @param {Number} position read from the given position in the Binary.
- * @param {Number} length the number of bytes to read.
+ * @method
+ * @param {number} position read from the given position in the Binary.
+ * @param {number} length the number of bytes to read.
  * @return {Buffer}
- * @api public
  */
 Binary.prototype.read = function read(position, length) {
   length = length && length > 0
@@ -12303,8 +12645,8 @@ Binary.prototype.read = function read(position, length) {
 /**
  * Returns the value of this binary as a string.
  *
- * @return {String}
- * @api public
+ * @method
+ * @return {string}
  */
 Binary.prototype.value = function value(asRaw) {
   asRaw = asRaw == null ? false : asRaw;  
@@ -12340,8 +12682,8 @@ Binary.prototype.value = function value(asRaw) {
 /**
  * Length.
  *
- * @return {Number} the length of the binary.
- * @api public
+ * @method
+ * @return {number} the length of the binary.
  */
 Binary.prototype.length = function length() {
   return this.position;
@@ -12349,7 +12691,6 @@ Binary.prototype.length = function length() {
 
 /**
  * @ignore
- * @api private
  */
 Binary.prototype.toJSON = function() {
   return this.buffer != null ? this.buffer.toString('base64') : '';
@@ -12357,11 +12698,43 @@ Binary.prototype.toJSON = function() {
 
 /**
  * @ignore
- * @api private
  */
 Binary.prototype.toString = function(format) {
   return this.buffer != null ? this.buffer.slice(0, this.position).toString(format) : '';
 }
+
+/**
+ * Binary default subtype
+ * @ignore 
+ */
+var BSON_BINARY_SUBTYPE_DEFAULT = 0;
+
+/**
+ * @ignore
+ */
+var writeStringToArray = function(data) {
+  // Create a buffer
+  var buffer = typeof Uint8Array != 'undefined' ? new Uint8Array(new ArrayBuffer(data.length)) : new Array(data.length);
+  // Write the content to the buffer
+  for(var i = 0; i < data.length; i++) {
+    buffer[i] = data.charCodeAt(i);
+  }  
+  // Write the string to the buffer
+  return buffer;
+}
+
+/**
+ * Convert Array ot Uint8Array to Binary String
+ *
+ * @ignore
+ */
+var convertArraytoUtf8BinaryString = function(byteArray, startIndex, endIndex) {
+  var result = "";
+  for(var i = startIndex; i < endIndex; i++) {
+   result = result + String.fromCharCode(byteArray[i]);
+  }
+  return result;  
+};
 
 Binary.BUFFER_SIZE = 256;
 
@@ -12411,10 +12784,9 @@ Binary.SUBTYPE_USER_DEFINED = 128;
 /**
  * Expose.
  */
-exports.Binary = Binary;
-
-
-},{"buffer":40}],52:[function(require,module,exports){
+module.exports = Binary;
+module.exports.Binary = Binary;
+},{"buffer":40}],53:[function(require,module,exports){
 (function (process){
 /**
  * Binary Parser.
@@ -12803,7 +13175,7 @@ BinaryParser.Buffer = BinaryParserBuffer;
 exports.BinaryParser = BinaryParser;
 
 }).call(this,require("FWaASH"))
-},{"FWaASH":46,"util":48}],53:[function(require,module,exports){
+},{"FWaASH":46,"util":48}],54:[function(require,module,exports){
 (function (Buffer){
 var Long = require('./long').Long
   , Double = require('./double').Double
@@ -14380,12 +14752,12 @@ exports.MinKey = MinKey;
 exports.MaxKey = MaxKey;
 
 }).call(this,require("buffer").Buffer)
-},{"./binary":51,"./binary_parser":52,"./code":54,"./db_ref":55,"./double":56,"./float_parser":57,"./long":58,"./max_key":59,"./min_key":60,"./objectid":61,"./symbol":62,"./timestamp":63,"buffer":40}],54:[function(require,module,exports){
+},{"./binary":52,"./binary_parser":53,"./code":55,"./db_ref":56,"./double":57,"./float_parser":58,"./long":59,"./max_key":60,"./min_key":61,"./objectid":62,"./symbol":63,"./timestamp":64,"buffer":40}],55:[function(require,module,exports){
 /**
  * A class representation of the BSON Code type.
  *
- * @class Represents the BSON Code type.
- * @param {String|Function} code a string or function.
+ * @class Represents a BSON Code and Code with scope type.
+ * @param {(string|function)} code a string or function.
  * @param {Object} [scope] an optional scope for the function.
  * @return {Code}
  */
@@ -14398,21 +14770,21 @@ var Code = function Code(code, scope) {
 
 /**
  * @ignore
- * @api private
  */
 Code.prototype.toJSON = function() {
   return {scope:this.scope, code:this.code};
 }
 
-exports.Code = Code;
-},{}],55:[function(require,module,exports){
+module.exports = Code;
+module.exports.Code = Code;
+},{}],56:[function(require,module,exports){
 /**
  * A class representation of the BSON DBRef type.
  *
- * @class Represents the BSON DBRef type.
- * @param {String} namespace the collection name.
+ * @class Represents a BSON DbRef type.
+ * @param {string} namespace the collection name.
  * @param {ObjectID} oid the reference ObjectID.
- * @param {String} [db] optional db name, if omitted the reference is local to the current db.
+ * @param {string} [db] optional db name, if omitted the reference is local to the current db.
  * @return {DBRef}
  */
 function DBRef(namespace, oid, db) {
@@ -14436,13 +14808,14 @@ DBRef.prototype.toJSON = function() {
   };
 }
 
-exports.DBRef = DBRef;
-},{}],56:[function(require,module,exports){
+module.exports = DBRef;
+module.exports.DBRef = DBRef;
+},{}],57:[function(require,module,exports){
 /**
  * A class representation of the BSON Double type.
  *
- * @class Represents the BSON Double type.
- * @param {Number} value the number we want to represent as a double.
+ * @class Represents a BSON Double type.
+ * @param {number} value the number we want to represent as a double.
  * @return {Double}
  */
 function Double(value) {
@@ -14455,8 +14828,8 @@ function Double(value) {
 /**
  * Access the number value.
  *
- * @return {Number} returns the wrapped double number.
- * @api public
+ * @method
+ * @return {number} returns the wrapped double number.
  */
 Double.prototype.valueOf = function() {
   return this.value;
@@ -14464,14 +14837,14 @@ Double.prototype.valueOf = function() {
 
 /**
  * @ignore
- * @api private
  */
 Double.prototype.toJSON = function() {
   return this.value;
 }
 
-exports.Double = Double;
-},{}],57:[function(require,module,exports){
+module.exports = Double;
+module.exports.Double = Double;
+},{}],58:[function(require,module,exports){
 // Copyright (c) 2008, Fair Oaks Labs, Inc.
 // All rights reserved.
 // 
@@ -14593,7 +14966,7 @@ var writeIEEE754 = function(buffer, value, offset, endian, mLen, nBytes) {
 
 exports.readIEEE754 = readIEEE754;
 exports.writeIEEE754 = writeIEEE754;
-},{}],58:[function(require,module,exports){
+},{}],59:[function(require,module,exports){
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -14632,8 +15005,9 @@ exports.writeIEEE754 = writeIEEE754;
  * case would often result in infinite recursion.
  *
  * @class Represents the BSON Long type.
- * @param {Number} low  the low (signed) 32 bits of the Long.
- * @param {Number} high the high (signed) 32 bits of the Long.
+ * @param {number} low  the low (signed) 32 bits of the Long.
+ * @param {number} high the high (signed) 32 bits of the Long.
+ * @return {Long}
  */
 function Long(low, high) {
   if(!(this instanceof Long)) return new Long(low, high);
@@ -14641,13 +15015,13 @@ function Long(low, high) {
   this._bsontype = 'Long';
   /**
    * @type {number}
-   * @api private
+   * @ignore
    */
   this.low_ = low | 0;  // force into 32 signed bits.
 
   /**
    * @type {number}
-   * @api private
+   * @ignore
    */
   this.high_ = high | 0;  // force into 32 signed bits.
 };
@@ -14655,8 +15029,8 @@ function Long(low, high) {
 /**
  * Return the int value.
  *
- * @return {Number} the value, assuming it is a 32-bit integer.
- * @api public
+ * @method
+ * @return {number} the value, assuming it is a 32-bit integer.
  */
 Long.prototype.toInt = function() {
   return this.low_;
@@ -14665,8 +15039,8 @@ Long.prototype.toInt = function() {
 /**
  * Return the Number value.
  *
- * @return {Number} the closest floating-point representation to this value.
- * @api public
+ * @method
+ * @return {number} the closest floating-point representation to this value.
  */
 Long.prototype.toNumber = function() {
   return this.high_ * Long.TWO_PWR_32_DBL_ +
@@ -14676,8 +15050,8 @@ Long.prototype.toNumber = function() {
 /**
  * Return the JSON value.
  *
- * @return {String} the JSON representation.
- * @api public
+ * @method
+ * @return {string} the JSON representation.
  */
 Long.prototype.toJSON = function() {
   return this.toString();
@@ -14686,9 +15060,9 @@ Long.prototype.toJSON = function() {
 /**
  * Return the String value.
  *
- * @param {Number} [opt_radix] the radix in which the text should be written.
- * @return {String} the textual representation of this value.
- * @api public
+ * @method
+ * @param {number} [opt_radix] the radix in which the text should be written.
+ * @return {string} the textual representation of this value.
  */
 Long.prototype.toString = function(opt_radix) {
   var radix = opt_radix || 10;
@@ -14739,8 +15113,8 @@ Long.prototype.toString = function(opt_radix) {
 /**
  * Return the high 32-bits value.
  *
- * @return {Number} the high 32-bits as a signed value.
- * @api public
+ * @method
+ * @return {number} the high 32-bits as a signed value.
  */
 Long.prototype.getHighBits = function() {
   return this.high_;
@@ -14749,8 +15123,8 @@ Long.prototype.getHighBits = function() {
 /**
  * Return the low 32-bits value.
  *
- * @return {Number} the low 32-bits as a signed value.
- * @api public
+ * @method
+ * @return {number} the low 32-bits as a signed value.
  */
 Long.prototype.getLowBits = function() {
   return this.low_;
@@ -14759,8 +15133,8 @@ Long.prototype.getLowBits = function() {
 /**
  * Return the low unsigned 32-bits value.
  *
- * @return {Number} the low 32-bits as an unsigned value.
- * @api public
+ * @method
+ * @return {number} the low 32-bits as an unsigned value.
  */
 Long.prototype.getLowBitsUnsigned = function() {
   return (this.low_ >= 0) ?
@@ -14770,8 +15144,8 @@ Long.prototype.getLowBitsUnsigned = function() {
 /**
  * Returns the number of bits needed to represent the absolute value of this Long.
  *
- * @return {Number} Returns the number of bits needed to represent the absolute value of this Long.
- * @api public
+ * @method
+ * @return {number} Returns the number of bits needed to represent the absolute value of this Long.
  */
 Long.prototype.getNumBitsAbs = function() {
   if (this.isNegative()) {
@@ -14794,8 +15168,8 @@ Long.prototype.getNumBitsAbs = function() {
 /**
  * Return whether this value is zero.
  *
- * @return {Boolean} whether this value is zero.
- * @api public
+ * @method
+ * @return {boolean} whether this value is zero.
  */
 Long.prototype.isZero = function() {
   return this.high_ == 0 && this.low_ == 0;
@@ -14804,8 +15178,8 @@ Long.prototype.isZero = function() {
 /**
  * Return whether this value is negative.
  *
- * @return {Boolean} whether this value is negative.
- * @api public
+ * @method
+ * @return {boolean} whether this value is negative.
  */
 Long.prototype.isNegative = function() {
   return this.high_ < 0;
@@ -14814,8 +15188,8 @@ Long.prototype.isNegative = function() {
 /**
  * Return whether this value is odd.
  *
- * @return {Boolean} whether this value is odd.
- * @api public
+ * @method
+ * @return {boolean} whether this value is odd.
  */
 Long.prototype.isOdd = function() {
   return (this.low_ & 1) == 1;
@@ -14824,9 +15198,9 @@ Long.prototype.isOdd = function() {
 /**
  * Return whether this Long equals the other
  *
+ * @method
  * @param {Long} other Long to compare against.
- * @return {Boolean} whether this Long equals the other
- * @api public
+ * @return {boolean} whether this Long equals the other
  */
 Long.prototype.equals = function(other) {
   return (this.high_ == other.high_) && (this.low_ == other.low_);
@@ -14835,9 +15209,9 @@ Long.prototype.equals = function(other) {
 /**
  * Return whether this Long does not equal the other.
  *
+ * @method
  * @param {Long} other Long to compare against.
- * @return {Boolean} whether this Long does not equal the other.
- * @api public
+ * @return {boolean} whether this Long does not equal the other.
  */
 Long.prototype.notEquals = function(other) {
   return (this.high_ != other.high_) || (this.low_ != other.low_);
@@ -14846,9 +15220,9 @@ Long.prototype.notEquals = function(other) {
 /**
  * Return whether this Long is less than the other.
  *
+ * @method
  * @param {Long} other Long to compare against.
- * @return {Boolean} whether this Long is less than the other.
- * @api public
+ * @return {boolean} whether this Long is less than the other.
  */
 Long.prototype.lessThan = function(other) {
   return this.compare(other) < 0;
@@ -14857,9 +15231,9 @@ Long.prototype.lessThan = function(other) {
 /**
  * Return whether this Long is less than or equal to the other.
  *
+ * @method
  * @param {Long} other Long to compare against.
- * @return {Boolean} whether this Long is less than or equal to the other.
- * @api public
+ * @return {boolean} whether this Long is less than or equal to the other.
  */
 Long.prototype.lessThanOrEqual = function(other) {
   return this.compare(other) <= 0;
@@ -14868,9 +15242,9 @@ Long.prototype.lessThanOrEqual = function(other) {
 /**
  * Return whether this Long is greater than the other.
  *
+ * @method
  * @param {Long} other Long to compare against.
- * @return {Boolean} whether this Long is greater than the other.
- * @api public
+ * @return {boolean} whether this Long is greater than the other.
  */
 Long.prototype.greaterThan = function(other) {
   return this.compare(other) > 0;
@@ -14879,9 +15253,9 @@ Long.prototype.greaterThan = function(other) {
 /**
  * Return whether this Long is greater than or equal to the other.
  *
+ * @method
  * @param {Long} other Long to compare against.
- * @return {Boolean} whether this Long is greater than or equal to the other.
- * @api public
+ * @return {boolean} whether this Long is greater than or equal to the other.
  */
 Long.prototype.greaterThanOrEqual = function(other) {
   return this.compare(other) >= 0;
@@ -14890,9 +15264,9 @@ Long.prototype.greaterThanOrEqual = function(other) {
 /**
  * Compares this Long with the given one.
  *
+ * @method
  * @param {Long} other Long to compare against.
- * @return {Boolean} 0 if they are the same, 1 if the this is greater, and -1 if the given one is greater.
- * @api public
+ * @return {boolean} 0 if they are the same, 1 if the this is greater, and -1 if the given one is greater.
  */
 Long.prototype.compare = function(other) {
   if (this.equals(other)) {
@@ -14919,8 +15293,8 @@ Long.prototype.compare = function(other) {
 /**
  * The negation of this value.
  *
+ * @method
  * @return {Long} the negation of this value.
- * @api public
  */
 Long.prototype.negate = function() {
   if (this.equals(Long.MIN_VALUE)) {
@@ -14933,9 +15307,9 @@ Long.prototype.negate = function() {
 /**
  * Returns the sum of this and the given Long.
  *
+ * @method
  * @param {Long} other Long to add to this one.
  * @return {Long} the sum of this and the given Long.
- * @api public
  */
 Long.prototype.add = function(other) {
   // Divide each number into 4 chunks of 16 bits, and then sum the chunks.
@@ -14968,9 +15342,9 @@ Long.prototype.add = function(other) {
 /**
  * Returns the difference of this and the given Long.
  *
+ * @method
  * @param {Long} other Long to subtract from this.
  * @return {Long} the difference of this and the given Long.
- * @api public
  */
 Long.prototype.subtract = function(other) {
   return this.add(other.negate());
@@ -14979,9 +15353,9 @@ Long.prototype.subtract = function(other) {
 /**
  * Returns the product of this and the given Long.
  *
+ * @method
  * @param {Long} other Long to multiply with this.
  * @return {Long} the product of this and the other.
- * @api public
  */
 Long.prototype.multiply = function(other) {
   if (this.isZero()) {
@@ -15052,9 +15426,9 @@ Long.prototype.multiply = function(other) {
 /**
  * Returns this Long divided by the given one.
  *
+ * @method
  * @param {Long} other Long by which to divide.
  * @return {Long} this Long divided by the given one.
- * @api public
  */
 Long.prototype.div = function(other) {
   if (other.isZero()) {
@@ -15137,9 +15511,9 @@ Long.prototype.div = function(other) {
 /**
  * Returns this Long modulo the given one.
  *
+ * @method
  * @param {Long} other Long by which to mod.
  * @return {Long} this Long modulo the given one.
- * @api public
  */
 Long.prototype.modulo = function(other) {
   return this.subtract(this.div(other).multiply(other));
@@ -15148,8 +15522,8 @@ Long.prototype.modulo = function(other) {
 /**
  * The bitwise-NOT of this value.
  *
+ * @method
  * @return {Long} the bitwise-NOT of this value.
- * @api public
  */
 Long.prototype.not = function() {
   return Long.fromBits(~this.low_, ~this.high_);
@@ -15158,9 +15532,9 @@ Long.prototype.not = function() {
 /**
  * Returns the bitwise-AND of this Long and the given one.
  *
+ * @method
  * @param {Long} other the Long with which to AND.
  * @return {Long} the bitwise-AND of this and the other.
- * @api public
  */
 Long.prototype.and = function(other) {
   return Long.fromBits(this.low_ & other.low_, this.high_ & other.high_);
@@ -15169,9 +15543,9 @@ Long.prototype.and = function(other) {
 /**
  * Returns the bitwise-OR of this Long and the given one.
  *
+ * @method
  * @param {Long} other the Long with which to OR.
  * @return {Long} the bitwise-OR of this and the other.
- * @api public
  */
 Long.prototype.or = function(other) {
   return Long.fromBits(this.low_ | other.low_, this.high_ | other.high_);
@@ -15180,9 +15554,9 @@ Long.prototype.or = function(other) {
 /**
  * Returns the bitwise-XOR of this Long and the given one.
  *
+ * @method
  * @param {Long} other the Long with which to XOR.
  * @return {Long} the bitwise-XOR of this and the other.
- * @api public
  */
 Long.prototype.xor = function(other) {
   return Long.fromBits(this.low_ ^ other.low_, this.high_ ^ other.high_);
@@ -15191,9 +15565,9 @@ Long.prototype.xor = function(other) {
 /**
  * Returns this Long with bits shifted to the left by the given amount.
  *
- * @param {Number} numBits the number of bits by which to shift.
+ * @method
+ * @param {number} numBits the number of bits by which to shift.
  * @return {Long} this shifted to the left by the given amount.
- * @api public
  */
 Long.prototype.shiftLeft = function(numBits) {
   numBits &= 63;
@@ -15215,9 +15589,9 @@ Long.prototype.shiftLeft = function(numBits) {
 /**
  * Returns this Long with bits shifted to the right by the given amount.
  *
- * @param {Number} numBits the number of bits by which to shift.
+ * @method
+ * @param {number} numBits the number of bits by which to shift.
  * @return {Long} this shifted to the right by the given amount.
- * @api public
  */
 Long.prototype.shiftRight = function(numBits) {
   numBits &= 63;
@@ -15241,9 +15615,9 @@ Long.prototype.shiftRight = function(numBits) {
 /**
  * Returns this Long with bits shifted to the right by the given amount, with the new top bits matching the current sign bit.
  *
- * @param {Number} numBits the number of bits by which to shift.
+ * @method
+ * @param {number} numBits the number of bits by which to shift.
  * @return {Long} this shifted to the right by the given amount, with zeros placed into the new leading bits.
- * @api public
  */
 Long.prototype.shiftRightUnsigned = function(numBits) {
   numBits &= 63;
@@ -15267,9 +15641,9 @@ Long.prototype.shiftRightUnsigned = function(numBits) {
 /**
  * Returns a Long representing the given (32-bit) integer value.
  *
- * @param {Number} value the 32-bit integer in question.
+ * @method
+ * @param {number} value the 32-bit integer in question.
  * @return {Long} the corresponding Long value.
- * @api public
  */
 Long.fromInt = function(value) {
   if (-128 <= value && value < 128) {
@@ -15289,9 +15663,9 @@ Long.fromInt = function(value) {
 /**
  * Returns a Long representing the given value, provided that it is a finite number. Otherwise, zero is returned.
  *
- * @param {Number} value the number in question.
+ * @method
+ * @param {number} value the number in question.
  * @return {Long} the corresponding Long value.
- * @api public
  */
 Long.fromNumber = function(value) {
   if (isNaN(value) || !isFinite(value)) {
@@ -15312,10 +15686,10 @@ Long.fromNumber = function(value) {
 /**
  * Returns a Long representing the 64-bit integer that comes by concatenating the given high and low bits. Each is assumed to use 32 bits.
  *
- * @param {Number} lowBits the low 32-bits.
- * @param {Number} highBits the high 32-bits.
+ * @method
+ * @param {number} lowBits the low 32-bits.
+ * @param {number} highBits the high 32-bits.
  * @return {Long} the corresponding Long value.
- * @api public
  */
 Long.fromBits = function(lowBits, highBits) {
   return new Long(lowBits, highBits);
@@ -15324,10 +15698,10 @@ Long.fromBits = function(lowBits, highBits) {
 /**
  * Returns a Long representation of the given string, written using the given radix.
  *
- * @param {String} str the textual representation of the Long.
- * @param {Number} opt_radix the radix in which the text is written.
+ * @method
+ * @param {string} str the textual representation of the Long.
+ * @param {number} opt_radix the radix in which the text is written.
  * @return {Long} the corresponding Long value.
- * @api public
  */
 Long.fromString = function(str, opt_radix) {
   if (str.length == 0) {
@@ -15371,7 +15745,7 @@ Long.fromString = function(str, opt_radix) {
 /**
  * A cache of the Long representations of small integer values.
  * @type {Object}
- * @api private
+ * @ignore
  */
 Long.INT_CACHE_ = {};
 
@@ -15382,43 +15756,43 @@ Long.INT_CACHE_ = {};
  * Number used repeated below in calculations.  This must appear before the
  * first call to any from* function below.
  * @type {number}
- * @api private
+ * @ignore
  */
 Long.TWO_PWR_16_DBL_ = 1 << 16;
 
 /**
  * @type {number}
- * @api private
+ * @ignore
  */
 Long.TWO_PWR_24_DBL_ = 1 << 24;
 
 /**
  * @type {number}
- * @api private
+ * @ignore
  */
 Long.TWO_PWR_32_DBL_ = Long.TWO_PWR_16_DBL_ * Long.TWO_PWR_16_DBL_;
 
 /**
  * @type {number}
- * @api private
+ * @ignore
  */
 Long.TWO_PWR_31_DBL_ = Long.TWO_PWR_32_DBL_ / 2;
 
 /**
  * @type {number}
- * @api private
+ * @ignore
  */
 Long.TWO_PWR_48_DBL_ = Long.TWO_PWR_32_DBL_ * Long.TWO_PWR_16_DBL_;
 
 /**
  * @type {number}
- * @api private
+ * @ignore
  */
 Long.TWO_PWR_64_DBL_ = Long.TWO_PWR_32_DBL_ * Long.TWO_PWR_32_DBL_;
 
 /**
  * @type {number}
- * @api private
+ * @ignore
  */
 Long.TWO_PWR_63_DBL_ = Long.TWO_PWR_64_DBL_ / 2;
 
@@ -15440,20 +15814,21 @@ Long.MIN_VALUE = Long.fromBits(0, 0x80000000 | 0);
 
 /**
  * @type {Long}
- * @api private
+ * @ignore
  */
 Long.TWO_PWR_24_ = Long.fromInt(1 << 24);
 
 /**
  * Expose.
  */
-exports.Long = Long;
-},{}],59:[function(require,module,exports){
+module.exports = Long;
+module.exports.Long = Long;
+},{}],60:[function(require,module,exports){
 /**
  * A class representation of the BSON MaxKey type.
  *
- * @class Represents the BSON MaxKey type.
- * @return {MaxKey}
+ * @class Represents a BSON MaxKey type.
+ * @return {MaxKey} A MaxKey instance
  */
 function MaxKey() {
   if(!(this instanceof MaxKey)) return new MaxKey();
@@ -15461,13 +15836,14 @@ function MaxKey() {
   this._bsontype = 'MaxKey';  
 }
 
-exports.MaxKey = MaxKey;
-},{}],60:[function(require,module,exports){
+module.exports = MaxKey;
+module.exports.MaxKey = MaxKey;
+},{}],61:[function(require,module,exports){
 /**
  * A class representation of the BSON MinKey type.
  *
- * @class Represents the BSON MinKey type.
- * @return {MinKey}
+ * @class Represents a BSON MinKey type.
+ * @return {MinKey} A MinKey instance
  */
 function MinKey() {
   if(!(this instanceof MinKey)) return new MinKey();
@@ -15475,11 +15851,13 @@ function MinKey() {
   this._bsontype = 'MinKey';
 }
 
-exports.MinKey = MinKey;
-},{}],61:[function(require,module,exports){
+module.exports = MinKey;
+module.exports.MinKey = MinKey;
+},{}],62:[function(require,module,exports){
 (function (process){
 /**
  * Module dependencies.
+ * @ignore
  */
 var BinaryParser = require('./binary_parser').BinaryParser;
 
@@ -15489,6 +15867,7 @@ var BinaryParser = require('./binary_parser').BinaryParser;
  * Create a random 3-byte value (i.e. unique for this
  * process). Other drivers use a md5 of the machine id here, but
  * that would mean an asyc call to gethostname, so we don't bother.
+ * @ignore
  */
 var MACHINE_ID = parseInt(Math.random() * 0xFFFFFF, 10);
 
@@ -15498,9 +15877,10 @@ var checkForHexRegExp = new RegExp("^[0-9a-fA-F]{24}$");
 /**
 * Create a new ObjectID instance
 *
-* @class Represents the BSON ObjectID type
-* @param {String|Number} id Can be a 24 byte hex string, 12 byte binary string or a Number.
-* @return {Object} instance of ObjectID.
+* @class Represents a BSON ObjectId type.
+* @param {(string|number)} id Can be a 24 byte hex string, 12 byte binary string or a Number.
+* @property {number} generationTime The generation time of this ObjectId instance
+* @return {ObjectID} instance of ObjectID.
 */
 var ObjectID = function ObjectID(id) {
   if(!(this instanceof ObjectID)) return new ObjectID(id);
@@ -15538,8 +15918,8 @@ for (var i = 0; i < 256; i++) {
 /**
 * Return the ObjectID id as a 24 byte hex string representation
 *
-* @return {String} return the 24 byte hex string representation.
-* @api public
+* @method
+* @return {string} return the 24 byte hex string representation.
 */
 ObjectID.prototype.toHexString = function() {
   if(ObjectID.cacheHexString && this.__id) return this.__id;
@@ -15557,8 +15937,9 @@ ObjectID.prototype.toHexString = function() {
 /**
 * Update the ObjectID index used in generating new ObjectID's on the driver
 *
-* @return {Number} returns next index value.
-* @api private
+* @method
+* @return {number} returns next index value.
+* @ignore
 */
 ObjectID.prototype.get_inc = function() {
   return ObjectID.index = (ObjectID.index + 1) % 0xFFFFFF;
@@ -15567,8 +15948,9 @@ ObjectID.prototype.get_inc = function() {
 /**
 * Update the ObjectID index used in generating new ObjectID's on the driver
 *
-* @return {Number} returns next index value.
-* @api private
+* @method
+* @return {number} returns next index value.
+* @ignore
 */
 ObjectID.prototype.getInc = function() {
   return this.get_inc();
@@ -15577,9 +15959,9 @@ ObjectID.prototype.getInc = function() {
 /**
 * Generate a 12 byte id string used in ObjectID's
 *
-* @param {Number} [time] optional parameter allowing to pass in a second based timestamp.
-* @return {String} return the 12 byte id binary string.
-* @api private
+* @method
+* @param {number} [time] optional parameter allowing to pass in a second based timestamp.
+* @return {string} return the 12 byte id binary string.
 */
 ObjectID.prototype.generate = function(time) {
   if ('number' != typeof time) {
@@ -15589,7 +15971,7 @@ ObjectID.prototype.generate = function(time) {
   var time4Bytes = BinaryParser.encodeInt(time, 32, true, true);
   /* for time-based ObjectID the bytes following the time will be zeroed */
   var machine3Bytes = BinaryParser.encodeInt(MACHINE_ID, 24, false);
-  var pid2Bytes = BinaryParser.fromShort(typeof process === 'undefined' ? Math.floor(Math.random() * 100000) : process.pid);
+  var pid2Bytes = BinaryParser.fromShort(typeof process === 'undefined' ? Math.floor(Math.random() * 100000) : process.pid % 0xFFFF);
   var index3Bytes = BinaryParser.encodeInt(this.get_inc(), 24, false, true);
 
   return time4Bytes + machine3Bytes + pid2Bytes + index3Bytes;
@@ -15599,7 +15981,7 @@ ObjectID.prototype.generate = function(time) {
 * Converts the id into a 24 byte hex string for printing
 *
 * @return {String} return the 24 byte hex string representation.
-* @api private
+* @ignore
 */
 ObjectID.prototype.toString = function() {
   return this.toHexString();
@@ -15609,7 +15991,7 @@ ObjectID.prototype.toString = function() {
 * Converts to a string representation of this Id.
 *
 * @return {String} return the 24 byte hex string representation.
-* @api private
+* @ignore
 */
 ObjectID.prototype.inspect = ObjectID.prototype.toString;
 
@@ -15617,7 +15999,7 @@ ObjectID.prototype.inspect = ObjectID.prototype.toString;
 * Converts to its JSON representation.
 *
 * @return {String} return the 24 byte hex string representation.
-* @api private
+* @ignore
 */
 ObjectID.prototype.toJSON = function() {
   return this.toHexString();
@@ -15626,9 +16008,9 @@ ObjectID.prototype.toJSON = function() {
 /**
 * Compares the equality of this ObjectID with `otherID`.
 *
-* @param {Object} otherID ObjectID instance to compare against.
-* @return {Bool} the result of comparing two ObjectID's
-* @api public
+* @method
+* @param {object} otherID ObjectID instance to compare against.
+* @return {boolean} the result of comparing two ObjectID's
 */
 ObjectID.prototype.equals = function equals (otherID) {
   if(otherID == null) return false;
@@ -15642,8 +16024,8 @@ ObjectID.prototype.equals = function equals (otherID) {
 /**
 * Returns the generation date (accurate up to the second) that this ID was generated.
 *
-* @return {Date} the generation date
-* @api public
+* @method
+* @return {date} the generation date
 */
 ObjectID.prototype.getTimestamp = function() {
   var timestamp = new Date();
@@ -15653,10 +16035,12 @@ ObjectID.prototype.getTimestamp = function() {
 
 /**
 * @ignore
-* @api private
 */
 ObjectID.index = parseInt(Math.random() * 0xFFFFFF, 10);
 
+/**
+* @ignore
+*/
 ObjectID.createPk = function createPk () {
   return new ObjectID();
 };
@@ -15664,9 +16048,9 @@ ObjectID.createPk = function createPk () {
 /**
 * Creates an ObjectID from a second based number, with the rest of the ObjectID zeroed out. Used for comparisons or sorting the ObjectID.
 *
-* @param {Number} time an integer number representing a number of seconds.
+* @method
+* @param {number} time an integer number representing a number of seconds.
 * @return {ObjectID} return the created ObjectID
-* @api public
 */
 ObjectID.createFromTime = function createFromTime (time) {
   var id = BinaryParser.encodeInt(time, 32, true, true) +
@@ -15677,9 +16061,9 @@ ObjectID.createFromTime = function createFromTime (time) {
 /**
 * Creates an ObjectID from a hex string representation of an ObjectID.
 *
-* @param {String} hexString create a ObjectID from a passed in 24 byte hexstring.
+* @method
+* @param {string} hexString create a ObjectID from a passed in 24 byte hexstring.
 * @return {ObjectID} return the created ObjectID
-* @api public
 */
 ObjectID.createFromHexString = function createFromHexString (hexString) {
   // Throw an error if it's not a valid setup
@@ -15708,8 +16092,8 @@ ObjectID.createFromHexString = function createFromHexString (hexString) {
 /**
 * Checks if a value is a valid bson ObjectId
 *
-* @return {Boolean} return true if the value is a valid bson ObjectId, return false otherwise.
-* @api public
+* @method
+* @return {boolean} return true if the value is a valid bson ObjectId, return false otherwise.
 */
 ObjectID.isValid = function isValid(id) {
   if(id == null) return false;
@@ -15742,16 +16126,17 @@ Object.defineProperty(ObjectID.prototype, "generationTime", {
 /**
  * Expose.
  */
-exports.ObjectID = ObjectID;
-exports.ObjectId = ObjectID;
-
+module.exports = ObjectID;
+module.exports.ObjectID = ObjectID;
+module.exports.ObjectId = ObjectID;
 }).call(this,require("FWaASH"))
-},{"./binary_parser":52,"FWaASH":46}],62:[function(require,module,exports){
+},{"./binary_parser":53,"FWaASH":46}],63:[function(require,module,exports){
 /**
  * A class representation of the BSON Symbol type.
  *
- * @class Represents the BSON Symbol type.
- * @param {String} value the string representing the symbol.
+ * @class Represents a BSON Symbol type.
+ * @deprecated
+ * @param {string} value the string representing the symbol.
  * @return {Symbol}
  */
 function Symbol(value) {
@@ -15763,8 +16148,8 @@ function Symbol(value) {
 /**
  * Access the wrapped string value.
  *
+ * @method
  * @return {String} returns the wrapped string.
- * @api public
  */
 Symbol.prototype.valueOf = function() {
   return this.value;
@@ -15772,7 +16157,6 @@ Symbol.prototype.valueOf = function() {
 
 /**
  * @ignore
- * @api private
  */
 Symbol.prototype.toString = function() {
   return this.value;
@@ -15780,7 +16164,6 @@ Symbol.prototype.toString = function() {
 
 /**
  * @ignore
- * @api private
  */
 Symbol.prototype.inspect = function() {
   return this.value;
@@ -15788,14 +16171,14 @@ Symbol.prototype.inspect = function() {
 
 /**
  * @ignore
- * @api private
  */
 Symbol.prototype.toJSON = function() {
   return this.value;
 }
 
-exports.Symbol = Symbol;
-},{}],63:[function(require,module,exports){
+module.exports = Symbol;
+module.exports.Symbol = Symbol;
+},{}],64:[function(require,module,exports){
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -15834,21 +16217,21 @@ exports.Symbol = Symbol;
  * case would often result in infinite recursion.
  *
  * @class Represents the BSON Timestamp type.
- * @param {Number} low  the low (signed) 32 bits of the Timestamp.
- * @param {Number} high the high (signed) 32 bits of the Timestamp.
+ * @param {number} low  the low (signed) 32 bits of the Timestamp.
+ * @param {number} high the high (signed) 32 bits of the Timestamp.
  */
 function Timestamp(low, high) {
   if(!(this instanceof Timestamp)) return new Timestamp(low, high);
   this._bsontype = 'Timestamp';
   /**
    * @type {number}
-   * @api private
+   * @ignore
    */
   this.low_ = low | 0;  // force into 32 signed bits.
 
   /**
    * @type {number}
-   * @api private
+   * @ignore
    */
   this.high_ = high | 0;  // force into 32 signed bits.
 };
@@ -15856,8 +16239,7 @@ function Timestamp(low, high) {
 /**
  * Return the int value.
  *
- * @return {Number} the value, assuming it is a 32-bit integer.
- * @api public
+ * @return {number} the value, assuming it is a 32-bit integer.
  */
 Timestamp.prototype.toInt = function() {
   return this.low_;
@@ -15866,8 +16248,8 @@ Timestamp.prototype.toInt = function() {
 /**
  * Return the Number value.
  *
- * @return {Number} the closest floating-point representation to this value.
- * @api public
+ * @method
+ * @return {number} the closest floating-point representation to this value.
  */
 Timestamp.prototype.toNumber = function() {
   return this.high_ * Timestamp.TWO_PWR_32_DBL_ +
@@ -15877,8 +16259,8 @@ Timestamp.prototype.toNumber = function() {
 /**
  * Return the JSON value.
  *
- * @return {String} the JSON representation.
- * @api public
+ * @method
+ * @return {string} the JSON representation.
  */
 Timestamp.prototype.toJSON = function() {
   return this.toString();
@@ -15887,9 +16269,9 @@ Timestamp.prototype.toJSON = function() {
 /**
  * Return the String value.
  *
- * @param {Number} [opt_radix] the radix in which the text should be written.
- * @return {String} the textual representation of this value.
- * @api public
+ * @method
+ * @param {number} [opt_radix] the radix in which the text should be written.
+ * @return {string} the textual representation of this value.
  */
 Timestamp.prototype.toString = function(opt_radix) {
   var radix = opt_radix || 10;
@@ -15940,8 +16322,8 @@ Timestamp.prototype.toString = function(opt_radix) {
 /**
  * Return the high 32-bits value.
  *
- * @return {Number} the high 32-bits as a signed value.
- * @api public
+ * @method
+ * @return {number} the high 32-bits as a signed value.
  */
 Timestamp.prototype.getHighBits = function() {
   return this.high_;
@@ -15950,8 +16332,8 @@ Timestamp.prototype.getHighBits = function() {
 /**
  * Return the low 32-bits value.
  *
- * @return {Number} the low 32-bits as a signed value.
- * @api public
+ * @method
+ * @return {number} the low 32-bits as a signed value.
  */
 Timestamp.prototype.getLowBits = function() {
   return this.low_;
@@ -15960,8 +16342,8 @@ Timestamp.prototype.getLowBits = function() {
 /**
  * Return the low unsigned 32-bits value.
  *
- * @return {Number} the low 32-bits as an unsigned value.
- * @api public
+ * @method
+ * @return {number} the low 32-bits as an unsigned value.
  */
 Timestamp.prototype.getLowBitsUnsigned = function() {
   return (this.low_ >= 0) ?
@@ -15971,8 +16353,8 @@ Timestamp.prototype.getLowBitsUnsigned = function() {
 /**
  * Returns the number of bits needed to represent the absolute value of this Timestamp.
  *
- * @return {Number} Returns the number of bits needed to represent the absolute value of this Timestamp.
- * @api public
+ * @method
+ * @return {number} Returns the number of bits needed to represent the absolute value of this Timestamp.
  */
 Timestamp.prototype.getNumBitsAbs = function() {
   if (this.isNegative()) {
@@ -15995,8 +16377,8 @@ Timestamp.prototype.getNumBitsAbs = function() {
 /**
  * Return whether this value is zero.
  *
- * @return {Boolean} whether this value is zero.
- * @api public
+ * @method
+ * @return {boolean} whether this value is zero.
  */
 Timestamp.prototype.isZero = function() {
   return this.high_ == 0 && this.low_ == 0;
@@ -16005,8 +16387,8 @@ Timestamp.prototype.isZero = function() {
 /**
  * Return whether this value is negative.
  *
- * @return {Boolean} whether this value is negative.
- * @api public
+ * @method
+ * @return {boolean} whether this value is negative.
  */
 Timestamp.prototype.isNegative = function() {
   return this.high_ < 0;
@@ -16015,8 +16397,8 @@ Timestamp.prototype.isNegative = function() {
 /**
  * Return whether this value is odd.
  *
- * @return {Boolean} whether this value is odd.
- * @api public
+ * @method
+ * @return {boolean} whether this value is odd.
  */
 Timestamp.prototype.isOdd = function() {
   return (this.low_ & 1) == 1;
@@ -16025,9 +16407,9 @@ Timestamp.prototype.isOdd = function() {
 /**
  * Return whether this Timestamp equals the other
  *
+ * @method
  * @param {Timestamp} other Timestamp to compare against.
- * @return {Boolean} whether this Timestamp equals the other
- * @api public
+ * @return {boolean} whether this Timestamp equals the other
  */
 Timestamp.prototype.equals = function(other) {
   return (this.high_ == other.high_) && (this.low_ == other.low_);
@@ -16036,9 +16418,9 @@ Timestamp.prototype.equals = function(other) {
 /**
  * Return whether this Timestamp does not equal the other.
  *
+ * @method
  * @param {Timestamp} other Timestamp to compare against.
- * @return {Boolean} whether this Timestamp does not equal the other.
- * @api public
+ * @return {boolean} whether this Timestamp does not equal the other.
  */
 Timestamp.prototype.notEquals = function(other) {
   return (this.high_ != other.high_) || (this.low_ != other.low_);
@@ -16047,9 +16429,9 @@ Timestamp.prototype.notEquals = function(other) {
 /**
  * Return whether this Timestamp is less than the other.
  *
+ * @method
  * @param {Timestamp} other Timestamp to compare against.
- * @return {Boolean} whether this Timestamp is less than the other.
- * @api public
+ * @return {boolean} whether this Timestamp is less than the other.
  */
 Timestamp.prototype.lessThan = function(other) {
   return this.compare(other) < 0;
@@ -16058,9 +16440,9 @@ Timestamp.prototype.lessThan = function(other) {
 /**
  * Return whether this Timestamp is less than or equal to the other.
  *
+ * @method
  * @param {Timestamp} other Timestamp to compare against.
- * @return {Boolean} whether this Timestamp is less than or equal to the other.
- * @api public
+ * @return {boolean} whether this Timestamp is less than or equal to the other.
  */
 Timestamp.prototype.lessThanOrEqual = function(other) {
   return this.compare(other) <= 0;
@@ -16069,9 +16451,9 @@ Timestamp.prototype.lessThanOrEqual = function(other) {
 /**
  * Return whether this Timestamp is greater than the other.
  *
+ * @method
  * @param {Timestamp} other Timestamp to compare against.
- * @return {Boolean} whether this Timestamp is greater than the other.
- * @api public
+ * @return {boolean} whether this Timestamp is greater than the other.
  */
 Timestamp.prototype.greaterThan = function(other) {
   return this.compare(other) > 0;
@@ -16080,9 +16462,9 @@ Timestamp.prototype.greaterThan = function(other) {
 /**
  * Return whether this Timestamp is greater than or equal to the other.
  *
+ * @method
  * @param {Timestamp} other Timestamp to compare against.
- * @return {Boolean} whether this Timestamp is greater than or equal to the other.
- * @api public
+ * @return {boolean} whether this Timestamp is greater than or equal to the other.
  */
 Timestamp.prototype.greaterThanOrEqual = function(other) {
   return this.compare(other) >= 0;
@@ -16091,9 +16473,9 @@ Timestamp.prototype.greaterThanOrEqual = function(other) {
 /**
  * Compares this Timestamp with the given one.
  *
+ * @method
  * @param {Timestamp} other Timestamp to compare against.
- * @return {Boolean} 0 if they are the same, 1 if the this is greater, and -1 if the given one is greater.
- * @api public
+ * @return {boolean} 0 if they are the same, 1 if the this is greater, and -1 if the given one is greater.
  */
 Timestamp.prototype.compare = function(other) {
   if (this.equals(other)) {
@@ -16120,8 +16502,8 @@ Timestamp.prototype.compare = function(other) {
 /**
  * The negation of this value.
  *
+ * @method
  * @return {Timestamp} the negation of this value.
- * @api public
  */
 Timestamp.prototype.negate = function() {
   if (this.equals(Timestamp.MIN_VALUE)) {
@@ -16134,9 +16516,9 @@ Timestamp.prototype.negate = function() {
 /**
  * Returns the sum of this and the given Timestamp.
  *
+ * @method
  * @param {Timestamp} other Timestamp to add to this one.
  * @return {Timestamp} the sum of this and the given Timestamp.
- * @api public
  */
 Timestamp.prototype.add = function(other) {
   // Divide each number into 4 chunks of 16 bits, and then sum the chunks.
@@ -16169,9 +16551,9 @@ Timestamp.prototype.add = function(other) {
 /**
  * Returns the difference of this and the given Timestamp.
  *
+ * @method
  * @param {Timestamp} other Timestamp to subtract from this.
  * @return {Timestamp} the difference of this and the given Timestamp.
- * @api public
  */
 Timestamp.prototype.subtract = function(other) {
   return this.add(other.negate());
@@ -16180,9 +16562,9 @@ Timestamp.prototype.subtract = function(other) {
 /**
  * Returns the product of this and the given Timestamp.
  *
+ * @method
  * @param {Timestamp} other Timestamp to multiply with this.
  * @return {Timestamp} the product of this and the other.
- * @api public
  */
 Timestamp.prototype.multiply = function(other) {
   if (this.isZero()) {
@@ -16253,9 +16635,9 @@ Timestamp.prototype.multiply = function(other) {
 /**
  * Returns this Timestamp divided by the given one.
  *
+ * @method
  * @param {Timestamp} other Timestamp by which to divide.
  * @return {Timestamp} this Timestamp divided by the given one.
- * @api public
  */
 Timestamp.prototype.div = function(other) {
   if (other.isZero()) {
@@ -16338,9 +16720,9 @@ Timestamp.prototype.div = function(other) {
 /**
  * Returns this Timestamp modulo the given one.
  *
+ * @method
  * @param {Timestamp} other Timestamp by which to mod.
  * @return {Timestamp} this Timestamp modulo the given one.
- * @api public
  */
 Timestamp.prototype.modulo = function(other) {
   return this.subtract(this.div(other).multiply(other));
@@ -16349,8 +16731,8 @@ Timestamp.prototype.modulo = function(other) {
 /**
  * The bitwise-NOT of this value.
  *
+ * @method
  * @return {Timestamp} the bitwise-NOT of this value.
- * @api public
  */
 Timestamp.prototype.not = function() {
   return Timestamp.fromBits(~this.low_, ~this.high_);
@@ -16359,9 +16741,9 @@ Timestamp.prototype.not = function() {
 /**
  * Returns the bitwise-AND of this Timestamp and the given one.
  *
+ * @method
  * @param {Timestamp} other the Timestamp with which to AND.
  * @return {Timestamp} the bitwise-AND of this and the other.
- * @api public
  */
 Timestamp.prototype.and = function(other) {
   return Timestamp.fromBits(this.low_ & other.low_, this.high_ & other.high_);
@@ -16370,9 +16752,9 @@ Timestamp.prototype.and = function(other) {
 /**
  * Returns the bitwise-OR of this Timestamp and the given one.
  *
+ * @method
  * @param {Timestamp} other the Timestamp with which to OR.
  * @return {Timestamp} the bitwise-OR of this and the other.
- * @api public
  */
 Timestamp.prototype.or = function(other) {
   return Timestamp.fromBits(this.low_ | other.low_, this.high_ | other.high_);
@@ -16381,9 +16763,9 @@ Timestamp.prototype.or = function(other) {
 /**
  * Returns the bitwise-XOR of this Timestamp and the given one.
  *
+ * @method
  * @param {Timestamp} other the Timestamp with which to XOR.
  * @return {Timestamp} the bitwise-XOR of this and the other.
- * @api public
  */
 Timestamp.prototype.xor = function(other) {
   return Timestamp.fromBits(this.low_ ^ other.low_, this.high_ ^ other.high_);
@@ -16392,9 +16774,9 @@ Timestamp.prototype.xor = function(other) {
 /**
  * Returns this Timestamp with bits shifted to the left by the given amount.
  *
- * @param {Number} numBits the number of bits by which to shift.
+ * @method
+ * @param {number} numBits the number of bits by which to shift.
  * @return {Timestamp} this shifted to the left by the given amount.
- * @api public
  */
 Timestamp.prototype.shiftLeft = function(numBits) {
   numBits &= 63;
@@ -16416,9 +16798,9 @@ Timestamp.prototype.shiftLeft = function(numBits) {
 /**
  * Returns this Timestamp with bits shifted to the right by the given amount.
  *
- * @param {Number} numBits the number of bits by which to shift.
+ * @method
+ * @param {number} numBits the number of bits by which to shift.
  * @return {Timestamp} this shifted to the right by the given amount.
- * @api public
  */
 Timestamp.prototype.shiftRight = function(numBits) {
   numBits &= 63;
@@ -16442,9 +16824,9 @@ Timestamp.prototype.shiftRight = function(numBits) {
 /**
  * Returns this Timestamp with bits shifted to the right by the given amount, with the new top bits matching the current sign bit.
  *
- * @param {Number} numBits the number of bits by which to shift.
+ * @method
+ * @param {number} numBits the number of bits by which to shift.
  * @return {Timestamp} this shifted to the right by the given amount, with zeros placed into the new leading bits.
- * @api public
  */
 Timestamp.prototype.shiftRightUnsigned = function(numBits) {
   numBits &= 63;
@@ -16468,9 +16850,9 @@ Timestamp.prototype.shiftRightUnsigned = function(numBits) {
 /**
  * Returns a Timestamp representing the given (32-bit) integer value.
  *
- * @param {Number} value the 32-bit integer in question.
+ * @method
+ * @param {number} value the 32-bit integer in question.
  * @return {Timestamp} the corresponding Timestamp value.
- * @api public
  */
 Timestamp.fromInt = function(value) {
   if (-128 <= value && value < 128) {
@@ -16490,9 +16872,9 @@ Timestamp.fromInt = function(value) {
 /**
  * Returns a Timestamp representing the given value, provided that it is a finite number. Otherwise, zero is returned.
  *
- * @param {Number} value the number in question.
+ * @method
+ * @param {number} value the number in question.
  * @return {Timestamp} the corresponding Timestamp value.
- * @api public
  */
 Timestamp.fromNumber = function(value) {
   if (isNaN(value) || !isFinite(value)) {
@@ -16513,10 +16895,10 @@ Timestamp.fromNumber = function(value) {
 /**
  * Returns a Timestamp representing the 64-bit integer that comes by concatenating the given high and low bits. Each is assumed to use 32 bits.
  *
- * @param {Number} lowBits the low 32-bits.
- * @param {Number} highBits the high 32-bits.
+ * @method
+ * @param {number} lowBits the low 32-bits.
+ * @param {number} highBits the high 32-bits.
  * @return {Timestamp} the corresponding Timestamp value.
- * @api public
  */
 Timestamp.fromBits = function(lowBits, highBits) {
   return new Timestamp(lowBits, highBits);
@@ -16525,10 +16907,10 @@ Timestamp.fromBits = function(lowBits, highBits) {
 /**
  * Returns a Timestamp representation of the given string, written using the given radix.
  *
- * @param {String} str the textual representation of the Timestamp.
- * @param {Number} opt_radix the radix in which the text is written.
+ * @method
+ * @param {string} str the textual representation of the Timestamp.
+ * @param {number} opt_radix the radix in which the text is written.
  * @return {Timestamp} the corresponding Timestamp value.
- * @api public
  */
 Timestamp.fromString = function(str, opt_radix) {
   if (str.length == 0) {
@@ -16572,7 +16954,7 @@ Timestamp.fromString = function(str, opt_radix) {
 /**
  * A cache of the Timestamp representations of small integer values.
  * @type {Object}
- * @api private
+ * @ignore
  */
 Timestamp.INT_CACHE_ = {};
 
@@ -16583,43 +16965,43 @@ Timestamp.INT_CACHE_ = {};
  * Number used repeated below in calculations.  This must appear before the
  * first call to any from* function below.
  * @type {number}
- * @api private
+ * @ignore
  */
 Timestamp.TWO_PWR_16_DBL_ = 1 << 16;
 
 /**
  * @type {number}
- * @api private
+ * @ignore
  */
 Timestamp.TWO_PWR_24_DBL_ = 1 << 24;
 
 /**
  * @type {number}
- * @api private
+ * @ignore
  */
 Timestamp.TWO_PWR_32_DBL_ = Timestamp.TWO_PWR_16_DBL_ * Timestamp.TWO_PWR_16_DBL_;
 
 /**
  * @type {number}
- * @api private
+ * @ignore
  */
 Timestamp.TWO_PWR_31_DBL_ = Timestamp.TWO_PWR_32_DBL_ / 2;
 
 /**
  * @type {number}
- * @api private
+ * @ignore
  */
 Timestamp.TWO_PWR_48_DBL_ = Timestamp.TWO_PWR_32_DBL_ * Timestamp.TWO_PWR_16_DBL_;
 
 /**
  * @type {number}
- * @api private
+ * @ignore
  */
 Timestamp.TWO_PWR_64_DBL_ = Timestamp.TWO_PWR_32_DBL_ * Timestamp.TWO_PWR_32_DBL_;
 
 /**
  * @type {number}
- * @api private
+ * @ignore
  */
 Timestamp.TWO_PWR_63_DBL_ = Timestamp.TWO_PWR_64_DBL_ / 2;
 
@@ -16641,18 +17023,19 @@ Timestamp.MIN_VALUE = Timestamp.fromBits(0, 0x80000000 | 0);
 
 /**
  * @type {Timestamp}
- * @api private
+ * @ignore
  */
 Timestamp.TWO_PWR_24_ = Timestamp.fromInt(1 << 24);
 
 /**
  * Expose.
  */
-exports.Timestamp = Timestamp;
-},{}],64:[function(require,module,exports){
+module.exports = Timestamp;
+module.exports.Timestamp = Timestamp;
+},{}],65:[function(require,module,exports){
 module.exports = exports = require('./lib');
 
-},{"./lib":65}],65:[function(require,module,exports){
+},{"./lib":66}],66:[function(require,module,exports){
 
 /**
  * Returns the value of object `o` at the given `path`.
@@ -16837,21 +17220,20 @@ function K (v) {
   return v;
 }
 
-},{}],66:[function(require,module,exports){
-module.exports = exports = require('./lib/promise');
-
-},{"./lib/promise":67}],67:[function(require,module,exports){
+},{}],67:[function(require,module,exports){
 (function (process){
 'use strict';
-
-/*!
- * Module dependencies.
- */
-
-var slice = function (arr, start, end) {
-  return Array.prototype.slice.call(arr, start, end)
-};
+var util = require('util');
 var EventEmitter = require('events').EventEmitter;
+function toArray(arr, start, end) {
+  return Array.prototype.slice.call(arr, start, end)
+}
+function strongUnshift(x, arrLike) {
+  var arr = toArray(arrLike);
+  arr.unshift(x);
+  return arr;
+}
+
 
 /**
  * Promise constructor.
@@ -16864,28 +17246,27 @@ var EventEmitter = require('events').EventEmitter;
  * @event `fulfill`: Emits when the promise is fulfilled (event name may be overridden)
  * @api public
  */
-
 function Promise(back) {
-  EventEmitter.call(this);
-
+  this.emitter = new EventEmitter();
   this.emitted = {};
   this.ended = false;
   if ('function' == typeof back)
     this.onResolve(back);
 }
 
+
+/*
+ * Module exports.
+ */
+module.exports = Promise;
+
+
 /*!
  * event names
  */
-
 Promise.SUCCESS = 'fulfill';
 Promise.FAILURE = 'reject';
 
-/*!
- * Inherits from EventEmitter.
- */
-
-Promise.prototype.__proto__ = EventEmitter.prototype;
 
 /**
  * Adds `listener` to the `event`.
@@ -16895,38 +17276,36 @@ Promise.prototype.__proto__ = EventEmitter.prototype;
  * @param {String} event
  * @param {Function} callback
  * @return {Promise} this
- * @api public
+ * @api private
  */
-
 Promise.prototype.on = function (event, callback) {
   if (this.emitted[event])
-    callback.apply(this, this.emitted[event]);
+    callback.apply(undefined, this.emitted[event]);
   else
-    EventEmitter.prototype.on.call(this, event, callback);
+    this.emitter.on(event, callback);
 
   return this;
-}
+};
+
 
 /**
  * Keeps track of emitted events to run them on `on`.
  *
  * @api private
  */
-
-Promise.prototype.emit = function (event) {
+Promise.prototype.safeEmit = function (event) {
   // ensures a promise can't be fulfill() or reject() more than once
-  var success = this.constructor.SUCCESS;
-  var failure = this.constructor.FAILURE;
-
-  if (event == success || event == failure) {
-    if (this.emitted[success] || this.emitted[failure]) {
+  if (event == Promise.SUCCESS || event == Promise.FAILURE) {
+    if (this.emitted[Promise.SUCCESS] || this.emitted[Promise.FAILURE]) {
       return this;
     }
-    this.emitted[event] = slice(arguments, 1);
+    this.emitted[event] = toArray(arguments, 1);
   }
 
-  return EventEmitter.prototype.emit.apply(this, arguments);
-}
+  this.emitter.emit.apply(this.emitter, arguments);
+  return this;
+};
+
 
 /**
  * Fulfills this promise with passed arguments.
@@ -16935,11 +17314,10 @@ Promise.prototype.emit = function (event) {
  *
  * @api public
  */
-
 Promise.prototype.fulfill = function () {
-  var args = slice(arguments);
-  return this.emit.apply(this, [this.constructor.SUCCESS].concat(args));
-}
+  return this.safeEmit.apply(this, strongUnshift(Promise.SUCCESS, arguments));
+};
+
 
 /**
  * Rejects this promise with `reason`.
@@ -16950,10 +17328,11 @@ Promise.prototype.fulfill = function () {
  * @param {Object|String} reason
  * @return {Promise} this
  */
-
 Promise.prototype.reject = function (reason) {
-  return this.emit(this.constructor.FAILURE, reason);
-}
+  if (this.ended && !this.hasRejectListeners()) throw reason;
+  return this.safeEmit(Promise.FAILURE, reason);
+};
+
 
 /**
  * Resolves this promise to a rejected state if `err` is passed or
@@ -16963,11 +17342,11 @@ Promise.prototype.reject = function (reason) {
  * @param {Object} [val] value to fulfill the promise with
  * @api public
  */
-
 Promise.prototype.resolve = function (err, val) {
   if (err) return this.reject(err);
   return this.fulfill(val);
-}
+};
+
 
 /**
  * Adds a listener to the SUCCESS event.
@@ -16975,28 +17354,30 @@ Promise.prototype.resolve = function (err, val) {
  * @return {Promise} this
  * @api public
  */
-
 Promise.prototype.onFulfill = function (fn) {
   if (!fn) return this;
   if ('function' != typeof fn) throw new TypeError("fn should be a function");
-  return this.on(this.constructor.SUCCESS, fn);
-}
+  return this.on(Promise.SUCCESS, fn);
+};
+
 
 Promise.prototype.hasRejectListeners = function () {
-  return this.listeners(this.constructor.FAILURE).length > 0;
+  return this.emitter.listeners(Promise.FAILURE).length > 0;
 };
+
+
 /**
  * Adds a listener to the FAILURE event.
  *
  * @return {Promise} this
  * @api public
  */
-
 Promise.prototype.onReject = function (fn) {
   if (!fn) return this;
   if ('function' != typeof fn) throw new TypeError("fn should be a function");
-  return this.on(this.constructor.FAILURE, fn);
-}
+  return this.on(Promise.FAILURE, fn);
+};
+
 
 /**
  * Adds a single function as a listener to both SUCCESS and FAILURE.
@@ -17004,25 +17385,21 @@ Promise.prototype.onReject = function (fn) {
  * It will be executed with traditional node.js argument position:
  * function (err, args...) {}
  *
+ * Also marks the promise as `end`ed, since it's the common use-case, and yet has no
+ * side effects unless `fn` is undefined or null.
+ *
  * @param {Function} fn
  * @return {Promise} this
  */
-
 Promise.prototype.onResolve = function (fn) {
+  this.end();
   if (!fn) return this;
   if ('function' != typeof fn) throw new TypeError("fn should be a function");
-
-  this.on(this.constructor.FAILURE, function (err) {
-    fn.apply(this, [err]);
-  });
-
-  this.on(this.constructor.SUCCESS, function () {
-    var args = slice(arguments);
-    fn.apply(this, [null].concat(args));
-  });
-
+  this.on(Promise.FAILURE, function (err) { fn.call(this, err); });
+  this.on(Promise.SUCCESS, function () { fn.apply(this, strongUnshift(null, arguments)); });
   return this;
-}
+};
+
 
 /**
  * Creates a new promise and returns it. If `onFulfill` or
@@ -17045,107 +17422,92 @@ Promise.prototype.onResolve = function (fn) {
  *     p.complete(1);
  *
  * @see promises-A+ https://github.com/promises-aplus/promises-spec
- * @param {Function} onFulFill
+ * @param {Function} onFulfill
  * @param {Function} [onReject]
  * @return {Promise} newPromise
  */
-
 Promise.prototype.then = function (onFulfill, onReject) {
-  var self = this
-    , retPromise = new Promise;
+  var newPromise = new Promise;
+
+  if ('function' == typeof onFulfill) {
+    this.onFulfill(handler(newPromise, onFulfill));
+  } else {
+    this.onFulfill(newPromise.fulfill.bind(newPromise));
+  }
 
   if ('function' == typeof onReject) {
-    self.onReject(handler(retPromise, onReject));
+    this.onReject(handler(newPromise, onReject));
   } else {
-    self.onReject(retPromise.reject.bind(retPromise));
-  }
-  if ('function' == typeof onFulfill) {
-    self.onFulfill(handler(retPromise, onFulfill));
-  } else {
-    self.onFulfill(retPromise.fulfill.bind(retPromise));
+    this.onReject(newPromise.reject.bind(newPromise));
   }
 
-  return retPromise;
+  return newPromise;
 };
 
 
-function handler(retPromise, fn) {
-  return function handler() {
-    var args = arguments;
-    process.nextTick(
-      function in_the_handler() {
-        if (retPromise.domain && retPromise.domain !== process.domain) retPromise.domain.enter();
-        var x;
-
-        try {
-          x = fn.apply(undefined, args);
-        } catch (err) {
-          if (retPromise.ended && !retPromise.hasRejectListeners()) throw err;
-          return retPromise.reject(err);
-        }
-
-        resolve(retPromise, x);
-        return;
-      }
-    );
+function handler(promise, fn) {
+  function newTickHandler() {
+    var pDomain = promise.emitter.domain;
+    if (pDomain && pDomain !== process.domain) pDomain.enter();
+    try {
+      var x = fn.apply(undefined, boundHandler.args);
+    } catch (err) {
+      promise.reject(err);
+      return;
+    }
+    resolve(promise, x);
   }
+  function boundHandler() {
+    boundHandler.args = arguments;
+    process.nextTick(newTickHandler);
+  }
+  return boundHandler;
 }
 
-function resolve(promise, x) {
-  var then;
-  var type;
-  var done;
-  var reject_;
-  var resolve_;
 
-  type = typeof x;
-  if ('undefined' == type) {
-    return promise.fulfill(x);
+function resolve(promise, x) {
+  function fulfillOnce() {
+    if (done++) return;
+    resolve.apply(undefined, strongUnshift(promise, arguments));
+  }
+  function rejectOnce(reason) {
+    if (done++) return;
+    promise.reject(reason);
   }
 
   if (promise === x) {
-    return promise.reject(new TypeError("promise and x are the same"));
+    promise.reject(new TypeError("promise and x are the same"));
+    return;
+  }
+  var rest = toArray(arguments, 1);
+  var type = typeof x;
+  if ('undefined' == type || null == x || !('object' == type || 'function' == type)) {
+    promise.fulfill.apply(promise, rest);
+    return;
   }
 
-  if (null != x) {
-
-    if ('object' == type || 'function' == type) {
-      try {
-        then = x.then;
-      } catch (err) {
-        if (promise.ended && !promise.hasRejectListeners()) throw err;
-        return promise.reject(err);
-      }
-
-      if ('function' == typeof then) {
-        try {
-          resolve_ = function () {var args = slice(arguments); resolve.apply(this, [promise].concat(args));};
-          reject_ = promise.reject.bind(promise);
-          done = false;
-          return then.call(
-            x
-            , function fulfill() {
-              if (done) return;
-              done = true;
-              return resolve_.apply(this, arguments);
-            }
-            , function reject() {
-              if (done) return;
-              done = true;
-              return reject_.apply(this, arguments);
-            })
-        } catch (err) {
-          if (done) return;
-          done = true;
-          if (promise.ended) throw err;
-          return promise.reject(err);
-        }
-      }
-    }
+  try {
+    var theThen = x.then;
+  } catch (err) {
+    promise.reject(err);
+    return;
   }
 
-  promise.fulfill(x);
+  if ('function' != typeof theThen) {
+    promise.fulfill.apply(promise, rest);
+    return;
+  }
+
+  var done = 0;
+  try {
+    var ret = theThen.call(x, fulfillOnce, rejectOnce);
+    return ret;
+  } catch (err) {
+    if (done++) return;
+    promise.reject(err);
+  }
 }
+
 
 /**
  * Signifies that this promise was the last in a chain of `then()s`: if a handler passed to the call to `then` which produced this promise throws, the exception will go uncaught.
@@ -17172,7 +17534,6 @@ function resolve(promise, x) {
  * @param {Function} [onReject]
  * @return {Promise} this
  */
-
 Promise.prototype.end = function (onReject) {
   this.onReject(onReject);
   this.ended = true;
@@ -17206,15 +17567,13 @@ Promise.prototype.end = function (onReject) {
  * @param {String} name
  * @return {Promise} this
  */
-
 Promise.trace = function (p, name) {
   p.then(
     function () {
-      console.log("%s fulfill %j", name, slice(arguments));
-    }
-    ,
+      console.log("%s fulfill %j", name, toArray(arguments));
+    },
     function () {
-      console.log("%s reject %j", name, slice(arguments));
+      console.log("%s reject %j", name, toArray(arguments));
     }
   )
 };
@@ -17227,21 +17586,6 @@ Promise.prototype.chain = function (p2) {
   return p2;
 };
 
-
-Promise.deferred = function () {
-  var p = new Promise;
-  return {
-    promise: p,
-    reject: p.reject.bind(p),
-    fulfill: p.fulfill.bind(p),
-    callback: p.resolve.bind(p)
-  }
-};
-
-
-/*!
- * Module exports.
- */
 
 Promise.prototype.all = function (promiseOfArr) {
   var pRet = new Promise;
@@ -17276,7 +17620,7 @@ Promise.prototype.all = function (promiseOfArr) {
 };
 
 
-Promise.hook = function(arr) {
+Promise.hook = function (arr) {
   var p1 = new Promise;
   var pFinal = new Promise;
   var signalP = function () {
@@ -17301,10 +17645,26 @@ Promise.hook = function(arr) {
   p1.resolve();
   return ps;
 };
-module.exports = Promise;
+
+
+/* This is for the A+ tests, but it's very useful as well */
+Promise.fulfilled = function fulfilled() { var p = new Promise; p.fulfill.apply(p, arguments); return p; };
+Promise.rejected = function rejected(reason) { return new Promise().reject(reason); };
+Promise.deferred = function deferred() {
+  var p = new Promise;
+  return {
+    promise: p,
+    reject: p.reject.bind(p),
+    resolve: p.fulfill.bind(p),
+    callback: p.resolve.bind(p)
+  }
+};
+/* End A+ tests adapter bit */
+
+
 
 }).call(this,require("FWaASH"))
-},{"FWaASH":46,"events":44}],68:[function(require,module,exports){
+},{"FWaASH":46,"events":44,"util":48}],68:[function(require,module,exports){
 /**
 
 # ms.js

@@ -2,13 +2,8 @@ var fs = require('fs');
 var acquit = require('acquit');
 var marked = require('marked');
 
-var docTests = acquit.parse(
-  fs.readFileSync('test/harmony/document.test_.js').toString());
-var queryTests = acquit.parse(
-  fs.readFileSync('test/harmony/query.test_.js').toString());
-var modelTests = acquit.parse(
-  fs.readFileSync('test/harmony/model.test_.js').toString());
-blocks = docTests.concat(queryTests).concat(modelTests);
+var blocks = acquit.parse(
+  fs.readFileSync('test/browser/example.test_.js').toString());
 
 for (var i = 0; i < blocks.length; ++i) {
   var block = blocks[i];
@@ -23,10 +18,18 @@ for (var i = 0; i < blocks.length; ++i) {
     if (b.comments && b.comments.length) {
       b.comments[0] = marked(acquit.trimEachLine(b.comments[0]));
     }
+
+    for (var k = 0; k < b.blocks.length; ++k) {
+      var it = b.blocks[k];
+      it.contents = marked(acquit.trimEachLine(it.contents));
+      if (it.comments && it.comments.length) {
+        it.comments[0] = marked(acquit.trimEachLine(it.comments[0]));
+      }
+    }
   }
 }
 
 module.exports = {
-  title: 'Using Mongoose with ECMAScript 6 (Harmony)',
+  title: 'Using Mongoose Schema Validation in the Browser',
   acquitBlocks: blocks
 };

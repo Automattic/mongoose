@@ -6,10 +6,15 @@ block content
     if block.comments && block.comments.length
       | !{block.comments[0]}
 
-    each it in block.blocks
-      h4 !{it.contents}
-      if it.comments && it.comments.length
-        | !{it.comments[0]}
+    each b in block.blocks
+      h3 !{b.contents}
+      if b.comments && b.comments.length
+        | !{b.comments[0]}
 
-      :js
-        #{it.code}
+      each it in b.blocks
+        h4 !{it.contents}
+        if it.comments && it.comments.length
+          | !{it.comments[0]}
+
+        :js
+          #{it.code}

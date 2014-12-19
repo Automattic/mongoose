@@ -1,7 +1,7 @@
 {
   "name": "mongoose",
   "description": "Mongoose MongoDB ODM",
-  "version": "3.9.7",
+  "version": "3.9.8-pre",
   "author": "Guillermo Rauch <guillermo@learnboost.com>",
   "keywords": ["mongodb", "document", "model", "schema", "database", "odm", "data", "datastore", "query", "nosql", "orm", "db"],
   "license": "MIT",

@@ -3533,6 +3533,8 @@ reserved.schema =
 reserved.modelName =
 reserved.collection =
 reserved.toObject =
+reserved.save =
+reserved.validate =
 reserved.emit =    // EventEmitter
 reserved._pres = reserved._posts = 1 // hooks.js
 

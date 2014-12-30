@@ -65,7 +65,7 @@ describe('ValidationError', function(){
       //should fail validation
       model.validate(function(err){
         assert.notEqual(err, null, 'min Date validation failed.');
-        model.appointmentDate = Date.now();
+        model.appointmentDate = new Date(Date.now().valueOf() + 10000);
 
         //should pass validation
         model.validate(function(err) {

@@ -106,6 +106,66 @@ describe('ValidationError', function(){
     });
   });
 
+  describe('#minlength', function() {
+    it('causes a validation error', function(done) {
+      var AddressSchema
+        , Address
+        , model;
+
+      AddressSchema = new Schema({
+        postalCode : { type: String, minlength: 5 }
+      });
+
+      Address = mongoose.model('MinLengthAddress', AddressSchema);
+
+      model = new Address({
+        postalCode: '9512'
+      });
+
+      //should fail validation
+      model.validate(function(err){
+        assert.notEqual(err, null, 'String minlegth validation failed.');
+        model.postalCode = '95125';
+
+        //should pass validation
+        model.validate(function(err) {
+          assert.equal(err, null);
+          done();  
+        });
+      });
+    });
+  });
+
+  describe('#maxlength', function() {
+    it('causes a validation error', function(done) {
+      var AddressSchema
+        , Address
+        , model;
+
+      AddressSchema = new Schema({
+        postalCode : { type: String, maxlength: 10 }
+      });
+
+      Address = mongoose.model('MaxLengthAddress', AddressSchema);
+
+      model = new Address({
+        postalCode: '95125012345'
+      });
+
+      //should fail validation
+      model.validate(function(err){
+        assert.notEqual(err, null, 'String maxlegth validation failed.');
+        model.postalCode = '95125';
+
+        //should pass validation
+        model.validate(function(err) {
+          assert.equal(err, null);
+          done();  
+        });
+      });
+    });
+  });
+
   describe('#toString', function() {
     it('does not cause RangeError (gh-1296)', function(done) {
       var ASchema = new Schema({

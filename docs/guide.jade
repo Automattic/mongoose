@@ -523,7 +523,7 @@ block content
 
     h4#notVersionedPaths option: notVersionedPaths
   :markdown
-    `notVersionedPaths` is a set of safe paths which are excluded from versioning (i.e the internal revision will not be incremented even if nonVersioned paths change). DO NOT do this unles you know what you're doing.
+    `notVersionedPaths` is a set of safe paths which are excluded from versioning (i.e the internal revision will not be incremented even if non-versioned paths change). DO NOT do this unless you know what you're doing.
   :js
     new Schema({..}, { notVersionedPaths: [ 'dontIncrementVersionEvenIfIChange' ] });
     var Thing = mongoose.model('Thing', schema);

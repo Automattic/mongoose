@@ -252,6 +252,7 @@ block content
     - [toObject](#toObject)
     - [validateBeforeSave](#validateBeforeSave)
     - [versionKey](#versionKey)
+    - [notVersionedPaths](#notVersionedPaths)
 
   h4#autoIndex option: autoIndex
   :markdown
@@ -519,6 +520,15 @@ block content
     var Thing = mongoose.model('Thing', schema);
     var thing = new Thing({ name: 'no versioning please' });
     thing.save(); // { name: 'no versioning please' }
+
+    h4#notVersionedPaths option: notVersionedPaths
+  :markdown
+    `notVersionedPaths` is a set of safe paths which are excluded from versioning (i.e the internal revision will not be incremented even if nonVersioned paths change). DO NOT do this unles you know what you're doing.
+  :js
+    new Schema({..}, { notVersionedPaths: [ 'dontIncrementVersionEvenIfIChange' ] });
+    var Thing = mongoose.model('Thing', schema);
+    var thing = new Thing({ dontIncrementVersionEvenIfIChange: [ { ... }] });
+    thing.save(); // version is not incremented
 
   h3#plugins Pluggable
   p

@@ -1,10 +1,9 @@
 # Mongoose
 
-[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/LearnBoost/mongoose?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-
 Mongoose is a [MongoDB](http://www.mongodb.org/) object modeling tool designed to work in an asynchronous environment.
 
 [![Build Status](https://travis-ci.org/LearnBoost/mongoose.png?branch=master)](https://travis-ci.org/LearnBoost/mongoose)
+[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/LearnBoost/mongoose?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 ## Documentation
 

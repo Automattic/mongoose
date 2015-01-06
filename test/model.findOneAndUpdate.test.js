@@ -392,11 +392,11 @@ describe('model: findOneAndUpdate:', function(){
       , M = db.model(modelname, collection + random())
       , pending = 6
 
-    M.findOneAndUpdate({ name: 'aaron' }, { $set: { name: 'Aaron'}}, { new: false }, cb);
-    M.findOneAndUpdate({ name: 'aaron' }, { $set: { name: 'Aaron'}}, cb);
-    M.where().findOneAndUpdate({ name: 'aaron' }, { $set: { name: 'Aaron'}}, { new: false }, cb);
-    M.where().findOneAndUpdate({ name: 'aaron' }, { $set: { name: 'Aaron'}}, cb);
-    M.where().findOneAndUpdate({ $set: { name: 'Aaron'}}, cb);
+    M.findOneAndUpdate({ name: 'aaron' }, { $set: { name: 'Aaron6'}}, { new: false }, cb);
+    M.findOneAndUpdate({ name: 'aaron' }, { $set: { name: 'Aaron4'}}, cb);
+    M.where().findOneAndUpdate({ name: 'aaron' }, { $set: { name: 'Aaron1'}}, { new: false }, cb);
+    M.where().findOneAndUpdate({ name: 'aaron' }, { $set: { name: 'Aaron2'}}, cb);
+    M.where().findOneAndUpdate({ $set: { name: 'Aaron6'}}, cb);
     M.where('name', 'aaron').findOneAndUpdate({ $set: { name: 'Aaron'}}).findOneAndUpdate(cb);
 
     function cb (err, doc) {
@@ -986,6 +986,76 @@ describe('model: findByIdAndUpdate:', function(){
             assert.equal('coffee', doc.ticks[0].name);
             done();
           });
+        });
+    });
+  });
+
+  describe('middleware', function() {
+    var db;
+
+    beforeEach(function() {
+      db = start();
+    });
+
+    afterEach(function(done) {
+      db.close(done);
+    });
+
+    it('works', function(done) {
+      var s = new Schema({
+        topping: { type: String, default: 'bacon' },
+        base: String
+      });
+
+      var preCount = 0;
+      s.pre('findOneAndUpdate', function() {
+        ++preCount;
+      });
+
+      var postCount = 0;
+      s.post('findOneAndUpdate', function() {
+        ++postCount;
+      });
+
+      var Breakfast = db.model('gh-964', s);
+
+      Breakfast.findOneAndUpdate(
+        {},
+        { base: 'eggs' },
+        {},
+        function(error, breakfast) {
+          assert.ifError(error);
+          assert.equal(1, preCount);
+          assert.equal(1, postCount);
+          done();
+        });
+    });
+
+    it('works with exec()', function(done) {
+      var s = new Schema({
+        topping: { type: String, default: 'bacon' },
+        base: String
+      });
+
+      var preCount = 0;
+      s.pre('findOneAndUpdate', function() {
+        ++preCount;
+      });
+
+      var postCount = 0;
+      s.post('findOneAndUpdate', function() {
+        ++postCount;
+      });
+
+      var Breakfast = db.model('gh-964-2', s);
+
+      Breakfast.
+        findOneAndUpdate({}, { base: 'eggs' }, {}).
+        exec(function(error, breakfast) {
+          assert.ifError(error);
+          assert.equal(1, preCount);
+          assert.equal(1, postCount);
+          done();
         });
     });
   });

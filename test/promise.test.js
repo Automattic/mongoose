@@ -15,7 +15,7 @@ describe('Promise', function(){
     var promise = new Promise()
       , called = 0;
 
-    promise.on('complete', function (a, b) {
+    promise.on('fulfill', function (a, b) {
       assert.equal(a, '1');
       assert.equal(b, '2');
       called++;
@@ -23,7 +23,7 @@ describe('Promise', function(){
 
     promise.complete('1', '2');
 
-    promise.on('complete', function (a, b) {
+    promise.on('fulfill', function (a, b) {
       assert.equal(a, '1');
       assert.equal(b, '2');
       called++;
@@ -37,14 +37,14 @@ describe('Promise', function(){
     var promise = new Promise()
       , called = 0;
 
-    promise.on('err', function (err) {
+    promise.on('reject', function (err) {
       assert.ok(err instanceof Error);
       called++;
     });
 
     promise.error('booyah');
 
-    promise.on('err', function (err) {
+    promise.on('reject', function (err) {
       assert.ok(err instanceof Error);
       called++;
     });
@@ -57,14 +57,14 @@ describe('Promise', function(){
     var promise = new Promise()
       , called = 0;
 
-    promise.on('err', function (err) {
+    promise.on('reject', function (err) {
       assert.equal(9, err);
       called++;
     });
 
     promise.reject(9);
 
-    promise.on('err', function (err) {
+    promise.on('reject', function (err) {
       assert.equal(9, err);
       called++;
     });

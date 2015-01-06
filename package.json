@@ -1,7 +1,7 @@
 {
   "name": "mongoose",
   "description": "Mongoose MongoDB ODM",
-  "version": "3.9.7-pre",
+  "version": "3.9.8-pre",
   "author": "Guillermo Rauch <guillermo@learnboost.com>",
   "keywords": ["mongodb", "document", "model", "schema", "database", "odm", "data", "datastore", "query", "nosql", "orm", "db"],
   "license": "MIT",
@@ -11,9 +11,9 @@
     "ms": "0.1.0",
     "sliced": "0.0.5",
     "muri": "0.3.1",
-    "mpromise": "0.5.0",
+    "mpromise": "0.5.4",
     "mpath": "0.1.1",
-    "kareem": "0.0.4",
+    "kareem": "0.0.7",
     "regexp-clone": "0.0.1",
     "mquery" : "1.0.0",
     "async": "0.9.0"

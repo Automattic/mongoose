@@ -1,3 +1,21 @@
+3.9.7 / 2014-12-19
+===================
+ * added; proper cursors for aggregate #2539 [changyy](https://github.com/changyy)
+ * added; min/max built-in validators for dates #2531 [bshamblen](https://github.com/bshamblen)
+ * fixed; save and validate are now reserved keywords #2380
+ * added; basic documentation for browser component #2256
+ * added; find and findOne hooks (query middleware) #2138
+ * fixed; throw a DivergentArrayError when saving positional operator queries #2031
+ * added; ability to use options as a document property #1416
+ * fixed; document no longer inherits from event emitter and so domain and _events are no longer reserved #1351
+ * removed; setProfiling #1349
+
+3.8.21 / 2014-12-18
+===================
+ * fixed; syntax in index.jade #2517 [elderbas](https://github.com/elderbas)
+ * fixed; writable statics #2510 #2528
+ * fixed; overwrite and explicit $set casting #2515
+
 3.9.6 / 2014-12-05
 ===================
  * added; correctly run validators on each element of array when entire array is modified #661 #1227

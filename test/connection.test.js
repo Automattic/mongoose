@@ -476,17 +476,18 @@ describe('connections:', function(){
     });
   });
 
-  describe('missing protocols', function(){
-    it('are allowed with replsets', function(done){
-      var conn = mongoose.createConnection('localhost:12345,127.0.0.1:14326', function (err) {
+  describe('missing protocols', function() {
+    it('are allowed with replsets', function(done) {
+      var conn = mongoose.createConnection('localhost:12345,127.0.0.1:14326?rs_name=bacon', function(err) {
         // force missing db error so we don't actually connect.
         assert.ok(err);
       });
       assert.deepEqual([{host:'localhost', port:12345},{host:'127.0.0.1',port:14326}], conn.hosts);
       assert.deepEqual(null, conn.host);
       assert.deepEqual(null, conn.port);
-      setTimeout(done,10);
+      setTimeout(done, 10);
     });
+
     it('are allowed with single connections', function(done){
       var conn = mongoose.createConnection();
       conn.doOpen = function(){};
@@ -795,8 +796,8 @@ describe('connections:', function(){
       });
     });
 
-    it('handles unix domain sockets', function(done){
-      var url = 'mongodb://aaron:psw@/tmp/mongodb-27018.sock,/tmp/mongodb-27019.sock/fake';
+    it('handles unix domain sockets', function(done) {
+      var url = 'mongodb://aaron:psw@/tmp/mongodb-27018.sock,/tmp/mongodb-27019.sock/fake?rs_name=bacon';
       var db = mongoose.createConnection(url, { server: { auto_reconnect: false }});
       db.on('error', function(err){});
       assert.equal('object', typeof db.options);

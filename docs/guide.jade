@@ -252,7 +252,7 @@ block content
     - [toObject](#toObject)
     - [validateBeforeSave](#validateBeforeSave)
     - [versionKey](#versionKey)
-    - [notVersionedPaths](#notVersionedPaths)
+    - [skipVersioning](#skipVersioning)
 
   h4#autoIndex option: autoIndex
   :markdown
@@ -521,13 +521,12 @@ block content
     var thing = new Thing({ name: 'no versioning please' });
     thing.save(); // { name: 'no versioning please' }
 
-    h4#notVersionedPaths option: notVersionedPaths
+    h4#skipVersioning option: skipVersioning
   :markdown
-    `notVersionedPaths` is a set of safe paths which are excluded from versioning (i.e the internal revision will not be incremented even if non-versioned paths change). DO NOT do this unless you know what you're doing.
+    `skipVersioning` allows excluding paths from versioning (i.e the internal revision will not be incremented even if these paths are updated). DO NOT do this unless you know what you're doing.
   :js
-    new Schema({..}, { notVersionedPaths: [ 'dontIncrementVersionEvenIfIChange' ] });
-    var Thing = mongoose.model('Thing', schema);
-    var thing = new Thing({ dontIncrementVersionEvenIfIChange: [ { ... }] });
+    new Schema({..}, { skipVersioning: { dontVersionMe: true } });
+    thing.dontVersionMe.push('hey');
     thing.save(); // version is not incremented
 
   h3#plugins Pluggable

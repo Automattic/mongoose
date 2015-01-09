@@ -260,7 +260,6 @@ describe('versioning', function(){
     }
 
     function save (a, b, cb) {
-      var pending = 2;
       var e;
       // make sure that a saves before b
       a.save(function (err) {

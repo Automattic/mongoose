@@ -10,6 +10,9 @@ block content
     var schema = new mongoose.Schema({ name: 'string', size: 'string' });
     var Tank = mongoose.model('Tank', schema);
 
+  :markdown
+    The `.model()` function makes a copy of `schema`. Make sure that you've added everything you want to `schema` before calling `.model()`!
+
   h3 Constructing documents
   :markdown
     [Documents](./documents.html) are instances of our model. Creating them and saving to the database is easy:

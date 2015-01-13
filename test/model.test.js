@@ -4153,7 +4153,7 @@ describe('Model', function(){
     describe('if disabled', function(){
       describe('with mongo down', function(){
         it('and no command buffering should pass an error', function(done){
-          var db = start({ server: { auto_reconnect: false }});
+          var db = start({ db: { bufferMaxEntries: 0 } });
           var schema = Schema({ type: String }, { bufferCommands: false });
           var T = db.model('Thing', schema);
           db.on('open', function () {
@@ -4161,7 +4161,7 @@ describe('Model', function(){
             var worked = false;
 
             t.save(function (err) {
-              assert.ok(/no open connections|Connection was destroyed by application/.test(err.message));
+              assert.ok(/no connection available for operation/.test(err.message));
               worked = true;
             });
 

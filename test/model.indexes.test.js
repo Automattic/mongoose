@@ -174,23 +174,20 @@ describe('model', function(){
         }, 100);
       });
 
-      describe('global autoIndexes (gh-1875)', function(){
-
-        it ('will create indexes as a default', function(done){
+      describe('global autoIndexes (gh-1875)', function() {
+        it('will create indexes as a default', function(done) {
           var db = start();
-          var schema = new Schema({name : {type: String, index: true}});
-          var Test = db.model('GlobalAutoIndex', schema, "x"+random());
-          Test.on('index', function(err){
-            assert.ok(true, 'Model.ensureIndexes() was called')
-          });
-
-          setTimeout(function () {
-            Test.collection.getIndexes(function(err, indexes){
+          var schema = new Schema({name : { type: String, index: true } });
+          var Test = db.model('GlobalAutoIndex', schema, 'gh-1875-1');
+          Test.on('index', function(error) {
+            assert.ifError(error);
+            assert.ok(true, 'Model.ensureIndexes() was called');
+            Test.collection.getIndexes(function(err, indexes) {
               assert.ifError(err);
               assert.equal(2, Object.keys(indexes).length);
               done();
             });
-          }, 100);
+          });
         });
 
         it ('will not create indexes if the global auto index is false and schema option isnt set (gh-1875)', function(done){
@@ -208,7 +205,6 @@ describe('model', function(){
               done();
             });
           }, 100);
-
         });
       });
     });

@@ -43,11 +43,12 @@ var BlogPost = new Schema({
       , nested    : [Comments]
       , numbers   : [Number]
     }
-  , mixed     : {}
-  , numbers   : [Number]
-  , comments  : [Comments]
-  , arr       : []
-}, { collection: 'versioning_' + random()});
+  , mixed        : {}
+  , numbers      : [Number]
+  , comments     : [Comments]
+  , arr          : []
+  , dontVersionMe: []
+}, { collection: 'versioning_' + random(), skipVersioning: { dontVersionMe: true } });
 
 
 mongoose.model('Versioning', BlogPost);
@@ -254,9 +255,20 @@ describe('versioning', function(){
       assert.ok(d[1].$set, 'two differing atomic ops on same path should create a $set');
       assert.ok(d[1].$inc, 'a $set of an array should trigger versioning');
       assert.ok(!d[1].$addToSet);
+      save(a, b, test13);
+    }
 
-      db.close();
-      done();
+    function test13 (err, a, b) {
+        assert.ifError(err);
+        a.dontVersionMe.push('value1');
+        b.dontVersionMe.push('value2');
+        save(a, b, test14);
+    }
+
+    function test14 (err, a, b) {
+        assert.equal(a._doc.__v, 13, 'version should not be incremented for non-versioned fields');
+        db.close();
+        done();
     }
 
     function save (a, b, cb) {

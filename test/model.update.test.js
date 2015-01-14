@@ -611,7 +611,7 @@ describe('model: update:', function(){
 
         S.update({ _id: s._id }, { ignore: true }, function (err, affected) {
           assert.ifError(err);
-          assert.equal(0, affected);
+          assert.equal(0, affected.n);
 
           S.findById(s._id, function (err, doc) {
             assert.ifError(err);
@@ -620,7 +620,7 @@ describe('model: update:', function(){
 
             S.update({ _id: s._id }, { name: 'Drukqs', foo: 'fooey' }, function (err, affected) {
               assert.ifError(err);
-              assert.equal(1, affected.result.n);
+              assert.equal(1, affected.n);
 
               S.findById(s._id, function (err, doc) {
                 db.close();
@@ -644,7 +644,7 @@ describe('model: update:', function(){
       B.update({}, { title: 'newtitle' }, { multi: true }, function (err, affected) {
         db.close();
         assert.ifError(err);
-        assert.equal(3, affected.result.n);
+        assert.equal(3, affected.n);
         done();
       });
     });
@@ -677,7 +677,7 @@ describe('model: update:', function(){
       assert.ifError(err);
       M.update({ _id: doc._id }, { $pull: { comments: { name: 'node 0.8' }}}, function (err, affected) {
         assert.ifError(err);
-        assert.equal(1, affected.result.n);
+        assert.equal(1, affected.n);
         db.close();
         done();
       });
@@ -783,7 +783,7 @@ describe('model: update:', function(){
       var sId1 = doc1._id;
       Some.where({_id: sId0}).update({}, {$set: {num: '99'}}, {multi: true}, function(err, cnt){
         assert.ifError(err);
-        assert.equal(1, cnt.result.n);
+        assert.equal(1, cnt.n);
         Some.findById(sId0, function(err, doc0_1){
           assert.ifError(err);
           assert.equal(99, doc0_1.num);

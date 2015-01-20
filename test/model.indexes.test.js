@@ -97,6 +97,54 @@ describe('model', function(){
       });
     });
 
+    it('of multiple embedded documents with same schema', function(done) {
+      var BlogPosts = new Schema({
+        _id: { type: ObjectId, index: true },
+        title: { type: String, index: true },
+        desc: String
+      });
+
+      var User = new Schema({
+        name: { type: String, index: true },
+        blogposts: [BlogPosts],
+        featured: [BlogPosts]
+      });
+
+      var db = start();
+      var UserModel = db.model('DeepIndexedModel', User, 'gh-2322');
+      var assertions = 0;
+
+      UserModel.on('index', function () {
+        UserModel.collection.getIndexes(function (err, indexes) {
+          assert.ifError(err);
+
+          for (var i in indexes) {
+            indexes[i].forEach(function(index){
+              if (index[0] === 'name') {
+                ++assertions;
+              }
+              if (index[0] === 'blogposts._id') {
+                ++assertions;
+              }
+              if (index[0] === 'blogposts.title') {
+                ++assertions;
+              }
+              if (index[0] === 'featured._id') {
+                ++assertions;
+              }
+              if (index[0] === 'featured.title') {
+                ++assertions;
+              }
+            });
+          }
+
+          db.close();
+          assert.equal(5, assertions);
+          done();
+        });
+      });
+    });
+
     it('compound: on embedded docs', function(done){
       var BlogPosts = new Schema({
           title   : String

@@ -23,7 +23,7 @@ describe('Documents in ES6', function() {
   };
 
   beforeEach(function() {
-    db = start();
+    db = start({ noErrorListener: 1 });
   });
 
   afterEach(function(done) {

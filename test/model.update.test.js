@@ -1244,4 +1244,43 @@ describe('model: update:', function(){
         });
     });
   });
+
+  describe('middleware', function() {
+    it('can specify pre and post hooks', function(done) {
+      var db = start();
+
+      var numPres = 0;
+      var numPosts = 0;
+      var band = new Schema({ members: [String] });
+      band.pre('update', function(next) {
+        ++numPres;
+        next();
+      });
+      band.post('update', function() {
+        ++numPosts;
+      });
+      var Band = db.model('gh-964', band);
+
+      var gnr = new Band({ members: ['Axl', 'Slash', 'Izzy', 'Duff', 'Adler' ] });
+      gnr.save(function(error) {
+        assert.ifError(error);
+        assert.equal(0, numPres);
+        assert.equal(0, numPosts);
+        Band.update(
+          { _id: gnr._id },
+          { $pull: { members: 'Adler' } },
+          function(error) {
+            assert.ifError(error);
+            assert.equal(1, numPres);
+            assert.equal(1, numPosts);
+            Band.findOne({ _id: gnr._id }, function(error, doc) {
+              assert.ifError(error);
+              assert.deepEqual(['Axl', 'Slash', 'Izzy', 'Duff'],
+                doc.toObject().members);
+              done();
+            });
+          });
+      });
+    });
+  });
 });

@@ -20,6 +20,8 @@ Mongoose is a [MongoDB](http://www.mongodb.org/) object modeling tool designed t
 
 Check out the [plugins search site](http://plugins.mongoosejs.com/) to see hundreds of related modules from the community.
 
+Build your own Mongoose plugin through [generator-mongoose-plugin](https://github.com/huei90/generator-mongoose-plugin).
+
 ## Contributors
 
 View all 100+ [contributors](https://github.com/learnboost/mongoose/graphs/contributors). Stand up and be counted as a [contributor](https://github.com/LearnBoost/mongoose/blob/master/CONTRIBUTING.md) too!

@@ -8,6 +8,7 @@ block content
     - Validation is defined in the [SchemaType](./schematypes.html)
     - Validation is an internal piece of [middleware](./middleware.html)
     - Validation occurs when a document attempts to be [saved](./api.html#model_Model-save), after defaults have been applied
+    - Validators are not run on undefined values. The only exception is the [`required` validator](./api.html#schematype_SchemaType-required).
     - Validation is asynchronously recursive; when you call [Model#save](./api.html#model_Model-save), sub-document validation is executed as well. If an error occurs, your [Model#save](./api.html#model_Model-save) callback receives it
     - Validation supports complete customization
 

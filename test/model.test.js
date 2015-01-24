@@ -4281,23 +4281,6 @@ describe('Model', function(){
 
   describe('save()', function(){
     describe('when no callback is passed', function(){
-      it('should emit error on its db', function(done){
-        var db = start();
-
-        db.on('error', function (err) {
-          db.close();
-          assert.ok(err instanceof Error);
-          done();
-        });
-
-        var DefaultErrSchema = new Schema({});
-        DefaultErrSchema.pre('save', function (next) {
-          next(new Error);
-        });
-        var DefaultErr = db.model('DefaultErr2', DefaultErrSchema, 'default_err_' + random());
-        new DefaultErr().save();
-      })
-
       it('should emit error on its Model when there are listeners', function(done){
         var db = start();
 
@@ -4316,24 +4299,6 @@ describe('Model', function(){
 
         new DefaultErr().save();
       })
-
-      it('should throw error when nothing is listening to db or Model errors', function(done){
-        var db = start({ noErrorListener: 1 });
-
-        var DefaultErrSchema = new Schema({});
-        DefaultErrSchema.pre('save', function (next) {
-          try {
-            next(new Error);
-          } catch (error) {
-            // throws b/c nothing is listening to the Model or db error event
-            db.close();
-            assert.ok(error instanceof Error);
-            done();
-          }
-        });
-        var DefaultErr = db.model('DefaultErr1', DefaultErrSchema, 'default_err_' + random());
-        new DefaultErr().save();
-      });
     });
     it('returns number of affected docs', function(done){
       var db = start()

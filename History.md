@@ -1,3 +1,13 @@
+3.8.22 / 2014-01-24
+===================
+ * upgraded; node-mongodb-native to 1.4.28 #2587 [Climax777](https://github.com/Climax777)
+ * added; additional documentation for validators #2449
+ * fixed; stack overflow when creating massive arrays #2423
+ * fixed; undefined is a valid id for queries #2411
+ * fixed; properly create nested schema index when same schema used twice #2322
+ * added; link to plugin generator in docs #2085 [huei90](https://github.com/huei90)
+ * fixed; optional arguments documentation for findOne() #1971 [nachinius](https://github.com/nachinius)
+
 3.8.21 / 2014-12-18
 ===================
  * fixed; syntax in index.jade #2517 [elderbas](https://github.com/elderbas)
@@ -1860,7 +1870,7 @@
 1.3.1 / 2011-04-27
 ===================
 
-  * fixed; setting a property on an embedded array no longer overwrites entire array (GH-310) 
+  * fixed; setting a property on an embedded array no longer overwrites entire array (GH-310)
   * fixed; setting nested properties works when sibling prop is named "type"
   * fixed; isModified is now much finer grained when .set() is used (GH-323)
   * fixed; mongoose.model() and connection.model() now return the Model (GH-308, GH-305)
@@ -1969,7 +1979,7 @@
 
   * Changed; Make sure to only ensure indexes while connected
 
-1.1.9 / 2011-03-2 
+1.1.9 / 2011-03-2
 ==================
 
   * Fixed; Mixed can now default to empty arrays
@@ -2027,7 +2037,7 @@
   * Restored Query#exec and added notion of default operation [brian]
   * Fixed ValidatorError messages [brian]
 
-1.1.1 / 2011-03-01 
+1.1.1 / 2011-03-01
 ==================
 
   * Added SchemaType String `lowercase`, `uppercase`, `trim`.
@@ -2062,28 +2072,28 @@
 
   * Fixed embedded documents saving.
 
-1.0.12 / 2011-02-14 
+1.0.12 / 2011-02-14
 ===================
 
   * Minor refactorings [brian]
 
-1.0.11 / 2011-02-14 
+1.0.11 / 2011-02-14
 ===================
 
   * Query refactor and $ne, $slice, $or, $size, $elemMatch, $nin, $exists support [brian]
   * Named scopes sugar [brian]
 
-1.0.10 / 2011-02-11 
+1.0.10 / 2011-02-11
 ===================
 
   * Updated node-mongodb-native driver [thanks John Allen]
 
-1.0.9 / 2011-02-09 
+1.0.9 / 2011-02-09
 ==================
 
   * Fixed single member arrays as defaults [brian]
 
-1.0.8 / 2011-02-09 
+1.0.8 / 2011-02-09
 ==================
 
   * Fixed for collection-level buffering of commands [gitfy]
@@ -2092,7 +2102,7 @@
   * Fixed clash of accessors in getters/setters [eirikurn]
   * Improved `Model#save` promise handling
 
-1.0.7 / 2011-02-05 
+1.0.7 / 2011-02-05
 ==================
 
   * Fixed memory leak warnings for test suite on 0.3
@@ -2101,14 +2111,14 @@
   * Fixed default value for Array types (fixes GH-210). [brian]
   * Fixed example code.
 
-1.0.6 / 2011-02-03 
+1.0.6 / 2011-02-03
 ==================
 
   * Fixed `post` middleware
   * Fixed; it's now possible to instantiate a model even when one of the paths maps
   to an undefined value [brian]
 
-1.0.5 / 2011-02-02 
+1.0.5 / 2011-02-02
 ==================
 
   * Fixed; combo $push and $pushAll auto-converts into a $pushAll [brian]
@@ -2122,20 +2132,20 @@
   * Added tests that show that Schemas with nested Arrays don't apply defaults
   [brian]
 
-1.0.4 / 2011-02-02 
+1.0.4 / 2011-02-02
 ==================
 
   * Added MongooseNumber#toString
   * Added MongooseNumber unit tests
 
-1.0.3 / 2011-02-02 
+1.0.3 / 2011-02-02
 ==================
 
   * Make sure safe mode works with Model#save
   * Changed Schema options: safe mode is now the default
   * Updated node-mongodb-native to HEAD
 
-1.0.2 / 2011-02-02 
+1.0.2 / 2011-02-02
 ==================
 
   * Added a Model.create shortcut for creating documents. [brian]
@@ -2143,7 +2153,7 @@
   null value. [brian]
   * Fixed Schema with more than 2 nested levels. [brian]
 
-1.0.1 / 2011-02-02 
+1.0.1 / 2011-02-02
 ==================
 
   * Improved `MongooseNumber`, works almost like the native except for `typeof`

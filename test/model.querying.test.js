@@ -405,7 +405,7 @@ describe('model: querying:', function(){
       post.collection.insert({ meta: { visitors: 9898, a: null } }, {}, function (err, b) {
         assert.ifError(err);
 
-        BlogPostA.findOne({_id: b[0]._id}, function (err, found) {
+        BlogPostA.findOne({_id: b.ops[0]._id}, function (err, found) {
           cb();
           assert.ifError(err);
           assert.equal(found.get('meta.visitors'), 9898);
@@ -1968,7 +1968,7 @@ describe('backwards compatibility', function(){
     post.collection.insert({ meta: { visitors: 9898, a: null } }, {}, function (err, b) {
       assert.ifError(err);
 
-      BlogPostB.findOne({_id: b[0]._id}, function (err, found) {
+      BlogPostB.findOne({_id: b.ops[0]._id}, function (err, found) {
         assert.ifError(err);
         assert.equal(9898, found.get('meta.visitors').valueOf());
         db.close();
@@ -1985,7 +1985,7 @@ describe('backwards compatibility', function(){
     post.collection.insert({ meta: { visitors: 9898, color: 'blue'}}, {}, function (err, b) {
       assert.ifError(err);
 
-      BlogPostB.findOne({_id: b[0]._id}, function (err, found) {
+      BlogPostB.findOne({_id: b.ops[0]._id}, function (err, found) {
         assert.ifError(err);
         assert.equal(9898, found.get('meta.visitors').valueOf());
         found.save(function (err) {

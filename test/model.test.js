@@ -1263,8 +1263,7 @@ describe('Model', function(){
 
       TestP.collection.insert({ a: null, previous: null}, {}, function (err, f) {
         assert.ifError(err);
-
-        TestP.findOne({_id: f[0]._id}, function (err, found) {
+        TestP.findOne({_id: f.ops[0]._id}, function (err, found) {
           assert.ifError(err);
           assert.equal(false, found.isNew);
           assert.strictEqual(found.get('previous'), null);
@@ -4154,7 +4153,7 @@ describe('Model', function(){
     describe('if disabled', function(){
       describe('with mongo down', function(){
         it('and no command buffering should pass an error', function(done){
-          var db = start({ server: { auto_reconnect: false }});
+          var db = start({ db: { bufferMaxEntries: 0 } });
           var schema = Schema({ type: String }, { bufferCommands: false });
           var T = db.model('Thing', schema);
           db.on('open', function () {
@@ -4162,7 +4161,7 @@ describe('Model', function(){
             var worked = false;
 
             t.save(function (err) {
-              assert.ok(/no open connections|Connection was destroyed by application/.test(err.message));
+              assert.ok(/no connection available for operation/.test(err.message));
               worked = true;
             });
 
@@ -4308,12 +4307,12 @@ describe('Model', function(){
       var s = new S({ name: 'aaron' });
       s.save(function (err, doc, affected) {
         assert.ifError(err);
-        assert.equal(1, affected);
+        assert.equal(1, affected.result.n);
         s.name = 'heckmanananananana';
         s.save(function (err, doc, affected) {
           db.close();
           assert.ifError(err);
-          assert.equal(1, affected);
+          assert.equal(1, affected.result.n);
           done();
         });
       });
@@ -4567,11 +4566,11 @@ describe('Model', function(){
               assert.ifError(err);
 
               doc.score = 55;
-              doc.save(function (err, doc, count){
+              doc.save(function (err, doc, count) {
                 db.close();
                 assert.ifError(err);
                 assert.equal(doc.score, 55);
-                assert.equal(count, 1);
+                assert.equal(count.result.n, 1);
                 done();
               });
             });

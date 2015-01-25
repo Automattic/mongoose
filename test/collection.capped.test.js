@@ -77,7 +77,8 @@ describe('collections: capped:', function(){
                 c.remove(function (err) {
                   db.close();
                   assert.ok(err);
-                  assert.equal(10101, err.code);
+                  assert.ok(err.code === 10101 || err.code === 20, 'Invalid ' +
+                    'error code: ' + err.code);
                   done();
                 });
               });

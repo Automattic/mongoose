@@ -208,18 +208,24 @@ describe('model', function(){
         var schema = new Schema({ name: { type: String, index: true }});
         schema.set('autoIndex', false);
 
-        var Test = db.model('AutoIndexing', schema, "x"+random());
+        var Test = db.model('AutoIndexing', schema, 'autoindexing-disable');
         Test.on('index', function(err){
           assert.ok(false, 'Model.ensureIndexes() was called');
         });
 
-        setTimeout(function () {
-          Test.collection.getIndexes(function(err, indexes){
-            assert.ifError(err);
-            assert.equal(0, Object.keys(indexes).length);
-            done();
-          });
-        }, 100);
+        // Create a doc because mongodb 3.0 getIndexes errors if db doesn't
+        // exist
+        Test.create({ name: 'Bacon' }, function(err) {
+          assert.ifError(err);
+          setTimeout(function () {
+            Test.collection.getIndexes(function(err, indexes){
+              assert.ifError(err);
+              // Only default _id index should exist
+              assert.deepEqual(['_id_'], Object.keys(indexes));
+              done();
+            });
+          }, 100);
+        });
       });
 
       describe('global autoIndexes (gh-1875)', function() {

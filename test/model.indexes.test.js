@@ -249,16 +249,19 @@ describe('model', function(){
           var schema = new Schema({name : {type: String, index: true}});
           var Test = db.model('GlobalAutoIndex', schema, "x"+random());
           Test.on('index', function(err){
-            assert.ok(false, 'Model.ensureIndexes() was called')
+            assert.ok(false, 'Model.ensureIndexes() was called');
           });
 
-          setTimeout(function () {
-            Test.collection.getIndexes(function(err, indexes){
-              assert.ifError(err);
-              assert.equal(0, Object.keys(indexes).length);
-              done();
-            });
-          }, 100);
+          Test.create({ name: 'Bacon' }, function(err) {
+            assert.ifError(err);
+            setTimeout(function() {
+              Test.collection.getIndexes(function(err, indexes){
+                assert.ifError(err);
+                assert.deepEqual(['_id_'], Object.keys(indexes));
+                done();
+              });
+            }, 100);
+          });
         });
       });
     });

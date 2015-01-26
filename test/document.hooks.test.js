@@ -534,6 +534,33 @@ describe('document: hooks:', function () {
       assert.equal(count, 4);
       done();
     });
-  })
+  });
+
+  it('parallel followed by serial (gh-2521)', function(done) {
+    var schema = Schema({ name: String });
+
+    schema.pre('save', true, function(next, done) {
+      process.nextTick(function() {
+        done();
+      });
+      next();
+    });
+
+    schema.pre('save', function(done) {
+      process.nextTick(function() {
+        done();
+      });
+    });
+
+    var db = start();
+    var People = db.model('gh-2521', schema, 'gh-2521');
+
+    var p = new People({ name: 'Val' });
+    p.save(function(error) {
+      console.log('Saved');
+      assert.ifError(error);
+      db.close(done);
+    });
+  });
 
 });

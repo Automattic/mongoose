@@ -61,13 +61,13 @@ describe('schema', function(){
       Test.path('complex').enum('d', 'e');
 
       assert.deepEqual(Test.path('complex').enumValues, ['a', 'b', 'c', null, 'd', 'e']);
-      
+
       // with SchemaTypes validate method
       Test.path('state').enum({
         values: 'opening open closing closed'.split(' '),
         message: 'enum validator failed for path `{PATH}` with value `{VALUE}`'
       });
-      
+
       assert.equal(Test.path('state').validators.length, 1);
       assert.deepEqual(Test.path('state').enumValues, ['opening', 'open', 'closing', 'closed']);
 
@@ -87,15 +87,15 @@ describe('schema', function(){
       Test.path('complex').doValidate('da', function(err){
         assert.ok(err instanceof ValidatorError);
       });
-      
+
       Test.path('state').doValidate('x', function(err){
         assert.ok(err instanceof ValidatorError);
       });
-      
+
       Test.path('state').doValidate('opening', function(err){
         assert.ifError(err);
       });
-      
+
       Test.path('state').doValidate('open', function(err){
         assert.ifError(err);
       });
@@ -719,6 +719,19 @@ describe('schema', function(){
 
           done();
         });
+      });
+    });
+
+    it('returns cast errors', function(done) {
+      var breakfastSchema = new Schema({
+        eggs: Number
+      });
+      var Breakfast = mongoose.model('gh-2611', breakfastSchema, 'gh-2611');
+
+      var bad = new Breakfast({ eggs: 'none' });
+      bad.validate(function(error) {
+        assert.ok(error);
+        done();
       });
     });
   });

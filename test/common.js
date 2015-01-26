@@ -118,16 +118,14 @@ module.exports.mongodVersion = function (cb) {
   db.on('error', cb);
 
   db.on('open', function () {
-    db.db.admin(function (err, admin) {
+    var admin = db.db.admin();
+    admin.serverStatus(function (err, info) {
       if (err) return cb(err);
-      admin.serverStatus(function (err, info) {
-        if (err) return cb(err);
-        var version = info.version.split('.').map(function(n){return parseInt(n, 10) });
-        cb(null, version);
-      });
+      var version = info.version.split('.').map(function(n){return parseInt(n, 10) });
+      cb(null, version);
     });
-  })
-}
+  });
+};
 
 function dropDBs(done) {
   var db = module.exports();

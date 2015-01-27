@@ -1156,11 +1156,6 @@ describe('Model', function(){
         assert.ok(post.errors['items.0.subs.0.required'] instanceof ValidatorError);
         assert.equal(post.errors['items.0.subs.0.required'].message,'Path `required` is required.');
 
-        assert.ok(!err.errors['items.0.required']);
-        assert.ok(!err.errors['items.0.required']);
-        assert.ok(!post.errors['items.0.required']);
-        assert.ok(!post.errors['items.0.required']);
-
         post.items[0].subs[0].set('required', true);
         assert.equal(undefined, post.$__.validationError);
 
@@ -1183,6 +1178,35 @@ describe('Model', function(){
             done();
           });
         });
+      });
+    });
+
+    it('should not run validators/pre-validate more than once on save of a nested document', function(done) {
+      var db = start();
+      var SubSchema = new Schema({str: String});
+
+      var pathValidateCount = 0;
+      SubSchema.path('str').validate(function(val) {
+        pathValidateCount++;
+        return false;
+      }, 'test');
+
+      var preValidateCount = 0;
+      SubSchema.pre('validate', function(next) {
+        preValidateCount++;
+        next();
+      });
+
+      var DocSchema = new Schema({arr: [SubSchema]});
+      var Doc = db.model('b', DocSchema);
+
+      var p = new Doc();
+      p.arr.push({str: 'asdf'});
+      p.save(function(err) {
+        assert.equal(pathValidateCount, 1);
+        assert.equal(preValidateCount, 1);
+        db.close();
+        done();
       });
     });
 
@@ -4803,7 +4827,7 @@ describe('Model', function(){
       });
     });
 
-    
+
     it('Compound index on field earlier declared with 2dsphere index is saved', function (done) {
       var db = start();
       var PersonSchema = new Schema({

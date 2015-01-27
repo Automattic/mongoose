@@ -557,7 +557,6 @@ describe('document: hooks:', function () {
 
     var p = new People({ name: 'Val' });
     p.save(function(error) {
-      console.log('Saved');
       assert.ifError(error);
       db.close(done);
     });

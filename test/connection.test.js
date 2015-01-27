@@ -39,6 +39,26 @@ describe('connections:', function(){
     db.close(done);
   });
 
+  it('should accept replicaSet query param', function(done) {
+    var db = mongoose.createConnection('mongodb://localhost/fake?replicaSet=rs0');
+    db.on('error', function(err){});
+    assert.equal('object', typeof db.options);
+    assert.equal('object', typeof db.options.server);
+    assert.equal(true, db.options.server.auto_reconnect);
+    assert.equal('object', typeof db.options.db);
+    assert.equal(false, db.options.db.forceServerObjectId);
+    assert.equal('primary', db.options.db.read_preference);
+    assert.equal(undefined, db.pass);
+    assert.equal(undefined, db.user);
+    assert.equal('fake', db.name);
+    assert.deepEqual([{ host: 'localhost', port: 27017 }], db.hosts);
+
+    // Should be a replica set
+    assert.ok(db.replica);
+    db.close();
+    done();
+  });
+
   it('should accept mongodb://localhost:27000/fake', function(done){
     var db = mongoose.createConnection('mongodb://localhost:27000/fake');
     db.on('error', function(err){});

@@ -13,9 +13,17 @@ var start = require('./common')
  * Setup
  */
 
-var schema = Schema({
-    title: String
-})
+var schemaB = Schema({
+    title: String,
+    type: String
+}, {discriminatorKey: 'type'});
+
+var schemaC = Schema({
+  test: {
+    type: String,
+    default: 'test'
+  }
+}, {discriminatorKey: 'type'});
 
 
 describe('model', function(){
@@ -25,7 +33,8 @@ describe('model', function(){
 
     before(function(){
       db = start();
-      B = db.model('model-create', schema, 'model-create-'+random());
+      B = db.model('model-create', schemaB, 'model-create-'+random());
+      B.discriminator('C', schemaC);
     })
 
     after(function(done){
@@ -42,6 +51,14 @@ describe('model', function(){
       assert.equal(hydrated.isModified(), false);
       assert.equal(hydrated.isModified('title'), false);
 
+      done();
+    });
+
+    it('works correctly with model discriminators', function(done) {
+      var hydrated = B.hydrate({_id: '541085faedb2f28965d0e8e8', title: 'chair', type: 'C'});
+
+      assert.equal(hydrated.test, 'test');
+      assert.ok(hydrated.schema === schemaC);
       done();
     });
   });

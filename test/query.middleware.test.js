@@ -168,4 +168,23 @@ describe('query middleware', function() {
       done();
     });
   });
+
+  it('has hooks for count()', function(done) {
+    var preCount = 0;
+    var postCount = 0;
+
+    schema.pre('count', function() {
+      ++preCount;
+    });
+
+    schema.post('count', function() {
+      ++postCount;
+    });
+
+    Author.find({ title: 'Professional AngularJS' }).count(function(error, count) {
+      assert.ifError(error);
+      assert.equal(1, count);
+      done();
+    });
+  });
 });

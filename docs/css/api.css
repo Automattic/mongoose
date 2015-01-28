@@ -15,6 +15,27 @@ a {
   -webkit-transition-duration: 0.15s;
   -webkit-transition-timing-function: ease-out;
 }
+
+.toggle-item {
+  cursor: pointer;
+}
+
+.file {
+  margin-bottom: 15px;
+}
+
+.file.displayed {
+  margin-bottom: 0px;
+}
+
+.file ul {
+  display: none;
+}
+
+.file.displayed ul {
+  display: block !important;
+}
+
 a:hover {
   opacity: 0.8;
 }

@@ -414,6 +414,44 @@ describe('document', function(){
     done();
   });
 
+  it('toObject transform', function( done ){
+    var schema = new Schema({
+      name: String,
+      places: [{type: ObjectId, ref: 'toObject-transform-places'}]
+    });
+
+    var schemaPlaces = new Schema({
+      identity: String
+    });
+
+    schemaPlaces.set('toObject', {
+      transform: function (doc, ret) {
+
+        // here should be only toObject-transform-places documents
+        assert.equal(doc.constructor.modelName, 'toObject-transform-places');
+
+        return ret;
+      }
+    });
+
+    var db = start()
+      , Test = db.model('toObject-transform', schema)
+      , Places = db.model('toObject-transform-places', schemaPlaces);
+
+    Places.create({ identity: 'a' },{ identity: 'b' },{ identity: 'c' }, function(err, a, b, c){
+      Test.create({ name: 'chetverikov', places: [a, b, c]}, function( err ){
+        assert.ifError(err);
+        Test.findOne({}).populate('places').exec(function( err, docs ){
+          assert.ifError(err);
+
+          docs.toObject({transform: true});
+
+          done();
+        });
+      });
+    });
+  });
+
   it('doesnt use custom toObject options on save', function( done ){
     var schema = new Schema({
       name: String,

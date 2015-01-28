@@ -4,7 +4,9 @@ html(lang='en')
     meta(charset="utf-8")
     meta(name="viewport", content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no")
     title Mongoose API v#{package.version}
-    link(href='http://fonts.googleapis.com/css?family=Anonymous+Pro:400,700|Droid+Sans+Mono|Open+Sans:400,700|Linden+Hill|Quattrocento:400,700|News+Cycle:400,700|Antic+Slab|Cabin+Condensed:400,700', rel='stylesheet', type='text/css')
+    link( rel="stylesheet"
+          href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css")
+    link(href='//fonts.googleapis.com/css?family=Anonymous+Pro:400,700|Droid+Sans+Mono|Open+Sans:400,700|Linden+Hill|Quattrocento:400,700|News+Cycle:400,700|Antic+Slab|Cabin+Condensed:400,700', rel='stylesheet', type='text/css')
     link(href='css/default.css', rel='stylesheet', type='text/css')
     link(href='css/api.css', rel='stylesheet', type='text/css')
   body.api
@@ -19,8 +21,11 @@ html(lang='en')
       hr
       .doclinks
         each item in docs
-          .file(class=item.hasPublic ? '' : 'private')
-            a.section(href='#' + item.cleantitle)= item.title
+          div.file(class=item.hasPublic ? '' : 'private')
+            a.section(href='#' + item.cleantitle)
+              | #{item.title}
+            | &nbsp;
+            i.fa.fa-caret-right.toggle-item
             ul
               each method in item.methods
                 if method.ctx && !method.ignore
@@ -271,6 +276,17 @@ html(lang='en')
     script(src="/docs/js/zepto.min.js")
     script(src="/docs/js/cookies.min.js")
     script.
+      $(".toggle-item").click(function() {
+        if ($(this).hasClass('fa-caret-right')) {
+          $(this).removeClass('fa-caret-right');
+          $(this).addClass('fa-caret-down');
+          $(this).parent().addClass('displayed');
+        } else {
+          $(this).addClass('fa-caret-right');
+          $(this).removeClass('fa-caret-down');
+          $(this).parent().removeClass('displayed');
+        }
+      });
       $(".module").on("click", ".showcode", function (e) {
         $(this).closest(".item").find(".sourcecode").first().toggle();
       });

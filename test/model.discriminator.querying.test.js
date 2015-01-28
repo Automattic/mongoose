@@ -60,6 +60,62 @@ describe('model', function() {
       db.close(done);
     });
 
+    describe('pushing discriminated objects', function() {
+      var ContainerModel, BaseCustomEvent, DiscCustomEvent;
+      before(function() {
+        var BaseCustomEventSchema = new BaseSchema();
+        var DiscCustomEventSchema = new BaseSchema({
+          personName: Number
+        });
+        BaseCustomEvent = db.model('base-custom-event',
+                                   BaseCustomEventSchema);
+        DiscCustomEvent = BaseCustomEvent.discriminator('disc-custom-event',
+                                                        DiscCustomEventSchema);
+        var ContainerSchema = Schema({
+          title: String,
+          events: [{type: Schema.Types.ObjectId, ref: 'base-custom-event'}]
+        });
+        ContainerModel = db.model('container-event-model', ContainerSchema);
+      });
+
+      it('into non-discriminated arrays works', function(done) {
+        var c = new ContainerModel({
+          title: "events-group-1"
+        });
+        var d1 = new BaseCustomEvent();
+        var d2 = new BaseCustomEvent();
+        var d3 = new DiscCustomEvent();
+        c.events.push(d1);
+        c.events.push(d2);
+        async.series(
+          [
+            function(next) { d1.save(next); },
+            function(next) { d2.save(next); },
+            function(next) { d3.save(next); },
+            function(next) { c.save(next);  },
+            function(next) {
+              ContainerModel.findOne({}).populate('events').exec(function(err, doc) {
+                assert.ifError(err);
+                assert.ok(doc.events && doc.events.length);
+                assert.equal(doc.events.length, 2);
+                doc.events.push(d3);
+                var hasDisc = false;
+                var discKey = DiscCustomEvent.schema.discriminatorMapping.key;
+                doc.events.forEach(function(subDoc) {
+                  if (discKey in subDoc) {
+                    hasDisc = true;
+                  }
+                });
+                assert.ok(hasDisc);
+                next();
+              });
+            }
+          ],
+          done
+        );
+      });
+    });
+
     describe('find', function() {
       it('hydrates correct models', function(done) {
         var baseEvent  = new BaseEvent({ name: 'Base event' });

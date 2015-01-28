@@ -288,7 +288,7 @@ describe('mongoose module:', function(){
     if (!uri) {
       console.log('\033[31m', '\n', 'You\'re not testing replica sets!'
                 , '\n', 'Please set the MONGOOSE_SET_TEST_URI env variable.', '\n'
-                , 'e.g: `mongodb://localhost:27017/db,mongodb://localhost…`', '\n'
+                , 'e.g: `mongodb://localhost:27017/db,localhost…`', '\n'
                 , '\033[39m');
       return done();
     }

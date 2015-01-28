@@ -305,6 +305,19 @@ describe('model: update:', function(){
     });
   });
 
+  it('makes copy of conditions and update options', function(done) {
+    var db = start()
+      , BlogPost = db.model('BlogPostForUpdates', collection);
+
+    var conditions = { '_id': post._id.toString() };
+    var update = {'$set':{'some_attrib':post._id.toString()}};
+    BlogPost.update(conditions, update, function(err) {
+      assert.ifError(err);
+      assert.equal('string', typeof conditions._id);
+      done();
+    });
+  });
+
   it('handles weird casting (gh-479)', function(done){
     var db = start()
       , BlogPost = db.model('BlogPostForUpdates', collection)
@@ -357,7 +370,7 @@ describe('model: update:', function(){
         assert.equal(1, ret._doc.comments[0]._doc.newprop);
         assert.strictEqual(undefined, ret._doc.comments[1]._doc.newprop);
         assert.ok(ret.date instanceof Date);
-        assert.equal(ret.date.toString(), update.$set.date.toString());
+        assert.equal(ret.date.toString(), new Date(update.$set.date).toString());
 
         last = ret;
         done();
@@ -1016,6 +1029,29 @@ describe('model: update:', function(){
           done();
         });
       });
+    });
+  });
+
+  it('works with $set and overwrite (gh-2515)', function(done) {
+    var db = start();
+
+    var schema = new Schema({ breakfast: String });
+    var M = db.model('gh-2515', schema);
+
+    M.create({ breakfast: 'bacon' }, function(error, doc) {
+      assert.ifError(error);
+      M.update(
+        { _id: doc._id },
+        { $set: { breakfast: 'eggs' } },
+        { overwrite: true },
+        function(error) {
+          assert.ifError(error);
+          M.findOne({ _id: doc._id }, function(error, doc) {
+            assert.ifError(error);
+            assert.equal(doc.breakfast, 'eggs');
+            db.close(done);
+          });
+        });
     });
   });
 });

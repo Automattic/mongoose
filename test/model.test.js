@@ -4307,12 +4307,12 @@ describe('Model', function(){
       var s = new S({ name: 'aaron' });
       s.save(function (err, doc, affected) {
         assert.ifError(err);
-        assert.equal(1, affected.result.n);
+        assert.equal(1, affected);
         s.name = 'heckmanananananana';
         s.save(function (err, doc, affected) {
           db.close();
           assert.ifError(err);
-          assert.equal(1, affected.result.n);
+          assert.equal(1, affected);
           done();
         });
       });
@@ -4570,7 +4570,7 @@ describe('Model', function(){
                 db.close();
                 assert.ifError(err);
                 assert.equal(doc.score, 55);
-                assert.equal(count.result.n, 1);
+                assert.equal(count, 1);
                 done();
               });
             });

@@ -119,7 +119,7 @@ var NodeJSDocument = require('./document')
   , ValidationError = MongooseError.ValidationError
   , InternalCache = require('./internal')
   , deepEqual = utils.deepEqual
-  , hooks = require('hooks')
+  , hooks = require('hooks-fixed')
   , Promise = require('./promise')
   , DocumentArray
   , MongooseArray
@@ -218,7 +218,7 @@ Document.prototype.constructor = Document;
 Document.ValidationError = ValidationError;
 module.exports = exports = Document;
 
-},{"./document":4,"./error":8,"./internal":17,"./promise":18,"./schema":19,"./schema/mixed":26,"./schematype":30,"./types/objectid":37,"./utils":38,"events":44,"hooks":49,"util":48}],3:[function(require,module,exports){
+},{"./document":4,"./error":8,"./internal":17,"./promise":18,"./schema":19,"./schema/mixed":26,"./schematype":30,"./types/objectid":37,"./utils":38,"events":44,"hooks-fixed":49,"util":48}],3:[function(require,module,exports){
 /*!
  * Module dependencies.
  */
@@ -448,7 +448,7 @@ var EventEmitter = require('events').EventEmitter
   , ValidationError = MongooseError.ValidationError
   , InternalCache = require('./internal')
   , deepEqual = utils.deepEqual
-  , hooks = require('hooks')
+  , hooks = require('hooks-fixed')
   , Promise = require('./promise')
   , DocumentArray
   , MongooseArray
@@ -1117,7 +1117,7 @@ Document.prototype.$__set = function (
     } else {
       if (obj[parts[i]] && 'Object' === utils.getFunctionName(obj[parts[i]].constructor)) {
         obj = obj[parts[i]];
-      } else if (obj[parts[i]] && obj[parts[i]] instanceof Embedded) {  
+      } else if (obj[parts[i]] && obj[parts[i]] instanceof Embedded) {
         obj = obj[parts[i]];
       } else if (obj[parts[i]] && Array.isArray(obj[parts[i]])) {
         obj = obj[parts[i]];
@@ -1390,6 +1390,12 @@ Document.prototype.isSelected = function isSelected (path) {
 Document.prototype.validate = function (cb) {
   var self = this;
   var promise = new Promise(cb);
+
+  var preSaveErr = self.$__presaveValidate();
+  if (preSaveErr) {
+    promise.reject(preSaveErr);
+    return promise;
+  }
 
   // only validate required fields when necessary
   var paths = Object.keys(this.$__.activePaths.states.require).filter(function (path) {
@@ -1692,12 +1698,12 @@ function compile (tree, proto, prefix) {
 // makes all properties non-enumerable to match previous behavior to #2211
 function getOwnPropertyDescriptors(object) {
   var result = {};
-  
+
   Object.getOwnPropertyNames(object).forEach(function(key) {
     result[key] = Object.getOwnPropertyDescriptor(object, key);
     result[key].enumerable = false;
   });
-  
+
   return result;
 }
 
@@ -1956,16 +1962,8 @@ Document.prototype.$__handleReject = function handleReject(err) {
     this.constructor.emit('error', err);
   } else if (this.listeners && this.listeners('error').length) {
     this.emit('error', err);
-  } else if (this.db) {
-    // emit on the connection
-    if (!this.db.listeners('error').length) {
-      err.stack = 'No listeners detected, throwing. Consider adding an error listener to your connection.\n' + err.stack
-    }
-    this.db.emit('error', err);
-  } else {
-    throw err;
   }
-}
+};
 
 
 
@@ -2483,7 +2481,7 @@ Document.ValidationError = ValidationError;
 module.exports = exports = Document;
 
 }).call(this,require("FWaASH"),require("buffer").Buffer)
-},{"./error":8,"./internal":17,"./promise":18,"./schema":19,"./schema/mixed":26,"./schematype":30,"./types/array":32,"./types/documentarray":34,"./types/embedded":35,"./types/objectid":37,"./utils":38,"FWaASH":46,"buffer":40,"events":44,"hooks":49,"util":48}],5:[function(require,module,exports){
+},{"./error":8,"./internal":17,"./promise":18,"./schema":19,"./schema/mixed":26,"./schematype":30,"./types/array":32,"./types/documentarray":34,"./types/embedded":35,"./types/objectid":37,"./utils":38,"FWaASH":46,"buffer":40,"events":44,"hooks-fixed":49,"util":48}],5:[function(require,module,exports){
 'use strict';
 
 /*!
@@ -2510,11 +2508,11 @@ module.exports = function() {
  * Module dependencies.
  */
 
-var Binary = require('mongodb/node_modules/bson').Binary;
+var Binary = require('mongodb/node_modules/mongodb-core/node_modules/bson').Binary;
 
 module.exports = exports = Binary;
 
-},{"mongodb/node_modules/bson":54}],7:[function(require,module,exports){
+},{"mongodb/node_modules/mongodb-core/node_modules/bson":54}],7:[function(require,module,exports){
 
 /*!
  * [node-mongodb-native](https://github.com/mongodb/node-mongodb-native) ObjectId
@@ -2522,7 +2520,7 @@ module.exports = exports = Binary;
  * @see ObjectId
  */
 
-var ObjectId = require('mongodb/node_modules/bson').ObjectID;
+var ObjectId = require('mongodb/node_modules/mongodb-core/node_modules/bson').ObjectID;
 
 /*!
  * ignore
@@ -2531,7 +2529,7 @@ var ObjectId = require('mongodb/node_modules/bson').ObjectID;
 module.exports = exports = ObjectId;
 
 
-},{"mongodb/node_modules/bson":54}],8:[function(require,module,exports){
+},{"mongodb/node_modules/mongodb-core/node_modules/bson":54}],8:[function(require,module,exports){
 
 /**
  * MongooseError constructor
@@ -2709,6 +2707,8 @@ msg.Date.max = "Path `{PATH}` ({VALUE}) is after maximum allowed value ({MAX})."
 msg.String = {};
 msg.String.enum = "`{VALUE}` is not a valid enum value for path `{PATH}`.";
 msg.String.match = "Path `{PATH}` is invalid ({VALUE}).";
+msg.String.minlength = "Path `{PATH}` (`{VALUE}`) is shorter than the minimum allowed length ({MINLENGTH}).";
+msg.String.maxlength = "Path `{PATH}` (`{VALUE}`) is longer than the maximum allowed length ({MAXLENGTH}).";
 
 
 },{}],12:[function(require,module,exports){
@@ -3240,13 +3240,19 @@ module.exports = Promise;
  * Module dependencies.
  */
 
-var EventEmitter = require('events').EventEmitter
-  , VirtualType = require('./virtualtype')
-  , utils = require('./utils')
-  , MongooseTypes;
-
+var EventEmitter = require('events').EventEmitter;
+var VirtualType = require('./virtualtype');
+var utils = require('./utils');
+var MongooseTypes;
 var Kareem = require('kareem');
-var IS_QUERY_HOOK = { find: true, findOne: true };
+
+var IS_QUERY_HOOK = {
+  count: true,
+  find: true,
+  findOne: true,
+  findOneAndUpdate: true,
+  update: true
+};
 
 /**
  * Schema constructor.
@@ -4046,17 +4052,16 @@ Object.defineProperty(Schema, 'indexTypes', {
 Schema.prototype.indexes = function () {
   'use strict';
 
-  var indexes = []
-    , seenSchemas = []
-  collectIndexes(this);
-  return indexes;
+  var indexes = [];
+  var seenPrefix = {};
 
-  function collectIndexes (schema, prefix) {
-    if (~seenSchemas.indexOf(schema)) return;
-    seenSchemas.push(schema);
+  var collectIndexes = function(schema, prefix) {
+    if (seenPrefix[prefix]) {
+      return;
+    }
+    seenPrefix[prefix] = true;
 
     prefix = prefix || '';
-
     var key, path, index, field, isObject, options, type;
     var keys = Object.keys(schema.paths);
 
@@ -4101,7 +4106,11 @@ Schema.prototype.indexes = function () {
       });
       indexes = indexes.concat(schema._indexes);
     }
-  }
+
+  };
+
+  collectIndexes(this);
+  return indexes;
 
   /*!
    * Checks for indexes added to subdocs using Schema.index().
@@ -4210,7 +4219,6 @@ Schema.Types = MongooseTypes = require('./schema/index');
  */
 
 var ObjectId = exports.ObjectId = MongooseTypes.ObjectId;
-
 
 }).call(this,require("buffer").Buffer)
 },{"./schema/index":25,"./utils":38,"./virtualtype":39,"buffer":40,"events":44,"kareem":50}],20:[function(require,module,exports){
@@ -5925,7 +5933,8 @@ ObjectId.prototype.cast = function (value, doc, init) {
     return ret;
   }
 
-  if (value === null) return value;
+  // If null or undefined
+  if (value == null) return value;
 
   if (value instanceof oid)
     return value;
@@ -6193,6 +6202,112 @@ SchemaString.prototype.trim = function () {
     if (v) return v.trim();
     return v;
   });
+};
+
+/**
+ * Sets a minimum length validator.
+ *
+ * ####Example:
+ *
+ *     var schema = new Schema({ postalCode: { type: String, minlength: 5 })
+ *     var Address = db.model('Address', schema)
+ *     var address = new Address({ postalCode: '9512' })
+ *     address.save(function (err) {
+ *       console.error(err) // validator error
+ *       address.postalCode = '95125';
+ *       address.save() // success
+ *     })
+ *
+ *     // custom error messages
+ *     // We can also use the special {MINLENGTH} token which will be replaced with the invalid value
+ *     var minlength = [10, 'The value of path `{PATH}` (`{VALUE}`) is shorter than the minimum length ({MINLENGTH}).'];
+ *     var schema = new Schema({ postalCode: { type: String, minlength: minlength })
+ *     var Address = mongoose.model('Address', schema);
+ *     var address = new Address({ postalCode: '9512' });
+ *     s.validate(function (err) {
+ *       console.log(String(err)) // ValidationError: The value of path `postalCode` (`9512`) is shorter than the minimum length (5).
+ *     })
+ *
+ * @param {Number} value minimum string length
+ * @param {String} [message] optional custom error message
+ * @return {SchemaType} this
+ * @see Customized Error Messages #error_messages_MongooseError-messages
+ * @api public
+ */
+
+SchemaString.prototype.minlength = function (value, message) {
+  if (this.minlengthValidator) {
+    this.validators = this.validators.filter(function (v) {
+      return v.validator != this.minlengthValidator;
+    }, this);
+  }
+
+  if (null != value) {
+    var msg = message || errorMessages.String.minlength;
+    msg = msg.replace(/{MINLENGTH}/, value);
+    this.validators.push({
+      validator: this.minlengthValidator = function (v) {
+        return v === null || v.length >= value;
+      },
+      message: msg,
+      type: 'minlength'
+    });
+  }
+
+  return this;
+};
+
+/**
+ * Sets a maximum length validator.
+ *
+ * ####Example:
+ *
+ *     var schema = new Schema({ postalCode: { type: String, maxlength: 9 })
+ *     var Address = db.model('Address', schema)
+ *     var address = new Address({ postalCode: '9512512345' })
+ *     address.save(function (err) {
+ *       console.error(err) // validator error
+ *       address.postalCode = '95125';
+ *       address.save() // success
+ *     })
+ *
+ *     // custom error messages
+ *     // We can also use the special {MAXLENGTH} token which will be replaced with the invalid value
+ *     var maxlength = [10, 'The value of path `{PATH}` (`{VALUE}`) exceeds the maximum allowed length ({MAXLENGTH}).'];
+ *     var schema = new Schema({ postalCode: { type: String, maxlength: maxlength })
+ *     var Address = mongoose.model('Address', schema);
+ *     var address = new Address({ postalCode: '9512512345' });
+ *     address.validate(function (err) {
+ *       console.log(String(err)) // ValidationError: The value of path `postalCode` (`9512512345`) exceeds the maximum allowed length (10).
+ *     })
+ *
+ * @param {Number} value maximum string length
+ * @param {String} [message] optional custom error message
+ * @return {SchemaType} this
+ * @see Customized Error Messages #error_messages_MongooseError-messages
+ * @api public
+ */
+
+SchemaString.prototype.maxlength = function (value, message) {
+  if (this.maxlengthValidator) {
+    this.validators = this.validators.filter(function(v){
+      return v.validator != this.maxlengthValidator;
+    }, this);
+  }
+
+  if (null != value) {
+    var msg = message || errorMessages.String.maxlength;
+    msg = msg.replace(/{MAXLENGTH}/, value);
+    this.validators.push({
+      validator: this.maxlengthValidator = function(v) {
+        return v === null || v.length <= value;
+      },
+      message: msg,
+      type: 'maxlength'
+    });
+  }
+
+  return this;
 };
 
 /**
@@ -7378,8 +7493,7 @@ var isMongooseObject = utils.isMongooseObject;
  */
 
 function MongooseArray (values, path, doc) {
-  var arr = [];
-  arr.push.apply(arr, values);
+  var arr = [].concat(values);
 
   utils.decorate( arr, MongooseArray.mixin );
   arr.isMongooseArray = true;
@@ -8351,12 +8465,10 @@ var MongooseArray = require('./array')
  */
 
 function MongooseDocumentArray (values, path, doc) {
-  var arr = [];
+  var arr = [].concat(values);
 
   // Values always have to be passed to the constructor to initialize, since
   // otherwise MongooseArray#push will mark the array as modified to the parent.
-  arr.push.apply(arr, values);
-
   utils.decorate( arr, MongooseDocumentArray.mixin );
   arr.isMongooseArray = true;
   arr.isMongooseDocumentArray = true;
@@ -8858,7 +8970,7 @@ module.exports = ObjectId;
  * Module dependencies.
  */
 
-var ReadPref = require('mongodb/lib/mongodb/connection/read_preference').ReadPreference
+var ReadPref = require('mongodb/lib/read_preference')
   , ObjectId = require('./types/objectid')
   , cloneRegExp = require('regexp-clone')
   , sliced = require('sliced')
@@ -9603,7 +9715,7 @@ exports.each = function(arr, fn) {
 
 
 }).call(this,require("FWaASH"),require("buffer").Buffer)
-},{"./document":4,"./types":36,"./types/objectid":37,"FWaASH":46,"buffer":40,"mongodb/lib/mongodb/connection/read_preference":51,"mpath":65,"ms":68,"regexp-clone":69,"sliced":70}],39:[function(require,module,exports){
+},{"./document":4,"./types":36,"./types/objectid":37,"FWaASH":46,"buffer":40,"mongodb/lib/read_preference":51,"mpath":65,"ms":68,"regexp-clone":69,"sliced":70}],39:[function(require,module,exports){
 
 /**
  * VirtualType constructor
@@ -12046,7 +12158,7 @@ module.exports = {
                           ? [once(_next), once(_asyncsDone)]
                           : [once(_next)]).concat(hookArgs);
               return currPre.apply(self, preArgs);
-            } else if (!proto[name].numAsyncPres) {
+            } else if (!_asyncsLeft) {
               return _done.apply(self, hookArgs);
             }
           }
@@ -12092,7 +12204,7 @@ module.exports = {
           };
       if (_asyncsLeft) {
         function _asyncsDone (err) {
-          if (err && err instanceof Error) {
+          if (err) {
             return handleError(err);
           }
           --_asyncsLeft || _done.apply(self, hookArgs);
@@ -12190,11 +12302,14 @@ Kareem.prototype.execPre = function(name, context, callback) {
 
   if (!numPres) {
     return process.nextTick(function() {
-      callback();
+      callback(null);
     });
   }
 
   var next = function() {
+    if (currentPre >= numPres) {
+      return;
+    }
     var pre = pres[currentPre];
 
     if (pre.isAsync) {
@@ -12221,9 +12336,9 @@ Kareem.prototype.execPre = function(name, context, callback) {
             return callback(error);
           }
 
-          if (0 === --numAsyncPres) {
-            return callback();
-          } 
+          if (--numAsyncPres === 0) {
+            return callback(null);
+          }
         });
     } else if (pre.fn.length > 0) {
       pre.fn.call(context, function(error) {
@@ -12240,7 +12355,7 @@ Kareem.prototype.execPre = function(name, context, callback) {
             // Leave parallel hooks to run
             return;
           } else {
-            return callback();
+            return callback(null);
           }
         }
 
@@ -12254,7 +12369,7 @@ Kareem.prototype.execPre = function(name, context, callback) {
           return;
         } else {
           return process.nextTick(function() {
-            callback()
+            callback(null);
           });
         }
       }
@@ -12269,11 +12384,10 @@ Kareem.prototype.execPost = function(name, context, args, callback) {
   var posts = this._posts[name] || [];
   var numPosts = posts.length;
   var currentPost = 0;
-  var done = false;
 
   if (!numPosts) {
     return process.nextTick(function() {
-      callback.apply(null, [undefined].concat(args));
+      callback.apply(null, [null].concat(args));
     });
   }
 
@@ -12283,14 +12397,11 @@ Kareem.prototype.execPost = function(name, context, args, callback) {
     if (post.length > args.length) {
       post.apply(context, args.concat(function(error) {
         if (error) {
-          if (done) {
-            return;
-          }
           return callback(error);
         }
 
         if (++currentPost >= numPosts) {
-          return callback.apply(null, [undefined].concat(args));
+          return callback.apply(null, [null].concat(args));
         }
 
         next();
@@ -12299,7 +12410,7 @@ Kareem.prototype.execPost = function(name, context, args, callback) {
       post.apply(context, args);
 
       if (++currentPost >= numPosts) {
-        return callback.apply(null, [undefined].concat(args));
+        return callback.apply(null, [null].concat(args));
       }
 
       next();
@@ -12347,8 +12458,16 @@ Kareem.prototype.wrap = function(name, fn, context, args) {
   });
 };
 
+Kareem.prototype.createWrapper = function(name, fn, context) {
+  var _this = this;
+  return function() {
+    var args = Array.prototype.slice.call(arguments);
+    _this.wrap(name, fn, context, args);
+  };
+};
+
 Kareem.prototype.pre = function(name, isAsync, fn, error) {
-  if ('boolean' !== typeof arguments[1]) {
+  if (typeof arguments[1] !== 'boolean') {
     error = fn;
     fn = isAsync;
     isAsync = false;
@@ -12372,13 +12491,52 @@ Kareem.prototype.post = function(name, fn) {
   return this;
 };
 
+Kareem.prototype.clone = function() {
+  var n = new Kareem();
+  for (var key in this._pres) {
+    n._pres[key] = this._pres[key].slice();
+  }
+  for (var key in this._posts) {
+    n._posts[key] = this._posts[key].slice();
+  }
+
+  return n;
+};
+
 module.exports = Kareem;
 
 }).call(this,require("FWaASH"))
 },{"FWaASH":46}],51:[function(require,module,exports){
+"use strict";
+
 /**
- * A class representation of the Read Preference.
- *
+ * @fileOverview The **ReadPreference** class is a class that represents a MongoDB ReadPreference and is
+ * used to construct connections.
+ * 
+ * @example
+ * var Db = require('mongodb').Db,
+ *   ReplSet = require('mongodb').ReplSet,
+ *   Server = require('mongodb').Server,
+ *   ReadPreference = require('mongodb').ReadPreference,
+ *   test = require('assert');
+ * // Connect using ReplSet
+ * var server = new Server('localhost', 27017);
+ * var db = new Db('test', new ReplSet([server]));
+ * db.open(function(err, db) {
+ *   test.equal(null, err);
+ *   // Perform a read
+ *   var cursor = db.collection('t').find({});
+ *   cursor.setReadPreference(ReadPreference.PRIMARY);
+ *   cursor.toArray(function(err, docs) {
+ *     test.equal(null, err);
+ *     db.close();
+ *   });
+ * });
+ */
+
+/**
+ * Creates a new ReadPreference instance
+ * 
  * Read Preferences
  *  - **ReadPreference.PRIMARY**, Read from primary only. All operations produce an error (throw an exception where applicable) if primary is unavailable. Cannot be combined with tags (This is the default.).
  *  - **ReadPreference.PRIMARY_PREFERRED**, Read from primary if available, otherwise a secondary.
@@ -12386,11 +12544,13 @@ module.exports = Kareem;
  *  - **ReadPreference.SECONDARY_PREFERRED**, Read from a secondary if available, otherwise read from the primary.
  *  - **ReadPreference.NEAREST**, All modes read from among the nearest candidates, but unlike other modes, NEAREST will include both the primary and all secondaries in the random selection.
  *
- * @class Represents a Read Preference.
- * @param {String} the read preference type
- * @param {Object} tags
- * @return {ReadPreference}
- */
+ * @class
+ * @param {string} mode The ReadPreference mode as listed above.
+ * @param {object} tags An object representing read preference tags.
+ * @property {string} mode The ReadPreference mode.
+ * @property {object} tags The ReadPreference tags.
+ * @return {ReadPreference} a ReadPreference instance.
+ */ 
 var ReadPreference = function(mode, tags) {
   if(!(this instanceof ReadPreference))
     return new ReadPreference(mode, tags);
@@ -12400,8 +12560,12 @@ var ReadPreference = function(mode, tags) {
 }
 
 /**
- * @ignore
- */
+ * Validate if a mode is legal
+ *
+ * @method
+ * @param {string} mode The string representing the read preference mode.
+ * @return {boolean}
+ */  
 ReadPreference.isValid = function(_mode) {
   return (_mode == ReadPreference.PRIMARY || _mode == ReadPreference.PRIMARY_PREFERRED
     || _mode == ReadPreference.SECONDARY || _mode == ReadPreference.SECONDARY_PREFERRED
@@ -12410,8 +12574,12 @@ ReadPreference.isValid = function(_mode) {
 }
 
 /**
- * @ignore
- */
+ * Validate if a mode is legal
+ *
+ * @method
+ * @param {string} mode The string representing the read preference mode.
+ * @return {boolean}
+ */  
 ReadPreference.prototype.isValid = function(mode) {
   var _mode = typeof mode == 'string' ? mode : this.mode;
   return ReadPreference.isValid(_mode);
@@ -12442,7 +12610,7 @@ ReadPreference.NEAREST = 'nearest'
 /**
  * @ignore
  */
-exports.ReadPreference  = ReadPreference;
+module.exports = ReadPreference;
 },{}],52:[function(require,module,exports){
 /**
  * Module dependencies.
@@ -16196,6 +16364,9 @@ module.exports.Symbol = Symbol;
 // Copyright 2009 Google Inc. All Rights Reserved
 
 /**
+ * This type is for INTERNAL use in MongoDB only and should not be used in applications.
+ * The appropriate corresponding type is the JavaScript Date type.
+ * 
  * Defines a Timestamp class for representing a 64-bit two's-complement
  * integer value, which faithfully simulates the behavior of a Java "Timestamp". This
  * implementation is derived from TimestampLib in GWT.

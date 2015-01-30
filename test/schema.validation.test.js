@@ -722,6 +722,26 @@ describe('schema', function(){
       });
     });
 
+    it('doesnt do double validation on document arrays (gh-2618)', function(done) {
+      var A = new Schema({str: String});
+      var B = new Schema({a: [A]});
+      var validateCalls = 0;
+      B.path('a').validate(function(val, next) {
+        ++validateCalls;
+        next();
+      });
+
+      var B = mongoose.model('b', B);
+
+      var p = new B();
+      p.a.push({ str: 'asdf' });
+      p.validate(function(err) {
+        assert.ifError(err);
+        assert.equal(1, validateCalls);
+        done();
+      });
+    });
+
     it('returns cast errors', function(done) {
       var breakfastSchema = new Schema({
         eggs: Number

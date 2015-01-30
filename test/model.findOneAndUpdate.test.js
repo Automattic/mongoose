@@ -990,6 +990,24 @@ describe('model: findByIdAndUpdate:', function(){
     });
   });
 
+  it('accepts undefined', function(done) {
+    var db = start();
+
+    var s = new Schema({
+      time: Date,
+      base: String
+    });
+
+    var Breakfast = db.model('gh-2272', s);
+
+    Breakfast.
+      findOneAndUpdate({}, { time: undefined, base: undefined }, {}).
+      exec(function(error, breakfast) {
+        assert.ifError(error);
+        done();
+      });
+  });
+
   describe('middleware', function() {
     var db;
 

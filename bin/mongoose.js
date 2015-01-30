@@ -1422,7 +1422,8 @@ Document.prototype.validate = function (cb) {
   for (var i = 0; i < paths.length; ++i) {
     var path = paths[i];
     var val = self.getValue(path);
-    if (val instanceof Array && !Buffer.isBuffer(val)) {
+    if (val instanceof Array && !Buffer.isBuffer(val) &&
+        !val.isMongooseDocumentArray) {
       var numElements = val.length;
       for (var j = 0; j < numElements; ++j) {
         paths.push(path + '.' + j);
@@ -5095,8 +5096,9 @@ SchemaDate.prototype.max = function (value, message) {
  */
 
 SchemaDate.prototype.cast = function (value) {
-  if (value === null || value === '')
-    return null;
+  // If null or undefined
+  if (value == null || value === '')
+    return value;
 
   if (value instanceof Date)
     return value;
@@ -5104,7 +5106,7 @@ SchemaDate.prototype.cast = function (value) {
   var date;
 
   // support for timestamps
-  if (value instanceof Number || 'number' == typeof value 
+  if (value instanceof Number || 'number' == typeof value
       || String(value) == Number(value))
     date = new Date(Number(value));
 
@@ -6419,7 +6421,8 @@ SchemaString.prototype.cast = function (value, doc, init) {
     return ret;
   }
 
-  if (value === null) {
+  // If null or undefined
+  if (value == null) {
     return value;
   }
 

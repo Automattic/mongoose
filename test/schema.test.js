@@ -297,16 +297,6 @@ describe('schema', function(){
         assert.equal('woot', Tobi.path('nickname').cast(new Test));
         done();
       });
-      it('casts undefined to "undefined"', function(done){
-        var db= require('./common')();
-        var schema = new Schema({ arr: [String] });
-        var M = db.model('castingStringArrayWithUndefined', schema);
-        M.find({ arr: { $in: [undefined] }}, function (err) {
-          db.close();
-          assert.equal(err && err.message, 'Cast to string failed for value "undefined" at path "arr"');
-          done();
-        });
-      });
     });
 
     it('date', function(done){

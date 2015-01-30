@@ -130,7 +130,7 @@ describe('model: mapreduce:', function(){
             assert.equal('nathan', docs[3]._id);
 
             // update casting works
-            ret.findOneAndUpdate({ _id: 'aaron' }, { published: true }, function (err, doc) {
+            ret.findOneAndUpdate({ _id: 'aaron' }, { published: true }, { 'new': true }, function (err, doc) {
               assert.ifError(err);
               assert.ok(doc);
               assert.equal('aaron', doc._id);

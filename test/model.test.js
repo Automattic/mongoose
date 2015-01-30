@@ -3007,7 +3007,7 @@ describe('Model', function(){
           b.save(function (err) {
             assert.ifError(err);
 
-            B.findByIdAndUpdate({ _id: b._id }, { $set: { comments: [{ title: 'a' }] }}, function (err, doc) {
+            B.findByIdAndUpdate({ _id: b._id }, { $set: { comments: [{ title: 'a' }] }}, { 'new': true }, function (err, doc) {
               assert.ifError(err);
               doc.comments[0].title = 'differ';
               doc.comments[0].remove();
@@ -4852,7 +4852,7 @@ describe('Model', function(){
           }
         };
 
-        Person.findByIdAndUpdate(p._id, updates, function (err, personDoc) {
+        Person.findByIdAndUpdate(p._id, updates, { 'new': true }, function (err, personDoc) {
           assert.ifError(err);
 
           assert.equal(personDoc.loc[0], updates.$set.loc[0]);

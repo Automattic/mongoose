@@ -1,3 +1,18 @@
+4.0.0-rc0 / 2014-01-31
+===================
+ * fixed; wrong order for distinct() params #2628
+ * fixed; handling no query argument to remove() #2627
+ * fixed; createModel and discriminators #2623 [ashaffer](https://github.com/ashaffer)
+ * added; pre('count') middleware #2621
+ * fixed; double validation calls on document arrays #2618
+ * added; validate() catches cast errors #2611
+ * fixed; respect replicaSet parameter in connection string #2609
+ * added; can explicitly exclude paths from versioning #2576 [csabapalfi](https://github.com/csabapalfi)
+ * upgraded; driver to 2.0.15 #2552
+ * fixed; save() handles errors more gracefully in ES6 #2371
+ * fixed; undefined is now a valid argument to findOneAndUpdate #2272
+ * changed; `new` option to findAndModify ops is false by default #2262
+
 3.8.22 / 2014-01-24
 ===================
  * upgraded; node-mongodb-native to 1.4.28 #2587 [Climax777](https://github.com/Climax777)

@@ -1,3 +1,8 @@
+4.0.0-rc1 / 2014-02-01
+======================
+ * fixed; use driver 2.0.14
+ * changed; use transform: true by default #2245
+
 4.0.0-rc0 / 2014-01-31
 ===================
  * fixed; wrong order for distinct() params #2628

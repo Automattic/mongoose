@@ -307,7 +307,7 @@ describe('document', function(){
 
     // test toObject options
     doc.schema.options.toObject = { virtuals: true };
-    clone = doc.toObject();
+    clone = doc.toObject({ transform: false, virtuals: true });
     assert.equal('test', clone.test);
     assert.ok(clone.oids instanceof Array);
     assert.equal(5, clone.nested.age);
@@ -330,7 +330,7 @@ describe('document', function(){
     assert.equal(undefined, clone.nested2);
 
     doc.schema.options.toObject = { minimize: false };
-    clone = doc.toObject();
+    clone = doc.toObject({ transform: false, minimize: false });
     assert.equal('Object', clone.nested2.constructor.name);
     assert.equal(1, Object.keys(clone.nested2).length);
     delete doc.schema.options.toObject;
@@ -379,7 +379,7 @@ describe('document', function(){
     assert.deepEqual(out, clone);
 
     // ignored transform with inline options
-    clone = doc.toObject({ x: 1 });
+    clone = doc.toObject({ x: 1, transform: false });
     assert.ok(!('myid' in clone));
     assert.equal('test', clone.test);
     assert.ok(clone.oids instanceof Array);
@@ -389,7 +389,7 @@ describe('document', function(){
     assert.equal('Object', clone.em[0].constructor.name);
 
     // applied transform when inline transform is true
-    clone = doc.toObject({ x: 1, transform: true });
+    clone = doc.toObject({ x: 1 });
     assert.deepEqual(out, clone);
 
     // transform passed inline
@@ -625,7 +625,7 @@ describe('document', function(){
     assert.deepEqual(out, clone);
 
     // ignored transform with inline options
-    clone = doc.toJSON({ x: 1 });
+    clone = doc.toJSON({ x: 1, transform: false });
     assert.ok(!('myid' in clone));
     assert.equal('test', clone.test);
     assert.ok(clone.oids instanceof Array);
@@ -635,7 +635,7 @@ describe('document', function(){
     assert.equal('Object', clone.em[0].constructor.name);
 
     // applied transform when inline transform is true
-    clone = doc.toJSON({ x: 1, transform: true });
+    clone = doc.toJSON({ x: 1 });
     assert.deepEqual(out, clone);
 
     // transform passed inline
@@ -654,7 +654,6 @@ describe('document', function(){
     assert.ok(undefined === clone.oids);
     assert.ok(undefined === clone._id);
     assert.ok(undefined === clone.nested);
-    assert.ok(undefined === clone.myid);
 
     // all done
     delete doc.schema.options.toJSON;
@@ -664,10 +663,8 @@ describe('document', function(){
   it('jsonifying an object', function(done){
     var doc = new TestDocument({ test: 'woot' })
       , oidString = doc._id.toString();
-
     // convert to json string
     var json = JSON.stringify(doc);
-
     // parse again
     var obj = JSON.parse(json);
 

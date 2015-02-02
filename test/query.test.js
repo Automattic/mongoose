@@ -800,6 +800,7 @@ describe('Query', function(){
         , select: undefined
         , model: undefined
         , options: undefined
+        , repl: undefined
         , _docs: {}
       }
       q.populate(o);
@@ -815,6 +816,7 @@ describe('Query', function(){
         , select: undefined
         , model: undefined
         , options: undefined
+        , repl: undefined
         , _docs: {}
       }
       q.populate(o);
@@ -836,6 +838,7 @@ describe('Query', function(){
         , select: undefined
         , model: undefined
         , options: undefined
+        , repl: undefined
         , _docs: {}
       }
       assert.equal(2, Object.keys(q._mongooseOptions.populate).length);
@@ -1444,7 +1447,7 @@ describe('Query', function(){
       q.setOptions({ read: ['s', [{dc:'eu'}]]});
 
       assert.equal(q.options.thing, 'cat');
-      assert.deepEqual(q._mongooseOptions.populate.fans, { path: 'fans', select: undefined, match: undefined, options: undefined, model: undefined, _docs: {} });
+      assert.deepEqual(q._mongooseOptions.populate.fans, { path: 'fans', select: undefined, match: undefined, options: undefined, model: undefined, repl: undefined, _docs: {} });
       assert.equal(q.options.batchSize, 10);
       assert.equal(q.options.limit, 4);
       assert.equal(q.options.skip, 3);

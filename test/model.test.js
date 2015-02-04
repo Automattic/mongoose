@@ -4864,4 +4864,50 @@ describe('Model', function(){
       });
     });
   });
+
+  describe('gh-2442', function() {
+    it('marks array as modified when initializing non-array from db', function(done) {
+      var db = start();
+
+      var s1 = new Schema({
+        array: mongoose.Schema.Types.Mixed
+      }, { minimize: false });
+
+      var s2 = new Schema({
+        array: {
+          type: [{
+            _id: false,
+            value: {
+              type: Number,
+              default: 0
+            }
+          }],
+          default: [{}]
+        }
+      });
+
+      var M1 = db.model('gh-2442-1', s1, 'gh-2442');
+      var M2 = db.model('gh-2442-2', s2, 'gh-2442');
+
+      M1.create({ array: {} }, function(err, doc) {
+        assert.ifError(err);
+        assert.ok(doc.array);
+        M2.findOne({ _id: doc._id }, function(err, doc) {
+          assert.ifError(err);
+          assert.equal(doc.array[0].value, 0);
+          doc.array[0].value = 1;
+          doc.save(function(err) {
+            assert.ifError(err);
+            M2.findOne({ _id: doc._id }, function(err, doc) {
+              assert.ifError(err);
+              assert.ok(!doc.isModified('array'));
+              assert.deepEqual(doc.array[0].value, 1);
+              assert.equal('[{"value":1}]', JSON.stringify(doc.array));
+              done();
+            });
+          });
+        });
+      });
+    });
+  });
 });

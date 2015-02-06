@@ -22,7 +22,7 @@
       , "jade": "0.26.3"
       , "highlight.js": "7.0.1"
       , "markdown": "0.3.1"
-      , "promises-aplus-tests": ">= 1.0.2"
+      , "promises-aplus-tests": "2.0.4"
       , "tbd": "0.6.4"
       , "benchmark" : "1.0.0"
       , "open": "0.0.3"

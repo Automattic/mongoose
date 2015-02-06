@@ -1,3 +1,11 @@
+3.8.23 / 2014-02-06
+===================
+ * fixed; unset opts.remove when upsert is true #2519
+ * fixed; array saved as object when path is object in array #2442
+ * fixed; inline transforms #2440
+ * fixed; check for callback in count() #2204
+ * fixed; documentation for selecting fields #1534
+
 3.8.22 / 2014-01-24
 ===================
  * upgraded; node-mongodb-native to 1.4.28 #2587 [Climax777](https://github.com/Climax777)

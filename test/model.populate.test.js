@@ -2614,132 +2614,71 @@ describe('model: populate:', function(){
 
   describe('DynRef', function() {
     var db;
+    var Review;
+    var Item1;
+    var Item2;
 
     before(function(done) {
       db = start();
-
-      var ReviewSchema = new Schema({
-          _id: Number,
-          text: String,
-          item: {
-            id: {
+      var reviewSchema = new Schema({
+        _id: Number,
+        text: String,
+        item: {
+          id: {
+            type: Number,
+            refPath: 'item.type'
+          },
+          type: {
+            type: String
+          }
+        },
+        items: [
+          {
+            id: { 
               type: Number,
-              refPath: 'item.type'
+              refPath: 'items.type'
             },
-            type: {
+            type: { 
               type: String
             }
           }
-        }),
-        ArrayPopulate = new Schema({
-          items: [{
-            item: {
-              type: mongoose.SchemaTypes.Mixed,
-              refPath: 'items.type'
-            },
-            type: {
-              type: String
-            }
-          }]
-        }),
-        AnotherSchema = new Schema({
-          _id: Number,
-          body: String,
-          array: Array,
-          bool: Boolean,
-          nest: {
-            string: String,
-            array: Array
-          },
-          mixed: {}
-        }),
-        Review = db.model('DynRefReview', ReviewSchema, 'DynRefReview'),
-        Note = db.model('DynRefNote', AnotherSchema, 'DynRefNote'),
-        Place = db.model('DynRefPlace', AnotherSchema, 'DynRefPlace'),
-        Another = db.model('DynRefAnother', AnotherSchema, 'DynRefAnother'),
-        ArrayPop = db.model('DynRefArrayPopulate', ArrayPopulate, 'DynRefArrayPopulate');
+        ]
+      });
 
-      Place.create({
-        _id: 11,
-        body: "wefwef"
-      }, {
-        _id: 12,
-        body: "rthrth"
-      }, {
-        _id: 13,
-        body: "o.i.io."
-      }, function(err) {
-        assert.ifError(err);
-        Note.create({
-          _id: 21,
-          body: "ergerg"
-        }, {
-          _id: 22,
-          body: "rhtrhryj"
-        }, {
-          _id: 23,
-          body: "kyukuk"
-        }, function(err) {
-          assert.ifError(err);
-          Review.create({
-            _id: 31,
-            text: 'safadv',
-            item: {
-              id: 11,
-              type: 'DynRefPlace'
+      var item1Schema = new Schema({
+        _id: Number,
+        name: String
+      });
+
+      var item2Schema = new Schema({
+        _id: Number,
+        otherName: String
+      });
+
+      Review = db.model('dynrefReview', reviewSchema, 'dynref-0');
+      Item1 = db.model('dynrefItem1', item1Schema, 'dynref-1');
+      Item2 = db.model('dynrefItem2', item2Schema, 'dynref-2');
+
+      var review = {
+        _id: 0,
+        text: 'Test',
+        item: { id: 1, type: 'dynrefItem1' },
+        items: [{ id: 1, type: 'dynrefItem1' }, { id: 2, type: 'dynrefItem2' }]
+      };
+
+      Item1.create({ _id: 1, name: 'Val' }, function(err, doc) {
+        if (err) {
+          return done(err);
+        }
+        Item2.create({ _id: 2, otherName: 'Val' }, function(err, doc) {
+          if (err) {
+            return done(err);
+          }
+          Review.create(review, function(err, doc) {
+            if (err) {
+              return done(err);
             }
-          }, {
-            _id: 32,
-            text: 'rthrt',
-            item: {
-              id: 12,
-              type: 'DynRefPlace'
-            }
-          }, {
-            _id: 33,
-            text: 'tmtyj',
-            item: {
-              id: 13,
-              type: 'DynRefPlace'
-            }
-          }, {
-            _id: 34,
-            text: 'yukilui',
-            item: {
-              id: 21,
-              type: 'DynRefNote'
-            }
-          }, {
-            _id: 35,
-            text: 'h4545t',
-            item: {
-              id: 22,
-              type: 'DynRefNote'
-            }
-          }, {
-            _id: 36,
-            text: 'regeg45',
-            item: {
-              id: 23,
-              type: 'DynRefNote'
-            }
-          }, function(err, a) {
-            assert.ifError(err);
-            ArrayPop.create({
-              items: [{
-                item: 32,
-                type: 'DynRefReview'
-              }, {
-                item: 12,
-                type: 'DynRefPlace'
-              }, {
-                item: 21,
-                type: 'DynRefNote'
-              }]
-            }, function(err) {
-              assert.ifError(err);
-              done();
-            });
+            done();
           });
         });
       });
@@ -2750,25 +2689,23 @@ describe('model: populate:', function(){
     });
 
     it('Simple populate', function(done) {
-      db.model('DynRefReview').find({}).populate('item.id').exec(function(err, result) {
+      Review.find({}).populate('item.id').exec(function(err, results) {
         assert.ifError(err);
-        assert.equal(6, result.length);
-        assert.equal(11, result[0].item.id._id);
-        assert.equal(12, result[1].item.id._id);
-        assert.equal(13, result[2].item.id._id);
-        assert.equal(21, result[3].item.id._id);
-        assert.equal(22, result[4].item.id._id);
-        assert.equal(23, result[5].item.id._id);
+        assert.equal(1, results.length);
+        var result = results[0];
+        assert.equal('Val', result.item.id.name);
         done();
       });
     });
 
     it('Array populate', function(done) {
-      db.model('DynRefArrayPopulate').find({}).populate('items.item').exec(function(err, result) {
+      Review.find({}).populate('items.id').exec(function(err, results) {
         assert.ifError(err);
-        assert.equal(32, result[0].items[0].item._id);
-        assert.equal(12, result[0].items[1].item._id);
-        assert.equal(21, result[0].items[2].item._id);
+        assert.equal(1, results.length);
+        var result = results[0];
+        assert.equal(2, result.items.length);
+        assert.equal('Val', result.items[0].id.name);
+        assert.equal('Val', result.items[1].id.otherName);
         done();
       });
     });

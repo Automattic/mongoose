@@ -5079,6 +5079,7 @@ describe('Model', function(){
             u2.save(function(err) {
               assert.ok(err);
               assert.ok(u2.isModified('changer'));
+              done();
             });
           });
         });

@@ -1,3 +1,11 @@
+3.8.23 / 2014-02-06
+===================
+ * fixed; unset opts.remove when upsert is true #2519
+ * fixed; array saved as object when path is object in array #2442
+ * fixed; inline transforms #2440
+ * fixed; check for callback in count() #2204
+ * fixed; documentation for selecting fields #1534
+
 4.0.0-rc1 / 2014-02-01
 ======================
  * fixed; use driver 2.0.14

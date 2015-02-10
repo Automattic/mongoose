@@ -1,3 +1,13 @@
+4.0.0-rc2 / 2015-02-10
+======================
+ * added; io.js to travis build
+ * removed; browser build dependencies not installed by default
+ * added; dynamic refpaths #2640 [chetvernikov](https://github.com/chetvernikov)
+ * fixed; dont call child schema transforms on parent #2639 [chetvernikov](https://github.com/chetvernikov)
+ * fixed; get rid of remove option if new is set in findAndModify #2598
+ * fixed; aggregate all document array validation errors #2589
+ * fixed; custom setters called when setting value to undefined #1892
+
 3.8.23 / 2015-02-06
 ===================
  * fixed; unset opts.remove when upsert is true #2519

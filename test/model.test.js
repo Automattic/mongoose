@@ -2047,6 +2047,24 @@ describe('Model', function(){
         });
       });
 
+      it('can be cleared by setting null', function (done) {
+        var db = start();
+
+        var schema = new Schema({
+          nest: {
+            st: String
+          }
+        });
+
+        mongoose.model('NestedStringD', schema);
+        var T = db.model('NestedStringD', collection);
+        var t = new T({ nest: { st: 'check'} });
+        assert.strictEqual(typeof t.nest.st, 'string');
+        t.set({ nest: null });
+        assert.strictEqual(t.nest.st, undefined);
+        done();
+      });
+
       it('array of Mixed on existing doc can be pushed to', function(done){
         var db = start();
 

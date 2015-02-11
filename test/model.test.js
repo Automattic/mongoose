@@ -5042,6 +5042,37 @@ describe('Model', function(){
     });
   });
 
+  it('should mark populated defaults as modified when not a new document', function(done){
+    var db = start();
+
+    var Test = new Schema({
+        original: String
+    }, { collection: 'test' });
+
+    var ModifiedTest = new Schema({
+      original: String,
+      another: {
+        type: String,
+        default: 'hello'
+      }
+    }, { collection: 'test' });
+
+    var TestModel = db.model('TestModel', Test);
+    var ModifiedTestModel = db.model('ModifiedTestModel', ModifiedTest);
+
+    var test = new TestModel({original: 'original value'});
+
+    test.save(function(err, savedTest) {
+      ModifiedTestModel.findById(savedTest._id, function(err, modifiedTest) {
+        assert.ifError(err);
+        assert.equal(test.original, modifiedTest.original);
+        assert.equal(modifiedTest.another, 'hello');
+        assert.ok(modifiedTest.isModified('another'));
+        done();
+      });
+    });
+  })
+
   describe('save failure', function() {
     it('doesnt reset "modified" status for fields', function(done) {
       var db = start();

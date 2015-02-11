@@ -80,7 +80,9 @@ schema.path('nested.setr').set(function (v) {
 var dateSetterCalled = false;
 schema.path('date').set(function (v) {
   // should not have been cast to a Date yet
-  assert.equal('string', typeof v);
+  if (v !== undefined) {
+    assert.equal('string', typeof v);
+  }
   dateSetterCalled = true;
   return v;
 });
@@ -113,7 +115,7 @@ describe('document', function(){
       doc.init({ nested: null });
       assert.strictEqual(undefined, doc.nested.age);
       done();
-    })
+    });
 
     it('work', function(done){
       var doc = new TestDocument();
@@ -1319,7 +1321,21 @@ describe('document', function(){
         assert.equal(+d.date, +new Date(date));
         done();
       })
-    })
+    });
+
+    it('works with undefined (gh-1892)', function(done) {
+      var date = 'Thu Aug 16 2012 09:45:59 GMT-0700';
+      var d = new TestDocument();
+      d.nested.setr = undefined;
+      assert.equal('undefined setter', d.nested.setr);
+      dateSetterCalled = false;
+      d.date = undefined;
+      d.validate(function(err) {
+        assert.ifError(err);
+        assert.ok(dateSetterCalled);
+        done();
+      });
+    });
 
     describe('on nested paths', function(){
       describe('using set(path, object)', function(){
@@ -1403,7 +1419,7 @@ describe('document', function(){
           assert.ok(!doc.isModified('nested.age'));
           assert.ok(doc.isModified('nested.deep'));
           assert.equal('Hank and Marie', doc.nested.deep.x);
-          
+
           done();
         })
 

@@ -754,5 +754,19 @@ describe('schema', function(){
         done();
       });
     });
+
+    it('handles multiple subdocument errors', function(done) {
+      var foodSchema = new Schema({ name: { type: String, required: true, enum: ['bacon', 'eggs'] } });
+      var breakfast = new Schema({ foods: [foodSchema] });
+
+      var Breakfast = mongoose.model('gh-2589', breakfast, 'gh-2589');
+      var bad = new Breakfast({ foods: [{ name: 'tofu' }, { name: 'waffles' }] });
+      bad.validate(function(error) {
+        assert.ok(error);
+        assert.ok(error.errors['foods.0.name']);
+        assert.ok(error.errors['foods.1.name']);
+        done();
+      });
+    });
   });
 });

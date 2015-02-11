@@ -1,9 +1,27 @@
-4.0.0-rc1 / 2014-02-01
+4.0.0-rc2 / 2015-02-10
+======================
+ * added; io.js to travis build
+ * removed; browser build dependencies not installed by default
+ * added; dynamic refpaths #2640 [chetvernikov](https://github.com/chetvernikov)
+ * fixed; dont call child schema transforms on parent #2639 [chetvernikov](https://github.com/chetvernikov)
+ * fixed; get rid of remove option if new is set in findAndModify #2598
+ * fixed; aggregate all document array validation errors #2589
+ * fixed; custom setters called when setting value to undefined #1892
+
+3.8.23 / 2015-02-06
+===================
+ * fixed; unset opts.remove when upsert is true #2519
+ * fixed; array saved as object when path is object in array #2442
+ * fixed; inline transforms #2440
+ * fixed; check for callback in count() #2204
+ * fixed; documentation for selecting fields #1534
+
+4.0.0-rc1 / 2015-02-01
 ======================
  * fixed; use driver 2.0.14
  * changed; use transform: true by default #2245
 
-4.0.0-rc0 / 2014-01-31
+4.0.0-rc0 / 2015-01-31
 ===================
  * fixed; wrong order for distinct() params #2628
  * fixed; handling no query argument to remove() #2627
@@ -18,7 +36,7 @@
  * fixed; undefined is now a valid argument to findOneAndUpdate #2272
  * changed; `new` option to findAndModify ops is false by default #2262
 
-3.8.22 / 2014-01-24
+3.8.22 / 2015-01-24
 ===================
  * upgraded; node-mongodb-native to 1.4.28 #2587 [Climax777](https://github.com/Climax777)
  * added; additional documentation for validators #2449

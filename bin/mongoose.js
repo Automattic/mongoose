@@ -689,7 +689,8 @@ Document.prototype.init = function (doc, opts, fn) {
   this.isNew = false;
 
   // handle docs with populated paths
-  if (doc._id && opts && opts.populated && opts.populated.length) {
+  // If doc._id is not null or undefined
+  if (doc._id != null && opts && opts.populated && opts.populated.length) {
     var id = String(doc._id);
     for (var i = 0; i < opts.populated.length; ++i) {
       var item = opts.populated[i];
@@ -753,7 +754,9 @@ function init (self, obj, doc, prefix) {
         }
       }
       // mark as hydrated
-      self.$__.activePaths.init(path);
+      if (!self.isModified(path)) {
+        self.$__.activePaths.init(path);
+      }
     }
   }
 }
@@ -997,7 +1000,7 @@ Document.prototype.set = function (path, val, type, options) {
     ? undefined
     : this.getValue(path);
 
-  if (!schema || undefined === val) {
+  if (!schema) {
     this.$__set(pathToMark, path, constructing, parts, schema, val, priorVal);
     return this;
   }
@@ -2086,6 +2089,12 @@ Document.prototype.$__handleReject = function handleReject(err) {
  */
 
 Document.prototype.toObject = function (options) {
+  var defaultOptions = { transform: true };
+  for (var key in options) {
+    defaultOptions[key] = options[key];
+  }
+  options = defaultOptions;
+
   if (options && options.depopulate && !options._skipDepopulateTopLevel && this.$__.wasPopulated) {
     // populated paths that we set to a document
     return clone(this._id, options);
@@ -2131,25 +2140,27 @@ Document.prototype.toObject = function (options) {
     }
   }
 
+  var transform = options.transform;
+
   // In the case where a subdocument has its own transform function, we need to
   // check and see if the parent has a transform (options.transform) and if the
   // child schema has a transform (this.schema.options.toObject) In this case,
   // we need to adjust options.transform to be the child schema's transform and
   // not the parent schema's
-  if (true === options.transform ||
-      (this.schema.options.toObject && options.transform)) {
-    var opts = options.json
-      ? this.schema.options.toJSON
-      : this.schema.options.toObject;
+  if (true === transform ||
+      (this.schema.options.toObject && transform)) {
+
+    var opts = options.json? this.schema.options.toJSON : this.schema.options.toObject;
+
     if (opts) {
-      options.transform = opts.transform;
+      transform = (typeof options.transform === 'function' ? options.transform : opts.transform);
     }
   } else {
     options.transform = originalTransform;
   }
 
-  if ('function' == typeof options.transform) {
-    var xformed = options.transform(this, ret, options);
+  if ('function' == typeof transform) {
+    var xformed = transform(this, ret, options);
     if ('undefined' != typeof xformed) ret = xformed;
   }
 
@@ -3885,7 +3896,7 @@ Schema.prototype.post = function(method, fn) {
  * Registers a plugin for this schema.
  *
  * @param {Function} plugin callback
- * @param {Object} opts
+ * @param {Object} [opts]
  * @see plugins
  * @api public
  */
@@ -4385,6 +4396,11 @@ SchemaArray.prototype.cast = function (value, doc, init) {
 
     return value;
   } else {
+    // gh-2442: if we're loading this from the db and its not an array, mark
+    // the whole array as modified.
+    if (!!doc && !!init) {
+      doc.markModified(this.path);
+    }
     return this.cast([value], doc, init);
   }
 };
@@ -5261,8 +5277,8 @@ DocumentArray.prototype.doValidate = function (array, fn, scope) {
   SchemaType.prototype.doValidate.call(this, array, function (err) {
     if (err) return fn(err);
 
-    var count = array && array.length
-      , error;
+    var count = array && array.length;
+    var error;
 
     if (!count) return fn();
 
@@ -5274,16 +5290,16 @@ DocumentArray.prototype.doValidate = function (array, fn, scope) {
       // sidestep sparse entries
       var doc = array[i];
       if (!doc) {
-        --count || fn();
+        --count || fn(errors);
         continue;
       }
 
       ;(function (i) {
         doc.validate(function (err) {
-          if (err && !error) {
-            return fn(error = err);
+          if (err) {
+            error = err;
           }
-          --count || fn();
+          --count || fn(error);
         });
       })(i);
     }
@@ -5345,6 +5361,11 @@ DocumentArray.prototype.cast = function (value, doc, init, prev) {
     , i
 
   if (!Array.isArray(value)) {
+    // gh-2442 mark whole array as modified if we're initializing a doc from
+    // the db and the path isn't an array in the document
+    if (!!doc && init) {
+      doc.markModified(this.path);
+    }
     return this.cast([value], doc, init, prev);
   }
 
@@ -7684,7 +7705,7 @@ MongooseArray.mixin = {
     var i = keys.length;
 
     if (0 === i) {
-      ret[0] = ['$set', this.toObject({ depopulate: 1 })];
+      ret[0] = ['$set', this.toObject({ depopulate: 1, transform: false })];
       return ret;
     }
 
@@ -7696,9 +7717,9 @@ MongooseArray.mixin = {
       // need to convert their elements as if they were MongooseArrays
       // to handle populated arrays versus DocumentArrays properly.
       if (isMongooseObject(val)) {
-        val = val.toObject({ depopulate: 1 });
+        val = val.toObject({ depopulate: 1, transform: false });
       } else if (Array.isArray(val)) {
-        val = this.toObject.call(val, { depopulate: 1 });
+        val = this.toObject.call(val, { depopulate: 1, transform: false });
       } else if (val.valueOf) {
         val = val.valueOf();
       }

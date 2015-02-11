@@ -2612,6 +2612,105 @@ describe('model: populate:', function(){
     });
   })
 
+  describe('DynRef', function() {
+    var db;
+    var Review;
+    var Item1;
+    var Item2;
+
+    before(function(done) {
+      db = start();
+      var reviewSchema = new Schema({
+        _id: Number,
+        text: String,
+        item: {
+          id: {
+            type: Number,
+            refPath: 'item.type'
+          },
+          type: {
+            type: String
+          }
+        },
+        items: [
+          {
+            id: { 
+              type: Number,
+              refPath: 'items.type'
+            },
+            type: { 
+              type: String
+            }
+          }
+        ]
+      });
+
+      var item1Schema = new Schema({
+        _id: Number,
+        name: String
+      });
+
+      var item2Schema = new Schema({
+        _id: Number,
+        otherName: String
+      });
+
+      Review = db.model('dynrefReview', reviewSchema, 'dynref-0');
+      Item1 = db.model('dynrefItem1', item1Schema, 'dynref-1');
+      Item2 = db.model('dynrefItem2', item2Schema, 'dynref-2');
+
+      var review = {
+        _id: 0,
+        text: 'Test',
+        item: { id: 1, type: 'dynrefItem1' },
+        items: [{ id: 1, type: 'dynrefItem1' }, { id: 2, type: 'dynrefItem2' }]
+      };
+
+      Item1.create({ _id: 1, name: 'Val' }, function(err, doc) {
+        if (err) {
+          return done(err);
+        }
+        Item2.create({ _id: 2, otherName: 'Val' }, function(err, doc) {
+          if (err) {
+            return done(err);
+          }
+          Review.create(review, function(err, doc) {
+            if (err) {
+              return done(err);
+            }
+            done();
+          });
+        });
+      });
+    });
+
+    after(function(done) {
+      db.close(done);
+    });
+
+    it('Simple populate', function(done) {
+      Review.find({}).populate('item.id').exec(function(err, results) {
+        assert.ifError(err);
+        assert.equal(1, results.length);
+        var result = results[0];
+        assert.equal('Val', result.item.id.name);
+        done();
+      });
+    });
+
+    it('Array populate', function(done) {
+      Review.find({}).populate('items.id').exec(function(err, results) {
+        assert.ifError(err);
+        assert.equal(1, results.length);
+        var result = results[0];
+        assert.equal(2, result.items.length);
+        assert.equal('Val', result.items[0].id.name);
+        assert.equal('Val', result.items[1].id.otherName);
+        done();
+      });
+    });
+  });
+
   describe('leaves Documents within Mixed properties alone (gh-1471)', function(){
     var db;
     var Cat;

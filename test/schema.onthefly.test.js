@@ -125,4 +125,20 @@ describe('schema.onthefly', function(){
     // TODO
     done();
   });
-})
+
+  it('casts on get() (gh-2360)', function(done) {
+    var db = start();
+    var Decorated = db.model('gh2360', DecoratedSchema, 'gh2360');
+
+    var d = new Decorated({ title: '1' });
+    assert.equal('number', typeof d.get('title', 'Number'));
+
+    d.title = '000000000000000000000001';
+    assert.equal(d.get('title', ObjectId).constructor.name, 'ObjectID');
+
+    d.set('title', 1, Number);
+    assert.equal('number', typeof d.get('title'));
+
+    done();
+  });
+});

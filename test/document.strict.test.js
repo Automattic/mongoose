@@ -318,10 +318,52 @@ describe('document: strict mode:', function(){
             assert.equal(undefined, doc._doc.notInSchema);
             done();
           });
-        })
-      })
-    })
-  })
+        });
+      });
+    });
+  });
+
+  it('can be overwritten with findOneAndUpdate (gh-1967)', function(done) {
+    var db = start();
+
+    var strict = new Schema({
+      bool: Boolean
+    });
+
+    var Strict = db.model('Strict', strict);
+    var s = new Strict({ bool: true });
+
+    // insert non-schema property
+    var doc = s.toObject();
+    doc.notInSchema = true;
+
+    Strict.collection.insert(doc, { w: 1 }, function (err) {
+      assert.ifError(err);
+
+      Strict.findById(doc._id, function (err, doc) {
+        assert.ifError(err);
+        assert.equal(true, doc._doc.bool);
+        assert.equal(true, doc._doc.notInSchema);
+
+        Strict.findOneAndUpdate(
+            { _id: doc._id }
+          , { $unset: { bool: 1, notInSchema: 1 }}
+          , { strict: false, w: 1 }
+          , function (err) {
+
+          assert.ifError(err);
+
+          Strict.findById(doc._id, function (err, doc) {
+            db.close();
+            assert.ifError(err);
+            assert.equal(undefined, doc._doc.bool);
+            assert.equal(undefined, doc._doc.notInSchema);
+            done();
+          });
+        });
+      });
+    });
+  });
 
   describe('"throws" mode', function(){
     it('throws on set() of unknown property', function(done){

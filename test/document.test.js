@@ -529,7 +529,53 @@ describe('document', function(){
 
         done();
     });
+  });
 
+  it('handles child schema transforms', function(done) {
+    var db = start();
+    var userSchema = new Schema({
+      name: String,
+      email: String
+    });
+    var topicSchema = new Schema({
+      title: String,
+      email: String,
+      followers: [userSchema]
+    });
+
+    userSchema.options.toObject = {
+      transform: function(doc, ret, options) {
+        delete ret.email;
+      }
+    };
+    
+    topicSchema.options.toObject = {
+      transform: function(doc, ret, options) {
+        ret.title = ret.title.toLowerCase();
+      }
+    };
+
+    var Topic = db.model('gh2691', topicSchema, 'gh2691');
+
+    var topic = new Topic({
+      title: 'Favorite Foods',
+      email: 'a@b.co',
+      followers: [{ name: 'Val', email: 'val@test.co' }]
+    });
+
+    var expectedOutput = {
+      _id: topic._id.toString(),
+      title: 'favorite foods',
+      email: 'a@b.co',
+      followers: [{ name: 'Val', _id: topic.followers[0]._id.toString() }]
+    };
+
+    var output = topic.toObject({ transform: true });
+    assert.equal('favorite foods', output.title);
+    assert.equal('a@b.co', output.email);
+    assert.equal('Val', output.followers[0].name);
+    assert.equal(undefined, output.followers[0].email);
+    done();
   });
 
   it('doesnt clobber child schema options when called with no params (gh-2035)', function(done) {

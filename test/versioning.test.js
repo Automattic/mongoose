@@ -501,4 +501,19 @@ describe('versioning', function(){
     });
   });
 
+  it('can remove version key from toObject() (gh-2675)', function(done) {
+    var db = start();
+    var schema = new Schema({ name: String });
+    var M = db.model('gh2675', schema, 'gh2675');
+
+    var m = new M();
+    m.save(function(err, m) {
+      assert.ifError(err);
+      var obj = m.toObject();
+      assert.equal(0, obj.__v);
+      obj = m.toObject({ versionKey: false });
+      assert.equal(undefined, obj.__v);
+      done();
+    });
+  });
 })

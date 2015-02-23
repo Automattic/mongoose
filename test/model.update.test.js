@@ -1185,7 +1185,7 @@ describe('model: update:', function(){
 
     it('multiple validation errors', function(done) {
       var db = start();
-    
+
       var s = new Schema({
         steak: { type: String, enum: ['ribeye', 'sirloin'] },
         eggs: { type: Number, min: 4, max: 6 },
@@ -1280,6 +1280,23 @@ describe('model: update:', function(){
               done();
             });
           });
+      });
+    });
+
+    it('runs before validators (gh-2706)', function(done) {
+      var db = start();
+
+      var bandSchema = new Schema({
+        lead: { type: String, enum: ['Axl Rose'] }
+      });
+      bandSchema.pre('update', function() {
+        this.options.runValidators = true;
+      });
+      var Band = db.model('gh2706', bandSchema, 'gh2706');
+
+      Band.update({}, { $set: { lead: 'Not Axl' } }, function(err) {
+        assert.ok(err);
+        done();
       });
     });
   });

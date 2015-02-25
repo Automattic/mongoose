@@ -364,5 +364,24 @@ describe('document: strict mode:', function(){
 
       done();
     });
+
+    it('doesnt throw with refs (gh-2665)', function(done) {
+      var m = new mongoose.Mongoose;
+
+      // Simple schema with throws option
+      var FooSchema = new mongoose.Schema({
+        name: { type: m.Schema.Types.ObjectId, ref: 'test', required: false, default: null },
+        father: { name: { full: String } }
+      }, {strict: "throw"});
+
+      // Create the model
+      var Foo = m.model('Foo', FooSchema);
+
+      assert.doesNotThrow(function(){
+        new Foo({name: m.Types.ObjectId(), father: { name: { full: 'bacon' } } });
+      })
+
+      done();
+    });
   })
 })

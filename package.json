@@ -1,11 +1,11 @@
 {
     "name": "mongoose"
   , "description": "Mongoose MongoDB ODM"
-  , "version": "3.8.23"
+  , "version": "3.8.24"
   , "author": "Guillermo Rauch <guillermo@learnboost.com>"
   , "keywords": ["mongodb", "document", "model", "schema", "database", "odm", "data", "datastore", "query", "nosql", "orm", "db"]
   , "dependencies": {
-        "mongodb": "1.4.28"
+        "mongodb": "1.4.31"
       , "hooks": "0.2.1"
       , "ms": "0.1.0"
       , "sliced": "0.0.5"
@@ -22,7 +22,7 @@
       , "jade": "0.26.3"
       , "highlight.js": "7.0.1"
       , "markdown": "0.3.1"
-      , "promises-aplus-tests": ">= 1.0.2"
+      , "promises-aplus-tests": "2.0.4"
       , "tbd": "0.6.4"
       , "benchmark" : "1.0.0"
       , "open": "0.0.3"

@@ -1,3 +1,13 @@
+3.8.24 / 2015-02-25
+===================
+ * fixed; properly apply child schema transforms #2691
+ * fixed; make copy of findOneAndUpdate options before modifying #2687
+ * fixed; apply defaults when parent path is selected #2670 #2629
+ * fixed; properly get ref property for nested paths #2665
+ * fixed; node driver makes copy of authenticate options before modifying them #2619
+ * fixed; dont block process exit when auth fails #2599
+ * fixed; remove redundant clone in update() #2537
+
 4.0.0-rc2 / 2015-02-10
 ======================
  * added; io.js to travis build

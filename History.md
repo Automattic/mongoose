@@ -1,3 +1,13 @@
+3.8.24 / 2014-02-25
+===================
+ * fixed; properly apply child schema transforms #2691
+ * fixed; make copy of findOneAndUpdate options before modifying #2687
+ * fixed; apply defaults when parent path is selected #2670 #2629
+ * fixed; properly get ref property for nested paths #2665
+ * fixed; node driver makes copy of authenticate options before modifying them #2619
+ * fixed; dont block process exit when auth fails #2599
+ * fixed; remove redundant clone in update() #2537
+
 3.8.23 / 2014-02-06
 ===================
  * fixed; unset opts.remove when upsert is true #2519

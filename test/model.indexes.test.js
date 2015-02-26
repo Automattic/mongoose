@@ -190,7 +190,7 @@ describe('model', function(){
 
       Test.on('index', function (err) {
         db.close();
-        assert.ok(/^E11000 duplicate key error index:/.test(err.message), err);
+        assert.ok(/E11000 duplicate key error/.test(err.message), err);
         done();
       });
 

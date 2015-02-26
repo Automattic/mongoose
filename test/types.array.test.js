@@ -763,7 +763,7 @@ describe('types array', function(){
           assert.equal(2, m.doc.length);
           assert.ok(m.doc.some(function(v) { return v.name === 'Rap' }));
           assert.ok(m.doc.some(function(v) { return v.name === 'House' }));
-          done();
+          db.close(done);
         });
       });
     });
@@ -848,7 +848,7 @@ describe('types array', function(){
                   assert.equal(3, m.x[1]);
                   assert.equal(2, m.x[2]);
                   assert.equal(1, m.x[3]);
-                  done();
+                  db.close(done);
                 })
               })
             })
@@ -1349,7 +1349,7 @@ describe('types array', function(){
             assert.equal(2, m.em.length);
             assert.equal(1, m.em[0].sub.length);
             assert.equal('a', m.em[0].sub[0]);
-            done();
+            db.close(done);
           });
         });
       });

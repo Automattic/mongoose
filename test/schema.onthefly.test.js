@@ -121,11 +121,6 @@ describe('schema.onthefly', function(){
     });
   })
 
-  it('should support on the fly nested documents', function (done) {
-    // TODO
-    done();
-  });
-
   it('casts on get() (gh-2360)', function(done) {
     var db = start();
     var Decorated = db.model('gh2360', DecoratedSchema, 'gh2360');
@@ -139,6 +134,6 @@ describe('schema.onthefly', function(){
     d.set('title', 1, Number);
     assert.equal('number', typeof d.get('title'));
 
-    done();
+    db.close(done);
   });
 });

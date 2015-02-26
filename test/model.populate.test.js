@@ -87,7 +87,7 @@ describe('model: populate:', function(){
             post.populate('comments', function(){});
           });
           
-          done();
+          db.close(done);
         });
       });
     });
@@ -114,13 +114,12 @@ describe('model: populate:', function(){
         .findById(post._id)
         .populate('_creator')
         .exec(function (err, post) {
-          db.close();
           assert.ifError(err);
 
           assert.ok(post._creator instanceof User);
           assert.equal(post._creator.name, 'Guillermo');
           assert.equal(post._creator.email, 'rauchg@gmail.com');
-          done();
+          db.close(done);
         });
       });
     });

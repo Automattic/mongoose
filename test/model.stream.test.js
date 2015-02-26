@@ -326,6 +326,7 @@ describe('query stream:', function(){
           error = err;
         }).
         on('close', function () {
+          db.close();
           done(error);
         });
     });
@@ -369,9 +370,7 @@ describe('query stream:', function(){
         assert.ok(~found.indexOf(2));
         assert.ok(~found.indexOf(3));
       }
-      db.close(function () {
-        done(err);
-      });
+      db.close(done);
     };
   });
 
@@ -388,9 +387,7 @@ describe('query stream:', function(){
       assert.ifError(error);
       User.find().stream().on('data', function(doc) {
         assert.equal(undefined, doc.password);
-        db.close(function() {
-          done();
-        });
+        db.close(done);
       });
     });
   });

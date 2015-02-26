@@ -5036,7 +5036,7 @@ describe('Model', function(){
         parent.children.push({name: 'another child'});
         Parent.findByIdAndUpdate(it._id, { $set: { children: parent.children } }, function(err, affected) {
           assert.ifError(err);
-          done();
+          db.close(done);
         });
       });
     });
@@ -5079,7 +5079,7 @@ describe('Model', function(){
             u2.save(function(err) {
               assert.ok(err);
               assert.ok(u2.isModified('changer'));
-              done();
+              db.close(done);
             });
           });
         });
@@ -5125,7 +5125,7 @@ describe('Model', function(){
               assert.ok(!doc.isModified('array'));
               assert.deepEqual(doc.array[0].value, 1);
               assert.equal('[{"value":1}]', JSON.stringify(doc.array));
-              done();
+              db.close(done);
             });
           });
         });

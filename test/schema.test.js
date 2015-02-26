@@ -1284,7 +1284,7 @@ describe('schema', function(){
           Some.findOne({ _id : s.id }, function (err, ss) {
             assert.ifError(err);
             assert.equal(ss.obj, ele.id);
-            done();
+            db.close(done);
           });
         });
       });
@@ -1393,7 +1393,7 @@ describe('schema', function(){
           err = e;
         }
         assert.ifError(err);
-        done();
+        db.close(done);
       })
     })
   })

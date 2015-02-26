@@ -341,7 +341,7 @@ describe('document: hooks:', function () {
       assert.ok(err);
       assert.ok(err.errors['e.0.text']);
       assert.equal(false, presave);
-      done();
+      db.close(done);
     });
   });
 
@@ -396,7 +396,7 @@ describe('document: hooks:', function () {
                 assert.ifError(err);
                 assert.equal(2, called.pre);
                 assert.equal(2, called.post);
-                done();
+                db.close(done);
               });
             });
           });

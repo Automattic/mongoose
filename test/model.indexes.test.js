@@ -52,9 +52,8 @@ describe('model', function(){
             }
           });
 
-          db.close();
           assert.equal(4, assertions);
-          done();
+          db.close(done);
         });
       });
     });
@@ -90,9 +89,8 @@ describe('model', function(){
             });
           }
 
-          db.close();
           assert.equal(3, assertions);
-          done();
+          db.close(done);
         });
       });
     });
@@ -138,9 +136,8 @@ describe('model', function(){
             });
           }
 
-          db.close();
           assert.equal(5, assertions);
-          done();
+          db.close(done);
         });
       });
     });
@@ -222,7 +219,7 @@ describe('model', function(){
               assert.ifError(err);
               // Only default _id index should exist
               assert.deepEqual(['_id_'], Object.keys(indexes));
-              done();
+              db.close(done);
             });
           }, 100);
         });
@@ -239,7 +236,7 @@ describe('model', function(){
             Test.collection.getIndexes(function(err, indexes) {
               assert.ifError(err);
               assert.equal(2, Object.keys(indexes).length);
-              done();
+              db.close(done);
             });
           });
         });
@@ -258,7 +255,7 @@ describe('model', function(){
               Test.collection.getIndexes(function(err, indexes){
                 assert.ifError(err);
                 assert.deepEqual(['_id_'], Object.keys(indexes));
-                done();
+                db.close(done);
               });
             }, 100);
           });
@@ -341,7 +338,7 @@ describe('model', function(){
         Test.ensureIndexes(function (err) {
           assert.ifError(err);
           assert.ok(called);
-          done();
+          db.close(done);
         });
       })
     })

@@ -52,6 +52,7 @@ describe('collections: capped:', function(){
       assert.ifError(err);
       assert.ok(options.capped, 'should create a capped collection');
       assert.equal(8192, options.size);
+      db.close();
       done();
     });
   })

@@ -367,7 +367,7 @@ describe('schema select option', function(){
         query.exec(function (err, doc) {
           if (err) return done(err);
           assert.equal(2, doc.many.length);
-          done();
+          db.close(done);
         });
       });
     })
@@ -391,8 +391,7 @@ describe('schema select option', function(){
       var pending = 2;
       function cb (err, s) {
         if (!--pending) {
-          db.close();
-          done();
+          db.close(done);
         }
         if (Array.isArray(s)) s = s[0];
         assert.ifError(err);
@@ -553,7 +552,7 @@ describe('schema select option', function(){
       Model.findOne({}, { nested: 1 }, function(error, doc){
         assert.ifError(error);
         assert.equal('val', doc.nested.name);
-        done();
+        db.close(done);
       });
     });
   });

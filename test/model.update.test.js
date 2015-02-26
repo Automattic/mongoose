@@ -103,7 +103,7 @@ describe('model: update:', function(){
 
     post.save(function (err) {
       assert.ifError(err);
-      done();
+      db.close(done);
     });
   });
 
@@ -192,7 +192,6 @@ describe('model: update:', function(){
                   assert.ifError(err);
 
                   BlogPost.findById(post._id, function (err, up) {
-                    db.close();
                     assert.ifError(err);
 
                     assert.equal(up.title,newTitle);
@@ -210,7 +209,7 @@ describe('model: update:', function(){
                     // non-schema data was still stored in mongodb
                     assert.strictEqual(1, up._doc.idontexist);
 
-                    done();
+                    db.close(done);
                   });
                 });
               });
@@ -236,7 +235,6 @@ describe('model: update:', function(){
 
       // get the underlying doc
       BlogPost.collection.findOne({ _id: post._id }, function (err, doc) {
-        db.close();
         assert.ifError(err);
 
         var up = new BlogPost;
@@ -252,7 +250,7 @@ describe('model: update:', function(){
         assert.equal(2, doc.idontexist);
         assert.equal(100, doc.numbers[1]);
 
-        done();
+        db.close(done);
       });
     });
   })
@@ -268,7 +266,6 @@ describe('model: update:', function(){
     BlogPost.update({ _id: post._id }, update, function (err) {
       assert.ifError(err);
       BlogPost.findById(post, function (err, ret) {
-        db.close();
         assert.ifError(err);
         assert.equal(3, ret.comments.length);
         assert.equal(ret.comments[1].body,'i am number 2');
@@ -277,7 +274,7 @@ describe('model: update:', function(){
         assert.equal(ret.comments[2].body,'i am number 3');
         assert.strictEqual(true, !! ret.comments[2]._id);
         assert.ok(ret.comments[2]._id instanceof DocumentObjectId)
-        done();
+        db.close(done);
       })
     });
   })
@@ -293,14 +290,13 @@ describe('model: update:', function(){
     BlogPost.update({ _id: post._id }, update, function (err) {
       assert.ifError(err);
       BlogPost.findById(post, function (err, ret) {
-        db.close();
         assert.ifError(err);
         assert.equal(2, ret.comments.length);
         assert.equal(ret.comments[0].body,'worked great');
         assert.ok(ret.comments[0]._id instanceof DocumentObjectId)
         assert.equal(ret.comments[1].body,'i am number 3');
         assert.ok(ret.comments[1]._id instanceof DocumentObjectId)
-        done();
+        db.close(done);
       })
     });
   });
@@ -314,7 +310,7 @@ describe('model: update:', function(){
     BlogPost.update(conditions, update, function(err) {
       assert.ifError(err);
       assert.equal('string', typeof conditions._id);
-      done();
+      db.close(done);
     });
   });
 
@@ -334,7 +330,6 @@ describe('model: update:', function(){
     BlogPost.update({ _id: post._id, 'comments.body': 'worked great' }, update, function (err) {
       assert.ifError(err);
       BlogPost.findById(post, function (err, ret) {
-        db.close();
         assert.ifError(err);
         assert.equal(2, ret.comments.length);
         assert.equal(ret.comments[0].body, 'worked great');
@@ -347,7 +342,7 @@ describe('model: update:', function(){
         assert.equal(ret.comments[1].body,'i am number 3');
         assert.strictEqual(undefined, ret.comments[1].title);
         assert.ok(ret.comments[1]._id instanceof DocumentObjectId)
-        done();
+        db.close(done);
       })
     });
   })
@@ -365,7 +360,6 @@ describe('model: update:', function(){
     BlogPost.update({ _id: post._id, 'comments.body': 'worked great' }, update, function (err) {
       assert.ifError(err);
       BlogPost.findById(post, function (err, ret) {
-        db.close();
         assert.ifError(err);
         assert.equal(1, ret._doc.comments[0]._doc.newprop);
         assert.strictEqual(undefined, ret._doc.comments[1]._doc.newprop);
@@ -373,8 +367,8 @@ describe('model: update:', function(){
         assert.equal(ret.date.toString(), new Date(update.$set.date).toString());
 
         last = ret;
-        done();
-      })
+        db.close(done);
+      });
     });
   });
 
@@ -391,13 +385,12 @@ describe('model: update:', function(){
     BlogPost.update({ _id: post._id }, update, function (err) {
       assert.ifError(err);
       BlogPost.findById(post, function (err, ret) {
-        db.close();
         assert.ifError(err);
         assert.equal(1, ret.owners.length);
         assert.equal(ret.owners[0].toString(), owner.toString());
 
         last = ret;
-        done();
+        db.close(done);
       })
     });
   });
@@ -416,14 +409,13 @@ describe('model: update:', function(){
     BlogPost.update({ _id: post._id }, update, function (err) {
       assert.ifError(err);
       BlogPost.findById(post, function (err, ret) {
-        db.close();
         assert.ifError(err);
         assert.equal(2, ret.owners.length);
         assert.equal(ret.owners[0].toString(), owner.toString());
         assert.equal(ret.owners[1].toString(), newowner.toString());
 
         last = newowner;
-        done();
+        db.close(done);
       })
     });
   });
@@ -441,12 +433,11 @@ describe('model: update:', function(){
     BlogPost.update({ _id: post._id }, update, function (err) {
       assert.ifError(err);
       BlogPost.findById(post, function (err, ret) {
-        db.close();
         assert.ifError(err);
         assert.equal(1, ret.owners.length);
         assert.equal(ret.owners[0].toString(), last.toString());
         assert.strictEqual(undefined, ret.title);
-        done();
+        db.close(done);
       });
     });
   });
@@ -465,14 +456,13 @@ describe('model: update:', function(){
     BlogPost.update({ _id: post._id }, update, function (err) {
       assert.ifError(err);
       BlogPost.findById(post, function (err, ret) {
-        db.close();
         assert.ifError(err);
         assert.equal(2, ret.comments.length, 2);
         assert.equal(ret.comments[0].body, 'worked great');
         assert.equal(ret.comments[1].body, '9000');
         assert.equal(ret.comments[0].comments[0].date.toString(), new Date('11/5/2011').toString())
         assert.equal(ret.comments[1].comments.length, 0);
-        done();
+        db.close(done);
       })
     });
   });
@@ -491,11 +481,10 @@ describe('model: update:', function(){
       BlogPost.update({ _id: post._id }, update, function (err) {
         assert.ifError(err);
         BlogPost.findById(post, function (err, ret) {
-          db.close();
           assert.ifError(err);
           assert.equal(1, ret.comments.length);
           assert.equal(ret.comments[0].body, '9000');
-          done();
+          db.close(done);
         })
       });
     });
@@ -514,12 +503,11 @@ describe('model: update:', function(){
       BlogPost.update({ _id: post._id }, update, function (err) {
         assert.ifError(err);
         BlogPost.findById(post, function (err, ret) {
-          db.close();
           assert.ifError(err);
           assert.equal(0, ret.comments.length);
 
           last = ret;
-          done();
+          db.close(done);
         })
       });
     });
@@ -546,10 +534,9 @@ describe('model: update:', function(){
           BlogPost.update({ _id: ret._id }, update, function (err) {
             assert.ifError(err);
             BlogPost.findById(post, function (err, ret) {
-              db.close();
               assert.ifError(err);
               assert.equal(1, ret.comments.length);
-              done();
+              db.close(done);
             })
           });
         })
@@ -721,7 +708,7 @@ describe('model: update:', function(){
             assert.equal(1, proj.components[0].tasks.length);
             assert.equal('my task', proj.components[0].tasks[0].name);
             assert.equal(task.id, proj.components[0].tasks[0].id);
-            done();
+            db.close(done);
           })
         });
       });
@@ -741,7 +728,7 @@ describe('model: update:', function(){
           assert.ifError(err);
           assert.equal(1, doc.counts['1']);
           assert.equal(10, doc.counts['1a']);
-          done();
+          db.close(done);
         });
       });
     })
@@ -763,7 +750,7 @@ describe('model: update:', function(){
           assert.ifError(err);
 
           assert.strictEqual(ss.obj[1], '2');
-          done();
+          db.close(done);
         });
       });
     });
@@ -790,7 +777,7 @@ describe('model: update:', function(){
           Some.findById(sId1, function(err, doc1_1){
             assert.ifError(err);
             assert.equal(1, doc1_1.num);
-            done();
+            db.close(done);
           });
         });
       });
@@ -835,7 +822,7 @@ describe('model: update:', function(){
             M.findOne(function (err, doc) {
               assert.equal(47, doc.age);
               assert.equal('changed', doc.name);
-              done();
+              db.close(done);
             });
           });
         });
@@ -868,7 +855,7 @@ describe('model: update:', function(){
             assert.equal(created.id, doc.id)
             assert.equal(1, doc.n.length);
             assert.equal(10, doc.n[0].x);
-            done()
+            db.close(done);
           })
         })
       })
@@ -910,7 +897,7 @@ describe('model: update:', function(){
                assert.equal(2, m.n[0].x);
                assert.equal(1, m.n[1].x);
                assert.equal(0, m.n[2].x);
-               done();
+               db.close(done);
              });
            });
       });
@@ -939,7 +926,7 @@ describe('model: update:', function(){
                assert.ifError(error);
                assert.ok(m.lastModified.getTime() >= before);
                assert.ok(m.lastModified.getTime() <= after);
-               done();
+               db.close(done);
              });
            });
       });
@@ -962,7 +949,7 @@ describe('model: update:', function(){
             assert.equal(created.id, doc.id)
             assert.equal(typeof doc.mixed, 'object');
             assert.equal(Object.keys(doc.mixed).length, 0);
-            done()
+            db.close(done);
           })
         })
       })
@@ -984,7 +971,7 @@ describe('model: update:', function(){
             assert.equal(doc.title, 'something!');
             assert.equal(doc.subdoc.name, undefined);
             assert.equal(doc.subdoc.num, undefined);
-            done();
+            db.close(done);
           });
         });
       });
@@ -1006,7 +993,7 @@ describe('model: update:', function(){
             assert.equal(doc.title, undefined);
             assert.equal(doc.subdoc.name, undefined);
             assert.equal(doc.subdoc.num, undefined);
-            done();
+            db.close(done);
           });
         });
       });
@@ -1025,11 +1012,10 @@ describe('model: update:', function(){
       Some.update({ _id: s._id }, { arr: [] }, function(err) {
         if (err) return done(err);
         Some.findById(s._id, function(err, doc) {
-          db.close();
           if (err) return done(err);
           assert.ok(Array.isArray(doc.arr));
           assert.strictEqual(0, doc.arr.length);
-          done();
+          db.close(done);
         });
       });
     });
@@ -1049,8 +1035,7 @@ describe('model: update:', function(){
           assert.ifError(error);
           assert.equal('eggs', breakfast.base);
           assert.equal('bacon', breakfast.topping);
-          db.close();
-          done();
+          db.close(done);
         });
       });
     });
@@ -1277,7 +1262,7 @@ describe('model: update:', function(){
               assert.ifError(error);
               assert.deepEqual(['Axl', 'Slash', 'Izzy', 'Duff'],
                 doc.toObject().members);
-              done();
+              db.close(done);
             });
           });
       });
@@ -1296,7 +1281,7 @@ describe('model: update:', function(){
 
       Band.update({}, { $set: { lead: 'Not Axl' } }, function(err) {
         assert.ok(err);
-        done();
+        db.close(done);
       });
     });
   });

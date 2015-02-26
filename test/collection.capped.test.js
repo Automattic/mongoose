@@ -12,10 +12,8 @@ var start = require('./common')
 /**
  * setup
  */
-
 var capped = new Schema({ key: 'string', val: 'number' });
 capped.set('capped', { size: 1000 });
-
 var coll = 'capped_' + random();
 
 /**
@@ -54,38 +52,7 @@ describe('collections: capped:', function(){
       assert.ifError(err);
       assert.ok(options.capped, 'should create a capped collection');
       assert.equal(8192, options.size);
-      var s = '';
-      for (var i = 0; i < 4096 + 2000; ++i) s+='A';
-      Capped.create({ key: s }, function (err, doc) {
-        assert.ifError(err);
-        var id = doc.id;
-        Capped.count(function (err, count) {
-          assert.ifError(err);
-          assert.equal(1, count);
-          var c = new Capped({ key: s });
-          c.save(function (err, doc, num) {
-            assert.ifError(err);
-            assert.equal(1, num);
-            Capped.find(function (err, docs) {
-              assert.ifError(err);
-              assert.equal(1, docs.length);
-              c = docs[0];
-              assert.notEqual(id, c.id);
-              c.key = c.key + s;
-              c.save(function (err) {
-                assert.ok(err);
-                c.remove(function (err) {
-                  db.close();
-                  assert.ok(err);
-                  assert.ok(err.code === 10101 || err.code === 20, 'Invalid ' +
-                    'error code: ' + err.code);
-                  done();
-                });
-              });
-            });
-          });
-        });
-      });
+      done();
     });
   })
   it('attempting to use existing non-capped collection as capped emits error', function(done){

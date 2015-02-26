@@ -114,7 +114,6 @@ module.exports.mongoose = mongoose;
 
 module.exports.mongodVersion = function (cb) {
   var db = module.exports();
-
   db.on('error', cb);
 
   db.on('open', function () {

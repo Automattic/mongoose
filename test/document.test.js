@@ -448,7 +448,7 @@ describe('document', function(){
 
           docs.toObject({transform: true});
 
-          done();
+          db.close(done);
         });
       });
     });
@@ -482,7 +482,7 @@ describe('document', function(){
         assert.equal( doc._doc.iWillNotBeDelete, true );
         assert.equal( doc._doc.nested.iWillNotBeDeleteToo, true );
 
-        done();
+        db.close(done);
       });
     });
   });
@@ -527,7 +527,7 @@ describe('document', function(){
         assert.equal(obj.phew, 'new');
         assert.ok(!doc.sub.wow);
 
-        done();
+        db.close(done);
     });
   });
 
@@ -575,7 +575,7 @@ describe('document', function(){
     assert.equal('a@b.co', output.email);
     assert.equal('Val', output.followers[0].name);
     assert.equal(undefined, output.followers[0].email);
-    done();
+    db.close(done);
   });
 
   it('doesnt clobber child schema options when called with no params (gh-2035)', function(done) {
@@ -784,7 +784,7 @@ describe('document', function(){
         Group.findById(group).populate('_users').exec(function(err, group) {
           assert.ifError(err);
           assert.ok(group.toJSON()._users[0].hello);
-          done();
+          db.close(done);
         });
       });
     });
@@ -817,10 +817,9 @@ describe('document', function(){
           oldUpdate.apply(docs, arguments);
         };
         d.update({$set :{text: 'A changed doc'}}, function (err) {
-          db.close();
           assert.ifError(err);
           assert.equal(true, called);
-          done();
+          db.close(done);
         });
       });
 
@@ -956,8 +955,8 @@ describe('document', function(){
                 T.findById(t).select('_id').exec(function (err, t) {
                   assert.ifError(err);
                   t.save(function (err) {
-                    db.close();
                     assert.ifError(err);
+                    db.close(done);
                   });
                 });
               });
@@ -966,7 +965,6 @@ describe('document', function(){
         });
       });
     });
-    done();
   })
 
   describe('#validate', function(){
@@ -997,7 +995,7 @@ describe('document', function(){
           m.save(function (err) {
             assert.equal(false, called);
             assert.ifError(err);
-            done();
+            db.close(done);
           });
         });
       });
@@ -1025,8 +1023,7 @@ describe('document', function(){
         promise2.onReject(function(err) {
           assert.ok(!!err);
           clearTimeout(timeout);
-          db.close();
-          done();
+          db.close(done);
         });
       });
 
@@ -1182,7 +1179,7 @@ describe('document', function(){
 
       post.save(function () {
         assert.equal(count, 1);
-        done();
+        db.close(done);
       });
     });
 
@@ -1218,7 +1215,7 @@ describe('document', function(){
 
       post.save(function() {
         assert.equal(count, post.controls.length);
-        done();
+        db.close(done);
       });
     });
 
@@ -1261,7 +1258,7 @@ describe('document', function(){
       m.save(function(err) {
         assert.ifError(err);
         assert.equal(count, 4);
-        done();
+        db.close(done);
       });
     });
 
@@ -1301,12 +1298,25 @@ describe('document', function(){
 
   describe('#equals', function() {
     describe('should work', function() {
-      var db = start();
-      var S = db.model('equals-S', new Schema({ _id: String }));
-      var N = db.model('equals-N', new Schema({ _id: Number }));
-      var O = db.model('equals-O', new Schema({ _id: Schema.ObjectId }));
-      var B = db.model('equals-B', new Schema({ _id: Buffer }));
-      var M = db.model('equals-I', new Schema({ name: String }, { _id: false }));
+      var db;
+      var S;
+      var N;
+      var O;
+      var B;
+      var M;
+
+      before(function() {
+        db = start();
+        S = db.model('equals-S', new Schema({ _id: String }));
+        N = db.model('equals-N', new Schema({ _id: Number }));
+        O = db.model('equals-O', new Schema({ _id: Schema.ObjectId }));
+        B = db.model('equals-B', new Schema({ _id: Buffer }));
+        M = db.model('equals-I', new Schema({ name: String }, { _id: false }));
+      });
+
+      after(function(done) {
+        db.close(done);
+      });
 
       it('with string _ids', function(done) {
         var s1 = new S({ _id: 'one' });
@@ -1345,10 +1355,6 @@ describe('document', function(){
           m1.equals(m2)
         });
         done();
-      });
-
-      after(function() {
-        db.close();
       });
     });
   });
@@ -1569,7 +1575,7 @@ describe('document', function(){
               Parent.findOne({}, function(error, parent) {
                 assert.ifError(error);
                 assert.equal(2, parent.children[0].counter);
-                done();
+                db.close(done);
               });
             });
           });
@@ -1591,7 +1597,7 @@ describe('document', function(){
           doc.field = 5;//.push({ _id: '123', type: '456' });
           doc.save(function(error) {
             assert.ifError(error);
-            done();
+            db.close(done);
           });
         });
       });
@@ -1627,7 +1633,7 @@ describe('document', function(){
         p.save(function(error, doc) {
           assert.ifError(error);
           assert.equal(1, doc.children.length);
-          done();
+          db.close(done);
         });
       });
     });
@@ -1655,7 +1661,7 @@ describe('document', function(){
           Item.findById(item._id, function(error, doc) {
             assert.ifError(error);
             assert.equal(3, doc.st);
-            done();
+            db.close(done);
           });
         });
       });

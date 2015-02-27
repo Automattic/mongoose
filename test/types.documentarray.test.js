@@ -257,7 +257,7 @@ describe('types.documentarray', function(){
       assert.ok(obj.second[1].secondToObject);
       assert.ok(!obj.second[0].firstToObject);
       assert.ok(!obj.second[1].firstToObject);
-      done();
+      db.close(done);
     })
   })
 
@@ -309,13 +309,12 @@ describe('types.documentarray', function(){
             doc.save(function (err) {
               assert.ifError(err);
               M.findById(m._id, function (err, doc) {
-                db.close()
                 assert.ifError(err);
                 assert.equal(3, doc.children.length);
                 doc.children.forEach(function (child) {
                   assert.equal(doc.children[0].id, child.id);
-                })
-                done();
+                });
+                db.close(done);
               })
             })
           })
@@ -369,10 +368,9 @@ describe('types.documentarray', function(){
           assert.ifError(err);
 
           Post.findById(p._id, function (err, p) {
-            db.close();
             assert.ifError(err);
             assert.equal(p.comments[0].comments[0].comments[0].comments[0].title, 'c4');
-            done();
+            db.close(done);
           });
         });
       });
@@ -416,9 +414,8 @@ describe('types.documentarray', function(){
       var M = db.model('embedded-invalidate', schema);
       var m = new M({ docs: [{ v: 900 }] });
       m.save(function (err) {
-        db.close();
         assert.equal(900, err.errors['docs.0.v'].value);
-        done();
+        db.close(done);
       });
     })
 
@@ -438,7 +435,7 @@ describe('types.documentarray', function(){
         m.save(function(error, m) {
           assert.ifError(error);
           assert.equal(numListeners, m.listeners('save').length);
-          done();
+          db.close(done);
         });
       });
     });

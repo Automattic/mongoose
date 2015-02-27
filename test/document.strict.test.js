@@ -43,6 +43,10 @@ describe('document: strict mode:', function(){
       Strict = db.model('Strict', strict);
     });
 
+    after(function(done) {
+      db.close(done);
+    });
+
     it('when creating models with non-strict schemas', function(done) {
       var l = new Lax({content: 'sample', rouge: 'data'});
       assert.equal(false, l.$__.strictMode);

@@ -359,7 +359,7 @@ describe('document modified', function(){
                 assert.ifError(error);
                 assert.ok(child);
                 assert.equal(child._id.toString(), p.child.toString());
-                done();
+                db.close(done);
               });
             });
           });
@@ -399,10 +399,9 @@ describe('document modified', function(){
         b.save(function (err) {
           assert.ifError(err);
           BlogPost.findById(b, function (err, doc) {
-            db.close();
             assert.ifError(err);
             assert.equal(8, doc.get(path));
-            done();
+            db.close(done);
           })
         })
       });
@@ -438,7 +437,7 @@ describe('document modified', function(){
           p.save(function(error, inDb) {
             assert.ifError(error); 
             assert.equal('Jason', inDb.child[0].grandChild[0].name);
-            done();
+            db.close(done);
           });
         });
     });

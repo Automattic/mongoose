@@ -84,7 +84,7 @@ describe('model', function(){
             assert.equal(results[0].obj.coordinates[1], testLocations.MONGODB_NYC_OFFICE[1]);
             assert.equal(results[0].obj.id, geos[0].id);
             assert.ok(results[0].obj instanceof Geo);
-            done();
+            db.close(done);
           });
         }
       });
@@ -129,7 +129,7 @@ describe('model', function(){
             assert.equal(results[0].obj.coordinates[1], testLocations.MONGODB_NYC_OFFICE[1]);
             assert.equal(results[0].obj.id, geos[0].id);
             assert.ok(results[0].obj instanceof Geo);
-            done();
+            db.close(done);
           });
         }
       });
@@ -174,7 +174,7 @@ describe('model', function(){
             assert.equal(results[0].obj.coordinates[1], testLocations.MONGODB_NYC_OFFICE[1]);
             assert.equal(results[0].obj._id, geos[0].id);
             assert.ok(!(results[0].obj instanceof Geo));
-            done();
+            db.close(done);
           });
         }
       });
@@ -208,7 +208,7 @@ describe('model', function(){
                   assert.ok(e);
                   assert.equal(e.message, "Must pass either a legacy coordinate array or GeoJSON Point to geoNear");
 
-                  done();
+                  db.close(done);
                 });
               });
             });

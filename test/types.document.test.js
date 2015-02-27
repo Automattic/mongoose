@@ -104,7 +104,6 @@ describe('types.document', function(){
   it('cached _ids', function (done) {
     var db = start();
     var Movie = db.model('Movie');
-    db.close();
     var m = new Movie;
 
     assert.equal(m.id, m.$__._id);
@@ -120,7 +119,7 @@ describe('types.document', function(){
     assert.strictEqual(true, m.$__._id !== m2.$__._id);
     assert.strictEqual(true, m.id !== m2.id);
     assert.strictEqual(true, m.$__._id !== m2.$__._id);
-    done();
+    db.close(done);
   });
 
   it('Subdocument#remove (gh-531)', function (done) {
@@ -183,10 +182,9 @@ describe('types.document', function(){
               movie.ratings[0].remove();
               movie.save(function (err) {
                 Movie.findById(super8._id, function (err, movie) {
-                  db.close();
                   assert.ifError(err);
                   assert.equal(0, movie.ratings.length);
-                  done();
+                  db.close(done);
                 });
               });
             });
@@ -241,7 +239,7 @@ describe('types.document', function(){
                   assert.equal(String(newDate), movie.ratings[0].description.source.time);
                   // url not overwritten using merge
                   assert.equal('http://www.lifeofpimovie.com/', movie.ratings[0].description.source.url);
-                  done();
+                  db.close(done);
                 });
               });
             });

@@ -165,7 +165,7 @@ describe('model: mapreduce:', function(){
 
     MR.mapReduce(o, function (err, results, stats){
       assert.equal('undefined', typeof stats);
-      done();
+      db.close(done);
     });
   });
 
@@ -182,8 +182,7 @@ describe('model: mapreduce:', function(){
       var promise = MR.mapReduce(o, function(){});
       assert.ok(promise instanceof mongoose.Promise);
 
-      db.close();
-      done();
+      db.close(done);
     });
 
     it('allow not passing a callback', function(done){

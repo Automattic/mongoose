@@ -206,7 +206,7 @@ describe('Model', function(){
     s.field = [{text: 'text'}];
 
     assert.ok(s.field[0]);
-    done();
+    db.close(done);
   });
 
   describe('schema', function(){
@@ -390,8 +390,7 @@ describe('Model', function(){
 
         assert.ok(post.get('owners').isMongooseArray);
         assert.ok(post.get('comments').isMongooseDocumentArray);
-        db.close();
-        done();
+        db.close(done);
       });
     })
 
@@ -2831,7 +2830,6 @@ describe('Model', function(){
 
         function complete () {
           Temp.findOne({ _id: t.get('_id') }, function (err, doc) {
-            db.close();
             assert.ifError(err);
             assert.equal(3, doc.get('nums').length);
 
@@ -2849,7 +2847,7 @@ describe('Model', function(){
               return num.valueOf() == '3';
             });
             assert.ok(v);
-            done()
+            db.close(done);
           });
         };
       });
@@ -4706,7 +4704,7 @@ describe('Model', function(){
     assert.equal(thing.thing, a._id);
     assert.equal(thing.subdoc.thing[0], a._id);
 
-    done();
+    db.close(done);
   })
 
   it('setters trigger on null values (gh-1445)', function(done){

@@ -360,4 +360,89 @@ describe('model: findByIdAndRemove:', function(){
       })
     })
   })
+
+  describe('middleware', function() {
+    var db;
+
+    beforeEach(function() {
+      db = start();
+    });
+
+    afterEach(function(done) {
+      db.close(done);
+    });
+
+    it('works', function(done) {
+      var s = new Schema({
+        topping: { type: String, default: 'bacon' },
+        base: String
+      });
+
+      var preCount = 0;
+      s.pre('findOneAndRemove', function() {
+        ++preCount;
+      });
+
+      var postCount = 0;
+      s.post('findOneAndRemove', function() {
+        ++postCount;
+      });
+
+      var Breakfast = db.model('gh-439', s);
+      var breakfast = new Breakfast({
+        base: 'eggs'
+      });
+
+      breakfast.save(function(error) {
+        assert.ifError(error);
+
+        Breakfast.findOneAndRemove(
+          { base: 'eggs' },
+          {},
+          function(error, breakfast) {
+            assert.ifError(error);
+            assert.equal('eggs', breakfast.base);
+            assert.equal(1, preCount);
+            assert.equal(1, postCount);
+            done();
+          });
+      });
+    });
+
+    it('works with exec()', function(done) {
+      var s = new Schema({
+        topping: { type: String, default: 'bacon' },
+        base: String
+      });
+
+      var preCount = 0;
+      s.pre('findOneAndRemove', function() {
+        ++preCount;
+      });
+
+      var postCount = 0;
+      s.post('findOneAndRemove', function() {
+        ++postCount;
+      });
+
+      var Breakfast = db.model('gh-439', s);
+      var breakfast = new Breakfast({
+        base: 'eggs'
+      });
+
+      breakfast.save(function(error) {
+        assert.ifError(error);
+
+        Breakfast
+          .findOneAndRemove({ base: 'eggs' }, {}).
+          exec(function(error, breakfast) {
+            assert.ifError(error);
+            assert.equal('eggs', breakfast.base);
+            assert.equal(1, preCount);
+            assert.equal(1, postCount);
+            done();
+          });
+      });
+    });
+  });
 })

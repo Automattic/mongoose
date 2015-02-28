@@ -367,6 +367,25 @@ describe('document modified', function(){
       });
     });
 
+    it('properly sets populated for gh-1530 (gh-2678)', function(done) {
+      var childrenSchema = new Schema({ name: String});
+      var db = start();
+
+      var parentSchema = new Schema({
+        name: String,
+        child: { type: Schema.Types.ObjectId, ref: 'Child'}
+      });
+
+      var Parent = db.model('Parent', parentSchema, 'parents');
+      var Child = db.model('Child', parentSchema, 'children');
+
+      var child = new Child({ name: 'Mary' });
+      var p = new Parent({ name: 'Alex', child: child });
+
+      assert.equal(p.populated('child').toString(), child._id.toString());
+      db.close(done);
+    });
+
     it('should support setting mixed paths by string (gh-1418)', function(done){
       var db = start();
       var BlogPost = db.model('1418', new Schema({ mixed: {} }))

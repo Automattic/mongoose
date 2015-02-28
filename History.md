@@ -1,3 +1,16 @@
+4.0.0-rc3 / 2015-02-28
+======================
+ * fixed; update() pre hooks run before validators #2706
+ * fixed; setters not called on arrays of refs #2698 [brandom](https://github.com/brandom)
+ * fixed; use node driver 2.0.18 for nodejs 0.12 support #2685
+ * fixed; comments reference file that no longer exists #2681
+ * fixed; populated() returns _id of manually populated doc #2678
+ * added; ability to exclude version key in toObject() #2675
+ * fixed; dont allow setting nested path to a string #2592
+ * fixed; can cast objects with _id field to ObjectIds #2581
+ * fixed; on-the-fly schema getters #2360
+ * added; strict option for findOneAndUpdate() #1967
+
 3.8.24 / 2015-02-25
 ===================
  * fixed; properly apply child schema transforms #2691

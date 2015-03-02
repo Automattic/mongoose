@@ -783,5 +783,18 @@ describe('schema', function(){
         done();
       });
     });
+
+    it('doesnt execute other validators if required fails (gh-2725)', function(done) {
+      var breakfast = new Schema({ description: { type: String, required: true, maxlength: 50 } });
+
+      var Breakfast = mongoose.model('gh2725', breakfast, 'gh2725');
+      var bad = new Breakfast({});
+      bad.validate(function(error) {
+        assert.ok(error);
+        var errorMessage = 'ValidationError: Path `description` is required.';
+        assert.equal(errorMessage, error.toString());
+        done();
+      });
+    });
   });
 });

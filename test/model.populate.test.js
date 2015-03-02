@@ -900,13 +900,12 @@ describe('model: populate:', function(){
             .populate('_creator')
             .populate('comments._creator')
             .exec(function (err, post) {
-              db.close();
               assert.ifError(err);
 
               assert.equal(post._creator.name,'User 1');
               assert.equal(post.comments[0]._creator.name,'User 1');
               assert.equal(post.comments[1]._creator.name,'User 2');
-              done();
+              db.close(done);
             });
           });
         });
@@ -949,7 +948,7 @@ describe('model: populate:', function(){
             assert.ok(posts.length);
             assert.ok(posts[1].comments[0]._creator);
             assert.equal('gh-1055-1', posts[1].comments[0]._creator.name);
-            done();
+            db.close(done);
           });
         });
       });
@@ -987,7 +986,7 @@ describe('model: populate:', function(){
                 posts[0].populate('_creator', function(error, doc) {
                   assert.ifError(error);
                   assert.equal('val', doc._creator.name);
-                  done();
+                  db.close(done);
                 });
               });
             });
@@ -1145,7 +1144,6 @@ describe('model: populate:', function(){
                 .findById(post._id)
                 .populate('comments._creator', 'email')
                 .exec(function (err, post) {
-                  db.close();
                   assert.ifError(err);
 
                   assert.ok(post.comments);
@@ -1156,7 +1154,7 @@ describe('model: populate:', function(){
                   assert.equal(post.comments[1]._creator.isInit('name'), false);
                   assert.equal(post.comments[1].content,'Wha wha');
 
-                  done();
+                  db.close(done);
                 });
               });
             })
@@ -1253,7 +1251,7 @@ describe('model: populate:', function(){
               assert.equal(2, docs.length);
               assert.equal(1, docs[0].author.friends.length);
               assert.equal(1, docs[1].author.friends.length);
-              done();
+              db.close(done);
             })
           });
       });
@@ -1571,7 +1569,7 @@ describe('model: populate:', function(){
         assert.equal(j.length, 2);
         assert.equal(j[0].b.length, 2);
         assert.equal(j[1].b.length, 2);
-        done();
+        db.close(done);
       });
     }
   })
@@ -2077,7 +2075,6 @@ describe('model: populate:', function(){
         , options: { sort: {'name': -1} }
       })
       .exec(function (err, post) {
-        db.close();
         assert.ifError(err);
 
         assert.ok(Array.isArray(post.fans));
@@ -2343,7 +2340,6 @@ describe('model: populate:', function(){
           .populate('fans')
           .lean()
           .exec(function (err, blogposts) {
-            db.close();
             assert.ifError(err);
 
             assert.equal(blogposts[0].fans[0].name,'Fan 1');
@@ -2359,7 +2355,7 @@ describe('model: populate:', function(){
             assert.equal(blogposts[1].fans[1].name,'Fan 1');
             assert.equal(blogposts[1].fans[1].email,'fan1@learnboost.com');
             assert.equal('undefined', typeof blogposts[1].fans[1].update);
-            done();
+            db.close(done);
           });
         });
       });
@@ -2788,7 +2784,7 @@ describe('model: populate:', function(){
             Category.findOne({}).populate({ path: 'movies', options: { limit: 2, skip: 1 } }).exec(function(error, category) {
               assert.ifError(error);
               assert.equal(2, category.movies.length);
-              done();
+              db.close(done);
             });
           });
         });

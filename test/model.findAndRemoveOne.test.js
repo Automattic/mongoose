@@ -320,8 +320,6 @@ describe('model: findByIdAndRemove:', function(){
       , M = db.model(modelname, collection)
       , _id = new DocumentObjectId
 
-    db.close();
-
     var now = new Date
       , query;
 
@@ -334,7 +332,7 @@ describe('model: findByIdAndRemove:', function(){
     assert.equal(2, Object.keys(query.options.sort).length);
     assert.equal(1, query.options.sort.author);
     assert.equal(-1, query.options.sort.title);
-    done();
+    db.close(done);
   });
 
   it('supports population (gh-1395)', function(done){
@@ -355,11 +353,11 @@ describe('model: findByIdAndRemove:', function(){
           assert.equal(undefined, doc._id);
           assert.ok(doc.a);
           assert.equal(doc.a.name, 'i am an A');
-          done();
-        })
-      })
-    })
-  })
+          db.close(done);
+        });
+      });
+    });
+  });
 
   describe('middleware', function() {
     var db;
@@ -433,8 +431,8 @@ describe('model: findByIdAndRemove:', function(){
       breakfast.save(function(error) {
         assert.ifError(error);
 
-        Breakfast
-          .findOneAndRemove({ base: 'eggs' }, {}).
+        Breakfast.
+          findOneAndRemove({ base: 'eggs' }, {}).
           exec(function(error, breakfast) {
             assert.ifError(error);
             assert.equal('eggs', breakfast.base);

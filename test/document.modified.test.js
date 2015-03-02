@@ -193,7 +193,6 @@ describe('document modified', function(){
         var db = start()
           , BlogPost = db.model(modelName, collection);
 
-        db.close();
         var post = new BlogPost()
         post.init({
             title       : 'Test'
@@ -208,8 +207,7 @@ describe('document modified', function(){
         assert.equal(true, post.isModified('comments.0.title'));
         assert.equal(true, post.isDirectModified('comments.0.title'));
 
-        db.close();
-        done();
+        db.close(done);
       })
       it('with accessors', function(done){
         var db = start()

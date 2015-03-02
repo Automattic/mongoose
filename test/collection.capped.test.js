@@ -36,11 +36,10 @@ describe('collections: capped:', function(){
       // use the existing capped collection in the db (no coll creation)
       var Capped2 = db.model('Capped2', capped, coll);
       Capped2.collection.isCapped(function (err, isCapped) {
-        db.close();
         assert.ifError(err);
         assert.ok(isCapped, 'should reuse the capped collection in the db');
         assert.equal(Capped.collection.name, Capped2.collection.name);
-        done();
+        db.close(done);
       });
     });
   });
@@ -52,8 +51,7 @@ describe('collections: capped:', function(){
       assert.ifError(err);
       assert.ok(options.capped, 'should create a capped collection');
       assert.equal(8192, options.size);
-      db.close();
-      done();
+      db.close(done);
     });
   })
   it('attempting to use existing non-capped collection as capped emits error', function(done){

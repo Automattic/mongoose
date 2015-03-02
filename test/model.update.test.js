@@ -579,13 +579,12 @@ describe('model: update:', function(){
     it('(gh-699)', function(done){
       var db = start();
       var S = db.model('UpdateStrictSchema');
-      db.close();
 
       var doc = S.find()._castUpdate({ ignore: true });
       assert.equal(false, doc);
       var doc = S.find()._castUpdate({ $unset: {x: 1}});
       assert.equal(1, Object.keys(doc.$unset).length);
-      done();
+      db.close(done);
     });
 
     it('works', function(done){

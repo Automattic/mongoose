@@ -72,8 +72,7 @@ describe('model query casting', function(){
       BlogPostB.findOne({ _id: id }, function (err, doc) {
         assert.ifError(err);
         assert.equal(title, doc.get('title'));
-        db.close();
-        done();
+        db.close(done);
       });
     });
   });
@@ -85,8 +84,7 @@ describe('model query casting', function(){
     BlogPostB.find({ date: 'invalid date' }, function (err) {
       assert.ok(err instanceof Error);
       assert.ok(err instanceof CastError);
-      db.close();
-      done();
+      db.close(done);
     });
   });
 
@@ -110,8 +108,7 @@ describe('model query casting', function(){
         assert.equal(1, found.length);
         assert.equal(found[0].get('_id').toString(), post.get('_id'));
         assert.equal(found[0].get('meta.visitors').valueOf(), post.get('meta.visitors').valueOf());
-        db.close();
-        done();
+        db.close(done);
       });
     });
   })
@@ -130,8 +127,7 @@ describe('model query casting', function(){
         assert.ifError(err);
 
         assert.equal(doc._id.toString(), id);
-        db.close();
-        done();
+        db.close(done);
       });
     });
   })
@@ -155,8 +151,7 @@ describe('model query casting', function(){
           Nin.find({ num: {$nin: [2]}}, function (err, found) {
             assert.ifError(err);
             assert.equal(2, found.length);
-            db.close();
-            done();
+            db.close(done);
           });
         });
       });
@@ -182,10 +177,9 @@ describe('model query casting', function(){
         doc.save(function (err) {
           assert.ifError(err);
           P.findById(doc._id, function (err, doc) {
-            db.close();
             assert.ifError(err);
             assert.strictEqual(doc.meta.date, null);
-            done();
+            db.close(done);
           });
         });
       });
@@ -200,10 +194,9 @@ describe('model query casting', function(){
       assert.equal(err.message,"$type parameter must be Number");
 
       B.find({ title: { $type: 2 }}, function (err, posts) {
-        db.close();
         assert.ifError(err);
         assert.strictEqual(Array.isArray(posts), true);
-        done();
+        db.close(done);
       });
     });
   });
@@ -219,7 +212,7 @@ describe('model query casting', function(){
         assert.ifError(err);
         assert.ok(doc);
         assert.equal(doc[0].id, b.id);
-        done();
+        db.close(done);
       });
     })
   })
@@ -235,7 +228,7 @@ describe('model query casting', function(){
         assert.ifError(err);
         assert.ok(doc);
         assert.equal(doc[0].id, b.id);
-        done();
+        db.close(done);
       });
     })
   })
@@ -246,7 +239,7 @@ describe('model query casting', function(){
       , result = B.find({}).cast(B, {$and:[{date:'1987-03-17T20:00:00.000Z'}, {_id:'000000000000000000000000'}]});
     assert.ok(result.$and[0].date instanceof Date);
     assert.ok(result.$and[1]._id instanceof DocumentObjectId);
-    done();
+    db.close(done);
   })
 
   describe('$near', function(){
@@ -725,10 +718,9 @@ describe('model query casting', function(){
 
         function test () {
           Test.find({ 'loc.nested': { $within: { $box: [['8', '1'], ['50','100']] }}}, function (err, docs) {
-            db.close();
             assert.ifError(err);
             assert.equal(2, docs.length);
-            done()
+            db.close(done);
           });
         }
       })
@@ -747,7 +739,7 @@ describe('model query casting', function(){
         , result = B.find({}).cast(B, { tags: {$regex:/a/, $options: opts}});
 
       assert.equal('img', result.tags.$options);
-      done();
+      db.close(done);
     })
   })
 });

@@ -87,8 +87,7 @@ describe('model: querying:', function(){
     // query, fields (null), options
     assert.ok(BlogPostB.find({}, null, {}) instanceof Query);
 
-    db.close();
-    done();
+    db.close(done);
   });
 
   it('findOne returns a Query', function(done){
@@ -110,8 +109,7 @@ describe('model: querying:', function(){
     // query, fields (null), options
     assert.ok(BlogPostB.findOne({}, null, {}) instanceof Query);
 
-    db.close();
-    done();
+    db.close(done);
   });
 
   it('an empty find does not hang', function(done){
@@ -119,8 +117,7 @@ describe('model: querying:', function(){
       , BlogPostB = db.model('BlogPostB', collection)
 
     function fn () {
-      db.close();
-      done();
+      db.close(done);
     };
 
     BlogPostB.find({}, fn);
@@ -134,8 +131,7 @@ describe('model: querying:', function(){
 
     function fn () {
       if (--count) return;
-      db.close();
-      done();
+      db.close(done);
     };
 
     // query
@@ -255,12 +251,11 @@ describe('model: querying:', function(){
       Address.create({ zip: '10010'}, { zip: '10010'}, { zip: '99701'}, function (err, a1, a2, a3) {
         assert.strictEqual(null, err);
         var query = Address.distinct('zip', {}, function (err, results) {
-          db.close();
           assert.ifError(err);
           assert.equal(2, results.length);
           assert.ok(results.indexOf('10010') > -1);
           assert.ok(results.indexOf('99701') > -1);
-          done();
+          db.close(done);
         });
         assert.ok(query instanceof Query);
       });
@@ -1469,8 +1464,7 @@ describe('model: querying:', function(){
                     assert.ifError(error);
                     b.remove(function(error) {
                       assert.ifError(error);
-                      db.close();
-                      done();
+                      db.close(done);
                     });
                   });
                 });
@@ -1490,7 +1484,7 @@ describe('model: querying:', function(){
 
         indexes = exampleSchema.indexes();
         assert.equal(indexes[0][1].text, true);
-        done();
+        db.close(done);
       });
     });
   });
@@ -1736,10 +1730,9 @@ describe('model: querying:', function(){
             assert.equal(false, !!doc);
 
             P.findOne({ 'sub.d': { $all: [o2] }}, function (err, doc) {
-              db.close();
               assert.ifError(err);
               assert.equal(doc.id, p.id);
-              done();
+              db.close(done);
             });
           });
         });
@@ -1784,7 +1777,7 @@ describe('model: querying:', function(){
                 query.exec(function (err, docs) {
                   assert.ifError(err);
                   assert.equal(0, docs.length);
-                  done();
+                  db.close(done);
                 });
               });
             });
@@ -1799,7 +1792,7 @@ describe('model: querying:', function(){
 
       B.remove({ $and: [{ a: 'coffee' }, { b: { $in: ['bacon', 'eggs'] } }] }, function(error) {
         assert.ifError(error);
-        done();
+        db.close(done);
       });
     });
   });
@@ -2064,10 +2057,9 @@ describe('geo-spatial', function(){
 
       function test () {
         Test.find({ loc: { $nearSphere: [30, 40] }}, function (err, docs) {
-          db.close();
           assert.ifError(err);
           assert.equal(2, docs.length);
-          done()
+          db.close(done);
         });
       }
     });
@@ -2110,7 +2102,7 @@ describe('geo-spatial', function(){
           q.cast(Test);
         });
 
-        done();
+        db.close(done);
       }
     });
 
@@ -2200,7 +2192,7 @@ describe('geo-spatial', function(){
                 assert.ifError(err);
                 assert.equal(1, docs.length);
                 assert.equal(created.id, docs[0].id);
-                done()
+                db.close(done);
               })
             })
           })
@@ -2231,7 +2223,7 @@ describe('geo-spatial', function(){
               Test.where('line').intersects().geometry(geojsonLine).findOne(function (err, doc) {
                 assert.ifError(err);
                 assert.equal(created.id, doc.id);
-                done();
+                db.close(done);
               })
             })
           })
@@ -2259,7 +2251,7 @@ describe('geo-spatial', function(){
             Test.where('geom').intersects().geometry(geojsonLine).findOne(function (err, doc) {
               assert.ifError(err);
               assert.equal(created.id, doc.id);
-              done();
+              db.close(done);
             })
           })
         })
@@ -2285,7 +2277,7 @@ describe('geo-spatial', function(){
             Test.where('geom').intersects().geometry(geojsonPolygon).findOne(function (err, doc) {
               assert.ifError(err);
               assert.equal(created.id, doc.id);
-              done();
+              db.close(done);
             })
           })
         })
@@ -2316,7 +2308,7 @@ describe('geo-spatial', function(){
                 assert.ifError(err);
                 assert.equal(1, docs.length);
                 assert.equal(created.id, docs[0].id);
-                done();
+                db.close(done);
               })
             })
           })
@@ -2404,7 +2396,9 @@ describe('geo-spatial', function(){
       })
 
       function complete () {
-        if (0 === --pending) done();
+        if (0 === --pending) {
+          db.close(done);
+        }
       }
     })
   })

@@ -6,11 +6,11 @@
   "keywords": ["mongodb", "document", "model", "schema", "database", "odm", "data", "datastore", "query", "nosql", "orm", "db"],
   "license": "MIT",
   "dependencies": {
-    "hooks-fixed": "1.0.0",
+    "hooks-fixed": "1.0.1",
     "mongodb": "2.0.18",
     "ms": "0.1.0",
     "sliced": "0.0.5",
-    "muri": "0.3.1",
+    "muri": "1.0.0",
     "mpromise": "0.5.4",
     "mpath": "0.1.1",
     "kareem": "1.0.0",

@@ -125,6 +125,50 @@ describe('model: populate:', function(){
     });
   });
 
+  it('not failing on null as ref', function(done) {
+    var db = start()
+      , BlogPost = db.model('RefBlogPost', posts);
+
+    BlogPost.create({
+        title     : 'woot'
+      , _creator  : null
+    }, function (err, post) {
+      assert.ifError(err);
+
+      BlogPost
+      .findById(post._id)
+      .populate('_creator')
+      .exec(function (err, post) {
+        assert.ifError(err);
+
+        assert.equal(post._creator, null);
+        db.close(done);
+      });
+    });
+  });
+
+  it('not failing on empty object as ref', function(done) {
+    var db = start()
+      , BlogPost = db.model('RefBlogPost', posts);
+
+    BlogPost.create({
+        title     : 'woot'
+      , _creator  : {}
+    }, function (err, post) {
+      assert.ifError(err);
+
+      BlogPost
+      .findById(post._id)
+      .populate('_creator')
+      .exec(function (err, post) {
+        assert.ifError(err);
+
+        assert.equal(post._creator, {});
+        db.close(done);
+      });
+    });
+  });
+
   it('across DBs', function(done) {
     var db = start()
       , db2 = db.useDb('mongoose_test2')

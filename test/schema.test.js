@@ -246,6 +246,8 @@ describe('schema', function(){
     assert.equal(Test.path('arrayX').getDefault(new TestDocument)[0], 9);
     assert.equal(typeof Test.path('arrayFn').defaultValue, 'function');
     assert.ok(Test.path('arrayFn').getDefault(new TestDocument).isMongooseArray);
+    assert.ok(Test.path('arrayX').getDefault(new TestDocument).isMongooseArray);
+    assert.equal(Test.path('arrayX').getDefault(new TestDocument)[0], 9);
     done();
   })
 

@@ -1283,5 +1283,26 @@ describe('model: update:', function(){
         db.close(done);
       });
     });
+
+    it('handles document array validation (gh-2733)', function(done) {
+      var db = start();
+
+      var member = new Schema({
+        name: String,
+        role: { type: String, required: true, enum: ['singer', 'guitar', 'drums', 'bass'] }
+      });
+      var band = new Schema({ members: [member], name: String });
+      var Band = db.model('band', band, 'bands');
+      var members = [
+        { name: 'Axl Rose', role: 'singer' },
+        { name: 'Slash', role: 'guitar' },
+        { name: 'Christopher Walken', role: 'cowbell' }
+      ];
+
+      Band.findOneAndUpdate({ name: "Guns N' Roses" }, { $set: { members: members } }, { runValidators: true }, function(err) {
+        assert.ok(err);
+        done();
+      });
+    });
   });
 });

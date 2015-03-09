@@ -2,7 +2,7 @@
  * Module dependencies.
  */
 
-var start = require('../common');
+var start = require('./common');
 var assert = require('assert');
 var mongoose = start.mongoose;
 

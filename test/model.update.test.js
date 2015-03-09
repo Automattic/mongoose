@@ -1325,7 +1325,6 @@ describe('model: update:', function(){
         { runValidators: true },
         function(err) {
           assert.ok(err);
-          require('util').inspect(err);
           done();
         });
     });

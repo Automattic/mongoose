@@ -996,6 +996,23 @@ describe('model: findByIdAndUpdate:', function(){
       });
   });
 
+  it('cast errors for empty objects as object ids (gh-2732)', function(done) {
+    var db = start();
+
+    var s = new Schema({
+      base: ObjectId
+    });
+
+    var Breakfast = db.model('gh2732', s);
+
+    Breakfast.
+      findOneAndUpdate({}, { base: {} }, {}).
+      exec(function(error, breakfast) {
+        assert.ok(error);
+        db.close(done);
+      });
+  });
+
   describe('middleware', function() {
     var db;
 

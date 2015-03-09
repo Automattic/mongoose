@@ -151,22 +151,17 @@ describe('model: populate:', function(){
     var db = start()
       , BlogPost = db.model('RefBlogPost', posts);
 
-    BlogPost.create({
-        title     : 'woot'
-      , _creator  : {}
-    }, function (err, post) {
-      assert.ifError(err);
-
-      BlogPost
-      .findById(post._id)
-      .populate('_creator')
-      .exec(function (err, post) {
+    BlogPost.create(
+      { title : 'woot' },
+      function (err, post) {
         assert.ifError(err);
 
-        assert.equal(post._creator, {});
-        db.close(done);
+        BlogPost.
+         findByIdAndUpdate(post._id, { $set: { _creator: {} } }, function(err) {
+           assert.ok(err);
+           db.close(done);
+         });
       });
-    });
   });
 
   it('across DBs', function(done) {

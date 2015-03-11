@@ -60,6 +60,31 @@ describe('model middleware', function(){
     });
   });
 
+  it('validate middleware runs before save middleware (gh-2462)', function(done) {
+    var schema = new Schema({
+      title: String
+    });
+    var count = 0;
+
+    schema.pre('validate', function(next) {
+      assert.equal(0, count++);
+      next();
+    });
+
+    schema.pre('save', function(next) {
+      assert.equal(1, count++);
+      next();
+    });
+
+    var db = start();
+    var Book = db.model('gh2462', schema);
+
+    Book.create({}, function(err) {
+      assert.equal(count, 2);
+      db.close(done);
+    });
+  });
+
   it('works', function(done){
     var schema = new Schema({
         title: String

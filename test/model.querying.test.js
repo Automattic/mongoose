@@ -2487,5 +2487,35 @@ describe('lean option:', function(){
     assert.equal('number', typeof q._conditions.$and[0].$or[0].$and[0].$or[0].num);
     assert.equal('number', typeof q._conditions.$and[0].$or[0].$and[0].$or[1]['subdoc.num']);
     done();
-  })
+  });
+
+  describe('$eq', function() {
+    var mongo26 = false;
+
+    before(function(done){
+      start.mongodVersion(function (err, version) {
+        if (err) return done(err);
+        mongo26 = 2 < version[0] || (2 == version[0] && 6 <= version[1]);
+        done();
+      });
+    });
+
+    it('casts $eq (gh-2752)', function(done){
+      var db = start();
+      var BlogPostB = db.model('BlogPostB', collection);
+
+      BlogPostB.findOne(
+        { _id: { $eq: '000000000000000000000001' }, numbers: { $eq: [1, 2] } },
+        function(err, doc) {
+          if (mongo26) {
+            assert.ifError(err);
+          } else {
+            assert.ok(err.toString().indexOf('MongoError') !== -1);
+          }
+
+          assert.ok(!doc);
+          db.close(done);
+        });
+    });
+  });
 })

@@ -6,7 +6,7 @@ var start = require('./common');
 var assert = require('assert');
 var mongoose = start.mongoose;
 
-describe('document unit tests', function() {
+describe('sharding', function() {
   it('should handle shard keys properly (gh-2127)', function(done) {
     var mockSchema = {
       options: {
@@ -24,8 +24,36 @@ describe('document unit tests', function() {
 
     d.$__storeShard();
     assert.equal(currentTime, d.$__.shardval.date);
-    process.nextTick(function() {
-      done();
-    });
+    done();
+  });
+});
+
+describe('toObject()', function() {
+  var Stub;
+
+  beforeEach(function() {
+    Stub = function() {
+      var schema = this.schema = {
+        options: { toObject: { minimize: false, virtuals: true } },
+        virtuals: { virtual: 'test' }
+      };
+      this._doc = { empty: {} };
+      this.get = function(path) { return schema.virtuals[path]; };
+      this.$__ = {};
+    };
+    Stub.prototype = Object.create(mongoose.Document.prototype);
+    var d = new Stub();
+  });
+
+  it('should inherit options from schema', function(done) {
+    var d = new Stub();
+    assert.deepEqual(d.toObject(), { empty: {}, virtual: 'test' });
+    done();
+  });
+
+  it('can overwrite by passing an option', function(done) {
+    var d = new Stub();
+    assert.equal(d.toObject({ minimize: true }), undefined);
+    done();
   });
 });

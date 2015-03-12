@@ -2489,6 +2489,25 @@ describe('lean option:', function(){
     done();
   });
 
+  it('casts $elemMatch (gh-2199)', function(done) {
+    var db = start();
+    var schema = new Schema({ dates: [Date] });
+    var Dates = db.model('Date', schema, 'dates');
+
+    var array = ['2014-07-01T02:00:00.000Z', '2014-07-01T04:00:00.000Z'];
+    Dates.create({ dates: array }, function(err) {
+      assert.ifError(err);
+      var elemMatch = { $gte: '2014-07-01T03:00:00.000Z' };
+      Dates.findOne({}, { dates: { $elemMatch: elemMatch } }, function(err, doc) {
+        assert.ifError(err);
+        assert.equal(doc.dates.length, 1);
+        assert.equal(doc.dates[0].getTime(),
+          new Date('2014-07-01T04:00:00.000Z').getTime());
+        done();
+      });
+    });
+  });
+
   describe('$eq', function() {
     var mongo26 = false;
 

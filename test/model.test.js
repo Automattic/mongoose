@@ -786,15 +786,8 @@ describe('Model', function(){
         , BlogPost = db.model('BlogPost', collection)
         , threw = false;
 
-      var post = new BlogPost;
-
       try {
-        post.init({
-          date: 'Test',
-          meta: {
-            date: 'Test'
-          }
-        });
+        var post = new BlogPost({ date: 'Test', meta: { date: 'Test' } });
       } catch(e){
         threw = true;
       }
@@ -4602,7 +4595,7 @@ describe('Model', function(){
     assert.equal(doc.$__delta()[1].$set.title,'css3');
     doc.title = undefined;
     assert.equal(doc.$__delta()[1].$unset.title,1);
-    assert.strictEqual(undefined, doc.$__delta()[1].$set);
+    assert.strictEqual(undefined, doc.$__delta()[1].$set.title);
 
     doc.title='css3';
     doc.author = 'aaron';

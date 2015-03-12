@@ -428,8 +428,7 @@ describe('versioning', function(){
   it('works with numbericAlpha paths', function(done){
     var db = start();
     var M = db.model('Versioning');
-    var m = new M;
-    m.init({ mixed: {}});
+    var m = new M({ mixed: {} });
     var path = 'mixed.4a';
     m.set(path, 2);
     m.save(function (err) {

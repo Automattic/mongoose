@@ -1,3 +1,11 @@
+3.8.25 / 2015-03-13
+===================
+ * fixed; debug output reverses order of aggregation keys #2759
+ * fixed; $eq is a valid query selector in 3.0 #2752
+ * fixed; upgraded node driver to 1.4.32 for handling non-numeric poolSize #2682
+ * fixed; update() with overwrite sets _id for nested docs #2658
+ * fixed; casting for operators in $elemMatch #2199
+
 3.8.24 / 2015-02-25
 ===================
  * fixed; properly apply child schema transforms #2691

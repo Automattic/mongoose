@@ -1054,4 +1054,38 @@ describe('model: update:', function(){
         });
     });
   });
+
+  it('works with overwrite but no $set (gh-2568)', function(done) {
+    var db = start();
+
+    var chapterSchema = {
+      name: String
+    };
+    var bookSchema = {
+      chapters: [chapterSchema],
+      title: String,
+      author: String,
+      id: Number
+    };
+    var Book = db.model('gh2568', bookSchema);
+
+    var jsonObject = {
+      chapters: [{name: 'Ursus'}, {name: 'The Comprachicos'}],
+      name: 'The Man Who Laughs',
+      author: 'Victor Hugo',
+      id: 0
+    };
+
+    Book.update({}, jsonObject, { upsert: true, overwrite: true },
+      function(error, book) {
+        assert.ifError(error);
+        Book.findOne({ id: 0 }, function(error, book) {
+          assert.ifError(error);
+          assert.equal(book.chapters.length, 2);
+          assert.ok(book.chapters[0]._id);
+          assert.ok(book.chapters[1]._id);
+          done();
+        });
+      });
+  });
 });

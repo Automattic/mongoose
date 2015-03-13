@@ -1,4 +1,12 @@
-3.8.24 / 2014-02-25
+3.8.25 / 2015-03-13
+===================
+ * fixed; debug output reverses order of aggregation keys #2759
+ * fixed; $eq is a valid query selector in 3.0 #2752
+ * fixed; upgraded node driver to 1.4.32 for handling non-numeric poolSize #2682
+ * fixed; update() with overwrite sets _id for nested docs #2658
+ * fixed; casting for operators in $elemMatch #2199
+
+3.8.24 / 2015-02-25
 ===================
  * fixed; properly apply child schema transforms #2691
  * fixed; make copy of findOneAndUpdate options before modifying #2687
@@ -8,7 +16,7 @@
  * fixed; dont block process exit when auth fails #2599
  * fixed; remove redundant clone in update() #2537
 
-3.8.23 / 2014-02-06
+3.8.23 / 2015-02-06
 ===================
  * fixed; unset opts.remove when upsert is true #2519
  * fixed; array saved as object when path is object in array #2442
@@ -16,7 +24,7 @@
  * fixed; check for callback in count() #2204
  * fixed; documentation for selecting fields #1534
 
-3.8.22 / 2014-01-24
+3.8.22 / 2015-01-24
 ===================
  * upgraded; node-mongodb-native to 1.4.28 #2587 [Climax777](https://github.com/Climax777)
  * added; additional documentation for validators #2449

@@ -1,3 +1,15 @@
+4.0.0-rc4 / 2015-03-14
+======================
+ * fixed; toObject virtuals schema option handled properly #2751
+ * fixed; update validators work on document arrays #2733
+ * fixed; check for cast errors on $set #2729
+ * fixed; instance field set for all schema types #2727 [csdco](https://github.com/csdco)
+ * fixed; dont run other validators if required fails #2725
+ * fixed; custom getters execute on ref paths #2610
+ * fixed; save defaults if they were set when doc was loaded from db #2558
+ * fixed; pre validate now runs before pre save #2462
+ * fixed; no longer throws errors with --use_strict #2281
+
 3.8.25 / 2015-03-13
 ===================
  * fixed; debug output reverses order of aggregation keys #2759

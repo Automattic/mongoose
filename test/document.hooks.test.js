@@ -341,7 +341,7 @@ describe('document: hooks:', function () {
       assert.ok(err);
       assert.ok(err.errors['e.0.text']);
       assert.equal(false, presave);
-      done();
+      db.close(done);
     });
   });
 
@@ -396,7 +396,7 @@ describe('document: hooks:', function () {
                 assert.ifError(err);
                 assert.equal(2, called.pre);
                 assert.equal(2, called.post);
-                done();
+                db.close(done);
               });
             });
           });
@@ -428,7 +428,7 @@ describe('document: hooks:', function () {
       assert.equal(typeof dbBar.foos, 'undefined');
       assert.ok(!b.foos);
       assert.equal(typeof b.foos, 'undefined');
-      done();
+      db.close(done);
     });
   });
 
@@ -532,7 +532,7 @@ describe('document: hooks:', function () {
     m.save(function (err) {
       assert.equal(err.message, "gaga");
       assert.equal(count, 4);
-      done();
+      db.close(done);
     });
   });
 
@@ -561,5 +561,4 @@ describe('document: hooks:', function () {
       db.close(done);
     });
   });
-
 });

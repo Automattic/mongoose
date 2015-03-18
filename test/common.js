@@ -114,7 +114,6 @@ module.exports.mongoose = mongoose;
 
 module.exports.mongodVersion = function (cb) {
   var db = module.exports();
-
   db.on('error', cb);
 
   db.on('open', function () {
@@ -130,7 +129,6 @@ module.exports.mongodVersion = function (cb) {
 function dropDBs(done) {
   var db = module.exports();
   db.once('open', function () {
-
     // drop the default test database
     db.db.dropDatabase(function () {
       var db2 = db.useDb('mongoose-test-2');
@@ -150,8 +148,10 @@ function dropDBs(done) {
 }
 
 before(function (done) {
+  this.timeout(10 * 1000);
   dropDBs(done);
 });
 after(function (done) {
+  this.timeout(10 * 1000);
   dropDBs(done);
 });

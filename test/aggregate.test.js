@@ -44,7 +44,9 @@ function setupData(callback) {
 }
 
 function clearData(db, callback) {
-  db.model('Employee').remove(callback);
+  db.model('Employee').remove(function() {
+    db.close(callback);
+  });
 }
 
 /**

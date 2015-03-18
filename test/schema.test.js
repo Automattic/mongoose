@@ -246,6 +246,8 @@ describe('schema', function(){
     assert.equal(Test.path('arrayX').getDefault(new TestDocument)[0], 9);
     assert.equal(typeof Test.path('arrayFn').defaultValue, 'function');
     assert.ok(Test.path('arrayFn').getDefault(new TestDocument).isMongooseArray);
+    assert.ok(Test.path('arrayX').getDefault(new TestDocument).isMongooseArray);
+    assert.equal(Test.path('arrayX').getDefault(new TestDocument)[0], 9);
     done();
   })
 
@@ -726,13 +728,13 @@ describe('schema', function(){
       var Tobi = new Schema();
 
       Tobi.pre('save', function(){});
-      assert.equal(2, Tobi.callQueue.length);
-
-      Tobi.post('save', function(){});
       assert.equal(3, Tobi.callQueue.length);
 
-      Tobi.pre('save', function(){});
+      Tobi.post('save', function(){});
       assert.equal(4, Tobi.callQueue.length);
+
+      Tobi.pre('save', function(){});
+      assert.equal(5, Tobi.callQueue.length);
       done();
     });
   });
@@ -1284,7 +1286,7 @@ describe('schema', function(){
           Some.findOne({ _id : s.id }, function (err, ss) {
             assert.ifError(err);
             assert.equal(ss.obj, ele.id);
-            done();
+            db.close(done);
           });
         });
       });
@@ -1393,7 +1395,7 @@ describe('schema', function(){
           err = e;
         }
         assert.ifError(err);
-        done();
+        db.close(done);
       })
     })
   })

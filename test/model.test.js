@@ -206,7 +206,7 @@ describe('Model', function(){
     s.field = [{text: 'text'}];
 
     assert.ok(s.field[0]);
-    done();
+    db.close(done);
   });
 
   describe('schema', function(){
@@ -390,8 +390,7 @@ describe('Model', function(){
 
         assert.ok(post.get('owners').isMongooseArray);
         assert.ok(post.get('comments').isMongooseDocumentArray);
-        db.close();
-        done();
+        db.close(done);
       });
     })
 
@@ -787,15 +786,8 @@ describe('Model', function(){
         , BlogPost = db.model('BlogPost', collection)
         , threw = false;
 
-      var post = new BlogPost;
-
       try {
-        post.init({
-          date: 'Test',
-          meta: {
-            date: 'Test'
-          }
-        });
+        var post = new BlogPost({ date: 'Test', meta: { date: 'Test' } });
       } catch(e){
         threw = true;
       }
@@ -2831,7 +2823,6 @@ describe('Model', function(){
 
         function complete () {
           Temp.findOne({ _id: t.get('_id') }, function (err, doc) {
-            db.close();
             assert.ifError(err);
             assert.equal(3, doc.get('nums').length);
 
@@ -2849,7 +2840,7 @@ describe('Model', function(){
               return num.valueOf() == '3';
             });
             assert.ok(v);
-            done()
+            db.close(done);
           });
         };
       });
@@ -4604,7 +4595,7 @@ describe('Model', function(){
     assert.equal(doc.$__delta()[1].$set.title,'css3');
     doc.title = undefined;
     assert.equal(doc.$__delta()[1].$unset.title,1);
-    assert.strictEqual(undefined, doc.$__delta()[1].$set);
+    assert.strictEqual(undefined, doc.$__delta()[1].$set.title);
 
     doc.title='css3';
     doc.author = 'aaron';
@@ -4706,7 +4697,7 @@ describe('Model', function(){
     assert.equal(thing.thing, a._id);
     assert.equal(thing.subdoc.thing[0], a._id);
 
-    done();
+    db.close(done);
   })
 
   it('setters trigger on null values (gh-1445)', function(done){
@@ -5036,7 +5027,7 @@ describe('Model', function(){
         parent.children.push({name: 'another child'});
         Parent.findByIdAndUpdate(it._id, { $set: { children: parent.children } }, function(err, affected) {
           assert.ifError(err);
-          done();
+          db.close(done);
         });
       });
     });
@@ -5079,7 +5070,53 @@ describe('Model', function(){
             u2.save(function(err) {
               assert.ok(err);
               assert.ok(u2.isModified('changer'));
-              done();
+              db.close(done);
+            });
+          });
+        });
+      });
+    });
+  });
+
+  describe('gh-2442', function() {
+    it('marks array as modified when initializing non-array from db', function(done) {
+      var db = start();
+
+      var s1 = new Schema({
+        array: mongoose.Schema.Types.Mixed
+      }, { minimize: false });
+
+      var s2 = new Schema({
+        array: {
+          type: [{
+            _id: false,
+            value: {
+              type: Number,
+              default: 0
+            }
+          }],
+          default: [{}]
+        }
+      });
+
+      var M1 = db.model('gh-2442-1', s1, 'gh-2442');
+      var M2 = db.model('gh-2442-2', s2, 'gh-2442');
+
+      M1.create({ array: {} }, function(err, doc) {
+        assert.ifError(err);
+        assert.ok(doc.array);
+        M2.findOne({ _id: doc._id }, function(err, doc) {
+          assert.ifError(err);
+          assert.equal(doc.array[0].value, 0);
+          doc.array[0].value = 1;
+          doc.save(function(err) {
+            assert.ifError(err);
+            M2.findOne({ _id: doc._id }, function(err, doc) {
+              assert.ifError(err);
+              assert.ok(!doc.isModified('array'));
+              assert.deepEqual(doc.array[0].value, 1);
+              assert.equal('[{"value":1}]', JSON.stringify(doc.array));
+              db.close(done);
             });
           });
         });

@@ -61,7 +61,11 @@ describe('model aggregate', function(){
         done();
       });
     });
-  })
+  });
+
+  after(function(done) {
+    db.close(done);
+  });
 
   describe('works', function(done){
     it('with argument lists', function(done){

@@ -244,6 +244,7 @@ block content
     - [collection](#collection)
     - [id](#id)
     - [_id](#_id)
+    - [minimize](#minimize)
     - [read](#read)
     - [safe](#safe)
     - [shardKey](#shardKey)
@@ -334,6 +335,39 @@ block content
 
   :markdown
     Note that currently you must disable the `_id` 
+
+  h4#minimize option: minimize
+  :markdown
+    Mongoose will, by default, "minimize" schemas by removing empty objects.
+    
+  :js
+    var schema = new Schema({ name: String, inventory: {} });
+    var Character = mongoose.model('Character', schema);
+    
+    // will store `inventory` field if it is not empty
+    var frodo = new Character({ name: 'Frodo', inventory: { ringOfPower: 1 }});
+    Character.findOne({ name: 'Frodo' }, function(err, character) {
+      console.log(character); // { name: 'Frodo', inventory: { ringOfPower: 1 }}
+    });
+    
+    // will not store `inventory` field if it is empty
+    var sam = new Character({ name: 'Sam', inventory: {}});
+    Character.findOne({ name: 'Sam' }, function(err, character) {
+      console.log(character); // { name: 'Sam' }
+    });
+
+  :markdown
+    This behavior can be overridden by setting `minimize` option to `false`. It will then store empty objects.
+    
+  :js
+    var schema = new Schema({ name: String, inventory: {} }, { minimize: false });
+    var Character = mongoose.model('Character', schema);
+    
+    // will store `inventory` if empty
+    var sam = new Character({ name: 'Sam', inventory: {}});
+    Character.findOne({ name: 'Sam' }, function(err, character) {
+      console.log(character); // { name: 'Sam', inventory: {}}
+    });
 
   h4#read option: read
   :markdown

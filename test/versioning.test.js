@@ -419,24 +419,23 @@ describe('versioning', function(){
 
         M.collection.findOne({ _id: doc._id }, function (err, doc) {
           assert.equal(false, '__v' in doc);
-          done();
-        })
-      })
+          db.close(done);
+        });
+      });
     });
-  })
+  });
 
   it('works with numbericAlpha paths', function(done){
     var db = start();
     var M = db.model('Versioning');
-    var m = new M;
-    m.init({ mixed: {}});
+    var m = new M({ mixed: {} });
     var path = 'mixed.4a';
     m.set(path, 2);
     m.save(function (err) {
       assert.ifError(err);
-      done();
-    })
-  })
+      db.close(done);
+    });
+  });
 
   describe('doc.increment()', function(){
     it('works without any other changes (gh-1475)', function(done){
@@ -458,7 +457,7 @@ describe('versioning', function(){
           V.findById(doc, function (err, doc) {
             assert.ifError(err);
             assert.equal(1, doc.__v);
-            done();
+            db.close(done);
           })
         })
       })
@@ -496,9 +495,23 @@ describe('versioning', function(){
 
       assert.equal(m.$__where(m.$__delta()[0]).__v, 0);
       assert.equal(m.$__delta()[1].$inc.__v, 1);
-      db.close();
-      done();
+      db.close(done);
     });
   });
 
-})
+  it('can remove version key from toObject() (gh-2675)', function(done) {
+    var db = start();
+    var schema = new Schema({ name: String });
+    var M = db.model('gh2675', schema, 'gh2675');
+
+    var m = new M();
+    m.save(function(err, m) {
+      assert.ifError(err);
+      var obj = m.toObject();
+      assert.equal(0, obj.__v);
+      obj = m.toObject({ versionKey: false });
+      assert.equal(undefined, obj.__v);
+      db.close(done);
+    });
+  });
+});

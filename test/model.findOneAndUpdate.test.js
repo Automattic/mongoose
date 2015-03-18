@@ -565,8 +565,7 @@ describe('model: findByIdAndUpdate:', function(){
       assert.ifError(err);
       assert.strictEqual(null, doc); // no previously existing doc
       if (--pending) return;
-      db.close();
-      done();
+      db.close(done);
     }
   });
 
@@ -583,8 +582,7 @@ describe('model: findByIdAndUpdate:', function(){
       assert.ifError(err);
       assert.strictEqual(null, doc); // no previously existing doc
       if (--pending) return;
-      db.close();
-      done();
+      db.close(done);
     }
   })
 
@@ -625,7 +623,6 @@ describe('model: findByIdAndUpdate:', function(){
         }
 
         M.findByIdAndUpdate(post.id, update, { new: false }, function (err, up) {
-          db.close();
           assert.ifError(err);
 
           assert.equal(up.title,post.title);
@@ -644,7 +641,7 @@ describe('model: findByIdAndUpdate:', function(){
           assert.ok(up.comments[1]._id);
           assert.ok(up.comments[0]._id instanceof DocumentObjectId)
           assert.ok(up.comments[1]._id instanceof DocumentObjectId)
-          done();
+          db.close(done);
         });
       });
     });
@@ -654,8 +651,6 @@ describe('model: findByIdAndUpdate:', function(){
     var db = start()
       , M = db.model(modelname, collection)
       , _id = new DocumentObjectId
-
-    db.close();
 
     var now = new Date
       , query;
@@ -680,15 +675,13 @@ describe('model: findByIdAndUpdate:', function(){
     assert.strictEqual(undefined, query.options.new);
     assert.equal(undefined, query._update);
     assert.strictEqual(undefined, query._conditions._id);
-    done();
+    db.close(done);
   });
 
   it('supports v3 select string syntax', function(done){
     var db = start()
       , M = db.model(modelname, collection)
       , _id = new DocumentObjectId
-
-    db.close();
 
     var now = new Date
       , query;
@@ -700,15 +693,13 @@ describe('model: findByIdAndUpdate:', function(){
     query = M.findOneAndUpdate({}, { $set: { date: now }}, { select: 'author -title' });
     assert.strictEqual(1, query._fields.author);
     assert.strictEqual(0, query._fields.title);
-    done();
-  })
+    db.close(done);
+  });
 
   it('supports v3 select object syntax', function(done){
     var db = start()
       , M = db.model(modelname, collection)
       , _id = new DocumentObjectId
-
-    db.close();
 
     var now = new Date
       , query;
@@ -720,7 +711,7 @@ describe('model: findByIdAndUpdate:', function(){
     query = M.findOneAndUpdate({}, { $set: { date: now }}, { select: { author: 1, title: 0 }});
     assert.strictEqual(1, query._fields.author);
     assert.strictEqual(0, query._fields.title);
-    done();
+    db.close(done);
   })
 
   it('supports v3 sort string syntax', function(done){
@@ -753,9 +744,8 @@ describe('model: findByIdAndUpdate:', function(){
       .sort({ 'meta.visitors': -1 })
       .exec(function(err, doc) {
         if (err) return done(err);
-        db.close();
         assert.equal(10, doc.meta.visitors);
-        done();
+        db.close(done);
       });
     });
   })
@@ -764,8 +754,6 @@ describe('model: findByIdAndUpdate:', function(){
     var db = start()
       , M = db.model(modelname, collection)
       , _id = new DocumentObjectId
-
-    db.close();
 
     var now = new Date
       , query;
@@ -780,7 +768,7 @@ describe('model: findByIdAndUpdate:', function(){
     assert.equal(1, query.options.sort.author);
     assert.equal(-1, query.options.sort.title);
 
-    done();
+    db.close(done);
   });
 
   it('supports $elemMatch with $in (gh-1091 gh-1100)', function(done){
@@ -808,7 +796,7 @@ describe('model: findByIdAndUpdate:', function(){
         assert.equal('woot', found.title);
         assert.equal(1, found.ids.length);
         assert.equal(_id2.toString(), found.ids[0].toString());
-        done();
+        db.close(done);
       });
     })
   })
@@ -830,7 +818,7 @@ describe('model: findByIdAndUpdate:', function(){
           assert.ok(doc);
           assert.ok(doc.a);
           assert.equal(doc.a.name, 'i am an A');
-          done();
+          db.close(done);
         })
       })
     })
@@ -856,7 +844,7 @@ describe('model: findByIdAndUpdate:', function(){
           assert.ifError(err);
           assert.equal(key, thing2.id);
           assert.equal(false, thing2.flag);
-          done();
+          db.close(done);
         });
     });
   });
@@ -877,7 +865,7 @@ describe('model: findByIdAndUpdate:', function(){
           if (err) return done(err);
           assert.ok(doc);
           assert.equal(doc.name, null);
-          done();
+          db.close(done);
       });
     });
   });
@@ -891,7 +879,7 @@ describe('model: findByIdAndUpdate:', function(){
         if (err) return done(err);
         assert.ok(doc.change);
         assert.equal(undefined, doc.name);
-        done();
+        db.close(done);
       });
     });
   });
@@ -929,7 +917,7 @@ describe('model: findByIdAndUpdate:', function(){
               assert.ifError(error);
               assert.ok(Utils.deepEqual(doc.contacts[0].account, a2._id));
               assert.ok(_.isEqual(doc.contacts[0].account, a2._id));
-              done();
+              db.close(done);
             });
           });
       });
@@ -952,7 +940,7 @@ describe('model: findByIdAndUpdate:', function(){
       function(error, doc) {
         assert.ifError(error);
         assert.equal(0, doc.__v);
-        done();
+        db.close(done);
       });
   });
 
@@ -984,7 +972,7 @@ describe('model: findByIdAndUpdate:', function(){
             assert.ifError(error);
             assert.equal(1, doc.ticks.length);
             assert.equal('coffee', doc.ticks[0].name);
-            done();
+            db.close(done);
           });
         });
     });
@@ -1004,7 +992,24 @@ describe('model: findByIdAndUpdate:', function(){
       findOneAndUpdate({}, { time: undefined, base: undefined }, {}).
       exec(function(error, breakfast) {
         assert.ifError(error);
-        done();
+        db.close(done);
+      });
+  });
+
+  it('cast errors for empty objects as object ids (gh-2732)', function(done) {
+    var db = start();
+
+    var s = new Schema({
+      base: ObjectId
+    });
+
+    var Breakfast = db.model('gh2732', s);
+
+    Breakfast.
+      findOneAndUpdate({}, { base: {} }, {}).
+      exec(function(error, breakfast) {
+        assert.ok(error);
+        db.close(done);
       });
   });
 
@@ -1306,8 +1311,7 @@ describe('model: findByIdAndUpdate:', function(){
           assert.ifError(error);
           assert.ok(!!breakfast);
           assert.equal(1, breakfast.eggs);
-          db.close();
-          done();
+          db.close(done);
         });
     });
   });

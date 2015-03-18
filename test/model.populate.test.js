@@ -87,7 +87,7 @@ describe('model: populate:', function(){
             post.populate('comments', function(){});
           });
           
-          done();
+          db.close(done);
         });
       });
     });
@@ -114,16 +114,54 @@ describe('model: populate:', function(){
         .findById(post._id)
         .populate('_creator')
         .exec(function (err, post) {
-          db.close();
           assert.ifError(err);
 
           assert.ok(post._creator instanceof User);
           assert.equal(post._creator.name, 'Guillermo');
           assert.equal(post._creator.email, 'rauchg@gmail.com');
-          done();
+          db.close(done);
         });
       });
     });
+  });
+
+  it('not failing on null as ref', function(done) {
+    var db = start()
+      , BlogPost = db.model('RefBlogPost', posts);
+
+    BlogPost.create({
+        title     : 'woot'
+      , _creator  : null
+    }, function (err, post) {
+      assert.ifError(err);
+
+      BlogPost
+      .findById(post._id)
+      .populate('_creator')
+      .exec(function (err, post) {
+        assert.ifError(err);
+
+        assert.equal(post._creator, null);
+        db.close(done);
+      });
+    });
+  });
+
+  it('not failing on empty object as ref', function(done) {
+    var db = start()
+      , BlogPost = db.model('RefBlogPost', posts);
+
+    BlogPost.create(
+      { title : 'woot' },
+      function (err, post) {
+        assert.ifError(err);
+
+        BlogPost.
+         findByIdAndUpdate(post._id, { $set: { _creator: {} } }, function(err) {
+           assert.ok(err);
+           db.close(done);
+         });
+      });
   });
 
   it('across DBs', function(done) {
@@ -901,13 +939,12 @@ describe('model: populate:', function(){
             .populate('_creator')
             .populate('comments._creator')
             .exec(function (err, post) {
-              db.close();
               assert.ifError(err);
 
               assert.equal(post._creator.name,'User 1');
               assert.equal(post.comments[0]._creator.name,'User 1');
               assert.equal(post.comments[1]._creator.name,'User 2');
-              done();
+              db.close(done);
             });
           });
         });
@@ -950,7 +987,7 @@ describe('model: populate:', function(){
             assert.ok(posts.length);
             assert.ok(posts[1].comments[0]._creator);
             assert.equal('gh-1055-1', posts[1].comments[0]._creator.name);
-            done();
+            db.close(done);
           });
         });
       });
@@ -988,7 +1025,7 @@ describe('model: populate:', function(){
                 posts[0].populate('_creator', function(error, doc) {
                   assert.ifError(error);
                   assert.equal('val', doc._creator.name);
-                  done();
+                  db.close(done);
                 });
               });
             });
@@ -1146,7 +1183,6 @@ describe('model: populate:', function(){
                 .findById(post._id)
                 .populate('comments._creator', 'email')
                 .exec(function (err, post) {
-                  db.close();
                   assert.ifError(err);
 
                   assert.ok(post.comments);
@@ -1157,7 +1193,7 @@ describe('model: populate:', function(){
                   assert.equal(post.comments[1]._creator.isInit('name'), false);
                   assert.equal(post.comments[1].content,'Wha wha');
 
-                  done();
+                  db.close(done);
                 });
               });
             })
@@ -1254,7 +1290,7 @@ describe('model: populate:', function(){
               assert.equal(2, docs.length);
               assert.equal(1, docs[0].author.friends.length);
               assert.equal(1, docs[1].author.friends.length);
-              done();
+              db.close(done);
             })
           });
       });
@@ -1572,7 +1608,7 @@ describe('model: populate:', function(){
         assert.equal(j.length, 2);
         assert.equal(j[0].b.length, 2);
         assert.equal(j[1].b.length, 2);
-        done();
+        db.close(done);
       });
     }
   })
@@ -2078,7 +2114,6 @@ describe('model: populate:', function(){
         , options: { sort: {'name': -1} }
       })
       .exec(function (err, post) {
-        db.close();
         assert.ifError(err);
 
         assert.ok(Array.isArray(post.fans));
@@ -2344,7 +2379,6 @@ describe('model: populate:', function(){
           .populate('fans')
           .lean()
           .exec(function (err, blogposts) {
-            db.close();
             assert.ifError(err);
 
             assert.equal(blogposts[0].fans[0].name,'Fan 1');
@@ -2360,7 +2394,7 @@ describe('model: populate:', function(){
             assert.equal(blogposts[1].fans[1].name,'Fan 1');
             assert.equal(blogposts[1].fans[1].email,'fan1@learnboost.com');
             assert.equal('undefined', typeof blogposts[1].fans[1].update);
-            done();
+            db.close(done);
           });
         });
       });
@@ -2614,132 +2648,71 @@ describe('model: populate:', function(){
 
   describe('DynRef', function() {
     var db;
+    var Review;
+    var Item1;
+    var Item2;
 
     before(function(done) {
       db = start();
-
-      var ReviewSchema = new Schema({
-          _id: Number,
-          text: String,
-          item: {
-            id: {
+      var reviewSchema = new Schema({
+        _id: Number,
+        text: String,
+        item: {
+          id: {
+            type: Number,
+            refPath: 'item.type'
+          },
+          type: {
+            type: String
+          }
+        },
+        items: [
+          {
+            id: { 
               type: Number,
-              refPath: 'item.type'
+              refPath: 'items.type'
             },
-            type: {
+            type: { 
               type: String
             }
           }
-        }),
-        ArrayPopulate = new Schema({
-          items: [{
-            item: {
-              type: mongoose.SchemaTypes.Mixed,
-              refPath: 'items.type'
-            },
-            type: {
-              type: String
-            }
-          }]
-        }),
-        AnotherSchema = new Schema({
-          _id: Number,
-          body: String,
-          array: Array,
-          bool: Boolean,
-          nest: {
-            string: String,
-            array: Array
-          },
-          mixed: {}
-        }),
-        Review = db.model('DynRefReview', ReviewSchema, 'DynRefReview'),
-        Note = db.model('DynRefNote', AnotherSchema, 'DynRefNote'),
-        Place = db.model('DynRefPlace', AnotherSchema, 'DynRefPlace'),
-        Another = db.model('DynRefAnother', AnotherSchema, 'DynRefAnother'),
-        ArrayPop = db.model('DynRefArrayPopulate', ArrayPopulate, 'DynRefArrayPopulate');
+        ]
+      });
 
-      Place.create({
-        _id: 11,
-        body: "wefwef"
-      }, {
-        _id: 12,
-        body: "rthrth"
-      }, {
-        _id: 13,
-        body: "o.i.io."
-      }, function(err) {
-        assert.ifError(err);
-        Note.create({
-          _id: 21,
-          body: "ergerg"
-        }, {
-          _id: 22,
-          body: "rhtrhryj"
-        }, {
-          _id: 23,
-          body: "kyukuk"
-        }, function(err) {
-          assert.ifError(err);
-          Review.create({
-            _id: 31,
-            text: 'safadv',
-            item: {
-              id: 11,
-              type: 'DynRefPlace'
+      var item1Schema = new Schema({
+        _id: Number,
+        name: String
+      });
+
+      var item2Schema = new Schema({
+        _id: Number,
+        otherName: String
+      });
+
+      Review = db.model('dynrefReview', reviewSchema, 'dynref-0');
+      Item1 = db.model('dynrefItem1', item1Schema, 'dynref-1');
+      Item2 = db.model('dynrefItem2', item2Schema, 'dynref-2');
+
+      var review = {
+        _id: 0,
+        text: 'Test',
+        item: { id: 1, type: 'dynrefItem1' },
+        items: [{ id: 1, type: 'dynrefItem1' }, { id: 2, type: 'dynrefItem2' }]
+      };
+
+      Item1.create({ _id: 1, name: 'Val' }, function(err, doc) {
+        if (err) {
+          return done(err);
+        }
+        Item2.create({ _id: 2, otherName: 'Val' }, function(err, doc) {
+          if (err) {
+            return done(err);
+          }
+          Review.create(review, function(err, doc) {
+            if (err) {
+              return done(err);
             }
-          }, {
-            _id: 32,
-            text: 'rthrt',
-            item: {
-              id: 12,
-              type: 'DynRefPlace'
-            }
-          }, {
-            _id: 33,
-            text: 'tmtyj',
-            item: {
-              id: 13,
-              type: 'DynRefPlace'
-            }
-          }, {
-            _id: 34,
-            text: 'yukilui',
-            item: {
-              id: 21,
-              type: 'DynRefNote'
-            }
-          }, {
-            _id: 35,
-            text: 'h4545t',
-            item: {
-              id: 22,
-              type: 'DynRefNote'
-            }
-          }, {
-            _id: 36,
-            text: 'regeg45',
-            item: {
-              id: 23,
-              type: 'DynRefNote'
-            }
-          }, function(err, a) {
-            assert.ifError(err);
-            ArrayPop.create({
-              items: [{
-                item: 32,
-                type: 'DynRefReview'
-              }, {
-                item: 12,
-                type: 'DynRefPlace'
-              }, {
-                item: 21,
-                type: 'DynRefNote'
-              }]
-            }, function(err) {
-              assert.ifError(err);
-              done();
-            });
+            done();
           });
         });
       });
@@ -2750,25 +2723,23 @@ describe('model: populate:', function(){
     });
 
     it('Simple populate', function(done) {
-      db.model('DynRefReview').find({}).populate('item.id').exec(function(err, result) {
+      Review.find({}).populate('item.id').exec(function(err, results) {
         assert.ifError(err);
-        assert.equal(6, result.length);
-        assert.equal(11, result[0].item.id._id);
-        assert.equal(12, result[1].item.id._id);
-        assert.equal(13, result[2].item.id._id);
-        assert.equal(21, result[3].item.id._id);
-        assert.equal(22, result[4].item.id._id);
-        assert.equal(23, result[5].item.id._id);
+        assert.equal(1, results.length);
+        var result = results[0];
+        assert.equal('Val', result.item.id.name);
         done();
       });
     });
 
     it('Array populate', function(done) {
-      db.model('DynRefArrayPopulate').find({}).populate('items.item').exec(function(err, result) {
+      Review.find({}).populate('items.id').exec(function(err, results) {
         assert.ifError(err);
-        assert.equal(32, result[0].items[0].item._id);
-        assert.equal(12, result[0].items[1].item._id);
-        assert.equal(21, result[0].items[2].item._id);
+        assert.equal(1, results.length);
+        var result = results[0];
+        assert.equal(2, result.items.length);
+        assert.equal('Val', result.items[0].id.name);
+        assert.equal('Val', result.items[1].id.otherName);
         done();
       });
     });
@@ -2852,7 +2823,7 @@ describe('model: populate:', function(){
             Category.findOne({}).populate({ path: 'movies', options: { limit: 2, skip: 1 } }).exec(function(error, category) {
               assert.ifError(error);
               assert.equal(2, category.movies.length);
-              done();
+              db.close(done);
             });
           });
         });

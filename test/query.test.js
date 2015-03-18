@@ -1173,13 +1173,12 @@ describe('Query', function(){
             assert.ifError(err);
 
             Product.collection.findOne({ _id: product._id }, function (err, doc) {
-              db.close();
               assert.ifError(err);
               assert.equal(doc.comments.length, 1);
               // ensure hidden private props were not saved to db
               assert.ok(!doc.comments[0].hasOwnProperty('parentArry') );
               assert.equal(doc.comments[0].text,'goodbye');
-              done();
+              db.close(done);
             });
           });
         });
@@ -1422,7 +1421,7 @@ describe('Query', function(){
           q.exec(function(err, res) {
             if (err) return done(err);
             assert.ok(called);
-            done();
+            db.close(done);
           });
         });
 
@@ -1489,7 +1488,7 @@ describe('Query', function(){
       var Product = db.model('Product', 'Product_setOptions_test');
       Product.find().sort({ _id: 1 }).count({}).exec(function(error) {
         assert.ifError(error);
-        done();
+        db.close(done);
       });
     });
 
@@ -1498,7 +1497,7 @@ describe('Query', function(){
       var Product = db.model('Product', 'Product_setOptions_test');
       Product.find().count({}).sort({ _id: 1 }).exec(function(error) {
         assert.ifError(error);
-        done();
+        db.close(done);
       });
     });
   });

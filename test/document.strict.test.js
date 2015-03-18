@@ -43,6 +43,10 @@ describe('document: strict mode:', function(){
       Strict = db.model('Strict', strict);
     });
 
+    after(function(done) {
+      db.close(done);
+    });
+
     it('when creating models with non-strict schemas', function(done) {
       var l = new Lax({content: 'sample', rouge: 'data'});
       assert.equal(false, l.$__.strictMode);
@@ -130,8 +134,6 @@ describe('document: strict mode:', function(){
     var Lax = db.model('NestedLax', lax, 'nestdoc'+random());
     var Strict = db.model('NestedStrict', strict, 'nestdoc'+random());
 
-    db.close();
-
     var l = new Lax;
     l.set('name', { last: 'goose', hack: 'xx' });
     l = l.toObject();
@@ -153,7 +155,7 @@ describe('document: strict mode:', function(){
     assert.ok(!('hack' in s.name));
     assert.ok(!s.name.hack);
     assert.ok(!s.shouldnt);
-    done();
+    db.close(done);
   })
 
   it('sub doc', function(done){
@@ -197,11 +199,10 @@ describe('document: strict mode:', function(){
 
     // strict on create
     Strict.create({dox:[{content: 'sample2', rouge: 'data'}]}, function(err, doc){
-      db.close();
       assert.equal('sample2', doc.dox[0].content);
       assert.ok(!('rouge' in doc.dox[0]));
       assert.ok(!doc.dox[0].rouge);
-      done();
+      db.close(done);
     });
   })
 
@@ -234,7 +235,6 @@ describe('document: strict mode:', function(){
       , myvirtual: 'test'
     });
 
-    db.close();
     assert.equal(0, getCount);
     assert.equal(1, setCount);
 
@@ -243,7 +243,7 @@ describe('document: strict mode:', function(){
 
     assert.equal(1, getCount);
     assert.equal(2, setCount);
-    done();
+    db.close(done);
   })
 
   it('can be overridden during set()', function(done){
@@ -270,11 +270,10 @@ describe('document: strict mode:', function(){
         doc.set('notInSchema', undefined, { strict: false });
         doc.save(function (err) {
           Strict.findById(doc._id, function (err, doc) {
-            db.close();
             assert.ifError(err);
             assert.equal(undefined, doc._doc.bool);
             assert.equal(undefined, doc._doc.notInSchema);
-            done();
+            db.close(done);
           });
         })
       })
@@ -318,10 +317,51 @@ describe('document: strict mode:', function(){
             assert.equal(undefined, doc._doc.notInSchema);
             done();
           });
-        })
-      })
-    })
-  })
+        });
+      });
+    });
+  });
+
+  it('can be overwritten with findOneAndUpdate (gh-1967)', function(done) {
+    var db = start();
+
+    var strict = new Schema({
+      bool: Boolean
+    });
+
+    var Strict = db.model('Strict', strict);
+    var s = new Strict({ bool: true });
+
+    // insert non-schema property
+    var doc = s.toObject();
+    doc.notInSchema = true;
+
+    Strict.collection.insert(doc, { w: 1 }, function (err) {
+      assert.ifError(err);
+
+      Strict.findById(doc._id, function (err, doc) {
+        assert.ifError(err);
+        assert.equal(true, doc._doc.bool);
+        assert.equal(true, doc._doc.notInSchema);
+
+        Strict.findOneAndUpdate(
+            { _id: doc._id }
+          , { $unset: { bool: 1, notInSchema: 1 }}
+          , { strict: false, w: 1 }
+          , function (err) {
+
+          assert.ifError(err);
+
+          Strict.findById(doc._id, function (err, doc) {
+            assert.ifError(err);
+            assert.equal(undefined, doc._doc.bool);
+            assert.equal(undefined, doc._doc.notInSchema);
+            db.close(done);
+          });
+        });
+      });
+    });
+  });
 
   describe('"throws" mode', function(){
     it('throws on set() of unknown property', function(done){
@@ -372,15 +412,13 @@ describe('document: strict mode:', function(){
     })
 
     it('fails with extra fields', function (done) {
-      var m = new mongoose.Mongoose;
-
       // Simple schema with throws option
       var FooSchema = new mongoose.Schema({
           name: { type: String }
       }, {strict: "throw"});
 
       // Create the model
-      var Foo = m.model('Foo', FooSchema);
+      var Foo = mongoose.model('Foo1234', FooSchema);
 
       assert.doesNotThrow(function(){
         new Foo({name: 'bar'});
@@ -390,6 +428,23 @@ describe('document: strict mode:', function(){
         // The extra baz field should throw
         new Foo({name: 'bar', baz: 'bam'});
       }, /Field `baz` is not in schema/);
+
+      done();
+    });
+
+    it('doesnt throw with refs (gh-2665)', function(done) {
+      // Simple schema with throws option
+      var FooSchema = new mongoose.Schema({
+        name: { type: mongoose.Schema.Types.ObjectId, ref: 'test', required: false, default: null },
+        father: { name: { full: String } }
+      }, {strict: "throw"});
+
+      // Create the model
+      var Foo = mongoose.model('Foo', FooSchema);
+
+      assert.doesNotThrow(function(){
+        new Foo({name: mongoose.Types.ObjectId(), father: { name: { full: 'bacon' } } });
+      })
 
       done();
     });

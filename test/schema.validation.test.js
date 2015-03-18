@@ -768,5 +768,33 @@ describe('schema', function(){
         done();
       });
     });
+
+    it('fails when you try to set a nested path to a primitive (gh-2592)', function(done) {
+      var breakfast = new Schema({ foods: { bacon: Number, eggs: Number } });
+
+      var Breakfast = mongoose.model('gh-2592', breakfast, 'gh-2592');
+      var bad = new Breakfast();
+      bad.foods = 'waffles';
+      bad.validate(function(error) {
+        assert.ok(error);
+        var errorMessage = 'CastError: Cast to Object failed for value ' +
+          '"waffles" at path "foods"';
+        assert.equal(errorMessage, error.toString());
+        done();
+      });
+    });
+
+    it('doesnt execute other validators if required fails (gh-2725)', function(done) {
+      var breakfast = new Schema({ description: { type: String, required: true, maxlength: 50 } });
+
+      var Breakfast = mongoose.model('gh2725', breakfast, 'gh2725');
+      var bad = new Breakfast({});
+      bad.validate(function(error) {
+        assert.ok(error);
+        var errorMessage = 'ValidationError: Path `description` is required.';
+        assert.equal(errorMessage, error.toString());
+        done();
+      });
+    });
   });
 });

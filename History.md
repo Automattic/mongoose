@@ -1,9 +1,70 @@
-4.0.0-rc1 / 2014-02-01
+4.0.0-rc4 / 2015-03-14
+======================
+ * fixed; toObject virtuals schema option handled properly #2751
+ * fixed; update validators work on document arrays #2733
+ * fixed; check for cast errors on $set #2729
+ * fixed; instance field set for all schema types #2727 [csdco](https://github.com/csdco)
+ * fixed; dont run other validators if required fails #2725
+ * fixed; custom getters execute on ref paths #2610
+ * fixed; save defaults if they were set when doc was loaded from db #2558
+ * fixed; pre validate now runs before pre save #2462
+ * fixed; no longer throws errors with --use_strict #2281
+
+3.8.25 / 2015-03-13
+===================
+ * fixed; debug output reverses order of aggregation keys #2759
+ * fixed; $eq is a valid query selector in 3.0 #2752
+ * fixed; upgraded node driver to 1.4.32 for handling non-numeric poolSize #2682
+ * fixed; update() with overwrite sets _id for nested docs #2658
+ * fixed; casting for operators in $elemMatch #2199
+
+4.0.0-rc3 / 2015-02-28
+======================
+ * fixed; update() pre hooks run before validators #2706
+ * fixed; setters not called on arrays of refs #2698 [brandom](https://github.com/brandom)
+ * fixed; use node driver 2.0.18 for nodejs 0.12 support #2685
+ * fixed; comments reference file that no longer exists #2681
+ * fixed; populated() returns _id of manually populated doc #2678
+ * added; ability to exclude version key in toObject() #2675
+ * fixed; dont allow setting nested path to a string #2592
+ * fixed; can cast objects with _id field to ObjectIds #2581
+ * fixed; on-the-fly schema getters #2360
+ * added; strict option for findOneAndUpdate() #1967
+
+3.8.24 / 2015-02-25
+===================
+ * fixed; properly apply child schema transforms #2691
+ * fixed; make copy of findOneAndUpdate options before modifying #2687
+ * fixed; apply defaults when parent path is selected #2670 #2629
+ * fixed; properly get ref property for nested paths #2665
+ * fixed; node driver makes copy of authenticate options before modifying them #2619
+ * fixed; dont block process exit when auth fails #2599
+ * fixed; remove redundant clone in update() #2537
+
+4.0.0-rc2 / 2015-02-10
+======================
+ * added; io.js to travis build
+ * removed; browser build dependencies not installed by default
+ * added; dynamic refpaths #2640 [chetverikov](https://github.com/chetverikov)
+ * fixed; dont call child schema transforms on parent #2639 [chetverikov](https://github.com/chetverikov)
+ * fixed; get rid of remove option if new is set in findAndModify #2598
+ * fixed; aggregate all document array validation errors #2589
+ * fixed; custom setters called when setting value to undefined #1892
+
+3.8.23 / 2015-02-06
+===================
+ * fixed; unset opts.remove when upsert is true #2519
+ * fixed; array saved as object when path is object in array #2442
+ * fixed; inline transforms #2440
+ * fixed; check for callback in count() #2204
+ * fixed; documentation for selecting fields #1534
+
+4.0.0-rc1 / 2015-02-01
 ======================
  * fixed; use driver 2.0.14
  * changed; use transform: true by default #2245
 
-4.0.0-rc0 / 2014-01-31
+4.0.0-rc0 / 2015-01-31
 ===================
  * fixed; wrong order for distinct() params #2628
  * fixed; handling no query argument to remove() #2627
@@ -18,7 +79,7 @@
  * fixed; undefined is now a valid argument to findOneAndUpdate #2272
  * changed; `new` option to findAndModify ops is false by default #2262
 
-3.8.22 / 2014-01-24
+3.8.22 / 2015-01-24
 ===================
  * upgraded; node-mongodb-native to 1.4.28 #2587 [Climax777](https://github.com/Climax777)
  * added; additional documentation for validators #2449

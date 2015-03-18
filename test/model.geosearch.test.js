@@ -61,7 +61,7 @@ describe('model', function(){
             Geo.geoSearch({ type : "place" }, { near : [40,40], maxDistance : 5 }, function (err, results, stats) {
               assert.ifError(err);
               assert.equal(0, results.length);
-              done();
+              db.close(done);
             });
           });
         }
@@ -102,7 +102,7 @@ describe('model', function(){
             assert.equal(results[0]._id, geos[0].id);
             assert.strictEqual(results[0].id, undefined);
             assert.ok(!(results[0] instanceof Geo));
-            done();
+            db.close(done);
           });
         }
       });
@@ -134,7 +134,7 @@ describe('model', function(){
                 Geo.geoSearch({ type : "test" }, { near : [1,2] }, function (err, res) {
                   assert.ok(err);
                   assert.ok(/maxDistance needs a number/.test(err));
-                  done();
+                  db.close(done);
                 });
               });
             });

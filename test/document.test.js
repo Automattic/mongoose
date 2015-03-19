@@ -1033,6 +1033,22 @@ describe('document', function(){
       }, 500);
     });
 
+    it('doesnt have stale cast errors (gh-2766)', function(done) {
+      var db = start();
+      var testSchema = new Schema({ name: String });
+      var M = db.model('gh2766', testSchema);
+
+      var m = new M({ _id: 'this is not a valid _id' });
+      assert.ok(!m.$isValid('_id'));
+      m._id = '000000000000000000000001';
+      assert.ok(m.$isValid('_id'));
+      m.validate(function(error) {
+        assert.ifError(error);
+        db.close(done);
+
+      });
+    });
+
     it('returns a promise when there are no validators', function(done) {
       var db = start();
       var schema = null;

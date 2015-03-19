@@ -856,8 +856,7 @@ describe('Model', function(){
         , BlogPost = db.model('BlogPost', collection)
         , threw = false;
 
-      var post = new BlogPost()
-      post.init({
+      var post = new BlogPost({
           title       : 'Test'
         , slug        : 'test'
         , comments    : [ { title: 'Test', date: new Date, body: 'Test' } ]
@@ -865,7 +864,7 @@ describe('Model', function(){
 
       post.get('comments')[0].set('date', 'invalid');
 
-      post.save(function(err){
+      post.save(function(err) {
         db.close();
         assert.ok(err instanceof MongooseError);
         assert.ok(err instanceof ValidationError);

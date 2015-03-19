@@ -779,7 +779,7 @@ describe('schema', function(){
         assert.ok(error);
         var errorMessage = 'CastError: Cast to Object failed for value ' +
           '"waffles" at path "foods"';
-        assert.equal(errorMessage, error.toString());
+        assert.ok(error.toString().indexOf(errorMessage) !== -1, error.toString());
         done();
       });
     });

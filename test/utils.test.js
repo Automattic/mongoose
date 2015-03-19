@@ -283,7 +283,25 @@ describe('utils', function(){
     var orig = [0,[1,2,[3,4,[5,[6]],7],8],9];
     assert.deepEqual([0,1,2,3,4,5,6,7,8,9], utils.array.flatten(orig));
     done();
-  })
+  });
+
+  it('array.unique', function(done) {
+    var case1 = [1, 2, 3, 3, 5, 'a', 6, 'a'];
+    assert.deepEqual(utils.array.unique(case1), [1, 2, 3, 5, 'a', 6]);
+    var objId = new ObjectId('000000000000000000000001');
+    var case2 = [
+      1,
+      '000000000000000000000001',
+      1,
+      objId,
+      '000000000000000000000001',
+      objId,
+      1
+    ];
+    assert.deepEqual(utils.array.unique(case2),
+      [1, '000000000000000000000001', objId]);
+    done();
+  });
 
   describe('merge', function(){
     it('merges two objects together without overriding properties & methods', function(done){

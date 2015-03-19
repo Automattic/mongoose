@@ -705,6 +705,47 @@ describe('model', function() {
           });
         });
       });
+
+      it('reference in child schemas (gh-2719)', function(done){
+        var vehicleSchema = new Schema({});
+        var carSchema = new Schema({
+          speed: Number,
+          garage: {type: Schema.Types.ObjectId, ref: 'gh2719PopulationGarage'}
+        });
+        var busSchema = new Schema({
+          speed: Number,
+          garage: {type: Schema.Types.ObjectId, ref: 'gh2719PopulationGarage'}
+        });
+
+        var garageSchema = new Schema({
+          name: String,
+          num_of_places: Number
+        });
+
+        var Vehicle = db.model('gh2719PopulationVehicle', vehicleSchema)
+          , Car = Vehicle.discriminator('gh2719PopulationCar', carSchema)
+          , Bus = Vehicle.discriminator('gh2719PopulationBus', busSchema)
+          , Garage = db.model('gh2719PopulationGarage', garageSchema);
+
+        Garage.create({name: 'My', num_of_places: 3}, function(err, garage){
+          assert.ifError(err);
+          Car.create({ speed: 160, garage: garage }, function(err, car) {
+            assert.ifError(err);
+            Bus.create({ speed: 80, garage: garage }, function(err, bus) {
+              assert.ifError(err);
+              Vehicle.find({}).populate('garage').exec(function(err, vehicles){
+                assert.ifError(err);
+
+                vehicles.forEach(function(v){
+                  assert.ok(v.garage instanceof Garage);
+                });
+
+                done();
+              });
+            })
+          });
+        });
+      })
     });
 
     describe('aggregate', function() {

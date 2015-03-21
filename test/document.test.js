@@ -1040,12 +1040,37 @@ describe('document', function(){
 
       var m = new M({ _id: 'this is not a valid _id' });
       assert.ok(!m.$isValid('_id'));
+      assert.ok(m.validateSync().errors['_id'].name, 'CastError');
+
       m._id = '000000000000000000000001';
       assert.ok(m.$isValid('_id'));
+      assert.ifError(m.validateSync());
       m.validate(function(error) {
         assert.ifError(error);
         db.close(done);
+      });
+    });
 
+    it('cast errors persist across validate() calls (gh-2766)', function(done) {
+      var db = start();
+      var testSchema = new Schema({ name: String });
+      var M = db.model('gh2766', testSchema);
+
+      var m = new M({ _id: 'this is not a valid _id' });
+      assert.ok(!m.$isValid('_id'));
+      m.validate(function(error) {
+        assert.ok(error);
+        assert.equal(error.errors['_id'].name, 'CastError');
+        m.validate(function(error) {
+          assert.ok(error);
+          assert.equal(error.errors['_id'].name, 'CastError');
+
+          var err1 = m.validateSync();
+          var err2 = m.validateSync();
+          assert.equal(err1.errors['_id'].name, 'CastError');
+          assert.equal(err2.errors['_id'].name, 'CastError');
+          db.close(done);
+        });
       });
     });
 

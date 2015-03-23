@@ -2670,4 +2670,33 @@ describe('model: populate:', function(){
       });
     });
   });
+
+  it('handles slice (gh-1934)', function(done) {
+    var db = start();
+
+    var movieSchema = new Schema({ title: String, actors: [String] });
+    var categorySchema = new Schema({ movies: [{ type: ObjectId, ref: 'gh-1934-1' }] });
+
+    var Movie = db.model('gh-1934-1', movieSchema);
+    var Category = db.model('gh-1934-2', categorySchema);
+    var movies = [
+      { title: 'Rush', actors: ['Chris Hemsworth', 'Daniel Bruhl'] },
+      { title: 'Pacific Rim', actors: ['Charlie Hunnam', 'Idris Elba'] },
+      { title: 'Man of Steel', actors: ['Henry Cavill', 'Amy Adams'] }
+    ];
+    Movie.create(movies, function(error, m1, m2, m3) {
+      assert.ifError(error);
+      Category.create({ movies: [m1._id, m2._id, m3._id] }, function(error) {
+        assert.ifError(error);
+        Category.findOne({}).populate({ path: 'movies', options: { slice: { actors: 1 } } }).exec(function(error, category) {
+          assert.ifError(error);
+          assert.equal(category.movies.length, 3);
+          assert.equal(category.movies[0].actors.length, 1);
+          assert.equal(category.movies[1].actors.length, 1);
+          assert.equal(category.movies[2].actors.length, 1);
+          done();
+        });
+      });
+    });
+  });
 });

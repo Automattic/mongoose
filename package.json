@@ -15,7 +15,7 @@
     "mpath": "0.1.1",
     "kareem": "1.0.0",
     "regexp-clone": "0.0.1",
-    "mquery" : "1.0.0",
+    "mquery" : "1.4.0",
     "async": "0.9.0"
   },
   "devDependencies": {

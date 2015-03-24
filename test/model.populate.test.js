@@ -2850,7 +2850,7 @@ describe('model: populate:', function(){
       { title: 'Pacific Rim', actors: ['Charlie Hunnam', 'Idris Elba'] },
       { title: 'Man of Steel', actors: ['Henry Cavill', 'Amy Adams'] }
     ];
-    Movie.create(movies, function(error, m1, m2, m3) {
+    Movie.create(movies[0], movies[1], movies[2], function(error, m1, m2, m3) {
       assert.ifError(error);
       Category.create({ movies: [m1._id, m2._id, m3._id] }, function(error) {
         assert.ifError(error);

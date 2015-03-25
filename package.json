@@ -7,7 +7,7 @@
   "license": "MIT",
   "dependencies": {
     "hooks-fixed": "1.0.1",
-    "mongodb": "2.0.23",
+    "mongodb": "2.0.24",
     "ms": "0.1.0",
     "sliced": "0.0.5",
     "muri": "1.0.0",

@@ -3,7 +3,7 @@
 Mongoose is a [MongoDB](http://www.mongodb.org/) object modeling tool designed to work in an asynchronous environment.
 
 [![Build Status](https://api.travis-ci.org/Automattic/mongoose.png?branch=master)](https://travis-ci.org/Automattic/mongoose)
-[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/LearnBoost/mongoose?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/Automattic/mongoose?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 ## Documentation
 
@@ -62,7 +62,7 @@ Once connected, the `open` event is fired on the `Connection` instance. If you'r
 
 ### Defining a Model
 
-Models are defined through the `Schema` interface. 
+Models are defined through the `Schema` interface.
 
 ```js
 var Schema = mongoose.Schema
@@ -239,14 +239,14 @@ Moreover, you can mutate the incoming `method` arguments so that subsequent midd
 // pre declaration is chainable
 .pre(method, function secondPre (next, methodArg1, methodArg2) {
   console.log(methodArg1);
-  // => 'altered-originalValOfMethodArg1' 
-      
+  // => 'altered-originalValOfMethodArg1'
+
   console.log(methodArg2);
-  // => 'originalValOfMethodArg2' 
-      
+  // => 'originalValOfMethodArg2'
+
   // Passing no arguments to `next` automatically passes along the current argument values
   // i.e., the following `next()` is equivalent to `next(methodArg1, methodArg2)`
-  // and also equivalent to, with the example method arg 
+  // and also equivalent to, with the example method arg
   // values, `next('altered-originalValOfMethodArg1', 'originalValOfMethodArg2')`
   next();
 });
@@ -280,7 +280,8 @@ The driver being used defaults to [node-mongodb-native](https://github.com/mongo
 
 ## API Docs
 
-Find the API docs [here](http://mongoosejs.com/docs/api.html), generated using [dox](http://github.com/visionmedia/dox).
+Find the API docs [here](http://mongoosejs.com/docs/api.html), generated using [dox](http://github.com/visionmedia/dox)
+and [acquit](http://github.com/vkarpov15/acquit).
 
 ## License
 

@@ -22,71 +22,104 @@ var start = require('./common')
   , MongooseError = mongoose.Error;
 
 describe('document: strict mode:', function(){
-  it('should work', function(done){
-    var db = start();
+  describe('should work', function(){
+    var db, Lax, Strict;
 
-    var raw = {
+    before(function() {
+      db = start();
+
+      var raw = {
         ts  : { type: Date, default: Date.now }
-      , content: String
-      , mixed: {}
-      , deepMixed: { '4a': {}}
-      , arrayMixed: []
-    };
+        , content: String
+        , mixed: {}
+        , deepMixed: { '4a': {}}
+        , arrayMixed: []
+      };
 
-    var lax = new Schema(raw, { strict: false });
-    var strict = new Schema(raw);
+      var lax = new Schema(raw, { strict: false });
+      var strict = new Schema(raw);
 
-    var Lax = db.model('Lax', lax);
-    var Strict = db.model('Strict', strict);
+      Lax = db.model('Lax', lax);
+      Strict = db.model('Strict', strict);
+    });
 
-    var l = new Lax({content: 'sample', rouge: 'data'});
-    assert.equal(false, l.$__.strictMode);
-    l = l.toObject();
-    assert.ok('ts' in l);
-    assert.equal('sample', l.content);
-    assert.equal('data', l.rouge);
+    after(function(done) {
+      db.close(done);
+    });
 
-    var s = new Strict({content: 'sample', rouge: 'data'});
-    assert.equal(true, s.$__.strictMode);
-    s = s.toObject();
-    assert.ok('ts' in s);
-    assert.equal('sample', s.content);
-    assert.ok(!('rouge' in s));
-    assert.ok(!s.rouge);
+    it('when creating models with non-strict schemas', function(done) {
+      var l = new Lax({content: 'sample', rouge: 'data'});
+      assert.equal(false, l.$__.strictMode);
 
-    // instance override
-    var instance = new Lax({content: 'sample', rouge: 'data'}, true);
-    assert.ok(instance.$__.strictMode);
-    instance = instance.toObject();
-    assert.equal('sample', instance.content);
-    assert.ok(!instance.rouge);
-    assert.ok('ts' in instance);
-
-    // hydrate works as normal, but supports the schema level flag.
-    var s2 = new Strict({content: 'sample', rouge: 'data'}, false);
-    assert.equal(false, s2.$__.strictMode);
-    s2 = s2.toObject();
-    assert.ok('ts' in s2);
-    assert.equal('sample', s2.content);
-    assert.ok('rouge' in s2);
-
-    // testing init
-    var s3 = new Strict();
-    s3.init({content: 'sample', rouge: 'data'});
-    var s3obj = s3.toObject();
-    assert.equal('sample', s3.content);
-    assert.ok(!('rouge' in s3));
-    assert.ok(!s3.rouge);
-
-    // strict on create
-    Strict.create({content: 'sample2', rouge: 'data'}, function(err, doc){
-      db.close();
-      assert.equal('sample2', doc.content);
-      assert.ok(!('rouge' in doc));
-      assert.ok(!doc.rouge);
+      lo = l.toObject();
+      assert.ok('ts' in l);
+      assert.ok('ts' in lo);
+      assert.equal('sample', l.content);
+      assert.equal('sample', lo.content);
+      assert.equal('data', l.rouge);
+      assert.equal('data', lo.rouge);
       done();
     });
-  })
+
+    it('when creating models with strict schemas', function(done) {
+      var s = new Strict({content: 'sample', rouge: 'data'});
+      assert.equal(true, s.$__.strictMode);
+
+      so = s.toObject();
+      assert.ok('ts' in s);
+      assert.ok('ts' in so);
+      assert.equal('sample', s.content);
+      assert.equal('sample', so.content);
+      assert.ok(!('rouge' in s));
+      assert.ok(!('rouge' in so));
+      assert.ok(!s.rouge);
+      assert.ok(!so.rouge);
+      done();
+    });
+
+    it('when overriding strictness', function(done) {
+      // instance override
+      var instance = new Lax({content: 'sample', rouge: 'data'}, true);
+      assert.ok(instance.$__.strictMode);
+
+      instance = instance.toObject();
+      assert.equal('sample', instance.content);
+      assert.ok(!instance.rouge);
+      assert.ok('ts' in instance);
+
+      // hydrate works as normal, but supports the schema level flag.
+      var s2 = new Strict({content: 'sample', rouge: 'data'}, false);
+      assert.equal(false, s2.$__.strictMode);
+      s2 = s2.toObject();
+      assert.ok('ts' in s2);
+      assert.equal('sample', s2.content);
+      assert.ok('rouge' in s2);
+
+      // testing init
+      var s3 = new Strict();
+      s3.init({content: 'sample', rouge: 'data'});
+      var s3obj = s3.toObject();
+      assert.equal('sample', s3.content);
+      assert.ok(!('rouge' in s3));
+      assert.ok(!s3.rouge);
+      done();
+    });
+
+    it('when using Model#create', function(done) {
+      // strict on create
+      Strict.create({content: 'sample2', rouge: 'data'}, function(err, doc){
+        assert.equal('sample2', doc.content);
+        assert.ok(!('rouge' in doc));
+        assert.ok(!doc.rouge);
+        done();
+      });
+    });
+
+    after(function() {
+      db.close();
+    });
+  });
+
   it('nested doc', function(done){
     var db = start();
 
@@ -100,8 +133,6 @@ describe('document: strict mode:', function(){
 
     var Lax = db.model('NestedLax', lax, 'nestdoc'+random());
     var Strict = db.model('NestedStrict', strict, 'nestdoc'+random());
-
-    db.close();
 
     var l = new Lax;
     l.set('name', { last: 'goose', hack: 'xx' });
@@ -124,7 +155,7 @@ describe('document: strict mode:', function(){
     assert.ok(!('hack' in s.name));
     assert.ok(!s.name.hack);
     assert.ok(!s.shouldnt);
-    done();
+    db.close(done);
   })
 
   it('sub doc', function(done){
@@ -168,11 +199,10 @@ describe('document: strict mode:', function(){
 
     // strict on create
     Strict.create({dox:[{content: 'sample2', rouge: 'data'}]}, function(err, doc){
-      db.close();
       assert.equal('sample2', doc.dox[0].content);
       assert.ok(!('rouge' in doc.dox[0]));
       assert.ok(!doc.dox[0].rouge);
-      done();
+      db.close(done);
     });
   })
 
@@ -205,7 +235,6 @@ describe('document: strict mode:', function(){
       , myvirtual: 'test'
     });
 
-    db.close();
     assert.equal(0, getCount);
     assert.equal(1, setCount);
 
@@ -214,7 +243,7 @@ describe('document: strict mode:', function(){
 
     assert.equal(1, getCount);
     assert.equal(2, setCount);
-    done();
+    db.close(done);
   })
 
   it('can be overridden during set()', function(done){
@@ -241,11 +270,10 @@ describe('document: strict mode:', function(){
         doc.set('notInSchema', undefined, { strict: false });
         doc.save(function (err) {
           Strict.findById(doc._id, function (err, doc) {
-            db.close();
             assert.ifError(err);
             assert.equal(undefined, doc._doc.bool);
             assert.equal(undefined, doc._doc.notInSchema);
-            done();
+            db.close(done);
           });
         })
       })
@@ -289,10 +317,51 @@ describe('document: strict mode:', function(){
             assert.equal(undefined, doc._doc.notInSchema);
             done();
           });
-        })
-      })
-    })
-  })
+        });
+      });
+    });
+  });
+
+  it('can be overwritten with findOneAndUpdate (gh-1967)', function(done) {
+    var db = start();
+
+    var strict = new Schema({
+      bool: Boolean
+    });
+
+    var Strict = db.model('Strict', strict);
+    var s = new Strict({ bool: true });
+
+    // insert non-schema property
+    var doc = s.toObject();
+    doc.notInSchema = true;
+
+    Strict.collection.insert(doc, { w: 1 }, function (err) {
+      assert.ifError(err);
+
+      Strict.findById(doc._id, function (err, doc) {
+        assert.ifError(err);
+        assert.equal(true, doc._doc.bool);
+        assert.equal(true, doc._doc.notInSchema);
+
+        Strict.findOneAndUpdate(
+            { _id: doc._id }
+          , { $unset: { bool: 1, notInSchema: 1 }}
+          , { strict: false, w: 1 }
+          , function (err) {
+
+          assert.ifError(err);
+
+          Strict.findById(doc._id, function (err, doc) {
+            assert.ifError(err);
+            assert.equal(undefined, doc._doc.bool);
+            assert.equal(undefined, doc._doc.notInSchema);
+            db.close(done);
+          });
+        });
+      });
+    });
+  });
 
   describe('"throws" mode', function(){
     it('throws on set() of unknown property', function(done){
@@ -343,15 +412,13 @@ describe('document: strict mode:', function(){
     })
 
     it('fails with extra fields', function (done) {
-      var m = new mongoose.Mongoose;
-
       // Simple schema with throws option
       var FooSchema = new mongoose.Schema({
           name: { type: String }
       }, {strict: "throw"});
 
       // Create the model
-      var Foo = m.model('Foo', FooSchema);
+      var Foo = mongoose.model('Foo1234', FooSchema);
 
       assert.doesNotThrow(function(){
         new Foo({name: 'bar'});
@@ -366,19 +433,17 @@ describe('document: strict mode:', function(){
     });
 
     it('doesnt throw with refs (gh-2665)', function(done) {
-      var m = new mongoose.Mongoose;
-
       // Simple schema with throws option
       var FooSchema = new mongoose.Schema({
-        name: { type: m.Schema.Types.ObjectId, ref: 'test', required: false, default: null },
+        name: { type: mongoose.Schema.Types.ObjectId, ref: 'test', required: false, default: null },
         father: { name: { full: String } }
       }, {strict: "throw"});
 
       // Create the model
-      var Foo = m.model('Foo', FooSchema);
+      var Foo = mongoose.model('Foo', FooSchema);
 
       assert.doesNotThrow(function(){
-        new Foo({name: m.Types.ObjectId(), father: { name: { full: 'bacon' } } });
+        new Foo({name: mongoose.Types.ObjectId(), father: { name: { full: 'bacon' } } });
       })
 
       done();

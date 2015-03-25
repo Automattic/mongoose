@@ -45,6 +45,56 @@ TestDocument.prototype.$__setSchema(new Schema({
  */
 
 describe('schema', function(){
+  describe('nested fields with same name', function() {
+    var db, NestedModel;
+
+    before(function() {
+      db = start();
+      var NestedSchema = new Schema({
+        a: {
+          b: {
+            c: {type: String},
+            d: {type: String}
+          }
+        },
+        b: {type: String}
+      });
+      NestedModel = db.model('Nested', NestedSchema);
+    });
+
+    after(function() {
+      db.close();
+    });
+
+    it('don\'t disappear', function(done) {
+      var n = new NestedModel({
+        a: {
+          b: {
+            c:'foo',
+            d:'bar'}
+        }, b:'foobar'
+      });
+
+      n.save(function(err) {
+        assert.ifError(err);
+        NestedModel.findOne({_id :n._id}, function(err, nm) {
+          assert.ifError(err);
+
+          // make sure no field has disappeared
+          assert.ok(nm.a);
+          assert.ok(nm.a.b);
+          assert.ok(nm.a.b.c);
+          assert.ok(nm.a.b.d);
+          assert.equal(nm.a.b.c, n.a.b.c);
+          assert.equal(nm.a.b.d, n.a.b.d);
+
+          done();
+        });
+      });
+    });
+  });
+
+
   it('can be created without the "new" keyword', function(done){
     var schema = Schema({ name: String });
     assert.ok(schema instanceof Schema);
@@ -195,7 +245,9 @@ describe('schema', function(){
     assert.equal(Test.path('array').getDefault(new TestDocument)[3], 4);
     assert.equal(Test.path('arrayX').getDefault(new TestDocument)[0], 9);
     assert.equal(typeof Test.path('arrayFn').defaultValue, 'function');
-    assert.ok(Test.path('arrayFn').getDefault(new TestDocument) instanceof MongooseArray);
+    assert.ok(Test.path('arrayFn').getDefault(new TestDocument).isMongooseArray);
+    assert.ok(Test.path('arrayX').getDefault(new TestDocument).isMongooseArray);
+    assert.equal(Test.path('arrayX').getDefault(new TestDocument)[0], 9);
     done();
   })
 
@@ -246,16 +298,6 @@ describe('schema', function(){
         assert.equal('string', typeof Tobi.path('nickname').cast(new Test));
         assert.equal('woot', Tobi.path('nickname').cast(new Test));
         done();
-      });
-      it('casts undefined to "undefined"', function(done){
-        var db= require('./common')();
-        var schema = new Schema({ arr: [String] });
-        var M = db.model('castingStringArrayWithUndefined', schema);
-        M.find({ arr: { $in: [undefined] }}, function (err) {
-          db.close();
-          assert.equal(err && err.message, 'Cast to string failed for value "undefined" at path "arr"');
-          done();
-        });
       });
     });
 
@@ -471,6 +513,19 @@ describe('schema', function(){
       done();
     });
 
+    describe('array', function(){
+      it('object setters will be applied for each object in array', function(done) {
+        var Tobi = new Schema({
+          names: [{type: String, lowercase: true, trim: true}]
+        });
+        assert.equal(typeof Tobi.path('names').applySetters(['   whaT', 'WoOt  '])[0], 'string');
+        assert.equal(typeof Tobi.path('names').applySetters(['   whaT', 'WoOt  '])[1], 'string');
+        assert.equal(Tobi.path('names').applySetters(['   whaT', 'WoOt  '])[0], 'what');
+        assert.equal(Tobi.path('names').applySetters(['   whaT', 'WoOt  '])[1], 'woot');
+        done();
+      });
+    });
+
     describe('string', function(){
       it('lowercase', function(done){
         var Tobi = new Schema({
@@ -673,13 +728,13 @@ describe('schema', function(){
       var Tobi = new Schema();
 
       Tobi.pre('save', function(){});
-      assert.equal(1, Tobi.callQueue.length);
+      assert.equal(3, Tobi.callQueue.length);
 
       Tobi.post('save', function(){});
-      assert.equal(2, Tobi.callQueue.length);
+      assert.equal(4, Tobi.callQueue.length);
 
       Tobi.pre('save', function(){});
-      assert.equal(3, Tobi.callQueue.length);
+      assert.equal(5, Tobi.callQueue.length);
       done();
     });
   });
@@ -1231,7 +1286,7 @@ describe('schema', function(){
           Some.findOne({ _id : s.id }, function (err, ss) {
             assert.ifError(err);
             assert.equal(ss.obj, ele.id);
-            done();
+            db.close(done);
           });
         });
       });
@@ -1248,12 +1303,6 @@ describe('schema', function(){
           , child: [child]
         });
       }, /`on` may not be used as a schema pathname/);
-
-      assert.throws(function(){
-        new Schema({
-            options: String
-        });
-      }, /`options` may not be used as a schema pathname/);
 
       assert.throws(function(){
         new Schema({
@@ -1346,7 +1395,7 @@ describe('schema', function(){
           err = e;
         }
         assert.ifError(err);
-        done();
+        db.close(done);
       })
     })
   })

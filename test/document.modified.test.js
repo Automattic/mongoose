@@ -193,7 +193,6 @@ describe('document modified', function(){
         var db = start()
           , BlogPost = db.model(modelName, collection);
 
-        db.close();
         var post = new BlogPost()
         post.init({
             title       : 'Test'
@@ -208,8 +207,7 @@ describe('document modified', function(){
         assert.equal(true, post.isModified('comments.0.title'));
         assert.equal(true, post.isDirectModified('comments.0.title'));
 
-        db.close();
-        done();
+        db.close(done);
       })
       it('with accessors', function(done){
         var db = start()
@@ -311,6 +309,81 @@ describe('document modified', function(){
       });
     })
 
+    it('should let you set ref paths (gh-1530)', function(done) {
+      var db = start();
+
+      var parentSchema = new Schema({
+        child: { type: Schema.Types.ObjectId, ref: 'gh-1530-2' } 
+      });
+      var Parent = db.model('gh-1530-1', parentSchema);
+      var childSchema = new Schema({
+        name: String
+      });
+
+      var preCalls = 0;
+      childSchema.pre('save', function(next) {
+        ++preCalls;
+        next();
+      });
+
+      var postCalls = 0;
+      childSchema.post('save', function(doc, next) {
+        ++postCalls;
+        next();
+      });
+      var Child = db.model('gh-1530-2', childSchema);
+
+      var p = new Parent();
+      var c = new Child({ name: 'Luke' });
+      p.child = c;
+      assert.equal(p.child.name, 'Luke');
+
+      p.save(function(error) {
+        assert.ifError(error);
+        assert.equal(p.child.name, 'Luke');
+        var originalParent = p;
+        Parent.findOne({}, function(error, p) {
+          assert.ifError(error);
+          assert.ok(p.child);
+          assert.ok(typeof p.child.name === 'undefined');
+          assert.equal(0, preCalls);
+          assert.equal(0, postCalls);
+          Child.findOne({ name: 'Luke' }, function(error, child) {
+            assert.ifError(error);
+            assert.ok(!child);
+            originalParent.child.save(function(error) {
+              assert.ifError(error);
+              Child.findOne({ name: 'Luke' }, function(error, child) {
+                assert.ifError(error);
+                assert.ok(child);
+                assert.equal(child._id.toString(), p.child.toString());
+                db.close(done);
+              });
+            });
+          });
+        });
+      });
+    });
+
+    it('properly sets populated for gh-1530 (gh-2678)', function(done) {
+      var childrenSchema = new Schema({ name: String});
+      var db = start();
+
+      var parentSchema = new Schema({
+        name: String,
+        child: { type: Schema.Types.ObjectId, ref: 'Child'}
+      });
+
+      var Parent = db.model('Parent', parentSchema, 'parents');
+      var Child = db.model('Child', parentSchema, 'children');
+
+      var child = new Child({ name: 'Mary' });
+      var p = new Parent({ name: 'Alex', child: child });
+
+      assert.equal(p.populated('child').toString(), child._id.toString());
+      db.close(done);
+    });
+
     it('should support setting mixed paths by string (gh-1418)', function(done){
       var db = start();
       var BlogPost = db.model('1418', new Schema({ mixed: {} }))
@@ -343,10 +416,9 @@ describe('document modified', function(){
         b.save(function (err) {
           assert.ifError(err);
           BlogPost.findById(b, function (err, doc) {
-            db.close();
             assert.ifError(err);
             assert.equal(8, doc.get(path));
-            done();
+            db.close(done);
           })
         })
       });
@@ -382,7 +454,7 @@ describe('document modified', function(){
           p.save(function(error, inDb) {
             assert.ifError(error); 
             assert.equal('Jason', inDb.child[0].grandChild[0].name);
-            done();
+            db.close(done);
           });
         });
     });

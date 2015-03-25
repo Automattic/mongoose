@@ -17,7 +17,6 @@ var start = require('./common')
   , MongooseArray = mongoose.Types.Array
   , MongooseError = mongoose.Error;
 
-
 describe('model middleware', function(){
   it('post save', function(done){
     var schema = new Schema({
@@ -28,12 +27,6 @@ describe('model middleware', function(){
 
     schema.post('save', function (obj) {
       assert.equal(obj.title,'Little Green Running Hood');
-      assert.equal(0, called);
-      called++;
-    });
-
-    schema.post('save', function (obj) {
-      assert.equal(obj.title,'Little Green Running Hood');
       assert.equal(1, called);
       called++;
     });
@@ -41,8 +34,16 @@ describe('model middleware', function(){
     schema.post('save', function (obj) {
       assert.equal(obj.title,'Little Green Running Hood');
       assert.equal(2, called);
-      db.close();
-      done();
+      called++;
+    });
+
+    schema.post('save', function(obj, next){
+      setTimeout(function(){
+        assert.equal(obj.title,'Little Green Running Hood');
+        assert.equal(0, called);
+        called++;
+        next();
+      }, 0);
     });
 
     var db = start()
@@ -52,8 +53,37 @@ describe('model middleware', function(){
 
     test.save(function(err){
       assert.ifError(err);
+      assert.equal(test.title,'Little Green Running Hood');
+      assert.equal(3, called);
+      db.close();
+      done();
     });
-  })
+  });
+
+  it('validate middleware runs before save middleware (gh-2462)', function(done) {
+    var schema = new Schema({
+      title: String
+    });
+    var count = 0;
+
+    schema.pre('validate', function(next) {
+      assert.equal(0, count++);
+      next();
+    });
+
+    schema.pre('save', function(next) {
+      assert.equal(1, count++);
+      next();
+    });
+
+    var db = start();
+    var Book = db.model('gh2462', schema);
+
+    Book.create({}, function(err) {
+      assert.equal(count, 2);
+      db.close(done);
+    });
+  });
 
   it('works', function(done){
     var schema = new Schema({
@@ -140,6 +170,64 @@ describe('model middleware', function(){
           db.close();
           done();
         });
+      });
+    });
+  });
+
+  it('gh-1829', function(done) {
+    var childSchema = new mongoose.Schema({
+      name: String,
+    });
+
+    var childPreCalls = 0;
+    var childPreCallsByName = {};
+    var parentPreCalls = 0;
+
+    childSchema.pre('save', function(next) {
+      childPreCallsByName[this.name] = childPreCallsByName[this.name] || 0;
+      ++childPreCallsByName[this.name];
+      ++childPreCalls;
+      next();
+    });
+
+    var parentSchema = new mongoose.Schema({
+      name: String,
+      children: [childSchema],
+    });
+
+    parentSchema.pre('save', function(next) {
+      ++parentPreCalls;
+      next();
+    });
+
+    var db = start();
+    var Parent = db.model('gh-1829', parentSchema, 'gh-1829');
+
+    var parent = new Parent({
+      name: 'Han',
+      children: [
+        { name: 'Jaina' },
+        { name: 'Jacen' }
+      ]
+    });
+
+    parent.save(function(error) {
+      assert.ifError(error);
+      assert.equal(2, childPreCalls);
+      assert.equal(1, childPreCallsByName['Jaina']);
+      assert.equal(1, childPreCallsByName['Jacen']);
+      assert.equal(1, parentPreCalls);
+      parent.children[0].name = 'Anakin';
+      parent.save(function(error) {
+        assert.ifError(error);
+        assert.equal(4, childPreCalls);
+        assert.equal(1, childPreCallsByName['Anakin']);
+        assert.equal(1, childPreCallsByName['Jaina']);
+        assert.equal(2, childPreCallsByName['Jacen']);
+
+        assert.equal(2, parentPreCalls);
+        db.close();
+        done();
       });
     });
   });

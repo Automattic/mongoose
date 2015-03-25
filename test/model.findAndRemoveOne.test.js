@@ -320,8 +320,6 @@ describe('model: findByIdAndRemove:', function(){
       , M = db.model(modelname, collection)
       , _id = new DocumentObjectId
 
-    db.close();
-
     var now = new Date
       , query;
 
@@ -334,7 +332,7 @@ describe('model: findByIdAndRemove:', function(){
     assert.equal(2, Object.keys(query.options.sort).length);
     assert.equal(1, query.options.sort.author);
     assert.equal(-1, query.options.sort.title);
-    done();
+    db.close(done);
   });
 
   it('supports population (gh-1395)', function(done){
@@ -355,9 +353,94 @@ describe('model: findByIdAndRemove:', function(){
           assert.equal(undefined, doc._id);
           assert.ok(doc.a);
           assert.equal(doc.a.name, 'i am an A');
-          done();
-        })
-      })
-    })
-  })
+          db.close(done);
+        });
+      });
+    });
+  });
+
+  describe('middleware', function() {
+    var db;
+
+    beforeEach(function() {
+      db = start();
+    });
+
+    afterEach(function(done) {
+      db.close(done);
+    });
+
+    it('works', function(done) {
+      var s = new Schema({
+        topping: { type: String, default: 'bacon' },
+        base: String
+      });
+
+      var preCount = 0;
+      s.pre('findOneAndRemove', function() {
+        ++preCount;
+      });
+
+      var postCount = 0;
+      s.post('findOneAndRemove', function() {
+        ++postCount;
+      });
+
+      var Breakfast = db.model('gh-439', s);
+      var breakfast = new Breakfast({
+        base: 'eggs'
+      });
+
+      breakfast.save(function(error) {
+        assert.ifError(error);
+
+        Breakfast.findOneAndRemove(
+          { base: 'eggs' },
+          {},
+          function(error, breakfast) {
+            assert.ifError(error);
+            assert.equal('eggs', breakfast.base);
+            assert.equal(1, preCount);
+            assert.equal(1, postCount);
+            done();
+          });
+      });
+    });
+
+    it('works with exec()', function(done) {
+      var s = new Schema({
+        topping: { type: String, default: 'bacon' },
+        base: String
+      });
+
+      var preCount = 0;
+      s.pre('findOneAndRemove', function() {
+        ++preCount;
+      });
+
+      var postCount = 0;
+      s.post('findOneAndRemove', function() {
+        ++postCount;
+      });
+
+      var Breakfast = db.model('gh-439', s);
+      var breakfast = new Breakfast({
+        base: 'eggs'
+      });
+
+      breakfast.save(function(error) {
+        assert.ifError(error);
+
+        Breakfast.
+          findOneAndRemove({ base: 'eggs' }, {}).
+          exec(function(error, breakfast) {
+            assert.ifError(error);
+            assert.equal('eggs', breakfast.base);
+            assert.equal(1, preCount);
+            assert.equal(1, postCount);
+            done();
+          });
+      });
+    });
+  });
 })

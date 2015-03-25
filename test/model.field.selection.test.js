@@ -323,11 +323,32 @@ describe('model field selection', function(){
             assert.ok(/ ids/.test(err));
             assert.ok(/ ids2/.test(err));
             done()
-          })
-        })
-      })
-    })
-  })
+          });
+        });
+      });
+    });
+
+    it('works with $ positional in select (gh-2031)', function(done) {
+      var db = start();
+
+      var postSchema = new Schema({
+         tags: [{ tag: String, count: 0 }]
+      });
+
+      var Post = db.model('gh-2031', postSchema, 'gh-2031');
+      Post.create({ tags: [{ tag: 'bacon', count: 2 }, { tag: 'eggs', count: 3 }] }, function(error, post) {
+        assert.ifError(error);
+        Post.findOne({ 'tags.tag': 'eggs' }, { 'tags.$': 1 }, function(error, post) {
+          assert.ifError(error);
+          post.tags[0].count = 1;
+          post.save(function(error, post) {
+            assert.ok(error);
+            db.close(done);
+          });
+        });
+      });
+    });
+  });
 
   it('selecting an array of docs applies defaults properly (gh-1108)', function(done){
     var db = start()
@@ -338,12 +359,11 @@ describe('model field selection', function(){
     m.save(function (err, doc) {
       assert.ifError(err);
       M.findById(doc._id).select('comments').exec(function (err, found) {
-        db.close();
         assert.ifError(err);
         assert.ok(Array.isArray(found.comments));
         assert.equal(1, found.comments.length);
         assert.ok(Array.isArray(found.comments[0].comments));
-        done();
+        db.close(done);
       })
     });
   })
@@ -397,7 +417,7 @@ describe('model field selection', function(){
           assert.equal(res.stations.start.toString(), "undefined");
           assert.equal(res.stations.end.toString(), "undefined");
           assert.ok(Array.isArray(res.stations.points));
-          done();
+          db.close(done);
         });
       });
     });

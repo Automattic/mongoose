@@ -39,6 +39,26 @@ describe('connections:', function(){
     db.close(done);
   });
 
+  it('should accept replicaSet query param', function(done) {
+    var db = mongoose.createConnection('mongodb://localhost/fake?replicaSet=rs0');
+    db.on('error', function(err){});
+    assert.equal('object', typeof db.options);
+    assert.equal('object', typeof db.options.server);
+    assert.equal(true, db.options.server.auto_reconnect);
+    assert.equal('object', typeof db.options.db);
+    assert.equal(false, db.options.db.forceServerObjectId);
+    assert.equal('primary', db.options.db.read_preference);
+    assert.equal(undefined, db.pass);
+    assert.equal(undefined, db.user);
+    assert.equal('fake', db.name);
+    assert.deepEqual([{ host: 'localhost', port: 27017 }], db.hosts);
+
+    // Should be a replica set
+    assert.ok(db.replica);
+    db.close();
+    done();
+  });
+
   it('should accept mongodb://localhost:27000/fake', function(done){
     var db = mongoose.createConnection('mongodb://localhost:27000/fake');
     db.on('error', function(err){});
@@ -476,17 +496,18 @@ describe('connections:', function(){
     });
   });
 
-  describe('missing protocols', function(){
-    it('are allowed with replsets', function(done){
-      var conn = mongoose.createConnection('localhost:12345,127.0.0.1:14326', function (err) {
+  describe('missing protocols', function() {
+    it('are allowed with replsets', function(done) {
+      var conn = mongoose.createConnection('localhost:12345,127.0.0.1:14326?replicaSet=bacon', function(err) {
         // force missing db error so we don't actually connect.
         assert.ok(err);
       });
       assert.deepEqual([{host:'localhost', port:12345},{host:'127.0.0.1',port:14326}], conn.hosts);
       assert.deepEqual(null, conn.host);
       assert.deepEqual(null, conn.port);
-      setTimeout(done,10);
+      setTimeout(done, 10);
     });
+
     it('are allowed with single connections', function(done){
       var conn = mongoose.createConnection();
       conn.doOpen = function(){};
@@ -597,17 +618,19 @@ describe('connections:', function(){
       process._events.uncaughtException = function (err) {
         assert.ok(err);
         process._events.uncaughtException = old;
-        done()
+        db.close();
+        done();
       }
 
-      var db= start({ uri: 'mongodb://whatever23939.localhost/noooope', noErrorListener: 1 });
+      var db = start({ uri: 'mongodb://whatever23939.localhost/noooope', noErrorListener: 1 });
     });
 
     it('event fires with one listener', function(done){
       this.timeout(1000);
-      var db= start({ uri: 'mongodb://localasdfads/fakeeee?connectTimeoutMS=500', noErrorListener: 1 })
+      var db = start({ uri: 'mongodb://localasdfads/fakeeee?connectTimeoutMS=500', noErrorListener: 1 })
       db.on('error', function () {
         // this callback has no params which triggered the bug #759
+        db.close();
         done();
       });
     });
@@ -655,6 +678,7 @@ describe('connections:', function(){
         db.model(name, new Schema);
       }, /Cannot overwrite `gh-1209-a` model/);
 
+      db.close();
       done();
     });
 
@@ -668,6 +692,7 @@ describe('connections:', function(){
         db.model(name, schema);
       });
 
+      db.close();
       done();
     });
 
@@ -677,6 +702,7 @@ describe('connections:', function(){
         db.model('iDoNotExist!');
       }, /Schema hasn't been registered/);
 
+      db.close();
       done();
     });
 
@@ -700,6 +726,7 @@ describe('connections:', function(){
       var C = db.model('gh-1209-a');
       assert.ok(C.schema == A.schema);
 
+      db.close();
       done();
     });
 
@@ -710,6 +737,7 @@ describe('connections:', function(){
         var m = db.model('some-th-1458');
         assert.equal(m.collection.opts.capped.size, 1000);
         assert.equal(m.collection.opts.capped.max, 10);
+        db.close();
         done();
       });
     });
@@ -727,6 +755,7 @@ describe('connections:', function(){
           assert.ok(A.collection.name != C.collection.name);
           assert.ok(db.models[name].collection.name != C.collection.name);
           assert.ok(db.models[name].collection.name == A.collection.name);
+          db.close();
           done();
         });
       });
@@ -795,8 +824,8 @@ describe('connections:', function(){
       });
     });
 
-    it('handles unix domain sockets', function(done){
-      var url = 'mongodb://aaron:psw@/tmp/mongodb-27018.sock,/tmp/mongodb-27019.sock/fake';
+    it('handles unix domain sockets', function(done) {
+      var url = 'mongodb://aaron:psw@/tmp/mongodb-27018.sock,/tmp/mongodb-27019.sock/fake?replicaSet=bacon';
       var db = mongoose.createConnection(url, { server: { auto_reconnect: false }});
       db.on('error', function(err){});
       assert.equal('object', typeof db.options);
@@ -891,7 +920,7 @@ describe('connections:', function(){
       assert.equal('another', names[1]);
       assert.equal('discriminated', names[2]);
 
-      done();
+      db.close(done);
     });
   });
 
@@ -913,7 +942,7 @@ describe('connections:', function(){
       assert.equal(db.pass, db2.pass);
       assert.deepEqual(db.options, db2.options);
 
-      done();
+      db2.close(done);
     });
 
     it('saves correctly', function (done) {

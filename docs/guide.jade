@@ -117,7 +117,7 @@ block content
   :js
     // assign a function to the "statics" object of our animalSchema
     animalSchema.statics.findByName = function (name, cb) {
-      this.find({ name: new RegExp(name, 'i') }, cb);
+      return this.find({ name: new RegExp(name, 'i') }, cb);
     }
 
     var Animal = mongoose.model('Animal', animalSchema);
@@ -156,7 +156,7 @@ block content
 
   h3#virtuals Virtuals
   :markdown
-    [Virtuals](./api.html#schema_Schema-virtual) are document properties that you can get and set but that do not get persisted to MongoDB. The getters are useful for formatting or combining fields, while settings are useful for de-composing a single value into multiple values for storage.
+    [Virtuals](./api.html#schema_Schema-virtual) are document properties that you can get and set but that do not get persisted to MongoDB. The getters are useful for formatting or combining fields, while setters are useful for de-composing a single value into multiple values for storage.
 
   :js
     // define a schema
@@ -244,13 +244,16 @@ block content
     - [collection](#collection)
     - [id](#id)
     - [_id](#_id)
+    - [minimize](#minimize)
     - [read](#read)
     - [safe](#safe)
     - [shardKey](#shardKey)
     - [strict](#strict)
     - [toJSON](#toJSON)
     - [toObject](#toObject)
+    - [validateBeforeSave](#validateBeforeSave)
     - [versionKey](#versionKey)
+    - [skipVersioning](#skipVersioning)
 
   h4#autoIndex option: autoIndex
   :markdown
@@ -300,7 +303,7 @@ block content
 
   h4#_id option: _id
   :markdown
-    Mongoose assigns each of your schemas an `_id` field by default if one is not passed into the [Schema](/docs/api.html#schema-js) constructor. The type assiged is an [ObjectId](/docs/api.html#schema_Schema.Types) to coincide with MongoDBs default behavior. If you don't want an `_id` added to your schema at all, you may disable it using this option.
+    Mongoose assigns each of your schemas an `_id` field by default if one is not passed into the [Schema](/docs/api.html#schema-js) constructor. The type assigned is an [ObjectId](/docs/api.html#schema_Schema.Types) to coincide with MongoDBs default behavior. If you don't want an `_id` added to your schema at all, you may disable it using this option.
 
     Pass this option *during schema construction* to prevent documents from getting an `_id` created by Mongoose (parent documents will still have an `_id` created by MongoDB when inserted). _Passing the option later using `Schema.set('_id', false)` will not work. See issue [#1512](https://github.com/LearnBoost/mongoose/issues/1512)._
   :js
@@ -332,6 +335,39 @@ block content
 
   :markdown
     Note that currently you must disable the `_id` 
+
+  h4#minimize option: minimize
+  :markdown
+    Mongoose will, by default, "minimize" schemas by removing empty objects.
+    
+  :js
+    var schema = new Schema({ name: String, inventory: {} });
+    var Character = mongoose.model('Character', schema);
+    
+    // will store `inventory` field if it is not empty
+    var frodo = new Character({ name: 'Frodo', inventory: { ringOfPower: 1 }});
+    Character.findOne({ name: 'Frodo' }, function(err, character) {
+      console.log(character); // { name: 'Frodo', inventory: { ringOfPower: 1 }}
+    });
+    
+    // will not store `inventory` field if it is empty
+    var sam = new Character({ name: 'Sam', inventory: {}});
+    Character.findOne({ name: 'Sam' }, function(err, character) {
+      console.log(character); // { name: 'Sam' }
+    });
+
+  :markdown
+    This behavior can be overridden by setting `minimize` option to `false`. It will then store empty objects.
+    
+  :js
+    var schema = new Schema({ name: String, inventory: {} }, { minimize: false });
+    var Character = mongoose.model('Character', schema);
+    
+    // will store `inventory` if empty
+    var sam = new Character({ name: 'Sam', inventory: {}});
+    Character.findOne({ name: 'Sam' }, function(err, character) {
+      console.log(character); // { name: 'Sam', inventory: {}}
+    });
 
   h4#read option: read
   :markdown
@@ -478,6 +514,23 @@ block content
 
   :markdown
     To see all available `toObject` options, read [this](/docs/api.html#document_Document-toObject).
+    
+  h4#validateBeforeSave option: validateBeforeSave
+  :markdown
+    By default, documents are automatically validated before they are saved to the database. This is to prevent saving an invalid document. If you want to handle validation manually, and be able to save objects which don't pass validation, you can set validateBeforeSave to false.
+
+  :js
+    var schema = new Schema({ name: String });
+    schema.set('validateBeforeSave', false);
+    schema.path('name').validate(function (value) {
+        return v != null;
+    });
+    var M = mongoose.model('Person', schema);
+    var m = new M({ name: null });
+    m.validate(function(err) {
+        console.log(err); // Will tell you that null is not allowed.
+    });
+    m.save(); // Succeeds despite being invalid
 
   h4#versionKey option: versionKey
   :markdown
@@ -501,6 +554,14 @@ block content
     var Thing = mongoose.model('Thing', schema);
     var thing = new Thing({ name: 'no versioning please' });
     thing.save(); // { name: 'no versioning please' }
+
+    h4#skipVersioning option: skipVersioning
+  :markdown
+    `skipVersioning` allows excluding paths from versioning (i.e the internal revision will not be incremented even if these paths are updated). DO NOT do this unless you know what you're doing.
+  :js
+    new Schema({..}, { skipVersioning: { dontVersionMe: true } });
+    thing.dontVersionMe.push('hey');
+    thing.save(); // version is not incremented
 
   h3#plugins Pluggable
   p

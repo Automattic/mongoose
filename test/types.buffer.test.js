@@ -41,7 +41,7 @@ describe('types.buffer', function(){
     var a = new MongooseBuffer;
 
     assert.ok(a instanceof Buffer);
-    assert.ok(a instanceof MongooseBuffer);
+    assert.ok(a.isMongooseBuffer);
     assert.equal(true, Buffer.isBuffer(a));
 
     var a = new MongooseBuffer([195, 188, 98, 101, 114]);
@@ -66,25 +66,26 @@ describe('types.buffer', function(){
       });
 
       t.validate(function (err) {
-        assert.equal(err.message,'Validation failed');
-        assert.equal(err.errors.required.type,'required');
-        t.required = {x:[20]}
+        assert.equal(err.message,'UserBuffer validation failed');
+        assert.equal(err.errors.required.kind,'required');
+        t.required = {x:[20]};
         t.save(function (err) {
           assert.ok(err);
-          assert.equal(err.name, 'CastError');
-          assert.equal(err.type, 'buffer');
-          assert.equal(err.message, 'Cast to buffer failed for value "[object Object]" at path "required"');
-          assert.deepEqual(err.value, {x:[20]});
+          assert.equal(err.name, 'ValidationError');
+          assert.equal(err.errors.required.name, 'CastError');
+          assert.equal(err.errors.required.kind, 'Buffer');
+          assert.equal(err.errors.required.message, 'Cast to Buffer failed for value "[object Object]" at path "required"');
+          assert.deepEqual(err.errors.required.value, {x:[20]});
           t.required = new Buffer("hello");
 
           t.sub.push({ name: 'Friday Friday' });
           t.save(function (err) {
-            assert.equal(err.message,'Validation failed');
-            assert.equal(err.errors['sub.0.buf'].type,'required');
+            assert.equal(err.message,'UserBuffer validation failed');
+            assert.equal(err.errors['sub.0.buf'].kind,'required');
             t.sub[0].buf = new Buffer("well well");
             t.save(function (err) {
-              assert.equal(err.message,'Validation failed');
-              assert.equal(err.errors['sub.0.buf'].type,'user defined');
+              assert.equal(err.message,'UserBuffer validation failed');
+              assert.equal(err.errors['sub.0.buf'].kind,'user defined');
               assert.equal(err.errors['sub.0.buf'].message,'valid failed');
 
               t.sub[0].buf = new Buffer("well well well");

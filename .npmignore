@@ -11,3 +11,6 @@ Makefile
 CNAME
 index.html
 index.jade
+bin/
+karma.*.js
+format_deps.js

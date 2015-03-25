@@ -14,8 +14,8 @@ var assert = require('assert')
   , ValidationError = mongoose.Document.ValidationError
 
 describe('ValidationError', function(){
-  describe('#infiniteRecursion', function(){
-    it('does not cause RangeError (gh-1834)', function(done){
+  describe('#infiniteRecursion', function() {
+    it('does not cause RangeError (gh-1834)', function(done) {
       var SubSchema
         , M
         , model;
@@ -46,8 +46,128 @@ describe('ValidationError', function(){
     })
   });
 
-  describe('#toString', function(){
-    it('does not cause RangeError (gh-1296)', function(done){
+  describe('#minDate', function() {
+    it('causes a validation error', function(done) {
+      var MinSchema
+        , M
+        , model;
+
+      MinSchema = new Schema({
+        appointmentDate : { type: Date, min: Date.now }
+      });
+
+      M = mongoose.model('MinSchema', MinSchema);
+
+      model = new M({
+        appointmentDate: new Date(Date.now().valueOf() - 10000)
+      });
+
+      //should fail validation
+      model.validate(function(err){
+        assert.notEqual(err, null, 'min Date validation failed.');
+        model.appointmentDate = new Date(Date.now().valueOf() + 10000);
+
+        //should pass validation
+        model.validate(function(err) {
+          assert.equal(err, null);
+          done();  
+        });
+      });
+    });
+  });
+
+  describe('#maxDate', function() {
+    it('causes a validation error', function(done) {
+      var MaxSchema
+        , M
+        , model;
+
+      MaxSchema = new Schema({
+        birthdate : { type: Date, max: Date.now }
+      });
+
+      M = mongoose.model('MaxSchema', MaxSchema);
+
+      model = new M({
+        birthdate: new Date(Date.now().valueOf() + 2000)
+      });
+
+      //should fail validation
+      model.validate(function(err){
+        assert.notEqual(err, null, 'max Date validation failed');
+        model.birthdate = Date.now();
+
+        //should pass validation
+        model.validate(function(err) {
+          assert.equal(err, null, 'max Date validation failed');
+          done();  
+        });
+      });
+    });
+  });
+
+  describe('#minlength', function() {
+    it('causes a validation error', function(done) {
+      var AddressSchema
+        , Address
+        , model;
+
+      AddressSchema = new Schema({
+        postalCode : { type: String, minlength: 5 }
+      });
+
+      Address = mongoose.model('MinLengthAddress', AddressSchema);
+
+      model = new Address({
+        postalCode: '9512'
+      });
+
+      //should fail validation
+      model.validate(function(err){
+        assert.notEqual(err, null, 'String minlegth validation failed.');
+        model.postalCode = '95125';
+
+        //should pass validation
+        model.validate(function(err) {
+          assert.equal(err, null);
+          done();  
+        });
+      });
+    });
+  });
+
+  describe('#maxlength', function() {
+    it('causes a validation error', function(done) {
+      var AddressSchema
+        , Address
+        , model;
+
+      AddressSchema = new Schema({
+        postalCode : { type: String, maxlength: 10 }
+      });
+
+      Address = mongoose.model('MaxLengthAddress', AddressSchema);
+
+      model = new Address({
+        postalCode: '95125012345'
+      });
+
+      //should fail validation
+      model.validate(function(err){
+        assert.notEqual(err, null, 'String maxlegth validation failed.');
+        model.postalCode = '95125';
+
+        //should pass validation
+        model.validate(function(err) {
+          assert.equal(err, null);
+          done();  
+        });
+      });
+    });
+  });
+
+  describe('#toString', function() {
+    it('does not cause RangeError (gh-1296)', function(done) {
       var ASchema = new Schema({
           key: {type: String, required: true}
         , value: {type:String, required: true}
@@ -67,5 +187,16 @@ describe('ValidationError', function(){
         done();
       });
     })
-  })
+  });
+
+  describe('formatMessage', function() {
+    it('replaces properties in a message', function(done) {
+      var props = { base: 'eggs', topping: 'bacon' };
+      var message = 'I had {BASE} and {TOPPING} for breakfast';
+
+      var result = ValidatorError.prototype.formatMessage(message, props);
+      assert.equal('I had eggs and bacon for breakfast', result);
+      done();
+    });
+  });
 });

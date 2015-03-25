@@ -1,3 +1,24 @@
+4.0.0 / 2015-03-25
+==================
+ * fixed; on-the-fly schema docs typo #2783 [artiifix](https://github.com/artiifix)
+ * fixed; cast error validation handling #2775 #2766 #2678
+ * fixed; discriminators with populate() #2773 #2719 [chetverikov](https://github.com/chetverikov)
+ * fixed; increment now a reserved path #2709
+ * fixed; avoid sending duplicate object ids in populate() #2683
+ * upgraded; mongodb to 2.0.24 to properly emit reconnect event multiple times #2656
+
+4.0.0-rc4 / 2015-03-14
+======================
+ * fixed; toObject virtuals schema option handled properly #2751
+ * fixed; update validators work on document arrays #2733
+ * fixed; check for cast errors on $set #2729
+ * fixed; instance field set for all schema types #2727 [csdco](https://github.com/csdco)
+ * fixed; dont run other validators if required fails #2725
+ * fixed; custom getters execute on ref paths #2610
+ * fixed; save defaults if they were set when doc was loaded from db #2558
+ * fixed; pre validate now runs before pre save #2462
+ * fixed; no longer throws errors with --use_strict #2281
+
 3.8.25 / 2015-03-13
 ===================
  * fixed; debug output reverses order of aggregation keys #2759
@@ -5,6 +26,19 @@
  * fixed; upgraded node driver to 1.4.32 for handling non-numeric poolSize #2682
  * fixed; update() with overwrite sets _id for nested docs #2658
  * fixed; casting for operators in $elemMatch #2199
+
+4.0.0-rc3 / 2015-02-28
+======================
+ * fixed; update() pre hooks run before validators #2706
+ * fixed; setters not called on arrays of refs #2698 [brandom](https://github.com/brandom)
+ * fixed; use node driver 2.0.18 for nodejs 0.12 support #2685
+ * fixed; comments reference file that no longer exists #2681
+ * fixed; populated() returns _id of manually populated doc #2678
+ * added; ability to exclude version key in toObject() #2675
+ * fixed; dont allow setting nested path to a string #2592
+ * fixed; can cast objects with _id field to ObjectIds #2581
+ * fixed; on-the-fly schema getters #2360
+ * added; strict option for findOneAndUpdate() #1967
 
 3.8.24 / 2015-02-25
 ===================
@@ -16,6 +50,16 @@
  * fixed; dont block process exit when auth fails #2599
  * fixed; remove redundant clone in update() #2537
 
+4.0.0-rc2 / 2015-02-10
+======================
+ * added; io.js to travis build
+ * removed; browser build dependencies not installed by default
+ * added; dynamic refpaths #2640 [chetverikov](https://github.com/chetverikov)
+ * fixed; dont call child schema transforms on parent #2639 [chetverikov](https://github.com/chetverikov)
+ * fixed; get rid of remove option if new is set in findAndModify #2598
+ * fixed; aggregate all document array validation errors #2589
+ * fixed; custom setters called when setting value to undefined #1892
+
 3.8.23 / 2015-02-06
 ===================
  * fixed; unset opts.remove when upsert is true #2519
@@ -23,6 +67,26 @@
  * fixed; inline transforms #2440
  * fixed; check for callback in count() #2204
  * fixed; documentation for selecting fields #1534
+
+4.0.0-rc1 / 2015-02-01
+======================
+ * fixed; use driver 2.0.14
+ * changed; use transform: true by default #2245
+
+4.0.0-rc0 / 2015-01-31
+===================
+ * fixed; wrong order for distinct() params #2628
+ * fixed; handling no query argument to remove() #2627
+ * fixed; createModel and discriminators #2623 [ashaffer](https://github.com/ashaffer)
+ * added; pre('count') middleware #2621
+ * fixed; double validation calls on document arrays #2618
+ * added; validate() catches cast errors #2611
+ * fixed; respect replicaSet parameter in connection string #2609
+ * added; can explicitly exclude paths from versioning #2576 [csabapalfi](https://github.com/csabapalfi)
+ * upgraded; driver to 2.0.15 #2552
+ * fixed; save() handles errors more gracefully in ES6 #2371
+ * fixed; undefined is now a valid argument to findOneAndUpdate #2272
+ * changed; `new` option to findAndModify ops is false by default #2262
 
 3.8.22 / 2015-01-24
 ===================
@@ -34,11 +98,35 @@
  * added; link to plugin generator in docs #2085 [huei90](https://github.com/huei90)
  * fixed; optional arguments documentation for findOne() #1971 [nachinius](https://github.com/nachinius)
 
+3.9.7 / 2014-12-19
+===================
+ * added; proper cursors for aggregate #2539 [changyy](https://github.com/changyy)
+ * added; min/max built-in validators for dates #2531 [bshamblen](https://github.com/bshamblen)
+ * fixed; save and validate are now reserved keywords #2380
+ * added; basic documentation for browser component #2256
+ * added; find and findOne hooks (query middleware) #2138
+ * fixed; throw a DivergentArrayError when saving positional operator queries #2031
+ * added; ability to use options as a document property #1416
+ * fixed; document no longer inherits from event emitter and so domain and _events are no longer reserved #1351
+ * removed; setProfiling #1349
+
 3.8.21 / 2014-12-18
 ===================
  * fixed; syntax in index.jade #2517 [elderbas](https://github.com/elderbas)
  * fixed; writable statics #2510 #2528
  * fixed; overwrite and explicit $set casting #2515
+
+3.9.6 / 2014-12-05
+===================
+ * added; correctly run validators on each element of array when entire array is modified #661 #1227
+ * added; castErrors in validation #1013 [jondavidjohn](https://github.com/jondavidjohn)
+ * added; specify text indexes in schema fields #1401 [sr527](https://github.com/sr527)
+ * added; ability to set field with validators to undefined #1594 [alabid](https://github.com/alabid)
+ * added; .create() returns an array when passed an array #1746 [alabid](https://github.com/alabid)
+ * added; test suite and docs for use with co and yield #2177 #2474
+ * fixed; subdocument toObject() transforms #2447 [chmanie](https://github.com/chmanie)
+ * fixed; Model.create() with save errors #2484
+ * added; pass options to .save() and .remove() #2494 [jondavidjohn](https://github.com/jondavidjohn)
 
 3.8.20 / 2014-12-01
 ===================
@@ -48,6 +136,16 @@
  * fixed; setting a schema-less field to an empty object #2314 [alabid](https://github.com/alabid)
  * fixed; registering statics and methods for discriminators #2167 [alabid](https://github.com/alabid)
 
+3.9.5 / 2014-11-10
+===================
+ * added; ability to disable autoIndex on a per-connection basis #1875 [sr527](https://github.com/sr527)
+ * fixed; `geoNear()` no longer enforces legacy coordinate pairs - supports GeoJSON #1987 [alabid](https://github.com/alabid)
+ * fixed; browser component works when minified with mangled variable names #2302
+ * fixed; `doc.errors` now cleared before `validate()` called #2302
+ * added; `execPopulate()` function to make `doc.populate()` compatible with promises #2317
+ * fixed; `count()` no longer throws an error when used with `sort()` #2374
+ * fixed; `save()` no longer recursively calls `save()` on populated fields #2418
+
 3.8.19 / 2014-11-09
 ===================
  * fixed; make sure to not override subdoc _ids on find #2276 [alabid](https://github.com/alabid)
@@ -55,9 +153,21 @@
  * fixed; getters for properties with non-strict schemas #2439 [alabid](https://github.com/alabid)
  * fixed; inconsistent URI format in docs #2414 [sr527](https://github.com/sr527)
 
+3.9.4 / 2014-10-25
+==================
+ * fixed; statics no longer can be overwritten #2343 [nkcmr](https://github.com/chetverikov)
+ * added; ability to set single populated paths to documents #1530
+ * added; setDefaultsOnInsert and runValidator options for findOneAndUpdate() #860
+
 3.8.18 / 2014-10-22
 ==================
  * fixed; Dont use all toObject options in save #2340 [chetverikov](https://github.com/chetverikov)
+
+3.9.3 / 2014-10-01
+=================
+ * added; support for virtuals that return objects #2294
+ * added; ability to manually hydrate POJOs into mongoose objects #2292
+ * added; setDefaultsOnInsert and runValidator options for update() #860
 
 3.8.17 / 2014-09-29
 ==================
@@ -66,6 +176,13 @@
  * fixed; fix stack overflow when passing MongooseArray to findAndModify #2214
  * fixed; optimize .length usage in populate #2289
 
+3.9.2 / 2014-09-08
+==================
+ * added; test coverage for browser component #2255
+ * added; in-order execution of validators #2243
+ * added; custom fields for validators #2132
+ * removed; exception thrown when find() used with count() #1950
+
 3.8.16 / 2014-09-08
 ==================
  * fixed; properly remove modified array paths if array has been overwritten #1638
@@ -73,6 +190,13 @@
  * fixed; make sure populate on an array always returns a Mongoose array #2214
  * fixed; SSL connections with node 0.11 #2234
  * fixed; return sensible strings for promise errors #2239
+
+3.9.1 / 2014-08-17
+==================
+ * added; alpha version of browser-side schema validation #2254
+ * added; support passing a function to schemas `required` field #2247
+ * added; support for setting updatedAt and createdAt timestamps #2227
+ * added; document.validate() returns a promise #2131
 
 3.8.15 / 2014-08-17
 ==================
@@ -117,6 +241,16 @@
  * fixed; sub-doc changes not getting persisted to db after save #2082
  * fixed; custom getter might cause mongoose to mistakenly think a path is dirty #2100 [pgherveou](https://github.com/pgherveou)
  * fixed; chainable helper for allowDiskUse option in aggregation #2114
+
+3.9.0 (unstable) / 2014-05-22
+==================
+ * changed; added `domain` to reserved keywords #1338 #2052 [antoinepairet](https://github.com/antoinepairet)
+ * added; asynchronous post hooks #1977 #2081 [chopachom](https://github.com/chopachom) [JasonGhent](https://github.com/JasonGhent)
+ * added; using model for population, cross-db populate [mihai-chiorean](https://github.com/mihai-chiorean)
+ * added; can define a type for schema validators
+ * added; `doc.remove()` returns a promise #1619 [refack](https://github.com/refack)
+ * added; internal promises for hooks, pre-save hooks run in parallel #1732 [refack](https://github.com/refack)
+ * fixed; geoSearch hanging when no results returned #1846 [ghartnett](https://github.com/ghartnett)
 
 3.8.11 / 2014-05-22
 ==================

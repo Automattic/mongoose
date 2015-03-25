@@ -13,10 +13,10 @@ var start = require('./common')
  */
 
 var EmployeeSchema = new Schema({
-    name: String
-  , sal: Number
-  , dept: String
-  , customers: [String]
+  name: String,
+  sal: Number,
+  dept: String,
+  customers: [String]
 });
 
 var Employee = mongoose.model('Employee', EmployeeSchema);
@@ -44,7 +44,9 @@ function setupData(callback) {
 }
 
 function clearData(db, callback) {
-  db.model('Employee').remove(callback);
+  db.model('Employee').remove(function() {
+    db.close(callback);
+  });
 }
 
 /**
@@ -294,17 +296,17 @@ describe('aggregate', function() {
     it('project', function(done) {
       var aggregate = new Aggregate();
 
-      setupData(function (db) {
+      setupData(function(db) {
         aggregate
           .bind(db.model('Employee'))
           .project({ sal: 1, sal_k: { $divide: [ "$sal", 1000 ] } })
-          .exec(function (err, docs) {
+          .exec(function(err, docs) {
             assert.ifError(err);
-            docs.forEach(function (doc) {
+            docs.forEach(function(doc) {
               assert.equal(doc.sal / 1000, doc.sal_k);
             });
 
-            clearData(db, function () { done(); });
+            clearData(db, function() { done(); });
           });
       });
     });
@@ -312,7 +314,7 @@ describe('aggregate', function() {
     it('group', function(done) {
       var aggregate = new Aggregate();
 
-      setupData(function (db) {
+      setupData(function(db) {
         aggregate
           .bind(db.model('Employee'))
           .group({ _id: "$dept" })
@@ -382,7 +384,7 @@ describe('aggregate', function() {
     it('match', function(done) {
       var aggregate = new Aggregate();
 
-      setupData(function (db) {
+      setupData(function(db) {
         aggregate
           .bind(db.model('Employee'))
           .match({ sal: { $gt: 15000 } })
@@ -411,10 +413,10 @@ describe('aggregate', function() {
       });
     });
 
-	it('complex pipeline', function(done) {
+    it('complex pipeline', function(done) {
       var aggregate = new Aggregate();
 
-      setupData(function (db) {
+      setupData(function(db) {
         aggregate
           .bind(db.model('Employee'))
           .match({ sal: { $lt: 16000 } })
@@ -431,10 +433,10 @@ describe('aggregate', function() {
             clearData(db, function() { done(); });
           });
       });
-	});
+    });
 
     describe('error when empty pipeline', function() {
-      it('without a callback', function(done){
+      it('without a callback', function(done) {
         var agg = new Aggregate;
         var promise = agg.exec();
         assert.ok(promise instanceof mongoose.Promise);
@@ -442,10 +444,10 @@ describe('aggregate', function() {
           assert.ok(err);
           assert.equal(err.message, "Aggregate has empty pipeline");
           done();
-        })
-      })
+        });
+      });
 
-      it('with a callback', function(done){
+      it('with a callback', function(done) {
         var aggregate = new Aggregate()
           , callback;
 
@@ -456,11 +458,11 @@ describe('aggregate', function() {
         };
 
         aggregate.exec(callback);
-      })
+      });
     });
 
     describe('error when not bound to a model', function() {
-      it('with callback', function(done){
+      it('with callback', function(done) {
         var aggregate = new Aggregate()
           , callback;
 
@@ -472,8 +474,9 @@ describe('aggregate', function() {
 
         aggregate.skip(0);
         aggregate.exec(callback);
-      })
-      it('without callback', function(done){
+      });
+
+      it('without callback', function(done) {
         var agg = new Aggregate;
         var promise = agg.limit(3).exec();
         assert.ok(promise instanceof mongoose.Promise);
@@ -481,11 +484,11 @@ describe('aggregate', function() {
           assert.ok(err);
           assert.equal(err.message, "Aggregate not bound to any Model");
           done();
-        })
-      })
+        });
+      });
     });
 
-    it('handles aggregation options', function(done){
+    it('handles aggregation options', function(done) {
       setupData(function (db) {
         start.mongodVersion(function (err, version) {
           if (err) throw err;
@@ -513,6 +516,6 @@ describe('aggregate', function() {
             });
         });
       });
-    })
+    });
   });
 });

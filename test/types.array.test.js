@@ -10,7 +10,6 @@ var start = require('./common')
   , random = require('../lib/utils').random
   , MongooseArray = mongoose.Types.Array
   , collection = 'avengers_'+random()
-  , MongooseBuffer = mongoose.Types.Buffer
 
 var User = new Schema({
     name: String
@@ -34,7 +33,7 @@ describe('types array', function(){
     var a = new MongooseArray;
 
     assert.ok(a instanceof Array);
-    assert.ok(a instanceof MongooseArray);
+    assert.ok(a.isMongooseArray);
     assert.equal(true, Array.isArray(a));
     assert.deepEqual(a._atomics.constructor, Object);
     done();
@@ -764,7 +763,7 @@ describe('types array', function(){
           assert.equal(2, m.doc.length);
           assert.ok(m.doc.some(function(v) { return v.name === 'Rap' }));
           assert.ok(m.doc.some(function(v) { return v.name === 'House' }));
-          done();
+          db.close(done);
         });
       });
     });
@@ -849,7 +848,7 @@ describe('types array', function(){
                   assert.equal(3, m.x[1]);
                   assert.equal(2, m.x[2]);
                   assert.equal(1, m.x[3]);
-                  done();
+                  db.close(done);
                 })
               })
             })
@@ -1028,11 +1027,11 @@ describe('types array', function(){
       save(m, function (err, doc) {
         assert.ifError(err);
         assert.equal(2, doc.arr.length);
-        assert.ok(doc.arr[0] instanceof MongooseBuffer);
-        assert.ok(doc.arr[1] instanceof MongooseBuffer);
+        assert.ok(doc.arr[0].isMongooseBuffer);
+        assert.ok(doc.arr[1].isMongooseBuffer);
         doc.arr.set(1, "nice");
         assert.equal(2, doc.arr.length);
-        assert.ok(doc.arr[1] instanceof MongooseBuffer);
+        assert.ok(doc.arr[1].isMongooseBuffer);
         assert.equal("nice", doc.arr[1].toString('utf8'));
         doc.arr.set(doc.arr.length, [11]);
         assert.equal(3, doc.arr.length);
@@ -1041,9 +1040,9 @@ describe('types array', function(){
         save(doc, function (err, doc) {
           assert.ifError(err);
           assert.equal(3, doc.arr.length);
-          assert.ok(doc.arr[0] instanceof MongooseBuffer);
-          assert.ok(doc.arr[1] instanceof MongooseBuffer);
-          assert.ok(doc.arr[2] instanceof MongooseBuffer);
+          assert.ok(doc.arr[0].isMongooseBuffer);
+          assert.ok(doc.arr[1].isMongooseBuffer);
+          assert.ok(doc.arr[2].isMongooseBuffer);
           assert.equal('\u0000', doc.arr[0].toString());
           assert.equal("nice", doc.arr[1].toString());
           assert.equal(11, doc.arr[2][0]);
@@ -1350,7 +1349,7 @@ describe('types array', function(){
             assert.equal(2, m.em.length);
             assert.equal(1, m.em[0].sub.length);
             assert.equal('a', m.em[0].sub[0]);
-            done();
+            db.close(done);
           });
         });
       });

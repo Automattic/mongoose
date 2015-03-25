@@ -341,7 +341,7 @@ describe('document: hooks:', function () {
       assert.ok(err);
       assert.ok(err.errors['e.0.text']);
       assert.equal(false, presave);
-      done();
+      db.close(done);
     });
   });
 
@@ -396,7 +396,7 @@ describe('document: hooks:', function () {
                 assert.ifError(err);
                 assert.equal(2, called.pre);
                 assert.equal(2, called.post);
-                done();
+                db.close(done);
               });
             });
           });
@@ -428,7 +428,7 @@ describe('document: hooks:', function () {
       assert.equal(typeof dbBar.foos, 'undefined');
       assert.ok(!b.foos);
       assert.equal(typeof b.foos, 'undefined');
-      done();
+      db.close(done);
     });
   });
 
@@ -487,4 +487,78 @@ describe('document: hooks:', function () {
     });
   });
 
+  it("pre save hooks should run in parallel", function (done) {
+    // we set the time out to be double that of the validator - 1 (so that running in serial will be greater then that)
+    this.timeout(1000);
+    var db = start(),
+      count = 0
+
+    var SchemaWithPreSaveHook = new Schema ({
+      preference: String
+    });
+    SchemaWithPreSaveHook.pre('save', true, function hook (next, done) {
+      setTimeout(function () {
+        count++;
+        next();
+        if (count == 3) {
+          done(new Error("gaga"));
+        } else {
+          done();
+        }
+      }, 500);
+    });
+
+    var MWPSH = db.model('mwpsh', new Schema({subs: [SchemaWithPreSaveHook]}));
+    var m = new MWPSH({
+      subs: [
+        {
+          preference: "xx"
+        }
+        ,
+        {
+          preference: "yy"
+        }
+        ,
+        {
+          preference: "1"
+        }
+        ,
+        {
+          preference: "2"
+        }
+      ]
+    });
+
+    m.save(function (err) {
+      assert.equal(err.message, "gaga");
+      assert.equal(count, 4);
+      db.close(done);
+    });
+  });
+
+  it('parallel followed by serial (gh-2521)', function(done) {
+    var schema = Schema({ name: String });
+
+    schema.pre('save', true, function(next, done) {
+      process.nextTick(function() {
+        done();
+      });
+      next();
+    });
+
+    schema.pre('save', function(done) {
+      process.nextTick(function() {
+        done();
+      });
+    });
+
+    var db = start();
+    var People = db.model('gh-2521', schema, 'gh-2521');
+
+    var p = new People({ name: 'Val' });
+    p.save(function(error) {
+      assert.ifError(error);
+      db.close(done);
+    });
+  });
 });

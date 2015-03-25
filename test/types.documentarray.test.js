@@ -53,8 +53,8 @@ describe('types.documentarray', function(){
     var a = new MongooseDocumentArray();
 
     assert.ok(a instanceof Array);
-    assert.ok(a instanceof MongooseArray);
-    assert.ok(a instanceof MongooseDocumentArray);
+    assert.ok(a.isMongooseArray);
+    assert.ok(a.isMongooseDocumentArray);
     assert.ok(Array.isArray(a));
     assert.equal('Object', a._atomics.constructor.name);
     assert.equal('object', typeof a);
@@ -220,8 +220,17 @@ describe('types.documentarray', function(){
       assert.equal(undefined, delta.$pushAll.docs[0].changed);
       done();
     })
-    it('uses the correct transform (gh-1412)', function(done){
+    it('uses the correct transform (gh-1412)', function(done) {
       var db = start();
+      var SecondSchema = new Schema({});
+
+      SecondSchema.set('toObject', {
+        transform: function second(doc, ret, options) {
+          ret.secondToObject = true;
+          return ret;
+        },
+      });
+
       var FirstSchema = new Schema({
         second: [SecondSchema],
       });
@@ -229,15 +238,6 @@ describe('types.documentarray', function(){
       FirstSchema.set('toObject', {
       transform: function first(doc, ret, options) {
           ret.firstToObject = true;
-          return ret;
-        },
-      });
-
-      var SecondSchema = new Schema({});
-
-      SecondSchema.set('toObject', {
-        transform: function second(doc, ret, options) {
-          ret.secondToObject = true;
           return ret;
         },
       });
@@ -257,7 +257,7 @@ describe('types.documentarray', function(){
       assert.ok(obj.second[1].secondToObject);
       assert.ok(!obj.second[0].firstToObject);
       assert.ok(!obj.second[1].firstToObject);
-      done();
+      db.close(done);
     })
   })
 
@@ -309,13 +309,12 @@ describe('types.documentarray', function(){
             doc.save(function (err) {
               assert.ifError(err);
               M.findById(m._id, function (err, doc) {
-                db.close()
                 assert.ifError(err);
                 assert.equal(3, doc.children.length);
                 doc.children.forEach(function (child) {
                   assert.equal(doc.children[0].id, child.id);
-                })
-                done();
+                });
+                db.close(done);
               })
             })
           })
@@ -369,10 +368,9 @@ describe('types.documentarray', function(){
           assert.ifError(err);
 
           Post.findById(p._id, function (err, p) {
-            db.close();
             assert.ifError(err);
             assert.equal(p.comments[0].comments[0].comments[0].comments[0].title, 'c4');
-            done();
+            db.close(done);
           });
         });
       });
@@ -382,27 +380,29 @@ describe('types.documentarray', function(){
   describe('invalidate()', function(){
     it('works', function(done){
       var schema = Schema({ docs: [{ name: 'string' }] });
+      schema.pre('validate', function(next) {
+        var subdoc = this.docs[this.docs.length - 1];
+        subdoc.invalidate('name', 'boo boo', '%');
+        next();
+      });
       var T = mongoose.model('embeddedDocument#invalidate_test', schema, 'asdfasdfa'+ random());
       var t = new T;
       t.docs.push({ name: 100 });
-      var subdoc = t.docs[t.docs.length-1];
-      subdoc.invalidate('name', 'boo boo', '%');
 
       subdoc = t.docs.create({ name: 'yep' });
       assert.throws(function(){
         // has no parent array
-        subdoc.invalidate('name', 'crap', 47);
+        subdoc.invalidate('name', 'junk', 47);
       }, /^Error: Unable to invalidate a subdocument/);
-
       t.validate(function (err) {
         var e = t.errors['docs.0.name'];
         assert.ok(e);
         assert.equal(e.path, 'docs.0.name');
-        assert.equal(e.type, 'user defined');
+        assert.equal(e.kind, 'user defined');
         assert.equal(e.message, 'boo boo');
         assert.equal(e.value, '%');
         done();
-      })
+      });
     })
 
     it('handles validation failures', function(done){
@@ -414,9 +414,8 @@ describe('types.documentarray', function(){
       var M = db.model('embedded-invalidate', schema);
       var m = new M({ docs: [{ v: 900 }] });
       m.save(function (err) {
-        db.close();
         assert.equal(900, err.errors['docs.0.v'].value);
-        done();
+        db.close(done);
       });
     })
 
@@ -430,13 +429,13 @@ describe('types.documentarray', function(){
       M.create({ docs: [{v: 900}] }, function(error, m) {
         m.shouldPrint = true;
         assert.ifError(error);
-        var numListeners = m._events.save.length;
+        var numListeners = m.listeners('save').length;
         assert.ok(numListeners > 0);
         m.docs = [{ v: 9000 }];
         m.save(function(error, m) {
           assert.ifError(error);
-          assert.equal(numListeners, m._events.save.length);
-          done();
+          assert.equal(numListeners, m.listeners('save').length);
+          db.close(done);
         });
       });
     });

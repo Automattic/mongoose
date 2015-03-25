@@ -13,4 +13,6 @@ docs/source/_docs
 docs/*.html
 tags
 test/triage/*.js
-.idea/
+/.idea
+/inspections
+bin/mongoose.min.js

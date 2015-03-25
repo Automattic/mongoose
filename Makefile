@@ -14,7 +14,7 @@ test-short:
 test-long:
 	@MONGOOSE_DISABLE_STABILITY_WARNING=1 ./node_modules/.bin/mocha $(T) -g LONG --async-only test/**/*.test.js
 
-docs: ghpages docclean gendocs
+docs: ghpages merge_stable docclean gendocs
 docs_legacy: legacy docclean_legacy gendocs copytmp gitreset ghpages copylegacy
 
 gendocs: $(DOCFILE)

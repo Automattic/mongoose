@@ -205,7 +205,7 @@ describe('query stream:', function(){
     function cb (err) {
       ++finished;
       setTimeout(function () {
-        assert.ok(/no open connections|Connection was destroyed by application/.test(err.message), err.message);
+        assert.ok(/connection to host localhost:27017 was destroyed/.test(err.message), err.message);
         assert.equal(i, 5);
         assert.equal(1, closed);
         assert.equal(1, finished);
@@ -326,6 +326,7 @@ describe('query stream:', function(){
           error = err;
         }).
         on('close', function () {
+          db.close();
           done(error);
         });
     });
@@ -369,9 +370,7 @@ describe('query stream:', function(){
         assert.ok(~found.indexOf(2));
         assert.ok(~found.indexOf(3));
       }
-      db.close(function () {
-        done(err);
-      });
+      db.close(done);
     };
   });
 
@@ -388,9 +387,7 @@ describe('query stream:', function(){
       assert.ifError(error);
       User.find().stream().on('data', function(doc) {
         assert.equal(undefined, doc.password);
-        db.close(function() {
-          done();
-        });
+        db.close(done);
       });
     });
   });

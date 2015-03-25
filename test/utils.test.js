@@ -283,7 +283,25 @@ describe('utils', function(){
     var orig = [0,[1,2,[3,4,[5,[6]],7],8],9];
     assert.deepEqual([0,1,2,3,4,5,6,7,8,9], utils.array.flatten(orig));
     done();
-  })
+  });
+
+  it('array.unique', function(done) {
+    var case1 = [1, 2, 3, 3, 5, 'a', 6, 'a'];
+    assert.deepEqual(utils.array.unique(case1), [1, 2, 3, 5, 'a', 6]);
+    var objId = new ObjectId('000000000000000000000001');
+    var case2 = [
+      1,
+      '000000000000000000000001',
+      1,
+      objId,
+      '000000000000000000000001',
+      objId,
+      1
+    ];
+    assert.deepEqual(utils.array.unique(case2),
+      [1, '000000000000000000000001', objId]);
+    done();
+  });
 
   describe('merge', function(){
     it('merges two objects together without overriding properties & methods', function(done){
@@ -318,9 +336,17 @@ describe('utils', function(){
   })
 
   describe('pluralize', function(){
-    it('should not pluralize _temp_ (gh-1703)', function(done){
-      var db = start();
+    var db;
 
+    beforeEach(function() {
+      db = start();
+    });
+
+    afterEach(function(done) {
+      db.close(done);
+    });
+
+    it('should not pluralize _temp_ (gh-1703)', function(done){
       var ASchema = new Schema ({
           value: { type: Schema.Types.Mixed }
       });
@@ -331,7 +357,6 @@ describe('utils', function(){
       done();
     });
     it('should pluralize _temp (gh-1703)', function(done){
-      var db = start();
 
       var ASchema = new Schema ({
           value: { type: Schema.Types.Mixed }
@@ -344,7 +369,6 @@ describe('utils', function(){
     });
     describe('option (gh-1707)', function(){
       it('should pluralize by default', function(done){
-        var db = start();
         var ASchema = new Schema ({value: String});
 
         var collectionName = 'singular';
@@ -353,7 +377,6 @@ describe('utils', function(){
         done();
       });
       it('should pluralize when global option set to true', function(done){
-        var db = start();
         db.base.set('pluralization', true);
 
         var ASchema = new Schema ({value: String});
@@ -364,7 +387,6 @@ describe('utils', function(){
         done();
       });
       it('should not pluralize when global option set to false', function(done){
-        var db = start();
         db.base.set('pluralization', false);
 
         var ASchema = new Schema ({value: String});
@@ -375,7 +397,6 @@ describe('utils', function(){
         done();
       });
       it('should pluralize when local option set to true', function(done){
-        var db = start();
         db.base.set('pluralization', false);
 
         // override
@@ -387,7 +408,6 @@ describe('utils', function(){
         done();
       });
       it('should not pluralize when local option set to false and global is true', function(done){
-        var db = start();
         db.base.set('pluralization', true);
 
         var ASchema = new Schema ({value: String}, {pluralization: false});
@@ -398,8 +418,6 @@ describe('utils', function(){
         done();
       });
       it('should not pluralize when local option set to false and global not set', function(done){
-        var db = start();
-
         var ASchema = new Schema ({value: String}, {pluralization: false});
 
         var collectionName = 'singular';

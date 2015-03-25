@@ -12,10 +12,8 @@ var start = require('./common')
 /**
  * setup
  */
-
 var capped = new Schema({ key: 'string', val: 'number' });
 capped.set('capped', { size: 1000 });
-
 var coll = 'capped_' + random();
 
 /**
@@ -38,11 +36,10 @@ describe('collections: capped:', function(){
       // use the existing capped collection in the db (no coll creation)
       var Capped2 = db.model('Capped2', capped, coll);
       Capped2.collection.isCapped(function (err, isCapped) {
-        db.close();
         assert.ifError(err);
         assert.ok(isCapped, 'should reuse the capped collection in the db');
         assert.equal(Capped.collection.name, Capped2.collection.name);
-        done();
+        db.close(done);
       });
     });
   });
@@ -54,37 +51,7 @@ describe('collections: capped:', function(){
       assert.ifError(err);
       assert.ok(options.capped, 'should create a capped collection');
       assert.equal(8192, options.size);
-      var s = '';
-      for (var i = 0; i < 4096 + 2000; ++i) s+='A';
-      Capped.create({ key: s }, function (err, doc) {
-        assert.ifError(err);
-        var id = doc.id;
-        Capped.count(function (err, count) {
-          assert.ifError(err);
-          assert.equal(1, count);
-          var c = new Capped({ key: s });
-          c.save(function (err, doc, num) {
-            assert.ifError(err);
-            assert.equal(1, num);
-            Capped.find(function (err, docs) {
-              assert.ifError(err);
-              assert.equal(1, docs.length);
-              c = docs[0];
-              assert.notEqual(id, c.id);
-              c.key = c.key + s;
-              c.save(function (err) {
-                assert.ok(err);
-                c.remove(function (err) {
-                  db.close();
-                  assert.ok(err);
-                  assert.equal(10101, err.code);
-                  done();
-                });
-              });
-            });
-          });
-        });
-      });
+      db.close(done);
     });
   })
   it('attempting to use existing non-capped collection as capped emits error', function(done){

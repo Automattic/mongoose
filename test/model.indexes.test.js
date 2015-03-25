@@ -52,9 +52,8 @@ describe('model', function(){
             }
           });
 
-          db.close();
           assert.equal(4, assertions);
-          done();
+          db.close(done);
         });
       });
     });
@@ -90,9 +89,8 @@ describe('model', function(){
             });
           }
 
-          db.close();
           assert.equal(3, assertions);
-          done();
+          db.close(done);
         });
       });
     });
@@ -138,9 +136,8 @@ describe('model', function(){
             });
           }
 
-          db.close();
           assert.equal(5, assertions);
-          done();
+          db.close(done);
         });
       });
     });
@@ -190,7 +187,7 @@ describe('model', function(){
 
       Test.on('index', function (err) {
         db.close();
-        assert.ok(/^E11000 duplicate key error index:/.test(err.message), err);
+        assert.ok(/E11000 duplicate key error/.test(err.message), err);
         done();
       });
 
@@ -205,23 +202,66 @@ describe('model', function(){
     describe('auto creation', function(){
       it('can be disabled', function(done){
         var db = start();
-        var schema = new Schema({ name: { type: String, index: true }})
+        var schema = new Schema({ name: { type: String, index: true }});
         schema.set('autoIndex', false);
 
-        var Test = db.model('AutoIndexing', schema, "x"+random());
+        var Test = db.model('AutoIndexing', schema, 'autoindexing-disable');
         Test.on('index', function(err){
           assert.ok(false, 'Model.ensureIndexes() was called');
         });
 
-        setTimeout(function () {
-          Test.collection.getIndexes(function(err, indexes){
-            assert.ifError(err);
-            assert.equal(0, Object.keys(indexes).length);
-            done();
+        // Create a doc because mongodb 3.0 getIndexes errors if db doesn't
+        // exist
+        Test.create({ name: 'Bacon' }, function(err) {
+          assert.ifError(err);
+          setTimeout(function () {
+            Test.collection.getIndexes(function(err, indexes){
+              assert.ifError(err);
+              // Only default _id index should exist
+              assert.deepEqual(['_id_'], Object.keys(indexes));
+              db.close(done);
+            });
+          }, 100);
+        });
+      });
+
+      describe('global autoIndexes (gh-1875)', function() {
+        it('will create indexes as a default', function(done) {
+          var db = start();
+          var schema = new Schema({name : { type: String, index: true } });
+          var Test = db.model('GlobalAutoIndex', schema, 'gh-1875-1');
+          Test.on('index', function(error) {
+            assert.ifError(error);
+            assert.ok(true, 'Model.ensureIndexes() was called');
+            Test.collection.getIndexes(function(err, indexes) {
+              assert.ifError(err);
+              assert.equal(2, Object.keys(indexes).length);
+              db.close(done);
+            });
           });
-        }, 100);
-      })
-    })
+        });
+
+        it ('will not create indexes if the global auto index is false and schema option isnt set (gh-1875)', function(done){
+          var db = start({config: {autoIndex : false}});
+          var schema = new Schema({name : {type: String, index: true}});
+          var Test = db.model('GlobalAutoIndex', schema, "x"+random());
+          Test.on('index', function(err){
+            assert.ok(false, 'Model.ensureIndexes() was called');
+          });
+
+          Test.create({ name: 'Bacon' }, function(err) {
+            assert.ifError(err);
+            setTimeout(function() {
+              Test.collection.getIndexes(function(err, indexes){
+                assert.ifError(err);
+                assert.deepEqual(['_id_'], Object.keys(indexes));
+                db.close(done);
+              });
+            }, 100);
+          });
+        });
+      });
+    });
 
     it('do not trigger "MongoError: cannot add index with a background operation in progress" (gh-1365) LONG', function(done){
       this.timeout(45000);
@@ -239,7 +279,7 @@ describe('model', function(){
       K.on('index', function (err) {
         assert.ifError(err);
         db.close(done);
-      })
+      });
 
       var neededKittens = 30000;
 
@@ -264,7 +304,8 @@ describe('model', function(){
           })
         }
       })
-    })
+    });
+
 
     describe('model.ensureIndexes()', function(done){
       it('is a function', function(done){
@@ -272,7 +313,7 @@ describe('model', function(){
         var Test = mongoose.createConnection().model('ensureIndexes-'+random, schema);
         assert.equal('function', typeof Test.ensureIndexes);
         done();
-      })
+      });
 
       it('returns a Promise', function(done){
         var schema = mongoose.Schema({ x: 'string' });
@@ -280,7 +321,7 @@ describe('model', function(){
         var p = Test.ensureIndexes();
         assert.ok(p instanceof mongoose.Promise);
         done();
-      })
+      });
 
       it('creates indexes', function(done){
         var db = start();
@@ -297,7 +338,7 @@ describe('model', function(){
         Test.ensureIndexes(function (err) {
           assert.ifError(err);
           assert.ok(called);
-          done();
+          db.close(done);
         });
       })
     })

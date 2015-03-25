@@ -131,7 +131,7 @@ describe('model: findOneAndUpdate:', function(){
           , 'comments.1.body': 8 // $set
         }
 
-        M.findOneAndUpdate({ title: title }, update, function (err, up) {
+        M.findOneAndUpdate({ title: title }, update, { 'new': true }, function (err, up) {
           db.close();
           assert.equal(err, null, err && err.stack);
 
@@ -392,11 +392,11 @@ describe('model: findOneAndUpdate:', function(){
       , M = db.model(modelname, collection + random())
       , pending = 6
 
-    M.findOneAndUpdate({ name: 'aaron' }, { $set: { name: 'Aaron'}}, { new: false }, cb);
-    M.findOneAndUpdate({ name: 'aaron' }, { $set: { name: 'Aaron'}}, cb);
-    M.where().findOneAndUpdate({ name: 'aaron' }, { $set: { name: 'Aaron'}}, { new: false }, cb);
-    M.where().findOneAndUpdate({ name: 'aaron' }, { $set: { name: 'Aaron'}}, cb);
-    M.where().findOneAndUpdate({ $set: { name: 'Aaron'}}, cb);
+    M.findOneAndUpdate({ name: 'aaron' }, { $set: { name: 'Aaron6'}}, { new: false }, cb);
+    M.findOneAndUpdate({ name: 'aaron' }, { $set: { name: 'Aaron4'}}, cb);
+    M.where().findOneAndUpdate({ name: 'aaron' }, { $set: { name: 'Aaron1'}}, { new: false }, cb);
+    M.where().findOneAndUpdate({ name: 'aaron' }, { $set: { name: 'Aaron2'}}, cb);
+    M.where().findOneAndUpdate({ $set: { name: 'Aaron6'}}, cb);
     M.where('name', 'aaron').findOneAndUpdate({ $set: { name: 'Aaron'}}).findOneAndUpdate(cb);
 
     function cb (err, doc) {
@@ -484,7 +484,7 @@ describe('model: findOneAndUpdate:', function(){
     s.save(function (err) {
       assert.ifError(err);
       var name = Date.now();
-      S.findOneAndUpdate({ name: name }, { ignore: true }, { upsert: true }, function (err, doc) {
+      S.findOneAndUpdate({ name: name }, { ignore: true }, { upsert: true, 'new': true }, function (err, doc) {
         assert.ifError(err);
         assert.ok(doc);
         assert.ok(doc._id);
@@ -565,8 +565,7 @@ describe('model: findByIdAndUpdate:', function(){
       assert.ifError(err);
       assert.strictEqual(null, doc); // no previously existing doc
       if (--pending) return;
-      db.close();
-      done();
+      db.close(done);
     }
   });
 
@@ -583,8 +582,7 @@ describe('model: findByIdAndUpdate:', function(){
       assert.ifError(err);
       assert.strictEqual(null, doc); // no previously existing doc
       if (--pending) return;
-      db.close();
-      done();
+      db.close(done);
     }
   })
 
@@ -625,7 +623,6 @@ describe('model: findByIdAndUpdate:', function(){
         }
 
         M.findByIdAndUpdate(post.id, update, { new: false }, function (err, up) {
-          db.close();
           assert.ifError(err);
 
           assert.equal(up.title,post.title);
@@ -644,7 +641,7 @@ describe('model: findByIdAndUpdate:', function(){
           assert.ok(up.comments[1]._id);
           assert.ok(up.comments[0]._id instanceof DocumentObjectId)
           assert.ok(up.comments[1]._id instanceof DocumentObjectId)
-          done();
+          db.close(done);
         });
       });
     });
@@ -654,8 +651,6 @@ describe('model: findByIdAndUpdate:', function(){
     var db = start()
       , M = db.model(modelname, collection)
       , _id = new DocumentObjectId
-
-    db.close();
 
     var now = new Date
       , query;
@@ -680,15 +675,13 @@ describe('model: findByIdAndUpdate:', function(){
     assert.strictEqual(undefined, query.options.new);
     assert.equal(undefined, query._update);
     assert.strictEqual(undefined, query._conditions._id);
-    done();
+    db.close(done);
   });
 
   it('supports v3 select string syntax', function(done){
     var db = start()
       , M = db.model(modelname, collection)
       , _id = new DocumentObjectId
-
-    db.close();
 
     var now = new Date
       , query;
@@ -700,15 +693,13 @@ describe('model: findByIdAndUpdate:', function(){
     query = M.findOneAndUpdate({}, { $set: { date: now }}, { select: 'author -title' });
     assert.strictEqual(1, query._fields.author);
     assert.strictEqual(0, query._fields.title);
-    done();
-  })
+    db.close(done);
+  });
 
   it('supports v3 select object syntax', function(done){
     var db = start()
       , M = db.model(modelname, collection)
       , _id = new DocumentObjectId
-
-    db.close();
 
     var now = new Date
       , query;
@@ -720,7 +711,7 @@ describe('model: findByIdAndUpdate:', function(){
     query = M.findOneAndUpdate({}, { $set: { date: now }}, { select: { author: 1, title: 0 }});
     assert.strictEqual(1, query._fields.author);
     assert.strictEqual(0, query._fields.title);
-    done();
+    db.close(done);
   })
 
   it('supports v3 sort string syntax', function(done){
@@ -753,9 +744,8 @@ describe('model: findByIdAndUpdate:', function(){
       .sort({ 'meta.visitors': -1 })
       .exec(function(err, doc) {
         if (err) return done(err);
-        db.close();
         assert.equal(10, doc.meta.visitors);
-        done();
+        db.close(done);
       });
     });
   })
@@ -764,8 +754,6 @@ describe('model: findByIdAndUpdate:', function(){
     var db = start()
       , M = db.model(modelname, collection)
       , _id = new DocumentObjectId
-
-    db.close();
 
     var now = new Date
       , query;
@@ -780,7 +768,7 @@ describe('model: findByIdAndUpdate:', function(){
     assert.equal(1, query.options.sort.author);
     assert.equal(-1, query.options.sort.title);
 
-    done();
+    db.close(done);
   });
 
   it('supports $elemMatch with $in (gh-1091 gh-1100)', function(done){
@@ -799,7 +787,7 @@ describe('model: findByIdAndUpdate:', function(){
       assert.ifError(err);
 
       B
-      .findByIdAndUpdate(doc._id, { title: 'woot' })
+      .findByIdAndUpdate(doc._id, { title: 'woot' }, { 'new': true })
       .select({ title: 1, ids: { $elemMatch: { $in: [_id2.toString()] }}})
       .exec(function (err, found) {
         assert.ifError(err);
@@ -808,7 +796,7 @@ describe('model: findByIdAndUpdate:', function(){
         assert.equal('woot', found.title);
         assert.equal(1, found.ids.length);
         assert.equal(_id2.toString(), found.ids[0].toString());
-        done();
+        db.close(done);
       });
     })
   })
@@ -830,7 +818,7 @@ describe('model: findByIdAndUpdate:', function(){
           assert.ok(doc);
           assert.ok(doc.a);
           assert.equal(doc.a.name, 'i am an A');
-          done();
+          db.close(done);
         })
       })
     })
@@ -856,7 +844,7 @@ describe('model: findByIdAndUpdate:', function(){
           assert.ifError(err);
           assert.equal(key, thing2.id);
           assert.equal(false, thing2.flag);
-          done();
+          db.close(done);
         });
     });
   });
@@ -872,12 +860,12 @@ describe('model: findByIdAndUpdate:', function(){
 
     Thing.create({name:["Test"]}, function (err, thing) {
       if (err) return done(err);
-      Thing.findOneAndUpdate({ _id: thing._id }, {name:null})
+      Thing.findOneAndUpdate({ _id: thing._id }, {name:null}, { 'new': true })
         .exec(function (err, doc) {
           if (err) return done(err);
           assert.ok(doc);
           assert.equal(doc.name, null);
-          done();
+          db.close(done);
       });
     });
   });
@@ -887,11 +875,11 @@ describe('model: findByIdAndUpdate:', function(){
     var M = db.model('1809', { name: String, change: Boolean });
     M.create({ name: 'first' }, function(err, doc) {
       if (err) return done(err);
-      M.findByIdAndUpdate(doc._id, { change: true }, { overwrite: true }, function(err, doc) {
+      M.findByIdAndUpdate(doc._id, { change: true }, { overwrite: true, 'new': true }, function(err, doc) {
         if (err) return done(err);
         assert.ok(doc.change);
         assert.equal(undefined, doc.name);
-        done();
+        db.close(done);
       });
     });
   });
@@ -929,7 +917,7 @@ describe('model: findByIdAndUpdate:', function(){
               assert.ifError(error);
               assert.ok(Utils.deepEqual(doc.contacts[0].account, a2._id));
               assert.ok(_.isEqual(doc.contacts[0].account, a2._id));
-              done();
+              db.close(done);
             });
           });
       });
@@ -952,7 +940,7 @@ describe('model: findByIdAndUpdate:', function(){
       function(error, doc) {
         assert.ifError(error);
         assert.equal(0, doc.__v);
-        done();
+        db.close(done);
       });
   });
 
@@ -984,9 +972,347 @@ describe('model: findByIdAndUpdate:', function(){
             assert.ifError(error);
             assert.equal(1, doc.ticks.length);
             assert.equal('coffee', doc.ticks[0].name);
-            done();
+            db.close(done);
           });
         });
     });
   });
-})
+
+  it('accepts undefined', function(done) {
+    var db = start();
+
+    var s = new Schema({
+      time: Date,
+      base: String
+    });
+
+    var Breakfast = db.model('gh-2272', s);
+
+    Breakfast.
+      findOneAndUpdate({}, { time: undefined, base: undefined }, {}).
+      exec(function(error, breakfast) {
+        assert.ifError(error);
+        db.close(done);
+      });
+  });
+
+  it('cast errors for empty objects as object ids (gh-2732)', function(done) {
+    var db = start();
+
+    var s = new Schema({
+      base: ObjectId
+    });
+
+    var Breakfast = db.model('gh2732', s);
+
+    Breakfast.
+      findOneAndUpdate({}, { base: {} }, {}).
+      exec(function(error, breakfast) {
+        assert.ok(error);
+        db.close(done);
+      });
+  });
+
+  describe('middleware', function() {
+    var db;
+
+    beforeEach(function() {
+      db = start();
+    });
+
+    afterEach(function(done) {
+      db.close(done);
+    });
+
+    it('works', function(done) {
+      var s = new Schema({
+        topping: { type: String, default: 'bacon' },
+        base: String
+      });
+
+      var preCount = 0;
+      s.pre('findOneAndUpdate', function() {
+        ++preCount;
+      });
+
+      var postCount = 0;
+      s.post('findOneAndUpdate', function() {
+        ++postCount;
+      });
+
+      var Breakfast = db.model('gh-964', s);
+
+      Breakfast.findOneAndUpdate(
+        {},
+        { base: 'eggs' },
+        {},
+        function(error, breakfast) {
+          assert.ifError(error);
+          assert.equal(1, preCount);
+          assert.equal(1, postCount);
+          done();
+        });
+    });
+
+    it('works with exec()', function(done) {
+      var s = new Schema({
+        topping: { type: String, default: 'bacon' },
+        base: String
+      });
+
+      var preCount = 0;
+      s.pre('findOneAndUpdate', function() {
+        ++preCount;
+      });
+
+      var postCount = 0;
+      s.post('findOneAndUpdate', function() {
+        ++postCount;
+      });
+
+      var Breakfast = db.model('gh-964-2', s);
+
+      Breakfast.
+        findOneAndUpdate({}, { base: 'eggs' }, {}).
+        exec(function(error, breakfast) {
+          assert.ifError(error);
+          assert.equal(1, preCount);
+          assert.equal(1, postCount);
+          done();
+        });
+    });
+  });
+
+  describe('validators (gh-860)', function(done) {
+    it('applies defaults on upsert', function(done) {
+      var db = start();
+
+      var s = new Schema({
+        topping: { type: String, default: 'bacon' },
+        base: String
+      });
+      var Breakfast = db.model('fam-gh-860-0', s);
+
+      var updateOptions = { upsert: true, setDefaultsOnInsert: true, 'new': true };
+      Breakfast.findOneAndUpdate(
+        {},
+        { base: 'eggs' },
+        updateOptions,
+        function(error, breakfast) {
+          assert.ifError(error);
+          assert.equal('eggs', breakfast.base);
+          assert.equal('bacon', breakfast.topping);
+          db.close();
+          done();
+        });
+    });
+
+    it('doesnt set default on upsert if query sets it', function(done) {
+      var db = start();
+
+      var s = new Schema({
+        topping: { type: String, default: 'bacon' },
+        base: String
+      });
+      var Breakfast = db.model('fam-gh-860-1', s);
+
+      var updateOptions = { upsert: true, setDefaultsOnInsert: true, 'new': true };
+      Breakfast.findOneAndUpdate(
+        { topping: 'sausage' },
+        { base: 'eggs' },
+        updateOptions,
+        function(error, breakfast) {
+          assert.ifError(error);
+          assert.equal('eggs', breakfast.base);
+          assert.equal('sausage', breakfast.topping);
+          db.close();
+          done();
+        });
+    });
+
+    it('properly sets default on upsert if query wont set it', function(done) {
+      var db = start();
+
+      var s = new Schema({
+        topping: { type: String, default: 'bacon' },
+        base: String
+      });
+      var Breakfast = db.model('fam-gh-860-2', s);
+
+      var updateOptions = { upsert: true, setDefaultsOnInsert: true, 'new': true };
+      Breakfast.findOneAndUpdate(
+        { topping: { $ne: 'sausage' } },
+        { base: 'eggs' },
+        updateOptions,
+        function(error, breakfast) {
+          assert.ifError(error);
+          assert.equal('eggs', breakfast.base);
+          assert.equal('bacon', breakfast.topping);
+          db.close();
+          done();
+        });
+    });
+
+    it('runs validators if theyre set', function(done) {
+      var db = start();
+
+      var s = new Schema({
+        topping: { type: String, validate: function(v) { return false; } },
+        base: { type: String, validate: function(v) { return true; } }
+      });
+      var Breakfast = db.model('fam-gh-860-3', s);
+
+      var updateOptions = {
+        upsert: true,
+        setDefaultsOnInsert: true,
+        runValidators: true,
+        'new': true
+      };
+      Breakfast.findOneAndUpdate(
+        {},
+        { topping: 'bacon', base: 'eggs' },
+        updateOptions,
+        function(error, breakfast) {
+          assert.ok(!!error);
+          assert.ok(!breakfast);
+          assert.equal(1, Object.keys(error.errors).length);
+          assert.equal('topping', Object.keys(error.errors)[0]);
+          assert.equal('Validator failed for path `topping` with value `bacon`',
+            error.errors['topping'].message);
+
+          assert.ok(!breakfast);
+          db.close();
+          done();
+        });
+    });
+
+    it('validators handle $unset and $setOnInsert', function(done) {
+      var db = start();
+
+      var s = new Schema({
+        steak: { type: String, required: true },
+        eggs: { type: String, validate: function(v) { return false; } }
+      });
+      var Breakfast = db.model('fam-gh-860-4', s);
+
+      var updateOptions = { runValidators: true, 'new': true };
+      Breakfast.findOneAndUpdate(
+        {},
+        { $unset: { steak: '' }, $setOnInsert: { eggs: 'softboiled' } },
+        updateOptions,
+        function(error, breakfast) {
+          assert.ok(!!error);
+          assert.ok(!breakfast);
+          assert.equal(2, Object.keys(error.errors).length);
+          assert.ok(Object.keys(error.errors).indexOf('eggs') != -1);
+          assert.ok(Object.keys(error.errors).indexOf('steak') != -1);
+          assert.equal('Validator failed for path `eggs` with value `softboiled`',
+            error.errors['eggs'].message);
+          assert.equal('Path `steak` is required.',
+            error.errors['steak'].message);
+          db.close();
+          done();
+        });
+    });
+
+    it('min/max, enum, and regex built-in validators work', function(done) {
+      var db = start();
+
+      var s = new Schema({
+        steak: { type: String, enum: ['ribeye', 'sirloin'] },
+        eggs: { type: Number, min: 4, max: 6 },
+        bacon: { type: String, match: /strips/ }
+      });
+      var Breakfast = db.model('fam-gh-860-5', s);
+
+      var updateOptions = { runValidators: true, 'new': true };
+      Breakfast.findOneAndUpdate(
+        {},
+        { $set: { steak: 'ribeye', eggs: 3, bacon: '3 strips' } },
+        updateOptions,
+        function(error) {
+          assert.ok(!!error);
+          assert.equal(1, Object.keys(error.errors).length);
+          assert.equal('eggs', Object.keys(error.errors)[0]);
+          assert.equal('Path `eggs` (3) is less than minimum allowed value (4).',
+            error.errors['eggs'].message);
+
+          Breakfast.findOneAndUpdate(
+            {},
+            { $set: { steak: 'tofu', eggs: 5, bacon: '3 strips' } },
+            updateOptions,
+            function(error) {
+              assert.ok(!!error);
+              assert.equal(1, Object.keys(error.errors).length);
+              assert.equal('steak', Object.keys(error.errors)[0]);
+              assert.equal('`tofu` is not a valid enum value for path `steak`.',
+                error.errors['steak']);
+
+
+              Breakfast.findOneAndUpdate(
+                {},
+                { $set: { steak: 'sirloin', eggs: 6, bacon: 'none' } },
+                updateOptions,
+                function(error) {
+                  assert.ok(!!error);
+                  assert.equal(1, Object.keys(error.errors).length);
+                  assert.equal('bacon', Object.keys(error.errors)[0]);
+                  assert.equal('Path `bacon` is invalid (none).',
+                    error.errors['bacon'].message);
+
+                  db.close();
+                  done();
+                });
+            });
+        });
+    });
+
+    it('multiple validation errors', function(done) {
+      var db = start();
+
+      var s = new Schema({
+        steak: { type: String, enum: ['ribeye', 'sirloin'] },
+        eggs: { type: Number, min: 4, max: 6 },
+        bacon: { type: String, match: /strips/ }
+      });
+      var Breakfast = db.model('fam-gh-860-6', s);
+
+      var updateOptions = { runValidators: true, 'new': true };
+      Breakfast.findOneAndUpdate(
+        {},
+        { $set: { steak: 'tofu', eggs: 2, bacon: '3 strips' } },
+        updateOptions,
+        function(error, breakfast) {
+          assert.ok(!!error);
+          assert.equal(2, Object.keys(error.errors).length);
+          assert.ok(Object.keys(error.errors).indexOf('steak') !== -1);
+          assert.ok(Object.keys(error.errors).indexOf('eggs') !== -1);
+          assert.ok(!breakfast);
+          db.close();
+          done();
+        });
+    });
+
+    it('validators ignore $inc', function(done) {
+      var db = start();
+
+      var s = new Schema({
+        steak: { type: String, required: true },
+        eggs: { type: Number, min: 4 }
+      });
+      var Breakfast = db.model('fam-gh-860-7', s);
+
+      var updateOptions = { runValidators: true, upsert: true, 'new': true };
+      Breakfast.findOneAndUpdate(
+        {},
+        { $inc: { eggs: 1 } },
+        updateOptions,
+        function(error, breakfast) {
+          assert.ifError(error);
+          assert.ok(!!breakfast);
+          assert.equal(1, breakfast.eggs);
+          db.close(done);
+        });
+    });
+  });
+});

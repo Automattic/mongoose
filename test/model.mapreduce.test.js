@@ -63,9 +63,11 @@ describe('model: mapreduce:', function(){
     for (var i = 0; i< num; ++i)
       docs.push({ author: authors[i%authors.length], owners: [id], published: true });
 
-    MR.create(docs, function (err, a, b) {
+    MR.create(docs, function (err, insertedDocs) {
       assert.ifError(err);
 
+      var a = insertedDocs[0];
+      var b = insertedDocs[1];
       magicID = b._id;
 
       var o = {
@@ -128,7 +130,7 @@ describe('model: mapreduce:', function(){
             assert.equal('nathan', docs[3]._id);
 
             // update casting works
-            ret.findOneAndUpdate({ _id: 'aaron' }, { published: true }, function (err, doc) {
+            ret.findOneAndUpdate({ _id: 'aaron' }, { published: true }, { 'new': true }, function (err, doc) {
               assert.ifError(err);
               assert.ok(doc);
               assert.equal('aaron', doc._id);
@@ -163,7 +165,7 @@ describe('model: mapreduce:', function(){
 
     MR.mapReduce(o, function (err, results, stats){
       assert.equal('undefined', typeof stats);
-      done();
+      db.close(done);
     });
   });
 
@@ -180,8 +182,7 @@ describe('model: mapreduce:', function(){
       var promise = MR.mapReduce(o, function(){});
       assert.ok(promise instanceof mongoose.Promise);
 
-      db.close();
-      done();
+      db.close(done);
     });
 
     it('allow not passing a callback', function(done){

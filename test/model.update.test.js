@@ -103,7 +103,7 @@ describe('model: update:', function(){
 
     post.save(function (err) {
       assert.ifError(err);
-      done();
+      db.close(done);
     });
   });
 
@@ -192,7 +192,6 @@ describe('model: update:', function(){
                   assert.ifError(err);
 
                   BlogPost.findById(post._id, function (err, up) {
-                    db.close();
                     assert.ifError(err);
 
                     assert.equal(up.title,newTitle);
@@ -210,7 +209,7 @@ describe('model: update:', function(){
                     // non-schema data was still stored in mongodb
                     assert.strictEqual(1, up._doc.idontexist);
 
-                    done();
+                    db.close(done);
                   });
                 });
               });
@@ -236,7 +235,6 @@ describe('model: update:', function(){
 
       // get the underlying doc
       BlogPost.collection.findOne({ _id: post._id }, function (err, doc) {
-        db.close();
         assert.ifError(err);
 
         var up = new BlogPost;
@@ -252,7 +250,7 @@ describe('model: update:', function(){
         assert.equal(2, doc.idontexist);
         assert.equal(100, doc.numbers[1]);
 
-        done();
+        db.close(done);
       });
     });
   })
@@ -268,7 +266,6 @@ describe('model: update:', function(){
     BlogPost.update({ _id: post._id }, update, function (err) {
       assert.ifError(err);
       BlogPost.findById(post, function (err, ret) {
-        db.close();
         assert.ifError(err);
         assert.equal(3, ret.comments.length);
         assert.equal(ret.comments[1].body,'i am number 2');
@@ -277,7 +274,7 @@ describe('model: update:', function(){
         assert.equal(ret.comments[2].body,'i am number 3');
         assert.strictEqual(true, !! ret.comments[2]._id);
         assert.ok(ret.comments[2]._id instanceof DocumentObjectId)
-        done();
+        db.close(done);
       })
     });
   })
@@ -293,14 +290,13 @@ describe('model: update:', function(){
     BlogPost.update({ _id: post._id }, update, function (err) {
       assert.ifError(err);
       BlogPost.findById(post, function (err, ret) {
-        db.close();
         assert.ifError(err);
         assert.equal(2, ret.comments.length);
         assert.equal(ret.comments[0].body,'worked great');
         assert.ok(ret.comments[0]._id instanceof DocumentObjectId)
         assert.equal(ret.comments[1].body,'i am number 3');
         assert.ok(ret.comments[1]._id instanceof DocumentObjectId)
-        done();
+        db.close(done);
       })
     });
   });
@@ -314,7 +310,7 @@ describe('model: update:', function(){
     BlogPost.update(conditions, update, function(err) {
       assert.ifError(err);
       assert.equal('string', typeof conditions._id);
-      done();
+      db.close(done);
     });
   });
 
@@ -334,7 +330,6 @@ describe('model: update:', function(){
     BlogPost.update({ _id: post._id, 'comments.body': 'worked great' }, update, function (err) {
       assert.ifError(err);
       BlogPost.findById(post, function (err, ret) {
-        db.close();
         assert.ifError(err);
         assert.equal(2, ret.comments.length);
         assert.equal(ret.comments[0].body, 'worked great');
@@ -347,7 +342,7 @@ describe('model: update:', function(){
         assert.equal(ret.comments[1].body,'i am number 3');
         assert.strictEqual(undefined, ret.comments[1].title);
         assert.ok(ret.comments[1]._id instanceof DocumentObjectId)
-        done();
+        db.close(done);
       })
     });
   })
@@ -365,7 +360,6 @@ describe('model: update:', function(){
     BlogPost.update({ _id: post._id, 'comments.body': 'worked great' }, update, function (err) {
       assert.ifError(err);
       BlogPost.findById(post, function (err, ret) {
-        db.close();
         assert.ifError(err);
         assert.equal(1, ret._doc.comments[0]._doc.newprop);
         assert.strictEqual(undefined, ret._doc.comments[1]._doc.newprop);
@@ -373,8 +367,8 @@ describe('model: update:', function(){
         assert.equal(ret.date.toString(), new Date(update.$set.date).toString());
 
         last = ret;
-        done();
-      })
+        db.close(done);
+      });
     });
   });
 
@@ -391,13 +385,12 @@ describe('model: update:', function(){
     BlogPost.update({ _id: post._id }, update, function (err) {
       assert.ifError(err);
       BlogPost.findById(post, function (err, ret) {
-        db.close();
         assert.ifError(err);
         assert.equal(1, ret.owners.length);
         assert.equal(ret.owners[0].toString(), owner.toString());
 
         last = ret;
-        done();
+        db.close(done);
       })
     });
   });
@@ -416,14 +409,13 @@ describe('model: update:', function(){
     BlogPost.update({ _id: post._id }, update, function (err) {
       assert.ifError(err);
       BlogPost.findById(post, function (err, ret) {
-        db.close();
         assert.ifError(err);
         assert.equal(2, ret.owners.length);
         assert.equal(ret.owners[0].toString(), owner.toString());
         assert.equal(ret.owners[1].toString(), newowner.toString());
 
         last = newowner;
-        done();
+        db.close(done);
       })
     });
   });
@@ -441,12 +433,11 @@ describe('model: update:', function(){
     BlogPost.update({ _id: post._id }, update, function (err) {
       assert.ifError(err);
       BlogPost.findById(post, function (err, ret) {
-        db.close();
         assert.ifError(err);
         assert.equal(1, ret.owners.length);
         assert.equal(ret.owners[0].toString(), last.toString());
         assert.strictEqual(undefined, ret.title);
-        done();
+        db.close(done);
       });
     });
   });
@@ -465,14 +456,13 @@ describe('model: update:', function(){
     BlogPost.update({ _id: post._id }, update, function (err) {
       assert.ifError(err);
       BlogPost.findById(post, function (err, ret) {
-        db.close();
         assert.ifError(err);
         assert.equal(2, ret.comments.length, 2);
         assert.equal(ret.comments[0].body, 'worked great');
         assert.equal(ret.comments[1].body, '9000');
         assert.equal(ret.comments[0].comments[0].date.toString(), new Date('11/5/2011').toString())
         assert.equal(ret.comments[1].comments.length, 0);
-        done();
+        db.close(done);
       })
     });
   });
@@ -491,11 +481,10 @@ describe('model: update:', function(){
       BlogPost.update({ _id: post._id }, update, function (err) {
         assert.ifError(err);
         BlogPost.findById(post, function (err, ret) {
-          db.close();
           assert.ifError(err);
           assert.equal(1, ret.comments.length);
           assert.equal(ret.comments[0].body, '9000');
-          done();
+          db.close(done);
         })
       });
     });
@@ -514,12 +503,11 @@ describe('model: update:', function(){
       BlogPost.update({ _id: post._id }, update, function (err) {
         assert.ifError(err);
         BlogPost.findById(post, function (err, ret) {
-          db.close();
           assert.ifError(err);
           assert.equal(0, ret.comments.length);
 
           last = ret;
-          done();
+          db.close(done);
         })
       });
     });
@@ -546,10 +534,9 @@ describe('model: update:', function(){
           BlogPost.update({ _id: ret._id }, update, function (err) {
             assert.ifError(err);
             BlogPost.findById(post, function (err, ret) {
-              db.close();
               assert.ifError(err);
               assert.equal(1, ret.comments.length);
-              done();
+              db.close(done);
             })
           });
         })
@@ -592,13 +579,12 @@ describe('model: update:', function(){
     it('(gh-699)', function(done){
       var db = start();
       var S = db.model('UpdateStrictSchema');
-      db.close();
 
       var doc = S.find()._castUpdate({ ignore: true });
       assert.equal(false, doc);
       var doc = S.find()._castUpdate({ $unset: {x: 1}});
       assert.equal(1, Object.keys(doc.$unset).length);
-      done();
+      db.close(done);
     });
 
     it('works', function(done){
@@ -611,7 +597,7 @@ describe('model: update:', function(){
 
         S.update({ _id: s._id }, { ignore: true }, function (err, affected) {
           assert.ifError(err);
-          assert.equal(0, affected);
+          assert.equal(0, affected.n);
 
           S.findById(s._id, function (err, doc) {
             assert.ifError(err);
@@ -620,7 +606,7 @@ describe('model: update:', function(){
 
             S.update({ _id: s._id }, { name: 'Drukqs', foo: 'fooey' }, function (err, affected) {
               assert.ifError(err);
-              assert.equal(1, affected);
+              assert.equal(1, affected.n);
 
               S.findById(s._id, function (err, doc) {
                 db.close();
@@ -644,7 +630,7 @@ describe('model: update:', function(){
       B.update({}, { title: 'newtitle' }, { multi: true }, function (err, affected) {
         db.close();
         assert.ifError(err);
-        assert.equal(3, affected);
+        assert.equal(3, affected.n);
         done();
       });
     });
@@ -677,7 +663,7 @@ describe('model: update:', function(){
       assert.ifError(err);
       M.update({ _id: doc._id }, { $pull: { comments: { name: 'node 0.8' }}}, function (err, affected) {
         assert.ifError(err);
-        assert.equal(1, affected);
+        assert.equal(1, affected.n);
         db.close();
         done();
       });
@@ -721,7 +707,7 @@ describe('model: update:', function(){
             assert.equal(1, proj.components[0].tasks.length);
             assert.equal('my task', proj.components[0].tasks[0].name);
             assert.equal(task.id, proj.components[0].tasks[0].id);
-            done();
+            db.close(done);
           })
         });
       });
@@ -741,7 +727,7 @@ describe('model: update:', function(){
           assert.ifError(err);
           assert.equal(1, doc.counts['1']);
           assert.equal(10, doc.counts['1a']);
-          done();
+          db.close(done);
         });
       });
     })
@@ -763,7 +749,7 @@ describe('model: update:', function(){
           assert.ifError(err);
 
           assert.strictEqual(ss.obj[1], '2');
-          done();
+          db.close(done);
         });
       });
     });
@@ -774,20 +760,23 @@ describe('model: update:', function(){
     var so = new Schema({ num : Number });
     var Some = db.model('gh-2170' + random(), so);
 
-    Some.create([ {num: 1}, {num: 1} ], function(err, doc0, doc1){
+    Some.create([ {num: 1}, {num: 1} ], function(err, docs) {
       assert.ifError(err);
+      assert.equal(docs.length, 2);
+      var doc0 = docs[0];
+      var doc1 = docs[1];
       var sId0 = doc0._id;
       var sId1 = doc1._id;
       Some.where({_id: sId0}).update({}, {$set: {num: '99'}}, {multi: true}, function(err, cnt){
         assert.ifError(err);
-        assert.equal(1, cnt);
+        assert.equal(1, cnt.n);
         Some.findById(sId0, function(err, doc0_1){
           assert.ifError(err);
           assert.equal(99, doc0_1.num);
           Some.findById(sId1, function(err, doc1_1){
             assert.ifError(err);
             assert.equal(1, doc1_1.num);
-            done();
+            db.close(done);
           });
         });
       });
@@ -832,7 +821,7 @@ describe('model: update:', function(){
             M.findOne(function (err, doc) {
               assert.equal(47, doc.age);
               assert.equal('changed', doc.name);
-              done();
+              db.close(done);
             });
           });
         });
@@ -865,7 +854,7 @@ describe('model: update:', function(){
             assert.equal(created.id, doc.id)
             assert.equal(1, doc.n.length);
             assert.equal(10, doc.n[0].x);
-            done()
+            db.close(done);
           })
         })
       })
@@ -907,7 +896,7 @@ describe('model: update:', function(){
                assert.equal(2, m.n[0].x);
                assert.equal(1, m.n[1].x);
                assert.equal(0, m.n[2].x);
-               done();
+               db.close(done);
              });
            });
       });
@@ -936,7 +925,7 @@ describe('model: update:', function(){
                assert.ifError(error);
                assert.ok(m.lastModified.getTime() >= before);
                assert.ok(m.lastModified.getTime() <= after);
-               done();
+               db.close(done);
              });
            });
       });
@@ -959,7 +948,7 @@ describe('model: update:', function(){
             assert.equal(created.id, doc.id)
             assert.equal(typeof doc.mixed, 'object');
             assert.equal(Object.keys(doc.mixed).length, 0);
-            done()
+            db.close(done);
           })
         })
       })
@@ -981,7 +970,7 @@ describe('model: update:', function(){
             assert.equal(doc.title, 'something!');
             assert.equal(doc.subdoc.name, undefined);
             assert.equal(doc.subdoc.num, undefined);
-            done();
+            db.close(done);
           });
         });
       });
@@ -1003,7 +992,7 @@ describe('model: update:', function(){
             assert.equal(doc.title, undefined);
             assert.equal(doc.subdoc.name, undefined);
             assert.equal(doc.subdoc.num, undefined);
-            done();
+            db.close(done);
           });
         });
       });
@@ -1022,12 +1011,197 @@ describe('model: update:', function(){
       Some.update({ _id: s._id }, { arr: [] }, function(err) {
         if (err) return done(err);
         Some.findById(s._id, function(err, doc) {
-          db.close();
           if (err) return done(err);
           assert.ok(Array.isArray(doc.arr));
           assert.strictEqual(0, doc.arr.length);
+          db.close(done);
+        });
+      });
+    });
+  });
+
+  describe('defaults and validators (gh-860)', function() {
+    it('applies defaults on upsert', function(done) {
+      var db = start();
+
+      var s = new Schema({ topping: { type: String, default: 'bacon' }, base: String });
+      var Breakfast = db.model('gh-860-0', s);
+
+      var updateOptions = { upsert: true, setDefaultsOnInsert: true };
+      Breakfast.update({}, { base: 'eggs' }, updateOptions, function(error) {
+        assert.ifError(error);
+        Breakfast.findOne({}, function(error, breakfast) {
+          assert.ifError(error);
+          assert.equal('eggs', breakfast.base);
+          assert.equal('bacon', breakfast.topping);
+          db.close(done);
+        });
+      });
+    });
+
+    it('doesnt set default on upsert if query sets it', function(done) {
+      var db = start();
+
+      var s = new Schema({ topping: { type: String, default: 'bacon' }, base: String });
+      var Breakfast = db.model('gh-860-1', s);
+
+      var updateOptions = { upsert: true, setDefaultsOnInsert: true };
+      Breakfast.update({ topping: 'sausage' }, { base: 'eggs' }, updateOptions, function(error) {
+        assert.ifError(error);
+        Breakfast.findOne({}, function(error, breakfast) {
+          assert.ifError(error);
+          assert.equal('eggs', breakfast.base);
+          assert.equal('sausage', breakfast.topping);
+          db.close();
           done();
         });
+      });
+    });
+
+    it('properly sets default on upsert if query wont set it', function(done) {
+      var db = start();
+
+      var s = new Schema({ topping: { type: String, default: 'bacon' }, base: String });
+      var Breakfast = db.model('gh-860-2', s);
+
+      var updateOptions = { upsert: true, setDefaultsOnInsert: true };
+      Breakfast.update({ topping: { $ne: 'sausage' } }, { base: 'eggs' }, updateOptions, function(error) {
+        assert.ifError(error);
+        Breakfast.findOne({}, function(error, breakfast) {
+          assert.ifError(error);
+          assert.equal('eggs', breakfast.base);
+          assert.equal('bacon', breakfast.topping);
+          db.close();
+          done();
+        });
+      });
+    });
+
+    it('runs validators if theyre set', function(done) {
+      var db = start();
+
+      var s = new Schema({
+        topping: { type: String, validate: function(v) { return false; } },
+        base: { type: String, validate: function(v) { return true; } }
+      });
+      var Breakfast = db.model('gh-860-3', s);
+
+      var updateOptions = { upsert: true, setDefaultsOnInsert: true, runValidators: true };
+      Breakfast.update({}, { topping: 'bacon', base: 'eggs' }, updateOptions, function(error) {
+        assert.ok(!!error);
+        assert.equal(1, Object.keys(error.errors).length);
+        assert.equal('topping', Object.keys(error.errors)[0]);
+        assert.equal('Validator failed for path `topping` with value `bacon`',
+          error.errors['topping'].message);
+
+        Breakfast.findOne({}, function(error, breakfast) {
+          assert.ifError(error);
+          assert.ok(!breakfast);
+          db.close();
+          done();
+        });
+      });
+    });
+
+    it('validators handle $unset and $setOnInsert', function(done) {
+      var db = start();
+
+      var s = new Schema({
+        steak: { type: String, required: true },
+        eggs: { type: String, validate: function(v) { return false; } }
+      });
+      var Breakfast = db.model('gh-860-4', s);
+
+      var updateOptions = { runValidators: true };
+      Breakfast.update({}, { $unset: { steak: '' }, $setOnInsert: { eggs: 'softboiled' } }, updateOptions, function(error) {
+        assert.ok(!!error);
+        assert.equal(2, Object.keys(error.errors).length);
+        assert.ok(Object.keys(error.errors).indexOf('eggs') !== -1);
+        assert.ok(Object.keys(error.errors).indexOf('steak') !== -1);
+        assert.equal('Validator failed for path `eggs` with value `softboiled`',
+          error.errors['eggs'].message);
+        assert.equal('Path `steak` is required.',
+          error.errors['steak'].message);
+        db.close();
+        done();
+      });
+    });
+
+    it('min/max, enum, and regex built-in validators work', function(done) {
+      var db = start();
+
+      var s = new Schema({
+        steak: { type: String, enum: ['ribeye', 'sirloin'] },
+        eggs: { type: Number, min: 4, max: 6 },
+        bacon: { type: String, match: /strips/ }
+      });
+      var Breakfast = db.model('gh-860-5', s);
+
+      var updateOptions = { runValidators: true };
+      Breakfast.update({}, { $set: { steak: 'ribeye', eggs: 3, bacon: '3 strips' } }, updateOptions, function(error) {
+        assert.ok(!!error);
+        assert.equal(1, Object.keys(error.errors).length);
+        assert.equal('eggs', Object.keys(error.errors)[0]);
+        assert.equal('Path `eggs` (3) is less than minimum allowed value (4).',
+          error.errors['eggs'].message);
+
+        Breakfast.update({}, { $set: { steak: 'tofu', eggs: 5, bacon: '3 strips' } }, updateOptions, function(error) {
+          assert.ok(!!error);
+          assert.equal(1, Object.keys(error.errors).length);
+          assert.equal('steak', Object.keys(error.errors)[0]);
+          assert.equal('`tofu` is not a valid enum value for path `steak`.',
+            error.errors['steak']);
+
+
+          Breakfast.update({}, { $set: { steak: 'sirloin', eggs: 6, bacon: 'none' } }, updateOptions, function(error) {
+            assert.ok(!!error);
+            assert.equal(1, Object.keys(error.errors).length);
+            assert.equal('bacon', Object.keys(error.errors)[0]);
+            assert.equal('Path `bacon` is invalid (none).',
+              error.errors['bacon'].message);
+
+            db.close();
+            done();
+          });
+        });
+      });
+    });
+
+    it('multiple validation errors', function(done) {
+      var db = start();
+
+      var s = new Schema({
+        steak: { type: String, enum: ['ribeye', 'sirloin'] },
+        eggs: { type: Number, min: 4, max: 6 },
+        bacon: { type: String, match: /strips/ }
+      });
+      var Breakfast = db.model('gh-860-6', s);
+
+      var updateOptions = { runValidators: true };
+      Breakfast.update({}, { $set: { steak: 'tofu', eggs: 2, bacon: '3 strips' } }, updateOptions, function(error) {
+        assert.ok(!!error);
+        assert.equal(2, Object.keys(error.errors).length);
+        assert.ok(Object.keys(error.errors).indexOf('steak') !== -1);
+        assert.ok(Object.keys(error.errors).indexOf('eggs') !== -1);
+        db.close();
+        done();
+      });
+    });
+
+    it('validators ignore $inc', function(done) {
+      var db = start();
+
+      var s = new Schema({
+        steak: { type: String, required: true },
+        eggs: { type: Number, min: 4 }
+      });
+      var Breakfast = db.model('gh-860-7', s);
+
+      var updateOptions = { runValidators: true };
+      Breakfast.update({}, { $inc: { eggs: 1 } }, updateOptions, function(error) {
+        assert.ifError(error);
+        db.close();
+        done();
       });
     });
   });
@@ -1051,6 +1225,107 @@ describe('model: update:', function(){
             assert.equal(doc.breakfast, 'eggs');
             db.close(done);
           });
+        });
+    });
+  });
+
+  describe('middleware', function() {
+    it('can specify pre and post hooks', function(done) {
+      var db = start();
+
+      var numPres = 0;
+      var numPosts = 0;
+      var band = new Schema({ members: [String] });
+      band.pre('update', function(next) {
+        ++numPres;
+        next();
+      });
+      band.post('update', function() {
+        ++numPosts;
+      });
+      var Band = db.model('gh-964', band);
+
+      var gnr = new Band({ members: ['Axl', 'Slash', 'Izzy', 'Duff', 'Adler' ] });
+      gnr.save(function(error) {
+        assert.ifError(error);
+        assert.equal(0, numPres);
+        assert.equal(0, numPosts);
+        Band.update(
+          { _id: gnr._id },
+          { $pull: { members: 'Adler' } },
+          function(error) {
+            assert.ifError(error);
+            assert.equal(1, numPres);
+            assert.equal(1, numPosts);
+            Band.findOne({ _id: gnr._id }, function(error, doc) {
+              assert.ifError(error);
+              assert.deepEqual(['Axl', 'Slash', 'Izzy', 'Duff'],
+                doc.toObject().members);
+              db.close(done);
+            });
+          });
+      });
+    });
+
+    it('runs before validators (gh-2706)', function(done) {
+      var db = start();
+
+      var bandSchema = new Schema({
+        lead: { type: String, enum: ['Axl Rose'] }
+      });
+      bandSchema.pre('update', function() {
+        this.options.runValidators = true;
+      });
+      var Band = db.model('gh2706', bandSchema, 'gh2706');
+
+      Band.update({}, { $set: { lead: 'Not Axl' } }, function(err) {
+        assert.ok(err);
+        db.close(done);
+      });
+    });
+
+    it('embedded objects (gh-2733)', function(done) {
+      var db = start();
+
+      var bandSchema = new Schema({
+        singer: {
+          firstName: { type: String, enum: ['Axl'] },
+          lastName: { type: String, enum: ['Rose'] }
+        }
+      });
+      bandSchema.pre('update', function() {
+        this.options.runValidators = true;
+      });
+      var Band = db.model('gh2706', bandSchema, 'gh2706');
+
+      Band.update({}, { $set: { singer: { firstName: 'Not', lastName: 'Axl' } } }, function(err) {
+        assert.ok(err);
+        db.close(done);
+      });
+    });
+
+    it('handles document array validation (gh-2733)', function(done) {
+      var db = start();
+
+      var member = new Schema({
+        name: String,
+        role: { type: String, required: true, enum: ['singer', 'guitar', 'drums', 'bass'] }
+      });
+      var band = new Schema({ members: [member], name: String });
+      var Band = db.model('band', band, 'bands');
+      var members = [
+        { name: 'Axl Rose', role: 'singer' },
+        { name: 'Slash', role: 'guitar' },
+        { name: 'Christopher Walken', role: 'cowbell' }
+      ];
+
+      Band.findOneAndUpdate(
+        { name: "Guns N' Roses" },
+        { $set: { members: members } },
+        { runValidators: true },
+        function(err) {
+          assert.ok(err);
+          done();
         });
     });
   });

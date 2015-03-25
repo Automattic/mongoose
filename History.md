@@ -1,3 +1,12 @@
+4.0.0 / 2015-03-25
+==================
+ * fixed; on-the-fly schema docs typo #2783 [artiifix](https://github.com/artiifix)
+ * fixed; cast error validation handling #2775 #2766 #2678
+ * fixed; discriminators with populate() #2773 #2719 [chetverikov](https://github.com/chetverikov)
+ * fixed; increment now a reserved path #2709
+ * fixed; avoid sending duplicate object ids in populate() #2683
+ * upgraded; mongodb to 2.0.24 to properly emit reconnect event multiple times #2656
+
 4.0.0-rc4 / 2015-03-14
 ======================
  * fixed; toObject virtuals schema option handled properly #2751

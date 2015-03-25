@@ -2,7 +2,7 @@
 
 Mongoose is a [MongoDB](http://www.mongodb.org/) object modeling tool designed to work in an asynchronous environment.
 
-[![Build Status](https://travis-ci.org/LearnBoost/mongoose.png?branch=master)](https://travis-ci.org/LearnBoost/mongoose)
+[![Build Status](https://api.travis-ci.org/Automattic/mongoose.png?branch=master)](https://travis-ci.org/Automattic/mongoose)
 [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/LearnBoost/mongoose?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 ## Documentation
@@ -12,7 +12,7 @@ Mongoose is a [MongoDB](http://www.mongodb.org/) object modeling tool designed t
 ## Support
 
   - [Stack Overflow](http://stackoverflow.com/questions/tagged/mongoose)
-  - [bug reports](https://github.com/learnboost/mongoose/issues/)
+  - [bug reports](https://github.com/Automattic/mongoose/issues/)
   - [help forum](http://groups.google.com/group/mongoose-orm)
   - [MongoDB support](http://www.mongodb.org/display/DOCS/Technical+Support)
   - (irc) #mongoosejs on freenode
@@ -25,7 +25,7 @@ Build your own Mongoose plugin through [generator-mongoose-plugin](https://githu
 
 ## Contributors
 
-View all 100+ [contributors](https://github.com/learnboost/mongoose/graphs/contributors). Stand up and be counted as a [contributor](https://github.com/LearnBoost/mongoose/blob/master/CONTRIBUTING.md) too!
+View all 100+ [contributors](https://github.com/Automattic/mongoose/graphs/contributors). Stand up and be counted as a [contributor](https://github.com/Automattic/mongoose/blob/master/CONTRIBUTING.md) too!
 
 ## Live Examples
 <a href="http://runnable.com/mongoose" target="_blank"><img src="http://runnable.com/external/styles/assets/runnablebtn.png" style="width:67px;height:25px;"></a>
@@ -40,7 +40,7 @@ $ npm install mongoose
 
 ## Stability
 
-The current stable branch is [3.8.x](https://github.com/LearnBoost/mongoose/tree/3.8.x). New (unstable) development always occurs on the [master](https://github.com/LearnBoost/mongoose/tree/master) branch.
+The current stable branch is [3.8.x](https://github.com/Automattic/mongoose/tree/3.8.x). New (unstable) development always occurs on the [master](https://github.com/Automattic/mongoose/tree/master) branch.
 
 ## Overview
 

@@ -1,0 +1,93 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>Mongoose Using Mongoose Schema Validation in the Browser v4.0.0</title><link href="http://fonts.googleapis.com/css?family=Anonymous+Pro:400,700|Droid+Sans+Mono|Open+Sans:400,700|Linden+Hill|Quattrocento:400,700|News+Cycle:400,700|Antic+Slab|Cabin+Condensed:400,700" rel="stylesheet" type="text/css"><link href="css/default.css" rel="stylesheet" type="text/css"><link href="css/guide.css" rel="stylesheet" type="text/css"></head><body><a id="forkbanner" href="http://github.com/learnboost/mongoose"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png" alt="Fork me on GitHub"></a><div id="links"><div id="header"><h1><a href="../index.html"><div class="mongoose">Mongoose</div></a></h1></div><ul><li class="home"><a href="../index.html">home</a></li><li class="faq"><a href="./faq.html">FAQ</a></li><li class="plugins"><a href="http://plugins.mongoosejs.com">plugins</a></li><li class="changelog"><a href="http://github.com/learnboost/mongoose/tree/master/History.md">change log</a></li><li class="support"><a href="../index.html#support">support</a></li><li class="fork"><a href="http://github.com/learnboost/mongoose">fork</a></li><li class="guide"><a href="./guide.html">guide</a></li><li class="api"><a href="./api.html">API docs</a></li><li class="quickstart"><a href="./index.html">quick start</a></li><li class="contrib"><a href="http://github.com/learnboost/mongoose/contributors">contributors</a></li><li class="prior"><a href="./prior.html">prior releases</a></li></ul></div><div id="content"><div class="module"><gcse:search></gcse:search><h2><p>Mongoose in the browser</p>
+</h2><p>As of v3.9.3, Mongoose schema declarations are isomorphic, that is,
+you can use mongoose&#39;s browser component to validate objects against
+your mongoose schemas in the browser.</p>
+<p>To include mongoose in your browser code, you can use
+<code>require(&#39;mongoose&#39;)</code> if you are using <a href="https://www.npmjs.com/package/browserify">Browserify</a>
+or you can include mongoose in a <code>script</code> tag. The below example
+utilizes mongoose&#39;s Amazon <a href="http://aws.amazon.com/cloudfront/">CloudFront</a>
+CDN.</p>
+<pre><code>&lt;script type=&quot;text/javascript&quot; src=&quot;//d1l4stvdmqmdzl.cloudfront.net/3.9.6/mongoose.js&quot;&gt;
+&lt;/script&gt;
+</code></pre><h3><p>Declaring schemas in the browser</p>
+</h3><p>When you include the <code>mongoose.js</code> file in a script tag, mongoose will
+attach a <code>mongoose</code> object to the global <code>window</code>. This object includes
+a Schema constructor that you can use to define schemas much like
+in NodeJS.</p>
+<p>Note: Mongoose&#39;s browser component requires an ECMAScript 5 compliant
+browser. In particular, it will <em>not</em> work in Internet Explorer 8
+or Safari 5.</p>
+<h4><p>allows you to use mongoose types</p>
+</h4><pre><code class="javascript">
+      var foodSchema = new mongoose.Schema({ name: String });
+      var breakfastSchema = new mongoose.Schema({
+        foods: [foodSchema],
+        date: { type: Date, default: Date.now }
+      });
+
+      assert.ok(foodSchema.path('name') instanceof mongoose.Schema.Types.String);
+      assert.ok(breakfastSchema.path('foods') instanceof mongoose.Schema.Types.DocumentArray);
+      assert.ok(breakfastSchema.path('date') instanceof mongoose.Schema.Types.Date);
+    </code></pre><h3><p>Validating documents in the browser</p>
+</h3><p>The primary goal of mongoose&#39;s browser component is to validate documents
+against a given schema. Because the mongoose browser component doesn&#39;t
+currently support any sort of querying, you&#39;re responsible for creating
+your own documents.</p>
+<h4><p>allows you to create a schema and use it to validate documents</p>
+</h4><pre><code class="javascript">
+      var schema = new mongoose.Schema({
+        name: { type: String, required: true },
+        quest: { type: String, match: /Holy Grail/i, required: true },
+        favoriteColor: { type: String, enum: ['Red', 'Blue'], required: true }
+      });
+
+      /* `mongoose.Document` is different in the browser than in NodeJS.
+       * the constructor takes an initial state and a schema. You can
+       * then modify the document and call `validate()` to make sure it
+       * passes validation rules. */
+      var doc = new mongoose.Document({}, schema);
+      doc.validate(function(error) {
+        assert.ok(error);
+        assert.equal('Path `name` is required.', error.errors['name'].message);
+        assert.equal('Path `quest` is required.', error.errors['quest'].message);
+        assert.equal('Path `favoriteColor` is required.',
+          error.errors['favoriteColor'].message);
+
+        doc.name = 'Sir Lancelot of Camelot';
+        doc.quest = 'To seek the holy grail';
+        doc.favoriteColor = 'Blue';
+        doc.validate(function(error) {
+          assert.ifError(error);
+
+          doc.name = 'Sir Galahad of Camelot';
+          doc.quest = 'I seek the grail'; // Invalid, must contain 'holy grail'
+          doc.favoriteColor = 'Yellow'; // Invalid, not 'Red' or 'Blue'
+          doc.validate(function(error) {
+            assert.ok(error);
+            assert.ok(!error.errors['name']);
+            assert.equal('Path `quest` is invalid (I seek the grail).',
+              error.errors['quest'].message);
+            assert.equal('`Yellow` is not a valid enum value for path `favoriteColor`.',
+              error.errors['favoriteColor'].message);
+            done();
+          });
+        });
+      });
+    </code></pre></div></div><script>document.body.className = 'load';</script><script>;(function() {
+  var cx = '012173159455227967368:uvscsuqjovs';
+  var gcse = document.createElement('script');
+  gcse.type = 'text/javascript';
+  gcse.async = true;
+  gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+      '//www.google.com/cse/cse.js?cx=' + cx;
+  var s = document.getElementsByTagName('script')[0];
+  s.parentNode.insertBefore(gcse, s);
+})();</script><script>var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-1122274-9']);
+_gaq.push(['_trackPageview', location.pathname + location.search + location.hash]);
+
+(function() {
+  var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+  ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+  var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+})();</script></body></html>

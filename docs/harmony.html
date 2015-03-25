@@ -1,0 +1,394 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>Mongoose Using Mongoose with ECMAScript 6 (Harmony) v4.0.0</title><link href="http://fonts.googleapis.com/css?family=Anonymous+Pro:400,700|Droid+Sans+Mono|Open+Sans:400,700|Linden+Hill|Quattrocento:400,700|News+Cycle:400,700|Antic+Slab|Cabin+Condensed:400,700" rel="stylesheet" type="text/css"><link href="css/default.css" rel="stylesheet" type="text/css"><link href="css/guide.css" rel="stylesheet" type="text/css"></head><body><a id="forkbanner" href="http://github.com/learnboost/mongoose"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png" alt="Fork me on GitHub"></a><div id="links"><div id="header"><h1><a href="../index.html"><div class="mongoose">Mongoose</div></a></h1></div><ul><li class="home"><a href="../index.html">home</a></li><li class="faq"><a href="./faq.html">FAQ</a></li><li class="plugins"><a href="http://plugins.mongoosejs.com">plugins</a></li><li class="changelog"><a href="http://github.com/learnboost/mongoose/tree/master/History.md">change log</a></li><li class="support"><a href="../index.html#support">support</a></li><li class="fork"><a href="http://github.com/learnboost/mongoose">fork</a></li><li class="guide"><a href="./guide.html">guide</a></li><li class="api"><a href="./api.html">API docs</a></li><li class="quickstart"><a href="./index.html">quick start</a></li><li class="contrib"><a href="http://github.com/learnboost/mongoose/contributors">contributors</a></li><li class="prior"><a href="./prior.html">prior releases</a></li></ul></div><div id="content"><div class="module"><gcse:search></gcse:search><h2><p>Documents in ES6</p>
+</h2><p>Asynchronous document functions return
+<a href="https://www.npmjs.org/package/mpromise">promises</a>, and so are compatible
+with the <a href="http://mzl.la/1gSa8Gu">ES6 <code>yield</code> keyword</a> and libraries like
+<a href="https://www.npmjs.org/package/co">co</a>.</p>
+<p>Note that the <code>yield</code> keyword is currently only supported in NodeJS 0.11.x
+with the <code>--harmony</code> flag.</p>
+<h4><p>validate() integrates with co and the yield keyword</p>
+</h4><pre><code class="javascript">
+    co(function*() {
+      var schema = null;
+      var called = false;
+      var shouldSucceed = true;
+      var error;
+
+      var validate = {
+        validator: function(str) {
+          called = true;
+          return shouldSucceed;
+        },
+        message: 'BAM'
+      };
+
+      schema = new Schema({
+        eggs: { type: String, required: true, validate: validate },
+        bacon: { type: Boolean, required: true }
+      });
+ 
+      var M = db.model('validateSchema', schema, getCollectionName());
+      var m = new M({ eggs: 'Sunny side up', bacon: false });
+
+      try {
+        yield m.validate();
+      } catch(e) {
+        error = e;
+      }
+
+      assert.ok(!error);
+      assert.equal(true, called);
+      called = false;
+
+      // The validator function above should now fail
+      shouldSucceed = false;
+      try {
+        yield m.validate();
+      } catch(e) {
+        error = e;
+      }
+
+      assert.ok(error);
+      assert.ok(error instanceof ValidationError);
+
+      done();
+    })();
+  </code></pre><h4><p>save() integrates with co and the yield keyword</p>
+</h4><pre><code class="javascript">
+    co(function*() {
+      var error;
+      var schema = new Schema({
+        description: { type: String, required: true },
+      });
+
+      var Breakfast = db.model('breakfast', schema, getCollectionName());
+
+      var goodBreakfast = new Breakfast({ description: 'eggs &amp; bacon' });
+
+      try {
+        yield goodBreakfast.save();
+      } catch(e) {
+        error = e;
+      }
+
+      assert.ifError(error);
+      var result;
+      try {
+        result = yield Breakfast.findOne().exec();
+      } catch(e) {
+        error = e;
+      }
+      assert.ifError(error);
+      assert.equal('eggs &amp; bacon', result.description);
+
+      // Should cause a validation error because `description` is required
+      var badBreakfast = new Breakfast({});
+      try {
+        yield badBreakfast.save();
+      } catch(e) {
+        error = e;
+      }
+
+      assert.ok(error);
+      assert.ok(error instanceof ValidationError);
+
+      done();
+    })();
+  </code></pre><h4><p>populate() <em>requires</em> execPopulate() to work with the yield keyword</p>
+</h4><pre><code class="javascript">
+    /**
+     *  Because the `populate()` function supports chaining, it's difficult
+     *  to determine when the chain is 'done'. Therefore, you need to call
+     *  `execPopulate()` to use `populate()` with `yield`.
+     */
+    co(function*() {
+      var error;
+      var breakfastCollectionName = getCollectionName();
+      var foodCollectionName = getCollectionName();
+      var breakfastSchema = new Schema({
+        foods: [{ type: mongoose.Schema.ObjectId, ref: foodCollectionName }],
+      });
+
+      var foodSchema = new Schema({
+        name: String
+      });
+
+      var Food = db.model(foodCollectionName, foodSchema, foodCollectionName);
+      var Breakfast = db.model(breakfastCollectionName, breakfastSchema, breakfastCollectionName);
+
+      var bacon = new Food({ name: 'bacon' });
+      var eggs = new Food({ name: 'eggs' });
+      var goodBreakfast = new Breakfast({ foods: [bacon, eggs] });
+
+      try {
+        yield [bacon.save(), eggs.save(), goodBreakfast.save()];
+      } catch(e) {
+        error = e;
+      }
+
+      var result;
+      try {
+        result = yield Breakfast.findOne().exec();
+      } catch(e) {
+        error = e;
+      }
+      assert.ifError(error);
+      assert.equal(2, result.foods.length);
+
+      try {
+        result = yield result.populate('foods').execPopulate();
+      } catch(e) {
+        error = e;
+      }
+      assert.ifError(error);
+      assert.equal(2, result.foods.length);
+      assert.equal('bacon', result.foods[0].name);
+      assert.equal('eggs', result.foods[1].name);
+
+      done();
+    })();
+  </code></pre><h4><p>update() works with co and yield</p>
+</h4><pre><code class="javascript">
+    co(function*() {
+      var schema = new Schema({
+        steak: String,
+        eggs: String
+      });
+
+      var Breakfast = db.model('breakfast', schema, getCollectionName());
+
+      var breakfast = new Breakfast({});
+      var error;
+
+      try {
+        yield breakfast.update({ steak: 'Ribeye', eggs: 'Scrambled' }, { upsert: true }).exec();
+      } catch(e) {
+        error = e;
+      }
+
+      assert.ifError(error);
+      var result;
+      try {
+        result = yield Breakfast.findOne().exec();
+      } catch(e) {
+        error = e;
+      }
+      assert.ifError(error);
+      assert.equal(breakfast._id.toString(), result._id.toString());
+      assert.equal('Ribeye', result.steak);
+      assert.equal('Scrambled', result.eggs);
+      done();
+    })();
+  </code></pre><h2><p>Queries in ES6</p>
+</h2><p>Mongoose queries&#39; .exec() function returns a
+<a href="https://www.npmjs.org/package/mpromise">promise</a>, and so its compatible
+with the <a href="http://mzl.la/1gSa8Gu">ES6 <code>yield</code> keyword</a> and libraries like
+<a href="https://www.npmjs.org/package/co">co</a>.</p>
+<p>Note that the <code>yield</code> keyword is currently only supported in NodeJS 0.11.x
+with the <code>--harmony</code> flag.</p>
+<h4><p><code>exec()</code> integrates with co and the yield keyword</p>
+</h4><pre><code class="javascript">
+    co(function*() {
+      var schema = new Schema({
+        eggs: { type: Number, required: true },
+        bacon: { type: Number, required: true }
+      });
+ 
+      var Breakfast = db.model('BreakfastHarmony', schema, getCollectionName());
+
+      try {
+        yield Breakfast.create(
+          { eggs: 4, bacon: 2 },
+          { eggs: 3, bacon: 3 },
+          { eggs: 2, bacon: 4 });
+      } catch(e) {
+        return done(e);
+      }
+
+      var result;
+      try {
+        result = yield Breakfast.findOne({ eggs: 4 }).exec();
+      } catch(e) {
+        return done(e);
+      }
+
+      assert.equal(2, result.bacon);
+
+      var results;
+      try {
+        results = yield Breakfast.find({ eggs: { $gt: 2 } }).sort({ bacon: 1 }).exec();
+      } catch(e) {
+        return done(e);
+      }
+
+      assert.equal(2, results.length);
+      assert.equal(2, results[0].bacon);
+      assert.equal(3, results[1].bacon);
+
+      var count;
+      try {
+        count = yield Breakfast.count({ eggs: { $gt: 2 } }).exec();
+      } catch(e) {
+        return done(e);
+      }
+
+      assert.equal(2, count);
+
+      done();
+    })();
+  </code></pre><h4><p>can call <code>populate()</code> with <code>exec()</code></p>
+</h4><pre><code class="javascript">
+    co(function*() {
+      var bookSchema = new Schema({
+        author: { type: mongoose.Schema.ObjectId, ref: 'AuthorHarmony' },
+        title: String
+      });
+
+      var authorSchema = new Schema({
+        name: String
+      });
+
+      var Book = db.model('BookHarmony', bookSchema, getCollectionName());
+      var Author = db.model('AuthorHarmony', authorSchema, getCollectionName());
+
+      try {
+        var hugo = yield Author.create({ name: 'Victor Hugo' });
+        yield Book.create({ author: hugo._id, title: 'Les Miserables' });
+      } catch(e) {
+        return done(e);
+      }
+
+      var result;
+      try {
+        result = yield Book.findOne({ title: 'Les Miserables' }).populate('author').exec();
+      } catch(e) {
+        return done(e);
+      }
+
+      assert.equal('Victor Hugo', result.author.name);
+
+      done();
+    })();
+  </code></pre><h2><p>Models in ES6</p>
+</h2><p>Asynchronous functions on Model return
+<a href="https://www.npmjs.org/package/mpromise">promises</a>, and so are compatible
+with the <a href="http://mzl.la/1gSa8Gu">ES6 <code>yield</code> keyword</a> and libraries like
+<a href="https://www.npmjs.org/package/co">co</a>.</p>
+<p>Note that the functions <code>find()</code>, <code>findOne()</code>, <code>findById()</code>, <code>count()</code>,
+<code>findOneAndUpdate()</code>, <code>remove()</code>, <code>distinct()</code>, <code>findByIdAndUpdate()</code>,
+<code>findOneAndRemove()</code>, <code>update()</code>, and <code>findByIdAndRemove()</code> return <em>Query</em>
+objects, and so you need to use <code>.exec()</code> to use these functions with
+<code>yield</code> as described above.</p>
+<h4><p><code>create()</code> integrates with co and the yield keyword</p>
+</h4><pre><code class="javascript">
+    co(function*() {
+      schema = new Schema({
+        eggs: { type: String, required: true },
+        bacon: { type: Boolean, required: true }
+      });
+ 
+      var M = db.model('harmonyCreate', schema, getCollectionName());
+
+      var results;
+      try {
+        results = yield M.create([
+          { eggs: 'sunny-side up', bacon: false },
+          { eggs: 'scrambled', bacon: true }]);
+      } catch(e) {
+        return done(e);
+      }
+
+      assert.equal(2, results.length);
+      assert.equal('sunny-side up', results[0].eggs);
+      assert.equal('scrambled', results[1].eggs);
+
+      done();
+    })();
+  </code></pre><h4><p><code>aggregate()</code> integrates with co and the yield keyword</p>
+</h4><pre><code class="javascript">
+    co(function*() {
+      schema = new Schema({
+        eggs: { type: String, required: true },
+        bacon: { type: Boolean, required: true }
+      });
+
+      var M = db.model('harmonyAggregate', schema, getCollectionName());
+
+      try {
+        yield M.create([
+          { eggs: 'sunny-side up', bacon: false },
+          { eggs: 'scrambled', bacon: true }]);
+      } catch(e) {
+        return done(e);
+      }
+
+      var results;
+      try {
+        results = yield M.aggregate([
+          { $group: { _id: '$bacon', eggs: { $first: '$eggs' } } },
+          { $sort: { _id: 1 } }
+        ]).exec();
+      } catch(e) {
+        return done(e);
+      }
+
+      assert.equal(2, results.length);
+      assert.equal(false, results[0]._id);
+      assert.equal('sunny-side up', results[0].eggs);
+      assert.equal(true, results[1]._id);
+      assert.equal('scrambled', results[1].eggs);
+
+      done();
+    })();
+  </code></pre><h4><p><code>mapReduce()</code> can also be used with co and yield</p>
+</h4><pre><code class="javascript">
+    co(function*() {
+      schema = new Schema({
+        eggs: { type: String, required: true },
+        bacon: { type: Boolean, required: true }
+      });
+
+      var M = db.model('harmonyMapreduce', schema, getCollectionName());
+
+      try {
+        yield M.create([
+          { eggs: 'sunny-side up', bacon: false },
+          { eggs: 'sunny-side up', bacon: true },
+          { eggs: 'scrambled', bacon: true }]);
+      } catch(e) {
+        return done(e);
+      }
+
+      var results;
+      try {
+        results = yield M.mapReduce({
+          map: function() { emit(this.eggs, 1); },
+          reduce: function(k, vals) { return vals.length; }
+        });
+      } catch(e) {
+        return done(e);
+      }
+
+      assert.equal(2, results.length);
+      assert.ok(results[0]._id === 'sunny-side up' || results[1]._id === 'sunny-side up');
+      assert.ok(results[0]._id === 'scrambled' || results[1]._id === 'scrambled');
+
+      done();
+    })();
+  </code></pre></div></div><script>document.body.className = 'load';</script><script>;(function() {
+  var cx = '012173159455227967368:uvscsuqjovs';
+  var gcse = document.createElement('script');
+  gcse.type = 'text/javascript';
+  gcse.async = true;
+  gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+      '//www.google.com/cse/cse.js?cx=' + cx;
+  var s = document.getElementsByTagName('script')[0];
+  s.parentNode.insertBefore(gcse, s);
+})();</script><script>var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-1122274-9']);
+_gaq.push(['_trackPageview', location.pathname + location.search + location.hash]);
+
+(function() {
+  var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+  ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+  var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+})();</script></body></html>

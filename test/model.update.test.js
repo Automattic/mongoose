@@ -1233,7 +1233,7 @@ describe('model: update:', function(){
     var db = start();
 
     var schema = new Schema({ breakfast: {} });
-    var M = db.model('gh-2515', schema);
+    var M = db.model('gh-2796', schema);
 
     M.create({}, function(error, doc) {
       assert.ifError(error);
@@ -1249,6 +1249,29 @@ describe('model: update:', function(){
             assert.equal(doc.breakfast.eggs, 2);
             db.close(done);
           });
+        });
+    });
+  });
+
+  it('handles empty update with promises (gh-2796)', function(done) {
+    var db = start();
+
+    var schema = new Schema({ eggs: Number });
+    var M = db.model('gh-2796', schema);
+
+    M.create({}, function(error, doc) {
+      assert.ifError(error);
+      M.update(
+        { _id: doc._id },
+        { notInSchema: 1 }).
+        exec().
+        then(function(data) {
+          assert.equal(data.ok, 0);
+          assert.equal(data.n, 0);
+          db.close(done);
+        }).
+        onReject(function(error) {
+          return done(error);
         });
     });
   });

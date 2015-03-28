@@ -851,10 +851,10 @@ Document.prototype.update = function update () {
  *         }
  *     })
  *
- *     // only-the-fly cast to number
+ *     // on-the-fly cast to number
  *     doc.set(path, value, Number)
  *
- *     // only-the-fly cast to string
+ *     // on-the-fly cast to string
  *     doc.set(path, value, String)
  *
  *     // changing strict mode behavior
@@ -1027,12 +1027,8 @@ Document.prototype.set = function (path, val, type, options) {
     val = schema.applySetters(val, this, false, priorVal);
     this.$markValid(path);
   } catch (e) {
-    this.invalidate(e.path, new ValidatorError({
-      path: e.path,
-      message: e.message,
-      type: 'cast',
-      value: e.value
-    }));
+    this.invalidate(e.path,
+      new MongooseError.CastError(schema.instance, val, e.path));
     shouldSet = false;
   }
 
@@ -1450,7 +1446,11 @@ Document.prototype.validate = function (cb) {
 
     process.nextTick(function(){
       var p = self.schema.path(path);
-      if (!p) return --total || complete();
+      if (!p) {
+        return --total || complete();
+      }
+
+      // If user marked as invalid or there was a cast error, don't validate
       if (!self.$isValid(path)) {
         --total || complete();
         return;
@@ -1471,6 +1471,12 @@ Document.prototype.validate = function (cb) {
     self.$__.validationError = undefined;
     self.emit('validate', self);
     if (err) {
+      for (var key in err.errors) {
+        // Make sure cast errors persist
+        if (err.errors[key] instanceof MongooseError.CastError) {
+          self.invalidate(err.errors[key].path, err.errors[key]);
+        }
+      }
       promise.reject(err);
     } else {
       promise.fulfill();
@@ -1535,6 +1541,15 @@ Document.prototype.validateSync = function () {
   self.$__.validationError = undefined;
   self.emit('validate', self);
 
+  if (err) {
+    for (var key in err.errors) {
+      // Make sure cast errors persist
+      if (err.errors[key] instanceof MongooseError.CastError) {
+        self.invalidate(err.errors[key].path, err.errors[key]);
+      }
+    }
+  }
+
   return err;
 };
 
@@ -1592,6 +1607,7 @@ Document.prototype.invalidate = function (path, err, val) {
  * Marks a path as valid, removing existing validation errors.
  *
  * @param {String} path the field to mark as valid
+ * @method $markValid
  * @api private
  */
 
@@ -1610,6 +1626,7 @@ Document.prototype.$markValid = function(path) {
  * Checks if a path is invalid
  *
  * @param {String} path the field to check
+ * @method $isValid
  * @api private
  */
 
@@ -4898,9 +4915,10 @@ SchemaBuffer.prototype.cast = function (value, doc, init) {
     return value;
   } else if (value instanceof Binary) {
     var ret = new MongooseBuffer(value.value(true), [this.path, doc]);
-    ret.subtype(value.sub_type);
-    // do not override Binary subtypes. users set this
-    // to whatever they want.
+    if (typeof value.sub_type !== 'number') {
+      throw new CastError('buffer', value, this.path);
+    }
+    ret._subtype = value.sub_type;
     return ret;
   }
 
@@ -5356,7 +5374,7 @@ DocumentArray.prototype.doValidate = function (array, fn, scope) {
       // sidestep sparse entries
       var doc = array[i];
       if (!doc) {
-        --count || fn(errors);
+        --count || fn(error);
         continue;
       }
 
@@ -8953,11 +8971,13 @@ EmbeddedDocument.prototype.invalidate = function (path, err, val, first) {
 };
 
 /**
- * Marks a path as valid, causing validation to succeed
+ * Marks a path as valid, removing existing validation errors.
  *
  * @param {String} path the field to mark as valid
- * @api public
+ * @method $markValid
+ * @api private
  */
+
 EmbeddedDocument.prototype.$markValid = function(path) {
   if (!this.__parent) {
     return;
@@ -8974,6 +8994,7 @@ EmbeddedDocument.prototype.$markValid = function(path) {
  * Checks if a path is invalid
  *
  * @param {String} path the field to check
+ * @method $isValid
  * @api private
  */
 
@@ -12815,7 +12836,7 @@ if(typeof window === 'undefined') {
  *  - **BSON.BSON_BINARY_SUBTYPE_MD5**, BSON md5 type.
  *  - **BSON.BSON_BINARY_SUBTYPE_USER_DEFINED**, BSON user defined type.
  *
- * @class Represents a BSON Binary type.
+ * @class
  * @param {Buffer} buffer a buffer object containing the binary data.
  * @param {Number} [subType] the option binary type.
  * @return {Binary}
@@ -13553,7 +13574,7 @@ var checkForHexRegExp = new RegExp("^[0-9a-fA-F]{24}$");
 /**
 * Create a new ObjectID instance
 *
-* @class Represents a BSON ObjectId type.
+* @class
 * @param {(string|number)} id Can be a 24 byte hex string, 12 byte binary string or a Number.
 * @property {number} generationTime The generation time of this ObjectId instance
 * @return {ObjectID} instance of ObjectID.

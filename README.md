@@ -40,7 +40,7 @@ $ npm install mongoose
 
 ## Stability
 
-The current stable branch is [3.8.x](https://github.com/Automattic/mongoose/tree/3.8.x). New (unstable) development always occurs on the [master](https://github.com/Automattic/mongoose/tree/master) branch.
+The current stable branch is [master](https://github.com/Automattic/mongoose/tree/master). The [3.8.x](https://github.com/Automattic/mongoose/tree/3.8.x) branch is for legacy support for the 3.x release series, which will continue to be maintained until September 1, 2015.
 
 ## Overview
 

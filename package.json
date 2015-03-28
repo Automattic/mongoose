@@ -1,7 +1,7 @@
 {
   "name": "mongoose",
   "description": "Mongoose MongoDB ODM",
-  "version": "4.0.0",
+  "version": "4.0.1",
   "author": "Guillermo Rauch <guillermo@learnboost.com>",
   "keywords": ["mongodb", "document", "model", "schema", "database", "odm", "data", "datastore", "query", "nosql", "orm", "db"],
   "license": "MIT",
@@ -57,7 +57,6 @@
     "type": "git",
     "url": "git://github.com/LearnBoost/mongoose.git"
   },
-  "publishConfig": { "tag": "unstable" },
   "homepage": "http://mongoosejs.com",
   "browser": "lib/browser.js"
 }

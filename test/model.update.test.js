@@ -1229,6 +1229,53 @@ describe('model: update:', function(){
     });
   });
 
+  it('successfully casts set with nested mixed objects (gh-2796)', function(done) {
+    var db = start();
+
+    var schema = new Schema({ breakfast: {} });
+    var M = db.model('gh-2796', schema);
+
+    M.create({}, function(error, doc) {
+      assert.ifError(error);
+      M.update(
+        { _id: doc._id },
+        { breakfast: { eggs: 2, bacon: 3 } },
+        function(error, result) {
+          assert.ifError(error);
+          assert.ok(result.ok);
+          assert.equal(result.n, 1);
+          M.findOne({ _id: doc._id }, function(error, doc) {
+            assert.ifError(error);
+            assert.equal(doc.breakfast.eggs, 2);
+            db.close(done);
+          });
+        });
+    });
+  });
+
+  it('handles empty update with promises (gh-2796)', function(done) {
+    var db = start();
+
+    var schema = new Schema({ eggs: Number });
+    var M = db.model('gh-2796', schema);
+
+    M.create({}, function(error, doc) {
+      assert.ifError(error);
+      M.update(
+        { _id: doc._id },
+        { notInSchema: 1 }).
+        exec().
+        then(function(data) {
+          assert.equal(data.ok, 0);
+          assert.equal(data.n, 0);
+          db.close(done);
+        }).
+        onReject(function(error) {
+          return done(error);
+        });
+    });
+  });
+
   describe('middleware', function() {
     it('can specify pre and post hooks', function(done) {
       var db = start();

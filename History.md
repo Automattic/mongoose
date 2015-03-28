@@ -1,3 +1,9 @@
+4.0.1 / 2015-03-28
+==================
+ * fixed; properly handle empty cast doc in update() with promises #2796
+ * fixed; unstable warning #2794
+ * fixed; findAndModify docs now show new option is false by default #2793
+
 4.0.0 / 2015-03-25
 ==================
  * fixed; on-the-fly schema docs typo #2783 [artiifix](https://github.com/artiifix)

@@ -757,14 +757,13 @@ describe('schema', function(){
 
     it('handles multiple subdocument errors', function(done) {
       var foodSchema = new Schema({ name: { type: String, required: true, enum: ['bacon', 'eggs'] } });
-      var breakfast = new Schema({ foods: [foodSchema] });
+      var breakfast = new Schema({ foods: [foodSchema], id: Number });
 
       var Breakfast = mongoose.model('gh-2589', breakfast, 'gh-2589');
-      var bad = new Breakfast({ foods: [{ name: 'tofu' }, { name: 'waffles' }] });
+      var bad = new Breakfast({ foods: [{ name: 'tofu' }, { name: 'waffles' }], id: 'Not a number' });
       bad.validate(function(error) {
         assert.ok(error);
-        assert.ok(error.errors['foods.0.name']);
-        assert.ok(error.errors['foods.1.name']);
+        assert.deepEqual(['id', 'foods.0.name', 'foods.1.name'], Object.keys(error.errors));
         done();
       });
     });

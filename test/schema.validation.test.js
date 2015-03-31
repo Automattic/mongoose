@@ -768,6 +768,19 @@ describe('schema', function(){
       });
     });
 
+    it('handles subdocument cast errors (gh-2819)', function(done) {
+      var foodSchema = new Schema({ eggs: { type: Number, required: true } });
+      var breakfast = new Schema({ foods: [foodSchema], id: Number });
+
+      var Breakfast = mongoose.model('gh-2819', breakfast, 'gh-2819');
+      var bad = new Breakfast({ foods: [{ eggs: 'Not a number' }], id: 'Not a number' });
+      bad.validate(function(error) {
+        assert.ok(error);
+        assert.deepEqual(['id', 'foods.0.eggs'], Object.keys(error.errors));
+        done();
+      });
+    });
+
     it('fails when you try to set a nested path to a primitive (gh-2592)', function(done) {
       var breakfast = new Schema({ foods: { bacon: Number, eggs: Number } });
 

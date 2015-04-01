@@ -86,7 +86,6 @@ describe('model: populate:', function(){
           assert.doesNotThrow(function(){
             post.populate('comments', function(){});
           });
-          
           db.close(done);
         });
       });
@@ -1519,53 +1518,60 @@ describe('model: populate:', function(){
       , P = db.model('RefBlogPost', posts)
       , User = db.model('RefUser', users);
 
-    User.create({ name: 'aaron', age: 10 }, { name: 'fan2', age: 8 }, { name: 'someone else', age: 3 },
-    function (err, fan1, fan2, fan3) {
-      assert.ifError(err);
-
-      P.create({ fans: [fan2, fan3, fan1] }, function (err, post) {
+    User.create(
+      { name: 'aaron', age: 10 },
+      { name: 'fan2', age: 8 },
+      { name: 'someone else', age: 3 },
+      { name: 'val', age: 3 },
+      function (err, fan1, fan2, fan3, fan4) {
         assert.ifError(err);
 
-        P.findById(post)
-        .populate('fans', null, null, { sort: 'name' })
-        .exec(function (err, post) {
+        P.create({ fans: [fan4, fan2, fan3, fan1] }, function (err, post) {
           assert.ifError(err);
 
-          assert.equal(post.fans.length,3);
-          assert.equal(post.fans[0].name,'aaron');
-          assert.equal(post.fans[1].name,'fan2');
-          assert.equal(post.fans[2].name,'someone else');
-
           P.findById(post)
-          .populate('fans', 'name', null, { sort: {'name':-1} })
+          .populate('fans', null, null, { sort: { age: 1, name: 1 } })
           .exec(function (err, post) {
             assert.ifError(err);
 
-            assert.equal(post.fans.length,3);
-            assert.equal(post.fans[2].name,'aaron');
-            assert.strictEqual(undefined, post.fans[2].age)
-            assert.equal(post.fans[1].name,'fan2');
-            assert.strictEqual(undefined, post.fans[1].age)
-            assert.equal(post.fans[0].name,'someone else');
-            assert.strictEqual(undefined, post.fans[0].age)
+            assert.equal(post.fans.length, 4);
+            assert.equal(post.fans[0].name, 'someone else');
+            assert.equal(post.fans[1].name, 'val');
+            assert.equal(post.fans[2].name, 'fan2');
+            assert.equal(post.fans[3].name, 'aaron');
 
             P.findById(post)
-            .populate('fans', 'age', { age: { $gt: 3 }}, { sort: {'name': 'desc'} })
+            .populate('fans', 'name', null, { sort: {'name':-1} })
             .exec(function (err, post) {
-              db.close();
               assert.ifError(err);
 
-              assert.equal(post.fans.length,2);
-              assert.equal(post.fans[1].age.valueOf(),10);
-              assert.equal(post.fans[0].age.valueOf(),8);
+              assert.equal(post.fans.length, 4);
+              assert.equal(post.fans[3].name,'aaron');
+              assert.strictEqual(undefined, post.fans[3].age);
+              assert.equal(post.fans[2].name,'fan2');
+              assert.strictEqual(undefined, post.fans[2].age);
+              assert.equal(post.fans[1].name,'someone else');
+              assert.strictEqual(undefined, post.fans[1].age);
+              assert.equal(post.fans[0].name, 'val');
+              assert.strictEqual(undefined, post.fans[0].age);
 
-              done();
+              P.findById(post)
+              .populate('fans', 'age', { age: { $gt: 3 }}, { sort: {'name': 'desc'} })
+              .exec(function (err, post) {
+                db.close();
+                assert.ifError(err);
+
+                assert.equal(post.fans.length,2);
+                assert.equal(post.fans[1].age.valueOf(),10);
+                assert.equal(post.fans[0].age.valueOf(),8);
+
+                done();
+              });
             });
           });
         });
       });
-    });
-  })
+  });
 
   it('limit should apply to each returned doc, not in aggregate (gh-1490)', function(done){
     var db = start();
@@ -2826,6 +2832,35 @@ describe('model: populate:', function(){
               db.close(done);
             });
           });
+        });
+      });
+    });
+  });
+
+  it('handles slice (gh-1934)', function(done) {
+    var db = start();
+
+    var movieSchema = new Schema({ title: String, actors: [String] });
+    var categorySchema = new Schema({ movies: [{ type: ObjectId, ref: 'gh-1934-1' }] });
+
+    var Movie = db.model('gh-1934-1', movieSchema);
+    var Category = db.model('gh-1934-2', categorySchema);
+    var movies = [
+      { title: 'Rush', actors: ['Chris Hemsworth', 'Daniel Bruhl'] },
+      { title: 'Pacific Rim', actors: ['Charlie Hunnam', 'Idris Elba'] },
+      { title: 'Man of Steel', actors: ['Henry Cavill', 'Amy Adams'] }
+    ];
+    Movie.create(movies[0], movies[1], movies[2], function(error, m1, m2, m3) {
+      assert.ifError(error);
+      Category.create({ movies: [m1._id, m2._id, m3._id] }, function(error) {
+        assert.ifError(error);
+        Category.findOne({}).populate({ path: 'movies', options: { slice: { actors: 1 } } }).exec(function(error, category) {
+          assert.ifError(error);
+          assert.equal(category.movies.length, 3);
+          assert.equal(category.movies[0].actors.length, 1);
+          assert.equal(category.movies[1].actors.length, 1);
+          assert.equal(category.movies[2].actors.length, 1);
+          done();
         });
       });
     });

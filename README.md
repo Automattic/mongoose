@@ -2,8 +2,8 @@
 
 Mongoose is a [MongoDB](http://www.mongodb.org/) object modeling tool designed to work in an asynchronous environment.
 
-[![Build Status](https://travis-ci.org/LearnBoost/mongoose.png?branch=master)](https://travis-ci.org/LearnBoost/mongoose)
-[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/LearnBoost/mongoose?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![Build Status](https://api.travis-ci.org/Automattic/mongoose.png?branch=master)](https://travis-ci.org/Automattic/mongoose)
+[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/Automattic/mongoose?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 ## Documentation
 
@@ -12,7 +12,7 @@ Mongoose is a [MongoDB](http://www.mongodb.org/) object modeling tool designed t
 ## Support
 
   - [Stack Overflow](http://stackoverflow.com/questions/tagged/mongoose)
-  - [bug reports](https://github.com/learnboost/mongoose/issues/)
+  - [bug reports](https://github.com/Automattic/mongoose/issues/)
   - [help forum](http://groups.google.com/group/mongoose-orm)
   - [MongoDB support](http://www.mongodb.org/display/DOCS/Technical+Support)
   - (irc) #mongoosejs on freenode
@@ -25,7 +25,7 @@ Build your own Mongoose plugin through [generator-mongoose-plugin](https://githu
 
 ## Contributors
 
-View all 100+ [contributors](https://github.com/learnboost/mongoose/graphs/contributors). Stand up and be counted as a [contributor](https://github.com/LearnBoost/mongoose/blob/master/CONTRIBUTING.md) too!
+View all 100+ [contributors](https://github.com/Automattic/mongoose/graphs/contributors). Stand up and be counted as a [contributor](https://github.com/Automattic/mongoose/blob/master/CONTRIBUTING.md) too!
 
 ## Live Examples
 <a href="http://runnable.com/mongoose" target="_blank"><img src="http://runnable.com/external/styles/assets/runnablebtn.png" style="width:67px;height:25px;"></a>
@@ -40,7 +40,7 @@ $ npm install mongoose
 
 ## Stability
 
-The current stable branch is [3.8.x](https://github.com/LearnBoost/mongoose/tree/3.8.x). New (unstable) development always occurs on the [master](https://github.com/LearnBoost/mongoose/tree/master) branch.
+The current stable branch is [master](https://github.com/Automattic/mongoose/tree/master). The [3.8.x](https://github.com/Automattic/mongoose/tree/3.8.x) branch is for legacy support for the 3.x release series, which will continue to be maintained until September 1, 2015.
 
 ## Overview
 
@@ -62,7 +62,7 @@ Once connected, the `open` event is fired on the `Connection` instance. If you'r
 
 ### Defining a Model
 
-Models are defined through the `Schema` interface. 
+Models are defined through the `Schema` interface.
 
 ```js
 var Schema = mongoose.Schema
@@ -239,14 +239,14 @@ Moreover, you can mutate the incoming `method` arguments so that subsequent midd
 // pre declaration is chainable
 .pre(method, function secondPre (next, methodArg1, methodArg2) {
   console.log(methodArg1);
-  // => 'altered-originalValOfMethodArg1' 
-      
+  // => 'altered-originalValOfMethodArg1'
+
   console.log(methodArg2);
-  // => 'originalValOfMethodArg2' 
-      
+  // => 'originalValOfMethodArg2'
+
   // Passing no arguments to `next` automatically passes along the current argument values
   // i.e., the following `next()` is equivalent to `next(methodArg1, methodArg2)`
-  // and also equivalent to, with the example method arg 
+  // and also equivalent to, with the example method arg
   // values, `next('altered-originalValOfMethodArg1', 'originalValOfMethodArg2')`
   next();
 });
@@ -280,7 +280,8 @@ The driver being used defaults to [node-mongodb-native](https://github.com/mongo
 
 ## API Docs
 
-Find the API docs [here](http://mongoosejs.com/docs/api.html), generated using [dox](http://github.com/visionmedia/dox).
+Find the API docs [here](http://mongoosejs.com/docs/api.html), generated using [dox](http://github.com/visionmedia/dox)
+and [acquit](http://github.com/vkarpov15/acquit).
 
 ## License
 

@@ -1,13 +1,13 @@
 {
   "name": "mongoose",
   "description": "Mongoose MongoDB ODM",
-  "version": "4.0.0-pre",
+  "version": "4.0.2-pre",
   "author": "Guillermo Rauch <guillermo@learnboost.com>",
   "keywords": ["mongodb", "document", "model", "schema", "database", "odm", "data", "datastore", "query", "nosql", "orm", "db"],
   "license": "MIT",
   "dependencies": {
     "hooks-fixed": "1.0.1",
-    "mongodb": "2.0.18",
+    "mongodb": "2.0.24",
     "ms": "0.1.0",
     "sliced": "0.0.5",
     "muri": "1.0.0",
@@ -15,7 +15,7 @@
     "mpath": "0.1.1",
     "kareem": "1.0.0",
     "regexp-clone": "0.0.1",
-    "mquery" : "1.0.0",
+    "mquery" : "1.4.0",
     "async": "0.9.0"
   },
   "devDependencies": {
@@ -57,7 +57,6 @@
     "type": "git",
     "url": "git://github.com/LearnBoost/mongoose.git"
   },
-  "publishConfig": { "tag": "unstable" },
   "homepage": "http://mongoosejs.com",
   "browser": "lib/browser.js"
 }

@@ -90,7 +90,7 @@ block content
   :js
     Story
     .find(...)
-    .populate('fans author') // space delimited path names
+    .populate('fans _creator') // space delimited path names
     .exec()
   .important
     :markdown
@@ -99,7 +99,7 @@ block content
     Story
     .find(...)
     .populate('fans')
-    .populate('author')
+    .populate('_creator')
     .exec()
   h3 Query conditions and other options
   :markdown

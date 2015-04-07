@@ -42,4 +42,5 @@
       , "url": "git://github.com/LearnBoost/mongoose.git"
     }
   , "homepage": "http://mongoosejs.com"
+  , "publishConfig": { "tag": "legacy" }
 }

@@ -3,20 +3,33 @@
   "description": "Mongoose MongoDB ODM",
   "version": "4.0.2-pre",
   "author": "Guillermo Rauch <guillermo@learnboost.com>",
-  "keywords": ["mongodb", "document", "model", "schema", "database", "odm", "data", "datastore", "query", "nosql", "orm", "db"],
+  "keywords": [
+    "mongodb",
+    "document",
+    "model",
+    "schema",
+    "database",
+    "odm",
+    "data",
+    "datastore",
+    "query",
+    "nosql",
+    "orm",
+    "db"
+  ],
   "license": "MIT",
   "dependencies": {
+    "async": "0.9.0",
     "hooks-fixed": "1.0.1",
-    "mongodb": "2.0.24",
-    "ms": "0.1.0",
-    "sliced": "0.0.5",
-    "muri": "1.0.0",
-    "mpromise": "0.5.4",
-    "mpath": "0.1.1",
     "kareem": "1.0.0",
+    "mongodb": "2.0.24",
+    "mpath": "0.1.1",
+    "mpromise": "0.5.4",
+    "mquery": "1.4.0",
+    "ms": "0.1.0",
+    "muri": "1.0.0",
     "regexp-clone": "0.0.1",
-    "mquery" : "1.4.0",
-    "async": "0.9.0"
+    "sliced": "0.0.5"
   },
   "devDependencies": {
     "acquit": "0.0.3",
@@ -32,7 +45,8 @@
     "open": "0.0.3",
     "tbd": "0.6.4",
     "uglify-js": "2.4.15",
-    "underscore": "1.5.2"
+    "underscore": "1.5.2",
+    "istanbul": "^0.3.13"
   },
   "browserDependencies": {
     "browserify": "4.1.10",
@@ -42,15 +56,20 @@
     "karma-chrome-launcher": "0.1.4",
     "karma-sauce-launcher": "0.2.8"
   },
-  "directories": { "lib": "./lib/mongoose" },
+  "directories": {
+    "lib": "./lib/mongoose"
+  },
   "scripts": {
     "install-browser": "npm install `node format_deps.js`",
-    "test": "set MONGOOSE_DISABLE_STABILITY_WARNING=1 && mocha --async-only test/*.test.js"
+    "test": "set MONGOOSE_DISABLE_STABILITY_WARNING=1 && mocha --async-only test/*.test.js",
+    "test-cov": "set MONGOOSE_DISABLE_STABILITY_WARNING=1 && node_modules/.bin/istanbul cover node_modules/.bin/_mocha --async-only test/*.test.js"
   },
   "main": "./index.js",
-  "engines": { "node": ">=0.6.19" },
+  "engines": {
+    "node": ">=0.6.19"
+  },
   "bugs": {
-    "url":"https://github.com/learnboost/mongoose/issues/new",
+    "url": "https://github.com/learnboost/mongoose/issues/new",
     "email": "mongoose-orm@googlegroups.com"
   },
   "repository": {

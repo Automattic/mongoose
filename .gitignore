@@ -16,3 +16,4 @@ test/triage/*.js
 /.idea
 /inspections
 bin/mongoose.min.js
+coverage

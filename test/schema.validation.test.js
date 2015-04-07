@@ -777,7 +777,13 @@ describe('schema', function(){
       bad.validate(function(error) {
         assert.ok(error);
         assert.deepEqual(['id', 'foods.0.eggs'], Object.keys(error.errors));
-        done();
+        assert.ok(error.errors['foods.0.eggs'] instanceof mongoose.Error.CastError);
+        bad.foods.push({ eggs: 'Also not a number' });
+        bad.validate(function(error) {
+          assert.deepEqual(['id', 'foods.0.eggs', 'foods.1.eggs'], Object.keys(error.errors));
+          assert.ok(error.errors['foods.1.eggs'] instanceof mongoose.Error.CastError);
+          done();
+        });
       });
     });
 

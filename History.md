@@ -1,3 +1,11 @@
+3.8.26 / 2015-04-07
+===================
+ * fixed; TypeError when setting date to undefined #2833
+ * fixed; handle CastError properly in distinct() with no callback #2786
+ * fixed; broken links in queries docs #2779
+ * fixed; dont mark buffer as modified when setting type initially #2738
+ * fixed; dont crash when using slice with populate #1934
+
 3.8.25 / 2015-03-13
 ===================
  * fixed; debug output reverses order of aggregation keys #2759

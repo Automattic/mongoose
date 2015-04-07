@@ -1420,7 +1420,7 @@ describe('model: update:', function(){
     var D = db.model('gh2833', dateSchema);
 
     D.update({}, { d: undefined }, function(error) {
-      assert.ok(error instanceof MongooseError.CastError);
+      assert.ifError(error);
       done();
     });
   });

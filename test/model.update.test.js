@@ -1088,4 +1088,18 @@ describe('model: update:', function(){
         });
       });
   });
+
+  it('works with undefined date (gh-2833)', function(done) {
+    var db = start();
+
+    var dateSchema = {
+      d: Date
+    };
+    var D = db.model('gh2833', dateSchema);
+
+    D.update({}, { d: undefined }, function(error) {
+      assert.ok(error instanceof MongooseError.CastError);
+      done();
+    });
+  });
 });

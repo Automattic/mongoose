@@ -18,7 +18,7 @@ var schemaB = Schema({
 });
 
 describe('model', function(){
-  describe.only('construct', function(){
+  describe('construct', function(){
     var db;
     var B;
     var calledConstruct, constructCtx;

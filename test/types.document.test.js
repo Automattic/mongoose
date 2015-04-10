@@ -72,6 +72,7 @@ describe('types.document', function(){
     var a = new Subdocument();
     a.set('test', '');
     a.set('work', 'nope');
+    a.__index = 0;
 
     a.validate(function(err){
       assert.ok(a.__parent.$__.validationError instanceof ValidationError);

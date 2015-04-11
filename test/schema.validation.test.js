@@ -843,5 +843,20 @@ describe('schema', function(){
         done();
       });
     });
+
+    it('sets path correctly when setter throws exception (gh-2832)', function(done) {
+      var breakfast = new Schema({
+        description: { type: String, set: function() { throw new Error('oops'); } }
+      });
+
+      var Breakfast = mongoose.model('gh2832', breakfast, 'gh2832');
+      Breakfast.create({ description: undefined }, function(error) {
+        assert.ok(error);
+        var errorMessage = 'ValidationError: CastError: Cast to String failed for value "undefined" at path "description"';
+        assert.equal(errorMessage, error.toString());
+        assert.ok(error.errors['description']);
+        done();
+      });
+    });
   });
 });

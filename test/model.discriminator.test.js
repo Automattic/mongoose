@@ -194,6 +194,39 @@ describe('model', function() {
       done();
     });
 
+    it('works with nested schemas (gh-2821)', function(done) {
+      var MinionSchema = function() {
+        mongoose.Schema.apply(this, arguments);
+
+        this.add({
+          name: String
+        });
+      };
+      util.inherits(MinionSchema, mongoose.Schema);
+
+      var BaseSchema = function() {
+        mongoose.Schema.apply( this, arguments );
+
+        this.add({
+          name: String,
+          created_at: Date,
+          minions: [ new MinionSchema() ]
+        });
+      };
+      util.inherits(BaseSchema, mongoose.Schema);
+
+      var PersonSchema = new BaseSchema();
+      var BossSchema = new BaseSchema({
+        department: String
+      });
+
+      assert.doesNotThrow(function() {
+        var Person = db.model('gh2821', PersonSchema);
+        var Boss = Person.discriminator('Boss', BossSchema);
+      });
+      done();
+    });
+
     describe('options', function() {
       it('allows toObject to be overridden', function(done) {
         assert.notDeepEqual(Employee.schema.get('toObject'), Person.schema.get('toObject'));

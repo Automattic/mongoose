@@ -548,7 +548,7 @@ describe('document', function(){
         delete ret.email;
       }
     };
-    
+
     topicSchema.options.toObject = {
       transform: function(doc, ret, options) {
         ret.title = ret.title.toLowerCase();
@@ -1706,6 +1706,48 @@ describe('document', function(){
           });
         });
       });
+    });
+  });
+
+  describe('gh-2782', function () {
+    var schema1 = new mongoose.Schema({
+      data: {
+        email: String
+      }
+    });
+    var schema2 = new mongoose.Schema({
+      email: String
+    });
+    var Model1 = mongoose.model('gh-2782-1', schema1);
+    var Model2 = mongoose.model('gh-2782-2', schema2);
+    it("won't set data from a sub doc", function (done) {
+      var doc1 = new Model1({ 'data.email': 'some@example.com' });
+      assert.equal(doc1.data.email, 'some@example.com');
+      var doc2 = new Model2();
+      doc2.set(doc1.data);
+      assert.equal(doc2.email, 'some@example.com');
+      done();
+    });
+    var schema3 = new mongoose.Schema({
+      data: mongoose.Schema.Types.Mixed
+    });
+    var Model3 = mongoose.model('gh-2782-3', schema3);
+    it("will set data from an object of type Mixed when in strict mode", function (done) {
+      var doc3 = new Model3({ data: { email: 'some@example.com' } });
+      assert.equal(doc3.data.email, 'some@example.com');
+      var doc2 = new Model2();
+      doc2.set(doc3.data);
+      assert.equal(doc2.email, 'some@example.com');
+      done();
+    });
+    it("won't set data from an object of type Mixed when in non-strict mode", function (done) {
+      var doc3 = new Model3({ data: { email: 'some@example.com' } });
+      assert.equal(doc3.data.email, 'some@example.com');
+      var doc2 = new Model2();
+      // The only difference to the test above is that strict mode is set to false
+      doc2.set(doc3.data, { strict: false });
+      assert.equal(doc2.email, 'some@example.com');
+      done();
     });
   });
 

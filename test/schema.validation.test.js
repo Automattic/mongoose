@@ -844,6 +844,19 @@ describe('schema', function(){
       });
     });
 
+    it('adds required validators to the front of the list (gh-2843)', function(done) {
+      var breakfast = new Schema({ description: { type: String, maxlength: 50, required: true } });
+
+      var Breakfast = mongoose.model('gh2843', breakfast, 'gh2843');
+      var bad = new Breakfast({});
+      bad.validate(function(error) {
+        assert.ok(error);
+        var errorMessage = 'ValidationError: Path `description` is required.';
+        assert.equal(errorMessage, error.toString());
+        done();
+      });
+    });
+
     it('sets path correctly when setter throws exception (gh-2832)', function(done) {
       var breakfast = new Schema({
         description: { type: String, set: function() { throw new Error('oops'); } }

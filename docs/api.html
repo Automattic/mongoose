@@ -3921,7 +3921,7 @@ Kitten.find().tailable(<span class="literal">false</span>)</code></pre></div><hr
 <pre><code>Kitten.where(<span class="string">'color'</span>, <span class="string">'black'</span>).count(<span class="function"><span class="keyword">function</span> <span class="params">(err, count)</span> {</span>
   <span class="keyword">if</span> (err) <span class="keyword">return</span> handleError(err);
   console.log(<span class="string">'there are %d black kittens'</span>, count);
-})</code></pre></div><hr class=""></div><div class="item method public"><h3 id="query_Query-distinct"><a href="#query_Query-distinct">Query#distinct(<code>field</code>, <code>callback</code>)</a></h3><p>Executes this query as a distict() operation.</p><span class="showcode">show code</span><div class="sourcecode"><pre><code class="javascript">Query.prototype.distinct = <span class="function"><span class="keyword">function</span> <span class="params">(field, callback)</span> {</span>
+})</code></pre></div><hr class=""></div><div class="item method public"><h3 id="query_Query-distinct"><a href="#query_Query-distinct">Query#distinct(<code>field</code>, <code>callback</code>)</a></h3><p>Executes this query as a distinct() operation.</p><span class="showcode">show code</span><div class="sourcecode"><pre><code class="javascript">Query.prototype.distinct = <span class="function"><span class="keyword">function</span> <span class="params">(field, callback)</span> {</span>
   <span class="keyword">this</span>.op = <span class="string">'distinct'</span>;
   <span class="keyword">var</span> model = <span class="keyword">this</span>.model;
 

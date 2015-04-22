@@ -1,3 +1,9 @@
+3.8.27 / 2015-04-22
+===================
+ * fixed; dont duplicate db calls on Q.ninvoke() #2864
+ * fixed; Model.find arguments naming in docs #2828
+ * fixed; Support ipv6 in connection strings #2298
+
 3.8.26 / 2015-04-07
 ===================
  * fixed; TypeError when setting date to undefined #2833

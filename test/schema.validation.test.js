@@ -871,5 +871,20 @@ describe('schema', function(){
         done();
       });
     });
+
+    it('allows you to validate embedded doc that was .create()-ed (gh-2902)', function(done) {
+      var parentSchema = mongoose.Schema({
+        children: [{ name: { type: String, required: true } }]
+      });
+
+      var Parent = mongoose.model('gh2902', parentSchema);
+
+      var p = new Parent();
+      var n = p.children.create({ name: '2' });
+      n.validate(function(error) {
+        assert.ifError(error);
+        done();
+      });
+    });
   });
 });

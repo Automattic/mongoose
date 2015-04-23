@@ -90,7 +90,7 @@ block content
   :js
     Story
     .find(...)
-    .populate('fans author') // space delimited path names
+    .populate('fans _creator') // space delimited path names
     .exec()
   .important
     :markdown
@@ -99,7 +99,7 @@ block content
     Story
     .find(...)
     .populate('fans')
-    .populate('author')
+    .populate('_creator')
     .exec()
   h3 Query conditions and other options
   :markdown
@@ -182,18 +182,6 @@ block content
   h3#populate_multiple_documents Populating multiple existing documents
   :markdown
     If we have one or many mongoose documents or even plain objects (_like [mapReduce](./api.html#model_Model.mapReduce) output_), we may populate them using the [Model.populate()](./api.html#model_Model.populate) method available in **mongoose >= 3.6**. This is what `document#populate()` and `query#populate()` use to populate documents.
-
-  h3 Field selection difference from v2 to v3
-  .important
-    :markdown
-      Field selection in v3 is slightly different than v2. Arrays of fields are no longer accepted. See the [migration guide](./migration.html#fields) and the example below for more detail.
-
-  :js
-    // this works in v3
-    Story.findOne(..).populate('_creator', 'name age').exec(..);
-
-    // this doesn't
-    Story.findOne(..).populate('_creator', ['name', 'age']).exec(..);
 
   h3#next Next Up
   :markdown

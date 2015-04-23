@@ -689,7 +689,7 @@ describe('schema', function(){
         user.name = 'bacon';
         user.validate(function(err) {
           assert.ok(!err);
-          assert.ok(!user.errors);
+          assert.ok(!user.$__.validationError);
           done();
         });
       });
@@ -755,17 +755,64 @@ describe('schema', function(){
       });
     });
 
-    it('handles multiple subdocument errors', function(done) {
+    it('handles multiple subdocument errors (gh-2589)', function(done) {
       var foodSchema = new Schema({ name: { type: String, required: true, enum: ['bacon', 'eggs'] } });
-      var breakfast = new Schema({ foods: [foodSchema] });
+      var breakfast = new Schema({ foods: [foodSchema], id: Number });
 
       var Breakfast = mongoose.model('gh-2589', breakfast, 'gh-2589');
-      var bad = new Breakfast({ foods: [{ name: 'tofu' }, { name: 'waffles' }] });
+      var bad = new Breakfast({ foods: [{ name: 'tofu' }, { name: 'waffles' }], id: 'Not a number' });
       bad.validate(function(error) {
         assert.ok(error);
-        assert.ok(error.errors['foods.0.name']);
-        assert.ok(error.errors['foods.1.name']);
+        assert.deepEqual(['id', 'foods.0.name', 'foods.1.name'], Object.keys(error.errors));
         done();
+      });
+    });
+
+    it('handles subdocument cast errors (gh-2819)', function(done) {
+      var foodSchema = new Schema({ eggs: { type: Number, required: true } });
+      var breakfast = new Schema({ foods: [foodSchema], id: Number });
+
+      var Breakfast = mongoose.model('gh-2819', breakfast, 'gh-2819');
+
+      // Initially creating subdocs with cast errors
+      var bad = new Breakfast({ foods: [{ eggs: 'Not a number' }], id: 'Not a number' });
+      bad.validate(function(error) {
+        assert.ok(error);
+        assert.deepEqual(['id', 'foods.0.eggs'], Object.keys(error.errors));
+        assert.ok(error.errors['foods.0.eggs'] instanceof mongoose.Error.CastError);
+
+        // Pushing docs with cast errors
+        bad.foods.push({ eggs: 'Also not a number' });
+        bad.validate(function(error) {
+          assert.deepEqual(['id', 'foods.0.eggs', 'foods.1.eggs'], Object.keys(error.errors));
+          assert.ok(error.errors['foods.1.eggs'] instanceof mongoose.Error.CastError);
+
+          // Splicing docs with cast errors
+          bad.foods.splice(1, 1, { eggs: 'fail1' }, { eggs: 'fail2' });
+          bad.validate(function(error) {
+            assert.deepEqual(['id', 'foods.0.eggs', 'foods.1.eggs', 'foods.2.eggs'], Object.keys(error.errors));
+            assert.ok(error.errors['foods.0.eggs'] instanceof mongoose.Error.CastError);
+            assert.ok(error.errors['foods.1.eggs'] instanceof mongoose.Error.CastError);
+            assert.ok(error.errors['foods.2.eggs'] instanceof mongoose.Error.CastError);
+
+            // Remove the cast error by setting field
+            bad.foods[2].eggs = 3;
+            bad.validate(function(error) {
+              assert.deepEqual(['id', 'foods.0.eggs', 'foods.1.eggs'], Object.keys(error.errors));
+              assert.ok(error.errors['foods.0.eggs'] instanceof mongoose.Error.CastError);
+              assert.ok(error.errors['foods.1.eggs'] instanceof mongoose.Error.CastError);
+
+              // Remove the cast error using array.set()
+              bad.foods.set(1, { eggs: 1 });
+              bad.validate(function(error) {
+                assert.deepEqual(['id', 'foods.0.eggs'], Object.keys(error.errors));
+                assert.ok(error.errors['foods.0.eggs'] instanceof mongoose.Error.CastError);
+
+                done();
+              });
+            });
+          });
+        });
       });
     });
 
@@ -793,6 +840,49 @@ describe('schema', function(){
         assert.ok(error);
         var errorMessage = 'ValidationError: Path `description` is required.';
         assert.equal(errorMessage, error.toString());
+        done();
+      });
+    });
+
+    it('adds required validators to the front of the list (gh-2843)', function(done) {
+      var breakfast = new Schema({ description: { type: String, maxlength: 50, required: true } });
+
+      var Breakfast = mongoose.model('gh2843', breakfast, 'gh2843');
+      var bad = new Breakfast({});
+      bad.validate(function(error) {
+        assert.ok(error);
+        var errorMessage = 'ValidationError: Path `description` is required.';
+        assert.equal(errorMessage, error.toString());
+        done();
+      });
+    });
+
+    it('sets path correctly when setter throws exception (gh-2832)', function(done) {
+      var breakfast = new Schema({
+        description: { type: String, set: function() { throw new Error('oops'); } }
+      });
+
+      var Breakfast = mongoose.model('gh2832', breakfast, 'gh2832');
+      Breakfast.create({ description: undefined }, function(error) {
+        assert.ok(error);
+        var errorMessage = 'ValidationError: CastError: Cast to String failed for value "undefined" at path "description"';
+        assert.equal(errorMessage, error.toString());
+        assert.ok(error.errors['description']);
+        done();
+      });
+    });
+
+    it('allows you to validate embedded doc that was .create()-ed (gh-2902)', function(done) {
+      var parentSchema = mongoose.Schema({
+        children: [{ name: { type: String, required: true } }]
+      });
+
+      var Parent = mongoose.model('gh2902', parentSchema);
+
+      var p = new Parent();
+      var n = p.children.create({ name: '2' });
+      n.validate(function(error) {
+        assert.ifError(error);
         done();
       });
     });

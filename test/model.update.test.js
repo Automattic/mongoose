@@ -1026,11 +1026,10 @@ describe('model: update:', function(){
 
       var s = new Schema({ topping: { type: String, default: 'bacon' }, base: String });
       var Breakfast = db.model('gh-860-0', s);
-
       var updateOptions = { upsert: true, setDefaultsOnInsert: true };
       Breakfast.update({}, { base: 'eggs' }, updateOptions, function(error) {
         assert.ifError(error);
-        Breakfast.findOne({}, function(error, breakfast) {
+        Breakfast.findOne({}).lean().exec(function(error, breakfast) {
           assert.ifError(error);
           assert.equal('eggs', breakfast.base);
           assert.equal('bacon', breakfast.topping);
@@ -1409,5 +1408,19 @@ describe('model: update:', function(){
           done();
         });
       });
+  });
+
+  it('works with undefined date (gh-2833)', function(done) {
+    var db = start();
+
+    var dateSchema = {
+      d: Date
+    };
+    var D = db.model('gh2833', dateSchema);
+
+    D.update({}, { d: undefined }, function(error) {
+      assert.ifError(error);
+      done();
+    });
   });
 });

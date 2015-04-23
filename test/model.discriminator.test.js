@@ -194,6 +194,39 @@ describe('model', function() {
       done();
     });
 
+    it('works with nested schemas (gh-2821)', function(done) {
+      var MinionSchema = function() {
+        mongoose.Schema.apply(this, arguments);
+
+        this.add({
+          name: String
+        });
+      };
+      util.inherits(MinionSchema, mongoose.Schema);
+
+      var BaseSchema = function() {
+        mongoose.Schema.apply( this, arguments );
+
+        this.add({
+          name: String,
+          created_at: Date,
+          minions: [ new MinionSchema() ]
+        });
+      };
+      util.inherits(BaseSchema, mongoose.Schema);
+
+      var PersonSchema = new BaseSchema();
+      var BossSchema = new BaseSchema({
+        department: String
+      });
+
+      assert.doesNotThrow(function() {
+        var Person = db.model('gh2821', PersonSchema);
+        var Boss = Person.discriminator('Boss', BossSchema);
+      });
+      done();
+    });
+
     describe('options', function() {
       it('allows toObject to be overridden', function(done) {
         assert.notDeepEqual(Employee.schema.get('toObject'), Person.schema.get('toObject'));
@@ -270,14 +303,14 @@ describe('model', function() {
       });
 
       it('merges callQueue with base queue defined before discriminator types callQueue', function(done) {
-        assert.equal(Employee.schema.callQueue.length, 6);
+        assert.equal(Employee.schema.callQueue.length, 3);
         // PersonSchema.post('save')
         assert.strictEqual(Employee.schema.callQueue[0], Person.schema.callQueue[0]);
 
         // EmployeeSchema.pre('save')
-        assert.strictEqual(Employee.schema.callQueue[5][0], 'pre');
-        assert.strictEqual(Employee.schema.callQueue[5][1]['0'], 'save');
-        assert.strictEqual(Employee.schema.callQueue[5][1]['1'], employeeSchemaPreSaveFn);
+        assert.strictEqual(Employee.schema.callQueue[2][0], 'pre');
+        assert.strictEqual(Employee.schema.callQueue[2][1]['0'], 'save');
+        assert.strictEqual(Employee.schema.callQueue[2][1]['1'], employeeSchemaPreSaveFn);
         done();
       });
 

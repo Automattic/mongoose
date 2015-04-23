@@ -3776,8 +3776,14 @@ fullname <span class="keyword">instanceof</span> mongoose.VirtualType <span clas
   <span class="comment">// do not cast until all setters are applied #665</span>
   v = <span class="keyword">this</span>.cast(v, scope, init, priorVal);
 
-  <span class="keyword">return</span> v;
 };</code></pre></div><hr class="private"></div><div class="item method public"><h3 id="schematype_SchemaType-default"><a href="#schematype_SchemaType-default">SchemaType#default(<code>val</code>)</a></h3><p>Sets a default value for this SchemaType.</p><div class="params"><h4>Parameters:</h4><ul><li><code>val</code><span class="types"> &lt;<a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Function">Function</a>, T&gt; </span><span>the default value</span></li></ul></div><div class="returns"><h4>Returns:</h4><ul><li><span class="types"> &lt;<a href="#defaultValue">defaultValue</a>&gt; </span><span></span></li></ul></div><div class="description"><h4>Example:</h4>
+<pre><code>Kitten.where(<span class="string">'color'</span>, <span class="string">'black'</span>).count(<span class="function"><span class="keyword">function</span> <span class="params">(err, count)</span> {</span>
+  <span class="keyword">if</span> (err) <span class="keyword">return</span> handleError(err);
+  console.log(<span class="string">'there are %d black kittens'</span>, count);
+})</code></pre></div><hr class=""></div><div class="item method public"><h3 id="query_Query-distinct"><a href="#query_Query-distinct">Query#distinct(<code>field</code>, <code>callback</code>)</a></h3><p>Executes this query as a distinct() operation.</p><span class="showcode">show code</span><div class="sourcecode"><pre><code class="javascript">Query.prototype.distinct = <span class="function"><span class="keyword">function</span> <span class="params">(field, callback)</span> {</span>
+  <span class="keyword">this</span>.op = <span class="string">'distinct'</span>;
+  <span class="keyword">var</span> model = <span class="keyword">this</span>.model;
+>>>>>>> master
 
 <pre><code><span class="keyword">var</span> schema = <span class="keyword">new</span> Schema({ n: { type: Number, <span class="keyword">default</span>: <span class="number">10</span> })
 <span class="keyword">var</span> M = db.model(<span class="string">'M'</span>, schema)

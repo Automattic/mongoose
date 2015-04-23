@@ -1709,4 +1709,21 @@ describe('document', function(){
     });
   });
 
-})
+  it('properly calls queue functions (gh-2856)', function(done) {
+    var personSchema = new mongoose.Schema({
+      name: String
+    });
+
+    var db = start();
+    var calledName;
+    personSchema.methods.fn = function() {
+      calledName = this.name;
+    };
+    personSchema.queue('fn');
+
+    var Person = db.model('gh2856', personSchema, 'gh2856');
+    var i = new Person({ name: 'Val' });
+    assert.equal(calledName, 'Val');
+    db.close(done);
+  });
+});

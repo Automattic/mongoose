@@ -746,6 +746,67 @@ describe('model', function() {
           });
         });
       })
+
+      it('reference in child schemas (gh-2719-2)', function(done){
+        var EventSchema, Event, TalkSchema, Talk, Survey;
+
+        function BaseSchema() {
+          Schema.apply(this, arguments);
+
+          this.add({
+            name     : { type: String, required: true },
+            date     : { type: Date, required: true },
+            period   : { start : { type: String, required: true },
+              end   : { type: String, required: true }
+            }
+          });
+        }
+
+        util.inherits(BaseSchema, Schema);
+
+        EventSchema = new BaseSchema({});
+        Event = db.model('Event', EventSchema);
+
+        TalkSchema = new BaseSchema({
+          pin            : { type: String, required: true, index: { unique: true } },
+          totalAttendees : { type: Number },
+          speakers       : [{ type: Schema.Types.ObjectId, ref: 'Speaker' }],
+          surveys        : [{ type: Schema.Types.ObjectId, ref: 'Survey' }],
+          questions      : [{ type: Schema.Types.ObjectId, ref: 'Question' }]
+        });
+
+        Talk = Event.discriminator('Talk', TalkSchema);
+
+        Survey = db.model('Survey', Schema({
+          name: String,
+          date: Date
+        }));
+
+        Survey.create({
+          name: "That you see?",
+          date: Date.now()
+        }, function(err, survey){
+          assert.ifError(err);
+
+          Talk.create({
+            name: "Meetup rails",
+            date: new Date("2015-04-01T00:00:00Z"),
+            pin: "0004",
+            period: { start: "11:00", end: "12:00" },
+            surveys: [ survey ]
+          }, function(err){
+            assert.ifError(err);
+
+            Event.find({}).populate('surveys').exec(function(err, events){
+              assert.ifError(err);
+
+              assert.ok(events[0].surveys[0] instanceof Survey);
+
+              done();
+            });
+          })
+        });
+      })
     });
 
     describe('aggregate', function() {

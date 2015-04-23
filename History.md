@@ -1,3 +1,28 @@
+4.0.2 / 2015-04-23
+==================
+ * fixed; error thrown when calling .validate() on subdoc not in an array #2902
+ * fixed; rename define() to play nice with webpack #2900 [jspears](https://github.com/jspears )
+ * fixed; pre validate called twice with discriminators #2892
+ * fixed; .inspect() on mongoose.Types #2875
+ * docs; correct callback params for Model.update #2872
+ * fixed; setDefaultsOnInsert now works when runValidators not specified #2870
+ * fixed; Document now wraps EventEmitter.addListener #2867
+ * fixed; call non-hook functions in schema queue #2856
+ * fixed; statics can be mocked out for tests #2848 [ninelb](https://github.com/ninelb)
+ * upgraded; mquery 1.4.0 for bluebird bug fix #2846
+ * fixed; required validators run first #2843
+ * docs; improved docs for new option to findAndMody #2838
+ * docs; populate example now uses correct field #2837 [swilliams](https://github.com/swilliams)
+ * fixed; pre validate changes causing VersionError #2835
+ * fixed; get path from correct place when setting CastError #2832
+ * docs; improve docs for Model.update() function signature #2827 [irnc](https://github.com/irnc)
+ * fixed; populating discriminators #2825 [chetverikov](https://github.com/chetverikov)
+ * fixed; discriminators with nested schemas #2821
+ * fixed; CastErrors with embedded docs #2819
+ * fixed; post save hook context #2816
+ * docs; 3.8.x -> 4.x migration guide #2807
+ * fixed; proper _distinct copying for query #2765 [cdelauder](https://github.com/cdelauder) 
+
 3.8.27 / 2015-04-22
 ===================
  * fixed; dont duplicate db calls on Q.ninvoke() #2864

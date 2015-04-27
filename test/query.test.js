@@ -1501,4 +1501,31 @@ describe('Query', function(){
       });
     });
   });
+
+  describe('Invalid IDs', function () {
+    it('should not throw an error when bogus id using find', function (done) {
+      var db = start();
+      var Product = db.model('Product', 'Product_setOptions_test');
+      Product.find({_id: 'bogus'}).exec(function(error) {
+        assert.ifError(error);
+        db.close(done);
+      });
+    });
+    it('should not throw an error when bogus id using findOne', function (done) {
+      var db = start();
+      var Product = db.model('Product', 'Product_setOptions_test');
+      Product.findOne({_id: 'bogus'}).exec(function(error) {
+        assert.ifError(error);
+        db.close(done);
+      });
+    });
+    it('should not throw an error when bogus id using findById', function (done) {
+      var db = start();
+      var Product = db.model('Product', 'Product_setOptions_test');
+      Product.findById({_id: 'bogus'}).exec(function(error) {
+        assert.ifError(error);
+        db.close(done);
+      });
+    });
+  });
 })

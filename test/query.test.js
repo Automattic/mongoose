@@ -1522,7 +1522,7 @@ describe('Query', function(){
     it('should not throw an error when bogus id using findById', function (done) {
       var db = start();
       var Product = db.model('Product', 'Product_setOptions_test');
-      Product.findById({_id: 'bogus'}).exec(function(error) {
+      Product.findById('bogus').exec(function(error) {
         assert.ifError(error);
         db.close(done);
       });

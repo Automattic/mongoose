@@ -205,7 +205,7 @@ describe('query stream:', function(){
     function cb (err) {
       ++finished;
       setTimeout(function () {
-        assert.ok(/connection to host localhost:27017 was destroyed/.test(err.message), err.message);
+        assert.ok(/destroyed/.test(err.message), err.message);
         assert.equal(i, 5);
         assert.equal(1, closed);
         assert.equal(1, finished);

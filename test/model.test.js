@@ -4151,7 +4151,7 @@ describe('Model', function(){
             var worked = false;
 
             t.save(function (err) {
-              assert.ok(/no connection available for operation/.test(err.message));
+              assert.ok(/(operation|destroyed)/.test(err.message));
               worked = true;
             });
 

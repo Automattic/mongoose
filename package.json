@@ -22,7 +22,7 @@
     "async": "0.9.0",
     "hooks-fixed": "1.0.1",
     "kareem": "1.0.0",
-    "mongodb": "2.0.27",
+    "mongodb": "2.0.28",
     "mpath": "0.1.1",
     "mpromise": "0.5.4",
     "mquery": "1.4.0",

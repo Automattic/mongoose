@@ -500,7 +500,7 @@ function Document (obj, fields, skipId) {
 
     keys.forEach(function(key) {
       if (!(key in schema.tree)) {
-        define(key, null, self);
+        defineKey(key, null, self);
       }
     });
   }
@@ -514,7 +514,7 @@ function Document (obj, fields, skipId) {
  */
 utils.each(
   ['on', 'once', 'emit', 'listeners', 'removeListener', 'setMaxListeners',
-    'removeAllListeners'],
+    'removeAllListeners', 'addListener'],
   function(emitterFn) {
     Document.prototype[emitterFn] = function() {
       return this.$__.emitter[emitterFn].apply(this.$__.emitter, arguments);
@@ -1014,7 +1014,6 @@ Document.prototype.set = function (path, val, type, options) {
   }
 
   var shouldSet = true;
-
   try {
     // If the user is trying to set a ref path to a document with
     // the correct model name, treat it as populated
@@ -1027,8 +1026,8 @@ Document.prototype.set = function (path, val, type, options) {
     val = schema.applySetters(val, this, false, priorVal);
     this.$markValid(path);
   } catch (e) {
-    this.invalidate(e.path,
-      new MongooseError.CastError(schema.instance, val, e.path));
+    this.invalidate(path,
+      new MongooseError.CastError(schema.instance, val, path));
     shouldSet = false;
   }
 
@@ -1473,8 +1472,8 @@ Document.prototype.validate = function (cb) {
     if (err) {
       for (var key in err.errors) {
         // Make sure cast errors persist
-        if (err.errors[key] instanceof MongooseError.CastError) {
-          self.invalidate(err.errors[key].path, err.errors[key]);
+        if (!self.__parent && err.errors[key] instanceof MongooseError.CastError) {
+          self.invalidate(key, err.errors[key]);
         }
       }
       promise.reject(err);
@@ -1545,7 +1544,7 @@ Document.prototype.validateSync = function () {
     for (var key in err.errors) {
       // Make sure cast errors persist
       if (err.errors[key] instanceof MongooseError.CastError) {
-        self.invalidate(err.errors[key].path, err.errors[key]);
+        self.invalidate(key, err.errors[key]);
       }
     }
   }
@@ -1763,7 +1762,7 @@ function compile (tree, proto, prefix) {
     key = keys[i];
     limb = tree[key];
 
-    define(key
+    defineKey(key
         , (('Object' === utils.getFunctionName(limb.constructor)
                && Object.keys(limb).length)
                && (!limb.type || limb.type.type)
@@ -1792,7 +1791,7 @@ function getOwnPropertyDescriptors(object) {
  * Defines the accessor named prop on the incoming prototype.
  */
 
-function define (prop, subprops, prototype, prefix, keys) {
+function defineKey (prop, subprops, prototype, prefix, keys) {
   var prefix = prefix || ''
     , path = (prefix ? prefix + '.' : '') + prop;
 
@@ -1939,6 +1938,10 @@ Document.prototype.$__registerHooksFromSchema = function () {
 
   // we are only interested in 'pre' hooks, and group by point-cut
   var toWrap = q.reduce(function (seed, pair) {
+    if (pair[0] !== 'pre' && pair[0] !== 'post' && pair[0] !== 'on') {
+      self[pair[0]].apply(self, pair[1]);
+      return seed;
+    }
     var args = [].slice.call(pair[1]);
     var pointCut = pair[0] === 'on' ? 'post' : args[0];
     if (!(pointCut in seed)) seed[pointCut] = [];
@@ -3396,19 +3399,10 @@ function Schema (obj, options) {
     this.virtual('id').get(idGetter);
   }
 
-  this.pre('save', function(next) {
-    // Nested docs have their own presave
-    if (this.ownerDocument) {
-      return next();
-    }
-
-    // Validate
-    if (this.schema.options.validateBeforeSave) {
-      this.validate(next);
-    } else {
-      next();
-    }
-  });
+  for (var i = 0; i < this._defaultMiddleware.length; ++i) {
+    var m = this._defaultMiddleware[i];
+    this[m.kind](m.hook, m.fn);
+  }
 
   // adds updatedAt and createdAt timestamps to documents if enabled
   var timestamps = this.options.timestamps;
@@ -3438,11 +3432,6 @@ function Schema (obj, options) {
     });
   }
 
-  this.pre('validate', function(next) {
-    delete this.errors;
-    next();
-  });
-
 }
 
 /*!
@@ -3464,6 +3453,41 @@ function idGetter () {
  */
 Schema.prototype = Object.create( EventEmitter.prototype );
 Schema.prototype.constructor = Schema;
+
+/**
+ * Default middleware attached to a schema. Cannot be changed.
+ *
+ * This field is used to make sure discriminators don't get multiple copies of
+ * built-in middleware. Declared as a constant because changing this at runtime
+ * may lead to instability with Model.prototype.discriminator().
+ *
+ * @api private
+ * @property _defaultMiddleware
+ */
+Object.defineProperty(Schema.prototype, '_defaultMiddleware', {
+  configurable: false,
+  enumerable: false,
+  writable: false,
+  value: [
+    {
+      kind: 'pre',
+      hook: 'save',
+      fn: function(next) {
+        // Nested docs have their own presave
+        if (this.ownerDocument) {
+          return next();
+        }
+
+        // Validate
+        if (this.schema.options.validateBeforeSave) {
+          this.validate(next);
+        } else {
+          next();
+        }
+      }
+    }
+  ]
+});
 
 /**
  * Schema as flat paths
@@ -3942,7 +3966,10 @@ Schema.prototype.post = function(method, fn) {
   }
   // assuming that all callbacks with arity < 2 are synchronous post hooks
   if (fn.length < 2) {
-    return this.queue('on', arguments);
+    return this.queue('post', [arguments[0], function(next) {
+      fn.call(this, this);
+      next();
+    }]);
   }
 
   return this.queue('post', [arguments[0], function(next){
@@ -5204,16 +5231,19 @@ SchemaDate.prototype.cast = function (value) {
   var date;
 
   // support for timestamps
-  if (value instanceof Number || 'number' == typeof value
-      || String(value) == Number(value))
-    date = new Date(Number(value));
+  if (typeof value !== 'undefined') {
+    if (value instanceof Number || 'number' == typeof value
+        || String(value) == Number(value)) {
+      date = new Date(Number(value));
+    } else if (value.toString) {
+      // support for date strings
+      date = new Date(value.toString());
+    }
 
-  // support for date strings
-  else if (value.toString)
-    date = new Date(value.toString());
-
-  if (date.toString() != 'Invalid Date')
-    return date;
+    if (date.toString() != 'Invalid Date') {
+      return date;
+    }
+  }
 
   throw new CastError('date', value, this.path);
 };
@@ -5284,8 +5314,6 @@ module.exports = SchemaDate;
  * Module dependencies.
  */
 
-var utils = require('../utils.js');
-
 var ArrayType = require('./array');
 var Document = require('../document');
 var MongooseDocumentArray = require('../types/documentarray');
@@ -5306,16 +5334,16 @@ function DocumentArray (key, schema, options) {
 
   // compile an embedded document for this schema
   function EmbeddedDocument () {
-    this.$__setSchema(schema);
-    // apply methods
-    for (var i in schema.methods) {
-      this[i] = schema.methods[i];
-    }
     Subdocument.apply(this, arguments);
   }
 
-  EmbeddedDocument.prototype = Subdocument.prototype;
+  EmbeddedDocument.prototype = Object.create(Subdocument.prototype);
+  EmbeddedDocument.prototype.$__setSchema(schema);
   EmbeddedDocument.schema = schema;
+
+  // apply methods
+  for (var i in schema.methods)
+    EmbeddedDocument.prototype[i] = schema.methods[i];
 
   // apply statics
   for (var i in schema.statics)
@@ -5359,7 +5387,9 @@ DocumentArray.prototype.constructor = DocumentArray;
 
 DocumentArray.prototype.doValidate = function (array, fn, scope) {
   SchemaType.prototype.doValidate.call(this, array, function (err) {
-    if (err) return fn(err);
+    if (err) {
+      return fn(err);
+    }
 
     var count = array && array.length;
     var error;
@@ -5466,7 +5496,7 @@ DocumentArray.prototype.cast = function (value, doc, init, prev) {
     if (!(value[i] instanceof Subdocument) && value[i]) {
       if (init) {
         selected || (selected = scopePaths(this, doc.$__.selected, init));
-        subdoc = new this.casterConstructor(null, value, true, selected);
+        subdoc = new this.casterConstructor(null, value, true, selected, i);
         value[i] = subdoc.init(value[i]);
       } else {
         try {
@@ -5477,13 +5507,15 @@ DocumentArray.prototype.cast = function (value, doc, init, prev) {
           // handle resetting doc with existing id but differing data
           // doc.array = [{ doc: 'val' }]
           subdoc.set(value[i]);
+          // if set() is hooked it will have no return value
+          // see gh-746
+          value[i] = subdoc;
         } else {
-          subdoc = new this.casterConstructor(value[i], value);
+          subdoc = new this.casterConstructor(value[i], value, undefined, undefined, i);
+          // if set() is hooked it will have no return value
+          // see gh-746
+          value[i] = subdoc;
         }
-
-        // if set() is hooked it will have no return value
-        // see gh-746
-        value[i] = subdoc;
       }
     }
   }
@@ -5527,7 +5559,7 @@ function scopePaths (array, fields, init) {
 
 module.exports = DocumentArray;
 
-},{"../document":4,"../schematype":30,"../types/documentarray":34,"../types/embedded":35,"../utils.js":38,"./array":20}],25:[function(require,module,exports){
+},{"../document":4,"../schematype":30,"../types/documentarray":34,"../types/embedded":35,"./array":20}],25:[function(require,module,exports){
 
 /*!
  * Module exports.
@@ -7073,7 +7105,8 @@ SchemaType.prototype.validate = function (obj, message, type) {
 };
 
 /**
- * Adds a required validator to this schematype.
+ * Adds a required validator to this schematype. The required validator is added
+ * to the front of the validators array using `unshift()`.
  *
  * ####Example:
  *
@@ -7129,7 +7162,7 @@ SchemaType.prototype.required = function (required, message) {
   }
 
   var msg = message || errorMessages.general.required;
-  this.validators.push({
+  this.validators.unshift({
     validator: this.requiredValidator,
     message: msg,
     type: 'required'
@@ -7592,7 +7625,6 @@ StateMachine.prototype.map = function map () {
 
 },{"./utils":38}],32:[function(require,module,exports){
 (function (Buffer){
-
 /*!
  * Module dependencies.
  */
@@ -7853,6 +7885,17 @@ MongooseArray.mixin = {
   },
 
   /**
+   * Internal helper for .map()
+   *
+   * @api private
+   * @return {Number}
+   * @method hasAtomics
+   */
+  _mapCast: function(val, index) {
+    return this._cast(val, this.length + index);
+  },
+
+  /**
    * Wraps [`Array#push`](https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array/push) with proper change tracking.
    *
    * @param {Object} [args...]
@@ -7861,8 +7904,8 @@ MongooseArray.mixin = {
    */
 
   push: function () {
-    var values = [].map.call(arguments, this._cast, this)
-      , ret = [].push.apply(this, values);
+    var values = [].map.call(arguments, this._mapCast, this);
+    var ret = [].push.apply(this, values);
 
     // $pushAll might be fibbed (could be $push). But it makes it easier to
     // handle what could have been $push, $pushAll combos
@@ -7884,8 +7927,8 @@ MongooseArray.mixin = {
    */
 
   nonAtomicPush: function () {
-    var values = [].map.call(arguments, this._cast, this)
-      , ret = [].push.apply(this, values);
+    var values = [].map.call(arguments, this._mapCast, this);
+    var ret = [].push.apply(this, values);
     this._registerAtomic('$set', this);
     this._markModified();
     return ret;
@@ -8096,7 +8139,7 @@ MongooseArray.mixin = {
       for (i = 0; i < arguments.length; ++i) {
         vals[i] = i < 2
           ? arguments[i]
-          : this._cast(arguments[i]);
+          : this._cast(arguments[i], arguments[0] + (i - 2));
       }
       ret = [].splice.apply(this, vals);
       this._registerAtomic('$set', this);
@@ -8160,9 +8203,9 @@ MongooseArray.mixin = {
    */
 
   addToSet: function addToSet () {
-    var values = [].map.call(arguments, this._cast, this)
-      , added = []
-      , type = values[0] instanceof EmbeddedDocument ? 'doc' :
+    var values = [].map.call(arguments, this._mapCast, this);
+    var added = [];
+    var type = values[0] instanceof EmbeddedDocument ? 'doc' :
                values[0] instanceof Date ? 'date' :
                '';
 
@@ -8218,7 +8261,7 @@ MongooseArray.mixin = {
    */
 
   set: function set (i, val) {
-    this[i] = this._cast(val);
+    this[i] = this._cast(val, i);
     this._markModified(i);
     return this;
   },
@@ -8630,13 +8673,14 @@ MongooseDocumentArray.mixin = Object.create( MongooseArray.mixin );
  * @api private
  */
 
-MongooseDocumentArray.mixin._cast = function (value) {
+MongooseDocumentArray.mixin._cast = function (value, index) {
   if (value instanceof this._schema.casterConstructor) {
     if (!(value.__parent && value.__parentArray)) {
       // value may have been created using array.create()
       value.__parent = this._parent;
       value.__parentArray = this;
     }
+    value.__index = index;
     return value;
   }
 
@@ -8647,8 +8691,7 @@ MongooseDocumentArray.mixin._cast = function (value) {
       value instanceof ObjectId || !utils.isObject(value)) {
     value = { _id: value };
   }
-
-  return new this._schema.casterConstructor(value, this);
+  return new this._schema.casterConstructor(value, this, undefined, undefined, index);
 };
 
 /**
@@ -8721,7 +8764,7 @@ MongooseDocumentArray.mixin.toObject = function (options) {
  */
 
 MongooseDocumentArray.mixin.inspect = function () {
-  return '[' + this.map(function (doc) {
+  return '[' + Array.prototype.map.call(this, function (doc) {
     if (doc) {
       return doc.inspect
         ? doc.inspect()
@@ -8800,7 +8843,7 @@ var Promise = require('../promise');
  * @api private
  */
 
-function EmbeddedDocument (obj, parentArr, skipId, fields) {
+function EmbeddedDocument (obj, parentArr, skipId, fields, index) {
   if (parentArr) {
     this.__parentArray = parentArr;
     this.__parent = parentArr._parent;
@@ -8808,6 +8851,7 @@ function EmbeddedDocument (obj, parentArr, skipId, fields) {
     this.__parentArray = undefined;
     this.__parent = undefined;
   }
+  this.__index = index;
 
   Document.call(this, obj, fields, skipId);
 
@@ -8952,21 +8996,13 @@ EmbeddedDocument.prototype.invalidate = function (path, err, val, first) {
     throw new Error(msg);
   }
 
-  var index = this.__parentArray.indexOf(this);
-  var parentPath = this.__parentArray._path;
-  var fullPath = [parentPath, index, path].join('.');
-
-  // sniffing arguments:
-  // need to check if user passed a value to keep
-  // our error message clean.
-  if (2 < arguments.length) {
+  var index = this.__index;
+  if (typeof index !== 'undefined') {
+    var parentPath = this.__parentArray._path;
+    var fullPath = [parentPath, index, path].join('.');
     this.__parent.invalidate(fullPath, err, val);
-  } else {
-    this.__parent.invalidate(fullPath, err);
   }
 
-  if (first)
-    this.$__.validationError = this.ownerDocument().$__.validationError;
   return true;
 };
 
@@ -8983,11 +9019,12 @@ EmbeddedDocument.prototype.$markValid = function(path) {
     return;
   }
 
-  var index = this.__parentArray.indexOf(this);
-  var parentPath = this.__parentArray._path;
-  var fullPath = [parentPath, index, path].join('.');
-
-  this.__parent.$markValid(fullPath);
+  var index = this.__index;
+  if (typeof index !== 'undefined') {
+    var parentPath = this.__parentArray._path;
+    var fullPath = [parentPath, index, path].join('.');
+    this.__parent.$markValid(fullPath);
+  }
 };
 
 /**
@@ -8999,17 +9036,16 @@ EmbeddedDocument.prototype.$markValid = function(path) {
  */
 
 EmbeddedDocument.prototype.$isValid = function(path) {
-  if (!this.__parent) {
-    var msg = 'Unable to invalidate a subdocument that has not been added to an array.'
-    throw new Error(msg);
+  var index = this.__index;
+  if (typeof index !== 'undefined') {
+    var parentPath = this.__parentArray._path;
+    var fullPath = [parentPath, index, path].join('.');
+
+    return !this.__parent.$__.validationError ||
+      !this.__parent.$__.validationError.errors[path];
   }
 
-  var index = this.__parentArray.indexOf(this);
-  var parentPath = this.__parentArray._path;
-  var fullPath = [parentPath, index, path].join('.');
-
-  return !this.__parent.$__.validationError ||
-    !this.__parent.$__.validationError.errors[path];
+  return true;
 };
 
 /**

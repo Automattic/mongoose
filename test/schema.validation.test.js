@@ -203,6 +203,8 @@ describe('schema', function(){
 
         Tobi.path('friends').doValidate(1, function(err){
           assert.ok(err instanceof ValidatorError);
+          assert.equal('friends', err.path);
+          assert.equal('min', err.kind);
         });
 
         // null is allowed

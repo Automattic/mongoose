@@ -296,6 +296,7 @@
  * added; `doc.remove()` returns a promise #1619 [refack](https://github.com/refack)
  * added; internal promises for hooks, pre-save hooks run in parallel #1732 [refack](https://github.com/refack)
  * fixed; geoSearch hanging when no results returned #1846 [ghartnett](https://github.com/ghartnett)
+ * fixed; do not set .type property on ValidationError, use .kind instead #1323
 
 3.8.11 / 2014-05-22
 ==================

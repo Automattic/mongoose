@@ -28,21 +28,21 @@ describe('model middleware', function(){
     schema.post('save', function (obj) {
       assert.equal(obj.title, 'Little Green Running Hood');
       assert.equal(this.title, 'Little Green Running Hood');
-      assert.equal(0, called);
+      assert.equal(1, called);
       called++;
     });
 
     schema.post('save', function (obj) {
       assert.equal(obj.title, 'Little Green Running Hood');
       assert.equal(this.title, 'Little Green Running Hood');
-      assert.equal(1, called);
+      assert.equal(2, called);
       called++;
     });
 
     schema.post('save', function(obj, next){
       setTimeout(function(){
         assert.equal(obj.title, 'Little Green Running Hood');
-        assert.equal(2, called);
+        assert.equal(0, called);
         called++;
         next();
       }, 0);

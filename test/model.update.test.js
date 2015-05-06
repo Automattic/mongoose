@@ -1023,17 +1023,15 @@ describe('model: update:', function(){
   describe('upsert helper method', function() {
     
     it('$setOnInsert operator', function(done){
-      var db = start()
+      var db = start();
       var schema = Schema({ name: String, age: Number, x: String });
       var M = db.model('setoninsert-' + random(), schema);
 
       var match = { name: 'set on insert' };
       var op = { $setOnInsert: { age: '47' }, x: 'inserted' };
       M.upsert(match, op, function (err, updated) {
-        console.log('upsert!', err, updated);
         assert.ifError(err);
         M.findOne(function (err, doc) {
-          console.log('upsert.findOne!', err, doc);
           assert.ifError(err);
           assert.equal(47, doc.age);
           assert.equal('set on insert', doc.name);

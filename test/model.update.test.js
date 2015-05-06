@@ -1020,6 +1020,157 @@ describe('model: update:', function(){
     });
   });
 
+  describe('upsert helper method', function() {
+    
+    it('$setOnInsert operator', function(done){
+      var db = start()
+      var schema = Schema({ name: String, age: Number, x: String });
+      var M = db.model('setoninsert-' + random(), schema);
+
+      var match = { name: 'set on insert' };
+      var op = { $setOnInsert: { age: '47' }, x: 'inserted' };
+      M.upsert(match, op, function (err, updated) {
+        console.log('upsert!', err, updated);
+        assert.ifError(err);
+        M.findOne(function (err, doc) {
+          console.log('upsert.findOne!', err, doc);
+          assert.ifError(err);
+          assert.equal(47, doc.age);
+          assert.equal('set on insert', doc.name);
+
+          var match = { name: 'set on insert' };
+          var op = { $setOnInsert: { age: 108 }, name: 'changed' };
+          M.upsert(match, op, function (err, updated) {
+            assert.ifError(err);
+
+            M.findOne(function (err, doc) {
+              assert.equal(47, doc.age);
+              assert.equal('changed', doc.name);
+              db.close(done);
+            });
+          });
+        });
+      });
+    });
+
+    it('applies defaults on upsert helper', function(done) {
+      var db = start();
+
+      var s = new Schema({ topping: { type: String, default: 'bacon' }, base: String });
+      var Breakfast = db.model('gh-860-0', s);
+
+      var updateOptions = { setDefaultsOnInsert: true };
+      Breakfast.upsert({}, { base: 'eggs' }, updateOptions, function(error) {
+        assert.ifError(error);
+        Breakfast.findOne({}, function(error, breakfast) {
+          assert.ifError(error);
+          assert.equal('eggs', breakfast.base);
+          assert.equal('bacon', breakfast.topping);
+          db.close(done);
+        });
+      });
+    });
+
+    it('doesnt set default on upsert if query sets it', function(done) {
+      var db = start();
+
+      var s = new Schema({ topping: { type: String, default: 'bacon' }, base: String });
+      var Breakfast = db.model('gh-860-1', s);
+
+      var updateOptions = { setDefaultsOnInsert: true };
+      Breakfast.upsert({ topping: 'sausage' }, { base: 'eggs' }, updateOptions, function(error) {
+        assert.ifError(error);
+        Breakfast.findOne({}, function(error, breakfast) {
+          assert.ifError(error);
+          assert.equal('eggs', breakfast.base);
+          assert.equal('sausage', breakfast.topping);
+          db.close();
+          done();
+        });
+      });
+    });
+
+    it('properly sets default on upsert if query wont set it', function(done) {
+      var db = start();
+
+      var s = new Schema({ topping: { type: String, default: 'bacon' }, base: String });
+      var Breakfast = db.model('gh-860-2', s);
+
+      var updateOptions = { setDefaultsOnInsert: true };
+      Breakfast.upsert({ topping: { $ne: 'sausage' } }, { base: 'eggs' }, updateOptions, function(error) {
+        assert.ifError(error);
+        Breakfast.findOne({}, function(error, breakfast) {
+          assert.ifError(error);
+          assert.equal('eggs', breakfast.base);
+          assert.equal('bacon', breakfast.topping);
+          db.close();
+          done();
+        });
+      });
+    });
+
+    it('runs validators if theyre set', function(done) {
+      var db = start();
+
+      var s = new Schema({
+        topping: { type: String, validate: function(v) { return false; } },
+        base: { type: String, validate: function(v) { return true; } }
+      });
+      var Breakfast = db.model('gh-860-3', s);
+
+      var updateOptions = { setDefaultsOnInsert: true, runValidators: true };
+      Breakfast.upsert({}, { topping: 'bacon', base: 'eggs' }, updateOptions, function(error) {
+        assert.ok(!!error);
+        assert.equal(1, Object.keys(error.errors).length);
+        assert.equal('topping', Object.keys(error.errors)[0]);
+        assert.equal('Validator failed for path `topping` with value `bacon`',
+          error.errors['topping'].message);
+
+        Breakfast.findOne({}, function(error, breakfast) {
+          assert.ifError(error);
+          assert.ok(!breakfast);
+          db.close();
+          done();
+        });
+      });
+    });
+
+    it('works with overwrite but no $set (gh-2568)', function(done) {
+      var db = start();
+
+      var chapterSchema = {
+        name: String
+      };
+      var bookSchema = {
+        chapters: [chapterSchema],
+        title: String,
+        author: String,
+        id: Number
+      };
+      var Book = db.model('gh2568', bookSchema);
+
+      var jsonObject = {
+        chapters: [{name: 'Ursus'}, {name: 'The Comprachicos'}],
+        name: 'The Man Who Laughs',
+        author: 'Victor Hugo',
+        id: 0
+      };
+
+      Book.upsert({}, jsonObject, { overwrite: true },
+        function(error, book) {
+          assert.ifError(error);
+          Book.findOne({ id: 0 }, function(error, book) {
+            assert.ifError(error);
+            assert.equal(book.chapters.length, 2);
+            assert.ok(book.chapters[0]._id);
+            assert.ok(book.chapters[1]._id);
+            done();
+          });
+      });
+    });
+  });
+
+
   describe('defaults and validators (gh-860)', function() {
     it('applies defaults on upsert', function(done) {
       var db = start();

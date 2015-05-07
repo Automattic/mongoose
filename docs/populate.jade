@@ -48,7 +48,7 @@ block content
         if (err) return handleError(err);
         // thats it!
       });
-    })
+    });
   h3 Population
   :markdown
     So far we haven't done anything much different. We've merely created a `Person` and a `Story`. Now let's take a look at populating our story's `_creator` using the query builder:
@@ -60,7 +60,7 @@ block content
       if (err) return handleError(err);
       console.log('The creator is %s', story._creator.name);
       // prints "The creator is Aaron"
-    })
+    });
   :markdown
     Populated paths are no longer set to their original `_id` , their value is replaced with the mongoose document returned from the database by performing a separate query before returning the results.
 
@@ -68,6 +68,19 @@ block content
   .important
     :markdown
       **Note**: mongoose >= 3.6 exposes the original `_ids` used during population through the [document#populated()](./api.html#document_Document-populated) method.
+  h3 Setting Populated Fields
+  :markdown
+    In Mongoose >= 4.0, you can manually populate a field as well.
+  :js
+    Story.findOne({ title: 'Once upon a timex.' }, function(error, story) {
+      if (error) {
+        return handleError(error);
+      }
+      story._creator = aaron;
+      console.log(story._creator.name); // prints "Aaron"
+    });
+  :markdown
+    Note that this only works for single refs. You currently **can't** manually populate an array of refs.
   h3 Field selection
   :markdown
     What if we only want a few specific fields returned for the populated documents? This can be accomplished by passing the usual [field name syntax](./api.html#query_Query-select) as the second argument to the populate method:

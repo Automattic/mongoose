@@ -7,7 +7,7 @@ LEGACY_BRANCH = 3.8.x
 
 test:
 	@MONGOOSE_DISABLE_STABILITY_WARNING=1 node test/dropdb.js
-	@MONGOOSE_DISABLE_STABILITY_WARNING=1 ./node_modules/.bin/mocha $(T) --async-only $(TESTS)
+	@MONGOOSE_DISABLE_STABILITY_WARNING=1 ./node_modules/.bin/mocha $(T) --async-only test/*.test.js
 	@MONGOOSE_DISABLE_STABILITY_WARNING=1 node test/dropdb.js
 
 test-short:

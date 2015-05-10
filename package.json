@@ -22,7 +22,7 @@
     "async": "0.9.0",
     "bson": "~0.3",
     "hooks-fixed": "1.0.1",
-    "kareem": "1.0.0",
+    "kareem": "1.0.1",
     "mongodb": "2.0.30",
     "mpath": "0.1.1",
     "mpromise": "0.5.4",

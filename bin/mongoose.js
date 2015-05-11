@@ -1781,7 +1781,7 @@ function getOwnPropertyDescriptors(object) {
 
   Object.getOwnPropertyNames(object).forEach(function(key) {
     result[key] = Object.getOwnPropertyDescriptor(object, key);
-    result[key].enumerable = false;
+    result[key].enumerable = true;
   });
 
   return result;
@@ -1825,9 +1825,11 @@ function defineKey (prop, subprops, prototype, prefix, keys) {
               });
             }
 
-            nested.toObject = function () {
+            nested.toObject = function() {
               return this.get(path);
             };
+
+            nested.toJSON = nested.toObject;
 
             compile(subprops, nested, path);
             this.$__.getters[path] = nested;
@@ -2015,6 +2017,105 @@ Document.prototype.$__handleReject = function handleReject(err) {
 
 
 /**
+ * Internal helper for toObject() and toJSON() that doesn't manipulate options
+ *
+ * @api private
+ * @method $toObject
+ * @memberOf Document
+ */
+
+Document.prototype.$toObject = function(options, json) {
+  var defaultOptions = { transform: true, json: json };
+
+  if (options && options.depopulate && !options._skipDepopulateTopLevel && this.$__.wasPopulated) {
+    // populated paths that we set to a document
+    return clone(this._id, options);
+  }
+
+  // If we're calling toObject on a populated doc, we may want to skip
+  // depopulated on the top level
+  if (options && options._skipDepopulateTopLevel) {
+    options._skipDepopulateTopLevel = false;
+  }
+
+  // When internally saving this document we always pass options,
+  // bypassing the custom schema options.
+  var optionsParameter = options;
+  if (!(options && 'Object' == utils.getFunctionName(options.constructor)) ||
+      (options && options._useSchemaOptions)) {
+    if (json) {
+      options = this.schema.options.toJSON ?
+        clone(this.schema.options.toJSON) :
+        {};
+    } else {
+      options = this.schema.options.toObject ?
+        clone(this.schema.options.toObject) :
+        {};
+    }
+  }
+
+  for (var key in defaultOptions) {
+    if (options[key] === undefined) {
+      options[key] = defaultOptions[key];
+    }
+  }
+
+  ;('minimize' in options) || (options.minimize = this.schema.options.minimize);
+  if (!optionsParameter) {
+    options._useSchemaOptions = true;
+  }
+
+  // remember the root transform function
+  // to save it from being overwritten by sub-transform functions
+  var originalTransform = options.transform;
+
+  var ret = clone(this._doc, options);
+
+  if (options.virtuals || options.getters && false !== options.virtuals) {
+    applyGetters(this, ret, 'virtuals', options);
+  }
+
+  if (options.getters) {
+    applyGetters(this, ret, 'paths', options);
+    // applyGetters for paths will add nested empty objects;
+    // if minimize is set, we need to remove them.
+    if (options.minimize) {
+      ret = minimize(ret) || {};
+    }
+  }
+
+  if (options.versionKey === false && this.schema.options.versionKey) {
+    delete ret[this.schema.options.versionKey];
+  }
+
+  var transform = options.transform;
+
+  // In the case where a subdocument has its own transform function, we need to
+  // check and see if the parent has a transform (options.transform) and if the
+  // child schema has a transform (this.schema.options.toObject) In this case,
+  // we need to adjust options.transform to be the child schema's transform and
+  // not the parent schema's
+  if (true === transform ||
+      (this.schema.options.toObject && transform)) {
+
+    var opts = options.json ? this.schema.options.toJSON : this.schema.options.toObject;
+
+    if (opts) {
+      transform = (typeof options.transform === 'function' ? options.transform : opts.transform);
+    }
+  } else {
+    options.transform = originalTransform;
+  }
+
+  if ('function' == typeof transform) {
+    var xformed = transform(this, ret, options);
+    if ('undefined' != typeof xformed) ret = xformed;
+  }
+
+  return ret;
+};
+
+/**
  * Converts this document into a plain javascript object, ready for storage in MongoDB.
  *
  * Buffers are converted to instances of [mongodb.Binary](http://mongodb.github.com/node-mongodb-native/api-bson-generated/binary.html) for proper storage.
@@ -2027,6 +2128,7 @@ Document.prototype.$__handleReject = function handleReject(err) {
  * - `transform` a transform function to apply to the resulting document before returning
  * - `depopulate` depopulate any populated paths, replacing them with their original refs (defaults to false)
  * - `versionKey` whether to include the version key (defaults to true)
+ * - `retainKeyOrder` keep the order of object keys. If this is set to true, `Object.keys(new Doc({ a: 1, b: 2}).toObject())` will always produce `['a', 'b']` (defaults to false)
  *
  * ####Getters/Virtuals
  *
@@ -2129,88 +2231,7 @@ Document.prototype.$__handleReject = function handleReject(err) {
  */
 
 Document.prototype.toObject = function (options) {
-  var defaultOptions = { transform: true };
-
-  if (options && options.depopulate && !options._skipDepopulateTopLevel && this.$__.wasPopulated) {
-    // populated paths that we set to a document
-    return clone(this._id, options);
-  }
-
-  // If we're calling toObject on a populated doc, we may want to skip
-  // depopulated on the top level
-  if (options && options._skipDepopulateTopLevel) {
-    options._skipDepopulateTopLevel = false;
-  }
-
-  // When internally saving this document we always pass options,
-  // bypassing the custom schema options.
-  var optionsParameter = options;
-  if (!(options && 'Object' == utils.getFunctionName(options.constructor)) ||
-      (options && options._useSchemaOptions)) {
-    options = this.schema.options.toObject
-      ? clone(this.schema.options.toObject)
-      : {};
-  }
-
-  for (var key in defaultOptions) {
-    if (options[key] === undefined) {
-      options[key] = defaultOptions[key];
-    }
-  }
-
-  ;('minimize' in options) || (options.minimize = this.schema.options.minimize);
-  if (!optionsParameter) {
-    options._useSchemaOptions = true;
-  }
-
-  // remember the root transform function
-  // to save it from being overwritten by sub-transform functions
-  var originalTransform = options.transform;
-
-  var ret = clone(this._doc, options);
-
-  if (options.virtuals || options.getters && false !== options.virtuals) {
-    applyGetters(this, ret, 'virtuals', options);
-  }
-
-  if (options.getters) {
-    applyGetters(this, ret, 'paths', options);
-    // applyGetters for paths will add nested empty objects;
-    // if minimize is set, we need to remove them.
-    if (options.minimize) {
-      ret = minimize(ret) || {};
-    }
-  }
-
-  if (options.versionKey === false && this.schema.options.versionKey) {
-    delete ret[this.schema.options.versionKey];
-  }
-
-  var transform = options.transform;
-
-  // In the case where a subdocument has its own transform function, we need to
-  // check and see if the parent has a transform (options.transform) and if the
-  // child schema has a transform (this.schema.options.toObject) In this case,
-  // we need to adjust options.transform to be the child schema's transform and
-  // not the parent schema's
-  if (true === transform ||
-      (this.schema.options.toObject && transform)) {
-
-    var opts = options.json? this.schema.options.toJSON : this.schema.options.toObject;
-
-    if (opts) {
-      transform = (typeof options.transform === 'function' ? options.transform : opts.transform);
-    }
-  } else {
-    options.transform = originalTransform;
-  }
-
-  if ('function' == typeof transform) {
-    var xformed = transform(this, ret, options);
-    if ('undefined' != typeof xformed) ret = xformed;
-  }
-
-  return ret;
+  return this.$toObject(options);
 };
 
 /*!
@@ -2301,21 +2322,7 @@ function applyGetters (self, json, type, options) {
  */
 
 Document.prototype.toJSON = function (options) {
-  // check for object type since an array of documents
-  // being stringified passes array indexes instead
-  // of options objects. JSON.stringify([doc, doc])
-  // The second check here is to make sure that populated documents (or
-  // subdocuments) use their own options for `.toJSON()` instead of their
-  // parent's
-  if (!(options && 'Object' == utils.getFunctionName(options.constructor))
-      || ((!options || options.json) && this.schema.options.toJSON)) {
-    options = this.schema.options.toJSON
-      ? clone(this.schema.options.toJSON)
-      : {};
-  }
-  options.json = true;
-
-  return this.toObject(options);
+  return this.$toObject(options, true);
 };
 
 /**
@@ -3290,7 +3297,7 @@ Promise.prototype.addErrback = Promise.prototype.onReject;
 
 module.exports = Promise;
 
-},{"mpromise":67,"util":48}],19:[function(require,module,exports){
+},{"mpromise":66,"util":48}],19:[function(require,module,exports){
 (function (Buffer){
 /*!
  * Module dependencies.
@@ -3964,9 +3971,8 @@ Schema.prototype.post = function(method, fn) {
   }
   // assuming that all callbacks with arity < 2 are synchronous post hooks
   if (fn.length < 2) {
-    return this.queue('post', [arguments[0], function(next) {
-      fn.call(this, this);
-      next();
+    return this.queue('on', [arguments[0], function(doc) {
+      return fn.call(doc, doc);
     }]);
   }
 
@@ -6274,7 +6280,11 @@ SchemaString.prototype.enum = function () {
   this.enumValidator = function (v) {
     return undefined === v || ~vals.indexOf(v);
   };
-  this.validators.push({ validator: this.enumValidator, message: errorMessage, type: 'enum' });
+  this.validators.push({
+    validator: this.enumValidator,
+    message: errorMessage,
+    kind: 'enum'
+  });
 
   return this;
 };
@@ -7303,8 +7313,6 @@ SchemaType.prototype.doValidate = function (value, fn, scope) {
     }
 
     var validator = v.validator;
-    var message = v.message;
-    var type = v.type;
 
     var validatorProperties = utils.clone(v);
     validatorProperties.path = path;
@@ -7458,8 +7466,6 @@ var utils = require('./utils');
  */
 
 var StateMachine = module.exports = exports = function StateMachine () {
-  this.paths = {};
-  this.states = {};
 }
 
 /*!
@@ -7481,6 +7487,8 @@ StateMachine.ctor = function () {
 
   var ctor = function () {
     StateMachine.apply(this, arguments);
+    this.paths = {};
+    this.states = {};
     this.stateNames = states;
 
     var i = states.length
@@ -9003,6 +9011,10 @@ EmbeddedDocument.prototype.invalidate = function (path, err, val, first) {
     this.__parent.invalidate(fullPath, err, val);
   }
 
+  if (first) {
+    this.$__.validationError = this.ownerDocument().$__.validationError;
+  }
+
   return true;
 };
 
@@ -9174,15 +9186,17 @@ module.exports = ObjectId;
  * Module dependencies.
  */
 
-var ReadPref = require('mongodb/lib/read_preference')
-  , ObjectId = require('./types/objectid')
-  , cloneRegExp = require('regexp-clone')
-  , sliced = require('sliced')
-  , mpath = require('mpath')
-  , ms = require('ms')
-  , MongooseBuffer
-  , MongooseArray
-  , Document
+var mongodb = require('mongodb');
+var ObjectId = require('./types/objectid');
+var cloneRegExp = require('regexp-clone');
+var sliced = require('sliced');
+var mpath = require('mpath');
+var ms = require('ms');
+var MongooseBuffer;
+var MongooseArray;
+var Document;
+
+var ReadPref = !!mongodb ? mongodb.ReadPreference : function(v) { return v; };
 
 /*!
  * Produces a collection name from model `name`.
@@ -9957,7 +9971,7 @@ exports.each = function(arr, fn) {
 
 
 }).call(this,require("FWaASH"),require("buffer").Buffer)
-},{"./document":4,"./types":36,"./types/objectid":37,"FWaASH":46,"buffer":40,"mongodb/lib/read_preference":64,"mpath":65,"ms":68,"regexp-clone":69,"sliced":70}],39:[function(require,module,exports){
+},{"./document":4,"./types":36,"./types/objectid":37,"FWaASH":46,"buffer":40,"mpath":64,"ms":67,"regexp-clone":68,"sliced":69}],39:[function(require,module,exports){
 
 /**
  * VirtualType constructor
@@ -11239,7 +11253,7 @@ var lookup = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
 }(typeof exports === 'undefined' ? (this.base64js = {}) : exports))
 
 },{}],42:[function(require,module,exports){
-exports.read = function(buffer, offset, isLE, mLen, nBytes) {
+exports.read = function (buffer, offset, isLE, mLen, nBytes) {
   var e, m,
       eLen = nBytes * 8 - mLen - 1,
       eMax = (1 << eLen) - 1,
@@ -11247,32 +11261,32 @@ exports.read = function(buffer, offset, isLE, mLen, nBytes) {
       nBits = -7,
       i = isLE ? (nBytes - 1) : 0,
       d = isLE ? -1 : 1,
-      s = buffer[offset + i];
+      s = buffer[offset + i]
 
-  i += d;
+  i += d
 
-  e = s & ((1 << (-nBits)) - 1);
-  s >>= (-nBits);
-  nBits += eLen;
-  for (; nBits > 0; e = e * 256 + buffer[offset + i], i += d, nBits -= 8);
+  e = s & ((1 << (-nBits)) - 1)
+  s >>= (-nBits)
+  nBits += eLen
+  for (; nBits > 0; e = e * 256 + buffer[offset + i], i += d, nBits -= 8) {}
 
-  m = e & ((1 << (-nBits)) - 1);
-  e >>= (-nBits);
-  nBits += mLen;
-  for (; nBits > 0; m = m * 256 + buffer[offset + i], i += d, nBits -= 8);
+  m = e & ((1 << (-nBits)) - 1)
+  e >>= (-nBits)
+  nBits += mLen
+  for (; nBits > 0; m = m * 256 + buffer[offset + i], i += d, nBits -= 8) {}
 
   if (e === 0) {
-    e = 1 - eBias;
+    e = 1 - eBias
   } else if (e === eMax) {
-    return m ? NaN : ((s ? -1 : 1) * Infinity);
+    return m ? NaN : ((s ? -1 : 1) * Infinity)
   } else {
-    m = m + Math.pow(2, mLen);
-    e = e - eBias;
+    m = m + Math.pow(2, mLen)
+    e = e - eBias
   }
-  return (s ? -1 : 1) * m * Math.pow(2, e - mLen);
-};
+  return (s ? -1 : 1) * m * Math.pow(2, e - mLen)
+}
 
-exports.write = function(buffer, value, offset, isLE, mLen, nBytes) {
+exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
   var e, m, c,
       eLen = nBytes * 8 - mLen - 1,
       eMax = (1 << eLen) - 1,
@@ -11280,49 +11294,49 @@ exports.write = function(buffer, value, offset, isLE, mLen, nBytes) {
       rt = (mLen === 23 ? Math.pow(2, -24) - Math.pow(2, -77) : 0),
       i = isLE ? 0 : (nBytes - 1),
       d = isLE ? 1 : -1,
-      s = value < 0 || (value === 0 && 1 / value < 0) ? 1 : 0;
+      s = value < 0 || (value === 0 && 1 / value < 0) ? 1 : 0
 
-  value = Math.abs(value);
+  value = Math.abs(value)
 
   if (isNaN(value) || value === Infinity) {
-    m = isNaN(value) ? 1 : 0;
-    e = eMax;
+    m = isNaN(value) ? 1 : 0
+    e = eMax
   } else {
-    e = Math.floor(Math.log(value) / Math.LN2);
+    e = Math.floor(Math.log(value) / Math.LN2)
     if (value * (c = Math.pow(2, -e)) < 1) {
-      e--;
-      c *= 2;
+      e--
+      c *= 2
     }
     if (e + eBias >= 1) {
-      value += rt / c;
+      value += rt / c
     } else {
-      value += rt * Math.pow(2, 1 - eBias);
+      value += rt * Math.pow(2, 1 - eBias)
     }
     if (value * c >= 2) {
-      e++;
-      c /= 2;
+      e++
+      c /= 2
     }
 
     if (e + eBias >= eMax) {
-      m = 0;
-      e = eMax;
+      m = 0
+      e = eMax
     } else if (e + eBias >= 1) {
-      m = (value * c - 1) * Math.pow(2, mLen);
-      e = e + eBias;
+      m = (value * c - 1) * Math.pow(2, mLen)
+      e = e + eBias
     } else {
-      m = value * Math.pow(2, eBias - 1) * Math.pow(2, mLen);
-      e = 0;
+      m = value * Math.pow(2, eBias - 1) * Math.pow(2, mLen)
+      e = 0
     }
   }
 
-  for (; mLen >= 8; buffer[offset + i] = m & 0xff, i += d, m /= 256, mLen -= 8);
+  for (; mLen >= 8; buffer[offset + i] = m & 0xff, i += d, m /= 256, mLen -= 8) {}
 
-  e = (e << mLen) | m;
-  eLen += mLen;
-  for (; eLen > 0; buffer[offset + i] = e & 0xff, i += d, e /= 256, eLen -= 8);
+  e = (e << mLen) | m
+  eLen += mLen
+  for (; eLen > 0; buffer[offset + i] = e & 0xff, i += d, e /= 256, eLen -= 8) {}
 
-  buffer[offset + i - d] |= s * 128;
-};
+  buffer[offset + i - d] |= s * 128
+}
 
 },{}],43:[function(require,module,exports){
 
@@ -17160,7 +17174,7 @@ Kareem.prototype.execPre = function(name, context, callback) {
           }
 
           ++currentPre;
-          next();
+          next.apply(context, arguments);
         },
         function(error) {
           if (error) {
@@ -17176,7 +17190,7 @@ Kareem.prototype.execPre = function(name, context, callback) {
           }
         });
     } else if (pre.fn.length > 0) {
-      pre.fn.call(context, function(error) {
+      var args = [function(error) {
         if (error) {
           if (done) {
             return;
@@ -17194,8 +17208,14 @@ Kareem.prototype.execPre = function(name, context, callback) {
           }
         }
 
-        next();
-      });
+        next.apply(context, arguments);
+      }];
+      if (arguments.length >= 2) {
+        for (var i = 1; i < arguments.length; ++i) {
+          args.push(arguments[i]);
+        }
+      }
+      pre.fn.apply(context, args);
     } else {
       pre.fn.call(context);
       if (++currentPre >= numPres) {
@@ -17255,7 +17275,7 @@ Kareem.prototype.execPost = function(name, context, args, callback) {
   next();
 };
 
-Kareem.prototype.wrap = function(name, fn, context, args) {
+Kareem.prototype.wrap = function(name, fn, context, args, useLegacyPost) {
   var lastArg = (args.length > 0 ? args[args.length - 1] : null);
   var _this = this;
 
@@ -17277,6 +17297,10 @@ Kareem.prototype.wrap = function(name, fn, context, args) {
           undefined;
       }
 
+      if (useLegacyPost && typeof lastArg === 'function') {
+        lastArg.apply(context, arguments);
+      }
+
       var argsWithoutError = Array.prototype.slice.call(arguments, 1);
       _this.execPost(name, context, argsWithoutError, function() {
         if (arguments[0]) {
@@ -17285,7 +17309,7 @@ Kareem.prototype.wrap = function(name, fn, context, args) {
             undefined;
         }
 
-        return typeof lastArg === 'function' ?
+        return typeof lastArg === 'function' && !useLegacyPost ?
           lastArg.apply(context, arguments) :
           undefined;
       });
@@ -17342,114 +17366,9 @@ module.exports = Kareem;
 
 }).call(this,require("FWaASH"))
 },{"FWaASH":46}],64:[function(require,module,exports){
-"use strict";
-
-/**
- * @fileOverview The **ReadPreference** class is a class that represents a MongoDB ReadPreference and is
- * used to construct connections.
- * 
- * @example
- * var Db = require('mongodb').Db,
- *   ReplSet = require('mongodb').ReplSet,
- *   Server = require('mongodb').Server,
- *   ReadPreference = require('mongodb').ReadPreference,
- *   test = require('assert');
- * // Connect using ReplSet
- * var server = new Server('localhost', 27017);
- * var db = new Db('test', new ReplSet([server]));
- * db.open(function(err, db) {
- *   test.equal(null, err);
- *   // Perform a read
- *   var cursor = db.collection('t').find({});
- *   cursor.setReadPreference(ReadPreference.PRIMARY);
- *   cursor.toArray(function(err, docs) {
- *     test.equal(null, err);
- *     db.close();
- *   });
- * });
- */
-
-/**
- * Creates a new ReadPreference instance
- * 
- * Read Preferences
- *  - **ReadPreference.PRIMARY**, Read from primary only. All operations produce an error (throw an exception where applicable) if primary is unavailable. Cannot be combined with tags (This is the default.).
- *  - **ReadPreference.PRIMARY_PREFERRED**, Read from primary if available, otherwise a secondary.
- *  - **ReadPreference.SECONDARY**, Read from secondary if available, otherwise error.
- *  - **ReadPreference.SECONDARY_PREFERRED**, Read from a secondary if available, otherwise read from the primary.
- *  - **ReadPreference.NEAREST**, All modes read from among the nearest candidates, but unlike other modes, NEAREST will include both the primary and all secondaries in the random selection.
- *
- * @class
- * @param {string} mode The ReadPreference mode as listed above.
- * @param {object} tags An object representing read preference tags.
- * @property {string} mode The ReadPreference mode.
- * @property {object} tags The ReadPreference tags.
- * @return {ReadPreference} a ReadPreference instance.
- */ 
-var ReadPreference = function(mode, tags) {
-  if(!(this instanceof ReadPreference))
-    return new ReadPreference(mode, tags);
-  this._type = 'ReadPreference';
-  this.mode = mode;
-  this.tags = tags;
-}
-
-/**
- * Validate if a mode is legal
- *
- * @method
- * @param {string} mode The string representing the read preference mode.
- * @return {boolean}
- */  
-ReadPreference.isValid = function(_mode) {
-  return (_mode == ReadPreference.PRIMARY || _mode == ReadPreference.PRIMARY_PREFERRED
-    || _mode == ReadPreference.SECONDARY || _mode == ReadPreference.SECONDARY_PREFERRED
-    || _mode == ReadPreference.NEAREST
-    || _mode == true || _mode == false || _mode == null);
-}
-
-/**
- * Validate if a mode is legal
- *
- * @method
- * @param {string} mode The string representing the read preference mode.
- * @return {boolean}
- */  
-ReadPreference.prototype.isValid = function(mode) {
-  var _mode = typeof mode == 'string' ? mode : this.mode;
-  return ReadPreference.isValid(_mode);
-}
-
-/**
- * @ignore
- */
-ReadPreference.prototype.toObject = function() {
-  var object = {mode:this.mode};
-
-  if(this.tags != null) {
-    object['tags'] = this.tags;
-  }
-
-  return object;
-}
-
-/**
- * @ignore
- */
-ReadPreference.PRIMARY = 'primary';
-ReadPreference.PRIMARY_PREFERRED = 'primaryPreferred';
-ReadPreference.SECONDARY = 'secondary';
-ReadPreference.SECONDARY_PREFERRED = 'secondaryPreferred';
-ReadPreference.NEAREST = 'nearest'
-
-/**
- * @ignore
- */
-module.exports = ReadPreference;
-},{}],65:[function(require,module,exports){
 module.exports = exports = require('./lib');
 
-},{"./lib":66}],66:[function(require,module,exports){
+},{"./lib":65}],65:[function(require,module,exports){
 
 /**
  * Returns the value of object `o` at the given `path`.
@@ -17634,7 +17553,7 @@ function K (v) {
   return v;
 }
 
-},{}],67:[function(require,module,exports){
+},{}],66:[function(require,module,exports){
 (function (process){
 'use strict';
 var util = require('util');
@@ -18078,7 +17997,7 @@ Promise.deferred = function deferred() {
 
 
 }).call(this,require("FWaASH"))
-},{"FWaASH":46,"events":44,"util":48}],68:[function(require,module,exports){
+},{"FWaASH":46,"events":44,"util":48}],67:[function(require,module,exports){
 /**
 
 # ms.js
@@ -18115,7 +18034,7 @@ No more painful `setTimeout(fn, 60 * 4 * 3 * 2 * 1 * Infinity * NaN * '☃')`.
   g.top ? g.ms = ms : module.exports = ms;
 })(this);
 
-},{}],69:[function(require,module,exports){
+},{}],68:[function(require,module,exports){
 
 var toString = Object.prototype.toString;
 
@@ -18137,10 +18056,10 @@ module.exports = exports = function (regexp) {
 }
 
 
-},{}],70:[function(require,module,exports){
+},{}],69:[function(require,module,exports){
 module.exports = exports = require('./lib/sliced');
 
-},{"./lib/sliced":71}],71:[function(require,module,exports){
+},{"./lib/sliced":70}],70:[function(require,module,exports){
 
 /**
  * An Array.prototype.slice.call(arguments) alternative

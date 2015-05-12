@@ -1,3 +1,8 @@
+3.8.28 / 2015-05-12
+===================
+ * fixed; proper handling for toJSON options #2910
+ * fixed; dont attach virtuals to embedded docs in update() #2046
+
 4.0.2 / 2015-04-23
 ==================
  * fixed; error thrown when calling .validate() on subdoc not in an array #2902

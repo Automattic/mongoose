@@ -1114,7 +1114,7 @@ describe('model: update:', function(){
     var Parent = db.model('gh2046', parentSchema, 'gh2046');
 
     var update = Parent.update({}, { $push: { children: { foo: 'foo' } } }, { upsert: true });
-    assert.ok(!update._update.$push.children.bar);
+    assert.equal(update._update.$push.children.bar, undefined);
 
     update.exec(function(error) {
       assert.ifError(error);

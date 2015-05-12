@@ -1,3 +1,8 @@
+3.8.28 / 2015-05-12
+===================
+ * fixed; proper handling for toJSON options #2910
+ * fixed; dont attach virtuals to embedded docs in update() #2046
+
 3.8.27 / 2015-04-22
 ===================
  * fixed; dont duplicate db calls on Q.ninvoke() #2864

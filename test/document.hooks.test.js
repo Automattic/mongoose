@@ -561,4 +561,24 @@ describe('document: hooks:', function () {
       db.close(done);
     });
   });
+
+  it('runs post hooks after function (gh-2949)', function(done) {
+    var schema = Schema({ name: String });
+
+    var postCount = 0;
+    schema.post('init', function(doc) {
+      assert.equal(doc.name, 'Val');
+      ++postCount;
+    });
+
+    var db = start();
+    var People = db.model('gh-2949', schema, 'gh-2949');
+
+    People.create({ name: 'Val' }, function(err, doc) {
+      People.findOne({ _id: doc._id }, function(err) {
+        assert.equal(postCount, 1);
+        db.close(done);
+      });
+    });
+  });
 });

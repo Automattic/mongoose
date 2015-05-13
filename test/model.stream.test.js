@@ -205,7 +205,7 @@ describe('query stream:', function(){
     function cb (err) {
       ++finished;
       setTimeout(function () {
-        assert.ok(/connection to host localhost:27017 was destroyed/.test(err.message), err.message);
+        assert.ok(/destroyed/.test(err.message), err.message);
         assert.equal(i, 5);
         assert.equal(1, closed);
         assert.equal(1, finished);
@@ -388,6 +388,34 @@ describe('query stream:', function(){
       User.find().stream().on('data', function(doc) {
         assert.equal(undefined, doc.password);
         db.close(done);
+      });
+    });
+  });
+
+  it('works with populate + lean (gh-2841)', function(done) {
+    var db = start();
+
+    var Sku = db.model('Sku', {}, 'gh2841_0');
+    var Item = db.model('Item', {
+      sku: { ref: 'Sku', type: Schema.Types.ObjectId }
+    }, 'gh2841_1');
+
+    Sku.create({}, function(error, sku) {
+      assert.ifError(error);
+      Item.create({ sku: sku._id }, function(error, item) {
+        assert.ifError(error);
+
+        var found = 0;
+        var popOpts = { path: 'sku', options: { lean: true } };
+        var stream = Item.find().populate(popOpts).stream();
+        stream.on('data', function(doc) {
+          ++found;
+          assert.equal(doc.sku._id.toString(), sku._id.toString());
+        });
+        stream.on('end', function() {
+          assert.equal(found, 1);
+          db.close(done);
+        });
       });
     });
   });

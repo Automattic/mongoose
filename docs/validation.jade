@@ -61,6 +61,49 @@ block content
   :js
     toy.errors.color.message === err.errors.color.message
 
+  h3 Update Validators
+  :markdown
+    In the above examples, you learned about document validation. Mongoose also
+    supports validation for `update()` and `findOneAndUpdate()` operations.
+    In Mongoose 4.x, update validators are off by default - you need to specify
+    the `runValidators` option.
+  :js
+    var toySchema = new Schema({
+      color: String,
+      name: String
+    });
+
+    var Toy = mongoose.model('Toy', toySchema);
+
+    Toy.schema.path('color').validate(function (value) {
+      return /blue|green|white|red|orange|periwinkle/i.test(value);
+    }, 'Invalid color');
+
+    Toy.update({}, { color: 'bacon' }, { runValidators: true }, function (err) {
+      console.log(err.errors.color.message); // prints 'Validator "Invalid color" failed for path color with value `bacon`'
+    });
+  :markdown
+    There is one key difference between update validators and document
+    validators. In the color validation function above, `this` refers
+    to the document being validated when using document validation.
+    However, when running update validators, the document being updated
+    may not be in the server's memory, so `this` refers to the NodeJS global
+    object.
+  :markdown
+    Note that in mongoose 4.x, update validators **only** run on `$set`
+    and `$unset` operations. For instance, the below update will succeed,
+    regardless of the value of `number`.
+  :js
+    var testSchema = new Schema({
+      number: { type: Number, max: 0 },
+    });
+
+    var Test = mongoose.model('Test', testSchema);
+
+    Test.update({}, { $inc: { number: 1 } }, { runValidators: true }, function (err) {
+      // There will never be a validation error here
+    });
+
   h3#next Next Up
   :markdown
     Now that we've covered `validation`, let's take a look at how you might handle advanced validation with Mongoose's [middleware](/docs/middleware.html).

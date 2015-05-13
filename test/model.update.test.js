@@ -1423,4 +1423,28 @@ describe('model: update:', function(){
       done();
     });
   });
+
+  it('does not add virtuals to update (gh-2046)', function(done) {
+    var db = start();
+
+    var childSchema = Schema({ foo: String }, { toObject: { getters: true } })
+    var parentSchema = Schema({ children: [childSchema] });
+
+    childSchema.virtual('bar').get(function() { return 'bar'; });
+
+    var Parent = db.model('gh2046', parentSchema, 'gh2046');
+
+    var update = Parent.update({}, { $push: { children: { foo: 'foo' } } }, { upsert: true });
+    assert.equal(update._update.$push.children.bar, undefined);
+
+    update.exec(function(error) {
+      assert.ifError(error);
+      Parent.findOne({}, function(error, doc) {
+        assert.ifError(error);
+        assert.equal(doc.children.length, 1);
+        assert.ok(!doc.children[0].bar);
+        db.close(done);
+      });
+    });
+  });
 });

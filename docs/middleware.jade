@@ -111,11 +111,28 @@ block content
 
   :js
     schema.pre('update', function() {
+      console.log(this instanceof mongoose.Query); // true
       this.start = Date.now();
     });
 
     schema.post('update', function() {
+      console.log(this instanceof mongoose.Query); // true
       console.log('update() took ' + (Date.now() - this.start) + ' millis');
+    });
+
+  :markdown
+    Query middleware differs from document middleware in a subtle but
+    important way: in document middleware, `this` refers to the document
+    being updated. In query middleware, mongoose doesn't necessarily have
+    a reference to the document being updated, so `this` refers to the
+    **query** object rather than the document being updated.
+
+    For instance, if you wanted to add an `updatedAt` timestamp to every
+    `update()` call, you would use the following pre hook.
+
+  :js
+    schema.pre('update', function() {
+      this.update({ $set: { updatedAt: Date.now() } });
     });
 
   h3#next Next Up

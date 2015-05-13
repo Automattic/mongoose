@@ -2134,7 +2134,8 @@ describe('Model', function(){
         assert.equal(false, threw);
         getter1 = JSON.parse(getter1);
         getter2 = JSON.parse(getter2);
-        assert.equal(getter1.visitors, getter2.visitors);
+        assert.equal(getter1.visitors, 5);
+        assert.equal(getter2.visitors, 5);
         assert.equal(getter1.date, getter2.date);
 
         post.meta.date = new Date - 1000;
@@ -4151,7 +4152,7 @@ describe('Model', function(){
             var worked = false;
 
             t.save(function (err) {
-              assert.ok(/no connection available for operation/.test(err.message));
+              assert.ok(/(operation|destroyed)/.test(err.message));
               worked = true;
             });
 

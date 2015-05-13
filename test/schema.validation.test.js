@@ -203,6 +203,8 @@ describe('schema', function(){
 
         Tobi.path('friends').doValidate(1, function(err){
           assert.ok(err instanceof ValidatorError);
+          assert.equal('friends', err.path);
+          assert.equal('min', err.kind);
         });
 
         // null is allowed
@@ -872,7 +874,7 @@ describe('schema', function(){
       });
     });
 
-    it('allows you to validate embedded doc that was .create()-ed (gh-2902)', function(done) {
+    it('allows you to validate embedded doc that was .create()-ed (gh-2902) (gh-2929)', function(done) {
       var parentSchema = mongoose.Schema({
         children: [{ name: { type: String, required: true } }]
       });
@@ -883,7 +885,13 @@ describe('schema', function(){
       var n = p.children.create({ name: '2' });
       n.validate(function(error) {
         assert.ifError(error);
-        done();
+        var bad = p.children.create({});
+        p.children.push(bad);
+        bad.validate(function(error) {
+          assert.ok(error);
+          assert.ok(error.errors['children.0.name']);
+          done();
+        });
       });
     });
   });

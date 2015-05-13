@@ -1,7 +1,35 @@
+4.0.3 / 2015-05-13
+==================
+ * upgraded; mquery -> 1.5.1 #2983
+ * docs; clarify context for query middleware #2974
+ * docs; fix missing type -> kind rename in History.md #2961
+ * fixed; broken ReadPreference include on Heroku #2957
+ * docs; correct form for cursor aggregate option #2955
+ * fixed; sync post hooks now properly called after function #2949 #2925
+ * fixed; fix sub-doc validate() function #2929
+ * upgraded; node driver -> 2.0.30 #2926
+ * docs; retainKeyOrder for save() #2924
+ * docs; fix broken class names #2913
+ * fixed; error when using node-clone on a doc #2909
+ * fixed; no more hard references to bson #2908 #2906
+ * fixed; dont overwrite array values #2907 [naoina](https://github.com/naoina)
+ * fixed; use readPreference=primary for findOneAndUpdate #2899 #2823
+ * docs; clarify that update validators only run on $set and $unset #2889
+ * fixed; set kind consistently for built-in validators #2885
+ * docs; single field populated documents #2884
+ * fixed; nested objects are now enumerable #2880 [toblerpwn](https://github.com/toblerpwn)
+ * fixed; properly populate field when ref, lean, stream used together #2841
+ * docs; fixed migration guide jade error #2807
+
+3.8.28 / 2015-05-12
+===================
+ * fixed; proper handling for toJSON options #2910
+ * fixed; dont attach virtuals to embedded docs in update() #2046
+
 4.0.2 / 2015-04-23
 ==================
  * fixed; error thrown when calling .validate() on subdoc not in an array #2902
- * fixed; rename define() to play nice with webpack #2900 [jspears](https://github.com/jspears )
+ * fixed; rename define() to play nice with webpack #2900 [jspears](https://github.com/jspears)
  * fixed; pre validate called twice with discriminators #2892
  * fixed; .inspect() on mongoose.Types #2875
  * docs; correct callback params for Model.update #2872
@@ -296,6 +324,7 @@
  * added; `doc.remove()` returns a promise #1619 [refack](https://github.com/refack)
  * added; internal promises for hooks, pre-save hooks run in parallel #1732 [refack](https://github.com/refack)
  * fixed; geoSearch hanging when no results returned #1846 [ghartnett](https://github.com/ghartnett)
+ * fixed; do not set .type property on ValidationError, use .kind instead #1323
 
 3.8.11 / 2014-05-22
 ==================

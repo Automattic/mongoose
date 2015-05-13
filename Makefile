@@ -68,7 +68,7 @@ copylegacy:
 .PHONY: test test-short test-long ghpages site docs docclean gendocs docs_from_master docs_unstable master copytmp copyunstable gitreset docclean_unstable
 
 browser:
-	./node_modules/browserify/bin/cmd.js -o ./bin/mongoose.js lib/browser.js
+	./node_modules/browserify/bin/cmd.js -u "**/mongodb/**" -o ./bin/mongoose.js lib/browser.js
 	./node_modules/uglify-js/bin/uglifyjs ./bin/mongoose.js -o ./bin/mongoose.min.js --screw-ie8 -c -m
 
 browser_debug:

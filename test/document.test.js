@@ -1726,4 +1726,38 @@ describe('document', function(){
     assert.equal(calledName, 'Val');
     db.close(done);
   });
+
+  it('applies toJSON transform correctly for populated docs (gh-2910)', function(done) {
+    var db = start();
+    var parentSchema = mongoose.Schema({
+      c: { type: mongoose.Schema.Types.ObjectId, ref: 'gh-2910-1' }
+    });
+
+    var called = [];
+    parentSchema.options.toJSON = {
+      transform: function(doc, ret, options) {
+        called.push(ret);
+        return ret;
+      }
+    };
+
+    var childSchema = mongoose.Schema({
+      name: String
+    });
+
+    var Child = db.model('gh-2910-1', childSchema);
+    var Parent = db.model('gh-2910-0', parentSchema);
+
+    Child.create({ name: 'test' }, function(error, c) {
+      Parent.create({ c: c._id }, function(error, p) {
+        Parent.findOne({ _id: p._id }).populate('c').exec(function(error, p) {
+          var doc = p.toJSON();
+          assert.equal(called.length, 1);
+          assert.equal(called[0]._id.toString(), p._id.toString());
+          assert.equal(doc._id.toString(), p._id.toString());
+          db.close(done);
+        });
+      });
+    });
+  });
 });

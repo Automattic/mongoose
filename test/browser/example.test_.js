@@ -10,7 +10,7 @@
  *  CDN.
  *
  *  ```
- *  <script type="text/javascript" src="//d1l4stvdmqmdzl.cloudfront.net/3.9.6/mongoose.js">
+ *  <script type="text/javascript" src="//d1l4stvdmqmdzl.cloudfront.net/4.0.2/mongoose.js">
  *  </script>
  *  ```
  */

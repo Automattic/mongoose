@@ -894,5 +894,17 @@ describe('schema', function(){
         });
       });
     });
+
+    it('returns correct kind for user defined custom validators (gh-2885)', function(done) {
+      var s = mongoose.Schema({ n: { type: String, validate: { validator: function() { return false; } }, msg: 'fail' } });
+      var M = mongoose.model('gh2885', s);
+
+      var m = new M({ n: 'test' });
+      m.validate(function(error) {
+        assert.ok(error);
+        assert.equal(error.errors['n'].kind, 'user defined');
+        done();
+      });
+    });
   });
 });

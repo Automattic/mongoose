@@ -1760,4 +1760,21 @@ describe('document', function(){
       });
     });
   });
+
+  it('setters firing with objects on real paths (gh-2943)', function(done) {
+    var M = mongoose.model('gh2943', {
+      myStr: {
+        type: String, set: function (v) { return v.value; }
+      },
+      otherStr: String
+    });
+
+    var t = new M({ myStr: { value: 'test' } });
+    assert.equal(t.myStr, 'test');
+
+    var t2 = new M({ otherStr: { value: 'test' } });
+    assert.ok(!t.otherStr);
+
+    done();
+  });
 });

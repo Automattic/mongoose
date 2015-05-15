@@ -1102,8 +1102,11 @@ describe('model: findByIdAndUpdate:', function(){
           assert.ifError(error);
           assert.equal('eggs', breakfast.base);
           assert.equal('bacon', breakfast.topping);
-          db.close();
-          done();
+          Breakfast.count({ topping: 'bacon' }, function(error, count) {
+            assert.ifError(error);
+            assert.equal(count, 1);
+            db.close(done);
+          });
         });
     });
 
@@ -1148,8 +1151,11 @@ describe('model: findByIdAndUpdate:', function(){
           assert.ifError(error);
           assert.equal('eggs', breakfast.base);
           assert.equal('bacon', breakfast.topping);
-          db.close();
-          done();
+          Breakfast.count({ topping: 'bacon' }, function(error, count) {
+            assert.ifError(error);
+            assert.equal(count, 1);
+            db.close(done);
+          });
         });
     });
 

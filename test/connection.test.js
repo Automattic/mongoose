@@ -610,24 +610,10 @@ describe('connections:', function(){
     });
   });
 
-  describe('errors', function(){
-    it('should be thrown when there are no listeners', function(done){
-      var old = process._events.uncaughtException;
-
-      // sidestep mochas listener
-      process._events.uncaughtException = function (err) {
-        assert.ok(err);
-        process._events.uncaughtException = old;
-        db.close();
-        done();
-      }
-
-      var db = start({ uri: 'mongodb://whatever23939.localhost/noooope', noErrorListener: 1 });
-    });
-
-    it('event fires with one listener', function(done){
+  describe('errors', function() {
+    it('event fires with one listener', function(done) {
       this.timeout(1000);
-      var db = start({ uri: 'mongodb://localasdfads/fakeeee?connectTimeoutMS=500', noErrorListener: 1 })
+      var db = start({ uri: 'mongodb://whatever23939.localhost/fakeeee?connectTimeoutMS=500', noErrorListener: 1 })
       db.on('error', function () {
         // this callback has no params which triggered the bug #759
         db.close();

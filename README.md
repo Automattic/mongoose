@@ -56,7 +56,9 @@ var mongoose = require('mongoose');
 mongoose.connect('mongodb://localhost/my_database');
 ```
 
-Once connected, the `open` event is fired on the `Connection` instance. If you're using `mongoose.connect`, the `Connection` is `mongoose.connection`. Otherwise, `mongoose.createConnection` return value is a `Connection`.
+Once connected, the `open` event is fired on the `Connection` instance. If you're using `mongoose.connect`, the `Connection` is `mongoose.connection`. Otherwise, `mongoose.createConnection` return value is a `Connection`. 
+
+**Note:** _If the local connection fails then try using 127.0.0.1 instead of localhost. Sometimes issues may arise when the local hostname has been changed._
 
 **Important!** Mongoose buffers all the commands until it's connected to the database. This means that you don't have to wait until it connects to MongoDB in order to define models, run queries, etc.
 
@@ -128,7 +130,15 @@ Or just do it all at once
 var MyModel = mongoose.model('ModelName', mySchema);
 ```
 
-We can then instantiate it, and save it:
+The first argument is the _singular_ name of the collection your model is for. **Mongoose automatically looks for the _plural_ version of your model name.** For example, if you use
+
+```js
+var MyModel = mongoose.model('Ticket', mySchema);
+```
+
+Then Mongoose will create the model for your __tickets__ collection, not your __ticket__ collection.
+
+Once we have our model, we can then instantiate it, and save it:
 
 ```js
 var instance = new MyModel();

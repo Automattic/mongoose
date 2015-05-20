@@ -463,7 +463,7 @@ describe('document', function(){
         delete ret.email;
       }
     };
-    
+
     topicSchema.options.toObject = {
       transform: function(doc, ret, options) {
         ret.title = ret.title.toLowerCase();
@@ -1200,7 +1200,7 @@ describe('document', function(){
           assert.ok(!doc.isModified('nested.age'));
           assert.ok(doc.isModified('nested.deep'));
           assert.equal('Hank and Marie', doc.nested.deep.x);
-          
+
           done();
         })
 
@@ -1396,7 +1396,7 @@ describe('document', function(){
     });
   });
 
-  it('applies toJSON transform correctly for populated docs (gh-2910)', function(done) {
+  it('applies toJSON transform correctly for populated docs (gh-2910) (gh-2990)', function(done) {
     var db = start();
     var parentSchema = mongoose.Schema({
       c: { type: mongoose.Schema.Types.ObjectId, ref: 'gh-2910-1' }
@@ -1414,6 +1414,14 @@ describe('document', function(){
       name: String
     });
 
+    var childCalled = [];
+    childSchema.options.toJSON = {
+      transform: function(doc, ret, options) {
+        childCalled.push(ret);
+        return ret;
+      }
+    };
+
     var Child = db.model('gh-2910-1', childSchema);
     var Parent = db.model('gh-2910-0', parentSchema);
 
@@ -1424,6 +1432,21 @@ describe('document', function(){
           assert.equal(called.length, 1);
           assert.equal(called[0]._id.toString(), p._id.toString());
           assert.equal(doc._id.toString(), p._id.toString());
+          assert.equal(childCalled.length, 1);
+          assert.equal(childCalled[0]._id.toString(), c._id.toString());
+
+          called = [];
+          childCalled = [];
+
+          // JSON.stringify() passes field name, so make sure we don't treat
+          // that as a param to toJSON (gh-2990)
+          var doc = JSON.parse(JSON.stringify({ parent: p })).parent;
+          assert.equal(called.length, 1);
+          assert.equal(called[0]._id.toString(), p._id.toString());
+          assert.equal(doc._id.toString(), p._id.toString());
+          assert.equal(childCalled.length, 1);
+          assert.equal(childCalled[0]._id.toString(), c._id.toString());
+
           db.close(done);
         });
       });

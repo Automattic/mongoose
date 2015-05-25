@@ -2500,7 +2500,7 @@ MyModel.find({ name: <span class="regexp">/john/i</span> }, <span class="literal
 <h4>Options:</h4>
 
 <ul>
-<li><code>new</code>: bool - true to return the modified document rather than the original. defaults to false</li>
+<li><code>new</code>: bool - true to return the modified document rather than the original. defaults to true</li>
 <li><code>upsert</code>: bool - creates the object if it doesn't exist. defaults to false.</li>
 <li><code>sort</code>: if multiple docs are found by the conditions, sets the sort order to choose which doc to update</li>
 <li><code>select</code>: sets the document fields to return</li>
@@ -2572,7 +2572,7 @@ Model.findOneAndUpdate(query, { $set: { name: <span class="string">'jason borne'
 <h4>Options:</h4>
 
 <ul>
-<li><code>new</code>: bool - true to return the modified document rather than the original. defaults to false</li>
+<li><code>new</code>: bool - true to return the modified document rather than the original. defaults to true</li>
 <li><code>upsert</code>: bool - creates the object if it doesn't exist. defaults to false.</li>
 <li><code>sort</code>: if multiple docs are found by the conditions, sets the sort order to choose which doc to update</li>
 <li><code>select</code>: sets the document fields to return</li>
@@ -2591,7 +2591,7 @@ A.findByIdAndUpdate()                     <span class="comment">// returns Query
 <h4>Options:</h4>
 
 <ul>
-<li><code>new</code>: bool - true to return the modified document rather than the original. defaults to false</li>
+<li><code>new</code>: bool - true to return the modified document rather than the original. defaults to true</li>
 <li><code>upsert</code>: bool - creates the object if it doesn't exist. defaults to false.</li>
 <li><code>sort</code>: if multiple docs are found by the conditions, sets the sort order to choose which doc to update</li>
 </ul>
@@ -4278,7 +4278,7 @@ Kitten.find().tailable(<span class="literal">false</span>)</code></pre></div><hr
 <h4>Available options</h4>
 
 <ul>
-<li><code>new</code>: bool - true to return the modified document rather than the original. defaults to false</li>
+<li><code>new</code>: bool - true to return the modified document rather than the original. defaults to true</li>
 <li><code>upsert</code>: bool - creates the object if it doesn't exist. defaults to false.</li>
 <li><code>sort</code>: if multiple docs are found by the conditions, sets the sort order to choose which doc to update</li>
 </ul>

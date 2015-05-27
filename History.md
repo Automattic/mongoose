@@ -1,3 +1,7 @@
+3.8.29 / 2015-05-27
+===================
+ * fixed; Handle JSON.stringify properly for nested docs #2990
+
 4.0.3 / 2015-05-13
 ==================
  * upgraded; mquery -> 1.5.1 #2983

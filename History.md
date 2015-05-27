@@ -1,3 +1,7 @@
+3.8.29 / 2015-05-27
+===================
+ * fixed; Handle JSON.stringify properly for nested docs #2990
+
 3.8.28 / 2015-05-12
 ===================
  * fixed; proper handling for toJSON options #2910

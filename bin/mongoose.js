@@ -231,7 +231,6 @@ var Types = require('./schema/index');
  *
  * @param {Schema} schema
  * @param {Object obj Object to cast
- * @method cast
  * @api private
  */
 
@@ -911,11 +910,13 @@ Document.prototype.set = function (path, val, type, options) {
         key = keys[i];
         var pathName = prefix + key;
         pathtype = this.schema.pathType(pathName);
+
         if (null != path[key]
             // need to know if plain object - no Buffer, ObjectId, ref, etc
             && utils.isObject(path[key])
             && (!path[key].constructor || 'Object' == utils.getFunctionName(path[key].constructor))
-            && 'virtual' != pathtype
+            && 'virtual' !== pathtype
+            && 'real' !== pathtype
             && !(this.$__path(pathName) instanceof MixedSchema)
             && !(this.schema.paths[pathName] && this.schema.paths[pathName].options.ref)) {
           this.set(path[key], prefix + key, constructing);
@@ -1606,8 +1607,9 @@ Document.prototype.invalidate = function (path, err, val) {
  * Marks a path as valid, removing existing validation errors.
  *
  * @param {String} path the field to mark as valid
- * @method $markValid
  * @api private
+ * @method $markValid
+ * @receiver Document
  */
 
 Document.prototype.$markValid = function(path) {
@@ -1627,6 +1629,7 @@ Document.prototype.$markValid = function(path) {
  * @param {String} path the field to check
  * @method $isValid
  * @api private
+ * @receiver Document
  */
 
 Document.prototype.$isValid = function(path) {
@@ -2047,10 +2050,14 @@ Document.prototype.$toObject = function(options, json) {
       options = this.schema.options.toJSON ?
         clone(this.schema.options.toJSON) :
         {};
+      options.json = true;
+      options._useSchemaOptions = true;
     } else {
       options = this.schema.options.toObject ?
         clone(this.schema.options.toObject) :
         {};
+      options.json = false;
+      options._useSchemaOptions = true;
     }
   }
 
@@ -2061,9 +2068,6 @@ Document.prototype.$toObject = function(options, json) {
   }
 
   ;('minimize' in options) || (options.minimize = this.schema.options.minimize);
-  if (!optionsParameter) {
-    options._useSchemaOptions = true;
-  }
 
   // remember the root transform function
   // to save it from being overwritten by sub-transform functions
@@ -3180,6 +3184,7 @@ Promise.prototype.addBack = Promise.prototype.onResolve;
  * Fulfills this promise with passed arguments.
  *
  * @method fulfill
+ * @receiver Promise
  * @see https://github.com/aheckmann/mpromise#fulfill
  * @param {any} args
  * @api public
@@ -3193,6 +3198,7 @@ Promise.prototype.addBack = Promise.prototype.onResolve;
  * _Deprecated. Use `fulfill` instead._
  *
  * @method complete
+ * @receiver Promise
  * @param {any} args
  * @api public
  * @deprecated
@@ -3627,23 +3633,27 @@ Schema.prototype.add = function add (obj, prefix) {
 
 Schema.reserved = Object.create(null);
 var reserved = Schema.reserved;
+// EventEmitter
 reserved.emit =
 reserved.on =
-reserved.once = // EventEmitter
-reserved.db =
-reserved.set =
-reserved.get =
-reserved.init =
-reserved.isNew =
-reserved.errors =
-reserved.schema =
-reserved.modelName =
+reserved.once =
+// document properties and functions
 reserved.collection =
-reserved.toObject =
+reserved.db =
+reserved.errors =
+reserved.increment =
+reserved.init =
+reserved.isModified =
+reserved.isNew =
+reserved.get =
+reserved.modelName =
 reserved.save =
+reserved.schema =
+reserved.set =
+reserved.toObject =
 reserved.validate =
-reserved.increment = // document properties and functions
-reserved._pres = reserved._posts = 1 // hooks.js
+// hooks.js
+reserved._pres = reserved._posts = 1;
 
 /**
  * Gets/sets schema paths.
@@ -4527,9 +4537,9 @@ SchemaArray.prototype.castForQuery = function ($conditional, value) {
     if (Array.isArray(val)) {
       val = val.map(function (v) {
         if (method) v = method.call(caster, v);
-        return isMongooseObject(v)
-          ? v.toObject()
-          : v;
+        return isMongooseObject(v) ?
+          v.toObject({ virtuals: false }) :
+          v;
       });
 
     } else if (method) {
@@ -4537,9 +4547,9 @@ SchemaArray.prototype.castForQuery = function ($conditional, value) {
     }
   }
 
-  return val && isMongooseObject(val)
-    ? val.toObject()
-    : val;
+  return val && isMongooseObject(val) ?
+    val.toObject({ virtuals: false }) :
+    val;
 };
 
 /*!
@@ -7084,6 +7094,7 @@ SchemaType.prototype.validate = function (obj, message, type) {
         properties.message = properties.msg;
       }
       properties.validator = obj;
+      properties.type = properties.type || 'user defined';
     } else {
       if (!message) message = errorMessages.general.default;
       if (!type) type = 'user defined';
@@ -7692,6 +7703,7 @@ MongooseArray.mixin = {
    *
    * @property _parent
    * @api private
+   * @receiver MongooseArray
    */
 
   _parent: undefined,
@@ -7703,6 +7715,7 @@ MongooseArray.mixin = {
    * @return value the casted value
    * @method _cast
    * @api private
+   * @receiver MongooseArray
    */
 
   _cast: function (value) {
@@ -7755,6 +7768,7 @@ MongooseArray.mixin = {
    * @param {String} embeddedPath the path which changed in the embeddedDoc
    * @method _markModified
    * @api private
+   * @receiver MongooseArray
    */
 
   _markModified: function (elem, embeddedPath) {
@@ -7786,6 +7800,7 @@ MongooseArray.mixin = {
    * @param {any} val
    * @method _registerAtomic
    * @api private
+   * @receiver MongooseArray
    */
 
   _registerAtomic: function (op, val) {
@@ -7882,6 +7897,7 @@ MongooseArray.mixin = {
    * @api private
    * @return {Number}
    * @method hasAtomics
+   * @receiver MongooseArray
    */
 
   hasAtomics: function hasAtomics () {
@@ -7897,7 +7913,8 @@ MongooseArray.mixin = {
    *
    * @api private
    * @return {Number}
-   * @method hasAtomics
+   * @method _mapCast
+   * @receiver MongooseArray
    */
   _mapCast: function(val, index) {
     return this._cast(val, this.length + index);
@@ -7909,6 +7926,7 @@ MongooseArray.mixin = {
    * @param {Object} [args...]
    * @api public
    * @method push
+   * @receiver MongooseArray
    */
 
   push: function () {
@@ -7932,6 +7950,7 @@ MongooseArray.mixin = {
    * @param {any} [args...]
    * @api public
    * @method nonAtomicPush
+   * @receiver MongooseArray
    */
 
   nonAtomicPush: function () {
@@ -7974,6 +7993,7 @@ MongooseArray.mixin = {
    * @memberOf MongooseArray
    * @see mongodb http://www.mongodb.org/display/DOCS/Updating/#Updating-%24pop
    * @method $pop
+   * @receiver MongooseArray
    */
 
   $pop: function () {
@@ -7997,6 +8017,7 @@ MongooseArray.mixin = {
    * @see MongooseArray#$pop #types_array_MongooseArray-%24pop
    * @api public
    * @method pop
+   * @receiver MongooseArray
    */
 
   pop: function () {
@@ -8066,6 +8087,7 @@ MongooseArray.mixin = {
    *
    * @api public
    * @method shift
+   * @receiver MongooseArray
    */
 
   shift: function () {
@@ -8099,6 +8121,7 @@ MongooseArray.mixin = {
    * @see mongodb http://www.mongodb.org/display/DOCS/Updating/#Updating-%24pull
    * @api public
    * @method pull
+   * @receiver MongooseArray
    */
 
   pull: function () {
@@ -8137,6 +8160,7 @@ MongooseArray.mixin = {
    *
    * @api public
    * @method splice
+   * @receiver MongooseArray
    */
 
   splice: function splice () {
@@ -8166,6 +8190,7 @@ MongooseArray.mixin = {
    *
    * @api public
    * @method unshift
+   * @receiver MongooseArray
    */
 
   unshift: function () {
@@ -8185,6 +8210,7 @@ MongooseArray.mixin = {
    *
    * @api public
    * @method sort
+   * @receiver MongooseArray
    */
 
   sort: function () {
@@ -8206,6 +8232,7 @@ MongooseArray.mixin = {
    *
    * @param {any} [args...]
    * @return {Array} the values that were added
+   * @receiver MongooseArray
    * @api public
    * @method addToSet
    */
@@ -8266,6 +8293,7 @@ MongooseArray.mixin = {
    * @return {Array} this
    * @api public
    * @method set
+   * @receiver MongooseArray
    */
 
   set: function set (i, val) {
@@ -8281,6 +8309,7 @@ MongooseArray.mixin = {
    * @return {Array}
    * @api public
    * @method toObject
+   * @receiver MongooseArray
    */
 
   toObject: function (options) {
@@ -8300,6 +8329,7 @@ MongooseArray.mixin = {
    *
    * @api public
    * @method inspect
+   * @receiver MongooseArray
    */
 
   inspect: function () {
@@ -8313,6 +8343,7 @@ MongooseArray.mixin = {
    * @return {Number}
    * @api public
    * @method indexOf
+   * @receiver MongooseArray
    */
 
   indexOf: function indexOf (obj) {
@@ -8429,6 +8460,7 @@ MongooseBuffer.mixin = {
    *
    * @api private
    * @property _parent
+   * @receiver MongooseBuffer
    */
 
   _parent: undefined,
@@ -8438,6 +8470,7 @@ MongooseBuffer.mixin = {
    *
    * @api private
    * @property _subtype
+   * @receiver MongooseBuffer
    */
 
   _subtype: undefined,
@@ -8447,6 +8480,7 @@ MongooseBuffer.mixin = {
    *
    * @api private
    * @method _markModified
+   * @receiver MongooseBuffer
    */
 
   _markModified: function () {
@@ -8463,6 +8497,7 @@ MongooseBuffer.mixin = {
    *
    * @api public
    * @method write
+   * @receiver MongooseBuffer
    */
 
   write: function () {
@@ -8485,6 +8520,7 @@ MongooseBuffer.mixin = {
    * @return {MongooseBuffer}
    * @param {Buffer} target
    * @method copy
+   * @receiver MongooseBuffer
    */
 
   copy: function (target) {
@@ -8541,6 +8577,7 @@ MongooseBuffer.mixin = {
  * @return {Binary}
  * @api public
  * @method toObject
+ * @receiver MongooseBuffer
  */
 
 MongooseBuffer.mixin.toObject = function (options) {
@@ -8556,6 +8593,7 @@ MongooseBuffer.mixin.toObject = function (options) {
  * @param {Buffer} other
  * @return {Boolean}
  * @method equals
+ * @receiver MongooseBuffer
  */
 
 MongooseBuffer.mixin.equals = function (other) {
@@ -8593,6 +8631,7 @@ MongooseBuffer.mixin.equals = function (other) {
  * @param {Hex} subtype
  * @api public
  * @method subtype
+ * @receiver MongooseBuffer
  */
 
 MongooseBuffer.mixin.subtype = function (subtype) {
@@ -8679,6 +8718,7 @@ MongooseDocumentArray.mixin = Object.create( MongooseArray.mixin );
  *
  * @method _cast
  * @api private
+ * @receiver MongooseDocumentArray
  */
 
 MongooseDocumentArray.mixin._cast = function (value, index) {
@@ -8714,6 +8754,7 @@ MongooseDocumentArray.mixin._cast = function (value, index) {
  * @TODO cast to the _id based on schema for proper comparison
  * @method id
  * @api public
+ * @receiver MongooseDocumentArray
  */
 
 MongooseDocumentArray.mixin.id = function (id) {
@@ -8756,6 +8797,7 @@ MongooseDocumentArray.mixin.id = function (id) {
  * @return {Array}
  * @method toObject
  * @api public
+ * @receiver MongooseDocumentArray
  */
 
 MongooseDocumentArray.mixin.toObject = function (options) {
@@ -8769,6 +8811,7 @@ MongooseDocumentArray.mixin.toObject = function (options) {
  *
  * @method inspect
  * @api public
+ * @receiver MongooseDocumentArray
  */
 
 MongooseDocumentArray.mixin.inspect = function () {
@@ -8790,6 +8833,7 @@ MongooseDocumentArray.mixin.inspect = function () {
  * @param {Object} obj the value to cast to this arrays SubDocument schema
  * @method create
  * @api public
+ * @receiver MongooseDocumentArray
  */
 
 MongooseDocumentArray.mixin.create = function (obj) {
@@ -8803,6 +8847,7 @@ MongooseDocumentArray.mixin.create = function (obj) {
  * @return {Function}
  * @method notify
  * @api private
+ * @receiver MongooseDocumentArray
  */
 
 MongooseDocumentArray.mixin.notify = function notify (event) {
@@ -8886,6 +8931,7 @@ EmbeddedDocument.prototype.constructor = EmbeddedDocument;
  *
  * @param {String} path the path which changed
  * @api public
+ * @receiver EmbeddedDocument
  */
 
 EmbeddedDocument.prototype.markModified = function (path) {
@@ -9022,8 +9068,9 @@ EmbeddedDocument.prototype.invalidate = function (path, err, val, first) {
  * Marks a path as valid, removing existing validation errors.
  *
  * @param {String} path the field to mark as valid
- * @method $markValid
  * @api private
+ * @method $markValid
+ * @receiver EmbeddedDocument
  */
 
 EmbeddedDocument.prototype.$markValid = function(path) {
@@ -9043,8 +9090,9 @@ EmbeddedDocument.prototype.$markValid = function(path) {
  * Checks if a path is invalid
  *
  * @param {String} path the field to check
- * @method $isValid
  * @api private
+ * @method $isValid
+ * @receiver EmbeddedDocument
  */
 
 EmbeddedDocument.prototype.$isValid = function(path) {

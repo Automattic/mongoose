@@ -9,7 +9,9 @@ block content
     mongoose.connect('mongodb://localhost/myapp');
 
   :markdown
-    This is the minimum needed to connect the `myapp` database running locally on the default port (27017). We may also specify several more parameters in the `uri` depending on your environment:
+    This is the minimum needed to connect the `myapp` database running locally on the default port (27017). If the local connection fails then try using 127.0.0.1 instead of localhost. Sometimes issues may arise when the local hostname has been changed.
+   
+    We may also specify several more parameters in the `uri` depending on your environment:
 
   :js
     mongoose.connect('mongodb://username:password@host:port/database?options...');

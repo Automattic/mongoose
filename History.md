@@ -1,3 +1,18 @@
+4.0.4 / 2015-05-28
+==================
+ * docs; findAndModify new parameter correct default value #3012 [JonForest](https://github.com/JonForest)
+ * docs; clarify pluralization rules #2999 [anonmily](https://github.com/anonmily)
+ * fix; discriminators with schema methods #2978
+ * fix; make `isModified` a schema reserved keyword #2975
+ * fix; properly fire setters when initializing path with object #2943
+ * fix; can use `setDefaultsOnInsert` without specifying `runValidators` #2938
+ * fix; always set validation error's `kind` property #2885
+ * upgraded; node driver -> 2.0.33 #2865
+
+3.8.29 / 2015-05-27
+===================
+ * fixed; Handle JSON.stringify properly for nested docs #2990
+
 4.0.3 / 2015-05-13
 ==================
  * upgraded; mquery -> 1.5.1 #2983
@@ -49,7 +64,7 @@
  * fixed; CastErrors with embedded docs #2819
  * fixed; post save hook context #2816
  * docs; 3.8.x -> 4.x migration guide #2807
- * fixed; proper _distinct copying for query #2765 [cdelauder](https://github.com/cdelauder) 
+ * fixed; proper _distinct copying for query #2765 [cdelauder](https://github.com/cdelauder)
 
 3.8.27 / 2015-04-22
 ===================

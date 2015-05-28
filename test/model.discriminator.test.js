@@ -21,6 +21,10 @@ PersonSchema.index({ name: 1 });
 PersonSchema.methods.getFullName = function() {
   return this.name.first + ' ' + this.name.last;
 };
+PersonSchema.methods.toJSonConfig = {
+  include: ['prop1', 'prop2'],
+  exclude: ['prop3', 'prop4']
+};
 PersonSchema.statics.findByGender = function(gender, cb) {};
 PersonSchema.virtual('name.full').get(function () {
   return this.name.first + ' ' + this.name.last;

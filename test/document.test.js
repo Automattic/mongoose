@@ -1822,4 +1822,19 @@ describe('document', function(){
       done();
     });
   });
+
+  it('doesnt attempt to cast generic objects as strings (gh-3030)', function(done) {
+    var M = mongoose.model('gh3030', {
+      myStr: {
+        type: String
+      }
+    });
+
+    var t = new M({ myStr: { thisIs: 'anObject' } });
+    assert.ok(!t.myStr);
+    t.validate(function(error) {
+      assert.ok(error);
+      done();
+    });
+  });
 });

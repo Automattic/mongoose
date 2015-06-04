@@ -1320,5 +1320,35 @@ describe('model: findByIdAndUpdate:', function(){
           db.close(done);
         });
     });
+
+    it('should work with arrays (gh-3035)', function(done) {
+      var db = start();
+
+      var testSchema = new mongoose.Schema({
+        id: String,
+        name: String,
+        a: [String],
+        _createdAt: {
+          type: Number,
+          default: Date.now
+        },
+      });
+
+      var TestModel = db.model('gh3035', testSchema);
+      TestModel.create({ id: '1' }, function(error) {
+        assert.ifError(error);
+        TestModel.findOneAndUpdate(
+          { id: '1' },
+          { $set: { name: 'Joe' } },
+          {
+            upsert: true,
+            setDefaultsOnInsert: true
+          },
+          function(error, result) {
+            assert.ifError(error);
+            done();
+          });
+      });
+    });
   });
 });

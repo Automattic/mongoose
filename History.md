@@ -1,3 +1,7 @@
+3.8.30 / 2015-06-05
+===================
+ * fixed; enable users to set all options with tailable() #2883
+
 3.8.29 / 2015-05-27
 ===================
  * fixed; Handle JSON.stringify properly for nested docs #2990

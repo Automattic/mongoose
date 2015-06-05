@@ -1,3 +1,7 @@
+3.8.30 / 2015-06-05
+===================
+ * fixed; enable users to set all options with tailable() #2883
+
 4.0.4 / 2015-05-28
 ==================
  * docs; findAndModify new parameter correct default value #3012 [JonForest](https://github.com/JonForest)
@@ -6,7 +10,7 @@
  * fix; make `isModified` a schema reserved keyword #2975
  * fix; properly fire setters when initializing path with object #2943
  * fix; can use `setDefaultsOnInsert` without specifying `runValidators` #2938
- * fix; always set validation error's `kind` property #2885
+ * fix; always set validation errors `kind` property #2885
  * upgraded; node driver -> 2.0.33 #2865
 
 3.8.29 / 2015-05-27

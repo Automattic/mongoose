@@ -1800,4 +1800,41 @@ describe('document', function(){
 
     done();
   });
+
+  describe('gh-2782', function () {
+    it('should set data from a sub doc', function (done) {
+      var schema1 = new mongoose.Schema({
+        data: {
+          email: String
+        }
+      });
+      var schema2 = new mongoose.Schema({
+        email: String
+      });
+      var Model1 = mongoose.model('gh-2782-1', schema1);
+      var Model2 = mongoose.model('gh-2782-2', schema2);
+
+      var doc1 = new Model1({ 'data.email': 'some@example.com' });
+      assert.equal(doc1.data.email, 'some@example.com');
+      var doc2 = new Model2();
+      doc2.set(doc1.data);
+      assert.equal(doc2.email, 'some@example.com');
+      done();
+    });
+  });
+
+  it('doesnt attempt to cast generic objects as strings (gh-3030)', function(done) {
+    var M = mongoose.model('gh3030', {
+      myStr: {
+        type: String
+      }
+    });
+
+    var t = new M({ myStr: { thisIs: 'anObject' } });
+    assert.ok(!t.myStr);
+    t.validate(function(error) {
+      assert.ok(error);
+      done();
+    });
+  });
 });

@@ -1,3 +1,17 @@
+4.0.5 / 2015-06-05
+==================
+ * fixed; ObjectIds and buffers when mongodb driver is a sibling dependency #3050 #3048 #3040 #3031 #3020 #2988 #2951
+ * fixed; warn user when 'increment' is used in schema #3039
+ * fixed; setDefaultsOnInsert with array in schema #3035
+ * fixed; dont use default Object toString to cast to string #3030
+ * added; npm badge #3020 [odeke-em](https://github.com/odeke-em)
+ * fixed; proper handling for calling .set() with a subdoc #2782
+ * fixed; dont throw cast error when using $rename on non-string path #1845
+
+3.8.30 / 2015-06-05
+===================
+ * fixed; enable users to set all options with tailable() #2883
+
 4.0.4 / 2015-05-28
 ==================
  * docs; findAndModify new parameter correct default value #3012 [JonForest](https://github.com/JonForest)
@@ -6,7 +20,7 @@
  * fix; make `isModified` a schema reserved keyword #2975
  * fix; properly fire setters when initializing path with object #2943
  * fix; can use `setDefaultsOnInsert` without specifying `runValidators` #2938
- * fix; always set validation error's `kind` property #2885
+ * fix; always set validation errors `kind` property #2885
  * upgraded; node driver -> 2.0.33 #2865
 
 3.8.29 / 2015-05-27

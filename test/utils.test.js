@@ -211,41 +211,6 @@ describe('utils', function(){
     done();
   })
 
-  it('#readPref', function(done){
-    var r = utils.readPref('p');
-    assert.equal('primary', r.mode);
-    var r = utils.readPref('primary');
-    assert.equal('primary', r.mode);
-
-    var r = utils.readPref('pp');
-    assert.ok(r.isValid());
-    assert.equal('primaryPreferred', r.mode);
-    var r = utils.readPref('primaryPreferred');
-    assert.ok(r.isValid());
-    assert.equal('primaryPreferred', r.mode);
-
-    var r = utils.readPref('s');
-    assert.equal('secondary', r.mode);
-    var r = utils.readPref('secondary');
-    assert.equal('secondary', r.mode);
-
-    var r = utils.readPref('sp');
-    assert.ok(r.isValid());
-    assert.equal('secondaryPreferred', r.mode);
-    var r = utils.readPref('secondaryPreferred');
-    assert.ok(r.isValid());
-    assert.equal('secondaryPreferred', r.mode);
-
-    var r = utils.readPref('n');
-    assert.equal('nearest', r.mode);
-    var r = utils.readPref('nearest');
-    assert.equal('nearest', r.mode);
-
-    var r = utils.readPref('explode');
-    assert.equal(false, r.isValid());
-    done();
-  })
-
   describe('clone', function(){
     it('retains RegExp options gh-1355', function(done){
       var a = new RegExp('hello', 'igm');

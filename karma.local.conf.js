@@ -13,7 +13,7 @@ module.exports = function(config) {
     // list of files / patterns to load in the browser
     files: [
       './bin/mongoose.js',
-      './test/browser/*.js'
+      './test/browser/example.test_.js'
     ],
 
     // test results reporter to use

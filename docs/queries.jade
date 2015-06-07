@@ -10,7 +10,11 @@ block content
     When a `callback` function:
 
     - is passed, the operation will be executed immediately with the results passed to the callback.
-    - is not passed, an instance of [Query](./api.html#query-js) is returned, which provides a special `QueryBuilder` interface for you.
+    - is not passed, an instance of [Query](./api.html#query-js) is returned, which provides a special query builder interface.
+
+    .important
+      :markdown
+        In mongoose 4, a [Query](./api.html#query-js) has a `.then()` function, and thus can be used as a promise.
 
     Let's take a look at what happens when passing a `callback`:
   :js

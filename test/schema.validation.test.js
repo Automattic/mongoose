@@ -906,5 +906,17 @@ describe('schema', function(){
         done();
       });
     });
+
+    it('enums report kind (gh-3009)', function(done) {
+      var s = mongoose.Schema({ n: { type: String, enum: ['a', 'b'] } });
+      var M = mongoose.model('gh3009', s);
+
+      var m = new M({ n: 'test' });
+      m.validate(function(error) {
+        assert.ok(error);
+        assert.equal(error.errors['n'].kind, 'enum');
+        done();
+      });
+    });
   });
 });

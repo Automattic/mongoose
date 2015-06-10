@@ -12,7 +12,7 @@ block content
     - Validation is asynchronously recursive; when you call [Model#save](./api.html#model_Model-save), sub-document validation is executed as well. If an error occurs, your [Model#save](./api.html#model_Model-save) callback receives it
     - Validation supports complete customization
 
-  h3 Built in validators
+  h3#built-in-validators Built in validators
   :markdown
     Mongoose has several built in validators.
 
@@ -26,7 +26,7 @@ block content
     If the built-in validators aren't enough, validation can be completely tailored to suite your needs.
 
     Custom validation is declared by passing a validation `function` and coinciding error message to your `SchemaTypes` `validate` method. Instructions for how to do so are available in the [API docs](./api.html#schematype_SchemaType-validate).
-  h3 Validation errors
+  h3#validation-errors Validation errors
   :markdown
     Errors returned after failed validation contain an `errors` object holding the actual `ValidatorError`s. Each [ValidatorError](./api.html#error-validation-js) has a `type`, `path`, and `value` property providing us with a little more error handling flexibility.
   :js
@@ -61,7 +61,7 @@ block content
   :js
     toy.errors.color.message === err.errors.color.message
 
-  h3 Update Validators
+  h3#update-validators Update Validators
   :markdown
     In the above examples, you learned about document validation. Mongoose also
     supports validation for `update()` and `findOneAndUpdate()` operations.

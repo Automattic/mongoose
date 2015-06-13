@@ -479,7 +479,7 @@ describe('document: hooks:', function () {
         doc.subs.push({ name: 'maa' });
         doc.save(function(err) {
           assert.ifError(err);
-          assert.equal(3, called.post);
+          assert.equal(4, called.post);
 
           _done();
         });

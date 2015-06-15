@@ -1501,4 +1501,27 @@ describe('Query', function(){
       });
     });
   });
+
+  it('excludes _id when select false and inclusive mode (gh-3010)', function(done) {
+    var db = start();
+    var User = db.model('Product', {
+      _id: {
+        select: false,
+        type: Schema.Types.ObjectId,
+        default: mongoose.Types.ObjectId
+      },
+      username: String
+    });
+
+    User.create({ username: 'Val' }, function(error, user) {
+      assert.ifError(error);
+      User.find({ _id: user._id }).select('username').exec(function(error, users) {
+        assert.ifError(error);
+        assert.equal(users.length, 1);
+        assert.ok(!users[0]._id);
+        assert.equal(users[0].username, 'Val');
+        done();
+      });
+    });
+  });
 })

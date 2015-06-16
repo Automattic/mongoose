@@ -13,7 +13,7 @@
       , "mpromise": "0.4.3"
       , "mpath": "0.1.1"
       , "regexp-clone": "0.0.1"
-      , "mquery" : "1.4.0"
+      , "mquery" : "1.6.1"
     }
   , "devDependencies": {
         "mocha": "1.12.0"

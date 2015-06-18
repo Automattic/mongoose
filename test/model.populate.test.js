@@ -311,6 +311,42 @@ describe('model: populate:', function(){
     });
   })
 
+  it('population of undefined fields in a collection of docs', function (done) {
+    var db = start()
+      , BlogPost = db.model('RefBlogPost', 'blogposts_' + random())
+      , User = db.model('RefUser', 'users_' + random());
+    User.create({
+      name: 'Eloy',
+      email: 'eloytoro@gmail.com'
+    }, function (err, user) {
+      assert.ifError(err);
+
+      BlogPost.create({
+        title: 'I have a user ref',
+        _creator: user
+      }, function (err) {
+        assert.ifError(err);
+
+        BlogPost.create({
+          title: 'I don\'t'
+        }, function (err) {
+          assert.ifError(err);
+          BlogPost
+          .find()
+          .populate('_creator')
+          .exec(function (err, posts) {
+            db.close();
+            posts.forEach(function (post) {
+              if ('_creator' in post)
+                assert.ok(post._creator !== null);
+            });
+            done();
+          });
+        });
+      });
+    });
+  })
+
   it('population and changing a reference', function(done){
     var db = start()
       , BlogPost = db.model('RefBlogPost', posts)

@@ -1,3 +1,7 @@
+3.8.31 / 2015-06-20
+===================
+ * fixed; properly handle text search with discriminators and $meta #2166
+
 3.8.30 / 2015-06-05
 ===================
  * fixed; enable users to set all options with tailable() #2883

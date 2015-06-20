@@ -1,3 +1,7 @@
+3.8.31 / 2015-06-20
+===================
+ * fixed; properly handle text search with discriminators and $meta #2166
+
 4.0.5 / 2015-06-05
 ==================
  * fixed; ObjectIds and buffers when mongodb driver is a sibling dependency #3050 #3048 #3040 #3031 #3020 #2988 #2951

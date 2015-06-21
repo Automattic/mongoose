@@ -846,6 +846,19 @@ describe('schema', function(){
       });
     });
 
+    it('doesnt execute other validators if required fails (gh-3025)', function(done) {
+      var breakfast = new Schema({ description: { type: String, required: true, maxlength: 50 } });
+
+      var Breakfast = mongoose.model('gh3025', breakfast, 'gh3025');
+      var bad = new Breakfast({});
+      var error = bad.validateSync();
+
+      assert.ok(error);
+      var errorMessage = 'ValidationError: Path `description` is required.';
+      assert.equal(errorMessage, error.toString());
+      done();
+    });
+
     it('adds required validators to the front of the list (gh-2843)', function(done) {
       var breakfast = new Schema({ description: { type: String, maxlength: 50, required: true } });
 
@@ -903,6 +916,18 @@ describe('schema', function(){
       m.validate(function(error) {
         assert.ok(error);
         assert.equal(error.errors['n'].kind, 'user defined');
+        done();
+      });
+    });
+
+    it('enums report kind (gh-3009)', function(done) {
+      var s = mongoose.Schema({ n: { type: String, enum: ['a', 'b'] } });
+      var M = mongoose.model('gh3009', s);
+
+      var m = new M({ n: 'test' });
+      m.validate(function(error) {
+        assert.ok(error);
+        assert.equal(error.errors['n'].kind, 'enum');
         done();
       });
     });

@@ -1,3 +1,25 @@
+4.0.6 / 2015-06-21
+==================
+ * upgraded; node driver -> 2.0.34 #3087
+ * fixed; apply setters on addToSet, etc #3067 [victorkohl](https://github.com/victorkohl)
+ * fixed; missing semicolons #3065 [sokolikp](https://github.com/sokolikp)
+ * fixed; proper handling for async doc hooks #3062 [gregthegeek](https://github.com/gregthegeek)
+ * fixed; dont set failed populate field to null if other docs are successfully populated #3055 [eloytoro](https://github.com/eloytoro)
+ * fixed; setDefaultsOnInsert with document arrays #3034 [taxilian](https://github.com/taxilian)
+ * fixed; setters fired on array items #3032
+ * fixed; stop validateSync() on first error #3025 [victorkohl](https://github.com/victorkohl)
+ * docs; improve query docs #3016
+ * fixed; always exclude _id when its deselected #3010
+ * fixed; enum validator kind property #3009
+ * fixed; mquery collection names #3005
+ * docs; clarify mongos option #3000
+ * docs; clarify that query builder has a .then() #2995
+ * fixed; race condition in dynamic ref #2992
+
+3.8.31 / 2015-06-20
+===================
+ * fixed; properly handle text search with discriminators and $meta #2166
+
 4.0.5 / 2015-06-05
 ==================
  * fixed; ObjectIds and buffers when mongodb driver is a sibling dependency #3050 #3048 #3040 #3031 #3020 #2988 #2951

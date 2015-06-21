@@ -35,7 +35,7 @@ block content
          user    - username for authentication (if not specified in uri)
          pass    - password for authentication (if not specified in uri)
          auth    - options for authentication
-         mongos  - Boolean - if true, enables High Availability support for mongos
+         mongos  - passed to the [underlying driver's mongos options](http://mongodb.github.io/node-mongodb-native/2.0/api/Mongos.html)
     Example:
   :js
     var options = {

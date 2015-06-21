@@ -10,9 +10,13 @@ block content
     When a `callback` function:
 
     - is passed, the operation will be executed immediately with the results passed to the callback.
-    - is not passed, an instance of [Query](./api.html#query-js) is returned, which provides a special `QueryBuilder` interface for you.
+    - is not passed, an instance of [Query](./api.html#query-js) is returned, which provides a special query builder interface.
 
-    Let's take a look at what happens when passing a `callback`:
+    .important
+      :markdown
+        In mongoose 4, a [Query](./api.html#query-js) has a `.then()` function, and thus can be used as a promise.
+
+    When executing a query with a `callback` function, you specify your query as a JSON document. The JSON document's syntax is the same as the [MongoDB shell](http://docs.mongodb.org/manual/tutorial/query-documents/).
   :js
     var Person = mongoose.model('Person', yourSchema);
 
@@ -43,17 +47,36 @@ block content
       console.log('%s %s is a %s.', person.name.first, person.name.last, person.occupation) // Space Ghost is a talk show host.
     })
   :markdown
-    An instance of [Query](./api.html#query-js) was returned which allows us to build up our query. Taking this example further:
+    In the above code, the `query` variable is of type [Query](./api.html#query-js).
+    A `Query` enables you to build up a query using chaining syntax, rather than specifying a JSON object.
+    The below 2 examples are equivalent.
   :js
-    Person
-    .find({ occupation: /host/ })
-    .where('name.last').equals('Ghost')
-    .where('age').gt(17).lt(66)
-    .where('likes').in(['vaporizing', 'talking'])
-    .limit(10)
-    .sort('-occupation')
-    .select('name occupation')
-    .exec(callback);
+    // With a JSON doc
+    Person.
+      find({
+        occupation: /host/,
+        'name.last': 'Ghost',
+        age: { $gt: 17, $lt: 66 },
+        likes: { $in: ['vaporizing', talking] }
+      }).
+      limit(10).
+      sort({ occupation: -1 }).
+      select({ name: 1, occupation: 1 }).
+      exec(callback);
+
+    // Using query builder
+    Person.
+      find({ occupation: /host/ }).
+      where('name.last').equals('Ghost').
+      where('age').gt(17).lt(66).
+      where('likes').in(['vaporizing', 'talking']).
+      limit(10).
+      sort('-occupation').
+      select('name occupation').
+      exec(callback);
+
+  :markdown
+    A full list of [Query helper functions can be found in the API docs](http://mongoosejs.com/docs/api.html#query-js).
 
   h3#refs References to other documents
   :markdown

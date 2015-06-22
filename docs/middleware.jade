@@ -132,7 +132,7 @@ block content
 
   :js
     schema.pre('update', function() {
-      this.update({ $set: { updatedAt: Date.now() } });
+      this.update({},{ $set: { updatedAt: new Date() } });
     });
 
   h3#next Next Up

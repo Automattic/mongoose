@@ -70,12 +70,12 @@
     "node": ">=0.6.19"
   },
   "bugs": {
-    "url": "https://github.com/learnboost/mongoose/issues/new",
+    "url": "https://github.com/Automattic/mongoose/issues/new",
     "email": "mongoose-orm@googlegroups.com"
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/LearnBoost/mongoose.git"
+    "url": "git://github.com/Automattic/mongoose.git"
   },
   "homepage": "http://mongoosejs.com",
   "browser": "lib/browser.js"

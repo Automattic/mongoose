@@ -338,6 +338,16 @@ describe('schema', function(){
         done();
       });
 
+      it('date not empty string', function (done) {
+        var HappyBirthday = new Schema({
+          date: { type: Date, required: true }
+        });
+
+        HappyBirthday.path('date').doValidate('', function (err) {
+          assert.ok(err instanceof ValidatorError);
+        });
+      });
+
       it('objectid required', function(done){
         var Loki = new Schema({
             owner: { type: ObjectId, required: true }

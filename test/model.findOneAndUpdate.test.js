@@ -1351,6 +1351,32 @@ describe('model: findByIdAndUpdate:', function(){
       });
     });
 
+    it('should allow null values in query (gh-3135)', function(done) {
+        var db = start();
+
+        var testSchema = new mongoose.Schema({
+          id:      String,
+          blob:    ObjectId,
+          status:  String,
+        });
+
+        var TestModel = db.model('gh3135', testSchema);
+        TestModel.create({ blob: null, status: 'active' }, function(error) {
+          assert.ifError(error);
+          TestModel.findOneAndUpdate(
+            { id: '1', blob: null },
+            { $set: { status: 'inactive' }},
+            {
+              upsert: true,
+              setDefaultsOnInsert: true
+            },
+            function(error, result) {
+              assert.ifError(error);
+              done();
+            });
+        });
+    });
+
     it('should work with array documents (gh-3034)', function(done) {
       var db = start();
 

@@ -1,3 +1,8 @@
+3.8.33 / 2015-07-10
+===================
+ * upgraded; node driver -> 1.4.38
+ * fixed; dont crash when `match` validator undefined
+
 4.0.6 / 2015-06-21
 ==================
  * upgraded; node driver -> 2.0.34 #3087

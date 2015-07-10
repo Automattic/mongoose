@@ -1,3 +1,8 @@
+3.8.32 / 2015-07-10
+===================
+ * upgraded; node driver -> 1.4.38
+ * fixed; dont crash when `match` validator undefined
+
 3.8.31 / 2015-06-20
 ===================
  * fixed; properly handle text search with discriminators and $meta #2166

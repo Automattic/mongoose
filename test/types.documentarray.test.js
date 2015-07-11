@@ -110,6 +110,26 @@ describe('types.documentarray', function(){
     assert.equal(a.id(id3).title, 'rock-n-roll');
     assert.equal(a.id(sub3._id).title, 'rock-n-roll');
 
+    // test with object as _id
+    var Custom = new Schema({
+        title: { type: String }
+      , _id:   { one: { type: String }, two: { type: String } }
+    });
+
+    var Subdocument = TestDoc(Custom);
+
+    var sub1 = new Subdocument();
+    sub1._id = {one: 'rolling', two: 'rock'};
+    sub1.title = 'to be a rock and not to roll';
+
+    var sub2 = new Subdocument();
+    sub2._id = {one: 'rock', two: 'roll'};
+    sub2.title = 'rock-n-roll';
+
+    var a = new MongooseDocumentArray([sub1,sub2]);
+    assert.notEqual(a.id({one: 'rolling', two: 'rock'}).title, 'rock-n-roll');
+    assert.equal(a.id({one: 'rock', two: 'roll'}).title, 'rock-n-roll');
+
     // test with no _id
     var NoId = new Schema({
         title: { type: String }

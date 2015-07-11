@@ -1404,9 +1404,39 @@ describe('model: findByIdAndUpdate:', function(){
           },
           function(error, result) {
             assert.ifError(error);
-            done();
+            db.close(done);
           });
       });
+    });
+
+    it('handles setting array (gh-3107)', function(done) {
+      var db = start();
+
+      var testSchema = new mongoose.Schema({
+        name: String,
+        a: [{
+          foo: String
+        }],
+        b: [Number]
+      });
+
+      var TestModel = db.model('gh3107', testSchema);
+      TestModel.findOneAndUpdate(
+        { id: '1' },
+        { $setOnInsert: { a: [{ foo: 'bar' }], b: [2] } },
+        {
+          upsert: true,
+          'new': true,
+          setDefaultsOnInsert: true
+        },
+        function(error, doc) {
+          assert.ifError(error);
+          assert.equal(doc.a.length, 1);
+          assert.equal(doc.a[0].foo, 'bar');
+          assert.equal(doc.b.length, 1);
+          assert.equal(doc.b[0], 2);
+          db.close(done);
+        });
     });
   });
 });

@@ -139,6 +139,12 @@ describe('schema', function(){
       Test.path('simple').doValidate(0, function(err){
         assert.ok(err instanceof ValidatorError);
       });
+
+      Test.path('simple').match(null);
+      Test.path('simple').doValidate(0, function(err) {
+        assert.ok(err instanceof ValidatorError);
+      });
+
       done();
     });
 

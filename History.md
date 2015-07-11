@@ -1,3 +1,24 @@
+4.0.7 / 2015-07-11
+==================
+ * fixed; documentarray id method when using object id #3157 [siboulet](https://github.com/siboulet)
+ * docs; improve findById docs #3147
+ * fixed; update validators handle null properly #3136 [odeke-em](https://github.com/odeke-em)
+ * docs; jsdoc syntax errors #3128 [rhmeeuwisse](https://github.com/rhmeeuwisse)
+ * docs; fix typo #3126 [rhmeeuwisse](https://github.com/rhmeeuwisse)
+ * docs; proper formatting in queries.jade #3121 [rhmeeuwisse](https://github.com/rhmeeuwisse)
+ * docs; correct example for string maxlength validator #3111 [rhmeeuwisse](https://github.com/rhmeeuwisse)
+ * fixed; setDefaultsOnInsert with arrays #3107
+ * docs; LearnBoost -> Automattic in package.json #3099
+ * docs; pre update hook example #3094 [danpe](https://github.com/danpe)
+ * docs; clarify query middleware example #3051
+ * fixed; ValidationErrors in strict mode #3046
+ * fixed; set findOneAndUpdate properties before hooks run #3024
+
+3.8.33 / 2015-07-10
+===================
+ * upgraded; node driver -> 1.4.38
+ * fixed; dont crash when `match` validator undefined
+
 4.0.6 / 2015-06-21
 ==================
  * upgraded; node driver -> 2.0.34 #3087

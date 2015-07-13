@@ -515,7 +515,7 @@ describe('model: update:', function(){
 
   it('handles $pull and nested $nin', function(done){
     var db = start()
-      , BlogPost = db.model('BlogPostForUpdates', collection)
+      , BlogPost = db.model('BlogPostForUpdates', collection);
 
     BlogPost.findById(post, function (err, last) {
       assert.ifError(err);

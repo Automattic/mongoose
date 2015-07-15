@@ -844,22 +844,6 @@ describe('Query', function(){
       assert.deepEqual(o, q._mongooseOptions.populate['dirt']);
       done();
     })
-  })
-
-  describe('an empty query', function(){
-    it('should not throw', function(done){
-      var query = new Query({}, {}, null, p1.collection);
-      var threw = false;
-
-      try {
-        query.exec();
-      } catch (err) {
-        threw = true;
-      }
-
-      assert.equal(threw, false);
-      done();
-    })
   });
 
   describe('casting', function(){

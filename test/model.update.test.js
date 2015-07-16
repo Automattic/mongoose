@@ -1126,4 +1126,19 @@ describe('model: update:', function(){
       });
     });
   });
+
+  it('doesnt modify original argument doc (gh-3008)', function(done) {
+    var db = start();
+    var FooSchema = new mongoose.Schema({
+      key: Number,
+      value: String
+    });
+    var Model = db.model('gh3008', FooSchema);
+
+    var update = { $set: { values: 2, value: 2 } };
+    Model.update({ key: 1 }, update, function(err) {
+      assert.equal(update.$set.values, 2);
+      done();
+    });
+  });
 });

@@ -1883,6 +1883,24 @@ describe('Model', function(){
         });
       });
     });
+
+    it('errors when id deselected (gh-3118)', function(done) {
+      var db = start()
+        , collection = 'blogposts_' + random()
+        , BlogPost = db.model('BlogPost', collection)
+
+      BlogPost.create({ title: 1 }, { title: 2 }, function (err) {
+        assert.ifError(err);
+        BlogPost.findOne({ title: 1 }, { _id: 0 }, function(error, doc) {
+          assert.ifError(error);
+          doc.remove(function (err) {
+            assert.ok(err);
+            assert.equal(err.toString(), 'Error: No _id found on document!');
+            db.close(done);
+          });
+        });
+      });
+    });
   })
 
   describe('#remove()', function(){

@@ -21,7 +21,7 @@
   "dependencies": {
     "async": "0.9.0",
     "bson": "~0.3",
-    "hooks-fixed": "1.0.1",
+    "hooks-fixed": "1.0.2",
     "kareem": "1.0.1",
     "mongodb": "2.0.34",
     "mpath": "0.1.1",

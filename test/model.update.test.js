@@ -1141,4 +1141,15 @@ describe('model: update:', function(){
       done();
     });
   });
+
+  it('can $rename (gh-1845)', function(done) {
+    var db = start();
+    var schema = Schema({ foo: Date, bar: Date });
+    var Model = db.model('gh1845', schema, 'gh1845');
+
+    Model.update({}, { $rename: { foo: 'bar' } }, function(error) {
+      assert.ifError(error);
+      db.close(done);
+    });
+  });
 });

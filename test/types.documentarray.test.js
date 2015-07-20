@@ -167,6 +167,9 @@ describe('types.documentarray', function(){
       threw = err;
     }
     assert.equal(false, threw);
+    // undefined and null should not match a nonexistent _id
+    assert.strictEqual(null, a.id(undefined));
+    assert.strictEqual(null, a.id(null));
 
     // test when _id is a populated document
     var Custom = new Schema({

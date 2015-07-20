@@ -515,7 +515,7 @@ describe('model: update:', function(){
 
   it('handles $pull and nested $nin', function(done){
     var db = start()
-      , BlogPost = db.model('BlogPostForUpdates', collection)
+      , BlogPost = db.model('BlogPostForUpdates', collection);
 
     BlogPost.findById(post, function (err, last) {
       assert.ifError(err);
@@ -1451,6 +1451,32 @@ describe('model: update:', function(){
   it('can $rename (gh-1845)', function(done) {
     var db = start();
 
+    var schema = Schema({ foo: Date, bar: Date });
+    var Model = db.model('gh1845', schema, 'gh1845');
+
+    Model.update({}, { $rename: { foo: 'bar' } }, function(error) {
+      assert.ifError(error);
+      db.close(done);
+    });
+  });
+
+  it('doesnt modify original argument doc (gh-3008)', function(done) {
+    var db = start();
+    var FooSchema = new mongoose.Schema({
+      key: Number,
+      value: String
+    });
+    var Model = db.model('gh3008', FooSchema);
+
+    var update = { $set: { values: 2, value: 2 } };
+    Model.update({ key: 1 }, update, function(err) {
+      assert.equal(update.$set.values, 2);
+      done();
+    });
+  });
+
+  it('can $rename (gh-1845)', function(done) {
+    var db = start();
     var schema = Schema({ foo: Date, bar: Date });
     var Model = db.model('gh1845', schema, 'gh1845');
 

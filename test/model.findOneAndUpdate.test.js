@@ -1013,6 +1013,25 @@ describe('model: findByIdAndUpdate:', function(){
       });
   });
 
+  it('strict mode with objects (gh-2947)', function(done) {
+    var db = start();
+
+    var s = new Schema({
+      test: String
+    }, { strict: true });
+
+    var Breakfast = db.model('gh2947', s);
+    var q = Breakfast.findOneAndUpdate({},
+      { notInSchema: { a: 1 }, test: 'abc' },
+      { 'new': true, strict: true, upsert: true });
+
+    q.lean();
+    q.exec(function(error, doc) {
+      assert.ok(!doc.notInSchema);
+      done();
+    });
+  });
+
   describe('middleware', function() {
     var db;
 

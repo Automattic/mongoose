@@ -12,6 +12,8 @@ rules:
   comma-style:
     - 2
     - first
+    - exceptions:
+        ObjectExpression: true
   no-spaced-func: 2
   space-after-keywords: 2
   space-before-blocks: 2

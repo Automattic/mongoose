@@ -1,3 +1,8 @@
+3.8.35 / 2015-07-20
+===================
+ * fixed; allow using $rename #3171
+ * fixed; no longer modifies update arguments #3008
+
 3.8.33 / 2015-07-10
 ===================
  * upgraded; node driver -> 1.4.38

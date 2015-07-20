@@ -1,3 +1,15 @@
+4.0.8 / 2015-07-20
+==================
+ * fixed; assignment with document arrays #3178 [rosston](https://github.com/rosston)
+ * docs; remove duplicate paragraph #3164 [rhmeeuwisse](https://github.com/rhmeeuwisse)
+ * docs; improve findOneAndXYZ parameter descriptions #3159 [rhmeeuwisse](https://github.com/rhmeeuwisse)
+ * docs; add findOneAndRemove to list of supported middleware #3158
+ * docs; clarify ensureIndex #3156
+ * fixed; refuse to save/remove document without id #3118
+ * fixed; hooks next() no longer accidentally returns promise #3104
+ * fixed; strict mode for findOneAndUpdate #2947
+ * added; .min.js.gz file for browser component #2806
+
 3.8.35 / 2015-07-20
 ===================
  * fixed; allow using $rename #3171

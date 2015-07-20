@@ -1,3 +1,8 @@
+3.8.35 / 2015-07-20
+===================
+ * fixed; allow using $rename #3171
+ * fixed; no longer modifies update arguments #3008
+
 4.0.7 / 2015-07-11
 ==================
  * fixed; documentarray id method when using object id #3157 [siboulet](https://github.com/siboulet)

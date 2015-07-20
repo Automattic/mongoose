@@ -65,7 +65,7 @@ describe('schema', function(){
       // with SchemaTypes validate method
       Test.path('state').enum({
         values: 'opening open closing closed'.split(' '),
-        message: 'enum validator failed for path `{PATH}` with value `{VALUE}`'
+        message: 'enum validator failed for path `{PATH}`: test'
       });
 
       assert.equal(Test.path('state').validators.length, 1);
@@ -90,6 +90,8 @@ describe('schema', function(){
 
       Test.path('state').doValidate('x', function(err){
         assert.ok(err instanceof ValidatorError);
+        assert.equal(err.message,
+          'enum validator failed for path `state`: test')
       });
 
       Test.path('state').doValidate('opening', function(err){

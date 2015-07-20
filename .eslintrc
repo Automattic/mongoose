@@ -14,6 +14,7 @@ rules:
     - first
     - exceptions:
         ObjectExpression: true
+        ArrayExpression: true
   no-spaced-func: 2
   space-after-keywords: 2
   space-before-blocks: 2

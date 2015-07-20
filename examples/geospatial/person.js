@@ -4,7 +4,7 @@ var mongoose = require('../../lib');
 var Schema = mongoose.Schema;
 
 // create an export function to encapsulate the model creation
-module.exports = function() {
+module.exports = function () {
   // define schema
   var PersonSchema = new Schema({
     name : String,
@@ -17,8 +17,8 @@ module.exports = function() {
   });
 
   // define a method to find the closest person
-  PersonSchema.methods.findClosest = function(cb) {
-    return this.model('Person').find({ 
+  PersonSchema.methods.findClosest = function (cb) {
+    return this.model('Person').find({
         loc : { $nearSphere : this.loc },
         name : { $ne : this.name }
       }).limit(1).exec(cb);

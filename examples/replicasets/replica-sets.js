@@ -20,7 +20,7 @@ var data = [
   { name : 'lilly', age : 26, birthday : new Date().setFullYear((new
     Date().getFullYear() - 26)) },
   { name : 'alucard', age : 1000, birthday : new Date().setFullYear((new
-    Date().getFullYear() - 1000)) },
+    Date().getFullYear() - 1000)) }
 ];
 
 
@@ -46,8 +46,8 @@ mongoose.connect('mongodb://localhost:27018/persons,localhost:27019,localhost:27
   });
 });
 
-function cleanup() {
-  Person.remove(function() {
+function cleanup () {
+  Person.remove(function () {
     mongoose.disconnect();
   });
 }

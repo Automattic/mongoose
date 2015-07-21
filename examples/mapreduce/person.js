@@ -7,10 +7,10 @@ var Schema = mongoose.Schema;
 module.exports = function () {
   // define schema
   var PersonSchema = new Schema({
-    name : String
-  , age : Number
-  , birthday : Date
-  , gender: String
+    name : String,
+    age : Number,
+    birthday : Date,
+    gender: String
   });
   mongoose.model('Person', PersonSchema);
 };

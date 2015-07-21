@@ -12,29 +12,29 @@ var Person = mongoose.model('Person');
 // define some dummy data
 var data = [
   {
-    name : 'bill'
-  , age : 25
-  , birthday : new Date().setFullYear((new Date().getFullYear() - 25))
-  }
-, {
-    name : 'mary'
-  , age : 30
-  , birthday : new Date().setFullYear((new Date().getFullYear() - 30))
-  }
-, {
-    name : 'bob'
-  , age : 21
-  , birthday : new Date().setFullYear((new Date().getFullYear() - 21))
-  }
-, {
-    name : 'lilly'
-  , age : 26
-  , birthday : new Date().setFullYear((new Date().getFullYear() - 26))
-  }
-, {
-    name : 'alucard'
-  , age : 1000
-  , birthday : new Date().setFullYear((new Date().getFullYear() - 1000))
+    name : 'bill',
+    age : 25,
+    birthday : new Date().setFullYear((new Date().getFullYear() - 25))
+  },
+  {
+    name : 'mary',
+    age : 30,
+    birthday : new Date().setFullYear((new Date().getFullYear() - 30))
+  },
+  {
+    name : 'bob',
+    age : 21,
+    birthday : new Date().setFullYear((new Date().getFullYear() - 21))
+  },
+  {
+    name : 'lilly',
+    age : 26,
+    birthday : new Date().setFullYear((new Date().getFullYear() - 26))
+  },
+  {
+    name : 'alucard',
+    age : 1000,
+    birthday : new Date().setFullYear((new Date().getFullYear() - 1000))
   }
 ];
 
@@ -49,11 +49,11 @@ mongoose.connect('mongodb://localhost:27018/persons,localhost:27019,localhost:27
 
   // create all of the dummy people
   async.each(
-    data
-  , function (item, cb) {
+    data,
+    function (item, cb) {
       Person.create(item, cb);
-    }
-  , function (err) {
+    },
+    function (err) {
       // create and delete some data
       var prom = Person.find({age : { $lt : 1000 }}).exec();
 

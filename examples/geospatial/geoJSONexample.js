@@ -12,11 +12,11 @@ var Location = mongoose.model('Location');
 // define some dummy data
 // note: the type can be Point, LineString, or Polygon
 var data = [
-  { loc: { type: 'Point', coordinates: [-20.0, 5.0] }}
-, { loc: { type: 'Point', coordinates: [6.0, 10.0] }}
-, { loc: { type: 'Point', coordinates: [34.0, -50.0] }}
-, { loc: { type: 'Point', coordinates: [-100.0, 70.0] }}
-, { loc: { type: 'Point', coordinates: [38.0, 38.0] }}
+  { loc: { type: 'Point', coordinates: [-20.0, 5.0] }},
+  { loc: { type: 'Point', coordinates: [6.0, 10.0] }},
+  { loc: { type: 'Point', coordinates: [34.0, -50.0] }},
+  { loc: { type: 'Point', coordinates: [-100.0, 70.0] }},
+  { loc: { type: 'Point', coordinates: [38.0, 38.0] }}
 ];
 
 

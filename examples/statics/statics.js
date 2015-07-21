@@ -15,22 +15,23 @@ mongoose.connect('mongodb://localhost/persons', function (err) {
 
   Person.create(
     {
-      name : 'bill'
-    , age : 25
-    , birthday : new Date().setFullYear((new Date().getFullYear() - 25))
-    }
-  , function (err, bill) {
-    if (err) throw err;
-    console.log("People added to db: %s", bill.toString());
-
-    // using the static
-    Person.findPersonByName('bill', function (err, result) {
+      name : 'bill',
+      age : 25,
+      birthday : new Date().setFullYear((new Date().getFullYear() - 25))
+    },
+    function (err, bill) {
       if (err) throw err;
+      console.log("People added to db: %s", bill.toString());
 
-      console.log(result);
-      cleanup();
-    });
-  });
+      // using the static
+      Person.findPersonByName('bill', function (err, result) {
+        if (err) throw err;
+
+        console.log(result);
+        cleanup();
+      });
+    }
+  );
 });
 
 function cleanup () {

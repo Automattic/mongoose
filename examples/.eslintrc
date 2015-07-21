@@ -1,0 +1,4 @@
+rules:
+  comma-style:
+    - 2
+    - last

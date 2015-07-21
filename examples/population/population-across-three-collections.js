@@ -19,20 +19,20 @@ mongoose.connection.on('error', function () {
  */
 
 var user = new Schema({
-  name: String
-, friends: [{
-    type: Schema.ObjectId
-  , ref: 'User'
+  name: String,
+  friends: [{
+    type: Schema.ObjectId,
+    ref: 'User'
   }]
 });
 var User = mongoose.model('User', user);
 
 var blogpost = Schema({
-  title: String
-, tags: [String]
-, author: {
-    type: Schema.ObjectId
-  , ref: 'User'
+  title: String,
+  tags: [String],
+  author: {
+    type: Schema.ObjectId,
+    ref: 'User'
   }
 });
 
@@ -52,24 +52,24 @@ mongoose.connection.on('open', function () {
   var users = [];
 
   users.push({
-    _id: userIds[0]
-  , name: 'mary'
-  , friends: [userIds[1], userIds[2], userIds[3]]
+    _id: userIds[0],
+    name: 'mary',
+    friends: [userIds[1], userIds[2], userIds[3]]
   });
   users.push({
-    _id: userIds[1]
-  , name: 'bob'
-  , friends: [userIds[0], userIds[2], userIds[3]]
+    _id: userIds[1],
+    name: 'bob',
+    friends: [userIds[0], userIds[2], userIds[3]]
   });
   users.push({
-    _id: userIds[2]
-  , name: 'joe'
-  , friends: [userIds[0], userIds[1], userIds[3]]
+    _id: userIds[2],
+    name: 'joe',
+    friends: [userIds[0], userIds[1], userIds[3]]
   });
   users.push({
-    _id: userIds[3]
-  , name: 'sally'
-  , friends: [userIds[0], userIds[1], userIds[2]]
+    _id: userIds[3],
+    name: 'sally',
+    friends: [userIds[0], userIds[1], userIds[2]]
   });
 
   User.create(users, function (err, docs) {
@@ -77,19 +77,19 @@ mongoose.connection.on('open', function () {
 
     var blogposts = [];
     blogposts.push({
-      title: 'blog 1'
-    , tags: ['fun', 'cool']
-    , author: userIds[3]
+      title: 'blog 1',
+      tags: ['fun', 'cool'],
+      author: userIds[3]
     });
     blogposts.push({
-      title: 'blog 2'
-    , tags: ['cool']
-    , author: userIds[1]
+      title: 'blog 2',
+      tags: ['cool'],
+      author: userIds[1]
     });
     blogposts.push({
-      title: 'blog 3'
-    , tags: ['fun', 'odd']
-    , author: userIds[2]
+      title: 'blog 3',
+      tags: ['fun', 'odd'],
+      author: userIds[2]
     });
 
     BlogPost.create(blogposts, function (err, docs) {
@@ -111,9 +111,9 @@ mongoose.connection.on('open', function () {
          */
 
         var opts = {
-          path: 'author.friends'
-        , select: 'name'
-        , options: { limit: 2 }
+          path: 'author.friends',
+          select: 'name',
+          options: { limit: 2 }
         };
 
         BlogPost.populate(docs, opts, function (err, docs) {

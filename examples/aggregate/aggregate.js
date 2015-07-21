@@ -12,39 +12,39 @@ var Person = mongoose.model('Person');
 // define some dummy data
 var data = [
   {
-    name : 'bill'
-  , age : 25
-  , birthday : new Date().setFullYear((new Date().getFullYear() - 25))
-  , gender : "Male"
-  , likes : ['movies', 'games', 'dogs']
-  }
-, {
-    name : 'mary'
-  , age : 30
-  , birthday : new Date().setFullYear((new Date().getFullYear() - 30))
-  , gender : "Female"
-  , likes : ['movies', 'birds', 'cats']
-  }
-, {
-    name : 'bob'
-  , age : 21
-  , birthday : new Date().setFullYear((new Date().getFullYear() - 21))
-  , gender : "Male"
-  , likes : ['tv', 'games', 'rabbits']
-  }
-, {
-    name : 'lilly'
-  , age : 26
-  , birthday : new Date().setFullYear((new Date().getFullYear() - 26))
-  , gender : "Female"
-  , likes : ['books', 'cats', 'dogs']
-  }
-, {
-    name : 'alucard'
-  , age : 1000
-  , birthday : new Date().setFullYear((new Date().getFullYear() - 1000))
-  , gender : "Male"
-  , likes : ['glasses', 'wine', 'the night']
+    name : 'bill',
+    age : 25,
+    birthday : new Date().setFullYear((new Date().getFullYear() - 25)),
+    gender : "Male",
+    likes : ['movies', 'games', 'dogs']
+  },
+  {
+    name : 'mary',
+    age : 30,
+    birthday : new Date().setFullYear((new Date().getFullYear() - 30)),
+    gender : "Female",
+    likes : ['movies', 'birds', 'cats']
+  },
+  {
+    name : 'bob',
+    age : 21,
+    birthday : new Date().setFullYear((new Date().getFullYear() - 21)),
+    gender : "Male",
+    likes : ['tv', 'games', 'rabbits']
+  },
+  {
+    name : 'lilly',
+    age : 26,
+    birthday : new Date().setFullYear((new Date().getFullYear() - 26)),
+    gender : "Female",
+    likes : ['books', 'cats', 'dogs']
+  },
+  {
+    name : 'alucard',
+    age : 1000,
+    birthday : new Date().setFullYear((new Date().getFullYear() - 1000)),
+    gender : "Male",
+    likes : ['glasses', 'wine', 'the night']
   }
 ];
 
@@ -67,8 +67,8 @@ mongoose.connect('mongodb://localhost/persons', function (err) {
       // group everything by the like and then add each name with that like to
       // the set for the like
       { $group : {
-        _id : { likes : "$likes" }
-      , likers : { $addToSet : "$name" }
+        _id : { likes : "$likes" },
+        likers : { $addToSet : "$name" }
       } },
       function (err, result) {
         if (err) throw err;

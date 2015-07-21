@@ -8,6 +8,7 @@ rules:
   indent:
     - 2
     - 2
+    - indentSwitchCase: true
   no-trailing-spaces: 2
   comma-style:
     - 2

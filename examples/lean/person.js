@@ -7,11 +7,11 @@ var Schema = mongoose.Schema;
 module.exports = function () {
   // define schema
   var PersonSchema = new Schema({
-    name : String,
-    age : Number,
-    birthday : Date,
-    gender: String,
-    likes: [String]
+    name : String
+  , age : Number
+  , birthday : Date
+  , gender: String
+  , likes: [String]
   });
   mongoose.model('Person', PersonSchema);
 };

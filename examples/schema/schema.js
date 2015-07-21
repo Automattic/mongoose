@@ -4,7 +4,7 @@
  */
 
 var mongoose = require('../../lib')
-  , Schema = mongoose.Schema;
+, Schema = mongoose.Schema;
 
 /**
  * Schema definition
@@ -15,28 +15,28 @@ var mongoose = require('../../lib')
 var Comment = new Schema();
 
 Comment.add({
-    title     : { type: String, index: true }
-  , date      : Date
-  , body      : String
-  , comments  : [Comment]
+  title     : { type: String, index: true }
+, date      : Date
+, body      : String
+, comments  : [Comment]
 });
 
 var BlogPost = new Schema({
-    title     : { type: String, index: true }
-  , slug      : { type: String, lowercase: true, trim: true }
-  , date      : Date
-  , buf       : Buffer
-  , comments  : [Comment]
-  , creator   : Schema.ObjectId
+  title     : { type: String, index: true }
+, slug      : { type: String, lowercase: true, trim: true }
+, date      : Date
+, buf       : Buffer
+, comments  : [Comment]
+, creator   : Schema.ObjectId
 });
 
 var Person = new Schema({
-    name: {
-        first: String
-      , last : String
-    }
-  , email: { type: String, required: true, index: { unique: true, sparse: true } }
-  , alive: Boolean
+  name: {
+    first: String
+  , last : String
+  }
+, email: { type: String, required: true, index: { unique: true, sparse: true } }
+, alive: Boolean
 });
 
 /**
@@ -44,12 +44,12 @@ var Person = new Schema({
  */
 
 BlogPost.path('date')
-.default(function () {
-   return new Date()
- })
-.set(function (v) {
-   return v == 'now' ? new Date() : v;
- });
+  .default(function () {
+    return new Date();
+  })
+  .set(function (v) {
+    return v == 'now' ? new Date() : v;
+  });
 
 /**
  * Pre hook.
@@ -66,15 +66,15 @@ BlogPost.pre('save', function (next, done) {
 
 BlogPost.methods.findCreator = function (callback) {
   return this.db.model('Person').findById(this.creator, callback);
-}
+};
 
 BlogPost.statics.findByTitle = function (title, callback) {
   return this.find({ title: title }, callback);
-}
+};
 
 BlogPost.methods.expressiveQuery = function (creator, date, callback) {
   return this.find('creator', creator).where('date').gte(date).run(callback);
-}
+};
 
 /**
  * Plugins

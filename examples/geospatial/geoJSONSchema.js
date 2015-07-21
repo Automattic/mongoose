@@ -11,8 +11,8 @@ module.exports = function () {
   // MUST BE VANILLA
   var LocationObject = new Schema({
     loc: {
-      type: { type: String },
-      coordinates: []
+      type: { type: String }
+    , coordinates: []
     }
   });
   // define the index

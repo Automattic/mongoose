@@ -1,5 +1,5 @@
 
-var mongoose = require('../../lib')
+var mongoose = require('../../lib');
 var Schema = mongoose.Schema;
 
 console.log('Running mongoose version %s', mongoose.version);
@@ -9,10 +9,10 @@ console.log('Running mongoose version %s', mongoose.version);
  */
 
 var consoleSchema = Schema({
-    name: String
-  , manufacturer: String
-  , released: Date
-})
+  name: String
+, manufacturer: String
+, released: Date
+});
 var Console = mongoose.model('Console', consoleSchema);
 
 /**
@@ -20,11 +20,11 @@ var Console = mongoose.model('Console', consoleSchema);
  */
 
 var gameSchema = Schema({
-    name: String
-  , developer: String
-  , released: Date
-  , consoles: [{ type: Schema.Types.ObjectId, ref: 'Console' }]
-})
+  name: String
+, developer: String
+, released: Date
+, consoles: [{ type: Schema.Types.ObjectId, ref: 'Console' }]
+});
 var Game = mongoose.model('Game', gameSchema);
 
 /**
@@ -38,30 +38,36 @@ mongoose.connect('mongodb://localhost/console', function (err) {
 
   // we connected ok
   createData();
-})
+});
 
 /**
  * Data generation
  */
 
 function createData () {
-  Console.create({
+  Console.create(
+    {
       name: 'Nintendo 64'
     , manufacturer: 'Nintendo'
     , released: 'September 29, 1996'
-  }, function (err, nintendo64) {
-    if (err) return done(err);
-
-    Game.create({
-        name: 'Legend of Zelda: Ocarina of Time'
-      , developer: 'Nintendo'
-      , released: new Date('November 21, 1998')
-      , consoles: [nintendo64]
-    }, function (err) {
+    }
+  , function (err, nintendo64) {
       if (err) return done(err);
-      example();
-    })
-  })
+
+      Game.create(
+        {
+          name: 'Legend of Zelda: Ocarina of Time'
+        , developer: 'Nintendo'
+        , released: new Date('November 21, 1998')
+        , consoles: [nintendo64]
+        }
+      , function (err) {
+          if (err) return done(err);
+          example();
+        }
+      );
+    }
+  );
 }
 
 /**
@@ -83,7 +89,7 @@ function example () {
       , ocinara.released.toLocaleDateString());
 
     done();
-  })
+  });
 }
 
 function done (err) {
@@ -91,6 +97,6 @@ function done (err) {
   Console.remove(function () {
     Game.remove(function () {
       mongoose.disconnect();
-    })
-  })
+    });
+  });
 }

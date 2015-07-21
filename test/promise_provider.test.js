@@ -10,6 +10,7 @@ var start = require('./common');
 
 var PromiseProvider = require('../lib/promise_provider');
 var Schema = require('../lib/schema');
+var ValidationError = require('../lib/error/validation');
 
 var Promise;
 var db;
@@ -167,7 +168,14 @@ describe('ES6 promises: ', function() {
   });
 
   describe('bluebird: ', function() {
-    bluebird.onPossiblyUnhandledRejection(function() {});
+    // Allow validation errors, those are going to happen because of quirks
+    // with hooks. Other unhandled rejections should cause tests to fail.
+    bluebird.onPossiblyUnhandledRejection(function(err) {
+      if (err instanceof ValidationError) {
+        return;
+      }
+      throw err;
+    });
 
     before(function() {
       PromiseProvider.set(bluebird);

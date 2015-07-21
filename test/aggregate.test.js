@@ -435,6 +435,24 @@ describe('aggregate: ', function() {
       });
     });
 
+    it('explain()', function(done) {
+      var aggregate = new Aggregate();
+
+      setupData(function(db) {
+        aggregate.
+          model(db.model('Employee')).
+          match({ sal: { $lt: 16000 } }).
+          explain(function(err, output) {
+            assert.ifError(err);
+            assert.ok(output);
+            // make sure we got explain output
+            assert.ok(output.stages);
+
+            clearData(db, function() { done(); });
+          });
+      });
+    });
+
     describe('error when empty pipeline', function() {
       it('without a callback', function(done) {
         var agg = new Aggregate;

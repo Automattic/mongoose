@@ -27,72 +27,72 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function (err) {
 
     var Comments = new Schema;
     Comments.add({
-        title     : String
-      , date      : Date
-      , body      : String
-      , comments  : [Comments]
+      title     : String
+    , date      : Date
+    , body      : String
+    , comments  : [Comments]
     });
 
     var BlogPost = new Schema({
-        title     : String
-      , author    : String
-      , slug      : String
-      , date      : Date
-      , meta      : {
-            date      : Date
-          , visitors  : Number
-        }
-      , published : Boolean
-      , mixed     : {}
-      , numbers   : [Number]
-      , tags      : [String]
-      , owners    : [ObjectId]
-      , comments  : [Comments]
-      , def       : { type: String, default: 'kandinsky' }
+      title     : String
+    , author    : String
+    , slug      : String
+    , date      : Date
+    , meta      : {
+        date      : Date
+      , visitors  : Number
+      }
+    , published : Boolean
+    , mixed     : {}
+    , numbers   : [Number]
+    , tags      : [String]
+    , owners    : [ObjectId]
+    , comments  : [Comments]
+    , def       : { type: String, default: 'kandinsky' }
     });
 
     var blogData = {
-      title : 'dummy post',
-      author : 'somebody',
-      slug : 'test.post',
-      date : new Date(),
-      meta : { date : new Date(), visitors: 9001},
-      published : true,
-      mixed : { thisIsRandom : true },
-      numbers : [1,2,7,10,23432],
-      tags : ['test', 'BENCH', 'things', 'more things'],
-      def : 'THANGS!!!',
-      comments : []
+      title : 'dummy post'
+    , author : 'somebody'
+    , slug : 'test.post'
+    , date : new Date()
+    , meta : { date : new Date(), visitors: 9001}
+    , published : true
+    , mixed : { thisIsRandom : true }
+    , numbers : [1,2,7,10,23432]
+    , tags : ['test', 'BENCH', 'things', 'more things']
+    , def : 'THANGS!!!'
+    , comments : []
     };
     var commentData = {
-      title : 'test comment',
-      date : new Date(),
-      body : 'this be some crazzzyyyyy text that would go in a comment',
-      comments : [{ title : 'second level', date : new Date(), body : 'texttt'}]
+      title : 'test comment'
+    , date : new Date()
+    , body : 'this be some crazzzyyyyy text that would go in a comment'
+    , comments : [{ title : 'second level', date : new Date(), body : 'texttt'}]
     };
     for (var i=0; i < 5; i++) {
       blogData.comments.push(commentData);
     }
     var data = {
-      name : "name",
-      age : 0,
-      likes : ["dogs", "cats", "pizza"],
-      address : " Nowhere-ville USA"
+      name : "name"
+    , age : 0
+    , likes : ["dogs", "cats", "pizza"]
+    , address : " Nowhere-ville USA"
     };
 
     var UserSchema = new Schema({
-      name : String,
-      age: Number,
-      likes: [String],
-      address: String
+      name : String
+    , age: Number
+    , likes: [String]
+    , address: String
     });
 
     var User = mongoose.model('User', UserSchema);
-    var BlogPost = mongoose.model('BlogPost', BlogPost);
+    BlogPost = mongoose.model('BlogPost', BlogPost);
     var user = db.collection('user');
     var blogpost = db.collection('blogpost');
 
-    function closeDB() {
+    function closeDB () {
       mongoose.connection.db.dropDatabase(function () {
         mongoose.disconnect();
         process.exit();
@@ -100,8 +100,8 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function (err) {
     }
 
     suite.add('Insert - Mongoose - Basic', {
-      defer : true,
-      fn : function (deferred) {
+      defer : true
+    , fn : function (deferred) {
         var nData = utils.clone(data);
         User.create(nData, function (err) {
           if (err) throw err;
@@ -109,8 +109,8 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function (err) {
         });
       }
     }).add('Insert - Driver - Basic', {
-      defer : true,
-      fn : function (deferred) {
+      defer : true
+    , fn : function (deferred) {
         var nData = utils.clone(data);
         user.insert(nData, function (err) {
           if (err) throw err;
@@ -118,8 +118,8 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function (err) {
         });
       }
     }).add('Insert - Mongoose - Embedded Docs', {
-      defer : true,
-      fn : function (deferred) {
+      defer : true
+    , fn : function (deferred) {
         var bp = utils.clone(blogData);
         BlogPost.create(bp, function (err) {
           if (err) throw err;
@@ -127,8 +127,8 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function (err) {
         });
       }
     }).add('Insert - Driver - Embedded Docs', {
-      defer : true,
-      fn : function (deferred) {
+      defer : true
+    , fn : function (deferred) {
 
         var bp = utils.clone(blogData);
         blogpost.insert(bp, function (err) {

@@ -35,6 +35,7 @@
   "devDependencies": {
     "acquit": "0.0.3",
     "benchmark": "1.0.0",
+    "bluebird": "2.9.34",
     "co": "3.1.0",
     "dox": "0.3.1",
     "highlight.js": "7.0.1",
@@ -44,6 +45,7 @@
     "mocha": "1.20.0",
     "node-static": "0.5.9",
     "open": "0.0.3",
+    "q": "1.4.1",
     "tbd": "0.6.4",
     "uglify-js": "2.4.15",
     "underscore": "1.5.2",

@@ -128,6 +128,18 @@ describe('document modified', function(){
     })
   });
 
+  describe('isDefault', function() {
+    it('works', function(done) {
+      var db = start();
+
+      var MyModel = db.model('test',
+        { name: { type: String, default: 'Val '} });
+      var m = new MyModel();
+      assert.ok(m.isDefault('name'));
+      db.close(done);
+    });
+  });
+
   describe('isModified', function(){
     it('should not throw with no argument', function(done){
       var db = start();
@@ -313,7 +325,7 @@ describe('document modified', function(){
       var db = start();
 
       var parentSchema = new Schema({
-        child: { type: Schema.Types.ObjectId, ref: 'gh-1530-2' } 
+        child: { type: Schema.Types.ObjectId, ref: 'gh-1530-2' }
       });
       var Parent = db.model('gh-1530-1', parentSchema);
       var childSchema = new Schema({
@@ -452,7 +464,7 @@ describe('document modified', function(){
           p.child[0].grandChild[0].name = 'Jason';
           assert.ok(p.isModified('child.0.grandChild.0.name'));
           p.save(function(error, inDb) {
-            assert.ifError(error); 
+            assert.ifError(error);
             assert.equal('Jason', inDb.child[0].grandChild[0].name);
             db.close(done);
           });

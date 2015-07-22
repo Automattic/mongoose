@@ -168,15 +168,6 @@ describe('ES6 promises: ', function() {
   });
 
   describe('bluebird: ', function() {
-    // Allow validation errors, those are going to happen because of quirks
-    // with hooks. Other unhandled rejections should cause tests to fail.
-    bluebird.onPossiblyUnhandledRejection(function(err) {
-      if (err instanceof ValidationError) {
-        return;
-      }
-      throw err;
-    });
-
     before(function() {
       PromiseProvider.set(bluebird);
       Promise = PromiseProvider.get();

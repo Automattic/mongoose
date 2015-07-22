@@ -873,7 +873,7 @@ describe('schema', function(){
         other: { type: String, required: true }
       });
 
-      var Breakfast = mongoose.model('gh3025', breakfast, 'gh3025');
+      var Breakfast = mongoose.model('gh3153', breakfast, 'gh3153');
       var bad = new Breakfast({});
       var error = bad.validateSync('other');
 

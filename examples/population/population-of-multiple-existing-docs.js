@@ -1,5 +1,5 @@
 
-var mongoose = require('../../lib');
+var mongoose = require('../../lib')
 var Schema = mongoose.Schema;
 
 console.log('Running mongoose version %s', mongoose.version);
@@ -9,10 +9,10 @@ console.log('Running mongoose version %s', mongoose.version);
  */
 
 var consoleSchema = Schema({
-  name: String,
-  manufacturer: String,
-  released: Date
-});
+    name: String
+  , manufacturer: String
+  , released: Date
+})
 var Console = mongoose.model('Console', consoleSchema);
 
 /**
@@ -20,11 +20,11 @@ var Console = mongoose.model('Console', consoleSchema);
  */
 
 var gameSchema = Schema({
-  name: String,
-  developer: String,
-  released: Date,
-  consoles: [{ type: Schema.Types.ObjectId, ref: 'Console' }]
-});
+    name: String
+  , developer: String
+  , released: Date
+  , consoles: [{ type: Schema.Types.ObjectId, ref: 'Console' }]
+})
 var Game = mongoose.model('Game', gameSchema);
 
 /**
@@ -38,47 +38,39 @@ mongoose.connect('mongodb://localhost/console', function (err) {
 
   // we connected ok
   createData();
-});
+})
 
 /**
  * Data generation
  */
 
 function createData () {
-  Console.create(
-    {
-      name: 'Nintendo 64',
-      manufacturer: 'Nintendo',
-      released: 'September 29, 1996'
-    },
-    {
-      name: 'Super Nintendo',
-      manufacturer: 'Nintendo',
-      released: 'August 23, 1991'
-    },
-    function (err, nintendo64, superNintendo) {
-      if (err) return done(err);
+  Console.create({
+      name: 'Nintendo 64'
+    , manufacturer: 'Nintendo'
+    , released: 'September 29, 1996'
+  }, {
+      name: 'Super Nintendo'
+    , manufacturer: 'Nintendo'
+    , released: 'August 23, 1991'
+  }, function (err, nintendo64, superNintendo) {
+    if (err) return done(err);
 
-      Game.create(
-        {
-          name: 'Legend of Zelda: Ocarina of Time',
-          developer: 'Nintendo',
-          released: new Date('November 21, 1998'),
-          consoles: [nintendo64]
-        },
-        {
-          name: 'Mario Kart',
-          developer: 'Nintendo',
-          released: 'September 1, 1992',
-          consoles: [superNintendo]
-        },
-        function (err) {
-          if (err) return done(err);
-          example();
-        }
-      );
-    }
-  );
+    Game.create({
+        name: 'Legend of Zelda: Ocarina of Time'
+      , developer: 'Nintendo'
+      , released: new Date('November 21, 1998')
+      , consoles: [nintendo64]
+    }, {
+        name: 'Mario Kart'
+      , developer: 'Nintendo'
+      , released: 'September 1, 1992'
+      , consoles: [superNintendo]
+    }, function (err) {
+      if (err) return done(err);
+      example();
+    })
+  })
 }
 
 /**
@@ -99,16 +91,15 @@ function example () {
 
       games.forEach(function (game) {
         console.log(
-          '"%s" was released for the %s on %s',
-          game.name,
-          game.consoles[0].name,
-          game.released.toLocaleDateString()
-        );
-      });
+            '"%s" was released for the %s on %s'
+          , game.name
+          , game.consoles[0].name
+          , game.released.toLocaleDateString());
+      })
 
-      done();
-    });
-  });
+      done()
+    })
+  })
 }
 
 function done (err) {
@@ -116,6 +107,6 @@ function done (err) {
   Console.remove(function () {
     Game.remove(function () {
       mongoose.disconnect();
-    });
-  });
+    })
+  })
 }

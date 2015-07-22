@@ -867,6 +867,23 @@ describe('schema', function(){
       done();
     });
 
+    it('validateSync allows you to filter paths (gh-3153)', function(done) {
+      var breakfast = new Schema({
+        description: { type: String, required: true, maxlength: 50 },
+        other: { type: String, required: true }
+      });
+
+      var Breakfast = mongoose.model('gh3025', breakfast, 'gh3025');
+      var bad = new Breakfast({});
+      var error = bad.validateSync('other');
+
+      assert.ok(error);
+      assert.equal(Object.keys(error.errors).length, 1);
+      assert.ok(error.errors['other']);
+      assert.ok(!error.errors['description']);
+      done();
+    });
+
     it('adds required validators to the front of the list (gh-2843)', function(done) {
       var breakfast = new Schema({ description: { type: String, maxlength: 50, required: true } });
 

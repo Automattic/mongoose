@@ -6,6 +6,7 @@ var suite = new Benchmark.Suite();
 
 var Schema = mongoose.Schema;
 var ObjectId = Schema.Types.ObjectId;
+var mongo = require('mongodb');
 var utils = require('../../lib/utils.js');
 
 // to make things work in the way the are normally described online...
@@ -24,106 +25,106 @@ mongoose.connect('mongodb://localhost/mongoose-bench-pop', function (err) {
 
   var commentSchema = new Schema;
   commentSchema.add({
-    title     : String
-  , date      : Date
-  , body      : String
+      title     : String
+    , date      : Date
+    , body      : String
   });
   var dummy1Schema = new Schema({
-    title : String
-  , isThisTest : Boolean
+    title : String,
+    isThisTest : Boolean
   });
   var dummy2Schema = new Schema({
-    title : String
-  , isThisTest : Boolean
+    title : String,
+    isThisTest : Boolean
   });
   var dummy3Schema = new Schema({
-    title : String
-  , isThisTest : Boolean
+    title : String,
+    isThisTest : Boolean
   });
   var dummy4Schema = new Schema({
-    title : String
-  , isThisTest : Boolean
+    title : String,
+    isThisTest : Boolean
   });
   var dummy5Schema = new Schema({
-    title : String
-  , isThisTest : Boolean
+    title : String,
+    isThisTest : Boolean
   });
   var dummy6Schema = new Schema({
-    title : String
-  , isThisTest : Boolean
+    title : String,
+    isThisTest : Boolean
   });
   var dummy7Schema = new Schema({
-    title : String
-  , isThisTest : Boolean
+    title : String,
+    isThisTest : Boolean
   });
   var dummy8Schema = new Schema({
-    title : String
-  , isThisTest : Boolean
+    title : String,
+    isThisTest : Boolean
   });
   var dummy9Schema = new Schema({
-    title : String
-  , isThisTest : Boolean
+    title : String,
+    isThisTest : Boolean
   });
   var BlogPost = new Schema({
-    title     : String
-  , author    : String
-  , slug      : String
-  , date      : Date
-  , meta      : {
-      date      : Date
-    , visitors  : Number
-    }
-  , published : Boolean
-  , mixed     : {}
-  , numbers   : [Number]
-  , tags      : [String]
-  , owners    : [ObjectId]
-  , comments  : [{ type : ObjectId, ref : 'Comment' }]
-  , dummy1    : [{ type : ObjectId, ref : 'Dummy1' }]
-  , dummy2    : [{ type : ObjectId, ref : 'Dummy2' }]
-  , dummy3    : [{ type : ObjectId, ref : 'Dummy3' }]
-  , dummy4    : [{ type : ObjectId, ref : 'Dummy4' }]
-  , dummy5    : [{ type : ObjectId, ref : 'Dummy5' }]
-  , dummy6    : [{ type : ObjectId, ref : 'Dummy6' }]
-  , dummy7    : [{ type : ObjectId, ref : 'Dummy7' }]
-  , dummy8    : [{ type : ObjectId, ref : 'Dummy8' }]
-  , dummy9    : [{ type : ObjectId, ref : 'Dummy9' }]
-  , def       : { type: String, default: 'kandinsky' }
+      title     : String
+    , author    : String
+    , slug      : String
+    , date      : Date
+    , meta      : {
+          date      : Date
+        , visitors  : Number
+      }
+    , published : Boolean
+    , mixed     : {}
+    , numbers   : [Number]
+    , tags      : [String]
+    , owners    : [ObjectId]
+    , comments  : [{ type : ObjectId, ref : 'Comment' }]
+    , dummy1    : [{ type : ObjectId, ref : 'Dummy1' }]
+    , dummy2    : [{ type : ObjectId, ref : 'Dummy2' }]
+    , dummy3    : [{ type : ObjectId, ref : 'Dummy3' }]
+    , dummy4    : [{ type : ObjectId, ref : 'Dummy4' }]
+    , dummy5    : [{ type : ObjectId, ref : 'Dummy5' }]
+    , dummy6    : [{ type : ObjectId, ref : 'Dummy6' }]
+    , dummy7    : [{ type : ObjectId, ref : 'Dummy7' }]
+    , dummy8    : [{ type : ObjectId, ref : 'Dummy8' }]
+    , dummy9    : [{ type : ObjectId, ref : 'Dummy9' }]
+    , def       : { type: String, default: 'kandinsky' }
   });
 
   var blogData = {
-    title : 'dummy post'
-  , author : 'somebody'
-  , slug : 'test.post'
-  , date : new Date()
-  , meta : { date : new Date(), visitors: 9001}
-  , published : true
-  , mixed : { thisIsRandom : true }
-  , numbers : [1,2,7,10,23432]
-  , tags : ['test', 'BENCH', 'things', 'more things']
-  , def : 'THANGS!!!'
-  , comments : []
-  , dummy1 : []
-  , dummy2 : []
-  , dummy3 : []
-  , dummy4 : []
-  , dummy5 : []
-  , dummy6 : []
-  , dummy7 : []
-  , dummy8 : []
-  , dummy9 : []
+    title : 'dummy post',
+    author : 'somebody',
+    slug : 'test.post',
+    date : new Date(),
+    meta : { date : new Date(), visitors: 9001},
+    published : true,
+    mixed : { thisIsRandom : true },
+    numbers : [1,2,7,10,23432],
+    tags : ['test', 'BENCH', 'things', 'more things'],
+    def : 'THANGS!!!',
+    comments : [],
+    dummy1 : [],
+    dummy2 : [],
+    dummy3 : [],
+    dummy4 : [],
+    dummy5 : [],
+    dummy6 : [],
+    dummy7 : [],
+    dummy8 : [],
+    dummy9 : []
   };
   var commentData = {
-    title : 'test comment'
-  , date : new Date()
-  , body : 'this be some crazzzyyyyy text that would go in a comment'
+    title : 'test comment',
+    date : new Date(),
+    body : 'this be some crazzzyyyyy text that would go in a comment'
   };
   var dummyData = {
-    title : "dummy data~"
-  , isThisTest : true
+    title : "dummy data~",
+    isThisTest : true
   };
   var Comments = mongoose.model('Comment', commentSchema);
-  BlogPost = mongoose.model('BlogPost', BlogPost);
+  var BlogPost = mongoose.model('BlogPost', BlogPost);
   var Dummy1 = mongoose.model('Dummy1', dummy1Schema);
   var Dummy2 = mongoose.model('Dummy2', dummy2Schema);
   var Dummy3 = mongoose.model('Dummy3', dummy3Schema);
@@ -140,7 +141,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench-pop', function (err) {
   }
 
   var cn = 5000;
-  for (i = 0; i < 500; i++) {
+  for (var i=0; i < 500; i++) {
     Comments.create(commentData, function (err, com) {
       cIds.push(com.id);
       --cn || cont();
@@ -194,7 +195,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench-pop', function (err) {
 
   var blog = [];
 
-  function cont () {
+  function cont() {
     blog[0] = utils.clone(blogData);
     blog[1] = utils.clone(blogData);
     blog[2] = utils.clone(blogData);
@@ -205,19 +206,19 @@ mongoose.connect('mongodb://localhost/mongoose-bench-pop', function (err) {
     blog[5] = utils.clone(blogData);
     blog[6] = utils.clone(blogData);
 
-    for (var i = 0; i < 10; i++) {
+    for (var i=0; i < 10; i++) {
       blog[0].comments.push(getNextcId());
     }
-    for (i = 0; i < 100; i++) {
+    for (var i=0; i < 100; i++) {
       blog[1].comments.push(getNextcId());
     }
-    for (i = 0; i < 1000; i++) {
+    for (var i=0; i < 1000; i++) {
       blog[2].comments.push(getNextcId());
     }
-    for (i = 0; i < 10000; i++) {
+    for (var i=0; i < 10000; i++) {
       blog[3].comments.push(getNextcId());
     }
-    for (i = 0; i < 100; i++) {
+    for (var i=0; i < 100; i++) {
       blog[5].comments.push(getNextcId());
       blog[6].comments.push(getNextcId());
 
@@ -239,9 +240,9 @@ mongoose.connect('mongodb://localhost/mongoose-bench-pop', function (err) {
 
     // insert all of the data here
     var count = 7;
-    for (i = 0; i < blog.length; i++) {
+    for (var i=0; i < blog.length; i++) {
       // use some closure magic to make sure we retain the index
-      (function (c) {
+      (function(c) {
         BlogPost.create(blog[c], function (err, bl) {
           if (err) throw err;
           blog[c] = bl;
@@ -254,22 +255,22 @@ mongoose.connect('mongodb://localhost/mongoose-bench-pop', function (err) {
 
   var ci = 0;
   var di = [];
-  for (i = 0; i < 9; i++) {
+  for (var i=0; i < 9; i++) {
     di.push(0);
   }
 
-  function getNextcId () {
+  function getNextcId() {
     ci = ++ci % cIds.length;
     return cIds[ci];
   }
 
-  function getNextdId (i) {
+  function getNextdId(i) {
     di[i] = ++di[i] % dIds[i].length;
     return dIds[i][di[i]];
   }
 
 
-  function closeDB () {
+  function closeDB() {
     // just a bit simpler...
     mongoose.connection.db.dropDatabase(function () {
       mongoose.disconnect();
@@ -278,56 +279,56 @@ mongoose.connect('mongodb://localhost/mongoose-bench-pop', function (err) {
   }
 
   suite.add('Populate - 1 value', {
-    defer : true
-  , fn : function (deferred) {
+    defer : true,
+    fn : function (deferred) {
       blog[4].populate('comments', function (err) {
         if (err) throw err;
         deferred.resolve();
       });
     }
   }).add('Populate - 10 values', {
-    defer : true
-  , fn : function (deferred) {
+    defer : true,
+    fn : function (deferred) {
       blog[0].populate('comments', function (err) {
         if (err) throw err;
         deferred.resolve();
       });
     }
   }).add('Populate - 100 values', {
-    defer : true
-  , fn : function (deferred) {
+    defer : true,
+    fn : function (deferred) {
       blog[1].populate('comments', function (err) {
         if (err) throw err;
         deferred.resolve();
       });
     }
   }).add('Populate - 1000 values', {
-    defer : true
-  , fn : function (deferred) {
+    defer : true,
+    fn : function (deferred) {
       blog[2].populate('comments', function (err) {
         if (err) throw err;
         deferred.resolve();
       });
     }
   }).add('Populate - 10000 values', {
-    defer : true
-  , fn : function (deferred) {
+    defer : true,
+    fn : function (deferred) {
       blog[3].populate('comments', function (err) {
         if (err) throw err;
         deferred.resolve();
       });
     }
   }).add('Populate - 5 properties', {
-    defer : true
-  , fn : function (deferred) {
+    defer : true,
+    fn : function (deferred) {
       blog[5].populate('comments dummy1 dummy2 dummy3 dummy4', function (err) {
         if (err) throw err;
         deferred.resolve();
       });
     }
   }).add('Populate - 10 properties', {
-    defer : true
-  , fn : function (deferred) {
+    defer : true,
+    fn : function (deferred) {
       blog[6].populate('comments dummy1 dummy2 dummy3 dummy4 dummy5 dummy6 dummy7 dummy8 dummy9', function (err) {
         if (err) throw err;
         deferred.resolve();
@@ -353,7 +354,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench-pop', function (err) {
       console.log(JSON.stringify(outObj));
     }
   });
-  function next () {
+  function next() {
     suite.run({ async : true });
   }
 });

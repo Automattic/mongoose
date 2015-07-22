@@ -23,10 +23,10 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function (err) {
   mongo.connect('mongodb://localhost/mongoose-bench', function (err, db) {
     if (err) throw err;
     var UserSchema = new Schema({
-      name : String
-    , age: Number
-    , likes: [String]
-    , address: String
+      name : String,
+      age: Number,
+      likes: [String],
+      address: String
     });
 
     var User = mongoose.model('User', UserSchema);
@@ -36,10 +36,10 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function (err) {
     var dIds = [];
 
     var data = {
-      name : "name"
-    , age : 0
-    , likes : ["dogs", "cats", "pizza"]
-    , address : " Nowhere-ville USA"
+      name : "name",
+      age : 0,
+      likes : ["dogs", "cats", "pizza"],
+      address : " Nowhere-ville USA"
     };
 
     // insert all of the data here
@@ -61,7 +61,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function (err) {
       });
     }
 
-    function closeDB () {
+    function closeDB() {
       User.count(function (err, res) {
         if (res != 0) {
           console.log("Still mongoose entries left...");
@@ -78,16 +78,16 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function (err) {
     }
 
     suite.add('Delete - Mongoose', {
-      defer : true
-    , fn : function (deferred) {
+      defer : true,
+      fn : function (deferred) {
         User.remove({ _id : mIds.pop()}, function (err) {
           if (err) throw err;
           deferred.resolve();
         });
       }
     }).add('Delete - Driver', {
-      defer : true
-    , fn : function (deferred) {
+      defer : true,
+      fn : function (deferred) {
         user.remove({ _id : dIds.pop()}, function (err) {
           if (err) throw err;
           deferred.resolve();
@@ -112,7 +112,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function (err) {
         console.log(JSON.stringify(outObj));
       }
     });
-    function next () {
+    function next() {
       suite.run({ async : true });
     }
   });

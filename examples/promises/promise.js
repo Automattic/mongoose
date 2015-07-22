@@ -11,31 +11,16 @@ var Person = mongoose.model('Person');
 
 // define some dummy data
 var data = [
-  {
-    name : 'bill',
-    age : 25,
-    birthday : new Date().setFullYear((new Date().getFullYear() - 25))
-  },
-  {
-    name : 'mary',
-    age : 30,
-    birthday : new Date().setFullYear((new Date().getFullYear() - 30))
-  },
-  {
-    name : 'bob',
-    age : 21,
-    birthday : new Date().setFullYear((new Date().getFullYear() - 21))
-  },
-  {
-    name : 'lilly',
-    age : 26,
-    birthday : new Date().setFullYear((new Date().getFullYear() - 26))
-  },
-  {
-    name : 'alucard',
-    age : 1000,
-    birthday : new Date().setFullYear((new Date().getFullYear() - 1000))
-  }
+  { name : 'bill', age : 25, birthday : new Date().setFullYear((new
+    Date().getFullYear() - 25)) },
+  { name : 'mary', age : 30, birthday : new Date().setFullYear((new
+    Date().getFullYear() - 30)) },
+  { name : 'bob', age : 21, birthday : new Date().setFullYear((new
+    Date().getFullYear() - 21)) },
+  { name : 'lilly', age : 26, birthday : new Date().setFullYear((new
+    Date().getFullYear() - 26)) },
+  { name : 'alucard', age : 1000, birthday : new Date().setFullYear((new
+    Date().getFullYear() - 1000)) },
 ];
 
 
@@ -46,7 +31,7 @@ mongoose.connect('mongodb://localhost/persons', function (err) {
   async.each(data, function (item, cb) {
       Person.create(item, cb);
     }, function (err) {
-
+      
       // create a promise (get one from the query builder)
       var prom = Person.find({age : { $lt : 1000 }}).exec();
 
@@ -69,18 +54,17 @@ mongoose.connect('mongodb://localhost/persons', function (err) {
         var ids = people.map(function (p) {
           return p._id;
         });
-
+        
         // return the next promise
         return Person.find({ _id : { $nin : ids }}).exec();
       }).then(function (oldest) {
         console.log("Oldest person is: %s", oldest);
       }).then(cleanup);
-    }
-  );
+  });
 });
 
-function cleanup () {
-  Person.remove(function () {
+function cleanup() {
+  Person.remove(function() {
     mongoose.disconnect();
   });
 }

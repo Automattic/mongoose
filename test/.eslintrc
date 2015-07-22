@@ -1,3 +1,0 @@
-globals:
-  mongoose: true
-  assert: true

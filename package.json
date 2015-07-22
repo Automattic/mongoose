@@ -37,9 +37,7 @@
     "benchmark": "1.0.0",
     "co": "3.1.0",
     "dox": "0.3.1",
-    "eslint": "^1.0.0-rc-1",
     "highlight.js": "7.0.1",
-    "istanbul": "^0.3.13",
     "jade": "0.26.3",
     "markdown": "0.3.1",
     "marked": "0.3.2",
@@ -48,7 +46,8 @@
     "open": "0.0.3",
     "tbd": "0.6.4",
     "uglify-js": "2.4.15",
-    "underscore": "1.5.2"
+    "underscore": "1.5.2",
+    "istanbul": "^0.3.13"
   },
   "browserDependencies": {
     "browserify": "4.1.10",
@@ -64,7 +63,6 @@
   "scripts": {
     "install-browser": "npm install `node format_deps.js`",
     "test": "set MONGOOSE_DISABLE_STABILITY_WARNING=1 && mocha --async-only test/*.test.js",
-    "posttest": "eslint .",
     "test-cov": "set MONGOOSE_DISABLE_STABILITY_WARNING=1 && node_modules/.bin/istanbul cover node_modules/.bin/_mocha --async-only test/*.test.js"
   },
   "main": "./index.js",

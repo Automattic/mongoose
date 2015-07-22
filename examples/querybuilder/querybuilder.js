@@ -11,31 +11,16 @@ var Person = mongoose.model('Person');
 
 // define some dummy data
 var data = [
-  {
-    name : 'bill',
-    age : 25,
-    birthday : new Date().setFullYear((new Date().getFullYear() - 25))
-  },
-  {
-    name : 'mary',
-    age : 30,
-    birthday : new Date().setFullYear((new Date().getFullYear() - 30))
-  },
-  {
-    name : 'bob',
-    age : 21,
-    birthday : new Date().setFullYear((new Date().getFullYear() - 21))
-  },
-  {
-    name : 'lilly',
-    age : 26,
-    birthday : new Date().setFullYear((new Date().getFullYear() - 26))
-  },
-  {
-    name : 'alucard',
-    age : 1000,
-    birthday : new Date().setFullYear((new Date().getFullYear() - 1000))
-  }
+  { name : 'bill', age : 25, birthday : new Date().setFullYear((new
+    Date().getFullYear() - 25)) },
+  { name : 'mary', age : 30, birthday : new Date().setFullYear((new
+    Date().getFullYear() - 30)) },
+  { name : 'bob', age : 21, birthday : new Date().setFullYear((new
+    Date().getFullYear() - 21)) },
+  { name : 'lilly', age : 26, birthday : new Date().setFullYear((new
+    Date().getFullYear() - 26)) },
+  { name : 'alucard', age : 1000, birthday : new Date().setFullYear((new
+    Date().getFullYear() - 1000)) },
 ];
 
 
@@ -55,7 +40,7 @@ mongoose.connect('mongodb://localhost/persons', function (err) {
     // this allows you to continue applying modifiers to it
     query.sort('birthday');
     query.select('name');
-
+    
     // you can chain them together as well
     // a full list of methods can be found:
     // http://mongoosejs.com/docs/api.html#query-js
@@ -69,12 +54,12 @@ mongoose.connect('mongodb://localhost/persons', function (err) {
 
       cleanup();
     });
-
+    
   });
 });
 
-function cleanup () {
-  Person.remove(function () {
+function cleanup() {
+  Person.remove(function() {
     mongoose.disconnect();
   });
 }

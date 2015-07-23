@@ -230,7 +230,8 @@ describe('document: strict mode:', function(){
     assert.equal(0, getCount);
     assert.equal(2, setCount);
 
-    strictInstance.myvirtual;
+    var temp = strictInstance.myvirtual;
+    assert.equal(typeof temp, 'string');
     assert.equal(1, getCount);
     assert.equal(2, setCount);
 

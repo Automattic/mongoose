@@ -75,31 +75,27 @@ describe('document modified', function(){
   describe('modified states', function(){
     it('reset after save', function(done){
       var db = start()
-        , B = db.model(modelName, collection)
-        , pending = 2;
+        , B = db.model(modelName, collection);
 
       var b = new B;
 
       b.numbers.push(3);
       b.save(function (err) {
         assert.strictEqual(null, err);
-        --pending || find();
-      });
 
-      b.numbers.push(3);
-      b.save(function (err) {
-        assert.strictEqual(null, err);
-        --pending || find();
-      });
-
-      function find () {
-        B.findById(b, function (err, b) {
-          db.close();
+        b.numbers.push(3);
+        b.save(function (err) {
           assert.strictEqual(null, err);
-          assert.equal(2, b.numbers.length);
-          done();
+
+          B.findById(b, function (err, b) {
+            assert.strictEqual(null, err);
+            assert.equal(2, b.numbers.length);
+
+            db.close();
+            done();
+          });
         });
-      }
+      });
     });
 
     it('of embedded docs reset after save', function(done){

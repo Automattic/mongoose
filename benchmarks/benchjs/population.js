@@ -6,7 +6,6 @@ var suite = new Benchmark.Suite();
 
 var Schema = mongoose.Schema;
 var ObjectId = Schema.Types.ObjectId;
-var mongo = require('mongodb');
 var utils = require('../../lib/utils.js');
 
 // to make things work in the way the are normally described online...

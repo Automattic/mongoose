@@ -71,7 +71,7 @@ mongoose.connection.on('open', function() {
     friends: [userIds[0], userIds[1], userIds[2]]
   });
 
-  User.create(users, function(err, docs) {
+  User.create(users, function(err) {
     assert.ifError(err);
 
     var blogposts = [];
@@ -91,7 +91,7 @@ mongoose.connection.on('open', function() {
       author: userIds[2]
     })
 
-    BlogPost.create(blogposts, function(err, docs) {
+    BlogPost.create(blogposts, function(err) {
       assert.ifError(err);
 
       /**

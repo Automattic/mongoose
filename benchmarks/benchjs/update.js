@@ -81,7 +81,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function (err) {
     });
 
     var User = mongoose.model('User', UserSchema);
-    var BlogPost = mongoose.model('BlogPost', BlogPost);
+    BlogPost = mongoose.model('BlogPost', BlogPost);
     var user = db.collection('user');
     var blogpost = db.collection('blogpost');
 
@@ -102,7 +102,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function (err) {
     var testBp;
     // insert all of the data here
     var count = 4000;
-    for (var i=0; i < 1000; i++) {
+    for (i=0; i < 1000; i++) {
       User.create(data, function (err, u) {
         if (err) throw err;
         mIds.push(u.id);

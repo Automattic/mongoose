@@ -37,9 +37,9 @@ var totaltime = 0;
 
 // bench the normal way
 // the try building the doc into the document prototype
-// and using inheritance and bench that 
+// and using inheritance and bench that
 //
-// also, bench using listeners for each subdoc vs one 
+// also, bench using listeners for each subdoc vs one
 // listener that knows about all subdocs and notifies
 // them.
 
@@ -49,6 +49,7 @@ function run (label, fn) {
   var start = new Date;
   var total = 10000;
   var i = total;
+  var a;
   while (i--) {
     a = fn();
     if (i%2) {
@@ -149,4 +150,4 @@ run('array of docs', function () {
 //console.error(a.toObject({depopulate:true}));
 console.error('completed %d docs in %d seconds (%d dps)', numdocs, totaltime,numdocs/totaltime);
 
-// --trace-opt --trace-deopt --trace-bailout 
+// --trace-opt --trace-deopt --trace-bailout

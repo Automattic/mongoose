@@ -2,7 +2,7 @@
 var mongoose = require('../')
   , Schema = mongoose.Schema;
 
-var db = mongoose.connect('localhost', 'testing_bench');
+mongoose.connect('localhost', 'testing_bench');
 
 var DocSchema = new Schema({
     title: String
@@ -98,9 +98,8 @@ var i = total;
 mongoose.connection.on('open', function () {
   mongoose.connection.db.dropDatabase(function () {
 
-    ;(function cycle () {
+    (function cycle () {
       if (0 === i--) return done();
-
       var a = new A({
           string: "hello world"
         , number: 444848484
@@ -118,9 +117,9 @@ mongoose.connection.on('open', function () {
         , docs: [ {title: "yo"}, {title:"nowafasdi0fas asjkdfla fa" }]
       });
 
-      a.save(function (err) {
+      a.save(function () {
         methods[Math.random()*methods.length|0](a, function () {
-          a= u =null;
+          a = null;
           process.nextTick(cycle);
         })
       });
@@ -153,6 +152,6 @@ mongoose.connection.on('open', function () {
       });
     }
 
-  // --trace-opt --trace-deopt --trace-bailout 
+  // --trace-opt --trace-deopt --trace-bailout
   })
 })

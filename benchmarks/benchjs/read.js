@@ -170,7 +170,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function (err) {
     }).add('Read - Driver - Basic', {
       defer : true,
       fn : function (deferred) {
-        user.findOne({ _id : getNextdId() }, function (err, cursor) {
+        user.findOne({ _id : getNextdId() }, function (err) {
           if (err) throw err;
           deferred.resolve();
         });

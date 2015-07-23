@@ -231,7 +231,7 @@ describe('document: strict mode:', function(){
     assert.equal(1, getCount);
     assert.equal(2, setCount);
     db.close(done);
-  })
+  });
 
   it('can be overridden during set()', function(done){
     var db = start();

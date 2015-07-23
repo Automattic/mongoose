@@ -19,15 +19,15 @@ var EmployeeSchema = new Schema({
   customers: [String]
 });
 
-var Employee = mongoose.model('Employee', EmployeeSchema);
+mongoose.model('Employee', EmployeeSchema);
 
 function setupData(callback) {
   var saved = 0
     , emps = [
         { name: "Alice", sal: 18000, dept: "sales", customers: [ 'Eve', 'Fred' ] }
-	  , { name: "Bob", sal: 15000, dept: "sales", customers: [ 'Gary', 'Herbert', 'Isaac' ] }
-	  , { name: "Carol", sal: 14000, dept: "r&d" }
-	  , { name: "Dave", sal: 14500, dept: "r&d" }
+    , { name: "Bob", sal: 15000, dept: "sales", customers: [ 'Gary', 'Herbert', 'Isaac' ] }
+    , { name: "Carol", sal: 14000, dept: "r&d" }
+    , { name: "Dave", sal: 14500, dept: "r&d" }
     ]
     , db = start()
     , Employee = db.model('Employee');
@@ -451,7 +451,7 @@ describe('aggregate', function() {
         var aggregate = new Aggregate()
           , callback;
 
-        callback = function(err, docs) {
+        callback = function(err) {
           assert.ok(err);
           assert.equal(err.message, "Aggregate has empty pipeline");
           done();
@@ -466,7 +466,7 @@ describe('aggregate', function() {
         var aggregate = new Aggregate()
           , callback;
 
-        callback = function(err, docs) {
+        callback = function(err) {
           assert.ok(err);
           assert.equal(err.message, "Aggregate not bound to any Model");
           done();
@@ -492,7 +492,7 @@ describe('aggregate', function() {
       setupData(function (db) {
         start.mongodVersion(function (err, version) {
           if (err) throw err;
-          mongo26_or_greater = 2 < version[0] || (2 == version[0] && 6 <= version[1]);
+          var mongo26_or_greater = 2 < version[0] || (2 == version[0] && 6 <= version[1]);
 
           var m = db.model('Employee');
           var match = { $match: { sal: { $gt: 15000 }}};

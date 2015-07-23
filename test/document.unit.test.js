@@ -10,7 +10,7 @@ describe('sharding', function() {
   it('should handle shard keys properly (gh-2127)', function(done) {
     var mockSchema = {
       options: {
-        shardKey: { date: 1 } 
+        shardKey: { date: 1 }
       }
     };
     var Stub = function() {
@@ -42,7 +42,6 @@ describe('toObject()', function() {
       this.$__ = {};
     };
     Stub.prototype = Object.create(mongoose.Document.prototype);
-    var d = new Stub();
   });
 
   it('should inherit options from schema', function(done) {

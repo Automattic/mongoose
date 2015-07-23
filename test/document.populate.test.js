@@ -10,8 +10,7 @@ var start = require('./common')
   , random = utils.random
   , Schema = mongoose.Schema
   , ObjectId = Schema.ObjectId
-  , Document = require('../lib/document')
-  , DocObjectId = mongoose.Types.ObjectId
+  , Document = require('../lib/document');
 
 /**
  * Setup.
@@ -23,7 +22,7 @@ var start = require('./common')
 
 function TestDocument () {
   Document.apply(this, arguments);
-};
+}
 
 /**
  * Inherits from Document.
@@ -95,9 +94,6 @@ var BlogPost = new Schema({
   , comments      : [Comment]
   , fans          : [{ type: ObjectId, ref: 'doc.populate.u' }]
 });
-
-var posts = 'blogposts_' + random()
-  , users = 'users_' + random();
 
 mongoose.model('doc.populate.b', BlogPost);
 mongoose.model('doc.populate.u', User);
@@ -187,7 +183,7 @@ describe('document.populate', function(){
     it('resets populate options after execution', function(done){
       B.findById(post, function (err, post) {
         var creator_id = post._creator;
-        post.populate('_creator', function (err, post_) {
+        post.populate('_creator', function (err) {
           assert.ifError(err);
           assert.ok(!post.$__.populate);
           assert.ok(post._creator);
@@ -210,7 +206,7 @@ describe('document.populate', function(){
       B.findById(post, function (err, post) {
         var creator_id = post._creator;
         var alt_id = post.fans[1];
-        post.populate('_creator fans', function (err, post_) {
+        post.populate('_creator fans', function (err) {
           assert.ifError(err);
           assert.ok(post._creator);
           assert.equal(String(creator_id), String(post._creator._id));
@@ -226,7 +222,7 @@ describe('document.populate', function(){
     B.findById(post, function (err, post) {
       var creator_id = post._creator;
       var alt_id = post.fans[1];
-      post.populate('_creator').populate(function (err, post_) {
+      post.populate('_creator').populate(function (err) {
         assert.ifError(err);
         assert.ok(post._creator);
         assert.equal(String(creator_id), String(post._creator._id));
@@ -336,7 +332,7 @@ describe('document.populate', function(){
   it('of empty array', function(done){
     B.findById(post, function (err, post) {
       post.fans = []
-      post.populate('fans', function (err, post) {
+      post.populate('fans', function (err) {
         assert.ifError(err);
         done();
       });
@@ -346,7 +342,7 @@ describe('document.populate', function(){
   it('of array of null/undefined', function(done){
     B.findById(post, function (err, post) {
       post.fans = [null, undefined]
-      post.populate('fans', function (err, post) {
+      post.populate('fans', function (err) {
         assert.ifError(err);
         done();
       });
@@ -356,7 +352,7 @@ describe('document.populate', function(){
   it('of null property', function(done){
     B.findById(post, function (err, post) {
       post._creator = null;
-      post.populate('_creator', function (err, post) {
+      post.populate('_creator', function (err) {
         assert.ifError(err);
         done();
       });
@@ -385,7 +381,7 @@ describe('document.populate', function(){
       assert.ifError(err);
 
       var note = new Note({ author: 'alice', body: "Buy Milk" });
-      note.populate('author', function (err, note_) {
+      note.populate('author', function (err) {
         db.close();
         assert.ifError(err);
         assert.ok(note.author);
@@ -508,12 +504,12 @@ describe('document.populate', function(){
     it('should return a real document array when populating', function(done) {
       var db = start();
 
-      Car = db.model('gh-2214-1', {
+      var Car = db.model('gh-2214-1', {
         color: String,
         model: String
       });
 
-      Person = db.model('gh-2214-2', {
+      var Person = db.model('gh-2214-2', {
         name: String,
         cars: [
           {
@@ -536,7 +532,7 @@ describe('document.populate', function(){
       return joe.save(function() {
         return car.save(function() {
           return Person.findById(joe.id, function(err, joe) {
-            return joe.populate("cars", function(err) {
+            return joe.populate("cars", function() {
               car = new Car({
                 model: "BMW",
                 color: "black"

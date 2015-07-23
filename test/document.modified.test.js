@@ -7,18 +7,9 @@ var start = require('./common')
   , assert = require('assert')
   , mongoose = start.mongoose
   , random = require('../lib/utils').random
-  , Query = require('../lib/query')
   , Schema = mongoose.Schema
-  , SchemaType = mongoose.SchemaType
-  , CastError = mongoose.Error.CastError
-  , ValidatorError = mongoose.Error.ValidatorError
-  , ValidationError = mongoose.Error.ValidationError
   , ObjectId = Schema.ObjectId
-  , DocumentObjectId = mongoose.Types.ObjectId
-  , DocumentArray = mongoose.Types.DocumentArray
-  , EmbeddedDocument = mongoose.Types.Embedded
-  , MongooseArray = mongoose.Types.Array
-  , MongooseError = mongoose.Error;
+  , DocumentObjectId = mongoose.Types.ObjectId;
 
 /**
  * Setup.
@@ -313,7 +304,7 @@ describe('document modified', function(){
       var db = start();
 
       var parentSchema = new Schema({
-        child: { type: Schema.Types.ObjectId, ref: 'gh-1530-2' } 
+        child: { type: Schema.Types.ObjectId, ref: 'gh-1530-2' }
       });
       var Parent = db.model('gh-1530-1', parentSchema);
       var childSchema = new Schema({
@@ -366,7 +357,6 @@ describe('document modified', function(){
     });
 
     it('properly sets populated for gh-1530 (gh-2678)', function(done) {
-      var childrenSchema = new Schema({ name: String});
       var db = start();
 
       var parentSchema = new Schema({
@@ -452,7 +442,7 @@ describe('document modified', function(){
           p.child[0].grandChild[0].name = 'Jason';
           assert.ok(p.isModified('child.0.grandChild.0.name'));
           p.save(function(error, inDb) {
-            assert.ifError(error); 
+            assert.ifError(error);
             assert.equal('Jason', inDb.child[0].grandChild[0].name);
             db.close(done);
           });

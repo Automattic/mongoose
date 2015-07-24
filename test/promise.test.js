@@ -209,4 +209,44 @@ describe('Promise', function(){
       })
     })
   })
+
+  describe('all()', function() {
+    it('resolve when all promises are resolved', function(done){
+      var p1 = new Promise()
+        , p2 = new Promise()
+        , p3 = new Promise();
+
+      p1.fulfill(1);
+
+      Promise.all([p1, p2, p3]).then(function(vals) {
+        assert.equal(1, vals[0]);
+        assert.equal(2, vals[1]);
+        assert.equal(3, vals[2]);
+        done();
+      }, function(err) {
+        throw(err);
+      })
+
+      p2.fulfill(2);
+      p3.fulfill(3);
+    })
+
+    it('reject when one promise is rejected', function(done){
+      var p1 = new Promise()
+        , p2 = new Promise()
+        , p3 = new Promise();
+
+      p1.fulfill(1);
+
+      Promise.all([p1, p2, p3]).then(function(vals) {
+        throw(vals);
+      }, function(err) {
+        assert.equal(2, err);
+        done();
+      })
+
+      p2.reject(2);
+      p3.fulfill(3);
+    })
+  })
 })

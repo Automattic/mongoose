@@ -7,18 +7,7 @@ var start = require('./common')
   , mongoose = start.mongoose
   , assert = require('assert')
   , random = require('../lib/utils').random
-  , Query = require('../lib/query')
   , Schema = mongoose.Schema
-  , SchemaType = mongoose.SchemaType
-  , ObjectId = mongoose.Schema.Types.ObjectId
-  , DocumentObjectId = mongoose.Types.ObjectId
-  , DocumentArray = mongoose.Types.DocumentArray
-  , EmbeddedDocument = mongoose.Types.Embedded
-  , MongooseArray = mongoose.Types.Array
-  , MongooseError = mongoose.Error
-  , CastError = mongoose.Error.CastError
-  , ValidatorError = mongoose.Error.ValidatorError
-  , ValidationError = mongoose.Error.ValidationError
   , VersionError = mongoose.Error.VersionError
   ;
 
@@ -250,7 +239,7 @@ describe('versioning', function(){
       assert.ok(d[1].$addToSet.comments);
 
       a.comments.$shift();
-      var d = a.$__delta();
+      d = a.$__delta();
       assert.equal(12, d[0].__v, 'version should be included in where clause');
       assert.ok(d[1].$set, 'two differing atomic ops on same path should create a $set');
       assert.ok(d[1].$inc, 'a $set of an array should trigger versioning');
@@ -265,7 +254,7 @@ describe('versioning', function(){
         save(a, b, test14);
     }
 
-    function test14 (err, a, b) {
+    function test14 (err, a) {
         assert.equal(a._doc.__v, 13, 'version should not be incremented for non-versioned fields');
         db.close();
         done();

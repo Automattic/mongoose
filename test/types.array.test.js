@@ -75,8 +75,7 @@ describe('types array', function(){
       var tj = new User({ name: 'tj' })
         , tobi = new Pet({ name: 'tobi' })
         , loki = new Pet({ name: 'loki' })
-        , jane = new Pet({ name: 'jane' })
-        , pets = [];
+        , jane = new Pet({ name: 'jane' });
 
       tj.pets.push(tobi);
       tj.pets.push(loki);
@@ -84,14 +83,14 @@ describe('types array', function(){
 
       var pending = 3;
 
-      ;[tobi, loki, jane].forEach(function(pet){
+      [tobi, loki, jane].forEach(function(pet){
         pet.save(function(){
           --pending || cb();
         });
       });
 
       function cb() {
-        Pet.find({}, function(err, pets){
+        Pet.find({}, function(err){
           assert.ifError(err);
           tj.save(function(err){
             assert.ifError(err);
@@ -702,7 +701,7 @@ describe('types array', function(){
         });
       });
     });
-    
+
   })
 
   describe('$pop()', function(){
@@ -1542,7 +1541,6 @@ describe('types array', function(){
       var schema = new Schema({ x: [Number] }, { collection: 'nullsareallowed'+random() });
       var M = db.model('nullsareallowed', schema);
       var m;
-      var threw = false;
 
       m = new M({ x: [1, null, 3] });
       m.save(function (err) {
@@ -1606,7 +1604,7 @@ describe('types array', function(){
     var schema = new Schema({ em: [new Schema({ sub: [String] })]});
     var M = db.model('gh1073', schema);
     var m = new M({ em: [ { sub: [] }]});
-    m.save(function (err) {
+    m.save(function () {
       M.findById(m, function (err, m) {
         assert.ifError(err);
 
@@ -1822,4 +1820,3 @@ describe('types array', function(){
     })
   })
 })
-

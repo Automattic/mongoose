@@ -12,7 +12,6 @@ var start = require('./common')
   , EmbeddedDocument = require('../lib/types/embedded')
   , DocumentArray = require('../lib/types/documentarray')
   , Schema = mongoose.Schema
-  , ObjectId = Schema.ObjectId
   , assert = require('assert')
   , collection = 'types.documentarray_' + random()
 
@@ -82,14 +81,14 @@ describe('types.documentarray', function(){
       , _id:   { type: String, required: true }
     });
 
-    var Subdocument = TestDoc(Custom);
+    Subdocument = TestDoc(Custom);
 
     var sub2 = new Subdocument();
     sub2.title = 'together we can play some rock-n-roll';
     sub2._id = 'a25';
     var id2 = sub2.id;
 
-    var a = new MongooseDocumentArray([sub2]);
+    a = new MongooseDocumentArray([sub2]);
     assert.equal(a.id(id2).title, 'together we can play some rock-n-roll');
     assert.equal(a.id(sub2._id).title, 'together we can play some rock-n-roll');
 
@@ -99,34 +98,34 @@ describe('types.documentarray', function(){
       , _id:   { type: Number, required: true }
     });
 
-    var Subdocument = TestDoc(CustNumber);
+    Subdocument = TestDoc(CustNumber);
 
     var sub3 = new Subdocument();
     sub3.title = 'rock-n-roll';
     sub3._id = 1995;
     var id3 = sub3.id;
 
-    var a = new MongooseDocumentArray([sub3]);
+    a = new MongooseDocumentArray([sub3]);
     assert.equal(a.id(id3).title, 'rock-n-roll');
     assert.equal(a.id(sub3._id).title, 'rock-n-roll');
 
     // test with object as _id
-    var Custom = new Schema({
+    Custom = new Schema({
         title: { type: String }
       , _id:   { one: { type: String }, two: { type: String } }
     });
 
-    var Subdocument = TestDoc(Custom);
+    Subdocument = TestDoc(Custom);
 
-    var sub1 = new Subdocument();
+    sub1 = new Subdocument();
     sub1._id = {one: 'rolling', two: 'rock'};
     sub1.title = 'to be a rock and not to roll';
 
-    var sub2 = new Subdocument();
+    sub2 = new Subdocument();
     sub2._id = {one: 'rock', two: 'roll'};
     sub2.title = 'rock-n-roll';
 
-    var a = new MongooseDocumentArray([sub1,sub2]);
+    a = new MongooseDocumentArray([sub1,sub2]);
     assert.notEqual(a.id({one: 'rolling', two: 'rock'}).title, 'rock-n-roll');
     assert.equal(a.id({one: 'rock', two: 'roll'}).title, 'rock-n-roll');
 
@@ -135,13 +134,13 @@ describe('types.documentarray', function(){
         title: { type: String }
     }, { noId: true });
 
-    var Subdocument = TestDoc(NoId);
+    Subdocument = TestDoc(NoId);
 
     var sub4 = new Subdocument();
     sub4.title = 'rock-n-roll';
 
-    var a = new MongooseDocumentArray([sub4])
-      , threw = false;
+    a = new MongooseDocumentArray([sub4])
+    var threw = false;
     try {
       a.id('i better not throw');
     } catch (err) {
@@ -150,16 +149,16 @@ describe('types.documentarray', function(){
     assert.equal(false, threw);
 
     // test the _id option, noId is deprecated
-    var NoId = new Schema({
+    NoId = new Schema({
         title: { type: String }
     }, { _id: false });
 
-    var Subdocument = TestDoc(NoId);
+    Subdocument = TestDoc(NoId);
 
-    var sub4 = new Subdocument();
+    sub4 = new Subdocument();
     sub4.title = 'rock-n-roll';
 
-    var a = new MongooseDocumentArray([sub4])
+    a = new MongooseDocumentArray([sub4])
       , threw = false;
     try {
       a.id('i better not throw');
@@ -172,22 +171,22 @@ describe('types.documentarray', function(){
     assert.strictEqual(null, a.id(null));
 
     // test when _id is a populated document
-    var Custom = new Schema({
+    Custom = new Schema({
         title: { type: String }
     });
 
     var Custom1 = new Schema({}, { id: false });
 
-    var Subdocument = TestDoc(Custom);
+    Subdocument = TestDoc(Custom);
     var Subdocument1 = TestDoc(Custom1);
 
     var sub = new Subdocument1();
-    var sub1 = new Subdocument1();
+    sub1 = new Subdocument1();
     sub.title = 'Hello again to all my friends';
-    var id = sub1._id.toString();
+    id = sub1._id.toString();
     setValue('_id', sub1 , sub);
 
-    var a = new MongooseDocumentArray([sub]);
+    a = new MongooseDocumentArray([sub]);
     assert.equal(a.id(id).title, 'Hello again to all my friends');
 
     done();
@@ -227,7 +226,7 @@ describe('types.documentarray', function(){
       });
 
       subSchema.set('toObject', {
-        transform: function (doc, ret, options) {
+        transform: function (doc, ret) {
           // this should not be called because custom options are
           // passed during MongooseArray#toObject() calls
           ret.changed = 123;
@@ -248,21 +247,21 @@ describe('types.documentarray', function(){
       var SecondSchema = new Schema({});
 
       SecondSchema.set('toObject', {
-        transform: function second(doc, ret, options) {
+        transform: function second(doc, ret) {
           ret.secondToObject = true;
           return ret;
-        },
+        }
       });
 
       var FirstSchema = new Schema({
-        second: [SecondSchema],
+        second: [SecondSchema]
       });
 
       FirstSchema.set('toObject', {
-      transform: function first(doc, ret, options) {
+      transform: function first(doc, ret) {
           ret.firstToObject = true;
           return ret;
-        },
+        }
       });
 
       var First = db.model('first', FirstSchema);
@@ -412,12 +411,12 @@ describe('types.documentarray', function(){
       var t = new T;
       t.docs.push({ name: 100 });
 
-      subdoc = t.docs.create({ name: 'yep' });
+      var subdoc = t.docs.create({ name: 'yep' });
       assert.throws(function(){
         // has no parent array
         subdoc.invalidate('name', 'junk', 47);
       }, /^Error: Unable to invalidate a subdocument/);
-      t.validate(function (err) {
+      t.validate(function () {
         var e = t.errors['docs.0.name'];
         assert.ok(e);
         assert.equal(e.path, 'docs.0.name');

@@ -60,7 +60,6 @@ describe('model: mapreduce:', function(){
     MR.create(docs, function (err, insertedDocs) {
       assert.ifError(err);
 
-      var a = insertedDocs[0];
       var b = insertedDocs[1];
       magicID = b._id;
 

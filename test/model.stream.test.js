@@ -374,7 +374,7 @@ describe('query stream:', function(){
 
     var schema = Schema({
       fullname: { type: String },
-      password: { type: String, select: false },
+      password: { type: String, select: false }
     });
 
     var User = db.model('gh-1862', schema, 'gh-1862');

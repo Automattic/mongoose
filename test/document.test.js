@@ -1453,7 +1453,7 @@ describe('document', function(){
           assert.equal(3, Object.keys(doc._doc.nested).length);
           assert.ok(doc.isModified('nested'));
 
-          var doc = new TestDocument();
+          doc = new TestDocument();
           doc.init({
               test    : 'Test'
             , nested  : {

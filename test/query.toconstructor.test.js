@@ -1,7 +1,6 @@
 
 var start = require('./common')
   , mongoose = start.mongoose
-  , DocumentObjectId = mongoose.Types.ObjectId
   , Schema = mongoose.Schema
   , assert = require('assert')
   , random = require('../lib/utils').random
@@ -150,4 +149,3 @@ describe('Query:', function(){
     })
   });
 });
-

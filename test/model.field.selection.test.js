@@ -6,7 +6,6 @@ var start = require('./common')
   , assert = require('assert')
   , mongoose = start.mongoose
   , random = require('../lib/utils').random
-  , Query = require('../lib/query')
   , Schema = mongoose.Schema
   , ObjectId = Schema.Types.ObjectId
   , DocumentObjectId = mongoose.Types.ObjectId;

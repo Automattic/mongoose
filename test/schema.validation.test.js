@@ -6,16 +6,11 @@ var start = require('./common')
   , mongoose = start.mongoose
   , assert = require('assert')
   , Schema = mongoose.Schema
-  , Document = mongoose.Document
-  , SchemaType = mongoose.SchemaType
-  , VirtualType = mongoose.VirtualType
   , ValidatorError = mongoose.Error.ValidatorError
   , SchemaTypes = Schema.Types
   , ObjectId = SchemaTypes.ObjectId
   , Mixed = SchemaTypes.Mixed
   , DocumentObjectId = mongoose.Types.ObjectId
-  , MongooseArray = mongoose.Types.Array
-  , vm = require('vm')
   , random = require('../lib/utils').random
 
 describe('schema', function(){
@@ -741,7 +736,7 @@ describe('schema', function(){
         next();
       });
 
-      var B = mongoose.model('b', B);
+      B = mongoose.model('b', B);
 
       var p = new B();
       p.a.push({ str: 'asdf' });

@@ -7,12 +7,7 @@ var start = require('./common')
   , assert = require('assert')
   , mongoose = start.mongoose
   , random = require('../lib/utils').random
-  , Query = require('../lib/query')
-  , Schema = mongoose.Schema
-  , SchemaType = mongoose.SchemaType
-  , ObjectId = Schema.Types.ObjectId
-  , MongooseBuffer = mongoose.Types.Buffer
-  , DocumentObjectId = mongoose.Types.ObjectId;
+  , Schema = mongoose.Schema;
 
 describe('schema select option', function(){
 
@@ -103,7 +98,7 @@ describe('schema select option', function(){
     });
   });
 
-  describe('overriding schematype select options', function (done) {
+  describe('overriding schematype select options', function () {
     var db, selected, excluded, S, E;
 
     before(function(){
@@ -129,7 +124,7 @@ describe('schema select option', function(){
     })
 
     describe('works', function(){
-      describe('for inclusions', function(done){
+      describe('for inclusions', function(){
         var s;
         before(function(done){
           S.create({ thin: true, name: 'the included', docs: [{name:'test',bool: true}] },function (err, s_) {
@@ -272,7 +267,7 @@ describe('schema select option', function(){
     });
   })
 
-  describe('exclusion in root schema should override child schema', function (done) {
+  describe('exclusion in root schema should override child schema', function () {
     it('works (gh-1333)', function(done){
       var m = new mongoose.Mongoose();
       var child = new Schema({
@@ -538,7 +533,7 @@ describe('schema select option', function(){
   it('initializes nested defaults with selected objects (gh-2629)', function(done){
     var NestedSchema = new mongoose.Schema({
       nested: {
-        name: { type: String, default: 'val' },
+        name: { type: String, default: 'val' }
       }
     });
 

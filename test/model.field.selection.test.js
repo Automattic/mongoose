@@ -8,9 +8,7 @@ var start = require('./common')
   , random = require('../lib/utils').random
   , Query = require('../lib/query')
   , Schema = mongoose.Schema
-  , SchemaType = mongoose.SchemaType
   , ObjectId = Schema.Types.ObjectId
-  , MongooseBuffer = mongoose.Types.Buffer
   , DocumentObjectId = mongoose.Types.ObjectId;
 
 /**
@@ -114,7 +112,7 @@ describe('model field selection', function(){
   it('where subset of fields excludes _id', function(done){
     var db = start()
       , BlogPostB = db.model(modelName, collection);
-    BlogPostB.create({title: 'subset 1'}, function (err, created) {
+    BlogPostB.create({title: 'subset 1'}, function (err) {
       assert.ifError(err);
       BlogPostB.findOne({title: 'subset 1'}, {title: 1, _id: 0}, function (err, found) {
         db.close();
@@ -129,7 +127,7 @@ describe('model field selection', function(){
   it('works with subset of fields, excluding _id', function(done){
     var db = start()
       , BlogPostB = db.model(modelName, collection);
-    BlogPostB.create({title: 'subset 1', author: 'me'}, function (err, created) {
+    BlogPostB.create({title: 'subset 1', author: 'me'}, function (err) {
       assert.ifError(err);
       BlogPostB.find({title: 'subset 1'}, {title: 1, _id: 0}, function (err, found) {
         db.close();
@@ -336,12 +334,12 @@ describe('model field selection', function(){
       });
 
       var Post = db.model('gh-2031', postSchema, 'gh-2031');
-      Post.create({ tags: [{ tag: 'bacon', count: 2 }, { tag: 'eggs', count: 3 }] }, function(error, post) {
+      Post.create({ tags: [{ tag: 'bacon', count: 2 }, { tag: 'eggs', count: 3 }] }, function(error) {
         assert.ifError(error);
         Post.findOne({ 'tags.tag': 'eggs' }, { 'tags.$': 1 }, function(error, post) {
           assert.ifError(error);
           post.tags[0].count = 1;
-          post.save(function(error, post) {
+          post.save(function(error) {
             assert.ok(error);
             db.close(done);
           });
@@ -383,7 +381,7 @@ describe('model field selection', function(){
         points: [
           {
             name:   { type: String },
-            loc:    { type: [Number], index: '2d' },
+            loc:    { type: [Number], index: '2d' }
           }
         ]
       }

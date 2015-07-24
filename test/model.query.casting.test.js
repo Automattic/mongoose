@@ -7,12 +7,10 @@ var start = require('./common')
   , assert = require('assert')
   , mongoose = start.mongoose
   , random = require('../lib/utils').random
-  , Query = require('../lib/query')
   , Schema = mongoose.Schema
   , SchemaType = mongoose.SchemaType
   , CastError = SchemaType.CastError
   , ObjectId = Schema.Types.ObjectId
-  , MongooseBuffer = mongoose.Types.Buffer
   , DocumentObjectId = mongoose.Types.ObjectId;
 
 /**
@@ -48,7 +46,7 @@ var BlogPostB = new Schema({
 });
 
 var modelName = 'model.query.casting.blogpost'
-var BP = mongoose.model(modelName, BlogPostB);
+mongoose.model(modelName, BlogPostB);
 var collection = 'blogposts_' + random();
 
 var geoSchemaArray = new Schema({ loc: { type: [Number], index: '2d'}});
@@ -142,11 +140,11 @@ describe('model query casting', function(){
 
     var Nin = db.model('Nin', 'nins_' + random());
 
-    Nin.create({ num: 1 }, function (err, one) {
+    Nin.create({ num: 1 }, function (err) {
       assert.ifError(err);
-      Nin.create({ num: 2 }, function (err, two) {
+      Nin.create({ num: 2 }, function (err) {
         assert.ifError(err);
-        Nin.create({num: 3}, function (err, three) {
+        Nin.create({num: 3}, function (err) {
           assert.ifError(err);
           Nin.find({ num: {$nin: [2]}}, function (err, found) {
             assert.ifError(err);
@@ -190,7 +188,7 @@ describe('model query casting', function(){
     var db = start()
       , B = db.model(modelName, collection);
 
-    B.find({ title: { $type: "asd" }}, function (err, posts) {
+    B.find({ title: { $type: "asd" }}, function (err) {
       assert.equal(err.message,"$type parameter must be Number");
 
       B.find({ title: { $type: 2 }}, function (err, posts) {

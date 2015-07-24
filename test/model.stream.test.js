@@ -8,12 +8,7 @@ var start = require('./common')
   , mongoose = start.mongoose
   , utils = require('../lib/utils')
   , random = utils.random
-  , Query = require('../lib/query')
   , Schema = mongoose.Schema
-  , SchemaType = mongoose.SchemaType
-  , ObjectId = Schema.Types.ObjectId
-  , MongooseBuffer = mongoose.Types.Buffer
-  , DocumentObjectId = mongoose.Types.ObjectId
   , fs = require('fs')
 
 var names = ('Aaden Aaron Adrian Aditya Agustin Jim Bob Jonah Frank Sally Lucy').split(' ');
@@ -190,7 +185,7 @@ describe('query stream:', function(){
 
     var stream = P.find().batchSize(5).stream();
 
-    stream.on('data', function (doc) {
+    stream.on('data', function () {
       if (++i === 5) {
         db.close();
       }
@@ -402,7 +397,7 @@ describe('query stream:', function(){
 
     Sku.create({}, function(error, sku) {
       assert.ifError(error);
-      Item.create({ sku: sku._id }, function(error, item) {
+      Item.create({ sku: sku._id }, function(error) {
         assert.ifError(error);
 
         var found = 0;

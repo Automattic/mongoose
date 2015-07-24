@@ -7,16 +7,12 @@ var start = require('./common')
   , assert = require('assert')
   , mongoose = start.mongoose
   , random = require('../lib/utils').random
-  , Query = require('../lib/query')
   , Schema = mongoose.Schema
-  , SchemaType = mongoose.SchemaType
   , ValidatorError = mongoose.Error.ValidatorError
   , ValidationError = mongoose.Error.ValidationError
   , ObjectId = Schema.Types.ObjectId
   , DocumentObjectId = mongoose.Types.ObjectId
-  , DocumentArray = mongoose.Types.DocumentArray
   , EmbeddedDocument = mongoose.Types.Embedded
-  , MongooseArray = mongoose.Types.Array
   , MongooseError = mongoose.Error;
 
 /**
@@ -521,7 +517,7 @@ describe('Model', function(){
         assert.equal(true, post.get('comments')[0].isNew);
         assert.equal(true, post.get('comments')[0].comments[0].isNew);
         post.invalidate('title'); // force error
-        post.save(function (err) {
+        post.save(function () {
           assert.equal(true, post.isNew);
           assert.equal(true, post.get('comments')[0].isNew);
           assert.equal(true, post.get('comments')[0].comments[0].isNew);
@@ -853,8 +849,7 @@ describe('Model', function(){
 
     it('subdocument cast error', function(done){
       var db = start()
-        , BlogPost = db.model('BlogPost', collection)
-        , threw = false;
+        , BlogPost = db.model('BlogPost', collection);
 
       var post = new BlogPost({
           title       : 'Test'
@@ -874,7 +869,7 @@ describe('Model', function(){
 
 
     it('subdocument validation error', function(done){
-      function failingvalidator(val) {
+      function failingvalidator() {
         return false;
       }
 
@@ -967,11 +962,11 @@ describe('Model', function(){
         , post = new BlogPost();
 
       post.get('numbers').push(1, 2, 3, 4);
-      post.save( function (err) {
+      post.save( function () {
         BlogPost.findById( post.get('_id'), function (err, found) {
           assert.equal(found.get('numbers').length,4);
           found.get('numbers').pull('3');
-          found.save( function (err) {
+          found.save( function () {
             BlogPost.findById(found.get('_id'), function (err, found2) {
               db.close();
               assert.ifError(err);
@@ -1059,7 +1054,7 @@ describe('Model', function(){
 
   describe('validation', function(){
     it('works', function(done){
-      function dovalidate (val) {
+      function dovalidate () {
         assert.equal('correct', this.asyncScope);
         return true;
       }
@@ -1364,7 +1359,7 @@ describe('Model', function(){
             executed = true;
             fn(v !== 'test');
           }, 5);
-        };
+        }
         mongoose.model('TestAsyncValidation', new Schema({
             async: { type: String, validate: [validator, 'async validator failed for `{PATH}`'] }
         }));
@@ -1401,7 +1396,7 @@ describe('Model', function(){
             executed = true;
             fn(v !== 'test');
           }, 5);
-        };
+        }
 
         mongoose.model('TestNestedAsyncValidation', new Schema({
             nested: {
@@ -2140,9 +2135,8 @@ describe('Model', function(){
         var threw = false;
         var getter1;
         var getter2;
-        var strmet;
         try {
-          strmet = JSON.stringify(meta);
+          JSON.stringify(meta);
           getter1 = JSON.stringify(post.get('meta'));
           getter2 = JSON.stringify(post.meta);
         } catch (err) {
@@ -2509,7 +2503,7 @@ describe('Model', function(){
               });
             });
           }
-        };
+        }
 
         function complete () {
           BlogPost.findOne({ _id: post.get('_id') }, function (err, doc) {

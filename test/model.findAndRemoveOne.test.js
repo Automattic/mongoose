@@ -7,15 +7,9 @@ var start = require('./common')
   , mongoose = start.mongoose
   , assert = require('assert')
   , random = require('../lib/utils').random
-  , Query = require('../lib/query')
   , Schema = mongoose.Schema
-  , SchemaType = mongoose.SchemaType
   , ObjectId = Schema.Types.ObjectId
-  , DocumentObjectId = mongoose.Types.ObjectId
-  , DocumentArray = mongoose.Types.DocumentArray
-  , EmbeddedDocument = mongoose.Types.Embedded
-  , MongooseArray = mongoose.Types.Array
-  , MongooseError = mongoose.Error;
+  , DocumentObjectId = mongoose.Types.ObjectId;
 
 /**
  * Setup.
@@ -234,8 +228,7 @@ describe('model: findByIdAndRemove:', function(){
 
     db.close();
 
-    var now = new Date
-      , query;
+    var query;
 
     // Model.findByIdAndRemove
     query = M.findByIdAndRemove(_id, { select: 'author' });
@@ -260,8 +253,7 @@ describe('model: findByIdAndRemove:', function(){
 
     db.close();
 
-    var now = new Date
-      , query;
+    var query;
 
     query = M.findByIdAndRemove(_id, { select: 'author -title' });
     assert.strictEqual(1, query._fields.author);
@@ -280,8 +272,7 @@ describe('model: findByIdAndRemove:', function(){
 
     db.close();
 
-    var now = new Date
-      , query;
+    var query;
 
     query = M.findByIdAndRemove(_id, { select: { author: 1, title: 0 }});
     assert.strictEqual(1, query._fields.author);
@@ -300,8 +291,7 @@ describe('model: findByIdAndRemove:', function(){
 
     db.close();
 
-    var now = new Date
-      , query;
+    var query;
 
     query = M.findByIdAndRemove(_id, { sort: 'author -title' });
     assert.equal(2, Object.keys(query.options.sort).length);
@@ -320,8 +310,7 @@ describe('model: findByIdAndRemove:', function(){
       , M = db.model(modelname, collection)
       , _id = new DocumentObjectId
 
-    var now = new Date
-      , query;
+    var query;
 
     query = M.findByIdAndRemove(_id, { sort: { author: 1, title: -1 }});
     assert.equal(2, Object.keys(query.options.sort).length);

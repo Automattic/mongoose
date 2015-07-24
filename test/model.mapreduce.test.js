@@ -1,4 +1,5 @@
-
+/* eslint unused-vars: 1 */
+/* global emit */
 /**
  * Test dependencies.
  */
@@ -7,15 +8,8 @@ var start = require('./common')
   , mongoose = start.mongoose
   , assert = require('assert')
   , random = require('../lib/utils').random
-  , Query = require('../lib/query')
   , Schema = mongoose.Schema
-  , SchemaType = mongoose.SchemaType
-  , ObjectId = Schema.Types.ObjectId
-  , DocumentObjectId = mongoose.Types.ObjectId
-  , DocumentArray = mongoose.Types.DocumentArray
-  , EmbeddedDocument = mongoose.Types.Embedded
-  , MongooseArray = mongoose.Types.Array
-  , MongooseError = mongoose.Error;
+  , ObjectId = Schema.Types.ObjectId;
 
 /**
  * Setup.
@@ -113,7 +107,7 @@ describe('model: mapreduce:', function(){
           , out: { replace: '_mapreduce_test_' + random() }
         }
 
-        MR.mapReduce(o, function (err, ret, stats) {
+        MR.mapReduce(o, function (err, ret) {
           assert.ifError(err);
 
           // ret is a model

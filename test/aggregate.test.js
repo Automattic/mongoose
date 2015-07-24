@@ -446,7 +446,7 @@ describe('aggregate: ', function() {
             assert.ifError(err);
             assert.ok(output);
             // make sure we got explain output
-            assert.ok(output.stages);
+            assert.equal(output.stages instanceof Array, true);
 
             clearData(db, function() { done(); });
           });
@@ -474,7 +474,7 @@ describe('aggregate: ', function() {
 
         setupData(function(db) {
           aggregate.model(db.model('Employee'));
-          callback = function(err, docs) {
+          callback = function(err) {
             assert.ok(err);
             assert.equal(err.message, "Aggregate has empty pipeline");
             done();

@@ -9,7 +9,6 @@ var start = require('./common')
   , Schema = mongoose.Schema
   , assert = require('assert')
   , random = require('../lib/utils').random
-  , Promise = require('../lib/promise')
   , Query = require('../lib/query');
 
 var Comment = new Schema({
@@ -1073,7 +1072,7 @@ describe('Query', function(){
       var Product = db.model('Product');
       var promise = Product.findOne();
 
-      promise.then(function(prod) {
+      promise.then(function() {
         done();
       }, function(err) {
         assert.ifError(err);

@@ -1,3 +1,4 @@
+/* eslint no-unused-vars: 1 */
 
 /**
  * Module dependencies.
@@ -10,7 +11,6 @@ var start = require('./common');
 
 var PromiseProvider = require('../lib/promise_provider');
 var Schema = require('../lib/schema');
-var ValidationError = require('../lib/error/validation');
 
 var Promise;
 var db;
@@ -74,7 +74,7 @@ describe('ES6 promises: ', function() {
       var promise = m.save();
       assert.equal(promise.constructor, global.Promise);
       promise.
-        then(function(doc) {
+        then(function() {
           assert.ok(false);
         }).
         catch(function(err) {
@@ -90,7 +90,7 @@ describe('ES6 promises: ', function() {
       var promise = m.save();
       assert.equal(promise.constructor, global.Promise);
       promise.
-        then(function(doc) {
+        then(function() {
           assert.ok(false);
         }).
         catch(function(err) {
@@ -106,7 +106,7 @@ describe('ES6 promises: ', function() {
       var promise = m.save();
       assert.equal(promise.constructor, global.Promise);
       promise.
-        then(function(doc) {
+        then(function() {
           assert.ok(false);
         }).
         catch(function(err) {
@@ -121,7 +121,7 @@ describe('ES6 promises: ', function() {
       var promise = m.validate();
       assert.equal(promise.constructor, global.Promise);
       promise.
-        then(function(doc) {
+        then(function() {
           assert.ok(false);
         }).
         catch(function(err) {
@@ -201,7 +201,7 @@ describe('ES6 promises: ', function() {
       var promise = m.save();
       assert.equal(promise.constructor, bluebird);
       promise.
-        then(function(doc) {
+        then(function() {
           assert.ok(false);
         }).
         catch(function(err) {
@@ -217,7 +217,7 @@ describe('ES6 promises: ', function() {
       var promise = m.save();
       assert.equal(promise.constructor, bluebird);
       promise.
-        then(function(doc) {
+        then(function() {
           assert.ok(false);
         }).
         catch(function(err) {
@@ -233,7 +233,7 @@ describe('ES6 promises: ', function() {
       var promise = m.save();
       assert.equal(promise.constructor, bluebird);
       promise.
-        then(function(doc) {
+        then(function() {
           assert.ok(false);
         }).
         catch(function(err) {
@@ -248,7 +248,7 @@ describe('ES6 promises: ', function() {
       var promise = m.validate();
       assert.equal(promise.constructor, bluebird);
       promise.
-        then(function(doc) {
+        then(function() {
           assert.ok(false);
         }).
         catch(function(err) {
@@ -328,7 +328,7 @@ describe('ES6 promises: ', function() {
       var promise = m.save();
       assert.ok(promise instanceof q.makePromise);
       promise.
-        then(function(doc) {
+        then(function() {
           assert.ok(false);
         }).
         catch(function(err) {
@@ -344,7 +344,7 @@ describe('ES6 promises: ', function() {
       var promise = m.save();
       assert.ok(promise instanceof q.makePromise);
       promise.
-        then(function(doc) {
+        then(function() {
           assert.ok(false);
         }).
         catch(function(err) {
@@ -360,7 +360,7 @@ describe('ES6 promises: ', function() {
       var promise = m.save();
       assert.ok(promise instanceof q.makePromise);
       promise.
-        then(function(doc) {
+        then(function() {
           assert.ok(false);
         }).
         catch(function(err) {
@@ -375,7 +375,7 @@ describe('ES6 promises: ', function() {
       var promise = m.validate();
       assert.ok(promise instanceof q.makePromise);
       promise.
-        then(function(doc) {
+        then(function() {
           assert.ok(false);
         }).
         catch(function(err) {

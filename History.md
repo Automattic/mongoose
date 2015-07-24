@@ -1,3 +1,18 @@
+4.1.0 / 2015-07-24
+==================
+ * added; `schema.queue()` now public #3193
+ * added; raw result as third parameter to findOneAndX callback #3173
+ * added; ability to run validateSync() on only certain fields #3153
+ * added; subPopulate #3103 [timbur](https://github.com/timbur)
+ * added; $isDefault function on documents #3077
+ * added; additional properties for built-in validator messages #3063 [KLicheR](https://github.com/KLicheR)
+ * added; getQuery() and getUpdate() functions for Query #3013
+ * added; export DocumentProvider #2996
+ * added; ability to remove path from schema #2993 [JohnnyEstilles](https://github.com/JohnnyEstilles)
+ * added; .explain() helper for aggregate #2714
+ * added; ability to specify which ES6-compatible promises library mongoose uses #2688
+ * added; export Aggregate #1910
+
 4.0.8 / 2015-07-20
 ==================
  * fixed; assignment with document arrays #3178 [rosston](https://github.com/rosston)

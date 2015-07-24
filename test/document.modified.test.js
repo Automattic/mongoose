@@ -115,6 +115,18 @@ describe('document modified', function(){
     })
   });
 
+  describe('isDefault', function() {
+    it('works', function(done) {
+      var db = start();
+
+      var MyModel = db.model('test',
+        { name: { type: String, default: 'Val '} });
+      var m = new MyModel();
+      assert.ok(m.$isDefault('name'));
+      db.close(done);
+    });
+  });
+
   describe('isModified', function(){
     it('should not throw with no argument', function(done){
       var db = start();

@@ -2467,8 +2467,9 @@ describe('model: populate:', function(){
             title : 'Woot2'
           , fans  : [fan2, fan1]
           , _creator: fan2
-        }, function (err) {
+        }, function (err, post) {
           assert.ifError(err);
+          b1 = post;
           done();
         });
       });

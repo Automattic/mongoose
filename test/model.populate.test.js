@@ -26,6 +26,7 @@ var User = new Schema({
   , gender    : { type: String, enum: ['male', 'female'], default: 'male' }
   , age       : { type: Number, default: 21 }
   , blogposts : [{ type: ObjectId, ref: 'RefBlogPost' }]
+  , followers : [{ type: ObjectId, ref: 'RefUser' }]
 });
 
 /**
@@ -87,6 +88,65 @@ describe('model: populate:', function(){
             post.populate('comments', function(){});
           });
           db.close(done);
+        });
+      });
+    });
+  });
+  
+  it('deep population', function(done){
+    var db = start()
+      , BlogPost = db.model('RefBlogPost', posts)
+      , User = db.model('RefUser', users);
+
+    User.create({ name: 'User 01' }, function (err, user1) {
+      assert.ifError(err);
+
+      User.create({ name: 'User 02', followers: [user1._id] }, function (err, user2) {
+        assert.ifError(err);
+
+        User.create({ name: 'User 03', followers: [user2._id] }, function (err, user3) {
+          assert.ifError(err);
+  
+          BlogPost.create({
+            title: 'w00tabulous'
+            , _creator: user3._id
+          }, function (err, post) {
+            assert.ifError(err);
+  
+            assert.doesNotThrow(function(){
+              BlogPost
+                .findById(post._id)
+                .select('_creator')
+                .populate({
+                  path: '_creator',
+                  model: 'RefUser',
+                  select: 'name followers',
+                  populate: [{
+                    path: 'followers',
+                    select: 'name followers',
+                    options: { limit: 5 },
+                    populate: {  // can also use a single object instead of array of objects
+                      path: 'followers',
+                      select: 'name',
+                      options: { limit: 2 }
+                    }
+                  }]
+                })
+                .exec(function (err, post) {
+                  db.close();
+                  assert.ifError(err);
+                  assert.ok(post._creator);
+                  assert.equal(post._creator.name,'User 03');
+                  assert.ok(post._creator.followers);
+                  assert.ok(post._creator.followers[0]);
+                  assert.equal(post._creator.followers[0].name,'User 02');
+                  assert.ok(post._creator.followers[0].followers);
+                  assert.ok(post._creator.followers[0].followers[0]);
+                  assert.equal(post._creator.followers[0].followers[0].name,'User 01');
+                  done();
+                });
+            });
+          });
         });
       });
     });

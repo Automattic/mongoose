@@ -135,7 +135,7 @@ describe('document modified', function(){
       var MyModel = db.model('test',
         { name: { type: String, default: 'Val '} });
       var m = new MyModel();
-      assert.ok(m.isDefault('name'));
+      assert.ok(m.$isDefault('name'));
       db.close(done);
     });
   });

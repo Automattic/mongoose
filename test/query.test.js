@@ -9,6 +9,7 @@ var start = require('./common')
   , Schema = mongoose.Schema
   , assert = require('assert')
   , random = require('../lib/utils').random
+  , Promise = require('../lib/promise')
   , Query = require('../lib/query');
 
 var Comment = new Schema({
@@ -844,22 +845,6 @@ describe('Query', function(){
       assert.deepEqual(o, q._mongooseOptions.populate['dirt']);
       done();
     })
-  })
-
-  describe('an empty query', function(){
-    it('should not throw', function(done){
-      var query = new Query({}, {}, null, p1.collection);
-      var threw = false;
-
-      try {
-        query.exec();
-      } catch (err) {
-        threw = true;
-      }
-
-      assert.equal(threw, false);
-      done();
-    })
   });
 
   describe('casting', function(){
@@ -1084,6 +1069,18 @@ describe('Query', function(){
         db.close();
         done();
       }, 50);
+    });
+
+    it('works as a promise', function(done) {
+      var db = start();
+      var Product = db.model('Product');
+      var promise = Product.findOne();
+
+      promise.then(function(prod) {
+        done();
+      }, function(err) {
+        assert.ifError(err);
+      });
     });
   });
 

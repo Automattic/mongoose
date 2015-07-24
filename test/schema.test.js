@@ -1457,4 +1457,44 @@ describe('schema', function(){
       })
     })
   })
+
+  describe('remove()', function() {
+
+    before(function() {
+      this.schema = Schema({
+        a: String,
+        b: {
+          c: {
+            d: String
+          }
+        },
+        e: Number,
+        f: String,
+        g: [String]
+      });
+    });
+
+    it('removes a single path', function(done) {
+      this.schema.remove('a');
+      assert.strictEqual(this.schema.path('a'), undefined);
+      done();
+    });
+
+    it('removes a nested path', function(done) {
+      this.schema.remove('b.c.d');
+      assert.strictEqual(this.schema.path('b'), undefined);
+      assert.strictEqual(this.schema.path('b.c'), undefined);
+      assert.strictEqual(this.schema.path('b.c.d'), undefined);
+      done();
+    });
+
+    it('removes an array of paths', function(done) {
+      this.schema.remove(['e', 'f', 'g']);
+      assert.strictEqual(this.schema.path('e'), undefined);
+      assert.strictEqual(this.schema.path('f'), undefined);
+      assert.strictEqual(this.schema.path('g'), undefined);
+      done();
+    });
+
+  });
 });

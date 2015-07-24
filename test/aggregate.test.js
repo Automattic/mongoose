@@ -53,7 +53,7 @@ function clearData(db, callback) {
  * Test.
  */
 
-describe('aggregate', function() {
+describe('aggregate: ', function() {
   describe('append', function() {
     it('(pipeline)', function(done) {
       var aggregate = new Aggregate();
@@ -285,7 +285,7 @@ describe('aggregate', function() {
       var aggregate = new Aggregate()
         , model = { foo: 42 };
 
-      assert.equal(aggregate.bind(model), aggregate);
+      assert.equal(aggregate.model(model), aggregate);
       assert.equal(aggregate._model, model);
 
       done();
@@ -298,7 +298,7 @@ describe('aggregate', function() {
 
       setupData(function(db) {
         aggregate
-          .bind(db.model('Employee'))
+          .model(db.model('Employee'))
           .project({ sal: 1, sal_k: { $divide: [ "$sal", 1000 ] } })
           .exec(function(err, docs) {
             assert.ifError(err);
@@ -316,7 +316,7 @@ describe('aggregate', function() {
 
       setupData(function(db) {
         aggregate
-          .bind(db.model('Employee'))
+          .model(db.model('Employee'))
           .group({ _id: "$dept" })
           .exec(function (err, docs) {
             var depts;
@@ -338,7 +338,7 @@ describe('aggregate', function() {
 
       setupData(function (db) {
         aggregate
-          .bind(db.model('Employee'))
+          .model(db.model('Employee'))
           .skip(1)
           .exec(function (err, docs) {
             assert.ifError(err);
@@ -354,7 +354,7 @@ describe('aggregate', function() {
 
       setupData(function (db) {
         aggregate
-          .bind(db.model('Employee'))
+          .model(db.model('Employee'))
           .limit(3)
           .exec(function (err, docs) {
             assert.ifError(err);
@@ -370,7 +370,7 @@ describe('aggregate', function() {
 
       setupData(function (db) {
         aggregate
-          .bind(db.model('Employee'))
+          .model(db.model('Employee'))
           .unwind('customers')
           .exec(function (err, docs) {
             assert.ifError(err);
@@ -386,7 +386,7 @@ describe('aggregate', function() {
 
       setupData(function(db) {
         aggregate
-          .bind(db.model('Employee'))
+          .model(db.model('Employee'))
           .match({ sal: { $gt: 15000 } })
           .exec(function (err, docs) {
             assert.ifError(err);
@@ -402,7 +402,7 @@ describe('aggregate', function() {
 
       setupData(function (db) {
         aggregate
-          .bind(db.model('Employee'))
+          .model(db.model('Employee'))
           .sort("sal")
           .exec(function (err, docs) {
             assert.ifError(err);
@@ -418,7 +418,7 @@ describe('aggregate', function() {
 
       setupData(function(db) {
         aggregate
-          .bind(db.model('Employee'))
+          .model(db.model('Employee'))
           .match({ sal: { $lt: 16000 } })
           .unwind('customers')
           .project({ emp: "$name", cust: "$customers" })
@@ -435,15 +435,36 @@ describe('aggregate', function() {
       });
     });
 
+    it('explain()', function(done) {
+      var aggregate = new Aggregate();
+
+      setupData(function(db) {
+        aggregate.
+          model(db.model('Employee')).
+          match({ sal: { $lt: 16000 } }).
+          explain(function(err, output) {
+            assert.ifError(err);
+            assert.ok(output);
+            // make sure we got explain output
+            assert.ok(output.stages);
+
+            clearData(db, function() { done(); });
+          });
+      });
+    });
+
     describe('error when empty pipeline', function() {
       it('without a callback', function(done) {
         var agg = new Aggregate;
-        var promise = agg.exec();
-        assert.ok(promise instanceof mongoose.Promise);
-        promise.onResolve(function(err){
-          assert.ok(err);
-          assert.equal(err.message, "Aggregate has empty pipeline");
-          done();
+        setupData(function(db) {
+          agg.model(db.model('Employee'));
+          var promise = agg.exec();
+          assert.ok(promise instanceof mongoose.Promise);
+          promise.onResolve(function(err){
+            assert.ok(err);
+            assert.equal(err.message, "Aggregate has empty pipeline");
+            done();
+          });
         });
       });
 
@@ -451,40 +472,29 @@ describe('aggregate', function() {
         var aggregate = new Aggregate()
           , callback;
 
-        callback = function(err, docs) {
-          assert.ok(err);
-          assert.equal(err.message, "Aggregate has empty pipeline");
-          done();
-        };
+        setupData(function(db) {
+          aggregate.model(db.model('Employee'));
+          callback = function(err, docs) {
+            assert.ok(err);
+            assert.equal(err.message, "Aggregate has empty pipeline");
+            done();
+          };
 
-        aggregate.exec(callback);
+          aggregate.exec(callback);
+        });
       });
     });
 
     describe('error when not bound to a model', function() {
       it('with callback', function(done) {
-        var aggregate = new Aggregate()
-          , callback;
-
-        callback = function(err, docs) {
-          assert.ok(err);
-          assert.equal(err.message, "Aggregate not bound to any Model");
-          done();
-        };
+        var aggregate = new Aggregate();
 
         aggregate.skip(0);
-        aggregate.exec(callback);
-      });
+        assert.throws(function() {
+          aggregate.exec();
+        }, 'Aggregate not bound to any Model');
 
-      it('without callback', function(done) {
-        var agg = new Aggregate;
-        var promise = agg.limit(3).exec();
-        assert.ok(promise instanceof mongoose.Promise);
-        promise.onResolve(function(err){
-          assert.ok(err);
-          assert.equal(err.message, "Aggregate not bound to any Model");
-          done();
-        });
+        done();
       });
     });
 

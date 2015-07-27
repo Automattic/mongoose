@@ -1765,6 +1765,25 @@ describe('Model', function(){
         });
       });
     });
+
+    it('do not cause the document to stay dirty after save', function(done){
+      var db = start(),
+          Model = db.model('SavingDefault', new Schema({ name: { type: String, default: 'saving' }}), collection),
+          doc = new Model();
+
+      doc.save(function (err, doc, numberAffected) {
+        assert.ifError(err);
+        assert.strictEqual(1, numberAffected);
+
+        doc.save(function (err, doc, numberAffected) {
+          db.close();
+          assert.ifError(err);
+          // should not have saved a second time
+          assert.strictEqual(0, numberAffected);
+          done();
+        });
+      });
+    });
   });
 
   describe('virtuals', function(){

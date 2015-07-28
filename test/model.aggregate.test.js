@@ -120,7 +120,6 @@ describe('model aggregate', function(){
         .exec();
 
       promise.then(function(res){
-        console.log(res)
           assert.ok(promise instanceof mongoose.Promise);
           assert.ok(res);
           assert.equal(1, res.length);

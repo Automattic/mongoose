@@ -581,4 +581,62 @@ describe('document: hooks:', function () {
       });
     });
   });
+
+  it('pre-init hooks work', function(done) {
+    var schema = Schema({ text: String });
+
+    schema.pre('init', function(next, data) {
+      data.text = "pre init'd";
+      next();
+    });
+
+    var db = start(),
+        Parent = db.model('Parent', schema);
+
+    Parent.create({
+      text: "not init'd",
+    }, function(err, doc) {
+
+      Parent.findOne({ _id: doc._id }, function(err, doc) {
+        db.close();
+
+        assert.strictEqual(doc.text, "pre init'd");
+
+        done();
+      });
+    });
+  });
+
+  it('pre-init hooks on subdocuments work', function(done) {
+    var childSchema = Schema({ age: Number });
+
+    childSchema.pre('init', function(next, data) {
+      ++data.age;
+      next();
+      // On subdocuments, you have to return `this`
+      return this;
+    });
+
+    var parentSchema = Schema({ name: String, children: [childSchema] });
+    var db = start(),
+        Parent = db.model('ParentWithChildren', parentSchema);
+
+    Parent.create({
+      name: 'Bob',
+      children: [{ age: 8 }, { age: 5 }]
+    }, function(err, doc) {
+
+      Parent.findOne({ _id: doc._id }, function(err, doc) {
+        db.close();
+
+        assert.strictEqual(doc.children.length, 2);
+        assert.strictEqual(doc.children[0].constructor.name, 'EmbeddedDocument');
+        assert.strictEqual(doc.children[1].constructor.name, 'EmbeddedDocument');
+        assert.strictEqual(doc.children[0].age, 9);
+        assert.strictEqual(doc.children[1].age, 6);
+
+        done();
+      });
+    });
+  });
 });

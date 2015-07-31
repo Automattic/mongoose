@@ -338,10 +338,16 @@ describe('document: hooks:', function () {
     var S = db.model('docArrayWithHookedSave', schema);
     var s = new S({ name: 'hi', e: [{}] });
     s.save(function (err) {
-      assert.ok(err);
-      assert.ok(err.errors['e.0.text']);
-      assert.equal(false, presave);
-      db.close(done);
+      db.close();
+
+      try {
+        assert.ok(err);
+        assert.ok(err.errors['e.0.text']);
+        assert.equal(false, presave);
+        done();
+      } catch (e) {
+        done(e);
+      }
     });
   });
 
@@ -500,7 +506,7 @@ describe('document: hooks:', function () {
       setTimeout(function () {
         count++;
         next();
-        if (count == 3) {
+        if (count === 3) {
           done(new Error("gaga"));
         } else {
           done();
@@ -530,9 +536,15 @@ describe('document: hooks:', function () {
     });
 
     m.save(function (err) {
-      assert.equal(err.message, "gaga");
-      assert.equal(count, 4);
-      db.close(done);
+      db.close();
+
+      try {
+        assert.equal(err.message, "gaga");
+        assert.equal(count, 4);
+        done();
+      } catch (e) {
+        done(e);
+      }
     });
   });
 
@@ -637,6 +649,47 @@ describe('document: hooks:', function () {
 
         done();
       });
+    });
+  });
+
+  it('pre-save hooks fire on subdocs before their parent doc', function(done) {
+    var childSchema = Schema({ name: String, count: Number });
+
+    childSchema.pre('save', function(next) {
+      ++this.count;
+      next();
+      // On subdocuments, you have to return `this`
+      return this;
+    });
+
+    var parentSchema = Schema({
+      cumulativeCount: Number,
+      children: [childSchema]
+    });
+
+    parentSchema.pre('save', function(next) {
+      this.cumulativeCount = this.children.reduce(function (seed, child) {
+        return seed += child.count;
+      }, 0)
+      next();
+    });
+
+    var db = start(),
+        Parent = db.model('ParentWithChildren', parentSchema),
+        doc = new Parent({ children: [{ count: 0, name: 'a' }, { count: 1, name: 'b' }] });
+
+    doc.save(function(err, doc){
+      db.close();
+
+      try {
+        assert.strictEqual(doc.children[0].count, 1);
+        assert.strictEqual(doc.children[1].count, 2);
+        assert.strictEqual(doc.cumulativeCount, 3);
+      } catch (e) {
+        return done(e);
+      }
+
+      done();
     });
   });
 });

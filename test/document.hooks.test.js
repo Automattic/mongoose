@@ -338,10 +338,16 @@ describe('document: hooks:', function () {
     var S = db.model('docArrayWithHookedSave', schema);
     var s = new S({ name: 'hi', e: [{}] });
     s.save(function (err) {
-      assert.ok(err);
-      assert.ok(err.errors['e.0.text']);
-      assert.equal(false, presave);
-      db.close(done);
+      db.close();
+
+      try {
+        assert.ok(err);
+        assert.ok(err.errors['e.0.text']);
+        assert.equal(false, presave);
+        done();
+      } catch (e) {
+        done(e);
+      }
     });
   });
 
@@ -500,7 +506,7 @@ describe('document: hooks:', function () {
       setTimeout(function () {
         count++;
         next();
-        if (count == 3) {
+        if (count === 3) {
           done(new Error("gaga"));
         } else {
           done();
@@ -530,9 +536,15 @@ describe('document: hooks:', function () {
     });
 
     m.save(function (err) {
-      assert.equal(err.message, "gaga");
-      assert.equal(count, 4);
-      db.close(done);
+      db.close();
+
+      try {
+        assert.equal(err.message, "gaga");
+        assert.equal(count, 4);
+        done();
+      } catch (e) {
+        done(e);
+      }
     });
   });
 
@@ -579,6 +591,105 @@ describe('document: hooks:', function () {
         assert.equal(postCount, 1);
         db.close(done);
       });
+    });
+  });
+
+  it('pre-init hooks work', function(done) {
+    var schema = Schema({ text: String });
+
+    schema.pre('init', function(next, data) {
+      data.text = "pre init'd";
+      next();
+    });
+
+    var db = start(),
+        Parent = db.model('Parent', schema);
+
+    Parent.create({
+      text: "not init'd",
+    }, function(err, doc) {
+
+      Parent.findOne({ _id: doc._id }, function(err, doc) {
+        db.close();
+
+        assert.strictEqual(doc.text, "pre init'd");
+
+        done();
+      });
+    });
+  });
+
+  it('pre-init hooks on subdocuments work', function(done) {
+    var childSchema = Schema({ age: Number });
+
+    childSchema.pre('init', function(next, data) {
+      ++data.age;
+      next();
+      // On subdocuments, you have to return `this`
+      return this;
+    });
+
+    var parentSchema = Schema({ name: String, children: [childSchema] });
+    var db = start(),
+        Parent = db.model('ParentWithChildren', parentSchema);
+
+    Parent.create({
+      name: 'Bob',
+      children: [{ age: 8 }, { age: 5 }]
+    }, function(err, doc) {
+
+      Parent.findOne({ _id: doc._id }, function(err, doc) {
+        db.close();
+
+        assert.strictEqual(doc.children.length, 2);
+        assert.strictEqual(doc.children[0].constructor.name, 'EmbeddedDocument');
+        assert.strictEqual(doc.children[1].constructor.name, 'EmbeddedDocument');
+        assert.strictEqual(doc.children[0].age, 9);
+        assert.strictEqual(doc.children[1].age, 6);
+
+        done();
+      });
+    });
+  });
+
+  it('pre-save hooks fire on subdocs before their parent doc', function(done) {
+    var childSchema = Schema({ name: String, count: Number });
+
+    childSchema.pre('save', function(next) {
+      ++this.count;
+      next();
+      // On subdocuments, you have to return `this`
+      return this;
+    });
+
+    var parentSchema = Schema({
+      cumulativeCount: Number,
+      children: [childSchema]
+    });
+
+    parentSchema.pre('save', function(next) {
+      this.cumulativeCount = this.children.reduce(function (seed, child) {
+        return seed += child.count;
+      }, 0)
+      next();
+    });
+
+    var db = start(),
+        Parent = db.model('ParentWithChildren', parentSchema),
+        doc = new Parent({ children: [{ count: 0, name: 'a' }, { count: 1, name: 'b' }] });
+
+    doc.save(function(err, doc){
+      db.close();
+
+      try {
+        assert.strictEqual(doc.children[0].count, 1);
+        assert.strictEqual(doc.children[1].count, 2);
+        assert.strictEqual(doc.cumulativeCount, 3);
+      } catch (e) {
+        return done(e);
+      }
+
+      done();
     });
   });
 });

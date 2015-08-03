@@ -1,3 +1,14 @@
+4.1.1 / 2015-08-03
+==================
+ * fixed; aggregate exec() crash with no callback #3212 #3198 [jpgarcia](https://github.com/jpgarcia)
+ * fixed; pre init hooks now properly synchronous #3207 [burtonjc](https://github.com/burtonjc)
+ * fixed; updateValidators doesn't flatten dates #3206 #3194 [victorkohl](https://github.com/victorkohl)
+ * fixed; default fields don't make document dirty between saves #3205 [burtonjc](https://github.com/burtonjc)
+ * fixed; save passes 0 as numAffected rather than undefined when no change #3195 [burtonjc](https://github.com/burtonjc)
+ * fixed; better handling for positional operator in update #3185
+ * fixed; use Travis containers #3181 [ChristianMurphy](https://github.com/ChristianMurphy)
+ * fixed; leaked variable #3180 [ChristianMurphy](https://github.com/ChristianMurphy)
+
 4.1.0 / 2015-07-24
 ==================
  * added; `schema.queue()` now public #3193

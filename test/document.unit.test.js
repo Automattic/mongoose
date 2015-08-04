@@ -53,7 +53,7 @@ describe('toObject()', function() {
 
   it('can overwrite by passing an option', function(done) {
     var d = new Stub();
-    assert.equal(d.toObject({ minimize: true }), undefined);
+    assert.deepEqual(d.toObject({ minimize: true }), {});
     done();
   });
 

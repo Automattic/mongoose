@@ -1120,6 +1120,25 @@ describe('model: querying:', function(){
       });
     })
 
+    it('using $or with array of Document', function (done) {
+      var db = start()
+        , Mod = db.model('Mod', 'mods_' + random());
+
+      Mod.create({num: 1}, function(err, one) {
+        assert.ifError(err);
+        Mod.find({num: 1}, function(err, found) {
+          assert.ifError(err);
+          Mod.find({$or: found}, function(err, found) {
+            assert.ifError(err);
+            assert.equal(1, found.length);
+            assert.equal(found[0]._id.toString(), one._id);
+            db.close();
+            done();
+          });
+        });
+      });
+    });
+
     it('where $ne', function(done){
       var db = start()
         , Mod = db.model('Mod', 'mods_' + random());

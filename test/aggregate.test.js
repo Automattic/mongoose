@@ -437,19 +437,28 @@ describe('aggregate: ', function() {
 
     it('explain()', function(done) {
       var aggregate = new Aggregate();
+      start.mongodVersion(function (err, version) {
+        if (err) {
+          return done(err);
+        }
+        var mongo26 = 2 < version[0] || (2 == version[0] && 6 <= version[1]);
+        if (!mongo26) {
+          return done();
+        }
 
-      setupData(function(db) {
-        aggregate.
-          model(db.model('Employee')).
-          match({ sal: { $lt: 16000 } }).
-          explain(function(err, output) {
-            assert.ifError(err);
-            assert.ok(output);
-            // make sure we got explain output
-            assert.equal(output.stages instanceof Array, true);
+        setupData(function(db) {
+          aggregate.
+            model(db.model('Employee')).
+            match({ sal: { $lt: 16000 } }).
+            explain(function(err, output) {
+              assert.ifError(err);
+              assert.ok(output);
+              // make sure we got explain output
+              assert.ok(output.stages);
 
-            clearData(db, function() { done(); });
-          });
+              clearData(db, function() { done(); });
+            });
+        });
       });
     });
 

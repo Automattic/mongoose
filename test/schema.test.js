@@ -725,13 +725,13 @@ describe('schema', function(){
       var Tobi = new Schema();
 
       Tobi.pre('save', function(){});
-      assert.equal(2, Tobi.callQueue.length);
+      assert.equal(Tobi.callQueue.length, 3);
 
       Tobi.post('save', function(){});
-      assert.equal(3, Tobi.callQueue.length);
+      assert.equal(Tobi.callQueue.length, 4);
 
       Tobi.pre('save', function(){});
-      assert.equal(4, Tobi.callQueue.length);
+      assert.equal(Tobi.callQueue.length, 5);
       done();
     });
   });

@@ -55,4 +55,13 @@ describe('toObject()', function() {
     assert.equal(d.toObject({ minimize: true }), undefined);
     done();
   });
+
+  it('doesnt crash with empty object (gh-3130)', function(done) {
+    var d = new Stub();
+    d._doc = undefined;
+    assert.doesNotThrow(function() {
+      d.toObject();
+    });
+    done();
+  });
 });

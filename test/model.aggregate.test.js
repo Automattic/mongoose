@@ -103,6 +103,24 @@ describe('model aggregate', function(){
           });
     });
 
+    it('with Aggregate syntax if callback not provided', function(done) {
+      this.timeout(4000);
+
+      var promise = A.aggregate()
+        .group(group.$group)
+        .project(project.$project)
+        .exec();
+
+      promise.then(function(res){
+          assert.ok(promise instanceof mongoose.Promise);
+          assert.ok(res);
+          assert.equal(1, res.length);
+          assert.ok('maxAge' in res[0]);
+          assert.equal(maxAge, res[0].maxAge);
+          done();
+        }).end();
+    });
+
     it('when returning Aggregate', function(done) {
       assert(A.aggregate(project) instanceof Aggregate);
       done();

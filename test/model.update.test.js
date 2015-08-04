@@ -1478,4 +1478,23 @@ describe('model: update:', function(){
       db.close(done);
     });
   });
+
+  it('allows objects with positional operator (gh-3185)', function(done) {
+    var db = start();
+    var schema = Schema({ children: [{ _id: Number }] });
+    var MyModel = db.model('gh3185', schema, 'gh3185');
+
+    MyModel.create({ children: [{ _id: 1 }] }, function(error, doc) {
+      assert.ifError(error);
+      MyModel.findOneAndUpdate(
+        { _id: doc._id, 'children._id': 1 },
+        { $set: { 'children.$': { _id: 2 } } },
+        { 'new': true },
+        function(error, doc) {
+          assert.ifError(error);
+          assert.equal(doc.children[0]._id, 2);
+          db.close(done);
+        });
+    });
+  });
 });

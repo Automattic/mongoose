@@ -307,14 +307,15 @@ describe('model', function() {
       });
 
       it('merges callQueue with base queue defined before discriminator types callQueue', function(done) {
-        assert.equal(Employee.schema.callQueue.length, 3);
+        assert.equal(Employee.schema.callQueue.length, 4);
         // PersonSchema.post('save')
         assert.strictEqual(Employee.schema.callQueue[0], Person.schema.callQueue[0]);
 
         // EmployeeSchema.pre('save')
-        assert.strictEqual(Employee.schema.callQueue[2][0], 'pre');
-        assert.strictEqual(Employee.schema.callQueue[2][1]['0'], 'save');
-        assert.strictEqual(Employee.schema.callQueue[2][1]['1'], employeeSchemaPreSaveFn);
+        var queueIndex = Employee.schema.callQueue.length - 1;
+        assert.strictEqual(Employee.schema.callQueue[queueIndex][0], 'pre');
+        assert.strictEqual(Employee.schema.callQueue[queueIndex][1]['0'], 'save');
+        assert.strictEqual(Employee.schema.callQueue[queueIndex][1]['1'], employeeSchemaPreSaveFn);
         done();
       });
 

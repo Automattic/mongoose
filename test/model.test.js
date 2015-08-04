@@ -1760,6 +1760,25 @@ describe('Model', function(){
         });
       });
     });
+
+    it('do not cause the document to stay dirty after save', function(done){
+      var db = start(),
+          Model = db.model('SavingDefault', new Schema({ name: { type: String, default: 'saving' }}), collection),
+          doc = new Model();
+
+      doc.save(function (err, doc, numberAffected) {
+        assert.ifError(err);
+        assert.strictEqual(1, numberAffected);
+
+        doc.save(function (err, doc, numberAffected) {
+          db.close();
+          assert.ifError(err);
+          // should not have saved a second time
+          assert.strictEqual(0, numberAffected);
+          done();
+        });
+      });
+    });
   });
 
   describe('virtuals', function(){
@@ -4299,6 +4318,7 @@ describe('Model', function(){
         new DefaultErr().save();
       })
     });
+
     it('returns number of affected docs', function(done){
       var db = start()
       var schema = new Schema({ name: String });
@@ -4315,7 +4335,29 @@ describe('Model', function(){
           done();
         });
       });
-    })
+    });
+
+    it('returns 0 as the number of affected docs if doc was not modified', function(done){
+      var db = start(),
+          schema = new Schema({ name: String }),
+          Model = db.model('AffectedDocsAreReturned', schema),
+          doc = new Model({ name: 'aaron' });
+
+      doc.save(function (err, doc, affected) {
+        assert.ifError(err);
+        assert.equal(1, affected);
+
+        Model.findById(doc.id).then(function(doc) {
+          doc.save(function (err, doc, affected) {
+            db.close();
+            assert.ifError(err);
+            assert.equal(0, affected);
+            done();
+          });
+        });
+      });
+    });
+
     it('saved changes made within callback of a previous no-op save gh-1139', function(done){
       var db = start()
         , B = db.model('BlogPost', collection);
@@ -4341,7 +4383,6 @@ describe('Model', function(){
         })
       })
     })
-
 
     it('rejects new documents that have no _id set (1595)', function(done){
       var db = start();

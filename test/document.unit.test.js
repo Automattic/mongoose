@@ -42,7 +42,6 @@ describe('toObject()', function() {
       this.$__ = {};
     };
     Stub.prototype = Object.create(mongoose.Document.prototype);
-    var d = new Stub();
   });
 
   it('should inherit options from schema', function(done) {

@@ -25,7 +25,7 @@ var data = [
     likes : ['books', 'cats', 'dogs']},
   { name : 'alucard', age : 1000, birthday : new Date().setFullYear((new
     Date().getFullYear() - 1000)), gender : "Male",
-    likes : ['glasses', 'wine', 'the night']},
+    likes : ['glasses', 'wine', 'the night']}
 ];
 
 
@@ -36,7 +36,10 @@ mongoose.connect('mongodb://localhost/persons', function (err) {
   async.each(data, function (item, cb) {
     Person.create(item, cb);
   }, function (err) {
-    
+    if (err) {
+      // handle error
+    }
+
     // run an aggregate query that will get all of the people who like a given
     // item. To see the full documentation on ways to use the aggregate
     // framework, see http://docs.mongodb.org/manual/core/aggregation/

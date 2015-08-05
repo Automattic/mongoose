@@ -20,11 +20,11 @@ describe('schematype', function(){
   it('properly handles specifying index in combination with unique or sparse', function(done){
     var s = new Schema({ name: { type: String, index: true, unique: true }});
     assert.deepEqual(s.path('name')._index, { unique: true });
-    var s = new Schema({ name: { type: String, unique: true, index: true }});
+    s = new Schema({ name: { type: String, unique: true, index: true }});
     assert.deepEqual(s.path('name')._index, { unique: true });
-    var s = new Schema({ name: { type: String, index: true, sparse: true }});
+    s = new Schema({ name: { type: String, index: true, sparse: true }});
     assert.deepEqual(s.path('name')._index, { sparse: true });
-    var s = new Schema({ name: { type: String, sparse: true, index: true }});
+    s = new Schema({ name: { type: String, sparse: true, index: true }});
     assert.deepEqual(s.path('name')._index, { sparse: true });
     done();
   })

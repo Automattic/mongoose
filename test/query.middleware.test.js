@@ -71,7 +71,7 @@ describe('query middleware', function() {
       next();
     });
 
-    var db = start();
+    start();
 
     initializeData(function(error) {
       assert.ifError(error);
@@ -119,7 +119,7 @@ describe('query middleware', function() {
       next();
     });
 
-    initializeData(function(error) {
+    initializeData(function() {
       Author.find({ title: 'Professional AngularJS' }).exec(function(error, docs) {
         assert.ifError(error);
         assert.equal(1, count);
@@ -144,7 +144,7 @@ describe('query middleware', function() {
       next();
     });
 
-    initializeData(function(error) {
+    initializeData(function() {
       Author.findOne({ title: 'Professional AngularJS' }).exec(function(error, doc) {
         assert.ifError(error);
         assert.equal(1, count);
@@ -161,7 +161,7 @@ describe('query middleware', function() {
       next();
     });
 
-    initializeData(function(error) {
+    initializeData(function() {
       Author.findOne({ title: 'Professional AngularJS' }).exec(function(error, doc) {
         assert.ifError(error);
         assert.equal('Val', doc.author);
@@ -178,7 +178,7 @@ describe('query middleware', function() {
       });
     });
 
-    initializeData(function(error) {
+    initializeData(function() {
       Author.findOne({ title: 'Professional AngularJS' }).exec(function(error, doc) {
         assert.ifError(error);
         assert.equal('Val', doc.author);

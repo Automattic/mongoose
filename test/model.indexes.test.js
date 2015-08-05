@@ -7,15 +7,8 @@ var start = require('./common')
   , assert = require('assert')
   , mongoose = start.mongoose
   , random = require('../lib/utils').random
-  , Query = require('../lib/query')
   , Schema = mongoose.Schema
-  , SchemaType = mongoose.SchemaType
-  , ObjectId = Schema.Types.ObjectId
-  , DocumentObjectId = mongoose.Types.ObjectId
-  , DocumentArray = mongoose.Types.DocumentArray
-  , EmbeddedDocument = mongoose.Types.Embedded
-  , MongooseArray = mongoose.Types.Array
-  , MongooseError = mongoose.Error;
+  , ObjectId = Schema.Types.ObjectId;
 
 describe('model', function(){
   describe('indexes', function(){
@@ -206,7 +199,7 @@ describe('model', function(){
         schema.set('autoIndex', false);
 
         var Test = db.model('AutoIndexing', schema, 'autoindexing-disable');
-        Test.on('index', function(err){
+        Test.on('index', function(){
           assert.ok(false, 'Model.ensureIndexes() was called');
         });
 
@@ -245,7 +238,7 @@ describe('model', function(){
           var db = start({config: {autoIndex : false}});
           var schema = new Schema({name : {type: String, index: true}});
           var Test = db.model('GlobalAutoIndex', schema, "x"+random());
-          Test.on('index', function(err){
+          Test.on('index', function(){
             assert.ok(false, 'Model.ensureIndexes() was called');
           });
 
@@ -307,7 +300,7 @@ describe('model', function(){
     });
 
 
-    describe('model.ensureIndexes()', function(done){
+    describe('model.ensureIndexes()', function(){
       it('is a function', function(done){
         var schema = mongoose.Schema({ x: 'string' });
         var Test = mongoose.createConnection().model('ensureIndexes-'+random, schema);
@@ -331,7 +324,7 @@ describe('model', function(){
         Test.schema.index({ name: 1 }, { sparse: true });
 
         var called = false;
-        Test.on('index', function(err){
+        Test.on('index', function(){
           called= true;
         });
 

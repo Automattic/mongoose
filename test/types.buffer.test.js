@@ -44,7 +44,7 @@ describe('types.buffer', function(){
     assert.ok(a.isMongooseBuffer);
     assert.equal(true, Buffer.isBuffer(a));
 
-    var a = new MongooseBuffer([195, 188, 98, 101, 114]);
+    a = new MongooseBuffer([195, 188, 98, 101, 114]);
     var b = new MongooseBuffer("buffer shtuffs are neat");
     var c = new MongooseBuffer('aGVsbG8gd29ybGQ=', 'base64');
     var d = new MongooseBuffer(0);

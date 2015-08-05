@@ -2,15 +2,12 @@ var underlyingBuffer = Buffer;
 
 var Schema = mongoose.Schema
   , Document = mongoose.Document
-  , SchemaType = mongoose.SchemaType
   , VirtualType = mongoose.VirtualType
-  , ValidatorError = mongoose.Error.ValidatorError
   , SchemaTypes = Schema.Types
   , ObjectId = SchemaTypes.ObjectId
   , Mixed = SchemaTypes.Mixed
   , Buffer = SchemaTypes.Buffer
   , DocumentObjectId = mongoose.Types.ObjectId
-  , MongooseArray = mongoose.Types.Array
 
 /**
  * Test Document constructor.
@@ -400,7 +397,7 @@ describe('schema', function(){
     });
 
     it('order', function(done){
-      function extract (v, self) {
+      function extract (v) {
         return (v && v._id)
           ? v._id
           : v
@@ -442,7 +439,7 @@ describe('schema', function(){
         return 'last';
       }
 
-      function first (v) {
+      function first () {
         return 0;
       }
 
@@ -538,7 +535,7 @@ describe('schema', function(){
       done();
     });
     it('order', function(done){
-      function format (v, self) {
+      function format (v) {
         return v
           ? '$' + v
           : v
@@ -572,7 +569,7 @@ describe('schema', function(){
         return 'last';
       }
 
-      function first (v) {
+      function first () {
         return 0;
       }
 

@@ -26,7 +26,7 @@ mongoose.connect('localhost', 'benchmark-populate', function (err) {
 
     var pending = docs;
     for (var i = 0; i < pending; ++i) {
-      var b = new B({
+      new B({
           as: [a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a]
         , a: a
         , nested: [{ a: a }, { a: a }, { a: a }, { a: a }, { a: a }, { a: a }]
@@ -63,8 +63,6 @@ function test () {
 
 
 function done (err) {
-  var end = Date.now();
-
   if (err) console.error(err.stack);
 
   mongoose.connection.db.dropDatabase(function () {

@@ -7,14 +7,11 @@ var start = require('./common')
   , assert = require('assert')
   , Schema = mongoose.Schema
   , Document = mongoose.Document
-  , SchemaType = mongoose.SchemaType
   , VirtualType = mongoose.VirtualType
-  , ValidatorError = mongoose.Error.ValidatorError
   , SchemaTypes = Schema.Types
   , ObjectId = SchemaTypes.ObjectId
   , Mixed = SchemaTypes.Mixed
   , DocumentObjectId = mongoose.Types.ObjectId
-  , MongooseArray = mongoose.Types.Array
   , ReadPref = mongoose.mongo.ReadPreference
   , vm = require('vm')
 
@@ -24,7 +21,7 @@ var start = require('./common')
 
 function TestDocument () {
   Document.apply(this, arguments);
-};
+}
 
 /**
  * Inherits from Document.
@@ -285,7 +282,7 @@ describe('schema', function(){
             nickname: String
         });
 
-        function Test(){};
+        function Test(){}
         Test.prototype.toString = function(){
           return 'woot';
         };
@@ -439,7 +436,7 @@ describe('schema', function(){
     it('work', function(done){
       function lowercase (v) {
         return v.toLowerCase();
-      };
+      }
 
       var Tobi = new Schema({
           name: { type: String, set: lowercase }
@@ -458,11 +455,11 @@ describe('schema', function(){
     });
 
     it('order', function(done){
-      function extract (v, self) {
+      function extract (v) {
         return (v && v._id)
           ? v._id
           : v
-      };
+      }
 
       var Tobi = new Schema({
           name: { type: Schema.ObjectId, set: extract }
@@ -483,7 +480,7 @@ describe('schema', function(){
         assert.equal('b', this.a);
         assert.equal('name', self.path);
         return v.toLowerCase();
-      };
+      }
 
       var Tobi = new Schema({
           name: { type: String, set: lowercase }
@@ -498,11 +495,11 @@ describe('schema', function(){
         assert.equal('number', typeof v);
         assert.equal(0, v);
         return 'last';
-      };
+      }
 
-      function first (v) {
+      function first () {
         return 0;
-      };
+      }
 
       var Tobi = new Schema({
           name: { type: String, set: last }
@@ -567,7 +564,7 @@ describe('schema', function(){
 
     it('assignment of non-functions throw', function(done){
       var schema = new Schema({ fun: String });
-      var g, s;
+      var g;
 
       try {
         schema.path('fun').set(4);
@@ -585,7 +582,7 @@ describe('schema', function(){
     it('work', function(done){
       function woot (v) {
         return v + ' woot';
-      };
+      }
 
       var Tobi = new Schema({
           name: { type: String, get: woot }
@@ -596,11 +593,11 @@ describe('schema', function(){
       done();
     });
     it('order', function(done){
-      function format (v, self) {
+      function format (v) {
         return v
           ? '$' + v
           : v
-      };
+      }
 
       var Tobi = new Schema({
           name: { type: Number, get: format }
@@ -614,7 +611,7 @@ describe('schema', function(){
         assert.equal('b', this.a);
         assert.equal('name', self.path);
         return v.toLowerCase();
-      };
+      }
 
       var Tobi = new Schema({
           name: { type: String, get: woot }
@@ -628,11 +625,11 @@ describe('schema', function(){
         assert.equal('number', typeof v);
         assert.equal(0, v);
         return 'last';
-      };
+      }
 
-      function first (v) {
+      function first () {
         return 0;
-      };
+      }
 
       var Tobi = new Schema({
           name: { type: String, get: last }
@@ -652,7 +649,7 @@ describe('schema', function(){
     });
     it('assignment of non-functions throw', function(done){
       var schema = new Schema({ fun: String });
-      var g, s;
+      var g;
 
       try {
         schema.path('fun').get(true);
@@ -670,23 +667,23 @@ describe('schema', function(){
       });
       assert.ok(schema.path('_id') instanceof Schema.ObjectId);
 
-      var schema = new Schema({
+      schema = new Schema({
           name: String
       }, { _id: true });
       assert.ok(schema.path('_id') instanceof Schema.ObjectId);
 
-      var schema = new Schema({
+      schema = new Schema({
           name: String
       }, { _id: false });
       assert.equal(undefined, schema.path('_id'));
 
       // old options
-      var schema = new Schema({
+      schema = new Schema({
           name: String
       }, { noId: false });
       assert.ok(schema.path('_id') instanceof Schema.ObjectId);
 
-      var schema = new Schema({
+      schema = new Schema({
           name: String
       }, { noId: true });
       assert.equal(undefined, schema.path('_id'));
@@ -699,23 +696,23 @@ describe('schema', function(){
       });
       assert.ok(schema.virtualpath('id') instanceof mongoose.VirtualType);
 
-      var schema = new Schema({
+      schema = new Schema({
           name: String
       }, { id: true });
       assert.ok(schema.virtualpath('id') instanceof mongoose.VirtualType);
 
-      var schema = new Schema({
+      schema = new Schema({
           name: String
       }, { id: false });
       assert.equal(undefined, schema.virtualpath('id'));
 
       // old options
-      var schema = new Schema({
+      schema = new Schema({
           name: String
       }, { noVirtualId: false });
       assert.ok(schema.virtualpath('id') instanceof mongoose.VirtualType);
 
-      var schema = new Schema({
+      schema = new Schema({
           name: String
       }, { noVirtualId: true });
       assert.equal(undefined, schema.virtualpath('id'));
@@ -1122,8 +1119,8 @@ describe('schema', function(){
       }, /Cannot set nested path/)
       assert.equal(false, ('age' in o.name));
 
-      var o = { name: 'string' }
-      var s = new Schema(o);
+      o = { name: 'string' }
+      s = new Schema(o);
 
       assert.throws(function () {
         s.add({ age: Number }, 'name.');
@@ -1350,8 +1347,6 @@ describe('schema', function(){
     })
 
     it('that do not conflict do not throw', function(done){
-      var child = new Schema({ name: String });
-
       assert.doesNotThrow(function(){
         new Schema({
             model: String
@@ -1369,13 +1364,13 @@ describe('schema', function(){
       assert.doesNotThrow(function(){
         var s = Schema({ docs: [{ path: String }] });
         var M = mongoose.model('gh-1245', s);
-        var m = new M({ docs: [{ path: 'works' }] });
+        new M({ docs: [{ path: 'works' }] });
       });
 
       assert.doesNotThrow(function () {
         var s = Schema({ setMaxListeners: String });
         var M = mongoose.model('setMaxListeners-as-property-name', s);
-        var m = new M({ setMaxListeners: 'works' });
+        new M({ setMaxListeners: 'works' });
       })
 
       done();

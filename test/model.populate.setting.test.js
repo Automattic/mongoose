@@ -1,3 +1,4 @@
+/* eslint no-dupe-keys: 1 */
 
 /**
  * Test dependencies.
@@ -9,7 +10,6 @@ var start = require('./common')
   , utils = require('../lib/utils')
   , random = utils.random
   , Schema = mongoose.Schema
-  , ObjectId = Schema.ObjectId
   , DocObjectId = mongoose.Types.ObjectId
 
 /**
@@ -42,11 +42,10 @@ describe('model: populate:', function(){
 
     Object.keys(types).forEach(function (id) {
       describe('should not cast to _id of type ' + id, function(){
-        var ID = types[id];
         var refuser;
         var db;
         var B, U;
-        var u1, u2;
+        var u1;
         var b1, b2
 
         before(function(done){
@@ -84,7 +83,6 @@ describe('model: populate:', function(){
           }, function (err, fan1, fan2) {
             assert.ifError(err);
             u1 = fan1;
-            u2 = fan2;
 
             B.create({
                 title : 'Woot'

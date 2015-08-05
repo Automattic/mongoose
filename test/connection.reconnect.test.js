@@ -1,7 +1,6 @@
 
 var start = require('./common');
 var mongoose = start.mongoose;
-var assert = require('assert');
 
 describe('connection: manual reconnect with authReconnect: false', function(){
   it('should continue processing queries/writes', function(done){
@@ -38,7 +37,7 @@ describe('connection: manual reconnect with authReconnect: false', function(){
       if (!open) return;
       M.create({ name: times }, function (err, doc) {
         if (err) return complete(err);
-        M.findOne({ _id: doc._id }, function (err, found) {
+        M.findOne({ _id: doc._id }, function (err) {
           if (err) return complete(err);
           if (times > 1) {
             return complete();

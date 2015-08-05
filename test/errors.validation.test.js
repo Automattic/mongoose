@@ -6,12 +6,9 @@
 var assert = require('assert')
   , start = require('./common')
   , mongoose = start.mongoose
-  , EmbeddedDocument = require('../lib/types/embedded')
-  , DocumentArray = require('../lib/types/documentarray')
   , Schema = mongoose.Schema
   , SchemaType = mongoose.SchemaType
   , ValidatorError = SchemaType.ValidatorError
-  , ValidationError = mongoose.Document.ValidationError
 
 describe('ValidationError', function(){
   describe('#infiniteRecursion', function() {
@@ -70,7 +67,7 @@ describe('ValidationError', function(){
         //should pass validation
         model.validate(function(err) {
           assert.equal(err, null);
-          done();  
+          done();
         });
       });
     });
@@ -100,7 +97,7 @@ describe('ValidationError', function(){
         //should pass validation
         model.validate(function(err) {
           assert.equal(err, null, 'max Date validation failed');
-          done();  
+          done();
         });
       });
     });
@@ -130,7 +127,7 @@ describe('ValidationError', function(){
         //should pass validation
         model.validate(function(err) {
           assert.equal(err, null);
-          done();  
+          done();
         });
       });
     });
@@ -160,7 +157,7 @@ describe('ValidationError', function(){
         //should pass validation
         model.validate(function(err) {
           assert.equal(err, null);
-          done();  
+          done();
         });
       });
     });

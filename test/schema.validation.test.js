@@ -343,8 +343,15 @@ describe('schema', function(){
           date: { type: Date, required: true }
         });
 
-        HappyBirthday.path('date').doValidate('', function (err) {
+        var BdayModel = mongoose.model('schema-validation-date-'+random(), HappyBirthday);
+
+        var bday = new BdayModel({
+            date: ''
+        });
+
+        bday.validate(function (err) {
           assert.ok(err instanceof ValidatorError);
+          done();
         });
       });
 

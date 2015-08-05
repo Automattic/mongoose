@@ -742,10 +742,10 @@ describe('model', function() {
 
                 done();
               });
-            })
+            });
           });
         });
-      })
+      });
 
       it('reference in child schemas (gh-2719-2)', function(done){
         var EventSchema, Event, TalkSchema, Talk, Survey;
@@ -804,9 +804,9 @@ describe('model', function() {
 
               done();
             });
-          })
+          });
         });
-      })
+      });
     });
 
     describe('aggregate', function() {

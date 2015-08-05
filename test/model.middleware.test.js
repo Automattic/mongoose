@@ -131,7 +131,7 @@ describe('model middleware', function(){
     });
 
     var preinit = 0
-      , postinit = 0
+      , postinit = 0;
 
     schema.pre('init', function (next) {
       ++preinit;
@@ -231,7 +231,7 @@ describe('model middleware', function(){
     var preValidate = 0
       , postValidate = 0
       , preRemove = 0
-      , postRemove = 0
+      , postRemove = 0;
 
     schema.pre('validate', function (next) {
       ++preValidate;
@@ -272,7 +272,7 @@ describe('model middleware', function(){
         assert.equal(1, preRemove);
         assert.equal(1, postRemove);
         done();
-      })
+      });
     });
-  })
+  });
 });

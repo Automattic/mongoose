@@ -13,9 +13,9 @@ describe('connection:', function(){
         assert.ok(conn.options.auth);
         assert.equal('users', conn.options.auth.authSource);
         done();
-      }
+      };
       conn.open(start.uri + '?authSource=users');
-    })
+    });
 
     it('passed as an option', function(done){
       var conn = mongoose.createConnection();
@@ -24,8 +24,8 @@ describe('connection:', function(){
         assert.ok(conn.options.auth);
         assert.equal('users', conn.options.auth.authSource);
         done();
-      }
+      };
       conn.open(start.uri, { auth: { authSource: 'users' }});
-    })
-  })
-})
+    });
+  });
+});

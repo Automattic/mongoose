@@ -39,13 +39,13 @@ describe('model: populate: divergent arrays', function(){
       M.create({ array: [0, 1, 2] }, function (err) {
         assert.ifError(err);
         done();
-      })
-    })
-  })
+      });
+    });
+  });
 
   after(function(done){
-    db.close(done)
-  })
+    db.close(done);
+  });
 
   function test (check, fn) {
     it('using $set', function(done){
@@ -55,9 +55,9 @@ describe('model: populate: divergent arrays', function(){
         doc.save(function (err) {
           check(err);
           done();
-        })
+        });
       });
-    })
+    });
     it('using $pop 1', function(done){
       fn(function (err, doc) {
         assert.ifError(err);
@@ -65,9 +65,9 @@ describe('model: populate: divergent arrays', function(){
         doc.save(function (err) {
           check(err);
           done();
-        })
+        });
       });
-    })
+    });
     it('using $pop -1', function(done){
       fn(function (err, doc) {
         assert.ifError(err);
@@ -75,9 +75,9 @@ describe('model: populate: divergent arrays', function(){
         doc.save(function (err) {
           check(err);
           done();
-        })
+        });
       });
-    })
+    });
   }
 
   function testOk (fn) {
@@ -95,51 +95,51 @@ describe('model: populate: divergent arrays', function(){
     testFails(function (cb) {
       M.findOne().populate({ path: 'array', match: { name: 'one' }}).exec(cb);
     });
-  })
+  });
   describe('from skip', function(){
     describe('2', function(){
       testFails(function (cb) {
         M.findOne().populate({ path: 'array', options: { skip: 2 }}).exec(cb);
       });
-    })
+    });
     describe('0', function(){
       testOk(function (cb) {
         M.findOne().populate({ path: 'array', options: { skip: 0 }}).exec(cb);
       });
-    })
-  })
+    });
+  });
   describe('from limit', function(){
     describe('0', function(){
       testFails(function (cb) {
         M.findOne().populate({ path: 'array', options: { limit: 0 }}).exec(cb);
       });
-    })
+    });
     describe('1', function(){
       testFails(function (cb) {
         M.findOne().populate({ path: 'array', options: { limit: 1 }}).exec(cb);
       });
-    })
-  })
+    });
+  });
   describe('from deselected _id', function(){
     describe('using string and only -_id', function(){
       testFails(function (cb) {
         M.findOne().populate({ path: 'array', select: '-_id'}).exec(cb);
       });
-    })
+    });
     describe('using string', function(){
       testFails(function (cb) {
         M.findOne().populate({ path: 'array', select: 'name -_id'}).exec(cb);
       });
-    })
+    });
     describe('using object and only _id: 0', function(){
       testFails(function (cb) {
         M.findOne().populate({ path: 'array', select: { _id: 0 }}).exec(cb);
       });
-    })
+    });
     describe('using object', function(){
       testFails(function (cb) {
         M.findOne().populate({ path: 'array', select: { _id: 0, name: 1 }}).exec(cb);
       });
-    })
-  })
-})
+    });
+  });
+});

@@ -7,7 +7,7 @@ var start = require('./common')
   , mongoose = start.mongoose
   , random = require('../lib/utils').random
   , Schema = mongoose.Schema
-  , DocumentObjectId = mongoose.Types.ObjectId
+  , DocumentObjectId = mongoose.Types.ObjectId;
 
 /**
  * Setup
@@ -15,7 +15,7 @@ var start = require('./common')
 
 var schema = Schema({
     title: String
-})
+});
 
 
 describe('model', function(){
@@ -26,11 +26,11 @@ describe('model', function(){
     before(function(){
       db = start();
       B = db.model('model-create', schema, 'model-create-'+random());
-    })
+    });
 
     after(function(done){
       db.close(done);
-    })
+    });
 
     it('accepts an array and returns an array', function(done){
       B.create([{ title: 'hi'}, { title: 'bye'}], function (err, posts) {
@@ -78,7 +78,7 @@ describe('model', function(){
       this.timeout(1000);
       var db = start()
         , countPre = 0
-        , countPost = 0
+        , countPost = 0;
 
       var SchemaWithPreSaveHook = new Schema ({
         preference: String
@@ -91,7 +91,7 @@ describe('model', function(){
         }, 500);
       });
       SchemaWithPreSaveHook.post('save', function () {
-        countPost++
+        countPost++;
       });
       var MWPSH = db.model('mwpsh', SchemaWithPreSaveHook);
       MWPSH.create([
@@ -129,7 +129,7 @@ describe('model', function(){
           assert.equal('optional callback', doc.title);
           done();
         }, done).end();
-      })
+      });
 
       it('with more than one doc', function(done){
         var p = B.create({ title: 'optional callback 2' }, { title: 'orient expressions' });
@@ -138,7 +138,7 @@ describe('model', function(){
           assert.equal('orient expressions', doc2.title);
           done();
         }, done).end();
-      })
+      });
 
       it('with array of docs', function(done){
         var p = B.create([{ title: 'optional callback3' }, { title: '3' }]);
@@ -151,7 +151,7 @@ describe('model', function(){
           assert.equal('3', doc2.title);
           done();
         }, done).end();
-      })
+      });
 
       it('and should reject promise on error', function(done){
         var p = B.create({ title: 'optional callback 4' });
@@ -164,7 +164,7 @@ describe('model', function(){
             done();
           }).end();
         }, done).end();
-      })
-    })
+      });
+    });
   });
-})
+});

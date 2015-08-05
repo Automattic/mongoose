@@ -6,7 +6,7 @@
 var start = require('./common')
   , mongoose = start.mongoose
   , assert = require('assert')
-  , Schema = mongoose.Schema
+  , Schema = mongoose.Schema;
 
 describe('schematype', function(){
   describe('boolean', function(){
@@ -17,7 +17,7 @@ describe('schematype', function(){
         , s2 = new Schema({ b: { type: Boolean, default: false }})
         , M2 = db.model('NullDateDefaultIsAllowed2', s2)
         , s3 = new Schema({ b: { type: Boolean, default: true }})
-        , M3 = db.model('NullDateDefaultIsAllowed3', s3)
+        , M3 = db.model('NullDateDefaultIsAllowed3', s3);
 
       db.close();
 
@@ -28,6 +28,6 @@ describe('schematype', function(){
       var m3 = new M3;
       assert.strictEqual(true, m3.b);
       done();
-    })
-  })
-})
+    });
+  });
+});

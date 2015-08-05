@@ -13,7 +13,7 @@ describe('mongoose module:', function(){
     it('without options', function(done){
       var goose = new Mongoose;
       var db = goose.connection
-        , uri = 'mongodb://localhost/mongoose_test'
+        , uri = 'mongodb://localhost/mongoose_test';
 
       goose.connect(process.env.MONGOOSE_TEST_URI || uri);
 
@@ -22,12 +22,12 @@ describe('mongoose module:', function(){
           done();
         });
       });
-    })
+    });
 
     it('with options', function(done){
       var goose = new Mongoose;
       var db = goose.connection
-        , uri = 'mongodb://localhost/mongoose_test'
+        , uri = 'mongodb://localhost/mongoose_test';
 
       goose.connect(process.env.MONGOOSE_TEST_URI || uri, {db:{safe:false}});
 
@@ -36,7 +36,7 @@ describe('mongoose module:', function(){
           done();
         });
       });
-    })
+    });
   });
 
   it('{g,s}etting options', function(done){
@@ -69,8 +69,8 @@ describe('mongoose module:', function(){
     mong.model('GlobalPlugins', schema);
 
     assert.equal(2, called);
-    done()
-  })
+    done();
+  });
 
   describe('disconnection of all connections', function(){
     describe('no callback', function(){
@@ -118,7 +118,7 @@ describe('mongoose module:', function(){
 
       it('properly handles errors', function(done){
         var mong = new Mongoose()
-          , uri = 'mongodb://localhost/mongoose_test'
+          , uri = 'mongodb://localhost/mongoose_test';
 
         mong.connect(process.env.MONGOOSE_TEST_URI || uri);
         var db = mong.connection;
@@ -136,12 +136,12 @@ describe('mongoose module:', function(){
         }
         assert.equal('bam', failure.message);
         done();
-      })
+      });
     });
 
     it('with callback', function(done){
       var mong = new Mongoose()
-        , uri = 'mongodb://localhost/mongoose_test'
+        , uri = 'mongodb://localhost/mongoose_test';
 
       mong.connect(process.env.MONGOOSE_TEST_URI || uri);
 
@@ -166,7 +166,7 @@ describe('mongoose module:', function(){
       }
 
       assert.equal(true, thrown);
-      done()
+      done();
     });
 
     it('returns the model at creation', function(done){
@@ -180,7 +180,7 @@ describe('mongoose module:', function(){
       var Numbered = mongoose.model('Numbered', schema, collection);
       var n3 = new Numbered({ number: 1234 });
       assert.equal(1234, n3.number.valueOf());
-      done()
+      done();
     });
 
     it('prevents overwriting pre-existing models', function(done){
@@ -192,7 +192,7 @@ describe('mongoose module:', function(){
       }, /Cannot overwrite `A` model/);
 
       done();
-    })
+    });
 
     it('allows passing identical name + schema args', function(done){
       var m = new Mongoose;
@@ -204,7 +204,7 @@ describe('mongoose module:', function(){
       });
 
       done();
-    })
+    });
 
     it('throws on unknown model name', function(done){
       assert.throws(function () {
@@ -212,7 +212,7 @@ describe('mongoose module:', function(){
       }, /Schema hasn't been registered/);
 
       done();
-    })
+    });
 
     describe('passing collection name', function(){
       describe('when model name already exists', function(){
@@ -228,9 +228,9 @@ describe('mongoose module:', function(){
           assert.ok(m.models[name].collection.name != C.collection.name);
           assert.ok(m.models[name].collection.name == A.collection.name);
           done();
-        })
-      })
-    })
+        });
+      });
+    });
 
     describe('passing object literal schemas', function(){
       it('works', function(done){
@@ -238,9 +238,9 @@ describe('mongoose module:', function(){
         var A = m.model('A', { n: [{ age: 'number' }]});
         var a = new A({ n: [{ age: '47' }] });
         assert.strictEqual(47, a.n[0].age);
-        done()
-      })
-    })
+        done();
+      });
+    });
   });
 
   it('connecting with a signature of host, database, function', function(done){
@@ -266,11 +266,11 @@ describe('mongoose module:', function(){
         mong.connection.close();
         done();
       });
-    })
+    });
 
     it('with replica set', function(done){
       var mong = new Mongoose()
-        , uri = process.env.MONGOOSE_SET_TEST_URI
+        , uri = process.env.MONGOOSE_SET_TEST_URI;
 
       if (!uri) return done();
 
@@ -279,7 +279,7 @@ describe('mongoose module:', function(){
         mong.connection.close();
         done();
       });
-    })
+    });
   });
 
   it('goose.connect() to a replica set', function(done){
@@ -293,7 +293,7 @@ describe('mongoose module:', function(){
       return done();
     }
 
-    var mong = new Mongoose()
+    var mong = new Mongoose();
 
     mong.connect(uri, function (err) {
       assert.ifError(err);
@@ -388,11 +388,11 @@ describe('mongoose module:', function(){
     it('of module', function(done){
       test(mongoose);
       done();
-    })
+    });
     it('of new Mongoose instances', function(done){
       test(new mongoose.Mongoose);
       done();
-    })
-  })
+    });
+  });
 
 });

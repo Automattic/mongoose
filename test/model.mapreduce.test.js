@@ -47,7 +47,7 @@ mongoose.model('MapReduce', BlogPost);
 describe('model: mapreduce:', function(){
   it('works', function(done){
     var db = start()
-      , MR = db.model('MapReduce', collection)
+      , MR = db.model('MapReduce', collection);
 
     var magicID;
     var id = new mongoose.Types.ObjectId;
@@ -64,9 +64,9 @@ describe('model: mapreduce:', function(){
       magicID = b._id;
 
       var o = {
-          map: function () { emit(this.author, 1) }
-        , reduce: function (k, vals) { return vals.length }
-      }
+          map: function () { emit(this.author, 1); }
+        , reduce: function (k, vals) { return vals.length; }
+      };
 
       MR.mapReduce(o, function (err, ret, stats) {
         assert.ifError(err);
@@ -80,10 +80,10 @@ describe('model: mapreduce:', function(){
         });
 
         var o = {
-            map: function () { emit(this.author, 1) }
-          , reduce: function (k, vals) { return vals.length }
+            map: function () { emit(this.author, 1); }
+          , reduce: function (k, vals) { return vals.length; }
           , query: { author: 'aaron', published: 1, owners: id }
-        }
+        };
 
         MR.mapReduce(o, function (err, ret, stats) {
           assert.ifError(err);
@@ -100,11 +100,11 @@ describe('model: mapreduce:', function(){
 
       function modeling () {
         var o = {
-            map: function () { emit(this.author, { own: magicID }) }
+            map: function () { emit(this.author, { own: magicID }); }
           , scope: { magicID: magicID }
-          , reduce: function (k, vals) { return { own: vals[0].own, count: vals.length }}
+          , reduce: function (k, vals) { return { own: vals[0].own, count: vals.length };}
           , out: { replace: '_mapreduce_test_' + random() }
-        }
+        };
 
         MR.mapReduce(o, function (err, ret) {
           assert.ifError(err);
@@ -138,23 +138,23 @@ describe('model: mapreduce:', function(){
                 assert.ifError(err);
                 assert.equal('guillermo', doc.value.own.author);
                 done();
-              })
+              });
             });
           });
         });
       }
     });
-  })
+  });
 
   it('withholds stats with false verbosity', function(done){
     var db = start()
-      , MR = db.model('MapReduce', collection)
+      , MR = db.model('MapReduce', collection);
 
     var o = {
         map: function () {}
-      , reduce: function () { return 'test' }
+      , reduce: function () { return 'test'; }
       , verbose: false
-    }
+    };
 
     MR.mapReduce(o, function (err, results, stats){
       assert.equal('undefined', typeof stats);
@@ -165,12 +165,12 @@ describe('model: mapreduce:', function(){
   describe('promises (gh-1628)', function () {
     it('are returned', function(done){
       var db = start()
-        , MR = db.model('MapReduce', collection)
+        , MR = db.model('MapReduce', collection);
 
       var o = {
           map: function () {}
-        , reduce: function () { return 'test' }
-      }
+        , reduce: function () { return 'test'; }
+      };
 
       var promise = MR.mapReduce(o, function(){});
       assert.ok(promise instanceof mongoose.Promise);
@@ -180,13 +180,13 @@ describe('model: mapreduce:', function(){
 
     it('allow not passing a callback', function(done){
       var db = start()
-        , MR = db.model('MapReduce', collection)
+        , MR = db.model('MapReduce', collection);
 
       var o = {
-          map: function () { emit(this.author, 1) }
-        , reduce: function (k, vals) { return vals.length }
+          map: function () { emit(this.author, 1); }
+        , reduce: function (k, vals) { return vals.length; }
         , query: { author: 'aaron', published: 1 }
-      }
+      };
 
       function validate (ret, stats) {
         assert.ok(Array.isArray(ret));
@@ -204,10 +204,10 @@ describe('model: mapreduce:', function(){
 
       assert.doesNotThrow(function(){
         promise = MR.mapReduce(o);
-      })
+      });
 
       promise.then(validate, assert.ifError).then(finish).end();
-    })
+    });
 
   });
 });

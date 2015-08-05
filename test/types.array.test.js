@@ -9,7 +9,7 @@ var start = require('./common')
   , Schema = mongoose.Schema
   , random = require('../lib/utils').random
   , MongooseArray = mongoose.Types.Array
-  , collection = 'avengers_'+random()
+  , collection = 'avengers_'+random();
 
 var User = new Schema({
     name: String
@@ -45,7 +45,7 @@ describe('types array', function(){
       var threw = false;
 
       try {
-        b.hasAtomics
+        b.hasAtomics;
       } catch (_) {
         threw = true;
       }
@@ -64,7 +64,7 @@ describe('types array', function(){
       done();
     });
 
-  })
+  });
 
   describe('indexOf()', function(){
     it('works', function(done){
@@ -110,8 +110,8 @@ describe('types array', function(){
         });
       }
 
-    })
-  })
+    });
+  });
 
   describe('push()', function(){
     var db, N, S, B, M, D, ST;
@@ -120,7 +120,7 @@ describe('types array', function(){
       doc.save(function (err) {
         if (err) return cb(err);
         doc.constructor.findById(doc._id, cb);
-      })
+      });
     }
 
     before(function(done){
@@ -135,11 +135,11 @@ describe('types array', function(){
           lowercase: true
       }] }));
       done();
-    })
+    });
 
     after(function(done){
-      db.close(done)
-    })
+      db.close(done);
+    });
 
     it('works with numbers', function(done){
       var m = new N({ arr: [3,4,5,6] });
@@ -185,7 +185,7 @@ describe('types array', function(){
           done();
         });
       });
-    })
+    });
 
     it('works with buffers', function(done){
       var m = new B({ arr: [[0], new Buffer(1)] });
@@ -210,7 +210,7 @@ describe('types array', function(){
           done();
         });
       });
-    })
+    });
 
     it('works with mixed', function(done){
       var m = new M({ arr: [3,{x:1},'yes', [5]] });
@@ -254,10 +254,10 @@ describe('types array', function(){
             assert.strictEqual('', doc.arr[6].toString());
 
             done();
-          })
+          });
         });
       });
-    })
+    });
 
     it('works with sub-docs', function(done){
       var m = new D({ arr: [{name:'aaron'}, {name:'moombahton '}] });
@@ -278,9 +278,9 @@ describe('types array', function(){
           assert.equal("Restrepo", doc.arr[2].name);
 
           done();
-        })
-      })
-    })
+        });
+      });
+    });
 
     it('applies setters (gh-3032)', function(done){
       var m = new ST({ arr: ["ONE", "TWO"] });
@@ -302,8 +302,8 @@ describe('types array', function(){
           done();
         });
       });
-    })
-  })
+    });
+  });
 
   describe('splice()', function(){
     it('works', function(done){
@@ -336,7 +336,7 @@ describe('types array', function(){
           });
         });
       });
-    })
+    });
 
     it('on embedded docs', function(done){
       var collection = 'splicetest-embeddeddocs' + random();
@@ -375,7 +375,7 @@ describe('types array', function(){
         });
       });
     });
-  })
+  });
 
   describe('unshift()', function(){
     it('works', function(done){
@@ -457,7 +457,7 @@ describe('types array', function(){
           });
         });
       });
-    })
+    });
 
     it('applies setters (gh-3032)', function(done){
       var db = start();
@@ -484,7 +484,7 @@ describe('types array', function(){
           db.close(done);
         });
       });
-    })
+    });
   });
 
   describe('shift()', function(){
@@ -494,7 +494,7 @@ describe('types array', function(){
               types: [new Schema({ type: String })]
             , nums: [Number]
             , strs: [String]
-          })
+          });
 
       var A = db.model('shift', schema, 'unshift'+random());
 
@@ -563,7 +563,7 @@ describe('types array', function(){
     it('works', function(done){
       // atomic shift uses $pop -1
       var db= start();
-      var painting = new Schema({ colors: [] })
+      var painting = new Schema({ colors: [] });
       var Painting= db.model('Painting', painting);
       var p = new Painting({ colors : ['blue', 'green', 'yellow'] });
       p.save(function (err) {
@@ -591,7 +591,7 @@ describe('types array', function(){
                 db.close();
                 assert.ifError(err);
                 assert.equal(1, doc.colors.length);
-                assert.equal(doc.colors[0], 'yellow')
+                assert.equal(doc.colors[0], 'yellow');
                 done();
               });
             });
@@ -599,7 +599,7 @@ describe('types array', function(){
         });
       });
     });
-  })
+  });
 
   describe('pop()', function(){
     it('works', function(done){
@@ -608,7 +608,7 @@ describe('types array', function(){
               types: [new Schema({ type: String })]
             , nums: [Number]
             , strs: [String]
-          })
+          });
 
       var A = db.model('pop', schema, 'pop'+random());
 
@@ -670,13 +670,13 @@ describe('types array', function(){
           });
         });
       });
-    })
-  })
+    });
+  });
 
   describe('pull()', function(){
     it('works', function(done){
       var db= start();
-      var catschema = new Schema({ name: String })
+      var catschema = new Schema({ name: String });
       var Cat = db.model('Cat', catschema);
       var schema = new Schema({
           a: [{ type: Schema.ObjectId, ref: 'Cat' }]
@@ -702,12 +702,12 @@ describe('types array', function(){
       });
     });
 
-  })
+  });
 
   describe('$pop()', function(){
     it('works', function(done){
       var db= start();
-      var painting = new Schema({ colors: [] })
+      var painting = new Schema({ colors: [] });
       var Painting= db.model('Painting', painting);
       var p = new Painting({ colors : ['blue', 'green', 'yellow'] });
       p.save(function (err) {
@@ -736,14 +736,14 @@ describe('types array', function(){
                 db.close();
                 assert.strictEqual(null, err);
                 assert.equal(1, doc.colors.length);
-                assert.equal(doc.colors[0], 'blue')
+                assert.equal(doc.colors[0], 'blue');
                 done();
               });
             });
           });
         });
       });
-    })
+    });
   });
 
   describe('addToSet()', function(){
@@ -828,9 +828,9 @@ describe('types array', function(){
           assert.ok(~m.date.indexOf(d3.toString()));
 
           assert.equal(m.doc.length,3);
-          assert.ok(m.doc.some(function(v){return v.name === 'Waltz'}))
-          assert.ok(m.doc.some(function(v){return v.name === 'Dubstep'}))
-          assert.ok(m.doc.some(function(v){return v.name === 'Polka'}))
+          assert.ok(m.doc.some(function(v){return v.name === 'Waltz';}));
+          assert.ok(m.doc.some(function(v){return v.name === 'Dubstep';}));
+          assert.ok(m.doc.some(function(v){return v.name === 'Polka';}));
 
           // test single $addToSet
           m.num.addToSet(3,4,5,6);
@@ -881,10 +881,10 @@ describe('types array', function(){
               assert.ok(~m.date.indexOf(d4.toString()));
 
               assert.equal(m.doc.length,4);
-              assert.ok(m.doc.some(function(v){return v.name === 'Waltz'}));
-              assert.ok(m.doc.some(function(v){return v.name === 'Dubstep'}));
-              assert.ok(m.doc.some(function(v){return v.name === 'Polka'}));
-              assert.ok(m.doc.some(function(v){return v.name === '8bit'}));
+              assert.ok(m.doc.some(function(v){return v.name === 'Waltz';}));
+              assert.ok(m.doc.some(function(v){return v.name === 'Dubstep';}));
+              assert.ok(m.doc.some(function(v){return v.name === 'Polka';}));
+              assert.ok(m.doc.some(function(v){return v.name === '8bit';}));
 
               // test multiple $addToSet
               m.num.addToSet(7,8);
@@ -944,12 +944,12 @@ describe('types array', function(){
                   assert.ok(~m.date.indexOf(d6.toString()));
 
                   assert.equal(m.doc.length,6);
-                  assert.ok(m.doc.some(function(v){return v.name === 'Waltz'}))
-                  assert.ok(m.doc.some(function(v){return v.name === 'Dubstep'}))
-                  assert.ok(m.doc.some(function(v){return v.name === 'Polka'}))
-                  assert.ok(m.doc.some(function(v){return v.name === '8bit'}))
-                  assert.ok(m.doc.some(function(v){return v.name === 'BigBeat'}))
-                  assert.ok(m.doc.some(function(v){return v.name === 'Funk'}))
+                  assert.ok(m.doc.some(function(v){return v.name === 'Waltz';}));
+                  assert.ok(m.doc.some(function(v){return v.name === 'Dubstep';}));
+                  assert.ok(m.doc.some(function(v){return v.name === 'Polka';}));
+                  assert.ok(m.doc.some(function(v){return v.name === '8bit';}));
+                  assert.ok(m.doc.some(function(v){return v.name === 'BigBeat';}));
+                  assert.ok(m.doc.some(function(v){return v.name === 'Funk';}));
                   done();
                 });
               });
@@ -979,8 +979,8 @@ describe('types array', function(){
         m.save(function(error, m) {
           assert.ifError(error);
           assert.equal(2, m.doc.length);
-          assert.ok(m.doc.some(function(v) { return v.name === 'Rap' }));
-          assert.ok(m.doc.some(function(v) { return v.name === 'House' }));
+          assert.ok(m.doc.some(function(v) { return v.name === 'Rap'; }));
+          assert.ok(m.doc.some(function(v) { return v.name === 'House'; }));
           db.close(done);
         });
       });
@@ -1011,8 +1011,8 @@ describe('types array', function(){
           db.close(done);
         });
       });
-    })
-  })
+    });
+  });
 
   describe('nonAtomicPush()', function(){
     it('works', function(done){
@@ -1051,7 +1051,7 @@ describe('types array', function(){
         });
       });
     });
-  })
+  });
 
   describe('sort()', function(){
     it('order should be saved', function(done){
@@ -1082,7 +1082,7 @@ describe('types array', function(){
 
               m.x.sort(function(a,b){
                 return b > a;
-              })
+              });
 
               m.save(function (err) {
                 assert.ifError(err);
@@ -1094,14 +1094,14 @@ describe('types array', function(){
                   assert.equal(2, m.x[2]);
                   assert.equal(1, m.x[3]);
                   db.close(done);
-                })
-              })
-            })
-          })
+                });
+              });
+            });
+          });
         });
-      })
-    })
-  })
+      });
+    });
+  });
 
   describe('set()', function(){
     var db, N, S, B, M, D, ST;
@@ -1110,7 +1110,7 @@ describe('types array', function(){
       doc.save(function (err) {
         if (err) return cb(err);
         doc.constructor.findById(doc._id, cb);
-      })
+      });
     }
 
     before(function(done){
@@ -1125,11 +1125,11 @@ describe('types array', function(){
           lowercase: true
       }] }));
       done();
-    })
+    });
 
     after(function(done){
-      db.close(done)
-    })
+      db.close(done);
+    });
 
     it('works combined with other ops', function(done){
       var m = new N({ arr: [3,4,5,6] });
@@ -1177,7 +1177,7 @@ describe('types array', function(){
       });
 
       // after this works go back to finishing doc.populate() branch
-    })
+    });
 
     it('works with numbers', function(done){
       var m = new N({ arr: [3,4,5,6] });
@@ -1220,7 +1220,7 @@ describe('types array', function(){
             assert.equal(null, doc.arr[7]);
             assert.strictEqual(1, doc.arr[8]);
             done();
-          })
+          });
         });
       });
     });
@@ -1266,10 +1266,10 @@ describe('types array', function(){
             assert.equal(null, doc.arr[7]);
             assert.strictEqual('yo', doc.arr[8]);
             done();
-          })
+          });
         });
       });
-    })
+    });
 
     it('works with buffers', function(done){
       var m = new B({ arr: [[0], new Buffer(1)] });
@@ -1298,7 +1298,7 @@ describe('types array', function(){
           done();
         });
       });
-    })
+    });
 
     it('works with mixed', function(done){
       var m = new M({ arr: [3,{x:1},'yes', [5]] });
@@ -1350,10 +1350,10 @@ describe('types array', function(){
             assert.equal('', doc.arr[9].toString());
 
             done();
-          })
+          });
         });
       });
-    })
+    });
 
     it('works with sub-docs', function(done){
       var m = new D({ arr: [{name:'aaron'}, {name:'moombahton '}] });
@@ -1376,7 +1376,7 @@ describe('types array', function(){
           assert.equal("moombahton ", doc.arr[1].name);
           assert.equal("Restrepo", doc.arr[2].name);
 
-          doc.arr.set(10, { name: 'temple of doom' })
+          doc.arr.set(10, { name: 'temple of doom' });
           assert.equal(11, doc.arr.length);
           assert.equal('temple of doom', doc.arr[10].name);
           assert.equal(null, doc.arr[9]);
@@ -1394,7 +1394,7 @@ describe('types array', function(){
             assert.equal('temple of doom', doc.arr[10].name);
 
             doc.arr.remove(doc.arr[0]);
-            doc.arr.set(7, { name: 7 })
+            doc.arr.set(7, { name: 7 });
             assert.strictEqual("7", doc.arr[7].name);
             assert.equal(10, doc.arr.length);
 
@@ -1415,9 +1415,9 @@ describe('types array', function(){
             });
           });
 
-        })
-      })
-    })
+        });
+      });
+    });
 
     it('applies setters (gh-3032)', function(done){
       var m = new ST({ arr: ["ONE", "TWO"] });
@@ -1442,8 +1442,8 @@ describe('types array', function(){
           done();
         });
       });
-    })
-  })
+    });
+  });
 
   describe('setting a doc array', function(){
     it('should adjust path positions', function(done){
@@ -1486,8 +1486,8 @@ describe('types array', function(){
           });
         });
       });
-    })
-  })
+    });
+  });
 
   describe('paths with similar names', function(){
     it('should be saved', function(done){
@@ -1532,8 +1532,8 @@ describe('types array', function(){
           });
         });
       });
-    })
-  })
+    });
+  });
 
   describe('of number', function(){
     it('allows nulls', function(done){
@@ -1554,8 +1554,8 @@ describe('types array', function(){
           done();
         });
       });
-    })
-  })
+    });
+  });
 
   it('modifying subdoc props and manipulating the array works (gh-842)', function(done){
     var db= start();
@@ -1597,7 +1597,7 @@ describe('types array', function(){
         });
       });
     });
-  })
+  });
 
   it('pushing top level arrays and subarrays works (gh-1073)', function(done){
     var db= start();
@@ -1635,7 +1635,7 @@ describe('types array', function(){
         , DefaultArraySchema = new Schema({
             num1: Array
           , num2: []
-          })
+        });
 
       mongoose.model('DefaultArraySchema', DefaultArraySchema);
       var DefaultArray = db.model('DefaultArraySchema', collection);
@@ -1649,9 +1649,9 @@ describe('types array', function(){
         , threw2 = false;
 
       try {
-        arr.num1.push({ x: 1 })
-        arr.num1.push(9)
-        arr.num1.push("woah")
+        arr.num1.push({ x: 1 });
+        arr.num1.push(9);
+        arr.num1.push("woah");
       } catch (err) {
         threw1 = true;
       }
@@ -1659,17 +1659,17 @@ describe('types array', function(){
       assert.equal(threw1, false);
 
       try {
-        arr.num2.push({ x: 1 })
-        arr.num2.push(9)
-        arr.num2.push("woah")
+        arr.num2.push({ x: 1 });
+        arr.num2.push(9);
+        arr.num2.push("woah");
       } catch (err) {
         threw2 = true;
       }
 
       assert.equal(threw2, false);
       done();
-    })
-  })
+    });
+  });
 
   describe('removing from an array atomically using MongooseArray#remove', function(){
     var db;
@@ -1682,16 +1682,16 @@ describe('types array', function(){
         , stringIds: [{ _id: 'string', name: 'string' }]
         , bufferIds: [{ _id: 'buffer', name: 'string' }]
         , oidIds:    [{ name: 'string' }]
-      })
+      });
 
       db = start();
       B = db.model('BlogPost', schema);
       done();
-    })
+    });
 
     after(function(done){
       db.close(done);
-    })
+    });
 
     it('works', function(done){
       var post = new B;
@@ -1726,17 +1726,17 @@ describe('types array', function(){
           });
         });
       });
-    })
+    });
 
     describe('with subdocs', function(){
       function docs (arr) {
         return arr.map(function (val) {
-          return { _id: val }
+          return { _id: val };
         });
       }
 
       it('supports passing strings', function(done){
-        var post = new B({ stringIds: docs('a b c d'.split(' ')) })
+        var post = new B({ stringIds: docs('a b c d'.split(' ')) });
         post.save(function (err) {
           assert.ifError(err);
           B.findById(post, function (err, post) {
@@ -1749,13 +1749,13 @@ describe('types array', function(){
                 assert.equal(3, post.stringIds.length);
                 assert.ok(!post.stringIds.id('b'));
                 done();
-              })
-            })
-          })
-        })
-      })
+              });
+            });
+          });
+        });
+      });
       it('supports passing numbers', function(done){
-        var post = new B({ numberIds: docs([1,2,3,4]) })
+        var post = new B({ numberIds: docs([1,2,3,4]) });
         post.save(function (err) {
           assert.ifError(err);
           B.findById(post, function (err, post) {
@@ -1769,17 +1769,17 @@ describe('types array', function(){
                 assert.ok(!post.numberIds.id(2));
                 assert.ok(!post.numberIds.id(4));
                 done();
-              })
-            })
-          })
-        })
-      })
+              });
+            });
+          });
+        });
+      });
       it('supports passing objectids', function(done){
         var OID = mongoose.Types.ObjectId;
         var a = new OID;
         var b = new OID;
         var c = new OID;
-        var post = new B({ oidIds: docs([a,b,c]) })
+        var post = new B({ oidIds: docs([a,b,c]) });
         post.save(function (err) {
           assert.ifError(err);
           B.findById(post, function (err, post) {
@@ -1793,13 +1793,13 @@ describe('types array', function(){
                 assert.ok(!post.oidIds.id(a));
                 assert.ok(!post.oidIds.id(c));
                 done();
-              })
-            })
-          })
-        })
-      })
+              });
+            });
+          });
+        });
+      });
       it('supports passing buffers', function(done){
-        var post = new B({ bufferIds: docs(['a','b','c','d']) })
+        var post = new B({ bufferIds: docs(['a','b','c','d']) });
         post.save(function (err) {
           assert.ifError(err);
           B.findById(post, function (err, post) {
@@ -1812,11 +1812,11 @@ describe('types array', function(){
                 assert.equal(3, post.bufferIds.length);
                 assert.ok(!post.bufferIds.id(new Buffer('a')));
                 done();
-              })
-            })
-          })
-        })
-      })
-    })
-  })
-})
+              });
+            });
+          });
+        });
+      });
+    });
+  });
+});

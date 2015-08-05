@@ -340,7 +340,7 @@ describe('connections:', function(){
                  + '&retries=10&reconnectWait=5&rs_name=replworld&readSecondary=true'
                  + '&nativeParser=false&w=2&safe=true&fsync=true&journal=true'
                  + '&wtimeoutMS=80&readPreference=nearest&readPreferenceTags='
-                 + 'dc:ny,rack:1&readPreferenceTags=dc:sf'
+                 + 'dc:ny,rack:1&readPreferenceTags=dc:sf';
 
         var db = mongoose.createConnection(conn);
         db.on('error', function(){});
@@ -381,7 +381,7 @@ describe('connections:', function(){
                  + '&retries=10&reconnectWait=5&rs_name=replworld&readSecondary=true'
                  + '&nativeParser=false&w=2&safe=true&fsync=true&journal=true'
                  + '&wtimeoutMS=80&readPreference=nearest&readPreferenceTags='
-                 + 'dc:ny,rack:1&readPreferenceTags=dc:sf'
+                 + 'dc:ny,rack:1&readPreferenceTags=dc:sf';
 
         var db = mongoose.createConnection(conn, { server: { poolSize: 3, auto_reconnect: false }});
         db.on('error', function(){});
@@ -424,7 +424,7 @@ describe('connections:', function(){
                  + '&slaveOk=false&ssl=true&socketTimeoutMS=10&connectTimeoutMS=12'
                  + '&retries=10&reconnectWait=5&readSecondary=true'
                  + '&nativeParser=false&w=2&safe=true&fsync=true&journal=true'
-                 + '&wtimeoutMS=80&'
+                 + '&wtimeoutMS=80&';
 
         var db = mongoose.createConnection(conn);
         db.on('error', function(){});
@@ -460,7 +460,7 @@ describe('connections:', function(){
         var conn = 'mongodb://localhost/fake?autoReconnect=false&poolSize=2'
                  + '&slaveOk=false&ssl=true&socketTimeoutMS=10&connectTimeoutMS=12'
                  + '&retries=10&reconnectWait=5&readSecondary=true'
-                 + '&nativeParser=false&w=2&safe=true&fsync=true&journal=true'
+                 + '&nativeParser=false&w=2&safe=true&fsync=true&journal=true';
 
         var db = mongoose.createConnection(conn, { db: { w: 3, wtimeoutMS: 80 }});
         db.on('error', function(){});
@@ -522,7 +522,7 @@ describe('connections:', function(){
       var db = mongoose.createConnection('mongodb://aaron:psw@localhost:27000/fake', { server: { auto_reconnect: true }}, function () {
         done();
       });
-      db.on('error', function (err) { assert.ok(err) });
+      db.on('error', function (err) { assert.ok(err); });
       assert.equal('object', typeof db.options);
       assert.equal('object', typeof db.options.server);
       assert.equal(true, db.options.server.auto_reconnect);
@@ -532,7 +532,7 @@ describe('connections:', function(){
     });
     it('execute without user:pwd connection strings', function(done){
       var db = mongoose.createConnection('mongodb://localhost/fake', function(){});
-      db.on('error', function (err) { assert.ok(err) });
+      db.on('error', function (err) { assert.ok(err); });
       assert.equal('object', typeof db.options);
       assert.equal('object', typeof db.options.server);
       assert.equal(true, db.options.server.auto_reconnect);
@@ -612,7 +612,7 @@ describe('connections:', function(){
   describe('errors', function() {
     it('event fires with one listener', function(done) {
       this.timeout(1000);
-      var db = start({ uri: 'mongodb://whatever23939.localhost/fakeeee?connectTimeoutMS=500', noErrorListener: 1 })
+      var db = start({ uri: 'mongodb://whatever23939.localhost/fakeeee?connectTimeoutMS=500', noErrorListener: 1 });
       db.on('error', function () {
         // this callback has no params which triggered the bug #759
         db.close();
@@ -966,9 +966,9 @@ describe('connections:', function(){
                   assert.ifError(err);
                   assert.strictEqual(null, nothing);
 
-                  db2.close(done)
+                  db2.close(done);
                 });
-              })
+              });
             });
           });
         });

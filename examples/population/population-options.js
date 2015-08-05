@@ -1,5 +1,5 @@
 
-var mongoose = require('../../lib')
+var mongoose = require('../../lib');
 var Schema = mongoose.Schema;
 
 console.log('Running mongoose version %s', mongoose.version);
@@ -12,7 +12,7 @@ var consoleSchema = Schema({
     name: String
   , manufacturer: String
   , released: Date
-})
+});
 var Console = mongoose.model('Console', consoleSchema);
 
 /**
@@ -24,7 +24,7 @@ var gameSchema = Schema({
   , developer: String
   , released: Date
   , consoles: [{ type: Schema.Types.ObjectId, ref: 'Console' }]
-})
+});
 var Game = mongoose.model('Game', gameSchema);
 
 /**
@@ -38,7 +38,7 @@ mongoose.connect('mongodb://localhost/console', function (err) {
 
   // we connected ok
   createData();
-})
+});
 
 /**
  * Data generation
@@ -78,8 +78,8 @@ function createData () {
     }, function (err) {
       if (err) return done(err);
       example();
-    })
-  })
+    });
+  });
 }
 
 /**
@@ -104,10 +104,10 @@ function example () {
         , game.name
         , game.consoles.length ? game.consoles[0].name : '??'
         , game.released.toLocaleDateString());
-    })
+    });
 
     return done();
-  })
+  });
 }
 
 /**
@@ -119,6 +119,6 @@ function done (err) {
   Console.remove(function () {
     Game.remove(function () {
       mongoose.disconnect();
-    })
-  })
+    });
+  });
 }

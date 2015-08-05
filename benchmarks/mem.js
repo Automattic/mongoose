@@ -22,7 +22,7 @@ var AllSchema = new Schema({
   , bools  : [Boolean]
   , buffers: [Buffer]
   , objectids: [Schema.ObjectId]
-  , docs     : { type: [DocSchema], validate: function () { return true }}
+  , docs     : { type: [DocSchema], validate: function () { return true; }}
   , s: { nest: String }
 });
 
@@ -39,16 +39,16 @@ methods.push(function (a, cb) {
   A.findById(a._id, cb);
 }); // 4.6 MB
 methods.push(function (a, cb) {
-  A.where('number', a.number).limit(10).exec(cb)
+  A.where('number', a.number).limit(10).exec(cb);
 }); // 4.8 MB
 methods.push(function (a, cb) {
-  A.where('date', a.date).select('string').limit(10).exec(cb)
+  A.where('date', a.date).select('string').limit(10).exec(cb);
 }); // 3.5 mb
 methods.push(function (a, cb) {
-  A.where('date', a.date).select('string bool').limit(10).exec(cb)
+  A.where('date', a.date).select('string bool').limit(10).exec(cb);
 }); // 3.5 MB
 methods.push(function (a, cb) {
-  A.where('date', a.date).where('array').in(3).limit(10).exec(cb)
+  A.where('date', a.date).where('array').in(3).limit(10).exec(cb);
 }); // 1.82 MB
 methods.push(function (a, cb) {
   A.update({ _id: a._id }, { $addToset: { array: "heeeeello" }}, cb);
@@ -121,7 +121,7 @@ mongoose.connection.on('open', function () {
         methods[Math.random()*methods.length|0](a, function () {
           a = null;
           process.nextTick(cycle);
-        })
+        });
       });
 
       //if (i%2)
@@ -134,13 +134,13 @@ mongoose.connection.on('open', function () {
         //console.error('rss: %d, vsize: %d, heapTotal: %d, heapUsed: %d',
             //u.rss, u.vsize, u.heapTotal, u.heapUsed);
       //}
-    })()
+    })();
 
     function done () {
       var time= (new Date - start);
       var used = process.memoryUsage();
 
-      var res = {}
+      var res = {};
       res.rss  = used.rss - started.rss;
       res.heapTotal = used.heapTotal - started.heapTotal;
       res.heapUsed = used.heapUsed - started.heapUsed;
@@ -153,5 +153,5 @@ mongoose.connection.on('open', function () {
     }
 
   // --trace-opt --trace-deopt --trace-bailout
-  })
-})
+  });
+});

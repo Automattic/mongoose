@@ -8,7 +8,7 @@ var assert = require('assert')
   , mongoose = start.mongoose
   , Schema = mongoose.Schema
   , SchemaType = mongoose.SchemaType
-  , ValidatorError = SchemaType.ValidatorError
+  , ValidatorError = SchemaType.ValidatorError;
 
 describe('ValidationError', function(){
   describe('#infiniteRecursion', function() {
@@ -40,7 +40,7 @@ describe('ValidationError', function(){
         });
         done();
       });
-    })
+    });
   });
 
   describe('#minDate', function() {
@@ -179,11 +179,11 @@ describe('ValidationError', function(){
       m.contents.push({ key: 'asdf' });
       m.validate(function (err) {
         assert.doesNotThrow(function(){
-          String(err)
+          String(err);
         });
         done();
       });
-    })
+    });
   });
 
   describe('formatMessage', function() {

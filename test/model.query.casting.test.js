@@ -45,7 +45,7 @@ var BlogPostB = new Schema({
   , def       : { type: String, default: 'kandinsky' }
 });
 
-var modelName = 'model.query.casting.blogpost'
+var modelName = 'model.query.casting.blogpost';
 mongoose.model(modelName, BlogPostB);
 var collection = 'blogposts_' + random();
 
@@ -60,7 +60,7 @@ describe('model query casting', function(){
       , title = 'Loki ' + random();
 
     var post = new BlogPostB()
-      , id = post.get('_id').toString()
+      , id = post.get('_id').toString();
 
     post.set('title', title);
 
@@ -109,14 +109,14 @@ describe('model query casting', function(){
         db.close(done);
       });
     });
-  })
+  });
 
   it('casts $in values of arrays (gh-199)', function(done){
     var db = start()
       , BlogPostB = db.model(modelName, collection);
 
     var post = new BlogPostB()
-      , id = post._id.toString()
+      , id = post._id.toString();
 
     post.save(function (err) {
       assert.ifError(err);
@@ -128,7 +128,7 @@ describe('model query casting', function(){
         db.close(done);
       });
     });
-  })
+  });
 
   it('casts $nin values of arrays (gh-232)', function(done){
     var db = start()
@@ -182,7 +182,7 @@ describe('model query casting', function(){
         });
       });
     });
-  })
+  });
 
   it('works with $type matching', function(done){
     var db = start()
@@ -212,8 +212,8 @@ describe('model query casting', function(){
         assert.equal(doc[0].id, b.id);
         db.close(done);
       });
-    })
-  })
+    });
+  });
 
   it('works when finding Boolean with $ne (gh-1093)', function (done) {
     var db = start()
@@ -228,8 +228,8 @@ describe('model query casting', function(){
         assert.equal(doc[0].id, b.id);
         db.close(done);
       });
-    })
-  })
+    });
+  });
 
   it('properly casts $and (gh-1180)', function (done) {
     var db = start()
@@ -238,7 +238,7 @@ describe('model query casting', function(){
     assert.ok(result.$and[0].date instanceof Date);
     assert.ok(result.$and[1]._id instanceof DocumentObjectId);
     db.close(done);
-  })
+  });
 
   describe('$near', function(){
     this.slow(60);
@@ -266,7 +266,7 @@ describe('model query casting', function(){
           db.close();
           assert.ifError(err);
           assert.equal(2, docs.length);
-          done()
+          done();
         });
       }
     });
@@ -291,7 +291,7 @@ describe('model query casting', function(){
           db.close();
           assert.ifError(err);
           assert.equal(2, docs.length);
-          done()
+          done();
         });
       }
 
@@ -322,7 +322,7 @@ describe('model query casting', function(){
           db.close();
           assert.ifError(err);
           assert.equal(1, docs.length);
-          done()
+          done();
         });
       }
 
@@ -331,8 +331,8 @@ describe('model query casting', function(){
           { loc: {nested:{long:10, lat:20 }}}
         , { loc: {nested:{long:40, lat:90 }}}
         , complete);
-    })
-  })
+    });
+  });
 
   describe('$nearSphere', function(){
     this.slow(70);
@@ -356,7 +356,7 @@ describe('model query casting', function(){
           db.close();
           assert.ifError(err);
           assert.equal(2, docs.length);
-          done()
+          done();
         });
       }
     });
@@ -380,7 +380,7 @@ describe('model query casting', function(){
           db.close();
           assert.ifError(err);
           assert.equal(2, docs.length);
-          done()
+          done();
         });
       }
     });
@@ -407,11 +407,11 @@ describe('model query casting', function(){
           db.close();
           assert.ifError(err);
           assert.equal(2, docs.length);
-          done()
+          done();
         });
       }
-    })
-  })
+    });
+  });
 
   describe('$within', function(){
     this.slow(60);
@@ -436,7 +436,7 @@ describe('model query casting', function(){
             db.close();
             assert.ifError(err);
             assert.equal(1, docs.length);
-            done()
+            done();
           });
         }
       });
@@ -460,7 +460,7 @@ describe('model query casting', function(){
             db.close();
             assert.ifError(err);
             assert.equal(1, docs.length);
-            done()
+            done();
           });
         }
       });
@@ -487,11 +487,11 @@ describe('model query casting', function(){
             db.close();
             assert.ifError(err);
             assert.equal(1, docs.length);
-            done()
+            done();
           });
         }
-      })
-    })
+      });
+    });
 
     describe('$center', function(){
       it('with arrays', function(done){
@@ -513,7 +513,7 @@ describe('model query casting', function(){
             db.close();
             assert.ifError(err);
             assert.equal(1, docs.length);
-            done()
+            done();
           });
         }
       });
@@ -537,7 +537,7 @@ describe('model query casting', function(){
             db.close();
             assert.ifError(err);
             assert.equal(1, docs.length);
-            done()
+            done();
           });
         }
       });
@@ -564,11 +564,11 @@ describe('model query casting', function(){
             db.close();
             assert.ifError(err);
             assert.equal(1, docs.length);
-            done()
+            done();
           });
         }
-      })
-    })
+      });
+    });
 
     describe('$polygon', function(){
       it('with arrays', function(done){
@@ -590,7 +590,7 @@ describe('model query casting', function(){
             db.close();
             assert.ifError(err);
             assert.equal(2, docs.length);
-            done()
+            done();
           });
         }
       });
@@ -614,7 +614,7 @@ describe('model query casting', function(){
             db.close();
             assert.ifError(err);
             assert.equal(2, docs.length);
-            done()
+            done();
           });
         }
       });
@@ -641,11 +641,11 @@ describe('model query casting', function(){
             db.close();
             assert.ifError(err);
             assert.equal(2, docs.length);
-            done()
+            done();
           });
         }
-      })
-    })
+      });
+    });
 
     describe('$box', function(){
       it('with arrays', function(done){
@@ -668,7 +668,7 @@ describe('model query casting', function(){
             db.close();
             assert.ifError(err);
             assert.equal(2, docs.length);
-            done()
+            done();
           });
         }
       });
@@ -692,7 +692,7 @@ describe('model query casting', function(){
             db.close();
             assert.ifError(err);
             assert.equal(2, docs.length);
-            done()
+            done();
           });
         }
       });
@@ -721,16 +721,16 @@ describe('model query casting', function(){
             db.close(done);
           });
         }
-      })
-    })
-  })
+      });
+    });
+  });
 
   describe('$options', function(){
     it('works on arrays gh-1462', function(done){
       var opts = {};
       opts.toString = function () {
-        return 'img'
-      }
+        return 'img';
+      };
 
       var db = start()
         , B = db.model(modelName, collection + random())
@@ -738,6 +738,6 @@ describe('model query casting', function(){
 
       assert.equal('img', result.tags.$options);
       db.close(done);
-    })
-  })
+    });
+  });
 });

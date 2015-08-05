@@ -144,7 +144,7 @@ describe('document: strict mode:', function(){
     assert.ok(!s.name.hack);
     assert.ok(!s.shouldnt);
     db.close(done);
-  })
+  });
 
   it('sub doc', function(done){
     var db = start();
@@ -192,7 +192,7 @@ describe('document: strict mode:', function(){
       assert.ok(!doc.dox[0].rouge);
       db.close(done);
     });
-  })
+  });
 
   it('virtuals', function(done){
     var db = start();
@@ -267,10 +267,10 @@ describe('document: strict mode:', function(){
             assert.equal(undefined, doc._doc.notInSchema);
             db.close(done);
           });
-        })
-      })
-    })
-  })
+        });
+      });
+    });
+  });
 
   it('can be overridden during update()', function(done){
     var db = start();
@@ -358,7 +358,7 @@ describe('document: strict mode:', function(){
   describe('"throws" mode', function(){
     it('throws on set() of unknown property', function(done){
       var schema = Schema({ n: String, docs:[{x:[{y:String}]}] });
-      schema.set('strict', 'throw')
+      schema.set('strict', 'throw');
       var M = mongoose.model('throwStrictSet', schema, 'tss_'+random());
       var m = new M;
 
@@ -401,7 +401,7 @@ describe('document: strict mode:', function(){
       }, badField);
 
       done();
-    })
+    });
 
     it('fails with extra fields', function (done) {
       // Simple schema with throws option
@@ -414,7 +414,7 @@ describe('document: strict mode:', function(){
 
       assert.doesNotThrow(function(){
         new Foo({name: 'bar'});
-      })
+      });
 
       assert.throws(function(){
         // The extra baz field should throw
@@ -436,9 +436,9 @@ describe('document: strict mode:', function(){
 
       assert.doesNotThrow(function(){
         new Foo({name: mongoose.Types.ObjectId(), father: { name: { full: 'bacon' } } });
-      })
+      });
 
       done();
     });
-  })
-})
+  });
+});

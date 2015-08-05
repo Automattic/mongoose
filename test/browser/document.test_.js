@@ -3,7 +3,7 @@ var Schema = mongoose.Schema
 
 var em = new mongoose.Schema({ title: String, body: String });
 em.virtual('works').get(function () {
-  return 'em virtual works'
+  return 'em virtual works';
 });
 
 var schema = new Schema({
@@ -125,7 +125,7 @@ describe('browser:document', function() {
 describe('browser:validate', function() {
   it('works', function(done) {
     var called = false;
-    var validate = [function(){ called = true; return true }, 'BAM'];
+    var validate = [function(){ called = true; return true; }, 'BAM'];
 
     schema = new Schema({
       prop: { type: String, required: true, validate: validate },
@@ -191,7 +191,7 @@ describe('#equals', function(){
       var m1 = new mongoose.Document({}, M);
       var m2 = new mongoose.Document({}, M);
       assert.doesNotThrow(function () {
-        m1.equals(m2)
+        m1.equals(m2);
       });
       done();
     });

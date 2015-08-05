@@ -7,7 +7,7 @@
 var start = require('./common')
   , assert = require('assert')
   , mongoose = start.mongoose
-  , Schema = mongoose.Schema
+  , Schema = mongoose.Schema;
 
 var schema = new Schema({
     a: String
@@ -26,11 +26,11 @@ describe('is compatible with object created using Object.create(null) (gh-1484)'
   before(function(){
     db = start();
     M = db.model('1484', schema);
-  })
+  });
 
   after(function(done){
     db.close(done);
-  })
+  });
 
   it('during construction', function(done){
     assert.doesNotThrow(function () {
@@ -62,7 +62,7 @@ describe('is compatible with object created using Object.create(null) (gh-1484)'
       h.ad = 1;
       h.hoc = 2;
       h.obj = Object.create(null);
-      o.h = h
+      o.h = h;
 
       var m = new M(o);
 
@@ -75,7 +75,7 @@ describe('is compatible with object created using Object.create(null) (gh-1484)'
     });
 
     done();
-  })
+  });
 
   it('with .set(path, obj)', function(done){
     var m = new M;
@@ -103,7 +103,7 @@ describe('is compatible with object created using Object.create(null) (gh-1484)'
     assert.equal(date, m.f.g);
     assert.deepEqual('yes', m.h.obj.thing.h);
     done();
-  })
+  });
 
   it('with schema', function(done){
     var o = Object.create(null);
@@ -133,5 +133,5 @@ describe('is compatible with object created using Object.create(null) (gh-1484)'
     });
 
     done();
-  })
-})
+  });
+});

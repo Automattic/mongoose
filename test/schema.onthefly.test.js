@@ -92,7 +92,7 @@ describe('schema.onthefly', function(){
     post.set('moderators', [{name: 'alex trebek'}], [new Schema({name: String})]);
     assert.equal(post.get('moderators')[0].name,'alex trebek');
     done();
-  })
+  });
 
   it('on the fly Embedded Array schemas should get from a fresh queried document properly', function (done) {
     var db = start()
@@ -119,7 +119,7 @@ describe('schema.onthefly', function(){
         done();
       });
     });
-  })
+  });
 
   it('casts on get() (gh-2360)', function(done) {
     var db = start();

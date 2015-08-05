@@ -50,7 +50,7 @@ describe('model field selection', function(){
   it('excluded fields should be undefined', function(done){
     var db = start()
       , BlogPostB = db.model(modelName, collection)
-      , date = new Date
+      , date = new Date;
 
     var doc = {
         title: 'subset 1'
@@ -78,7 +78,7 @@ describe('model field selection', function(){
         assert.equal(found.comments.length, 2);
         found.comments.forEach(function (comment) {
           assert.equal(undefined, comment.user);
-        })
+        });
         done();
       });
     });
@@ -88,7 +88,7 @@ describe('model field selection', function(){
     var db = start()
       , BlogPostB = db.model(modelName, collection)
       , id = new DocumentObjectId
-      , date = new Date
+      , date = new Date;
 
     BlogPostB.collection.insert({ _id: id, title: 'hahaha1', meta: { date: date }}, function (err) {
       assert.ifError(err);
@@ -121,7 +121,7 @@ describe('model field selection', function(){
         done();
       });
     });
-  })
+  });
 
   it('works with subset of fields, excluding _id', function(done){
     var db = start()
@@ -139,7 +139,7 @@ describe('model field selection', function(){
         done();
       });
     });
-  })
+  });
 
   it('works with subset of fields excluding emebedded doc _id (gh-541)', function(done){
     var db = start()
@@ -163,12 +163,12 @@ describe('model field selection', function(){
         done();
       });
     });
-  })
+  });
 
   it('included fields should have defaults applied when no value exists in db (gh-870)', function(done){
     var db = start()
       , BlogPostB = db.model(modelName, collection)
-      , id = new DocumentObjectId
+      , id = new DocumentObjectId;
 
     BlogPostB.collection.insert(
         { _id: id, title: 'issue 870'}, { safe: true }, function (err) {
@@ -191,7 +191,7 @@ describe('model field selection', function(){
 
   it('including subdoc field excludes other subdoc fields (gh-1027)', function(done){
     var db = start()
-      , BlogPostB = db.model(modelName, collection)
+      , BlogPostB = db.model(modelName, collection);
 
     BlogPostB.create({ comments: [{title: 'a'}, {title:'b'}] }, function (err, doc) {
       assert.ifError(err);
@@ -216,7 +216,7 @@ describe('model field selection', function(){
 
   it('excluding nested subdoc fields (gh-1027)', function(done){
     var db = start()
-      , BlogPostB = db.model(modelName, collection)
+      , BlogPostB = db.model(modelName, collection);
 
     BlogPostB.create({ title: 'top', comments: [{title: 'a',body:'body'}, {title:'b', body:'body',comments: [{title:'c'}]}] }, function (err, doc) {
       assert.ifError(err);
@@ -250,7 +250,7 @@ describe('model field selection', function(){
     // mongodb 2.2 support
 
     it('casts elemMatch args (gh-1091)', function(done){
-      var db = start()
+      var db = start();
 
       var postSchema = new Schema({
          ids: [{type: Schema.ObjectId}]
@@ -284,13 +284,13 @@ describe('model field selection', function(){
             assert.equal(1, found.ids.length);
             assert.equal(_id2.toString(), found.ids[0].toString());
             done();
-          })
-        })
-      })
-    })
+          });
+        });
+      });
+    });
 
     it('disallows saving modified elemMatch paths (gh-1334)', function(done){
-      var db = start()
+      var db = start();
 
       var postSchema = new Schema({
            ids:  [{type: Schema.ObjectId}]
@@ -319,7 +319,7 @@ describe('model field selection', function(){
             assert.ok(/\$elemMatch projection/.test(err));
             assert.ok(/ ids/.test(err));
             assert.ok(/ ids2/.test(err));
-            done()
+            done();
           });
         });
       });
@@ -349,7 +349,7 @@ describe('model field selection', function(){
 
   it('selecting an array of docs applies defaults properly (gh-1108)', function(done){
     var db = start()
-      , M = db.model(modelName, collection)
+      , M = db.model(modelName, collection);
 
     var m = new M({ title: '1108', comments: [{body:'yay'}] });
     m.comments[0].comments = undefined;
@@ -361,9 +361,9 @@ describe('model field selection', function(){
         assert.equal(1, found.comments.length);
         assert.ok(Array.isArray(found.comments[0].comments));
         db.close(done);
-      })
+      });
     });
-  })
+  });
 
   it('appropriately filters subdocuments based on properties (gh-1280)', function(done){
     var db = start();
@@ -418,5 +418,5 @@ describe('model field selection', function(){
         });
       });
     });
-  })
-})
+  });
+});

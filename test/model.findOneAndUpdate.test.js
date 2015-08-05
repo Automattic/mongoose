@@ -7,16 +7,10 @@ var start = require('./common')
   , assert = require('assert')
   , mongoose = start.mongoose
   , random = require('../lib/utils').random
-  , Query = require('../lib/query')
   , Utils = require('../lib/utils')
   , Schema = mongoose.Schema
-  , SchemaType = mongoose.SchemaType
   , ObjectId = Schema.Types.ObjectId
   , DocumentObjectId = mongoose.Types.ObjectId
-  , DocumentArray = mongoose.Types.DocumentArray
-  , EmbeddedDocument = mongoose.Types.Embedded
-  , MongooseArray = mongoose.Types.Array
-  , MongooseError = mongoose.Error
   , _ = require('underscore');
 
 /**
@@ -173,7 +167,7 @@ describe('model: findOneAndUpdate:', function(){
         age: Number
       }, {_id: false});
       var itemSchema = new Schema({
-        items: [itemSpec],
+        items: [itemSpec]
       });
       ItemParentModel = db.model('ItemParentModel', itemSchema);
       ItemChildModel = db.model('ItemChildModel', itemSpec);
@@ -245,7 +239,7 @@ describe('model: findOneAndUpdate:', function(){
 
     post.save(function (err) {
       assert.ifError(err);
-      M.findById(post._id, function (err, cf) {
+      M.findById(post._id, function (err) {
         assert.ifError(err);
 
         var update = {
@@ -448,8 +442,7 @@ describe('model: findOneAndUpdate:', function(){
   it('updates numbers atomically', function(done){
     var db = start()
       , BlogPost = db.model(modelname, collection)
-      , totalDocs = 4
-      , saveQueue = [];
+      , totalDocs = 4;
 
     var post = new BlogPost();
     post.set('meta.visitors', 5);
@@ -472,7 +465,7 @@ describe('model: findOneAndUpdate:', function(){
           assert.equal(9, doc.get('meta.visitors'));
           done();
         });
-      };
+      }
     });
   });
 
@@ -608,7 +601,7 @@ describe('model: findByIdAndUpdate:', function(){
 
     post.save(function (err) {
       assert.ifError(err);
-      M.findById(post._id, function (err, cf) {
+      M.findById(post._id, function (err) {
         assert.ifError(err);
 
         var update = {
@@ -737,7 +730,7 @@ describe('model: findByIdAndUpdate:', function(){
         { title: 1, meta: {visitors: 0}}
       , { title: 2, meta: {visitors: 10}}
       , { title: 3, meta: {visitors: 5}}
-      , function (err, a,b,c) {
+      , function (err) {
       if (err) return done(err);
 
       M.findOneAndUpdate({}, { title: 'changed' })
@@ -900,7 +893,7 @@ describe('model: findByIdAndUpdate:', function(){
     var a1 = new Account({ name: 'parent' });
     var a2 = new Account({ name: 'child' });
 
-    a1.save(function(error, a1) {
+    a1.save(function(error) {
       assert.ifError(error);
       a2.save(function(error, a2) {
         assert.ifError(error);
@@ -928,7 +921,7 @@ describe('model: findByIdAndUpdate:', function(){
     var db = start();
 
     var accountSchema = Schema({
-      name: String,
+      name: String
     });
 
     var Account = db.model('2122', accountSchema);
@@ -990,7 +983,7 @@ describe('model: findByIdAndUpdate:', function(){
 
     Breakfast.
       findOneAndUpdate({}, { time: undefined, base: undefined }, {}).
-      exec(function(error, breakfast) {
+      exec(function(error) {
         assert.ifError(error);
         db.close(done);
       });
@@ -1007,7 +1000,7 @@ describe('model: findByIdAndUpdate:', function(){
 
     Breakfast.
       findOneAndUpdate({}, { base: {} }, {}).
-      exec(function(error, breakfast) {
+      exec(function(error) {
         assert.ok(error);
         db.close(done);
       });
@@ -1065,7 +1058,7 @@ describe('model: findByIdAndUpdate:', function(){
         {},
         { base: 'eggs' },
         {},
-        function(error, breakfast) {
+        function(error) {
           assert.ifError(error);
           assert.equal(1, preCount);
           assert.equal(1, postCount);
@@ -1093,7 +1086,7 @@ describe('model: findByIdAndUpdate:', function(){
 
       Breakfast.
         findOneAndUpdate({}, { base: 'eggs' }, {}).
-        exec(function(error, breakfast) {
+        exec(function(error) {
           assert.ifError(error);
           assert.equal(1, preCount);
           assert.equal(1, postCount);
@@ -1102,7 +1095,7 @@ describe('model: findByIdAndUpdate:', function(){
     });
   });
 
-  describe('validators (gh-860)', function(done) {
+  describe('validators (gh-860)', function() {
     it('applies defaults on upsert', function(done) {
       var db = start();
 
@@ -1182,8 +1175,8 @@ describe('model: findByIdAndUpdate:', function(){
       var db = start();
 
       var s = new Schema({
-        topping: { type: String, validate: function(v) { return false; } },
-        base: { type: String, validate: function(v) { return true; } }
+        topping: { type: String, validate: function() { return false; } },
+        base: { type: String, validate: function() { return true; } }
       });
       var Breakfast = db.model('fam-gh-860-3', s);
 
@@ -1216,7 +1209,7 @@ describe('model: findByIdAndUpdate:', function(){
 
       var s = new Schema({
         steak: { type: String, required: true },
-        eggs: { type: String, validate: function(v) { return false; } }
+        eggs: { type: String, validate: function() { return false; } }
       });
       var Breakfast = db.model('fam-gh-860-4', s);
 
@@ -1350,7 +1343,7 @@ describe('model: findByIdAndUpdate:', function(){
         _createdAt: {
           type: Number,
           default: Date.now
-        },
+        }
       });
 
       var TestModel = db.model('gh3035', testSchema);
@@ -1363,7 +1356,7 @@ describe('model: findByIdAndUpdate:', function(){
             upsert: true,
             setDefaultsOnInsert: true
           },
-          function(error, result) {
+          function(error) {
             assert.ifError(error);
             done();
           });
@@ -1376,7 +1369,7 @@ describe('model: findByIdAndUpdate:', function(){
         var testSchema = new mongoose.Schema({
           id:      String,
           blob:    ObjectId,
-          status:  String,
+          status:  String
         });
 
         var TestModel = db.model('gh3135', testSchema);
@@ -1389,7 +1382,7 @@ describe('model: findByIdAndUpdate:', function(){
               upsert: true,
               setDefaultsOnInsert: true
             },
-            function(error, result) {
+            function(error) {
               assert.ifError(error);
               done();
             });
@@ -1408,7 +1401,7 @@ describe('model: findByIdAndUpdate:', function(){
         _createdAt: {
           type: Number,
           default: Date.now
-        },
+        }
       });
 
       var TestModel = db.model('gh3034', testSchema);
@@ -1421,7 +1414,7 @@ describe('model: findByIdAndUpdate:', function(){
             upsert: true,
             setDefaultsOnInsert: true
           },
-          function(error, result) {
+          function(error) {
             assert.ifError(error);
             db.close(done);
           });

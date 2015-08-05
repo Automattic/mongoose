@@ -81,7 +81,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function (err) {
     });
 
     var User = mongoose.model('User', UserSchema);
-    var BlogPost = mongoose.model('BlogPost', BlogPost);
+    BlogPost = mongoose.model('BlogPost', BlogPost);
     var user = db.collection('user');
     var blogpost = db.collection('blogpost');
 
@@ -100,7 +100,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function (err) {
 
     // insert all of the data here
     var count = 4000;
-    for (var i=0; i < 1000; i++) {
+    for (i=0; i < 1000; i++) {
       data.age = Math.floor(Math.random() * 50);
       User.create(data, function (err, u) {
         if (err) throw err;
@@ -164,13 +164,13 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function (err) {
       fn : function (deferred) {
         var count = 150;
         for (var i=0; i < 150; i++) {
-          User.findOne({ _id : getNextmId() }, function (err, res) {
+          User.findOne({ _id : getNextmId() }, function (err) {
             if (err) throw err;
             --count || deferred.resolve();
           });
           if (i%15 == 0) {
             var nData = utils.clone(data);
-            User.create(nData, function (err, res) {
+            User.create(nData, function (err) {
               if (err) throw err;
               --count || deferred.resolve();
             });
@@ -183,13 +183,13 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function (err) {
       fn : function (deferred) {
         var count = 150;
         for (var i=0; i < 150; i++) {
-          user.findOne({ _id : getNextdId() }, function (err, cursor) {
+          user.findOne({ _id : getNextdId() }, function (err) {
             if (err) throw err;
             --count || deferred.resolve();
           });
           if (i%15 == 0) {
             var nData = utils.clone(data);
-            user.insert(nData, function (err, res) {
+            user.insert(nData, function (err) {
               if (err) throw err;
               --count || deferred.resolve();
             });
@@ -201,13 +201,13 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function (err) {
       fn : function (deferred) {
         var count = 150;
         for (var i=0; i < 150; i++) {
-          BlogPost.findOne({ _id : getNextbmId() }, function (err, res) {
+          BlogPost.findOne({ _id : getNextbmId() }, function (err) {
             if (err) throw err;
             --count || deferred.resolve();
           });
           if (i%15 == 0) {
             var nData = utils.clone(blogData);
-            BlogPost.create(nData, function (err, res) {
+            BlogPost.create(nData, function (err) {
               if (err) throw err;
               --count || deferred.resolve();
             });
@@ -219,13 +219,13 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function (err) {
       fn : function (deferred) {
         var count = 150;
         for (var i=0; i < 150; i++) {
-          blogpost.findOne({ _id : getNextbdId() }, function (err, cursor) {
+          blogpost.findOne({ _id : getNextbdId() }, function (err) {
             if (err) throw err;
             --count || deferred.resolve();
           });
           if (i%15 == 0) {
             var nData = utils.clone(blogData);
-            blogpost.insert(nData, function (err, res) {
+            blogpost.insert(nData, function (err) {
               if (err) throw err;
               --count || deferred.resolve();
             });
@@ -239,12 +239,12 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function (err) {
 
         for (var i=0; i < 150; i++) {
           var nData = utils.clone(data);
-          User.create(nData, function (err, res) {
+          User.create(nData, function (err) {
             if (err) throw err;
             --count || deferred.resolve();
           });
           if (i%15 == 0) {
-            User.findOne({ _id : getNextmId() }, function (err, res) {
+            User.findOne({ _id : getNextmId() }, function (err) {
               if (err) throw err;
               --count || deferred.resolve();
             });
@@ -258,12 +258,12 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function (err) {
 
         for (var i=0; i < 150; i++) {
           var nData = utils.clone(data);
-          user.insert(nData, function (err, res) {
+          user.insert(nData, function (err) {
             if (err) throw err;
             --count || deferred.resolve();
           });
           if (i%15 == 0) {
-            user.findOne({ _id : getNextdId() }, function (err, cursor) {
+            user.findOne({ _id : getNextdId() }, function (err) {
               if (err) throw err;
               --count || deferred.resolve();
             });
@@ -277,12 +277,12 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function (err) {
 
         for (var i=0; i < 150; i++) {
           var nData = utils.clone(blogData);
-          BlogPost.create(nData, function (err, res) {
+          BlogPost.create(nData, function (err) {
             if (err) throw err;
             --count || deferred.resolve();
           });
           if (i%15 == 0) {
-            BlogPost.findOne({ _id : getNextbmId() }, function (err, res) {
+            BlogPost.findOne({ _id : getNextbmId() }, function (err) {
               if (err) throw err;
               --count || deferred.resolve();
             });
@@ -296,12 +296,12 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function (err) {
 
         for (var i=0; i < 150; i++) {
           var nData = utils.clone(blogData);
-          blogpost.insert(nData, function (err, res) {
+          blogpost.insert(nData, function (err) {
             if (err) throw err;
             --count || deferred.resolve();
           });
           if (i%15 == 0) {
-            blogpost.findOne({ _id : getNextbdId() }, function (err, cursor) {
+            blogpost.findOne({ _id : getNextbdId() }, function (err) {
               if (err) throw err;
               --count || deferred.resolve();
             });
@@ -331,7 +331,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function (err) {
           });
           if (i%15 == 0) {
             var nData = utils.clone(blogData);
-            BlogPost.create(nData, function (err, res) {
+            BlogPost.create(nData, function (err) {
               if (err) throw err;
               --count || deferred.resolve();
             });
@@ -361,7 +361,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function (err) {
           });
           if (i%15 == 0) {
             var nData = utils.clone(blogData);
-            blogpost.insert(nData, function (err, res) {
+            blogpost.insert(nData, function (err) {
               if (err) throw err;
               --count || deferred.resolve();
             });

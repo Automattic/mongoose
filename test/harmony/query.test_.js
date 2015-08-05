@@ -1,7 +1,6 @@
 var start = require('../common');
 var mongoose = start.mongoose;
 var Schema = mongoose.Schema;
-var ValidationError = require('../../lib/error/validation');
 var co = require('co');
 var assert = require('assert');
 
@@ -36,7 +35,7 @@ describe('Queries in ES6', function() {
         eggs: { type: Number, required: true },
         bacon: { type: Number, required: true }
       });
- 
+
       var Breakfast = db.model('BreakfastHarmony', schema, getCollectionName());
 
       try {

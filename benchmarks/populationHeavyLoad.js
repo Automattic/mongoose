@@ -1,4 +1,4 @@
-
+/* eslint no-unused-vars: 1 */
 var tbd = require('tbd');
 var mongoose = require('../');
 var Schema = mongoose.Schema;
@@ -17,7 +17,7 @@ function createRandomWord(len) {
   return word;
 }
 
-Medication = mongoose.model('Medication', Schema({
+var Medication = mongoose.model('Medication', Schema({
   catCode: { type: String },
   concentration: { type: String },
   medicationName: { type: String, required: true },
@@ -33,7 +33,7 @@ load.Medication = tbd.from({
   qty: 10
 }).make(dicCnt);
 
-Prescription = mongoose.model('Prescription', Schema({
+var Prescription = mongoose.model('Prescription', Schema({
   age: { type: Number },
   city: { type: String },
   clientID: { type: String, required: true },
@@ -77,7 +77,7 @@ load.Prescription = tbd.from({
   tel: "{ type: String }"
 }).make(dicCnt);
 
-Observation = mongoose.model('Observation', Schema({
+var Observation = mongoose.model('Observation', Schema({
   observationCode: { type: Number},
   observationDesc: { type: String},
   observationGroup: { type: String
@@ -90,7 +90,7 @@ load.Observation = tbd.from({
   observationGroup: "{ type: String}"
 }).make(dicCnt);
 
-Heart = mongoose.model('Heart', Schema({
+var Heart = mongoose.model('Heart', Schema({
   abdominalAscites: { type: String},
   abdominalCondition: { type: String},
   abdominalLocation: { type: String},
@@ -115,7 +115,7 @@ load.Heart = tbd.from({
   sounds: "{ type: String }"
 }).make(dicCnt);
 
-PereferialPulse = mongoose.model('PereferialPulse', Schema({
+var PereferialPulse = mongoose.model('PereferialPulse', Schema({
   leftDP: { type: String},
   leftFemoral: { type: String},
   leftPopliteal: { type: String},
@@ -138,7 +138,7 @@ load.PereferialPulse = tbd.from({
   rigthPopliteal: "{ type: String}"
 }).make(dicCnt);
 
-Treatment = mongoose.model('Treatment', Schema({
+var Treatment = mongoose.model('Treatment', Schema({
   notes: { type: String},
   treatmentCode: { type: String},
   treatmentName: { type: String, required: true
@@ -151,7 +151,7 @@ load.Treatment = tbd.from({
   treatmentName: "{ type: String, required: true}"
 }).make(dicCnt);
 
-VitalSign = mongoose.model('VitalSign', Schema({
+var VitalSign = mongoose.model('VitalSign', Schema({
   O2: { type: String},
   diastole: { type: String},
   heartSounds: { type: String},
@@ -194,7 +194,7 @@ load.VitalSign = tbd.from({
   weight: "{ type: String}"
 }).make(dicCnt);
 
-FluidsProgram = mongoose.model('FluidsProgram', Schema({
+var FluidsProgram = mongoose.model('FluidsProgram', Schema({
   name: String
 }));
 
@@ -202,7 +202,7 @@ load.FluidsProgram = tbd.from({
   name: "String"
 }).make(dicCnt);
 
-Allergy = mongoose.model('Allergy', Schema({
+var Allergy = mongoose.model('Allergy', Schema({
   allergy: { type: String, required: true},
   notes: { type: String
   }
@@ -213,7 +213,7 @@ load.Allergy = tbd.from({
   notes: "{ type: String }"
 }).make(dicCnt);
 
-Head = mongoose.model('Head', Schema({
+var Head = mongoose.model('Head', Schema({
   ears: { type: String},
   neckMurmur: { type: String},
   normalEarRight: { type: Boolean},
@@ -252,7 +252,7 @@ load.Head = tbd.from({
   venousCongestion: false
 }).make(dicCnt);
 
-Sckeletal = mongoose.model('Sckeletal', Schema({
+var Sckeletal = mongoose.model('Sckeletal', Schema({
   consiousness: { type: String},
   dvtSigns: { type: Boolean},
   edema: { type: String},
@@ -285,7 +285,7 @@ load.Sckeletal = tbd.from({
   reflexes: "{ type: String}"
 }).make(dicCnt);
 
-Pulse = mongoose.model('Pulse', Schema({
+var Pulse = mongoose.model('Pulse', Schema({
   rate: String
 }));
 
@@ -293,7 +293,7 @@ load.Pulse = tbd.from({
   rate: "String"
 }).make(dicCnt);
 
-Supplier = mongoose.model('Supplier', Schema({
+var Supplier = mongoose.model('Supplier', Schema({
   supplierDescription: { type: String},
   supplierQty: { type: Number},
   supplierRemarks: { type: String
@@ -306,7 +306,7 @@ load.Supplier = tbd.from({
   supplierRemarks: "{ type: String }"
 }).make(dicCnt);
 
-Gastrointestinal = mongoose.model('Gastrointestinal', Schema({
+var Gastrointestinal = mongoose.model('Gastrointestinal', Schema({
   leftKidney: { type: String},
   liver: { type: String},
   rightKidney: { type: String},
@@ -321,7 +321,7 @@ load.Gastrointestinal = tbd.from({
   spleen: "{ type: String }"
 }).make(dicCnt);
 
-Ecg = mongoose.model('Ecg', Schema({
+var Ecg = mongoose.model('Ecg', Schema({
   ecgAxis: { type: String},
   ecgConduction: { type: String},
   ecgIschemia: { type: String},
@@ -340,7 +340,7 @@ load.Ecg = tbd.from({
   generalCondition:" { type: String }"
 }).make(dicCnt);
 
-Diagnose = mongoose.model('Diagnose', Schema({
+var Diagnose = mongoose.model('Diagnose', Schema({
   diagNotes: { type: String},
   diagnoseGroup: { type: String},
   diagnoseName: { type: String, required: true},
@@ -355,7 +355,7 @@ load.Diagnose = tbd.from({
   idDiagnose: "{ type: String }"
 }).make(dicCnt);
 
-Conclusion = mongoose.model('Conclusion', Schema({
+var Conclusion = mongoose.model('Conclusion', Schema({
   approver: { type: String},
   daysScheduleVisits: { type: String},
   doctorLicense: { type: String},
@@ -385,19 +385,6 @@ load.Conclusion = tbd.from({
   presentedTo: "{ type: String}",
   stampImage: "{ type: String }"
 }).make(dicCnt);
-
-
-function getItems (list){
-    if (!list)debugger
-  return function(){
-    var cnt = Math.floor(Math.random() * dicCnt);
-    var i, res = [];
-    for (i = 0; i< cnt; i++){
-      res.push(list[i]);
-    }
-    return res;
-  };
-}
 
 function getItem (list){
   return function(){
@@ -439,6 +426,18 @@ for (i = 0; i< len; i++){
 
 
 var db = mongoose.createConnection('localhost', 'HeavyLoad', function (err) {
+  function getItems (list){
+      if (!list) done();
+    return function(){
+      var cnt = Math.floor(Math.random() * dicCnt);
+      var i, res = [];
+      for (i = 0; i< cnt; i++){
+        res.push(list[i]);
+      }
+      return res;
+    };
+  }
+
   var cnt = creatList.length;
   var length = cnt;
   var runResults = {};
@@ -570,7 +569,7 @@ var db = mongoose.createConnection('localhost', 'HeavyLoad', function (err) {
     console.log('Main Collection prepare');
       coll.remove({}, function(){
         console.log('clean collection done');
-        loadMedicalCard = tbd.from({})
+        var loadMedicalCard = tbd.from({})
           .prop('firstName').use(function() { return createRandomWord(10);}).done()
           .prop('lastName').use(function() { return createRandomWord(10);}).done()
           .prop('medication').use(getItems(load.Medication)).done()
@@ -611,7 +610,7 @@ var db = mongoose.createConnection('localhost', 'HeavyLoad', function (err) {
   };
 
 
-  done = function (){
+  function done () {
     var qrs = Object.keys(runResults);
     var i, qry;
     var len = qrs.length;
@@ -649,7 +648,8 @@ var db = mongoose.createConnection('localhost', 'HeavyLoad', function (err) {
     console.log('actual results', finalResults);
 
     mongoose.disconnect();
-  };
+  }
+
   var updated = {};
   var next = function(err, data){
     if(cnt < length && Array.isArray(data)) {

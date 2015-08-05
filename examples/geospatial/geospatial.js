@@ -25,7 +25,7 @@ var data = [
     likes : ['books', 'cats', 'dogs'], loc : [6, 6]},
   { name : 'alucard', age : 1000, birthday : new Date().setFullYear((new
     Date().getFullYear() - 1000)), gender : "Male",
-    likes : ['glasses', 'wine', 'the night'], loc : [10, 10]},
+    likes : ['glasses', 'wine', 'the night'], loc : [10, 10]}
 ];
 
 
@@ -36,7 +36,10 @@ mongoose.connect('mongodb://localhost/persons', function (err) {
   async.each(data, function (item, cb) {
     Person.create(item, cb);
   }, function (err) {
-    
+    if (err) {
+      // handler error
+    }
+
     // let's find the closest person to bob
     Person.find({ name : 'bob' }, function (err, res) {
       if (err) throw err;
@@ -45,7 +48,7 @@ mongoose.connect('mongodb://localhost/persons', function (err) {
         if (err) throw err;
 
         console.log("%s is closest to %s", res[0].name, closest);
-        
+
 
         // we can also just query straight off of the model. For more
         // information about geospatial queries and indexes, see

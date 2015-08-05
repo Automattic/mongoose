@@ -9,7 +9,6 @@ var start = require('./common')
   , Schema = mongoose.Schema
   , assert = require('assert')
   , random = require('../lib/utils').random
-  , Promise = require('../lib/promise')
   , Query = require('../lib/query');
 
 var Comment = new Schema({
@@ -909,7 +908,6 @@ describe('Query', function(){
       var query = new Query({}, {}, null, p1.collection);
       var db = start();
       var Product = db.model('Product');
-      var Comment = db.model('Comment');
       db.close();
 
       var params = {
@@ -1012,7 +1010,6 @@ describe('Query', function(){
   describe('distinct', function(){
     it('op', function(done){
       var db = start();
-      var query = new Query({}, {}, null, p1.collection);
       var Product = db.model('Product');
       var prod = new Product({});
       var q = new Query({}, {}, Product, prod.collection).distinct('blah', function(){
@@ -1026,7 +1023,6 @@ describe('Query', function(){
   describe('without a callback', function(){
     it('count, update, remove works', function(done){
       var db = start();
-      var query = new Query({}, {}, null, p1.collection);
       var Product = db.model('Product', 'update_products_' + random());
       new Query(p1.collection, {}, Product).count();
       Product.create({ tags: 12345 }, function (err) {
@@ -1076,7 +1072,7 @@ describe('Query', function(){
       var Product = db.model('Product');
       var promise = Product.findOne();
 
-      promise.then(function(prod) {
+      promise.then(function() {
         done();
       }, function(err) {
         assert.ifError(err);
@@ -1102,7 +1098,7 @@ describe('Query', function(){
       var db = start();
       var Product = db.model('Product');
 
-      Product.create({ strings: ['remove-single-condition'] }).then(function(p){
+      Product.create({ strings: ['remove-single-condition'] }).then(function(){
         db.close();
         var q = Product.where().remove({ strings: 'remove-single-condition' });
         assert.ok(q instanceof mongoose.Query);
@@ -1115,7 +1111,7 @@ describe('Query', function(){
       var Product = db.model('Product');
       var val = 'remove-single-callback';
 
-      Product.create({ strings: [val] }).then(function(p){
+      Product.create({ strings: [val] }).then(function(){
         Product.where({ strings: val }).remove(function (err) {
           assert.ifError(err);
           Product.findOne({ strings: val }, function (err, doc) {
@@ -1133,7 +1129,7 @@ describe('Query', function(){
       var Product = db.model('Product');
       var val = 'remove-cond-and-callback';
 
-      Product.create({ strings: [val] }).then(function(p){
+      Product.create({ strings: [val] }).then(function(){
         Product.where().remove({ strings: val }, function (err) {
           assert.ifError(err);
           Product.findOne({ strings: val }, function (err, doc) {
@@ -1156,7 +1152,6 @@ describe('Query', function(){
       var prod2doc = { comments: [{ text: 'goodbye' }] };
 
       var prod = new Product(proddoc);
-      var prod2 = new Product(prod2doc);
 
       prod.save(function (err) {
         assert.ifError(err);
@@ -1216,11 +1211,11 @@ describe('Query', function(){
         query.slaveOk();
         assert.equal(true, query.options.slaveOk);
 
-        var query = new Query({}, {}, null, p1.collection);
+        query = new Query({}, {}, null, p1.collection);
         query.slaveOk(true);
         assert.equal(true, query.options.slaveOk);
 
-        var query = new Query({}, {}, null, p1.collection);
+        query = new Query({}, {}, null, p1.collection);
         query.slaveOk(false);
         assert.equal(false, query.options.slaveOk);
         done();
@@ -1233,11 +1228,11 @@ describe('Query', function(){
         query.tailable();
         assert.equal(true, query.options.tailable);
 
-        var query = new Query({}, {}, null, p1.collection);
+        query = new Query({}, {}, null, p1.collection);
         query.tailable(true);
         assert.equal(true, query.options.tailable);
 
-        var query = new Query({}, {}, null, p1.collection);
+        query = new Query({}, {}, null, p1.collection);
         query.tailable(false);
         assert.equal(false, query.options.tailable);
         done();
@@ -1373,7 +1368,7 @@ describe('Query', function(){
       })
 
       describe('inherits its models schema read option', function(){
-        var schema, M;
+        var schema, M, called;
         before(function () {
           schema = new Schema({}, { read: 'p' });
           M = mongoose.model('schemaOptionReadPrefWithQuery', schema);
@@ -1415,7 +1410,7 @@ describe('Query', function(){
             return ret;
           }
 
-          q.exec(function(err, res) {
+          q.exec(function(err) {
             if (err) return done(err);
             assert.ok(called);
             db.close(done);

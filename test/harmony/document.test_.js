@@ -38,7 +38,7 @@ describe('Documents in ES6', function() {
       var error;
 
       var validate = {
-        validator: function(str) {
+        validator: function() {
           called = true;
           return shouldSucceed;
         },
@@ -49,7 +49,7 @@ describe('Documents in ES6', function() {
         eggs: { type: String, required: true, validate: validate },
         bacon: { type: Boolean, required: true }
       });
- 
+
       var M = db.model('validateSchema', schema, getCollectionName());
       var m = new M({ eggs: 'Sunny side up', bacon: false });
 
@@ -82,7 +82,7 @@ describe('Documents in ES6', function() {
     co(function*() {
       var error;
       var schema = new Schema({
-        description: { type: String, required: true },
+        description: { type: String, required: true }
       });
 
       var Breakfast = db.model('breakfast', schema, getCollectionName());
@@ -131,7 +131,7 @@ describe('Documents in ES6', function() {
       var breakfastCollectionName = getCollectionName();
       var foodCollectionName = getCollectionName();
       var breakfastSchema = new Schema({
-        foods: [{ type: mongoose.Schema.ObjectId, ref: foodCollectionName }],
+        foods: [{ type: mongoose.Schema.ObjectId, ref: foodCollectionName }]
       });
 
       var foodSchema = new Schema({

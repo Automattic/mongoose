@@ -8,7 +8,6 @@ var start = require('./common')
   , mongoose = start.mongoose
   , random = require('../lib/utils').random
   , Schema = mongoose.Schema
-  , SchemaType = mongoose.SchemaType
   , ObjectId = Schema.Types.ObjectId
   , MongooseBuffer = mongoose.Types.Buffer
   , DocumentObjectId = mongoose.Types.ObjectId
@@ -118,7 +117,7 @@ describe('model: querying:', function(){
 
     function fn () {
       db.close(done);
-    };
+    }
 
     BlogPostB.find({}, fn);
   });
@@ -132,7 +131,7 @@ describe('model: querying:', function(){
     function fn () {
       if (--count) return;
       db.close(done);
-    };
+    }
 
     // query
     assert.ok(BlogPostB.find(q, fn) instanceof Query);
@@ -160,7 +159,7 @@ describe('model: querying:', function(){
       if (--count) return;
       db.close();
       done();
-    };
+    }
 
     // query
     assert.ok(BlogPostB.findOne(q, fn) instanceof Query);
@@ -196,7 +195,7 @@ describe('model: querying:', function(){
         if (--pending) return;
         db.close();
         done();
-      };
+      }
 
       assert.ok(BlogPostB.count({}, fn) instanceof Query);
       assert.ok(BlogPostB.count(fn) instanceof Query);
@@ -248,7 +247,7 @@ describe('model: querying:', function(){
       var Address = new Schema({ zip: String });
       Address = db.model('Address', Address, 'addresses_' + random());
 
-      Address.create({ zip: '10010'}, { zip: '10010'}, { zip: '99701'}, function (err, a1, a2, a3) {
+      Address.create({ zip: '10010'}, { zip: '10010'}, { zip: '99701'}, function (err) {
         assert.strictEqual(null, err);
         var query = Address.distinct('zip', {}, function (err, results) {
           assert.ifError(err);
@@ -265,9 +264,9 @@ describe('model: querying:', function(){
       var db = start();
       var Address = new Schema({ zip: String });
       Address = db.model('Address', Address, 'addresses_' + random());
-      Address.create({ zip: '10010'}, { zip: '10010'}, { zip: '99701'}, function (err, a1, a2, a3) {
+      Address.create({ zip: '10010'}, { zip: '10010'}, { zip: '99701'}, function (err) {
         assert.ifError(err);
-        var query = Address.distinct('zip', function (err, results) {
+        Address.distinct('zip', function (err, results) {
           assert.ifError(err);
           assert.equal(2, results.length);
           assert.ok(results.indexOf('10010') > -1);
@@ -298,7 +297,7 @@ describe('model: querying:', function(){
         if (--count) return;
         db.close();
         done();
-      };
+      }
 
       assert.ok(BlogPostB.update({title: random()}, {}, fn) instanceof Query);
       assert.ok(BlogPostB.update({title: random()}, {}, {}, fn) instanceof Query);
@@ -529,7 +528,6 @@ describe('model: querying:', function(){
       var post = new P({ title: "nested elemMatch" });
       post.comments.push({ title: 'comment A' }, { title: 'comment B' }, { title: 'comment C' })
 
-      var id0 = post.comments[0]._id;
       var id1 = post.comments[1]._id;
       var id2 = post.comments[2]._id;
 
@@ -555,9 +553,7 @@ describe('model: querying:', function(){
       var post = new P({ title: "nested elemMatch" });
       post.comments.push({ title: 'comment D' }, { title: 'comment E' }, { title: 'comment F' })
 
-      var id0 = post.comments[0]._id;
       var id1 = post.comments[1]._id;
-      var id2 = post.comments[2]._id;
 
       post.save(function (err) {
         assert.ifError(err);
@@ -587,7 +583,7 @@ describe('model: querying:', function(){
           found.id;
           assert.equal(found._id.toString(), created._id);
           var query = { sigs: { "$in" : [new Buffer([3, 3, 3]), new Buffer([4, 5, 6])] } };
-          BlogPostB.findOne(query, function (err, found) {
+          BlogPostB.findOne(query, function (err) {
             assert.ifError(err);
             db.close();
             done();
@@ -600,7 +596,7 @@ describe('model: querying:', function(){
       var db = start()
         , B = db.model('BlogPostB', random())
 
-      B.create({ tags: 'wooof baaaark meeeeow'.split(' ') }, function (err, b) {
+      B.create({ tags: 'wooof baaaark meeeeow'.split(' ') }, function (err) {
         assert.ifError(err);
         B.findOne({ tags: /ooof$/ }, function (err, doc) {
           assert.ifError(err);
@@ -889,9 +885,9 @@ describe('model: querying:', function(){
       var id3 = new DocumentObjectId;
       var id4 = new DocumentObjectId;
 
-      NE.create({ ids: [id1, id4], b: id3 }, function (err, ne1) {
+      NE.create({ ids: [id1, id4], b: id3 }, function (err) {
         assert.ifError(err);
-        NE.create({ ids: [id2, id4], b: id3 },function (err, ne2) {
+        NE.create({ ids: [id2, id4], b: id3 },function (err) {
           assert.ifError(err);
 
           var query = NE.find({ 'b': id3.toString(), 'ids': { $ne: id1 }});
@@ -899,10 +895,10 @@ describe('model: querying:', function(){
             assert.ifError(err);
             assert.equal(1, nes1.length);
 
-            NE.find({ b: { $ne: [1] }}, function (err, nes2) {
+            NE.find({ b: { $ne: [1] }}, function (err) {
               assert.equal("Cast to ObjectId failed for value \"1\" at path \"b\"", err.message);
 
-              NE.find({ b: { $ne: 4 }}, function (err, nes3) {
+              NE.find({ b: { $ne: 4 }}, function (err) {
                 assert.equal("Cast to ObjectId failed for value \"4\" at path \"b\"", err.message);
 
                 NE.find({ b: id3, ids: { $ne: id4 }}, function (err, nes4) {
@@ -986,9 +982,9 @@ describe('model: querying:', function(){
           });
       mongoose.model('Exists', ExistsSchema);
       var Exists = db.model('Exists', 'exists_' + random());
-      Exists.create({ a: 1}, function (err, aExisting) {
+      Exists.create({ a: 1}, function (err) {
         assert.ifError(err);
-        Exists.create({b: 'hi'}, function (err, bExisting) {
+        Exists.create({b: 'hi'}, function (err) {
           assert.ifError(err);
           Exists.find({b: {$exists: true}}, function (err, docs) {
             assert.ifError(err);
@@ -1006,7 +1002,7 @@ describe('model: querying:', function(){
         , id1 = new DocumentObjectId
         , id2 = new DocumentObjectId
 
-      BlogPostB.create({owners: [id1, id2]}, function (err, createdAfter) {
+      BlogPostB.create({owners: [id1, id2]}, function (err) {
         assert.ifError(err);
         BlogPostB.find({owners: {'$elemMatch': { $in: [id2.toString()] }}}, function (err, found) {
           db.close();
@@ -1022,7 +1018,7 @@ describe('model: querying:', function(){
         , Mod = db.model('Mod', 'mods_' + random());
       Mod.create({num: 1}, function (err, one) {
         assert.ifError(err);
-        Mod.create({num: 2}, function (err, two) {
+        Mod.create({num: 2}, function (err) {
           assert.ifError(err);
           Mod.find({num: {$mod: [2, 1]}}, function (err, found) {
             assert.ifError(err);
@@ -1038,7 +1034,7 @@ describe('model: querying:', function(){
     it('where $not', function(done){
       var db = start()
         , Mod = db.model('Mod', 'mods_' + random());
-      Mod.create({num: 1}, function (err, one) {
+      Mod.create({num: 1}, function (err) {
         assert.ifError(err);
         Mod.create({num: 2}, function (err, two) {
           assert.ifError(err);
@@ -1142,7 +1138,7 @@ describe('model: querying:', function(){
     it('where $ne', function(done){
       var db = start()
         , Mod = db.model('Mod', 'mods_' + random());
-      Mod.create({num: 1}, function (err, one) {
+      Mod.create({num: 1}, function (err) {
         assert.ifError(err);
         Mod.create({num: 2}, function (err, two) {
           assert.ifError(err);
@@ -1215,7 +1211,7 @@ describe('model: querying:', function(){
 
       var a = { title: 'A', author: null};
       var b = { title: 'B' };
-      BlogPostB.create(a, b, function (err, createdA, createdB) {
+      BlogPostB.create(a, b, function (err, createdA) {
         assert.ifError(err);
         BlogPostB.find({author: {$in: [null], $exists: true}}, function (err, found) {
           db.close();
@@ -1233,7 +1229,7 @@ describe('model: querying:', function(){
 
       BlogPostB.create(
           { title: 'A', author: null }
-        , { title: 'B' }, function (err, createdA, createdB) {
+        , { title: 'B' }, function (err) {
         assert.ifError(err);
         BlogPostB.find({author: null}, function (err, found) {
           db.close();
@@ -1387,11 +1383,11 @@ describe('model: querying:', function(){
       var db = start()
         , BlogPostB = db.model('BlogPostB', collection);
 
-      BlogPostB.create({numbers: [1,2,3,4,5,6,7,8,9,10]}, function (err, whereoutZero) {
+      BlogPostB.create({numbers: [1,2,3,4,5,6,7,8,9,10]}, function (err) {
         assert.ifError(err);
-        BlogPostB.create({numbers: [11,12,13,14,15,16,17,18,19,20]}, function (err, whereZero) {
+        BlogPostB.create({numbers: [11,12,13,14,15,16,17,18,19,20]}, function (err) {
           assert.ifError(err);
-          BlogPostB.create({numbers: [1,2,3,4,5,6,7,8,9,10,11]}, function (err, found) {
+          BlogPostB.create({numbers: [1,2,3,4,5,6,7,8,9,10,11]}, function (err) {
             assert.ifError(err);
             BlogPostB.find({numbers: {$size: 10}}, function (err, found) {
               assert.ifError(err);
@@ -1464,7 +1460,7 @@ describe('model: querying:', function(){
         var db = start()
           , blogPost = db.model('BlogPostB', collection);
 
-        blogPost.collection.ensureIndex({ title : 'text' }, function(error, res) {
+        blogPost.collection.ensureIndex({ title : 'text' }, function(error) {
           assert.ifError(error);
           var a = new blogPost({ title : 'querying in mongoose' });
           var b = new blogPost({ title : 'text search in mongoose' });
@@ -1501,7 +1497,7 @@ describe('model: querying:', function(){
           large_text: String
         });
 
-        indexes = exampleSchema.indexes();
+        var indexes = exampleSchema.indexes();
         assert.equal(indexes[0][1].text, true);
         db.close(done);
       });
@@ -1517,7 +1513,7 @@ describe('model: querying:', function(){
         assert.ifError(err);
         BlogPostB.create({title: 'second limit'}, function (err, second) {
           assert.ifError(err);
-          BlogPostB.create({title: 'third limit'}, function (err, third) {
+          BlogPostB.create({title: 'third limit'}, function (err) {
             assert.ifError(err);
             BlogPostB.find({title: /limit$/}).limit(2).find( function (err, found) {
               db.close();
@@ -1538,7 +1534,7 @@ describe('model: querying:', function(){
       var db = start()
         , BlogPostB = db.model('BlogPostB', collection);
 
-      BlogPostB.create({title: 'first skip'}, function (err, first) {
+      BlogPostB.create({title: 'first skip'}, function (err) {
         assert.ifError(err);
         BlogPostB.create({title: 'second skip'}, function (err, second) {
           assert.ifError(err);
@@ -1593,7 +1589,7 @@ describe('model: querying:', function(){
       var db = start()
         , blogPost = db.model('BlogPostB', collection);
 
-      blogPost.collection.ensureIndex({ title : 'text' }, function(error, res) {
+      blogPost.collection.ensureIndex({ title : 'text' }, function(error) {
         assert.ifError(error);
         var a = new blogPost({ title : 'searching in mongoose' });
         var b = new blogPost({ title : 'text search in mongoose' });
@@ -1624,7 +1620,7 @@ describe('model: querying:', function(){
       var db = start()
         , BlogPostB = db.model('BlogPostB', collection);
 
-      BlogPostB.find({ 'mixed.nested.stuff': 'skynet' }, function (err, docs) {
+      BlogPostB.find({ 'mixed.nested.stuff': 'skynet' }, function (err) {
         db.close();
         assert.ifError(err);
         done();
@@ -1638,7 +1634,7 @@ describe('model: querying:', function(){
       , Test = db.model('TestDateQuery', new Schema({ date: Date }), 'datetest_' + random())
       , now = new Date;
 
-    Test.create({ date: now }, { date: new Date(now-10000) }, function (err, a, b) {
+    Test.create({ date: now }, { date: new Date(now-10000) }, function (err) {
       assert.ifError(err);
       Test.find({ date: now }, function (err, docs) {
         db.close();
@@ -1764,7 +1760,7 @@ describe('model: querying:', function(){
       var db = start();
       var B = db.model('BlogPostB');
 
-      B.create({ title: 'and operator', published: false, author: 'Me' }, function(err, doc) {
+      B.create({ title: 'and operator', published: false, author: 'Me' }, function(err) {
         assert.ifError(err);
 
         B.find({ $and: [{ title: 'and operator' }] }, function(err, docs) {
@@ -1841,7 +1837,7 @@ describe('buffers', function(){
           assert.ifError(err);
           assert.equal(rb.block.toString('utf8'),'buffer shtuffs are neat');
 
-          Test.findOne({ block: /buffer/i }, function (err, rb) {
+          Test.findOne({ block: /buffer/i }, function (err) {
             assert.equal(err.message, 'Cast to buffer failed for value "/buffer/i" at path "block"')
             Test.findOne({ block: [195, 188, 98, 101, 114] }, function (err, rb) {
               assert.ifError(err);

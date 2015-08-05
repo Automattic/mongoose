@@ -6,19 +6,7 @@
 var start = require('./common')
   , assert = require('assert')
   , mongoose = start.mongoose
-  , random = require('../lib/utils').random
-  , Query = require('../lib/query')
-  , Schema = mongoose.Schema
-  , SchemaType = mongoose.SchemaType
-  , CastError = mongoose.Error.CastError
-  , ValidatorError = mongoose.Error.ValidatorError
-  , ValidationError = mongoose.Error.ValidationError
-  , ObjectId = Schema.Types.ObjectId
-  , DocumentObjectId = mongoose.Types.ObjectId
-  , DocumentArray = mongoose.Types.DocumentArray
-  , EmbeddedDocument = mongoose.Types.Embedded
-  , MongooseArray = mongoose.Types.Array
-  , MongooseError = mongoose.Error;
+  , Schema = mongoose.Schema;
 
 describe('documents should not be converted to _id (gh-1408)', function(){
   it('if an embedded doc', function(done){
@@ -32,7 +20,7 @@ describe('documents should not be converted to _id (gh-1408)', function(){
 
     var BrandSchema = new Schema({
         settings: {
-          preferences: [PreferenceSchema],
+          preferences: [PreferenceSchema]
         }
     });
 

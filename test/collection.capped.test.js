@@ -73,7 +73,7 @@ describe('collections: capped:', function(){
           done();
         });
 
-        var C = db.model('CappedExisting', capped, conn);
+        db.model('CappedExisting', capped, conn);
         timer = setTimeout(function () {
           db.close();
           throw new Error('capped test timeout');

@@ -9,8 +9,6 @@ var assert = require('assert')
   , EmbeddedDocument = require('../lib/types/embedded')
   , DocumentArray = require('../lib/types/documentarray')
   , Schema = mongoose.Schema
-  , SchemaType = mongoose.SchemaType
-  , ValidatorError = SchemaType.ValidatorError
   , ValidationError = mongoose.Document.ValidationError
 
 /**
@@ -29,7 +27,7 @@ function Subdocument () {
   arr._parent = new Dummy;
   arr[0] = this;
   EmbeddedDocument.call(this, {}, arr);
-};
+}
 
 /**
  * Inherits from EmbeddedDocument.
@@ -74,7 +72,7 @@ describe('types.document', function(){
     a.set('work', 'nope');
     a.__index = 0;
 
-    a.validate(function(err){
+    a.validate(function(){
       assert.ok(a.__parent.$__.validationError instanceof ValidationError);
       assert.equal(a.__parent.errors['jsconf.ar.0.work'].name, 'ValidatorError');
       assert.equal(a.__parent.$__.validationError.toString(), 'ValidationError: Path `test` is required., Validator failed for path `work` with value `nope`');
@@ -181,7 +179,7 @@ describe('types.document', function(){
               // gh-531
               movie.ratings[0].remove();
               movie.ratings[0].remove();
-              movie.save(function (err) {
+              movie.save(function () {
                 Movie.findById(super8._id, function (err, movie) {
                   assert.ifError(err);
                   assert.equal(0, movie.ratings.length);

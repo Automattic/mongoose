@@ -7,16 +7,12 @@ var start = require('./common')
   , assert = require('assert')
   , mongoose = start.mongoose
   , random = require('../lib/utils').random
-  , Query = require('../lib/query')
   , Schema = mongoose.Schema
-  , SchemaType = mongoose.SchemaType
   , ValidatorError = mongoose.Error.ValidatorError
   , ValidationError = mongoose.Error.ValidationError
   , ObjectId = Schema.Types.ObjectId
   , DocumentObjectId = mongoose.Types.ObjectId
-  , DocumentArray = mongoose.Types.DocumentArray
   , EmbeddedDocument = mongoose.Types.Embedded
-  , MongooseArray = mongoose.Types.Array
   , MongooseError = mongoose.Error;
 
 /**
@@ -521,7 +517,7 @@ describe('Model', function(){
         assert.equal(true, post.get('comments')[0].isNew);
         assert.equal(true, post.get('comments')[0].comments[0].isNew);
         post.invalidate('title'); // force error
-        post.save(function (err) {
+        post.save(function () {
           assert.equal(true, post.isNew);
           assert.equal(true, post.get('comments')[0].isNew);
           assert.equal(true, post.get('comments')[0].comments[0].isNew);
@@ -853,8 +849,7 @@ describe('Model', function(){
 
     it('subdocument cast error', function(done){
       var db = start()
-        , BlogPost = db.model('BlogPost', collection)
-        , threw = false;
+        , BlogPost = db.model('BlogPost', collection);
 
       var post = new BlogPost({
           title       : 'Test'
@@ -874,7 +869,7 @@ describe('Model', function(){
 
 
     it('subdocument validation error', function(done){
-      function failingvalidator(val) {
+      function failingvalidator() {
         return false;
       }
 
@@ -967,11 +962,11 @@ describe('Model', function(){
         , post = new BlogPost();
 
       post.get('numbers').push(1, 2, 3, 4);
-      post.save( function (err) {
+      post.save( function () {
         BlogPost.findById( post.get('_id'), function (err, found) {
           assert.equal(found.get('numbers').length,4);
           found.get('numbers').pull('3');
-          found.save( function (err) {
+          found.save( function () {
             BlogPost.findById(found.get('_id'), function (err, found2) {
               db.close();
               assert.ifError(err);
@@ -1059,7 +1054,7 @@ describe('Model', function(){
 
   describe('validation', function(){
     it('works', function(done){
-      function dovalidate (val) {
+      function dovalidate () {
         assert.equal('correct', this.asyncScope);
         return true;
       }
@@ -1364,7 +1359,7 @@ describe('Model', function(){
             executed = true;
             fn(v !== 'test');
           }, 5);
-        };
+        }
         mongoose.model('TestAsyncValidation', new Schema({
             async: { type: String, validate: [validator, 'async validator failed for `{PATH}`'] }
         }));
@@ -1401,7 +1396,7 @@ describe('Model', function(){
             executed = true;
             fn(v !== 'test');
           }, 5);
-        };
+        }
 
         mongoose.model('TestNestedAsyncValidation', new Schema({
             nested: {
@@ -1452,7 +1447,7 @@ describe('Model', function(){
             executed = true;
             fn(v !== '');
           }, 5);
-        };
+        }
 
         var Subdocs = new Schema({
             required: { type: String, validate: [validator, 'async in subdocs'] }
@@ -2159,9 +2154,8 @@ describe('Model', function(){
         var threw = false;
         var getter1;
         var getter2;
-        var strmet;
         try {
-          strmet = JSON.stringify(meta);
+          JSON.stringify(meta);
           getter1 = JSON.stringify(post.get('meta'));
           getter2 = JSON.stringify(post.meta);
         } catch (err) {
@@ -2528,7 +2522,7 @@ describe('Model', function(){
               });
             });
           }
-        };
+        }
 
         function complete () {
           BlogPost.findOne({ _id: post.get('_id') }, function (err, doc) {
@@ -2568,7 +2562,7 @@ describe('Model', function(){
             assert.ok(v);
             done();
           });
-        };
+        }
       });
     })
 
@@ -2617,7 +2611,7 @@ describe('Model', function(){
     mongoose.model('Outer', Outer);
 
     var db = start();
-    var Outer = db.model('Outer', 'arr_test_' + random());
+    Outer = db.model('Outer', 'arr_test_' + random());
 
     var outer = new Outer();
     outer.inner.push({});
@@ -2666,7 +2660,7 @@ describe('Model', function(){
       t.save(function (err) {
         assert.ifError(err);
         assert.equal(t.nested.nums.length,2);
-        Temp.findById(t._id, function (err, found) {
+        Temp.findById(t._id, function (err) {
           db.close();
           assert.ifError(err);
           assert.equal(t.nested.nums.length,2);
@@ -2856,7 +2850,7 @@ describe('Model', function(){
               });
             });
           }
-        };
+        }
 
         function complete () {
           Temp.findOne({ _id: t.get('_id') }, function (err, doc) {
@@ -2879,7 +2873,7 @@ describe('Model', function(){
             assert.ok(v);
             db.close(done);
           });
-        };
+        }
       });
     })
 
@@ -2922,7 +2916,7 @@ describe('Model', function(){
               });
             });
           }
-        };
+        }
 
         function complete () {
           StrList.findOne({ _id: t.get('_id') }, function (err, doc) {
@@ -2947,7 +2941,7 @@ describe('Model', function(){
             assert.ok(v);
             done();
           });
-        };
+        }
       });
     })
 
@@ -2989,7 +2983,7 @@ describe('Model', function(){
               });
             });
           }
-        };
+        }
 
         function complete () {
           BufList.findOne({ _id: t.get('_id') }, function (err, doc) {
@@ -3015,7 +3009,7 @@ describe('Model', function(){
 
             done();
           });
-        };
+        }
       });
     })
 
@@ -3339,7 +3333,7 @@ describe('Model', function(){
             doc.mixed.push([ 'foo', 'bar' ]);
             doc.markModified('mixed');
 
-            doc.save(function (err, doc) {
+            doc.save(function (err) {
               assert.ifError(err);
 
               BlogPost.findById(post2._id, function (err, doc) {
@@ -3412,7 +3406,7 @@ describe('Model', function(){
         x: { y: { type: { type: String }, owner: String } }
     }));
 
-    var post = new TestDefaults2;
+    post = new TestDefaults2;
     post.x.y.type = "#402";
     post.x.y.owner= "me";
     post.save(function (err) {
@@ -3459,7 +3453,7 @@ describe('Model', function(){
       mongoose.model('SafeHuman', Human, true);
 
       var db = start()
-        , Human = db.model('SafeHuman', 'safehuman' + random());
+      Human = db.model('SafeHuman', 'safehuman' + random());
 
       Human.on('index', function (err) {
         assert.ifError(err);
@@ -3503,8 +3497,8 @@ describe('Model', function(){
 
       mongoose.model('UnsafeHuman', Human, true);
 
-      var db = start()
-        , Human = db.model('UnsafeHuman', 'unsafehuman' + random());
+      var db = start();
+      Human = db.model('UnsafeHuman', 'unsafehuman' + random());
 
       Human.on('index', function (err) {
         assert.ifError(err);
@@ -3713,7 +3707,7 @@ describe('Model', function(){
           var doc = new PreInit();
           doc.save(function (err) {
             assert.ifError(err);
-            PreInit.findById(doc._id, function (err, found) {
+            PreInit.findById(doc._id, function (err) {
               db.close();
               assert.ifError(err);
               assert.strictEqual(undefined, preId);
@@ -3805,9 +3799,7 @@ describe('Model', function(){
       });
 
       it('on embedded docs', function(done){
-        var save = false,
-            init = false,
-            remove = false;
+        var save = false;
 
         var EmbeddedSchema = new Schema({
           title : String
@@ -3817,7 +3809,7 @@ describe('Model', function(){
           embeds : [EmbeddedSchema]
         });
 
-        EmbeddedSchema.post('save', function(next){
+        EmbeddedSchema.post('save', function(){
           save = true;
         });
 
@@ -3855,7 +3847,7 @@ describe('Model', function(){
       var db = start()
         , BlogPost = db.model('BlogPost'+random(), bpSchema);
 
-      BlogPost.create({title: 'interoperable count as promise'}, function (err, created) {
+      BlogPost.create({title: 'interoperable count as promise'}, function (err) {
         assert.ifError(err);
         var query = BlogPost.count({title: 'interoperable count as promise'});
         query.exec(function (err, count) {
@@ -3872,7 +3864,7 @@ describe('Model', function(){
       var db = start()
         , BlogPost = db.model(col, bpSchema);
 
-      BlogPost.create({title: 'interoperable update as promise'}, function (err, created) {
+      BlogPost.create({title: 'interoperable update as promise'}, function (err) {
         assert.ifError(err);
         var query = BlogPost.update({title: 'interoperable update as promise'}, {title: 'interoperable update as promise delta'});
         query.exec(function (err) {
@@ -3933,7 +3925,7 @@ describe('Model', function(){
 
       BlogPost.create(
           {title: 'interoperable remove as promise'}
-        , function (err, createdOne, createdTwo) {
+        , function (err) {
         assert.ifError(err);
         var query = BlogPost.remove({title: 'interoperable remove as promise'});
         query.exec(function (err) {
@@ -3969,7 +3961,7 @@ describe('Model', function(){
         var db = start()
           , BlogPost = db.model('BlogPost'+random(), bpSchema);
 
-        BlogPost.create({title: 'interoperable count as promise 2'}, function (err, created) {
+        BlogPost.create({title: 'interoperable count as promise 2'}, function (err) {
           assert.ifError(err);
           var query = BlogPost.count({title: 'interoperable count as promise 2'});
           var promise = query.exec();
@@ -3987,7 +3979,7 @@ describe('Model', function(){
         var db = start()
           , BlogPost = db.model(col, bpSchema);
 
-        BlogPost.create({title: 'interoperable update as promise 2'}, function (err, created) {
+        BlogPost.create({title: 'interoperable update as promise 2'}, function (err) {
           assert.ifError(err);
           var query = BlogPost.update({title: 'interoperable update as promise 2'}, {title: 'interoperable update as promise delta 2'});
           var promise = query.exec();
@@ -4048,7 +4040,7 @@ describe('Model', function(){
 
         BlogPost.create(
             {title: 'interoperable remove as promise 2'}
-          , function (err, createdOne, createdTwo) {
+          , function (err) {
           assert.ifError(err);
           var query = BlogPost.remove({title: 'interoperable remove as promise 2'});
           var promise = query.exec();
@@ -4097,7 +4089,7 @@ describe('Model', function(){
               { name: 'brandon', likes: [d1] }
             , { name: 'ben', likes: [d2] }
             , { name: 'bernie', likes: [d3] }
-            , function (err, brandon, ben, bernie) {
+            , function (err) {
             assert.ifError(err);
 
             var promise = B.find({ title: /^then promise/ }).select('_id').exec();
@@ -4109,7 +4101,7 @@ describe('Model', function(){
             }).then(function (people) {
               assert.equal(3, people.length);
               return people;
-            }).then(function (people) {
+            }).then(function () {
               db.close();
               done();
             }, function (err) {
@@ -4146,8 +4138,6 @@ describe('Model', function(){
       });
 
       db.close();
-
-      var a = '{ meta: { visitors: 45 },\n  numbers: [ 5, 6, 7 ],\n  owners: [ 4dd3e169dbfb13b4570000b6 ],\n  comments: \n   [{ _id: 4dd3e169dbfb13b4570000b7,\n     comments: [],\n     body: \'this is a comment\',\n     date: Wed, 18 May 2011 15:02:31 GMT,\n     title: \'my comment\' }\n   { _id: 4dd3e169dbfb13b4570000b8,\n     comments: [],\n     body: \'this is a comment too!\',\n     date: Wed, 18 May 2011 15:02:31 GMT,\n     title: \'the next thang\' }],\n  _id: 4dd3e169dbfb13b4570000b9,\n  date: Wed, 18 May 2011 15:02:31 GMT,\n  title: \'Test\' }'
 
       var out = post.inspect();
       assert.ok(/meta: { visitors: 45 }/.test(out));
@@ -4609,7 +4599,7 @@ describe('Model', function(){
           assert.ifError(err);
 
           doc.score = undefined; // unset
-          doc.save(function (err, doc, count){
+          doc.save(function (err){
             assert.ifError(err);
 
             DefaultTestObject.findById(doc._id, function (err, doc){
@@ -5073,7 +5063,7 @@ describe('Model', function(){
 
       var parentSchema = new Schema({
         children: [new Schema({
-          name: String,
+          name: String
         })]
       });
 
@@ -5084,7 +5074,7 @@ describe('Model', function(){
       parent.save(function(err, it) {
         assert.ifError(err);
         parent.children.push({name: 'another child'});
-        Parent.findByIdAndUpdate(it._id, { $set: { children: parent.children } }, function(err, affected) {
+        Parent.findByIdAndUpdate(it._id, { $set: { children: parent.children } }, function(err) {
           assert.ifError(err);
           db.close(done);
         });

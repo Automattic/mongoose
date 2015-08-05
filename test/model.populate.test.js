@@ -92,7 +92,7 @@ describe('model: populate:', function(){
       });
     });
   });
-  
+
   it('deep population', function(done){
     var db = start()
       , BlogPost = db.model('RefBlogPost', posts)
@@ -106,13 +106,13 @@ describe('model: populate:', function(){
 
         User.create({ name: 'User 03', followers: [user2._id] }, function (err, user3) {
           assert.ifError(err);
-  
+
           BlogPost.create({
             title: 'w00tabulous'
             , _creator: user3._id
           }, function (err, post) {
             assert.ifError(err);
-  
+
             assert.doesNotThrow(function(){
               BlogPost
                 .findById(post._id)

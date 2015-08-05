@@ -10,7 +10,6 @@ var start = require('./common')
   , StateMachine = require('../lib/statemachine')
   , ObjectId = require('../lib/types/objectid')
   , MongooseBuffer = require('../lib/types/buffer')
-  , ReadPref = mongoose.mongo.ReadPreference
   , assert = require('assert')
 
 /**
@@ -393,4 +392,3 @@ describe('utils', function(){
     })
   });
 });
-

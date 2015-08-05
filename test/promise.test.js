@@ -3,7 +3,8 @@
  * Module dependencies.
  */
 
-var assert = require('assert')
+var assert = require('assert');
+
 var Promise = require('../lib/promise');
 
 /**
@@ -99,7 +100,7 @@ describe('Promise', function(){
         called++;
       });
 
-      promise.onResolve(function (err, data){
+      promise.onResolve(function (err){
         assert.strictEqual(err, null);
         called++;
       });
@@ -200,13 +201,13 @@ describe('Promise', function(){
 
     describe('reject()', function(){
       it('does not cast arguments to Error', function(done){
-        var p = new Promise(function (err, arg) {
+        var p = new Promise(function (err) {
           assert.equal(3, err);
           done();
         });
 
         p.reject(3);
-      })
-    })
-  })
-})
+      });
+    });
+  });
+});

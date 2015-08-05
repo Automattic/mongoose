@@ -25,7 +25,7 @@ PersonSchema.methods.toJSonConfig = {
   include: ['prop1', 'prop2'],
   exclude: ['prop3', 'prop4']
 };
-PersonSchema.statics.findByGender = function(gender, cb) {};
+PersonSchema.statics.findByGender = function() {};
 PersonSchema.virtual('name.full').get(function () {
   return this.name.first + ' ' + this.name.last;
 });
@@ -48,7 +48,7 @@ EmployeeSchema.index({ department: 1 });
 EmployeeSchema.methods.getDepartment = function() {
   return this.department;
 };
-EmployeeSchema.statics.findByDepartment = function(department, cb) {};
+EmployeeSchema.statics.findByDepartment = function() {};
 EmployeeSchema.path('department').validate(function(value) {
   return /[a-zA-Z]/.test(value);
 }, 'Invalid name');
@@ -226,7 +226,7 @@ describe('model', function() {
 
       assert.doesNotThrow(function() {
         var Person = db.model('gh2821', PersonSchema);
-        var Boss = Person.discriminator('Boss', BossSchema);
+        Person.discriminator('Boss', BossSchema);
       });
       done();
     });
@@ -307,14 +307,15 @@ describe('model', function() {
       });
 
       it('merges callQueue with base queue defined before discriminator types callQueue', function(done) {
-        assert.equal(Employee.schema.callQueue.length, 3);
+        assert.equal(Employee.schema.callQueue.length, 4);
         // PersonSchema.post('save')
         assert.strictEqual(Employee.schema.callQueue[0], Person.schema.callQueue[0]);
 
         // EmployeeSchema.pre('save')
-        assert.strictEqual(Employee.schema.callQueue[2][0], 'pre');
-        assert.strictEqual(Employee.schema.callQueue[2][1]['0'], 'save');
-        assert.strictEqual(Employee.schema.callQueue[2][1]['1'], employeeSchemaPreSaveFn);
+        var queueIndex = Employee.schema.callQueue.length - 1;
+        assert.strictEqual(Employee.schema.callQueue[queueIndex][0], 'pre');
+        assert.strictEqual(Employee.schema.callQueue[queueIndex][1]['0'], 'save');
+        assert.strictEqual(Employee.schema.callQueue[queueIndex][1]['1'], employeeSchemaPreSaveFn);
         done();
       });
 

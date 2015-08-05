@@ -10,7 +10,7 @@ describe('sharding', function() {
   it('should handle shard keys properly (gh-2127)', function(done) {
     var mockSchema = {
       options: {
-        shardKey: { date: 1 } 
+        shardKey: { date: 1 }
       }
     };
     var Stub = function() {
@@ -42,7 +42,6 @@ describe('toObject()', function() {
       this.$__ = {};
     };
     Stub.prototype = Object.create(mongoose.Document.prototype);
-    var d = new Stub();
   });
 
   it('should inherit options from schema', function(done) {
@@ -53,7 +52,16 @@ describe('toObject()', function() {
 
   it('can overwrite by passing an option', function(done) {
     var d = new Stub();
-    assert.equal(d.toObject({ minimize: true }), undefined);
+    assert.deepEqual(d.toObject({ minimize: true }), {});
+    done();
+  });
+
+  it('doesnt crash with empty object (gh-3130)', function(done) {
+    var d = new Stub();
+    d._doc = undefined;
+    assert.doesNotThrow(function() {
+      d.toObject();
+    });
     done();
   });
 });

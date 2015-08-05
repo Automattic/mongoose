@@ -6,7 +6,6 @@ var suite = new Benchmark.Suite();
 
 var Schema = mongoose.Schema;
 var ObjectId = Schema.Types.ObjectId;
-var mongo = require('mongodb');
 var utils = require('../../lib/utils.js');
 
 // to make things work in the way the are normally described online...
@@ -124,7 +123,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench-pop', function (err) {
     isThisTest : true
   };
   var Comments = mongoose.model('Comment', commentSchema);
-  var BlogPost = mongoose.model('BlogPost', BlogPost);
+  BlogPost = mongoose.model('BlogPost', BlogPost);
   var Dummy1 = mongoose.model('Dummy1', dummy1Schema);
   var Dummy2 = mongoose.model('Dummy2', dummy2Schema);
   var Dummy3 = mongoose.model('Dummy3', dummy3Schema);
@@ -141,7 +140,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench-pop', function (err) {
   }
 
   var cn = 5000;
-  for (var i=0; i < 500; i++) {
+  for (i=0; i < 500; i++) {
     Comments.create(commentData, function (err, com) {
       cIds.push(com.id);
       --cn || cont();
@@ -209,16 +208,16 @@ mongoose.connect('mongodb://localhost/mongoose-bench-pop', function (err) {
     for (var i=0; i < 10; i++) {
       blog[0].comments.push(getNextcId());
     }
-    for (var i=0; i < 100; i++) {
+    for (i=0; i < 100; i++) {
       blog[1].comments.push(getNextcId());
     }
-    for (var i=0; i < 1000; i++) {
+    for (i=0; i < 1000; i++) {
       blog[2].comments.push(getNextcId());
     }
-    for (var i=0; i < 10000; i++) {
+    for (i=0; i < 10000; i++) {
       blog[3].comments.push(getNextcId());
     }
-    for (var i=0; i < 100; i++) {
+    for (i=0; i < 100; i++) {
       blog[5].comments.push(getNextcId());
       blog[6].comments.push(getNextcId());
 
@@ -240,7 +239,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench-pop', function (err) {
 
     // insert all of the data here
     var count = 7;
-    for (var i=0; i < blog.length; i++) {
+    for (i=0; i < blog.length; i++) {
       // use some closure magic to make sure we retain the index
       (function(c) {
         BlogPost.create(blog[c], function (err, bl) {
@@ -255,7 +254,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench-pop', function (err) {
 
   var ci = 0;
   var di = [];
-  for (var i=0; i < 9; i++) {
+  for (i=0; i < 9; i++) {
     di.push(0);
   }
 

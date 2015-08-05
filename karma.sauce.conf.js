@@ -91,7 +91,6 @@ module.exports = function(config) {
 
     sauceLabs: {
       testName: 'Mongoose ' + Date.now()
-    },
+    }
   });
 };
-

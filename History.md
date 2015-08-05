@@ -1,3 +1,89 @@
+4.1.1 / 2015-08-03
+==================
+ * fixed; aggregate exec() crash with no callback #3212 #3198 [jpgarcia](https://github.com/jpgarcia)
+ * fixed; pre init hooks now properly synchronous #3207 [burtonjc](https://github.com/burtonjc)
+ * fixed; updateValidators doesn't flatten dates #3206 #3194 [victorkohl](https://github.com/victorkohl)
+ * fixed; default fields don't make document dirty between saves #3205 [burtonjc](https://github.com/burtonjc)
+ * fixed; save passes 0 as numAffected rather than undefined when no change #3195 [burtonjc](https://github.com/burtonjc)
+ * fixed; better handling for positional operator in update #3185
+ * fixed; use Travis containers #3181 [ChristianMurphy](https://github.com/ChristianMurphy)
+ * fixed; leaked variable #3180 [ChristianMurphy](https://github.com/ChristianMurphy)
+
+4.1.0 / 2015-07-24
+==================
+ * added; `schema.queue()` now public #3193
+ * added; raw result as third parameter to findOneAndX callback #3173
+ * added; ability to run validateSync() on only certain fields #3153
+ * added; subPopulate #3103 [timbur](https://github.com/timbur)
+ * added; $isDefault function on documents #3077
+ * added; additional properties for built-in validator messages #3063 [KLicheR](https://github.com/KLicheR)
+ * added; getQuery() and getUpdate() functions for Query #3013
+ * added; export DocumentProvider #2996
+ * added; ability to remove path from schema #2993 [JohnnyEstilles](https://github.com/JohnnyEstilles)
+ * added; .explain() helper for aggregate #2714
+ * added; ability to specify which ES6-compatible promises library mongoose uses #2688
+ * added; export Aggregate #1910
+
+4.0.8 / 2015-07-20
+==================
+ * fixed; assignment with document arrays #3178 [rosston](https://github.com/rosston)
+ * docs; remove duplicate paragraph #3164 [rhmeeuwisse](https://github.com/rhmeeuwisse)
+ * docs; improve findOneAndXYZ parameter descriptions #3159 [rhmeeuwisse](https://github.com/rhmeeuwisse)
+ * docs; add findOneAndRemove to list of supported middleware #3158
+ * docs; clarify ensureIndex #3156
+ * fixed; refuse to save/remove document without id #3118
+ * fixed; hooks next() no longer accidentally returns promise #3104
+ * fixed; strict mode for findOneAndUpdate #2947
+ * added; .min.js.gz file for browser component #2806
+
+3.8.35 / 2015-07-20
+===================
+ * fixed; allow using $rename #3171
+ * fixed; no longer modifies update arguments #3008
+
+4.0.7 / 2015-07-11
+==================
+ * fixed; documentarray id method when using object id #3157 [siboulet](https://github.com/siboulet)
+ * docs; improve findById docs #3147
+ * fixed; update validators handle null properly #3136 [odeke-em](https://github.com/odeke-em)
+ * docs; jsdoc syntax errors #3128 [rhmeeuwisse](https://github.com/rhmeeuwisse)
+ * docs; fix typo #3126 [rhmeeuwisse](https://github.com/rhmeeuwisse)
+ * docs; proper formatting in queries.jade #3121 [rhmeeuwisse](https://github.com/rhmeeuwisse)
+ * docs; correct example for string maxlength validator #3111 [rhmeeuwisse](https://github.com/rhmeeuwisse)
+ * fixed; setDefaultsOnInsert with arrays #3107
+ * docs; LearnBoost -> Automattic in package.json #3099
+ * docs; pre update hook example #3094 [danpe](https://github.com/danpe)
+ * docs; clarify query middleware example #3051
+ * fixed; ValidationErrors in strict mode #3046
+ * fixed; set findOneAndUpdate properties before hooks run #3024
+
+3.8.33 / 2015-07-10
+===================
+ * upgraded; node driver -> 1.4.38
+ * fixed; dont crash when `match` validator undefined
+
+4.0.6 / 2015-06-21
+==================
+ * upgraded; node driver -> 2.0.34 #3087
+ * fixed; apply setters on addToSet, etc #3067 [victorkohl](https://github.com/victorkohl)
+ * fixed; missing semicolons #3065 [sokolikp](https://github.com/sokolikp)
+ * fixed; proper handling for async doc hooks #3062 [gregthegeek](https://github.com/gregthegeek)
+ * fixed; dont set failed populate field to null if other docs are successfully populated #3055 [eloytoro](https://github.com/eloytoro)
+ * fixed; setDefaultsOnInsert with document arrays #3034 [taxilian](https://github.com/taxilian)
+ * fixed; setters fired on array items #3032
+ * fixed; stop validateSync() on first error #3025 [victorkohl](https://github.com/victorkohl)
+ * docs; improve query docs #3016
+ * fixed; always exclude _id when its deselected #3010
+ * fixed; enum validator kind property #3009
+ * fixed; mquery collection names #3005
+ * docs; clarify mongos option #3000
+ * docs; clarify that query builder has a .then() #2995
+ * fixed; race condition in dynamic ref #2992
+
+3.8.31 / 2015-06-20
+===================
+ * fixed; properly handle text search with discriminators and $meta #2166
+
 4.0.5 / 2015-06-05
 ==================
  * fixed; ObjectIds and buffers when mongodb driver is a sibling dependency #3050 #3048 #3040 #3031 #3020 #2988 #2951

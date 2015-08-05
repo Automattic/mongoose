@@ -1,4 +1,3 @@
-
 // import async to make control flow simplier
 var async = require('async');
 
@@ -20,7 +19,7 @@ var data = [
   { name : 'lilly', age : 26, birthday : new Date().setFullYear((new
     Date().getFullYear() - 26)), gender : "Female" },
   { name : 'alucard', age : 1000, birthday : new Date().setFullYear((new
-    Date().getFullYear() - 1000)), gender : "Male" },
+    Date().getFullYear() - 1000)), gender : "Male" }
 ];
 
 
@@ -31,7 +30,10 @@ mongoose.connect('mongodb://localhost/persons', function (err) {
   async.each(data, function (item, cb) {
     Person.create(item, cb);
   }, function (err) {
-     
+    if (err) {
+      // handle error
+    }
+
     // alright, simple map reduce example. We will find the total ages of each
     // gender
 
@@ -40,7 +42,8 @@ mongoose.connect('mongodb://localhost/persons', function (err) {
 
     o.map = function () {
       // in this function, 'this' refers to the current document being
-      // processed. Return the (gender, age) tuple using emit()
+      // processed. Return the (gender, age) tuple using
+      /* global emit */
       emit(this.gender, this.age);
     };
 

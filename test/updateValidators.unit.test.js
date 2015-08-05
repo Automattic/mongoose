@@ -39,5 +39,22 @@ describe('updateValidators', function() {
         done();
       });
     });
+
+    it('doesnt flatten dates (gh-3194)', function(done) {
+      var dt = new Date();
+      var fn = updateValidators({}, schema, { test: dt }, {});
+      schema.doValidate.emitter.on('called', function(args) {
+        args.cb();
+      });
+      fn(function(err) {
+        assert.ifError(err);
+        assert.equal(schema.path.calls.length, 2);
+        assert.equal(schema.doValidate.calls.length, 1);
+        assert.equal('test', schema.path.calls[0]);
+        assert.equal('test', schema.path.calls[1]);
+        assert.equal(dt, schema.doValidate.calls[0].v);
+        done();
+      });
+    });
   });
 });

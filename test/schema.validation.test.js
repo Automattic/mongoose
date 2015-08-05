@@ -6,16 +6,11 @@ var start = require('./common')
   , mongoose = start.mongoose
   , assert = require('assert')
   , Schema = mongoose.Schema
-  , Document = mongoose.Document
-  , SchemaType = mongoose.SchemaType
-  , VirtualType = mongoose.VirtualType
   , ValidatorError = mongoose.Error.ValidatorError
   , SchemaTypes = Schema.Types
   , ObjectId = SchemaTypes.ObjectId
   , Mixed = SchemaTypes.Mixed
   , DocumentObjectId = mongoose.Types.ObjectId
-  , MongooseArray = mongoose.Types.Array
-  , vm = require('vm')
   , random = require('../lib/utils').random
 
 describe('schema', function(){
@@ -65,7 +60,7 @@ describe('schema', function(){
       // with SchemaTypes validate method
       Test.path('state').enum({
         values: 'opening open closing closed'.split(' '),
-        message: 'enum validator failed for path `{PATH}` with value `{VALUE}`'
+        message: 'enum validator failed for path `{PATH}`: test'
       });
 
       assert.equal(Test.path('state').validators.length, 1);
@@ -90,6 +85,8 @@ describe('schema', function(){
 
       Test.path('state').doValidate('x', function(err){
         assert.ok(err instanceof ValidatorError);
+        assert.equal(err.message,
+          'enum validator failed for path `state`: test')
       });
 
       Test.path('state').doValidate('opening', function(err){
@@ -139,6 +136,12 @@ describe('schema', function(){
       Test.path('simple').doValidate(0, function(err){
         assert.ok(err instanceof ValidatorError);
       });
+
+      Test.path('simple').match(null);
+      Test.path('simple').doValidate(0, function(err) {
+        assert.ok(err instanceof ValidatorError);
+      });
+
       done();
     });
 
@@ -338,7 +341,7 @@ describe('schema', function(){
         done();
       });
 
-      it('date not empty string', function (done) {
+      it('date not empty string (gh-3132)', function (done) {
         var HappyBirthday = new Schema({
           date: { type: Date, required: true }
         });
@@ -750,7 +753,7 @@ describe('schema', function(){
         next();
       });
 
-      var B = mongoose.model('b', B);
+      B = mongoose.model('b', B);
 
       var p = new B();
       p.a.push({ str: 'asdf' });
@@ -873,6 +876,23 @@ describe('schema', function(){
       assert.ok(error);
       var errorMessage = 'ValidationError: Path `description` is required.';
       assert.equal(errorMessage, error.toString());
+      done();
+    });
+
+    it('validateSync allows you to filter paths (gh-3153)', function(done) {
+      var breakfast = new Schema({
+        description: { type: String, required: true, maxlength: 50 },
+        other: { type: String, required: true }
+      });
+
+      var Breakfast = mongoose.model('gh3153', breakfast, 'gh3153');
+      var bad = new Breakfast({});
+      var error = bad.validateSync('other');
+
+      assert.ok(error);
+      assert.equal(Object.keys(error.errors).length, 1);
+      assert.ok(error.errors['other']);
+      assert.ok(!error.errors['description']);
       done();
     });
 

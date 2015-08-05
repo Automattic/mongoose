@@ -7,16 +7,8 @@ var start = require('./common')
   , mongoose = start.mongoose
   , assert = require('assert')
   , random = require('../lib/utils').random
-  , Query = require('../lib/query')
   , Aggregate = require('../lib/aggregate')
-  , Schema = mongoose.Schema
-  , SchemaType = mongoose.SchemaType
-  , ObjectId = Schema.Types.ObjectId
-  , DocumentObjectId = mongoose.Types.ObjectId
-  , DocumentArray = mongoose.Types.DocumentArray
-  , EmbeddedDocument = mongoose.Types.Embedded
-  , MongooseArray = mongoose.Types.Array
-  , MongooseError = mongoose.Error;
+  , Schema = mongoose.Schema;
 
 /**
  * Setup.
@@ -67,7 +59,7 @@ describe('model aggregate', function(){
     db.close(done);
   });
 
-  describe('works', function(done){
+  describe('works', function(){
     it('with argument lists', function(done){
       this.timeout(4000);
 
@@ -111,6 +103,24 @@ describe('model aggregate', function(){
           });
     });
 
+    it('with Aggregate syntax if callback not provided', function(done) {
+      this.timeout(4000);
+
+      var promise = A.aggregate()
+        .group(group.$group)
+        .project(project.$project)
+        .exec();
+
+      promise.then(function(res){
+          assert.ok(promise instanceof mongoose.Promise);
+          assert.ok(res);
+          assert.equal(1, res.length);
+          assert.ok('maxAge' in res[0]);
+          assert.equal(maxAge, res[0].maxAge);
+          done();
+        }).end();
+    });
+
     it('when returning Aggregate', function(done) {
       assert(A.aggregate(project) instanceof Aggregate);
       done();
@@ -123,12 +133,12 @@ describe('model aggregate', function(){
 
       this.timeout(4000);
 
-      var outputCollection = 'aggregate_output_' + random(); 
-      var promise = A.aggregate()
+      var outputCollection = 'aggregate_output_' + random();
+      A.aggregate()
         .group(group.$group)
         .project(project.$project)
         .out(outputCollection)
-        .exec(function(error, result) {
+        .exec(function(error) {
           assert.ifError(error);
           A.db.collection(outputCollection).find().toArray(function(error, documents) {
             assert.ifError(error);

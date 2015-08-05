@@ -3,7 +3,6 @@ var start = require('./common')
   , assert = require('assert')
   , random = require('../lib/utils').random
   , mongoose = start.mongoose
-  , Mongoose = mongoose.Mongoose
   , Schema = mongoose.Schema;
 
 var uri = process.env.MONGOOSE_SHARD_TEST_URI;
@@ -150,7 +149,7 @@ describe('shard', function(){
 
     var pending = 6;
 
-    P.create({ name: 'ryu', likes: ['street fighting']}, function (err, ryu) {
+    P.create({ name: 'ryu', likes: ['street fighting']}, function (err) {
       assert.ok(err);
       assert.ok(err.message);
       if (!--pending) {
@@ -159,7 +158,7 @@ describe('shard', function(){
       }
     });
 
-    P.create({ likes: ['street fighting']}, function (err, ryu) {
+    P.create({ likes: ['street fighting']}, function (err) {
       assert.ok(err);
       assert.ok(err.message);
       if (!--pending) {
@@ -168,7 +167,7 @@ describe('shard', function(){
       }
     });
 
-    P.create({ name: 'ryu' }, function (err, ryu) {
+    P.create({ name: 'ryu' }, function (err) {
       assert.ok(err);
       assert.ok(err.message);
       if (!--pending) {
@@ -177,7 +176,7 @@ describe('shard', function(){
       }
     });
 
-    P.create({ age: 49 }, function (err, ryu) {
+    P.create({ age: 49 }, function (err) {
       assert.ok(err);
       assert.ok(err.message);
       if (!--pending) {
@@ -186,7 +185,7 @@ describe('shard', function(){
       }
     });
 
-    P.create({ likes: ['street fighting'], age: 8 }, function (err, ryu) {
+    P.create({ likes: ['street fighting'], age: 8 }, function (err) {
       assert.ok(err);
       assert.ok(err.message);
       if (!--pending) {
@@ -282,7 +281,7 @@ describe('shard', function(){
 
     P.create({ name: null, age: 27 }, function (err, ken) {
       assert.ifError(err);
-      P.findById(ken, function (err, ken) {
+      P.findById(ken, function (err) {
         assert.ifError(err);
         done();
       });
@@ -292,7 +291,7 @@ describe('shard', function(){
   after(function (done) {
     var db = start({ uri:  uri })
     var P = db.model('ShardPerson', collection);
-    P.collection.drop(function (err) {
+    P.collection.drop(function () {
       db.close();
       done();
     });

@@ -5,8 +5,7 @@
 
 var start = require('../../common')
   , assert = require('assert')
-  , mongoose = start.mongoose
-  , Schema = mongoose.Schema;
+  , mongoose = start.mongoose;
 
 describe('drivers: native:', function(){
   describe('connection', function(){
@@ -14,7 +13,7 @@ describe('drivers: native:', function(){
       var m = new mongoose.Mongoose;
 
       'journal fsync safe'.split(' ').forEach(function (type) {
-        ;[-1,0].forEach(function(val){
+        [-1,0].forEach(function(val){
 
           var inner = {};
           inner.w = val;

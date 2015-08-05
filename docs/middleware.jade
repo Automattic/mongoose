@@ -20,6 +20,7 @@ block content
     * [count](./api.html#query_Query-count)
     * [find](./api.html#query_Query-find)
     * [findOne](./api.html#query_Query-findOne)
+    * [findOneAndRemove](./api.html#query_Query-findOneAndRemove)
     * [findOneAndUpdate](./api.html#query_Query-findOneAndUpdate)
     * [update](./api.html#query_Query-update)
 
@@ -34,7 +35,7 @@ block content
     Serial middleware are executed one after another, when each middleware calls `next`.
   :js
     var schema = new Schema(..);
-    schema.pre('save', function (next) {
+    schema.pre('save', function(next) {
       // do stuff
       next();
     });
@@ -43,7 +44,7 @@ block content
     | Parallel middleware offer more fine-grained flow control.
   :js
     var schema = new Schema(..);
-    schema.pre('save', true, function (next, done) {
+    schema.pre('save', true, function(next, done) {
       // calling next kicks off the next middleware in parallel
       next();
       doAsync(done);
@@ -69,14 +70,14 @@ block content
     If any middleware calls `next` or `done` with an error, the flow
     is interrupted, and the error is passed to the callback.
   :js
-    schema.pre('save', function (next) {
+    schema.pre('save', function(next) {
       var err = new Error('something went wrong');
       next(err);
     });
 
     // later...
 
-    myDoc.save(function (err) {
+    myDoc.save(function(err) {
       console.log(err.message) // something went wrong
     });
 
@@ -89,18 +90,18 @@ block content
     traditional event listeners for these methods.
 
   :js
-    schema.post('init', function (doc) {
+    schema.post('init', function(doc) {
       console.log('%s has been initialized from the db', doc._id);
-    })
-    schema.post('validate', function (doc) {
+    });
+    schema.post('validate', function(doc) {
       console.log('%s has been validated (but not saved yet)', doc._id);
-    })
-    schema.post('save', function (doc) {
+    });
+    schema.post('save', function(doc) {
       console.log('%s has been saved', doc._id);
-    })
-    schema.post('remove', function (doc) {
+    });
+    schema.post('remove', function(doc) {
       console.log('%s has been removed', doc._id);
-    })
+    });
 
   h3#notes Notes on findAndUpdate() and Query Middleware
   :markdown
@@ -110,14 +111,17 @@ block content
     Mongoose 4.0 has distinct hooks for these functions.
 
   :js
-    schema.pre('update', function() {
+    schema.pre('find', function() {
       console.log(this instanceof mongoose.Query); // true
       this.start = Date.now();
     });
 
-    schema.post('update', function() {
+    schema.post('find', function(result) {
       console.log(this instanceof mongoose.Query); // true
-      console.log('update() took ' + (Date.now() - this.start) + ' millis');
+      // prints returned documents
+      console.log('find() returned ' + JSON.stringify(result));
+      // prints number of milliseconds the query took
+      console.log('find() took ' + (Date.now() - this.start) + ' millis');
     });
 
   :markdown
@@ -132,7 +136,7 @@ block content
 
   :js
     schema.pre('update', function() {
-      this.update({ $set: { updatedAt: Date.now() } });
+      this.update({},{ $set: { updatedAt: new Date() } });
     });
 
   h3#next Next Up

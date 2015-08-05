@@ -12,10 +12,11 @@ block content
     - is passed, the operation will be executed immediately with the results passed to the callback.
     - is not passed, an instance of [Query](./api.html#query-js) is returned, which provides a special query builder interface.
 
-    .important
-      :markdown
-        In mongoose 4, a [Query](./api.html#query-js) has a `.then()` function, and thus can be used as a promise.
+  .important
+    :markdown
+      In mongoose 4, a [Query](./api.html#query-js) has a `.then()` function, and thus can be used as a promise.
 
+  :markdown
     When executing a query with a `callback` function, you specify your query as a JSON document. The JSON document's syntax is the same as the [MongoDB shell](http://docs.mongodb.org/manual/tutorial/query-documents/).
   :js
     var Person = mongoose.model('Person', yourSchema);
@@ -57,7 +58,7 @@ block content
         occupation: /host/,
         'name.last': 'Ghost',
         age: { $gt: 17, $lt: 66 },
-        likes: { $in: ['vaporizing', talking] }
+        likes: { $in: ['vaporizing', 'talking'] }
       }).
       limit(10).
       sort({ occupation: -1 }).

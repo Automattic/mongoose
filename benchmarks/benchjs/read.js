@@ -81,7 +81,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function (err) {
     });
 
     var User = mongoose.model('User', UserSchema);
-    var BlogPost = mongoose.model('BlogPost', BlogPost);
+    BlogPost = mongoose.model('BlogPost', BlogPost);
     var user = db.collection('user');
     var blogpost = db.collection('blogpost');
 
@@ -100,7 +100,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function (err) {
 
     // insert all of the data here
     var count = 4000;
-    for (var i=0; i < 1000; i++) {
+    for (i=0; i < 1000; i++) {
       data.age = Math.floor(Math.random() * 50);
       User.create(data, function (err, u) {
         if (err) throw err;
@@ -170,7 +170,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function (err) {
     }).add('Read - Driver - Basic', {
       defer : true,
       fn : function (deferred) {
-        user.findOne({ _id : getNextdId() }, function (err, cursor) {
+        user.findOne({ _id : getNextdId() }, function (err) {
           if (err) throw err;
           deferred.resolve();
         });

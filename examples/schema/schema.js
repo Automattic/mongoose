@@ -56,6 +56,7 @@ BlogPost.path('date')
  */
 
 BlogPost.pre('save', function(next, done){
+  /* global emailAuthor */
   emailAuthor(done); // some async function
   next();
 });
@@ -90,7 +91,7 @@ function slugGenerator (options){
       return v;
     });
   };
-};
+}
 
 BlogPost.plugin(slugGenerator());
 

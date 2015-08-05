@@ -7,11 +7,7 @@
 var start = require('./common')
   , assert = require('assert')
   , mongoose = start.mongoose
-  , DivergentArrayError = mongoose.Error.DivergentArrayError
-  , utils = require('../lib/utils')
-  , random = utils.random
   , Schema = mongoose.Schema
-  , ObjectId = Schema.ObjectId
 
 var schema = new Schema({
     a: String
@@ -130,7 +126,7 @@ describe('is compatible with object created using Object.create(null) (gh-1484)'
     assert.doesNotThrow(function () {
       var s = new Schema;
       var o = Object.create(null);
-      var o = {};
+      o = {};
       o.name = String;
       var x = { type: [o] };
       s.path('works', x);

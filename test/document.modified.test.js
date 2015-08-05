@@ -7,18 +7,9 @@ var start = require('./common')
   , assert = require('assert')
   , mongoose = start.mongoose
   , random = require('../lib/utils').random
-  , Query = require('../lib/query')
   , Schema = mongoose.Schema
-  , SchemaType = mongoose.SchemaType
-  , CastError = mongoose.Error.CastError
-  , ValidatorError = mongoose.Error.ValidatorError
-  , ValidationError = mongoose.Error.ValidationError
   , ObjectId = Schema.ObjectId
-  , DocumentObjectId = mongoose.Types.ObjectId
-  , DocumentArray = mongoose.Types.DocumentArray
-  , EmbeddedDocument = mongoose.Types.Embedded
-  , MongooseArray = mongoose.Types.Array
-  , MongooseError = mongoose.Error;
+  , DocumentObjectId = mongoose.Types.ObjectId;
 
 /**
  * Setup.
@@ -84,31 +75,27 @@ describe('document modified', function(){
   describe('modified states', function(){
     it('reset after save', function(done){
       var db = start()
-        , B = db.model(modelName, collection)
-        , pending = 2;
+        , B = db.model(modelName, collection);
 
       var b = new B;
 
       b.numbers.push(3);
       b.save(function (err) {
         assert.strictEqual(null, err);
-        --pending || find();
-      });
 
-      b.numbers.push(3);
-      b.save(function (err) {
-        assert.strictEqual(null, err);
-        --pending || find();
-      });
-
-      function find () {
-        B.findById(b, function (err, b) {
-          db.close();
+        b.numbers.push(3);
+        b.save(function (err) {
           assert.strictEqual(null, err);
-          assert.equal(2, b.numbers.length);
-          done();
+
+          B.findById(b, function (err, b) {
+            assert.strictEqual(null, err);
+            assert.equal(2, b.numbers.length);
+
+            db.close();
+            done();
+          });
         });
-      }
+      });
     });
 
     it('of embedded docs reset after save', function(done){
@@ -126,6 +113,18 @@ describe('document modified', function(){
         done();
       });
     })
+  });
+
+  describe('isDefault', function() {
+    it('works', function(done) {
+      var db = start();
+
+      var MyModel = db.model('test',
+        { name: { type: String, default: 'Val '} });
+      var m = new MyModel();
+      assert.ok(m.$isDefault('name'));
+      db.close(done);
+    });
   });
 
   describe('isModified', function(){
@@ -313,7 +312,7 @@ describe('document modified', function(){
       var db = start();
 
       var parentSchema = new Schema({
-        child: { type: Schema.Types.ObjectId, ref: 'gh-1530-2' } 
+        child: { type: Schema.Types.ObjectId, ref: 'gh-1530-2' }
       });
       var Parent = db.model('gh-1530-1', parentSchema);
       var childSchema = new Schema({
@@ -366,7 +365,6 @@ describe('document modified', function(){
     });
 
     it('properly sets populated for gh-1530 (gh-2678)', function(done) {
-      var childrenSchema = new Schema({ name: String});
       var db = start();
 
       var parentSchema = new Schema({
@@ -452,7 +450,7 @@ describe('document modified', function(){
           p.child[0].grandChild[0].name = 'Jason';
           assert.ok(p.isModified('child.0.grandChild.0.name'));
           p.save(function(error, inDb) {
-            assert.ifError(error); 
+            assert.ifError(error);
             assert.equal('Jason', inDb.child[0].grandChild[0].name);
             db.close(done);
           });

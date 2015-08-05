@@ -22,7 +22,7 @@ var data = [
 
 mongoose.connect('mongodb://localhost/locations', function (err) {
   if (err) throw err;
-  
+
   Location.on('index', function(err) {
     if (err) throw err;
     // create all of the dummy locations

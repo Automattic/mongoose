@@ -9,7 +9,7 @@ rules:
     - 1
     - 2
     - SwitchCase: 1
-  no-trailing-spaces: 1
+  no-trailing-spaces: 2
   comma-style: 1
   no-spaced-func: 1
   space-after-keywords: 1

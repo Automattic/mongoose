@@ -1699,7 +1699,7 @@ describe('model: querying:', function(){
         var o1 = p.sub[1]._id;
         var o2 = p.sub[2]._id;
 
-        P.findOne({ 'sub._id': { $all: [o1, o2] }}, function (err, doc) {
+        P.findOne({ 'sub._id': { $all: [o1, o2.toString()] }}, function (err, doc) {
           assert.ifError(err);
           assert.equal(doc.id, p.id);
 
@@ -1720,8 +1720,7 @@ describe('model: querying:', function(){
 
     it('with Dates', function(done){
       this.timeout(3000);
-      // this.slow(2000);
-      var db = start()
+      var db = start();
 
       var SSchema = new Schema({ d: Date });
       var PSchema = new Schema({ sub: [SSchema] });
@@ -1754,6 +1753,23 @@ describe('model: querying:', function(){
               db.close(done);
             });
           });
+        });
+      });
+    });
+
+    it('with $elemMatch (gh-3163)', function(done) {
+      var db = start();
+
+      var schema = new Schema({ test: [String] });
+      var MyModel = db.model('gh3163', schema);
+
+      MyModel.create({ test: ['log1', 'log2'] }, function(error) {
+        assert.ifError(error);
+        var query = { test: { $all: [{ $elemMatch: { $regex: /log/g } }] } };
+        MyModel.find(query, function(error, docs) {
+          assert.ifError(error);
+          assert.equal(docs.length, 1);
+          db.close(done);
         });
       });
     });

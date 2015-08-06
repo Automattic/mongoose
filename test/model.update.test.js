@@ -1196,6 +1196,26 @@ describe('model: update:', function(){
         done();
       });
     });
+
+    it('validators handle positional operator (gh-3167)', function(done) {
+      var db = start();
+
+      var s = new Schema({
+        toppings: [{ name: { type: String, enum: ['bacon', 'cheese'] } }]
+      });
+      var Breakfast = db.model('gh-860-8', s);
+
+      var updateOptions = { runValidators: true };
+      Breakfast.update(
+        { 'toppings.name': 'bacon' },
+        { 'toppings.$.name': 'tofu' },
+        updateOptions,
+        function(error) {
+          assert.ok(error);
+          assert.ok(error.errors['name']);
+          db.close(done);
+        });
+    });
   });
 
   it('works with $set and overwrite (gh-2515)', function(done) {

@@ -116,7 +116,24 @@ describe('Query:', function(){
       assert.deepEqual(nq._mongooseOptions, { lean : true, limit : 3 });
       assert.deepEqual(nq.options, { sort : { 'title': 1 }, limit : 3 });
       done();
-    })
+    });
+
+    it('options get cloned (gh-3176)', function(done) {
+      var db = start();
+      var Product = db.model(prodName);
+      db.close();
+
+      var prodC = Product.find({ title : /blah/ }).setOptions({ sort : 'title', lean : true });
+      prodC = prodC.toConstructor();
+
+      var nq = prodC(null, { limit : 3 });
+      assert.deepEqual(nq._mongooseOptions, { lean : true, limit : 3 });
+      assert.deepEqual(nq.options, { sort : { 'title': 1 }, limit : 3 });
+      var nq2 = prodC(null, { limit: 5 });
+      assert.deepEqual(nq._mongooseOptions, { lean : true, limit : 3 });
+      assert.deepEqual(nq2._mongooseOptions, { lean : true, limit : 5 });
+      done();
+    });
 
     it('creates subclasses of mquery', function(done) {
       var db = start();

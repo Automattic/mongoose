@@ -36,6 +36,6 @@ describe('types.buffer', function(){
       // validate the drivers Binary type output retains the option
       assert.equal(out.sub_type, 2);
       done();
-    })
+    });
   });
 });

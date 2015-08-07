@@ -9,7 +9,7 @@ var start = require('./common')
   , utils = require('../lib/utils')
   , random = utils.random
   , Schema = mongoose.Schema
-  , fs = require('fs')
+  , fs = require('fs');
 
 var names = ('Aaden Aaron Adrian Aditya Agustin Jim Bob Jonah Frank Sally Lucy').split(' ');
 
@@ -27,7 +27,7 @@ var collection = 'personforstream_' + random();
 describe('query stream:', function(){
   before(function (done) {
     var db = start()
-      , P = db.model('PersonForStream', collection)
+      , P = db.model('PersonForStream', collection);
 
     var people = names.map(function (name) {
       return { name: name };
@@ -48,7 +48,7 @@ describe('query stream:', function(){
       , paused = 0
       , resumed = 0
       , seen = {}
-      , err
+      , err;
 
     var stream = P.find().batchSize(3).stream();
 
@@ -112,13 +112,13 @@ describe('query stream:', function(){
   it('immediately destroying a stream prevents the query from executing', function(done){
     var db = start()
       , P = db.model('PersonForStream', collection)
-      , i = 0
+      , i = 0;
 
     var stream = P.where('name', 'Jonah').select('name').findOne().stream();
 
     stream.on('data', function () {
       i++;
-    })
+    });
     stream.on('close', cb);
     stream.on('error', cb);
 
@@ -131,7 +131,7 @@ describe('query stream:', function(){
         db.close();
         assert.strictEqual(null, stream._fields);
         done();
-      })
+      });
     }
   });
 
@@ -141,7 +141,7 @@ describe('query stream:', function(){
     var db = start()
       , P = db.model('PersonForStream', collection)
       , finished = 0
-      , i = 0
+      , i = 0;
 
     var stream = P.where('name').exists().limit(10).select('_id').stream();
 
@@ -170,7 +170,7 @@ describe('query stream:', function(){
         assert.equal(false, stream.readable);
         assert.equal(true, stream._cursor.isClosed());
         done();
-      }, 100)
+      }, 100);
     }
   });
 
@@ -181,7 +181,7 @@ describe('query stream:', function(){
       , P = db.model('PersonForStream', collection)
       , finished = 0
       , closed = 0
-      , i = 0
+      , i = 0;
 
     var stream = P.find().batchSize(5).stream();
 
@@ -208,7 +208,7 @@ describe('query stream:', function(){
         assert.equal(stream.readable, false);
         assert.equal(stream._cursor.isClosed(), true);
         done();
-      }, 100)
+      }, 100);
     }
   });
 
@@ -264,7 +264,7 @@ describe('query stream:', function(){
           assert.equal(true, stream.paused);
           stream.resume();
           assert.equal(false, stream.paused);
-        })
+        });
       }
     });
 

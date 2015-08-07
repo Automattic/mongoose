@@ -264,9 +264,9 @@ describe('model', function(){
       var schema = Schema({
           name: { type:String, index: true }
         , furryness: { type:Number, index: true }
-      }, { autoIndex: false })
+      }, { autoIndex: false });
 
-      schema.index({ name:1, furryness:1})
+      schema.index({ name:1, furryness:1});
 
       var K = db.model('Kitten', schema);
       K.on('index', function (err) {
@@ -288,15 +288,15 @@ describe('model', function(){
               index();
             });
           })(i);
-        })
+        });
 
         function index () {
           K.collection.dropAllIndexes(function (err) {
             assert.ifError(err);
             K.ensureIndexes();
-          })
+          });
         }
-      })
+      });
     });
 
 
@@ -333,7 +333,7 @@ describe('model', function(){
           assert.ok(called);
           db.close(done);
         });
-      })
-    })
+      });
+    });
   });
 });

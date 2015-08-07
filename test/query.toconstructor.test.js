@@ -142,7 +142,7 @@ describe('Query:', function(){
 
       var opts = { safe: { w: 'majority' }, readPreference: 'p' };
       var match = { title: 'test', count: { $gt: 101 }};
-      var select = { name: 1, count: 0 }
+      var select = { name: 1, count: 0 };
       var update = { $set: { title : 'thing' }};
       var path = 'title';
 
@@ -163,6 +163,6 @@ describe('Query:', function(){
       assert.equal(path, m._path);
       assert.equal('find', m.op);
       done();
-    })
+    });
   });
 });

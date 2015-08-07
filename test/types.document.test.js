@@ -9,7 +9,7 @@ var assert = require('assert')
   , EmbeddedDocument = require('../lib/types/embedded')
   , DocumentArray = require('../lib/types/documentarray')
   , Schema = mongoose.Schema
-  , ValidationError = mongoose.Document.ValidationError
+  , ValidationError = mongoose.Document.ValidationError;
 
 /**
  * Setup.
@@ -19,11 +19,11 @@ function Dummy () {
   mongoose.Document.call(this, {});
 }
 Dummy.prototype.__proto__ = mongoose.Document.prototype;
-Dummy.prototype.$__setSchema(new Schema)
+Dummy.prototype.$__setSchema(new Schema);
 
 function Subdocument () {
   var arr = new DocumentArray;
-  arr._path = 'jsconf.ar'
+  arr._path = 'jsconf.ar';
   arr._parent = new Dummy;
   arr[0] = this;
   EmbeddedDocument.call(this, {}, arr);
@@ -86,7 +86,7 @@ describe('types.document', function(){
     assert.equal(a.test, 'paradiddle');
     assert.equal(a.work, 'good flam');
     done();
-  })
+  });
 
   it('Subdocuments can be passed to #set', function (done) {
     var a = new Subdocument();
@@ -98,7 +98,7 @@ describe('types.document', function(){
     assert.equal(b.test, 'paradiddle');
     assert.equal(b.work, 'good flam');
     done();
-  })
+  });
 
   it('cached _ids', function (done) {
     var db = start();
@@ -242,10 +242,10 @@ describe('types.document', function(){
                 });
               });
             });
-          })
+          });
         });
       });
-    })
-  })
+    });
+  });
 
 });

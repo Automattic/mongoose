@@ -31,7 +31,7 @@ TestDocument.prototype.__proto__ = Document.prototype;
 
 var em = new Schema({ title: String, body: String });
 em.virtual('works').get(function () {
-  return 'em virtual works'
+  return 'em virtual works';
 });
 var schema = new Schema({
     test    : String
@@ -130,7 +130,7 @@ describe('document', function(){
       , 'numbers': 1
       , 'nested.deep': 1
       , 'oids': 1
-    }
+    };
 
     doc = new TestDocument(undefined, selection);
 
@@ -142,29 +142,29 @@ describe('document', function(){
         }
     });
 
-    assert.ok(doc.isSelected('_id'))
-    assert.ok(doc.isSelected('test'))
-    assert.ok(doc.isSelected('numbers'))
+    assert.ok(doc.isSelected('_id'));
+    assert.ok(doc.isSelected('test'));
+    assert.ok(doc.isSelected('numbers'));
     assert.ok(doc.isSelected('oids')); // even if no data
     assert.ok(doc.isSelected('nested'));
-    assert.ok(!doc.isSelected('nested.age'))
-    assert.ok(!doc.isSelected('nested.cool'))
-    assert.ok(!doc.isSelected('nested.path'))
-    assert.ok(doc.isSelected('nested.deep'))
-    assert.ok(!doc.isSelected('nested.nope'))
+    assert.ok(!doc.isSelected('nested.age'));
+    assert.ok(!doc.isSelected('nested.cool'));
+    assert.ok(!doc.isSelected('nested.path'));
+    assert.ok(doc.isSelected('nested.deep'));
+    assert.ok(!doc.isSelected('nested.nope'));
     assert.ok(doc.isSelected('nested.deep.x'));
-    assert.ok(doc.isSelected('nested.deep.x.no'))
-    assert.ok(doc.isSelected('nested.deep.y'))
-    assert.ok(!doc.isSelected('noway'))
-    assert.ok(!doc.isSelected('notapath'))
-    assert.ok(!doc.isSelected('em'))
-    assert.ok(!doc.isSelected('em.title'))
-    assert.ok(!doc.isSelected('em.body'))
-    assert.ok(!doc.isSelected('em.nonpath'))
+    assert.ok(doc.isSelected('nested.deep.x.no'));
+    assert.ok(doc.isSelected('nested.deep.y'));
+    assert.ok(!doc.isSelected('noway'));
+    assert.ok(!doc.isSelected('notapath'));
+    assert.ok(!doc.isSelected('em'));
+    assert.ok(!doc.isSelected('em.title'));
+    assert.ok(!doc.isSelected('em.body'));
+    assert.ok(!doc.isSelected('em.nonpath'));
 
     selection = {
         'em.title': 1
-    }
+    };
 
     doc = new TestDocument(undefined, selection);
 
@@ -172,29 +172,29 @@ describe('document', function(){
         em: [{ title: 'one' }]
     });
 
-    assert.ok(doc.isSelected('_id'))
-    assert.ok(!doc.isSelected('test'))
-    assert.ok(!doc.isSelected('numbers'))
-    assert.ok(!doc.isSelected('oids'))
-    assert.ok(!doc.isSelected('nested'))
-    assert.ok(!doc.isSelected('nested.age'))
-    assert.ok(!doc.isSelected('nested.cool'))
-    assert.ok(!doc.isSelected('nested.path'))
-    assert.ok(!doc.isSelected('nested.deep'))
-    assert.ok(!doc.isSelected('nested.nope'))
-    assert.ok(!doc.isSelected('nested.deep.x'))
-    assert.ok(!doc.isSelected('nested.deep.x.no'))
-    assert.ok(!doc.isSelected('nested.deep.y'))
-    assert.ok(!doc.isSelected('noway'))
-    assert.ok(!doc.isSelected('notapath'))
-    assert.ok(doc.isSelected('em'))
-    assert.ok(doc.isSelected('em.title'))
-    assert.ok(!doc.isSelected('em.body'))
-    assert.ok(!doc.isSelected('em.nonpath'))
+    assert.ok(doc.isSelected('_id'));
+    assert.ok(!doc.isSelected('test'));
+    assert.ok(!doc.isSelected('numbers'));
+    assert.ok(!doc.isSelected('oids'));
+    assert.ok(!doc.isSelected('nested'));
+    assert.ok(!doc.isSelected('nested.age'));
+    assert.ok(!doc.isSelected('nested.cool'));
+    assert.ok(!doc.isSelected('nested.path'));
+    assert.ok(!doc.isSelected('nested.deep'));
+    assert.ok(!doc.isSelected('nested.nope'));
+    assert.ok(!doc.isSelected('nested.deep.x'));
+    assert.ok(!doc.isSelected('nested.deep.x.no'));
+    assert.ok(!doc.isSelected('nested.deep.y'));
+    assert.ok(!doc.isSelected('noway'));
+    assert.ok(!doc.isSelected('notapath'));
+    assert.ok(doc.isSelected('em'));
+    assert.ok(doc.isSelected('em.title'));
+    assert.ok(!doc.isSelected('em.body'));
+    assert.ok(!doc.isSelected('em.nonpath'));
 
     selection = {
         'em': 0
-    }
+    };
 
     doc = new TestDocument(undefined, selection);
     doc.init({
@@ -209,20 +209,20 @@ describe('document', function(){
       , notapath: 'i am not in the schema'
     });
 
-    assert.ok(doc.isSelected('_id'))
-    assert.ok(doc.isSelected('test'))
-    assert.ok(doc.isSelected('numbers'))
-    assert.ok(doc.isSelected('oids'))
-    assert.ok(doc.isSelected('nested'))
-    assert.ok(doc.isSelected('nested.age'))
-    assert.ok(doc.isSelected('nested.cool'))
-    assert.ok(doc.isSelected('nested.path'))
-    assert.ok(doc.isSelected('nested.deep'))
-    assert.ok(doc.isSelected('nested.nope'))
-    assert.ok(doc.isSelected('nested.deep.x'))
-    assert.ok(doc.isSelected('nested.deep.x.no'))
-    assert.ok(doc.isSelected('nested.deep.y'))
-    assert.ok(doc.isSelected('noway'))
+    assert.ok(doc.isSelected('_id'));
+    assert.ok(doc.isSelected('test'));
+    assert.ok(doc.isSelected('numbers'));
+    assert.ok(doc.isSelected('oids'));
+    assert.ok(doc.isSelected('nested'));
+    assert.ok(doc.isSelected('nested.age'));
+    assert.ok(doc.isSelected('nested.cool'));
+    assert.ok(doc.isSelected('nested.path'));
+    assert.ok(doc.isSelected('nested.deep'));
+    assert.ok(doc.isSelected('nested.nope'));
+    assert.ok(doc.isSelected('nested.deep.x'));
+    assert.ok(doc.isSelected('nested.deep.x.no'));
+    assert.ok(doc.isSelected('nested.deep.y'));
+    assert.ok(doc.isSelected('noway'));
     assert.ok(doc.isSelected('notapath'));
     assert.ok(!doc.isSelected('em'));
     assert.ok(!doc.isSelected('em.title'));
@@ -231,7 +231,7 @@ describe('document', function(){
 
     selection = {
         '_id': 0
-    }
+    };
 
     doc = new TestDocument(undefined, selection);
     doc.init({
@@ -246,33 +246,33 @@ describe('document', function(){
       , notapath: 'i am not in the schema'
     });
 
-    assert.ok(!doc.isSelected('_id'))
+    assert.ok(!doc.isSelected('_id'));
     assert.ok(doc.isSelected('nested.deep.x.no'));
 
     doc = new TestDocument({ test: 'boom' });
-    assert.ok(doc.isSelected('_id'))
-    assert.ok(doc.isSelected('test'))
-    assert.ok(doc.isSelected('numbers'))
-    assert.ok(doc.isSelected('oids'))
-    assert.ok(doc.isSelected('nested'))
-    assert.ok(doc.isSelected('nested.age'))
-    assert.ok(doc.isSelected('nested.cool'))
-    assert.ok(doc.isSelected('nested.path'))
-    assert.ok(doc.isSelected('nested.deep'))
-    assert.ok(doc.isSelected('nested.nope'))
-    assert.ok(doc.isSelected('nested.deep.x'))
-    assert.ok(doc.isSelected('nested.deep.x.no'))
-    assert.ok(doc.isSelected('nested.deep.y'))
-    assert.ok(doc.isSelected('noway'))
-    assert.ok(doc.isSelected('notapath'))
-    assert.ok(doc.isSelected('em'))
-    assert.ok(doc.isSelected('em.title'))
-    assert.ok(doc.isSelected('em.body'))
+    assert.ok(doc.isSelected('_id'));
+    assert.ok(doc.isSelected('test'));
+    assert.ok(doc.isSelected('numbers'));
+    assert.ok(doc.isSelected('oids'));
+    assert.ok(doc.isSelected('nested'));
+    assert.ok(doc.isSelected('nested.age'));
+    assert.ok(doc.isSelected('nested.cool'));
+    assert.ok(doc.isSelected('nested.path'));
+    assert.ok(doc.isSelected('nested.deep'));
+    assert.ok(doc.isSelected('nested.nope'));
+    assert.ok(doc.isSelected('nested.deep.x'));
+    assert.ok(doc.isSelected('nested.deep.x.no'));
+    assert.ok(doc.isSelected('nested.deep.y'));
+    assert.ok(doc.isSelected('noway'));
+    assert.ok(doc.isSelected('notapath'));
+    assert.ok(doc.isSelected('em'));
+    assert.ok(doc.isSelected('em.title'));
+    assert.ok(doc.isSelected('em.body'));
     assert.ok(doc.isSelected('em.nonpath'));
 
     selection = {
         '_id': 1
-    }
+    };
 
     doc = new TestDocument(undefined, selection);
     doc.init({ _id: 'test' });
@@ -304,7 +304,7 @@ describe('document', function(){
     selection = {
         '_id': 1,
         'n': 1
-    }
+    };
 
     doc = new TestDocument(undefined, selection);
     doc.init({
@@ -326,5 +326,5 @@ describe('document', function(){
     assert.ok(!doc.isSelected('numbers'));
 
     done();
-  })
-})
+  });
+});

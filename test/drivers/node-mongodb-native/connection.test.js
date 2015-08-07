@@ -19,7 +19,7 @@ describe('drivers: native:', function(){
           inner.w = val;
           var opts = { db: inner };
 
-          var q = type + '=true'
+          var q = type + '=true';
           assert.throws(function(){
             m.connect('mongodb://localhost?' + q, opts);
           }, /Invalid writeConcern/, JSON.stringify(opts));
@@ -47,10 +47,10 @@ describe('drivers: native:', function(){
           }, /Invalid writeConcern/, JSON.stringify(opts));
 
         });
-      })
+      });
 
       done();
-    })
+    });
     it('defaults w to 1', function(done){
       var m = new mongoose.Mongoose;
 
@@ -75,6 +75,6 @@ describe('drivers: native:', function(){
       assert.equal(0, c.options.db.w);
 
       done();
-    })
-  })
-})
+    });
+  });
+});

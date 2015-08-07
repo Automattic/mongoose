@@ -51,7 +51,7 @@ describe('drivers: native:', function(){
   it('unique index failure passes error', function(done){
     var db = start()
       , schema = new Schema({ title: String })
-      , NativeTestCollection = db.model('NativeDriverTestUnique', schema)
+      , NativeTestCollection = db.model('NativeDriverTestUnique', schema);
 
     NativeTestCollection.create({ title: 'x' }, {title:'x'}, function (err) {
       assert.ifError(err);
@@ -62,6 +62,6 @@ describe('drivers: native:', function(){
         done();
       });
     });
-  })
+  });
 
-})
+});

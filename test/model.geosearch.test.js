@@ -148,7 +148,7 @@ describe('model', function(){
       assert.ok(prom instanceof mongoose.Promise);
       db.close();
       done();
-    })
+    });
 
     it('allows not passing a callback (gh-1614)', function (done) {
       var db = start();

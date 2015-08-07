@@ -24,14 +24,14 @@ describe('connection: manual reconnect with authReconnect: false', function(){
       ++times;
       open = true;
       hit();
-    })
+    });
 
     db.on('disconnected', function () {
       open = false;
       setTimeout(function () {
         db.open(start.uri, { server: { auto_reconnect: false }});
       }, 30);
-    })
+    });
 
     function hit () {
       if (!open) return;
@@ -43,8 +43,8 @@ describe('connection: manual reconnect with authReconnect: false', function(){
             return complete();
           }
           shutdownMongo();
-        })
-      })
+        });
+      });
     }
 
     function shutdownMongo () {
@@ -56,5 +56,5 @@ describe('connection: manual reconnect with authReconnect: false', function(){
       complete.ran = 1;
       done(err);
     }
-  })
-})
+  });
+});

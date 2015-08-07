@@ -1,6 +1,6 @@
 
 // modules
-var mongoose = require('../../../lib')
+var mongoose = require('../../../lib');
 var Schema = mongoose.Schema;
 
 // parse json
@@ -24,4 +24,4 @@ var threeFour = new TimeSignature({
 });
 
 // print its description
-console.log(threeFour)
+console.log(threeFour);

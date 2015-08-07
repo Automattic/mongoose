@@ -13,7 +13,7 @@ var start = require('./common')
   , DocumentArray = require('../lib/types/documentarray')
   , Schema = mongoose.Schema
   , assert = require('assert')
-  , collection = 'types.documentarray_' + random()
+  , collection = 'types.documentarray_' + random();
 
 /**
  * Setup.
@@ -139,7 +139,7 @@ describe('types.documentarray', function(){
     var sub4 = new Subdocument();
     sub4.title = 'rock-n-roll';
 
-    a = new MongooseDocumentArray([sub4])
+    a = new MongooseDocumentArray([sub4]);
     var threw = false;
     try {
       a.id('i better not throw');
@@ -190,7 +190,7 @@ describe('types.documentarray', function(){
     assert.equal(a.id(id).title, 'Hello again to all my friends');
 
     done();
-  })
+  });
 
   describe('inspect', function(){
     it('works with bad data', function(done){
@@ -204,8 +204,8 @@ describe('types.documentarray', function(){
       }
       assert.ok(!threw);
       done();
-    })
-  })
+    });
+  });
 
   describe('toObject', function(){
     it('works with bad data', function(done){
@@ -219,7 +219,7 @@ describe('types.documentarray', function(){
       }
       assert.ok(!threw);
       done();
-    })
+    });
     it('passes options to its documents (gh-1415)', function(done){
       var subSchema = new Schema({
           title: { type: String }
@@ -232,7 +232,7 @@ describe('types.documentarray', function(){
           ret.changed = 123;
           return ret;
         }
-      })
+      });
 
       var db = mongoose.createConnection();
       var M = db.model('gh-1415', { docs: [subSchema] });
@@ -241,7 +241,7 @@ describe('types.documentarray', function(){
       var delta = m.$__delta()[1];
       assert.equal(undefined, delta.$pushAll.docs[0].changed);
       done();
-    })
+    });
     it('uses the correct transform (gh-1412)', function(done) {
       var db = start();
       var SecondSchema = new Schema({});
@@ -280,8 +280,8 @@ describe('types.documentarray', function(){
       assert.ok(!obj.second[0].firstToObject);
       assert.ok(!obj.second[1].firstToObject);
       db.close(done);
-    })
-  })
+    });
+  });
 
   describe('create()', function(){
     it('works', function(done){
@@ -297,8 +297,8 @@ describe('types.documentarray', function(){
       assert.equal(subdoc.name, '100');
       assert.ok(subdoc instanceof EmbeddedDocument);
       done();
-    })
-  })
+    });
+  });
 
   describe('push()', function(){
     it('does not re-cast instances of its embedded doc', function(done){
@@ -316,7 +316,7 @@ describe('types.documentarray', function(){
         assert.ifError(err);
         M.findById(m._id, function (err, doc) {
           assert.ifError(err);
-          var c = doc.children.create({ name: 'first' })
+          var c = doc.children.create({ name: 'first' });
           assert.equal(undefined, c.date);
           doc.children.push(c);
           assert.equal(undefined, c.date);
@@ -337,12 +337,12 @@ describe('types.documentarray', function(){
                   assert.equal(doc.children[0].id, child.id);
                 });
                 db.close(done);
-              })
-            })
-          })
-        })
-      })
-    })
+              });
+            });
+          });
+        });
+      });
+    });
     it('corrects #ownerDocument() if value was created with array.create() (gh-1385)', function(done){
       var mg = new mongoose.Mongoose;
       var M = mg.model('1385', { docs: [{ name: String }] });
@@ -352,8 +352,8 @@ describe('types.documentarray', function(){
       m.docs.push(doc);
       assert.equal(doc.ownerDocument()._id, String(m._id));
       done();
-    })
-  })
+    });
+  });
 
   it('#push should work on EmbeddedDocuments more than 2 levels deep', function (done) {
     var Comments = new Schema;
@@ -367,7 +367,7 @@ describe('types.documentarray', function(){
     });
 
     var db = start()
-      , Post = db.model('docarray-BlogPost', BlogPost, collection)
+      , Post = db.model('docarray-BlogPost', BlogPost, collection);
 
     var p =new Post({ title: "comment nesting" });
     var c1 = p.comments.create({ title: "c1" });
@@ -396,7 +396,7 @@ describe('types.documentarray', function(){
           });
         });
       });
-    })
+    });
   });
 
   describe('invalidate()', function(){
@@ -425,7 +425,7 @@ describe('types.documentarray', function(){
         assert.equal(e.value, '%');
         done();
       });
-    })
+    });
 
     it('handles validation failures', function(done){
       var db = start();
@@ -439,7 +439,7 @@ describe('types.documentarray', function(){
         assert.equal(900, err.errors['docs.0.v'].value);
         db.close(done);
       });
-    })
+    });
 
     it('removes attached event listeners when creating new doc array', function(done) {
       var db = start();
@@ -461,5 +461,5 @@ describe('types.documentarray', function(){
         });
       });
     });
-  })
-})
+  });
+});

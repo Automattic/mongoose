@@ -11,7 +11,7 @@ var start = require('./common')
   , ObjectId = SchemaTypes.ObjectId
   , Mixed = SchemaTypes.Mixed
   , DocumentObjectId = mongoose.Types.ObjectId
-  , random = require('../lib/utils').random
+  , random = require('../lib/utils').random;
 
 describe('schema', function(){
   describe('validation', function(){
@@ -86,7 +86,7 @@ describe('schema', function(){
       Test.path('state').doValidate('x', function(err){
         assert.ok(err instanceof ValidatorError);
         assert.equal(err.message,
-          'enum validator failed for path `state`: test')
+          'enum validator failed for path `state`: test');
       });
 
       Test.path('state').doValidate('opening', function(err){
@@ -180,7 +180,7 @@ describe('schema', function(){
                 // validation should still work for non-undefined values
                 assert.ok(err);
                 done();
-              })
+              });
             });
           });
         });
@@ -319,7 +319,7 @@ describe('schema', function(){
       });
 
       done();
-    })
+    });
 
       it('date required', function(done){
         var Loki = new Schema({

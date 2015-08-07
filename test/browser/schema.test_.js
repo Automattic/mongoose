@@ -7,7 +7,7 @@ var Schema = mongoose.Schema
   , ObjectId = SchemaTypes.ObjectId
   , Mixed = SchemaTypes.Mixed
   , Buffer = SchemaTypes.Buffer
-  , DocumentObjectId = mongoose.Types.ObjectId
+  , DocumentObjectId = mongoose.Types.ObjectId;
 
 /**
  * Test Document constructor.
@@ -161,7 +161,7 @@ describe('schema', function(){
       simple    : { type: String, default: 'a' }
       , array     : { type: Array, default: [1,2,3,4,5] }
       , arrayX    : { type: Array, default: 9 }
-      , arrayFn   : { type: Array, default: function () { return [8] } }
+      , arrayFn   : { type: Array, default: function () { return [8]; } }
       , callback  : { type: Number, default: function(){
         assert.equal('b', this.a);
         return '3';
@@ -400,7 +400,7 @@ describe('schema', function(){
       function extract (v) {
         return (v && v._id)
           ? v._id
-          : v
+          : v;
       }
 
       var Tobi = new Schema({
@@ -538,7 +538,7 @@ describe('schema', function(){
       function format (v) {
         return v
           ? '$' + v
-          : v
+          : v;
       }
 
       var Tobi = new Schema({
@@ -659,7 +659,7 @@ describe('schema', function(){
       }, { noVirtualId: true });
       assert.equal(undefined, schema.virtualpath('id'));
       done();
-    })
+    });
   });
 
   describe('hooks', function(){
@@ -690,7 +690,7 @@ describe('schema', function(){
 
       assert.equal(true, called);
       done();
-    })
+    });
   });
 
   describe('options', function(){
@@ -772,7 +772,7 @@ describe('schema', function(){
 
         assert.equal('yep', Tobi.virtualpath('name').applyGetters('YEP', { a: 'b' }));
         done();
-      })
+      });
     });
 
     describe('setter', function(){
@@ -797,17 +797,17 @@ describe('schema', function(){
   it('debugging msgs', function(done){
     var err;
     try {
-      new Schema({ name: { first: null } })
+      new Schema({ name: { first: null } });
     } catch (e) {
       err = e;
     }
-    assert.equal(err.message,'Invalid value for schema path `name.first`')
+    assert.equal(err.message,'Invalid value for schema path `name.first`');
     try {
-      new Schema({ age: undefined })
+      new Schema({ age: undefined });
     } catch (e) {
       err = e;
     }
-    assert.equal(err.message, 'Invalid value for schema path `age`')
+    assert.equal(err.message, 'Invalid value for schema path `age`');
     done();
   });
 

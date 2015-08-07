@@ -39,8 +39,8 @@ describe('model', function(){
       mongo24_or_greater = 2 < version[0] || (2 == version[0] && 4 <= version[1]);
       if (!mongo24_or_greater) console.log('not testing mongodb 2.4 features');
       done();
-    })
-  })
+    });
+  });
   describe('geoNear', function () {
 
     it('works with legacy coordinate points', function (done) {
@@ -225,7 +225,7 @@ describe('model', function(){
       assert.ok(prom instanceof mongoose.Promise);
       db.close();
       done();
-    })
+    });
 
     it('allows not passing a callback (gh-1614)', function (done) {
       if (!mongo24_or_greater) return done();
@@ -283,6 +283,6 @@ describe('model', function(){
 
         });
       });
-    })
+    });
   });
 });

@@ -1,6 +1,6 @@
 
 var mongoose = require('../')
-  , Schema = mongoose.Schema
+  , Schema = mongoose.Schema;
 
 var DocSchema = new Schema({
     title: String
@@ -20,7 +20,7 @@ var AllSchema = new Schema({
   , bools  : [Boolean]
   , buffers: [Buffer]
   , objectids: [Schema.ObjectId]
-  , docs     : { type: [DocSchema], validate: function () { return true }}
+  , docs     : { type: [DocSchema], validate: function () { return true; }}
   , s: { nest: String }
 });
 

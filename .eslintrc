@@ -20,4 +20,4 @@ rules:
   consistent-this:
     - 1
     - _this
-  semi: 1
+  semi: 2

@@ -5,7 +5,7 @@
 
 var mongoose = require('./common').mongoose
   , SchemaNumber = mongoose.Schema.Types.Number
-  , assert = require('assert')
+  , assert = require('assert');
 
 /**
  * Test.
@@ -17,13 +17,13 @@ describe('types.number', function(){
     var n = new SchemaNumber();
     assert.strictEqual(n.cast(''), null);
     done();
-  })
+  });
 
   it('a null number should castForQuery to null', function (done) {
     var n = new SchemaNumber();
     assert.strictEqual(n.castForQuery(null), null);
     done();
-  })
+  });
 
   it('undefined throws number cast error', function (done) {
     var n = new SchemaNumber();
@@ -35,7 +35,7 @@ describe('types.number', function(){
     }
     assert.strictEqual(true, !! err);
     done();
-  })
+  });
 
   it('array throws cast number error', function (done) {
     var n = new SchemaNumber();
@@ -47,7 +47,7 @@ describe('types.number', function(){
     }
     assert.strictEqual(true, !! err);
     done();
-  })
+  });
 
   it('three throws cast number error', function (done) {
     var n = new SchemaNumber();
@@ -59,7 +59,7 @@ describe('types.number', function(){
     }
     assert.strictEqual(true, !! err);
     done();
-  })
+  });
 
   it('{} throws cast number error', function (done) {
     var n = new SchemaNumber();
@@ -71,7 +71,7 @@ describe('types.number', function(){
     }
     assert.strictEqual(true, !! err);
     done();
-  })
+  });
 
   it('does not throw number cast error', function (done) {
     var n = new SchemaNumber();
@@ -86,6 +86,6 @@ describe('types.number', function(){
     }
     assert.strictEqual(false, !! err, err);
     done();
-  })
+  });
 
-})
+});

@@ -66,7 +66,7 @@ BlogPost.static('woot', function(){
   return this;
 });
 
-var modelName = 'docuemnt.modified.blogpost'
+var modelName = 'docuemnt.modified.blogpost';
 mongoose.model(modelName, BlogPost);
 
 var collection = 'blogposts_' + random();
@@ -112,7 +112,7 @@ describe('document modified', function(){
         assert.equal(false, post.isModified('title'));
         done();
       });
-    })
+    });
   });
 
   describe('isDefault', function() {
@@ -167,7 +167,7 @@ describe('document modified', function(){
 
       assert.equal(false, post.isModified('meta.date'));
       done();
-    })
+    });
 
     it('setting a key identically to its current value should not dirty the key', function(done){
       var db = start()
@@ -185,14 +185,14 @@ describe('document modified', function(){
       post.set('title', 'Test');
       assert.equal(false, post.isModified('title'));
       done();
-    })
+    });
 
     describe('on DocumentArray', function(){
       it('work', function (done) {
         var db = start()
           , BlogPost = db.model(modelName, collection);
 
-        var post = new BlogPost()
+        var post = new BlogPost();
         post.init({
             title       : 'Test'
           , slug        : 'test'
@@ -207,12 +207,12 @@ describe('document modified', function(){
         assert.equal(true, post.isDirectModified('comments.0.title'));
 
         db.close(done);
-      })
+      });
       it('with accessors', function(done){
         var db = start()
           , BlogPost = db.model(modelName, collection);
 
-        var post = new BlogPost()
+        var post = new BlogPost();
         post.init({
             title       : 'Test'
           , slug        : 'test'
@@ -228,8 +228,8 @@ describe('document modified', function(){
 
         db.close();
         done();
-      })
-    })
+      });
+    });
 
     describe('on MongooseArray', function(){
       it('atomic methods', function(done){
@@ -238,7 +238,7 @@ describe('document modified', function(){
           , BlogPost = db.model(modelName, collection);
 
         db.close();
-        var post = new BlogPost()
+        var post = new BlogPost();
         assert.equal(false, post.isModified('owners'));
         post.get('owners').push(new DocumentObjectId);
         assert.equal(true, post.isModified('owners'));
@@ -258,7 +258,7 @@ describe('document modified', function(){
 
     it('on entire document', function(done){
       var db = start()
-        , BlogPost = db.model(modelName, collection)
+        , BlogPost = db.model(modelName, collection);
 
       var doc = {
           title       : 'Test'
@@ -306,7 +306,7 @@ describe('document modified', function(){
           done();
         });
       });
-    })
+    });
 
     it('should let you set ref paths (gh-1530)', function(done) {
       var db = start();
@@ -384,7 +384,7 @@ describe('document modified', function(){
 
     it('should support setting mixed paths by string (gh-1418)', function(done){
       var db = start();
-      var BlogPost = db.model('1418', new Schema({ mixed: {} }))
+      var BlogPost = db.model('1418', new Schema({ mixed: {} }));
       var b = new BlogPost;
       b.init({ mixed: {} });
 
@@ -402,7 +402,7 @@ describe('document modified', function(){
       assert.ok(b.isModified(path));
       assert.equal(4, b.get(path));
 
-      b = new BlogPost({ mixed: {} })
+      b = new BlogPost({ mixed: {} });
       b.save(function (err) {
         assert.ifError(err);
 
@@ -417,8 +417,8 @@ describe('document modified', function(){
             assert.ifError(err);
             assert.equal(8, doc.get(path));
             db.close(done);
-          })
-        })
+          });
+        });
       });
     });
 
@@ -457,4 +457,4 @@ describe('document modified', function(){
         });
     });
   });
-})
+});

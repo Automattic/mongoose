@@ -7,7 +7,7 @@ var Schema = mongoose.Schema
   , SchemaTypes = Schema.Types
   , ObjectId = SchemaTypes.ObjectId
   , Mixed = SchemaTypes.Mixed
-  , DocumentObjectId = mongoose.Types.ObjectId
+  , DocumentObjectId = mongoose.Types.ObjectId;
 
 describe('schema', function(){
   describe('validation', function(){
@@ -535,7 +535,7 @@ describe('schema', function(){
             assert.equal('x failed validation (3,4,5,6)', String(err.errors.x));
             assert.equal('customType', err.errors.x.kind);
             done();
-          })
+          });
         });
 
         it('for many custom validators', function(done){
@@ -612,7 +612,7 @@ describe('schema', function(){
           assert.equal('b', this.a);
 
           called = true;
-          return true
+          return true;
         }
 
         var Animal = new Schema({

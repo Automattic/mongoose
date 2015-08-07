@@ -51,7 +51,7 @@ describe('Promise', function(){
     });
 
     assert.equal(2, called);
-    done()
+    done();
   });
 
   it('events fire right after reject()', function(done){
@@ -71,7 +71,7 @@ describe('Promise', function(){
     });
 
     assert.equal(2, called);
-    done()
+    done();
   });
 
   describe('onResolve()', function(){
@@ -81,7 +81,7 @@ describe('Promise', function(){
       var promise = new Promise(function (err) {
         assert.ok(err instanceof Error);
         called++;
-      })
+      });
 
       promise.reject(new Error('dawg'));
 
@@ -107,7 +107,7 @@ describe('Promise', function(){
 
       assert.equal(2, called);
       done();
-    })
+    });
 
     it('after error()', function(done){
       var promise = new Promise()
@@ -126,7 +126,7 @@ describe('Promise', function(){
       });
       assert.equal(2, called);
       done();
-    })
+    });
   });
 
   describe('onFulfill() shortcut', function(){
@@ -143,8 +143,8 @@ describe('Promise', function(){
 
       assert.equal(1, called);
       done();
-    })
-  })
+    });
+  });
 
   describe('onReject shortcut', function(){
     it('works', function(done){
@@ -159,32 +159,32 @@ describe('Promise', function(){
       promise.reject(new Error);
       assert.equal(1, called);
       done();
-    })
+    });
   });
 
   describe('return values', function(){
     it('on()', function(done){
-      var promise = new Promise()
+      var promise = new Promise();
       assert.ok(promise.on('jump', function(){}) instanceof Promise);
-      done()
+      done();
     });
 
     it('onFulfill()', function(done){
-      var promise = new Promise()
+      var promise = new Promise();
       assert.ok(promise.onFulfill(function(){}) instanceof Promise);
       done();
-    })
+    });
     it('onReject()', function(done){
-      var promise = new Promise()
+      var promise = new Promise();
       assert.ok(promise.onReject(function(){}) instanceof Promise);
       done();
-    })
+    });
     it('onResolve()', function(done){
-      var promise = new Promise()
+      var promise = new Promise();
       assert.ok(promise.onResolve(function(){}) instanceof Promise);
       done();
-    })
-  })
+    });
+  });
 
   describe('casting errors', function(){
     describe('error()', function(){
@@ -196,8 +196,8 @@ describe('Promise', function(){
         });
 
         p.error(3);
-      })
-    })
+      });
+    });
 
     describe('reject()', function(){
       it('does not cast arguments to Error', function(done){

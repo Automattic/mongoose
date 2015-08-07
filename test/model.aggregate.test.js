@@ -23,15 +23,15 @@ var collection = 'aggregate_' + random();
 mongoose.model('Aggregate', userSchema);
 
 describe('model aggregate', function(){
-  var group = { $group: { _id: null, maxAge: { $max: '$age' } }}
+  var group = { $group: { _id: null, maxAge: { $max: '$age' } }};
   var project = { $project: { maxAge: 1, _id: 0 }};
   var db, A, maxAge;
 
   var mongo26_or_greater = false;
 
   before(function(done){
-    db = start()
-    A = db.model('Aggregate', collection)
+    db = start();
+    A = db.model('Aggregate', collection);
 
     var authors = 'guillermo nathan tj damian marco'.split(' ');
     var num = 10;
@@ -149,5 +149,5 @@ describe('model aggregate', function(){
           });
         });
     });
-  })
+  });
 });

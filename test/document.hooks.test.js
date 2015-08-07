@@ -31,7 +31,7 @@ TestDocument.prototype.__proto__ = Document.prototype;
 
 var em = new Schema({ title: String, body: String });
 em.virtual('works').get(function () {
-  return 'em virtual works'
+  return 'em virtual works';
 });
 var schema = new Schema({
     test    : String
@@ -156,7 +156,7 @@ describe('document: hooks:', function () {
 
   it('calling done twice does not break', function(done){
     var doc = new TestDocument()
-      , steps = 0
+      , steps = 0;
 
     doc.pre('hooksTest', true, function(next, done){
       steps++;
@@ -269,7 +269,7 @@ describe('document: hooks:', function () {
       assert.equal(2, args.length);
       assert.equal(args[1], 'test');
       done();
-    }, 'test')
+    }, 'test');
   });
 
   it('hooking set works with document arrays (gh-746)', function(done){
@@ -305,9 +305,9 @@ describe('document: hooks:', function () {
             assert.ifError(err);
             assert.equal('bye', s.e[0].text);
             done();
-          })
-        })
-      })
+          });
+        });
+      });
     });
   });
 
@@ -489,7 +489,7 @@ describe('document: hooks:', function () {
     // we set the time out to be double that of the validator - 1 (so that running in serial will be greater then that)
     this.timeout(1000);
     var db = start(),
-      count = 0
+      count = 0;
 
     var SchemaWithPreSaveHook = new Schema ({
       preference: String
@@ -680,7 +680,7 @@ describe('document: hooks:', function () {
     parentSchema.pre('save', function(next) {
       this.cumulativeCount = this.children.reduce(function (seed, child) {
         return seed += child.count;
-      }, 0)
+      }, 0);
       next();
     });
 

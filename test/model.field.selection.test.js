@@ -46,8 +46,8 @@ var modelName = 'model.select.blogpost';
 mongoose.model(modelName, BlogPostB);
 var collection = 'blogposts_' + random();
 
-describe('model field selection', function(){
-  it('excluded fields should be undefined', function(done){
+describe('model field selection', function () {
+  it('excluded fields should be undefined', function (done) {
     var db = start()
       , BlogPostB = db.model(modelName, collection)
       , date = new Date;
@@ -84,7 +84,7 @@ describe('model field selection', function(){
     });
   });
 
-  it('excluded fields should be undefined and defaults applied to other fields', function(done){
+  it('excluded fields should be undefined and defaults applied to other fields', function (done) {
     var db = start()
       , BlogPostB = db.model(modelName, collection)
       , id = new DocumentObjectId
@@ -108,7 +108,7 @@ describe('model field selection', function(){
     });
   });
 
-  it('where subset of fields excludes _id', function(done){
+  it('where subset of fields excludes _id', function (done) {
     var db = start()
       , BlogPostB = db.model(modelName, collection);
     BlogPostB.create({title: 'subset 1'}, function (err) {
@@ -123,7 +123,7 @@ describe('model field selection', function(){
     });
   });
 
-  it('works with subset of fields, excluding _id', function(done){
+  it('works with subset of fields, excluding _id', function (done) {
     var db = start()
       , BlogPostB = db.model(modelName, collection);
     BlogPostB.create({title: 'subset 1', author: 'me'}, function (err) {
@@ -141,7 +141,7 @@ describe('model field selection', function(){
     });
   });
 
-  it('works with subset of fields excluding emebedded doc _id (gh-541)', function(done){
+  it('works with subset of fields excluding emebedded doc _id (gh-541)', function (done) {
     var db = start()
       , BlogPostB = db.model(modelName, collection);
 
@@ -165,7 +165,7 @@ describe('model field selection', function(){
     });
   });
 
-  it('included fields should have defaults applied when no value exists in db (gh-870)', function(done){
+  it('included fields should have defaults applied when no value exists in db (gh-870)', function (done) {
     var db = start()
       , BlogPostB = db.model(modelName, collection)
       , id = new DocumentObjectId;
@@ -189,7 +189,7 @@ describe('model field selection', function(){
     });
   });
 
-  it('including subdoc field excludes other subdoc fields (gh-1027)', function(done){
+  it('including subdoc field excludes other subdoc fields (gh-1027)', function (done) {
     var db = start()
       , BlogPostB = db.model(modelName, collection);
 
@@ -214,7 +214,7 @@ describe('model field selection', function(){
     });
   });
 
-  it('excluding nested subdoc fields (gh-1027)', function(done){
+  it('excluding nested subdoc fields (gh-1027)', function (done) {
     var db = start()
       , BlogPostB = db.model(modelName, collection);
 
@@ -246,10 +246,10 @@ describe('model field selection', function(){
     });
   });
 
-  describe('with $elemMatch projection', function(){
+  describe('with $elemMatch projection', function () {
     // mongodb 2.2 support
 
-    it('casts elemMatch args (gh-1091)', function(done){
+    it('casts elemMatch args (gh-1091)', function (done) {
       var db = start();
 
       var postSchema = new Schema({
@@ -289,7 +289,7 @@ describe('model field selection', function(){
       });
     });
 
-    it('disallows saving modified elemMatch paths (gh-1334)', function(done){
+    it('disallows saving modified elemMatch paths (gh-1334)', function (done) {
       var db = start();
 
       var postSchema = new Schema({
@@ -325,7 +325,7 @@ describe('model field selection', function(){
       });
     });
 
-    it('works with $ positional in select (gh-2031)', function(done) {
+    it('works with $ positional in select (gh-2031)', function (done) {
       var db = start();
 
       var postSchema = new Schema({
@@ -333,12 +333,12 @@ describe('model field selection', function(){
       });
 
       var Post = db.model('gh-2031', postSchema, 'gh-2031');
-      Post.create({ tags: [{ tag: 'bacon', count: 2 }, { tag: 'eggs', count: 3 }] }, function(error) {
+      Post.create({ tags: [{ tag: 'bacon', count: 2 }, { tag: 'eggs', count: 3 }] }, function (error) {
         assert.ifError(error);
-        Post.findOne({ 'tags.tag': 'eggs' }, { 'tags.$': 1 }, function(error, post) {
+        Post.findOne({ 'tags.tag': 'eggs' }, { 'tags.$': 1 }, function (error, post) {
           assert.ifError(error);
           post.tags[0].count = 1;
-          post.save(function(error) {
+          post.save(function (error) {
             assert.ok(error);
             db.close(done);
           });
@@ -347,7 +347,7 @@ describe('model field selection', function(){
     });
   });
 
-  it('selecting an array of docs applies defaults properly (gh-1108)', function(done){
+  it('selecting an array of docs applies defaults properly (gh-1108)', function (done) {
     var db = start()
       , M = db.model(modelName, collection);
 
@@ -365,9 +365,9 @@ describe('model field selection', function(){
     });
   });
 
-  it('appropriately filters subdocuments based on properties (gh-1280)', function(done){
+  it('appropriately filters subdocuments based on properties (gh-1280)', function (done) {
     var db = start();
-    var RouteSchema = new Schema ({
+    var RouteSchema = new Schema({
       stations:   {
         start: {
           name:   { type: String },

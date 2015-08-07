@@ -17,7 +17,7 @@ if (process.env.D === '1')
  * Override all Collection related queries to keep count
  */
 
-[   'ensureIndex'
+[ 'ensureIndex'
   , 'findAndModify'
   , 'findOne'
   , 'find'
@@ -46,7 +46,7 @@ if (process.env.D === '1')
 
 var oldOnOpen = Collection.prototype.onOpen;
 
-Collection.prototype.onOpen = function(){
+Collection.prototype.onOpen = function () {
   opened++;
   return oldOnOpen.apply(this, arguments);
 };
@@ -57,7 +57,7 @@ Collection.prototype.onOpen = function(){
 
 var oldOnClose = Collection.prototype.onClose;
 
-Collection.prototype.onClose = function(){
+Collection.prototype.onClose = function () {
   closed++;
   return oldOnClose.apply(this, arguments);
 };
@@ -80,7 +80,7 @@ module.exports = function (options) {
     uri = module.exports.uri;
   }
 
-  var noErrorListener = !! options.noErrorListener;
+  var noErrorListener = !!options.noErrorListener;
   delete options.noErrorListener;
 
   var conn = mongoose.createConnection(uri, options);
@@ -118,13 +118,13 @@ module.exports.mongodVersion = function (cb) {
     var admin = db.db.admin();
     admin.serverStatus(function (err, info) {
       if (err) return cb(err);
-      var version = info.version.split('.').map(function(n){return parseInt(n, 10); });
+      var version = info.version.split('.').map(function (n) {return parseInt(n, 10); });
       cb(null, version);
     });
   });
 };
 
-function dropDBs(done) {
+function dropDBs (done) {
   var db = module.exports();
   db.once('open', function () {
     // drop the default test database

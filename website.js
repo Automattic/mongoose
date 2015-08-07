@@ -1,5 +1,5 @@
 
-var fs= require('fs');
+var fs = require('fs');
 var jade = require('jade');
 var package = require('./package');
 var hl = require('./docs/helpers/highlight');
@@ -60,7 +60,7 @@ function getVersion () {
   throw new Error('no match found');
 }
 
-function getUnstable(ver) {
+function getUnstable (ver) {
   ver = ver.replace("-pre");
   var spl = ver.split('.');
   spl = spl.map(function (i) {

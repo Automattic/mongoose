@@ -25,7 +25,7 @@ var cName = 'Comment' + random();
 mongoose.model(prodName, Product);
 mongoose.model(cName, Comment);
 
-describe('Query:', function(){
+describe('Query:', function () {
   describe('toConstructor', function () {
     it('creates a query', function (done) {
       var db = start();
@@ -104,7 +104,7 @@ describe('Query:', function(){
       });
     });
 
-    it('options get merged properly', function(done){
+    it('options get merged properly', function (done) {
       var db = start();
       var Product = db.model(prodName);
       db.close();
@@ -118,7 +118,7 @@ describe('Query:', function(){
       done();
     });
 
-    it('options get cloned (gh-3176)', function(done) {
+    it('options get cloned (gh-3176)', function (done) {
       var db = start();
       var Product = db.model(prodName);
       db.close();
@@ -135,7 +135,7 @@ describe('Query:', function(){
       done();
     });
 
-    it('creates subclasses of mquery', function(done) {
+    it('creates subclasses of mquery', function (done) {
       var db = start();
       var Product = db.model(prodName);
       db.close();

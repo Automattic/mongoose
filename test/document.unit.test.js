@@ -6,14 +6,14 @@ var start = require('./common');
 var assert = require('assert');
 var mongoose = start.mongoose;
 
-describe('sharding', function() {
-  it('should handle shard keys properly (gh-2127)', function(done) {
+describe('sharding', function () {
+  it('should handle shard keys properly (gh-2127)', function (done) {
     var mockSchema = {
       options: {
         shardKey: { date: 1 }
       }
     };
-    var Stub = function() {
+    var Stub = function () {
       this.schema = mockSchema;
       this.$__ = {};
     };
@@ -28,38 +28,38 @@ describe('sharding', function() {
   });
 });
 
-describe('toObject()', function() {
+describe('toObject()', function () {
   var Stub;
 
-  beforeEach(function() {
-    Stub = function() {
+  beforeEach(function () {
+    Stub = function () {
       var schema = this.schema = {
         options: { toObject: { minimize: false, virtuals: true } },
         virtuals: { virtual: 'test' }
       };
       this._doc = { empty: {} };
-      this.get = function(path) { return schema.virtuals[path]; };
+      this.get = function (path) { return schema.virtuals[path]; };
       this.$__ = {};
     };
     Stub.prototype = Object.create(mongoose.Document.prototype);
   });
 
-  it('should inherit options from schema', function(done) {
+  it('should inherit options from schema', function (done) {
     var d = new Stub();
     assert.deepEqual(d.toObject(), { empty: {}, virtual: 'test' });
     done();
   });
 
-  it('can overwrite by passing an option', function(done) {
+  it('can overwrite by passing an option', function (done) {
     var d = new Stub();
     assert.deepEqual(d.toObject({ minimize: true }), {});
     done();
   });
 
-  it('doesnt crash with empty object (gh-3130)', function(done) {
+  it('doesnt crash with empty object (gh-3130)', function (done) {
     var d = new Stub();
     d._doc = undefined;
-    assert.doesNotThrow(function() {
+    assert.doesNotThrow(function () {
       d.toObject();
     });
     done();

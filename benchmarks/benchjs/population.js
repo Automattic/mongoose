@@ -135,12 +135,12 @@ mongoose.connect('mongodb://localhost/mongoose-bench-pop', function (err) {
   var Dummy9 = mongoose.model('Dummy9', dummy9Schema);
   var cIds = [];
   var dIds = [];
-  for (var i=0; i < 9; i++) {
+  for (var i = 0; i < 9; i++) {
     dIds.push([]);
   }
 
   var cn = 5000;
-  for (i=0; i < 500; i++) {
+  for (i = 0; i < 500; i++) {
     Comments.create(commentData, function (err, com) {
       cIds.push(com.id);
       --cn || cont();
@@ -194,7 +194,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench-pop', function (err) {
 
   var blog = [];
 
-  function cont() {
+  function cont () {
     blog[0] = utils.clone(blogData);
     blog[1] = utils.clone(blogData);
     blog[2] = utils.clone(blogData);
@@ -205,19 +205,19 @@ mongoose.connect('mongodb://localhost/mongoose-bench-pop', function (err) {
     blog[5] = utils.clone(blogData);
     blog[6] = utils.clone(blogData);
 
-    for (var i=0; i < 10; i++) {
+    for (var i = 0; i < 10; i++) {
       blog[0].comments.push(getNextcId());
     }
-    for (i=0; i < 100; i++) {
+    for (i = 0; i < 100; i++) {
       blog[1].comments.push(getNextcId());
     }
-    for (i=0; i < 1000; i++) {
+    for (i = 0; i < 1000; i++) {
       blog[2].comments.push(getNextcId());
     }
-    for (i=0; i < 10000; i++) {
+    for (i = 0; i < 10000; i++) {
       blog[3].comments.push(getNextcId());
     }
-    for (i=0; i < 100; i++) {
+    for (i = 0; i < 100; i++) {
       blog[5].comments.push(getNextcId());
       blog[6].comments.push(getNextcId());
 
@@ -239,9 +239,9 @@ mongoose.connect('mongodb://localhost/mongoose-bench-pop', function (err) {
 
     // insert all of the data here
     var count = 7;
-    for (i=0; i < blog.length; i++) {
+    for (i = 0; i < blog.length; i++) {
       // use some closure magic to make sure we retain the index
-      (function(c) {
+      (function (c) {
         BlogPost.create(blog[c], function (err, bl) {
           if (err) throw err;
           blog[c] = bl;
@@ -254,22 +254,22 @@ mongoose.connect('mongodb://localhost/mongoose-bench-pop', function (err) {
 
   var ci = 0;
   var di = [];
-  for (i=0; i < 9; i++) {
+  for (i = 0; i < 9; i++) {
     di.push(0);
   }
 
-  function getNextcId() {
+  function getNextcId () {
     ci = ++ci % cIds.length;
     return cIds[ci];
   }
 
-  function getNextdId(i) {
+  function getNextdId (i) {
     di[i] = ++di[i] % dIds[i].length;
     return dIds[i][di[i]];
   }
 
 
-  function closeDB() {
+  function closeDB () {
     // just a bit simpler...
     mongoose.connection.db.dropDatabase(function () {
       mongoose.disconnect();
@@ -353,7 +353,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench-pop', function (err) {
       console.log(JSON.stringify(outObj));
     }
   });
-  function next() {
+  function next () {
     suite.run({ async : true });
   }
 });

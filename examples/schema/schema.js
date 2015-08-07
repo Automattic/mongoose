@@ -44,10 +44,10 @@ var Person = new Schema({
  */
 
 BlogPost.path('date')
-.default(function(){
+.default(function () {
    return new Date();
  })
-.set(function(v){
+.set(function (v) {
    return v == 'now' ? new Date() : v;
  });
 
@@ -55,7 +55,7 @@ BlogPost.path('date')
  * Pre hook.
  */
 
-BlogPost.pre('save', function(next, done){
+BlogPost.pre('save', function (next, done) {
   /* global emailAuthor */
   emailAuthor(done); // some async function
   next();
@@ -81,12 +81,12 @@ BlogPost.methods.expressiveQuery = function (creator, date, callback) {
  * Plugins
  */
 
-function slugGenerator (options){
+function slugGenerator (options) {
   options = options || {};
   var key = options.key || 'title';
 
-  return function slugGenerator(schema){
-    schema.path(key).set(function(v){
+  return function slugGenerator (schema) {
+    schema.path(key).set(function (v) {
       this.slug = v.toLowerCase().replace(/[^a-z0-9]/g, '').replace(/-+/g, '');
       return v;
     });

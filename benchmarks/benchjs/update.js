@@ -70,7 +70,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function (err) {
       body : 'this be some crazzzyyyyy text that would go in a comment',
       comments : [{ title : 'second level', date : new Date(), body : 'texttt'}]
     };
-    for (var i=0; i < 5; i++) {
+    for (var i = 0; i < 5; i++) {
       blogData.comments.push(commentData);
     }
     var UserSchema = new Schema({
@@ -102,7 +102,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function (err) {
     var testBp;
     // insert all of the data here
     var count = 4000;
-    for (i=0; i < 1000; i++) {
+    for (i = 0; i < 1000; i++) {
       User.create(data, function (err, u) {
         if (err) throw err;
         mIds.push(u.id);
@@ -133,27 +133,27 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function (err) {
         bmi = 0,
         bdi = 0;
 
-    function getNextmId() {
+    function getNextmId () {
       mi = ++mi % mIds.length;
       return mIds[mi];
     }
 
-    function getNextdId() {
+    function getNextdId () {
       di = ++di % dIds.length;
       return dIds[di];
     }
 
-    function getNextbmId() {
+    function getNextbmId () {
       bmi = ++bmi % bmIds.length;
       return bmIds[bmi];
     }
 
-    function getNextbdId() {
+    function getNextbdId () {
       bdi = ++bdi % bdIds.length;
       return bdIds[bdi];
     }
 
-    function closeDB() {
+    function closeDB () {
       mongoose.connection.db.dropDatabase(function () {
         mongoose.disconnect();
         process.exit();
@@ -214,7 +214,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function (err) {
       defer : true,
       fn : function (deferred) {
         var ids = [];
-        for (var i=0; i < 50; i++) {
+        for (var i = 0; i < 50; i++) {
           ids.push(getNextmId());
         }
         User.update({ _id : { $in : ids} }, { $set : { age : 2 } , $push : { likes : "metal" }}, function (err) {
@@ -226,7 +226,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function (err) {
       defer : true,
       fn : function (deferred) {
         var ids = [];
-        for (var i=0; i < 50; i++) {
+        for (var i = 0; i < 50; i++) {
           ids.push(getNextdId());
         }
         user.update({ _id : { $in : ids} }, { $set : { age : 2 }, $push : { likes : "metal" }}, function (err) {
@@ -297,8 +297,8 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function (err) {
         console.log(JSON.stringify(outObj));
       }
     });
-    function next() {
-      for (var i=0; i < 100; i++) {
+    function next () {
+      for (var i = 0; i < 100; i++) {
         testBp.comments.push(commentData);
       }
       testBp.save(function (err) {

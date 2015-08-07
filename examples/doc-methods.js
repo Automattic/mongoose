@@ -32,7 +32,7 @@ var Character = mongoose.model('Character', CharacterSchema);
  * the default port (27017)
  */
 
-var dbname = 'mongoose-example-doc-methods-' + ((Math.random()*10000)|0);
+var dbname = 'mongoose-example-doc-methods-' + ((Math.random() * 10000) | 0);
 var uri = 'mongodb://localhost/' + dbname;
 
 console.log('connecting to %s', uri);

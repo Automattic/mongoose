@@ -19,20 +19,20 @@ var schema = new Schema({
   , h: {}
 });
 
-describe('is compatible with object created using Object.create(null) (gh-1484)', function(){
+describe('is compatible with object created using Object.create(null) (gh-1484)', function () {
   var db;
   var M;
 
-  before(function(){
+  before(function () {
     db = start();
     M = db.model('1484', schema);
   });
 
-  after(function(done){
+  after(function (done) {
     db.close(done);
   });
 
-  it('during construction', function(done){
+  it('during construction', function (done) {
     assert.doesNotThrow(function () {
       new M(Object.create(null));
     });
@@ -77,7 +77,7 @@ describe('is compatible with object created using Object.create(null) (gh-1484)'
     done();
   });
 
-  it('with .set(path, obj)', function(done){
+  it('with .set(path, obj)', function (done) {
     var m = new M;
 
     var b = Object.create(null);
@@ -105,7 +105,7 @@ describe('is compatible with object created using Object.create(null) (gh-1484)'
     done();
   });
 
-  it('with schema', function(done){
+  it('with schema', function (done) {
     var o = Object.create(null);
     o.name = String;
     o.created = Date;

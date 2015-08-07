@@ -11,11 +11,14 @@ rules:
     - SwitchCase: 1
   no-trailing-spaces: 2
   comma-style: 1
-  no-spaced-func: 1
-  space-after-keywords: 1
-  space-before-blocks: 1
-  space-before-function-paren: 1
-  space-return-throw-case: 1
+  no-spaced-func: 2
+  no-multi-spaces: 2
+  space-after-keywords: 2
+  space-before-blocks: 2
+  space-before-function-paren: 2
+  space-infix-ops: 2
+  space-return-throw-case: 2
+  space-unary-ops: 2
   no-console: 0
   consistent-this:
     - 1

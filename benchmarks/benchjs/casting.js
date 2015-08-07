@@ -64,16 +64,16 @@ var blogData10 = utils.clone(blogData);
 var blogData100 = utils.clone(blogData);
 var blogData1000 = utils.clone(blogData);
 var blogData10000 = utils.clone(blogData);
-for (var i=0; i < 10; i++) {
+for (var i = 0; i < 10; i++) {
   blogData10.comments.push(commentData);
 }
-for (i=0; i < 100; i++) {
+for (i = 0; i < 100; i++) {
   blogData100.comments.push(commentData);
 }
-for (i=0; i < 1000; i++) {
+for (i = 0; i < 1000; i++) {
   blogData1000.comments.push(commentData);
 }
-for (i=0; i < 10000; i++) {
+for (i = 0; i < 10000; i++) {
   blogData10000.comments.push(commentData);
 }
 var commentData = {

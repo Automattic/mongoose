@@ -64,15 +64,15 @@ mongoose.model('Movie', MovieSchema);
  * Test.
  */
 
-describe('types.document', function(){
+describe('types.document', function () {
 
-  it('test that validate sets errors', function(done){
+  it('test that validate sets errors', function (done) {
     var a = new Subdocument();
     a.set('test', '');
     a.set('work', 'nope');
     a.__index = 0;
 
-    a.validate(function(){
+    a.validate(function () {
       assert.ok(a.__parent.$__.validationError instanceof ValidationError);
       assert.equal(a.__parent.errors['jsconf.ar.0.work'].name, 'ValidatorError');
       assert.equal(a.__parent.$__.validationError.toString(), 'ValidationError: Path `test` is required., Validator failed for path `work` with value `nope`');
@@ -111,7 +111,7 @@ describe('types.document', function(){
     assert.equal(m.id, m.$__._id);
     assert.strictEqual(true, old !== m.$__._id);
 
-    var m2= new Movie;
+    var m2 = new Movie;
     delete m2._doc._id;
     m2.init({ _id: new mongoose.Types.ObjectId });
     assert.equal(m2.id, m2.$__._id);
@@ -193,8 +193,8 @@ describe('types.document', function(){
     });
   });
 
-  describe('setting nested objects', function(){
-    it('works (gh-1394)', function(done){
+  describe('setting nested objects', function () {
+    it('works (gh-1394)', function (done) {
       var db = start();
       var Movie = db.model('Movie');
 

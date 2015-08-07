@@ -10,9 +10,9 @@ var assert = require('assert')
   , SchemaType = mongoose.SchemaType
   , ValidatorError = SchemaType.ValidatorError;
 
-describe('ValidationError', function(){
-  describe('#infiniteRecursion', function() {
-    it('does not cause RangeError (gh-1834)', function(done) {
+describe('ValidationError', function () {
+  describe('#infiniteRecursion', function () {
+    it('does not cause RangeError (gh-1834)', function (done) {
       var SubSchema
         , M
         , model;
@@ -34,8 +34,8 @@ describe('ValidationError', function(){
         ]
       });
 
-      model.validate(function(err){
-        assert.doesNotThrow(function(){
+      model.validate(function (err) {
+        assert.doesNotThrow(function () {
           JSON.stringify(err);
         });
         done();
@@ -43,8 +43,8 @@ describe('ValidationError', function(){
     });
   });
 
-  describe('#minDate', function() {
-    it('causes a validation error', function(done) {
+  describe('#minDate', function () {
+    it('causes a validation error', function (done) {
       var MinSchema
         , M
         , model;
@@ -60,12 +60,12 @@ describe('ValidationError', function(){
       });
 
       //should fail validation
-      model.validate(function(err){
+      model.validate(function (err) {
         assert.notEqual(err, null, 'min Date validation failed.');
         model.appointmentDate = new Date(Date.now().valueOf() + 10000);
 
         //should pass validation
-        model.validate(function(err) {
+        model.validate(function (err) {
           assert.equal(err, null);
           done();
         });
@@ -73,8 +73,8 @@ describe('ValidationError', function(){
     });
   });
 
-  describe('#maxDate', function() {
-    it('causes a validation error', function(done) {
+  describe('#maxDate', function () {
+    it('causes a validation error', function (done) {
       var MaxSchema
         , M
         , model;
@@ -90,12 +90,12 @@ describe('ValidationError', function(){
       });
 
       //should fail validation
-      model.validate(function(err){
+      model.validate(function (err) {
         assert.notEqual(err, null, 'max Date validation failed');
         model.birthdate = Date.now();
 
         //should pass validation
-        model.validate(function(err) {
+        model.validate(function (err) {
           assert.equal(err, null, 'max Date validation failed');
           done();
         });
@@ -103,8 +103,8 @@ describe('ValidationError', function(){
     });
   });
 
-  describe('#minlength', function() {
-    it('causes a validation error', function(done) {
+  describe('#minlength', function () {
+    it('causes a validation error', function (done) {
       var AddressSchema
         , Address
         , model;
@@ -120,12 +120,12 @@ describe('ValidationError', function(){
       });
 
       //should fail validation
-      model.validate(function(err){
+      model.validate(function (err) {
         assert.notEqual(err, null, 'String minlegth validation failed.');
         model.postalCode = '95125';
 
         //should pass validation
-        model.validate(function(err) {
+        model.validate(function (err) {
           assert.equal(err, null);
           done();
         });
@@ -133,8 +133,8 @@ describe('ValidationError', function(){
     });
   });
 
-  describe('#maxlength', function() {
-    it('causes a validation error', function(done) {
+  describe('#maxlength', function () {
+    it('causes a validation error', function (done) {
       var AddressSchema
         , Address
         , model;
@@ -150,12 +150,12 @@ describe('ValidationError', function(){
       });
 
       //should fail validation
-      model.validate(function(err){
+      model.validate(function (err) {
         assert.notEqual(err, null, 'String maxlegth validation failed.');
         model.postalCode = '95125';
 
         //should pass validation
-        model.validate(function(err) {
+        model.validate(function (err) {
           assert.equal(err, null);
           done();
         });
@@ -163,8 +163,8 @@ describe('ValidationError', function(){
     });
   });
 
-  describe('#toString', function() {
-    it('does not cause RangeError (gh-1296)', function(done) {
+  describe('#toString', function () {
+    it('does not cause RangeError (gh-1296)', function (done) {
       var ASchema = new Schema({
           key: {type: String, required: true}
         , value: {type:String, required: true}
@@ -178,7 +178,7 @@ describe('ValidationError', function(){
       var m = new M;
       m.contents.push({ key: 'asdf' });
       m.validate(function (err) {
-        assert.doesNotThrow(function(){
+        assert.doesNotThrow(function () {
           String(err);
         });
         done();
@@ -186,8 +186,8 @@ describe('ValidationError', function(){
     });
   });
 
-  describe('formatMessage', function() {
-    it('replaces properties in a message', function(done) {
+  describe('formatMessage', function () {
+    it('replaces properties in a message', function (done) {
       var props = { base: 'eggs', topping: 'bacon' };
       var message = 'I had {BASE} and {TOPPING} for breakfast';
 

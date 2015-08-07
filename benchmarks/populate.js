@@ -53,7 +53,7 @@ function test () {
     if (err) throw err;
     count++;
 
-    if (Date.now() - start > 1000*20) {
+    if (Date.now() - start > 1000 * 20) {
       return done();
     }
 

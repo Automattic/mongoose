@@ -54,7 +54,7 @@ mongoose.connect('mongodb://localhost/persons', function (err) {
         // information about geospatial queries and indexes, see
         // http://docs.mongodb.org/manual/applications/geospatial-indexes/
         var coords = [7,7];
-        Person.find({ loc : { $nearSphere : coords }}).limit(1).exec(function(err, res) {
+        Person.find({ loc : { $nearSphere : coords }}).limit(1).exec(function (err, res) {
           console.log("Closest to %s is %s", coords, res);
           cleanup();
         });
@@ -63,8 +63,8 @@ mongoose.connect('mongodb://localhost/persons', function (err) {
   });
 });
 
-function cleanup() {
-  Person.remove(function() {
+function cleanup () {
+  Person.remove(function () {
     mongoose.disconnect();
   });
 }

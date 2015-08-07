@@ -63,9 +63,9 @@ methods.push(function (a, cb) {
   A.count({ strings: a.strings[2], number: a.number }, cb);
 }); // 3.32 MB
 methods.push(function (a, cb) {
-  a.string= "asdfaf";
+  a.string = "asdfaf";
   a.number = 38383838;
-  a.date= new Date;
+  a.date = new Date;
   a.bool = false;
   a.array.push(3);
   a.dates.push(new Date);
@@ -77,7 +77,7 @@ methods.push(function (a, cb) {
   a.docs.pull.apply(a.docs, a.docs);
   a.s.nest = "aooooooga";
 
-  if (i%2)
+  if (i % 2)
   a.toObject({ depopulate: true });
   else {
     if (a._delta) {
@@ -118,7 +118,7 @@ mongoose.connection.on('open', function () {
       });
 
       a.save(function () {
-        methods[Math.random()*methods.length|0](a, function () {
+        methods[Math.random() * methods.length | 0](a, function () {
           a = null;
           process.nextTick(cycle);
         });
@@ -137,15 +137,15 @@ mongoose.connection.on('open', function () {
     })();
 
     function done () {
-      var time= (new Date - start);
+      var time = (new Date - start);
       var used = process.memoryUsage();
 
       var res = {};
-      res.rss  = used.rss - started.rss;
+      res.rss = used.rss - started.rss;
       res.heapTotal = used.heapTotal - started.heapTotal;
       res.heapUsed = used.heapUsed - started.heapUsed;
 
-      console.error('took %d ms for %d docs (%d dps)', time, total, total/(time/1000), 'change: ', res);
+      console.error('took %d ms for %d docs (%d dps)', time, total, total / (time / 1000), 'change: ', res);
 
       mongoose.connection.db.dropDatabase(function () {
         mongoose.connection.close();

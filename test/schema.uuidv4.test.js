@@ -25,9 +25,11 @@ describe('schematype', function(){
       var m1 = new M1({b: '644a4922-4eeb-4a54-b48c-29a6d094316c'});
       assert.strictEqual(true, UUID_FORMAT.test(m1.b));
       assert.strictEqual(true, m1.b === '644a4922-4eeb-4a54-b48c-29a6d094316c');
+      assert.strictEqual(true, m1.validateSync() === undefined);
       var m2 = new M2;
       assert.strictEqual(true, UUID_FORMAT.test(m2.b));
-
+      var m3 = new M1({b: '123'});
+      assert.strictEqual(false, m3.validateSync() === undefined);
       done();
     });
   });

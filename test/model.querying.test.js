@@ -1756,18 +1756,32 @@ describe('model: querying:', function(){
     it('with $elemMatch (gh-3163)', function(done) {
       var db = start();
 
-      var schema = new Schema({ test: [String] });
-      var MyModel = db.model('gh3163', schema);
+      start.mongodVersion(function (err, version) {
+        if (err) {
+          throw err;
+        }
+        var mongo26_or_greater = 2 < version[0] || (2 == version[0] && 6 <= version[1]);
+        if (!mongo26_or_greater) {
+          return done();
+        }
 
-      MyModel.create({ test: ['log1', 'log2'] }, function(error) {
-        assert.ifError(error);
-        var query = { test: { $all: [{ $elemMatch: { $regex: /log/g } }] } };
-        MyModel.find(query, function(error, docs) {
-          assert.ifError(error);
-          assert.equal(docs.length, 1);
-          db.close(done);
-        });
+        next();
       });
+
+      var next = function() {
+        var schema = new Schema({ test: [String] });
+        var MyModel = db.model('gh3163', schema);
+
+        MyModel.create({ test: ['log1', 'log2'] }, function(error) {
+          assert.ifError(error);
+          var query = { test: { $all: [{ $elemMatch: { $regex: /log/g } }] } };
+          MyModel.find(query, function(error, docs) {
+            assert.ifError(error);
+            assert.equal(docs.length, 1);
+            db.close(done);
+          });
+        });
+      };
     });
   });
 

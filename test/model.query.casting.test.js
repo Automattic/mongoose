@@ -1,3 +1,4 @@
+/* vim: set softtabstop=2 ts=2 sw=2 expandtab tw=120: */
 
 /**
  * Test dependencies.
@@ -135,6 +136,26 @@ describe('model query casting', function(){
       });
     });
   })
+
+  it('casts $in values of arrays with single item instead of array (jrl-3238)', function(done) {
+    var db = start()
+      , BlogPostB = db.model(modelName, collection);
+
+    var post = new BlogPostB()
+      , id = post._id.toString()
+
+    post.save(function (err) {
+      assert.ifError(err);
+
+      BlogPostB.findOne({ _id: { $in: id } }, function (err, doc) {
+        assert.ifError(err);
+
+        assert.equal(doc._id.toString(), id);
+        db.close();
+        done();
+      });
+    });
+  });
 
   it('casts $nin values of arrays (gh-232)', function(done){
     var db = start()

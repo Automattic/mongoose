@@ -1,3 +1,4 @@
+/* eslint no-dupe-keys: 1 */
 
 /**
  * Test dependencies.
@@ -9,8 +10,7 @@ var start = require('./common')
   , utils = require('../lib/utils')
   , random = utils.random
   , Schema = mongoose.Schema
-  , ObjectId = Schema.ObjectId
-  , DocObjectId = mongoose.Types.ObjectId
+  , DocObjectId = mongoose.Types.ObjectId;
 
 /**
  * Setup.
@@ -30,7 +30,7 @@ describe('model: populate:', function(){
       , 'String': String
       , 'Number': Number
       , 'Buffer': Buffer
-    }
+    };
 
     var construct = {};
     construct.String = random;
@@ -38,16 +38,15 @@ describe('model: populate:', function(){
     construct.Number = random;
     construct.Buffer = function () {
       return new Buffer(random());
-    }
+    };
 
     Object.keys(types).forEach(function (id) {
       describe('should not cast to _id of type ' + id, function(){
-        var ID = types[id];
         var refuser;
         var db;
         var B, U;
-        var u1, u2;
-        var b1, b2
+        var u1;
+        var b1, b2;
 
         before(function(done){
           refuser = 'RefUser-'+id;
@@ -69,8 +68,8 @@ describe('model: populate:', function(){
             , email: String
           });
 
-          db = start()
-          B = db.model('RefBlogPost-'+id, bSchema, posts + random())
+          db = start();
+          B = db.model('RefBlogPost-'+id, bSchema, posts + random());
           U = db.model(refuser, uSchema, users + random());
 
           U.create({
@@ -84,7 +83,6 @@ describe('model: populate:', function(){
           }, function (err, fan1, fan2) {
             assert.ifError(err);
             u1 = fan1;
-            u2 = fan2;
 
             B.create({
                 title : 'Woot'
@@ -106,11 +104,11 @@ describe('model: populate:', function(){
               done();
             });
           });
-        })
+        });
 
         after(function(done){
-          db.close(done)
-        })
+          db.close(done);
+        });
 
         function userLiteral (name) {
           return { _id: construct[id](), name: name };
@@ -150,7 +148,7 @@ describe('model: populate:', function(){
 
             doc.fans.forEach(function (doc) {
               assert.ok(doc instanceof U);
-            })
+            });
 
             var user8 = user('user8');
             doc.fans.set(0, user8);
@@ -211,10 +209,10 @@ describe('model: populate:', function(){
                 assert.equal(doc.adhoc[0].subdoc, user2a.id);
                 assert.equal(doc.adhoc[0].subarray[0].things[1], user2b.id);
                 done();
-              })
-            })
-          })
-        })
+              });
+            });
+          });
+        });
 
         it('if an object', function(done){
           B.findById(b2)
@@ -256,7 +254,7 @@ describe('model: populate:', function(){
 
             doc.fans.forEach(function (doc) {
               assert.ok(doc instanceof U);
-            })
+            });
 
             name = 'creator';
             var creator = userLiteral(name);
@@ -273,13 +271,13 @@ describe('model: populate:', function(){
             var user1a = userLiteral(name);
             doc.embed[0].array.set(0, user1a);
             assert.equal(name, doc.embed[0].array[0].name);
-            var user1aId = doc.embed[0].array[0]._id
+            var user1aId = doc.embed[0].array[0]._id;
 
             name = 'user1b';
             var user1b = userLiteral(name);
             doc.embed[0].other = user1b;
             assert.equal(name, doc.embed[0].other.name);
-            var user1bId = doc.embed[0].other._id
+            var user1bId = doc.embed[0].other._id;
 
             // embedded without declared ref in schema
             name = 'user2a';
@@ -308,12 +306,12 @@ describe('model: populate:', function(){
                 assert.equal(doc.adhoc[0].subdoc, String(user2aId));
                 assert.equal(doc.adhoc[0].subarray[0].things[1], String(user2bId));
                 done();
-              })
+              });
             });
           });
-        })
+        });
 
-      })
-    })
-  })
-})
+      });
+    });
+  });
+});

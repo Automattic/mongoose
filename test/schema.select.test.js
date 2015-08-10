@@ -7,17 +7,12 @@ var start = require('./common')
   , assert = require('assert')
   , mongoose = start.mongoose
   , random = require('../lib/utils').random
-  , Query = require('../lib/query')
-  , Schema = mongoose.Schema
-  , SchemaType = mongoose.SchemaType
-  , ObjectId = Schema.Types.ObjectId
-  , MongooseBuffer = mongoose.Types.Buffer
-  , DocumentObjectId = mongoose.Types.ObjectId;
+  , Schema = mongoose.Schema;
 
 describe('schema select option', function(){
 
   it('excluding paths through schematype', function (done) {
-    var db =start()
+    var db =start();
 
     var schema = new Schema({
         thin: Boolean
@@ -60,7 +55,7 @@ describe('schema select option', function(){
   });
 
   it('including paths through schematype', function (done) {
-    var db =start()
+    var db =start();
 
     var schema = new Schema({
         thin: Boolean
@@ -103,11 +98,11 @@ describe('schema select option', function(){
     });
   });
 
-  describe('overriding schematype select options', function (done) {
+  describe('overriding schematype select options', function () {
     var db, selected, excluded, S, E;
 
     before(function(){
-      db =start()
+      db =start();
 
       selected = new Schema({
           thin: Boolean
@@ -125,11 +120,11 @@ describe('schema select option', function(){
     });
 
     after(function(done){
-      db.close(done)
-    })
+      db.close(done);
+    });
 
     describe('works', function(){
-      describe('for inclusions', function(done){
+      describe('for inclusions', function(){
         var s;
         before(function(done){
           S.create({ thin: true, name: 'the included', docs: [{name:'test',bool: true}] },function (err, s_) {
@@ -139,7 +134,7 @@ describe('schema select option', function(){
             assert.equal(s.docs[0].name, 'test');
             done();
           });
-        })
+        });
         it('with find', function(done){
           S.find({ _id: s._id }).select('thin name docs.bool docs.name').exec(function (err, s) {
             assert.ifError(err);
@@ -155,14 +150,14 @@ describe('schema select option', function(){
             assert.ok(s.docs[0].bool);
             done();
           });
-        })
+        });
         it('for findById', function(done){
           S.findById(s).select('-name -docs.name').exec(function (err, s) {
             assert.strictEqual(null, err);
-            assert.equal(false, s.isSelected('name'))
-            assert.equal(true, s.isSelected('thin'))
-            assert.equal(false, s.isSelected('docs.name'))
-            assert.equal(true, s.isSelected('docs.bool'))
+            assert.equal(false, s.isSelected('name'));
+            assert.equal(true, s.isSelected('thin'));
+            assert.equal(false, s.isSelected('docs.name'));
+            assert.equal(true, s.isSelected('docs.bool'));
             assert.strictEqual(undefined, s.name);
             assert.strictEqual(undefined, s.docs[0].name);
             assert.equal(true, s.thin);
@@ -183,14 +178,14 @@ describe('schema select option', function(){
             assert.ok(s.docs[0].bool);
             done();
           });
-        })
+        });
         it('for findByIdAndUpdate', function(done){
           S.findByIdAndUpdate(s, { thin: false }, { 'new': true }).select('-name -docs.name').exec(function (err, s) {
             assert.strictEqual(null, err);
-            assert.equal(false, s.isSelected('name'))
-            assert.equal(true, s.isSelected('thin'))
-            assert.equal(false, s.isSelected('docs.name'))
-            assert.equal(true, s.isSelected('docs.bool'))
+            assert.equal(false, s.isSelected('name'));
+            assert.equal(true, s.isSelected('thin'));
+            assert.equal(false, s.isSelected('docs.name'));
+            assert.equal(true, s.isSelected('docs.bool'));
             assert.strictEqual(undefined, s.name);
             assert.strictEqual(undefined, s.docs[0].name);
             assert.equal(false, s.thin);
@@ -209,8 +204,8 @@ describe('schema select option', function(){
             assert.equal(e.name, 'the excluded');
             assert.equal(e.docs[0].name, 'test');
             done();
-          })
-        })
+          });
+        });
         it('with find', function(done){
           E.find({ _id: e._id }).select('thin name docs.name docs.bool').exec(function (err, e) {
             e = e[0];
@@ -225,13 +220,13 @@ describe('schema select option', function(){
             assert.ok(e.docs[0].bool);
             done();
           });
-        })
+        });
         it('with findById', function(done){
           E.findById(e).select('-name -docs.name').exec(function (err, e) {
             assert.strictEqual(null, err);
-            assert.equal(e.isSelected('name'),false)
+            assert.equal(e.isSelected('name'),false);
             assert.equal(e.isSelected('thin'), true);
-            assert.equal(e.isSelected('docs.name'),false)
+            assert.equal(e.isSelected('docs.name'),false);
             assert.equal(e.isSelected('docs.bool'), true);
             assert.strictEqual(undefined, e.name);
             assert.strictEqual(undefined, e.docs[0].name);
@@ -239,7 +234,7 @@ describe('schema select option', function(){
             assert.strictEqual(true, e.docs[0].bool);
             done();
           });
-        })
+        });
         it('with findOneAndUpdate', function(done){
           E.findOneAndUpdate({ _id: e._id }, { name: 'changed' }, { 'new': true }).select('thin name docs.name docs.bool').exec(function (err, e) {
             assert.strictEqual(null, err);
@@ -253,13 +248,13 @@ describe('schema select option', function(){
             assert.ok(e.docs[0].bool);
             done();
           });
-        })
+        });
         it('with findOneAndRemove', function(done){
           E.findOneAndRemove({ _id: e._id }).select('-name -docs.name').exec(function (err, e) {
             assert.strictEqual(null, err);
-            assert.equal(e.isSelected('name'),false)
+            assert.equal(e.isSelected('name'),false);
             assert.equal(e.isSelected('thin'), true);
-            assert.equal(e.isSelected('docs.name'),false)
+            assert.equal(e.isSelected('docs.name'),false);
             assert.equal(e.isSelected('docs.bool'), true);
             assert.strictEqual(undefined, e.name);
             assert.strictEqual(undefined, e.docs[0].name);
@@ -267,12 +262,12 @@ describe('schema select option', function(){
             assert.strictEqual(true, e.docs[0].bool);
             done();
           });
-        })
-      })
+        });
+      });
     });
-  })
+  });
 
-  describe('exclusion in root schema should override child schema', function (done) {
+  describe('exclusion in root schema should override child schema', function () {
     it('works (gh-1333)', function(done){
       var m = new mongoose.Mongoose();
       var child = new Schema({
@@ -291,8 +286,8 @@ describe('schema select option', function(){
       assert.equal(undefined, query._fields['docs.name2']);
       assert.equal(0, query._fields.docs);
       done();
-    })
-  })
+    });
+  });
 
   describe('forcing inclusion of a deselected schema path', function () {
     it('works', function (done) {
@@ -370,11 +365,11 @@ describe('schema select option', function(){
           db.close(done);
         });
       });
-    })
+    });
   });
 
   it('conflicting schematype path selection should not error', function (done) {
-    var db =start()
+    var db =start();
 
     var schema = new Schema({
         thin: Boolean
@@ -402,7 +397,7 @@ describe('schema select option', function(){
       S.findById(s).exec(cb);
       S.find({ _id: s._id }).exec(cb);
     });
-  })
+  });
 
   it('selecting _id works with excluded schematype path', function (done) {
     var db = start();
@@ -526,11 +521,11 @@ describe('schema select option', function(){
                 nonId(T, id, function () {
                   db.close();
                   done();
-                })
+                });
               });
-            })
+            });
           });
-        })
+        });
       });
     });
   });
@@ -538,7 +533,7 @@ describe('schema select option', function(){
   it('initializes nested defaults with selected objects (gh-2629)', function(done){
     var NestedSchema = new mongoose.Schema({
       nested: {
-        name: { type: String, default: 'val' },
+        name: { type: String, default: 'val' }
       }
     });
 
@@ -556,4 +551,4 @@ describe('schema select option', function(){
       });
     });
   });
-})
+});

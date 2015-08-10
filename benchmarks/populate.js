@@ -7,7 +7,7 @@ var A = mongoose.model('A', Schema({ name: 'string' }));
 
 var nested = Schema({
   a: { type: Schema.ObjectId, ref: 'A' }
-})
+});
 
 var B = mongoose.model('B', Schema({
     as: [{ type: Schema.ObjectId, ref: 'A' }]
@@ -26,7 +26,7 @@ mongoose.connect('localhost', 'benchmark-populate', function (err) {
 
     var pending = docs;
     for (var i = 0; i < pending; ++i) {
-      var b = new B({
+      new B({
           as: [a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a]
         , a: a
         , nested: [{ a: a }, { a: a }, { a: a }, { a: a }, { a: a }, { a: a }]
@@ -38,10 +38,10 @@ mongoose.connect('localhost', 'benchmark-populate', function (err) {
           start = Date.now();
           test();
         }
-      })
+      });
     }
-  })
-})
+  });
+});
 
 function test () {
   var pending = 2;
@@ -63,12 +63,10 @@ function test () {
 
 
 function done (err) {
-  var end = Date.now();
-
   if (err) console.error(err.stack);
 
   mongoose.connection.db.dropDatabase(function () {
-    mongoose.disconnect()
+    mongoose.disconnect();
     console.log('%d completed queries on mongoose version %s', count, mongoose.version);
-  })
+  });
 }

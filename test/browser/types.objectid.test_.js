@@ -1,3 +1,4 @@
+/* eslint no-empty: 1 */
 (function() {
   var ObjectId = mongoose.Types.ObjectId;
 
@@ -16,8 +17,8 @@
 
     it('ObjectId should correctly create objects', function (done) {
       try {
-        var object1 = ObjectId.createFromHexString('000000000000000000000001');
-        var object2 = ObjectId.createFromHexString('00000000000000000000001');
+        ObjectId.createFromHexString('000000000000000000000001');
+        ObjectId.createFromHexString('00000000000000000000001');
         assert.ok(false);
       } catch (err) {
         assert.ok(err != null);

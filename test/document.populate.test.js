@@ -10,8 +10,7 @@ var start = require('./common')
   , random = utils.random
   , Schema = mongoose.Schema
   , ObjectId = Schema.ObjectId
-  , Document = require('../lib/document')
-  , DocObjectId = mongoose.Types.ObjectId
+  , Document = require('../lib/document');
 
 /**
  * Setup.
@@ -23,7 +22,7 @@ var start = require('./common')
 
 function TestDocument () {
   Document.apply(this, arguments);
-};
+}
 
 /**
  * Inherits from Document.
@@ -37,7 +36,7 @@ TestDocument.prototype.__proto__ = Document.prototype;
 
 var em = new Schema({ title: String, body: String });
 em.virtual('works').get(function () {
-  return 'em virtual works'
+  return 'em virtual works';
 });
 var schema = new Schema({
     test    : String
@@ -96,9 +95,6 @@ var BlogPost = new Schema({
   , fans          : [{ type: ObjectId, ref: 'doc.populate.u' }]
 });
 
-var posts = 'blogposts_' + random()
-  , users = 'users_' + random();
-
 mongoose.model('doc.populate.b', BlogPost);
 mongoose.model('doc.populate.u', User);
 mongoose.model('doc.populate.u2', User);
@@ -135,7 +131,7 @@ describe('document.populate', function(){
         , comments: [{ _creator: user2, content: 'user2' }, { _creator: user1, content: 'user1' }]
       }, function (err, p) {
         assert.ifError(err);
-        post = p
+        post = p;
         done();
       });
     });
@@ -143,7 +139,7 @@ describe('document.populate', function(){
 
   after(function(done){
     db.close(done);
-  })
+  });
 
   describe('argument processing', function(){
     describe('duplicates', function(){
@@ -165,8 +161,8 @@ describe('document.populate', function(){
           assert.ok('_creator' in post.$__.populate);
           assert.ok('fans' in post.$__.populate);
           done();
-        })
-      })
+        });
+      });
       it('overwrite previous', function(done){
         B.findById(post, function (err, post) {
           assert.ifError(err);
@@ -178,16 +174,16 @@ describe('document.populate', function(){
           assert.ok('_creator' in post.$__.populate);
           assert.equal('name', post.$__.populate._creator.select);
           done();
-        })
-      })
-    })
-  })
+        });
+      });
+    });
+  });
 
   describe('options', function(){
     it('resets populate options after execution', function(done){
       B.findById(post, function (err, post) {
         var creator_id = post._creator;
-        post.populate('_creator', function (err, post_) {
+        post.populate('_creator', function (err) {
           assert.ifError(err);
           assert.ok(!post.$__.populate);
           assert.ok(post._creator);
@@ -195,22 +191,22 @@ describe('document.populate', function(){
           done();
         });
       });
-    })
+    });
 
     it('are not modified when no arguments are passed', function(done){
       var d = new TestDocument();
       var o = utils.clone(d.options);
       assert.deepEqual(o, d.populate().options);
       done();
-    })
-  })
+    });
+  });
 
   describe('populating two paths', function(){
     it('with space delmited string works', function(done){
       B.findById(post, function (err, post) {
         var creator_id = post._creator;
         var alt_id = post.fans[1];
-        post.populate('_creator fans', function (err, post_) {
+        post.populate('_creator fans', function (err) {
           assert.ifError(err);
           assert.ok(post._creator);
           assert.equal(String(creator_id), String(post._creator._id));
@@ -219,28 +215,28 @@ describe('document.populate', function(){
           done();
         });
       });
-    })
-  })
+    });
+  });
 
   it('works with just a callback', function(done){
     B.findById(post, function (err, post) {
       var creator_id = post._creator;
       var alt_id = post.fans[1];
-      post.populate('_creator').populate(function (err, post_) {
+      post.populate('_creator').populate(function (err) {
         assert.ifError(err);
         assert.ok(post._creator);
         assert.equal(String(creator_id), String(post._creator._id));
         assert.equal(String(alt_id), String(post.fans[1]));
         done();
       });
-    })
-  })
+    });
+  });
 
   it('populating using space delimited paths with options', function(done){
     B.findById(post, function (err, post) {
       var param = {};
       param.select = '-email';
-      param.options = { sort: 'name' }
+      param.options = { sort: 'name' };
       param.path = '_creator fans'; // 2 paths
 
       var creator_id = post._creator;
@@ -267,7 +263,7 @@ describe('document.populate', function(){
 
       var param = {};
       param.select = '-email';
-      param.options = { sort: 'name' }
+      param.options = { sort: 'name' };
       param.path = '_creator';
       post.populate(param);
       param.path = 'fans';
@@ -291,7 +287,7 @@ describe('document.populate', function(){
     B.findById(post, function (err, post) {
       var param = {};
       param.select = '-email';
-      param.options = { sort: 'name' }
+      param.options = { sort: 'name' };
       param.path = '_creator fans';
       param.model = 'doc.populate.u2';
 
@@ -331,37 +327,37 @@ describe('document.populate', function(){
         });
       });
     });
-  })
+  });
 
   it('of empty array', function(done){
     B.findById(post, function (err, post) {
-      post.fans = []
-      post.populate('fans', function (err, post) {
+      post.fans = [];
+      post.populate('fans', function (err) {
         assert.ifError(err);
         done();
       });
     });
-  })
+  });
 
   it('of array of null/undefined', function(done){
     B.findById(post, function (err, post) {
-      post.fans = [null, undefined]
-      post.populate('fans', function (err, post) {
+      post.fans = [null, undefined];
+      post.populate('fans', function (err) {
         assert.ifError(err);
         done();
       });
     });
-  })
+  });
 
   it('of null property', function(done){
     B.findById(post, function (err, post) {
       post._creator = null;
-      post.populate('_creator', function (err, post) {
+      post.populate('_creator', function (err) {
         assert.ifError(err);
         done();
       });
     });
-  })
+  });
 
   it('String _ids', function(done){
     var db = start();
@@ -369,23 +365,23 @@ describe('document.populate', function(){
     var UserSchema = new Schema({
         _id: String
       , name: String
-    })
+    });
 
     var NoteSchema = new Schema({
         author: { type: String, ref: 'UserWithStringId' }
       , body: String
-    })
+    });
 
-    var User = db.model('UserWithStringId', UserSchema, random())
-    var Note = db.model('NoteWithStringId', NoteSchema, random())
+    var User = db.model('UserWithStringId', UserSchema, random());
+    var Note = db.model('NoteWithStringId', NoteSchema, random());
 
-    var alice = new User({_id: 'alice', name: "Alice In Wonderland"})
+    var alice = new User({_id: 'alice', name: "Alice In Wonderland"});
 
     alice.save(function (err) {
       assert.ifError(err);
 
       var note = new Note({ author: 'alice', body: "Buy Milk" });
-      note.populate('author', function (err, note_) {
+      note.populate('author', function (err) {
         db.close();
         assert.ifError(err);
         assert.ok(note.author);
@@ -393,8 +389,8 @@ describe('document.populate', function(){
         assert.equal(note.author.name, 'Alice In Wonderland');
         done();
       });
-    })
-  })
+    });
+  });
 
   it('Buffer _ids', function(done){
     var db = start();
@@ -402,17 +398,17 @@ describe('document.populate', function(){
     var UserSchema = new Schema({
         _id: Buffer
       , name: String
-    })
+    });
 
     var NoteSchema = new Schema({
         author: { type: Buffer, ref: 'UserWithBufferId' }
       , body: String
-    })
+    });
 
-    var User = db.model('UserWithBufferId', UserSchema, random())
-    var Note = db.model('NoteWithBufferId', NoteSchema, random())
+    var User = db.model('UserWithBufferId', UserSchema, random());
+    var Note = db.model('NoteWithBufferId', NoteSchema, random());
 
-    var alice = new User({_id: new mongoose.Types.Buffer('YWxpY2U=', 'base64'), name: "Alice"})
+    var alice = new User({_id: new mongoose.Types.Buffer('YWxpY2U=', 'base64'), name: "Alice"});
 
     alice.save(function (err) {
       assert.ifError(err);
@@ -434,8 +430,8 @@ describe('document.populate', function(){
           });
         });
       });
-    })
-  })
+    });
+  });
 
   it('Number _ids', function(done){
     var db = start();
@@ -443,17 +439,17 @@ describe('document.populate', function(){
     var UserSchema = new Schema({
         _id: Number
       , name: String
-    })
+    });
 
     var NoteSchema = new Schema({
         author: { type: Number, ref: 'UserWithNumberId' }
       , body: String
-    })
+    });
 
-    var User = db.model('UserWithNumberId', UserSchema, random())
-    var Note = db.model('NoteWithNumberId', NoteSchema, random())
+    var User = db.model('UserWithNumberId', UserSchema, random());
+    var Note = db.model('NoteWithNumberId', NoteSchema, random());
 
-    var alice = new User({_id: 2359, name: "Alice"})
+    var alice = new User({_id: 2359, name: "Alice"});
 
     alice.save(function (err) {
       assert.ifError(err);
@@ -467,8 +463,8 @@ describe('document.populate', function(){
         assert.equal(note.author.name,'Alice');
         done();
       });
-    })
-  })
+    });
+  });
 
   describe('sub-level properties', function(){
     it('with string arg', function(done){
@@ -481,10 +477,10 @@ describe('document.populate', function(){
           assert.equal(id0, post.comments[0]._creator.id);
           assert.equal(id1, post.comments[1]._creator.id);
           done();
-        })
-      })
-    })
-  })
+        });
+      });
+    });
+  });
 
   describe('of new document', function(){
     it('should save just the populated _id (gh-1442)', function(done){
@@ -498,22 +494,22 @@ describe('document.populate', function(){
             assert.ifError(err);
             assert.equal(b._creator, String(user1._id));
             done();
-          })
-        })
-      })
-    })
-  })
+          });
+        });
+      });
+    });
+  });
 
   describe('gh-2214', function() {
     it('should return a real document array when populating', function(done) {
       var db = start();
 
-      Car = db.model('gh-2214-1', {
+      var Car = db.model('gh-2214-1', {
         color: String,
         model: String
       });
 
-      Person = db.model('gh-2214-2', {
+      var Person = db.model('gh-2214-2', {
         name: String,
         cars: [
           {
@@ -536,7 +532,7 @@ describe('document.populate', function(){
       return joe.save(function() {
         return car.save(function() {
           return Person.findById(joe.id, function(err, joe) {
-            return joe.populate("cars", function(err) {
+            return joe.populate("cars", function() {
               car = new Car({
                 model: "BMW",
                 color: "black"

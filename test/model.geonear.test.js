@@ -3,8 +3,7 @@ var start = require('./common')
   , assert = require('assert')
   , mongoose = start.mongoose
   , random = require('../lib/utils').random
-  , Schema = mongoose.Schema
-  , DocumentObjectId = mongoose.Types.ObjectId
+  , Schema = mongoose.Schema;
 
 /**
  * Setup
@@ -40,8 +39,8 @@ describe('model', function(){
       mongo24_or_greater = 2 < version[0] || (2 == version[0] && 4 <= version[1]);
       if (!mongo24_or_greater) console.log('not testing mongodb 2.4 features');
       done();
-    })
-  })
+    });
+  });
   describe('geoNear', function () {
 
     it('works with legacy coordinate points', function (done) {
@@ -73,7 +72,7 @@ describe('model', function(){
 
         function next() {
           // using legacy coordinates -- maxDistance units in radians
-          Geo.geoNear(testLocations.PORT_AUTHORITY_STATION, { spherical : true, maxDistance : metersToRadians(300)  }, function (err, results, stats) {
+          Geo.geoNear(testLocations.PORT_AUTHORITY_STATION, { spherical : true, maxDistance : metersToRadians(300)  }, function (err, results) {
             assert.ifError(err);
 
             assert.equal(1, results.length);
@@ -118,7 +117,7 @@ describe('model', function(){
 
         function next() {
           var pnt = { type : "Point", coordinates : testLocations.PORT_AUTHORITY_STATION };
-          Geo.geoNear(pnt, { spherical : true, maxDistance : 300 }, function (err, results, stats) {
+          Geo.geoNear(pnt, { spherical : true, maxDistance : 300 }, function (err, results) {
             assert.ifError(err);
 
             assert.equal(1, results.length);
@@ -163,7 +162,7 @@ describe('model', function(){
 
         function next() {
           var pnt = { type : "Point", coordinates : testLocations.PORT_AUTHORITY_STATION };
-          Geo.geoNear(pnt, { spherical : true, maxDistance : 300, lean : true }, function (err, results, stats) {
+          Geo.geoNear(pnt, { spherical : true, maxDistance : 300, lean : true }, function (err, results) {
             assert.ifError(err);
 
             assert.equal(1, results.length);
@@ -191,7 +190,6 @@ describe('model', function(){
 
         var g = new Geo({ coordinates : [10,10], type : "place"});
         g.save(function() {
-          var threw = false;
           Geo.geoNear("1,2", {}, function (e) {
             assert.ok(e);
             assert.equal(e.message, "Must pass either a legacy coordinate array or GeoJSON Point to geoNear");
@@ -223,12 +221,11 @@ describe('model', function(){
 
       var pnt = { type : "Point", coordinates : testLocations.PORT_AUTHORITY_STATION };
       // using GeoJSON point
-      var prom = Geo.geoNear(pnt, { spherical : true, maxDistance : 300 }, function (err, results, stats) {
-      });
+      var prom = Geo.geoNear(pnt, { spherical : true, maxDistance : 300 }, function () {});
       assert.ok(prom instanceof mongoose.Promise);
       db.close();
       done();
-    })
+    });
 
     it('allows not passing a callback (gh-1614)', function (done) {
       if (!mongo24_or_greater) return done();
@@ -286,6 +283,6 @@ describe('model', function(){
 
         });
       });
-    })
+    });
   });
 });

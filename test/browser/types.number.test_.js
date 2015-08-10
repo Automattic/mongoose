@@ -73,7 +73,7 @@ describe('types.number', function(){
 
   it('does not throw number cast error', function (done) {
     var n = new SchemaNumber();
-    var items = [1, '2', '0', null, '', new String('47'), new Number(5), Number(47), 09, 0x12];
+    var items = [1, '2', '0', null, '', new String('47'), new Number(5), Number(47), Number('09'), 0x12];
     var err;
     try {
       for (var i = 0, len = items.length; i < len; ++i) {

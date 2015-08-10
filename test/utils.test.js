@@ -10,8 +10,7 @@ var start = require('./common')
   , StateMachine = require('../lib/statemachine')
   , ObjectId = require('../lib/types/objectid')
   , MongooseBuffer = require('../lib/types/buffer')
-  , ReadPref = mongoose.mongo.ReadPreference
-  , assert = require('assert')
+  , assert = require('assert');
 
 /**
  * Setup.
@@ -30,21 +29,21 @@ describe('utils', function(){
       ar.require('hello');
       assert.equal(ar.paths['hello'],'require');
       done();
-    })
+    });
 
     it('should detect a path as inited if it has been inited', function (done) {
       var ar = new ActiveRoster();
       ar.init('hello');
       assert.equal(ar.paths['hello'],'init');
       done();
-    })
+    });
 
     it('should detect a path as modified', function (done) {
       var ar = new ActiveRoster();
       ar.modify('hello');
       assert.equal(ar.paths['hello'],'modify');
       done();
-    })
+    });
 
     it('should remove a path from an old state upon a state change', function (done) {
       var ar = new ActiveRoster();
@@ -53,7 +52,7 @@ describe('utils', function(){
       assert.ok(!ar.states.init.hasOwnProperty('hello'));
       assert.ok(ar.states.modify.hasOwnProperty('hello'));
       done();
-    })
+    });
 
     it('forEach should be able to iterate through the paths belonging to one state', function (done) {
       var ar = new ActiveRoster();
@@ -65,7 +64,7 @@ describe('utils', function(){
         assert.ok(~['hello', 'goodbye'].indexOf(path));
       });
       done();
-    })
+    });
 
     it('forEach should be able to iterate through the paths in the union of two or more states', function (done) {
       var ar = new ActiveRoster();
@@ -77,7 +76,7 @@ describe('utils', function(){
         assert.ok(~['world', 'foo'].indexOf(path));
       });
       done();
-    })
+    });
 
     it('forEach should iterate through all paths that have any state if given no state arguments', function (done) {
       var ar = new ActiveRoster();
@@ -89,7 +88,7 @@ describe('utils', function(){
         assert.ok(~['hello', 'goodbye','world', 'foo'].indexOf(path));
       });
       done();
-    })
+    });
 
     it('should be able to detect if at least one path exists in a set of states', function (done) {
       var ar = new ActiveRoster();
@@ -102,7 +101,7 @@ describe('utils', function(){
       assert.ok(ar.some('init', 'require'));
       assert.ok(ar.some('modify', 'require'));
       done();
-    })
+    });
 
     it('should be able to `map` over the set of paths in a given state', function (done) {
       var ar = new ActiveRoster();
@@ -114,7 +113,7 @@ describe('utils', function(){
       });
       assert.deepEqual(suffixedPaths,['hello-suffix', 'world-suffix']);
       done();
-    })
+    });
 
     it("should `map` over all states' paths if no states are specified in a `map` invocation", function (done) {
       var ar = new ActiveRoster();
@@ -126,7 +125,7 @@ describe('utils', function(){
       });
       assert.deepEqual(suffixedPaths,['iAmTheWalrus-suffix', 'hello-suffix', 'world-suffix']);
       done();
-    })
+    });
 
   });
 
@@ -152,7 +151,7 @@ describe('utils', function(){
     // same object
     assert.notEqual(defaults, result2);
     done();
-  })
+  });
 
   it('deepEquals on ObjectIds', function (done) {
     var s = (new ObjectId).toString();
@@ -164,7 +163,7 @@ describe('utils', function(){
     assert.ok(utils.deepEqual(a, a));
     assert.ok(!utils.deepEqual(a, new ObjectId));
     done();
-  })
+  });
 
   it('deepEquals on MongooseDocumentArray works', function (done) {
     var db = start()
@@ -189,9 +188,9 @@ describe('utils', function(){
     assert.ok(utils.deepEqual(m1.a1, m2.a1));
 
     m2.set(m1.toObject());
-    assert.ok(utils.deepEqual(m1.a1, m2.a1))
+    assert.ok(utils.deepEqual(m1.a1, m2.a1));
     done();
-  })
+  });
 
   // gh-688
   it('deepEquals with MongooseBuffer', function (done) {
@@ -202,14 +201,14 @@ describe('utils', function(){
     var d = new Buffer("this is the way");
     var e = new Buffer("other length");
 
-    assert.ok(utils.deepEqual(a, b))
-    assert.ok(utils.deepEqual(a, c))
-    assert.ok(!utils.deepEqual(a, d))
-    assert.ok(!utils.deepEqual(a, e))
-    assert.ok(!utils.deepEqual(a, []))
-    assert.ok(!utils.deepEqual([], a))
+    assert.ok(utils.deepEqual(a, b));
+    assert.ok(utils.deepEqual(a, c));
+    assert.ok(!utils.deepEqual(a, d));
+    assert.ok(!utils.deepEqual(a, e));
+    assert.ok(!utils.deepEqual(a, []));
+    assert.ok(!utils.deepEqual([], a));
     done();
-  })
+  });
 
   describe('clone', function(){
     it('retains RegExp options gh-1355', function(done){
@@ -224,7 +223,7 @@ describe('utils', function(){
       assert.equal(a.ignoreCase, b.ignoreCase);
       assert.equal(a.multiline, b.multiline);
       done();
-    })
+    });
 
     it('clones objects created with Object.create(null)', function(done){
       var o = Object.create(null);
@@ -241,8 +240,8 @@ describe('utils', function(){
       assert.equal(4, Object.keys(out).length);
 
       done();
-    })
-  })
+    });
+  });
 
   it('array.flatten', function(done){
     var orig = [0,[1,2,[3,4,[5,[6]],7],8],9];
@@ -297,8 +296,8 @@ describe('utils', function(){
       assert.equal(to.fomMethod, From.prototype.fomMethod);
 
       done();
-    })
-  })
+    });
+  });
 
   describe('pluralize', function(){
     var db;
@@ -390,7 +389,6 @@ describe('utils', function(){
         assert.equal(A.collection.name, collectionName);
         done();
       });
-    })
+    });
   });
 });
-

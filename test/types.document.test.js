@@ -9,9 +9,7 @@ var assert = require('assert')
   , EmbeddedDocument = require('../lib/types/embedded')
   , DocumentArray = require('../lib/types/documentarray')
   , Schema = mongoose.Schema
-  , SchemaType = mongoose.SchemaType
-  , ValidatorError = SchemaType.ValidatorError
-  , ValidationError = mongoose.Document.ValidationError
+  , ValidationError = mongoose.Document.ValidationError;
 
 /**
  * Setup.
@@ -21,15 +19,15 @@ function Dummy () {
   mongoose.Document.call(this, {});
 }
 Dummy.prototype.__proto__ = mongoose.Document.prototype;
-Dummy.prototype.$__setSchema(new Schema)
+Dummy.prototype.$__setSchema(new Schema);
 
 function Subdocument () {
   var arr = new DocumentArray;
-  arr._path = 'jsconf.ar'
+  arr._path = 'jsconf.ar';
   arr._parent = new Dummy;
   arr[0] = this;
   EmbeddedDocument.call(this, {}, arr);
-};
+}
 
 /**
  * Inherits from EmbeddedDocument.
@@ -74,7 +72,7 @@ describe('types.document', function(){
     a.set('work', 'nope');
     a.__index = 0;
 
-    a.validate(function(err){
+    a.validate(function(){
       assert.ok(a.__parent.$__.validationError instanceof ValidationError);
       assert.equal(a.__parent.errors['jsconf.ar.0.work'].name, 'ValidatorError');
       assert.equal(a.__parent.$__.validationError.toString(), 'ValidationError: Path `test` is required., Validator failed for path `work` with value `nope`');
@@ -88,7 +86,7 @@ describe('types.document', function(){
     assert.equal(a.test, 'paradiddle');
     assert.equal(a.work, 'good flam');
     done();
-  })
+  });
 
   it('Subdocuments can be passed to #set', function (done) {
     var a = new Subdocument();
@@ -100,7 +98,7 @@ describe('types.document', function(){
     assert.equal(b.test, 'paradiddle');
     assert.equal(b.work, 'good flam');
     done();
-  })
+  });
 
   it('cached _ids', function (done) {
     var db = start();
@@ -181,7 +179,7 @@ describe('types.document', function(){
               // gh-531
               movie.ratings[0].remove();
               movie.ratings[0].remove();
-              movie.save(function (err) {
+              movie.save(function () {
                 Movie.findById(super8._id, function (err, movie) {
                   assert.ifError(err);
                   assert.equal(0, movie.ratings.length);
@@ -244,10 +242,10 @@ describe('types.document', function(){
                 });
               });
             });
-          })
+          });
         });
       });
-    })
-  })
+    });
+  });
 
 });

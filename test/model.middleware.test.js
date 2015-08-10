@@ -6,16 +6,7 @@
 var start = require('./common')
   , assert = require('assert')
   , mongoose = start.mongoose
-  , random = require('../lib/utils').random
-  , Query = require('../lib/query')
-  , Schema = mongoose.Schema
-  , SchemaType = mongoose.SchemaType
-  , ObjectId = Schema.Types.ObjectId
-  , DocumentObjectId = mongoose.Types.ObjectId
-  , DocumentArray = mongoose.Types.DocumentArray
-  , EmbeddedDocument = mongoose.Types.Embedded
-  , MongooseArray = mongoose.Types.Array
-  , MongooseError = mongoose.Error;
+  , Schema = mongoose.Schema;
 
 describe('model middleware', function(){
   it('post save', function(done){
@@ -79,7 +70,7 @@ describe('model middleware', function(){
     var db = start();
     var Book = db.model('gh2462', schema);
 
-    Book.create({}, function(err) {
+    Book.create({}, function() {
       assert.equal(count, 2);
       db.close(done);
     });
@@ -140,7 +131,7 @@ describe('model middleware', function(){
     });
 
     var preinit = 0
-      , postinit = 0
+      , postinit = 0;
 
     schema.pre('init', function (next) {
       ++preinit;
@@ -166,7 +157,7 @@ describe('model middleware', function(){
         assert.ifError(err);
         assert.equal(1, preinit);
         assert.equal(1, postinit);
-        test.remove(function(err){
+        test.remove(function(){
           db.close();
           done();
         });
@@ -176,7 +167,7 @@ describe('model middleware', function(){
 
   it('gh-1829', function(done) {
     var childSchema = new mongoose.Schema({
-      name: String,
+      name: String
     });
 
     var childPreCalls = 0;
@@ -192,7 +183,7 @@ describe('model middleware', function(){
 
     var parentSchema = new mongoose.Schema({
       name: String,
-      children: [childSchema],
+      children: [childSchema]
     });
 
     parentSchema.pre('save', function(next) {
@@ -240,7 +231,7 @@ describe('model middleware', function(){
     var preValidate = 0
       , postValidate = 0
       , preRemove = 0
-      , postRemove = 0
+      , postRemove = 0;
 
     schema.pre('validate', function (next) {
       ++preValidate;
@@ -281,7 +272,7 @@ describe('model middleware', function(){
         assert.equal(1, preRemove);
         assert.equal(1, postRemove);
         done();
-      })
+      });
     });
-  })
+  });
 });

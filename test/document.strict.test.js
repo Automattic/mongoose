@@ -7,19 +7,7 @@ var start = require('./common')
   , mongoose = start.mongoose
   , assert = require('assert')
   , random = require('../lib/utils').random
-  , Query = require('../lib/query')
-  , Schema = mongoose.Schema
-  , SchemaType = mongoose.SchemaType
-  , CastError = mongoose.Error.CastError
-  , ValidatorError = mongoose.Error.ValidatorError
-  , ValidationError = mongoose.Error.ValidationError
-  , ObjectId = Schema.Types.ObjectId
-  , DocumentObjectId = mongoose.Types.ObjectId
-  , DocumentArray = mongoose.Types.DocumentArray
-  , EmbeddedDocument = mongoose.Types.Embedded
-  , MongooseNumber = mongoose.Types.Number
-  , MongooseArray = mongoose.Types.Array
-  , MongooseError = mongoose.Error;
+  , Schema = mongoose.Schema;
 
 describe('document: strict mode:', function(){
   describe('should work', function(){
@@ -51,7 +39,7 @@ describe('document: strict mode:', function(){
       var l = new Lax({content: 'sample', rouge: 'data'});
       assert.equal(false, l.$__.strictMode);
 
-      lo = l.toObject();
+      var lo = l.toObject();
       assert.ok('ts' in l);
       assert.ok('ts' in lo);
       assert.equal('sample', l.content);
@@ -65,7 +53,7 @@ describe('document: strict mode:', function(){
       var s = new Strict({content: 'sample', rouge: 'data'});
       assert.equal(true, s.$__.strictMode);
 
-      so = s.toObject();
+      var so = s.toObject();
       assert.ok('ts' in s);
       assert.ok('ts' in so);
       assert.equal('sample', s.content);
@@ -98,7 +86,7 @@ describe('document: strict mode:', function(){
       // testing init
       var s3 = new Strict();
       s3.init({content: 'sample', rouge: 'data'});
-      var s3obj = s3.toObject();
+      s3.toObject();
       assert.equal('sample', s3.content);
       assert.ok(!('rouge' in s3));
       assert.ok(!s3.rouge);
@@ -156,7 +144,7 @@ describe('document: strict mode:', function(){
     assert.ok(!s.name.hack);
     assert.ok(!s.shouldnt);
     db.close(done);
-  })
+  });
 
   it('sub doc', function(done){
     var db = start();
@@ -192,7 +180,7 @@ describe('document: strict mode:', function(){
     // testing init
     var s3 = new Strict();
     s3.init({dox: [{content: 'sample', rouge: 'data'}]});
-    var s3obj = s3.toObject();
+    s3.toObject();
     assert.equal('sample', s3.dox[0].content);
     assert.ok(!('rouge' in s3.dox[0]));
     assert.ok(!s3.dox[0].rouge);
@@ -204,7 +192,7 @@ describe('document: strict mode:', function(){
       assert.ok(!doc.dox[0].rouge);
       db.close(done);
     });
-  })
+  });
 
   it('virtuals', function(done){
     var db = start();
@@ -239,12 +227,16 @@ describe('document: strict mode:', function(){
     assert.equal(1, setCount);
 
     strictInstance.myvirtual = 'anotherone';
-    var myvirtual = strictInstance.myvirtual;
+    assert.equal(0, getCount);
+    assert.equal(2, setCount);
 
+    var temp = strictInstance.myvirtual;
+    assert.equal(typeof temp, 'string');
     assert.equal(1, getCount);
     assert.equal(2, setCount);
+
     db.close(done);
-  })
+  });
 
   it('can be overridden during set()', function(done){
     var db = start();
@@ -268,17 +260,17 @@ describe('document: strict mode:', function(){
         assert.equal(true, doc._doc.notInSchema);
         doc.bool = undefined;
         doc.set('notInSchema', undefined, { strict: false });
-        doc.save(function (err) {
+        doc.save(function () {
           Strict.findById(doc._id, function (err, doc) {
             assert.ifError(err);
             assert.equal(undefined, doc._doc.bool);
             assert.equal(undefined, doc._doc.notInSchema);
             db.close(done);
           });
-        })
-      })
-    })
-  })
+        });
+      });
+    });
+  });
 
   it('can be overridden during update()', function(done){
     var db = start();
@@ -366,7 +358,7 @@ describe('document: strict mode:', function(){
   describe('"throws" mode', function(){
     it('throws on set() of unknown property', function(done){
       var schema = Schema({ n: String, docs:[{x:[{y:String}]}] });
-      schema.set('strict', 'throw')
+      schema.set('strict', 'throw');
       var M = mongoose.model('throwStrictSet', schema, 'tss_'+random());
       var m = new M;
 
@@ -409,7 +401,7 @@ describe('document: strict mode:', function(){
       }, badField);
 
       done();
-    })
+    });
 
     it('fails with extra fields', function (done) {
       // Simple schema with throws option
@@ -422,7 +414,7 @@ describe('document: strict mode:', function(){
 
       assert.doesNotThrow(function(){
         new Foo({name: 'bar'});
-      })
+      });
 
       assert.throws(function(){
         // The extra baz field should throw
@@ -444,9 +436,9 @@ describe('document: strict mode:', function(){
 
       assert.doesNotThrow(function(){
         new Foo({name: mongoose.Types.ObjectId(), father: { name: { full: 'bacon' } } });
-      })
+      });
 
       done();
     });
-  })
-})
+  });
+});

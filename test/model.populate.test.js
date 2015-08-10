@@ -10,7 +10,7 @@ var start = require('./common')
   , random = utils.random
   , Schema = mongoose.Schema
   , ObjectId = Schema.ObjectId
-  , DocObjectId = mongoose.Types.ObjectId
+  , DocObjectId = mongoose.Types.ObjectId;
 
 /**
  * Setup.
@@ -92,7 +92,7 @@ describe('model: populate:', function(){
       });
     });
   });
-  
+
   it('deep population', function(done){
     var db = start()
       , BlogPost = db.model('RefBlogPost', posts)
@@ -106,13 +106,13 @@ describe('model: populate:', function(){
 
         User.create({ name: 'User 03', followers: [user2._id] }, function (err, user3) {
           assert.ifError(err);
-  
+
           BlogPost.create({
             title: 'w00tabulous'
             , _creator: user3._id
           }, function (err, post) {
             assert.ifError(err);
-  
+
             assert.doesNotThrow(function(){
               BlogPost
                 .findById(post._id)
@@ -155,7 +155,7 @@ describe('model: populate:', function(){
   it('populating a single ref', function(done){
     var db = start()
       , BlogPost = db.model('RefBlogPost', posts)
-      , User = db.model('RefUser', users)
+      , User = db.model('RefUser', users);
 
     User.create({
         name  : 'Guillermo'
@@ -250,11 +250,11 @@ describe('model: populate:', function(){
             assert.ifError(err);
             assert.ok(post._creator.name == 'Guillermo');
             done();
-          })
+          });
         });
       });
-    })
-  })
+    });
+  });
 
   it('an error in single ref population propagates', function(done){
     var db = start()
@@ -288,15 +288,15 @@ describe('model: populate:', function(){
         BlogPost
         .findById(post._id)
         .populate('_creator')
-        .exec(function (err, post) {
+        .exec(function (err) {
           db.close();
           assert.ok(err instanceof Error);
           assert.equal('woot', err.message);
-          done()
+          done();
         });
       });
     });
-  })
+  });
 
   it('populating with partial fields selection', function(done){
     var db = start()
@@ -369,7 +369,7 @@ describe('model: populate:', function(){
         });
       });
     });
-  })
+  });
 
   it('population of undefined fields in a collection of docs', function (done) {
     var db = start()
@@ -405,7 +405,7 @@ describe('model: populate:', function(){
         });
       });
     });
-  })
+  });
 
   it('population and changing a reference', function(done){
     var db = start()
@@ -461,7 +461,7 @@ describe('model: populate:', function(){
         });
       });
     });
-  })
+  });
 
   it('populating with partial fields selection and changing ref', function(done){
     var db = start()
@@ -568,7 +568,7 @@ describe('model: populate:', function(){
         });
       });
     });
-  })
+  });
 
   it('an error in array reference population propagates', function(done){
     var db = start()
@@ -613,7 +613,7 @@ describe('model: populate:', function(){
             BlogPost
             .find({ $or: [{ _id: post1._id }, { _id: post2._id }] })
             .populate('fans')
-            .exec(function (err, blogposts) {
+            .exec(function (err) {
               db.close();
 
               assert.ok(err instanceof Error);
@@ -624,7 +624,7 @@ describe('model: populate:', function(){
         });
       });
     });
-  })
+  });
 
   it('populating an array of references with fields selection', function(done){
     var db = start()
@@ -679,7 +679,7 @@ describe('model: populate:', function(){
         });
       });
     });
-  })
+  });
 
   it('populating an array of references and filtering', function(done){
     var db = start()
@@ -907,7 +907,7 @@ describe('model: populate:', function(){
                 assert.strictEqual(blogposts[0].fans.length, 1);
                 assert.equal(blogposts[0].fans[0].name,'Fan 3');
                 assert.equal(blogposts[0].fans[0].email,'fan3@learnboost.com');
-                assert.equal(blogposts[0].fans[0].isInit('email'), true)
+                assert.equal(blogposts[0].fans[0].isInit('email'), true);
                 assert.equal(blogposts[0].fans[0].isInit('gender'), false);
                 assert.equal(blogposts[0].fans[0].isInit('age'), false);
 
@@ -916,16 +916,16 @@ describe('model: populate:', function(){
                 assert.equal(blogposts[1].fans[0].email,'fan3@learnboost.com');
                 assert.equal(blogposts[1].fans[0].isInit('email'), true);
                 assert.equal(blogposts[1].fans[0].isInit('gender'), false);
-                assert.equal(blogposts[1].fans[0].isInit('age'), false)
+                assert.equal(blogposts[1].fans[0].isInit('age'), false);
 
-                done()
+                done();
               });
             });
           });
         });
       });
     });
-  })
+  });
 
   it('populating an array of refs changing one and removing one', function(done){
     var db = start()
@@ -1005,7 +1005,7 @@ describe('model: populate:', function(){
         });
       });
     });
-  })
+  });
 
   describe('populating sub docs', function(){
     it('works with findById', function(done){
@@ -1044,7 +1044,7 @@ describe('model: populate:', function(){
           });
         });
       });
-    })
+    });
 
     it('works when first doc returned has empty array for populated path (gh-1055)', function(done){
       var db = start()
@@ -1065,7 +1065,7 @@ describe('model: populate:', function(){
                 { _creator: user1._id, content: 'Woot woot', asers: [] }
               , { _creator: user2._id, content: 'Wha wha', asers: [user1, user2] }
             ]
-        }, function (err, post1, post2) {
+        }, function (err) {
           assert.ifError(err);
 
           var ran = false;
@@ -1086,8 +1086,8 @@ describe('model: populate:', function(){
           });
         });
       });
-    })
-  })
+    });
+  });
 
   it('clears cache when array has been re-assigned (gh-2176)', function(done) {
     var db = start();
@@ -1103,7 +1103,7 @@ describe('model: populate:', function(){
           _creator: user1._id,
           comments: []
         },
-        function (err, post1) {
+        function (err) {
           assert.ifError(err);
           BlogPost.
             find({ title: 'gh-2176' }).
@@ -1145,7 +1145,7 @@ describe('model: populate:', function(){
       }, function (err, user2) {
         assert.ifError(err);
 
-        var post = BlogPost.create({
+        BlogPost.create({
             title: 'Woot'
           , comments: [
                 { _creator: user1, content: 'Woot woot' }
@@ -1171,7 +1171,7 @@ describe('model: populate:', function(){
         });
       });
     });
-  })
+  });
 
   it('populating subdocuments partially with conditions', function(done){
     var db = start()
@@ -1190,7 +1190,7 @@ describe('model: populate:', function(){
       }, function (err, user2) {
         assert.ifError(err);
 
-        var post = BlogPost.create({
+        BlogPost.create({
             title: 'Woot'
           , comments: [
                 { _creator: user1, content: 'Woot woot' }
@@ -1211,12 +1211,12 @@ describe('model: populate:', function(){
             assert.equal(post.comments[1]._creator.email,'user2@learnboost.com');
             assert.equal(post.comments[1]._creator.isInit('name'), false);
 
-            done()
+            done();
           });
         });
       });
     });
-  })
+  });
 
   it('populating subdocs with invalid/missing subproperties', function(done){
     var db = start()
@@ -1226,7 +1226,7 @@ describe('model: populate:', function(){
     User.create({
         name  : 'T-100'
       , email : 'terminator100@learnboost.com'
-    }, function (err, user1) {
+    }, function (err) {
       assert.ifError(err);
 
       User.create({
@@ -1235,7 +1235,7 @@ describe('model: populate:', function(){
       }, function (err, user2) {
         assert.ifError(err);
 
-        var post = BlogPost.create({
+        BlogPost.create({
             title: 'Woot'
           , comments: [
                 { _creator: null, content: 'Woot woot' }
@@ -1291,7 +1291,7 @@ describe('model: populate:', function(){
                   db.close(done);
                 });
               });
-            })
+            });
           });
         });
       });
@@ -1318,7 +1318,7 @@ describe('model: populate:', function(){
         type: Schema.ObjectId,
         ref: 'gh-2151-1'
       }
-    })
+    });
     var BlogPost = db.model('gh-2151-2', blogpost, 'gh-2151-2');
 
     var userIds = [new ObjectId, new ObjectId, new ObjectId, new ObjectId];
@@ -1345,7 +1345,7 @@ describe('model: populate:', function(){
       friends: [userIds[0], userIds[1], userIds[2]]
     });
 
-    User.create(users, function(err, docs) {
+    User.create(users, function(err) {
       assert.ifError(err);
 
       var blogposts = [];
@@ -1365,7 +1365,7 @@ describe('model: populate:', function(){
         author: userIds[2]
       });
 
-      BlogPost.create(blogposts, function(err, docs) {
+      BlogPost.create(blogposts, function(err) {
         assert.ifError(err);
 
         BlogPost.
@@ -1386,7 +1386,7 @@ describe('model: populate:', function(){
               assert.equal(1, docs[0].author.friends.length);
               assert.equal(1, docs[1].author.friends.length);
               db.close(done);
-            })
+            });
           });
       });
     });
@@ -1394,10 +1394,9 @@ describe('model: populate:', function(){
 
   it('populating subdocuments partially with empty array (gh-481)', function(done){
     var db = start()
-      , BlogPost = db.model('RefBlogPost', posts)
-      , worked = false;
+      , BlogPost = db.model('RefBlogPost', posts);
 
-    var post = BlogPost.create({
+    BlogPost.create({
         title: 'Woot'
       , comments: [] // EMPTY ARRAY
     }, function (err, post) {
@@ -1417,10 +1416,9 @@ describe('model: populate:', function(){
 
   it('populating subdocuments partially with null array', function(done){
     var db = start()
-      , BlogPost = db.model('RefBlogPost', posts)
-      , worked = false;
+      , BlogPost = db.model('RefBlogPost', posts);
 
-    var post = BlogPost.create({
+    BlogPost.create({
         title: 'Woot'
       , comments: null
     }, function (err, post) {
@@ -1441,13 +1439,13 @@ describe('model: populate:', function(){
   it('populating subdocuments with array including nulls', function(done){
     var db = start()
       , BlogPost = db.model('RefBlogPost', posts)
-      , User = db.model('RefUser', users)
+      , User = db.model('RefUser', users);
 
     var user = new User({ name: 'hans zimmer' });
     user.save(function (err) {
       assert.ifError(err);
 
-      var post = BlogPost.create({
+      BlogPost.create({
           title: 'Woot'
         , fans: []
       }, function (err, post) {
@@ -1467,10 +1465,10 @@ describe('model: populate:', function(){
             assert.equal(returned.fans.length, 1);
             done();
           });
-        })
+        });
       });
     });
-  })
+  });
 
   it('populating more than one array at a time', function(done){
     var db = start()
@@ -1479,7 +1477,7 @@ describe('model: populate:', function(){
             users: [{ type: ObjectId, ref: 'RefUser' }]
           , fans:  [{ type: ObjectId, ref: 'RefUser' }]
           , comments: [Comment]
-        }))
+        }));
 
     User.create({
         email : 'fan1@learnboost.com'
@@ -1545,7 +1543,7 @@ describe('model: populate:', function(){
         });
       });
     });
-  })
+  });
 
   it('populating multiple children of a sub-array at a time', function(done){
     var db = start()
@@ -1554,12 +1552,12 @@ describe('model: populate:', function(){
       , Inner = new Schema({
             user: { type: ObjectId, ref: 'RefUser' }
           , post: { type: ObjectId, ref: 'RefBlogPost' }
-        })
-      , I = db.model('PopMultiChildrenOfSubDocInner', Inner)
+        });
+        db.model('PopMultiChildrenOfSubDocInner', Inner);
 
     var M = db.model('PopMultiChildrenOfSubDoc', new Schema({
             kids: [Inner]
-        }))
+        }));
 
     User.create({
         name   : 'Fan 1'
@@ -1607,7 +1605,7 @@ describe('model: populate:', function(){
         });
       });
     });
-  })
+  });
 
   it('passing sort options to the populate method', function(done){
     var db = start()
@@ -1713,7 +1711,7 @@ describe('model: populate:', function(){
         db.close(done);
       });
     }
-  })
+  });
 
   it('refs should cast to ObjectId from hexstrings', function(done){
     var BP = mongoose.model('RefBlogPost', BlogPost);
@@ -1723,7 +1721,7 @@ describe('model: populate:', function(){
     bp.set('_creator', new DocObjectId().toString());
     assert.ok(bp._creator instanceof DocObjectId);
     done();
-  })
+  });
 
   it('populate should work on String _ids', function(done){
     var db = start();
@@ -1731,17 +1729,17 @@ describe('model: populate:', function(){
     var UserSchema = new Schema({
         _id: String
       , name: String
-    })
+    });
 
     var NoteSchema = new Schema({
         author: { type: String, ref: 'UserWithStringId' }
       , body: String
-    })
+    });
 
-    var User = db.model('UserWithStringId', UserSchema, random())
-    var Note = db.model('NoteWithStringId', NoteSchema, random())
+    var User = db.model('UserWithStringId', UserSchema, random());
+    var Note = db.model('NoteWithStringId', NoteSchema, random());
 
-    var alice = new User({_id: 'alice', name: "Alice"})
+    var alice = new User({_id: 'alice', name: "Alice"});
 
     alice.save(function (err) {
       assert.ifError(err);
@@ -1759,7 +1757,7 @@ describe('model: populate:', function(){
           done();
         });
       });
-    })
+    });
   });
 
   it('populate should work on Number _ids', function(done){
@@ -1768,17 +1766,17 @@ describe('model: populate:', function(){
     var UserSchema = new Schema({
         _id: Number
       , name: String
-    })
+    });
 
     var NoteSchema = new Schema({
         author: { type: Number, ref: 'UserWithNumberId' }
       , body: String
-    })
+    });
 
-    var User = db.model('UserWithNumberId', UserSchema, random())
-    var Note = db.model('NoteWithNumberId', NoteSchema, random())
+    var User = db.model('UserWithNumberId', UserSchema, random());
+    var Note = db.model('NoteWithNumberId', NoteSchema, random());
 
-    var alice = new User({_id: 2359, name: "Alice"})
+    var alice = new User({_id: 2359, name: "Alice"});
 
     alice.save(function (err) {
       assert.ifError(err);
@@ -1796,7 +1794,7 @@ describe('model: populate:', function(){
           done();
         });
       });
-    })
+    });
   });
 
   it('required works on ref fields (gh-577)', function(done){
@@ -1865,7 +1863,7 @@ describe('model: populate:', function(){
 
             comment.set({text: 'test2'});
 
-            comment.save(function (err, comment) {
+            comment.save(function (err) {
               db.close();
               assert.ifError(err);
               done();
@@ -1879,7 +1877,7 @@ describe('model: populate:', function(){
   it('populate works with schemas with both id and _id defined', function(done){
     var db =start()
       , S1 = new Schema({ id: String })
-      , S2 = new Schema({ things: [{ type: ObjectId, ref: '_idAndid' }]})
+      , S2 = new Schema({ things: [{ type: ObjectId, ref: '_idAndid' }]});
 
     var M1 = db.model('_idAndid', S1);
     var M2 = db.model('populateWorksWith_idAndidSchemas', S2);
@@ -1900,23 +1898,20 @@ describe('model: populate:', function(){
           assert.equal(doc.things[0].id,"The Tiger That Isn't");
           assert.equal(doc.things[1].id,"Users Guide To The Universe");
           done();
-        })
+        });
       });
-    })
+    });
   });
 
   it('Update works with populated arrays (gh-602)', function(done){
     var db = start()
       , BlogPost = db.model('RefBlogPost', posts)
-      , User = db.model('RefUser', users)
-
-    var user1 = new User({ name: 'aphex' });
-    var user2 = new User({ name: 'twin' });
+      , User = db.model('RefUser', users);
 
     User.create({name:'aphex'},{name:'twin'}, function (err, u1, u2) {
       assert.ifError(err);
 
-      var post = BlogPost.create({
+      BlogPost.create({
           title: 'Woot'
         , fans: []
       }, function (err, post) {
@@ -1948,21 +1943,21 @@ describe('model: populate:', function(){
   it('toJSON should also be called for refs (gh-675)', function(done){
     var db = start()
       , BlogPost = db.model('RefBlogPost', posts)
-      , User = db.model('RefUser', users)
+      , User = db.model('RefUser', users);
 
     User.prototype._toJSON = User.prototype.toJSON;
     User.prototype.toJSON = function() {
       var res = this._toJSON();
       res.was_in_to_json = true;
       return res;
-    }
+    };
 
     BlogPost.prototype._toJSON = BlogPost.prototype.toJSON;
     BlogPost.prototype.toJSON = function() {
       var res = this._toJSON();
       res.was_in_to_json = true;
       return res;
-    }
+    };
 
     User.create({
         name  : 'Jerem'
@@ -1998,17 +1993,17 @@ describe('model: populate:', function(){
     var UserSchema = new Schema({
         _id: Buffer
       , name: String
-    })
+    });
 
     var NoteSchema = new Schema({
         author: { type: Buffer, ref: 'UserWithBufferId' }
       , body: String
-    })
+    });
 
-    var User = db.model('UserWithBufferId', UserSchema, random())
-    var Note = db.model('NoteWithBufferId', NoteSchema, random())
+    var User = db.model('UserWithBufferId', UserSchema, random());
+    var Note = db.model('NoteWithBufferId', NoteSchema, random());
 
-    var alice = new User({_id: new mongoose.Types.Buffer('YWxpY2U=', 'base64'), name: "Alice"})
+    var alice = new User({_id: new mongoose.Types.Buffer('YWxpY2U=', 'base64'), name: "Alice"});
 
     alice.save(function (err) {
       assert.ifError(err);
@@ -2026,7 +2021,7 @@ describe('model: populate:', function(){
           done();
         });
       });
-    })
+    });
   });
 
   it('populated Buffer _ids should be requireable', function(done){
@@ -2035,17 +2030,17 @@ describe('model: populate:', function(){
     var UserSchema = new Schema({
         _id: Buffer
       , name: String
-    })
+    });
 
     var NoteSchema = new Schema({
         author: { type: Buffer, ref: 'UserWithBufferId', required: true }
       , body: String
-    })
+    });
 
-    var User = db.model('UserWithBufferId', UserSchema, random())
-    var Note = db.model('NoteWithBufferId', NoteSchema, random())
+    var User = db.model('UserWithBufferId', UserSchema, random());
+    var Note = db.model('NoteWithBufferId', NoteSchema, random());
 
-    var alice = new User({_id: new mongoose.Types.Buffer('YWxpY2U=', 'base64'), name: "Alice"})
+    var alice = new User({_id: new mongoose.Types.Buffer('YWxpY2U=', 'base64'), name: "Alice"});
 
     alice.save(function (err) {
       assert.ifError(err);
@@ -2060,10 +2055,10 @@ describe('model: populate:', function(){
             db.close();
             assert.ifError(err);
             done();
-          })
+          });
         });
       });
-    })
+    });
   });
 
   it('populating with custom model selection (gh-773)', function(done){
@@ -2098,9 +2093,9 @@ describe('model: populate:', function(){
         });
       });
     });
-  })
+  });
 
-  describe('specifying a custom model without specifying a ref in schema', function(done){
+  describe('specifying a custom model without specifying a ref in schema', function(){
     it('with String _id', function(done){
       var db = start();
       var A = db.model('A', { name: String, _id: String });
@@ -2114,10 +2109,10 @@ describe('model: populate:', function(){
             if (err) return done(err);
             assert.equal('hello', b.other.name);
             done();
-          })
-        })
-      })
-    })
+          });
+        });
+      });
+    });
     it('with Number _id', function(done){
       var db = start();
       var A = db.model('A', { name: String, _id: Number });
@@ -2131,10 +2126,10 @@ describe('model: populate:', function(){
             if (err) return done(err);
             assert.equal('hello', b.other.name);
             done();
-          })
-        })
-      })
-    })
+          });
+        });
+      });
+    });
     it('with Buffer _id', function(done){
       var db = start();
       var A = db.model('A', { name: String, _id: Buffer });
@@ -2148,10 +2143,10 @@ describe('model: populate:', function(){
             if (err) return done(err);
             assert.equal('hello', b.other.name);
             done();
-          })
-        })
-      })
-    })
+          });
+        });
+      });
+    });
     it('with ObjectId _id', function(done){
       var db = start();
       var A = db.model('A', { name: String });
@@ -2165,19 +2160,19 @@ describe('model: populate:', function(){
             if (err) return done(err);
             assert.equal('hello', b.other.name);
             done();
-          })
-        })
-      })
-    })
-  })
+          });
+        });
+      });
+    });
+  });
 
   describe('specifying all params using an object', function(){
     var db, B, User;
     var post;
 
     before(function (done) {
-      db = start()
-      B = db.model('RefBlogPost')
+      db = start();
+      B = db.model('RefBlogPost');
       User = db.model('RefAlternateUser');
 
       User.create({
@@ -2196,17 +2191,15 @@ describe('model: populate:', function(){
           assert.ifError(err);
           post = post_;
           done();
-        })
-      })
-    })
+        });
+      });
+    });
 
     after(function(done){
-      db.close(done)
-    })
+      db.close(done);
+    });
 
     it('works', function(done){
-      var fan3id = String(post.fans[2]);
-
       B.findById(post._id)
       .populate({
           path: 'fans'
@@ -2231,17 +2224,17 @@ describe('model: populate:', function(){
 
         done();
       });
-    })
+    });
 
-  })
+  });
 
   describe('Model.populate()', function(){
     var db, B, User;
     var user1, user2, post1, post2, _id;
 
     before(function(done){
-      db = start()
-      B = db.model('RefBlogPost', posts)
+      db = start();
+      B = db.model('RefBlogPost', posts);
       User = db.model('RefAlternateUser', users);
 
       _id = new mongoose.Types.ObjectId;
@@ -2279,7 +2272,7 @@ describe('model: populate:', function(){
 
     after(function(done){
       db.close(done);
-    })
+    });
 
     describe('returns', function(){
       it('a promise', function(done){
@@ -2290,13 +2283,13 @@ describe('model: populate:', function(){
           assert.ok(doc);
           done();
         }
-      })
-    })
+      });
+    });
 
     describe('of individual document', function(){
       it('works', function(done){
         B.findById(post1._id, function(error, post1) {
-          var ret = utils.populate({ path: '_creator', model: 'RefAlternateUser' })
+          var ret = utils.populate({ path: '_creator', model: 'RefAlternateUser' });
           B.populate(post1, ret, function (err, post) {
             assert.ifError(err);
             assert.ok(post);
@@ -2305,8 +2298,8 @@ describe('model: populate:', function(){
             done();
           });
         });
-      })
-    })
+      });
+    });
 
     describe('a document already populated', function(){
       describe('when paths are not modified', function(){
@@ -2341,12 +2334,12 @@ describe('model: populate:', function(){
                     String(post.fans[1]._id)
                   , String(post.populated('fans')[1]));
 
-                done()
+                done();
               });
             });
           });
-        })
-      })
+        });
+      });
       describe('when paths are modified', function(){
         it('works', function(done){
           B.findById(post1._id, function (err, doc) {
@@ -2383,13 +2376,13 @@ describe('model: populate:', function(){
                     String(post.fans[1]._id)
                   , String(post.populated('fans')[1]));
 
-                done()
+                done();
               });
             });
           });
-        })
-      })
-    })
+        });
+      });
+    });
 
     describe('of multiple documents', function() {
       it('works', function(done) {
@@ -2415,13 +2408,13 @@ describe('model: populate:', function(){
       });
     });
 
-  })
+  });
 
   describe('populating combined with lean (gh-1260)', function(){
     it('with findOne', function(done){
       var db = start()
         , BlogPost = db.model('RefBlogPost', posts + random())
-        , User = db.model('RefUser', users + random())
+        , User = db.model('RefUser', users + random());
 
       User.create({
           name  : 'Guillermo'
@@ -2451,7 +2444,7 @@ describe('model: populate:', function(){
           });
         });
       });
-    })
+    });
 
     it('with find', function(done){
       var db = start()
@@ -2500,19 +2493,19 @@ describe('model: populate:', function(){
           });
         });
       });
-    })
-  })
+    });
+  });
 
   describe('records paths and _ids used in population', function(){
     var db;
     var B;
     var U;
     var u1, u2;
-    var b1, b2
+    var b1;
 
     before(function(done){
-      db = start()
-      B = db.model('RefBlogPost', posts + random())
+      db = start();
+      B = db.model('RefBlogPost', posts + random());
       U = db.model('RefUser', users + random());
 
       U.create({
@@ -2534,18 +2527,17 @@ describe('model: populate:', function(){
             title : 'Woot2'
           , fans  : [fan2, fan1]
           , _creator: fan2
-        }, function (err, post1, post2) {
+        }, function (err, post) {
           assert.ifError(err);
-          b1 = post1;
-          b2 = post2;
+          b1 = post;
           done();
         });
       });
-    })
+    });
 
     after(function(){
-      db.close()
-    })
+      db.close();
+    });
 
     it('with findOne', function(done){
       B.findById(b1).populate('fans _creator').exec(function (err, doc) {
@@ -2556,8 +2548,8 @@ describe('model: populate:', function(){
         assert.equal(doc.populated('fans')[1], String(u2._id));
         assert.equal(doc.populated('_creator'), String(u1._id));
         done();
-      })
-    })
+      });
+    });
 
     it('with find', function(done){
       B.find().sort('title').populate('fans _creator').exec(function (err, docs) {
@@ -2580,12 +2572,12 @@ describe('model: populate:', function(){
         assert.equal(doc2.populated('fans')[1], String(u1._id));
         assert.equal(doc2.populated('_creator'), String(u2._id));
         done();
-      })
-    })
-  })
+      });
+    });
+  });
 
   describe('deselecting _id', function(){
-    var db, C, U, u1, c1, c2;
+    var db, C, U, c1, c2;
     before(function(done){
       db = start();
 
@@ -2607,17 +2599,16 @@ describe('model: populate:', function(){
         U.create(
             { name: 'u1', comments: [c1, c2], comment: c1 }
           , { name: 'u2', comment: c2 }
-          , function (err, u) {
+          , function (err) {
           assert.ifError(err);
-          u1 = u;
           done();
         });
       });
-    })
+    });
 
     after(function(done){
-      db.close(done)
-    })
+      db.close(done);
+    });
 
     describe('in a subdocument', function(){
       it('works', function(done){
@@ -2655,10 +2646,10 @@ describe('model: populate:', function(){
                 assert.equal(typeof d._doc.__v, 'number');
               });
               done();
-            })
-          })
-        })
-      })
+            });
+          });
+        });
+      });
 
       it('with lean', function(done){
         U.find({name:'u1'}).lean().populate({ path: 'comments', select: { _id: 0 }, options: { lean: true }}).exec(function (err, docs) {
@@ -2681,10 +2672,10 @@ describe('model: populate:', function(){
               assert.equal('number', typeof d.__v);
             });
             done();
-          })
-        })
-      })
-    })
+          });
+        });
+      });
+    });
 
     describe('of documents being populated', function(){
       it('still works (gh-1441)', function(done){
@@ -2703,13 +2694,13 @@ describe('model: populate:', function(){
             } else {
               assert.equal('comment 2', doc.comment.body);
             }
-          })
+          });
 
           done();
-        })
-      })
-    })
-  })
+        });
+      });
+    });
+  });
 
   it('maps results back to correct document (gh-1444)', function(done){
     var db = start();
@@ -2739,14 +2730,14 @@ describe('model: populate:', function(){
           db.close();
           assert.ifError(err);
 
-          var a2 = docs.filter(function(d){return 'body2' == d.body})[0];
+          var a2 = docs.filter(function(d){return 'body2' == d.body;})[0];
           assert.equal(a2.mediaAttach.id, media.id);
 
           done();
         });
       });
     });
-  })
+  });
 
   describe('DynRef', function() {
     var db;
@@ -2770,11 +2761,11 @@ describe('model: populate:', function(){
         },
         items: [
           {
-            id: { 
+            id: {
               type: Number,
               refPath: 'items.type'
             },
-            type: { 
+            type: {
               type: String
             }
           }
@@ -2802,15 +2793,15 @@ describe('model: populate:', function(){
         items: [{ id: 1, type: 'dynrefItem1' }, { id: 2, type: 'dynrefItem2' }]
       };
 
-      Item1.create({ _id: 1, name: 'Val' }, function(err, doc) {
+      Item1.create({ _id: 1, name: 'Val' }, function(err) {
         if (err) {
           return done(err);
         }
-        Item2.create({ _id: 2, otherName: 'Val' }, function(err, doc) {
+        Item2.create({ _id: 2, otherName: 'Val' }, function(err) {
           if (err) {
             return done(err);
           }
-          Review.create(review, function(err, doc) {
+          Review.create(review, function(err) {
             if (err) {
               return done(err);
             }
@@ -2873,8 +2864,8 @@ describe('model: populate:', function(){
           , o: b
           , a: [c]
         }, confirm(done));
-      })
-    })
+      });
+    });
 
     it('when saving existing docs 5T5', function(done){
       Cat.create({name:'ex1'},{name:'ex2'},{name:'ex3'}, function (err, a, b, c) {
@@ -2883,11 +2874,11 @@ describe('model: populate:', function(){
         Litter.create({name:'existing'}, function (err, doc) {
           doc.cats = [a];
           doc.o = b;
-          doc.a = [c]
+          doc.a = [c];
           doc.save(confirm(done));
         });
       });
-    })
+    });
 
     function confirm (done) {
       return function (err, litter) {
@@ -2900,10 +2891,10 @@ describe('model: populate:', function(){
           assert.ok(doc.a[0]);
           assert.ok(doc.a[0]._id);
           done();
-        })
-      }
+        });
+      };
     }
-  })
+  });
 
   describe('gh-2252', function() {
     it('handles skip', function(done) {

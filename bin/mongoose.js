@@ -1,4 +1,6 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+/* eslint no-unused-vars: 1 */
+
 /**
  * ES6 Promise wrapper constructor.
  *
@@ -127,30 +129,19 @@ if (typeof window !== 'undefined') {
 }
 
 }).call(this,require("buffer").Buffer)
-},{"./document_provider.js":6,"./error":12,"./schema":24,"./schematype.js":35,"./types":41,"./utils.js":43,"./virtualtype":44,"buffer":46}],3:[function(require,module,exports){
+},{"./document_provider.js":6,"./error":12,"./schema":24,"./schematype.js":35,"./types":41,"./utils.js":43,"./virtualtype":44,"buffer":47}],3:[function(require,module,exports){
 /*!
  * Module dependencies.
  */
 
 var NodeJSDocument = require('./document')
   , EventEmitter = require('events').EventEmitter
-  , setMaxListeners = EventEmitter.prototype.setMaxListeners
   , MongooseError = require('./error')
-  , MixedSchema = require('./schema/mixed')
   , Schema = require('./schema')
   , ObjectId = require('./types/objectid')
-  , ValidatorError = require('./schematype').ValidatorError
   , utils = require('./utils')
-  , clone = utils.clone
-  , isMongooseObject = utils.isMongooseObject
-  , inspect = require('util').inspect
   , ValidationError = MongooseError.ValidationError
-  , InternalCache = require('./internal')
-  , deepEqual = utils.deepEqual
-  , hooks = require('hooks-fixed')
-  , DocumentArray
-  , MongooseArray
-  , Embedded
+  , InternalCache = require('./internal');
 
 /**
  * Document constructor.
@@ -211,7 +202,7 @@ function Document (obj, schema, fields, skipId, skipInit) {
     this.$__.activePaths.require(required[i]);
   }
 
-  setMaxListeners.call(this, 0);
+  this.$__.emitter.setMaxListeners(0);
   this._doc = this.$__buildDoc(obj, fields, skipId);
 
   if ( !skipInit && obj ){
@@ -245,7 +236,7 @@ Document.prototype.constructor = Document;
 Document.ValidationError = ValidationError;
 module.exports = exports = Document;
 
-},{"./document":5,"./error":12,"./internal":21,"./schema":24,"./schema/mixed":31,"./schematype":35,"./types/objectid":42,"./utils":43,"events":50,"hooks-fixed":68,"util":54}],4:[function(require,module,exports){
+},{"./document":5,"./error":12,"./internal":21,"./schema":24,"./types/objectid":42,"./utils":43,"events":51}],4:[function(require,module,exports){
 /*!
  * Module dependencies.
  */
@@ -277,7 +268,6 @@ var cast = module.exports = function(schema, obj) {
 
     if ('$or' === path || '$nor' === path || '$and' === path) {
       var k = val.length;
-      var orComponentQuery;
 
       while (k--) {
         val[k] = cast(schema, val[k]);
@@ -311,8 +301,7 @@ var cast = module.exports = function(schema, obj) {
           , j = split.length
           , pathFirstHalf
           , pathLastHalf
-          , remainingConds
-          , castingQuery;
+          , remainingConds;
 
         // Find the part of the var path that is a path of the Schema
         while (j--) {
@@ -348,7 +337,7 @@ var cast = module.exports = function(schema, obj) {
             continue;
           }
 
-          var numbertype = new Types.Number('__QueryCasting__')
+          var numbertype = new Types.Number('__QueryCasting__');
           var value = val[geo];
 
           if (val.$maxDistance) {
@@ -379,7 +368,7 @@ var cast = module.exports = function(schema, obj) {
             value = value.$geometry.coordinates;
           }
 
-          ;(function _cast (val) {
+          (function _cast (val) {
             if (Array.isArray(val)) {
               val.forEach(function (item, i) {
                 if (Array.isArray(item) || utils.isObject(item)) {
@@ -417,8 +406,9 @@ var cast = module.exports = function(schema, obj) {
         } else {
 
           var ks = Object.keys(val)
-            , k = ks.length
             , $cond;
+
+          k = ks.length;
 
           while (k--) {
             $cond = ks[k];
@@ -452,20 +442,20 @@ var cast = module.exports = function(schema, obj) {
   }
 
   return obj;
-}
+};
 
 },{"./schema/index":30,"./utils":43}],5:[function(require,module,exports){
 (function (process,Buffer){
+/* eslint no-unused-vars: 1 */
+
 /*!
  * Module dependencies.
  */
 
 var EventEmitter = require('events').EventEmitter
-  , setMaxListeners = EventEmitter.prototype.setMaxListeners
   , MongooseError = require('./error')
   , MixedSchema = require('./schema/mixed')
   , Schema = require('./schema')
-  , ObjectId = require('./types/objectid')
   , ValidatorError = require('./schematype').ValidatorError
   , utils = require('./utils')
   , clone = utils.clone
@@ -478,7 +468,7 @@ var EventEmitter = require('events').EventEmitter
   , PromiseProvider = require('./promise_provider')
   , DocumentArray
   , MongooseArray
-  , Embedded
+  , Embedded;
 
 /**
  * Document constructor.
@@ -609,8 +599,7 @@ Document.prototype.$__buildDoc = function (obj, fields, skipId) {
     , self = this
     , exclude
     , keys
-    , key
-    , ki
+    , ki;
 
   // determine if this doc is a result of a query with
   // excluded fields
@@ -628,7 +617,7 @@ Document.prototype.$__buildDoc = function (obj, fields, skipId) {
 
   var paths = Object.keys(this.schema.paths)
     , plen = paths.length
-    , ii = 0
+    , ii = 0;
 
   for (; ii < plen; ++ii) {
     var p = paths[ii];
@@ -649,7 +638,7 @@ Document.prototype.$__buildDoc = function (obj, fields, skipId) {
 
     for (; i < len; ++i) {
       var piece = path[i]
-        , def
+        , def;
 
       curPath += piece;
 
@@ -811,12 +800,12 @@ Document.prototype.$__storeShard = function () {
   var orig = this.$__.shardval = {}
     , paths = Object.keys(key)
     , len = paths.length
-    , val
+    , val;
 
   for (var i = 0; i < len; ++i) {
     val = this.getValue(paths[i]);
     if (isMongooseObject(val)) {
-      orig[paths[i]] = val.toObject({ depopulate: true })
+      orig[paths[i]] = val.toObject({ depopulate: true });
     } else if (null != val &&
         val.valueOf &&
         // Explicitly don't take value of dates
@@ -826,7 +815,7 @@ Document.prototype.$__storeShard = function () {
       orig[paths[i]] = val;
     }
   }
-}
+};
 
 /*!
  * Set up middleware support
@@ -859,7 +848,7 @@ Document.prototype.update = function update () {
   var args = utils.args(arguments);
   args.unshift({_id: this._id});
   return this.constructor.update.apply(this.constructor, args);
-}
+};
 
 /**
  * Sets the value of a path, or many paths.
@@ -902,7 +891,7 @@ Document.prototype.set = function (path, val, type, options) {
   var merge = options && options.merge
     , adhoc = type && true !== type
     , constructing = true === type
-    , adhocs
+    , adhocs;
 
   var strict = options && 'strict' in options
     ? options.strict
@@ -991,7 +980,7 @@ Document.prototype.set = function (path, val, type, options) {
     // check for roots that are Mixed types
     var mixed;
 
-    for (var i = 0; i < parts.length; ++i) {
+    for (i = 0; i < parts.length; ++i) {
       var subpath = parts.slice(0, i+1).join('.');
       schema = this.schema.path(subpath);
       if (schema instanceof MixedSchema) {
@@ -1024,8 +1013,8 @@ Document.prototype.set = function (path, val, type, options) {
   if (parts.length <= 1) {
     pathToMark = path;
   } else {
-    for (var i = 0; i < parts.length; ++i) {
-      var subpath = parts.slice(0, i+1).join('.');
+    for (i = 0; i < parts.length; ++i) {
+      subpath = parts.slice(0, i+1).join('.');
       if (this.isDirectModified(subpath) // earlier prefixes that are already
                                          // marked as dirty have precedence
           || this.get(subpath) === null) {
@@ -1070,7 +1059,7 @@ Document.prototype.set = function (path, val, type, options) {
   }
 
   return this;
-}
+};
 
 /**
  * Determine if we should mark this change as modified.
@@ -1110,7 +1099,7 @@ Document.prototype.$__shouldModify = function (
     return true;
   }
   return false;
-}
+};
 
 /**
  * Handles the actual setting of the value and marking the path modified if appropriate.
@@ -1147,7 +1136,7 @@ Document.prototype.$__set = function (
 
   var obj = this._doc
     , i = 0
-    , l = parts.length
+    , l = parts.length;
 
   for (; i < l; i++) {
     var next = i + 1
@@ -1167,7 +1156,7 @@ Document.prototype.$__set = function (
       }
     }
   }
-}
+};
 
 /**
  * Gets a raw value from a path (no getters)
@@ -1178,7 +1167,7 @@ Document.prototype.$__set = function (
 
 Document.prototype.getValue = function (path) {
   return utils.getValue(path, this._doc);
-}
+};
 
 /**
  * Sets a raw value for a path (no casting, setters, transformations)
@@ -1191,7 +1180,7 @@ Document.prototype.getValue = function (path) {
 Document.prototype.setValue = function (path, val) {
   utils.setValue(path, val, this._doc);
   return this;
-}
+};
 
 /**
  * Returns the value of a path.
@@ -1273,7 +1262,7 @@ Document.prototype.$__path = function (path) {
 
 Document.prototype.markModified = function (path) {
   this.$__.activePaths.modify(path);
-}
+};
 
 /**
  * Returns the list of paths that have been modified.
@@ -1328,6 +1317,7 @@ Document.prototype.isModified = function (path) {
  *
  * @param {String} [path]
  * @return {Boolean}
+ * @method $isDefault
  * @api public
  */
 
@@ -1390,7 +1380,7 @@ Document.prototype.isSelected = function isSelected (path) {
     var paths = Object.keys(this.$__.selected)
       , i = paths.length
       , inclusive = false
-      , cur
+      , cur;
 
     if (1 === i && '_id' === paths[0]) {
       // only _id was selected.
@@ -1760,17 +1750,18 @@ Document.prototype.$__reset = function reset () {
     }
   });
 
-  // Clear 'modify'('dirty') cache
+  // Clear 'dirty' cache
   this.$__.activePaths.clear('modify');
+  this.$__.activePaths.clear('default');
   this.$__.validationError = undefined;
   this.errors = undefined;
-  var self = this;
+  self = this;
   this.schema.requiredPaths().forEach(function (path) {
     self.$__.activePaths.require(path);
   });
 
   return this;
-}
+};
 
 /**
  * Returns this documents dirty paths / vals.
@@ -1836,7 +1827,7 @@ Document.prototype.$__dirty = function () {
 
   top = lastPath = null;
   return minimal;
-}
+};
 
 /*!
  * Compiles schemas.
@@ -1862,7 +1853,7 @@ function compile (tree, proto, prefix) {
         , prefix
         , keys);
   }
-};
+}
 
 // gets descriptors for all properties of `object`
 // makes all properties non-enumerable to match previous behavior to #2211
@@ -1882,8 +1873,8 @@ function getOwnPropertyDescriptors(object) {
  */
 
 function defineKey (prop, subprops, prototype, prefix, keys) {
-  var prefix = prefix || ''
-    , path = (prefix ? prefix + '.' : '') + prop;
+  var path = (prefix ? prefix + '.' : '') + prop;
+  prefix = prefix || '';
 
   if (subprops) {
 
@@ -1981,7 +1972,7 @@ Document.prototype.$__getArrayPathsToValidate = function () {
     }).reduce(function(seed, array) {
       return seed.concat(array);
     }, [])
-    .filter(function (doc) {return doc});
+    .filter(function (doc) {return doc;});
 };
 
 
@@ -2056,6 +2047,21 @@ Document.prototype.$__registerHooksFromSchema = function () {
   });
   delete toWrap.post;
 
+  // 'init' should be synchronous on subdocuments
+  if (toWrap.init && self instanceof Embedded) {
+    if (toWrap.init.pre) {
+      toWrap.init.pre.forEach(function (args) {
+        self.pre.apply(self, args);
+      });
+    }
+    if (toWrap.init.post) {
+      toWrap.init.post.forEach(function (args) {
+        self.post.apply(self, args);
+      });
+    }
+    delete toWrap.init;
+  }
+
   Object.keys(toWrap).forEach(function (pointCut) {
     // this is so we can wrap everything into a promise;
     var newName = ('$__original_' + pointCut);
@@ -2081,6 +2087,7 @@ Document.prototype.$__registerHooksFromSchema = function () {
             reject(error);
             return;
           }
+
           fn && fn.apply(null, [null].concat(Array.prototype.slice.call(arguments, 1)));
           resolve(result);
         });
@@ -2136,7 +2143,6 @@ Document.prototype.$toObject = function(options, json) {
 
   // When internally saving this document we always pass options,
   // bypassing the custom schema options.
-  var optionsParameter = options;
   if (!(options && 'Object' == utils.getFunctionName(options.constructor)) ||
       (options && options._useSchemaOptions)) {
     if (json) {
@@ -2160,13 +2166,13 @@ Document.prototype.$toObject = function(options, json) {
     }
   }
 
-  ;('minimize' in options) || (options.minimize = this.schema.options.minimize);
+  ('minimize' in options) || (options.minimize = this.schema.options.minimize);
 
   // remember the root transform function
   // to save it from being overwritten by sub-transform functions
   var originalTransform = options.transform;
 
-  var ret = clone(this._doc, options);
+  var ret = clone(this._doc, options) || {};
 
   if (options.virtuals || options.getters && false !== options.virtuals) {
     applyGetters(this, ret, 'virtuals', options);
@@ -2343,7 +2349,7 @@ function minimize (obj) {
     , i = keys.length
     , hasKeys
     , key
-    , val
+    , val;
 
   while (i--) {
     key = keys[i];
@@ -2379,7 +2385,7 @@ function applyGetters (self, json, type, options) {
   var schema = self.schema
     , paths = Object.keys(schema[type])
     , i = paths.length
-    , path
+    , path;
 
   while (i--) {
     path = paths[i];
@@ -2388,7 +2394,7 @@ function applyGetters (self, json, type, options) {
       , plen = parts.length
       , last = plen - 1
       , branch = json
-      , part
+      , part;
 
     for (var ii = 0; ii < plen; ++ii) {
       part = parts[ii];
@@ -2457,7 +2463,7 @@ Document.prototype.toString = Document.prototype.inspect;
 
 Document.prototype.equals = function (doc) {
   var tid = this.get('_id');
-  var docid = doc.get('_id');
+  var docid = doc.get ? doc.get('_id') : doc;
   if (!tid && !docid) {
     return deepEqual(this, doc);
   }
@@ -2616,7 +2622,7 @@ Document.prototype.populated = function (path, val, options) {
   this.$__.populated || (this.$__.populated = {});
   this.$__.populated[path] = { value: val, options: options };
   return val;
-}
+};
 
 /**
  * Returns the full path to this document.
@@ -2631,7 +2637,7 @@ Document.prototype.populated = function (path, val, options) {
 Document.prototype.$__fullPath = function (path) {
   // overridden in SubDocuments
   return path || '';
-}
+};
 
 /*!
  * Module exports.
@@ -2641,7 +2647,7 @@ Document.ValidationError = ValidationError;
 module.exports = exports = Document;
 
 }).call(this,require("FWaASH"),require("buffer").Buffer)
-},{"./error":12,"./internal":21,"./promise_provider":23,"./schema":24,"./schema/mixed":31,"./schematype":35,"./types/array":37,"./types/documentarray":39,"./types/embedded":40,"./types/objectid":42,"./utils":43,"FWaASH":52,"buffer":46,"events":50,"hooks-fixed":68,"util":54}],6:[function(require,module,exports){
+},{"./error":12,"./internal":21,"./promise_provider":23,"./schema":24,"./schema/mixed":31,"./schematype":35,"./types/array":37,"./types/documentarray":39,"./types/embedded":40,"./utils":43,"FWaASH":53,"buffer":47,"events":51,"hooks-fixed":69,"util":55}],6:[function(require,module,exports){
 'use strict';
 
 /*!
@@ -2683,7 +2689,7 @@ var Binary = require('bson').Binary;
 
 module.exports = exports = Binary;
 
-},{"bson":57}],9:[function(require,module,exports){
+},{"bson":58}],9:[function(require,module,exports){
 /*!
  * Module exports.
  */
@@ -2708,7 +2714,7 @@ var ObjectId = require('bson').ObjectID;
 
 module.exports = exports = ObjectId;
 
-},{"bson":57}],11:[function(require,module,exports){
+},{"bson":58}],11:[function(require,module,exports){
 (function (global){
 /*!
  * ignore
@@ -2744,7 +2750,7 @@ function MongooseError (msg) {
   this.stack = new Error().stack;
   this.message = msg;
   this.name = 'MongooseError';
-};
+}
 
 /*!
  * Inherits from Error.
@@ -2776,12 +2782,12 @@ MongooseError.Messages = MongooseError.messages;
  */
 
 MongooseError.CastError = require('./error/cast');
-MongooseError.ValidationError = require('./error/validation')
-MongooseError.ValidatorError = require('./error/validator')
-MongooseError.VersionError =require('./error/version')
-MongooseError.OverwriteModelError = require('./error/overwriteModel')
-MongooseError.MissingSchemaError = require('./error/missingSchema')
-MongooseError.DivergentArrayError = require('./error/divergentArray')
+MongooseError.ValidationError = require('./error/validation');
+MongooseError.ValidatorError = require('./error/validator');
+MongooseError.VersionError =require('./error/version');
+MongooseError.OverwriteModelError = require('./error/overwriteModel');
+MongooseError.MissingSchemaError = require('./error/missingSchema');
+MongooseError.DivergentArrayError = require('./error/divergentArray');
 
 },{"./error/cast":13,"./error/divergentArray":14,"./error/messages":15,"./error/missingSchema":16,"./error/overwriteModel":17,"./error/validation":18,"./error/validator":19,"./error/version":20}],13:[function(require,module,exports){
 /*!
@@ -2806,7 +2812,7 @@ function CastError (type, value, path) {
   this.kind = type;
   this.value = value;
   this.path = path;
-};
+}
 
 /*!
  * Inherits from MongooseError.
@@ -2844,13 +2850,13 @@ function DivergentArrayError (paths) {
           + 'the entire array is not supported. The following '
           + 'path(s) would have been modified unsafely:\n'
           + '  ' + paths.join('\n  ') + '\n'
-          + 'Use Model.update() to update these arrays instead.'
+          + 'Use Model.update() to update these arrays instead.';
           // TODO write up a docs page (FAQ) and link to it
 
   MongooseError.call(this, msg);
   Error.captureStackTrace && Error.captureStackTrace(this, arguments.callee);
   this.name = 'DivergentArrayError';
-};
+}
 
 /*!
  * Inherits from MongooseError.
@@ -2964,7 +2970,7 @@ function OverwriteModelError (name) {
   MongooseError.call(this, 'Cannot overwrite `' + name + '` model once compiled.');
   Error.captureStackTrace && Error.captureStackTrace(this, arguments.callee);
   this.name = 'OverwriteModelError';
-};
+}
 
 /*!
  * Inherits from MongooseError.
@@ -3069,7 +3075,7 @@ function ValidatorError (properties) {
   this.kind = properties.type;
   this.path = properties.path;
   this.value = properties.value;
-};
+}
 
 /*!
  * Inherits from MongooseError
@@ -3100,7 +3106,7 @@ ValidatorError.prototype.formatMessage = function (msg, properties) {
 
 ValidatorError.prototype.toString = function () {
   return this.message;
-}
+};
 
 /*!
  * exports
@@ -3127,7 +3133,7 @@ function VersionError () {
   MongooseError.call(this, 'No matching document found.');
   Error.captureStackTrace && Error.captureStackTrace(this, arguments.callee);
   this.name = 'VersionError';
-};
+}
 
 /*!
  * Inherits from MongooseError.
@@ -3147,7 +3153,7 @@ module.exports = VersionError;
  * Dependencies
  */
 
-var StateMachine = require('./statemachine')
+var StateMachine = require('./statemachine');
 var ActiveRoster = StateMachine.ctor('require', 'modify', 'init', 'default', 'ignore');
 
 module.exports = exports = InternalCache;
@@ -3301,7 +3307,7 @@ Promise.prototype.error = function (err) {
     err = new Error(err);
   }
   return this.reject(err);
-}
+};
 
 /**
  * Resolves this promise to a rejected state if `err` is passed or a fulfilled state if no `err` is passed.
@@ -3471,7 +3477,7 @@ Promise.prototype.addErrback = Promise.prototype.onReject;
 
 module.exports = Promise;
 
-},{"mpromise":72,"util":54}],23:[function(require,module,exports){
+},{"mpromise":73,"util":55}],23:[function(require,module,exports){
 /*!
  * Module dependencies.
  */
@@ -3524,18 +3530,21 @@ Promise.reset = function() {
 
 module.exports = Promise;
 
-},{"./ES6Promise":1,"./promise":22,"mquery":77}],24:[function(require,module,exports){
+},{"./ES6Promise":1,"./promise":22,"mquery":78}],24:[function(require,module,exports){
 (function (Buffer){
 /*!
  * Module dependencies.
  */
 
-var readPref = require('./drivers').ReadPreference;
-var EventEmitter = require('events').EventEmitter;
-var VirtualType = require('./virtualtype');
-var utils = require('./utils');
-var MongooseTypes;
-var Kareem = require('kareem');
+var readPref = require('./drivers').ReadPreference
+  , EventEmitter = require('events').EventEmitter
+  , VirtualType = require('./virtualtype')
+  , utils = require('./utils')
+  , MongooseTypes
+  , Kareem = require('kareem')
+  , async = require('async')
+  , PromiseProvider = require('./promise_provider');
+
 
 var IS_QUERY_HOOK = {
   count: true,
@@ -3634,7 +3643,7 @@ function Schema (obj, options) {
 
   for (var i = 0; i < this._defaultMiddleware.length; ++i) {
     var m = this._defaultMiddleware[i];
-    this[m.kind](m.hook, m.fn);
+    this[m.kind](m.hook, !!m.isAsync, m.fn);
   }
 
   // adds updatedAt and createdAt timestamps to documents if enabled
@@ -3701,25 +3710,64 @@ Object.defineProperty(Schema.prototype, '_defaultMiddleware', {
   configurable: false,
   enumerable: false,
   writable: false,
-  value: [
-    {
-      kind: 'pre',
-      hook: 'save',
-      fn: function(next) {
-        // Nested docs have their own presave
-        if (this.ownerDocument) {
-          return next();
-        }
+  value: [{
+    kind: 'pre',
+    hook: 'save',
+    fn: function(next) {
+      // Nested docs have their own presave
+      if (this.ownerDocument) {
+        return next();
+      }
 
-        // Validate
-        if (this.schema.options.validateBeforeSave) {
-          this.validate().then(next, next);
-        } else {
-          next();
-        }
+      // Validate
+      if (this.schema.options.validateBeforeSave) {
+        this.validate().then(next, next);
+      } else {
+        next();
       }
     }
-  ]
+  }, {
+    kind: 'pre',
+    hook: 'save',
+    isAsync: true,
+    fn: function(next, done) {
+      var Promise = PromiseProvider.get(),
+          subdocs = this.$__getAllSubdocs();
+
+      // Calling `save` on a nested subdoc calls `save` with
+      // the scope of its direct parent. That means in the
+      // case of a nested subdoc, `subdocs` here will include
+      // this subdoc itself leading to an infinite loop.
+      subdocs = subdocs.filter(function(subdoc) {
+        return !subdoc.$__preSavingFromParent;
+      });
+
+      if (!subdocs.length) {
+        done();
+        next();
+        return;
+      }
+
+      new Promise.ES6(function(resolve, reject) {
+        async.each(subdocs, function(subdoc, cb) {
+          subdoc.$__preSavingFromParent = true;
+          subdoc.save(function(err) {
+            delete subdoc.$__preSavingFromParent;
+            cb(err);
+          });
+        }, function(error) {
+          if (error) {
+            reject(error);
+            return;
+          }
+          resolve();
+        });
+      }).then(function() {
+        next();
+        done();
+      }, done);
+    }
+  }]
 });
 
 /**
@@ -3796,7 +3844,7 @@ Schema.prototype.defaultOptions = function (options) {
   }
 
   return options;
-}
+};
 
 /**
  * Adds key path / schema type pairs to this schema.
@@ -4057,7 +4105,7 @@ Schema.prototype.requiredPaths = function requiredPaths () {
   }
 
   return this._requiredpaths = ret;
-}
+};
 
 /**
  * Returns indexes from fields and schema-level indexes (cached).
@@ -4070,7 +4118,7 @@ Schema.prototype.indexedPaths = function indexedPaths () {
   if (this._indexedpaths) return this._indexedpaths;
 
   return this._indexedpaths = this.indexes();
-}
+};
 
 /**
  * Returns the pathType of `path` for this schema.
@@ -4091,7 +4139,7 @@ Schema.prototype.pathType = function (path) {
   if (/\.\d+\.|\.\d+$/.test(path) && getPositionalPath(this, path)) {
     return 'real';
   } else {
-    return 'adhocOrUndefined'
+    return 'adhocOrUndefined';
   }
 };
 
@@ -4219,12 +4267,13 @@ Schema.prototype.post = function(method, fn) {
     }]);
   }
 
-  return this.queue('post', [arguments[0], function(next){
+  return this.queue('post', [arguments[0], function(next) {
     // wrap original function so that the callback goes last,
     // for compatibility with old code that is using synchronous post hooks
     var self = this;
-    fn.call(this, this, function(err, result) {
-        return next(err, result || self);
+    var args = Array.prototype.slice.call(arguments, 1);
+    fn.call(this, this, function(err) {
+      return next.apply(self, [err].concat(args));
     });
   }]);
 };
@@ -4357,14 +4406,14 @@ Schema.prototype.set = function (key, value, _tags) {
     case 'safe':
       this.options[key] = false === value
         ? { w: 0 }
-        : value
+        : value;
       break;
     default:
       this.options[key] = value;
   }
 
   return this;
-}
+};
 
 /**
  * Gets a schema option.
@@ -4375,7 +4424,7 @@ Schema.prototype.set = function (key, value, _tags) {
 
 Schema.prototype.get = function (key) {
   return this.options[key];
-}
+};
 
 /**
  * The allowed index types
@@ -4388,9 +4437,9 @@ Schema.prototype.get = function (key) {
 var indexTypes = '2d 2dsphere hashed text'.split(' ');
 
 Object.defineProperty(Schema, 'indexTypes', {
-    get: function () { return indexTypes }
-  , set: function () { throw new Error('Cannot overwrite Schema.indexTypes') }
-})
+    get: function () { return indexTypes; }
+  , set: function () { throw new Error('Cannot overwrite Schema.indexTypes'); }
+});
 
 /**
  * Compiles indexes from fields and schema-level indexes
@@ -4477,7 +4526,7 @@ Schema.prototype.indexes = function () {
       , keys
       , key
       , i = 0
-      , j
+      , j;
 
     for (i = 0; i < len; ++i) {
       indexObj = subindexes[i][0];
@@ -4494,7 +4543,7 @@ Schema.prototype.indexes = function () {
       indexes.push([newindex, subindexes[i][1]]);
     }
   }
-}
+};
 
 /**
  * Creates a virtual type with the given name.
@@ -4544,7 +4593,7 @@ Schema.prototype.remove = function(path) {
       }
     }, this);
   }
-}
+};
 
 /*!
  * Module exports.
@@ -4587,17 +4636,16 @@ Schema.Types = MongooseTypes = require('./schema/index');
  * ignore
  */
 
-var ObjectId = exports.ObjectId = MongooseTypes.ObjectId;
+exports.ObjectId = MongooseTypes.ObjectId;
 
 }).call(this,require("buffer").Buffer)
-},{"./drivers":11,"./schema/index":30,"./utils":43,"./virtualtype":44,"buffer":46,"events":50,"kareem":69}],25:[function(require,module,exports){
+},{"./drivers":11,"./promise_provider":23,"./schema/index":30,"./utils":43,"./virtualtype":44,"async":45,"buffer":47,"events":51,"kareem":70}],25:[function(require,module,exports){
 /*!
  * Module dependencies.
  */
 
 var SchemaType = require('../schematype')
   , CastError = SchemaType.CastError
-  , NumberSchema = require('./number')
   , Types = {
         Boolean: require('./boolean')
       , Date: require('./date')
@@ -4611,7 +4659,7 @@ var SchemaType = require('../schematype')
   , Mixed = require('./mixed')
   , cast = require('../cast')
   , utils = require('../utils')
-  , isMongooseObject = utils.isMongooseObject
+  , isMongooseObject = utils.isMongooseObject;
 
 /**
  * Array SchemaType constructor
@@ -4742,7 +4790,7 @@ SchemaArray.prototype.cast = function (value, doc, init) {
 
     if (this.caster) {
       try {
-        for (var i = 0, l = value.length; i < l; i++) {
+        for (i = 0, l = value.length; i < l; i++) {
           value[i] = this.caster.cast(value[i], doc, init);
         }
       } catch (e) {
@@ -4880,9 +4928,9 @@ function cast$within (val) {
       arr.forEach(function (v, i) {
         arr[i] = castToNumber.call(this, v);
       });
-    })
+    });
   } else if (val.$center || val.$centerSphere) {
-    var type = val.$center ? '$center' : '$centerSphere';
+    type = val.$center ? '$center' : '$centerSphere';
     val[type].forEach(function (item, i) {
       if (Array.isArray(item)) {
         item.forEach(function (v, j) {
@@ -4891,7 +4939,7 @@ function cast$within (val) {
       } else {
         val[type][i] = castToNumber.call(this, item);
       }
-    })
+    });
   } else if (val.$geometry) {
     cast$geometry(val, this);
   }
@@ -4913,7 +4961,7 @@ function cast$all (val) {
     return v;
   }, this);
 
-  return this.castForQuery(val);
+  return val;
 }
 
 function cast$elemMatch (val) {
@@ -4923,8 +4971,8 @@ function cast$elemMatch (val) {
   var key;
   var value;
   for (var i = 0; i < numKeys; ++i) {
-    var key = keys[i];
-    var value = val[key];
+    key = keys[i];
+    value = val[key];
     if (key.indexOf('$') === 0 && value) {
       val[key] = this.castForQuery(key, value);
       hasDollarKey = true;
@@ -4997,7 +5045,6 @@ module.exports = SchemaArray;
 var utils = require('../utils');
 
 var SchemaType = require('../schematype');
-var utils = require('../utils');
 
 /**
  * Boolean SchemaType constructor.
@@ -5049,7 +5096,7 @@ SchemaBoolean.prototype.cast = function (value) {
   if ('true' === value) return true;
   if ('false' === value) return false;
   return !! value;
-}
+};
 
 /*!
  * ignore
@@ -5162,6 +5209,7 @@ SchemaBuffer.prototype.checkRequired = function (value, doc) {
  */
 
 SchemaBuffer.prototype.cast = function (value, doc, init) {
+  var ret;
   if (SchemaType._isRef(this, value, doc, init)) {
     // wait! we may need to cast this to a document
 
@@ -5190,7 +5238,7 @@ SchemaBuffer.prototype.cast = function (value, doc, init) {
     var path = doc.$__fullPath(this.path);
     var owner = doc.ownerDocument ? doc.ownerDocument() : doc;
     var pop = owner.populated(path, true);
-    var ret = new pop.options.model(value);
+    ret = new pop.options.model(value);
     ret.$__.wasPopulated = true;
     return ret;
   }
@@ -5211,7 +5259,7 @@ SchemaBuffer.prototype.cast = function (value, doc, init) {
 
     return value;
   } else if (value instanceof Binary) {
-    var ret = new MongooseBuffer(value.value(true), [this.path, doc]);
+    ret = new MongooseBuffer(value.value(true), [this.path, doc]);
     if (typeof value.sub_type !== 'number') {
       throw new CastError('buffer', value, this.path);
     }
@@ -5223,7 +5271,7 @@ SchemaBuffer.prototype.cast = function (value, doc, init) {
 
   var type = typeof value;
   if ('string' == type || 'number' == type || Array.isArray(value)) {
-    var ret = new MongooseBuffer(value, [this.path, doc]);
+    ret = new MongooseBuffer(value, [this.path, doc]);
     return ret;
   }
 
@@ -5283,12 +5331,12 @@ SchemaBuffer.prototype.castForQuery = function ($conditional, val) {
 module.exports = SchemaBuffer;
 
 }).call(this,require("buffer").Buffer)
-},{"../schematype":35,"../types":41,"../utils":43,"./../document":5,"buffer":46}],28:[function(require,module,exports){
+},{"../schematype":35,"../types":41,"../utils":43,"./../document":5,"buffer":47}],28:[function(require,module,exports){
 /*!
  * Module requirements.
  */
 
-var errorMessages = require('../error').messages
+var errorMessages = require('../error').messages;
 var utils = require('../utils');
 
 var SchemaType = require('../schematype');
@@ -5581,13 +5629,13 @@ SchemaDate.prototype.castForQuery = function ($conditional, val) {
 module.exports = SchemaDate;
 
 },{"../error":12,"../schematype":35,"../utils":43}],29:[function(require,module,exports){
+/* eslint no-empty: 1 */
 
 /*!
  * Module dependencies.
  */
 
 var ArrayType = require('./array');
-var Document = require('../document');
 var MongooseDocumentArray = require('../types/documentarray');
 var SchemaType = require('../schematype');
 var Subdocument = require('../types/embedded');
@@ -5618,7 +5666,7 @@ function DocumentArray (key, schema, options) {
     EmbeddedDocument.prototype[i] = schema.methods[i];
 
   // apply statics
-  for (var i in schema.statics)
+  for (i in schema.statics)
     EmbeddedDocument[i] = schema.statics[i];
 
   EmbeddedDocument.options = options;
@@ -5742,7 +5790,7 @@ DocumentArray.prototype.doValidateSync = function (array, scope) {
 DocumentArray.prototype.cast = function (value, doc, init, prev) {
   var selected
     , subdoc
-    , i
+    , i;
 
   if (!Array.isArray(value)) {
     // gh-2442 mark whole array as modified if we're initializing a doc from
@@ -5793,7 +5841,7 @@ DocumentArray.prototype.cast = function (value, doc, init, prev) {
   }
 
   return value;
-}
+};
 
 /*!
  * Scopes paths selected in a query to this array.
@@ -5812,7 +5860,7 @@ function scopePaths (array, fields, init) {
     , i = keys.length
     , selected = {}
     , hasKeys
-    , key
+    , key;
 
   while (i--) {
     key = keys[i];
@@ -5831,7 +5879,7 @@ function scopePaths (array, fields, init) {
 
 module.exports = DocumentArray;
 
-},{"../document":5,"../schematype":35,"../types/documentarray":39,"../types/embedded":40,"./array":25}],30:[function(require,module,exports){
+},{"../schematype":35,"../types/documentarray":39,"../types/embedded":40,"./array":25}],30:[function(require,module,exports){
 
 /*!
  * Module exports.
@@ -5890,8 +5938,8 @@ function Mixed (path, options) {
                0 === Object.keys(def).length) {
       // prevent odd "shared" objects between documents
       options.default = function () {
-        return {}
-      }
+        return {};
+      };
     }
   }
 
@@ -5964,7 +6012,7 @@ var SchemaType = require('../schematype')
   , CastError = SchemaType.CastError
   , errorMessages = require('../error').messages
   , utils = require('../utils')
-  , Document
+  , Document;
 
 /**
  * Number SchemaType constructor.
@@ -6166,11 +6214,11 @@ SchemaNumber.prototype.cast = function (value, doc, init) {
     if (null === val) return val;
     if ('' === val) return null;
     if ('string' == typeof val) val = Number(val);
-    if (val instanceof Number) return val
+    if (val instanceof Number) return val;
     if ('number' == typeof val) return val;
     if (val.toString && !Array.isArray(val) &&
         val.toString() == Number(val)) {
-      return new Number(val)
+      return new Number(val);
     }
   }
 
@@ -6182,13 +6230,13 @@ SchemaNumber.prototype.cast = function (value, doc, init) {
  */
 
 function handleSingle (val) {
-  return this.cast(val)
+  return this.cast(val);
 }
 
 function handleArray (val) {
   var self = this;
   return val.map(function (m) {
-    return self.cast(m)
+    return self.cast(m);
   });
 }
 
@@ -6222,7 +6270,7 @@ SchemaNumber.prototype.castForQuery = function ($conditional, val) {
     return handler.call(this, val);
   } else {
     val = this.cast($conditional);
-    return val == null ? val : val
+    return val == null ? val : val;
   }
 };
 
@@ -6233,8 +6281,10 @@ SchemaNumber.prototype.castForQuery = function ($conditional, val) {
 module.exports = SchemaNumber;
 
 }).call(this,require("buffer").Buffer)
-},{"../error":12,"../schematype":35,"../utils":43,"./../document":5,"buffer":46}],33:[function(require,module,exports){
+},{"../error":12,"../schematype":35,"../utils":43,"./../document":5,"buffer":47}],33:[function(require,module,exports){
 (function (Buffer){
+/* eslint no-empty: 1 */
+
 /*!
  * Module dependencies.
  */
@@ -6243,7 +6293,7 @@ var SchemaType = require('../schematype')
   , CastError = SchemaType.CastError
   , oid = require('../types/objectid')
   , utils = require('../utils')
-  , Document
+  , Document;
 
 /**
  * ObjectId SchemaType constructor.
@@ -6282,7 +6332,7 @@ ObjectId.prototype.constructor = ObjectId;
 ObjectId.prototype.auto = function (turnOn) {
   if (turnOn) {
     this.default(defaultId);
-    this.set(resetId)
+    this.set(resetId);
   }
 
   return this;
@@ -6426,7 +6476,7 @@ ObjectId.prototype.castForQuery = function ($conditional, val) {
 
 function defaultId () {
   return new oid();
-};
+}
 
 function resetId (v) {
   this.$__._id = null;
@@ -6440,7 +6490,7 @@ function resetId (v) {
 module.exports = ObjectId;
 
 }).call(this,require("buffer").Buffer)
-},{"../schematype":35,"../types/objectid":42,"../utils":43,"./../document":5,"buffer":46}],34:[function(require,module,exports){
+},{"../schematype":35,"../types/objectid":42,"../utils":43,"./../document":5,"buffer":47}],34:[function(require,module,exports){
 (function (Buffer){
 
 /*!
@@ -6451,7 +6501,7 @@ var SchemaType = require('../schematype')
   , CastError = SchemaType.CastError
   , errorMessages = require('../error').messages
   , utils = require('../utils')
-  , Document
+  , Document;
 
 /**
  * String SchemaType constructor.
@@ -6466,7 +6516,7 @@ function SchemaString (key, options) {
   this.enumValues = [];
   this.regExp = null;
   SchemaType.call(this, key, options, 'String');
-};
+}
 
 /**
  * This schema type's name, to defend against minifiers that mangle
@@ -6576,7 +6626,7 @@ SchemaString.prototype.enum = function () {
 
 SchemaString.prototype.lowercase = function () {
   return this.set(function (v, self) {
-    if ('string' != typeof v) v = self.cast(v)
+    if ('string' != typeof v) v = self.cast(v);
     if (v) return v.toLowerCase();
     return v;
   });
@@ -6598,7 +6648,7 @@ SchemaString.prototype.lowercase = function () {
 
 SchemaString.prototype.uppercase = function () {
   return this.set(function (v, self) {
-    if ('string' != typeof v) v = self.cast(v)
+    if ('string' != typeof v) v = self.cast(v);
     if (v) return v.toUpperCase();
     return v;
   });
@@ -6624,7 +6674,7 @@ SchemaString.prototype.uppercase = function () {
 
 SchemaString.prototype.trim = function () {
   return this.set(function (v, self) {
-    if ('string' != typeof v) v = self.cast(v)
+    if ('string' != typeof v) v = self.cast(v);
     if (v) return v.trim();
     return v;
   });
@@ -6936,7 +6986,7 @@ SchemaString.prototype.castForQuery = function ($conditional, val) {
 module.exports = SchemaString;
 
 }).call(this,require("buffer").Buffer)
-},{"../error":12,"../schematype":35,"../utils":43,"./../document":5,"buffer":46}],35:[function(require,module,exports){
+},{"../error":12,"../schematype":35,"../utils":43,"./../document":5,"buffer":47}],35:[function(require,module,exports){
 (function (Buffer){
 /*!
  * Module dependencies.
@@ -6979,7 +7029,7 @@ function SchemaType (path, options, instance) {
       this[i].apply(this, opts);
     }
   }
-};
+}
 
 /**
  * Sets a default value for this SchemaType.
@@ -7450,7 +7500,7 @@ SchemaType.prototype.required = function (required, message) {
 
     return (('function' === typeof required) && !required.apply(this)) ||
         self.checkRequired(v, this);
-  }
+  };
 
   if ('string' == typeof required) {
     message = required;
@@ -7646,9 +7696,7 @@ SchemaType.prototype.doValidateSync = function (value, scope) {
 
   var validate = function(ok, validatorProperties) {
     if (err) return;
-    if (ok === undefined || ok) {
-
-    } else {
+    if (ok !== undefined && !ok) {
       err = new ValidatorError(validatorProperties);
     }
   };
@@ -7662,7 +7710,7 @@ SchemaType.prototype.doValidateSync = function (value, scope) {
     if (err) {
       return;
     }
-    
+
     var validator = v.validator;
     var validatorProperties = utils.clone(v);
     validatorProperties.path = path;
@@ -7742,7 +7790,7 @@ exports.CastError = CastError;
 exports.ValidatorError = ValidatorError;
 
 }).call(this,require("buffer").Buffer)
-},{"./error":12,"./utils":43,"buffer":46}],36:[function(require,module,exports){
+},{"./error":12,"./utils":43,"buffer":47}],36:[function(require,module,exports){
 
 /*!
  * Module dependencies.
@@ -7758,7 +7806,7 @@ var utils = require('./utils');
  */
 
 var StateMachine = module.exports = exports = function StateMachine () {
-}
+};
 
 /*!
  * StateMachine.ctor('state1', 'state2', ...)
@@ -7798,7 +7846,7 @@ StateMachine.ctor = function () {
     // Changes the `path`'s state to `state`.
     ctor.prototype[state] = function (path) {
       this._changeState(path, state);
-    }
+    };
   });
 
   return ctor;
@@ -7820,7 +7868,7 @@ StateMachine.prototype._changeState = function _changeState (path, nextState) {
 
   this.paths[path] = nextState;
   this.states[nextState][path] = true;
-}
+};
 
 /*!
  * ignore
@@ -7829,14 +7877,14 @@ StateMachine.prototype._changeState = function _changeState (path, nextState) {
 StateMachine.prototype.clear = function clear (state) {
   var keys = Object.keys(this.states[state])
     , i = keys.length
-    , path
+    , path;
 
   while (i--) {
     path = keys[i];
     delete this.states[state][path];
     delete this.paths[path];
   }
-}
+};
 
 /*!
  * Checks to see if at least one path is in the states passed in via `arguments`
@@ -7852,7 +7900,7 @@ StateMachine.prototype.some = function some () {
   return Array.prototype.some.call(what, function (state) {
     return Object.keys(self.states[state]).length;
   });
-}
+};
 
 /*!
  * This function builds the functions that get assigned to `forEach` and `map`,
@@ -7881,7 +7929,7 @@ StateMachine.prototype._iter = function _iter (iterMethod) {
       return callback(path, i, paths);
     });
   };
-}
+};
 
 /*!
  * Iterates over the paths that belong to one of the parameter states.
@@ -7900,7 +7948,7 @@ StateMachine.prototype._iter = function _iter (iterMethod) {
 StateMachine.prototype.forEach = function forEach () {
   this.forEach = this._iter('forEach');
   return this.forEach.apply(this, arguments);
-}
+};
 
 /*!
  * Maps over the paths that belong to one of the parameter states.
@@ -7920,8 +7968,7 @@ StateMachine.prototype.forEach = function forEach () {
 StateMachine.prototype.map = function map () {
   this.map = this._iter('map');
   return this.map.apply(this, arguments);
-}
-
+};
 
 },{"./utils":43}],37:[function(require,module,exports){
 (function (Buffer){
@@ -8038,10 +8085,10 @@ MongooseArray.mixin = {
       if (!isDisc) {
         value = new Model(value);
       }
-      return this._schema.caster.cast(value, this._parent, true)
+      return this._schema.caster.cast(value, this._parent, true);
     }
 
-    return this._schema.caster.cast(value, this._parent, false)
+    return this._schema.caster.cast(value, this._parent, false);
   },
 
   /**
@@ -8167,7 +8214,7 @@ MongooseArray.mixin = {
       }
 
       if ('$addToSet' == op) {
-        val = { $each: val }
+        val = { $each: val };
       }
 
       ret.push([op, val]);
@@ -8536,11 +8583,11 @@ MongooseArray.mixin = {
       var found;
       switch (type) {
         case 'doc':
-          found = this.some(function(doc){ return doc.equals(v) });
+          found = this.some(function(doc){ return doc.equals(v); });
           break;
         case 'date':
           var val = +v;
-          found = this.some(function(d){ return +d === val });
+          found = this.some(function(d){ return +d === val; });
           break;
         default:
           found = ~this.indexOf(v);
@@ -8610,7 +8657,7 @@ MongooseArray.mixin = {
       return this.map(function (doc) {
         return doc instanceof Document
           ? doc.toObject(options)
-          : doc
+          : doc;
       });
     }
 
@@ -8668,7 +8715,7 @@ MongooseArray.mixin.remove = MongooseArray.mixin.pull;
 module.exports = exports = MongooseArray;
 
 }).call(this,require("buffer").Buffer)
-},{"../document":5,"../utils":43,"./embedded":40,"./objectid":42,"buffer":46}],38:[function(require,module,exports){
+},{"../document":5,"../utils":43,"./embedded":40,"./objectid":42,"buffer":47}],38:[function(require,module,exports){
 (function (Buffer){
 /*!
  * Module dependencies.
@@ -8824,7 +8871,7 @@ MongooseBuffer.mixin = {
  * Compile other Buffer methods marking this buffer as modified.
  */
 
-;(
+(
 // node < 0.5
 'writeUInt8 writeUInt16 writeUInt32 writeInt8 writeInt16 writeInt32 ' +
 'writeFloat writeDouble fill ' +
@@ -8840,7 +8887,7 @@ MongooseBuffer.mixin = {
     'var ret = Buffer.prototype.'+method+'.apply(this, arguments);' +
     'this._markModified();' +
     'return ret;'
-  )
+  );
 });
 
 /**
@@ -8941,7 +8988,7 @@ MongooseBuffer.Binary = Binary;
 module.exports = MongooseBuffer;
 
 }).call(this,require("buffer").Buffer)
-},{"../drivers":11,"../utils":43,"buffer":46}],39:[function(require,module,exports){
+},{"../drivers":11,"../utils":43,"buffer":47}],39:[function(require,module,exports){
 (function (Buffer){
 /*!
  * Module dependencies.
@@ -8952,7 +8999,7 @@ var MongooseArray = require('./array')
   , ObjectIdSchema = require('../schema/objectid')
   , utils = require('../utils')
   , util = require('util')
-  , Document = require('../document')
+  , Document = require('../document');
 
 /**
  * DocumentArray constructor
@@ -9050,7 +9097,7 @@ MongooseDocumentArray.mixin._cast = function (value, index) {
 MongooseDocumentArray.mixin.id = function (id) {
   var casted
     , sid
-    , _id
+    , _id;
 
   try {
     var casted_ = ObjectIdSchema.prototype.cast.call({}, id);
@@ -9110,9 +9157,9 @@ MongooseDocumentArray.mixin.inspect = function () {
     if (doc) {
       return doc.inspect
         ? doc.inspect()
-        : util.inspect(doc)
+        : util.inspect(doc);
     }
-    return 'null'
+    return 'null';
   }).join('\n') + ']';
 };
 
@@ -9129,7 +9176,7 @@ MongooseDocumentArray.mixin.inspect = function () {
 
 MongooseDocumentArray.mixin.create = function (obj) {
   return new this._schema.casterConstructor(obj);
-}
+};
 
 /**
  * Creates a fn that notifies all child docs of `event`.
@@ -9158,8 +9205,8 @@ MongooseDocumentArray.mixin.notify = function notify (event) {
       }
       self[i].emit(event, val);
     }
-  }
-}
+  };
+};
 
 /*!
  * Module exports.
@@ -9168,7 +9215,9 @@ MongooseDocumentArray.mixin.notify = function notify (event) {
 module.exports = MongooseDocumentArray;
 
 }).call(this,require("buffer").Buffer)
-},{"../document":5,"../schema/objectid":33,"../utils":43,"./array":37,"./objectid":42,"buffer":46,"util":54}],40:[function(require,module,exports){
+},{"../document":5,"../schema/objectid":33,"../utils":43,"./array":37,"./objectid":42,"buffer":47,"util":55}],40:[function(require,module,exports){
+/* eslint no-func-assign: 1 */
+
 /*!
  * Module dependencies.
  */
@@ -9252,11 +9301,11 @@ EmbeddedDocument.prototype.markModified = function (path) {
  */
 
 EmbeddedDocument.prototype.save = function (fn) {
-  return new Promise.ES6(function(resolve, reject) {
+  return new Promise.ES6(function(resolve) {
     fn && fn();
     resolve();
   });
-}
+};
 
 /**
  * Removes the subdocument from its parent array.
@@ -9305,8 +9354,8 @@ function registerRemoveListener (sub) {
     owner.removeListener('remove', emitRemove);
     sub.emit('remove', sub);
     owner = sub = emitRemove = null;
-  };
-};
+  }
+}
 
 /**
  * Override #update method of parent documents.
@@ -9315,7 +9364,7 @@ function registerRemoveListener (sub) {
 
 EmbeddedDocument.prototype.update = function () {
   throw new Error('The #update method is not available on EmbeddedDocuments');
-}
+};
 
 /**
  * Helper for console.log
@@ -9338,7 +9387,7 @@ EmbeddedDocument.prototype.inspect = function () {
 
 EmbeddedDocument.prototype.invalidate = function (path, err, val, first) {
   if (!this.__parent) {
-    var msg = 'Unable to invalidate a subdocument that has not been added to an array.'
+    var msg = 'Unable to invalidate a subdocument that has not been added to an array.';
     throw new Error(msg);
   }
 
@@ -9390,8 +9439,6 @@ EmbeddedDocument.prototype.$markValid = function(path) {
 EmbeddedDocument.prototype.$isValid = function(path) {
   var index = this.__index;
   if (typeof index !== 'undefined') {
-    var parentPath = this.__parentArray._path;
-    var fullPath = [parentPath, index, path].join('.');
 
     return !this.__parent.$__.validationError ||
       !this.__parent.$__.validationError.errors[path];
@@ -9419,7 +9466,7 @@ EmbeddedDocument.prototype.ownerDocument = function () {
   }
 
   return this.$__.ownerDocument = parent;
-}
+};
 
 /**
  * Returns the full path to this document. If optional `path` is passed, it is appended to the full path.
@@ -9453,7 +9500,7 @@ EmbeddedDocument.prototype.$__fullPath = function (path) {
   return path
     ? this.$__.fullPath + '.' + path
     : this.$__.fullPath;
-}
+};
 
 /**
  * Returns this sub-documents parent document.
@@ -9463,7 +9510,7 @@ EmbeddedDocument.prototype.$__fullPath = function (path) {
 
 EmbeddedDocument.prototype.parent = function () {
   return this.__parent;
-}
+};
 
 /**
  * Returns this sub-documents parent array.
@@ -9473,7 +9520,7 @@ EmbeddedDocument.prototype.parent = function () {
 
 EmbeddedDocument.prototype.parentArray = function () {
   return this.__parentArray;
-}
+};
 
 /*!
  * Module exports.
@@ -9481,7 +9528,7 @@ EmbeddedDocument.prototype.parentArray = function () {
 
 module.exports = EmbeddedDocument;
 
-},{"../document_provider":6,"../promise":22,"util":54}],41:[function(require,module,exports){
+},{"../document_provider":6,"../promise":22,"util":55}],41:[function(require,module,exports){
 
 /*!
  * Module exports.
@@ -9623,7 +9670,7 @@ var uncountables = exports.uncountables;
  */
 
 function pluralize (str) {
-  var rule, found;
+  var found;
   if (!~uncountables.indexOf(str.toLowerCase())){
     found = rules.filter(function(rule){
       return str.match(rule[0]);
@@ -9631,7 +9678,7 @@ function pluralize (str) {
     if (found[0]) return str.replace(found[0][0], found[0][1]);
   }
   return str;
-};
+}
 
 /*!
  * Determines if `a` and `b` are deep equal.
@@ -9665,7 +9712,7 @@ exports.deepEqual = function deepEqual (a, b) {
     return a == b;
 
   if (a === null || b === null || a === undefined || b === undefined)
-    return false
+    return false;
 
   if (a.prototype !== b.prototype) return false;
 
@@ -9781,7 +9828,7 @@ function cloneObject (obj, options) {
     , keys
     , val
     , k
-    , i
+    , i;
 
   if (retainKeyOrder) {
     for (k in obj) {
@@ -9812,14 +9859,14 @@ function cloneObject (obj, options) {
   return minimize
     ? hasKeys && ret
     : ret;
-};
+}
 
 function cloneArray (arr, options) {
   var ret = [];
   for (var i = 0, l = arr.length; i < l; i++)
     ret.push(clone(arr[i], options));
   return ret;
-};
+}
 
 /*!
  * Shallow copies defaults into options.
@@ -9887,6 +9934,49 @@ exports.merge = function merge (to, from) {
 var toString = Object.prototype.toString;
 
 /*!
+ * Applies toObject recursively.
+ *
+ * @param {Document|Array|Object} obj
+ * @return {Object}
+ * @api private
+ */
+
+exports.toObject = function toObject (obj) {
+  var ret;
+
+  if (exports.isNullOrUndefined(obj)) {
+    return obj;
+  }
+
+  if (obj instanceof Document) {
+    return obj.toObject();
+  }
+
+  if (Array.isArray(obj)) {
+    ret = [];
+
+    for (var i = 0, len = obj.length; i < len; ++i) {
+      ret.push(toObject(obj[i]));
+    }
+
+    return ret;
+  }
+
+  if ((obj.constructor && exports.getFunctionName(obj.constructor) === 'Object') ||
+      (!obj.constructor && exports.isObject(obj))) {
+    ret = {};
+
+    for (var k in obj) {
+      ret[k] = toObject(obj[k]);
+    }
+
+    return ret;
+  }
+
+  return obj;
+};
+
+/*!
  * Determines if `arg` is an object.
  *
  * @param {Object|Array|String|Function|RegExp|any} arg
@@ -9896,7 +9986,7 @@ var toString = Object.prototype.toString;
 
 exports.isObject = function (arg) {
   return '[object Object]' == toString.call(arg);
-}
+};
 
 /*!
  * A faster Array.prototype.slice.call(arguments) alternative
@@ -9928,8 +10018,8 @@ exports.tick = function tick (callback) {
         throw err;
       });
     }
-  }
-}
+  };
+};
 
 /*!
  * Returns if `v` is a mongoose object that has a `toObject()` method we can use.
@@ -10044,7 +10134,7 @@ exports.populate = function populate (path, select, model, match, options, subPo
   }
 
   return ret;
-}
+};
 
 /*!
  * Return the value of `obj` at the given `path`.
@@ -10055,7 +10145,7 @@ exports.populate = function populate (path, select, model, match, options, subPo
 
 exports.getValue = function (path, obj, map) {
   return mpath.get(path, obj, '_doc', map);
-}
+};
 
 /*!
  * Sets the value of `obj` at the given `path`.
@@ -10067,7 +10157,7 @@ exports.getValue = function (path, obj, map) {
 
 exports.setValue = function (path, val, obj, map) {
   mpath.set(path, val, obj, '_doc', map);
-}
+};
 
 /*!
  * Returns an array of values from object `o`.
@@ -10088,7 +10178,7 @@ exports.object.vals = function vals (o) {
   }
 
   return ret;
-}
+};
 
 /*!
  * @see exports.options
@@ -10106,7 +10196,7 @@ exports.object.shallowCopy = exports.options;
 var hop = Object.prototype.hasOwnProperty;
 exports.object.hasOwnProperty = function (obj, prop) {
   return hop.call(obj, prop);
-}
+};
 
 /*!
  * Determine if `val` is null or undefined
@@ -10115,8 +10205,8 @@ exports.object.hasOwnProperty = function (obj, prop) {
  */
 
 exports.isNullOrUndefined = function (val) {
-  return null == val
-}
+  return null == val;
+};
 
 /*!
  * ignore
@@ -10231,7 +10321,7 @@ exports.decorate = function(destination, source) {
 exports.mergeClone = function(to, from) {
   var keys = Object.keys(from)
     , i = keys.length
-    , key
+    , key;
 
   while (i--) {
     key = keys[i];
@@ -10266,7 +10356,7 @@ exports.each = function(arr, fn) {
 };
 
 }).call(this,require("FWaASH"),require("buffer").Buffer)
-},{"./document":5,"./types":41,"./types/objectid":42,"FWaASH":52,"buffer":46,"mpath":70,"ms":84,"regexp-clone":85,"sliced":86}],44:[function(require,module,exports){
+},{"./document":5,"./types":41,"./types/objectid":42,"FWaASH":53,"buffer":47,"mpath":71,"ms":85,"regexp-clone":86,"sliced":87}],44:[function(require,module,exports){
 
 /**
  * VirtualType constructor
@@ -10372,6 +10462,1133 @@ VirtualType.prototype.applySetters = function (value, scope) {
 module.exports = VirtualType;
 
 },{}],45:[function(require,module,exports){
+(function (process){
+/*!
+ * async
+ * https://github.com/caolan/async
+ *
+ * Copyright 2010-2014 Caolan McMahon
+ * Released under the MIT license
+ */
+/*jshint onevar: false, indent:4 */
+/*global setImmediate: false, setTimeout: false, console: false */
+(function () {
+
+    var async = {};
+
+    // global on the server, window in the browser
+    var root, previous_async;
+
+    root = this;
+    if (root != null) {
+      previous_async = root.async;
+    }
+
+    async.noConflict = function () {
+        root.async = previous_async;
+        return async;
+    };
+
+    function only_once(fn) {
+        var called = false;
+        return function() {
+            if (called) throw new Error("Callback was already called.");
+            called = true;
+            fn.apply(root, arguments);
+        }
+    }
+
+    //// cross-browser compatiblity functions ////
+
+    var _toString = Object.prototype.toString;
+
+    var _isArray = Array.isArray || function (obj) {
+        return _toString.call(obj) === '[object Array]';
+    };
+
+    var _each = function (arr, iterator) {
+        if (arr.forEach) {
+            return arr.forEach(iterator);
+        }
+        for (var i = 0; i < arr.length; i += 1) {
+            iterator(arr[i], i, arr);
+        }
+    };
+
+    var _map = function (arr, iterator) {
+        if (arr.map) {
+            return arr.map(iterator);
+        }
+        var results = [];
+        _each(arr, function (x, i, a) {
+            results.push(iterator(x, i, a));
+        });
+        return results;
+    };
+
+    var _reduce = function (arr, iterator, memo) {
+        if (arr.reduce) {
+            return arr.reduce(iterator, memo);
+        }
+        _each(arr, function (x, i, a) {
+            memo = iterator(memo, x, i, a);
+        });
+        return memo;
+    };
+
+    var _keys = function (obj) {
+        if (Object.keys) {
+            return Object.keys(obj);
+        }
+        var keys = [];
+        for (var k in obj) {
+            if (obj.hasOwnProperty(k)) {
+                keys.push(k);
+            }
+        }
+        return keys;
+    };
+
+    //// exported async module functions ////
+
+    //// nextTick implementation with browser-compatible fallback ////
+    if (typeof process === 'undefined' || !(process.nextTick)) {
+        if (typeof setImmediate === 'function') {
+            async.nextTick = function (fn) {
+                // not a direct alias for IE10 compatibility
+                setImmediate(fn);
+            };
+            async.setImmediate = async.nextTick;
+        }
+        else {
+            async.nextTick = function (fn) {
+                setTimeout(fn, 0);
+            };
+            async.setImmediate = async.nextTick;
+        }
+    }
+    else {
+        async.nextTick = process.nextTick;
+        if (typeof setImmediate !== 'undefined') {
+            async.setImmediate = function (fn) {
+              // not a direct alias for IE10 compatibility
+              setImmediate(fn);
+            };
+        }
+        else {
+            async.setImmediate = async.nextTick;
+        }
+    }
+
+    async.each = function (arr, iterator, callback) {
+        callback = callback || function () {};
+        if (!arr.length) {
+            return callback();
+        }
+        var completed = 0;
+        _each(arr, function (x) {
+            iterator(x, only_once(done) );
+        });
+        function done(err) {
+          if (err) {
+              callback(err);
+              callback = function () {};
+          }
+          else {
+              completed += 1;
+              if (completed >= arr.length) {
+                  callback();
+              }
+          }
+        }
+    };
+    async.forEach = async.each;
+
+    async.eachSeries = function (arr, iterator, callback) {
+        callback = callback || function () {};
+        if (!arr.length) {
+            return callback();
+        }
+        var completed = 0;
+        var iterate = function () {
+            iterator(arr[completed], function (err) {
+                if (err) {
+                    callback(err);
+                    callback = function () {};
+                }
+                else {
+                    completed += 1;
+                    if (completed >= arr.length) {
+                        callback();
+                    }
+                    else {
+                        iterate();
+                    }
+                }
+            });
+        };
+        iterate();
+    };
+    async.forEachSeries = async.eachSeries;
+
+    async.eachLimit = function (arr, limit, iterator, callback) {
+        var fn = _eachLimit(limit);
+        fn.apply(null, [arr, iterator, callback]);
+    };
+    async.forEachLimit = async.eachLimit;
+
+    var _eachLimit = function (limit) {
+
+        return function (arr, iterator, callback) {
+            callback = callback || function () {};
+            if (!arr.length || limit <= 0) {
+                return callback();
+            }
+            var completed = 0;
+            var started = 0;
+            var running = 0;
+
+            (function replenish () {
+                if (completed >= arr.length) {
+                    return callback();
+                }
+
+                while (running < limit && started < arr.length) {
+                    started += 1;
+                    running += 1;
+                    iterator(arr[started - 1], function (err) {
+                        if (err) {
+                            callback(err);
+                            callback = function () {};
+                        }
+                        else {
+                            completed += 1;
+                            running -= 1;
+                            if (completed >= arr.length) {
+                                callback();
+                            }
+                            else {
+                                replenish();
+                            }
+                        }
+                    });
+                }
+            })();
+        };
+    };
+
+
+    var doParallel = function (fn) {
+        return function () {
+            var args = Array.prototype.slice.call(arguments);
+            return fn.apply(null, [async.each].concat(args));
+        };
+    };
+    var doParallelLimit = function(limit, fn) {
+        return function () {
+            var args = Array.prototype.slice.call(arguments);
+            return fn.apply(null, [_eachLimit(limit)].concat(args));
+        };
+    };
+    var doSeries = function (fn) {
+        return function () {
+            var args = Array.prototype.slice.call(arguments);
+            return fn.apply(null, [async.eachSeries].concat(args));
+        };
+    };
+
+
+    var _asyncMap = function (eachfn, arr, iterator, callback) {
+        arr = _map(arr, function (x, i) {
+            return {index: i, value: x};
+        });
+        if (!callback) {
+            eachfn(arr, function (x, callback) {
+                iterator(x.value, function (err) {
+                    callback(err);
+                });
+            });
+        } else {
+            var results = [];
+            eachfn(arr, function (x, callback) {
+                iterator(x.value, function (err, v) {
+                    results[x.index] = v;
+                    callback(err);
+                });
+            }, function (err) {
+                callback(err, results);
+            });
+        }
+    };
+    async.map = doParallel(_asyncMap);
+    async.mapSeries = doSeries(_asyncMap);
+    async.mapLimit = function (arr, limit, iterator, callback) {
+        return _mapLimit(limit)(arr, iterator, callback);
+    };
+
+    var _mapLimit = function(limit) {
+        return doParallelLimit(limit, _asyncMap);
+    };
+
+    // reduce only has a series version, as doing reduce in parallel won't
+    // work in many situations.
+    async.reduce = function (arr, memo, iterator, callback) {
+        async.eachSeries(arr, function (x, callback) {
+            iterator(memo, x, function (err, v) {
+                memo = v;
+                callback(err);
+            });
+        }, function (err) {
+            callback(err, memo);
+        });
+    };
+    // inject alias
+    async.inject = async.reduce;
+    // foldl alias
+    async.foldl = async.reduce;
+
+    async.reduceRight = function (arr, memo, iterator, callback) {
+        var reversed = _map(arr, function (x) {
+            return x;
+        }).reverse();
+        async.reduce(reversed, memo, iterator, callback);
+    };
+    // foldr alias
+    async.foldr = async.reduceRight;
+
+    var _filter = function (eachfn, arr, iterator, callback) {
+        var results = [];
+        arr = _map(arr, function (x, i) {
+            return {index: i, value: x};
+        });
+        eachfn(arr, function (x, callback) {
+            iterator(x.value, function (v) {
+                if (v) {
+                    results.push(x);
+                }
+                callback();
+            });
+        }, function (err) {
+            callback(_map(results.sort(function (a, b) {
+                return a.index - b.index;
+            }), function (x) {
+                return x.value;
+            }));
+        });
+    };
+    async.filter = doParallel(_filter);
+    async.filterSeries = doSeries(_filter);
+    // select alias
+    async.select = async.filter;
+    async.selectSeries = async.filterSeries;
+
+    var _reject = function (eachfn, arr, iterator, callback) {
+        var results = [];
+        arr = _map(arr, function (x, i) {
+            return {index: i, value: x};
+        });
+        eachfn(arr, function (x, callback) {
+            iterator(x.value, function (v) {
+                if (!v) {
+                    results.push(x);
+                }
+                callback();
+            });
+        }, function (err) {
+            callback(_map(results.sort(function (a, b) {
+                return a.index - b.index;
+            }), function (x) {
+                return x.value;
+            }));
+        });
+    };
+    async.reject = doParallel(_reject);
+    async.rejectSeries = doSeries(_reject);
+
+    var _detect = function (eachfn, arr, iterator, main_callback) {
+        eachfn(arr, function (x, callback) {
+            iterator(x, function (result) {
+                if (result) {
+                    main_callback(x);
+                    main_callback = function () {};
+                }
+                else {
+                    callback();
+                }
+            });
+        }, function (err) {
+            main_callback();
+        });
+    };
+    async.detect = doParallel(_detect);
+    async.detectSeries = doSeries(_detect);
+
+    async.some = function (arr, iterator, main_callback) {
+        async.each(arr, function (x, callback) {
+            iterator(x, function (v) {
+                if (v) {
+                    main_callback(true);
+                    main_callback = function () {};
+                }
+                callback();
+            });
+        }, function (err) {
+            main_callback(false);
+        });
+    };
+    // any alias
+    async.any = async.some;
+
+    async.every = function (arr, iterator, main_callback) {
+        async.each(arr, function (x, callback) {
+            iterator(x, function (v) {
+                if (!v) {
+                    main_callback(false);
+                    main_callback = function () {};
+                }
+                callback();
+            });
+        }, function (err) {
+            main_callback(true);
+        });
+    };
+    // all alias
+    async.all = async.every;
+
+    async.sortBy = function (arr, iterator, callback) {
+        async.map(arr, function (x, callback) {
+            iterator(x, function (err, criteria) {
+                if (err) {
+                    callback(err);
+                }
+                else {
+                    callback(null, {value: x, criteria: criteria});
+                }
+            });
+        }, function (err, results) {
+            if (err) {
+                return callback(err);
+            }
+            else {
+                var fn = function (left, right) {
+                    var a = left.criteria, b = right.criteria;
+                    return a < b ? -1 : a > b ? 1 : 0;
+                };
+                callback(null, _map(results.sort(fn), function (x) {
+                    return x.value;
+                }));
+            }
+        });
+    };
+
+    async.auto = function (tasks, callback) {
+        callback = callback || function () {};
+        var keys = _keys(tasks);
+        var remainingTasks = keys.length
+        if (!remainingTasks) {
+            return callback();
+        }
+
+        var results = {};
+
+        var listeners = [];
+        var addListener = function (fn) {
+            listeners.unshift(fn);
+        };
+        var removeListener = function (fn) {
+            for (var i = 0; i < listeners.length; i += 1) {
+                if (listeners[i] === fn) {
+                    listeners.splice(i, 1);
+                    return;
+                }
+            }
+        };
+        var taskComplete = function () {
+            remainingTasks--
+            _each(listeners.slice(0), function (fn) {
+                fn();
+            });
+        };
+
+        addListener(function () {
+            if (!remainingTasks) {
+                var theCallback = callback;
+                // prevent final callback from calling itself if it errors
+                callback = function () {};
+
+                theCallback(null, results);
+            }
+        });
+
+        _each(keys, function (k) {
+            var task = _isArray(tasks[k]) ? tasks[k]: [tasks[k]];
+            var taskCallback = function (err) {
+                var args = Array.prototype.slice.call(arguments, 1);
+                if (args.length <= 1) {
+                    args = args[0];
+                }
+                if (err) {
+                    var safeResults = {};
+                    _each(_keys(results), function(rkey) {
+                        safeResults[rkey] = results[rkey];
+                    });
+                    safeResults[k] = args;
+                    callback(err, safeResults);
+                    // stop subsequent errors hitting callback multiple times
+                    callback = function () {};
+                }
+                else {
+                    results[k] = args;
+                    async.setImmediate(taskComplete);
+                }
+            };
+            var requires = task.slice(0, Math.abs(task.length - 1)) || [];
+            var ready = function () {
+                return _reduce(requires, function (a, x) {
+                    return (a && results.hasOwnProperty(x));
+                }, true) && !results.hasOwnProperty(k);
+            };
+            if (ready()) {
+                task[task.length - 1](taskCallback, results);
+            }
+            else {
+                var listener = function () {
+                    if (ready()) {
+                        removeListener(listener);
+                        task[task.length - 1](taskCallback, results);
+                    }
+                };
+                addListener(listener);
+            }
+        });
+    };
+
+    async.retry = function(times, task, callback) {
+        var DEFAULT_TIMES = 5;
+        var attempts = [];
+        // Use defaults if times not passed
+        if (typeof times === 'function') {
+            callback = task;
+            task = times;
+            times = DEFAULT_TIMES;
+        }
+        // Make sure times is a number
+        times = parseInt(times, 10) || DEFAULT_TIMES;
+        var wrappedTask = function(wrappedCallback, wrappedResults) {
+            var retryAttempt = function(task, finalAttempt) {
+                return function(seriesCallback) {
+                    task(function(err, result){
+                        seriesCallback(!err || finalAttempt, {err: err, result: result});
+                    }, wrappedResults);
+                };
+            };
+            while (times) {
+                attempts.push(retryAttempt(task, !(times-=1)));
+            }
+            async.series(attempts, function(done, data){
+                data = data[data.length - 1];
+                (wrappedCallback || callback)(data.err, data.result);
+            });
+        }
+        // If a callback is passed, run this as a controll flow
+        return callback ? wrappedTask() : wrappedTask
+    };
+
+    async.waterfall = function (tasks, callback) {
+        callback = callback || function () {};
+        if (!_isArray(tasks)) {
+          var err = new Error('First argument to waterfall must be an array of functions');
+          return callback(err);
+        }
+        if (!tasks.length) {
+            return callback();
+        }
+        var wrapIterator = function (iterator) {
+            return function (err) {
+                if (err) {
+                    callback.apply(null, arguments);
+                    callback = function () {};
+                }
+                else {
+                    var args = Array.prototype.slice.call(arguments, 1);
+                    var next = iterator.next();
+                    if (next) {
+                        args.push(wrapIterator(next));
+                    }
+                    else {
+                        args.push(callback);
+                    }
+                    async.setImmediate(function () {
+                        iterator.apply(null, args);
+                    });
+                }
+            };
+        };
+        wrapIterator(async.iterator(tasks))();
+    };
+
+    var _parallel = function(eachfn, tasks, callback) {
+        callback = callback || function () {};
+        if (_isArray(tasks)) {
+            eachfn.map(tasks, function (fn, callback) {
+                if (fn) {
+                    fn(function (err) {
+                        var args = Array.prototype.slice.call(arguments, 1);
+                        if (args.length <= 1) {
+                            args = args[0];
+                        }
+                        callback.call(null, err, args);
+                    });
+                }
+            }, callback);
+        }
+        else {
+            var results = {};
+            eachfn.each(_keys(tasks), function (k, callback) {
+                tasks[k](function (err) {
+                    var args = Array.prototype.slice.call(arguments, 1);
+                    if (args.length <= 1) {
+                        args = args[0];
+                    }
+                    results[k] = args;
+                    callback(err);
+                });
+            }, function (err) {
+                callback(err, results);
+            });
+        }
+    };
+
+    async.parallel = function (tasks, callback) {
+        _parallel({ map: async.map, each: async.each }, tasks, callback);
+    };
+
+    async.parallelLimit = function(tasks, limit, callback) {
+        _parallel({ map: _mapLimit(limit), each: _eachLimit(limit) }, tasks, callback);
+    };
+
+    async.series = function (tasks, callback) {
+        callback = callback || function () {};
+        if (_isArray(tasks)) {
+            async.mapSeries(tasks, function (fn, callback) {
+                if (fn) {
+                    fn(function (err) {
+                        var args = Array.prototype.slice.call(arguments, 1);
+                        if (args.length <= 1) {
+                            args = args[0];
+                        }
+                        callback.call(null, err, args);
+                    });
+                }
+            }, callback);
+        }
+        else {
+            var results = {};
+            async.eachSeries(_keys(tasks), function (k, callback) {
+                tasks[k](function (err) {
+                    var args = Array.prototype.slice.call(arguments, 1);
+                    if (args.length <= 1) {
+                        args = args[0];
+                    }
+                    results[k] = args;
+                    callback(err);
+                });
+            }, function (err) {
+                callback(err, results);
+            });
+        }
+    };
+
+    async.iterator = function (tasks) {
+        var makeCallback = function (index) {
+            var fn = function () {
+                if (tasks.length) {
+                    tasks[index].apply(null, arguments);
+                }
+                return fn.next();
+            };
+            fn.next = function () {
+                return (index < tasks.length - 1) ? makeCallback(index + 1): null;
+            };
+            return fn;
+        };
+        return makeCallback(0);
+    };
+
+    async.apply = function (fn) {
+        var args = Array.prototype.slice.call(arguments, 1);
+        return function () {
+            return fn.apply(
+                null, args.concat(Array.prototype.slice.call(arguments))
+            );
+        };
+    };
+
+    var _concat = function (eachfn, arr, fn, callback) {
+        var r = [];
+        eachfn(arr, function (x, cb) {
+            fn(x, function (err, y) {
+                r = r.concat(y || []);
+                cb(err);
+            });
+        }, function (err) {
+            callback(err, r);
+        });
+    };
+    async.concat = doParallel(_concat);
+    async.concatSeries = doSeries(_concat);
+
+    async.whilst = function (test, iterator, callback) {
+        if (test()) {
+            iterator(function (err) {
+                if (err) {
+                    return callback(err);
+                }
+                async.whilst(test, iterator, callback);
+            });
+        }
+        else {
+            callback();
+        }
+    };
+
+    async.doWhilst = function (iterator, test, callback) {
+        iterator(function (err) {
+            if (err) {
+                return callback(err);
+            }
+            var args = Array.prototype.slice.call(arguments, 1);
+            if (test.apply(null, args)) {
+                async.doWhilst(iterator, test, callback);
+            }
+            else {
+                callback();
+            }
+        });
+    };
+
+    async.until = function (test, iterator, callback) {
+        if (!test()) {
+            iterator(function (err) {
+                if (err) {
+                    return callback(err);
+                }
+                async.until(test, iterator, callback);
+            });
+        }
+        else {
+            callback();
+        }
+    };
+
+    async.doUntil = function (iterator, test, callback) {
+        iterator(function (err) {
+            if (err) {
+                return callback(err);
+            }
+            var args = Array.prototype.slice.call(arguments, 1);
+            if (!test.apply(null, args)) {
+                async.doUntil(iterator, test, callback);
+            }
+            else {
+                callback();
+            }
+        });
+    };
+
+    async.queue = function (worker, concurrency) {
+        if (concurrency === undefined) {
+            concurrency = 1;
+        }
+        function _insert(q, data, pos, callback) {
+          if (!q.started){
+            q.started = true;
+          }
+          if (!_isArray(data)) {
+              data = [data];
+          }
+          if(data.length == 0) {
+             // call drain immediately if there are no tasks
+             return async.setImmediate(function() {
+                 if (q.drain) {
+                     q.drain();
+                 }
+             });
+          }
+          _each(data, function(task) {
+              var item = {
+                  data: task,
+                  callback: typeof callback === 'function' ? callback : null
+              };
+
+              if (pos) {
+                q.tasks.unshift(item);
+              } else {
+                q.tasks.push(item);
+              }
+
+              if (q.saturated && q.tasks.length === q.concurrency) {
+                  q.saturated();
+              }
+              async.setImmediate(q.process);
+          });
+        }
+
+        var workers = 0;
+        var q = {
+            tasks: [],
+            concurrency: concurrency,
+            saturated: null,
+            empty: null,
+            drain: null,
+            started: false,
+            paused: false,
+            push: function (data, callback) {
+              _insert(q, data, false, callback);
+            },
+            kill: function () {
+              q.drain = null;
+              q.tasks = [];
+            },
+            unshift: function (data, callback) {
+              _insert(q, data, true, callback);
+            },
+            process: function () {
+                if (!q.paused && workers < q.concurrency && q.tasks.length) {
+                    var task = q.tasks.shift();
+                    if (q.empty && q.tasks.length === 0) {
+                        q.empty();
+                    }
+                    workers += 1;
+                    var next = function () {
+                        workers -= 1;
+                        if (task.callback) {
+                            task.callback.apply(task, arguments);
+                        }
+                        if (q.drain && q.tasks.length + workers === 0) {
+                            q.drain();
+                        }
+                        q.process();
+                    };
+                    var cb = only_once(next);
+                    worker(task.data, cb);
+                }
+            },
+            length: function () {
+                return q.tasks.length;
+            },
+            running: function () {
+                return workers;
+            },
+            idle: function() {
+                return q.tasks.length + workers === 0;
+            },
+            pause: function () {
+                if (q.paused === true) { return; }
+                q.paused = true;
+                q.process();
+            },
+            resume: function () {
+                if (q.paused === false) { return; }
+                q.paused = false;
+                q.process();
+            }
+        };
+        return q;
+    };
+    
+    async.priorityQueue = function (worker, concurrency) {
+        
+        function _compareTasks(a, b){
+          return a.priority - b.priority;
+        };
+        
+        function _binarySearch(sequence, item, compare) {
+          var beg = -1,
+              end = sequence.length - 1;
+          while (beg < end) {
+            var mid = beg + ((end - beg + 1) >>> 1);
+            if (compare(item, sequence[mid]) >= 0) {
+              beg = mid;
+            } else {
+              end = mid - 1;
+            }
+          }
+          return beg;
+        }
+        
+        function _insert(q, data, priority, callback) {
+          if (!q.started){
+            q.started = true;
+          }
+          if (!_isArray(data)) {
+              data = [data];
+          }
+          if(data.length == 0) {
+             // call drain immediately if there are no tasks
+             return async.setImmediate(function() {
+                 if (q.drain) {
+                     q.drain();
+                 }
+             });
+          }
+          _each(data, function(task) {
+              var item = {
+                  data: task,
+                  priority: priority,
+                  callback: typeof callback === 'function' ? callback : null
+              };
+              
+              q.tasks.splice(_binarySearch(q.tasks, item, _compareTasks) + 1, 0, item);
+
+              if (q.saturated && q.tasks.length === q.concurrency) {
+                  q.saturated();
+              }
+              async.setImmediate(q.process);
+          });
+        }
+        
+        // Start with a normal queue
+        var q = async.queue(worker, concurrency);
+        
+        // Override push to accept second parameter representing priority
+        q.push = function (data, priority, callback) {
+          _insert(q, data, priority, callback);
+        };
+        
+        // Remove unshift function
+        delete q.unshift;
+
+        return q;
+    };
+
+    async.cargo = function (worker, payload) {
+        var working     = false,
+            tasks       = [];
+
+        var cargo = {
+            tasks: tasks,
+            payload: payload,
+            saturated: null,
+            empty: null,
+            drain: null,
+            drained: true,
+            push: function (data, callback) {
+                if (!_isArray(data)) {
+                    data = [data];
+                }
+                _each(data, function(task) {
+                    tasks.push({
+                        data: task,
+                        callback: typeof callback === 'function' ? callback : null
+                    });
+                    cargo.drained = false;
+                    if (cargo.saturated && tasks.length === payload) {
+                        cargo.saturated();
+                    }
+                });
+                async.setImmediate(cargo.process);
+            },
+            process: function process() {
+                if (working) return;
+                if (tasks.length === 0) {
+                    if(cargo.drain && !cargo.drained) cargo.drain();
+                    cargo.drained = true;
+                    return;
+                }
+
+                var ts = typeof payload === 'number'
+                            ? tasks.splice(0, payload)
+                            : tasks.splice(0, tasks.length);
+
+                var ds = _map(ts, function (task) {
+                    return task.data;
+                });
+
+                if(cargo.empty) cargo.empty();
+                working = true;
+                worker(ds, function () {
+                    working = false;
+
+                    var args = arguments;
+                    _each(ts, function (data) {
+                        if (data.callback) {
+                            data.callback.apply(null, args);
+                        }
+                    });
+
+                    process();
+                });
+            },
+            length: function () {
+                return tasks.length;
+            },
+            running: function () {
+                return working;
+            }
+        };
+        return cargo;
+    };
+
+    var _console_fn = function (name) {
+        return function (fn) {
+            var args = Array.prototype.slice.call(arguments, 1);
+            fn.apply(null, args.concat([function (err) {
+                var args = Array.prototype.slice.call(arguments, 1);
+                if (typeof console !== 'undefined') {
+                    if (err) {
+                        if (console.error) {
+                            console.error(err);
+                        }
+                    }
+                    else if (console[name]) {
+                        _each(args, function (x) {
+                            console[name](x);
+                        });
+                    }
+                }
+            }]));
+        };
+    };
+    async.log = _console_fn('log');
+    async.dir = _console_fn('dir');
+    /*async.info = _console_fn('info');
+    async.warn = _console_fn('warn');
+    async.error = _console_fn('error');*/
+
+    async.memoize = function (fn, hasher) {
+        var memo = {};
+        var queues = {};
+        hasher = hasher || function (x) {
+            return x;
+        };
+        var memoized = function () {
+            var args = Array.prototype.slice.call(arguments);
+            var callback = args.pop();
+            var key = hasher.apply(null, args);
+            if (key in memo) {
+                async.nextTick(function () {
+                    callback.apply(null, memo[key]);
+                });
+            }
+            else if (key in queues) {
+                queues[key].push(callback);
+            }
+            else {
+                queues[key] = [callback];
+                fn.apply(null, args.concat([function () {
+                    memo[key] = arguments;
+                    var q = queues[key];
+                    delete queues[key];
+                    for (var i = 0, l = q.length; i < l; i++) {
+                      q[i].apply(null, arguments);
+                    }
+                }]));
+            }
+        };
+        memoized.memo = memo;
+        memoized.unmemoized = fn;
+        return memoized;
+    };
+
+    async.unmemoize = function (fn) {
+      return function () {
+        return (fn.unmemoized || fn).apply(null, arguments);
+      };
+    };
+
+    async.times = function (count, iterator, callback) {
+        var counter = [];
+        for (var i = 0; i < count; i++) {
+            counter.push(i);
+        }
+        return async.map(counter, iterator, callback);
+    };
+
+    async.timesSeries = function (count, iterator, callback) {
+        var counter = [];
+        for (var i = 0; i < count; i++) {
+            counter.push(i);
+        }
+        return async.mapSeries(counter, iterator, callback);
+    };
+
+    async.seq = function (/* functions... */) {
+        var fns = arguments;
+        return function () {
+            var that = this;
+            var args = Array.prototype.slice.call(arguments);
+            var callback = args.pop();
+            async.reduce(fns, args, function (newargs, fn, cb) {
+                fn.apply(that, newargs.concat([function () {
+                    var err = arguments[0];
+                    var nextargs = Array.prototype.slice.call(arguments, 1);
+                    cb(err, nextargs);
+                }]))
+            },
+            function (err, results) {
+                callback.apply(that, [err].concat(results));
+            });
+        };
+    };
+
+    async.compose = function (/* functions... */) {
+      return async.seq.apply(null, Array.prototype.reverse.call(arguments));
+    };
+
+    var _applyEach = function (eachfn, fns /*args...*/) {
+        var go = function () {
+            var that = this;
+            var args = Array.prototype.slice.call(arguments);
+            var callback = args.pop();
+            return eachfn(fns, function (fn, cb) {
+                fn.apply(that, args.concat([cb]));
+            },
+            callback);
+        };
+        if (arguments.length > 2) {
+            var args = Array.prototype.slice.call(arguments, 2);
+            return go.apply(this, args);
+        }
+        else {
+            return go;
+        }
+    };
+    async.applyEach = doParallel(_applyEach);
+    async.applyEachSeries = doSeries(_applyEach);
+
+    async.forever = function (fn, callback) {
+        function next(err) {
+            if (err) {
+                if (callback) {
+                    return callback(err);
+                }
+                throw err;
+            }
+            fn(next);
+        }
+        next();
+    };
+
+    // Node.js
+    if (typeof module !== 'undefined' && module.exports) {
+        module.exports = async;
+    }
+    // AMD / RequireJS
+    else if (typeof define !== 'undefined' && define.amd) {
+        define([], function () {
+            return async;
+        });
+    }
+    // included directly via <script> tag
+    else {
+        root.async = async;
+    }
+
+}());
+
+}).call(this,require("FWaASH"))
+},{"FWaASH":53}],46:[function(require,module,exports){
 // http://wiki.commonjs.org/wiki/Unit_Testing/1.0
 //
 // THIS IS NOT TESTED NOR LIKELY TO WORK OUTSIDE V8!
@@ -10733,7 +11950,7 @@ var objectKeys = Object.keys || function (obj) {
   return keys;
 };
 
-},{"util/":54}],46:[function(require,module,exports){
+},{"util/":55}],47:[function(require,module,exports){
 /*!
  * The buffer module from node.js, for the browser.
  *
@@ -11787,7 +13004,7 @@ function decodeUtf8Char (str) {
   }
 }
 
-},{"base64-js":47,"ieee754":48,"is-array":49}],47:[function(require,module,exports){
+},{"base64-js":48,"ieee754":49,"is-array":50}],48:[function(require,module,exports){
 var lookup = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
 
 ;(function (exports) {
@@ -11909,7 +13126,7 @@ var lookup = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
 	exports.fromByteArray = uint8ToBase64
 }(typeof exports === 'undefined' ? (this.base64js = {}) : exports))
 
-},{}],48:[function(require,module,exports){
+},{}],49:[function(require,module,exports){
 exports.read = function (buffer, offset, isLE, mLen, nBytes) {
   var e, m
   var eLen = nBytes * 8 - mLen - 1
@@ -11995,7 +13212,7 @@ exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
   buffer[offset + i - d] |= s * 128
 }
 
-},{}],49:[function(require,module,exports){
+},{}],50:[function(require,module,exports){
 
 /**
  * isArray
@@ -12030,7 +13247,7 @@ module.exports = isArray || function (val) {
   return !! val && '[object Array]' == str.call(val);
 };
 
-},{}],50:[function(require,module,exports){
+},{}],51:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -12333,7 +13550,7 @@ function isUndefined(arg) {
   return arg === void 0;
 }
 
-},{}],51:[function(require,module,exports){
+},{}],52:[function(require,module,exports){
 if (typeof Object.create === 'function') {
   // implementation from standard node.js 'util' module
   module.exports = function inherits(ctor, superCtor) {
@@ -12358,7 +13575,7 @@ if (typeof Object.create === 'function') {
   }
 }
 
-},{}],52:[function(require,module,exports){
+},{}],53:[function(require,module,exports){
 // shim for using process in browser
 
 var process = module.exports = {};
@@ -12423,14 +13640,14 @@ process.chdir = function (dir) {
     throw new Error('process.chdir is not supported');
 };
 
-},{}],53:[function(require,module,exports){
+},{}],54:[function(require,module,exports){
 module.exports = function isBuffer(arg) {
   return arg && typeof arg === 'object'
     && typeof arg.copy === 'function'
     && typeof arg.fill === 'function'
     && typeof arg.readUInt8 === 'function';
 }
-},{}],54:[function(require,module,exports){
+},{}],55:[function(require,module,exports){
 (function (process,global){
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -13020,7 +14237,7 @@ function hasOwnProperty(obj, prop) {
 }
 
 }).call(this,require("FWaASH"),typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./support/isBuffer":53,"FWaASH":52,"inherits":51}],55:[function(require,module,exports){
+},{"./support/isBuffer":54,"FWaASH":53,"inherits":52}],56:[function(require,module,exports){
 /**
  * Module dependencies.
  * @ignore
@@ -13365,7 +14582,7 @@ Binary.SUBTYPE_USER_DEFINED = 128;
  */
 module.exports = Binary;
 module.exports.Binary = Binary;
-},{"buffer":46}],56:[function(require,module,exports){
+},{"buffer":47}],57:[function(require,module,exports){
 (function (process){
 /**
  * Binary Parser.
@@ -13754,7 +14971,7 @@ BinaryParser.Buffer = BinaryParserBuffer;
 exports.BinaryParser = BinaryParser;
 
 }).call(this,require("FWaASH"))
-},{"FWaASH":52,"util":54}],57:[function(require,module,exports){
+},{"FWaASH":53,"util":55}],58:[function(require,module,exports){
 (function (Buffer){
 var Long = require('./long').Long
   , Double = require('./double').Double
@@ -15331,7 +16548,7 @@ exports.MinKey = MinKey;
 exports.MaxKey = MaxKey;
 
 }).call(this,require("buffer").Buffer)
-},{"./binary":55,"./binary_parser":56,"./code":58,"./db_ref":59,"./double":60,"./float_parser":61,"./long":62,"./max_key":63,"./min_key":64,"./objectid":65,"./symbol":66,"./timestamp":67,"buffer":46}],58:[function(require,module,exports){
+},{"./binary":56,"./binary_parser":57,"./code":59,"./db_ref":60,"./double":61,"./float_parser":62,"./long":63,"./max_key":64,"./min_key":65,"./objectid":66,"./symbol":67,"./timestamp":68,"buffer":47}],59:[function(require,module,exports){
 /**
  * A class representation of the BSON Code type.
  *
@@ -15356,7 +16573,7 @@ Code.prototype.toJSON = function() {
 
 module.exports = Code;
 module.exports.Code = Code;
-},{}],59:[function(require,module,exports){
+},{}],60:[function(require,module,exports){
 /**
  * A class representation of the BSON DBRef type.
  *
@@ -15389,7 +16606,7 @@ DBRef.prototype.toJSON = function() {
 
 module.exports = DBRef;
 module.exports.DBRef = DBRef;
-},{}],60:[function(require,module,exports){
+},{}],61:[function(require,module,exports){
 /**
  * A class representation of the BSON Double type.
  *
@@ -15423,7 +16640,7 @@ Double.prototype.toJSON = function() {
 
 module.exports = Double;
 module.exports.Double = Double;
-},{}],61:[function(require,module,exports){
+},{}],62:[function(require,module,exports){
 // Copyright (c) 2008, Fair Oaks Labs, Inc.
 // All rights reserved.
 // 
@@ -15545,7 +16762,7 @@ var writeIEEE754 = function(buffer, value, offset, endian, mLen, nBytes) {
 
 exports.readIEEE754 = readIEEE754;
 exports.writeIEEE754 = writeIEEE754;
-},{}],62:[function(require,module,exports){
+},{}],63:[function(require,module,exports){
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -16402,7 +17619,7 @@ Long.TWO_PWR_24_ = Long.fromInt(1 << 24);
  */
 module.exports = Long;
 module.exports.Long = Long;
-},{}],63:[function(require,module,exports){
+},{}],64:[function(require,module,exports){
 /**
  * A class representation of the BSON MaxKey type.
  *
@@ -16417,7 +17634,7 @@ function MaxKey() {
 
 module.exports = MaxKey;
 module.exports.MaxKey = MaxKey;
-},{}],64:[function(require,module,exports){
+},{}],65:[function(require,module,exports){
 /**
  * A class representation of the BSON MinKey type.
  *
@@ -16432,7 +17649,7 @@ function MinKey() {
 
 module.exports = MinKey;
 module.exports.MinKey = MinKey;
-},{}],65:[function(require,module,exports){
+},{}],66:[function(require,module,exports){
 (function (process){
 /**
  * Module dependencies.
@@ -16709,7 +17926,7 @@ module.exports = ObjectID;
 module.exports.ObjectID = ObjectID;
 module.exports.ObjectId = ObjectID;
 }).call(this,require("FWaASH"))
-},{"./binary_parser":56,"FWaASH":52}],66:[function(require,module,exports){
+},{"./binary_parser":57,"FWaASH":53}],67:[function(require,module,exports){
 /**
  * A class representation of the BSON Symbol type.
  *
@@ -16757,7 +17974,7 @@ Symbol.prototype.toJSON = function() {
 
 module.exports = Symbol;
 module.exports.Symbol = Symbol;
-},{}],67:[function(require,module,exports){
+},{}],68:[function(require,module,exports){
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -17614,7 +18831,7 @@ Timestamp.TWO_PWR_24_ = Timestamp.fromInt(1 << 24);
  */
 module.exports = Timestamp;
 module.exports.Timestamp = Timestamp;
-},{}],68:[function(require,module,exports){
+},{}],69:[function(require,module,exports){
 // TODO Add in pre and post skipping options
 module.exports = {
   /**
@@ -17807,7 +19024,7 @@ function once (fn, scope) {
   };
 }
 
-},{}],69:[function(require,module,exports){
+},{}],70:[function(require,module,exports){
 (function (process){
 'use strict';
 
@@ -18040,10 +19257,10 @@ Kareem.prototype.clone = function() {
 module.exports = Kareem;
 
 }).call(this,require("FWaASH"))
-},{"FWaASH":52}],70:[function(require,module,exports){
+},{"FWaASH":53}],71:[function(require,module,exports){
 module.exports = exports = require('./lib');
 
-},{"./lib":71}],71:[function(require,module,exports){
+},{"./lib":72}],72:[function(require,module,exports){
 
 /**
  * Returns the value of object `o` at the given `path`.
@@ -18228,7 +19445,7 @@ function K (v) {
   return v;
 }
 
-},{}],72:[function(require,module,exports){
+},{}],73:[function(require,module,exports){
 (function (process){
 'use strict';
 var util = require('util');
@@ -18672,7 +19889,7 @@ Promise.deferred = function deferred() {
 
 
 }).call(this,require("FWaASH"))
-},{"FWaASH":52,"events":50,"util":54}],73:[function(require,module,exports){
+},{"FWaASH":53,"events":51,"util":55}],74:[function(require,module,exports){
 'use strict';
 
 /**
@@ -18716,7 +19933,7 @@ function notImplemented (method) {
 }
 
 
-},{}],74:[function(require,module,exports){
+},{}],75:[function(require,module,exports){
 'use strict';
 
 var env = require('../env')
@@ -18731,7 +19948,7 @@ module.exports =
   require('./collection');
 
 
-},{"../env":76,"./collection":73,"./node":75}],75:[function(require,module,exports){
+},{"../env":77,"./collection":74,"./node":76}],76:[function(require,module,exports){
 'use strict';
 
 /**
@@ -18833,7 +20050,7 @@ NodeCollection.prototype.findStream = function(match, findOptions, streamOptions
 module.exports = exports = NodeCollection;
 
 
-},{"../utils":79,"./collection":73}],76:[function(require,module,exports){
+},{"../utils":80,"./collection":74}],77:[function(require,module,exports){
 (function (process,global,Buffer){
 'use strict';
 
@@ -18859,7 +20076,7 @@ exports.type = exports.isNode ? 'node'
   : 'unknown'
 
 }).call(this,require("FWaASH"),typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer)
-},{"FWaASH":52,"buffer":46}],77:[function(require,module,exports){
+},{"FWaASH":53,"buffer":47}],78:[function(require,module,exports){
 'use strict';
 
 /**
@@ -21471,7 +22688,7 @@ module.exports = exports = Query;
 // TODO
 // test utils
 
-},{"./collection":74,"./collection/collection":73,"./env":76,"./permissions":78,"./utils":79,"assert":45,"bluebird":80,"debug":81,"sliced":86,"util":54}],78:[function(require,module,exports){
+},{"./collection":75,"./collection/collection":74,"./env":77,"./permissions":79,"./utils":80,"assert":46,"bluebird":81,"debug":82,"sliced":87,"util":55}],79:[function(require,module,exports){
 'use strict';
 
 var denied = exports;
@@ -21563,7 +22780,7 @@ denied.count.maxScan =
 denied.count.snapshot =
 denied.count.tailable = true;
 
-},{}],79:[function(require,module,exports){
+},{}],80:[function(require,module,exports){
 (function (process,Buffer){
 'use strict';
 
@@ -21898,7 +23115,7 @@ exports.cloneBuffer = function (buff) {
 };
 
 }).call(this,require("FWaASH"),require("buffer").Buffer)
-},{"FWaASH":52,"buffer":46,"regexp-clone":85}],80:[function(require,module,exports){
+},{"FWaASH":53,"buffer":47,"regexp-clone":86}],81:[function(require,module,exports){
 (function (process,global){
 /* @preserve
  * The MIT License (MIT)
@@ -27006,7 +28223,7 @@ function isUndefined(arg) {
 },{}]},{},[4])(4)
 });                    ;if (typeof window !== 'undefined' && window !== null) {                               window.P = window.Promise;                                                     } else if (typeof self !== 'undefined' && self !== null) {                             self.P = self.Promise;                                                         }
 }).call(this,require("FWaASH"),typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"FWaASH":52}],81:[function(require,module,exports){
+},{"FWaASH":53}],82:[function(require,module,exports){
 
 /**
  * This is the web browser implementation of `debug()`.
@@ -27176,7 +28393,7 @@ function localstorage(){
   } catch (e) {}
 }
 
-},{"./debug":82}],82:[function(require,module,exports){
+},{"./debug":83}],83:[function(require,module,exports){
 
 /**
  * This is the common logic for both the Node.js and web browser
@@ -27375,7 +28592,7 @@ function coerce(val) {
   return val;
 }
 
-},{"ms":83}],83:[function(require,module,exports){
+},{"ms":84}],84:[function(require,module,exports){
 /**
  * Helpers.
  */
@@ -27502,7 +28719,7 @@ function plural(ms, n, name) {
   return Math.ceil(ms / n) + ' ' + name + 's';
 }
 
-},{}],84:[function(require,module,exports){
+},{}],85:[function(require,module,exports){
 /**
 
 # ms.js
@@ -27539,7 +28756,7 @@ No more painful `setTimeout(fn, 60 * 4 * 3 * 2 * 1 * Infinity * NaN * '☃')`.
   g.top ? g.ms = ms : module.exports = ms;
 })(this);
 
-},{}],85:[function(require,module,exports){
+},{}],86:[function(require,module,exports){
 
 var toString = Object.prototype.toString;
 
@@ -27561,10 +28778,10 @@ module.exports = exports = function (regexp) {
 }
 
 
-},{}],86:[function(require,module,exports){
+},{}],87:[function(require,module,exports){
 module.exports = exports = require('./lib/sliced');
 
-},{"./lib/sliced":87}],87:[function(require,module,exports){
+},{"./lib/sliced":88}],88:[function(require,module,exports){
 
 /**
  * An Array.prototype.slice.call(arguments) alternative

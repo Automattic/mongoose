@@ -6,8 +6,7 @@
 var start = require('./common')
   , mongoose = start.mongoose
   , assert = require('assert')
-  , random = require('../lib/utils').random
-  , Schema = mongoose.Schema
+  , Schema = mongoose.Schema;
 
 /**
  * Test.
@@ -15,11 +14,11 @@ var start = require('./common')
 
 describe('schema.documentarray', function(){
   it('defaults should be preserved', function(done){
-    var child = new Schema({ title: String })
+    var child = new Schema({ title: String });
 
     var schema1 = new Schema({ x: { type: [child], default: [{ title: 'Prometheus'}] }});
     var schema2 = new Schema({ x: { type: [child], default: { title: 'Prometheus'} }});
-    var schema3 = new Schema({ x: { type: [child], default: function(){return [{ title: 'Prometheus'}]} }});
+    var schema3 = new Schema({ x: { type: [child], default: function(){return [{ title: 'Prometheus'}];} }});
 
     var M = mongoose.model('DefaultDocArrays1', schema1);
     var N = mongoose.model('DefaultDocArrays2', schema2);
@@ -32,5 +31,5 @@ describe('schema.documentarray', function(){
       assert.equal('Prometheus', m.x[0].title);
     });
     done();
-  })
-})
+  });
+});

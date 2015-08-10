@@ -1,7 +1,6 @@
 
 var start = require('./common');
 var mongoose = start.mongoose;
-var assert = require('assert');
 
 describe('connection: manual reconnect with authReconnect: false', function(){
   it('should continue processing queries/writes', function(done){
@@ -25,27 +24,27 @@ describe('connection: manual reconnect with authReconnect: false', function(){
       ++times;
       open = true;
       hit();
-    })
+    });
 
     db.on('disconnected', function () {
       open = false;
       setTimeout(function () {
         db.open(start.uri, { server: { auto_reconnect: false }});
       }, 30);
-    })
+    });
 
     function hit () {
       if (!open) return;
       M.create({ name: times }, function (err, doc) {
         if (err) return complete(err);
-        M.findOne({ _id: doc._id }, function (err, found) {
+        M.findOne({ _id: doc._id }, function (err) {
           if (err) return complete(err);
           if (times > 1) {
             return complete();
           }
           shutdownMongo();
-        })
-      })
+        });
+      });
     }
 
     function shutdownMongo () {
@@ -57,5 +56,5 @@ describe('connection: manual reconnect with authReconnect: false', function(){
       complete.ran = 1;
       done(err);
     }
-  })
-})
+  });
+});

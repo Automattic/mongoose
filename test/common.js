@@ -4,10 +4,8 @@
  */
 
 var mongoose = require('../')
-  , Mongoose = mongoose.Mongoose
   , Collection = mongoose.Collection
   , assert = require('assert')
-  , startTime = Date.now()
   , queryCount = 0
   , opened = 0
   , closed = 0;
@@ -120,7 +118,7 @@ module.exports.mongodVersion = function (cb) {
     var admin = db.db.admin();
     admin.serverStatus(function (err, info) {
       if (err) return cb(err);
-      var version = info.version.split('.').map(function(n){return parseInt(n, 10) });
+      var version = info.version.split('.').map(function(n){return parseInt(n, 10); });
       cb(null, version);
     });
   });
@@ -138,7 +136,7 @@ function dropDBs(done) {
         if (!mongos) return done();
 
 
-        var db = start({ uri: mongos, mongos: true });
+        var db = mongoose.connect(mongos, {mongos: true });
         db.once('open', function () {
           db.db.dropDatabase(done);
         });

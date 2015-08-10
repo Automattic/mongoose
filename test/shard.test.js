@@ -3,7 +3,6 @@ var start = require('./common')
   , assert = require('assert')
   , random = require('../lib/utils').random
   , mongoose = start.mongoose
-  , Mongoose = mongoose.Mongoose
   , Schema = mongoose.Schema;
 
 var uri = process.env.MONGOOSE_SHARD_TEST_URI;
@@ -16,7 +15,7 @@ if (!uri) {
             , '\033[39m');
 
   // let expresso shut down this test
-  exports.r = function expressoHack(){}
+  exports.r = function expressoHack(){};
   return;
 }
 
@@ -46,7 +45,7 @@ describe('shard', function(){
           + '\n'
           + '    Are you sure there is a db running at '
           + uri + ' ?'
-          + '\n'
+          + '\n';
       }
       return done(err);
     });
@@ -79,7 +78,7 @@ describe('shard', function(){
             admin.serverStatus(function (err, info) {
               db.close();
               assert.ifError(err);
-              version = info.version.split('.').map(function(n){return parseInt(n, 10) });
+              version = info.version.split('.').map(function(n){return parseInt(n, 10); });
               greaterThan20x = 2 < version[0] || 2==version[0] && 0<version[0];
               done();
             });
@@ -90,7 +89,7 @@ describe('shard', function(){
   });
 
   it('can read and write to a shard', function (done) {
-    var db = start({ uri:  uri })
+    var db = start({ uri:  uri });
     var P = db.model('ShardPerson', collection);
 
     P.create({ name: 'ryu', age: 25, likes: ['street fighting']}, function (err, ryu) {
@@ -102,10 +101,10 @@ describe('shard', function(){
         done();
       });
     });
-  })
+  });
 
   it('save() and remove() works with shard keys transparently', function (done) {
-    var db = start({ uri:  uri })
+    var db = start({ uri:  uri });
     var P = db.model('ShardPerson', collection);
 
     var zangief = new P({ name: 'Zangief', age: 33 });
@@ -142,15 +141,15 @@ describe('shard', function(){
         });
       });
     });
-  })
+  });
 
   it('inserting to a sharded collection without the full shard key fails', function (done) {
-    var db = start({ uri:  uri })
+    var db = start({ uri:  uri });
     var P = db.model('ShardPerson', collection);
 
     var pending = 6;
 
-    P.create({ name: 'ryu', likes: ['street fighting']}, function (err, ryu) {
+    P.create({ name: 'ryu', likes: ['street fighting']}, function (err) {
       assert.ok(err);
       assert.ok(err.message);
       if (!--pending) {
@@ -159,7 +158,7 @@ describe('shard', function(){
       }
     });
 
-    P.create({ likes: ['street fighting']}, function (err, ryu) {
+    P.create({ likes: ['street fighting']}, function (err) {
       assert.ok(err);
       assert.ok(err.message);
       if (!--pending) {
@@ -168,7 +167,7 @@ describe('shard', function(){
       }
     });
 
-    P.create({ name: 'ryu' }, function (err, ryu) {
+    P.create({ name: 'ryu' }, function (err) {
       assert.ok(err);
       assert.ok(err.message);
       if (!--pending) {
@@ -177,7 +176,7 @@ describe('shard', function(){
       }
     });
 
-    P.create({ age: 49 }, function (err, ryu) {
+    P.create({ age: 49 }, function (err) {
       assert.ok(err);
       assert.ok(err.message);
       if (!--pending) {
@@ -186,7 +185,7 @@ describe('shard', function(){
       }
     });
 
-    P.create({ likes: ['street fighting'], age: 8 }, function (err, ryu) {
+    P.create({ likes: ['street fighting'], age: 8 }, function (err) {
       assert.ok(err);
       assert.ok(err.message);
       if (!--pending) {
@@ -207,7 +206,7 @@ describe('shard', function(){
   });
 
   it('updating a sharded collection without the full shard key fails', function (done) {
-    var db = start({ uri:  uri })
+    var db = start({ uri:  uri });
     var P = db.model('ShardPerson', collection);
 
     P.create({ name: 'ken', age: 27 }, function (err, ken) {
@@ -241,10 +240,10 @@ describe('shard', function(){
         });
       });
     });
-  })
+  });
 
   it('updating shard key values fails', function (done) {
-    var db = start({ uri:  uri })
+    var db = start({ uri:  uri });
     var P = db.model('ShardPerson', collection);
     P.create({ name: 'chun li', age: 19, likes: ['street fighting']}, function (err, chunli) {
       assert.ifError(err);
@@ -277,12 +276,12 @@ describe('shard', function(){
   });
 
   it('allows null shard key values', function (done) {
-    var db = start({ uri:  uri })
+    var db = start({ uri:  uri });
     var P = db.model('ShardPerson', collection);
 
     P.create({ name: null, age: 27 }, function (err, ken) {
       assert.ifError(err);
-      P.findById(ken, function (err, ken) {
+      P.findById(ken, function (err) {
         assert.ifError(err);
         done();
       });
@@ -290,12 +289,12 @@ describe('shard', function(){
   });
 
   after(function (done) {
-    var db = start({ uri:  uri })
+    var db = start({ uri:  uri });
     var P = db.model('ShardPerson', collection);
-    P.collection.drop(function (err) {
+    P.collection.drop(function () {
       db.close();
       done();
     });
   });
 
-})
+});

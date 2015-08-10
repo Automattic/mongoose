@@ -729,9 +729,9 @@ describe('model', function() {
 
         Garage.create({name: 'My', num_of_places: 3}, function(err, garage){
           assert.ifError(err);
-          Car.create({ speed: 160, garage: garage }, function(err, car) {
+          Car.create({ speed: 160, garage: garage }, function(err) {
             assert.ifError(err);
-            Bus.create({ speed: 80, garage: garage }, function(err, bus) {
+            Bus.create({ speed: 80, garage: garage }, function(err) {
               assert.ifError(err);
               Vehicle.find({}).populate('garage').exec(function(err, vehicles){
                 assert.ifError(err);
@@ -742,10 +742,10 @@ describe('model', function() {
 
                 done();
               });
-            })
+            });
           });
         });
-      })
+      });
 
       it('reference in child schemas (gh-2719-2)', function(done){
         var EventSchema, Event, TalkSchema, Talk, Survey;
@@ -804,9 +804,9 @@ describe('model', function() {
 
               done();
             });
-          })
+          });
         });
-      })
+      });
     });
 
     describe('aggregate', function() {
@@ -829,13 +829,13 @@ describe('model', function() {
       describe('using "RootModel#aggregate"', function() {
         it('to aggregate documents of all discriminators', function(done) {
           var aggregate = BaseEvent.aggregate([
-            { $match: { name: 'Test Event' } },
+            { $match: { name: 'Test Event' } }
           ]);
 
           aggregate.exec(function(err, docs) {
             assert.ifError(err);
             assert.deepEqual(aggregate._pipeline, [
-              { $match: { name: 'Test Event' } },
+              { $match: { name: 'Test Event' } }
             ]);
             assert.equal(docs.length, 2);
             done();
@@ -846,7 +846,7 @@ describe('model', function() {
       describe('using "ModelDiscriminator#aggregate"', function() {
         it('only aggregates documents of the appropriate discriminator', function(done) {
           var aggregate = ImpressionEvent.aggregate([
-            { $group: { _id: '$__t', count: { $sum: 1 } } },
+            { $group: { _id: '$__t', count: { $sum: 1 } } }
           ]);
 
           aggregate.exec(function(err, result) {
@@ -858,7 +858,7 @@ describe('model', function() {
             // discriminators be executed
             assert.deepEqual(aggregate._pipeline, [
               { $match: { __t: 'model-discriminator-querying-impression' } },
-              { $group: { _id: '$__t', count: { $sum: 1 } } },
+              { $group: { _id: '$__t', count: { $sum: 1 } } }
             ]);
 
             assert.equal(result.length, 1);
@@ -871,7 +871,7 @@ describe('model', function() {
 
         it('merges the first pipeline stages if applicable', function(done) {
           var aggregate = ImpressionEvent.aggregate([
-            { $match: { name: 'Test Event' } },
+            { $match: { name: 'Test Event' } }
           ]);
 
           aggregate.exec(function(err, result) {
@@ -882,7 +882,7 @@ describe('model', function() {
             // aggregations with empty pipelines, but that are over
             // discriminators be executed
             assert.deepEqual(aggregate._pipeline, [
-              { $match: { __t: 'model-discriminator-querying-impression', name: 'Test Event' } },
+              { $match: { __t: 'model-discriminator-querying-impression', name: 'Test Event' } }
             ]);
 
             assert.equal(result.length, 1);

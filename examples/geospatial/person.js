@@ -18,7 +18,7 @@ module.exports = function() {
 
   // define a method to find the closest person
   PersonSchema.methods.findClosest = function(cb) {
-    return this.model('Person').find({ 
+    return this.model('Person').find({
         loc : { $nearSphere : this.loc },
         name : { $ne : this.name }
       }).limit(1).exec(cb);

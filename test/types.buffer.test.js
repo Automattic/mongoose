@@ -8,7 +8,7 @@ var start = require('./common')
   , mongoose = require('./common').mongoose
   , Schema = mongoose.Schema
   , random = require('../lib/utils').random
-  , MongooseBuffer = mongoose.Types.Buffer
+  , MongooseBuffer = mongoose.Types.Buffer;
 
 function valid (v) {
   return !v || v.length > 10;
@@ -44,7 +44,7 @@ describe('types.buffer', function(){
     assert.ok(a.isMongooseBuffer);
     assert.equal(true, Buffer.isBuffer(a));
 
-    var a = new MongooseBuffer([195, 188, 98, 101, 114]);
+    a = new MongooseBuffer([195, 188, 98, 101, 114]);
     var b = new MongooseBuffer("buffer shtuffs are neat");
     var c = new MongooseBuffer('aGVsbG8gd29ybGQ=', 'base64');
     var d = new MongooseBuffer(0);
@@ -169,7 +169,7 @@ describe('types.buffer', function(){
             assert.equal('e3thYSo=', tj.required.toString('base64'));
 
             function not (tj) {
-              assert.equal(false, tj.isModified('required'))
+              assert.equal(false, tj.isModified('required'));
             }
 
             function is (tj) {
@@ -340,7 +340,7 @@ describe('types.buffer', function(){
 
             var keys = Object.keys(fns)
               , i = keys.length
-              , key
+              , key;
 
             while (i--) {
               key = keys[i];
@@ -375,10 +375,10 @@ describe('types.buffer', function(){
         assert.equal(1, doc.array.length);
         assert.equal(null, doc.array[0]);
         done();
-      })
-    })
+      });
+    });
 
-  })
+  });
 
   describe('#toObject', function(){
     it('retains custom subtypes', function(done){
@@ -387,8 +387,8 @@ describe('types.buffer', function(){
       // validate the drivers Binary type output retains the option
       assert.equal(out.sub_type, 2);
       done();
-    })
-  })
+    });
+  });
 
   describe('subtype', function(){
     var db, bufferSchema, B;
@@ -398,24 +398,24 @@ describe('types.buffer', function(){
       bufferSchema = new Schema({ buf: Buffer });
       B = db.model('1571', bufferSchema);
       done();
-    })
+    });
 
     after(function(done){
       db.close(done);
-    })
+    });
 
     it('default value', function(done){
       var b = new B({ buf: new Buffer('hi') });
       assert.strictEqual(0, b.buf._subtype);
       done();
-    })
+    });
 
     it('method works', function(done){
       var b = new B({ buf: new Buffer('hi') });
       b.buf.subtype(128);
       assert.strictEqual(128, b.buf._subtype);
       done();
-    })
+    });
 
     it('is stored', function(done){
       var b = new B({ buf: new Buffer('hi') });
@@ -426,9 +426,9 @@ describe('types.buffer', function(){
           if (err) return done(err);
           assert.equal(128, doc.buf._subtype);
           done();
-        })
-      })
-    })
+        });
+      });
+    });
 
     it('changes are retained', function(done){
       var b = new B({ buf: new Buffer('hi') });
@@ -445,10 +445,10 @@ describe('types.buffer', function(){
               if (err) return done(err);
               assert.strictEqual(0, doc.buf._subtype);
               done();
-            })
-          })
-        })
-      })
-    })
-  })
-})
+            });
+          });
+        });
+      });
+    });
+  });
+});

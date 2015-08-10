@@ -8,7 +8,6 @@ var start = require('./common')
   , mongoose = start.mongoose
   , random = require('../lib/utils').random
   , Schema = mongoose.Schema
-  , SchemaType = mongoose.SchemaType
   , ObjectId = Schema.Types.ObjectId
   , MongooseBuffer = mongoose.Types.Buffer
   , DocumentObjectId = mongoose.Types.ObjectId
@@ -65,8 +64,8 @@ describe('model: querying:', function(){
       mongo26_or_greater = 2 < version[0] || (2 == version[0] && 6 <= version[1]);
       if (!mongo26_or_greater) console.log('not testing mongodb 2.6 features');
       done();
-    })
-  })
+    });
+  });
 
   it('find returns a Query', function(done){
     var db = start()
@@ -114,11 +113,11 @@ describe('model: querying:', function(){
 
   it('an empty find does not hang', function(done){
     var db = start()
-      , BlogPostB = db.model('BlogPostB', collection)
+      , BlogPostB = db.model('BlogPostB', collection);
 
     function fn () {
       db.close(done);
-    };
+    }
 
     BlogPostB.find({}, fn);
   });
@@ -132,7 +131,7 @@ describe('model: querying:', function(){
     function fn () {
       if (--count) return;
       db.close(done);
-    };
+    }
 
     // query
     assert.ok(BlogPostB.find(q, fn) instanceof Query);
@@ -160,7 +159,7 @@ describe('model: querying:', function(){
       if (--count) return;
       db.close();
       done();
-    };
+    }
 
     // query
     assert.ok(BlogPostB.findOne(q, fn) instanceof Query);
@@ -190,13 +189,13 @@ describe('model: querying:', function(){
     it('Query executes when you pass a callback', function(done){
       var db = start()
         , BlogPostB = db.model('BlogPostB', collection)
-        , pending = 2
+        , pending = 2;
 
       function fn () {
         if (--pending) return;
         db.close();
         done();
-      };
+      }
 
       assert.ok(BlogPostB.count({}, fn) instanceof Query);
       assert.ok(BlogPostB.count(fn) instanceof Query);
@@ -230,7 +229,7 @@ describe('model: querying:', function(){
           });
         });
       });
-    })
+    });
   });
 
   describe('distinct', function(){
@@ -248,7 +247,7 @@ describe('model: querying:', function(){
       var Address = new Schema({ zip: String });
       Address = db.model('Address', Address, 'addresses_' + random());
 
-      Address.create({ zip: '10010'}, { zip: '10010'}, { zip: '99701'}, function (err, a1, a2, a3) {
+      Address.create({ zip: '10010'}, { zip: '10010'}, { zip: '99701'}, function (err) {
         assert.strictEqual(null, err);
         var query = Address.distinct('zip', {}, function (err, results) {
           assert.ifError(err);
@@ -265,9 +264,9 @@ describe('model: querying:', function(){
       var db = start();
       var Address = new Schema({ zip: String });
       Address = db.model('Address', Address, 'addresses_' + random());
-      Address.create({ zip: '10010'}, { zip: '10010'}, { zip: '99701'}, function (err, a1, a2, a3) {
+      Address.create({ zip: '10010'}, { zip: '10010'}, { zip: '99701'}, function (err) {
         assert.ifError(err);
-        var query = Address.distinct('zip', function (err, results) {
+        Address.distinct('zip', function (err, results) {
           assert.ifError(err);
           assert.equal(2, results.length);
           assert.ok(results.indexOf('10010') > -1);
@@ -275,7 +274,7 @@ describe('model: querying:', function(){
           db.close(done);
         });
       });
-    })
+    });
   });
 
   describe('update', function(){
@@ -298,11 +297,11 @@ describe('model: querying:', function(){
         if (--count) return;
         db.close();
         done();
-      };
+      }
 
       assert.ok(BlogPostB.update({title: random()}, {}, fn) instanceof Query);
       assert.ok(BlogPostB.update({title: random()}, {}, {}, fn) instanceof Query);
-    })
+    });
   });
 
   describe('findOne', function () {
@@ -351,7 +350,7 @@ describe('model: querying:', function(){
           done();
         });
       });
-    })
+    });
 
     it('querying if an array contains one of multiple members $in a set', function(done){
       var db = start()
@@ -380,7 +379,7 @@ describe('model: querying:', function(){
 
     it('querying if an array contains one of multiple members $in a set 2', function(done){
       var db = start()
-        , BlogPostA = db.model('BlogPostB', collection)
+        , BlogPostA = db.model('BlogPostB', collection);
 
       var post = new BlogPostA({ tags: ['gooberOne'] });
 
@@ -413,7 +412,7 @@ describe('model: querying:', function(){
         db.close();
         done();
       }
-    })
+    });
 
     it('querying via $where a string', function(done){
       var db = start()
@@ -449,7 +448,7 @@ describe('model: querying:', function(){
           done();
         });
       });
-    })
+    });
 
     it('based on nested fields', function(done){
       var db = start()
@@ -472,7 +471,7 @@ describe('model: querying:', function(){
           done();
         });
       });
-    })
+    });
 
     it('based on embedded doc fields (gh-242, gh-463)', function(done){
       var db = start()
@@ -503,7 +502,7 @@ describe('model: querying:', function(){
           });
         });
       });
-    })
+    });
 
     it('works with nested docs and string ids (gh-389)', function(done){
       var db = start()
@@ -520,16 +519,15 @@ describe('model: querying:', function(){
           done();
         });
       });
-    })
+    });
 
     it('using #all with nested #elemMatch', function(done){
       var db = start()
         , P = db.model('BlogPostB', collection + '_nestedElemMatch');
 
       var post = new P({ title: "nested elemMatch" });
-      post.comments.push({ title: 'comment A' }, { title: 'comment B' }, { title: 'comment C' })
+      post.comments.push({ title: 'comment A' }, { title: 'comment B' }, { title: 'comment C' });
 
-      var id0 = post.comments[0]._id;
       var id1 = post.comments[1]._id;
       var id2 = post.comments[2]._id;
 
@@ -553,11 +551,9 @@ describe('model: querying:', function(){
         , P = db.model('BlogPostB', collection);
 
       var post = new P({ title: "nested elemMatch" });
-      post.comments.push({ title: 'comment D' }, { title: 'comment E' }, { title: 'comment F' })
+      post.comments.push({ title: 'comment D' }, { title: 'comment E' }, { title: 'comment F' });
 
-      var id0 = post.comments[0]._id;
       var id1 = post.comments[1]._id;
-      var id2 = post.comments[2]._id;
 
       post.save(function (err) {
         assert.ifError(err);
@@ -587,7 +583,7 @@ describe('model: querying:', function(){
           found.id;
           assert.equal(found._id.toString(), created._id);
           var query = { sigs: { "$in" : [new Buffer([3, 3, 3]), new Buffer([4, 5, 6])] } };
-          BlogPostB.findOne(query, function (err, found) {
+          BlogPostB.findOne(query, function (err) {
             assert.ifError(err);
             db.close();
             done();
@@ -598,9 +594,9 @@ describe('model: querying:', function(){
 
     it('regex with Array (gh-599)', function(done){
       var db = start()
-        , B = db.model('BlogPostB', random())
+        , B = db.model('BlogPostB', random());
 
-      B.create({ tags: 'wooof baaaark meeeeow'.split(' ') }, function (err, b) {
+      B.create({ tags: 'wooof baaaark meeeeow'.split(' ') }, function (err) {
         assert.ifError(err);
         B.findOne({ tags: /ooof$/ }, function (err, doc) {
           assert.ifError(err);
@@ -620,7 +616,7 @@ describe('model: querying:', function(){
 
     it('regex with options', function(done){
       var db = start()
-        , B = db.model('BlogPostB', collection)
+        , B = db.model('BlogPostB', collection);
 
       var post = new B({ title: '$option queries' });
       post.save(function (err) {
@@ -630,7 +626,7 @@ describe('model: querying:', function(){
           assert.strictEqual(null, err, err && err.stack);
           assert.equal(doc.id, post.id);
           done();
-        })
+        });
       });
     });
 
@@ -638,7 +634,7 @@ describe('model: querying:', function(){
       var db = start()
         , BlogPostB = db.model('BlogPostB', collection)
         , id1 = new DocumentObjectId
-        , id2 = new DocumentObjectId
+        , id2 = new DocumentObjectId;
 
       BlogPostB.create({owners: [id1, id2]}, function (err, created) {
         assert.ifError(err);
@@ -650,7 +646,7 @@ describe('model: querying:', function(){
           done();
         });
       });
-    })
+    });
   });
 
   describe('findById', function () {
@@ -889,9 +885,9 @@ describe('model: querying:', function(){
       var id3 = new DocumentObjectId;
       var id4 = new DocumentObjectId;
 
-      NE.create({ ids: [id1, id4], b: id3 }, function (err, ne1) {
+      NE.create({ ids: [id1, id4], b: id3 }, function (err) {
         assert.ifError(err);
-        NE.create({ ids: [id2, id4], b: id3 },function (err, ne2) {
+        NE.create({ ids: [id2, id4], b: id3 },function (err) {
           assert.ifError(err);
 
           var query = NE.find({ 'b': id3.toString(), 'ids': { $ne: id1 }});
@@ -899,10 +895,10 @@ describe('model: querying:', function(){
             assert.ifError(err);
             assert.equal(1, nes1.length);
 
-            NE.find({ b: { $ne: [1] }}, function (err, nes2) {
+            NE.find({ b: { $ne: [1] }}, function (err) {
               assert.equal("Cast to ObjectId failed for value \"1\" at path \"b\"", err.message);
 
-              NE.find({ b: { $ne: 4 }}, function (err, nes3) {
+              NE.find({ b: { $ne: 4 }}, function (err) {
                 assert.equal("Cast to ObjectId failed for value \"4\" at path \"b\"", err.message);
 
                 NE.find({ b: id3, ids: { $ne: id4 }}, function (err, nes4) {
@@ -975,8 +971,8 @@ describe('model: querying:', function(){
           db.close();
           done();
         });
-      })
-    })
+      });
+    });
 
     it('where $exists', function(done){
       var db = start()
@@ -986,9 +982,9 @@ describe('model: querying:', function(){
           });
       mongoose.model('Exists', ExistsSchema);
       var Exists = db.model('Exists', 'exists_' + random());
-      Exists.create({ a: 1}, function (err, aExisting) {
+      Exists.create({ a: 1}, function (err) {
         assert.ifError(err);
-        Exists.create({b: 'hi'}, function (err, bExisting) {
+        Exists.create({b: 'hi'}, function (err) {
           assert.ifError(err);
           Exists.find({b: {$exists: true}}, function (err, docs) {
             assert.ifError(err);
@@ -1004,9 +1000,9 @@ describe('model: querying:', function(){
       var db = start()
         , BlogPostB = db.model('BlogPostB', collection)
         , id1 = new DocumentObjectId
-        , id2 = new DocumentObjectId
+        , id2 = new DocumentObjectId;
 
-      BlogPostB.create({owners: [id1, id2]}, function (err, createdAfter) {
+      BlogPostB.create({owners: [id1, id2]}, function (err) {
         assert.ifError(err);
         BlogPostB.find({owners: {'$elemMatch': { $in: [id2.toString()] }}}, function (err, found) {
           db.close();
@@ -1015,14 +1011,14 @@ describe('model: querying:', function(){
           done();
         });
       });
-    })
+    });
 
     it('where $mod', function(done){
       var db = start()
         , Mod = db.model('Mod', 'mods_' + random());
       Mod.create({num: 1}, function (err, one) {
         assert.ifError(err);
-        Mod.create({num: 2}, function (err, two) {
+        Mod.create({num: 2}, function (err) {
           assert.ifError(err);
           Mod.find({num: {$mod: [2, 1]}}, function (err, found) {
             assert.ifError(err);
@@ -1038,7 +1034,7 @@ describe('model: querying:', function(){
     it('where $not', function(done){
       var db = start()
         , Mod = db.model('Mod', 'mods_' + random());
-      Mod.create({num: 1}, function (err, one) {
+      Mod.create({num: 1}, function (err) {
         assert.ifError(err);
         Mod.create({num: 2}, function (err, two) {
           assert.ifError(err);
@@ -1077,7 +1073,7 @@ describe('model: querying:', function(){
             found.forEach(function (doc) {
               if (doc.id == one.id) found1 = true;
               else if (doc.id == two.id) found2 = true;
-            })
+            });
 
             assert.ok(found1);
             assert.ok(found2);
@@ -1105,7 +1101,7 @@ describe('model: querying:', function(){
             found.forEach(function (doc) {
               if (doc.id == one.id) found1 = true;
               else if (doc.id == two.id) found2 = true;
-            })
+            });
 
             assert.ok(found1);
             assert.ok(found2);
@@ -1118,12 +1114,31 @@ describe('model: querying:', function(){
           done();
         }
       });
-    })
+    });
+
+    it('using $or with array of Document', function (done) {
+      var db = start()
+        , Mod = db.model('Mod', 'mods_' + random());
+
+      Mod.create({num: 1}, function(err, one) {
+        assert.ifError(err);
+        Mod.find({num: 1}, function(err, found) {
+          assert.ifError(err);
+          Mod.find({$or: found}, function(err, found) {
+            assert.ifError(err);
+            assert.equal(1, found.length);
+            assert.equal(found[0]._id.toString(), one._id);
+            db.close();
+            done();
+          });
+        });
+      });
+    });
 
     it('where $ne', function(done){
       var db = start()
         , Mod = db.model('Mod', 'mods_' + random());
-      Mod.create({num: 1}, function (err, one) {
+      Mod.create({num: 1}, function (err) {
         assert.ifError(err);
         Mod.create({num: 2}, function (err, two) {
           assert.ifError(err);
@@ -1185,18 +1200,18 @@ describe('model: querying:', function(){
         function cb () {
           if (--pending) return;
           db.close();
-          done()
+          done();
         }
       });
     });
 
     it('STRICT null matches', function(done){
-      var db = start()
+      var db = start();
       var BlogPostB = db.model('BlogPostB', collection + random());
 
       var a = { title: 'A', author: null};
       var b = { title: 'B' };
-      BlogPostB.create(a, b, function (err, createdA, createdB) {
+      BlogPostB.create(a, b, function (err, createdA) {
         assert.ifError(err);
         BlogPostB.find({author: {$in: [null], $exists: true}}, function (err, found) {
           db.close();
@@ -1214,7 +1229,7 @@ describe('model: querying:', function(){
 
       BlogPostB.create(
           { title: 'A', author: null }
-        , { title: 'B' }, function (err, createdA, createdB) {
+        , { title: 'B' }, function (err) {
         assert.ifError(err);
         BlogPostB.find({author: null}, function (err, found) {
           db.close();
@@ -1279,7 +1294,7 @@ describe('model: querying:', function(){
       var p0 = { title: "nested $nor elemMatch1", comments: [] };
 
       var p1 = { title: "nested $nor elemMatch0", comments: [] };
-      p1.comments.push({ title: 'comment X' }, { title: 'comment Y' }, { title: 'comment W' })
+      p1.comments.push({ title: 'comment X' }, { title: 'comment Y' }, { title: 'comment W' });
 
       P.create(p0, p1, function (err, post0, post1) {
         assert.ifError(err);
@@ -1368,11 +1383,11 @@ describe('model: querying:', function(){
       var db = start()
         , BlogPostB = db.model('BlogPostB', collection);
 
-      BlogPostB.create({numbers: [1,2,3,4,5,6,7,8,9,10]}, function (err, whereoutZero) {
+      BlogPostB.create({numbers: [1,2,3,4,5,6,7,8,9,10]}, function (err) {
         assert.ifError(err);
-        BlogPostB.create({numbers: [11,12,13,14,15,16,17,18,19,20]}, function (err, whereZero) {
+        BlogPostB.create({numbers: [11,12,13,14,15,16,17,18,19,20]}, function (err) {
           assert.ifError(err);
-          BlogPostB.create({numbers: [1,2,3,4,5,6,7,8,9,10,11]}, function (err, found) {
+          BlogPostB.create({numbers: [1,2,3,4,5,6,7,8,9,10,11]}, function (err) {
             assert.ifError(err);
             BlogPostB.find({numbers: {$size: 10}}, function (err, found) {
               assert.ifError(err);
@@ -1390,7 +1405,7 @@ describe('model: querying:', function(){
     });
 
     it('$gt, $lt, $lte, $gte work on strings', function(done){
-      var db = start()
+      var db = start();
       var D = db.model('D', new Schema({dt: String}), collection);
 
       D.create({ dt: '2011-03-30' }, cb);
@@ -1417,7 +1432,7 @@ describe('model: querying:', function(){
           assert.equal(docs[0].dt, '2011-03-30');
           assert.equal(docs[1].dt, '2011-03-31');
           assert.equal(docs[2].dt, '2011-04-01');
-          assert.equal(false, docs.some(function (d) { return '2011-04-02' === d.dt }));
+          assert.equal(false, docs.some(function (d) { return '2011-04-02' === d.dt; }));
         });
 
         D.find({ 'dt': { $gt: '2011-03-30', $lt: '2011-04-02' }}).sort('dt').exec(function (err, docs) {
@@ -1429,8 +1444,8 @@ describe('model: querying:', function(){
           assert.equal(2, docs.length);
           assert.equal(docs[0].dt, '2011-03-31');
           assert.equal(docs[1].dt, '2011-04-01');
-          assert.equal(false, docs.some(function (d) { return '2011-03-30' === d.dt }));
-          assert.equal(false, docs.some(function (d) { return '2011-04-02' === d.dt }));
+          assert.equal(false, docs.some(function (d) { return '2011-03-30' === d.dt; }));
+          assert.equal(false, docs.some(function (d) { return '2011-04-02' === d.dt; }));
         });
       }
 
@@ -1445,7 +1460,7 @@ describe('model: querying:', function(){
         var db = start()
           , blogPost = db.model('BlogPostB', collection);
 
-        blogPost.collection.ensureIndex({ title : 'text' }, function(error, res) {
+        blogPost.collection.ensureIndex({ title : 'text' }, function(error) {
           assert.ifError(error);
           var a = new blogPost({ title : 'querying in mongoose' });
           var b = new blogPost({ title : 'text search in mongoose' });
@@ -1482,7 +1497,7 @@ describe('model: querying:', function(){
           large_text: String
         });
 
-        indexes = exampleSchema.indexes();
+        var indexes = exampleSchema.indexes();
         assert.equal(indexes[0][1].text, true);
         db.close(done);
       });
@@ -1498,7 +1513,7 @@ describe('model: querying:', function(){
         assert.ifError(err);
         BlogPostB.create({title: 'second limit'}, function (err, second) {
           assert.ifError(err);
-          BlogPostB.create({title: 'third limit'}, function (err, third) {
+          BlogPostB.create({title: 'third limit'}, function (err) {
             assert.ifError(err);
             BlogPostB.find({title: /limit$/}).limit(2).find( function (err, found) {
               db.close();
@@ -1506,20 +1521,20 @@ describe('model: querying:', function(){
               assert.equal(2, found.length);
               assert.equal(found[0].id, first.id);
               assert.equal(found[1].id, second.id);
-              done()
+              done();
             });
           });
         });
       });
-    })
-  })
+    });
+  });
 
   describe('skip', function(){
     it('works', function(done){
       var db = start()
         , BlogPostB = db.model('BlogPostB', collection);
 
-      BlogPostB.create({title: 'first skip'}, function (err, first) {
+      BlogPostB.create({title: 'first skip'}, function (err) {
         assert.ifError(err);
         BlogPostB.create({title: 'second skip'}, function (err, second) {
           assert.ifError(err);
@@ -1536,7 +1551,7 @@ describe('model: querying:', function(){
           });
         });
       });
-    })
+    });
   });
 
   describe('sort', function(){
@@ -1574,7 +1589,7 @@ describe('model: querying:', function(){
       var db = start()
         , blogPost = db.model('BlogPostB', collection);
 
-      blogPost.collection.ensureIndex({ title : 'text' }, function(error, res) {
+      blogPost.collection.ensureIndex({ title : 'text' }, function(error) {
         assert.ifError(error);
         var a = new blogPost({ title : 'searching in mongoose' });
         var b = new blogPost({ title : 'text search in mongoose' });
@@ -1605,7 +1620,7 @@ describe('model: querying:', function(){
       var db = start()
         , BlogPostB = db.model('BlogPostB', collection);
 
-      BlogPostB.find({ 'mixed.nested.stuff': 'skynet' }, function (err, docs) {
+      BlogPostB.find({ 'mixed.nested.stuff': 'skynet' }, function (err) {
         db.close();
         assert.ifError(err);
         done();
@@ -1619,7 +1634,7 @@ describe('model: querying:', function(){
       , Test = db.model('TestDateQuery', new Schema({ date: Date }), 'datetest_' + random())
       , now = new Date;
 
-    Test.create({ date: now }, { date: new Date(now-10000) }, function (err, a, b) {
+    Test.create({ date: now }, { date: new Date(now-10000) }, function (err) {
       assert.ifError(err);
       Test.find({ date: now }, function (err, docs) {
         db.close();
@@ -1628,12 +1643,12 @@ describe('model: querying:', function(){
         done();
       });
     });
-  })
+  });
 
   it('mixed types with $elemMatch (gh-591)', function(done){
     var db = start()
       , S = new Schema({ a: [{}], b: Number })
-      , M = db.model('QueryingMixedArrays', S, random())
+      , M = db.model('QueryingMixedArrays', S, random());
 
     var m = new M;
     m.a = [1,2,{ name: 'Frodo' },'IDK', {name: 100}];
@@ -1651,7 +1666,7 @@ describe('model: querying:', function(){
             a: {
                 $elemMatch: { name: 100 }
             }
-        }
+        };
 
         M.find(query, function (err, docs) {
           db.close();
@@ -1665,7 +1680,7 @@ describe('model: querying:', function(){
 
   describe('$all', function(){
     it('with ObjectIds (gh-690)', function (done) {
-      var db = start()
+      var db = start();
 
       var SSchema = new Schema({ name: String });
       var PSchema = new Schema({ sub: [SSchema] });
@@ -1680,7 +1695,7 @@ describe('model: querying:', function(){
         var o1 = p.sub[1]._id;
         var o2 = p.sub[2]._id;
 
-        P.findOne({ 'sub._id': { $all: [o1, o2] }}, function (err, doc) {
+        P.findOne({ 'sub._id': { $all: [o1, o2.toString()] }}, function (err, doc) {
           assert.ifError(err);
           assert.equal(doc.id, p.id);
 
@@ -1701,8 +1716,7 @@ describe('model: querying:', function(){
 
     it('with Dates', function(done){
       this.timeout(3000);
-      // this.slow(2000);
-      var db = start()
+      var db = start();
 
       var SSchema = new Schema({ d: Date });
       var PSchema = new Schema({ sub: [SSchema] });
@@ -1738,6 +1752,37 @@ describe('model: querying:', function(){
         });
       });
     });
+
+    it('with $elemMatch (gh-3163)', function(done) {
+      var db = start();
+
+      start.mongodVersion(function (err, version) {
+        if (err) {
+          throw err;
+        }
+        var mongo26_or_greater = 2 < version[0] || (2 == version[0] && 6 <= version[1]);
+        if (!mongo26_or_greater) {
+          return done();
+        }
+
+        next();
+      });
+
+      var next = function() {
+        var schema = new Schema({ test: [String] });
+        var MyModel = db.model('gh3163', schema);
+
+        MyModel.create({ test: ['log1', 'log2'] }, function(error) {
+          assert.ifError(error);
+          var query = { test: { $all: [{ $elemMatch: { $regex: /log/g } }] } };
+          MyModel.find(query, function(error, docs) {
+            assert.ifError(error);
+            assert.equal(docs.length, 1);
+            db.close(done);
+          });
+        });
+      };
+    });
   });
 
   describe('and', function(){
@@ -1745,7 +1790,7 @@ describe('model: querying:', function(){
       var db = start();
       var B = db.model('BlogPostB');
 
-      B.create({ title: 'and operator', published: false, author: 'Me' }, function(err, doc) {
+      B.create({ title: 'and operator', published: false, author: 'Me' }, function(err) {
         assert.ifError(err);
 
         B.find({ $and: [{ title: 'and operator' }] }, function(err, docs) {
@@ -1769,7 +1814,7 @@ describe('model: querying:', function(){
                 assert.ifError(err);
                 assert.equal(1, docs.length);
 
-                var query = B.find()
+                var query = B.find();
                 query.and([
                   { title: 'and operator', published: false },
                   { author: 'You' }
@@ -1822,8 +1867,8 @@ describe('buffers', function(){
           assert.ifError(err);
           assert.equal(rb.block.toString('utf8'),'buffer shtuffs are neat');
 
-          Test.findOne({ block: /buffer/i }, function (err, rb) {
-            assert.equal(err.message, 'Cast to buffer failed for value "/buffer/i" at path "block"')
+          Test.findOne({ block: /buffer/i }, function (err) {
+            assert.equal(err.message, 'Cast to buffer failed for value "/buffer/i" at path "block"');
             Test.findOne({ block: [195, 188, 98, 101, 114] }, function (err, rb) {
               assert.ifError(err);
               assert.equal(rb.block.toString('utf8'),'über');
@@ -1870,7 +1915,7 @@ describe('buffers', function(){
       assert.ifError(err);
       assert.equal(a.block.toString('utf8'),'über');
       assert.equal(b.block.toString('utf8'),'buffer shtuffs are neat');
-      assert.equal(c.block.toString('utf8'),'hello world')
+      assert.equal(c.block.toString('utf8'),'hello world');
 
       Test.find({ block: { $in: [[195, 188, 98, 101, 114], "buffer shtuffs are neat", new Buffer('aGVsbG8gd29ybGQ=', 'base64')] }}, function (err, tests) {
         cb();
@@ -1950,7 +1995,7 @@ describe('buffers', function(){
       }
     });
   });
-})
+});
 
 describe('backwards compatibility', function(){
   it('with previously existing null values in the db', function(done){
@@ -1966,8 +2011,8 @@ describe('backwards compatibility', function(){
         assert.equal(9898, found.get('meta.visitors').valueOf());
         db.close();
         done();
-      })
-    })
+      });
+    });
   });
 
   it('with unused values in the db', function(done){
@@ -1985,9 +2030,9 @@ describe('backwards compatibility', function(){
           assert.ifError(err);
           db.close();
           done();
-        })
-      })
-    })
+        });
+      });
+    });
   });
 });
 
@@ -2079,7 +2124,7 @@ describe('geo-spatial', function(){
         if (complete.ran) return;
         if (err) return done(complete.ran = err);
         --pending || test();
-      }
+      };
 
       Test.on('index', complete);
       Test.create(
@@ -2103,7 +2148,7 @@ describe('geo-spatial', function(){
         });
 
         db.close(done);
-      }
+      };
     });
 
     it('$maxDistance with arrays', function(done){
@@ -2132,8 +2177,8 @@ describe('geo-spatial', function(){
           });
         });
       }
-    })
-  })
+    });
+  });
 
   describe('2dsphere', function(){
     // mongodb 2.4
@@ -2155,18 +2200,18 @@ describe('geo-spatial', function(){
         mongo24_or_greater = 2 < version[0] || (2 == version[0] && 4 <= version[1]);
         if (!mongo24_or_greater) console.log('not testing mongodb 2.4 features');
         done();
-      })
-    })
+      });
+    });
 
     it('index is allowed in schema', function(done){
       if (!mongo24_or_greater) return done();
 
       var ok = schema2dsphere.indexes().some(function (index) {
-        return '2dsphere' == index[0].loc
+        return '2dsphere' == index[0].loc;
       });
       assert.ok(ok);
       done();
-    })
+    });
 
     describe('$geometry', function(){
       it('Polygon', function(done){
@@ -2181,7 +2226,7 @@ describe('geo-spatial', function(){
           Test.create({ loc: [ 0, 0 ]}, function (err, created) {
             assert.ifError(err);
 
-            var geojsonPoly = { type: 'Polygon', coordinates: [[[-5,-5], ['-5',5], [5,5], [5,-5],[-5,'-5']]] }
+            var geojsonPoly = { type: 'Polygon', coordinates: [[[-5,-5], ['-5',5], [5,5], [5,-5],[-5,'-5']]] };
 
             Test.find({ loc: { $within: { $geometry: geojsonPoly }}}, function (err, docs) {
               assert.ifError(err);
@@ -2193,12 +2238,12 @@ describe('geo-spatial', function(){
                 assert.equal(1, docs.length);
                 assert.equal(created.id, docs[0].id);
                 db.close(done);
-              })
-            })
-          })
-        })
+              });
+            });
+          });
+        });
       });
-    })
+    });
 
     describe('$geoIntersects', function(){
       it('LineString', function(done){
@@ -2213,7 +2258,7 @@ describe('geo-spatial', function(){
           Test.create({ line: { type:'LineString', coordinates: [[-178.0, 10.0],[178.0,10.0]] }}, function (err, created) {
             assert.ifError(err);
 
-            var geojsonLine = { type: 'LineString', coordinates: [[180.0, 11.0], [180.0, '9.00']] }
+            var geojsonLine = { type: 'LineString', coordinates: [[180.0, 11.0], [180.0, '9.00']] };
 
             Test.find({ line: { $geoIntersects: { $geometry: geojsonLine }}}, function (err, docs) {
               assert.ifError(err);
@@ -2224,11 +2269,11 @@ describe('geo-spatial', function(){
                 assert.ifError(err);
                 assert.equal(created.id, doc.id);
                 db.close(done);
-              })
-            })
-          })
+              });
+            });
+          });
 
-        })
+        });
       });
 
       it('MultiLineString', function(done){
@@ -2241,7 +2286,7 @@ describe('geo-spatial', function(){
                              { type:'LineString', coordinates: [[-178.0, 5.0],[178.0,5.0]] } ]}, function (err, created) {
           assert.ifError(err);
 
-          var geojsonLine = { type: 'LineString', coordinates: [[180.0, 11.0], [180.0, '9.00']] }
+          var geojsonLine = { type: 'LineString', coordinates: [[180.0, 11.0], [180.0, '9.00']] };
 
           Test.find({ geom: { $geoIntersects: { $geometry: geojsonLine }}}, function (err, docs) {
             assert.ifError(err);
@@ -2252,9 +2297,9 @@ describe('geo-spatial', function(){
               assert.ifError(err);
               assert.equal(created.id, doc.id);
               db.close(done);
-            })
-          })
-        })
+            });
+          });
+        });
       });
 
       it('MultiPolygon', function(done){
@@ -2267,7 +2312,7 @@ describe('geo-spatial', function(){
                              { type: "Polygon", coordinates: [[ [-1,-1],[1,-1],[1,1],[-1,1],[-1,-1] ]] }]}, function (err, created) {
           assert.ifError(err);
 
-          var geojsonPolygon = { type: 'Polygon', coordinates: [[ [26,36],[45,36],[45,42],[26,42],[26,36] ]] }
+          var geojsonPolygon = { type: 'Polygon', coordinates: [[ [26,36],[45,36],[45,42],[26,42],[26,36] ]] };
 
           Test.find({ geom: { $geoIntersects: { $geometry: geojsonPolygon }}}, function (err, docs) {
             assert.ifError(err);
@@ -2278,11 +2323,11 @@ describe('geo-spatial', function(){
               assert.ifError(err);
               assert.equal(created.id, doc.id);
               db.close(done);
-            })
-          })
-        })
+            });
+          });
+        });
       });
-    })
+    });
 
     describe('$near', function(){
       it('Point', function(done){
@@ -2297,7 +2342,7 @@ describe('geo-spatial', function(){
           Test.create({ line: { type:'Point', coordinates: [-179.0, 0.0] }}, function (err, created) {
             assert.ifError(err);
 
-            var geojsonPoint = { type: 'Point', coordinates: [-179.0, 0.0] }
+            var geojsonPoint = { type: 'Point', coordinates: [-179.0, 0.0] };
 
             Test.find({ line: { $near: geojsonPoint }}, function (err, docs) {
               assert.ifError(err);
@@ -2309,10 +2354,10 @@ describe('geo-spatial', function(){
                 assert.equal(1, docs.length);
                 assert.equal(created.id, docs[0].id);
                 db.close(done);
-              })
-            })
-          })
-        })
+              });
+            });
+          });
+        });
       });
 
       it('works with GeoJSON (gh-1482)', function (done) {
@@ -2348,8 +2393,8 @@ describe('geo-spatial', function(){
         }
       });
 
-    })
-  })
+    });
+  });
 
   describe('hashed indexes', function(){
     var mongo24_or_greater = false;
@@ -2360,8 +2405,8 @@ describe('geo-spatial', function(){
         mongo24_or_greater = 2 < version[0] || (2 == version[0] && 4 <= version[1]);
         if (!mongo24_or_greater) console.log('not testing mongodb 2.4 features');
         done();
-      })
-    })
+      });
+    });
 
     it('work', function(done){
       if (!mongo24_or_greater) return done();
@@ -2382,7 +2427,7 @@ describe('geo-spatial', function(){
 
             var found = indexes.some(function (index) {
               return 'hashed' === index.key.t;
-            })
+            });
             assert.ok(found);
 
             H.create({ t: 'hashing' }, { }, function (err, doc1, doc2) {
@@ -2390,18 +2435,18 @@ describe('geo-spatial', function(){
               assert.ok(doc1);
               assert.ok(doc2);
               complete();
-            })
-          })
-        })
-      })
+            });
+          });
+        });
+      });
 
       function complete () {
         if (0 === --pending) {
           db.close(done);
         }
       }
-    })
-  })
+    });
+  });
 });
 
 describe('lean option:', function(){
@@ -2469,7 +2514,7 @@ describe('lean option:', function(){
     assert.equal('string', typeof q._conditions.$and[1].$and[0]['subdoc.title']);
     assert.equal('number', typeof q._conditions.$and[1].$and[1].num);
     done();
-  })
+  });
   it('properly casts deeply nested and/or queries (gh-676)', function(done){
     var sch = new Schema({
       num : Number,
@@ -2547,4 +2592,4 @@ describe('lean option:', function(){
         });
     });
   });
-})
+});

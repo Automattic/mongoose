@@ -1431,9 +1431,10 @@ describe('model: update:', function(){
     };
     var D = db.model('gh2833', dateSchema);
 
-    D.update({}, { d: undefined }, function(error) {
-      assert.ifError(error);
-      done();
+    assert.doesNotThrow(function() {
+      D.update({}, { d: undefined }, function(error) {
+        done();
+      });
     });
   });
 

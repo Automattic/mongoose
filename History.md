@@ -1,3 +1,19 @@
+4.1.2 / 2015-08-10
+==================
+ * fixed; better handling for Jade templates #3241 [kbadk](https://github.com/kbadk)
+ * added; ESlint trailing spaces #3234 [ChristianMurphy](https://github.com/ChristianMurphy)
+ * added; ESlint #3191 [ChristianMurphy](https://github.com/ChristianMurphy)
+ * fixed; properly emit event on disconnect #3183
+ * fixed; copy options properly using Query.toConstructor() #3176
+ * fixed; setMaxListeners() issue in browser build #3170
+ * fixed; node driver -> 2.0.40 to not store undefined keys as null #3169
+ * fixed; update validators handle positional operator #3167
+ * fixed; handle $all + $elemMatch query casting #3163
+ * fixed; post save hooks don't swallow extra args #3155
+ * docs; spelling mistake in index.jade #3154
+ * fixed; don't crash when toObject() has no fields #3130
+ * fixed; apply toObject() recursively for find and update queries #3086 [naoina](https://github.com/naoina)
+
 4.1.1 / 2015-08-03
 ==================
  * fixed; aggregate exec() crash with no callback #3212 #3198 [jpgarcia](https://github.com/jpgarcia)

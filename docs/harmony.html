@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>Mongoose Using Mongoose with ECMAScript 6 (Harmony) v4.1.1</title><link href="http://fonts.googleapis.com/css?family=Anonymous+Pro:400,700|Droid+Sans+Mono|Open+Sans:400,700|Linden+Hill|Quattrocento:400,700|News+Cycle:400,700|Antic+Slab|Cabin+Condensed:400,700" rel="stylesheet" type="text/css"><link href="css/default.css" rel="stylesheet" type="text/css"><link href="css/guide.css" rel="stylesheet" type="text/css"></head><body><a id="forkbanner" href="http://github.com/Automattic/mongoose"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png" alt="Fork me on GitHub"></a><div id="links"><div id="header"><h1><a href="../index.html"><div class="mongoose">Mongoose</div></a></h1></div><ul><li class="home"><a href="../index.html">home</a></li><li class="faq"><a href="./faq.html">FAQ</a></li><li class="plugins"><a href="http://plugins.mongoosejs.com">plugins</a></li><li class="changelog"><a href="http://github.com/Automattic/mongoose/tree/master/History.md">change log</a></li><li class="support"><a href="../index.html#support">support</a></li><li class="fork"><a href="http://github.com/Automattic/mongoose">fork</a></li><li class="guide"><a href="./guide.html">guide</a></li><li class="api"><a href="./api.html">API docs</a></li><li class="quickstart"><a href="./index.html">quick start</a></li><li class="contrib"><a href="http://github.com/Automattic/mongoose/contributors">contributors</a></li><li class="prior"><a href="./prior.html">prior releases</a></li></ul></div><div id="content"><div class="module"><gcse:search></gcse:search><h2><p>Documents in ES6</p>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>Mongoose Using Mongoose with ECMAScript 6 (Harmony) v4.1.2</title><link href="http://fonts.googleapis.com/css?family=Anonymous+Pro:400,700|Droid+Sans+Mono|Open+Sans:400,700|Linden+Hill|Quattrocento:400,700|News+Cycle:400,700|Antic+Slab|Cabin+Condensed:400,700" rel="stylesheet" type="text/css"><link href="css/default.css" rel="stylesheet" type="text/css"><link href="css/guide.css" rel="stylesheet" type="text/css"></head><body><a id="forkbanner" href="http://github.com/Automattic/mongoose"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png" alt="Fork me on GitHub"></a><div id="links"><div id="header"><h1><a href="../index.html"><div class="mongoose">Mongoose</div></a></h1></div><ul><li class="home"><a href="../index.html">home</a></li><li class="faq"><a href="./faq.html">FAQ</a></li><li class="plugins"><a href="http://plugins.mongoosejs.com">plugins</a></li><li class="changelog"><a href="http://github.com/Automattic/mongoose/tree/master/History.md">change log</a></li><li class="support"><a href="../index.html#support">support</a></li><li class="fork"><a href="http://github.com/Automattic/mongoose">fork</a></li><li class="guide"><a href="./guide.html">guide</a></li><li class="api"><a href="./api.html">API docs</a></li><li class="quickstart"><a href="./index.html">quick start</a></li><li class="contrib"><a href="http://github.com/Automattic/mongoose/contributors">contributors</a></li><li class="prior"><a href="./prior.html">prior releases</a></li></ul></div><div id="content"><div class="module"><gcse:search></gcse:search><h2><p>Documents in ES6</p>
 </h2><p>Asynchronous document functions return
 <a href="https://www.npmjs.org/package/mpromise">promises</a>, and so are compatible
 with the <a href="http://mzl.la/1gSa8Gu">ES6 <code>yield</code> keyword</a> and libraries like
@@ -14,7 +14,7 @@ with the <code>--harmony</code> flag.</p>
       var error;
 
       var validate = {
-        validator: function(str) {
+        validator: function() {
           called = true;
           return shouldSucceed;
         },
@@ -25,7 +25,7 @@ with the <code>--harmony</code> flag.</p>
         eggs: { type: String, required: true, validate: validate },
         bacon: { type: Boolean, required: true }
       });
- 
+
       var M = db.model('validateSchema', schema, getCollectionName());
       var m = new M({ eggs: 'Sunny side up', bacon: false });
 
@@ -57,7 +57,7 @@ with the <code>--harmony</code> flag.</p>
     co(function*() {
       var error;
       var schema = new Schema({
-        description: { type: String, required: true },
+        description: { type: String, required: true }
       });
 
       var Breakfast = db.model('breakfast', schema, getCollectionName());
@@ -105,7 +105,7 @@ with the <code>--harmony</code> flag.</p>
       var breakfastCollectionName = getCollectionName();
       var foodCollectionName = getCollectionName();
       var breakfastSchema = new Schema({
-        foods: [{ type: mongoose.Schema.ObjectId, ref: foodCollectionName }],
+        foods: [{ type: mongoose.Schema.ObjectId, ref: foodCollectionName }]
       });
 
       var foodSchema = new Schema({
@@ -192,7 +192,7 @@ with the <code>--harmony</code> flag.</p>
         eggs: { type: Number, required: true },
         bacon: { type: Number, required: true }
       });
- 
+
       var Breakfast = db.model('BreakfastHarmony', schema, getCollectionName());
 
       try {
@@ -280,12 +280,12 @@ objects, and so you need to use <code>.exec()</code> to use these functions with
 <code>yield</code> as described above.</p>
 <h4><p><code>create()</code> integrates with co and the yield keyword</p>
 </h4><pre><code class="javascript">
-    co(function*() {
-      schema = new Schema({
+    co(function * () {
+      var schema = new Schema({
         eggs: { type: String, required: true },
         bacon: { type: Boolean, required: true }
       });
- 
+
       var M = db.model('harmonyCreate', schema, getCollectionName());
 
       var results;
@@ -306,7 +306,7 @@ objects, and so you need to use <code>.exec()</code> to use these functions with
   </code></pre><h4><p><code>aggregate()</code> integrates with co and the yield keyword</p>
 </h4><pre><code class="javascript">
     co(function*() {
-      schema = new Schema({
+      var schema = new Schema({
         eggs: { type: String, required: true },
         bacon: { type: Boolean, required: true }
       });
@@ -342,7 +342,7 @@ objects, and so you need to use <code>.exec()</code> to use these functions with
   </code></pre><h4><p><code>mapReduce()</code> can also be used with co and yield</p>
 </h4><pre><code class="javascript">
     co(function*() {
-      schema = new Schema({
+      var schema = new Schema({
         eggs: { type: String, required: true },
         bacon: { type: Boolean, required: true }
       });

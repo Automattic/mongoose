@@ -81,15 +81,15 @@ schema.path('date').set(function (v) {
  * executed.
  */
 
-TestDocument.prototype.hooksTest = function(fn){
+TestDocument.prototype.hooksTest = function (fn) {
   fn(null, arguments);
 };
 
 /**
  * Test.
  */
-describe('document', function(){
-  it('isSelected()', function(done){
+describe('document', function () {
+  it('isSelected()', function (done) {
     var doc = new TestDocument();
 
     doc.init({

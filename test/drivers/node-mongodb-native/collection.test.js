@@ -20,9 +20,9 @@ mongoose.model('NativeDriverTest', new Schema({
  * Test.
  */
 
-describe('drivers: native:', function(){
+describe('drivers: native:', function () {
 
-  it('sparse index works', function(done){
+  it('sparse index works', function (done) {
     var db = start()
       , NativeTestCollection = db.model('NativeDriverTest');
 
@@ -38,7 +38,7 @@ describe('drivers: native:', function(){
     });
   });
 
-  it('traditional ensureIndex spec syntax for fields works', function(done){
+  it('traditional ensureIndex spec syntax for fields works', function (done) {
     var db = start()
       , NativeTestCollection = db.model('NativeDriverTest');
 
@@ -48,7 +48,7 @@ describe('drivers: native:', function(){
     });
   });
 
-  it('unique index failure passes error', function(done){
+  it('unique index failure passes error', function (done) {
     var db = start()
       , schema = new Schema({ title: String })
       , NativeTestCollection = db.model('NativeDriverTestUnique', schema);

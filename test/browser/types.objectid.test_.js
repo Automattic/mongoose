@@ -1,5 +1,5 @@
 /* eslint no-empty: 1 */
-(function() {
+(function () {
   var ObjectId = mongoose.Types.ObjectId;
 
   describe('types.objectid', function () {

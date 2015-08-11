@@ -14,7 +14,7 @@ var start = require('./common')
 /**
  * Setup
  */
-function BaseSchema() {
+function BaseSchema () {
   Schema.apply(this, arguments);
 
   this.add({
@@ -28,27 +28,27 @@ var EventSchema = new BaseSchema();
 var ImpressionEventSchema = new BaseSchema();
 var ConversionEventSchema = new BaseSchema({ revenue: Number });
 
-describe('model', function() {
-  describe('discriminator()', function() {
+describe('model', function () {
+  describe('discriminator()', function () {
     var db, BaseEvent, ImpressionEvent, ConversionEvent;
 
-    before(function() {
+    before(function () {
       db = start();
-      BaseEvent = db.model('model-discriminator-querying-event', EventSchema, 'model-discriminator-querying-'+random());
+      BaseEvent = db.model('model-discriminator-querying-event', EventSchema, 'model-discriminator-querying-' + random());
       ImpressionEvent = BaseEvent.discriminator('model-discriminator-querying-impression', ImpressionEventSchema);
       ConversionEvent = BaseEvent.discriminator('model-discriminator-querying-conversion', ConversionEventSchema);
     });
 
-    afterEach(function(done) {
+    afterEach(function (done) {
       async.series(
         [
-          function removeBaseEvent(next) {
+          function removeBaseEvent (next) {
             BaseEvent.remove(next);
           },
-          function removeImpressionEvent(next) {
+          function removeImpressionEvent (next) {
             ImpressionEvent.remove(next);
           },
-          function removeConversionEvent(next) {
+          function removeConversionEvent (next) {
             ConversionEvent.remove(next);
           }
         ],
@@ -56,13 +56,13 @@ describe('model', function() {
       );
     });
 
-    after(function(done) {
+    after(function (done) {
       db.close(done);
     });
 
-    describe('pushing discriminated objects', function() {
+    describe('pushing discriminated objects', function () {
       var ContainerModel, BaseCustomEvent, DiscCustomEvent;
-      before(function() {
+      before(function () {
         var BaseCustomEventSchema = new BaseSchema();
         var DiscCustomEventSchema = new BaseSchema({
           personName: Number
@@ -78,7 +78,7 @@ describe('model', function() {
         ContainerModel = db.model('container-event-model', ContainerSchema);
       });
 
-      it('into non-discriminated arrays works', function(done) {
+      it('into non-discriminated arrays works', function (done) {
         var c = new ContainerModel({
           title: "events-group-1"
         });
@@ -89,19 +89,19 @@ describe('model', function() {
         c.events.push(d2);
         async.series(
           [
-            function(next) { d1.save(next); },
-            function(next) { d2.save(next); },
-            function(next) { d3.save(next); },
-            function(next) { c.save(next);  },
-            function(next) {
-              ContainerModel.findOne({}).populate('events').exec(function(err, doc) {
+            function (next) { d1.save(next); },
+            function (next) { d2.save(next); },
+            function (next) { d3.save(next); },
+            function (next) { c.save(next); },
+            function (next) {
+              ContainerModel.findOne({}).populate('events').exec(function (err, doc) {
                 assert.ifError(err);
                 assert.ok(doc.events && doc.events.length);
                 assert.equal(doc.events.length, 2);
                 doc.events.push(d3);
                 var hasDisc = false;
                 var discKey = DiscCustomEvent.schema.discriminatorMapping.key;
-                doc.events.forEach(function(subDoc) {
+                doc.events.forEach(function (subDoc) {
                   if (discKey in subDoc) {
                     hasDisc = true;
                   }
@@ -116,19 +116,19 @@ describe('model', function() {
       });
     });
 
-    describe('find', function() {
-      it('hydrates correct models', function(done) {
-        var baseEvent  = new BaseEvent({ name: 'Base event' });
+    describe('find', function () {
+      it('hydrates correct models', function (done) {
+        var baseEvent = new BaseEvent({ name: 'Base event' });
         var impressionEvent = new ImpressionEvent({ name: 'Impression event' });
         var conversionEvent = new ConversionEvent({ name: 'Conversion event', revenue: 1.337 });
 
-        baseEvent.save(function(err) {
+        baseEvent.save(function (err) {
           assert.ifError(err);
-          impressionEvent.save(function(err) {
+          impressionEvent.save(function (err) {
             assert.ifError(err);
-            conversionEvent.save(function(err) {
+            conversionEvent.save(function (err) {
               assert.ifError(err);
-              BaseEvent.find({}).sort('name').exec(function(err, docs) {
+              BaseEvent.find({}).sort('name').exec(function (err, docs) {
                 assert.ifError(err);
                 assert.ok(docs[0] instanceof BaseEvent);
                 assert.equal(docs[0].name, 'Base event');
@@ -148,18 +148,18 @@ describe('model', function() {
         });
       });
 
-      var checkHydratesCorrectModels = function(fields, done) {
-        var baseEvent  = new BaseEvent({ name: 'Base event' });
+      var checkHydratesCorrectModels = function (fields, done) {
+        var baseEvent = new BaseEvent({ name: 'Base event' });
         var impressionEvent = new ImpressionEvent({ name: 'Impression event' });
         var conversionEvent = new ConversionEvent({ name: 'Conversion event', revenue: 1.337 });
 
-        baseEvent.save(function(err) {
+        baseEvent.save(function (err) {
           assert.ifError(err);
-          impressionEvent.save(function(err) {
+          impressionEvent.save(function (err) {
             assert.ifError(err);
-            conversionEvent.save(function(err) {
+            conversionEvent.save(function (err) {
               assert.ifError(err);
-              BaseEvent.find({}, fields).sort('name').exec(function(err, docs) {
+              BaseEvent.find({}, fields).sort('name').exec(function (err, docs) {
                 assert.ifError(err);
                 assert.ok(docs[0] instanceof BaseEvent);
                 assert.equal(docs[0].name, 'Base event');
@@ -179,42 +179,42 @@ describe('model', function() {
         });
       };
 
-      it('hydrates correct models when fields selection set as string', function(done) {
+      it('hydrates correct models when fields selection set as string', function (done) {
         checkHydratesCorrectModels('name', done);
       });
 
-      it('hydrates correct models when fields selection set as object', function(done) {
+      it('hydrates correct models when fields selection set as object', function (done) {
         checkHydratesCorrectModels({name: 1}, done);
       });
 
-      describe('discriminator model only finds documents of its type', function() {
+      describe('discriminator model only finds documents of its type', function () {
         var impressionEvent, conversionEvent1, conversionEvent2;
 
-        before(function() {
+        before(function () {
           impressionEvent = new ImpressionEvent({ name: 'Impression event' });
           conversionEvent1 = new ConversionEvent({ name: 'Conversion event 1', revenue: 1 });
           conversionEvent2 = new ConversionEvent({ name: 'Conversion event 2', revenue: 2 });
         });
 
-        describe('using "ModelDiscriminator#findById"', function() {
-          it('to find a document of the appropriate discriminator', function(done) {
-            impressionEvent.save(function(err) {
+        describe('using "ModelDiscriminator#findById"', function () {
+          it('to find a document of the appropriate discriminator', function (done) {
+            impressionEvent.save(function (err) {
               assert.ifError(err);
 
               // via BaseEvent model
-              BaseEvent.findById(impressionEvent._id, function(err, doc) {
+              BaseEvent.findById(impressionEvent._id, function (err, doc) {
                 assert.ifError(err);
                 assert.ok(doc);
                 assert.equal(impressionEvent.__t, doc.__t);
 
                 // via ImpressionEvent model discriminator -- should be present
-                ImpressionEvent.findById(impressionEvent._id, function(err, doc) {
+                ImpressionEvent.findById(impressionEvent._id, function (err, doc) {
                   assert.ifError(err);
                   assert.ok(doc);
                   assert.equal(impressionEvent.__t, doc.__t);
 
                   // via ConversionEvent model discriminator -- should not be present
-                  ConversionEvent.findById(impressionEvent._id, function(err, doc) {
+                  ConversionEvent.findById(impressionEvent._id, function (err, doc) {
                     assert.ifError(err);
                     assert.ok(!doc);
 
@@ -226,19 +226,19 @@ describe('model', function() {
           });
         });
 
-        describe('using "ModelDiscriminator#find"', function() {
-          it('to find documents of the appropriate discriminator', function(done) {
-            impressionEvent.save(function(err) {
+        describe('using "ModelDiscriminator#find"', function () {
+          it('to find documents of the appropriate discriminator', function (done) {
+            impressionEvent.save(function (err) {
               assert.ifError(err);
-              conversionEvent1.save(function(err) {
+              conversionEvent1.save(function (err) {
                 assert.ifError(err);
-                conversionEvent2.save(function(err) {
+                conversionEvent2.save(function (err) {
                   assert.ifError(err);
                   // doesn't find anything since we're querying for an impression id
                   var query = ConversionEvent.find({ _id: impressionEvent._id });
                   assert.equal(query.op, 'find');
                   assert.deepEqual(query._conditions, { _id: impressionEvent._id, __t: 'model-discriminator-querying-conversion' });
-                  query.exec(function(err, documents) {
+                  query.exec(function (err, documents) {
                     assert.ifError(err);
                     assert.equal(documents.length, 0);
 
@@ -246,7 +246,7 @@ describe('model', function() {
                     var query = ConversionEvent.find();
                     assert.deepEqual(query._conditions, { __t: 'model-discriminator-querying-conversion' });
                     assert.equal(query.op, 'find');
-                    query.exec(function(err, documents) {
+                    query.exec(function (err, documents) {
                       assert.ifError(err);
                       assert.equal(documents.length, 2);
 
@@ -266,22 +266,22 @@ describe('model', function() {
         });
       });
 
-      var checkDiscriminatorModelsFindDocumentsOfItsType = function(fields, done){
+      var checkDiscriminatorModelsFindDocumentsOfItsType = function (fields, done) {
         var impressionEvent = new ImpressionEvent({ name: 'Impression event' });
         var conversionEvent1 = new ConversionEvent({ name: 'Conversion event 1', revenue: 1 });
         var conversionEvent2 = new ConversionEvent({ name: 'Conversion event 2', revenue: 2 });
 
-        impressionEvent.save(function(err) {
+        impressionEvent.save(function (err) {
           assert.ifError(err);
-          conversionEvent1.save(function(err) {
+          conversionEvent1.save(function (err) {
             assert.ifError(err);
-            conversionEvent2.save(function(err) {
+            conversionEvent2.save(function (err) {
               assert.ifError(err);
               // doesn't find anything since we're querying for an impression id
               var query = ConversionEvent.find({ _id: impressionEvent._id }, fields);
               assert.equal(query.op, 'find');
               assert.deepEqual(query._conditions, { _id: impressionEvent._id, __t: 'model-discriminator-querying-conversion' });
-              query.exec(function(err, documents) {
+              query.exec(function (err, documents) {
                 assert.ifError(err);
                 assert.equal(documents.length, 0);
 
@@ -289,7 +289,7 @@ describe('model', function() {
                 var query = ConversionEvent.find({}, fields);
                 assert.deepEqual(query._conditions, { __t: 'model-discriminator-querying-conversion' });
                 assert.equal(query.op, 'find');
-                query.exec(function(err, documents) {
+                query.exec(function (err, documents) {
                   assert.ifError(err);
                   assert.equal(documents.length, 2);
 
@@ -306,45 +306,45 @@ describe('model', function() {
         });
       };
 
-      it('discriminator model only finds documents of its type when fields selection set as string inclusive', function(done) {
+      it('discriminator model only finds documents of its type when fields selection set as string inclusive', function (done) {
         checkDiscriminatorModelsFindDocumentsOfItsType('name', done);
       });
 
-      it('discriminator model only finds documents of its type when fields selection set as string exclusive', function(done) {
+      it('discriminator model only finds documents of its type when fields selection set as string exclusive', function (done) {
         checkDiscriminatorModelsFindDocumentsOfItsType('-revenue', done);
       });
 
-      it('discriminator model only finds documents of its type when fields selection set as empty string', function(done) {
+      it('discriminator model only finds documents of its type when fields selection set as empty string', function (done) {
         checkDiscriminatorModelsFindDocumentsOfItsType('', done);
       });
 
-      it('discriminator model only finds documents of its type when fields selection set as object inclusive', function(done) {
+      it('discriminator model only finds documents of its type when fields selection set as object inclusive', function (done) {
         checkDiscriminatorModelsFindDocumentsOfItsType({name: 1}, done);
       });
 
-      it('discriminator model only finds documents of its type when fields selection set as object exclusive', function(done) {
+      it('discriminator model only finds documents of its type when fields selection set as object exclusive', function (done) {
         checkDiscriminatorModelsFindDocumentsOfItsType({revenue: 0}, done);
       });
 
-      it('discriminator model only finds documents of its type when fields selection set as empty object', function(done) {
+      it('discriminator model only finds documents of its type when fields selection set as empty object', function (done) {
         checkDiscriminatorModelsFindDocumentsOfItsType({}, done);
       });
 
-      it('hydrates streams', function(done) {
-        var baseEvent  = new BaseEvent({ name: 'Base event' });
+      it('hydrates streams', function (done) {
+        var baseEvent = new BaseEvent({ name: 'Base event' });
         var impressionEvent = new ImpressionEvent({ name: 'Impression event' });
         var conversionEvent = new ConversionEvent({ name: 'Conversion event', revenue: 1.337 });
 
-        baseEvent.save(function(err) {
+        baseEvent.save(function (err) {
           assert.ifError(err);
-          impressionEvent.save(function(err) {
+          impressionEvent.save(function (err) {
             assert.ifError(err);
-            conversionEvent.save(function(err) {
+            conversionEvent.save(function (err) {
               assert.ifError(err);
               var stream = BaseEvent.find({}).sort('name').stream();
 
-              stream.on('data', function(doc) {
-                switch(doc.name) {
+              stream.on('data', function (doc) {
+                switch (doc.name) {
                   case 'Base event':
                     assert.ok(doc instanceof BaseEvent);
                     break;
@@ -365,7 +365,7 @@ describe('model', function() {
                 assert.ifError(err);
               });
 
-              stream.on('close', function() {
+              stream.on('close', function () {
                 done();
               });
             });
@@ -374,33 +374,33 @@ describe('model', function() {
       });
     });
 
-    describe('findOne', function() {
-      it('hydrates correct model', function(done) {
-        var baseEvent  = new BaseEvent({ name: 'Base event' });
+    describe('findOne', function () {
+      it('hydrates correct model', function (done) {
+        var baseEvent = new BaseEvent({ name: 'Base event' });
         var impressionEvent = new ImpressionEvent({ name: 'Impression event' });
         var conversionEvent = new ConversionEvent({ name: 'Conversion event', revenue: 1.337 });
 
-        baseEvent.save(function(err) {
+        baseEvent.save(function (err) {
           assert.ifError(err);
-          impressionEvent.save(function(err) {
+          impressionEvent.save(function (err) {
             assert.ifError(err);
-            conversionEvent.save(function(err) {
+            conversionEvent.save(function (err) {
               assert.ifError(err);
               // finds & hydrates BaseEvent
-              BaseEvent.findOne({ _id: baseEvent._id }, function(err, event) {
+              BaseEvent.findOne({ _id: baseEvent._id }, function (err, event) {
                 assert.ifError(err);
                 assert.ok(event instanceof BaseEvent);
                 assert.equal(event.name, 'Base event');
 
                 // finds & hydrates ImpressionEvent
-                BaseEvent.findOne({ _id: impressionEvent._id }, function(err, event) {
+                BaseEvent.findOne({ _id: impressionEvent._id }, function (err, event) {
                   assert.ifError(err);
                   assert.ok(event instanceof ImpressionEvent);
                   assert.equal(event.schema, ImpressionEventSchema);
                   assert.equal(event.name, 'Impression event');
 
                   // finds & hydrates ConversionEvent
-                  BaseEvent.findOne({ _id: conversionEvent._id }, function(err, event) {
+                  BaseEvent.findOne({ _id: conversionEvent._id }, function (err, event) {
                     assert.ifError(err);
                     assert.ok(event instanceof ConversionEvent);
                     assert.equal(event.schema, ConversionEventSchema);
@@ -414,32 +414,32 @@ describe('model', function() {
         });
       });
 
-      var checkHydratesCorrectModels = function(fields, done, checkUndefinedRevenue) {
-        var baseEvent  = new BaseEvent({ name: 'Base event' });
+      var checkHydratesCorrectModels = function (fields, done, checkUndefinedRevenue) {
+        var baseEvent = new BaseEvent({ name: 'Base event' });
         var impressionEvent = new ImpressionEvent({ name: 'Impression event' });
         var conversionEvent = new ConversionEvent({ name: 'Conversion event', revenue: 1.337 });
 
-        baseEvent.save(function(err) {
+        baseEvent.save(function (err) {
           assert.ifError(err);
-          impressionEvent.save(function(err) {
+          impressionEvent.save(function (err) {
             assert.ifError(err);
-            conversionEvent.save(function(err) {
+            conversionEvent.save(function (err) {
               assert.ifError(err);
               // finds & hydrates BaseEvent
-              BaseEvent.findOne({ _id: baseEvent._id }, fields, function(err, event) {
+              BaseEvent.findOne({ _id: baseEvent._id }, fields, function (err, event) {
                 assert.ifError(err);
                 assert.ok(event instanceof BaseEvent);
                 assert.equal(event.name, 'Base event');
 
                 // finds & hydrates ImpressionEvent
-                BaseEvent.findOne({ _id: impressionEvent._id }, fields, function(err, event) {
+                BaseEvent.findOne({ _id: impressionEvent._id }, fields, function (err, event) {
                   assert.ifError(err);
                   assert.ok(event instanceof ImpressionEvent);
                   assert.equal(event.schema, ImpressionEventSchema);
                   assert.equal(event.name, 'Impression event');
 
                   // finds & hydrates ConversionEvent
-                  BaseEvent.findOne({ _id: conversionEvent._id }, fields, function(err, event) {
+                  BaseEvent.findOne({ _id: conversionEvent._id }, fields, function (err, event) {
                     assert.ifError(err);
                     assert.ok(event instanceof ConversionEvent);
                     assert.equal(event.schema, ConversionEventSchema);
@@ -456,44 +456,44 @@ describe('model', function() {
         });
       };
 
-      it('hydrates correct model when fields selection set as string inclusive', function(done) {
+      it('hydrates correct model when fields selection set as string inclusive', function (done) {
         checkHydratesCorrectModels('name', done, true);
       });
 
-      it('hydrates correct model when fields selection set as string exclusive', function(done) {
+      it('hydrates correct model when fields selection set as string exclusive', function (done) {
         checkHydratesCorrectModels('-revenue', done, true);
       });
 
-      it('hydrates correct model when fields selection set as empty string', function(done) {
+      it('hydrates correct model when fields selection set as empty string', function (done) {
         checkHydratesCorrectModels('', done);
       });
 
-      it('hydrates correct model when fields selection set as object inclusive', function(done) {
+      it('hydrates correct model when fields selection set as object inclusive', function (done) {
         checkHydratesCorrectModels({name: 1}, done, true);
       });
 
-      it('hydrates correct model when fields selection set as object exclusive', function(done) {
+      it('hydrates correct model when fields selection set as object exclusive', function (done) {
         checkHydratesCorrectModels({revenue: 0}, done, true);
       });
 
-      it('hydrates correct model when fields selection set as empty object', function(done) {
+      it('hydrates correct model when fields selection set as empty object', function (done) {
         checkHydratesCorrectModels({}, done);
       });
 
-      it('discriminator model only finds a document of its type', function(done) {
+      it('discriminator model only finds a document of its type', function (done) {
         var impressionEvent = new ImpressionEvent({ name: 'Impression event' });
         var conversionEvent = new ConversionEvent({ name: 'Conversion event', revenue: 2 });
 
-        impressionEvent.save(function(err) {
+        impressionEvent.save(function (err) {
           assert.ifError(err);
-          conversionEvent.save(function(err) {
+          conversionEvent.save(function (err) {
             assert.ifError(err);
             // doesn't find anything since we're querying for an impression id
             var query = ConversionEvent.findOne({ _id: impressionEvent._id });
             assert.equal(query.op, 'findOne');
             assert.deepEqual(query._conditions, { _id: impressionEvent._id, __t: 'model-discriminator-querying-conversion' });
 
-            query.exec(function(err, document) {
+            query.exec(function (err, document) {
               assert.ifError(err);
               assert.equal(document, null);
 
@@ -502,7 +502,7 @@ describe('model', function() {
               assert.equal(query.op, 'findOne');
               assert.deepEqual(query._conditions, { __t: 'model-discriminator-querying-conversion' });
 
-              query.exec(function(err, document) {
+              query.exec(function (err, document) {
                 assert.ifError(err);
                 assert.ok(document instanceof ConversionEvent);
                 assert.equal(document.__t, 'model-discriminator-querying-conversion');
@@ -513,20 +513,20 @@ describe('model', function() {
         });
       });
 
-      var checkDiscriminatorModelsFindOneDocumentOfItsType = function(fields, done) {
+      var checkDiscriminatorModelsFindOneDocumentOfItsType = function (fields, done) {
         var impressionEvent = new ImpressionEvent({ name: 'Impression event' });
         var conversionEvent = new ConversionEvent({ name: 'Conversion event', revenue: 2 });
 
-        impressionEvent.save(function(err) {
+        impressionEvent.save(function (err) {
           assert.ifError(err);
-          conversionEvent.save(function(err) {
+          conversionEvent.save(function (err) {
             assert.ifError(err);
             // doesn't find anything since we're querying for an impression id
             var query = ConversionEvent.findOne({ _id: impressionEvent._id }, fields);
             assert.equal(query.op, 'findOne');
             assert.deepEqual(query._conditions, { _id: impressionEvent._id, __t: 'model-discriminator-querying-conversion' });
 
-            query.exec(function(err, document) {
+            query.exec(function (err, document) {
               assert.ifError(err);
               assert.equal(document, null);
 
@@ -535,7 +535,7 @@ describe('model', function() {
               assert.equal(query.op, 'findOne');
               assert.deepEqual(query._conditions, { __t: 'model-discriminator-querying-conversion' });
 
-              query.exec(function(err, document) {
+              query.exec(function (err, document) {
                 assert.ifError(err);
                 assert.ok(document instanceof ConversionEvent);
                 assert.equal(document.__t, 'model-discriminator-querying-conversion');
@@ -546,46 +546,46 @@ describe('model', function() {
         });
       };
 
-      it('discriminator model only finds a document of its type when fields selection set as string inclusive', function(done) {
+      it('discriminator model only finds a document of its type when fields selection set as string inclusive', function (done) {
         checkDiscriminatorModelsFindOneDocumentOfItsType('name', done);
       });
 
-      it('discriminator model only finds a document of its type when fields selection set as string exclusive', function(done) {
+      it('discriminator model only finds a document of its type when fields selection set as string exclusive', function (done) {
         checkDiscriminatorModelsFindOneDocumentOfItsType('-revenue', done);
       });
 
-      it('discriminator model only finds a document of its type when fields selection set as empty string', function(done) {
+      it('discriminator model only finds a document of its type when fields selection set as empty string', function (done) {
         checkDiscriminatorModelsFindOneDocumentOfItsType('', done);
       });
 
-      it('discriminator model only finds a document of its type when fields selection set as object inclusive', function(done) {
+      it('discriminator model only finds a document of its type when fields selection set as object inclusive', function (done) {
         checkDiscriminatorModelsFindOneDocumentOfItsType({name: 1}, done);
       });
 
-      it('discriminator model only finds a document of its type when fields selection set as object exclusive', function(done) {
+      it('discriminator model only finds a document of its type when fields selection set as object exclusive', function (done) {
         checkDiscriminatorModelsFindOneDocumentOfItsType({revenue: 0}, done);
       });
 
-      it('discriminator model only finds a document of its type when fields selection set as empty object', function(done) {
+      it('discriminator model only finds a document of its type when fields selection set as empty object', function (done) {
         checkDiscriminatorModelsFindOneDocumentOfItsType({}, done);
       });
     });
 
-    describe('findOneAndUpdate', function() {
-      it('does not update models of other types', function(done) {
-        var baseEvent  = new BaseEvent({ name: 'Base event' });
+    describe('findOneAndUpdate', function () {
+      it('does not update models of other types', function (done) {
+        var baseEvent = new BaseEvent({ name: 'Base event' });
         var impressionEvent = new ImpressionEvent({ name: 'Impression event' });
         var conversionEvent = new ConversionEvent({ name: 'Conversion event', revenue: 1.337 });
 
-        baseEvent.save(function(err) {
+        baseEvent.save(function (err) {
           assert.ifError(err);
-          impressionEvent.save(function(err) {
+          impressionEvent.save(function (err) {
             assert.ifError(err);
-            conversionEvent.save(function(err) {
+            conversionEvent.save(function (err) {
               assert.ifError(err);
               var query = ConversionEvent.findOneAndUpdate({ name: 'Impression event' }, { $set: { name: 'Impression event - updated'}});
               assert.deepEqual(query._conditions, { name: 'Impression event', __t: 'model-discriminator-querying-conversion' });
-              query.exec(function(err, document) {
+              query.exec(function (err, document) {
                 assert.ifError(err);
                 assert.equal(document, null);
                 done();
@@ -595,20 +595,20 @@ describe('model', function() {
         });
       });
 
-      it('updates models of its own type', function(done) {
-        var baseEvent  = new BaseEvent({ name: 'Base event' });
+      it('updates models of its own type', function (done) {
+        var baseEvent = new BaseEvent({ name: 'Base event' });
         var impressionEvent = new ImpressionEvent({ name: 'Impression event' });
         var conversionEvent = new ConversionEvent({ name: 'Conversion event', revenue: 1.337 });
 
-        baseEvent.save(function(err) {
+        baseEvent.save(function (err) {
           assert.ifError(err);
-          impressionEvent.save(function(err) {
+          impressionEvent.save(function (err) {
             assert.ifError(err);
-            conversionEvent.save(function(err) {
+            conversionEvent.save(function (err) {
               assert.ifError(err);
               var query = ConversionEvent.findOneAndUpdate({ name: 'Conversion event' }, { $set: { name: 'Conversion event - updated'}}, { 'new': true });
               assert.deepEqual(query._conditions, { name: 'Conversion event', __t: 'model-discriminator-querying-conversion' });
-              query.exec(function(err, document) {
+              query.exec(function (err, document) {
                 assert.ifError(err);
                 var expected = conversionEvent.toJSON();
                 expected.name = 'Conversion event - updated';
@@ -620,20 +620,20 @@ describe('model', function() {
         });
       });
 
-      it('base model modifies any event type', function(done) {
-        var baseEvent  = new BaseEvent({ name: 'Base event' });
+      it('base model modifies any event type', function (done) {
+        var baseEvent = new BaseEvent({ name: 'Base event' });
         var impressionEvent = new ImpressionEvent({ name: 'Impression event' });
         var conversionEvent = new ConversionEvent({ name: 'Conversion event', revenue: 1.337 });
 
-        baseEvent.save(function(err) {
+        baseEvent.save(function (err) {
           assert.ifError(err);
-          impressionEvent.save(function(err) {
+          impressionEvent.save(function (err) {
             assert.ifError(err);
-            conversionEvent.save(function(err) {
+            conversionEvent.save(function (err) {
               assert.ifError(err);
               var query = BaseEvent.findOneAndUpdate({ name: 'Conversion event' }, { $set: { name: 'Conversion event - updated'}}, { 'new': true });
               assert.deepEqual(query._conditions, { name: 'Conversion event' });
-              query.exec(function(err, document) {
+              query.exec(function (err, document) {
                 assert.ifError(err);
                 var expected = conversionEvent.toJSON();
                 expected.name = 'Conversion event - updated';
@@ -646,8 +646,8 @@ describe('model', function() {
       });
     });
 
-    describe('population/reference mapping', function() {
-      it('populates and hydrates correct models', function(done) {
+    describe('population/reference mapping', function () {
+      it('populates and hydrates correct models', function (done) {
         var vehicleSchema = new Schema();
         var carSchema = new Schema({ speed: Number });
         var busSchema = new Schema({ speed: Number });
@@ -663,14 +663,14 @@ describe('model', function() {
           , Bus = Vehicle.discriminator('ModelDiscriminatorPopulationBus', busSchema)
           , User = db.model('ModelDiscriminatorPopulationUser', userSchema);
 
-        Vehicle.create({}, function(err, vehicle) {
+        Vehicle.create({}, function (err, vehicle) {
           assert.ifError(err);
-          Car.create({ speed: 160 }, function(err, car) {
-            Bus.create({ speed: 80 }, function(err, bus) {
+          Car.create({ speed: 160 }, function (err, car) {
+            Bus.create({ speed: 80 }, function (err, bus) {
               assert.ifError(err);
-              User.create({ vehicles: [vehicle._id, car._id, bus._id], favoriteVehicle: car._id, favoriteBus: bus._id }, function(err) {
+              User.create({ vehicles: [vehicle._id, car._id, bus._id], favoriteVehicle: car._id, favoriteBus: bus._id }, function (err) {
                 assert.ifError(err);
-                User.findOne({}).populate('vehicles favoriteVehicle favoriteBus').exec(function(err, user) {
+                User.findOne({}).populate('vehicles favoriteVehicle favoriteBus').exec(function (err, user) {
                   assert.ifError(err);
 
                   var expected = {
@@ -706,7 +706,7 @@ describe('model', function() {
         });
       });
 
-      it('reference in child schemas (gh-2719)', function(done){
+      it('reference in child schemas (gh-2719)', function (done) {
         var vehicleSchema = new Schema({});
         var carSchema = new Schema({
           speed: Number,
@@ -727,16 +727,16 @@ describe('model', function() {
           , Bus = Vehicle.discriminator('gh2719PopulationBus', busSchema)
           , Garage = db.model('gh2719PopulationGarage', garageSchema);
 
-        Garage.create({name: 'My', num_of_places: 3}, function(err, garage){
+        Garage.create({name: 'My', num_of_places: 3}, function (err, garage) {
           assert.ifError(err);
-          Car.create({ speed: 160, garage: garage }, function(err) {
+          Car.create({ speed: 160, garage: garage }, function (err) {
             assert.ifError(err);
-            Bus.create({ speed: 80, garage: garage }, function(err) {
+            Bus.create({ speed: 80, garage: garage }, function (err) {
               assert.ifError(err);
-              Vehicle.find({}).populate('garage').exec(function(err, vehicles){
+              Vehicle.find({}).populate('garage').exec(function (err, vehicles) {
                 assert.ifError(err);
 
-                vehicles.forEach(function(v){
+                vehicles.forEach(function (v) {
                   assert.ok(v.garage instanceof Garage);
                 });
 
@@ -747,10 +747,10 @@ describe('model', function() {
         });
       });
 
-      it('reference in child schemas (gh-2719-2)', function(done){
+      it('reference in child schemas (gh-2719-2)', function (done) {
         var EventSchema, Event, TalkSchema, Talk, Survey;
 
-        function BaseSchema() {
+        function BaseSchema () {
           Schema.apply(this, arguments);
 
           this.add({
@@ -785,7 +785,7 @@ describe('model', function() {
         Survey.create({
           name: "That you see?",
           date: Date.now()
-        }, function(err, survey){
+        }, function (err, survey) {
           assert.ifError(err);
 
           Talk.create({
@@ -794,10 +794,10 @@ describe('model', function() {
             pin: "0004",
             period: { start: "11:00", end: "12:00" },
             surveys: [ survey ]
-          }, function(err){
+          }, function (err) {
             assert.ifError(err);
 
-            Event.find({}).populate('surveys').exec(function(err, events){
+            Event.find({}).populate('surveys').exec(function (err, events) {
               assert.ifError(err);
 
               assert.ok(events[0].surveys[0] instanceof Survey);
@@ -809,10 +809,10 @@ describe('model', function() {
       });
     });
 
-    describe('aggregate', function() {
+    describe('aggregate', function () {
       var impressionEvent, conversionEvent, ignoredImpressionEvent;
 
-      beforeEach(function(done) {
+      beforeEach(function (done) {
         impressionEvent = new ImpressionEvent({ name: 'Test Event' });
         conversionEvent = new ConversionEvent({ name: 'Test Event', revenue: 10 });
         ignoredImpressionEvent = new ImpressionEvent({ name: 'Ignored Event' });
@@ -826,13 +826,13 @@ describe('model', function() {
         );
       });
 
-      describe('using "RootModel#aggregate"', function() {
-        it('to aggregate documents of all discriminators', function(done) {
+      describe('using "RootModel#aggregate"', function () {
+        it('to aggregate documents of all discriminators', function (done) {
           var aggregate = BaseEvent.aggregate([
             { $match: { name: 'Test Event' } }
           ]);
 
-          aggregate.exec(function(err, docs) {
+          aggregate.exec(function (err, docs) {
             assert.ifError(err);
             assert.deepEqual(aggregate._pipeline, [
               { $match: { name: 'Test Event' } }
@@ -843,13 +843,13 @@ describe('model', function() {
         });
       });
 
-      describe('using "ModelDiscriminator#aggregate"', function() {
-        it('only aggregates documents of the appropriate discriminator', function(done) {
+      describe('using "ModelDiscriminator#aggregate"', function () {
+        it('only aggregates documents of the appropriate discriminator', function (done) {
           var aggregate = ImpressionEvent.aggregate([
             { $group: { _id: '$__t', count: { $sum: 1 } } }
           ]);
 
-          aggregate.exec(function(err, result) {
+          aggregate.exec(function (err, result) {
             assert.ifError(err);
 
             // Discriminator `$match` pipeline step was added on the
@@ -869,12 +869,12 @@ describe('model', function() {
           });
         });
 
-        it('merges the first pipeline stages if applicable', function(done) {
+        it('merges the first pipeline stages if applicable', function (done) {
           var aggregate = ImpressionEvent.aggregate([
             { $match: { name: 'Test Event' } }
           ]);
 
-          aggregate.exec(function(err, result) {
+          aggregate.exec(function (err, result) {
             assert.ifError(err);
 
             // Discriminator `$match` pipeline step was added on the

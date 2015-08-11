@@ -70,7 +70,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function (err) {
       body : 'this be some crazzzyyyyy text that would go in a comment',
       comments : [{ title : 'second level', date : new Date(), body : 'texttt'}]
     };
-    for (var i=0; i < 5; i++) {
+    for (var i = 0; i < 5; i++) {
       blogData.comments.push(commentData);
     }
     var data = {
@@ -92,7 +92,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function (err) {
     var user = db.collection('user');
     var blogpost = db.collection('blogpost');
 
-    function closeDB() {
+    function closeDB () {
       mongoose.connection.db.dropDatabase(function () {
         mongoose.disconnect();
         process.exit();

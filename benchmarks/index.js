@@ -52,7 +52,7 @@ function run (label, fn) {
   var a;
   while (i--) {
     a = fn();
-    if (i%2) {
+    if (i % 2) {
       a.toObject({ depopulate: true });
     } else {
       if (a._delta) {
@@ -62,13 +62,13 @@ function run (label, fn) {
       }
     }
   }
-  var time = (new Date - start)/1000;
+  var time = (new Date - start) / 1000;
   totaltime += time;
   numdocs += total;
-  log(label + ' took %d seconds for %d docs (%d dps)', time, total, total/time);
+  log(label + ' took %d seconds for %d docs (%d dps)', time, total, total / time);
   var used = process.memoryUsage();
   var res = {};
-  res.rss  = used.rss - started.rss;
+  res.rss = used.rss - started.rss;
   res.heapTotal = used.heapTotal - started.heapTotal;
   res.heapUsed = used.heapUsed - started.heapUsed;
   log('change: ', res);
@@ -148,6 +148,6 @@ run('array of docs', function () {
 });
 
 //console.error(a.toObject({depopulate:true}));
-console.error('completed %d docs in %d seconds (%d dps)', numdocs, totaltime,numdocs/totaltime);
+console.error('completed %d docs in %d seconds (%d dps)', numdocs, totaltime, numdocs / totaltime);
 
 // --trace-opt --trace-deopt --trace-bailout

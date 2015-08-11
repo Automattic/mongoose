@@ -44,8 +44,8 @@ var BlogPost = new Schema({
 var collection = 'mapreduce_' + random();
 mongoose.model('MapReduce', BlogPost);
 
-describe('model: mapreduce:', function(){
-  it('works', function(done){
+describe('model: mapreduce:', function () {
+  it('works', function (done) {
     var db = start()
       , MR = db.model('MapReduce', collection);
 
@@ -54,8 +54,8 @@ describe('model: mapreduce:', function(){
     var authors = 'aaron guillermo brian nathan'.split(' ');
     var num = 10;
     var docs = [];
-    for (var i = 0; i< num; ++i)
-      docs.push({ author: authors[i%authors.length], owners: [id], published: true });
+    for (var i = 0; i < num; ++i)
+      docs.push({ author: authors[i % authors.length], owners: [id], published: true });
 
     MR.create(docs, function (err, insertedDocs) {
       assert.ifError(err);
@@ -146,7 +146,7 @@ describe('model: mapreduce:', function(){
     });
   });
 
-  it('withholds stats with false verbosity', function(done){
+  it('withholds stats with false verbosity', function (done) {
     var db = start()
       , MR = db.model('MapReduce', collection);
 
@@ -156,14 +156,14 @@ describe('model: mapreduce:', function(){
       , verbose: false
     };
 
-    MR.mapReduce(o, function (err, results, stats){
+    MR.mapReduce(o, function (err, results, stats) {
       assert.equal('undefined', typeof stats);
       db.close(done);
     });
   });
 
   describe('promises (gh-1628)', function () {
-    it('are returned', function(done){
+    it('are returned', function (done) {
       var db = start()
         , MR = db.model('MapReduce', collection);
 
@@ -172,13 +172,13 @@ describe('model: mapreduce:', function(){
         , reduce: function () { return 'test'; }
       };
 
-      var promise = MR.mapReduce(o, function(){});
+      var promise = MR.mapReduce(o, function () {});
       assert.ok(promise instanceof mongoose.Promise);
 
       db.close(done);
     });
 
-    it('allow not passing a callback', function(done){
+    it('allow not passing a callback', function (done) {
       var db = start()
         , MR = db.model('MapReduce', collection);
 
@@ -202,7 +202,7 @@ describe('model: mapreduce:', function(){
 
       var promise;
 
-      assert.doesNotThrow(function(){
+      assert.doesNotThrow(function () {
         promise = MR.mapReduce(o);
       });
 

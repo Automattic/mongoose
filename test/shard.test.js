@@ -15,7 +15,7 @@ if (!uri) {
             , '\033[39m');
 
   // let expresso shut down this test
-  exports.r = function expressoHack(){};
+  exports.r = function expressoHack () {};
   return;
 }
 
@@ -35,7 +35,7 @@ mongoose.model('ShardPerson', schema, collection);
 var version;
 var greaterThan20x;
 var db;
-describe('shard', function(){
+describe('shard', function () {
   before(function (done) {
     db = start({ uri: uri });
     db.on('error', function (err) {
@@ -67,7 +67,7 @@ describe('shard', function(){
           if (!(res && res.documents && res.documents[0] && res.documents[0].ok)) {
             err = new Error('could not shard test collection '
                 + collection + '\n'
-                + res.documents[0].errmsg +'\n'
+                + res.documents[0].errmsg + '\n'
                 + 'Make sure to use a different database than what '
                 + 'is used for the MULTI_MONGOS_TEST' );
             return done(err);
@@ -78,8 +78,8 @@ describe('shard', function(){
             admin.serverStatus(function (err, info) {
               db.close();
               assert.ifError(err);
-              version = info.version.split('.').map(function(n){return parseInt(n, 10); });
-              greaterThan20x = 2 < version[0] || 2==version[0] && 0<version[0];
+              version = info.version.split('.').map(function (n) {return parseInt(n, 10); });
+              greaterThan20x = 2 < version[0] || 2 == version[0] && 0 < version[0];
               done();
             });
           });
@@ -264,7 +264,7 @@ describe('shard', function(){
           assert.equal(chunli.$__.shardval.name, 'chun li');
           assert.equal(chunli.$__.shardval.age, 19);
 
-          chunli.name='chuuuun liiiii';
+          chunli.name = 'chuuuun liiiii';
           chunli.save(function (err) {
             db.close();
             assert.ok(/^After applying the update to the document/.test(err.message));

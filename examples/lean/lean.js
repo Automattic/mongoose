@@ -57,8 +57,8 @@ mongoose.connect('mongodb://localhost/persons', function (err) {
   });
 });
 
-function cleanup() {
-  Person.remove(function() {
+function cleanup () {
+  Person.remove(function () {
     mongoose.disconnect();
   });
 }

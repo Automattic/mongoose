@@ -5,8 +5,8 @@ var start = require('./common')
   , assert = require('assert')
   , mongoose = start.mongoose;
 
-describe('crash: (gh-407)', function(){
-  it('test mongodb crash with invalid objectid string', function(done){
+describe('crash: (gh-407)', function () {
+  it('test mongodb crash with invalid objectid string', function (done) {
     var db = mongoose.createConnection("mongodb://localhost/test-crash");
 
     var IndexedGuy = new mongoose.Schema({

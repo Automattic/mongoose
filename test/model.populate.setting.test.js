@@ -23,8 +23,8 @@ var posts = 'blogposts_' + random()
  * Tests.
  */
 
-describe('model: populate:', function(){
-  describe('setting populated paths (gh-570)', function(){
+describe('model: populate:', function () {
+  describe('setting populated paths (gh-570)', function () {
     var types = {
         'ObjectId': DocObjectId
       , 'String': String
@@ -41,15 +41,15 @@ describe('model: populate:', function(){
     };
 
     Object.keys(types).forEach(function (id) {
-      describe('should not cast to _id of type ' + id, function(){
+      describe('should not cast to _id of type ' + id, function () {
         var refuser;
         var db;
         var B, U;
         var u1;
         var b1, b2;
 
-        before(function(done){
-          refuser = 'RefUser-'+id;
+        before(function (done) {
+          refuser = 'RefUser-' + id;
 
           var bSchema = Schema({
               title: String
@@ -69,7 +69,7 @@ describe('model: populate:', function(){
           });
 
           db = start();
-          B = db.model('RefBlogPost-'+id, bSchema, posts + random());
+          B = db.model('RefBlogPost-' + id, bSchema, posts + random());
           U = db.model(refuser, uSchema, users + random());
 
           U.create({
@@ -106,7 +106,7 @@ describe('model: populate:', function(){
           });
         });
 
-        after(function(done){
+        after(function (done) {
           db.close(done);
         });
 
@@ -118,7 +118,7 @@ describe('model: populate:', function(){
           return new U(userLiteral(name));
         }
 
-        it('if a document', function(done){
+        it('if a document', function (done) {
           B.findById(b1)
            .populate('fans _creator embed.other embed.array')
            .populate({ path: 'adhoc.subdoc', model: refuser })
@@ -214,7 +214,7 @@ describe('model: populate:', function(){
           });
         });
 
-        it('if an object', function(done){
+        it('if an object', function (done) {
           B.findById(b2)
            .populate('fans _creator embed.other embed.array')
            .populate({ path: 'adhoc.subdoc', model: refuser })

@@ -42,8 +42,8 @@ var BlogPost = new Schema({
 
 mongoose.model('Versioning', BlogPost);
 
-describe('versioning', function(){
-  it('is only added to parent schema (gh-1265)', function(done){
+describe('versioning', function () {
+  it('is only added to parent schema (gh-1265)', function (done) {
     assert.ok(BlogPost.path('__v'));
     assert.ok(!BlogPost.path('comments').__v);
     assert.ok(!BlogPost.path('meta.nested').__v);
@@ -318,9 +318,9 @@ describe('versioning', function(){
 
   it('version works with strict docs', function (done) {
     var db = start();
-    var schema = new Schema({ str: ['string'] }, { strict: true, collection: 'versionstrict_'+random() });
+    var schema = new Schema({ str: ['string'] }, { strict: true, collection: 'versionstrict_' + random() });
     var M = db.model('VersionStrict', schema);
-    var m =new M({ str: ['death', 'to', 'smootchy'] });
+    var m = new M({ str: ['death', 'to', 'smootchy'] });
     m.save(function (err) {
       assert.ifError(err);
       M.find(m, function (err, m) {
@@ -373,10 +373,10 @@ describe('versioning', function(){
   });
 
   it('versionKey is configurable', function (done) {
-    var db =start();
+    var db = start();
     var schema = new Schema(
         { configured: 'bool' }
-      , { versionKey: 'lolwat', collection: 'configuredversion'+random() });
+      , { versionKey: 'lolwat', collection: 'configuredversion' + random() });
     var V = db.model('ConfiguredVersionKey', schema);
     var v = new V({ configured: true });
     v.save(function (err) {
@@ -390,10 +390,10 @@ describe('versioning', function(){
     });
   });
 
-  it('can be disabled', function(done){
+  it('can be disabled', function (done) {
     var db = start();
     var schema = Schema({ x: ['string'] }, { versionKey: false });
-    var M = db.model('disabledVersioning', schema, 's'+random());
+    var M = db.model('disabledVersioning', schema, 's' + random());
     M.create({ x: ['hi'] }, function (err, doc) {
       assert.ifError(err);
       assert.equal(false, '__v' in doc._doc);
@@ -414,7 +414,7 @@ describe('versioning', function(){
     });
   });
 
-  it('works with numbericAlpha paths', function(done){
+  it('works with numbericAlpha paths', function (done) {
     var db = start();
     var M = db.model('Versioning');
     var m = new M({ mixed: {} });
@@ -426,8 +426,8 @@ describe('versioning', function(){
     });
   });
 
-  describe('doc.increment()', function(){
-    it('works without any other changes (gh-1475)', function(done){
+  describe('doc.increment()', function () {
+    it('works without any other changes (gh-1475)', function (done) {
       var db = start()
         , V = db.model('Versioning');
 
@@ -453,20 +453,20 @@ describe('versioning', function(){
     });
   });
 
-  describe('versioning is off', function(){
-    it('when { safe : false } is set (gh-1520)', function(done){
+  describe('versioning is off', function () {
+    it('when { safe : false } is set (gh-1520)', function (done) {
       var schema1 = new Schema({ title : String}, { safe : false });
       assert.equal(schema1.options.versionKey, false);
       done();
     });
-    it('when { safe : { w: 0 }} is set (gh-1520)', function(done){
+    it('when { safe : { w: 0 }} is set (gh-1520)', function (done) {
       var schema1 = new Schema({ title : String}, { safe : { w: 0 } });
       assert.equal(schema1.options.versionKey, false);
       done();
     });
   });
 
-  it('gh-1898', function(done) {
+  it('gh-1898', function (done) {
     var db = start();
     var schema = new Schema({ tags: [String], name: String });
 
@@ -474,7 +474,7 @@ describe('versioning', function(){
 
     var m = new M({ tags: ['eggs'] });
 
-    m.save(function(err) {
+    m.save(function (err) {
       assert.ifError(err);
 
       m.tags.push('bacon');
@@ -488,13 +488,13 @@ describe('versioning', function(){
     });
   });
 
-  it('can remove version key from toObject() (gh-2675)', function(done) {
+  it('can remove version key from toObject() (gh-2675)', function (done) {
     var db = start();
     var schema = new Schema({ name: String });
     var M = db.model('gh2675', schema, 'gh2675');
 
     var m = new M();
-    m.save(function(err, m) {
+    m.save(function (err, m) {
       assert.ifError(err);
       var obj = m.toObject();
       assert.equal(0, obj.__v);

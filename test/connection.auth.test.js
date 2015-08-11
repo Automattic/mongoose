@@ -3,10 +3,10 @@ var start = require('./common');
 var mongoose = start.mongoose;
 var assert = require('assert');
 
-describe('connection:', function(){
-  describe('supports authSource', function(){
+describe('connection:', function () {
+  describe('supports authSource', function () {
 
-    it('in querystring', function(done){
+    it('in querystring', function (done) {
       var conn = mongoose.createConnection();
       conn._open = function () {
         assert.ok(conn.options);
@@ -17,7 +17,7 @@ describe('connection:', function(){
       conn.open(start.uri + '?authSource=users');
     });
 
-    it('passed as an option', function(done){
+    it('passed as an option', function (done) {
       var conn = mongoose.createConnection();
       conn._open = function () {
         assert.ok(conn.options);

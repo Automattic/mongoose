@@ -8,11 +8,11 @@ var start = require('./common')
   , mongoose = start.mongoose
   , Schema = mongoose.Schema;
 
-describe('documents should not be converted to _id (gh-1408)', function(){
-  it('if an embedded doc', function(done){
+describe('documents should not be converted to _id (gh-1408)', function () {
+  it('if an embedded doc', function (done) {
     var db = start();
 
-    var PreferenceSchema = new Schema ({
+    var PreferenceSchema = new Schema({
         _id: {type: Schema.ObjectId, auto: true},
         preference: { type: String, required: true },
         value: { type: Schema.Types.Mixed }

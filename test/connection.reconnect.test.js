@@ -2,8 +2,8 @@
 var start = require('./common');
 var mongoose = start.mongoose;
 
-describe('connection: manual reconnect with authReconnect: false', function(){
-  it('should continue processing queries/writes', function(done){
+describe('connection: manual reconnect with authReconnect: false', function () {
+  it('should continue processing queries/writes', function (done) {
     // connect to mongod
     // perform writes/queries
     // take mongod down

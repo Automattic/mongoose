@@ -9,7 +9,7 @@ var SchemaNumber = mongoose.Schema.Types.Number;
  * Test.
  */
 
-describe('types.number', function(){
+describe('types.number', function () {
 
   it('an empty string casts to null', function (done) {
     var n = new SchemaNumber();
@@ -31,7 +31,7 @@ describe('types.number', function(){
     } catch (e) {
       err = e;
     }
-    assert.strictEqual(true, !! err);
+    assert.strictEqual(true, !!err);
     done();
   });
 
@@ -43,7 +43,7 @@ describe('types.number', function(){
     } catch (e) {
       err = e;
     }
-    assert.strictEqual(true, !! err);
+    assert.strictEqual(true, !!err);
     done();
   });
 
@@ -55,7 +55,7 @@ describe('types.number', function(){
     } catch (e) {
       err = e;
     }
-    assert.strictEqual(true, !! err);
+    assert.strictEqual(true, !!err);
     done();
   });
 
@@ -67,7 +67,7 @@ describe('types.number', function(){
     } catch (e) {
       err = e;
     }
-    assert.strictEqual(true, !! err);
+    assert.strictEqual(true, !!err);
     done();
   });
 
@@ -82,7 +82,7 @@ describe('types.number', function(){
     } catch (e) {
       err = e;
     }
-    assert.strictEqual(false, !! err, err);
+    assert.strictEqual(false, !!err, err);
     done();
   });
 

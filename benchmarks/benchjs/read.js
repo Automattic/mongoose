@@ -70,7 +70,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function (err) {
       body : 'this be some crazzzyyyyy text that would go in a comment',
       comments : [{ title : 'second level', date : new Date(), body : 'texttt'}]
     };
-    for (var i=0; i < 5; i++) {
+    for (var i = 0; i < 5; i++) {
       blogData.comments.push(commentData);
     }
     var UserSchema = new Schema({
@@ -100,7 +100,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function (err) {
 
     // insert all of the data here
     var count = 4000;
-    for (i=0; i < 1000; i++) {
+    for (i = 0; i < 1000; i++) {
       data.age = Math.floor(Math.random() * 50);
       User.create(data, function (err, u) {
         if (err) throw err;
@@ -132,27 +132,27 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function (err) {
         bmi = 0,
         bdi = 0;
 
-    function getNextmId() {
+    function getNextmId () {
       mi = ++mi % mIds.length;
       return mIds[mi];
     }
 
-    function getNextdId() {
+    function getNextdId () {
       di = ++di % dIds.length;
       return dIds[di];
     }
 
-    function getNextbmId() {
+    function getNextbmId () {
       bmi = ++bmi % bmIds.length;
       return bmIds[bmi];
     }
 
-    function getNextbdId() {
+    function getNextbdId () {
       bdi = ++bdi % bdIds.length;
       return bdIds[bdi];
     }
 
-    function closeDB() {
+    function closeDB () {
       mongoose.connection.db.dropDatabase(function () {
         mongoose.disconnect();
         process.exit();
@@ -187,7 +187,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function (err) {
       defer : true,
       fn : function (deferred) {
         var ids = [];
-        for (var i=0; i < 25; i++) {
+        for (var i = 0; i < 25; i++) {
           ids.push(getNextmId());
         }
         User.find({ _id : { $in : ids }}, function (err) {
@@ -199,7 +199,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function (err) {
       defer : true,
       fn : function (deferred) {
         var ids = [];
-        for (var i=0; i < 25; i++) {
+        for (var i = 0; i < 25; i++) {
           ids.push(getNextdId());
         }
         user.find({ _id : { $in : ids }}, function (err, cursor) {
@@ -273,7 +273,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function (err) {
         console.log(JSON.stringify(outObj));
       }
     });
-    function next() {
+    function next () {
       suite.run({ async : true });
     }
   });

@@ -17,10 +17,10 @@ var schema = new Schema({
 schema.index({ "pos" : "geoHaystack", type : 1},{ bucketSize : 1});
 
 function getModel (db) {
-  return db.model('GeoSearch', schema, 'geosearch-'+random());
+  return db.model('GeoSearch', schema, 'geosearch-' + random());
 }
 
-describe('model', function(){
+describe('model', function () {
   describe('geoSearch', function () {
     it('works', function (done) {
 
@@ -28,7 +28,7 @@ describe('model', function(){
       var Geo = getModel(db);
       assert.ok(Geo.geoSearch instanceof Function);
 
-      Geo.on('index', function(err){
+      Geo.on('index', function (err) {
         assert.ifError(err);
 
         var geos = [];
@@ -38,14 +38,14 @@ describe('model', function(){
         geos[3] = new Geo({ pos : [1,-1], type : "house"});
         var count = geos.length;
 
-        for (var i=0; i < geos.length; i++) {
+        for (var i = 0; i < geos.length; i++) {
           geos[i].save(function (err) {
             assert.ifError(err);
             --count || next();
           });
         }
 
-        function next() {
+        function next () {
           Geo.geoSearch({ type : "place" }, { near : [9,9], maxDistance : 5 }, function (err, results) {
             assert.ifError(err);
             assert.equal(1, results.length);
@@ -72,7 +72,7 @@ describe('model', function(){
       var Geo = getModel(db);
       assert.ok(Geo.geoSearch instanceof Function);
 
-      Geo.on('index', function(err){
+      Geo.on('index', function (err) {
         assert.ifError(err);
 
         var geos = [];
@@ -82,14 +82,14 @@ describe('model', function(){
         geos[3] = new Geo({ pos : [1,-1], type : "house"});
         var count = geos.length;
 
-        for (var i=0; i < geos.length; i++) {
+        for (var i = 0; i < geos.length; i++) {
           geos[i].save(function (err) {
             assert.ifError(err);
             --count || next();
           });
         }
 
-        function next() {
+        function next () {
           Geo.geoSearch({ type : "place" }, { near : [9,9], maxDistance : 5, lean : true }, function (err, results) {
             assert.ifError(err);
             assert.equal(1, results.length);
@@ -112,11 +112,11 @@ describe('model', function(){
       var Geo = getModel(db);
       assert.ok(Geo.geoSearch instanceof Function);
 
-      Geo.on('index', function(err){
+      Geo.on('index', function (err) {
         assert.ifError(err);
 
         var g = new Geo({ pos : [10,10], type : "place"});
-        g.save(function() {
+        g.save(function () {
           Geo.geoSearch([], {}, function (e) {
             assert.ok(e);
             assert.equal(e.message, "Must pass conditions to geoSearch");
@@ -140,7 +140,7 @@ describe('model', function(){
         });
       });
     });
-    it('returns a promise (gh-1614)', function(done){
+    it('returns a promise (gh-1614)', function (done) {
       var db = start();
       var Geo = getModel(db);
 
@@ -153,24 +153,24 @@ describe('model', function(){
     it('allows not passing a callback (gh-1614)', function (done) {
       var db = start();
       var Geo = getModel(db);
-      Geo.on('index', function(err){
+      Geo.on('index', function (err) {
         assert.ifError(err);
         var g = new Geo({ pos : [10,10], type : "place"});
         g.save(function (err) {
           assert.ifError(err);
 
           var promise;
-          assert.doesNotThrow(function() {
+          assert.doesNotThrow(function () {
             promise = Geo.geoSearch({ type : "place" }, { near : [9,9], maxDistance : 5 });
           });
-          function validate(ret, stat) {
+          function validate (ret, stat) {
             assert.equal(1, ret.length);
             assert.equal(ret[0].pos[0], 10);
             assert.equal(ret[0].pos[1], 10);
             assert.ok(stat);
           }
 
-          function finish() {
+          function finish () {
             db.close(done);
           }
           promise.then(validate, assert.ifError).then(finish).end();

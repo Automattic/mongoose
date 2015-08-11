@@ -44,7 +44,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function (err) {
 
     // insert all of the data here
     var count = 1000;
-    for (var i=0; i < 500; i++) {
+    for (var i = 0; i < 500; i++) {
       User.create(data, function (err, u) {
         if (err) throw err;
         mIds.push(u.id);
@@ -61,7 +61,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function (err) {
       });
     }
 
-    function closeDB() {
+    function closeDB () {
       User.count(function (err, res) {
         if (res != 0) {
           console.log("Still mongoose entries left...");
@@ -112,7 +112,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function (err) {
         console.log(JSON.stringify(outObj));
       }
     });
-    function next() {
+    function next () {
       suite.run({ async : true });
     }
   });

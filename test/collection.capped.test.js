@@ -20,13 +20,13 @@ var coll = 'capped_' + random();
  * Test.
  */
 
-describe('collections: capped:', function(){
-  it('schemas should have option size', function(done){
+describe('collections: capped:', function () {
+  it('schemas should have option size', function (done) {
     assert.ok(capped.options.capped);
     assert.equal(1000, capped.options.capped.size);
     done();
   });
-  it('creation', function(done){
+  it('creation', function (done) {
     var db = start();
     var Capped = db.model('Capped', capped, coll);
     Capped.collection.isCapped(function (err, isCapped) {
@@ -43,7 +43,7 @@ describe('collections: capped:', function(){
       });
     });
   });
-  it('creation using a number', function(done){
+  it('creation using a number', function (done) {
     var db = start();
     var schema = new Schema({ key: 'string' }, { capped: 8192 });
     var Capped = db.model('Capped3', schema);
@@ -54,10 +54,10 @@ describe('collections: capped:', function(){
       db.close(done);
     });
   });
-  it('attempting to use existing non-capped collection as capped emits error', function(done){
+  it('attempting to use existing non-capped collection as capped emits error', function (done) {
     var db = start();
     var opts = { safe: true };
-    var conn = 'capped_existing_'+random();
+    var conn = 'capped_existing_' + random();
 
     db.on('open', function () {
       db.db.createCollection(conn, opts, function (err) {

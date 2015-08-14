@@ -1,3 +1,8 @@
+3.8.35 / 2015-08-14
+===================
+ * fixed; handling for minimize on nested objects #2930
+ * fixed; don't crash when schema.path.options undefined #1824
+
 4.1.2 / 2015-08-10
 ==================
  * fixed; better handling for Jade templates #3241 [kbadk](https://github.com/kbadk)
@@ -52,7 +57,7 @@
  * fixed; strict mode for findOneAndUpdate #2947
  * added; .min.js.gz file for browser component #2806
 
-3.8.35 / 2015-07-20
+3.8.34 / 2015-07-20
 ===================
  * fixed; allow using $rename #3171
  * fixed; no longer modifies update arguments #3008

@@ -1,4 +1,9 @@
-3.8.35 / 2015-07-20
+3.8.35 / 2015-08-14
+===================
+ * fixed; handling for minimize on nested objects #2930
+ * fixed; don't crash when schema.path.options undefined #1824
+
+3.8.34 / 2015-07-20
 ===================
  * fixed; allow using $rename #3171
  * fixed; no longer modifies update arguments #3008

@@ -1655,7 +1655,7 @@ schema.path(<span class="string">'name'</span>, Number) <span class="comment">//
 
   branch[last] = utils.clone(obj);
 
-  <span class="keyword">this</span>.paths[path] = Schema.interpretAsType(path, obj);
+  <span class="keyword">this</span>.paths[path] = Schema.interpretAsType(path, obj, <span class="keyword">this</span>.options);
   <span class="keyword">return</span> <span class="keyword">this</span>;
 };</code></pre></div><hr class=""></div><div class="item method public"><h3 id="schema_Schema-pathType"><a href="#schema_Schema-pathType">Schema#pathType(<code>path</code>)</a></h3><p>Returns the pathType of <code>path</code> for this schema.</p><div class="params"><h4>Parameters:</h4><ul><li><code>path</code><span class="types"> &lt;<a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/String">String</a>&gt; </span><span></span></li></ul></div><div class="returns"><h4>Returns:</h4><ul><li><span class="types"> &lt;<a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/String">String</a>&gt; </span><span></span></li></ul></div><div class="description"><p>Given a path, returns whether it is a real, virtual, nested, or ad-hoc/undefined path.</p></div><span class="showcode">show code</span><div class="sourcecode"><pre><code class="javascript">Schema.prototype.pathType = <span class="function"><span class="keyword">function</span> <span class="params">(path)</span> {</span>
   <span class="keyword">if</span> (path <span class="keyword">in</span> <span class="keyword">this</span>.paths) <span class="keyword">return</span> <span class="string">'real'</span>;
@@ -1835,7 +1835,7 @@ Drink.findByName(<span class="string">'sanpellegrino'</span>, <span class="funct
 Object.defineProperty(Schema, <span class="string">'indexTypes'</span>, {
     get: <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span> <span class="keyword">return</span> indexTypes }
   , set: <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span> <span class="keyword">throw</span> <span class="keyword">new</span> Error(<span class="string">'Cannot overwrite Schema.indexTypes'</span>) }
-})</code></pre></div><hr class=""></div><div class="item static private"><h3 id="schema_Schema.interpretAsType"><a href="#schema_Schema.interpretAsType">Schema.interpretAsType(<code>path</code>, <code>obj</code>)</a></h3><p>Converts type arguments into Mongoose Types.</p><span class="showcode">show code</span><div class="sourcecode"><pre><code class="javascript">Schema.interpretAsType = function (path, obj) {
+})</code></pre></div><hr class=""></div><div class="item static private"><h3 id="schema_Schema.interpretAsType"><a href="#schema_Schema.interpretAsType">Schema.interpretAsType(<code>path</code>, <code>obj</code>)</a></h3><p>Converts type arguments into Mongoose Types.</p><span class="showcode">show code</span><div class="sourcecode"><pre><code class="javascript">Schema.interpretAsType = function (path, obj, options) {
   if (obj.constructor &amp;&amp; obj.constructor.name != 'Object')
     obj = { type: obj };
 
@@ -1865,7 +1865,7 @@ Object.defineProperty(Schema, <span class="string">'indexTypes'</span>, {
     } else if (cast &amp;&amp; (!cast.type || cast.type.type)
                     &amp;&amp; 'Object' == cast.constructor.name
                     &amp;&amp; Object.keys(cast).length) {
-      return new Types.DocumentArray(path, new Schema(cast), obj);
+      return new Types.DocumentArray(path, new Schema(cast, options), obj);
     }
 
     return new Types.Array(path, cast || Types.Mixed, obj);
@@ -2334,7 +2334,9 @@ doc.set(path, value, { strict: <span class="literal">false</span> });</code></pr
             &amp;&amp; (!path[key].constructor || <span class="string">'Object'</span> == path[key].constructor.name)
             &amp;&amp; <span class="string">'virtual'</span> != pathtype
             &amp;&amp; !(<span class="keyword">this</span>.$__path(pathName) <span class="keyword">instanceof</span> MixedSchema)
-            &amp;&amp; !(<span class="keyword">this</span>.schema.paths[pathName] &amp;&amp; <span class="keyword">this</span>.schema.paths[pathName].options.ref)) {
+            &amp;&amp; !(<span class="keyword">this</span>.schema.paths[pathName] &amp;&amp;
+              <span class="keyword">this</span>.schema.paths[pathName].options &amp;&amp;
+              <span class="keyword">this</span>.schema.paths[pathName].options.ref)) {
           <span class="keyword">this</span>.set(path[key], prefix + key, constructing);
         } <span class="keyword">else</span> <span class="keyword">if</span> (strict) {
           <span class="keyword">if</span> (<span class="string">'real'</span> === pathtype || <span class="string">'virtual'</span> === pathtype) {
@@ -5489,7 +5491,6 @@ console.log(m.caps) <span class="comment">// AN EXAMPLE</span></code></pre></div
 
   <span class="keyword">return</span> value;
 }</code></pre></div><hr class="private"></div><div class="item method private"><h3 id="schema_documentarray_DocumentArray"><a href="#schema_documentarray_DocumentArray">DocumentArray(<code>key</code>, <code>schema</code>, <code>options</code>)</a></h3><p>SubdocsArray SchemaType constructor</p><div class="params"><h4>Parameters:</h4><ul><li><code>key</code><span class="types"> &lt;<a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/String">String</a>&gt; </span><span></span></li><li><code>schema</code><span class="types"> &lt;<a href="#schema_Schema">Schema</a>&gt; </span><span></span></li><li><code>options</code><span class="types"> &lt;<a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Object">Object</a>&gt; </span><span></span></li></ul></div><div class="inherits"><h4>Inherits:</h4><ul><li><a href="#schema_array_SchemaArray">SchemaArray</a></li></ul></div><div class="description"></div><span class="showcode">show code</span><div class="sourcecode"><pre><code class="javascript"><span class="function"><span class="keyword">function</span> <span class="title">DocumentArray</span> <span class="params">(key, schema, options)</span> {</span>
-
   <span class="comment">// compile an embedded document for this schema</span>
   <span class="function"><span class="keyword">function</span> <span class="title">EmbeddedDocument</span> <span class="params">()</span> {</span>
     Subdocument.apply(<span class="keyword">this</span>, arguments);

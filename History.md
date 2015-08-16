@@ -1,3 +1,12 @@
+4.1.3 / 2015-08-16
+==================
+ * fixed; getUpdate() in pre update hooks #3520 [gregthegeek](https://github.com/gregthegeek)
+ * fixed; handleArray() ensures arg is an array #3238 [jloveridge](https://github.com/jloveridge)
+ * fixed; refresh required path cache when recreating docs #3199
+ * fixed; $ operator on unwind aggregation helper #3197
+ * fixed; findOneAndUpdate() properly returns raw result as third arg to callback #3173
+ * fixed; querystream with dynamic refs #3108
+
 3.8.35 / 2015-08-14
 ===================
  * fixed; handling for minimize on nested objects #2930

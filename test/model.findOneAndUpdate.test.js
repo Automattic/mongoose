@@ -1450,5 +1450,29 @@ describe('model: findByIdAndUpdate:', function(){
           db.close(done);
         });
     });
+
+    it('passes raw result as 3rd param (gh-3173)', function(done) {
+      var db = start();
+
+      var testSchema = new mongoose.Schema({
+        test: String
+      });
+
+      var TestModel = db.model('gh3173', testSchema);
+
+      TestModel.findOneAndUpdate(
+        {},
+        { $set: { test: 'abc' } },
+        {
+          upsert: true,
+          'new': true
+        },
+        function(error, doc, res) {
+          assert.ifError(error);
+          assert.ok(res);
+          assert.ok(res.ok);
+          done();
+        });
+    });
   });
 });

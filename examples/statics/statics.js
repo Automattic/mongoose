@@ -24,7 +24,7 @@ mongoose.connect('mongodb://localhost/persons', function(err) {
     // using the static
     Person.findPersonByName('bill', function(err, result) {
       if (err) throw err;
-      
+
       console.log(result);
       cleanup();
     });

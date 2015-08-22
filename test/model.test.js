@@ -7,16 +7,12 @@ var start = require('./common')
   , assert = require('assert')
   , mongoose = start.mongoose
   , random = require('../lib/utils').random
-  , Query = require('../lib/query')
   , Schema = mongoose.Schema
-  , SchemaType = mongoose.SchemaType
   , ValidatorError = mongoose.Error.ValidatorError
   , ValidationError = mongoose.Error.ValidationError
   , ObjectId = Schema.Types.ObjectId
   , DocumentObjectId = mongoose.Types.ObjectId
-  , DocumentArray = mongoose.Types.DocumentArray
   , EmbeddedDocument = mongoose.Types.Embedded
-  , MongooseArray = mongoose.Types.Array
   , MongooseError = mongoose.Error;
 
 /**
@@ -141,7 +137,7 @@ describe('Model', function(){
       b = B();
       assert.ok(b instanceof B);
       done();
-    })
+    });
     it('works "new" keyword', function(done){
       var B = mongoose.model('BlogPost');
       var b = new B();
@@ -152,8 +148,8 @@ describe('Model', function(){
       b = new B();
       assert.ok(b instanceof B);
       done();
-    })
-  })
+    });
+  });
   describe('isNew', function(){
     it('is true on instantiation', function(done){
       var db = start()
@@ -166,7 +162,7 @@ describe('Model', function(){
     });
 
     it('on parent and subdocs on failed inserts', function(done){
-      var db = start()
+      var db = start();
 
       var schema = new Schema({
           name: { type: String, unique: true }
@@ -191,7 +187,7 @@ describe('Model', function(){
           });
         });
       });
-    })
+    });
   });
 
   it('gh-2140', function(done) {
@@ -222,7 +218,7 @@ describe('Model', function(){
     it('emits init event', function(done){
       var db = start()
         , schema = new Schema({ name: String })
-        , model
+        , model;
 
       schema.on('init', function (model_) {
         model = model_;
@@ -278,13 +274,13 @@ describe('Model', function(){
           var DefaultArray = db.model('DefaultArray', collection);
           var arr = new DefaultArray;
           db.close();
-          assert.equal(arr.get('arr').length, 3)
+          assert.equal(arr.get('arr').length, 3);
           assert.equal(arr.get('arr')[0],'a');
           assert.equal(arr.get('arr')[1],'b');
           assert.equal(arr.get('arr')[2],'c');
-          assert.equal(arr.get('single').length, 1)
+          assert.equal(arr.get('single').length, 1);
           assert.equal(arr.get('single')[0],'a');
-          done()
+          done();
         });
 
         it('empty', function(done){
@@ -303,7 +299,7 @@ describe('Model', function(){
           done();
         });
       });
-    })
+    });
 
     it('a hash with one null value', function(done){
       var db = start()
@@ -365,7 +361,7 @@ describe('Model', function(){
         assert.ok(post.get('comments').isMongooseDocumentArray);
         cb();
       });
-    })
+    });
 
 
     it('when saved using the promise not the callback', function(done){
@@ -392,7 +388,7 @@ describe('Model', function(){
         assert.ok(post.get('comments').isMongooseDocumentArray);
         db.close(done);
       });
-    })
+    });
 
 
     describe('init', function(){
@@ -400,7 +396,7 @@ describe('Model', function(){
         var db = start()
           , BlogPost = db.model('BlogPost', collection);
 
-        var post = new BlogPost()
+        var post = new BlogPost();
         db.close();
 
         post.init({
@@ -424,7 +420,7 @@ describe('Model', function(){
         assert.ok(post.get('date') instanceof Date);
         assert.equal('object', typeof post.get('meta'));
         assert.ok(post.get('meta').date instanceof Date);
-        assert.equal(typeof post.get('meta').visitors, 'number')
+        assert.equal(typeof post.get('meta').visitors, 'number');
         assert.equal(post.get('published'), true);
 
         assert.equal(post.title,'Test');
@@ -451,7 +447,7 @@ describe('Model', function(){
         assert.ok(post.comments[0] instanceof EmbeddedDocument);
         assert.ok(post.comments[1] instanceof EmbeddedDocument);
         done();
-      })
+      });
 
       it('partially', function(done){
         var db = start()
@@ -478,7 +474,7 @@ describe('Model', function(){
         assert.ok(post.get('owners').isMongooseArray);
         assert.ok(post.get('comments').isMongooseDocumentArray);
         done();
-      })
+      });
 
       it('with partial hash', function(done){
         var db = start()
@@ -501,7 +497,7 @@ describe('Model', function(){
           , BlogPost = db.model('BlogPost', collection);
 
         db.close();
-        var post = new BlogPost()
+        var post = new BlogPost();
         post.init({
             title       : 'Test'
           , slug        : 'test'
@@ -510,18 +506,18 @@ describe('Model', function(){
 
         assert.equal(false, post.get('comments')[0].isNew);
         done();
-      })
+      });
 
       it('isNew on embedded documents after saving', function(done){
         var db = start()
           , BlogPost = db.model('BlogPost', collection);
 
-        var post = new BlogPost({ title: 'hocus pocus' })
+        var post = new BlogPost({ title: 'hocus pocus' });
         post.comments.push({ title: 'Humpty Dumpty', comments: [{title: 'nested'}] });
         assert.equal(true, post.get('comments')[0].isNew);
         assert.equal(true, post.get('comments')[0].comments[0].isNew);
         post.invalidate('title'); // force error
-        post.save(function (err) {
+        post.save(function () {
           assert.equal(true, post.isNew);
           assert.equal(true, post.get('comments')[0].isNew);
           assert.equal(true, post.get('comments')[0].comments[0].isNew);
@@ -531,10 +527,10 @@ describe('Model', function(){
             assert.equal(false, post.isNew);
             assert.equal(false, post.get('comments')[0].isNew);
             assert.equal(false, post.get('comments')[0].comments[0].isNew);
-            done()
+            done();
           });
         });
-      })
+      });
     });
   });
 
@@ -582,7 +578,7 @@ describe('Model', function(){
     childSchema.pre('save', function(next) {
       child_hook = this.name;
       next();
-    })
+    });
 
     var parentSchema = new Schema({
       name: String,
@@ -592,7 +588,7 @@ describe('Model', function(){
     parentSchema.pre('save', function(next) {
       parent_hook = this.name;
       next();
-    })
+    });
 
     var Parent = db.model('doc', parentSchema);
 
@@ -605,7 +601,7 @@ describe('Model', function(){
 
     parent.save(function (err, parent) {
       assert.equal(parent_hook, "Bob");
-      assert.equal(child_hook, "Mary")
+      assert.equal(child_hook, "Mary");
       assert.ifError(err);
       parent.children[0].name = 'Jane';
       parent.save(function(err){
@@ -635,10 +631,10 @@ describe('Model', function(){
         done();
       });
     });
-  })
+  });
 
   it('modified nested objects which contain MongoseNumbers should not cause a RangeError on save (gh-714)', function(done){
-    var db =start()
+    var db =start();
 
     var schema = new Schema({
         nested: {
@@ -662,10 +658,10 @@ describe('Model', function(){
         });
       });
     });
-  })
+  });
 
   it('no RangeError on remove() of a doc with Number _id (gh-714)', function(done){
-    var db = start()
+    var db = start();
 
     var MySchema = new Schema({
         _id: { type: Number },
@@ -728,7 +724,7 @@ describe('Model', function(){
       var post = new BlogPost();
       assert.equal(post, post.cool());
       done();
-    })
+    });
 
     it('can be defined on embedded documents', function(done){
       var db = start();
@@ -764,10 +760,10 @@ describe('Model', function(){
       });
       var NestedKey = db.model('NestedKey', NestedKeySchema);
       var n = new NestedKey();
-      assert.equal(n, n.foo.bar())
+      assert.equal(n, n.foo.bar());
       done();
     });
-  })
+  });
 
   describe('statics', function(){
     it('can be defined', function(done){
@@ -812,9 +808,9 @@ describe('Model', function(){
           db.close();
           assert.ifError(err);
           done();
-        })
+        });
       });
-    })
+    });
     it('nested error', function(done){
       var db = start()
         , BlogPost = db.model('BlogPost', collection)
@@ -853,8 +849,7 @@ describe('Model', function(){
 
     it('subdocument cast error', function(done){
       var db = start()
-        , BlogPost = db.model('BlogPost', collection)
-        , threw = false;
+        , BlogPost = db.model('BlogPost', collection);
 
       var post = new BlogPost({
           title       : 'Test'
@@ -874,7 +869,7 @@ describe('Model', function(){
 
 
     it('subdocument validation error', function(done){
-      function failingvalidator(val) {
+      function failingvalidator() {
         return false;
       }
 
@@ -884,9 +879,9 @@ describe('Model', function(){
             type: String, validate: failingvalidator
           }
         })
-        , BlogPost = db.model('BlogPost', {subs: [subs]})
+        , BlogPost = db.model('BlogPost', {subs: [subs]});
 
-      var post = new BlogPost()
+      var post = new BlogPost();
       post.init({
         subs: [ { str: 'gaga' } ]
       });
@@ -904,7 +899,7 @@ describe('Model', function(){
         , BlogPost = db.model('BlogPost', collection)
         , threw = false;
 
-      var post = new BlogPost()
+      var post = new BlogPost();
 
       try {
         post.get('comments').push({
@@ -967,11 +962,11 @@ describe('Model', function(){
         , post = new BlogPost();
 
       post.get('numbers').push(1, 2, 3, 4);
-      post.save( function (err) {
+      post.save( function () {
         BlogPost.findById( post.get('_id'), function (err, found) {
           assert.equal(found.get('numbers').length,4);
           found.get('numbers').pull('3');
-          found.save( function (err) {
+          found.save( function () {
             BlogPost.findById(found.get('_id'), function (err, found2) {
               db.close();
               assert.ifError(err);
@@ -1003,11 +998,11 @@ describe('Model', function(){
           db.close();
           done();
         });
-      })
+      });
     });
 
     it('date casting compat with datejs (gh-502)', function(done){
-      var db = start()
+      var db = start();
 
       Date.prototype.toObject = function() {
           return {
@@ -1059,7 +1054,7 @@ describe('Model', function(){
 
   describe('validation', function(){
     it('works', function(done){
-      function dovalidate (val) {
+      function dovalidate () {
         assert.equal('correct', this.asyncScope);
         return true;
       }
@@ -1126,7 +1121,7 @@ describe('Model', function(){
           done();
         });
       });
-    })
+    });
 
     it('with Model.schema.path introspection (gh-272)', function(done){
       var db = start();
@@ -1168,10 +1163,10 @@ describe('Model', function(){
           done();
         });
       });
-    })
+    });
 
     it('save callback should only execute once (gh-319)', function(done){
-      var db = start()
+      var db = start();
 
       var D = db.model('CallbackFiresOnceValidation', new Schema({
           username: { type: String, validate: /^[a-z]{6}$/i }
@@ -1237,7 +1232,7 @@ describe('Model', function(){
               db.close();
               assert.ifError(err);
               done();
-            })
+            });
           });
         });
       });
@@ -1250,7 +1245,7 @@ describe('Model', function(){
       }));
 
       var db = start()
-        , TestP = db.model('TestPreviousNullValidation')
+        , TestP = db.model('TestPreviousNullValidation');
 
       TestP.collection.insert({ a: null, previous: null}, {}, function (err, f) {
         assert.ifError(err);
@@ -1267,12 +1262,12 @@ describe('Model', function(){
             found.save(function (err) {
               assert.strictEqual(err, null);
               db.close();
-              done()
+              done();
             });
-          })
-        })
+          });
+        });
       });
-    })
+    });
 
     it('nested', function(done){
       mongoose.model('TestNestedValidation', new Schema({
@@ -1298,7 +1293,7 @@ describe('Model', function(){
           done();
         });
       });
-    })
+    });
 
     it('of nested subdocuments', function(done){
       var Subsubdocs= new Schema({ required: { type: String, required: true }});
@@ -1364,7 +1359,7 @@ describe('Model', function(){
             executed = true;
             fn(v !== 'test');
           }, 5);
-        };
+        }
         mongoose.model('TestAsyncValidation', new Schema({
             async: { type: String, validate: [validator, 'async validator failed for `{PATH}`'] }
         }));
@@ -1391,7 +1386,7 @@ describe('Model', function(){
             done();
           });
         });
-      })
+      });
 
       it('nested', function(done){
         var executed = false;
@@ -1401,7 +1396,7 @@ describe('Model', function(){
             executed = true;
             fn(v !== 'test');
           }, 5);
-        };
+        }
 
         mongoose.model('TestNestedAsyncValidation', new Schema({
             nested: {
@@ -1452,7 +1447,7 @@ describe('Model', function(){
             executed = true;
             fn(v !== '');
           }, 5);
-        };
+        }
 
         var Subdocs = new Schema({
             required: { type: String, validate: [validator, 'async in subdocs'] }
@@ -1532,7 +1527,7 @@ describe('Model', function(){
       db.close();
       assert.equal(false, post.schema.path('result').isRequired);
       done();
-    })
+    });
 
     describe('middleware', function(){
       it('works', function(done){
@@ -1571,7 +1566,7 @@ describe('Model', function(){
             done();
           });
         });
-      })
+      });
 
       it('async', function(done){
         var db = start()
@@ -1684,8 +1679,8 @@ describe('Model', function(){
             done();
           });
         });
-      })
-    })
+      });
+    });
   });
 
   describe('defaults application', function(){
@@ -1703,7 +1698,7 @@ describe('Model', function(){
       var post = new TestDefaults;
       assert.ok(post.get('date') instanceof Date);
       assert.equal(+post.get('date'), now);
-      done()
+      done();
     });
 
     it('nested', function(done){
@@ -1723,7 +1718,7 @@ describe('Model', function(){
       assert.ok(post.get('nested.date') instanceof Date);
       assert.equal(+post.get('nested.date'), now);
       done();
-    })
+    });
 
     it('subdocument', function(done){
       var now = Date.now();
@@ -1807,7 +1802,7 @@ describe('Model', function(){
         , post = new BlogPost();
 
       db.close();
-      post.set('titleWithAuthor', 'Huckleberry Finn by Mark Twain')
+      post.set('titleWithAuthor', 'Huckleberry Finn by Mark Twain');
       assert.equal(post.get('title'),'Huckleberry Finn');
       assert.equal(post.get('author'),'Mark Twain');
       done();
@@ -1884,7 +1879,7 @@ describe('Model', function(){
     it('works', function(done){
       var db = start()
         , collection = 'blogposts_' + random()
-        , BlogPost = db.model('BlogPost', collection)
+        , BlogPost = db.model('BlogPost', collection);
 
       BlogPost.create({ title: 1 }, { title: 2 }, function (err) {
         assert.ifError(err);
@@ -1906,7 +1901,7 @@ describe('Model', function(){
     it('errors when id deselected (gh-3118)', function(done) {
       var db = start()
         , collection = 'blogposts_' + random()
-        , BlogPost = db.model('BlogPost', collection)
+        , BlogPost = db.model('BlogPost', collection);
 
       BlogPost.create({ title: 1 }, { title: 2 }, function (err) {
         assert.ifError(err);
@@ -1920,19 +1915,19 @@ describe('Model', function(){
         });
       });
     });
-  })
+  });
 
   describe('#remove()', function(){
     var db, B;
 
     before(function(){
-      db = start()
-      B = db.model('BlogPost', 'blogposts_'+random())
-    })
+      db = start();
+      B = db.model('BlogPost', 'blogposts_'+random());
+    });
 
     after(function(done){
       db.close(done);
-    })
+    });
 
     it('passes the removed document (gh-1419)', function(done){
       B.create({}, function (err, post) {
@@ -1945,10 +1940,10 @@ describe('Model', function(){
             assert.ok(doc);
             assert.ok(doc.equals(found));
             done();
-          })
-        })
-      })
-    })
+          });
+        });
+      });
+    });
 
     it('works as a promise', function(done){
       B.create({}, function (err, post) {
@@ -1961,10 +1956,10 @@ describe('Model', function(){
             assert.ok(doc);
             assert.ok(doc.equals(found));
             done();
-          })
-        })
-      })
-    })
+          });
+        });
+      });
+    });
 
     it('works as a promise with a hook', function(done){
       var called = 0;
@@ -1976,7 +1971,7 @@ describe('Model', function(){
         return next();
       });
 
-      var RH = db.model('RH', RHS, 'RH_'+random())
+      var RH = db.model('RH', RHS, 'RH_'+random());
 
       RH.create({name: 'to be removed'}, function (err, post) {
         assert.ifError(err);
@@ -1991,10 +1986,10 @@ describe('Model', function(){
             assert.ok(doc);
             assert.ok(doc.equals(found));
             done();
-          })
-        })
-      })
-    })
+          });
+        });
+      });
+    });
 
     it('passes the removed document (gh-1419)', function(done){
       B.create({}, function (err, post) {
@@ -2007,10 +2002,10 @@ describe('Model', function(){
             assert.ok(doc);
             assert.ok(doc.equals(found));
             done();
-          })
-        })
-      })
-    })
+          });
+        });
+      });
+    });
 
     describe('when called multiple times', function(){
       it('always executes the passed callback gh-1210', function(done){
@@ -2033,8 +2028,8 @@ describe('Model', function(){
             done();
           });
         });
-      })
-    })
+      });
+    });
   });
 
   describe('getters', function(){
@@ -2065,14 +2060,14 @@ describe('Model', function(){
 
     it('should not be triggered at construction (gh-685)', function(done){
       var db = start()
-        , called = false
+        , called = false;
 
       db.close();
 
       var schema = new mongoose.Schema({
           number: {
               type:Number
-            , set: function(x){return x/2}
+            , set: function(x){return x/2;}
             , get: function(x){
                 called = true;
                 return x*2;
@@ -2098,7 +2093,7 @@ describe('Model', function(){
       assert.equal(100, num.valueOf());
       assert.equal(50, b.getValue('number').valueOf());
       done();
-    })
+    });
 
     it('with type defined with { type: Native } (gh-190)', function(done){
       var schema = new Schema({
@@ -2114,7 +2109,7 @@ describe('Model', function(){
       db.close();
       post.set('date', Date.now());
       assert.ok(post.date instanceof Date);
-      done()
+      done();
     });
 
     describe('nested', function(){
@@ -2133,7 +2128,7 @@ describe('Model', function(){
         db.close();
         assert.equal('object', typeof doc.first);
         assert.ok(doc.first.second.isMongooseArray);
-        done()
+        done();
       });
 
       it('works with object literals', function(done){
@@ -2148,7 +2143,7 @@ describe('Model', function(){
           , visitors: 5
         };
 
-        var post = new BlogPost()
+        var post = new BlogPost();
         post.init({
             meta: meta
         });
@@ -2159,9 +2154,8 @@ describe('Model', function(){
         var threw = false;
         var getter1;
         var getter2;
-        var strmet;
         try {
-          strmet = JSON.stringify(meta);
+          JSON.stringify(meta);
           getter1 = JSON.stringify(post.get('meta'));
           getter2 = JSON.stringify(post.meta);
         } catch (err) {
@@ -2214,10 +2208,10 @@ describe('Model', function(){
         assert.equal((+post.meta.visitors),4815162342);
         assert.equal((+post.get('meta').visitors),4815162342);
         done();
-      })
+      });
 
       it('object property access works when root initd with null', function(done){
-        var db = start()
+        var db = start();
 
         var schema = new Schema({
           nest: {
@@ -2243,7 +2237,7 @@ describe('Model', function(){
       });
 
       it('object property access works when root initd with undefined', function(done){
-        var db = start()
+        var db = start();
 
         var schema = new Schema({
           nest: {
@@ -2265,11 +2259,11 @@ describe('Model', function(){
           db.close();
           assert.ifError(err);
           done();
-        })
+        });
       });
 
       it('pre-existing null object re-save', function(done){
-        var db = start()
+        var db = start();
 
         var schema = new Schema({
           nest: {
@@ -2353,13 +2347,13 @@ describe('Model', function(){
             });
           });
         });
-      })
+      });
 
       it('props can be set directly when property was named "type"', function(done){
         var db = start();
 
         function def () {
-          return [{ x: 1 }, { x: 2 }, { x:3 }]
+          return [{ x: 1 }, { x: 2 }, { x:3 }];
         }
 
         mongoose.model('MySchema2', new Schema({
@@ -2372,7 +2366,7 @@ describe('Model', function(){
         }));
 
         var DooDad = db.model('MySchema2', collection)
-          , doodad = new DooDad()
+          , doodad = new DooDad();
 
         doodad.save(function (err) {
           assert.ifError(err);
@@ -2397,7 +2391,7 @@ describe('Model', function(){
                 done();
               });
             });
-          })
+          });
         });
       });
 
@@ -2480,7 +2474,7 @@ describe('Model', function(){
         });
       });
     });
-  })
+  });
 
   describe('atomic subdocument', function(){
     it('saving', function(done){
@@ -2528,7 +2522,7 @@ describe('Model', function(){
               });
             });
           }
-        };
+        }
 
         function complete () {
           BlogPost.findOne({ _id: post.get('_id') }, function (err, doc) {
@@ -2551,7 +2545,7 @@ describe('Model', function(){
 
             v = doc.get('comments').some(function(comment){
               return comment.get('title') == '3';
-            })
+            });
 
             assert.ok(v);
 
@@ -2568,13 +2562,13 @@ describe('Model', function(){
             assert.ok(v);
             done();
           });
-        };
+        }
       });
-    })
+    });
 
     it('setting (gh-310)', function(done){
       var db = start()
-        , BlogPost = db.model('BlogPost', collection)
+        , BlogPost = db.model('BlogPost', collection);
 
       BlogPost.create({
         comments: [{ title: 'first-title', body: 'first-body'}]
@@ -2603,7 +2597,7 @@ describe('Model', function(){
           });
         });
       });
-    })
+    });
   });
 
   it('doubly nested array saving and loading', function(done){
@@ -2617,7 +2611,7 @@ describe('Model', function(){
     mongoose.model('Outer', Outer);
 
     var db = start();
-    var Outer = db.model('Outer', 'arr_test_' + random());
+    Outer = db.model('Outer', 'arr_test_' + random());
 
     var outer = new Outer();
     outer.inner.push({});
@@ -2666,7 +2660,7 @@ describe('Model', function(){
       t.save(function (err) {
         assert.ifError(err);
         assert.equal(t.nested.nums.length,2);
-        Temp.findById(t._id, function (err, found) {
+        Temp.findById(t._id, function (err) {
           db.close();
           assert.ifError(err);
           assert.equal(t.nested.nums.length,2);
@@ -2674,7 +2668,7 @@ describe('Model', function(){
         });
       });
     });
-  })
+  });
 
   it('updating at least a single $push and $pushAll as a single $pushAll', function(done){
     var db = start()
@@ -2723,7 +2717,7 @@ describe('Model', function(){
       db.close();
       done();
     });
-  })
+  });
 
 
   it('activePaths should be updated for nested modifieds as promise', function(done){
@@ -2745,7 +2739,7 @@ describe('Model', function(){
       db.close();
       done();
     });
-  })
+  });
 
 
 
@@ -2815,7 +2809,7 @@ describe('Model', function(){
         });
       });
     });
-  })
+  });
 
   describe('saving embedded arrays', function(){
     it('of Numbers atomically', function(done){
@@ -2856,7 +2850,7 @@ describe('Model', function(){
               });
             });
           }
-        };
+        }
 
         function complete () {
           Temp.findOne({ _id: t.get('_id') }, function (err, doc) {
@@ -2879,9 +2873,9 @@ describe('Model', function(){
             assert.ok(v);
             db.close(done);
           });
-        };
+        }
       });
-    })
+    });
 
     it('of Strings atomically', function(done){
       var db = start()
@@ -2922,7 +2916,7 @@ describe('Model', function(){
               });
             });
           }
-        };
+        }
 
         function complete () {
           StrList.findOne({ _id: t.get('_id') }, function (err, doc) {
@@ -2947,9 +2941,9 @@ describe('Model', function(){
             assert.ok(v);
             done();
           });
-        };
+        }
       });
-    })
+    });
 
     it('of Buffers atomically', function(done){
       var db = start()
@@ -2989,7 +2983,7 @@ describe('Model', function(){
               });
             });
           }
-        };
+        }
 
         function complete () {
           BufList.findOne({ _id: t.get('_id') }, function (err, doc) {
@@ -3015,9 +3009,9 @@ describe('Model', function(){
 
             done();
           });
-        };
+        }
       });
-    })
+    });
 
     it('works with modified element properties + doc removal (gh-975)', function(done){
       var db = start()
@@ -3046,13 +3040,13 @@ describe('Model', function(){
                   assert.ifError(err);
                   assert.equal(0, doc.comments.length);
                   done();
-                })
-              })
-            })
-          })
+                });
+              });
+            });
+          });
         });
-      })
-    })
+      });
+    });
 
     it('updating an embedded document in an embedded array with set call', function(done) {
       var db = start(),
@@ -3108,7 +3102,7 @@ describe('Model', function(){
         });
       });
     });
-  })
+  });
 
   it('updating an embedded array document to an Object value (gh-334)', function(done){
     var db = start()
@@ -3139,7 +3133,7 @@ describe('Model', function(){
         });
       });
     });
-  })
+  });
 
   it('saving an embedded document twice should not push that doc onto the parent doc twice (gh-267)', function(done){
     var db = start()
@@ -3165,7 +3159,7 @@ describe('Model', function(){
         });
       });
     });
-  })
+  });
 
   describe('embedded array filtering', function(){
     it('by the id shortcut function', function(done){
@@ -3214,7 +3208,7 @@ describe('Model', function(){
           done();
         });
       });
-    })
+    });
 
     it('by the id shortcut with no match', function(done){
       var db = start()
@@ -3264,7 +3258,7 @@ describe('Model', function(){
         });
       });
     });
-  })
+  });
 
   it('single pull embedded doc', function(done){
     var db = start()
@@ -3339,7 +3333,7 @@ describe('Model', function(){
             doc.mixed.push([ 'foo', 'bar' ]);
             doc.markModified('mixed');
 
-            doc.save(function (err, doc) {
+            doc.save(function (err) {
               assert.ifError(err);
 
               BlogPost.findById(post2._id, function (err, doc) {
@@ -3392,8 +3386,8 @@ describe('Model', function(){
     assert.equal('test', post.mixed.type);
     assert.equal('rules', post.mixed.github);
     assert.equal(3, post.mixed.nested.number);
-    done()
-  })
+    done();
+  });
 
   it('"type" is allowed as a key', function(done){
     mongoose.model('TestTypeDefaults', new Schema({
@@ -3412,7 +3406,7 @@ describe('Model', function(){
         x: { y: { type: { type: String }, owner: String } }
     }));
 
-    var post = new TestDefaults2;
+    post = new TestDefaults2;
     post.x.y.type = "#402";
     post.x.y.owner= "me";
     post.save(function (err) {
@@ -3420,7 +3414,7 @@ describe('Model', function(){
       assert.ifError(err);
       done();
     });
-  })
+  });
 
   it('unaltered model does not clear the doc (gh-195)', function(done){
     var db = start()
@@ -3458,8 +3452,8 @@ describe('Model', function(){
 
       mongoose.model('SafeHuman', Human, true);
 
-      var db = start()
-        , Human = db.model('SafeHuman', 'safehuman' + random());
+      var db = start();
+      Human = db.model('SafeHuman', 'safehuman' + random());
 
       Human.on('index', function (err) {
         assert.ifError(err);
@@ -3503,8 +3497,8 @@ describe('Model', function(){
 
       mongoose.model('UnsafeHuman', Human, true);
 
-      var db = start()
-        , Human = db.model('UnsafeHuman', 'unsafehuman' + random());
+      var db = start();
+      Human = db.model('UnsafeHuman', 'unsafehuman' + random());
 
       Human.on('index', function (err) {
         assert.ifError(err);
@@ -3695,13 +3689,13 @@ describe('Model', function(){
           assert.equal(err.message,'Error 101');
           done();
         });
-      })
+      });
 
       describe('init', function(){
         it('has access to the true ObjectId when used with querying (gh-289)', function(done){
           var db = start()
             , PreInitSchema = new Schema({})
-            , preId = null
+            , preId = null;
 
           PreInitSchema.pre('init', function (next) {
             preId = this._id;
@@ -3713,15 +3707,15 @@ describe('Model', function(){
           var doc = new PreInit();
           doc.save(function (err) {
             assert.ifError(err);
-            PreInit.findById(doc._id, function (err, found) {
+            PreInit.findById(doc._id, function (err) {
               db.close();
               assert.ifError(err);
               assert.strictEqual(undefined, preId);
               done();
             });
           });
-        })
-      })
+        });
+      });
 
       it('should not work when calling next() after a thrown error', function(done){
         var db = start();
@@ -3729,7 +3723,7 @@ describe('Model', function(){
         var s = new Schema({});
         s.methods.funky = function () {
           assert.strictEqual(false, true, 'reached unreachable code');
-        }
+        };
 
         s.pre('funky', function (next) {
           db.close();
@@ -3759,7 +3753,7 @@ describe('Model', function(){
           , post = undefined;
 
         schema.post('save', function (arg) {
-          assert.equal(arg.id, post.id)
+          assert.equal(arg.id, post.id);
           save = true;
         });
 
@@ -3768,7 +3762,7 @@ describe('Model', function(){
         });
 
         schema.post('remove', function (arg) {
-          assert.equal(arg.id,post.id)
+          assert.equal(arg.id,post.id);
           remove = true;
         });
 
@@ -3805,9 +3799,7 @@ describe('Model', function(){
       });
 
       it('on embedded docs', function(done){
-        var save = false,
-            init = false,
-            remove = false;
+        var save = false;
 
         var EmbeddedSchema = new Schema({
           title : String
@@ -3817,7 +3809,7 @@ describe('Model', function(){
           embeds : [EmbeddedSchema]
         });
 
-        EmbeddedSchema.post('save', function(next){
+        EmbeddedSchema.post('save', function(){
           save = true;
         });
 
@@ -3855,7 +3847,7 @@ describe('Model', function(){
       var db = start()
         , BlogPost = db.model('BlogPost'+random(), bpSchema);
 
-      BlogPost.create({title: 'interoperable count as promise'}, function (err, created) {
+      BlogPost.create({title: 'interoperable count as promise'}, function (err) {
         assert.ifError(err);
         var query = BlogPost.count({title: 'interoperable count as promise'});
         query.exec(function (err, count) {
@@ -3872,7 +3864,7 @@ describe('Model', function(){
       var db = start()
         , BlogPost = db.model(col, bpSchema);
 
-      BlogPost.create({title: 'interoperable update as promise'}, function (err, created) {
+      BlogPost.create({title: 'interoperable update as promise'}, function (err) {
         assert.ifError(err);
         var query = BlogPost.update({title: 'interoperable update as promise'}, {title: 'interoperable update as promise delta'});
         query.exec(function (err) {
@@ -3912,7 +3904,7 @@ describe('Model', function(){
         , {title: 'interoperable find as promise'}
         , function (err, createdOne, createdTwo) {
         assert.ifError(err);
-        var query = BlogPost.find({title: 'interoperable find as promise'}).sort('_id')
+        var query = BlogPost.find({title: 'interoperable find as promise'}).sort('_id');
         query.exec(function (err, found) {
           db.close();
           assert.ifError(err);
@@ -3933,7 +3925,7 @@ describe('Model', function(){
 
       BlogPost.create(
           {title: 'interoperable remove as promise'}
-        , function (err, createdOne, createdTwo) {
+        , function (err) {
         assert.ifError(err);
         var query = BlogPost.remove({title: 'interoperable remove as promise'});
         query.exec(function (err) {
@@ -3969,7 +3961,7 @@ describe('Model', function(){
         var db = start()
           , BlogPost = db.model('BlogPost'+random(), bpSchema);
 
-        BlogPost.create({title: 'interoperable count as promise 2'}, function (err, created) {
+        BlogPost.create({title: 'interoperable count as promise 2'}, function (err) {
           assert.ifError(err);
           var query = BlogPost.count({title: 'interoperable count as promise 2'});
           var promise = query.exec();
@@ -3987,7 +3979,7 @@ describe('Model', function(){
         var db = start()
           , BlogPost = db.model(col, bpSchema);
 
-        BlogPost.create({title: 'interoperable update as promise 2'}, function (err, created) {
+        BlogPost.create({title: 'interoperable update as promise 2'}, function (err) {
           assert.ifError(err);
           var query = BlogPost.update({title: 'interoperable update as promise 2'}, {title: 'interoperable update as promise delta 2'});
           var promise = query.exec();
@@ -4048,7 +4040,7 @@ describe('Model', function(){
 
         BlogPost.create(
             {title: 'interoperable remove as promise 2'}
-          , function (err, createdOne, createdTwo) {
+          , function (err) {
           assert.ifError(err);
           var query = BlogPost.remove({title: 'interoperable remove as promise 2'});
           var promise = query.exec();
@@ -4082,9 +4074,9 @@ describe('Model', function(){
 
       it('are thenable', function(done){
         var db = start()
-          , B = db.model('BlogPost' + random(), bpSchema)
+          , B = db.model('BlogPost' + random(), bpSchema);
 
-        var peopleSchema = Schema({ name: String, likes: ['ObjectId'] })
+        var peopleSchema = Schema({ name: String, likes: ['ObjectId'] });
         var P = db.model('promise-BP-people', peopleSchema, random());
         B.create(
             { title: 'then promise 1' }
@@ -4097,7 +4089,7 @@ describe('Model', function(){
               { name: 'brandon', likes: [d1] }
             , { name: 'ben', likes: [d2] }
             , { name: 'bernie', likes: [d3] }
-            , function (err, brandon, ben, bernie) {
+            , function (err) {
             assert.ifError(err);
 
             var promise = B.find({ title: /^then promise/ }).select('_id').exec();
@@ -4109,16 +4101,16 @@ describe('Model', function(){
             }).then(function (people) {
               assert.equal(3, people.length);
               return people;
-            }).then(function (people) {
+            }).then(function () {
               db.close();
               done();
             }, function (err) {
               db.close();
               done(new Error(err));
             });
-          })
-        })
-      })
+          });
+        });
+      });
     });
   });
 
@@ -4147,8 +4139,6 @@ describe('Model', function(){
 
       db.close();
 
-      var a = '{ meta: { visitors: 45 },\n  numbers: [ 5, 6, 7 ],\n  owners: [ 4dd3e169dbfb13b4570000b6 ],\n  comments: \n   [{ _id: 4dd3e169dbfb13b4570000b7,\n     comments: [],\n     body: \'this is a comment\',\n     date: Wed, 18 May 2011 15:02:31 GMT,\n     title: \'my comment\' }\n   { _id: 4dd3e169dbfb13b4570000b8,\n     comments: [],\n     body: \'this is a comment too!\',\n     date: Wed, 18 May 2011 15:02:31 GMT,\n     title: \'the next thang\' }],\n  _id: 4dd3e169dbfb13b4570000b9,\n  date: Wed, 18 May 2011 15:02:31 GMT,\n  title: \'Test\' }'
-
       var out = post.inspect();
       assert.ok(/meta: { visitors: 45 }/.test(out));
       assert.ok(/numbers: \[ 5, 6, 7 \]/.test(out));
@@ -4157,12 +4147,12 @@ describe('Model', function(){
       assert.ok(!/_atomics:/.test(out));
       done();
     });
-  })
+  });
 
   describe('pathnames', function(){
     it('named path can be used', function(done){
       var db = start()
-        , P = db.model('pathnametest', new Schema({ path: String }))
+        , P = db.model('pathnametest', new Schema({ path: String }));
       db.close();
 
       var threw = false;
@@ -4174,8 +4164,8 @@ describe('Model', function(){
 
       assert.ok(!threw);
       done();
-    })
-  })
+    });
+  });
 
   describe('auto_reconnect', function(){
     describe('if disabled', function(){
@@ -4206,7 +4196,7 @@ describe('Model', function(){
   });
 
   it('subdocuments with changed values should persist the values', function(done){
-    var db = start()
+    var db = start();
     var Subdoc = new Schema({ name: String, mixed: Schema.Types.Mixed });
     var T = db.model('SubDocMixed', new Schema({ subs: [Subdoc] }));
 
@@ -4254,13 +4244,13 @@ describe('Model', function(){
                 assert.ifError(err);
                 assert.strictEqual(t.subs[0].mixed.w, 5);
                 done();
-              })
-            })
+              });
+            });
           });
         });
-      })
-    })
-  })
+      });
+    });
+  });
 
   describe('RegExps', function(){
     it('can be saved', function(done){
@@ -4281,7 +4271,7 @@ describe('Model', function(){
         });
       });
     });
-  })
+  });
 
   // Demonstration showing why GH-261 is a misunderstanding
   it('a single instantiated document should be able to update its embedded documents more than once', function(done){
@@ -4305,7 +4295,7 @@ describe('Model', function(){
         });
       });
     });
-  })
+  });
 
   describe('save()', function(){
     describe('when no callback is passed', function(){
@@ -4326,11 +4316,11 @@ describe('Model', function(){
         });
 
         new DefaultErr().save();
-      })
+      });
     });
 
     it('returns number of affected docs', function(done){
-      var db = start()
+      var db = start();
       var schema = new Schema({ name: String });
       var S = db.model('AffectedDocsAreReturned', schema);
       var s = new S({ name: 'aaron' });
@@ -4388,11 +4378,11 @@ describe('Model', function(){
               assert.ifError(err);
               assert.equal('changed', doc.title);
               done();
-            })
-          })
-        })
-      })
-    })
+            });
+          });
+        });
+      });
+    });
 
     it('rejects new documents that have no _id set (1595)', function(done){
       var db = start();
@@ -4404,8 +4394,8 @@ describe('Model', function(){
         assert.ok(err);
         assert.ok(/must have an _id/.test(err));
         done();
-      })
-    })
+      });
+    });
   });
 
 
@@ -4453,13 +4443,13 @@ describe('Model', function(){
                   assert.equal(4, b.numbers[0]);
                   assert.equal(5, b.numbers[1]);
                   done();
-                })
-              })
-            })
-          })
-        })
+                });
+              });
+            });
+          });
+        });
       });
-    })
+    });
 
     it('should use $set when subdoc changed before pulling (gh-1303)', function(done){
       var db = start()
@@ -4496,12 +4486,12 @@ describe('Model', function(){
               assert.equal('a', b.comments[0].body);
               assert.equal('changed', b.comments[1].body);
               done();
-            })
-          })
-        })
-      })
-    })
-  })
+            });
+          });
+        });
+      });
+    });
+  });
 
   describe('backward compatibility', function(){
     it('with conflicted data in db', function(done){
@@ -4543,16 +4533,16 @@ describe('Model', function(){
             assert.ok(doc._doc.databases['15']);
             assert.equal(undefined, doc.databases);
             done();
-          })
-        })
+          });
+        });
       });
-    })
+    });
   });
 
   describe('non-schema adhoc property assignments', function(){
     it('are not saved', function(done){
       var db = start()
-        , B = db.model('BlogPost', collection)
+        , B = db.model('BlogPost', collection);
 
       var b = new B;
       b.whateveriwant = 10;
@@ -4566,7 +4556,7 @@ describe('Model', function(){
         });
       });
     });
-  })
+  });
 
   it('should not throw range error when using Number _id and saving existing doc (gh-691)', function(done){
     var db =start();
@@ -4609,7 +4599,7 @@ describe('Model', function(){
           assert.ifError(err);
 
           doc.score = undefined; // unset
-          doc.save(function (err, doc, count){
+          doc.save(function (err){
             assert.ifError(err);
 
             DefaultTestObject.findById(doc._id, function (err, doc){
@@ -4628,7 +4618,7 @@ describe('Model', function(){
         });
       });
     });
-  })
+  });
 
   it('path is cast to correct value when retreived from db', function(done){
     var db = start();
@@ -4647,7 +4637,7 @@ describe('Model', function(){
 
   it('setting a path to undefined should retain the value as undefined', function (done) {
     var db = start()
-      , B = db.model('BlogPost', collection + random())
+      , B = db.model('BlogPost', collection + random());
 
     var doc = new B;
     doc.title='css3';
@@ -4713,7 +4703,7 @@ describe('Model', function(){
         });
       });
     });
-  })
+  });
 
   describe('unsetting a default value', function(){
     it('should be ignored (gh-758)', function(done){
@@ -4728,8 +4718,8 @@ describe('Model', function(){
           done();
         });
       });
-    })
-  })
+    });
+  });
 
   it('allow for object passing to ref paths (gh-1606)', function(done){
     var db = start();
@@ -4757,7 +4747,7 @@ describe('Model', function(){
     assert.equal(thing.subdoc.thing[0], a._id);
 
     db.close(done);
-  })
+  });
 
   it('setters trigger on null values (gh-1445)', function(done){
     var db = start();
@@ -4778,7 +4768,7 @@ describe('Model', function(){
     var o = new Order({ total: null });
     assert.equal(o.total, 10);
      done();
-  })
+  });
 
   describe('Skip setting default value for Geospatial-indexed fields (gh-1668)', function () {
 
@@ -5073,7 +5063,7 @@ describe('Model', function(){
 
       var parentSchema = new Schema({
         children: [new Schema({
-          name: String,
+          name: String
         })]
       });
 
@@ -5084,7 +5074,7 @@ describe('Model', function(){
       parent.save(function(err, it) {
         assert.ifError(err);
         parent.children.push({name: 'another child'});
-        Parent.findByIdAndUpdate(it._id, { $set: { children: parent.children } }, function(err, affected) {
+        Parent.findByIdAndUpdate(it._id, { $set: { children: parent.children } }, function(err) {
           assert.ifError(err);
           db.close(done);
         });

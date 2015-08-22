@@ -7,7 +7,7 @@ var start = require('./common')
   , mongoose = start.mongoose
   , assert = require('assert')
   , Schema = mongoose.Schema
-  , random = require('../lib/utils').random
+  , random = require('../lib/utils').random;
 
 /**
  * setup
@@ -25,7 +25,7 @@ describe('collections: capped:', function(){
     assert.ok(capped.options.capped);
     assert.equal(1000, capped.options.capped.size);
     done();
-  })
+  });
   it('creation', function(done){
     var db = start();
     var Capped = db.model('Capped', capped, coll);
@@ -53,10 +53,10 @@ describe('collections: capped:', function(){
       assert.equal(8192, options.size);
       db.close(done);
     });
-  })
+  });
   it('attempting to use existing non-capped collection as capped emits error', function(done){
     var db = start();
-    var opts = { safe: true }
+    var opts = { safe: true };
     var conn = 'capped_existing_'+random();
 
     db.on('open', function () {
@@ -73,12 +73,12 @@ describe('collections: capped:', function(){
           done();
         });
 
-        var C = db.model('CappedExisting', capped, conn);
+        db.model('CappedExisting', capped, conn);
         timer = setTimeout(function () {
           db.close();
           throw new Error('capped test timeout');
         }, 900);
       });
     });
-  })
-})
+  });
+});

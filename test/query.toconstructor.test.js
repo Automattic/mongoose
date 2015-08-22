@@ -1,7 +1,6 @@
 
 var start = require('./common')
   , mongoose = start.mongoose
-  , DocumentObjectId = mongoose.Types.ObjectId
   , Schema = mongoose.Schema
   , assert = require('assert')
   , random = require('../lib/utils').random
@@ -117,7 +116,24 @@ describe('Query:', function(){
       assert.deepEqual(nq._mongooseOptions, { lean : true, limit : 3 });
       assert.deepEqual(nq.options, { sort : { 'title': 1 }, limit : 3 });
       done();
-    })
+    });
+
+    it('options get cloned (gh-3176)', function(done) {
+      var db = start();
+      var Product = db.model(prodName);
+      db.close();
+
+      var prodC = Product.find({ title : /blah/ }).setOptions({ sort : 'title', lean : true });
+      prodC = prodC.toConstructor();
+
+      var nq = prodC(null, { limit : 3 });
+      assert.deepEqual(nq._mongooseOptions, { lean : true, limit : 3 });
+      assert.deepEqual(nq.options, { sort : { 'title': 1 }, limit : 3 });
+      var nq2 = prodC(null, { limit: 5 });
+      assert.deepEqual(nq._mongooseOptions, { lean : true, limit : 3 });
+      assert.deepEqual(nq2._mongooseOptions, { lean : true, limit : 5 });
+      done();
+    });
 
     it('creates subclasses of mquery', function(done) {
       var db = start();
@@ -126,7 +142,7 @@ describe('Query:', function(){
 
       var opts = { safe: { w: 'majority' }, readPreference: 'p' };
       var match = { title: 'test', count: { $gt: 101 }};
-      var select = { name: 1, count: 0 }
+      var select = { name: 1, count: 0 };
       var update = { $set: { title : 'thing' }};
       var path = 'title';
 
@@ -147,7 +163,6 @@ describe('Query:', function(){
       assert.equal(path, m._path);
       assert.equal('find', m.op);
       done();
-    })
+    });
   });
 });
-

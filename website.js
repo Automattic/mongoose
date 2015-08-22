@@ -1,11 +1,11 @@
 
-var fs= require('fs')
-var jade = require('jade')
-var package = require('./package')
-var hl = require('./docs/helpers/highlight')
-var linktype = require('./docs/helpers/linktype')
-var href = require('./docs/helpers/href')
-var klass = require('./docs/helpers/klass')
+var fs= require('fs');
+var jade = require('jade');
+var package = require('./package');
+var hl = require('./docs/helpers/highlight');
+var linktype = require('./docs/helpers/linktype');
+var href = require('./docs/helpers/href');
+var klass = require('./docs/helpers/klass');
 
 // add custom jade filters
 require('./docs/helpers/filters')(jade);
@@ -40,7 +40,7 @@ function jadeify (filename, options) {
   jade.renderFile(filename, options, function (err, str) {
     if (err) return console.error(err.stack);
 
-    var newfile = filename.replace('.jade', '.html')
+    var newfile = filename.replace('.jade', '.html');
     fs.writeFile(newfile, str, function (err) {
       if (err) return console.error('could not write', err.stack);
       console.log('%s : rendered ', new Date, newfile);

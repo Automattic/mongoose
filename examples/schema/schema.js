@@ -45,7 +45,7 @@ var Person = new Schema({
 
 BlogPost.path('date')
 .default(function(){
-   return new Date()
+   return new Date();
  })
 .set(function(v){
    return v == 'now' ? new Date() : v;
@@ -56,6 +56,7 @@ BlogPost.path('date')
  */
 
 BlogPost.pre('save', function(next, done){
+  /* global emailAuthor */
   emailAuthor(done); // some async function
   next();
 });
@@ -66,15 +67,15 @@ BlogPost.pre('save', function(next, done){
 
 BlogPost.methods.findCreator = function (callback) {
   return this.db.model('Person').findById(this.creator, callback);
-}
+};
 
 BlogPost.statics.findByTitle = function (title, callback) {
   return this.find({ title: title }, callback);
-}
+};
 
 BlogPost.methods.expressiveQuery = function (creator, date, callback) {
   return this.find('creator', creator).where('date').gte(date).run(callback);
-}
+};
 
 /**
  * Plugins
@@ -90,7 +91,7 @@ function slugGenerator (options){
       return v;
     });
   };
-};
+}
 
 BlogPost.plugin(slugGenerator());
 

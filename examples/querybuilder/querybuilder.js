@@ -20,7 +20,7 @@ var data = [
   { name : 'lilly', age : 26, birthday : new Date().setFullYear((new
     Date().getFullYear() - 26)) },
   { name : 'alucard', age : 1000, birthday : new Date().setFullYear((new
-    Date().getFullYear() - 1000)) },
+    Date().getFullYear() - 1000)) }
 ];
 
 
@@ -40,7 +40,7 @@ mongoose.connect('mongodb://localhost/persons', function (err) {
     // this allows you to continue applying modifiers to it
     query.sort('birthday');
     query.select('name');
-    
+
     // you can chain them together as well
     // a full list of methods can be found:
     // http://mongoosejs.com/docs/api.html#query-js
@@ -54,7 +54,7 @@ mongoose.connect('mongodb://localhost/persons', function (err) {
 
       cleanup();
     });
-    
+
   });
 });
 

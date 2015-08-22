@@ -1,5 +1,5 @@
 
-var mongoose = require('mongoose')
+var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
 console.log('Running mongoose version %s', mongoose.version);
@@ -11,7 +11,7 @@ console.log('Running mongoose version %s', mongoose.version);
 var CharacterSchema = Schema({
     name: { type: String, required: true }
   , health: { type: Number, min: 0, max: 100 }
-})
+});
 
 /**
  * Methods
@@ -19,7 +19,7 @@ var CharacterSchema = Schema({
 
 CharacterSchema.methods.attack = function () {
   console.log('%s is attacking', this.name);
-}
+};
 
 /**
  * Character model
@@ -43,7 +43,7 @@ mongoose.connect(uri, function (err) {
 
   // we connected ok
   example();
-})
+});
 
 /**
  * Use case
@@ -55,7 +55,7 @@ function example () {
     console.log('found', link);
     link.attack(); // 'Link is attacking'
     done();
-  })
+  });
 }
 
 /**
@@ -66,5 +66,5 @@ function done (err) {
   if (err) console.error(err);
   mongoose.connection.db.dropDatabase(function () {
     mongoose.disconnect();
-  })
+  });
 }

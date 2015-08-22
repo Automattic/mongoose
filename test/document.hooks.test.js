@@ -9,8 +9,7 @@ var start = require('./common')
   , Schema = mongoose.Schema
   , ObjectId = Schema.ObjectId
   , Document = require('../lib/document')
-  , EmbeddedDocument = require('../lib/types/embedded')
-  , DocumentObjectId = mongoose.Types.ObjectId;
+  , EmbeddedDocument = require('../lib/types/embedded');
 
 /**
  * Test Document constructor.
@@ -18,7 +17,7 @@ var start = require('./common')
 
 function TestDocument () {
   Document.apply(this, arguments);
-};
+}
 
 /**
  * Inherits from Document.
@@ -32,7 +31,7 @@ TestDocument.prototype.__proto__ = Document.prototype;
 
 var em = new Schema({ title: String, body: String });
 em.virtual('works').get(function () {
-  return 'em virtual works'
+  return 'em virtual works';
 });
 var schema = new Schema({
     test    : String
@@ -57,7 +56,7 @@ var schema = new Schema({
 });
 TestDocument.prototype.$__setSchema(schema);
 
-schema.virtual('nested.agePlus2').get(function (v) {
+schema.virtual('nested.agePlus2').get(function () {
   return this.nested.age + 2;
 });
 schema.virtual('nested.setAge').set(function (v) {
@@ -82,9 +81,7 @@ TestDocument.prototype.hooksTest = function(fn){
 describe('document: hooks:', function () {
   it('step order', function(done){
     var doc = new TestDocument()
-      , steps = 0
-      , awaiting = 0
-      , called = false;
+      , steps = 0;
 
     // serial
     doc.pre('hooksTest', function(next){
@@ -137,8 +134,7 @@ describe('document: hooks:', function () {
 
   it('calling next twice does not break', function(done){
     var doc = new TestDocument()
-      , steps = 0
-      , called = false;
+      , steps = 0;
 
     doc.pre('hooksTest', function(next){
       steps++;
@@ -160,7 +156,7 @@ describe('document: hooks:', function () {
 
   it('calling done twice does not break', function(done){
     var doc = new TestDocument()
-      , steps = 0
+      , steps = 0;
 
     doc.pre('hooksTest', true, function(next, done){
       steps++;
@@ -185,8 +181,7 @@ describe('document: hooks:', function () {
 
   it('errors from a serial hook', function(done){
     var doc = new TestDocument()
-      , steps = 0
-      , called = false;
+      , steps = 0;
 
     doc.pre('hooksTest', function(next){
       steps++;
@@ -198,7 +193,7 @@ describe('document: hooks:', function () {
       next(new Error);
     });
 
-    doc.pre('hooksTest', function(next){
+    doc.pre('hooksTest', function(){
       steps++;
     });
 
@@ -210,8 +205,7 @@ describe('document: hooks:', function () {
   });
 
   it('errors from last serial hook', function(done){
-    var doc = new TestDocument()
-      , called = false;
+    var doc = new TestDocument();
 
     doc.pre('hooksTest', function(next){
       next(new Error);
@@ -237,8 +231,7 @@ describe('document: hooks:', function () {
 
   it('test hooks system errors from a parallel hook', function(done){
     var doc = new TestDocument()
-      , steps = 0
-      , called = false;
+      , steps = 0;
 
     doc.pre('hooksTest', true, function(next, done){
       steps++;
@@ -266,8 +259,7 @@ describe('document: hooks:', function () {
   });
 
   it('passing two arguments to a method subject to hooks and return value', function(done){
-    var doc = new TestDocument()
-      , called = false;
+    var doc = new TestDocument();
 
     doc.pre('hooksTest', function (next) {
       next();
@@ -277,7 +269,7 @@ describe('document: hooks:', function () {
       assert.equal(2, args.length);
       assert.equal(args[1], 'test');
       done();
-    }, 'test')
+    }, 'test');
   });
 
   it('hooking set works with document arrays (gh-746)', function(done){
@@ -313,9 +305,9 @@ describe('document: hooks:', function () {
             assert.ifError(err);
             assert.equal('bye', s.e[0].text);
             done();
-          })
-        })
-      })
+          });
+        });
+      });
     });
   });
 
@@ -414,7 +406,7 @@ describe('document: hooks:', function () {
   it('can set nested schema to undefined in pre save (gh-1335)', function(done) {
     var db = start();
     var FooSchema = new Schema({});
-    var Foo = db.model('gh-1335-1', FooSchema);
+    db.model('gh-1335-1', FooSchema);
     var BarSchema = new Schema({
       foos: [FooSchema]
     });
@@ -497,7 +489,7 @@ describe('document: hooks:', function () {
     // we set the time out to be double that of the validator - 1 (so that running in serial will be greater then that)
     this.timeout(1000);
     var db = start(),
-      count = 0
+      count = 0;
 
     var SchemaWithPreSaveHook = new Schema ({
       preference: String
@@ -587,7 +579,7 @@ describe('document: hooks:', function () {
     var People = db.model('gh-2949', schema, 'gh-2949');
 
     People.create({ name: 'Val' }, function(err, doc) {
-      People.findOne({ _id: doc._id }, function(err) {
+      People.findOne({ _id: doc._id }, function() {
         assert.equal(postCount, 1);
         db.close(done);
       });
@@ -606,7 +598,7 @@ describe('document: hooks:', function () {
         Parent = db.model('Parent', schema);
 
     Parent.create({
-      text: "not init'd",
+      text: "not init'd"
     }, function(err, doc) {
 
       Parent.findOne({ _id: doc._id }, function(err, doc) {
@@ -616,6 +608,24 @@ describe('document: hooks:', function () {
 
         done();
       });
+    });
+  });
+
+  it('post save handles multiple args (gh-3155)', function(done) {
+    var schema = Schema({});
+
+    schema.post('save', function(item, next) {
+      next();
+    });
+
+    var db = start();
+    var Test = db.model('gh3155', schema);
+
+    var t = new Test();
+    t.save(function(error, doc, numAffected) {
+      assert.strictEqual(numAffected, 1);
+
+      db.close(done);
     });
   });
 
@@ -670,7 +680,7 @@ describe('document: hooks:', function () {
     parentSchema.pre('save', function(next) {
       this.cumulativeCount = this.children.reduce(function (seed, child) {
         return seed += child.count;
-      }, 0)
+      }, 0);
       next();
     });
 

@@ -1,7 +1,7 @@
+/* global emit */
 var start = require('../common');
 var mongoose = start.mongoose;
 var Schema = mongoose.Schema;
-var ValidationError = require('../../lib/error/validation');
 var co = require('co');
 var assert = require('assert');
 
@@ -35,12 +35,12 @@ describe('Models in ES6', function() {
   });
 
   it('`create()` integrates with co and the yield keyword', function(done) {
-    co(function*() {
-      schema = new Schema({
+    co(function * () {
+      var schema = new Schema({
         eggs: { type: String, required: true },
         bacon: { type: Boolean, required: true }
       });
- 
+
       var M = db.model('harmonyCreate', schema, getCollectionName());
 
       var results;
@@ -62,7 +62,7 @@ describe('Models in ES6', function() {
 
   it('`aggregate()` integrates with co and the yield keyword', function(done) {
     co(function*() {
-      schema = new Schema({
+      var schema = new Schema({
         eggs: { type: String, required: true },
         bacon: { type: Boolean, required: true }
       });
@@ -99,7 +99,7 @@ describe('Models in ES6', function() {
 
   it('`mapReduce()` can also be used with co and yield', function(done) {
     co(function*() {
-      schema = new Schema({
+      var schema = new Schema({
         eggs: { type: String, required: true },
         bacon: { type: Boolean, required: true }
       });

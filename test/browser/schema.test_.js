@@ -2,15 +2,12 @@ var underlyingBuffer = Buffer;
 
 var Schema = mongoose.Schema
   , Document = mongoose.Document
-  , SchemaType = mongoose.SchemaType
   , VirtualType = mongoose.VirtualType
-  , ValidatorError = mongoose.Error.ValidatorError
   , SchemaTypes = Schema.Types
   , ObjectId = SchemaTypes.ObjectId
   , Mixed = SchemaTypes.Mixed
   , Buffer = SchemaTypes.Buffer
-  , DocumentObjectId = mongoose.Types.ObjectId
-  , MongooseArray = mongoose.Types.Array
+  , DocumentObjectId = mongoose.Types.ObjectId;
 
 /**
  * Test Document constructor.
@@ -164,7 +161,7 @@ describe('schema', function(){
       simple    : { type: String, default: 'a' }
       , array     : { type: Array, default: [1,2,3,4,5] }
       , arrayX    : { type: Array, default: 9 }
-      , arrayFn   : { type: Array, default: function () { return [8] } }
+      , arrayFn   : { type: Array, default: function () { return [8]; } }
       , callback  : { type: Number, default: function(){
         assert.equal('b', this.a);
         return '3';
@@ -400,10 +397,10 @@ describe('schema', function(){
     });
 
     it('order', function(done){
-      function extract (v, self) {
+      function extract (v) {
         return (v && v._id)
           ? v._id
-          : v
+          : v;
       }
 
       var Tobi = new Schema({
@@ -442,7 +439,7 @@ describe('schema', function(){
         return 'last';
       }
 
-      function first (v) {
+      function first () {
         return 0;
       }
 
@@ -538,10 +535,10 @@ describe('schema', function(){
       done();
     });
     it('order', function(done){
-      function format (v, self) {
+      function format (v) {
         return v
           ? '$' + v
-          : v
+          : v;
       }
 
       var Tobi = new Schema({
@@ -572,7 +569,7 @@ describe('schema', function(){
         return 'last';
       }
 
-      function first (v) {
+      function first () {
         return 0;
       }
 
@@ -662,7 +659,7 @@ describe('schema', function(){
       }, { noVirtualId: true });
       assert.equal(undefined, schema.virtualpath('id'));
       done();
-    })
+    });
   });
 
   describe('hooks', function(){
@@ -693,7 +690,7 @@ describe('schema', function(){
 
       assert.equal(true, called);
       done();
-    })
+    });
   });
 
   describe('options', function(){
@@ -775,7 +772,7 @@ describe('schema', function(){
 
         assert.equal('yep', Tobi.virtualpath('name').applyGetters('YEP', { a: 'b' }));
         done();
-      })
+      });
     });
 
     describe('setter', function(){
@@ -800,17 +797,17 @@ describe('schema', function(){
   it('debugging msgs', function(done){
     var err;
     try {
-      new Schema({ name: { first: null } })
+      new Schema({ name: { first: null } });
     } catch (e) {
       err = e;
     }
-    assert.equal(err.message,'Invalid value for schema path `name.first`')
+    assert.equal(err.message,'Invalid value for schema path `name.first`');
     try {
-      new Schema({ age: undefined })
+      new Schema({ age: undefined });
     } catch (e) {
       err = e;
     }
-    assert.equal(err.message, 'Invalid value for schema path `age`')
+    assert.equal(err.message, 'Invalid value for schema path `age`');
     done();
   });
 

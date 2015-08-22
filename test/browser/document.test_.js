@@ -3,7 +3,7 @@ var Schema = mongoose.Schema
 
 var em = new mongoose.Schema({ title: String, body: String });
 em.virtual('works').get(function () {
-  return 'em virtual works'
+  return 'em virtual works';
 });
 
 var schema = new Schema({
@@ -29,7 +29,7 @@ var schema = new Schema({
   date: Date
 });
 
-schema.virtual('nested.agePlus2').get(function (v) {
+schema.virtual('nested.agePlus2').get(function () {
   return this.get('nested.age') + 2;
 });
 schema.virtual('nested.setAge').set(function (v) {
@@ -125,7 +125,7 @@ describe('browser:document', function() {
 describe('browser:validate', function() {
   it('works', function(done) {
     var called = false;
-    var validate = [function(str){ called = true; return true }, 'BAM'];
+    var validate = [function(){ called = true; return true; }, 'BAM'];
 
     schema = new Schema({
       prop: { type: String, required: true, validate: validate },
@@ -143,7 +143,7 @@ describe('browser:validate', function() {
       doc.validate(function(error) {
         assert.ok(!error.errors['prop']);
         assert.equal('Path `nick` is required.', error.errors['nick'].message);
-        done();  
+        done();
       });
     });
   });
@@ -191,7 +191,7 @@ describe('#equals', function(){
       var m1 = new mongoose.Document({}, M);
       var m2 = new mongoose.Document({}, M);
       assert.doesNotThrow(function () {
-        m1.equals(m2)
+        m1.equals(m2);
       });
       done();
     });

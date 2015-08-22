@@ -6,17 +6,12 @@ var start = require('./common')
   , mongoose = start.mongoose
   , assert = require('assert')
   , Schema = mongoose.Schema
-  , Document = mongoose.Document
-  , SchemaType = mongoose.SchemaType
-  , VirtualType = mongoose.VirtualType
   , ValidatorError = mongoose.Error.ValidatorError
   , SchemaTypes = Schema.Types
   , ObjectId = SchemaTypes.ObjectId
   , Mixed = SchemaTypes.Mixed
   , DocumentObjectId = mongoose.Types.ObjectId
-  , MongooseArray = mongoose.Types.Array
-  , vm = require('vm')
-  , random = require('../lib/utils').random
+  , random = require('../lib/utils').random;
 
 describe('schema', function(){
   describe('validation', function(){
@@ -91,7 +86,7 @@ describe('schema', function(){
       Test.path('state').doValidate('x', function(err){
         assert.ok(err instanceof ValidatorError);
         assert.equal(err.message,
-          'enum validator failed for path `state`: test')
+          'enum validator failed for path `state`: test');
       });
 
       Test.path('state').doValidate('opening', function(err){
@@ -185,7 +180,7 @@ describe('schema', function(){
                 // validation should still work for non-undefined values
                 assert.ok(err);
                 done();
-              })
+              });
             });
           });
         });
@@ -324,7 +319,7 @@ describe('schema', function(){
       });
 
       done();
-    })
+    });
 
       it('date required', function(done){
         var Loki = new Schema({
@@ -344,6 +339,17 @@ describe('schema', function(){
         });
 
         done();
+      });
+
+      it('date not empty string (gh-3132)', function (done) {
+        var HappyBirthday = new Schema({
+          date: { type: Date, required: true }
+        });
+
+        HappyBirthday.path('date').doValidate('', function (err) {
+          assert.ok(err instanceof ValidatorError);
+          done();
+        });
       });
 
       it('objectid required', function(done){
@@ -741,7 +747,7 @@ describe('schema', function(){
         next();
       });
 
-      var B = mongoose.model('b', B);
+      B = mongoose.model('b', B);
 
       var p = new B();
       p.a.push({ str: 'asdf' });

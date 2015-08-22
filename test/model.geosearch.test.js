@@ -3,8 +3,7 @@ var start = require('./common')
   , assert = require('assert')
   , mongoose = start.mongoose
   , random = require('../lib/utils').random
-  , Schema = mongoose.Schema
-  , DocumentObjectId = mongoose.Types.ObjectId
+  , Schema = mongoose.Schema;
 
 /**
  * Setup
@@ -47,7 +46,7 @@ describe('model', function(){
         }
 
         function next() {
-          Geo.geoSearch({ type : "place" }, { near : [9,9], maxDistance : 5 }, function (err, results, stats) {
+          Geo.geoSearch({ type : "place" }, { near : [9,9], maxDistance : 5 }, function (err, results) {
             assert.ifError(err);
             assert.equal(1, results.length);
 
@@ -58,7 +57,7 @@ describe('model', function(){
             assert.equal(results[0].id, geos[0].id);
             assert.ok(results[0] instanceof Geo);
 
-            Geo.geoSearch({ type : "place" }, { near : [40,40], maxDistance : 5 }, function (err, results, stats) {
+            Geo.geoSearch({ type : "place" }, { near : [40,40], maxDistance : 5 }, function (err, results) {
               assert.ifError(err);
               assert.equal(0, results.length);
               db.close(done);
@@ -91,7 +90,7 @@ describe('model', function(){
         }
 
         function next() {
-          Geo.geoSearch({ type : "place" }, { near : [9,9], maxDistance : 5, lean : true }, function (err, results, stats) {
+          Geo.geoSearch({ type : "place" }, { near : [9,9], maxDistance : 5, lean : true }, function (err, results) {
             assert.ifError(err);
             assert.equal(1, results.length);
 
@@ -118,7 +117,6 @@ describe('model', function(){
 
         var g = new Geo({ pos : [10,10], type : "place"});
         g.save(function() {
-          var threw = false;
           Geo.geoSearch([], {}, function (e) {
             assert.ok(e);
             assert.equal(e.message, "Must pass conditions to geoSearch");
@@ -131,7 +129,7 @@ describe('model', function(){
                 assert.ok(e);
                 assert.equal(e.message, "near option must be an array [x, y]");
 
-                Geo.geoSearch({ type : "test" }, { near : [1,2] }, function (err, res) {
+                Geo.geoSearch({ type : "test" }, { near : [1,2] }, function (err) {
                   assert.ok(err);
                   assert.ok(/maxDistance needs a number/.test(err));
                   db.close(done);
@@ -146,12 +144,11 @@ describe('model', function(){
       var db = start();
       var Geo = getModel(db);
 
-      var prom = Geo.geoSearch({ type : "place" }, { near : [9,9], maxDistance : 5 }, function (err, results, stats) {
-      });
+      var prom = Geo.geoSearch({ type : "place" }, { near : [9,9], maxDistance : 5 }, function () {});
       assert.ok(prom instanceof mongoose.Promise);
       db.close();
       done();
-    })
+    });
 
     it('allows not passing a callback (gh-1614)', function (done) {
       var db = start();

@@ -5,9 +5,8 @@
 var start = require('./common')
   , assert = require('assert')
   , mongoose = start.mongoose
-  , random = require('../lib/utils').random
   , Schema = mongoose.Schema
-  , DocumentObjectId = mongoose.Types.ObjectId
+  , DocumentObjectId = mongoose.Types.ObjectId;
 
 /**
  * Setup
@@ -41,11 +40,11 @@ describe('model', function(){
       B = db.model('model-create', schemaB, 'gh-2637-1');
       B.discriminator('C', schemaC);
       Breakfast = db.model('gh-2637-2', breakfastSchema, 'gh-2637-2');
-    })
+    });
 
     after(function(done){
       db.close(done);
-    })
+    });
 
     it('hydrates documents with no modified paths', function(done) {
       var hydrated = B.hydrate({ _id: '541085faedb2f28965d0e8e7', title: 'chair' });
@@ -82,4 +81,4 @@ describe('model', function(){
       done();
     });
   });
-})
+});

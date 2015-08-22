@@ -1,3 +1,44 @@
+4.1.3 / 2015-08-16
+==================
+ * fixed; getUpdate() in pre update hooks #3520 [gregthegeek](https://github.com/gregthegeek)
+ * fixed; handleArray() ensures arg is an array #3238 [jloveridge](https://github.com/jloveridge)
+ * fixed; refresh required path cache when recreating docs #3199
+ * fixed; $ operator on unwind aggregation helper #3197
+ * fixed; findOneAndUpdate() properly returns raw result as third arg to callback #3173
+ * fixed; querystream with dynamic refs #3108
+
+3.8.35 / 2015-08-14
+===================
+ * fixed; handling for minimize on nested objects #2930
+ * fixed; don't crash when schema.path.options undefined #1824
+
+4.1.2 / 2015-08-10
+==================
+ * fixed; better handling for Jade templates #3241 [kbadk](https://github.com/kbadk)
+ * added; ESlint trailing spaces #3234 [ChristianMurphy](https://github.com/ChristianMurphy)
+ * added; ESlint #3191 [ChristianMurphy](https://github.com/ChristianMurphy)
+ * fixed; properly emit event on disconnect #3183
+ * fixed; copy options properly using Query.toConstructor() #3176
+ * fixed; setMaxListeners() issue in browser build #3170
+ * fixed; node driver -> 2.0.40 to not store undefined keys as null #3169
+ * fixed; update validators handle positional operator #3167
+ * fixed; handle $all + $elemMatch query casting #3163
+ * fixed; post save hooks don't swallow extra args #3155
+ * docs; spelling mistake in index.jade #3154
+ * fixed; don't crash when toObject() has no fields #3130
+ * fixed; apply toObject() recursively for find and update queries #3086 [naoina](https://github.com/naoina)
+
+4.1.1 / 2015-08-03
+==================
+ * fixed; aggregate exec() crash with no callback #3212 #3198 [jpgarcia](https://github.com/jpgarcia)
+ * fixed; pre init hooks now properly synchronous #3207 [burtonjc](https://github.com/burtonjc)
+ * fixed; updateValidators doesn't flatten dates #3206 #3194 [victorkohl](https://github.com/victorkohl)
+ * fixed; default fields don't make document dirty between saves #3205 [burtonjc](https://github.com/burtonjc)
+ * fixed; save passes 0 as numAffected rather than undefined when no change #3195 [burtonjc](https://github.com/burtonjc)
+ * fixed; better handling for positional operator in update #3185
+ * fixed; use Travis containers #3181 [ChristianMurphy](https://github.com/ChristianMurphy)
+ * fixed; leaked variable #3180 [ChristianMurphy](https://github.com/ChristianMurphy)
+
 4.1.0 / 2015-07-24
 ==================
  * added; `schema.queue()` now public #3193
@@ -25,7 +66,7 @@
  * fixed; strict mode for findOneAndUpdate #2947
  * added; .min.js.gz file for browser component #2806
 
-3.8.35 / 2015-07-20
+3.8.34 / 2015-07-20
 ===================
  * fixed; allow using $rename #3171
  * fixed; no longer modifies update arguments #3008

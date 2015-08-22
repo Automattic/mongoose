@@ -8,13 +8,8 @@ var start = require('./common')
   , mongoose = start.mongoose
   , utils = require('../lib/utils')
   , random = utils.random
-  , Query = require('../lib/query')
   , Schema = mongoose.Schema
-  , SchemaType = mongoose.SchemaType
-  , ObjectId = Schema.Types.ObjectId
-  , MongooseBuffer = mongoose.Types.Buffer
-  , DocumentObjectId = mongoose.Types.ObjectId
-  , fs = require('fs')
+  , fs = require('fs');
 
 var names = ('Aaden Aaron Adrian Aditya Agustin Jim Bob Jonah Frank Sally Lucy').split(' ');
 
@@ -32,7 +27,7 @@ var collection = 'personforstream_' + random();
 describe('query stream:', function(){
   before(function (done) {
     var db = start()
-      , P = db.model('PersonForStream', collection)
+      , P = db.model('PersonForStream', collection);
 
     var people = names.map(function (name) {
       return { name: name };
@@ -53,7 +48,7 @@ describe('query stream:', function(){
       , paused = 0
       , resumed = 0
       , seen = {}
-      , err
+      , err;
 
     var stream = P.find().batchSize(3).stream();
 
@@ -117,13 +112,13 @@ describe('query stream:', function(){
   it('immediately destroying a stream prevents the query from executing', function(done){
     var db = start()
       , P = db.model('PersonForStream', collection)
-      , i = 0
+      , i = 0;
 
     var stream = P.where('name', 'Jonah').select('name').findOne().stream();
 
     stream.on('data', function () {
       i++;
-    })
+    });
     stream.on('close', cb);
     stream.on('error', cb);
 
@@ -136,7 +131,7 @@ describe('query stream:', function(){
         db.close();
         assert.strictEqual(null, stream._fields);
         done();
-      })
+      });
     }
   });
 
@@ -146,7 +141,7 @@ describe('query stream:', function(){
     var db = start()
       , P = db.model('PersonForStream', collection)
       , finished = 0
-      , i = 0
+      , i = 0;
 
     var stream = P.where('name').exists().limit(10).select('_id').stream();
 
@@ -175,7 +170,7 @@ describe('query stream:', function(){
         assert.equal(false, stream.readable);
         assert.equal(true, stream._cursor.isClosed());
         done();
-      }, 100)
+      }, 100);
     }
   });
 
@@ -186,11 +181,11 @@ describe('query stream:', function(){
       , P = db.model('PersonForStream', collection)
       , finished = 0
       , closed = 0
-      , i = 0
+      , i = 0;
 
     var stream = P.find().batchSize(5).stream();
 
-    stream.on('data', function (doc) {
+    stream.on('data', function () {
       if (++i === 5) {
         db.close();
       }
@@ -213,7 +208,7 @@ describe('query stream:', function(){
         assert.equal(stream.readable, false);
         assert.equal(stream._cursor.isClosed(), true);
         done();
-      }, 100)
+      }, 100);
     }
   });
 
@@ -269,7 +264,7 @@ describe('query stream:', function(){
           assert.equal(true, stream.paused);
           stream.resume();
           assert.equal(false, stream.paused);
-        })
+        });
       }
     });
 
@@ -379,7 +374,7 @@ describe('query stream:', function(){
 
     var schema = Schema({
       fullname: { type: String },
-      password: { type: String, select: false },
+      password: { type: String, select: false }
     });
 
     var User = db.model('gh-1862', schema, 'gh-1862');
@@ -402,7 +397,7 @@ describe('query stream:', function(){
 
     Sku.create({}, function(error, sku) {
       assert.ifError(error);
-      Item.create({ sku: sku._id }, function(error, item) {
+      Item.create({ sku: sku._id }, function(error) {
         assert.ifError(error);
 
         var found = 0;
@@ -416,6 +411,95 @@ describe('query stream:', function(){
           assert.equal(found, 1);
           db.close(done);
         });
+      });
+    });
+  });
+
+  it('works with populate + dynref (gh-3108)', function(done) {
+    var db = start();
+
+    var reviewSchema = new Schema({
+      _id: Number,
+      text: String,
+      item: {
+        id: {
+          type: Number,
+          refPath: 'item.type'
+        },
+        type: {
+          type: String
+        }
+      },
+      items: [
+        {
+          id: {
+            type: Number,
+            refPath: 'items.type'
+          },
+          type: {
+            type: String
+          }
+        }
+      ]
+    });
+
+    var item1Schema = new Schema({
+      _id: Number,
+      name: String
+    });
+
+    var item2Schema = new Schema({
+      _id: Number,
+      otherName: String
+    });
+
+    Review = db.model('dynrefReview', reviewSchema, 'gh3108_0');
+    Item1 = db.model('dynrefItem1', item1Schema, 'gh3108_1');
+    Item2 = db.model('dynrefItem2', item2Schema, 'gh3108_2');
+
+    var c = 0;
+
+    var create = function(cb) {
+      Item1.create({ _id: ++c, name: 'Val' }, function(error, doc) {
+        assert.ifError(error);
+        Item2.create({ _id: ++c, otherName: 'Val' }, function(error, doc) {
+          assert.ifError(error);
+          var review = {
+            _id: c,
+            text: 'Test',
+            item: { id: c - 1, type: 'dynrefItem1' },
+            items: [
+              { id: c - 1, type: 'dynrefItem1' },
+              { id: c, type: 'dynrefItem2' }
+            ]
+          };
+          Review.create(review, function(error, doc) {
+            assert.ifError(error);
+            cb();
+          });
+        });
+      });
+    };
+
+    var test = function() {
+      var stream = Review.find({}).populate('items.id').stream();
+      var count = 0;
+
+      stream.on('data', function(doc) {
+        ++count;
+        assert.equal('Val', doc.items[0].id.name);
+        assert.equal('Val', doc.items[1].id.otherName);
+      });
+
+      stream.on('close', function() {
+        assert.equal(count, 2);
+        db.close(done);
+      });
+    };
+
+    create(function() {
+      create(function() {
+        test();
       });
     });
   });

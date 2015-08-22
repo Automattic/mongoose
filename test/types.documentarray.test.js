@@ -12,9 +12,8 @@ var start = require('./common')
   , EmbeddedDocument = require('../lib/types/embedded')
   , DocumentArray = require('../lib/types/documentarray')
   , Schema = mongoose.Schema
-  , ObjectId = Schema.ObjectId
   , assert = require('assert')
-  , collection = 'types.documentarray_' + random()
+  , collection = 'types.documentarray_' + random();
 
 /**
  * Setup.
@@ -82,14 +81,14 @@ describe('types.documentarray', function(){
       , _id:   { type: String, required: true }
     });
 
-    var Subdocument = TestDoc(Custom);
+    Subdocument = TestDoc(Custom);
 
     var sub2 = new Subdocument();
     sub2.title = 'together we can play some rock-n-roll';
     sub2._id = 'a25';
     var id2 = sub2.id;
 
-    var a = new MongooseDocumentArray([sub2]);
+    a = new MongooseDocumentArray([sub2]);
     assert.equal(a.id(id2).title, 'together we can play some rock-n-roll');
     assert.equal(a.id(sub2._id).title, 'together we can play some rock-n-roll');
 
@@ -99,34 +98,34 @@ describe('types.documentarray', function(){
       , _id:   { type: Number, required: true }
     });
 
-    var Subdocument = TestDoc(CustNumber);
+    Subdocument = TestDoc(CustNumber);
 
     var sub3 = new Subdocument();
     sub3.title = 'rock-n-roll';
     sub3._id = 1995;
     var id3 = sub3.id;
 
-    var a = new MongooseDocumentArray([sub3]);
+    a = new MongooseDocumentArray([sub3]);
     assert.equal(a.id(id3).title, 'rock-n-roll');
     assert.equal(a.id(sub3._id).title, 'rock-n-roll');
 
     // test with object as _id
-    var Custom = new Schema({
+    Custom = new Schema({
         title: { type: String }
       , _id:   { one: { type: String }, two: { type: String } }
     });
 
-    var Subdocument = TestDoc(Custom);
+    Subdocument = TestDoc(Custom);
 
-    var sub1 = new Subdocument();
+    sub1 = new Subdocument();
     sub1._id = {one: 'rolling', two: 'rock'};
     sub1.title = 'to be a rock and not to roll';
 
-    var sub2 = new Subdocument();
+    sub2 = new Subdocument();
     sub2._id = {one: 'rock', two: 'roll'};
     sub2.title = 'rock-n-roll';
 
-    var a = new MongooseDocumentArray([sub1,sub2]);
+    a = new MongooseDocumentArray([sub1,sub2]);
     assert.notEqual(a.id({one: 'rolling', two: 'rock'}).title, 'rock-n-roll');
     assert.equal(a.id({one: 'rock', two: 'roll'}).title, 'rock-n-roll');
 
@@ -135,13 +134,13 @@ describe('types.documentarray', function(){
         title: { type: String }
     }, { noId: true });
 
-    var Subdocument = TestDoc(NoId);
+    Subdocument = TestDoc(NoId);
 
     var sub4 = new Subdocument();
     sub4.title = 'rock-n-roll';
 
-    var a = new MongooseDocumentArray([sub4])
-      , threw = false;
+    a = new MongooseDocumentArray([sub4]);
+    var threw = false;
     try {
       a.id('i better not throw');
     } catch (err) {
@@ -150,16 +149,16 @@ describe('types.documentarray', function(){
     assert.equal(false, threw);
 
     // test the _id option, noId is deprecated
-    var NoId = new Schema({
+    NoId = new Schema({
         title: { type: String }
     }, { _id: false });
 
-    var Subdocument = TestDoc(NoId);
+    Subdocument = TestDoc(NoId);
 
-    var sub4 = new Subdocument();
+    sub4 = new Subdocument();
     sub4.title = 'rock-n-roll';
 
-    var a = new MongooseDocumentArray([sub4])
+    a = new MongooseDocumentArray([sub4])
       , threw = false;
     try {
       a.id('i better not throw');
@@ -172,26 +171,26 @@ describe('types.documentarray', function(){
     assert.strictEqual(null, a.id(null));
 
     // test when _id is a populated document
-    var Custom = new Schema({
+    Custom = new Schema({
         title: { type: String }
     });
 
     var Custom1 = new Schema({}, { id: false });
 
-    var Subdocument = TestDoc(Custom);
+    Subdocument = TestDoc(Custom);
     var Subdocument1 = TestDoc(Custom1);
 
     var sub = new Subdocument1();
-    var sub1 = new Subdocument1();
+    sub1 = new Subdocument1();
     sub.title = 'Hello again to all my friends';
-    var id = sub1._id.toString();
+    id = sub1._id.toString();
     setValue('_id', sub1 , sub);
 
-    var a = new MongooseDocumentArray([sub]);
+    a = new MongooseDocumentArray([sub]);
     assert.equal(a.id(id).title, 'Hello again to all my friends');
 
     done();
-  })
+  });
 
   describe('inspect', function(){
     it('works with bad data', function(done){
@@ -205,8 +204,8 @@ describe('types.documentarray', function(){
       }
       assert.ok(!threw);
       done();
-    })
-  })
+    });
+  });
 
   describe('toObject', function(){
     it('works with bad data', function(done){
@@ -220,20 +219,20 @@ describe('types.documentarray', function(){
       }
       assert.ok(!threw);
       done();
-    })
+    });
     it('passes options to its documents (gh-1415)', function(done){
       var subSchema = new Schema({
           title: { type: String }
       });
 
       subSchema.set('toObject', {
-        transform: function (doc, ret, options) {
+        transform: function (doc, ret) {
           // this should not be called because custom options are
           // passed during MongooseArray#toObject() calls
           ret.changed = 123;
           return ret;
         }
-      })
+      });
 
       var db = mongoose.createConnection();
       var M = db.model('gh-1415', { docs: [subSchema] });
@@ -242,27 +241,27 @@ describe('types.documentarray', function(){
       var delta = m.$__delta()[1];
       assert.equal(undefined, delta.$pushAll.docs[0].changed);
       done();
-    })
+    });
     it('uses the correct transform (gh-1412)', function(done) {
       var db = start();
       var SecondSchema = new Schema({});
 
       SecondSchema.set('toObject', {
-        transform: function second(doc, ret, options) {
+        transform: function second(doc, ret) {
           ret.secondToObject = true;
           return ret;
-        },
+        }
       });
 
       var FirstSchema = new Schema({
-        second: [SecondSchema],
+        second: [SecondSchema]
       });
 
       FirstSchema.set('toObject', {
-      transform: function first(doc, ret, options) {
+      transform: function first(doc, ret) {
           ret.firstToObject = true;
           return ret;
-        },
+        }
       });
 
       var First = db.model('first', FirstSchema);
@@ -281,8 +280,8 @@ describe('types.documentarray', function(){
       assert.ok(!obj.second[0].firstToObject);
       assert.ok(!obj.second[1].firstToObject);
       db.close(done);
-    })
-  })
+    });
+  });
 
   describe('create()', function(){
     it('works', function(done){
@@ -298,8 +297,8 @@ describe('types.documentarray', function(){
       assert.equal(subdoc.name, '100');
       assert.ok(subdoc instanceof EmbeddedDocument);
       done();
-    })
-  })
+    });
+  });
 
   describe('push()', function(){
     it('does not re-cast instances of its embedded doc', function(done){
@@ -317,7 +316,7 @@ describe('types.documentarray', function(){
         assert.ifError(err);
         M.findById(m._id, function (err, doc) {
           assert.ifError(err);
-          var c = doc.children.create({ name: 'first' })
+          var c = doc.children.create({ name: 'first' });
           assert.equal(undefined, c.date);
           doc.children.push(c);
           assert.equal(undefined, c.date);
@@ -338,12 +337,12 @@ describe('types.documentarray', function(){
                   assert.equal(doc.children[0].id, child.id);
                 });
                 db.close(done);
-              })
-            })
-          })
-        })
-      })
-    })
+              });
+            });
+          });
+        });
+      });
+    });
     it('corrects #ownerDocument() if value was created with array.create() (gh-1385)', function(done){
       var mg = new mongoose.Mongoose;
       var M = mg.model('1385', { docs: [{ name: String }] });
@@ -353,8 +352,8 @@ describe('types.documentarray', function(){
       m.docs.push(doc);
       assert.equal(doc.ownerDocument()._id, String(m._id));
       done();
-    })
-  })
+    });
+  });
 
   it('#push should work on EmbeddedDocuments more than 2 levels deep', function (done) {
     var Comments = new Schema;
@@ -368,7 +367,7 @@ describe('types.documentarray', function(){
     });
 
     var db = start()
-      , Post = db.model('docarray-BlogPost', BlogPost, collection)
+      , Post = db.model('docarray-BlogPost', BlogPost, collection);
 
     var p =new Post({ title: "comment nesting" });
     var c1 = p.comments.create({ title: "c1" });
@@ -397,7 +396,7 @@ describe('types.documentarray', function(){
           });
         });
       });
-    })
+    });
   });
 
   describe('invalidate()', function(){
@@ -412,12 +411,12 @@ describe('types.documentarray', function(){
       var t = new T;
       t.docs.push({ name: 100 });
 
-      subdoc = t.docs.create({ name: 'yep' });
+      var subdoc = t.docs.create({ name: 'yep' });
       assert.throws(function(){
         // has no parent array
         subdoc.invalidate('name', 'junk', 47);
       }, /^Error: Unable to invalidate a subdocument/);
-      t.validate(function (err) {
+      t.validate(function () {
         var e = t.errors['docs.0.name'];
         assert.ok(e);
         assert.equal(e.path, 'docs.0.name');
@@ -426,7 +425,7 @@ describe('types.documentarray', function(){
         assert.equal(e.value, '%');
         done();
       });
-    })
+    });
 
     it('handles validation failures', function(done){
       var db = start();
@@ -440,7 +439,7 @@ describe('types.documentarray', function(){
         assert.equal(900, err.errors['docs.0.v'].value);
         db.close(done);
       });
-    })
+    });
 
     it('removes attached event listeners when creating new doc array', function(done) {
       var db = start();
@@ -462,5 +461,5 @@ describe('types.documentarray', function(){
         });
       });
     });
-  })
-})
+  });
+});

@@ -6,7 +6,6 @@ var suite = new Benchmark.Suite();
 
 var Schema = mongoose.Schema;
 var ObjectId = Schema.Types.ObjectId;
-var mongo = require('mongodb');
 var utils = require('../../lib/utils.js');
 
 // to make things work in the way the are normally described online...
@@ -68,13 +67,13 @@ var blogData10000 = utils.clone(blogData);
 for (var i=0; i < 10; i++) {
   blogData10.comments.push(commentData);
 }
-for (var i=0; i < 100; i++) {
+for (i=0; i < 100; i++) {
   blogData100.comments.push(commentData);
 }
-for (var i=0; i < 1000; i++) {
+for (i=0; i < 1000; i++) {
   blogData1000.comments.push(commentData);
 }
-for (var i=0; i < 10000; i++) {
+for (i=0; i < 10000; i++) {
   blogData10000.comments.push(commentData);
 }
 var commentData = {
@@ -83,7 +82,7 @@ var commentData = {
   body : 'this be some crazzzyyyyy text that would go in a comment',
   comments : [{ title : 'second level', date : new Date(), body : 'texttt'}]
 };
-var BlogPost = mongoose.model('BlogPost', BlogPost);
+BlogPost = mongoose.model('BlogPost', BlogPost);
 
 suite.add('Casting - Embedded Docs - 0 Docs', {
   fn : function () {
@@ -133,4 +132,3 @@ suite.add('Casting - Embedded Docs - 0 Docs', {
     console.log(JSON.stringify(outObj));
   }
 }).run({ async : true });
-

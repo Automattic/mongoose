@@ -1,8 +1,6 @@
 
 var mongoose = require('../')
-  , utils = require('../lib/utils')
-  , clone = utils.clone
-  , Schema = mongoose.Schema
+  , Schema = mongoose.Schema;
 
 var DocSchema = new Schema({
     title: String
@@ -22,7 +20,7 @@ var AllSchema = new Schema({
   , bools  : [Boolean]
   , buffers: [Buffer]
   , objectids: [Schema.ObjectId]
-  , docs     : { type: [DocSchema], validate: function () { return true }}
+  , docs     : { type: [DocSchema], validate: function () { return true; }}
   , s: { nest: String }
 });
 
@@ -48,13 +46,14 @@ var a = new A({
 var start = new Date;
 var total = 100000;
 var i = total;
+var len;
 
-for (var i = 0, len = total; i < len; ++i) {
+for (i = 0, len = total; i < len; ++i) {
   a.toObject({ depopulate: true });
 }
 
-var time= (new Date - start)/1000;
+var time = (new Date - start)/1000;
 console.error('took %d seconds for %d docs (%d dps)', time, total, total/time);
-var used = process.memoryUsage();
+process.memoryUsage();
 
 // --trace-opt --trace-deopt --trace-bailout

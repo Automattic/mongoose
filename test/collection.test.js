@@ -10,7 +10,7 @@ describe('collections:', function(){
       , collection = db.collection('test-buffering-collection')
       , connected = false
       , inserted = false
-      , pending = 2
+      , pending = 2;
 
     function finish () {
       if (--pending) return;
@@ -31,7 +31,7 @@ describe('collections:', function(){
       connected = !err;
       finish();
     });
-  })
+  });
 
   it('methods should that throw (unimplemented)', function(done){
     var collection = new Collection('test', mongoose.connection)
@@ -117,5 +117,5 @@ describe('collections:', function(){
     assert.ok(thrown);
     thrown = false;
     done();
-  })
-})
+  });
+});

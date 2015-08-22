@@ -88,7 +88,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function (err) {
     });
 
     var User = mongoose.model('User', UserSchema);
-    var BlogPost = mongoose.model('BlogPost', BlogPost);
+    BlogPost = mongoose.model('BlogPost', BlogPost);
     var user = db.collection('user');
     var blogpost = db.collection('blogpost');
 

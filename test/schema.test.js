@@ -7,16 +7,13 @@ var start = require('./common')
   , assert = require('assert')
   , Schema = mongoose.Schema
   , Document = mongoose.Document
-  , SchemaType = mongoose.SchemaType
   , VirtualType = mongoose.VirtualType
-  , ValidatorError = mongoose.Error.ValidatorError
   , SchemaTypes = Schema.Types
   , ObjectId = SchemaTypes.ObjectId
   , Mixed = SchemaTypes.Mixed
   , DocumentObjectId = mongoose.Types.ObjectId
-  , MongooseArray = mongoose.Types.Array
   , ReadPref = mongoose.mongo.ReadPreference
-  , vm = require('vm')
+  , vm = require('vm');
 
 /**
  * Test Document constructor.
@@ -24,7 +21,7 @@ var start = require('./common')
 
 function TestDocument () {
   Document.apply(this, arguments);
-};
+}
 
 /**
  * Inherits from Document.
@@ -99,7 +96,7 @@ describe('schema', function(){
     var schema = Schema({ name: String });
     assert.ok(schema instanceof Schema);
     done();
-  })
+  });
 
   it('supports different schematypes', function(done){
     var Checkin = new Schema({
@@ -210,7 +207,7 @@ describe('schema', function(){
 
     assert.strictEqual(Person.path('location.unexistent'), undefined);
     done();
-  })
+  });
 
   it('allows paths nested > 2 levels', function(done){
     var Nested = new Schema({
@@ -229,7 +226,7 @@ describe('schema', function(){
         simple    : { type: String, default: 'a' }
       , array     : { type: Array, default: [1,2,3,4,5] }
       , arrayX    : { type: Array, default: 9 }
-      , arrayFn   : { type: Array, default: function () { return [8] } }
+      , arrayFn   : { type: Array, default: function () { return [8]; } }
       , callback  : { type: Number, default: function(){
           assert.equal('b', this.a);
           return '3';
@@ -249,7 +246,7 @@ describe('schema', function(){
     assert.ok(Test.path('arrayX').getDefault(new TestDocument).isMongooseArray);
     assert.equal(Test.path('arrayX').getDefault(new TestDocument)[0], 9);
     done();
-  })
+  });
 
   it('Mixed defaults can be empty arrays', function(done){
     var Test = new Schema({
@@ -262,7 +259,7 @@ describe('schema', function(){
     assert.ok(Test.path('mixed2').getDefault() instanceof Array);
     assert.equal(Test.path('mixed2').getDefault().length, 0);
     done();
-  })
+  });
 
   describe('casting', function(){
     it('number', function(done){
@@ -285,7 +282,7 @@ describe('schema', function(){
             nickname: String
         });
 
-        function Test(){};
+        function Test(){}
         Test.prototype.toString = function(){
           return 'woot';
         };
@@ -431,7 +428,7 @@ describe('schema', function(){
       , c: function(){}
     });
 
-    assert.equal(Object.keys(a.statics).length, 4)
+    assert.equal(Object.keys(a.statics).length, 4);
     done();
   });
 
@@ -439,7 +436,7 @@ describe('schema', function(){
     it('work', function(done){
       function lowercase (v) {
         return v.toLowerCase();
-      };
+      }
 
       var Tobi = new Schema({
           name: { type: String, set: lowercase }
@@ -458,11 +455,11 @@ describe('schema', function(){
     });
 
     it('order', function(done){
-      function extract (v, self) {
+      function extract (v) {
         return (v && v._id)
           ? v._id
-          : v
-      };
+          : v;
+      }
 
       var Tobi = new Schema({
           name: { type: Schema.ObjectId, set: extract }
@@ -483,7 +480,7 @@ describe('schema', function(){
         assert.equal('b', this.a);
         assert.equal('name', self.path);
         return v.toLowerCase();
-      };
+      }
 
       var Tobi = new Schema({
           name: { type: String, set: lowercase }
@@ -498,11 +495,11 @@ describe('schema', function(){
         assert.equal('number', typeof v);
         assert.equal(0, v);
         return 'last';
-      };
+      }
 
-      function first (v) {
+      function first () {
         return 0;
-      };
+      }
 
       var Tobi = new Schema({
           name: { type: String, set: last }
@@ -567,7 +564,7 @@ describe('schema', function(){
 
     it('assignment of non-functions throw', function(done){
       var schema = new Schema({ fun: String });
-      var g, s;
+      var g;
 
       try {
         schema.path('fun').set(4);
@@ -578,14 +575,14 @@ describe('schema', function(){
       assert.ok(g);
       assert.equal(g.message,'A setter must be a function.');
       done();
-    })
+    });
   });
 
   describe('getters', function(){
     it('work', function(done){
       function woot (v) {
         return v + ' woot';
-      };
+      }
 
       var Tobi = new Schema({
           name: { type: String, get: woot }
@@ -596,11 +593,11 @@ describe('schema', function(){
       done();
     });
     it('order', function(done){
-      function format (v, self) {
+      function format (v) {
         return v
           ? '$' + v
-          : v
-      };
+          : v;
+      }
 
       var Tobi = new Schema({
           name: { type: Number, get: format }
@@ -614,7 +611,7 @@ describe('schema', function(){
         assert.equal('b', this.a);
         assert.equal('name', self.path);
         return v.toLowerCase();
-      };
+      }
 
       var Tobi = new Schema({
           name: { type: String, get: woot }
@@ -628,11 +625,11 @@ describe('schema', function(){
         assert.equal('number', typeof v);
         assert.equal(0, v);
         return 'last';
-      };
+      }
 
-      function first (v) {
+      function first () {
         return 0;
-      };
+      }
 
       var Tobi = new Schema({
           name: { type: String, get: last }
@@ -652,7 +649,7 @@ describe('schema', function(){
     });
     it('assignment of non-functions throw', function(done){
       var schema = new Schema({ fun: String });
-      var g, s;
+      var g;
 
       try {
         schema.path('fun').get(true);
@@ -663,35 +660,35 @@ describe('schema', function(){
       assert.ok(g);
       assert.equal(g.message,'A getter must be a function.');
       done();
-    })
+    });
     it('auto _id', function(done){
       var schema = new Schema({
           name: String
       });
       assert.ok(schema.path('_id') instanceof Schema.ObjectId);
 
-      var schema = new Schema({
+      schema = new Schema({
           name: String
       }, { _id: true });
       assert.ok(schema.path('_id') instanceof Schema.ObjectId);
 
-      var schema = new Schema({
+      schema = new Schema({
           name: String
       }, { _id: false });
       assert.equal(undefined, schema.path('_id'));
 
       // old options
-      var schema = new Schema({
+      schema = new Schema({
           name: String
       }, { noId: false });
       assert.ok(schema.path('_id') instanceof Schema.ObjectId);
 
-      var schema = new Schema({
+      schema = new Schema({
           name: String
       }, { noId: true });
       assert.equal(undefined, schema.path('_id'));
       done();
-    })
+    });
 
     it('auto id', function(done){
       var schema = new Schema({
@@ -699,28 +696,28 @@ describe('schema', function(){
       });
       assert.ok(schema.virtualpath('id') instanceof mongoose.VirtualType);
 
-      var schema = new Schema({
+      schema = new Schema({
           name: String
       }, { id: true });
       assert.ok(schema.virtualpath('id') instanceof mongoose.VirtualType);
 
-      var schema = new Schema({
+      schema = new Schema({
           name: String
       }, { id: false });
       assert.equal(undefined, schema.virtualpath('id'));
 
       // old options
-      var schema = new Schema({
+      schema = new Schema({
           name: String
       }, { noVirtualId: false });
       assert.ok(schema.virtualpath('id') instanceof mongoose.VirtualType);
 
-      var schema = new Schema({
+      schema = new Schema({
           name: String
       }, { noVirtualId: true });
       assert.equal(undefined, schema.virtualpath('id'));
       done();
-    })
+    });
   });
 
   describe('hooks', function(){
@@ -803,7 +800,7 @@ describe('schema', function(){
         assert.equal(60*60*24, i.expireAfterSeconds);
 
         done();
-      })
+      });
       it('compound', function(done){
         var Tobi = new Schema({
             name: { type: String, index: true }
@@ -839,7 +836,7 @@ describe('schema', function(){
 
       assert.equal(true, called);
       done();
-    })
+    });
   });
 
   describe('options', function(){
@@ -1057,12 +1054,12 @@ describe('schema', function(){
           assert.equal('b', this.a);
           assert.equal('name', self.path);
           return v.toLowerCase();
-        })
+        });
 
         assert.equal('yep', Tobi.virtualpath('name').applyGetters('YEP', { a: 'b' }));
         done();
-      })
-    })
+      });
+    });
 
     describe('setter', function(){
       it('scope', function(done){
@@ -1072,12 +1069,12 @@ describe('schema', function(){
           assert.equal('b', this.a);
           assert.equal('name', self.path);
           return v.toLowerCase();
-        })
+        });
 
         assert.equal('yep', Tobi.virtualpath('name').applySetters('YEP', { a: 'b' }));
         done();
-      })
-    })
+      });
+    });
   });
 
   describe('other contexts', function(){
@@ -1110,28 +1107,28 @@ describe('schema', function(){
 
   describe('#add()', function(){
     it('does not polute existing paths', function(done){
-      var o = { name: String }
+      var o = { name: String };
       var s = new Schema(o);
 
       assert.throws(function () {
         s.add({ age: Number }, 'name.');
-      }, /Cannot set nested path/)
+      }, /Cannot set nested path/);
 
       assert.throws(function () {
         s.add({ age: { x: Number }}, 'name.');
-      }, /Cannot set nested path/)
+      }, /Cannot set nested path/);
       assert.equal(false, ('age' in o.name));
 
-      var o = { name: 'string' }
-      var s = new Schema(o);
+      o = { name: 'string' };
+      s = new Schema(o);
 
       assert.throws(function () {
         s.add({ age: Number }, 'name.');
-      }, /Cannot set nested path/)
+      }, /Cannot set nested path/);
 
       assert.throws(function () {
         s.add({ age: { x: Number }}, 'name.');
-      }, /Cannot set nested path/)
+      }, /Cannot set nested path/);
 
       assert.equal('string', o.name);
       done();
@@ -1177,23 +1174,23 @@ describe('schema', function(){
           done();
         });
       });
-    })
+    });
   });
 
   it('debugging msgs', function(done){
     var err;
     try {
-      new Schema({ name: { first: null } })
+      new Schema({ name: { first: null } });
     } catch (e) {
       err = e;
     }
-    assert.equal(err.message,'Invalid value for schema path `name.first`')
+    assert.equal(err.message,'Invalid value for schema path `name.first`');
     try {
-      new Schema({ age: undefined })
+      new Schema({ age: undefined });
     } catch (e) {
       err = e;
     }
-    assert.equal(err.message, 'Invalid value for schema path `age`')
+    assert.equal(err.message, 'Invalid value for schema path `age`');
     done();
   });
 
@@ -1230,7 +1227,7 @@ describe('schema', function(){
 
     it('of nested schemas should throw (gh-700)', function(done){
       var a = new Schema({ title: String })
-        , err
+        , err;
 
       try {
         new Schema({ blah: Boolean, a: a });
@@ -1263,7 +1260,7 @@ describe('schema', function(){
       assert.deepEqual([{ a: String, b: [{ type: { type: Buffer }, x: Number }] }], schema.e);
 
       done();
-    })
+    });
 
     it('properly gets value of plain objects when dealing with refs (gh-1606)', function (done) {
       var db = start();
@@ -1347,11 +1344,9 @@ describe('schema', function(){
       }, /`init` may not be used as a schema pathname/);
 
       done();
-    })
+    });
 
     it('that do not conflict do not throw', function(done){
-      var child = new Schema({ name: String });
-
       assert.doesNotThrow(function(){
         new Schema({
             model: String
@@ -1369,17 +1364,17 @@ describe('schema', function(){
       assert.doesNotThrow(function(){
         var s = Schema({ docs: [{ path: String }] });
         var M = mongoose.model('gh-1245', s);
-        var m = new M({ docs: [{ path: 'works' }] });
+        new M({ docs: [{ path: 'works' }] });
       });
 
       assert.doesNotThrow(function () {
         var s = Schema({ setMaxListeners: String });
         var M = mongoose.model('setMaxListeners-as-property-name', s);
-        var m = new M({ setMaxListeners: 'works' });
-      })
+        new M({ setMaxListeners: 'works' });
+      });
 
       done();
-    })
+    });
 
     it('permit _scope to be used (gh-1184)', function(done){
       var db = start();
@@ -1396,9 +1391,9 @@ describe('schema', function(){
         }
         assert.ifError(err);
         db.close(done);
-      })
-    })
-  })
+      });
+    });
+  });
 
   describe('pathType()', function(){
     var schema;
@@ -1409,8 +1404,8 @@ describe('schema', function(){
         , nest: { thing: { nests: Boolean }}
         , docs:[{ x: [{ y:String }] }]
         , mixed: {}
-      })
-    })
+      });
+    });
 
     describe('when called on an explicit real path', function(){
       it('returns "real"', function(done){
@@ -1421,21 +1416,21 @@ describe('schema', function(){
         assert.equal('real', schema.pathType('docs.0.x.3.y'));
         assert.equal('real', schema.pathType('mixed'));
         done();
-      })
-    })
+      });
+    });
     describe('when called on a virtual', function(){
       it('returns virtual', function(done){
         assert.equal('virtual', schema.pathType('id'));
         done();
-      })
-    })
+      });
+    });
     describe('when called on nested structure', function(){
       it('returns nested', function(done){
         assert.equal('nested', schema.pathType('nest'));
         assert.equal('nested', schema.pathType('nest.thing'));
         done();
-      })
-    })
+      });
+    });
     describe('when called on undefined path', function(){
       it('returns adHocOrUndefined', function(done){
         assert.equal('adhocOrUndefined', schema.pathType('mixed.what'));
@@ -1454,9 +1449,22 @@ describe('schema', function(){
         assert.equal('adhocOrUndefined', schema.pathType('nest.thing.nests.9a'));
         assert.equal('adhocOrUndefined', schema.pathType('nest.thing.nests.a'));
         done();
-      })
-    })
-  })
+      });
+    });
+  });
+
+  it('required() with doc arrays (gh-3199)', function(done) {
+    var schema = Schema({
+      test: [{ x: String }]
+    });
+
+    schema.path('test').schema.path('x').required(true);
+    var M = mongoose.model('gh3199', schema);
+    var m = new M({ test: [{}] });
+
+    assert.equal(m.validateSync().errors['test.0.x'].kind, 'required');
+    done();
+  });
 
   describe('remove()', function() {
 
@@ -1495,6 +1503,5 @@ describe('schema', function(){
       assert.strictEqual(this.schema.path('g'), undefined);
       done();
     });
-
   });
 });

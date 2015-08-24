@@ -1496,7 +1496,7 @@ describe('Query', function(){
 
   it('excludes _id when select false and inclusive mode (gh-3010)', function(done) {
     var db = start();
-    var User = db.model('Product', {
+    var User = db.model('gh3010', {
       _id: {
         select: false,
         type: Schema.Types.ObjectId,
@@ -1512,8 +1512,28 @@ describe('Query', function(){
         assert.equal(users.length, 1);
         assert.ok(!users[0]._id);
         assert.equal(users[0].username, 'Val');
-        done();
+        db.close(done);
       });
     });
+  });
+
+  it('doesnt reverse key order for update docs (gh-3215)', function(done) {
+    var db = start();
+    var Test = db.model('gh3010', {
+      arr: [{ date: Date, value: Number }]
+    });
+
+    var q = Test.update({}, {
+      $push: {
+        arr: {
+          $each: [{ date: new Date(), value: 1 }],
+          $sort: { value: -1, date: -1 }
+        }
+      }
+    });
+
+    assert.deepEqual(Object.keys(q.getUpdate().$push.arr.$sort),
+     ['value', 'date']);
+    done();
   });
 });

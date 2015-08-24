@@ -1594,5 +1594,14 @@ describe('Query', function(){
           done();
         });
     });
+
+    it('empty projection', function(done) {
+      MyModel.findOne({ name: 'John' }, {}).
+        exec(function(error, person) {
+          assert.ifError(error);
+          assert.equal(person.salary, 25000);
+          done();
+        });
+    });
   });
 });

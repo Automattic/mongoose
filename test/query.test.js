@@ -1537,7 +1537,7 @@ describe('Query', function(){
     done();
   });
 
-  describe('handles falsy and object projections (gh-3256)', function() {
+  describe('handles falsy and object projections with defaults (gh-3256)', function() {
     var db = start();
     var MyModel;
 
@@ -1579,6 +1579,15 @@ describe('Query', function(){
 
     it('falsy projection', function(done) {
       MyModel.findOne({ name: 'John' }, { lastName: false }).
+        exec(function(error, person) {
+          assert.ifError(error);
+          assert.equal(person.salary, 25000);
+          done();
+        });
+    });
+
+    it('slice projection', function(done) {
+      MyModel.findOne({ name: 'John' }, { dependents: { $slice: 1 } }).
         exec(function(error, person) {
           assert.ifError(error);
           assert.equal(person.salary, 25000);

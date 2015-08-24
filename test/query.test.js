@@ -1536,4 +1536,54 @@ describe('Query', function(){
      ['value', 'date']);
     done();
   });
+
+  describe('handles falsy and object projections (gh-3256)', function() {
+    var db = start();
+    var MyModel;
+
+    before(function(done) {
+      db = start();
+
+      var PersonSchema = new Schema({
+        name: String,
+        lastName: String,
+        dependents: [String]
+      });
+
+      var m = db.model('gh3256', PersonSchema, 'gh3256');
+
+      var obj = {
+        name: 'John',
+        lastName: 'Doe',
+        dependents: ['Jake', 'Jill', 'Jane']
+      };
+      m.create(obj, function(error) {
+        assert.ifError(error);
+
+        var PersonSchema = new Schema({
+          name: String,
+          lastName: String,
+          dependents: [String],
+          salary: {type: Number, default: 25000}
+        });
+
+        MyModel = db.model('gh3256-salary', PersonSchema, 'gh3256');
+
+        done();
+      });
+    });
+
+    after(function() {
+      db.close();
+    });
+
+    it('falsy projection', function(done) {
+      MyModel.findOne({ name: 'John' }, { lastName: false }).
+        exec(function(error, person) {
+          assert.ifError(error);
+          assert.equal(person.salary, 25000);
+          done();
+        });
+    });
+  });
 });

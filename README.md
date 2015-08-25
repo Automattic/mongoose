@@ -182,10 +182,10 @@ m.save(); // does not work b/c the default connection object was never connected
 In the first example snippet, we defined a key in the Schema that looks like:
 
 ```
-comments: [Comments]
+comments: [Comment]
 ```
 
-Where `Comments` is a `Schema` we created. This means that creating embedded documents is as simple as:
+Where `Comment` is a `Schema` we created. This means that creating embedded documents is as simple as:
 
 ```js
 // retrieve my model

@@ -1519,7 +1519,7 @@ describe('Query', function(){
 
   it('doesnt reverse key order for update docs (gh-3215)', function(done) {
     var db = start();
-    var Test = db.model('gh3010', {
+    var Test = db.model('gh3215', {
       arr: [{ date: Date, value: Number }]
     });
 
@@ -1534,6 +1534,29 @@ describe('Query', function(){
 
     assert.deepEqual(Object.keys(q.getUpdate().$push.arr.$sort),
      ['value', 'date']);
+    done();
+  });
+
+  it('handles nested $ (gh-3265)', function(done) {
+    var db = start();
+    var Post = db.model('gh3265', {
+      title: String,
+      answers: [{
+        details: String,
+        stats: {
+          votes: Number,
+          count: Number
+        }
+      }]
+    });
+
+    var answersUpdate = { details: 'blah', stats: { votes: 1, count: '3' } };
+    var q = Post.update(
+      { 'answers._id': '507f1f77bcf86cd799439011' },
+      { $set: { 'answers.$': answersUpdate } });
+
+    assert.deepEqual(q.getUpdate().$set['answers.$'].stats,
+      { votes: 1, count: 3 });
     done();
   });
 

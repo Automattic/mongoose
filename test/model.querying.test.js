@@ -650,6 +650,25 @@ describe('model: querying:', function(){
   });
 
   describe('findById', function () {
+    it('handles undefined', function(done){
+      var db = start()
+        , BlogPostB = db.model('BlogPostB', collection)
+        , title = 'Edwald ' + random();
+
+      var post = new BlogPostB();
+      post.set('title', title);
+
+      post.save(function (err) {
+        assert.ifError(err);
+
+        BlogPostB.findById(undefined, function (err, doc) {
+          assert.ifError(err);
+          assert.equal(null, doc);
+          done();
+        });
+      });
+    });
+
     it('works', function(done){
       var db = start()
         , BlogPostB = db.model('BlogPostB', collection)

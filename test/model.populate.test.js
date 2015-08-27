@@ -2952,4 +2952,54 @@ describe('model: populate:', function(){
       });
     });
   });
+
+  it('handles toObject() (gh-3279)', function(done) {
+    var db = start();
+
+    var teamSchema = new Schema({
+      members:[{
+        user: {type: ObjectId, ref: 'gh3279'},
+        role: String
+      }]
+    });
+
+    var calls = 0;
+    teamSchema.set('toJSON', {
+      transform: function(doc, ret) {
+        ++calls;
+        return ret;
+      }
+    });
+
+
+    var Team = db.model('gh3279_1', teamSchema);
+
+    var userSchema = new Schema({
+      username: String
+    });
+
+    userSchema.set('toJSON', {
+      transform: function(doc, ret){
+        return ret
+      }
+    });
+
+    var User = db.model('gh3279', userSchema);
+
+    var user = new User({ username: 'Test' });
+
+    user.save(function(err) {
+      assert.ifError(err);
+      var team = new Team({ members: [{ user: user }] });
+
+      team.save(function(err) {
+        assert.ifError(err);
+        team.populate('members.user', function(err) {
+          var output = team.toJSON();
+          assert.equal(calls, 1);
+          done();
+        });
+      });
+    });
+  });
 });

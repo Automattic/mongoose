@@ -1920,14 +1920,13 @@ describe('Model', function(){
       var db = start();
       var collection = 'blogposts_' + random();
       var BlogPost = db.model('BlogPost', collection);
-
       BlogPost.create({ title: 1 }, { title: 2 }, function (err) {
         assert.ifError(err);
 
-        BlogPost.remove({_id: undefined}, function(err) {
+        BlogPost.remove({ _id: undefined }, function(err) {
           assert.ifError(err);
           BlogPost.find({}, function (err, found) {
-            assert.equal(found.length, 1, 'Should not remove any records');
+            assert.equal(found.length, 2, 'Should not remove any records');
             done();
           });
         });

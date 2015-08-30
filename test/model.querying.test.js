@@ -650,6 +650,25 @@ describe('model: querying:', function(){
   });
 
   describe('findById', function () {
+    it('handles undefined', function(done){
+      var db = start()
+        , BlogPostB = db.model('BlogPostB', collection)
+        , title = 'Edwald ' + random();
+
+      var post = new BlogPostB();
+      post.set('title', title);
+
+      post.save(function (err) {
+        assert.ifError(err);
+
+        BlogPostB.findById(undefined, function (err, doc) {
+          assert.ifError(err);
+          assert.equal(null, doc);
+          done();
+        });
+      });
+    });
+
     it('works', function(done){
       var db = start()
         , BlogPostB = db.model('BlogPostB', collection)
@@ -1534,17 +1553,17 @@ describe('model: querying:', function(){
       var db = start()
         , BlogPostB = db.model('BlogPostB', collection);
 
-      BlogPostB.create({title: 'first skip'}, function (err) {
+      BlogPostB.create({title: '1 skip'}, function (err) {
         assert.ifError(err);
-        BlogPostB.create({title: 'second skip'}, function (err, second) {
+        BlogPostB.create({title: '2 skip'}, function (err, second) {
           assert.ifError(err);
-          BlogPostB.create({title: 'third skip'}, function (err, third) {
+          BlogPostB.create({title: '3 skip'}, function (err, third) {
             assert.ifError(err);
-            BlogPostB.find({title: /skip$/}).skip(1).limit(2).find( function (err, found) {
+            BlogPostB.find({title: /skip$/}).sort({ title: 1 }).skip(1).limit(2).find( function (err, found) {
               assert.ifError(err);
               assert.equal(2,found.length);
-              assert.equal(found[0].id,second._id);
-              assert.equal(found[1].id,third._id);
+              assert.equal(found[0].id, second._id);
+              assert.equal(found[1].id, third._id);
               db.close();
               done();
             });

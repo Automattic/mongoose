@@ -210,4 +210,13 @@ describe('Promise', function(){
       });
     });
   });
+
+  it('doesnt swallow exceptions (gh-3222)', function(done) {
+    assert.throws(function() {
+      new Promise.ES6(function(resolve, reject) {
+        throw 'bacon';
+      });
+    });
+    done();
+  });
 });

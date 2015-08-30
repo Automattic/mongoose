@@ -1465,9 +1465,10 @@ describe('model: findByIdAndUpdate:', function(){
         { $set: { test: 'abc' } },
         {
           upsert: true,
-          'new': true
-        },
-        function(error, doc, res) {
+          'new': true,
+          passRawResult: true
+        }).
+        exec(function(error, doc, res) {
           assert.ifError(error);
           assert.ok(res);
           assert.ok(res.ok);

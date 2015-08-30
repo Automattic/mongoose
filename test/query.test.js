@@ -1496,7 +1496,7 @@ describe('Query', function(){
 
   it('excludes _id when select false and inclusive mode (gh-3010)', function(done) {
     var db = start();
-    var User = db.model('Product', {
+    var User = db.model('gh3010', {
       _id: {
         select: false,
         type: Schema.Types.ObjectId,
@@ -1512,8 +1512,119 @@ describe('Query', function(){
         assert.equal(users.length, 1);
         assert.ok(!users[0]._id);
         assert.equal(users[0].username, 'Val');
+        db.close(done);
+      });
+    });
+  });
+
+  it('doesnt reverse key order for update docs (gh-3215)', function(done) {
+    var db = start();
+    var Test = db.model('gh3215', {
+      arr: [{ date: Date, value: Number }]
+    });
+
+    var q = Test.update({}, {
+      $push: {
+        arr: {
+          $each: [{ date: new Date(), value: 1 }],
+          $sort: { value: -1, date: -1 }
+        }
+      }
+    });
+
+    assert.deepEqual(Object.keys(q.getUpdate().$push.arr.$sort),
+     ['value', 'date']);
+    done();
+  });
+
+  it('handles nested $ (gh-3265)', function(done) {
+    var db = start();
+    var Post = db.model('gh3265', {
+      title: String,
+      answers: [{
+        details: String,
+        stats: {
+          votes: Number,
+          count: Number
+        }
+      }]
+    });
+
+    var answersUpdate = { details: 'blah', stats: { votes: 1, count: '3' } };
+    var q = Post.update(
+      { 'answers._id': '507f1f77bcf86cd799439011' },
+      { $set: { 'answers.$': answersUpdate } });
+
+    assert.deepEqual(q.getUpdate().$set['answers.$'].stats,
+      { votes: 1, count: 3 });
+    done();
+  });
+
+  describe('handles falsy and object projections with defaults (gh-3256)', function() {
+    var db = start();
+    var MyModel;
+
+    before(function(done) {
+      db = start();
+
+      var PersonSchema = new Schema({
+        name: String,
+        lastName: String,
+        dependents: [String]
+      });
+
+      var m = db.model('gh3256', PersonSchema, 'gh3256');
+
+      var obj = {
+        name: 'John',
+        lastName: 'Doe',
+        dependents: ['Jake', 'Jill', 'Jane']
+      };
+      m.create(obj, function(error) {
+        assert.ifError(error);
+
+        var PersonSchema = new Schema({
+          name: String,
+          lastName: String,
+          dependents: [String],
+          salary: {type: Number, default: 25000}
+        });
+
+        MyModel = db.model('gh3256-salary', PersonSchema, 'gh3256');
+
         done();
       });
+    });
+
+    after(function() {
+      db.close();
+    });
+
+    it('falsy projection', function(done) {
+      MyModel.findOne({ name: 'John' }, { lastName: false }).
+        exec(function(error, person) {
+          assert.ifError(error);
+          assert.equal(person.salary, 25000);
+          done();
+        });
+    });
+
+    it('slice projection', function(done) {
+      MyModel.findOne({ name: 'John' }, { dependents: { $slice: 1 } }).
+        exec(function(error, person) {
+          assert.ifError(error);
+          assert.equal(person.salary, 25000);
+          done();
+        });
+    });
+
+    it('empty projection', function(done) {
+      MyModel.findOne({ name: 'John' }, {}).
+        exec(function(error, person) {
+          assert.ifError(error);
+          assert.equal(person.salary, 25000);
+          done();
+        });
     });
   });
 });

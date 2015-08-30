@@ -748,4 +748,45 @@ describe('document: hooks:', function () {
       });
     });
   });
+
+  it('nested subdocs only fire once (gh-3281)', function(done) {
+    var L3Schema = new Schema({
+      title: String
+    });
+
+    var L2Schema = new Schema({
+      items: [L3Schema]
+    });
+
+    var L1Schema = new Schema({
+      items: [L2Schema]
+    });
+
+    var calls = 0;
+    L3Schema.pre('save', function(next) {
+      ++calls;
+      return next();
+    });
+
+    var db = start();
+    var L1 = db.model('gh3281', L1Schema);
+
+    var data = {
+      items: [
+        {
+          items: [
+            {
+              title: 'test'
+            }
+          ]
+        }
+      ]
+    };
+
+    L1.create(data, function(error, item) {
+      assert.ifError(error);
+      assert.equal(calls, 1);
+      done();
+    });
+  });
 });

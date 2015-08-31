@@ -165,6 +165,14 @@ describe('ES6 promises: ', function() {
           });
       });
     });
+
+    it('create', function(done) {
+      var promise = MyModel.create({ test: '123' });
+      assert.equal(promise.constructor, global.Promise);
+      promise.then(function() {
+        done();
+      });
+    });
   });
 
   describe('bluebird: ', function() {
@@ -292,6 +300,14 @@ describe('ES6 promises: ', function() {
           });
       });
     });
+
+    it('create', function(done) {
+      var promise = MyModel.create({ test: '123' });
+      assert.equal(promise.constructor, bluebird);
+      promise.then(function() {
+        done();
+      });
+    });
   });
 
   describe('q: ', function() {
@@ -417,6 +433,14 @@ describe('ES6 promises: ', function() {
             assert.equal(err.toString(), 'Error: findOne failed');
             done();
           });
+      });
+    });
+
+    it('create', function(done) {
+      var promise = MyModel.create({ test: '123' });
+      assert.ok(promise instanceof q.makePromise);
+      promise.then(function() {
+        done();
       });
     });
   });

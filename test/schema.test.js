@@ -1453,6 +1453,19 @@ describe('schema', function(){
     });
   });
 
+  it('required() with doc arrays (gh-3199)', function(done) {
+    var schema = Schema({
+      test: [{ x: String }]
+    });
+
+    schema.path('test').schema.path('x').required(true);
+    var M = mongoose.model('gh3199', schema);
+    var m = new M({ test: [{}] });
+
+    assert.equal(m.validateSync().errors['test.0.x'].kind, 'required');
+    done();
+  });
+
   describe('remove()', function() {
 
     before(function() {
@@ -1490,6 +1503,5 @@ describe('schema', function(){
       assert.strictEqual(this.schema.path('g'), undefined);
       done();
     });
-
   });
 });

@@ -1518,4 +1518,22 @@ describe('model: update:', function(){
         });
     });
   });
+
+  it('mixed type casting (gh-3305)', function(done) {
+    var db = start();
+
+    var Schema = mongoose.Schema({}, { strict: false });
+    var Model  = db.model('gh3305', Schema);
+
+    Model.create({}, function(error, m) {
+      assert.ifError(error);
+      Model.
+        update({ _id: m._id }, { '$push': { 'myArr': { 'key': 'Value' } } }).
+        exec(function(error, res) {
+          assert.ifError(error);
+          assert.equal(res.nModified, 1);
+          done();
+        });
+    });
+  });
 });

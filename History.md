@@ -1,3 +1,34 @@
+4.1.4 / 2015-08-31
+==================
+ * fixed; ability to set strict: false for update #3305
+ * fixed; .create() properly uses ES6 promises #3297
+ * fixed; pre hooks on nested subdocs #3291 #3284 [aliatsis](https://github.com/aliatsis)
+ * docs; remove unclear text in .remove() docs #3282
+ * fixed; pre hooks called twice for 3rd-level nested doc #3281
+ * fixed; nested transforms #3279
+ * upgraded; mquery -> 1.6.3 #3278 #3272
+ * fixed; don't swallow callback errors by default #3273 #3222
+ * fixed; properly get nested paths from nested schemas #3265
+ * fixed; remove() with id undefined deleting all docs #3260 [thanpolas](https://github.com/thanpolas)
+ * fixed; handling for non-numeric projections #3256
+ * fixed; findById with id undefined returning first doc #3255
+ * fixed; use retainKeyOrder for update #3215
+ * added; passRawResult option to findOneAndUpdate for backwards compat #3173
+
+4.1.3 / 2015-08-16
+==================
+ * fixed; getUpdate() in pre update hooks #3520 [gregthegeek](https://github.com/gregthegeek)
+ * fixed; handleArray() ensures arg is an array #3238 [jloveridge](https://github.com/jloveridge)
+ * fixed; refresh required path cache when recreating docs #3199
+ * fixed; $ operator on unwind aggregation helper #3197
+ * fixed; findOneAndUpdate() properly returns raw result as third arg to callback #3173
+ * fixed; querystream with dynamic refs #3108
+
+3.8.35 / 2015-08-14
+===================
+ * fixed; handling for minimize on nested objects #2930
+ * fixed; don't crash when schema.path.options undefined #1824
+
 4.1.2 / 2015-08-10
 ==================
  * fixed; better handling for Jade templates #3241 [kbadk](https://github.com/kbadk)
@@ -52,7 +83,7 @@
  * fixed; strict mode for findOneAndUpdate #2947
  * added; .min.js.gz file for browser component #2806
 
-3.8.35 / 2015-07-20
+3.8.34 / 2015-07-20
 ===================
  * fixed; allow using $rename #3171
  * fixed; no longer modifies update arguments #3008

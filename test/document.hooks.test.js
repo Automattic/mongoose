@@ -702,4 +702,91 @@ describe('document: hooks:', function () {
       done();
     });
   });
+
+  describe('gh-3284', function() {
+    it('should call pre hooks on nested subdoc', function(done) {
+      var self = this;
+
+      var childSchema = new Schema({
+        title: String
+      });
+
+      ['init', 'save', 'validate'].forEach(function(type) {
+        childSchema.pre(type, function(obj, next) {
+          self['pre' + type + 'Called'] = true;
+          next();
+        });
+      });
+
+      var parentSchema = new Schema({
+        nested: {
+          children: [childSchema]
+        }
+      });
+
+      mongoose.model('gh-3284', parentSchema);
+
+      var db = start();
+      var Parent = db.model('gh-3284');
+
+      var parent = new Parent({
+        nested: {
+          children: [{
+            title: 'banana'
+          }]
+        }
+      });
+
+      parent.save().then(function() {
+        return Parent.findById(parent._id);
+      }).then(function() {
+        db.close();
+        assert.ok(self.preinitCalled);
+        assert.ok(self.prevalidateCalled);
+        assert.ok(self.presaveCalled);
+        done();
+      });
+    });
+  });
+
+  it('nested subdocs only fire once (gh-3281)', function(done) {
+    var L3Schema = new Schema({
+      title: String
+    });
+
+    var L2Schema = new Schema({
+      items: [L3Schema]
+    });
+
+    var L1Schema = new Schema({
+      items: [L2Schema]
+    });
+
+    var calls = 0;
+    L3Schema.pre('save', function(next) {
+      ++calls;
+      return next();
+    });
+
+    var db = start();
+    var L1 = db.model('gh3281', L1Schema);
+
+    var data = {
+      items: [
+        {
+          items: [
+            {
+              title: 'test'
+            }
+          ]
+        }
+      ]
+    };
+
+    L1.create(data, function(error, item) {
+      assert.ifError(error);
+      assert.equal(calls, 1);
+      done();
+    });
+  });
 });

@@ -394,6 +394,7 @@ var cast = module.exports = function(schema, obj) {
         }
 
       } else if (val === null || val === undefined) {
+        obj[path] = null;
         continue;
       } else if ('Object' === val.constructor.name) {
 
@@ -595,11 +596,11 @@ Document.prototype.errors;
  */
 
 Document.prototype.$__buildDoc = function (obj, fields, skipId) {
-  var doc = {}
-    , self = this
-    , exclude
-    , keys
-    , ki;
+  var doc = {};
+  var exclude = null;
+  var keys;
+  var ki;
+  var self = this;
 
   // determine if this doc is a result of a query with
   // excluded fields
@@ -608,8 +609,9 @@ Document.prototype.$__buildDoc = function (obj, fields, skipId) {
     ki = keys.length;
 
     while (ki--) {
-      if ('_id' !== keys[ki]) {
-        exclude = 0 === fields[keys[ki]];
+      if (keys[ki] !== '_id' &&
+        (!fields[keys[ki]] || typeof fields[keys[ki]] !== 'object')) {
+        exclude = !fields[keys[ki]];
         break;
       }
     }
@@ -643,15 +645,15 @@ Document.prototype.$__buildDoc = function (obj, fields, skipId) {
       curPath += piece;
 
       // support excluding intermediary levels
-      if (exclude) {
+      if (exclude === true) {
         if (curPath in fields) break;
       } else if (fields && curPath in fields) {
         included = true;
       }
 
       if (i === last) {
-        if (fields) {
-          if (exclude) {
+        if (fields && exclude !== null) {
+          if (exclude === true) {
             // apply defaults to all non-excluded fields
             if (p in fields) continue;
 
@@ -1999,6 +2001,11 @@ Document.prototype.$__getAllSubdocs = function () {
         if (doc instanceof Embedded) seed.push(doc);
         seed = Object.keys(doc._doc).reduce(docReducer.bind(doc._doc), seed);
       });
+    } else if (val instanceof Document && val.$__isNested) {
+      val = val.toObject();
+      if (val) {
+        seed = Object.keys(val).reduce(docReducer.bind(val), seed);
+      }
     }
     return seed;
   }
@@ -3227,17 +3234,14 @@ function Promise (fn) {
 Promise.ES6 = function(resolver) {
   var promise = new Promise();
 
-  try {
-    resolver(
-      function() {
-        promise.complete.apply(promise, arguments);
-      },
-      function(e) {
-        promise.error(e);
-      });
-  } catch(e) {
-    promise.error(e);
-  }
+  // No try/catch for backwards compatibility
+  resolver(
+    function() {
+      promise.complete.apply(promise, arguments);
+    },
+    function(e) {
+      promise.error(e);
+    });
 
   return promise;
 };
@@ -3736,15 +3740,7 @@ Object.defineProperty(Schema.prototype, '_defaultMiddleware', {
       var Promise = PromiseProvider.get(),
           subdocs = this.$__getAllSubdocs();
 
-      // Calling `save` on a nested subdoc calls `save` with
-      // the scope of its direct parent. That means in the
-      // case of a nested subdoc, `subdocs` here will include
-      // this subdoc itself leading to an infinite loop.
-      subdocs = subdocs.filter(function(subdoc) {
-        return !subdoc.$__preSavingFromParent;
-      });
-
-      if (!subdocs.length) {
+      if (!subdocs.length || this.$__preSavingFromParent) {
         done();
         next();
         return;
@@ -3754,10 +3750,12 @@ Object.defineProperty(Schema.prototype, '_defaultMiddleware', {
         async.each(subdocs, function(subdoc, cb) {
           subdoc.$__preSavingFromParent = true;
           subdoc.save(function(err) {
-            delete subdoc.$__preSavingFromParent;
             cb(err);
           });
         }, function(error) {
+          for (var i = 0; i < subdocs.length; ++i) {
+            delete subdocs[i].$__preSavingFromParent;
+          }
           if (error) {
             reject(error);
             return;
@@ -4036,7 +4034,8 @@ Schema.interpretAsType = function (path, obj, options) {
     } else if (cast && (!cast.type || cast.type.type)
                     && 'Object' == utils.getFunctionName(cast.constructor)
                     && Object.keys(cast).length) {
-      return new MongooseTypes.DocumentArray(path, new Schema(cast, options), obj);
+      var opts = { minimize: options.minimize };
+      return new MongooseTypes.DocumentArray(path, new Schema(cast, opts), obj);
     }
 
     return new MongooseTypes.Array(path, cast || MongooseTypes.Mixed, obj);
@@ -4139,8 +4138,8 @@ Schema.prototype.pathType = function (path) {
   if (path in this.nested) return 'nested';
   if (path in this.subpaths) return 'real';
 
-  if (/\.\d+\.|\.\d+$/.test(path) && getPositionalPath(this, path)) {
-    return 'real';
+  if (/\.\d+\.|\.\d+$/.test(path)) {
+    return getPositionalPathType(this, path);
   } else {
     return 'adhocOrUndefined';
   }
@@ -4150,13 +4149,14 @@ Schema.prototype.pathType = function (path) {
  * ignore
  */
 
-function getPositionalPath (self, path) {
+function getPositionalPathType(self, path) {
   var subpaths = path.split(/\.(\d+)\.|\.(\d+)$/).filter(Boolean);
   if (subpaths.length < 2) {
     return self.paths[subpaths[0]];
   }
 
   var val = self.path(subpaths[0]);
+  var isNested = false;
   if (!val) return val;
 
   var last = subpaths.length - 1
@@ -4164,6 +4164,7 @@ function getPositionalPath (self, path) {
     , i = 1;
 
   for (; i < subpaths.length; ++i) {
+    isNested = false;
     subpath = subpaths[i];
 
     if (i === last && val && !val.schema && !/\D/.test(subpath)) {
@@ -4184,10 +4185,29 @@ function getPositionalPath (self, path) {
       break;
     }
 
+    var type = val.schema.pathType(subpath);
+    isNested = (type === 'nested');
     val = val.schema.path(subpath);
   }
 
-  return self.subpaths[path] = val;
+  self.subpaths[path] = val
+  if (val) {
+    return 'real';
+  }
+  if (isNested) {
+    return 'nested';
+  }
+  return 'adhocOrUndefined';
+}
+
+
+/*!
+ * ignore
+ */
+
+function getPositionalPath (self, path) {
+  getPositionalPathType(self, path)
+  return self.subpaths[path];
 }
 
 /**
@@ -22920,9 +22940,9 @@ Query.prototype.then = function(resolve, reject) {
   var self = this;
   var promise = new Query.Promise(function(success, error) {
     self.exec(function(err, val) {
-      self = resolve = reject = null;
-      if (err) return error(err);
-      success(val);
+      if (err) error(err);
+      else success(val);
+      self = success = error = null;
     });
   });
   return promise.then(resolve, reject);
@@ -22980,7 +23000,9 @@ Query.prototype.selectedInclusively = function selectedInclusively () {
   for (var i = 0; i < keys.length; ++i) {
     var key = keys[i];
     if (0 === this._fields[key]) return false;
-    if (typeof this._fields[key] === 'object' && this._fields[key].$meta) {
+    if (this._fields[key] &&
+        typeof this._fields[key] === 'object' &&
+        this._fields[key].$meta) {
       return false;
     }
   }
@@ -23050,7 +23072,7 @@ Query.prototype._optionsForExec = function () {
  */
 
 Query.prototype._fieldsForExec = function () {
-  return utils.clone(this._fields);
+  return utils.clone(this._fields, { retainKeyOrder: true });
 }
 
 /**

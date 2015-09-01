@@ -1531,7 +1531,7 @@ describe('model: update:', function(){
         update({ _id: m._id }, { '$push': { 'myArr': { 'key': 'Value' } } }).
         exec(function(error, res) {
           assert.ifError(error);
-          assert.equal(res.nModified, 1);
+          assert.equal(res.n, 1);
           done();
         });
     });

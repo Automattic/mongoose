@@ -1932,6 +1932,29 @@ describe('Model', function(){
         });
       });
     });
+
+    it('should not remove all documents in the collection', function(done) {
+      var db = start()
+        , collection = 'blogposts_' + random()
+        , BlogPost = db.model('BlogPost', collection);
+
+      BlogPost.create({ title: 1 }, { title: 2 }, function (err) {
+        assert.ifError(err);
+        BlogPost.findOne({ title: 1 }, function(error, doc) {
+          assert.ifError(error);
+          doc.remove(function (err) {
+            assert.ifError(err);
+            BlogPost.find(function (err, found) {
+              db.close();
+              assert.ifError(err);
+              assert.equal(1, found.length);
+              assert.equal('2', found[0].title);
+              done();
+            });
+          });
+        });
+      });
+    });
   });
 
   describe('#remove()', function(){

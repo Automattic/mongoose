@@ -1,3 +1,10 @@
+4.1.5 / 2015-09-01
+==================
+ * fixed; document.remove() removing all docs #3326 #3325
+ * fixed; connect() checks for rs_name in options #3299
+ * docs; examples for schema.set() #3288
+ * fixed; checkKeys issue with bluebird #3286 [gregthegeek](https://github.com/gregthegeek)
+
 4.1.4 / 2015-08-31
 ==================
  * fixed; ability to set strict: false for update #3305

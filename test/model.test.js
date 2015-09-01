@@ -1933,7 +1933,7 @@ describe('Model', function(){
       });
     });
 
-    it('should not remove all documents in the collection', function(done) {
+    it('should not remove all documents in the collection (gh-3326)', function(done) {
       var db = start()
         , collection = 'blogposts_' + random()
         , BlogPost = db.model('BlogPost', collection);

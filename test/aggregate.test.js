@@ -278,6 +278,41 @@ describe('aggregate: ', function() {
 
       done();
     });
+
+    it('works with discriminators (gh-3304)', function(done) {
+      var aggregate = new Aggregate();
+      var stub = {
+        schema: {
+          discriminatorMapping: {
+            key: '__t',
+            value: 'subschema',
+            isRoot: false
+          }
+        }
+      };
+
+      aggregate._model = stub;
+
+      assert.equal(aggregate.near({ a: 1 }), aggregate);
+      // Run exec so we apply discriminator pipeline
+      assert.throws(function() {
+        aggregate.exec();
+      }, /Cannot read property 'aggregate' of undefined/);
+      assert.deepEqual(aggregate._pipeline,
+        [{ $geoNear: { a: 1, query: { __t: 'subschema' } } }]);
+
+      aggregate = new Aggregate();
+      aggregate._model = stub;
+
+      aggregate.near({ b: 2, query: { x: 1 } });
+      assert.throws(function() {
+        aggregate.exec();
+      }, /Cannot read property 'aggregate' of undefined/);
+      assert.deepEqual(aggregate._pipeline,
+        [{ $geoNear: { b: 2, query: { x: 1, __t: 'subschema' } } }]);
+
+      done();
+    });
   });
 
   describe('bind', function() {

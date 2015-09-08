@@ -150,7 +150,7 @@ var NodeJSDocument = require('./document')
  * @param {Object} [fields] optional object containing the fields which were selected in the query returning this document and any populated paths data
  * @param {Boolean} [skipId] bool, should we auto create an ObjectId _id
  * @inherits NodeJS EventEmitter http://nodejs.org/api/events.html#events_class_events_eventemitter
- * @event `init`: Emitted on a document after it has was retreived from the db and fully hydrated by Mongoose.
+ * @event `init`: Emitted on a document after it has was retrieved from the db and fully hydrated by Mongoose.
  * @event `save`: Emitted when the document is successfully saved
  * @api private
  */
@@ -1044,17 +1044,28 @@ Document.prototype.set = function (path, val, type, options) {
   try {
     // If the user is trying to set a ref path to a document with
     // the correct model name, treat it as populated
+    var didPopulate = false;
     if (schema.options &&
         schema.options.ref &&
         val instanceof Document &&
         schema.options.ref === val.constructor.modelName) {
       this.populated(path, val._id);
+      didPopulate = true;
     }
     val = schema.applySetters(val, this, false, priorVal);
+
+    if (!didPopulate && this.$__.populated) {
+      delete this.$__.populated[path];
+    }
+
     this.$markValid(path);
   } catch (e) {
+    var reason;
+    if (!(e instanceof MongooseError.CastError)) {
+      reason = e;
+    }
     this.invalidate(path,
-      new MongooseError.CastError(schema.instance, val, path));
+      new MongooseError.CastError(schema.instance, val, path, reason));
     shouldSet = false;
   }
 
@@ -2732,8 +2743,7 @@ module.exports = exports = ObjectId;
 var driver;
 
 if (typeof window === 'undefined') {
-  driver = require('./' +
-    (global.MONGOOSE_DRIVER_PATH || 'node-mongodb-native'));
+  driver = require(global.MONGOOSE_DRIVER_PATH || './node-mongodb-native');
 } else {
   driver = require('./browser');
 }
@@ -2814,13 +2824,14 @@ var MongooseError = require('../error.js');
  * @api private
  */
 
-function CastError (type, value, path) {
+function CastError (type, value, path, reason) {
   MongooseError.call(this, 'Cast to ' + type + ' failed for value "' + value + '" at path "' + path + '"');
   this.stack = new Error().stack;
   this.name = 'CastError';
   this.kind = type;
   this.value = value;
   this.path = path;
+  this.reason = reason;
 }
 
 /*!
@@ -4412,8 +4423,15 @@ Schema.prototype.index = function (fields, options) {
 /**
  * Sets/gets a schema option.
  *
+ * ####Example
+ *
+ *     schema.set('strict'); // 'true' by default
+ *     schema.set('strict', false); // Sets 'strict' to false
+ *     schema.set('strict'); // 'false'
+ *
  * @param {String} key option name
  * @param {Object} [value] if not passed, the current option value is returned
+ * @see Schema ./
  * @api public
  */
 

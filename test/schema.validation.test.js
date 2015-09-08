@@ -914,6 +914,7 @@ describe('schema', function(){
         var errorMessage = 'ValidationError: CastError: Cast to String failed for value "undefined" at path "description"';
         assert.equal(errorMessage, error.toString());
         assert.ok(error.errors['description']);
+        assert.equal(error.errors['description'].reason.toString(), 'Error: oops');
         done();
       });
     });

@@ -1,0 +1,9 @@
+extends layout
+
+block content
+  each block in acquitBlocks[0].blocks
+    h2(id="#{block.identifier}") !{block.contents}
+    if block.comments && block.comments.length
+      | !{block.comments[block.comments.length - 1]}
+      :js
+        #{block.code}

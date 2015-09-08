@@ -500,6 +500,31 @@ describe('document.populate', function(){
     });
   });
 
+  it('gh-3308', function(done) {
+    var db = start();
+
+    var Person = db.model('gh3308', {
+      name: String
+    });
+
+    var Band = db.model('gh3308_0', {
+      guitarist: { type: Schema.Types.ObjectId, ref: 'gh3308' }
+    });
+
+    var slash = new Person({ name: 'Slash' });
+    var gnr = new Band({ guitarist: slash._id });
+
+    gnr.guitarist = slash;
+    assert.equal(gnr.guitarist.name, 'Slash');
+    assert.ok(gnr.populated('guitarist'));
+
+    var buckethead = new Person({ name: 'Buckethead' });
+    gnr.guitarist = buckethead._id;
+    assert.ok(!gnr.populated('guitarist'));
+
+    done();
+  });
+
   describe('gh-2214', function() {
     it('should return a real document array when populating', function(done) {
       var db = start();

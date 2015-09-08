@@ -1,7 +1,7 @@
 {
   "name": "mongoose",
   "description": "Mongoose MongoDB ODM",
-  "version": "4.1.5",
+  "version": "4.1.6",
   "author": "Guillermo Rauch <guillermo@learnboost.com>",
   "keywords": [
     "mongodb",
@@ -33,7 +33,8 @@
     "sliced": "0.0.5"
   },
   "devDependencies": {
-    "acquit": "0.0.3",
+    "acquit": "0.3.0",
+    "acquit-ignore": "0.0.1",
     "benchmark": "1.0.0",
     "bluebird": "2.9.34",
     "co": "3.1.0",
@@ -65,8 +66,8 @@
   },
   "scripts": {
     "install-browser": "npm install `node format_deps.js`",
-    "test": "set MONGOOSE_DISABLE_STABILITY_WARNING=1 && mocha --async-only test/*.test.js",
-    "test-cov": "set MONGOOSE_DISABLE_STABILITY_WARNING=1 && node_modules/.bin/istanbul cover node_modules/.bin/_mocha --async-only test/*.test.js"
+    "test": "mocha --async-only test/*.test.js test/**/*.test.js",
+    "test-cov": "istanbul cover _mocha --async-only test/*.test.js"
   },
   "main": "./index.js",
   "engines": {

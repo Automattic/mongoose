@@ -1,0 +1,142 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>Mongoose Discriminators v4.1.6</title><link href="http://fonts.googleapis.com/css?family=Anonymous+Pro:400,700|Droid+Sans+Mono|Open+Sans:400,700|Linden+Hill|Quattrocento:400,700|News+Cycle:400,700|Antic+Slab|Cabin+Condensed:400,700" rel="stylesheet" type="text/css"><link href="css/default.css" rel="stylesheet" type="text/css"><link href="css/guide.css" rel="stylesheet" type="text/css"></head><body><a id="forkbanner" href="http://github.com/Automattic/mongoose"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png" alt="Fork me on GitHub"></a><div id="links"><div id="header"><h1><a href="../index.html"><div class="mongoose">Mongoose</div></a></h1></div><ul><li class="home"><a href="../index.html">home</a></li><li class="faq"><a href="./faq.html">FAQ</a></li><li class="plugins"><a href="http://plugins.mongoosejs.com">plugins</a></li><li class="changelog"><a href="http://github.com/Automattic/mongoose/tree/master/History.md">change log</a></li><li class="support"><a href="../index.html#support">support</a></li><li class="fork"><a href="http://github.com/Automattic/mongoose">fork</a></li><li class="guide"><a href="./guide.html">guide</a></li><li class="api"><a href="./api.html">API docs</a></li><li class="quickstart"><a href="./index.html">quick start</a></li><li class="contrib"><a href="http://github.com/Automattic/mongoose/contributors">contributors</a></li><li class="prior"><a href="./prior.html">prior releases</a></li></ul></div><div id="content"><div class="module"><gcse:search></gcse:search><h2 id="the-model-discriminator-function"><p>The <code>model.discriminator()</code> function</p>
+</h2><p>Discriminators are a schema inheritance mechanism. They enable
+you to have multiple models with overlapping schemas on top of the
+same underlying MongoDB collection.</p>
+<p>Suppose you wanted to track different types of events in a single
+collection. Every event will have a timestamp, but events that
+represent clicked links should have a URL. You can achieve this
+using the <code>model.discriminator()</code> function. This function takes
+2 parameters, a model name and a discriminator schema. It returns a
+model whose schema is the union of the base schema and the
+discriminator schema.</p>
+<pre><code class="javascript">
+    var options = { discriminatorKey: 'kind' };
+
+    var eventSchema = new mongoose.Schema({ time: Date }, options);
+    var Event = mongoose.model('Event', eventSchema);
+
+    // ClickedLinkEvent is a special type of Event that has
+    // a URL.
+    var ClickedLinkEvent = Event.discriminator('ClickedLink',
+      new mongoose.Schema({ url: String }, options));
+
+    // When you create a generic event, it can't have a URL field...
+    var genericEvent = new Event({ time: Date.now(), url: 'google.com' });
+    assert.ok(!genericEvent.url);
+
+    // But a ClickedLinkEvent can
+    var clickedEvent =
+      new ClickedLinkEvent({ time: Date.now(), url: 'google.com' });
+    assert.ok(clickedEvent.url);
+  </code></pre><h2 id="discriminators-save-to-the-event-models-collection"><p>Discriminators save to the Event model&#39;s collection</p>
+</h2><p>Suppose you created another discriminator to track events where
+a new user registered. These <code>SignedUpEvent</code> instances will be
+stored in the same collection as generic events and <code>ClickedLinkEvent</code>
+instances.</p>
+<pre><code class="javascript">
+    var event1 = new Event({ time: Date.now() });
+    var event2 = new ClickedLinkEvent({ time: Date.now(), url: 'google.com' });
+    var event3 = new SignedUpEvent({ time: Date.now(), user: 'testuser' });
+
+    var save = function(doc, callback) {
+      doc.save(function(error, doc) {
+        callback(error, doc);
+      });
+    };
+
+    async.map([event1, event2, event3], save, function(error) {
+
+      Event.count({}, function(error, count) {
+        assert.equal(count, 3);
+      });
+    });
+  </code></pre><h2 id="discriminator-keys"><p>Discriminator keys</p>
+</h2><p>The way mongoose tells the difference between the different
+discriminator models is by the &#39;discriminator key&#39;, which is
+<code>kind</code> by default. Mongoose adds a String path called <code>kind</code>
+to your schemas that it uses to track which discriminator
+this document is an instance of.</p>
+<pre><code class="javascript">
+    var event1 = new Event({ time: Date.now() });
+    var event2 = new ClickedLinkEvent({ time: Date.now(), url: 'google.com' });
+    var event3 = new SignedUpEvent({ time: Date.now(), user: 'testuser' });
+
+    assert.ok(!event1.kind);
+    assert.equal(event2.kind, 'ClickedLink');
+    assert.equal(event3.kind, 'SignedUp');
+  </code></pre><h2 id="discriminators-add-the-discriminator-key-to-queries"><p>Discriminators add the discriminator key to queries</p>
+</h2><p>Discriminator models are special; they attach the discriminator key
+to queries. In other words, <code>find()</code>, <code>count()</code>, <code>aggregate()</code>, etc.
+are smart enough to account for discriminators.</p>
+<pre><code class="javascript">
+    var event1 = new Event({ time: Date.now() });
+    var event2 = new ClickedLinkEvent({ time: Date.now(), url: 'google.com' });
+    var event3 = new SignedUpEvent({ time: Date.now(), user: 'testuser' });
+
+    var save = function(doc, callback) {
+      doc.save(function(error, doc) {
+        callback(error, doc);
+      });
+    };
+
+    async.map([event1, event2, event3], save, function(error) {
+
+      ClickedLinkEvent.find({}, function(error, docs) {
+        assert.equal(docs.length, 1);
+        assert.equal(docs[0]._id.toString(), event2._id.toString());
+        assert.equal(docs[0].url, 'google.com');
+      });
+    });
+  </code></pre><h2 id="discriminators-copy-pre-and-post-hooks"><p>Discriminators copy pre and post hooks</p>
+</h2><p>Discriminators also take their base schema&#39;s pre and post middleware.
+However, you can also attach middleware to the discriminator schema
+without affecting the base schema.</p>
+<pre><code class="javascript">
+    var options = { discriminatorKey: 'kind' };
+
+    var eventSchema = new mongoose.Schema({ time: Date }, options);
+    var eventSchemaCalls = 0;
+    eventSchema.pre('validate', function(next) {
+      ++eventSchemaCalls;
+      next();
+    });
+    var Event = mongoose.model('GenericEvent', eventSchema);
+
+    var clickedLinkSchema = new mongoose.Schema({ url: String }, options);
+    var clickedSchemaCalls = 0;
+    clickedLinkSchema.pre('validate', function(next) {
+      ++clickedSchemaCalls;
+      next();
+    });
+    var ClickedLinkEvent = Event.discriminator('ClickedLink',
+      clickedLinkSchema);
+
+    var event1 = new ClickedLinkEvent();
+    event1.validate(function(error) {
+      assert.equal(eventSchemaCalls, 1);
+      assert.equal(clickedSchemaCalls, 1);
+
+      var generic = new Event();
+      generic.validate(function(error) {
+        assert.equal(eventSchemaCalls, 2);
+        assert.equal(clickedSchemaCalls, 1);
+      });
+    });
+  </code></pre></div></div><script>document.body.className = 'load';</script><script>;(function() {
+  var cx = '012173159455227967368:uvscsuqjovs';
+  var gcse = document.createElement('script');
+  gcse.type = 'text/javascript';
+  gcse.async = true;
+  gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+      '//www.google.com/cse/cse.js?cx=' + cx;
+  var s = document.getElementsByTagName('script')[0];
+  s.parentNode.insertBefore(gcse, s);
+})();</script><script>var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-1122274-9']);
+_gaq.push(['_trackPageview', location.pathname + location.search + location.hash]);
+
+(function() {
+  var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+  ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+  var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+})();</script></body></html>

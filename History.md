@@ -1,3 +1,13 @@
+4.1.6 / 2015-09-08
+==================
+ * fixed; MONGOOSE_DRIVER_PATH env variable #3345 [g13013](https://github.com/g13013)
+ * docs; global autoIndex option #3335 [albertorestifo](https://github.com/albertorestifo)
+ * docs; model documentation typos #3330
+ * fixed; report reason for CastError #3320
+ * fixed; .populate() no longer returns true after re-assigning #3308
+ * fixed; discriminators with aggregation geoNear #3304
+ * docs; discriminator docs #2743
+
 4.1.5 / 2015-09-01
 ==================
  * fixed; document.remove() removing all docs #3326 #3325

@@ -30,7 +30,14 @@ files.forEach(function (file) {
   }
 });
 
-function jadeify (filename, options) {
+var acquit = require('./docs/source/acquit');
+var acquitFiles = Object.keys(acquit);
+acquitFiles.forEach(function(file) {
+  var filename = __dirname + '/docs/acquit.jade';
+  jadeify(filename, acquit[file], __dirname + '/docs/' + file);
+});
+
+function jadeify (filename, options, newfile) {
   options || (options = {});
   options.package = package;
   options.hl = hl;
@@ -40,7 +47,7 @@ function jadeify (filename, options) {
   jade.renderFile(filename, options, function (err, str) {
     if (err) return console.error(err.stack);
 
-    var newfile = filename.replace('.jade', '.html');
+    newfile = newfile || filename.replace('.jade', '.html');
     fs.writeFile(newfile, str, function (err) {
       if (err) return console.error('could not write', err.stack);
       console.log('%s : rendered ', new Date, newfile);

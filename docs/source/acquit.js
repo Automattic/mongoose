@@ -39,7 +39,8 @@ files.forEach(function(file) {
   exports[file.output] = {
     title: file.title,
     acquitBlocks: blocks,
-    destination: file.output
+    destination: file.output,
+    guide: true
   }
 });
 

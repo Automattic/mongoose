@@ -28,5 +28,6 @@ for (var i = 0; i < blocks.length; ++i) {
 
 module.exports = {
   title: 'Using Mongoose with ECMAScript 6 (Harmony)',
-  acquitBlocks: blocks
+  acquitBlocks: blocks,
+  guide: true
 };

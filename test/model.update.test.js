@@ -1551,7 +1551,11 @@ describe('model: update:', function(){
         exec(function(error, res) {
           assert.ifError(error);
           assert.equal(res.n, 1);
-          done();
+          Model.findById(m._id, function(error, doc) {
+            assert.ifError(error);
+            assert.equal(doc.attributes.scores.bar.length, 1);
+            done();
+          });
         });
     });
   });

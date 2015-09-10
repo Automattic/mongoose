@@ -1152,7 +1152,6 @@ describe('Query', function(){
       var prod2doc = { comments: [{ text: 'goodbye' }] };
 
       var prod = new Product(proddoc);
-
       prod.save(function (err) {
         assert.ifError(err);
 
@@ -1161,7 +1160,7 @@ describe('Query', function(){
           assert.equal(product.comments.length, 1);
           assert.equal(product.comments[0].text, 'hello');
 
-          Product.update(product, prod2doc, function (err) {
+          Product.update(product, prod2doc, function (err, res) {
             assert.ifError(err);
 
             Product.collection.findOne({ _id: product._id }, function (err, doc) {

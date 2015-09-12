@@ -2,8 +2,8 @@
   name:    String,
   binary:  Buffer,
   living:  Boolean,
-  updated: { type: Date, <span class="keyword">default</span>: Date.now }
-  age:     { type: Number, min: <span class="number">18</span>, max: <span class="number">65</span> }
+  updated: { type: Date, <span class="keyword">default</span>: Date.now },
+  age:     { type: Number, min: <span class="number">18</span>, max: <span class="number">65</span> },
   mixed:   Schema.Types.Mixed,
   _someId: Schema.Types.ObjectId,
   array:      [],
@@ -24,7 +24,7 @@
 <span class="keyword">var</span> Thing = mongoose.model(<span class="string">'Thing'</span>, schema);
 
 <span class="keyword">var</span> m = <span class="keyword">new</span> Thing;
-m.name = <span class="string">'Statue of Liberty'</span>
+m.name = <span class="string">'Statue of Liberty'</span>;
 m.age = <span class="number">125</span>;
 m.updated = <span class="keyword">new</span> Date;
 m.binary = <span class="keyword">new</span> Buffer(<span class="number">0</span>);
@@ -35,7 +35,7 @@ m._someId = <span class="keyword">new</span> mongoose.Types.ObjectId;
 m.array.push(<span class="number">1</span>);
 m.ofString.push(<span class="string">"strings!"</span>);
 m.ofNumber.unshift(<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>);
-m.ofDate.addToSet(<span class="keyword">new</span> Date);
+m.ofDates.addToSet(<span class="keyword">new</span> Date);
 m.ofBuffer.pop();
 m.ofMixed = [<span class="number">1</span>, [], <span class="string">'three'</span>, { four: <span class="number">5</span> }];
 m.nested.stuff = <span class="string">'good'</span>;
@@ -45,7 +45,7 @@ m.save(callback);
 person.markModified(<span class="string">'anything'</span>);
 person.save(); <span class="comment">// anything will now get saved</span></code></pre><h4 id="objectids">ObjectIds</h4><p>To specify a type of ObjectId, use <code>Schema.Types.ObjectId</code> in your declaration.</p><pre><code class="javascript"><span class="keyword">var</span> mongoose = require(<span class="string">'mongoose'</span>);
 <span class="keyword">var</span> ObjectId = mongoose.Schema.Types.ObjectId;
-<span class="keyword">var</span> Car = <span class="keyword">new</span> Schema({ driver: ObjectId })
+<span class="keyword">var</span> Car = <span class="keyword">new</span> Schema({ driver: ObjectId });
 <span class="comment">// or just Schema.ObjectId for backwards compatibility with v2</span></code></pre><h4 id="arrays">Arrays</h4><p>Provide creation of arrays of <a href="./api.html#schema_Schema.Types">SchemaTypes</a> or <a href="./subdocs.html">Sub-Documents</a>.</p><pre><code class="javascript"><span class="keyword">var</span> ToySchema = <span class="keyword">new</span> Schema({ name: String });
 <span class="keyword">var</span> ToyBox = <span class="keyword">new</span> Schema({
   toys: [ToySchema],

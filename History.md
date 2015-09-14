@@ -1,3 +1,13 @@
+4.1.7 / 2015-09-14
+==================
+ * docs; typos in SchemaType documentation #3367 [jasson15](https://github.com/jasson15)
+ * fixed; MONGOOSE_DRIVER_PATH env variable again #3360
+ * docs; added validateSync docs #3353
+ * fixed; set findOne op synchronously in query #3344
+ * fixed; handling for `.pull()` on a documentarray without an id #3341
+ * fixed; use natural order for cloning update conditions #3338
+ * fixed; issue with strict mode casting for mixed type updates #3337
+
 4.1.6 / 2015-09-08
 ==================
  * fixed; MONGOOSE_DRIVER_PATH env variable #3345 [g13013](https://github.com/g13013)

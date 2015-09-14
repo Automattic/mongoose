@@ -28,7 +28,11 @@ block content
     Custom validation is declared by passing a validation `function` and coinciding error message to your `SchemaTypes` `validate` method. Instructions for how to do so are available in the [API docs](./api.html#schematype_SchemaType-validate).
   h3#validation-errors Validation errors
   :markdown
-    Errors returned after failed validation contain an `errors` object holding the actual `ValidatorError`s. Each [ValidatorError](./api.html#error-validation-js) has a `type`, `path`, and `value` property providing us with a little more error handling flexibility.
+    Errors returned after failed validation contain an `errors` object
+    holding the actual `ValidatorError`s. Each
+    [ValidatorError](./api.html#error-validation-js) has a `type`, `path`,
+    and `value` property providing us with a little more error handling
+    flexibility.
   :js
     var toySchema = new Schema({
       color: String,
@@ -60,6 +64,39 @@ block content
     After a validation error, the document will also have the same `errors` property available:
   :js
     toy.errors.color.message === err.errors.color.message
+  
+  h3#validate-sync Synchronous Validation
+  :markdown
+    Validation is asynchronous by default. Mongoose evaluates each individual
+    path in a separate `process.nextTick()` call, which helps make sure
+    validation doesn't block the event loop if there are a lot of paths to
+    validate. However, mongoose's built-in validators are all synchronous, and
+    it's often more convenient to validate synchronously.
+    
+    Mongoose documents also have a `validateSync()` function, which returns
+    a `ValidationError` if there was an error, or falsy if there was no error.
+    Note that `validateSync()` **only** executes synchronous validators.
+    Custom asynchronous validators won't execute.
+    
+  :js
+    var toySchema = new Schema({
+      color: String,
+      name: String
+    });
+
+    var Toy = mongoose.model('Toy', toySchema);
+
+    Toy.schema.path('color').validate(function (value) {
+      return /blue|green|white|red|orange|periwinkle/i.test(value);
+    }, 'Invalid color');
+
+    var toy = new Toy({ color: 'grease'});
+  
+    // `error` is a ValidationError analogous to the one from `validate()`
+    var error = toy.validateSync();
+
+    // prints 'Validator "Invalid color" failed for path color with value `grease`'
+    console.log(error.errors.color.message);
 
   h3#update-validators Update Validators
   :markdown

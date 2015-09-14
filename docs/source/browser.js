@@ -31,5 +31,6 @@ for (var i = 0; i < blocks.length; ++i) {
 
 module.exports = {
   title: 'Using Mongoose Schema Validation in the Browser',
-  acquitBlocks: blocks
+  acquitBlocks: blocks,
+  guide: true
 };

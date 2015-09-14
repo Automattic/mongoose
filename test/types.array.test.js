@@ -702,6 +702,52 @@ describe('types array', function(){
       });
     });
 
+    it('handles pulling with no _id (gh-3341)', function(done) {
+      var db = start();
+      var personSchema = new Schema({
+        name: String,
+        role: String
+      }, { _id: false });
+      var bandSchema = new Schema({
+        name: String,
+        members: [personSchema]
+      });
+
+      var Band = db.model('gh3341', bandSchema, 'gh3341');
+
+      var gnr = new Band({
+        name: "Guns N' Roses",
+        members: [
+          { name: 'Axl', role: 'Lead Singer' },
+          { name: 'Slash', role: 'Guitar' },
+          { name: 'Izzy', role: 'Guitar' },
+          { name: 'Duff', role: 'Bass' },
+          { name: 'Adler', role: 'Drums' }
+        ]
+      });
+
+      gnr.save(function(error) {
+        assert.ifError(error);
+        gnr.members.pull({ name: 'Slash', role: 'Guitar' });
+        gnr.save(function(error) {
+          assert.ifError(error);
+          assert.equal(gnr.members.length, 4);
+          assert.equal(gnr.members[0].name, 'Axl');
+          assert.equal(gnr.members[1].name, 'Izzy');
+          assert.equal(gnr.members[2].name, 'Duff');
+          assert.equal(gnr.members[3].name, 'Adler');
+          Band.findById(gnr._id, function(error, gnr) {
+            assert.ifError(error);
+            assert.equal(gnr.members.length, 4);
+            assert.equal(gnr.members[0].name, 'Axl');
+            assert.equal(gnr.members[1].name, 'Izzy');
+            assert.equal(gnr.members[2].name, 'Duff');
+            assert.equal(gnr.members[3].name, 'Adler');
+            done();
+          });
+        });
+      });
+    });
   });
 
   describe('$pop()', function(){

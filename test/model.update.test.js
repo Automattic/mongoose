@@ -1536,4 +1536,27 @@ describe('model: update:', function(){
         });
     });
   });
+
+  it('mixed nested type casting (gh-3337)', function(done) {
+    var db = start();
+
+    var Schema = mongoose.Schema({ attributes: {} }, { strict: true });
+    var Model  = db.model('gh3337', Schema);
+
+    Model.create({}, function(error, m) {
+      assert.ifError(error);
+      var update = { '$push': { 'attributes.scores.bar': { a: 1 } } };
+      Model.
+        update({ _id: m._id }, update).
+        exec(function(error, res) {
+          assert.ifError(error);
+          assert.equal(res.n, 1);
+          Model.findById(m._id, function(error, doc) {
+            assert.ifError(error);
+            assert.equal(doc.attributes.scores.bar.length, 1);
+            done();
+          });
+        });
+    });
+  });
 });

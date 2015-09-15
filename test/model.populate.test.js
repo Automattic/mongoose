@@ -2980,7 +2980,7 @@ describe('model: populate:', function(){
 
     userSchema.set('toJSON', {
       transform: function(doc, ret){
-        return ret
+        return ret;
       }
     });
 
@@ -2994,8 +2994,8 @@ describe('model: populate:', function(){
 
       team.save(function(err) {
         assert.ifError(err);
-        team.populate('members.user', function(err) {
-          var output = team.toJSON();
+        team.populate('members.user', function() {
+          team.toJSON();
           assert.equal(calls, 1);
           done();
         });

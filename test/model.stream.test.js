@@ -453,16 +453,16 @@ describe('query stream:', function(){
       otherName: String
     });
 
-    Review = db.model('dynrefReview', reviewSchema, 'gh3108_0');
-    Item1 = db.model('dynrefItem1', item1Schema, 'gh3108_1');
-    Item2 = db.model('dynrefItem2', item2Schema, 'gh3108_2');
+    var Review = db.model('dynrefReview', reviewSchema, 'gh3108_0');
+    var Item1 = db.model('dynrefItem1', item1Schema, 'gh3108_1');
+    var Item2 = db.model('dynrefItem2', item2Schema, 'gh3108_2');
 
     var c = 0;
 
     var create = function(cb) {
-      Item1.create({ _id: ++c, name: 'Val' }, function(error, doc) {
+      Item1.create({ _id: ++c, name: 'Val' }, function(error) {
         assert.ifError(error);
-        Item2.create({ _id: ++c, otherName: 'Val' }, function(error, doc) {
+        Item2.create({ _id: ++c, otherName: 'Val' }, function(error) {
           assert.ifError(error);
           var review = {
             _id: c,
@@ -473,7 +473,7 @@ describe('query stream:', function(){
               { id: c, type: 'dynrefItem2' }
             ]
           };
-          Review.create(review, function(error, doc) {
+          Review.create(review, function(error) {
             assert.ifError(error);
             cb();
           });

@@ -40,7 +40,7 @@ Subdocument.prototype.__proto__ = EmbeddedDocument.prototype;
  */
 
 Subdocument.prototype.$__setSchema(new Schema({
-    test: { type: String, required: true }
+  test: { type: String, required: true }
   , work: { type: String, validate: /^good/ }
 }));
 
@@ -49,12 +49,12 @@ Subdocument.prototype.$__setSchema(new Schema({
  */
 
 var RatingSchema = new Schema({
-    stars: Number
+  stars: Number
   , description: { source: { url: String, time: Date }}
 });
 
 var MovieSchema = new Schema({
-    title: String
+  title: String
   , ratings: [RatingSchema]
 });
 
@@ -64,15 +64,15 @@ mongoose.model('Movie', MovieSchema);
  * Test.
  */
 
-describe('types.document', function(){
+describe('types.document', function () {
 
-  it('test that validate sets errors', function(done){
+  it('test that validate sets errors', function (done) {
     var a = new Subdocument();
     a.set('test', '');
     a.set('work', 'nope');
     a.__index = 0;
 
-    a.validate(function(){
+    a.validate(function () {
       assert.ok(a.__parent.$__.validationError instanceof ValidationError);
       assert.equal(a.__parent.errors['jsconf.ar.0.work'].name, 'ValidatorError');
       assert.equal(a.__parent.$__.validationError.toString(), 'ValidationError: Path `test` is required., Validator failed for path `work` with value `nope`');
@@ -193,21 +193,21 @@ describe('types.document', function(){
     });
   });
 
-  describe('setting nested objects', function(){
-    it('works (gh-1394)', function(done){
+  describe('setting nested objects', function () {
+    it('works (gh-1394)', function (done) {
       var db = start();
       var Movie = db.model('Movie');
 
       Movie.create({
-          title: 'Life of Pi'
+        title: 'Life of Pi'
         , ratings: [{
-              description: {
-                  source: {
-                      url: 'http://www.imdb.com/title/tt0454876/'
+          description: {
+                source: {
+                    url: 'http://www.imdb.com/title/tt0454876/'
                     , time: new Date
                   }
               }
-          }]
+        }]
       }, function (err, movie) {
         assert.ifError(err);
 

@@ -63,11 +63,11 @@ mongoose.connect('mongodb://localhost/persons', function (err) {
       }).then(function (oldest) {
         console.log("Oldest person is: %s", oldest);
       }).then(cleanup);
-  });
+    });
 });
 
-function cleanup() {
-  Person.remove(function() {
+function cleanup () {
+  Person.remove(function () {
     mongoose.disconnect();
   });
 }

@@ -9,7 +9,7 @@ var SchemaNumber = mongoose.Schema.Types.Number;
  * Test.
  */
 
-describe('types.number', function(){
+describe('types.number', function () {
 
   it('an empty string casts to null', function (done) {
     var n = new SchemaNumber();

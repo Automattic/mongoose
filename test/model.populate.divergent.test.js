@@ -14,7 +14,7 @@ var start = require('./common')
  * Tests.
  */
 
-describe('model: populate: divergent arrays', function(){
+describe('model: populate: divergent arrays', function () {
   // match
   // skip
   // limit
@@ -26,7 +26,7 @@ describe('model: populate: divergent arrays', function(){
 
   var db, C, M;
 
-  before(function(done){
+  before(function (done) {
     db = start();
     C = db.model("Child", { _id: Number, name: String }, 'child-'+random());
     M = db.model("Parent", { array: { type: [{ type: Number, ref: 'Child' }] }}, 'parent-'+random());
@@ -43,12 +43,12 @@ describe('model: populate: divergent arrays', function(){
     });
   });
 
-  after(function(done){
+  after(function (done) {
     db.close(done);
   });
 
   function test (check, fn) {
-    it('using $set', function(done){
+    it('using $set', function (done) {
       fn(function (err, doc) {
         assert.ifError(err);
         doc.array.unshift({ _id: 10, name: 'ten' });
@@ -58,7 +58,7 @@ describe('model: populate: divergent arrays', function(){
         });
       });
     });
-    it('using $pop 1', function(done){
+    it('using $pop 1', function (done) {
       fn(function (err, doc) {
         assert.ifError(err);
         doc.array.$pop();
@@ -68,7 +68,7 @@ describe('model: populate: divergent arrays', function(){
         });
       });
     });
-    it('using $pop -1', function(done){
+    it('using $pop -1', function (done) {
       fn(function (err, doc) {
         assert.ifError(err);
         doc.array.$shift();
@@ -91,52 +91,52 @@ describe('model: populate: divergent arrays', function(){
     }, fn);
   }
 
-  describe('from match', function(){
+  describe('from match', function () {
     testFails(function (cb) {
       M.findOne().populate({ path: 'array', match: { name: 'one' }}).exec(cb);
     });
   });
-  describe('from skip', function(){
-    describe('2', function(){
+  describe('from skip', function () {
+    describe('2', function () {
       testFails(function (cb) {
         M.findOne().populate({ path: 'array', options: { skip: 2 }}).exec(cb);
       });
     });
-    describe('0', function(){
+    describe('0', function () {
       testOk(function (cb) {
         M.findOne().populate({ path: 'array', options: { skip: 0 }}).exec(cb);
       });
     });
   });
-  describe('from limit', function(){
-    describe('0', function(){
+  describe('from limit', function () {
+    describe('0', function () {
       testFails(function (cb) {
         M.findOne().populate({ path: 'array', options: { limit: 0 }}).exec(cb);
       });
     });
-    describe('1', function(){
+    describe('1', function () {
       testFails(function (cb) {
         M.findOne().populate({ path: 'array', options: { limit: 1 }}).exec(cb);
       });
     });
   });
-  describe('from deselected _id', function(){
-    describe('using string and only -_id', function(){
+  describe('from deselected _id', function () {
+    describe('using string and only -_id', function () {
       testFails(function (cb) {
         M.findOne().populate({ path: 'array', select: '-_id'}).exec(cb);
       });
     });
-    describe('using string', function(){
+    describe('using string', function () {
       testFails(function (cb) {
         M.findOne().populate({ path: 'array', select: 'name -_id'}).exec(cb);
       });
     });
-    describe('using object and only _id: 0', function(){
+    describe('using object and only _id: 0', function () {
       testFails(function (cb) {
         M.findOne().populate({ path: 'array', select: { _id: 0 }}).exec(cb);
       });
     });
-    describe('using object', function(){
+    describe('using object', function () {
       testFails(function (cb) {
         M.findOne().populate({ path: 'array', select: { _id: 0, name: 1 }}).exec(cb);
       });

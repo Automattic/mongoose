@@ -15,12 +15,12 @@ if (!uri) {
             , '\033[39m');
 
   // let expresso shut down this test
-  exports.r = function expressoHack(){};
+  exports.r = function expressoHack () {};
   return;
 }
 
 var schema = new Schema({
-    name: String
+  name: String
   , age: Number
   , likes: [String]
 }, { shardkey: { name: 1, age: 1 }});
@@ -35,7 +35,7 @@ mongoose.model('ShardPerson', schema, collection);
 var version;
 var greaterThan20x;
 var db;
-describe('shard', function(){
+describe('shard', function () {
   before(function (done) {
     db = start({ uri: uri });
     db.on('error', function (err) {
@@ -61,7 +61,7 @@ describe('shard', function(){
         cmd.shardcollection = db.name + '.' + collection;
         cmd.key = P.schema.options.shardkey;
 
-        P.db.db.executeDbAdminCommand(cmd,function (err, res) {
+        P.db.db.executeDbAdminCommand(cmd, function (err, res) {
           assert.ifError(err);
 
           if (!(res && res.documents && res.documents[0] && res.documents[0].ok)) {
@@ -78,7 +78,7 @@ describe('shard', function(){
             admin.serverStatus(function (err, info) {
               db.close();
               assert.ifError(err);
-              version = info.version.split('.').map(function(n){return parseInt(n, 10); });
+              version = info.version.split('.').map(function (n) { return parseInt(n, 10); });
               greaterThan20x = 2 < version[0] || 2==version[0] && 0<version[0];
               done();
             });

@@ -27,21 +27,21 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function (err) {
 
     var Comments = new Schema;
     Comments.add({
-        title     : String
+      title     : String
       , date      : Date
       , body      : String
       , comments  : [Comments]
     });
 
     var BlogPost = new Schema({
-        title     : String
+      title     : String
       , author    : String
       , slug      : String
       , date      : Date
       , meta      : {
-            date      : Date
+        date      : Date
           , visitors  : Number
-        }
+      }
       , published : Boolean
       , mixed     : {}
       , numbers   : [Number]
@@ -92,7 +92,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function (err) {
     var user = db.collection('user');
     var blogpost = db.collection('blogpost');
 
-    function closeDB() {
+    function closeDB () {
       mongoose.connection.db.dropDatabase(function () {
         mongoose.disconnect();
         process.exit();

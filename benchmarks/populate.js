@@ -10,7 +10,7 @@ var nested = Schema({
 });
 
 var B = mongoose.model('B', Schema({
-    as: [{ type: Schema.ObjectId, ref: 'A' }]
+  as: [{ type: Schema.ObjectId, ref: 'A' }]
   , a: { type: Schema.ObjectId, ref: 'A' }
   , nested: [nested]
 }));
@@ -27,7 +27,7 @@ mongoose.connect('localhost', 'benchmark-populate', function (err) {
     var pending = docs;
     for (var i = 0; i < pending; ++i) {
       new B({
-          as: [a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a]
+        as: [a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a]
         , a: a
         , nested: [{ a: a }, { a: a }, { a: a }, { a: a }, { a: a }, { a: a }]
       }).save(function (err) {

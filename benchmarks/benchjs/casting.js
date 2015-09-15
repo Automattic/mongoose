@@ -22,21 +22,21 @@ var utils = require('../../lib/utils.js');
 var Comments = new Schema;
 
 Comments.add({
-    title     : String
+  title     : String
   , date      : Date
   , body      : String
   , comments  : [Comments]
 });
 
 var BlogPost = new Schema({
-    title     : String
+  title     : String
   , author    : String
   , slug      : String
   , date      : Date
   , meta      : {
-        date      : Date
+    date      : Date
       , visitors  : Number
-    }
+  }
   , published : Boolean
   , mixed     : {}
   , numbers   : [Number]

@@ -39,24 +39,24 @@ em.virtual('works').get(function () {
   return 'em virtual works';
 });
 var schema = new Schema({
-    test    : String
+  test    : String
   , oids    : [ObjectId]
   , numbers : [Number]
   , nested  : {
-        age   : Number
+    age   : Number
       , cool  : ObjectId
       , deep  : { x: String }
       , path  : String
       , setr  : String
-    }
+  }
   , nested2 : {
-        nested: String
+    nested: String
       , yup   : {
-            nested  : Boolean
+        nested  : Boolean
           , yup     : String
           , age     : Number
-        }
-    }
+      }
+  }
   , em: [em]
   , date: Date
 });
@@ -67,7 +67,7 @@ TestDocument.prototype.$__setSchema(schema);
  */
 
 var User = new Schema({
-    name      : String
+  name      : String
   , email     : String
   , gender    : { type: String, enum: ['male', 'female'], default: 'male' }
   , age       : { type: Number, default: 21 }
@@ -79,7 +79,7 @@ var User = new Schema({
  */
 
 var Comment = new Schema({
-    asers   : [{ type: ObjectId, ref: 'doc.populate.u' }]
+  asers   : [{ type: ObjectId, ref: 'doc.populate.u' }]
   , _creator : { type: ObjectId, ref: 'doc.populate.u' }
   , content  : String
 });
@@ -89,7 +89,7 @@ var Comment = new Schema({
  */
 
 var BlogPost = new Schema({
-    _creator      : { type: ObjectId, ref: 'doc.populate.u' }
+  _creator      : { type: ObjectId, ref: 'doc.populate.u' }
   , title         : String
   , comments      : [Comment]
   , fans          : [{ type: ObjectId, ref: 'doc.populate.u' }]
@@ -99,11 +99,11 @@ mongoose.model('doc.populate.b', BlogPost);
 mongoose.model('doc.populate.u', User);
 mongoose.model('doc.populate.u2', User);
 
-describe('document.populate', function(){
+describe('document.populate', function () {
   var db, B, User;
   var user1, user2, post, _id;
 
-  before(function(done){
+  before(function (done) {
     db = start();
     B = db.model('doc.populate.b');
     User = db.model('doc.populate.u');
@@ -111,11 +111,11 @@ describe('document.populate', function(){
     _id = new mongoose.Types.ObjectId;
 
     User.create({
-        name  : 'Phoenix'
+      name  : 'Phoenix'
       , email : 'phx@az.com'
       , blogposts: [_id]
     }, {
-        name  : 'Newark'
+      name  : 'Newark'
       , email : 'ewr@nj.com'
       , blogposts: [_id]
     }, function (err, u1, u2) {
@@ -125,7 +125,7 @@ describe('document.populate', function(){
       user2 = u2;
 
       B.create({
-          title     : 'the how and why'
+        title     : 'the how and why'
         , _creator  : user1
         , fans: [user1, user2]
         , comments: [{ _creator: user2, content: 'user2' }, { _creator: user1, content: 'user1' }]
@@ -137,13 +137,13 @@ describe('document.populate', function(){
     });
   });
 
-  after(function(done){
+  after(function (done) {
     db.close(done);
   });
 
-  describe('argument processing', function(){
-    describe('duplicates', function(){
-      it('are removed', function(done){
+  describe('argument processing', function () {
+    describe('duplicates', function () {
+      it('are removed', function (done) {
         B.findById(post, function (err, post) {
           assert.ifError(err);
           post.populate('_creator');
@@ -163,7 +163,7 @@ describe('document.populate', function(){
           done();
         });
       });
-      it('overwrite previous', function(done){
+      it('overwrite previous', function (done) {
         B.findById(post, function (err, post) {
           assert.ifError(err);
           post.populate('_creator');
@@ -179,8 +179,8 @@ describe('document.populate', function(){
     });
   });
 
-  describe('options', function(){
-    it('resets populate options after execution', function(done){
+  describe('options', function () {
+    it('resets populate options after execution', function (done) {
       B.findById(post, function (err, post) {
         var creator_id = post._creator;
         post.populate('_creator', function (err) {
@@ -193,7 +193,7 @@ describe('document.populate', function(){
       });
     });
 
-    it('are not modified when no arguments are passed', function(done){
+    it('are not modified when no arguments are passed', function (done) {
       var d = new TestDocument();
       var o = utils.clone(d.options);
       assert.deepEqual(o, d.populate().options);
@@ -201,8 +201,8 @@ describe('document.populate', function(){
     });
   });
 
-  describe('populating two paths', function(){
-    it('with space delmited string works', function(done){
+  describe('populating two paths', function () {
+    it('with space delmited string works', function (done) {
       B.findById(post, function (err, post) {
         var creator_id = post._creator;
         var alt_id = post.fans[1];
@@ -218,7 +218,7 @@ describe('document.populate', function(){
     });
   });
 
-  it('works with just a callback', function(done){
+  it('works with just a callback', function (done) {
     B.findById(post, function (err, post) {
       var creator_id = post._creator;
       var alt_id = post.fans[1];
@@ -232,7 +232,7 @@ describe('document.populate', function(){
     });
   });
 
-  it('populating using space delimited paths with options', function(done){
+  it('populating using space delimited paths with options', function (done) {
     B.findById(post, function (err, post) {
       var param = {};
       param.select = '-email';
@@ -256,7 +256,7 @@ describe('document.populate', function(){
     });
   });
 
-  it('using multiple populate calls', function(done){
+  it('using multiple populate calls', function (done) {
     B.findById(post, function (err, post) {
       var creator_id = post._creator;
       var alt_id = post.fans[1];
@@ -283,7 +283,7 @@ describe('document.populate', function(){
     });
   });
 
-  it('with custom model selection', function(done){
+  it('with custom model selection', function (done) {
     B.findById(post, function (err, post) {
       var param = {};
       param.select = '-email';
@@ -308,7 +308,7 @@ describe('document.populate', function(){
     });
   });
 
-  it('a property not in schema', function(done){
+  it('a property not in schema', function (done) {
     B.findById(post, function (err, post) {
       assert.ifError(err);
       post.populate('idontexist', function (err) {
@@ -329,7 +329,7 @@ describe('document.populate', function(){
     });
   });
 
-  it('of empty array', function(done){
+  it('of empty array', function (done) {
     B.findById(post, function (err, post) {
       post.fans = [];
       post.populate('fans', function (err) {
@@ -339,7 +339,7 @@ describe('document.populate', function(){
     });
   });
 
-  it('of array of null/undefined', function(done){
+  it('of array of null/undefined', function (done) {
     B.findById(post, function (err, post) {
       post.fans = [null, undefined];
       post.populate('fans', function (err) {
@@ -349,7 +349,7 @@ describe('document.populate', function(){
     });
   });
 
-  it('of null property', function(done){
+  it('of null property', function (done) {
     B.findById(post, function (err, post) {
       post._creator = null;
       post.populate('_creator', function (err) {
@@ -359,16 +359,16 @@ describe('document.populate', function(){
     });
   });
 
-  it('String _ids', function(done){
+  it('String _ids', function (done) {
     var db = start();
 
     var UserSchema = new Schema({
-        _id: String
+      _id: String
       , name: String
     });
 
     var NoteSchema = new Schema({
-        author: { type: String, ref: 'UserWithStringId' }
+      author: { type: String, ref: 'UserWithStringId' }
       , body: String
     });
 
@@ -392,16 +392,16 @@ describe('document.populate', function(){
     });
   });
 
-  it('Buffer _ids', function(done){
+  it('Buffer _ids', function (done) {
     var db = start();
 
     var UserSchema = new Schema({
-        _id: Buffer
+      _id: Buffer
       , name: String
     });
 
     var NoteSchema = new Schema({
-        author: { type: Buffer, ref: 'UserWithBufferId' }
+      author: { type: Buffer, ref: 'UserWithBufferId' }
       , body: String
     });
 
@@ -433,16 +433,16 @@ describe('document.populate', function(){
     });
   });
 
-  it('Number _ids', function(done){
+  it('Number _ids', function (done) {
     var db = start();
 
     var UserSchema = new Schema({
-        _id: Number
+      _id: Number
       , name: String
     });
 
     var NoteSchema = new Schema({
-        author: { type: Number, ref: 'UserWithNumberId' }
+      author: { type: Number, ref: 'UserWithNumberId' }
       , body: String
     });
 
@@ -466,8 +466,8 @@ describe('document.populate', function(){
     });
   });
 
-  describe('sub-level properties', function(){
-    it('with string arg', function(done){
+  describe('sub-level properties', function () {
+    it('with string arg', function (done) {
       B.findById(post, function (err, post) {
         var id0 = post.comments[0]._creator;
         var id1 = post.comments[1]._creator;
@@ -482,8 +482,8 @@ describe('document.populate', function(){
     });
   });
 
-  describe('of new document', function(){
-    it('should save just the populated _id (gh-1442)', function(done){
+  describe('of new document', function () {
+    it('should save just the populated _id (gh-1442)', function (done) {
       var b = new B({ _creator: user1 });
       b.populate('_creator', function (err, b) {
         if (err) return done(err);
@@ -500,7 +500,7 @@ describe('document.populate', function(){
     });
   });
 
-  it('gh-3308', function(done) {
+  it('gh-3308', function (done) {
     var db = start();
 
     var Person = db.model('gh3308', {
@@ -525,8 +525,8 @@ describe('document.populate', function(){
     done();
   });
 
-  describe('gh-2214', function() {
-    it('should return a real document array when populating', function(done) {
+  describe('gh-2214', function () {
+    it('should return a real document array when populating', function (done) {
       var db = start();
 
       var Car = db.model('gh-2214-1', {
@@ -537,10 +537,10 @@ describe('document.populate', function(){
       var Person = db.model('gh-2214-2', {
         name: String,
         cars: [
-          {
-            type: Schema.Types.ObjectId,
-            ref: 'gh-2214-1'
-          }
+            {
+              type: Schema.Types.ObjectId,
+              ref: 'gh-2214-1'
+            }
         ]
       });
 
@@ -554,10 +554,10 @@ describe('document.populate', function(){
       });
       joe.cars.push(car);
 
-      return joe.save(function() {
-        return car.save(function() {
-          return Person.findById(joe.id, function(err, joe) {
-            return joe.populate("cars", function() {
+      return joe.save(function () {
+        return car.save(function () {
+          return Person.findById(joe.id, function (err, joe) {
+            return joe.populate("cars", function () {
               car = new Car({
                 model: "BMW",
                 color: "black"

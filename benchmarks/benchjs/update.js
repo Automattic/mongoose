@@ -27,21 +27,21 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function (err) {
 
     var Comments = new Schema;
     Comments.add({
-        title     : String
+      title     : String
       , date      : Date
       , body      : String
       , comments  : [Comments]
     });
 
     var BlogPost = new Schema({
-        title     : String
+      title     : String
       , author    : String
       , slug      : String
       , date      : Date
       , meta      : {
-            date      : Date
+        date      : Date
           , visitors  : Number
-        }
+      }
       , published : Boolean
       , mixed     : {}
       , numbers   : [Number]
@@ -133,27 +133,27 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function (err) {
         bmi = 0,
         bdi = 0;
 
-    function getNextmId() {
+    function getNextmId () {
       mi = ++mi % mIds.length;
       return mIds[mi];
     }
 
-    function getNextdId() {
+    function getNextdId () {
       di = ++di % dIds.length;
       return dIds[di];
     }
 
-    function getNextbmId() {
+    function getNextbmId () {
       bmi = ++bmi % bmIds.length;
       return bmIds[bmi];
     }
 
-    function getNextbdId() {
+    function getNextbdId () {
       bdi = ++bdi % bdIds.length;
       return bdIds[bdi];
     }
 
-    function closeDB() {
+    function closeDB () {
       mongoose.connection.db.dropDatabase(function () {
         mongoose.disconnect();
         process.exit();
@@ -297,7 +297,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function (err) {
         console.log(JSON.stringify(outObj));
       }
     });
-    function next() {
+    function next () {
       for (var i=0; i < 100; i++) {
         testBp.comments.push(commentData);
       }

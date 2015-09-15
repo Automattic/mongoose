@@ -13,8 +13,8 @@ var start = require('./common')
  */
 
 var schemaB = Schema({
-    title: String,
-    type: String
+  title: String,
+  type: String
 }, {discriminatorKey: 'type'});
 
 var schemaC = Schema({
@@ -25,8 +25,8 @@ var schemaC = Schema({
 }, {discriminatorKey: 'type'});
 
 
-describe('model', function(){
-  describe('hydrate()', function(){
+describe('model', function () {
+  describe('hydrate()', function () {
     var db;
     var B;
     var Breakfast;
@@ -35,18 +35,18 @@ describe('model', function(){
       food: { type: String, enum: ['bacon', 'eggs'] }
     });
 
-    before(function(){
+    before(function () {
       db = start();
       B = db.model('model-create', schemaB, 'gh-2637-1');
       B.discriminator('C', schemaC);
       Breakfast = db.model('gh-2637-2', breakfastSchema, 'gh-2637-2');
     });
 
-    after(function(done){
+    after(function (done) {
       db.close(done);
     });
 
-    it('hydrates documents with no modified paths', function(done) {
+    it('hydrates documents with no modified paths', function (done) {
       var hydrated = B.hydrate({ _id: '541085faedb2f28965d0e8e7', title: 'chair' });
 
       assert.ok(hydrated.get('_id') instanceof DocumentObjectId);
@@ -59,13 +59,13 @@ describe('model', function(){
       done();
     });
 
-    it('runs validators', function(done) {
+    it('runs validators', function (done) {
       var hydrated = Breakfast.hydrate({
         _id: '000000000000000000000001',
         food: 'waffles'
       });
 
-      hydrated.validate(function(err) {
+      hydrated.validate(function (err) {
         assert.ok(err);
         assert.ok(err.errors['food']);
         assert.deepEqual(['food'], Object.keys(err.errors));
@@ -73,7 +73,7 @@ describe('model', function(){
       });
     });
 
-    it('works correctly with model discriminators', function(done) {
+    it('works correctly with model discriminators', function (done) {
       var hydrated = B.hydrate({_id: '541085faedb2f28965d0e8e8', title: 'chair', type: 'C'});
 
       assert.equal(hydrated.test, 'test');

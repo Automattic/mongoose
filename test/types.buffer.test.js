@@ -15,12 +15,12 @@ function valid (v) {
 }
 
 var subBuf = new Schema({
-    name: String
+  name: String
   , buf: { type: Buffer, validate: [valid, 'valid failed'], required: true }
 });
 
 var UserBuffer = new Schema({
-    name: String
+  name: String
   , serial: Buffer
   , array: [Buffer]
   , required: { type: Buffer, required: true, index: true }
@@ -35,9 +35,9 @@ var UserBuffer = new Schema({
  * Test.
  */
 
-describe('types.buffer', function(){
+describe('types.buffer', function () {
 
-  it('test that a mongoose buffer behaves and quacks like a buffer', function(done){
+  it('test that a mongoose buffer behaves and quacks like a buffer', function (done) {
     var a = new MongooseBuffer;
 
     assert.ok(a instanceof Buffer);
@@ -62,7 +62,7 @@ describe('types.buffer', function(){
 
     User.on('index', function () {
       var t = new User({
-          name: 'test validation'
+        name: 'test validation'
       });
 
       t.validate(function (err) {
@@ -101,7 +101,7 @@ describe('types.buffer', function(){
     });
   });
 
-  it('buffer storage', function(done){
+  it('buffer storage', function (done) {
     var db = start()
       , User = db.model('UserBuffer', UserBuffer, 'usersbuffer_' + random());
 
@@ -109,7 +109,7 @@ describe('types.buffer', function(){
       var sampleBuffer = new Buffer([123, 223, 23, 42, 11]);
 
       var tj = new User({
-          name: 'tj'
+        name: 'tj'
         , serial: sampleBuffer
         , required: new Buffer(sampleBuffer)
       });
@@ -132,7 +132,7 @@ describe('types.buffer', function(){
     });
   });
 
-  it('test write markModified', function(done){
+  it('test write markModified', function (done) {
     var db = start()
       , User = db.model('UserBuffer', UserBuffer, 'usersbuffer_' + random());
 
@@ -140,7 +140,7 @@ describe('types.buffer', function(){
       var sampleBuffer = new Buffer([123, 223, 23, 42, 11]);
 
       var tj = new User({
-          name: 'tj'
+        name: 'tj'
         , serial: sampleBuffer
         , required: sampleBuffer
       });
@@ -178,7 +178,7 @@ describe('types.buffer', function(){
 
             // buffer method tests
             var fns = {
-                'writeUInt8': function () {
+              'writeUInt8': function () {
                   reset(tj);
                   not(tj);
                   tj.required.writeUInt8(0x3, 0, 'big');
@@ -363,7 +363,7 @@ describe('types.buffer', function(){
     }
   });
 
-  it('can be set to null', function(done){
+  it('can be set to null', function (done) {
     var db = start()
       , User = db.model('UserBuffer', UserBuffer, 'usersbuffer_' + random());
     var user = new User({ array: [null], required: new Buffer(1) });
@@ -380,8 +380,8 @@ describe('types.buffer', function(){
 
   });
 
-  describe('#toObject', function(){
-    it('retains custom subtypes', function(done){
+  describe('#toObject', function () {
+    it('retains custom subtypes', function (done) {
       var buf = new MongooseBuffer(0);
       var out = buf.toObject(2);
       // validate the drivers Binary type output retains the option
@@ -390,34 +390,34 @@ describe('types.buffer', function(){
     });
   });
 
-  describe('subtype', function(){
+  describe('subtype', function () {
     var db, bufferSchema, B;
 
-    before(function(done){
+    before(function (done) {
       db = start();
       bufferSchema = new Schema({ buf: Buffer });
       B = db.model('1571', bufferSchema);
       done();
     });
 
-    after(function(done){
+    after(function (done) {
       db.close(done);
     });
 
-    it('default value', function(done){
+    it('default value', function (done) {
       var b = new B({ buf: new Buffer('hi') });
       assert.strictEqual(0, b.buf._subtype);
       done();
     });
 
-    it('method works', function(done){
+    it('method works', function (done) {
       var b = new B({ buf: new Buffer('hi') });
       b.buf.subtype(128);
       assert.strictEqual(128, b.buf._subtype);
       done();
     });
 
-    it('is stored', function(done){
+    it('is stored', function (done) {
       var b = new B({ buf: new Buffer('hi') });
       b.buf.subtype(128);
       b.save(function (err) {
@@ -430,7 +430,7 @@ describe('types.buffer', function(){
       });
     });
 
-    it('changes are retained', function(done){
+    it('changes are retained', function (done) {
       var b = new B({ buf: new Buffer('hi') });
       b.buf.subtype(128);
       b.save(function (err) {

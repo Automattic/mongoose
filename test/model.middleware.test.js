@@ -8,10 +8,10 @@ var start = require('./common')
   , mongoose = start.mongoose
   , Schema = mongoose.Schema;
 
-describe('model middleware', function(){
-  it('post save', function(done){
+describe('model middleware', function () {
+  it('post save', function (done) {
     var schema = new Schema({
-        title: String
+      title: String
     });
 
     var called = 0;
@@ -30,7 +30,7 @@ describe('model middleware', function(){
       called++;
     });
 
-    schema.post('save', function(obj, next){
+    schema.post('save', function (obj, next) {
       assert.equal(obj.title, 'Little Green Running Hood');
       assert.equal(2, called);
       called++;
@@ -42,7 +42,7 @@ describe('model middleware', function(){
 
     var test = new TestMiddleware({ title: 'Little Green Running Hood'});
 
-    test.save(function(err){
+    test.save(function (err) {
       assert.ifError(err);
       assert.equal(test.title,'Little Green Running Hood');
       assert.equal(3, called);
@@ -51,18 +51,18 @@ describe('model middleware', function(){
     });
   });
 
-  it('validate middleware runs before save middleware (gh-2462)', function(done) {
+  it('validate middleware runs before save middleware (gh-2462)', function (done) {
     var schema = new Schema({
       title: String
     });
     var count = 0;
 
-    schema.pre('validate', function(next) {
+    schema.pre('validate', function (next) {
       assert.equal(0, count++);
       next();
     });
 
-    schema.pre('save', function(next) {
+    schema.pre('save', function (next) {
       assert.equal(1, count++);
       next();
     });
@@ -70,15 +70,15 @@ describe('model middleware', function(){
     var db = start();
     var Book = db.model('gh2462', schema);
 
-    Book.create({}, function() {
+    Book.create({}, function () {
       assert.equal(count, 2);
       db.close(done);
     });
   });
 
-  it('works', function(done){
+  it('works', function (done) {
     var schema = new Schema({
-        title: String
+      title: String
     });
 
     var called = 0;
@@ -106,17 +106,17 @@ describe('model middleware', function(){
     var test = new TestMiddleware();
 
     test.init({
-        title: 'Test'
+      title: 'Test'
     });
 
     assert.equal(1, called);
 
-    test.save(function(err){
+    test.save(function (err) {
       assert.ok(err instanceof Error);
       assert.equal(err.message,'Error 101');
       assert.equal(2, called);
 
-      test.remove(function(err){
+      test.remove(function (err) {
         db.close();
         assert.ifError(err);
         assert.equal(3, called);
@@ -125,9 +125,9 @@ describe('model middleware', function(){
     });
   });
 
-  it('post init', function(done){
+  it('post init', function (done) {
     var schema = new Schema({
-        title: String
+      title: String
     });
 
     var preinit = 0
@@ -150,14 +150,14 @@ describe('model middleware', function(){
 
     var test = new Test({ title: "banana" });
 
-    test.save(function(err){
+    test.save(function (err) {
       assert.ifError(err);
 
       Test.findById(test._id, function (err, test) {
         assert.ifError(err);
         assert.equal(1, preinit);
         assert.equal(1, postinit);
-        test.remove(function(){
+        test.remove(function () {
           db.close();
           done();
         });
@@ -165,7 +165,7 @@ describe('model middleware', function(){
     });
   });
 
-  it('gh-1829', function(done) {
+  it('gh-1829', function (done) {
     var childSchema = new mongoose.Schema({
       name: String
     });
@@ -174,7 +174,7 @@ describe('model middleware', function(){
     var childPreCallsByName = {};
     var parentPreCalls = 0;
 
-    childSchema.pre('save', function(next) {
+    childSchema.pre('save', function (next) {
       childPreCallsByName[this.name] = childPreCallsByName[this.name] || 0;
       ++childPreCallsByName[this.name];
       ++childPreCalls;
@@ -186,7 +186,7 @@ describe('model middleware', function(){
       children: [childSchema]
     });
 
-    parentSchema.pre('save', function(next) {
+    parentSchema.pre('save', function (next) {
       ++parentPreCalls;
       next();
     });
@@ -202,14 +202,14 @@ describe('model middleware', function(){
       ]
     });
 
-    parent.save(function(error) {
+    parent.save(function (error) {
       assert.ifError(error);
       assert.equal(2, childPreCalls);
       assert.equal(1, childPreCallsByName['Jaina']);
       assert.equal(1, childPreCallsByName['Jacen']);
       assert.equal(1, parentPreCalls);
       parent.children[0].name = 'Anakin';
-      parent.save(function(error) {
+      parent.save(function (error) {
         assert.ifError(error);
         assert.equal(4, childPreCalls);
         assert.equal(1, childPreCallsByName['Anakin']);
@@ -223,9 +223,9 @@ describe('model middleware', function(){
     });
   });
 
-  it('validate + remove', function(done){
+  it('validate + remove', function (done) {
     var schema = new Schema({
-        title: String
+      title: String
     });
 
     var preValidate = 0
@@ -258,7 +258,7 @@ describe('model middleware', function(){
 
     var test = new Test({ title: "banana" });
 
-    test.save(function(err){
+    test.save(function (err) {
       assert.ifError(err);
       assert.equal(1, preValidate);
       assert.equal(1, postValidate);

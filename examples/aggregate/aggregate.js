@@ -70,12 +70,12 @@ mongoose.connect('mongodb://localhost/persons', function (err) {
         //{ _id: { likes: 'movies' }, likers: [ 'mary', 'bill' ] } ]
 
         cleanup();
-    });
+      });
   });
 });
 
-function cleanup() {
-  Person.remove(function() {
+function cleanup () {
+  Person.remove(function () {
     mongoose.disconnect();
   });
 }

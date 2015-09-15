@@ -10,7 +10,7 @@ var Person = mongoose.model("Person");
 
 // connect to a server to do a quick write / read example
 
-mongoose.connect('mongodb://localhost/persons', function(err) {
+mongoose.connect('mongodb://localhost/persons', function (err) {
   if (err) throw err;
 
   Person.create({
@@ -20,10 +20,10 @@ mongoose.connect('mongodb://localhost/persons', function(err) {
   }, function (err, bill) {
     if (err) throw err;
     console.log("People added to db: %s", bill.toString());
-    Person.find({}, function(err, people) {
+    Person.find({}, function (err, people) {
       if (err) throw err;
 
-      people.forEach(function(person) {
+      people.forEach(function (person) {
         console.log("People in the db: %s", person.toString());
       });
 
@@ -33,8 +33,8 @@ mongoose.connect('mongodb://localhost/persons', function(err) {
   });
 });
 
-function cleanup() {
-  Person.remove(function() {
+function cleanup () {
+  Person.remove(function () {
     mongoose.disconnect();
   });
 }

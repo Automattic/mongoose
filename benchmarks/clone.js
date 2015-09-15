@@ -3,11 +3,11 @@ var mongoose = require('../')
   , Schema = mongoose.Schema;
 
 var DocSchema = new Schema({
-    title: String
+  title: String
 });
 
 var AllSchema = new Schema({
-    string: { type: String, required: true }
+  string: { type: String, required: true }
   , number: { type: Number, min: 10 }
   , date  : Date
   , bool  : Boolean
@@ -26,7 +26,7 @@ var AllSchema = new Schema({
 
 var A = mongoose.model('A', AllSchema);
 var a = new A({
-    string: "hello world"
+  string: "hello world"
   , number: 444848484
   , date: new Date
   , bool: true

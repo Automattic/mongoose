@@ -1,4 +1,4 @@
-module.exports = function(config) {
+module.exports = function (config) {
   var customLaunchers = {
     sl_chrome_35: {
       base: 'SauceLabs',

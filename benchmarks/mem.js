@@ -5,11 +5,11 @@ var mongoose = require('../')
 mongoose.connect('localhost', 'testing_bench');
 
 var DocSchema = new Schema({
-    title: String
+  title: String
 });
 
 var AllSchema = new Schema({
-    string: { type: String, required: true }
+  string: { type: String, required: true }
   , number: { type: Number, min: 10 }
   , date  : Date
   , bool  : Boolean
@@ -78,7 +78,7 @@ methods.push(function (a, cb) {
   a.s.nest = "aooooooga";
 
   if (i%2)
-  a.toObject({ depopulate: true });
+    a.toObject({ depopulate: true });
   else {
     if (a._delta) {
       a._delta();
@@ -101,7 +101,7 @@ mongoose.connection.on('open', function () {
     (function cycle () {
       if (0 === i--) return done();
       var a = new A({
-          string: "hello world"
+        string: "hello world"
         , number: 444848484
         , date: new Date
         , bool: true

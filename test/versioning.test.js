@@ -18,20 +18,20 @@ var start = require('./common')
 var Comments = new Schema();
 
 Comments.add({
-    title     : String
+  title     : String
   , date      : Date
   , comments  : [Comments]
 });
 
 var BlogPost = new Schema({
-    title     : String
+  title     : String
   , date      : Date
   , meta      : {
-        date      : Date
+    date      : Date
       , visitors  : Number
       , nested    : [Comments]
       , numbers   : [Number]
-    }
+  }
   , mixed        : {}
   , numbers      : [Number]
   , comments     : [Comments]
@@ -42,8 +42,8 @@ var BlogPost = new Schema({
 
 mongoose.model('Versioning', BlogPost);
 
-describe('versioning', function(){
-  it('is only added to parent schema (gh-1265)', function(done){
+describe('versioning', function () {
+  it('is only added to parent schema (gh-1265)', function (done) {
     assert.ok(BlogPost.path('__v'));
     assert.ok(!BlogPost.path('comments').__v);
     assert.ok(!BlogPost.path('meta.nested').__v);
@@ -252,13 +252,13 @@ describe('versioning', function(){
         a.dontVersionMe.push('value1');
         b.dontVersionMe.push('value2');
         save(a, b, test14);
-    }
+      }
 
     function test14 (err, a) {
         assert.equal(a._doc.__v, 13, 'version should not be incremented for non-versioned fields');
         db.close();
         done();
-    }
+      }
 
     function save (a, b, cb) {
       var e;
@@ -390,7 +390,7 @@ describe('versioning', function(){
     });
   });
 
-  it('can be disabled', function(done){
+  it('can be disabled', function (done) {
     var db = start();
     var schema = Schema({ x: ['string'] }, { versionKey: false });
     var M = db.model('disabledVersioning', schema, 's'+random());
@@ -414,7 +414,7 @@ describe('versioning', function(){
     });
   });
 
-  it('works with numbericAlpha paths', function(done){
+  it('works with numbericAlpha paths', function (done) {
     var db = start();
     var M = db.model('Versioning');
     var m = new M({ mixed: {} });
@@ -426,8 +426,8 @@ describe('versioning', function(){
     });
   });
 
-  describe('doc.increment()', function(){
-    it('works without any other changes (gh-1475)', function(done){
+  describe('doc.increment()', function () {
+    it('works without any other changes (gh-1475)', function (done) {
       var db = start()
         , V = db.model('Versioning');
 
@@ -453,20 +453,20 @@ describe('versioning', function(){
     });
   });
 
-  describe('versioning is off', function(){
-    it('when { safe : false } is set (gh-1520)', function(done){
+  describe('versioning is off', function () {
+    it('when { safe : false } is set (gh-1520)', function (done) {
       var schema1 = new Schema({ title : String}, { safe : false });
       assert.equal(schema1.options.versionKey, false);
       done();
     });
-    it('when { safe : { w: 0 }} is set (gh-1520)', function(done){
+    it('when { safe : { w: 0 }} is set (gh-1520)', function (done) {
       var schema1 = new Schema({ title : String}, { safe : { w: 0 } });
       assert.equal(schema1.options.versionKey, false);
       done();
     });
   });
 
-  it('gh-1898', function(done) {
+  it('gh-1898', function (done) {
     var db = start();
     var schema = new Schema({ tags: [String], name: String });
 
@@ -474,7 +474,7 @@ describe('versioning', function(){
 
     var m = new M({ tags: ['eggs'] });
 
-    m.save(function(err) {
+    m.save(function (err) {
       assert.ifError(err);
 
       m.tags.push('bacon');
@@ -488,13 +488,13 @@ describe('versioning', function(){
     });
   });
 
-  it('can remove version key from toObject() (gh-2675)', function(done) {
+  it('can remove version key from toObject() (gh-2675)', function (done) {
     var db = start();
     var schema = new Schema({ name: String });
     var M = db.model('gh2675', schema, 'gh2675');
 
     var m = new M();
-    m.save(function(err, m) {
+    m.save(function (err, m) {
       assert.ifError(err);
       var obj = m.toObject();
       assert.equal(0, obj.__v);

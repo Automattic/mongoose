@@ -19,7 +19,7 @@ function getModel (db) {
 }
 
 var testLocations = {
-    MONGODB_NYC_OFFICE :     [-73.987732, 40.757471]
+  MONGODB_NYC_OFFICE :     [-73.987732, 40.757471]
   , BRYANT_PART_NY :         [-73.983677, 40.753628]
   , EAST_HARLEM_SHOP :       [-73.93831, 40.794963]
   , CENTRAL_PARK_ZOO :       [-73.972299, 40.767732]
@@ -27,13 +27,13 @@ var testLocations = {
 };
 
 // convert meters to radians for use as legacy coordinates
-function metersToRadians(m) {
+function metersToRadians (m) {
   return m / (6371 * 1000);
 }
 
-describe('model', function(){
+describe('model', function () {
   var mongo24_or_greater = false;
-  before(function(done){
+  before(function (done) {
     start.mongodVersion(function (err, version) {
       if (err) throw err;
       mongo24_or_greater = 2 < version[0] || (2 == version[0] && 4 <= version[1]);
@@ -49,7 +49,7 @@ describe('model', function(){
       var Geo = getModel(db);
       assert.ok(Geo.geoNear instanceof Function);
 
-      Geo.on('index', function(err){
+      Geo.on('index', function (err) {
         assert.ifError(err);
 
         var geos = [];
@@ -70,7 +70,7 @@ describe('model', function(){
           });
         }
 
-        function next() {
+        function next () {
           // using legacy coordinates -- maxDistance units in radians
           Geo.geoNear(testLocations.PORT_AUTHORITY_STATION, { spherical : true, maxDistance : metersToRadians(300)  }, function (err, results) {
             assert.ifError(err);
@@ -95,7 +95,7 @@ describe('model', function(){
       var Geo = getModel(db);
       assert.ok(Geo.geoNear instanceof Function);
 
-      Geo.on('index', function(err){
+      Geo.on('index', function (err) {
         assert.ifError(err);
 
         var geos = [];
@@ -115,7 +115,7 @@ describe('model', function(){
           });
         }
 
-        function next() {
+        function next () {
           var pnt = { type : "Point", coordinates : testLocations.PORT_AUTHORITY_STATION };
           Geo.geoNear(pnt, { spherical : true, maxDistance : 300 }, function (err, results) {
             assert.ifError(err);
@@ -140,7 +140,7 @@ describe('model', function(){
       var Geo = getModel(db);
       assert.ok(Geo.geoNear instanceof Function);
 
-      Geo.on('index', function(err){
+      Geo.on('index', function (err) {
         assert.ifError(err);
 
         var geos = [];
@@ -160,7 +160,7 @@ describe('model', function(){
           });
         }
 
-        function next() {
+        function next () {
           var pnt = { type : "Point", coordinates : testLocations.PORT_AUTHORITY_STATION };
           Geo.geoNear(pnt, { spherical : true, maxDistance : 300, lean : true }, function (err, results) {
             assert.ifError(err);
@@ -185,11 +185,11 @@ describe('model', function(){
       var db = start();
       var Geo = getModel(db);
 
-      Geo.on('index', function(err){
+      Geo.on('index', function (err) {
         assert.ifError(err);
 
         var g = new Geo({ coordinates : [10,10], type : "place"});
-        g.save(function() {
+        g.save(function () {
           Geo.geoNear("1,2", {}, function (e) {
             assert.ok(e);
             assert.equal(e.message, "Must pass either a legacy coordinate array or GeoJSON Point to geoNear");
@@ -214,7 +214,7 @@ describe('model', function(){
         });
       });
     });
-    it('returns a promise (gh-1614)', function(done){
+    it('returns a promise (gh-1614)', function (done) {
       if (!mongo24_or_greater) return done();
       var db = start();
       var Geo = getModel(db);
@@ -231,7 +231,7 @@ describe('model', function(){
       if (!mongo24_or_greater) return done();
       var db = start();
       var Geo = getModel(db);
-      Geo.on('index', function(err) {
+      Geo.on('index', function (err) {
         assert.ifError(err);
         var g = new Geo({ coordinates : testLocations.MONGODB_NYC_OFFICE, type : "Point"});
         g.save(function (err) {
@@ -239,18 +239,18 @@ describe('model', function(){
 
           var pnt = { type : "Point", coordinates : testLocations.PORT_AUTHORITY_STATION };
           var promise;
-          assert.doesNotThrow(function() {
+          assert.doesNotThrow(function () {
             promise = Geo.geoNear(pnt, { spherical : true, maxDistance : 300 });
           });
 
-          function validate(ret, stat) {
+          function validate (ret, stat) {
             assert.equal(1, ret.length);
             assert.equal(ret[0].obj.coordinates[0], testLocations.MONGODB_NYC_OFFICE[0]);
             assert.equal(ret[0].obj.coordinates[1], testLocations.MONGODB_NYC_OFFICE[1]);
             assert.ok(stat);
           }
 
-          function finish() {
+          function finish () {
             db.close(done);
           }
 
@@ -259,11 +259,11 @@ describe('model', function(){
         });
       });
     });
-    it('promise fulfill even when no results returned', function(done){
+    it('promise fulfill even when no results returned', function (done) {
       if (!mongo24_or_greater) return done();
       var db = start();
       var Geo = getModel(db);
-      Geo.on('index', function(err) {
+      Geo.on('index', function (err) {
         assert.ifError(err);
         var g = new Geo({ coordinates : [1,1], type : "Point"});
         g.save(function (err) {
@@ -271,11 +271,11 @@ describe('model', function(){
 
           var pnt = { type : "Point", coordinates : [90, 45] };
           var promise;
-          assert.doesNotThrow(function() {
+          assert.doesNotThrow(function () {
             promise = Geo.geoNear(pnt, { spherical : true, maxDistance : 1000 });
           });
 
-          function finish() {
+          function finish () {
             db.close(done);
           }
 

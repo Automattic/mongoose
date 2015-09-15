@@ -9,11 +9,11 @@ var start = require('./common')
   , random = require('../lib/utils').random
   , Schema = mongoose.Schema;
 
-describe('document: strict mode:', function(){
-  describe('should work', function(){
+describe('document: strict mode:', function () {
+  describe('should work', function () {
     var db, Lax, Strict;
 
-    before(function() {
+    before(function () {
       db = start();
 
       var raw = {
@@ -31,11 +31,11 @@ describe('document: strict mode:', function(){
       Strict = db.model('Strict', strict);
     });
 
-    after(function(done) {
+    after(function (done) {
       db.close(done);
     });
 
-    it('when creating models with non-strict schemas', function(done) {
+    it('when creating models with non-strict schemas', function (done) {
       var l = new Lax({content: 'sample', rouge: 'data'});
       assert.equal(false, l.$__.strictMode);
 
@@ -49,7 +49,7 @@ describe('document: strict mode:', function(){
       done();
     });
 
-    it('when creating models with strict schemas', function(done) {
+    it('when creating models with strict schemas', function (done) {
       var s = new Strict({content: 'sample', rouge: 'data'});
       assert.equal(true, s.$__.strictMode);
 
@@ -65,7 +65,7 @@ describe('document: strict mode:', function(){
       done();
     });
 
-    it('when overriding strictness', function(done) {
+    it('when overriding strictness', function (done) {
       // instance override
       var instance = new Lax({content: 'sample', rouge: 'data'}, true);
       assert.ok(instance.$__.strictMode);
@@ -93,9 +93,9 @@ describe('document: strict mode:', function(){
       done();
     });
 
-    it('when using Model#create', function(done) {
+    it('when using Model#create', function (done) {
       // strict on create
-      Strict.create({content: 'sample2', rouge: 'data'}, function(err, doc){
+      Strict.create({content: 'sample2', rouge: 'data'}, function (err, doc) {
         assert.equal('sample2', doc.content);
         assert.ok(!('rouge' in doc));
         assert.ok(!doc.rouge);
@@ -103,20 +103,20 @@ describe('document: strict mode:', function(){
       });
     });
 
-    after(function() {
+    after(function () {
       db.close();
     });
   });
 
-  it('nested doc', function(done){
+  it('nested doc', function (done) {
     var db = start();
 
     var lax = new Schema({
-        name: { last: String }
+      name: { last: String }
     }, { strict: false });
 
     var strict = new Schema({
-        name: { last: String }
+      name: { last: String }
     });
 
     var Lax = db.model('NestedLax', lax, 'nestdoc'+random());
@@ -146,16 +146,16 @@ describe('document: strict mode:', function(){
     db.close(done);
   });
 
-  it('sub doc', function(done){
+  it('sub doc', function (done) {
     var db = start();
 
     var lax = new Schema({
-        ts  : { type: Date, default: Date.now }
+      ts  : { type: Date, default: Date.now }
       , content: String
     }, { strict: false });
 
     var strict = new Schema({
-        ts  : { type: Date, default: Date.now }
+      ts  : { type: Date, default: Date.now }
       , content: String
     });
 
@@ -186,7 +186,7 @@ describe('document: strict mode:', function(){
     assert.ok(!s3.dox[0].rouge);
 
     // strict on create
-    Strict.create({dox:[{content: 'sample2', rouge: 'data'}]}, function(err, doc){
+    Strict.create({dox:[{content: 'sample2', rouge: 'data'}]}, function (err, doc) {
       assert.equal('sample2', doc.dox[0].content);
       assert.ok(!('rouge' in doc.dox[0]));
       assert.ok(!doc.dox[0].rouge);
@@ -194,24 +194,24 @@ describe('document: strict mode:', function(){
     });
   });
 
-  it('virtuals', function(done){
+  it('virtuals', function (done) {
     var db = start();
 
     var getCount = 0
       , setCount = 0;
 
     var strictSchema = new Schema({
-        email: String
+      email: String
       , prop: String
     });
 
     strictSchema
     .virtual('myvirtual')
-    .get(function() {
+    .get(function () {
       getCount++;
       return 'ok';
     })
-    .set(function(v) {
+    .set(function (v) {
       setCount++;
       this.prop = v;
     });
@@ -219,7 +219,7 @@ describe('document: strict mode:', function(){
     var StrictModel = db.model('StrictVirtual', strictSchema);
 
     var strictInstance = new StrictModel({
-        email: 'hunter@skookum.com'
+      email: 'hunter@skookum.com'
       , myvirtual: 'test'
     });
 
@@ -238,11 +238,11 @@ describe('document: strict mode:', function(){
     db.close(done);
   });
 
-  it('can be overridden during set()', function(done){
+  it('can be overridden during set()', function (done) {
     var db = start();
 
     var strict = new Schema({
-        bool: Boolean
+      bool: Boolean
     });
 
     var Strict = db.model('Strict', strict);
@@ -272,11 +272,11 @@ describe('document: strict mode:', function(){
     });
   });
 
-  it('can be overridden during update()', function(done){
+  it('can be overridden during update()', function (done) {
     var db = start();
 
     var strict = new Schema({
-        bool: Boolean
+      bool: Boolean
     });
 
     var Strict = db.model('Strict', strict);
@@ -314,7 +314,7 @@ describe('document: strict mode:', function(){
     });
   });
 
-  it('can be overwritten with findOneAndUpdate (gh-1967)', function(done) {
+  it('can be overwritten with findOneAndUpdate (gh-1967)', function (done) {
     var db = start();
 
     var strict = new Schema({
@@ -355,8 +355,8 @@ describe('document: strict mode:', function(){
     });
   });
 
-  describe('"throws" mode', function(){
-    it('throws on set() of unknown property', function(done){
+  describe('"throws" mode', function () {
+    it('throws on set() of unknown property', function (done) {
       var schema = Schema({ n: String, docs:[{x:[{y:String}]}] });
       schema.set('strict', 'throw');
       var M = mongoose.model('throwStrictSet', schema, 'tss_'+random());
@@ -364,39 +364,39 @@ describe('document: strict mode:', function(){
 
       var badField = /Field `[\w\.]+` is not in schema/;
 
-      assert.throws(function(){
+      assert.throws(function () {
         m.set('unknown.stuff.is.here', 3);
       }, badField);
 
-      assert.throws(function(){
+      assert.throws(function () {
         m.set('n.something', 3);
       }, badField);
 
-      assert.throws(function(){
+      assert.throws(function () {
         m.set('n.3', 3);
       }, badField);
 
-      assert.throws(function(){
+      assert.throws(function () {
         m.set('z', 3);
       }, badField);
 
-      assert.throws(function(){
+      assert.throws(function () {
         m.set('docs.z', 3);
       }, badField);
 
-      assert.throws(function(){
+      assert.throws(function () {
         m.set('docs.0.z', 3);
       }, badField);
 
-      assert.throws(function(){
+      assert.throws(function () {
         m.set('docs.0.x.z', 3);
       }, badField);
 
-      assert.throws(function(){
+      assert.throws(function () {
         m.set('docs.0.x.4.z', 3);
       }, badField);
 
-      assert.throws(function(){
+      assert.throws(function () {
         m.set('docs.0.x.4.y.z', 3);
       }, badField);
 
@@ -406,17 +406,17 @@ describe('document: strict mode:', function(){
     it('fails with extra fields', function (done) {
       // Simple schema with throws option
       var FooSchema = new mongoose.Schema({
-          name: { type: String }
+        name: { type: String }
       }, {strict: "throw"});
 
       // Create the model
       var Foo = mongoose.model('Foo1234', FooSchema);
 
-      assert.doesNotThrow(function(){
+      assert.doesNotThrow(function () {
         new Foo({name: 'bar'});
       });
 
-      assert.throws(function(){
+      assert.throws(function () {
         // The extra baz field should throw
         new Foo({name: 'bar', baz: 'bam'});
       }, /Field `baz` is not in schema/);
@@ -424,7 +424,7 @@ describe('document: strict mode:', function(){
       done();
     });
 
-    it('doesnt throw with refs (gh-2665)', function(done) {
+    it('doesnt throw with refs (gh-2665)', function (done) {
       // Simple schema with throws option
       var FooSchema = new mongoose.Schema({
         name: { type: mongoose.Schema.Types.ObjectId, ref: 'test', required: false, default: null },
@@ -434,7 +434,7 @@ describe('document: strict mode:', function(){
       // Create the model
       var Foo = mongoose.model('Foo', FooSchema);
 
-      assert.doesNotThrow(function(){
+      assert.doesNotThrow(function () {
         new Foo({name: mongoose.Types.ObjectId(), father: { name: { full: 'bacon' } } });
       });
 

@@ -24,7 +24,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench-pop', function (err) {
 
   var commentSchema = new Schema;
   commentSchema.add({
-      title     : String
+    title     : String
     , date      : Date
     , body      : String
   });
@@ -65,14 +65,14 @@ mongoose.connect('mongodb://localhost/mongoose-bench-pop', function (err) {
     isThisTest : Boolean
   });
   var BlogPost = new Schema({
-      title     : String
+    title     : String
     , author    : String
     , slug      : String
     , date      : Date
     , meta      : {
-          date      : Date
+      date      : Date
         , visitors  : Number
-      }
+    }
     , published : Boolean
     , mixed     : {}
     , numbers   : [Number]
@@ -194,7 +194,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench-pop', function (err) {
 
   var blog = [];
 
-  function cont() {
+  function cont () {
     blog[0] = utils.clone(blogData);
     blog[1] = utils.clone(blogData);
     blog[2] = utils.clone(blogData);
@@ -241,7 +241,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench-pop', function (err) {
     var count = 7;
     for (i=0; i < blog.length; i++) {
       // use some closure magic to make sure we retain the index
-      (function(c) {
+      (function (c) {
         BlogPost.create(blog[c], function (err, bl) {
           if (err) throw err;
           blog[c] = bl;
@@ -258,18 +258,18 @@ mongoose.connect('mongodb://localhost/mongoose-bench-pop', function (err) {
     di.push(0);
   }
 
-  function getNextcId() {
+  function getNextcId () {
     ci = ++ci % cIds.length;
     return cIds[ci];
   }
 
-  function getNextdId(i) {
+  function getNextdId (i) {
     di[i] = ++di[i] % dIds[i].length;
     return dIds[i][di[i]];
   }
 
 
-  function closeDB() {
+  function closeDB () {
     // just a bit simpler...
     mongoose.connection.db.dropDatabase(function () {
       mongoose.disconnect();
@@ -353,7 +353,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench-pop', function (err) {
       console.log(JSON.stringify(outObj));
     }
   });
-  function next() {
+  function next () {
     suite.run({ async : true });
   }
 });

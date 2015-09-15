@@ -8,18 +8,18 @@ var start = require('./common')
   , mongoose = start.mongoose
   , Schema = mongoose.Schema;
 
-describe('documents should not be converted to _id (gh-1408)', function(){
-  it('if an embedded doc', function(done){
+describe('documents should not be converted to _id (gh-1408)', function () {
+  it('if an embedded doc', function (done) {
     var db = start();
 
-    var PreferenceSchema = new Schema ({
-        _id: {type: Schema.ObjectId, auto: true},
-        preference: { type: String, required: true },
-        value: { type: Schema.Types.Mixed }
+    var PreferenceSchema = new Schema({
+      _id: {type: Schema.ObjectId, auto: true},
+      preference: { type: String, required: true },
+      value: { type: Schema.Types.Mixed }
     }, { versionKey: false });
 
     var BrandSchema = new Schema({
-        settings: {
+      settings: {
           preferences: [PreferenceSchema]
         }
     });
@@ -34,7 +34,7 @@ describe('documents should not be converted to _id (gh-1408)', function(){
            { preference: 'hide_from_buyers', value: true },
            { preference: 'no_orders', value: '' }
          ]
-        }
+      }
     });
 
     a.save(function (err, a) {

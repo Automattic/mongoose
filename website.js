@@ -32,7 +32,7 @@ files.forEach(function (file) {
 
 var acquit = require('./docs/source/acquit');
 var acquitFiles = Object.keys(acquit);
-acquitFiles.forEach(function(file) {
+acquitFiles.forEach(function (file) {
   var filename = __dirname + '/docs/acquit.jade';
   jadeify(filename, acquit[file], __dirname + '/docs/' + file);
 });
@@ -67,7 +67,7 @@ function getVersion () {
   throw new Error('no match found');
 }
 
-function getUnstable(ver) {
+function getUnstable (ver) {
   ver = ver.replace("-pre");
   var spl = ver.split('.');
   spl = spl.map(function (i) {

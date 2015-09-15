@@ -46,11 +46,11 @@ mongoose.connect('mongodb://localhost:27018/persons,localhost:27019,localhost:27
       prom.then(function (people) {
         console.log("young people: %s", people);
       }).then(cleanup);
-  });
+    });
 });
 
-function cleanup() {
-  Person.remove(function() {
+function cleanup () {
+  Person.remove(function () {
     mongoose.disconnect();
   });
 }

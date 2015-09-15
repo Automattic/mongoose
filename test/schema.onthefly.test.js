@@ -10,14 +10,14 @@ var start = require('./common')
  */
 
 var DecoratedSchema = new Schema({
-    title     : String
+  title     : String
 }, { strict: false });
 
 mongoose.model('Decorated', DecoratedSchema);
 
 var collection = 'decorated_' + random();
 
-describe('schema.onthefly', function(){
+describe('schema.onthefly', function () {
   it('setting should cache the schema type and cast values appropriately', function (done) {
     var db = start()
       , Decorated = db.model('Decorated', collection);
@@ -121,7 +121,7 @@ describe('schema.onthefly', function(){
     });
   });
 
-  it('casts on get() (gh-2360)', function(done) {
+  it('casts on get() (gh-2360)', function (done) {
     var db = start();
     var Decorated = db.model('gh2360', DecoratedSchema, 'gh2360');
 

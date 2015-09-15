@@ -136,7 +136,7 @@ describe('model query casting', function(){
       , BlogPostB = db.model(modelName, collection);
 
     var post = new BlogPostB()
-      , id = post._id.toString()
+      , id = post._id.toString();
 
     post.save(function (err) {
       assert.ifError(err);

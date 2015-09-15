@@ -1432,7 +1432,7 @@ describe('model: update:', function(){
     var D = db.model('gh2833', dateSchema);
 
     assert.doesNotThrow(function() {
-      D.update({}, { d: undefined }, function(error) {
+      D.update({}, { d: undefined }, function() {
         done();
       });
     });

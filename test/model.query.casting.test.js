@@ -55,6 +55,7 @@ var geoSchemaObject = new Schema({ loc: { long: Number, lat: Number }});
 geoSchemaObject.index({'loc': '2d'});
 
 describe('model query casting', function(){
+
   it('works', function(done){
     var db = start()
       , BlogPostB = db.model(modelName, collection)
@@ -759,6 +760,52 @@ describe('model query casting', function(){
 
       assert.equal('img', result.tags.$options);
       db.close(done);
+    });
+  });
+
+  describe('$elemMatch', function() {
+    it('should cast String to ObjectId in $elemMatch', function(done){
+      var db = start()
+        , BlogPostB = db.model(modelName, collection);
+
+      var commentId = mongoose.Types.ObjectId(111);
+
+      var post = new BlogPostB({
+        comments: [{ _id: commentId }]
+      }), id = post._id.toString();
+
+      post.save(function (err) {
+        assert.ifError(err);
+
+        BlogPostB.findOne({ _id: id, comments: { $elemMatch: { _id: commentId.toString() } } }, function (err, doc) {
+          assert.ifError(err);
+
+          assert.equal(doc._id.toString(), id);
+          db.close(done);
+        });
+      });
+    });
+
+    it('should cast String to ObjectId in $elemMatch inside $not', function(done){
+      var db = start()
+        , BlogPostB = db.model(modelName, collection);
+
+      var commentId = mongoose.Types.ObjectId(111);
+
+      var post = new BlogPostB({
+        comments: [{ _id: commentId }]
+      }), id = post._id.toString();
+
+      post.save(function (err) {
+        assert.ifError(err);
+
+        BlogPostB.findOne({ _id: id, comments: { $not: { $elemMatch: { _id: commentId.toString() } } } }, function (err, doc) {
+          assert.ifError(err);
+
+          assert.equal(doc, null);
+          db.close(done);
+        });
+      });
     });
   });
 });

@@ -15,7 +15,7 @@ var start = require('./common')
  * Test Document constructor.
  */
 
-function TestDocument () {
+function TestDocument() {
   Document.apply(this, arguments);
 }
 
@@ -30,42 +30,42 @@ TestDocument.prototype.__proto__ = Document.prototype;
  */
 
 var em = new Schema({ title: String, body: String });
-em.virtual('works').get(function () {
+em.virtual('works').get(function() {
   return 'em virtual works';
 });
 var schema = new Schema({
-    test    : String
+  test    : String
   , oids    : [ObjectId]
   , numbers : [Number]
   , nested  : {
-        age   : Number
+    age   : Number
       , cool  : ObjectId
       , deep  : { x: String }
       , path  : String
       , setr  : String
-    }
+  }
   , nested2 : {
-        nested: String
+    nested: String
       , yup   : {
-            nested  : Boolean
+        nested  : Boolean
           , yup     : String
           , age     : Number
-        }
-    }
+      }
+  }
   , em: [em]
 });
 TestDocument.prototype.$__setSchema(schema);
 
-schema.virtual('nested.agePlus2').get(function () {
+schema.virtual('nested.agePlus2').get(function() {
   return this.nested.age + 2;
 });
-schema.virtual('nested.setAge').set(function (v) {
+schema.virtual('nested.setAge').set(function(v) {
   this.nested.age = v;
 });
-schema.path('nested.path').get(function (v) {
+schema.path('nested.path').get(function(v) {
   return this.nested.age + (v ? v : '');
 });
-schema.path('nested.setr').set(function (v) {
+schema.path('nested.setr').set(function(v) {
   return v + ' setter';
 });
 
@@ -74,57 +74,57 @@ schema.path('nested.setr').set(function (v) {
  * executed.
  */
 
-TestDocument.prototype.hooksTest = function(fn){
+TestDocument.prototype.hooksTest = function(fn) {
   fn(null, arguments);
 };
 
-describe('document: hooks:', function () {
-  it('step order', function(done){
+describe('document: hooks:', function() {
+  it('step order', function(done) {
     var doc = new TestDocument()
       , steps = 0;
 
     // serial
-    doc.pre('hooksTest', function(next){
+    doc.pre('hooksTest', function(next) {
       steps++;
-      setTimeout(function(){
+      setTimeout(function() {
         // make sure next step hasn't executed yet
         assert.equal(1, steps);
         next();
       }, 50);
     });
 
-    doc.pre('hooksTest', function(next){
+    doc.pre('hooksTest', function(next) {
       steps++;
       next();
     });
 
     // parallel
-    doc.pre('hooksTest', true, function(next, done){
+    doc.pre('hooksTest', true, function(next, done) {
       steps++;
       assert.equal(3, steps);
-      setTimeout(function(){
+      setTimeout(function() {
         assert.equal(4, steps);
       }, 10);
-      setTimeout(function(){
+      setTimeout(function() {
         steps++;
         done();
       }, 110);
       next();
     });
 
-    doc.pre('hooksTest', true, function(next, done){
+    doc.pre('hooksTest', true, function(next, done) {
       steps++;
-      setTimeout(function(){
+      setTimeout(function() {
         assert.equal(4, steps);
       }, 10);
-      setTimeout(function(){
+      setTimeout(function() {
         steps++;
         done();
       }, 110);
       next();
     });
 
-    doc.hooksTest(function(err){
+    doc.hooksTest(function(err) {
       assert.ifError(err);
       assert.equal(6, steps);
       done();
@@ -132,95 +132,95 @@ describe('document: hooks:', function () {
 
   });
 
-  it('calling next twice does not break', function(done){
+  it('calling next twice does not break', function(done) {
     var doc = new TestDocument()
       , steps = 0;
 
-    doc.pre('hooksTest', function(next){
+    doc.pre('hooksTest', function(next) {
       steps++;
       next();
       next();
     });
 
-    doc.pre('hooksTest', function(next){
+    doc.pre('hooksTest', function(next) {
       steps++;
       next();
     });
 
-    doc.hooksTest(function(err){
+    doc.hooksTest(function(err) {
       assert.ifError(err);
       assert.equal(2, steps);
       done();
     });
   });
 
-  it('calling done twice does not break', function(done){
+  it('calling done twice does not break', function(done) {
     var doc = new TestDocument()
       , steps = 0;
 
-    doc.pre('hooksTest', true, function(next, done){
+    doc.pre('hooksTest', true, function(next, done) {
       steps++;
       next();
       done();
       done();
     });
 
-    doc.pre('hooksTest', true, function(next, done){
+    doc.pre('hooksTest', true, function(next, done) {
       steps++;
       next();
       done();
       done();
     });
 
-    doc.hooksTest(function(err){
+    doc.hooksTest(function(err) {
       assert.ifError(err);
       assert.equal(2, steps);
       done();
     });
   });
 
-  it('errors from a serial hook', function(done){
+  it('errors from a serial hook', function(done) {
     var doc = new TestDocument()
       , steps = 0;
 
-    doc.pre('hooksTest', function(next){
+    doc.pre('hooksTest', function(next) {
       steps++;
       next();
     });
 
-    doc.pre('hooksTest', function(next){
+    doc.pre('hooksTest', function(next) {
       steps++;
       next(new Error);
     });
 
-    doc.pre('hooksTest', function(){
+    doc.pre('hooksTest', function() {
       steps++;
     });
 
-    doc.hooksTest(function(err){
+    doc.hooksTest(function(err) {
       assert.ok(err instanceof Error);
       assert.equal(2, steps);
       done();
     });
   });
 
-  it('errors from last serial hook', function(done){
+  it('errors from last serial hook', function(done) {
     var doc = new TestDocument();
 
-    doc.pre('hooksTest', function(next){
+    doc.pre('hooksTest', function(next) {
       next(new Error);
     });
 
-    doc.hooksTest(function(err){
+    doc.hooksTest(function(err) {
       assert.ok(err instanceof Error);
       done();
     });
   });
 
-  it('mutating incoming args via middleware', function(done){
+  it('mutating incoming args via middleware', function(done) {
     var doc = new TestDocument();
 
-    doc.pre('set', function(next, path, val){
+    doc.pre('set', function(next, path, val) {
       next(path, 'altered-' + val);
     });
 
@@ -229,60 +229,60 @@ describe('document: hooks:', function () {
     done();
   });
 
-  it('test hooks system errors from a parallel hook', function(done){
+  it('test hooks system errors from a parallel hook', function(done) {
     var doc = new TestDocument()
       , steps = 0;
 
-    doc.pre('hooksTest', true, function(next, done){
+    doc.pre('hooksTest', true, function(next, done) {
       steps++;
       next();
       done();
     });
 
-    doc.pre('hooksTest', true, function(next, done){
+    doc.pre('hooksTest', true, function(next, done) {
       steps++;
       next();
       done();
     });
 
-    doc.pre('hooksTest', true, function(next, done){
+    doc.pre('hooksTest', true, function(next, done) {
       steps++;
       next();
       done(new Error);
     });
 
-    doc.hooksTest(function(err){
+    doc.hooksTest(function(err) {
       assert.ok(err instanceof Error);
       assert.equal(3, steps);
       done();
     });
   });
 
-  it('passing two arguments to a method subject to hooks and return value', function(done){
+  it('passing two arguments to a method subject to hooks and return value', function(done) {
     var doc = new TestDocument();
 
-    doc.pre('hooksTest', function (next) {
+    doc.pre('hooksTest', function(next) {
       next();
     });
 
-    doc.hooksTest(function (err, args) {
+    doc.hooksTest(function(err, args) {
       assert.equal(2, args.length);
       assert.equal(args[1], 'test');
       done();
     }, 'test');
   });
 
-  it('hooking set works with document arrays (gh-746)', function(done){
+  it('hooking set works with document arrays (gh-746)', function(done) {
     var db = start();
 
     var child = new Schema({ text: String });
 
-    child.pre('set', function (next, path, value, type) {
+    child.pre('set', function(next, path, value, type) {
       next(path, value, type);
     });
 
     var schema = new Schema({
-        name: String
+      name: String
       , e: [child]
     });
 
@@ -290,17 +290,17 @@ describe('document: hooks:', function () {
 
     var s = new S({ name: "test" });
     s.e = [{ text: 'hi' }];
-    s.save(function (err) {
+    s.save(function(err) {
       assert.ifError(err);
 
-      S.findById(s.id, function (err ,s) {
+      S.findById(s.id, function(err ,s) {
         assert.ifError(err);
 
         s.e = [{ text: 'bye' }];
-        s.save(function (err) {
+        s.save(function(err) {
           assert.ifError(err);
 
-          S.findById(s.id, function (err, s) {
+          S.findById(s.id, function(err, s) {
             db.close();
             assert.ifError(err);
             assert.equal('bye', s.e[0].text);
@@ -311,25 +311,25 @@ describe('document: hooks:', function () {
     });
   });
 
-  it('pre save hooks on sub-docs should not exec after validation errors', function(done){
+  it('pre save hooks on sub-docs should not exec after validation errors', function(done) {
     var db = start();
     var presave = false;
 
     var child = new Schema({ text: { type: String, required: true }});
 
-    child.pre('save', function (next) {
+    child.pre('save', function(next) {
       presave = true;
       next();
     });
 
     var schema = new Schema({
-        name: String
+      name: String
       , e: [child]
     });
 
     var S = db.model('docArrayWithHookedSave', schema);
     var s = new S({ name: 'hi', e: [{}] });
-    s.save(function (err) {
+    s.save(function(err) {
       db.close();
 
       try {
@@ -348,12 +348,12 @@ describe('document: hooks:', function () {
     var sub = Schema({ _id: Number });
     var called = { pre: 0, post: 0 };
 
-    sub.pre('remove', function (next) {
+    sub.pre('remove', function(next) {
       called.pre++;
       next();
     });
 
-    sub.post('remove', function (doc) {
+    sub.post('remove', function(doc) {
       called.post++;
       assert.ok(doc instanceof Document);
     });
@@ -362,7 +362,7 @@ describe('document: hooks:', function () {
     var M = db.model('post-remove-hooks-sub', par);
 
     var m = new M({ sub: [{ _id: 1 }, { _id: 2 }] });
-    m.save(function (err) {
+    m.save(function(err) {
       assert.ifError(err);
       assert.equal(0, called.pre);
       assert.equal(0, called.post);
@@ -371,26 +371,26 @@ describe('document: hooks:', function () {
         assert.ifError(err);
 
         doc.sub.id(1).remove();
-        doc.save(function (err) {
+        doc.save(function(err) {
           assert.ifError(err);
           assert.equal(1, called.pre);
           assert.equal(1, called.post);
 
           // does not get called when not removed
           doc.name = 'changed1';
-          doc.save(function (err) {
+          doc.save(function(err) {
             assert.ifError(err);
             assert.equal(1, called.pre);
             assert.equal(1, called.post);
 
             doc.sub.id(2).remove();
-            doc.remove(function (err) {
+            doc.remove(function(err) {
               assert.ifError(err);
               assert.equal(2, called.pre);
               assert.equal(2, called.post);
 
               // does not get called twice
-              doc.remove(function (err) {
+              doc.remove(function(err) {
                 assert.ifError(err);
                 assert.equal(2, called.pre);
                 assert.equal(2, called.post);
@@ -485,17 +485,17 @@ describe('document: hooks:', function () {
     });
   });
 
-  it("pre save hooks should run in parallel", function (done) {
+  it("pre save hooks should run in parallel", function(done) {
     // we set the time out to be double that of the validator - 1 (so that running in serial will be greater then that)
     this.timeout(1000);
     var db = start(),
-      count = 0;
+        count = 0;
 
-    var SchemaWithPreSaveHook = new Schema ({
+    var SchemaWithPreSaveHook = new Schema({
       preference: String
     });
-    SchemaWithPreSaveHook.pre('save', true, function hook (next, done) {
-      setTimeout(function () {
+    SchemaWithPreSaveHook.pre('save', true, function hook(next, done) {
+      setTimeout(function() {
         count++;
         next();
         if (count === 3) {
@@ -509,25 +509,25 @@ describe('document: hooks:', function () {
     var MWPSH = db.model('mwpsh', new Schema({subs: [SchemaWithPreSaveHook]}));
     var m = new MWPSH({
       subs: [
-        {
-          preference: "xx"
-        }
+          {
+            preference: "xx"
+          }
         ,
-        {
-          preference: "yy"
-        }
+          {
+            preference: "yy"
+          }
         ,
-        {
-          preference: "1"
-        }
+          {
+            preference: "1"
+          }
         ,
-        {
-          preference: "2"
-        }
+          {
+            preference: "2"
+          }
       ]
     });
 
-    m.save(function (err) {
+    m.save(function(err) {
       db.close();
 
       try {
@@ -678,7 +678,7 @@ describe('document: hooks:', function () {
     });
 
     parentSchema.pre('save', function(next) {
-      this.cumulativeCount = this.children.reduce(function (seed, child) {
+      this.cumulativeCount = this.children.reduce(function(seed, child) {
         return seed += child.count;
       }, 0);
       next();
@@ -688,7 +688,7 @@ describe('document: hooks:', function () {
         Parent = db.model('ParentWithChildren', parentSchema),
         doc = new Parent({ children: [{ count: 0, name: 'a' }, { count: 1, name: 'b' }] });
 
-    doc.save(function(err, doc){
+    doc.save(function(err, doc) {
       db.close();
 
       try {
@@ -773,13 +773,13 @@ describe('document: hooks:', function () {
 
     var data = {
       items: [
-        {
-          items: [
-            {
-              title: 'test'
-            }
-          ]
-        }
+          {
+            items: [
+                {
+                  title: 'test'
+                }
+            ]
+          }
       ]
     };
 

@@ -13,8 +13,8 @@ var start = require('./common')
  */
 
 var schemaB = Schema({
-    title: String,
-    type: String
+  title: String,
+  type: String
 }, {discriminatorKey: 'type'});
 
 var schemaC = Schema({
@@ -25,8 +25,8 @@ var schemaC = Schema({
 }, {discriminatorKey: 'type'});
 
 
-describe('model', function(){
-  describe('hydrate()', function(){
+describe('model', function() {
+  describe('hydrate()', function() {
     var db;
     var B;
     var Breakfast;
@@ -35,14 +35,14 @@ describe('model', function(){
       food: { type: String, enum: ['bacon', 'eggs'] }
     });
 
-    before(function(){
+    before(function() {
       db = start();
       B = db.model('model-create', schemaB, 'gh-2637-1');
       B.discriminator('C', schemaC);
       Breakfast = db.model('gh-2637-2', breakfastSchema, 'gh-2637-2');
     });
 
-    after(function(done){
+    after(function(done) {
       db.close(done);
     });
 

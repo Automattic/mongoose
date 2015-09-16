@@ -43,14 +43,14 @@ describe('Queries in ES6', function() {
           { eggs: 4, bacon: 2 },
           { eggs: 3, bacon: 3 },
           { eggs: 2, bacon: 4 });
-      } catch(e) {
+      } catch (e) {
         return done(e);
       }
 
       var result;
       try {
         result = yield Breakfast.findOne({ eggs: 4 }).exec();
-      } catch(e) {
+      } catch (e) {
         return done(e);
       }
 
@@ -59,7 +59,7 @@ describe('Queries in ES6', function() {
       var results;
       try {
         results = yield Breakfast.find({ eggs: { $gt: 2 } }).sort({ bacon: 1 }).exec();
-      } catch(e) {
+      } catch (e) {
         return done(e);
       }
 
@@ -70,7 +70,7 @@ describe('Queries in ES6', function() {
       var count;
       try {
         count = yield Breakfast.count({ eggs: { $gt: 2 } }).exec();
-      } catch(e) {
+      } catch (e) {
         return done(e);
       }
 
@@ -97,14 +97,14 @@ describe('Queries in ES6', function() {
       try {
         var hugo = yield Author.create({ name: 'Victor Hugo' });
         yield Book.create({ author: hugo._id, title: 'Les Miserables' });
-      } catch(e) {
+      } catch (e) {
         return done(e);
       }
 
       var result;
       try {
         result = yield Book.findOne({ title: 'Les Miserables' }).populate('author').exec();
-      } catch(e) {
+      } catch (e) {
         return done(e);
       }
 

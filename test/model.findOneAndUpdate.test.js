@@ -20,21 +20,21 @@ var start = require('./common')
 var Comments = new Schema();
 
 Comments.add({
-    title     : String
+  title     : String
   , date      : Date
   , body      : String
   , comments  : [Comments]
 });
 
 var BlogPost = new Schema({
-    title     : String
+  title     : String
   , author    : String
   , slug      : String
   , date      : Date
   , meta      : {
-        date      : Date
+    date      : Date
       , visitors  : Number
-    }
+  }
   , published : Boolean
   , mixed     : {}
   , numbers   : [Number]
@@ -43,20 +43,20 @@ var BlogPost = new Schema({
 });
 
 BlogPost.virtual('titleWithAuthor')
-  .get(function () {
+  .get(function() {
     return this.get('title') + ' by ' + this.get('author');
   })
-  .set(function (val) {
+  .set(function(val) {
     var split = val.split(' by ');
     this.set('title', split[0]);
     this.set('author', split[1]);
   });
 
-BlogPost.method('cool', function(){
+BlogPost.method('cool', function() {
   return this;
 });
 
-BlogPost.static('woot', function(){
+BlogPost.static('woot', function() {
   return this;
 });
 
@@ -71,8 +71,8 @@ mongoose.model('UpdateOneStrictSchema', strictSchema);
 var strictThrowSchema = new Schema({ name: String }, { strict: 'throw'});
 mongoose.model('UpdateOneStrictThrowSchema', strictThrowSchema);
 
-describe('model: findOneAndUpdate:', function(){
-  it('WWW returns the edited document', function(done){
+describe('model: findOneAndUpdate:', function() {
+  it('WWW returns the edited document', function(done) {
     var db = start()
       , M = db.model(modelname, collection)
       , title = 'Tobi ' + random()
@@ -92,9 +92,9 @@ describe('model: findOneAndUpdate:', function(){
     post.owners = [id0, id1];
     post.comments = [{ body: 'been there' }, { body: 'done that' }];
 
-    post.save(function (err) {
+    post.save(function(err) {
       assert.ifError(err);
-      M.findById(post._id, function (err, cf) {
+      M.findById(post._id, function(err, cf) {
         assert.ifError(err);
         assert.equal(title, cf.title);
         assert.equal(author, cf.author);
@@ -115,7 +115,7 @@ describe('model: findOneAndUpdate:', function(){
         assert.ok(cf.comments[1]._id instanceof DocumentObjectId);
 
         var update = {
-            title: newTitle // becomes $set
+          title: newTitle // becomes $set
           , $inc: { 'meta.visitors': 2 }
           , $set: { date: new Date }
           , published: false // becomes $set
@@ -125,7 +125,7 @@ describe('model: findOneAndUpdate:', function(){
           , 'comments.1.body': 8 // $set
         };
 
-        M.findOneAndUpdate({ title: title }, update, { 'new': true }, function (err, up) {
+        M.findOneAndUpdate({ title: title }, update, { 'new': true }, function(err, up) {
           db.close();
           assert.equal(err, null, err && err.stack);
 
@@ -158,7 +158,7 @@ describe('model: findOneAndUpdate:', function(){
       db = start();
       var itemSpec = new Schema({
         item_id: {
-          type: ObjectId, required: true, default: function() {return new DocumentObjectId();}
+          type: ObjectId, required: true, default: function() { return new DocumentObjectId();}
         },
         address: {
           street: String,
@@ -217,7 +217,7 @@ describe('model: findOneAndUpdate:', function(){
     });
   });
 
-  it('returns the original document', function(done){
+  it('returns the original document', function(done) {
     var db = start()
       , M = db.model(modelname, collection)
       , title = 'Tobi ' + random()
@@ -237,13 +237,13 @@ describe('model: findOneAndUpdate:', function(){
     post.owners = [id0, id1];
     post.comments = [{ body: 'been there' }, { body: 'done that' }];
 
-    post.save(function (err) {
+    post.save(function(err) {
       assert.ifError(err);
-      M.findById(post._id, function (err) {
+      M.findById(post._id, function(err) {
         assert.ifError(err);
 
         var update = {
-            title: newTitle // becomes $set
+          title: newTitle // becomes $set
           , $inc: { 'meta.visitors': 2 }
           , $set: { date: new Date }
           , published: false // becomes $set
@@ -253,7 +253,7 @@ describe('model: findOneAndUpdate:', function(){
           , 'comments.1.body': 8 // $set
         };
 
-        M.findOneAndUpdate({ title: title }, update, { new: false }, function (err, up) {
+        M.findOneAndUpdate({ title: title }, update, { new: false }, function(err, up) {
           db.close();
           assert.ifError(err);
 
@@ -279,7 +279,7 @@ describe('model: findOneAndUpdate:', function(){
     });
   });
 
-  it('allows upserting', function(done){
+  it('allows upserting', function(done) {
     var db = start()
       , M = db.model(modelname, collection)
       , title = 'Tobi ' + random()
@@ -300,7 +300,7 @@ describe('model: findOneAndUpdate:', function(){
     post.comments = [{ body: 'been there' }, { body: 'done that' }];
 
     var update = {
-        title: newTitle // becomes $set
+      title: newTitle // becomes $set
       , $inc: { 'meta.visitors': 2 }
       , $set: { date: new Date }
       , published: false // becomes $set
@@ -309,7 +309,7 @@ describe('model: findOneAndUpdate:', function(){
       , $pull: { 'owners': id0 }
     };
 
-    M.findOneAndUpdate({ title: title }, update, { upsert: true, new: true }, function (err, up) {
+    M.findOneAndUpdate({ title: title }, update, { upsert: true, new: true }, function(err, up) {
       db.close();
       assert.ifError(err);
 
@@ -327,7 +327,7 @@ describe('model: findOneAndUpdate:', function(){
     });
   });
 
-  it('options/conditions/doc are merged when no callback is passed', function(done){
+  it('options/conditions/doc are merged when no callback is passed', function(done) {
     var db = start()
       , M = db.model(modelname, collection);
 
@@ -381,7 +381,7 @@ describe('model: findOneAndUpdate:', function(){
     done();
   });
 
-  it('executes when a callback is passed', function(done){
+  it('executes when a callback is passed', function(done) {
     var db = start()
       , M = db.model(modelname, collection + random())
       , pending = 6;
@@ -393,7 +393,7 @@ describe('model: findOneAndUpdate:', function(){
     M.where().findOneAndUpdate({ $set: { name: 'Aaron6'}}, cb);
     M.where('name', 'aaron').findOneAndUpdate({ $set: { name: 'Aaron'}}).findOneAndUpdate(cb);
 
-    function cb (err, doc) {
+    function cb(err, doc) {
       assert.ifError(err);
       assert.strictEqual(null, doc); // not an upsert, no previously existing doc
       if (--pending) return;
@@ -402,7 +402,7 @@ describe('model: findOneAndUpdate:', function(){
     }
   });
 
-  it('executes when a callback is passed to a succeeding function', function(done){
+  it('executes when a callback is passed to a succeeding function', function(done) {
     var db = start()
       , M = db.model(modelname, collection + random())
       , pending = 6;
@@ -414,7 +414,7 @@ describe('model: findOneAndUpdate:', function(){
     M.where().findOneAndUpdate({ $set: { name: 'Aaron'}}).exec(cb);
     M.where('name', 'aaron').findOneAndUpdate({ $set: { name: 'Aaron'}}).exec(cb);
 
-    function cb (err, doc) {
+    function cb(err, doc) {
       assert.ifError(err);
       assert.strictEqual(null, doc); // not an upsert, no previously existing doc
       if (--pending) return;
@@ -423,13 +423,13 @@ describe('model: findOneAndUpdate:', function(){
     }
   });
 
-  it('executing with only a callback throws', function(done){
+  it('executing with only a callback throws', function(done) {
     var db = start()
       , M = db.model(modelname, collection)
       , err;
 
     try {
-      M.findOneAndUpdate(function(){});
+      M.findOneAndUpdate(function() {});
     } catch (e) {
       err = e;
     }
@@ -439,7 +439,7 @@ describe('model: findOneAndUpdate:', function(){
     done();
   });
 
-  it('updates numbers atomically', function(done){
+  it('updates numbers atomically', function(done) {
     var db = start()
       , BlogPost = db.model(modelname, collection)
       , totalDocs = 4;
@@ -447,19 +447,19 @@ describe('model: findOneAndUpdate:', function(){
     var post = new BlogPost();
     post.set('meta.visitors', 5);
 
-    post.save(function(err){
+    post.save(function(err) {
       assert.ifError(err);
 
       for (var i = 0; i < 4; ++i) {
         BlogPost
-        .findOneAndUpdate({ _id: post._id }, { $inc: { 'meta.visitors': 1 }}, function (err) {
+        .findOneAndUpdate({ _id: post._id }, { $inc: { 'meta.visitors': 1 }}, function(err) {
           assert.ifError(err);
           --totalDocs || complete();
         });
       }
 
-      function complete () {
-        BlogPost.findOne({ _id: post.get('_id') }, function (err, doc) {
+      function complete() {
+        BlogPost.findOne({ _id: post.get('_id') }, function(err, doc) {
           db.close();
           assert.ifError(err);
           assert.equal(9, doc.get('meta.visitors'));
@@ -469,27 +469,27 @@ describe('model: findOneAndUpdate:', function(){
     });
   });
 
-  it('honors strict schemas', function(done){
+  it('honors strict schemas', function(done) {
     var db = start();
     var S = db.model('UpdateOneStrictSchema');
     var s = new S({ name: 'orange crush' });
 
-    s.save(function (err) {
+    s.save(function(err) {
       assert.ifError(err);
       var name = Date.now();
-      S.findOneAndUpdate({ name: name }, { ignore: true }, { upsert: true, 'new': true }, function (err, doc) {
+      S.findOneAndUpdate({ name: name }, { ignore: true }, { upsert: true, 'new': true }, function(err, doc) {
         assert.ifError(err);
         assert.ok(doc);
         assert.ok(doc._id);
         assert.equal(undefined, doc.ignore);
         assert.equal(undefined, doc._doc.ignore);
         assert.equal(name, doc.name);
-        S.findOneAndUpdate({ name: 'orange crush' }, { ignore: true }, { upsert: true }, function (err, doc) {
+        S.findOneAndUpdate({ name: 'orange crush' }, { ignore: true }, { upsert: true }, function(err, doc) {
           assert.ifError(err);
           assert.ok(!doc.ignore);
           assert.ok(!doc._doc.ignore);
           assert.equal('orange crush', doc.name);
-          S.findOneAndUpdate({ name: 'orange crush' }, { ignore: true }, function (err, doc) {
+          S.findOneAndUpdate({ name: 'orange crush' }, { ignore: true }, function(err, doc) {
             db.close();
             assert.ifError(err);
             assert.ok(!doc.ignore);
@@ -502,21 +502,21 @@ describe('model: findOneAndUpdate:', function(){
     });
   });
 
-  it('returns errors with strict:throw schemas', function(done){
+  it('returns errors with strict:throw schemas', function(done) {
     var db = start();
     var S = db.model('UpdateOneStrictThrowSchema');
     var s = new S({ name: 'orange crush' });
 
-    s.save(function (err) {
+    s.save(function(err) {
       assert.ifError(err);
 
       var name = Date.now();
-      S.findOneAndUpdate({ name: name }, { ignore: true }, { upsert: true }, function (err, doc) {
+      S.findOneAndUpdate({ name: name }, { ignore: true }, { upsert: true }, function(err, doc) {
         assert.ok(err);
         assert.ok(/not in schema/.test(err));
         assert.ok(!doc);
 
-        S.findOneAndUpdate({ _id: s._id }, { ignore: true }, function (err, doc) {
+        S.findOneAndUpdate({ _id: s._id }, { ignore: true }, function(err, doc) {
           db.close();
           assert.ok(err);
           assert.ok(/not in schema/.test(err));
@@ -528,14 +528,14 @@ describe('model: findOneAndUpdate:', function(){
   });
 });
 
-describe('model: findByIdAndUpdate:', function(){
-  it('executing with just a callback throws', function(done){
+describe('model: findByIdAndUpdate:', function() {
+  it('executing with just a callback throws', function(done) {
     var db = start()
       , M = db.model(modelname, collection)
       , err;
 
     try {
-      M.findByIdAndUpdate(function(){});
+      M.findByIdAndUpdate(function() {});
     } catch (e) {
       err = e;
     }
@@ -545,7 +545,7 @@ describe('model: findByIdAndUpdate:', function(){
     done();
   });
 
-  it('executes when a callback is passed', function(done){
+  it('executes when a callback is passed', function(done) {
     var db = start()
       , M = db.model(modelname, collection + random())
       , _id = new DocumentObjectId
@@ -554,7 +554,7 @@ describe('model: findByIdAndUpdate:', function(){
     M.findByIdAndUpdate(_id, { $set: { name: 'Aaron'}}, { new: false }, cb);
     M.findByIdAndUpdate(_id, { $set: { name: 'changed' }}, cb);
 
-    function cb (err, doc) {
+    function cb(err, doc) {
       assert.ifError(err);
       assert.strictEqual(null, doc); // no previously existing doc
       if (--pending) return;
@@ -562,7 +562,7 @@ describe('model: findByIdAndUpdate:', function(){
     }
   });
 
-  it('executes when a callback is passed to a succeeding function', function(done){
+  it('executes when a callback is passed to a succeeding function', function(done) {
     var db = start()
       , M = db.model(modelname, collection + random())
       , _id = new DocumentObjectId
@@ -571,7 +571,7 @@ describe('model: findByIdAndUpdate:', function(){
     M.findByIdAndUpdate(_id, { $set: { name: 'Aaron'}}, { new: false }).exec(cb);
     M.findByIdAndUpdate(_id, { $set: { name: 'changed' }}).exec(cb);
 
-    function cb (err, doc) {
+    function cb(err, doc) {
       assert.ifError(err);
       assert.strictEqual(null, doc); // no previously existing doc
       if (--pending) return;
@@ -579,7 +579,7 @@ describe('model: findByIdAndUpdate:', function(){
     }
   });
 
-  it('returns the original document', function(done){
+  it('returns the original document', function(done) {
     var db = start()
       , M = db.model(modelname, collection)
       , title = 'Tobi ' + random()
@@ -599,13 +599,13 @@ describe('model: findByIdAndUpdate:', function(){
     post.owners = [id0, id1];
     post.comments = [{ body: 'been there' }, { body: 'done that' }];
 
-    post.save(function (err) {
+    post.save(function(err) {
       assert.ifError(err);
-      M.findById(post._id, function (err) {
+      M.findById(post._id, function(err) {
         assert.ifError(err);
 
         var update = {
-            title: newTitle // becomes $set
+          title: newTitle // becomes $set
           , $inc: { 'meta.visitors': 2 }
           , $set: { date: new Date }
           , published: false // becomes $set
@@ -615,7 +615,7 @@ describe('model: findByIdAndUpdate:', function(){
           , 'comments.1.body': 8 // $set
         };
 
-        M.findByIdAndUpdate(post.id, update, { new: false }, function (err, up) {
+        M.findByIdAndUpdate(post.id, update, { new: false }, function(err, up) {
           assert.ifError(err);
 
           assert.equal(up.title,post.title);
@@ -640,7 +640,7 @@ describe('model: findByIdAndUpdate:', function(){
     });
   });
 
-  it('options/conditions/doc are merged when no callback is passed', function(done){
+  it('options/conditions/doc are merged when no callback is passed', function(done) {
     var db = start()
       , M = db.model(modelname, collection)
       , _id = new DocumentObjectId;
@@ -671,7 +671,7 @@ describe('model: findByIdAndUpdate:', function(){
     db.close(done);
   });
 
-  it('supports v3 select string syntax', function(done){
+  it('supports v3 select string syntax', function(done) {
     var db = start()
       , M = db.model(modelname, collection)
       , _id = new DocumentObjectId;
@@ -689,7 +689,7 @@ describe('model: findByIdAndUpdate:', function(){
     db.close(done);
   });
 
-  it('supports v3 select object syntax', function(done){
+  it('supports v3 select object syntax', function(done) {
     var db = start()
       , M = db.model(modelname, collection)
       , _id = new DocumentObjectId;
@@ -707,7 +707,7 @@ describe('model: findByIdAndUpdate:', function(){
     db.close(done);
   });
 
-  it('supports v3 sort string syntax', function(done){
+  it('supports v3 sort string syntax', function(done) {
     var db = start()
       , M = db.model(modelname, collection);
 
@@ -730,7 +730,7 @@ describe('model: findByIdAndUpdate:', function(){
         { title: 1, meta: {visitors: 0}}
       , { title: 2, meta: {visitors: 10}}
       , { title: 3, meta: {visitors: 5}}
-      , function (err) {
+      , function(err) {
       if (err) return done(err);
 
       M.findOneAndUpdate({}, { title: 'changed' })
@@ -743,7 +743,7 @@ describe('model: findByIdAndUpdate:', function(){
     });
   });
 
-  it('supports v3 sort object syntax', function(done){
+  it('supports v3 sort object syntax', function(done) {
     var db = start()
       , M = db.model(modelname, collection)
       , _id = new DocumentObjectId;
@@ -764,11 +764,11 @@ describe('model: findByIdAndUpdate:', function(){
     db.close(done);
   });
 
-  it('supports $elemMatch with $in (gh-1091 gh-1100)', function(done){
+  it('supports $elemMatch with $in (gh-1091 gh-1100)', function(done) {
     var db = start();
 
     var postSchema = new Schema({
-        ids: [{type: Schema.ObjectId}]
+      ids: [{type: Schema.ObjectId}]
       , title: String
     });
 
@@ -776,13 +776,13 @@ describe('model: findByIdAndUpdate:', function(){
     var _id1 = new mongoose.Types.ObjectId;
     var _id2 = new mongoose.Types.ObjectId;
 
-    B.create({ ids: [_id1, _id2] }, function (err, doc) {
+    B.create({ ids: [_id1, _id2] }, function(err, doc) {
       assert.ifError(err);
 
       B
       .findByIdAndUpdate(doc._id, { title: 'woot' }, { 'new': true })
       .select({ title: 1, ids: { $elemMatch: { $in: [_id2.toString()] }}})
-      .exec(function (err, found) {
+      .exec(function(err, found) {
         assert.ifError(err);
         assert.ok(found);
         assert.equal(found.id, doc.id);
@@ -794,19 +794,19 @@ describe('model: findByIdAndUpdate:', function(){
     });
   });
 
-  it('supports population (gh-1395)', function(done){
+  it('supports population (gh-1395)', function(done) {
     var db = start();
     var M = db.model('A', { name: String });
     var N = db.model('B', { a: { type: Schema.ObjectId, ref: 'A' }, i: Number});
 
-    M.create({ name: 'i am an A' }, function (err, a) {
+    M.create({ name: 'i am an A' }, function(err, a) {
       if (err) return done(err);
-      N.create({ a: a._id, i: 10 }, function (err, b) {
+      N.create({ a: a._id, i: 10 }, function(err, b) {
         if (err) return done(err);
 
         N.findOneAndUpdate({ _id: b._id }, { $inc: { i: 1 }})
         .populate('a')
-        .exec(function (err, doc) {
+        .exec(function(err, doc) {
           if (err) return done(err);
           assert.ok(doc);
           assert.ok(doc.a);
@@ -816,15 +816,15 @@ describe('model: findByIdAndUpdate:', function(){
       });
     });
   });
-  it('returns null when doing an upsert & new=false gh-1533', function (done) {
+  it('returns null when doing an upsert & new=false gh-1533', function(done) {
     var db = start();
 
     var thingSchema = new Schema({
-        _id: String,
-        flag: {
-            type: Boolean,
-            "default": false
-        }
+      _id: String,
+      flag: {
+        type: Boolean,
+        "default": false
+      }
     });
 
     var Thing = db.model('Thing', thingSchema);
@@ -833,16 +833,16 @@ describe('model: findByIdAndUpdate:', function(){
     Thing.findOneAndUpdate({_id: key}, {$set: {flag: false}}, {upsert: true, "new": false}).exec(function(err, thing) {
         assert.ifError(err);
         assert.equal(null, thing);
-        Thing.findOneAndUpdate({_id: key}, {$set: {flag: false}}, {upsert: true, "new": false}).exec(function (err, thing2) {
+        Thing.findOneAndUpdate({_id: key}, {$set: {flag: false}}, {upsert: true, "new": false}).exec(function(err, thing2) {
           assert.ifError(err);
           assert.equal(key, thing2.id);
           assert.equal(false, thing2.flag);
           db.close(done);
         });
-    });
+      });
   });
 
-  it('allows properties to be set to null gh-1643', function (done) {
+  it('allows properties to be set to null gh-1643', function(done) {
     var db = start();
 
     var thingSchema = new Schema({
@@ -851,15 +851,15 @@ describe('model: findByIdAndUpdate:', function(){
 
     var Thing = db.model('Thing', thingSchema);
 
-    Thing.create({name:["Test"]}, function (err, thing) {
+    Thing.create({name:["Test"]}, function(err, thing) {
       if (err) return done(err);
       Thing.findOneAndUpdate({ _id: thing._id }, {name:null}, { 'new': true })
-        .exec(function (err, doc) {
+        .exec(function(err, doc) {
           if (err) return done(err);
           assert.ok(doc);
           assert.equal(doc.name, null);
           db.close(done);
-      });
+        });
     });
   });
 
@@ -1387,7 +1387,7 @@ describe('model: findByIdAndUpdate:', function(){
               done();
             });
         });
-    });
+      });
 
     it('should work with array documents (gh-3034)', function(done) {
       var db = start();
@@ -1396,7 +1396,7 @@ describe('model: findByIdAndUpdate:', function(){
         id: String,
         name: String,
         a: [{
-            foo: String
+          foo: String
         }],
         _createdAt: {
           type: Number,

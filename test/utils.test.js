@@ -22,30 +22,30 @@ var ActiveRoster = StateMachine.ctor('require', 'init', 'modify');
  * Test.
  */
 
-describe('utils', function(){
-  describe('ActiveRoster', function(){
-    it('should detect a path as required if it has been required', function (done) {
+describe('utils', function() {
+  describe('ActiveRoster', function() {
+    it('should detect a path as required if it has been required', function(done) {
       var ar = new ActiveRoster();
       ar.require('hello');
       assert.equal(ar.paths['hello'],'require');
       done();
     });
 
-    it('should detect a path as inited if it has been inited', function (done) {
+    it('should detect a path as inited if it has been inited', function(done) {
       var ar = new ActiveRoster();
       ar.init('hello');
       assert.equal(ar.paths['hello'],'init');
       done();
     });
 
-    it('should detect a path as modified', function (done) {
+    it('should detect a path as modified', function(done) {
       var ar = new ActiveRoster();
       ar.modify('hello');
       assert.equal(ar.paths['hello'],'modify');
       done();
     });
 
-    it('should remove a path from an old state upon a state change', function (done) {
+    it('should remove a path from an old state upon a state change', function(done) {
       var ar = new ActiveRoster();
       ar.init('hello');
       ar.modify('hello');
@@ -54,43 +54,43 @@ describe('utils', function(){
       done();
     });
 
-    it('forEach should be able to iterate through the paths belonging to one state', function (done) {
+    it('forEach should be able to iterate through the paths belonging to one state', function(done) {
       var ar = new ActiveRoster();
       ar.init('hello');
       ar.init('goodbye');
       ar.modify('world');
       ar.require('foo');
-      ar.forEach('init', function (path) {
+      ar.forEach('init', function(path) {
         assert.ok(~['hello', 'goodbye'].indexOf(path));
       });
       done();
     });
 
-    it('forEach should be able to iterate through the paths in the union of two or more states', function (done) {
+    it('forEach should be able to iterate through the paths in the union of two or more states', function(done) {
       var ar = new ActiveRoster();
       ar.init('hello');
       ar.init('goodbye');
       ar.modify('world');
       ar.require('foo');
-      ar.forEach('modify', 'require', function (path) {
+      ar.forEach('modify', 'require', function(path) {
         assert.ok(~['world', 'foo'].indexOf(path));
       });
       done();
     });
 
-    it('forEach should iterate through all paths that have any state if given no state arguments', function (done) {
+    it('forEach should iterate through all paths that have any state if given no state arguments', function(done) {
       var ar = new ActiveRoster();
       ar.init('hello');
       ar.init('goodbye');
       ar.modify('world');
       ar.require('foo');
-      ar.forEach(function (path) {
+      ar.forEach(function(path) {
         assert.ok(~['hello', 'goodbye','world', 'foo'].indexOf(path));
       });
       done();
     });
 
-    it('should be able to detect if at least one path exists in a set of states', function (done) {
+    it('should be able to detect if at least one path exists in a set of states', function(done) {
       var ar = new ActiveRoster();
       ar.init('hello');
       ar.modify('world');
@@ -103,24 +103,24 @@ describe('utils', function(){
       done();
     });
 
-    it('should be able to `map` over the set of paths in a given state', function (done) {
+    it('should be able to `map` over the set of paths in a given state', function(done) {
       var ar = new ActiveRoster();
       ar.init('hello');
       ar.modify('world');
       ar.require('iAmTheWalrus');
-      var suffixedPaths = ar.map('init', 'modify', function (path) {
+      var suffixedPaths = ar.map('init', 'modify', function(path) {
         return path + '-suffix';
       });
       assert.deepEqual(suffixedPaths,['hello-suffix', 'world-suffix']);
       done();
     });
 
-    it("should `map` over all states' paths if no states are specified in a `map` invocation", function (done) {
+    it("should `map` over all states' paths if no states are specified in a `map` invocation", function(done) {
       var ar = new ActiveRoster();
       ar.init('hello');
       ar.modify('world');
       ar.require('iAmTheWalrus');
-      var suffixedPaths = ar.map(function (path) {
+      var suffixedPaths = ar.map(function(path) {
         return path + '-suffix';
       });
       assert.deepEqual(suffixedPaths,['iAmTheWalrus-suffix', 'hello-suffix', 'world-suffix']);
@@ -129,7 +129,7 @@ describe('utils', function(){
 
   });
 
-  it('utils.options', function (done) {
+  it('utils.options', function(done) {
     var o = { a: 1, b: 2, c: 3, 0: 'zero1' };
     var defaults = { b: 10, d: 20, 0: 'zero2' };
     var result = utils.options(defaults, o);
@@ -153,7 +153,7 @@ describe('utils', function(){
     done();
   });
 
-  it('deepEquals on ObjectIds', function (done) {
+  it('deepEquals on ObjectIds', function(done) {
     var s = (new ObjectId).toString();
 
     var a = new ObjectId(s)
@@ -165,18 +165,18 @@ describe('utils', function(){
     done();
   });
 
-  it('deepEquals on MongooseDocumentArray works', function (done) {
+  it('deepEquals on MongooseDocumentArray works', function(done) {
     var db = start()
       , A = new Schema({ a: String })
       , M = db.model('deepEqualsOnMongooseDocArray', new Schema({
-            a1: [A]
+        a1: [A]
           , a2: [A]
-        }));
+      }));
 
     db.close();
 
     var m1 = new M({
-        a1: [{a: 'Hi'}, {a: 'Bye'}]
+      a1: [{a: 'Hi'}, {a: 'Bye'}]
     });
 
     m1.a2 = m1.a1;
@@ -193,7 +193,7 @@ describe('utils', function(){
   });
 
   // gh-688
-  it('deepEquals with MongooseBuffer', function (done) {
+  it('deepEquals with MongooseBuffer', function(done) {
     var str = "this is the day";
     var a = new MongooseBuffer(str);
     var b = new MongooseBuffer(str);
@@ -210,8 +210,8 @@ describe('utils', function(){
     done();
   });
 
-  describe('clone', function(){
-    it('retains RegExp options gh-1355', function(done){
+  describe('clone', function() {
+    it('retains RegExp options gh-1355', function(done) {
       var a = new RegExp('hello', 'igm');
       assert.ok(a.global);
       assert.ok(a.ignoreCase);
@@ -225,7 +225,7 @@ describe('utils', function(){
       done();
     });
 
-    it('clones objects created with Object.create(null)', function(done){
+    it('clones objects created with Object.create(null)', function(done) {
       var o = Object.create(null);
       o.a = 0;
       o.b = '0';
@@ -243,7 +243,7 @@ describe('utils', function(){
     });
   });
 
-  it('array.flatten', function(done){
+  it('array.flatten', function(done) {
     var orig = [0,[1,2,[3,4,[5,[6]],7],8],9];
     assert.deepEqual([0,1,2,3,4,5,6,7,8,9], utils.array.flatten(orig));
     done();
@@ -267,8 +267,8 @@ describe('utils', function(){
     done();
   });
 
-  describe('merge', function(){
-    it('merges two objects together without overriding properties & methods', function(done){
+  describe('merge', function() {
+    it('merges two objects together without overriding properties & methods', function(done) {
       function To() {
         this.name = 'to';
         this.toProperty = true;
@@ -299,7 +299,7 @@ describe('utils', function(){
     });
   });
 
-  describe('pluralize', function(){
+  describe('pluralize', function() {
     var db;
 
     beforeEach(function() {
@@ -310,9 +310,9 @@ describe('utils', function(){
       db.close(done);
     });
 
-    it('should not pluralize _temp_ (gh-1703)', function(done){
-      var ASchema = new Schema ({
-          value: { type: Schema.Types.Mixed }
+    it('should not pluralize _temp_ (gh-1703)', function(done) {
+      var ASchema = new Schema({
+        value: { type: Schema.Types.Mixed }
       });
 
       var collectionName = '_temp_';
@@ -320,10 +320,10 @@ describe('utils', function(){
       assert.equal(A.collection.name, collectionName);
       done();
     });
-    it('should pluralize _temp (gh-1703)', function(done){
+    it('should pluralize _temp (gh-1703)', function(done) {
 
-      var ASchema = new Schema ({
-          value: { type: Schema.Types.Mixed }
+      var ASchema = new Schema({
+        value: { type: Schema.Types.Mixed }
       });
 
       var collectionName = '_temp';
@@ -331,58 +331,58 @@ describe('utils', function(){
       assert.equal(A.collection.name, collectionName + 's');
       done();
     });
-    describe('option (gh-1707)', function(){
-      it('should pluralize by default', function(done){
-        var ASchema = new Schema ({value: String});
+    describe('option (gh-1707)', function() {
+      it('should pluralize by default', function(done) {
+        var ASchema = new Schema({value: String});
 
         var collectionName = 'singular';
         var A = db.model(collectionName, ASchema);
         assert.equal(A.collection.name, collectionName + 's');
         done();
       });
-      it('should pluralize when global option set to true', function(done){
+      it('should pluralize when global option set to true', function(done) {
         db.base.set('pluralization', true);
 
-        var ASchema = new Schema ({value: String});
+        var ASchema = new Schema({value: String});
 
         var collectionName = 'singular';
         var A = db.model(collectionName, ASchema);
         assert.equal(A.collection.name, collectionName + 's');
         done();
       });
-      it('should not pluralize when global option set to false', function(done){
+      it('should not pluralize when global option set to false', function(done) {
         db.base.set('pluralization', false);
 
-        var ASchema = new Schema ({value: String});
+        var ASchema = new Schema({value: String});
 
         var collectionName = 'singular';
         var A = db.model(collectionName, ASchema);
         assert.equal(A.collection.name, collectionName);
         done();
       });
-      it('should pluralize when local option set to true', function(done){
+      it('should pluralize when local option set to true', function(done) {
         db.base.set('pluralization', false);
 
         // override
-        var ASchema = new Schema ({value: String}, {pluralization: true});
+        var ASchema = new Schema({value: String}, {pluralization: true});
 
         var collectionName = 'singular';
         var A = db.model(collectionName, ASchema);
         assert.equal(A.collection.name, collectionName + 's');
         done();
       });
-      it('should not pluralize when local option set to false and global is true', function(done){
+      it('should not pluralize when local option set to false and global is true', function(done) {
         db.base.set('pluralization', true);
 
-        var ASchema = new Schema ({value: String}, {pluralization: false});
+        var ASchema = new Schema({value: String}, {pluralization: false});
 
         var collectionName = 'singular';
         var A = db.model(collectionName, ASchema);
         assert.equal(A.collection.name, collectionName);
         done();
       });
-      it('should not pluralize when local option set to false and global not set', function(done){
-        var ASchema = new Schema ({value: String}, {pluralization: false});
+      it('should not pluralize when local option set to false and global not set', function(done) {
+        var ASchema = new Schema({value: String}, {pluralization: false});
 
         var collectionName = 'singular';
         var A = db.model(collectionName, ASchema);

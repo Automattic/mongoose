@@ -20,28 +20,28 @@ var ObjectId = Schema.Types.ObjectId;
  */
 
 
-mongoose.connect('mongodb://localhost/mongoose-bench', function (err) {
+mongoose.connect('mongodb://localhost/mongoose-bench', function(err) {
   if (err) throw err;
-  mongo.connect('mongodb://localhost/mongoose-bench', function (err, db) {
+  mongo.connect('mongodb://localhost/mongoose-bench', function(err, db) {
     if (err) throw err;
 
     var Comments = new Schema;
     Comments.add({
-        title     : String
+      title     : String
       , date      : Date
       , body      : String
       , comments  : [Comments]
     });
 
     var BlogPost = new Schema({
-        title     : String
+      title     : String
       , author    : String
       , slug      : String
       , date      : Date
       , meta      : {
-            date      : Date
+        date      : Date
           , visitors  : Number
-        }
+      }
       , published : Boolean
       , mixed     : {}
       , numbers   : [Number]
@@ -70,7 +70,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function (err) {
       body : 'this be some crazzzyyyyy text that would go in a comment',
       comments : [{ title : 'second level', date : new Date(), body : 'texttt'}]
     };
-    for (var i=0; i < 5; i++) {
+    for (var i = 0; i < 5; i++) {
       blogData.comments.push(commentData);
     }
     var data = {
@@ -93,7 +93,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function (err) {
     var blogpost = db.collection('blogpost');
 
     function closeDB() {
-      mongoose.connection.db.dropDatabase(function () {
+      mongoose.connection.db.dropDatabase(function() {
         mongoose.disconnect();
         process.exit();
       });
@@ -101,51 +101,51 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function (err) {
 
     suite.add('Insert - Mongoose - Basic', {
       defer : true,
-      fn : function (deferred) {
+      fn : function(deferred) {
         var nData = utils.clone(data);
-        User.create(nData, function (err) {
+        User.create(nData, function(err) {
           if (err) throw err;
           deferred.resolve();
         });
       }
     }).add('Insert - Driver - Basic', {
       defer : true,
-      fn : function (deferred) {
+      fn : function(deferred) {
         var nData = utils.clone(data);
-        user.insert(nData, function (err) {
+        user.insert(nData, function(err) {
           if (err) throw err;
           deferred.resolve();
         });
       }
     }).add('Insert - Mongoose - Embedded Docs', {
       defer : true,
-      fn : function (deferred) {
+      fn : function(deferred) {
         var bp = utils.clone(blogData);
-        BlogPost.create(bp, function (err) {
+        BlogPost.create(bp, function(err) {
           if (err) throw err;
           deferred.resolve();
         });
       }
     }).add('Insert - Driver - Embedded Docs', {
       defer : true,
-      fn : function (deferred) {
+      fn : function(deferred) {
 
         var bp = utils.clone(blogData);
-        blogpost.insert(bp, function (err) {
+        blogpost.insert(bp, function(err) {
           if (err) throw err;
           deferred.resolve();
         });
       }
     })
-    .on('cycle', function (evt) {
+    .on('cycle', function(evt) {
       if (process.env.MONGOOSE_DEV || process.env.PULL_REQUEST) {
         console.log(String(evt.target));
       }
-    }).on('complete', function () {
+    }).on('complete', function() {
       closeDB();
       if (!process.env.MONGOOSE_DEV && !process.env.PULL_REQUEST) {
         var outObj = {};
-        this.forEach(function (item) {
+        this.forEach(function(item) {
           var out = {};
           out.stats = item.stats;
           delete out.stats.sample;

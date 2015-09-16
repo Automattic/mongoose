@@ -17,7 +17,7 @@ mongoose.connect('mongodb://localhost/persons', function(err) {
     name : 'bill',
     age : 25,
     birthday : new Date().setFullYear((new Date().getFullYear() - 25))
-  }, function (err, bill) {
+  }, function(err, bill) {
     if (err) throw err;
     console.log("People added to db: %s", bill.toString());
 

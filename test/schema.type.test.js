@@ -7,8 +7,8 @@ var mongoose = require('./common').mongoose
   , assert = require('assert')
   , Schema = mongoose.Schema;
 
-describe('schematype', function(){
-  it('honors the selected option', function(done){
+describe('schematype', function() {
+  it('honors the selected option', function(done) {
     var s = new Schema({ thought: { type: String, select: false }});
     assert.equal(false, s.path('thought').selected);
 
@@ -17,7 +17,7 @@ describe('schematype', function(){
     done();
   });
 
-  it('properly handles specifying index in combination with unique or sparse', function(done){
+  it('properly handles specifying index in combination with unique or sparse', function(done) {
     var s = new Schema({ name: { type: String, index: true, unique: true }});
     assert.deepEqual(s.path('name')._index, { unique: true });
     s = new Schema({ name: { type: String, unique: true, index: true }});

@@ -353,7 +353,7 @@ describe('aggregate: ', function() {
         aggregate
           .model(db.model('Employee'))
           .group({ _id: "$dept" })
-          .exec(function (err, docs) {
+          .exec(function(err, docs) {
             var depts;
 
             assert.ifError(err);
@@ -363,7 +363,7 @@ describe('aggregate: ', function() {
             assert.notEqual(depts.indexOf("sales"), -1);
             assert.notEqual(depts.indexOf("r&d"), -1);
 
-            clearData(db, function () { done(); });
+            clearData(db, function() { done(); });
           });
       });
     });
@@ -371,15 +371,15 @@ describe('aggregate: ', function() {
     it('skip', function(done) {
       var aggregate = new Aggregate();
 
-      setupData(function (db) {
+      setupData(function(db) {
         aggregate
           .model(db.model('Employee'))
           .skip(1)
-          .exec(function (err, docs) {
+          .exec(function(err, docs) {
             assert.ifError(err);
             assert.equal(docs.length, 3);
 
-            clearData(db, function () { done(); });
+            clearData(db, function() { done(); });
           });
       });
     });
@@ -387,15 +387,15 @@ describe('aggregate: ', function() {
     it('limit', function(done) {
       var aggregate = new Aggregate();
 
-      setupData(function (db) {
+      setupData(function(db) {
         aggregate
           .model(db.model('Employee'))
           .limit(3)
-          .exec(function (err, docs) {
+          .exec(function(err, docs) {
             assert.ifError(err);
             assert.equal(docs.length, 3);
 
-            clearData(db, function () { done(); });
+            clearData(db, function() { done(); });
           });
       });
     });
@@ -403,11 +403,11 @@ describe('aggregate: ', function() {
     it('unwind', function(done) {
       var aggregate = new Aggregate();
 
-      setupData(function (db) {
+      setupData(function(db) {
         aggregate
           .model(db.model('Employee'))
           .unwind('customers')
-          .exec(function (err, docs) {
+          .exec(function(err, docs) {
             assert.ifError(err);
             assert.equal(docs.length, 5);
 
@@ -423,7 +423,7 @@ describe('aggregate: ', function() {
         aggregate
           .model(db.model('Employee'))
           .match({ sal: { $gt: 15000 } })
-          .exec(function (err, docs) {
+          .exec(function(err, docs) {
             assert.ifError(err);
             assert.equal(docs.length, 1);
 
@@ -435,11 +435,11 @@ describe('aggregate: ', function() {
     it('sort', function(done) {
       var aggregate = new Aggregate();
 
-      setupData(function (db) {
+      setupData(function(db) {
         aggregate
           .model(db.model('Employee'))
           .sort("sal")
-          .exec(function (err, docs) {
+          .exec(function(err, docs) {
             assert.ifError(err);
             assert.equal(docs[0].sal, 14000);
 
@@ -459,7 +459,7 @@ describe('aggregate: ', function() {
           .project({ emp: "$name", cust: "$customers" })
           .sort('-cust')
           .skip(2)
-          .exec(function (err, docs) {
+          .exec(function(err, docs) {
             assert.ifError(err);
             assert.equal(docs.length, 1);
             assert.equal(docs[0].cust, 'Gary');
@@ -472,7 +472,7 @@ describe('aggregate: ', function() {
 
     it('explain()', function(done) {
       var aggregate = new Aggregate();
-      start.mongodVersion(function (err, version) {
+      start.mongodVersion(function(err, version) {
         if (err) {
           return done(err);
         }
@@ -504,7 +504,7 @@ describe('aggregate: ', function() {
           agg.model(db.model('Employee'));
           var promise = agg.exec();
           assert.ok(promise instanceof mongoose.Promise);
-          promise.onResolve(function(err){
+          promise.onResolve(function(err) {
             assert.ok(err);
             assert.equal(err.message, "Aggregate has empty pipeline");
             done();
@@ -543,8 +543,8 @@ describe('aggregate: ', function() {
     });
 
     it('handles aggregation options', function(done) {
-      setupData(function (db) {
-        start.mongodVersion(function (err, version) {
+      setupData(function(db) {
+        start.mongodVersion(function(err, version) {
           if (err) throw err;
           var mongo26_or_greater = 2 < version[0] || (2 == version[0] && 6 <= version[1]);
 
@@ -562,7 +562,7 @@ describe('aggregate: ', function() {
           }
 
           aggregate
-            .exec(function (err, docs) {
+            .exec(function(err, docs) {
               assert.ifError(err);
               assert.equal(1, docs.length);
               assert.equal(docs[0].sal, 18000);

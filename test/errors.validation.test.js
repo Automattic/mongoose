@@ -10,7 +10,7 @@ var assert = require('assert')
   , SchemaType = mongoose.SchemaType
   , ValidatorError = SchemaType.ValidatorError;
 
-describe('ValidationError', function(){
+describe('ValidationError', function() {
   describe('#infiniteRecursion', function() {
     it('does not cause RangeError (gh-1834)', function(done) {
       var SubSchema
@@ -34,8 +34,8 @@ describe('ValidationError', function(){
         ]
       });
 
-      model.validate(function(err){
-        assert.doesNotThrow(function(){
+      model.validate(function(err) {
+        assert.doesNotThrow(function() {
           JSON.stringify(err);
         });
         done();
@@ -60,7 +60,7 @@ describe('ValidationError', function(){
       });
 
       //should fail validation
-      model.validate(function(err){
+      model.validate(function(err) {
         assert.notEqual(err, null, 'min Date validation failed.');
         model.appointmentDate = new Date(Date.now().valueOf() + 10000);
 
@@ -90,7 +90,7 @@ describe('ValidationError', function(){
       });
 
       //should fail validation
-      model.validate(function(err){
+      model.validate(function(err) {
         assert.notEqual(err, null, 'max Date validation failed');
         model.birthdate = Date.now();
 
@@ -120,7 +120,7 @@ describe('ValidationError', function(){
       });
 
       //should fail validation
-      model.validate(function(err){
+      model.validate(function(err) {
         assert.notEqual(err, null, 'String minlegth validation failed.');
         model.postalCode = '95125';
 
@@ -150,7 +150,7 @@ describe('ValidationError', function(){
       });
 
       //should fail validation
-      model.validate(function(err){
+      model.validate(function(err) {
         assert.notEqual(err, null, 'String maxlegth validation failed.');
         model.postalCode = '95125';
 
@@ -166,19 +166,19 @@ describe('ValidationError', function(){
   describe('#toString', function() {
     it('does not cause RangeError (gh-1296)', function(done) {
       var ASchema = new Schema({
-          key: {type: String, required: true}
+        key: {type: String, required: true}
         , value: {type:String, required: true}
       });
 
       var BSchema = new Schema({
-          contents: [ASchema]
+        contents: [ASchema]
       });
 
       var M = mongoose.model('A', BSchema);
       var m = new M;
       m.contents.push({ key: 'asdf' });
-      m.validate(function (err) {
-        assert.doesNotThrow(function(){
+      m.validate(function(err) {
+        assert.doesNotThrow(function() {
           String(err);
         });
         done();

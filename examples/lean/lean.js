@@ -29,13 +29,13 @@ var data = [
 ];
 
 
-mongoose.connect('mongodb://localhost/persons', function (err) {
+mongoose.connect('mongodb://localhost/persons', function(err) {
   if (err) throw err;
 
   // create all of the dummy people
-  async.each(data, function (item, cb) {
+  async.each(data, function(item, cb) {
     Person.create(item, cb);
-  }, function (err) {
+  }, function(err) {
     if (err) {
       // handle error
     }
@@ -47,7 +47,7 @@ mongoose.connect('mongodb://localhost/persons', function (err) {
     // when using .lean() the default is true, but you can explicitly set the
     // value by passing in a boolean value. IE. .lean(false)
     var q = Person.find({ age : { $lt : 1000 }}).sort('age').limit(2).lean();
-    q.exec(function (err, results) {
+    q.exec(function(err, results) {
       if (err) throw err;
       console.log("Are the results MongooseDocuments?: %s", results[0] instanceof mongoose.Document);
 

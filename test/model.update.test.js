@@ -847,7 +847,23 @@ describe('model: update:', function() {
             assert.equal(created.id, doc.id);
             assert.equal(1, doc.n.length);
             assert.equal(10, doc.n[0].x);
-            db.close(done);
+
+            op = {
+              $push: {
+                n: {
+                  $each: [],
+                  $slice: 0
+                }
+              }
+            };
+            M.update({ _id: created._id }, op, function(err) {
+              assert.ifError(err);
+              M.findById(created._id, function(error, doc) {
+                assert.ifError(error);
+                assert.equal(doc.n.length, 0);
+                db.close(done);
+              });
+            });
           });
         });
       });

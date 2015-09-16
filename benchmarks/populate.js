@@ -18,10 +18,10 @@ var B = mongoose.model('B', Schema({
 var start;
 var count = 0;
 
-mongoose.connect('localhost', 'benchmark-populate', function (err) {
+mongoose.connect('localhost', 'benchmark-populate', function(err) {
   if (err) return done(err);
 
-  A.create({ name: 'wooooooooooooooooooooooooooooooooooooooooot' }, function (err, a) {
+  A.create({ name: 'wooooooooooooooooooooooooooooooooooooooooot' }, function(err, a) {
     if (err) return done(err);
 
     var pending = docs;
@@ -30,7 +30,7 @@ mongoose.connect('localhost', 'benchmark-populate', function (err) {
         as: [a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a]
         , a: a
         , nested: [{ a: a }, { a: a }, { a: a }, { a: a }, { a: a }, { a: a }]
-      }).save(function (err) {
+      }).save(function(err) {
         if (err) return done(err);
         --pending;
         if (0 === pending) {
@@ -43,17 +43,17 @@ mongoose.connect('localhost', 'benchmark-populate', function (err) {
   });
 });
 
-function test () {
+function test() {
   var pending = 2;
 
   B.find().populate('as').populate('a').populate('nested.a').exec(handle);
   B.findOne().populate('as').populate('a').populate('nested.a').exec(handle);
 
-  function handle (err) {
+  function handle(err) {
     if (err) throw err;
     count++;
 
-    if (Date.now() - start > 1000*20) {
+    if (Date.now() - start > 1000 * 20) {
       return done();
     }
 
@@ -62,10 +62,10 @@ function test () {
 }
 
 
-function done (err) {
+function done(err) {
   if (err) console.error(err.stack);
 
-  mongoose.connection.db.dropDatabase(function () {
+  mongoose.connection.db.dropDatabase(function() {
     mongoose.disconnect();
     console.log('%d completed queries on mongoose version %s', count, mongoose.version);
   });

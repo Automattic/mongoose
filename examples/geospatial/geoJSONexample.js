@@ -20,20 +20,20 @@ var data = [
 ];
 
 
-mongoose.connect('mongodb://localhost/locations', function (err) {
+mongoose.connect('mongodb://localhost/locations', function(err) {
   if (err) throw err;
 
-  Location.on('index', function (err) {
+  Location.on('index', function(err) {
     if (err) throw err;
     // create all of the dummy locations
-    async.each(data, function (item, cb) {
+    async.each(data, function(item, cb) {
       Location.create(item, cb);
-    }, function (err) {
+    }, function(err) {
       if (err) throw err;
       // create the location we want to search for
       var coords = { type : 'Point', coordinates : [-5, 5] };
       // search for it
-      Location.find({ loc : { $near : coords }}).limit(1).exec(function (err, res) {
+      Location.find({ loc : { $near : coords }}).limit(1).exec(function(err, res) {
         if (err) throw err;
         console.log("Closest to %s is %s", JSON.stringify(coords), res);
         cleanup();
@@ -42,8 +42,8 @@ mongoose.connect('mongodb://localhost/locations', function (err) {
   });
 });
 
-function cleanup () {
-  Location.remove(function () {
+function cleanup() {
+  Location.remove(function() {
     mongoose.disconnect();
   });
 }

@@ -42,15 +42,15 @@ var BlogPost = new Schema({
 
 mongoose.model('Versioning', BlogPost);
 
-describe('versioning', function () {
-  it('is only added to parent schema (gh-1265)', function (done) {
+describe('versioning', function() {
+  it('is only added to parent schema (gh-1265)', function(done) {
     assert.ok(BlogPost.path('__v'));
     assert.ok(!BlogPost.path('comments').__v);
     assert.ok(!BlogPost.path('meta.nested').__v);
     done();
   });
 
-  it('works', function (done) {
+  it('works', function(done) {
     var db = start()
       , V = db.model('Versioning');
 
@@ -76,29 +76,29 @@ describe('versioning', function () {
     ];
     doc.arr = [['2d']];
 
-    doc.save(function (err) {
+    doc.save(function(err) {
       var a , b;
       assert.ifError(err);
       // test 2 concurrent ops
-      V.findById(doc, function (err, _a) {
+      V.findById(doc, function(err, _a) {
         assert.ifError(err);
         a = _a;
         a && b && test1(a, b);
       });
-      V.findById(doc, function (err, _b) {
+      V.findById(doc, function(err, _b) {
         assert.ifError(err);
         b = _b;
         a && b && test1(a, b);
       });
     });
 
-    function test1 (a, b) {
+    function test1(a, b) {
       a.meta.numbers.push(9);
       b.meta.numbers.push(8);
       save(a, b, test2);
     }
 
-    function test2 (err, a, b) {
+    function test2(err, a, b) {
       assert.ifError(err);
       assert.equal(a.meta.numbers.length, 5);
       assert.equal(a._doc.__v, 2);
@@ -107,7 +107,7 @@ describe('versioning', function () {
       save(a, b, test3);
     }
 
-    function test3 (err, a, b) {
+    function test3(err, a, b) {
       assert.ifError(err);
       assert.equal(a.meta.numbers.length, 5);
       assert.equal(b.meta.numbers.length, 5);
@@ -122,7 +122,7 @@ describe('versioning', function () {
       save(a, b, test4);
     }
 
-    function test4 (err, a, b) {
+    function test4(err, a, b) {
       assert.ok(/No matching document/.test(err), err);
       assert.equal(a._doc.__v, 5);
       a.set('arr.0.0', 'updated');
@@ -132,7 +132,7 @@ describe('versioning', function () {
       save(a,b,test5);
     }
 
-    function test5 (err, a, b) {
+    function test5(err, a, b) {
       assert.ifError(err);
       assert.equal('updated', a.arr[0][0]);
       assert.equal(a._doc.__v, 5);
@@ -143,7 +143,7 @@ describe('versioning', function () {
       save(a, b, test6);
     }
 
-    function test6 (err, a, b) {
+    function test6(err, a, b) {
       assert.ifError(err);
       assert.equal(a.arr.length, 2);
       assert.equal('updated', a.arr[0][0]);
@@ -158,7 +158,7 @@ describe('versioning', function () {
       save(a, b, test7);
     }
 
-    function test7 (err,a,b) {
+    function test7(err,a,b) {
       assert.ok(/No matching document/.test(err), 'changes to b should not be applied');
       assert.equal(a.arr.length, 2);
       assert.equal('updated', a.arr[0][0]);
@@ -169,7 +169,7 @@ describe('versioning', function () {
       save(a, b, test8);
     }
 
-    function test8 (err, a, b) {
+    function test8(err, a, b) {
       assert.ok(/No matching document/.test(err), 'changes to b should not be applied');
       assert.equal(a.meta.nested.length, 3);
       assert.equal(a._doc.__v, 8);
@@ -179,7 +179,7 @@ describe('versioning', function () {
       save(a, b, test9);
     }
 
-    function test9 (err, a, b) {
+    function test9(err, a, b) {
       assert.ifError(err);
       assert.equal(6, a.meta.nested.length);
       assert.equal(a._doc.__v, 10);
@@ -187,7 +187,7 @@ describe('versioning', function () {
       a.meta.nested[2].title = 'two';
       b.meta.nested[0].title = 'zero';
       b.meta.nested[1].comments[0].title = 'sub one';
-      save(a,b, function (err, _a, _b) {
+      save(a,b, function(err, _a, _b) {
         assert.ifError(err);
         assert.equal(a._doc.__v, 10);
         assert.equal(b._doc.__v, 10);
@@ -195,7 +195,7 @@ describe('versioning', function () {
       });
     }
 
-    function test10 (err, a, b) {
+    function test10(err, a, b) {
       assert.ifError(err);
       assert.equal('two', b.meta.nested[2].title);
       assert.equal('zero', b.meta.nested[0].title);
@@ -207,7 +207,7 @@ describe('versioning', function () {
       save(a, b, test11);
     }
 
-    function test11 (err, a, b) {
+    function test11(err, a, b) {
       assert.ifError(err);
       assert.equal(a._doc.__v, 11);
       assert.equal(6, a.mixed.arr.length);
@@ -224,7 +224,7 @@ describe('versioning', function () {
       save(a, b, test12);
     }
 
-    function test12 (err, a, b) {
+    function test12(err, a, b) {
       assert.ok(err instanceof VersionError);
       assert.ok(/No matching document/.test(err), 'changes to b should not be applied');
       assert.equal(5, a.comments.length);
@@ -247,37 +247,37 @@ describe('versioning', function () {
       save(a, b, test13);
     }
 
-    function test13 (err, a, b) {
+    function test13(err, a, b) {
         assert.ifError(err);
         a.dontVersionMe.push('value1');
         b.dontVersionMe.push('value2');
         save(a, b, test14);
       }
 
-    function test14 (err, a) {
+    function test14(err, a) {
         assert.equal(a._doc.__v, 13, 'version should not be incremented for non-versioned fields');
         db.close();
         done();
       }
 
-    function save (a, b, cb) {
+    function save(a, b, cb) {
       var e;
       // make sure that a saves before b
-      a.save(function (err) {
+      a.save(function(err) {
         if (err) e = err;
-        b.save(function (err) {
+        b.save(function(err) {
           if (err) e = err;
           lookup();
         });
       });
-      function lookup () {
+      function lookup() {
         var a1, b1;
-        V.findById(a, function (err, a_) {
+        V.findById(a, function(err, a_) {
           if (err && !e) e = err;
           a1 = a_;
           a1 && b1 && cb(e, a1, b1);
         });
-        V.findById(b, function (err, b_) {
+        V.findById(b, function(err, b_) {
           if (err && !e) e = err;
           b1 = b_;
           a1 && b1 && cb(e, a1, b1);
@@ -287,7 +287,7 @@ describe('versioning', function () {
 
   });
 
-  it('versioning without version key', function (done) {
+  it('versioning without version key', function(done) {
     var db = start()
       , V = db.model('Versioning');
 
@@ -302,10 +302,10 @@ describe('versioning', function () {
 
     doc.save(test);
 
-    function test (err) {
+    function test(err) {
       assert.ifError(err);
       // test getting docs back from db missing version key
-      V.findById(doc).select('numbers comments').exec(function (err, doc) {
+      V.findById(doc).select('numbers comments').exec(function(err, doc) {
         db.close();
         assert.ifError(err);
         doc.comments[0].title = 'no version was included';
@@ -316,22 +316,22 @@ describe('versioning', function () {
     }
   });
 
-  it('version works with strict docs', function (done) {
+  it('version works with strict docs', function(done) {
     var db = start();
-    var schema = new Schema({ str: ['string'] }, { strict: true, collection: 'versionstrict_'+random() });
+    var schema = new Schema({ str: ['string'] }, { strict: true, collection: 'versionstrict_' + random() });
     var M = db.model('VersionStrict', schema);
-    var m =new M({ str: ['death', 'to', 'smootchy'] });
-    m.save(function (err) {
+    var m = new M({ str: ['death', 'to', 'smootchy'] });
+    m.save(function(err) {
       assert.ifError(err);
-      M.find(m, function (err, m) {
+      M.find(m, function(err, m) {
         assert.ifError(err);
         assert.equal(1, m.length);
         m = m[0];
         assert.equal(0, m._doc.__v);
         m.str.pull('death');
-        m.save(function (err) {
+        m.save(function(err) {
           assert.ifError(err);
-          M.findById(m, function (err, m) {
+          M.findById(m, function(err, m) {
             db.close();
             assert.ifError(err);
             assert.equal(1, m._doc.__v);
@@ -344,13 +344,13 @@ describe('versioning', function () {
     });
   });
 
-  it('version works with existing unversioned docs', function (done) {
+  it('version works with existing unversioned docs', function(done) {
     var db = start()
       , V = db.model('Versioning');
 
-    V.collection.insert({ title: 'unversioned', numbers: [1,2,3] }, {safe:true}, function (err) {
+    V.collection.insert({ title: 'unversioned', numbers: [1,2,3] }, {safe:true}, function(err) {
       assert.ifError(err);
-      V.findOne({ title: 'unversioned' }, function (err, d) {
+      V.findOne({ title: 'unversioned' }, function(err, d) {
         assert.ifError(err);
         assert.ok(!d._doc.__v);
         d.numbers.splice(1, 1, 10);
@@ -358,10 +358,10 @@ describe('versioning', function () {
         assert.equal(undefined, o[0].__v);
         assert.ok(o[1].$inc);
         assert.equal(1, o[1].$inc.__v);
-        d.save(function (err, d) {
+        d.save(function(err, d) {
           assert.ifError(err);
           assert.equal(1, d._doc.__v);
-          V.findById(d, function (err, d) {
+          V.findById(d, function(err, d) {
             db.close();
             assert.ifError(err);
             assert.ok(d);
@@ -372,16 +372,16 @@ describe('versioning', function () {
     });
   });
 
-  it('versionKey is configurable', function (done) {
-    var db =start();
+  it('versionKey is configurable', function(done) {
+    var db = start();
     var schema = new Schema(
         { configured: 'bool' }
-      , { versionKey: 'lolwat', collection: 'configuredversion'+random() });
+      , { versionKey: 'lolwat', collection: 'configuredversion' + random() });
     var V = db.model('ConfiguredVersionKey', schema);
     var v = new V({ configured: true });
-    v.save(function (err) {
+    v.save(function(err) {
       assert.ifError(err);
-      V.findById(v, function (err, v) {
+      V.findById(v, function(err, v) {
         db.close();
         assert.ifError(err);
         assert.equal(0, v._doc.lolwat);
@@ -390,15 +390,15 @@ describe('versioning', function () {
     });
   });
 
-  it('can be disabled', function (done) {
+  it('can be disabled', function(done) {
     var db = start();
     var schema = Schema({ x: ['string'] }, { versionKey: false });
-    var M = db.model('disabledVersioning', schema, 's'+random());
-    M.create({ x: ['hi'] }, function (err, doc) {
+    var M = db.model('disabledVersioning', schema, 's' + random());
+    M.create({ x: ['hi'] }, function(err, doc) {
       assert.ifError(err);
       assert.equal(false, '__v' in doc._doc);
       doc.x.pull('hi');
-      doc.save(function (err) {
+      doc.save(function(err) {
         assert.ifError(err);
         assert.equal(false, '__v' in doc._doc);
 
@@ -406,7 +406,7 @@ describe('versioning', function () {
         var d = doc.$__delta()[0];
         assert.equal(undefined, d.__v, 'version should not be added to where clause');
 
-        M.collection.findOne({ _id: doc._id }, function (err, doc) {
+        M.collection.findOne({ _id: doc._id }, function(err, doc) {
           assert.equal(false, '__v' in doc);
           db.close(done);
         });
@@ -414,36 +414,36 @@ describe('versioning', function () {
     });
   });
 
-  it('works with numbericAlpha paths', function (done) {
+  it('works with numbericAlpha paths', function(done) {
     var db = start();
     var M = db.model('Versioning');
     var m = new M({ mixed: {} });
     var path = 'mixed.4a';
     m.set(path, 2);
-    m.save(function (err) {
+    m.save(function(err) {
       assert.ifError(err);
       db.close(done);
     });
   });
 
-  describe('doc.increment()', function () {
-    it('works without any other changes (gh-1475)', function (done) {
+  describe('doc.increment()', function() {
+    it('works without any other changes (gh-1475)', function(done) {
       var db = start()
         , V = db.model('Versioning');
 
       var doc = new V;
-      doc.save(function (err) {
+      doc.save(function(err) {
         assert.ifError(err);
         assert.equal(0, doc.__v);
 
         doc.increment();
 
-        doc.save(function (err) {
+        doc.save(function(err) {
           assert.ifError(err);
 
           assert.equal(1, doc.__v);
 
-          V.findById(doc, function (err, doc) {
+          V.findById(doc, function(err, doc) {
             assert.ifError(err);
             assert.equal(1, doc.__v);
             db.close(done);
@@ -453,20 +453,20 @@ describe('versioning', function () {
     });
   });
 
-  describe('versioning is off', function () {
-    it('when { safe : false } is set (gh-1520)', function (done) {
+  describe('versioning is off', function() {
+    it('when { safe : false } is set (gh-1520)', function(done) {
       var schema1 = new Schema({ title : String}, { safe : false });
       assert.equal(schema1.options.versionKey, false);
       done();
     });
-    it('when { safe : { w: 0 }} is set (gh-1520)', function (done) {
+    it('when { safe : { w: 0 }} is set (gh-1520)', function(done) {
       var schema1 = new Schema({ title : String}, { safe : { w: 0 } });
       assert.equal(schema1.options.versionKey, false);
       done();
     });
   });
 
-  it('gh-1898', function (done) {
+  it('gh-1898', function(done) {
     var db = start();
     var schema = new Schema({ tags: [String], name: String });
 
@@ -474,7 +474,7 @@ describe('versioning', function () {
 
     var m = new M({ tags: ['eggs'] });
 
-    m.save(function (err) {
+    m.save(function(err) {
       assert.ifError(err);
 
       m.tags.push('bacon');
@@ -488,13 +488,13 @@ describe('versioning', function () {
     });
   });
 
-  it('can remove version key from toObject() (gh-2675)', function (done) {
+  it('can remove version key from toObject() (gh-2675)', function(done) {
     var db = start();
     var schema = new Schema({ name: String });
     var M = db.model('gh2675', schema, 'gh2675');
 
     var m = new M();
-    m.save(function (err, m) {
+    m.save(function(err, m) {
       assert.ifError(err);
       var obj = m.toObject();
       assert.equal(0, obj.__v);

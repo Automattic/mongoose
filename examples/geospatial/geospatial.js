@@ -29,22 +29,22 @@ var data = [
 ];
 
 
-mongoose.connect('mongodb://localhost/persons', function (err) {
+mongoose.connect('mongodb://localhost/persons', function(err) {
   if (err) throw err;
 
   // create all of the dummy people
-  async.each(data, function (item, cb) {
+  async.each(data, function(item, cb) {
     Person.create(item, cb);
-  }, function (err) {
+  }, function(err) {
     if (err) {
       // handler error
     }
 
     // let's find the closest person to bob
-    Person.find({ name : 'bob' }, function (err, res) {
+    Person.find({ name : 'bob' }, function(err, res) {
       if (err) throw err;
 
-      res[0].findClosest(function (err, closest) {
+      res[0].findClosest(function(err, closest) {
         if (err) throw err;
 
         console.log("%s is closest to %s", res[0].name, closest);
@@ -54,7 +54,7 @@ mongoose.connect('mongodb://localhost/persons', function (err) {
         // information about geospatial queries and indexes, see
         // http://docs.mongodb.org/manual/applications/geospatial-indexes/
         var coords = [7,7];
-        Person.find({ loc : { $nearSphere : coords }}).limit(1).exec(function (err, res) {
+        Person.find({ loc : { $nearSphere : coords }}).limit(1).exec(function(err, res) {
           console.log("Closest to %s is %s", coords, res);
           cleanup();
         });
@@ -63,8 +63,8 @@ mongoose.connect('mongodb://localhost/persons', function (err) {
   });
 });
 
-function cleanup () {
-  Person.remove(function () {
+function cleanup() {
+  Person.remove(function() {
     mongoose.disconnect();
   });
 }

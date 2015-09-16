@@ -2,17 +2,17 @@ var assert = require('assert');
 var updateValidators = require('../lib/services/updateValidators');
 var emitter = require('events').EventEmitter;
 
-describe('updateValidators', function () {
+describe('updateValidators', function() {
   var schema;
 
-  beforeEach(function () {
+  beforeEach(function() {
     schema = {};
-    schema.path = function (p) {
+    schema.path = function(p) {
       schema.path.calls.push(p);
       return schema;
     };
     schema.path.calls = [];
-    schema.doValidate = function (v, cb) {
+    schema.doValidate = function(v, cb) {
       schema.doValidate.calls.push({ v: v, cb: cb });
       schema.doValidate.emitter.emit('called', { v: v, cb: cb });
     };
@@ -20,13 +20,13 @@ describe('updateValidators', function () {
     schema.doValidate.emitter = new emitter();
   });
 
-  describe('validators', function () {
-    it('flattens paths', function (done) {
+  describe('validators', function() {
+    it('flattens paths', function(done) {
       var fn = updateValidators({}, schema, { test: { a: 1, b: null } }, {});
-      schema.doValidate.emitter.on('called', function (args) {
+      schema.doValidate.emitter.on('called', function(args) {
         args.cb();
       });
-      fn(function (err) {
+      fn(function(err) {
         assert.ifError(err);
         assert.equal(schema.path.calls.length, 4);
         assert.equal(schema.doValidate.calls.length, 2);
@@ -40,13 +40,13 @@ describe('updateValidators', function () {
       });
     });
 
-    it('doesnt flatten dates (gh-3194)', function (done) {
+    it('doesnt flatten dates (gh-3194)', function(done) {
       var dt = new Date();
       var fn = updateValidators({}, schema, { test: dt }, {});
-      schema.doValidate.emitter.on('called', function (args) {
+      schema.doValidate.emitter.on('called', function(args) {
         args.cb();
       });
-      fn(function (err) {
+      fn(function(err) {
         assert.ifError(err);
         assert.equal(schema.path.calls.length, 2);
         assert.equal(schema.doValidate.calls.length, 1);

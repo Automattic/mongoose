@@ -20,7 +20,7 @@ var AllSchema = new Schema({
   , bools  : [Boolean]
   , buffers: [Buffer]
   , objectids: [Schema.ObjectId]
-  , docs     : { type: [DocSchema], validate: function () { return true; }}
+  , docs     : { type: [DocSchema], validate: function() { return true; }}
   , s: { nest: String }
 });
 
@@ -52,8 +52,8 @@ for (i = 0, len = total; i < len; ++i) {
   a.toObject({ depopulate: true });
 }
 
-var time = (new Date - start)/1000;
-console.error('took %d seconds for %d docs (%d dps)', time, total, total/time);
+var time = (new Date - start) / 1000;
+console.error('took %d seconds for %d docs (%d dps)', time, total, total / time);
 process.memoryUsage();
 
 // --trace-opt --trace-deopt --trace-bailout

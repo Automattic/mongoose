@@ -14,23 +14,23 @@ var assert = require('assert');
  *  Note that the `yield` keyword is currently only supported in NodeJS 0.11.x
  *  with the `--harmony` flag.
  */
-describe('Documents in ES6', function () {
+describe('Documents in ES6', function() {
   var db;
   var collectionNameCounter = 0;
 
-  var getCollectionName = function () {
+  var getCollectionName = function() {
     return 'harmony-documents-validate-' + (++collectionNameCounter);
   };
 
-  beforeEach(function () {
+  beforeEach(function() {
     db = start({ noErrorListener: 1 });
   });
 
-  afterEach(function (done) {
+  afterEach(function(done) {
     db.close(done);
   });
 
-  it('validate() integrates with co and the yield keyword', function (done) {
+  it('validate() integrates with co and the yield keyword', function(done) {
     co(function*() {
       var schema = null;
       var called = false;
@@ -38,7 +38,7 @@ describe('Documents in ES6', function () {
       var error;
 
       var validate = {
-        validator: function () {
+        validator: function() {
           called = true;
           return shouldSucceed;
         },
@@ -78,7 +78,7 @@ describe('Documents in ES6', function () {
     })();
   });
 
-  it('save() integrates with co and the yield keyword', function (done) {
+  it('save() integrates with co and the yield keyword', function(done) {
     co(function*() {
       var error;
       var schema = new Schema({
@@ -120,7 +120,7 @@ describe('Documents in ES6', function () {
     })();
   });
 
-  it('populate() *requires* execPopulate() to work with the yield keyword', function (done) {
+  it('populate() *requires* execPopulate() to work with the yield keyword', function(done) {
     /**
      *  Because the `populate()` function supports chaining, it's difficult
      *  to determine when the chain is 'done'. Therefore, you need to call
@@ -174,7 +174,7 @@ describe('Documents in ES6', function () {
     })();
   });
 
-  it('update() works with co and yield', function (done) {
+  it('update() works with co and yield', function(done) {
     co(function*() {
       var schema = new Schema({
         steak: String,

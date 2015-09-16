@@ -32,7 +32,7 @@ var Game = mongoose.model('Game', gameSchema);
  * the default port (27017)
  */
 
-mongoose.connect('mongodb://localhost/console', function (err) {
+mongoose.connect('mongodb://localhost/console', function(err) {
   // if we failed to connect, abort
   if (err) throw err;
 
@@ -44,12 +44,12 @@ mongoose.connect('mongodb://localhost/console', function (err) {
  * Data generation
  */
 
-function createData () {
+function createData() {
   Console.create({
     name: 'Nintendo 64'
     , manufacturer: 'Nintendo'
     , released: 'September 29, 1996'
-  }, function (err, nintendo64) {
+  }, function(err, nintendo64) {
     if (err) return done(err);
 
     Game.create({
@@ -57,7 +57,7 @@ function createData () {
       , developer: 'Nintendo'
       , released: new Date('November 21, 1998')
       , consoles: [nintendo64]
-    }, function (err) {
+    }, function(err) {
       if (err) return done(err);
       example();
     });
@@ -68,11 +68,11 @@ function createData () {
  * Population
  */
 
-function example () {
+function example() {
   Game
   .findOne({ name: /^Legend of Zelda/ })
   .populate('consoles')
-  .exec(function (err, ocinara) {
+  .exec(function(err, ocinara) {
     if (err) return done(err);
 
     console.log(
@@ -85,10 +85,10 @@ function example () {
   });
 }
 
-function done (err) {
+function done(err) {
   if (err) console.error(err);
-  Console.remove(function () {
-    Game.remove(function () {
+  Console.remove(function() {
+    Game.remove(function() {
       mongoose.disconnect();
     });
   });

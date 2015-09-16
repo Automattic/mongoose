@@ -3,27 +3,27 @@ var assert = require('assert');
 var mongoose = start.mongoose;
 var Schema = mongoose.Schema;
 
-describe('query middleware', function () {
+describe('query middleware', function() {
   var db;
   var schema;
   var publisherSchema;
   var Author;
   var Publisher;
 
-  var initializeData = function (done) {
+  var initializeData = function(done) {
     Author = db.model('gh-2138', schema, 'gh-2138');
     Publisher = db.model('gh-2138-1', publisherSchema, 'gh-2138-1');
 
-    Author.remove({}, function (error) {
+    Author.remove({}, function(error) {
       if (error) {
         return done(error);
       }
 
-      Publisher.remove({}, function (error) {
+      Publisher.remove({}, function(error) {
         if (error) {
           return done(error);
         }
-        Publisher.create({ name: 'Wiley' }, function (error, publisher) {
+        Publisher.create({ name: 'Wiley' }, function(error, publisher) {
           if (error) {
             return done(error);
           }
@@ -35,7 +35,7 @@ describe('query middleware', function () {
             options: 'bacon'
           };
 
-          Author.create(doc, function (error) {
+          Author.create(doc, function(error) {
             done(error);
           });
         });
@@ -43,7 +43,7 @@ describe('query middleware', function () {
     });
   };
 
-  beforeEach(function (done) {
+  beforeEach(function(done) {
     schema = new Schema({
       title: String,
       author: String,
@@ -60,22 +60,22 @@ describe('query middleware', function () {
     done();
   });
 
-  afterEach(function (done) {
+  afterEach(function(done) {
     db.close(done);
   });
 
-  it('has a pre find hook', function (done) {
+  it('has a pre find hook', function(done) {
     var count = 0;
-    schema.pre('find', function (next) {
+    schema.pre('find', function(next) {
       ++count;
       next();
     });
 
     start();
 
-    initializeData(function (error) {
+    initializeData(function(error) {
       assert.ifError(error);
-      Author.find({ x: 1 }, function (error) {
+      Author.find({ x: 1 }, function(error) {
         assert.ifError(error);
         assert.equal(1, count);
         done();
@@ -83,9 +83,9 @@ describe('query middleware', function () {
     });
   });
 
-  it('has post find hooks', function (done) {
+  it('has post find hooks', function(done) {
     var postCount = 0;
-    schema.post('find', function (results, next) {
+    schema.post('find', function(results, next) {
       assert.equal(1, results.length);
       assert.equal('Val', results[0].author);
       assert.equal('bacon', results[0].options);
@@ -93,9 +93,9 @@ describe('query middleware', function () {
       next();
     });
 
-    initializeData(function (error) {
+    initializeData(function(error) {
       assert.ifError(error);
-      Author.find({ title: 'Professional AngularJS' }, function (error, docs) {
+      Author.find({ title: 'Professional AngularJS' }, function(error, docs) {
         assert.ifError(error);
         assert.equal(1, postCount);
         assert.equal(1, docs.length);
@@ -104,23 +104,23 @@ describe('query middleware', function () {
     });
   });
 
-  it('works when using a chained query builder', function (done) {
+  it('works when using a chained query builder', function(done) {
     var count = 0;
-    schema.pre('find', function (next) {
+    schema.pre('find', function(next) {
       ++count;
       next();
     });
 
     var postCount = 0;
-    schema.post('find', function (results, next) {
+    schema.post('find', function(results, next) {
       assert.equal(1, results.length);
       assert.equal('Val', results[0].author);
       ++postCount;
       next();
     });
 
-    initializeData(function () {
-      Author.find({ title: 'Professional AngularJS' }).exec(function (error, docs) {
+    initializeData(function() {
+      Author.find({ title: 'Professional AngularJS' }).exec(function(error, docs) {
         assert.ifError(error);
         assert.equal(1, count);
         assert.equal(1, postCount);
@@ -130,22 +130,22 @@ describe('query middleware', function () {
     });
   });
 
-  it('has separate pre-findOne() and post-findOne() hooks', function (done) {
+  it('has separate pre-findOne() and post-findOne() hooks', function(done) {
     var count = 0;
-    schema.pre('findOne', function (next) {
+    schema.pre('findOne', function(next) {
       ++count;
       next();
     });
 
     var postCount = 0;
-    schema.post('findOne', function (result, next) {
+    schema.post('findOne', function(result, next) {
       assert.equal('Val', result.author);
       ++postCount;
       next();
     });
 
-    initializeData(function () {
-      Author.findOne({ title: 'Professional AngularJS' }).exec(function (error, doc) {
+    initializeData(function() {
+      Author.findOne({ title: 'Professional AngularJS' }).exec(function(error, doc) {
         assert.ifError(error);
         assert.equal(1, count);
         assert.equal(1, postCount);
@@ -155,14 +155,14 @@ describe('query middleware', function () {
     });
   });
 
-  it('can populate in pre hook', function (done) {
-    schema.pre('findOne', function (next) {
+  it('can populate in pre hook', function(done) {
+    schema.pre('findOne', function(next) {
       this.populate('publisher');
       next();
     });
 
-    initializeData(function () {
-      Author.findOne({ title: 'Professional AngularJS' }).exec(function (error, doc) {
+    initializeData(function() {
+      Author.findOne({ title: 'Professional AngularJS' }).exec(function(error, doc) {
         assert.ifError(error);
         assert.equal('Val', doc.author);
         assert.equal('Wiley', doc.publisher.name);
@@ -171,15 +171,15 @@ describe('query middleware', function () {
     });
   });
 
-  it('can populate in post hook', function (done) {
-    schema.post('findOne', function (doc, next) {
-      doc.populate('publisher', function (error) {
+  it('can populate in post hook', function(done) {
+    schema.post('findOne', function(doc, next) {
+      doc.populate('publisher', function(error) {
         next(error);
       });
     });
 
-    initializeData(function () {
-      Author.findOne({ title: 'Professional AngularJS' }).exec(function (error, doc) {
+    initializeData(function() {
+      Author.findOne({ title: 'Professional AngularJS' }).exec(function(error, doc) {
         assert.ifError(error);
         assert.equal('Val', doc.author);
         assert.equal('Wiley', doc.publisher.name);
@@ -188,21 +188,21 @@ describe('query middleware', function () {
     });
   });
 
-  it('has hooks for count()', function (done) {
+  it('has hooks for count()', function(done) {
     var preCount = 0;
     var postCount = 0;
 
-    schema.pre('count', function () {
+    schema.pre('count', function() {
       ++preCount;
     });
 
-    schema.post('count', function () {
+    schema.post('count', function() {
       ++postCount;
     });
 
-    initializeData(function (error) {
+    initializeData(function(error) {
       assert.ifError(error);
-      Author.find({ title: 'Professional AngularJS' }).count(function (error, count) {
+      Author.find({ title: 'Professional AngularJS' }).count(function(error, count) {
         assert.ifError(error);
         assert.equal(1, count);
         assert.equal(1, preCount);

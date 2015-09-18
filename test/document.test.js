@@ -1806,6 +1806,21 @@ describe('document', function() {
     });
   });
 
+  it('set data from subdoc keys (gh-3346)', function(done) {
+    var schema1 = new mongoose.Schema({
+      data: {
+        email: String
+      }
+    });
+    var Model1 = mongoose.model('gh3346', schema1);
+
+    var doc1 = new Model1({ 'data.email': 'some@example.com' });
+    assert.equal(doc1.data.email, 'some@example.com');
+    var doc2 = new Model1({ data: doc1.data });
+    assert.equal(doc2.data.email, 'some@example.com');
+    done();
+  });
+
   it('doesnt attempt to cast generic objects as strings (gh-3030)', function(done) {
     var M = mongoose.model('gh3030', {
       myStr: {

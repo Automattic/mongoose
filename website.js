@@ -1,5 +1,5 @@
 
-var fs= require('fs');
+var fs = require('fs');
 var jade = require('jade');
 var package = require('./package');
 var hl = require('./docs/helpers/highlight');
@@ -17,12 +17,12 @@ package.unstable = getUnstable(package.version);
 var filemap = require('./docs/source');
 var files = Object.keys(filemap);
 
-files.forEach(function (file) {
+files.forEach(function(file) {
   var filename = __dirname + '/' + file;
   jadeify(filename, filemap[file]);
 
   if ('--watch' == process.argv[2]) {
-    fs.watchFile(filename, { interval: 1000 }, function (cur, prev) {
+    fs.watchFile(filename, { interval: 1000 }, function(cur, prev) {
       if (cur.mtime > prev.mtime) {
         jadeify(filename, filemap[file]);
       }
@@ -37,25 +37,25 @@ acquitFiles.forEach(function(file) {
   jadeify(filename, acquit[file], __dirname + '/docs/' + file);
 });
 
-function jadeify (filename, options, newfile) {
+function jadeify(filename, options, newfile) {
   options || (options = {});
   options.package = package;
   options.hl = hl;
   options.linktype = linktype;
   options.href = href;
   options.klass = klass;
-  jade.renderFile(filename, options, function (err, str) {
+  jade.renderFile(filename, options, function(err, str) {
     if (err) return console.error(err.stack);
 
     newfile = newfile || filename.replace('.jade', '.html');
-    fs.writeFile(newfile, str, function (err) {
+    fs.writeFile(newfile, str, function(err) {
       if (err) return console.error('could not write', err.stack);
       console.log('%s : rendered ', new Date, newfile);
     });
   });
 }
 
-function getVersion () {
+function getVersion() {
   var hist = fs.readFileSync('./History.md','utf8').replace(/\r/g, '\n').split('\n');
   for (var i = 0; i < hist.length; ++i) {
     var line = (hist[i] || '').trim();
@@ -70,7 +70,7 @@ function getVersion () {
 function getUnstable(ver) {
   ver = ver.replace("-pre");
   var spl = ver.split('.');
-  spl = spl.map(function (i) {
+  spl = spl.map(function(i) {
     return parseInt(i);
   });
   spl[1]++;

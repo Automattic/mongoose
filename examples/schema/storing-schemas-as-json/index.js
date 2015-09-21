@@ -14,7 +14,7 @@ var TimeSignature = mongoose.model('TimeSignatures', timeSignatureSchema);
 
 // create a TimeSignature document
 var threeFour = new TimeSignature({
-    count: 3
+  count: 3
   , unit: 4
   , description: "3/4"
   , additive: false

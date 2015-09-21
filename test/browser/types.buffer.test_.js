@@ -9,9 +9,9 @@ var MongooseBuffer = mongoose.Types.Buffer;
  * Test.
  */
 
-describe('types.buffer', function(){
+describe('types.buffer', function() {
 
-  it('test that a mongoose buffer behaves and quacks like a buffer', function(done){
+  it('test that a mongoose buffer behaves and quacks like a buffer', function(done) {
     var a = new MongooseBuffer;
 
     assert.ok(a.isMongooseBuffer);
@@ -29,8 +29,8 @@ describe('types.buffer', function(){
     done();
   });
 
-  describe('#toObject', function(){
-    it('retains custom subtypes', function(done){
+  describe('#toObject', function() {
+    it('retains custom subtypes', function(done) {
       var buf = new MongooseBuffer(0);
       var out = buf.toObject(2);
       // validate the drivers Binary type output retains the option

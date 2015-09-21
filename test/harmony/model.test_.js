@@ -48,7 +48,7 @@ describe('Models in ES6', function() {
         results = yield M.create([
           { eggs: 'sunny-side up', bacon: false },
           { eggs: 'scrambled', bacon: true }]);
-      } catch(e) {
+      } catch (e) {
         return done(e);
       }
 
@@ -73,7 +73,7 @@ describe('Models in ES6', function() {
         yield M.create([
           { eggs: 'sunny-side up', bacon: false },
           { eggs: 'scrambled', bacon: true }]);
-      } catch(e) {
+      } catch (e) {
         return done(e);
       }
 
@@ -83,7 +83,7 @@ describe('Models in ES6', function() {
           { $group: { _id: '$bacon', eggs: { $first: '$eggs' } } },
           { $sort: { _id: 1 } }
         ]).exec();
-      } catch(e) {
+      } catch (e) {
         return done(e);
       }
 
@@ -111,7 +111,7 @@ describe('Models in ES6', function() {
           { eggs: 'sunny-side up', bacon: false },
           { eggs: 'sunny-side up', bacon: true },
           { eggs: 'scrambled', bacon: true }]);
-      } catch(e) {
+      } catch (e) {
         return done(e);
       }
 
@@ -121,7 +121,7 @@ describe('Models in ES6', function() {
           map: function() { emit(this.eggs, 1); },
           reduce: function(k, vals) { return vals.length; }
         });
-      } catch(e) {
+      } catch (e) {
         return done(e);
       }
 

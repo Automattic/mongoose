@@ -181,12 +181,12 @@ describe('discriminator docs', function() {
       clickedLinkSchema);
 
     var event1 = new ClickedLinkEvent();
-    event1.validate(function(error) {
+    event1.validate(function() {
       assert.equal(eventSchemaCalls, 1);
       assert.equal(clickedSchemaCalls, 1);
 
       var generic = new Event();
-      generic.validate(function(error) {
+      generic.validate(function() {
         assert.equal(eventSchemaCalls, 2);
         assert.equal(clickedSchemaCalls, 1);
         // acquit:ignore:start

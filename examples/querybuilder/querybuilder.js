@@ -24,13 +24,13 @@ var data = [
 ];
 
 
-mongoose.connect('mongodb://localhost/persons', function (err) {
+mongoose.connect('mongodb://localhost/persons', function(err) {
   if (err) throw err;
 
   // create all of the dummy people
-  async.each(data, function (item, cb) {
+  async.each(data, function(item, cb) {
       Person.create(item, cb);
-    }, function (err) {
+    }, function(err) {
     if (err) throw err;
 
     // when querying data, instead of providing a callback, you can instead
@@ -47,7 +47,7 @@ mongoose.connect('mongodb://localhost/persons', function (err) {
     query.where('age').gt(21);
 
     // finally, when ready to execute the query, call the exec() function
-    query.exec(function (err, results) {
+    query.exec(function(err, results) {
       if (err) throw err;
 
       console.log(results);

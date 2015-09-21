@@ -29,13 +29,13 @@ var data = [
 var opts = {
   replSet : { rs_name : "rs0" }
 };
-mongoose.connect('mongodb://localhost:27018/persons,localhost:27019,localhost:27020', opts, function (err) {
+mongoose.connect('mongodb://localhost:27018/persons,localhost:27019,localhost:27020', opts, function(err) {
   if (err) throw err;
 
   // create all of the dummy people
-  async.each(data, function (item, cb) {
+  async.each(data, function(item, cb) {
       Person.create(item, cb);
-    }, function (err) {
+    }, function(err) {
       if (err) {
         // handle error
       }
@@ -43,10 +43,10 @@ mongoose.connect('mongodb://localhost:27018/persons,localhost:27019,localhost:27
       // create and delete some data
       var prom = Person.find({age : { $lt : 1000 }}).exec();
 
-      prom.then(function (people) {
+      prom.then(function(people) {
         console.log("young people: %s", people);
       }).then(cleanup);
-  });
+    });
 });
 
 function cleanup() {

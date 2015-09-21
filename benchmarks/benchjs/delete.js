@@ -18,9 +18,9 @@ var mongo = require('mongodb');
  */
 
 
-mongoose.connect('mongodb://localhost/mongoose-bench', function (err) {
+mongoose.connect('mongodb://localhost/mongoose-bench', function(err) {
   if (err) throw err;
-  mongo.connect('mongodb://localhost/mongoose-bench', function (err, db) {
+  mongo.connect('mongodb://localhost/mongoose-bench', function(err, db) {
     if (err) throw err;
     var UserSchema = new Schema({
       name : String,
@@ -44,8 +44,8 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function (err) {
 
     // insert all of the data here
     var count = 1000;
-    for (var i=0; i < 500; i++) {
-      User.create(data, function (err, u) {
+    for (var i = 0; i < 500; i++) {
+      User.create(data, function(err, u) {
         if (err) throw err;
         mIds.push(u.id);
         --count || next();
@@ -55,20 +55,20 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function (err) {
       nData.age = data.age;
       nData.likes = data.likes;
       nData.address = data.address;
-      user.insert(nData, function (err, res) {
+      user.insert(nData, function(err, res) {
         dIds.push(res[0]._id);
         --count || next();
       });
     }
 
     function closeDB() {
-      User.count(function (err, res) {
+      User.count(function(err, res) {
         if (res != 0) {
           console.log("Still mongoose entries left...");
         }
         mongoose.disconnect();
       });
-      user.count({}, function (err, res) {
+      user.count({}, function(err, res) {
         if (res != 0) {
           console.log("Still driver entries left...");
         }
@@ -79,30 +79,30 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function (err) {
 
     suite.add('Delete - Mongoose', {
       defer : true,
-      fn : function (deferred) {
-        User.remove({ _id : mIds.pop()}, function (err) {
+      fn : function(deferred) {
+        User.remove({ _id : mIds.pop()}, function(err) {
           if (err) throw err;
           deferred.resolve();
         });
       }
     }).add('Delete - Driver', {
       defer : true,
-      fn : function (deferred) {
-        user.remove({ _id : dIds.pop()}, function (err) {
+      fn : function(deferred) {
+        user.remove({ _id : dIds.pop()}, function(err) {
           if (err) throw err;
           deferred.resolve();
         });
       }
     })
-    .on('cycle', function (evt) {
+    .on('cycle', function(evt) {
       if (process.env.MONGOOSE_DEV || process.env.PULL_REQUEST) {
         console.log(String(evt.target));
       }
-    }).on('complete', function () {
+    }).on('complete', function() {
       closeDB();
       if (!process.env.MONGOOSE_DEV && !process.env.PULL_REQUEST) {
         var outObj = {};
-        this.forEach(function (item) {
+        this.forEach(function(item) {
           var out = {};
           out.stats = item.stats;
           delete out.stats.sample;

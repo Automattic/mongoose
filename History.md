@@ -1,3 +1,16 @@
+4.1.8 / 2015-09-21
+==================
+ * docs; fixed typo in example #3390 [kmctown](https://github.com/kmctown)
+ * fixed; error in toObject() #3387 [guumaster](https://github.com/guumaster)
+ * fixed; handling for casting null dates #3383 [alexmingoia](https://github.com/alexmingoia)
+ * fixed; passing composite ids to `findByIdAndUpdate` #3380
+ * fixed; linting #3376 #3375 [ChristianMurphy](https://github.com/ChristianMurphy)
+ * fixed; added NodeJS v4 to Travis #3374 [ChristianMurphy](https://github.com/ChristianMurphy)
+ * fixed; casting $elemMatch inside of $not #3373 [gaguirre](https://github.com/gaguirre)
+ * fixed; handle case where $slice is 0 #3369
+ * fixed; avoid running getters if path is populated #3357
+ * fixed; cast documents to objects when setting to a nested path #3346
+
 4.1.7 / 2015-09-14
 ==================
  * docs; typos in SchemaType documentation #3367 [jasson15](https://github.com/jasson15)

@@ -55,7 +55,7 @@ describe('Documents in ES6', function() {
 
       try {
         yield m.validate();
-      } catch(e) {
+      } catch (e) {
         error = e;
       }
 
@@ -67,7 +67,7 @@ describe('Documents in ES6', function() {
       shouldSucceed = false;
       try {
         yield m.validate();
-      } catch(e) {
+      } catch (e) {
         error = e;
       }
 
@@ -91,7 +91,7 @@ describe('Documents in ES6', function() {
 
       try {
         yield goodBreakfast.save();
-      } catch(e) {
+      } catch (e) {
         error = e;
       }
 
@@ -99,7 +99,7 @@ describe('Documents in ES6', function() {
       var result;
       try {
         result = yield Breakfast.findOne().exec();
-      } catch(e) {
+      } catch (e) {
         error = e;
       }
       assert.ifError(error);
@@ -109,7 +109,7 @@ describe('Documents in ES6', function() {
       var badBreakfast = new Breakfast({});
       try {
         yield badBreakfast.save();
-      } catch(e) {
+      } catch (e) {
         error = e;
       }
 
@@ -147,14 +147,14 @@ describe('Documents in ES6', function() {
 
       try {
         yield [bacon.save(), eggs.save(), goodBreakfast.save()];
-      } catch(e) {
+      } catch (e) {
         error = e;
       }
 
       var result;
       try {
         result = yield Breakfast.findOne().exec();
-      } catch(e) {
+      } catch (e) {
         error = e;
       }
       assert.ifError(error);
@@ -162,7 +162,7 @@ describe('Documents in ES6', function() {
 
       try {
         result = yield result.populate('foods').execPopulate();
-      } catch(e) {
+      } catch (e) {
         error = e;
       }
       assert.ifError(error);
@@ -188,7 +188,7 @@ describe('Documents in ES6', function() {
 
       try {
         yield breakfast.update({ steak: 'Ribeye', eggs: 'Scrambled' }, { upsert: true }).exec();
-      } catch(e) {
+      } catch (e) {
         error = e;
       }
 
@@ -196,7 +196,7 @@ describe('Documents in ES6', function() {
       var result;
       try {
         result = yield Breakfast.findOne().exec();
-      } catch(e) {
+      } catch (e) {
         error = e;
       }
       assert.ifError(error);

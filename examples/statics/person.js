@@ -13,7 +13,7 @@ module.exports = function() {
   });
 
   // define a static
-  PersonSchema.statics.findPersonByName = function (name, cb) {
+  PersonSchema.statics.findPersonByName = function(name, cb) {
     this.find({ name : new RegExp(name, 'i') }, cb);
   };
 

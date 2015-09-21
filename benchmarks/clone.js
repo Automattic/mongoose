@@ -3,11 +3,11 @@ var mongoose = require('../')
   , Schema = mongoose.Schema;
 
 var DocSchema = new Schema({
-    title: String
+  title: String
 });
 
 var AllSchema = new Schema({
-    string: { type: String, required: true }
+  string: { type: String, required: true }
   , number: { type: Number, min: 10 }
   , date  : Date
   , bool  : Boolean
@@ -20,13 +20,13 @@ var AllSchema = new Schema({
   , bools  : [Boolean]
   , buffers: [Buffer]
   , objectids: [Schema.ObjectId]
-  , docs     : { type: [DocSchema], validate: function () { return true; }}
+  , docs     : { type: [DocSchema], validate: function() { return true; }}
   , s: { nest: String }
 });
 
 var A = mongoose.model('A', AllSchema);
 var a = new A({
-    string: "hello world"
+  string: "hello world"
   , number: 444848484
   , date: new Date
   , bool: true
@@ -52,8 +52,8 @@ for (i = 0, len = total; i < len; ++i) {
   a.toObject({ depopulate: true });
 }
 
-var time = (new Date - start)/1000;
-console.error('took %d seconds for %d docs (%d dps)', time, total, total/time);
+var time = (new Date - start) / 1000;
+console.error('took %d seconds for %d docs (%d dps)', time, total, total / time);
 process.memoryUsage();
 
 // --trace-opt --trace-deopt --trace-bailout

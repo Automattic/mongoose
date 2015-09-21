@@ -17,7 +17,7 @@ mongoose.connect('mongodb://localhost/persons', function(err) {
     name : 'bill',
     age : 25,
     birthday : new Date().setFullYear((new Date().getFullYear() - 25))
-  }, function (err, bill) {
+  }, function(err, bill) {
     if (err) throw err;
     console.log("People added to db: %s", bill.toString());
     Person.find({}, function(err, people) {
@@ -28,7 +28,7 @@ mongoose.connect('mongodb://localhost/persons', function(err) {
       });
 
       // make sure to clean things up after we're done
-      setTimeout(function () { cleanup(); }, 2000);
+      setTimeout(function() { cleanup(); }, 2000);
     });
   });
 });

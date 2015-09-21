@@ -20,15 +20,15 @@ var data = [
 ];
 
 
-mongoose.connect('mongodb://localhost/locations', function (err) {
+mongoose.connect('mongodb://localhost/locations', function(err) {
   if (err) throw err;
 
   Location.on('index', function(err) {
     if (err) throw err;
     // create all of the dummy locations
-    async.each(data, function (item, cb) {
+    async.each(data, function(item, cb) {
       Location.create(item, cb);
-    }, function (err) {
+    }, function(err) {
       if (err) throw err;
       // create the location we want to search for
       var coords = { type : 'Point', coordinates : [-5, 5] };

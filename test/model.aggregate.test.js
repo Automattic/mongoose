@@ -15,21 +15,21 @@ var start = require('./common')
  */
 
 var userSchema = new Schema({
-    name: String
+  name: String
   , age: Number
 });
 
 var collection = 'aggregate_' + random();
 mongoose.model('Aggregate', userSchema);
 
-describe('model aggregate', function(){
+describe('model aggregate', function() {
   var group = { $group: { _id: null, maxAge: { $max: '$age' } }};
   var project = { $project: { maxAge: 1, _id: 0 }};
   var db, A, maxAge;
 
   var mongo26_or_greater = false;
 
-  before(function(done){
+  before(function(done) {
     db = start();
     A = db.model('Aggregate', collection);
 
@@ -38,15 +38,15 @@ describe('model aggregate', function(){
     var docs = [];
     maxAge = 0;
 
-    for (var i = 0; i< num; ++i) {
+    for (var i = 0; i < num; ++i) {
       var age = Math.random() * 100 | 0;
       maxAge = Math.max(maxAge, age);
-      docs.push({ author: authors[i%authors.length], age: age });
+      docs.push({ author: authors[i % authors.length], age: age });
     }
 
-    A.create(docs, function (err) {
+    A.create(docs, function(err) {
       assert.ifError(err);
-      start.mongodVersion(function (err, version) {
+      start.mongodVersion(function(err, version) {
         if (err) throw err;
         mongo26_or_greater = 2 < version[0] || (2 == version[0] && 6 <= version[1]);
         if (!mongo26_or_greater) console.log('not testing mongodb 2.6 features');
@@ -59,11 +59,11 @@ describe('model aggregate', function(){
     db.close(done);
   });
 
-  describe('works', function(){
-    it('with argument lists', function(done){
+  describe('works', function() {
+    it('with argument lists', function(done) {
       this.timeout(4000);
 
-      A.aggregate(group, project, function (err, res) {
+      A.aggregate(group, project, function(err, res) {
         assert.ifError(err);
         assert.ok(res);
         assert.equal(1, res.length);
@@ -73,10 +73,10 @@ describe('model aggregate', function(){
       });
     });
 
-    it('with arrays', function(done){
+    it('with arrays', function(done) {
       this.timeout(4000);
 
-      A.aggregate([group, project], function (err, res) {
+      A.aggregate([group, project], function(err, res) {
         assert.ifError(err);
         assert.ok(res);
         assert.equal(1, res.length);
@@ -92,7 +92,7 @@ describe('model aggregate', function(){
       var promise = A.aggregate()
         .group(group.$group)
         .project(project.$project)
-        .exec(function (err, res) {
+        .exec(function(err, res) {
             assert.ifError(err);
             assert.ok(promise instanceof mongoose.Promise);
             assert.ok(res);
@@ -111,7 +111,7 @@ describe('model aggregate', function(){
         .project(project.$project)
         .exec();
 
-      promise.then(function(res){
+      promise.then(function(res) {
           assert.ok(promise instanceof mongoose.Promise);
           assert.ok(res);
           assert.equal(1, res.length);

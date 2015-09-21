@@ -18,29 +18,29 @@ var names = ('Aaden Aaron Adrian Aditya Agustin Jim Bob Jonah Frank Sally Lucy')
  */
 
 var Person = new Schema({
-    name: String
+  name: String
 });
 
 mongoose.model('PersonForStream', Person);
 var collection = 'personforstream_' + random();
 
-describe('query stream:', function(){
-  before(function (done) {
+describe('query stream:', function() {
+  before(function(done) {
     var db = start()
       , P = db.model('PersonForStream', collection);
 
-    var people = names.map(function (name) {
+    var people = names.map(function(name) {
       return { name: name };
     });
 
-    P.create(people, function (err) {
+    P.create(people, function(err) {
       assert.ifError(err);
       db.close();
       done();
     });
   });
 
-  it('works', function(done){
+  it('works', function(done) {
     var db = start()
       , P = db.model('PersonForStream', collection)
       , i = 0
@@ -52,7 +52,7 @@ describe('query stream:', function(){
 
     var stream = P.find().batchSize(3).stream();
 
-    stream.on('data', function (doc) {
+    stream.on('data', function(doc) {
       assert.strictEqual(true, !! doc.name);
       assert.strictEqual(true, !! doc._id);
 
@@ -73,7 +73,7 @@ describe('query stream:', function(){
         assert.equal(true, stream.paused);
         paused++;
 
-        setTimeout(function () {
+        setTimeout(function() {
           assert.equal(true, stream.paused);
           resumed++;
           stream.resume();
@@ -87,17 +87,17 @@ describe('query stream:', function(){
       }
     });
 
-    stream.on('error', function (er) {
+    stream.on('error', function(er) {
       err = er;
       cb();
     });
 
-    stream.on('close', function () {
+    stream.on('close', function() {
       closed++;
       cb();
     });
 
-    function cb () {
+    function cb() {
       db.close();
       assert.strictEqual(undefined, err);
       assert.equal(i, names.length);
@@ -109,14 +109,14 @@ describe('query stream:', function(){
     }
   });
 
-  it('immediately destroying a stream prevents the query from executing', function(done){
+  it('immediately destroying a stream prevents the query from executing', function(done) {
     var db = start()
       , P = db.model('PersonForStream', collection)
       , i = 0;
 
     var stream = P.where('name', 'Jonah').select('name').findOne().stream();
 
-    stream.on('data', function () {
+    stream.on('data', function() {
       i++;
     });
     stream.on('close', cb);
@@ -124,10 +124,10 @@ describe('query stream:', function(){
 
     stream.destroy();
 
-    function cb (err) {
+    function cb(err) {
       assert.ifError(err);
       assert.equal(0, i);
-      process.nextTick(function () {
+      process.nextTick(function() {
         db.close();
         assert.strictEqual(null, stream._fields);
         done();
@@ -135,7 +135,7 @@ describe('query stream:', function(){
     }
   });
 
-  it('destroying a stream stops it', function(done){
+  it('destroying a stream stops it', function(done) {
     this.slow(300);
 
     var db = start()
@@ -148,7 +148,7 @@ describe('query stream:', function(){
     assert.strictEqual(null, stream._destroyed);
     assert.equal(true, stream.readable);
 
-    stream.on('data', function (doc) {
+    stream.on('data', function(doc) {
       assert.strictEqual(undefined, doc.name);
       if (++i === 5) {
         stream.destroy();
@@ -159,9 +159,9 @@ describe('query stream:', function(){
     stream.on('close', cb);
     stream.on('error', cb);
 
-    function cb (err) {
+    function cb(err) {
       ++finished;
-      setTimeout(function () {
+      setTimeout(function() {
         db.close();
         assert.strictEqual(undefined, err);
         assert.equal(5, i);
@@ -174,7 +174,7 @@ describe('query stream:', function(){
     }
   });
 
-  it('errors', function(done){
+  it('errors', function(done) {
     this.slow(300);
 
     var db = start({ server: { auto_reconnect: false }})
@@ -185,21 +185,21 @@ describe('query stream:', function(){
 
     var stream = P.find().batchSize(5).stream();
 
-    stream.on('data', function () {
+    stream.on('data', function() {
       if (++i === 5) {
         db.close();
       }
     });
 
-    stream.on('close', function () {
+    stream.on('close', function() {
       closed++;
     });
 
     stream.on('error', cb);
 
-    function cb (err) {
+    function cb(err) {
       ++finished;
-      setTimeout(function () {
+      setTimeout(function() {
         assert.ok(/destroyed/.test(err.message), err.message);
         assert.equal(i, 5);
         assert.equal(1, closed);
@@ -260,7 +260,7 @@ describe('query stream:', function(){
       } else if (2 === i) {
         stream.pause();
         assert.equal(true, stream.paused);
-        process.nextTick(function () {
+        process.nextTick(function() {
           assert.equal(true, stream.paused);
           stream.resume();
           assert.equal(false, stream.paused);
@@ -268,12 +268,12 @@ describe('query stream:', function(){
       }
     });
 
-    stream.on('error', function (er) {
+    stream.on('error', function(er) {
       err = er;
       cb();
     });
 
-    stream.on('close', function () {
+    stream.on('close', function() {
       closed++;
       cb();
     });
@@ -294,7 +294,7 @@ describe('query stream:', function(){
     var db = start();
 
     var postSchema = new Schema({
-        ids: [{type: Schema.ObjectId}]
+      ids: [{type: Schema.ObjectId}]
       , title: String
     });
 
@@ -312,15 +312,15 @@ describe('query stream:', function(){
         .stream();
 
       stream.
-        on('data', function (found) {
+        on('data', function(found) {
           assert.equal(found.id, doc.id);
           assert.equal(1, found.ids.length);
           assert.equal(_id2.toString(), found.ids[0].toString());
         }).
-        on('error', function (err) {
+        on('error', function(err) {
           error = err;
         }).
-        on('close', function () {
+        on('close', function() {
           db.close();
           done(error);
         });
@@ -431,15 +431,15 @@ describe('query stream:', function(){
         }
       },
       items: [
-        {
-          id: {
-            type: Number,
-            refPath: 'items.type'
-          },
-          type: {
-            type: String
+          {
+            id: {
+              type: Number,
+              refPath: 'items.type'
+            },
+            type: {
+              type: String
+            }
           }
-        }
       ]
     });
 
@@ -453,16 +453,16 @@ describe('query stream:', function(){
       otherName: String
     });
 
-    Review = db.model('dynrefReview', reviewSchema, 'gh3108_0');
-    Item1 = db.model('dynrefItem1', item1Schema, 'gh3108_1');
-    Item2 = db.model('dynrefItem2', item2Schema, 'gh3108_2');
+    var Review = db.model('dynrefReview', reviewSchema, 'gh3108_0');
+    var Item1 = db.model('dynrefItem1', item1Schema, 'gh3108_1');
+    var Item2 = db.model('dynrefItem2', item2Schema, 'gh3108_2');
 
     var c = 0;
 
     var create = function(cb) {
-      Item1.create({ _id: ++c, name: 'Val' }, function(error, doc) {
+      Item1.create({ _id: ++c, name: 'Val' }, function(error) {
         assert.ifError(error);
-        Item2.create({ _id: ++c, otherName: 'Val' }, function(error, doc) {
+        Item2.create({ _id: ++c, otherName: 'Val' }, function(error) {
           assert.ifError(error);
           var review = {
             _id: c,
@@ -473,7 +473,7 @@ describe('query stream:', function(){
               { id: c, type: 'dynrefItem2' }
             ]
           };
-          Review.create(review, function(error, doc) {
+          Review.create(review, function(error) {
             assert.ifError(error);
             cb();
           });

@@ -29,13 +29,13 @@ var data = [
 ];
 
 
-mongoose.connect('mongodb://localhost/persons', function (err) {
+mongoose.connect('mongodb://localhost/persons', function(err) {
   if (err) throw err;
 
   // create all of the dummy people
-  async.each(data, function (item, cb) {
+  async.each(data, function(item, cb) {
     Person.create(item, cb);
-  }, function (err) {
+  }, function(err) {
     if (err) {
       // handle error
     }
@@ -54,7 +54,7 @@ mongoose.connect('mongodb://localhost/persons', function (err) {
         _id : { likes : "$likes" },
         likers : { $addToSet : "$name" }
       } },
-      function (err, result) {
+      function(err, result) {
         if (err) throw err;
         console.log(result);
         //[ { _id: { likes: 'the night' }, likers: [ 'alucard' ] },
@@ -70,7 +70,7 @@ mongoose.connect('mongodb://localhost/persons', function (err) {
         //{ _id: { likes: 'movies' }, likers: [ 'mary', 'bill' ] } ]
 
         cleanup();
-    });
+      });
   });
 });
 

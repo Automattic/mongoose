@@ -34,7 +34,7 @@ describe('model', function() {
 
     before(function() {
       db = start();
-      BaseEvent = db.model('model-discriminator-querying-event', EventSchema, 'model-discriminator-querying-'+random());
+      BaseEvent = db.model('model-discriminator-querying-event', EventSchema, 'model-discriminator-querying-' + random());
       ImpressionEvent = BaseEvent.discriminator('model-discriminator-querying-impression', ImpressionEventSchema);
       ConversionEvent = BaseEvent.discriminator('model-discriminator-querying-conversion', ConversionEventSchema);
     });
@@ -266,7 +266,7 @@ describe('model', function() {
         });
       });
 
-      var checkDiscriminatorModelsFindDocumentsOfItsType = function(fields, done){
+      var checkDiscriminatorModelsFindDocumentsOfItsType = function(fields, done) {
         var impressionEvent = new ImpressionEvent({ name: 'Impression event' });
         var conversionEvent1 = new ConversionEvent({ name: 'Conversion event 1', revenue: 1 });
         var conversionEvent2 = new ConversionEvent({ name: 'Conversion event 2', revenue: 2 });
@@ -344,7 +344,7 @@ describe('model', function() {
               var stream = BaseEvent.find({}).sort('name').stream();
 
               stream.on('data', function(doc) {
-                switch(doc.name) {
+                switch (doc.name) {
                   case 'Base event':
                     assert.ok(doc instanceof BaseEvent);
                     break;
@@ -361,7 +361,7 @@ describe('model', function() {
                 }
               });
 
-              stream.on('error', function (err) {
+              stream.on('error', function(err) {
                 assert.ifError(err);
               });
 
@@ -653,7 +653,7 @@ describe('model', function() {
         var busSchema = new Schema({ speed: Number });
 
         var userSchema = new Schema({
-            vehicles: [{ type: Schema.Types.ObjectId, ref: 'ModelDiscriminatorPopulationVehicle' }]
+          vehicles: [{ type: Schema.Types.ObjectId, ref: 'ModelDiscriminatorPopulationVehicle' }]
           , favoriteVehicle: { type: Schema.Types.ObjectId, ref: 'ModelDiscriminatorPopulationVehicle' }
           , favoriteBus: { type: Schema.Types.ObjectId, ref: 'ModelDiscriminatorPopulationBus' }
         });
@@ -674,7 +674,7 @@ describe('model', function() {
                   assert.ifError(err);
 
                   var expected = {
-                      __v: 0
+                    __v: 0
                     , _id: user._id
                     , vehicles: [
                         { _id: vehicle._id, __v: 0 }
@@ -706,7 +706,7 @@ describe('model', function() {
         });
       });
 
-      it('reference in child schemas (gh-2719)', function(done){
+      it('reference in child schemas (gh-2719)', function(done) {
         var vehicleSchema = new Schema({});
         var carSchema = new Schema({
           speed: Number,
@@ -727,16 +727,16 @@ describe('model', function() {
           , Bus = Vehicle.discriminator('gh2719PopulationBus', busSchema)
           , Garage = db.model('gh2719PopulationGarage', garageSchema);
 
-        Garage.create({name: 'My', num_of_places: 3}, function(err, garage){
+        Garage.create({name: 'My', num_of_places: 3}, function(err, garage) {
           assert.ifError(err);
           Car.create({ speed: 160, garage: garage }, function(err) {
             assert.ifError(err);
             Bus.create({ speed: 80, garage: garage }, function(err) {
               assert.ifError(err);
-              Vehicle.find({}).populate('garage').exec(function(err, vehicles){
+              Vehicle.find({}).populate('garage').exec(function(err, vehicles) {
                 assert.ifError(err);
 
-                vehicles.forEach(function(v){
+                vehicles.forEach(function(v) {
                   assert.ok(v.garage instanceof Garage);
                 });
 
@@ -747,7 +747,7 @@ describe('model', function() {
         });
       });
 
-      it('reference in child schemas (gh-2719-2)', function(done){
+      it('reference in child schemas (gh-2719-2)', function(done) {
         var EventSchema, Event, TalkSchema, Talk, Survey;
 
         function BaseSchema() {
@@ -785,7 +785,7 @@ describe('model', function() {
         Survey.create({
           name: "That you see?",
           date: Date.now()
-        }, function(err, survey){
+        }, function(err, survey) {
           assert.ifError(err);
 
           Talk.create({
@@ -794,10 +794,10 @@ describe('model', function() {
             pin: "0004",
             period: { start: "11:00", end: "12:00" },
             surveys: [ survey ]
-          }, function(err){
+          }, function(err) {
             assert.ifError(err);
 
-            Event.find({}).populate('surveys').exec(function(err, events){
+            Event.find({}).populate('surveys').exec(function(err, events) {
               assert.ifError(err);
 
               assert.ok(events[0].surveys[0] instanceof Survey);
@@ -819,7 +819,7 @@ describe('model', function() {
 
         async.forEach(
           [impressionEvent, conversionEvent, ignoredImpressionEvent],
-          function (doc, cb) {
+          function(doc, cb) {
             doc.save(cb);
           },
           done

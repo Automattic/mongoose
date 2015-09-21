@@ -8,9 +8,9 @@ var start = require('./common')
   , assert = require('assert')
   , Schema = mongoose.Schema;
 
-describe('schematype', function(){
-  describe('boolean', function(){
-    it('null default is permitted (gh-523)', function(done){
+describe('schematype', function() {
+  describe('boolean', function() {
+    it('null default is permitted (gh-523)', function(done) {
       var db = start()
         , s1 = new Schema({ b: { type: Boolean, default: null }})
         , M1 = db.model('NullDateDefaultIsAllowed1', s1)

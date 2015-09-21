@@ -306,6 +306,8 @@ describe('schema', function() {
       assert.ok(Loki.path('birth_date').cast(1294525628301) instanceof Date);
       assert.ok(Loki.path('birth_date').cast('8/24/2000') instanceof Date);
       assert.ok(Loki.path('birth_date').cast(new Date) instanceof Date);
+      assert.ok(Loki.path('birth_date').cast('') === null);
+      assert.ok(Loki.path('birth_date').cast(null) === null);
       done();
     });
 

@@ -25,7 +25,34 @@ block content
   :markdown
     If the built-in validators aren't enough, validation can be completely tailored to suite your needs.
 
-    Custom validation is declared by passing a validation `function` and coinciding error message to your `SchemaTypes` `validate` method. Instructions for how to do so are available in the [API docs](./api.html#schematype_SchemaType-validate).
+    Custom validation is declared by passing a validation function.
+    You can find detailed instructions on how to do this in the
+    [`SchemaType#validate()` API docs](./api.html#schematype_SchemaType-validate).
+    
+  :js
+    var userSchema = new Schema({
+      phone: {
+        type: String,
+        validate: {
+          validator: function(v) {
+            return /\d{3}-\d{3}-\d{4}/.test(v);
+          },
+          message: '{VALUE} is not a valid phone number!'
+        }
+      }
+    });
+    
+    var User = mongoose.model('user', userSchema);
+
+    var u = new User();
+
+    u.phone = '555.0123';
+    // Prints "ValidationError: 555.0123 is not a valid phone number!"
+    console.log(u.validateSync().toString());
+
+    u.phone = '201-555-0123';
+    // Prints undefined - validation succeeded!
+    console.log(u.validateSync());
   h3#validation-errors Validation errors
   :markdown
     Errors returned after failed validation contain an `errors` object

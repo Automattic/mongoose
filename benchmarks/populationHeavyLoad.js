@@ -432,8 +432,8 @@ var db = mongoose.createConnection('localhost', 'HeavyLoad', function(err) {
       var cnt = Math.floor(Math.random() * dicCnt);
       var i, res = [];
       for (i = 0; i < cnt; i++) {
-          res.push(list[i]);
-        }
+        res.push(list[i]);
+      }
       return res;
     };
   }

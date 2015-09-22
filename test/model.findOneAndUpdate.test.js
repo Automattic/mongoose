@@ -1378,10 +1378,10 @@ describe('model: findByIdAndUpdate:', function() {
         TestModel.findOneAndUpdate(
             { id: '1', blob: null },
             { $set: { status: 'inactive' }},
-            {
-              upsert: true,
-              setDefaultsOnInsert: true
-            },
+          {
+            upsert: true,
+            setDefaultsOnInsert: true
+          },
             function(error) {
               assert.ifError(error);
               done();

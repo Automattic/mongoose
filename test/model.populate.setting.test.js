@@ -197,19 +197,19 @@ describe('model: populate:', function() {
                assert.ifError(err);
                B.findById(b1).exec(function(err, doc) {
                 // db is closed in after()
-                assert.ifError(err);
-                assert.equal(8, doc.fans.length);
-                assert.equal(doc.fans[0], user8.id);
-                assert.equal(doc.fans[5], user7.id);
-                assert.equal(doc.fans[6], null);
-                assert.equal(doc.fans[7], String(_id));
-                assert.equal(String(doc._creator), creator._id);
-                assert.equal(doc.embed[0].array[0], user1a.id);
-                assert.equal(doc.embed[0].other, user1b.id);
-                assert.equal(doc.adhoc[0].subdoc, user2a.id);
-                assert.equal(doc.adhoc[0].subarray[0].things[1], user2b.id);
-                done();
-              });
+                 assert.ifError(err);
+                 assert.equal(8, doc.fans.length);
+                 assert.equal(doc.fans[0], user8.id);
+                 assert.equal(doc.fans[5], user7.id);
+                 assert.equal(doc.fans[6], null);
+                 assert.equal(doc.fans[7], String(_id));
+                 assert.equal(String(doc._creator), creator._id);
+                 assert.equal(doc.embed[0].array[0], user1a.id);
+                 assert.equal(doc.embed[0].other, user1b.id);
+                 assert.equal(doc.adhoc[0].subdoc, user2a.id);
+                 assert.equal(doc.adhoc[0].subarray[0].things[1], user2b.id);
+                 done();
+               });
              });
            });
         });
@@ -296,17 +296,17 @@ describe('model: populate:', function() {
                assert.ifError(err);
                B.findById(b2).exec(function(err, doc) {
                 // db is closed in after()
-                assert.ifError(err);
-                assert.equal(6, doc.fans.length);
-                assert.equal(String(doc._creator), creatorId);
-                assert.equal(doc.fans[2], String(fan2Id));
-                assert.equal(doc.fans[5], String(fan5Id));
-                assert.equal(doc.embed[0].array[0], String(user1aId));
-                assert.equal(doc.embed[0].other, String(user1bId));
-                assert.equal(doc.adhoc[0].subdoc, String(user2aId));
-                assert.equal(doc.adhoc[0].subarray[0].things[1], String(user2bId));
-                done();
-              });
+                 assert.ifError(err);
+                 assert.equal(6, doc.fans.length);
+                 assert.equal(String(doc._creator), creatorId);
+                 assert.equal(doc.fans[2], String(fan2Id));
+                 assert.equal(doc.fans[5], String(fan5Id));
+                 assert.equal(doc.embed[0].array[0], String(user1aId));
+                 assert.equal(doc.embed[0].other, String(user1bId));
+                 assert.equal(doc.adhoc[0].subdoc, String(user2aId));
+                 assert.equal(doc.adhoc[0].subarray[0].things[1], String(user2bId));
+                 done();
+               });
              });
            });
         });

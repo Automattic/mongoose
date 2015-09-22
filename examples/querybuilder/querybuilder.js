@@ -48,12 +48,12 @@ mongoose.connect('mongodb://localhost/persons', function(err) {
 
     // finally, when ready to execute the query, call the exec() function
     query.exec(function(err, results) {
-        if (err) throw err;
+      if (err) throw err;
 
-        console.log(results);
+      console.log(results);
 
-        cleanup();
-      });
+      cleanup();
+    });
 
   });
 });

@@ -584,10 +584,10 @@ describe('model: querying:', function() {
                                    assert.equal(found._id.toString(), created._id);
                                    var query = { sigs: { "$in" : [new Buffer([3, 3, 3]), new Buffer([4, 5, 6])] } };
                                    BlogPostB.findOne(query, function(err) {
-            assert.ifError(err);
-            db.close();
-            done();
-          });
+                                     assert.ifError(err);
+                                     db.close();
+                                     done();
+                                   });
                                  });
                                });
     });
@@ -2313,10 +2313,10 @@ describe('geo-spatial', function() {
                                  assert.equal(created.id, docs[0].id);
 
                                  Test.where('geom').intersects().geometry(geojsonLine).findOne(function(err, doc) {
-              assert.ifError(err);
-              assert.equal(created.id, doc.id);
-              db.close(done);
-            });
+                                   assert.ifError(err);
+                                   assert.equal(created.id, doc.id);
+                                   db.close(done);
+                                 });
                                });
                              });
       });
@@ -2339,10 +2339,10 @@ describe('geo-spatial', function() {
                                  assert.equal(created.id, docs[0].id);
 
                                  Test.where('geom').intersects().geometry(geojsonPolygon).findOne(function(err, doc) {
-              assert.ifError(err);
-              assert.equal(created.id, doc.id);
-              db.close(done);
-            });
+                                   assert.ifError(err);
+                                   assert.equal(created.id, doc.id);
+                                   db.close(done);
+                                 });
                                });
                              });
       });

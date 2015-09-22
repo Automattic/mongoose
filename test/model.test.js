@@ -3971,10 +3971,10 @@ describe('Model', function() {
           query.exec(function(err) {
             assert.ifError(err);
             BlogPost.count({title: 'interoperable remove as promise'}, function(err, count) {
-            db.close();
-            assert.equal(count, 0);
-            done();
-          });
+              db.close();
+              assert.equal(count, 0);
+              done();
+            });
           });
         });
     });
@@ -4087,10 +4087,10 @@ describe('Model', function() {
             promise.onResolve(function(err) {
               assert.ifError(err);
               BlogPost.count({title: 'interoperable remove as promise 2'}, function(err, count) {
-              db.close();
-              assert.equal(count,0);
-              done();
-            });
+                db.close();
+                assert.equal(count,0);
+                done();
+              });
             });
           });
       });
@@ -4135,19 +4135,19 @@ describe('Model', function() {
               var promise = B.find({ title: /^then promise/ }).select('_id').exec();
               promise.then(function(blogs) {
                 var ids = blogs.map(function(m) {
-                return m._id;
-              });
+                  return m._id;
+                });
                 return P.where('likes').in(ids).exec();
               }).then(function(people) {
-              assert.equal(3, people.length);
-              return people;
-            }).then(function() {
-              db.close();
-              done();
-            }, function(err) {
-              db.close();
-              done(new Error(err));
-            });
+                assert.equal(3, people.length);
+                return people;
+              }).then(function() {
+                db.close();
+                done();
+              }, function(err) {
+                db.close();
+                done(new Error(err));
+              });
             });
           });
       });
@@ -4516,18 +4516,18 @@ describe('Model', function() {
             assert.equal(d.$set.comments.length, 2);
 
             b.save(function(err) {
-            assert.ifError(err);
-
-            B.findById(b._id, function(err, b) {
-              db.close();
               assert.ifError(err);
-              assert.ok(Array.isArray(b.comments));
-              assert.equal(2, b.comments.length);
-              assert.equal('a', b.comments[0].body);
-              assert.equal('changed', b.comments[1].body);
-              done();
+
+              B.findById(b._id, function(err, b) {
+                db.close();
+                assert.ifError(err);
+                assert.ok(Array.isArray(b.comments));
+                assert.equal(2, b.comments.length);
+                assert.equal('a', b.comments[0].body);
+                assert.equal('changed', b.comments[1].body);
+                done();
+              });
             });
-          });
           });
         });
     });

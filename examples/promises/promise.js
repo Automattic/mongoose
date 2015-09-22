@@ -33,7 +33,7 @@ mongoose.connect('mongodb://localhost/persons', function(err) {
   }, function(err) {
     if (err) {
         // handle error
-      }
+    }
 
       // create a promise (get one from the query builder)
     var prom = Person.find({age : { $lt : 1000 }}).exec();
@@ -54,15 +54,15 @@ mongoose.connect('mongodb://localhost/persons', function(err) {
     prom.then(function(people) {
 
         // just getting the stuff for the next query
-        var ids = people.map(function(p) {
-          return p._id;
-        });
+      var ids = people.map(function(p) {
+        return p._id;
+      });
 
         // return the next promise
-        return Person.find({ _id : { $nin : ids }}).exec();
-      }).then(function(oldest) {
-        console.log("Oldest person is: %s", oldest);
-      }).then(cleanup);
+      return Person.find({ _id : { $nin : ids }}).exec();
+    }).then(function(oldest) {
+      console.log("Oldest person is: %s", oldest);
+    }).then(cleanup);
   });
 });
 

@@ -1892,13 +1892,13 @@ describe('model: populate:', function() {
         m2.save(function(err) {
           assert.ifError(err);
           M2.findById(m2).populate('things').exec(function(err, doc) {
-          db.close();
-          assert.ifError(err);
-          assert.equal(doc.things.length,2);
-          assert.equal(doc.things[0].id,"The Tiger That Isn't");
-          assert.equal(doc.things[1].id,"Users Guide To The Universe");
-          done();
-        });
+            db.close();
+            assert.ifError(err);
+            assert.equal(doc.things.length,2);
+            assert.equal(doc.things[0].id,"The Tiger That Isn't");
+            assert.equal(doc.things[1].id,"Users Guide To The Universe");
+            done();
+          });
         });
       });
   });
@@ -2690,10 +2690,10 @@ describe('model: populate:', function() {
             docs.forEach(function(doc) {
               assert.ok(doc.comment && doc.comment.body);
               if ('u1' == doc.name) {
-              assert.equal('comment 1', doc.comment.body);
-            } else {
-              assert.equal('comment 2', doc.comment.body);
-            }
+                assert.equal('comment 1', doc.comment.body);
+              } else {
+                assert.equal('comment 2', doc.comment.body);
+              }
             });
 
             done();

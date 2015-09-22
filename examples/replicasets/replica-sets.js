@@ -38,14 +38,14 @@ mongoose.connect('mongodb://localhost:27018/persons,localhost:27019,localhost:27
   }, function(err) {
     if (err) {
         // handle error
-      }
+    }
 
       // create and delete some data
     var prom = Person.find({age : { $lt : 1000 }}).exec();
 
     prom.then(function(people) {
-        console.log("young people: %s", people);
-      }).then(cleanup);
+      console.log("young people: %s", people);
+    }).then(cleanup);
   });
 });
 

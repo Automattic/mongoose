@@ -250,8 +250,8 @@ describe('model', function() {
         try {
           Person.discriminator('model-discriminator-custom', CustomizedSchema);
         } catch (e) {
-            errorMessage = e.message;
-          }
+          errorMessage = e.message;
+        }
 
         assert.equal(errorMessage, 'Discriminator options are not customizable (except toJSON & toObject)');
         done();

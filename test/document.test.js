@@ -518,8 +518,8 @@ describe('document', function() {
 
       var obj = doc.toObject({
         transform: function(doc, ret) {
-            ret.phew = 'new';
-          }
+          ret.phew = 'new';
+        }
       });
 
       assert.equal(obj.phew, 'new');

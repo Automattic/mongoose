@@ -429,8 +429,8 @@ describe('schema', function() {
         Animal.path('characteristics').doValidate({
           aggresive: true
         }, function(err) {
-            assert.ifError(err);
-          });
+          assert.ifError(err);
+        });
 
         Animal.path('characteristics').doValidate('none available', function(err) {
           assert.ifError(err);

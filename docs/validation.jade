@@ -147,14 +147,41 @@ block content
       console.log(err.errors.color.message); // prints 'Validator "Invalid color" failed for path color with value `bacon`'
     });
   :markdown
-    There is one key difference between update validators and document
-    validators. In the color validation function above, `this` refers
+    There are a couple of key differences between update validators and
+    document validators. In the color validation function above, `this` refers
     to the document being validated when using document validation.
     However, when running update validators, the document being updated
-    may not be in the server's memory, so `this` refers to the NodeJS global
-    object.
+    may not be in the server's memory, so the value of `this` is not defined
+    (it may be the global object or undefined depending on [strict mode](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Strict_mode)).
+    
+    The other key difference that update validators only run on the paths
+    specified in the update. For instance, in the below example, because
+    'name' is not specified in the update operation, update validation will
+    succeed.
+      
+  :js
+    var toySchema = new Schema({
+      color: String,
+      name: { type: String, required: true }
+    });
+    
+    var Toy = mongoose.model('Toy', toySchema);
+    
+    Toy.update({}, { color: 'blue' }, { runValidators: true }, function(err) {
+      // Operation succeeds despite the fact that 'name' is not specified
+    });
+  
   :markdown
-    Note that in mongoose 4.x, update validators **only** run on `$set`
+    When using update validators, `required` validators **only** fail when
+    you try to explicitly `$unset` the key.
+  :js
+    var unsetOp = { $unset: { name: 1 } };
+    Toy.update({}, unsetOp, { runValidators: true }, function(err) {
+      // Operation fails because 'name' is required
+    });
+    
+  :markdown
+    One final detail worth noting: update validators **only** run on `$set`
     and `$unset` operations. For instance, the below update will succeed,
     regardless of the value of `number`.
   :js

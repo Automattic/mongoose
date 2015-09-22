@@ -29,25 +29,25 @@ mongoose.connect('mongodb://localhost/persons', function(err) {
 
   // create all of the dummy people
   async.each(data, function(item, cb) {
-      Person.create(item, cb);
-    }, function(err) {
-    if (err) throw err;
+    Person.create(item, cb);
+  }, function(err) {
+      if (err) throw err;
 
     // when querying data, instead of providing a callback, you can instead
     // leave that off and get a query object returned
-    var query = Person.find({ age : { $lt : 1000 }});
+      var query = Person.find({ age : { $lt : 1000 }});
 
     // this allows you to continue applying modifiers to it
-    query.sort('birthday');
-    query.select('name');
+      query.sort('birthday');
+      query.select('name');
 
     // you can chain them together as well
     // a full list of methods can be found:
     // http://mongoosejs.com/docs/api.html#query-js
-    query.where('age').gt(21);
+      query.where('age').gt(21);
 
     // finally, when ready to execute the query, call the exec() function
-    query.exec(function(err, results) {
+      query.exec(function(err, results) {
       if (err) throw err;
 
       console.log(results);
@@ -55,7 +55,7 @@ mongoose.connect('mongodb://localhost/persons', function(err) {
       cleanup();
     });
 
-  });
+    });
 });
 
 function cleanup() {

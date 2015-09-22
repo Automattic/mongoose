@@ -731,16 +731,16 @@ describe('model: findByIdAndUpdate:', function() {
       , { title: 2, meta: {visitors: 10}}
       , { title: 3, meta: {visitors: 5}}
       , function(err) {
-      if (err) return done(err);
+        if (err) return done(err);
 
-      M.findOneAndUpdate({}, { title: 'changed' })
+        M.findOneAndUpdate({}, { title: 'changed' })
       .sort({ 'meta.visitors': -1 })
       .exec(function(err, doc) {
         if (err) return done(err);
         assert.equal(10, doc.meta.visitors);
         db.close(done);
       });
-    });
+      });
   });
 
   it('supports v3 sort object syntax', function(done) {
@@ -831,15 +831,15 @@ describe('model: findByIdAndUpdate:', function() {
     var key = 'some-id';
 
     Thing.findOneAndUpdate({_id: key}, {$set: {flag: false}}, {upsert: true, "new": false}).exec(function(err, thing) {
-        assert.ifError(err);
-        assert.equal(null, thing);
-        Thing.findOneAndUpdate({_id: key}, {$set: {flag: false}}, {upsert: true, "new": false}).exec(function(err, thing2) {
+      assert.ifError(err);
+      assert.equal(null, thing);
+      Thing.findOneAndUpdate({_id: key}, {$set: {flag: false}}, {upsert: true, "new": false}).exec(function(err, thing2) {
           assert.ifError(err);
           assert.equal(key, thing2.id);
           assert.equal(false, thing2.flag);
           db.close(done);
         });
-      });
+    });
   });
 
   it('allows properties to be set to null gh-1643', function(done) {
@@ -1364,16 +1364,16 @@ describe('model: findByIdAndUpdate:', function() {
     });
 
     it('should allow null values in query (gh-3135)', function(done) {
-        var db = start();
+      var db = start();
 
-        var testSchema = new mongoose.Schema({
+      var testSchema = new mongoose.Schema({
           id:      String,
           blob:    ObjectId,
           status:  String
         });
 
-        var TestModel = db.model('gh3135', testSchema);
-        TestModel.create({ blob: null, status: 'active' }, function(error) {
+      var TestModel = db.model('gh3135', testSchema);
+      TestModel.create({ blob: null, status: 'active' }, function(error) {
           assert.ifError(error);
           TestModel.findOneAndUpdate(
             { id: '1', blob: null },
@@ -1387,7 +1387,7 @@ describe('model: findByIdAndUpdate:', function() {
               done();
             });
         });
-      });
+    });
 
     it('should work with array documents (gh-3034)', function(done) {
       var db = start();

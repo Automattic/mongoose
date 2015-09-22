@@ -427,16 +427,16 @@ for (i = 0; i < len; i++) {
 
 var db = mongoose.createConnection('localhost', 'HeavyLoad', function(err) {
   function getItems(list) {
-      if (!list) done();
-      return function() {
+    if (!list) done();
+    return function() {
         var cnt = Math.floor(Math.random() * dicCnt);
         var i, res = [];
         for (i = 0; i < cnt; i++) {
-        res.push(list[i]);
-      }
+          res.push(list[i]);
+        }
         return res;
       };
-    }
+  }
 
   var cnt = creatList.length;
   var length = cnt;
@@ -568,8 +568,8 @@ var db = mongoose.createConnection('localhost', 'HeavyLoad', function(err) {
     var coll = db.db.collection('medicalcards');
     console.log('Main Collection prepare');
     coll.remove({}, function() {
-        console.log('clean collection done');
-        var loadMedicalCard = tbd.from({})
+      console.log('clean collection done');
+      var loadMedicalCard = tbd.from({})
           .prop('firstName').use(function() { return createRandomWord(10);}).done()
           .prop('lastName').use(function() { return createRandomWord(10);}).done()
           .prop('medication').use(getItems(load.Medication)).done()
@@ -591,7 +591,7 @@ var db = mongoose.createConnection('localhost', 'HeavyLoad', function(err) {
           .prop('conclusion').use(getItem(load.Conclusion)).done()
           .make(mainCnt);
 
-        var saveAll = function(err, data) {
+      var saveAll = function(err, data) {
           if (err) done();
           else if (--res === 0) {
             console.log('save done');
@@ -599,14 +599,14 @@ var db = mongoose.createConnection('localhost', 'HeavyLoad', function(err) {
           }
         };
 
-        var res = loadMedicalCard.length;
-        var mc = db.model('MedicalCard');
-        var i, rec;
-        var len = loadMedicalCard.length;
-        for (i = 0; i < len; i++) {
+      var res = loadMedicalCard.length;
+      var mc = db.model('MedicalCard');
+      var i, rec;
+      var len = loadMedicalCard.length;
+      for (i = 0; i < len; i++) {
           new mc(loadMedicalCard[i]).save(saveAll);
         }
-      });
+    });
   };
 
 

@@ -245,17 +245,17 @@ describe('model', function() {
       });
 
       it('is not customizable', function(done) {
-          var errorMessage
+        var errorMessage
             , CustomizedSchema = new Schema({}, { capped: true });
-          try {
+        try {
             Person.discriminator('model-discriminator-custom', CustomizedSchema);
           } catch (e) {
             errorMessage = e.message;
           }
 
-          assert.equal(errorMessage, 'Discriminator options are not customizable (except toJSON & toObject)');
-          done();
-        });
+        assert.equal(errorMessage, 'Discriminator options are not customizable (except toJSON & toObject)');
+        done();
+      });
     });
 
     describe('root schema inheritance', function() {

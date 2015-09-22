@@ -35,12 +35,12 @@ describe('model: populate: divergent arrays', function() {
         { _id: 0, name: 'zero' }
       , { _id: 1, name: 'one' }
       , { _id: 2, name: 'two' }, function(err) {
-      assert.ifError(err);
-      M.create({ array: [0, 1, 2] }, function(err) {
+        assert.ifError(err);
+        M.create({ array: [0, 1, 2] }, function(err) {
         assert.ifError(err);
         done();
       });
-    });
+      });
   });
 
   after(function(done) {

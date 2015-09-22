@@ -34,8 +34,8 @@ mongoose.connect('mongodb://localhost:27018/persons,localhost:27019,localhost:27
 
   // create all of the dummy people
   async.each(data, function(item, cb) {
-      Person.create(item, cb);
-    }, function(err) {
+    Person.create(item, cb);
+  }, function(err) {
       if (err) {
         // handle error
       }

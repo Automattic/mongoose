@@ -1005,7 +1005,7 @@ describe('Model', function() {
       var db = start();
 
       Date.prototype.toObject = function() {
-          return {
+        return {
             millisecond: 86
               , second: 42
               , minute: 47
@@ -1015,7 +1015,7 @@ describe('Model', function() {
               , month: 11
               , year: 2011
           };
-        };
+      };
 
       var S = new Schema({
         name: String
@@ -1616,8 +1616,8 @@ describe('Model', function() {
           , Post = null
           , post = null
           , abc = function(v) {
-              return v === 'abc';
-            };
+            return v === 'abc';
+          };
 
         ComplexValidationMiddlewareSchema = new Schema({
           baz: { type: String },
@@ -3943,9 +3943,9 @@ describe('Model', function() {
           {title: 'interoperable find as promise'}
         , {title: 'interoperable find as promise'}
         , function(err, createdOne, createdTwo) {
-        assert.ifError(err);
-        var query = BlogPost.find({title: 'interoperable find as promise'}).sort('_id');
-        query.exec(function(err, found) {
+          assert.ifError(err);
+          var query = BlogPost.find({title: 'interoperable find as promise'}).sort('_id');
+          query.exec(function(err, found) {
           db.close();
           assert.ifError(err);
           assert.equal(found.length, 2);
@@ -3956,7 +3956,7 @@ describe('Model', function() {
           assert.ok(String(createdTwo._id) in ids);
           done();
         });
-      });
+        });
     });
 
     it('remove()', function(done) {
@@ -3966,9 +3966,9 @@ describe('Model', function() {
       BlogPost.create(
           {title: 'interoperable remove as promise'}
         , function(err) {
-        assert.ifError(err);
-        var query = BlogPost.remove({title: 'interoperable remove as promise'});
-        query.exec(function(err) {
+          assert.ifError(err);
+          var query = BlogPost.remove({title: 'interoperable remove as promise'});
+          query.exec(function(err) {
           assert.ifError(err);
           BlogPost.count({title: 'interoperable remove as promise'}, function(err, count) {
             db.close();
@@ -3976,7 +3976,7 @@ describe('Model', function() {
             done();
           });
         });
-      });
+        });
     });
 
     it('op can be changed', function(done) {
@@ -4060,10 +4060,10 @@ describe('Model', function() {
             {title: 'interoperable find as promise 2'}
           , {title: 'interoperable find as promise 2'}
           , function(err, createdOne, createdTwo) {
-          assert.ifError(err);
-          var query = BlogPost.find({title: 'interoperable find as promise 2'}).sort('_id');
-          var promise = query.exec();
-          promise.onResolve(function(err, found) {
+            assert.ifError(err);
+            var query = BlogPost.find({title: 'interoperable find as promise 2'}).sort('_id');
+            var promise = query.exec();
+            promise.onResolve(function(err, found) {
             db.close();
             assert.ifError(err);
             assert.equal(found.length,2);
@@ -4071,7 +4071,7 @@ describe('Model', function() {
             assert.equal(found[1].id,createdTwo.id);
             done();
           });
-        });
+          });
       });
 
       it('remove()', function(done) {
@@ -4081,10 +4081,10 @@ describe('Model', function() {
         BlogPost.create(
             {title: 'interoperable remove as promise 2'}
           , function(err) {
-          assert.ifError(err);
-          var query = BlogPost.remove({title: 'interoperable remove as promise 2'});
-          var promise = query.exec();
-          promise.onResolve(function(err) {
+            assert.ifError(err);
+            var query = BlogPost.remove({title: 'interoperable remove as promise 2'});
+            var promise = query.exec();
+            promise.onResolve(function(err) {
             assert.ifError(err);
             BlogPost.count({title: 'interoperable remove as promise 2'}, function(err, count) {
               db.close();
@@ -4092,7 +4092,7 @@ describe('Model', function() {
               done();
             });
           });
-        });
+          });
       });
 
       it('are compatible with op modification on the fly', function(done) {
@@ -4123,17 +4123,17 @@ describe('Model', function() {
           , { title: 'then promise 2' }
           , { title: 'then promise 3' }
           , function(err, d1, d2, d3) {
-          assert.ifError(err);
+            assert.ifError(err);
 
-          P.create(
+            P.create(
               { name: 'brandon', likes: [d1] }
             , { name: 'ben', likes: [d2] }
             , { name: 'bernie', likes: [d3] }
             , function(err) {
-            assert.ifError(err);
+              assert.ifError(err);
 
-            var promise = B.find({ title: /^then promise/ }).select('_id').exec();
-            promise.then(function(blogs) {
+              var promise = B.find({ title: /^then promise/ }).select('_id').exec();
+              promise.then(function(blogs) {
               var ids = blogs.map(function(m) {
                 return m._id;
               });
@@ -4148,8 +4148,8 @@ describe('Model', function() {
               db.close();
               done(new Error(err));
             });
+            });
           });
-        });
       });
     });
   });
@@ -4499,8 +4499,8 @@ describe('Model', function() {
           { title: 'gh-1303', comments: [{body:'a'},{body:'b'},{body:'c'}] }
         , function(err, b) {
 
-        assert.ifError(err);
-        B.findById(b._id, function(err, b) {
+          assert.ifError(err);
+          B.findById(b._id, function(err, b) {
           assert.ifError(err);
 
           b.comments[2].body = 'changed';
@@ -4529,7 +4529,7 @@ describe('Model', function() {
             });
           });
         });
-      });
+        });
     });
   });
 

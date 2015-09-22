@@ -172,9 +172,9 @@ describe('model field selection', function() {
 
     BlogPostB.collection.insert(
         { _id: id, title: 'issue 870'}, { safe: true }, function(err) {
-      assert.ifError(err);
+          assert.ifError(err);
 
-      BlogPostB.findById(id, 'def comments', function(err, found) {
+          BlogPostB.findById(id, 'def comments', function(err, found) {
         db.close();
         assert.ifError(err);
         assert.ok(found);
@@ -186,7 +186,7 @@ describe('model field selection', function() {
         assert.equal(0, found.comments.length);
         done();
       });
-    });
+        });
   });
 
   it('including subdoc field excludes other subdoc fields (gh-1027)', function(done) {

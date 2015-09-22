@@ -579,16 +579,16 @@ describe('model: querying:', function() {
                                new Buffer([7, 8, 9])]}, function(err, created) {
                                  assert.ifError(err);
                                  BlogPostB.findOne({sigs: new Buffer([1, 2, 3])}, function(err, found) {
-          assert.ifError(err);
-          found.id;
-          assert.equal(found._id.toString(), created._id);
-          var query = { sigs: { "$in" : [new Buffer([3, 3, 3]), new Buffer([4, 5, 6])] } };
-          BlogPostB.findOne(query, function(err) {
+                                   assert.ifError(err);
+                                   found.id;
+                                   assert.equal(found._id.toString(), created._id);
+                                   var query = { sigs: { "$in" : [new Buffer([3, 3, 3]), new Buffer([4, 5, 6])] } };
+                                   BlogPostB.findOne(query, function(err) {
             assert.ifError(err);
             db.close();
             done();
           });
-        });
+                                 });
                                });
     });
 
@@ -1251,11 +1251,11 @@ describe('model: querying:', function() {
         , { title: 'B' }, function(err) {
           assert.ifError(err);
           BlogPostB.find({author: null}, function(err, found) {
-          db.close();
-          assert.ifError(err);
-          assert.equal(2, found.length);
-          done();
-        });
+            db.close();
+            assert.ifError(err);
+            assert.equal(2, found.length);
+            done();
+          });
         });
     });
 
@@ -2308,16 +2308,16 @@ describe('geo-spatial', function() {
                                var geojsonLine = { type: 'LineString', coordinates: [[180.0, 11.0], [180.0, '9.00']] };
 
                                Test.find({ geom: { $geoIntersects: { $geometry: geojsonLine }}}, function(err, docs) {
-            assert.ifError(err);
-            assert.equal(1, docs.length);
-            assert.equal(created.id, docs[0].id);
+                                 assert.ifError(err);
+                                 assert.equal(1, docs.length);
+                                 assert.equal(created.id, docs[0].id);
 
-            Test.where('geom').intersects().geometry(geojsonLine).findOne(function(err, doc) {
+                                 Test.where('geom').intersects().geometry(geojsonLine).findOne(function(err, doc) {
               assert.ifError(err);
               assert.equal(created.id, doc.id);
               db.close(done);
             });
-          });
+                               });
                              });
       });
 
@@ -2334,16 +2334,16 @@ describe('geo-spatial', function() {
                                var geojsonPolygon = { type: 'Polygon', coordinates: [[ [26,36],[45,36],[45,42],[26,42],[26,36] ]] };
 
                                Test.find({ geom: { $geoIntersects: { $geometry: geojsonPolygon }}}, function(err, docs) {
-            assert.ifError(err);
-            assert.equal(1, docs.length);
-            assert.equal(created.id, docs[0].id);
+                                 assert.ifError(err);
+                                 assert.equal(1, docs.length);
+                                 assert.equal(created.id, docs[0].id);
 
-            Test.where('geom').intersects().geometry(geojsonPolygon).findOne(function(err, doc) {
+                                 Test.where('geom').intersects().geometry(geojsonPolygon).findOne(function(err, doc) {
               assert.ifError(err);
               assert.equal(created.id, doc.id);
               db.close(done);
             });
-          });
+                               });
                              });
       });
     });

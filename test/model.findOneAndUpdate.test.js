@@ -834,11 +834,11 @@ describe('model: findByIdAndUpdate:', function() {
       assert.ifError(err);
       assert.equal(null, thing);
       Thing.findOneAndUpdate({_id: key}, {$set: {flag: false}}, {upsert: true, "new": false}).exec(function(err, thing2) {
-          assert.ifError(err);
-          assert.equal(key, thing2.id);
-          assert.equal(false, thing2.flag);
-          db.close(done);
-        });
+        assert.ifError(err);
+        assert.equal(key, thing2.id);
+        assert.equal(false, thing2.flag);
+        db.close(done);
+      });
     });
   });
 
@@ -1367,15 +1367,15 @@ describe('model: findByIdAndUpdate:', function() {
       var db = start();
 
       var testSchema = new mongoose.Schema({
-          id:      String,
-          blob:    ObjectId,
-          status:  String
-        });
+        id:      String,
+        blob:    ObjectId,
+        status:  String
+      });
 
       var TestModel = db.model('gh3135', testSchema);
       TestModel.create({ blob: null, status: 'active' }, function(error) {
-          assert.ifError(error);
-          TestModel.findOneAndUpdate(
+        assert.ifError(error);
+        TestModel.findOneAndUpdate(
             { id: '1', blob: null },
             { $set: { status: 'inactive' }},
             {
@@ -1386,7 +1386,7 @@ describe('model: findByIdAndUpdate:', function() {
               assert.ifError(error);
               done();
             });
-        });
+      });
     });
 
     it('should work with array documents (gh-3034)', function(done) {

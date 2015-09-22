@@ -36,17 +36,17 @@ mongoose.connect('mongodb://localhost:27018/persons,localhost:27019,localhost:27
   async.each(data, function(item, cb) {
     Person.create(item, cb);
   }, function(err) {
-      if (err) {
+    if (err) {
         // handle error
       }
 
       // create and delete some data
-      var prom = Person.find({age : { $lt : 1000 }}).exec();
+    var prom = Person.find({age : { $lt : 1000 }}).exec();
 
-      prom.then(function(people) {
+    prom.then(function(people) {
         console.log("young people: %s", people);
       }).then(cleanup);
-    });
+  });
 });
 
 function cleanup() {

@@ -1890,8 +1890,8 @@ describe('model: populate:', function() {
 
         var m2 = new M2({ things: [a, b]});
         m2.save(function(err) {
-        assert.ifError(err);
-        M2.findById(m2).populate('things').exec(function(err, doc) {
+          assert.ifError(err);
+          M2.findById(m2).populate('things').exec(function(err, doc) {
           db.close();
           assert.ifError(err);
           assert.equal(doc.things.length,2);
@@ -1899,7 +1899,7 @@ describe('model: populate:', function() {
           assert.equal(doc.things[1].id,"Users Guide To The Universe");
           done();
         });
-      });
+        });
       });
   });
 
@@ -2688,13 +2688,13 @@ describe('model: populate:', function() {
             assert.equal(2, docs.length);
 
             docs.forEach(function(doc) {
-            assert.ok(doc.comment && doc.comment.body);
-            if ('u1' == doc.name) {
+              assert.ok(doc.comment && doc.comment.body);
+              if ('u1' == doc.name) {
               assert.equal('comment 1', doc.comment.body);
             } else {
               assert.equal('comment 2', doc.comment.body);
             }
-          });
+            });
 
             done();
           });
@@ -2727,14 +2727,14 @@ describe('model: populate:', function() {
           if (err) return done(err);
 
           Article.find().populate('mediaAttach').exec(function(err, docs) {
-          db.close();
-          assert.ifError(err);
+            db.close();
+            assert.ifError(err);
 
-          var a2 = docs.filter(function(d) { return 'body2' == d.body;})[0];
-          assert.equal(a2.mediaAttach.id, media.id);
+            var a2 = docs.filter(function(d) { return 'body2' == d.body;})[0];
+            assert.equal(a2.mediaAttach.id, media.id);
 
-          done();
-        });
+            done();
+          });
         });
     });
   });

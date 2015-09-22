@@ -429,13 +429,13 @@ var db = mongoose.createConnection('localhost', 'HeavyLoad', function(err) {
   function getItems(list) {
     if (!list) done();
     return function() {
-        var cnt = Math.floor(Math.random() * dicCnt);
-        var i, res = [];
-        for (i = 0; i < cnt; i++) {
+      var cnt = Math.floor(Math.random() * dicCnt);
+      var i, res = [];
+      for (i = 0; i < cnt; i++) {
           res.push(list[i]);
         }
-        return res;
-      };
+      return res;
+    };
   }
 
   var cnt = creatList.length;
@@ -592,20 +592,20 @@ var db = mongoose.createConnection('localhost', 'HeavyLoad', function(err) {
           .make(mainCnt);
 
       var saveAll = function(err, data) {
-          if (err) done();
+        if (err) done();
           else if (--res === 0) {
             console.log('save done');
             doBenchmark();
           }
-        };
+      };
 
       var res = loadMedicalCard.length;
       var mc = db.model('MedicalCard');
       var i, rec;
       var len = loadMedicalCard.length;
       for (i = 0; i < len; i++) {
-          new mc(loadMedicalCard[i]).save(saveAll);
-        }
+        new mc(loadMedicalCard[i]).save(saveAll);
+      }
     });
   };
 

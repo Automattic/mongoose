@@ -303,12 +303,12 @@ describe('document: strict mode:', function() {
             assert.ifError(err);
 
             Strict.findById(doc._id, function(err, doc) {
-            db.close();
-            assert.ifError(err);
-            assert.equal(undefined, doc._doc.bool);
-            assert.equal(undefined, doc._doc.notInSchema);
-            done();
-          });
+              db.close();
+              assert.ifError(err);
+              assert.equal(undefined, doc._doc.bool);
+              assert.equal(undefined, doc._doc.notInSchema);
+              done();
+            });
           });
       });
     });
@@ -345,11 +345,11 @@ describe('document: strict mode:', function() {
             assert.ifError(err);
 
             Strict.findById(doc._id, function(err, doc) {
-            assert.ifError(err);
-            assert.equal(undefined, doc._doc.bool);
-            assert.equal(undefined, doc._doc.notInSchema);
-            db.close(done);
-          });
+              assert.ifError(err);
+              assert.equal(undefined, doc._doc.bool);
+              assert.equal(undefined, doc._doc.notInSchema);
+              db.close(done);
+            });
           });
       });
     });

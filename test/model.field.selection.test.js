@@ -175,17 +175,17 @@ describe('model field selection', function() {
           assert.ifError(err);
 
           BlogPostB.findById(id, 'def comments', function(err, found) {
-        db.close();
-        assert.ifError(err);
-        assert.ok(found);
-        assert.equal(found._id.toString(), id);
-        assert.strictEqual(undefined, found.title);
-        assert.strictEqual('kandinsky', found.def);
-        assert.strictEqual(undefined, found.author);
-        assert.strictEqual(true, Array.isArray(found.comments));
-        assert.equal(0, found.comments.length);
-        done();
-      });
+            db.close();
+            assert.ifError(err);
+            assert.ok(found);
+            assert.equal(found._id.toString(), id);
+            assert.strictEqual(undefined, found.title);
+            assert.strictEqual('kandinsky', found.def);
+            assert.strictEqual(undefined, found.author);
+            assert.strictEqual(true, Array.isArray(found.comments));
+            assert.equal(0, found.comments.length);
+            done();
+          });
         });
   });
 

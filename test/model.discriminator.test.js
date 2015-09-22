@@ -248,8 +248,8 @@ describe('model', function() {
         var errorMessage
             , CustomizedSchema = new Schema({}, { capped: true });
         try {
-            Person.discriminator('model-discriminator-custom', CustomizedSchema);
-          } catch (e) {
+          Person.discriminator('model-discriminator-custom', CustomizedSchema);
+        } catch (e) {
             errorMessage = e.message;
           }
 

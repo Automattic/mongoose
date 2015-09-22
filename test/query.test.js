@@ -1455,12 +1455,12 @@ describe('Query', function() {
           assert.ifError(err);
 
           Product.find().setOptions({ limit: 1, sort: {_id: -1}, read: 'n' }).exec(function(err, docs) {
-          db.close();
-          assert.ifError(err);
-          assert.equal(docs.length, 1);
-          assert.equal(docs[0].id, doc2.id);
-          done();
-        });
+            db.close();
+            assert.ifError(err);
+            assert.equal(docs.length, 1);
+            assert.equal(docs[0].id, doc2.id);
+            done();
+          });
         });
     });
   });

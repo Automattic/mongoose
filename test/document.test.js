@@ -517,10 +517,10 @@ describe('document', function() {
     }, function( err, doc ) {
 
       var obj = doc.toObject({
-          transform: function(doc, ret) {
+        transform: function(doc, ret) {
             ret.phew = 'new';
           }
-        });
+      });
 
       assert.equal(obj.phew, 'new');
       assert.ok(!doc.sub.wow);

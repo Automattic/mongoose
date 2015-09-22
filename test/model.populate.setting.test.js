@@ -147,8 +147,8 @@ describe('model: populate:', function() {
              assert.deepEqual(doc.fans[5].toObject(), user7.toObject());
 
              doc.fans.forEach(function(doc) {
-              assert.ok(doc instanceof U);
-            });
+               assert.ok(doc instanceof U);
+             });
 
              var user8 = user('user8');
              doc.fans.set(0, user8);
@@ -160,10 +160,10 @@ describe('model: populate:', function() {
              var _id = construct[id]();
              doc.fans.addToSet(_id);
              if (Buffer.isBuffer(_id)) {
-              assert.equal(doc.fans[7]._id.toString('utf8'), _id.toString('utf8'));
-            } else {
-              assert.equal(doc.fans[7]._id, String(_id));
-            }
+               assert.equal(doc.fans[7]._id.toString('utf8'), _id.toString('utf8'));
+             } else {
+               assert.equal(doc.fans[7]._id, String(_id));
+             }
 
              assert.equal(doc._creator.email, u1.email);
 
@@ -194,8 +194,8 @@ describe('model: populate:', function() {
              assert.deepEqual(doc.adhoc[0].subarray[0].things[1].toObject(), user2b.toObject());
 
              doc.save(function(err) {
-              assert.ifError(err);
-              B.findById(b1).exec(function(err, doc) {
+               assert.ifError(err);
+               B.findById(b1).exec(function(err, doc) {
                 // db is closed in after()
                 assert.ifError(err);
                 assert.equal(8, doc.fans.length);
@@ -210,7 +210,7 @@ describe('model: populate:', function() {
                 assert.equal(doc.adhoc[0].subarray[0].things[1], user2b.id);
                 done();
               });
-            });
+             });
            });
         });
 
@@ -253,8 +253,8 @@ describe('model: populate:', function() {
              assert.equal(name, doc.fans[0].name);
 
              doc.fans.forEach(function(doc) {
-              assert.ok(doc instanceof U);
-            });
+               assert.ok(doc instanceof U);
+             });
 
              name = 'creator';
              var creator = userLiteral(name);
@@ -293,8 +293,8 @@ describe('model: populate:', function() {
              var user2bId = doc.adhoc[0].subarray[0].things[1]._id;
 
              doc.save(function(err) {
-              assert.ifError(err);
-              B.findById(b2).exec(function(err, doc) {
+               assert.ifError(err);
+               B.findById(b2).exec(function(err, doc) {
                 // db is closed in after()
                 assert.ifError(err);
                 assert.equal(6, doc.fans.length);
@@ -307,7 +307,7 @@ describe('model: populate:', function() {
                 assert.equal(doc.adhoc[0].subarray[0].things[1], String(user2bId));
                 done();
               });
-            });
+             });
            });
         });
 

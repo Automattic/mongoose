@@ -37,9 +37,9 @@ describe('model: populate: divergent arrays', function() {
       , { _id: 2, name: 'two' }, function(err) {
         assert.ifError(err);
         M.create({ array: [0, 1, 2] }, function(err) {
-        assert.ifError(err);
-        done();
-      });
+          assert.ifError(err);
+          done();
+        });
       });
   });
 

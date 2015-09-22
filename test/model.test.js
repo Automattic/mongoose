@@ -1006,7 +1006,7 @@ describe('Model', function() {
 
       Date.prototype.toObject = function() {
         return {
-            millisecond: 86
+          millisecond: 86
               , second: 42
               , minute: 47
               , hour: 17
@@ -1014,7 +1014,7 @@ describe('Model', function() {
               , week: 50
               , month: 11
               , year: 2011
-          };
+        };
       };
 
       var S = new Schema({
@@ -3946,16 +3946,16 @@ describe('Model', function() {
           assert.ifError(err);
           var query = BlogPost.find({title: 'interoperable find as promise'}).sort('_id');
           query.exec(function(err, found) {
-          db.close();
-          assert.ifError(err);
-          assert.equal(found.length, 2);
-          var ids = {};
-          ids[String(found[0]._id)] = 1;
-          ids[String(found[1]._id)] = 1;
-          assert.ok(String(createdOne._id) in ids);
-          assert.ok(String(createdTwo._id) in ids);
-          done();
-        });
+            db.close();
+            assert.ifError(err);
+            assert.equal(found.length, 2);
+            var ids = {};
+            ids[String(found[0]._id)] = 1;
+            ids[String(found[1]._id)] = 1;
+            assert.ok(String(createdOne._id) in ids);
+            assert.ok(String(createdTwo._id) in ids);
+            done();
+          });
         });
     });
 
@@ -3969,13 +3969,13 @@ describe('Model', function() {
           assert.ifError(err);
           var query = BlogPost.remove({title: 'interoperable remove as promise'});
           query.exec(function(err) {
-          assert.ifError(err);
-          BlogPost.count({title: 'interoperable remove as promise'}, function(err, count) {
+            assert.ifError(err);
+            BlogPost.count({title: 'interoperable remove as promise'}, function(err, count) {
             db.close();
             assert.equal(count, 0);
             done();
           });
-        });
+          });
         });
     });
 
@@ -4064,13 +4064,13 @@ describe('Model', function() {
             var query = BlogPost.find({title: 'interoperable find as promise 2'}).sort('_id');
             var promise = query.exec();
             promise.onResolve(function(err, found) {
-            db.close();
-            assert.ifError(err);
-            assert.equal(found.length,2);
-            assert.equal(found[0].id,createdOne.id);
-            assert.equal(found[1].id,createdTwo.id);
-            done();
-          });
+              db.close();
+              assert.ifError(err);
+              assert.equal(found.length,2);
+              assert.equal(found[0].id,createdOne.id);
+              assert.equal(found[1].id,createdTwo.id);
+              done();
+            });
           });
       });
 
@@ -4085,13 +4085,13 @@ describe('Model', function() {
             var query = BlogPost.remove({title: 'interoperable remove as promise 2'});
             var promise = query.exec();
             promise.onResolve(function(err) {
-            assert.ifError(err);
-            BlogPost.count({title: 'interoperable remove as promise 2'}, function(err, count) {
+              assert.ifError(err);
+              BlogPost.count({title: 'interoperable remove as promise 2'}, function(err, count) {
               db.close();
               assert.equal(count,0);
               done();
             });
-          });
+            });
           });
       });
 
@@ -4134,11 +4134,11 @@ describe('Model', function() {
 
               var promise = B.find({ title: /^then promise/ }).select('_id').exec();
               promise.then(function(blogs) {
-              var ids = blogs.map(function(m) {
+                var ids = blogs.map(function(m) {
                 return m._id;
               });
-              return P.where('likes').in(ids).exec();
-            }).then(function(people) {
+                return P.where('likes').in(ids).exec();
+              }).then(function(people) {
               assert.equal(3, people.length);
               return people;
             }).then(function() {
@@ -4501,21 +4501,21 @@ describe('Model', function() {
 
           assert.ifError(err);
           B.findById(b._id, function(err, b) {
-          assert.ifError(err);
+            assert.ifError(err);
 
-          b.comments[2].body = 'changed';
-          b.comments.pull(b.comments[1]);
+            b.comments[2].body = 'changed';
+            b.comments.pull(b.comments[1]);
 
-          assert.equal(2, b.comments.length);
-          assert.equal('a', b.comments[0].body);
-          assert.equal('changed', b.comments[1].body);
+            assert.equal(2, b.comments.length);
+            assert.equal('a', b.comments[0].body);
+            assert.equal('changed', b.comments[1].body);
 
-          var d = b.$__delta()[1];
-          assert.ok('$set' in d, 'invalid delta ' + JSON.stringify(d));
-          assert.ok(Array.isArray(d.$set.comments));
-          assert.equal(d.$set.comments.length, 2);
+            var d = b.$__delta()[1];
+            assert.ok('$set' in d, 'invalid delta ' + JSON.stringify(d));
+            assert.ok(Array.isArray(d.$set.comments));
+            assert.equal(d.$set.comments.length, 2);
 
-          b.save(function(err) {
+            b.save(function(err) {
             assert.ifError(err);
 
             B.findById(b._id, function(err, b) {
@@ -4528,7 +4528,7 @@ describe('Model', function() {
               done();
             });
           });
-        });
+          });
         });
     });
   });

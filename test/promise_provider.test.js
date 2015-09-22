@@ -305,7 +305,12 @@ describe('ES6 promises: ', function() {
       var promise = MyModel.create({ test: '123' });
       assert.equal(promise.constructor, bluebird);
       promise.then(function() {
-        done();
+
+        var p = MyModel.create({});
+        p.catch(function(error) {
+          assert.ok(error);
+          done();
+        });
       });
     });
   });

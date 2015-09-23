@@ -1680,6 +1680,48 @@ describe('Model', function() {
           });
         });
       });
+
+      it('skips validation (gh-2981)', function(done){
+        var db = start()
+          , NoValidationMiddlewareSchema = null
+          , Post = null
+          , post = null
+          , called = 0;
+
+        NoValidationMiddlewareSchema = new Schema({
+          baz: { type: String }
+        });
+
+        NoValidationMiddlewareSchema.pre('validate', function(next) {
+          called++;
+          if (this.get('baz') == 'bad') {
+            this.invalidate('baz', 'bad');
+          }
+          next();
+        });
+
+        mongoose.model('NoValidationMiddleware', NoValidationMiddlewareSchema);
+
+        Post = db.model('NoValidationMiddleware');
+        post = new Post();
+        post.set({baz: 'bad'});
+
+        post.save({ skipValidation: true }, function(err){
+          assert.ifError(err);
+          assert.equal(called, 0);
+
+          post.markModified('baz');
+          post.save(function(err){
+            assert.ok(err instanceof MongooseError);
+            assert.ok(err instanceof ValidationError);
+            assert.equal(err.errors.baz.kind,'user defined');
+            assert.equal(err.errors.baz.path,'baz');
+            assert.equal(called, 1);
+            db.close();
+            done();
+          });
+        });
+      });
     });
   });
 

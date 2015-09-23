@@ -898,16 +898,16 @@ describe('model: update:', function() {
            { name: '2.6' },
            { $push: { n: { $each: [{x: 2}, {x: 1}], $position: 0 } } },
            function(error) {
-              assert.ifError(error);
-              M.findOne({ name: '2.6' }, function(error, m) {
-                assert.ifError(error);
-                assert.equal(3, m.n.length);
-                assert.equal(2, m.n[0].x);
-                assert.equal(1, m.n[1].x);
-                assert.equal(0, m.n[2].x);
-                db.close(done);
-              });
-            });
+             assert.ifError(error);
+             M.findOne({ name: '2.6' }, function(error, m) {
+               assert.ifError(error);
+               assert.equal(3, m.n.length);
+               assert.equal(2, m.n[0].x);
+               assert.equal(1, m.n[1].x);
+               assert.equal(0, m.n[2].x);
+               db.close(done);
+             });
+           });
       });
     });
 
@@ -928,15 +928,15 @@ describe('model: update:', function() {
            { name: '2.6' },
            { $currentDate: { lastModified: true, lastModifiedTS: { $type: 'timestamp' } } },
            function(error) {
-              assert.ifError(error);
-              M.findOne({ name: '2.6' }, function(error, m) {
-                var after = Date.now();
-                assert.ifError(error);
-                assert.ok(m.lastModified.getTime() >= before);
-                assert.ok(m.lastModified.getTime() <= after);
-                db.close(done);
-              });
-            });
+             assert.ifError(error);
+             M.findOne({ name: '2.6' }, function(error, m) {
+               var after = Date.now();
+               assert.ifError(error);
+               assert.ok(m.lastModified.getTime() >= before);
+               assert.ok(m.lastModified.getTime() <= after);
+               db.close(done);
+             });
+           });
       });
     });
   });

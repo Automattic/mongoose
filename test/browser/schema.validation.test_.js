@@ -202,45 +202,45 @@ describe('schema', function() {
 
         var required = true,
             isRequired = function() {
-                return required;
-              };
+              return required;
+            };
 
         Test.path('simple').required(isRequired);
         assert.equal(Test.path('simple').validators.length, 1);
 
         Test.path('simple').doValidate(null, function(err) {
-            assert.ok(err instanceof ValidatorError);
-          });
+          assert.ok(err instanceof ValidatorError);
+        });
 
         Test.path('simple').doValidate(undefined, function(err) {
-            assert.ok(err instanceof ValidatorError);
-          });
+          assert.ok(err instanceof ValidatorError);
+        });
 
         Test.path('simple').doValidate('', function(err) {
-            assert.ok(err instanceof ValidatorError);
-          });
+          assert.ok(err instanceof ValidatorError);
+        });
 
         Test.path('simple').doValidate('woot', function(err) {
-            assert.ifError(err);
-          });
+          assert.ifError(err);
+        });
 
         required = false;
 
         Test.path('simple').doValidate(null, function(err) {
-            assert.ifError(err);
-          });
+          assert.ifError(err);
+        });
 
         Test.path('simple').doValidate(undefined, function(err) {
-            assert.ifError(err);
-          });
+          assert.ifError(err);
+        });
 
         Test.path('simple').doValidate('', function(err) {
-            assert.ifError(err);
-          });
+          assert.ifError(err);
+        });
 
         Test.path('simple').doValidate('woot', function(err) {
-            assert.ifError(err);
-          });
+          assert.ifError(err);
+        });
 
         done();
       });
@@ -347,29 +347,29 @@ describe('schema', function() {
       });
 
       it('mixed required', function(done) {
-          var Animal = new Schema({
-            characteristics: { type: Mixed, required: true }
-          });
-
-          Animal.path('characteristics').doValidate(null, function(err) {
-            assert.ok(err instanceof ValidatorError);
-          });
-
-          Animal.path('characteristics').doValidate(undefined, function(err) {
-            assert.ok(err instanceof ValidatorError);
-          });
-
-          Animal.path('characteristics').doValidate({
-            aggresive: true
-          }, function(err) {
-            assert.ifError(err);
-          });
-
-          Animal.path('characteristics').doValidate('none available', function(err) {
-            assert.ifError(err);
-          });
-          done();
+        var Animal = new Schema({
+          characteristics: { type: Mixed, required: true }
         });
+
+        Animal.path('characteristics').doValidate(null, function(err) {
+          assert.ok(err instanceof ValidatorError);
+        });
+
+        Animal.path('characteristics').doValidate(undefined, function(err) {
+          assert.ok(err instanceof ValidatorError);
+        });
+
+        Animal.path('characteristics').doValidate({
+          aggresive: true
+        }, function(err) {
+          assert.ifError(err);
+        });
+
+        Animal.path('characteristics').doValidate('none available', function(err) {
+          assert.ifError(err);
+        });
+        done();
+      });
     });
 
     describe('async', function() {

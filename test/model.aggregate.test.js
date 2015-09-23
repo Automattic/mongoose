@@ -93,14 +93,14 @@ describe('model aggregate', function() {
         .group(group.$group)
         .project(project.$project)
         .exec(function(err, res) {
-            assert.ifError(err);
-            assert.ok(promise instanceof mongoose.Promise);
-            assert.ok(res);
-            assert.equal(1, res.length);
-            assert.ok('maxAge' in res[0]);
-            assert.equal(maxAge, res[0].maxAge);
-            done();
-          });
+          assert.ifError(err);
+          assert.ok(promise instanceof mongoose.Promise);
+          assert.ok(res);
+          assert.equal(1, res.length);
+          assert.ok('maxAge' in res[0]);
+          assert.equal(maxAge, res[0].maxAge);
+          done();
+        });
     });
 
     it('with Aggregate syntax if callback not provided', function(done) {
@@ -112,13 +112,13 @@ describe('model aggregate', function() {
         .exec();
 
       promise.then(function(res) {
-          assert.ok(promise instanceof mongoose.Promise);
-          assert.ok(res);
-          assert.equal(1, res.length);
-          assert.ok('maxAge' in res[0]);
-          assert.equal(maxAge, res[0].maxAge);
-          done();
-        }).end();
+        assert.ok(promise instanceof mongoose.Promise);
+        assert.ok(res);
+        assert.equal(1, res.length);
+        assert.ok('maxAge' in res[0]);
+        assert.equal(maxAge, res[0].maxAge);
+        done();
+      }).end();
     });
 
     it('when returning Aggregate', function(done) {

@@ -39,7 +39,7 @@
     "bluebird": "2.9.34",
     "co": "3.1.0",
     "dox": "0.3.1",
-    "eslint": "1.4.3",
+    "eslint": "1.5.0",
     "highlight.js": "7.0.1",
     "istanbul": "^0.3.13",
     "jade": "0.26.3",

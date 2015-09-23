@@ -29,41 +29,41 @@ mongoose.connect('mongodb://localhost/persons', function(err) {
 
   // create all of the dummy people
   async.each(data, function(item, cb) {
-      Person.create(item, cb);
-    }, function(err) {
-      if (err) {
+    Person.create(item, cb);
+  }, function(err) {
+    if (err) {
         // handle error
-      }
+    }
 
       // create a promise (get one from the query builder)
-      var prom = Person.find({age : { $lt : 1000 }}).exec();
+    var prom = Person.find({age : { $lt : 1000 }}).exec();
 
       // add a callback on the promise. This will be called on both error and
       // complete
-      prom.addBack(function() { console.log("completed"); });
+    prom.addBack(function() { console.log("completed"); });
 
       // add a callback that is only called on complete (success) events
-      prom.addCallback(function() { console.log("Successful Completion!"); });
+    prom.addCallback(function() { console.log("Successful Completion!"); });
 
       // add a callback that is only called on err (rejected) events
-      prom.addErrback(function() { console.log("Fail Boat"); });
+    prom.addErrback(function() { console.log("Fail Boat"); });
 
       // you can chain things just like in the promise/A+ spec
       // note: each then() is returning a new promise, so the above methods
       // that we defined will all fire after the initial promise is fulfilled
-      prom.then(function(people) {
+    prom.then(function(people) {
 
         // just getting the stuff for the next query
-        var ids = people.map(function(p) {
-          return p._id;
-        });
+      var ids = people.map(function(p) {
+        return p._id;
+      });
 
         // return the next promise
-        return Person.find({ _id : { $nin : ids }}).exec();
-      }).then(function(oldest) {
-        console.log("Oldest person is: %s", oldest);
-      }).then(cleanup);
-    });
+      return Person.find({ _id : { $nin : ids }}).exec();
+    }).then(function(oldest) {
+      console.log("Oldest person is: %s", oldest);
+    }).then(cleanup);
+  });
 });
 
 function cleanup() {

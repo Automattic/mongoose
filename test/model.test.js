@@ -1005,8 +1005,8 @@ describe('Model', function() {
       var db = start();
 
       Date.prototype.toObject = function() {
-          return {
-            millisecond: 86
+        return {
+          millisecond: 86
               , second: 42
               , minute: 47
               , hour: 17
@@ -1014,8 +1014,8 @@ describe('Model', function() {
               , week: 50
               , month: 11
               , year: 2011
-          };
         };
+      };
 
       var S = new Schema({
         name: String
@@ -1616,8 +1616,8 @@ describe('Model', function() {
           , Post = null
           , post = null
           , abc = function(v) {
-              return v === 'abc';
-            };
+            return v === 'abc';
+          };
 
         ComplexValidationMiddlewareSchema = new Schema({
           baz: { type: String },
@@ -3943,20 +3943,20 @@ describe('Model', function() {
           {title: 'interoperable find as promise'}
         , {title: 'interoperable find as promise'}
         , function(err, createdOne, createdTwo) {
-        assert.ifError(err);
-        var query = BlogPost.find({title: 'interoperable find as promise'}).sort('_id');
-        query.exec(function(err, found) {
-          db.close();
           assert.ifError(err);
-          assert.equal(found.length, 2);
-          var ids = {};
-          ids[String(found[0]._id)] = 1;
-          ids[String(found[1]._id)] = 1;
-          assert.ok(String(createdOne._id) in ids);
-          assert.ok(String(createdTwo._id) in ids);
-          done();
+          var query = BlogPost.find({title: 'interoperable find as promise'}).sort('_id');
+          query.exec(function(err, found) {
+            db.close();
+            assert.ifError(err);
+            assert.equal(found.length, 2);
+            var ids = {};
+            ids[String(found[0]._id)] = 1;
+            ids[String(found[1]._id)] = 1;
+            assert.ok(String(createdOne._id) in ids);
+            assert.ok(String(createdTwo._id) in ids);
+            done();
+          });
         });
-      });
     });
 
     it('remove()', function(done) {
@@ -3966,17 +3966,17 @@ describe('Model', function() {
       BlogPost.create(
           {title: 'interoperable remove as promise'}
         , function(err) {
-        assert.ifError(err);
-        var query = BlogPost.remove({title: 'interoperable remove as promise'});
-        query.exec(function(err) {
           assert.ifError(err);
-          BlogPost.count({title: 'interoperable remove as promise'}, function(err, count) {
-            db.close();
-            assert.equal(count, 0);
-            done();
+          var query = BlogPost.remove({title: 'interoperable remove as promise'});
+          query.exec(function(err) {
+            assert.ifError(err);
+            BlogPost.count({title: 'interoperable remove as promise'}, function(err, count) {
+              db.close();
+              assert.equal(count, 0);
+              done();
+            });
           });
         });
-      });
     });
 
     it('op can be changed', function(done) {
@@ -4060,18 +4060,18 @@ describe('Model', function() {
             {title: 'interoperable find as promise 2'}
           , {title: 'interoperable find as promise 2'}
           , function(err, createdOne, createdTwo) {
-          assert.ifError(err);
-          var query = BlogPost.find({title: 'interoperable find as promise 2'}).sort('_id');
-          var promise = query.exec();
-          promise.onResolve(function(err, found) {
-            db.close();
             assert.ifError(err);
-            assert.equal(found.length,2);
-            assert.equal(found[0].id,createdOne.id);
-            assert.equal(found[1].id,createdTwo.id);
-            done();
+            var query = BlogPost.find({title: 'interoperable find as promise 2'}).sort('_id');
+            var promise = query.exec();
+            promise.onResolve(function(err, found) {
+              db.close();
+              assert.ifError(err);
+              assert.equal(found.length,2);
+              assert.equal(found[0].id,createdOne.id);
+              assert.equal(found[1].id,createdTwo.id);
+              done();
+            });
           });
-        });
       });
 
       it('remove()', function(done) {
@@ -4081,18 +4081,18 @@ describe('Model', function() {
         BlogPost.create(
             {title: 'interoperable remove as promise 2'}
           , function(err) {
-          assert.ifError(err);
-          var query = BlogPost.remove({title: 'interoperable remove as promise 2'});
-          var promise = query.exec();
-          promise.onResolve(function(err) {
             assert.ifError(err);
-            BlogPost.count({title: 'interoperable remove as promise 2'}, function(err, count) {
-              db.close();
-              assert.equal(count,0);
-              done();
+            var query = BlogPost.remove({title: 'interoperable remove as promise 2'});
+            var promise = query.exec();
+            promise.onResolve(function(err) {
+              assert.ifError(err);
+              BlogPost.count({title: 'interoperable remove as promise 2'}, function(err, count) {
+                db.close();
+                assert.equal(count,0);
+                done();
+              });
             });
           });
-        });
       });
 
       it('are compatible with op modification on the fly', function(done) {
@@ -4123,33 +4123,33 @@ describe('Model', function() {
           , { title: 'then promise 2' }
           , { title: 'then promise 3' }
           , function(err, d1, d2, d3) {
-          assert.ifError(err);
+            assert.ifError(err);
 
-          P.create(
+            P.create(
               { name: 'brandon', likes: [d1] }
             , { name: 'ben', likes: [d2] }
             , { name: 'bernie', likes: [d3] }
             , function(err) {
-            assert.ifError(err);
+              assert.ifError(err);
 
-            var promise = B.find({ title: /^then promise/ }).select('_id').exec();
-            promise.then(function(blogs) {
-              var ids = blogs.map(function(m) {
-                return m._id;
+              var promise = B.find({ title: /^then promise/ }).select('_id').exec();
+              promise.then(function(blogs) {
+                var ids = blogs.map(function(m) {
+                  return m._id;
+                });
+                return P.where('likes').in(ids).exec();
+              }).then(function(people) {
+                assert.equal(3, people.length);
+                return people;
+              }).then(function() {
+                db.close();
+                done();
+              }, function(err) {
+                db.close();
+                done(new Error(err));
               });
-              return P.where('likes').in(ids).exec();
-            }).then(function(people) {
-              assert.equal(3, people.length);
-              return people;
-            }).then(function() {
-              db.close();
-              done();
-            }, function(err) {
-              db.close();
-              done(new Error(err));
             });
           });
-        });
       });
     });
   });
@@ -4499,37 +4499,37 @@ describe('Model', function() {
           { title: 'gh-1303', comments: [{body:'a'},{body:'b'},{body:'c'}] }
         , function(err, b) {
 
-        assert.ifError(err);
-        B.findById(b._id, function(err, b) {
           assert.ifError(err);
-
-          b.comments[2].body = 'changed';
-          b.comments.pull(b.comments[1]);
-
-          assert.equal(2, b.comments.length);
-          assert.equal('a', b.comments[0].body);
-          assert.equal('changed', b.comments[1].body);
-
-          var d = b.$__delta()[1];
-          assert.ok('$set' in d, 'invalid delta ' + JSON.stringify(d));
-          assert.ok(Array.isArray(d.$set.comments));
-          assert.equal(d.$set.comments.length, 2);
-
-          b.save(function(err) {
+          B.findById(b._id, function(err, b) {
             assert.ifError(err);
 
-            B.findById(b._id, function(err, b) {
-              db.close();
+            b.comments[2].body = 'changed';
+            b.comments.pull(b.comments[1]);
+
+            assert.equal(2, b.comments.length);
+            assert.equal('a', b.comments[0].body);
+            assert.equal('changed', b.comments[1].body);
+
+            var d = b.$__delta()[1];
+            assert.ok('$set' in d, 'invalid delta ' + JSON.stringify(d));
+            assert.ok(Array.isArray(d.$set.comments));
+            assert.equal(d.$set.comments.length, 2);
+
+            b.save(function(err) {
               assert.ifError(err);
-              assert.ok(Array.isArray(b.comments));
-              assert.equal(2, b.comments.length);
-              assert.equal('a', b.comments[0].body);
-              assert.equal('changed', b.comments[1].body);
-              done();
+
+              B.findById(b._id, function(err, b) {
+                db.close();
+                assert.ifError(err);
+                assert.ok(Array.isArray(b.comments));
+                assert.equal(2, b.comments.length);
+                assert.equal('a', b.comments[0].body);
+                assert.equal('changed', b.comments[1].body);
+                done();
+              });
             });
           });
         });
-      });
     });
   });
 

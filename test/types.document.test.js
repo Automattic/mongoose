@@ -203,9 +203,9 @@ describe('types.document', function() {
         , ratings: [{
           description: {
             source: {
-                  url: 'http://www.imdb.com/title/tt0454876/'
+              url: 'http://www.imdb.com/title/tt0454876/'
                     , time: new Date
-                }
+            }
           }
         }]
       }, function(err, movie) {

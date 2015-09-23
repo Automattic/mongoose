@@ -248,17 +248,17 @@ describe('versioning', function() {
     }
 
     function test13(err, a, b) {
-        assert.ifError(err);
-        a.dontVersionMe.push('value1');
-        b.dontVersionMe.push('value2');
-        save(a, b, test14);
-      }
+      assert.ifError(err);
+      a.dontVersionMe.push('value1');
+      b.dontVersionMe.push('value2');
+      save(a, b, test14);
+    }
 
     function test14(err, a) {
-        assert.equal(a._doc.__v, 13, 'version should not be incremented for non-versioned fields');
-        db.close();
-        done();
-      }
+      assert.equal(a._doc.__v, 13, 'version should not be incremented for non-versioned fields');
+      db.close();
+      done();
+    }
 
     function save(a, b, cb) {
       var e;

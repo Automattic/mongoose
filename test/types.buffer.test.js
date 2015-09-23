@@ -179,11 +179,11 @@ describe('types.buffer', function() {
             // buffer method tests
             var fns = {
               'writeUInt8': function() {
-                  reset(tj);
-                  not(tj);
-                  tj.required.writeUInt8(0x3, 0, 'big');
-                  is(tj);
-                }
+                reset(tj);
+                not(tj);
+                tj.required.writeUInt8(0x3, 0, 'big');
+                is(tj);
+              }
               , 'writeUInt16': function() {
                   reset(tj);
                   not(tj);

@@ -23,7 +23,7 @@ $(DOCFILE): $(DOCS)
 	node website.js
 
 %.json: %.js
-	@echo -e "\n### $(patsubst lib//%,lib/%, $^)" >> $(DOCFILE)
+	@echo "\n### $(patsubst lib//%,lib/%, $^)" >> $(DOCFILE)
 	./node_modules/dox/bin/dox < $^ >> $(DOCFILE)
 
 site:

@@ -808,4 +808,24 @@ describe('model query casting', function() {
       });
     });
   });
+
+  it('works with $all (gh-3394)', function(done) {
+    var db = start();
+
+    var MyModel = db.model('gh3394', { tags: [ObjectId] });
+
+    var doc = {
+      tags: ['00000000000000000000000a', '00000000000000000000000b']
+    };
+
+    MyModel.create(doc, function(error, savedDoc) {
+      assert.ifError(error);
+      assert.equal(typeof savedDoc.tags[0], 'object');
+      MyModel.findOne({ tags: { $all: doc.tags } }, function(error, doc) {
+        assert.ifError(error);
+        assert.ok(doc);
+        done();
+      });
+    });
+  });
 });

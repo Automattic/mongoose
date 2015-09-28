@@ -172,21 +172,21 @@ describe('model field selection', function() {
 
     BlogPostB.collection.insert(
         { _id: id, title: 'issue 870'}, { safe: true }, function(err) {
-      assert.ifError(err);
+          assert.ifError(err);
 
-      BlogPostB.findById(id, 'def comments', function(err, found) {
-        db.close();
-        assert.ifError(err);
-        assert.ok(found);
-        assert.equal(found._id.toString(), id);
-        assert.strictEqual(undefined, found.title);
-        assert.strictEqual('kandinsky', found.def);
-        assert.strictEqual(undefined, found.author);
-        assert.strictEqual(true, Array.isArray(found.comments));
-        assert.equal(0, found.comments.length);
-        done();
-      });
-    });
+          BlogPostB.findById(id, 'def comments', function(err, found) {
+            db.close();
+            assert.ifError(err);
+            assert.ok(found);
+            assert.equal(found._id.toString(), id);
+            assert.strictEqual(undefined, found.title);
+            assert.strictEqual('kandinsky', found.def);
+            assert.strictEqual(undefined, found.author);
+            assert.strictEqual(true, Array.isArray(found.comments));
+            assert.equal(0, found.comments.length);
+            done();
+          });
+        });
   });
 
   it('including subdoc field excludes other subdoc fields (gh-1027)', function(done) {

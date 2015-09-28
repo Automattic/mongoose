@@ -1458,12 +1458,42 @@ Document.prototype.isSelected = function isSelected(path) {
  *       else // validation passed
  *     });
  *
+ * @param {Object} optional options internal options
  * @param {Function} optional callback called after validation completes, passing an error if one occurred
  * @return {Promise} Promise
  * @api public
  */
 
-Document.prototype.validate = function(callback) {
+Document.prototype.validate = function(options, callback) {
+  var _this = this;
+  var Promise = PromiseProvider.get();
+  if (typeof options === 'function') {
+    callback = options;
+    options = null;
+  }
+
+  if (options && options.__noPromise) {
+    this.$__validate(callback);
+    return;
+  }
+
+  return new Promise.ES6(function(resolve, reject) {
+    _this.$__validate(function(error) {
+      callback && callback(error);
+      if (error) {
+        reject(error);
+        return;
+      }
+      resolve();
+    });
+  });
+};
+
+/*!
+ * ignore
+ */
+
+Document.prototype.$__validate = function(callback) {
   var self = this;
   var _complete = function() {
     var err = self.$__.validationError;
@@ -1482,7 +1512,6 @@ Document.prototype.validate = function(callback) {
       return;
     }
   };
-  var Promise = PromiseProvider.get();
 
   // only validate required fields when necessary
   var paths = Object.keys(this.$__.activePaths.states.require).filter(function(path) {
@@ -1495,17 +1524,13 @@ Document.prototype.validate = function(callback) {
   paths = paths.concat(Object.keys(this.$__.activePaths.states.default));
 
   if (0 === paths.length) {
-    return new Promise.ES6(function(resolve, reject) {
-      process.nextTick(function() {
-        var err = _complete();
-        if (err) {
-          callback && callback(err);
-          reject(err);
-          return;
-        }
-        callback && callback();
-        resolve();
-      });
+    process.nextTick(function() {
+      var err = _complete();
+      if (err) {
+        callback(err);
+        return;
+      }
+      callback();
     });
   }
 
@@ -1526,48 +1551,44 @@ Document.prototype.validate = function(callback) {
     }
   }
 
-  return new Promise.ES6(function(resolve, reject) {
-    var complete = function() {
-      var err = _complete();
-      if (err) {
-        callback && callback(err);
-        reject(err);
+  var complete = function() {
+    var err = _complete();
+    if (err) {
+      callback(err);
+      return;
+    }
+    callback();
+  };
+
+  var validatePath = function(path) {
+    if (validating[path]) return;
+
+    validating[path] = true;
+    total++;
+
+    process.nextTick(function() {
+      var p = self.schema.path(path);
+      if (!p) {
+        return --total || complete();
+      }
+
+      // If user marked as invalid or there was a cast error, don't validate
+      if (!self.$isValid(path)) {
+        --total || complete();
         return;
       }
-      callback && callback();
-      resolve();
-    };
 
-    var validatePath = function(path) {
-      if (validating[path]) return;
-
-      validating[path] = true;
-      total++;
-
-      process.nextTick(function() {
-        var p = self.schema.path(path);
-        if (!p) {
-          return --total || complete();
+      var val = self.getValue(path);
+      p.doValidate(val, function(err) {
+        if (err) {
+          self.invalidate(path, err, undefined, true);
         }
+        --total || complete();
+      }, self);
+    });
+  };
 
-        // If user marked as invalid or there was a cast error, don't validate
-        if (!self.$isValid(path)) {
-          --total || complete();
-          return;
-        }
-
-        var val = self.getValue(path);
-        p.doValidate(val, function(err) {
-          if (err) {
-            self.invalidate(path, err, undefined, true);
-          }
-          --total || complete();
-        }, self);
-      });
-    };
-
-    paths.forEach(validatePath);
-  });
+  paths.forEach(validatePath);
 };
 
 /**
@@ -3748,7 +3769,17 @@ Object.defineProperty(Schema.prototype, '_defaultMiddleware', {
 
       // Validate
       if (this.schema.options.validateBeforeSave) {
-        this.validate().then(next, next);
+        // HACK: use $__original_validate to avoid promises so bluebird doesn't
+        // complain
+        if (this.$__original_validate) {
+          this.$__original_validate({ __noPromise: true }, function(error) {
+            next(error);
+          });
+        } else {
+          this.validate({ __noPromise: true }, function(error) {
+            next(error);
+          });
+        }
       } else {
         next();
       }
@@ -4913,6 +4944,9 @@ SchemaArray.prototype.castForQuery = function($conditional, value) {
 
     if (Array.isArray(val)) {
       val = val.map(function(v) {
+        if (utils.isObject(v) && v.$elemMatch) {
+          return v;
+        }
         if (method) v = method.call(caster, v);
         return isMongooseObject(v) ?
           v.toObject({ virtuals: false }) :
@@ -5034,7 +5068,7 @@ function cast$all(val) {
     return v;
   }, this);
 
-  return val;
+  return this.castForQuery(val);
 }
 
 function cast$elemMatch(val) {

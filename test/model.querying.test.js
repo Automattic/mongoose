@@ -577,19 +577,19 @@ describe('model: querying:', function() {
       BlogPostB.create({sigs: [new Buffer([1, 2, 3]),
                                new Buffer([4, 5, 6]),
                                new Buffer([7, 8, 9])]}, function(err, created) {
-        assert.ifError(err);
-        BlogPostB.findOne({sigs: new Buffer([1, 2, 3])}, function(err, found) {
-          assert.ifError(err);
-          found.id;
-          assert.equal(found._id.toString(), created._id);
-          var query = { sigs: { "$in" : [new Buffer([3, 3, 3]), new Buffer([4, 5, 6])] } };
-          BlogPostB.findOne(query, function(err) {
-            assert.ifError(err);
-            db.close();
-            done();
-          });
-        });
-      });
+                                 assert.ifError(err);
+                                 BlogPostB.findOne({sigs: new Buffer([1, 2, 3])}, function(err, found) {
+                                   assert.ifError(err);
+                                   found.id;
+                                   assert.equal(found._id.toString(), created._id);
+                                   var query = { sigs: { "$in" : [new Buffer([3, 3, 3]), new Buffer([4, 5, 6])] } };
+                                   BlogPostB.findOne(query, function(err) {
+                                     assert.ifError(err);
+                                     db.close();
+                                     done();
+                                   });
+                                 });
+                               });
     });
 
     it('regex with Array (gh-599)', function(done) {
@@ -1249,14 +1249,14 @@ describe('model: querying:', function() {
       BlogPostB.create(
           { title: 'A', author: null }
         , { title: 'B' }, function(err) {
-        assert.ifError(err);
-        BlogPostB.find({author: null}, function(err, found) {
-          db.close();
           assert.ifError(err);
-          assert.equal(2, found.length);
-          done();
+          BlogPostB.find({author: null}, function(err, found) {
+            db.close();
+            assert.ifError(err);
+            assert.equal(2, found.length);
+            done();
+          });
         });
-      });
     });
 
     it('a document whose arrays contain at least $all string values', function(done) {
@@ -2303,22 +2303,22 @@ describe('geo-spatial', function() {
 
         Test.create({ geom: [{ type:'LineString', coordinates: [[-178.0, 10.0],[178.0,10.0]] },
                              { type:'LineString', coordinates: [[-178.0, 5.0],[178.0,5.0]] } ]}, function(err, created) {
-          assert.ifError(err);
+                               assert.ifError(err);
 
-          var geojsonLine = { type: 'LineString', coordinates: [[180.0, 11.0], [180.0, '9.00']] };
+                               var geojsonLine = { type: 'LineString', coordinates: [[180.0, 11.0], [180.0, '9.00']] };
 
-          Test.find({ geom: { $geoIntersects: { $geometry: geojsonLine }}}, function(err, docs) {
-            assert.ifError(err);
-            assert.equal(1, docs.length);
-            assert.equal(created.id, docs[0].id);
+                               Test.find({ geom: { $geoIntersects: { $geometry: geojsonLine }}}, function(err, docs) {
+                                 assert.ifError(err);
+                                 assert.equal(1, docs.length);
+                                 assert.equal(created.id, docs[0].id);
 
-            Test.where('geom').intersects().geometry(geojsonLine).findOne(function(err, doc) {
-              assert.ifError(err);
-              assert.equal(created.id, doc.id);
-              db.close(done);
-            });
-          });
-        });
+                                 Test.where('geom').intersects().geometry(geojsonLine).findOne(function(err, doc) {
+                                   assert.ifError(err);
+                                   assert.equal(created.id, doc.id);
+                                   db.close(done);
+                                 });
+                               });
+                             });
       });
 
       it('MultiPolygon', function(done) {
@@ -2329,22 +2329,22 @@ describe('geo-spatial', function() {
 
         Test.create({ geom: [{ type: "Polygon", coordinates: [[ [28.7,41],[29.2,40.9],[29.1,41.3],[28.7,41] ]] },
                              { type: "Polygon", coordinates: [[ [-1,-1],[1,-1],[1,1],[-1,1],[-1,-1] ]] }]}, function(err, created) {
-          assert.ifError(err);
+                               assert.ifError(err);
 
-          var geojsonPolygon = { type: 'Polygon', coordinates: [[ [26,36],[45,36],[45,42],[26,42],[26,36] ]] };
+                               var geojsonPolygon = { type: 'Polygon', coordinates: [[ [26,36],[45,36],[45,42],[26,42],[26,36] ]] };
 
-          Test.find({ geom: { $geoIntersects: { $geometry: geojsonPolygon }}}, function(err, docs) {
-            assert.ifError(err);
-            assert.equal(1, docs.length);
-            assert.equal(created.id, docs[0].id);
+                               Test.find({ geom: { $geoIntersects: { $geometry: geojsonPolygon }}}, function(err, docs) {
+                                 assert.ifError(err);
+                                 assert.equal(1, docs.length);
+                                 assert.equal(created.id, docs[0].id);
 
-            Test.where('geom').intersects().geometry(geojsonPolygon).findOne(function(err, doc) {
-              assert.ifError(err);
-              assert.equal(created.id, doc.id);
-              db.close(done);
-            });
-          });
-        });
+                                 Test.where('geom').intersects().geometry(geojsonPolygon).findOne(function(err, doc) {
+                                   assert.ifError(err);
+                                   assert.equal(created.id, doc.id);
+                                   db.close(done);
+                                 });
+                               });
+                             });
       });
     });
 
@@ -2404,11 +2404,11 @@ describe('geo-spatial', function() {
           // in lat/long, need an incredibly high number here
           Test.where('loc').near({ center : { type : 'Point', coordinates :
             [11,20]}, maxDistance : 1000000 }).exec(function(err, docs) {
-            db.close();
-            assert.ifError(err);
-            assert.equal(1, docs.length);
-            done();
-          });
+              db.close();
+              assert.ifError(err);
+              assert.equal(1, docs.length);
+              done();
+            });
         }
       });
 

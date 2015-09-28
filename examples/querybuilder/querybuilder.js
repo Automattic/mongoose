@@ -29,8 +29,8 @@ mongoose.connect('mongodb://localhost/persons', function(err) {
 
   // create all of the dummy people
   async.each(data, function(item, cb) {
-      Person.create(item, cb);
-    }, function(err) {
+    Person.create(item, cb);
+  }, function(err) {
     if (err) throw err;
 
     // when querying data, instead of providing a callback, you can instead

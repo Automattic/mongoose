@@ -124,94 +124,94 @@ describe('model: populate:', function() {
            .populate({ path: 'adhoc.subdoc', model: refuser })
            .populate({ path: 'adhoc.subarray.things', model: refuser })
            .exec(function(err, doc) {
-            assert.ifError(err);
+             assert.ifError(err);
 
-            var user3 = user('user3');
-            doc.fans.push(user3);
-            assert.deepEqual(doc.fans[2].toObject(), user3.toObject());
+             var user3 = user('user3');
+             doc.fans.push(user3);
+             assert.deepEqual(doc.fans[2].toObject(), user3.toObject());
 
-            var user4 = user('user4');
-            doc.fans.nonAtomicPush(user4);
-            assert.deepEqual(doc.fans[3].toObject(), user4.toObject());
+             var user4 = user('user4');
+             doc.fans.nonAtomicPush(user4);
+             assert.deepEqual(doc.fans[3].toObject(), user4.toObject());
 
-            var user5 = user('user5');
-            doc.fans.splice(2, 1, user5);
-            assert.deepEqual(doc.fans[2].toObject(), user5.toObject());
+             var user5 = user('user5');
+             doc.fans.splice(2, 1, user5);
+             assert.deepEqual(doc.fans[2].toObject(), user5.toObject());
 
-            var user6 = user('user6');
-            doc.fans.unshift(user6);
-            assert.deepEqual(doc.fans[0].toObject(), user6.toObject());
+             var user6 = user('user6');
+             doc.fans.unshift(user6);
+             assert.deepEqual(doc.fans[0].toObject(), user6.toObject());
 
-            var user7 = user('user7');
-            doc.fans.addToSet(user7);
-            assert.deepEqual(doc.fans[5].toObject(), user7.toObject());
+             var user7 = user('user7');
+             doc.fans.addToSet(user7);
+             assert.deepEqual(doc.fans[5].toObject(), user7.toObject());
 
-            doc.fans.forEach(function(doc) {
-              assert.ok(doc instanceof U);
-            });
+             doc.fans.forEach(function(doc) {
+               assert.ok(doc instanceof U);
+             });
 
-            var user8 = user('user8');
-            doc.fans.set(0, user8);
-            assert.deepEqual(doc.fans[0].toObject(), user8.toObject());
+             var user8 = user('user8');
+             doc.fans.set(0, user8);
+             assert.deepEqual(doc.fans[0].toObject(), user8.toObject());
 
-            doc.fans.push(null);
-            assert.equal(doc.fans[6], null);
+             doc.fans.push(null);
+             assert.equal(doc.fans[6], null);
 
-            var _id = construct[id]();
-            doc.fans.addToSet(_id);
-            if (Buffer.isBuffer(_id)) {
-              assert.equal(doc.fans[7]._id.toString('utf8'), _id.toString('utf8'));
-            } else {
-              assert.equal(doc.fans[7]._id, String(_id));
-            }
+             var _id = construct[id]();
+             doc.fans.addToSet(_id);
+             if (Buffer.isBuffer(_id)) {
+               assert.equal(doc.fans[7]._id.toString('utf8'), _id.toString('utf8'));
+             } else {
+               assert.equal(doc.fans[7]._id, String(_id));
+             }
 
-            assert.equal(doc._creator.email, u1.email);
+             assert.equal(doc._creator.email, u1.email);
 
-            doc._creator = null;
-            assert.equal(null, doc._creator);
+             doc._creator = null;
+             assert.equal(null, doc._creator);
 
-            var creator = user('creator');
-            doc._creator = creator;
-            assert.ok(doc._creator instanceof mongoose.Document);
-            assert.deepEqual(doc._creator.toObject(), creator.toObject());
+             var creator = user('creator');
+             doc._creator = creator;
+             assert.ok(doc._creator instanceof mongoose.Document);
+             assert.deepEqual(doc._creator.toObject(), creator.toObject());
 
             // embedded with declared ref in schema
-            var user1a = user('user1a');
-            doc.embed[0].array.set(0, user1a);
-            assert.deepEqual(doc.embed[0].array[0].toObject(), user1a.toObject());
+             var user1a = user('user1a');
+             doc.embed[0].array.set(0, user1a);
+             assert.deepEqual(doc.embed[0].array[0].toObject(), user1a.toObject());
 
-            var user1b = user('user1b');
-            doc.embed[0].other = user1b;
-            assert.deepEqual(doc.embed[0].other.toObject(), user1b.toObject());
+             var user1b = user('user1b');
+             doc.embed[0].other = user1b;
+             assert.deepEqual(doc.embed[0].other.toObject(), user1b.toObject());
 
             // embedded without declared ref in schema
-            var user2a = user('user2a');
-            doc.adhoc[0].subdoc = user2a;
-            assert.deepEqual(doc.adhoc[0].subdoc.toObject(), user2a.toObject());
+             var user2a = user('user2a');
+             doc.adhoc[0].subdoc = user2a;
+             assert.deepEqual(doc.adhoc[0].subdoc.toObject(), user2a.toObject());
 
-            var user2b = user('user2b');
-            doc.adhoc[0].subarray[0].things.push(user2b);
-            assert.deepEqual(doc.adhoc[0].subarray[0].things[1].toObject(), user2b.toObject());
+             var user2b = user('user2b');
+             doc.adhoc[0].subarray[0].things.push(user2b);
+             assert.deepEqual(doc.adhoc[0].subarray[0].things[1].toObject(), user2b.toObject());
 
-            doc.save(function(err) {
-              assert.ifError(err);
-              B.findById(b1).exec(function(err, doc) {
+             doc.save(function(err) {
+               assert.ifError(err);
+               B.findById(b1).exec(function(err, doc) {
                 // db is closed in after()
-                assert.ifError(err);
-                assert.equal(8, doc.fans.length);
-                assert.equal(doc.fans[0], user8.id);
-                assert.equal(doc.fans[5], user7.id);
-                assert.equal(doc.fans[6], null);
-                assert.equal(doc.fans[7], String(_id));
-                assert.equal(String(doc._creator), creator._id);
-                assert.equal(doc.embed[0].array[0], user1a.id);
-                assert.equal(doc.embed[0].other, user1b.id);
-                assert.equal(doc.adhoc[0].subdoc, user2a.id);
-                assert.equal(doc.adhoc[0].subarray[0].things[1], user2b.id);
-                done();
-              });
-            });
-          });
+                 assert.ifError(err);
+                 assert.equal(8, doc.fans.length);
+                 assert.equal(doc.fans[0], user8.id);
+                 assert.equal(doc.fans[5], user7.id);
+                 assert.equal(doc.fans[6], null);
+                 assert.equal(doc.fans[7], String(_id));
+                 assert.equal(String(doc._creator), creator._id);
+                 assert.equal(doc.embed[0].array[0], user1a.id);
+                 assert.equal(doc.embed[0].other, user1b.id);
+                 assert.equal(doc.adhoc[0].subdoc, user2a.id);
+                 assert.equal(doc.adhoc[0].subarray[0].things[1], user2b.id);
+                 done();
+               });
+             });
+           });
         });
 
         it('if an object', function(done) {
@@ -220,95 +220,95 @@ describe('model: populate:', function() {
            .populate({ path: 'adhoc.subdoc', model: refuser })
            .populate({ path: 'adhoc.subarray.things', model: refuser })
            .exec(function(err, doc) {
-            assert.ifError(err);
+             assert.ifError(err);
 
-            var name = 'fan1';
-            doc.fans.push(userLiteral(name));
-            assert.ok(doc.fans[2]._id);
-            assert.equal(name, doc.fans[2].name);
+             var name = 'fan1';
+             doc.fans.push(userLiteral(name));
+             assert.ok(doc.fans[2]._id);
+             assert.equal(name, doc.fans[2].name);
 
-            name = 'fan2';
-            doc.fans.nonAtomicPush(userLiteral(name));
-            assert.ok(doc.fans[3]._id);
-            assert.equal(name, doc.fans[3].name);
+             name = 'fan2';
+             doc.fans.nonAtomicPush(userLiteral(name));
+             assert.ok(doc.fans[3]._id);
+             assert.equal(name, doc.fans[3].name);
 
-            name = 'fan3';
-            doc.fans.splice(2,1,userLiteral(name));
-            assert.ok(doc.fans[2]._id);
-            assert.equal(name, doc.fans[2].name);
+             name = 'fan3';
+             doc.fans.splice(2,1,userLiteral(name));
+             assert.ok(doc.fans[2]._id);
+             assert.equal(name, doc.fans[2].name);
 
-            name = 'fan4';
-            doc.fans.unshift(userLiteral(name));
-            assert.ok(doc.fans[0]._id);
-            assert.equal(name, doc.fans[0].name);
+             name = 'fan4';
+             doc.fans.unshift(userLiteral(name));
+             assert.ok(doc.fans[0]._id);
+             assert.equal(name, doc.fans[0].name);
 
-            name = 'fan5';
-            doc.fans.addToSet(userLiteral(name));
-            assert.ok(doc.fans[5]._id);
-            assert.equal(name, doc.fans[5].name);
+             name = 'fan5';
+             doc.fans.addToSet(userLiteral(name));
+             assert.ok(doc.fans[5]._id);
+             assert.equal(name, doc.fans[5].name);
 
-            name = 'fan6';
-            doc.fans.set(0, userLiteral(name));
-            assert.ok(doc.fans[0]._id);
-            assert.equal(name, doc.fans[0].name);
+             name = 'fan6';
+             doc.fans.set(0, userLiteral(name));
+             assert.ok(doc.fans[0]._id);
+             assert.equal(name, doc.fans[0].name);
 
-            doc.fans.forEach(function(doc) {
-              assert.ok(doc instanceof U);
-            });
+             doc.fans.forEach(function(doc) {
+               assert.ok(doc instanceof U);
+             });
 
-            name = 'creator';
-            var creator = userLiteral(name);
-            doc._creator = creator;
-            var creatorId = doc._creator._id;
-            assert.ok(creatorId);
-            assert.equal(name, doc._creator.name);
-            assert.ok(doc._creator instanceof U);
+             name = 'creator';
+             var creator = userLiteral(name);
+             doc._creator = creator;
+             var creatorId = doc._creator._id;
+             assert.ok(creatorId);
+             assert.equal(name, doc._creator.name);
+             assert.ok(doc._creator instanceof U);
 
-            var fan2Id = doc.fans[2]._id;
-            var fan5Id = doc.fans[5]._id;
+             var fan2Id = doc.fans[2]._id;
+             var fan5Id = doc.fans[5]._id;
 
-            name = 'user1a';
-            var user1a = userLiteral(name);
-            doc.embed[0].array.set(0, user1a);
-            assert.equal(name, doc.embed[0].array[0].name);
-            var user1aId = doc.embed[0].array[0]._id;
+             name = 'user1a';
+             var user1a = userLiteral(name);
+             doc.embed[0].array.set(0, user1a);
+             assert.equal(name, doc.embed[0].array[0].name);
+             var user1aId = doc.embed[0].array[0]._id;
 
-            name = 'user1b';
-            var user1b = userLiteral(name);
-            doc.embed[0].other = user1b;
-            assert.equal(name, doc.embed[0].other.name);
-            var user1bId = doc.embed[0].other._id;
+             name = 'user1b';
+             var user1b = userLiteral(name);
+             doc.embed[0].other = user1b;
+             assert.equal(name, doc.embed[0].other.name);
+             var user1bId = doc.embed[0].other._id;
 
             // embedded without declared ref in schema
-            name = 'user2a';
-            var user2a = userLiteral(name);
-            doc.adhoc[0].subdoc = user2a;
-            assert.equal(name, doc.adhoc[0].subdoc.name);
-            var user2aId = doc.adhoc[0].subdoc._id;
+             name = 'user2a';
+             var user2a = userLiteral(name);
+             doc.adhoc[0].subdoc = user2a;
+             assert.equal(name, doc.adhoc[0].subdoc.name);
+             var user2aId = doc.adhoc[0].subdoc._id;
 
-            name = 'user2b';
-            var user2b = userLiteral(name);
-            doc.adhoc[0].subarray[0].things.push(user2b);
-            assert.deepEqual(name, doc.adhoc[0].subarray[0].things[1].name);
-            var user2bId = doc.adhoc[0].subarray[0].things[1]._id;
+             name = 'user2b';
+             var user2b = userLiteral(name);
+             doc.adhoc[0].subarray[0].things.push(user2b);
+             assert.deepEqual(name, doc.adhoc[0].subarray[0].things[1].name);
+             var user2bId = doc.adhoc[0].subarray[0].things[1]._id;
 
-            doc.save(function(err) {
-              assert.ifError(err);
-              B.findById(b2).exec(function(err, doc) {
+             doc.save(function(err) {
+               assert.ifError(err);
+               B.findById(b2).exec(function(err, doc) {
                 // db is closed in after()
-                assert.ifError(err);
-                assert.equal(6, doc.fans.length);
-                assert.equal(String(doc._creator), creatorId);
-                assert.equal(doc.fans[2], String(fan2Id));
-                assert.equal(doc.fans[5], String(fan5Id));
-                assert.equal(doc.embed[0].array[0], String(user1aId));
-                assert.equal(doc.embed[0].other, String(user1bId));
-                assert.equal(doc.adhoc[0].subdoc, String(user2aId));
-                assert.equal(doc.adhoc[0].subarray[0].things[1], String(user2bId));
-                done();
-              });
-            });
-          });
+                 assert.ifError(err);
+                 assert.equal(6, doc.fans.length);
+                 assert.equal(String(doc._creator), creatorId);
+                 assert.equal(doc.fans[2], String(fan2Id));
+                 assert.equal(doc.fans[5], String(fan5Id));
+                 assert.equal(doc.embed[0].array[0], String(user1aId));
+                 assert.equal(doc.embed[0].other, String(user1bId));
+                 assert.equal(doc.adhoc[0].subdoc, String(user2aId));
+                 assert.equal(doc.adhoc[0].subarray[0].things[1], String(user2bId));
+                 done();
+               });
+             });
+           });
         });
 
       });

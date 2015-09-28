@@ -1,3 +1,12 @@
+4.1.9 / 2015-09-28
+==================
+ * docs; minlength and maxlength string validation docs #3368 #3413 [cosmosgenius](https://github.com/cosmosgenius)
+ * fixed; linting for infix operators #3397 [ChristianMurphy](https://github.com/ChristianMurphy)
+ * fixed; proper casting for $all #3394
+ * fixed; unhandled rejection warnings with .create() #3391
+ * docs; clarify update validators on paths that aren't explicitly set #3386
+ * docs; custom validator examples #2778
+
 4.1.8 / 2015-09-21
 ==================
  * docs; fixed typo in example #3390 [kmctown](https://github.com/kmctown)

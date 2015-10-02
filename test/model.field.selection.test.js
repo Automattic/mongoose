@@ -141,6 +141,21 @@ describe('model field selection', function() {
     });
   });
 
+  it('works with just _id and findOneAndUpdate (gh-3407)', function(done){
+    var db = start();
+
+    var MyModel = db.model('gh3407', { test: { type: Number, default: 1 } });
+
+    MyModel.collection.insert({}, function(error) {
+      assert.ifError(error);
+      MyModel.findOne({}, { _id: 1 }, function(error, doc) {
+        assert.ifError(error);
+        assert.ok(!doc.test);
+        done();
+      });
+    });
+  });
+
   it('works with subset of fields excluding emebedded doc _id (gh-541)', function(done) {
     var db = start()
       , BlogPostB = db.model(modelName, collection);

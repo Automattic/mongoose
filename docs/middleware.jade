@@ -26,6 +26,10 @@ block content
 
     Both document middleware and query middleware support pre and post hooks.
     How pre and post hooks work is described in more detail below.
+    
+    **Note:** There is no query hook for `remove()`, only for documents.
+    If you set a 'remove' hook, it will be fired when you call `myDoc.remove()`,
+    not when you call `MyModel.remove()`.
 
   h3 Pre
   :markdown

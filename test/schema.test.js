@@ -1227,21 +1227,6 @@ describe('schema', function() {
       done();
     });
 
-    it('of nested schemas should throw (gh-700)', function(done) {
-      var a = new Schema({ title: String })
-        , err;
-
-      try {
-        new Schema({ blah: Boolean, a: a });
-      } catch (err_) {
-        err = err_;
-      }
-
-      assert.ok(err);
-      assert.ok(/Did you try nesting Schemas/.test(err.message));
-      done();
-    });
-
     it('does not alter original argument (gh-1364)', function(done) {
       var schema = {
         ids: [{ type: Schema.ObjectId, ref: 'something' }]

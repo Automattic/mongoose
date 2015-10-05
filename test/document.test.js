@@ -1835,4 +1835,46 @@ describe('document', function() {
       done();
     });
   });
+
+  it('single embedded schemas (gh-2689)', function(done) {
+    var db = start();
+
+    var userSchema = new mongoose.Schema({
+      name: String,
+      email: String
+    }, { _id: false });
+
+    var userHookCount = 0;
+    userSchema.pre('save', function(next) {
+      ++userHookCount;
+      next();
+    });
+
+    var eventSchema = new mongoose.Schema({
+      user: userSchema,
+      name: String
+    });
+
+    var eventHookCount = 0;
+    eventSchema.pre('save', function(next) {
+      ++eventHookCount;
+      next();
+    });
+
+    var Event = db.model('gh2689', eventSchema);
+
+    var e = new Event({ name: 'test', user: { name: 123, email: 'val' } });
+    e.save(function(error) {
+      assert.ifError(error);
+      assert.strictEqual(e.user.name, '123');
+      assert.equal(eventHookCount, 1);
+      assert.equal(userHookCount, 1);
+
+      Event.findOne({ user: { name: 123, email: 'val' } }, function(error, doc) {
+        assert.ifError(error);
+        assert.ok(doc);
+        db.close(done);
+      });
+    });
+  });
 });

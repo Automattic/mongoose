@@ -20,3 +20,7 @@ exports['docs/connections.jade'] = { guide: true, title: 'Connecting to MongoDB'
 exports['docs/faq.jade'] = { guide: true, title: 'FAQ' }
 exports['docs/harmony.jade'] = require('./harmony');
 exports['docs/browser.jade'] = require('./browser');
+exports['docs/compatibility.jade'] = {
+  title: 'MongoDB Version Compatibility',
+  guide: true
+};

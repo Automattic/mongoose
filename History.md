@@ -1,3 +1,13 @@
+4.1.10 / 2015-10-05
+===================
+ * docs; improve virtuals docs to explain virtuals schema option #3433 [zoyaH](https://github.com/zoyaH)
+ * docs; MongoDB server version compatibility guide #3427
+ * docs; clarify that findById and findByIdAndUpdate fire hooks #3422
+ * docs; clean up Model.save() docs #3420
+ * fixed; properly handle projection with just id #3407 #3412
+ * fixed; infinite loop when database document is corrupted #3405
+ * docs; clarify remove middleware #3388
+
 4.1.9 / 2015-09-28
 ==================
  * docs; minlength and maxlength string validation docs #3368 #3413 [cosmosgenius](https://github.com/cosmosgenius)

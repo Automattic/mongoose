@@ -1886,4 +1886,35 @@ describe('document', function() {
         });
     });
   });
+
+  it('single embedded schemas with validation (gh-2689)', function(done) {
+    var db = start();
+
+    var userSchema = new mongoose.Schema({
+      name: String,
+      email: { type: String, required: true, match: /.+@.+/ }
+    }, { _id: false, id: false });
+
+    var eventSchema = new mongoose.Schema({
+      user: userSchema,
+      name: String
+    });
+
+    var Event = db.model('gh2689_1', eventSchema);
+
+    var e = new Event({ name: 'test', user: {} });
+    var error = e.validateSync();
+    assert.ok(error);
+    assert.ok(error.errors['user.email']);
+    assert.equal(error.errors['user.email'].kind, 'required');
+
+    e.user.email = 'val';
+    error = e.validateSync();
+
+    assert.ok(error);
+    assert.ok(error.errors['user.email']);
+    assert.equal(error.errors['user.email'].kind, 'regexp');
+
+    done();
+  });
 });

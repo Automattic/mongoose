@@ -1842,7 +1842,7 @@ describe('document', function() {
     var userSchema = new mongoose.Schema({
       name: String,
       email: String
-    }, { _id: false });
+    }, { _id: false, id: false });
 
     var userHookCount = 0;
     userSchema.pre('save', function(next) {
@@ -1870,11 +1870,20 @@ describe('document', function() {
       assert.equal(eventHookCount, 1);
       assert.equal(userHookCount, 1);
 
-      Event.findOne({ user: { name: 123, email: 'val' } }, function(error, doc) {
-        assert.ifError(error);
-        assert.ok(doc);
-        db.close(done);
-      });
+      Event.findOne(
+        { user: { $eq: { name: '123', email: 'val' } } },
+        function(error, doc) {
+          assert.ifError(error);
+          assert.ok(doc);
+
+          Event.findOne(
+            { user: { $in: [{ name: '123', email: 'val' }] } },
+            function(error, doc) {
+              assert.ifError(error);
+              assert.ok(doc);
+              db.close(done);
+            });
+        });
     });
   });
 });

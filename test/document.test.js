@@ -460,7 +460,7 @@ describe('document', function() {
       { name: { type: String, required: true } });
 
     var doc = new MyModel();
-    doc.save({ validateOnSave: false }, function(error) {
+    doc.save({ validateBeforeSave: false }, function(error) {
       assert.ifError(error);
       db.close(done);
     });

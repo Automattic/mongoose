@@ -1871,7 +1871,7 @@ describe('document', function() {
       assert.equal(userHookCount, 1);
 
       Event.findOne(
-        { user: { $eq: { name: '123', email: 'val' } } },
+        { user: { name: '123', email: 'val' } },
         function(error, doc) {
           assert.ifError(error);
           assert.ok(doc);

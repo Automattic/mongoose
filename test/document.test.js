@@ -453,6 +453,19 @@ describe('document', function() {
     });
   });
 
+  it('allows you to skip validation on save (gh-2981)', function(done) {
+    var db = start();
+
+    var MyModel = db.model('gh2981',
+      { name: { type: String, required: true } });
+
+    var doc = new MyModel();
+    doc.save({ validateOnSave: false }, function(error) {
+      assert.ifError(error);
+      db.close(done);
+    });
+  });
+
   it('doesnt use custom toObject options on save', function( done ) {
     var schema = new Schema({
       name: String,

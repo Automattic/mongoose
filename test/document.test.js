@@ -1981,7 +1981,17 @@ describe('document', function() {
     Event.update({}, badUpdate, options, function(error) {
       assert.ok(error);
       assert.equal(error.errors['user.email'].kind, 'regexp');
-      done();
+
+      var nestedUpdate = { name: 'test' };
+      var options = { upsert: true, setDefaultsOnInsert: true };
+      var query = Event.update({}, nestedUpdate, options, function(error, val) {
+        assert.ifError(error);
+        Event.findOne({ name: 'test' }, function(error, ev) {
+          assert.ifError(error);
+          assert.equal(ev.user.name, 'Val');
+          db.close(done);
+        });
+      });
     });
   });
 });

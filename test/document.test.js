@@ -1960,4 +1960,28 @@ describe('document', function() {
       });
     });
   });
+
+  it('single embedded schemas + update validators (gh-2689)', function(done) {
+    var db = start();
+
+    var userSchema = new mongoose.Schema({
+      name: { type: String, default: 'Val' },
+      email: { type: String, required: true, match: /.+@.+/ }
+    }, { _id: false, id: false });
+
+    var eventSchema = new mongoose.Schema({
+      user: userSchema,
+      name: String
+    });
+
+    var Event = db.model('gh2689_3', eventSchema);
+
+    var badUpdate = { $set: { 'user.email': 'a' } };
+    var options = { runValidators: true };
+    Event.update({}, badUpdate, options, function(error) {
+      assert.ok(error);
+      assert.equal(error.errors['user.email'].kind, 'regexp');
+      done();
+    });
+  });
 });

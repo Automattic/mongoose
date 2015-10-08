@@ -572,4 +572,19 @@ describe('aggregate: ', function() {
       });
     });
   });
+
+  it('cursor (gh-3160)', function(done) {
+    var db = start();
+
+    var MyModel = db.model('gh3160', { name: String });
+
+    MyModel.
+      aggregate([{ $match: { name: 'test' } }]).
+      cursor({ async: true }).
+      exec(function(error, cursor) {
+        assert.ifError(error);
+        assert.ok(cursor);
+        db.close(done);
+      });
+  });
 });

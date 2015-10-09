@@ -255,6 +255,7 @@ block content
     - [validateBeforeSave](#validateBeforeSave)
     - [versionKey](#versionKey)
     - [skipVersioning](#skipVersioning)
+    - [timestamps](#timestamps)
 
   h4#autoIndex option: autoIndex
   :markdown
@@ -563,6 +564,17 @@ block content
     new Schema({..}, { skipVersioning: { dontVersionMe: true } });
     thing.dontVersionMe.push('hey');
     thing.save(); // version is not incremented
+
+  h4#timestamps option: timestamps
+  :markdown
+    If set `timestamps`, mongoose assigns `createdAt` and `updatedAt` fields to your schema, the type assigned is [Date](http://mongoosejs.com/docs/api.html#schema-date-js).
+
+    By default, the name of two fields are `createdAt` and `updatedAt`, custom the field name by setting `timestamps.createdAt` and `timestamps.updatedAt`.
+  :js
+    var thingSchema = new Schema({..}, { timestamps: { createdAt: 'created_at' } });
+    var Thing = mongoose.model('Thing', thingSchema);
+    var thing = new Thing();
+    thing.save(); // `created_at` & `updatedAt` will included
 
   h3#plugins Pluggable
   p

@@ -320,8 +320,8 @@ describe('model', function() {
       });
 
       it('does not inherit indexes', function(done) {
-        assert.deepEqual(Person.schema.indexes(), [[{ name: 1 }, { background: true, safe: undefined }]]);
-        assert.deepEqual(Employee.schema.indexes(), [[{ department: 1 }, { background: true, safe: undefined }]]);
+        assert.deepEqual(Person.schema.indexes(), [[{ name: 1 }, { background: true }]]);
+        assert.deepEqual(Employee.schema.indexes(), [[{ department: 1 }, { background: true }]]);
         done();
       });
 

@@ -297,7 +297,7 @@ describe('aggregate: ', function() {
       // Run exec so we apply discriminator pipeline
       assert.throws(function() {
         aggregate.exec();
-      }, /Cannot read property 'aggregate' of undefined/);
+      }, /Cannot read property 'aggregate' of undefined|Cannot call method 'aggregate' of undefined/);
       assert.deepEqual(aggregate._pipeline,
         [{ $geoNear: { a: 1, query: { __t: 'subschema' } } }]);
 
@@ -307,7 +307,7 @@ describe('aggregate: ', function() {
       aggregate.near({ b: 2, query: { x: 1 } });
       assert.throws(function() {
         aggregate.exec();
-      }, /Cannot read property 'aggregate' of undefined/);
+      }, /Cannot read property 'aggregate' of undefined|Cannot call method 'aggregate' of undefined/);
       assert.deepEqual(aggregate._pipeline,
         [{ $geoNear: { b: 2, query: { x: 1, __t: 'subschema' } } }]);
 

@@ -312,7 +312,7 @@ describe('model: querying:', function() {
 
       var query = Model.update({}, { mixed: {}, name: 'abc' },
         { minimize: true });
-      console.log(query._update);
+
       assert.ok(!query._update.$set.mixed);
 
       done();

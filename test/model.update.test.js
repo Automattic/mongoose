@@ -1116,11 +1116,17 @@ describe('model: update:', function() {
 
       var s = new Schema({
         steak: { type: String, required: true },
-        eggs: { type: String, validate: function() { return false; } }
+        eggs: {
+          type: String,
+          validate: function() {
+            assert.ok(this instanceof require('../').Query);
+            return false;
+          }
+        }
       });
       var Breakfast = db.model('gh-860-4', s);
 
-      var updateOptions = { runValidators: true };
+      var updateOptions = { runValidators: true, context: 'query' };
       Breakfast.update({}, { $unset: { steak: '' }, $setOnInsert: { eggs: 'softboiled' } }, updateOptions, function(error) {
         assert.ok(!!error);
         assert.equal(2, Object.keys(error.errors).length);

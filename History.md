@@ -1,3 +1,15 @@
+4.1.11 / 2015-10-12
+===================
+ * fixed; update timestamps for update() if they're enabled #3450 [isayme](https://github.com/isayme)
+ * fixed; unit test error on node 0.10 #3449 [isayme](https://github.com/isayme)
+ * docs; timestamp option docs #3448 [isayme](https://github.com/isayme)
+ * docs; fix unexpected indent #3443 [isayme](https://github.com/isayme)
+ * fixed; use ES6 promises for Model.prototype.remove() #3442
+ * fixed; don't use unused 'safe' option for index builds #3439
+ * fixed; elemMatch casting bug #3437 #3435 [DefinitelyCarter](https://github.com/DefinitelyCarter)
+ * docs; schema.index docs #3434
+ * fixed; exceptions in save() callback getting swallowed on mongodb 2.4 #3371
+
 4.1.10 / 2015-10-05
 ===================
  * docs; improve virtuals docs to explain virtuals schema option #3433 [zoyaH](https://github.com/zoyaH)

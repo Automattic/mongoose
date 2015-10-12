@@ -28,23 +28,23 @@ Comments.add({
 });
 
 var BlogPostB = new Schema({
-  title     : String
-  , author    : String
-  , slug      : String
-  , date      : Date
-  , meta      : {
-    date      : Date
-      , visitors  : Number
-  }
-  , published : Boolean
-  , mixed     : {}
-  , numbers   : [Number]
-  , tags      : [String]
-  , sigs      : [Buffer]
-  , owners    : [ObjectId]
-  , comments  : [Comments]
-  , def       : { type: String, default: 'kandinsky' }
-});
+  title     : { $type: String },
+  author    : String,
+  slug      : String,
+  date      : Date,
+  meta      : {
+    date      : Date,
+    visitors  : Number
+  },
+  published : Boolean,
+  mixed     : {},
+  numbers   : [{ $type: Number }],
+  tags      : [String],
+  sigs      : [Buffer],
+  owners    : [ObjectId],
+  comments  : [Comments],
+  def       : { $type: String, default: 'kandinsky' }
+}, { typeKey: '$type' });
 
 var modelName = 'model.query.casting.blogpost';
 mongoose.model(modelName, BlogPostB);

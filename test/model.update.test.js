@@ -1228,7 +1228,7 @@ describe('model: update:', function() {
         updateOptions,
         function(error) {
           assert.ok(error);
-          assert.ok(error.errors['name']);
+          assert.ok(error.errors['toppings.0.name']);
           db.close(done);
         });
     });

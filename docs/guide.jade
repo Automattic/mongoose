@@ -253,6 +253,7 @@ block content
     - [strict](#strict)
     - [toJSON](#toJSON)
     - [toObject](#toObject)
+    - [typeKey](#typeKey)
     - [validateBeforeSave](#validateBeforeSave)
     - [versionKey](#versionKey)
     - [skipVersioning](#skipVersioning)
@@ -541,6 +542,28 @@ block content
 
   :markdown
     To see all available `toObject` options, read [this](/docs/api.html#document_Document-toObject).
+    
+  h4#typeKey option: typeKey
+  :markdown
+    By default, if you have an object with key 'type' in your schema, mongoose
+    will interpret it as a type declaration.
+  
+  :js
+    // Mongoose interprets this as 'loc is a String'
+    var schema = new Schema({ loc: { type: String, coordinates: [Number] } });
+    
+  :markdown
+    However, for applications like [geoJSON](http://docs.mongodb.org/manual/reference/geojson/),
+    the 'type' property is important. If you want to control which key mongoose
+    uses to find type declarations, set the 'typeKey' schema option.
+    
+  :js
+    var schema = new Schema({
+      // Mongoose interpets this as 'loc is an object with 2 keys, type and coordinates'
+      loc: { type: String, coordinates: [Number] },
+      // Mongoose interprets this as 'name is a String'
+      name: { $type: String }
+    }, { typeKey: '$type' }); // A '$type' key means this object is a type declaration
     
   h4#validateBeforeSave option: validateBeforeSave
   :markdown

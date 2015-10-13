@@ -50,12 +50,12 @@ describe('schema', function() {
       var NestedSchema = new Schema({
         a: {
           b: {
-            c: {type: String},
-            d: {type: String}
+            c: {$type: String},
+            d: {$type: String}
           }
         },
-        b: {type: String}
-      });
+        b: {$type: String}
+      }, { typeKey: '$type' });
       NestedModel = db.model('Nested', NestedSchema);
     });
 
@@ -223,15 +223,15 @@ describe('schema', function() {
 
   it('default definition', function(done) {
     var Test = new Schema({
-      simple    : { type: String, default: 'a' }
-      , array     : { type: Array, default: [1,2,3,4,5] }
-      , arrayX    : { type: Array, default: 9 }
-      , arrayFn   : { type: Array, default: function() { return [8]; } }
-      , callback  : { type: Number, default: function() {
+      simple    : { $type: String, default: 'a' }
+      , array     : { $type: Array, default: [1,2,3,4,5] }
+      , arrayX    : { $type: Array, default: 9 }
+      , arrayFn   : { $type: Array, default: function() { return [8]; } }
+      , callback  : { $type: Number, default: function() {
           assert.equal('b', this.a);
           return '3';
         }}
-    });
+    }, { typeKey: '$type' });
 
     assert.equal(Test.path('simple').defaultValue, 'a');
     assert.equal(typeof Test.path('callback').defaultValue, 'function');

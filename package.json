@@ -20,7 +20,7 @@
   "license": "MIT",
   "dependencies": {
     "async": "0.9.0",
-    "bson": "~0.4",
+    "bson": "~0.4.18",
     "hooks-fixed": "1.1.0",
     "kareem": "1.0.1",
     "mongodb": "2.0.45",

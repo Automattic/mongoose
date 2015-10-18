@@ -1,3 +1,7 @@
+3.8.36 / 2015-10-18
+===================
+ * fixed; Make array props non-enumerable #3461 [boblauer](https://github.com/boblauer)
+
 3.8.35 / 2015-08-14
 ===================
  * fixed; handling for minimize on nested objects #2930

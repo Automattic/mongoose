@@ -1,3 +1,13 @@
+4.1.12 / 2015-10-19
+===================
+ * docs; use readPreference instead of slaveOk for Query.setOptions docs #3471 [buunguyen](https://github.com/buunguyen)
+ * fixed; more helpful error when regexp contains null bytes #3456
+ * fixed; x509 auth issue #3454 [NoxHarmonium](https://github.com/NoxHarmonium)
+
+3.8.36 / 2015-10-18
+===================
+ * fixed; Make array props non-enumerable #3461 [boblauer](https://github.com/boblauer)
+
 4.1.11 / 2015-10-12
 ===================
  * fixed; update timestamps for update() if they're enabled #3450 [isayme](https://github.com/isayme)

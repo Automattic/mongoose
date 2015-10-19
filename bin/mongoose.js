@@ -8147,6 +8147,13 @@ function MongooseArray(values, path, doc) {
   utils.decorate( arr, MongooseArray.mixin );
   arr.isMongooseArray = true;
 
+  var _options = { enumerable: false, configurable: true, writable: true };
+  var keys = Object.keys(MongooseArray.mixin).
+    concat(['isMongooseArray', 'validators', '_path']);
+  for (var i = 0; i < keys.length; ++i) {
+    Object.defineProperty(arr, keys[i], _options);
+  };
+
   arr._atomics = {};
   arr.validators = [];
   arr._path = path;
@@ -16536,127 +16543,126 @@ module.exports.Long = Long;
 if(typeof global.Map !== 'undefined') {
   module.exports = global.Map;
   module.exports.Map = global.Map;
-  return;
-}
+} else {
+  // We will return a polyfill
+  var Map = function(array) {
+    this._keys = [];
+    this._values = {};
 
-// We will return a polyfill
-var Map = function(array) {
-  this._keys = [];
-  this._values = {};
+    for(var i = 0; i < array.length; i++) {
+      if(array[i] == null) continue;  // skip null and undefined
+      var entry = array[i];
+      var key = entry[0];
+      var value = entry[1];
+      // Add the key to the list of keys in order
+      this._keys.push(key);
+      // Add the key and value to the values dictionary with a point
+      // to the location in the ordered keys list
+      this._values[key] = {v: value, i: this._keys.length - 1};
+    }
+  }
 
-  for(var i = 0; i < array.length; i++) {
-    if(array[i] == null) continue;  // skip null and undefined
-    var entry = array[i];
-    var key = entry[0];
-    var value = entry[1];
+  Map.prototype.clear = function() {
+    this._keys = [];
+    this._values = {};
+  }
+
+  Map.prototype.delete = function(key) {
+    var value = this._values[key];
+    if(value == null) return false;
+    // Delete entry
+    delete this._values[key];
+    // Remove the key from the ordered keys list
+    this._keys.splice(value.i, 1);
+    return true;
+  }
+
+  Map.prototype.entries = function() {
+    var self = this;
+    var index = 0;
+
+    return {
+      next: function() {
+        var key = self._keys[index++];
+        return {
+          value: key !== undefined ? [key, self._values[key].v] : undefined,
+          done: key !== undefined ? false : true
+        }
+      }
+    };
+  }
+
+  Map.prototype.forEach = function(callback, self) {
+    self = self || this;
+
+    for(var i = 0; i < this._keys.length; i++) {
+      var key = this._keys[i];
+      // Call the forEach callback
+      callback.call(self, this._values[key].v, key, self);
+    }
+  }
+
+  Map.prototype.get = function(key) {
+    return this._values[key] ? this._values[key].v : undefined;
+  }
+
+  Map.prototype.has = function(key) {
+    return this._values[key] != null;
+  }
+
+  Map.prototype.keys = function(key) {
+    var self = this;
+    var index = 0;
+
+    return {
+      next: function() {
+        var key = self._keys[index++];
+        return {
+          value: key !== undefined ? key : undefined,
+          done: key !== undefined ? false : true
+        }
+      }
+    };
+  }
+
+  Map.prototype.set = function(key, value) {
+    if(this._values[key]) {
+      this._values[key].v = value;
+      return this;
+    }
+
     // Add the key to the list of keys in order
     this._keys.push(key);
     // Add the key and value to the values dictionary with a point
     // to the location in the ordered keys list
     this._values[key] = {v: value, i: this._keys.length - 1};
-  }
-}
-
-Map.prototype.clear = function() {
-  this._keys = [];
-  this._values = {};
-}
-
-Map.prototype.delete = function(key) {
-  var value = this._values[key];
-  if(value == null) return false;
-  // Delete entry
-  delete this._values[key];
-  // Remove the key from the ordered keys list
-  this._keys.splice(value.i, 1);
-  return true;
-}
-
-Map.prototype.entries = function() {
-  var self = this;
-  var index = 0;
-
-  return {
-    next: function() {
-      var key = self._keys[index++];
-      return {
-        value: key !== undefined ? [key, self._values[key].v] : undefined,
-        done: key !== undefined ? false : true
-      }
-    }
-  };
-}
-
-Map.prototype.forEach = function(callback, self) {
-  self = self || this;
-
-  for(var i = 0; i < this._keys.length; i++) {
-    var key = this._keys[i];
-    // Call the forEach callback
-    callback.call(self, this._values[key].v, key, self);
-  }
-}
-
-Map.prototype.get = function(key) {
-  return this._values[key] ? this._values[key].v : undefined;
-}
-
-Map.prototype.has = function(key) {
-  return this._values[key] != null;
-}
-
-Map.prototype.keys = function(key) {
-  var self = this;
-  var index = 0;
-
-  return {
-    next: function() {
-      var key = self._keys[index++];
-      return {
-        value: key !== undefined ? key : undefined,
-        done: key !== undefined ? false : true
-      }
-    }
-  };
-}
-
-Map.prototype.set = function(key, value) {
-  if(this._values[key]) {
-    this._values[key].v = value;
     return this;
   }
 
-  // Add the key to the list of keys in order
-  this._keys.push(key);
-  // Add the key and value to the values dictionary with a point
-  // to the location in the ordered keys list
-  this._values[key] = {v: value, i: this._keys.length - 1};
-  return this;
-}
+  Map.prototype.values = function(key, value) {
+    var self = this;
+    var index = 0;
 
-Map.prototype.values = function(key, value) {
-  var self = this;
-  var index = 0;
-
-  return {
-    next: function() {
-      var key = self._keys[index++];
-      return {
-        value: key !== undefined ? self._values[key].v : undefined,
-        done: key !== undefined ? false : true
+    return {
+      next: function() {
+        var key = self._keys[index++];
+        return {
+          value: key !== undefined ? self._values[key].v : undefined,
+          done: key !== undefined ? false : true
+        }
       }
-    }
-  };
+    };
+  }
+
+  // Last ismaster
+  Object.defineProperty(Map.prototype, 'size', {
+    enumerable:true,
+    get: function() { return this._keys.length; }
+  });
+
+  module.exports = Map;
+  module.exports.Map = Map;
 }
-
-// Last ismaster
-Object.defineProperty(Map.prototype, 'size', {
-  enumerable:true,
-  get: function() { return this._keys.length; }
-});
-
-module.exports = Map;
-module.exports.Map = Map;
 }).call(this,typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{}],65:[function(require,module,exports){
 /**
@@ -16848,10 +16854,15 @@ ObjectID.prototype.toJSON = function() {
 * @return {boolean} the result of comparing two ObjectID's
 */
 ObjectID.prototype.equals = function equals (otherID) {
-  if(otherID == null) return false;
-  var id = (otherID instanceof ObjectID || otherID.toHexString)
-    ? otherID.id
-    : ObjectID.createFromHexString(otherID).id;
+  var id;
+
+  if(otherID != null && (otherID instanceof ObjectID || otherID.toHexString)) {
+    id = otherID.id;
+  } else if(typeof otherID == 'string' && ObjectID.isValid(otherID)) {
+    id = ObjectID.createFromHexString(otherID).id;
+  } else {
+    return false;
+  }
 
   return this.id === id;
 }
@@ -17344,6 +17355,7 @@ var deserializeObject = function(buffer, options, isArray) {
 	var fieldsAsRaw = options['fieldsAsRaw'] == null ? {} : options['fieldsAsRaw'];
   // Return BSONRegExp objects instead of native regular expressions
   var bsonRegExp = typeof options['bsonRegExp'] == 'boolean' ? options['bsonRegExp'] : false;
+  var promoteBuffers = options['promoteBuffers'] == null ? false : options['promoteBuffers'];
 
   // Validate that we have at least 4 bytes of buffer
   if(buffer.length < 5) throw new Error("corrupt bson message < 5 bytes long");
@@ -17418,8 +17430,13 @@ var deserializeObject = function(buffer, options, isArray) {
         if(subType == Binary.SUBTYPE_BYTE_ARRAY) {
           binarySize = buffer[index++] | buffer[index++] << 8 | buffer[index++] << 16 | buffer[index++] << 24;
         }
-        // Slice the data
-        object[name] = new Binary(buffer.slice(index, index + binarySize), subType);
+        if(promoteBuffers) {
+          // assign reference to sliced Buffer object
+          object[name] = buffer.slice(index, index + binarySize);
+        } else {
+          // Slice the data
+          object[name] = new Binary(buffer.slice(index, index + binarySize), subType);
+        }
       } else {
         var _buffer = typeof Uint8Array != 'undefined' ? new Uint8Array(new ArrayBuffer(binarySize)) : new Array(binarySize);
         // If we have subtype 2 skip the 4 bytes for the size
@@ -17430,8 +17447,13 @@ var deserializeObject = function(buffer, options, isArray) {
         for(var i = 0; i < binarySize; i++) {
           _buffer[i] = buffer[index + i];
         }
-        // Create the binary object
-        object[name] = new Binary(_buffer, subType);
+        if(promoteBuffers) {
+          // assign reference to Buffer object
+          object[name] = _buffer;
+        } else {
+          // Create the binary object
+          object[name] = new Binary(_buffer, subType);
+        }
       }
       // Update the index
       index = index + binarySize;
@@ -18004,6 +18026,9 @@ var serializeRegExp = function(buffer, key, value, index) {
   // Encode the name
   index = index + numberOfWrittenBytes;
   buffer[index++] = 0;
+  if (value.source && value.source.match(regexp) != null) {
+    throw Error("value " + value.source + " must not contain null bytes");
+  }
   // Adjust the index
   index = index + buffer.write(value.source, index, 'utf8');
   // Write zero

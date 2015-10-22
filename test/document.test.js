@@ -453,6 +453,19 @@ describe('document', function() {
     });
   });
 
+  it('allows you to skip validation on save (gh-2981)', function(done) {
+    var db = start();
+
+    var MyModel = db.model('gh2981',
+      { name: { type: String, required: true } });
+
+    var doc = new MyModel();
+    doc.save({ validateBeforeSave: false }, function(error) {
+      assert.ifError(error);
+      db.close(done);
+    });
+  });
+
   it('doesnt use custom toObject options on save', function( done ) {
     var schema = new Schema({
       name: String,
@@ -1833,6 +1846,165 @@ describe('document', function() {
     t.validate(function(error) {
       assert.ok(error);
       done();
+    });
+  });
+
+  it('single embedded schemas (gh-2689)', function(done) {
+    var db = start();
+
+    var userSchema = new mongoose.Schema({
+      name: String,
+      email: String
+    }, { _id: false, id: false });
+
+    var userHookCount = 0;
+    userSchema.pre('save', function(next) {
+      ++userHookCount;
+      next();
+    });
+
+    var eventSchema = new mongoose.Schema({
+      user: userSchema,
+      name: String
+    });
+
+    var eventHookCount = 0;
+    eventSchema.pre('save', function(next) {
+      ++eventHookCount;
+      next();
+    });
+
+    var Event = db.model('gh2689', eventSchema);
+
+    var e = new Event({ name: 'test', user: { name: 123, email: 'val' } });
+    e.save(function(error) {
+      assert.ifError(error);
+      assert.strictEqual(e.user.name, '123');
+      assert.equal(eventHookCount, 1);
+      assert.equal(userHookCount, 1);
+
+      Event.findOne(
+        { user: { name: '123', email: 'val' } },
+        function(error, doc) {
+          assert.ifError(error);
+          assert.ok(doc);
+
+          Event.findOne(
+            { user: { $in: [{ name: '123', email: 'val' }] } },
+            function(error, doc) {
+              assert.ifError(error);
+              assert.ok(doc);
+              db.close(done);
+            });
+        });
+    });
+  });
+
+  it('single embedded schemas with validation (gh-2689)', function(done) {
+    var db = start();
+
+    var userSchema = new mongoose.Schema({
+      name: String,
+      email: { type: String, required: true, match: /.+@.+/ }
+    }, { _id: false, id: false });
+
+    var eventSchema = new mongoose.Schema({
+      user: userSchema,
+      name: String
+    });
+
+    var Event = db.model('gh2689_1', eventSchema);
+
+    var e = new Event({ name: 'test', user: {} });
+    var error = e.validateSync();
+    assert.ok(error);
+    assert.ok(error.errors['user.email']);
+    assert.equal(error.errors['user.email'].kind, 'required');
+
+    e.user.email = 'val';
+    error = e.validateSync();
+
+    assert.ok(error);
+    assert.ok(error.errors['user.email']);
+    assert.equal(error.errors['user.email'].kind, 'regexp');
+
+    done();
+  });
+
+  it('single embedded schemas with markmodified (gh-2689)', function(done) {
+    var db = start();
+
+    var userSchema = new mongoose.Schema({
+      name: String,
+      email: { type: String, required: true, match: /.+@.+/ }
+    }, { _id: false, id: false });
+
+    var eventSchema = new mongoose.Schema({
+      user: userSchema,
+      name: String
+    });
+
+    var Event = db.model('gh2689_2', eventSchema);
+
+    var e = new Event({ name: 'test', user: { email: 'a@b' } });
+    e.save(function(error, doc) {
+      assert.ifError(error);
+      assert.ok(doc);
+      assert.ok(!doc.isModified('user'));
+      assert.ok(!doc.isModified('user.email'));
+      assert.ok(!doc.isModified('user.name'));
+      doc.user.name = 'Val';
+      assert.ok(doc.isModified('user'));
+      assert.ok(!doc.isModified('user.email'));
+      assert.ok(doc.isModified('user.name'));
+
+      var delta = doc.$__delta()[1];
+      assert.deepEqual(delta, {
+        $set: { 'user.name': 'Val' }
+      });
+
+      doc.save(function(error) {
+        assert.ifError(error);
+        Event.findOne({ _id: doc._id }, function(error, doc) {
+          assert.ifError(error);
+          assert.deepEqual(doc.user.toObject(), { email: 'a@b', name: 'Val' });
+          db.close(done);
+        });
+      });
+    });
+  });
+
+  it('single embedded schemas + update validators (gh-2689)', function(done) {
+    var db = start();
+
+    var userSchema = new mongoose.Schema({
+      name: { type: String, default: 'Val' },
+      email: { type: String, required: true, match: /.+@.+/ }
+    }, { _id: false, id: false });
+
+    var eventSchema = new mongoose.Schema({
+      user: userSchema,
+      name: String
+    });
+
+    var Event = db.model('gh2689_3', eventSchema);
+
+    var badUpdate = { $set: { 'user.email': 'a' } };
+    var options = { runValidators: true };
+    Event.update({}, badUpdate, options, function(error) {
+      assert.ok(error);
+      assert.equal(error.errors['user.email'].kind, 'regexp');
+
+      var nestedUpdate = { name: 'test' };
+      var options = { upsert: true, setDefaultsOnInsert: true };
+      var query = Event.update({}, nestedUpdate, options, function(error, val) {
+        assert.ifError(error);
+        Event.findOne({ name: 'test' }, function(error, ev) {
+          assert.ifError(error);
+          assert.equal(ev.user.name, 'Val');
+          db.close(done);
+        });
+      });
     });
   });
 });

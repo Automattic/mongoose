@@ -151,9 +151,22 @@ block content
     document validators. In the color validation function above, `this` refers
     to the document being validated when using document validation.
     However, when running update validators, the document being updated
-    may not be in the server's memory, so the value of `this` is not defined
-    (it may be the global object or undefined depending on [strict mode](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Strict_mode)).
+    may not be in the server's memory, so by default the value of `this` is
+    not defined. However, you can set the `context` option to 'query' to make
+    `this` refer to the underlying query.
     
+  :js
+    Toy.schema.path('color').validate(function (value) {
+      this.schema; // refers to the query's schema if you set the `context` option
+      return /blue|green|white|red|orange|periwinkle/i.test(value);
+    }, 'Invalid color');
+
+    var options = { runValidators: true, context: 'query' };
+    Toy.update({}, { color: 'bacon' }, options, function (err) {
+      console.log(err.errors.color.message); // prints 'Validator "Invalid color" failed for path color with value `bacon`'
+    });
+    
+  :markdown
     The other key difference that update validators only run on the paths
     specified in the update. For instance, in the below example, because
     'name' is not specified in the update operation, update validation will

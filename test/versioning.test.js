@@ -21,13 +21,14 @@ Comments.add({
   title     : String
   , date      : Date
   , comments  : [Comments]
+  , dontVersionMeEither: []
 });
 
 var BlogPost = new Schema({
   title     : String
   , date      : Date
   , meta      : {
-    date      : Date
+        date      : Date
       , visitors  : Number
       , nested    : [Comments]
       , numbers   : [Number]
@@ -37,8 +38,13 @@ var BlogPost = new Schema({
   , comments     : [Comments]
   , arr          : []
   , dontVersionMe: []
-}, { collection: 'versioning_' + random(), skipVersioning: { dontVersionMe: true } });
-
+}, {
+  collection: 'versioning_' + random()
+  , skipVersioning: {
+    dontVersionMe: true
+    , 'comments.dontVersionMeEither': true
+  }
+});
 
 mongoose.model('Versioning', BlogPost);
 
@@ -254,8 +260,16 @@ describe('versioning', function() {
       save(a, b, test14);
     }
 
-    function test14(err, a) {
+    function test14(err, a, b) {
+      assert.ifError(err);
       assert.equal(a._doc.__v, 13, 'version should not be incremented for non-versioned fields');
+      a.comments[0].dontVersionMeEither.push('value1');
+      b.comments[0].dontVersionMeEither.push('value2');
+      save(a, b, test15);
+    }
+
+    function test15(err, a) {
+      assert.equal(a._doc.__v, 13, 'version should not be incremented for non-versioned sub-document fields');
       db.close();
       done();
     }

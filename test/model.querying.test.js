@@ -302,6 +302,21 @@ describe('model: querying:', function() {
       assert.ok(BlogPostB.update({title: random()}, {}, fn) instanceof Query);
       assert.ok(BlogPostB.update({title: random()}, {}, {}, fn) instanceof Query);
     });
+
+    it('can handle minimize option (gh-3381)', function(done) {
+      var db = start();
+      var Model = db.model('gh3381', {
+        name: String,
+        mixed: Schema.Types.Mixed
+      });
+
+      var query = Model.update({}, { mixed: {}, name: 'abc' },
+        { minimize: true });
+
+      assert.ok(!query._update.$set.mixed);
+
+      done();
+    });
   });
 
   describe('findOne', function() {

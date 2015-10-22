@@ -7695,8 +7695,17 @@ SchemaType.prototype.get = function(fn) {
  *         ...
  *         respond(false); // validation failed
  *       })
-*      }, '{PATH} failed validation.');
-*
+ *     }, '{PATH} failed validation.');
+ *
+ *     // or with dynamic message
+ *
+ *     schema.path('name').validate(function (value, respond) {
+ *       doStuff(value, function () {
+ *         ...
+ *         respond(false, 'this message gets to the validation error');
+ *       });
+ *     }, 'this message does not matter');
+ *
  * You might use asynchronous validators to retreive other documents from the database to validate against or to meet other I/O bound validation needs.
  *
  * Validation occurs `pre('save')` or whenever you manually execute [document#validate](#document_Document-validate).
@@ -7974,7 +7983,10 @@ SchemaType.prototype.doValidate = function(value, fn, scope) {
         return;
       }
       if (2 === validator.length) {
-        validator.call(scope, value, function(ok) {
+        validator.call(scope, value, function(ok, customMsg) {
+          if (customMsg) {
+              validatorProperties.message = customMsg;
+          }
           validate(ok, validatorProperties);
         });
       } else {
@@ -10010,6 +10022,7 @@ var cloneRegExp = require('regexp-clone');
 var sliced = require('sliced');
 var mpath = require('mpath');
 var ms = require('ms');
+var pluralize = require('pluralize-mongoose');
 var MongooseBuffer;
 var MongooseArray;
 var Document;
@@ -10029,97 +10042,6 @@ exports.toCollectionName = function(name, options) {
   if (options.pluralization === false) return name;
   return pluralize(name.toLowerCase());
 };
-
-/**
- * Pluralization rules.
- *
- * These rules are applied while processing the argument to `toCollectionName`.
- *
- * @deprecated remove in 4.x gh-1350
- */
-
-exports.pluralization = [
-  [/(m)an$/gi, '$1en'],
-  [/(pe)rson$/gi, '$1ople'],
-  [/(child)$/gi, '$1ren'],
-  [/^(ox)$/gi, '$1en'],
-  [/(ax|test)is$/gi, '$1es'],
-  [/(octop|vir)us$/gi, '$1i'],
-  [/(alias|status)$/gi, '$1es'],
-  [/(bu)s$/gi, '$1ses'],
-  [/(buffal|tomat|potat)o$/gi, '$1oes'],
-  [/([ti])um$/gi, '$1a'],
-  [/sis$/gi, 'ses'],
-  [/(?:([^f])fe|([lr])f)$/gi, '$1$2ves'],
-  [/(hive)$/gi, '$1s'],
-  [/([^aeiouy]|qu)y$/gi, '$1ies'],
-  [/(x|ch|ss|sh)$/gi, '$1es'],
-  [/(matr|vert|ind)ix|ex$/gi, '$1ices'],
-  [/([m|l])ouse$/gi, '$1ice'],
-  [/(kn|w|l)ife$/gi, '$1ives'],
-  [/(quiz)$/gi, '$1zes'],
-  [/s$/gi, 's'],
-  [/([^a-z])$/, '$1'],
-  [/$/gi, 's']
-];
-var rules = exports.pluralization;
-
-/**
- * Uncountable words.
- *
- * These words are applied while processing the argument to `toCollectionName`.
- * @api public
- */
-
-exports.uncountables = [
-  'advice',
-  'energy',
-  'excretion',
-  'digestion',
-  'cooperation',
-  'health',
-  'justice',
-  'labour',
-  'machinery',
-  'equipment',
-  'information',
-  'pollution',
-  'sewage',
-  'paper',
-  'money',
-  'species',
-  'series',
-  'rain',
-  'rice',
-  'fish',
-  'sheep',
-  'moose',
-  'deer',
-  'news',
-  'expertise',
-  'status',
-  'media'
-];
-var uncountables = exports.uncountables;
-
-/*!
- * Pluralize function.
- *
- * @author TJ Holowaychuk (extracted from _ext.js_)
- * @param {String} string to pluralize
- * @api private
- */
-
-function pluralize(str) {
-  var found;
-  if (!~uncountables.indexOf(str.toLowerCase())) {
-    found = rules.filter(function(rule) {
-      return str.match(rule[0]);
-    });
-    if (found[0]) return str.replace(found[0][0], found[0][1]);
-  }
-  return str;
-}
 
 /*!
  * Determines if `a` and `b` are deep equal.
@@ -10797,7 +10719,7 @@ exports.each = function(arr, fn) {
 };
 
 }).call(this,require("FWaASH"),require("buffer").Buffer)
-},{"./document":5,"./types":42,"./types/objectid":43,"FWaASH":55,"buffer":49,"mpath":78,"ms":92,"regexp-clone":93,"sliced":94}],46:[function(require,module,exports){
+},{"./document":5,"./types":42,"./types/objectid":43,"FWaASH":55,"buffer":49,"mpath":78,"ms":92,"pluralize-mongoose":93,"regexp-clone":94,"sliced":95}],46:[function(require,module,exports){
 
 /**
  * VirtualType constructor
@@ -23834,7 +23756,7 @@ module.exports = exports = Query;
 // TODO
 // test utils
 
-},{"./collection":82,"./collection/collection":81,"./env":84,"./permissions":86,"./utils":87,"assert":48,"bluebird":88,"debug":89,"sliced":94,"util":57}],86:[function(require,module,exports){
+},{"./collection":82,"./collection/collection":81,"./env":84,"./permissions":86,"./utils":87,"assert":48,"bluebird":88,"debug":89,"sliced":95,"util":57}],86:[function(require,module,exports){
 'use strict';
 
 var denied = exports;
@@ -24261,7 +24183,7 @@ exports.cloneBuffer = function (buff) {
 };
 
 }).call(this,require("FWaASH"),require("buffer").Buffer)
-},{"FWaASH":55,"buffer":49,"regexp-clone":93}],88:[function(require,module,exports){
+},{"FWaASH":55,"buffer":49,"regexp-clone":94}],88:[function(require,module,exports){
 (function (process,global){
 /* @preserve
  * The MIT License (MIT)
@@ -29903,6 +29825,306 @@ No more painful `setTimeout(fn, 60 * 4 * 3 * 2 * 1 * Infinity * NaN * '☃')`.
 })(this);
 
 },{}],93:[function(require,module,exports){
+/* global define */
+
+(function (root, pluralize) {
+  /* istanbul ignore else */
+  if (typeof require === 'function' && typeof exports === 'object' && typeof module === 'object') {
+    // Node.
+    module.exports = pluralize();
+  } else if (typeof define === 'function' && define.amd) {
+    // AMD, registers as an anonymous module.
+    define(function () {
+      return pluralize();
+    });
+  } else {
+    // Browser global.
+    root.pluralize = pluralize();
+  }
+})(this, function () {
+  // Rule storage - pluralize and singularize need to be run sequentially,
+  // while other rules can be optimized using an object for instant lookups.
+  var pluralRules = [];
+  var singularRules = [];
+  var uncountables = {};
+  var irregularPlurals = {};
+  var irregularSingles = {};
+
+  /**
+   * Title case a string.
+   *
+   * @param  {string} str
+   * @return {string}
+   */
+  function toTitleCase (str) {
+    return str.charAt(0).toUpperCase() + str.substr(1).toLowerCase();
+  }
+
+  /**
+   * Sanitize a pluralization rule to a usable regular expression.
+   *
+   * @param  {(RegExp|string)} rule
+   * @return {RegExp}
+   */
+  function sanitizeRule (rule) {
+    if (typeof rule === 'string') {
+      return new RegExp('^' + rule + '$', 'i');
+    }
+
+    return rule;
+  }
+
+  /**
+   * Pass in a word token to produce a function that can replicate the case on
+   * another word.
+   *
+   * @param  {string}   word
+   * @param  {string}   token
+   * @return {Function}
+   */
+  function restoreCase (word, token) {
+    // Upper cased words. E.g. "HELLO".
+    if (word === word.toUpperCase()) {
+      return token.toUpperCase();
+    }
+
+    // Title cased words. E.g. "Title".
+    if (word[0] === word[0].toUpperCase()) {
+      return toTitleCase(token);
+    }
+
+    // Lower cased words. E.g. "test".
+    return token.toLowerCase();
+  }
+
+  /**
+   * Interpolate a regexp string.
+   *
+   * @param  {string} str
+   * @param  {Array}  args
+   * @return {string}
+   */
+  function interpolate (str, args) {
+    return str.replace(/\$(\d{1,2})/g, function (match, index) {
+      return args[index] || '';
+    });
+  }
+
+  /**
+   * Sanitize a word by passing in the word and sanitization rules.
+   *
+   * @param  {String}   token
+   * @param  {String}   word
+   * @param  {Array}    collection
+   * @return {String}
+   */
+  function sanitizeWord (token, word, collection) {
+    // Empty string or doesn't need fixing.
+    if (!token.length || uncountables.hasOwnProperty(token)) {
+      return word;
+    }
+
+    var len = collection.length;
+
+    // Iterate over the sanitization rules and use the first one to match.
+    while (len--) {
+      var rule = collection[len];
+
+      // If the rule passes, return the replacement.
+      if (rule[0].test(word)) {
+        return word.replace(rule[0], function (match, index, word) {
+          var result = interpolate(rule[1], arguments);
+
+          if (match === '') {
+            return restoreCase(word[index - 1], result);
+          }
+
+          return restoreCase(match, result);
+        });
+      }
+    }
+
+    return word;
+  }
+
+  /**
+   * Replace a word with the updated word.
+   *
+   * @param  {Object}   replaceMap
+   * @param  {Object}   keepMap
+   * @param  {Array}    rules
+   * @return {Function}
+   */
+  function replaceWord (replaceMap, keepMap, rules) {
+    return function (word) {
+      // Get the correct token and case restoration functions.
+      var token = word.toLowerCase();
+
+      // Check against the keep object map.
+      if (keepMap.hasOwnProperty(token)) {
+        return restoreCase(word, token);
+      }
+
+      // Check against the replacement map for a direct word replacement.
+      if (replaceMap.hasOwnProperty(token)) {
+        return restoreCase(word, replaceMap[token]);
+      }
+
+      // Run all the rules against the word.
+      return sanitizeWord(token, word, rules);
+    };
+  }
+
+  /**
+   * Pluralize or singularize a word based on the passed in count.
+   *
+   * @param  {String}  word
+   * @param  {Number}  count
+   * @param  {Boolean} inclusive
+   * @return {String}
+   */
+  function pluralize (word, count, inclusive) {
+    var pluralized = count === 1
+      ? pluralize.singular(word) : pluralize.plural(word);
+
+    return (inclusive ? count + ' ' : '') + pluralized;
+  }
+
+  /**
+   * Pluralize a word.
+   *
+   * @type {Function}
+   */
+  pluralize.plural = replaceWord(
+    irregularSingles, irregularPlurals, pluralRules
+  );
+
+  /**
+   * Singularize a word.
+   *
+   * @type {Function}
+   */
+  pluralize.singular = replaceWord(
+    irregularPlurals, irregularSingles, singularRules
+  );
+
+  /**
+   * Add a pluralization rule to the collection.
+   *
+   * @param {(string|RegExp)} rule
+   * @param {string}          replacement
+   */
+  pluralize.addPluralRule = function (rule, replacement) {
+    pluralRules.push([sanitizeRule(rule), replacement]);
+  };
+
+  /**
+   * Add a singularization rule to the collection.
+   *
+   * @param {(string|RegExp)} rule
+   * @param {string}          replacement
+   */
+  pluralize.addSingularRule = function (rule, replacement) {
+    singularRules.push([sanitizeRule(rule), replacement]);
+  };
+
+  /**
+   * Add an uncountable word rule.
+   *
+   * @param {(string|RegExp)} word
+   */
+  pluralize.addUncountableRule = function (word) {
+    if (typeof word === 'string') {
+      uncountables[word.toLowerCase()] = true;
+      return;
+    }
+
+    // Set singular and plural references for the word.
+    pluralize.addPluralRule(word, '$0');
+    pluralize.addSingularRule(word, '$0');
+  };
+
+  /**
+   * Add an irregular word definition.
+   *
+   * @param {String} single
+   * @param {String} plural
+   */
+  pluralize.addIrregularRule = function (single, plural) {
+    plural = plural.toLowerCase();
+    single = single.toLowerCase();
+
+    irregularSingles[single] = plural;
+    irregularPlurals[plural] = single;
+  };
+
+  /**
+   * Pluralization rules.
+   */
+  [
+    [/(m)an$/gi, '$1en'],
+    [/(pe)rson$/gi, '$1ople'],
+    [/(child)$/gi, '$1ren'],
+    [/^(ox)$/gi, '$1en'],
+    [/(ax|test)is$/gi, '$1es'],
+    [/(octop|vir)us$/gi, '$1i'],
+    [/(alias|status)$/gi, '$1es'],
+    [/(bu)s$/gi, '$1ses'],
+    [/(buffal|tomat|potat)o$/gi, '$1oes'],
+    [/([ti])um$/gi, '$1a'],
+    [/sis$/gi, 'ses'],
+    [/(?:([^f])fe|([lr])f)$/gi, '$1$2ves'],
+    [/(hive)$/gi, '$1s'],
+    [/([^aeiouy]|qu)y$/gi, '$1ies'],
+    [/(x|ch|ss|sh)$/gi, '$1es'],
+    [/(matr|vert|ind)ix|ex$/gi, '$1ices'],
+    [/([m|l])ouse$/gi, '$1ice'],
+    [/(kn|w|l)ife$/gi, '$1ives'],
+    [/(quiz)$/gi, '$1zes'],
+    [/s$/gi, 's'],
+    [/$/gi, 's']
+  ].forEach(function (rule) {
+    return pluralize.addPluralRule(rule[0], rule[1]);
+  });
+
+  /**
+   * Uncountable rules.
+   */
+  [
+    'advice',
+    'energy',
+    'excretion',
+    'digestion',
+    'cooperation',
+    'health',
+    'justice',
+    'labour',
+    'machinery',
+    'equipment',
+    'information',
+    'pollution',
+    'sewage',
+    'paper',
+    'money',
+    'species',
+    'series',
+    'rain',
+    'rice',
+    'fish',
+    'sheep',
+    'moose',
+    'deer',
+    'news',
+    'expertise',
+    'status',
+    'media',
+    /([^a-z])$/
+  ].forEach(pluralize.addUncountableRule);
+
+  return pluralize;
+});
+
+},{}],94:[function(require,module,exports){
 
 var toString = Object.prototype.toString;
 
@@ -29924,10 +30146,10 @@ module.exports = exports = function (regexp) {
 }
 
 
-},{}],94:[function(require,module,exports){
+},{}],95:[function(require,module,exports){
 module.exports = exports = require('./lib/sliced');
 
-},{"./lib/sliced":95}],95:[function(require,module,exports){
+},{"./lib/sliced":96}],96:[function(require,module,exports){
 
 /**
  * An Array.prototype.slice.call(arguments) alternative

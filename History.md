@@ -1,3 +1,21 @@
+4.2.0 / 2015-10-22
+==================
+ * added; support for skipVersioning for document arrays #3467 [chazmo03](https://github.com/chazmo03)
+ * added; ability to customize schema 'type' key #3459 #3245
+ * fixed; writeConcern for index builds #3455
+ * added; emit event when individual index build starts #3440 [objectiveSee](https://github.com/objectiveSee)
+ * added; 'context' option for update validators #3430
+ * refactor; pluralization now in separate pluralize-mongoose npm module #3415 [ChristianMurphy](https://github.com/ChristianMurphy)
+ * added; customizable error validation messages #3406 [geronime](https://github.com/geronime)
+ * added; support for passing 'minimize' option to update #3381
+ * added; ability to customize debug logging format #3261
+ * added; baseModelName property for discriminator models #3202
+ * added; 'emitIndexErrors' option #3174
+ * added; 'async' option for aggregation cursor to support buffering #3160
+ * added; ability to skip validation for individual save() calls #2981
+ * added; single embedded schema support #2689 #585
+ * added; depopulate function #2509
+
 4.1.12 / 2015-10-19
 ===================
  * docs; use readPreference instead of slaveOk for Query.setOptions docs #3471 [buunguyen](https://github.com/buunguyen)

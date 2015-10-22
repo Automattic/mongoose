@@ -607,7 +607,7 @@ block content
 
   h4#skipVersioning option: skipVersioning
   :markdown
-    `skipVersioning` allows excluding paths from versioning (i.e the internal revision will not be incremented even if these paths are updated). DO NOT do this unless you know what you're doing.
+    `skipVersioning` allows excluding paths from versioning (i.e., the internal revision will not be incremented even if these paths are updated). DO NOT do this unless you know what you're doing. For sub-documents, include this on the parent document using the fully qualified path. 
   :js
     new Schema({..}, { skipVersioning: { dontVersionMe: true } });
     thing.dontVersionMe.push('hey');

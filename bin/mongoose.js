@@ -4549,7 +4549,8 @@ Schema.prototype.static = function(name, fn) {
  *     schema.index({ first: 1, last: -1 })
  *
  * @param {Object} fields
- * @param {Object} [options]
+ * @param {Object} [options] Options to pass to [MongoDB driver's `createIndex()` function](http://mongodb.github.io/node-mongodb-native/2.0/api/Collection.html#createIndex)
+ * @param {String} [options.expires=null] Mongoose-specific syntactic sugar, uses [ms](https://www.npmjs.com/package/ms) to convert `expires` option into seconds for the `expireAfterSeconds` in the above link.
  * @api public
  */
 
@@ -8354,6 +8355,13 @@ function MongooseArray(values, path, doc) {
 
   utils.decorate( arr, MongooseArray.mixin );
   arr.isMongooseArray = true;
+
+  var _options = { enumerable: false, configurable: true, writable: true };
+  var keys = Object.keys(MongooseArray.mixin).
+    concat(['isMongooseArray', 'validators', '_path']);
+  for (var i = 0; i < keys.length; ++i) {
+    Object.defineProperty(arr, keys[i], _options);
+  };
 
   arr._atomics = {};
   arr.validators = [];

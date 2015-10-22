@@ -1,3 +1,7 @@
+4.2.2 / 2015-10-22
+==================
+ * fixed; go back to old pluralization code #3490
+
 4.2.1 / 2015-10-22
 ==================
  * fixed; pluralization issues #3492 [ChristianMurphy](https://github.com/ChristianMurphy)

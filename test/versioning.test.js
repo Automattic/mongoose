@@ -260,11 +260,11 @@ describe('versioning', function() {
       save(a, b, test14);
     }
 
-    function test14(err, a) {
+    function test14(err, a, b) {
       assert.ifError(err);
       assert.equal(a._doc.__v, 13, 'version should not be incremented for non-versioned fields');
-      a.comments.dontVersionMeEither.push('value1');
-      b.comments.dontVersionMeEither.push('value2');
+      a.comments[0].dontVersionMeEither.push('value1');
+      b.comments[0].dontVersionMeEither.push('value2');
       save(a, b, test15);
     }
 

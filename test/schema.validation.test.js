@@ -649,6 +649,25 @@ describe('schema', function() {
             done();
           });
         });
+
+        it('supports dynamic message for validators with callback (gh-1936)', function(done) {
+          var schema = new Schema({
+            x: {
+              type: String,
+              validate: [{
+                validator: function(value, fn) { fn(false, 'Custom message'); },
+                msg: 'Does not matter'
+              }]
+            }
+          });
+          var M = mongoose.model('gh-1936', schema, 'gh-1936');
+
+          var m = new M({ x: 'whatever' });
+          m.validate(function(err) {
+            assert.equal('Custom message', err.errors.x.toString());
+            done();
+          });
+        });
       });
     });
 

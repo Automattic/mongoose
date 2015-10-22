@@ -92,7 +92,7 @@ describe('model', function() {
             function(next) { d1.save(next); },
             function(next) { d2.save(next); },
             function(next) { d3.save(next); },
-            function(next) { c.save(next);  },
+            function(next) { c.save(next); },
             function(next) {
               ContainerModel.findOne({}).populate('events').exec(function(err, doc) {
                 assert.ifError(err);
@@ -118,7 +118,7 @@ describe('model', function() {
 
     describe('find', function() {
       it('hydrates correct models', function(done) {
-        var baseEvent  = new BaseEvent({ name: 'Base event' });
+        var baseEvent = new BaseEvent({ name: 'Base event' });
         var impressionEvent = new ImpressionEvent({ name: 'Impression event' });
         var conversionEvent = new ConversionEvent({ name: 'Conversion event', revenue: 1.337 });
 
@@ -149,7 +149,7 @@ describe('model', function() {
       });
 
       var checkHydratesCorrectModels = function(fields, done) {
-        var baseEvent  = new BaseEvent({ name: 'Base event' });
+        var baseEvent = new BaseEvent({ name: 'Base event' });
         var impressionEvent = new ImpressionEvent({ name: 'Impression event' });
         var conversionEvent = new ConversionEvent({ name: 'Conversion event', revenue: 1.337 });
 
@@ -331,7 +331,7 @@ describe('model', function() {
       });
 
       it('hydrates streams', function(done) {
-        var baseEvent  = new BaseEvent({ name: 'Base event' });
+        var baseEvent = new BaseEvent({ name: 'Base event' });
         var impressionEvent = new ImpressionEvent({ name: 'Impression event' });
         var conversionEvent = new ConversionEvent({ name: 'Conversion event', revenue: 1.337 });
 
@@ -376,7 +376,7 @@ describe('model', function() {
 
     describe('findOne', function() {
       it('hydrates correct model', function(done) {
-        var baseEvent  = new BaseEvent({ name: 'Base event' });
+        var baseEvent = new BaseEvent({ name: 'Base event' });
         var impressionEvent = new ImpressionEvent({ name: 'Impression event' });
         var conversionEvent = new ConversionEvent({ name: 'Conversion event', revenue: 1.337 });
 
@@ -415,7 +415,7 @@ describe('model', function() {
       });
 
       var checkHydratesCorrectModels = function(fields, done, checkUndefinedRevenue) {
-        var baseEvent  = new BaseEvent({ name: 'Base event' });
+        var baseEvent = new BaseEvent({ name: 'Base event' });
         var impressionEvent = new ImpressionEvent({ name: 'Impression event' });
         var conversionEvent = new ConversionEvent({ name: 'Conversion event', revenue: 1.337 });
 
@@ -573,7 +573,7 @@ describe('model', function() {
 
     describe('findOneAndUpdate', function() {
       it('does not update models of other types', function(done) {
-        var baseEvent  = new BaseEvent({ name: 'Base event' });
+        var baseEvent = new BaseEvent({ name: 'Base event' });
         var impressionEvent = new ImpressionEvent({ name: 'Impression event' });
         var conversionEvent = new ConversionEvent({ name: 'Conversion event', revenue: 1.337 });
 
@@ -596,7 +596,7 @@ describe('model', function() {
       });
 
       it('updates models of its own type', function(done) {
-        var baseEvent  = new BaseEvent({ name: 'Base event' });
+        var baseEvent = new BaseEvent({ name: 'Base event' });
         var impressionEvent = new ImpressionEvent({ name: 'Impression event' });
         var conversionEvent = new ConversionEvent({ name: 'Conversion event', revenue: 1.337 });
 
@@ -621,7 +621,7 @@ describe('model', function() {
       });
 
       it('base model modifies any event type', function(done) {
-        var baseEvent  = new BaseEvent({ name: 'Base event' });
+        var baseEvent = new BaseEvent({ name: 'Base event' });
         var impressionEvent = new ImpressionEvent({ name: 'Impression event' });
         var conversionEvent = new ConversionEvent({ name: 'Conversion event', revenue: 1.337 });
 

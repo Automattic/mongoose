@@ -17,7 +17,7 @@ if (process.env.D === '1')
  * Override all Collection related queries to keep count
  */
 
-[   'ensureIndex'
+[ 'ensureIndex'
   , 'findAndModify'
   , 'findOne'
   , 'find'
@@ -80,7 +80,7 @@ module.exports = function(options) {
     uri = module.exports.uri;
   }
 
-  var noErrorListener = !! options.noErrorListener;
+  var noErrorListener = !!options.noErrorListener;
   delete options.noErrorListener;
 
   var conn = mongoose.createConnection(uri, options);

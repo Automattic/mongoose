@@ -72,7 +72,7 @@ describe('model', function() {
 
         function next() {
           // using legacy coordinates -- maxDistance units in radians
-          Geo.geoNear(testLocations.PORT_AUTHORITY_STATION, { spherical : true, maxDistance : metersToRadians(300)  }, function(err, results) {
+          Geo.geoNear(testLocations.PORT_AUTHORITY_STATION, { spherical : true, maxDistance : metersToRadians(300) }, function(err, results) {
             assert.ifError(err);
 
             assert.equal(1, results.length);

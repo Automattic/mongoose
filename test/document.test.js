@@ -950,7 +950,7 @@ describe('document', function() {
             t.req = undefined;
             t.save(function(err) {
               err = String(err);
-              var invalid  = /Path `req` is required./.test(err);
+              var invalid = /Path `req` is required./.test(err);
               assert.ok(invalid);
               t.req = 'it works again';
               t.save(function(err) {
@@ -1997,7 +1997,7 @@ describe('document', function() {
 
       var nestedUpdate = { name: 'test' };
       var options = { upsert: true, setDefaultsOnInsert: true };
-      var query = Event.update({}, nestedUpdate, options, function(error, val) {
+      Event.update({}, nestedUpdate, options, function(error) {
         assert.ifError(error);
         Event.findOne({ name: 'test' }, function(error, ev) {
           assert.ifError(error);

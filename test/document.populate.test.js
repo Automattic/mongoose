@@ -572,4 +572,46 @@ describe('document.populate', function() {
       });
     });
   });
+
+  it('can depopulate (gh-2509)', function(done) {
+    var db = start();
+
+    var Person = db.model('gh2509_1', {
+      name: String
+    });
+
+    var Band = db.model('gh2509_2', {
+      name: String,
+      members: [{ type: Schema.Types.ObjectId, ref: 'gh2509_1' }],
+      lead: { type: Schema.Types.ObjectId, ref: 'gh2509_1' }
+    });
+
+    var people = [{ name: 'Axl Rose' }, { name: 'Slash' }];
+    Person.create(people, function(error, docs) {
+      assert.ifError(error);
+      var band = {
+        name: "Guns N' Roses",
+        members: [docs[0]._id, docs[1]],
+        lead: docs[0]._id
+      };
+      Band.create(band, function(error, band) {
+        band.populate('members', function(error) {
+          assert.equal(band.members[0].name, 'Axl Rose');
+          band.depopulate('members');
+          assert.ok(!band.members[0].name);
+          assert.equal(band.members[0].toString(), docs[0]._id.toString());
+          assert.equal(band.members[1].toString(), docs[1]._id.toString());
+          assert.ok(!band.populated('members'));
+          assert.ok(!band.populated('lead'));
+          band.populate('lead', function(error) {
+            assert.equal(band.lead.name, 'Axl Rose');
+            band.depopulate('lead');
+            assert.ok(!band.lead.name);
+            assert.equal(band.lead.toString(), docs[0]._id.toString());
+            done();
+          });
+        });
+      });
+    });
+  });
 });

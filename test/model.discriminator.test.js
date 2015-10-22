@@ -80,6 +80,7 @@ describe('model', function() {
     });
 
     it('is instance of root', function(done) {
+      assert.equal(Employee.baseModelName, 'model-discriminator-person');
       var employee = new Employee();
       assert.ok(employee instanceof Person);
       assert.ok(employee instanceof Employee);

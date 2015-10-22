@@ -243,6 +243,7 @@ block content
     - [autoIndex](#autoIndex)
     - [capped](#capped)
     - [collection](#collection)
+    - [emitIndexErrors](#emitIndexErrors)
     - [id](#id)
     - [_id](#_id)
     - [minimize](#minimize)
@@ -252,6 +253,7 @@ block content
     - [strict](#strict)
     - [toJSON](#toJSON)
     - [toObject](#toObject)
+    - [typeKey](#typeKey)
     - [validateBeforeSave](#validateBeforeSave)
     - [versionKey](#versionKey)
     - [skipVersioning](#skipVersioning)
@@ -286,6 +288,30 @@ block content
     Mongoose by default produces a collection name by passing the model name to the [utils.toCollectionName](./api.html#utils_exports.toCollectionName) method. This method pluralizes the name. Set this option if you need a different name for your collection.
   :js
     var dataSchema = new Schema({..}, { collection: 'data' });
+
+  h4#emitIndexErrors option: emitIndexErrors
+  :markdown
+    By default, mongoose will build any indexes you specify in your schema for
+    you, and emit an 'index' event on the model when the index build either
+    succeeds or errors out.
+  :js
+    MyModel.on('index', function(error) {
+      /* If error is truthy, index build failed */
+    });
+  :markdown
+    However, this makes it tricky to catch when your index build fails. The
+    `emitIndexErrors` option makes seeing when your index build fails simpler.
+    If this option is on, mongoose will additionally emit an 'error' event
+    on the model when an index build fails.
+  :js
+    MyModel.schema.options.emitIndexErrors; // true
+    MyModel.on('error', function(error) {
+      // gets an error whenever index build fails
+    });
+  :markdown
+    Node.js' built-in
+    [event emitter throws an exception if an error event is emitted and there are no listeners](https://nodejs.org/api/events.html#events_class_events_eventemitter),
+    so its easy to configure your application to fail fast when an index build fails.
 
   h4#id option: id
   :markdown
@@ -516,6 +542,28 @@ block content
 
   :markdown
     To see all available `toObject` options, read [this](/docs/api.html#document_Document-toObject).
+    
+  h4#typeKey option: typeKey
+  :markdown
+    By default, if you have an object with key 'type' in your schema, mongoose
+    will interpret it as a type declaration.
+  
+  :js
+    // Mongoose interprets this as 'loc is a String'
+    var schema = new Schema({ loc: { type: String, coordinates: [Number] } });
+    
+  :markdown
+    However, for applications like [geoJSON](http://docs.mongodb.org/manual/reference/geojson/),
+    the 'type' property is important. If you want to control which key mongoose
+    uses to find type declarations, set the 'typeKey' schema option.
+    
+  :js
+    var schema = new Schema({
+      // Mongoose interpets this as 'loc is an object with 2 keys, type and coordinates'
+      loc: { type: String, coordinates: [Number] },
+      // Mongoose interprets this as 'name is a String'
+      name: { $type: String }
+    }, { typeKey: '$type' }); // A '$type' key means this object is a type declaration
     
   h4#validateBeforeSave option: validateBeforeSave
   :markdown

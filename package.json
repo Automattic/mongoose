@@ -29,7 +29,6 @@
     "mquery": "1.6.3",
     "ms": "0.1.0",
     "muri": "1.0.0",
-    "pluralize-mongoose": "0.2.0",
     "regexp-clone": "0.0.1",
     "sliced": "0.0.5"
   },

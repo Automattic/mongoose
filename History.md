@@ -1,3 +1,7 @@
+4.2.1 / 2015-10-22
+==================
+ * fixed; pluralization issues #3492 [ChristianMurphy](https://github.com/ChristianMurphy)
+
 4.2.0 / 2015-10-22
 ==================
  * added; support for skipVersioning for document arrays #3467 [chazmo03](https://github.com/chazmo03)

@@ -3,15 +3,16 @@
  * Test dependencies.
  */
 
-var start = require('./common')
-  , assert = require('assert')
-  , mongoose = start.mongoose
-  , random = require('../lib/utils').random
-  , Utils = require('../lib/utils')
-  , Schema = mongoose.Schema
-  , ObjectId = Schema.Types.ObjectId
-  , DocumentObjectId = mongoose.Types.ObjectId
-  , _ = require('underscore');
+var CastError = require('../lib/error/cast');
+var start = require('./common');
+var assert = require('assert');
+var mongoose = start.mongoose;
+var random = require('../lib/utils').random;
+var Utils = require('../lib/utils');
+var Schema = mongoose.Schema;
+var ObjectId = Schema.Types.ObjectId;
+var DocumentObjectId = mongoose.Types.ObjectId;
+var _ = require('underscore');
 
 /**
  * Setup.
@@ -1474,6 +1475,39 @@ describe('model: findByIdAndUpdate:', function() {
           assert.ok(res.ok);
           done();
         });
+    });
+
+    it('handles nested cast errors (gh-3468)', function(done) {
+      var db = start();
+      var recordSchema = new mongoose.Schema({
+        kind: String,
+        amount: Number,
+      }, {
+        _id: false,
+      });
+
+      var shiftSchema = new mongoose.Schema({
+        userId: String,
+        records: [recordSchema]
+      });
+
+      var Shift = db.model('gh3468', shiftSchema);
+
+      Shift.create({
+        userId: 'tom',
+        records: [],
+      }, function(error, shift) {
+        assert.ifError(error);
+        Shift.findOneAndUpdate({userId: 'tom'}, {
+          records: [{kind: 'kind1', amount: NaN}],
+        }, {
+          'new': true,
+        }, function(error, shift) {
+          assert.ok(error);
+          assert.ok(error instanceof CastError);
+          db.close(done);
+        });
+      })
     });
   });
 });

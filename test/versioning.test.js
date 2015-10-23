@@ -28,7 +28,7 @@ var BlogPost = new Schema({
   title     : String
   , date      : Date
   , meta      : {
-        date      : Date
+    date      : Date
       , visitors  : Number
       , nested    : [Comments]
       , numbers   : [Number]

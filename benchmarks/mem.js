@@ -141,7 +141,7 @@ mongoose.connection.on('open', function() {
       var used = process.memoryUsage();
 
       var res = {};
-      res.rss  = used.rss - started.rss;
+      res.rss = used.rss - started.rss;
       res.heapTotal = used.heapTotal - started.heapTotal;
       res.heapUsed = used.heapUsed - started.heapUsed;
 

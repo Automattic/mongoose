@@ -683,7 +683,7 @@ describe('types array', function() {
         a: [{ type: Schema.ObjectId, ref: 'Cat' }]
       });
       var A = db.model('TestPull', schema);
-      var cat  = new Cat({ name: 'peanut' });
+      var cat = new Cat({ name: 'peanut' });
       cat.save(function(err) {
         assert.ifError(err);
 

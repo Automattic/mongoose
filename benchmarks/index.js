@@ -68,7 +68,7 @@ function run(label, fn) {
   log(label + ' took %d seconds for %d docs (%d dps)', time, total, total / time);
   var used = process.memoryUsage();
   var res = {};
-  res.rss  = used.rss - started.rss;
+  res.rss = used.rss - started.rss;
   res.heapTotal = used.heapTotal - started.heapTotal;
   res.heapUsed = used.heapUsed - started.heapUsed;
   log('change: ', res);

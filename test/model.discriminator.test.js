@@ -41,7 +41,7 @@ PersonSchema.post('save', function(next) {
   next();
 });
 PersonSchema.set('toObject', { getters: true, virtuals: true });
-PersonSchema.set('toJSON',   { getters: true, virtuals: true });
+PersonSchema.set('toJSON', { getters: true, virtuals: true });
 
 var EmployeeSchema = new Schema({ department: String });
 EmployeeSchema.index({ department: 1 });
@@ -57,7 +57,7 @@ var employeeSchemaPreSaveFn = function(next) {
 };
 EmployeeSchema.pre('save', employeeSchemaPreSaveFn);
 EmployeeSchema.set('toObject', { getters: true, virtuals: false });
-EmployeeSchema.set('toJSON',   { getters: false, virtuals: true });
+EmployeeSchema.set('toJSON', { getters: false, virtuals: true });
 
 describe('model', function() {
   describe('discriminator()', function() {

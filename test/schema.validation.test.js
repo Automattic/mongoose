@@ -510,7 +510,7 @@ describe('schema', function() {
 
         function validator2(value, fn) {
           setTimeout(function() {
-            validator2Executed  = true;
+            validator2Executed = true;
             assert.ok(validator1Executed);
             fn(value === true);
             done();

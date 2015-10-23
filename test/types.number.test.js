@@ -88,4 +88,10 @@ describe('types.number', function() {
     done();
   });
 
+  it('boolean casts to 0/1 (gh-3475)', function(done) {
+    var n = new SchemaNumber();
+    assert.strictEqual(n.cast(true), 1);
+    assert.strictEqual(n.cast(false), 0);
+    done();
+  });
 });

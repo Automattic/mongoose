@@ -731,16 +731,16 @@ describe('model: findByIdAndUpdate:', function() {
       , { title: 2, meta: {visitors: 10}}
       , { title: 3, meta: {visitors: 5}}
       , function(err) {
-        if (err) return done(err);
+      if (err) return done(err);
 
-        M.findOneAndUpdate({}, { title: 'changed' })
+      M.findOneAndUpdate({}, { title: 'changed' })
       .sort({ 'meta.visitors': -1 })
       .exec(function(err, doc) {
         if (err) return done(err);
         assert.equal(10, doc.meta.visitors);
         db.close(done);
       });
-      });
+    });
   });
 
   it('supports v3 sort object syntax', function(done) {

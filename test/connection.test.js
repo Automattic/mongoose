@@ -1174,6 +1174,27 @@ describe('connections:', function() {
           done();
         });
       });
+      describe('when username and password are empty strings', function() {
+        it('should return false', function(done) {
+          var db = mongoose.createConnection('localhost', 'fake', 27000, { user: '', pass: ''});
+          db.on('error', function() {});
+          assert.equal('object', typeof db.options);
+          assert.equal('object', typeof db.options.server);
+          assert.equal(true, db.options.server.auto_reconnect);
+          assert.equal('object', typeof db.options.db);
+          assert.equal(false, db.options.db.forceServerObjectId);
+          assert.equal('fake', db.name);
+          assert.equal('localhost', db.host);
+          assert.equal(27000, db.port);
+          assert.equal(undefined, db.pass);
+          assert.equal(undefined, db.user);
+
+          assert.equal(false, db.shouldAuthenticate());
+
+          db.close();
+          done();
+        });
+      });
       describe('when only username is defined', function() {
         it('should return false', function(done) {
           var db = mongoose.createConnection('localhost', 'fake', 27000, { user: 'user' });

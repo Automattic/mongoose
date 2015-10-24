@@ -17,3 +17,10 @@ test/triage/*.js
 /inspections
 bin/mongoose.min.js
 coverage
+
+# Visual Studio
+# =========
+*.suo
+*.ntvs*
+*.njsproj
+*.sln

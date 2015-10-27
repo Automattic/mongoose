@@ -1581,4 +1581,16 @@ describe('model: update:', function() {
         });
     });
   });
+
+  it('works with buffers (gh-3496)', function(done) {
+    var db = start();
+
+    var Schema = mongoose.Schema({ myBufferField: Buffer });
+    var Model = db.model('gh3496', Schema);
+
+    Model.update({}, { myBufferField: new Buffer(1) }, function(error) {
+      assert.ifError(error);
+      db.close(done);
+    });
+  });
 });

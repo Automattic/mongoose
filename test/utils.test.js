@@ -23,6 +23,14 @@ var ActiveRoster = StateMachine.ctor('require', 'init', 'modify');
  */
 
 describe('utils', function() {
+  describe('toCollectionName', function() {
+    it('works (gh-3490)', function(done) {
+      assert.equal(utils.toCollectionName('stations'), 'stations');
+      assert.equal(utils.toCollectionName('category'), 'categories');
+      done();
+    });
+  });
+
   describe('ActiveRoster', function() {
     it('should detect a path as required if it has been required', function(done) {
       var ar = new ActiveRoster();

@@ -235,7 +235,7 @@ describe('model: update:', function() {
         up.init(doc);
         assert.equal(up.comments.length, 1);
         assert.equal(up.comments[0].body, 'worked great');
-        assert.strictEqual(true, !! doc.comments[0]._id);
+        assert.strictEqual(true, !!doc.comments[0]._id);
         assert.equal(2,up.meta.visitors.valueOf());
         assert.equal(up.mixed.x,'ECKS');
         assert.deepEqual(up.numbers.toObject(),[5,100]);
@@ -263,10 +263,10 @@ describe('model: update:', function() {
         assert.ifError(err);
         assert.equal(3, ret.comments.length);
         assert.equal(ret.comments[1].body,'i am number 2');
-        assert.strictEqual(true, !! ret.comments[1]._id);
+        assert.strictEqual(true, !!ret.comments[1]._id);
         assert.ok(ret.comments[1]._id instanceof DocumentObjectId);
         assert.equal(ret.comments[2].body,'i am number 3');
-        assert.strictEqual(true, !! ret.comments[2]._id);
+        assert.strictEqual(true, !!ret.comments[2]._id);
         assert.ok(ret.comments[2]._id instanceof DocumentObjectId);
         db.close(done);
       });
@@ -328,7 +328,7 @@ describe('model: update:', function() {
         assert.equal(2, ret.comments.length);
         assert.equal(ret.comments[0].body, 'worked great');
         assert.equal(ret.comments[0].title,'MongoDB++');
-        assert.strictEqual(true, !! ret.comments[0].comments);
+        assert.strictEqual(true, !!ret.comments[0].comments);
         assert.equal(ret.comments[0].comments.length, 1);
         assert.strictEqual(ret.comments[0].comments[0].body, 'The Ring Of Power');
         assert.ok(ret.comments[0]._id instanceof DocumentObjectId);
@@ -1545,7 +1545,7 @@ describe('model: update:', function() {
     var db = start();
 
     var Schema = mongoose.Schema({}, { strict: false });
-    var Model  = db.model('gh3305', Schema);
+    var Model = db.model('gh3305', Schema);
 
     Model.create({}, function(error, m) {
       assert.ifError(error);
@@ -1563,7 +1563,7 @@ describe('model: update:', function() {
     var db = start();
 
     var Schema = mongoose.Schema({ attributes: {} }, { strict: true });
-    var Model  = db.model('gh3337', Schema);
+    var Model = db.model('gh3337', Schema);
 
     Model.create({}, function(error, m) {
       assert.ifError(error);

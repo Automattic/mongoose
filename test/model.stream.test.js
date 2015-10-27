@@ -53,8 +53,8 @@ describe('query stream:', function() {
     var stream = P.find().batchSize(3).stream();
 
     stream.on('data', function(doc) {
-      assert.strictEqual(true, !! doc.name);
-      assert.strictEqual(true, !! doc._id);
+      assert.strictEqual(true, !!doc.name);
+      assert.strictEqual(true, !!doc._id);
 
       // no dup docs emitted
       assert.ok(!seen[doc.id]);

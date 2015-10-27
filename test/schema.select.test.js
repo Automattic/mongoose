@@ -295,7 +295,7 @@ describe('schema select option', function() {
       var excluded = new Schema({
         thin: Boolean
         , name: { type: String, select: false }
-        , docs: [new Schema({ name: { type: String, select: false },  bool: Boolean })]
+        , docs: [new Schema({ name: { type: String, select: false }, bool: Boolean })]
       });
 
       var M = db.model('ForcedInclusionOfPath', excluded);

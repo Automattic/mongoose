@@ -11,8 +11,8 @@ var mainCnt = process.argv[4] ? process.argv[4] | 0 : 25;
 var load = {};
 
 function createRandomWord(len) {
-  var cons = 'bcdfghjklmnpqrstvwxyz', vow = 'aeiou', rand = function(limit) {   return Math.floor(Math.random() * limit); }, i, word = '', length = parseInt(len, 10), consonants = cons.split(''), vowels = vow.split('');
-  for (i = 0; i < length / 2; i++) { var randConsonant = consonants[rand(consonants.length)],   randVowel = vowels[rand(vowels.length)]; word += (i === 0) ? randConsonant.toUpperCase() : randConsonant; word += i * 2 < length - 1 ? randVowel : '';
+  var cons = 'bcdfghjklmnpqrstvwxyz', vow = 'aeiou', rand = function(limit) { return Math.floor(Math.random() * limit); }, i, word = '', length = parseInt(len, 10), consonants = cons.split(''), vowels = vow.split('');
+  for (i = 0; i < length / 2; i++) { var randConsonant = consonants[rand(consonants.length)], randVowel = vowels[rand(vowels.length)]; word += (i === 0) ? randConsonant.toUpperCase() : randConsonant; word += i * 2 < length - 1 ? randVowel : '';
   }
   return word;
 }

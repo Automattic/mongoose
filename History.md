@@ -1,3 +1,22 @@
+4.2.3 / 2015-10-26
+==================
+ * docs; remove unreferenced function in middleware.jade #3506
+ * fixed; handling auth with no username/password #3500 #3498 #3484 [mleanos](https://github.com/mleanos)
+ * fixed; more ESlint rules #3491 [ChristianMurphy](https://github.com/ChristianMurphy)
+ * fixed; swallowing exceptions in save callback #3478
+ * docs; fixed broken links in subdocs guide #3477
+ * fixed; casting booleans to numbers #3475
+ * fixed; report CastError for subdoc arrays in findOneAndUpdate #3468
+ * fixed; geoNear returns ES6 promise #3458
+
+4.2.2 / 2015-10-22
+==================
+ * fixed; go back to old pluralization code #3490
+
+4.2.1 / 2015-10-22
+==================
+ * fixed; pluralization issues #3492 [ChristianMurphy](https://github.com/ChristianMurphy)
+
 4.2.0 / 2015-10-22
 ==================
  * added; support for skipVersioning for document arrays #3467 [chazmo03](https://github.com/chazmo03)

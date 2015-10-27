@@ -413,7 +413,7 @@ describe('document.populate', function() {
     alice.save(function(err) {
       assert.ifError(err);
 
-      var note  = new Note({author: 'alice', body: "Buy Milk"});
+      var note = new Note({author: 'alice', body: "Buy Milk"});
       note.save(function(err) {
         assert.ifError(err);
 
@@ -595,7 +595,7 @@ describe('document.populate', function() {
         lead: docs[0]._id
       };
       Band.create(band, function(error, band) {
-        band.populate('members', function(error) {
+        band.populate('members', function() {
           assert.equal(band.members[0].name, 'Axl Rose');
           band.depopulate('members');
           assert.ok(!band.members[0].name);
@@ -603,7 +603,7 @@ describe('document.populate', function() {
           assert.equal(band.members[1].toString(), docs[1]._id.toString());
           assert.ok(!band.populated('members'));
           assert.ok(!band.populated('lead'));
-          band.populate('lead', function(error) {
+          band.populate('lead', function() {
             assert.equal(band.lead.name, 'Axl Rose');
             band.depopulate('lead');
             assert.ok(!band.lead.name);

@@ -51,7 +51,7 @@ block content
     schema.pre('save', true, function(next, done) {
       // calling next kicks off the next middleware in parallel
       next();
-      doAsync(done);
+      setTimeout(done, 100);
     });
   :markdown
     The hooked method, in this case `save`, will not be executed until `done` is called by each middleware.

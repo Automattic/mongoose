@@ -380,6 +380,25 @@ describe('types.buffer', function() {
 
   });
 
+  it('can be directly updated', function(done) {
+    var db = start()
+      , User = db.model('UserBuffer', UserBuffer, 'usersbuffer_' + random());
+    var user = new User({ array: [null], required: new Buffer(1) });
+    user.save(function(err, doc) {
+      assert.ifError(err);
+      assert(doc);
+
+      var conditions = { _id: doc._id }
+        , updateStatement = { $set: {required: new Buffer([123, 456, 789])} };
+
+      User.update(conditions, updateStatement, function(err) {
+        db.close();
+        assert.ifError(err);
+        done();
+      });
+    });
+  });
+
   describe('#toObject', function() {
     it('retains custom subtypes', function(done) {
       var buf = new MongooseBuffer(0);

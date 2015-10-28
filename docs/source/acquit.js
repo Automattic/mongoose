@@ -9,6 +9,11 @@ var files = [
     input: 'test/docs/discriminators.test.js',
     output: 'discriminators.html',
     title: 'Discriminators'
+  },
+  {
+    input: 'test/docs/promises.test.js',
+    output: 'promises.html',
+    title: 'Promises'
   }
 ];
 

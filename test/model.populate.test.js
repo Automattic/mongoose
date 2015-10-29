@@ -1255,11 +1255,11 @@ describe('model: populate:', function() {
             BlogPost.collection.update(
                 { _id: post._id }
               , { $set: { 'comments.0._idontexist': user2._id }}, function(err) {
-              assert.ifError(err);
+                assert.ifError(err);
 
               // allow population of unknown property by passing model name.
               // helpful when populating mapReduce results too.
-              BlogPost
+                BlogPost
               .findById(post._id)
               .populate('comments._idontexist', 'email', 'RefUser')
               .exec(function(err, post) {
@@ -1291,7 +1291,7 @@ describe('model: populate:', function() {
                   db.close(done);
                 });
               });
-            });
+              });
           });
         });
       });
@@ -1886,10 +1886,10 @@ describe('model: populate:', function() {
         { id: "The Tiger That Isn't" }
       , { id: "Users Guide To The Universe" }
       , function(err, a, b) {
-      assert.ifError(err);
+        assert.ifError(err);
 
-      var m2 = new M2({ things: [a, b]});
-      m2.save(function(err) {
+        var m2 = new M2({ things: [a, b]});
+        m2.save(function(err) {
           assert.ifError(err);
           M2.findById(m2).populate('things').exec(function(err, doc) {
             db.close();
@@ -1900,7 +1900,7 @@ describe('model: populate:', function() {
             done();
           });
         });
-    });
+      });
   });
 
   it('Update works with populated arrays (gh-602)', function(done) {
@@ -2600,9 +2600,9 @@ describe('model: populate:', function() {
             { name: 'u1', comments: [c1, c2], comment: c1 }
           , { name: 'u2', comment: c2 }
           , function(err) {
-          assert.ifError(err);
-          done();
-        });
+            assert.ifError(err);
+            done();
+          });
       });
     });
 
@@ -2724,9 +2724,9 @@ describe('model: populate:', function() {
           {body: 'body1', author: 'a'}
         , {body: 'body2', author: 'a', mediaAttach: media._id}
         , {body: 'body3', author: 'a'}, function(err) {
-        if (err) return done(err);
+          if (err) return done(err);
 
-        Article.find().populate('mediaAttach').exec(function(err, docs) {
+          Article.find().populate('mediaAttach').exec(function(err, docs) {
             db.close();
             assert.ifError(err);
 
@@ -2735,7 +2735,7 @@ describe('model: populate:', function() {
 
             done();
           });
-      });
+        });
     });
   });
 

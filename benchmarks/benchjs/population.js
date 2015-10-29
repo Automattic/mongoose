@@ -24,71 +24,71 @@ mongoose.connect('mongodb://localhost/mongoose-bench-pop', function(err) {
 
   var commentSchema = new Schema;
   commentSchema.add({
-    title     : String
-    , date      : Date
-    , body      : String
+    title: String,
+    date: Date,
+    body: String
   });
   var dummy1Schema = new Schema({
-    title : String,
-    isThisTest : Boolean
+    title: String,
+    isThisTest: Boolean
   });
   var dummy2Schema = new Schema({
-    title : String,
-    isThisTest : Boolean
+    title: String,
+    isThisTest: Boolean
   });
   var dummy3Schema = new Schema({
-    title : String,
-    isThisTest : Boolean
+    title: String,
+    isThisTest: Boolean
   });
   var dummy4Schema = new Schema({
-    title : String,
-    isThisTest : Boolean
+    title: String,
+    isThisTest: Boolean
   });
   var dummy5Schema = new Schema({
-    title : String,
-    isThisTest : Boolean
+    title: String,
+    isThisTest: Boolean
   });
   var dummy6Schema = new Schema({
-    title : String,
-    isThisTest : Boolean
+    title: String,
+    isThisTest: Boolean
   });
   var dummy7Schema = new Schema({
-    title : String,
-    isThisTest : Boolean
+    title: String,
+    isThisTest: Boolean
   });
   var dummy8Schema = new Schema({
-    title : String,
-    isThisTest : Boolean
+    title: String,
+    isThisTest: Boolean
   });
   var dummy9Schema = new Schema({
-    title : String,
-    isThisTest : Boolean
+    title: String,
+    isThisTest: Boolean
   });
   var BlogPost = new Schema({
-    title     : String
-    , author    : String
-    , slug      : String
-    , date      : Date
-    , meta      : {
-      date      : Date
-        , visitors  : Number
-    }
-    , published : Boolean
-    , mixed     : {}
-    , numbers   : [Number]
-    , tags      : [String]
-    , owners    : [ObjectId]
-    , comments  : [{ type : ObjectId, ref : 'Comment' }]
-    , dummy1    : [{ type : ObjectId, ref : 'Dummy1' }]
-    , dummy2    : [{ type : ObjectId, ref : 'Dummy2' }]
-    , dummy3    : [{ type : ObjectId, ref : 'Dummy3' }]
-    , dummy4    : [{ type : ObjectId, ref : 'Dummy4' }]
-    , dummy5    : [{ type : ObjectId, ref : 'Dummy5' }]
-    , dummy6    : [{ type : ObjectId, ref : 'Dummy6' }]
-    , dummy7    : [{ type : ObjectId, ref : 'Dummy7' }]
-    , dummy8    : [{ type : ObjectId, ref : 'Dummy8' }]
-    , dummy9    : [{ type : ObjectId, ref : 'Dummy9' }]
-    , def       : { type: String, default: 'kandinsky' }
+    title: String,
+    author: String,
+    slug: String,
+    date: Date,
+    meta: {
+      date: Date,
+      visitors: Number
+    },
+    published: Boolean,
+    mixed: {},
+    numbers: [Number],
+    tags: [String],
+    owners: [ObjectId],
+    comments: [{ type : ObjectId, ref : 'Comment' }],
+    dummy1: [{ type : ObjectId, ref : 'Dummy1' }],
+    dummy2: [{ type : ObjectId, ref : 'Dummy2' }],
+    dummy3: [{ type : ObjectId, ref : 'Dummy3' }],
+    dummy4: [{ type : ObjectId, ref : 'Dummy4' }],
+    dummy5: [{ type : ObjectId, ref : 'Dummy5' }],
+    dummy6: [{ type : ObjectId, ref : 'Dummy6' }],
+    dummy7: [{ type : ObjectId, ref : 'Dummy7' }],
+    dummy8: [{ type : ObjectId, ref : 'Dummy8' }],
+    dummy9: [{ type : ObjectId, ref : 'Dummy9' }],
+    def: { type: String, default: 'kandinsky' }
   });
 
   var blogData = {

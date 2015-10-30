@@ -1452,16 +1452,16 @@ describe('Query', function() {
           { numbers: [3,4,5] }
         , { strings: 'hi there'.split(' ') } , function(err, doc1, doc2) {
 
-        assert.ifError(err);
+          assert.ifError(err);
 
-        Product.find().setOptions({ limit: 1, sort: {_id: -1}, read: 'n' }).exec(function(err, docs) {
+          Product.find().setOptions({ limit: 1, sort: {_id: -1}, read: 'n' }).exec(function(err, docs) {
             db.close();
             assert.ifError(err);
             assert.equal(docs.length, 1);
             assert.equal(docs[0].id, doc2.id);
             done();
           });
-      });
+        });
     });
   });
 

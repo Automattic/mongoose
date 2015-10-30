@@ -300,16 +300,16 @@ describe('document: strict mode:', function() {
           , { strict: false, w: 1 }
           , function(err) {
 
-          assert.ifError(err);
+            assert.ifError(err);
 
-          Strict.findById(doc._id, function(err, doc) {
+            Strict.findById(doc._id, function(err, doc) {
               db.close();
               assert.ifError(err);
               assert.equal(undefined, doc._doc.bool);
               assert.equal(undefined, doc._doc.notInSchema);
               done();
             });
-        });
+          });
       });
     });
   });
@@ -342,15 +342,15 @@ describe('document: strict mode:', function() {
           , { strict: false, w: 1 }
           , function(err) {
 
-          assert.ifError(err);
+            assert.ifError(err);
 
-          Strict.findById(doc._id, function(err, doc) {
+            Strict.findById(doc._id, function(err, doc) {
               assert.ifError(err);
               assert.equal(undefined, doc._doc.bool);
               assert.equal(undefined, doc._doc.notInSchema);
               db.close(done);
             });
-        });
+          });
       });
     });
   });

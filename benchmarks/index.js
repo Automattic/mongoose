@@ -6,28 +6,28 @@ function log() {
   }
 }
 
-var mongoose = require('../')
-  , Schema = mongoose.Schema;
+var mongoose = require('../'),
+    Schema = mongoose.Schema;
 
 var DocSchema = new Schema({
   title: String
 });
 
 var AllSchema = new Schema({
-  string: String
-  , number: Number
-  , date  : Date
-  , bool  : Boolean
-  , buffer: Buffer
-  , objectid: Schema.ObjectId
-  , array : Array
-  , strings: [String]
-  , numbers: [Number]
-  , dates  : [Date]
-  , bools  : [Boolean]
-  , buffers: [Buffer]
-  , objectids: [Schema.ObjectId]
-  , docs     : [DocSchema]
+  string: String,
+  number: Number,
+  date  : Date,
+  bool  : Boolean,
+  buffer: Buffer,
+  objectid: Schema.ObjectId,
+  array : Array,
+  strings: [String],
+  numbers: [Number],
+  dates  : [Date],
+  bools  : [Boolean],
+  buffers: [Buffer],
+  objectids: [Schema.ObjectId],
+  docs     : [DocSchema]
 });
 
 var A = mongoose.model('A', AllSchema);

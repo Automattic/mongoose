@@ -27,28 +27,31 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function(err) {
 
     var Comments = new Schema;
     Comments.add({
-      title     : String
-      , date      : Date
-      , body      : String
-      , comments  : [Comments]
+      title     : String,
+      date      : Date,
+      body      : String,
+      comments  : [Comments]
     });
 
     var BlogPost = new Schema({
-      title     : String
-      , author    : String
-      , slug      : String
-      , date      : Date
-      , meta      : {
-        date      : Date
-          , visitors  : Number
+      title: String,
+      author: String,
+      slug: String,
+      date: Date,
+      meta: {
+        date: Date,
+        visitors: Number
+      },
+      published: Boolean,
+      mixed: {},
+      numbers: [Number],
+      tags: [String],
+      owners: [ObjectId],
+      comments: [Comments],
+      def: {
+        type: String,
+        default: 'kandinsky'
       }
-      , published : Boolean
-      , mixed     : {}
-      , numbers   : [Number]
-      , tags      : [String]
-      , owners    : [ObjectId]
-      , comments  : [Comments]
-      , def       : { type: String, default: 'kandinsky' }
     });
 
     var blogData = {

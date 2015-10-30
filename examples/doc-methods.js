@@ -9,8 +9,15 @@ console.log('Running mongoose version %s', mongoose.version);
  */
 
 var CharacterSchema = Schema({
-  name: { type: String, required: true }
-  , health: { type: Number, min: 0, max: 100 }
+  name: {
+    type: String,
+    required: true
+  },
+  health: {
+    type: Number,
+    min: 0,
+    max: 100
+  }
 });
 
 /**

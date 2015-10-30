@@ -6,12 +6,12 @@ env:
 
 rules:
   indent:
-    - 1
+    - 2
     - 2
     - SwitchCase: 1
       VariableDeclarator: 2
   no-trailing-spaces: 2
-  comma-style: 1
+  comma-style: 2
   no-spaced-func: 2
   no-multi-spaces: 1
   space-after-keywords: 2

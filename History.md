@@ -1,3 +1,14 @@
+4.2.4 / 2015-11-02
+==================
+ * fixed; upgraded `ms` package for security vulnerability #3254 [fhemberger](https://github.com/fhemberger)
+ * fixed; ESlint rules #3517 [ChristianMurphy](https://github.com/ChristianMurphy)
+ * docs; typo in aggregation docs #3513 [rafakato](https://github.com/rafakato)
+ * fixed; add `dontThrowCastError` option to .update() for promises #3512
+ * fixed; don't double-cast buffers in node 4.x #3510 #3496
+ * fixed; population with single embedded schemas #3501
+ * fixed; pre('set') hooks work properly #3479
+ * docs; promises guide #3441
+
 4.2.3 / 2015-10-26
 ==================
  * docs; remove unreferenced function in middleware.jade #3506

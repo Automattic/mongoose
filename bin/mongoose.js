@@ -134,14 +134,14 @@ if (typeof window !== 'undefined') {
  * Module dependencies.
  */
 
-var NodeJSDocument = require('./document')
-  , EventEmitter = require('events').EventEmitter
-  , MongooseError = require('./error')
-  , Schema = require('./schema')
-  , ObjectId = require('./types/objectid')
-  , utils = require('./utils')
-  , ValidationError = MongooseError.ValidationError
-  , InternalCache = require('./internal');
+var NodeJSDocument = require('./document'),
+    EventEmitter = require('events').EventEmitter,
+    MongooseError = require('./error'),
+    Schema = require('./schema'),
+    ObjectId = require('./types/objectid'),
+    utils = require('./utils'),
+    ValidationError = MongooseError.ValidationError,
+    InternalCache = require('./internal');
 
 /**
  * Document constructor.
@@ -253,14 +253,14 @@ var Types = require('./schema/index');
  */
 
 var cast = module.exports = function(schema, obj) {
-  var paths = Object.keys(obj)
-    , i = paths.length
-    , any$conditionals
-    , schematype
-    , nested
-    , path
-    , type
-    , val;
+  var paths = Object.keys(obj),
+      i = paths.length,
+      any$conditionals,
+      schematype,
+      nested,
+      path,
+      type,
+      val;
 
   while (i--) {
     path = paths[i];
@@ -301,11 +301,11 @@ var cast = module.exports = function(schema, obj) {
 
       if (!schematype) {
         // Handle potential embedded array queries
-        var split = path.split('.')
-          , j = split.length
-          , pathFirstHalf
-          , pathLastHalf
-          , remainingConds;
+        var split = path.split('.'),
+            j = split.length,
+            pathFirstHalf,
+            pathLastHalf,
+            remainingConds;
 
         // Find the part of the var path that is a path of the Schema
         while (j--) {
@@ -410,8 +410,8 @@ var cast = module.exports = function(schema, obj) {
           obj[path] = schematype.castForQuery(val);
         } else {
 
-          var ks = Object.keys(val)
-            , $cond;
+          var ks = Object.keys(val),
+              $cond;
 
           k = ks.length;
 
@@ -457,23 +457,23 @@ var cast = module.exports = function(schema, obj) {
  * Module dependencies.
  */
 
-var EventEmitter = require('events').EventEmitter
-  , MongooseError = require('./error')
-  , MixedSchema = require('./schema/mixed')
-  , Schema = require('./schema')
-  , ValidatorError = require('./schematype').ValidatorError
-  , utils = require('./utils')
-  , clone = utils.clone
-  , isMongooseObject = utils.isMongooseObject
-  , inspect = require('util').inspect
-  , ValidationError = MongooseError.ValidationError
-  , InternalCache = require('./internal')
-  , deepEqual = utils.deepEqual
-  , hooks = require('hooks-fixed')
-  , PromiseProvider = require('./promise_provider')
-  , DocumentArray
-  , MongooseArray
-  , Embedded;
+var EventEmitter = require('events').EventEmitter,
+    MongooseError = require('./error'),
+    MixedSchema = require('./schema/mixed'),
+    Schema = require('./schema'),
+    ValidatorError = require('./schematype').ValidatorError,
+    utils = require('./utils'),
+    clone = utils.clone,
+    isMongooseObject = utils.isMongooseObject,
+    inspect = require('util').inspect,
+    ValidationError = MongooseError.ValidationError,
+    InternalCache = require('./internal'),
+    deepEqual = utils.deepEqual,
+    hooks = require('hooks-fixed'),
+    PromiseProvider = require('./promise_provider'),
+    DocumentArray,
+    MongooseArray,
+    Embedded;
 
 /**
  * Document constructor.
@@ -516,8 +516,8 @@ function Document(obj, fields, skipId) {
   }
 
   if (!schema.options.strict && obj) {
-    var self = this
-      , keys = Object.keys(this._doc);
+    var self = this,
+        keys = Object.keys(this._doc);
 
     keys.forEach(function(key) {
       if (!(key in schema.tree)) {
@@ -625,9 +625,9 @@ Document.prototype.$__buildDoc = function(obj, fields, skipId) {
     }
   }
 
-  var paths = Object.keys(this.schema.paths)
-    , plen = paths.length
-    , ii = 0;
+  var paths = Object.keys(this.schema.paths),
+      plen = paths.length,
+      ii = 0;
 
   for (; ii < plen; ++ii) {
     var p = paths[ii];
@@ -647,8 +647,8 @@ Document.prototype.$__buildDoc = function(obj, fields, skipId) {
     var included = false;
 
     for (; i < len; ++i) {
-      var piece = path[i]
-        , def;
+      var piece = path[i],
+          def;
 
       curPath += piece;
 
@@ -747,11 +747,11 @@ Document.prototype.init = function(doc, opts, fn) {
 function init(self, obj, doc, prefix) {
   prefix = prefix || '';
 
-  var keys = Object.keys(obj)
-    , len = keys.length
-    , schema
-    , path
-    , i;
+  var keys = Object.keys(obj),
+      len = keys.length,
+      schema,
+      path,
+      i;
 
   while (len--) {
     i = keys[len];
@@ -807,10 +807,10 @@ Document.prototype.$__storeShard = function() {
   var key = this.schema.options.shardKey || this.schema.options.shardkey;
   if (!(key && 'Object' == utils.getFunctionName(key.constructor))) return;
 
-  var orig = this.$__.shardval = {}
-    , paths = Object.keys(key)
-    , len = paths.length
-    , val;
+  var orig = this.$__.shardval = {},
+      paths = Object.keys(key),
+      len = paths.length,
+      val;
 
   for (var i = 0; i < len; ++i) {
     val = this.getValue(paths[i]);
@@ -898,10 +898,10 @@ Document.prototype.set = function(path, val, type, options) {
     type = undefined;
   }
 
-  var merge = options && options.merge
-    , adhoc = type && true !== type
-    , constructing = true === type
-    , adhocs;
+  var merge = options && options.merge,
+      adhoc = type && true !== type,
+      constructing = true === type,
+      adhocs;
 
   var strict = options && 'strict' in options
     ? options.strict
@@ -933,10 +933,10 @@ Document.prototype.set = function(path, val, type, options) {
         }
       }
 
-      var keys = Object.keys(path)
-        , i = keys.length
-        , pathtype
-        , key;
+      var keys = Object.keys(path),
+          i = keys.length,
+          pathtype,
+          key;
 
       while (i--) {
         key = keys[i];
@@ -1160,13 +1160,13 @@ Document.prototype.$__set = function(
     }
   }
 
-  var obj = this._doc
-    , i = 0
-    , l = parts.length;
+  var obj = this._doc,
+      i = 0,
+      l = parts.length;
 
   for (; i < l; i++) {
-    var next = i + 1
-      , last = next === l;
+    var next = i + 1,
+        last = next === l;
 
     if (last) {
       obj[parts[i]] = val;
@@ -1230,9 +1230,9 @@ Document.prototype.get = function(path, type) {
     adhoc = Schema.interpretAsType(path, type, this.schema.options);
   }
 
-  var schema = this.$__path(path) || this.schema.virtualpath(path)
-    , pieces = path.split('.')
-    , obj = this._doc;
+  var schema = this.$__path(path) || this.schema.virtualpath(path),
+      pieces = path.split('.'),
+      obj = this._doc;
 
   for (var i = 0, l = pieces.length; i < l; i++) {
     obj = undefined === obj || null === obj
@@ -1263,8 +1263,8 @@ Document.prototype.get = function(path, type) {
  */
 
 Document.prototype.$__path = function(path) {
-  var adhocs = this.$__.adhocPaths
-    , adhocType = adhocs && adhocs[path];
+  var adhocs = this.$__.adhocPaths,
+      adhocType = adhocs && adhocs[path];
 
   if (adhocType) {
     return adhocType;
@@ -1405,10 +1405,10 @@ Document.prototype.isSelected = function isSelected(path) {
       return 0 !== this.$__.selected._id;
     }
 
-    var paths = Object.keys(this.$__.selected)
-      , i = paths.length
-      , inclusive = false
-      , cur;
+    var paths = Object.keys(this.$__.selected),
+        i = paths.length,
+        inclusive = false,
+        cur;
 
     if (1 === i && '_id' === paths[0]) {
       // only _id was selected.
@@ -1538,8 +1538,8 @@ Document.prototype.$__validate = function(callback) {
     });
   }
 
-  var validating = {}
-    , total = 0;
+  var validating = {},
+      total = 0;
 
   // gh-661: if a whole array is modified, make sure to run validation on all
   // the children as well
@@ -1850,9 +1850,9 @@ Document.prototype.$__dirty = function() {
   });
 
   // Ignore "foo.a" if "foo" is dirty already.
-  var minimal = []
-    , lastPath
-    , top;
+  var minimal = [],
+      lastPath,
+      top;
 
   all.forEach(function(item, i) {
     if (!item) {
@@ -1883,10 +1883,10 @@ Document.prototype.$__dirty = function() {
  */
 
 function compile(tree, proto, prefix, options) {
-  var keys = Object.keys(tree)
-    , i = keys.length
-    , limb
-    , key;
+  var keys = Object.keys(tree),
+      i = keys.length,
+      limb,
+      key;
 
   while (i--) {
     key = keys[i];
@@ -1929,60 +1929,60 @@ function defineKey(prop, subprops, prototype, prefix, keys, options) {
   if (subprops) {
 
     Object.defineProperty(prototype, prop, {
-      enumerable: true
-      , configurable: true
-      , get: function() {
-          var _self = this;
-          if (!this.$__.getters)
-            this.$__.getters = {};
+      enumerable: true,
+      configurable: true,
+      get: function() {
+        var _self = this;
+        if (!this.$__.getters)
+          this.$__.getters = {};
 
-          if (!this.$__.getters[path]) {
-            var nested = Object.create(Object.getPrototypeOf(this), getOwnPropertyDescriptors(this));
+        if (!this.$__.getters[path]) {
+          var nested = Object.create(Object.getPrototypeOf(this), getOwnPropertyDescriptors(this));
 
             // save scope for nested getters/setters
-            if (!prefix) nested.$__.scope = this;
+          if (!prefix) nested.$__.scope = this;
 
             // shadow inherited getters from sub-objects so
             // thing.nested.nested.nested... doesn't occur (gh-366)
-            var i = 0
-              , len = keys.length;
+          var i = 0,
+              len = keys.length;
 
-            for (; i < len; ++i) {
+          for (; i < len; ++i) {
               // over-write the parents getter without triggering it
-              Object.defineProperty(nested, keys[i], {
-                enumerable: false   // It doesn't show up.
-                , writable: true      // We can set it later.
-                , configurable: true  // We can Object.defineProperty again.
-                , value: undefined    // It shadows its parent.
-              });
-            }
-
-            nested.toObject = function() {
-              return _self.get(path);
-            };
-
-            nested.toJSON = nested.toObject;
-
-            nested.$__isNested = true;
-
-            compile(subprops, nested, path, options);
-            this.$__.getters[path] = nested;
+            Object.defineProperty(nested, keys[i], {
+              enumerable: false,    // It doesn't show up.
+              writable: true,       // We can set it later.
+              configurable: true,   // We can Object.defineProperty again.
+              value: undefined      // It shadows its parent.
+            });
           }
 
-          return this.$__.getters[path];
+          nested.toObject = function() {
+            return _self.get(path);
+          };
+
+          nested.toJSON = nested.toObject;
+
+          nested.$__isNested = true;
+
+          compile(subprops, nested, path, options);
+          this.$__.getters[path] = nested;
         }
-      , set: function(v) {
-          if (v instanceof Document) v = v.toObject();
-          return (this.$__.scope || this).set(path, v);
-        }
+
+        return this.$__.getters[path];
+      },
+      set: function(v) {
+        if (v instanceof Document) v = v.toObject();
+        return (this.$__.scope || this).set(path, v);
+      }
     });
 
   } else {
     Object.defineProperty(prototype, prop, {
-      enumerable: true
-      , configurable: true
-      , get: function( ) { return this.get.call(this.$__.scope || this, path); }
-      , set: function(v) { return this.set.call(this.$__.scope || this, path, v); }
+      enumerable: true,
+      configurable: true,
+      get: function() { return this.get.call(this.$__.scope || this, path); },
+      set: function(v) { return this.set.call(this.$__.scope || this, path, v); }
     });
   }
 }
@@ -2120,6 +2120,19 @@ Document.prototype.$__registerHooksFromSchema = function() {
       });
     }
     delete toWrap.init;
+  } else if (toWrap.set) {
+    // Set hooks also need to be sync re: gh-3479
+    if (toWrap.set.pre) {
+      toWrap.set.pre.forEach(function(args) {
+        self.pre.apply(self, args);
+      });
+    }
+    if (toWrap.set.post) {
+      toWrap.set.post.forEach(function(args) {
+        self.post.apply(self, args);
+      });
+    }
+    delete toWrap.set;
   }
 
   Object.keys(toWrap).forEach(function(pointCut) {
@@ -2405,11 +2418,11 @@ Document.prototype.toObject = function(options) {
  */
 
 function minimize(obj) {
-  var keys = Object.keys(obj)
-    , i = keys.length
-    , hasKeys
-    , key
-    , val;
+  var keys = Object.keys(obj),
+      i = keys.length,
+      hasKeys,
+      key,
+      val;
 
   while (i--) {
     key = keys[i];
@@ -2442,19 +2455,19 @@ function minimize(obj) {
  */
 
 function applyGetters(self, json, type, options) {
-  var schema = self.schema
-    , paths = Object.keys(schema[type])
-    , i = paths.length
-    , path;
+  var schema = self.schema,
+      paths = Object.keys(schema[type]),
+      i = paths.length,
+      path;
 
   while (i--) {
     path = paths[i];
 
-    var parts = path.split('.')
-      , plen = parts.length
-      , last = plen - 1
-      , branch = json
-      , part;
+    var parts = path.split('.'),
+        plen = parts.length,
+        last = plen - 1,
+        branch = json,
+        part;
 
     for (var ii = 0; ii < plen; ++ii) {
       part = parts[ii];
@@ -2735,7 +2748,7 @@ Document.ValidationError = ValidationError;
 module.exports = exports = Document;
 
 }).call(this,require("FWaASH"),require("buffer").Buffer)
-},{"./error":12,"./internal":21,"./promise_provider":23,"./schema":24,"./schema/mixed":32,"./schematype":36,"./types/array":38,"./types/documentarray":40,"./types/embedded":41,"./utils":45,"FWaASH":55,"buffer":49,"events":53,"hooks-fixed":71,"util":57}],6:[function(require,module,exports){
+},{"./error":12,"./internal":21,"./promise_provider":23,"./schema":24,"./schema/mixed":32,"./schematype":36,"./types/array":38,"./types/documentarray":40,"./types/embedded":41,"./utils":45,"FWaASH":55,"buffer":49,"events":53,"hooks-fixed":76,"util":57}],6:[function(require,module,exports){
 'use strict';
 
 /*!
@@ -3331,10 +3344,10 @@ Promise.ES6 = function(resolver) {
 
 Promise.prototype = Object.create(MPromise.prototype, {
   constructor: {
-    value: Promise
-      , enumerable: false
-      , writable: true
-      , configurable: true
+    value: Promise,
+    enumerable: false,
+    writable: true,
+    configurable: true
   }
 });
 
@@ -3562,7 +3575,7 @@ Promise.prototype.addErrback = Promise.prototype.onReject;
 
 module.exports = Promise;
 
-},{"mpromise":75,"util":57}],23:[function(require,module,exports){
+},{"mpromise":80,"util":57}],23:[function(require,module,exports){
 /*!
  * Module dependencies.
  */
@@ -3615,7 +3628,7 @@ Promise.reset = function() {
 
 module.exports = Promise;
 
-},{"./ES6Promise":1,"./promise":22,"mquery":80}],24:[function(require,module,exports){
+},{"./ES6Promise":1,"./promise":22,"mquery":85}],24:[function(require,module,exports){
 (function (Buffer){
 /*!
  * Module dependencies.
@@ -3739,9 +3752,9 @@ function Schema(obj, options) {
   // adds updatedAt and createdAt timestamps to documents if enabled
   var timestamps = this.options.timestamps;
   if (timestamps) {
-    var createdAt = timestamps.createdAt || 'createdAt'
-      , updatedAt = timestamps.updatedAt || 'updatedAt'
-      , schemaAdditions = {};
+    var createdAt = timestamps.createdAt || 'createdAt',
+        updatedAt = timestamps.updatedAt || 'updatedAt',
+        schemaAdditions = {};
 
     schemaAdditions[updatedAt] = Date;
 
@@ -4095,9 +4108,9 @@ Schema.prototype.path = function(path, obj) {
   }
 
   // update the tree
-  var subpaths = path.split(/\./)
-    , last = subpaths.pop()
-    , branch = this.tree;
+  var subpaths = path.split(/\./),
+      last = subpaths.pop(),
+      branch = this.tree;
 
   subpaths.forEach(function(sub, i) {
     if (!branch[sub]) branch[sub] = {};
@@ -4208,8 +4221,8 @@ Schema.interpretAsType = function(path, obj, options) {
  */
 
 Schema.prototype.eachPath = function(fn) {
-  var keys = Object.keys(this.paths)
-    , len = keys.length;
+  var keys = Object.keys(this.paths),
+      len = keys.length;
 
   for (var i = 0; i < len; ++i) {
     fn(keys[i], this.paths[keys[i]]);
@@ -4229,9 +4242,9 @@ Schema.prototype.eachPath = function(fn) {
 Schema.prototype.requiredPaths = function requiredPaths(invalidate) {
   if (this._requiredpaths && !invalidate) return this._requiredpaths;
 
-  var paths = Object.keys(this.paths)
-    , i = paths.length
-    , ret = [];
+  var paths = Object.keys(this.paths),
+      i = paths.length,
+      ret = [];
 
   while (i--) {
     var path = paths[i];
@@ -4313,9 +4326,9 @@ function getPositionalPathType(self, path) {
   var isNested = false;
   if (!val) return val;
 
-  var last = subpaths.length - 1
-    , subpath
-    , i = 1;
+  var last = subpaths.length - 1,
+      subpath,
+      i = 1;
 
   for (; i < subpaths.length; ++i) {
     isNested = false;
@@ -4622,8 +4635,8 @@ Schema.prototype.get = function(key) {
 var indexTypes = '2d 2dsphere hashed text'.split(' ');
 
 Object.defineProperty(Schema, 'indexTypes', {
-  get: function() { return indexTypes; }
-  , set: function() { throw new Error('Cannot overwrite Schema.indexTypes'); }
+  get: function() { return indexTypes; },
+  set: function() { throw new Error('Cannot overwrite Schema.indexTypes'); }
 });
 
 /**
@@ -4703,15 +4716,15 @@ Schema.prototype.indexes = function() {
    */
 
   function fixSubIndexPaths(schema, prefix) {
-    var subindexes = schema._indexes
-      , len = subindexes.length
-      , indexObj
-      , newindex
-      , klen
-      , keys
-      , key
-      , i = 0
-      , j;
+    var subindexes = schema._indexes,
+        len = subindexes.length,
+        indexObj,
+        newindex,
+        klen,
+        keys,
+        key,
+        i = 0,
+        j;
 
     for (i = 0; i < len; ++i) {
       indexObj = subindexes[i][0];
@@ -4794,9 +4807,9 @@ Schema.prototype._getSchema = function(path) {
 
   // look for arrays
   return (function search(parts, schema) {
-    var p = parts.length + 1
-      , foundschema
-      , trypath;
+    var p = parts.length + 1,
+        foundschema,
+        trypath;
 
     while (p--) {
       trypath = parts.slice(0, p).join('.');
@@ -4874,27 +4887,27 @@ Schema.Types = MongooseTypes = require('./schema/index');
 exports.ObjectId = MongooseTypes.ObjectId;
 
 }).call(this,require("buffer").Buffer)
-},{"./drivers":11,"./promise_provider":23,"./schema/index":31,"./utils":45,"./virtualtype":46,"async":47,"buffer":49,"events":53,"kareem":72}],25:[function(require,module,exports){
+},{"./drivers":11,"./promise_provider":23,"./schema/index":31,"./utils":45,"./virtualtype":46,"async":47,"buffer":49,"events":53,"kareem":77}],25:[function(require,module,exports){
 /*!
  * Module dependencies.
  */
 
-var SchemaType = require('../schematype')
-  , CastError = SchemaType.CastError
-  , Types = {
-    Boolean: require('./boolean')
-      , Date: require('./date')
-      , Number: require('./number')
-      , String: require('./string')
-      , ObjectId: require('./objectid')
-      , Buffer: require('./buffer')
-  }
-  , MongooseArray = require('../types').Array
-  , EmbeddedDoc = require('../types').Embedded
-  , Mixed = require('./mixed')
-  , cast = require('../cast')
-  , utils = require('../utils')
-  , isMongooseObject = utils.isMongooseObject;
+var SchemaType = require('../schematype'),
+    CastError = SchemaType.CastError,
+    Types = {
+      Boolean: require('./boolean'),
+      Date: require('./date'),
+      Number: require('./number'),
+      String: require('./string'),
+      ObjectId: require('./objectid'),
+      Buffer: require('./buffer')
+    },
+    MongooseArray = require('../types').Array,
+    EmbeddedDoc = require('../types').Embedded,
+    Mixed = require('./mixed'),
+    cast = require('../cast'),
+    utils = require('../utils'),
+    isMongooseObject = utils.isMongooseObject;
 
 /**
  * Array SchemaType constructor
@@ -4939,9 +4952,9 @@ function SchemaArray(key, cast, options) {
 
   SchemaType.call(this, key, options, 'Array');
 
-  var self = this
-    , defaultArr
-    , fn;
+  var self = this,
+      defaultArr,
+      fn;
 
   if (this.defaultValue) {
     defaultArr = this.defaultValue;
@@ -5054,8 +5067,8 @@ SchemaArray.prototype.cast = function(value, doc, init) {
  */
 
 SchemaArray.prototype.castForQuery = function($conditional, value) {
-  var handler
-    , val;
+  var handler,
+      val;
 
   if (arguments.length === 2) {
     handler = this.$conditionalHandlers[$conditional];
@@ -5952,8 +5965,8 @@ DocumentArray.prototype.doValidateSync = function(array, scope) {
   var schemaTypeError = SchemaType.prototype.doValidateSync.call(this, array, scope);
   if (schemaTypeError) return schemaTypeError;
 
-  var count = array && array.length
-    , resultError = null;
+  var count = array && array.length,
+      resultError = null;
 
   if (!count) return;
 
@@ -5987,9 +6000,9 @@ DocumentArray.prototype.doValidateSync = function(array, scope) {
  */
 
 DocumentArray.prototype.cast = function(value, doc, init, prev) {
-  var selected
-    , subdoc
-    , i;
+  var selected,
+      subdoc,
+      i;
 
   if (!Array.isArray(value)) {
     // gh-2442 mark whole array as modified if we're initializing a doc from
@@ -6036,7 +6049,7 @@ DocumentArray.prototype.cast = function(value, doc, init, prev) {
             // if set() is hooked it will have no return value
             // see gh-746
             value[i] = subdoc;
-          } catch(error) {
+          } catch (error) {
             throw new CastError('embedded', value[i], value._path);
           }
         }
@@ -6059,12 +6072,12 @@ DocumentArray.prototype.cast = function(value, doc, init, prev) {
 function scopePaths(array, fields, init) {
   if (!(init && fields)) return undefined;
 
-  var path = array.path + '.'
-    , keys = Object.keys(fields)
-    , i = keys.length
-    , selected = {}
-    , hasKeys
-    , key;
+  var path = array.path + '.',
+      keys = Object.keys(fields),
+      i = keys.length,
+      selected = {},
+      hasKeys,
+      key;
 
   while (i--) {
     key = keys[i];
@@ -6125,7 +6138,8 @@ Embedded.prototype = Object.create(SchemaType.prototype);
  */
 
 Embedded.prototype.cast = function(val, doc) {
-  var subdoc = new this.caster(val);
+  var subdoc = new this.caster();
+  subdoc = subdoc.init(val);
   subdoc.$parent = doc;
   return subdoc;
 };
@@ -6292,11 +6306,11 @@ module.exports = Mixed;
  * Module requirements.
  */
 
-var SchemaType = require('../schematype')
-  , CastError = SchemaType.CastError
-  , errorMessages = require('../error').messages
-  , utils = require('../utils')
-  , Document;
+var SchemaType = require('../schematype'),
+    CastError = SchemaType.CastError,
+    errorMessages = require('../error').messages,
+    utils = require('../utils'),
+    Document;
 
 /**
  * Number SchemaType constructor.
@@ -6574,11 +6588,11 @@ module.exports = SchemaNumber;
  * Module dependencies.
  */
 
-var SchemaType = require('../schematype')
-  , CastError = SchemaType.CastError
-  , oid = require('../types/objectid')
-  , utils = require('../utils')
-  , Document;
+var SchemaType = require('../schematype'),
+    CastError = SchemaType.CastError,
+    oid = require('../types/objectid'),
+    utils = require('../utils'),
+    Document;
 
 /**
  * ObjectId SchemaType constructor.
@@ -6771,11 +6785,11 @@ module.exports = ObjectId;
  * Module dependencies.
  */
 
-var SchemaType = require('../schematype')
-  , CastError = SchemaType.CastError
-  , errorMessages = require('../error').messages
-  , utils = require('../utils')
-  , Document;
+var SchemaType = require('../schematype'),
+    CastError = SchemaType.CastError,
+    errorMessages = require('../error').messages,
+    utils = require('../utils'),
+    Document;
 
 /**
  * String SchemaType constructor.
@@ -7714,9 +7728,9 @@ SchemaType.prototype.validate = function(obj, message, type) {
     return this;
   }
 
-  var i
-    , length
-    , arg;
+  var i,
+      length,
+      arg;
 
   for (i = 0, length = arguments.length; i < length; i++) {
     arg = arguments[i];
@@ -7830,10 +7844,10 @@ SchemaType.prototype.getDefault = function(scope, init) {
  */
 
 SchemaType.prototype.applySetters = function(value, scope, init, priorVal) {
-  var v = value
-    , setters = this.setters
-    , len = setters.length
-    , caster = this.caster;
+  var v = value,
+      setters = this.setters,
+      len = setters.length,
+      caster = this.caster;
 
   while (len--) {
     v = setters[len].call(scope, v, this);
@@ -7864,9 +7878,9 @@ SchemaType.prototype.applySetters = function(value, scope, init, priorVal) {
  */
 
 SchemaType.prototype.applyGetters = function(value, scope) {
-  var v = value
-    , getters = this.getters
-    , len = getters.length;
+  var v = value,
+      getters = this.getters,
+      len = getters.length;
 
   if (!len) {
     return v;
@@ -7911,9 +7925,9 @@ SchemaType.prototype.select = function select(val) {
  */
 
 SchemaType.prototype.doValidate = function(value, fn, scope) {
-  var err = false
-    , path = this.path
-    , count = this.validators.length;
+  var err = false,
+      path = this.path,
+      count = this.validators.length;
 
   if (!count) return fn(null);
 
@@ -7974,9 +7988,9 @@ SchemaType.prototype.doValidate = function(value, fn, scope) {
  */
 
 SchemaType.prototype.doValidateSync = function(value, scope) {
-  var err = null
-    , path = this.path
-    , count = this.validators.length;
+  var err = null,
+      path = this.path,
+      count = this.validators.length;
 
   if (!count) return null;
 
@@ -8160,8 +8174,8 @@ StateMachine.ctor = function() {
     this.states = {};
     this.stateNames = states;
 
-    var i = states.length
-      , state;
+    var i = states.length,
+        state;
 
     while (i--) {
       state = states[i];
@@ -8204,9 +8218,9 @@ StateMachine.prototype._changeState = function _changeState(path, nextState) {
  */
 
 StateMachine.prototype.clear = function clear(state) {
-  var keys = Object.keys(this.states[state])
-    , i = keys.length
-    , path;
+  var keys = Object.keys(this.states[state]),
+      i = keys.length,
+      path;
 
   while (i--) {
     path = keys[i];
@@ -8242,9 +8256,9 @@ StateMachine.prototype.some = function some() {
 
 StateMachine.prototype._iter = function _iter(iterMethod) {
   return function() {
-    var numArgs = arguments.length
-      , states = utils.args(arguments, 0, numArgs - 1)
-      , callback = arguments[numArgs - 1];
+    var numArgs = arguments.length,
+        states = utils.args(arguments, 0, numArgs - 1),
+        callback = arguments[numArgs - 1];
 
     if (!states.length) states = this.stateNames;
 
@@ -8440,8 +8454,8 @@ MongooseArray.mixin = {
    */
 
   _markModified: function(elem, embeddedPath) {
-    var parent = this._parent
-      , dirtyPath;
+    var parent = this._parent,
+        dirtyPath;
 
     if (parent) {
       dirtyPath = this._path;
@@ -8806,10 +8820,10 @@ MongooseArray.mixin = {
    */
 
   pull: function() {
-    var values = [].map.call(arguments, this._cast, this)
-      , cur = this._parent.get(this._path)
-      , i = cur.length
-      , mem;
+    var values = [].map.call(arguments, this._cast, this),
+        cur = this._parent.get(this._path),
+        i = cur.length,
+        mem;
 
     while (i--) {
       mem = cur[i];
@@ -9071,8 +9085,8 @@ module.exports = exports = MongooseArray;
  * Module dependencies.
  */
 
-var Binary = require('../drivers').Binary
-  , utils = require('../utils');
+var Binary = require('../drivers').Binary,
+    utils = require('../utils');
 
 /**
  * Mongoose Buffer constructor.
@@ -9115,9 +9129,9 @@ function MongooseBuffer(value, encode, offset) {
 
   // make sure these internal props don't show up in Object.keys()
   Object.defineProperties(buf, {
-    validators: { value: [] }
-    , _path: { value: path }
-    , _parent: { value: doc }
+    validators: { value: [] },
+    _path: { value: path },
+    _parent: { value: doc }
   });
 
   if (doc && "string" === typeof path) {
@@ -9344,12 +9358,12 @@ module.exports = MongooseBuffer;
  * Module dependencies.
  */
 
-var MongooseArray = require('./array')
-  , ObjectId = require('./objectid')
-  , ObjectIdSchema = require('../schema/objectid')
-  , utils = require('../utils')
-  , util = require('util')
-  , Document = require('../document');
+var MongooseArray = require('./array'),
+    ObjectId = require('./objectid'),
+    ObjectIdSchema = require('../schema/objectid'),
+    utils = require('../utils'),
+    util = require('util'),
+    Document = require('../document');
 
 /**
  * DocumentArray constructor
@@ -9445,9 +9459,9 @@ MongooseDocumentArray.mixin._cast = function(value, index) {
  */
 
 MongooseDocumentArray.mixin.id = function(id) {
-  var casted
-    , sid
-    , _id;
+  var casted,
+      sid,
+      _id;
 
   try {
     var casted_ = ObjectIdSchema.prototype.cast.call({}, id);
@@ -10238,14 +10252,14 @@ var clone = exports.clone;
  */
 
 function cloneObject(obj, options) {
-  var retainKeyOrder = options && options.retainKeyOrder
-    , minimize = options && options.minimize
-    , ret = {}
-    , hasKeys
-    , keys
-    , val
-    , k
-    , i;
+  var retainKeyOrder = options && options.retainKeyOrder,
+      minimize = options && options.minimize,
+      ret = {},
+      hasKeys,
+      keys,
+      val,
+      k,
+      i;
 
   if (retainKeyOrder) {
     for (k in obj) {
@@ -10295,9 +10309,9 @@ function cloneArray(arr, options) {
  */
 
 exports.options = function(defaults, options) {
-  var keys = Object.keys(defaults)
-    , i = keys.length
-    , k ;
+  var keys = Object.keys(defaults),
+      i = keys.length,
+      k;
 
   options = options || {};
 
@@ -10330,9 +10344,9 @@ exports.random = function() {
  */
 
 exports.merge = function merge(to, from) {
-  var keys = Object.keys(from)
-    , i = keys.length
-    , key;
+  var keys = Object.keys(from),
+      i = keys.length,
+      key;
 
   while (i--) {
     key = keys[i];
@@ -10402,6 +10416,9 @@ exports.toObject = function toObject(obj) {
  */
 
 exports.isObject = function(arg) {
+  if (Buffer.isBuffer(arg)) {
+    return true;
+  }
   return '[object Object]' == toString.call(arg);
 };
 
@@ -10586,9 +10603,9 @@ exports.setValue = function(path, val, obj, map) {
 
 exports.object = {};
 exports.object.vals = function vals(o) {
-  var keys = Object.keys(o)
-    , i = keys.length
-    , ret = [];
+  var keys = Object.keys(o),
+      i = keys.length,
+      ret = [];
 
   while (i--) {
     ret.push(o[keys[i]]);
@@ -10736,9 +10753,9 @@ exports.decorate = function(destination, source) {
  */
 
 exports.mergeClone = function(to, from) {
-  var keys = Object.keys(from)
-    , i = keys.length
-    , key;
+  var keys = Object.keys(from),
+      i = keys.length,
+      key;
 
   while (i--) {
     key = keys[i];
@@ -10773,7 +10790,7 @@ exports.each = function(arr, fn) {
 };
 
 }).call(this,require("FWaASH"),require("buffer").Buffer)
-},{"./document":5,"./types":42,"./types/objectid":43,"FWaASH":55,"buffer":49,"mpath":73,"ms":87,"regexp-clone":88,"sliced":89}],46:[function(require,module,exports){
+},{"./document":5,"./types":42,"./types/objectid":43,"FWaASH":55,"buffer":49,"mpath":78,"ms":91,"regexp-clone":92,"sliced":93}],46:[function(require,module,exports){
 
 /**
  * VirtualType constructor
@@ -14659,13 +14676,13 @@ function hasOwnProperty(obj, prop) {
  * Module dependencies.
  * @ignore
  */
-if(typeof window === 'undefined') { 
+if(typeof window === 'undefined') {
   var Buffer = require('buffer').Buffer; // TODO just use global Buffer
 }
 
 /**
  * A class representation of the BSON Binary type.
- * 
+ *
  * Sub types
  *  - **BSON.BSON_BINARY_SUBTYPE_DEFAULT**, default BSON type.
  *  - **BSON.BSON_BINARY_SUBTYPE_FUNCTION**, BSON function type.
@@ -14681,13 +14698,13 @@ if(typeof window === 'undefined') {
  */
 function Binary(buffer, subType) {
   if(!(this instanceof Binary)) return new Binary(buffer, subType);
-  
+
   this._bsontype = 'Binary';
 
   if(buffer instanceof Number) {
     this.sub_type = buffer;
     this.position = 0;
-  } else {    
+  } else {
     this.sub_type = subType == null ? BSON_BINARY_SUBTYPE_DEFAULT : subType;
     this.position = 0;
   }
@@ -14704,12 +14721,12 @@ function Binary(buffer, subType) {
         throw new Error("only String, Buffer, Uint8Array or Array accepted");
       }
     } else {
-      this.buffer = buffer;      
+      this.buffer = buffer;
     }
     this.position = buffer.length;
   } else {
     if(typeof Buffer != 'undefined') {
-      this.buffer =  new Buffer(Binary.BUFFER_SIZE);      
+      this.buffer =  new Buffer(Binary.BUFFER_SIZE);
     } else if(typeof Uint8Array != 'undefined'){
       this.buffer = new Uint8Array(new ArrayBuffer(Binary.BUFFER_SIZE));
     } else {
@@ -14730,21 +14747,21 @@ Binary.prototype.put = function put(byte_value) {
   // If it's a string and a has more than one character throw an error
   if(byte_value['length'] != null && typeof byte_value != 'number' && byte_value.length != 1) throw new Error("only accepts single character String, Uint8Array or Array");
   if(typeof byte_value != 'number' && byte_value < 0 || byte_value > 255) throw new Error("only accepts number in a valid unsigned byte range 0-255");
-  
+
   // Decode the byte value once
   var decoded_byte = null;
   if(typeof byte_value == 'string') {
-    decoded_byte = byte_value.charCodeAt(0);      
+    decoded_byte = byte_value.charCodeAt(0);
   } else if(byte_value['length'] != null) {
     decoded_byte = byte_value[0];
   } else {
     decoded_byte = byte_value;
   }
-  
+
   if(this.buffer.length > this.position) {
     this.buffer[this.position++] = decoded_byte;
   } else {
-    if(typeof Buffer != 'undefined' && Buffer.isBuffer(this.buffer)) {    
+    if(typeof Buffer != 'undefined' && Buffer.isBuffer(this.buffer)) {
       // Create additional overflow buffer
       var buffer = new Buffer(Binary.BUFFER_SIZE + this.buffer.length);
       // Combine the two buffers together
@@ -14758,13 +14775,13 @@ Binary.prototype.put = function put(byte_value) {
         buffer = new Uint8Array(new ArrayBuffer(Binary.BUFFER_SIZE + this.buffer.length));
       } else {
         buffer = new Array(Binary.BUFFER_SIZE + this.buffer.length);
-      }      
-      
+      }
+
       // We need to copy all the content to the new array
       for(var i = 0; i < this.buffer.length; i++) {
         buffer[i] = this.buffer[i];
       }
-      
+
       // Reassign the buffer
       this.buffer = buffer;
       // Write the byte
@@ -14788,9 +14805,9 @@ Binary.prototype.write = function write(string, offset) {
   if(this.buffer.length < offset + string.length) {
     var buffer = null;
     // If we are in node.js
-    if(typeof Buffer != 'undefined' && Buffer.isBuffer(this.buffer)) {      
+    if(typeof Buffer != 'undefined' && Buffer.isBuffer(this.buffer)) {
       buffer = new Buffer(this.buffer.length + string.length);
-      this.buffer.copy(buffer, 0, 0, this.buffer.length);      
+      this.buffer.copy(buffer, 0, 0, this.buffer.length);
     } else if(Object.prototype.toString.call(this.buffer) == '[object Uint8Array]') {
       // Create a new buffer
       buffer = new Uint8Array(new ArrayBuffer(this.buffer.length + string.length))
@@ -14799,7 +14816,7 @@ Binary.prototype.write = function write(string, offset) {
         buffer[i] = this.buffer[i];
       }
     }
-    
+
     // Assign the new buffer
     this.buffer = buffer;
   }
@@ -14809,14 +14826,14 @@ Binary.prototype.write = function write(string, offset) {
     this.position = (offset + string.length) > this.position ? (offset + string.length) : this.position;
     // offset = string.length
   } else if(typeof Buffer != 'undefined' && typeof string == 'string' && Buffer.isBuffer(this.buffer)) {
-    this.buffer.write(string, 'binary', offset);
+    this.buffer.write(string, offset, 'binary');
     this.position = (offset + string.length) > this.position ? (offset + string.length) : this.position;
     // offset = string.length;
-  } else if(Object.prototype.toString.call(string) == '[object Uint8Array]' 
-    || Object.prototype.toString.call(string) == '[object Array]' && typeof string != 'string') {      
+  } else if(Object.prototype.toString.call(string) == '[object Uint8Array]'
+    || Object.prototype.toString.call(string) == '[object Array]' && typeof string != 'string') {
     for(var i = 0; i < string.length; i++) {
       this.buffer[offset++] = string[i];
-    }    
+    }
 
     this.position = offset > this.position ? offset : this.position;
   } else if(typeof string == 'string') {
@@ -14840,7 +14857,7 @@ Binary.prototype.read = function read(position, length) {
   length = length && length > 0
     ? length
     : this.position;
-  
+
   // Let's return the data based on the type we have
   if(this.buffer['slice']) {
     return this.buffer.slice(position, position + length);
@@ -14862,12 +14879,12 @@ Binary.prototype.read = function read(position, length) {
  * @return {string}
  */
 Binary.prototype.value = function value(asRaw) {
-  asRaw = asRaw == null ? false : asRaw;  
+  asRaw = asRaw == null ? false : asRaw;
 
   // Optimize to serialize for the situation where the data == size of buffer
   if(asRaw && typeof Buffer != 'undefined' && Buffer.isBuffer(this.buffer) && this.buffer.length == this.position)
     return this.buffer;
-  
+
   // If it's a node.js buffer object
   if(typeof Buffer != 'undefined' && Buffer.isBuffer(this.buffer)) {
     return asRaw ? this.buffer.slice(0, this.position) : this.buffer.toString('binary', 0, this.position);
@@ -14918,7 +14935,7 @@ Binary.prototype.toString = function(format) {
 
 /**
  * Binary default subtype
- * @ignore 
+ * @ignore
  */
 var BSON_BINARY_SUBTYPE_DEFAULT = 0;
 
@@ -14931,7 +14948,7 @@ var writeStringToArray = function(data) {
   // Write the content to the buffer
   for(var i = 0; i < data.length; i++) {
     buffer[i] = data.charCodeAt(i);
-  }  
+  }
   // Write the string to the buffer
   return buffer;
 }
@@ -14946,50 +14963,50 @@ var convertArraytoUtf8BinaryString = function(byteArray, startIndex, endIndex) {
   for(var i = startIndex; i < endIndex; i++) {
    result = result + String.fromCharCode(byteArray[i]);
   }
-  return result;  
+  return result;
 };
 
 Binary.BUFFER_SIZE = 256;
 
 /**
  * Default BSON type
- *  
+ *
  * @classconstant SUBTYPE_DEFAULT
  **/
 Binary.SUBTYPE_DEFAULT = 0;
 /**
  * Function BSON type
- *  
+ *
  * @classconstant SUBTYPE_DEFAULT
  **/
 Binary.SUBTYPE_FUNCTION = 1;
 /**
  * Byte Array BSON type
- *  
+ *
  * @classconstant SUBTYPE_DEFAULT
  **/
 Binary.SUBTYPE_BYTE_ARRAY = 2;
 /**
  * OLD UUID BSON type
- *  
+ *
  * @classconstant SUBTYPE_DEFAULT
  **/
 Binary.SUBTYPE_UUID_OLD = 3;
 /**
  * UUID BSON type
- *  
+ *
  * @classconstant SUBTYPE_DEFAULT
  **/
 Binary.SUBTYPE_UUID = 4;
 /**
  * MD5 BSON type
- *  
+ *
  * @classconstant SUBTYPE_DEFAULT
  **/
 Binary.SUBTYPE_MD5 = 5;
 /**
  * User BSON type
- *  
+ *
  * @classconstant SUBTYPE_DEFAULT
  **/
 Binary.SUBTYPE_USER_DEFINED = 128;
@@ -14999,6 +15016,7 @@ Binary.SUBTYPE_USER_DEFINED = 128;
  */
 module.exports = Binary;
 module.exports.Binary = Binary;
+
 },{"buffer":49}],59:[function(require,module,exports){
 (function (process){
 /**
@@ -15390,32 +15408,148 @@ exports.BinaryParser = BinaryParser;
 }).call(this,require("FWaASH"))
 },{"FWaASH":55,"util":57}],60:[function(require,module,exports){
 (function (Buffer){
-var Long = require('./long').Long
-  , Double = require('./double').Double
-  , Timestamp = require('./timestamp').Timestamp
-  , ObjectID = require('./objectid').ObjectID
-  , Symbol = require('./symbol').Symbol
-  , Code = require('./code').Code
-  , MinKey = require('./min_key').MinKey
-  , MaxKey = require('./max_key').MaxKey
-  , DBRef = require('./db_ref').DBRef
-  , Binary = require('./binary').Binary
-  , BinaryParser = require('./binary_parser').BinaryParser
-  , writeIEEE754 = require('./float_parser').writeIEEE754
-  , readIEEE754 = require('./float_parser').readIEEE754
+// "use strict"
 
-// To ensure that 0.4 of node works correctly
-var isDate = function isDate(d) {
-  return typeof d === 'object' && Object.prototype.toString.call(d) === '[object Date]';
+var writeIEEE754 = require('./float_parser').writeIEEE754,
+	readIEEE754 = require('./float_parser').readIEEE754,
+  Map = require('./map'),
+	Long = require('./long').Long,
+  Double = require('./double').Double,
+  Timestamp = require('./timestamp').Timestamp,
+  ObjectID = require('./objectid').ObjectID,
+  BSONRegExp = require('./regexp').BSONRegExp,
+  Symbol = require('./symbol').Symbol,
+  Code = require('./code').Code,
+  MinKey = require('./min_key').MinKey,
+  MaxKey = require('./max_key').MaxKey,
+  DBRef = require('./db_ref').DBRef,
+  Binary = require('./binary').Binary;
+
+// Parts of the parser
+var deserialize = require('./parser/deserializer'),
+	serializer = require('./parser/serializer'),
+	calculateObjectSize = require('./parser/calculate_size');
+
+/**
+ * @ignore
+ * @api private
+ */
+// Max Size
+var MAXSIZE = (1024*1024*17);
+// Max Document Buffer size
+var buffer = new Buffer(MAXSIZE);
+
+var BSON = function() {
 }
 
 /**
- * Create a new BSON instance
+ * Serialize a Javascript object.
  *
- * @class
- * @return {BSON} instance of BSON Parser.
+ * @param {Object} object the Javascript object to serialize.
+ * @param {Boolean} checkKeys the serializer will check if keys are valid.
+ * @param {Boolean} asBuffer return the serialized object as a Buffer object **(ignore)**.
+ * @param {Boolean} serializeFunctions serialize the javascript functions **(default:false)**.
+ * @return {Buffer} returns the Buffer object containing the serialized object.
+ * @api public
  */
-function BSON () {};
+BSON.prototype.serialize = function serialize(object, checkKeys, asBuffer, serializeFunctions, index, ignoreUndefined) {
+	// Attempt to serialize
+	var serializationIndex = serializer(buffer, object, checkKeys, index || 0, 0, serializeFunctions, ignoreUndefined);
+	// Create the final buffer
+	var finishedBuffer = new Buffer(serializationIndex);
+	// Copy into the finished buffer
+	buffer.copy(finishedBuffer, 0, 0, finishedBuffer.length);
+	// Return the buffer
+	return finishedBuffer;
+}
+
+/**
+ * Serialize a Javascript object using a predefined Buffer and index into the buffer, useful when pre-allocating the space for serialization.
+ *
+ * @param {Object} object the Javascript object to serialize.
+ * @param {Boolean} checkKeys the serializer will check if keys are valid.
+ * @param {Buffer} buffer the Buffer you pre-allocated to store the serialized BSON object.
+ * @param {Number} index the index in the buffer where we wish to start serializing into.
+ * @param {Boolean} serializeFunctions serialize the javascript functions **(default:false)**.
+ * @return {Number} returns the new write index in the Buffer.
+ * @api public
+ */
+BSON.prototype.serializeWithBufferAndIndex = function(object, checkKeys, finalBuffer, startIndex, serializeFunctions, ignoreUndefined) {
+	// Attempt to serialize
+	var serializationIndex = serializer(buffer, object, checkKeys, startIndex || 0, 0, serializeFunctions, ignoreUndefined);
+	buffer.copy(finalBuffer, startIndex, 0, serializationIndex);
+	// Return the index
+	return startIndex + serializationIndex - 1;
+}
+
+/**
+ * Deserialize data as BSON.
+ *
+ * Options
+ *  - **evalFunctions** {Boolean, default:false}, evaluate functions in the BSON document scoped to the object deserialized.
+ *  - **cacheFunctions** {Boolean, default:false}, cache evaluated functions for reuse.
+ *  - **cacheFunctionsCrc32** {Boolean, default:false}, use a crc32 code for caching, otherwise use the string of the function.
+ *  - **promoteLongs** {Boolean, default:true}, when deserializing a Long will fit it into a Number if it's smaller than 53 bits
+ *
+ * @param {Buffer} buffer the buffer containing the serialized set of BSON documents.
+ * @param {Object} [options] additional options used for the deserialization.
+ * @param {Boolean} [isArray] ignore used for recursive parsing.
+ * @return {Object} returns the deserialized Javascript Object.
+ * @api public
+ */
+BSON.prototype.deserialize = function(data, options) {
+  return deserialize(data, options);
+}
+
+/**
+ * Calculate the bson size for a passed in Javascript object.
+ *
+ * @param {Object} object the Javascript object to calculate the BSON byte size for.
+ * @param {Boolean} [serializeFunctions] serialize all functions in the object **(default:false)**.
+ * @return {Number} returns the number of bytes the BSON object will take up.
+ * @api public
+ */
+BSON.prototype.calculateObjectSize = function(object, serializeFunctions, ignoreUndefined) {
+  return calculateObjectSize(object, serializeFunctions, ignoreUndefined);
+}
+
+/**
+ * Deserialize stream data as BSON documents.
+ *
+ * Options
+ *  - **evalFunctions** {Boolean, default:false}, evaluate functions in the BSON document scoped to the object deserialized.
+ *  - **cacheFunctions** {Boolean, default:false}, cache evaluated functions for reuse.
+ *  - **cacheFunctionsCrc32** {Boolean, default:false}, use a crc32 code for caching, otherwise use the string of the function.
+ *  - **promoteLongs** {Boolean, default:true}, when deserializing a Long will fit it into a Number if it's smaller than 53 bits
+ *
+ * @param {Buffer} data the buffer containing the serialized set of BSON documents.
+ * @param {Number} startIndex the start index in the data Buffer where the deserialization is to start.
+ * @param {Number} numberOfDocuments number of documents to deserialize.
+ * @param {Array} documents an array where to store the deserialized documents.
+ * @param {Number} docStartIndex the index in the documents array from where to start inserting documents.
+ * @param {Object} [options] additional options used for the deserialization.
+ * @return {Number} returns the next index in the buffer after deserialization **x** numbers of documents.
+ * @api public
+ */
+BSON.prototype.deserializeStream = function(data, startIndex, numberOfDocuments, documents, docStartIndex, options) {
+  // if(numberOfDocuments !== documents.length) throw new Error("Number of expected results back is less than the number of documents");
+  options = options != null ? options : {};
+  var index = startIndex;
+  // Loop over all documents
+  for(var i = 0; i < numberOfDocuments; i++) {
+    // Find size of the document
+    var size = data[index] | data[index + 1] << 8 | data[index + 2] << 16 | data[index + 3] << 24;
+    // Update options with index
+    options['index'] = index;
+    // Parse the document at this point
+    documents[docStartIndex + i] = this.deserialize(data, options);
+    // Adjust index by the document size
+    index = index + size;
+  }
+
+  // Return object containing end index of parsing and list of documents
+  return index;
+}
 
 /**
  * @ignore
@@ -15466,12 +15600,6 @@ BSON.BSON_DATA_ARRAY = 4;
  * @classconstant BSON_DATA_BINARY
  **/
 BSON.BSON_DATA_BINARY = 5;
-/**
- * Binary BSON Type
- *
- * @classconstant BSON_DATA_UNDEFINED
- **/
-BSON.BSON_DATA_UNDEFINED = 6;
 /**
  * ObjectID BSON Type
  *
@@ -15588,1384 +15716,24 @@ BSON.BSON_BINARY_SUBTYPE_MD5 = 4;
  **/
 BSON.BSON_BINARY_SUBTYPE_USER_DEFINED = 128;
 
-/**
- * Calculate the bson size for a passed in Javascript object.
- *
- * @param {Object} object the Javascript object to calculate the BSON byte size for.
- * @param {Boolean} [serializeFunctions] serialize all functions in the object **(default:false)**.
- * @return {Number} returns the number of bytes the BSON object will take up.
- * @api public
- */
-BSON.calculateObjectSize = function calculateObjectSize(object, serializeFunctions) {
-  var totalLength = (4 + 1);
-
-  if(Array.isArray(object)) {
-    for(var i = 0; i < object.length; i++) {
-      totalLength += calculateElement(i.toString(), object[i], serializeFunctions)
-    }
-  } else {
-		// If we have toBSON defined, override the current object
-		if(object.toBSON) {
-			object = object.toBSON();
-		}
-
-		// Calculate size
-    for(var key in object) {
-      totalLength += calculateElement(key, object[key], serializeFunctions)
-    }
-  }
-
-  return totalLength;
-}
-
-/**
- * @ignore
- * @api private
- */
-function calculateElement(name, value, serializeFunctions) {
-  var isBuffer = typeof Buffer !== 'undefined';
-  
-  // If we have toBSON defined, override the current object
-  if(value && value.toBSON){
-        value = value.toBSON();
-  }
-  
-  switch(typeof value) {
-    case 'string':
-      return 1 + (!isBuffer ? numberOfBytes(name) : Buffer.byteLength(name, 'utf8')) + 1 + 4 + (!isBuffer ? numberOfBytes(value) : Buffer.byteLength(value, 'utf8')) + 1;
-    case 'number':
-      if(Math.floor(value) === value && value >= BSON.JS_INT_MIN && value <= BSON.JS_INT_MAX) {
-        if(value >= BSON.BSON_INT32_MIN && value <= BSON.BSON_INT32_MAX) { // 32 bit
-          return (name != null ? ((!isBuffer ? numberOfBytes(name) : Buffer.byteLength(name, 'utf8')) + 1) : 0) + (4 + 1);
-        } else {
-          return (name != null ? ((!isBuffer ? numberOfBytes(name) : Buffer.byteLength(name, 'utf8')) + 1) : 0) + (8 + 1);
-        }
-      } else {  // 64 bit
-        return (name != null ? ((!isBuffer ? numberOfBytes(name) : Buffer.byteLength(name, 'utf8')) + 1) : 0) + (8 + 1);
-      }
-    case 'undefined':
-      return (name != null ? ((!isBuffer ? numberOfBytes(name) : Buffer.byteLength(name, 'utf8')) + 1) : 0) + (1);
-    case 'boolean':
-      return (name != null ? ((!isBuffer ? numberOfBytes(name) : Buffer.byteLength(name, 'utf8')) + 1) : 0) + (1 + 1);
-    case 'object':
-      if(value == null || value instanceof MinKey || value instanceof MaxKey || value['_bsontype'] == 'MinKey' || value['_bsontype'] == 'MaxKey') {
-        return (name != null ? ((!isBuffer ? numberOfBytes(name) : Buffer.byteLength(name, 'utf8')) + 1) : 0) + (1);
-      } else if(value instanceof ObjectID || value['_bsontype'] == 'ObjectID') {
-        return (name != null ? ((!isBuffer ? numberOfBytes(name) : Buffer.byteLength(name, 'utf8')) + 1) : 0) + (12 + 1);
-      } else if(value instanceof Date || isDate(value)) {
-        return (name != null ? ((!isBuffer ? numberOfBytes(name) : Buffer.byteLength(name, 'utf8')) + 1) : 0) + (8 + 1);
-      } else if(typeof Buffer !== 'undefined' && Buffer.isBuffer(value)) {
-        return (name != null ? ((!isBuffer ? numberOfBytes(name) : Buffer.byteLength(name, 'utf8')) + 1) : 0) + (1 + 4 + 1) + value.length;
-      } else if(value instanceof Long || value instanceof Double || value instanceof Timestamp
-          || value['_bsontype'] == 'Long' || value['_bsontype'] == 'Double' || value['_bsontype'] == 'Timestamp') {
-        return (name != null ? ((!isBuffer ? numberOfBytes(name) : Buffer.byteLength(name, 'utf8')) + 1) : 0) + (8 + 1);
-      } else if(value instanceof Code || value['_bsontype'] == 'Code') {
-        // Calculate size depending on the availability of a scope
-        if(value.scope != null && Object.keys(value.scope).length > 0) {
-          return (name != null ? ((!isBuffer ? numberOfBytes(name) : Buffer.byteLength(name, 'utf8')) + 1) : 0) + 1 + 4 + 4 + (!isBuffer ? numberOfBytes(value.code.toString()) : Buffer.byteLength(value.code.toString(), 'utf8')) + 1 + BSON.calculateObjectSize(value.scope, serializeFunctions);
-        } else {
-          return (name != null ? ((!isBuffer ? numberOfBytes(name) : Buffer.byteLength(name, 'utf8')) + 1) : 0) + 1 + 4 + (!isBuffer ? numberOfBytes(value.code.toString()) : Buffer.byteLength(value.code.toString(), 'utf8')) + 1;
-        }
-      } else if(value instanceof Binary || value['_bsontype'] == 'Binary') {
-        // Check what kind of subtype we have
-        if(value.sub_type == Binary.SUBTYPE_BYTE_ARRAY) {
-          return (name != null ? ((!isBuffer ? numberOfBytes(name) : Buffer.byteLength(name, 'utf8')) + 1) : 0) + (value.position + 1 + 4 + 1 + 4);
-        } else {
-          return (name != null ? ((!isBuffer ? numberOfBytes(name) : Buffer.byteLength(name, 'utf8')) + 1) : 0) + (value.position + 1 + 4 + 1);
-        }
-      } else if(value instanceof Symbol || value['_bsontype'] == 'Symbol') {
-        return (name != null ? ((!isBuffer ? numberOfBytes(name) : Buffer.byteLength(name, 'utf8')) + 1) : 0) + ((!isBuffer ? numberOfBytes(value.value) : Buffer.byteLength(value.value, 'utf8')) + 4 + 1 + 1);
-      } else if(value instanceof DBRef || value['_bsontype'] == 'DBRef') {
-        // Set up correct object for serialization
-        var ordered_values = {
-            '$ref': value.namespace
-          , '$id' : value.oid
-        };
-
-        // Add db reference if it exists
-        if(null != value.db) {
-          ordered_values['$db'] = value.db;
-        }
-
-        return (name != null ? ((!isBuffer ? numberOfBytes(name) : Buffer.byteLength(name, 'utf8')) + 1) : 0) + 1 + BSON.calculateObjectSize(ordered_values, serializeFunctions);
-      } else if(value instanceof RegExp || Object.prototype.toString.call(value) === '[object RegExp]') {
-          return (name != null ? ((!isBuffer ? numberOfBytes(name) : Buffer.byteLength(name, 'utf8')) + 1) : 0) + 1 + (!isBuffer ? numberOfBytes(value.source) : Buffer.byteLength(value.source, 'utf8')) + 1
-            + (value.global ? 1 : 0) + (value.ignoreCase ? 1 : 0) + (value.multiline ? 1 : 0) + 1
-      } else {
-        return (name != null ? ((!isBuffer ? numberOfBytes(name) : Buffer.byteLength(name, 'utf8')) + 1) : 0) + BSON.calculateObjectSize(value, serializeFunctions) + 1;
-      }
-    case 'function':
-      // WTF for 0.4.X where typeof /someregexp/ === 'function'
-      if(value instanceof RegExp || Object.prototype.toString.call(value) === '[object RegExp]' || String.call(value) == '[object RegExp]') {
-        return (name != null ? ((!isBuffer ? numberOfBytes(name) : Buffer.byteLength(name, 'utf8')) + 1) : 0) + 1 + (!isBuffer ? numberOfBytes(value.source) : Buffer.byteLength(value.source, 'utf8')) + 1
-          + (value.global ? 1 : 0) + (value.ignoreCase ? 1 : 0) + (value.multiline ? 1 : 0) + 1
-      } else {
-        if(serializeFunctions && value.scope != null && Object.keys(value.scope).length > 0) {
-          return (name != null ? ((!isBuffer ? numberOfBytes(name) : Buffer.byteLength(name, 'utf8')) + 1) : 0) + 1 + 4 + 4 + (!isBuffer ? numberOfBytes(value.toString()) : Buffer.byteLength(value.toString(), 'utf8')) + 1 + BSON.calculateObjectSize(value.scope, serializeFunctions);
-        } else if(serializeFunctions) {
-          return (name != null ? ((!isBuffer ? numberOfBytes(name) : Buffer.byteLength(name, 'utf8')) + 1) : 0) + 1 + 4 + (!isBuffer ? numberOfBytes(value.toString()) : Buffer.byteLength(value.toString(), 'utf8')) + 1;
-        }
-      }
-  }
-
-  return 0;
-}
-
-/**
- * Serialize a Javascript object using a predefined Buffer and index into the buffer, useful when pre-allocating the space for serialization.
- *
- * @param {Object} object the Javascript object to serialize.
- * @param {Boolean} checkKeys the serializer will check if keys are valid.
- * @param {Buffer} buffer the Buffer you pre-allocated to store the serialized BSON object.
- * @param {Number} index the index in the buffer where we wish to start serializing into.
- * @param {Boolean} serializeFunctions serialize the javascript functions **(default:false)**.
- * @return {Number} returns the new write index in the Buffer.
- * @api public
- */
-BSON.serializeWithBufferAndIndex = function serializeWithBufferAndIndex(object, checkKeys, buffer, index, serializeFunctions) {
-  // Default setting false
-  serializeFunctions = serializeFunctions == null ? false : serializeFunctions;
-  // Write end information (length of the object)
-  var size = buffer.length;
-  // Write the size of the object
-  buffer[index++] = size & 0xff;
-  buffer[index++] = (size >> 8) & 0xff;
-  buffer[index++] = (size >> 16) & 0xff;
-  buffer[index++] = (size >> 24) & 0xff;
-  return serializeObject(object, checkKeys, buffer, index, serializeFunctions) - 1;
-}
-
-/**
- * @ignore
- * @api private
- */
-var serializeObject = function(object, checkKeys, buffer, index, serializeFunctions) {
-  if(object.toBSON) {
-    if(typeof object.toBSON != 'function') throw new Error("toBSON is not a function");
-    object = object.toBSON();
-    if(object != null && typeof object != 'object') throw new Error("toBSON function did not return an object");
-  }
-
-  // Process the object
-  if(Array.isArray(object)) {
-    for(var i = 0; i < object.length; i++) {
-      index = packElement(i.toString(), object[i], checkKeys, buffer, index, serializeFunctions);
-    }
-  } else {
-		// If we have toBSON defined, override the current object
-		if(object.toBSON) {
-			object = object.toBSON();
-		}
-
-		// Serialize the object
-    for(var key in object) {
-      // Check the key and throw error if it's illegal
-      if (key != '$db' && key != '$ref' && key != '$id') {
-        // dollars and dots ok
-        BSON.checkKey(key, !checkKeys);
-      }
-
-      // Pack the element
-      index = packElement(key, object[key], checkKeys, buffer, index, serializeFunctions);
-    }
-  }
-
-  // Write zero
-  buffer[index++] = 0;
-  return index;
-}
-
-var stringToBytes = function(str) {
-  var ch, st, re = [];
-  for (var i = 0; i < str.length; i++ ) {
-    ch = str.charCodeAt(i);  // get char
-    st = [];                 // set up "stack"
-    do {
-      st.push( ch & 0xFF );  // push byte to stack
-      ch = ch >> 8;          // shift value down by 1 byte
-    }
-    while ( ch );
-    // add stack contents to result
-    // done because chars have "wrong" endianness
-    re = re.concat( st.reverse() );
-  }
-  // return an array of bytes
-  return re;
-}
-
-var numberOfBytes = function(str) {
-  var ch, st, re = 0;
-  for (var i = 0; i < str.length; i++ ) {
-    ch = str.charCodeAt(i);  // get char
-    st = [];                 // set up "stack"
-    do {
-      st.push( ch & 0xFF );  // push byte to stack
-      ch = ch >> 8;          // shift value down by 1 byte
-    }
-    while ( ch );
-    // add stack contents to result
-    // done because chars have "wrong" endianness
-    re = re + st.length;
-  }
-  // return an array of bytes
-  return re;
-}
-
-/**
- * @ignore
- * @api private
- */
-var writeToTypedArray = function(buffer, string, index) {
-  var bytes = stringToBytes(string);
-  for(var i = 0; i < bytes.length; i++) {
-    buffer[index + i] = bytes[i];
-  }
-  return bytes.length;
-}
-
-/**
- * @ignore
- * @api private
- */
-var supportsBuffer = typeof Buffer != 'undefined';
-
-/**
- * @ignore
- * @api private
- */
-var packElement = function(name, value, checkKeys, buffer, index, serializeFunctions) {
-	
-  // If we have toBSON defined, override the current object
-  if(value && value.toBSON){
-        value = value.toBSON();
-  }
-  
-  var startIndex = index;
-
-  switch(typeof value) {
-    case 'string':
-      // console.log("+++++++++++ index string:: " + index)
-      // Encode String type
-      buffer[index++] = BSON.BSON_DATA_STRING;
-      // Number of written bytes
-      var numberOfWrittenBytes = supportsBuffer ? buffer.write(name, index, 'utf8') : writeToTypedArray(buffer, name, index);
-      // Encode the name
-      index = index + numberOfWrittenBytes + 1;
-      buffer[index - 1] = 0;
-
-      // Calculate size
-      var size = supportsBuffer ? Buffer.byteLength(value) + 1 : numberOfBytes(value) + 1;
-      // console.log("====== key :: " + name + " size ::" + size)
-      // Write the size of the string to buffer
-      buffer[index + 3] = (size >> 24) & 0xff;
-      buffer[index + 2] = (size >> 16) & 0xff;
-      buffer[index + 1] = (size >> 8) & 0xff;
-      buffer[index] = size & 0xff;
-      // Ajust the index
-      index = index + 4;
-      // Write the string
-      supportsBuffer ? buffer.write(value, index, 'utf8') : writeToTypedArray(buffer, value, index);
-      // Update index
-      index = index + size - 1;
-      // Write zero
-      buffer[index++] = 0;
-      // Return index
-      return index;
-    case 'number':
-      // We have an integer value
-      if(Math.floor(value) === value && value >= BSON.JS_INT_MIN && value <= BSON.JS_INT_MAX) {
-        // If the value fits in 32 bits encode as int, if it fits in a double
-        // encode it as a double, otherwise long
-        if(value >= BSON.BSON_INT32_MIN && value <= BSON.BSON_INT32_MAX) {
-          // Set int type 32 bits or less
-          buffer[index++] = BSON.BSON_DATA_INT;
-          // Number of written bytes
-          var numberOfWrittenBytes = supportsBuffer ? buffer.write(name, index, 'utf8') : writeToTypedArray(buffer, name, index);
-          // Encode the name
-          index = index + numberOfWrittenBytes + 1;
-          buffer[index - 1] = 0;
-          // Write the int value
-          buffer[index++] = value & 0xff;
-          buffer[index++] = (value >> 8) & 0xff;
-          buffer[index++] = (value >> 16) & 0xff;
-          buffer[index++] = (value >> 24) & 0xff;
-        } else if(value >= BSON.JS_INT_MIN && value <= BSON.JS_INT_MAX) {
-          // Encode as double
-          buffer[index++] = BSON.BSON_DATA_NUMBER;
-          // Number of written bytes
-          var numberOfWrittenBytes = supportsBuffer ? buffer.write(name, index, 'utf8') : writeToTypedArray(buffer, name, index);
-          // Encode the name
-          index = index + numberOfWrittenBytes + 1;
-          buffer[index - 1] = 0;
-          // Write float
-          writeIEEE754(buffer, value, index, 'little', 52, 8);
-          // Ajust index
-          index = index + 8;
-        } else {
-          // Set long type
-          buffer[index++] = BSON.BSON_DATA_LONG;
-          // Number of written bytes
-          var numberOfWrittenBytes = supportsBuffer ? buffer.write(name, index, 'utf8') : writeToTypedArray(buffer, name, index);
-          // Encode the name
-          index = index + numberOfWrittenBytes + 1;
-          buffer[index - 1] = 0;
-          var longVal = Long.fromNumber(value);
-          var lowBits = longVal.getLowBits();
-          var highBits = longVal.getHighBits();
-          // Encode low bits
-          buffer[index++] = lowBits & 0xff;
-          buffer[index++] = (lowBits >> 8) & 0xff;
-          buffer[index++] = (lowBits >> 16) & 0xff;
-          buffer[index++] = (lowBits >> 24) & 0xff;
-          // Encode high bits
-          buffer[index++] = highBits & 0xff;
-          buffer[index++] = (highBits >> 8) & 0xff;
-          buffer[index++] = (highBits >> 16) & 0xff;
-          buffer[index++] = (highBits >> 24) & 0xff;
-        }
-      } else {
-        // Encode as double
-        buffer[index++] = BSON.BSON_DATA_NUMBER;
-        // Number of written bytes
-        var numberOfWrittenBytes = supportsBuffer ? buffer.write(name, index, 'utf8') : writeToTypedArray(buffer, name, index);
-        // Encode the name
-        index = index + numberOfWrittenBytes + 1;
-        buffer[index - 1] = 0;
-        // Write float
-        writeIEEE754(buffer, value, index, 'little', 52, 8);
-        // Ajust index
-        index = index + 8;
-      }
-
-      return index;
-    case 'undefined':
-      // Set long type
-      buffer[index++] = BSON.BSON_DATA_NULL;
-      // Number of written bytes
-      var numberOfWrittenBytes = supportsBuffer ? buffer.write(name, index, 'utf8') : writeToTypedArray(buffer, name, index);
-      // Encode the name
-      index = index + numberOfWrittenBytes + 1;
-      buffer[index - 1] = 0;
-      return index;
-    case 'boolean':
-      // Write the type
-      buffer[index++] = BSON.BSON_DATA_BOOLEAN;
-      // Number of written bytes
-      var numberOfWrittenBytes = supportsBuffer ? buffer.write(name, index, 'utf8') : writeToTypedArray(buffer, name, index);
-      // Encode the name
-      index = index + numberOfWrittenBytes + 1;
-      buffer[index - 1] = 0;
-      // Encode the boolean value
-      buffer[index++] = value ? 1 : 0;
-      return index;
-    case 'object':
-      if(value === null || value instanceof MinKey || value instanceof MaxKey
-          || value['_bsontype'] == 'MinKey' || value['_bsontype'] == 'MaxKey') {
-        // Write the type of either min or max key
-        if(value === null) {
-          buffer[index++] = BSON.BSON_DATA_NULL;
-        } else if(value instanceof MinKey) {
-          buffer[index++] = BSON.BSON_DATA_MIN_KEY;
-        } else {
-          buffer[index++] = BSON.BSON_DATA_MAX_KEY;
-        }
-
-        // Number of written bytes
-        var numberOfWrittenBytes = supportsBuffer ? buffer.write(name, index, 'utf8') : writeToTypedArray(buffer, name, index);
-        // Encode the name
-        index = index + numberOfWrittenBytes + 1;
-        buffer[index - 1] = 0;
-        return index;
-      } else if(value instanceof ObjectID || value['_bsontype'] == 'ObjectID') {
-        // console.log("+++++++++++ index OBJECTID:: " + index)
-        // Write the type
-        buffer[index++] = BSON.BSON_DATA_OID;
-        // Number of written bytes
-        var numberOfWrittenBytes = supportsBuffer ? buffer.write(name, index, 'utf8') : writeToTypedArray(buffer, name, index);
-        // Encode the name
-        index = index + numberOfWrittenBytes + 1;
-        buffer[index - 1] = 0;
-
-        // Write objectid
-        supportsBuffer ? buffer.write(value.id, index, 'binary') : writeToTypedArray(buffer, value.id, index);
-        // Ajust index
-        index = index + 12;
-        return index;
-      } else if(value instanceof Date || isDate(value)) {
-        // Write the type
-        buffer[index++] = BSON.BSON_DATA_DATE;
-        // Number of written bytes
-        var numberOfWrittenBytes = supportsBuffer ? buffer.write(name, index, 'utf8') : writeToTypedArray(buffer, name, index);
-        // Encode the name
-        index = index + numberOfWrittenBytes + 1;
-        buffer[index - 1] = 0;
-
-        // Write the date
-        var dateInMilis = Long.fromNumber(value.getTime());
-        var lowBits = dateInMilis.getLowBits();
-        var highBits = dateInMilis.getHighBits();
-        // Encode low bits
-        buffer[index++] = lowBits & 0xff;
-        buffer[index++] = (lowBits >> 8) & 0xff;
-        buffer[index++] = (lowBits >> 16) & 0xff;
-        buffer[index++] = (lowBits >> 24) & 0xff;
-        // Encode high bits
-        buffer[index++] = highBits & 0xff;
-        buffer[index++] = (highBits >> 8) & 0xff;
-        buffer[index++] = (highBits >> 16) & 0xff;
-        buffer[index++] = (highBits >> 24) & 0xff;
-        return index;
-      } else if(typeof Buffer !== 'undefined' && Buffer.isBuffer(value)) {
-        // Write the type
-        buffer[index++] = BSON.BSON_DATA_BINARY;
-        // Number of written bytes
-        var numberOfWrittenBytes = supportsBuffer ? buffer.write(name, index, 'utf8') : writeToTypedArray(buffer, name, index);
-        // Encode the name
-        index = index + numberOfWrittenBytes + 1;
-        buffer[index - 1] = 0;
-        // Get size of the buffer (current write point)
-        var size = value.length;
-        // Write the size of the string to buffer
-        buffer[index++] = size & 0xff;
-        buffer[index++] = (size >> 8) & 0xff;
-        buffer[index++] = (size >> 16) & 0xff;
-        buffer[index++] = (size >> 24) & 0xff;
-        // Write the default subtype
-        buffer[index++] = BSON.BSON_BINARY_SUBTYPE_DEFAULT;
-        // Copy the content form the binary field to the buffer
-        value.copy(buffer, index, 0, size);
-        // Adjust the index
-        index = index + size;
-        return index;
-      } else if(value instanceof Long || value instanceof Timestamp || value['_bsontype'] == 'Long' || value['_bsontype'] == 'Timestamp') {
-        // Write the type
-        buffer[index++] = value instanceof Long || value['_bsontype'] == 'Long' ? BSON.BSON_DATA_LONG : BSON.BSON_DATA_TIMESTAMP;
-        // Number of written bytes
-        var numberOfWrittenBytes = supportsBuffer ? buffer.write(name, index, 'utf8') : writeToTypedArray(buffer, name, index);
-        // Encode the name
-        index = index + numberOfWrittenBytes + 1;
-        buffer[index - 1] = 0;
-        // Write the date
-        var lowBits = value.getLowBits();
-        var highBits = value.getHighBits();
-        // Encode low bits
-        buffer[index++] = lowBits & 0xff;
-        buffer[index++] = (lowBits >> 8) & 0xff;
-        buffer[index++] = (lowBits >> 16) & 0xff;
-        buffer[index++] = (lowBits >> 24) & 0xff;
-        // Encode high bits
-        buffer[index++] = highBits & 0xff;
-        buffer[index++] = (highBits >> 8) & 0xff;
-        buffer[index++] = (highBits >> 16) & 0xff;
-        buffer[index++] = (highBits >> 24) & 0xff;
-        return index;
-      } else if(value instanceof Double || value['_bsontype'] == 'Double') {
-        // Encode as double
-        buffer[index++] = BSON.BSON_DATA_NUMBER;
-        // Number of written bytes
-        var numberOfWrittenBytes = supportsBuffer ? buffer.write(name, index, 'utf8') : writeToTypedArray(buffer, name, index);
-        // Encode the name
-        index = index + numberOfWrittenBytes + 1;
-        buffer[index - 1] = 0;
-        // Write float
-        writeIEEE754(buffer, value, index, 'little', 52, 8);
-        // Ajust index
-        index = index + 8;
-        return index;
-      } else if(value instanceof Code || value['_bsontype'] == 'Code') {
-        if(value.scope != null && Object.keys(value.scope).length > 0) {
-          // Write the type
-          buffer[index++] = BSON.BSON_DATA_CODE_W_SCOPE;
-          // Number of written bytes
-          var numberOfWrittenBytes = supportsBuffer ? buffer.write(name, index, 'utf8') : writeToTypedArray(buffer, name, index);
-          // Encode the name
-          index = index + numberOfWrittenBytes + 1;
-          buffer[index - 1] = 0;
-          // Calculate the scope size
-          var scopeSize = BSON.calculateObjectSize(value.scope, serializeFunctions);
-          // Function string
-          var functionString = value.code.toString();
-          // Function Size
-          var codeSize = supportsBuffer ? Buffer.byteLength(functionString) + 1 : numberOfBytes(functionString) + 1;
-
-          // Calculate full size of the object
-          var totalSize = 4 + codeSize + scopeSize + 4;
-
-          // Write the total size of the object
-          buffer[index++] = totalSize & 0xff;
-          buffer[index++] = (totalSize >> 8) & 0xff;
-          buffer[index++] = (totalSize >> 16) & 0xff;
-          buffer[index++] = (totalSize >> 24) & 0xff;
-
-          // Write the size of the string to buffer
-          buffer[index++] = codeSize & 0xff;
-          buffer[index++] = (codeSize >> 8) & 0xff;
-          buffer[index++] = (codeSize >> 16) & 0xff;
-          buffer[index++] = (codeSize >> 24) & 0xff;
-
-          // Write the string
-          supportsBuffer ? buffer.write(functionString, index, 'utf8') : writeToTypedArray(buffer, functionString, index);
-          // Update index
-          index = index + codeSize - 1;
-          // Write zero
-          buffer[index++] = 0;
-          // Serialize the scope object
-          var scopeObjectBuffer = supportsBuffer ? new Buffer(scopeSize) : new Uint8Array(new ArrayBuffer(scopeSize));
-          // Execute the serialization into a seperate buffer
-          serializeObject(value.scope, checkKeys, scopeObjectBuffer, 0, serializeFunctions);
-
-          // Adjusted scope Size (removing the header)
-          var scopeDocSize = scopeSize;
-          // Write scope object size
-          buffer[index++] = scopeDocSize & 0xff;
-          buffer[index++] = (scopeDocSize >> 8) & 0xff;
-          buffer[index++] = (scopeDocSize >> 16) & 0xff;
-          buffer[index++] = (scopeDocSize >> 24) & 0xff;
-
-          // Write the scopeObject into the buffer
-          supportsBuffer ? scopeObjectBuffer.copy(buffer, index, 0, scopeSize) : buffer.set(scopeObjectBuffer, index);
-          // Adjust index, removing the empty size of the doc (5 bytes 0000000005)
-          index = index + scopeDocSize - 5;
-          // Write trailing zero
-          buffer[index++] = 0;
-          return index
-        } else {
-          buffer[index++] = BSON.BSON_DATA_CODE;
-          // Number of written bytes
-          var numberOfWrittenBytes = supportsBuffer ? buffer.write(name, index, 'utf8') : writeToTypedArray(buffer, name, index);
-          // Encode the name
-          index = index + numberOfWrittenBytes + 1;
-          buffer[index - 1] = 0;
-          // Function string
-          var functionString = value.code.toString();
-          // Function Size
-          var size = supportsBuffer ? Buffer.byteLength(functionString) + 1 : numberOfBytes(functionString) + 1;
-          // Write the size of the string to buffer
-          buffer[index++] = size & 0xff;
-          buffer[index++] = (size >> 8) & 0xff;
-          buffer[index++] = (size >> 16) & 0xff;
-          buffer[index++] = (size >> 24) & 0xff;
-          // Write the string
-          supportsBuffer ? buffer.write(functionString, index, 'utf8') : writeToTypedArray(buffer, functionString, index);
-          // Update index
-          index = index + size - 1;
-          // Write zero
-          buffer[index++] = 0;
-          return index;
-        }
-      } else if(value instanceof Binary || value['_bsontype'] == 'Binary') {
-        // Write the type
-        buffer[index++] = BSON.BSON_DATA_BINARY;
-        // Number of written bytes
-        var numberOfWrittenBytes = supportsBuffer ? buffer.write(name, index, 'utf8') : writeToTypedArray(buffer, name, index);
-        // Encode the name
-        index = index + numberOfWrittenBytes + 1;
-        buffer[index - 1] = 0;
-        // Extract the buffer
-        var data = value.value(true);
-        // Calculate size
-        var size = value.position;
-        // Write the size of the string to buffer
-        buffer[index++] = size & 0xff;
-        buffer[index++] = (size >> 8) & 0xff;
-        buffer[index++] = (size >> 16) & 0xff;
-        buffer[index++] = (size >> 24) & 0xff;
-        // Write the subtype to the buffer
-        buffer[index++] = value.sub_type;
-
-        // If we have binary type 2 the 4 first bytes are the size
-        if(value.sub_type == Binary.SUBTYPE_BYTE_ARRAY) {
-          buffer[index++] = size & 0xff;
-          buffer[index++] = (size >> 8) & 0xff;
-          buffer[index++] = (size >> 16) & 0xff;
-          buffer[index++] = (size >> 24) & 0xff;
-        }
-
-        // Write the data to the object
-        supportsBuffer ? data.copy(buffer, index, 0, value.position) : buffer.set(data, index);
-        // Ajust index
-        index = index + value.position;
-        return index;
-      } else if(value instanceof Symbol || value['_bsontype'] == 'Symbol') {
-        // Write the type
-        buffer[index++] = BSON.BSON_DATA_SYMBOL;
-        // Number of written bytes
-        var numberOfWrittenBytes = supportsBuffer ? buffer.write(name, index, 'utf8') : writeToTypedArray(buffer, name, index);
-        // Encode the name
-        index = index + numberOfWrittenBytes + 1;
-        buffer[index - 1] = 0;
-        // Calculate size
-        var size = supportsBuffer ? Buffer.byteLength(value.value) + 1 : numberOfBytes(value.value) + 1;
-        // Write the size of the string to buffer
-        buffer[index++] = size & 0xff;
-        buffer[index++] = (size >> 8) & 0xff;
-        buffer[index++] = (size >> 16) & 0xff;
-        buffer[index++] = (size >> 24) & 0xff;
-        // Write the string
-        buffer.write(value.value, index, 'utf8');
-        // Update index
-        index = index + size - 1;
-        // Write zero
-        buffer[index++] = 0x00;
-        return index;
-      } else if(value instanceof DBRef || value['_bsontype'] == 'DBRef') {
-        // Write the type
-        buffer[index++] = BSON.BSON_DATA_OBJECT;
-        // Number of written bytes
-        var numberOfWrittenBytes = supportsBuffer ? buffer.write(name, index, 'utf8') : writeToTypedArray(buffer, name, index);
-        // Encode the name
-        index = index + numberOfWrittenBytes + 1;
-        buffer[index - 1] = 0;
-        // Set up correct object for serialization
-        var ordered_values = {
-            '$ref': value.namespace
-          , '$id' : value.oid
-        };
-
-        // Add db reference if it exists
-        if(null != value.db) {
-          ordered_values['$db'] = value.db;
-        }
-
-        // Message size
-        var size = BSON.calculateObjectSize(ordered_values, serializeFunctions);
-        // Serialize the object
-        var endIndex = BSON.serializeWithBufferAndIndex(ordered_values, checkKeys, buffer, index, serializeFunctions);
-        // Write the size of the string to buffer
-        buffer[index++] = size & 0xff;
-        buffer[index++] = (size >> 8) & 0xff;
-        buffer[index++] = (size >> 16) & 0xff;
-        buffer[index++] = (size >> 24) & 0xff;
-        // Write zero for object
-        buffer[endIndex++] = 0x00;
-        // Return the end index
-        return endIndex;
-      } else if(value instanceof RegExp || Object.prototype.toString.call(value) === '[object RegExp]') {
-        // Write the type
-        buffer[index++] = BSON.BSON_DATA_REGEXP;
-        // Number of written bytes
-        var numberOfWrittenBytes = supportsBuffer ? buffer.write(name, index, 'utf8') : writeToTypedArray(buffer, name, index);
-        // Encode the name
-        index = index + numberOfWrittenBytes + 1;
-        buffer[index - 1] = 0;
-
-        // Write the regular expression string
-        supportsBuffer ? buffer.write(value.source, index, 'utf8') : writeToTypedArray(buffer, value.source, index);
-        // Adjust the index
-        index = index + (supportsBuffer ? Buffer.byteLength(value.source) : numberOfBytes(value.source));
-        // Write zero
-        buffer[index++] = 0x00;
-        // Write the parameters
-        if(value.global) buffer[index++] = 0x73; // s
-        if(value.ignoreCase) buffer[index++] = 0x69; // i
-        if(value.multiline) buffer[index++] = 0x6d; // m
-        // Add ending zero
-        buffer[index++] = 0x00;
-        return index;
-      } else {
-        // Write the type
-        buffer[index++] = Array.isArray(value) ? BSON.BSON_DATA_ARRAY : BSON.BSON_DATA_OBJECT;
-        // Number of written bytes
-        var numberOfWrittenBytes = supportsBuffer ? buffer.write(name, index, 'utf8') : writeToTypedArray(buffer, name, index);
-        // Adjust the index
-        index = index + numberOfWrittenBytes + 1;
-        buffer[index - 1] = 0;
-	      var endIndex = serializeObject(value, checkKeys, buffer, index + 4, serializeFunctions);
-        // Write size
-        var size = endIndex - index;
-        // Write the size of the string to buffer
-        buffer[index++] = size & 0xff;
-        buffer[index++] = (size >> 8) & 0xff;
-        buffer[index++] = (size >> 16) & 0xff;
-        buffer[index++] = (size >> 24) & 0xff;
-        return endIndex;
-      }
-    case 'function':
-      // WTF for 0.4.X where typeof /someregexp/ === 'function'
-      if(value instanceof RegExp || Object.prototype.toString.call(value) === '[object RegExp]' || String.call(value) == '[object RegExp]') {
-        // Write the type
-        buffer[index++] = BSON.BSON_DATA_REGEXP;
-        // Number of written bytes
-        var numberOfWrittenBytes = supportsBuffer ? buffer.write(name, index, 'utf8') : writeToTypedArray(buffer, name, index);
-        // Encode the name
-        index = index + numberOfWrittenBytes + 1;
-        buffer[index - 1] = 0;
-
-        // Write the regular expression string
-        buffer.write(value.source, index, 'utf8');
-        // Adjust the index
-        index = index + (supportsBuffer ? Buffer.byteLength(value.source) : numberOfBytes(value.source));
-        // Write zero
-        buffer[index++] = 0x00;
-        // Write the parameters
-        if(value.global) buffer[index++] = 0x73; // s
-        if(value.ignoreCase) buffer[index++] = 0x69; // i
-        if(value.multiline) buffer[index++] = 0x6d; // m
-        // Add ending zero
-        buffer[index++] = 0x00;
-        return index;
-      } else {
-        if(serializeFunctions && value.scope != null && Object.keys(value.scope).length > 0) {
-          // Write the type
-          buffer[index++] = BSON.BSON_DATA_CODE_W_SCOPE;
-          // Number of written bytes
-          var numberOfWrittenBytes = supportsBuffer ? buffer.write(name, index, 'utf8') : writeToTypedArray(buffer, name, index);
-          // Encode the name
-          index = index + numberOfWrittenBytes + 1;
-          buffer[index - 1] = 0;
-          // Calculate the scope size
-          var scopeSize = BSON.calculateObjectSize(value.scope, serializeFunctions);
-          // Function string
-          var functionString = value.toString();
-          // Function Size
-          var codeSize = supportsBuffer ? Buffer.byteLength(functionString) + 1 : numberOfBytes(functionString) + 1;
-
-          // Calculate full size of the object
-          var totalSize = 4 + codeSize + scopeSize;
-
-          // Write the total size of the object
-          buffer[index++] = totalSize & 0xff;
-          buffer[index++] = (totalSize >> 8) & 0xff;
-          buffer[index++] = (totalSize >> 16) & 0xff;
-          buffer[index++] = (totalSize >> 24) & 0xff;
-
-          // Write the size of the string to buffer
-          buffer[index++] = codeSize & 0xff;
-          buffer[index++] = (codeSize >> 8) & 0xff;
-          buffer[index++] = (codeSize >> 16) & 0xff;
-          buffer[index++] = (codeSize >> 24) & 0xff;
-
-          // Write the string
-          supportsBuffer ? buffer.write(functionString, index, 'utf8') : writeToTypedArray(buffer, functionString, index);
-          // Update index
-          index = index + codeSize - 1;
-          // Write zero
-          buffer[index++] = 0;
-          // Serialize the scope object
-          var scopeObjectBuffer = new Buffer(scopeSize);
-          // Execute the serialization into a seperate buffer
-          serializeObject(value.scope, checkKeys, scopeObjectBuffer, 0, serializeFunctions);
-
-          // Adjusted scope Size (removing the header)
-          var scopeDocSize = scopeSize - 4;
-          // Write scope object size
-          buffer[index++] = scopeDocSize & 0xff;
-          buffer[index++] = (scopeDocSize >> 8) & 0xff;
-          buffer[index++] = (scopeDocSize >> 16) & 0xff;
-          buffer[index++] = (scopeDocSize >> 24) & 0xff;
-
-          // Write the scopeObject into the buffer
-          scopeObjectBuffer.copy(buffer, index, 0, scopeSize);
-
-          // Adjust index, removing the empty size of the doc (5 bytes 0000000005)
-          index = index + scopeDocSize - 5;
-          // Write trailing zero
-          buffer[index++] = 0;
-          return index
-        } else if(serializeFunctions) {
-          buffer[index++] = BSON.BSON_DATA_CODE;
-          // Number of written bytes
-          var numberOfWrittenBytes = supportsBuffer ? buffer.write(name, index, 'utf8') : writeToTypedArray(buffer, name, index);
-          // Encode the name
-          index = index + numberOfWrittenBytes + 1;
-          buffer[index - 1] = 0;
-          // Function string
-          var functionString = value.toString();
-          // Function Size
-          var size = supportsBuffer ? Buffer.byteLength(functionString) + 1 : numberOfBytes(functionString) + 1;
-          // Write the size of the string to buffer
-          buffer[index++] = size & 0xff;
-          buffer[index++] = (size >> 8) & 0xff;
-          buffer[index++] = (size >> 16) & 0xff;
-          buffer[index++] = (size >> 24) & 0xff;
-          // Write the string
-          supportsBuffer ? buffer.write(functionString, index, 'utf8') : writeToTypedArray(buffer, functionString, index);
-          // Update index
-          index = index + size - 1;
-          // Write zero
-          buffer[index++] = 0;
-          return index;
-        }
-      }
-  }
-
-  // If no value to serialize
-  return index;
-}
-
-/**
- * Serialize a Javascript object.
- *
- * @param {Object} object the Javascript object to serialize.
- * @param {Boolean} checkKeys the serializer will check if keys are valid.
- * @param {Boolean} asBuffer return the serialized object as a Buffer object **(ignore)**.
- * @param {Boolean} serializeFunctions serialize the javascript functions **(default:false)**.
- * @return {Buffer} returns the Buffer object containing the serialized object.
- * @api public
- */
-BSON.serialize = function(object, checkKeys, asBuffer, serializeFunctions) {
-  // Throw error if we are trying serialize an illegal type
-  if(object == null || typeof object != 'object' || Array.isArray(object)) 
-    throw new Error("Only javascript objects supported");
-  
-  // Emoty target buffer
-  var buffer = null;
-  // Calculate the size of the object
-  var size = BSON.calculateObjectSize(object, serializeFunctions);
-  // Fetch the best available type for storing the binary data
-  if(buffer = typeof Buffer != 'undefined') {
-    buffer = new Buffer(size);
-    asBuffer = true;
-  } else if(typeof Uint8Array != 'undefined') {
-    buffer = new Uint8Array(new ArrayBuffer(size));
-  } else {
-    buffer = new Array(size);
-  }
-
-  // If asBuffer is false use typed arrays
-  BSON.serializeWithBufferAndIndex(object, checkKeys, buffer, 0, serializeFunctions);
-  // console.log("++++++++++++++++++++++++++++++++++++ OLDJS :: " + buffer.length)  
-  // console.log(buffer.toString('hex'))
-  // console.log(buffer.toString('ascii'))
-  return buffer;
-}
-
-/**
- * Contains the function cache if we have that enable to allow for avoiding the eval step on each deserialization, comparison is by md5
- *
- * @ignore
- * @api private
- */
-var functionCache = BSON.functionCache = {};
-
-/**
- * Crc state variables shared by function
- *
- * @ignore
- * @api private
- */
-var table = [0x00000000, 0x77073096, 0xEE0E612C, 0x990951BA, 0x076DC419, 0x706AF48F, 0xE963A535, 0x9E6495A3, 0x0EDB8832, 0x79DCB8A4, 0xE0D5E91E, 0x97D2D988, 0x09B64C2B, 0x7EB17CBD, 0xE7B82D07, 0x90BF1D91, 0x1DB71064, 0x6AB020F2, 0xF3B97148, 0x84BE41DE, 0x1ADAD47D, 0x6DDDE4EB, 0xF4D4B551, 0x83D385C7, 0x136C9856, 0x646BA8C0, 0xFD62F97A, 0x8A65C9EC, 0x14015C4F, 0x63066CD9, 0xFA0F3D63, 0x8D080DF5, 0x3B6E20C8, 0x4C69105E, 0xD56041E4, 0xA2677172, 0x3C03E4D1, 0x4B04D447, 0xD20D85FD, 0xA50AB56B, 0x35B5A8FA, 0x42B2986C, 0xDBBBC9D6, 0xACBCF940, 0x32D86CE3, 0x45DF5C75, 0xDCD60DCF, 0xABD13D59, 0x26D930AC, 0x51DE003A, 0xC8D75180, 0xBFD06116, 0x21B4F4B5, 0x56B3C423, 0xCFBA9599, 0xB8BDA50F, 0x2802B89E, 0x5F058808, 0xC60CD9B2, 0xB10BE924, 0x2F6F7C87, 0x58684C11, 0xC1611DAB, 0xB6662D3D, 0x76DC4190, 0x01DB7106, 0x98D220BC, 0xEFD5102A, 0x71B18589, 0x06B6B51F, 0x9FBFE4A5, 0xE8B8D433, 0x7807C9A2, 0x0F00F934, 0x9609A88E, 0xE10E9818, 0x7F6A0DBB, 0x086D3D2D, 0x91646C97, 0xE6635C01, 0x6B6B51F4, 0x1C6C6162, 0x856530D8, 0xF262004E, 0x6C0695ED, 0x1B01A57B, 0x8208F4C1, 0xF50FC457, 0x65B0D9C6, 0x12B7E950, 0x8BBEB8EA, 0xFCB9887C, 0x62DD1DDF, 0x15DA2D49, 0x8CD37CF3, 0xFBD44C65, 0x4DB26158, 0x3AB551CE, 0xA3BC0074, 0xD4BB30E2, 0x4ADFA541, 0x3DD895D7, 0xA4D1C46D, 0xD3D6F4FB, 0x4369E96A, 0x346ED9FC, 0xAD678846, 0xDA60B8D0, 0x44042D73, 0x33031DE5, 0xAA0A4C5F, 0xDD0D7CC9, 0x5005713C, 0x270241AA, 0xBE0B1010, 0xC90C2086, 0x5768B525, 0x206F85B3, 0xB966D409, 0xCE61E49F, 0x5EDEF90E, 0x29D9C998, 0xB0D09822, 0xC7D7A8B4, 0x59B33D17, 0x2EB40D81, 0xB7BD5C3B, 0xC0BA6CAD, 0xEDB88320, 0x9ABFB3B6, 0x03B6E20C, 0x74B1D29A, 0xEAD54739, 0x9DD277AF, 0x04DB2615, 0x73DC1683, 0xE3630B12, 0x94643B84, 0x0D6D6A3E, 0x7A6A5AA8, 0xE40ECF0B, 0x9309FF9D, 0x0A00AE27, 0x7D079EB1, 0xF00F9344, 0x8708A3D2, 0x1E01F268, 0x6906C2FE, 0xF762575D, 0x806567CB, 0x196C3671, 0x6E6B06E7, 0xFED41B76, 0x89D32BE0, 0x10DA7A5A, 0x67DD4ACC, 0xF9B9DF6F, 0x8EBEEFF9, 0x17B7BE43, 0x60B08ED5, 0xD6D6A3E8, 0xA1D1937E, 0x38D8C2C4, 0x4FDFF252, 0xD1BB67F1, 0xA6BC5767, 0x3FB506DD, 0x48B2364B, 0xD80D2BDA, 0xAF0A1B4C, 0x36034AF6, 0x41047A60, 0xDF60EFC3, 0xA867DF55, 0x316E8EEF, 0x4669BE79, 0xCB61B38C, 0xBC66831A, 0x256FD2A0, 0x5268E236, 0xCC0C7795, 0xBB0B4703, 0x220216B9, 0x5505262F, 0xC5BA3BBE, 0xB2BD0B28, 0x2BB45A92, 0x5CB36A04, 0xC2D7FFA7, 0xB5D0CF31, 0x2CD99E8B, 0x5BDEAE1D, 0x9B64C2B0, 0xEC63F226, 0x756AA39C, 0x026D930A, 0x9C0906A9, 0xEB0E363F, 0x72076785, 0x05005713, 0x95BF4A82, 0xE2B87A14, 0x7BB12BAE, 0x0CB61B38, 0x92D28E9B, 0xE5D5BE0D, 0x7CDCEFB7, 0x0BDBDF21, 0x86D3D2D4, 0xF1D4E242, 0x68DDB3F8, 0x1FDA836E, 0x81BE16CD, 0xF6B9265B, 0x6FB077E1, 0x18B74777, 0x88085AE6, 0xFF0F6A70, 0x66063BCA, 0x11010B5C, 0x8F659EFF, 0xF862AE69, 0x616BFFD3, 0x166CCF45, 0xA00AE278, 0xD70DD2EE, 0x4E048354, 0x3903B3C2, 0xA7672661, 0xD06016F7, 0x4969474D, 0x3E6E77DB, 0xAED16A4A, 0xD9D65ADC, 0x40DF0B66, 0x37D83BF0, 0xA9BCAE53, 0xDEBB9EC5, 0x47B2CF7F, 0x30B5FFE9, 0xBDBDF21C, 0xCABAC28A, 0x53B39330, 0x24B4A3A6, 0xBAD03605, 0xCDD70693, 0x54DE5729, 0x23D967BF, 0xB3667A2E, 0xC4614AB8, 0x5D681B02, 0x2A6F2B94, 0xB40BBE37, 0xC30C8EA1, 0x5A05DF1B, 0x2D02EF8D];
-
-/**
- * CRC32 hash method, Fast and enough versitility for our usage
- *
- * @ignore
- * @api private
- */
-var crc32 =  function(string, start, end) {
-  var crc = 0
-  var x = 0;
-  var y = 0;
-  crc = crc ^ (-1);
-
-  for(var i = start, iTop = end; i < iTop;i++) {
-  	y = (crc ^ string[i]) & 0xFF;
-    x = table[y];
-  	crc = (crc >>> 8) ^ x;
-  }
-
-  return crc ^ (-1);
-}
-
-/**
- * Deserialize stream data as BSON documents.
- *
- * Options
- *  - **evalFunctions** {Boolean, default:false}, evaluate functions in the BSON document scoped to the object deserialized.
- *  - **cacheFunctions** {Boolean, default:false}, cache evaluated functions for reuse.
- *  - **cacheFunctionsCrc32** {Boolean, default:false}, use a crc32 code for caching, otherwise use the string of the function.
- *  - **promoteLongs** {Boolean, default:true}, when deserializing a Long will fit it into a Number if it's smaller than 53 bits
- *
- * @param {Buffer} data the buffer containing the serialized set of BSON documents.
- * @param {Number} startIndex the start index in the data Buffer where the deserialization is to start.
- * @param {Number} numberOfDocuments number of documents to deserialize.
- * @param {Array} documents an array where to store the deserialized documents.
- * @param {Number} docStartIndex the index in the documents array from where to start inserting documents.
- * @param {Object} [options] additional options used for the deserialization.
- * @return {Number} returns the next index in the buffer after deserialization **x** numbers of documents.
- * @api public
- */
-BSON.deserializeStream = function(data, startIndex, numberOfDocuments, documents, docStartIndex, options) {
-  // if(numberOfDocuments !== documents.length) throw new Error("Number of expected results back is less than the number of documents");
-  options = options != null ? options : {};
-  var index = startIndex;
-  // Loop over all documents
-  for(var i = 0; i < numberOfDocuments; i++) {
-    // Find size of the document
-    var size = data[index] | data[index + 1] << 8 | data[index + 2] << 16 | data[index + 3] << 24;
-    // Update options with index
-    options['index'] = index;
-    // Parse the document at this point
-    documents[docStartIndex + i] = BSON.deserialize(data, options);
-    // Adjust index by the document size
-    index = index + size;
-  }
-
-  // Return object containing end index of parsing and list of documents
-  return index;
-}
-
-/**
- * Ensure eval is isolated.
- *
- * @ignore
- * @api private
- */
-var isolateEvalWithHash = function(functionCache, hash, functionString, object) {
-  // Contains the value we are going to set
-  var value = null;
-
-  // Check for cache hit, eval if missing and return cached function
-  if(functionCache[hash] == null) {
-    eval("value = " + functionString);
-    functionCache[hash] = value;
-  }
-  // Set the object
-  return functionCache[hash].bind(object);
-}
-
-/**
- * Ensure eval is isolated.
- *
- * @ignore
- * @api private
- */
-var isolateEval = function(functionString) {
-  // Contains the value we are going to set
-  var value = null;
-  // Eval the function
-  eval("value = " + functionString);
-  return value;
-}
-
-/**
- * Convert Uint8Array to String
- *
- * @ignore
- * @api private
- */
-var convertUint8ArrayToUtf8String = function(byteArray, startIndex, endIndex) {
-  return BinaryParser.decode_utf8(convertArraytoUtf8BinaryString(byteArray, startIndex, endIndex));
-}
-
-var convertArraytoUtf8BinaryString = function(byteArray, startIndex, endIndex) {
-  var result = "";
-  for(var i = startIndex; i < endIndex; i++) {
-    result = result + String.fromCharCode(byteArray[i]);
-  }
-
-  return result;
-};
-
-/**
- * Deserialize data as BSON.
- *
- * Options
- *  - **evalFunctions** {Boolean, default:false}, evaluate functions in the BSON document scoped to the object deserialized.
- *  - **cacheFunctions** {Boolean, default:false}, cache evaluated functions for reuse.
- *  - **cacheFunctionsCrc32** {Boolean, default:false}, use a crc32 code for caching, otherwise use the string of the function.
- *  - **promoteLongs** {Boolean, default:true}, when deserializing a Long will fit it into a Number if it's smaller than 53 bits
- *
- * @param {Buffer} buffer the buffer containing the serialized set of BSON documents.
- * @param {Object} [options] additional options used for the deserialization.
- * @param {Boolean} [isArray] ignore used for recursive parsing.
- * @return {Object} returns the deserialized Javascript Object.
- * @api public
- */
-BSON.deserialize = function(buffer, options, isArray) {
-  // Options
-  options = options == null ? {} : options;
-  var evalFunctions = options['evalFunctions'] == null ? false : options['evalFunctions'];
-  var cacheFunctions = options['cacheFunctions'] == null ? false : options['cacheFunctions'];
-  var cacheFunctionsCrc32 = options['cacheFunctionsCrc32'] == null ? false : options['cacheFunctionsCrc32'];
-  var promoteLongs = options['promoteLongs'] == null ? true : options['promoteLongs'];
-
-  // Validate that we have at least 4 bytes of buffer
-  if(buffer.length < 5) throw new Error("corrupt bson message < 5 bytes long");
-
-  // Set up index
-  var index = typeof options['index'] == 'number' ? options['index'] : 0;
-  // Reads in a C style string
-  var readCStyleString = function() {
-    // Get the start search index
-    var i = index;
-    // Locate the end of the c string
-    while(buffer[i] !== 0x00 && i < buffer.length) { 
-      i++ 
-    }
-    // If are at the end of the buffer there is a problem with the document
-    if(i >= buffer.length) throw new Error("Bad BSON Document: illegal CString")
-    // Grab utf8 encoded string
-    var string = supportsBuffer && Buffer.isBuffer(buffer) ? buffer.toString('utf8', index, i) : convertUint8ArrayToUtf8String(buffer, index, i);
-    // Update index position
-    index = i + 1;
-    // Return string
-    return string;
-  }
-
-  // Create holding object
-  var object = isArray ? [] : {};
-
-  // Read the document size
-  var size = buffer[index++] | buffer[index++] << 8 | buffer[index++] << 16 | buffer[index++] << 24;
-
-  // Ensure buffer is valid size
-  if(size < 5 || size > buffer.length) throw new Error("corrupt bson message");
-
-  // While we have more left data left keep parsing
-  while(true) {
-    // Read the type
-    var elementType = buffer[index++];
-    // If we get a zero it's the last byte, exit
-    if(elementType == 0) break;
-    // Read the name of the field
-    var name = readCStyleString();
-    // Switch on the type
-    switch(elementType) {
-      case BSON.BSON_DATA_OID:
-        var string = supportsBuffer && Buffer.isBuffer(buffer) ? buffer.toString('binary', index, index + 12) : convertArraytoUtf8BinaryString(buffer, index, index + 12);
-        // Decode the oid
-        object[name] = new ObjectID(string);
-        // Update index
-        index = index + 12;
-        break;
-      case BSON.BSON_DATA_STRING:
-        // Read the content of the field
-        var stringSize = buffer[index++] | buffer[index++] << 8 | buffer[index++] << 16 | buffer[index++] << 24;
-        // Add string to object
-        object[name] = supportsBuffer && Buffer.isBuffer(buffer) ? buffer.toString('utf8', index, index + stringSize - 1) : convertUint8ArrayToUtf8String(buffer, index, index + stringSize - 1);
-        // Update parse index position
-        index = index + stringSize;
-        break;
-      case BSON.BSON_DATA_INT:
-        // Decode the 32bit value
-        object[name] = buffer[index++] | buffer[index++] << 8 | buffer[index++] << 16 | buffer[index++] << 24;
-        break;
-      case BSON.BSON_DATA_NUMBER:
-        // Decode the double value
-        object[name] = readIEEE754(buffer, index, 'little', 52, 8);
-        // Update the index
-        index = index + 8;
-        break;
-      case BSON.BSON_DATA_DATE:
-        // Unpack the low and high bits
-        var lowBits = buffer[index++] | buffer[index++] << 8 | buffer[index++] << 16 | buffer[index++] << 24;
-        var highBits = buffer[index++] | buffer[index++] << 8 | buffer[index++] << 16 | buffer[index++] << 24;
-        // Set date object
-        object[name] = new Date(new Long(lowBits, highBits).toNumber());
-        break;
-      case BSON.BSON_DATA_BOOLEAN:
-        // Parse the boolean value
-        object[name] = buffer[index++] == 1;
-        break;
-      case BSON.BSON_DATA_UNDEFINED:
-      case BSON.BSON_DATA_NULL:
-        // Parse the boolean value
-        object[name] = null;
-        break;
-      case BSON.BSON_DATA_BINARY:
-        // Decode the size of the binary blob
-        var binarySize = buffer[index++] | buffer[index++] << 8 | buffer[index++] << 16 | buffer[index++] << 24;
-        // Decode the subtype
-        var subType = buffer[index++];
-        // Decode as raw Buffer object if options specifies it
-        if(buffer['slice'] != null) {
-          // If we have subtype 2 skip the 4 bytes for the size
-          if(subType == Binary.SUBTYPE_BYTE_ARRAY) {
-            binarySize = buffer[index++] | buffer[index++] << 8 | buffer[index++] << 16 | buffer[index++] << 24;
-          }
-          // Slice the data
-          object[name] = new Binary(buffer.slice(index, index + binarySize), subType);
-        } else {
-          var _buffer = typeof Uint8Array != 'undefined' ? new Uint8Array(new ArrayBuffer(binarySize)) : new Array(binarySize);
-          // If we have subtype 2 skip the 4 bytes for the size
-          if(subType == Binary.SUBTYPE_BYTE_ARRAY) {
-            binarySize = buffer[index++] | buffer[index++] << 8 | buffer[index++] << 16 | buffer[index++] << 24;
-          }
-          // Copy the data
-          for(var i = 0; i < binarySize; i++) {
-            _buffer[i] = buffer[index + i];
-          }
-          // Create the binary object
-          object[name] = new Binary(_buffer, subType);
-        }
-        // Update the index
-        index = index + binarySize;
-        break;
-      case BSON.BSON_DATA_ARRAY:
-        options['index'] = index;
-        // Decode the size of the array document
-        var objectSize = buffer[index] | buffer[index + 1] << 8 | buffer[index + 2] << 16 | buffer[index + 3] << 24;
-        // Set the array to the object
-        object[name] = BSON.deserialize(buffer, options, true);
-        // Adjust the index
-        index = index + objectSize;
-        break;
-      case BSON.BSON_DATA_OBJECT:
-        options['index'] = index;
-        // Decode the size of the object document
-        var objectSize = buffer[index] | buffer[index + 1] << 8 | buffer[index + 2] << 16 | buffer[index + 3] << 24;
-        // Set the array to the object
-        object[name] = BSON.deserialize(buffer, options, false);
-        // Adjust the index
-        index = index + objectSize;
-        break;
-      case BSON.BSON_DATA_REGEXP:
-        // Create the regexp
-        var source = readCStyleString();
-        var regExpOptions = readCStyleString();
-        // For each option add the corresponding one for javascript
-        var optionsArray = new Array(regExpOptions.length);
-
-        // Parse options
-        for(var i = 0; i < regExpOptions.length; i++) {
-          switch(regExpOptions[i]) {
-            case 'm':
-              optionsArray[i] = 'm';
-              break;
-            case 's':
-              optionsArray[i] = 'g';
-              break;
-            case 'i':
-              optionsArray[i] = 'i';
-              break;
-          }
-        }
-
-        object[name] = new RegExp(source, optionsArray.join(''));
-        break;
-      case BSON.BSON_DATA_LONG:
-        // Unpack the low and high bits
-        var lowBits = buffer[index++] | buffer[index++] << 8 | buffer[index++] << 16 | buffer[index++] << 24;
-        var highBits = buffer[index++] | buffer[index++] << 8 | buffer[index++] << 16 | buffer[index++] << 24;
-        // Create long object
-        var long = new Long(lowBits, highBits); 
-        // Promote the long if possible
-        if(promoteLongs) {
-          object[name] = long.lessThanOrEqual(JS_INT_MAX_LONG) && long.greaterThanOrEqual(JS_INT_MIN_LONG) ? long.toNumber() : long;
-        } else {
-          object[name] = long;
-        }
-        break;
-      case BSON.BSON_DATA_SYMBOL:
-        // Read the content of the field
-        var stringSize = buffer[index++] | buffer[index++] << 8 | buffer[index++] << 16 | buffer[index++] << 24;
-        // Add string to object
-        object[name] = new Symbol(buffer.toString('utf8', index, index + stringSize - 1));
-        // Update parse index position
-        index = index + stringSize;
-        break;
-      case BSON.BSON_DATA_TIMESTAMP:
-        // Unpack the low and high bits
-        var lowBits = buffer[index++] | buffer[index++] << 8 | buffer[index++] << 16 | buffer[index++] << 24;
-        var highBits = buffer[index++] | buffer[index++] << 8 | buffer[index++] << 16 | buffer[index++] << 24;
-        // Set the object
-        object[name] = new Timestamp(lowBits, highBits);
-        break;
-      case BSON.BSON_DATA_MIN_KEY:
-        // Parse the object
-        object[name] = new MinKey();
-        break;
-      case BSON.BSON_DATA_MAX_KEY:
-        // Parse the object
-        object[name] = new MaxKey();
-        break;
-      case BSON.BSON_DATA_CODE:
-        // Read the content of the field
-        var stringSize = buffer[index++] | buffer[index++] << 8 | buffer[index++] << 16 | buffer[index++] << 24;
-        // Function string
-        var functionString = supportsBuffer && Buffer.isBuffer(buffer) ? buffer.toString('utf8', index, index + stringSize - 1) : convertUint8ArrayToUtf8String(buffer, index, index + stringSize - 1);
-
-        // If we are evaluating the functions
-        if(evalFunctions) {
-          // Contains the value we are going to set
-          var value = null;
-          // If we have cache enabled let's look for the md5 of the function in the cache
-          if(cacheFunctions) {
-            var hash = cacheFunctionsCrc32 ? crc32(functionString) : functionString;
-            // Got to do this to avoid V8 deoptimizing the call due to finding eval
-            object[name] = isolateEvalWithHash(functionCache, hash, functionString, object);
-          } else {
-            // Set directly
-            object[name] = isolateEval(functionString);
-          }
-        } else {
-          object[name]  = new Code(functionString, {});
-        }
-
-        // Update parse index position
-        index = index + stringSize;
-        break;
-      case BSON.BSON_DATA_CODE_W_SCOPE:
-        // Read the content of the field
-        var totalSize = buffer[index++] | buffer[index++] << 8 | buffer[index++] << 16 | buffer[index++] << 24;
-        var stringSize = buffer[index++] | buffer[index++] << 8 | buffer[index++] << 16 | buffer[index++] << 24;
-        // Javascript function
-        var functionString = supportsBuffer && Buffer.isBuffer(buffer) ? buffer.toString('utf8', index, index + stringSize - 1) : convertUint8ArrayToUtf8String(buffer, index, index + stringSize - 1);
-        // Update parse index position
-        index = index + stringSize;
-        // Parse the element
-        options['index'] = index;
-        // Decode the size of the object document
-        var objectSize = buffer[index] | buffer[index + 1] << 8 | buffer[index + 2] << 16 | buffer[index + 3] << 24;
-        // Decode the scope object
-        var scopeObject = BSON.deserialize(buffer, options, false);
-        // Adjust the index
-        index = index + objectSize;
-
-        // If we are evaluating the functions
-        if(evalFunctions) {
-          // Contains the value we are going to set
-          var value = null;
-          // If we have cache enabled let's look for the md5 of the function in the cache
-          if(cacheFunctions) {
-            var hash = cacheFunctionsCrc32 ? crc32(functionString) : functionString;
-            // Got to do this to avoid V8 deoptimizing the call due to finding eval
-            object[name] = isolateEvalWithHash(functionCache, hash, functionString, object);
-          } else {
-            // Set directly
-            object[name] = isolateEval(functionString);
-          }
-
-          // Set the scope on the object
-          object[name].scope = scopeObject;
-        } else {
-          object[name]  = new Code(functionString, scopeObject);
-        }
-
-        // Add string to object
-        break;
-    }
-  }
-
-  // Check if we have a db ref object
-  if(object['$id'] != null) object = new DBRef(object['$ref'], object['$id'], object['$db']);
-
-  // Return the final objects
-  return object;
-}
-
-/**
- * Check if key name is valid.
- *
- * @ignore
- * @api private
- */
-BSON.checkKey = function checkKey (key, dollarsAndDotsOk) {
-  if (!key.length) return;
-  // Check if we have a legal key for the object
-  if (!!~key.indexOf("\x00")) {
-    // The BSON spec doesn't allow keys with null bytes because keys are
-    // null-terminated.
-    throw Error("key " + key + " must not contain null bytes");
-  }
-  if (!dollarsAndDotsOk) {
-    if('$' == key[0]) {
-      throw Error("key " + key + " must not start with '$'");
-    } else if (!!~key.indexOf('.')) {
-      throw Error("key " + key + " must not contain '.'");
-    }
-  }
-};
-
-/**
- * Deserialize data as BSON.
- *
- * Options
- *  - **evalFunctions** {Boolean, default:false}, evaluate functions in the BSON document scoped to the object deserialized.
- *  - **cacheFunctions** {Boolean, default:false}, cache evaluated functions for reuse.
- *  - **cacheFunctionsCrc32** {Boolean, default:false}, use a crc32 code for caching, otherwise use the string of the function.
- *
- * @param {Buffer} buffer the buffer containing the serialized set of BSON documents.
- * @param {Object} [options] additional options used for the deserialization.
- * @param {Boolean} [isArray] ignore used for recursive parsing.
- * @return {Object} returns the deserialized Javascript Object.
- * @api public
- */
-BSON.prototype.deserialize = function(data, options) {
-  return BSON.deserialize(data, options);
-}
-
-/**
- * Deserialize stream data as BSON documents.
- *
- * Options
- *  - **evalFunctions** {Boolean, default:false}, evaluate functions in the BSON document scoped to the object deserialized.
- *  - **cacheFunctions** {Boolean, default:false}, cache evaluated functions for reuse.
- *  - **cacheFunctionsCrc32** {Boolean, default:false}, use a crc32 code for caching, otherwise use the string of the function.
- *
- * @param {Buffer} data the buffer containing the serialized set of BSON documents.
- * @param {Number} startIndex the start index in the data Buffer where the deserialization is to start.
- * @param {Number} numberOfDocuments number of documents to deserialize.
- * @param {Array} documents an array where to store the deserialized documents.
- * @param {Number} docStartIndex the index in the documents array from where to start inserting documents.
- * @param {Object} [options] additional options used for the deserialization.
- * @return {Number} returns the next index in the buffer after deserialization **x** numbers of documents.
- * @api public
- */
-BSON.prototype.deserializeStream = function(data, startIndex, numberOfDocuments, documents, docStartIndex, options) {
-  return BSON.deserializeStream(data, startIndex, numberOfDocuments, documents, docStartIndex, options);
-}
-
-/**
- * Serialize a Javascript object.
- *
- * @param {Object} object the Javascript object to serialize.
- * @param {Boolean} checkKeys the serializer will check if keys are valid.
- * @param {Boolean} asBuffer return the serialized object as a Buffer object **(ignore)**.
- * @param {Boolean} serializeFunctions serialize the javascript functions **(default:false)**.
- * @return {Buffer} returns the Buffer object containing the serialized object.
- * @api public
- */
-BSON.prototype.serialize = function(object, checkKeys, asBuffer, serializeFunctions) {
-  return BSON.serialize(object, checkKeys, asBuffer, serializeFunctions);
-}
-
-/**
- * Calculate the bson size for a passed in Javascript object.
- *
- * @param {Object} object the Javascript object to calculate the BSON byte size for.
- * @param {Boolean} [serializeFunctions] serialize all functions in the object **(default:false)**.
- * @return {Number} returns the number of bytes the BSON object will take up.
- * @api public
- */
-BSON.prototype.calculateObjectSize = function(object, serializeFunctions) {
-  return BSON.calculateObjectSize(object, serializeFunctions);
-}
-
-/**
- * Serialize a Javascript object using a predefined Buffer and index into the buffer, useful when pre-allocating the space for serialization.
- *
- * @param {Object} object the Javascript object to serialize.
- * @param {Boolean} checkKeys the serializer will check if keys are valid.
- * @param {Buffer} buffer the Buffer you pre-allocated to store the serialized BSON object.
- * @param {Number} index the index in the buffer where we wish to start serializing into.
- * @param {Boolean} serializeFunctions serialize the javascript functions **(default:false)**.
- * @return {Number} returns the new write index in the Buffer.
- * @api public
- */
-BSON.prototype.serializeWithBufferAndIndex = function(object, checkKeys, buffer, startIndex, serializeFunctions) {
-  return BSON.serializeWithBufferAndIndex(object, checkKeys, buffer, startIndex, serializeFunctions);
-}
-
-/**
- * @ignore
- * @api private
- */
-exports.Code = Code;
-exports.Symbol = Symbol;
-exports.BSON = BSON;
-exports.DBRef = DBRef;
-exports.Binary = Binary;
-exports.ObjectID = ObjectID;
-exports.Long = Long;
-exports.Timestamp = Timestamp;
-exports.Double = Double;
-exports.MinKey = MinKey;
-exports.MaxKey = MaxKey;
+// Return BSON
+module.exports = BSON;
+module.exports.Code = Code;
+module.exports.Map = Map;
+module.exports.Symbol = Symbol;
+module.exports.BSON = BSON;
+module.exports.DBRef = DBRef;
+module.exports.Binary = Binary;
+module.exports.ObjectID = ObjectID;
+module.exports.Long = Long;
+module.exports.Timestamp = Timestamp;
+module.exports.Double = Double;
+module.exports.MinKey = MinKey;
+module.exports.MaxKey = MaxKey;
+module.exports.BSONRegExp = BSONRegExp;
 
 }).call(this,require("buffer").Buffer)
-},{"./binary":58,"./binary_parser":59,"./code":61,"./db_ref":62,"./double":63,"./float_parser":64,"./long":65,"./max_key":66,"./min_key":67,"./objectid":68,"./symbol":69,"./timestamp":70,"buffer":49}],61:[function(require,module,exports){
+},{"./binary":58,"./code":61,"./db_ref":62,"./double":63,"./float_parser":64,"./long":65,"./map":66,"./max_key":67,"./min_key":68,"./objectid":69,"./parser/calculate_size":70,"./parser/deserializer":71,"./parser/serializer":72,"./regexp":73,"./symbol":74,"./timestamp":75,"buffer":49}],61:[function(require,module,exports){
 /**
  * A class representation of the BSON Code type.
  *
@@ -18037,6 +16805,135 @@ Long.TWO_PWR_24_ = Long.fromInt(1 << 24);
 module.exports = Long;
 module.exports.Long = Long;
 },{}],66:[function(require,module,exports){
+(function (global){
+"use strict"
+
+// We have an ES6 Map available, return the native instance
+if(typeof global.Map !== 'undefined') {
+  module.exports = global.Map;
+  module.exports.Map = global.Map;
+} else {
+  // We will return a polyfill
+  var Map = function(array) {
+    this._keys = [];
+    this._values = {};
+
+    for(var i = 0; i < array.length; i++) {
+      if(array[i] == null) continue;  // skip null and undefined
+      var entry = array[i];
+      var key = entry[0];
+      var value = entry[1];
+      // Add the key to the list of keys in order
+      this._keys.push(key);
+      // Add the key and value to the values dictionary with a point
+      // to the location in the ordered keys list
+      this._values[key] = {v: value, i: this._keys.length - 1};
+    }
+  }
+
+  Map.prototype.clear = function() {
+    this._keys = [];
+    this._values = {};
+  }
+
+  Map.prototype.delete = function(key) {
+    var value = this._values[key];
+    if(value == null) return false;
+    // Delete entry
+    delete this._values[key];
+    // Remove the key from the ordered keys list
+    this._keys.splice(value.i, 1);
+    return true;
+  }
+
+  Map.prototype.entries = function() {
+    var self = this;
+    var index = 0;
+
+    return {
+      next: function() {
+        var key = self._keys[index++];
+        return {
+          value: key !== undefined ? [key, self._values[key].v] : undefined,
+          done: key !== undefined ? false : true
+        }
+      }
+    };
+  }
+
+  Map.prototype.forEach = function(callback, self) {
+    self = self || this;
+
+    for(var i = 0; i < this._keys.length; i++) {
+      var key = this._keys[i];
+      // Call the forEach callback
+      callback.call(self, this._values[key].v, key, self);
+    }
+  }
+
+  Map.prototype.get = function(key) {
+    return this._values[key] ? this._values[key].v : undefined;
+  }
+
+  Map.prototype.has = function(key) {
+    return this._values[key] != null;
+  }
+
+  Map.prototype.keys = function(key) {
+    var self = this;
+    var index = 0;
+
+    return {
+      next: function() {
+        var key = self._keys[index++];
+        return {
+          value: key !== undefined ? key : undefined,
+          done: key !== undefined ? false : true
+        }
+      }
+    };
+  }
+
+  Map.prototype.set = function(key, value) {
+    if(this._values[key]) {
+      this._values[key].v = value;
+      return this;
+    }
+
+    // Add the key to the list of keys in order
+    this._keys.push(key);
+    // Add the key and value to the values dictionary with a point
+    // to the location in the ordered keys list
+    this._values[key] = {v: value, i: this._keys.length - 1};
+    return this;
+  }
+
+  Map.prototype.values = function(key, value) {
+    var self = this;
+    var index = 0;
+
+    return {
+      next: function() {
+        var key = self._keys[index++];
+        return {
+          value: key !== undefined ? self._values[key].v : undefined,
+          done: key !== undefined ? false : true
+        }
+      }
+    };
+  }
+
+  // Last ismaster
+  Object.defineProperty(Map.prototype, 'size', {
+    enumerable:true,
+    get: function() { return this._keys.length; }
+  });
+
+  module.exports = Map;
+  module.exports.Map = Map;
+}
+}).call(this,typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+},{}],67:[function(require,module,exports){
 /**
  * A class representation of the BSON MaxKey type.
  *
@@ -18051,7 +16948,7 @@ function MaxKey() {
 
 module.exports = MaxKey;
 module.exports.MaxKey = MaxKey;
-},{}],67:[function(require,module,exports){
+},{}],68:[function(require,module,exports){
 /**
  * A class representation of the BSON MinKey type.
  *
@@ -18066,7 +16963,7 @@ function MinKey() {
 
 module.exports = MinKey;
 module.exports.MinKey = MinKey;
-},{}],68:[function(require,module,exports){
+},{}],69:[function(require,module,exports){
 (function (process){
 /**
  * Module dependencies.
@@ -18180,7 +17077,7 @@ ObjectID.prototype.generate = function(time) {
   if ('number' != typeof time) {
     time = parseInt(Date.now()/1000,10);
   }
-  
+
   var time4Bytes = BinaryParser.encodeInt(time, 32, true, true);
   /* for time-based ObjectID the bytes following the time will be zeroed */
   var machine3Bytes = BinaryParser.encodeInt(MACHINE_ID, 24, false);
@@ -18226,10 +17123,15 @@ ObjectID.prototype.toJSON = function() {
 * @return {boolean} the result of comparing two ObjectID's
 */
 ObjectID.prototype.equals = function equals (otherID) {
-  if(otherID == null) return false;
-  var id = (otherID instanceof ObjectID || otherID.toHexString)
-    ? otherID.id
-    : ObjectID.createFromHexString(otherID).id;
+  var id;
+
+  if(otherID != null && (otherID instanceof ObjectID || otherID.toHexString)) {
+    id = otherID.id;
+  } else if(typeof otherID == 'string' && ObjectID.isValid(otherID)) {
+    id = ObjectID.createFromHexString(otherID).id;
+  } else {
+    return false;
+  }
 
   return this.id === id;
 }
@@ -18311,13 +17213,12 @@ ObjectID.createFromHexString = function createFromHexString (hexString) {
 ObjectID.isValid = function isValid(id) {
   if(id == null) return false;
 
-  if(id != null && 'number' != typeof id && (id.length != 12 && id.length != 24)) {
-    return false;
-  } else {
-    // Check specifically for hex correctness
-    if(typeof id == 'string' && id.length == 24) return checkForHexRegExp.test(id);
+  if(typeof id == 'number')
     return true;
+  if(typeof id == 'string') {
+    return id.length == 12 || (id.length == 24 && checkForHexRegExp.test(id));
   }
+  return false;
 };
 
 /**
@@ -18342,8 +17243,1827 @@ Object.defineProperty(ObjectID.prototype, "generationTime", {
 module.exports = ObjectID;
 module.exports.ObjectID = ObjectID;
 module.exports.ObjectId = ObjectID;
+
 }).call(this,require("FWaASH"))
-},{"./binary_parser":59,"FWaASH":55}],69:[function(require,module,exports){
+},{"./binary_parser":59,"FWaASH":55}],70:[function(require,module,exports){
+(function (Buffer){
+"use strict"
+
+var writeIEEE754 = require('../float_parser').writeIEEE754
+	, readIEEE754 = require('../float_parser').readIEEE754
+	, Long = require('../long').Long
+  , Double = require('../double').Double
+  , Timestamp = require('../timestamp').Timestamp
+  , ObjectID = require('../objectid').ObjectID
+  , Symbol = require('../symbol').Symbol
+  , BSONRegExp = require('../regexp').BSONRegExp
+  , Code = require('../code').Code
+  , MinKey = require('../min_key').MinKey
+  , MaxKey = require('../max_key').MaxKey
+  , DBRef = require('../db_ref').DBRef
+  , Binary = require('../binary').Binary;
+
+// To ensure that 0.4 of node works correctly
+var isDate = function isDate(d) {
+  return typeof d === 'object' && Object.prototype.toString.call(d) === '[object Date]';
+}
+
+var calculateObjectSize = function calculateObjectSize(object, serializeFunctions, ignoreUndefined) {
+  var totalLength = (4 + 1);
+
+  if(Array.isArray(object)) {
+    for(var i = 0; i < object.length; i++) {
+      totalLength += calculateElement(i.toString(), object[i], serializeFunctions, true, ignoreUndefined)
+    }
+  } else {
+		// If we have toBSON defined, override the current object
+		if(object.toBSON) {
+			object = object.toBSON();
+		}
+
+		// Calculate size
+    for(var key in object) {
+      totalLength += calculateElement(key, object[key], serializeFunctions, false, ignoreUndefined)
+    }
+  }
+
+  return totalLength;
+}
+
+/**
+ * @ignore
+ * @api private
+ */
+function calculateElement(name, value, serializeFunctions, isArray, ignoreUndefined) {
+	// If we have toBSON defined, override the current object
+  if(value && value.toBSON){
+    value = value.toBSON();
+  }
+
+  switch(typeof value) {
+    case 'string':
+      return 1 + Buffer.byteLength(name, 'utf8') + 1 + 4 + Buffer.byteLength(value, 'utf8') + 1;
+    case 'number':
+      if(Math.floor(value) === value && value >= BSON.JS_INT_MIN && value <= BSON.JS_INT_MAX) {
+        if(value >= BSON.BSON_INT32_MIN && value <= BSON.BSON_INT32_MAX) { // 32 bit
+          return (name != null ? (Buffer.byteLength(name, 'utf8') + 1) : 0) + (4 + 1);
+        } else {
+          return (name != null ? (Buffer.byteLength(name, 'utf8') + 1) : 0) + (8 + 1);
+        }
+      } else {  // 64 bit
+        return (name != null ? (Buffer.byteLength(name, 'utf8') + 1) : 0) + (8 + 1);
+      }
+    case 'undefined':
+      if(isArray || !ignoreUndefined) return (name != null ? (Buffer.byteLength(name, 'utf8') + 1) : 0) + (1);
+      return 0;
+    case 'boolean':
+      return (name != null ? (Buffer.byteLength(name, 'utf8') + 1) : 0) + (1 + 1);
+    case 'object':
+      if(value == null || value instanceof MinKey || value instanceof MaxKey || value['_bsontype'] == 'MinKey' || value['_bsontype'] == 'MaxKey') {
+        return (name != null ? (Buffer.byteLength(name, 'utf8') + 1) : 0) + (1);
+      } else if(value instanceof ObjectID || value['_bsontype'] == 'ObjectID') {
+        return (name != null ? (Buffer.byteLength(name, 'utf8') + 1) : 0) + (12 + 1);
+      } else if(value instanceof Date || isDate(value)) {
+        return (name != null ? (Buffer.byteLength(name, 'utf8') + 1) : 0) + (8 + 1);
+      } else if(typeof Buffer !== 'undefined' && Buffer.isBuffer(value)) {
+        return (name != null ? (Buffer.byteLength(name, 'utf8') + 1) : 0) + (1 + 4 + 1) + value.length;
+      } else if(value instanceof Long || value instanceof Double || value instanceof Timestamp
+          || value['_bsontype'] == 'Long' || value['_bsontype'] == 'Double' || value['_bsontype'] == 'Timestamp') {
+        return (name != null ? (Buffer.byteLength(name, 'utf8') + 1) : 0) + (8 + 1);
+      } else if(value instanceof Code || value['_bsontype'] == 'Code') {
+        // Calculate size depending on the availability of a scope
+        if(value.scope != null && Object.keys(value.scope).length > 0) {
+          return (name != null ? (Buffer.byteLength(name, 'utf8') + 1) : 0) + 1 + 4 + 4 + Buffer.byteLength(value.code.toString(), 'utf8') + 1 + calculateObjectSize(value.scope, serializeFunctions, ignoreUndefined);
+        } else {
+          return (name != null ? (Buffer.byteLength(name, 'utf8') + 1) : 0) + 1 + 4 + Buffer.byteLength(value.code.toString(), 'utf8') + 1;
+        }
+      } else if(value instanceof Binary || value['_bsontype'] == 'Binary') {
+        // Check what kind of subtype we have
+        if(value.sub_type == Binary.SUBTYPE_BYTE_ARRAY) {
+          return (name != null ? (Buffer.byteLength(name, 'utf8') + 1) : 0) + (value.position + 1 + 4 + 1 + 4);
+        } else {
+          return (name != null ? (Buffer.byteLength(name, 'utf8') + 1) : 0) + (value.position + 1 + 4 + 1);
+        }
+      } else if(value instanceof Symbol || value['_bsontype'] == 'Symbol') {
+        return (name != null ? (Buffer.byteLength(name, 'utf8') + 1) : 0) + Buffer.byteLength(value.value, 'utf8') + 4 + 1 + 1;
+      } else if(value instanceof DBRef || value['_bsontype'] == 'DBRef') {
+        // Set up correct object for serialization
+        var ordered_values = {
+            '$ref': value.namespace
+          , '$id' : value.oid
+        };
+
+        // Add db reference if it exists
+        if(null != value.db) {
+          ordered_values['$db'] = value.db;
+        }
+
+        return (name != null ? (Buffer.byteLength(name, 'utf8') + 1) : 0) + 1 + calculateObjectSize(ordered_values, serializeFunctions, ignoreUndefined);
+      } else if(value instanceof RegExp || Object.prototype.toString.call(value) === '[object RegExp]') {
+          return (name != null ? (Buffer.byteLength(name, 'utf8') + 1) : 0) + 1 + Buffer.byteLength(value.source, 'utf8') + 1
+            + (value.global ? 1 : 0) + (value.ignoreCase ? 1 : 0) + (value.multiline ? 1 : 0) + 1
+      } else if(value instanceof BSONRegExp || value['_bsontype'] == 'BSONRegExp') {
+          return (name != null ? (Buffer.byteLength(name, 'utf8') + 1) : 0) + 1 + Buffer.byteLength(value.pattern, 'utf8') + 1
+            + Buffer.byteLength(value.options, 'utf8') + 1
+      } else {
+        return (name != null ? (Buffer.byteLength(name, 'utf8') + 1) : 0) + calculateObjectSize(value, serializeFunctions, ignoreUndefined) + 1;
+      }
+    case 'function':
+      // WTF for 0.4.X where typeof /someregexp/ === 'function'
+      if(value instanceof RegExp || Object.prototype.toString.call(value) === '[object RegExp]' || String.call(value) == '[object RegExp]') {
+        return (name != null ? (Buffer.byteLength(name, 'utf8') + 1) : 0) + 1 + Buffer.byteLength(value.source, 'utf8') + 1
+          + (value.global ? 1 : 0) + (value.ignoreCase ? 1 : 0) + (value.multiline ? 1 : 0) + 1
+      } else {
+        if(serializeFunctions && value.scope != null && Object.keys(value.scope).length > 0) {
+          return (name != null ? (Buffer.byteLength(name, 'utf8') + 1) : 0) + 1 + 4 + 4 + Buffer.byteLength(value.toString(), 'utf8') + 1 + calculateObjectSize(value.scope, serializeFunctions, ignoreUndefined);
+        } else if(serializeFunctions) {
+          return (name != null ? (Buffer.byteLength(name, 'utf8') + 1) : 0) + 1 + 4 + Buffer.byteLength(value.toString(), 'utf8') + 1;
+        }
+      }
+  }
+
+  return 0;
+}
+
+var BSON = {};
+
+/**
+ * Contains the function cache if we have that enable to allow for avoiding the eval step on each deserialization, comparison is by md5
+ *
+ * @ignore
+ * @api private
+ */
+var functionCache = BSON.functionCache = {};
+
+/**
+ * Number BSON Type
+ *
+ * @classconstant BSON_DATA_NUMBER
+ **/
+BSON.BSON_DATA_NUMBER = 1;
+/**
+ * String BSON Type
+ *
+ * @classconstant BSON_DATA_STRING
+ **/
+BSON.BSON_DATA_STRING = 2;
+/**
+ * Object BSON Type
+ *
+ * @classconstant BSON_DATA_OBJECT
+ **/
+BSON.BSON_DATA_OBJECT = 3;
+/**
+ * Array BSON Type
+ *
+ * @classconstant BSON_DATA_ARRAY
+ **/
+BSON.BSON_DATA_ARRAY = 4;
+/**
+ * Binary BSON Type
+ *
+ * @classconstant BSON_DATA_BINARY
+ **/
+BSON.BSON_DATA_BINARY = 5;
+/**
+ * ObjectID BSON Type
+ *
+ * @classconstant BSON_DATA_OID
+ **/
+BSON.BSON_DATA_OID = 7;
+/**
+ * Boolean BSON Type
+ *
+ * @classconstant BSON_DATA_BOOLEAN
+ **/
+BSON.BSON_DATA_BOOLEAN = 8;
+/**
+ * Date BSON Type
+ *
+ * @classconstant BSON_DATA_DATE
+ **/
+BSON.BSON_DATA_DATE = 9;
+/**
+ * null BSON Type
+ *
+ * @classconstant BSON_DATA_NULL
+ **/
+BSON.BSON_DATA_NULL = 10;
+/**
+ * RegExp BSON Type
+ *
+ * @classconstant BSON_DATA_REGEXP
+ **/
+BSON.BSON_DATA_REGEXP = 11;
+/**
+ * Code BSON Type
+ *
+ * @classconstant BSON_DATA_CODE
+ **/
+BSON.BSON_DATA_CODE = 13;
+/**
+ * Symbol BSON Type
+ *
+ * @classconstant BSON_DATA_SYMBOL
+ **/
+BSON.BSON_DATA_SYMBOL = 14;
+/**
+ * Code with Scope BSON Type
+ *
+ * @classconstant BSON_DATA_CODE_W_SCOPE
+ **/
+BSON.BSON_DATA_CODE_W_SCOPE = 15;
+/**
+ * 32 bit Integer BSON Type
+ *
+ * @classconstant BSON_DATA_INT
+ **/
+BSON.BSON_DATA_INT = 16;
+/**
+ * Timestamp BSON Type
+ *
+ * @classconstant BSON_DATA_TIMESTAMP
+ **/
+BSON.BSON_DATA_TIMESTAMP = 17;
+/**
+ * Long BSON Type
+ *
+ * @classconstant BSON_DATA_LONG
+ **/
+BSON.BSON_DATA_LONG = 18;
+/**
+ * MinKey BSON Type
+ *
+ * @classconstant BSON_DATA_MIN_KEY
+ **/
+BSON.BSON_DATA_MIN_KEY = 0xff;
+/**
+ * MaxKey BSON Type
+ *
+ * @classconstant BSON_DATA_MAX_KEY
+ **/
+BSON.BSON_DATA_MAX_KEY = 0x7f;
+
+/**
+ * Binary Default Type
+ *
+ * @classconstant BSON_BINARY_SUBTYPE_DEFAULT
+ **/
+BSON.BSON_BINARY_SUBTYPE_DEFAULT = 0;
+/**
+ * Binary Function Type
+ *
+ * @classconstant BSON_BINARY_SUBTYPE_FUNCTION
+ **/
+BSON.BSON_BINARY_SUBTYPE_FUNCTION = 1;
+/**
+ * Binary Byte Array Type
+ *
+ * @classconstant BSON_BINARY_SUBTYPE_BYTE_ARRAY
+ **/
+BSON.BSON_BINARY_SUBTYPE_BYTE_ARRAY = 2;
+/**
+ * Binary UUID Type
+ *
+ * @classconstant BSON_BINARY_SUBTYPE_UUID
+ **/
+BSON.BSON_BINARY_SUBTYPE_UUID = 3;
+/**
+ * Binary MD5 Type
+ *
+ * @classconstant BSON_BINARY_SUBTYPE_MD5
+ **/
+BSON.BSON_BINARY_SUBTYPE_MD5 = 4;
+/**
+ * Binary User Defined Type
+ *
+ * @classconstant BSON_BINARY_SUBTYPE_USER_DEFINED
+ **/
+BSON.BSON_BINARY_SUBTYPE_USER_DEFINED = 128;
+
+// BSON MAX VALUES
+BSON.BSON_INT32_MAX = 0x7FFFFFFF;
+BSON.BSON_INT32_MIN = -0x80000000;
+
+BSON.BSON_INT64_MAX = Math.pow(2, 63) - 1;
+BSON.BSON_INT64_MIN = -Math.pow(2, 63);
+
+// JS MAX PRECISE VALUES
+BSON.JS_INT_MAX = 0x20000000000000;  // Any integer up to 2^53 can be precisely represented by a double.
+BSON.JS_INT_MIN = -0x20000000000000;  // Any integer down to -2^53 can be precisely represented by a double.
+
+// Internal long versions
+var JS_INT_MAX_LONG = Long.fromNumber(0x20000000000000);  // Any integer up to 2^53 can be precisely represented by a double.
+var JS_INT_MIN_LONG = Long.fromNumber(-0x20000000000000);  // Any integer down to -2^53 can be precisely represented by a double.
+
+module.exports = calculateObjectSize;
+
+}).call(this,require("buffer").Buffer)
+},{"../binary":58,"../code":61,"../db_ref":62,"../double":63,"../float_parser":64,"../long":65,"../max_key":67,"../min_key":68,"../objectid":69,"../regexp":73,"../symbol":74,"../timestamp":75,"buffer":49}],71:[function(require,module,exports){
+"use strict"
+
+var writeIEEE754 = require('../float_parser').writeIEEE754,
+	readIEEE754 = require('../float_parser').readIEEE754,
+	f = require('util').format,
+	Long = require('../long').Long,
+  Double = require('../double').Double,
+  Timestamp = require('../timestamp').Timestamp,
+  ObjectID = require('../objectid').ObjectID,
+  Symbol = require('../symbol').Symbol,
+  Code = require('../code').Code,
+  MinKey = require('../min_key').MinKey,
+  MaxKey = require('../max_key').MaxKey,
+  DBRef = require('../db_ref').DBRef,
+  BSONRegExp = require('../regexp').BSONRegExp,
+  Binary = require('../binary').Binary;
+
+var deserialize = function(buffer, options, isArray) {
+	var index = 0;
+	// Read the document size
+  var size = buffer[index++] | buffer[index++] << 8 | buffer[index++] << 16 | buffer[index++] << 24;
+
+	// Ensure buffer is valid size
+  if(size < 5 || buffer.length < size) {
+		throw new Error("corrupt bson message");
+	}
+
+	// Illegal end value
+	if(buffer[size - 1] != 0) {
+		throw new Error("One object, sized correctly, with a spot for an EOO, but the EOO isn't 0x00");
+	}
+
+	// Start deserializtion
+	return deserializeObject(buffer, options, isArray);
+}
+
+// Reads in a C style string
+var readCStyleStringSpecial = function(buffer, index) {
+	// Get the start search index
+	var i = index;
+	// Locate the end of the c string
+	while(buffer[i] !== 0x00 && i < buffer.length) {
+		i++
+	}
+	// If are at the end of the buffer there is a problem with the document
+	if(i >= buffer.length) throw new Error("Bad BSON Document: illegal CString")
+	// Grab utf8 encoded string
+	var string = buffer.toString('utf8', index, i);
+	// Update index position
+	index = i + 1;
+	// Return string
+	return {s: string, i: index};
+}
+
+var deserializeObject = function(buffer, options, isArray) {
+  // Options
+  options = options == null ? {} : options;
+  var evalFunctions = options['evalFunctions'] == null ? false : options['evalFunctions'];
+  var cacheFunctions = options['cacheFunctions'] == null ? false : options['cacheFunctions'];
+  var cacheFunctionsCrc32 = options['cacheFunctionsCrc32'] == null ? false : options['cacheFunctionsCrc32'];
+  var promoteLongs = options['promoteLongs'] == null ? true : options['promoteLongs'];
+	var fieldsAsRaw = options['fieldsAsRaw'] == null ? {} : options['fieldsAsRaw'];
+  // Return BSONRegExp objects instead of native regular expressions
+  var bsonRegExp = typeof options['bsonRegExp'] == 'boolean' ? options['bsonRegExp'] : false;
+  var promoteBuffers = options['promoteBuffers'] == null ? false : options['promoteBuffers'];
+
+  // Validate that we have at least 4 bytes of buffer
+  if(buffer.length < 5) throw new Error("corrupt bson message < 5 bytes long");
+
+  // Set up index
+  var index = typeof options['index'] == 'number' ? options['index'] : 0;
+
+	// Read the document size
+  var size = buffer[index++] | buffer[index++] << 8 | buffer[index++] << 16 | buffer[index++] << 24;
+
+	// Ensure buffer is valid size
+  if(size < 5 || size > buffer.length) throw new Error("corrupt bson message");
+
+  // Create holding object
+  var object = isArray ? [] : {};
+
+  // While we have more left data left keep parsing
+  while(true) {
+    // Read the type
+    var elementType = buffer[index++];
+    // If we get a zero it's the last byte, exit
+    if(elementType == 0) break;
+    // Read the name of the field
+    var r = readCStyleStringSpecial(buffer, index);
+		var name = r.s;
+		index = r.i;
+
+		// Switch on the type
+		if(elementType == BSON.BSON_DATA_OID) {
+      var string = buffer.toString('binary', index, index + 12);
+      // Decode the oid
+      object[name] = new ObjectID(string);
+      // Update index
+      index = index + 12;
+		} else if(elementType == BSON.BSON_DATA_STRING) {
+      // Read the content of the field
+      var stringSize = buffer[index++] | buffer[index++] << 8 | buffer[index++] << 16 | buffer[index++] << 24;
+			// Validate if string Size is larger than the actual provided buffer
+			if(stringSize <= 0 || stringSize > (buffer.length - index) || buffer[index + stringSize - 1] != 0) throw new Error("bad string length in bson");
+      // Add string to object
+      object[name] = buffer.toString('utf8', index, index + stringSize - 1);
+      // Update parse index position
+      index = index + stringSize;
+		} else if(elementType == BSON.BSON_DATA_INT) {
+      // Decode the 32bit value
+      object[name] = buffer[index++] | buffer[index++] << 8 | buffer[index++] << 16 | buffer[index++] << 24;
+		} else if(elementType == BSON.BSON_DATA_NUMBER) {
+      // Decode the double value
+      object[name] = readIEEE754(buffer, index, 'little', 52, 8);
+      // Update the index
+      index = index + 8;
+		} else if(elementType == BSON.BSON_DATA_DATE) {
+      // Unpack the low and high bits
+      var lowBits = buffer[index++] | buffer[index++] << 8 | buffer[index++] << 16 | buffer[index++] << 24;
+      var highBits = buffer[index++] | buffer[index++] << 8 | buffer[index++] << 16 | buffer[index++] << 24;
+      // Set date object
+      object[name] = new Date(new Long(lowBits, highBits).toNumber());
+		} else if(elementType == BSON.BSON_DATA_BOOLEAN) {
+      // Parse the boolean value
+      object[name] = buffer[index++] == 1;
+		} else if(elementType == BSON.BSON_DATA_UNDEFINED || elementType == BSON.BSON_DATA_NULL) {
+      // Parse the boolean value
+      object[name] = null;
+		} else if(elementType == BSON.BSON_DATA_BINARY) {
+      // Decode the size of the binary blob
+      var binarySize = buffer[index++] | buffer[index++] << 8 | buffer[index++] << 16 | buffer[index++] << 24;
+      // Decode the subtype
+      var subType = buffer[index++];
+      // Decode as raw Buffer object if options specifies it
+      if(buffer['slice'] != null) {
+        // If we have subtype 2 skip the 4 bytes for the size
+        if(subType == Binary.SUBTYPE_BYTE_ARRAY) {
+          binarySize = buffer[index++] | buffer[index++] << 8 | buffer[index++] << 16 | buffer[index++] << 24;
+        }
+        if(promoteBuffers) {
+          // assign reference to sliced Buffer object
+          object[name] = buffer.slice(index, index + binarySize);
+        } else {
+          // Slice the data
+          object[name] = new Binary(buffer.slice(index, index + binarySize), subType);
+        }
+      } else {
+        var _buffer = typeof Uint8Array != 'undefined' ? new Uint8Array(new ArrayBuffer(binarySize)) : new Array(binarySize);
+        // If we have subtype 2 skip the 4 bytes for the size
+        if(subType == Binary.SUBTYPE_BYTE_ARRAY) {
+          binarySize = buffer[index++] | buffer[index++] << 8 | buffer[index++] << 16 | buffer[index++] << 24;
+        }
+        // Copy the data
+        for(var i = 0; i < binarySize; i++) {
+          _buffer[i] = buffer[index + i];
+        }
+        if(promoteBuffers) {
+          // assign reference to Buffer object
+          object[name] = _buffer;
+        } else {
+          // Create the binary object
+          object[name] = new Binary(_buffer, subType);
+        }
+      }
+      // Update the index
+      index = index + binarySize;
+		} else if(elementType == BSON.BSON_DATA_ARRAY) {
+      options['index'] = index;
+      // Decode the size of the array document
+      var objectSize = buffer[index] | buffer[index + 1] << 8 | buffer[index + 2] << 16 | buffer[index + 3] << 24;
+			var arrayOptions = options;
+
+			// All elements of array to be returned as raw bson
+			if(fieldsAsRaw[name]) {
+				arrayOptions = {};
+				for(var n in options) arrayOptions[n] = options[n];
+				arrayOptions['raw'] = true;
+			}
+
+      // Set the array to the object
+      object[name] = deserializeObject(buffer, arrayOptions, true);
+      // Adjust the index
+      index = index + objectSize;
+		} else if(elementType == BSON.BSON_DATA_OBJECT) {
+      options['index'] = index;
+      // Decode the size of the object document
+      var objectSize = buffer[index] | buffer[index + 1] << 8 | buffer[index + 2] << 16 | buffer[index + 3] << 24;
+			// Validate if string Size is larger than the actual provided buffer
+			if(objectSize <= 0 || objectSize > (buffer.length - index)) throw new Error("bad embedded document length in bson");
+
+			// We have a raw value
+			if(options['raw']) {
+				// Set the array to the object
+	      object[name] = buffer.slice(index, index + objectSize);
+			} else {
+				// Set the array to the object
+	      object[name] = deserializeObject(buffer, options, false);
+			}
+
+      // Adjust the index
+      index = index + objectSize;
+		} else if(elementType == BSON.BSON_DATA_REGEXP && bsonRegExp == false) {
+      // Create the regexp
+			var r = readCStyleStringSpecial(buffer, index);
+			var source = r.s;
+			index = r.i;
+
+			var r = readCStyleStringSpecial(buffer, index);
+			var regExpOptions = r.s;
+			index = r.i;
+
+      // For each option add the corresponding one for javascript
+      var optionsArray = new Array(regExpOptions.length);
+
+      // Parse options
+      for(var i = 0; i < regExpOptions.length; i++) {
+        switch(regExpOptions[i]) {
+          case 'm':
+            optionsArray[i] = 'm';
+            break;
+          case 's':
+            optionsArray[i] = 'g';
+            break;
+          case 'i':
+            optionsArray[i] = 'i';
+            break;
+        }
+      }
+
+      object[name] = new RegExp(source, optionsArray.join(''));
+    } else if(elementType == BSON.BSON_DATA_REGEXP && bsonRegExp == true) {
+      // Create the regexp
+      var r = readCStyleStringSpecial(buffer, index);
+      var source = r.s;
+      index = r.i;
+
+      var r = readCStyleStringSpecial(buffer, index);
+      var regExpOptions = r.s;
+      index = r.i;
+
+      // Set the object
+      object[name] = new BSONRegExp(source, regExpOptions);      
+		} else if(elementType == BSON.BSON_DATA_LONG) {
+      // Unpack the low and high bits
+      var lowBits = buffer[index++] | buffer[index++] << 8 | buffer[index++] << 16 | buffer[index++] << 24;
+      var highBits = buffer[index++] | buffer[index++] << 8 | buffer[index++] << 16 | buffer[index++] << 24;
+      // Create long object
+      var long = new Long(lowBits, highBits);
+      // Promote the long if possible
+      if(promoteLongs) {
+        object[name] = long.lessThanOrEqual(JS_INT_MAX_LONG) && long.greaterThanOrEqual(JS_INT_MIN_LONG) ? long.toNumber() : long;
+      } else {
+        object[name] = long;
+      }
+		} else if(elementType == BSON.BSON_DATA_SYMBOL) {
+      // Read the content of the field
+      var stringSize = buffer[index++] | buffer[index++] << 8 | buffer[index++] << 16 | buffer[index++] << 24;
+			// Validate if string Size is larger than the actual provided buffer
+			if(stringSize <= 0 || stringSize > (buffer.length - index) || buffer[index + stringSize - 1] != 0) throw new Error("bad string length in bson");
+      // Add string to object
+      object[name] = new Symbol(buffer.toString('utf8', index, index + stringSize - 1));
+      // Update parse index position
+      index = index + stringSize;
+		} else if(elementType == BSON.BSON_DATA_TIMESTAMP) {
+      // Unpack the low and high bits
+      var lowBits = buffer[index++] | buffer[index++] << 8 | buffer[index++] << 16 | buffer[index++] << 24;
+      var highBits = buffer[index++] | buffer[index++] << 8 | buffer[index++] << 16 | buffer[index++] << 24;
+      // Set the object
+      object[name] = new Timestamp(lowBits, highBits);
+		} else if(elementType == BSON.BSON_DATA_MIN_KEY) {
+      // Parse the object
+      object[name] = new MinKey();
+		} else if(elementType == BSON.BSON_DATA_MAX_KEY) {
+      // Parse the object
+      object[name] = new MaxKey();
+		} else if(elementType == BSON.BSON_DATA_CODE) {
+      // Read the content of the field
+      var stringSize = buffer[index++] | buffer[index++] << 8 | buffer[index++] << 16 | buffer[index++] << 24;
+			// Validate if string Size is larger than the actual provided buffer
+			if(stringSize <= 0 || stringSize > (buffer.length - index) || buffer[index + stringSize - 1] != 0) throw new Error("bad string length in bson");
+      // Function string
+      var functionString = buffer.toString('utf8', index, index + stringSize - 1);
+
+      // If we are evaluating the functions
+      if(evalFunctions) {
+        // Contains the value we are going to set
+        var value = null;
+        // If we have cache enabled let's look for the md5 of the function in the cache
+        if(cacheFunctions) {
+          var hash = cacheFunctionsCrc32 ? crc32(functionString) : functionString;
+          // Got to do this to avoid V8 deoptimizing the call due to finding eval
+          object[name] = isolateEvalWithHash(functionCache, hash, functionString, object);
+        } else {
+          // Set directly
+          object[name] = isolateEval(functionString);
+        }
+      } else {
+        object[name]  = new Code(functionString, {});
+      }
+
+      // Update parse index position
+      index = index + stringSize;
+		} else if(elementType == BSON.BSON_DATA_CODE_W_SCOPE) {
+      // Read the content of the field
+      var totalSize = buffer[index++] | buffer[index++] << 8 | buffer[index++] << 16 | buffer[index++] << 24;
+      var stringSize = buffer[index++] | buffer[index++] << 8 | buffer[index++] << 16 | buffer[index++] << 24;
+			// Validate if string Size is larger than the actual provided buffer
+			if(stringSize <= 0 || stringSize > (buffer.length - index) || buffer[index + stringSize - 1] != 0) throw new Error("bad string length in bson");
+      // Javascript function
+      var functionString = buffer.toString('utf8', index, index + stringSize - 1);
+      // Update parse index position
+      index = index + stringSize;
+      // Parse the element
+      options['index'] = index;
+      // Decode the size of the object document
+      var objectSize = buffer[index] | buffer[index + 1] << 8 | buffer[index + 2] << 16 | buffer[index + 3] << 24;
+      // Decode the scope object
+      var scopeObject = deserializeObject(buffer, options, false);
+      // Adjust the index
+      index = index + objectSize;
+
+      // If we are evaluating the functions
+      if(evalFunctions) {
+        // Contains the value we are going to set
+        var value = null;
+        // If we have cache enabled let's look for the md5 of the function in the cache
+        if(cacheFunctions) {
+          var hash = cacheFunctionsCrc32 ? crc32(functionString) : functionString;
+          // Got to do this to avoid V8 deoptimizing the call due to finding eval
+          object[name] = isolateEvalWithHash(functionCache, hash, functionString, object);
+        } else {
+          // Set directly
+          object[name] = isolateEval(functionString);
+        }
+
+        // Set the scope on the object
+        object[name].scope = scopeObject;
+      } else {
+        object[name]  = new Code(functionString, scopeObject);
+      }
+    }
+  }
+
+  // Check if we have a db ref object
+  if(object['$id'] != null) object = new DBRef(object['$ref'], object['$id'], object['$db']);
+
+  // Return the final objects
+  return object;
+}
+
+/**
+ * Ensure eval is isolated.
+ *
+ * @ignore
+ * @api private
+ */
+var isolateEvalWithHash = function(functionCache, hash, functionString, object) {
+  // Contains the value we are going to set
+  var value = null;
+
+  // Check for cache hit, eval if missing and return cached function
+  if(functionCache[hash] == null) {
+    eval("value = " + functionString);
+    functionCache[hash] = value;
+  }
+  // Set the object
+  return functionCache[hash].bind(object);
+}
+
+/**
+ * Ensure eval is isolated.
+ *
+ * @ignore
+ * @api private
+ */
+var isolateEval = function(functionString) {
+  // Contains the value we are going to set
+  var value = null;
+  // Eval the function
+  eval("value = " + functionString);
+  return value;
+}
+
+var BSON = {};
+
+/**
+ * Contains the function cache if we have that enable to allow for avoiding the eval step on each deserialization, comparison is by md5
+ *
+ * @ignore
+ * @api private
+ */
+var functionCache = BSON.functionCache = {};
+
+/**
+ * Number BSON Type
+ *
+ * @classconstant BSON_DATA_NUMBER
+ **/
+BSON.BSON_DATA_NUMBER = 1;
+/**
+ * String BSON Type
+ *
+ * @classconstant BSON_DATA_STRING
+ **/
+BSON.BSON_DATA_STRING = 2;
+/**
+ * Object BSON Type
+ *
+ * @classconstant BSON_DATA_OBJECT
+ **/
+BSON.BSON_DATA_OBJECT = 3;
+/**
+ * Array BSON Type
+ *
+ * @classconstant BSON_DATA_ARRAY
+ **/
+BSON.BSON_DATA_ARRAY = 4;
+/**
+ * Binary BSON Type
+ *
+ * @classconstant BSON_DATA_BINARY
+ **/
+BSON.BSON_DATA_BINARY = 5;
+/**
+ * ObjectID BSON Type
+ *
+ * @classconstant BSON_DATA_OID
+ **/
+BSON.BSON_DATA_OID = 7;
+/**
+ * Boolean BSON Type
+ *
+ * @classconstant BSON_DATA_BOOLEAN
+ **/
+BSON.BSON_DATA_BOOLEAN = 8;
+/**
+ * Date BSON Type
+ *
+ * @classconstant BSON_DATA_DATE
+ **/
+BSON.BSON_DATA_DATE = 9;
+/**
+ * null BSON Type
+ *
+ * @classconstant BSON_DATA_NULL
+ **/
+BSON.BSON_DATA_NULL = 10;
+/**
+ * RegExp BSON Type
+ *
+ * @classconstant BSON_DATA_REGEXP
+ **/
+BSON.BSON_DATA_REGEXP = 11;
+/**
+ * Code BSON Type
+ *
+ * @classconstant BSON_DATA_CODE
+ **/
+BSON.BSON_DATA_CODE = 13;
+/**
+ * Symbol BSON Type
+ *
+ * @classconstant BSON_DATA_SYMBOL
+ **/
+BSON.BSON_DATA_SYMBOL = 14;
+/**
+ * Code with Scope BSON Type
+ *
+ * @classconstant BSON_DATA_CODE_W_SCOPE
+ **/
+BSON.BSON_DATA_CODE_W_SCOPE = 15;
+/**
+ * 32 bit Integer BSON Type
+ *
+ * @classconstant BSON_DATA_INT
+ **/
+BSON.BSON_DATA_INT = 16;
+/**
+ * Timestamp BSON Type
+ *
+ * @classconstant BSON_DATA_TIMESTAMP
+ **/
+BSON.BSON_DATA_TIMESTAMP = 17;
+/**
+ * Long BSON Type
+ *
+ * @classconstant BSON_DATA_LONG
+ **/
+BSON.BSON_DATA_LONG = 18;
+/**
+ * MinKey BSON Type
+ *
+ * @classconstant BSON_DATA_MIN_KEY
+ **/
+BSON.BSON_DATA_MIN_KEY = 0xff;
+/**
+ * MaxKey BSON Type
+ *
+ * @classconstant BSON_DATA_MAX_KEY
+ **/
+BSON.BSON_DATA_MAX_KEY = 0x7f;
+
+/**
+ * Binary Default Type
+ *
+ * @classconstant BSON_BINARY_SUBTYPE_DEFAULT
+ **/
+BSON.BSON_BINARY_SUBTYPE_DEFAULT = 0;
+/**
+ * Binary Function Type
+ *
+ * @classconstant BSON_BINARY_SUBTYPE_FUNCTION
+ **/
+BSON.BSON_BINARY_SUBTYPE_FUNCTION = 1;
+/**
+ * Binary Byte Array Type
+ *
+ * @classconstant BSON_BINARY_SUBTYPE_BYTE_ARRAY
+ **/
+BSON.BSON_BINARY_SUBTYPE_BYTE_ARRAY = 2;
+/**
+ * Binary UUID Type
+ *
+ * @classconstant BSON_BINARY_SUBTYPE_UUID
+ **/
+BSON.BSON_BINARY_SUBTYPE_UUID = 3;
+/**
+ * Binary MD5 Type
+ *
+ * @classconstant BSON_BINARY_SUBTYPE_MD5
+ **/
+BSON.BSON_BINARY_SUBTYPE_MD5 = 4;
+/**
+ * Binary User Defined Type
+ *
+ * @classconstant BSON_BINARY_SUBTYPE_USER_DEFINED
+ **/
+BSON.BSON_BINARY_SUBTYPE_USER_DEFINED = 128;
+
+// BSON MAX VALUES
+BSON.BSON_INT32_MAX = 0x7FFFFFFF;
+BSON.BSON_INT32_MIN = -0x80000000;
+
+BSON.BSON_INT64_MAX = Math.pow(2, 63) - 1;
+BSON.BSON_INT64_MIN = -Math.pow(2, 63);
+
+// JS MAX PRECISE VALUES
+BSON.JS_INT_MAX = 0x20000000000000;  // Any integer up to 2^53 can be precisely represented by a double.
+BSON.JS_INT_MIN = -0x20000000000000;  // Any integer down to -2^53 can be precisely represented by a double.
+
+// Internal long versions
+var JS_INT_MAX_LONG = Long.fromNumber(0x20000000000000);  // Any integer up to 2^53 can be precisely represented by a double.
+var JS_INT_MIN_LONG = Long.fromNumber(-0x20000000000000);  // Any integer down to -2^53 can be precisely represented by a double.
+
+module.exports = deserialize
+
+},{"../binary":58,"../code":61,"../db_ref":62,"../double":63,"../float_parser":64,"../long":65,"../max_key":67,"../min_key":68,"../objectid":69,"../regexp":73,"../symbol":74,"../timestamp":75,"util":57}],72:[function(require,module,exports){
+(function (Buffer){
+"use strict"
+
+var writeIEEE754 = require('../float_parser').writeIEEE754,
+  readIEEE754 = require('../float_parser').readIEEE754,
+  Long = require('../long').Long,
+  Map = require('../map'),
+  Double = require('../double').Double,
+  Timestamp = require('../timestamp').Timestamp,
+  ObjectID = require('../objectid').ObjectID,
+  Symbol = require('../symbol').Symbol,
+  Code = require('../code').Code,
+  BSONRegExp = require('../regexp').BSONRegExp,
+  MinKey = require('../min_key').MinKey,
+  MaxKey = require('../max_key').MaxKey,
+  DBRef = require('../db_ref').DBRef,
+  Binary = require('../binary').Binary;
+
+var regexp = /\x00/
+
+// To ensure that 0.4 of node works correctly
+var isDate = function isDate(d) {
+  return typeof d === 'object' && Object.prototype.toString.call(d) === '[object Date]';
+}
+
+var isRegExp = function isRegExp(d) {
+  return Object.prototype.toString.call(d) === '[object RegExp]';
+}
+
+var serializeString = function(buffer, key, value, index) {
+  // Encode String type
+  buffer[index++] = BSON.BSON_DATA_STRING;
+  // Number of written bytes
+  var numberOfWrittenBytes = buffer.write(key, index, 'utf8');
+  // Encode the name
+  index = index + numberOfWrittenBytes + 1;
+  buffer[index - 1] = 0;
+  // Write the string
+  var size = buffer.write(value, index + 4, 'utf8');
+  // Write the size of the string to buffer
+  buffer[index + 3] = (size + 1 >> 24) & 0xff;
+  buffer[index + 2] = (size + 1 >> 16) & 0xff;
+  buffer[index + 1] = (size + 1 >> 8) & 0xff;
+  buffer[index] = size + 1 & 0xff;
+  // Update index
+  index = index + 4 + size;
+  // Write zero
+  buffer[index++] = 0;
+  return index;
+}
+
+var serializeNumber = function(buffer, key, value, index) {
+  // We have an integer value
+  if(Math.floor(value) === value && value >= BSON.JS_INT_MIN && value <= BSON.JS_INT_MAX) {
+    // If the value fits in 32 bits encode as int, if it fits in a double
+    // encode it as a double, otherwise long
+    if(value >= BSON.BSON_INT32_MIN && value <= BSON.BSON_INT32_MAX) {
+      // Set int type 32 bits or less
+      buffer[index++] = BSON.BSON_DATA_INT;
+      // Number of written bytes
+      var numberOfWrittenBytes = buffer.write(key, index, 'utf8');
+      // Encode the name
+      index = index + numberOfWrittenBytes;
+      buffer[index++] = 0;
+      // Write the int value
+      buffer[index++] = value & 0xff;
+      buffer[index++] = (value >> 8) & 0xff;
+      buffer[index++] = (value >> 16) & 0xff;
+      buffer[index++] = (value >> 24) & 0xff;
+    } else if(value >= BSON.JS_INT_MIN && value <= BSON.JS_INT_MAX) {
+      // Encode as double
+      buffer[index++] = BSON.BSON_DATA_NUMBER;
+      // Number of written bytes
+      var numberOfWrittenBytes = buffer.write(key, index, 'utf8');
+      // Encode the name
+      index = index + numberOfWrittenBytes;
+      buffer[index++] = 0;
+      // Write float
+      writeIEEE754(buffer, value, index, 'little', 52, 8);
+      // Ajust index
+      index = index + 8;
+    } else {
+      // Set long type
+      buffer[index++] = BSON.BSON_DATA_LONG;
+      // Number of written bytes
+      var numberOfWrittenBytes = buffer.write(key, index, 'utf8');
+      // Encode the name
+      index = index + numberOfWrittenBytes;
+      buffer[index++] = 0;
+      var longVal = Long.fromNumber(value);
+      var lowBits = longVal.getLowBits();
+      var highBits = longVal.getHighBits();
+      // Encode low bits
+      buffer[index++] = lowBits & 0xff;
+      buffer[index++] = (lowBits >> 8) & 0xff;
+      buffer[index++] = (lowBits >> 16) & 0xff;
+      buffer[index++] = (lowBits >> 24) & 0xff;
+      // Encode high bits
+      buffer[index++] = highBits & 0xff;
+      buffer[index++] = (highBits >> 8) & 0xff;
+      buffer[index++] = (highBits >> 16) & 0xff;
+      buffer[index++] = (highBits >> 24) & 0xff;
+    }
+  } else {
+    // Encode as double
+    buffer[index++] = BSON.BSON_DATA_NUMBER;
+    // Number of written bytes
+    var numberOfWrittenBytes = buffer.write(key, index, 'utf8');
+    // Encode the name
+    index = index + numberOfWrittenBytes;
+    buffer[index++] = 0;
+    // Write float
+    writeIEEE754(buffer, value, index, 'little', 52, 8);
+    // Ajust index
+    index = index + 8;
+  }
+
+  return index;
+}
+
+var serializeUndefined = function(buffer, key, value, index) {
+  // Set long type
+  buffer[index++] = BSON.BSON_DATA_NULL;
+  // Number of written bytes
+  var numberOfWrittenBytes = buffer.write(key, index, 'utf8');
+  // Encode the name
+  index = index + numberOfWrittenBytes;
+  buffer[index++] = 0;
+  return index;
+}
+
+var serializeBoolean = function(buffer, key, value, index) {
+  // Write the type
+  buffer[index++] = BSON.BSON_DATA_BOOLEAN;
+  // Number of written bytes
+  var numberOfWrittenBytes = buffer.write(key, index, 'utf8');
+  // Encode the name
+  index = index + numberOfWrittenBytes;
+  buffer[index++] = 0;
+  // Encode the boolean value
+  buffer[index++] = value ? 1 : 0;
+  return index;
+}
+
+var serializeDate = function(buffer, key, value, index) {
+  // Write the type
+  buffer[index++] = BSON.BSON_DATA_DATE;
+  // Number of written bytes
+  var numberOfWrittenBytes = buffer.write(key, index, 'utf8');
+  // Encode the name
+  index = index + numberOfWrittenBytes;
+  buffer[index++] = 0;
+
+  // Write the date
+  var dateInMilis = Long.fromNumber(value.getTime());
+  var lowBits = dateInMilis.getLowBits();
+  var highBits = dateInMilis.getHighBits();
+  // Encode low bits
+  buffer[index++] = lowBits & 0xff;
+  buffer[index++] = (lowBits >> 8) & 0xff;
+  buffer[index++] = (lowBits >> 16) & 0xff;
+  buffer[index++] = (lowBits >> 24) & 0xff;
+  // Encode high bits
+  buffer[index++] = highBits & 0xff;
+  buffer[index++] = (highBits >> 8) & 0xff;
+  buffer[index++] = (highBits >> 16) & 0xff;
+  buffer[index++] = (highBits >> 24) & 0xff;
+  return index;
+}
+
+var serializeRegExp = function(buffer, key, value, index) {
+  // Write the type
+  buffer[index++] = BSON.BSON_DATA_REGEXP;
+  // Number of written bytes
+  var numberOfWrittenBytes = buffer.write(key, index, 'utf8');
+  // Encode the name
+  index = index + numberOfWrittenBytes;
+  buffer[index++] = 0;
+  if (value.source && value.source.match(regexp) != null) {
+    throw Error("value " + value.source + " must not contain null bytes");
+  }
+  // Adjust the index
+  index = index + buffer.write(value.source, index, 'utf8');
+  // Write zero
+  buffer[index++] = 0x00;
+  // Write the parameters
+  if(value.global) buffer[index++] = 0x73; // s
+  if(value.ignoreCase) buffer[index++] = 0x69; // i
+  if(value.multiline) buffer[index++] = 0x6d; // m
+  // Add ending zero
+  buffer[index++] = 0x00;
+  return index;
+}
+
+var serializeBSONRegExp = function(buffer, key, value, index) {
+  // Write the type
+  buffer[index++] = BSON.BSON_DATA_REGEXP;
+  // Number of written bytes
+  var numberOfWrittenBytes = buffer.write(key, index, 'utf8');
+  // Encode the name
+  index = index + numberOfWrittenBytes;
+  buffer[index++] = 0;
+  // Adjust the index
+  index = index + buffer.write(value.pattern, index, 'utf8');
+  // Write zero
+  buffer[index++] = 0x00;
+  // Write the options
+  index = index + buffer.write(value.options, index, 'utf8');
+  // Add ending zero
+  buffer[index++] = 0x00;
+  return index;
+}
+
+var serializeMinMax = function(buffer, key, value, index) {
+  // Write the type of either min or max key
+  if(value === null) {
+    buffer[index++] = BSON.BSON_DATA_NULL;
+  } else if(value instanceof MinKey) {
+    buffer[index++] = BSON.BSON_DATA_MIN_KEY;
+  } else {
+    buffer[index++] = BSON.BSON_DATA_MAX_KEY;
+  }
+
+  // Number of written bytes
+  var numberOfWrittenBytes = buffer.write(key, index, 'utf8');
+  // Encode the name
+  index = index + numberOfWrittenBytes;
+  buffer[index++] = 0;
+  return index;
+}
+
+var serializeObjectId = function(buffer, key, value, index) {
+  // Write the type
+  buffer[index++] = BSON.BSON_DATA_OID;
+  // Number of written bytes
+  var numberOfWrittenBytes = buffer.write(key, index, 'utf8');
+
+  // Encode the name
+  index = index + numberOfWrittenBytes;
+  buffer[index++] = 0;
+
+  // Write the objectId into the shared buffer
+  buffer.write(value.id, index, 'binary')
+
+  // Ajust index
+  return index + 12;
+}
+
+var serializeBuffer = function(buffer, key, value, index) {
+  // Write the type
+  buffer[index++] = BSON.BSON_DATA_BINARY;
+  // Number of written bytes
+  var numberOfWrittenBytes = buffer.write(key, index, 'utf8');
+  // Encode the name
+  index = index + numberOfWrittenBytes;
+  buffer[index++] = 0;
+  // Get size of the buffer (current write point)
+  var size = value.length;
+  // Write the size of the string to buffer
+  buffer[index++] = size & 0xff;
+  buffer[index++] = (size >> 8) & 0xff;
+  buffer[index++] = (size >> 16) & 0xff;
+  buffer[index++] = (size >> 24) & 0xff;
+  // Write the default subtype
+  buffer[index++] = BSON.BSON_BINARY_SUBTYPE_DEFAULT;
+  // Copy the content form the binary field to the buffer
+  value.copy(buffer, index, 0, size);
+  // Adjust the index
+  index = index + size;
+  return index;
+}
+
+var serializeObject = function(buffer, key, value, index, checkKeys, depth, serializeFunctions, ignoreUndefined) {
+  // Write the type
+  buffer[index++] = Array.isArray(value) ? BSON.BSON_DATA_ARRAY : BSON.BSON_DATA_OBJECT;
+  // Number of written bytes
+  var numberOfWrittenBytes = buffer.write(key, index, 'utf8');
+  // Encode the name
+  index = index + numberOfWrittenBytes;
+  buffer[index++] = 0;
+  var endIndex = serializeInto(buffer, value, checkKeys, index, depth + 1, serializeFunctions, ignoreUndefined);
+  // Write size
+  var size = endIndex - index;
+  return endIndex;
+}
+
+var serializeLong = function(buffer, key, value, index) {
+  // Write the type
+  buffer[index++] = value instanceof Long ? BSON.BSON_DATA_LONG : BSON.BSON_DATA_TIMESTAMP;
+  // Number of written bytes
+  var numberOfWrittenBytes = buffer.write(key, index, 'utf8');
+  // Encode the name
+  index = index + numberOfWrittenBytes;
+  buffer[index++] = 0;
+  // Write the date
+  var lowBits = value.getLowBits();
+  var highBits = value.getHighBits();
+  // Encode low bits
+  buffer[index++] = lowBits & 0xff;
+  buffer[index++] = (lowBits >> 8) & 0xff;
+  buffer[index++] = (lowBits >> 16) & 0xff;
+  buffer[index++] = (lowBits >> 24) & 0xff;
+  // Encode high bits
+  buffer[index++] = highBits & 0xff;
+  buffer[index++] = (highBits >> 8) & 0xff;
+  buffer[index++] = (highBits >> 16) & 0xff;
+  buffer[index++] = (highBits >> 24) & 0xff;
+  return index;
+}
+
+var serializeDouble = function(buffer, key, value, index) {
+  // Encode as double
+  buffer[index++] = BSON.BSON_DATA_NUMBER;
+  // Number of written bytes
+  var numberOfWrittenBytes = buffer.write(key, index, 'utf8');
+  // Encode the name
+  index = index + numberOfWrittenBytes;
+  buffer[index++] = 0;
+  // Write float
+  writeIEEE754(buffer, value, index, 'little', 52, 8);
+  // Ajust index
+  index = index + 8;
+  return index;
+}
+
+var serializeFunction = function(buffer, key, value, index, checkKeys, depth) {
+  buffer[index++] = BSON.BSON_DATA_CODE;
+  // Number of written bytes
+  var numberOfWrittenBytes = buffer.write(key, index, 'utf8');
+  // Encode the name
+  index = index + numberOfWrittenBytes;
+  buffer[index++] = 0;
+  // Function string
+  var functionString = value.toString();
+  // Write the string
+  var size = buffer.write(functionString, index + 4, 'utf8') + 1;
+  // Write the size of the string to buffer
+  buffer[index] = size & 0xff;
+  buffer[index + 1] = (size >> 8) & 0xff;
+  buffer[index + 2] = (size >> 16) & 0xff;
+  buffer[index + 3] = (size >> 24) & 0xff;
+  // Update index
+  index = index + 4 + size - 1;
+  // Write zero
+  buffer[index++] = 0;
+  return index;
+}
+
+var serializeCode = function(buffer, key, value, index, checkKeys, depth, serializeFunctions, ignoreUndefined) {
+  if(value.scope != null && Object.keys(value.scope).length > 0) {
+    // Write the type
+    buffer[index++] = BSON.BSON_DATA_CODE_W_SCOPE;
+    // Number of written bytes
+    var numberOfWrittenBytes = buffer.write(key, index, 'utf8');
+    // Encode the name
+    index = index + numberOfWrittenBytes;
+    buffer[index++] = 0;
+
+    // Starting index
+    var startIndex = index;
+
+    // Serialize the function
+    // Get the function string
+    var functionString = typeof value.code == 'string' ? value.code : value.code.toString();
+    // Index adjustment
+    index = index + 4;
+    // Write string into buffer
+    var codeSize = buffer.write(functionString, index + 4, 'utf8') + 1;
+    // Write the size of the string to buffer
+    buffer[index] = codeSize & 0xff;
+    buffer[index + 1] = (codeSize >> 8) & 0xff;
+    buffer[index + 2] = (codeSize >> 16) & 0xff;
+    buffer[index + 3] = (codeSize >> 24) & 0xff;
+    // Write end 0
+    buffer[index + 4 + codeSize - 1] = 0;
+    // Write the
+    index = index + codeSize + 4;
+
+    //
+    // Serialize the scope value
+    var endIndex = serializeInto(buffer, value.scope, checkKeys, index, depth + 1, serializeFunctions, ignoreUndefined)
+    index = endIndex - 1;
+
+    // Writ the total
+    var totalSize = endIndex - startIndex;
+
+    // Write the total size of the object
+    buffer[startIndex++] = totalSize & 0xff;
+    buffer[startIndex++] = (totalSize >> 8) & 0xff;
+    buffer[startIndex++] = (totalSize >> 16) & 0xff;
+    buffer[startIndex++] = (totalSize >> 24) & 0xff;
+    // Write trailing zero
+    buffer[index++] = 0;
+  } else {
+    buffer[index++] = BSON.BSON_DATA_CODE;
+    // Number of written bytes
+    var numberOfWrittenBytes = buffer.write(key, index, 'utf8');
+    // Encode the name
+    index = index + numberOfWrittenBytes;
+    buffer[index++] = 0;
+    // Function string
+    var functionString = value.code.toString();
+    // Write the string
+    var size = buffer.write(functionString, index + 4, 'utf8') + 1;
+    // Write the size of the string to buffer
+    buffer[index] = size & 0xff;
+    buffer[index + 1] = (size >> 8) & 0xff;
+    buffer[index + 2] = (size >> 16) & 0xff;
+    buffer[index + 3] = (size >> 24) & 0xff;
+    // Update index
+    index = index + 4 + size - 1;
+    // Write zero
+    buffer[index++] = 0;
+  }
+
+  return index;
+}
+
+var serializeBinary = function(buffer, key, value, index) {
+  // Write the type
+  buffer[index++] = BSON.BSON_DATA_BINARY;
+  // Number of written bytes
+  var numberOfWrittenBytes = buffer.write(key, index, 'utf8');
+  // Encode the name
+  index = index + numberOfWrittenBytes;
+  buffer[index++] = 0;
+  // Extract the buffer
+  var data = value.value(true);
+  // Calculate size
+  var size = value.position;
+  // Write the size of the string to buffer
+  buffer[index++] = size & 0xff;
+  buffer[index++] = (size >> 8) & 0xff;
+  buffer[index++] = (size >> 16) & 0xff;
+  buffer[index++] = (size >> 24) & 0xff;
+  // Write the subtype to the buffer
+  buffer[index++] = value.sub_type;
+
+  // If we have binary type 2 the 4 first bytes are the size
+  if(value.sub_type == Binary.SUBTYPE_BYTE_ARRAY) {
+    buffer[index++] = size & 0xff;
+    buffer[index++] = (size >> 8) & 0xff;
+    buffer[index++] = (size >> 16) & 0xff;
+    buffer[index++] = (size >> 24) & 0xff;
+  }
+
+  // Write the data to the object
+  data.copy(buffer, index, 0, value.position);
+  // Adjust the index
+  index = index + value.position;
+  return index;
+}
+
+var serializeSymbol = function(buffer, key, value, index) {
+  // Write the type
+  buffer[index++] = BSON.BSON_DATA_SYMBOL;
+  // Number of written bytes
+  var numberOfWrittenBytes = buffer.write(key, index, 'utf8');
+  // Encode the name
+  index = index + numberOfWrittenBytes;
+  buffer[index++] = 0;
+  // Write the string
+  var size = buffer.write(value.value, index + 4, 'utf8') + 1;
+  // Write the size of the string to buffer
+  buffer[index] = size & 0xff;
+  buffer[index + 1] = (size >> 8) & 0xff;
+  buffer[index + 2] = (size >> 16) & 0xff;
+  buffer[index + 3] = (size >> 24) & 0xff;
+  // Update index
+  index = index + 4 + size - 1;
+  // Write zero
+  buffer[index++] = 0x00;
+  return index;
+}
+
+var serializeDBRef = function(buffer, key, value, index, depth, serializeFunctions) {
+  // Write the type
+  buffer[index++] = BSON.BSON_DATA_OBJECT;
+  // Number of written bytes
+  var numberOfWrittenBytes = buffer.write(key, index, 'utf8');
+
+  // Encode the name
+  index = index + numberOfWrittenBytes;
+  buffer[index++] = 0;
+
+  var startIndex = index;
+  var endIndex;
+
+  // Serialize object
+  if(null != value.db) {
+    endIndex = serializeInto(buffer, {
+        '$ref': value.namespace
+      , '$id' : value.oid
+      , '$db' : value.db
+    }, false, index, depth + 1, serializeFunctions);
+  } else {
+    endIndex = serializeInto(buffer, {
+        '$ref': value.namespace
+      , '$id' : value.oid
+    }, false, index, depth + 1, serializeFunctions);
+  }
+
+  // Calculate object size
+  var size = endIndex - startIndex;
+  // Write the size
+  buffer[startIndex++] = size & 0xff;
+  buffer[startIndex++] = (size >> 8) & 0xff;
+  buffer[startIndex++] = (size >> 16) & 0xff;
+  buffer[startIndex++] = (size >> 24) & 0xff;
+  // Set index
+  return endIndex;
+}
+
+var serializeInto = function serializeInto(buffer, object, checkKeys, startingIndex, depth, serializeFunctions, ignoreUndefined) {
+  startingIndex = startingIndex || 0;
+
+  // Start place to serialize into
+  var index = startingIndex + 4;
+  var self = this;
+
+  // Special case isArray
+  if(Array.isArray(object)) {
+    // Get object keys
+    for(var i = 0; i < object.length; i++) {
+      var key = "" + i;
+      var value = object[i];
+
+      // Is there an override value
+      if(value && value.toBSON) {
+        if(typeof value.toBSON != 'function') throw new Error("toBSON is not a function");
+        value = value.toBSON();
+      }
+
+      var type = typeof value;
+      if(type == 'string') {
+        index = serializeString(buffer, key, value, index);
+      } else if(type == 'number') {
+        index = serializeNumber(buffer, key, value, index);
+      } else if(type == 'boolean') {
+        index = serializeBoolean(buffer, key, value, index);
+      } else if(value instanceof Date || isDate(value)) {
+        index = serializeDate(buffer, key, value, index);
+      } else if(type == 'undefined' || value == null) {
+        index = serializeUndefined(buffer, key, value, index);
+      } else if(value['_bsontype'] == 'ObjectID') {
+        index = serializeObjectId(buffer, key, value, index);
+      } else if(Buffer.isBuffer(value)) {
+        index = serializeBuffer(buffer, key, value, index);
+      } else if(value instanceof RegExp || isRegExp(value)) {
+        index = serializeRegExp(buffer, key, value, index);
+      } else if(type == 'object' && value['_bsontype'] == null) {
+        index = serializeObject(buffer, key, value, index, checkKeys, depth, serializeFunctions, ignoreUndefined);
+      } else if(value['_bsontype'] == 'Long' || value['_bsontype'] == 'Timestamp') {
+        index = serializeLong(buffer, key, value, index);
+      } else if(value['_bsontype'] == 'Double') {
+        index = serializeDouble(buffer, key, value, index);
+      } else if(typeof value == 'function' && serializeFunctions) {
+        index = serializeFunction(buffer, key, value, index, checkKeys, depth, serializeFunctions);
+      } else if(value['_bsontype'] == 'Code') {
+        index = serializeCode(buffer, key, value, index, checkKeys, depth, serializeFunctions, ignoreUndefined);
+      } else if(value['_bsontype'] == 'Binary') {
+        index = serializeBinary(buffer, key, value, index);
+      } else if(value['_bsontype'] == 'Symbol') {
+        index = serializeSymbol(buffer, key, value, index);
+      } else if(value['_bsontype'] == 'DBRef') {
+        index = serializeDBRef(buffer, key, value, index, depth, serializeFunctions);
+      } else if(value['_bsontype'] == 'BSONRegExp') {
+        index = serializeBSONRegExp(buffer, key, value, index);        
+      } else if(value['_bsontype'] == 'MinKey' || value['_bsontype'] == 'MaxKey') {
+        index = serializeMinMax(buffer, key, value, index);
+      }
+    }
+  } else if(object instanceof Map) {
+    var iterator = object.entries();
+    var done = false;
+
+    while(!done) {
+      // Unpack the next entry
+      var entry = iterator.next();
+      done = entry.done;
+      // Are we done, then skip and terminate
+      if(done) continue;
+
+      // Get the entry values
+      var key = entry.value[0];
+      var value = entry.value[1];
+
+      // Check the type of the value
+      var type = typeof value;
+
+      // Check the key and throw error if it's illegal
+      if(key != '$db' && key != '$ref' && key != '$id') {
+        if (key.match(regexp) != null) {
+          // The BSON spec doesn't allow keys with null bytes because keys are
+          // null-terminated.
+          throw Error("key " + key + " must not contain null bytes");
+        }
+
+        if (checkKeys) {
+          if('$' == key[0]) {
+            throw Error("key " + key + " must not start with '$'");
+          } else if (!!~key.indexOf('.')) {
+            throw Error("key " + key + " must not contain '.'");
+          }
+        }
+      }
+      
+      // console.log("---------------------------------------------------")
+      // console.dir("key = " + key)
+      // console.dir("value = " + value)
+
+      if(type == 'string') {
+        index = serializeString(buffer, key, value, index);
+      } else if(type == 'number') {
+        index = serializeNumber(buffer, key, value, index);
+      } else if(type == 'boolean') {
+        index = serializeBoolean(buffer, key, value, index);
+      } else if(value instanceof Date || isDate(value)) {
+        index = serializeDate(buffer, key, value, index);
+      } else if(value === undefined && ignoreUndefined == true) {
+      } else if(value === null || value === undefined) {
+        index = serializeUndefined(buffer, key, value, index);
+      } else if(value['_bsontype'] == 'ObjectID') {
+        index = serializeObjectId(buffer, key, value, index);
+      } else if(Buffer.isBuffer(value)) {
+        index = serializeBuffer(buffer, key, value, index);
+      } else if(value instanceof RegExp || isRegExp(value)) {
+        index = serializeRegExp(buffer, key, value, index);
+      } else if(type == 'object' && value['_bsontype'] == null) {
+        index = serializeObject(buffer, key, value, index, checkKeys, depth, serializeFunctions, ignoreUndefined);
+      } else if(value['_bsontype'] == 'Long' || value['_bsontype'] == 'Timestamp') {
+        index = serializeLong(buffer, key, value, index);
+      } else if(value['_bsontype'] == 'Double') {
+        index = serializeDouble(buffer, key, value, index);
+      } else if(value['_bsontype'] == 'Code') {
+        index = serializeCode(buffer, key, value, index, checkKeys, depth, serializeFunctions, ignoreUndefined);
+      } else if(typeof value == 'function' && serializeFunctions) {
+        index = serializeFunction(buffer, key, value, index, checkKeys, depth, serializeFunctions);
+      } else if(value['_bsontype'] == 'Binary') {
+        index = serializeBinary(buffer, key, value, index);
+      } else if(value['_bsontype'] == 'Symbol') {
+        index = serializeSymbol(buffer, key, value, index);
+      } else if(value['_bsontype'] == 'DBRef') {
+        index = serializeDBRef(buffer, key, value, index, depth, serializeFunctions);
+      } else if(value['_bsontype'] == 'BSONRegExp') {
+        index = serializeBSONRegExp(buffer, key, value, index);        
+      } else if(value['_bsontype'] == 'MinKey' || value['_bsontype'] == 'MaxKey') {
+        index = serializeMinMax(buffer, key, value, index);
+      }
+    }
+  } else {
+    // Did we provide a custom serialization method
+    if(object.toBSON) {
+      if(typeof object.toBSON != 'function') throw new Error("toBSON is not a function");
+      object = object.toBSON();
+      if(object != null && typeof object != 'object') throw new Error("toBSON function did not return an object");
+    }
+
+    // Iterate over all the keys
+    for(var key in object) {
+      var value = object[key];
+      // Is there an override value
+      if(value && value.toBSON) {
+        if(typeof value.toBSON != 'function') throw new Error("toBSON is not a function");
+        value = value.toBSON();
+      }
+
+      // Check the type of the value
+      var type = typeof value;
+
+      // Check the key and throw error if it's illegal
+      if(key != '$db' && key != '$ref' && key != '$id') {
+        if (key.match(regexp) != null) {
+          // The BSON spec doesn't allow keys with null bytes because keys are
+          // null-terminated.
+          throw Error("key " + key + " must not contain null bytes");
+        }
+
+        if (checkKeys) {
+          if('$' == key[0]) {
+            throw Error("key " + key + " must not start with '$'");
+          } else if (!!~key.indexOf('.')) {
+            throw Error("key " + key + " must not contain '.'");
+          }
+        }
+      }
+
+      if(type == 'string') {
+        index = serializeString(buffer, key, value, index);
+      } else if(type == 'number') {
+        index = serializeNumber(buffer, key, value, index);
+      } else if(type == 'boolean') {
+        index = serializeBoolean(buffer, key, value, index);
+      } else if(value instanceof Date || isDate(value)) {
+        index = serializeDate(buffer, key, value, index);
+      } else if(value === undefined && ignoreUndefined == true) {
+      } else if(value === null || value === undefined) {
+        index = serializeUndefined(buffer, key, value, index);
+      } else if(value['_bsontype'] == 'ObjectID') {
+        index = serializeObjectId(buffer, key, value, index);
+      } else if(Buffer.isBuffer(value)) {
+        index = serializeBuffer(buffer, key, value, index);
+      } else if(value instanceof RegExp || isRegExp(value)) {
+        index = serializeRegExp(buffer, key, value, index);
+      } else if(type == 'object' && value['_bsontype'] == null) {
+        index = serializeObject(buffer, key, value, index, checkKeys, depth, serializeFunctions, ignoreUndefined);
+      } else if(value['_bsontype'] == 'Long' || value['_bsontype'] == 'Timestamp') {
+        index = serializeLong(buffer, key, value, index);
+      } else if(value['_bsontype'] == 'Double') {
+        index = serializeDouble(buffer, key, value, index);
+      } else if(value['_bsontype'] == 'Code') {
+        index = serializeCode(buffer, key, value, index, checkKeys, depth, serializeFunctions, ignoreUndefined);
+      } else if(typeof value == 'function' && serializeFunctions) {
+        index = serializeFunction(buffer, key, value, index, checkKeys, depth, serializeFunctions);
+      } else if(value['_bsontype'] == 'Binary') {
+        index = serializeBinary(buffer, key, value, index);
+      } else if(value['_bsontype'] == 'Symbol') {
+        index = serializeSymbol(buffer, key, value, index);
+      } else if(value['_bsontype'] == 'DBRef') {
+        index = serializeDBRef(buffer, key, value, index, depth, serializeFunctions);
+      } else if(value['_bsontype'] == 'BSONRegExp') {
+        index = serializeBSONRegExp(buffer, key, value, index);        
+      } else if(value['_bsontype'] == 'MinKey' || value['_bsontype'] == 'MaxKey') {
+        index = serializeMinMax(buffer, key, value, index);
+      }
+    }
+  }
+
+  // Final padding byte for object
+  buffer[index++] = 0x00;
+
+  // Final size
+  var size = index - startingIndex;
+  // Write the size of the object
+  buffer[startingIndex++] = size & 0xff;
+  buffer[startingIndex++] = (size >> 8) & 0xff;
+  buffer[startingIndex++] = (size >> 16) & 0xff;
+  buffer[startingIndex++] = (size >> 24) & 0xff;
+  return index;
+}
+
+var BSON = {};
+
+/**
+ * Contains the function cache if we have that enable to allow for avoiding the eval step on each deserialization, comparison is by md5
+ *
+ * @ignore
+ * @api private
+ */
+var functionCache = BSON.functionCache = {};
+
+/**
+ * Number BSON Type
+ *
+ * @classconstant BSON_DATA_NUMBER
+ **/
+BSON.BSON_DATA_NUMBER = 1;
+/**
+ * String BSON Type
+ *
+ * @classconstant BSON_DATA_STRING
+ **/
+BSON.BSON_DATA_STRING = 2;
+/**
+ * Object BSON Type
+ *
+ * @classconstant BSON_DATA_OBJECT
+ **/
+BSON.BSON_DATA_OBJECT = 3;
+/**
+ * Array BSON Type
+ *
+ * @classconstant BSON_DATA_ARRAY
+ **/
+BSON.BSON_DATA_ARRAY = 4;
+/**
+ * Binary BSON Type
+ *
+ * @classconstant BSON_DATA_BINARY
+ **/
+BSON.BSON_DATA_BINARY = 5;
+/**
+ * ObjectID BSON Type
+ *
+ * @classconstant BSON_DATA_OID
+ **/
+BSON.BSON_DATA_OID = 7;
+/**
+ * Boolean BSON Type
+ *
+ * @classconstant BSON_DATA_BOOLEAN
+ **/
+BSON.BSON_DATA_BOOLEAN = 8;
+/**
+ * Date BSON Type
+ *
+ * @classconstant BSON_DATA_DATE
+ **/
+BSON.BSON_DATA_DATE = 9;
+/**
+ * null BSON Type
+ *
+ * @classconstant BSON_DATA_NULL
+ **/
+BSON.BSON_DATA_NULL = 10;
+/**
+ * RegExp BSON Type
+ *
+ * @classconstant BSON_DATA_REGEXP
+ **/
+BSON.BSON_DATA_REGEXP = 11;
+/**
+ * Code BSON Type
+ *
+ * @classconstant BSON_DATA_CODE
+ **/
+BSON.BSON_DATA_CODE = 13;
+/**
+ * Symbol BSON Type
+ *
+ * @classconstant BSON_DATA_SYMBOL
+ **/
+BSON.BSON_DATA_SYMBOL = 14;
+/**
+ * Code with Scope BSON Type
+ *
+ * @classconstant BSON_DATA_CODE_W_SCOPE
+ **/
+BSON.BSON_DATA_CODE_W_SCOPE = 15;
+/**
+ * 32 bit Integer BSON Type
+ *
+ * @classconstant BSON_DATA_INT
+ **/
+BSON.BSON_DATA_INT = 16;
+/**
+ * Timestamp BSON Type
+ *
+ * @classconstant BSON_DATA_TIMESTAMP
+ **/
+BSON.BSON_DATA_TIMESTAMP = 17;
+/**
+ * Long BSON Type
+ *
+ * @classconstant BSON_DATA_LONG
+ **/
+BSON.BSON_DATA_LONG = 18;
+/**
+ * MinKey BSON Type
+ *
+ * @classconstant BSON_DATA_MIN_KEY
+ **/
+BSON.BSON_DATA_MIN_KEY = 0xff;
+/**
+ * MaxKey BSON Type
+ *
+ * @classconstant BSON_DATA_MAX_KEY
+ **/
+BSON.BSON_DATA_MAX_KEY = 0x7f;
+
+/**
+ * Binary Default Type
+ *
+ * @classconstant BSON_BINARY_SUBTYPE_DEFAULT
+ **/
+BSON.BSON_BINARY_SUBTYPE_DEFAULT = 0;
+/**
+ * Binary Function Type
+ *
+ * @classconstant BSON_BINARY_SUBTYPE_FUNCTION
+ **/
+BSON.BSON_BINARY_SUBTYPE_FUNCTION = 1;
+/**
+ * Binary Byte Array Type
+ *
+ * @classconstant BSON_BINARY_SUBTYPE_BYTE_ARRAY
+ **/
+BSON.BSON_BINARY_SUBTYPE_BYTE_ARRAY = 2;
+/**
+ * Binary UUID Type
+ *
+ * @classconstant BSON_BINARY_SUBTYPE_UUID
+ **/
+BSON.BSON_BINARY_SUBTYPE_UUID = 3;
+/**
+ * Binary MD5 Type
+ *
+ * @classconstant BSON_BINARY_SUBTYPE_MD5
+ **/
+BSON.BSON_BINARY_SUBTYPE_MD5 = 4;
+/**
+ * Binary User Defined Type
+ *
+ * @classconstant BSON_BINARY_SUBTYPE_USER_DEFINED
+ **/
+BSON.BSON_BINARY_SUBTYPE_USER_DEFINED = 128;
+
+// BSON MAX VALUES
+BSON.BSON_INT32_MAX = 0x7FFFFFFF;
+BSON.BSON_INT32_MIN = -0x80000000;
+
+BSON.BSON_INT64_MAX = Math.pow(2, 63) - 1;
+BSON.BSON_INT64_MIN = -Math.pow(2, 63);
+
+// JS MAX PRECISE VALUES
+BSON.JS_INT_MAX = 0x20000000000000;  // Any integer up to 2^53 can be precisely represented by a double.
+BSON.JS_INT_MIN = -0x20000000000000;  // Any integer down to -2^53 can be precisely represented by a double.
+
+// Internal long versions
+var JS_INT_MAX_LONG = Long.fromNumber(0x20000000000000);  // Any integer up to 2^53 can be precisely represented by a double.
+var JS_INT_MIN_LONG = Long.fromNumber(-0x20000000000000);  // Any integer down to -2^53 can be precisely represented by a double.
+
+module.exports = serializeInto;
+
+}).call(this,require("buffer").Buffer)
+},{"../binary":58,"../code":61,"../db_ref":62,"../double":63,"../float_parser":64,"../long":65,"../map":66,"../max_key":67,"../min_key":68,"../objectid":69,"../regexp":73,"../symbol":74,"../timestamp":75,"buffer":49}],73:[function(require,module,exports){
+/**
+ * A class representation of the BSON RegExp type.
+ *
+ * @class
+ * @return {BSONRegExp} A MinKey instance
+ */
+function BSONRegExp(pattern, options) {
+  if(!(this instanceof BSONRegExp)) return new BSONRegExp();
+  
+  // Execute
+  this._bsontype = 'BSONRegExp';
+  this.pattern = pattern;
+  this.options = options;
+
+  // Validate options
+  for(var i = 0; i < options.length; i++) {
+    if(!(this.options[i] == 'i' 
+      || this.options[i] == 'm'
+      || this.options[i] == 'x'
+      || this.options[i] == 'l'
+      || this.options[i] == 's'
+      || this.options[i] == 'u'
+    )) {
+      throw new Error('the regular expression options [' + this.options[i] + "] is not supported");
+    }
+  }
+}
+
+module.exports = BSONRegExp;
+module.exports.BSONRegExp = BSONRegExp;
+},{}],74:[function(require,module,exports){
 /**
  * A class representation of the BSON Symbol type.
  *
@@ -18391,7 +19111,7 @@ Symbol.prototype.toJSON = function() {
 
 module.exports = Symbol;
 module.exports.Symbol = Symbol;
-},{}],70:[function(require,module,exports){
+},{}],75:[function(require,module,exports){
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -19248,7 +19968,7 @@ Timestamp.TWO_PWR_24_ = Timestamp.fromInt(1 << 24);
  */
 module.exports = Timestamp;
 module.exports.Timestamp = Timestamp;
-},{}],71:[function(require,module,exports){
+},{}],76:[function(require,module,exports){
 // TODO Add in pre and post skipping options
 module.exports = {
   /**
@@ -19441,7 +20161,7 @@ function once (fn, scope) {
   };
 }
 
-},{}],72:[function(require,module,exports){
+},{}],77:[function(require,module,exports){
 (function (process){
 'use strict';
 
@@ -19674,10 +20394,10 @@ Kareem.prototype.clone = function() {
 module.exports = Kareem;
 
 }).call(this,require("FWaASH"))
-},{"FWaASH":55}],73:[function(require,module,exports){
+},{"FWaASH":55}],78:[function(require,module,exports){
 module.exports = exports = require('./lib');
 
-},{"./lib":74}],74:[function(require,module,exports){
+},{"./lib":79}],79:[function(require,module,exports){
 
 /**
  * Returns the value of object `o` at the given `path`.
@@ -19862,7 +20582,7 @@ function K (v) {
   return v;
 }
 
-},{}],75:[function(require,module,exports){
+},{}],80:[function(require,module,exports){
 (function (process){
 'use strict';
 var util = require('util');
@@ -20306,7 +21026,7 @@ Promise.deferred = function deferred() {
 
 
 }).call(this,require("FWaASH"))
-},{"FWaASH":55,"events":53,"util":57}],76:[function(require,module,exports){
+},{"FWaASH":55,"events":53,"util":57}],81:[function(require,module,exports){
 'use strict';
 
 /**
@@ -20350,7 +21070,7 @@ function notImplemented (method) {
 }
 
 
-},{}],77:[function(require,module,exports){
+},{}],82:[function(require,module,exports){
 'use strict';
 
 var env = require('../env')
@@ -20365,7 +21085,7 @@ module.exports =
   require('./collection');
 
 
-},{"../env":79,"./collection":76,"./node":78}],78:[function(require,module,exports){
+},{"../env":84,"./collection":81,"./node":83}],83:[function(require,module,exports){
 'use strict';
 
 /**
@@ -20467,7 +21187,7 @@ NodeCollection.prototype.findStream = function(match, findOptions, streamOptions
 module.exports = exports = NodeCollection;
 
 
-},{"../utils":82,"./collection":76}],79:[function(require,module,exports){
+},{"../utils":87,"./collection":81}],84:[function(require,module,exports){
 (function (process,global,Buffer){
 'use strict';
 
@@ -20493,7 +21213,7 @@ exports.type = exports.isNode ? 'node'
   : 'unknown'
 
 }).call(this,require("FWaASH"),typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer)
-},{"FWaASH":55,"buffer":49}],80:[function(require,module,exports){
+},{"FWaASH":55,"buffer":49}],85:[function(require,module,exports){
 'use strict';
 
 /**
@@ -22842,9 +23562,9 @@ Query.prototype.then = function(resolve, reject) {
   var self = this;
   var promise = new Query.Promise(function(success, error) {
     self.exec(function(err, val) {
-      self = resolve = reject = null;
-      if (err) return error(err);
-      success(val);
+      if (err) error(err);
+      else success(val);
+      self = success = error = null;
     });
   });
   return promise.then(resolve, reject);
@@ -22902,7 +23622,9 @@ Query.prototype.selectedInclusively = function selectedInclusively () {
   for (var i = 0; i < keys.length; ++i) {
     var key = keys[i];
     if (0 === this._fields[key]) return false;
-    if (typeof this._fields[key] === 'object' && this._fields[key].$meta) {
+    if (this._fields[key] &&
+        typeof this._fields[key] === 'object' &&
+        this._fields[key].$meta) {
       return false;
     }
   }
@@ -22972,7 +23694,7 @@ Query.prototype._optionsForExec = function () {
  */
 
 Query.prototype._fieldsForExec = function () {
-  return utils.clone(this._fields);
+  return utils.clone(this._fields, { retainKeyOrder: true });
 }
 
 /**
@@ -23105,7 +23827,7 @@ module.exports = exports = Query;
 // TODO
 // test utils
 
-},{"./collection":77,"./collection/collection":76,"./env":79,"./permissions":81,"./utils":82,"assert":48,"bluebird":83,"debug":84,"sliced":89,"util":57}],81:[function(require,module,exports){
+},{"./collection":82,"./collection/collection":81,"./env":84,"./permissions":86,"./utils":87,"assert":48,"bluebird":88,"debug":89,"sliced":93,"util":57}],86:[function(require,module,exports){
 'use strict';
 
 var denied = exports;
@@ -23197,7 +23919,7 @@ denied.count.maxScan =
 denied.count.snapshot =
 denied.count.tailable = true;
 
-},{}],82:[function(require,module,exports){
+},{}],87:[function(require,module,exports){
 (function (process,Buffer){
 'use strict';
 
@@ -23532,7 +24254,7 @@ exports.cloneBuffer = function (buff) {
 };
 
 }).call(this,require("FWaASH"),require("buffer").Buffer)
-},{"FWaASH":55,"buffer":49,"regexp-clone":88}],83:[function(require,module,exports){
+},{"FWaASH":55,"buffer":49,"regexp-clone":92}],88:[function(require,module,exports){
 (function (process,global){
 /* @preserve
  * The MIT License (MIT)
@@ -28640,7 +29362,7 @@ function isUndefined(arg) {
 },{}]},{},[4])(4)
 });                    ;if (typeof window !== 'undefined' && window !== null) {                               window.P = window.Promise;                                                     } else if (typeof self !== 'undefined' && self !== null) {                             self.P = self.Promise;                                                         }
 }).call(this,require("FWaASH"),typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"FWaASH":55}],84:[function(require,module,exports){
+},{"FWaASH":55}],89:[function(require,module,exports){
 
 /**
  * This is the web browser implementation of `debug()`.
@@ -28810,7 +29532,7 @@ function localstorage(){
   } catch (e) {}
 }
 
-},{"./debug":85}],85:[function(require,module,exports){
+},{"./debug":90}],90:[function(require,module,exports){
 
 /**
  * This is the common logic for both the Node.js and web browser
@@ -29009,7 +29731,7 @@ function coerce(val) {
   return val;
 }
 
-},{"ms":86}],86:[function(require,module,exports){
+},{"ms":91}],91:[function(require,module,exports){
 /**
  * Helpers.
  */
@@ -29136,44 +29858,7 @@ function plural(ms, n, name) {
   return Math.ceil(ms / n) + ' ' + name + 's';
 }
 
-},{}],87:[function(require,module,exports){
-/**
-
-# ms.js
-
-No more painful `setTimeout(fn, 60 * 4 * 3 * 2 * 1 * Infinity * NaN * '☃')`.
-
-    ms('2d')      // 172800000
-    ms('1.5h')    // 5400000
-    ms('1h')      // 3600000
-    ms('1m')      // 60000
-    ms('5s')      // 5000
-    ms('500ms')    // 500
-    ms('100')     // '100'
-    ms(100)       // 100
-
-**/
-
-(function (g) {
-  var r = /(\d*.?\d+)([mshd]+)/
-    , _ = {}
-
-  _.ms = 1;
-  _.s = 1000;
-  _.m = _.s * 60;
-  _.h = _.m * 60;
-  _.d = _.h * 24;
-
-  function ms (s) {
-    if (s == Number(s)) return Number(s);
-    r.exec(s.toLowerCase());
-    return RegExp.$1 * _[RegExp.$2];
-  }
-
-  g.top ? g.ms = ms : module.exports = ms;
-})(this);
-
-},{}],88:[function(require,module,exports){
+},{}],92:[function(require,module,exports){
 
 var toString = Object.prototype.toString;
 
@@ -29195,10 +29880,10 @@ module.exports = exports = function (regexp) {
 }
 
 
-},{}],89:[function(require,module,exports){
+},{}],93:[function(require,module,exports){
 module.exports = exports = require('./lib/sliced');
 
-},{"./lib/sliced":90}],90:[function(require,module,exports){
+},{"./lib/sliced":94}],94:[function(require,module,exports){
 
 /**
  * An Array.prototype.slice.call(arguments) alternative

@@ -1593,4 +1593,19 @@ describe('model: update:', function() {
       db.close(done);
     });
   });
+
+  it('dontThrowCastError option (gh-3512)', function(done) {
+    var db = start();
+
+    var Schema = mongoose.Schema({ name: String });
+    var Model = db.model('gh3412', Schema);
+
+    var badQuery = { _id: 'foo' };
+    var update = { name: 'test' };
+    var options = { dontThrowCastError: true };
+    Model.update(badQuery, update, options).then(null, function(error) {
+      assert.ok(error);
+      db.close(done);
+    });
+  });
 });

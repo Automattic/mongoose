@@ -749,6 +749,29 @@ describe('document: hooks:', function() {
     });
   });
 
+  it('pre set hooks on real documents (gh-3479)', function(done) {
+    var bookSchema = new Schema({
+      title: String
+    });
+
+    var preCalls = [];
+    bookSchema.pre('set', function(next, path, val) {
+      preCalls.push({ path: path, val: val });
+      next();
+    });
+
+    var Book = mongoose.model('gh3479', bookSchema);
+
+    var book = new Book({});
+
+    book.title = 'Professional AngularJS';
+    assert.equal(preCalls.length, 1);
+    assert.equal(preCalls[0].path, 'title');
+    assert.equal(preCalls[0].val, 'Professional AngularJS');
+
+    done();
+  });
+
   it('nested subdocs only fire once (gh-3281)', function(done) {
     var L3Schema = new Schema({
       title: String

@@ -2007,4 +2007,42 @@ describe('document', function() {
       });
     });
   });
+
+  it('single embedded schemas with populate (gh-3501)', function(done) {
+    var db = start();
+    var PopulateMeSchema = new Schema({
+    });
+
+    var Child = db.model('gh3501', PopulateMeSchema);
+
+    var SingleNestedSchema = new Schema({
+      populateMeArray: [{
+        type: Schema.Types.ObjectId,
+        ref: 'gh3501'
+      }]
+    });
+
+    var parentSchema = new Schema({
+      singleNested: SingleNestedSchema
+    });
+
+    var P = db.model('gh3501_1', parentSchema);
+
+    Child.create([{}, {}], function(error, docs) {
+      assert.ifError(error);
+      var obj = {
+        singleNested: { populateMeArray: [docs[0]._id, docs[1]._id] }
+      };
+      P.create(obj, function(error, doc) {
+        assert.ifError(error);
+        P.
+          findById(doc._id).
+          populate('singleNested.populateMeArray').
+          exec(function(error, doc) {
+            assert.ok(doc.singleNested.populateMeArray[0]._id);
+            db.close(done);
+          });
+      });
+    });
+  });
 });

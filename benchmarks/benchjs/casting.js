@@ -22,42 +22,50 @@ var utils = require('../../lib/utils.js');
 var Comments = new Schema;
 
 Comments.add({
-  title     : String
-  , date      : Date
-  , body      : String
-  , comments  : [Comments]
+  title: String,
+  date: Date,
+  body: String,
+  comments: [Comments]
 });
 
 var BlogPost = new Schema({
-  title     : String
-  , author    : String
-  , slug      : String
-  , date      : Date
-  , meta      : {
-    date      : Date
-      , visitors  : Number
+  title: String,
+  author: String,
+  slug: String,
+  date: Date,
+  meta: {
+    date: Date,
+    visitors: Number
+  },
+  published: Boolean,
+  mixed: {},
+  numbers: [Number],
+  tags: [String],
+  owners: [ObjectId],
+  comments: [Comments],
+  def: {
+    type: String,
+    default: 'kandinsky'
   }
-  , published : Boolean
-  , mixed     : {}
-  , numbers   : [Number]
-  , tags      : [String]
-  , owners    : [ObjectId]
-  , comments  : [Comments]
-  , def       : { type: String, default: 'kandinsky' }
 });
 
 var blogData = {
-  title : 'dummy post',
-  author : 'somebody',
-  slug : 'test.post',
-  date : new Date(),
-  meta : { date : new Date(), visitors: 9001},
-  published : true,
-  mixed : { thisIsRandom : true },
-  numbers : [1,2,7,10,23432],
-  tags : ['test', 'BENCH', 'things', 'more things'],
-  def : 'THANGS!!!',
-  comments : []
+  title: 'dummy post',
+  author: 'somebody',
+  slug: 'test.post',
+  date: new Date(),
+  meta: {
+    date: new Date(),
+    visitors: 9001
+  },
+  published: true,
+  mixed: {
+    thisIsRandom: true
+  },
+  numbers: [1,2,7,10,23432],
+  tags: ['test', 'BENCH', 'things', 'more things'],
+  def: 'THANGS!!!',
+  comments: []
 };
 
 var blogData10 = utils.clone(blogData);

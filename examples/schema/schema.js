@@ -3,8 +3,8 @@
  * Module dependencies.
  */
 
-var mongoose = require('../../lib')
-  , Schema = mongoose.Schema;
+var mongoose = require('../../lib'),
+    Schema = mongoose.Schema;
 
 /**
  * Schema definition
@@ -15,28 +15,45 @@ var mongoose = require('../../lib')
 var Comment = new Schema();
 
 Comment.add({
-  title     : { type: String, index: true }
-  , date      : Date
-  , body      : String
-  , comments  : [Comment]
+  title: {
+    type: String,
+    index: true
+  },
+  date: Date,
+  body: String,
+  comments: [Comment]
 });
 
 var BlogPost = new Schema({
-  title     : { type: String, index: true }
-  , slug      : { type: String, lowercase: true, trim: true }
-  , date      : Date
-  , buf       : Buffer
-  , comments  : [Comment]
-  , creator   : Schema.ObjectId
+  title: {
+    type: String,
+    index: true
+  },
+  slug: {
+    type: String,
+    lowercase: true,
+    trim: true
+  },
+  date: Date,
+  buf: Buffer,
+  comments: [Comment],
+  creator: Schema.ObjectId
 });
 
 var Person = new Schema({
   name: {
-    first: String
-      , last : String
-  }
-  , email: { type: String, required: true, index: { unique: true, sparse: true } }
-  , alive: Boolean
+    first: String,
+    last : String
+  },
+  email: {
+    type: String,
+    required: true,
+    index: {
+      unique: true,
+      sparse: true
+    }
+  },
+  alive: Boolean
 });
 
 /**

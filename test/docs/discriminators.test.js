@@ -195,4 +195,45 @@ describe('discriminator docs', function() {
       });
     });
   });
+
+  /**
+   * A discriminator's fields are the union of the base schema's fields and
+   * the discriminator schema's fields, and the discriminator schema's fields
+   * take precedence. This behavior gets quirky when you have a custom `_id`
+   * field. A schema gets an `_id` field by default, so the base schema's
+   * `_id` field will get overridden by the discriminator schema's default
+   * `_id` field.
+   *
+   * You can work around this by setting the `_id` option to false in the
+   * discriminator schema as shown below.
+   */
+  it('Handling custom _id fields', function(done) {
+    var options = { discriminatorKey: 'kind' };
+
+    // Base schema has a String _id...
+    var eventSchema = new mongoose.Schema({ _id: String, time: Date },
+      options);
+    var Event = mongoose.model('BaseEvent', eventSchema);
+
+    var clickedLinkSchema = new mongoose.Schema({ url: String }, options);
+    var ClickedLinkEvent = Event.discriminator('ChildEventBad',
+      clickedLinkSchema);
+
+    var event1 = new ClickedLinkEvent();
+    // Woops, clickedLinkSchema overwrote the custom _id
+    assert.ok(event1._id instanceof mongoose.Types.ObjectId);
+
+    // But if you set `_id` option to false...
+    clickedLinkSchema = new mongoose.Schema({ url: String },
+      { discriminatorKey: 'kind', _id: false });
+    ClickedLinkEvent = Event.discriminator('ChildEventGood',
+      clickedLinkSchema);
+
+    // The custom _id from the base schema comes through
+    var event2 = new ClickedLinkEvent({ _id: 'test' });
+    assert.ok(event2._id.toString() === event2._id);
+    // acquit:ignore:start
+    done();
+    // acquit:ignore:end
+  });
 });

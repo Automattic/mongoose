@@ -776,6 +776,7 @@ describe('schema', function() {
         terrible.votes.push(terrible.votes.create({
           vote: 'terrible'
         }));
+
         terrible.validate(function(error) {
           assert.ok(error);
           assert.ok(error.errors['votes.0.vote']);

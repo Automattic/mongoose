@@ -84,12 +84,36 @@ block content
 
   h4#altsyntax Alternate declaration syntax
   :markdown
-    _New in v3_ If you don't need access to the sub-document schema instance,
+    If you don't need access to the sub-document schema instance,
     you may also declare sub-docs by simply passing an object literal:
   :js
     var parentSchema = new Schema({
       children: [{ name: 'string' }]
     })
+  
+  h4#single-embedded Single Embedded Subdocs
+  :markdown
+    **New in 4.2.0**
+    
+    You can also embed schemas without using arrays.
+  :js
+    var childSchema = new Schema({ name: 'string' });
+
+    var parentSchema = new Schema({
+      child: childSchema
+    });
+  :markdown
+    A single embedded sub-document behaves similarly to an embedded array.
+    It only gets saved when the parent document gets saved, and its pre/post
+    document middleware get executed.
+  :js
+    childSchema.pre('save', function(next) {
+      console.log(this.name); // prints 'Leia'
+    });
+    var Parent = mongoose.model('Parent', parentSchema);
+    var parent = new Parent({ child: { name: 'Luke' } })
+    parent.child.name = 'Leia';
+    parent.save(callback); // Triggers the pre middleware.
 
   h3#next Next Up
   :markdown

@@ -254,7 +254,7 @@ describe('model', function() {
           errorMessage = e.message;
         }
 
-        assert.equal(errorMessage, 'Discriminator options are not customizable (except toJSON & toObject)');
+        assert.equal(errorMessage, 'Discriminator options are not customizable (except toJSON, toObject, _id)');
         done();
       });
     });

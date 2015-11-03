@@ -93,7 +93,7 @@ describe('model: populate:', function() {
     });
   });
 
-  it('deep population', function(done) {
+  it('deep population (gh-3103)', function(done) {
     var db = start()
       , BlogPost = db.model('RefBlogPost', posts)
       , User = db.model('RefUser', users);
@@ -150,6 +150,55 @@ describe('model: populate:', function() {
         });
       });
     });
+  });
+
+  it('deep population with refs (gh-3507)', function(done) {
+    var db = start();
+    // handler schema
+    var handlerSchema = new Schema({
+      name: String
+    });
+
+    // task schema
+    var taskSchema = new Schema({
+      name: String,
+      handler: { type: Schema.Types.ObjectId, ref: 'gh3507_0' }
+    });
+
+    // application schema
+    var applicationSchema = new Schema({
+      name: String,
+      tasks: [{ type: Schema.Types.ObjectId, ref: 'gh3507_1' }]
+    });
+
+    var Handler = db.model('gh3507_0', handlerSchema);
+    var Task = db.model('gh3507_1', taskSchema);
+    var Application = db.model('gh3507_2', applicationSchema);
+
+    Handler.create({ name: 'test' }, function(error, doc) {
+      assert.ifError(error);
+      Task.create({ name: 'test2', handler: doc._id }, function(error, doc) {
+        assert.ifError(error);
+        var obj = { name: 'test3', tasks: [doc._id] };
+        Application.create(obj, function(error, doc) {
+          assert.ifError(error);
+          test(doc._id);
+        });
+      });
+    });
+
+    function test(id) {
+      Application.
+        findById(id).
+        populate([
+          { path: 'tasks', populate: { path: 'handler' } },
+        ]).
+        exec(function(error, doc) {
+          assert.ifError(error);
+          assert.ok(doc.tasks[0].handler._id);
+          db.close(done);
+        });
+    }
   });
 
   it('populating a single ref', function(done) {

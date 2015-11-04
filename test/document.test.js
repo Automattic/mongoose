@@ -2045,4 +2045,19 @@ describe('document', function() {
       });
     });
   });
+
+  it('single embedded schemas with methods (gh-3534)', function(done) {
+    var db = start();
+    var personSchema = new Schema({ name: String });
+    personSchema.methods.firstName = function() {
+      return this.name.substr(0, this.name.indexOf(' '));
+    };
+
+    var bandSchema = new Schema({ leadSinger: personSchema });
+    var Band = db.model('gh3534', bandSchema);
+
+    var gnr = new Band({ leadSinger: { name: 'Axl Rose' } });
+    assert.equal(gnr.leadSinger.firstName(), 'Axl');
+    done();
+  });
 });

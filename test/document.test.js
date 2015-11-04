@@ -2058,6 +2058,24 @@ describe('document', function() {
 
     var gnr = new Band({ leadSinger: { name: 'Axl Rose' } });
     assert.equal(gnr.leadSinger.firstName(), 'Axl');
-    done();
+    db.close(done);
+  });
+
+  it('single embedded schemas with models (gh-3535)', function(done) {
+    var db = start();
+    var personSchema = new Schema({ name: String });
+    var Person = db.model('gh3535_0', personSchema);
+
+    var bandSchema = new Schema({ leadSinger: personSchema });
+    var Band = db.model('gh3535', bandSchema);
+
+    var axl = new Person({ name: 'Axl Rose' });
+    var gnr = new Band({ leadSinger: axl });
+
+    gnr.save(function(error, doc) {
+      assert.ifError(error);
+      assert.equal(gnr.leadSinger.name, 'Axl Rose');
+      db.close(done);
+    });
   });
 });

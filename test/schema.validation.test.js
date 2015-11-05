@@ -1013,5 +1013,18 @@ describe('schema', function() {
         done();
       });
     });
+
+    it('skips conditional required (gh-3539)', function(done) {
+      var s = mongoose.Schema({
+        n: { type: Number, required: function() { return false; }, min: 0 }
+      });
+      var M = mongoose.model('gh3539', s);
+
+      var m = new M();
+      m.validate(function(error) {
+        assert.ifError(error);
+        done();
+      });
+    });
   });
 });

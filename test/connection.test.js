@@ -871,6 +871,12 @@ describe('connections:', function() {
     });
   });
 
+  it('connecting to single mongos (gh-3537)', function(done) {
+    var db = mongoose.createConnection('localhost:27017', { mongos: true });
+    assert.ok(db.db.serverConfig instanceof mongoose.mongo.Mongos);
+    db.close(done);
+  });
+
   describe('connecting to multiple mongos nodes (gh-1037)', function() {
     var mongos = process.env.MONGOOSE_MULTI_MONGOS_TEST_URI;
     if (!mongos) return console.log('Not testing multi-mongos support');

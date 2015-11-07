@@ -191,7 +191,7 @@ describe('model: populate:', function() {
       Application.
         findById(id).
         populate([
-          { path: 'tasks', populate: { path: 'handler' } },
+          { path: 'tasks', populate: { path: 'handler' } }
         ]).
         exec(function(error, doc) {
           assert.ifError(error);

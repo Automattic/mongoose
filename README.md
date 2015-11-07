@@ -57,7 +57,7 @@ var mongoose = require('mongoose');
 mongoose.connect('mongodb://localhost/my_database');
 ```
 
-Once connected, the `open` event is fired on the `Connection` instance. If you're using `mongoose.connect`, the `Connection` is `mongoose.connection`. Otherwise, `mongoose.createConnection` return value is a `Connection`. 
+Once connected, the `open` event is fired on the `Connection` instance. If you're using `mongoose.connect`, the `Connection` is `mongoose.connection`. Otherwise, `mongoose.createConnection` return value is a `Connection`.
 
 **Note:** _If the local connection fails then try using 127.0.0.1 instead of localhost. Sometimes issues may arise when the local hostname has been changed._
 
@@ -68,14 +68,14 @@ Once connected, the `open` event is fired on the `Connection` instance. If you'r
 Models are defined through the `Schema` interface.
 
 ```js
-var Schema = mongoose.Schema
-  , ObjectId = Schema.ObjectId;
+var Schema = mongoose.Schema,
+    ObjectId = Schema.ObjectId;
 
 var BlogPost = new Schema({
-    author    : ObjectId
-  , title     : String
-  , body      : String
-  , date      : Date
+    author    : ObjectId,
+    title     : String,
+    body      : String,
+    date      : Date
 });
 ```
 
@@ -96,11 +96,11 @@ The following example shows some of these features:
 
 ```js
 var Comment = new Schema({
-    name  :  { type: String, default: 'hahaha' }
-  , age   :  { type: Number, min: 18, index: true }
-  , bio   :  { type: String, match: /[a-z]/ }
-  , date  :  { type: Date, default: Date.now }
-  , buff  :  Buffer
+  name  :  { type: String, default: 'hahaha' },
+  age   :  { type: Number, min: 18, index: true },
+  bio   :  { type: String, match: /[a-z]/ },
+  date  :  { type: Date, default: Date.now },
+  buff  :  Buffer
 });
 
 // a setter
@@ -269,19 +269,19 @@ Moreover, you can mutate the incoming `method` arguments so that subsequent midd
 
 ```js
 new Schema({
-    broken: { type: Boolean }
-  , asset : {
-        name: String
-      , type: String // uh oh, it broke. asset will be interpreted as String
+  broken: { type: Boolean },
+    asset : {
+      name: String,
+      type: String // uh oh, it broke. asset will be interpreted as String
     }
 });
 
 new Schema({
-    works: { type: Boolean }
-  , asset : {
-        name: String
-      , type: { type: String } // works. asset is an object with a type property
-    }
+  works: { type: Boolean },
+  asset : {
+    name: String,
+    type: { type: String } // works. asset is an object with a type property
+  }
 });
 ```
 

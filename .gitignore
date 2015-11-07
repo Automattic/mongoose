@@ -17,6 +17,7 @@ test/triage/*.js
 /inspections
 bin/mongoose.min.js
 coverage
+npm-debug.log
 
 # Visual Studio
 # =========

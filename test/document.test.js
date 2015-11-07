@@ -2072,7 +2072,7 @@ describe('document', function() {
     var axl = new Person({ name: 'Axl Rose' });
     var gnr = new Band({ leadSinger: axl });
 
-    gnr.save(function(error, doc) {
+    gnr.save(function(error) {
       assert.ifError(error);
       assert.equal(gnr.leadSinger.name, 'Axl Rose');
       db.close(done);

@@ -1,3 +1,19 @@
+4.2.5 / 2015-11-09
+==================
+ * fixed; handle setting fields in pre update hooks with exec #3549
+ * upgraded; ESLint #3547 [ChristianMurphy](https://github.com/ChristianMurphy)
+ * fixed; bluebird unhandled rejections with cast errors and .exec #3543
+ * fixed; min/max validators handling undefined #3539
+ * fixed; standalone mongos connections #3537
+ * fixed; call `.toObject()` when setting a single nested doc #3535
+ * fixed; single nested docs now have methods #3534
+ * fixed; single nested docs with .create() #3533 #3521 [tusbar](https://github.com/tusbar)
+ * docs; deep populate docs #3528
+ * fixed; deep populate schema ref handling #3507
+ * upgraded; mongodb driver -> 2.0.48 for sort overflow issue #3493
+ * docs; clarify default ids for discriminators #3482
+ * fixed; properly support .update(doc) #3221
+
 4.2.4 / 2015-11-02
 ==================
  * fixed; upgraded `ms` package for security vulnerability #3254 [fhemberger](https://github.com/fhemberger)

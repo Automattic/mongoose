@@ -1608,4 +1608,19 @@ describe('model: update:', function() {
       db.close(done);
     });
   });
+
+  it('.update(doc) (gh-3221)', function(done) {
+    var db = start();
+
+    var Schema = mongoose.Schema({ name: String });
+    var Model = db.model('gh3412', Schema);
+
+    var query = Model.update({ name: 'Val' });
+    assert.equal(query.getUpdate().$set.name, 'Val');
+
+    query = Model.find().update({ name: 'Val' });
+    assert.equal(query.getUpdate().$set.name, 'Val');
+
+    db.close(done);
+  });
 });

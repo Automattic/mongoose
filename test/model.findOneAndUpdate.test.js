@@ -1481,9 +1481,9 @@ describe('model: findByIdAndUpdate:', function() {
       var db = start();
       var recordSchema = new mongoose.Schema({
         kind: String,
-        amount: Number,
+        amount: Number
       }, {
-        _id: false,
+        _id: false
       });
 
       var shiftSchema = new mongoose.Schema({
@@ -1495,14 +1495,14 @@ describe('model: findByIdAndUpdate:', function() {
 
       Shift.create({
         userId: 'tom',
-        records: [],
-      }, function(error, shift) {
+        records: []
+      }, function(error) {
         assert.ifError(error);
         Shift.findOneAndUpdate({userId: 'tom'}, {
-          records: [{kind: 'kind1', amount: NaN}],
+          records: [{kind: 'kind1', amount: NaN}]
         }, {
-          'new': true,
-        }, function(error, shift) {
+          'new': true
+        }, function(error) {
           assert.ok(error);
           assert.ok(error instanceof CastError);
           db.close(done);

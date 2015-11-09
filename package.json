@@ -1,7 +1,7 @@
 {
   "name": "mongoose",
   "description": "Mongoose MongoDB ODM",
-  "version": "4.2.5-pre",
+  "version": "4.2.5",
   "author": "Guillermo Rauch <guillermo@learnboost.com>",
   "keywords": [
     "mongodb",
@@ -23,7 +23,7 @@
     "bson": "~0.4.18",
     "hooks-fixed": "1.1.0",
     "kareem": "1.0.1",
-    "mongodb": "2.0.46",
+    "mongodb": "2.0.48",
     "mpath": "0.1.1",
     "mpromise": "0.5.4",
     "mquery": "1.6.3",
@@ -39,7 +39,7 @@
     "bluebird": "2.9.34",
     "co": "3.1.0",
     "dox": "0.3.1",
-    "eslint": "1.7.3",
+    "eslint": "1.9.0",
     "highlight.js": "7.0.1",
     "istanbul": "^0.3.13",
     "jade": "0.26.3",
@@ -67,7 +67,8 @@
   "scripts": {
     "install-browser": "npm install `node format_deps.js`",
     "test": "mocha --async-only test/*.test.js test/**/*.test.js",
-    "test-cov": "istanbul cover _mocha --async-only test/*.test.js"
+    "test-cov": "istanbul cover _mocha --async-only test/*.test.js",
+    "lint": "eslint . --quiet"
   },
   "main": "./index.js",
   "engines": {

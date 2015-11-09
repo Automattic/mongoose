@@ -190,11 +190,38 @@ block content
 
   h3#populate_an_existing_mongoose_document Populating an existing document
   :markdown
-    If we have an existing mongoose document and want to populate some of its paths, **mongoose >= 3.6** supports the [document#populate()](./api.html#document_Document-populate) method.
+    If we have an existing mongoose document and want to populate some of its
+    paths, **mongoose >= 3.6** supports the
+    [document#populate()](./api.html#document_Document-populate) method.
 
   h3#populate_multiple_documents Populating multiple existing documents
   :markdown
-    If we have one or many mongoose documents or even plain objects (_like [mapReduce](./api.html#model_Model.mapReduce) output_), we may populate them using the [Model.populate()](./api.html#model_Model.populate) method available in **mongoose >= 3.6**. This is what `document#populate()` and `query#populate()` use to populate documents.
+    If we have one or many mongoose documents or even plain objects
+    (_like [mapReduce](./api.html#model_Model.mapReduce) output_), we may
+    populate them using the [Model.populate()](./api.html#model_Model.populate)
+    method available in **mongoose >= 3.6**. This is what `document#populate()`
+    and `query#populate()` use to populate documents.
+  
+  h3#deep-populate Populating across multiple levels
+  :markdown
+    Say you have a user schema which keeps track of the user's friends.
+  :js
+    var userSchema = new Schema({
+      name: String,
+      friends: [{ type: ObjectId, ref: 'User' }]
+    });
+  :markdown
+    Populate lets you get a list of a user's friends, but what if you also
+    wanted a user's friends of friends? Specify the `populate` option to tell
+    mongoose to populate the `friends` array of all the user's friends:
+  :js
+    User.
+      findOne({ name: 'Val' }).
+      populate({
+        path: 'friends',
+        // Get friends of friends - populate the 'friends' array for every friend
+        populate: { path: 'friends' }
+      });
 
   h3#next Next Up
   :markdown

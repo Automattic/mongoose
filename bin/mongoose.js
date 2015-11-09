@@ -956,6 +956,12 @@ Document.prototype.set = function(path, val, type, options) {
           this.set(path[key], prefix + key, constructing);
         } else if (strict) {
           if ('real' === pathtype || 'virtual' === pathtype) {
+            // Check for setting single embedded schema to document (gh-3535)
+            if (this.schema.paths[pathName] &&
+                this.schema.paths[pathName].$isSingleNested &&
+                path[key] instanceof Document) {
+              path[key] = path[key].toObject({ virtuals: false });
+            }
             this.set(prefix + key, path[key], constructing);
           } else if (pathtype === 'nested' && path[key] instanceof Document) {
             this.set(prefix + key,
@@ -6122,6 +6128,16 @@ function Embedded(schema, path, options) {
   _embedded.$isSingleNested = true;
   _embedded.prototype.$basePath = path;
 
+  // apply methods
+  for (var i in schema.methods) {
+    _embedded.prototype[i] = schema.methods[i];
+  }
+
+  // apply statics
+  for (i in schema.statics) {
+    _embedded[i] = schema.statics[i];
+  }
+
   this.caster = _embedded;
   this.schema = schema;
   this.$isSingleNested = true;
@@ -6396,7 +6412,7 @@ SchemaNumber.prototype.min = function(value, message) {
     msg = msg.replace(/{MIN}/, value);
     this.validators.push({
       validator: this.minValidator = function(v) {
-        return v === null || v >= value;
+        return v == null || v >= value;
       },
       message: msg,
       type: 'min',
@@ -6450,7 +6466,7 @@ SchemaNumber.prototype.max = function(value, message) {
     msg = msg.replace(/{MAX}/, value);
     this.validators.push({
       validator: this.maxValidator = function(v) {
-        return v === null || v <= value;
+        return v == null || v <= value;
       },
       message: msg,
       type: 'max',
@@ -9639,9 +9655,9 @@ EmbeddedDocument.prototype.constructor = EmbeddedDocument;
  */
 
 EmbeddedDocument.prototype.markModified = function(path) {
+  this.$__.activePaths.modify(path);
   if (!this.__parentArray) return;
 
-  this.$__.activePaths.modify(path);
   if (this.isNew) {
     // Mark the WHOLE parent array as modified
     // if this is a new document (i.e., we are initializing

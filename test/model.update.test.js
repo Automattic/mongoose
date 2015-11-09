@@ -1608,4 +1608,44 @@ describe('model: update:', function() {
       db.close(done);
     });
   });
+
+  it('.update(doc) (gh-3221)', function(done) {
+    var db = start();
+
+    var Schema = mongoose.Schema({ name: String });
+    var Model = db.model('gh3412', Schema);
+
+    var query = Model.update({ name: 'Val' });
+    assert.equal(query.getUpdate().$set.name, 'Val');
+
+    query = Model.find().update({ name: 'Val' });
+    assert.equal(query.getUpdate().$set.name, 'Val');
+
+    db.close(done);
+  });
+
+  it('middleware update with exec (gh-3549)', function(done) {
+    var db = start();
+
+    var Schema = mongoose.Schema({ name: String });
+
+    Schema.pre('update', function(next) {
+      this.update({ name: 'Val' });
+      next();
+    });
+
+    var Model = db.model('gh3549', Schema);
+
+    Model.create({}, function(error, doc) {
+      assert.ifError(error);
+      Model.update({ _id: doc._id }, { name: 'test' }).exec(function(error) {
+        assert.ifError(error);
+        Model.findOne({ _id: doc._id }, function(error, doc) {
+          assert.ifError(error);
+          assert.equal(doc.name, 'Val');
+          db.close(done);
+        });
+      });
+    });
+  });
 });

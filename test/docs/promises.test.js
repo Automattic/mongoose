@@ -1,6 +1,5 @@
 var PromiseProvider = require('../../lib/promise_provider');
 var assert = require('assert');
-var async = require('async');
 var mongoose = require('../../');
 
 describe('promises docs', function() {

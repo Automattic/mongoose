@@ -53,5 +53,20 @@ describe('updateValidators', function() {
         done();
       });
     });
+
+    it('doesnt flatten empty arrays (gh-3554)', function(done) {
+      var fn = updateValidators({}, schema, { test: [] }, {});
+      schema.doValidate.emitter.on('called', function(args) {
+        args.cb();
+      });
+      fn(function(err) {
+        assert.ifError(err);
+        assert.equal(schema._getSchema.calls.length, 1);
+        assert.equal(schema.doValidate.calls.length, 1);
+        assert.equal('test', schema._getSchema.calls[0]);
+        assert.deepEqual(schema.doValidate.calls[0].v, []);
+        done();
+      });
+    });
   });
 });

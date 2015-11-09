@@ -757,6 +757,37 @@ describe('schema', function() {
       });
     });
 
+    it('should allow an array of subdocuments with enums (gh-3521)', function(done) {
+      var coolSchema = new Schema({
+        votes: [{
+          vote: { type: String, enum: ['cool', 'not-cool'] }
+        }]
+      });
+      var Cool = mongoose.model('gh-3521', coolSchema, 'gh-3521');
+
+      var cool = new Cool();
+      cool.votes.push(cool.votes.create({
+        vote: 'cool'
+      }));
+      cool.validate(function(error) {
+        assert.ifError(error);
+
+        var terrible = new Cool();
+        terrible.votes.push(terrible.votes.create({
+          vote: 'terrible'
+        }));
+
+        terrible.validate(function(error) {
+          assert.ok(error);
+          assert.ok(error.errors['votes.0.vote']);
+          assert.equal(error.errors['votes.0.vote'].message,
+            '`terrible` is not a valid enum value for path `vote`.');
+
+          done();
+        });
+      });
+    });
+
     it('doesnt do double validation on document arrays (gh-2618)', function(done) {
       var A = new Schema({str: String});
       var B = new Schema({a: [A]});
@@ -979,6 +1010,19 @@ describe('schema', function() {
       m.validate(function(error) {
         assert.ok(error);
         assert.equal(error.errors['n'].kind, 'enum');
+        done();
+      });
+    });
+
+    it('skips conditional required (gh-3539)', function(done) {
+      var s = mongoose.Schema({
+        n: { type: Number, required: function() { return false; }, min: 0 }
+      });
+      var M = mongoose.model('gh3539', s);
+
+      var m = new M();
+      m.validate(function(error) {
+        assert.ifError(error);
         done();
       });
     });

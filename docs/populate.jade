@@ -26,7 +26,7 @@ block content
     var Story  = mongoose.model('Story', storySchema);
     var Person = mongoose.model('Person', personSchema);
   :markdown
-    So far we've created two [Models](./models.html). Our `Person` model has it's `stories` field set to an array of `ObjectId`s. The `ref` option is what tells Mongoose which model to use during population, in our case the `Story` model. All `_id`s we store here must be document `_id`s from the `Story` model. We also declared the `Story` `_creator` property as a `Number`, the same type as the `_id` used in the `personSchema`. It is important to match the type of `_id` to the type of ref.
+    So far we've created two [Models](./models.html). Our `Person` model has its `stories` field set to an array of `ObjectId`s. The `ref` option is what tells Mongoose which model to use during population, in our case the `Story` model. All `_id`s we store here must be document `_id`s from the `Story` model. We also declared the `Story` `_creator` property as a `Number`, the same type as the `_id` used in the `personSchema`. It is important to match the type of `_id` to the type of ref.
   .important
     :markdown
       **Note**: `ObjectId`, `Number`, `String`, and `Buffer` are valid for use as refs.

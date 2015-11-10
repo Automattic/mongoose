@@ -1453,6 +1453,22 @@ describe('schema', function() {
     done();
   });
 
+  it('custom typeKey in doc arrays (gh-3560)', function(done) {
+    var schema = Schema({
+      test: [{
+        name: { $type: String }
+      }]
+    }, { typeKey: '$type' });
+
+    schema.path('test').schema.path('name').required(true);
+    var M = mongoose.model('gh3560', schema);
+    var m = new M({ test: [{ name: 'Val' }] });
+
+    assert.ifError(m.validateSync());
+    assert.equal(m.test[0].name, 'Val');
+    done();
+  });
+
   describe('remove()', function() {
 
     before(function() {

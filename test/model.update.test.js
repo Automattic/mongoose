@@ -1648,4 +1648,39 @@ describe('model: update:', function() {
       });
     });
   });
+
+  it('casting $push with overwrite (gh-3564)', function(done) {
+    var db = start();
+
+    var schema = mongoose.Schema({
+      topicId: Number,
+      name: String,
+      followers: [Number]
+    });
+
+    var doc = {
+      topicId: 100,
+      name: 'name',
+      followers: [500]
+    };
+
+    var M = db.model('gh-3564', schema);
+
+    M.create(doc, function(err, topic) {
+      assert.ifError(err);
+
+      var update = { $push: { followers: 200 } };
+      var opts =  { overwrite: true, new: true, safe: true, upsert: false, multi: false};
+
+      M.update({ topicId: doc.topicId }, update, opts, function(err) {
+        assert.ifError(err);
+        M.findOne({ topicId: doc.topicId }, function(error, doc) {
+          assert.ifError(error);
+          assert.equal(doc.name, 'name');
+          assert.deepEqual(doc.followers.toObject(), [500, 200]);
+          db.close(done);
+        });
+      })
+    });
+  });
 });

@@ -31,10 +31,10 @@ block content
     If you set a 'remove' hook, it will be fired when you call `myDoc.remove()`,
     not when you call `MyModel.remove()`.
 
-  h3 Pre
+  h3#pre Pre
   :markdown
     There are two types of `pre` hooks, serial and parallel.
-  h4 Serial
+  h4#serial Serial
   :markdown
     Serial middleware are executed one after another, when each middleware calls `next`.
   :js
@@ -43,11 +43,14 @@ block content
       // do stuff
       next();
     });
-  h4 Parallel
+  h4#parallel Parallel
   p
     | Parallel middleware offer more fine-grained flow control.
   :js
     var schema = new Schema(..);
+    
+    // `true` means this is a parallel middleware. You **must** specify `true`
+    // as the second parameter if you want to use parallel middleware.
     schema.pre('save', true, function(next, done) {
       // calling next kicks off the next middleware in parallel
       next();
@@ -55,7 +58,7 @@ block content
     });
   :markdown
     The hooked method, in this case `save`, will not be executed until `done` is called by each middleware.
-  h4 Use Cases
+  h4#use-cases Use Cases
   p
     | Middleware are useful for atomizing model logic and avoiding nested blocks of async code. Here are some other ideas:
     ul
@@ -69,7 +72,7 @@ block content
         ul
           li triggering custom events
           li notifications
-  h4 Error handling
+  h4#error-handling Error handling
   :markdown
     If any middleware calls `next` or `done` with an error, the flow
     is interrupted, and the error is passed to the callback.

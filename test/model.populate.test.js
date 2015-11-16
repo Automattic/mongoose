@@ -3051,4 +3051,31 @@ describe('model: populate:', function() {
       });
     });
   });
+
+  it('populate option (gh-2321)', function(done) {
+    var db = start();
+
+    var User = db.model('User', { name: String });
+    var Group = db.model('Group', {
+      users: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+      name: String
+    });
+
+    User.create({ name: 'Val' }, function(error, user) {
+      assert.ifError(error);
+      Group.create({ users: [user._id], name: 'test' }, function(error, group) {
+        assert.ifError(error);
+        test(group._id);
+      });
+    });
+
+    var test = function(id) {
+      var options = { populate: { path: 'users', model: 'User' } };
+      Group.find({ _id: id }, '-name', options, function(error, group) {
+        assert.ifError(error);
+        assert.ok(group[0].users[0]._id);
+        db.close(done);
+      });
+    };
+  });
 });

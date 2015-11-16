@@ -1,3 +1,19 @@
+4.2.6 / 2015-11-16
+==================
+ * fixed; ability to manually populate an array #3575
+ * docs; clarify `isAsync` parameter to hooks #3573
+ * fixed; use captureStackTrace if possible instead #3571
+ * fixed; crash with buffer and update validators #3565 [johnpeb](https://github.com/johnpeb)
+ * fixed; update casting with operators overwrite: true #3564
+ * fixed; validation with single embedded docs #3562
+ * fixed; inline docs inherit parents $type key #3560
+ * docs; bad grammar in populate docs #3559 [amaurymedeiros](https://github.com/amaurymedeiros)
+ * fixed; properly handle populate option for find() #2321
+
+3.8.37 / 2015-11-16
+===================
+ * fixed; use retainKeyOrder for cloning update op #3572
+
 4.2.5 / 2015-11-09
 ==================
  * fixed; handle setting fields in pre update hooks with exec #3549

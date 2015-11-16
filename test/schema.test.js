@@ -1453,6 +1453,43 @@ describe('schema', function() {
     done();
   });
 
+  it('custom typeKey in doc arrays (gh-3560)', function(done) {
+    var schema = Schema({
+      test: [{
+        name: { $type: String }
+      }]
+    }, { typeKey: '$type' });
+
+    schema.path('test').schema.path('name').required(true);
+    var M = mongoose.model('gh3560', schema);
+    var m = new M({ test: [{ name: 'Val' }] });
+
+    assert.ifError(m.validateSync());
+    assert.equal(m.test[0].name, 'Val');
+    done();
+  });
+
+  it('required for single nested schemas (gh-3562)', function(done) {
+    var personSchema = Schema({
+      name: { type: String, required: true }
+    });
+
+    var bandSchema = Schema({
+      name: String,
+      guitarist: { type: personSchema, required: true }
+    });
+
+    var Band = mongoose.model('gh3562', bandSchema);
+    var band = new Band({ name: "Guns N' Roses" });
+
+    assert.ok(band.validateSync());
+    assert.ok(band.validateSync().errors['guitarist']);
+    band.guitarist = { name: 'Slash' };
+    assert.ifError(band.validateSync());
+
+    done();
+  });
+
   describe('remove()', function() {
 
     before(function() {

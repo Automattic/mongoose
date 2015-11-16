@@ -1,3 +1,7 @@
+3.8.37 / 2015-11-16
+===================
+ * fixed; use retainKeyOrder for cloning update op #3572
+
 4.2.5 / 2015-11-09
 ==================
  * fixed; handle setting fields in pre update hooks with exec #3549

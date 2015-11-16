@@ -369,7 +369,7 @@ describe('document modified', function() {
 
       var parentSchema = new Schema({
         name: String,
-        child: { type: Schema.Types.ObjectId, ref: 'Child'}
+        child: { type: Schema.Types.ObjectId, ref: 'Child' }
       });
 
       var Parent = db.model('Parent', parentSchema, 'parents');
@@ -379,6 +379,25 @@ describe('document modified', function() {
       var p = new Parent({ name: 'Alex', child: child });
 
       assert.equal(p.populated('child').toString(), child._id.toString());
+      db.close(done);
+    });
+
+    it('gh-1530 for arrays (gh-3575)', function(done) {
+      var db = start();
+
+      var parentSchema = new Schema({
+        name: String,
+        children: [{ type: Schema.Types.ObjectId, ref: 'Child' }]
+      });
+
+      var Parent = db.model('Parent', parentSchema, 'parents');
+      var Child = db.model('Child', parentSchema, 'children');
+
+      var child = new Child({ name: 'Luke' });
+      var p = new Parent({ name: 'Anakin', children: [child] });
+
+      assert.equal(p.children[0].name, 'Luke');
+      assert.ok(p.populated('children'));
       db.close(done);
     });
 

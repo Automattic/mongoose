@@ -48,6 +48,9 @@ block content
     | Parallel middleware offer more fine-grained flow control.
   :js
     var schema = new Schema(..);
+    
+    // `true` means this is a parallel middleware. You **must** specify `true`
+    // as the second parameter if you want to use parallel middleware.
     schema.pre('save', true, function(next, done) {
       // calling next kicks off the next middleware in parallel
       next();

@@ -1,3 +1,7 @@
+3.8.37 / 2015-11-16
+===================
+ * fixed; use retainKeyOrder for cloning update op #3572
+
 3.8.36 / 2015-10-18
 ===================
  * fixed; Make array props non-enumerable #3461 [boblauer](https://github.com/boblauer)

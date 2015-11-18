@@ -72,6 +72,9 @@ mongoose.model('UpdateOneStrictSchema', strictSchema);
 var strictThrowSchema = new Schema({ name: String }, { strict: 'throw'});
 mongoose.model('UpdateOneStrictThrowSchema', strictThrowSchema);
 
+var zeroNumSchema = new Schema({name: String, num: {type: Number, default: 0}});
+mongoose.model('UpdateOneZeroNumSchema', zeroNumSchema);
+
 describe('model: findOneAndUpdate:', function() {
   it('WWW returns the edited document', function(done) {
     var db = start()
@@ -217,6 +220,54 @@ describe('model: findOneAndUpdate:', function() {
       });
     });
   });
+
+  it('Increment document from zero', function(done) {
+    var db = start()
+      , M = db.model('UpdateOneZeroNumSchema', collection)
+      , name = 'Tobi ' + random();
+
+    var post = new M;
+    post.set('name', name);
+    post.save(function(err) {
+      assert.ifError(err);
+      M.findById(post._id, function(err, res) {
+        assert.ifError(err);
+
+        M.findOneAndUpdate({ _id: post._id }, { $inc: { num: 1 }})
+        .exec(function(err, res) {
+          assert.ifError(err);
+
+          assert.equal(res.num, 1);
+          done();
+        });
+      });      
+    });
+  });
+
+  it('Increment document from set value', function(done) {
+    var db = start()
+      , M = db.model('UpdateOneZeroNumSchema', collection)
+      , name = 'Tobi ' + random();
+
+    var post = new M;
+    post.set('name', name);
+    post.set('num', 1);
+    post.save(function(err) {
+      assert.ifError(err);
+      M.findById(post._id, function(err, res) {
+        assert.ifError(err);
+
+        M.findOneAndUpdate({ _id: post._id }, { $inc: { num: 1 }})
+        .exec(function(err, res) {
+          assert.ifError(err);
+
+          assert.equal(res.num, 2);
+          done();
+        });
+      });      
+    });
+  });
+
 
   it('returns the original document', function(done) {
     var db = start()

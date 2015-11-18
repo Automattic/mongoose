@@ -1509,5 +1509,20 @@ describe('model: findByIdAndUpdate:', function() {
         });
       });
     });
+
+    it('cast errors with nested schemas (gh-3580)', function(done) {
+      var db = start();
+
+      var nested = new Schema({ num: Number });
+      var s = new Schema({ nested: nested });
+
+      var MyModel = db.model('gh3580', s);
+
+      var update = { nested: { num: 'Not a Number' } };
+      MyModel.findOneAndUpdate({}, update, function(error) {
+        assert.ok(error);
+        db.close(done);
+      });
+    });
   });
 });

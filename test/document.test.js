@@ -2078,4 +2078,16 @@ describe('document', function() {
       db.close(done);
     });
   });
+
+  it('single embedded schemas with indexes (gh-3594)', function(done) {
+    var personSchema = new Schema({ name: { type: String, unique: true } });
+
+    var bandSchema = new Schema({ leadSinger: personSchema });
+
+    assert.equal(bandSchema.indexes().length, 1);
+    var index = bandSchema.indexes()[0];
+    assert.deepEqual(index[0], { 'leadSinger.name': 1 });
+    assert.ok(index[1].unique);
+    done();
+  });
 });

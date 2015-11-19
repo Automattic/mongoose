@@ -66,6 +66,23 @@ block content
     **Q**. Should I create/destroy a new connection for each database operation?
 
     **A**. No. Open your connection when your application starts up and leave it open until the application shuts down.
+  hr#overwritemodelerror
+  :markdown
+    **Q**. Why do I get "OverwriteModelError: Cannot overwrite .. model once compiled" when I use nodemon / a testing framework?
+    It always works when the code loads the first time, but then throws this error from the second load onwards.
+    
+    **A**. Use `connection.model(..)` instead of `mongoose.model(..)` to create your models.  
+    See [this issue](https://github.com/Automattic/mongoose/issues/1251#issuecomment-11697477) and below:
+    "it works b/c a new connection is created for each of your tests and the model is cached locally within the connection for each. the other way fails b/c models were getting compiled at the mongoose module level for each test, hence the conflicts."
+  :js
+    var mongoose = require('mongoose');
+    var connection = mongoose.createConnection(..);
+
+    // use mongoose.Schema
+    var kittySchema = mongoose.Schema({ name: String });
+    
+    // use connection.model
+    var Kitten = connection.model('Kitten', kittySchema);
 
   hr
   :markdown

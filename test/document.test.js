@@ -2108,4 +2108,26 @@ describe('document', function() {
     assert.equal(gnr.leadSinger.display(), "Axl Rose of Guns N' Roses");
     db.close(done);
   });
+
+  it('removing single embedded docs (gh-3596)', function(done) {
+    var db = start();
+    var personSchema = new Schema({ name: String });
+
+    var bandSchema = new Schema({ guitarist: personSchema, name: String });
+    var Band = db.model('gh3596', bandSchema);
+
+    var gnr = new Band({
+      name: "Guns N' Roses",
+      guitarist: { name: 'Slash' }
+    });
+    gnr.save(function(error, gnr) {
+      assert.ifError(error);
+      gnr.guitarist = undefined;
+      gnr.save(function(error, gnr) {
+        assert.ifError(error);
+        assert.ok(!gnr.guitarist);
+        db.close(done);
+      });
+    });
+  });
 });

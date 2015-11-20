@@ -23,7 +23,7 @@
     "bson": "~0.4.18",
     "hooks-fixed": "1.1.0",
     "kareem": "1.0.1",
-    "mongodb": "2.0.48",
+    "mongodb": "2.0.49",
     "mpath": "0.1.1",
     "mpromise": "0.5.4",
     "mquery": "1.6.3",

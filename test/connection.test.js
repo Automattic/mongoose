@@ -29,7 +29,6 @@ describe('connections:', function() {
     assert.equal(true, db.options.server.auto_reconnect);
     assert.equal('object', typeof db.options.db);
     assert.equal(false, db.options.db.forceServerObjectId);
-    assert.equal('primary', db.options.db.read_preference);
     assert.equal(undefined, db.pass);
     assert.equal(undefined, db.user);
     assert.equal('fake', db.name);
@@ -46,7 +45,6 @@ describe('connections:', function() {
     assert.equal(true, db.options.server.auto_reconnect);
     assert.equal('object', typeof db.options.db);
     assert.equal(false, db.options.db.forceServerObjectId);
-    assert.equal('primary', db.options.db.read_preference);
     assert.equal(undefined, db.pass);
     assert.equal(undefined, db.user);
     assert.equal('fake', db.name);
@@ -387,7 +385,7 @@ describe('connections:', function() {
         assert.equal(true, db.options.db.fsync);
         assert.equal(true, db.options.db.journal);
         assert.equal(80, db.options.db.wtimeoutMS);
-        assert.equal('nearest', db.options.db.read_preference);
+        assert.equal('nearest', db.options.db.readPreference);
         assert.deepEqual([{ dc: 'ny', rack: 1 }, { dc: 'sf' }], db.options.db.read_preference_tags);
         assert.equal(false, db.options.db.forceServerObjectId);
         done();
@@ -428,7 +426,7 @@ describe('connections:', function() {
         assert.equal(true, db.options.db.fsync);
         assert.equal(true, db.options.db.journal);
         assert.equal(80, db.options.db.wtimeoutMS);
-        assert.equal('nearest', db.options.db.read_preference);
+        assert.equal('nearest', db.options.db.readPreference);
         assert.deepEqual([{ dc: 'ny', rack: 1 }, { dc: 'sf' }], db.options.db.read_preference_tags);
         assert.equal(false, db.options.db.forceServerObjectId);
 

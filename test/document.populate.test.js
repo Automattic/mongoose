@@ -608,8 +608,39 @@ describe('document.populate', function() {
             band.depopulate('lead');
             assert.ok(!band.lead.name);
             assert.equal(band.lead.toString(), docs[0]._id.toString());
-            done();
+            db.close(done);
           });
+        });
+      });
+    });
+  });
+
+  it('handles pulling from populated array (gh-3579)', function(done) {
+    var db = start();
+    var barSchema = new Schema({ name: String });
+
+    var Bar = db.model('gh3579', barSchema);
+
+    var fooSchema = new Schema({
+      bars: [{
+        type: Schema.Types.ObjectId,
+        ref: 'gh3579'
+      }]
+    });
+
+    var Foo = db.model('gh3579_0', fooSchema);
+
+    Bar.create([{ name: 'bar1' }, { name: 'bar2' }], function(error, docs) {
+      assert.ifError(error);
+      var foo = new Foo({ bars: [docs[0], docs[1]] });
+      foo.bars.pull(docs[0]._id);
+      foo.save(function(error) {
+        assert.ifError(error);
+        Foo.findById(foo._id, function(error, foo) {
+          assert.ifError(error);
+          assert.equal(foo.bars.length, 1);
+          assert.equal(foo.bars[0].toString(), docs[1]._id.toString());
+          db.close(done);
         });
       });
     });

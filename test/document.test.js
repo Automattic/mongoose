@@ -2078,4 +2078,56 @@ describe('document', function() {
       db.close(done);
     });
   });
+
+  it('single embedded schemas with indexes (gh-3594)', function(done) {
+    var personSchema = new Schema({ name: { type: String, unique: true } });
+
+    var bandSchema = new Schema({ leadSinger: personSchema });
+
+    assert.equal(bandSchema.indexes().length, 1);
+    var index = bandSchema.indexes()[0];
+    assert.deepEqual(index[0], { 'leadSinger.name': 1 });
+    assert.ok(index[1].unique);
+    done();
+  });
+
+  it('single embedded docs have an ownerDocument function (gh-3589)', function(done) {
+    var db = start();
+    var personSchema = new Schema({ name: String });
+    personSchema.methods.display = function() {
+      return this.name + ' of ' + this.ownerDocument().name;
+    };
+
+    var bandSchema = new Schema({ leadSinger: personSchema, name: String });
+    var Band = db.model('gh3589', bandSchema);
+
+    var gnr = new Band({
+      name: "Guns N' Roses",
+      leadSinger: { name: 'Axl Rose' }
+    });
+    assert.equal(gnr.leadSinger.display(), "Axl Rose of Guns N' Roses");
+    db.close(done);
+  });
+
+  it('removing single embedded docs (gh-3596)', function(done) {
+    var db = start();
+    var personSchema = new Schema({ name: String });
+
+    var bandSchema = new Schema({ guitarist: personSchema, name: String });
+    var Band = db.model('gh3596', bandSchema);
+
+    var gnr = new Band({
+      name: "Guns N' Roses",
+      guitarist: { name: 'Slash' }
+    });
+    gnr.save(function(error, gnr) {
+      assert.ifError(error);
+      gnr.guitarist = undefined;
+      gnr.save(function(error, gnr) {
+        assert.ifError(error);
+        assert.ok(!gnr.guitarist);
+        db.close(done);
+      });
+    });
+  });
 });

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>Mongoose FAQ v4.2.6</title><link href="http://fonts.googleapis.com/css?family=Anonymous+Pro:400,700|Droid+Sans+Mono|Open+Sans:400,700|Linden+Hill|Quattrocento:400,700|News+Cycle:400,700|Antic+Slab|Cabin+Condensed:400,700" rel="stylesheet" type="text/css"><link href="css/default.css" rel="stylesheet" type="text/css"><link href="css/guide.css" rel="stylesheet" type="text/css"><style>hr {
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>Mongoose FAQ v4.2.7</title><link href="http://fonts.googleapis.com/css?family=Anonymous+Pro:400,700|Droid+Sans+Mono|Open+Sans:400,700|Linden+Hill|Quattrocento:400,700|News+Cycle:400,700|Antic+Slab|Cabin+Condensed:400,700" rel="stylesheet" type="text/css"><link href="css/default.css" rel="stylesheet" type="text/css"><link href="css/guide.css" rel="stylesheet" type="text/css"><style>hr {
   display: block;
   margin: 30px 0;
 }
@@ -10,10 +10,7 @@ doc.save();
 <span class="comment">// if running a version less than 3.2.0, you must mark the array modified before saving.</span>
 doc.array[<span class="number">3</span>] = <span class="string">'changed'</span>;
 doc.markModified(<span class="string">'array'</span>);
-doc.save();</code></pre><hr id="assign_schemas_to_paths"><p><strong>Q</strong>. Why doesn&#39;t mongoose allow me to directly assign schemas to paths?</p><pre><code class="javascript"><span class="keyword">var</span> userSchema = <span class="keyword">new</span> Schema({ name: String });
-<span class="keyword">new</span> Schema({ user: userSchema })</code></pre><p><strong>A</strong>. Schemas have a one-to-one mapping with documents. Documents have <code>save</code> and <code>remove</code> methods along with their own <code>pre</code> and <code>post</code> hooks which would lead to code like the following:</p><pre><code class="javascript">doc.user.save();  <span class="comment">// ?</span>
-doc.user.remove();<span class="comment">// ?</span>
-doc.save()</code></pre><p>We&#39;ve felt that this api would be more confusing than helpful. The counter argument is that arrays of sub-documents already have this functionality, but at best this too leads to confusion (calling <code>save</code> on a sub-document is a no-op and exists only to support <code>pre</code> save hooks). In the future this is likely to be revisited.</p><hr id="enable_debugging"><p><strong>Q</strong>. How can I enable debugging?</p>
+doc.save();</code></pre><hr id="enable_debugging"><p><strong>Q</strong>. How can I enable debugging?</p>
 
 <p><strong>A</strong>. Set the <code>debug</code> option to <code>true</code>:</p><pre><code class="javascript">mongoose.set(<span class="string">'debug'</span>, <span class="literal">true</span>)</code></pre><p>All executed collection methods will log output of their arguments to your console.</p><hr id="callback_never_executes"><p><strong>Q</strong>. My <code>save()</code> callback never executes. What am I doing wrong?</p>
 
@@ -25,7 +22,25 @@ mongoose.connection.on(<span class="string">'error'</span>, handleError);
 <span class="keyword">var</span> conn = mongoose.createConnection(..);
 conn.on(<span class="string">'error'</span>, handleError);</code></pre><hr id="creating_connections"><p><strong>Q</strong>. Should I create/destroy a new connection for each database operation?</p>
 
-<p><strong>A</strong>. No. Open your connection when your application starts up and leave it open until the application shuts down.</p><hr><p><strong>Something to add?</strong></p>
+<p><strong>A</strong>. No. Open your connection when your application starts up and leave it open until the application shuts down.</p><hr id="overwrite-model-error"><p><strong>Q</strong>. Why do I get &quot;OverwriteModelError: Cannot overwrite .. model once
+compiled&quot; when I use nodemon / a testing framework?</p>
+
+<p><strong>A</strong>. <code>mongoose.model(&#39;ModelName&#39;, schema)</code> requires &#39;ModelName&#39; to be
+unique, so you can access the model by using <code>mongoose.model(&#39;ModelName&#39;)</code>.
+If you put <code>mongoose.model(&#39;ModelName&#39;, schema);</code> in a
+<a href="https://mochajs.org/#hooks">mocha <code>beforeEach()</code> hook</a>, this code will
+attempt to create a new model named &#39;ModelName&#39; before <strong>every</strong> test,
+and so you will get an error. Make sure you only create a new model with
+a given name <strong>once</strong>. If you need to create multiple models with the
+same name, create a new connection and bind the model to the connection.</p><pre><code class="javascript"><span class="keyword">var</span> mongoose = require(<span class="string">'mongoose'</span>);
+<span class="keyword">var</span> connection = mongoose.createConnection(..);
+
+<span class="comment">// use mongoose.Schema</span>
+<span class="keyword">var</span> kittySchema = mongoose.Schema({ name: String });
+
+<span class="comment">// use connection.model</span>
+<span class="keyword">var</span> Kitten = connection.model(<span class="string">'Kitten'</span>, kittySchema);
+</code></pre><hr><p><strong>Something to add?</strong></p>
 
 <p>If you&#39;d like to contribute to this page, please <a href="https://github.com/Automattic/mongoose/tree/master/docs/faq.jade">visit it</a> on github and use the <a href="https://github.com/blog/844-forking-with-the-edit-button">Edit</a> button to send a pull request.</p><br></div></div><script>document.body.className = 'load';</script><script>;(function() {
   var cx = '012173159455227967368:uvscsuqjovs';

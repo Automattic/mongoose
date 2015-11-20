@@ -2090,4 +2090,22 @@ describe('document', function() {
     assert.ok(index[1].unique);
     done();
   });
+
+  it('single embedded docs have an ownerDocument function (gh-3589)', function(done) {
+    var db = start();
+    var personSchema = new Schema({ name: String });
+    personSchema.methods.display = function() {
+      return this.name + ' of ' + this.ownerDocument().name;
+    };
+
+    var bandSchema = new Schema({ leadSinger: personSchema, name: String });
+    var Band = db.model('gh3589', bandSchema);
+
+    var gnr = new Band({
+      name: "Guns N' Roses",
+      leadSinger: { name: 'Axl Rose' }
+    });
+    assert.equal(gnr.leadSinger.display(), "Axl Rose of Guns N' Roses");
+    db.close(done);
+  });
 });

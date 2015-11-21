@@ -96,11 +96,11 @@ The following example shows some of these features:
 
 ```js
 var Comment = new Schema({
-  name  :  { type: String, default: 'hahaha' },
-  age   :  { type: Number, min: 18, index: true },
-  bio   :  { type: String, match: /[a-z]/ },
-  date  :  { type: Date, default: Date.now },
-  buff  :  Buffer
+  name: { type: String, default: 'hahaha' },
+  age: { type: Number, min: 18, index: true },
+  bio: { type: String, match: /[a-z]/ },
+  date: { type: Date, default: Date.now },
+  buff: Buffer
 });
 
 // a setter
@@ -162,18 +162,18 @@ You can also `findOne`, `findById`, `update`, etc. For more details check out [t
 **Important!** If you opened a separate connection using `mongoose.createConnection()` but attempt to access the model through `mongoose.model('ModelName')` it will not work as expected since it is not hooked up to an active db connection. In this case access your model through the connection you created:
 
 ```js
-var conn = mongoose.createConnection('your connection string')
-  , MyModel = conn.model('ModelName', schema)
-  , m = new MyModel;
+var conn = mongoose.createConnection('your connection string'),
+    MyModel = conn.model('ModelName', schema),
+    m = new MyModel;
 m.save(); // works
 ```
 
 vs
 
 ```js
-var conn = mongoose.createConnection('your connection string')
-  , MyModel = mongoose.model('ModelName', schema)
-  , m = new MyModel;
+var conn = mongoose.createConnection('your connection string'),
+    MyModel = mongoose.model('ModelName', schema),
+    m = new MyModel;
 m.save(); // does not work b/c the default connection object was never connected
 ```
 
@@ -278,7 +278,7 @@ new Schema({
 
 new Schema({
   works: { type: Boolean },
-  asset : {
+  asset: {
     name: String,
     type: { type: String } // works. asset is an object with a type property
   }

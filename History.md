@@ -1,3 +1,15 @@
+4.2.7 / 2015-11-20
+==================
+ * fixed; readPreference connection string option #3600
+ * fixed; pulling from manually populated arrays #3598 #3579
+ * docs; FAQ about OverwriteModelError #3597 [stcruy](https://github.com/stcruy)
+ * fixed; setting single embedded schemas to null #3596
+ * fixed; indexes for single embedded schemas #3594
+ * docs; clarify projection for `findOne()` #3593 [gunar](https://github.com/gunar)
+ * fixed; .ownerDocument() method on single embedded schemas #3589
+ * fixed; properly throw casterror for query on single embedded schema #3580
+ * upgraded; mongodb driver -> 2.0.49 for reconnect issue fix #3481
+
 4.2.6 / 2015-11-16
 ==================
  * fixed; ability to manually populate an array #3575

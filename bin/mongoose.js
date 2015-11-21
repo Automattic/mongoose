@@ -1066,7 +1066,21 @@ Document.prototype.set = function(path, val, type, options) {
         schema.options.ref &&
         val instanceof Document &&
         schema.options.ref === val.constructor.modelName) {
-      this.populated(path, val._id);
+      this.populated(path, val._id, { model: val.constructor });
+      didPopulate = true;
+    }
+
+    if (schema.options &&
+        Array.isArray(schema.options.type) &&
+        schema.options.type.length &&
+        schema.options.type[0].ref &&
+        Array.isArray(val) &&
+        val.length > 0 &&
+        val[0] instanceof Document &&
+        val[0].constructor.modelName &&
+        schema.options.type[0].ref === val[0].constructor.modelName) {
+      this.populated(path, val.map(function(v) { return v._id }),
+        { model: val[0].constructor });
       didPopulate = true;
     }
     val = schema.applySetters(val, this, false, priorVal);
@@ -2853,7 +2867,11 @@ module.exports = driver;
 
 function MongooseError(msg) {
   Error.call(this);
-  this.stack = new Error().stack;
+  if (Error.captureStackTrace) {
+    Error.captureStackTrace(this);
+  } else {
+    this.stack = new Error().stack
+  }
   this.message = msg;
   this.name = 'MongooseError';
 }
@@ -2913,7 +2931,11 @@ var MongooseError = require('../error.js');
 
 function CastError(type, value, path, reason) {
   MongooseError.call(this, 'Cast to ' + type + ' failed for value "' + value + '" at path "' + path + '"');
-  this.stack = new Error().stack;
+  if (Error.captureStackTrace) {
+    Error.captureStackTrace(this);
+  } else {
+    this.stack = new Error().stack
+  }
   this.name = 'CastError';
   this.kind = type;
   this.value = value;
@@ -3114,7 +3136,11 @@ function ValidationError(instance) {
   } else {
     MongooseError.call(this, "Validation failed");
   }
-  this.stack = new Error().stack;
+  if (Error.captureStackTrace) {
+    Error.captureStackTrace(this);
+  } else {
+    this.stack = new Error().stack
+  }
   this.name = 'ValidationError';
   this.errors = {};
   if (instance) {
@@ -3177,7 +3203,11 @@ function ValidatorError(properties) {
   this.properties = properties;
   var message = this.formatMessage(msg, properties);
   MongooseError.call(this, message);
-  this.stack = new Error().stack;
+  if (Error.captureStackTrace) {
+    Error.captureStackTrace(this);
+  } else {
+    this.stack = new Error().stack
+  }
   this.name = 'ValidatorError';
   this.kind = properties.type;
   this.path = properties.path;
@@ -4181,8 +4211,16 @@ Schema.interpretAsType = function(path, obj, options) {
     } else if (cast && (!cast[options.typeKey] || (options.typeKey === 'type' && cast.type.type))
                     && 'Object' == utils.getFunctionName(cast.constructor)
                     && Object.keys(cast).length) {
-      var opts = { minimize: options.minimize };
-      return new MongooseTypes.DocumentArray(path, new Schema(cast, opts), obj);
+
+      // The `minimize` and `typeKey` options propagate to child schemas
+      // declared inline, like `{ arr: [{ val: { $type: String } }] }`.
+      // See gh-3560
+      var childSchemaOptions = { minimize: options.minimize };
+      if (options.typeKey) {
+        childSchemaOptions.typeKey = options.typeKey;
+      }
+      var childSchema = new Schema(cast, childSchemaOptions);
+      return new MongooseTypes.DocumentArray(path, childSchema, obj);
     }
 
     return new MongooseTypes.Array(path, cast || MongooseTypes.Mixed, obj);
@@ -4672,6 +4710,8 @@ Schema.prototype.indexes = function() {
       path = schema.paths[key];
 
       if (path instanceof MongooseTypes.DocumentArray) {
+        collectIndexes(path.schema, key + '.');
+      } else if (path.$isSingleNested) {
         collectIndexes(path.schema, key + '.');
       } else {
         index = path._index;
@@ -6155,8 +6195,8 @@ Embedded.prototype = Object.create(SchemaType.prototype);
 
 Embedded.prototype.cast = function(val, doc) {
   var subdoc = new this.caster();
-  subdoc = subdoc.init(val);
   subdoc.$parent = doc;
+  subdoc = subdoc.init(val);
   return subdoc;
 };
 
@@ -6183,12 +6223,49 @@ Embedded.prototype.castForQuery = function($conditional, val) {
   }
 };
 
+/**
+ * Async validation on this single nested doc.
+ *
+ * @api private
+ */
+
 Embedded.prototype.doValidate = function(value, fn) {
-  value.validate(fn, { __noPromise: true });
+  SchemaType.prototype.doValidate.call(this, value, function(error) {
+    if (error) {
+      return fn(error);
+    }
+    if (!value) {
+      return fn(null);
+    }
+    value.validate(fn, { __noPromise: true });
+  });
 };
 
+/**
+ * Synchronously validate this single nested doc
+ *
+ * @api private
+ */
+
 Embedded.prototype.doValidateSync = function(value) {
+  var schemaTypeError = SchemaType.prototype.doValidateSync.call(this, value);
+  if (schemaTypeError) {
+    return schemaTypeError;
+  }
+  if (!value) {
+    return;
+  }
   return value.validateSync();
+};
+
+/**
+ * Required validator for single nested docs
+ *
+ * @api private
+ */
+
+Embedded.prototype.checkRequired = function(value) {
+  return !!value && value.$isSingleNested;
 };
 
 },{"../schematype":36,"../types/subdocument":44}],31:[function(require,module,exports){
@@ -8843,7 +8920,7 @@ MongooseArray.mixin = {
 
     while (i--) {
       mem = cur[i];
-      if (mem instanceof EmbeddedDocument) {
+      if (mem instanceof Document) {
         if (values.some(function(v) { return v.equals(mem); } )) {
           [].splice.call(cur, i, 1);
         }
@@ -9069,8 +9146,9 @@ MongooseArray.mixin = {
   indexOf: function indexOf(obj) {
     if (obj instanceof ObjectId) obj = obj.toString();
     for (var i = 0, len = this.length; i < len; ++i) {
-      if (obj == this[i])
+      if (obj == this[i]) {
         return i;
+      }
     }
     return -1;
   }
@@ -10002,7 +10080,32 @@ Subdocument.prototype.$markValid = function(path) {
 Subdocument.prototype.invalidate = function(path, err, val) {
   if (this.$parent) {
     this.$parent.invalidate([this.$basePath, path].join('.'), err, val);
+  } else if (err.kind === 'cast') {
+    throw err;
   }
+};
+
+/**
+ * Returns the top level document of this sub-document.
+ *
+ * @return {Document}
+ */
+
+Subdocument.prototype.ownerDocument = function() {
+  if (this.$__.ownerDocument) {
+    return this.$__.ownerDocument;
+  }
+
+  var parent = this.$parent;
+  if (!parent) {
+    return this;
+  }
+
+  while (parent.$parent) {
+    parent = parent.$parent;
+  }
+
+  return this.$__.ownerDocument = parent;
 };
 
 },{"../document":5,"../promise_provider":23}],45:[function(require,module,exports){

@@ -66,8 +66,8 @@
   },
   "scripts": {
     "install-browser": "npm install `node format_deps.js`",
-    "test": "mocha --async-only test/*.test.js test/**/*.test.js",
-    "test-cov": "istanbul cover _mocha --async-only test/*.test.js",
+    "test": "mocha test/*.test.js test/**/*.test.js",
+    "test-cov": "istanbul cover _mocha test/*.test.js",
     "lint": "eslint . --quiet"
   },
   "main": "./index.js",

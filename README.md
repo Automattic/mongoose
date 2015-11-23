@@ -1,6 +1,6 @@
 # Mongoose
 
-Mongoose is a [MongoDB](http://www.mongodb.org/) object modeling tool designed to work in an asynchronous environment.
+Mongoose is a [MongoDB](https://www.mongodb.org/) object modeling tool designed to work in an asynchronous environment.
 
 [![Build Status](https://api.travis-ci.org/Automattic/mongoose.png?branch=master)](https://travis-ci.org/Automattic/mongoose)
 [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/Automattic/mongoose?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
@@ -15,7 +15,7 @@ Mongoose is a [MongoDB](http://www.mongodb.org/) object modeling tool designed t
   - [Stack Overflow](http://stackoverflow.com/questions/tagged/mongoose)
   - [bug reports](https://github.com/Automattic/mongoose/issues/)
   - [help forum](http://groups.google.com/group/mongoose-orm)
-  - [MongoDB support](http://www.mongodb.org/display/DOCS/Technical+Support)
+  - [MongoDB support](https://docs.mongodb.org/manual/support/)
   - (irc) #mongoosejs on freenode
 
 ## Plugins
@@ -29,11 +29,11 @@ Build your own Mongoose plugin through [generator-mongoose-plugin](https://githu
 View all 100+ [contributors](https://github.com/Automattic/mongoose/graphs/contributors). Stand up and be counted as a [contributor](https://github.com/Automattic/mongoose/blob/master/CONTRIBUTING.md) too!
 
 ## Live Examples
-<a href="http://runnable.com/mongoose" target="_blank"><img src="http://runnable.com/external/styles/assets/runnablebtn.png" style="width:67px;height:25px;"></a>
+<a href="http://code.runnable.com/mongoose" target="_blank"><img src="http://runnable.com/external/styles/assets/runnablebtn.png" style="width:67px;height:25px;"></a>
 
 ## Installation
 
-First install [node.js](http://nodejs.org/) and [mongodb](http://www.mongodb.org/downloads). Then:
+First install [node.js](http://nodejs.org/) and [mongodb](https://www.mongodb.org/downloads). Then:
 
 ```sh
 $ npm install mongoose
@@ -291,8 +291,8 @@ The driver being used defaults to [node-mongodb-native](https://github.com/mongo
 
 ## API Docs
 
-Find the API docs [here](http://mongoosejs.com/docs/api.html), generated using [dox](http://github.com/visionmedia/dox)
-and [acquit](http://github.com/vkarpov15/acquit).
+Find the API docs [here](http://mongoosejs.com/docs/api.html), generated using [dox](https://github.com/tj/dox)
+and [acquit](https://github.com/vkarpov15/acquit).
 
 ## License
 

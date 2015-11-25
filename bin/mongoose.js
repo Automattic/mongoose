@@ -1079,7 +1079,7 @@ Document.prototype.set = function(path, val, type, options) {
         val[0] instanceof Document &&
         val[0].constructor.modelName &&
         schema.options.type[0].ref === val[0].constructor.modelName) {
-      this.populated(path, val.map(function(v) { return v._id }),
+      this.populated(path, val.map(function(v) { return v._id; }),
         { model: val[0].constructor });
       didPopulate = true;
     }
@@ -2870,7 +2870,7 @@ function MongooseError(msg) {
   if (Error.captureStackTrace) {
     Error.captureStackTrace(this);
   } else {
-    this.stack = new Error().stack
+    this.stack = new Error().stack;
   }
   this.message = msg;
   this.name = 'MongooseError';
@@ -2934,7 +2934,7 @@ function CastError(type, value, path, reason) {
   if (Error.captureStackTrace) {
     Error.captureStackTrace(this);
   } else {
-    this.stack = new Error().stack
+    this.stack = new Error().stack;
   }
   this.name = 'CastError';
   this.kind = type;
@@ -3139,7 +3139,7 @@ function ValidationError(instance) {
   if (Error.captureStackTrace) {
     Error.captureStackTrace(this);
   } else {
-    this.stack = new Error().stack
+    this.stack = new Error().stack;
   }
   this.name = 'ValidationError';
   this.errors = {};
@@ -3206,7 +3206,7 @@ function ValidatorError(properties) {
   if (Error.captureStackTrace) {
     Error.captureStackTrace(this);
   } else {
-    this.stack = new Error().stack
+    this.stack = new Error().stack;
   }
   this.name = 'ValidatorError';
   this.kind = properties.type;
@@ -6194,6 +6194,9 @@ Embedded.prototype = Object.create(SchemaType.prototype);
  */
 
 Embedded.prototype.cast = function(val, doc) {
+  if (val && val.$isSingleNested) {
+    return val;
+  }
   var subdoc = new this.caster();
   subdoc.$parent = doc;
   subdoc = subdoc.init(val);

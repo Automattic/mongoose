@@ -1,3 +1,10 @@
+4.2.8 / 2015-11-25
+==================
+ * docs; clean up README links #3612 [ReadmeCritic](https://github.com/ReadmeCritic)
+ * fix; ESLint improvements #3605 [ChristianMurphy](https://github.com/ChristianMurphy)
+ * fix; assigning single nested subdocs #3601
+ * docs; describe custom logging functions in `mongoose.set()` docs #3557
+
 4.2.7 / 2015-11-20
 ==================
  * fixed; readPreference connection string option #3600

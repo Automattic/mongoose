@@ -1666,11 +1666,11 @@ describe('model: update:', function() {
 
     var M = db.model('gh-3564', schema);
 
-    M.create(doc, function(err, topic) {
+    M.create(doc, function(err) {
       assert.ifError(err);
 
       var update = { $push: { followers: 200 } };
-      var opts =  { overwrite: true, new: true, safe: true, upsert: false, multi: false};
+      var opts = { overwrite: true, new: true, safe: true, upsert: false, multi: false};
 
       M.update({ topicId: doc.topicId }, update, opts, function(err) {
         assert.ifError(err);
@@ -1680,7 +1680,7 @@ describe('model: update:', function() {
           assert.deepEqual(doc.followers.toObject(), [500, 200]);
           db.close(done);
         });
-      })
+      });
     });
   });
 });

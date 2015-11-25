@@ -2130,4 +2130,26 @@ describe('document', function() {
       });
     });
   });
+
+  it('setting single embedded docs (gh-3601)', function(done) {
+    var db = start();
+    var personSchema = new Schema({ name: String });
+
+    var bandSchema = new Schema({ guitarist: personSchema, name: String });
+    var Band = db.model('gh3601', bandSchema);
+
+    var gnr = new Band({
+      name: "Guns N' Roses",
+      guitarist: { name: 'Slash' }
+    });
+    var velvetRevolver = new Band({
+      name: 'Velvet Revolver'
+    });
+    velvetRevolver.guitarist = gnr.guitarist;
+    velvetRevolver.save(function(error) {
+      assert.ifError(error);
+      assert.equal(velvetRevolver.guitarist, gnr.guitarist);
+      db.close(done);
+    });
+  });
 });

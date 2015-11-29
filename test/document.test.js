@@ -2152,4 +2152,27 @@ describe('document', function() {
       db.close(done);
     });
   });
+
+  it('handles virtuals with dots correctly (gh-3618)', function(done) {
+    var db = start();
+    var testSchema = new Schema({ nested: { type: Object, default: {} } });
+    testSchema.virtual('nested.test').get(function() {
+      return true;
+    });
+
+    var Test = db.model('gh3618', testSchema);
+
+    var test = new Test();
+
+    var doc = test.toObject({ getters: true, virtuals: true });
+    delete doc._id;
+    delete doc.id;
+    assert.deepEqual(doc, { 'nested.test': true });
+
+    doc = test.toObject({ getters: false, virtuals: true });
+    delete doc._id;
+    delete doc.id;
+    assert.deepEqual(doc, { 'nested.test': true });
+    db.close(done);
+  });
 });

@@ -2167,12 +2167,12 @@ describe('document', function() {
     var doc = test.toObject({ getters: true, virtuals: true });
     delete doc._id;
     delete doc.id;
-    assert.deepEqual(doc, { 'nested.test': true });
+    assert.deepEqual(doc, { nested: { test: true } });
 
     doc = test.toObject({ getters: false, virtuals: true });
     delete doc._id;
     delete doc.id;
-    assert.deepEqual(doc, { 'nested.test': true });
+    assert.deepEqual(doc, { nested: { test: true } });
     db.close(done);
   });
 });

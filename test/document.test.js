@@ -2175,4 +2175,37 @@ describe('document', function() {
     assert.deepEqual(doc, { nested: { test: true } });
     db.close(done);
   });
+
+  it('handles pushing with numeric keys (gh-3623)', function(done) {
+    var db = start();
+    var schema = new Schema({
+      array: [{
+        1: {
+          date: Date
+        },
+        2: {
+          date: Date
+        },
+        3: {
+          date: Date
+        }
+      }]
+    });
+
+    var MyModel = db.model('gh3623', schema);
+
+    var doc = { array: [{ 2: {} }] };
+    MyModel.collection.insertOne(doc, function(error) {
+      assert.ifError(error);
+
+      MyModel.findOne({ _id: doc._id }, function(error, doc) {
+        assert.ifError(error);
+        doc.array.push({ 2: {} });
+        doc.save(function(error) {
+          assert.ifError(error);
+          db.close(done);
+        });
+      });
+    });
+  });
 });

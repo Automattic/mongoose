@@ -23,7 +23,6 @@ var files = [
 ];
 
 files.forEach(function(file) {
-  console.log('umm', file);
   var blocks = acquit.parse(fs.readFileSync(file.input).toString());
 
   for (var i = 0; i < blocks.length; ++i) {

@@ -1977,13 +1977,30 @@ function defineKey(prop, subprops, prototype, prefix, keys, options) {
             });
           }
 
-          nested.toObject = function() {
-            return _self.get(path);
-          };
+          Object.defineProperty(nested, 'toObject', {
+            enumerable: true,
+            configurable: true,
+            writable: false,
+            value: function() {
+              return _self.get(path);
+            }
+          });
 
-          nested.toJSON = nested.toObject;
+          Object.defineProperty(nested, 'toJSON', {
+            enumerable: true,
+            configurable: true,
+            writable: false,
+            value: function() {
+              return _self.get(path);
+            }
+          });
 
-          nested.$__isNested = true;
+          Object.defineProperty(nested, '$__isNested', {
+            enumerable: true,
+            configurable: true,
+            writable: false,
+            value: true
+          });
 
           compile(subprops, nested, path, options);
           this.$__.getters[path] = nested;
@@ -2267,10 +2284,6 @@ Document.prototype.$toObject = function(options, json) {
 
   var ret = clone(this._doc, options) || {};
 
-  if (options.virtuals || options.getters && false !== options.virtuals) {
-    applyGetters(this, ret, 'virtuals', options);
-  }
-
   if (options.getters) {
     applyGetters(this, ret, 'paths', options);
     // applyGetters for paths will add nested empty objects;
@@ -2278,6 +2291,10 @@ Document.prototype.$toObject = function(options, json) {
     if (options.minimize) {
       ret = minimize(ret) || {};
     }
+  }
+
+  if (options.virtuals || options.getters && false !== options.virtuals) {
+    applyGetters(this, ret, 'virtuals', options);
   }
 
   if (options.versionKey === false && this.schema.options.versionKey) {
@@ -3737,6 +3754,7 @@ function Schema(obj, options) {
   this.paths = {};
   this.subpaths = {};
   this.virtuals = {};
+  this.singleNestedPaths = {};
   this.nested = {};
   this.inherits = {};
   this.callQueue = [];
@@ -4164,6 +4182,12 @@ Schema.prototype.path = function(path, obj) {
   branch[last] = utils.clone(obj);
 
   this.paths[path] = Schema.interpretAsType(path, obj, this.options);
+  if (this.paths[path].$isSingleNested) {
+    for (var key in this.paths[path].schema.paths) {
+      this.singleNestedPaths[path + '.' + key] =
+        this.paths[path].schema.paths[key];
+    }
+  }
   return this;
 };
 
@@ -4326,6 +4350,9 @@ Schema.prototype.pathType = function(path) {
   if (path in this.virtuals) return 'virtual';
   if (path in this.nested) return 'nested';
   if (path in this.subpaths) return 'real';
+  if (path in this.singleNestedPaths) {
+    return 'real';
+  }
 
   if (/\.\d+\.|\.\d+$/.test(path)) {
     return getPositionalPathType(this, path);

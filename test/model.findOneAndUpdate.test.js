@@ -1524,5 +1524,25 @@ describe('model: findByIdAndUpdate:', function() {
         db.close(done);
       });
     });
+
+    it('pull with nested schemas (gh-3616)', function(done) {
+      var db = start();
+
+      var nested = new Schema({ arr: [{ num: Number }] });
+      var s = new Schema({ nested: nested });
+
+      var MyModel = db.model('gh3616', s);
+
+      MyModel.create({ nested: { arr: [{ num: 5 }] } }, function(error, doc) {
+        assert.ifError(error);
+        var update = { $pull: { 'nested.arr': { num: 5 } } };
+        var options = { 'new': true };
+        MyModel.findOneAndUpdate({}, update, options, function(error, doc) {
+          assert.ifError(error);
+          assert.equal(doc.nested.arr.length, 0);
+          db.close(done);
+        });
+      });
+    });
   });
 });

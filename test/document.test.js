@@ -2152,4 +2152,60 @@ describe('document', function() {
       db.close(done);
     });
   });
+
+  it('handles virtuals with dots correctly (gh-3618)', function(done) {
+    var db = start();
+    var testSchema = new Schema({ nested: { type: Object, default: {} } });
+    testSchema.virtual('nested.test').get(function() {
+      return true;
+    });
+
+    var Test = db.model('gh3618', testSchema);
+
+    var test = new Test();
+
+    var doc = test.toObject({ getters: true, virtuals: true });
+    delete doc._id;
+    delete doc.id;
+    assert.deepEqual(doc, { nested: { test: true } });
+
+    doc = test.toObject({ getters: false, virtuals: true });
+    delete doc._id;
+    delete doc.id;
+    assert.deepEqual(doc, { nested: { test: true } });
+    db.close(done);
+  });
+
+  it('handles pushing with numeric keys (gh-3623)', function(done) {
+    var db = start();
+    var schema = new Schema({
+      array: [{
+        1: {
+          date: Date
+        },
+        2: {
+          date: Date
+        },
+        3: {
+          date: Date
+        }
+      }]
+    });
+
+    var MyModel = db.model('gh3623', schema);
+
+    var doc = { array: [{ 2: {} }] };
+    MyModel.collection.insertOne(doc, function(error) {
+      assert.ifError(error);
+
+      MyModel.findOne({ _id: doc._id }, function(error, doc) {
+        assert.ifError(error);
+        doc.array.push({ 2: {} });
+        doc.save(function(error) {
+          assert.ifError(error);
+          db.close(done);
+        });
+      });
+    });
+  });
 });

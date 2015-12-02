@@ -1,3 +1,10 @@
+4.2.9 / 2015-12-02
+==================
+ * docs; defaults docs #3625
+ * fix; nested numeric keys causing an embedded document crash #3623
+ * fix; apply path getters before virtual getters #3618
+ * fix; casting for arrays in single nested schemas #3616
+
 4.2.8 / 2015-11-25
 ==================
  * docs; clean up README links #3612 [ReadmeCritic](https://github.com/ReadmeCritic)

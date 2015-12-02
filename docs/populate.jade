@@ -58,13 +58,13 @@ block content
     .populate('_creator')
     .exec(function (err, story) {
       if (err) return handleError(err);
-      console.log('The creator is %s', story._creator.name);
+      console.log('The creator is %s', story._creator[0].name);
       // prints "The creator is Aaron"
     });
   :markdown
     Populated paths are no longer set to their original `_id` , their value is replaced with the mongoose document returned from the database by performing a separate query before returning the results.
+    The [populate](./api.html#query_Query-populate) method returns an array of documents _in place_ of the original _id's.
 
-    Arrays of refs work the same way. Just call the [populate](./api.html#query_Query-populate) method on the query and an array of documents will be returned _in place_ of the original `_id`s.
   .important
     :markdown
       **Note**: mongoose >= 3.6 exposes the original `_ids` used during population through the [document#populated()](./api.html#document_Document-populated) method.

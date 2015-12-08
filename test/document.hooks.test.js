@@ -3,13 +3,13 @@
  * Module dependencies.
  */
 
-var start = require('./common')
-  , mongoose = start.mongoose
-  , assert = require('assert')
-  , Schema = mongoose.Schema
-  , ObjectId = Schema.ObjectId
-  , Document = require('../lib/document')
-  , EmbeddedDocument = require('../lib/types/embedded');
+var start = require('./common'),
+    mongoose = start.mongoose,
+    assert = require('assert'),
+    Schema = mongoose.Schema,
+    ObjectId = Schema.ObjectId,
+    Document = require('../lib/document'),
+    EmbeddedDocument = require('../lib/types/embedded');
 
 /**
  * Test Document constructor.
@@ -34,25 +34,25 @@ em.virtual('works').get(function() {
   return 'em virtual works';
 });
 var schema = new Schema({
-  test    : String
-  , oids    : [ObjectId]
-  , numbers : [Number]
-  , nested  : {
-    age   : Number
-      , cool  : ObjectId
-      , deep  : { x: String }
-      , path  : String
-      , setr  : String
-  }
-  , nested2 : {
-    nested: String
-      , yup   : {
-        nested  : Boolean
-          , yup     : String
-          , age     : Number
-      }
-  }
-  , em: [em]
+  test: String,
+  oids: [ObjectId],
+  numbers: [Number],
+  nested: {
+    age: Number,
+    cool: ObjectId,
+    deep: { x: String },
+    path: String,
+    setr: String
+  },
+  nested2: {
+    nested: String,
+    yup: {
+      nested: Boolean,
+      yup: String,
+      age: Number
+    }
+  },
+  em: [em]
 });
 TestDocument.prototype.$__setSchema(schema);
 
@@ -80,8 +80,8 @@ TestDocument.prototype.hooksTest = function(fn) {
 
 describe('document: hooks:', function() {
   it('step order', function(done) {
-    var doc = new TestDocument()
-      , steps = 0;
+    var doc = new TestDocument(),
+        steps = 0;
 
     // serial
     doc.pre('hooksTest', function(next) {
@@ -133,8 +133,8 @@ describe('document: hooks:', function() {
   });
 
   it('calling next twice does not break', function(done) {
-    var doc = new TestDocument()
-      , steps = 0;
+    var doc = new TestDocument(),
+        steps = 0;
 
     doc.pre('hooksTest', function(next) {
       steps++;
@@ -155,8 +155,8 @@ describe('document: hooks:', function() {
   });
 
   it('calling done twice does not break', function(done) {
-    var doc = new TestDocument()
-      , steps = 0;
+    var doc = new TestDocument(),
+        steps = 0;
 
     doc.pre('hooksTest', true, function(next, done) {
       steps++;
@@ -180,8 +180,8 @@ describe('document: hooks:', function() {
   });
 
   it('errors from a serial hook', function(done) {
-    var doc = new TestDocument()
-      , steps = 0;
+    var doc = new TestDocument(),
+        steps = 0;
 
     doc.pre('hooksTest', function(next) {
       steps++;
@@ -230,8 +230,8 @@ describe('document: hooks:', function() {
   });
 
   it('test hooks system errors from a parallel hook', function(done) {
-    var doc = new TestDocument()
-      , steps = 0;
+    var doc = new TestDocument(),
+        steps = 0;
 
     doc.pre('hooksTest', true, function(next, done) {
       steps++;
@@ -282,8 +282,8 @@ describe('document: hooks:', function() {
     });
 
     var schema = new Schema({
-      name: String
-      , e: [child]
+      name: String,
+      e: [child]
     });
 
     var S = db.model('docArrayWithHookedSet', schema);
@@ -323,8 +323,8 @@ describe('document: hooks:', function() {
     });
 
     var schema = new Schema({
-      name: String
-      , e: [child]
+      name: String,
+      e: [child]
     });
 
     var S = db.model('docArrayWithHookedSave', schema);
@@ -511,16 +511,13 @@ describe('document: hooks:', function() {
       subs: [
           {
             preference: "xx"
-          }
-        ,
+          },
           {
             preference: "yy"
-          }
-        ,
+          },
           {
             preference: "1"
-          }
-        ,
+          },
           {
             preference: "2"
           }

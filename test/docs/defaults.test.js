@@ -1,5 +1,4 @@
 var assert = require('assert');
-var async = require('async');
 var mongoose = require('../../');
 
 describe('defaults docs', function() {

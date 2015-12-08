@@ -2,13 +2,13 @@
  * Test dependencies.
  */
 
-var start = require('./common')
-  , mongoose = start.mongoose
-  , Schema = mongoose.Schema
-  , assert = require('assert')
-  , random = require('../lib/utils').random
-  , util = require('util')
-  , async = require('async');
+var start = require('./common'),
+    mongoose = start.mongoose,
+    Schema = mongoose.Schema,
+    assert = require('assert'),
+    random = require('../lib/utils').random,
+    util = require('util'),
+    async = require('async');
 
 
 /**
@@ -653,15 +653,15 @@ describe('model', function() {
         var busSchema = new Schema({ speed: Number });
 
         var userSchema = new Schema({
-          vehicles: [{ type: Schema.Types.ObjectId, ref: 'ModelDiscriminatorPopulationVehicle' }]
-          , favoriteVehicle: { type: Schema.Types.ObjectId, ref: 'ModelDiscriminatorPopulationVehicle' }
-          , favoriteBus: { type: Schema.Types.ObjectId, ref: 'ModelDiscriminatorPopulationBus' }
+          vehicles: [{ type: Schema.Types.ObjectId, ref: 'ModelDiscriminatorPopulationVehicle' }],
+          favoriteVehicle: { type: Schema.Types.ObjectId, ref: 'ModelDiscriminatorPopulationVehicle' },
+          favoriteBus: { type: Schema.Types.ObjectId, ref: 'ModelDiscriminatorPopulationBus' }
         });
 
-        var Vehicle = db.model('ModelDiscriminatorPopulationVehicle', vehicleSchema)
-          , Car = Vehicle.discriminator('ModelDiscriminatorPopulationCar', carSchema)
-          , Bus = Vehicle.discriminator('ModelDiscriminatorPopulationBus', busSchema)
-          , User = db.model('ModelDiscriminatorPopulationUser', userSchema);
+        var Vehicle = db.model('ModelDiscriminatorPopulationVehicle', vehicleSchema),
+            Car = Vehicle.discriminator('ModelDiscriminatorPopulationCar', carSchema),
+            Bus = Vehicle.discriminator('ModelDiscriminatorPopulationBus', busSchema),
+            User = db.model('ModelDiscriminatorPopulationUser', userSchema);
 
         Vehicle.create({}, function(err, vehicle) {
           assert.ifError(err);
@@ -674,15 +674,15 @@ describe('model', function() {
                   assert.ifError(err);
 
                   var expected = {
-                    __v: 0
-                    , _id: user._id
-                    , vehicles: [
-                        { _id: vehicle._id, __v: 0 }
-                      , { _id: car._id, speed: 160, __v: 0, __t: 'ModelDiscriminatorPopulationCar' }
-                      , { _id: bus._id, speed: 80, __v: 0, __t: 'ModelDiscriminatorPopulationBus' }
-                    ]
-                    , favoriteVehicle: { _id: car._id, speed: 160, __v: 0, __t: 'ModelDiscriminatorPopulationCar' }
-                    , favoriteBus: { _id: bus._id, speed: 80, __v: 0, __t: 'ModelDiscriminatorPopulationBus' }
+                    __v: 0,
+                    _id: user._id,
+                    vehicles: [
+                      { _id: vehicle._id, __v: 0 },
+                      { _id: car._id, speed: 160, __v: 0, __t: 'ModelDiscriminatorPopulationCar' },
+                      { _id: bus._id, speed: 80, __v: 0, __t: 'ModelDiscriminatorPopulationBus' }
+                    ],
+                    favoriteVehicle: { _id: car._id, speed: 160, __v: 0, __t: 'ModelDiscriminatorPopulationCar' },
+                    favoriteBus: { _id: bus._id, speed: 80, __v: 0, __t: 'ModelDiscriminatorPopulationBus' }
                   };
 
                   assert.deepEqual(user.toJSON(), expected);
@@ -722,10 +722,10 @@ describe('model', function() {
           num_of_places: Number
         });
 
-        var Vehicle = db.model('gh2719PopulationVehicle', vehicleSchema)
-          , Car = Vehicle.discriminator('gh2719PopulationCar', carSchema)
-          , Bus = Vehicle.discriminator('gh2719PopulationBus', busSchema)
-          , Garage = db.model('gh2719PopulationGarage', garageSchema);
+        var Vehicle = db.model('gh2719PopulationVehicle', vehicleSchema),
+            Car = Vehicle.discriminator('gh2719PopulationCar', carSchema),
+            Bus = Vehicle.discriminator('gh2719PopulationBus', busSchema),
+            Garage = db.model('gh2719PopulationGarage', garageSchema);
 
         Garage.create({name: 'My', num_of_places: 3}, function(err, garage) {
           assert.ifError(err);
@@ -754,10 +754,10 @@ describe('model', function() {
           Schema.apply(this, arguments);
 
           this.add({
-            name     : { type: String, required: true },
-            date     : { type: Date, required: true },
-            period   : { start : { type: String, required: true },
-              end   : { type: String, required: true }
+            name: { type: String, required: true },
+            date: { type: Date, required: true },
+            period: { start: { type: String, required: true },
+              end: { type: String, required: true }
             }
           });
         }
@@ -768,11 +768,11 @@ describe('model', function() {
         Event = db.model('Event', EventSchema);
 
         TalkSchema = new BaseSchema({
-          pin            : { type: String, required: true, index: { unique: true } },
-          totalAttendees : { type: Number },
-          speakers       : [{ type: Schema.Types.ObjectId, ref: 'Speaker' }],
-          surveys        : [{ type: Schema.Types.ObjectId, ref: 'Survey' }],
-          questions      : [{ type: Schema.Types.ObjectId, ref: 'Question' }]
+          pin: { type: String, required: true, index: { unique: true } },
+          totalAttendees: { type: Number },
+          speakers: [{ type: Schema.Types.ObjectId, ref: 'Speaker' }],
+          surveys: [{ type: Schema.Types.ObjectId, ref: 'Survey' }],
+          questions: [{ type: Schema.Types.ObjectId, ref: 'Question' }]
         });
 
         Talk = Event.discriminator('Talk', TalkSchema);

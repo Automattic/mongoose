@@ -3,20 +3,20 @@
  * Module dependencies.
  */
 
-var start = require('./common')
-  , mongoose = start.mongoose
-  , assert = require('assert')
-  , random = require('../lib/utils').random
-  , Schema = mongoose.Schema
-  , ObjectId = Schema.ObjectId
-  , Document = require('../lib/document')
-  , DocumentObjectId = mongoose.Types.ObjectId
-  , SchemaType = mongoose.SchemaType
-  , ValidatorError = SchemaType.ValidatorError
-  , ValidationError = mongoose.Document.ValidationError
-  , MongooseError = mongoose.Error
-  , EmbeddedDocument = require('../lib/types/embedded')
-  , Query = require('../lib/query');
+var start = require('./common'),
+    mongoose = start.mongoose,
+    assert = require('assert'),
+    random = require('../lib/utils').random,
+    Schema = mongoose.Schema,
+    ObjectId = Schema.ObjectId,
+    Document = require('../lib/document'),
+    DocumentObjectId = mongoose.Types.ObjectId,
+    SchemaType = mongoose.SchemaType,
+    ValidatorError = SchemaType.ValidatorError,
+    ValidationError = mongoose.Document.ValidationError,
+    MongooseError = mongoose.Error,
+    EmbeddedDocument = require('../lib/types/embedded'),
+    Query = require('../lib/query');
 
 /**
  * Test Document constructor.

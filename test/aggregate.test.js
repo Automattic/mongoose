@@ -2,11 +2,11 @@
  * Module dependencies
  */
 
-var start = require('./common')
-  , Aggregate = require('../lib/aggregate')
-  , mongoose = start.mongoose
-  , Schema = mongoose.Schema
-  , assert = require('assert');
+var start = require('./common'),
+    Aggregate = require('../lib/aggregate'),
+    mongoose = start.mongoose,
+    Schema = mongoose.Schema,
+    assert = require('assert');
 
 /**
  * Test data
@@ -22,15 +22,15 @@ var EmployeeSchema = new Schema({
 mongoose.model('Employee', EmployeeSchema);
 
 function setupData(callback) {
-  var saved = 0
-    , emps = [
-        { name: "Alice", sal: 18000, dept: "sales", customers: [ 'Eve', 'Fred' ] }
-    , { name: "Bob", sal: 15000, dept: "sales", customers: [ 'Gary', 'Herbert', 'Isaac' ] }
-    , { name: "Carol", sal: 14000, dept: "r&d" }
-    , { name: "Dave", sal: 14500, dept: "r&d" }
-    ]
-    , db = start()
-    , Employee = db.model('Employee');
+  var saved = 0,
+      emps = [
+        { name: "Alice", sal: 18000, dept: "sales", customers: [ 'Eve', 'Fred' ] },
+        { name: "Bob", sal: 15000, dept: "sales", customers: [ 'Gary', 'Herbert', 'Isaac' ] },
+        { name: "Carol", sal: 14000, dept: "r&d" },
+        { name: "Dave", sal: 14500, dept: "r&d" }
+      ],
+      db = start(),
+      Employee = db.model('Employee');
 
   emps.forEach(function(data) {
     var emp = new Employee(data);
@@ -68,8 +68,8 @@ describe('aggregate: ', function() {
     });
 
     it('throws if non-operator parameter is passed', function(done) {
-      var aggregate = new Aggregate()
-        , regexp = /Arguments must be aggregate pipeline operators/;
+      var aggregate = new Aggregate(),
+          regexp = /Arguments must be aggregate pipeline operators/;
 
       assert.throws(function() {
         aggregate.append({ $a: 1 }, "string");
@@ -198,10 +198,10 @@ describe('aggregate: ', function() {
 
       aggregate.unwind("a", "b", "c");
       assert.deepEqual(aggregate._pipeline, [
-        { $unwind: "$field" }
-      , { $unwind: "$a" }
-      , { $unwind: "$b" }
-      , { $unwind: "$c" }
+        { $unwind: "$field" },
+        { $unwind: "$a" },
+        { $unwind: "$b" },
+        { $unwind: "$c" }
       ]);
 
       done();
@@ -317,8 +317,8 @@ describe('aggregate: ', function() {
 
   describe('bind', function() {
     it('works', function(done) {
-      var aggregate = new Aggregate()
-        , model = { foo: 42 };
+      var aggregate = new Aggregate(),
+          model = { foo: 42 };
 
       assert.equal(aggregate.model(model), aggregate);
       assert.equal(aggregate._model, model);
@@ -513,8 +513,8 @@ describe('aggregate: ', function() {
       });
 
       it('with a callback', function(done) {
-        var aggregate = new Aggregate()
-          , callback;
+        var aggregate = new Aggregate(),
+            callback;
 
         setupData(function(db) {
           aggregate.model(db.model('Employee'));

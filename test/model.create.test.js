@@ -2,12 +2,12 @@
  * Test dependencies.
  */
 
-var start = require('./common')
-  , assert = require('assert')
-  , mongoose = start.mongoose
-  , random = require('../lib/utils').random
-  , Schema = mongoose.Schema
-  , DocumentObjectId = mongoose.Types.ObjectId;
+var start = require('./common'),
+    assert = require('assert'),
+    mongoose = start.mongoose,
+    random = require('../lib/utils').random,
+    Schema = mongoose.Schema,
+    DocumentObjectId = mongoose.Types.ObjectId;
 
 /**
  * Setup
@@ -76,9 +76,9 @@ describe('model', function() {
     it('creates in parallel', function(done) {
       // we set the time out to be double that of the validator - 1 (so that running in serial will be greater then that)
       this.timeout(1000);
-      var db = start()
-        , countPre = 0
-        , countPost = 0;
+      var db = start(),
+          countPre = 0,
+          countPost = 0;
 
       var SchemaWithPreSaveHook = new Schema({
         preference: String
@@ -95,12 +95,9 @@ describe('model', function() {
       });
       var MWPSH = db.model('mwpsh', SchemaWithPreSaveHook);
       MWPSH.create([
-        {preference: "xx"}
-        ,
-        {preference: "yy"}
-        ,
-        {preference: "1"}
-        ,
+        {preference: "xx"},
+        {preference: "yy"},
+        {preference: "1"},
         {preference: "2"}
       ], function(err, docs) {
         assert.ifError(err);

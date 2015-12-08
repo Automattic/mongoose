@@ -522,7 +522,7 @@ describe('document.populate', function() {
     gnr.guitarist = buckethead._id;
     assert.ok(!gnr.populated('guitarist'));
 
-    done();
+    db.close(done);
   });
 
   describe('gh-2214', function() {

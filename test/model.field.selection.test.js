@@ -151,7 +151,7 @@ describe('model field selection', function() {
       MyModel.findOne({}, { _id: 1 }, function(error, doc) {
         assert.ifError(error);
         assert.ok(!doc.test);
-        done();
+        db.close(done);
       });
     });
   });
@@ -298,7 +298,7 @@ describe('model field selection', function() {
             assert.equal(found.id, doc.id);
             assert.equal(1, found.ids.length);
             assert.equal(_id2.toString(), found.ids[0].toString());
-            done();
+            db.close(done);
           });
         });
       });

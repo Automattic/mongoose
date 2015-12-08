@@ -847,11 +847,19 @@ describe('Query', function() {
   });
 
   describe('casting', function() {
+    var db;
+
+    before(function() {
+      db = start();
+    });
+
+    after(function(done) {
+      db.close(done);
+    });
+
     it('to an array of mixed', function(done) {
       var query = new Query({}, {}, null, p1.collection);
-      var db = start();
       var Product = db.model('Product');
-      db.close();
       var params = { _id: new DocumentObjectId, tags: { $in: [ 4, 8, 15, 16 ] }};
       query.cast(Product, params);
       assert.deepEqual(params.tags.$in, [4,8,15,16]);
@@ -860,10 +868,8 @@ describe('Query', function() {
 
     it('find $ne should not cast single value to array for schematype of Array', function(done) {
       var query = new Query({}, {}, null, p1.collection);
-      var db = start();
       var Product = db.model('Product');
       var Comment = db.model('Comment');
-      db.close();
 
       var id = new DocumentObjectId;
       var castedComment = { _id: id, text: 'hello there' };
@@ -906,9 +912,7 @@ describe('Query', function() {
 
     it('subdocument array with $ne: null should not throw', function(done) {
       var query = new Query({}, {}, null, p1.collection);
-      var db = start();
       var Product = db.model('Product');
-      db.close();
 
       var params = {
         comments: { $ne: null }
@@ -921,10 +925,8 @@ describe('Query', function() {
 
     it('find should not cast single value to array for schematype of Array', function(done) {
       var query = new Query({}, {}, null, p1.collection);
-      var db = start();
       var Product = db.model('Product');
       var Comment = db.model('Comment');
-      db.close();
 
       var id = new DocumentObjectId;
       var castedComment = { _id: id, text: 'hello there' };
@@ -967,9 +969,7 @@ describe('Query', function() {
 
     it('an $elemMatch with $in works (gh-1100)', function(done) {
       var query = new Query({}, {}, null, p1.collection);
-      var db = start();
       var Product = db.model('Product');
-      db.close();
       var ids = [String(new DocumentObjectId), String(new DocumentObjectId)];
       var params = { ids: { $elemMatch: { $in: ids }}};
       query.cast(Product, params);
@@ -982,10 +982,8 @@ describe('Query', function() {
 
     it('inequality operators for an array', function(done) {
       var query = new Query({}, {}, null, p1.collection);
-      var db = start();
       var Product = db.model('Product');
       var Comment = db.model('Comment');
-      db.close();
 
       var id = new DocumentObjectId;
       var castedComment = { _id: id, text: 'hello there' };
@@ -1014,9 +1012,8 @@ describe('Query', function() {
       var prod = new Product({});
       var q = new Query({}, {}, Product, prod.collection).distinct('blah', function() {
         assert.equal(q.op,'distinct');
-        db.close();
+        db.close(done);
       });
-      done();
     });
   });
 
@@ -1073,7 +1070,7 @@ describe('Query', function() {
       var promise = Product.findOne();
 
       promise.then(function() {
-        done();
+        db.close(done);
       }, function(err) {
         assert.ifError(err);
       });
@@ -1533,7 +1530,7 @@ describe('Query', function() {
 
     assert.deepEqual(Object.keys(q.getUpdate().$push.arr.$sort),
      ['value', 'date']);
-    done();
+    db.close(done);
   });
 
   it('handles nested $ (gh-3265)', function(done) {
@@ -1556,7 +1553,7 @@ describe('Query', function() {
 
     assert.deepEqual(q.getUpdate().$set['answers.$'].stats,
       { votes: 1, count: 3 });
-    done();
+    db.close(done);
   });
 
   describe('handles falsy and object projections with defaults (gh-3256)', function() {

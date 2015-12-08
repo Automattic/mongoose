@@ -1928,7 +1928,7 @@ describe('document', function() {
     assert.ok(error.errors['user.email']);
     assert.equal(error.errors['user.email'].kind, 'regexp');
 
-    done();
+    db.close(done);
   });
 
   it('single embedded schemas with markmodified (gh-2689)', function(done) {

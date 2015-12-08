@@ -1406,7 +1406,7 @@ describe('model: update:', function() {
         { runValidators: true },
         function(err) {
           assert.ok(err);
-          done();
+          db.close(done);
         });
     });
   });
@@ -1440,7 +1440,7 @@ describe('model: update:', function() {
           assert.equal(book.chapters.length, 2);
           assert.ok(book.chapters[0]._id);
           assert.ok(book.chapters[1]._id);
-          done();
+          db.close(done);
         });
       });
   });
@@ -1455,7 +1455,7 @@ describe('model: update:', function() {
 
     assert.doesNotThrow(function() {
       D.update({}, { d: undefined }, function() {
-        done();
+        db.close(done);
       });
     });
   });
@@ -1507,7 +1507,7 @@ describe('model: update:', function() {
     var update = { $set: { values: 2, value: 2 } };
     Model.update({ key: 1 }, update, function() {
       assert.equal(update.$set.values, 2);
-      done();
+      db.close(done);
     });
   });
 
@@ -1554,7 +1554,7 @@ describe('model: update:', function() {
         exec(function(error, res) {
           assert.ifError(error);
           assert.equal(res.n, 1);
-          done();
+          db.close(done);
         });
     });
   });
@@ -1576,7 +1576,7 @@ describe('model: update:', function() {
           Model.findById(m._id, function(error, doc) {
             assert.ifError(error);
             assert.equal(doc.attributes.scores.bar.length, 1);
-            done();
+            db.close(done);
           });
         });
     });

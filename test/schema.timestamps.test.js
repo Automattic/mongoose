@@ -119,7 +119,9 @@ describe('schema options.timestamps', function() {
     });
 
     after(function(done) {
-      Cat.remove({}, done);
+      Cat.remove({}, function() {
+        conn.close(done);
+      });
     });
   });
 

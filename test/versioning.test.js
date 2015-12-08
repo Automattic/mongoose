@@ -49,6 +49,16 @@ var BlogPost = new Schema({
 mongoose.model('Versioning', BlogPost);
 
 describe('versioning', function() {
+  var db;
+
+  before(function() {
+    db = start();
+  });
+
+  after(function(done) {
+    db.close(done);
+  });
+
   it('is only added to parent schema (gh-1265)', function(done) {
     assert.ok(BlogPost.path('__v'));
     assert.ok(!BlogPost.path('comments').__v);
@@ -57,8 +67,7 @@ describe('versioning', function() {
   });
 
   it('works', function(done) {
-    var db = start()
-      , V = db.model('Versioning');
+    var V = db.model('Versioning');
 
     var doc = new V;
     doc.title = 'testing versioning';
@@ -270,7 +279,6 @@ describe('versioning', function() {
 
     function test15(err, a) {
       assert.equal(a._doc.__v, 13, 'version should not be incremented for non-versioned sub-document fields');
-      db.close();
       done();
     }
 
@@ -302,8 +310,7 @@ describe('versioning', function() {
   });
 
   it('versioning without version key', function(done) {
-    var db = start()
-      , V = db.model('Versioning');
+    var V = db.model('Versioning');
 
     var doc = new V;
     doc.numbers = [3,4,5,6,7];
@@ -320,7 +327,6 @@ describe('versioning', function() {
       assert.ifError(err);
       // test getting docs back from db missing version key
       V.findById(doc).select('numbers comments').exec(function(err, doc) {
-        db.close();
         assert.ifError(err);
         doc.comments[0].title = 'no version was included';
         var d = doc.$__delta();
@@ -331,7 +337,6 @@ describe('versioning', function() {
   });
 
   it('version works with strict docs', function(done) {
-    var db = start();
     var schema = new Schema({ str: ['string'] }, { strict: true, collection: 'versionstrict_' + random() });
     var M = db.model('VersionStrict', schema);
     var m = new M({ str: ['death', 'to', 'smootchy'] });
@@ -346,7 +351,6 @@ describe('versioning', function() {
         m.save(function(err) {
           assert.ifError(err);
           M.findById(m, function(err, m) {
-            db.close();
             assert.ifError(err);
             assert.equal(1, m._doc.__v);
             assert.equal(2, m.str.length);
@@ -359,8 +363,7 @@ describe('versioning', function() {
   });
 
   it('version works with existing unversioned docs', function(done) {
-    var db = start()
-      , V = db.model('Versioning');
+    var V = db.model('Versioning');
 
     V.collection.insert({ title: 'unversioned', numbers: [1,2,3] }, {safe:true}, function(err) {
       assert.ifError(err);
@@ -376,7 +379,6 @@ describe('versioning', function() {
           assert.ifError(err);
           assert.equal(1, d._doc.__v);
           V.findById(d, function(err, d) {
-            db.close();
             assert.ifError(err);
             assert.ok(d);
             done();
@@ -387,7 +389,6 @@ describe('versioning', function() {
   });
 
   it('versionKey is configurable', function(done) {
-    var db = start();
     var schema = new Schema(
         { configured: 'bool' }
       , { versionKey: 'lolwat', collection: 'configuredversion' + random() });
@@ -396,7 +397,6 @@ describe('versioning', function() {
     v.save(function(err) {
       assert.ifError(err);
       V.findById(v, function(err, v) {
-        db.close();
         assert.ifError(err);
         assert.equal(0, v._doc.lolwat);
         done();
@@ -405,7 +405,6 @@ describe('versioning', function() {
   });
 
   it('can be disabled', function(done) {
-    var db = start();
     var schema = Schema({ x: ['string'] }, { versionKey: false });
     var M = db.model('disabledVersioning', schema, 's' + random());
     M.create({ x: ['hi'] }, function(err, doc) {
@@ -422,28 +421,26 @@ describe('versioning', function() {
 
         M.collection.findOne({ _id: doc._id }, function(err, doc) {
           assert.equal(false, '__v' in doc);
-          db.close(done);
+          done();
         });
       });
     });
   });
 
   it('works with numbericAlpha paths', function(done) {
-    var db = start();
     var M = db.model('Versioning');
     var m = new M({ mixed: {} });
     var path = 'mixed.4a';
     m.set(path, 2);
     m.save(function(err) {
       assert.ifError(err);
-      db.close(done);
+      done();
     });
   });
 
   describe('doc.increment()', function() {
     it('works without any other changes (gh-1475)', function(done) {
-      var db = start()
-        , V = db.model('Versioning');
+      var V = db.model('Versioning');
 
       var doc = new V;
       doc.save(function(err) {
@@ -460,7 +457,7 @@ describe('versioning', function() {
           V.findById(doc, function(err, doc) {
             assert.ifError(err);
             assert.equal(1, doc.__v);
-            db.close(done);
+            done();
           });
         });
       });
@@ -481,7 +478,6 @@ describe('versioning', function() {
   });
 
   it('gh-1898', function(done) {
-    var db = start();
     var schema = new Schema({ tags: [String], name: String });
 
     var M = db.model('gh-1898', schema, 'gh-1898');
@@ -498,12 +494,11 @@ describe('versioning', function() {
 
       assert.equal(m.$__where(m.$__delta()[0]).__v, 0);
       assert.equal(m.$__delta()[1].$inc.__v, 1);
-      db.close(done);
+      done();
     });
   });
 
   it('can remove version key from toObject() (gh-2675)', function(done) {
-    var db = start();
     var schema = new Schema({ name: String });
     var M = db.model('gh2675', schema, 'gh2675');
 
@@ -514,7 +509,7 @@ describe('versioning', function() {
       assert.equal(0, obj.__v);
       obj = m.toObject({ versionKey: false });
       assert.equal(undefined, obj.__v);
-      db.close(done);
+      done();
     });
   });
 });

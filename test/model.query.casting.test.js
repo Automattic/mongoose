@@ -824,7 +824,7 @@ describe('model query casting', function() {
       MyModel.findOne({ tags: { $all: doc.tags } }, function(error, doc) {
         assert.ifError(error);
         assert.ok(doc);
-        done();
+        db.close(done);
       });
     });
   });

@@ -6,9 +6,11 @@ describe('discriminator docs', function() {
   var Event;
   var ClickedLinkEvent;
   var SignedUpEvent;
-  var db = mongoose.createConnection('mongodb://localhost:27017/mongoose_test');
+  var db;
 
   before(function(done) {
+    db = mongoose.createConnection('mongodb://localhost:27017/mongoose_test');
+
     var options = { discriminatorKey: 'kind' };
 
     var eventSchema = new mongoose.Schema({ time: Date }, options);
@@ -21,6 +23,10 @@ describe('discriminator docs', function() {
       new mongoose.Schema({ username: String }, options));
 
     done();
+  });
+
+  after(function(done) {
+    db.close(done);
   });
 
   beforeEach(function(done) {

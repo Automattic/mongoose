@@ -119,7 +119,9 @@ module.exports.mongodVersion = function(cb) {
     admin.serverStatus(function(err, info) {
       if (err) return cb(err);
       var version = info.version.split('.').map(function(n) { return parseInt(n, 10); });
-      cb(null, version);
+      db.close(function() {
+        cb(null, version);
+      });
     });
   });
 };

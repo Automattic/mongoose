@@ -4,6 +4,7 @@
 
 var start = require('./common')
   , assert = require('assert')
+  , domain = require('domain')
   , mongoose = start.mongoose
   , random = require('../lib/utils').random
   , Schema = mongoose.Schema
@@ -121,6 +122,20 @@ describe('model', function() {
       });
     });
 
+    it('does not swallow exceptions (gh-3222) (gh-3478)', function(done) {
+      var d = domain.create();
+      B.create({title: 'hi'}, function (err) {
+        assert.ifError(err);
+        d.run(function () {
+          throw new Error('This exception should be caught by the domain');
+        });
+      });
+
+      d.once('error', function (err) {
+        assert.equal(err.message, 'This exception should be caught by the domain');
+        done();
+      });
+    });
 
     describe('callback is optional', function() {
       it('with one doc', function(done) {

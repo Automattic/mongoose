@@ -315,7 +315,7 @@ describe('model: querying:', function() {
 
       assert.ok(!query._update.$set.mixed);
 
-      done();
+      db.close(done);
     });
   });
 
@@ -679,7 +679,7 @@ describe('model: querying:', function() {
         BlogPostB.findById(undefined, function(err, doc) {
           assert.ifError(err);
           assert.equal(null, doc);
-          done();
+          db.close(done);
         });
       });
     });
@@ -2592,7 +2592,7 @@ describe('lean option:', function() {
         assert.equal(doc.dates.length, 1);
         assert.equal(doc.dates[0].getTime(),
           new Date('2014-07-01T04:00:00.000Z').getTime());
-        done();
+        db.close(done);
       });
     });
   });

@@ -1022,7 +1022,7 @@ describe('model: findByIdAndUpdate:', function() {
     q.lean();
     q.exec(function(error, doc) {
       assert.ok(!doc.notInSchema);
-      done();
+      db.close(done);
     });
   });
 
@@ -1359,7 +1359,7 @@ describe('model: findByIdAndUpdate:', function() {
           },
           function(error) {
             assert.ifError(error);
-            done();
+            db.close(done);
           });
       });
     });
@@ -1385,7 +1385,7 @@ describe('model: findByIdAndUpdate:', function() {
           },
             function(error) {
               assert.ifError(error);
-              done();
+              db.close(done);
             });
       });
     });
@@ -1473,7 +1473,7 @@ describe('model: findByIdAndUpdate:', function() {
           assert.ifError(error);
           assert.ok(res);
           assert.ok(res.ok);
-          done();
+          db.close(done);
         });
     });
 

@@ -2,8 +2,16 @@ var assert = require('assert');
 var mongoose = require('../../');
 
 describe('defaults docs', function() {
-  var db = mongoose.createConnection('mongodb://localhost:27017/mongoose_test');
+  var db;
   var Schema = mongoose.Schema;
+
+  before(function() {
+    db = mongoose.createConnection('mongodb://localhost:27017/mongoose_test');
+  });
+
+  after(function(done) {
+    db.close(done);
+  });
 
   /**
    * Your schemas can define default values for certain paths. If you create

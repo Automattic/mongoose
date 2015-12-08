@@ -6220,13 +6220,17 @@ Embedded.prototype = Object.create(SchemaType.prototype);
  * @api private
  */
 
-Embedded.prototype.cast = function(val, doc) {
+Embedded.prototype.cast = function(val, doc, init) {
   if (val && val.$isSingleNested) {
     return val;
   }
   var subdoc = new this.caster();
   subdoc.$parent = doc;
-  subdoc = subdoc.init(val);
+  if (init) {
+    subdoc.init(val);
+  } else {
+    subdoc.set(val, undefined, true);
+  }
   return subdoc;
 };
 
@@ -10110,7 +10114,7 @@ Subdocument.prototype.$markValid = function(path) {
 Subdocument.prototype.invalidate = function(path, err, val) {
   if (this.$parent) {
     this.$parent.invalidate([this.$basePath, path].join('.'), err, val);
-  } else if (err.kind === 'cast') {
+  } else if (err.kind === 'cast' || err.name === 'CastError') {
     throw err;
   }
 };

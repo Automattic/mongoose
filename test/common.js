@@ -120,7 +120,9 @@ module.exports.mongodVersion = function(cb) {
     admin.serverStatus(function(err, info) {
       if (err) return cb(err);
       var version = info.version.split('.').map(function(n) { return parseInt(n, 10); });
-      cb(null, version);
+      db.close(function() {
+        cb(null, version);
+      });
     });
   });
 };
@@ -151,6 +153,7 @@ before(function(done) {
   dropDBs(done);
 });
 after(function(done) {
-  this.timeout(10 * 1000);
+  // DropDBs can be extraordinarily slow on 3.2
+  this.timeout(120 * 1000);
   dropDBs(done);
 });

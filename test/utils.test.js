@@ -310,11 +310,11 @@ describe('utils', function() {
   describe('pluralize', function() {
     var db;
 
-    beforeEach(function() {
+    before(function() {
       db = start();
     });
 
-    afterEach(function(done) {
+    after(function(done) {
       db.close(done);
     });
 
@@ -353,7 +353,7 @@ describe('utils', function() {
 
         var ASchema = new Schema({value: String});
 
-        var collectionName = 'singular';
+        var collectionName = 'one';
         var A = db.model(collectionName, ASchema);
         assert.equal(A.collection.name, collectionName + 's');
         done();
@@ -363,7 +363,7 @@ describe('utils', function() {
 
         var ASchema = new Schema({value: String});
 
-        var collectionName = 'singular';
+        var collectionName = 'two';
         var A = db.model(collectionName, ASchema);
         assert.equal(A.collection.name, collectionName);
         done();
@@ -374,7 +374,7 @@ describe('utils', function() {
         // override
         var ASchema = new Schema({value: String}, {pluralization: true});
 
-        var collectionName = 'singular';
+        var collectionName = 'three';
         var A = db.model(collectionName, ASchema);
         assert.equal(A.collection.name, collectionName + 's');
         done();
@@ -384,7 +384,7 @@ describe('utils', function() {
 
         var ASchema = new Schema({value: String}, {pluralization: false});
 
-        var collectionName = 'singular';
+        var collectionName = 'four';
         var A = db.model(collectionName, ASchema);
         assert.equal(A.collection.name, collectionName);
         done();
@@ -392,7 +392,7 @@ describe('utils', function() {
       it('should not pluralize when local option set to false and global not set', function(done) {
         var ASchema = new Schema({value: String}, {pluralization: false});
 
-        var collectionName = 'singular';
+        var collectionName = 'five';
         var A = db.model(collectionName, ASchema);
         assert.equal(A.collection.name, collectionName);
         done();

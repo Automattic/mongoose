@@ -1928,7 +1928,7 @@ describe('document', function() {
     assert.ok(error.errors['user.email']);
     assert.equal(error.errors['user.email'].kind, 'regexp');
 
-    done();
+    db.close(done);
   });
 
   it('single embedded schemas with markmodified (gh-2689)', function(done) {
@@ -2150,6 +2150,29 @@ describe('document', function() {
       assert.ifError(error);
       assert.equal(velvetRevolver.guitarist, gnr.guitarist);
       db.close(done);
+    });
+  });
+
+  it('single embedded docs init obeys strict mode (gh-3642)', function(done) {
+    var db = start();
+    var personSchema = new Schema({ name: String });
+
+    var bandSchema = new Schema({ guitarist: personSchema, name: String });
+    var Band = db.model('gh3642', bandSchema);
+
+    var velvetRevolver = new Band({
+      name: 'Velvet Revolver',
+      guitarist: { name: 'Slash', realName: 'Saul Hudson' }
+    });
+
+    velvetRevolver.save(function(error) {
+      assert.ifError(error);
+      var query = { name: 'Velvet Revolver' };
+      Band.collection.findOne(query, function(error, band) {
+        assert.ifError(error);
+        assert.ok(!band.guitarist.realName);
+        db.close(done);
+      });
     });
   });
 

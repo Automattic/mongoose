@@ -12,7 +12,7 @@ describe('connection:', function() {
         assert.ok(conn.options);
         assert.ok(conn.options.auth);
         assert.equal('users', conn.options.auth.authSource);
-        done();
+        conn.close(done);
       };
       conn.open(start.uri + '?authSource=users');
     });
@@ -23,7 +23,7 @@ describe('connection:', function() {
         assert.ok(conn.options);
         assert.ok(conn.options.auth);
         assert.equal('users', conn.options.auth.authSource);
-        done();
+        conn.close(done);
       };
       conn.open(start.uri, { auth: { authSource: 'users' }});
     });

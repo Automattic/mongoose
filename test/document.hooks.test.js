@@ -806,7 +806,7 @@ describe('document: hooks:', function() {
     L1.create(data, function(error) {
       assert.ifError(error);
       assert.equal(calls, 1);
-      done();
+      db.close(done);
     });
   });
 });

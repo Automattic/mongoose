@@ -1,3 +1,13 @@
+4.2.10 /2015-12-08
+==================
+ * fixed; upgraded marked #3653 [ChristianMurphy](https://github.com/ChristianMurphy)
+ * docs; cross-db populate #3648
+ * docs; update mocha URL #3646 [ojhaujjwal](https://github.com/ojhaujjwal)
+ * fixed; call close callback asynchronously #3645
+ * docs; virtuals.html issue #3644 [Psarna94](https://github.com/Psarna94)
+ * fixed; single embedded doc casting on init #3642
+ * docs; validation docs improvements #3640
+
 4.2.9 / 2015-12-02
 ==================
  * docs; defaults docs #3625

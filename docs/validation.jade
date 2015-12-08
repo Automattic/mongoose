@@ -56,10 +56,9 @@ block content
   h3#validation-errors Validation errors
   :markdown
     Errors returned after failed validation contain an `errors` object
-    holding the actual `ValidatorError`s. Each
-    [ValidatorError](./api.html#error-validation-js) has a `type`, `path`,
-    and `value` property providing us with a little more error handling
-    flexibility.
+    holding the actual `ValidatorError` objects. Each
+    [ValidatorError](./api.html#error-validation-js) has `kind`, `path`,
+    `value`, and `message` properties.
   :js
     var toySchema = new Schema({
       color: String,
@@ -80,7 +79,7 @@ block content
 
       console.log(err.errors.color.message) // prints 'Validator "Invalid color" failed for path color with value `grease`'
       console.log(String(err.errors.color)) // prints 'Validator "Invalid color" failed for path color with value `grease`'
-      console.log(err.errors.color.type)  // prints "Invalid color"
+      console.log(err.errors.color.kind)  // prints "Invalid color"
       console.log(err.errors.color.path)  // prints "color"
       console.log(err.errors.color.value) // prints "grease"
       console.log(err.name) // prints "ValidationError"

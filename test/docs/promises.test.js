@@ -4,9 +4,11 @@ var mongoose = require('../../');
 
 describe('promises docs', function() {
   var Band;
-  var db = mongoose.createConnection('mongodb://localhost:27017/mongoose_test');
+  var db;
 
   before(function(done) {
+    db = mongoose.createConnection('mongodb://localhost:27017/mongoose_test');
+
     Band = db.model('band-promises', { name: String, members: [String] });
 
     done();
@@ -16,8 +18,9 @@ describe('promises docs', function() {
     Band.remove({}, done);
   });
 
-  after(function() {
+  after(function(done) {
     PromiseProvider.reset();
+    db.close(done);
   });
 
   /**

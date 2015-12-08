@@ -2153,6 +2153,29 @@ describe('document', function() {
     });
   });
 
+  it('single embedded docs init obeys strict mode (gh-3642)', function(done) {
+    var db = start();
+    var personSchema = new Schema({ name: String });
+
+    var bandSchema = new Schema({ guitarist: personSchema, name: String });
+    var Band = db.model('gh3642', bandSchema);
+
+    var velvetRevolver = new Band({
+      name: 'Velvet Revolver',
+      guitarist: { name: 'Slash', realName: 'Saul Hudson' }
+    });
+
+    velvetRevolver.save(function(error) {
+      assert.ifError(error);
+      var query = { name: 'Velvet Revolver' };
+      Band.collection.findOne(query, function(error, band) {
+        assert.ifError(error);
+        assert.ok(!band.guitarist.realName);
+        db.close(done);
+      });
+    });
+  });
+
   it('handles virtuals with dots correctly (gh-3618)', function(done) {
     var db = start();
     var testSchema = new Schema({ nested: { type: Object, default: {} } });

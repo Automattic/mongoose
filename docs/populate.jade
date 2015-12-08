@@ -222,6 +222,43 @@ block content
         // Get friends of friends - populate the 'friends' array for every friend
         populate: { path: 'friends' }
       });
+  
+  h3#cross-db-populate Populating across Databases
+  :markdown
+    Let's say you have a schema representing events, and a schema representing
+    conversations. Each event has a corresponding conversation thread.
+  :js
+    var eventSchema = new Schema({
+      name: String,
+      // The id of the corresponding conversation
+      // Notice there's no ref here!
+      conversation: ObjectId
+    });
+    var conversationSchema = new Schema({
+      numMessages: Number
+    });
+  :markdown
+    Also, suppose that events and conversations are stored in separate MongoDB
+    instances.
+  :js
+    var db1 = mongoose.createConnection('localhost:27000/db1');
+    var db2 = mongoose.createConnection('localhost:27001/db2');
+    
+    var Event = db1.model('Event', eventSchema);
+    var Conversation = db2.model('Conversation', conversationSchema);
+  :markdown
+    In this situation, you will **not** be able to `populate()` normally.
+    The `conversation` field will always be null, because `populate()` doesn't
+    know which model to use. However,
+    [you can specify the model explicitly](http://mongoosejs.com/docs/api.html#model_Model.populate).
+  :js
+    Event.
+      find().
+      populate({ path: 'conversation', model: Conversation }).
+      exec(function(error, docs) { /* ... */ });
+  :markdown
+    This is known as a "cross-database populate," because it enables you to
+    populate across MongoDB databases and even acrosss MongoDB instances.
 
   h3#next Next Up
   :markdown

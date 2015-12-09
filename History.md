@@ -1,5 +1,12 @@
-4.2.10 /2015-12-08
+4.3.0 / 2015-12-09
 ==================
+ * feat(query): support for mongodb 3.2 bitwise query operators #3660
+ * style: use comma-last style consistently #3657 [ChristianMurphy](https://github.com/ChristianMurphy)
+ * feat: upgrade mongodb driver to 2.1.0 for full MongoDB 3.2 support #3656
+ * feat(aggregate): `.lookup()` helper #3532
+
+4.2.10 / 2015-12-08
+===================
  * fixed; upgraded marked #3653 [ChristianMurphy](https://github.com/ChristianMurphy)
  * docs; cross-db populate #3648
  * docs; update mocha URL #3646 [ojhaujjwal](https://github.com/ojhaujjwal)

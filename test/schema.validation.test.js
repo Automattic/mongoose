@@ -158,8 +158,8 @@ describe('schema', function() {
           Person = db.model('person-schema-validation-test', PersonSchema);
         });
 
-        after(function() {
-          db.close();
+        after(function(done) {
+          db.close(done);
         });
 
         it('and can be set to "undefined" (gh-1594)', function(done) {

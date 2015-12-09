@@ -3,11 +3,11 @@
  * Module dependencies.
  */
 
-var start = require('./common')
-  , mongoose = start.mongoose
-  , assert = require('assert')
-  , Schema = mongoose.Schema
-  , random = require('../lib/utils').random;
+var start = require('./common'),
+    mongoose = start.mongoose,
+    assert = require('assert'),
+    Schema = mongoose.Schema,
+    random = require('../lib/utils').random;
 
 /**
  * setup
@@ -21,13 +21,22 @@ var coll = 'capped_' + random();
  */
 
 describe('collections: capped:', function() {
+  var db;
+
+  before(function() {
+    db = start();
+  });
+
+  after(function(done) {
+    db.close(done);
+  });
+
   it('schemas should have option size', function(done) {
     assert.ok(capped.options.capped);
     assert.equal(1000, capped.options.capped.size);
     done();
   });
   it('creation', function(done) {
-    var db = start();
     var Capped = db.model('Capped', capped, coll);
     Capped.collection.isCapped(function(err, isCapped) {
       assert.ifError(err);
@@ -39,19 +48,18 @@ describe('collections: capped:', function() {
         assert.ifError(err);
         assert.ok(isCapped, 'should reuse the capped collection in the db');
         assert.equal(Capped.collection.name, Capped2.collection.name);
-        db.close(done);
+        done();
       });
     });
   });
   it('creation using a number', function(done) {
-    var db = start();
     var schema = new Schema({ key: 'string' }, { capped: 8192 });
     var Capped = db.model('Capped3', schema);
     Capped.collection.options(function(err, options) {
       assert.ifError(err);
       assert.ok(options.capped, 'should create a capped collection');
       assert.equal(8192, options.size);
-      db.close(done);
+      done();
     });
   });
   it('attempting to use existing non-capped collection as capped emits error', function(done) {

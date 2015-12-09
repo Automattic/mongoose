@@ -4417,7 +4417,7 @@ describe('Model', function() {
             B.findById(post, function(err, doc) {
               assert.ifError(err);
               assert.equal('changed', doc.title);
-              done();
+              db.close(done);
             });
           });
         });
@@ -4482,7 +4482,7 @@ describe('Model', function() {
                   assert.equal(2, b.numbers.length);
                   assert.equal(4, b.numbers[0]);
                   assert.equal(5, b.numbers[1]);
-                  done();
+                  db.close(done);
                 });
               });
             });
@@ -4755,7 +4755,7 @@ describe('Model', function() {
           assert.ifError(err);
           m.s = m.n = m.a = undefined;
           assert.equal(undefined, m.$__delta());
-          done();
+          db.close(done);
         });
       });
     });

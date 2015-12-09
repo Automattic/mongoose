@@ -1,19 +1,19 @@
 
-var url = require('url')
-  , start = require('./common')
-  , assert = require('assert')
-  , mongoose = start.mongoose
-  , Mongoose = mongoose.Mongoose
-  , Schema = mongoose.Schema
-  , random = require('../lib/utils').random
-  , collection = 'blogposts_' + random();
+var url = require('url'),
+    start = require('./common'),
+    assert = require('assert'),
+    mongoose = start.mongoose,
+    Mongoose = mongoose.Mongoose,
+    Schema = mongoose.Schema,
+    random = require('../lib/utils').random,
+    collection = 'blogposts_' + random();
 
 describe('mongoose module:', function() {
   describe('default connection works', function() {
     it('without options', function(done) {
       var goose = new Mongoose;
-      var db = goose.connection
-        , uri = 'mongodb://localhost/mongoose_test';
+      var db = goose.connection,
+          uri = 'mongodb://localhost/mongoose_test';
 
       goose.connect(process.env.MONGOOSE_TEST_URI || uri);
 
@@ -26,10 +26,10 @@ describe('mongoose module:', function() {
 
     it('with options', function(done) {
       var goose = new Mongoose;
-      var db = goose.connection
-        , uri = 'mongodb://localhost/mongoose_test';
+      var db = goose.connection,
+          uri = 'mongodb://localhost/mongoose_test';
 
-      goose.connect(process.env.MONGOOSE_TEST_URI || uri, {db:{safe:false}});
+      goose.connect(process.env.MONGOOSE_TEST_URI || uri, {db: {safe: false}});
 
       db.on('open', function() {
         db.close(function() {
@@ -52,9 +52,9 @@ describe('mongoose module:', function() {
   });
 
   it('declaring global plugins', function(done) {
-    var mong = new Mongoose()
-      , schema = new Schema()
-      , called = 0;
+    var mong = new Mongoose(),
+        schema = new Schema(),
+        called = 0;
 
     mong.plugin(function(s) {
       assert.equal(s, schema);
@@ -75,11 +75,11 @@ describe('mongoose module:', function() {
   describe('disconnection of all connections', function() {
     describe('no callback', function() {
       it('works', function(done) {
-        var mong = new Mongoose()
-          , uri = 'mongodb://localhost/mongoose_test'
-          , connections = 0
-          , disconnections = 0
-          , pending = 4;
+        var mong = new Mongoose(),
+            uri = 'mongodb://localhost/mongoose_test',
+            connections = 0,
+            disconnections = 0,
+            pending = 4;
 
         mong.connect(process.env.MONGOOSE_TEST_URI || uri);
         var db = mong.connection;
@@ -117,8 +117,8 @@ describe('mongoose module:', function() {
       });
 
       it('properly handles errors', function(done) {
-        var mong = new Mongoose()
-          , uri = 'mongodb://localhost/mongoose_test';
+        var mong = new Mongoose(),
+            uri = 'mongodb://localhost/mongoose_test';
 
         mong.connect(process.env.MONGOOSE_TEST_URI || uri);
         var db = mong.connection;
@@ -140,8 +140,8 @@ describe('mongoose module:', function() {
     });
 
     it('with callback', function(done) {
-      var mong = new Mongoose()
-        , uri = 'mongodb://localhost/mongoose_test';
+      var mong = new Mongoose(),
+          uri = 'mongodb://localhost/mongoose_test';
 
       mong.connect(process.env.MONGOOSE_TEST_URI || uri);
 
@@ -155,8 +155,8 @@ describe('mongoose module:', function() {
 
   describe('model()', function() {
     it('accessing a model that hasn\'t been defined', function(done) {
-      var mong = new Mongoose()
-        , thrown = false;
+      var mong = new Mongoose(),
+          thrown = false;
 
       try {
         mong.model('Test');
@@ -244,8 +244,8 @@ describe('mongoose module:', function() {
   });
 
   it('connecting with a signature of host, database, function', function(done) {
-    var mong = new Mongoose()
-      , uri = process.env.MONGOOSE_TEST_URI || 'mongodb://localhost/mongoose_test';
+    var mong = new Mongoose(),
+        uri = process.env.MONGOOSE_TEST_URI || 'mongodb://localhost/mongoose_test';
 
     uri = url.parse(uri);
 
@@ -258,8 +258,8 @@ describe('mongoose module:', function() {
 
   describe('connecting with a signature of uri, options, function', function() {
     it('with single mongod', function(done) {
-      var mong = new Mongoose()
-        , uri = process.env.MONGOOSE_TEST_URI || 'mongodb://localhost/mongoose_test';
+      var mong = new Mongoose(),
+          uri = process.env.MONGOOSE_TEST_URI || 'mongodb://localhost/mongoose_test';
 
       mong.connect(uri, { db: { safe: false }}, function(err) {
         assert.ifError(err);
@@ -269,8 +269,8 @@ describe('mongoose module:', function() {
     });
 
     it('with replica set', function(done) {
-      var mong = new Mongoose()
-        , uri = process.env.MONGOOSE_SET_TEST_URI;
+      var mong = new Mongoose(),
+          uri = process.env.MONGOOSE_SET_TEST_URI;
 
       if (!uri) return done();
 
@@ -302,8 +302,8 @@ describe('mongoose module:', function() {
         test: String
       }));
 
-      var Test = mong.model('Test')
-        , test = new Test();
+      var Test = mong.model('Test'),
+          test = new Test();
 
       test.test = 'aa';
       test.save(function(err) {
@@ -341,8 +341,8 @@ describe('mongoose module:', function() {
         test: String
       }));
 
-      var Test = conn.model('ReplSetTwo')
-        , test = new Test();
+      var Test = conn.model('ReplSetTwo'),
+          test = new Test();
 
       test.test = 'aa';
       test.save(function(err) {

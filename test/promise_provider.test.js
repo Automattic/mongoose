@@ -51,8 +51,9 @@ describe('ES6 promises: ', function() {
       MyModel = db.model('es6promise', testSchema);
     });
 
-    after(function() {
+    after(function(done) {
       PromiseProvider.reset();
+      db.close(done);
     });
 
     afterEach(function(done) {
@@ -186,8 +187,9 @@ describe('ES6 promises: ', function() {
       MyModel = db.model('es6promise_bluebird', testSchema);
     });
 
-    after(function() {
+    after(function(done) {
       PromiseProvider.reset();
+      db.close(done);
     });
 
     afterEach(function(done) {
@@ -326,8 +328,9 @@ describe('ES6 promises: ', function() {
       MyModel = db.model('es6promise_q', testSchema);
     });
 
-    after(function() {
+    after(function(done) {
       PromiseProvider.reset();
+      db.close(done);
     });
 
     afterEach(function(done) {

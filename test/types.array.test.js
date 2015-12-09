@@ -96,7 +96,6 @@ describe('types array', function() {
           tj.save(function(err) {
             assert.ifError(err);
             User.findOne({ name: 'tj' }, function(err, user) {
-              db.close();
               assert.ifError(err);
               assert.equal(user.pets.length, 3);
               assert.equal(user.pets.indexOf(tobi.id),0);
@@ -105,7 +104,7 @@ describe('types array', function() {
               assert.equal(user.pets.indexOf(tobi._id),0);
               assert.equal(user.pets.indexOf(loki._id),1);
               assert.equal(user.pets.indexOf(jane._id),2);
-              done();
+              db.close(done);
             });
           });
         });
@@ -307,10 +306,19 @@ describe('types array', function() {
   });
 
   describe('splice()', function() {
+    var db;
+
+    before(function() {
+      db = start();
+    });
+
+    after(function(done) {
+      db.close(done);
+    });
+
     it('works', function(done) {
       var collection = 'splicetest-number' + random();
-      var db = start()
-        , schema = new Schema({ numbers: [Number] })
+      var schema = new Schema({ numbers: [Number] })
         , A = db.model('splicetestNumber', schema, collection);
 
       var a = new A({ numbers: [4,5,6,7] });
@@ -329,7 +337,6 @@ describe('types array', function() {
               assert.deepEqual(doc.numbers.toObject(), [4,10,6,7]);
 
               A.collection.drop(function(err) {
-                db.close();
                 assert.ifError(err);
                 done();
               });
@@ -341,8 +348,7 @@ describe('types array', function() {
 
     it('on embedded docs', function(done) {
       var collection = 'splicetest-embeddeddocs' + random();
-      var db = start()
-        , schema = new Schema({ types: [new Schema({ type: String }) ]})
+      var schema = new Schema({ types: [new Schema({ type: String }) ]})
         , A = db.model('splicetestEmbeddedDoc', schema, collection);
 
       var a = new A({ types: [{type:'bird'},{type:'boy'},{type:'frog'},{type:'cloud'}] });
@@ -364,7 +370,6 @@ describe('types array', function() {
           doc.save(function(err) {
             assert.ifError(err);
             A.findById(a._id, function(err, doc) {
-              db.close();
               assert.ifError(err);
 
               var obj = doc.types.toObject();
@@ -379,14 +384,23 @@ describe('types array', function() {
   });
 
   describe('unshift()', function() {
+    var db;
+
+    before(function() {
+      db = start();
+    });
+
+    after(function(done) {
+      db.close(done);
+    });
+
     it('works', function(done) {
-      var db = start()
-        , schema = new Schema({
-          types: [new Schema({ type: String })]
-            , nums: [Number]
-            , strs: [String]
-        })
-        , A = db.model('unshift', schema, 'unshift' + random());
+      var schema = new Schema({
+            types: [new Schema({ type: String })],
+            nums: [Number],
+            strs: [String]
+          }),
+          A = db.model('unshift', schema, 'unshift' + random());
 
       var a = new A({
         types: [{type:'bird'},{type:'boy'},{type:'frog'},{type:'cloud'}]
@@ -431,7 +445,6 @@ describe('types array', function() {
           doc.save(function(err) {
             assert.ifError(err);
             A.findById(a._id, function(err, doc) {
-              db.close();
               assert.ifError(err);
 
               var obj = doc.types.toObject();
@@ -461,7 +474,6 @@ describe('types array', function() {
     });
 
     it('applies setters (gh-3032)', function(done) {
-      var db = start();
       var ST = db.model('setterArray', Schema({ arr: [{
         type: String,
         lowercase: true
@@ -482,20 +494,28 @@ describe('types array', function() {
           assert.strictEqual('one', doc.arr[1]);
           assert.strictEqual('two', doc.arr[2]);
 
-          db.close(done);
+          done();
         });
       });
     });
   });
 
   describe('shift()', function() {
+    var db;
+    before(function() {
+      db = start();
+    });
+
+    after(function(done) {
+      db.close(done);
+    });
+
     it('works', function(done) {
-      var db = start()
-        , schema = new Schema({
-          types: [new Schema({ type: String })]
-            , nums: [Number]
-            , strs: [String]
-        });
+      var schema = new Schema({
+        types: [new Schema({ type: String })],
+        nums: [Number],
+        strs: [String]
+      });
 
       var A = db.model('shift', schema, 'unshift' + random());
 
@@ -744,7 +764,7 @@ describe('types array', function() {
             assert.equal(gnr.members[1].name, 'Izzy');
             assert.equal(gnr.members[2].name, 'Duff');
             assert.equal(gnr.members[3].name, 'Adler');
-            done();
+            db.close(done);
           });
         });
       });

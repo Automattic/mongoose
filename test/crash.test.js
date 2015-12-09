@@ -1,9 +1,9 @@
 
 // GH-407
 
-var start = require('./common')
-  , assert = require('assert')
-  , mongoose = start.mongoose;
+var start = require('./common'),
+    assert = require('assert'),
+    mongoose = start.mongoose;
 
 describe('crash: (gh-407)', function() {
   it('test mongodb crash with invalid objectid string', function(done) {

@@ -3,11 +3,11 @@
  * Module dependencies.
  */
 
-var start = require('./common')
-  , mongoose = start.mongoose
-  , assert = require('assert')
-  , Schema = mongoose.Schema
-  , random = require('../lib/utils').random;
+var start = require('./common'),
+    mongoose = start.mongoose,
+    assert = require('assert'),
+    Schema = mongoose.Schema,
+    random = require('../lib/utils').random;
 
 /**
  * setup

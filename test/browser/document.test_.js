@@ -1,5 +1,5 @@
-var Schema = mongoose.Schema
-  , ObjectId = mongoose.Schema.Types.ObjectId;
+var Schema = mongoose.Schema,
+    ObjectId = mongoose.Schema.Types.ObjectId;
 
 var em = new mongoose.Schema({ title: String, body: String });
 em.virtual('works').get(function() {

@@ -3,12 +3,12 @@
  * Module dependencies.
  */
 
-var mongoose = require('../')
-  , Collection = mongoose.Collection
-  , assert = require('assert')
-  , queryCount = 0
-  , opened = 0
-  , closed = 0;
+var mongoose = require('../'),
+    Collection = mongoose.Collection,
+    assert = require('assert'),
+    queryCount = 0,
+    opened = 0,
+    closed = 0;
 
 if (process.env.D === '1')
   mongoose.set('debug', true);
@@ -17,18 +17,19 @@ if (process.env.D === '1')
  * Override all Collection related queries to keep count
  */
 
-[ 'ensureIndex'
-  , 'findAndModify'
-  , 'findOne'
-  , 'find'
-  , 'insert'
-  , 'save'
-  , 'update'
-  , 'remove'
-  , 'count'
-  , 'distinct'
-  , 'isCapped'
-  , 'options'
+[
+  'ensureIndex',
+  'findAndModify',
+  'findOne',
+  'find',
+  'insert',
+  'save',
+  'update',
+  'remove',
+  'count',
+  'distinct',
+  'isCapped',
+  'options'
 ].forEach(function(method) {
 
   var oldMethod = Collection.prototype[method];

@@ -1,16 +1,16 @@
 
-var start = require('./common')
-  , mongoose = start.mongoose
-  , assert = require('assert')
-  , Collection = require('../lib/collection');
+var start = require('./common'),
+    mongoose = start.mongoose,
+    assert = require('assert'),
+    Collection = require('../lib/collection');
 
 describe('collections:', function() {
   it('should buffer commands until connection is established', function(done) {
-    var db = mongoose.createConnection()
-      , collection = db.collection('test-buffering-collection')
-      , connected = false
-      , inserted = false
-      , pending = 2;
+    var db = mongoose.createConnection(),
+        collection = db.collection('test-buffering-collection'),
+        connected = false,
+        inserted = false,
+        pending = 2;
 
     function finish() {
       if (--pending) return;
@@ -34,8 +34,8 @@ describe('collections:', function() {
   });
 
   it('methods should that throw (unimplemented)', function(done) {
-    var collection = new Collection('test', mongoose.connection)
-      , thrown = false;
+    var collection = new Collection('test', mongoose.connection),
+        thrown = false;
 
     try {
       collection.getIndexes();

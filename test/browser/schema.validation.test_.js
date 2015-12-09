@@ -2,12 +2,12 @@
  * Module dependencies.
  */
 
-var Schema = mongoose.Schema
-  , ValidatorError = mongoose.Error.ValidatorError
-  , SchemaTypes = Schema.Types
-  , ObjectId = SchemaTypes.ObjectId
-  , Mixed = SchemaTypes.Mixed
-  , DocumentObjectId = mongoose.Types.ObjectId;
+var Schema = mongoose.Schema,
+    ValidatorError = mongoose.Error.ValidatorError,
+    SchemaTypes = Schema.Types,
+    ObjectId = SchemaTypes.ObjectId,
+    Mixed = SchemaTypes.Mixed,
+    DocumentObjectId = mongoose.Types.ObjectId;
 
 describe('schema', function() {
   describe('validation', function() {
@@ -456,16 +456,16 @@ describe('schema', function() {
       describe('are customizable', function() {
         it('within schema definitions', function(done) {
           var schema = new Schema({
-            name: { type: String, enum: ['one', 'two'] }
-            , myenum: { type: String, enum: { values: ['x'], message: 'enum validator failed for path: {PATH} with {VALUE}' }}
-            , requiredString1: { type: String, required: true }
-            , requiredString2: { type: String, required: 'oops, {PATH} is missing. {TYPE}' }
-            , matchString0: { type: String, match: /bryancranston/ }
-            , matchString1: { type: String, match: [/bryancranston/, 'invalid string for {PATH} with value: {VALUE}'] }
-            , numMin0: { type: Number, min: 10 }
-            , numMin1: { type: Number, min: [10, 'hey, {PATH} is too small']}
-            , numMax0: { type: Number, max: 20 }
-            , numMax1: { type: Number, max: [20, 'hey, {PATH} ({VALUE}) is greater than {MAX}'] }
+            name: { type: String, enum: ['one', 'two'] },
+            myenum: { type: String, enum: { values: ['x'], message: 'enum validator failed for path: {PATH} with {VALUE}' }},
+            requiredString1: { type: String, required: true },
+            requiredString2: { type: String, required: 'oops, {PATH} is missing. {TYPE}' },
+            matchString0: { type: String, match: /bryancranston/ },
+            matchString1: { type: String, match: [/bryancranston/, 'invalid string for {PATH} with value: {VALUE}'] },
+            numMin0: { type: Number, min: 10 },
+            numMin1: { type: Number, min: [10, 'hey, {PATH} is too small']},
+            numMax0: { type: Number, max: 20 },
+            numMax1: { type: Number, max: [20, 'hey, {PATH} ({VALUE}) is greater than {MAX}'] }
           });
 
           var a = new mongoose.Document({}, schema);

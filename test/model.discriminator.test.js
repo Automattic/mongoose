@@ -2,20 +2,20 @@
  * Test dependencies.
  */
 
-var start = require('./common')
-  , mongoose = start.mongoose
-  , Schema = mongoose.Schema
-  , assert = require('assert')
-  , util = require('util')
-  , clone = require('../lib/utils').clone
-  , random = require('../lib/utils').random;
+var start = require('./common'),
+    mongoose = start.mongoose,
+    Schema = mongoose.Schema,
+    assert = require('assert'),
+    util = require('util'),
+    clone = require('../lib/utils').clone,
+    random = require('../lib/utils').random;
 
 /**
  * Setup
  */
 var PersonSchema = new Schema({
-  name: { first: String, last: String }
-  , gender: String
+  name: { first: String, last: String },
+  gender: String
 }, { collection: 'model-discriminator-' + random() });
 PersonSchema.index({ name: 1 });
 PersonSchema.methods.getFullName = function() {
@@ -111,7 +111,7 @@ describe('model', function() {
       var Person = db.model('Person', PersonSchema);
       var Boss = Person.discriminator('Boss', BossSchema);
 
-      var boss = new Boss({name:'Bernenke'});
+      var boss = new Boss({name: 'Bernenke'});
       assert.equal(boss.myName(), 'Bernenke');
       assert.equal(boss.notInstanceMethod, undefined);
       assert.equal(Boss.currentPresident(), 'obama');
@@ -246,8 +246,8 @@ describe('model', function() {
       });
 
       it('is not customizable', function(done) {
-        var errorMessage
-            , CustomizedSchema = new Schema({}, { capped: true });
+        var errorMessage,
+            CustomizedSchema = new Schema({}, { capped: true });
         try {
           Person.discriminator('model-discriminator-custom', CustomizedSchema);
         } catch (e) {
@@ -274,8 +274,8 @@ describe('model', function() {
       });
 
       it('does not inherit and override fields that exist', function(done) {
-        var FemaleSchema = new Schema({ gender: { type: String, default: 'F' }})
-          , Female = Person.discriminator('model-discriminator-female', FemaleSchema);
+        var FemaleSchema = new Schema({ gender: { type: String, default: 'F' }}),
+            Female = Person.discriminator('model-discriminator-female', FemaleSchema);
 
         var gender = Female.schema.paths.gender;
 
@@ -327,8 +327,8 @@ describe('model', function() {
       });
 
       it('gets options overridden by root options except toJSON and toObject', function(done) {
-        var personOptions = clone(Person.schema.options)
-          , employeeOptions = clone(Employee.schema.options);
+        var personOptions = clone(Person.schema.options),
+            employeeOptions = clone(Employee.schema.options);
 
         delete personOptions.toJSON;
         delete personOptions.toObject;

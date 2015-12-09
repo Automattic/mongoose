@@ -3,24 +3,24 @@
  * Module dependencies.
  */
 
-var assert = require('assert')
-  , start = require('./common')
-  , mongoose = start.mongoose
-  , Schema = mongoose.Schema
-  , SchemaType = mongoose.SchemaType
-  , ValidatorError = SchemaType.ValidatorError;
+var assert = require('assert'),
+    start = require('./common'),
+    mongoose = start.mongoose,
+    Schema = mongoose.Schema,
+    SchemaType = mongoose.SchemaType,
+    ValidatorError = SchemaType.ValidatorError;
 
 describe('ValidationError', function() {
   describe('#infiniteRecursion', function() {
     it('does not cause RangeError (gh-1834)', function(done) {
-      var SubSchema
-        , M
-        , model;
+      var SubSchema,
+          M,
+          model;
 
       SubSchema = new Schema({
         name: {type: String, required: true},
         contents: [new Schema({
-          key:   {type: String, required: true},
+          key: {type: String, required: true},
           value: {type: String, required: true}
         }, {_id: false})]
       });
@@ -45,12 +45,12 @@ describe('ValidationError', function() {
 
   describe('#minDate', function() {
     it('causes a validation error', function(done) {
-      var MinSchema
-        , M
-        , model;
+      var MinSchema,
+          M,
+          model;
 
       MinSchema = new Schema({
-        appointmentDate : { type: Date, min: Date.now }
+        appointmentDate: { type: Date, min: Date.now }
       });
 
       M = mongoose.model('MinSchema', MinSchema);
@@ -75,12 +75,12 @@ describe('ValidationError', function() {
 
   describe('#maxDate', function() {
     it('causes a validation error', function(done) {
-      var MaxSchema
-        , M
-        , model;
+      var MaxSchema,
+          M,
+          model;
 
       MaxSchema = new Schema({
-        birthdate : { type: Date, max: Date.now }
+        birthdate: { type: Date, max: Date.now }
       });
 
       M = mongoose.model('MaxSchema', MaxSchema);
@@ -105,12 +105,12 @@ describe('ValidationError', function() {
 
   describe('#minlength', function() {
     it('causes a validation error', function(done) {
-      var AddressSchema
-        , Address
-        , model;
+      var AddressSchema,
+          Address,
+          model;
 
       AddressSchema = new Schema({
-        postalCode : { type: String, minlength: 5 }
+        postalCode: { type: String, minlength: 5 }
       });
 
       Address = mongoose.model('MinLengthAddress', AddressSchema);
@@ -135,12 +135,12 @@ describe('ValidationError', function() {
 
   describe('#maxlength', function() {
     it('causes a validation error', function(done) {
-      var AddressSchema
-        , Address
-        , model;
+      var AddressSchema,
+          Address,
+          model;
 
       AddressSchema = new Schema({
-        postalCode : { type: String, maxlength: 10 }
+        postalCode: { type: String, maxlength: 10 }
       });
 
       Address = mongoose.model('MaxLengthAddress', AddressSchema);
@@ -166,8 +166,8 @@ describe('ValidationError', function() {
   describe('#toString', function() {
     it('does not cause RangeError (gh-1296)', function(done) {
       var ASchema = new Schema({
-        key: {type: String, required: true}
-        , value: {type:String, required: true}
+        key: {type: String, required: true},
+        value: {type: String, required: true}
       });
 
       var BSchema = new Schema({

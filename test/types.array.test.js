@@ -396,11 +396,11 @@ describe('types array', function() {
 
     it('works', function(done) {
       var schema = new Schema({
-          types: [new Schema({ type: String })]
-            , nums: [Number]
-            , strs: [String]
-        })
-        , A = db.model('unshift', schema, 'unshift' + random());
+            types: [new Schema({ type: String })],
+            nums: [Number],
+            strs: [String]
+          }),
+          A = db.model('unshift', schema, 'unshift' + random());
 
       var a = new A({
         types: [{type:'bird'},{type:'boy'},{type:'frog'},{type:'cloud'}]
@@ -512,10 +512,10 @@ describe('types array', function() {
 
     it('works', function(done) {
       var schema = new Schema({
-          types: [new Schema({ type: String })]
-            , nums: [Number]
-            , strs: [String]
-        });
+        types: [new Schema({ type: String })],
+        nums: [Number],
+        strs: [String]
+      });
 
       var A = db.model('shift', schema, 'unshift' + random());
 

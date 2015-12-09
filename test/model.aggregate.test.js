@@ -3,20 +3,20 @@
  * Test dependencies.
  */
 
-var start = require('./common')
-  , mongoose = start.mongoose
-  , assert = require('assert')
-  , random = require('../lib/utils').random
-  , Aggregate = require('../lib/aggregate')
-  , Schema = mongoose.Schema;
+var start = require('./common'),
+    mongoose = start.mongoose,
+    assert = require('assert'),
+    random = require('../lib/utils').random,
+    Aggregate = require('../lib/aggregate'),
+    Schema = mongoose.Schema;
 
 /**
  * Setup.
  */
 
 var userSchema = new Schema({
-  name: String
-  , age: Number
+  name: String,
+  age: Number
 });
 
 var collection = 'aggregate_' + random();

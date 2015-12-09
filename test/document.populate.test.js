@@ -3,14 +3,14 @@
  * Test dependencies.
  */
 
-var start = require('./common')
-  , assert = require('assert')
-  , mongoose = start.mongoose
-  , utils = require('../lib/utils')
-  , random = utils.random
-  , Schema = mongoose.Schema
-  , ObjectId = Schema.ObjectId
-  , Document = require('../lib/document');
+var start = require('./common'),
+    assert = require('assert'),
+    mongoose = start.mongoose,
+    utils = require('../lib/utils'),
+    random = utils.random,
+    Schema = mongoose.Schema,
+    ObjectId = Schema.ObjectId,
+    Document = require('../lib/document');
 
 /**
  * Setup.
@@ -39,26 +39,26 @@ em.virtual('works').get(function() {
   return 'em virtual works';
 });
 var schema = new Schema({
-  test    : String
-  , oids    : [ObjectId]
-  , numbers : [Number]
-  , nested  : {
-    age   : Number
-      , cool  : ObjectId
-      , deep  : { x: String }
-      , path  : String
-      , setr  : String
-  }
-  , nested2 : {
-    nested: String
-      , yup   : {
-        nested  : Boolean
-          , yup     : String
-          , age     : Number
-      }
-  }
-  , em: [em]
-  , date: Date
+  test: String,
+  oids: [ObjectId],
+  numbers: [Number],
+  nested: {
+    age: Number,
+    cool: ObjectId,
+    deep: { x: String },
+    path: String,
+    setr: String
+  },
+  nested2: {
+    nested: String,
+    yup: {
+      nested: Boolean,
+      yup: String,
+      age: Number
+    }
+  },
+  em: [em],
+  date: Date
 });
 TestDocument.prototype.$__setSchema(schema);
 
@@ -67,11 +67,11 @@ TestDocument.prototype.$__setSchema(schema);
  */
 
 var User = new Schema({
-  name      : String
-  , email     : String
-  , gender    : { type: String, enum: ['male', 'female'], default: 'male' }
-  , age       : { type: Number, default: 21 }
-  , blogposts : [{ type: ObjectId, ref: 'doc.populate.b' }]
+  name: String,
+  email: String,
+  gender: { type: String, enum: ['male', 'female'], default: 'male' },
+  age: { type: Number, default: 21 },
+  blogposts: [{ type: ObjectId, ref: 'doc.populate.b' }]
 }, { collection: 'doc.populate.us' });
 
 /**
@@ -79,9 +79,9 @@ var User = new Schema({
  */
 
 var Comment = new Schema({
-  asers   : [{ type: ObjectId, ref: 'doc.populate.u' }]
-  , _creator : { type: ObjectId, ref: 'doc.populate.u' }
-  , content  : String
+  asers: [{ type: ObjectId, ref: 'doc.populate.u' }],
+  _creator: { type: ObjectId, ref: 'doc.populate.u' },
+  content: String
 });
 
 /**
@@ -89,10 +89,10 @@ var Comment = new Schema({
  */
 
 var BlogPost = new Schema({
-  _creator      : { type: ObjectId, ref: 'doc.populate.u' }
-  , title         : String
-  , comments      : [Comment]
-  , fans          : [{ type: ObjectId, ref: 'doc.populate.u' }]
+  _creator: { type: ObjectId, ref: 'doc.populate.u' },
+  title: String,
+  comments: [Comment],
+  fans: [{ type: ObjectId, ref: 'doc.populate.u' }]
 });
 
 mongoose.model('doc.populate.b', BlogPost);
@@ -111,13 +111,13 @@ describe('document.populate', function() {
     _id = new mongoose.Types.ObjectId;
 
     User.create({
-      name  : 'Phoenix'
-      , email : 'phx@az.com'
-      , blogposts: [_id]
+      name: 'Phoenix',
+      email: 'phx@az.com',
+      blogposts: [_id]
     }, {
-      name  : 'Newark'
-      , email : 'ewr@nj.com'
-      , blogposts: [_id]
+      name: 'Newark',
+      email: 'ewr@nj.com',
+      blogposts: [_id]
     }, function(err, u1, u2) {
       assert.ifError(err);
 
@@ -125,10 +125,10 @@ describe('document.populate', function() {
       user2 = u2;
 
       B.create({
-        title     : 'the how and why'
-        , _creator  : user1
-        , fans: [user1, user2]
-        , comments: [{ _creator: user2, content: 'user2' }, { _creator: user1, content: 'user1' }]
+        title: 'the how and why',
+        _creator: user1,
+        fans: [user1, user2],
+        comments: [{ _creator: user2, content: 'user2' }, { _creator: user1, content: 'user1' }]
       }, function(err, p) {
         assert.ifError(err);
         post = p;
@@ -363,13 +363,13 @@ describe('document.populate', function() {
     var db = start();
 
     var UserSchema = new Schema({
-      _id: String
-      , name: String
+      _id: String,
+      name: String
     });
 
     var NoteSchema = new Schema({
-      author: { type: String, ref: 'UserWithStringId' }
-      , body: String
+      author: { type: String, ref: 'UserWithStringId' },
+      body: String
     });
 
     var User = db.model('UserWithStringId', UserSchema, random());
@@ -396,13 +396,13 @@ describe('document.populate', function() {
     var db = start();
 
     var UserSchema = new Schema({
-      _id: Buffer
-      , name: String
+      _id: Buffer,
+      name: String
     });
 
     var NoteSchema = new Schema({
-      author: { type: Buffer, ref: 'UserWithBufferId' }
-      , body: String
+      author: { type: Buffer, ref: 'UserWithBufferId' },
+      body: String
     });
 
     var User = db.model('UserWithBufferId', UserSchema, random());
@@ -437,13 +437,13 @@ describe('document.populate', function() {
     var db = start();
 
     var UserSchema = new Schema({
-      _id: Number
-      , name: String
+      _id: Number,
+      name: String
     });
 
     var NoteSchema = new Schema({
-      author: { type: Number, ref: 'UserWithNumberId' }
-      , body: String
+      author: { type: Number, ref: 'UserWithNumberId' },
+      body: String
     });
 
     var User = db.model('UserWithNumberId', UserSchema, random());

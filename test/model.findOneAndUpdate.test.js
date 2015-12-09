@@ -1533,7 +1533,7 @@ describe('model: findByIdAndUpdate:', function() {
 
       var MyModel = db.model('gh3616', s);
 
-      MyModel.create({ nested: { arr: [{ num: 5 }] } }, function(error, doc) {
+      MyModel.create({ nested: { arr: [{ num: 5 }] } }, function(error) {
         assert.ifError(error);
         var update = { $pull: { 'nested.arr': { num: 5 } } };
         var options = { 'new': true };

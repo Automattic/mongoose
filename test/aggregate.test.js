@@ -315,6 +315,24 @@ describe('aggregate: ', function() {
     });
   });
 
+  describe('lookup', function() {
+    it('works', function(done) {
+      var aggregate = new Aggregate();
+      var obj = {
+        from: 'users',
+        localField: 'userId',
+        foreignField: '_id',
+        as: 'users'
+      };
+
+      aggregate.lookup(obj);
+
+      assert.equal(aggregate._pipeline.length, 1);
+      assert.deepEqual(aggregate._pipeline[0].$lookup, obj);
+      done();
+    });
+  });
+
   describe('bind', function() {
     it('works', function(done) {
       var aggregate = new Aggregate()

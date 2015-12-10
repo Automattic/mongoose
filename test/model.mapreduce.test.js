@@ -91,9 +91,10 @@ describe('model: mapreduce:', function() {
           assert.equal(3, ret[0].value);
           assert.ok(stats);
           modeling();
+        }).catch(function(err) {
+          assert.ifError(err);
         });
-      }).catch(function(err) {
-        assert.ifError(err);
+
       });
 
       function modeling() {

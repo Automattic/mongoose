@@ -68,8 +68,7 @@ describe('model: mapreduce:', function() {
         , reduce: function(k, vals) { return vals.length; }
       };
 
-      MR.mapReduce(o, function(err, ret, stats) {
-        assert.ifError(err);
+      MR.mapReduce(o).then(function(ret, stats) {
         assert.ok(Array.isArray(ret));
         assert.ok(stats);
         ret.forEach(function(res) {
@@ -85,17 +84,16 @@ describe('model: mapreduce:', function() {
           , query: { author: 'aaron', published: 1, owners: id }
         };
 
-        MR.mapReduce(o, function(err, ret, stats) {
-          assert.ifError(err);
-
+        MR.mapReduce(o).then(function(ret, stats) {
           assert.ok(Array.isArray(ret));
           assert.equal(1, ret.length);
           assert.equal('aaron', ret[0]._id);
           assert.equal(3, ret[0].value);
           assert.ok(stats);
-
           modeling();
         });
+      }).catch(function(err) {
+        assert.ifError(err);
       });
 
       function modeling() {
@@ -106,8 +104,7 @@ describe('model: mapreduce:', function() {
           , out: { replace: '_mapreduce_test_' + random() }
         };
 
-        MR.mapReduce(o, function(err, ret) {
-          assert.ifError(err);
+        MR.mapReduce(o).then(function(ret) {
 
           // ret is a model
           assert.ok(!Array.isArray(ret));
@@ -141,6 +138,9 @@ describe('model: mapreduce:', function() {
               });
             });
           });
+        }).catch(function(err) {
+          assert.ifError(err);
+          done();
         });
       }
     });
@@ -156,10 +156,11 @@ describe('model: mapreduce:', function() {
       , verbose: false
     };
 
-    MR.mapReduce(o, function(err, results, stats) {
+    MR.mapReduce(o).then(function(results, stats) {
       assert.equal('undefined', typeof stats);
       db.close(done);
     });
+
   });
 
   describe('promises (gh-1628)', function() {

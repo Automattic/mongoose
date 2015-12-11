@@ -1,3 +1,9 @@
+4.3.1 / 2015-12-11
+==================
+ * feat(aggregate): `.sample()` helper #3665
+ * fix(query): bitwise query operators with buffers #3663
+ * docs(migration): clarify `new` option and findByIdAndUpdate #3661
+
 4.3.0 / 2015-12-09
 ==================
  * feat(query): support for mongodb 3.2 bitwise query operators #3660

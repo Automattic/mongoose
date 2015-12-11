@@ -333,6 +333,18 @@ describe('aggregate: ', function() {
     });
   });
 
+  describe('sample', function() {
+    it('works', function(done) {
+      var aggregate = new Aggregate();
+
+      aggregate.sample(3);
+
+      assert.equal(aggregate._pipeline.length, 1);
+      assert.deepEqual(aggregate._pipeline[0].$sample, { size: 3 });
+      done();
+    });
+  });
+
   describe('bind', function() {
     it('works', function(done) {
       var aggregate = new Aggregate(),

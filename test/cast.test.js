@@ -9,13 +9,13 @@ var cast = require('../lib/cast');
 describe('cast: ', function() {
   describe('bitwise query operators: ', function() {
     it('with a number', function() {
-      var schema = new Schema({ x: Number });
+      var schema = new Schema({ x: Buffer });
       assert.deepEqual(cast(schema, { x: { $bitsAllClear: 3 } }),
         { x: { $bitsAllClear: 3 } });
     });
 
     it('with an array', function() {
-      var schema = new Schema({ x: Number });
+      var schema = new Schema({ x: Buffer });
       assert.deepEqual(cast(schema, { x: { $bitsAllSet: [2, '3'] } }),
         { x: { $bitsAllSet: [2, 3] } });
     });

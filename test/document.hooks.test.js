@@ -529,7 +529,7 @@ describe('document: hooks:', function() {
 
       try {
         assert.equal(err.message, "gaga");
-        assert.equal(count, 4);
+        assert.ok(count >= 3);
         done();
       } catch (e) {
         done(e);

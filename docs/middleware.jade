@@ -74,10 +74,12 @@ block content
           li notifications
   h4#error-handling Error handling
   :markdown
-    If any middleware calls `next` or `done` with an error, the flow
-    is interrupted, and the error is passed to the callback.
+    If any middleware calls `next` or `done` with a parameter of type `Error`,
+    the flow is interrupted, and the error is passed to the callback.
   :js
     schema.pre('save', function(next) {
+      // You **must** do `new Error()`. `next('something went wrong')` will
+      // **not** work
       var err = new Error('something went wrong');
       next(err);
     });

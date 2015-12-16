@@ -315,6 +315,16 @@ describe('ES6 promises: ', function() {
         });
       });
     });
+
+    it('subdocument validation (gh-3681)', function(done) {
+      var subSchema = new Schema({ name: { type: String, required: true } });
+      var parentSchema = new Schema({ sub: [subSchema] });
+      var Parent = db.model('gh3681', parentSchema);
+
+      Parent.create({ sub: [{}] }).catch(function() {
+        done();
+      });
+    });
   });
 
   describe('q: ', function() {

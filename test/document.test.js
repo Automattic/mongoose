@@ -2176,6 +2176,28 @@ describe('document', function() {
     });
   });
 
+  it('single embedded docs post hooks (gh-3679)', function(done) {
+    var db = start();
+    var postHookCalls = [];
+    var personSchema = new Schema({ name: String });
+    personSchema.post('save', function() {
+      postHookCalls.push(this);
+    });
+
+    var bandSchema = new Schema({ guitarist: personSchema, name: String });
+    var Band = db.model('gh3679', bandSchema);
+    var obj = { name: "Guns N' Roses", guitarist: { name: 'Slash' } };
+
+    Band.create(obj, function(error) {
+      assert.ifError(error);
+      setTimeout(function() {
+        assert.equal(postHookCalls.length, 1);
+        assert.equal(postHookCalls[0].name, 'Slash');
+        db.close(done);
+      });
+    });
+  });
+
   it('handles virtuals with dots correctly (gh-3618)', function(done) {
     var db = start();
     var testSchema = new Schema({ nested: { type: Object, default: {} } });

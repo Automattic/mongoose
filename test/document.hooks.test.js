@@ -709,7 +709,7 @@ describe('document: hooks:', function() {
       });
 
       ['init', 'save', 'validate'].forEach(function(type) {
-        childSchema.pre(type, function(obj, next) {
+        childSchema.pre(type, function(next) {
           self['pre' + type + 'Called'] = true;
           next();
         });

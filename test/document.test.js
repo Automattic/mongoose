@@ -2198,6 +2198,32 @@ describe('document', function() {
     });
   });
 
+  it('single embedded docs .set() (gh-3686)', function(done) {
+    var db = start();
+    var postHookCalls = [];
+    var personSchema = new Schema({ name: String, realName: String });
+
+    var bandSchema = new Schema({
+      guitarist: personSchema,
+      name: String
+    });
+    var Band = db.model('gh3686', bandSchema);
+    var obj = {
+      name: "Guns N' Roses",
+      guitarist: { name: 'Slash', realName: 'Saul Hudson' }
+    };
+
+    Band.create(obj, function(error, gnr) {
+      gnr.set('guitarist.name', 'Buckethead');
+      gnr.save(function(error) {
+        assert.ifError(error);
+        assert.equal(gnr.guitarist.name, 'Buckethead');
+        assert.equal(gnr.guitarist.realName, 'Saul Hudson');
+        done();
+      });
+    });
+  });
+
   it('handles virtuals with dots correctly (gh-3618)', function(done) {
     var db = start();
     var testSchema = new Schema({ nested: { type: Object, default: {} } });

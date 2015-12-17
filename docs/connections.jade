@@ -56,10 +56,15 @@ block content
   h4#keepAlive A note about keepAlive
   .important
     :markdown
-      For long running applictions it is often prudent to enable `keepAlive`. Without it, after some period of time you may start to see `"connection closed"` errors for what seems like no reason. If so, after [reading this](http://tldp.org/HOWTO/TCP-Keepalive-HOWTO/overview.html), you may decide to enable `keepAlive`:
+      For long running applictions it is often prudent to enable `keepAlive`
+      with a number of milliseconds. Without it, after some period of time
+      you may start to see `"connection closed"` errors for what seems like
+      no reason. If so, after
+      [reading this](http://tldp.org/HOWTO/TCP-Keepalive-HOWTO/overview.html),
+      you may decide to enable `keepAlive`:
 
   :js
-    options.server.socketOptions = options.replset.socketOptions = { keepAlive: 1 };
+    options.server.socketOptions = options.replset.socketOptions = { keepAlive: 120 };
     mongoose.connect(uri, options);
 
   h3#replicaset_connections ReplicaSet Connections

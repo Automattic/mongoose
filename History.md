@@ -1,3 +1,17 @@
+4.3.2 / 2015-12-17
+==================
+ * fix(document): .set() into single nested schemas #3686
+ * fix(connection): support 'replSet' as well as 'replset' option #3685
+ * fix(document): bluebird unhandled rejection when validating doc arrays #3681
+ * fix(document): hooks for doc arrays in single nested schemas #3680
+ * fix(document): post hooks for single nested schemas #3679
+ * fix: remove unused npm module #3674 [sybarite](https://github.com/sybarite)
+ * fix(model): don't swallow exceptions in nested doc save callback #3671
+ * docs: update keepAlive info #3667 [ChrisZieba](https://github.com/ChrisZieba)
+ * fix(document): strict 'throw' throws a specific mongoose error #3662
+ * fix: flakey test #3332
+ * fix(query): more robust check for RegExp #2969
+
 4.3.1 / 2015-12-11
 ==================
  * feat(aggregate): `.sample()` helper #3665

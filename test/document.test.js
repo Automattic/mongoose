@@ -2219,8 +2219,35 @@ describe('document', function() {
         assert.ifError(error);
         assert.equal(gnr.guitarist.name, 'Buckethead');
         assert.equal(gnr.guitarist.realName, 'Saul Hudson');
-        done();
+        db.close(done);
       });
+    });
+  });
+
+  it('single embedded docs with arrays pre hooks (gh-3680)', function(done) {
+    var db = start();
+    var childSchema = Schema({ count: Number });
+
+    var preCalls = 0;
+    childSchema.pre('save', function(next) {
+      ++preCalls;
+      next();
+    });
+
+    var SingleNestedSchema = new Schema({
+      children: [childSchema]
+    });
+
+    var ParentSchema = new Schema({
+      singleNested: SingleNestedSchema
+    });
+
+    var Parent = db.model('gh3680', ParentSchema);
+    var obj = { singleNested: { children: [{ count: 0 }] } };
+    Parent.create(obj, function(error) {
+      assert.ifError(error);
+      assert.equal(preCalls, 1);
+      db.close(done);
     });
   });
 

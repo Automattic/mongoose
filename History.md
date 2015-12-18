@@ -1,3 +1,8 @@
+4.3.3 / 2015-12-18
+==================
+ * fix(connection): properly support 'replSet' as well as 'replset' #3688 [taxilian](https://github.com/taxilian)
+ * fix(document): single nested doc pre hooks called before nested doc array #3687 [aliatsis](https://github.com/aliatsis)
+
 4.3.2 / 2015-12-17
 ==================
  * fix(document): .set() into single nested schemas #3686

@@ -98,6 +98,12 @@ describe('schema', function() {
     done();
   });
 
+  it('does expose a property for duck-typing instanceof', function(done) {
+    var schema = Schema({ name: String });
+    assert.ok(schema.instanceOfSchema);
+    done();
+  });
+
   it('supports different schematypes', function(done) {
     var Checkin = new Schema({
       date      : Date

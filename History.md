@@ -1,3 +1,13 @@
+4.3.4 / 2015-12-23
+==================
+ * fix: upgrade mongodb driver to 2.1.2 for repl set error #3712 [sansmischevia](https://github.com/sansmischevia)
+ * docs: validation docs typo #3709 [ivanmaeder](https://github.com/ivanmaeder)
+ * style: remove unused variables #3708 [ChristianMurphy](https://github.com/ChristianMurphy)
+ * fix(schema): duck-typing for schemas #3703 [mgcrea](https://github.com/mgcrea)
+ * docs: connection sample code issue #3697
+ * fix(schema): duck-typing for schemas #3693 [mgcrea](https://github.com/mgcrea)
+ * docs: clarify id schema option #3638
+
 4.3.3 / 2015-12-18
 ==================
  * fix(connection): properly support 'replSet' as well as 'replset' #3688 [taxilian](https://github.com/taxilian)

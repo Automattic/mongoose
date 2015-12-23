@@ -2200,7 +2200,6 @@ describe('document', function() {
 
   it('single embedded docs .set() (gh-3686)', function(done) {
     var db = start();
-    var postHookCalls = [];
     var personSchema = new Schema({ name: String, realName: String });
 
     var bandSchema = new Schema({

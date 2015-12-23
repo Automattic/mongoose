@@ -160,7 +160,7 @@ function Document(obj, schema, fields, skipId, skipInit) {
     return new Document( obj, schema, fields, skipId, skipInit );
 
 
-  if (utils.isObject(schema) && !(schema instanceof Schema)) {
+  if (utils.isObject(schema) && !schema.instanceOfSchema) {
     schema = new Schema(schema);
   }
 
@@ -3735,7 +3735,6 @@ var utils = require('./utils');
 var MongooseTypes;
 var Kareem = require('kareem');
 var async = require('async');
-var PromiseProvider = require('./promise_provider');
 
 var IS_QUERY_HOOK = {
   count: true,
@@ -3912,6 +3911,7 @@ function idGetter() {
  */
 Schema.prototype = Object.create( EventEmitter.prototype );
 Schema.prototype.constructor = Schema;
+Schema.prototype.instanceOfSchema = true;
 
 /**
  * Default middleware attached to a schema. Cannot be changed.
@@ -3969,7 +3969,6 @@ Object.defineProperty(Schema.prototype, '_defaultMiddleware', {
     hook: 'save',
     isAsync: true,
     fn: function(next, done) {
-      var Promise = PromiseProvider.get();
       var subdocs = this.$__getAllSubdocs();
 
       if (!subdocs.length || this.$__preSavingFromParent) {
@@ -4266,7 +4265,7 @@ Schema.interpretAsType = function(path, obj, options) {
       ? obj.cast
       : type[0];
 
-    if (cast instanceof Schema) {
+    if (cast && cast.instanceOfSchema) {
       return new MongooseTypes.DocumentArray(path, cast, obj);
     }
 
@@ -4290,7 +4289,7 @@ Schema.interpretAsType = function(path, obj, options) {
     return new MongooseTypes.Array(path, cast || MongooseTypes.Mixed, obj);
   }
 
-  if (type instanceof Schema) {
+  if (type && type.instanceOfSchema) {
     return new MongooseTypes.Embedded(type, path, obj);
   }
 
@@ -5000,7 +4999,7 @@ Schema.Types = MongooseTypes = require('./schema/index');
 exports.ObjectId = MongooseTypes.ObjectId;
 
 }).call(this,require("buffer").Buffer)
-},{"./drivers":11,"./promise_provider":24,"./schema/index":32,"./utils":47,"./virtualtype":48,"async":49,"buffer":51,"events":55,"kareem":79}],26:[function(require,module,exports){
+},{"./drivers":11,"./schema/index":32,"./utils":47,"./virtualtype":48,"async":49,"buffer":51,"events":55,"kareem":79}],26:[function(require,module,exports){
 /*!
  * Module dependencies.
  */
@@ -6720,18 +6719,6 @@ function handleArray(val) {
   return val.map(function(m) {
     return self.cast(m);
   });
-}
-
-function handleBitwiseOperator(val) {
-  var _this = this;
-  if (Array.isArray(val)) {
-    return val.map(function(v) { return _this.cast(v); });
-  } else if (Buffer.isBuffer(val)) {
-    return val;
-  } else {
-    // Assume trying to cast to number
-    return this.cast(val);
-  }
 }
 
 SchemaNumber.prototype.$conditionalHandlers =

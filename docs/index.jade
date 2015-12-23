@@ -38,8 +38,8 @@ html(lang='en')
         :js
           var db = mongoose.connection;
           db.on('error', console.error.bind(console, 'connection error:'));
-          db.once('open', function (callback) {
-            // yay!
+          db.once('open', function() {
+            // we're connected!
           });
         :markdown
           Once our connection opens, our callback will be called. For brevity, let's assume that all following code is within this callback.

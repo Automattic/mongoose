@@ -65,6 +65,18 @@ describe('aggregate', function() {
       done();
     });
 
+    it('supports array as single argument', function (done) {
+      var aggregate = new Aggregate();
+
+      assert.equal(aggregate.append([{$a: 1}, {$b: 2}, {$c: 3}]), aggregate);
+      assert.deepEqual(aggregate._pipeline, [{$a: 1}, {$b: 2}, {$c: 3}]);
+
+      aggregate.append([{$d: 4}, {$c: 5}]);
+      assert.deepEqual(aggregate._pipeline, [{$a: 1}, {$b: 2}, {$c: 3}, {$d: 4}, {$c: 5}]);
+
+      done();
+    });
+
     it('throws if non-operator parameter is passed', function(done) {
       var aggregate = new Aggregate()
         , regexp = /Arguments must be aggregate pipeline operators/;
@@ -81,6 +93,10 @@ describe('aggregate', function() {
         aggregate.append({ $a: 1 }, { a: 1 });
       }, regexp);
 
+      assert.throws(function () {
+        aggregate.append([{$a: 1}, {a: 1}]);
+      }, regexp);
+
       done();
     });
 
@@ -89,6 +105,16 @@ describe('aggregate', function() {
 
       assert.doesNotThrow(function() {
         aggregate.append();
+      });
+
+      done();
+    });
+
+    it('does not throw when empty array is passed as single argument', function (done) {
+      var aggregate = new Aggregate();
+
+      assert.doesNotThrow(function () {
+        aggregate.append([]);
       });
 
       done();

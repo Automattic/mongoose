@@ -2250,6 +2250,21 @@ describe('document', function() {
     });
   });
 
+  it('nested single embedded doc validation (gh-3702)', function(done) {
+    var db = start();
+    var childChildSchema = Schema({ count: { type: Number, min: 1 } });
+    var childSchema = new Schema({ child: childChildSchema });
+    var parentSchema = new Schema({ child: childSchema });
+
+    var Parent = db.model('gh3702', parentSchema);
+    var obj = { child: { child: { count: 0 } } };
+    Parent.create(obj, function(error) {
+      assert.ok(error);
+      assert.ok(/ValidationError/.test(error.toString()));
+      db.close(done);
+    });
+  });
+
   it('handles virtuals with dots correctly (gh-3618)', function(done) {
     var db = start();
     var testSchema = new Schema({ nested: { type: Object, default: {} } });

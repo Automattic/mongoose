@@ -10,7 +10,8 @@ block append style
 block content
   h2 FAQ
   :markdown
-    **Q**. Why don't my changes to arrays get saved when I update an element directly?
+    **Q**. Why don't my changes to arrays get saved when I update an element
+    directly?
   :js
     doc.array[3] = 'changed';
     doc.save();
@@ -25,6 +26,26 @@ block content
     doc.array[3] = 'changed';
     doc.markModified('array');
     doc.save();
+  hr#date_changes
+  :markdown
+    **Q**. Why don't in-place modifications to date objects
+    (e.g. `date.setMonth(1);`) get saved?
+  :js
+    doc.createdAt.setDate(2011, 5, 1);
+    doc.save(); // createdAt changes won't get saved!
+  :markdown
+    **A**. Mongoose currently doesn't watch for in-place updates to date
+    objects. If you have need for this feature, feel free to discuss on
+    [this GitHub issue](https://github.com/Automattic/mongoose/issues/3738).
+    There are several workarounds:
+  :js
+    doc.createdAt.setDate(2011, 5, 1);
+    doc.markModified('createdAt');
+    doc.save(); // Works
+  :js
+    doc.createdAt = new Date(2011, 5, 1).setHours(4);
+    doc.save(); // Works
+  
   hr#enable_debugging
   :markdown
     **Q**. How can I enable debugging?

@@ -1,3 +1,7 @@
+3.8.38 / 2016-01-07
+===================
+ * fixed; aggregate.append an array #3730 [dbkup](https://github.com/dbkup)
+
 4.3.4 / 2015-12-23
 ==================
  * fix: upgrade mongodb driver to 2.1.2 for repl set error #3712 [sansmischevia](https://github.com/sansmischevia)

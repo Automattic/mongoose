@@ -1,3 +1,7 @@
+3.8.38 / 2016-01-07
+===================
+ * fixed; aggregate.append an array #3730 [dbkup](https://github.com/dbkup)
+
 3.8.37 / 2015-11-16
 ===================
  * fixed; use retainKeyOrder for cloning update op #3572

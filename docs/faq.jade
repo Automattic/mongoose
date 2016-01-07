@@ -16,7 +16,11 @@ block content
     doc.array[3] = 'changed';
     doc.save();
   :markdown
-    **A**. Mongoose doesn't create getters/setters for array indexes; without them mongoose never gets notified of the change and so doesn't know to persist the new value. The work-around is to use [MongooseArray#set](./api.html#types_array_MongooseArray-set) available in **Mongoose >= 3.2.0**.
+    **A**. Mongoose doesn't create getters/setters for array indexes; without
+    them mongoose never gets notified of the change and so doesn't know to
+    persist the new value. The work-around is to use
+    [MongooseArray#set](./api.html#types_array_MongooseArray.set) available
+    in **Mongoose >= 3.2.0**.
   :js
     // 3.2.0
     doc.array.set(3, 'changed');

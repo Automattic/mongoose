@@ -1,3 +1,24 @@
+4.3.5 / 2016-01-09
+==================
+ * fix(query): throw when 4th parameter to update not a function #3741 [kasselTrankos](https://github.com/kasselTrankos)
+ * fix(document): separate error type for setting an object to a primitive #3735
+ * fix(populate): Model.populate returns ES6 promise #3734
+ * fix(drivers): re-register event handlers after manual reconnect #3729
+ * docs: broken links #3727
+ * fix(validation): update validators run array validation #3724
+ * docs: clarify the need to use markModified with in-place date ops #3722
+ * fix(document): mark correct path as populated when manually populating array #3721
+ * fix(aggregate): support for array pipeline argument to append #3718 [dbkup](https://github.com/dbkup)
+ * docs: clarify `.connect()` callback #3705
+ * fix(schema): properly validate nested single nested docs #3702
+ * fix(types): handle setting documentarray of wrong type #3701
+ * docs: broken links #3700
+ * fix(drivers): debug output properly displays '0' #3689
+
+3.8.38 / 2016-01-07
+===================
+ * fixed; aggregate.append an array #3730 [dbkup](https://github.com/dbkup)
+
 4.3.4 / 2015-12-23
 ==================
  * fix: upgrade mongodb driver to 2.1.2 for repl set error #3712 [sansmischevia](https://github.com/sansmischevia)

@@ -440,5 +440,19 @@ describe('document: strict mode:', function() {
 
       done();
     });
+
+    it('set nested to num throws ObjectExpectedError (gh-3735)', function() {
+      var schema = new Schema({
+        resolved: {
+          by: { type: String }
+        }
+      }, { strict: 'throw' });
+
+      var Test = mongoose.model('gh3735', schema);
+
+      assert.throws(function() {
+        var t = new Test({ resolved: 123 });
+      }, /ObjectExpectedError/);
+    });
   });
 });

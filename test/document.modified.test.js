@@ -382,24 +382,62 @@ describe('document modified', function() {
       db.close(done);
     });
 
-    it('gh-1530 for arrays (gh-3575)', function(done) {
-      var db = start();
+    describe('manually populating arrays', function() {
+      var db;
 
-      var parentSchema = new Schema({
-        name: String,
-        children: [{ type: Schema.Types.ObjectId, ref: 'Child' }]
+      before(function() {
+        db = start();
       });
 
-      var Parent = db.model('Parent', parentSchema, 'parents');
-      var Child = db.model('Child', parentSchema, 'children');
+      after(function(done) {
+        db.close(done);
+      });
 
-      var child = new Child({ name: 'Luke' });
-      var p = new Parent({ name: 'Anakin', children: [child] });
+      it('gh-1530 for arrays (gh-3575)', function(done) {
+        var parentSchema = new Schema({
+          name: String,
+          children: [{ type: Schema.Types.ObjectId, ref: 'Child' }]
+        });
 
-      assert.equal(p.children[0].name, 'Luke');
-      assert.ok(p.populated('children'));
-      db.close(done);
+        var Parent = db.model('Parent', parentSchema, 'parents');
+        var Child = db.model('Child', parentSchema, 'children');
+
+        var child = new Child({ name: 'Luke' });
+        var p = new Parent({ name: 'Anakin', children: [child] });
+
+        assert.equal(p.children[0].name, 'Luke');
+        assert.ok(p.populated('children'));
+        done();
+      });
+
+      it('setting nested arrays (gh-3721)', function(done) {
+        var userSchema = new Schema({
+          name: { type: Schema.Types.String }
+        });
+        var User = db.model('User', userSchema);
+
+        var accountSchema = new Schema({
+          roles: [{
+            name: { type: Schema.Types.String },
+            users: [{ type: Schema.Types.ObjectId, ref: 'User'}]
+          }]
+        });
+
+        var Account = db.model('Account', accountSchema);
+
+        var user = new User({ name: 'Test' });
+        var account = new Account({
+          roles: [
+            { name: 'test group', users: [user] }
+          ]
+        });
+
+        assert.ok(account.roles[0].users[0].isModified);
+        done();
+      });
     });
+
+
 
     it('should support setting mixed paths by string (gh-1418)', function(done) {
       var db = start();

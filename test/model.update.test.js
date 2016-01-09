@@ -1365,49 +1365,75 @@ describe('model: update:', function() {
       });
     });
 
-    it('embedded objects (gh-2733)', function(done) {
-      var db = start();
+    describe('objects and arrays', function() {
+      var db;
 
-      var bandSchema = new Schema({
-        singer: {
-          firstName: { type: String, enum: ['Axl'] },
-          lastName: { type: String, enum: ['Rose'] }
-        }
+      before(function() {
+        db = start();
       });
-      bandSchema.pre('update', function() {
-        this.options.runValidators = true;
-      });
-      var Band = db.model('gh2706', bandSchema, 'gh2706');
 
-      Band.update({}, { $set: { singer: { firstName: 'Not', lastName: 'Axl' } } }, function(err) {
-        assert.ok(err);
+      after(function(done) {
         db.close(done);
       });
-    });
 
-    it('handles document array validation (gh-2733)', function(done) {
-      var db = start();
-
-      var member = new Schema({
-        name: String,
-        role: { type: String, required: true, enum: ['singer', 'guitar', 'drums', 'bass'] }
-      });
-      var band = new Schema({ members: [member], name: String });
-      var Band = db.model('band', band, 'bands');
-      var members = [
-        { name: 'Axl Rose', role: 'singer' },
-        { name: 'Slash', role: 'guitar' },
-        { name: 'Christopher Walken', role: 'cowbell' }
-      ];
-
-      Band.findOneAndUpdate(
-        { name: "Guns N' Roses" },
-        { $set: { members: members } },
-        { runValidators: true },
-        function(err) {
-          assert.ok(err);
-          db.close(done);
+      it('embedded objects (gh-2706)', function(done) {
+        var bandSchema = new Schema({
+          singer: {
+            firstName: { type: String, enum: ['Axl'] },
+            lastName: { type: String, enum: ['Rose'] }
+          }
         });
+        bandSchema.pre('update', function() {
+          this.options.runValidators = true;
+        });
+        var Band = db.model('gh2706', bandSchema, 'gh2706');
+
+        Band.update({}, { $set: { singer: { firstName: 'Not', lastName: 'Axl' } } }, function(err) {
+          assert.ok(err);
+          done();
+        });
+      });
+
+      it('handles document array validation (gh-2733)', function(done) {
+        var member = new Schema({
+          name: String,
+          role: { type: String, required: true, enum: ['singer', 'guitar', 'drums', 'bass'] }
+        });
+        var band = new Schema({ members: [member], name: String });
+        var Band = db.model('band', band, 'bands');
+        var members = [
+          { name: 'Axl Rose', role: 'singer' },
+          { name: 'Slash', role: 'guitar' },
+          { name: 'Christopher Walken', role: 'cowbell' }
+        ];
+
+        Band.findOneAndUpdate(
+          { name: "Guns N' Roses" },
+          { $set: { members: members } },
+          { runValidators: true },
+          function(err) {
+            assert.ok(err);
+            done();
+          });
+      });
+
+      it('validators on arrays (gh-3724)', function(done) {
+        var schema = new Schema({
+          arr: [String]
+        });
+
+        schema.path('arr').validate(function(v) {
+          return false;
+        });
+
+        var M = db.model('gh3724', schema);
+        var options = { runValidators: true };
+        M.findOneAndUpdate({}, { arr: ['test'] }, options, function(error) {
+          assert.ok(error);
+          assert.ok(/ValidationError/.test(error.toString()));
+          done();
+        });
+      });
     });
   });
 

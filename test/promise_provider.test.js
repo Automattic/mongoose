@@ -325,6 +325,13 @@ describe('ES6 promises: ', function() {
         done();
       });
     });
+
+    it('Model.populate (gh-3734)', function(done) {
+      var doc = new MyModel({});
+      var promise = MyModel.populate(doc, 'test');
+      assert.equal(promise.constructor, bluebird);
+      done();
+    });
   });
 
   describe('q: ', function() {

@@ -32,4 +32,22 @@ describe('schema.documentarray', function() {
     });
     done();
   });
+
+  it('only sets if document has same schema (gh-3701)', function(done) {
+    var schema1 = new Schema({
+      arr: [new Schema({ a: Number, b: Number }, { _id: false })]
+    });
+    var schema2 = new Schema({
+      arr: [new Schema({ a: Number }, { _id: false })]
+    });
+
+    var Model1 = mongoose.model('gh3701_0', schema1);
+    var Model2 = mongoose.model('gh3701_1', schema2);
+
+    var source = new Model1({ arr: [{ a: 1, b: 1 }, { a: 2, b: 2 }] });
+    var dest = new Model2({ arr: source.arr });
+
+    assert.deepEqual(dest.toObject().arr, [{ a: 1 }, { a: 2 }]);
+    done();
+  });
 });

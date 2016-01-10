@@ -118,7 +118,7 @@ mongoose.connection.on('open', function() {
         BlogPost.populate(docs, opts, function(err, docs) {
           assert.ifError(err);
           console.log('populated');
-          var s = require('util').inspect(docs, { depth: null });
+          var s = require('util').inspect(docs, { depth: null, colors: true });
           console.log(s);
           done();
         });

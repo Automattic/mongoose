@@ -21,26 +21,26 @@ var _ = require('underscore');
 var Comments = new Schema();
 
 Comments.add({
-  title     : String
-  , date      : Date
-  , body      : String
-  , comments  : [Comments]
+  title: String,
+  date: Date,
+  body: String,
+  comments: [Comments]
 });
 
 var BlogPost = new Schema({
-  title     : String
-  , author    : String
-  , slug      : String
-  , date      : Date
-  , meta      : {
-    date      : Date
-      , visitors  : Number
-  }
-  , published : Boolean
-  , mixed     : {}
-  , numbers   : [Number]
-  , owners    : [ObjectId]
-  , comments  : [Comments]
+  title: String,
+  author: String,
+  slug: String,
+  date: Date,
+  meta: {
+    date: Date,
+    visitors: Number
+  },
+  published: Boolean,
+  mixed: {},
+  numbers: [Number],
+  owners: [ObjectId],
+  comments: [Comments]
 });
 
 BlogPost.virtual('titleWithAuthor')
@@ -74,13 +74,13 @@ mongoose.model('UpdateOneStrictThrowSchema', strictThrowSchema);
 
 describe('model: findOneAndUpdate:', function() {
   it('WWW returns the edited document', function(done) {
-    var db = start()
-      , M = db.model(modelname, collection)
-      , title = 'Tobi ' + random()
-      , author = 'Brian ' + random()
-      , newTitle = 'Woot ' + random()
-      , id0 = new DocumentObjectId
-      , id1 = new DocumentObjectId;
+    var db = start(),
+        M = db.model(modelname, collection),
+        title = 'Tobi ' + random(),
+        author = 'Brian ' + random(),
+        newTitle = 'Woot ' + random(),
+        id0 = new DocumentObjectId,
+        id1 = new DocumentObjectId;
 
     var post = new M;
     post.set('title', title);
@@ -116,14 +116,14 @@ describe('model: findOneAndUpdate:', function() {
         assert.ok(cf.comments[1]._id instanceof DocumentObjectId);
 
         var update = {
-          title: newTitle // becomes $set
-          , $inc: { 'meta.visitors': 2 }
-          , $set: { date: new Date }
-          , published: false // becomes $set
-          , 'mixed': { x: 'ECKS', y: 'why' } // $set
-          , $pullAll: { 'numbers': [4, 6] }
-          , $pull: { 'owners': id0 }
-          , 'comments.1.body': 8 // $set
+          title: newTitle, // becomes $set
+          $inc: { 'meta.visitors': 2 },
+          $set: { date: new Date },
+          published: false, // becomes $set
+          'mixed': { x: 'ECKS', y: 'why' }, // $set
+          $pullAll: { 'numbers': [4, 6] },
+          $pull: { 'owners': id0 },
+          'comments.1.body': 8 // $set
         };
 
         M.findOneAndUpdate({ title: title }, update, { 'new': true }, function(err, up) {
@@ -219,13 +219,13 @@ describe('model: findOneAndUpdate:', function() {
   });
 
   it('returns the original document', function(done) {
-    var db = start()
-      , M = db.model(modelname, collection)
-      , title = 'Tobi ' + random()
-      , author = 'Brian ' + random()
-      , newTitle = 'Woot ' + random()
-      , id0 = new DocumentObjectId
-      , id1 = new DocumentObjectId;
+    var db = start(),
+        M = db.model(modelname, collection),
+        title = 'Tobi ' + random(),
+        author = 'Brian ' + random(),
+        newTitle = 'Woot ' + random(),
+        id0 = new DocumentObjectId,
+        id1 = new DocumentObjectId;
 
     var post = new M;
     post.set('title', title);
@@ -244,14 +244,14 @@ describe('model: findOneAndUpdate:', function() {
         assert.ifError(err);
 
         var update = {
-          title: newTitle // becomes $set
-          , $inc: { 'meta.visitors': 2 }
-          , $set: { date: new Date }
-          , published: false // becomes $set
-          , 'mixed': { x: 'ECKS', y: 'why' } // $set
-          , $pullAll: { 'numbers': [4, 6] }
-          , $pull: { 'owners': id0 }
-          , 'comments.1.body': 8 // $set
+          title: newTitle, // becomes $set
+          $inc: { 'meta.visitors': 2 },
+          $set: { date: new Date },
+          published: false, // becomes $set
+          'mixed': { x: 'ECKS', y: 'why' }, // $set
+          $pullAll: { 'numbers': [4, 6] },
+          $pull: { 'owners': id0 },
+          'comments.1.body': 8 // $set
         };
 
         M.findOneAndUpdate({ title: title }, update, { new: false }, function(err, up) {
@@ -281,13 +281,13 @@ describe('model: findOneAndUpdate:', function() {
   });
 
   it('allows upserting', function(done) {
-    var db = start()
-      , M = db.model(modelname, collection)
-      , title = 'Tobi ' + random()
-      , author = 'Brian ' + random()
-      , newTitle = 'Woot ' + random()
-      , id0 = new DocumentObjectId
-      , id1 = new DocumentObjectId;
+    var db = start(),
+        M = db.model(modelname, collection),
+        title = 'Tobi ' + random(),
+        author = 'Brian ' + random(),
+        newTitle = 'Woot ' + random(),
+        id0 = new DocumentObjectId,
+        id1 = new DocumentObjectId;
 
     var post = new M;
     post.set('title', title);
@@ -301,13 +301,13 @@ describe('model: findOneAndUpdate:', function() {
     post.comments = [{ body: 'been there' }, { body: 'done that' }];
 
     var update = {
-      title: newTitle // becomes $set
-      , $inc: { 'meta.visitors': 2 }
-      , $set: { date: new Date }
-      , published: false // becomes $set
-      , 'mixed': { x: 'ECKS', y: 'why' } // $set
-      , $pullAll: { 'numbers': [4, 6] }
-      , $pull: { 'owners': id0 }
+      title: newTitle, // becomes $set
+      $inc: { 'meta.visitors': 2 },
+      $set: { date: new Date },
+      published: false, // becomes $set
+      'mixed': { x: 'ECKS', y: 'why' }, // $set
+      $pullAll: { 'numbers': [4, 6] },
+      $pull: { 'owners': id0 }
     };
 
     M.findOneAndUpdate({ title: title }, update, { upsert: true, new: true }, function(err, up) {
@@ -329,13 +329,13 @@ describe('model: findOneAndUpdate:', function() {
   });
 
   it('options/conditions/doc are merged when no callback is passed', function(done) {
-    var db = start()
-      , M = db.model(modelname, collection);
+    var db = start(),
+        M = db.model(modelname, collection);
 
     db.close();
 
-    var now = new Date
-      , query;
+    var now = new Date,
+        query;
 
     // Model.findOneAndUpdate
     query = M.findOneAndUpdate({ author: 'aaron' }, { $set: { date: now }}, { new: false, fields: 'author' });
@@ -383,9 +383,9 @@ describe('model: findOneAndUpdate:', function() {
   });
 
   it('executes when a callback is passed', function(done) {
-    var db = start()
-      , M = db.model(modelname, collection + random())
-      , pending = 6;
+    var db = start(),
+        M = db.model(modelname, collection + random()),
+        pending = 6;
 
     M.findOneAndUpdate({ name: 'aaron' }, { $set: { name: 'Aaron6'}}, { new: false }, cb);
     M.findOneAndUpdate({ name: 'aaron' }, { $set: { name: 'Aaron4'}}, cb);
@@ -404,9 +404,9 @@ describe('model: findOneAndUpdate:', function() {
   });
 
   it('executes when a callback is passed to a succeeding function', function(done) {
-    var db = start()
-      , M = db.model(modelname, collection + random())
-      , pending = 6;
+    var db = start(),
+        M = db.model(modelname, collection + random()),
+        pending = 6;
 
     M.findOneAndUpdate({ name: 'aaron' }, { $set: { name: 'Aaron'}}, { new: false }).exec(cb);
     M.findOneAndUpdate({ name: 'aaron' }, { $set: { name: 'Aaron'}}).exec(cb);
@@ -425,9 +425,9 @@ describe('model: findOneAndUpdate:', function() {
   });
 
   it('executing with only a callback throws', function(done) {
-    var db = start()
-      , M = db.model(modelname, collection)
-      , err;
+    var db = start(),
+        M = db.model(modelname, collection),
+        err;
 
     try {
       M.findOneAndUpdate(function() {});
@@ -441,9 +441,9 @@ describe('model: findOneAndUpdate:', function() {
   });
 
   it('updates numbers atomically', function(done) {
-    var db = start()
-      , BlogPost = db.model(modelname, collection)
-      , totalDocs = 4;
+    var db = start(),
+        BlogPost = db.model(modelname, collection),
+        totalDocs = 4;
 
     var post = new BlogPost();
     post.set('meta.visitors', 5);
@@ -531,9 +531,9 @@ describe('model: findOneAndUpdate:', function() {
 
 describe('model: findByIdAndUpdate:', function() {
   it('executing with just a callback throws', function(done) {
-    var db = start()
-      , M = db.model(modelname, collection)
-      , err;
+    var db = start(),
+        M = db.model(modelname, collection),
+        err;
 
     try {
       M.findByIdAndUpdate(function() {});
@@ -547,10 +547,10 @@ describe('model: findByIdAndUpdate:', function() {
   });
 
   it('executes when a callback is passed', function(done) {
-    var db = start()
-      , M = db.model(modelname, collection + random())
-      , _id = new DocumentObjectId
-      , pending = 2;
+    var db = start(),
+        M = db.model(modelname, collection + random()),
+        _id = new DocumentObjectId,
+        pending = 2;
 
     M.findByIdAndUpdate(_id, { $set: { name: 'Aaron'}}, { new: false }, cb);
     M.findByIdAndUpdate(_id, { $set: { name: 'changed' }}, cb);
@@ -564,10 +564,10 @@ describe('model: findByIdAndUpdate:', function() {
   });
 
   it('executes when a callback is passed to a succeeding function', function(done) {
-    var db = start()
-      , M = db.model(modelname, collection + random())
-      , _id = new DocumentObjectId
-      , pending = 2;
+    var db = start(),
+        M = db.model(modelname, collection + random()),
+        _id = new DocumentObjectId,
+        pending = 2;
 
     M.findByIdAndUpdate(_id, { $set: { name: 'Aaron'}}, { new: false }).exec(cb);
     M.findByIdAndUpdate(_id, { $set: { name: 'changed' }}).exec(cb);
@@ -581,13 +581,13 @@ describe('model: findByIdAndUpdate:', function() {
   });
 
   it('returns the original document', function(done) {
-    var db = start()
-      , M = db.model(modelname, collection)
-      , title = 'Tobi ' + random()
-      , author = 'Brian ' + random()
-      , newTitle = 'Woot ' + random()
-      , id0 = new DocumentObjectId
-      , id1 = new DocumentObjectId;
+    var db = start(),
+        M = db.model(modelname, collection),
+        title = 'Tobi ' + random(),
+        author = 'Brian ' + random(),
+        newTitle = 'Woot ' + random(),
+        id0 = new DocumentObjectId,
+        id1 = new DocumentObjectId;
 
     var post = new M;
     post.set('title', title);
@@ -606,14 +606,14 @@ describe('model: findByIdAndUpdate:', function() {
         assert.ifError(err);
 
         var update = {
-          title: newTitle // becomes $set
-          , $inc: { 'meta.visitors': 2 }
-          , $set: { date: new Date }
-          , published: false // becomes $set
-          , 'mixed': { x: 'ECKS', y: 'why' } // $set
-          , $pullAll: { 'numbers': [4, 6] }
-          , $pull: { 'owners': id0 }
-          , 'comments.1.body': 8 // $set
+          title: newTitle, // becomes $set
+          $inc: { 'meta.visitors': 2 },
+          $set: { date: new Date },
+          published: false, // becomes $set
+          'mixed': { x: 'ECKS', y: 'why' }, // $set
+          $pullAll: { 'numbers': [4, 6] },
+          $pull: { 'owners': id0 },
+          'comments.1.body': 8 // $set
         };
 
         M.findByIdAndUpdate(post.id, update, { new: false }, function(err, up) {
@@ -642,12 +642,12 @@ describe('model: findByIdAndUpdate:', function() {
   });
 
   it('options/conditions/doc are merged when no callback is passed', function(done) {
-    var db = start()
-      , M = db.model(modelname, collection)
-      , _id = new DocumentObjectId;
+    var db = start(),
+        M = db.model(modelname, collection),
+        _id = new DocumentObjectId;
 
-    var now = new Date
-      , query;
+    var now = new Date,
+        query;
 
     // Model.findByIdAndUpdate
     query = M.findByIdAndUpdate(_id, { $set: { date: now }}, { new: false, fields: 'author' });
@@ -673,12 +673,12 @@ describe('model: findByIdAndUpdate:', function() {
   });
 
   it('supports v3 select string syntax', function(done) {
-    var db = start()
-      , M = db.model(modelname, collection)
-      , _id = new DocumentObjectId;
+    var db = start(),
+        M = db.model(modelname, collection),
+        _id = new DocumentObjectId;
 
-    var now = new Date
-      , query;
+    var now = new Date,
+        query;
 
     query = M.findByIdAndUpdate(_id, { $set: { date: now }}, { select: 'author -title' });
     assert.strictEqual(1, query._fields.author);
@@ -691,12 +691,12 @@ describe('model: findByIdAndUpdate:', function() {
   });
 
   it('supports v3 select object syntax', function(done) {
-    var db = start()
-      , M = db.model(modelname, collection)
-      , _id = new DocumentObjectId;
+    var db = start(),
+        M = db.model(modelname, collection),
+        _id = new DocumentObjectId;
 
-    var now = new Date
-      , query;
+    var now = new Date,
+        query;
 
     query = M.findByIdAndUpdate(_id, { $set: { date: now }}, { select: { author: 1, title: 0 }});
     assert.strictEqual(1, query._fields.author);
@@ -709,8 +709,8 @@ describe('model: findByIdAndUpdate:', function() {
   });
 
   it('supports v3 sort string syntax', function(done) {
-    var db = start()
-      , M = db.model(modelname, collection);
+    var db = start(),
+        M = db.model(modelname, collection);
 
     var now = new Date;
     var _id = new DocumentObjectId;
@@ -745,12 +745,12 @@ describe('model: findByIdAndUpdate:', function() {
   });
 
   it('supports v3 sort object syntax', function(done) {
-    var db = start()
-      , M = db.model(modelname, collection)
-      , _id = new DocumentObjectId;
+    var db = start(),
+        M = db.model(modelname, collection),
+        _id = new DocumentObjectId;
 
-    var now = new Date
-      , query;
+    var now = new Date,
+        query;
 
     query = M.findByIdAndUpdate(_id, { $set: { date: now }}, { sort: { author: 1, title: -1 }});
     assert.equal(2, Object.keys(query.options.sort).length);
@@ -769,8 +769,8 @@ describe('model: findByIdAndUpdate:', function() {
     var db = start();
 
     var postSchema = new Schema({
-      ids: [{type: Schema.ObjectId}]
-      , title: String
+      ids: [{type: Schema.ObjectId}],
+      title: String
     });
 
     var B = db.model('gh-1091+1100', postSchema);

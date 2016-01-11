@@ -3,12 +3,12 @@
  * Test dependencies.
  */
 
-var start = require('./common')
-  , assert = require('assert')
-  , mongoose = start.mongoose
-  , DivergentArrayError = mongoose.Error.DivergentArrayError
-  , utils = require('../lib/utils')
-  , random = utils.random;
+var start = require('./common'),
+    assert = require('assert'),
+    mongoose = start.mongoose,
+    DivergentArrayError = mongoose.Error.DivergentArrayError,
+    utils = require('../lib/utils'),
+    random = utils.random;
 
 /**
  * Tests.

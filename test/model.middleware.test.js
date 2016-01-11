@@ -3,10 +3,10 @@
  * Test dependencies.
  */
 
-var start = require('./common')
-  , assert = require('assert')
-  , mongoose = start.mongoose
-  , Schema = mongoose.Schema;
+var start = require('./common'),
+    assert = require('assert'),
+    mongoose = start.mongoose,
+    Schema = mongoose.Schema;
 
 describe('model middleware', function() {
   it('post save', function(done) {
@@ -37,8 +37,8 @@ describe('model middleware', function() {
       next();
     });
 
-    var db = start()
-      , TestMiddleware = db.model('TestPostSaveMiddleware', schema);
+    var db = start(),
+        TestMiddleware = db.model('TestPostSaveMiddleware', schema);
 
     var test = new TestMiddleware({ title: 'Little Green Running Hood'});
 
@@ -100,8 +100,8 @@ describe('model middleware', function() {
 
     mongoose.model('TestMiddleware', schema);
 
-    var db = start()
-      , TestMiddleware = db.model('TestMiddleware');
+    var db = start(),
+        TestMiddleware = db.model('TestMiddleware');
 
     var test = new TestMiddleware();
 
@@ -130,8 +130,8 @@ describe('model middleware', function() {
       title: String
     });
 
-    var preinit = 0
-      , postinit = 0;
+    var preinit = 0,
+        postinit = 0;
 
     schema.pre('init', function(next) {
       ++preinit;
@@ -145,8 +145,8 @@ describe('model middleware', function() {
 
     mongoose.model('TestPostInitMiddleware', schema);
 
-    var db = start()
-      , Test = db.model('TestPostInitMiddleware');
+    var db = start(),
+        Test = db.model('TestPostInitMiddleware');
 
     var test = new Test({ title: "banana" });
 
@@ -228,10 +228,10 @@ describe('model middleware', function() {
       title: String
     });
 
-    var preValidate = 0
-      , postValidate = 0
-      , preRemove = 0
-      , postRemove = 0;
+    var preValidate = 0,
+        postValidate = 0,
+        preRemove = 0,
+        postRemove = 0;
 
     schema.pre('validate', function(next) {
       ++preValidate;
@@ -253,8 +253,8 @@ describe('model middleware', function() {
       ++postRemove;
     });
 
-    var db = start()
-      , Test = db.model('TestPostValidateMiddleware', schema);
+    var db = start(),
+        Test = db.model('TestPostValidateMiddleware', schema);
 
     var test = new Test({ title: "banana" });
 

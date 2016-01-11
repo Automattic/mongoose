@@ -2,11 +2,11 @@
  * Test dependencies.
  */
 
-var start = require('./common')
-  , assert = require('assert')
-  , mongoose = start.mongoose
-  , Schema = mongoose.Schema
-  , DocumentObjectId = mongoose.Types.ObjectId;
+var start = require('./common'),
+    assert = require('assert'),
+    mongoose = start.mongoose,
+    Schema = mongoose.Schema,
+    DocumentObjectId = mongoose.Types.ObjectId;
 
 /**
  * Setup

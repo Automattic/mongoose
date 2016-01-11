@@ -1,15 +1,15 @@
-/* eslint unused-vars: 1 */
+/* eslint no-unused-vars: 1 */
 /* global emit */
 /**
  * Test dependencies.
  */
 
-var start = require('./common')
-  , mongoose = start.mongoose
-  , assert = require('assert')
-  , random = require('../lib/utils').random
-  , Schema = mongoose.Schema
-  , ObjectId = Schema.Types.ObjectId;
+var start = require('./common'),
+    mongoose = start.mongoose,
+    assert = require('assert'),
+    random = require('../lib/utils').random,
+    Schema = mongoose.Schema,
+    ObjectId = Schema.Types.ObjectId;
 
 /**
  * Setup.
@@ -18,26 +18,26 @@ var start = require('./common')
 var Comments = new Schema();
 
 Comments.add({
-  title     : String
-  , date      : Date
-  , body      : String
-  , comments  : [Comments]
+  title: String,
+  date: Date,
+  body: String,
+  comments: [Comments]
 });
 
 var BlogPost = new Schema({
-  title     : String
-  , author    : String
-  , slug      : String
-  , date      : Date
-  , meta      : {
-    date      : Date
-      , visitors  : Number
-  }
-  , published : Boolean
-  , mixed     : {}
-  , numbers   : [Number]
-  , owners    : [ObjectId]
-  , comments  : [Comments]
+  title: String,
+  author: String,
+  slug: String,
+  date: Date,
+  meta: {
+    date: Date,
+    visitors: Number
+  },
+  published: Boolean,
+  mixed: {},
+  numbers: [Number],
+  owners: [ObjectId],
+  comments: [Comments]
 });
 
 
@@ -46,8 +46,8 @@ mongoose.model('MapReduce', BlogPost);
 
 describe('model: mapreduce:', function() {
   it('works', function(done) {
-    var db = start()
-      , MR = db.model('MapReduce', collection);
+    var db = start(),
+        MR = db.model('MapReduce', collection);
 
     var magicID;
     var id = new mongoose.Types.ObjectId;
@@ -64,8 +64,8 @@ describe('model: mapreduce:', function() {
       magicID = b._id;
 
       var o = {
-        map: function() { emit(this.author, 1); }
-        , reduce: function(k, vals) { return vals.length; }
+        map: function() { emit(this.author, 1); },
+        reduce: function(k, vals) { return vals.length; }
       };
 
       MR.mapReduce(o, function(err, ret, stats) {
@@ -80,9 +80,9 @@ describe('model: mapreduce:', function() {
         });
 
         var o = {
-          map: function() { emit(this.author, 1); }
-          , reduce: function(k, vals) { return vals.length; }
-          , query: { author: 'aaron', published: 1, owners: id }
+          map: function() { emit(this.author, 1); },
+          reduce: function(k, vals) { return vals.length; },
+          query: { author: 'aaron', published: 1, owners: id }
         };
 
         MR.mapReduce(o, function(err, ret, stats) {
@@ -100,10 +100,10 @@ describe('model: mapreduce:', function() {
 
       function modeling() {
         var o = {
-          map: function() { emit(this.author, { own: magicID }); }
-          , scope: { magicID: magicID }
-          , reduce: function(k, vals) { return { own: vals[0].own, count: vals.length };}
-          , out: { replace: '_mapreduce_test_' + random() }
+          map: function() { emit(this.author, { own: magicID }); },
+          scope: { magicID: magicID },
+          reduce: function(k, vals) { return { own: vals[0].own, count: vals.length };},
+          out: { replace: '_mapreduce_test_' + random() }
         };
 
         MR.mapReduce(o, function(err, ret) {
@@ -147,13 +147,13 @@ describe('model: mapreduce:', function() {
   });
 
   it('withholds stats with false verbosity', function(done) {
-    var db = start()
-      , MR = db.model('MapReduce', collection);
+    var db = start(),
+        MR = db.model('MapReduce', collection);
 
     var o = {
-      map: function() {}
-      , reduce: function() { return 'test'; }
-      , verbose: false
+      map: function() {},
+      reduce: function() { return 'test'; },
+      verbose: false
     };
 
     MR.mapReduce(o, function(err, results, stats) {
@@ -164,12 +164,12 @@ describe('model: mapreduce:', function() {
 
   describe('promises (gh-1628)', function() {
     it('are returned', function(done) {
-      var db = start()
-        , MR = db.model('MapReduce', collection);
+      var db = start(),
+          MR = db.model('MapReduce', collection);
 
       var o = {
-        map: function() {}
-        , reduce: function() { return 'test'; }
+        map: function() {},
+        reduce: function() { return 'test'; }
       };
 
       var promise = MR.mapReduce(o, function() {});
@@ -179,13 +179,13 @@ describe('model: mapreduce:', function() {
     });
 
     it('allow not passing a callback', function(done) {
-      var db = start()
-        , MR = db.model('MapReduce', collection);
+      var db = start(),
+          MR = db.model('MapReduce', collection);
 
       var o = {
-        map: function() { emit(this.author, 1); }
-        , reduce: function(k, vals) { return vals.length; }
-        , query: { author: 'aaron', published: 1 }
+        map: function() { emit(this.author, 1); },
+        reduce: function(k, vals) { return vals.length; },
+        query: { author: 'aaron', published: 1 }
       };
 
       function validate(ret, stats) {

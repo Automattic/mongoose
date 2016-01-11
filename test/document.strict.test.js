@@ -451,7 +451,7 @@ describe('document: strict mode:', function() {
       var Test = mongoose.model('gh3735', schema);
 
       assert.throws(function() {
-        var t = new Test({ resolved: 123 });
+        new Test({ resolved: 123 });
       }, /ObjectExpectedError/);
     });
   });

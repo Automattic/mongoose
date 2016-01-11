@@ -2109,9 +2109,9 @@ describe('Model', function() {
           type:Number
             , set: function(x) { return x / 2;}
             , get: function(x) {
-                called = true;
-                return x * 2;
-              }
+              called = true;
+              return x * 2;
+            }
         }
       });
 

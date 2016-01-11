@@ -3,13 +3,13 @@
  * Test dependencies.
  */
 
-var start = require('./common')
-  , mongoose = start.mongoose
-  , assert = require('assert')
-  , random = require('../lib/utils').random
-  , Schema = mongoose.Schema
-  , ObjectId = Schema.Types.ObjectId
-  , DocumentObjectId = mongoose.Types.ObjectId;
+var start = require('./common'),
+    mongoose = start.mongoose,
+    assert = require('assert'),
+    random = require('../lib/utils').random,
+    Schema = mongoose.Schema,
+    ObjectId = Schema.Types.ObjectId,
+    DocumentObjectId = mongoose.Types.ObjectId;
 
 /**
  * Setup.
@@ -18,26 +18,26 @@ var start = require('./common')
 var Comments = new Schema;
 
 Comments.add({
-  title     : String
-  , date      : Date
-  , body      : String
-  , comments  : [Comments]
+  title: String,
+  date: Date,
+  body: String,
+  comments: [Comments]
 });
 
 var BlogPost = new Schema({
-  title     : String
-  , author    : String
-  , slug      : String
-  , date      : Date
-  , meta      : {
-    date      : Date
-      , visitors  : Number
-  }
-  , published : Boolean
-  , mixed     : {}
-  , numbers   : [Number]
-  , owners    : [ObjectId]
-  , comments  : [Comments]
+  title: String,
+  author: String,
+  slug: String,
+  date: Date,
+  meta: {
+    date: Date,
+    visitors: Number
+  },
+  published: Boolean,
+  mixed: {},
+  numbers: [Number],
+  owners: [ObjectId],
+  comments: [Comments]
 });
 
 BlogPost.virtual('titleWithAuthor')
@@ -68,9 +68,9 @@ mongoose.model('RemoveOneStrictSchema', strictSchema);
 
 describe('model: findOneAndRemove:', function() {
   it('returns the original document', function(done) {
-    var db = start()
-      , M = db.model(modelname, collection)
-      , title = 'remove muah';
+    var db = start(),
+        M = db.model(modelname, collection),
+        title = 'remove muah';
 
     var post = new M({ title: title });
     post.save(function(err) {
@@ -89,13 +89,13 @@ describe('model: findOneAndRemove:', function() {
   });
 
   it('options/conditions/doc are merged when no callback is passed', function(done) {
-    var db = start()
-      , M = db.model(modelname, collection);
+    var db = start(),
+        M = db.model(modelname, collection);
 
     db.close();
 
-    var now = new Date
-      , query;
+    var now = new Date,
+        query;
 
     // Model.findOneAndRemove
     query = M.findOneAndRemove({ author: 'aaron' }, { select: 'author' });
@@ -128,9 +128,9 @@ describe('model: findOneAndRemove:', function() {
   });
 
   it('executes when a callback is passed', function(done) {
-    var db = start()
-      , M = db.model(modelname, collection + random())
-      , pending = 5;
+    var db = start(),
+        M = db.model(modelname, collection + random()),
+        pending = 5;
 
     M.findOneAndRemove({ name: 'aaron1' }, { select: 'name' }, cb);
     M.findOneAndRemove({ name: 'aaron1' }, cb);
@@ -148,9 +148,9 @@ describe('model: findOneAndRemove:', function() {
   });
 
   it('executed with only a callback throws', function(done) {
-    var db = start()
-      , M = db.model(modelname, collection)
-      , err;
+    var db = start(),
+        M = db.model(modelname, collection),
+        err;
 
     try {
       M.findOneAndRemove(function() {});
@@ -167,9 +167,9 @@ describe('model: findOneAndRemove:', function() {
 
 describe('model: findByIdAndRemove:', function() {
   it('executed with only a callback throws', function(done) {
-    var db = start()
-      , M = db.model(modelname, collection)
-      , err;
+    var db = start(),
+        M = db.model(modelname, collection),
+        err;
 
     try {
       M.findByIdAndRemove(function() {});
@@ -183,10 +183,10 @@ describe('model: findByIdAndRemove:', function() {
   });
 
   it('executes when a callback is passed', function(done) {
-    var db = start()
-      , M = db.model(modelname, collection + random())
-      , _id = new DocumentObjectId
-      , pending = 2;
+    var db = start(),
+        M = db.model(modelname, collection + random()),
+        _id = new DocumentObjectId,
+        pending = 2;
 
     M.findByIdAndRemove(_id, { select: 'name' }, cb);
     M.findByIdAndRemove(_id, cb);
@@ -201,9 +201,9 @@ describe('model: findByIdAndRemove:', function() {
   });
 
   it('returns the original document', function(done) {
-    var db = start()
-      , M = db.model(modelname, collection)
-      , title = 'remove muah pleez';
+    var db = start(),
+        M = db.model(modelname, collection),
+        title = 'remove muah pleez';
 
     var post = new M({ title: title });
     post.save(function(err) {
@@ -222,9 +222,9 @@ describe('model: findByIdAndRemove:', function() {
   });
 
   it('options/conditions/doc are merged when no callback is passed', function(done) {
-    var db = start()
-      , M = db.model(modelname, collection)
-      , _id = new DocumentObjectId;
+    var db = start(),
+        M = db.model(modelname, collection),
+        _id = new DocumentObjectId;
 
     db.close();
 
@@ -247,9 +247,9 @@ describe('model: findByIdAndRemove:', function() {
   });
 
   it('supports v3 select string syntax', function(done) {
-    var db = start()
-      , M = db.model(modelname, collection)
-      , _id = new DocumentObjectId;
+    var db = start(),
+        M = db.model(modelname, collection),
+        _id = new DocumentObjectId;
 
     db.close();
 
@@ -266,9 +266,9 @@ describe('model: findByIdAndRemove:', function() {
   });
 
   it('supports v3 select object syntax', function(done) {
-    var db = start()
-      , M = db.model(modelname, collection)
-      , _id = new DocumentObjectId;
+    var db = start(),
+        M = db.model(modelname, collection),
+        _id = new DocumentObjectId;
 
     db.close();
 
@@ -285,9 +285,9 @@ describe('model: findByIdAndRemove:', function() {
   });
 
   it('supports v3 sort string syntax', function(done) {
-    var db = start()
-      , M = db.model(modelname, collection)
-      , _id = new DocumentObjectId;
+    var db = start(),
+        M = db.model(modelname, collection),
+        _id = new DocumentObjectId;
 
     db.close();
 
@@ -306,9 +306,9 @@ describe('model: findByIdAndRemove:', function() {
   });
 
   it('supports v3 sort object syntax', function(done) {
-    var db = start()
-      , M = db.model(modelname, collection)
-      , _id = new DocumentObjectId;
+    var db = start(),
+        M = db.model(modelname, collection),
+        _id = new DocumentObjectId;
 
     var query;
 

@@ -33,7 +33,7 @@
     "sliced": "0.0.5"
   },
   "devDependencies": {
-    "acquit": "0.3.0",
+    "acquit": "0.4.1",
     "acquit-ignore": "0.0.1",
     "benchmark": "1.0.0",
     "bluebird": "2.9.34",

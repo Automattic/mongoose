@@ -50,7 +50,7 @@
     "open": "0.0.3",
     "q": "1.4.1",
     "tbd": "0.6.4",
-    "uglify-js": "2.4.24",
+    "uglify-js": "2.6.1",
     "underscore": "1.5.2"
   },
   "browserDependencies": {

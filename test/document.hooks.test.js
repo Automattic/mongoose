@@ -809,4 +809,34 @@ describe('document: hooks:', function() {
       db.close(done);
     });
   });
+
+  it('remove hooks for single nested (gh-3754)', function(done) {
+    var db = start();
+    var postCount = 0;
+    var PhotoSchema = new mongoose.Schema({
+      bla: String
+    });
+
+    PhotoSchema.post('remove', function(photo) {
+      ++postCount;
+    });
+
+    var PersonSchema = new mongoose.Schema({
+      photo: PhotoSchema
+    });
+
+    var Person = db.model('Person', PersonSchema);
+
+    Person.create({ photo: { bla: 'test' } }, function(error, person) {
+      assert.ifError(error);
+      person.photo.remove();
+      person.save(function(error) {
+        assert.ifError(error);
+        setTimeout(function() {
+          assert.equal(postCount, 1);
+          done();
+        }, 0);
+      });
+    });
+  });
 });

@@ -33,7 +33,7 @@
     "sliced": "0.0.5"
   },
   "devDependencies": {
-    "acquit": "0.3.0",
+    "acquit": "0.4.1",
     "acquit-ignore": "0.0.1",
     "benchmark": "1.0.0",
     "bluebird": "2.9.34",
@@ -50,7 +50,7 @@
     "open": "0.0.3",
     "q": "1.4.1",
     "tbd": "0.6.4",
-    "uglify-js": "2.4.24",
+    "uglify-js": "2.6.1",
     "underscore": "1.5.2"
   },
   "browserDependencies": {

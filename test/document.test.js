@@ -2176,146 +2176,152 @@ describe('document', function() {
     });
   });
 
-  it('single embedded docs post hooks (gh-3679)', function(done) {
-    var db = start();
-    var postHookCalls = [];
-    var personSchema = new Schema({ name: String });
-    personSchema.post('save', function() {
-      postHookCalls.push(this);
+  describe('bug fixes', function() {
+    var db;
+
+    before(function() {
+      db = start();
     });
 
-    var bandSchema = new Schema({ guitarist: personSchema, name: String });
-    var Band = db.model('gh3679', bandSchema);
-    var obj = { name: "Guns N' Roses", guitarist: { name: 'Slash' } };
-
-    Band.create(obj, function(error) {
-      assert.ifError(error);
-      setTimeout(function() {
-        assert.equal(postHookCalls.length, 1);
-        assert.equal(postHookCalls[0].name, 'Slash');
-        db.close(done);
-      });
-    });
-  });
-
-  it('single embedded docs .set() (gh-3686)', function(done) {
-    var db = start();
-    var personSchema = new Schema({ name: String, realName: String });
-
-    var bandSchema = new Schema({
-      guitarist: personSchema,
-      name: String
-    });
-    var Band = db.model('gh3686', bandSchema);
-    var obj = {
-      name: "Guns N' Roses",
-      guitarist: { name: 'Slash', realName: 'Saul Hudson' }
-    };
-
-    Band.create(obj, function(error, gnr) {
-      gnr.set('guitarist.name', 'Buckethead');
-      gnr.save(function(error) {
-        assert.ifError(error);
-        assert.equal(gnr.guitarist.name, 'Buckethead');
-        assert.equal(gnr.guitarist.realName, 'Saul Hudson');
-        db.close(done);
-      });
-    });
-  });
-
-  it('single embedded docs with arrays pre hooks (gh-3680)', function(done) {
-    var db = start();
-    var childSchema = Schema({ count: Number });
-
-    var preCalls = 0;
-    childSchema.pre('save', function(next) {
-      ++preCalls;
-      next();
-    });
-
-    var SingleNestedSchema = new Schema({
-      children: [childSchema]
-    });
-
-    var ParentSchema = new Schema({
-      singleNested: SingleNestedSchema
-    });
-
-    var Parent = db.model('gh3680', ParentSchema);
-    var obj = { singleNested: { children: [{ count: 0 }] } };
-    Parent.create(obj, function(error) {
-      assert.ifError(error);
-      assert.equal(preCalls, 1);
+    after(function(done) {
       db.close(done);
     });
-  });
 
-  it('nested single embedded doc validation (gh-3702)', function(done) {
-    var db = start();
-    var childChildSchema = Schema({ count: { type: Number, min: 1 } });
-    var childSchema = new Schema({ child: childChildSchema });
-    var parentSchema = new Schema({ child: childSchema });
+    it('single embedded docs post hooks (gh-3679)', function(done) {
+      var postHookCalls = [];
+      var personSchema = new Schema({ name: String });
+      personSchema.post('save', function() {
+        postHookCalls.push(this);
+      });
 
-    var Parent = db.model('gh3702', parentSchema);
-    var obj = { child: { child: { count: 0 } } };
-    Parent.create(obj, function(error) {
-      assert.ok(error);
-      assert.ok(/ValidationError/.test(error.toString()));
-      db.close(done);
-    });
-  });
+      var bandSchema = new Schema({ guitarist: personSchema, name: String });
+      var Band = db.model('gh3679', bandSchema);
+      var obj = { name: "Guns N' Roses", guitarist: { name: 'Slash' } };
 
-  it('handles virtuals with dots correctly (gh-3618)', function(done) {
-    var db = start();
-    var testSchema = new Schema({ nested: { type: Object, default: {} } });
-    testSchema.virtual('nested.test').get(function() {
-      return true;
-    });
-
-    var Test = db.model('gh3618', testSchema);
-
-    var test = new Test();
-
-    var doc = test.toObject({ getters: true, virtuals: true });
-    delete doc._id;
-    delete doc.id;
-    assert.deepEqual(doc, { nested: { test: true } });
-
-    doc = test.toObject({ getters: false, virtuals: true });
-    delete doc._id;
-    delete doc.id;
-    assert.deepEqual(doc, { nested: { test: true } });
-    db.close(done);
-  });
-
-  it('handles pushing with numeric keys (gh-3623)', function(done) {
-    var db = start();
-    var schema = new Schema({
-      array: [{
-        1: {
-          date: Date
-        },
-        2: {
-          date: Date
-        },
-        3: {
-          date: Date
-        }
-      }]
-    });
-
-    var MyModel = db.model('gh3623', schema);
-
-    var doc = { array: [{ 2: {} }] };
-    MyModel.collection.insertOne(doc, function(error) {
-      assert.ifError(error);
-
-      MyModel.findOne({ _id: doc._id }, function(error, doc) {
+      Band.create(obj, function(error) {
         assert.ifError(error);
-        doc.array.push({ 2: {} });
-        doc.save(function(error) {
+        setTimeout(function() {
+          assert.equal(postHookCalls.length, 1);
+          assert.equal(postHookCalls[0].name, 'Slash');
+          done();
+        });
+      });
+    });
+
+    it('single embedded docs .set() (gh-3686)', function(done) {
+      var personSchema = new Schema({ name: String, realName: String });
+
+      var bandSchema = new Schema({
+        guitarist: personSchema,
+        name: String
+      });
+      var Band = db.model('gh3686', bandSchema);
+      var obj = {
+        name: "Guns N' Roses",
+        guitarist: { name: 'Slash', realName: 'Saul Hudson' }
+      };
+
+      Band.create(obj, function(error, gnr) {
+        gnr.set('guitarist.name', 'Buckethead');
+        gnr.save(function(error) {
           assert.ifError(error);
-          db.close(done);
+          assert.equal(gnr.guitarist.name, 'Buckethead');
+          assert.equal(gnr.guitarist.realName, 'Saul Hudson');
+          done();
+        });
+      });
+    });
+
+    it('single embedded docs with arrays pre hooks (gh-3680)', function(done) {
+      var childSchema = Schema({ count: Number });
+
+      var preCalls = 0;
+      childSchema.pre('save', function(next) {
+        ++preCalls;
+        next();
+      });
+
+      var SingleNestedSchema = new Schema({
+        children: [childSchema]
+      });
+
+      var ParentSchema = new Schema({
+        singleNested: SingleNestedSchema
+      });
+
+      var Parent = db.model('gh3680', ParentSchema);
+      var obj = { singleNested: { children: [{ count: 0 }] } };
+      Parent.create(obj, function(error) {
+        assert.ifError(error);
+        assert.equal(preCalls, 1);
+        done();
+      });
+    });
+
+    it('nested single embedded doc validation (gh-3702)', function(done) {
+      var childChildSchema = Schema({ count: { type: Number, min: 1 } });
+      var childSchema = new Schema({ child: childChildSchema });
+      var parentSchema = new Schema({ child: childSchema });
+
+      var Parent = db.model('gh3702', parentSchema);
+      var obj = { child: { child: { count: 0 } } };
+      Parent.create(obj, function(error) {
+        assert.ok(error);
+        assert.ok(/ValidationError/.test(error.toString()));
+        done();
+      });
+    });
+
+    it('handles virtuals with dots correctly (gh-3618)', function(done) {
+      var testSchema = new Schema({ nested: { type: Object, default: {} } });
+      testSchema.virtual('nested.test').get(function() {
+        return true;
+      });
+
+      var Test = db.model('gh3618', testSchema);
+
+      var test = new Test();
+
+      var doc = test.toObject({ getters: true, virtuals: true });
+      delete doc._id;
+      delete doc.id;
+      assert.deepEqual(doc, { nested: { test: true } });
+
+      doc = test.toObject({ getters: false, virtuals: true });
+      delete doc._id;
+      delete doc.id;
+      assert.deepEqual(doc, { nested: { test: true } });
+      done();
+    });
+
+    it('handles pushing with numeric keys (gh-3623)', function(done) {
+      var schema = new Schema({
+        array: [{
+          1: {
+            date: Date
+          },
+          2: {
+            date: Date
+          },
+          3: {
+            date: Date
+          }
+        }]
+      });
+
+      var MyModel = db.model('gh3623', schema);
+
+      var doc = { array: [{ 2: {} }] };
+      MyModel.collection.insertOne(doc, function(error) {
+        assert.ifError(error);
+
+        MyModel.findOne({ _id: doc._id }, function(error, doc) {
+          assert.ifError(error);
+          doc.array.push({ 2: {} });
+          doc.save(function(error) {
+            assert.ifError(error);
+            done();
+          });
         });
       });
     });

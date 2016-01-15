@@ -67,7 +67,7 @@ describe('aggregate: ', function() {
       done();
     });
 
-    it('supports array as single argument', function (done) {
+    it('supports array as single argument', function(done) {
       var aggregate = new Aggregate();
 
       assert.equal(aggregate.append([{$a: 1}, {$b: 2}, {$c: 3}]), aggregate);
@@ -95,7 +95,7 @@ describe('aggregate: ', function() {
         aggregate.append({ $a: 1 }, { a: 1 });
       }, regexp);
 
-      assert.throws(function () {
+      assert.throws(function() {
         aggregate.append([{$a: 1}, {a: 1}]);
       }, regexp);
 
@@ -112,10 +112,10 @@ describe('aggregate: ', function() {
       done();
     });
 
-    it('does not throw when empty array is passed as single argument', function (done) {
+    it('does not throw when empty array is passed as single argument', function(done) {
       var aggregate = new Aggregate();
 
-      assert.doesNotThrow(function () {
+      assert.doesNotThrow(function() {
         aggregate.append([]);
       });
 

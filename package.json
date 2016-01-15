@@ -1,7 +1,7 @@
 {
   "name": "mongoose",
   "description": "Mongoose MongoDB ODM",
-  "version": "4.3.5",
+  "version": "4.3.6",
   "author": "Guillermo Rauch <guillermo@learnboost.com>",
   "keywords": [
     "mongodb",
@@ -20,10 +20,10 @@
   "license": "MIT",
   "dependencies": {
     "async": "0.9.0",
-    "bson": "0.4.19",
+    "bson": "0.4.21",
     "hooks-fixed": "1.1.0",
     "kareem": "1.0.1",
-    "mongodb": "2.1.2",
+    "mongodb": "2.1.4",
     "mpath": "0.1.1",
     "mpromise": "0.5.4",
     "mquery": "1.6.3",
@@ -33,13 +33,13 @@
     "sliced": "0.0.5"
   },
   "devDependencies": {
-    "acquit": "0.3.0",
-    "acquit-ignore": "0.0.1",
+    "acquit": "0.4.1",
+    "acquit-ignore": "0.0.3",
     "benchmark": "1.0.0",
     "bluebird": "2.9.34",
     "co": "3.1.0",
     "dox": "0.3.1",
-    "eslint": "1.10.1",
+    "eslint": "2.0.0-alpha-2",
     "highlight.js": "7.0.1",
     "istanbul": "^0.3.13",
     "jade": "0.26.3",
@@ -50,7 +50,7 @@
     "open": "0.0.3",
     "q": "1.4.1",
     "tbd": "0.6.4",
-    "uglify-js": "2.4.24",
+    "uglify-js": "2.6.1",
     "underscore": "1.5.2"
   },
   "browserDependencies": {

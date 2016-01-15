@@ -1,3 +1,15 @@
+4.3.6 / 2016-01-15
+==================
+ * fix(types): casting a number to a buffer #3764
+ * fix: add "listener" to reserved keywords #3759
+ * chore: upgrade uglify #3757 [ChristianMurphy](https://github.com/ChristianMurphy)
+ * fix: broken execPopulate() in 4.3.5 #3755 #3753
+ * fix: ability to remove() a single embedded doc #3754
+ * style: comma-last in test folder #3751 [ChristianMurphy](https://github.com/ChristianMurphy)
+ * docs: clarify versionKey option #3747
+ * fix: improve colorization for arrays #3744 [TrejGun](https://github.com/TrejGun)
+ * fix: webpack build #3713
+
 4.3.5 / 2016-01-09
 ==================
  * fix(query): throw when 4th parameter to update not a function #3741 [kasselTrankos](https://github.com/kasselTrankos)

@@ -234,9 +234,9 @@ describe('schema', function() {
       , arrayX    : { $type: Array, default: 9 }
       , arrayFn   : { $type: Array, default: function() { return [8]; } }
       , callback  : { $type: Number, default: function() {
-          assert.equal('b', this.a);
-          return '3';
-        }}
+        assert.equal('b', this.a);
+        return '3';
+      }}
     }, { typeKey: '$type' });
 
     assert.equal(Test.path('simple').defaultValue, 'a');

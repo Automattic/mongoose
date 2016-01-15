@@ -1422,7 +1422,7 @@ describe('model: update:', function() {
           arr: [String]
         });
 
-        schema.path('arr').validate(function(v) {
+        schema.path('arr').validate(function() {
           return false;
         });
 

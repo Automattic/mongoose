@@ -4,20 +4,20 @@
  * Test dependencies.
  */
 
-var start = require('./common')
-  , assert = require('assert')
-  , mongoose = start.mongoose
-  , utils = require('../lib/utils')
-  , random = utils.random
-  , Schema = mongoose.Schema
-  , DocObjectId = mongoose.Types.ObjectId;
+var start = require('./common'),
+    assert = require('assert'),
+    mongoose = start.mongoose,
+    utils = require('../lib/utils'),
+    random = utils.random,
+    Schema = mongoose.Schema,
+    DocObjectId = mongoose.Types.ObjectId;
 
 /**
  * Setup.
  */
 
-var posts = 'blogposts_' + random()
-  , users = 'users_' + random();
+var posts = 'blogposts_' + random(),
+    users = 'users_' + random();
 
 /**
  * Tests.
@@ -26,10 +26,10 @@ var posts = 'blogposts_' + random()
 describe('model: populate:', function() {
   describe('setting populated paths (gh-570)', function() {
     var types = {
-      'ObjectId': DocObjectId
-      , 'String': String
-      , 'Number': Number
-      , 'Buffer': Buffer
+      'ObjectId': DocObjectId,
+      'String': String,
+      'Number': Number,
+      'Buffer': Buffer
     };
 
     var construct = {};
@@ -52,20 +52,20 @@ describe('model: populate:', function() {
           refuser = 'RefUser-' + id;
 
           var bSchema = Schema({
-            title: String
-            , fans: [{type: id, ref: refuser }]
-            , adhoc: [{ subdoc: id, subarray: [{ things: [id] }] }]
-            , _creator: { type: id, ref: refuser }
-            , embed: [{
-              other: { type: id, ref: refuser }
-                , array: [{ type: id, ref: refuser }]
+            title: String,
+            fans: [{type: id, ref: refuser }],
+            adhoc: [{ subdoc: id, subarray: [{ things: [id] }] }],
+            _creator: { type: id, ref: refuser },
+            embed: [{
+              other: { type: id, ref: refuser },
+              array: [{ type: id, ref: refuser }]
             }]
           });
 
           var uSchema = Schema({
-            _id: id
-            , name: String
-            , email: String
+            _id: id,
+            name: String,
+            email: String
           });
 
           db = start();
@@ -73,30 +73,30 @@ describe('model: populate:', function() {
           U = db.model(refuser, uSchema, users + random());
 
           U.create({
-            _id: construct[id]()
-            , name  : 'Fan 1'
-            , email : 'fan1@learnboost.com'
+            _id: construct[id](),
+            name: 'Fan 1',
+            email: 'fan1@learnboost.com'
           }, {
-            _id: construct[id]()
-            , name  : 'Fan 2'
-            , email : 'fan2@learnboost.com'
+            _id: construct[id](),
+            name: 'Fan 2',
+            email: 'fan2@learnboost.com'
           }, function(err, fan1, fan2) {
             assert.ifError(err);
             u1 = fan1;
 
             B.create({
-              title : 'Woot'
-              , fans  : [fan1, fan2]
-              , adhoc : [{ subdoc: fan2, subarray: [{ things: [fan1] }]}]
-              , _creator: fan1
-              , embed : [{ other: fan1, array: [fan1, fan2] }, { other: fan2, array: [fan2, fan1] }]
+              title: 'Woot',
+              fans: [fan1, fan2],
+              adhoc: [{ subdoc: fan2, subarray: [{ things: [fan1] }]}],
+              _creator: fan1,
+              embed: [{ other: fan1, array: [fan1, fan2] }, { other: fan2, array: [fan2, fan1] }]
             }, {
-              title : 'Woot2'
-              , fans  : [fan2, fan1]
-              , adhoc : [{ subdoc: fan1, subarray: [{ things: [fan2] }]}]
-              , _creator: fan1
-              , _creator: fan2
-              , embed : [{ other: fan2, array: [fan2, fan1] }, { other: fan1, array: [fan1, fan2] }]
+              title: 'Woot2',
+              fans: [fan2, fan1],
+              adhoc: [{ subdoc: fan1, subarray: [{ things: [fan2] }]}],
+              _creator: fan1,
+              _creator: fan2,
+              embed: [{ other: fan2, array: [fan2, fan1] }, { other: fan1, array: [fan1, fan2] }]
             }, function(err, post1, post2) {
               assert.ifError(err);
               b1 = post1;

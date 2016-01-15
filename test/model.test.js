@@ -2109,9 +2109,9 @@ describe('Model', function() {
           type:Number
             , set: function(x) { return x / 2;}
             , get: function(x) {
-                called = true;
-                return x * 2;
-              }
+              called = true;
+              return x * 2;
+            }
         }
       });
 
@@ -4180,11 +4180,11 @@ describe('Model', function() {
       db.close();
 
       var out = post.inspect();
-      assert.ok(/meta: { visitors: 45 }/.test(out));
-      assert.ok(/numbers: \[ 5, 6, 7 \]/.test(out));
-      assert.ok(/Wed.+ 2011 \d\d:02:31 GMT/.test(out));
-      assert.ok(!/activePaths:/.test(out));
-      assert.ok(!/_atomics:/.test(out));
+      assert.equal(out.meta.visitors, post.meta.visitors);
+      assert.deepEqual(out.numbers, Array.prototype.slice.call(post.numbers));
+      assert.equal(out.date.valueOf(), post.date.valueOf());
+      assert.equal(out.activePaths, undefined);
+      assert.equal(out._atomics, undefined);
       done();
     });
   });

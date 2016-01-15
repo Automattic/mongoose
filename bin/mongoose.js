@@ -129,7 +129,7 @@ if (typeof window !== 'undefined') {
 }
 
 }).call(this,require("buffer").Buffer)
-},{"./document_provider.js":6,"./error":12,"./schema":26,"./schematype.js":39,"./types":45,"./utils.js":48,"./virtualtype":49,"buffer":52}],3:[function(require,module,exports){
+},{"./document_provider.js":6,"./error":12,"./schema":26,"./schematype.js":39,"./types":45,"./utils.js":48,"./virtualtype":49,"buffer":71}],3:[function(require,module,exports){
 /*!
  * Module dependencies.
  */
@@ -236,7 +236,7 @@ Document.prototype.constructor = Document;
 Document.ValidationError = ValidationError;
 module.exports = exports = Document;
 
-},{"./document":5,"./error":12,"./internal":23,"./schema":26,"./types/objectid":46,"./utils":48,"events":56}],4:[function(require,module,exports){
+},{"./document":5,"./error":12,"./internal":23,"./schema":26,"./types/objectid":46,"./utils":48,"events":74}],4:[function(require,module,exports){
 /*!
  * Module dependencies.
  */
@@ -969,7 +969,7 @@ Document.prototype.set = function(path, val, type, options) {
             this.set(prefix + key,
               path[key].toObject({ virtuals: false }), constructing);
           } else if ('throw' == strict) {
-            if (pathtype ==='nested') {
+            if (pathtype === 'nested') {
               throw new ObjectExpectedError(key, path[key]);
             } else {
               throw new StrictModeError(key);
@@ -2562,7 +2562,7 @@ Document.prototype.inspect = function(options) {
   var opts = options && 'Object' == utils.getFunctionName(options.constructor) ? options : {};
   opts.minimize = false;
   opts.retainKeyOrder = true;
-  return inspect(this.toObject(opts));
+  return this.toObject(opts);
 };
 
 /**
@@ -2572,7 +2572,9 @@ Document.prototype.inspect = function(options) {
  * @method toString
  */
 
-Document.prototype.toString = Document.prototype.inspect;
+Document.prototype.toString = function() {
+  return inspect(this.inspect());
+};
 
 /**
  * Returns true if the Document stores the same data as doc.
@@ -2687,19 +2689,23 @@ Document.prototype.populate = function populate() {
  *     doc.execPopulate()
  *
  *
- * ####NOTE:
- *
- * Population does not occur unless a `callback` is passed.
- * Passing the same path a second time will overwrite the previous path options.
- * See [Model.populate()](#model_Model.populate) for explaination of options.
- *
  * @see Document.populate #Document_model.populate
  * @api public
  * @return {Promise} promise that resolves to the document when population is done
  */
 
 Document.prototype.execPopulate = function() {
-  return this.populate(function() {});
+  var Promise = PromiseProvider.get();
+  var _this = this;
+  return new Promise.ES6(function(resolve, reject) {
+    _this.populate(function(error, res) {
+      if (error) {
+        reject(error);
+      } else {
+        resolve(res);
+      }
+    });
+  });
 };
 
 /**
@@ -2790,8 +2796,8 @@ Document.prototype.$__fullPath = function(path) {
 Document.ValidationError = ValidationError;
 module.exports = exports = Document;
 
-}).call(this,require("FWaASH"),require("buffer").Buffer)
-},{"./error":12,"./error/objectExpected":17,"./error/strict":19,"./internal":23,"./promise_provider":25,"./schema":26,"./schema/mixed":34,"./schematype":39,"./types/array":41,"./types/documentarray":43,"./types/embedded":44,"./utils":48,"FWaASH":58,"buffer":52,"events":56,"hooks-fixed":79,"util":60}],6:[function(require,module,exports){
+}).call(this,require("g5I+bs"),require("buffer").Buffer)
+},{"./error":12,"./error/objectExpected":17,"./error/strict":19,"./internal":23,"./promise_provider":25,"./schema":26,"./schema/mixed":34,"./schematype":39,"./types/array":41,"./types/documentarray":43,"./types/embedded":44,"./utils":48,"buffer":71,"events":74,"g5I+bs":92,"hooks-fixed":75,"util":97}],6:[function(require,module,exports){
 'use strict';
 
 /*!
@@ -2833,7 +2839,7 @@ var Binary = require('bson').Binary;
 
 module.exports = exports = Binary;
 
-},{"bson":63}],9:[function(require,module,exports){
+},{"bson":55}],9:[function(require,module,exports){
 /*!
  * Module exports.
  */
@@ -2858,7 +2864,7 @@ var ObjectId = require('bson').ObjectID;
 
 module.exports = exports = ObjectId;
 
-},{"bson":63}],11:[function(require,module,exports){
+},{"bson":55}],11:[function(require,module,exports){
 (function (global){
 /*!
  * ignore
@@ -3708,7 +3714,7 @@ Promise.prototype.addErrback = Promise.prototype.onReject;
 
 module.exports = Promise;
 
-},{"mpromise":83,"util":60}],25:[function(require,module,exports){
+},{"mpromise":82,"util":97}],25:[function(require,module,exports){
 /*!
  * Module dependencies.
  */
@@ -3761,7 +3767,7 @@ Promise.reset = function() {
 
 module.exports = Promise;
 
-},{"./ES6Promise":1,"./promise":24,"mquery":88}],26:[function(require,module,exports){
+},{"./ES6Promise":1,"./promise":24,"mquery":87}],26:[function(require,module,exports){
 (function (Buffer){
 /*!
  * Module dependencies.
@@ -3814,7 +3820,7 @@ var IS_QUERY_HOOK = {
  * - [toObject](/docs/guide.html#toObject) - object - no default
  * - [typeKey](/docs/guide.html#typeKey) - string - defaults to 'type'
  * - [validateBeforeSave](/docs/guide.html#validateBeforeSave) - bool - defaults to `true`
- * - [versionKey](/docs/guide.html#versionKey): bool - defaults to "__v"
+ * - [versionKey](/docs/guide.html#versionKey): string - defaults to "__v"
  *
  * ####Note:
  *
@@ -4175,6 +4181,8 @@ var reserved = Schema.reserved;
 reserved.emit =
 reserved.on =
 reserved.once =
+reserved.listeners =
+reserved.removeListener =
 // document properties and functions
 reserved.collection =
 reserved.db =
@@ -4265,7 +4273,7 @@ Schema.prototype.path = function(path, obj) {
       this.singleNestedPaths[path + '.' + key] =
         this.paths[path].schema.paths[key];
     }
-    for (var key in this.paths[path].schema.singleNestedPaths) {
+    for (key in this.paths[path].schema.singleNestedPaths) {
       this.singleNestedPaths[path + '.' + key] =
         this.paths[path].schema.singleNestedPaths[key];
     }
@@ -5042,7 +5050,7 @@ Schema.Types = MongooseTypes = require('./schema/index');
 exports.ObjectId = MongooseTypes.ObjectId;
 
 }).call(this,require("buffer").Buffer)
-},{"./drivers":11,"./schema/index":33,"./utils":48,"./virtualtype":49,"async":50,"buffer":52,"events":56,"kareem":80}],27:[function(require,module,exports){
+},{"./drivers":11,"./schema/index":33,"./utils":48,"./virtualtype":49,"async":51,"buffer":71,"events":74,"kareem":79}],27:[function(require,module,exports){
 /*!
  * Module dependencies.
  */
@@ -5660,6 +5668,9 @@ SchemaBuffer.prototype.cast = function(value, doc, init) {
 
   var type = typeof value;
   if ('string' == type || 'number' == type || Array.isArray(value)) {
+    if (type === 'number') {
+      value = [value];
+    }
     ret = new MongooseBuffer(value, [this.path, doc]);
     return ret;
   }
@@ -5714,7 +5725,7 @@ SchemaBuffer.prototype.castForQuery = function($conditional, val) {
 module.exports = SchemaBuffer;
 
 }).call(this,require("buffer").Buffer)
-},{"../schematype":39,"../types":45,"../utils":48,"./../document":5,"./operators/bitwise":37,"buffer":52}],30:[function(require,module,exports){
+},{"../schematype":39,"../types":45,"../utils":48,"./../document":5,"./operators/bitwise":37,"buffer":71}],30:[function(require,module,exports){
 /*!
  * Module requirements.
  */
@@ -6077,7 +6088,6 @@ DocumentArray.prototype.constructor = DocumentArray;
  */
 
 DocumentArray.prototype.doValidate = function(array, fn, scope, options) {
-  var _this = this;
   SchemaType.prototype.doValidate.call(this, array, function(err) {
     if (err) {
       return fn(err);
@@ -6820,7 +6830,7 @@ SchemaNumber.prototype.castForQuery = function($conditional, val) {
 module.exports = SchemaNumber;
 
 }).call(this,require("buffer").Buffer)
-},{"../error":12,"../schematype":39,"../utils":48,"./../document":5,"./operators/bitwise":37,"buffer":52}],36:[function(require,module,exports){
+},{"../error":12,"../schematype":39,"../utils":48,"./../document":5,"./operators/bitwise":37,"buffer":71}],36:[function(require,module,exports){
 (function (Buffer){
 /* eslint no-empty: 1 */
 
@@ -7018,7 +7028,7 @@ function resetId(v) {
 module.exports = ObjectId;
 
 }).call(this,require("buffer").Buffer)
-},{"../schematype":39,"../types/objectid":46,"../utils":48,"./../document":5,"buffer":52}],37:[function(require,module,exports){
+},{"../schematype":39,"../types/objectid":46,"../utils":48,"./../document":5,"buffer":71}],37:[function(require,module,exports){
 (function (Buffer){
 /*!
  * Module requirements.
@@ -7059,7 +7069,7 @@ function _castNumber(_this, num) {
 module.exports = handleBitwiseOperator;
 
 }).call(this,require("buffer").Buffer)
-},{"../../error/cast":13,"buffer":52}],38:[function(require,module,exports){
+},{"../../error/cast":13,"buffer":71}],38:[function(require,module,exports){
 (function (Buffer){
 
 /*!
@@ -7557,7 +7567,7 @@ SchemaString.prototype.castForQuery = function($conditional, val) {
 module.exports = SchemaString;
 
 }).call(this,require("buffer").Buffer)
-},{"../error":12,"../schematype":39,"../utils":48,"./../document":5,"buffer":52}],39:[function(require,module,exports){
+},{"../error":12,"../schematype":39,"../utils":48,"./../document":5,"buffer":71}],39:[function(require,module,exports){
 (function (Buffer){
 /*!
  * Module dependencies.
@@ -8416,7 +8426,7 @@ exports.CastError = CastError;
 exports.ValidatorError = ValidatorError;
 
 }).call(this,require("buffer").Buffer)
-},{"./error":12,"./utils":48,"buffer":52}],40:[function(require,module,exports){
+},{"./error":12,"./utils":48,"buffer":71}],40:[function(require,module,exports){
 
 /*!
  * Module dependencies.
@@ -9363,7 +9373,7 @@ MongooseArray.mixin.remove = MongooseArray.mixin.pull;
 module.exports = exports = MongooseArray;
 
 }).call(this,require("buffer").Buffer)
-},{"../document":5,"../utils":48,"./embedded":44,"./objectid":46,"buffer":52}],42:[function(require,module,exports){
+},{"../document":5,"../utils":48,"./embedded":44,"./objectid":46,"buffer":71}],42:[function(require,module,exports){
 (function (Buffer){
 /*!
  * Module dependencies.
@@ -9636,7 +9646,7 @@ MongooseBuffer.Binary = Binary;
 module.exports = MongooseBuffer;
 
 }).call(this,require("buffer").Buffer)
-},{"../drivers":11,"../utils":48,"buffer":52}],43:[function(require,module,exports){
+},{"../drivers":11,"../utils":48,"buffer":71}],43:[function(require,module,exports){
 (function (Buffer){
 /*!
  * Module dependencies.
@@ -9646,7 +9656,6 @@ var MongooseArray = require('./array'),
     ObjectId = require('./objectid'),
     ObjectIdSchema = require('../schema/objectid'),
     utils = require('../utils'),
-    util = require('util'),
     Document = require('../document');
 
 /**
@@ -9801,14 +9810,7 @@ MongooseDocumentArray.mixin.toObject = function(options) {
  */
 
 MongooseDocumentArray.mixin.inspect = function() {
-  return '[' + Array.prototype.map.call(this, function(doc) {
-    if (doc) {
-      return doc.inspect
-        ? doc.inspect()
-        : util.inspect(doc);
-    }
-    return 'null';
-  }).join('\n') + ']';
+  return Array.prototype.slice.call(this);
 };
 
 /**
@@ -9863,7 +9865,7 @@ MongooseDocumentArray.mixin.notify = function notify(event) {
 module.exports = MongooseDocumentArray;
 
 }).call(this,require("buffer").Buffer)
-},{"../document":5,"../schema/objectid":36,"../utils":48,"./array":41,"./objectid":46,"buffer":52,"util":60}],44:[function(require,module,exports){
+},{"../document":5,"../schema/objectid":36,"../utils":48,"./array":41,"./objectid":46,"buffer":71}],44:[function(require,module,exports){
 /* eslint no-func-assign: 1 */
 
 /*!
@@ -9871,7 +9873,6 @@ module.exports = MongooseDocumentArray;
  */
 
 var Document = require('../document_provider')();
-var inspect = require('util').inspect;
 var PromiseProvider = require('../promise_provider');
 
 /**
@@ -10022,7 +10023,7 @@ EmbeddedDocument.prototype.update = function() {
  */
 
 EmbeddedDocument.prototype.inspect = function() {
-  return inspect(this.toObject());
+  return this.toObject();
 };
 
 /**
@@ -10177,7 +10178,7 @@ EmbeddedDocument.prototype.parentArray = function() {
 
 module.exports = EmbeddedDocument;
 
-},{"../document_provider":6,"../promise_provider":25,"util":60}],45:[function(require,module,exports){
+},{"../document_provider":6,"../promise_provider":25}],45:[function(require,module,exports){
 
 /*!
  * Module exports.
@@ -10297,6 +10298,42 @@ Subdocument.prototype.ownerDocument = function() {
 
   return this.$__.ownerDocument = parent;
 };
+
+/**
+ * Null-out this subdoc
+ *
+ * @param {Function} [callback] optional callback for compatibility with Document.prototype.remove
+ */
+
+Subdocument.prototype.remove = function(callback) {
+  this.$parent.set(this.$basePath, null);
+  registerRemoveListener(this);
+  if (callback) {
+    callback(null);
+  }
+};
+
+/*!
+ * Registers remove event listeners for triggering
+ * on subdocuments.
+ *
+ * @param {EmbeddedDocument} sub
+ * @api private
+ */
+
+function registerRemoveListener(sub) {
+  var owner = sub.ownerDocument();
+
+  owner.on('save', emitRemove);
+  owner.on('remove', emitRemove);
+
+  function emitRemove() {
+    owner.removeListener('save', emitRemove);
+    owner.removeListener('remove', emitRemove);
+    sub.emit('remove', sub);
+    owner = sub = emitRemove = null;
+  }
+}
 
 },{"../document":5,"../promise_provider":25}],48:[function(require,module,exports){
 (function (process,Buffer){
@@ -11098,8 +11135,8 @@ exports.each = function(arr, fn) {
   }
 };
 
-}).call(this,require("FWaASH"),require("buffer").Buffer)
-},{"./document":5,"./types":45,"./types/objectid":46,"FWaASH":58,"buffer":52,"mpath":81,"ms":94,"regexp-clone":95,"sliced":96}],49:[function(require,module,exports){
+}).call(this,require("g5I+bs"),require("buffer").Buffer)
+},{"./document":5,"./types":45,"./types/objectid":46,"buffer":71,"g5I+bs":92,"mpath":80,"ms":91,"regexp-clone":93,"sliced":94}],49:[function(require,module,exports){
 
 /**
  * VirtualType constructor
@@ -11205,6 +11242,368 @@ VirtualType.prototype.applySetters = function(value, scope) {
 module.exports = VirtualType;
 
 },{}],50:[function(require,module,exports){
+// http://wiki.commonjs.org/wiki/Unit_Testing/1.0
+//
+// THIS IS NOT TESTED NOR LIKELY TO WORK OUTSIDE V8!
+//
+// Originally from narwhal.js (http://narwhaljs.org)
+// Copyright (c) 2009 Thomas Robinson <280north.com>
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the 'Software'), to
+// deal in the Software without restriction, including without limitation the
+// rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+// sell copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
+// ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+// WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+// when used in node, this will actually load the util module we depend on
+// versus loading the builtin util module as happens otherwise
+// this is a bug in node module loading as far as I am concerned
+var util = require('util/');
+
+var pSlice = Array.prototype.slice;
+var hasOwn = Object.prototype.hasOwnProperty;
+
+// 1. The assert module provides functions that throw
+// AssertionError's when particular conditions are not met. The
+// assert module must conform to the following interface.
+
+var assert = module.exports = ok;
+
+// 2. The AssertionError is defined in assert.
+// new assert.AssertionError({ message: message,
+//                             actual: actual,
+//                             expected: expected })
+
+assert.AssertionError = function AssertionError(options) {
+  this.name = 'AssertionError';
+  this.actual = options.actual;
+  this.expected = options.expected;
+  this.operator = options.operator;
+  if (options.message) {
+    this.message = options.message;
+    this.generatedMessage = false;
+  } else {
+    this.message = getMessage(this);
+    this.generatedMessage = true;
+  }
+  var stackStartFunction = options.stackStartFunction || fail;
+
+  if (Error.captureStackTrace) {
+    Error.captureStackTrace(this, stackStartFunction);
+  }
+  else {
+    // non v8 browsers so we can have a stacktrace
+    var err = new Error();
+    if (err.stack) {
+      var out = err.stack;
+
+      // try to strip useless frames
+      var fn_name = stackStartFunction.name;
+      var idx = out.indexOf('\n' + fn_name);
+      if (idx >= 0) {
+        // once we have located the function frame
+        // we need to strip out everything before it (and its line)
+        var next_line = out.indexOf('\n', idx + 1);
+        out = out.substring(next_line + 1);
+      }
+
+      this.stack = out;
+    }
+  }
+};
+
+// assert.AssertionError instanceof Error
+util.inherits(assert.AssertionError, Error);
+
+function replacer(key, value) {
+  if (util.isUndefined(value)) {
+    return '' + value;
+  }
+  if (util.isNumber(value) && (isNaN(value) || !isFinite(value))) {
+    return value.toString();
+  }
+  if (util.isFunction(value) || util.isRegExp(value)) {
+    return value.toString();
+  }
+  return value;
+}
+
+function truncate(s, n) {
+  if (util.isString(s)) {
+    return s.length < n ? s : s.slice(0, n);
+  } else {
+    return s;
+  }
+}
+
+function getMessage(self) {
+  return truncate(JSON.stringify(self.actual, replacer), 128) + ' ' +
+         self.operator + ' ' +
+         truncate(JSON.stringify(self.expected, replacer), 128);
+}
+
+// At present only the three keys mentioned above are used and
+// understood by the spec. Implementations or sub modules can pass
+// other keys to the AssertionError's constructor - they will be
+// ignored.
+
+// 3. All of the following functions must throw an AssertionError
+// when a corresponding condition is not met, with a message that
+// may be undefined if not provided.  All assertion methods provide
+// both the actual and expected values to the assertion error for
+// display purposes.
+
+function fail(actual, expected, message, operator, stackStartFunction) {
+  throw new assert.AssertionError({
+    message: message,
+    actual: actual,
+    expected: expected,
+    operator: operator,
+    stackStartFunction: stackStartFunction
+  });
+}
+
+// EXTENSION! allows for well behaved errors defined elsewhere.
+assert.fail = fail;
+
+// 4. Pure assertion tests whether a value is truthy, as determined
+// by !!guard.
+// assert.ok(guard, message_opt);
+// This statement is equivalent to assert.equal(true, !!guard,
+// message_opt);. To test strictly for the value true, use
+// assert.strictEqual(true, guard, message_opt);.
+
+function ok(value, message) {
+  if (!value) fail(value, true, message, '==', assert.ok);
+}
+assert.ok = ok;
+
+// 5. The equality assertion tests shallow, coercive equality with
+// ==.
+// assert.equal(actual, expected, message_opt);
+
+assert.equal = function equal(actual, expected, message) {
+  if (actual != expected) fail(actual, expected, message, '==', assert.equal);
+};
+
+// 6. The non-equality assertion tests for whether two objects are not equal
+// with != assert.notEqual(actual, expected, message_opt);
+
+assert.notEqual = function notEqual(actual, expected, message) {
+  if (actual == expected) {
+    fail(actual, expected, message, '!=', assert.notEqual);
+  }
+};
+
+// 7. The equivalence assertion tests a deep equality relation.
+// assert.deepEqual(actual, expected, message_opt);
+
+assert.deepEqual = function deepEqual(actual, expected, message) {
+  if (!_deepEqual(actual, expected)) {
+    fail(actual, expected, message, 'deepEqual', assert.deepEqual);
+  }
+};
+
+function _deepEqual(actual, expected) {
+  // 7.1. All identical values are equivalent, as determined by ===.
+  if (actual === expected) {
+    return true;
+
+  } else if (util.isBuffer(actual) && util.isBuffer(expected)) {
+    if (actual.length != expected.length) return false;
+
+    for (var i = 0; i < actual.length; i++) {
+      if (actual[i] !== expected[i]) return false;
+    }
+
+    return true;
+
+  // 7.2. If the expected value is a Date object, the actual value is
+  // equivalent if it is also a Date object that refers to the same time.
+  } else if (util.isDate(actual) && util.isDate(expected)) {
+    return actual.getTime() === expected.getTime();
+
+  // 7.3 If the expected value is a RegExp object, the actual value is
+  // equivalent if it is also a RegExp object with the same source and
+  // properties (`global`, `multiline`, `lastIndex`, `ignoreCase`).
+  } else if (util.isRegExp(actual) && util.isRegExp(expected)) {
+    return actual.source === expected.source &&
+           actual.global === expected.global &&
+           actual.multiline === expected.multiline &&
+           actual.lastIndex === expected.lastIndex &&
+           actual.ignoreCase === expected.ignoreCase;
+
+  // 7.4. Other pairs that do not both pass typeof value == 'object',
+  // equivalence is determined by ==.
+  } else if (!util.isObject(actual) && !util.isObject(expected)) {
+    return actual == expected;
+
+  // 7.5 For all other Object pairs, including Array objects, equivalence is
+  // determined by having the same number of owned properties (as verified
+  // with Object.prototype.hasOwnProperty.call), the same set of keys
+  // (although not necessarily the same order), equivalent values for every
+  // corresponding key, and an identical 'prototype' property. Note: this
+  // accounts for both named and indexed properties on Arrays.
+  } else {
+    return objEquiv(actual, expected);
+  }
+}
+
+function isArguments(object) {
+  return Object.prototype.toString.call(object) == '[object Arguments]';
+}
+
+function objEquiv(a, b) {
+  if (util.isNullOrUndefined(a) || util.isNullOrUndefined(b))
+    return false;
+  // an identical 'prototype' property.
+  if (a.prototype !== b.prototype) return false;
+  //~~~I've managed to break Object.keys through screwy arguments passing.
+  //   Converting to array solves the problem.
+  if (isArguments(a)) {
+    if (!isArguments(b)) {
+      return false;
+    }
+    a = pSlice.call(a);
+    b = pSlice.call(b);
+    return _deepEqual(a, b);
+  }
+  try {
+    var ka = objectKeys(a),
+        kb = objectKeys(b),
+        key, i;
+  } catch (e) {//happens when one is a string literal and the other isn't
+    return false;
+  }
+  // having the same number of owned properties (keys incorporates
+  // hasOwnProperty)
+  if (ka.length != kb.length)
+    return false;
+  //the same set of keys (although not necessarily the same order),
+  ka.sort();
+  kb.sort();
+  //~~~cheap key test
+  for (i = ka.length - 1; i >= 0; i--) {
+    if (ka[i] != kb[i])
+      return false;
+  }
+  //equivalent values for every corresponding key, and
+  //~~~possibly expensive deep test
+  for (i = ka.length - 1; i >= 0; i--) {
+    key = ka[i];
+    if (!_deepEqual(a[key], b[key])) return false;
+  }
+  return true;
+}
+
+// 8. The non-equivalence assertion tests for any deep inequality.
+// assert.notDeepEqual(actual, expected, message_opt);
+
+assert.notDeepEqual = function notDeepEqual(actual, expected, message) {
+  if (_deepEqual(actual, expected)) {
+    fail(actual, expected, message, 'notDeepEqual', assert.notDeepEqual);
+  }
+};
+
+// 9. The strict equality assertion tests strict equality, as determined by ===.
+// assert.strictEqual(actual, expected, message_opt);
+
+assert.strictEqual = function strictEqual(actual, expected, message) {
+  if (actual !== expected) {
+    fail(actual, expected, message, '===', assert.strictEqual);
+  }
+};
+
+// 10. The strict non-equality assertion tests for strict inequality, as
+// determined by !==.  assert.notStrictEqual(actual, expected, message_opt);
+
+assert.notStrictEqual = function notStrictEqual(actual, expected, message) {
+  if (actual === expected) {
+    fail(actual, expected, message, '!==', assert.notStrictEqual);
+  }
+};
+
+function expectedException(actual, expected) {
+  if (!actual || !expected) {
+    return false;
+  }
+
+  if (Object.prototype.toString.call(expected) == '[object RegExp]') {
+    return expected.test(actual);
+  } else if (actual instanceof expected) {
+    return true;
+  } else if (expected.call({}, actual) === true) {
+    return true;
+  }
+
+  return false;
+}
+
+function _throws(shouldThrow, block, expected, message) {
+  var actual;
+
+  if (util.isString(expected)) {
+    message = expected;
+    expected = null;
+  }
+
+  try {
+    block();
+  } catch (e) {
+    actual = e;
+  }
+
+  message = (expected && expected.name ? ' (' + expected.name + ').' : '.') +
+            (message ? ' ' + message : '.');
+
+  if (shouldThrow && !actual) {
+    fail(actual, expected, 'Missing expected exception' + message);
+  }
+
+  if (!shouldThrow && expectedException(actual, expected)) {
+    fail(actual, expected, 'Got unwanted exception' + message);
+  }
+
+  if ((shouldThrow && actual && expected &&
+      !expectedException(actual, expected)) || (!shouldThrow && actual)) {
+    throw actual;
+  }
+}
+
+// 11. Expected to throw an error:
+// assert.throws(block, Error_opt, message_opt);
+
+assert.throws = function(block, /*optional*/error, /*optional*/message) {
+  _throws.apply(this, [true].concat(pSlice.call(arguments)));
+};
+
+// EXTENSION! This is annoying to write outside this module.
+assert.doesNotThrow = function(block, /*optional*/message) {
+  _throws.apply(this, [false].concat(pSlice.call(arguments)));
+};
+
+assert.ifError = function(err) { if (err) {throw err;}};
+
+var objectKeys = Object.keys || function (obj) {
+  var keys = [];
+  for (var key in obj) {
+    if (hasOwn.call(obj, key)) keys.push(key);
+  }
+  return keys;
+};
+
+},{"util/":97}],51:[function(require,module,exports){
 (function (process){
 /*!
  * async
@@ -12330,370 +12729,5397 @@ module.exports = VirtualType;
 
 }());
 
-}).call(this,require("FWaASH"))
-},{"FWaASH":58}],51:[function(require,module,exports){
-// http://wiki.commonjs.org/wiki/Unit_Testing/1.0
-//
-// THIS IS NOT TESTED NOR LIKELY TO WORK OUTSIDE V8!
-//
-// Originally from narwhal.js (http://narwhaljs.org)
-// Copyright (c) 2009 Thomas Robinson <280north.com>
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the 'Software'), to
-// deal in the Software without restriction, including without limitation the
-// rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
-// sell copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
-// ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
-// WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+}).call(this,require("g5I+bs"))
+},{"g5I+bs":92}],52:[function(require,module,exports){
+var lookup = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
 
-// when used in node, this will actually load the util module we depend on
-// versus loading the builtin util module as happens otherwise
-// this is a bug in node module loading as far as I am concerned
-var util = require('util/');
+;(function (exports) {
+	'use strict';
 
-var pSlice = Array.prototype.slice;
-var hasOwn = Object.prototype.hasOwnProperty;
+  var Arr = (typeof Uint8Array !== 'undefined')
+    ? Uint8Array
+    : Array
 
-// 1. The assert module provides functions that throw
-// AssertionError's when particular conditions are not met. The
-// assert module must conform to the following interface.
+	var PLUS   = '+'.charCodeAt(0)
+	var SLASH  = '/'.charCodeAt(0)
+	var NUMBER = '0'.charCodeAt(0)
+	var LOWER  = 'a'.charCodeAt(0)
+	var UPPER  = 'A'.charCodeAt(0)
 
-var assert = module.exports = ok;
+	function decode (elt) {
+		var code = elt.charCodeAt(0)
+		if (code === PLUS)
+			return 62 // '+'
+		if (code === SLASH)
+			return 63 // '/'
+		if (code < NUMBER)
+			return -1 //no match
+		if (code < NUMBER + 10)
+			return code - NUMBER + 26 + 26
+		if (code < UPPER + 26)
+			return code - UPPER
+		if (code < LOWER + 26)
+			return code - LOWER + 26
+	}
 
-// 2. The AssertionError is defined in assert.
-// new assert.AssertionError({ message: message,
-//                             actual: actual,
-//                             expected: expected })
+	function b64ToByteArray (b64) {
+		var i, j, l, tmp, placeHolders, arr
 
-assert.AssertionError = function AssertionError(options) {
-  this.name = 'AssertionError';
-  this.actual = options.actual;
-  this.expected = options.expected;
-  this.operator = options.operator;
-  if (options.message) {
-    this.message = options.message;
-    this.generatedMessage = false;
+		if (b64.length % 4 > 0) {
+			throw new Error('Invalid string. Length must be a multiple of 4')
+		}
+
+		// the number of equal signs (place holders)
+		// if there are two placeholders, than the two characters before it
+		// represent one byte
+		// if there is only one, then the three characters before it represent 2 bytes
+		// this is just a cheap hack to not do indexOf twice
+		var len = b64.length
+		placeHolders = '=' === b64.charAt(len - 2) ? 2 : '=' === b64.charAt(len - 1) ? 1 : 0
+
+		// base64 is 4/3 + up to two characters of the original data
+		arr = new Arr(b64.length * 3 / 4 - placeHolders)
+
+		// if there are placeholders, only get up to the last complete 4 chars
+		l = placeHolders > 0 ? b64.length - 4 : b64.length
+
+		var L = 0
+
+		function push (v) {
+			arr[L++] = v
+		}
+
+		for (i = 0, j = 0; i < l; i += 4, j += 3) {
+			tmp = (decode(b64.charAt(i)) << 18) | (decode(b64.charAt(i + 1)) << 12) | (decode(b64.charAt(i + 2)) << 6) | decode(b64.charAt(i + 3))
+			push((tmp & 0xFF0000) >> 16)
+			push((tmp & 0xFF00) >> 8)
+			push(tmp & 0xFF)
+		}
+
+		if (placeHolders === 2) {
+			tmp = (decode(b64.charAt(i)) << 2) | (decode(b64.charAt(i + 1)) >> 4)
+			push(tmp & 0xFF)
+		} else if (placeHolders === 1) {
+			tmp = (decode(b64.charAt(i)) << 10) | (decode(b64.charAt(i + 1)) << 4) | (decode(b64.charAt(i + 2)) >> 2)
+			push((tmp >> 8) & 0xFF)
+			push(tmp & 0xFF)
+		}
+
+		return arr
+	}
+
+	function uint8ToBase64 (uint8) {
+		var i,
+			extraBytes = uint8.length % 3, // if we have 1 byte left, pad 2 bytes
+			output = "",
+			temp, length
+
+		function encode (num) {
+			return lookup.charAt(num)
+		}
+
+		function tripletToBase64 (num) {
+			return encode(num >> 18 & 0x3F) + encode(num >> 12 & 0x3F) + encode(num >> 6 & 0x3F) + encode(num & 0x3F)
+		}
+
+		// go through the array every three bytes, we'll deal with trailing stuff later
+		for (i = 0, length = uint8.length - extraBytes; i < length; i += 3) {
+			temp = (uint8[i] << 16) + (uint8[i + 1] << 8) + (uint8[i + 2])
+			output += tripletToBase64(temp)
+		}
+
+		// pad the end with zeros, but make sure to not forget the extra bytes
+		switch (extraBytes) {
+			case 1:
+				temp = uint8[uint8.length - 1]
+				output += encode(temp >> 2)
+				output += encode((temp << 4) & 0x3F)
+				output += '=='
+				break
+			case 2:
+				temp = (uint8[uint8.length - 2] << 8) + (uint8[uint8.length - 1])
+				output += encode(temp >> 10)
+				output += encode((temp >> 4) & 0x3F)
+				output += encode((temp << 2) & 0x3F)
+				output += '='
+				break
+		}
+
+		return output
+	}
+
+	exports.toByteArray = b64ToByteArray
+	exports.fromByteArray = uint8ToBase64
+}(typeof exports === 'undefined' ? (this.base64js = {}) : exports))
+
+},{}],53:[function(require,module,exports){
+/**
+ * Module dependencies.
+ * @ignore
+ */
+if(typeof window === 'undefined') {
+  var Buffer = require('buffer').Buffer; // TODO just use global Buffer
+}
+
+/**
+ * A class representation of the BSON Binary type.
+ *
+ * Sub types
+ *  - **BSON.BSON_BINARY_SUBTYPE_DEFAULT**, default BSON type.
+ *  - **BSON.BSON_BINARY_SUBTYPE_FUNCTION**, BSON function type.
+ *  - **BSON.BSON_BINARY_SUBTYPE_BYTE_ARRAY**, BSON byte array type.
+ *  - **BSON.BSON_BINARY_SUBTYPE_UUID**, BSON uuid type.
+ *  - **BSON.BSON_BINARY_SUBTYPE_MD5**, BSON md5 type.
+ *  - **BSON.BSON_BINARY_SUBTYPE_USER_DEFINED**, BSON user defined type.
+ *
+ * @class
+ * @param {Buffer} buffer a buffer object containing the binary data.
+ * @param {Number} [subType] the option binary type.
+ * @return {Binary}
+ */
+function Binary(buffer, subType) {
+  if(!(this instanceof Binary)) return new Binary(buffer, subType);
+
+  this._bsontype = 'Binary';
+
+  if(buffer instanceof Number) {
+    this.sub_type = buffer;
+    this.position = 0;
   } else {
-    this.message = getMessage(this);
-    this.generatedMessage = true;
+    this.sub_type = subType == null ? BSON_BINARY_SUBTYPE_DEFAULT : subType;
+    this.position = 0;
   }
-  var stackStartFunction = options.stackStartFunction || fail;
 
-  if (Error.captureStackTrace) {
-    Error.captureStackTrace(this, stackStartFunction);
+  if(buffer != null && !(buffer instanceof Number)) {
+    // Only accept Buffer, Uint8Array or Arrays
+    if(typeof buffer == 'string') {
+      // Different ways of writing the length of the string for the different types
+      if(typeof Buffer != 'undefined') {
+        this.buffer = new Buffer(buffer);
+      } else if(typeof Uint8Array != 'undefined' || (Object.prototype.toString.call(buffer) == '[object Array]')) {
+        this.buffer = writeStringToArray(buffer);
+      } else {
+        throw new Error("only String, Buffer, Uint8Array or Array accepted");
+      }
+    } else {
+      this.buffer = buffer;
+    }
+    this.position = buffer.length;
+  } else {
+    if(typeof Buffer != 'undefined') {
+      this.buffer =  new Buffer(Binary.BUFFER_SIZE);
+    } else if(typeof Uint8Array != 'undefined'){
+      this.buffer = new Uint8Array(new ArrayBuffer(Binary.BUFFER_SIZE));
+    } else {
+      this.buffer = new Array(Binary.BUFFER_SIZE);
+    }
+    // Set position to start of buffer
+    this.position = 0;
   }
-  else {
-    // non v8 browsers so we can have a stacktrace
-    var err = new Error();
-    if (err.stack) {
-      var out = err.stack;
+};
 
-      // try to strip useless frames
-      var fn_name = stackStartFunction.name;
-      var idx = out.indexOf('\n' + fn_name);
-      if (idx >= 0) {
-        // once we have located the function frame
-        // we need to strip out everything before it (and its line)
-        var next_line = out.indexOf('\n', idx + 1);
-        out = out.substring(next_line + 1);
+/**
+ * Updates this binary with byte_value.
+ *
+ * @method
+ * @param {string} byte_value a single byte we wish to write.
+ */
+Binary.prototype.put = function put(byte_value) {
+  // If it's a string and a has more than one character throw an error
+  if(byte_value['length'] != null && typeof byte_value != 'number' && byte_value.length != 1) throw new Error("only accepts single character String, Uint8Array or Array");
+  if(typeof byte_value != 'number' && byte_value < 0 || byte_value > 255) throw new Error("only accepts number in a valid unsigned byte range 0-255");
+
+  // Decode the byte value once
+  var decoded_byte = null;
+  if(typeof byte_value == 'string') {
+    decoded_byte = byte_value.charCodeAt(0);
+  } else if(byte_value['length'] != null) {
+    decoded_byte = byte_value[0];
+  } else {
+    decoded_byte = byte_value;
+  }
+
+  if(this.buffer.length > this.position) {
+    this.buffer[this.position++] = decoded_byte;
+  } else {
+    if(typeof Buffer != 'undefined' && Buffer.isBuffer(this.buffer)) {
+      // Create additional overflow buffer
+      var buffer = new Buffer(Binary.BUFFER_SIZE + this.buffer.length);
+      // Combine the two buffers together
+      this.buffer.copy(buffer, 0, 0, this.buffer.length);
+      this.buffer = buffer;
+      this.buffer[this.position++] = decoded_byte;
+    } else {
+      var buffer = null;
+      // Create a new buffer (typed or normal array)
+      if(Object.prototype.toString.call(this.buffer) == '[object Uint8Array]') {
+        buffer = new Uint8Array(new ArrayBuffer(Binary.BUFFER_SIZE + this.buffer.length));
+      } else {
+        buffer = new Array(Binary.BUFFER_SIZE + this.buffer.length);
       }
 
-      this.stack = out;
+      // We need to copy all the content to the new array
+      for(var i = 0; i < this.buffer.length; i++) {
+        buffer[i] = this.buffer[i];
+      }
+
+      // Reassign the buffer
+      this.buffer = buffer;
+      // Write the byte
+      this.buffer[this.position++] = decoded_byte;
     }
   }
 };
 
-// assert.AssertionError instanceof Error
-util.inherits(assert.AssertionError, Error);
+/**
+ * Writes a buffer or string to the binary.
+ *
+ * @method
+ * @param {(Buffer|string)} string a string or buffer to be written to the Binary BSON object.
+ * @param {number} offset specify the binary of where to write the content.
+ * @return {null}
+ */
+Binary.prototype.write = function write(string, offset) {
+  offset = typeof offset == 'number' ? offset : this.position;
 
-function replacer(key, value) {
-  if (util.isUndefined(value)) {
-    return '' + value;
+  // If the buffer is to small let's extend the buffer
+  if(this.buffer.length < offset + string.length) {
+    var buffer = null;
+    // If we are in node.js
+    if(typeof Buffer != 'undefined' && Buffer.isBuffer(this.buffer)) {
+      buffer = new Buffer(this.buffer.length + string.length);
+      this.buffer.copy(buffer, 0, 0, this.buffer.length);
+    } else if(Object.prototype.toString.call(this.buffer) == '[object Uint8Array]') {
+      // Create a new buffer
+      buffer = new Uint8Array(new ArrayBuffer(this.buffer.length + string.length))
+      // Copy the content
+      for(var i = 0; i < this.position; i++) {
+        buffer[i] = this.buffer[i];
+      }
+    }
+
+    // Assign the new buffer
+    this.buffer = buffer;
   }
-  if (util.isNumber(value) && (isNaN(value) || !isFinite(value))) {
-    return value.toString();
+
+  if(typeof Buffer != 'undefined' && Buffer.isBuffer(string) && Buffer.isBuffer(this.buffer)) {
+    string.copy(this.buffer, offset, 0, string.length);
+    this.position = (offset + string.length) > this.position ? (offset + string.length) : this.position;
+    // offset = string.length
+  } else if(typeof Buffer != 'undefined' && typeof string == 'string' && Buffer.isBuffer(this.buffer)) {
+    this.buffer.write(string, offset, 'binary');
+    this.position = (offset + string.length) > this.position ? (offset + string.length) : this.position;
+    // offset = string.length;
+  } else if(Object.prototype.toString.call(string) == '[object Uint8Array]'
+    || Object.prototype.toString.call(string) == '[object Array]' && typeof string != 'string') {
+    for(var i = 0; i < string.length; i++) {
+      this.buffer[offset++] = string[i];
+    }
+
+    this.position = offset > this.position ? offset : this.position;
+  } else if(typeof string == 'string') {
+    for(var i = 0; i < string.length; i++) {
+      this.buffer[offset++] = string.charCodeAt(i);
+    }
+
+    this.position = offset > this.position ? offset : this.position;
   }
-  if (util.isFunction(value) || util.isRegExp(value)) {
-    return value.toString();
+};
+
+/**
+ * Reads **length** bytes starting at **position**.
+ *
+ * @method
+ * @param {number} position read from the given position in the Binary.
+ * @param {number} length the number of bytes to read.
+ * @return {Buffer}
+ */
+Binary.prototype.read = function read(position, length) {
+  length = length && length > 0
+    ? length
+    : this.position;
+
+  // Let's return the data based on the type we have
+  if(this.buffer['slice']) {
+    return this.buffer.slice(position, position + length);
+  } else {
+    // Create a buffer to keep the result
+    var buffer = typeof Uint8Array != 'undefined' ? new Uint8Array(new ArrayBuffer(length)) : new Array(length);
+    for(var i = 0; i < length; i++) {
+      buffer[i] = this.buffer[position++];
+    }
   }
+  // Return the buffer
+  return buffer;
+};
+
+/**
+ * Returns the value of this binary as a string.
+ *
+ * @method
+ * @return {string}
+ */
+Binary.prototype.value = function value(asRaw) {
+  asRaw = asRaw == null ? false : asRaw;
+
+  // Optimize to serialize for the situation where the data == size of buffer
+  if(asRaw && typeof Buffer != 'undefined' && Buffer.isBuffer(this.buffer) && this.buffer.length == this.position)
+    return this.buffer;
+
+  // If it's a node.js buffer object
+  if(typeof Buffer != 'undefined' && Buffer.isBuffer(this.buffer)) {
+    return asRaw ? this.buffer.slice(0, this.position) : this.buffer.toString('binary', 0, this.position);
+  } else {
+    if(asRaw) {
+      // we support the slice command use it
+      if(this.buffer['slice'] != null) {
+        return this.buffer.slice(0, this.position);
+      } else {
+        // Create a new buffer to copy content to
+        var newBuffer = Object.prototype.toString.call(this.buffer) == '[object Uint8Array]' ? new Uint8Array(new ArrayBuffer(this.position)) : new Array(this.position);
+        // Copy content
+        for(var i = 0; i < this.position; i++) {
+          newBuffer[i] = this.buffer[i];
+        }
+        // Return the buffer
+        return newBuffer;
+      }
+    } else {
+      return convertArraytoUtf8BinaryString(this.buffer, 0, this.position);
+    }
+  }
+};
+
+/**
+ * Length.
+ *
+ * @method
+ * @return {number} the length of the binary.
+ */
+Binary.prototype.length = function length() {
+  return this.position;
+};
+
+/**
+ * @ignore
+ */
+Binary.prototype.toJSON = function() {
+  return this.buffer != null ? this.buffer.toString('base64') : '';
+}
+
+/**
+ * @ignore
+ */
+Binary.prototype.toString = function(format) {
+  return this.buffer != null ? this.buffer.slice(0, this.position).toString(format) : '';
+}
+
+/**
+ * Binary default subtype
+ * @ignore
+ */
+var BSON_BINARY_SUBTYPE_DEFAULT = 0;
+
+/**
+ * @ignore
+ */
+var writeStringToArray = function(data) {
+  // Create a buffer
+  var buffer = typeof Uint8Array != 'undefined' ? new Uint8Array(new ArrayBuffer(data.length)) : new Array(data.length);
+  // Write the content to the buffer
+  for(var i = 0; i < data.length; i++) {
+    buffer[i] = data.charCodeAt(i);
+  }
+  // Write the string to the buffer
+  return buffer;
+}
+
+/**
+ * Convert Array ot Uint8Array to Binary String
+ *
+ * @ignore
+ */
+var convertArraytoUtf8BinaryString = function(byteArray, startIndex, endIndex) {
+  var result = "";
+  for(var i = startIndex; i < endIndex; i++) {
+   result = result + String.fromCharCode(byteArray[i]);
+  }
+  return result;
+};
+
+Binary.BUFFER_SIZE = 256;
+
+/**
+ * Default BSON type
+ *
+ * @classconstant SUBTYPE_DEFAULT
+ **/
+Binary.SUBTYPE_DEFAULT = 0;
+/**
+ * Function BSON type
+ *
+ * @classconstant SUBTYPE_DEFAULT
+ **/
+Binary.SUBTYPE_FUNCTION = 1;
+/**
+ * Byte Array BSON type
+ *
+ * @classconstant SUBTYPE_DEFAULT
+ **/
+Binary.SUBTYPE_BYTE_ARRAY = 2;
+/**
+ * OLD UUID BSON type
+ *
+ * @classconstant SUBTYPE_DEFAULT
+ **/
+Binary.SUBTYPE_UUID_OLD = 3;
+/**
+ * UUID BSON type
+ *
+ * @classconstant SUBTYPE_DEFAULT
+ **/
+Binary.SUBTYPE_UUID = 4;
+/**
+ * MD5 BSON type
+ *
+ * @classconstant SUBTYPE_DEFAULT
+ **/
+Binary.SUBTYPE_MD5 = 5;
+/**
+ * User BSON type
+ *
+ * @classconstant SUBTYPE_DEFAULT
+ **/
+Binary.SUBTYPE_USER_DEFINED = 128;
+
+/**
+ * Expose.
+ */
+module.exports = Binary;
+module.exports.Binary = Binary;
+
+},{"buffer":71}],54:[function(require,module,exports){
+(function (process){
+/**
+ * Binary Parser.
+ * Jonas Raoni Soares Silva
+ * http://jsfromhell.com/classes/binary-parser [v1.0]
+ */
+var chr = String.fromCharCode;
+
+var maxBits = [];
+for (var i = 0; i < 64; i++) {
+	maxBits[i] = Math.pow(2, i);
+}
+
+function BinaryParser (bigEndian, allowExceptions) {
+  if(!(this instanceof BinaryParser)) return new BinaryParser(bigEndian, allowExceptions);
+  
+	this.bigEndian = bigEndian;
+	this.allowExceptions = allowExceptions;
+};
+
+BinaryParser.warn = function warn (msg) {
+	if (this.allowExceptions) {
+		throw new Error(msg);
+  }
+
+	return 1;
+};
+
+BinaryParser.decodeFloat = function decodeFloat (data, precisionBits, exponentBits) {
+	var b = new this.Buffer(this.bigEndian, data);
+
+	b.checkBuffer(precisionBits + exponentBits + 1);
+
+	var bias = maxBits[exponentBits - 1] - 1
+    , signal = b.readBits(precisionBits + exponentBits, 1)
+    , exponent = b.readBits(precisionBits, exponentBits)
+    , significand = 0
+    , divisor = 2
+    , curByte = b.buffer.length + (-precisionBits >> 3) - 1;
+
+	do {
+		for (var byteValue = b.buffer[ ++curByte ], startBit = precisionBits % 8 || 8, mask = 1 << startBit; mask >>= 1; ( byteValue & mask ) && ( significand += 1 / divisor ), divisor *= 2 );
+	} while (precisionBits -= startBit);
+
+	return exponent == ( bias << 1 ) + 1 ? significand ? NaN : signal ? -Infinity : +Infinity : ( 1 + signal * -2 ) * ( exponent || significand ? !exponent ? Math.pow( 2, -bias + 1 ) * significand : Math.pow( 2, exponent - bias ) * ( 1 + significand ) : 0 );
+};
+
+BinaryParser.decodeInt = function decodeInt (data, bits, signed, forceBigEndian) {
+  var b = new this.Buffer(this.bigEndian || forceBigEndian, data)
+      , x = b.readBits(0, bits)
+      , max = maxBits[bits]; //max = Math.pow( 2, bits );
+  
+  return signed && x >= max / 2
+      ? x - max
+      : x;
+};
+
+BinaryParser.encodeFloat = function encodeFloat (data, precisionBits, exponentBits) {
+	var bias = maxBits[exponentBits - 1] - 1
+    , minExp = -bias + 1
+    , maxExp = bias
+    , minUnnormExp = minExp - precisionBits
+    , n = parseFloat(data)
+    , status = isNaN(n) || n == -Infinity || n == +Infinity ? n : 0
+    ,	exp = 0
+    , len = 2 * bias + 1 + precisionBits + 3
+    , bin = new Array(len)
+    , signal = (n = status !== 0 ? 0 : n) < 0
+    , intPart = Math.floor(n = Math.abs(n))
+    , floatPart = n - intPart
+    , lastBit
+    , rounded
+    , result
+    , i
+    , j;
+
+	for (i = len; i; bin[--i] = 0);
+
+	for (i = bias + 2; intPart && i; bin[--i] = intPart % 2, intPart = Math.floor(intPart / 2));
+
+	for (i = bias + 1; floatPart > 0 && i; (bin[++i] = ((floatPart *= 2) >= 1) - 0 ) && --floatPart);
+
+	for (i = -1; ++i < len && !bin[i];);
+
+	if (bin[(lastBit = precisionBits - 1 + (i = (exp = bias + 1 - i) >= minExp && exp <= maxExp ? i + 1 : bias + 1 - (exp = minExp - 1))) + 1]) {
+		if (!(rounded = bin[lastBit])) {
+			for (j = lastBit + 2; !rounded && j < len; rounded = bin[j++]);
+		}
+
+		for (j = lastBit + 1; rounded && --j >= 0; (bin[j] = !bin[j] - 0) && (rounded = 0));
+	}
+
+	for (i = i - 2 < 0 ? -1 : i - 3; ++i < len && !bin[i];);
+
+	if ((exp = bias + 1 - i) >= minExp && exp <= maxExp) {
+		++i;
+  } else if (exp < minExp) {
+		exp != bias + 1 - len && exp < minUnnormExp && this.warn("encodeFloat::float underflow");
+		i = bias + 1 - (exp = minExp - 1);
+	}
+
+	if (intPart || status !== 0) {
+		this.warn(intPart ? "encodeFloat::float overflow" : "encodeFloat::" + status);
+		exp = maxExp + 1;
+		i = bias + 2;
+
+		if (status == -Infinity) {
+			signal = 1;
+    } else if (isNaN(status)) {
+			bin[i] = 1;
+    }
+	}
+
+	for (n = Math.abs(exp + bias), j = exponentBits + 1, result = ""; --j; result = (n % 2) + result, n = n >>= 1);
+
+	for (n = 0, j = 0, i = (result = (signal ? "1" : "0") + result + bin.slice(i, i + precisionBits).join("")).length, r = []; i; j = (j + 1) % 8) {
+		n += (1 << j) * result.charAt(--i);
+		if (j == 7) {
+			r[r.length] = String.fromCharCode(n);
+			n = 0;
+		}
+	}
+
+	r[r.length] = n
+    ? String.fromCharCode(n)
+    : "";
+
+	return (this.bigEndian ? r.reverse() : r).join("");
+};
+
+BinaryParser.encodeInt = function encodeInt (data, bits, signed, forceBigEndian) {
+	var max = maxBits[bits];
+
+  if (data >= max || data < -(max / 2)) {
+    this.warn("encodeInt::overflow");
+    data = 0;
+  }
+
+	if (data < 0) {
+    data += max;
+  }
+
+	for (var r = []; data; r[r.length] = String.fromCharCode(data % 256), data = Math.floor(data / 256));
+
+	for (bits = -(-bits >> 3) - r.length; bits--; r[r.length] = "\0");
+
+  return ((this.bigEndian || forceBigEndian) ? r.reverse() : r).join("");
+};
+
+BinaryParser.toSmall    = function( data ){ return this.decodeInt( data,  8, true  ); };
+BinaryParser.fromSmall  = function( data ){ return this.encodeInt( data,  8, true  ); };
+BinaryParser.toByte     = function( data ){ return this.decodeInt( data,  8, false ); };
+BinaryParser.fromByte   = function( data ){ return this.encodeInt( data,  8, false ); };
+BinaryParser.toShort    = function( data ){ return this.decodeInt( data, 16, true  ); };
+BinaryParser.fromShort  = function( data ){ return this.encodeInt( data, 16, true  ); };
+BinaryParser.toWord     = function( data ){ return this.decodeInt( data, 16, false ); };
+BinaryParser.fromWord   = function( data ){ return this.encodeInt( data, 16, false ); };
+BinaryParser.toInt      = function( data ){ return this.decodeInt( data, 32, true  ); };
+BinaryParser.fromInt    = function( data ){ return this.encodeInt( data, 32, true  ); };
+BinaryParser.toLong     = function( data ){ return this.decodeInt( data, 64, true  ); };
+BinaryParser.fromLong   = function( data ){ return this.encodeInt( data, 64, true  ); };
+BinaryParser.toDWord    = function( data ){ return this.decodeInt( data, 32, false ); };
+BinaryParser.fromDWord  = function( data ){ return this.encodeInt( data, 32, false ); };
+BinaryParser.toQWord    = function( data ){ return this.decodeInt( data, 64, true ); };
+BinaryParser.fromQWord  = function( data ){ return this.encodeInt( data, 64, true ); };
+BinaryParser.toFloat    = function( data ){ return this.decodeFloat( data, 23, 8   ); };
+BinaryParser.fromFloat  = function( data ){ return this.encodeFloat( data, 23, 8   ); };
+BinaryParser.toDouble   = function( data ){ return this.decodeFloat( data, 52, 11  ); };
+BinaryParser.fromDouble = function( data ){ return this.encodeFloat( data, 52, 11  ); };
+
+// Factor out the encode so it can be shared by add_header and push_int32
+BinaryParser.encode_int32 = function encode_int32 (number, asArray) {
+  var a, b, c, d, unsigned;
+  unsigned = (number < 0) ? (number + 0x100000000) : number;
+  a = Math.floor(unsigned / 0xffffff);
+  unsigned &= 0xffffff;
+  b = Math.floor(unsigned / 0xffff);
+  unsigned &= 0xffff;
+  c = Math.floor(unsigned / 0xff);
+  unsigned &= 0xff;
+  d = Math.floor(unsigned);
+  return asArray ? [chr(a), chr(b), chr(c), chr(d)] : chr(a) + chr(b) + chr(c) + chr(d);
+};
+
+BinaryParser.encode_int64 = function encode_int64 (number) {
+  var a, b, c, d, e, f, g, h, unsigned;
+  unsigned = (number < 0) ? (number + 0x10000000000000000) : number;
+  a = Math.floor(unsigned / 0xffffffffffffff);
+  unsigned &= 0xffffffffffffff;
+  b = Math.floor(unsigned / 0xffffffffffff);
+  unsigned &= 0xffffffffffff;
+  c = Math.floor(unsigned / 0xffffffffff);
+  unsigned &= 0xffffffffff;
+  d = Math.floor(unsigned / 0xffffffff);
+  unsigned &= 0xffffffff;
+  e = Math.floor(unsigned / 0xffffff);
+  unsigned &= 0xffffff;
+  f = Math.floor(unsigned / 0xffff);
+  unsigned &= 0xffff;
+  g = Math.floor(unsigned / 0xff);
+  unsigned &= 0xff;
+  h = Math.floor(unsigned);
+  return chr(a) + chr(b) + chr(c) + chr(d) + chr(e) + chr(f) + chr(g) + chr(h);
+};
+
+/**
+ * UTF8 methods
+ */
+
+// Take a raw binary string and return a utf8 string
+BinaryParser.decode_utf8 = function decode_utf8 (binaryStr) {
+  var len = binaryStr.length
+    , decoded = ''
+    , i = 0
+    , c = 0
+    , c1 = 0
+    , c2 = 0
+    , c3;
+
+  while (i < len) {
+    c = binaryStr.charCodeAt(i);
+    if (c < 128) {
+      decoded += String.fromCharCode(c);
+      i++;
+    } else if ((c > 191) && (c < 224)) {
+	    c2 = binaryStr.charCodeAt(i+1);
+      decoded += String.fromCharCode(((c & 31) << 6) | (c2 & 63));
+      i += 2;
+    } else {
+	    c2 = binaryStr.charCodeAt(i+1);
+	    c3 = binaryStr.charCodeAt(i+2);
+      decoded += String.fromCharCode(((c & 15) << 12) | ((c2 & 63) << 6) | (c3 & 63));
+      i += 3;
+    }
+  }
+
+  return decoded;
+};
+
+// Encode a cstring
+BinaryParser.encode_cstring = function encode_cstring (s) {
+  return unescape(encodeURIComponent(s)) + BinaryParser.fromByte(0);
+};
+
+// Take a utf8 string and return a binary string
+BinaryParser.encode_utf8 = function encode_utf8 (s) {
+  var a = ""
+    , c;
+
+  for (var n = 0, len = s.length; n < len; n++) {
+    c = s.charCodeAt(n);
+
+    if (c < 128) {
+	    a += String.fromCharCode(c);
+    } else if ((c > 127) && (c < 2048)) {
+	    a += String.fromCharCode((c>>6) | 192) ;
+	    a += String.fromCharCode((c&63) | 128);
+    } else {
+      a += String.fromCharCode((c>>12) | 224);
+      a += String.fromCharCode(((c>>6) & 63) | 128);
+      a += String.fromCharCode((c&63) | 128);
+    }
+  }
+
+  return a;
+};
+
+BinaryParser.hprint = function hprint (s) {
+  var number;
+
+  for (var i = 0, len = s.length; i < len; i++) {
+    if (s.charCodeAt(i) < 32) {
+      number = s.charCodeAt(i) <= 15
+        ? "0" + s.charCodeAt(i).toString(16)
+        : s.charCodeAt(i).toString(16);        
+      process.stdout.write(number + " ")
+    } else {
+      number = s.charCodeAt(i) <= 15
+        ? "0" + s.charCodeAt(i).toString(16)
+        : s.charCodeAt(i).toString(16);
+        process.stdout.write(number + " ")
+    }
+  }
+  
+  process.stdout.write("\n\n");
+};
+
+BinaryParser.ilprint = function hprint (s) {
+  var number;
+
+  for (var i = 0, len = s.length; i < len; i++) {
+    if (s.charCodeAt(i) < 32) {
+      number = s.charCodeAt(i) <= 15
+        ? "0" + s.charCodeAt(i).toString(10)
+        : s.charCodeAt(i).toString(10);
+
+      require('util').debug(number+' : ');
+    } else {
+      number = s.charCodeAt(i) <= 15
+        ? "0" + s.charCodeAt(i).toString(10)
+        : s.charCodeAt(i).toString(10);
+      require('util').debug(number+' : '+ s.charAt(i));
+    }
+  }
+};
+
+BinaryParser.hlprint = function hprint (s) {
+  var number;
+
+  for (var i = 0, len = s.length; i < len; i++) {
+    if (s.charCodeAt(i) < 32) {
+      number = s.charCodeAt(i) <= 15
+        ? "0" + s.charCodeAt(i).toString(16)
+        : s.charCodeAt(i).toString(16);
+      require('util').debug(number+' : ');
+    } else {
+      number = s.charCodeAt(i) <= 15
+        ? "0" + s.charCodeAt(i).toString(16)
+        : s.charCodeAt(i).toString(16);
+      require('util').debug(number+' : '+ s.charAt(i));
+    }
+  }
+};
+
+/**
+ * BinaryParser buffer constructor.
+ */
+function BinaryParserBuffer (bigEndian, buffer) {
+  this.bigEndian = bigEndian || 0;
+  this.buffer = [];
+  this.setBuffer(buffer);
+};
+
+BinaryParserBuffer.prototype.setBuffer = function setBuffer (data) {
+  var l, i, b;
+
+	if (data) {
+    i = l = data.length;
+    b = this.buffer = new Array(l);
+		for (; i; b[l - i] = data.charCodeAt(--i));
+		this.bigEndian && b.reverse();
+	}
+};
+
+BinaryParserBuffer.prototype.hasNeededBits = function hasNeededBits (neededBits) {
+	return this.buffer.length >= -(-neededBits >> 3);
+};
+
+BinaryParserBuffer.prototype.checkBuffer = function checkBuffer (neededBits) {
+	if (!this.hasNeededBits(neededBits)) {
+		throw new Error("checkBuffer::missing bytes");
+  }
+};
+
+BinaryParserBuffer.prototype.readBits = function readBits (start, length) {
+	//shl fix: Henri Torgemane ~1996 (compressed by Jonas Raoni)
+
+	function shl (a, b) {
+		for (; b--; a = ((a %= 0x7fffffff + 1) & 0x40000000) == 0x40000000 ? a * 2 : (a - 0x40000000) * 2 + 0x7fffffff + 1);
+		return a;
+	}
+
+	if (start < 0 || length <= 0) {
+		return 0;
+  }
+
+	this.checkBuffer(start + length);
+
+  var offsetLeft
+    , offsetRight = start % 8
+    , curByte = this.buffer.length - ( start >> 3 ) - 1
+    , lastByte = this.buffer.length + ( -( start + length ) >> 3 )
+    , diff = curByte - lastByte
+    , sum = ((this.buffer[ curByte ] >> offsetRight) & ((1 << (diff ? 8 - offsetRight : length)) - 1)) + (diff && (offsetLeft = (start + length) % 8) ? (this.buffer[lastByte++] & ((1 << offsetLeft) - 1)) << (diff-- << 3) - offsetRight : 0);
+
+	for(; diff; sum += shl(this.buffer[lastByte++], (diff-- << 3) - offsetRight));
+
+	return sum;
+};
+
+/**
+ * Expose.
+ */
+BinaryParser.Buffer = BinaryParserBuffer;
+
+exports.BinaryParser = BinaryParser;
+
+}).call(this,require("g5I+bs"))
+},{"g5I+bs":92,"util":97}],55:[function(require,module,exports){
+(function (Buffer){
+// "use strict"
+
+var writeIEEE754 = require('./float_parser').writeIEEE754,
+	readIEEE754 = require('./float_parser').readIEEE754,
+  Map = require('./map'),
+	Long = require('./long').Long,
+  Double = require('./double').Double,
+  Timestamp = require('./timestamp').Timestamp,
+  ObjectID = require('./objectid').ObjectID,
+  BSONRegExp = require('./regexp').BSONRegExp,
+  Symbol = require('./symbol').Symbol,
+  Code = require('./code').Code,
+  MinKey = require('./min_key').MinKey,
+  MaxKey = require('./max_key').MaxKey,
+  DBRef = require('./db_ref').DBRef,
+  Binary = require('./binary').Binary;
+
+// Parts of the parser
+var deserialize = require('./parser/deserializer'),
+	serializer = require('./parser/serializer'),
+	calculateObjectSize = require('./parser/calculate_size');
+
+/**
+ * @ignore
+ * @api private
+ */
+// Max Size
+var MAXSIZE = (1024*1024*17);
+// Max Document Buffer size
+var buffer = new Buffer(MAXSIZE);
+
+var BSON = function() {
+}
+
+/**
+ * Serialize a Javascript object.
+ *
+ * @param {Object} object the Javascript object to serialize.
+ * @param {Boolean} checkKeys the serializer will check if keys are valid.
+ * @param {Boolean} asBuffer return the serialized object as a Buffer object **(ignore)**.
+ * @param {Boolean} serializeFunctions serialize the javascript functions **(default:false)**.
+ * @return {Buffer} returns the Buffer object containing the serialized object.
+ * @api public
+ */
+BSON.prototype.serialize = function serialize(object, checkKeys, asBuffer, serializeFunctions, index, ignoreUndefined) {
+	// Attempt to serialize
+	var serializationIndex = serializer(buffer, object, checkKeys, index || 0, 0, serializeFunctions, ignoreUndefined);
+	// Create the final buffer
+	var finishedBuffer = new Buffer(serializationIndex);
+	// Copy into the finished buffer
+	buffer.copy(finishedBuffer, 0, 0, finishedBuffer.length);
+	// Return the buffer
+	return finishedBuffer;
+}
+
+/**
+ * Serialize a Javascript object using a predefined Buffer and index into the buffer, useful when pre-allocating the space for serialization.
+ *
+ * @param {Object} object the Javascript object to serialize.
+ * @param {Boolean} checkKeys the serializer will check if keys are valid.
+ * @param {Buffer} buffer the Buffer you pre-allocated to store the serialized BSON object.
+ * @param {Number} index the index in the buffer where we wish to start serializing into.
+ * @param {Boolean} serializeFunctions serialize the javascript functions **(default:false)**.
+ * @return {Number} returns the new write index in the Buffer.
+ * @api public
+ */
+BSON.prototype.serializeWithBufferAndIndex = function(object, checkKeys, finalBuffer, startIndex, serializeFunctions, ignoreUndefined) {
+	// Attempt to serialize
+	var serializationIndex = serializer(buffer, object, checkKeys, startIndex || 0, 0, serializeFunctions, ignoreUndefined);
+	buffer.copy(finalBuffer, startIndex, 0, serializationIndex);
+	// Return the index
+	return startIndex + serializationIndex - 1;
+}
+
+/**
+ * Deserialize data as BSON.
+ *
+ * Options
+ *  - **evalFunctions** {Boolean, default:false}, evaluate functions in the BSON document scoped to the object deserialized.
+ *  - **cacheFunctions** {Boolean, default:false}, cache evaluated functions for reuse.
+ *  - **cacheFunctionsCrc32** {Boolean, default:false}, use a crc32 code for caching, otherwise use the string of the function.
+ *  - **promoteLongs** {Boolean, default:true}, when deserializing a Long will fit it into a Number if it's smaller than 53 bits
+ *
+ * @param {Buffer} buffer the buffer containing the serialized set of BSON documents.
+ * @param {Object} [options] additional options used for the deserialization.
+ * @param {Boolean} [isArray] ignore used for recursive parsing.
+ * @return {Object} returns the deserialized Javascript Object.
+ * @api public
+ */
+BSON.prototype.deserialize = function(data, options) {
+  return deserialize(data, options);
+}
+
+/**
+ * Calculate the bson size for a passed in Javascript object.
+ *
+ * @param {Object} object the Javascript object to calculate the BSON byte size for.
+ * @param {Boolean} [serializeFunctions] serialize all functions in the object **(default:false)**.
+ * @return {Number} returns the number of bytes the BSON object will take up.
+ * @api public
+ */
+BSON.prototype.calculateObjectSize = function(object, serializeFunctions, ignoreUndefined) {
+  return calculateObjectSize(object, serializeFunctions, ignoreUndefined);
+}
+
+/**
+ * Deserialize stream data as BSON documents.
+ *
+ * Options
+ *  - **evalFunctions** {Boolean, default:false}, evaluate functions in the BSON document scoped to the object deserialized.
+ *  - **cacheFunctions** {Boolean, default:false}, cache evaluated functions for reuse.
+ *  - **cacheFunctionsCrc32** {Boolean, default:false}, use a crc32 code for caching, otherwise use the string of the function.
+ *  - **promoteLongs** {Boolean, default:true}, when deserializing a Long will fit it into a Number if it's smaller than 53 bits
+ *
+ * @param {Buffer} data the buffer containing the serialized set of BSON documents.
+ * @param {Number} startIndex the start index in the data Buffer where the deserialization is to start.
+ * @param {Number} numberOfDocuments number of documents to deserialize.
+ * @param {Array} documents an array where to store the deserialized documents.
+ * @param {Number} docStartIndex the index in the documents array from where to start inserting documents.
+ * @param {Object} [options] additional options used for the deserialization.
+ * @return {Number} returns the next index in the buffer after deserialization **x** numbers of documents.
+ * @api public
+ */
+BSON.prototype.deserializeStream = function(data, startIndex, numberOfDocuments, documents, docStartIndex, options) {
+  // if(numberOfDocuments !== documents.length) throw new Error("Number of expected results back is less than the number of documents");
+  options = options != null ? options : {};
+  var index = startIndex;
+  // Loop over all documents
+  for(var i = 0; i < numberOfDocuments; i++) {
+    // Find size of the document
+    var size = data[index] | data[index + 1] << 8 | data[index + 2] << 16 | data[index + 3] << 24;
+    // Update options with index
+    options['index'] = index;
+    // Parse the document at this point
+    documents[docStartIndex + i] = this.deserialize(data, options);
+    // Adjust index by the document size
+    index = index + size;
+  }
+
+  // Return object containing end index of parsing and list of documents
+  return index;
+}
+
+/**
+ * @ignore
+ * @api private
+ */
+// BSON MAX VALUES
+BSON.BSON_INT32_MAX = 0x7FFFFFFF;
+BSON.BSON_INT32_MIN = -0x80000000;
+
+BSON.BSON_INT64_MAX = Math.pow(2, 63) - 1;
+BSON.BSON_INT64_MIN = -Math.pow(2, 63);
+
+// JS MAX PRECISE VALUES
+BSON.JS_INT_MAX = 0x20000000000000;  // Any integer up to 2^53 can be precisely represented by a double.
+BSON.JS_INT_MIN = -0x20000000000000;  // Any integer down to -2^53 can be precisely represented by a double.
+
+// Internal long versions
+var JS_INT_MAX_LONG = Long.fromNumber(0x20000000000000);  // Any integer up to 2^53 can be precisely represented by a double.
+var JS_INT_MIN_LONG = Long.fromNumber(-0x20000000000000);  // Any integer down to -2^53 can be precisely represented by a double.
+
+/**
+ * Number BSON Type
+ *
+ * @classconstant BSON_DATA_NUMBER
+ **/
+BSON.BSON_DATA_NUMBER = 1;
+/**
+ * String BSON Type
+ *
+ * @classconstant BSON_DATA_STRING
+ **/
+BSON.BSON_DATA_STRING = 2;
+/**
+ * Object BSON Type
+ *
+ * @classconstant BSON_DATA_OBJECT
+ **/
+BSON.BSON_DATA_OBJECT = 3;
+/**
+ * Array BSON Type
+ *
+ * @classconstant BSON_DATA_ARRAY
+ **/
+BSON.BSON_DATA_ARRAY = 4;
+/**
+ * Binary BSON Type
+ *
+ * @classconstant BSON_DATA_BINARY
+ **/
+BSON.BSON_DATA_BINARY = 5;
+/**
+ * ObjectID BSON Type
+ *
+ * @classconstant BSON_DATA_OID
+ **/
+BSON.BSON_DATA_OID = 7;
+/**
+ * Boolean BSON Type
+ *
+ * @classconstant BSON_DATA_BOOLEAN
+ **/
+BSON.BSON_DATA_BOOLEAN = 8;
+/**
+ * Date BSON Type
+ *
+ * @classconstant BSON_DATA_DATE
+ **/
+BSON.BSON_DATA_DATE = 9;
+/**
+ * null BSON Type
+ *
+ * @classconstant BSON_DATA_NULL
+ **/
+BSON.BSON_DATA_NULL = 10;
+/**
+ * RegExp BSON Type
+ *
+ * @classconstant BSON_DATA_REGEXP
+ **/
+BSON.BSON_DATA_REGEXP = 11;
+/**
+ * Code BSON Type
+ *
+ * @classconstant BSON_DATA_CODE
+ **/
+BSON.BSON_DATA_CODE = 13;
+/**
+ * Symbol BSON Type
+ *
+ * @classconstant BSON_DATA_SYMBOL
+ **/
+BSON.BSON_DATA_SYMBOL = 14;
+/**
+ * Code with Scope BSON Type
+ *
+ * @classconstant BSON_DATA_CODE_W_SCOPE
+ **/
+BSON.BSON_DATA_CODE_W_SCOPE = 15;
+/**
+ * 32 bit Integer BSON Type
+ *
+ * @classconstant BSON_DATA_INT
+ **/
+BSON.BSON_DATA_INT = 16;
+/**
+ * Timestamp BSON Type
+ *
+ * @classconstant BSON_DATA_TIMESTAMP
+ **/
+BSON.BSON_DATA_TIMESTAMP = 17;
+/**
+ * Long BSON Type
+ *
+ * @classconstant BSON_DATA_LONG
+ **/
+BSON.BSON_DATA_LONG = 18;
+/**
+ * MinKey BSON Type
+ *
+ * @classconstant BSON_DATA_MIN_KEY
+ **/
+BSON.BSON_DATA_MIN_KEY = 0xff;
+/**
+ * MaxKey BSON Type
+ *
+ * @classconstant BSON_DATA_MAX_KEY
+ **/
+BSON.BSON_DATA_MAX_KEY = 0x7f;
+
+/**
+ * Binary Default Type
+ *
+ * @classconstant BSON_BINARY_SUBTYPE_DEFAULT
+ **/
+BSON.BSON_BINARY_SUBTYPE_DEFAULT = 0;
+/**
+ * Binary Function Type
+ *
+ * @classconstant BSON_BINARY_SUBTYPE_FUNCTION
+ **/
+BSON.BSON_BINARY_SUBTYPE_FUNCTION = 1;
+/**
+ * Binary Byte Array Type
+ *
+ * @classconstant BSON_BINARY_SUBTYPE_BYTE_ARRAY
+ **/
+BSON.BSON_BINARY_SUBTYPE_BYTE_ARRAY = 2;
+/**
+ * Binary UUID Type
+ *
+ * @classconstant BSON_BINARY_SUBTYPE_UUID
+ **/
+BSON.BSON_BINARY_SUBTYPE_UUID = 3;
+/**
+ * Binary MD5 Type
+ *
+ * @classconstant BSON_BINARY_SUBTYPE_MD5
+ **/
+BSON.BSON_BINARY_SUBTYPE_MD5 = 4;
+/**
+ * Binary User Defined Type
+ *
+ * @classconstant BSON_BINARY_SUBTYPE_USER_DEFINED
+ **/
+BSON.BSON_BINARY_SUBTYPE_USER_DEFINED = 128;
+
+// Return BSON
+module.exports = BSON;
+module.exports.Code = Code;
+module.exports.Map = Map;
+module.exports.Symbol = Symbol;
+module.exports.BSON = BSON;
+module.exports.DBRef = DBRef;
+module.exports.Binary = Binary;
+module.exports.ObjectID = ObjectID;
+module.exports.Long = Long;
+module.exports.Timestamp = Timestamp;
+module.exports.Double = Double;
+module.exports.MinKey = MinKey;
+module.exports.MaxKey = MaxKey;
+module.exports.BSONRegExp = BSONRegExp;
+
+}).call(this,require("buffer").Buffer)
+},{"./binary":53,"./code":56,"./db_ref":57,"./double":58,"./float_parser":59,"./long":60,"./map":61,"./max_key":62,"./min_key":63,"./objectid":64,"./parser/calculate_size":65,"./parser/deserializer":66,"./parser/serializer":67,"./regexp":68,"./symbol":69,"./timestamp":70,"buffer":71}],56:[function(require,module,exports){
+/**
+ * A class representation of the BSON Code type.
+ *
+ * @class
+ * @param {(string|function)} code a string or function.
+ * @param {Object} [scope] an optional scope for the function.
+ * @return {Code}
+ */
+var Code = function Code(code, scope) {
+  if(!(this instanceof Code)) return new Code(code, scope);
+  this._bsontype = 'Code';
+  this.code = code;
+  this.scope = scope == null ? {} : scope;
+};
+
+/**
+ * @ignore
+ */
+Code.prototype.toJSON = function() {
+  return {scope:this.scope, code:this.code};
+}
+
+module.exports = Code;
+module.exports.Code = Code;
+},{}],57:[function(require,module,exports){
+/**
+ * A class representation of the BSON DBRef type.
+ *
+ * @class
+ * @param {string} namespace the collection name.
+ * @param {ObjectID} oid the reference ObjectID.
+ * @param {string} [db] optional db name, if omitted the reference is local to the current db.
+ * @return {DBRef}
+ */
+function DBRef(namespace, oid, db) {
+  if(!(this instanceof DBRef)) return new DBRef(namespace, oid, db);
+  
+  this._bsontype = 'DBRef';
+  this.namespace = namespace;
+  this.oid = oid;
+  this.db = db;
+};
+
+/**
+ * @ignore
+ * @api private
+ */
+DBRef.prototype.toJSON = function() {
+  return {
+    '$ref':this.namespace,
+    '$id':this.oid,
+    '$db':this.db == null ? '' : this.db
+  };
+}
+
+module.exports = DBRef;
+module.exports.DBRef = DBRef;
+},{}],58:[function(require,module,exports){
+/**
+ * A class representation of the BSON Double type.
+ *
+ * @class
+ * @param {number} value the number we want to represent as a double.
+ * @return {Double}
+ */
+function Double(value) {
+  if(!(this instanceof Double)) return new Double(value);
+  
+  this._bsontype = 'Double';
+  this.value = value;
+}
+
+/**
+ * Access the number value.
+ *
+ * @method
+ * @return {number} returns the wrapped double number.
+ */
+Double.prototype.valueOf = function() {
+  return this.value;
+};
+
+/**
+ * @ignore
+ */
+Double.prototype.toJSON = function() {
+  return this.value;
+}
+
+module.exports = Double;
+module.exports.Double = Double;
+},{}],59:[function(require,module,exports){
+// Copyright (c) 2008, Fair Oaks Labs, Inc.
+// All rights reserved.
+// 
+// Redistribution and use in source and binary forms, with or without
+// modification, are permitted provided that the following conditions are met:
+// 
+//  * Redistributions of source code must retain the above copyright notice,
+//    this list of conditions and the following disclaimer.
+// 
+//  * Redistributions in binary form must reproduce the above copyright notice,
+//    this list of conditions and the following disclaimer in the documentation
+//    and/or other materials provided with the distribution.
+// 
+//  * Neither the name of Fair Oaks Labs, Inc. nor the names of its contributors
+//    may be used to endorse or promote products derived from this software
+//    without specific prior written permission.
+// 
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+// ARE DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+// LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+// SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+// INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+// CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+// ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+//
+// Modifications to writeIEEE754 to support negative zeroes made by Brian White
+
+var readIEEE754 = function(buffer, offset, endian, mLen, nBytes) {
+  var e, m,
+      bBE = (endian === 'big'),
+      eLen = nBytes * 8 - mLen - 1,
+      eMax = (1 << eLen) - 1,
+      eBias = eMax >> 1,
+      nBits = -7,
+      i = bBE ? 0 : (nBytes - 1),
+      d = bBE ? 1 : -1,
+      s = buffer[offset + i];
+
+  i += d;
+
+  e = s & ((1 << (-nBits)) - 1);
+  s >>= (-nBits);
+  nBits += eLen;
+  for (; nBits > 0; e = e * 256 + buffer[offset + i], i += d, nBits -= 8);
+
+  m = e & ((1 << (-nBits)) - 1);
+  e >>= (-nBits);
+  nBits += mLen;
+  for (; nBits > 0; m = m * 256 + buffer[offset + i], i += d, nBits -= 8);
+
+  if (e === 0) {
+    e = 1 - eBias;
+  } else if (e === eMax) {
+    return m ? NaN : ((s ? -1 : 1) * Infinity);
+  } else {
+    m = m + Math.pow(2, mLen);
+    e = e - eBias;
+  }
+  return (s ? -1 : 1) * m * Math.pow(2, e - mLen);
+};
+
+var writeIEEE754 = function(buffer, value, offset, endian, mLen, nBytes) {
+  var e, m, c,
+      bBE = (endian === 'big'),
+      eLen = nBytes * 8 - mLen - 1,
+      eMax = (1 << eLen) - 1,
+      eBias = eMax >> 1,
+      rt = (mLen === 23 ? Math.pow(2, -24) - Math.pow(2, -77) : 0),
+      i = bBE ? (nBytes-1) : 0,
+      d = bBE ? -1 : 1,
+      s = value < 0 || (value === 0 && 1 / value < 0) ? 1 : 0;
+
+  value = Math.abs(value);
+
+  if (isNaN(value) || value === Infinity) {
+    m = isNaN(value) ? 1 : 0;
+    e = eMax;
+  } else {
+    e = Math.floor(Math.log(value) / Math.LN2);
+    if (value * (c = Math.pow(2, -e)) < 1) {
+      e--;
+      c *= 2;
+    }
+    if (e+eBias >= 1) {
+      value += rt / c;
+    } else {
+      value += rt * Math.pow(2, 1 - eBias);
+    }
+    if (value * c >= 2) {
+      e++;
+      c /= 2;
+    }
+
+    if (e + eBias >= eMax) {
+      m = 0;
+      e = eMax;
+    } else if (e + eBias >= 1) {
+      m = (value * c - 1) * Math.pow(2, mLen);
+      e = e + eBias;
+    } else {
+      m = value * Math.pow(2, eBias - 1) * Math.pow(2, mLen);
+      e = 0;
+    }
+  }
+
+  for (; mLen >= 8; buffer[offset + i] = m & 0xff, i += d, m /= 256, mLen -= 8);
+
+  e = (e << mLen) | m;
+  eLen += mLen;
+  for (; eLen > 0; buffer[offset + i] = e & 0xff, i += d, e /= 256, eLen -= 8);
+
+  buffer[offset + i - d] |= s * 128;
+};
+
+exports.readIEEE754 = readIEEE754;
+exports.writeIEEE754 = writeIEEE754;
+},{}],60:[function(require,module,exports){
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+// Copyright 2009 Google Inc. All Rights Reserved
+
+/**
+ * Defines a Long class for representing a 64-bit two's-complement
+ * integer value, which faithfully simulates the behavior of a Java "Long". This
+ * implementation is derived from LongLib in GWT.
+ *
+ * Constructs a 64-bit two's-complement integer, given its low and high 32-bit
+ * values as *signed* integers.  See the from* functions below for more
+ * convenient ways of constructing Longs.
+ *
+ * The internal representation of a Long is the two given signed, 32-bit values.
+ * We use 32-bit pieces because these are the size of integers on which
+ * Javascript performs bit-operations.  For operations like addition and
+ * multiplication, we split each number into 16-bit pieces, which can easily be
+ * multiplied within Javascript's floating-point representation without overflow
+ * or change in sign.
+ *
+ * In the algorithms below, we frequently reduce the negative case to the
+ * positive case by negating the input(s) and then post-processing the result.
+ * Note that we must ALWAYS check specially whether those values are MIN_VALUE
+ * (-2^63) because -MIN_VALUE == MIN_VALUE (since 2^63 cannot be represented as
+ * a positive number, it overflows back into a negative).  Not handling this
+ * case would often result in infinite recursion.
+ *
+ * @class
+ * @param {number} low  the low (signed) 32 bits of the Long.
+ * @param {number} high the high (signed) 32 bits of the Long.
+ * @return {Long}
+ */
+function Long(low, high) {
+  if(!(this instanceof Long)) return new Long(low, high);
+  
+  this._bsontype = 'Long';
+  /**
+   * @type {number}
+   * @ignore
+   */
+  this.low_ = low | 0;  // force into 32 signed bits.
+
+  /**
+   * @type {number}
+   * @ignore
+   */
+  this.high_ = high | 0;  // force into 32 signed bits.
+};
+
+/**
+ * Return the int value.
+ *
+ * @method
+ * @return {number} the value, assuming it is a 32-bit integer.
+ */
+Long.prototype.toInt = function() {
+  return this.low_;
+};
+
+/**
+ * Return the Number value.
+ *
+ * @method
+ * @return {number} the closest floating-point representation to this value.
+ */
+Long.prototype.toNumber = function() {
+  return this.high_ * Long.TWO_PWR_32_DBL_ +
+         this.getLowBitsUnsigned();
+};
+
+/**
+ * Return the JSON value.
+ *
+ * @method
+ * @return {string} the JSON representation.
+ */
+Long.prototype.toJSON = function() {
+  return this.toString();
+}
+
+/**
+ * Return the String value.
+ *
+ * @method
+ * @param {number} [opt_radix] the radix in which the text should be written.
+ * @return {string} the textual representation of this value.
+ */
+Long.prototype.toString = function(opt_radix) {
+  var radix = opt_radix || 10;
+  if (radix < 2 || 36 < radix) {
+    throw Error('radix out of range: ' + radix);
+  }
+
+  if (this.isZero()) {
+    return '0';
+  }
+
+  if (this.isNegative()) {
+    if (this.equals(Long.MIN_VALUE)) {
+      // We need to change the Long value before it can be negated, so we remove
+      // the bottom-most digit in this base and then recurse to do the rest.
+      var radixLong = Long.fromNumber(radix);
+      var div = this.div(radixLong);
+      var rem = div.multiply(radixLong).subtract(this);
+      return div.toString(radix) + rem.toInt().toString(radix);
+    } else {
+      return '-' + this.negate().toString(radix);
+    }
+  }
+
+  // Do several (6) digits each time through the loop, so as to
+  // minimize the calls to the very expensive emulated div.
+  var radixToPower = Long.fromNumber(Math.pow(radix, 6));
+
+  var rem = this;
+  var result = '';
+  while (true) {
+    var remDiv = rem.div(radixToPower);
+    var intval = rem.subtract(remDiv.multiply(radixToPower)).toInt();
+    var digits = intval.toString(radix);
+
+    rem = remDiv;
+    if (rem.isZero()) {
+      return digits + result;
+    } else {
+      while (digits.length < 6) {
+        digits = '0' + digits;
+      }
+      result = '' + digits + result;
+    }
+  }
+};
+
+/**
+ * Return the high 32-bits value.
+ *
+ * @method
+ * @return {number} the high 32-bits as a signed value.
+ */
+Long.prototype.getHighBits = function() {
+  return this.high_;
+};
+
+/**
+ * Return the low 32-bits value.
+ *
+ * @method
+ * @return {number} the low 32-bits as a signed value.
+ */
+Long.prototype.getLowBits = function() {
+  return this.low_;
+};
+
+/**
+ * Return the low unsigned 32-bits value.
+ *
+ * @method
+ * @return {number} the low 32-bits as an unsigned value.
+ */
+Long.prototype.getLowBitsUnsigned = function() {
+  return (this.low_ >= 0) ?
+      this.low_ : Long.TWO_PWR_32_DBL_ + this.low_;
+};
+
+/**
+ * Returns the number of bits needed to represent the absolute value of this Long.
+ *
+ * @method
+ * @return {number} Returns the number of bits needed to represent the absolute value of this Long.
+ */
+Long.prototype.getNumBitsAbs = function() {
+  if (this.isNegative()) {
+    if (this.equals(Long.MIN_VALUE)) {
+      return 64;
+    } else {
+      return this.negate().getNumBitsAbs();
+    }
+  } else {
+    var val = this.high_ != 0 ? this.high_ : this.low_;
+    for (var bit = 31; bit > 0; bit--) {
+      if ((val & (1 << bit)) != 0) {
+        break;
+      }
+    }
+    return this.high_ != 0 ? bit + 33 : bit + 1;
+  }
+};
+
+/**
+ * Return whether this value is zero.
+ *
+ * @method
+ * @return {boolean} whether this value is zero.
+ */
+Long.prototype.isZero = function() {
+  return this.high_ == 0 && this.low_ == 0;
+};
+
+/**
+ * Return whether this value is negative.
+ *
+ * @method
+ * @return {boolean} whether this value is negative.
+ */
+Long.prototype.isNegative = function() {
+  return this.high_ < 0;
+};
+
+/**
+ * Return whether this value is odd.
+ *
+ * @method
+ * @return {boolean} whether this value is odd.
+ */
+Long.prototype.isOdd = function() {
+  return (this.low_ & 1) == 1;
+};
+
+/**
+ * Return whether this Long equals the other
+ *
+ * @method
+ * @param {Long} other Long to compare against.
+ * @return {boolean} whether this Long equals the other
+ */
+Long.prototype.equals = function(other) {
+  return (this.high_ == other.high_) && (this.low_ == other.low_);
+};
+
+/**
+ * Return whether this Long does not equal the other.
+ *
+ * @method
+ * @param {Long} other Long to compare against.
+ * @return {boolean} whether this Long does not equal the other.
+ */
+Long.prototype.notEquals = function(other) {
+  return (this.high_ != other.high_) || (this.low_ != other.low_);
+};
+
+/**
+ * Return whether this Long is less than the other.
+ *
+ * @method
+ * @param {Long} other Long to compare against.
+ * @return {boolean} whether this Long is less than the other.
+ */
+Long.prototype.lessThan = function(other) {
+  return this.compare(other) < 0;
+};
+
+/**
+ * Return whether this Long is less than or equal to the other.
+ *
+ * @method
+ * @param {Long} other Long to compare against.
+ * @return {boolean} whether this Long is less than or equal to the other.
+ */
+Long.prototype.lessThanOrEqual = function(other) {
+  return this.compare(other) <= 0;
+};
+
+/**
+ * Return whether this Long is greater than the other.
+ *
+ * @method
+ * @param {Long} other Long to compare against.
+ * @return {boolean} whether this Long is greater than the other.
+ */
+Long.prototype.greaterThan = function(other) {
+  return this.compare(other) > 0;
+};
+
+/**
+ * Return whether this Long is greater than or equal to the other.
+ *
+ * @method
+ * @param {Long} other Long to compare against.
+ * @return {boolean} whether this Long is greater than or equal to the other.
+ */
+Long.prototype.greaterThanOrEqual = function(other) {
+  return this.compare(other) >= 0;
+};
+
+/**
+ * Compares this Long with the given one.
+ *
+ * @method
+ * @param {Long} other Long to compare against.
+ * @return {boolean} 0 if they are the same, 1 if the this is greater, and -1 if the given one is greater.
+ */
+Long.prototype.compare = function(other) {
+  if (this.equals(other)) {
+    return 0;
+  }
+
+  var thisNeg = this.isNegative();
+  var otherNeg = other.isNegative();
+  if (thisNeg && !otherNeg) {
+    return -1;
+  }
+  if (!thisNeg && otherNeg) {
+    return 1;
+  }
+
+  // at this point, the signs are the same, so subtraction will not overflow
+  if (this.subtract(other).isNegative()) {
+    return -1;
+  } else {
+    return 1;
+  }
+};
+
+/**
+ * The negation of this value.
+ *
+ * @method
+ * @return {Long} the negation of this value.
+ */
+Long.prototype.negate = function() {
+  if (this.equals(Long.MIN_VALUE)) {
+    return Long.MIN_VALUE;
+  } else {
+    return this.not().add(Long.ONE);
+  }
+};
+
+/**
+ * Returns the sum of this and the given Long.
+ *
+ * @method
+ * @param {Long} other Long to add to this one.
+ * @return {Long} the sum of this and the given Long.
+ */
+Long.prototype.add = function(other) {
+  // Divide each number into 4 chunks of 16 bits, and then sum the chunks.
+
+  var a48 = this.high_ >>> 16;
+  var a32 = this.high_ & 0xFFFF;
+  var a16 = this.low_ >>> 16;
+  var a00 = this.low_ & 0xFFFF;
+
+  var b48 = other.high_ >>> 16;
+  var b32 = other.high_ & 0xFFFF;
+  var b16 = other.low_ >>> 16;
+  var b00 = other.low_ & 0xFFFF;
+
+  var c48 = 0, c32 = 0, c16 = 0, c00 = 0;
+  c00 += a00 + b00;
+  c16 += c00 >>> 16;
+  c00 &= 0xFFFF;
+  c16 += a16 + b16;
+  c32 += c16 >>> 16;
+  c16 &= 0xFFFF;
+  c32 += a32 + b32;
+  c48 += c32 >>> 16;
+  c32 &= 0xFFFF;
+  c48 += a48 + b48;
+  c48 &= 0xFFFF;
+  return Long.fromBits((c16 << 16) | c00, (c48 << 16) | c32);
+};
+
+/**
+ * Returns the difference of this and the given Long.
+ *
+ * @method
+ * @param {Long} other Long to subtract from this.
+ * @return {Long} the difference of this and the given Long.
+ */
+Long.prototype.subtract = function(other) {
+  return this.add(other.negate());
+};
+
+/**
+ * Returns the product of this and the given Long.
+ *
+ * @method
+ * @param {Long} other Long to multiply with this.
+ * @return {Long} the product of this and the other.
+ */
+Long.prototype.multiply = function(other) {
+  if (this.isZero()) {
+    return Long.ZERO;
+  } else if (other.isZero()) {
+    return Long.ZERO;
+  }
+
+  if (this.equals(Long.MIN_VALUE)) {
+    return other.isOdd() ? Long.MIN_VALUE : Long.ZERO;
+  } else if (other.equals(Long.MIN_VALUE)) {
+    return this.isOdd() ? Long.MIN_VALUE : Long.ZERO;
+  }
+
+  if (this.isNegative()) {
+    if (other.isNegative()) {
+      return this.negate().multiply(other.negate());
+    } else {
+      return this.negate().multiply(other).negate();
+    }
+  } else if (other.isNegative()) {
+    return this.multiply(other.negate()).negate();
+  }
+
+  // If both Longs are small, use float multiplication
+  if (this.lessThan(Long.TWO_PWR_24_) &&
+      other.lessThan(Long.TWO_PWR_24_)) {
+    return Long.fromNumber(this.toNumber() * other.toNumber());
+  }
+
+  // Divide each Long into 4 chunks of 16 bits, and then add up 4x4 products.
+  // We can skip products that would overflow.
+
+  var a48 = this.high_ >>> 16;
+  var a32 = this.high_ & 0xFFFF;
+  var a16 = this.low_ >>> 16;
+  var a00 = this.low_ & 0xFFFF;
+
+  var b48 = other.high_ >>> 16;
+  var b32 = other.high_ & 0xFFFF;
+  var b16 = other.low_ >>> 16;
+  var b00 = other.low_ & 0xFFFF;
+
+  var c48 = 0, c32 = 0, c16 = 0, c00 = 0;
+  c00 += a00 * b00;
+  c16 += c00 >>> 16;
+  c00 &= 0xFFFF;
+  c16 += a16 * b00;
+  c32 += c16 >>> 16;
+  c16 &= 0xFFFF;
+  c16 += a00 * b16;
+  c32 += c16 >>> 16;
+  c16 &= 0xFFFF;
+  c32 += a32 * b00;
+  c48 += c32 >>> 16;
+  c32 &= 0xFFFF;
+  c32 += a16 * b16;
+  c48 += c32 >>> 16;
+  c32 &= 0xFFFF;
+  c32 += a00 * b32;
+  c48 += c32 >>> 16;
+  c32 &= 0xFFFF;
+  c48 += a48 * b00 + a32 * b16 + a16 * b32 + a00 * b48;
+  c48 &= 0xFFFF;
+  return Long.fromBits((c16 << 16) | c00, (c48 << 16) | c32);
+};
+
+/**
+ * Returns this Long divided by the given one.
+ *
+ * @method
+ * @param {Long} other Long by which to divide.
+ * @return {Long} this Long divided by the given one.
+ */
+Long.prototype.div = function(other) {
+  if (other.isZero()) {
+    throw Error('division by zero');
+  } else if (this.isZero()) {
+    return Long.ZERO;
+  }
+
+  if (this.equals(Long.MIN_VALUE)) {
+    if (other.equals(Long.ONE) ||
+        other.equals(Long.NEG_ONE)) {
+      return Long.MIN_VALUE;  // recall that -MIN_VALUE == MIN_VALUE
+    } else if (other.equals(Long.MIN_VALUE)) {
+      return Long.ONE;
+    } else {
+      // At this point, we have |other| >= 2, so |this/other| < |MIN_VALUE|.
+      var halfThis = this.shiftRight(1);
+      var approx = halfThis.div(other).shiftLeft(1);
+      if (approx.equals(Long.ZERO)) {
+        return other.isNegative() ? Long.ONE : Long.NEG_ONE;
+      } else {
+        var rem = this.subtract(other.multiply(approx));
+        var result = approx.add(rem.div(other));
+        return result;
+      }
+    }
+  } else if (other.equals(Long.MIN_VALUE)) {
+    return Long.ZERO;
+  }
+
+  if (this.isNegative()) {
+    if (other.isNegative()) {
+      return this.negate().div(other.negate());
+    } else {
+      return this.negate().div(other).negate();
+    }
+  } else if (other.isNegative()) {
+    return this.div(other.negate()).negate();
+  }
+
+  // Repeat the following until the remainder is less than other:  find a
+  // floating-point that approximates remainder / other *from below*, add this
+  // into the result, and subtract it from the remainder.  It is critical that
+  // the approximate value is less than or equal to the real value so that the
+  // remainder never becomes negative.
+  var res = Long.ZERO;
+  var rem = this;
+  while (rem.greaterThanOrEqual(other)) {
+    // Approximate the result of division. This may be a little greater or
+    // smaller than the actual value.
+    var approx = Math.max(1, Math.floor(rem.toNumber() / other.toNumber()));
+
+    // We will tweak the approximate result by changing it in the 48-th digit or
+    // the smallest non-fractional digit, whichever is larger.
+    var log2 = Math.ceil(Math.log(approx) / Math.LN2);
+    var delta = (log2 <= 48) ? 1 : Math.pow(2, log2 - 48);
+
+    // Decrease the approximation until it is smaller than the remainder.  Note
+    // that if it is too large, the product overflows and is negative.
+    var approxRes = Long.fromNumber(approx);
+    var approxRem = approxRes.multiply(other);
+    while (approxRem.isNegative() || approxRem.greaterThan(rem)) {
+      approx -= delta;
+      approxRes = Long.fromNumber(approx);
+      approxRem = approxRes.multiply(other);
+    }
+
+    // We know the answer can't be zero... and actually, zero would cause
+    // infinite recursion since we would make no progress.
+    if (approxRes.isZero()) {
+      approxRes = Long.ONE;
+    }
+
+    res = res.add(approxRes);
+    rem = rem.subtract(approxRem);
+  }
+  return res;
+};
+
+/**
+ * Returns this Long modulo the given one.
+ *
+ * @method
+ * @param {Long} other Long by which to mod.
+ * @return {Long} this Long modulo the given one.
+ */
+Long.prototype.modulo = function(other) {
+  return this.subtract(this.div(other).multiply(other));
+};
+
+/**
+ * The bitwise-NOT of this value.
+ *
+ * @method
+ * @return {Long} the bitwise-NOT of this value.
+ */
+Long.prototype.not = function() {
+  return Long.fromBits(~this.low_, ~this.high_);
+};
+
+/**
+ * Returns the bitwise-AND of this Long and the given one.
+ *
+ * @method
+ * @param {Long} other the Long with which to AND.
+ * @return {Long} the bitwise-AND of this and the other.
+ */
+Long.prototype.and = function(other) {
+  return Long.fromBits(this.low_ & other.low_, this.high_ & other.high_);
+};
+
+/**
+ * Returns the bitwise-OR of this Long and the given one.
+ *
+ * @method
+ * @param {Long} other the Long with which to OR.
+ * @return {Long} the bitwise-OR of this and the other.
+ */
+Long.prototype.or = function(other) {
+  return Long.fromBits(this.low_ | other.low_, this.high_ | other.high_);
+};
+
+/**
+ * Returns the bitwise-XOR of this Long and the given one.
+ *
+ * @method
+ * @param {Long} other the Long with which to XOR.
+ * @return {Long} the bitwise-XOR of this and the other.
+ */
+Long.prototype.xor = function(other) {
+  return Long.fromBits(this.low_ ^ other.low_, this.high_ ^ other.high_);
+};
+
+/**
+ * Returns this Long with bits shifted to the left by the given amount.
+ *
+ * @method
+ * @param {number} numBits the number of bits by which to shift.
+ * @return {Long} this shifted to the left by the given amount.
+ */
+Long.prototype.shiftLeft = function(numBits) {
+  numBits &= 63;
+  if (numBits == 0) {
+    return this;
+  } else {
+    var low = this.low_;
+    if (numBits < 32) {
+      var high = this.high_;
+      return Long.fromBits(
+                 low << numBits,
+                 (high << numBits) | (low >>> (32 - numBits)));
+    } else {
+      return Long.fromBits(0, low << (numBits - 32));
+    }
+  }
+};
+
+/**
+ * Returns this Long with bits shifted to the right by the given amount.
+ *
+ * @method
+ * @param {number} numBits the number of bits by which to shift.
+ * @return {Long} this shifted to the right by the given amount.
+ */
+Long.prototype.shiftRight = function(numBits) {
+  numBits &= 63;
+  if (numBits == 0) {
+    return this;
+  } else {
+    var high = this.high_;
+    if (numBits < 32) {
+      var low = this.low_;
+      return Long.fromBits(
+                 (low >>> numBits) | (high << (32 - numBits)),
+                 high >> numBits);
+    } else {
+      return Long.fromBits(
+                 high >> (numBits - 32),
+                 high >= 0 ? 0 : -1);
+    }
+  }
+};
+
+/**
+ * Returns this Long with bits shifted to the right by the given amount, with the new top bits matching the current sign bit.
+ *
+ * @method
+ * @param {number} numBits the number of bits by which to shift.
+ * @return {Long} this shifted to the right by the given amount, with zeros placed into the new leading bits.
+ */
+Long.prototype.shiftRightUnsigned = function(numBits) {
+  numBits &= 63;
+  if (numBits == 0) {
+    return this;
+  } else {
+    var high = this.high_;
+    if (numBits < 32) {
+      var low = this.low_;
+      return Long.fromBits(
+                 (low >>> numBits) | (high << (32 - numBits)),
+                 high >>> numBits);
+    } else if (numBits == 32) {
+      return Long.fromBits(high, 0);
+    } else {
+      return Long.fromBits(high >>> (numBits - 32), 0);
+    }
+  }
+};
+
+/**
+ * Returns a Long representing the given (32-bit) integer value.
+ *
+ * @method
+ * @param {number} value the 32-bit integer in question.
+ * @return {Long} the corresponding Long value.
+ */
+Long.fromInt = function(value) {
+  if (-128 <= value && value < 128) {
+    var cachedObj = Long.INT_CACHE_[value];
+    if (cachedObj) {
+      return cachedObj;
+    }
+  }
+
+  var obj = new Long(value | 0, value < 0 ? -1 : 0);
+  if (-128 <= value && value < 128) {
+    Long.INT_CACHE_[value] = obj;
+  }
+  return obj;
+};
+
+/**
+ * Returns a Long representing the given value, provided that it is a finite number. Otherwise, zero is returned.
+ *
+ * @method
+ * @param {number} value the number in question.
+ * @return {Long} the corresponding Long value.
+ */
+Long.fromNumber = function(value) {
+  if (isNaN(value) || !isFinite(value)) {
+    return Long.ZERO;
+  } else if (value <= -Long.TWO_PWR_63_DBL_) {
+    return Long.MIN_VALUE;
+  } else if (value + 1 >= Long.TWO_PWR_63_DBL_) {
+    return Long.MAX_VALUE;
+  } else if (value < 0) {
+    return Long.fromNumber(-value).negate();
+  } else {
+    return new Long(
+               (value % Long.TWO_PWR_32_DBL_) | 0,
+               (value / Long.TWO_PWR_32_DBL_) | 0);
+  }
+};
+
+/**
+ * Returns a Long representing the 64-bit integer that comes by concatenating the given high and low bits. Each is assumed to use 32 bits.
+ *
+ * @method
+ * @param {number} lowBits the low 32-bits.
+ * @param {number} highBits the high 32-bits.
+ * @return {Long} the corresponding Long value.
+ */
+Long.fromBits = function(lowBits, highBits) {
+  return new Long(lowBits, highBits);
+};
+
+/**
+ * Returns a Long representation of the given string, written using the given radix.
+ *
+ * @method
+ * @param {string} str the textual representation of the Long.
+ * @param {number} opt_radix the radix in which the text is written.
+ * @return {Long} the corresponding Long value.
+ */
+Long.fromString = function(str, opt_radix) {
+  if (str.length == 0) {
+    throw Error('number format error: empty string');
+  }
+
+  var radix = opt_radix || 10;
+  if (radix < 2 || 36 < radix) {
+    throw Error('radix out of range: ' + radix);
+  }
+
+  if (str.charAt(0) == '-') {
+    return Long.fromString(str.substring(1), radix).negate();
+  } else if (str.indexOf('-') >= 0) {
+    throw Error('number format error: interior "-" character: ' + str);
+  }
+
+  // Do several (8) digits each time through the loop, so as to
+  // minimize the calls to the very expensive emulated div.
+  var radixToPower = Long.fromNumber(Math.pow(radix, 8));
+
+  var result = Long.ZERO;
+  for (var i = 0; i < str.length; i += 8) {
+    var size = Math.min(8, str.length - i);
+    var value = parseInt(str.substring(i, i + size), radix);
+    if (size < 8) {
+      var power = Long.fromNumber(Math.pow(radix, size));
+      result = result.multiply(power).add(Long.fromNumber(value));
+    } else {
+      result = result.multiply(radixToPower);
+      result = result.add(Long.fromNumber(value));
+    }
+  }
+  return result;
+};
+
+// NOTE: Common constant values ZERO, ONE, NEG_ONE, etc. are defined below the
+// from* methods on which they depend.
+
+
+/**
+ * A cache of the Long representations of small integer values.
+ * @type {Object}
+ * @ignore
+ */
+Long.INT_CACHE_ = {};
+
+// NOTE: the compiler should inline these constant values below and then remove
+// these variables, so there should be no runtime penalty for these.
+
+/**
+ * Number used repeated below in calculations.  This must appear before the
+ * first call to any from* function below.
+ * @type {number}
+ * @ignore
+ */
+Long.TWO_PWR_16_DBL_ = 1 << 16;
+
+/**
+ * @type {number}
+ * @ignore
+ */
+Long.TWO_PWR_24_DBL_ = 1 << 24;
+
+/**
+ * @type {number}
+ * @ignore
+ */
+Long.TWO_PWR_32_DBL_ = Long.TWO_PWR_16_DBL_ * Long.TWO_PWR_16_DBL_;
+
+/**
+ * @type {number}
+ * @ignore
+ */
+Long.TWO_PWR_31_DBL_ = Long.TWO_PWR_32_DBL_ / 2;
+
+/**
+ * @type {number}
+ * @ignore
+ */
+Long.TWO_PWR_48_DBL_ = Long.TWO_PWR_32_DBL_ * Long.TWO_PWR_16_DBL_;
+
+/**
+ * @type {number}
+ * @ignore
+ */
+Long.TWO_PWR_64_DBL_ = Long.TWO_PWR_32_DBL_ * Long.TWO_PWR_32_DBL_;
+
+/**
+ * @type {number}
+ * @ignore
+ */
+Long.TWO_PWR_63_DBL_ = Long.TWO_PWR_64_DBL_ / 2;
+
+/** @type {Long} */
+Long.ZERO = Long.fromInt(0);
+
+/** @type {Long} */
+Long.ONE = Long.fromInt(1);
+
+/** @type {Long} */
+Long.NEG_ONE = Long.fromInt(-1);
+
+/** @type {Long} */
+Long.MAX_VALUE =
+    Long.fromBits(0xFFFFFFFF | 0, 0x7FFFFFFF | 0);
+
+/** @type {Long} */
+Long.MIN_VALUE = Long.fromBits(0, 0x80000000 | 0);
+
+/**
+ * @type {Long}
+ * @ignore
+ */
+Long.TWO_PWR_24_ = Long.fromInt(1 << 24);
+
+/**
+ * Expose.
+ */
+module.exports = Long;
+module.exports.Long = Long;
+},{}],61:[function(require,module,exports){
+(function (global){
+"use strict"
+
+// We have an ES6 Map available, return the native instance
+if(typeof global.Map !== 'undefined') {
+  module.exports = global.Map;
+  module.exports.Map = global.Map;
+} else {
+  // We will return a polyfill
+  var Map = function(array) {
+    this._keys = [];
+    this._values = {};
+
+    for(var i = 0; i < array.length; i++) {
+      if(array[i] == null) continue;  // skip null and undefined
+      var entry = array[i];
+      var key = entry[0];
+      var value = entry[1];
+      // Add the key to the list of keys in order
+      this._keys.push(key);
+      // Add the key and value to the values dictionary with a point
+      // to the location in the ordered keys list
+      this._values[key] = {v: value, i: this._keys.length - 1};
+    }
+  }
+
+  Map.prototype.clear = function() {
+    this._keys = [];
+    this._values = {};
+  }
+
+  Map.prototype.delete = function(key) {
+    var value = this._values[key];
+    if(value == null) return false;
+    // Delete entry
+    delete this._values[key];
+    // Remove the key from the ordered keys list
+    this._keys.splice(value.i, 1);
+    return true;
+  }
+
+  Map.prototype.entries = function() {
+    var self = this;
+    var index = 0;
+
+    return {
+      next: function() {
+        var key = self._keys[index++];
+        return {
+          value: key !== undefined ? [key, self._values[key].v] : undefined,
+          done: key !== undefined ? false : true
+        }
+      }
+    };
+  }
+
+  Map.prototype.forEach = function(callback, self) {
+    self = self || this;
+
+    for(var i = 0; i < this._keys.length; i++) {
+      var key = this._keys[i];
+      // Call the forEach callback
+      callback.call(self, this._values[key].v, key, self);
+    }
+  }
+
+  Map.prototype.get = function(key) {
+    return this._values[key] ? this._values[key].v : undefined;
+  }
+
+  Map.prototype.has = function(key) {
+    return this._values[key] != null;
+  }
+
+  Map.prototype.keys = function(key) {
+    var self = this;
+    var index = 0;
+
+    return {
+      next: function() {
+        var key = self._keys[index++];
+        return {
+          value: key !== undefined ? key : undefined,
+          done: key !== undefined ? false : true
+        }
+      }
+    };
+  }
+
+  Map.prototype.set = function(key, value) {
+    if(this._values[key]) {
+      this._values[key].v = value;
+      return this;
+    }
+
+    // Add the key to the list of keys in order
+    this._keys.push(key);
+    // Add the key and value to the values dictionary with a point
+    // to the location in the ordered keys list
+    this._values[key] = {v: value, i: this._keys.length - 1};
+    return this;
+  }
+
+  Map.prototype.values = function(key, value) {
+    var self = this;
+    var index = 0;
+
+    return {
+      next: function() {
+        var key = self._keys[index++];
+        return {
+          value: key !== undefined ? self._values[key].v : undefined,
+          done: key !== undefined ? false : true
+        }
+      }
+    };
+  }
+
+  // Last ismaster
+  Object.defineProperty(Map.prototype, 'size', {
+    enumerable:true,
+    get: function() { return this._keys.length; }
+  });
+
+  module.exports = Map;
+  module.exports.Map = Map;
+}
+}).call(this,typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+},{}],62:[function(require,module,exports){
+/**
+ * A class representation of the BSON MaxKey type.
+ *
+ * @class
+ * @return {MaxKey} A MaxKey instance
+ */
+function MaxKey() {
+  if(!(this instanceof MaxKey)) return new MaxKey();
+  
+  this._bsontype = 'MaxKey';  
+}
+
+module.exports = MaxKey;
+module.exports.MaxKey = MaxKey;
+},{}],63:[function(require,module,exports){
+/**
+ * A class representation of the BSON MinKey type.
+ *
+ * @class
+ * @return {MinKey} A MinKey instance
+ */
+function MinKey() {
+  if(!(this instanceof MinKey)) return new MinKey();
+  
+  this._bsontype = 'MinKey';
+}
+
+module.exports = MinKey;
+module.exports.MinKey = MinKey;
+},{}],64:[function(require,module,exports){
+(function (process){
+/**
+ * Module dependencies.
+ * @ignore
+ */
+var BinaryParser = require('./binary_parser').BinaryParser;
+
+/**
+ * Machine id.
+ *
+ * Create a random 3-byte value (i.e. unique for this
+ * process). Other drivers use a md5 of the machine id here, but
+ * that would mean an asyc call to gethostname, so we don't bother.
+ * @ignore
+ */
+var MACHINE_ID = parseInt(Math.random() * 0xFFFFFF, 10);
+
+// Regular expression that checks for hex value
+var checkForHexRegExp = new RegExp("^[0-9a-fA-F]{24}$");
+
+/**
+* Create a new ObjectID instance
+*
+* @class
+* @param {(string|number)} id Can be a 24 byte hex string, 12 byte binary string or a Number.
+* @property {number} generationTime The generation time of this ObjectId instance
+* @return {ObjectID} instance of ObjectID.
+*/
+var ObjectID = function ObjectID(id) {
+  if(!(this instanceof ObjectID)) return new ObjectID(id);
+  if((id instanceof ObjectID)) return id;
+
+  this._bsontype = 'ObjectID';
+  var __id = null;
+  var valid = ObjectID.isValid(id);
+
+  // Throw an error if it's not a valid setup
+  if(!valid && id != null){
+    throw new Error("Argument passed in must be a single String of 12 bytes or a string of 24 hex characters");
+  } else if(valid && typeof id == 'string' && id.length == 24) {
+    return ObjectID.createFromHexString(id);
+  } else if(id == null || typeof id == 'number') {
+    // convert to 12 byte binary string
+    this.id = this.generate(id);
+  } else if(id != null && id.length === 12) {
+    // assume 12 byte string
+    this.id = id;
+  }
+
+  if(ObjectID.cacheHexString) this.__id = this.toHexString();
+};
+
+// Allow usage of ObjectId as well as ObjectID
+var ObjectId = ObjectID;
+
+// Precomputed hex table enables speedy hex string conversion
+var hexTable = [];
+for (var i = 0; i < 256; i++) {
+  hexTable[i] = (i <= 15 ? '0' : '') + i.toString(16);
+}
+
+/**
+* Return the ObjectID id as a 24 byte hex string representation
+*
+* @method
+* @return {string} return the 24 byte hex string representation.
+*/
+ObjectID.prototype.toHexString = function() {
+  if(ObjectID.cacheHexString && this.__id) return this.__id;
+
+  var hexString = '';
+
+  for (var i = 0; i < this.id.length; i++) {
+    hexString += hexTable[this.id.charCodeAt(i)];
+  }
+
+  if(ObjectID.cacheHexString) this.__id = hexString;
+  return hexString;
+};
+
+/**
+* Update the ObjectID index used in generating new ObjectID's on the driver
+*
+* @method
+* @return {number} returns next index value.
+* @ignore
+*/
+ObjectID.prototype.get_inc = function() {
+  return ObjectID.index = (ObjectID.index + 1) % 0xFFFFFF;
+};
+
+/**
+* Update the ObjectID index used in generating new ObjectID's on the driver
+*
+* @method
+* @return {number} returns next index value.
+* @ignore
+*/
+ObjectID.prototype.getInc = function() {
+  return this.get_inc();
+};
+
+/**
+* Generate a 12 byte id string used in ObjectID's
+*
+* @method
+* @param {number} [time] optional parameter allowing to pass in a second based timestamp.
+* @return {string} return the 12 byte id binary string.
+*/
+ObjectID.prototype.generate = function(time) {
+  if ('number' != typeof time) {
+    time = parseInt(Date.now()/1000,10);
+  }
+
+  var time4Bytes = BinaryParser.encodeInt(time, 32, true, true);
+  /* for time-based ObjectID the bytes following the time will be zeroed */
+  var machine3Bytes = BinaryParser.encodeInt(MACHINE_ID, 24, false);
+  var pid2Bytes = BinaryParser.fromShort((typeof process === 'undefined' ? Math.floor(Math.random() * 100000) : process.pid) % 0xFFFF);
+  var index3Bytes = BinaryParser.encodeInt(this.get_inc(), 24, false, true);
+
+  return time4Bytes + machine3Bytes + pid2Bytes + index3Bytes;
+};
+
+/**
+* Converts the id into a 24 byte hex string for printing
+*
+* @return {String} return the 24 byte hex string representation.
+* @ignore
+*/
+ObjectID.prototype.toString = function() {
+  return this.toHexString();
+};
+
+/**
+* Converts to a string representation of this Id.
+*
+* @return {String} return the 24 byte hex string representation.
+* @ignore
+*/
+ObjectID.prototype.inspect = ObjectID.prototype.toString;
+
+/**
+* Converts to its JSON representation.
+*
+* @return {String} return the 24 byte hex string representation.
+* @ignore
+*/
+ObjectID.prototype.toJSON = function() {
+  return this.toHexString();
+};
+
+/**
+* Compares the equality of this ObjectID with `otherID`.
+*
+* @method
+* @param {object} otherID ObjectID instance to compare against.
+* @return {boolean} the result of comparing two ObjectID's
+*/
+ObjectID.prototype.equals = function equals (otherID) {
+  var id;
+
+  if(otherID != null && (otherID instanceof ObjectID || otherID.toHexString)) {
+    id = otherID.id;
+  } else if(typeof otherID == 'string' && ObjectID.isValid(otherID)) {
+    id = ObjectID.createFromHexString(otherID).id;
+  } else {
+    return false;
+  }
+
+  return this.id === id;
+}
+
+/**
+* Returns the generation date (accurate up to the second) that this ID was generated.
+*
+* @method
+* @return {date} the generation date
+*/
+ObjectID.prototype.getTimestamp = function() {
+  var timestamp = new Date();
+  timestamp.setTime(Math.floor(BinaryParser.decodeInt(this.id.substring(0,4), 32, true, true)) * 1000);
+  return timestamp;
+}
+
+/**
+* @ignore
+*/
+ObjectID.index = parseInt(Math.random() * 0xFFFFFF, 10);
+
+/**
+* @ignore
+*/
+ObjectID.createPk = function createPk () {
+  return new ObjectID();
+};
+
+/**
+* Creates an ObjectID from a second based number, with the rest of the ObjectID zeroed out. Used for comparisons or sorting the ObjectID.
+*
+* @method
+* @param {number} time an integer number representing a number of seconds.
+* @return {ObjectID} return the created ObjectID
+*/
+ObjectID.createFromTime = function createFromTime (time) {
+  var id = BinaryParser.encodeInt(time, 32, true, true) +
+           BinaryParser.encodeInt(0, 64, true, true);
+  return new ObjectID(id);
+};
+
+/**
+* Creates an ObjectID from a hex string representation of an ObjectID.
+*
+* @method
+* @param {string} hexString create a ObjectID from a passed in 24 byte hexstring.
+* @return {ObjectID} return the created ObjectID
+*/
+ObjectID.createFromHexString = function createFromHexString (hexString) {
+  // Throw an error if it's not a valid setup
+  if(typeof hexString === 'undefined' || hexString != null && hexString.length != 24)
+    throw new Error("Argument passed in must be a single String of 12 bytes or a string of 24 hex characters");
+
+  var len = hexString.length;
+
+  if(len > 12*2) {
+    throw new Error('Id cannot be longer than 12 bytes');
+  }
+
+  var result = ''
+    , string
+    , number;
+
+  for (var index = 0; index < len; index += 2) {
+    string = hexString.substr(index, 2);
+    number = parseInt(string, 16);
+    result += BinaryParser.fromByte(number);
+  }
+
+  return new ObjectID(result, hexString);
+};
+
+/**
+* Checks if a value is a valid bson ObjectId
+*
+* @method
+* @return {boolean} return true if the value is a valid bson ObjectId, return false otherwise.
+*/
+ObjectID.isValid = function isValid(id) {
+  if(id == null) return false;
+
+  if(typeof id == 'number')
+    return true;
+  if(typeof id == 'string') {
+    return id.length == 12 || (id.length == 24 && checkForHexRegExp.test(id));
+  }
+  return false;
+};
+
+/**
+* @ignore
+*/
+Object.defineProperty(ObjectID.prototype, "generationTime", {
+   enumerable: true
+ , get: function () {
+     return Math.floor(BinaryParser.decodeInt(this.id.substring(0,4), 32, true, true));
+   }
+ , set: function (value) {
+     var value = BinaryParser.encodeInt(value, 32, true, true);
+     this.id = value + this.id.substr(4);
+     // delete this.__id;
+     this.toHexString();
+   }
+});
+
+/**
+ * Expose.
+ */
+module.exports = ObjectID;
+module.exports.ObjectID = ObjectID;
+module.exports.ObjectId = ObjectID;
+
+}).call(this,require("g5I+bs"))
+},{"./binary_parser":54,"g5I+bs":92}],65:[function(require,module,exports){
+(function (Buffer){
+"use strict"
+
+var writeIEEE754 = require('../float_parser').writeIEEE754
+	, readIEEE754 = require('../float_parser').readIEEE754
+	, Long = require('../long').Long
+  , Double = require('../double').Double
+  , Timestamp = require('../timestamp').Timestamp
+  , ObjectID = require('../objectid').ObjectID
+  , Symbol = require('../symbol').Symbol
+  , BSONRegExp = require('../regexp').BSONRegExp
+  , Code = require('../code').Code
+  , MinKey = require('../min_key').MinKey
+  , MaxKey = require('../max_key').MaxKey
+  , DBRef = require('../db_ref').DBRef
+  , Binary = require('../binary').Binary;
+
+// To ensure that 0.4 of node works correctly
+var isDate = function isDate(d) {
+  return typeof d === 'object' && Object.prototype.toString.call(d) === '[object Date]';
+}
+
+var calculateObjectSize = function calculateObjectSize(object, serializeFunctions, ignoreUndefined) {
+  var totalLength = (4 + 1);
+
+  if(Array.isArray(object)) {
+    for(var i = 0; i < object.length; i++) {
+      totalLength += calculateElement(i.toString(), object[i], serializeFunctions, true, ignoreUndefined)
+    }
+  } else {
+		// If we have toBSON defined, override the current object
+		if(object.toBSON) {
+			object = object.toBSON();
+		}
+
+		// Calculate size
+    for(var key in object) {
+      totalLength += calculateElement(key, object[key], serializeFunctions, false, ignoreUndefined)
+    }
+  }
+
+  return totalLength;
+}
+
+/**
+ * @ignore
+ * @api private
+ */
+function calculateElement(name, value, serializeFunctions, isArray, ignoreUndefined) {
+	// If we have toBSON defined, override the current object
+  if(value && value.toBSON){
+    value = value.toBSON();
+  }
+
+  switch(typeof value) {
+    case 'string':
+      return 1 + Buffer.byteLength(name, 'utf8') + 1 + 4 + Buffer.byteLength(value, 'utf8') + 1;
+    case 'number':
+      if(Math.floor(value) === value && value >= BSON.JS_INT_MIN && value <= BSON.JS_INT_MAX) {
+        if(value >= BSON.BSON_INT32_MIN && value <= BSON.BSON_INT32_MAX) { // 32 bit
+          return (name != null ? (Buffer.byteLength(name, 'utf8') + 1) : 0) + (4 + 1);
+        } else {
+          return (name != null ? (Buffer.byteLength(name, 'utf8') + 1) : 0) + (8 + 1);
+        }
+      } else {  // 64 bit
+        return (name != null ? (Buffer.byteLength(name, 'utf8') + 1) : 0) + (8 + 1);
+      }
+    case 'undefined':
+      if(isArray || !ignoreUndefined) return (name != null ? (Buffer.byteLength(name, 'utf8') + 1) : 0) + (1);
+      return 0;
+    case 'boolean':
+      return (name != null ? (Buffer.byteLength(name, 'utf8') + 1) : 0) + (1 + 1);
+    case 'object':
+      if(value == null || value instanceof MinKey || value instanceof MaxKey || value['_bsontype'] == 'MinKey' || value['_bsontype'] == 'MaxKey') {
+        return (name != null ? (Buffer.byteLength(name, 'utf8') + 1) : 0) + (1);
+      } else if(value instanceof ObjectID || value['_bsontype'] == 'ObjectID') {
+        return (name != null ? (Buffer.byteLength(name, 'utf8') + 1) : 0) + (12 + 1);
+      } else if(value instanceof Date || isDate(value)) {
+        return (name != null ? (Buffer.byteLength(name, 'utf8') + 1) : 0) + (8 + 1);
+      } else if(typeof Buffer !== 'undefined' && Buffer.isBuffer(value)) {
+        return (name != null ? (Buffer.byteLength(name, 'utf8') + 1) : 0) + (1 + 4 + 1) + value.length;
+      } else if(value instanceof Long || value instanceof Double || value instanceof Timestamp
+          || value['_bsontype'] == 'Long' || value['_bsontype'] == 'Double' || value['_bsontype'] == 'Timestamp') {
+        return (name != null ? (Buffer.byteLength(name, 'utf8') + 1) : 0) + (8 + 1);
+      } else if(value instanceof Code || value['_bsontype'] == 'Code') {
+        // Calculate size depending on the availability of a scope
+        if(value.scope != null && Object.keys(value.scope).length > 0) {
+          return (name != null ? (Buffer.byteLength(name, 'utf8') + 1) : 0) + 1 + 4 + 4 + Buffer.byteLength(value.code.toString(), 'utf8') + 1 + calculateObjectSize(value.scope, serializeFunctions, ignoreUndefined);
+        } else {
+          return (name != null ? (Buffer.byteLength(name, 'utf8') + 1) : 0) + 1 + 4 + Buffer.byteLength(value.code.toString(), 'utf8') + 1;
+        }
+      } else if(value instanceof Binary || value['_bsontype'] == 'Binary') {
+        // Check what kind of subtype we have
+        if(value.sub_type == Binary.SUBTYPE_BYTE_ARRAY) {
+          return (name != null ? (Buffer.byteLength(name, 'utf8') + 1) : 0) + (value.position + 1 + 4 + 1 + 4);
+        } else {
+          return (name != null ? (Buffer.byteLength(name, 'utf8') + 1) : 0) + (value.position + 1 + 4 + 1);
+        }
+      } else if(value instanceof Symbol || value['_bsontype'] == 'Symbol') {
+        return (name != null ? (Buffer.byteLength(name, 'utf8') + 1) : 0) + Buffer.byteLength(value.value, 'utf8') + 4 + 1 + 1;
+      } else if(value instanceof DBRef || value['_bsontype'] == 'DBRef') {
+        // Set up correct object for serialization
+        var ordered_values = {
+            '$ref': value.namespace
+          , '$id' : value.oid
+        };
+
+        // Add db reference if it exists
+        if(null != value.db) {
+          ordered_values['$db'] = value.db;
+        }
+
+        return (name != null ? (Buffer.byteLength(name, 'utf8') + 1) : 0) + 1 + calculateObjectSize(ordered_values, serializeFunctions, ignoreUndefined);
+      } else if(value instanceof RegExp || Object.prototype.toString.call(value) === '[object RegExp]') {
+          return (name != null ? (Buffer.byteLength(name, 'utf8') + 1) : 0) + 1 + Buffer.byteLength(value.source, 'utf8') + 1
+            + (value.global ? 1 : 0) + (value.ignoreCase ? 1 : 0) + (value.multiline ? 1 : 0) + 1
+      } else if(value instanceof BSONRegExp || value['_bsontype'] == 'BSONRegExp') {
+          return (name != null ? (Buffer.byteLength(name, 'utf8') + 1) : 0) + 1 + Buffer.byteLength(value.pattern, 'utf8') + 1
+            + Buffer.byteLength(value.options, 'utf8') + 1
+      } else {
+        return (name != null ? (Buffer.byteLength(name, 'utf8') + 1) : 0) + calculateObjectSize(value, serializeFunctions, ignoreUndefined) + 1;
+      }
+    case 'function':
+      // WTF for 0.4.X where typeof /someregexp/ === 'function'
+      if(value instanceof RegExp || Object.prototype.toString.call(value) === '[object RegExp]' || String.call(value) == '[object RegExp]') {
+        return (name != null ? (Buffer.byteLength(name, 'utf8') + 1) : 0) + 1 + Buffer.byteLength(value.source, 'utf8') + 1
+          + (value.global ? 1 : 0) + (value.ignoreCase ? 1 : 0) + (value.multiline ? 1 : 0) + 1
+      } else {
+        if(serializeFunctions && value.scope != null && Object.keys(value.scope).length > 0) {
+          return (name != null ? (Buffer.byteLength(name, 'utf8') + 1) : 0) + 1 + 4 + 4 + Buffer.byteLength(value.toString(), 'utf8') + 1 + calculateObjectSize(value.scope, serializeFunctions, ignoreUndefined);
+        } else if(serializeFunctions) {
+          return (name != null ? (Buffer.byteLength(name, 'utf8') + 1) : 0) + 1 + 4 + Buffer.byteLength(value.toString(), 'utf8') + 1;
+        }
+      }
+  }
+
+  return 0;
+}
+
+var BSON = {};
+
+/**
+ * Contains the function cache if we have that enable to allow for avoiding the eval step on each deserialization, comparison is by md5
+ *
+ * @ignore
+ * @api private
+ */
+var functionCache = BSON.functionCache = {};
+
+/**
+ * Number BSON Type
+ *
+ * @classconstant BSON_DATA_NUMBER
+ **/
+BSON.BSON_DATA_NUMBER = 1;
+/**
+ * String BSON Type
+ *
+ * @classconstant BSON_DATA_STRING
+ **/
+BSON.BSON_DATA_STRING = 2;
+/**
+ * Object BSON Type
+ *
+ * @classconstant BSON_DATA_OBJECT
+ **/
+BSON.BSON_DATA_OBJECT = 3;
+/**
+ * Array BSON Type
+ *
+ * @classconstant BSON_DATA_ARRAY
+ **/
+BSON.BSON_DATA_ARRAY = 4;
+/**
+ * Binary BSON Type
+ *
+ * @classconstant BSON_DATA_BINARY
+ **/
+BSON.BSON_DATA_BINARY = 5;
+/**
+ * ObjectID BSON Type
+ *
+ * @classconstant BSON_DATA_OID
+ **/
+BSON.BSON_DATA_OID = 7;
+/**
+ * Boolean BSON Type
+ *
+ * @classconstant BSON_DATA_BOOLEAN
+ **/
+BSON.BSON_DATA_BOOLEAN = 8;
+/**
+ * Date BSON Type
+ *
+ * @classconstant BSON_DATA_DATE
+ **/
+BSON.BSON_DATA_DATE = 9;
+/**
+ * null BSON Type
+ *
+ * @classconstant BSON_DATA_NULL
+ **/
+BSON.BSON_DATA_NULL = 10;
+/**
+ * RegExp BSON Type
+ *
+ * @classconstant BSON_DATA_REGEXP
+ **/
+BSON.BSON_DATA_REGEXP = 11;
+/**
+ * Code BSON Type
+ *
+ * @classconstant BSON_DATA_CODE
+ **/
+BSON.BSON_DATA_CODE = 13;
+/**
+ * Symbol BSON Type
+ *
+ * @classconstant BSON_DATA_SYMBOL
+ **/
+BSON.BSON_DATA_SYMBOL = 14;
+/**
+ * Code with Scope BSON Type
+ *
+ * @classconstant BSON_DATA_CODE_W_SCOPE
+ **/
+BSON.BSON_DATA_CODE_W_SCOPE = 15;
+/**
+ * 32 bit Integer BSON Type
+ *
+ * @classconstant BSON_DATA_INT
+ **/
+BSON.BSON_DATA_INT = 16;
+/**
+ * Timestamp BSON Type
+ *
+ * @classconstant BSON_DATA_TIMESTAMP
+ **/
+BSON.BSON_DATA_TIMESTAMP = 17;
+/**
+ * Long BSON Type
+ *
+ * @classconstant BSON_DATA_LONG
+ **/
+BSON.BSON_DATA_LONG = 18;
+/**
+ * MinKey BSON Type
+ *
+ * @classconstant BSON_DATA_MIN_KEY
+ **/
+BSON.BSON_DATA_MIN_KEY = 0xff;
+/**
+ * MaxKey BSON Type
+ *
+ * @classconstant BSON_DATA_MAX_KEY
+ **/
+BSON.BSON_DATA_MAX_KEY = 0x7f;
+
+/**
+ * Binary Default Type
+ *
+ * @classconstant BSON_BINARY_SUBTYPE_DEFAULT
+ **/
+BSON.BSON_BINARY_SUBTYPE_DEFAULT = 0;
+/**
+ * Binary Function Type
+ *
+ * @classconstant BSON_BINARY_SUBTYPE_FUNCTION
+ **/
+BSON.BSON_BINARY_SUBTYPE_FUNCTION = 1;
+/**
+ * Binary Byte Array Type
+ *
+ * @classconstant BSON_BINARY_SUBTYPE_BYTE_ARRAY
+ **/
+BSON.BSON_BINARY_SUBTYPE_BYTE_ARRAY = 2;
+/**
+ * Binary UUID Type
+ *
+ * @classconstant BSON_BINARY_SUBTYPE_UUID
+ **/
+BSON.BSON_BINARY_SUBTYPE_UUID = 3;
+/**
+ * Binary MD5 Type
+ *
+ * @classconstant BSON_BINARY_SUBTYPE_MD5
+ **/
+BSON.BSON_BINARY_SUBTYPE_MD5 = 4;
+/**
+ * Binary User Defined Type
+ *
+ * @classconstant BSON_BINARY_SUBTYPE_USER_DEFINED
+ **/
+BSON.BSON_BINARY_SUBTYPE_USER_DEFINED = 128;
+
+// BSON MAX VALUES
+BSON.BSON_INT32_MAX = 0x7FFFFFFF;
+BSON.BSON_INT32_MIN = -0x80000000;
+
+BSON.BSON_INT64_MAX = Math.pow(2, 63) - 1;
+BSON.BSON_INT64_MIN = -Math.pow(2, 63);
+
+// JS MAX PRECISE VALUES
+BSON.JS_INT_MAX = 0x20000000000000;  // Any integer up to 2^53 can be precisely represented by a double.
+BSON.JS_INT_MIN = -0x20000000000000;  // Any integer down to -2^53 can be precisely represented by a double.
+
+// Internal long versions
+var JS_INT_MAX_LONG = Long.fromNumber(0x20000000000000);  // Any integer up to 2^53 can be precisely represented by a double.
+var JS_INT_MIN_LONG = Long.fromNumber(-0x20000000000000);  // Any integer down to -2^53 can be precisely represented by a double.
+
+module.exports = calculateObjectSize;
+
+}).call(this,require("buffer").Buffer)
+},{"../binary":53,"../code":56,"../db_ref":57,"../double":58,"../float_parser":59,"../long":60,"../max_key":62,"../min_key":63,"../objectid":64,"../regexp":68,"../symbol":69,"../timestamp":70,"buffer":71}],66:[function(require,module,exports){
+"use strict"
+
+var readIEEE754 = require('../float_parser').readIEEE754,
+	f = require('util').format,
+	Long = require('../long').Long,
+  Double = require('../double').Double,
+  Timestamp = require('../timestamp').Timestamp,
+  ObjectID = require('../objectid').ObjectID,
+  Symbol = require('../symbol').Symbol,
+  Code = require('../code').Code,
+  MinKey = require('../min_key').MinKey,
+  MaxKey = require('../max_key').MaxKey,
+  DBRef = require('../db_ref').DBRef,
+  BSONRegExp = require('../regexp').BSONRegExp,
+  Binary = require('../binary').Binary;
+
+var deserialize = function(buffer, options, isArray) {
+	options = options == null ? {} : options;
+	var index = options && options.index ? options.index : 0;
+	// Read the document size
+  var size = buffer[index++] | buffer[index++] << 8 | buffer[index++] << 16 | buffer[index++] << 24;
+
+	// Ensure buffer is valid size
+  if(size < 5 || buffer.length < size) {
+		throw new Error("corrupt bson message");
+	}
+
+	// Illegal end value
+	if(buffer[size - 1] != 0) {
+		throw new Error("One object, sized correctly, with a spot for an EOO, but the EOO isn't 0x00");
+	}
+
+	// Start deserializtion
+	return deserializeObject(buffer, index - 4, options, isArray);
+}
+
+var deserializeObject = function(buffer, index, options, isArray) {
+	var evalFunctions = options['evalFunctions'] == null ? false : options['evalFunctions'];
+  var cacheFunctions = options['cacheFunctions'] == null ? false : options['cacheFunctions'];
+  var cacheFunctionsCrc32 = options['cacheFunctionsCrc32'] == null ? false : options['cacheFunctionsCrc32'];
+  var promoteLongs = options['promoteLongs'] == null ? true : options['promoteLongs'];
+	var fieldsAsRaw = options['fieldsAsRaw'] == null ? null : options['fieldsAsRaw'];
+	var raw = options['raw'] == null ? false : options['raw'];
+  // Return BSONRegExp objects instead of native regular expressions
+  var bsonRegExp = typeof options['bsonRegExp'] == 'boolean' ? options['bsonRegExp'] : false;
+  var promoteBuffers = options['promoteBuffers'] == null ? false : options['promoteBuffers'];
+
+  // Validate that we have at least 4 bytes of buffer
+  if(buffer.length < 5) throw new Error("corrupt bson message < 5 bytes long");
+
+	// Read the document size
+  var size = buffer[index++] | buffer[index++] << 8 | buffer[index++] << 16 | buffer[index++] << 24;
+
+	// Ensure buffer is valid size
+  if(size < 5 || size > buffer.length) throw new Error("corrupt bson message");
+
+  // Create holding object
+  var object = isArray ? [] : {};
+
+  // While we have more left data left keep parsing
+  while(true) {
+    // Read the type
+    var elementType = buffer[index++];
+    // If we get a zero it's the last byte, exit
+    if(elementType == 0) break;
+
+		// Get the start search index
+		var i = index;
+		// Locate the end of the c string
+		while(buffer[i] !== 0x00 && i < buffer.length) {
+			i++
+		}
+
+		// If are at the end of the buffer there is a problem with the document
+		if(i >= buffer.length) throw new Error("Bad BSON Document: illegal CString")
+		var name = buffer.toString('utf8', index, i);
+
+		index = i + 1;
+
+		if(elementType == BSON.BSON_DATA_STRING) {
+      var stringSize = buffer[index++] | buffer[index++] << 8 | buffer[index++] << 16 | buffer[index++] << 24;
+			if(stringSize <= 0 || stringSize > (buffer.length - index) || buffer[index + stringSize - 1] != 0) throw new Error("bad string length in bson");
+      object[name] = buffer.toString('utf8', index, index + stringSize - 1);
+      index = index + stringSize;
+		} else if(elementType == BSON.BSON_DATA_OID) {
+      var string = buffer.toString('binary', index, index + 12);
+      object[name] = new ObjectID(string);
+      index = index + 12;
+		} else if(elementType == BSON.BSON_DATA_INT) {
+      object[name] = buffer[index++] | buffer[index++] << 8 | buffer[index++] << 16 | buffer[index++] << 24;
+		} else if(elementType == BSON.BSON_DATA_NUMBER) {
+			object[name] = buffer.readDoubleLE(index);
+      index = index + 8;
+		} else if(elementType == BSON.BSON_DATA_DATE) {
+      var lowBits = buffer[index++] | buffer[index++] << 8 | buffer[index++] << 16 | buffer[index++] << 24;
+      var highBits = buffer[index++] | buffer[index++] << 8 | buffer[index++] << 16 | buffer[index++] << 24;
+      object[name] = new Date(new Long(lowBits, highBits).toNumber());
+		} else if(elementType == BSON.BSON_DATA_BOOLEAN) {
+      object[name] = buffer[index++] == 1;
+		} else if(elementType == BSON.BSON_DATA_OBJECT) {
+			var _index = index;
+      var objectSize = buffer[index] | buffer[index + 1] << 8 | buffer[index + 2] << 16 | buffer[index + 3] << 24;
+			if(objectSize <= 0 || objectSize > (buffer.length - index)) throw new Error("bad embedded document length in bson");
+
+			// We have a raw value
+			if(raw) {
+	      object[name] = buffer.slice(index, index + objectSize);
+			} else {
+	      object[name] = deserializeObject(buffer, _index, options, false);
+			}
+
+      index = index + objectSize;
+		} else if(elementType == BSON.BSON_DATA_ARRAY) {
+			var _index = index;
+      var objectSize = buffer[index] | buffer[index + 1] << 8 | buffer[index + 2] << 16 | buffer[index + 3] << 24;
+			var arrayOptions = options;
+
+			// All elements of array to be returned as raw bson
+			if(fieldsAsRaw && fieldsAsRaw[name]) {
+				arrayOptions = {};
+				for(var n in options) arrayOptions[n] = options[n];
+				arrayOptions['raw'] = true;
+			}
+
+      object[name] = deserializeObject(buffer, _index, arrayOptions, true);
+      index = index + objectSize;
+		} else if(elementType == BSON.BSON_DATA_UNDEFINED || elementType == BSON.BSON_DATA_NULL) {
+      object[name] = null;
+		} else if(elementType == BSON.BSON_DATA_LONG) {
+      // Unpack the low and high bits
+      var lowBits = buffer[index++] | buffer[index++] << 8 | buffer[index++] << 16 | buffer[index++] << 24;
+      var highBits = buffer[index++] | buffer[index++] << 8 | buffer[index++] << 16 | buffer[index++] << 24;
+      var long = new Long(lowBits, highBits);
+      // Promote the long if possible
+      if(promoteLongs) {
+        object[name] = long.lessThanOrEqual(JS_INT_MAX_LONG) && long.greaterThanOrEqual(JS_INT_MIN_LONG) ? long.toNumber() : long;
+      } else {
+        object[name] = long;
+      }
+		} else if(elementType == BSON.BSON_DATA_BINARY) {
+      var binarySize = buffer[index++] | buffer[index++] << 8 | buffer[index++] << 16 | buffer[index++] << 24;
+      var subType = buffer[index++];
+      // Decode as raw Buffer object if options specifies it
+      if(buffer['slice'] != null) {
+        // If we have subtype 2 skip the 4 bytes for the size
+        if(subType == Binary.SUBTYPE_BYTE_ARRAY) {
+          binarySize = buffer[index++] | buffer[index++] << 8 | buffer[index++] << 16 | buffer[index++] << 24;
+        }
+        if(promoteBuffers) {
+          object[name] = buffer.slice(index, index + binarySize);
+        } else {
+          object[name] = new Binary(buffer.slice(index, index + binarySize), subType);
+        }
+      } else {
+        var _buffer = typeof Uint8Array != 'undefined' ? new Uint8Array(new ArrayBuffer(binarySize)) : new Array(binarySize);
+        // If we have subtype 2 skip the 4 bytes for the size
+        if(subType == Binary.SUBTYPE_BYTE_ARRAY) {
+          binarySize = buffer[index++] | buffer[index++] << 8 | buffer[index++] << 16 | buffer[index++] << 24;
+        }
+        // Copy the data
+        for(var i = 0; i < binarySize; i++) {
+          _buffer[i] = buffer[index + i];
+        }
+        if(promoteBuffers) {
+          object[name] = _buffer;
+        } else {
+          object[name] = new Binary(_buffer, subType);
+        }
+      }
+      // Update the index
+      index = index + binarySize;
+		} else if(elementType == BSON.BSON_DATA_REGEXP && bsonRegExp == false) {
+			// Get the start search index
+			var i = index;
+			// Locate the end of the c string
+			while(buffer[i] !== 0x00 && i < buffer.length) {
+				i++
+			}
+			// If are at the end of the buffer there is a problem with the document
+			if(i >= buffer.length) throw new Error("Bad BSON Document: illegal CString")
+			// Return the C string
+			var source = buffer.toString('utf8', index, i);
+      // Create the regexp
+			index = i + 1;
+
+			// Get the start search index
+			var i = index;
+			// Locate the end of the c string
+			while(buffer[i] !== 0x00 && i < buffer.length) {
+				i++
+			}
+			// If are at the end of the buffer there is a problem with the document
+			if(i >= buffer.length) throw new Error("Bad BSON Document: illegal CString")
+			// Return the C string
+			var regExpOptions = buffer.toString('utf8', index, i);
+			index = i + 1;
+
+      // For each option add the corresponding one for javascript
+      var optionsArray = new Array(regExpOptions.length);
+
+      // Parse options
+      for(var i = 0; i < regExpOptions.length; i++) {
+        switch(regExpOptions[i]) {
+          case 'm':
+            optionsArray[i] = 'm';
+            break;
+          case 's':
+            optionsArray[i] = 'g';
+            break;
+          case 'i':
+            optionsArray[i] = 'i';
+            break;
+        }
+      }
+
+      object[name] = new RegExp(source, optionsArray.join(''));
+    } else if(elementType == BSON.BSON_DATA_REGEXP && bsonRegExp == true) {
+			// Get the start search index
+			var i = index;
+			// Locate the end of the c string
+			while(buffer[i] !== 0x00 && i < buffer.length) {
+				i++
+			}
+			// If are at the end of the buffer there is a problem with the document
+			if(i >= buffer.length) throw new Error("Bad BSON Document: illegal CString")
+			// Return the C string
+			var source = buffer.toString('utf8', index, i);
+      index = i + 1;
+
+			// Get the start search index
+			var i = index;
+			// Locate the end of the c string
+			while(buffer[i] !== 0x00 && i < buffer.length) {
+				i++
+			}
+			// If are at the end of the buffer there is a problem with the document
+			if(i >= buffer.length) throw new Error("Bad BSON Document: illegal CString")
+			// Return the C string
+			var regExpOptions = buffer.toString('utf8', index, i);
+      index = i + 1;
+
+      // Set the object
+      object[name] = new BSONRegExp(source, regExpOptions);
+		} else if(elementType == BSON.BSON_DATA_SYMBOL) {
+      var stringSize = buffer[index++] | buffer[index++] << 8 | buffer[index++] << 16 | buffer[index++] << 24;
+			if(stringSize <= 0 || stringSize > (buffer.length - index) || buffer[index + stringSize - 1] != 0) throw new Error("bad string length in bson");
+      object[name] = new Symbol(buffer.toString('utf8', index, index + stringSize - 1));
+      index = index + stringSize;
+		} else if(elementType == BSON.BSON_DATA_TIMESTAMP) {
+      var lowBits = buffer[index++] | buffer[index++] << 8 | buffer[index++] << 16 | buffer[index++] << 24;
+      var highBits = buffer[index++] | buffer[index++] << 8 | buffer[index++] << 16 | buffer[index++] << 24;
+      object[name] = new Timestamp(lowBits, highBits);
+		} else if(elementType == BSON.BSON_DATA_MIN_KEY) {
+      object[name] = new MinKey();
+		} else if(elementType == BSON.BSON_DATA_MAX_KEY) {
+      object[name] = new MaxKey();
+		} else if(elementType == BSON.BSON_DATA_CODE) {
+      var stringSize = buffer[index++] | buffer[index++] << 8 | buffer[index++] << 16 | buffer[index++] << 24;
+			if(stringSize <= 0 || stringSize > (buffer.length - index) || buffer[index + stringSize - 1] != 0) throw new Error("bad string length in bson");
+      var functionString = buffer.toString('utf8', index, index + stringSize - 1);
+
+      // If we are evaluating the functions
+      if(evalFunctions) {
+        var value = null;
+        // If we have cache enabled let's look for the md5 of the function in the cache
+        if(cacheFunctions) {
+          var hash = cacheFunctionsCrc32 ? crc32(functionString) : functionString;
+          // Got to do this to avoid V8 deoptimizing the call due to finding eval
+          object[name] = isolateEvalWithHash(functionCache, hash, functionString, object);
+        } else {
+          object[name] = isolateEval(functionString);
+        }
+      } else {
+        object[name]  = new Code(functionString, {});
+      }
+
+      // Update parse index position
+      index = index + stringSize;
+		} else if(elementType == BSON.BSON_DATA_CODE_W_SCOPE) {
+      var totalSize = buffer[index++] | buffer[index++] << 8 | buffer[index++] << 16 | buffer[index++] << 24;
+      var stringSize = buffer[index++] | buffer[index++] << 8 | buffer[index++] << 16 | buffer[index++] << 24;
+			if(stringSize <= 0 || stringSize > (buffer.length - index) || buffer[index + stringSize - 1] != 0) throw new Error("bad string length in bson");
+      // Javascript function
+      var functionString = buffer.toString('utf8', index, index + stringSize - 1);
+      // Update parse index position
+      index = index + stringSize;
+      // Parse the element
+			var _index = index;
+      // Decode the size of the object document
+      var objectSize = buffer[index] | buffer[index + 1] << 8 | buffer[index + 2] << 16 | buffer[index + 3] << 24;
+      // Decode the scope object
+      var scopeObject = deserializeObject(buffer, _index, options, false);
+      // Adjust the index
+      index = index + objectSize;
+
+      // If we are evaluating the functions
+      if(evalFunctions) {
+        // Contains the value we are going to set
+        var value = null;
+        // If we have cache enabled let's look for the md5 of the function in the cache
+        if(cacheFunctions) {
+          var hash = cacheFunctionsCrc32 ? crc32(functionString) : functionString;
+          // Got to do this to avoid V8 deoptimizing the call due to finding eval
+          object[name] = isolateEvalWithHash(functionCache, hash, functionString, object);
+        } else {
+          object[name] = isolateEval(functionString);
+        }
+
+        object[name].scope = scopeObject;
+      } else {
+        object[name]  = new Code(functionString, scopeObject);
+      }
+    }
+  }
+
+  // Check if we have a db ref object
+  if(object['$id'] != null) object = new DBRef(object['$ref'], object['$id'], object['$db']);
+  return object;
+}
+
+/**
+ * Ensure eval is isolated.
+ *
+ * @ignore
+ * @api private
+ */
+var isolateEvalWithHash = function(functionCache, hash, functionString, object) {
+  // Contains the value we are going to set
+  var value = null;
+
+  // Check for cache hit, eval if missing and return cached function
+  if(functionCache[hash] == null) {
+    eval("value = " + functionString);
+    functionCache[hash] = value;
+  }
+  // Set the object
+  return functionCache[hash].bind(object);
+}
+
+/**
+ * Ensure eval is isolated.
+ *
+ * @ignore
+ * @api private
+ */
+var isolateEval = function(functionString) {
+  // Contains the value we are going to set
+  var value = null;
+  // Eval the function
+  eval("value = " + functionString);
   return value;
 }
 
-function truncate(s, n) {
-  if (util.isString(s)) {
-    return s.length < n ? s : s.slice(0, n);
+var BSON = {};
+
+/**
+ * Contains the function cache if we have that enable to allow for avoiding the eval step on each deserialization, comparison is by md5
+ *
+ * @ignore
+ * @api private
+ */
+var functionCache = BSON.functionCache = {};
+
+/**
+ * Number BSON Type
+ *
+ * @classconstant BSON_DATA_NUMBER
+ **/
+BSON.BSON_DATA_NUMBER = 1;
+/**
+ * String BSON Type
+ *
+ * @classconstant BSON_DATA_STRING
+ **/
+BSON.BSON_DATA_STRING = 2;
+/**
+ * Object BSON Type
+ *
+ * @classconstant BSON_DATA_OBJECT
+ **/
+BSON.BSON_DATA_OBJECT = 3;
+/**
+ * Array BSON Type
+ *
+ * @classconstant BSON_DATA_ARRAY
+ **/
+BSON.BSON_DATA_ARRAY = 4;
+/**
+ * Binary BSON Type
+ *
+ * @classconstant BSON_DATA_BINARY
+ **/
+BSON.BSON_DATA_BINARY = 5;
+/**
+ * ObjectID BSON Type
+ *
+ * @classconstant BSON_DATA_OID
+ **/
+BSON.BSON_DATA_OID = 7;
+/**
+ * Boolean BSON Type
+ *
+ * @classconstant BSON_DATA_BOOLEAN
+ **/
+BSON.BSON_DATA_BOOLEAN = 8;
+/**
+ * Date BSON Type
+ *
+ * @classconstant BSON_DATA_DATE
+ **/
+BSON.BSON_DATA_DATE = 9;
+/**
+ * null BSON Type
+ *
+ * @classconstant BSON_DATA_NULL
+ **/
+BSON.BSON_DATA_NULL = 10;
+/**
+ * RegExp BSON Type
+ *
+ * @classconstant BSON_DATA_REGEXP
+ **/
+BSON.BSON_DATA_REGEXP = 11;
+/**
+ * Code BSON Type
+ *
+ * @classconstant BSON_DATA_CODE
+ **/
+BSON.BSON_DATA_CODE = 13;
+/**
+ * Symbol BSON Type
+ *
+ * @classconstant BSON_DATA_SYMBOL
+ **/
+BSON.BSON_DATA_SYMBOL = 14;
+/**
+ * Code with Scope BSON Type
+ *
+ * @classconstant BSON_DATA_CODE_W_SCOPE
+ **/
+BSON.BSON_DATA_CODE_W_SCOPE = 15;
+/**
+ * 32 bit Integer BSON Type
+ *
+ * @classconstant BSON_DATA_INT
+ **/
+BSON.BSON_DATA_INT = 16;
+/**
+ * Timestamp BSON Type
+ *
+ * @classconstant BSON_DATA_TIMESTAMP
+ **/
+BSON.BSON_DATA_TIMESTAMP = 17;
+/**
+ * Long BSON Type
+ *
+ * @classconstant BSON_DATA_LONG
+ **/
+BSON.BSON_DATA_LONG = 18;
+/**
+ * MinKey BSON Type
+ *
+ * @classconstant BSON_DATA_MIN_KEY
+ **/
+BSON.BSON_DATA_MIN_KEY = 0xff;
+/**
+ * MaxKey BSON Type
+ *
+ * @classconstant BSON_DATA_MAX_KEY
+ **/
+BSON.BSON_DATA_MAX_KEY = 0x7f;
+
+/**
+ * Binary Default Type
+ *
+ * @classconstant BSON_BINARY_SUBTYPE_DEFAULT
+ **/
+BSON.BSON_BINARY_SUBTYPE_DEFAULT = 0;
+/**
+ * Binary Function Type
+ *
+ * @classconstant BSON_BINARY_SUBTYPE_FUNCTION
+ **/
+BSON.BSON_BINARY_SUBTYPE_FUNCTION = 1;
+/**
+ * Binary Byte Array Type
+ *
+ * @classconstant BSON_BINARY_SUBTYPE_BYTE_ARRAY
+ **/
+BSON.BSON_BINARY_SUBTYPE_BYTE_ARRAY = 2;
+/**
+ * Binary UUID Type
+ *
+ * @classconstant BSON_BINARY_SUBTYPE_UUID
+ **/
+BSON.BSON_BINARY_SUBTYPE_UUID = 3;
+/**
+ * Binary MD5 Type
+ *
+ * @classconstant BSON_BINARY_SUBTYPE_MD5
+ **/
+BSON.BSON_BINARY_SUBTYPE_MD5 = 4;
+/**
+ * Binary User Defined Type
+ *
+ * @classconstant BSON_BINARY_SUBTYPE_USER_DEFINED
+ **/
+BSON.BSON_BINARY_SUBTYPE_USER_DEFINED = 128;
+
+// BSON MAX VALUES
+BSON.BSON_INT32_MAX = 0x7FFFFFFF;
+BSON.BSON_INT32_MIN = -0x80000000;
+
+BSON.BSON_INT64_MAX = Math.pow(2, 63) - 1;
+BSON.BSON_INT64_MIN = -Math.pow(2, 63);
+
+// JS MAX PRECISE VALUES
+BSON.JS_INT_MAX = 0x20000000000000;  // Any integer up to 2^53 can be precisely represented by a double.
+BSON.JS_INT_MIN = -0x20000000000000;  // Any integer down to -2^53 can be precisely represented by a double.
+
+// Internal long versions
+var JS_INT_MAX_LONG = Long.fromNumber(0x20000000000000);  // Any integer up to 2^53 can be precisely represented by a double.
+var JS_INT_MIN_LONG = Long.fromNumber(-0x20000000000000);  // Any integer down to -2^53 can be precisely represented by a double.
+
+module.exports = deserialize
+
+},{"../binary":53,"../code":56,"../db_ref":57,"../double":58,"../float_parser":59,"../long":60,"../max_key":62,"../min_key":63,"../objectid":64,"../regexp":68,"../symbol":69,"../timestamp":70,"util":97}],67:[function(require,module,exports){
+(function (Buffer){
+"use strict"
+
+var writeIEEE754 = require('../float_parser').writeIEEE754,
+  readIEEE754 = require('../float_parser').readIEEE754,
+  Long = require('../long').Long,
+  Map = require('../map'),
+  Double = require('../double').Double,
+  Timestamp = require('../timestamp').Timestamp,
+  ObjectID = require('../objectid').ObjectID,
+  Symbol = require('../symbol').Symbol,
+  Code = require('../code').Code,
+  BSONRegExp = require('../regexp').BSONRegExp,
+  MinKey = require('../min_key').MinKey,
+  MaxKey = require('../max_key').MaxKey,
+  DBRef = require('../db_ref').DBRef,
+  Binary = require('../binary').Binary;
+
+var regexp = /\x00/
+
+// To ensure that 0.4 of node works correctly
+var isDate = function isDate(d) {
+  return typeof d === 'object' && Object.prototype.toString.call(d) === '[object Date]';
+}
+
+var isRegExp = function isRegExp(d) {
+  return Object.prototype.toString.call(d) === '[object RegExp]';
+}
+
+var serializeString = function(buffer, key, value, index) {
+  // Encode String type
+  buffer[index++] = BSON.BSON_DATA_STRING;
+  // Number of written bytes
+  var numberOfWrittenBytes = buffer.write(key, index, 'utf8');
+  // Encode the name
+  index = index + numberOfWrittenBytes + 1;
+  buffer[index - 1] = 0;
+  // Write the string
+  var size = buffer.write(value, index + 4, 'utf8');
+  // Write the size of the string to buffer
+  buffer[index + 3] = (size + 1 >> 24) & 0xff;
+  buffer[index + 2] = (size + 1 >> 16) & 0xff;
+  buffer[index + 1] = (size + 1 >> 8) & 0xff;
+  buffer[index] = size + 1 & 0xff;
+  // Update index
+  index = index + 4 + size;
+  // Write zero
+  buffer[index++] = 0;
+  return index;
+}
+
+var serializeNumber = function(buffer, key, value, index) {
+  // We have an integer value
+  if(Math.floor(value) === value && value >= BSON.JS_INT_MIN && value <= BSON.JS_INT_MAX) {
+    // If the value fits in 32 bits encode as int, if it fits in a double
+    // encode it as a double, otherwise long
+    if(value >= BSON.BSON_INT32_MIN && value <= BSON.BSON_INT32_MAX) {
+      // Set int type 32 bits or less
+      buffer[index++] = BSON.BSON_DATA_INT;
+      // Number of written bytes
+      var numberOfWrittenBytes = buffer.write(key, index, 'utf8');
+      // Encode the name
+      index = index + numberOfWrittenBytes;
+      buffer[index++] = 0;
+      // Write the int value
+      buffer[index++] = value & 0xff;
+      buffer[index++] = (value >> 8) & 0xff;
+      buffer[index++] = (value >> 16) & 0xff;
+      buffer[index++] = (value >> 24) & 0xff;
+    } else if(value >= BSON.JS_INT_MIN && value <= BSON.JS_INT_MAX) {
+      // Encode as double
+      buffer[index++] = BSON.BSON_DATA_NUMBER;
+      // Number of written bytes
+      var numberOfWrittenBytes = buffer.write(key, index, 'utf8');
+      // Encode the name
+      index = index + numberOfWrittenBytes;
+      buffer[index++] = 0;
+      // Write float
+      writeIEEE754(buffer, value, index, 'little', 52, 8);
+      // Ajust index
+      index = index + 8;
+    } else {
+      // Set long type
+      buffer[index++] = BSON.BSON_DATA_LONG;
+      // Number of written bytes
+      var numberOfWrittenBytes = buffer.write(key, index, 'utf8');
+      // Encode the name
+      index = index + numberOfWrittenBytes;
+      buffer[index++] = 0;
+      var longVal = Long.fromNumber(value);
+      var lowBits = longVal.getLowBits();
+      var highBits = longVal.getHighBits();
+      // Encode low bits
+      buffer[index++] = lowBits & 0xff;
+      buffer[index++] = (lowBits >> 8) & 0xff;
+      buffer[index++] = (lowBits >> 16) & 0xff;
+      buffer[index++] = (lowBits >> 24) & 0xff;
+      // Encode high bits
+      buffer[index++] = highBits & 0xff;
+      buffer[index++] = (highBits >> 8) & 0xff;
+      buffer[index++] = (highBits >> 16) & 0xff;
+      buffer[index++] = (highBits >> 24) & 0xff;
+    }
   } else {
-    return s;
+    // Encode as double
+    buffer[index++] = BSON.BSON_DATA_NUMBER;
+    // Number of written bytes
+    var numberOfWrittenBytes = buffer.write(key, index, 'utf8');
+    // Encode the name
+    index = index + numberOfWrittenBytes;
+    buffer[index++] = 0;
+    // Write float
+    writeIEEE754(buffer, value, index, 'little', 52, 8);
+    // Ajust index
+    index = index + 8;
   }
+
+  return index;
 }
 
-function getMessage(self) {
-  return truncate(JSON.stringify(self.actual, replacer), 128) + ' ' +
-         self.operator + ' ' +
-         truncate(JSON.stringify(self.expected, replacer), 128);
+var serializeUndefined = function(buffer, key, value, index) {
+  // Set long type
+  buffer[index++] = BSON.BSON_DATA_NULL;
+  // Number of written bytes
+  var numberOfWrittenBytes = buffer.write(key, index, 'utf8');
+  // Encode the name
+  index = index + numberOfWrittenBytes;
+  buffer[index++] = 0;
+  return index;
 }
 
-// At present only the three keys mentioned above are used and
-// understood by the spec. Implementations or sub modules can pass
-// other keys to the AssertionError's constructor - they will be
-// ignored.
-
-// 3. All of the following functions must throw an AssertionError
-// when a corresponding condition is not met, with a message that
-// may be undefined if not provided.  All assertion methods provide
-// both the actual and expected values to the assertion error for
-// display purposes.
-
-function fail(actual, expected, message, operator, stackStartFunction) {
-  throw new assert.AssertionError({
-    message: message,
-    actual: actual,
-    expected: expected,
-    operator: operator,
-    stackStartFunction: stackStartFunction
-  });
+var serializeBoolean = function(buffer, key, value, index) {
+  // Write the type
+  buffer[index++] = BSON.BSON_DATA_BOOLEAN;
+  // Number of written bytes
+  var numberOfWrittenBytes = buffer.write(key, index, 'utf8');
+  // Encode the name
+  index = index + numberOfWrittenBytes;
+  buffer[index++] = 0;
+  // Encode the boolean value
+  buffer[index++] = value ? 1 : 0;
+  return index;
 }
 
-// EXTENSION! allows for well behaved errors defined elsewhere.
-assert.fail = fail;
+var serializeDate = function(buffer, key, value, index) {
+  // Write the type
+  buffer[index++] = BSON.BSON_DATA_DATE;
+  // Number of written bytes
+  var numberOfWrittenBytes = buffer.write(key, index, 'utf8');
+  // Encode the name
+  index = index + numberOfWrittenBytes;
+  buffer[index++] = 0;
 
-// 4. Pure assertion tests whether a value is truthy, as determined
-// by !!guard.
-// assert.ok(guard, message_opt);
-// This statement is equivalent to assert.equal(true, !!guard,
-// message_opt);. To test strictly for the value true, use
-// assert.strictEqual(true, guard, message_opt);.
-
-function ok(value, message) {
-  if (!value) fail(value, true, message, '==', assert.ok);
+  // Write the date
+  var dateInMilis = Long.fromNumber(value.getTime());
+  var lowBits = dateInMilis.getLowBits();
+  var highBits = dateInMilis.getHighBits();
+  // Encode low bits
+  buffer[index++] = lowBits & 0xff;
+  buffer[index++] = (lowBits >> 8) & 0xff;
+  buffer[index++] = (lowBits >> 16) & 0xff;
+  buffer[index++] = (lowBits >> 24) & 0xff;
+  // Encode high bits
+  buffer[index++] = highBits & 0xff;
+  buffer[index++] = (highBits >> 8) & 0xff;
+  buffer[index++] = (highBits >> 16) & 0xff;
+  buffer[index++] = (highBits >> 24) & 0xff;
+  return index;
 }
-assert.ok = ok;
 
-// 5. The equality assertion tests shallow, coercive equality with
-// ==.
-// assert.equal(actual, expected, message_opt);
-
-assert.equal = function equal(actual, expected, message) {
-  if (actual != expected) fail(actual, expected, message, '==', assert.equal);
-};
-
-// 6. The non-equality assertion tests for whether two objects are not equal
-// with != assert.notEqual(actual, expected, message_opt);
-
-assert.notEqual = function notEqual(actual, expected, message) {
-  if (actual == expected) {
-    fail(actual, expected, message, '!=', assert.notEqual);
+var serializeRegExp = function(buffer, key, value, index) {
+  // Write the type
+  buffer[index++] = BSON.BSON_DATA_REGEXP;
+  // Number of written bytes
+  var numberOfWrittenBytes = buffer.write(key, index, 'utf8');
+  // Encode the name
+  index = index + numberOfWrittenBytes;
+  buffer[index++] = 0;
+  if (value.source && value.source.match(regexp) != null) {
+    throw Error("value " + value.source + " must not contain null bytes");
   }
-};
+  // Adjust the index
+  index = index + buffer.write(value.source, index, 'utf8');
+  // Write zero
+  buffer[index++] = 0x00;
+  // Write the parameters
+  if(value.global) buffer[index++] = 0x73; // s
+  if(value.ignoreCase) buffer[index++] = 0x69; // i
+  if(value.multiline) buffer[index++] = 0x6d; // m
+  // Add ending zero
+  buffer[index++] = 0x00;
+  return index;
+}
 
-// 7. The equivalence assertion tests a deep equality relation.
-// assert.deepEqual(actual, expected, message_opt);
+var serializeBSONRegExp = function(buffer, key, value, index) {
+  // Write the type
+  buffer[index++] = BSON.BSON_DATA_REGEXP;
+  // Number of written bytes
+  var numberOfWrittenBytes = buffer.write(key, index, 'utf8');
+  // Encode the name
+  index = index + numberOfWrittenBytes;
+  buffer[index++] = 0;
+  // Adjust the index
+  index = index + buffer.write(value.pattern, index, 'utf8');
+  // Write zero
+  buffer[index++] = 0x00;
+  // Write the options
+  index = index + buffer.write(value.options, index, 'utf8');
+  // Add ending zero
+  buffer[index++] = 0x00;
+  return index;
+}
 
-assert.deepEqual = function deepEqual(actual, expected, message) {
-  if (!_deepEqual(actual, expected)) {
-    fail(actual, expected, message, 'deepEqual', assert.deepEqual);
+var serializeMinMax = function(buffer, key, value, index) {
+  // Write the type of either min or max key
+  if(value === null) {
+    buffer[index++] = BSON.BSON_DATA_NULL;
+  } else if(value instanceof MinKey) {
+    buffer[index++] = BSON.BSON_DATA_MIN_KEY;
+  } else {
+    buffer[index++] = BSON.BSON_DATA_MAX_KEY;
   }
-};
 
-function _deepEqual(actual, expected) {
-  // 7.1. All identical values are equivalent, as determined by ===.
-  if (actual === expected) {
-    return true;
+  // Number of written bytes
+  var numberOfWrittenBytes = buffer.write(key, index, 'utf8');
+  // Encode the name
+  index = index + numberOfWrittenBytes;
+  buffer[index++] = 0;
+  return index;
+}
 
-  } else if (util.isBuffer(actual) && util.isBuffer(expected)) {
-    if (actual.length != expected.length) return false;
+var serializeObjectId = function(buffer, key, value, index) {
+  // Write the type
+  buffer[index++] = BSON.BSON_DATA_OID;
+  // Number of written bytes
+  var numberOfWrittenBytes = buffer.write(key, index, 'utf8');
 
-    for (var i = 0; i < actual.length; i++) {
-      if (actual[i] !== expected[i]) return false;
+  // Encode the name
+  index = index + numberOfWrittenBytes;
+  buffer[index++] = 0;
+
+  // Write the objectId into the shared buffer
+  buffer.write(value.id, index, 'binary')
+
+  // Ajust index
+  return index + 12;
+}
+
+var serializeBuffer = function(buffer, key, value, index) {
+  // Write the type
+  buffer[index++] = BSON.BSON_DATA_BINARY;
+  // Number of written bytes
+  var numberOfWrittenBytes = buffer.write(key, index, 'utf8');
+  // Encode the name
+  index = index + numberOfWrittenBytes;
+  buffer[index++] = 0;
+  // Get size of the buffer (current write point)
+  var size = value.length;
+  // Write the size of the string to buffer
+  buffer[index++] = size & 0xff;
+  buffer[index++] = (size >> 8) & 0xff;
+  buffer[index++] = (size >> 16) & 0xff;
+  buffer[index++] = (size >> 24) & 0xff;
+  // Write the default subtype
+  buffer[index++] = BSON.BSON_BINARY_SUBTYPE_DEFAULT;
+  // Copy the content form the binary field to the buffer
+  value.copy(buffer, index, 0, size);
+  // Adjust the index
+  index = index + size;
+  return index;
+}
+
+var serializeObject = function(buffer, key, value, index, checkKeys, depth, serializeFunctions, ignoreUndefined) {
+  // Write the type
+  buffer[index++] = Array.isArray(value) ? BSON.BSON_DATA_ARRAY : BSON.BSON_DATA_OBJECT;
+  // Number of written bytes
+  var numberOfWrittenBytes = buffer.write(key, index, 'utf8');
+  // Encode the name
+  index = index + numberOfWrittenBytes;
+  buffer[index++] = 0;
+  var endIndex = serializeInto(buffer, value, checkKeys, index, depth + 1, serializeFunctions, ignoreUndefined);
+  // Write size
+  var size = endIndex - index;
+  return endIndex;
+}
+
+var serializeLong = function(buffer, key, value, index) {
+  // Write the type
+  buffer[index++] = value._bsontype == 'Long' ? BSON.BSON_DATA_LONG : BSON.BSON_DATA_TIMESTAMP;
+  // Number of written bytes
+  var numberOfWrittenBytes = buffer.write(key, index, 'utf8');
+  // Encode the name
+  index = index + numberOfWrittenBytes;
+  buffer[index++] = 0;
+  // Write the date
+  var lowBits = value.getLowBits();
+  var highBits = value.getHighBits();
+  // Encode low bits
+  buffer[index++] = lowBits & 0xff;
+  buffer[index++] = (lowBits >> 8) & 0xff;
+  buffer[index++] = (lowBits >> 16) & 0xff;
+  buffer[index++] = (lowBits >> 24) & 0xff;
+  // Encode high bits
+  buffer[index++] = highBits & 0xff;
+  buffer[index++] = (highBits >> 8) & 0xff;
+  buffer[index++] = (highBits >> 16) & 0xff;
+  buffer[index++] = (highBits >> 24) & 0xff;
+  return index;
+}
+
+var serializeDouble = function(buffer, key, value, index) {
+  // Encode as double
+  buffer[index++] = BSON.BSON_DATA_NUMBER;
+  // Number of written bytes
+  var numberOfWrittenBytes = buffer.write(key, index, 'utf8');
+  // Encode the name
+  index = index + numberOfWrittenBytes;
+  buffer[index++] = 0;
+  // Write float
+  writeIEEE754(buffer, value, index, 'little', 52, 8);
+  // Ajust index
+  index = index + 8;
+  return index;
+}
+
+var serializeFunction = function(buffer, key, value, index, checkKeys, depth) {
+  buffer[index++] = BSON.BSON_DATA_CODE;
+  // Number of written bytes
+  var numberOfWrittenBytes = buffer.write(key, index, 'utf8');
+  // Encode the name
+  index = index + numberOfWrittenBytes;
+  buffer[index++] = 0;
+  // Function string
+  var functionString = value.toString();
+  // Write the string
+  var size = buffer.write(functionString, index + 4, 'utf8') + 1;
+  // Write the size of the string to buffer
+  buffer[index] = size & 0xff;
+  buffer[index + 1] = (size >> 8) & 0xff;
+  buffer[index + 2] = (size >> 16) & 0xff;
+  buffer[index + 3] = (size >> 24) & 0xff;
+  // Update index
+  index = index + 4 + size - 1;
+  // Write zero
+  buffer[index++] = 0;
+  return index;
+}
+
+var serializeCode = function(buffer, key, value, index, checkKeys, depth, serializeFunctions, ignoreUndefined) {
+  if(value.scope != null && Object.keys(value.scope).length > 0) {
+    // Write the type
+    buffer[index++] = BSON.BSON_DATA_CODE_W_SCOPE;
+    // Number of written bytes
+    var numberOfWrittenBytes = buffer.write(key, index, 'utf8');
+    // Encode the name
+    index = index + numberOfWrittenBytes;
+    buffer[index++] = 0;
+
+    // Starting index
+    var startIndex = index;
+
+    // Serialize the function
+    // Get the function string
+    var functionString = typeof value.code == 'string' ? value.code : value.code.toString();
+    // Index adjustment
+    index = index + 4;
+    // Write string into buffer
+    var codeSize = buffer.write(functionString, index + 4, 'utf8') + 1;
+    // Write the size of the string to buffer
+    buffer[index] = codeSize & 0xff;
+    buffer[index + 1] = (codeSize >> 8) & 0xff;
+    buffer[index + 2] = (codeSize >> 16) & 0xff;
+    buffer[index + 3] = (codeSize >> 24) & 0xff;
+    // Write end 0
+    buffer[index + 4 + codeSize - 1] = 0;
+    // Write the
+    index = index + codeSize + 4;
+
+    //
+    // Serialize the scope value
+    var endIndex = serializeInto(buffer, value.scope, checkKeys, index, depth + 1, serializeFunctions, ignoreUndefined)
+    index = endIndex - 1;
+
+    // Writ the total
+    var totalSize = endIndex - startIndex;
+
+    // Write the total size of the object
+    buffer[startIndex++] = totalSize & 0xff;
+    buffer[startIndex++] = (totalSize >> 8) & 0xff;
+    buffer[startIndex++] = (totalSize >> 16) & 0xff;
+    buffer[startIndex++] = (totalSize >> 24) & 0xff;
+    // Write trailing zero
+    buffer[index++] = 0;
+  } else {
+    buffer[index++] = BSON.BSON_DATA_CODE;
+    // Number of written bytes
+    var numberOfWrittenBytes = buffer.write(key, index, 'utf8');
+    // Encode the name
+    index = index + numberOfWrittenBytes;
+    buffer[index++] = 0;
+    // Function string
+    var functionString = value.code.toString();
+    // Write the string
+    var size = buffer.write(functionString, index + 4, 'utf8') + 1;
+    // Write the size of the string to buffer
+    buffer[index] = size & 0xff;
+    buffer[index + 1] = (size >> 8) & 0xff;
+    buffer[index + 2] = (size >> 16) & 0xff;
+    buffer[index + 3] = (size >> 24) & 0xff;
+    // Update index
+    index = index + 4 + size - 1;
+    // Write zero
+    buffer[index++] = 0;
+  }
+
+  return index;
+}
+
+var serializeBinary = function(buffer, key, value, index) {
+  // Write the type
+  buffer[index++] = BSON.BSON_DATA_BINARY;
+  // Number of written bytes
+  var numberOfWrittenBytes = buffer.write(key, index, 'utf8');
+  // Encode the name
+  index = index + numberOfWrittenBytes;
+  buffer[index++] = 0;
+  // Extract the buffer
+  var data = value.value(true);
+  // Calculate size
+  var size = value.position;
+  // Write the size of the string to buffer
+  buffer[index++] = size & 0xff;
+  buffer[index++] = (size >> 8) & 0xff;
+  buffer[index++] = (size >> 16) & 0xff;
+  buffer[index++] = (size >> 24) & 0xff;
+  // Write the subtype to the buffer
+  buffer[index++] = value.sub_type;
+
+  // If we have binary type 2 the 4 first bytes are the size
+  if(value.sub_type == Binary.SUBTYPE_BYTE_ARRAY) {
+    buffer[index++] = size & 0xff;
+    buffer[index++] = (size >> 8) & 0xff;
+    buffer[index++] = (size >> 16) & 0xff;
+    buffer[index++] = (size >> 24) & 0xff;
+  }
+
+  // Write the data to the object
+  data.copy(buffer, index, 0, value.position);
+  // Adjust the index
+  index = index + value.position;
+  return index;
+}
+
+var serializeSymbol = function(buffer, key, value, index) {
+  // Write the type
+  buffer[index++] = BSON.BSON_DATA_SYMBOL;
+  // Number of written bytes
+  var numberOfWrittenBytes = buffer.write(key, index, 'utf8');
+  // Encode the name
+  index = index + numberOfWrittenBytes;
+  buffer[index++] = 0;
+  // Write the string
+  var size = buffer.write(value.value, index + 4, 'utf8') + 1;
+  // Write the size of the string to buffer
+  buffer[index] = size & 0xff;
+  buffer[index + 1] = (size >> 8) & 0xff;
+  buffer[index + 2] = (size >> 16) & 0xff;
+  buffer[index + 3] = (size >> 24) & 0xff;
+  // Update index
+  index = index + 4 + size - 1;
+  // Write zero
+  buffer[index++] = 0x00;
+  return index;
+}
+
+var serializeDBRef = function(buffer, key, value, index, depth, serializeFunctions) {
+  // Write the type
+  buffer[index++] = BSON.BSON_DATA_OBJECT;
+  // Number of written bytes
+  var numberOfWrittenBytes = buffer.write(key, index, 'utf8');
+
+  // Encode the name
+  index = index + numberOfWrittenBytes;
+  buffer[index++] = 0;
+
+  var startIndex = index;
+  var endIndex;
+
+  // Serialize object
+  if(null != value.db) {
+    endIndex = serializeInto(buffer, {
+        '$ref': value.namespace
+      , '$id' : value.oid
+      , '$db' : value.db
+    }, false, index, depth + 1, serializeFunctions);
+  } else {
+    endIndex = serializeInto(buffer, {
+        '$ref': value.namespace
+      , '$id' : value.oid
+    }, false, index, depth + 1, serializeFunctions);
+  }
+
+  // Calculate object size
+  var size = endIndex - startIndex;
+  // Write the size
+  buffer[startIndex++] = size & 0xff;
+  buffer[startIndex++] = (size >> 8) & 0xff;
+  buffer[startIndex++] = (size >> 16) & 0xff;
+  buffer[startIndex++] = (size >> 24) & 0xff;
+  // Set index
+  return endIndex;
+}
+
+var serializeInto = function serializeInto(buffer, object, checkKeys, startingIndex, depth, serializeFunctions, ignoreUndefined) {
+  startingIndex = startingIndex || 0;
+
+  // Start place to serialize into
+  var index = startingIndex + 4;
+  var self = this;
+
+  // Special case isArray
+  if(Array.isArray(object)) {
+    // Get object keys
+    for(var i = 0; i < object.length; i++) {
+      var key = "" + i;
+      var value = object[i];
+
+      // Is there an override value
+      if(value && value.toBSON) {
+        if(typeof value.toBSON != 'function') throw new Error("toBSON is not a function");
+        value = value.toBSON();
+      }
+
+      var type = typeof value;
+      if(type == 'string') {
+        index = serializeString(buffer, key, value, index);
+      } else if(type == 'number') {
+        index = serializeNumber(buffer, key, value, index);
+      } else if(type == 'boolean') {
+        index = serializeBoolean(buffer, key, value, index);
+      } else if(value instanceof Date || isDate(value)) {
+        index = serializeDate(buffer, key, value, index);
+      } else if(type == 'undefined' || value == null) {
+        index = serializeUndefined(buffer, key, value, index);
+      } else if(value['_bsontype'] == 'ObjectID') {
+        index = serializeObjectId(buffer, key, value, index);
+      } else if(Buffer.isBuffer(value)) {
+        index = serializeBuffer(buffer, key, value, index);
+      } else if(value instanceof RegExp || isRegExp(value)) {
+        index = serializeRegExp(buffer, key, value, index);
+      } else if(type == 'object' && value['_bsontype'] == null) {
+        index = serializeObject(buffer, key, value, index, checkKeys, depth, serializeFunctions, ignoreUndefined);
+      } else if(value['_bsontype'] == 'Long' || value['_bsontype'] == 'Timestamp') {
+        index = serializeLong(buffer, key, value, index);
+      } else if(value['_bsontype'] == 'Double') {
+        index = serializeDouble(buffer, key, value, index);
+      } else if(typeof value == 'function' && serializeFunctions) {
+        index = serializeFunction(buffer, key, value, index, checkKeys, depth, serializeFunctions);
+      } else if(value['_bsontype'] == 'Code') {
+        index = serializeCode(buffer, key, value, index, checkKeys, depth, serializeFunctions, ignoreUndefined);
+      } else if(value['_bsontype'] == 'Binary') {
+        index = serializeBinary(buffer, key, value, index);
+      } else if(value['_bsontype'] == 'Symbol') {
+        index = serializeSymbol(buffer, key, value, index);
+      } else if(value['_bsontype'] == 'DBRef') {
+        index = serializeDBRef(buffer, key, value, index, depth, serializeFunctions);
+      } else if(value['_bsontype'] == 'BSONRegExp') {
+        index = serializeBSONRegExp(buffer, key, value, index);
+      } else if(value['_bsontype'] == 'MinKey' || value['_bsontype'] == 'MaxKey') {
+        index = serializeMinMax(buffer, key, value, index);
+      }
+    }
+  } else if(object instanceof Map) {
+    var iterator = object.entries();
+    var done = false;
+
+    while(!done) {
+      // Unpack the next entry
+      var entry = iterator.next();
+      done = entry.done;
+      // Are we done, then skip and terminate
+      if(done) continue;
+
+      // Get the entry values
+      var key = entry.value[0];
+      var value = entry.value[1];
+
+      // Check the type of the value
+      var type = typeof value;
+
+      // Check the key and throw error if it's illegal
+      if(key != '$db' && key != '$ref' && key != '$id') {
+        if (key.match(regexp) != null) {
+          // The BSON spec doesn't allow keys with null bytes because keys are
+          // null-terminated.
+          throw Error("key " + key + " must not contain null bytes");
+        }
+
+        if (checkKeys) {
+          if('$' == key[0]) {
+            throw Error("key " + key + " must not start with '$'");
+          } else if (!!~key.indexOf('.')) {
+            throw Error("key " + key + " must not contain '.'");
+          }
+        }
+      }
+
+      // console.log("---------------------------------------------------")
+      // console.dir("key = " + key)
+      // console.dir("value = " + value)
+
+      if(type == 'string') {
+        index = serializeString(buffer, key, value, index);
+      } else if(type == 'number') {
+        index = serializeNumber(buffer, key, value, index);
+      } else if(type == 'boolean') {
+        index = serializeBoolean(buffer, key, value, index);
+      } else if(value instanceof Date || isDate(value)) {
+        index = serializeDate(buffer, key, value, index);
+      } else if(value === undefined && ignoreUndefined == true) {
+      } else if(value === null || value === undefined) {
+        index = serializeUndefined(buffer, key, value, index);
+      } else if(value['_bsontype'] == 'ObjectID') {
+        index = serializeObjectId(buffer, key, value, index);
+      } else if(Buffer.isBuffer(value)) {
+        index = serializeBuffer(buffer, key, value, index);
+      } else if(value instanceof RegExp || isRegExp(value)) {
+        index = serializeRegExp(buffer, key, value, index);
+      } else if(type == 'object' && value['_bsontype'] == null) {
+        index = serializeObject(buffer, key, value, index, checkKeys, depth, serializeFunctions, ignoreUndefined);
+      } else if(value['_bsontype'] == 'Long' || value['_bsontype'] == 'Timestamp') {
+        index = serializeLong(buffer, key, value, index);
+      } else if(value['_bsontype'] == 'Double') {
+        index = serializeDouble(buffer, key, value, index);
+      } else if(value['_bsontype'] == 'Code') {
+        index = serializeCode(buffer, key, value, index, checkKeys, depth, serializeFunctions, ignoreUndefined);
+      } else if(typeof value == 'function' && serializeFunctions) {
+        index = serializeFunction(buffer, key, value, index, checkKeys, depth, serializeFunctions);
+      } else if(value['_bsontype'] == 'Binary') {
+        index = serializeBinary(buffer, key, value, index);
+      } else if(value['_bsontype'] == 'Symbol') {
+        index = serializeSymbol(buffer, key, value, index);
+      } else if(value['_bsontype'] == 'DBRef') {
+        index = serializeDBRef(buffer, key, value, index, depth, serializeFunctions);
+      } else if(value['_bsontype'] == 'BSONRegExp') {
+        index = serializeBSONRegExp(buffer, key, value, index);
+      } else if(value['_bsontype'] == 'MinKey' || value['_bsontype'] == 'MaxKey') {
+        index = serializeMinMax(buffer, key, value, index);
+      }
+    }
+  } else {
+    // Did we provide a custom serialization method
+    if(object.toBSON) {
+      if(typeof object.toBSON != 'function') throw new Error("toBSON is not a function");
+      object = object.toBSON();
+      if(object != null && typeof object != 'object') throw new Error("toBSON function did not return an object");
     }
 
-    return true;
+    // Iterate over all the keys
+    for(var key in object) {
+      var value = object[key];
+      // Is there an override value
+      if(value && value.toBSON) {
+        if(typeof value.toBSON != 'function') throw new Error("toBSON is not a function");
+        value = value.toBSON();
+      }
 
-  // 7.2. If the expected value is a Date object, the actual value is
-  // equivalent if it is also a Date object that refers to the same time.
-  } else if (util.isDate(actual) && util.isDate(expected)) {
-    return actual.getTime() === expected.getTime();
+      // Check the type of the value
+      var type = typeof value;
 
-  // 7.3 If the expected value is a RegExp object, the actual value is
-  // equivalent if it is also a RegExp object with the same source and
-  // properties (`global`, `multiline`, `lastIndex`, `ignoreCase`).
-  } else if (util.isRegExp(actual) && util.isRegExp(expected)) {
-    return actual.source === expected.source &&
-           actual.global === expected.global &&
-           actual.multiline === expected.multiline &&
-           actual.lastIndex === expected.lastIndex &&
-           actual.ignoreCase === expected.ignoreCase;
+      // Check the key and throw error if it's illegal
+      if(key != '$db' && key != '$ref' && key != '$id') {
+        if (key.match(regexp) != null) {
+          // The BSON spec doesn't allow keys with null bytes because keys are
+          // null-terminated.
+          throw Error("key " + key + " must not contain null bytes");
+        }
 
-  // 7.4. Other pairs that do not both pass typeof value == 'object',
-  // equivalence is determined by ==.
-  } else if (!util.isObject(actual) && !util.isObject(expected)) {
-    return actual == expected;
+        if (checkKeys) {
+          if('$' == key[0]) {
+            throw Error("key " + key + " must not start with '$'");
+          } else if (!!~key.indexOf('.')) {
+            throw Error("key " + key + " must not contain '.'");
+          }
+        }
+      }
 
-  // 7.5 For all other Object pairs, including Array objects, equivalence is
-  // determined by having the same number of owned properties (as verified
-  // with Object.prototype.hasOwnProperty.call), the same set of keys
-  // (although not necessarily the same order), equivalent values for every
-  // corresponding key, and an identical 'prototype' property. Note: this
-  // accounts for both named and indexed properties on Arrays.
-  } else {
-    return objEquiv(actual, expected);
-  }
-}
-
-function isArguments(object) {
-  return Object.prototype.toString.call(object) == '[object Arguments]';
-}
-
-function objEquiv(a, b) {
-  if (util.isNullOrUndefined(a) || util.isNullOrUndefined(b))
-    return false;
-  // an identical 'prototype' property.
-  if (a.prototype !== b.prototype) return false;
-  //~~~I've managed to break Object.keys through screwy arguments passing.
-  //   Converting to array solves the problem.
-  if (isArguments(a)) {
-    if (!isArguments(b)) {
-      return false;
+      if(type == 'string') {
+        index = serializeString(buffer, key, value, index);
+      } else if(type == 'number') {
+        index = serializeNumber(buffer, key, value, index);
+      } else if(type == 'boolean') {
+        index = serializeBoolean(buffer, key, value, index);
+      } else if(value instanceof Date || isDate(value)) {
+        index = serializeDate(buffer, key, value, index);
+      } else if(value === undefined && ignoreUndefined == true) {
+      } else if(value === null || value === undefined) {
+        index = serializeUndefined(buffer, key, value, index);
+      } else if(value['_bsontype'] == 'ObjectID') {
+        index = serializeObjectId(buffer, key, value, index);
+      } else if(Buffer.isBuffer(value)) {
+        index = serializeBuffer(buffer, key, value, index);
+      } else if(value instanceof RegExp || isRegExp(value)) {
+        index = serializeRegExp(buffer, key, value, index);
+      } else if(type == 'object' && value['_bsontype'] == null) {
+        index = serializeObject(buffer, key, value, index, checkKeys, depth, serializeFunctions, ignoreUndefined);
+      } else if(value['_bsontype'] == 'Long' || value['_bsontype'] == 'Timestamp') {
+        index = serializeLong(buffer, key, value, index);
+      } else if(value['_bsontype'] == 'Double') {
+        index = serializeDouble(buffer, key, value, index);
+      } else if(value['_bsontype'] == 'Code') {
+        index = serializeCode(buffer, key, value, index, checkKeys, depth, serializeFunctions, ignoreUndefined);
+      } else if(typeof value == 'function' && serializeFunctions) {
+        index = serializeFunction(buffer, key, value, index, checkKeys, depth, serializeFunctions);
+      } else if(value['_bsontype'] == 'Binary') {
+        index = serializeBinary(buffer, key, value, index);
+      } else if(value['_bsontype'] == 'Symbol') {
+        index = serializeSymbol(buffer, key, value, index);
+      } else if(value['_bsontype'] == 'DBRef') {
+        index = serializeDBRef(buffer, key, value, index, depth, serializeFunctions);
+      } else if(value['_bsontype'] == 'BSONRegExp') {
+        index = serializeBSONRegExp(buffer, key, value, index);
+      } else if(value['_bsontype'] == 'MinKey' || value['_bsontype'] == 'MaxKey') {
+        index = serializeMinMax(buffer, key, value, index);
+      }
     }
-    a = pSlice.call(a);
-    b = pSlice.call(b);
-    return _deepEqual(a, b);
   }
-  try {
-    var ka = objectKeys(a),
-        kb = objectKeys(b),
-        key, i;
-  } catch (e) {//happens when one is a string literal and the other isn't
-    return false;
-  }
-  // having the same number of owned properties (keys incorporates
-  // hasOwnProperty)
-  if (ka.length != kb.length)
-    return false;
-  //the same set of keys (although not necessarily the same order),
-  ka.sort();
-  kb.sort();
-  //~~~cheap key test
-  for (i = ka.length - 1; i >= 0; i--) {
-    if (ka[i] != kb[i])
-      return false;
-  }
-  //equivalent values for every corresponding key, and
-  //~~~possibly expensive deep test
-  for (i = ka.length - 1; i >= 0; i--) {
-    key = ka[i];
-    if (!_deepEqual(a[key], b[key])) return false;
-  }
-  return true;
+
+  // Final padding byte for object
+  buffer[index++] = 0x00;
+
+  // Final size
+  var size = index - startingIndex;
+  // Write the size of the object
+  buffer[startingIndex++] = size & 0xff;
+  buffer[startingIndex++] = (size >> 8) & 0xff;
+  buffer[startingIndex++] = (size >> 16) & 0xff;
+  buffer[startingIndex++] = (size >> 24) & 0xff;
+  return index;
 }
 
-// 8. The non-equivalence assertion tests for any deep inequality.
-// assert.notDeepEqual(actual, expected, message_opt);
+var BSON = {};
 
-assert.notDeepEqual = function notDeepEqual(actual, expected, message) {
-  if (_deepEqual(actual, expected)) {
-    fail(actual, expected, message, 'notDeepEqual', assert.notDeepEqual);
+/**
+ * Contains the function cache if we have that enable to allow for avoiding the eval step on each deserialization, comparison is by md5
+ *
+ * @ignore
+ * @api private
+ */
+var functionCache = BSON.functionCache = {};
+
+/**
+ * Number BSON Type
+ *
+ * @classconstant BSON_DATA_NUMBER
+ **/
+BSON.BSON_DATA_NUMBER = 1;
+/**
+ * String BSON Type
+ *
+ * @classconstant BSON_DATA_STRING
+ **/
+BSON.BSON_DATA_STRING = 2;
+/**
+ * Object BSON Type
+ *
+ * @classconstant BSON_DATA_OBJECT
+ **/
+BSON.BSON_DATA_OBJECT = 3;
+/**
+ * Array BSON Type
+ *
+ * @classconstant BSON_DATA_ARRAY
+ **/
+BSON.BSON_DATA_ARRAY = 4;
+/**
+ * Binary BSON Type
+ *
+ * @classconstant BSON_DATA_BINARY
+ **/
+BSON.BSON_DATA_BINARY = 5;
+/**
+ * ObjectID BSON Type
+ *
+ * @classconstant BSON_DATA_OID
+ **/
+BSON.BSON_DATA_OID = 7;
+/**
+ * Boolean BSON Type
+ *
+ * @classconstant BSON_DATA_BOOLEAN
+ **/
+BSON.BSON_DATA_BOOLEAN = 8;
+/**
+ * Date BSON Type
+ *
+ * @classconstant BSON_DATA_DATE
+ **/
+BSON.BSON_DATA_DATE = 9;
+/**
+ * null BSON Type
+ *
+ * @classconstant BSON_DATA_NULL
+ **/
+BSON.BSON_DATA_NULL = 10;
+/**
+ * RegExp BSON Type
+ *
+ * @classconstant BSON_DATA_REGEXP
+ **/
+BSON.BSON_DATA_REGEXP = 11;
+/**
+ * Code BSON Type
+ *
+ * @classconstant BSON_DATA_CODE
+ **/
+BSON.BSON_DATA_CODE = 13;
+/**
+ * Symbol BSON Type
+ *
+ * @classconstant BSON_DATA_SYMBOL
+ **/
+BSON.BSON_DATA_SYMBOL = 14;
+/**
+ * Code with Scope BSON Type
+ *
+ * @classconstant BSON_DATA_CODE_W_SCOPE
+ **/
+BSON.BSON_DATA_CODE_W_SCOPE = 15;
+/**
+ * 32 bit Integer BSON Type
+ *
+ * @classconstant BSON_DATA_INT
+ **/
+BSON.BSON_DATA_INT = 16;
+/**
+ * Timestamp BSON Type
+ *
+ * @classconstant BSON_DATA_TIMESTAMP
+ **/
+BSON.BSON_DATA_TIMESTAMP = 17;
+/**
+ * Long BSON Type
+ *
+ * @classconstant BSON_DATA_LONG
+ **/
+BSON.BSON_DATA_LONG = 18;
+/**
+ * MinKey BSON Type
+ *
+ * @classconstant BSON_DATA_MIN_KEY
+ **/
+BSON.BSON_DATA_MIN_KEY = 0xff;
+/**
+ * MaxKey BSON Type
+ *
+ * @classconstant BSON_DATA_MAX_KEY
+ **/
+BSON.BSON_DATA_MAX_KEY = 0x7f;
+
+/**
+ * Binary Default Type
+ *
+ * @classconstant BSON_BINARY_SUBTYPE_DEFAULT
+ **/
+BSON.BSON_BINARY_SUBTYPE_DEFAULT = 0;
+/**
+ * Binary Function Type
+ *
+ * @classconstant BSON_BINARY_SUBTYPE_FUNCTION
+ **/
+BSON.BSON_BINARY_SUBTYPE_FUNCTION = 1;
+/**
+ * Binary Byte Array Type
+ *
+ * @classconstant BSON_BINARY_SUBTYPE_BYTE_ARRAY
+ **/
+BSON.BSON_BINARY_SUBTYPE_BYTE_ARRAY = 2;
+/**
+ * Binary UUID Type
+ *
+ * @classconstant BSON_BINARY_SUBTYPE_UUID
+ **/
+BSON.BSON_BINARY_SUBTYPE_UUID = 3;
+/**
+ * Binary MD5 Type
+ *
+ * @classconstant BSON_BINARY_SUBTYPE_MD5
+ **/
+BSON.BSON_BINARY_SUBTYPE_MD5 = 4;
+/**
+ * Binary User Defined Type
+ *
+ * @classconstant BSON_BINARY_SUBTYPE_USER_DEFINED
+ **/
+BSON.BSON_BINARY_SUBTYPE_USER_DEFINED = 128;
+
+// BSON MAX VALUES
+BSON.BSON_INT32_MAX = 0x7FFFFFFF;
+BSON.BSON_INT32_MIN = -0x80000000;
+
+BSON.BSON_INT64_MAX = Math.pow(2, 63) - 1;
+BSON.BSON_INT64_MIN = -Math.pow(2, 63);
+
+// JS MAX PRECISE VALUES
+BSON.JS_INT_MAX = 0x20000000000000;  // Any integer up to 2^53 can be precisely represented by a double.
+BSON.JS_INT_MIN = -0x20000000000000;  // Any integer down to -2^53 can be precisely represented by a double.
+
+// Internal long versions
+var JS_INT_MAX_LONG = Long.fromNumber(0x20000000000000);  // Any integer up to 2^53 can be precisely represented by a double.
+var JS_INT_MIN_LONG = Long.fromNumber(-0x20000000000000);  // Any integer down to -2^53 can be precisely represented by a double.
+
+module.exports = serializeInto;
+
+}).call(this,require("buffer").Buffer)
+},{"../binary":53,"../code":56,"../db_ref":57,"../double":58,"../float_parser":59,"../long":60,"../map":61,"../max_key":62,"../min_key":63,"../objectid":64,"../regexp":68,"../symbol":69,"../timestamp":70,"buffer":71}],68:[function(require,module,exports){
+/**
+ * A class representation of the BSON RegExp type.
+ *
+ * @class
+ * @return {BSONRegExp} A MinKey instance
+ */
+function BSONRegExp(pattern, options) {
+  if(!(this instanceof BSONRegExp)) return new BSONRegExp();
+  
+  // Execute
+  this._bsontype = 'BSONRegExp';
+  this.pattern = pattern;
+  this.options = options;
+
+  // Validate options
+  for(var i = 0; i < options.length; i++) {
+    if(!(this.options[i] == 'i' 
+      || this.options[i] == 'm'
+      || this.options[i] == 'x'
+      || this.options[i] == 'l'
+      || this.options[i] == 's'
+      || this.options[i] == 'u'
+    )) {
+      throw new Error('the regular expression options [' + this.options[i] + "] is not supported");
+    }
   }
-};
-
-// 9. The strict equality assertion tests strict equality, as determined by ===.
-// assert.strictEqual(actual, expected, message_opt);
-
-assert.strictEqual = function strictEqual(actual, expected, message) {
-  if (actual !== expected) {
-    fail(actual, expected, message, '===', assert.strictEqual);
-  }
-};
-
-// 10. The strict non-equality assertion tests for strict inequality, as
-// determined by !==.  assert.notStrictEqual(actual, expected, message_opt);
-
-assert.notStrictEqual = function notStrictEqual(actual, expected, message) {
-  if (actual === expected) {
-    fail(actual, expected, message, '!==', assert.notStrictEqual);
-  }
-};
-
-function expectedException(actual, expected) {
-  if (!actual || !expected) {
-    return false;
-  }
-
-  if (Object.prototype.toString.call(expected) == '[object RegExp]') {
-    return expected.test(actual);
-  } else if (actual instanceof expected) {
-    return true;
-  } else if (expected.call({}, actual) === true) {
-    return true;
-  }
-
-  return false;
 }
 
-function _throws(shouldThrow, block, expected, message) {
-  var actual;
-
-  if (util.isString(expected)) {
-    message = expected;
-    expected = null;
-  }
-
-  try {
-    block();
-  } catch (e) {
-    actual = e;
-  }
-
-  message = (expected && expected.name ? ' (' + expected.name + ').' : '.') +
-            (message ? ' ' + message : '.');
-
-  if (shouldThrow && !actual) {
-    fail(actual, expected, 'Missing expected exception' + message);
-  }
-
-  if (!shouldThrow && expectedException(actual, expected)) {
-    fail(actual, expected, 'Got unwanted exception' + message);
-  }
-
-  if ((shouldThrow && actual && expected &&
-      !expectedException(actual, expected)) || (!shouldThrow && actual)) {
-    throw actual;
-  }
+module.exports = BSONRegExp;
+module.exports.BSONRegExp = BSONRegExp;
+},{}],69:[function(require,module,exports){
+/**
+ * A class representation of the BSON Symbol type.
+ *
+ * @class
+ * @deprecated
+ * @param {string} value the string representing the symbol.
+ * @return {Symbol}
+ */
+function Symbol(value) {
+  if(!(this instanceof Symbol)) return new Symbol(value);
+  this._bsontype = 'Symbol';
+  this.value = value;
 }
 
-// 11. Expected to throw an error:
-// assert.throws(block, Error_opt, message_opt);
-
-assert.throws = function(block, /*optional*/error, /*optional*/message) {
-  _throws.apply(this, [true].concat(pSlice.call(arguments)));
+/**
+ * Access the wrapped string value.
+ *
+ * @method
+ * @return {String} returns the wrapped string.
+ */
+Symbol.prototype.valueOf = function() {
+  return this.value;
 };
 
-// EXTENSION! This is annoying to write outside this module.
-assert.doesNotThrow = function(block, /*optional*/message) {
-  _throws.apply(this, [false].concat(pSlice.call(arguments)));
+/**
+ * @ignore
+ */
+Symbol.prototype.toString = function() {
+  return this.value;
+}
+
+/**
+ * @ignore
+ */
+Symbol.prototype.inspect = function() {
+  return this.value;
+}
+
+/**
+ * @ignore
+ */
+Symbol.prototype.toJSON = function() {
+  return this.value;
+}
+
+module.exports = Symbol;
+module.exports.Symbol = Symbol;
+},{}],70:[function(require,module,exports){
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+// Copyright 2009 Google Inc. All Rights Reserved
+
+/**
+ * This type is for INTERNAL use in MongoDB only and should not be used in applications.
+ * The appropriate corresponding type is the JavaScript Date type.
+ * 
+ * Defines a Timestamp class for representing a 64-bit two's-complement
+ * integer value, which faithfully simulates the behavior of a Java "Timestamp". This
+ * implementation is derived from TimestampLib in GWT.
+ *
+ * Constructs a 64-bit two's-complement integer, given its low and high 32-bit
+ * values as *signed* integers.  See the from* functions below for more
+ * convenient ways of constructing Timestamps.
+ *
+ * The internal representation of a Timestamp is the two given signed, 32-bit values.
+ * We use 32-bit pieces because these are the size of integers on which
+ * Javascript performs bit-operations.  For operations like addition and
+ * multiplication, we split each number into 16-bit pieces, which can easily be
+ * multiplied within Javascript's floating-point representation without overflow
+ * or change in sign.
+ *
+ * In the algorithms below, we frequently reduce the negative case to the
+ * positive case by negating the input(s) and then post-processing the result.
+ * Note that we must ALWAYS check specially whether those values are MIN_VALUE
+ * (-2^63) because -MIN_VALUE == MIN_VALUE (since 2^63 cannot be represented as
+ * a positive number, it overflows back into a negative).  Not handling this
+ * case would often result in infinite recursion.
+ *
+ * @class
+ * @param {number} low  the low (signed) 32 bits of the Timestamp.
+ * @param {number} high the high (signed) 32 bits of the Timestamp.
+ */
+function Timestamp(low, high) {
+  if(!(this instanceof Timestamp)) return new Timestamp(low, high);
+  this._bsontype = 'Timestamp';
+  /**
+   * @type {number}
+   * @ignore
+   */
+  this.low_ = low | 0;  // force into 32 signed bits.
+
+  /**
+   * @type {number}
+   * @ignore
+   */
+  this.high_ = high | 0;  // force into 32 signed bits.
 };
 
-assert.ifError = function(err) { if (err) {throw err;}};
+/**
+ * Return the int value.
+ *
+ * @return {number} the value, assuming it is a 32-bit integer.
+ */
+Timestamp.prototype.toInt = function() {
+  return this.low_;
+};
 
-var objectKeys = Object.keys || function (obj) {
-  var keys = [];
-  for (var key in obj) {
-    if (hasOwn.call(obj, key)) keys.push(key);
+/**
+ * Return the Number value.
+ *
+ * @method
+ * @return {number} the closest floating-point representation to this value.
+ */
+Timestamp.prototype.toNumber = function() {
+  return this.high_ * Timestamp.TWO_PWR_32_DBL_ +
+         this.getLowBitsUnsigned();
+};
+
+/**
+ * Return the JSON value.
+ *
+ * @method
+ * @return {string} the JSON representation.
+ */
+Timestamp.prototype.toJSON = function() {
+  return this.toString();
+}
+
+/**
+ * Return the String value.
+ *
+ * @method
+ * @param {number} [opt_radix] the radix in which the text should be written.
+ * @return {string} the textual representation of this value.
+ */
+Timestamp.prototype.toString = function(opt_radix) {
+  var radix = opt_radix || 10;
+  if (radix < 2 || 36 < radix) {
+    throw Error('radix out of range: ' + radix);
   }
-  return keys;
+
+  if (this.isZero()) {
+    return '0';
+  }
+
+  if (this.isNegative()) {
+    if (this.equals(Timestamp.MIN_VALUE)) {
+      // We need to change the Timestamp value before it can be negated, so we remove
+      // the bottom-most digit in this base and then recurse to do the rest.
+      var radixTimestamp = Timestamp.fromNumber(radix);
+      var div = this.div(radixTimestamp);
+      var rem = div.multiply(radixTimestamp).subtract(this);
+      return div.toString(radix) + rem.toInt().toString(radix);
+    } else {
+      return '-' + this.negate().toString(radix);
+    }
+  }
+
+  // Do several (6) digits each time through the loop, so as to
+  // minimize the calls to the very expensive emulated div.
+  var radixToPower = Timestamp.fromNumber(Math.pow(radix, 6));
+
+  var rem = this;
+  var result = '';
+  while (true) {
+    var remDiv = rem.div(radixToPower);
+    var intval = rem.subtract(remDiv.multiply(radixToPower)).toInt();
+    var digits = intval.toString(radix);
+
+    rem = remDiv;
+    if (rem.isZero()) {
+      return digits + result;
+    } else {
+      while (digits.length < 6) {
+        digits = '0' + digits;
+      }
+      result = '' + digits + result;
+    }
+  }
 };
 
-},{"util/":60}],52:[function(require,module,exports){
+/**
+ * Return the high 32-bits value.
+ *
+ * @method
+ * @return {number} the high 32-bits as a signed value.
+ */
+Timestamp.prototype.getHighBits = function() {
+  return this.high_;
+};
+
+/**
+ * Return the low 32-bits value.
+ *
+ * @method
+ * @return {number} the low 32-bits as a signed value.
+ */
+Timestamp.prototype.getLowBits = function() {
+  return this.low_;
+};
+
+/**
+ * Return the low unsigned 32-bits value.
+ *
+ * @method
+ * @return {number} the low 32-bits as an unsigned value.
+ */
+Timestamp.prototype.getLowBitsUnsigned = function() {
+  return (this.low_ >= 0) ?
+      this.low_ : Timestamp.TWO_PWR_32_DBL_ + this.low_;
+};
+
+/**
+ * Returns the number of bits needed to represent the absolute value of this Timestamp.
+ *
+ * @method
+ * @return {number} Returns the number of bits needed to represent the absolute value of this Timestamp.
+ */
+Timestamp.prototype.getNumBitsAbs = function() {
+  if (this.isNegative()) {
+    if (this.equals(Timestamp.MIN_VALUE)) {
+      return 64;
+    } else {
+      return this.negate().getNumBitsAbs();
+    }
+  } else {
+    var val = this.high_ != 0 ? this.high_ : this.low_;
+    for (var bit = 31; bit > 0; bit--) {
+      if ((val & (1 << bit)) != 0) {
+        break;
+      }
+    }
+    return this.high_ != 0 ? bit + 33 : bit + 1;
+  }
+};
+
+/**
+ * Return whether this value is zero.
+ *
+ * @method
+ * @return {boolean} whether this value is zero.
+ */
+Timestamp.prototype.isZero = function() {
+  return this.high_ == 0 && this.low_ == 0;
+};
+
+/**
+ * Return whether this value is negative.
+ *
+ * @method
+ * @return {boolean} whether this value is negative.
+ */
+Timestamp.prototype.isNegative = function() {
+  return this.high_ < 0;
+};
+
+/**
+ * Return whether this value is odd.
+ *
+ * @method
+ * @return {boolean} whether this value is odd.
+ */
+Timestamp.prototype.isOdd = function() {
+  return (this.low_ & 1) == 1;
+};
+
+/**
+ * Return whether this Timestamp equals the other
+ *
+ * @method
+ * @param {Timestamp} other Timestamp to compare against.
+ * @return {boolean} whether this Timestamp equals the other
+ */
+Timestamp.prototype.equals = function(other) {
+  return (this.high_ == other.high_) && (this.low_ == other.low_);
+};
+
+/**
+ * Return whether this Timestamp does not equal the other.
+ *
+ * @method
+ * @param {Timestamp} other Timestamp to compare against.
+ * @return {boolean} whether this Timestamp does not equal the other.
+ */
+Timestamp.prototype.notEquals = function(other) {
+  return (this.high_ != other.high_) || (this.low_ != other.low_);
+};
+
+/**
+ * Return whether this Timestamp is less than the other.
+ *
+ * @method
+ * @param {Timestamp} other Timestamp to compare against.
+ * @return {boolean} whether this Timestamp is less than the other.
+ */
+Timestamp.prototype.lessThan = function(other) {
+  return this.compare(other) < 0;
+};
+
+/**
+ * Return whether this Timestamp is less than or equal to the other.
+ *
+ * @method
+ * @param {Timestamp} other Timestamp to compare against.
+ * @return {boolean} whether this Timestamp is less than or equal to the other.
+ */
+Timestamp.prototype.lessThanOrEqual = function(other) {
+  return this.compare(other) <= 0;
+};
+
+/**
+ * Return whether this Timestamp is greater than the other.
+ *
+ * @method
+ * @param {Timestamp} other Timestamp to compare against.
+ * @return {boolean} whether this Timestamp is greater than the other.
+ */
+Timestamp.prototype.greaterThan = function(other) {
+  return this.compare(other) > 0;
+};
+
+/**
+ * Return whether this Timestamp is greater than or equal to the other.
+ *
+ * @method
+ * @param {Timestamp} other Timestamp to compare against.
+ * @return {boolean} whether this Timestamp is greater than or equal to the other.
+ */
+Timestamp.prototype.greaterThanOrEqual = function(other) {
+  return this.compare(other) >= 0;
+};
+
+/**
+ * Compares this Timestamp with the given one.
+ *
+ * @method
+ * @param {Timestamp} other Timestamp to compare against.
+ * @return {boolean} 0 if they are the same, 1 if the this is greater, and -1 if the given one is greater.
+ */
+Timestamp.prototype.compare = function(other) {
+  if (this.equals(other)) {
+    return 0;
+  }
+
+  var thisNeg = this.isNegative();
+  var otherNeg = other.isNegative();
+  if (thisNeg && !otherNeg) {
+    return -1;
+  }
+  if (!thisNeg && otherNeg) {
+    return 1;
+  }
+
+  // at this point, the signs are the same, so subtraction will not overflow
+  if (this.subtract(other).isNegative()) {
+    return -1;
+  } else {
+    return 1;
+  }
+};
+
+/**
+ * The negation of this value.
+ *
+ * @method
+ * @return {Timestamp} the negation of this value.
+ */
+Timestamp.prototype.negate = function() {
+  if (this.equals(Timestamp.MIN_VALUE)) {
+    return Timestamp.MIN_VALUE;
+  } else {
+    return this.not().add(Timestamp.ONE);
+  }
+};
+
+/**
+ * Returns the sum of this and the given Timestamp.
+ *
+ * @method
+ * @param {Timestamp} other Timestamp to add to this one.
+ * @return {Timestamp} the sum of this and the given Timestamp.
+ */
+Timestamp.prototype.add = function(other) {
+  // Divide each number into 4 chunks of 16 bits, and then sum the chunks.
+
+  var a48 = this.high_ >>> 16;
+  var a32 = this.high_ & 0xFFFF;
+  var a16 = this.low_ >>> 16;
+  var a00 = this.low_ & 0xFFFF;
+
+  var b48 = other.high_ >>> 16;
+  var b32 = other.high_ & 0xFFFF;
+  var b16 = other.low_ >>> 16;
+  var b00 = other.low_ & 0xFFFF;
+
+  var c48 = 0, c32 = 0, c16 = 0, c00 = 0;
+  c00 += a00 + b00;
+  c16 += c00 >>> 16;
+  c00 &= 0xFFFF;
+  c16 += a16 + b16;
+  c32 += c16 >>> 16;
+  c16 &= 0xFFFF;
+  c32 += a32 + b32;
+  c48 += c32 >>> 16;
+  c32 &= 0xFFFF;
+  c48 += a48 + b48;
+  c48 &= 0xFFFF;
+  return Timestamp.fromBits((c16 << 16) | c00, (c48 << 16) | c32);
+};
+
+/**
+ * Returns the difference of this and the given Timestamp.
+ *
+ * @method
+ * @param {Timestamp} other Timestamp to subtract from this.
+ * @return {Timestamp} the difference of this and the given Timestamp.
+ */
+Timestamp.prototype.subtract = function(other) {
+  return this.add(other.negate());
+};
+
+/**
+ * Returns the product of this and the given Timestamp.
+ *
+ * @method
+ * @param {Timestamp} other Timestamp to multiply with this.
+ * @return {Timestamp} the product of this and the other.
+ */
+Timestamp.prototype.multiply = function(other) {
+  if (this.isZero()) {
+    return Timestamp.ZERO;
+  } else if (other.isZero()) {
+    return Timestamp.ZERO;
+  }
+
+  if (this.equals(Timestamp.MIN_VALUE)) {
+    return other.isOdd() ? Timestamp.MIN_VALUE : Timestamp.ZERO;
+  } else if (other.equals(Timestamp.MIN_VALUE)) {
+    return this.isOdd() ? Timestamp.MIN_VALUE : Timestamp.ZERO;
+  }
+
+  if (this.isNegative()) {
+    if (other.isNegative()) {
+      return this.negate().multiply(other.negate());
+    } else {
+      return this.negate().multiply(other).negate();
+    }
+  } else if (other.isNegative()) {
+    return this.multiply(other.negate()).negate();
+  }
+
+  // If both Timestamps are small, use float multiplication
+  if (this.lessThan(Timestamp.TWO_PWR_24_) &&
+      other.lessThan(Timestamp.TWO_PWR_24_)) {
+    return Timestamp.fromNumber(this.toNumber() * other.toNumber());
+  }
+
+  // Divide each Timestamp into 4 chunks of 16 bits, and then add up 4x4 products.
+  // We can skip products that would overflow.
+
+  var a48 = this.high_ >>> 16;
+  var a32 = this.high_ & 0xFFFF;
+  var a16 = this.low_ >>> 16;
+  var a00 = this.low_ & 0xFFFF;
+
+  var b48 = other.high_ >>> 16;
+  var b32 = other.high_ & 0xFFFF;
+  var b16 = other.low_ >>> 16;
+  var b00 = other.low_ & 0xFFFF;
+
+  var c48 = 0, c32 = 0, c16 = 0, c00 = 0;
+  c00 += a00 * b00;
+  c16 += c00 >>> 16;
+  c00 &= 0xFFFF;
+  c16 += a16 * b00;
+  c32 += c16 >>> 16;
+  c16 &= 0xFFFF;
+  c16 += a00 * b16;
+  c32 += c16 >>> 16;
+  c16 &= 0xFFFF;
+  c32 += a32 * b00;
+  c48 += c32 >>> 16;
+  c32 &= 0xFFFF;
+  c32 += a16 * b16;
+  c48 += c32 >>> 16;
+  c32 &= 0xFFFF;
+  c32 += a00 * b32;
+  c48 += c32 >>> 16;
+  c32 &= 0xFFFF;
+  c48 += a48 * b00 + a32 * b16 + a16 * b32 + a00 * b48;
+  c48 &= 0xFFFF;
+  return Timestamp.fromBits((c16 << 16) | c00, (c48 << 16) | c32);
+};
+
+/**
+ * Returns this Timestamp divided by the given one.
+ *
+ * @method
+ * @param {Timestamp} other Timestamp by which to divide.
+ * @return {Timestamp} this Timestamp divided by the given one.
+ */
+Timestamp.prototype.div = function(other) {
+  if (other.isZero()) {
+    throw Error('division by zero');
+  } else if (this.isZero()) {
+    return Timestamp.ZERO;
+  }
+
+  if (this.equals(Timestamp.MIN_VALUE)) {
+    if (other.equals(Timestamp.ONE) ||
+        other.equals(Timestamp.NEG_ONE)) {
+      return Timestamp.MIN_VALUE;  // recall that -MIN_VALUE == MIN_VALUE
+    } else if (other.equals(Timestamp.MIN_VALUE)) {
+      return Timestamp.ONE;
+    } else {
+      // At this point, we have |other| >= 2, so |this/other| < |MIN_VALUE|.
+      var halfThis = this.shiftRight(1);
+      var approx = halfThis.div(other).shiftLeft(1);
+      if (approx.equals(Timestamp.ZERO)) {
+        return other.isNegative() ? Timestamp.ONE : Timestamp.NEG_ONE;
+      } else {
+        var rem = this.subtract(other.multiply(approx));
+        var result = approx.add(rem.div(other));
+        return result;
+      }
+    }
+  } else if (other.equals(Timestamp.MIN_VALUE)) {
+    return Timestamp.ZERO;
+  }
+
+  if (this.isNegative()) {
+    if (other.isNegative()) {
+      return this.negate().div(other.negate());
+    } else {
+      return this.negate().div(other).negate();
+    }
+  } else if (other.isNegative()) {
+    return this.div(other.negate()).negate();
+  }
+
+  // Repeat the following until the remainder is less than other:  find a
+  // floating-point that approximates remainder / other *from below*, add this
+  // into the result, and subtract it from the remainder.  It is critical that
+  // the approximate value is less than or equal to the real value so that the
+  // remainder never becomes negative.
+  var res = Timestamp.ZERO;
+  var rem = this;
+  while (rem.greaterThanOrEqual(other)) {
+    // Approximate the result of division. This may be a little greater or
+    // smaller than the actual value.
+    var approx = Math.max(1, Math.floor(rem.toNumber() / other.toNumber()));
+
+    // We will tweak the approximate result by changing it in the 48-th digit or
+    // the smallest non-fractional digit, whichever is larger.
+    var log2 = Math.ceil(Math.log(approx) / Math.LN2);
+    var delta = (log2 <= 48) ? 1 : Math.pow(2, log2 - 48);
+
+    // Decrease the approximation until it is smaller than the remainder.  Note
+    // that if it is too large, the product overflows and is negative.
+    var approxRes = Timestamp.fromNumber(approx);
+    var approxRem = approxRes.multiply(other);
+    while (approxRem.isNegative() || approxRem.greaterThan(rem)) {
+      approx -= delta;
+      approxRes = Timestamp.fromNumber(approx);
+      approxRem = approxRes.multiply(other);
+    }
+
+    // We know the answer can't be zero... and actually, zero would cause
+    // infinite recursion since we would make no progress.
+    if (approxRes.isZero()) {
+      approxRes = Timestamp.ONE;
+    }
+
+    res = res.add(approxRes);
+    rem = rem.subtract(approxRem);
+  }
+  return res;
+};
+
+/**
+ * Returns this Timestamp modulo the given one.
+ *
+ * @method
+ * @param {Timestamp} other Timestamp by which to mod.
+ * @return {Timestamp} this Timestamp modulo the given one.
+ */
+Timestamp.prototype.modulo = function(other) {
+  return this.subtract(this.div(other).multiply(other));
+};
+
+/**
+ * The bitwise-NOT of this value.
+ *
+ * @method
+ * @return {Timestamp} the bitwise-NOT of this value.
+ */
+Timestamp.prototype.not = function() {
+  return Timestamp.fromBits(~this.low_, ~this.high_);
+};
+
+/**
+ * Returns the bitwise-AND of this Timestamp and the given one.
+ *
+ * @method
+ * @param {Timestamp} other the Timestamp with which to AND.
+ * @return {Timestamp} the bitwise-AND of this and the other.
+ */
+Timestamp.prototype.and = function(other) {
+  return Timestamp.fromBits(this.low_ & other.low_, this.high_ & other.high_);
+};
+
+/**
+ * Returns the bitwise-OR of this Timestamp and the given one.
+ *
+ * @method
+ * @param {Timestamp} other the Timestamp with which to OR.
+ * @return {Timestamp} the bitwise-OR of this and the other.
+ */
+Timestamp.prototype.or = function(other) {
+  return Timestamp.fromBits(this.low_ | other.low_, this.high_ | other.high_);
+};
+
+/**
+ * Returns the bitwise-XOR of this Timestamp and the given one.
+ *
+ * @method
+ * @param {Timestamp} other the Timestamp with which to XOR.
+ * @return {Timestamp} the bitwise-XOR of this and the other.
+ */
+Timestamp.prototype.xor = function(other) {
+  return Timestamp.fromBits(this.low_ ^ other.low_, this.high_ ^ other.high_);
+};
+
+/**
+ * Returns this Timestamp with bits shifted to the left by the given amount.
+ *
+ * @method
+ * @param {number} numBits the number of bits by which to shift.
+ * @return {Timestamp} this shifted to the left by the given amount.
+ */
+Timestamp.prototype.shiftLeft = function(numBits) {
+  numBits &= 63;
+  if (numBits == 0) {
+    return this;
+  } else {
+    var low = this.low_;
+    if (numBits < 32) {
+      var high = this.high_;
+      return Timestamp.fromBits(
+                 low << numBits,
+                 (high << numBits) | (low >>> (32 - numBits)));
+    } else {
+      return Timestamp.fromBits(0, low << (numBits - 32));
+    }
+  }
+};
+
+/**
+ * Returns this Timestamp with bits shifted to the right by the given amount.
+ *
+ * @method
+ * @param {number} numBits the number of bits by which to shift.
+ * @return {Timestamp} this shifted to the right by the given amount.
+ */
+Timestamp.prototype.shiftRight = function(numBits) {
+  numBits &= 63;
+  if (numBits == 0) {
+    return this;
+  } else {
+    var high = this.high_;
+    if (numBits < 32) {
+      var low = this.low_;
+      return Timestamp.fromBits(
+                 (low >>> numBits) | (high << (32 - numBits)),
+                 high >> numBits);
+    } else {
+      return Timestamp.fromBits(
+                 high >> (numBits - 32),
+                 high >= 0 ? 0 : -1);
+    }
+  }
+};
+
+/**
+ * Returns this Timestamp with bits shifted to the right by the given amount, with the new top bits matching the current sign bit.
+ *
+ * @method
+ * @param {number} numBits the number of bits by which to shift.
+ * @return {Timestamp} this shifted to the right by the given amount, with zeros placed into the new leading bits.
+ */
+Timestamp.prototype.shiftRightUnsigned = function(numBits) {
+  numBits &= 63;
+  if (numBits == 0) {
+    return this;
+  } else {
+    var high = this.high_;
+    if (numBits < 32) {
+      var low = this.low_;
+      return Timestamp.fromBits(
+                 (low >>> numBits) | (high << (32 - numBits)),
+                 high >>> numBits);
+    } else if (numBits == 32) {
+      return Timestamp.fromBits(high, 0);
+    } else {
+      return Timestamp.fromBits(high >>> (numBits - 32), 0);
+    }
+  }
+};
+
+/**
+ * Returns a Timestamp representing the given (32-bit) integer value.
+ *
+ * @method
+ * @param {number} value the 32-bit integer in question.
+ * @return {Timestamp} the corresponding Timestamp value.
+ */
+Timestamp.fromInt = function(value) {
+  if (-128 <= value && value < 128) {
+    var cachedObj = Timestamp.INT_CACHE_[value];
+    if (cachedObj) {
+      return cachedObj;
+    }
+  }
+
+  var obj = new Timestamp(value | 0, value < 0 ? -1 : 0);
+  if (-128 <= value && value < 128) {
+    Timestamp.INT_CACHE_[value] = obj;
+  }
+  return obj;
+};
+
+/**
+ * Returns a Timestamp representing the given value, provided that it is a finite number. Otherwise, zero is returned.
+ *
+ * @method
+ * @param {number} value the number in question.
+ * @return {Timestamp} the corresponding Timestamp value.
+ */
+Timestamp.fromNumber = function(value) {
+  if (isNaN(value) || !isFinite(value)) {
+    return Timestamp.ZERO;
+  } else if (value <= -Timestamp.TWO_PWR_63_DBL_) {
+    return Timestamp.MIN_VALUE;
+  } else if (value + 1 >= Timestamp.TWO_PWR_63_DBL_) {
+    return Timestamp.MAX_VALUE;
+  } else if (value < 0) {
+    return Timestamp.fromNumber(-value).negate();
+  } else {
+    return new Timestamp(
+               (value % Timestamp.TWO_PWR_32_DBL_) | 0,
+               (value / Timestamp.TWO_PWR_32_DBL_) | 0);
+  }
+};
+
+/**
+ * Returns a Timestamp representing the 64-bit integer that comes by concatenating the given high and low bits. Each is assumed to use 32 bits.
+ *
+ * @method
+ * @param {number} lowBits the low 32-bits.
+ * @param {number} highBits the high 32-bits.
+ * @return {Timestamp} the corresponding Timestamp value.
+ */
+Timestamp.fromBits = function(lowBits, highBits) {
+  return new Timestamp(lowBits, highBits);
+};
+
+/**
+ * Returns a Timestamp representation of the given string, written using the given radix.
+ *
+ * @method
+ * @param {string} str the textual representation of the Timestamp.
+ * @param {number} opt_radix the radix in which the text is written.
+ * @return {Timestamp} the corresponding Timestamp value.
+ */
+Timestamp.fromString = function(str, opt_radix) {
+  if (str.length == 0) {
+    throw Error('number format error: empty string');
+  }
+
+  var radix = opt_radix || 10;
+  if (radix < 2 || 36 < radix) {
+    throw Error('radix out of range: ' + radix);
+  }
+
+  if (str.charAt(0) == '-') {
+    return Timestamp.fromString(str.substring(1), radix).negate();
+  } else if (str.indexOf('-') >= 0) {
+    throw Error('number format error: interior "-" character: ' + str);
+  }
+
+  // Do several (8) digits each time through the loop, so as to
+  // minimize the calls to the very expensive emulated div.
+  var radixToPower = Timestamp.fromNumber(Math.pow(radix, 8));
+
+  var result = Timestamp.ZERO;
+  for (var i = 0; i < str.length; i += 8) {
+    var size = Math.min(8, str.length - i);
+    var value = parseInt(str.substring(i, i + size), radix);
+    if (size < 8) {
+      var power = Timestamp.fromNumber(Math.pow(radix, size));
+      result = result.multiply(power).add(Timestamp.fromNumber(value));
+    } else {
+      result = result.multiply(radixToPower);
+      result = result.add(Timestamp.fromNumber(value));
+    }
+  }
+  return result;
+};
+
+// NOTE: Common constant values ZERO, ONE, NEG_ONE, etc. are defined below the
+// from* methods on which they depend.
+
+
+/**
+ * A cache of the Timestamp representations of small integer values.
+ * @type {Object}
+ * @ignore
+ */
+Timestamp.INT_CACHE_ = {};
+
+// NOTE: the compiler should inline these constant values below and then remove
+// these variables, so there should be no runtime penalty for these.
+
+/**
+ * Number used repeated below in calculations.  This must appear before the
+ * first call to any from* function below.
+ * @type {number}
+ * @ignore
+ */
+Timestamp.TWO_PWR_16_DBL_ = 1 << 16;
+
+/**
+ * @type {number}
+ * @ignore
+ */
+Timestamp.TWO_PWR_24_DBL_ = 1 << 24;
+
+/**
+ * @type {number}
+ * @ignore
+ */
+Timestamp.TWO_PWR_32_DBL_ = Timestamp.TWO_PWR_16_DBL_ * Timestamp.TWO_PWR_16_DBL_;
+
+/**
+ * @type {number}
+ * @ignore
+ */
+Timestamp.TWO_PWR_31_DBL_ = Timestamp.TWO_PWR_32_DBL_ / 2;
+
+/**
+ * @type {number}
+ * @ignore
+ */
+Timestamp.TWO_PWR_48_DBL_ = Timestamp.TWO_PWR_32_DBL_ * Timestamp.TWO_PWR_16_DBL_;
+
+/**
+ * @type {number}
+ * @ignore
+ */
+Timestamp.TWO_PWR_64_DBL_ = Timestamp.TWO_PWR_32_DBL_ * Timestamp.TWO_PWR_32_DBL_;
+
+/**
+ * @type {number}
+ * @ignore
+ */
+Timestamp.TWO_PWR_63_DBL_ = Timestamp.TWO_PWR_64_DBL_ / 2;
+
+/** @type {Timestamp} */
+Timestamp.ZERO = Timestamp.fromInt(0);
+
+/** @type {Timestamp} */
+Timestamp.ONE = Timestamp.fromInt(1);
+
+/** @type {Timestamp} */
+Timestamp.NEG_ONE = Timestamp.fromInt(-1);
+
+/** @type {Timestamp} */
+Timestamp.MAX_VALUE =
+    Timestamp.fromBits(0xFFFFFFFF | 0, 0x7FFFFFFF | 0);
+
+/** @type {Timestamp} */
+Timestamp.MIN_VALUE = Timestamp.fromBits(0, 0x80000000 | 0);
+
+/**
+ * @type {Timestamp}
+ * @ignore
+ */
+Timestamp.TWO_PWR_24_ = Timestamp.fromInt(1 << 24);
+
+/**
+ * Expose.
+ */
+module.exports = Timestamp;
+module.exports.Timestamp = Timestamp;
+},{}],71:[function(require,module,exports){
 /*!
  * The buffer module from node.js, for the browser.
  *
@@ -13747,250 +19173,376 @@ function decodeUtf8Char (str) {
   }
 }
 
-},{"base64-js":53,"ieee754":54,"is-array":55}],53:[function(require,module,exports){
-var lookup = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
+},{"base64-js":52,"ieee754":76,"is-array":78}],72:[function(require,module,exports){
 
-;(function (exports) {
-	'use strict';
+/**
+ * This is the web browser implementation of `debug()`.
+ *
+ * Expose `debug()` as the module.
+ */
 
-  var Arr = (typeof Uint8Array !== 'undefined')
-    ? Uint8Array
-    : Array
+exports = module.exports = require('./debug');
+exports.log = log;
+exports.formatArgs = formatArgs;
+exports.save = save;
+exports.load = load;
+exports.useColors = useColors;
+exports.storage = 'undefined' != typeof chrome
+               && 'undefined' != typeof chrome.storage
+                  ? chrome.storage.local
+                  : localstorage();
 
-	var PLUS   = '+'.charCodeAt(0)
-	var SLASH  = '/'.charCodeAt(0)
-	var NUMBER = '0'.charCodeAt(0)
-	var LOWER  = 'a'.charCodeAt(0)
-	var UPPER  = 'A'.charCodeAt(0)
+/**
+ * Colors.
+ */
 
-	function decode (elt) {
-		var code = elt.charCodeAt(0)
-		if (code === PLUS)
-			return 62 // '+'
-		if (code === SLASH)
-			return 63 // '/'
-		if (code < NUMBER)
-			return -1 //no match
-		if (code < NUMBER + 10)
-			return code - NUMBER + 26 + 26
-		if (code < UPPER + 26)
-			return code - UPPER
-		if (code < LOWER + 26)
-			return code - LOWER + 26
-	}
+exports.colors = [
+  'lightseagreen',
+  'forestgreen',
+  'goldenrod',
+  'dodgerblue',
+  'darkorchid',
+  'crimson'
+];
 
-	function b64ToByteArray (b64) {
-		var i, j, l, tmp, placeHolders, arr
+/**
+ * Currently only WebKit-based Web Inspectors, Firefox >= v31,
+ * and the Firebug extension (any Firefox version) are known
+ * to support "%c" CSS customizations.
+ *
+ * TODO: add a `localStorage` variable to explicitly enable/disable colors
+ */
 
-		if (b64.length % 4 > 0) {
-			throw new Error('Invalid string. Length must be a multiple of 4')
-		}
-
-		// the number of equal signs (place holders)
-		// if there are two placeholders, than the two characters before it
-		// represent one byte
-		// if there is only one, then the three characters before it represent 2 bytes
-		// this is just a cheap hack to not do indexOf twice
-		var len = b64.length
-		placeHolders = '=' === b64.charAt(len - 2) ? 2 : '=' === b64.charAt(len - 1) ? 1 : 0
-
-		// base64 is 4/3 + up to two characters of the original data
-		arr = new Arr(b64.length * 3 / 4 - placeHolders)
-
-		// if there are placeholders, only get up to the last complete 4 chars
-		l = placeHolders > 0 ? b64.length - 4 : b64.length
-
-		var L = 0
-
-		function push (v) {
-			arr[L++] = v
-		}
-
-		for (i = 0, j = 0; i < l; i += 4, j += 3) {
-			tmp = (decode(b64.charAt(i)) << 18) | (decode(b64.charAt(i + 1)) << 12) | (decode(b64.charAt(i + 2)) << 6) | decode(b64.charAt(i + 3))
-			push((tmp & 0xFF0000) >> 16)
-			push((tmp & 0xFF00) >> 8)
-			push(tmp & 0xFF)
-		}
-
-		if (placeHolders === 2) {
-			tmp = (decode(b64.charAt(i)) << 2) | (decode(b64.charAt(i + 1)) >> 4)
-			push(tmp & 0xFF)
-		} else if (placeHolders === 1) {
-			tmp = (decode(b64.charAt(i)) << 10) | (decode(b64.charAt(i + 1)) << 4) | (decode(b64.charAt(i + 2)) >> 2)
-			push((tmp >> 8) & 0xFF)
-			push(tmp & 0xFF)
-		}
-
-		return arr
-	}
-
-	function uint8ToBase64 (uint8) {
-		var i,
-			extraBytes = uint8.length % 3, // if we have 1 byte left, pad 2 bytes
-			output = "",
-			temp, length
-
-		function encode (num) {
-			return lookup.charAt(num)
-		}
-
-		function tripletToBase64 (num) {
-			return encode(num >> 18 & 0x3F) + encode(num >> 12 & 0x3F) + encode(num >> 6 & 0x3F) + encode(num & 0x3F)
-		}
-
-		// go through the array every three bytes, we'll deal with trailing stuff later
-		for (i = 0, length = uint8.length - extraBytes; i < length; i += 3) {
-			temp = (uint8[i] << 16) + (uint8[i + 1] << 8) + (uint8[i + 2])
-			output += tripletToBase64(temp)
-		}
-
-		// pad the end with zeros, but make sure to not forget the extra bytes
-		switch (extraBytes) {
-			case 1:
-				temp = uint8[uint8.length - 1]
-				output += encode(temp >> 2)
-				output += encode((temp << 4) & 0x3F)
-				output += '=='
-				break
-			case 2:
-				temp = (uint8[uint8.length - 2] << 8) + (uint8[uint8.length - 1])
-				output += encode(temp >> 10)
-				output += encode((temp >> 4) & 0x3F)
-				output += encode((temp << 2) & 0x3F)
-				output += '='
-				break
-		}
-
-		return output
-	}
-
-	exports.toByteArray = b64ToByteArray
-	exports.fromByteArray = uint8ToBase64
-}(typeof exports === 'undefined' ? (this.base64js = {}) : exports))
-
-},{}],54:[function(require,module,exports){
-exports.read = function (buffer, offset, isLE, mLen, nBytes) {
-  var e, m
-  var eLen = nBytes * 8 - mLen - 1
-  var eMax = (1 << eLen) - 1
-  var eBias = eMax >> 1
-  var nBits = -7
-  var i = isLE ? (nBytes - 1) : 0
-  var d = isLE ? -1 : 1
-  var s = buffer[offset + i]
-
-  i += d
-
-  e = s & ((1 << (-nBits)) - 1)
-  s >>= (-nBits)
-  nBits += eLen
-  for (; nBits > 0; e = e * 256 + buffer[offset + i], i += d, nBits -= 8) {}
-
-  m = e & ((1 << (-nBits)) - 1)
-  e >>= (-nBits)
-  nBits += mLen
-  for (; nBits > 0; m = m * 256 + buffer[offset + i], i += d, nBits -= 8) {}
-
-  if (e === 0) {
-    e = 1 - eBias
-  } else if (e === eMax) {
-    return m ? NaN : ((s ? -1 : 1) * Infinity)
-  } else {
-    m = m + Math.pow(2, mLen)
-    e = e - eBias
-  }
-  return (s ? -1 : 1) * m * Math.pow(2, e - mLen)
+function useColors() {
+  // is webkit? http://stackoverflow.com/a/16459606/376773
+  return ('WebkitAppearance' in document.documentElement.style) ||
+    // is firebug? http://stackoverflow.com/a/398120/376773
+    (window.console && (console.firebug || (console.exception && console.table))) ||
+    // is firefox >= v31?
+    // https://developer.mozilla.org/en-US/docs/Tools/Web_Console#Styling_messages
+    (navigator.userAgent.toLowerCase().match(/firefox\/(\d+)/) && parseInt(RegExp.$1, 10) >= 31);
 }
 
-exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
-  var e, m, c
-  var eLen = nBytes * 8 - mLen - 1
-  var eMax = (1 << eLen) - 1
-  var eBias = eMax >> 1
-  var rt = (mLen === 23 ? Math.pow(2, -24) - Math.pow(2, -77) : 0)
-  var i = isLE ? 0 : (nBytes - 1)
-  var d = isLE ? 1 : -1
-  var s = value < 0 || (value === 0 && 1 / value < 0) ? 1 : 0
-
-  value = Math.abs(value)
-
-  if (isNaN(value) || value === Infinity) {
-    m = isNaN(value) ? 1 : 0
-    e = eMax
-  } else {
-    e = Math.floor(Math.log(value) / Math.LN2)
-    if (value * (c = Math.pow(2, -e)) < 1) {
-      e--
-      c *= 2
-    }
-    if (e + eBias >= 1) {
-      value += rt / c
-    } else {
-      value += rt * Math.pow(2, 1 - eBias)
-    }
-    if (value * c >= 2) {
-      e++
-      c /= 2
-    }
-
-    if (e + eBias >= eMax) {
-      m = 0
-      e = eMax
-    } else if (e + eBias >= 1) {
-      m = (value * c - 1) * Math.pow(2, mLen)
-      e = e + eBias
-    } else {
-      m = value * Math.pow(2, eBias - 1) * Math.pow(2, mLen)
-      e = 0
-    }
-  }
-
-  for (; mLen >= 8; buffer[offset + i] = m & 0xff, i += d, m /= 256, mLen -= 8) {}
-
-  e = (e << mLen) | m
-  eLen += mLen
-  for (; eLen > 0; buffer[offset + i] = e & 0xff, i += d, e /= 256, eLen -= 8) {}
-
-  buffer[offset + i - d] |= s * 128
-}
-
-},{}],55:[function(require,module,exports){
-
 /**
- * isArray
+ * Map %j to `JSON.stringify()`, since no Web Inspectors do that by default.
  */
 
-var isArray = Array.isArray;
-
-/**
- * toString
- */
-
-var str = Object.prototype.toString;
-
-/**
- * Whether or not the given `val`
- * is an array.
- *
- * example:
- *
- *        isArray([]);
- *        // > true
- *        isArray(arguments);
- *        // > false
- *        isArray('');
- *        // > false
- *
- * @param {mixed} val
- * @return {bool}
- */
-
-module.exports = isArray || function (val) {
-  return !! val && '[object Array]' == str.call(val);
+exports.formatters.j = function(v) {
+  return JSON.stringify(v);
 };
 
-},{}],56:[function(require,module,exports){
+
+/**
+ * Colorize log arguments if enabled.
+ *
+ * @api public
+ */
+
+function formatArgs() {
+  var args = arguments;
+  var useColors = this.useColors;
+
+  args[0] = (useColors ? '%c' : '')
+    + this.namespace
+    + (useColors ? ' %c' : ' ')
+    + args[0]
+    + (useColors ? '%c ' : ' ')
+    + '+' + exports.humanize(this.diff);
+
+  if (!useColors) return args;
+
+  var c = 'color: ' + this.color;
+  args = [args[0], c, 'color: inherit'].concat(Array.prototype.slice.call(args, 1));
+
+  // the final "%c" is somewhat tricky, because there could be other
+  // arguments passed either before or after the %c, so we need to
+  // figure out the correct index to insert the CSS into
+  var index = 0;
+  var lastC = 0;
+  args[0].replace(/%[a-z%]/g, function(match) {
+    if ('%%' === match) return;
+    index++;
+    if ('%c' === match) {
+      // we only are interested in the *last* %c
+      // (the user may have provided their own)
+      lastC = index;
+    }
+  });
+
+  args.splice(lastC, 0, c);
+  return args;
+}
+
+/**
+ * Invokes `console.log()` when available.
+ * No-op when `console.log` is not a "function".
+ *
+ * @api public
+ */
+
+function log() {
+  // this hackery is required for IE8/9, where
+  // the `console.log` function doesn't have 'apply'
+  return 'object' === typeof console
+    && console.log
+    && Function.prototype.apply.call(console.log, console, arguments);
+}
+
+/**
+ * Save `namespaces`.
+ *
+ * @param {String} namespaces
+ * @api private
+ */
+
+function save(namespaces) {
+  try {
+    if (null == namespaces) {
+      exports.storage.removeItem('debug');
+    } else {
+      exports.storage.debug = namespaces;
+    }
+  } catch(e) {}
+}
+
+/**
+ * Load `namespaces`.
+ *
+ * @return {String} returns the previously persisted debug modes
+ * @api private
+ */
+
+function load() {
+  var r;
+  try {
+    r = exports.storage.debug;
+  } catch(e) {}
+  return r;
+}
+
+/**
+ * Enable namespaces listed in `localStorage.debug` initially.
+ */
+
+exports.enable(load());
+
+/**
+ * Localstorage attempts to return the localstorage.
+ *
+ * This is necessary because safari throws
+ * when a user disables cookies/localstorage
+ * and you attempt to access it.
+ *
+ * @return {LocalStorage}
+ * @api private
+ */
+
+function localstorage(){
+  try {
+    return window.localStorage;
+  } catch (e) {}
+}
+
+},{"./debug":73}],73:[function(require,module,exports){
+
+/**
+ * This is the common logic for both the Node.js and web browser
+ * implementations of `debug()`.
+ *
+ * Expose `debug()` as the module.
+ */
+
+exports = module.exports = debug;
+exports.coerce = coerce;
+exports.disable = disable;
+exports.enable = enable;
+exports.enabled = enabled;
+exports.humanize = require('ms');
+
+/**
+ * The currently active debug mode names, and names to skip.
+ */
+
+exports.names = [];
+exports.skips = [];
+
+/**
+ * Map of special "%n" handling functions, for the debug "format" argument.
+ *
+ * Valid key names are a single, lowercased letter, i.e. "n".
+ */
+
+exports.formatters = {};
+
+/**
+ * Previously assigned color.
+ */
+
+var prevColor = 0;
+
+/**
+ * Previous log timestamp.
+ */
+
+var prevTime;
+
+/**
+ * Select a color.
+ *
+ * @return {Number}
+ * @api private
+ */
+
+function selectColor() {
+  return exports.colors[prevColor++ % exports.colors.length];
+}
+
+/**
+ * Create a debugger with the given `namespace`.
+ *
+ * @param {String} namespace
+ * @return {Function}
+ * @api public
+ */
+
+function debug(namespace) {
+
+  // define the `disabled` version
+  function disabled() {
+  }
+  disabled.enabled = false;
+
+  // define the `enabled` version
+  function enabled() {
+
+    var self = enabled;
+
+    // set `diff` timestamp
+    var curr = +new Date();
+    var ms = curr - (prevTime || curr);
+    self.diff = ms;
+    self.prev = prevTime;
+    self.curr = curr;
+    prevTime = curr;
+
+    // add the `color` if not set
+    if (null == self.useColors) self.useColors = exports.useColors();
+    if (null == self.color && self.useColors) self.color = selectColor();
+
+    var args = Array.prototype.slice.call(arguments);
+
+    args[0] = exports.coerce(args[0]);
+
+    if ('string' !== typeof args[0]) {
+      // anything else let's inspect with %o
+      args = ['%o'].concat(args);
+    }
+
+    // apply any `formatters` transformations
+    var index = 0;
+    args[0] = args[0].replace(/%([a-z%])/g, function(match, format) {
+      // if we encounter an escaped % then don't increase the array index
+      if (match === '%%') return match;
+      index++;
+      var formatter = exports.formatters[format];
+      if ('function' === typeof formatter) {
+        var val = args[index];
+        match = formatter.call(self, val);
+
+        // now we need to remove `args[index]` since it's inlined in the `format`
+        args.splice(index, 1);
+        index--;
+      }
+      return match;
+    });
+
+    if ('function' === typeof exports.formatArgs) {
+      args = exports.formatArgs.apply(self, args);
+    }
+    var logFn = enabled.log || exports.log || console.log.bind(console);
+    logFn.apply(self, args);
+  }
+  enabled.enabled = true;
+
+  var fn = exports.enabled(namespace) ? enabled : disabled;
+
+  fn.namespace = namespace;
+
+  return fn;
+}
+
+/**
+ * Enables a debug mode by namespaces. This can include modes
+ * separated by a colon and wildcards.
+ *
+ * @param {String} namespaces
+ * @api public
+ */
+
+function enable(namespaces) {
+  exports.save(namespaces);
+
+  var split = (namespaces || '').split(/[\s,]+/);
+  var len = split.length;
+
+  for (var i = 0; i < len; i++) {
+    if (!split[i]) continue; // ignore empty strings
+    namespaces = split[i].replace(/\*/g, '.*?');
+    if (namespaces[0] === '-') {
+      exports.skips.push(new RegExp('^' + namespaces.substr(1) + '$'));
+    } else {
+      exports.names.push(new RegExp('^' + namespaces + '$'));
+    }
+  }
+}
+
+/**
+ * Disable debug output.
+ *
+ * @api public
+ */
+
+function disable() {
+  exports.enable('');
+}
+
+/**
+ * Returns true if the given mode name is enabled, false otherwise.
+ *
+ * @param {String} name
+ * @return {Boolean}
+ * @api public
+ */
+
+function enabled(name) {
+  var i, len;
+  for (i = 0, len = exports.skips.length; i < len; i++) {
+    if (exports.skips[i].test(name)) {
+      return false;
+    }
+  }
+  for (i = 0, len = exports.names.length; i < len; i++) {
+    if (exports.names[i].test(name)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+/**
+ * Coerce `val`.
+ *
+ * @param {Mixed} val
+ * @return {Mixed}
+ * @api private
+ */
+
+function coerce(val) {
+  if (val instanceof Error) return val.stack || val.message;
+  return val;
+}
+
+},{"ms":91}],74:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -14293,5991 +19845,7 @@ function isUndefined(arg) {
   return arg === void 0;
 }
 
-},{}],57:[function(require,module,exports){
-if (typeof Object.create === 'function') {
-  // implementation from standard node.js 'util' module
-  module.exports = function inherits(ctor, superCtor) {
-    ctor.super_ = superCtor
-    ctor.prototype = Object.create(superCtor.prototype, {
-      constructor: {
-        value: ctor,
-        enumerable: false,
-        writable: true,
-        configurable: true
-      }
-    });
-  };
-} else {
-  // old school shim for old browsers
-  module.exports = function inherits(ctor, superCtor) {
-    ctor.super_ = superCtor
-    var TempCtor = function () {}
-    TempCtor.prototype = superCtor.prototype
-    ctor.prototype = new TempCtor()
-    ctor.prototype.constructor = ctor
-  }
-}
-
-},{}],58:[function(require,module,exports){
-// shim for using process in browser
-
-var process = module.exports = {};
-
-process.nextTick = (function () {
-    var canSetImmediate = typeof window !== 'undefined'
-    && window.setImmediate;
-    var canPost = typeof window !== 'undefined'
-    && window.postMessage && window.addEventListener
-    ;
-
-    if (canSetImmediate) {
-        return function (f) { return window.setImmediate(f) };
-    }
-
-    if (canPost) {
-        var queue = [];
-        window.addEventListener('message', function (ev) {
-            var source = ev.source;
-            if ((source === window || source === null) && ev.data === 'process-tick') {
-                ev.stopPropagation();
-                if (queue.length > 0) {
-                    var fn = queue.shift();
-                    fn();
-                }
-            }
-        }, true);
-
-        return function nextTick(fn) {
-            queue.push(fn);
-            window.postMessage('process-tick', '*');
-        };
-    }
-
-    return function nextTick(fn) {
-        setTimeout(fn, 0);
-    };
-})();
-
-process.title = 'browser';
-process.browser = true;
-process.env = {};
-process.argv = [];
-
-function noop() {}
-
-process.on = noop;
-process.addListener = noop;
-process.once = noop;
-process.off = noop;
-process.removeListener = noop;
-process.removeAllListeners = noop;
-process.emit = noop;
-
-process.binding = function (name) {
-    throw new Error('process.binding is not supported');
-}
-
-// TODO(shtylman)
-process.cwd = function () { return '/' };
-process.chdir = function (dir) {
-    throw new Error('process.chdir is not supported');
-};
-
-},{}],59:[function(require,module,exports){
-module.exports = function isBuffer(arg) {
-  return arg && typeof arg === 'object'
-    && typeof arg.copy === 'function'
-    && typeof arg.fill === 'function'
-    && typeof arg.readUInt8 === 'function';
-}
-},{}],60:[function(require,module,exports){
-(function (process,global){
-// Copyright Joyent, Inc. and other Node contributors.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a
-// copy of this software and associated documentation files (the
-// "Software"), to deal in the Software without restriction, including
-// without limitation the rights to use, copy, modify, merge, publish,
-// distribute, sublicense, and/or sell copies of the Software, and to permit
-// persons to whom the Software is furnished to do so, subject to the
-// following conditions:
-//
-// The above copyright notice and this permission notice shall be included
-// in all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
-// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
-// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
-// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
-// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
-// USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-var formatRegExp = /%[sdj%]/g;
-exports.format = function(f) {
-  if (!isString(f)) {
-    var objects = [];
-    for (var i = 0; i < arguments.length; i++) {
-      objects.push(inspect(arguments[i]));
-    }
-    return objects.join(' ');
-  }
-
-  var i = 1;
-  var args = arguments;
-  var len = args.length;
-  var str = String(f).replace(formatRegExp, function(x) {
-    if (x === '%%') return '%';
-    if (i >= len) return x;
-    switch (x) {
-      case '%s': return String(args[i++]);
-      case '%d': return Number(args[i++]);
-      case '%j':
-        try {
-          return JSON.stringify(args[i++]);
-        } catch (_) {
-          return '[Circular]';
-        }
-      default:
-        return x;
-    }
-  });
-  for (var x = args[i]; i < len; x = args[++i]) {
-    if (isNull(x) || !isObject(x)) {
-      str += ' ' + x;
-    } else {
-      str += ' ' + inspect(x);
-    }
-  }
-  return str;
-};
-
-
-// Mark that a method should not be used.
-// Returns a modified function which warns once by default.
-// If --no-deprecation is set, then it is a no-op.
-exports.deprecate = function(fn, msg) {
-  // Allow for deprecating things in the process of starting up.
-  if (isUndefined(global.process)) {
-    return function() {
-      return exports.deprecate(fn, msg).apply(this, arguments);
-    };
-  }
-
-  if (process.noDeprecation === true) {
-    return fn;
-  }
-
-  var warned = false;
-  function deprecated() {
-    if (!warned) {
-      if (process.throwDeprecation) {
-        throw new Error(msg);
-      } else if (process.traceDeprecation) {
-        console.trace(msg);
-      } else {
-        console.error(msg);
-      }
-      warned = true;
-    }
-    return fn.apply(this, arguments);
-  }
-
-  return deprecated;
-};
-
-
-var debugs = {};
-var debugEnviron;
-exports.debuglog = function(set) {
-  if (isUndefined(debugEnviron))
-    debugEnviron = process.env.NODE_DEBUG || '';
-  set = set.toUpperCase();
-  if (!debugs[set]) {
-    if (new RegExp('\\b' + set + '\\b', 'i').test(debugEnviron)) {
-      var pid = process.pid;
-      debugs[set] = function() {
-        var msg = exports.format.apply(exports, arguments);
-        console.error('%s %d: %s', set, pid, msg);
-      };
-    } else {
-      debugs[set] = function() {};
-    }
-  }
-  return debugs[set];
-};
-
-
-/**
- * Echos the value of a value. Trys to print the value out
- * in the best way possible given the different types.
- *
- * @param {Object} obj The object to print out.
- * @param {Object} opts Optional options object that alters the output.
- */
-/* legacy: obj, showHidden, depth, colors*/
-function inspect(obj, opts) {
-  // default options
-  var ctx = {
-    seen: [],
-    stylize: stylizeNoColor
-  };
-  // legacy...
-  if (arguments.length >= 3) ctx.depth = arguments[2];
-  if (arguments.length >= 4) ctx.colors = arguments[3];
-  if (isBoolean(opts)) {
-    // legacy...
-    ctx.showHidden = opts;
-  } else if (opts) {
-    // got an "options" object
-    exports._extend(ctx, opts);
-  }
-  // set default options
-  if (isUndefined(ctx.showHidden)) ctx.showHidden = false;
-  if (isUndefined(ctx.depth)) ctx.depth = 2;
-  if (isUndefined(ctx.colors)) ctx.colors = false;
-  if (isUndefined(ctx.customInspect)) ctx.customInspect = true;
-  if (ctx.colors) ctx.stylize = stylizeWithColor;
-  return formatValue(ctx, obj, ctx.depth);
-}
-exports.inspect = inspect;
-
-
-// http://en.wikipedia.org/wiki/ANSI_escape_code#graphics
-inspect.colors = {
-  'bold' : [1, 22],
-  'italic' : [3, 23],
-  'underline' : [4, 24],
-  'inverse' : [7, 27],
-  'white' : [37, 39],
-  'grey' : [90, 39],
-  'black' : [30, 39],
-  'blue' : [34, 39],
-  'cyan' : [36, 39],
-  'green' : [32, 39],
-  'magenta' : [35, 39],
-  'red' : [31, 39],
-  'yellow' : [33, 39]
-};
-
-// Don't use 'blue' not visible on cmd.exe
-inspect.styles = {
-  'special': 'cyan',
-  'number': 'yellow',
-  'boolean': 'yellow',
-  'undefined': 'grey',
-  'null': 'bold',
-  'string': 'green',
-  'date': 'magenta',
-  // "name": intentionally not styling
-  'regexp': 'red'
-};
-
-
-function stylizeWithColor(str, styleType) {
-  var style = inspect.styles[styleType];
-
-  if (style) {
-    return '\u001b[' + inspect.colors[style][0] + 'm' + str +
-           '\u001b[' + inspect.colors[style][1] + 'm';
-  } else {
-    return str;
-  }
-}
-
-
-function stylizeNoColor(str, styleType) {
-  return str;
-}
-
-
-function arrayToHash(array) {
-  var hash = {};
-
-  array.forEach(function(val, idx) {
-    hash[val] = true;
-  });
-
-  return hash;
-}
-
-
-function formatValue(ctx, value, recurseTimes) {
-  // Provide a hook for user-specified inspect functions.
-  // Check that value is an object with an inspect function on it
-  if (ctx.customInspect &&
-      value &&
-      isFunction(value.inspect) &&
-      // Filter out the util module, it's inspect function is special
-      value.inspect !== exports.inspect &&
-      // Also filter out any prototype objects using the circular check.
-      !(value.constructor && value.constructor.prototype === value)) {
-    var ret = value.inspect(recurseTimes, ctx);
-    if (!isString(ret)) {
-      ret = formatValue(ctx, ret, recurseTimes);
-    }
-    return ret;
-  }
-
-  // Primitive types cannot have properties
-  var primitive = formatPrimitive(ctx, value);
-  if (primitive) {
-    return primitive;
-  }
-
-  // Look up the keys of the object.
-  var keys = Object.keys(value);
-  var visibleKeys = arrayToHash(keys);
-
-  if (ctx.showHidden) {
-    keys = Object.getOwnPropertyNames(value);
-  }
-
-  // IE doesn't make error fields non-enumerable
-  // http://msdn.microsoft.com/en-us/library/ie/dww52sbt(v=vs.94).aspx
-  if (isError(value)
-      && (keys.indexOf('message') >= 0 || keys.indexOf('description') >= 0)) {
-    return formatError(value);
-  }
-
-  // Some type of object without properties can be shortcutted.
-  if (keys.length === 0) {
-    if (isFunction(value)) {
-      var name = value.name ? ': ' + value.name : '';
-      return ctx.stylize('[Function' + name + ']', 'special');
-    }
-    if (isRegExp(value)) {
-      return ctx.stylize(RegExp.prototype.toString.call(value), 'regexp');
-    }
-    if (isDate(value)) {
-      return ctx.stylize(Date.prototype.toString.call(value), 'date');
-    }
-    if (isError(value)) {
-      return formatError(value);
-    }
-  }
-
-  var base = '', array = false, braces = ['{', '}'];
-
-  // Make Array say that they are Array
-  if (isArray(value)) {
-    array = true;
-    braces = ['[', ']'];
-  }
-
-  // Make functions say that they are functions
-  if (isFunction(value)) {
-    var n = value.name ? ': ' + value.name : '';
-    base = ' [Function' + n + ']';
-  }
-
-  // Make RegExps say that they are RegExps
-  if (isRegExp(value)) {
-    base = ' ' + RegExp.prototype.toString.call(value);
-  }
-
-  // Make dates with properties first say the date
-  if (isDate(value)) {
-    base = ' ' + Date.prototype.toUTCString.call(value);
-  }
-
-  // Make error with message first say the error
-  if (isError(value)) {
-    base = ' ' + formatError(value);
-  }
-
-  if (keys.length === 0 && (!array || value.length == 0)) {
-    return braces[0] + base + braces[1];
-  }
-
-  if (recurseTimes < 0) {
-    if (isRegExp(value)) {
-      return ctx.stylize(RegExp.prototype.toString.call(value), 'regexp');
-    } else {
-      return ctx.stylize('[Object]', 'special');
-    }
-  }
-
-  ctx.seen.push(value);
-
-  var output;
-  if (array) {
-    output = formatArray(ctx, value, recurseTimes, visibleKeys, keys);
-  } else {
-    output = keys.map(function(key) {
-      return formatProperty(ctx, value, recurseTimes, visibleKeys, key, array);
-    });
-  }
-
-  ctx.seen.pop();
-
-  return reduceToSingleString(output, base, braces);
-}
-
-
-function formatPrimitive(ctx, value) {
-  if (isUndefined(value))
-    return ctx.stylize('undefined', 'undefined');
-  if (isString(value)) {
-    var simple = '\'' + JSON.stringify(value).replace(/^"|"$/g, '')
-                                             .replace(/'/g, "\\'")
-                                             .replace(/\\"/g, '"') + '\'';
-    return ctx.stylize(simple, 'string');
-  }
-  if (isNumber(value))
-    return ctx.stylize('' + value, 'number');
-  if (isBoolean(value))
-    return ctx.stylize('' + value, 'boolean');
-  // For some reason typeof null is "object", so special case here.
-  if (isNull(value))
-    return ctx.stylize('null', 'null');
-}
-
-
-function formatError(value) {
-  return '[' + Error.prototype.toString.call(value) + ']';
-}
-
-
-function formatArray(ctx, value, recurseTimes, visibleKeys, keys) {
-  var output = [];
-  for (var i = 0, l = value.length; i < l; ++i) {
-    if (hasOwnProperty(value, String(i))) {
-      output.push(formatProperty(ctx, value, recurseTimes, visibleKeys,
-          String(i), true));
-    } else {
-      output.push('');
-    }
-  }
-  keys.forEach(function(key) {
-    if (!key.match(/^\d+$/)) {
-      output.push(formatProperty(ctx, value, recurseTimes, visibleKeys,
-          key, true));
-    }
-  });
-  return output;
-}
-
-
-function formatProperty(ctx, value, recurseTimes, visibleKeys, key, array) {
-  var name, str, desc;
-  desc = Object.getOwnPropertyDescriptor(value, key) || { value: value[key] };
-  if (desc.get) {
-    if (desc.set) {
-      str = ctx.stylize('[Getter/Setter]', 'special');
-    } else {
-      str = ctx.stylize('[Getter]', 'special');
-    }
-  } else {
-    if (desc.set) {
-      str = ctx.stylize('[Setter]', 'special');
-    }
-  }
-  if (!hasOwnProperty(visibleKeys, key)) {
-    name = '[' + key + ']';
-  }
-  if (!str) {
-    if (ctx.seen.indexOf(desc.value) < 0) {
-      if (isNull(recurseTimes)) {
-        str = formatValue(ctx, desc.value, null);
-      } else {
-        str = formatValue(ctx, desc.value, recurseTimes - 1);
-      }
-      if (str.indexOf('\n') > -1) {
-        if (array) {
-          str = str.split('\n').map(function(line) {
-            return '  ' + line;
-          }).join('\n').substr(2);
-        } else {
-          str = '\n' + str.split('\n').map(function(line) {
-            return '   ' + line;
-          }).join('\n');
-        }
-      }
-    } else {
-      str = ctx.stylize('[Circular]', 'special');
-    }
-  }
-  if (isUndefined(name)) {
-    if (array && key.match(/^\d+$/)) {
-      return str;
-    }
-    name = JSON.stringify('' + key);
-    if (name.match(/^"([a-zA-Z_][a-zA-Z_0-9]*)"$/)) {
-      name = name.substr(1, name.length - 2);
-      name = ctx.stylize(name, 'name');
-    } else {
-      name = name.replace(/'/g, "\\'")
-                 .replace(/\\"/g, '"')
-                 .replace(/(^"|"$)/g, "'");
-      name = ctx.stylize(name, 'string');
-    }
-  }
-
-  return name + ': ' + str;
-}
-
-
-function reduceToSingleString(output, base, braces) {
-  var numLinesEst = 0;
-  var length = output.reduce(function(prev, cur) {
-    numLinesEst++;
-    if (cur.indexOf('\n') >= 0) numLinesEst++;
-    return prev + cur.replace(/\u001b\[\d\d?m/g, '').length + 1;
-  }, 0);
-
-  if (length > 60) {
-    return braces[0] +
-           (base === '' ? '' : base + '\n ') +
-           ' ' +
-           output.join(',\n  ') +
-           ' ' +
-           braces[1];
-  }
-
-  return braces[0] + base + ' ' + output.join(', ') + ' ' + braces[1];
-}
-
-
-// NOTE: These type checking functions intentionally don't use `instanceof`
-// because it is fragile and can be easily faked with `Object.create()`.
-function isArray(ar) {
-  return Array.isArray(ar);
-}
-exports.isArray = isArray;
-
-function isBoolean(arg) {
-  return typeof arg === 'boolean';
-}
-exports.isBoolean = isBoolean;
-
-function isNull(arg) {
-  return arg === null;
-}
-exports.isNull = isNull;
-
-function isNullOrUndefined(arg) {
-  return arg == null;
-}
-exports.isNullOrUndefined = isNullOrUndefined;
-
-function isNumber(arg) {
-  return typeof arg === 'number';
-}
-exports.isNumber = isNumber;
-
-function isString(arg) {
-  return typeof arg === 'string';
-}
-exports.isString = isString;
-
-function isSymbol(arg) {
-  return typeof arg === 'symbol';
-}
-exports.isSymbol = isSymbol;
-
-function isUndefined(arg) {
-  return arg === void 0;
-}
-exports.isUndefined = isUndefined;
-
-function isRegExp(re) {
-  return isObject(re) && objectToString(re) === '[object RegExp]';
-}
-exports.isRegExp = isRegExp;
-
-function isObject(arg) {
-  return typeof arg === 'object' && arg !== null;
-}
-exports.isObject = isObject;
-
-function isDate(d) {
-  return isObject(d) && objectToString(d) === '[object Date]';
-}
-exports.isDate = isDate;
-
-function isError(e) {
-  return isObject(e) &&
-      (objectToString(e) === '[object Error]' || e instanceof Error);
-}
-exports.isError = isError;
-
-function isFunction(arg) {
-  return typeof arg === 'function';
-}
-exports.isFunction = isFunction;
-
-function isPrimitive(arg) {
-  return arg === null ||
-         typeof arg === 'boolean' ||
-         typeof arg === 'number' ||
-         typeof arg === 'string' ||
-         typeof arg === 'symbol' ||  // ES6 symbol
-         typeof arg === 'undefined';
-}
-exports.isPrimitive = isPrimitive;
-
-exports.isBuffer = require('./support/isBuffer');
-
-function objectToString(o) {
-  return Object.prototype.toString.call(o);
-}
-
-
-function pad(n) {
-  return n < 10 ? '0' + n.toString(10) : n.toString(10);
-}
-
-
-var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep',
-              'Oct', 'Nov', 'Dec'];
-
-// 26 Feb 16:19:34
-function timestamp() {
-  var d = new Date();
-  var time = [pad(d.getHours()),
-              pad(d.getMinutes()),
-              pad(d.getSeconds())].join(':');
-  return [d.getDate(), months[d.getMonth()], time].join(' ');
-}
-
-
-// log is just a thin wrapper to console.log that prepends a timestamp
-exports.log = function() {
-  console.log('%s - %s', timestamp(), exports.format.apply(exports, arguments));
-};
-
-
-/**
- * Inherit the prototype methods from one constructor into another.
- *
- * The Function.prototype.inherits from lang.js rewritten as a standalone
- * function (not on Function.prototype). NOTE: If this file is to be loaded
- * during bootstrapping this function needs to be rewritten using some native
- * functions as prototype setup using normal JavaScript does not work as
- * expected during bootstrapping (see mirror.js in r114903).
- *
- * @param {function} ctor Constructor function which needs to inherit the
- *     prototype.
- * @param {function} superCtor Constructor function to inherit prototype from.
- */
-exports.inherits = require('inherits');
-
-exports._extend = function(origin, add) {
-  // Don't do anything if add isn't an object
-  if (!add || !isObject(add)) return origin;
-
-  var keys = Object.keys(add);
-  var i = keys.length;
-  while (i--) {
-    origin[keys[i]] = add[keys[i]];
-  }
-  return origin;
-};
-
-function hasOwnProperty(obj, prop) {
-  return Object.prototype.hasOwnProperty.call(obj, prop);
-}
-
-}).call(this,require("FWaASH"),typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./support/isBuffer":59,"FWaASH":58,"inherits":57}],61:[function(require,module,exports){
-/**
- * Module dependencies.
- * @ignore
- */
-if(typeof window === 'undefined') {
-  var Buffer = require('buffer').Buffer; // TODO just use global Buffer
-}
-
-/**
- * A class representation of the BSON Binary type.
- *
- * Sub types
- *  - **BSON.BSON_BINARY_SUBTYPE_DEFAULT**, default BSON type.
- *  - **BSON.BSON_BINARY_SUBTYPE_FUNCTION**, BSON function type.
- *  - **BSON.BSON_BINARY_SUBTYPE_BYTE_ARRAY**, BSON byte array type.
- *  - **BSON.BSON_BINARY_SUBTYPE_UUID**, BSON uuid type.
- *  - **BSON.BSON_BINARY_SUBTYPE_MD5**, BSON md5 type.
- *  - **BSON.BSON_BINARY_SUBTYPE_USER_DEFINED**, BSON user defined type.
- *
- * @class
- * @param {Buffer} buffer a buffer object containing the binary data.
- * @param {Number} [subType] the option binary type.
- * @return {Binary}
- */
-function Binary(buffer, subType) {
-  if(!(this instanceof Binary)) return new Binary(buffer, subType);
-
-  this._bsontype = 'Binary';
-
-  if(buffer instanceof Number) {
-    this.sub_type = buffer;
-    this.position = 0;
-  } else {
-    this.sub_type = subType == null ? BSON_BINARY_SUBTYPE_DEFAULT : subType;
-    this.position = 0;
-  }
-
-  if(buffer != null && !(buffer instanceof Number)) {
-    // Only accept Buffer, Uint8Array or Arrays
-    if(typeof buffer == 'string') {
-      // Different ways of writing the length of the string for the different types
-      if(typeof Buffer != 'undefined') {
-        this.buffer = new Buffer(buffer);
-      } else if(typeof Uint8Array != 'undefined' || (Object.prototype.toString.call(buffer) == '[object Array]')) {
-        this.buffer = writeStringToArray(buffer);
-      } else {
-        throw new Error("only String, Buffer, Uint8Array or Array accepted");
-      }
-    } else {
-      this.buffer = buffer;
-    }
-    this.position = buffer.length;
-  } else {
-    if(typeof Buffer != 'undefined') {
-      this.buffer =  new Buffer(Binary.BUFFER_SIZE);
-    } else if(typeof Uint8Array != 'undefined'){
-      this.buffer = new Uint8Array(new ArrayBuffer(Binary.BUFFER_SIZE));
-    } else {
-      this.buffer = new Array(Binary.BUFFER_SIZE);
-    }
-    // Set position to start of buffer
-    this.position = 0;
-  }
-};
-
-/**
- * Updates this binary with byte_value.
- *
- * @method
- * @param {string} byte_value a single byte we wish to write.
- */
-Binary.prototype.put = function put(byte_value) {
-  // If it's a string and a has more than one character throw an error
-  if(byte_value['length'] != null && typeof byte_value != 'number' && byte_value.length != 1) throw new Error("only accepts single character String, Uint8Array or Array");
-  if(typeof byte_value != 'number' && byte_value < 0 || byte_value > 255) throw new Error("only accepts number in a valid unsigned byte range 0-255");
-
-  // Decode the byte value once
-  var decoded_byte = null;
-  if(typeof byte_value == 'string') {
-    decoded_byte = byte_value.charCodeAt(0);
-  } else if(byte_value['length'] != null) {
-    decoded_byte = byte_value[0];
-  } else {
-    decoded_byte = byte_value;
-  }
-
-  if(this.buffer.length > this.position) {
-    this.buffer[this.position++] = decoded_byte;
-  } else {
-    if(typeof Buffer != 'undefined' && Buffer.isBuffer(this.buffer)) {
-      // Create additional overflow buffer
-      var buffer = new Buffer(Binary.BUFFER_SIZE + this.buffer.length);
-      // Combine the two buffers together
-      this.buffer.copy(buffer, 0, 0, this.buffer.length);
-      this.buffer = buffer;
-      this.buffer[this.position++] = decoded_byte;
-    } else {
-      var buffer = null;
-      // Create a new buffer (typed or normal array)
-      if(Object.prototype.toString.call(this.buffer) == '[object Uint8Array]') {
-        buffer = new Uint8Array(new ArrayBuffer(Binary.BUFFER_SIZE + this.buffer.length));
-      } else {
-        buffer = new Array(Binary.BUFFER_SIZE + this.buffer.length);
-      }
-
-      // We need to copy all the content to the new array
-      for(var i = 0; i < this.buffer.length; i++) {
-        buffer[i] = this.buffer[i];
-      }
-
-      // Reassign the buffer
-      this.buffer = buffer;
-      // Write the byte
-      this.buffer[this.position++] = decoded_byte;
-    }
-  }
-};
-
-/**
- * Writes a buffer or string to the binary.
- *
- * @method
- * @param {(Buffer|string)} string a string or buffer to be written to the Binary BSON object.
- * @param {number} offset specify the binary of where to write the content.
- * @return {null}
- */
-Binary.prototype.write = function write(string, offset) {
-  offset = typeof offset == 'number' ? offset : this.position;
-
-  // If the buffer is to small let's extend the buffer
-  if(this.buffer.length < offset + string.length) {
-    var buffer = null;
-    // If we are in node.js
-    if(typeof Buffer != 'undefined' && Buffer.isBuffer(this.buffer)) {
-      buffer = new Buffer(this.buffer.length + string.length);
-      this.buffer.copy(buffer, 0, 0, this.buffer.length);
-    } else if(Object.prototype.toString.call(this.buffer) == '[object Uint8Array]') {
-      // Create a new buffer
-      buffer = new Uint8Array(new ArrayBuffer(this.buffer.length + string.length))
-      // Copy the content
-      for(var i = 0; i < this.position; i++) {
-        buffer[i] = this.buffer[i];
-      }
-    }
-
-    // Assign the new buffer
-    this.buffer = buffer;
-  }
-
-  if(typeof Buffer != 'undefined' && Buffer.isBuffer(string) && Buffer.isBuffer(this.buffer)) {
-    string.copy(this.buffer, offset, 0, string.length);
-    this.position = (offset + string.length) > this.position ? (offset + string.length) : this.position;
-    // offset = string.length
-  } else if(typeof Buffer != 'undefined' && typeof string == 'string' && Buffer.isBuffer(this.buffer)) {
-    this.buffer.write(string, offset, 'binary');
-    this.position = (offset + string.length) > this.position ? (offset + string.length) : this.position;
-    // offset = string.length;
-  } else if(Object.prototype.toString.call(string) == '[object Uint8Array]'
-    || Object.prototype.toString.call(string) == '[object Array]' && typeof string != 'string') {
-    for(var i = 0; i < string.length; i++) {
-      this.buffer[offset++] = string[i];
-    }
-
-    this.position = offset > this.position ? offset : this.position;
-  } else if(typeof string == 'string') {
-    for(var i = 0; i < string.length; i++) {
-      this.buffer[offset++] = string.charCodeAt(i);
-    }
-
-    this.position = offset > this.position ? offset : this.position;
-  }
-};
-
-/**
- * Reads **length** bytes starting at **position**.
- *
- * @method
- * @param {number} position read from the given position in the Binary.
- * @param {number} length the number of bytes to read.
- * @return {Buffer}
- */
-Binary.prototype.read = function read(position, length) {
-  length = length && length > 0
-    ? length
-    : this.position;
-
-  // Let's return the data based on the type we have
-  if(this.buffer['slice']) {
-    return this.buffer.slice(position, position + length);
-  } else {
-    // Create a buffer to keep the result
-    var buffer = typeof Uint8Array != 'undefined' ? new Uint8Array(new ArrayBuffer(length)) : new Array(length);
-    for(var i = 0; i < length; i++) {
-      buffer[i] = this.buffer[position++];
-    }
-  }
-  // Return the buffer
-  return buffer;
-};
-
-/**
- * Returns the value of this binary as a string.
- *
- * @method
- * @return {string}
- */
-Binary.prototype.value = function value(asRaw) {
-  asRaw = asRaw == null ? false : asRaw;
-
-  // Optimize to serialize for the situation where the data == size of buffer
-  if(asRaw && typeof Buffer != 'undefined' && Buffer.isBuffer(this.buffer) && this.buffer.length == this.position)
-    return this.buffer;
-
-  // If it's a node.js buffer object
-  if(typeof Buffer != 'undefined' && Buffer.isBuffer(this.buffer)) {
-    return asRaw ? this.buffer.slice(0, this.position) : this.buffer.toString('binary', 0, this.position);
-  } else {
-    if(asRaw) {
-      // we support the slice command use it
-      if(this.buffer['slice'] != null) {
-        return this.buffer.slice(0, this.position);
-      } else {
-        // Create a new buffer to copy content to
-        var newBuffer = Object.prototype.toString.call(this.buffer) == '[object Uint8Array]' ? new Uint8Array(new ArrayBuffer(this.position)) : new Array(this.position);
-        // Copy content
-        for(var i = 0; i < this.position; i++) {
-          newBuffer[i] = this.buffer[i];
-        }
-        // Return the buffer
-        return newBuffer;
-      }
-    } else {
-      return convertArraytoUtf8BinaryString(this.buffer, 0, this.position);
-    }
-  }
-};
-
-/**
- * Length.
- *
- * @method
- * @return {number} the length of the binary.
- */
-Binary.prototype.length = function length() {
-  return this.position;
-};
-
-/**
- * @ignore
- */
-Binary.prototype.toJSON = function() {
-  return this.buffer != null ? this.buffer.toString('base64') : '';
-}
-
-/**
- * @ignore
- */
-Binary.prototype.toString = function(format) {
-  return this.buffer != null ? this.buffer.slice(0, this.position).toString(format) : '';
-}
-
-/**
- * Binary default subtype
- * @ignore
- */
-var BSON_BINARY_SUBTYPE_DEFAULT = 0;
-
-/**
- * @ignore
- */
-var writeStringToArray = function(data) {
-  // Create a buffer
-  var buffer = typeof Uint8Array != 'undefined' ? new Uint8Array(new ArrayBuffer(data.length)) : new Array(data.length);
-  // Write the content to the buffer
-  for(var i = 0; i < data.length; i++) {
-    buffer[i] = data.charCodeAt(i);
-  }
-  // Write the string to the buffer
-  return buffer;
-}
-
-/**
- * Convert Array ot Uint8Array to Binary String
- *
- * @ignore
- */
-var convertArraytoUtf8BinaryString = function(byteArray, startIndex, endIndex) {
-  var result = "";
-  for(var i = startIndex; i < endIndex; i++) {
-   result = result + String.fromCharCode(byteArray[i]);
-  }
-  return result;
-};
-
-Binary.BUFFER_SIZE = 256;
-
-/**
- * Default BSON type
- *
- * @classconstant SUBTYPE_DEFAULT
- **/
-Binary.SUBTYPE_DEFAULT = 0;
-/**
- * Function BSON type
- *
- * @classconstant SUBTYPE_DEFAULT
- **/
-Binary.SUBTYPE_FUNCTION = 1;
-/**
- * Byte Array BSON type
- *
- * @classconstant SUBTYPE_DEFAULT
- **/
-Binary.SUBTYPE_BYTE_ARRAY = 2;
-/**
- * OLD UUID BSON type
- *
- * @classconstant SUBTYPE_DEFAULT
- **/
-Binary.SUBTYPE_UUID_OLD = 3;
-/**
- * UUID BSON type
- *
- * @classconstant SUBTYPE_DEFAULT
- **/
-Binary.SUBTYPE_UUID = 4;
-/**
- * MD5 BSON type
- *
- * @classconstant SUBTYPE_DEFAULT
- **/
-Binary.SUBTYPE_MD5 = 5;
-/**
- * User BSON type
- *
- * @classconstant SUBTYPE_DEFAULT
- **/
-Binary.SUBTYPE_USER_DEFINED = 128;
-
-/**
- * Expose.
- */
-module.exports = Binary;
-module.exports.Binary = Binary;
-
-},{"buffer":52}],62:[function(require,module,exports){
-(function (process){
-/**
- * Binary Parser.
- * Jonas Raoni Soares Silva
- * http://jsfromhell.com/classes/binary-parser [v1.0]
- */
-var chr = String.fromCharCode;
-
-var maxBits = [];
-for (var i = 0; i < 64; i++) {
-	maxBits[i] = Math.pow(2, i);
-}
-
-function BinaryParser (bigEndian, allowExceptions) {
-  if(!(this instanceof BinaryParser)) return new BinaryParser(bigEndian, allowExceptions);
-  
-	this.bigEndian = bigEndian;
-	this.allowExceptions = allowExceptions;
-};
-
-BinaryParser.warn = function warn (msg) {
-	if (this.allowExceptions) {
-		throw new Error(msg);
-  }
-
-	return 1;
-};
-
-BinaryParser.decodeFloat = function decodeFloat (data, precisionBits, exponentBits) {
-	var b = new this.Buffer(this.bigEndian, data);
-
-	b.checkBuffer(precisionBits + exponentBits + 1);
-
-	var bias = maxBits[exponentBits - 1] - 1
-    , signal = b.readBits(precisionBits + exponentBits, 1)
-    , exponent = b.readBits(precisionBits, exponentBits)
-    , significand = 0
-    , divisor = 2
-    , curByte = b.buffer.length + (-precisionBits >> 3) - 1;
-
-	do {
-		for (var byteValue = b.buffer[ ++curByte ], startBit = precisionBits % 8 || 8, mask = 1 << startBit; mask >>= 1; ( byteValue & mask ) && ( significand += 1 / divisor ), divisor *= 2 );
-	} while (precisionBits -= startBit);
-
-	return exponent == ( bias << 1 ) + 1 ? significand ? NaN : signal ? -Infinity : +Infinity : ( 1 + signal * -2 ) * ( exponent || significand ? !exponent ? Math.pow( 2, -bias + 1 ) * significand : Math.pow( 2, exponent - bias ) * ( 1 + significand ) : 0 );
-};
-
-BinaryParser.decodeInt = function decodeInt (data, bits, signed, forceBigEndian) {
-  var b = new this.Buffer(this.bigEndian || forceBigEndian, data)
-      , x = b.readBits(0, bits)
-      , max = maxBits[bits]; //max = Math.pow( 2, bits );
-  
-  return signed && x >= max / 2
-      ? x - max
-      : x;
-};
-
-BinaryParser.encodeFloat = function encodeFloat (data, precisionBits, exponentBits) {
-	var bias = maxBits[exponentBits - 1] - 1
-    , minExp = -bias + 1
-    , maxExp = bias
-    , minUnnormExp = minExp - precisionBits
-    , n = parseFloat(data)
-    , status = isNaN(n) || n == -Infinity || n == +Infinity ? n : 0
-    ,	exp = 0
-    , len = 2 * bias + 1 + precisionBits + 3
-    , bin = new Array(len)
-    , signal = (n = status !== 0 ? 0 : n) < 0
-    , intPart = Math.floor(n = Math.abs(n))
-    , floatPart = n - intPart
-    , lastBit
-    , rounded
-    , result
-    , i
-    , j;
-
-	for (i = len; i; bin[--i] = 0);
-
-	for (i = bias + 2; intPart && i; bin[--i] = intPart % 2, intPart = Math.floor(intPart / 2));
-
-	for (i = bias + 1; floatPart > 0 && i; (bin[++i] = ((floatPart *= 2) >= 1) - 0 ) && --floatPart);
-
-	for (i = -1; ++i < len && !bin[i];);
-
-	if (bin[(lastBit = precisionBits - 1 + (i = (exp = bias + 1 - i) >= minExp && exp <= maxExp ? i + 1 : bias + 1 - (exp = minExp - 1))) + 1]) {
-		if (!(rounded = bin[lastBit])) {
-			for (j = lastBit + 2; !rounded && j < len; rounded = bin[j++]);
-		}
-
-		for (j = lastBit + 1; rounded && --j >= 0; (bin[j] = !bin[j] - 0) && (rounded = 0));
-	}
-
-	for (i = i - 2 < 0 ? -1 : i - 3; ++i < len && !bin[i];);
-
-	if ((exp = bias + 1 - i) >= minExp && exp <= maxExp) {
-		++i;
-  } else if (exp < minExp) {
-		exp != bias + 1 - len && exp < minUnnormExp && this.warn("encodeFloat::float underflow");
-		i = bias + 1 - (exp = minExp - 1);
-	}
-
-	if (intPart || status !== 0) {
-		this.warn(intPart ? "encodeFloat::float overflow" : "encodeFloat::" + status);
-		exp = maxExp + 1;
-		i = bias + 2;
-
-		if (status == -Infinity) {
-			signal = 1;
-    } else if (isNaN(status)) {
-			bin[i] = 1;
-    }
-	}
-
-	for (n = Math.abs(exp + bias), j = exponentBits + 1, result = ""; --j; result = (n % 2) + result, n = n >>= 1);
-
-	for (n = 0, j = 0, i = (result = (signal ? "1" : "0") + result + bin.slice(i, i + precisionBits).join("")).length, r = []; i; j = (j + 1) % 8) {
-		n += (1 << j) * result.charAt(--i);
-		if (j == 7) {
-			r[r.length] = String.fromCharCode(n);
-			n = 0;
-		}
-	}
-
-	r[r.length] = n
-    ? String.fromCharCode(n)
-    : "";
-
-	return (this.bigEndian ? r.reverse() : r).join("");
-};
-
-BinaryParser.encodeInt = function encodeInt (data, bits, signed, forceBigEndian) {
-	var max = maxBits[bits];
-
-  if (data >= max || data < -(max / 2)) {
-    this.warn("encodeInt::overflow");
-    data = 0;
-  }
-
-	if (data < 0) {
-    data += max;
-  }
-
-	for (var r = []; data; r[r.length] = String.fromCharCode(data % 256), data = Math.floor(data / 256));
-
-	for (bits = -(-bits >> 3) - r.length; bits--; r[r.length] = "\0");
-
-  return ((this.bigEndian || forceBigEndian) ? r.reverse() : r).join("");
-};
-
-BinaryParser.toSmall    = function( data ){ return this.decodeInt( data,  8, true  ); };
-BinaryParser.fromSmall  = function( data ){ return this.encodeInt( data,  8, true  ); };
-BinaryParser.toByte     = function( data ){ return this.decodeInt( data,  8, false ); };
-BinaryParser.fromByte   = function( data ){ return this.encodeInt( data,  8, false ); };
-BinaryParser.toShort    = function( data ){ return this.decodeInt( data, 16, true  ); };
-BinaryParser.fromShort  = function( data ){ return this.encodeInt( data, 16, true  ); };
-BinaryParser.toWord     = function( data ){ return this.decodeInt( data, 16, false ); };
-BinaryParser.fromWord   = function( data ){ return this.encodeInt( data, 16, false ); };
-BinaryParser.toInt      = function( data ){ return this.decodeInt( data, 32, true  ); };
-BinaryParser.fromInt    = function( data ){ return this.encodeInt( data, 32, true  ); };
-BinaryParser.toLong     = function( data ){ return this.decodeInt( data, 64, true  ); };
-BinaryParser.fromLong   = function( data ){ return this.encodeInt( data, 64, true  ); };
-BinaryParser.toDWord    = function( data ){ return this.decodeInt( data, 32, false ); };
-BinaryParser.fromDWord  = function( data ){ return this.encodeInt( data, 32, false ); };
-BinaryParser.toQWord    = function( data ){ return this.decodeInt( data, 64, true ); };
-BinaryParser.fromQWord  = function( data ){ return this.encodeInt( data, 64, true ); };
-BinaryParser.toFloat    = function( data ){ return this.decodeFloat( data, 23, 8   ); };
-BinaryParser.fromFloat  = function( data ){ return this.encodeFloat( data, 23, 8   ); };
-BinaryParser.toDouble   = function( data ){ return this.decodeFloat( data, 52, 11  ); };
-BinaryParser.fromDouble = function( data ){ return this.encodeFloat( data, 52, 11  ); };
-
-// Factor out the encode so it can be shared by add_header and push_int32
-BinaryParser.encode_int32 = function encode_int32 (number, asArray) {
-  var a, b, c, d, unsigned;
-  unsigned = (number < 0) ? (number + 0x100000000) : number;
-  a = Math.floor(unsigned / 0xffffff);
-  unsigned &= 0xffffff;
-  b = Math.floor(unsigned / 0xffff);
-  unsigned &= 0xffff;
-  c = Math.floor(unsigned / 0xff);
-  unsigned &= 0xff;
-  d = Math.floor(unsigned);
-  return asArray ? [chr(a), chr(b), chr(c), chr(d)] : chr(a) + chr(b) + chr(c) + chr(d);
-};
-
-BinaryParser.encode_int64 = function encode_int64 (number) {
-  var a, b, c, d, e, f, g, h, unsigned;
-  unsigned = (number < 0) ? (number + 0x10000000000000000) : number;
-  a = Math.floor(unsigned / 0xffffffffffffff);
-  unsigned &= 0xffffffffffffff;
-  b = Math.floor(unsigned / 0xffffffffffff);
-  unsigned &= 0xffffffffffff;
-  c = Math.floor(unsigned / 0xffffffffff);
-  unsigned &= 0xffffffffff;
-  d = Math.floor(unsigned / 0xffffffff);
-  unsigned &= 0xffffffff;
-  e = Math.floor(unsigned / 0xffffff);
-  unsigned &= 0xffffff;
-  f = Math.floor(unsigned / 0xffff);
-  unsigned &= 0xffff;
-  g = Math.floor(unsigned / 0xff);
-  unsigned &= 0xff;
-  h = Math.floor(unsigned);
-  return chr(a) + chr(b) + chr(c) + chr(d) + chr(e) + chr(f) + chr(g) + chr(h);
-};
-
-/**
- * UTF8 methods
- */
-
-// Take a raw binary string and return a utf8 string
-BinaryParser.decode_utf8 = function decode_utf8 (binaryStr) {
-  var len = binaryStr.length
-    , decoded = ''
-    , i = 0
-    , c = 0
-    , c1 = 0
-    , c2 = 0
-    , c3;
-
-  while (i < len) {
-    c = binaryStr.charCodeAt(i);
-    if (c < 128) {
-      decoded += String.fromCharCode(c);
-      i++;
-    } else if ((c > 191) && (c < 224)) {
-	    c2 = binaryStr.charCodeAt(i+1);
-      decoded += String.fromCharCode(((c & 31) << 6) | (c2 & 63));
-      i += 2;
-    } else {
-	    c2 = binaryStr.charCodeAt(i+1);
-	    c3 = binaryStr.charCodeAt(i+2);
-      decoded += String.fromCharCode(((c & 15) << 12) | ((c2 & 63) << 6) | (c3 & 63));
-      i += 3;
-    }
-  }
-
-  return decoded;
-};
-
-// Encode a cstring
-BinaryParser.encode_cstring = function encode_cstring (s) {
-  return unescape(encodeURIComponent(s)) + BinaryParser.fromByte(0);
-};
-
-// Take a utf8 string and return a binary string
-BinaryParser.encode_utf8 = function encode_utf8 (s) {
-  var a = ""
-    , c;
-
-  for (var n = 0, len = s.length; n < len; n++) {
-    c = s.charCodeAt(n);
-
-    if (c < 128) {
-	    a += String.fromCharCode(c);
-    } else if ((c > 127) && (c < 2048)) {
-	    a += String.fromCharCode((c>>6) | 192) ;
-	    a += String.fromCharCode((c&63) | 128);
-    } else {
-      a += String.fromCharCode((c>>12) | 224);
-      a += String.fromCharCode(((c>>6) & 63) | 128);
-      a += String.fromCharCode((c&63) | 128);
-    }
-  }
-
-  return a;
-};
-
-BinaryParser.hprint = function hprint (s) {
-  var number;
-
-  for (var i = 0, len = s.length; i < len; i++) {
-    if (s.charCodeAt(i) < 32) {
-      number = s.charCodeAt(i) <= 15
-        ? "0" + s.charCodeAt(i).toString(16)
-        : s.charCodeAt(i).toString(16);        
-      process.stdout.write(number + " ")
-    } else {
-      number = s.charCodeAt(i) <= 15
-        ? "0" + s.charCodeAt(i).toString(16)
-        : s.charCodeAt(i).toString(16);
-        process.stdout.write(number + " ")
-    }
-  }
-  
-  process.stdout.write("\n\n");
-};
-
-BinaryParser.ilprint = function hprint (s) {
-  var number;
-
-  for (var i = 0, len = s.length; i < len; i++) {
-    if (s.charCodeAt(i) < 32) {
-      number = s.charCodeAt(i) <= 15
-        ? "0" + s.charCodeAt(i).toString(10)
-        : s.charCodeAt(i).toString(10);
-
-      require('util').debug(number+' : ');
-    } else {
-      number = s.charCodeAt(i) <= 15
-        ? "0" + s.charCodeAt(i).toString(10)
-        : s.charCodeAt(i).toString(10);
-      require('util').debug(number+' : '+ s.charAt(i));
-    }
-  }
-};
-
-BinaryParser.hlprint = function hprint (s) {
-  var number;
-
-  for (var i = 0, len = s.length; i < len; i++) {
-    if (s.charCodeAt(i) < 32) {
-      number = s.charCodeAt(i) <= 15
-        ? "0" + s.charCodeAt(i).toString(16)
-        : s.charCodeAt(i).toString(16);
-      require('util').debug(number+' : ');
-    } else {
-      number = s.charCodeAt(i) <= 15
-        ? "0" + s.charCodeAt(i).toString(16)
-        : s.charCodeAt(i).toString(16);
-      require('util').debug(number+' : '+ s.charAt(i));
-    }
-  }
-};
-
-/**
- * BinaryParser buffer constructor.
- */
-function BinaryParserBuffer (bigEndian, buffer) {
-  this.bigEndian = bigEndian || 0;
-  this.buffer = [];
-  this.setBuffer(buffer);
-};
-
-BinaryParserBuffer.prototype.setBuffer = function setBuffer (data) {
-  var l, i, b;
-
-	if (data) {
-    i = l = data.length;
-    b = this.buffer = new Array(l);
-		for (; i; b[l - i] = data.charCodeAt(--i));
-		this.bigEndian && b.reverse();
-	}
-};
-
-BinaryParserBuffer.prototype.hasNeededBits = function hasNeededBits (neededBits) {
-	return this.buffer.length >= -(-neededBits >> 3);
-};
-
-BinaryParserBuffer.prototype.checkBuffer = function checkBuffer (neededBits) {
-	if (!this.hasNeededBits(neededBits)) {
-		throw new Error("checkBuffer::missing bytes");
-  }
-};
-
-BinaryParserBuffer.prototype.readBits = function readBits (start, length) {
-	//shl fix: Henri Torgemane ~1996 (compressed by Jonas Raoni)
-
-	function shl (a, b) {
-		for (; b--; a = ((a %= 0x7fffffff + 1) & 0x40000000) == 0x40000000 ? a * 2 : (a - 0x40000000) * 2 + 0x7fffffff + 1);
-		return a;
-	}
-
-	if (start < 0 || length <= 0) {
-		return 0;
-  }
-
-	this.checkBuffer(start + length);
-
-  var offsetLeft
-    , offsetRight = start % 8
-    , curByte = this.buffer.length - ( start >> 3 ) - 1
-    , lastByte = this.buffer.length + ( -( start + length ) >> 3 )
-    , diff = curByte - lastByte
-    , sum = ((this.buffer[ curByte ] >> offsetRight) & ((1 << (diff ? 8 - offsetRight : length)) - 1)) + (diff && (offsetLeft = (start + length) % 8) ? (this.buffer[lastByte++] & ((1 << offsetLeft) - 1)) << (diff-- << 3) - offsetRight : 0);
-
-	for(; diff; sum += shl(this.buffer[lastByte++], (diff-- << 3) - offsetRight));
-
-	return sum;
-};
-
-/**
- * Expose.
- */
-BinaryParser.Buffer = BinaryParserBuffer;
-
-exports.BinaryParser = BinaryParser;
-
-}).call(this,require("FWaASH"))
-},{"FWaASH":58,"util":60}],63:[function(require,module,exports){
-(function (Buffer){
-// "use strict"
-
-var writeIEEE754 = require('./float_parser').writeIEEE754,
-	readIEEE754 = require('./float_parser').readIEEE754,
-  Map = require('./map'),
-	Long = require('./long').Long,
-  Double = require('./double').Double,
-  Timestamp = require('./timestamp').Timestamp,
-  ObjectID = require('./objectid').ObjectID,
-  BSONRegExp = require('./regexp').BSONRegExp,
-  Symbol = require('./symbol').Symbol,
-  Code = require('./code').Code,
-  MinKey = require('./min_key').MinKey,
-  MaxKey = require('./max_key').MaxKey,
-  DBRef = require('./db_ref').DBRef,
-  Binary = require('./binary').Binary;
-
-// Parts of the parser
-var deserialize = require('./parser/deserializer'),
-	serializer = require('./parser/serializer'),
-	calculateObjectSize = require('./parser/calculate_size');
-
-/**
- * @ignore
- * @api private
- */
-// Max Size
-var MAXSIZE = (1024*1024*17);
-// Max Document Buffer size
-var buffer = new Buffer(MAXSIZE);
-
-var BSON = function() {
-}
-
-/**
- * Serialize a Javascript object.
- *
- * @param {Object} object the Javascript object to serialize.
- * @param {Boolean} checkKeys the serializer will check if keys are valid.
- * @param {Boolean} asBuffer return the serialized object as a Buffer object **(ignore)**.
- * @param {Boolean} serializeFunctions serialize the javascript functions **(default:false)**.
- * @return {Buffer} returns the Buffer object containing the serialized object.
- * @api public
- */
-BSON.prototype.serialize = function serialize(object, checkKeys, asBuffer, serializeFunctions, index, ignoreUndefined) {
-	// Attempt to serialize
-	var serializationIndex = serializer(buffer, object, checkKeys, index || 0, 0, serializeFunctions, ignoreUndefined);
-	// Create the final buffer
-	var finishedBuffer = new Buffer(serializationIndex);
-	// Copy into the finished buffer
-	buffer.copy(finishedBuffer, 0, 0, finishedBuffer.length);
-	// Return the buffer
-	return finishedBuffer;
-}
-
-/**
- * Serialize a Javascript object using a predefined Buffer and index into the buffer, useful when pre-allocating the space for serialization.
- *
- * @param {Object} object the Javascript object to serialize.
- * @param {Boolean} checkKeys the serializer will check if keys are valid.
- * @param {Buffer} buffer the Buffer you pre-allocated to store the serialized BSON object.
- * @param {Number} index the index in the buffer where we wish to start serializing into.
- * @param {Boolean} serializeFunctions serialize the javascript functions **(default:false)**.
- * @return {Number} returns the new write index in the Buffer.
- * @api public
- */
-BSON.prototype.serializeWithBufferAndIndex = function(object, checkKeys, finalBuffer, startIndex, serializeFunctions, ignoreUndefined) {
-	// Attempt to serialize
-	var serializationIndex = serializer(buffer, object, checkKeys, startIndex || 0, 0, serializeFunctions, ignoreUndefined);
-	buffer.copy(finalBuffer, startIndex, 0, serializationIndex);
-	// Return the index
-	return startIndex + serializationIndex - 1;
-}
-
-/**
- * Deserialize data as BSON.
- *
- * Options
- *  - **evalFunctions** {Boolean, default:false}, evaluate functions in the BSON document scoped to the object deserialized.
- *  - **cacheFunctions** {Boolean, default:false}, cache evaluated functions for reuse.
- *  - **cacheFunctionsCrc32** {Boolean, default:false}, use a crc32 code for caching, otherwise use the string of the function.
- *  - **promoteLongs** {Boolean, default:true}, when deserializing a Long will fit it into a Number if it's smaller than 53 bits
- *
- * @param {Buffer} buffer the buffer containing the serialized set of BSON documents.
- * @param {Object} [options] additional options used for the deserialization.
- * @param {Boolean} [isArray] ignore used for recursive parsing.
- * @return {Object} returns the deserialized Javascript Object.
- * @api public
- */
-BSON.prototype.deserialize = function(data, options) {
-  return deserialize(data, options);
-}
-
-/**
- * Calculate the bson size for a passed in Javascript object.
- *
- * @param {Object} object the Javascript object to calculate the BSON byte size for.
- * @param {Boolean} [serializeFunctions] serialize all functions in the object **(default:false)**.
- * @return {Number} returns the number of bytes the BSON object will take up.
- * @api public
- */
-BSON.prototype.calculateObjectSize = function(object, serializeFunctions, ignoreUndefined) {
-  return calculateObjectSize(object, serializeFunctions, ignoreUndefined);
-}
-
-/**
- * Deserialize stream data as BSON documents.
- *
- * Options
- *  - **evalFunctions** {Boolean, default:false}, evaluate functions in the BSON document scoped to the object deserialized.
- *  - **cacheFunctions** {Boolean, default:false}, cache evaluated functions for reuse.
- *  - **cacheFunctionsCrc32** {Boolean, default:false}, use a crc32 code for caching, otherwise use the string of the function.
- *  - **promoteLongs** {Boolean, default:true}, when deserializing a Long will fit it into a Number if it's smaller than 53 bits
- *
- * @param {Buffer} data the buffer containing the serialized set of BSON documents.
- * @param {Number} startIndex the start index in the data Buffer where the deserialization is to start.
- * @param {Number} numberOfDocuments number of documents to deserialize.
- * @param {Array} documents an array where to store the deserialized documents.
- * @param {Number} docStartIndex the index in the documents array from where to start inserting documents.
- * @param {Object} [options] additional options used for the deserialization.
- * @return {Number} returns the next index in the buffer after deserialization **x** numbers of documents.
- * @api public
- */
-BSON.prototype.deserializeStream = function(data, startIndex, numberOfDocuments, documents, docStartIndex, options) {
-  // if(numberOfDocuments !== documents.length) throw new Error("Number of expected results back is less than the number of documents");
-  options = options != null ? options : {};
-  var index = startIndex;
-  // Loop over all documents
-  for(var i = 0; i < numberOfDocuments; i++) {
-    // Find size of the document
-    var size = data[index] | data[index + 1] << 8 | data[index + 2] << 16 | data[index + 3] << 24;
-    // Update options with index
-    options['index'] = index;
-    // Parse the document at this point
-    documents[docStartIndex + i] = this.deserialize(data, options);
-    // Adjust index by the document size
-    index = index + size;
-  }
-
-  // Return object containing end index of parsing and list of documents
-  return index;
-}
-
-/**
- * @ignore
- * @api private
- */
-// BSON MAX VALUES
-BSON.BSON_INT32_MAX = 0x7FFFFFFF;
-BSON.BSON_INT32_MIN = -0x80000000;
-
-BSON.BSON_INT64_MAX = Math.pow(2, 63) - 1;
-BSON.BSON_INT64_MIN = -Math.pow(2, 63);
-
-// JS MAX PRECISE VALUES
-BSON.JS_INT_MAX = 0x20000000000000;  // Any integer up to 2^53 can be precisely represented by a double.
-BSON.JS_INT_MIN = -0x20000000000000;  // Any integer down to -2^53 can be precisely represented by a double.
-
-// Internal long versions
-var JS_INT_MAX_LONG = Long.fromNumber(0x20000000000000);  // Any integer up to 2^53 can be precisely represented by a double.
-var JS_INT_MIN_LONG = Long.fromNumber(-0x20000000000000);  // Any integer down to -2^53 can be precisely represented by a double.
-
-/**
- * Number BSON Type
- *
- * @classconstant BSON_DATA_NUMBER
- **/
-BSON.BSON_DATA_NUMBER = 1;
-/**
- * String BSON Type
- *
- * @classconstant BSON_DATA_STRING
- **/
-BSON.BSON_DATA_STRING = 2;
-/**
- * Object BSON Type
- *
- * @classconstant BSON_DATA_OBJECT
- **/
-BSON.BSON_DATA_OBJECT = 3;
-/**
- * Array BSON Type
- *
- * @classconstant BSON_DATA_ARRAY
- **/
-BSON.BSON_DATA_ARRAY = 4;
-/**
- * Binary BSON Type
- *
- * @classconstant BSON_DATA_BINARY
- **/
-BSON.BSON_DATA_BINARY = 5;
-/**
- * ObjectID BSON Type
- *
- * @classconstant BSON_DATA_OID
- **/
-BSON.BSON_DATA_OID = 7;
-/**
- * Boolean BSON Type
- *
- * @classconstant BSON_DATA_BOOLEAN
- **/
-BSON.BSON_DATA_BOOLEAN = 8;
-/**
- * Date BSON Type
- *
- * @classconstant BSON_DATA_DATE
- **/
-BSON.BSON_DATA_DATE = 9;
-/**
- * null BSON Type
- *
- * @classconstant BSON_DATA_NULL
- **/
-BSON.BSON_DATA_NULL = 10;
-/**
- * RegExp BSON Type
- *
- * @classconstant BSON_DATA_REGEXP
- **/
-BSON.BSON_DATA_REGEXP = 11;
-/**
- * Code BSON Type
- *
- * @classconstant BSON_DATA_CODE
- **/
-BSON.BSON_DATA_CODE = 13;
-/**
- * Symbol BSON Type
- *
- * @classconstant BSON_DATA_SYMBOL
- **/
-BSON.BSON_DATA_SYMBOL = 14;
-/**
- * Code with Scope BSON Type
- *
- * @classconstant BSON_DATA_CODE_W_SCOPE
- **/
-BSON.BSON_DATA_CODE_W_SCOPE = 15;
-/**
- * 32 bit Integer BSON Type
- *
- * @classconstant BSON_DATA_INT
- **/
-BSON.BSON_DATA_INT = 16;
-/**
- * Timestamp BSON Type
- *
- * @classconstant BSON_DATA_TIMESTAMP
- **/
-BSON.BSON_DATA_TIMESTAMP = 17;
-/**
- * Long BSON Type
- *
- * @classconstant BSON_DATA_LONG
- **/
-BSON.BSON_DATA_LONG = 18;
-/**
- * MinKey BSON Type
- *
- * @classconstant BSON_DATA_MIN_KEY
- **/
-BSON.BSON_DATA_MIN_KEY = 0xff;
-/**
- * MaxKey BSON Type
- *
- * @classconstant BSON_DATA_MAX_KEY
- **/
-BSON.BSON_DATA_MAX_KEY = 0x7f;
-
-/**
- * Binary Default Type
- *
- * @classconstant BSON_BINARY_SUBTYPE_DEFAULT
- **/
-BSON.BSON_BINARY_SUBTYPE_DEFAULT = 0;
-/**
- * Binary Function Type
- *
- * @classconstant BSON_BINARY_SUBTYPE_FUNCTION
- **/
-BSON.BSON_BINARY_SUBTYPE_FUNCTION = 1;
-/**
- * Binary Byte Array Type
- *
- * @classconstant BSON_BINARY_SUBTYPE_BYTE_ARRAY
- **/
-BSON.BSON_BINARY_SUBTYPE_BYTE_ARRAY = 2;
-/**
- * Binary UUID Type
- *
- * @classconstant BSON_BINARY_SUBTYPE_UUID
- **/
-BSON.BSON_BINARY_SUBTYPE_UUID = 3;
-/**
- * Binary MD5 Type
- *
- * @classconstant BSON_BINARY_SUBTYPE_MD5
- **/
-BSON.BSON_BINARY_SUBTYPE_MD5 = 4;
-/**
- * Binary User Defined Type
- *
- * @classconstant BSON_BINARY_SUBTYPE_USER_DEFINED
- **/
-BSON.BSON_BINARY_SUBTYPE_USER_DEFINED = 128;
-
-// Return BSON
-module.exports = BSON;
-module.exports.Code = Code;
-module.exports.Map = Map;
-module.exports.Symbol = Symbol;
-module.exports.BSON = BSON;
-module.exports.DBRef = DBRef;
-module.exports.Binary = Binary;
-module.exports.ObjectID = ObjectID;
-module.exports.Long = Long;
-module.exports.Timestamp = Timestamp;
-module.exports.Double = Double;
-module.exports.MinKey = MinKey;
-module.exports.MaxKey = MaxKey;
-module.exports.BSONRegExp = BSONRegExp;
-
-}).call(this,require("buffer").Buffer)
-},{"./binary":61,"./code":64,"./db_ref":65,"./double":66,"./float_parser":67,"./long":68,"./map":69,"./max_key":70,"./min_key":71,"./objectid":72,"./parser/calculate_size":73,"./parser/deserializer":74,"./parser/serializer":75,"./regexp":76,"./symbol":77,"./timestamp":78,"buffer":52}],64:[function(require,module,exports){
-/**
- * A class representation of the BSON Code type.
- *
- * @class
- * @param {(string|function)} code a string or function.
- * @param {Object} [scope] an optional scope for the function.
- * @return {Code}
- */
-var Code = function Code(code, scope) {
-  if(!(this instanceof Code)) return new Code(code, scope);
-  this._bsontype = 'Code';
-  this.code = code;
-  this.scope = scope == null ? {} : scope;
-};
-
-/**
- * @ignore
- */
-Code.prototype.toJSON = function() {
-  return {scope:this.scope, code:this.code};
-}
-
-module.exports = Code;
-module.exports.Code = Code;
-},{}],65:[function(require,module,exports){
-/**
- * A class representation of the BSON DBRef type.
- *
- * @class
- * @param {string} namespace the collection name.
- * @param {ObjectID} oid the reference ObjectID.
- * @param {string} [db] optional db name, if omitted the reference is local to the current db.
- * @return {DBRef}
- */
-function DBRef(namespace, oid, db) {
-  if(!(this instanceof DBRef)) return new DBRef(namespace, oid, db);
-  
-  this._bsontype = 'DBRef';
-  this.namespace = namespace;
-  this.oid = oid;
-  this.db = db;
-};
-
-/**
- * @ignore
- * @api private
- */
-DBRef.prototype.toJSON = function() {
-  return {
-    '$ref':this.namespace,
-    '$id':this.oid,
-    '$db':this.db == null ? '' : this.db
-  };
-}
-
-module.exports = DBRef;
-module.exports.DBRef = DBRef;
-},{}],66:[function(require,module,exports){
-/**
- * A class representation of the BSON Double type.
- *
- * @class
- * @param {number} value the number we want to represent as a double.
- * @return {Double}
- */
-function Double(value) {
-  if(!(this instanceof Double)) return new Double(value);
-  
-  this._bsontype = 'Double';
-  this.value = value;
-}
-
-/**
- * Access the number value.
- *
- * @method
- * @return {number} returns the wrapped double number.
- */
-Double.prototype.valueOf = function() {
-  return this.value;
-};
-
-/**
- * @ignore
- */
-Double.prototype.toJSON = function() {
-  return this.value;
-}
-
-module.exports = Double;
-module.exports.Double = Double;
-},{}],67:[function(require,module,exports){
-// Copyright (c) 2008, Fair Oaks Labs, Inc.
-// All rights reserved.
-// 
-// Redistribution and use in source and binary forms, with or without
-// modification, are permitted provided that the following conditions are met:
-// 
-//  * Redistributions of source code must retain the above copyright notice,
-//    this list of conditions and the following disclaimer.
-// 
-//  * Redistributions in binary form must reproduce the above copyright notice,
-//    this list of conditions and the following disclaimer in the documentation
-//    and/or other materials provided with the distribution.
-// 
-//  * Neither the name of Fair Oaks Labs, Inc. nor the names of its contributors
-//    may be used to endorse or promote products derived from this software
-//    without specific prior written permission.
-// 
-// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-// ARE DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
-// LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-// SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-// INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-// CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-// ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-// POSSIBILITY OF SUCH DAMAGE.
-//
-//
-// Modifications to writeIEEE754 to support negative zeroes made by Brian White
-
-var readIEEE754 = function(buffer, offset, endian, mLen, nBytes) {
-  var e, m,
-      bBE = (endian === 'big'),
-      eLen = nBytes * 8 - mLen - 1,
-      eMax = (1 << eLen) - 1,
-      eBias = eMax >> 1,
-      nBits = -7,
-      i = bBE ? 0 : (nBytes - 1),
-      d = bBE ? 1 : -1,
-      s = buffer[offset + i];
-
-  i += d;
-
-  e = s & ((1 << (-nBits)) - 1);
-  s >>= (-nBits);
-  nBits += eLen;
-  for (; nBits > 0; e = e * 256 + buffer[offset + i], i += d, nBits -= 8);
-
-  m = e & ((1 << (-nBits)) - 1);
-  e >>= (-nBits);
-  nBits += mLen;
-  for (; nBits > 0; m = m * 256 + buffer[offset + i], i += d, nBits -= 8);
-
-  if (e === 0) {
-    e = 1 - eBias;
-  } else if (e === eMax) {
-    return m ? NaN : ((s ? -1 : 1) * Infinity);
-  } else {
-    m = m + Math.pow(2, mLen);
-    e = e - eBias;
-  }
-  return (s ? -1 : 1) * m * Math.pow(2, e - mLen);
-};
-
-var writeIEEE754 = function(buffer, value, offset, endian, mLen, nBytes) {
-  var e, m, c,
-      bBE = (endian === 'big'),
-      eLen = nBytes * 8 - mLen - 1,
-      eMax = (1 << eLen) - 1,
-      eBias = eMax >> 1,
-      rt = (mLen === 23 ? Math.pow(2, -24) - Math.pow(2, -77) : 0),
-      i = bBE ? (nBytes-1) : 0,
-      d = bBE ? -1 : 1,
-      s = value < 0 || (value === 0 && 1 / value < 0) ? 1 : 0;
-
-  value = Math.abs(value);
-
-  if (isNaN(value) || value === Infinity) {
-    m = isNaN(value) ? 1 : 0;
-    e = eMax;
-  } else {
-    e = Math.floor(Math.log(value) / Math.LN2);
-    if (value * (c = Math.pow(2, -e)) < 1) {
-      e--;
-      c *= 2;
-    }
-    if (e+eBias >= 1) {
-      value += rt / c;
-    } else {
-      value += rt * Math.pow(2, 1 - eBias);
-    }
-    if (value * c >= 2) {
-      e++;
-      c /= 2;
-    }
-
-    if (e + eBias >= eMax) {
-      m = 0;
-      e = eMax;
-    } else if (e + eBias >= 1) {
-      m = (value * c - 1) * Math.pow(2, mLen);
-      e = e + eBias;
-    } else {
-      m = value * Math.pow(2, eBias - 1) * Math.pow(2, mLen);
-      e = 0;
-    }
-  }
-
-  for (; mLen >= 8; buffer[offset + i] = m & 0xff, i += d, m /= 256, mLen -= 8);
-
-  e = (e << mLen) | m;
-  eLen += mLen;
-  for (; eLen > 0; buffer[offset + i] = e & 0xff, i += d, e /= 256, eLen -= 8);
-
-  buffer[offset + i - d] |= s * 128;
-};
-
-exports.readIEEE754 = readIEEE754;
-exports.writeIEEE754 = writeIEEE754;
-},{}],68:[function(require,module,exports){
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
-// Copyright 2009 Google Inc. All Rights Reserved
-
-/**
- * Defines a Long class for representing a 64-bit two's-complement
- * integer value, which faithfully simulates the behavior of a Java "Long". This
- * implementation is derived from LongLib in GWT.
- *
- * Constructs a 64-bit two's-complement integer, given its low and high 32-bit
- * values as *signed* integers.  See the from* functions below for more
- * convenient ways of constructing Longs.
- *
- * The internal representation of a Long is the two given signed, 32-bit values.
- * We use 32-bit pieces because these are the size of integers on which
- * Javascript performs bit-operations.  For operations like addition and
- * multiplication, we split each number into 16-bit pieces, which can easily be
- * multiplied within Javascript's floating-point representation without overflow
- * or change in sign.
- *
- * In the algorithms below, we frequently reduce the negative case to the
- * positive case by negating the input(s) and then post-processing the result.
- * Note that we must ALWAYS check specially whether those values are MIN_VALUE
- * (-2^63) because -MIN_VALUE == MIN_VALUE (since 2^63 cannot be represented as
- * a positive number, it overflows back into a negative).  Not handling this
- * case would often result in infinite recursion.
- *
- * @class
- * @param {number} low  the low (signed) 32 bits of the Long.
- * @param {number} high the high (signed) 32 bits of the Long.
- * @return {Long}
- */
-function Long(low, high) {
-  if(!(this instanceof Long)) return new Long(low, high);
-  
-  this._bsontype = 'Long';
-  /**
-   * @type {number}
-   * @ignore
-   */
-  this.low_ = low | 0;  // force into 32 signed bits.
-
-  /**
-   * @type {number}
-   * @ignore
-   */
-  this.high_ = high | 0;  // force into 32 signed bits.
-};
-
-/**
- * Return the int value.
- *
- * @method
- * @return {number} the value, assuming it is a 32-bit integer.
- */
-Long.prototype.toInt = function() {
-  return this.low_;
-};
-
-/**
- * Return the Number value.
- *
- * @method
- * @return {number} the closest floating-point representation to this value.
- */
-Long.prototype.toNumber = function() {
-  return this.high_ * Long.TWO_PWR_32_DBL_ +
-         this.getLowBitsUnsigned();
-};
-
-/**
- * Return the JSON value.
- *
- * @method
- * @return {string} the JSON representation.
- */
-Long.prototype.toJSON = function() {
-  return this.toString();
-}
-
-/**
- * Return the String value.
- *
- * @method
- * @param {number} [opt_radix] the radix in which the text should be written.
- * @return {string} the textual representation of this value.
- */
-Long.prototype.toString = function(opt_radix) {
-  var radix = opt_radix || 10;
-  if (radix < 2 || 36 < radix) {
-    throw Error('radix out of range: ' + radix);
-  }
-
-  if (this.isZero()) {
-    return '0';
-  }
-
-  if (this.isNegative()) {
-    if (this.equals(Long.MIN_VALUE)) {
-      // We need to change the Long value before it can be negated, so we remove
-      // the bottom-most digit in this base and then recurse to do the rest.
-      var radixLong = Long.fromNumber(radix);
-      var div = this.div(radixLong);
-      var rem = div.multiply(radixLong).subtract(this);
-      return div.toString(radix) + rem.toInt().toString(radix);
-    } else {
-      return '-' + this.negate().toString(radix);
-    }
-  }
-
-  // Do several (6) digits each time through the loop, so as to
-  // minimize the calls to the very expensive emulated div.
-  var radixToPower = Long.fromNumber(Math.pow(radix, 6));
-
-  var rem = this;
-  var result = '';
-  while (true) {
-    var remDiv = rem.div(radixToPower);
-    var intval = rem.subtract(remDiv.multiply(radixToPower)).toInt();
-    var digits = intval.toString(radix);
-
-    rem = remDiv;
-    if (rem.isZero()) {
-      return digits + result;
-    } else {
-      while (digits.length < 6) {
-        digits = '0' + digits;
-      }
-      result = '' + digits + result;
-    }
-  }
-};
-
-/**
- * Return the high 32-bits value.
- *
- * @method
- * @return {number} the high 32-bits as a signed value.
- */
-Long.prototype.getHighBits = function() {
-  return this.high_;
-};
-
-/**
- * Return the low 32-bits value.
- *
- * @method
- * @return {number} the low 32-bits as a signed value.
- */
-Long.prototype.getLowBits = function() {
-  return this.low_;
-};
-
-/**
- * Return the low unsigned 32-bits value.
- *
- * @method
- * @return {number} the low 32-bits as an unsigned value.
- */
-Long.prototype.getLowBitsUnsigned = function() {
-  return (this.low_ >= 0) ?
-      this.low_ : Long.TWO_PWR_32_DBL_ + this.low_;
-};
-
-/**
- * Returns the number of bits needed to represent the absolute value of this Long.
- *
- * @method
- * @return {number} Returns the number of bits needed to represent the absolute value of this Long.
- */
-Long.prototype.getNumBitsAbs = function() {
-  if (this.isNegative()) {
-    if (this.equals(Long.MIN_VALUE)) {
-      return 64;
-    } else {
-      return this.negate().getNumBitsAbs();
-    }
-  } else {
-    var val = this.high_ != 0 ? this.high_ : this.low_;
-    for (var bit = 31; bit > 0; bit--) {
-      if ((val & (1 << bit)) != 0) {
-        break;
-      }
-    }
-    return this.high_ != 0 ? bit + 33 : bit + 1;
-  }
-};
-
-/**
- * Return whether this value is zero.
- *
- * @method
- * @return {boolean} whether this value is zero.
- */
-Long.prototype.isZero = function() {
-  return this.high_ == 0 && this.low_ == 0;
-};
-
-/**
- * Return whether this value is negative.
- *
- * @method
- * @return {boolean} whether this value is negative.
- */
-Long.prototype.isNegative = function() {
-  return this.high_ < 0;
-};
-
-/**
- * Return whether this value is odd.
- *
- * @method
- * @return {boolean} whether this value is odd.
- */
-Long.prototype.isOdd = function() {
-  return (this.low_ & 1) == 1;
-};
-
-/**
- * Return whether this Long equals the other
- *
- * @method
- * @param {Long} other Long to compare against.
- * @return {boolean} whether this Long equals the other
- */
-Long.prototype.equals = function(other) {
-  return (this.high_ == other.high_) && (this.low_ == other.low_);
-};
-
-/**
- * Return whether this Long does not equal the other.
- *
- * @method
- * @param {Long} other Long to compare against.
- * @return {boolean} whether this Long does not equal the other.
- */
-Long.prototype.notEquals = function(other) {
-  return (this.high_ != other.high_) || (this.low_ != other.low_);
-};
-
-/**
- * Return whether this Long is less than the other.
- *
- * @method
- * @param {Long} other Long to compare against.
- * @return {boolean} whether this Long is less than the other.
- */
-Long.prototype.lessThan = function(other) {
-  return this.compare(other) < 0;
-};
-
-/**
- * Return whether this Long is less than or equal to the other.
- *
- * @method
- * @param {Long} other Long to compare against.
- * @return {boolean} whether this Long is less than or equal to the other.
- */
-Long.prototype.lessThanOrEqual = function(other) {
-  return this.compare(other) <= 0;
-};
-
-/**
- * Return whether this Long is greater than the other.
- *
- * @method
- * @param {Long} other Long to compare against.
- * @return {boolean} whether this Long is greater than the other.
- */
-Long.prototype.greaterThan = function(other) {
-  return this.compare(other) > 0;
-};
-
-/**
- * Return whether this Long is greater than or equal to the other.
- *
- * @method
- * @param {Long} other Long to compare against.
- * @return {boolean} whether this Long is greater than or equal to the other.
- */
-Long.prototype.greaterThanOrEqual = function(other) {
-  return this.compare(other) >= 0;
-};
-
-/**
- * Compares this Long with the given one.
- *
- * @method
- * @param {Long} other Long to compare against.
- * @return {boolean} 0 if they are the same, 1 if the this is greater, and -1 if the given one is greater.
- */
-Long.prototype.compare = function(other) {
-  if (this.equals(other)) {
-    return 0;
-  }
-
-  var thisNeg = this.isNegative();
-  var otherNeg = other.isNegative();
-  if (thisNeg && !otherNeg) {
-    return -1;
-  }
-  if (!thisNeg && otherNeg) {
-    return 1;
-  }
-
-  // at this point, the signs are the same, so subtraction will not overflow
-  if (this.subtract(other).isNegative()) {
-    return -1;
-  } else {
-    return 1;
-  }
-};
-
-/**
- * The negation of this value.
- *
- * @method
- * @return {Long} the negation of this value.
- */
-Long.prototype.negate = function() {
-  if (this.equals(Long.MIN_VALUE)) {
-    return Long.MIN_VALUE;
-  } else {
-    return this.not().add(Long.ONE);
-  }
-};
-
-/**
- * Returns the sum of this and the given Long.
- *
- * @method
- * @param {Long} other Long to add to this one.
- * @return {Long} the sum of this and the given Long.
- */
-Long.prototype.add = function(other) {
-  // Divide each number into 4 chunks of 16 bits, and then sum the chunks.
-
-  var a48 = this.high_ >>> 16;
-  var a32 = this.high_ & 0xFFFF;
-  var a16 = this.low_ >>> 16;
-  var a00 = this.low_ & 0xFFFF;
-
-  var b48 = other.high_ >>> 16;
-  var b32 = other.high_ & 0xFFFF;
-  var b16 = other.low_ >>> 16;
-  var b00 = other.low_ & 0xFFFF;
-
-  var c48 = 0, c32 = 0, c16 = 0, c00 = 0;
-  c00 += a00 + b00;
-  c16 += c00 >>> 16;
-  c00 &= 0xFFFF;
-  c16 += a16 + b16;
-  c32 += c16 >>> 16;
-  c16 &= 0xFFFF;
-  c32 += a32 + b32;
-  c48 += c32 >>> 16;
-  c32 &= 0xFFFF;
-  c48 += a48 + b48;
-  c48 &= 0xFFFF;
-  return Long.fromBits((c16 << 16) | c00, (c48 << 16) | c32);
-};
-
-/**
- * Returns the difference of this and the given Long.
- *
- * @method
- * @param {Long} other Long to subtract from this.
- * @return {Long} the difference of this and the given Long.
- */
-Long.prototype.subtract = function(other) {
-  return this.add(other.negate());
-};
-
-/**
- * Returns the product of this and the given Long.
- *
- * @method
- * @param {Long} other Long to multiply with this.
- * @return {Long} the product of this and the other.
- */
-Long.prototype.multiply = function(other) {
-  if (this.isZero()) {
-    return Long.ZERO;
-  } else if (other.isZero()) {
-    return Long.ZERO;
-  }
-
-  if (this.equals(Long.MIN_VALUE)) {
-    return other.isOdd() ? Long.MIN_VALUE : Long.ZERO;
-  } else if (other.equals(Long.MIN_VALUE)) {
-    return this.isOdd() ? Long.MIN_VALUE : Long.ZERO;
-  }
-
-  if (this.isNegative()) {
-    if (other.isNegative()) {
-      return this.negate().multiply(other.negate());
-    } else {
-      return this.negate().multiply(other).negate();
-    }
-  } else if (other.isNegative()) {
-    return this.multiply(other.negate()).negate();
-  }
-
-  // If both Longs are small, use float multiplication
-  if (this.lessThan(Long.TWO_PWR_24_) &&
-      other.lessThan(Long.TWO_PWR_24_)) {
-    return Long.fromNumber(this.toNumber() * other.toNumber());
-  }
-
-  // Divide each Long into 4 chunks of 16 bits, and then add up 4x4 products.
-  // We can skip products that would overflow.
-
-  var a48 = this.high_ >>> 16;
-  var a32 = this.high_ & 0xFFFF;
-  var a16 = this.low_ >>> 16;
-  var a00 = this.low_ & 0xFFFF;
-
-  var b48 = other.high_ >>> 16;
-  var b32 = other.high_ & 0xFFFF;
-  var b16 = other.low_ >>> 16;
-  var b00 = other.low_ & 0xFFFF;
-
-  var c48 = 0, c32 = 0, c16 = 0, c00 = 0;
-  c00 += a00 * b00;
-  c16 += c00 >>> 16;
-  c00 &= 0xFFFF;
-  c16 += a16 * b00;
-  c32 += c16 >>> 16;
-  c16 &= 0xFFFF;
-  c16 += a00 * b16;
-  c32 += c16 >>> 16;
-  c16 &= 0xFFFF;
-  c32 += a32 * b00;
-  c48 += c32 >>> 16;
-  c32 &= 0xFFFF;
-  c32 += a16 * b16;
-  c48 += c32 >>> 16;
-  c32 &= 0xFFFF;
-  c32 += a00 * b32;
-  c48 += c32 >>> 16;
-  c32 &= 0xFFFF;
-  c48 += a48 * b00 + a32 * b16 + a16 * b32 + a00 * b48;
-  c48 &= 0xFFFF;
-  return Long.fromBits((c16 << 16) | c00, (c48 << 16) | c32);
-};
-
-/**
- * Returns this Long divided by the given one.
- *
- * @method
- * @param {Long} other Long by which to divide.
- * @return {Long} this Long divided by the given one.
- */
-Long.prototype.div = function(other) {
-  if (other.isZero()) {
-    throw Error('division by zero');
-  } else if (this.isZero()) {
-    return Long.ZERO;
-  }
-
-  if (this.equals(Long.MIN_VALUE)) {
-    if (other.equals(Long.ONE) ||
-        other.equals(Long.NEG_ONE)) {
-      return Long.MIN_VALUE;  // recall that -MIN_VALUE == MIN_VALUE
-    } else if (other.equals(Long.MIN_VALUE)) {
-      return Long.ONE;
-    } else {
-      // At this point, we have |other| >= 2, so |this/other| < |MIN_VALUE|.
-      var halfThis = this.shiftRight(1);
-      var approx = halfThis.div(other).shiftLeft(1);
-      if (approx.equals(Long.ZERO)) {
-        return other.isNegative() ? Long.ONE : Long.NEG_ONE;
-      } else {
-        var rem = this.subtract(other.multiply(approx));
-        var result = approx.add(rem.div(other));
-        return result;
-      }
-    }
-  } else if (other.equals(Long.MIN_VALUE)) {
-    return Long.ZERO;
-  }
-
-  if (this.isNegative()) {
-    if (other.isNegative()) {
-      return this.negate().div(other.negate());
-    } else {
-      return this.negate().div(other).negate();
-    }
-  } else if (other.isNegative()) {
-    return this.div(other.negate()).negate();
-  }
-
-  // Repeat the following until the remainder is less than other:  find a
-  // floating-point that approximates remainder / other *from below*, add this
-  // into the result, and subtract it from the remainder.  It is critical that
-  // the approximate value is less than or equal to the real value so that the
-  // remainder never becomes negative.
-  var res = Long.ZERO;
-  var rem = this;
-  while (rem.greaterThanOrEqual(other)) {
-    // Approximate the result of division. This may be a little greater or
-    // smaller than the actual value.
-    var approx = Math.max(1, Math.floor(rem.toNumber() / other.toNumber()));
-
-    // We will tweak the approximate result by changing it in the 48-th digit or
-    // the smallest non-fractional digit, whichever is larger.
-    var log2 = Math.ceil(Math.log(approx) / Math.LN2);
-    var delta = (log2 <= 48) ? 1 : Math.pow(2, log2 - 48);
-
-    // Decrease the approximation until it is smaller than the remainder.  Note
-    // that if it is too large, the product overflows and is negative.
-    var approxRes = Long.fromNumber(approx);
-    var approxRem = approxRes.multiply(other);
-    while (approxRem.isNegative() || approxRem.greaterThan(rem)) {
-      approx -= delta;
-      approxRes = Long.fromNumber(approx);
-      approxRem = approxRes.multiply(other);
-    }
-
-    // We know the answer can't be zero... and actually, zero would cause
-    // infinite recursion since we would make no progress.
-    if (approxRes.isZero()) {
-      approxRes = Long.ONE;
-    }
-
-    res = res.add(approxRes);
-    rem = rem.subtract(approxRem);
-  }
-  return res;
-};
-
-/**
- * Returns this Long modulo the given one.
- *
- * @method
- * @param {Long} other Long by which to mod.
- * @return {Long} this Long modulo the given one.
- */
-Long.prototype.modulo = function(other) {
-  return this.subtract(this.div(other).multiply(other));
-};
-
-/**
- * The bitwise-NOT of this value.
- *
- * @method
- * @return {Long} the bitwise-NOT of this value.
- */
-Long.prototype.not = function() {
-  return Long.fromBits(~this.low_, ~this.high_);
-};
-
-/**
- * Returns the bitwise-AND of this Long and the given one.
- *
- * @method
- * @param {Long} other the Long with which to AND.
- * @return {Long} the bitwise-AND of this and the other.
- */
-Long.prototype.and = function(other) {
-  return Long.fromBits(this.low_ & other.low_, this.high_ & other.high_);
-};
-
-/**
- * Returns the bitwise-OR of this Long and the given one.
- *
- * @method
- * @param {Long} other the Long with which to OR.
- * @return {Long} the bitwise-OR of this and the other.
- */
-Long.prototype.or = function(other) {
-  return Long.fromBits(this.low_ | other.low_, this.high_ | other.high_);
-};
-
-/**
- * Returns the bitwise-XOR of this Long and the given one.
- *
- * @method
- * @param {Long} other the Long with which to XOR.
- * @return {Long} the bitwise-XOR of this and the other.
- */
-Long.prototype.xor = function(other) {
-  return Long.fromBits(this.low_ ^ other.low_, this.high_ ^ other.high_);
-};
-
-/**
- * Returns this Long with bits shifted to the left by the given amount.
- *
- * @method
- * @param {number} numBits the number of bits by which to shift.
- * @return {Long} this shifted to the left by the given amount.
- */
-Long.prototype.shiftLeft = function(numBits) {
-  numBits &= 63;
-  if (numBits == 0) {
-    return this;
-  } else {
-    var low = this.low_;
-    if (numBits < 32) {
-      var high = this.high_;
-      return Long.fromBits(
-                 low << numBits,
-                 (high << numBits) | (low >>> (32 - numBits)));
-    } else {
-      return Long.fromBits(0, low << (numBits - 32));
-    }
-  }
-};
-
-/**
- * Returns this Long with bits shifted to the right by the given amount.
- *
- * @method
- * @param {number} numBits the number of bits by which to shift.
- * @return {Long} this shifted to the right by the given amount.
- */
-Long.prototype.shiftRight = function(numBits) {
-  numBits &= 63;
-  if (numBits == 0) {
-    return this;
-  } else {
-    var high = this.high_;
-    if (numBits < 32) {
-      var low = this.low_;
-      return Long.fromBits(
-                 (low >>> numBits) | (high << (32 - numBits)),
-                 high >> numBits);
-    } else {
-      return Long.fromBits(
-                 high >> (numBits - 32),
-                 high >= 0 ? 0 : -1);
-    }
-  }
-};
-
-/**
- * Returns this Long with bits shifted to the right by the given amount, with the new top bits matching the current sign bit.
- *
- * @method
- * @param {number} numBits the number of bits by which to shift.
- * @return {Long} this shifted to the right by the given amount, with zeros placed into the new leading bits.
- */
-Long.prototype.shiftRightUnsigned = function(numBits) {
-  numBits &= 63;
-  if (numBits == 0) {
-    return this;
-  } else {
-    var high = this.high_;
-    if (numBits < 32) {
-      var low = this.low_;
-      return Long.fromBits(
-                 (low >>> numBits) | (high << (32 - numBits)),
-                 high >>> numBits);
-    } else if (numBits == 32) {
-      return Long.fromBits(high, 0);
-    } else {
-      return Long.fromBits(high >>> (numBits - 32), 0);
-    }
-  }
-};
-
-/**
- * Returns a Long representing the given (32-bit) integer value.
- *
- * @method
- * @param {number} value the 32-bit integer in question.
- * @return {Long} the corresponding Long value.
- */
-Long.fromInt = function(value) {
-  if (-128 <= value && value < 128) {
-    var cachedObj = Long.INT_CACHE_[value];
-    if (cachedObj) {
-      return cachedObj;
-    }
-  }
-
-  var obj = new Long(value | 0, value < 0 ? -1 : 0);
-  if (-128 <= value && value < 128) {
-    Long.INT_CACHE_[value] = obj;
-  }
-  return obj;
-};
-
-/**
- * Returns a Long representing the given value, provided that it is a finite number. Otherwise, zero is returned.
- *
- * @method
- * @param {number} value the number in question.
- * @return {Long} the corresponding Long value.
- */
-Long.fromNumber = function(value) {
-  if (isNaN(value) || !isFinite(value)) {
-    return Long.ZERO;
-  } else if (value <= -Long.TWO_PWR_63_DBL_) {
-    return Long.MIN_VALUE;
-  } else if (value + 1 >= Long.TWO_PWR_63_DBL_) {
-    return Long.MAX_VALUE;
-  } else if (value < 0) {
-    return Long.fromNumber(-value).negate();
-  } else {
-    return new Long(
-               (value % Long.TWO_PWR_32_DBL_) | 0,
-               (value / Long.TWO_PWR_32_DBL_) | 0);
-  }
-};
-
-/**
- * Returns a Long representing the 64-bit integer that comes by concatenating the given high and low bits. Each is assumed to use 32 bits.
- *
- * @method
- * @param {number} lowBits the low 32-bits.
- * @param {number} highBits the high 32-bits.
- * @return {Long} the corresponding Long value.
- */
-Long.fromBits = function(lowBits, highBits) {
-  return new Long(lowBits, highBits);
-};
-
-/**
- * Returns a Long representation of the given string, written using the given radix.
- *
- * @method
- * @param {string} str the textual representation of the Long.
- * @param {number} opt_radix the radix in which the text is written.
- * @return {Long} the corresponding Long value.
- */
-Long.fromString = function(str, opt_radix) {
-  if (str.length == 0) {
-    throw Error('number format error: empty string');
-  }
-
-  var radix = opt_radix || 10;
-  if (radix < 2 || 36 < radix) {
-    throw Error('radix out of range: ' + radix);
-  }
-
-  if (str.charAt(0) == '-') {
-    return Long.fromString(str.substring(1), radix).negate();
-  } else if (str.indexOf('-') >= 0) {
-    throw Error('number format error: interior "-" character: ' + str);
-  }
-
-  // Do several (8) digits each time through the loop, so as to
-  // minimize the calls to the very expensive emulated div.
-  var radixToPower = Long.fromNumber(Math.pow(radix, 8));
-
-  var result = Long.ZERO;
-  for (var i = 0; i < str.length; i += 8) {
-    var size = Math.min(8, str.length - i);
-    var value = parseInt(str.substring(i, i + size), radix);
-    if (size < 8) {
-      var power = Long.fromNumber(Math.pow(radix, size));
-      result = result.multiply(power).add(Long.fromNumber(value));
-    } else {
-      result = result.multiply(radixToPower);
-      result = result.add(Long.fromNumber(value));
-    }
-  }
-  return result;
-};
-
-// NOTE: Common constant values ZERO, ONE, NEG_ONE, etc. are defined below the
-// from* methods on which they depend.
-
-
-/**
- * A cache of the Long representations of small integer values.
- * @type {Object}
- * @ignore
- */
-Long.INT_CACHE_ = {};
-
-// NOTE: the compiler should inline these constant values below and then remove
-// these variables, so there should be no runtime penalty for these.
-
-/**
- * Number used repeated below in calculations.  This must appear before the
- * first call to any from* function below.
- * @type {number}
- * @ignore
- */
-Long.TWO_PWR_16_DBL_ = 1 << 16;
-
-/**
- * @type {number}
- * @ignore
- */
-Long.TWO_PWR_24_DBL_ = 1 << 24;
-
-/**
- * @type {number}
- * @ignore
- */
-Long.TWO_PWR_32_DBL_ = Long.TWO_PWR_16_DBL_ * Long.TWO_PWR_16_DBL_;
-
-/**
- * @type {number}
- * @ignore
- */
-Long.TWO_PWR_31_DBL_ = Long.TWO_PWR_32_DBL_ / 2;
-
-/**
- * @type {number}
- * @ignore
- */
-Long.TWO_PWR_48_DBL_ = Long.TWO_PWR_32_DBL_ * Long.TWO_PWR_16_DBL_;
-
-/**
- * @type {number}
- * @ignore
- */
-Long.TWO_PWR_64_DBL_ = Long.TWO_PWR_32_DBL_ * Long.TWO_PWR_32_DBL_;
-
-/**
- * @type {number}
- * @ignore
- */
-Long.TWO_PWR_63_DBL_ = Long.TWO_PWR_64_DBL_ / 2;
-
-/** @type {Long} */
-Long.ZERO = Long.fromInt(0);
-
-/** @type {Long} */
-Long.ONE = Long.fromInt(1);
-
-/** @type {Long} */
-Long.NEG_ONE = Long.fromInt(-1);
-
-/** @type {Long} */
-Long.MAX_VALUE =
-    Long.fromBits(0xFFFFFFFF | 0, 0x7FFFFFFF | 0);
-
-/** @type {Long} */
-Long.MIN_VALUE = Long.fromBits(0, 0x80000000 | 0);
-
-/**
- * @type {Long}
- * @ignore
- */
-Long.TWO_PWR_24_ = Long.fromInt(1 << 24);
-
-/**
- * Expose.
- */
-module.exports = Long;
-module.exports.Long = Long;
-},{}],69:[function(require,module,exports){
-(function (global){
-"use strict"
-
-// We have an ES6 Map available, return the native instance
-if(typeof global.Map !== 'undefined') {
-  module.exports = global.Map;
-  module.exports.Map = global.Map;
-} else {
-  // We will return a polyfill
-  var Map = function(array) {
-    this._keys = [];
-    this._values = {};
-
-    for(var i = 0; i < array.length; i++) {
-      if(array[i] == null) continue;  // skip null and undefined
-      var entry = array[i];
-      var key = entry[0];
-      var value = entry[1];
-      // Add the key to the list of keys in order
-      this._keys.push(key);
-      // Add the key and value to the values dictionary with a point
-      // to the location in the ordered keys list
-      this._values[key] = {v: value, i: this._keys.length - 1};
-    }
-  }
-
-  Map.prototype.clear = function() {
-    this._keys = [];
-    this._values = {};
-  }
-
-  Map.prototype.delete = function(key) {
-    var value = this._values[key];
-    if(value == null) return false;
-    // Delete entry
-    delete this._values[key];
-    // Remove the key from the ordered keys list
-    this._keys.splice(value.i, 1);
-    return true;
-  }
-
-  Map.prototype.entries = function() {
-    var self = this;
-    var index = 0;
-
-    return {
-      next: function() {
-        var key = self._keys[index++];
-        return {
-          value: key !== undefined ? [key, self._values[key].v] : undefined,
-          done: key !== undefined ? false : true
-        }
-      }
-    };
-  }
-
-  Map.prototype.forEach = function(callback, self) {
-    self = self || this;
-
-    for(var i = 0; i < this._keys.length; i++) {
-      var key = this._keys[i];
-      // Call the forEach callback
-      callback.call(self, this._values[key].v, key, self);
-    }
-  }
-
-  Map.prototype.get = function(key) {
-    return this._values[key] ? this._values[key].v : undefined;
-  }
-
-  Map.prototype.has = function(key) {
-    return this._values[key] != null;
-  }
-
-  Map.prototype.keys = function(key) {
-    var self = this;
-    var index = 0;
-
-    return {
-      next: function() {
-        var key = self._keys[index++];
-        return {
-          value: key !== undefined ? key : undefined,
-          done: key !== undefined ? false : true
-        }
-      }
-    };
-  }
-
-  Map.prototype.set = function(key, value) {
-    if(this._values[key]) {
-      this._values[key].v = value;
-      return this;
-    }
-
-    // Add the key to the list of keys in order
-    this._keys.push(key);
-    // Add the key and value to the values dictionary with a point
-    // to the location in the ordered keys list
-    this._values[key] = {v: value, i: this._keys.length - 1};
-    return this;
-  }
-
-  Map.prototype.values = function(key, value) {
-    var self = this;
-    var index = 0;
-
-    return {
-      next: function() {
-        var key = self._keys[index++];
-        return {
-          value: key !== undefined ? self._values[key].v : undefined,
-          done: key !== undefined ? false : true
-        }
-      }
-    };
-  }
-
-  // Last ismaster
-  Object.defineProperty(Map.prototype, 'size', {
-    enumerable:true,
-    get: function() { return this._keys.length; }
-  });
-
-  module.exports = Map;
-  module.exports.Map = Map;
-}
-}).call(this,typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],70:[function(require,module,exports){
-/**
- * A class representation of the BSON MaxKey type.
- *
- * @class
- * @return {MaxKey} A MaxKey instance
- */
-function MaxKey() {
-  if(!(this instanceof MaxKey)) return new MaxKey();
-  
-  this._bsontype = 'MaxKey';  
-}
-
-module.exports = MaxKey;
-module.exports.MaxKey = MaxKey;
-},{}],71:[function(require,module,exports){
-/**
- * A class representation of the BSON MinKey type.
- *
- * @class
- * @return {MinKey} A MinKey instance
- */
-function MinKey() {
-  if(!(this instanceof MinKey)) return new MinKey();
-  
-  this._bsontype = 'MinKey';
-}
-
-module.exports = MinKey;
-module.exports.MinKey = MinKey;
-},{}],72:[function(require,module,exports){
-(function (process){
-/**
- * Module dependencies.
- * @ignore
- */
-var BinaryParser = require('./binary_parser').BinaryParser;
-
-/**
- * Machine id.
- *
- * Create a random 3-byte value (i.e. unique for this
- * process). Other drivers use a md5 of the machine id here, but
- * that would mean an asyc call to gethostname, so we don't bother.
- * @ignore
- */
-var MACHINE_ID = parseInt(Math.random() * 0xFFFFFF, 10);
-
-// Regular expression that checks for hex value
-var checkForHexRegExp = new RegExp("^[0-9a-fA-F]{24}$");
-
-/**
-* Create a new ObjectID instance
-*
-* @class
-* @param {(string|number)} id Can be a 24 byte hex string, 12 byte binary string or a Number.
-* @property {number} generationTime The generation time of this ObjectId instance
-* @return {ObjectID} instance of ObjectID.
-*/
-var ObjectID = function ObjectID(id) {
-  if(!(this instanceof ObjectID)) return new ObjectID(id);
-  if((id instanceof ObjectID)) return id;
-
-  this._bsontype = 'ObjectID';
-  var __id = null;
-  var valid = ObjectID.isValid(id);
-
-  // Throw an error if it's not a valid setup
-  if(!valid && id != null){
-    throw new Error("Argument passed in must be a single String of 12 bytes or a string of 24 hex characters");
-  } else if(valid && typeof id == 'string' && id.length == 24) {
-    return ObjectID.createFromHexString(id);
-  } else if(id == null || typeof id == 'number') {
-    // convert to 12 byte binary string
-    this.id = this.generate(id);
-  } else if(id != null && id.length === 12) {
-    // assume 12 byte string
-    this.id = id;
-  }
-
-  if(ObjectID.cacheHexString) this.__id = this.toHexString();
-};
-
-// Allow usage of ObjectId as well as ObjectID
-var ObjectId = ObjectID;
-
-// Precomputed hex table enables speedy hex string conversion
-var hexTable = [];
-for (var i = 0; i < 256; i++) {
-  hexTable[i] = (i <= 15 ? '0' : '') + i.toString(16);
-}
-
-/**
-* Return the ObjectID id as a 24 byte hex string representation
-*
-* @method
-* @return {string} return the 24 byte hex string representation.
-*/
-ObjectID.prototype.toHexString = function() {
-  if(ObjectID.cacheHexString && this.__id) return this.__id;
-
-  var hexString = '';
-
-  for (var i = 0; i < this.id.length; i++) {
-    hexString += hexTable[this.id.charCodeAt(i)];
-  }
-
-  if(ObjectID.cacheHexString) this.__id = hexString;
-  return hexString;
-};
-
-/**
-* Update the ObjectID index used in generating new ObjectID's on the driver
-*
-* @method
-* @return {number} returns next index value.
-* @ignore
-*/
-ObjectID.prototype.get_inc = function() {
-  return ObjectID.index = (ObjectID.index + 1) % 0xFFFFFF;
-};
-
-/**
-* Update the ObjectID index used in generating new ObjectID's on the driver
-*
-* @method
-* @return {number} returns next index value.
-* @ignore
-*/
-ObjectID.prototype.getInc = function() {
-  return this.get_inc();
-};
-
-/**
-* Generate a 12 byte id string used in ObjectID's
-*
-* @method
-* @param {number} [time] optional parameter allowing to pass in a second based timestamp.
-* @return {string} return the 12 byte id binary string.
-*/
-ObjectID.prototype.generate = function(time) {
-  if ('number' != typeof time) {
-    time = parseInt(Date.now()/1000,10);
-  }
-
-  var time4Bytes = BinaryParser.encodeInt(time, 32, true, true);
-  /* for time-based ObjectID the bytes following the time will be zeroed */
-  var machine3Bytes = BinaryParser.encodeInt(MACHINE_ID, 24, false);
-  var pid2Bytes = BinaryParser.fromShort(typeof process === 'undefined' ? Math.floor(Math.random() * 100000) : process.pid % 0xFFFF);
-  var index3Bytes = BinaryParser.encodeInt(this.get_inc(), 24, false, true);
-
-  return time4Bytes + machine3Bytes + pid2Bytes + index3Bytes;
-};
-
-/**
-* Converts the id into a 24 byte hex string for printing
-*
-* @return {String} return the 24 byte hex string representation.
-* @ignore
-*/
-ObjectID.prototype.toString = function() {
-  return this.toHexString();
-};
-
-/**
-* Converts to a string representation of this Id.
-*
-* @return {String} return the 24 byte hex string representation.
-* @ignore
-*/
-ObjectID.prototype.inspect = ObjectID.prototype.toString;
-
-/**
-* Converts to its JSON representation.
-*
-* @return {String} return the 24 byte hex string representation.
-* @ignore
-*/
-ObjectID.prototype.toJSON = function() {
-  return this.toHexString();
-};
-
-/**
-* Compares the equality of this ObjectID with `otherID`.
-*
-* @method
-* @param {object} otherID ObjectID instance to compare against.
-* @return {boolean} the result of comparing two ObjectID's
-*/
-ObjectID.prototype.equals = function equals (otherID) {
-  var id;
-
-  if(otherID != null && (otherID instanceof ObjectID || otherID.toHexString)) {
-    id = otherID.id;
-  } else if(typeof otherID == 'string' && ObjectID.isValid(otherID)) {
-    id = ObjectID.createFromHexString(otherID).id;
-  } else {
-    return false;
-  }
-
-  return this.id === id;
-}
-
-/**
-* Returns the generation date (accurate up to the second) that this ID was generated.
-*
-* @method
-* @return {date} the generation date
-*/
-ObjectID.prototype.getTimestamp = function() {
-  var timestamp = new Date();
-  timestamp.setTime(Math.floor(BinaryParser.decodeInt(this.id.substring(0,4), 32, true, true)) * 1000);
-  return timestamp;
-}
-
-/**
-* @ignore
-*/
-ObjectID.index = parseInt(Math.random() * 0xFFFFFF, 10);
-
-/**
-* @ignore
-*/
-ObjectID.createPk = function createPk () {
-  return new ObjectID();
-};
-
-/**
-* Creates an ObjectID from a second based number, with the rest of the ObjectID zeroed out. Used for comparisons or sorting the ObjectID.
-*
-* @method
-* @param {number} time an integer number representing a number of seconds.
-* @return {ObjectID} return the created ObjectID
-*/
-ObjectID.createFromTime = function createFromTime (time) {
-  var id = BinaryParser.encodeInt(time, 32, true, true) +
-           BinaryParser.encodeInt(0, 64, true, true);
-  return new ObjectID(id);
-};
-
-/**
-* Creates an ObjectID from a hex string representation of an ObjectID.
-*
-* @method
-* @param {string} hexString create a ObjectID from a passed in 24 byte hexstring.
-* @return {ObjectID} return the created ObjectID
-*/
-ObjectID.createFromHexString = function createFromHexString (hexString) {
-  // Throw an error if it's not a valid setup
-  if(typeof hexString === 'undefined' || hexString != null && hexString.length != 24)
-    throw new Error("Argument passed in must be a single String of 12 bytes or a string of 24 hex characters");
-
-  var len = hexString.length;
-
-  if(len > 12*2) {
-    throw new Error('Id cannot be longer than 12 bytes');
-  }
-
-  var result = ''
-    , string
-    , number;
-
-  for (var index = 0; index < len; index += 2) {
-    string = hexString.substr(index, 2);
-    number = parseInt(string, 16);
-    result += BinaryParser.fromByte(number);
-  }
-
-  return new ObjectID(result, hexString);
-};
-
-/**
-* Checks if a value is a valid bson ObjectId
-*
-* @method
-* @return {boolean} return true if the value is a valid bson ObjectId, return false otherwise.
-*/
-ObjectID.isValid = function isValid(id) {
-  if(id == null) return false;
-
-  if(typeof id == 'number')
-    return true;
-  if(typeof id == 'string') {
-    return id.length == 12 || (id.length == 24 && checkForHexRegExp.test(id));
-  }
-  return false;
-};
-
-/**
-* @ignore
-*/
-Object.defineProperty(ObjectID.prototype, "generationTime", {
-   enumerable: true
- , get: function () {
-     return Math.floor(BinaryParser.decodeInt(this.id.substring(0,4), 32, true, true));
-   }
- , set: function (value) {
-     var value = BinaryParser.encodeInt(value, 32, true, true);
-     this.id = value + this.id.substr(4);
-     // delete this.__id;
-     this.toHexString();
-   }
-});
-
-/**
- * Expose.
- */
-module.exports = ObjectID;
-module.exports.ObjectID = ObjectID;
-module.exports.ObjectId = ObjectID;
-
-}).call(this,require("FWaASH"))
-},{"./binary_parser":62,"FWaASH":58}],73:[function(require,module,exports){
-(function (Buffer){
-"use strict"
-
-var writeIEEE754 = require('../float_parser').writeIEEE754
-	, readIEEE754 = require('../float_parser').readIEEE754
-	, Long = require('../long').Long
-  , Double = require('../double').Double
-  , Timestamp = require('../timestamp').Timestamp
-  , ObjectID = require('../objectid').ObjectID
-  , Symbol = require('../symbol').Symbol
-  , BSONRegExp = require('../regexp').BSONRegExp
-  , Code = require('../code').Code
-  , MinKey = require('../min_key').MinKey
-  , MaxKey = require('../max_key').MaxKey
-  , DBRef = require('../db_ref').DBRef
-  , Binary = require('../binary').Binary;
-
-// To ensure that 0.4 of node works correctly
-var isDate = function isDate(d) {
-  return typeof d === 'object' && Object.prototype.toString.call(d) === '[object Date]';
-}
-
-var calculateObjectSize = function calculateObjectSize(object, serializeFunctions, ignoreUndefined) {
-  var totalLength = (4 + 1);
-
-  if(Array.isArray(object)) {
-    for(var i = 0; i < object.length; i++) {
-      totalLength += calculateElement(i.toString(), object[i], serializeFunctions, true, ignoreUndefined)
-    }
-  } else {
-		// If we have toBSON defined, override the current object
-		if(object.toBSON) {
-			object = object.toBSON();
-		}
-
-		// Calculate size
-    for(var key in object) {
-      totalLength += calculateElement(key, object[key], serializeFunctions, false, ignoreUndefined)
-    }
-  }
-
-  return totalLength;
-}
-
-/**
- * @ignore
- * @api private
- */
-function calculateElement(name, value, serializeFunctions, isArray, ignoreUndefined) {
-	// If we have toBSON defined, override the current object
-  if(value && value.toBSON){
-    value = value.toBSON();
-  }
-
-  switch(typeof value) {
-    case 'string':
-      return 1 + Buffer.byteLength(name, 'utf8') + 1 + 4 + Buffer.byteLength(value, 'utf8') + 1;
-    case 'number':
-      if(Math.floor(value) === value && value >= BSON.JS_INT_MIN && value <= BSON.JS_INT_MAX) {
-        if(value >= BSON.BSON_INT32_MIN && value <= BSON.BSON_INT32_MAX) { // 32 bit
-          return (name != null ? (Buffer.byteLength(name, 'utf8') + 1) : 0) + (4 + 1);
-        } else {
-          return (name != null ? (Buffer.byteLength(name, 'utf8') + 1) : 0) + (8 + 1);
-        }
-      } else {  // 64 bit
-        return (name != null ? (Buffer.byteLength(name, 'utf8') + 1) : 0) + (8 + 1);
-      }
-    case 'undefined':
-      if(isArray || !ignoreUndefined) return (name != null ? (Buffer.byteLength(name, 'utf8') + 1) : 0) + (1);
-      return 0;
-    case 'boolean':
-      return (name != null ? (Buffer.byteLength(name, 'utf8') + 1) : 0) + (1 + 1);
-    case 'object':
-      if(value == null || value instanceof MinKey || value instanceof MaxKey || value['_bsontype'] == 'MinKey' || value['_bsontype'] == 'MaxKey') {
-        return (name != null ? (Buffer.byteLength(name, 'utf8') + 1) : 0) + (1);
-      } else if(value instanceof ObjectID || value['_bsontype'] == 'ObjectID') {
-        return (name != null ? (Buffer.byteLength(name, 'utf8') + 1) : 0) + (12 + 1);
-      } else if(value instanceof Date || isDate(value)) {
-        return (name != null ? (Buffer.byteLength(name, 'utf8') + 1) : 0) + (8 + 1);
-      } else if(typeof Buffer !== 'undefined' && Buffer.isBuffer(value)) {
-        return (name != null ? (Buffer.byteLength(name, 'utf8') + 1) : 0) + (1 + 4 + 1) + value.length;
-      } else if(value instanceof Long || value instanceof Double || value instanceof Timestamp
-          || value['_bsontype'] == 'Long' || value['_bsontype'] == 'Double' || value['_bsontype'] == 'Timestamp') {
-        return (name != null ? (Buffer.byteLength(name, 'utf8') + 1) : 0) + (8 + 1);
-      } else if(value instanceof Code || value['_bsontype'] == 'Code') {
-        // Calculate size depending on the availability of a scope
-        if(value.scope != null && Object.keys(value.scope).length > 0) {
-          return (name != null ? (Buffer.byteLength(name, 'utf8') + 1) : 0) + 1 + 4 + 4 + Buffer.byteLength(value.code.toString(), 'utf8') + 1 + calculateObjectSize(value.scope, serializeFunctions, ignoreUndefined);
-        } else {
-          return (name != null ? (Buffer.byteLength(name, 'utf8') + 1) : 0) + 1 + 4 + Buffer.byteLength(value.code.toString(), 'utf8') + 1;
-        }
-      } else if(value instanceof Binary || value['_bsontype'] == 'Binary') {
-        // Check what kind of subtype we have
-        if(value.sub_type == Binary.SUBTYPE_BYTE_ARRAY) {
-          return (name != null ? (Buffer.byteLength(name, 'utf8') + 1) : 0) + (value.position + 1 + 4 + 1 + 4);
-        } else {
-          return (name != null ? (Buffer.byteLength(name, 'utf8') + 1) : 0) + (value.position + 1 + 4 + 1);
-        }
-      } else if(value instanceof Symbol || value['_bsontype'] == 'Symbol') {
-        return (name != null ? (Buffer.byteLength(name, 'utf8') + 1) : 0) + Buffer.byteLength(value.value, 'utf8') + 4 + 1 + 1;
-      } else if(value instanceof DBRef || value['_bsontype'] == 'DBRef') {
-        // Set up correct object for serialization
-        var ordered_values = {
-            '$ref': value.namespace
-          , '$id' : value.oid
-        };
-
-        // Add db reference if it exists
-        if(null != value.db) {
-          ordered_values['$db'] = value.db;
-        }
-
-        return (name != null ? (Buffer.byteLength(name, 'utf8') + 1) : 0) + 1 + calculateObjectSize(ordered_values, serializeFunctions, ignoreUndefined);
-      } else if(value instanceof RegExp || Object.prototype.toString.call(value) === '[object RegExp]') {
-          return (name != null ? (Buffer.byteLength(name, 'utf8') + 1) : 0) + 1 + Buffer.byteLength(value.source, 'utf8') + 1
-            + (value.global ? 1 : 0) + (value.ignoreCase ? 1 : 0) + (value.multiline ? 1 : 0) + 1
-      } else if(value instanceof BSONRegExp || value['_bsontype'] == 'BSONRegExp') {
-          return (name != null ? (Buffer.byteLength(name, 'utf8') + 1) : 0) + 1 + Buffer.byteLength(value.pattern, 'utf8') + 1
-            + Buffer.byteLength(value.options, 'utf8') + 1
-      } else {
-        return (name != null ? (Buffer.byteLength(name, 'utf8') + 1) : 0) + calculateObjectSize(value, serializeFunctions, ignoreUndefined) + 1;
-      }
-    case 'function':
-      // WTF for 0.4.X where typeof /someregexp/ === 'function'
-      if(value instanceof RegExp || Object.prototype.toString.call(value) === '[object RegExp]' || String.call(value) == '[object RegExp]') {
-        return (name != null ? (Buffer.byteLength(name, 'utf8') + 1) : 0) + 1 + Buffer.byteLength(value.source, 'utf8') + 1
-          + (value.global ? 1 : 0) + (value.ignoreCase ? 1 : 0) + (value.multiline ? 1 : 0) + 1
-      } else {
-        if(serializeFunctions && value.scope != null && Object.keys(value.scope).length > 0) {
-          return (name != null ? (Buffer.byteLength(name, 'utf8') + 1) : 0) + 1 + 4 + 4 + Buffer.byteLength(value.toString(), 'utf8') + 1 + calculateObjectSize(value.scope, serializeFunctions, ignoreUndefined);
-        } else if(serializeFunctions) {
-          return (name != null ? (Buffer.byteLength(name, 'utf8') + 1) : 0) + 1 + 4 + Buffer.byteLength(value.toString(), 'utf8') + 1;
-        }
-      }
-  }
-
-  return 0;
-}
-
-var BSON = {};
-
-/**
- * Contains the function cache if we have that enable to allow for avoiding the eval step on each deserialization, comparison is by md5
- *
- * @ignore
- * @api private
- */
-var functionCache = BSON.functionCache = {};
-
-/**
- * Number BSON Type
- *
- * @classconstant BSON_DATA_NUMBER
- **/
-BSON.BSON_DATA_NUMBER = 1;
-/**
- * String BSON Type
- *
- * @classconstant BSON_DATA_STRING
- **/
-BSON.BSON_DATA_STRING = 2;
-/**
- * Object BSON Type
- *
- * @classconstant BSON_DATA_OBJECT
- **/
-BSON.BSON_DATA_OBJECT = 3;
-/**
- * Array BSON Type
- *
- * @classconstant BSON_DATA_ARRAY
- **/
-BSON.BSON_DATA_ARRAY = 4;
-/**
- * Binary BSON Type
- *
- * @classconstant BSON_DATA_BINARY
- **/
-BSON.BSON_DATA_BINARY = 5;
-/**
- * ObjectID BSON Type
- *
- * @classconstant BSON_DATA_OID
- **/
-BSON.BSON_DATA_OID = 7;
-/**
- * Boolean BSON Type
- *
- * @classconstant BSON_DATA_BOOLEAN
- **/
-BSON.BSON_DATA_BOOLEAN = 8;
-/**
- * Date BSON Type
- *
- * @classconstant BSON_DATA_DATE
- **/
-BSON.BSON_DATA_DATE = 9;
-/**
- * null BSON Type
- *
- * @classconstant BSON_DATA_NULL
- **/
-BSON.BSON_DATA_NULL = 10;
-/**
- * RegExp BSON Type
- *
- * @classconstant BSON_DATA_REGEXP
- **/
-BSON.BSON_DATA_REGEXP = 11;
-/**
- * Code BSON Type
- *
- * @classconstant BSON_DATA_CODE
- **/
-BSON.BSON_DATA_CODE = 13;
-/**
- * Symbol BSON Type
- *
- * @classconstant BSON_DATA_SYMBOL
- **/
-BSON.BSON_DATA_SYMBOL = 14;
-/**
- * Code with Scope BSON Type
- *
- * @classconstant BSON_DATA_CODE_W_SCOPE
- **/
-BSON.BSON_DATA_CODE_W_SCOPE = 15;
-/**
- * 32 bit Integer BSON Type
- *
- * @classconstant BSON_DATA_INT
- **/
-BSON.BSON_DATA_INT = 16;
-/**
- * Timestamp BSON Type
- *
- * @classconstant BSON_DATA_TIMESTAMP
- **/
-BSON.BSON_DATA_TIMESTAMP = 17;
-/**
- * Long BSON Type
- *
- * @classconstant BSON_DATA_LONG
- **/
-BSON.BSON_DATA_LONG = 18;
-/**
- * MinKey BSON Type
- *
- * @classconstant BSON_DATA_MIN_KEY
- **/
-BSON.BSON_DATA_MIN_KEY = 0xff;
-/**
- * MaxKey BSON Type
- *
- * @classconstant BSON_DATA_MAX_KEY
- **/
-BSON.BSON_DATA_MAX_KEY = 0x7f;
-
-/**
- * Binary Default Type
- *
- * @classconstant BSON_BINARY_SUBTYPE_DEFAULT
- **/
-BSON.BSON_BINARY_SUBTYPE_DEFAULT = 0;
-/**
- * Binary Function Type
- *
- * @classconstant BSON_BINARY_SUBTYPE_FUNCTION
- **/
-BSON.BSON_BINARY_SUBTYPE_FUNCTION = 1;
-/**
- * Binary Byte Array Type
- *
- * @classconstant BSON_BINARY_SUBTYPE_BYTE_ARRAY
- **/
-BSON.BSON_BINARY_SUBTYPE_BYTE_ARRAY = 2;
-/**
- * Binary UUID Type
- *
- * @classconstant BSON_BINARY_SUBTYPE_UUID
- **/
-BSON.BSON_BINARY_SUBTYPE_UUID = 3;
-/**
- * Binary MD5 Type
- *
- * @classconstant BSON_BINARY_SUBTYPE_MD5
- **/
-BSON.BSON_BINARY_SUBTYPE_MD5 = 4;
-/**
- * Binary User Defined Type
- *
- * @classconstant BSON_BINARY_SUBTYPE_USER_DEFINED
- **/
-BSON.BSON_BINARY_SUBTYPE_USER_DEFINED = 128;
-
-// BSON MAX VALUES
-BSON.BSON_INT32_MAX = 0x7FFFFFFF;
-BSON.BSON_INT32_MIN = -0x80000000;
-
-BSON.BSON_INT64_MAX = Math.pow(2, 63) - 1;
-BSON.BSON_INT64_MIN = -Math.pow(2, 63);
-
-// JS MAX PRECISE VALUES
-BSON.JS_INT_MAX = 0x20000000000000;  // Any integer up to 2^53 can be precisely represented by a double.
-BSON.JS_INT_MIN = -0x20000000000000;  // Any integer down to -2^53 can be precisely represented by a double.
-
-// Internal long versions
-var JS_INT_MAX_LONG = Long.fromNumber(0x20000000000000);  // Any integer up to 2^53 can be precisely represented by a double.
-var JS_INT_MIN_LONG = Long.fromNumber(-0x20000000000000);  // Any integer down to -2^53 can be precisely represented by a double.
-
-module.exports = calculateObjectSize;
-
-}).call(this,require("buffer").Buffer)
-},{"../binary":61,"../code":64,"../db_ref":65,"../double":66,"../float_parser":67,"../long":68,"../max_key":70,"../min_key":71,"../objectid":72,"../regexp":76,"../symbol":77,"../timestamp":78,"buffer":52}],74:[function(require,module,exports){
-"use strict"
-
-var writeIEEE754 = require('../float_parser').writeIEEE754,
-	readIEEE754 = require('../float_parser').readIEEE754,
-	f = require('util').format,
-	Long = require('../long').Long,
-  Double = require('../double').Double,
-  Timestamp = require('../timestamp').Timestamp,
-  ObjectID = require('../objectid').ObjectID,
-  Symbol = require('../symbol').Symbol,
-  Code = require('../code').Code,
-  MinKey = require('../min_key').MinKey,
-  MaxKey = require('../max_key').MaxKey,
-  DBRef = require('../db_ref').DBRef,
-  BSONRegExp = require('../regexp').BSONRegExp,
-  Binary = require('../binary').Binary;
-
-var deserialize = function(buffer, options, isArray) {
-	var index = 0;
-	// Read the document size
-  var size = buffer[index++] | buffer[index++] << 8 | buffer[index++] << 16 | buffer[index++] << 24;
-
-	// Ensure buffer is valid size
-  if(size < 5 || buffer.length < size) {
-		throw new Error("corrupt bson message");
-	}
-
-	// Illegal end value
-	if(buffer[size - 1] != 0) {
-		throw new Error("One object, sized correctly, with a spot for an EOO, but the EOO isn't 0x00");
-	}
-
-	// Start deserializtion
-	return deserializeObject(buffer, options, isArray);
-}
-
-// Reads in a C style string
-var readCStyleStringSpecial = function(buffer, index) {
-	// Get the start search index
-	var i = index;
-	// Locate the end of the c string
-	while(buffer[i] !== 0x00 && i < buffer.length) {
-		i++
-	}
-	// If are at the end of the buffer there is a problem with the document
-	if(i >= buffer.length) throw new Error("Bad BSON Document: illegal CString")
-	// Grab utf8 encoded string
-	var string = buffer.toString('utf8', index, i);
-	// Update index position
-	index = i + 1;
-	// Return string
-	return {s: string, i: index};
-}
-
-var deserializeObject = function(buffer, options, isArray) {
-  // Options
-  options = options == null ? {} : options;
-  var evalFunctions = options['evalFunctions'] == null ? false : options['evalFunctions'];
-  var cacheFunctions = options['cacheFunctions'] == null ? false : options['cacheFunctions'];
-  var cacheFunctionsCrc32 = options['cacheFunctionsCrc32'] == null ? false : options['cacheFunctionsCrc32'];
-  var promoteLongs = options['promoteLongs'] == null ? true : options['promoteLongs'];
-	var fieldsAsRaw = options['fieldsAsRaw'] == null ? {} : options['fieldsAsRaw'];
-  // Return BSONRegExp objects instead of native regular expressions
-  var bsonRegExp = typeof options['bsonRegExp'] == 'boolean' ? options['bsonRegExp'] : false;
-  var promoteBuffers = options['promoteBuffers'] == null ? false : options['promoteBuffers'];
-
-  // Validate that we have at least 4 bytes of buffer
-  if(buffer.length < 5) throw new Error("corrupt bson message < 5 bytes long");
-
-  // Set up index
-  var index = typeof options['index'] == 'number' ? options['index'] : 0;
-
-	// Read the document size
-  var size = buffer[index++] | buffer[index++] << 8 | buffer[index++] << 16 | buffer[index++] << 24;
-
-	// Ensure buffer is valid size
-  if(size < 5 || size > buffer.length) throw new Error("corrupt bson message");
-
-  // Create holding object
-  var object = isArray ? [] : {};
-
-  // While we have more left data left keep parsing
-  while(true) {
-    // Read the type
-    var elementType = buffer[index++];
-    // If we get a zero it's the last byte, exit
-    if(elementType == 0) break;
-    // Read the name of the field
-    var r = readCStyleStringSpecial(buffer, index);
-		var name = r.s;
-		index = r.i;
-
-		// Switch on the type
-		if(elementType == BSON.BSON_DATA_OID) {
-      var string = buffer.toString('binary', index, index + 12);
-      // Decode the oid
-      object[name] = new ObjectID(string);
-      // Update index
-      index = index + 12;
-		} else if(elementType == BSON.BSON_DATA_STRING) {
-      // Read the content of the field
-      var stringSize = buffer[index++] | buffer[index++] << 8 | buffer[index++] << 16 | buffer[index++] << 24;
-			// Validate if string Size is larger than the actual provided buffer
-			if(stringSize <= 0 || stringSize > (buffer.length - index) || buffer[index + stringSize - 1] != 0) throw new Error("bad string length in bson");
-      // Add string to object
-      object[name] = buffer.toString('utf8', index, index + stringSize - 1);
-      // Update parse index position
-      index = index + stringSize;
-		} else if(elementType == BSON.BSON_DATA_INT) {
-      // Decode the 32bit value
-      object[name] = buffer[index++] | buffer[index++] << 8 | buffer[index++] << 16 | buffer[index++] << 24;
-		} else if(elementType == BSON.BSON_DATA_NUMBER) {
-      // Decode the double value
-      object[name] = readIEEE754(buffer, index, 'little', 52, 8);
-      // Update the index
-      index = index + 8;
-		} else if(elementType == BSON.BSON_DATA_DATE) {
-      // Unpack the low and high bits
-      var lowBits = buffer[index++] | buffer[index++] << 8 | buffer[index++] << 16 | buffer[index++] << 24;
-      var highBits = buffer[index++] | buffer[index++] << 8 | buffer[index++] << 16 | buffer[index++] << 24;
-      // Set date object
-      object[name] = new Date(new Long(lowBits, highBits).toNumber());
-		} else if(elementType == BSON.BSON_DATA_BOOLEAN) {
-      // Parse the boolean value
-      object[name] = buffer[index++] == 1;
-		} else if(elementType == BSON.BSON_DATA_UNDEFINED || elementType == BSON.BSON_DATA_NULL) {
-      // Parse the boolean value
-      object[name] = null;
-		} else if(elementType == BSON.BSON_DATA_BINARY) {
-      // Decode the size of the binary blob
-      var binarySize = buffer[index++] | buffer[index++] << 8 | buffer[index++] << 16 | buffer[index++] << 24;
-      // Decode the subtype
-      var subType = buffer[index++];
-      // Decode as raw Buffer object if options specifies it
-      if(buffer['slice'] != null) {
-        // If we have subtype 2 skip the 4 bytes for the size
-        if(subType == Binary.SUBTYPE_BYTE_ARRAY) {
-          binarySize = buffer[index++] | buffer[index++] << 8 | buffer[index++] << 16 | buffer[index++] << 24;
-        }
-        if(promoteBuffers) {
-          // assign reference to sliced Buffer object
-          object[name] = buffer.slice(index, index + binarySize);
-        } else {
-          // Slice the data
-          object[name] = new Binary(buffer.slice(index, index + binarySize), subType);
-        }
-      } else {
-        var _buffer = typeof Uint8Array != 'undefined' ? new Uint8Array(new ArrayBuffer(binarySize)) : new Array(binarySize);
-        // If we have subtype 2 skip the 4 bytes for the size
-        if(subType == Binary.SUBTYPE_BYTE_ARRAY) {
-          binarySize = buffer[index++] | buffer[index++] << 8 | buffer[index++] << 16 | buffer[index++] << 24;
-        }
-        // Copy the data
-        for(var i = 0; i < binarySize; i++) {
-          _buffer[i] = buffer[index + i];
-        }
-        if(promoteBuffers) {
-          // assign reference to Buffer object
-          object[name] = _buffer;
-        } else {
-          // Create the binary object
-          object[name] = new Binary(_buffer, subType);
-        }
-      }
-      // Update the index
-      index = index + binarySize;
-		} else if(elementType == BSON.BSON_DATA_ARRAY) {
-      options['index'] = index;
-      // Decode the size of the array document
-      var objectSize = buffer[index] | buffer[index + 1] << 8 | buffer[index + 2] << 16 | buffer[index + 3] << 24;
-			var arrayOptions = options;
-
-			// All elements of array to be returned as raw bson
-			if(fieldsAsRaw[name]) {
-				arrayOptions = {};
-				for(var n in options) arrayOptions[n] = options[n];
-				arrayOptions['raw'] = true;
-			}
-
-      // Set the array to the object
-      object[name] = deserializeObject(buffer, arrayOptions, true);
-      // Adjust the index
-      index = index + objectSize;
-		} else if(elementType == BSON.BSON_DATA_OBJECT) {
-      options['index'] = index;
-      // Decode the size of the object document
-      var objectSize = buffer[index] | buffer[index + 1] << 8 | buffer[index + 2] << 16 | buffer[index + 3] << 24;
-			// Validate if string Size is larger than the actual provided buffer
-			if(objectSize <= 0 || objectSize > (buffer.length - index)) throw new Error("bad embedded document length in bson");
-
-			// We have a raw value
-			if(options['raw']) {
-				// Set the array to the object
-	      object[name] = buffer.slice(index, index + objectSize);
-			} else {
-				// Set the array to the object
-	      object[name] = deserializeObject(buffer, options, false);
-			}
-
-      // Adjust the index
-      index = index + objectSize;
-		} else if(elementType == BSON.BSON_DATA_REGEXP && bsonRegExp == false) {
-      // Create the regexp
-			var r = readCStyleStringSpecial(buffer, index);
-			var source = r.s;
-			index = r.i;
-
-			var r = readCStyleStringSpecial(buffer, index);
-			var regExpOptions = r.s;
-			index = r.i;
-
-      // For each option add the corresponding one for javascript
-      var optionsArray = new Array(regExpOptions.length);
-
-      // Parse options
-      for(var i = 0; i < regExpOptions.length; i++) {
-        switch(regExpOptions[i]) {
-          case 'm':
-            optionsArray[i] = 'm';
-            break;
-          case 's':
-            optionsArray[i] = 'g';
-            break;
-          case 'i':
-            optionsArray[i] = 'i';
-            break;
-        }
-      }
-
-      object[name] = new RegExp(source, optionsArray.join(''));
-    } else if(elementType == BSON.BSON_DATA_REGEXP && bsonRegExp == true) {
-      // Create the regexp
-      var r = readCStyleStringSpecial(buffer, index);
-      var source = r.s;
-      index = r.i;
-
-      var r = readCStyleStringSpecial(buffer, index);
-      var regExpOptions = r.s;
-      index = r.i;
-
-      // Set the object
-      object[name] = new BSONRegExp(source, regExpOptions);      
-		} else if(elementType == BSON.BSON_DATA_LONG) {
-      // Unpack the low and high bits
-      var lowBits = buffer[index++] | buffer[index++] << 8 | buffer[index++] << 16 | buffer[index++] << 24;
-      var highBits = buffer[index++] | buffer[index++] << 8 | buffer[index++] << 16 | buffer[index++] << 24;
-      // Create long object
-      var long = new Long(lowBits, highBits);
-      // Promote the long if possible
-      if(promoteLongs) {
-        object[name] = long.lessThanOrEqual(JS_INT_MAX_LONG) && long.greaterThanOrEqual(JS_INT_MIN_LONG) ? long.toNumber() : long;
-      } else {
-        object[name] = long;
-      }
-		} else if(elementType == BSON.BSON_DATA_SYMBOL) {
-      // Read the content of the field
-      var stringSize = buffer[index++] | buffer[index++] << 8 | buffer[index++] << 16 | buffer[index++] << 24;
-			// Validate if string Size is larger than the actual provided buffer
-			if(stringSize <= 0 || stringSize > (buffer.length - index) || buffer[index + stringSize - 1] != 0) throw new Error("bad string length in bson");
-      // Add string to object
-      object[name] = new Symbol(buffer.toString('utf8', index, index + stringSize - 1));
-      // Update parse index position
-      index = index + stringSize;
-		} else if(elementType == BSON.BSON_DATA_TIMESTAMP) {
-      // Unpack the low and high bits
-      var lowBits = buffer[index++] | buffer[index++] << 8 | buffer[index++] << 16 | buffer[index++] << 24;
-      var highBits = buffer[index++] | buffer[index++] << 8 | buffer[index++] << 16 | buffer[index++] << 24;
-      // Set the object
-      object[name] = new Timestamp(lowBits, highBits);
-		} else if(elementType == BSON.BSON_DATA_MIN_KEY) {
-      // Parse the object
-      object[name] = new MinKey();
-		} else if(elementType == BSON.BSON_DATA_MAX_KEY) {
-      // Parse the object
-      object[name] = new MaxKey();
-		} else if(elementType == BSON.BSON_DATA_CODE) {
-      // Read the content of the field
-      var stringSize = buffer[index++] | buffer[index++] << 8 | buffer[index++] << 16 | buffer[index++] << 24;
-			// Validate if string Size is larger than the actual provided buffer
-			if(stringSize <= 0 || stringSize > (buffer.length - index) || buffer[index + stringSize - 1] != 0) throw new Error("bad string length in bson");
-      // Function string
-      var functionString = buffer.toString('utf8', index, index + stringSize - 1);
-
-      // If we are evaluating the functions
-      if(evalFunctions) {
-        // Contains the value we are going to set
-        var value = null;
-        // If we have cache enabled let's look for the md5 of the function in the cache
-        if(cacheFunctions) {
-          var hash = cacheFunctionsCrc32 ? crc32(functionString) : functionString;
-          // Got to do this to avoid V8 deoptimizing the call due to finding eval
-          object[name] = isolateEvalWithHash(functionCache, hash, functionString, object);
-        } else {
-          // Set directly
-          object[name] = isolateEval(functionString);
-        }
-      } else {
-        object[name]  = new Code(functionString, {});
-      }
-
-      // Update parse index position
-      index = index + stringSize;
-		} else if(elementType == BSON.BSON_DATA_CODE_W_SCOPE) {
-      // Read the content of the field
-      var totalSize = buffer[index++] | buffer[index++] << 8 | buffer[index++] << 16 | buffer[index++] << 24;
-      var stringSize = buffer[index++] | buffer[index++] << 8 | buffer[index++] << 16 | buffer[index++] << 24;
-			// Validate if string Size is larger than the actual provided buffer
-			if(stringSize <= 0 || stringSize > (buffer.length - index) || buffer[index + stringSize - 1] != 0) throw new Error("bad string length in bson");
-      // Javascript function
-      var functionString = buffer.toString('utf8', index, index + stringSize - 1);
-      // Update parse index position
-      index = index + stringSize;
-      // Parse the element
-      options['index'] = index;
-      // Decode the size of the object document
-      var objectSize = buffer[index] | buffer[index + 1] << 8 | buffer[index + 2] << 16 | buffer[index + 3] << 24;
-      // Decode the scope object
-      var scopeObject = deserializeObject(buffer, options, false);
-      // Adjust the index
-      index = index + objectSize;
-
-      // If we are evaluating the functions
-      if(evalFunctions) {
-        // Contains the value we are going to set
-        var value = null;
-        // If we have cache enabled let's look for the md5 of the function in the cache
-        if(cacheFunctions) {
-          var hash = cacheFunctionsCrc32 ? crc32(functionString) : functionString;
-          // Got to do this to avoid V8 deoptimizing the call due to finding eval
-          object[name] = isolateEvalWithHash(functionCache, hash, functionString, object);
-        } else {
-          // Set directly
-          object[name] = isolateEval(functionString);
-        }
-
-        // Set the scope on the object
-        object[name].scope = scopeObject;
-      } else {
-        object[name]  = new Code(functionString, scopeObject);
-      }
-    }
-  }
-
-  // Check if we have a db ref object
-  if(object['$id'] != null) object = new DBRef(object['$ref'], object['$id'], object['$db']);
-
-  // Return the final objects
-  return object;
-}
-
-/**
- * Ensure eval is isolated.
- *
- * @ignore
- * @api private
- */
-var isolateEvalWithHash = function(functionCache, hash, functionString, object) {
-  // Contains the value we are going to set
-  var value = null;
-
-  // Check for cache hit, eval if missing and return cached function
-  if(functionCache[hash] == null) {
-    eval("value = " + functionString);
-    functionCache[hash] = value;
-  }
-  // Set the object
-  return functionCache[hash].bind(object);
-}
-
-/**
- * Ensure eval is isolated.
- *
- * @ignore
- * @api private
- */
-var isolateEval = function(functionString) {
-  // Contains the value we are going to set
-  var value = null;
-  // Eval the function
-  eval("value = " + functionString);
-  return value;
-}
-
-var BSON = {};
-
-/**
- * Contains the function cache if we have that enable to allow for avoiding the eval step on each deserialization, comparison is by md5
- *
- * @ignore
- * @api private
- */
-var functionCache = BSON.functionCache = {};
-
-/**
- * Number BSON Type
- *
- * @classconstant BSON_DATA_NUMBER
- **/
-BSON.BSON_DATA_NUMBER = 1;
-/**
- * String BSON Type
- *
- * @classconstant BSON_DATA_STRING
- **/
-BSON.BSON_DATA_STRING = 2;
-/**
- * Object BSON Type
- *
- * @classconstant BSON_DATA_OBJECT
- **/
-BSON.BSON_DATA_OBJECT = 3;
-/**
- * Array BSON Type
- *
- * @classconstant BSON_DATA_ARRAY
- **/
-BSON.BSON_DATA_ARRAY = 4;
-/**
- * Binary BSON Type
- *
- * @classconstant BSON_DATA_BINARY
- **/
-BSON.BSON_DATA_BINARY = 5;
-/**
- * ObjectID BSON Type
- *
- * @classconstant BSON_DATA_OID
- **/
-BSON.BSON_DATA_OID = 7;
-/**
- * Boolean BSON Type
- *
- * @classconstant BSON_DATA_BOOLEAN
- **/
-BSON.BSON_DATA_BOOLEAN = 8;
-/**
- * Date BSON Type
- *
- * @classconstant BSON_DATA_DATE
- **/
-BSON.BSON_DATA_DATE = 9;
-/**
- * null BSON Type
- *
- * @classconstant BSON_DATA_NULL
- **/
-BSON.BSON_DATA_NULL = 10;
-/**
- * RegExp BSON Type
- *
- * @classconstant BSON_DATA_REGEXP
- **/
-BSON.BSON_DATA_REGEXP = 11;
-/**
- * Code BSON Type
- *
- * @classconstant BSON_DATA_CODE
- **/
-BSON.BSON_DATA_CODE = 13;
-/**
- * Symbol BSON Type
- *
- * @classconstant BSON_DATA_SYMBOL
- **/
-BSON.BSON_DATA_SYMBOL = 14;
-/**
- * Code with Scope BSON Type
- *
- * @classconstant BSON_DATA_CODE_W_SCOPE
- **/
-BSON.BSON_DATA_CODE_W_SCOPE = 15;
-/**
- * 32 bit Integer BSON Type
- *
- * @classconstant BSON_DATA_INT
- **/
-BSON.BSON_DATA_INT = 16;
-/**
- * Timestamp BSON Type
- *
- * @classconstant BSON_DATA_TIMESTAMP
- **/
-BSON.BSON_DATA_TIMESTAMP = 17;
-/**
- * Long BSON Type
- *
- * @classconstant BSON_DATA_LONG
- **/
-BSON.BSON_DATA_LONG = 18;
-/**
- * MinKey BSON Type
- *
- * @classconstant BSON_DATA_MIN_KEY
- **/
-BSON.BSON_DATA_MIN_KEY = 0xff;
-/**
- * MaxKey BSON Type
- *
- * @classconstant BSON_DATA_MAX_KEY
- **/
-BSON.BSON_DATA_MAX_KEY = 0x7f;
-
-/**
- * Binary Default Type
- *
- * @classconstant BSON_BINARY_SUBTYPE_DEFAULT
- **/
-BSON.BSON_BINARY_SUBTYPE_DEFAULT = 0;
-/**
- * Binary Function Type
- *
- * @classconstant BSON_BINARY_SUBTYPE_FUNCTION
- **/
-BSON.BSON_BINARY_SUBTYPE_FUNCTION = 1;
-/**
- * Binary Byte Array Type
- *
- * @classconstant BSON_BINARY_SUBTYPE_BYTE_ARRAY
- **/
-BSON.BSON_BINARY_SUBTYPE_BYTE_ARRAY = 2;
-/**
- * Binary UUID Type
- *
- * @classconstant BSON_BINARY_SUBTYPE_UUID
- **/
-BSON.BSON_BINARY_SUBTYPE_UUID = 3;
-/**
- * Binary MD5 Type
- *
- * @classconstant BSON_BINARY_SUBTYPE_MD5
- **/
-BSON.BSON_BINARY_SUBTYPE_MD5 = 4;
-/**
- * Binary User Defined Type
- *
- * @classconstant BSON_BINARY_SUBTYPE_USER_DEFINED
- **/
-BSON.BSON_BINARY_SUBTYPE_USER_DEFINED = 128;
-
-// BSON MAX VALUES
-BSON.BSON_INT32_MAX = 0x7FFFFFFF;
-BSON.BSON_INT32_MIN = -0x80000000;
-
-BSON.BSON_INT64_MAX = Math.pow(2, 63) - 1;
-BSON.BSON_INT64_MIN = -Math.pow(2, 63);
-
-// JS MAX PRECISE VALUES
-BSON.JS_INT_MAX = 0x20000000000000;  // Any integer up to 2^53 can be precisely represented by a double.
-BSON.JS_INT_MIN = -0x20000000000000;  // Any integer down to -2^53 can be precisely represented by a double.
-
-// Internal long versions
-var JS_INT_MAX_LONG = Long.fromNumber(0x20000000000000);  // Any integer up to 2^53 can be precisely represented by a double.
-var JS_INT_MIN_LONG = Long.fromNumber(-0x20000000000000);  // Any integer down to -2^53 can be precisely represented by a double.
-
-module.exports = deserialize
-
-},{"../binary":61,"../code":64,"../db_ref":65,"../double":66,"../float_parser":67,"../long":68,"../max_key":70,"../min_key":71,"../objectid":72,"../regexp":76,"../symbol":77,"../timestamp":78,"util":60}],75:[function(require,module,exports){
-(function (Buffer){
-"use strict"
-
-var writeIEEE754 = require('../float_parser').writeIEEE754,
-  readIEEE754 = require('../float_parser').readIEEE754,
-  Long = require('../long').Long,
-  Map = require('../map'),
-  Double = require('../double').Double,
-  Timestamp = require('../timestamp').Timestamp,
-  ObjectID = require('../objectid').ObjectID,
-  Symbol = require('../symbol').Symbol,
-  Code = require('../code').Code,
-  BSONRegExp = require('../regexp').BSONRegExp,
-  MinKey = require('../min_key').MinKey,
-  MaxKey = require('../max_key').MaxKey,
-  DBRef = require('../db_ref').DBRef,
-  Binary = require('../binary').Binary;
-
-var regexp = /\x00/
-
-// To ensure that 0.4 of node works correctly
-var isDate = function isDate(d) {
-  return typeof d === 'object' && Object.prototype.toString.call(d) === '[object Date]';
-}
-
-var isRegExp = function isRegExp(d) {
-  return Object.prototype.toString.call(d) === '[object RegExp]';
-}
-
-var serializeString = function(buffer, key, value, index) {
-  // Encode String type
-  buffer[index++] = BSON.BSON_DATA_STRING;
-  // Number of written bytes
-  var numberOfWrittenBytes = buffer.write(key, index, 'utf8');
-  // Encode the name
-  index = index + numberOfWrittenBytes + 1;
-  buffer[index - 1] = 0;
-  // Write the string
-  var size = buffer.write(value, index + 4, 'utf8');
-  // Write the size of the string to buffer
-  buffer[index + 3] = (size + 1 >> 24) & 0xff;
-  buffer[index + 2] = (size + 1 >> 16) & 0xff;
-  buffer[index + 1] = (size + 1 >> 8) & 0xff;
-  buffer[index] = size + 1 & 0xff;
-  // Update index
-  index = index + 4 + size;
-  // Write zero
-  buffer[index++] = 0;
-  return index;
-}
-
-var serializeNumber = function(buffer, key, value, index) {
-  // We have an integer value
-  if(Math.floor(value) === value && value >= BSON.JS_INT_MIN && value <= BSON.JS_INT_MAX) {
-    // If the value fits in 32 bits encode as int, if it fits in a double
-    // encode it as a double, otherwise long
-    if(value >= BSON.BSON_INT32_MIN && value <= BSON.BSON_INT32_MAX) {
-      // Set int type 32 bits or less
-      buffer[index++] = BSON.BSON_DATA_INT;
-      // Number of written bytes
-      var numberOfWrittenBytes = buffer.write(key, index, 'utf8');
-      // Encode the name
-      index = index + numberOfWrittenBytes;
-      buffer[index++] = 0;
-      // Write the int value
-      buffer[index++] = value & 0xff;
-      buffer[index++] = (value >> 8) & 0xff;
-      buffer[index++] = (value >> 16) & 0xff;
-      buffer[index++] = (value >> 24) & 0xff;
-    } else if(value >= BSON.JS_INT_MIN && value <= BSON.JS_INT_MAX) {
-      // Encode as double
-      buffer[index++] = BSON.BSON_DATA_NUMBER;
-      // Number of written bytes
-      var numberOfWrittenBytes = buffer.write(key, index, 'utf8');
-      // Encode the name
-      index = index + numberOfWrittenBytes;
-      buffer[index++] = 0;
-      // Write float
-      writeIEEE754(buffer, value, index, 'little', 52, 8);
-      // Ajust index
-      index = index + 8;
-    } else {
-      // Set long type
-      buffer[index++] = BSON.BSON_DATA_LONG;
-      // Number of written bytes
-      var numberOfWrittenBytes = buffer.write(key, index, 'utf8');
-      // Encode the name
-      index = index + numberOfWrittenBytes;
-      buffer[index++] = 0;
-      var longVal = Long.fromNumber(value);
-      var lowBits = longVal.getLowBits();
-      var highBits = longVal.getHighBits();
-      // Encode low bits
-      buffer[index++] = lowBits & 0xff;
-      buffer[index++] = (lowBits >> 8) & 0xff;
-      buffer[index++] = (lowBits >> 16) & 0xff;
-      buffer[index++] = (lowBits >> 24) & 0xff;
-      // Encode high bits
-      buffer[index++] = highBits & 0xff;
-      buffer[index++] = (highBits >> 8) & 0xff;
-      buffer[index++] = (highBits >> 16) & 0xff;
-      buffer[index++] = (highBits >> 24) & 0xff;
-    }
-  } else {
-    // Encode as double
-    buffer[index++] = BSON.BSON_DATA_NUMBER;
-    // Number of written bytes
-    var numberOfWrittenBytes = buffer.write(key, index, 'utf8');
-    // Encode the name
-    index = index + numberOfWrittenBytes;
-    buffer[index++] = 0;
-    // Write float
-    writeIEEE754(buffer, value, index, 'little', 52, 8);
-    // Ajust index
-    index = index + 8;
-  }
-
-  return index;
-}
-
-var serializeUndefined = function(buffer, key, value, index) {
-  // Set long type
-  buffer[index++] = BSON.BSON_DATA_NULL;
-  // Number of written bytes
-  var numberOfWrittenBytes = buffer.write(key, index, 'utf8');
-  // Encode the name
-  index = index + numberOfWrittenBytes;
-  buffer[index++] = 0;
-  return index;
-}
-
-var serializeBoolean = function(buffer, key, value, index) {
-  // Write the type
-  buffer[index++] = BSON.BSON_DATA_BOOLEAN;
-  // Number of written bytes
-  var numberOfWrittenBytes = buffer.write(key, index, 'utf8');
-  // Encode the name
-  index = index + numberOfWrittenBytes;
-  buffer[index++] = 0;
-  // Encode the boolean value
-  buffer[index++] = value ? 1 : 0;
-  return index;
-}
-
-var serializeDate = function(buffer, key, value, index) {
-  // Write the type
-  buffer[index++] = BSON.BSON_DATA_DATE;
-  // Number of written bytes
-  var numberOfWrittenBytes = buffer.write(key, index, 'utf8');
-  // Encode the name
-  index = index + numberOfWrittenBytes;
-  buffer[index++] = 0;
-
-  // Write the date
-  var dateInMilis = Long.fromNumber(value.getTime());
-  var lowBits = dateInMilis.getLowBits();
-  var highBits = dateInMilis.getHighBits();
-  // Encode low bits
-  buffer[index++] = lowBits & 0xff;
-  buffer[index++] = (lowBits >> 8) & 0xff;
-  buffer[index++] = (lowBits >> 16) & 0xff;
-  buffer[index++] = (lowBits >> 24) & 0xff;
-  // Encode high bits
-  buffer[index++] = highBits & 0xff;
-  buffer[index++] = (highBits >> 8) & 0xff;
-  buffer[index++] = (highBits >> 16) & 0xff;
-  buffer[index++] = (highBits >> 24) & 0xff;
-  return index;
-}
-
-var serializeRegExp = function(buffer, key, value, index) {
-  // Write the type
-  buffer[index++] = BSON.BSON_DATA_REGEXP;
-  // Number of written bytes
-  var numberOfWrittenBytes = buffer.write(key, index, 'utf8');
-  // Encode the name
-  index = index + numberOfWrittenBytes;
-  buffer[index++] = 0;
-  if (value.source && value.source.match(regexp) != null) {
-    throw Error("value " + value.source + " must not contain null bytes");
-  }
-  // Adjust the index
-  index = index + buffer.write(value.source, index, 'utf8');
-  // Write zero
-  buffer[index++] = 0x00;
-  // Write the parameters
-  if(value.global) buffer[index++] = 0x73; // s
-  if(value.ignoreCase) buffer[index++] = 0x69; // i
-  if(value.multiline) buffer[index++] = 0x6d; // m
-  // Add ending zero
-  buffer[index++] = 0x00;
-  return index;
-}
-
-var serializeBSONRegExp = function(buffer, key, value, index) {
-  // Write the type
-  buffer[index++] = BSON.BSON_DATA_REGEXP;
-  // Number of written bytes
-  var numberOfWrittenBytes = buffer.write(key, index, 'utf8');
-  // Encode the name
-  index = index + numberOfWrittenBytes;
-  buffer[index++] = 0;
-  // Adjust the index
-  index = index + buffer.write(value.pattern, index, 'utf8');
-  // Write zero
-  buffer[index++] = 0x00;
-  // Write the options
-  index = index + buffer.write(value.options, index, 'utf8');
-  // Add ending zero
-  buffer[index++] = 0x00;
-  return index;
-}
-
-var serializeMinMax = function(buffer, key, value, index) {
-  // Write the type of either min or max key
-  if(value === null) {
-    buffer[index++] = BSON.BSON_DATA_NULL;
-  } else if(value instanceof MinKey) {
-    buffer[index++] = BSON.BSON_DATA_MIN_KEY;
-  } else {
-    buffer[index++] = BSON.BSON_DATA_MAX_KEY;
-  }
-
-  // Number of written bytes
-  var numberOfWrittenBytes = buffer.write(key, index, 'utf8');
-  // Encode the name
-  index = index + numberOfWrittenBytes;
-  buffer[index++] = 0;
-  return index;
-}
-
-var serializeObjectId = function(buffer, key, value, index) {
-  // Write the type
-  buffer[index++] = BSON.BSON_DATA_OID;
-  // Number of written bytes
-  var numberOfWrittenBytes = buffer.write(key, index, 'utf8');
-
-  // Encode the name
-  index = index + numberOfWrittenBytes;
-  buffer[index++] = 0;
-
-  // Write the objectId into the shared buffer
-  buffer.write(value.id, index, 'binary')
-
-  // Ajust index
-  return index + 12;
-}
-
-var serializeBuffer = function(buffer, key, value, index) {
-  // Write the type
-  buffer[index++] = BSON.BSON_DATA_BINARY;
-  // Number of written bytes
-  var numberOfWrittenBytes = buffer.write(key, index, 'utf8');
-  // Encode the name
-  index = index + numberOfWrittenBytes;
-  buffer[index++] = 0;
-  // Get size of the buffer (current write point)
-  var size = value.length;
-  // Write the size of the string to buffer
-  buffer[index++] = size & 0xff;
-  buffer[index++] = (size >> 8) & 0xff;
-  buffer[index++] = (size >> 16) & 0xff;
-  buffer[index++] = (size >> 24) & 0xff;
-  // Write the default subtype
-  buffer[index++] = BSON.BSON_BINARY_SUBTYPE_DEFAULT;
-  // Copy the content form the binary field to the buffer
-  value.copy(buffer, index, 0, size);
-  // Adjust the index
-  index = index + size;
-  return index;
-}
-
-var serializeObject = function(buffer, key, value, index, checkKeys, depth, serializeFunctions, ignoreUndefined) {
-  // Write the type
-  buffer[index++] = Array.isArray(value) ? BSON.BSON_DATA_ARRAY : BSON.BSON_DATA_OBJECT;
-  // Number of written bytes
-  var numberOfWrittenBytes = buffer.write(key, index, 'utf8');
-  // Encode the name
-  index = index + numberOfWrittenBytes;
-  buffer[index++] = 0;
-  var endIndex = serializeInto(buffer, value, checkKeys, index, depth + 1, serializeFunctions, ignoreUndefined);
-  // Write size
-  var size = endIndex - index;
-  return endIndex;
-}
-
-var serializeLong = function(buffer, key, value, index) {
-  // Write the type
-  buffer[index++] = value instanceof Long ? BSON.BSON_DATA_LONG : BSON.BSON_DATA_TIMESTAMP;
-  // Number of written bytes
-  var numberOfWrittenBytes = buffer.write(key, index, 'utf8');
-  // Encode the name
-  index = index + numberOfWrittenBytes;
-  buffer[index++] = 0;
-  // Write the date
-  var lowBits = value.getLowBits();
-  var highBits = value.getHighBits();
-  // Encode low bits
-  buffer[index++] = lowBits & 0xff;
-  buffer[index++] = (lowBits >> 8) & 0xff;
-  buffer[index++] = (lowBits >> 16) & 0xff;
-  buffer[index++] = (lowBits >> 24) & 0xff;
-  // Encode high bits
-  buffer[index++] = highBits & 0xff;
-  buffer[index++] = (highBits >> 8) & 0xff;
-  buffer[index++] = (highBits >> 16) & 0xff;
-  buffer[index++] = (highBits >> 24) & 0xff;
-  return index;
-}
-
-var serializeDouble = function(buffer, key, value, index) {
-  // Encode as double
-  buffer[index++] = BSON.BSON_DATA_NUMBER;
-  // Number of written bytes
-  var numberOfWrittenBytes = buffer.write(key, index, 'utf8');
-  // Encode the name
-  index = index + numberOfWrittenBytes;
-  buffer[index++] = 0;
-  // Write float
-  writeIEEE754(buffer, value, index, 'little', 52, 8);
-  // Ajust index
-  index = index + 8;
-  return index;
-}
-
-var serializeFunction = function(buffer, key, value, index, checkKeys, depth) {
-  buffer[index++] = BSON.BSON_DATA_CODE;
-  // Number of written bytes
-  var numberOfWrittenBytes = buffer.write(key, index, 'utf8');
-  // Encode the name
-  index = index + numberOfWrittenBytes;
-  buffer[index++] = 0;
-  // Function string
-  var functionString = value.toString();
-  // Write the string
-  var size = buffer.write(functionString, index + 4, 'utf8') + 1;
-  // Write the size of the string to buffer
-  buffer[index] = size & 0xff;
-  buffer[index + 1] = (size >> 8) & 0xff;
-  buffer[index + 2] = (size >> 16) & 0xff;
-  buffer[index + 3] = (size >> 24) & 0xff;
-  // Update index
-  index = index + 4 + size - 1;
-  // Write zero
-  buffer[index++] = 0;
-  return index;
-}
-
-var serializeCode = function(buffer, key, value, index, checkKeys, depth, serializeFunctions, ignoreUndefined) {
-  if(value.scope != null && Object.keys(value.scope).length > 0) {
-    // Write the type
-    buffer[index++] = BSON.BSON_DATA_CODE_W_SCOPE;
-    // Number of written bytes
-    var numberOfWrittenBytes = buffer.write(key, index, 'utf8');
-    // Encode the name
-    index = index + numberOfWrittenBytes;
-    buffer[index++] = 0;
-
-    // Starting index
-    var startIndex = index;
-
-    // Serialize the function
-    // Get the function string
-    var functionString = typeof value.code == 'string' ? value.code : value.code.toString();
-    // Index adjustment
-    index = index + 4;
-    // Write string into buffer
-    var codeSize = buffer.write(functionString, index + 4, 'utf8') + 1;
-    // Write the size of the string to buffer
-    buffer[index] = codeSize & 0xff;
-    buffer[index + 1] = (codeSize >> 8) & 0xff;
-    buffer[index + 2] = (codeSize >> 16) & 0xff;
-    buffer[index + 3] = (codeSize >> 24) & 0xff;
-    // Write end 0
-    buffer[index + 4 + codeSize - 1] = 0;
-    // Write the
-    index = index + codeSize + 4;
-
-    //
-    // Serialize the scope value
-    var endIndex = serializeInto(buffer, value.scope, checkKeys, index, depth + 1, serializeFunctions, ignoreUndefined)
-    index = endIndex - 1;
-
-    // Writ the total
-    var totalSize = endIndex - startIndex;
-
-    // Write the total size of the object
-    buffer[startIndex++] = totalSize & 0xff;
-    buffer[startIndex++] = (totalSize >> 8) & 0xff;
-    buffer[startIndex++] = (totalSize >> 16) & 0xff;
-    buffer[startIndex++] = (totalSize >> 24) & 0xff;
-    // Write trailing zero
-    buffer[index++] = 0;
-  } else {
-    buffer[index++] = BSON.BSON_DATA_CODE;
-    // Number of written bytes
-    var numberOfWrittenBytes = buffer.write(key, index, 'utf8');
-    // Encode the name
-    index = index + numberOfWrittenBytes;
-    buffer[index++] = 0;
-    // Function string
-    var functionString = value.code.toString();
-    // Write the string
-    var size = buffer.write(functionString, index + 4, 'utf8') + 1;
-    // Write the size of the string to buffer
-    buffer[index] = size & 0xff;
-    buffer[index + 1] = (size >> 8) & 0xff;
-    buffer[index + 2] = (size >> 16) & 0xff;
-    buffer[index + 3] = (size >> 24) & 0xff;
-    // Update index
-    index = index + 4 + size - 1;
-    // Write zero
-    buffer[index++] = 0;
-  }
-
-  return index;
-}
-
-var serializeBinary = function(buffer, key, value, index) {
-  // Write the type
-  buffer[index++] = BSON.BSON_DATA_BINARY;
-  // Number of written bytes
-  var numberOfWrittenBytes = buffer.write(key, index, 'utf8');
-  // Encode the name
-  index = index + numberOfWrittenBytes;
-  buffer[index++] = 0;
-  // Extract the buffer
-  var data = value.value(true);
-  // Calculate size
-  var size = value.position;
-  // Write the size of the string to buffer
-  buffer[index++] = size & 0xff;
-  buffer[index++] = (size >> 8) & 0xff;
-  buffer[index++] = (size >> 16) & 0xff;
-  buffer[index++] = (size >> 24) & 0xff;
-  // Write the subtype to the buffer
-  buffer[index++] = value.sub_type;
-
-  // If we have binary type 2 the 4 first bytes are the size
-  if(value.sub_type == Binary.SUBTYPE_BYTE_ARRAY) {
-    buffer[index++] = size & 0xff;
-    buffer[index++] = (size >> 8) & 0xff;
-    buffer[index++] = (size >> 16) & 0xff;
-    buffer[index++] = (size >> 24) & 0xff;
-  }
-
-  // Write the data to the object
-  data.copy(buffer, index, 0, value.position);
-  // Adjust the index
-  index = index + value.position;
-  return index;
-}
-
-var serializeSymbol = function(buffer, key, value, index) {
-  // Write the type
-  buffer[index++] = BSON.BSON_DATA_SYMBOL;
-  // Number of written bytes
-  var numberOfWrittenBytes = buffer.write(key, index, 'utf8');
-  // Encode the name
-  index = index + numberOfWrittenBytes;
-  buffer[index++] = 0;
-  // Write the string
-  var size = buffer.write(value.value, index + 4, 'utf8') + 1;
-  // Write the size of the string to buffer
-  buffer[index] = size & 0xff;
-  buffer[index + 1] = (size >> 8) & 0xff;
-  buffer[index + 2] = (size >> 16) & 0xff;
-  buffer[index + 3] = (size >> 24) & 0xff;
-  // Update index
-  index = index + 4 + size - 1;
-  // Write zero
-  buffer[index++] = 0x00;
-  return index;
-}
-
-var serializeDBRef = function(buffer, key, value, index, depth, serializeFunctions) {
-  // Write the type
-  buffer[index++] = BSON.BSON_DATA_OBJECT;
-  // Number of written bytes
-  var numberOfWrittenBytes = buffer.write(key, index, 'utf8');
-
-  // Encode the name
-  index = index + numberOfWrittenBytes;
-  buffer[index++] = 0;
-
-  var startIndex = index;
-  var endIndex;
-
-  // Serialize object
-  if(null != value.db) {
-    endIndex = serializeInto(buffer, {
-        '$ref': value.namespace
-      , '$id' : value.oid
-      , '$db' : value.db
-    }, false, index, depth + 1, serializeFunctions);
-  } else {
-    endIndex = serializeInto(buffer, {
-        '$ref': value.namespace
-      , '$id' : value.oid
-    }, false, index, depth + 1, serializeFunctions);
-  }
-
-  // Calculate object size
-  var size = endIndex - startIndex;
-  // Write the size
-  buffer[startIndex++] = size & 0xff;
-  buffer[startIndex++] = (size >> 8) & 0xff;
-  buffer[startIndex++] = (size >> 16) & 0xff;
-  buffer[startIndex++] = (size >> 24) & 0xff;
-  // Set index
-  return endIndex;
-}
-
-var serializeInto = function serializeInto(buffer, object, checkKeys, startingIndex, depth, serializeFunctions, ignoreUndefined) {
-  startingIndex = startingIndex || 0;
-
-  // Start place to serialize into
-  var index = startingIndex + 4;
-  var self = this;
-
-  // Special case isArray
-  if(Array.isArray(object)) {
-    // Get object keys
-    for(var i = 0; i < object.length; i++) {
-      var key = "" + i;
-      var value = object[i];
-
-      // Is there an override value
-      if(value && value.toBSON) {
-        if(typeof value.toBSON != 'function') throw new Error("toBSON is not a function");
-        value = value.toBSON();
-      }
-
-      var type = typeof value;
-      if(type == 'string') {
-        index = serializeString(buffer, key, value, index);
-      } else if(type == 'number') {
-        index = serializeNumber(buffer, key, value, index);
-      } else if(type == 'boolean') {
-        index = serializeBoolean(buffer, key, value, index);
-      } else if(value instanceof Date || isDate(value)) {
-        index = serializeDate(buffer, key, value, index);
-      } else if(type == 'undefined' || value == null) {
-        index = serializeUndefined(buffer, key, value, index);
-      } else if(value['_bsontype'] == 'ObjectID') {
-        index = serializeObjectId(buffer, key, value, index);
-      } else if(Buffer.isBuffer(value)) {
-        index = serializeBuffer(buffer, key, value, index);
-      } else if(value instanceof RegExp || isRegExp(value)) {
-        index = serializeRegExp(buffer, key, value, index);
-      } else if(type == 'object' && value['_bsontype'] == null) {
-        index = serializeObject(buffer, key, value, index, checkKeys, depth, serializeFunctions, ignoreUndefined);
-      } else if(value['_bsontype'] == 'Long' || value['_bsontype'] == 'Timestamp') {
-        index = serializeLong(buffer, key, value, index);
-      } else if(value['_bsontype'] == 'Double') {
-        index = serializeDouble(buffer, key, value, index);
-      } else if(typeof value == 'function' && serializeFunctions) {
-        index = serializeFunction(buffer, key, value, index, checkKeys, depth, serializeFunctions);
-      } else if(value['_bsontype'] == 'Code') {
-        index = serializeCode(buffer, key, value, index, checkKeys, depth, serializeFunctions, ignoreUndefined);
-      } else if(value['_bsontype'] == 'Binary') {
-        index = serializeBinary(buffer, key, value, index);
-      } else if(value['_bsontype'] == 'Symbol') {
-        index = serializeSymbol(buffer, key, value, index);
-      } else if(value['_bsontype'] == 'DBRef') {
-        index = serializeDBRef(buffer, key, value, index, depth, serializeFunctions);
-      } else if(value['_bsontype'] == 'BSONRegExp') {
-        index = serializeBSONRegExp(buffer, key, value, index);        
-      } else if(value['_bsontype'] == 'MinKey' || value['_bsontype'] == 'MaxKey') {
-        index = serializeMinMax(buffer, key, value, index);
-      }
-    }
-  } else if(object instanceof Map) {
-    var iterator = object.entries();
-    var done = false;
-
-    while(!done) {
-      // Unpack the next entry
-      var entry = iterator.next();
-      done = entry.done;
-      // Are we done, then skip and terminate
-      if(done) continue;
-
-      // Get the entry values
-      var key = entry.value[0];
-      var value = entry.value[1];
-
-      // Check the type of the value
-      var type = typeof value;
-
-      // Check the key and throw error if it's illegal
-      if(key != '$db' && key != '$ref' && key != '$id') {
-        if (key.match(regexp) != null) {
-          // The BSON spec doesn't allow keys with null bytes because keys are
-          // null-terminated.
-          throw Error("key " + key + " must not contain null bytes");
-        }
-
-        if (checkKeys) {
-          if('$' == key[0]) {
-            throw Error("key " + key + " must not start with '$'");
-          } else if (!!~key.indexOf('.')) {
-            throw Error("key " + key + " must not contain '.'");
-          }
-        }
-      }
-      
-      // console.log("---------------------------------------------------")
-      // console.dir("key = " + key)
-      // console.dir("value = " + value)
-
-      if(type == 'string') {
-        index = serializeString(buffer, key, value, index);
-      } else if(type == 'number') {
-        index = serializeNumber(buffer, key, value, index);
-      } else if(type == 'boolean') {
-        index = serializeBoolean(buffer, key, value, index);
-      } else if(value instanceof Date || isDate(value)) {
-        index = serializeDate(buffer, key, value, index);
-      } else if(value === undefined && ignoreUndefined == true) {
-      } else if(value === null || value === undefined) {
-        index = serializeUndefined(buffer, key, value, index);
-      } else if(value['_bsontype'] == 'ObjectID') {
-        index = serializeObjectId(buffer, key, value, index);
-      } else if(Buffer.isBuffer(value)) {
-        index = serializeBuffer(buffer, key, value, index);
-      } else if(value instanceof RegExp || isRegExp(value)) {
-        index = serializeRegExp(buffer, key, value, index);
-      } else if(type == 'object' && value['_bsontype'] == null) {
-        index = serializeObject(buffer, key, value, index, checkKeys, depth, serializeFunctions, ignoreUndefined);
-      } else if(value['_bsontype'] == 'Long' || value['_bsontype'] == 'Timestamp') {
-        index = serializeLong(buffer, key, value, index);
-      } else if(value['_bsontype'] == 'Double') {
-        index = serializeDouble(buffer, key, value, index);
-      } else if(value['_bsontype'] == 'Code') {
-        index = serializeCode(buffer, key, value, index, checkKeys, depth, serializeFunctions, ignoreUndefined);
-      } else if(typeof value == 'function' && serializeFunctions) {
-        index = serializeFunction(buffer, key, value, index, checkKeys, depth, serializeFunctions);
-      } else if(value['_bsontype'] == 'Binary') {
-        index = serializeBinary(buffer, key, value, index);
-      } else if(value['_bsontype'] == 'Symbol') {
-        index = serializeSymbol(buffer, key, value, index);
-      } else if(value['_bsontype'] == 'DBRef') {
-        index = serializeDBRef(buffer, key, value, index, depth, serializeFunctions);
-      } else if(value['_bsontype'] == 'BSONRegExp') {
-        index = serializeBSONRegExp(buffer, key, value, index);        
-      } else if(value['_bsontype'] == 'MinKey' || value['_bsontype'] == 'MaxKey') {
-        index = serializeMinMax(buffer, key, value, index);
-      }
-    }
-  } else {
-    // Did we provide a custom serialization method
-    if(object.toBSON) {
-      if(typeof object.toBSON != 'function') throw new Error("toBSON is not a function");
-      object = object.toBSON();
-      if(object != null && typeof object != 'object') throw new Error("toBSON function did not return an object");
-    }
-
-    // Iterate over all the keys
-    for(var key in object) {
-      var value = object[key];
-      // Is there an override value
-      if(value && value.toBSON) {
-        if(typeof value.toBSON != 'function') throw new Error("toBSON is not a function");
-        value = value.toBSON();
-      }
-
-      // Check the type of the value
-      var type = typeof value;
-
-      // Check the key and throw error if it's illegal
-      if(key != '$db' && key != '$ref' && key != '$id') {
-        if (key.match(regexp) != null) {
-          // The BSON spec doesn't allow keys with null bytes because keys are
-          // null-terminated.
-          throw Error("key " + key + " must not contain null bytes");
-        }
-
-        if (checkKeys) {
-          if('$' == key[0]) {
-            throw Error("key " + key + " must not start with '$'");
-          } else if (!!~key.indexOf('.')) {
-            throw Error("key " + key + " must not contain '.'");
-          }
-        }
-      }
-
-      if(type == 'string') {
-        index = serializeString(buffer, key, value, index);
-      } else if(type == 'number') {
-        index = serializeNumber(buffer, key, value, index);
-      } else if(type == 'boolean') {
-        index = serializeBoolean(buffer, key, value, index);
-      } else if(value instanceof Date || isDate(value)) {
-        index = serializeDate(buffer, key, value, index);
-      } else if(value === undefined && ignoreUndefined == true) {
-      } else if(value === null || value === undefined) {
-        index = serializeUndefined(buffer, key, value, index);
-      } else if(value['_bsontype'] == 'ObjectID') {
-        index = serializeObjectId(buffer, key, value, index);
-      } else if(Buffer.isBuffer(value)) {
-        index = serializeBuffer(buffer, key, value, index);
-      } else if(value instanceof RegExp || isRegExp(value)) {
-        index = serializeRegExp(buffer, key, value, index);
-      } else if(type == 'object' && value['_bsontype'] == null) {
-        index = serializeObject(buffer, key, value, index, checkKeys, depth, serializeFunctions, ignoreUndefined);
-      } else if(value['_bsontype'] == 'Long' || value['_bsontype'] == 'Timestamp') {
-        index = serializeLong(buffer, key, value, index);
-      } else if(value['_bsontype'] == 'Double') {
-        index = serializeDouble(buffer, key, value, index);
-      } else if(value['_bsontype'] == 'Code') {
-        index = serializeCode(buffer, key, value, index, checkKeys, depth, serializeFunctions, ignoreUndefined);
-      } else if(typeof value == 'function' && serializeFunctions) {
-        index = serializeFunction(buffer, key, value, index, checkKeys, depth, serializeFunctions);
-      } else if(value['_bsontype'] == 'Binary') {
-        index = serializeBinary(buffer, key, value, index);
-      } else if(value['_bsontype'] == 'Symbol') {
-        index = serializeSymbol(buffer, key, value, index);
-      } else if(value['_bsontype'] == 'DBRef') {
-        index = serializeDBRef(buffer, key, value, index, depth, serializeFunctions);
-      } else if(value['_bsontype'] == 'BSONRegExp') {
-        index = serializeBSONRegExp(buffer, key, value, index);        
-      } else if(value['_bsontype'] == 'MinKey' || value['_bsontype'] == 'MaxKey') {
-        index = serializeMinMax(buffer, key, value, index);
-      }
-    }
-  }
-
-  // Final padding byte for object
-  buffer[index++] = 0x00;
-
-  // Final size
-  var size = index - startingIndex;
-  // Write the size of the object
-  buffer[startingIndex++] = size & 0xff;
-  buffer[startingIndex++] = (size >> 8) & 0xff;
-  buffer[startingIndex++] = (size >> 16) & 0xff;
-  buffer[startingIndex++] = (size >> 24) & 0xff;
-  return index;
-}
-
-var BSON = {};
-
-/**
- * Contains the function cache if we have that enable to allow for avoiding the eval step on each deserialization, comparison is by md5
- *
- * @ignore
- * @api private
- */
-var functionCache = BSON.functionCache = {};
-
-/**
- * Number BSON Type
- *
- * @classconstant BSON_DATA_NUMBER
- **/
-BSON.BSON_DATA_NUMBER = 1;
-/**
- * String BSON Type
- *
- * @classconstant BSON_DATA_STRING
- **/
-BSON.BSON_DATA_STRING = 2;
-/**
- * Object BSON Type
- *
- * @classconstant BSON_DATA_OBJECT
- **/
-BSON.BSON_DATA_OBJECT = 3;
-/**
- * Array BSON Type
- *
- * @classconstant BSON_DATA_ARRAY
- **/
-BSON.BSON_DATA_ARRAY = 4;
-/**
- * Binary BSON Type
- *
- * @classconstant BSON_DATA_BINARY
- **/
-BSON.BSON_DATA_BINARY = 5;
-/**
- * ObjectID BSON Type
- *
- * @classconstant BSON_DATA_OID
- **/
-BSON.BSON_DATA_OID = 7;
-/**
- * Boolean BSON Type
- *
- * @classconstant BSON_DATA_BOOLEAN
- **/
-BSON.BSON_DATA_BOOLEAN = 8;
-/**
- * Date BSON Type
- *
- * @classconstant BSON_DATA_DATE
- **/
-BSON.BSON_DATA_DATE = 9;
-/**
- * null BSON Type
- *
- * @classconstant BSON_DATA_NULL
- **/
-BSON.BSON_DATA_NULL = 10;
-/**
- * RegExp BSON Type
- *
- * @classconstant BSON_DATA_REGEXP
- **/
-BSON.BSON_DATA_REGEXP = 11;
-/**
- * Code BSON Type
- *
- * @classconstant BSON_DATA_CODE
- **/
-BSON.BSON_DATA_CODE = 13;
-/**
- * Symbol BSON Type
- *
- * @classconstant BSON_DATA_SYMBOL
- **/
-BSON.BSON_DATA_SYMBOL = 14;
-/**
- * Code with Scope BSON Type
- *
- * @classconstant BSON_DATA_CODE_W_SCOPE
- **/
-BSON.BSON_DATA_CODE_W_SCOPE = 15;
-/**
- * 32 bit Integer BSON Type
- *
- * @classconstant BSON_DATA_INT
- **/
-BSON.BSON_DATA_INT = 16;
-/**
- * Timestamp BSON Type
- *
- * @classconstant BSON_DATA_TIMESTAMP
- **/
-BSON.BSON_DATA_TIMESTAMP = 17;
-/**
- * Long BSON Type
- *
- * @classconstant BSON_DATA_LONG
- **/
-BSON.BSON_DATA_LONG = 18;
-/**
- * MinKey BSON Type
- *
- * @classconstant BSON_DATA_MIN_KEY
- **/
-BSON.BSON_DATA_MIN_KEY = 0xff;
-/**
- * MaxKey BSON Type
- *
- * @classconstant BSON_DATA_MAX_KEY
- **/
-BSON.BSON_DATA_MAX_KEY = 0x7f;
-
-/**
- * Binary Default Type
- *
- * @classconstant BSON_BINARY_SUBTYPE_DEFAULT
- **/
-BSON.BSON_BINARY_SUBTYPE_DEFAULT = 0;
-/**
- * Binary Function Type
- *
- * @classconstant BSON_BINARY_SUBTYPE_FUNCTION
- **/
-BSON.BSON_BINARY_SUBTYPE_FUNCTION = 1;
-/**
- * Binary Byte Array Type
- *
- * @classconstant BSON_BINARY_SUBTYPE_BYTE_ARRAY
- **/
-BSON.BSON_BINARY_SUBTYPE_BYTE_ARRAY = 2;
-/**
- * Binary UUID Type
- *
- * @classconstant BSON_BINARY_SUBTYPE_UUID
- **/
-BSON.BSON_BINARY_SUBTYPE_UUID = 3;
-/**
- * Binary MD5 Type
- *
- * @classconstant BSON_BINARY_SUBTYPE_MD5
- **/
-BSON.BSON_BINARY_SUBTYPE_MD5 = 4;
-/**
- * Binary User Defined Type
- *
- * @classconstant BSON_BINARY_SUBTYPE_USER_DEFINED
- **/
-BSON.BSON_BINARY_SUBTYPE_USER_DEFINED = 128;
-
-// BSON MAX VALUES
-BSON.BSON_INT32_MAX = 0x7FFFFFFF;
-BSON.BSON_INT32_MIN = -0x80000000;
-
-BSON.BSON_INT64_MAX = Math.pow(2, 63) - 1;
-BSON.BSON_INT64_MIN = -Math.pow(2, 63);
-
-// JS MAX PRECISE VALUES
-BSON.JS_INT_MAX = 0x20000000000000;  // Any integer up to 2^53 can be precisely represented by a double.
-BSON.JS_INT_MIN = -0x20000000000000;  // Any integer down to -2^53 can be precisely represented by a double.
-
-// Internal long versions
-var JS_INT_MAX_LONG = Long.fromNumber(0x20000000000000);  // Any integer up to 2^53 can be precisely represented by a double.
-var JS_INT_MIN_LONG = Long.fromNumber(-0x20000000000000);  // Any integer down to -2^53 can be precisely represented by a double.
-
-module.exports = serializeInto;
-
-}).call(this,require("buffer").Buffer)
-},{"../binary":61,"../code":64,"../db_ref":65,"../double":66,"../float_parser":67,"../long":68,"../map":69,"../max_key":70,"../min_key":71,"../objectid":72,"../regexp":76,"../symbol":77,"../timestamp":78,"buffer":52}],76:[function(require,module,exports){
-/**
- * A class representation of the BSON RegExp type.
- *
- * @class
- * @return {BSONRegExp} A MinKey instance
- */
-function BSONRegExp(pattern, options) {
-  if(!(this instanceof BSONRegExp)) return new BSONRegExp();
-  
-  // Execute
-  this._bsontype = 'BSONRegExp';
-  this.pattern = pattern;
-  this.options = options;
-
-  // Validate options
-  for(var i = 0; i < options.length; i++) {
-    if(!(this.options[i] == 'i' 
-      || this.options[i] == 'm'
-      || this.options[i] == 'x'
-      || this.options[i] == 'l'
-      || this.options[i] == 's'
-      || this.options[i] == 'u'
-    )) {
-      throw new Error('the regular expression options [' + this.options[i] + "] is not supported");
-    }
-  }
-}
-
-module.exports = BSONRegExp;
-module.exports.BSONRegExp = BSONRegExp;
-},{}],77:[function(require,module,exports){
-/**
- * A class representation of the BSON Symbol type.
- *
- * @class
- * @deprecated
- * @param {string} value the string representing the symbol.
- * @return {Symbol}
- */
-function Symbol(value) {
-  if(!(this instanceof Symbol)) return new Symbol(value);
-  this._bsontype = 'Symbol';
-  this.value = value;
-}
-
-/**
- * Access the wrapped string value.
- *
- * @method
- * @return {String} returns the wrapped string.
- */
-Symbol.prototype.valueOf = function() {
-  return this.value;
-};
-
-/**
- * @ignore
- */
-Symbol.prototype.toString = function() {
-  return this.value;
-}
-
-/**
- * @ignore
- */
-Symbol.prototype.inspect = function() {
-  return this.value;
-}
-
-/**
- * @ignore
- */
-Symbol.prototype.toJSON = function() {
-  return this.value;
-}
-
-module.exports = Symbol;
-module.exports.Symbol = Symbol;
-},{}],78:[function(require,module,exports){
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
-// Copyright 2009 Google Inc. All Rights Reserved
-
-/**
- * This type is for INTERNAL use in MongoDB only and should not be used in applications.
- * The appropriate corresponding type is the JavaScript Date type.
- * 
- * Defines a Timestamp class for representing a 64-bit two's-complement
- * integer value, which faithfully simulates the behavior of a Java "Timestamp". This
- * implementation is derived from TimestampLib in GWT.
- *
- * Constructs a 64-bit two's-complement integer, given its low and high 32-bit
- * values as *signed* integers.  See the from* functions below for more
- * convenient ways of constructing Timestamps.
- *
- * The internal representation of a Timestamp is the two given signed, 32-bit values.
- * We use 32-bit pieces because these are the size of integers on which
- * Javascript performs bit-operations.  For operations like addition and
- * multiplication, we split each number into 16-bit pieces, which can easily be
- * multiplied within Javascript's floating-point representation without overflow
- * or change in sign.
- *
- * In the algorithms below, we frequently reduce the negative case to the
- * positive case by negating the input(s) and then post-processing the result.
- * Note that we must ALWAYS check specially whether those values are MIN_VALUE
- * (-2^63) because -MIN_VALUE == MIN_VALUE (since 2^63 cannot be represented as
- * a positive number, it overflows back into a negative).  Not handling this
- * case would often result in infinite recursion.
- *
- * @class
- * @param {number} low  the low (signed) 32 bits of the Timestamp.
- * @param {number} high the high (signed) 32 bits of the Timestamp.
- */
-function Timestamp(low, high) {
-  if(!(this instanceof Timestamp)) return new Timestamp(low, high);
-  this._bsontype = 'Timestamp';
-  /**
-   * @type {number}
-   * @ignore
-   */
-  this.low_ = low | 0;  // force into 32 signed bits.
-
-  /**
-   * @type {number}
-   * @ignore
-   */
-  this.high_ = high | 0;  // force into 32 signed bits.
-};
-
-/**
- * Return the int value.
- *
- * @return {number} the value, assuming it is a 32-bit integer.
- */
-Timestamp.prototype.toInt = function() {
-  return this.low_;
-};
-
-/**
- * Return the Number value.
- *
- * @method
- * @return {number} the closest floating-point representation to this value.
- */
-Timestamp.prototype.toNumber = function() {
-  return this.high_ * Timestamp.TWO_PWR_32_DBL_ +
-         this.getLowBitsUnsigned();
-};
-
-/**
- * Return the JSON value.
- *
- * @method
- * @return {string} the JSON representation.
- */
-Timestamp.prototype.toJSON = function() {
-  return this.toString();
-}
-
-/**
- * Return the String value.
- *
- * @method
- * @param {number} [opt_radix] the radix in which the text should be written.
- * @return {string} the textual representation of this value.
- */
-Timestamp.prototype.toString = function(opt_radix) {
-  var radix = opt_radix || 10;
-  if (radix < 2 || 36 < radix) {
-    throw Error('radix out of range: ' + radix);
-  }
-
-  if (this.isZero()) {
-    return '0';
-  }
-
-  if (this.isNegative()) {
-    if (this.equals(Timestamp.MIN_VALUE)) {
-      // We need to change the Timestamp value before it can be negated, so we remove
-      // the bottom-most digit in this base and then recurse to do the rest.
-      var radixTimestamp = Timestamp.fromNumber(radix);
-      var div = this.div(radixTimestamp);
-      var rem = div.multiply(radixTimestamp).subtract(this);
-      return div.toString(radix) + rem.toInt().toString(radix);
-    } else {
-      return '-' + this.negate().toString(radix);
-    }
-  }
-
-  // Do several (6) digits each time through the loop, so as to
-  // minimize the calls to the very expensive emulated div.
-  var radixToPower = Timestamp.fromNumber(Math.pow(radix, 6));
-
-  var rem = this;
-  var result = '';
-  while (true) {
-    var remDiv = rem.div(radixToPower);
-    var intval = rem.subtract(remDiv.multiply(radixToPower)).toInt();
-    var digits = intval.toString(radix);
-
-    rem = remDiv;
-    if (rem.isZero()) {
-      return digits + result;
-    } else {
-      while (digits.length < 6) {
-        digits = '0' + digits;
-      }
-      result = '' + digits + result;
-    }
-  }
-};
-
-/**
- * Return the high 32-bits value.
- *
- * @method
- * @return {number} the high 32-bits as a signed value.
- */
-Timestamp.prototype.getHighBits = function() {
-  return this.high_;
-};
-
-/**
- * Return the low 32-bits value.
- *
- * @method
- * @return {number} the low 32-bits as a signed value.
- */
-Timestamp.prototype.getLowBits = function() {
-  return this.low_;
-};
-
-/**
- * Return the low unsigned 32-bits value.
- *
- * @method
- * @return {number} the low 32-bits as an unsigned value.
- */
-Timestamp.prototype.getLowBitsUnsigned = function() {
-  return (this.low_ >= 0) ?
-      this.low_ : Timestamp.TWO_PWR_32_DBL_ + this.low_;
-};
-
-/**
- * Returns the number of bits needed to represent the absolute value of this Timestamp.
- *
- * @method
- * @return {number} Returns the number of bits needed to represent the absolute value of this Timestamp.
- */
-Timestamp.prototype.getNumBitsAbs = function() {
-  if (this.isNegative()) {
-    if (this.equals(Timestamp.MIN_VALUE)) {
-      return 64;
-    } else {
-      return this.negate().getNumBitsAbs();
-    }
-  } else {
-    var val = this.high_ != 0 ? this.high_ : this.low_;
-    for (var bit = 31; bit > 0; bit--) {
-      if ((val & (1 << bit)) != 0) {
-        break;
-      }
-    }
-    return this.high_ != 0 ? bit + 33 : bit + 1;
-  }
-};
-
-/**
- * Return whether this value is zero.
- *
- * @method
- * @return {boolean} whether this value is zero.
- */
-Timestamp.prototype.isZero = function() {
-  return this.high_ == 0 && this.low_ == 0;
-};
-
-/**
- * Return whether this value is negative.
- *
- * @method
- * @return {boolean} whether this value is negative.
- */
-Timestamp.prototype.isNegative = function() {
-  return this.high_ < 0;
-};
-
-/**
- * Return whether this value is odd.
- *
- * @method
- * @return {boolean} whether this value is odd.
- */
-Timestamp.prototype.isOdd = function() {
-  return (this.low_ & 1) == 1;
-};
-
-/**
- * Return whether this Timestamp equals the other
- *
- * @method
- * @param {Timestamp} other Timestamp to compare against.
- * @return {boolean} whether this Timestamp equals the other
- */
-Timestamp.prototype.equals = function(other) {
-  return (this.high_ == other.high_) && (this.low_ == other.low_);
-};
-
-/**
- * Return whether this Timestamp does not equal the other.
- *
- * @method
- * @param {Timestamp} other Timestamp to compare against.
- * @return {boolean} whether this Timestamp does not equal the other.
- */
-Timestamp.prototype.notEquals = function(other) {
-  return (this.high_ != other.high_) || (this.low_ != other.low_);
-};
-
-/**
- * Return whether this Timestamp is less than the other.
- *
- * @method
- * @param {Timestamp} other Timestamp to compare against.
- * @return {boolean} whether this Timestamp is less than the other.
- */
-Timestamp.prototype.lessThan = function(other) {
-  return this.compare(other) < 0;
-};
-
-/**
- * Return whether this Timestamp is less than or equal to the other.
- *
- * @method
- * @param {Timestamp} other Timestamp to compare against.
- * @return {boolean} whether this Timestamp is less than or equal to the other.
- */
-Timestamp.prototype.lessThanOrEqual = function(other) {
-  return this.compare(other) <= 0;
-};
-
-/**
- * Return whether this Timestamp is greater than the other.
- *
- * @method
- * @param {Timestamp} other Timestamp to compare against.
- * @return {boolean} whether this Timestamp is greater than the other.
- */
-Timestamp.prototype.greaterThan = function(other) {
-  return this.compare(other) > 0;
-};
-
-/**
- * Return whether this Timestamp is greater than or equal to the other.
- *
- * @method
- * @param {Timestamp} other Timestamp to compare against.
- * @return {boolean} whether this Timestamp is greater than or equal to the other.
- */
-Timestamp.prototype.greaterThanOrEqual = function(other) {
-  return this.compare(other) >= 0;
-};
-
-/**
- * Compares this Timestamp with the given one.
- *
- * @method
- * @param {Timestamp} other Timestamp to compare against.
- * @return {boolean} 0 if they are the same, 1 if the this is greater, and -1 if the given one is greater.
- */
-Timestamp.prototype.compare = function(other) {
-  if (this.equals(other)) {
-    return 0;
-  }
-
-  var thisNeg = this.isNegative();
-  var otherNeg = other.isNegative();
-  if (thisNeg && !otherNeg) {
-    return -1;
-  }
-  if (!thisNeg && otherNeg) {
-    return 1;
-  }
-
-  // at this point, the signs are the same, so subtraction will not overflow
-  if (this.subtract(other).isNegative()) {
-    return -1;
-  } else {
-    return 1;
-  }
-};
-
-/**
- * The negation of this value.
- *
- * @method
- * @return {Timestamp} the negation of this value.
- */
-Timestamp.prototype.negate = function() {
-  if (this.equals(Timestamp.MIN_VALUE)) {
-    return Timestamp.MIN_VALUE;
-  } else {
-    return this.not().add(Timestamp.ONE);
-  }
-};
-
-/**
- * Returns the sum of this and the given Timestamp.
- *
- * @method
- * @param {Timestamp} other Timestamp to add to this one.
- * @return {Timestamp} the sum of this and the given Timestamp.
- */
-Timestamp.prototype.add = function(other) {
-  // Divide each number into 4 chunks of 16 bits, and then sum the chunks.
-
-  var a48 = this.high_ >>> 16;
-  var a32 = this.high_ & 0xFFFF;
-  var a16 = this.low_ >>> 16;
-  var a00 = this.low_ & 0xFFFF;
-
-  var b48 = other.high_ >>> 16;
-  var b32 = other.high_ & 0xFFFF;
-  var b16 = other.low_ >>> 16;
-  var b00 = other.low_ & 0xFFFF;
-
-  var c48 = 0, c32 = 0, c16 = 0, c00 = 0;
-  c00 += a00 + b00;
-  c16 += c00 >>> 16;
-  c00 &= 0xFFFF;
-  c16 += a16 + b16;
-  c32 += c16 >>> 16;
-  c16 &= 0xFFFF;
-  c32 += a32 + b32;
-  c48 += c32 >>> 16;
-  c32 &= 0xFFFF;
-  c48 += a48 + b48;
-  c48 &= 0xFFFF;
-  return Timestamp.fromBits((c16 << 16) | c00, (c48 << 16) | c32);
-};
-
-/**
- * Returns the difference of this and the given Timestamp.
- *
- * @method
- * @param {Timestamp} other Timestamp to subtract from this.
- * @return {Timestamp} the difference of this and the given Timestamp.
- */
-Timestamp.prototype.subtract = function(other) {
-  return this.add(other.negate());
-};
-
-/**
- * Returns the product of this and the given Timestamp.
- *
- * @method
- * @param {Timestamp} other Timestamp to multiply with this.
- * @return {Timestamp} the product of this and the other.
- */
-Timestamp.prototype.multiply = function(other) {
-  if (this.isZero()) {
-    return Timestamp.ZERO;
-  } else if (other.isZero()) {
-    return Timestamp.ZERO;
-  }
-
-  if (this.equals(Timestamp.MIN_VALUE)) {
-    return other.isOdd() ? Timestamp.MIN_VALUE : Timestamp.ZERO;
-  } else if (other.equals(Timestamp.MIN_VALUE)) {
-    return this.isOdd() ? Timestamp.MIN_VALUE : Timestamp.ZERO;
-  }
-
-  if (this.isNegative()) {
-    if (other.isNegative()) {
-      return this.negate().multiply(other.negate());
-    } else {
-      return this.negate().multiply(other).negate();
-    }
-  } else if (other.isNegative()) {
-    return this.multiply(other.negate()).negate();
-  }
-
-  // If both Timestamps are small, use float multiplication
-  if (this.lessThan(Timestamp.TWO_PWR_24_) &&
-      other.lessThan(Timestamp.TWO_PWR_24_)) {
-    return Timestamp.fromNumber(this.toNumber() * other.toNumber());
-  }
-
-  // Divide each Timestamp into 4 chunks of 16 bits, and then add up 4x4 products.
-  // We can skip products that would overflow.
-
-  var a48 = this.high_ >>> 16;
-  var a32 = this.high_ & 0xFFFF;
-  var a16 = this.low_ >>> 16;
-  var a00 = this.low_ & 0xFFFF;
-
-  var b48 = other.high_ >>> 16;
-  var b32 = other.high_ & 0xFFFF;
-  var b16 = other.low_ >>> 16;
-  var b00 = other.low_ & 0xFFFF;
-
-  var c48 = 0, c32 = 0, c16 = 0, c00 = 0;
-  c00 += a00 * b00;
-  c16 += c00 >>> 16;
-  c00 &= 0xFFFF;
-  c16 += a16 * b00;
-  c32 += c16 >>> 16;
-  c16 &= 0xFFFF;
-  c16 += a00 * b16;
-  c32 += c16 >>> 16;
-  c16 &= 0xFFFF;
-  c32 += a32 * b00;
-  c48 += c32 >>> 16;
-  c32 &= 0xFFFF;
-  c32 += a16 * b16;
-  c48 += c32 >>> 16;
-  c32 &= 0xFFFF;
-  c32 += a00 * b32;
-  c48 += c32 >>> 16;
-  c32 &= 0xFFFF;
-  c48 += a48 * b00 + a32 * b16 + a16 * b32 + a00 * b48;
-  c48 &= 0xFFFF;
-  return Timestamp.fromBits((c16 << 16) | c00, (c48 << 16) | c32);
-};
-
-/**
- * Returns this Timestamp divided by the given one.
- *
- * @method
- * @param {Timestamp} other Timestamp by which to divide.
- * @return {Timestamp} this Timestamp divided by the given one.
- */
-Timestamp.prototype.div = function(other) {
-  if (other.isZero()) {
-    throw Error('division by zero');
-  } else if (this.isZero()) {
-    return Timestamp.ZERO;
-  }
-
-  if (this.equals(Timestamp.MIN_VALUE)) {
-    if (other.equals(Timestamp.ONE) ||
-        other.equals(Timestamp.NEG_ONE)) {
-      return Timestamp.MIN_VALUE;  // recall that -MIN_VALUE == MIN_VALUE
-    } else if (other.equals(Timestamp.MIN_VALUE)) {
-      return Timestamp.ONE;
-    } else {
-      // At this point, we have |other| >= 2, so |this/other| < |MIN_VALUE|.
-      var halfThis = this.shiftRight(1);
-      var approx = halfThis.div(other).shiftLeft(1);
-      if (approx.equals(Timestamp.ZERO)) {
-        return other.isNegative() ? Timestamp.ONE : Timestamp.NEG_ONE;
-      } else {
-        var rem = this.subtract(other.multiply(approx));
-        var result = approx.add(rem.div(other));
-        return result;
-      }
-    }
-  } else if (other.equals(Timestamp.MIN_VALUE)) {
-    return Timestamp.ZERO;
-  }
-
-  if (this.isNegative()) {
-    if (other.isNegative()) {
-      return this.negate().div(other.negate());
-    } else {
-      return this.negate().div(other).negate();
-    }
-  } else if (other.isNegative()) {
-    return this.div(other.negate()).negate();
-  }
-
-  // Repeat the following until the remainder is less than other:  find a
-  // floating-point that approximates remainder / other *from below*, add this
-  // into the result, and subtract it from the remainder.  It is critical that
-  // the approximate value is less than or equal to the real value so that the
-  // remainder never becomes negative.
-  var res = Timestamp.ZERO;
-  var rem = this;
-  while (rem.greaterThanOrEqual(other)) {
-    // Approximate the result of division. This may be a little greater or
-    // smaller than the actual value.
-    var approx = Math.max(1, Math.floor(rem.toNumber() / other.toNumber()));
-
-    // We will tweak the approximate result by changing it in the 48-th digit or
-    // the smallest non-fractional digit, whichever is larger.
-    var log2 = Math.ceil(Math.log(approx) / Math.LN2);
-    var delta = (log2 <= 48) ? 1 : Math.pow(2, log2 - 48);
-
-    // Decrease the approximation until it is smaller than the remainder.  Note
-    // that if it is too large, the product overflows and is negative.
-    var approxRes = Timestamp.fromNumber(approx);
-    var approxRem = approxRes.multiply(other);
-    while (approxRem.isNegative() || approxRem.greaterThan(rem)) {
-      approx -= delta;
-      approxRes = Timestamp.fromNumber(approx);
-      approxRem = approxRes.multiply(other);
-    }
-
-    // We know the answer can't be zero... and actually, zero would cause
-    // infinite recursion since we would make no progress.
-    if (approxRes.isZero()) {
-      approxRes = Timestamp.ONE;
-    }
-
-    res = res.add(approxRes);
-    rem = rem.subtract(approxRem);
-  }
-  return res;
-};
-
-/**
- * Returns this Timestamp modulo the given one.
- *
- * @method
- * @param {Timestamp} other Timestamp by which to mod.
- * @return {Timestamp} this Timestamp modulo the given one.
- */
-Timestamp.prototype.modulo = function(other) {
-  return this.subtract(this.div(other).multiply(other));
-};
-
-/**
- * The bitwise-NOT of this value.
- *
- * @method
- * @return {Timestamp} the bitwise-NOT of this value.
- */
-Timestamp.prototype.not = function() {
-  return Timestamp.fromBits(~this.low_, ~this.high_);
-};
-
-/**
- * Returns the bitwise-AND of this Timestamp and the given one.
- *
- * @method
- * @param {Timestamp} other the Timestamp with which to AND.
- * @return {Timestamp} the bitwise-AND of this and the other.
- */
-Timestamp.prototype.and = function(other) {
-  return Timestamp.fromBits(this.low_ & other.low_, this.high_ & other.high_);
-};
-
-/**
- * Returns the bitwise-OR of this Timestamp and the given one.
- *
- * @method
- * @param {Timestamp} other the Timestamp with which to OR.
- * @return {Timestamp} the bitwise-OR of this and the other.
- */
-Timestamp.prototype.or = function(other) {
-  return Timestamp.fromBits(this.low_ | other.low_, this.high_ | other.high_);
-};
-
-/**
- * Returns the bitwise-XOR of this Timestamp and the given one.
- *
- * @method
- * @param {Timestamp} other the Timestamp with which to XOR.
- * @return {Timestamp} the bitwise-XOR of this and the other.
- */
-Timestamp.prototype.xor = function(other) {
-  return Timestamp.fromBits(this.low_ ^ other.low_, this.high_ ^ other.high_);
-};
-
-/**
- * Returns this Timestamp with bits shifted to the left by the given amount.
- *
- * @method
- * @param {number} numBits the number of bits by which to shift.
- * @return {Timestamp} this shifted to the left by the given amount.
- */
-Timestamp.prototype.shiftLeft = function(numBits) {
-  numBits &= 63;
-  if (numBits == 0) {
-    return this;
-  } else {
-    var low = this.low_;
-    if (numBits < 32) {
-      var high = this.high_;
-      return Timestamp.fromBits(
-                 low << numBits,
-                 (high << numBits) | (low >>> (32 - numBits)));
-    } else {
-      return Timestamp.fromBits(0, low << (numBits - 32));
-    }
-  }
-};
-
-/**
- * Returns this Timestamp with bits shifted to the right by the given amount.
- *
- * @method
- * @param {number} numBits the number of bits by which to shift.
- * @return {Timestamp} this shifted to the right by the given amount.
- */
-Timestamp.prototype.shiftRight = function(numBits) {
-  numBits &= 63;
-  if (numBits == 0) {
-    return this;
-  } else {
-    var high = this.high_;
-    if (numBits < 32) {
-      var low = this.low_;
-      return Timestamp.fromBits(
-                 (low >>> numBits) | (high << (32 - numBits)),
-                 high >> numBits);
-    } else {
-      return Timestamp.fromBits(
-                 high >> (numBits - 32),
-                 high >= 0 ? 0 : -1);
-    }
-  }
-};
-
-/**
- * Returns this Timestamp with bits shifted to the right by the given amount, with the new top bits matching the current sign bit.
- *
- * @method
- * @param {number} numBits the number of bits by which to shift.
- * @return {Timestamp} this shifted to the right by the given amount, with zeros placed into the new leading bits.
- */
-Timestamp.prototype.shiftRightUnsigned = function(numBits) {
-  numBits &= 63;
-  if (numBits == 0) {
-    return this;
-  } else {
-    var high = this.high_;
-    if (numBits < 32) {
-      var low = this.low_;
-      return Timestamp.fromBits(
-                 (low >>> numBits) | (high << (32 - numBits)),
-                 high >>> numBits);
-    } else if (numBits == 32) {
-      return Timestamp.fromBits(high, 0);
-    } else {
-      return Timestamp.fromBits(high >>> (numBits - 32), 0);
-    }
-  }
-};
-
-/**
- * Returns a Timestamp representing the given (32-bit) integer value.
- *
- * @method
- * @param {number} value the 32-bit integer in question.
- * @return {Timestamp} the corresponding Timestamp value.
- */
-Timestamp.fromInt = function(value) {
-  if (-128 <= value && value < 128) {
-    var cachedObj = Timestamp.INT_CACHE_[value];
-    if (cachedObj) {
-      return cachedObj;
-    }
-  }
-
-  var obj = new Timestamp(value | 0, value < 0 ? -1 : 0);
-  if (-128 <= value && value < 128) {
-    Timestamp.INT_CACHE_[value] = obj;
-  }
-  return obj;
-};
-
-/**
- * Returns a Timestamp representing the given value, provided that it is a finite number. Otherwise, zero is returned.
- *
- * @method
- * @param {number} value the number in question.
- * @return {Timestamp} the corresponding Timestamp value.
- */
-Timestamp.fromNumber = function(value) {
-  if (isNaN(value) || !isFinite(value)) {
-    return Timestamp.ZERO;
-  } else if (value <= -Timestamp.TWO_PWR_63_DBL_) {
-    return Timestamp.MIN_VALUE;
-  } else if (value + 1 >= Timestamp.TWO_PWR_63_DBL_) {
-    return Timestamp.MAX_VALUE;
-  } else if (value < 0) {
-    return Timestamp.fromNumber(-value).negate();
-  } else {
-    return new Timestamp(
-               (value % Timestamp.TWO_PWR_32_DBL_) | 0,
-               (value / Timestamp.TWO_PWR_32_DBL_) | 0);
-  }
-};
-
-/**
- * Returns a Timestamp representing the 64-bit integer that comes by concatenating the given high and low bits. Each is assumed to use 32 bits.
- *
- * @method
- * @param {number} lowBits the low 32-bits.
- * @param {number} highBits the high 32-bits.
- * @return {Timestamp} the corresponding Timestamp value.
- */
-Timestamp.fromBits = function(lowBits, highBits) {
-  return new Timestamp(lowBits, highBits);
-};
-
-/**
- * Returns a Timestamp representation of the given string, written using the given radix.
- *
- * @method
- * @param {string} str the textual representation of the Timestamp.
- * @param {number} opt_radix the radix in which the text is written.
- * @return {Timestamp} the corresponding Timestamp value.
- */
-Timestamp.fromString = function(str, opt_radix) {
-  if (str.length == 0) {
-    throw Error('number format error: empty string');
-  }
-
-  var radix = opt_radix || 10;
-  if (radix < 2 || 36 < radix) {
-    throw Error('radix out of range: ' + radix);
-  }
-
-  if (str.charAt(0) == '-') {
-    return Timestamp.fromString(str.substring(1), radix).negate();
-  } else if (str.indexOf('-') >= 0) {
-    throw Error('number format error: interior "-" character: ' + str);
-  }
-
-  // Do several (8) digits each time through the loop, so as to
-  // minimize the calls to the very expensive emulated div.
-  var radixToPower = Timestamp.fromNumber(Math.pow(radix, 8));
-
-  var result = Timestamp.ZERO;
-  for (var i = 0; i < str.length; i += 8) {
-    var size = Math.min(8, str.length - i);
-    var value = parseInt(str.substring(i, i + size), radix);
-    if (size < 8) {
-      var power = Timestamp.fromNumber(Math.pow(radix, size));
-      result = result.multiply(power).add(Timestamp.fromNumber(value));
-    } else {
-      result = result.multiply(radixToPower);
-      result = result.add(Timestamp.fromNumber(value));
-    }
-  }
-  return result;
-};
-
-// NOTE: Common constant values ZERO, ONE, NEG_ONE, etc. are defined below the
-// from* methods on which they depend.
-
-
-/**
- * A cache of the Timestamp representations of small integer values.
- * @type {Object}
- * @ignore
- */
-Timestamp.INT_CACHE_ = {};
-
-// NOTE: the compiler should inline these constant values below and then remove
-// these variables, so there should be no runtime penalty for these.
-
-/**
- * Number used repeated below in calculations.  This must appear before the
- * first call to any from* function below.
- * @type {number}
- * @ignore
- */
-Timestamp.TWO_PWR_16_DBL_ = 1 << 16;
-
-/**
- * @type {number}
- * @ignore
- */
-Timestamp.TWO_PWR_24_DBL_ = 1 << 24;
-
-/**
- * @type {number}
- * @ignore
- */
-Timestamp.TWO_PWR_32_DBL_ = Timestamp.TWO_PWR_16_DBL_ * Timestamp.TWO_PWR_16_DBL_;
-
-/**
- * @type {number}
- * @ignore
- */
-Timestamp.TWO_PWR_31_DBL_ = Timestamp.TWO_PWR_32_DBL_ / 2;
-
-/**
- * @type {number}
- * @ignore
- */
-Timestamp.TWO_PWR_48_DBL_ = Timestamp.TWO_PWR_32_DBL_ * Timestamp.TWO_PWR_16_DBL_;
-
-/**
- * @type {number}
- * @ignore
- */
-Timestamp.TWO_PWR_64_DBL_ = Timestamp.TWO_PWR_32_DBL_ * Timestamp.TWO_PWR_32_DBL_;
-
-/**
- * @type {number}
- * @ignore
- */
-Timestamp.TWO_PWR_63_DBL_ = Timestamp.TWO_PWR_64_DBL_ / 2;
-
-/** @type {Timestamp} */
-Timestamp.ZERO = Timestamp.fromInt(0);
-
-/** @type {Timestamp} */
-Timestamp.ONE = Timestamp.fromInt(1);
-
-/** @type {Timestamp} */
-Timestamp.NEG_ONE = Timestamp.fromInt(-1);
-
-/** @type {Timestamp} */
-Timestamp.MAX_VALUE =
-    Timestamp.fromBits(0xFFFFFFFF | 0, 0x7FFFFFFF | 0);
-
-/** @type {Timestamp} */
-Timestamp.MIN_VALUE = Timestamp.fromBits(0, 0x80000000 | 0);
-
-/**
- * @type {Timestamp}
- * @ignore
- */
-Timestamp.TWO_PWR_24_ = Timestamp.fromInt(1 << 24);
-
-/**
- * Expose.
- */
-module.exports = Timestamp;
-module.exports.Timestamp = Timestamp;
-},{}],79:[function(require,module,exports){
+},{}],75:[function(require,module,exports){
 // TODO Add in pre and post skipping options
 module.exports = {
   /**
@@ -20470,7 +20038,153 @@ function once (fn, scope) {
   };
 }
 
-},{}],80:[function(require,module,exports){
+},{}],76:[function(require,module,exports){
+exports.read = function (buffer, offset, isLE, mLen, nBytes) {
+  var e, m
+  var eLen = nBytes * 8 - mLen - 1
+  var eMax = (1 << eLen) - 1
+  var eBias = eMax >> 1
+  var nBits = -7
+  var i = isLE ? (nBytes - 1) : 0
+  var d = isLE ? -1 : 1
+  var s = buffer[offset + i]
+
+  i += d
+
+  e = s & ((1 << (-nBits)) - 1)
+  s >>= (-nBits)
+  nBits += eLen
+  for (; nBits > 0; e = e * 256 + buffer[offset + i], i += d, nBits -= 8) {}
+
+  m = e & ((1 << (-nBits)) - 1)
+  e >>= (-nBits)
+  nBits += mLen
+  for (; nBits > 0; m = m * 256 + buffer[offset + i], i += d, nBits -= 8) {}
+
+  if (e === 0) {
+    e = 1 - eBias
+  } else if (e === eMax) {
+    return m ? NaN : ((s ? -1 : 1) * Infinity)
+  } else {
+    m = m + Math.pow(2, mLen)
+    e = e - eBias
+  }
+  return (s ? -1 : 1) * m * Math.pow(2, e - mLen)
+}
+
+exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
+  var e, m, c
+  var eLen = nBytes * 8 - mLen - 1
+  var eMax = (1 << eLen) - 1
+  var eBias = eMax >> 1
+  var rt = (mLen === 23 ? Math.pow(2, -24) - Math.pow(2, -77) : 0)
+  var i = isLE ? 0 : (nBytes - 1)
+  var d = isLE ? 1 : -1
+  var s = value < 0 || (value === 0 && 1 / value < 0) ? 1 : 0
+
+  value = Math.abs(value)
+
+  if (isNaN(value) || value === Infinity) {
+    m = isNaN(value) ? 1 : 0
+    e = eMax
+  } else {
+    e = Math.floor(Math.log(value) / Math.LN2)
+    if (value * (c = Math.pow(2, -e)) < 1) {
+      e--
+      c *= 2
+    }
+    if (e + eBias >= 1) {
+      value += rt / c
+    } else {
+      value += rt * Math.pow(2, 1 - eBias)
+    }
+    if (value * c >= 2) {
+      e++
+      c /= 2
+    }
+
+    if (e + eBias >= eMax) {
+      m = 0
+      e = eMax
+    } else if (e + eBias >= 1) {
+      m = (value * c - 1) * Math.pow(2, mLen)
+      e = e + eBias
+    } else {
+      m = value * Math.pow(2, eBias - 1) * Math.pow(2, mLen)
+      e = 0
+    }
+  }
+
+  for (; mLen >= 8; buffer[offset + i] = m & 0xff, i += d, m /= 256, mLen -= 8) {}
+
+  e = (e << mLen) | m
+  eLen += mLen
+  for (; eLen > 0; buffer[offset + i] = e & 0xff, i += d, e /= 256, eLen -= 8) {}
+
+  buffer[offset + i - d] |= s * 128
+}
+
+},{}],77:[function(require,module,exports){
+if (typeof Object.create === 'function') {
+  // implementation from standard node.js 'util' module
+  module.exports = function inherits(ctor, superCtor) {
+    ctor.super_ = superCtor
+    ctor.prototype = Object.create(superCtor.prototype, {
+      constructor: {
+        value: ctor,
+        enumerable: false,
+        writable: true,
+        configurable: true
+      }
+    });
+  };
+} else {
+  // old school shim for old browsers
+  module.exports = function inherits(ctor, superCtor) {
+    ctor.super_ = superCtor
+    var TempCtor = function () {}
+    TempCtor.prototype = superCtor.prototype
+    ctor.prototype = new TempCtor()
+    ctor.prototype.constructor = ctor
+  }
+}
+
+},{}],78:[function(require,module,exports){
+
+/**
+ * isArray
+ */
+
+var isArray = Array.isArray;
+
+/**
+ * toString
+ */
+
+var str = Object.prototype.toString;
+
+/**
+ * Whether or not the given `val`
+ * is an array.
+ *
+ * example:
+ *
+ *        isArray([]);
+ *        // > true
+ *        isArray(arguments);
+ *        // > false
+ *        isArray('');
+ *        // > false
+ *
+ * @param {mixed} val
+ * @return {bool}
+ */
+
+module.exports = isArray || function (val) {
+  return !! val && '[object Array]' == str.call(val);
+};
+
+},{}],79:[function(require,module,exports){
 (function (process){
 'use strict';
 
@@ -20702,11 +20416,11 @@ Kareem.prototype.clone = function() {
 
 module.exports = Kareem;
 
-}).call(this,require("FWaASH"))
-},{"FWaASH":58}],81:[function(require,module,exports){
+}).call(this,require("g5I+bs"))
+},{"g5I+bs":92}],80:[function(require,module,exports){
 module.exports = exports = require('./lib');
 
-},{"./lib":82}],82:[function(require,module,exports){
+},{"./lib":81}],81:[function(require,module,exports){
 
 /**
  * Returns the value of object `o` at the given `path`.
@@ -20891,7 +20605,7 @@ function K (v) {
   return v;
 }
 
-},{}],83:[function(require,module,exports){
+},{}],82:[function(require,module,exports){
 (function (process){
 'use strict';
 var util = require('util');
@@ -21334,8 +21048,8 @@ Promise.deferred = function deferred() {
 
 
 
-}).call(this,require("FWaASH"))
-},{"FWaASH":58,"events":56,"util":60}],84:[function(require,module,exports){
+}).call(this,require("g5I+bs"))
+},{"events":74,"g5I+bs":92,"util":97}],83:[function(require,module,exports){
 'use strict';
 
 /**
@@ -21379,7 +21093,7 @@ function notImplemented (method) {
 }
 
 
-},{}],85:[function(require,module,exports){
+},{}],84:[function(require,module,exports){
 'use strict';
 
 var env = require('../env')
@@ -21394,7 +21108,7 @@ module.exports =
   require('./collection');
 
 
-},{"../env":87,"./collection":84,"./node":86}],86:[function(require,module,exports){
+},{"../env":86,"./collection":83,"./node":85}],85:[function(require,module,exports){
 'use strict';
 
 /**
@@ -21496,7 +21210,7 @@ NodeCollection.prototype.findStream = function(match, findOptions, streamOptions
 module.exports = exports = NodeCollection;
 
 
-},{"../utils":90,"./collection":84}],87:[function(require,module,exports){
+},{"../utils":89,"./collection":83}],86:[function(require,module,exports){
 (function (process,global,Buffer){
 'use strict';
 
@@ -21521,8 +21235,8 @@ exports.type = exports.isNode ? 'node'
   : exports.isBrowser ? 'browser'
   : 'unknown'
 
-}).call(this,require("FWaASH"),typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer)
-},{"FWaASH":58,"buffer":52}],88:[function(require,module,exports){
+}).call(this,require("g5I+bs"),typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer)
+},{"buffer":71,"g5I+bs":92}],87:[function(require,module,exports){
 'use strict';
 
 /**
@@ -24136,7 +23850,7 @@ module.exports = exports = Query;
 // TODO
 // test utils
 
-},{"./collection":85,"./collection/collection":84,"./env":87,"./permissions":89,"./utils":90,"assert":51,"bluebird":91,"debug":92,"sliced":96,"util":60}],89:[function(require,module,exports){
+},{"./collection":84,"./collection/collection":83,"./env":86,"./permissions":88,"./utils":89,"assert":50,"bluebird":90,"debug":72,"sliced":94,"util":97}],88:[function(require,module,exports){
 'use strict';
 
 var denied = exports;
@@ -24228,7 +23942,7 @@ denied.count.maxScan =
 denied.count.snapshot =
 denied.count.tailable = true;
 
-},{}],90:[function(require,module,exports){
+},{}],89:[function(require,module,exports){
 (function (process,Buffer){
 'use strict';
 
@@ -24562,8 +24276,8 @@ exports.cloneBuffer = function (buff) {
   return dupe;
 };
 
-}).call(this,require("FWaASH"),require("buffer").Buffer)
-},{"FWaASH":58,"buffer":52,"regexp-clone":95}],91:[function(require,module,exports){
+}).call(this,require("g5I+bs"),require("buffer").Buffer)
+},{"buffer":71,"g5I+bs":92,"regexp-clone":93}],90:[function(require,module,exports){
 (function (process,global){
 /* @preserve
  * The MIT License (MIT)
@@ -29670,377 +29384,8 @@ function isUndefined(arg) {
 
 },{}]},{},[4])(4)
 });                    ;if (typeof window !== 'undefined' && window !== null) {                               window.P = window.Promise;                                                     } else if (typeof self !== 'undefined' && self !== null) {                             self.P = self.Promise;                                                         }
-}).call(this,require("FWaASH"),typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"FWaASH":58}],92:[function(require,module,exports){
-
-/**
- * This is the web browser implementation of `debug()`.
- *
- * Expose `debug()` as the module.
- */
-
-exports = module.exports = require('./debug');
-exports.log = log;
-exports.formatArgs = formatArgs;
-exports.save = save;
-exports.load = load;
-exports.useColors = useColors;
-exports.storage = 'undefined' != typeof chrome
-               && 'undefined' != typeof chrome.storage
-                  ? chrome.storage.local
-                  : localstorage();
-
-/**
- * Colors.
- */
-
-exports.colors = [
-  'lightseagreen',
-  'forestgreen',
-  'goldenrod',
-  'dodgerblue',
-  'darkorchid',
-  'crimson'
-];
-
-/**
- * Currently only WebKit-based Web Inspectors, Firefox >= v31,
- * and the Firebug extension (any Firefox version) are known
- * to support "%c" CSS customizations.
- *
- * TODO: add a `localStorage` variable to explicitly enable/disable colors
- */
-
-function useColors() {
-  // is webkit? http://stackoverflow.com/a/16459606/376773
-  return ('WebkitAppearance' in document.documentElement.style) ||
-    // is firebug? http://stackoverflow.com/a/398120/376773
-    (window.console && (console.firebug || (console.exception && console.table))) ||
-    // is firefox >= v31?
-    // https://developer.mozilla.org/en-US/docs/Tools/Web_Console#Styling_messages
-    (navigator.userAgent.toLowerCase().match(/firefox\/(\d+)/) && parseInt(RegExp.$1, 10) >= 31);
-}
-
-/**
- * Map %j to `JSON.stringify()`, since no Web Inspectors do that by default.
- */
-
-exports.formatters.j = function(v) {
-  return JSON.stringify(v);
-};
-
-
-/**
- * Colorize log arguments if enabled.
- *
- * @api public
- */
-
-function formatArgs() {
-  var args = arguments;
-  var useColors = this.useColors;
-
-  args[0] = (useColors ? '%c' : '')
-    + this.namespace
-    + (useColors ? ' %c' : ' ')
-    + args[0]
-    + (useColors ? '%c ' : ' ')
-    + '+' + exports.humanize(this.diff);
-
-  if (!useColors) return args;
-
-  var c = 'color: ' + this.color;
-  args = [args[0], c, 'color: inherit'].concat(Array.prototype.slice.call(args, 1));
-
-  // the final "%c" is somewhat tricky, because there could be other
-  // arguments passed either before or after the %c, so we need to
-  // figure out the correct index to insert the CSS into
-  var index = 0;
-  var lastC = 0;
-  args[0].replace(/%[a-z%]/g, function(match) {
-    if ('%%' === match) return;
-    index++;
-    if ('%c' === match) {
-      // we only are interested in the *last* %c
-      // (the user may have provided their own)
-      lastC = index;
-    }
-  });
-
-  args.splice(lastC, 0, c);
-  return args;
-}
-
-/**
- * Invokes `console.log()` when available.
- * No-op when `console.log` is not a "function".
- *
- * @api public
- */
-
-function log() {
-  // this hackery is required for IE8/9, where
-  // the `console.log` function doesn't have 'apply'
-  return 'object' === typeof console
-    && console.log
-    && Function.prototype.apply.call(console.log, console, arguments);
-}
-
-/**
- * Save `namespaces`.
- *
- * @param {String} namespaces
- * @api private
- */
-
-function save(namespaces) {
-  try {
-    if (null == namespaces) {
-      exports.storage.removeItem('debug');
-    } else {
-      exports.storage.debug = namespaces;
-    }
-  } catch(e) {}
-}
-
-/**
- * Load `namespaces`.
- *
- * @return {String} returns the previously persisted debug modes
- * @api private
- */
-
-function load() {
-  var r;
-  try {
-    r = exports.storage.debug;
-  } catch(e) {}
-  return r;
-}
-
-/**
- * Enable namespaces listed in `localStorage.debug` initially.
- */
-
-exports.enable(load());
-
-/**
- * Localstorage attempts to return the localstorage.
- *
- * This is necessary because safari throws
- * when a user disables cookies/localstorage
- * and you attempt to access it.
- *
- * @return {LocalStorage}
- * @api private
- */
-
-function localstorage(){
-  try {
-    return window.localStorage;
-  } catch (e) {}
-}
-
-},{"./debug":93}],93:[function(require,module,exports){
-
-/**
- * This is the common logic for both the Node.js and web browser
- * implementations of `debug()`.
- *
- * Expose `debug()` as the module.
- */
-
-exports = module.exports = debug;
-exports.coerce = coerce;
-exports.disable = disable;
-exports.enable = enable;
-exports.enabled = enabled;
-exports.humanize = require('ms');
-
-/**
- * The currently active debug mode names, and names to skip.
- */
-
-exports.names = [];
-exports.skips = [];
-
-/**
- * Map of special "%n" handling functions, for the debug "format" argument.
- *
- * Valid key names are a single, lowercased letter, i.e. "n".
- */
-
-exports.formatters = {};
-
-/**
- * Previously assigned color.
- */
-
-var prevColor = 0;
-
-/**
- * Previous log timestamp.
- */
-
-var prevTime;
-
-/**
- * Select a color.
- *
- * @return {Number}
- * @api private
- */
-
-function selectColor() {
-  return exports.colors[prevColor++ % exports.colors.length];
-}
-
-/**
- * Create a debugger with the given `namespace`.
- *
- * @param {String} namespace
- * @return {Function}
- * @api public
- */
-
-function debug(namespace) {
-
-  // define the `disabled` version
-  function disabled() {
-  }
-  disabled.enabled = false;
-
-  // define the `enabled` version
-  function enabled() {
-
-    var self = enabled;
-
-    // set `diff` timestamp
-    var curr = +new Date();
-    var ms = curr - (prevTime || curr);
-    self.diff = ms;
-    self.prev = prevTime;
-    self.curr = curr;
-    prevTime = curr;
-
-    // add the `color` if not set
-    if (null == self.useColors) self.useColors = exports.useColors();
-    if (null == self.color && self.useColors) self.color = selectColor();
-
-    var args = Array.prototype.slice.call(arguments);
-
-    args[0] = exports.coerce(args[0]);
-
-    if ('string' !== typeof args[0]) {
-      // anything else let's inspect with %o
-      args = ['%o'].concat(args);
-    }
-
-    // apply any `formatters` transformations
-    var index = 0;
-    args[0] = args[0].replace(/%([a-z%])/g, function(match, format) {
-      // if we encounter an escaped % then don't increase the array index
-      if (match === '%%') return match;
-      index++;
-      var formatter = exports.formatters[format];
-      if ('function' === typeof formatter) {
-        var val = args[index];
-        match = formatter.call(self, val);
-
-        // now we need to remove `args[index]` since it's inlined in the `format`
-        args.splice(index, 1);
-        index--;
-      }
-      return match;
-    });
-
-    if ('function' === typeof exports.formatArgs) {
-      args = exports.formatArgs.apply(self, args);
-    }
-    var logFn = enabled.log || exports.log || console.log.bind(console);
-    logFn.apply(self, args);
-  }
-  enabled.enabled = true;
-
-  var fn = exports.enabled(namespace) ? enabled : disabled;
-
-  fn.namespace = namespace;
-
-  return fn;
-}
-
-/**
- * Enables a debug mode by namespaces. This can include modes
- * separated by a colon and wildcards.
- *
- * @param {String} namespaces
- * @api public
- */
-
-function enable(namespaces) {
-  exports.save(namespaces);
-
-  var split = (namespaces || '').split(/[\s,]+/);
-  var len = split.length;
-
-  for (var i = 0; i < len; i++) {
-    if (!split[i]) continue; // ignore empty strings
-    namespaces = split[i].replace(/\*/g, '.*?');
-    if (namespaces[0] === '-') {
-      exports.skips.push(new RegExp('^' + namespaces.substr(1) + '$'));
-    } else {
-      exports.names.push(new RegExp('^' + namespaces + '$'));
-    }
-  }
-}
-
-/**
- * Disable debug output.
- *
- * @api public
- */
-
-function disable() {
-  exports.enable('');
-}
-
-/**
- * Returns true if the given mode name is enabled, false otherwise.
- *
- * @param {String} name
- * @return {Boolean}
- * @api public
- */
-
-function enabled(name) {
-  var i, len;
-  for (i = 0, len = exports.skips.length; i < len; i++) {
-    if (exports.skips[i].test(name)) {
-      return false;
-    }
-  }
-  for (i = 0, len = exports.names.length; i < len; i++) {
-    if (exports.names[i].test(name)) {
-      return true;
-    }
-  }
-  return false;
-}
-
-/**
- * Coerce `val`.
- *
- * @param {Mixed} val
- * @return {Mixed}
- * @api private
- */
-
-function coerce(val) {
-  if (val instanceof Error) return val.stack || val.message;
-  return val;
-}
-
-},{"ms":94}],94:[function(require,module,exports){
+}).call(this,require("g5I+bs"),typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+},{"g5I+bs":92}],91:[function(require,module,exports){
 /**
  * Helpers.
  */
@@ -30167,7 +29512,72 @@ function plural(ms, n, name) {
   return Math.ceil(ms / n) + ' ' + name + 's';
 }
 
-},{}],95:[function(require,module,exports){
+},{}],92:[function(require,module,exports){
+// shim for using process in browser
+
+var process = module.exports = {};
+
+process.nextTick = (function () {
+    var canSetImmediate = typeof window !== 'undefined'
+    && window.setImmediate;
+    var canPost = typeof window !== 'undefined'
+    && window.postMessage && window.addEventListener
+    ;
+
+    if (canSetImmediate) {
+        return function (f) { return window.setImmediate(f) };
+    }
+
+    if (canPost) {
+        var queue = [];
+        window.addEventListener('message', function (ev) {
+            var source = ev.source;
+            if ((source === window || source === null) && ev.data === 'process-tick') {
+                ev.stopPropagation();
+                if (queue.length > 0) {
+                    var fn = queue.shift();
+                    fn();
+                }
+            }
+        }, true);
+
+        return function nextTick(fn) {
+            queue.push(fn);
+            window.postMessage('process-tick', '*');
+        };
+    }
+
+    return function nextTick(fn) {
+        setTimeout(fn, 0);
+    };
+})();
+
+process.title = 'browser';
+process.browser = true;
+process.env = {};
+process.argv = [];
+
+function noop() {}
+
+process.on = noop;
+process.addListener = noop;
+process.once = noop;
+process.off = noop;
+process.removeListener = noop;
+process.removeAllListeners = noop;
+process.emit = noop;
+
+process.binding = function (name) {
+    throw new Error('process.binding is not supported');
+}
+
+// TODO(shtylman)
+process.cwd = function () { return '/' };
+process.chdir = function (dir) {
+    throw new Error('process.chdir is not supported');
+};
+
+},{}],93:[function(require,module,exports){
 
 var toString = Object.prototype.toString;
 
@@ -30189,10 +29599,10 @@ module.exports = exports = function (regexp) {
 }
 
 
-},{}],96:[function(require,module,exports){
+},{}],94:[function(require,module,exports){
 module.exports = exports = require('./lib/sliced');
 
-},{"./lib/sliced":97}],97:[function(require,module,exports){
+},{"./lib/sliced":95}],95:[function(require,module,exports){
 
 /**
  * An Array.prototype.slice.call(arguments) alternative
@@ -30227,4 +29637,601 @@ module.exports = function (args, slice, sliceEnd) {
 }
 
 
-},{}]},{},[2])
+},{}],96:[function(require,module,exports){
+module.exports = function isBuffer(arg) {
+  return arg && typeof arg === 'object'
+    && typeof arg.copy === 'function'
+    && typeof arg.fill === 'function'
+    && typeof arg.readUInt8 === 'function';
+}
+},{}],97:[function(require,module,exports){
+(function (process,global){
+// Copyright Joyent, Inc. and other Node contributors.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a
+// copy of this software and associated documentation files (the
+// "Software"), to deal in the Software without restriction, including
+// without limitation the rights to use, copy, modify, merge, publish,
+// distribute, sublicense, and/or sell copies of the Software, and to permit
+// persons to whom the Software is furnished to do so, subject to the
+// following conditions:
+//
+// The above copyright notice and this permission notice shall be included
+// in all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
+// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
+// USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+var formatRegExp = /%[sdj%]/g;
+exports.format = function(f) {
+  if (!isString(f)) {
+    var objects = [];
+    for (var i = 0; i < arguments.length; i++) {
+      objects.push(inspect(arguments[i]));
+    }
+    return objects.join(' ');
+  }
+
+  var i = 1;
+  var args = arguments;
+  var len = args.length;
+  var str = String(f).replace(formatRegExp, function(x) {
+    if (x === '%%') return '%';
+    if (i >= len) return x;
+    switch (x) {
+      case '%s': return String(args[i++]);
+      case '%d': return Number(args[i++]);
+      case '%j':
+        try {
+          return JSON.stringify(args[i++]);
+        } catch (_) {
+          return '[Circular]';
+        }
+      default:
+        return x;
+    }
+  });
+  for (var x = args[i]; i < len; x = args[++i]) {
+    if (isNull(x) || !isObject(x)) {
+      str += ' ' + x;
+    } else {
+      str += ' ' + inspect(x);
+    }
+  }
+  return str;
+};
+
+
+// Mark that a method should not be used.
+// Returns a modified function which warns once by default.
+// If --no-deprecation is set, then it is a no-op.
+exports.deprecate = function(fn, msg) {
+  // Allow for deprecating things in the process of starting up.
+  if (isUndefined(global.process)) {
+    return function() {
+      return exports.deprecate(fn, msg).apply(this, arguments);
+    };
+  }
+
+  if (process.noDeprecation === true) {
+    return fn;
+  }
+
+  var warned = false;
+  function deprecated() {
+    if (!warned) {
+      if (process.throwDeprecation) {
+        throw new Error(msg);
+      } else if (process.traceDeprecation) {
+        console.trace(msg);
+      } else {
+        console.error(msg);
+      }
+      warned = true;
+    }
+    return fn.apply(this, arguments);
+  }
+
+  return deprecated;
+};
+
+
+var debugs = {};
+var debugEnviron;
+exports.debuglog = function(set) {
+  if (isUndefined(debugEnviron))
+    debugEnviron = process.env.NODE_DEBUG || '';
+  set = set.toUpperCase();
+  if (!debugs[set]) {
+    if (new RegExp('\\b' + set + '\\b', 'i').test(debugEnviron)) {
+      var pid = process.pid;
+      debugs[set] = function() {
+        var msg = exports.format.apply(exports, arguments);
+        console.error('%s %d: %s', set, pid, msg);
+      };
+    } else {
+      debugs[set] = function() {};
+    }
+  }
+  return debugs[set];
+};
+
+
+/**
+ * Echos the value of a value. Trys to print the value out
+ * in the best way possible given the different types.
+ *
+ * @param {Object} obj The object to print out.
+ * @param {Object} opts Optional options object that alters the output.
+ */
+/* legacy: obj, showHidden, depth, colors*/
+function inspect(obj, opts) {
+  // default options
+  var ctx = {
+    seen: [],
+    stylize: stylizeNoColor
+  };
+  // legacy...
+  if (arguments.length >= 3) ctx.depth = arguments[2];
+  if (arguments.length >= 4) ctx.colors = arguments[3];
+  if (isBoolean(opts)) {
+    // legacy...
+    ctx.showHidden = opts;
+  } else if (opts) {
+    // got an "options" object
+    exports._extend(ctx, opts);
+  }
+  // set default options
+  if (isUndefined(ctx.showHidden)) ctx.showHidden = false;
+  if (isUndefined(ctx.depth)) ctx.depth = 2;
+  if (isUndefined(ctx.colors)) ctx.colors = false;
+  if (isUndefined(ctx.customInspect)) ctx.customInspect = true;
+  if (ctx.colors) ctx.stylize = stylizeWithColor;
+  return formatValue(ctx, obj, ctx.depth);
+}
+exports.inspect = inspect;
+
+
+// http://en.wikipedia.org/wiki/ANSI_escape_code#graphics
+inspect.colors = {
+  'bold' : [1, 22],
+  'italic' : [3, 23],
+  'underline' : [4, 24],
+  'inverse' : [7, 27],
+  'white' : [37, 39],
+  'grey' : [90, 39],
+  'black' : [30, 39],
+  'blue' : [34, 39],
+  'cyan' : [36, 39],
+  'green' : [32, 39],
+  'magenta' : [35, 39],
+  'red' : [31, 39],
+  'yellow' : [33, 39]
+};
+
+// Don't use 'blue' not visible on cmd.exe
+inspect.styles = {
+  'special': 'cyan',
+  'number': 'yellow',
+  'boolean': 'yellow',
+  'undefined': 'grey',
+  'null': 'bold',
+  'string': 'green',
+  'date': 'magenta',
+  // "name": intentionally not styling
+  'regexp': 'red'
+};
+
+
+function stylizeWithColor(str, styleType) {
+  var style = inspect.styles[styleType];
+
+  if (style) {
+    return '\u001b[' + inspect.colors[style][0] + 'm' + str +
+           '\u001b[' + inspect.colors[style][1] + 'm';
+  } else {
+    return str;
+  }
+}
+
+
+function stylizeNoColor(str, styleType) {
+  return str;
+}
+
+
+function arrayToHash(array) {
+  var hash = {};
+
+  array.forEach(function(val, idx) {
+    hash[val] = true;
+  });
+
+  return hash;
+}
+
+
+function formatValue(ctx, value, recurseTimes) {
+  // Provide a hook for user-specified inspect functions.
+  // Check that value is an object with an inspect function on it
+  if (ctx.customInspect &&
+      value &&
+      isFunction(value.inspect) &&
+      // Filter out the util module, it's inspect function is special
+      value.inspect !== exports.inspect &&
+      // Also filter out any prototype objects using the circular check.
+      !(value.constructor && value.constructor.prototype === value)) {
+    var ret = value.inspect(recurseTimes, ctx);
+    if (!isString(ret)) {
+      ret = formatValue(ctx, ret, recurseTimes);
+    }
+    return ret;
+  }
+
+  // Primitive types cannot have properties
+  var primitive = formatPrimitive(ctx, value);
+  if (primitive) {
+    return primitive;
+  }
+
+  // Look up the keys of the object.
+  var keys = Object.keys(value);
+  var visibleKeys = arrayToHash(keys);
+
+  if (ctx.showHidden) {
+    keys = Object.getOwnPropertyNames(value);
+  }
+
+  // IE doesn't make error fields non-enumerable
+  // http://msdn.microsoft.com/en-us/library/ie/dww52sbt(v=vs.94).aspx
+  if (isError(value)
+      && (keys.indexOf('message') >= 0 || keys.indexOf('description') >= 0)) {
+    return formatError(value);
+  }
+
+  // Some type of object without properties can be shortcutted.
+  if (keys.length === 0) {
+    if (isFunction(value)) {
+      var name = value.name ? ': ' + value.name : '';
+      return ctx.stylize('[Function' + name + ']', 'special');
+    }
+    if (isRegExp(value)) {
+      return ctx.stylize(RegExp.prototype.toString.call(value), 'regexp');
+    }
+    if (isDate(value)) {
+      return ctx.stylize(Date.prototype.toString.call(value), 'date');
+    }
+    if (isError(value)) {
+      return formatError(value);
+    }
+  }
+
+  var base = '', array = false, braces = ['{', '}'];
+
+  // Make Array say that they are Array
+  if (isArray(value)) {
+    array = true;
+    braces = ['[', ']'];
+  }
+
+  // Make functions say that they are functions
+  if (isFunction(value)) {
+    var n = value.name ? ': ' + value.name : '';
+    base = ' [Function' + n + ']';
+  }
+
+  // Make RegExps say that they are RegExps
+  if (isRegExp(value)) {
+    base = ' ' + RegExp.prototype.toString.call(value);
+  }
+
+  // Make dates with properties first say the date
+  if (isDate(value)) {
+    base = ' ' + Date.prototype.toUTCString.call(value);
+  }
+
+  // Make error with message first say the error
+  if (isError(value)) {
+    base = ' ' + formatError(value);
+  }
+
+  if (keys.length === 0 && (!array || value.length == 0)) {
+    return braces[0] + base + braces[1];
+  }
+
+  if (recurseTimes < 0) {
+    if (isRegExp(value)) {
+      return ctx.stylize(RegExp.prototype.toString.call(value), 'regexp');
+    } else {
+      return ctx.stylize('[Object]', 'special');
+    }
+  }
+
+  ctx.seen.push(value);
+
+  var output;
+  if (array) {
+    output = formatArray(ctx, value, recurseTimes, visibleKeys, keys);
+  } else {
+    output = keys.map(function(key) {
+      return formatProperty(ctx, value, recurseTimes, visibleKeys, key, array);
+    });
+  }
+
+  ctx.seen.pop();
+
+  return reduceToSingleString(output, base, braces);
+}
+
+
+function formatPrimitive(ctx, value) {
+  if (isUndefined(value))
+    return ctx.stylize('undefined', 'undefined');
+  if (isString(value)) {
+    var simple = '\'' + JSON.stringify(value).replace(/^"|"$/g, '')
+                                             .replace(/'/g, "\\'")
+                                             .replace(/\\"/g, '"') + '\'';
+    return ctx.stylize(simple, 'string');
+  }
+  if (isNumber(value))
+    return ctx.stylize('' + value, 'number');
+  if (isBoolean(value))
+    return ctx.stylize('' + value, 'boolean');
+  // For some reason typeof null is "object", so special case here.
+  if (isNull(value))
+    return ctx.stylize('null', 'null');
+}
+
+
+function formatError(value) {
+  return '[' + Error.prototype.toString.call(value) + ']';
+}
+
+
+function formatArray(ctx, value, recurseTimes, visibleKeys, keys) {
+  var output = [];
+  for (var i = 0, l = value.length; i < l; ++i) {
+    if (hasOwnProperty(value, String(i))) {
+      output.push(formatProperty(ctx, value, recurseTimes, visibleKeys,
+          String(i), true));
+    } else {
+      output.push('');
+    }
+  }
+  keys.forEach(function(key) {
+    if (!key.match(/^\d+$/)) {
+      output.push(formatProperty(ctx, value, recurseTimes, visibleKeys,
+          key, true));
+    }
+  });
+  return output;
+}
+
+
+function formatProperty(ctx, value, recurseTimes, visibleKeys, key, array) {
+  var name, str, desc;
+  desc = Object.getOwnPropertyDescriptor(value, key) || { value: value[key] };
+  if (desc.get) {
+    if (desc.set) {
+      str = ctx.stylize('[Getter/Setter]', 'special');
+    } else {
+      str = ctx.stylize('[Getter]', 'special');
+    }
+  } else {
+    if (desc.set) {
+      str = ctx.stylize('[Setter]', 'special');
+    }
+  }
+  if (!hasOwnProperty(visibleKeys, key)) {
+    name = '[' + key + ']';
+  }
+  if (!str) {
+    if (ctx.seen.indexOf(desc.value) < 0) {
+      if (isNull(recurseTimes)) {
+        str = formatValue(ctx, desc.value, null);
+      } else {
+        str = formatValue(ctx, desc.value, recurseTimes - 1);
+      }
+      if (str.indexOf('\n') > -1) {
+        if (array) {
+          str = str.split('\n').map(function(line) {
+            return '  ' + line;
+          }).join('\n').substr(2);
+        } else {
+          str = '\n' + str.split('\n').map(function(line) {
+            return '   ' + line;
+          }).join('\n');
+        }
+      }
+    } else {
+      str = ctx.stylize('[Circular]', 'special');
+    }
+  }
+  if (isUndefined(name)) {
+    if (array && key.match(/^\d+$/)) {
+      return str;
+    }
+    name = JSON.stringify('' + key);
+    if (name.match(/^"([a-zA-Z_][a-zA-Z_0-9]*)"$/)) {
+      name = name.substr(1, name.length - 2);
+      name = ctx.stylize(name, 'name');
+    } else {
+      name = name.replace(/'/g, "\\'")
+                 .replace(/\\"/g, '"')
+                 .replace(/(^"|"$)/g, "'");
+      name = ctx.stylize(name, 'string');
+    }
+  }
+
+  return name + ': ' + str;
+}
+
+
+function reduceToSingleString(output, base, braces) {
+  var numLinesEst = 0;
+  var length = output.reduce(function(prev, cur) {
+    numLinesEst++;
+    if (cur.indexOf('\n') >= 0) numLinesEst++;
+    return prev + cur.replace(/\u001b\[\d\d?m/g, '').length + 1;
+  }, 0);
+
+  if (length > 60) {
+    return braces[0] +
+           (base === '' ? '' : base + '\n ') +
+           ' ' +
+           output.join(',\n  ') +
+           ' ' +
+           braces[1];
+  }
+
+  return braces[0] + base + ' ' + output.join(', ') + ' ' + braces[1];
+}
+
+
+// NOTE: These type checking functions intentionally don't use `instanceof`
+// because it is fragile and can be easily faked with `Object.create()`.
+function isArray(ar) {
+  return Array.isArray(ar);
+}
+exports.isArray = isArray;
+
+function isBoolean(arg) {
+  return typeof arg === 'boolean';
+}
+exports.isBoolean = isBoolean;
+
+function isNull(arg) {
+  return arg === null;
+}
+exports.isNull = isNull;
+
+function isNullOrUndefined(arg) {
+  return arg == null;
+}
+exports.isNullOrUndefined = isNullOrUndefined;
+
+function isNumber(arg) {
+  return typeof arg === 'number';
+}
+exports.isNumber = isNumber;
+
+function isString(arg) {
+  return typeof arg === 'string';
+}
+exports.isString = isString;
+
+function isSymbol(arg) {
+  return typeof arg === 'symbol';
+}
+exports.isSymbol = isSymbol;
+
+function isUndefined(arg) {
+  return arg === void 0;
+}
+exports.isUndefined = isUndefined;
+
+function isRegExp(re) {
+  return isObject(re) && objectToString(re) === '[object RegExp]';
+}
+exports.isRegExp = isRegExp;
+
+function isObject(arg) {
+  return typeof arg === 'object' && arg !== null;
+}
+exports.isObject = isObject;
+
+function isDate(d) {
+  return isObject(d) && objectToString(d) === '[object Date]';
+}
+exports.isDate = isDate;
+
+function isError(e) {
+  return isObject(e) &&
+      (objectToString(e) === '[object Error]' || e instanceof Error);
+}
+exports.isError = isError;
+
+function isFunction(arg) {
+  return typeof arg === 'function';
+}
+exports.isFunction = isFunction;
+
+function isPrimitive(arg) {
+  return arg === null ||
+         typeof arg === 'boolean' ||
+         typeof arg === 'number' ||
+         typeof arg === 'string' ||
+         typeof arg === 'symbol' ||  // ES6 symbol
+         typeof arg === 'undefined';
+}
+exports.isPrimitive = isPrimitive;
+
+exports.isBuffer = require('./support/isBuffer');
+
+function objectToString(o) {
+  return Object.prototype.toString.call(o);
+}
+
+
+function pad(n) {
+  return n < 10 ? '0' + n.toString(10) : n.toString(10);
+}
+
+
+var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep',
+              'Oct', 'Nov', 'Dec'];
+
+// 26 Feb 16:19:34
+function timestamp() {
+  var d = new Date();
+  var time = [pad(d.getHours()),
+              pad(d.getMinutes()),
+              pad(d.getSeconds())].join(':');
+  return [d.getDate(), months[d.getMonth()], time].join(' ');
+}
+
+
+// log is just a thin wrapper to console.log that prepends a timestamp
+exports.log = function() {
+  console.log('%s - %s', timestamp(), exports.format.apply(exports, arguments));
+};
+
+
+/**
+ * Inherit the prototype methods from one constructor into another.
+ *
+ * The Function.prototype.inherits from lang.js rewritten as a standalone
+ * function (not on Function.prototype). NOTE: If this file is to be loaded
+ * during bootstrapping this function needs to be rewritten using some native
+ * functions as prototype setup using normal JavaScript does not work as
+ * expected during bootstrapping (see mirror.js in r114903).
+ *
+ * @param {function} ctor Constructor function which needs to inherit the
+ *     prototype.
+ * @param {function} superCtor Constructor function to inherit prototype from.
+ */
+exports.inherits = require('inherits');
+
+exports._extend = function(origin, add) {
+  // Don't do anything if add isn't an object
+  if (!add || !isObject(add)) return origin;
+
+  var keys = Object.keys(add);
+  var i = keys.length;
+  while (i--) {
+    origin[keys[i]] = add[keys[i]];
+  }
+  return origin;
+};
+
+function hasOwnProperty(obj, prop) {
+  return Object.prototype.hasOwnProperty.call(obj, prop);
+}
+
+}).call(this,require("g5I+bs"),typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+},{"./support/isBuffer":96,"g5I+bs":92,"inherits":77}]},{},[2])

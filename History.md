@@ -1,3 +1,8 @@
+3.8.39 / 2016-01-15
+===================
+ * fixed; casting a number to a buffer #3764
+ * fixed; enumerating virtual property with nested objects #3743 [kusold](https://github.com/kusold)
+
 4.3.6 / 2016-01-15
 ==================
  * fix(types): casting a number to a buffer #3764

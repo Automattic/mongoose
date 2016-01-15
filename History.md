@@ -1,3 +1,8 @@
+3.8.39 / 2016-01-15
+===================
+ * fixed; casting a number to a buffer #3764
+ * fixed; enumerating virtual property with nested objects #3743 [kusold](https://github.com/kusold)
+
 3.8.38 / 2016-01-07
 ===================
  * fixed; aggregate.append an array #3730 [dbkup](https://github.com/dbkup)

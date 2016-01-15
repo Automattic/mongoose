@@ -449,5 +449,14 @@ describe('types.buffer', function(){
         })
       })
     })
+
+    it('cast from number (gh-3764)', function(done) {
+      var schema = new Schema({ buf: Buffer });
+      var MyModel = mongoose.model('gh3764', schema);
+
+      var doc = new MyModel({ buf: 9001 });
+      assert.equal(doc.buf.length, 1);
+      done();
+    });
   })
 })

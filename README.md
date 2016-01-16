@@ -217,7 +217,6 @@ BlogPost.findById(myId, function (err, post) {
 
 Embedded documents enjoy all the same features as your models. Defaults, validators, middleware. Whenever an error occurs, it's bubbled to the `save()` error callback, so error handling is a snap!
 
-Mongoose interacts with your embedded documents in arrays _atomically_, out of the box.
 
 ### Middleware
 

@@ -111,6 +111,30 @@ block content
     schema.post('remove', function(doc) {
       console.log('%s has been removed', doc._id);
     });
+  
+  h3#post-async Asynchronous Post Hooks
+  :markdown
+    While post middleware doesn't receive flow control, you can still make
+    sure that asynchronous post hooks are executed in a pre-defined order.
+    If your post hook function takes at least 2 parameters, mongoose will
+    assume the second parameter is a `next()` function that you will call to
+    trigger the next middleware in the sequence.
+  
+  :js
+    // Takes 2 parameters: this is an asynchronous post hook
+    schema.post('save', function(doc, next) {
+      setTimeout(function() {
+        console.log('post1');
+        // Kick off the second post hook
+        next();
+      }, 10);
+    });
+
+    // Will not execute until the first middleware calls `next()`
+    schema.post('save', function(doc, next) {
+      console.log('post2');
+      next();
+    });
 
   h3#notes Notes on findAndUpdate() and Query Middleware
   :markdown

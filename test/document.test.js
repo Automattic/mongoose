@@ -2355,5 +2355,31 @@ describe('document', function() {
         });
       });
     });
+
+    it('handles 0 for numeric subdoc ids (gh-3776)', function(done) {
+      var personSchema = Schema({
+        _id: Number,
+        name: String,
+        age: Number,
+        friends: [{ type: Number, ref: 'gh3776' }]
+      });
+
+      var Person = db.model('gh3776', personSchema);
+
+      var people = [
+        { _id: 0, name: 'Alice' },
+        { _id: 1, name: 'Bob' }
+      ];
+
+      Person.create(people, function(error, people) {
+        assert.ifError(error);
+        var alice = people[0];
+        alice.friends.push(people[1]);
+        alice.save(function(error) {
+          assert.ifError(error);
+          done();
+        });
+      });
+    });
   });
 });

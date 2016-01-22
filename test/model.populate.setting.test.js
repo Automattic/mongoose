@@ -185,9 +185,9 @@ describe('model: populate:', function() {
              doc.embed[0].other = user1b;
              assert.deepEqual(doc.embed[0].other.toObject(), user1b.toObject());
 
-            var user1c = user('user2c');
-            doc.embed[0].nested = [{ subdoc: user1c }];
-            assert.deepEqual(doc.embed[0].nested[0].subdoc.toObject(), user1c.toObject());
+             var user1c = user('user2c');
+             doc.embed[0].nested = [{ subdoc: user1c }];
+             assert.deepEqual(doc.embed[0].nested[0].subdoc.toObject(), user1c.toObject());
 
             // embedded without declared ref in schema
              var user2a = user('user2a');

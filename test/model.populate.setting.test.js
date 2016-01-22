@@ -58,7 +58,8 @@ describe('model: populate:', function() {
             _creator: { type: id, ref: refuser },
             embed: [{
               other: { type: id, ref: refuser },
-              array: [{ type: id, ref: refuser }]
+              array: [{ type: id, ref: refuser }],
+              nested: [{ subdoc: { type: id, ref: refuser }}]
             }]
           });
 
@@ -120,7 +121,7 @@ describe('model: populate:', function() {
 
         it('if a document', function(done) {
           B.findById(b1)
-           .populate('fans _creator embed.other embed.array')
+           .populate('fans _creator embed.other embed.array embed.nested.subdoc')
            .populate({ path: 'adhoc.subdoc', model: refuser })
            .populate({ path: 'adhoc.subarray.things', model: refuser })
            .exec(function(err, doc) {
@@ -184,6 +185,10 @@ describe('model: populate:', function() {
              doc.embed[0].other = user1b;
              assert.deepEqual(doc.embed[0].other.toObject(), user1b.toObject());
 
+             var user1c = user('user2c');
+             doc.embed[0].nested = [{ subdoc: user1c }];
+             assert.deepEqual(doc.embed[0].nested[0].subdoc.toObject(), user1c.toObject());
+
             // embedded without declared ref in schema
              var user2a = user('user2a');
              doc.adhoc[0].subdoc = user2a;
@@ -206,6 +211,7 @@ describe('model: populate:', function() {
                  assert.equal(String(doc._creator), creator._id);
                  assert.equal(doc.embed[0].array[0], user1a.id);
                  assert.equal(doc.embed[0].other, user1b.id);
+                 assert.equal(doc.embed[0].nested[0].subdoc, user1c.id);
                  assert.equal(doc.adhoc[0].subdoc, user2a.id);
                  assert.equal(doc.adhoc[0].subarray[0].things[1], user2b.id);
                  done();
@@ -216,7 +222,7 @@ describe('model: populate:', function() {
 
         it('if an object', function(done) {
           B.findById(b2)
-           .populate('fans _creator embed.other embed.array')
+           .populate('fans _creator embed.other embed.array embed.nested.subdoc')
            .populate({ path: 'adhoc.subdoc', model: refuser })
            .populate({ path: 'adhoc.subarray.things', model: refuser })
            .exec(function(err, doc) {
@@ -279,6 +285,12 @@ describe('model: populate:', function() {
              assert.equal(name, doc.embed[0].other.name);
              var user1bId = doc.embed[0].other._id;
 
+             name = 'user1c';
+             var user1c = userLiteral(name);
+             doc.embed[0].nested = [{ subdoc: user1c }];
+             assert.equal(name, doc.embed[0].nested[0].subdoc.name);
+             var user1cId = doc.embed[0].nested[0].subdoc._id;
+
             // embedded without declared ref in schema
              name = 'user2a';
              var user2a = userLiteral(name);
@@ -303,6 +315,7 @@ describe('model: populate:', function() {
                  assert.equal(doc.fans[5], String(fan5Id));
                  assert.equal(doc.embed[0].array[0], String(user1aId));
                  assert.equal(doc.embed[0].other, String(user1bId));
+                 assert.equal(doc.embed[0].nested[0].subdoc, String(user1cId));
                  assert.equal(doc.adhoc[0].subdoc, String(user2aId));
                  assert.equal(doc.adhoc[0].subarray[0].things[1], String(user2bId));
                  done();

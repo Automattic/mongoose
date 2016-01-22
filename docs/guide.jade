@@ -622,7 +622,7 @@ block content
     var thingSchema = new Schema({..}, { timestamps: { createdAt: 'created_at' } });
     var Thing = mongoose.model('Thing', thingSchema);
     var thing = new Thing();
-    thing.save(); // `created_at` & `updatedAt` will included
+    thing.save(); // `created_at` & `updatedAt` will be included
 
   h3#plugins Pluggable
   p

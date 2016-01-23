@@ -430,7 +430,7 @@ describe('document: hooks:', function() {
     });
   });
 
-  it('post save hooks on subdocuments work (gh-915)', function(done) {
+  it('post save hooks on subdocuments work (gh-915) (gh-3780)', function(done) {
 
     var doneCalled = false;
     var _done = function(e) {
@@ -477,7 +477,7 @@ describe('document: hooks:', function() {
         doc.subs.push({ name: 'maa' });
         doc.save(function(err) {
           assert.ifError(err);
-          assert.equal(4, called.post);
+          assert.equal(called.post, 3);
 
           _done();
         });

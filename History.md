@@ -1,3 +1,17 @@
+4.3.7 / 2015-01-23
+==================
+ * docs: grammar fix in timestamps docs #3786 [zclancy](https://github.com/zclancy)
+ * fix(document): setting nested populated docs #3783 [slamuu](https://github.com/slamuu)
+ * fix(document): don't call post save hooks twice for pushed docs #3780
+ * fix(model): handle `_id=0` correctly #3776
+ * docs(middleware): async post hooks #3770
+ * docs: remove confusing sentence #3765 [marcusmellis89](https://github.com/marcusmellis89)
+
+3.8.39 / 2016-01-15
+===================
+ * fixed; casting a number to a buffer #3764
+ * fixed; enumerating virtual property with nested objects #3743 [kusold](https://github.com/kusold)
+
 4.3.6 / 2016-01-15
 ==================
  * fix(types): casting a number to a buffer #3764

@@ -1072,7 +1072,12 @@ Document.prototype.set = function(path, val, type, options) {
         schema.options.ref &&
         val instanceof Document &&
         schema.options.ref === val.constructor.modelName) {
-      this.populated(path, val._id, { model: val.constructor });
+      if (this.ownerDocument) {
+        this.ownerDocument().populated(this.$__fullPath(path),
+          val._id, { model: val.constructor });
+      } else {
+        this.populated(path, val._id, { model: val.constructor });
+      }
       didPopulate = true;
     }
 
@@ -6176,7 +6181,7 @@ DocumentArray.prototype.doValidateSync = function(array, scope) {
  * @api private
  */
 
-DocumentArray.prototype.cast = function(value, doc, init, prev) {
+DocumentArray.prototype.cast = function(value, doc, init, prev, options) {
   var selected,
       subdoc,
       i;
@@ -6190,7 +6195,8 @@ DocumentArray.prototype.cast = function(value, doc, init, prev) {
     return this.cast([value], doc, init, prev);
   }
 
-  if (!(value && value.isMongooseDocumentArray)) {
+  if (!(value && value.isMongooseDocumentArray) &&
+      (!options || !options.skipDocumentArrayCast)) {
     value = new MongooseDocumentArray(value, this.path, doc);
     if (prev && prev._handlers) {
       for (var key in prev._handlers) {
@@ -8136,7 +8142,7 @@ SchemaType.prototype.getDefault = function(scope, init) {
  * @api private
  */
 
-SchemaType.prototype.applySetters = function(value, scope, init, priorVal) {
+SchemaType.prototype.applySetters = function(value, scope, init, priorVal, options) {
   var v = value,
       setters = this.setters,
       len = setters.length,
@@ -8157,7 +8163,7 @@ SchemaType.prototype.applySetters = function(value, scope, init, priorVal) {
   if (null === v || undefined === v) return v;
 
   // do not cast until all setters are applied #665
-  v = this.cast(v, scope, init, priorVal);
+  v = this.cast(v, scope, init, priorVal, options);
 
   return v;
 };
@@ -8916,7 +8922,8 @@ MongooseArray.mixin = {
 
   push: function() {
     var values = [].map.call(arguments, this._mapCast, this);
-    values = this._schema.applySetters(values, this._parent);
+    values = this._schema.applySetters(values, this._parent, undefined,
+      undefined, { skipDocumentArrayCast: true });
     var ret = [].push.apply(this, values);
 
     // $pushAll might be fibbed (could be $push). But it makes it easier to

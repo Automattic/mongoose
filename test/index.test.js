@@ -128,13 +128,11 @@ describe('mongoose module:', function() {
           cb(new Error('bam'));
         };
 
-        var failure = {};
-        try {
-          mong.disconnect();
-        } catch (err) {
-          failure = err;
-        }
-        assert.equal('bam', failure.message);
+        mong.disconnect()
+          .on('error', function (error) {
+            assert.equal('bam', error.message);
+          });
+
         done();
       });
     });

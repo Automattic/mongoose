@@ -1,4 +1,4 @@
-4.3.7 / 2015-01-23
+4.3.7 / 2016-01-23
 ==================
  * docs: grammar fix in timestamps docs #3786 [zclancy](https://github.com/zclancy)
  * fix(document): setting nested populated docs #3783 [slamuu](https://github.com/slamuu)

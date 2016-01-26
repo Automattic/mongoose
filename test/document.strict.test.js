@@ -441,7 +441,7 @@ describe('document: strict mode:', function() {
       done();
     });
 
-    it('set nested to num throws ObjectExpectedError (gh-3735)', function() {
+    it('set nested to num throws ObjectExpectedError (gh-3735)', function(done) {
       var schema = new Schema({
         resolved: {
           by: { type: String }
@@ -453,6 +453,7 @@ describe('document: strict mode:', function() {
       assert.throws(function() {
         new Test({ resolved: 123 });
       }, /ObjectExpectedError/);
+      done();
     });
   });
 });

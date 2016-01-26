@@ -35,6 +35,7 @@ describe('types array', function() {
     assert.ok(a instanceof Array);
     assert.ok(a.isMongooseArray);
     assert.equal(true, Array.isArray(a));
+
     assert.deepEqual(Object.keys(a), Object.keys(a.toObject()));
     assert.deepEqual(a._atomics.constructor, Object);
     done();

@@ -7,7 +7,6 @@ var start = require('./common')
   , mongoose = require('./common').mongoose
   , random = require('../lib/utils').random
   , setValue = require('../lib/utils').setValue
-  , MongooseArray = mongoose.Types.Array
   , MongooseDocumentArray = mongoose.Types.DocumentArray
   , EmbeddedDocument = require('../lib/types/embedded')
   , DocumentArray = require('../lib/types/documentarray')
@@ -55,12 +54,10 @@ describe('types.documentarray', function() {
     assert.ok(a.isMongooseArray);
     assert.ok(a.isMongooseDocumentArray);
     assert.ok(Array.isArray(a));
-    assert.equal('Object', a._atomics.constructor.name);
-    assert.equal('object', typeof a);
 
-    var b = new MongooseArray([1,2,3,4]);
-    assert.equal('object', typeof b);
-    assert.equal(Object.keys(b.toObject()).length,4);
+    assert.deepEqual(Object.keys(a), Object.keys(a.toObject()));
+    assert.deepEqual(a._atomics.constructor, Object);
+
     done();
   });
 

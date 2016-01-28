@@ -5167,6 +5167,23 @@ describe('Model', function() {
     });
   });
 
+  it('insertMany() (gh-723)', function(done) {
+    var db = start();
+    var schema = new Schema({ name: String });
+    var Movie = db.model('gh723', schema);
+
+    var arr = [{ name: 'Star Wars' }, { name: 'The Empire Strikes Back' }];
+    Movie.insertMany(arr, function(error, docs) {
+      assert.ifError(error);
+      assert.equal(docs.length, 2);
+      Movie.find({}, function(error, docs) {
+        assert.ifError(error);
+        assert.equal(docs.length, 2);
+        done();
+      });
+    });
+  });
+
   describe('gh-2442', function() {
     it('marks array as modified when initializing non-array from db', function(done) {
       var db = start();

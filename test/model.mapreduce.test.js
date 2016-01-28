@@ -45,15 +45,9 @@ var collection = 'mapreduce_' + random();
 mongoose.model('MapReduce', BlogPost);
 
 describe('model: mapreduce:', function() {
-<<<<<<< HEAD
   it('works', function(done) {
     var db = start(),
         MR = db.model('MapReduce', collection);
-=======
-  it('works', function(done){
-    var db = start()
-      , MR = db.model('MapReduce', collection);
->>>>>>> 4.4
 
     var magicID;
     var id = new mongoose.Types.ObjectId;

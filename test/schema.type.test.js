@@ -3,9 +3,9 @@
  * Module dependencies.
  */
 
-var mongoose = require('./common').mongoose
-  , assert = require('assert')
-  , Schema = mongoose.Schema;
+var mongoose = require('./common').mongoose,
+    assert = require('assert'),
+    Schema = mongoose.Schema;
 
 describe('schematype', function() {
   it('honors the selected option', function(done) {

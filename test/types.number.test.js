@@ -3,9 +3,9 @@
  * Module dependencies.
  */
 
-var mongoose = require('./common').mongoose
-  , SchemaNumber = mongoose.Schema.Types.Number
-  , assert = require('assert');
+var mongoose = require('./common').mongoose,
+    SchemaNumber = mongoose.Schema.Types.Number,
+    assert = require('assert');
 
 /**
  * Test.

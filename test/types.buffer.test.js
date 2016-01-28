@@ -3,28 +3,28 @@
  * Module dependencies.
  */
 
-var start = require('./common')
-  , assert = require('assert')
-  , mongoose = require('./common').mongoose
-  , Schema = mongoose.Schema
-  , random = require('../lib/utils').random
-  , MongooseBuffer = mongoose.Types.Buffer;
+var start = require('./common'),
+    assert = require('assert'),
+    mongoose = require('./common').mongoose,
+    Schema = mongoose.Schema,
+    random = require('../lib/utils').random,
+    MongooseBuffer = mongoose.Types.Buffer;
 
 function valid(v) {
   return !v || v.length > 10;
 }
 
 var subBuf = new Schema({
-  name: String
-  , buf: { type: Buffer, validate: [valid, 'valid failed'], required: true }
+  name: String,
+  buf: { type: Buffer, validate: [valid, 'valid failed'], required: true }
 });
 
 var UserBuffer = new Schema({
-  name: String
-  , serial: Buffer
-  , array: [Buffer]
-  , required: { type: Buffer, required: true, index: true }
-  , sub: [subBuf]
+  name: String,
+  serial: Buffer,
+  array: [Buffer],
+  required: { type: Buffer, required: true, index: true },
+  sub: [subBuf]
 });
 
 // Dont put indexed models on the default connection, it
@@ -57,8 +57,8 @@ describe('types.buffer', function() {
   });
 
   it('buffer validation', function(done) {
-    var db = start()
-      , User = db.model('UserBuffer', UserBuffer, 'usersbuffer_' + random());
+    var db = start(),
+        User = db.model('UserBuffer', UserBuffer, 'usersbuffer_' + random());
 
     User.on('index', function() {
       var t = new User({
@@ -102,16 +102,16 @@ describe('types.buffer', function() {
   });
 
   it('buffer storage', function(done) {
-    var db = start()
-      , User = db.model('UserBuffer', UserBuffer, 'usersbuffer_' + random());
+    var db = start(),
+        User = db.model('UserBuffer', UserBuffer, 'usersbuffer_' + random());
 
     User.on('index', function() {
       var sampleBuffer = new Buffer([123, 223, 23, 42, 11]);
 
       var tj = new User({
-        name: 'tj'
-        , serial: sampleBuffer
-        , required: new Buffer(sampleBuffer)
+        name: 'tj',
+        serial: sampleBuffer,
+        required: new Buffer(sampleBuffer)
       });
 
       tj.save(function(err) {
@@ -133,16 +133,16 @@ describe('types.buffer', function() {
   });
 
   it('test write markModified', function(done) {
-    var db = start()
-      , User = db.model('UserBuffer', UserBuffer, 'usersbuffer_' + random());
+    var db = start(),
+        User = db.model('UserBuffer', UserBuffer, 'usersbuffer_' + random());
 
     User.on('index', function() {
       var sampleBuffer = new Buffer([123, 223, 23, 42, 11]);
 
       var tj = new User({
-        name: 'tj'
-        , serial: sampleBuffer
-        , required: sampleBuffer
+        name: 'tj',
+        serial: sampleBuffer,
+        required: sampleBuffer
       });
 
       tj.save(function(err) {
@@ -183,72 +183,72 @@ describe('types.buffer', function() {
                 not(tj);
                 tj.required.writeUInt8(0x3, 0, 'big');
                 is(tj);
-              }
-              , 'writeUInt16': function() {
+              },
+              'writeUInt16': function() {
                 reset(tj);
                 not(tj);
                 tj.required.writeUInt16(0xbeef, 0, 'little');
                 is(tj);
-              }
-              , 'writeUInt16LE': function() {
+              },
+              'writeUInt16LE': function() {
                 reset(tj);
                 not(tj);
                 tj.required.writeUInt16LE(0xbeef, 0);
                 is(tj);
-              }
-              , 'writeUInt16BE': function() {
+              },
+              'writeUInt16BE': function() {
                 reset(tj);
                 not(tj);
                 tj.required.writeUInt16BE(0xbeef, 0);
                 is(tj);
-              }
-              , 'writeUInt32': function() {
+              },
+              'writeUInt32': function() {
                 reset(tj);
                 not(tj);
                 tj.required.writeUInt32(0xfeedface, 0, 'little');
                 is(tj);
-              }
-              , 'writeUInt32LE': function() {
+              },
+              'writeUInt32LE': function() {
                 reset(tj);
                 not(tj);
                 tj.required.writeUInt32LE(0xfeedface, 0);
                 is(tj);
-              }
-              , 'writeUInt32BE': function() {
+              },
+              'writeUInt32BE': function() {
                 reset(tj);
                 not(tj);
                 tj.required.writeUInt32BE(0xfeedface, 0);
                 is(tj);
-              }
-              , 'writeInt8': function() {
+              },
+              'writeInt8': function() {
                 reset(tj);
                 not(tj);
                 tj.required.writeInt8(-5, 0, 'big');
                 is(tj);
-              }
-              , 'writeInt16': function() {
+              },
+              'writeInt16': function() {
                 reset(tj);
                 not(tj);
                 tj.required.writeInt16(0x0023, 2, 'little');
                 is(tj);
                 assert.equal(tj.required[2], 0x23);
                 assert.equal(tj.required[3], 0x00);
-              }
-              , 'writeInt16LE': function() {
+              },
+              'writeInt16LE': function() {
                 reset(tj);
                 not(tj);
                 tj.required.writeInt16LE(0x0023, 2);
                 is(tj);
                 assert.equal(tj.required[2], 0x23);
                 assert.equal(tj.required[3], 0x00);
-              }
-              , 'writeInt16BE': function() {
+              },
+              'writeInt16BE': function() {
                 reset(tj);
                 not(tj);
                 tj.required.writeInt16BE(0x0023, 2);
                 is(tj);
-              }
-              , 'writeInt32': function() {
+              },
+              'writeInt32': function() {
                 reset(tj);
                 not(tj);
                 tj.required.writeInt32(0x23, 0, 'big');
@@ -258,15 +258,15 @@ describe('types.buffer', function() {
                 assert.equal(tj.required[2], 0x00);
                 assert.equal(tj.required[3], 0x23);
                 tj.required = new Buffer(8);
-              }
-              , 'writeInt32LE': function() {
+              },
+              'writeInt32LE': function() {
                 tj.required = new Buffer(8);
                 reset(tj);
                 not(tj);
                 tj.required.writeInt32LE(0x23, 0);
                 is(tj);
-              }
-              , 'writeInt32BE': function() {
+              },
+              'writeInt32BE': function() {
                 tj.required = new Buffer(8);
                 reset(tj);
                 not(tj);
@@ -276,8 +276,8 @@ describe('types.buffer', function() {
                 assert.equal(tj.required[1], 0x00);
                 assert.equal(tj.required[2], 0x00);
                 assert.equal(tj.required[3], 0x23);
-              }
-              , 'writeFloat': function() {
+              },
+              'writeFloat': function() {
                 tj.required = new Buffer(16);
                 reset(tj);
                 not(tj);
@@ -291,36 +291,36 @@ describe('types.buffer', function() {
                 assert.equal(tj.required[5], 0xff);
                 assert.equal(tj.required[6], 0xff);
                 assert.equal(tj.required[7], 0xff);
-              }
-              , 'writeFloatLE': function() {
+              },
+              'writeFloatLE': function() {
                 tj.required = new Buffer(16);
                 reset(tj);
                 not(tj);
                 tj.required.writeFloatLE(2.225073858507201e-308, 0);
                 is(tj);
-              }
-              , 'writeFloatBE': function() {
+              },
+              'writeFloatBE': function() {
                 tj.required = new Buffer(16);
                 reset(tj);
                 not(tj);
                 tj.required.writeFloatBE(2.225073858507201e-308, 0);
                 is(tj);
-              }
-              , 'writeDoubleLE': function() {
+              },
+              'writeDoubleLE': function() {
                 tj.required = new Buffer(8);
                 reset(tj);
                 not(tj);
                 tj.required.writeDoubleLE(0xdeadbeefcafebabe, 0);
                 is(tj);
-              }
-              , 'writeDoubleBE': function() {
+              },
+              'writeDoubleBE': function() {
                 tj.required = new Buffer(8);
                 reset(tj);
                 not(tj);
                 tj.required.writeDoubleBE(0xdeadbeefcafebabe, 0);
                 is(tj);
-              }
-              , 'fill': function() {
+              },
+              'fill': function() {
                 tj.required = new Buffer(8);
                 reset(tj);
                 not(tj);
@@ -329,8 +329,8 @@ describe('types.buffer', function() {
                 for (var i = 0; i < tj.required.length; i++) {
                   assert.strictEqual(tj.required[i], 0);
                 }
-              }
-              , 'set': function() {
+              },
+              'set': function() {
                 reset(tj);
                 not(tj);
                 tj.required.set(0, 1);
@@ -338,9 +338,9 @@ describe('types.buffer', function() {
               }
             };
 
-            var keys = Object.keys(fns)
-              , i = keys.length
-              , key;
+            var keys = Object.keys(fns),
+                i = keys.length,
+                key;
 
             while (i--) {
               key = keys[i];
@@ -364,8 +364,8 @@ describe('types.buffer', function() {
   });
 
   it('can be set to null', function(done) {
-    var db = start()
-      , User = db.model('UserBuffer', UserBuffer, 'usersbuffer_' + random());
+    var db = start(),
+        User = db.model('UserBuffer', UserBuffer, 'usersbuffer_' + random());
     var user = new User({ array: [null], required: new Buffer(1) });
     user.save(function(err, doc) {
       assert.ifError(err);

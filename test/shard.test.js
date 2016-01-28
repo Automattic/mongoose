@@ -1,18 +1,20 @@
 
-var start = require('./common')
-  , assert = require('assert')
-  , random = require('../lib/utils').random
-  , mongoose = start.mongoose
-  , Schema = mongoose.Schema;
+var start = require('./common'),
+    assert = require('assert'),
+    random = require('../lib/utils').random,
+    mongoose = start.mongoose,
+    Schema = mongoose.Schema;
 
 var uri = process.env.MONGOOSE_SHARD_TEST_URI;
 
 if (!uri) {
-  console.log('\033[31m', '\n', 'You\'re not testing shards!'
-            , '\n', 'Please set the MONGOOSE_SHARD_TEST_URI env variable.', '\n'
-            , 'e.g: `mongodb://localhost:27017/database', '\n'
-            , 'Sharding must already be enabled on your database'
-            , '\033[39m');
+  console.log(
+    '\033[31m', '\n', 'You\'re not testing shards!',
+    '\n', 'Please set the MONGOOSE_SHARD_TEST_URI env variable.', '\n',
+    'e.g: `mongodb://localhost:27017/database', '\n',
+    'Sharding must already be enabled on your database',
+    '\033[39m'
+  );
 
   // let expresso shut down this test
   exports.r = function expressoHack() {};
@@ -20,9 +22,9 @@ if (!uri) {
 }
 
 var schema = new Schema({
-  name: String
-  , age: Number
-  , likes: [String]
+  name: String,
+  age: Number,
+  likes: [String]
 }, { shardkey: { name: 1, age: 1 }});
 
 // to keep mongodb happy when sharding the collection

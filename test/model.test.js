@@ -3,17 +3,17 @@ Error.stackTraceLimit = Infinity;
  * Test dependencies.
  */
 
-var start = require('./common')
-  , assert = require('assert')
-  , mongoose = start.mongoose
-  , random = require('../lib/utils').random
-  , Schema = mongoose.Schema
-  , ValidatorError = mongoose.Error.ValidatorError
-  , ValidationError = mongoose.Error.ValidationError
-  , ObjectId = Schema.Types.ObjectId
-  , DocumentObjectId = mongoose.Types.ObjectId
-  , EmbeddedDocument = mongoose.Types.Embedded
-  , MongooseError = mongoose.Error;
+var start = require('./common'),
+    assert = require('assert'),
+    mongoose = start.mongoose,
+    random = require('../lib/utils').random,
+    Schema = mongoose.Schema,
+    ValidatorError = mongoose.Error.ValidatorError,
+    ValidationError = mongoose.Error.ValidationError,
+    ObjectId = Schema.Types.ObjectId,
+    DocumentObjectId = mongoose.Types.ObjectId,
+    EmbeddedDocument = mongoose.Types.Embedded,
+    MongooseError = mongoose.Error;
 
 /**
  * Setup.
@@ -22,27 +22,27 @@ var start = require('./common')
 var Comments = new Schema;
 
 Comments.add({
-  title     : String
-  , date      : Date
-  , body      : String
-  , comments  : [Comments]
+  title: String,
+  date: Date,
+  body: String,
+  comments: [Comments]
 });
 
 var BlogPost = new Schema({
-  title     : String
-  , author    : String
-  , slug      : String
-  , date      : Date
-  , meta      : {
-    date      : Date
-      , visitors  : Number
-  }
-  , published : Boolean
-  , mixed     : {}
-  , numbers   : [Number]
-  , owners    : [ObjectId]
-  , comments  : [Comments]
-  , nested    : { array: [Number] }
+  title: String,
+  author: String,
+  slug: String,
+  date: Date,
+  meta: {
+    date: Date,
+    visitors: Number
+  },
+  published: Boolean,
+  mixed: {},
+  numbers: [Number],
+  owners: [ObjectId],
+  comments: [Comments],
+  nested: { array: [Number] }
 });
 
 BlogPost
@@ -152,8 +152,8 @@ describe('Model', function() {
   });
   describe('isNew', function() {
     it('is true on instantiation', function(done) {
-      var db = start()
-        , BlogPost = db.model('BlogPost', collection);
+      var db = start(),
+          BlogPost = db.model('BlogPost', collection);
 
       db.close();
       var post = new BlogPost;
@@ -165,8 +165,8 @@ describe('Model', function() {
       var db = start();
 
       var schema = new Schema({
-        name: { type: String, unique: true }
-        , em: [new Schema({ x: Number })]
+        name: { type: String, unique: true },
+        em: [new Schema({ x: Number })]
       }, { collection: 'testisnewonfail_' + random() });
 
       var A = db.model('isNewOnFail', schema);
@@ -207,8 +207,8 @@ describe('Model', function() {
 
   describe('schema', function() {
     it('should exist', function(done) {
-      var db = start()
-        , BlogPost = db.model('BlogPost', collection);
+      var db = start(),
+          BlogPost = db.model('BlogPost', collection);
 
       db.close();
       assert.ok(BlogPost.schema instanceof Schema);
@@ -216,9 +216,9 @@ describe('Model', function() {
       done();
     });
     it('emits init event', function(done) {
-      var db = start()
-        , schema = new Schema({ name: String })
-        , model;
+      var db = start(),
+          schema = new Schema({ name: String }),
+          model;
 
       schema.on('init', function(model_) {
         model = model_;
@@ -233,8 +233,8 @@ describe('Model', function() {
 
   describe('structure', function() {
     it('default when instantiated', function(done) {
-      var db = start()
-        , BlogPost = db.model('BlogPost', collection);
+      var db = start(),
+          BlogPost = db.model('BlogPost', collection);
 
       db.close();
       var post = new BlogPost;
@@ -265,11 +265,11 @@ describe('Model', function() {
     describe('array', function() {
       describe('defaults', function() {
         it('to a non-empty array', function(done) {
-          var db = start()
-            , DefaultArraySchema = new Schema({
-              arr: {type: Array, cast: String, default: ['a', 'b', 'c']}
-                , single: {type: Array, cast: String, default: ['a']}
-            });
+          var db = start(),
+              DefaultArraySchema = new Schema({
+                arr: {type: Array, cast: String, default: ['a', 'b', 'c']},
+                single: {type: Array, cast: String, default: ['a']}
+              });
           mongoose.model('DefaultArray', DefaultArraySchema);
           var DefaultArray = db.model('DefaultArray', collection);
           var arr = new DefaultArray;
@@ -284,11 +284,11 @@ describe('Model', function() {
         });
 
         it('empty', function(done) {
-          var db = start()
-            , DefaultZeroCardArraySchema = new Schema({
-              arr: {type: Array, cast: String, default: []}
-              , auto: [Number]
-            });
+          var db = start(),
+              DefaultZeroCardArraySchema = new Schema({
+                arr: {type: Array, cast: String, default: []},
+                auto: [Number]
+              });
           mongoose.model('DefaultZeroCardArray', DefaultZeroCardArraySchema);
           var DefaultZeroCardArray = db.model('DefaultZeroCardArray', collection);
           db.close();
@@ -302,8 +302,8 @@ describe('Model', function() {
     });
 
     it('a hash with one null value', function(done) {
-      var db = start()
-        , BlogPost = db.model('BlogPost', collection);
+      var db = start(),
+          BlogPost = db.model('BlogPost', collection);
 
       var post = new BlogPost({
         title: null
@@ -314,9 +314,9 @@ describe('Model', function() {
     });
 
     it('when saved', function(done) {
-      var db = start()
-        , BlogPost = db.model('BlogPost', collection)
-        , pending = 2;
+      var db = start(),
+          BlogPost = db.model('BlogPost', collection),
+          pending = 2;
 
       function cb() {
         if (--pending) return;
@@ -365,8 +365,8 @@ describe('Model', function() {
 
 
     it('when saved using the promise not the callback', function(done) {
-      var db = start()
-        , BlogPost = db.model('BlogPost', collection);
+      var db = start(),
+          BlogPost = db.model('BlogPost', collection);
 
       var post = new BlogPost();
       var p = post.save();
@@ -393,25 +393,25 @@ describe('Model', function() {
 
     describe('init', function() {
       it('works', function(done) {
-        var db = start()
-          , BlogPost = db.model('BlogPost', collection);
+        var db = start(),
+            BlogPost = db.model('BlogPost', collection);
 
         var post = new BlogPost();
         db.close();
 
         post.init({
-          title       : 'Test'
-          , slug        : 'test'
-          , date        : new Date
-          , meta        : {
-            date      : new Date
-              , visitors  : 5
-          }
-          , published   : true
-          , owners      : [new DocumentObjectId, new DocumentObjectId]
-          , comments    : [
-                              { title: 'Test', date: new Date, body: 'Test' }
-                            , { title: 'Super', date: new Date, body: 'Cool' }
+          title: 'Test',
+          slug: 'test',
+          date: new Date,
+          meta: {
+            date: new Date,
+            visitors: 5
+          },
+          published: true,
+          owners: [new DocumentObjectId, new DocumentObjectId],
+          comments: [
+                              { title: 'Test', date: new Date, body: 'Test' },
+                             { title: 'Super', date: new Date, body: 'Cool' }
           ]
         });
 
@@ -450,15 +450,15 @@ describe('Model', function() {
       });
 
       it('partially', function(done) {
-        var db = start()
-          , BlogPost = db.model('BlogPost', collection);
+        var db = start(),
+            BlogPost = db.model('BlogPost', collection);
 
         db.close();
         var post = new BlogPost;
         post.init({
-          title       : 'Test'
-          , slug        : 'test'
-          , date        : new Date
+          title: 'Test',
+          slug: 'test',
+          date: new Date
         });
 
         assert.equal(post.get('title'),'Test');
@@ -477,14 +477,14 @@ describe('Model', function() {
       });
 
       it('with partial hash', function(done) {
-        var db = start()
-          , BlogPost = db.model('BlogPost', collection);
+        var db = start(),
+            BlogPost = db.model('BlogPost', collection);
 
         db.close();
         var post = new BlogPost({
           meta: {
-            date      : new Date
-            , visitors  : 5
+            date: new Date,
+            visitors: 5
           }
         });
 
@@ -493,15 +493,15 @@ describe('Model', function() {
       });
 
       it('isNew on embedded documents', function(done) {
-        var db = start()
-          , BlogPost = db.model('BlogPost', collection);
+        var db = start(),
+            BlogPost = db.model('BlogPost', collection);
 
         db.close();
         var post = new BlogPost();
         post.init({
-          title       : 'Test'
-          , slug        : 'test'
-          , comments    : [ { title: 'Test', date: new Date, body: 'Test' } ]
+          title: 'Test',
+          slug: 'test',
+          comments: [ { title: 'Test', date: new Date, body: 'Test' } ]
         });
 
         assert.equal(false, post.get('comments')[0].isNew);
@@ -509,8 +509,8 @@ describe('Model', function() {
       });
 
       it('isNew on embedded documents after saving', function(done) {
-        var db = start()
-          , BlogPost = db.model('BlogPost', collection);
+        var db = start(),
+            BlogPost = db.model('BlogPost', collection);
 
         var post = new BlogPost({ title: 'hocus pocus' });
         post.comments.push({ title: 'Humpty Dumpty', comments: [{title: 'nested'}] });
@@ -548,8 +548,8 @@ describe('Model', function() {
   });
 
   it('saving a model with a null value should perpetuate that null value to the db', function(done) {
-    var db = start()
-      , BlogPost = db.model('BlogPost', collection);
+    var db = start(),
+        BlogPost = db.model('BlogPost', collection);
 
     var post = new BlogPost({
       title: null
@@ -615,8 +615,8 @@ describe('Model', function() {
   });
 
   it('instantiating a model with a hash that maps to at least 1 undefined value', function(done) {
-    var db = start()
-      , BlogPost = db.model('BlogPost', collection);
+    var db = start(),
+        BlogPost = db.model('BlogPost', collection);
 
     var post = new BlogPost({
       title: undefined
@@ -671,8 +671,8 @@ describe('Model', function() {
     var MyModel = db.model('MyModel', MySchema, 'numberrangeerror' + random());
 
     var instance = new MyModel({
-      name: 'test'
-      , _id: 35
+      name: 'test',
+      _id: 35
     });
     instance.save(function(err) {
       assert.ifError(err);
@@ -690,13 +690,13 @@ describe('Model', function() {
   });
 
   it('over-writing a number should persist to the db (gh-342)', function(done) {
-    var db = start()
-      , BlogPost = db.model('BlogPost', collection);
+    var db = start(),
+        BlogPost = db.model('BlogPost', collection);
 
     var post = new BlogPost({
       meta: {
-        date      : new Date
-        , visitors  : 10
+        date: new Date,
+        visitors: 10
       }
     });
 
@@ -717,8 +717,8 @@ describe('Model', function() {
 
   describe('methods', function() {
     it('can be defined', function(done) {
-      var db = start()
-        , BlogPost = db.model('BlogPost', collection);
+      var db = start(),
+          BlogPost = db.model('BlogPost', collection);
 
       db.close();
       var post = new BlogPost();
@@ -767,8 +767,8 @@ describe('Model', function() {
 
   describe('statics', function() {
     it('can be defined', function(done) {
-      var db = start()
-        , BlogPost = db.model('BlogPost', collection);
+      var db = start(),
+          BlogPost = db.model('BlogPost', collection);
 
       db.close();
       assert.equal(BlogPost, BlogPost.woot());
@@ -778,9 +778,9 @@ describe('Model', function() {
 
   describe('casting as validation errors', function() {
     it('error', function(done) {
-      var db = start()
-        , BlogPost = db.model('BlogPost', collection)
-        , threw = false;
+      var db = start(),
+          BlogPost = db.model('BlogPost', collection),
+          threw = false;
 
       try {
         var post = new BlogPost({ date: 'Test', meta: { date: 'Test' } });
@@ -812,9 +812,9 @@ describe('Model', function() {
       });
     });
     it('nested error', function(done) {
-      var db = start()
-        , BlogPost = db.model('BlogPost', collection)
-        , threw = false;
+      var db = start(),
+          BlogPost = db.model('BlogPost', collection),
+          threw = false;
 
       var post = new BlogPost;
 
@@ -848,13 +848,13 @@ describe('Model', function() {
 
 
     it('subdocument cast error', function(done) {
-      var db = start()
-        , BlogPost = db.model('BlogPost', collection);
+      var db = start(),
+          BlogPost = db.model('BlogPost', collection);
 
       var post = new BlogPost({
-        title       : 'Test'
-        , slug        : 'test'
-        , comments    : [ { title: 'Test', date: new Date, body: 'Test' } ]
+        title: 'Test',
+        slug: 'test',
+        comments: [ { title: 'Test', date: new Date, body: 'Test' } ]
       });
 
       post.get('comments')[0].set('date', 'invalid');
@@ -873,13 +873,13 @@ describe('Model', function() {
         return false;
       }
 
-      var db = start()
-        , subs = new Schema({
-          str: {
-            type: String, validate: failingvalidator
-          }
-        })
-        , BlogPost = db.model('BlogPost', {subs: [subs]});
+      var db = start(),
+          subs = new Schema({
+            str: {
+              type: String, validate: failingvalidator
+            }
+          }),
+          BlogPost = db.model('BlogPost', {subs: [subs]});
 
       var post = new BlogPost();
       post.init({
@@ -895,9 +895,9 @@ describe('Model', function() {
 
 
     it('subdocument error when adding a subdoc', function(done) {
-      var db = start()
-        , BlogPost = db.model('BlogPost', collection)
-        , threw = false;
+      var db = start(),
+          BlogPost = db.model('BlogPost', collection),
+          threw = false;
 
       var post = new BlogPost();
 
@@ -921,8 +921,8 @@ describe('Model', function() {
 
 
     it('updates', function(done) {
-      var db = start()
-        , BlogPost = db.model('BlogPost', collection);
+      var db = start(),
+          BlogPost = db.model('BlogPost', collection);
 
       var post = new BlogPost();
       post.set('title', '1');
@@ -946,9 +946,9 @@ describe('Model', function() {
     });
 
     it('$pull', function(done) {
-      var db = start()
-        , BlogPost = db.model('BlogPost', collection)
-        , post = new BlogPost();
+      var db = start(),
+          BlogPost = db.model('BlogPost', collection),
+          post = new BlogPost();
 
       db.close();
       post.get('numbers').push('3');
@@ -957,9 +957,9 @@ describe('Model', function() {
     });
 
     it('$push', function(done) {
-      var db = start()
-        , BlogPost = db.model('BlogPost', collection)
-        , post = new BlogPost();
+      var db = start(),
+          BlogPost = db.model('BlogPost', collection),
+          post = new BlogPost();
 
       post.get('numbers').push(1, 2, 3, 4);
       post.save( function() {
@@ -979,8 +979,8 @@ describe('Model', function() {
     });
 
     it('Number arrays', function(done) {
-      var db = start()
-        , BlogPost = db.model('BlogPost', collection);
+      var db = start(),
+          BlogPost = db.model('BlogPost', collection);
 
       var post = new BlogPost();
       post.numbers.push(1, '2', 3);
@@ -1006,29 +1006,29 @@ describe('Model', function() {
 
       Date.prototype.toObject = function() {
         return {
-          millisecond: 86
-              , second: 42
-              , minute: 47
-              , hour: 17
-              , day: 13
-              , week: 50
-              , month: 11
-              , year: 2011
+          millisecond: 86,
+          second: 42,
+          minute: 47,
+          hour: 17,
+          day: 13,
+          week: 50,
+          month: 11,
+          year: 2011
         };
       };
 
       var S = new Schema({
-        name: String
-        , description: String
-        , sabreId: String
-        , data: {
-          lastPrice: Number
-            , comm: String
-            , curr: String
-            , rateName: String
-        }
-        , created: { type: Date, default: Date.now }
-        , valid: { type: Boolean, default: true }
+        name: String,
+        description: String,
+        sabreId: String,
+        data: {
+          lastPrice: Number,
+          comm: String,
+          curr: String,
+          rateName: String
+        },
+        created: { type: Date, default: Date.now },
+        valid: { type: Boolean, default: true }
       });
 
       var M = db.model('gh502', S);
@@ -1067,13 +1067,13 @@ describe('Model', function() {
       }
 
       mongoose.model('TestValidation', new Schema({
-        simple: { type: String, required: true }
-        , scope: { type: String, validate: [dovalidate, 'scope failed'], required: true }
-        , asyncScope: { type: String, validate: [dovalidateAsync, 'async scope failed'], required: true }
+        simple: { type: String, required: true },
+        scope: { type: String, validate: [dovalidate, 'scope failed'], required: true },
+        asyncScope: { type: String, validate: [dovalidateAsync, 'async scope failed'], required: true }
       }));
 
-      var db = start()
-        , TestValidation = db.model('TestValidation');
+      var db = start(),
+          TestValidation = db.model('TestValidation');
 
       var post = new TestValidation();
       post.set('simple', '');
@@ -1101,8 +1101,8 @@ describe('Model', function() {
         simple: { type: String, validate: [validate, 'must be abc'] }
       }));
 
-      var db = start()
-        , TestValidationMessage = db.model('TestValidationMessage');
+      var db = start(),
+          TestValidationMessage = db.model('TestValidationMessage');
 
       var post = new TestValidationMessage();
       post.set('simple', '');
@@ -1147,8 +1147,8 @@ describe('Model', function() {
         simple: { type: String, required: true }
       }));
 
-      var db = start()
-        , TestUndefinedValidation = db.model('TestUndefinedValidation');
+      var db = start(),
+          TestUndefinedValidation = db.model('TestUndefinedValidation');
 
       var post = new TestUndefinedValidation;
 
@@ -1169,15 +1169,15 @@ describe('Model', function() {
       var db = start();
 
       var D = db.model('CallbackFiresOnceValidation', new Schema({
-        username: { type: String, validate: /^[a-z]{6}$/i }
-        , email: { type: String, validate: /^[a-z]{6}$/i }
-        , password: { type: String, validate: /^[a-z]{6}$/i }
+        username: { type: String, validate: /^[a-z]{6}$/i },
+        email: { type: String, validate: /^[a-z]{6}$/i },
+        password: { type: String, validate: /^[a-z]{6}$/i }
       }));
 
       var post = new D({
-        username: "nope"
-        , email: "too"
-        , password: "short"
+        username: "nope",
+        email: "too",
+        password: "short"
       });
 
       var timesCalled = 0;
@@ -1213,8 +1213,8 @@ describe('Model', function() {
         resultv: { type: String, required: true }
       }));
 
-      var db = start()
-        , TestV = db.model('TestValidationOnResult');
+      var db = start(),
+          TestV = db.model('TestValidationOnResult');
 
       var post = new TestV;
 
@@ -1240,12 +1240,12 @@ describe('Model', function() {
 
     it('of required previously existing null values', function(done) {
       mongoose.model('TestPreviousNullValidation', new Schema({
-        previous: { type: String, required: true }
-        , a: String
+        previous: { type: String, required: true },
+        a: String
       }));
 
-      var db = start()
-        , TestP = db.model('TestPreviousNullValidation');
+      var db = start(),
+          TestP = db.model('TestPreviousNullValidation');
 
       TestP.collection.insert({ a: null, previous: null}, {}, function(err, f) {
         assert.ifError(err);
@@ -1276,8 +1276,8 @@ describe('Model', function() {
         }
       }));
 
-      var db = start()
-        , TestNestedValidation = db.model('TestNestedValidation');
+      var db = start(),
+          TestNestedValidation = db.model('TestNestedValidation');
 
       var post = new TestNestedValidation();
       post.set('nested.required', null);
@@ -1299,16 +1299,16 @@ describe('Model', function() {
       var Subsubdocs = new Schema({ required: { type: String, required: true }});
 
       var Subdocs = new Schema({
-        required: { type: String, required: true }
-        , subs: [Subsubdocs]
+        required: { type: String, required: true },
+        subs: [Subsubdocs]
       });
 
       mongoose.model('TestSubdocumentsValidation', new Schema({
         items: [Subdocs]
       }));
 
-      var db = start()
-        , TestSubdocumentsValidation = db.model('TestSubdocumentsValidation');
+      var db = start(),
+          TestSubdocumentsValidation = db.model('TestSubdocumentsValidation');
 
       var post = new TestSubdocumentsValidation();
 
@@ -1364,8 +1364,8 @@ describe('Model', function() {
           async: { type: String, validate: [validator, 'async validator failed for `{PATH}`'] }
         }));
 
-        var db = start()
-          , TestAsyncValidation = db.model('TestAsyncValidation');
+        var db = start(),
+            TestAsyncValidation = db.model('TestAsyncValidation');
 
         var post = new TestAsyncValidation();
         post.set('async', 'test');
@@ -1404,8 +1404,8 @@ describe('Model', function() {
           }
         }));
 
-        var db = start()
-          , TestNestedAsyncValidation = db.model('TestNestedAsyncValidation');
+        var db = start(),
+            TestNestedAsyncValidation = db.model('TestNestedAsyncValidation');
 
         var post = new TestNestedAsyncValidation();
         post.set('nested.async', 'test');
@@ -1457,8 +1457,8 @@ describe('Model', function() {
           items: [Subdocs]
         }));
 
-        var db = start()
-          , Test = db.model('TestSubdocumentsAsyncValidation');
+        var db = start(),
+            Test = db.model('TestSubdocumentsAsyncValidation');
 
         var post = new Test();
 
@@ -1487,8 +1487,8 @@ describe('Model', function() {
         item: { type: String, required: true }
       }));
 
-      var db = start()
-        , TestCallingValidation = db.model('TestCallingValidation');
+      var db = start(),
+          TestCallingValidation = db.model('TestCallingValidation');
 
       var post = new TestCallingValidation;
 
@@ -1519,8 +1519,8 @@ describe('Model', function() {
         result: { type: String, validate: [validator, 'chump validator'], required: false }
       }));
 
-      var db = start()
-        , TestV = db.model('TestRequiredFalse');
+      var db = start(),
+          TestV = db.model('TestRequiredFalse');
 
       var post = new TestV;
 
@@ -1531,10 +1531,10 @@ describe('Model', function() {
 
     describe('middleware', function() {
       it('works', function(done) {
-        var db = start()
-          , ValidationMiddlewareSchema = null
-          , Post = null
-          , post = null;
+        var db = start(),
+            ValidationMiddlewareSchema = null,
+            Post = null,
+            post = null;
 
         ValidationMiddlewareSchema = new Schema({
           baz: { type: String }
@@ -1569,10 +1569,10 @@ describe('Model', function() {
       });
 
       it('async', function(done) {
-        var db = start()
-          , AsyncValidationMiddlewareSchema = null
-          , Post = null
-          , post = null;
+        var db = start(),
+            AsyncValidationMiddlewareSchema = null,
+            Post = null,
+            post = null;
 
         AsyncValidationMiddlewareSchema = new Schema({
           prop: { type: String }
@@ -1611,13 +1611,13 @@ describe('Model', function() {
       });
 
       it('complex', function(done) {
-        var db = start()
-          , ComplexValidationMiddlewareSchema = null
-          , Post = null
-          , post = null
-          , abc = function(v) {
-            return v === 'abc';
-          };
+        var db = start(),
+            ComplexValidationMiddlewareSchema = null,
+            Post = null,
+            post = null,
+            abc = function(v) {
+              return v === 'abc';
+            };
 
         ComplexValidationMiddlewareSchema = new Schema({
           baz: { type: String },
@@ -1691,8 +1691,8 @@ describe('Model', function() {
         date: { type: Date, default: now }
       }));
 
-      var db = start()
-        , TestDefaults = db.model('TestDefaults');
+      var db = start(),
+          TestDefaults = db.model('TestDefaults');
 
       db.close();
       var post = new TestDefaults;
@@ -1710,8 +1710,8 @@ describe('Model', function() {
         }
       }));
 
-      var db = start()
-        , TestDefaults = db.model('TestNestedDefaults');
+      var db = start(),
+          TestDefaults = db.model('TestNestedDefaults');
 
       var post = new TestDefaults();
       db.close();
@@ -1731,8 +1731,8 @@ describe('Model', function() {
         items: [Items]
       }));
 
-      var db = start()
-        , TestSubdocumentsDefaults = db.model('TestSubdocumentsDefaults');
+      var db = start(),
+          TestSubdocumentsDefaults = db.model('TestSubdocumentsDefaults');
 
       db.close();
       var post = new TestSubdocumentsDefaults();
@@ -1783,12 +1783,12 @@ describe('Model', function() {
 
   describe('virtuals', function() {
     it('getters', function(done) {
-      var db = start()
-        , BlogPost = db.model('BlogPost', collection)
-        , post = new BlogPost({
-          title: 'Letters from Earth'
-            , author: 'Mark Twain'
-        });
+      var db = start(),
+          BlogPost = db.model('BlogPost', collection),
+          post = new BlogPost({
+            title: 'Letters from Earth',
+            author: 'Mark Twain'
+          });
 
       db.close();
       assert.equal(post.get('titleWithAuthor'), 'Letters from Earth by Mark Twain');
@@ -1797,9 +1797,9 @@ describe('Model', function() {
     });
 
     it('set()', function(done) {
-      var db = start()
-        , BlogPost = db.model('BlogPost', collection)
-        , post = new BlogPost();
+      var db = start(),
+          BlogPost = db.model('BlogPost', collection),
+          post = new BlogPost();
 
       db.close();
       post.set('titleWithAuthor', 'Huckleberry Finn by Mark Twain');
@@ -1809,9 +1809,9 @@ describe('Model', function() {
     });
 
     it('should not be saved to the db', function(done) {
-      var db = start()
-        , BlogPost = db.model('BlogPost', collection)
-        , post = new BlogPost();
+      var db = start(),
+          BlogPost = db.model('BlogPost', collection),
+          post = new BlogPost();
 
       post.set('titleWithAuthor', 'Huckleberry Finn by Mark Twain');
 
@@ -1831,13 +1831,13 @@ describe('Model', function() {
     });
 
     it('nested', function(done) {
-      var db = start()
-        , PersonSchema = new Schema({
-          name: {
-            first: String
-              , last: String
-          }
-        });
+      var db = start(),
+          PersonSchema = new Schema({
+            name: {
+              first: String,
+              last: String
+            }
+          });
 
       PersonSchema
       .virtual('name.full')
@@ -1852,13 +1852,13 @@ describe('Model', function() {
 
       mongoose.model('Person', PersonSchema);
 
-      var Person = db.model('Person')
-        , person = new Person({
-          name: {
-            first: 'Michael'
-              , last: 'Sorrentino'
-          }
-        });
+      var Person = db.model('Person'),
+          person = new Person({
+            name: {
+              first: 'Michael',
+              last: 'Sorrentino'
+            }
+          });
 
       db.close();
 
@@ -1877,9 +1877,9 @@ describe('Model', function() {
 
   describe('.remove()', function() {
     it('works', function(done) {
-      var db = start()
-        , collection = 'blogposts_' + random()
-        , BlogPost = db.model('BlogPost', collection);
+      var db = start(),
+          collection = 'blogposts_' + random(),
+          BlogPost = db.model('BlogPost', collection);
 
       BlogPost.create({ title: 1 }, { title: 2 }, function(err) {
         assert.ifError(err);
@@ -1899,9 +1899,9 @@ describe('Model', function() {
     });
 
     it('errors when id deselected (gh-3118)', function(done) {
-      var db = start()
-        , collection = 'blogposts_' + random()
-        , BlogPost = db.model('BlogPost', collection);
+      var db = start(),
+          collection = 'blogposts_' + random(),
+          BlogPost = db.model('BlogPost', collection);
 
       BlogPost.create({ title: 1 }, { title: 2 }, function(err) {
         assert.ifError(err);
@@ -1934,9 +1934,9 @@ describe('Model', function() {
     });
 
     it('should not remove all documents in the collection (gh-3326)', function(done) {
-      var db = start()
-        , collection = 'blogposts_' + random()
-        , BlogPost = db.model('BlogPost', collection);
+      var db = start(),
+          collection = 'blogposts_' + random(),
+          BlogPost = db.model('BlogPost', collection);
 
       BlogPost.create({ title: 1 }, { title: 2 }, function(err) {
         assert.ifError(err);
@@ -2049,10 +2049,10 @@ describe('Model', function() {
 
     describe('when called multiple times', function() {
       it('always executes the passed callback gh-1210', function(done) {
-        var db = start()
-          , collection = 'blogposts_' + random()
-          , BlogPost = db.model('BlogPost', collection)
-          , post = new BlogPost();
+        var db = start(),
+            collection = 'blogposts_' + random(),
+            BlogPost = db.model('BlogPost', collection),
+            post = new BlogPost();
 
         post.save(function(err) {
           assert.ifError(err);
@@ -2075,20 +2075,20 @@ describe('Model', function() {
   describe('getters', function() {
     it('with same name on embedded docs do not class', function(done) {
       var Post = new Schema({
-        title   : String
-        , author  : { name : String }
-        , subject : { name : String }
+        title: String,
+        author: { name: String },
+        subject: { name: String }
       });
 
       mongoose.model('PostWithClashGetters', Post);
 
-      var db = start()
-        , PostModel = db.model('PostWithClashGetters', 'postwithclash' + random());
+      var db = start(),
+          PostModel = db.model('PostWithClashGetters', 'postwithclash' + random());
 
       var post = new PostModel({
-        title: 'Test'
-        , author: { name: 'A' }
-        , subject: { name: 'B' }
+        title: 'Test',
+        author: { name: 'A' },
+        subject: { name: 'B' }
       });
 
       db.close();
@@ -2099,19 +2099,19 @@ describe('Model', function() {
     });
 
     it('should not be triggered at construction (gh-685)', function(done) {
-      var db = start()
-        , called = false;
+      var db = start(),
+          called = false;
 
       db.close();
 
       var schema = new mongoose.Schema({
         number: {
-          type:Number
-            , set: function(x) { return x / 2;}
-            , get: function(x) {
-              called = true;
-              return x * 2;
-            }
+          type:Number,
+          set: function(x) { return x / 2;},
+          get: function(x) {
+            called = true;
+            return x * 2;
+          }
         }
       });
 
@@ -2142,9 +2142,9 @@ describe('Model', function() {
 
       mongoose.model('ShortcutGetterObject', schema);
 
-      var db = start()
-        , ShortcutGetter = db.model('ShortcutGetterObject', 'shortcut' + random())
-        , post = new ShortcutGetter();
+      var db = start(),
+          ShortcutGetter = db.model('ShortcutGetterObject', 'shortcut' + random()),
+          post = new ShortcutGetter();
 
       db.close();
       post.set('date', Date.now());
@@ -2161,9 +2161,9 @@ describe('Model', function() {
         });
         mongoose.model('ShortcutGetterNested', schema);
 
-        var db = start()
-          , ShortcutGetterNested = db.model('ShortcutGetterNested', collection)
-          , doc = new ShortcutGetterNested();
+        var db = start(),
+            ShortcutGetterNested = db.model('ShortcutGetterNested', collection),
+            doc = new ShortcutGetterNested();
 
         db.close();
         assert.equal('object', typeof doc.first);
@@ -2172,15 +2172,15 @@ describe('Model', function() {
       });
 
       it('works with object literals', function(done) {
-        var db = start()
-          , BlogPost = db.model('BlogPost', collection);
+        var db = start(),
+            BlogPost = db.model('BlogPost', collection);
 
         db.close();
         var date = new Date;
 
         var meta = {
-          date: date
-          , visitors: 5
+          date: date,
+          visitors: 5
         };
 
         var post = new BlogPost();
@@ -2218,8 +2218,8 @@ describe('Model', function() {
         assert.equal('number', typeof post.meta.visitors);
 
         var newmeta = {
-          date: date - 2000
-          , visitors: 234
+          date: date - 2000,
+          visitors: 234
         };
 
         post.set(newmeta, 'meta');
@@ -2235,8 +2235,8 @@ describe('Model', function() {
 
         // set object directly
         post.meta = {
-          date: date - 3000
-          , visitors: 4815162342
+          date: date - 3000,
+          visitors: 4815162342
         };
 
         assert.ok(post.meta.date instanceof Date);
@@ -2307,8 +2307,8 @@ describe('Model', function() {
 
         var schema = new Schema({
           nest: {
-            st: String
-            , yep: String
+            st: String,
+            yep: String
           }
         });
 
@@ -2359,9 +2359,9 @@ describe('Model', function() {
           }
         }));
 
-        var DooDad = db.model('MySchema')
-          , doodad = new DooDad({ nested: { arrays: [] } })
-          , date = 1234567890;
+        var DooDad = db.model('MySchema'),
+            doodad = new DooDad({ nested: { arrays: [] } }),
+            date = 1234567890;
 
         doodad.nested.arrays.push(["+10", "yup", date]);
 
@@ -2398,15 +2398,15 @@ describe('Model', function() {
 
         mongoose.model('MySchema2', new Schema({
           nested: {
-            type: { type: String, default: 'yep' }
-            , array: {
+            type: { type: String, default: 'yep' },
+            array: {
               type: Array, default: def
             }
           }
         }));
 
-        var DooDad = db.model('MySchema2', collection)
-          , doodad = new DooDad();
+        var DooDad = db.model('MySchema2', collection),
+            doodad = new DooDad();
 
         doodad.save(function(err) {
           assert.ifError(err);
@@ -2452,13 +2452,13 @@ describe('Model', function() {
       }
 
       var Location = new Schema({
-        lat:  { type: Number, default: 0, set: setLat}
-        , long: { type: Number, set: uptick }
+        lat:  { type: Number, default: 0, set: setLat},
+        long: { type: Number, set: uptick }
       });
 
       var Deal = new Schema({
-        title: String
-        , locations: [Location]
+        title: String,
+        locations: [Location]
       });
 
       Location = db.model('Location', Location, 'locations_' + random());
@@ -2487,8 +2487,8 @@ describe('Model', function() {
   });
 
   it('changing a number non-atomically (gh-203)', function(done) {
-    var db = start()
-      , BlogPost = db.model('BlogPost', collection);
+    var db = start(),
+        BlogPost = db.model('BlogPost', collection);
 
     var post = new BlogPost();
 
@@ -2518,10 +2518,10 @@ describe('Model', function() {
 
   describe('atomic subdocument', function() {
     it('saving', function(done) {
-      var db = start()
-        , BlogPost = db.model('BlogPost', collection)
-        , totalDocs = 4
-        , saveQueue = [];
+      var db = start(),
+          BlogPost = db.model('BlogPost', collection),
+          totalDocs = 4,
+          saveQueue = [];
 
       var post = new BlogPost;
 
@@ -2607,8 +2607,8 @@ describe('Model', function() {
     });
 
     it('setting (gh-310)', function(done) {
-      var db = start()
-        , BlogPost = db.model('BlogPost', collection);
+      var db = start(),
+          BlogPost = db.model('BlogPost', collection);
 
       BlogPost.create({
         comments: [{ title: 'first-title', body: 'first-body'}]
@@ -2680,12 +2680,12 @@ describe('Model', function() {
   });
 
   it('updating multiple Number $pushes as a single $pushAll', function(done) {
-    var db = start()
-      , schema = new Schema({
-        nested: {
-          nums: [Number]
-        }
-      });
+    var db = start(),
+        schema = new Schema({
+          nested: {
+            nums: [Number]
+          }
+        });
 
     mongoose.model('NestedPushes', schema);
     var Temp = db.model('NestedPushes', collection);
@@ -2711,12 +2711,12 @@ describe('Model', function() {
   });
 
   it('updating at least a single $push and $pushAll as a single $pushAll', function(done) {
-    var db = start()
-      , schema = new Schema({
-        nested: {
-          nums: [Number]
-        }
-      });
+    var db = start(),
+        schema = new Schema({
+          nested: {
+            nums: [Number]
+          }
+        });
 
     var Temp = db.model('NestedPushes', schema, collection);
 
@@ -2740,12 +2740,12 @@ describe('Model', function() {
   });
 
   it('activePaths should be updated for nested modifieds', function(done) {
-    var db = start()
-      , schema = new Schema({
-        nested: {
-          nums: [Number]
-        }
-      });
+    var db = start(),
+        schema = new Schema({
+          nested: {
+            nums: [Number]
+          }
+        });
 
     var Temp = db.model('NestedPushes', schema, collection);
 
@@ -2761,12 +2761,12 @@ describe('Model', function() {
 
 
   it('activePaths should be updated for nested modifieds as promise', function(done) {
-    var db = start()
-      , schema = new Schema({
-        nested: {
-          nums: [Number]
-        }
-      });
+    var db = start(),
+        schema = new Schema({
+          nested: {
+            nums: [Number]
+          }
+        });
 
     var Temp = db.model('NestedPushes', schema, collection);
 
@@ -2784,12 +2784,12 @@ describe('Model', function() {
 
 
   it('$pull should affect what you see in an array before a save', function(done) {
-    var db = start()
-      , schema = new Schema({
-        nested: {
-          nums: [Number]
-        }
-      });
+    var db = start(),
+        schema = new Schema({
+          nested: {
+            nums: [Number]
+          }
+        });
 
     var Temp = db.model('NestedPushes', schema, collection);
 
@@ -2803,12 +2803,12 @@ describe('Model', function() {
   });
 
   it('$shift', function(done) {
-    var db = start()
-      , schema = new Schema({
-        nested: {
-          nums: [Number]
-        }
-      });
+    var db = start(),
+        schema = new Schema({
+          nested: {
+            nums: [Number]
+          }
+        });
 
     mongoose.model('TestingShift', schema);
     var Temp = db.model('TestingShift', collection);
@@ -2853,12 +2853,12 @@ describe('Model', function() {
 
   describe('saving embedded arrays', function() {
     it('of Numbers atomically', function(done) {
-      var db = start()
-        , TempSchema = new Schema({
-          nums: [Number]
-        })
-        , totalDocs = 2
-        , saveQueue = [];
+      var db = start(),
+          TempSchema = new Schema({
+            nums: [Number]
+          }),
+          totalDocs = 2,
+          saveQueue = [];
 
       mongoose.model('Temp', TempSchema);
       var Temp = db.model('Temp', collection);
@@ -2918,12 +2918,12 @@ describe('Model', function() {
     });
 
     it('of Strings atomically', function(done) {
-      var db = start()
-        , StrListSchema = new Schema({
-          strings: [String]
-        })
-        , totalDocs = 2
-        , saveQueue = [];
+      var db = start(),
+          StrListSchema = new Schema({
+            strings: [String]
+          }),
+          totalDocs = 2,
+          saveQueue = [];
 
       mongoose.model('StrList', StrListSchema);
       var StrList = db.model('StrList');
@@ -2986,12 +2986,12 @@ describe('Model', function() {
     });
 
     it('of Buffers atomically', function(done) {
-      var db = start()
-        , BufListSchema = new Schema({
-          buffers: [Buffer]
-        })
-        , totalDocs = 2
-        , saveQueue = [];
+      var db = start(),
+          BufListSchema = new Schema({
+            buffers: [Buffer]
+          }),
+          totalDocs = 2,
+          saveQueue = [];
 
       mongoose.model('BufList', BufListSchema);
       var BufList = db.model('BufList');
@@ -3054,9 +3054,9 @@ describe('Model', function() {
     });
 
     it('works with modified element properties + doc removal (gh-975)', function(done) {
-      var db = start()
-        , B = db.model('BlogPost', collection)
-        , b = new B({ comments: [{ title: 'gh-975' }] });
+      var db = start(),
+          B = db.model('BlogPost', collection),
+          b = new B({ comments: [{ title: 'gh-975' }] });
 
       b.save(function(err) {
         assert.ifError(err);
@@ -3122,8 +3122,8 @@ describe('Model', function() {
   });
 
   it('updating an embedded document in an embedded array (gh-255)', function(done) {
-    var db = start()
-      , BlogPost = db.model('BlogPost', collection);
+    var db = start(),
+        BlogPost = db.model('BlogPost', collection);
 
     BlogPost.create({comments: [{title: 'woot'}]}, function(err, post) {
       assert.ifError(err);
@@ -3145,18 +3145,18 @@ describe('Model', function() {
   });
 
   it('updating an embedded array document to an Object value (gh-334)', function(done) {
-    var db = start()
-      , SubSchema = new Schema({
-        name : String ,
-        subObj : { subName : String }
-      });
-    var GH334Schema = new Schema({ name : String , arrData : [ SubSchema] });
+    var db = start(),
+        SubSchema = new Schema({
+          name: String,
+          subObj: { subName: String }
+        });
+    var GH334Schema = new Schema({ name: String, arrData: [ SubSchema] });
 
-    mongoose.model('GH334' , GH334Schema);
+    mongoose.model('GH334', GH334Schema);
     var AModel = db.model('GH334');
     var instance = new AModel();
 
-    instance.set( { name : 'name-value' , arrData : [ { name : 'arrName1' , subObj : { subName : 'subName1' } } ] });
+    instance.set( { name : 'name-value', arrData: [ { name: 'arrName1', subObj: { subName: 'subName1' } } ] });
     instance.save(function(err) {
       assert.ifError(err);
       AModel.findById(instance.id, function(err, doc) {
@@ -3176,9 +3176,9 @@ describe('Model', function() {
   });
 
   it('saving an embedded document twice should not push that doc onto the parent doc twice (gh-267)', function(done) {
-    var db = start()
-      , BlogPost = db.model('BlogPost', collection)
-      , post = new BlogPost();
+    var db = start(),
+        BlogPost = db.model('BlogPost', collection),
+        post = new BlogPost();
 
     post.comments.push({title: 'woot'});
     post.save( function(err) {
@@ -3203,8 +3203,8 @@ describe('Model', function() {
 
   describe('embedded array filtering', function() {
     it('by the id shortcut function', function(done) {
-      var db = start()
-        , BlogPost = db.model('BlogPost', collection);
+      var db = start(),
+          BlogPost = db.model('BlogPost', collection);
 
       var post = new BlogPost();
 
@@ -3233,8 +3233,8 @@ describe('Model', function() {
     });
 
     it('by the id with cast error', function(done) {
-      var db = start()
-        , BlogPost = db.model('BlogPost', collection);
+      var db = start(),
+          BlogPost = db.model('BlogPost', collection);
 
       var post = new BlogPost();
 
@@ -3251,8 +3251,8 @@ describe('Model', function() {
     });
 
     it('by the id shortcut with no match', function(done) {
-      var db = start()
-        , BlogPost = db.model('BlogPost', collection);
+      var db = start(),
+          BlogPost = db.model('BlogPost', collection);
 
       var post = new BlogPost();
 
@@ -3270,8 +3270,8 @@ describe('Model', function() {
   });
 
   it('removing a subdocument atomically', function(done) {
-    var db = start()
-      , BlogPost = db.model('BlogPost', collection);
+    var db = start(),
+        BlogPost = db.model('BlogPost', collection);
 
     var post = new BlogPost();
     post.title = 'hahaha';
@@ -3301,8 +3301,8 @@ describe('Model', function() {
   });
 
   it('single pull embedded doc', function(done) {
-    var db = start()
-    , BlogPost = db.model('BlogPost', collection);
+    var db = start(),
+        BlogPost = db.model('BlogPost', collection);
 
     var post = new BlogPost();
     post.title = 'hahaha';
@@ -3332,9 +3332,9 @@ describe('Model', function() {
   });
 
   it('saving mixed data', function(done) {
-    var db = start()
-      , BlogPost = db.model('BlogPost', collection)
-      , count = 3;
+    var db = start(),
+        BlogPost = db.model('BlogPost', collection),
+        count = 3;
 
     // string
     var post = new BlogPost();
@@ -3409,14 +3409,14 @@ describe('Model', function() {
   });
 
   it('populating mixed data from the constructor (gh-200)', function(done) {
-    var db = start()
-      , BlogPost = db.model('BlogPost');
+    var db = start(),
+        BlogPost = db.model('BlogPost');
 
     var post = new BlogPost({
       mixed: {
-        type: 'test'
-        , github: 'rules'
-        , nested: {
+        type: 'test',
+        github: 'rules',
+        nested: {
           number: 3
         }
       }
@@ -3434,8 +3434,8 @@ describe('Model', function() {
       type: { type: String, default: 'YES!' }
     }));
 
-    var db = start()
-      , TestDefaults = db.model('TestTypeDefaults');
+    var db = start(),
+        TestDefaults = db.model('TestTypeDefaults');
 
     var post = new TestDefaults();
     assert.equal(typeof post.get('type'),'string');
@@ -3457,8 +3457,8 @@ describe('Model', function() {
   });
 
   it('unaltered model does not clear the doc (gh-195)', function(done) {
-    var db = start()
-      , BlogPost = db.model('BlogPost', collection);
+    var db = start(),
+        BlogPost = db.model('BlogPost', collection);
 
     var post = new BlogPost();
     post.title = 'woot';
@@ -3486,8 +3486,8 @@ describe('Model', function() {
   describe('safe mode', function() {
     it('works', function(done) {
       var Human = new Schema({
-        name  : String
-        , email : { type: String, index: { unique: true, background: false }}
+        name: String,
+        email: { type: String, index: { unique: true, background: false }}
       });
 
       mongoose.model('SafeHuman', Human, true);
@@ -3498,8 +3498,8 @@ describe('Model', function() {
       Human.on('index', function(err) {
         assert.ifError(err);
         var me = new Human({
-          name  : 'Guillermo Rauch'
-          , email : 'rauchg@gmail.com'
+          name  : 'Guillermo Rauch',
+          email : 'rauchg@gmail.com'
         });
 
         me.save(function(err) {
@@ -3510,8 +3510,8 @@ describe('Model', function() {
             assert.equal(doc.email,'rauchg@gmail.com');
 
             var copycat = new Human({
-              name  : 'Lionel Messi'
-              , email : 'rauchg@gmail.com'
+              name  : 'Lionel Messi',
+              email : 'rauchg@gmail.com'
             });
 
             copycat.save(function(err) {
@@ -3528,8 +3528,8 @@ describe('Model', function() {
 
     it('can be disabled', function(done) {
       var Human = new Schema({
-        name  : String
-        , email : { type: String, index: { unique: true, background: false }}
+        name: String,
+        email: { type: String, index: { unique: true, background: false }}
       });
 
       // turn it off
@@ -3545,8 +3545,8 @@ describe('Model', function() {
       });
 
       var me = new Human({
-        name  : 'Guillermo Rauch'
-        , email : 'rauchg@gmail.com'
+        name  : 'Guillermo Rauch',
+        email : 'rauchg@gmail.com'
       });
 
       me.save(function(err) {
@@ -3560,8 +3560,8 @@ describe('Model', function() {
             assert.equal(doc.email,'rauchg@gmail.com');
 
             var copycat = new Human({
-              name  : 'Lionel Messi'
-              , email : 'rauchg@gmail.com'
+              name  : 'Lionel Messi',
+              email : 'rauchg@gmail.com'
             });
 
             copycat.save(function(err) {
@@ -3667,19 +3667,19 @@ describe('Model', function() {
       it('called on all sub levels', function(done) {
         var db = start();
 
-        var grandSchema = new Schema({ name : String });
+        var grandSchema = new Schema({ name: String });
         grandSchema.pre('save', function(next) {
           this.name = 'grand';
           next();
         });
 
-        var childSchema = new Schema({ name : String, grand : [grandSchema]});
+        var childSchema = new Schema({ name: String, grand: [grandSchema]});
         childSchema.pre('save', function(next) {
           this.name = 'child';
           next();
         });
 
-        var schema = new Schema({ name: String, child : [childSchema] });
+        var schema = new Schema({ name: String, child: [childSchema] });
 
         schema.pre('save', function(next) {
           this.name = 'parent';
@@ -3687,7 +3687,7 @@ describe('Model', function() {
         });
 
         var S = db.model('presave_hook', schema, 'presave_hook');
-        var s = new S({ name : 'a' , child : [ { name : 'b', grand : [{ name : 'c'}] } ]});
+        var s = new S({ name: 'a', child: [ { name: 'b', grand: [{ name: 'c'}] } ]});
 
         s.save(function(err, doc) {
           db.close();
@@ -3703,25 +3703,25 @@ describe('Model', function() {
       it('error on any sub level', function(done) {
         var db = start();
 
-        var grandSchema = new Schema({ name : String });
+        var grandSchema = new Schema({ name: String });
         grandSchema.pre('save', function(next) {
           next(new Error('Error 101'));
         });
 
-        var childSchema = new Schema({ name : String, grand : [grandSchema]});
+        var childSchema = new Schema({ name: String, grand: [grandSchema]});
         childSchema.pre('save', function(next) {
           this.name = 'child';
           next();
         });
 
-        var schema = new Schema({ name: String, child : [childSchema] });
+        var schema = new Schema({ name: String, child: [childSchema] });
         schema.pre('save', function(next) {
           this.name = 'parent';
           next();
         });
 
         var S = db.model('presave_hook_error', schema, 'presave_hook_error');
-        var s = new S({ name : 'a' , child : [ { name : 'b', grand : [{ name : 'c'}] } ]});
+        var s = new S({ name: 'a', child: [ { name: 'b', grand: [{ name: 'c'}] } ]});
 
         s.save(function(err) {
           db.close();
@@ -3733,9 +3733,9 @@ describe('Model', function() {
 
       describe('init', function() {
         it('has access to the true ObjectId when used with querying (gh-289)', function(done) {
-          var db = start()
-            , PreInitSchema = new Schema({})
-            , preId = null;
+          var db = start(),
+              PreInitSchema = new Schema({}),
+              preId = null;
 
           PreInitSchema.pre('init', function(next) {
             preId = this._id;
@@ -3786,11 +3786,11 @@ describe('Model', function() {
       it('works', function(done) {
         var schema = new Schema({
               title: String
-            })
-          , save = false
-          , remove = false
-          , init = false
-          , post = undefined;
+            }),
+            save = false,
+            remove = false,
+            init = false,
+            post = undefined;
 
         schema.post('save', function(arg) {
           assert.equal(arg.id, post.id);
@@ -3808,8 +3808,8 @@ describe('Model', function() {
 
         mongoose.model('PostHookTest', schema);
 
-        var db = start()
-          , BlogPost = db.model('PostHookTest');
+        var db = start(),
+            BlogPost = db.model('PostHookTest');
 
         post = new BlogPost();
 
@@ -3842,11 +3842,11 @@ describe('Model', function() {
         var save = false;
 
         var EmbeddedSchema = new Schema({
-          title : String
+          title: String
         });
 
         var ParentSchema = new Schema({
-          embeds : [EmbeddedSchema]
+          embeds: [EmbeddedSchema]
         });
 
         EmbeddedSchema.post('save', function() {
@@ -3884,8 +3884,8 @@ describe('Model', function() {
 
   describe('#exec()', function() {
     it('count()', function(done) {
-      var db = start()
-        , BlogPost = db.model('BlogPost' + random(), bpSchema);
+      var db = start(),
+          BlogPost = db.model('BlogPost' + random(), bpSchema);
 
       BlogPost.create({title: 'interoperable count as promise'}, function(err) {
         assert.ifError(err);
@@ -3901,8 +3901,8 @@ describe('Model', function() {
 
     it('update()', function(done) {
       var col = 'BlogPost' + random();
-      var db = start()
-        , BlogPost = db.model(col, bpSchema);
+      var db = start(),
+          BlogPost = db.model(col, bpSchema);
 
       BlogPost.create({title: 'interoperable update as promise'}, function(err) {
         assert.ifError(err);
@@ -3920,8 +3920,8 @@ describe('Model', function() {
     });
 
     it('findOne()', function(done) {
-      var db = start()
-        , BlogPost = db.model('BlogPost' + random(), bpSchema);
+      var db = start(),
+          BlogPost = db.model('BlogPost' + random(), bpSchema);
 
       BlogPost.create({title: 'interoperable findOne as promise'}, function(err, created) {
         assert.ifError(err);
@@ -3936,53 +3936,53 @@ describe('Model', function() {
     });
 
     it('find()', function(done) {
-      var db = start()
-        , BlogPost = db.model('BlogPost' + random(), bpSchema);
+      var db = start(),
+          BlogPost = db.model('BlogPost' + random(), bpSchema);
 
       BlogPost.create(
-          {title: 'interoperable find as promise'}
-        , {title: 'interoperable find as promise'}
-        , function(err, createdOne, createdTwo) {
-          assert.ifError(err);
-          var query = BlogPost.find({title: 'interoperable find as promise'}).sort('_id');
-          query.exec(function(err, found) {
-            db.close();
-            assert.ifError(err);
-            assert.equal(found.length, 2);
-            var ids = {};
-            ids[String(found[0]._id)] = 1;
-            ids[String(found[1]._id)] = 1;
-            assert.ok(String(createdOne._id) in ids);
-            assert.ok(String(createdTwo._id) in ids);
-            done();
-          });
-        });
+          {title: 'interoperable find as promise'},
+         {title: 'interoperable find as promise'},
+         function(err, createdOne, createdTwo) {
+           assert.ifError(err);
+           var query = BlogPost.find({title: 'interoperable find as promise'}).sort('_id');
+           query.exec(function(err, found) {
+             db.close();
+             assert.ifError(err);
+             assert.equal(found.length, 2);
+             var ids = {};
+             ids[String(found[0]._id)] = 1;
+             ids[String(found[1]._id)] = 1;
+             assert.ok(String(createdOne._id) in ids);
+             assert.ok(String(createdTwo._id) in ids);
+             done();
+           });
+         });
     });
 
     it('remove()', function(done) {
-      var db = start()
-        , BlogPost = db.model('BlogPost' + random(), bpSchema);
+      var db = start(),
+          BlogPost = db.model('BlogPost' + random(), bpSchema);
 
       BlogPost.create(
-          {title: 'interoperable remove as promise'}
-        , function(err) {
-          assert.ifError(err);
-          var query = BlogPost.remove({title: 'interoperable remove as promise'});
-          query.exec(function(err) {
-            assert.ifError(err);
-            BlogPost.count({title: 'interoperable remove as promise'}, function(err, count) {
-              db.close();
-              assert.equal(count, 0);
-              done();
-            });
-          });
-        });
+          {title: 'interoperable remove as promise'},
+         function(err) {
+           assert.ifError(err);
+           var query = BlogPost.remove({title: 'interoperable remove as promise'});
+           query.exec(function(err) {
+             assert.ifError(err);
+             BlogPost.count({title: 'interoperable remove as promise'}, function(err, count) {
+               db.close();
+               assert.equal(count, 0);
+               done();
+             });
+           });
+         });
     });
 
     it('op can be changed', function(done) {
-      var db = start()
-        , BlogPost = db.model('BlogPost' + random(), bpSchema)
-        , title = 'interop ad-hoc as promise';
+      var db = start(),
+          BlogPost = db.model('BlogPost' + random(), bpSchema),
+          title = 'interop ad-hoc as promise';
 
       BlogPost.create({title: title }, function(err, created) {
         assert.ifError(err);
@@ -3998,8 +3998,8 @@ describe('Model', function() {
 
     describe('promises', function() {
       it('count()', function(done) {
-        var db = start()
-          , BlogPost = db.model('BlogPost' + random(), bpSchema);
+        var db = start(),
+            BlogPost = db.model('BlogPost' + random(), bpSchema);
 
         BlogPost.create({title: 'interoperable count as promise 2'}, function(err) {
           assert.ifError(err);
@@ -4016,8 +4016,8 @@ describe('Model', function() {
 
       it('update()', function(done) {
         var col = 'BlogPost' + random();
-        var db = start()
-          , BlogPost = db.model(col, bpSchema);
+        var db = start(),
+            BlogPost = db.model(col, bpSchema);
 
         BlogPost.create({title: 'interoperable update as promise 2'}, function(err) {
           assert.ifError(err);
@@ -4036,8 +4036,8 @@ describe('Model', function() {
       });
 
       it('findOne()', function(done) {
-        var db = start()
-          , BlogPost = db.model('BlogPost' + random(), bpSchema);
+        var db = start(),
+            BlogPost = db.model('BlogPost' + random(), bpSchema);
 
         BlogPost.create({title: 'interoperable findOne as promise 2'}, function(err, created) {
           assert.ifError(err);
@@ -4053,51 +4053,51 @@ describe('Model', function() {
       });
 
       it('find()', function(done) {
-        var db = start()
-          , BlogPost = db.model('BlogPost' + random(), bpSchema);
+        var db = start(),
+            BlogPost = db.model('BlogPost' + random(), bpSchema);
 
         BlogPost.create(
-            {title: 'interoperable find as promise 2'}
-          , {title: 'interoperable find as promise 2'}
-          , function(err, createdOne, createdTwo) {
-            assert.ifError(err);
-            var query = BlogPost.find({title: 'interoperable find as promise 2'}).sort('_id');
-            var promise = query.exec();
-            promise.onResolve(function(err, found) {
-              db.close();
-              assert.ifError(err);
-              assert.equal(found.length,2);
-              assert.equal(found[0].id,createdOne.id);
-              assert.equal(found[1].id,createdTwo.id);
-              done();
-            });
-          });
+            {title: 'interoperable find as promise 2'},
+           {title: 'interoperable find as promise 2'},
+           function(err, createdOne, createdTwo) {
+             assert.ifError(err);
+             var query = BlogPost.find({title: 'interoperable find as promise 2'}).sort('_id');
+             var promise = query.exec();
+             promise.onResolve(function(err, found) {
+               db.close();
+               assert.ifError(err);
+               assert.equal(found.length,2);
+               assert.equal(found[0].id,createdOne.id);
+               assert.equal(found[1].id,createdTwo.id);
+               done();
+             });
+           });
       });
 
       it('remove()', function(done) {
-        var db = start()
-          , BlogPost = db.model('BlogPost' + random(), bpSchema);
+        var db = start(),
+            BlogPost = db.model('BlogPost' + random(), bpSchema);
 
         BlogPost.create(
-            {title: 'interoperable remove as promise 2'}
-          , function(err) {
-            assert.ifError(err);
-            var query = BlogPost.remove({title: 'interoperable remove as promise 2'});
-            var promise = query.exec();
-            promise.onResolve(function(err) {
-              assert.ifError(err);
-              BlogPost.count({title: 'interoperable remove as promise 2'}, function(err, count) {
-                db.close();
-                assert.equal(count,0);
-                done();
-              });
-            });
-          });
+            {title: 'interoperable remove as promise 2'},
+           function(err) {
+             assert.ifError(err);
+             var query = BlogPost.remove({title: 'interoperable remove as promise 2'});
+             var promise = query.exec();
+             promise.onResolve(function(err) {
+               assert.ifError(err);
+               BlogPost.count({title: 'interoperable remove as promise 2'}, function(err, count) {
+                 db.close();
+                 assert.equal(count,0);
+                 done();
+               });
+             });
+           });
       });
 
       it('are compatible with op modification on the fly', function(done) {
-        var db = start()
-          , BlogPost = db.model('BlogPost' + random(), bpSchema);
+        var db = start(),
+            BlogPost = db.model('BlogPost' + random(), bpSchema);
 
         BlogPost.create({title: 'interoperable ad-hoc as promise 2'}, function(err, created) {
           assert.ifError(err);
@@ -4113,51 +4113,51 @@ describe('Model', function() {
       });
 
       it('are thenable', function(done) {
-        var db = start()
-          , B = db.model('BlogPost' + random(), bpSchema);
+        var db = start(),
+            B = db.model('BlogPost' + random(), bpSchema);
 
         var peopleSchema = Schema({ name: String, likes: ['ObjectId'] });
         var P = db.model('promise-BP-people', peopleSchema, random());
         B.create(
-            { title: 'then promise 1' }
-          , { title: 'then promise 2' }
-          , { title: 'then promise 3' }
-          , function(err, d1, d2, d3) {
-            assert.ifError(err);
+            { title: 'then promise 1' },
+           { title: 'then promise 2' },
+           { title: 'then promise 3' },
+           function(err, d1, d2, d3) {
+             assert.ifError(err);
 
-            P.create(
-              { name: 'brandon', likes: [d1] }
-            , { name: 'ben', likes: [d2] }
-            , { name: 'bernie', likes: [d3] }
-            , function(err) {
-              assert.ifError(err);
+             P.create(
+              { name: 'brandon', likes: [d1] },
+             { name: 'ben', likes: [d2] },
+             { name: 'bernie', likes: [d3] },
+             function(err) {
+               assert.ifError(err);
 
-              var promise = B.find({ title: /^then promise/ }).select('_id').exec();
-              promise.then(function(blogs) {
-                var ids = blogs.map(function(m) {
-                  return m._id;
-                });
-                return P.where('likes').in(ids).exec();
-              }).then(function(people) {
-                assert.equal(3, people.length);
-                return people;
-              }).then(function() {
-                db.close();
-                done();
-              }, function(err) {
-                db.close();
-                done(new Error(err));
-              });
-            });
-          });
+               var promise = B.find({ title: /^then promise/ }).select('_id').exec();
+               promise.then(function(blogs) {
+                 var ids = blogs.map(function(m) {
+                   return m._id;
+                 });
+                 return P.where('likes').in(ids).exec();
+               }).then(function(people) {
+                 assert.equal(3, people.length);
+                 return people;
+               }).then(function() {
+                 db.close();
+                 done();
+               }, function(err) {
+                 db.close();
+                 done(new Error(err));
+               });
+             });
+           });
       });
     });
   });
 
   describe('console.log', function() {
     it('hides private props', function(done) {
-      var db = start()
-        , BlogPost = db.model('BlogPost', collection);
+      var db = start(),
+          BlogPost = db.model('BlogPost', collection);
 
       var date = new Date(1305730951086);
       var id0 = new DocumentObjectId('4dd3e169dbfb13b4570000b9');
@@ -4166,13 +4166,13 @@ describe('Model', function() {
       var id3 = new DocumentObjectId('4dd3e169dbfb13b4570000b8');
 
       var post = new BlogPost({
-        title: 'Test'
-        , _id: id0
-        , date: date
-        , numbers: [5,6,7]
-        , owners: [id1]
-        , meta: { visitors: 45 }
-        , comments: [
+        title: 'Test',
+        _id: id0,
+        date: date,
+        numbers: [5,6,7],
+        owners: [id1],
+        meta: { visitors: 45 },
+        comments: [
             { _id: id2, title: 'my comment', date: date, body: 'this is a comment' },
             { _id: id3, title: 'the next thang', date: date, body: 'this is a comment too!' }]
       });
@@ -4191,8 +4191,8 @@ describe('Model', function() {
 
   describe('pathnames', function() {
     it('named path can be used', function(done) {
-      var db = start()
-        , P = db.model('pathnametest', new Schema({ path: String }));
+      var db = start(),
+          P = db.model('pathnametest', new Schema({ path: String }));
       db.close();
 
       var threw = false;
@@ -4294,8 +4294,8 @@ describe('Model', function() {
 
   describe('RegExps', function() {
     it('can be saved', function(done) {
-      var db = start()
-        , BlogPost = db.model('BlogPost', collection);
+      var db = start(),
+          BlogPost = db.model('BlogPost', collection);
 
       var post = new BlogPost({ mixed: { rgx: /^asdf$/ } });
       assert.ok(post.mixed.rgx instanceof RegExp);
@@ -4315,8 +4315,8 @@ describe('Model', function() {
 
   // Demonstration showing why GH-261 is a misunderstanding
   it('a single instantiated document should be able to update its embedded documents more than once', function(done) {
-    var db = start()
-      , BlogPost = db.model('BlogPost', collection);
+    var db = start(),
+        BlogPost = db.model('BlogPost', collection);
 
     var post = new BlogPost();
     post.comments.push({title: 'one'});
@@ -4399,8 +4399,8 @@ describe('Model', function() {
     });
 
     it('saved changes made within callback of a previous no-op save gh-1139', function(done) {
-      var db = start()
-        , B = db.model('BlogPost', collection);
+      var db = start(),
+          B = db.model('BlogPost', collection);
 
       var post = new B({ title: 'first' });
       post.save(function(err) {
@@ -4441,8 +4441,8 @@ describe('Model', function() {
 
   describe('_delta()', function() {
     it('should overwrite arrays when directly set (gh-1126)', function(done) {
-      var db = start()
-        , B = db.model('BlogPost', collection);
+      var db = start(),
+          B = db.model('BlogPost', collection);
 
       B.create({ title: 'gh-1126', numbers: [1,2] }, function(err, b) {
         assert.ifError(err);
@@ -4492,44 +4492,44 @@ describe('Model', function() {
     });
 
     it('should use $set when subdoc changed before pulling (gh-1303)', function(done) {
-      var db = start()
-        , B = db.model('BlogPost', 'gh-1303-' + random());
+      var db = start(),
+          B = db.model('BlogPost', 'gh-1303-' + random());
 
       B.create(
-          { title: 'gh-1303', comments: [{body:'a'},{body:'b'},{body:'c'}] }
-        , function(err, b) {
+          { title: 'gh-1303', comments: [{body:'a'},{body:'b'},{body:'c'}] },
+         function(err, b) {
 
-          assert.ifError(err);
-          B.findById(b._id, function(err, b) {
-            assert.ifError(err);
+           assert.ifError(err);
+           B.findById(b._id, function(err, b) {
+             assert.ifError(err);
 
-            b.comments[2].body = 'changed';
-            b.comments.pull(b.comments[1]);
+             b.comments[2].body = 'changed';
+             b.comments.pull(b.comments[1]);
 
-            assert.equal(2, b.comments.length);
-            assert.equal('a', b.comments[0].body);
-            assert.equal('changed', b.comments[1].body);
+             assert.equal(2, b.comments.length);
+             assert.equal('a', b.comments[0].body);
+             assert.equal('changed', b.comments[1].body);
 
-            var d = b.$__delta()[1];
-            assert.ok('$set' in d, 'invalid delta ' + JSON.stringify(d));
-            assert.ok(Array.isArray(d.$set.comments));
-            assert.equal(d.$set.comments.length, 2);
+             var d = b.$__delta()[1];
+             assert.ok('$set' in d, 'invalid delta ' + JSON.stringify(d));
+             assert.ok(Array.isArray(d.$set.comments));
+             assert.equal(d.$set.comments.length, 2);
 
-            b.save(function(err) {
-              assert.ifError(err);
+             b.save(function(err) {
+               assert.ifError(err);
 
-              B.findById(b._id, function(err, b) {
-                db.close();
-                assert.ifError(err);
-                assert.ok(Array.isArray(b.comments));
-                assert.equal(2, b.comments.length);
-                assert.equal('a', b.comments[0].body);
-                assert.equal('changed', b.comments[1].body);
-                done();
-              });
-            });
-          });
-        });
+               B.findById(b._id, function(err, b) {
+                 db.close();
+                 assert.ifError(err);
+                 assert.ok(Array.isArray(b.comments));
+                 assert.equal(2, b.comments.length);
+                 assert.equal('a', b.comments[0].body);
+                 assert.equal('changed', b.comments[1].body);
+                 done();
+               });
+             });
+           });
+         });
     });
   });
 
@@ -4554,11 +4554,11 @@ describe('Model', function() {
       var M = db.model('backwardCompat-gh-1048', Schema({ name: 'string' }));
       db.on('open', function() {
         var o = {
-          name: 'gh-1048'
-          , _id: new mongoose.Types.ObjectId
-          , databases: {
-            0: { keys: 100, expires: 0}
-              , 15: {keys:1,expires:0}
+          name: 'gh-1048',
+          _id: new mongoose.Types.ObjectId,
+          databases: {
+            0: { keys: 100, expires: 0},
+            15: {keys:1,expires:0}
           }
         };
 
@@ -4581,8 +4581,8 @@ describe('Model', function() {
 
   describe('non-schema adhoc property assignments', function() {
     it('are not saved', function(done) {
-      var db = start()
-        , B = db.model('BlogPost', collection);
+      var db = start(),
+          B = db.model('BlogPost', collection);
 
       var b = new B;
       b.whateveriwant = 10;
@@ -4676,8 +4676,8 @@ describe('Model', function() {
   });
 
   it('setting a path to undefined should retain the value as undefined', function(done) {
-    var db = start()
-      , B = db.model('BlogPost', collection + random());
+    var db = start(),
+        B = db.model('BlogPost', collection + random());
 
     var doc = new B;
     doc.title = 'css3';
@@ -4763,23 +4763,23 @@ describe('Model', function() {
 
   it('allow for object passing to ref paths (gh-1606)', function(done) {
     var db = start();
-    var schA = new Schema({ title : String });
+    var schA = new Schema({ title: String });
     var schma = new Schema({
-      thing : { type : Schema.Types.ObjectId, ref : 'A' },
-      subdoc : {
-        some : String,
-        thing : [{ type : Schema.Types.ObjectId, ref : 'A' }]
+      thing: { type: Schema.Types.ObjectId, ref: 'A' },
+      subdoc: {
+        some: String,
+        thing: [{ type: Schema.Types.ObjectId, ref: 'A' }]
       }
     });
 
     var M1 = db.model('A', schA);
     var M2 = db.model('A2', schma);
-    var a = new M1({ title : 'hihihih' }).toObject();
+    var a = new M1({ title: 'hihihih' }).toObject();
     var thing = new M2({
-      thing : a,
-      subdoc : {
-        title : 'blah',
-        thing : [a]
+      thing: a,
+      subdoc: {
+        title: 'blah',
+        thing: [a]
       }
     });
 

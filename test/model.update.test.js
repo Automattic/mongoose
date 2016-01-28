@@ -3,13 +3,13 @@
  * Test dependencies.
  */
 
-var start = require('./common')
-  , assert = require('assert')
-  , mongoose = start.mongoose
-  , random = require('../lib/utils').random
-  , Schema = mongoose.Schema
-  , ObjectId = Schema.Types.ObjectId
-  , DocumentObjectId = mongoose.Types.ObjectId;
+var start = require('./common'),
+    assert = require('assert'),
+    mongoose = start.mongoose,
+    random = require('../lib/utils').random,
+    Schema = mongoose.Schema,
+    ObjectId = Schema.Types.ObjectId,
+    DocumentObjectId = mongoose.Types.ObjectId;
 
 /**
  * Setup.
@@ -18,26 +18,26 @@ var start = require('./common')
 var Comments = new Schema;
 
 Comments.add({
-  title     : String
-  , date      : Date
-  , body      : String
-  , comments  : [Comments]
+  title: String,
+  date: Date,
+  body: String,
+  comments: [Comments]
 });
 
 var BlogPost = new Schema({
-  title     : String
-  , author    : String
-  , slug      : String
-  , date      : Date
-  , meta      : {
-    date      : Date
-      , visitors  : Number
-  }
-  , published : Boolean
-  , mixed     : {}
-  , numbers   : [Number]
-  , owners    : [ObjectId]
-  , comments  : [Comments]
+  title: String,
+  author: String,
+  slug: String,
+  date: Date,
+  meta: {
+    date: Date,
+    visitors: Number
+  },
+  published: Boolean,
+  mixed: {},
+  numbers: [Number],
+  owners: [ObjectId],
+  comments: [Comments]
 }, { strict: false });
 
 BlogPost.virtual('titleWithAuthor')
@@ -70,16 +70,16 @@ mongoose.model('UpdateStrictSchema', strictSchema);
 
 
 describe('model: update:', function() {
-  var post
-    , title = 'Tobi ' + random()
-    , author = 'Brian ' + random()
-    , newTitle = 'Woot ' + random()
-    , id0
-    , id1;
+  var post,
+      title = 'Tobi ' + random(),
+      author = 'Brian ' + random(),
+      newTitle = 'Woot ' + random(),
+      id0,
+      id1;
 
   before(function(done) {
-    var db = start()
-      , BlogPost = db.model('BlogPostForUpdates', collection);
+    var db = start(),
+        BlogPost = db.model('BlogPostForUpdates', collection);
 
     id0 = new DocumentObjectId;
     id1 = new DocumentObjectId;
@@ -102,8 +102,8 @@ describe('model: update:', function() {
   });
 
   it('works', function(done) {
-    var db = start()
-      , BlogPost = db.model('BlogPostForUpdates', collection);
+    var db = start(),
+        BlogPost = db.model('BlogPostForUpdates', collection);
 
     BlogPost.findById(post._id, function(err, cf) {
       assert.ifError(err);
@@ -126,14 +126,14 @@ describe('model: update:', function() {
       assert.ok(cf.comments[1]._id instanceof DocumentObjectId);
 
       var update = {
-        title: newTitle // becomes $set
-        , $inc: { 'meta.visitors': 2 }
-        , $set: { date: new Date }
-        , published: false // becomes $set
-        , 'mixed': { x: 'ECKS', y: 'why' } // $set
-        , $pullAll: { 'numbers': [4, 6] }
-        , $pull: { 'owners': id0 }
-        , 'comments.1.body': 8 // $set
+        title: newTitle, // becomes $set
+        $inc: { 'meta.visitors': 2 },
+        $set: { date: new Date },
+        published: false, // becomes $set
+        'mixed': { x: 'ECKS', y: 'why' }, // $set
+        $pullAll: { 'numbers': [4, 6] },
+        $pull: { 'owners': id0 },
+        'comments.1.body': 8 // $set
       };
 
       BlogPost.update({ title: title }, update, function(err) {
@@ -215,13 +215,13 @@ describe('model: update:', function() {
   });
 
   it('casts doc arrays', function(done) {
-    var db = start()
-      , BlogPost = db.model('BlogPostForUpdates', collection);
+    var db = start(),
+        BlogPost = db.model('BlogPostForUpdates', collection);
 
     var update = {
-      comments: [{ body: 'worked great' }]
-      , $set: {'numbers.1': 100}
-      , $inc: { idontexist: 1 }
+      comments: [{ body: 'worked great' }],
+      $set: {'numbers.1': 100},
+      $inc: { idontexist: 1 }
     };
 
     BlogPost.update({ _id: post._id }, update, function(err) {
@@ -250,8 +250,8 @@ describe('model: update:', function() {
   });
 
   it('handles $pushAll array of docs', function(done) {
-    var db = start()
-      , BlogPost = db.model('BlogPostForUpdates', collection);
+    var db = start(),
+        BlogPost = db.model('BlogPostForUpdates', collection);
 
     var update = {
       $pushAll: { comments: [{ body: 'i am number 2' }, { body: 'i am number 3' }] }
@@ -274,8 +274,8 @@ describe('model: update:', function() {
   });
 
   it('handles $pull of object literal array of docs (gh-542)', function(done) {
-    var db = start()
-      , BlogPost = db.model('BlogPostForUpdates', collection);
+    var db = start(),
+        BlogPost = db.model('BlogPostForUpdates', collection);
 
     var update = {
       $pull: { comments: { body: 'i am number 2' } }
@@ -296,8 +296,8 @@ describe('model: update:', function() {
   });
 
   it('makes copy of conditions and update options', function(done) {
-    var db = start()
-      , BlogPost = db.model('BlogPostForUpdates', collection);
+    var db = start(),
+        BlogPost = db.model('BlogPostForUpdates', collection);
 
     var conditions = { '_id': post._id.toString() };
     var update = {'$set':{'some_attrib':post._id.toString()}};
@@ -309,16 +309,16 @@ describe('model: update:', function() {
   });
 
   it('handles weird casting (gh-479)', function(done) {
-    var db = start()
-      , BlogPost = db.model('BlogPostForUpdates', collection);
+    var db = start(),
+        BlogPost = db.model('BlogPostForUpdates', collection);
 
     function a() {}
     a.prototype.toString = function() { return 'MongoDB++'; };
     var crazy = new a;
 
     var update = {
-      $addToSet: { 'comments.$.comments': { body: 'The Ring Of Power' } }
-      , $set: { 'comments.$.title': crazy }
+      $addToSet: { 'comments.$.comments': { body: 'The Ring Of Power' } },
+      $set: { 'comments.$.title': crazy }
     };
 
     BlogPost.update({ _id: post._id, 'comments.body': 'worked great' }, update, function(err) {
@@ -343,12 +343,12 @@ describe('model: update:', function() {
 
   var last;
   it('handles date casting (gh-479)', function(done) {
-    var db = start()
-      , BlogPost = db.model('BlogPostForUpdates', collection);
+    var db = start(),
+        BlogPost = db.model('BlogPostForUpdates', collection);
 
     var update = {
-      $inc: { 'comments.$.newprop': '1' }
-      , $set: { date: (new Date).getTime() } // check for single val casting
+      $inc: { 'comments.$.newprop': '1' },
+      $set: { date: (new Date).getTime() } // check for single val casting
     };
 
     BlogPost.update({ _id: post._id, 'comments.body': 'worked great' }, update, function(err) {
@@ -367,8 +367,8 @@ describe('model: update:', function() {
   });
 
   it('handles $addToSet (gh-545)', function(done) {
-    var db = start()
-      , BlogPost = db.model('BlogPostForUpdates', collection);
+    var db = start(),
+        BlogPost = db.model('BlogPostForUpdates', collection);
 
     var owner = last.owners[0];
 
@@ -390,11 +390,11 @@ describe('model: update:', function() {
   });
 
   it('handles $addToSet with $each (gh-545)', function(done) {
-    var db = start()
-      , BlogPost = db.model('BlogPostForUpdates', collection);
+    var db = start(),
+        BlogPost = db.model('BlogPostForUpdates', collection);
 
-    var owner = last.owners[0]
-      , newowner = new DocumentObjectId;
+    var owner = last.owners[0],
+        newowner = new DocumentObjectId;
 
     var update = {
       $addToSet: { 'owners': { $each: [owner, newowner] }}
@@ -415,12 +415,12 @@ describe('model: update:', function() {
   });
 
   it('handles $pop and $unset (gh-574)', function(done) {
-    var db = start()
-      , BlogPost = db.model('BlogPostForUpdates', collection);
+    var db = start(),
+        BlogPost = db.model('BlogPostForUpdates', collection);
 
     var update = {
-      $pop: { 'owners': -1 }
-      , $unset: { title: 1 }
+      $pop: { 'owners': -1 },
+      $unset: { title: 1 }
     };
 
 
@@ -437,13 +437,13 @@ describe('model: update:', function() {
   });
 
   it('works with nested positional notation', function(done) {
-    var db = start()
-      , BlogPost = db.model('BlogPostForUpdates', collection);
+    var db = start(),
+        BlogPost = db.model('BlogPostForUpdates', collection);
 
     var update = {
       $set: {
-        'comments.0.comments.0.date': '11/5/2011'
-          , 'comments.1.body': 9000
+        'comments.0.comments.0.date': '11/5/2011',
+        'comments.1.body': 9000
       }
     };
 
@@ -462,8 +462,8 @@ describe('model: update:', function() {
   });
 
   it('handles $pull with obj literal (gh-542)', function(done) {
-    var db = start()
-      , BlogPost = db.model('BlogPostForUpdates', collection);
+    var db = start(),
+        BlogPost = db.model('BlogPostForUpdates', collection);
 
     BlogPost.findById(post, function(err, last) {
       assert.ifError(err);
@@ -485,8 +485,8 @@ describe('model: update:', function() {
   });
 
   it('handles $pull of obj literal and nested $in', function(done) {
-    var db = start()
-      , BlogPost = db.model('BlogPostForUpdates', collection);
+    var db = start(),
+        BlogPost = db.model('BlogPostForUpdates', collection);
 
     BlogPost.findById(post, function(err, last) {
       assert.ifError(err);
@@ -508,8 +508,8 @@ describe('model: update:', function() {
   });
 
   it('handles $pull and nested $nin', function(done) {
-    var db = start()
-      , BlogPost = db.model('BlogPostForUpdates', collection);
+    var db = start(),
+        BlogPost = db.model('BlogPostForUpdates', collection);
 
     BlogPost.findById(post, function(err, last) {
       assert.ifError(err);
@@ -539,9 +539,9 @@ describe('model: update:', function() {
   });
 
   it('updates numbers atomically', function(done) {
-    var db = start()
-      , BlogPost = db.model('BlogPostForUpdates', collection)
-      , totalDocs = 4;
+    var db = start(),
+        BlogPost = db.model('BlogPostForUpdates', collection),
+        totalDocs = 4;
 
     var post = new BlogPost;
     post.set('meta.visitors', 5);
@@ -615,8 +615,8 @@ describe('model: update:', function() {
   });
 
   it('passes number of affected docs', function(done) {
-    var db = start()
-      , B = db.model('BlogPostForUpdates', 'wwwwowowo' + random());
+    var db = start(),
+        B = db.model('BlogPostForUpdates', 'wwwwowowo' + random());
 
     B.create({ title: 'one'},{title:'two'},{title:'three'}, function(err) {
       assert.ifError(err);
@@ -671,13 +671,13 @@ describe('model: update:', function() {
     });
 
     var componentSchema = new Schema({
-      name: String
-      , tasks: [taskSchema]
+      name: String,
+      tasks: [taskSchema]
     });
 
     var projectSchema = new Schema({
-      name: String
-      , components: [componentSchema]
+      name: String,
+      components: [componentSchema]
     });
 
     var Project = db.model('1057-project', projectSchema, '1057-' + random());
@@ -729,7 +729,7 @@ describe('model: update:', function() {
   it('handles positional operators with referenced docs (gh-1572)', function(done) {
     var db = start();
 
-    var so = new Schema({ title : String, obj : [String] });
+    var so = new Schema({ title: String, obj: [String] });
     var Some = db.model('Some' + random(), so);
 
     Some.create({ obj: ['a','b','c'] }, function(err, s) {
@@ -750,7 +750,7 @@ describe('model: update:', function() {
 
   it('use .where for update condition (gh-2170)', function(done) {
     var db = start();
-    var so = new Schema({ num : Number });
+    var so = new Schema({ num: Number });
     var Some = db.model('gh-2170' + random(), so);
 
     Some.create([ {num: 1}, {num: 1} ], function(err, docs) {
@@ -835,9 +835,9 @@ describe('model: update:', function() {
         assert.ifError(err);
 
         var op = { $push: { n: {
-          $each: [{x:10},{x:4}, {x:1}]
-          , $slice: '-1'
-          , $sort: { x:1 }
+          $each: [{x:10},{x:4}, {x:1}],
+          $slice: '-1',
+          $sort: { x:1 }
         }}};
 
         M.update({ _id: created._id }, op, function(err) {
@@ -890,7 +890,7 @@ describe('model: update:', function() {
       var schema = Schema({ name: String, n: [{ x: Number }] });
       var M = db.model('setoninsert-' + random(), schema);
 
-      var m = new M({ name: '2.6', n: [{ x : 0 }] });
+      var m = new M({ name: '2.6', n: [{ x: 0 }] });
       m.save(function(error, m) {
         assert.ifError(error);
         assert.equal(1, m.n.length);
@@ -941,7 +941,7 @@ describe('model: update:', function() {
     });
   });
 
-  describe('{overwrite : true}', function() {
+  describe('{overwrite: true}', function() {
     it('overwrite works', function(done) {
       var db = start();
       var schema = new Schema({ mixed: {} });
@@ -950,7 +950,7 @@ describe('model: update:', function() {
       M.create({ mixed: 'something' }, function(err, created) {
         assert.ifError(err);
 
-        M.update({ _id: created._id }, { mixed: {} }, { overwrite : true }, function(err) {
+        M.update({ _id: created._id }, { mixed: {} }, { overwrite: true }, function(err) {
           assert.ifError(err);
           M.findById(created._id, function(err, doc) {
             assert.ifError(err);
@@ -965,14 +965,14 @@ describe('model: update:', function() {
 
     it('overwrites all properties', function(done) {
       var db = start();
-      var sch = new Schema({ title : String, subdoc : { name : String, num : Number }});
+      var sch = new Schema({ title: String, subdoc : { name: String, num: Number }});
 
       var M = db.model('updateover' + random(), sch);
 
-      M.create({ subdoc : { name : 'that', num : 1 } }, function(err, doc) {
+      M.create({ subdoc : { name : 'that', num: 1 } }, function(err, doc) {
         assert.ifError(err);
 
-        M.update({ _id : doc.id }, { title : 'something!' }, { overwrite : true }, function(err) {
+        M.update({ _id: doc.id }, { title : 'something!' }, { overwrite: true }, function(err) {
           assert.ifError(err);
           M.findById(doc.id, function(err, doc) {
             assert.ifError(err);
@@ -987,14 +987,14 @@ describe('model: update:', function() {
 
     it('allows users to blow it up', function(done) {
       var db = start();
-      var sch = new Schema({ title : String, subdoc : { name : String, num : Number }});
+      var sch = new Schema({ title: String, subdoc : { name: String, num: Number }});
 
       var M = db.model('updateover' + random(), sch);
 
-      M.create({ subdoc : { name : 'that', num : 1, title : 'hello' } }, function(err, doc) {
+      M.create({ subdoc : { name : 'that', num: 1, title : 'hello' } }, function(err, doc) {
         assert.ifError(err);
 
-        M.update({ _id : doc.id }, {}, { overwrite : true }, function(err) {
+        M.update({ _id: doc.id }, {}, { overwrite: true }, function(err) {
           assert.ifError(err);
           M.findById(doc.id, function(err, doc) {
             assert.ifError(err);

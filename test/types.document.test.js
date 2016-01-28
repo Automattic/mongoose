@@ -3,13 +3,13 @@
  * Module dependencies.
  */
 
-var assert = require('assert')
-  , start = require('./common')
-  , mongoose = start.mongoose
-  , EmbeddedDocument = require('../lib/types/embedded')
-  , DocumentArray = require('../lib/types/documentarray')
-  , Schema = mongoose.Schema
-  , ValidationError = mongoose.Document.ValidationError;
+var assert = require('assert'),
+    start = require('./common'),
+    mongoose = start.mongoose,
+    EmbeddedDocument = require('../lib/types/embedded'),
+    DocumentArray = require('../lib/types/documentarray'),
+    Schema = mongoose.Schema,
+    ValidationError = mongoose.Document.ValidationError;
 
 /**
  * Setup.
@@ -40,8 +40,8 @@ Subdocument.prototype.__proto__ = EmbeddedDocument.prototype;
  */
 
 Subdocument.prototype.$__setSchema(new Schema({
-  test: { type: String, required: true }
-  , work: { type: String, validate: /^good/ }
+  test: { type: String, required: true },
+  work: { type: String, validate: /^good/ }
 }));
 
 /**
@@ -49,13 +49,13 @@ Subdocument.prototype.$__setSchema(new Schema({
  */
 
 var RatingSchema = new Schema({
-  stars: Number
-  , description: { source: { url: String, time: Date }}
+  stars: Number,
+  description: { source: { url: String, time: Date }}
 });
 
 var MovieSchema = new Schema({
-  title: String
-  , ratings: [RatingSchema]
+  title: String,
+  ratings: [RatingSchema]
 });
 
 mongoose.model('Movie', MovieSchema);
@@ -199,12 +199,12 @@ describe('types.document', function() {
       var Movie = db.model('Movie');
 
       Movie.create({
-        title: 'Life of Pi'
-        , ratings: [{
+        title: 'Life of Pi',
+        ratings: [{
           description: {
             source: {
-              url: 'http://www.imdb.com/title/tt0454876/'
-                    , time: new Date
+              url: 'http://www.imdb.com/title/tt0454876/',
+              time: new Date
             }
           }
         }]

@@ -3,25 +3,25 @@
  * Module dependencies.
  */
 
-var start = require('./common')
-  , mongoose = start.mongoose
-  , DocumentObjectId = mongoose.Types.ObjectId
-  , Schema = mongoose.Schema
-  , assert = require('assert')
-  , random = require('../lib/utils').random
-  , Query = require('../lib/query');
+var start = require('./common'),
+    mongoose = start.mongoose,
+    DocumentObjectId = mongoose.Types.ObjectId,
+    Schema = mongoose.Schema,
+    assert = require('assert'),
+    random = require('../lib/utils').random,
+    Query = require('../lib/query');
 
 var Comment = new Schema({
   text: String
 });
 
 var Product = new Schema({
-  tags: {} // mixed
-  , array: Array
-  , ids: [Schema.ObjectId]
-  , strings: [String]
-  , numbers: [Number]
-  , comments: [Comment]
+  tags: {}, // mixed
+  array: Array,
+  ids: [Schema.ObjectId],
+  strings: [String],
+  numbers: [Number],
+  comments: [Comment]
 });
 
 mongoose.model('Product', Product);
@@ -310,7 +310,7 @@ describe('Query', function() {
   describe('near', function() {
     it('via where, where { center :[lat, long]} param', function(done) {
       var query = new Query({}, {}, null, p1.collection);
-      query.where('checkin').near({ center : [40, -72]});
+      query.where('checkin').near({ center: [40, -72]});
       assert.deepEqual(query._conditions, {checkin: {$near: [40, -72]}});
       done();
     });
@@ -340,8 +340,8 @@ describe('Query', function() {
     });
     it('via where, where GeoJSON param', function(done) {
       var query = new Query({}, {}, null, p1.collection);
-      query.where('numbers').near({ center : { type : 'Point', coordinates : [40, -72 ]}});
-      assert.deepEqual(query._conditions, {numbers: {$near: { $geometry : { type : 'Point', coordinates : [40, -72] }}}});
+      query.where('numbers').near({ center: { type: 'Point', coordinates: [40, -72 ]}});
+      assert.deepEqual(query._conditions, {numbers: {$near: { $geometry: { type: 'Point', coordinates: [40, -72] }}}});
       assert.doesNotThrow(function() {
         query.cast(p1.constructor);
       });
@@ -349,8 +349,8 @@ describe('Query', function() {
     });
     it('with path, where GeoJSON param', function(done) {
       var query = new Query({}, {}, null, p1.collection);
-      query.near('loc', { center : { type : 'Point', coordinates : [40, -72 ]}});
-      assert.deepEqual(query._conditions, {loc: {$near: { $geometry : { type : 'Point', coordinates : [40, -72] }}}});
+      query.near('loc', { center: { type: 'Point', coordinates: [40, -72 ]}});
+      assert.deepEqual(query._conditions, {loc: {$near: { $geometry: { type: 'Point', coordinates: [40, -72] }}}});
       done();
     });
   });
@@ -390,8 +390,8 @@ describe('Query', function() {
 
     it('via where, where GeoJSON param', function(done) {
       var query = new Query({}, {}, null, p1.collection);
-      query.where('numbers').nearSphere({ center : { type : 'Point', coordinates : [40, -72 ]}});
-      assert.deepEqual(query._conditions, {numbers: {$nearSphere: { $geometry : { type : 'Point', coordinates : [40, -72] }}}});
+      query.where('numbers').nearSphere({ center: { type: 'Point', coordinates: [40, -72 ]}});
+      assert.deepEqual(query._conditions, {numbers: {$nearSphere: { $geometry: { type: 'Point', coordinates: [40, -72] }}}});
       assert.doesNotThrow(function() {
         query.cast(p1.constructor);
       });
@@ -400,8 +400,8 @@ describe('Query', function() {
 
     it('with path, with GeoJSON', function(done) {
       var query = new Query({}, {}, null, p1.collection);
-      query.nearSphere('numbers', { center : { type : 'Point', coordinates : [40, -72 ]}});
-      assert.deepEqual(query._conditions, {numbers: {$nearSphere: { $geometry : { type : 'Point', coordinates : [40, -72] }}}});
+      query.nearSphere('numbers', { center: { type: 'Point', coordinates: [40, -72 ]}});
+      assert.deepEqual(query._conditions, {numbers: {$nearSphere: { $geometry: { type: 'Point', coordinates: [40, -72] }}}});
       assert.doesNotThrow(function() {
         query.cast(p1.constructor);
       });
@@ -728,7 +728,7 @@ describe('Query', function() {
     it('works', function(done) {
       var query = new Query({}, {}, null, p1.collection);
       query.sort('a -c b');
-      assert.deepEqual(query.options.sort, {'a': 1 , 'c': -1,'b': 1});
+      assert.deepEqual(query.options.sort, {'a': 1, 'c': -1,'b': 1});
       query = new Query({}, {}, null, p1.collection);
       query.sort({'a': 1, 'c': -1, 'b': 'asc', e: 'descending', f: 'ascending'});
       assert.deepEqual(query.options.sort, {'a': 1, 'c': -1, 'b': 1, 'e': -1, 'f': 1});
@@ -795,12 +795,12 @@ describe('Query', function() {
     it('converts to PopulateOptions objects', function(done) {
       var q = new Query({}, {}, null, p1.collection);
       var o = {
-        path: 'yellow.brick'
-        , match: { bricks: { $lt: 1000 }}
-        , select: undefined
-        , model: undefined
-        , options: undefined
-        , _docs: {}
+        path: 'yellow.brick',
+        match: { bricks: { $lt: 1000 }},
+        select: undefined,
+        model: undefined,
+        options: undefined,
+        _docs: {}
       };
       q.populate(o);
       assert.deepEqual(o, q._mongooseOptions.populate['yellow.brick']);
@@ -810,12 +810,12 @@ describe('Query', function() {
     it('overwrites duplicate paths', function(done) {
       var q = new Query({}, {}, null, p1.collection);
       var o = {
-        path: 'yellow.brick'
-        , match: { bricks: { $lt: 1000 }}
-        , select: undefined
-        , model: undefined
-        , options: undefined
-        , _docs: {}
+        path: 'yellow.brick',
+        match: { bricks: { $lt: 1000 }},
+        select: undefined,
+        model: undefined,
+        options: undefined,
+        _docs: {}
       };
       q.populate(o);
       assert.equal(1, Object.keys(q._mongooseOptions.populate).length);
@@ -831,12 +831,12 @@ describe('Query', function() {
       var q = new Query({}, {}, null, p1.collection);
       q.populate('yellow.brick dirt');
       var o = {
-        path: 'yellow.brick'
-        , match: undefined
-        , select: undefined
-        , model: undefined
-        , options: undefined
-        , _docs: {}
+        path: 'yellow.brick',
+        match: undefined,
+        select: undefined,
+        model: undefined,
+        options: undefined,
+        _docs: {}
       };
       assert.equal(2, Object.keys(q._mongooseOptions.populate).length);
       assert.deepEqual(o, q._mongooseOptions.populate['yellow.brick']);
@@ -876,11 +876,11 @@ describe('Query', function() {
       var comment = new Comment(castedComment);
 
       var params = {
-        array: { $ne: 5 }
-        , ids: { $ne: id }
-        , comments: { $ne: comment }
-        , strings: { $ne: 'Hi there' }
-        , numbers: { $ne: 10000 }
+        array: { $ne: 5 },
+        ids: { $ne: id },
+        comments: { $ne: comment },
+        strings: { $ne: 'Hi there' },
+        numbers: { $ne: 10000 }
       };
 
       query.cast(Product, params);
@@ -933,11 +933,11 @@ describe('Query', function() {
       var comment = new Comment(castedComment);
 
       var params = {
-        array: 5
-        , ids: id
-        , comments: comment
-        , strings: 'Hi there'
-        , numbers: 10000
+        array: 5,
+        ids: id,
+        comments: comment,
+        strings: 'Hi there',
+        numbers: 10000
       };
 
       query.cast(Product, params);
@@ -990,10 +990,10 @@ describe('Query', function() {
       var comment = new Comment(castedComment);
 
       var params = {
-        ids: { $gt: id }
-        , comments: { $gt: comment }
-        , strings: { $gt: 'Hi there' }
-        , numbers: { $gt: 10000 }
+        ids: { $gt: id },
+        comments: { $gt: comment },
+        strings: { $gt: 'Hi there' },
+        numbers: { $gt: 10000 }
       };
 
       query.cast(Product, params);
@@ -1446,8 +1446,8 @@ describe('Query', function() {
       var db = start();
       var Product = db.model('Product', 'Product_setOptions_test');
       Product.create(
-          { numbers: [3,4,5] }
-        , { strings: 'hi there'.split(' ') } , function(err, doc1, doc2) {
+        { numbers: [3,4,5] },
+        { strings: 'hi there'.split(' ') }, function(err, doc1, doc2) {
 
           assert.ifError(err);
 

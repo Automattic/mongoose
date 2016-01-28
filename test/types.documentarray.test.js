@@ -3,16 +3,16 @@
  * Module dependencies.
  */
 
-var start = require('./common')
-  , mongoose = require('./common').mongoose
-  , random = require('../lib/utils').random
-  , setValue = require('../lib/utils').setValue
-  , MongooseDocumentArray = mongoose.Types.DocumentArray
-  , EmbeddedDocument = require('../lib/types/embedded')
-  , DocumentArray = require('../lib/types/documentarray')
-  , Schema = mongoose.Schema
-  , assert = require('assert')
-  , collection = 'types.documentarray_' + random();
+var start = require('./common'),
+    mongoose = require('./common').mongoose,
+    random = require('../lib/utils').random,
+    setValue = require('../lib/utils').setValue,
+    MongooseDocumentArray = mongoose.Types.DocumentArray,
+    EmbeddedDocument = require('../lib/types/embedded'),
+    DocumentArray = require('../lib/types/documentarray'),
+    Schema = mongoose.Schema,
+    assert = require('assert'),
+    collection = 'types.documentarray_' + random();
 
 /**
  * Setup.
@@ -74,8 +74,8 @@ describe('types.documentarray', function() {
 
     // test with custom string _id
     var Custom = new Schema({
-      title: { type: String }
-      , _id:   { type: String, required: true }
+      title: { type: String },
+      _id:   { type: String, required: true }
     });
 
     Subdocument = TestDoc(Custom);
@@ -91,8 +91,8 @@ describe('types.documentarray', function() {
 
     // test with custom number _id
     var CustNumber = new Schema({
-      title: { type: String }
-      , _id:   { type: Number, required: true }
+      title: { type: String },
+      _id:   { type: Number, required: true }
     });
 
     Subdocument = TestDoc(CustNumber);
@@ -108,8 +108,8 @@ describe('types.documentarray', function() {
 
     // test with object as _id
     Custom = new Schema({
-      title: { type: String }
-      , _id:   { one: { type: String }, two: { type: String } }
+      title: { type: String },
+      _id:   { one: { type: String }, two: { type: String } }
     });
 
     Subdocument = TestDoc(Custom);
@@ -155,8 +155,8 @@ describe('types.documentarray', function() {
     sub4 = new Subdocument();
     sub4.title = 'rock-n-roll';
 
-    a = new MongooseDocumentArray([sub4])
-      , threw = false;
+    a = new MongooseDocumentArray([sub4]),
+       threw = false;
     try {
       a.id('i better not throw');
     } catch (err) {
@@ -181,7 +181,7 @@ describe('types.documentarray', function() {
     sub1 = new Subdocument1();
     sub.title = 'Hello again to all my friends';
     id = sub1._id.toString();
-    setValue('_id', sub1 , sub);
+    setValue('_id', sub1, sub);
 
     a = new MongooseDocumentArray([sub]);
     assert.equal(a.id(id).title, 'Hello again to all my friends');
@@ -355,16 +355,16 @@ describe('types.documentarray', function() {
   it('#push should work on EmbeddedDocuments more than 2 levels deep', function(done) {
     var Comments = new Schema;
     Comments.add({
-      title     : String
-      , comments  : [Comments]
+      title: String,
+      comments: [Comments]
     });
     var BlogPost = new Schema({
-      title     : String
-      , comments  : [Comments]
+      title: String,
+      comments: [Comments]
     });
 
-    var db = start()
-      , Post = db.model('docarray-BlogPost', BlogPost, collection);
+    var db = start(),
+        Post = db.model('docarray-BlogPost', BlogPost, collection);
 
     var p = new Post({ title: "comment nesting" });
     var c1 = p.comments.create({ title: "c1" });

@@ -3,11 +3,11 @@
  * Test dependencies.
  */
 
-var start = require('./common')
-  , assert = require('assert')
-  , mongoose = start.mongoose
-  , random = require('../lib/utils').random
-  , Schema = mongoose.Schema;
+var start = require('./common'),
+    assert = require('assert'),
+    mongoose = start.mongoose,
+    random = require('../lib/utils').random,
+    Schema = mongoose.Schema;
 
 describe('schema select option', function() {
 
@@ -15,9 +15,9 @@ describe('schema select option', function() {
     var db = start();
 
     var schema = new Schema({
-      thin: Boolean
-      , name: { type: String, select: false}
-      , docs: [new Schema({ bool: Boolean, name: { type: String, select: false }})]
+      thin: Boolean,
+      name: { type: String, select: false},
+      docs: [new Schema({ bool: Boolean, name: { type: String, select: false }})]
     });
 
     var S = db.model('ExcludingBySchemaType', schema);
@@ -40,7 +40,7 @@ describe('schema select option', function() {
         assert.strictEqual(undefined, s.name);
         // we need to make sure this executes absolutely last.
         if (pending === 1) {
-          S.findOneAndRemove({ _id : item._id }, cb);
+          S.findOneAndRemove({ _id: item._id }, cb);
         }
         if (0 === pending) {
           done();
@@ -58,9 +58,9 @@ describe('schema select option', function() {
     var db = start();
 
     var schema = new Schema({
-      thin: Boolean
-      , name: { type: String, select: true }
-      , docs: [new Schema({ bool: Boolean, name: { type: String, select: true }})]
+      thin: Boolean,
+      name: { type: String, select: true },
+      docs: [new Schema({ bool: Boolean, name: { type: String, select: true }})]
     });
 
     var S = db.model('IncludingBySchemaType', schema);
@@ -105,14 +105,14 @@ describe('schema select option', function() {
       db = start();
 
       selected = new Schema({
-        thin: Boolean
-        , name: { type: String, select: true }
-        , docs: [new Schema({ name: { type: String, select: true }, bool: Boolean })]
+        thin: Boolean,
+        name: { type: String, select: true },
+        docs: [new Schema({ name: { type: String, select: true }, bool: Boolean })]
       });
       excluded = new Schema({
-        thin: Boolean
-        , name: { type: String, select: false }
-        , docs: [new Schema({ name: { type: String, select: false }, bool: Boolean})]
+        thin: Boolean,
+        name: { type: String, select: false },
+        docs: [new Schema({ name: { type: String, select: false }, bool: Boolean})]
       });
 
       S = db.model('OverriddingSelectedBySchemaType', selected);
@@ -271,8 +271,8 @@ describe('schema select option', function() {
     it('works (gh-1333)', function(done) {
       var m = new mongoose.Mongoose();
       var child = new Schema({
-        name1: {type:String, select: false}
-        , name2: {type:String, select: true}
+        name1: {type:String, select: false},
+        name2: {type:String, select: true}
       });
       var selected = new Schema({
         docs: { type: [child], select: false }
@@ -293,9 +293,9 @@ describe('schema select option', function() {
     it('works', function(done) {
       var db = start();
       var excluded = new Schema({
-        thin: Boolean
-        , name: { type: String, select: false }
-        , docs: [new Schema({ name: { type: String, select: false }, bool: Boolean })]
+        thin: Boolean,
+        name: { type: String, select: false },
+        docs: [new Schema({ name: { type: String, select: false }, bool: Boolean })]
       });
 
       var M = db.model('ForcedInclusionOfPath', excluded);
@@ -372,9 +372,9 @@ describe('schema select option', function() {
     var db = start();
 
     var schema = new Schema({
-      thin: Boolean
-      , name: { type: String, select: true }
-      , conflict: { type: String, select: false}
+      thin: Boolean,
+      name: { type: String, select: true },
+      conflict: { type: String, select: false}
     });
 
     var S = db.model('ConflictingBySchemaType', schema);
@@ -442,20 +442,20 @@ describe('schema select option', function() {
     var coll = 'inclusiveexclusivecomboswork_' + random();
 
     var schema = new Schema({
-      name: { type: String }
-      , age: Number
+      name: { type: String },
+      age: Number
     }, { collection: coll });
     var M = db.model('InclusiveExclusiveCombosWork', schema);
 
     var schema1 = new Schema({
-      name: { type: String, select: false }
-      , age: Number
+      name: { type: String, select: false },
+      age: Number
     }, { collection: coll });
     var S = db.model('InclusiveExclusiveCombosWorkWithSchemaSelectionFalse', schema1);
 
     var schema2 = new Schema({
-      name: { type: String, select: true }
-      , age: Number
+      name: { type: String, select: true },
+      age: Number
     }, { collection: coll });
     var T = db.model('InclusiveExclusiveCombosWorkWithSchemaSelectionTrue', schema2);
 

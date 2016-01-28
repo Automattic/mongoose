@@ -3,11 +3,10 @@
  * Test dependencies.
  */
 
-var start = require('./common')
-  , mongoose = start.mongoose
-  , assert = require('assert')
-  , Schema = mongoose.Schema
-  ;
+var start = require('./common'),
+    mongoose = start.mongoose,
+    assert = require('assert'),
+    Schema = mongoose.Schema;
 
 describe('schema options.timestamps', function() {
   describe('create schema with options.timestamps', function() {

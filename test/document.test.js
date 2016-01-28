@@ -41,26 +41,26 @@ em.virtual('works').get(function() {
   return 'em virtual works';
 });
 var schema = new Schema({
-  test    : String
-  , oids    : [ObjectId]
-  , numbers : [Number]
-  , nested  : {
-    age   : Number
-      , cool  : ObjectId
-      , deep  : { x: String }
-      , path  : String
-      , setr  : String
-  }
-  , nested2 : {
-    nested: String
-      , yup   : {
-        nested  : Boolean
-          , yup     : String
-          , age     : Number
-      }
-  }
-  , em: [em]
-  , date: Date
+  test    : String,
+  oids    : [ObjectId],
+  numbers : [Number],
+  nested  : {
+    age   : Number,
+    cool  : ObjectId,
+    deep  : { x: String },
+    path  : String,
+    setr  : String
+  },
+  nested2 : {
+    nested: String,
+    yup   : {
+      nested  : Boolean,
+      yup     : String,
+      age     : Number
+    }
+  },
+  em: [em],
+  date: Date
 });
 TestDocument.prototype.$__setSchema(schema);
 
@@ -120,12 +120,12 @@ describe('document', function() {
     it('work', function(done) {
       var doc = new TestDocument();
       doc.init({
-        test    : 'test'
-        , oids    : []
-        , nested  : {
-          age   : 5
-            , cool  : DocumentObjectId.createFromHexString('4c6c2d6240ced95d0e00003c')
-            , path  : 'my path'
+        test    : 'test',
+        oids    : [],
+        nested  : {
+          age   : 5,
+          cool  : DocumentObjectId.createFromHexString('4c6c2d6240ced95d0e00003c'),
+          path  : 'my path'
         }
       });
 
@@ -142,12 +142,12 @@ describe('document', function() {
 
       var doc2 = new TestDocument();
       doc2.init({
-        test    : 'toop'
-        , oids    : []
-        , nested  : {
-          age   : 2
-            , cool  : DocumentObjectId.createFromHexString('4cf70857337498f95900001c')
-            , deep  : { x: 'yay' }
+        test    : 'toop',
+        oids    : [],
+        nested  : {
+          age   : 2,
+          cool  : DocumentObjectId.createFromHexString('4cf70857337498f95900001c'),
+          deep  : { x: 'yay' }
         }
       });
 
@@ -172,9 +172,9 @@ describe('document', function() {
       assert.equal('object', typeof doc2.nested2.yup);
 
       doc2.nested2.yup = {
-        age: 150
-        , yup: "Yesiree"
-        , nested: true
+        age: 150,
+        yup: "Yesiree",
+        nested: true
       };
 
       assert.equal(doc2.nested2.nested, undefined);
@@ -198,8 +198,8 @@ describe('document', function() {
     var doc = new TestDocument();
 
     doc.init({
-      test    : 'Test'
-      , nested  : {
+      test    : 'Test',
+      nested  : {
         age   : 5
       }
     });
@@ -237,11 +237,11 @@ describe('document', function() {
   it('test toObject clone', function(done) {
     var doc = new TestDocument();
     doc.init({
-      test    : 'test'
-      , oids    : []
-      , nested  : {
-        age   : 5
-          , cool  : new DocumentObjectId
+      test    : 'test',
+      oids    : [],
+      nested  : {
+        age   : 5,
+        cool  : new DocumentObjectId
       }
     });
 
@@ -263,16 +263,16 @@ describe('document', function() {
     var doc = new TestDocument();
 
     doc.init({
-      test    : 'test'
-      , oids    : []
-      , em: [{title:'asdf'}]
-      , nested  : {
-        age   : 5
-          , cool  : DocumentObjectId.createFromHexString('4c6c2d6240ced95d0e00003c')
-          , path  : 'my path'
-      }
-      , nested2: {}
-      , date: new Date
+      test    : 'test',
+      oids    : [],
+      em: [{title:'asdf'}],
+      nested  : {
+        age   : 5,
+        cool  : DocumentObjectId.createFromHexString('4c6c2d6240ced95d0e00003c'),
+        path  : 'my path'
+      },
+      nested2: {},
+      date: new Date
     });
 
     var clone = doc.toObject({ getters: true, virtuals: false });
@@ -400,8 +400,8 @@ describe('document', function() {
       });
     }
     clone = doc.toObject({
-      transform: xform
-      , fields: '_id em numbers oids nested'
+      transform: xform,
+      fields: '_id em numbers oids nested'
     });
     assert.equal('test', doc.test);
     assert.ok(undefined === clone.em);
@@ -435,9 +435,9 @@ describe('document', function() {
       }
     });
 
-    var db = start()
-      , Test = db.model('toObject-transform', schema)
-      , Places = db.model('toObject-transform-places', schemaPlaces);
+    var db = start(),
+        Test = db.model('toObject-transform', schema),
+        Places = db.model('toObject-transform-places', schemaPlaces);
 
     Places.create({ identity: 'a' },{ identity: 'b' },{ identity: 'c' }, function(err, a, b, c) {
       Test.create({ name: 'chetverikov', places: [a, b, c]}, function( err ) {
@@ -483,8 +483,8 @@ describe('document', function() {
         return ret;
       }
     });
-    var db = start()
-      , Test = db.model('TestToObject', schema);
+    var db = start(),
+        Test = db.model('TestToObject', schema);
 
     Test.create({ name: 'chetverikov', iWillNotBeDelete: true, 'nested.iWillNotBeDeleteToo': true}, function( err ) {
       assert.ifError(err);
@@ -517,8 +517,8 @@ describe('document', function() {
       sub: [subdocSchema]
     });
 
-    var db = start()
-      , Doc = db.model('Doc', docSchema);
+    var db = start(),
+        Doc = db.model('Doc', docSchema);
 
     Doc.create({
       foo: 'someString',
@@ -630,15 +630,15 @@ describe('document', function() {
     var doc = new TestDocument();
 
     doc.init({
-      test    : 'test'
-      , oids    : []
-      , em: [{title:'asdf'}]
-      , nested  : {
-        age   : 5
-          , cool  : DocumentObjectId.createFromHexString('4c6c2d6240ced95d0e00003c')
-          , path  : 'my path'
-      }
-      , nested2: {}
+      test    : 'test',
+      oids    : [],
+      em: [{title:'asdf'}],
+      nested  : {
+        age   : 5,
+        cool  : DocumentObjectId.createFromHexString('4c6c2d6240ced95d0e00003c'),
+        path  : 'my path'
+      },
+      nested2: {}
     });
 
     // override to check if toJSON gets fired
@@ -669,9 +669,9 @@ describe('document', function() {
     assert.equal(1, Object.keys(clone.nested2).length);
 
     // gh-852
-    var arr = [doc]
-      , err = false
-      , str;
+    var arr = [doc],
+        err = false,
+        str;
     try {
       str = JSON.stringify(arr);
     } catch (_) { err = true; }
@@ -735,8 +735,8 @@ describe('document', function() {
       });
     }
     clone = doc.toJSON({
-      transform: xform
-      , fields: '_id em numbers oids nested'
+      transform: xform,
+      fields: '_id em numbers oids nested'
     });
     assert.equal('test', doc.test);
     assert.ok(undefined === clone.em);
@@ -751,8 +751,8 @@ describe('document', function() {
   });
 
   it('jsonifying an object', function(done) {
-    var doc = new TestDocument({ test: 'woot' })
-      , oidString = doc._id.toString();
+    var doc = new TestDocument({ test: 'woot' }),
+        oidString = doc._id.toString();
     // convert to json string
     var json = JSON.stringify(doc);
     // parse again
@@ -831,8 +831,8 @@ describe('document', function() {
   });
 
   it('toObject should not set undefined values to null', function(done) {
-    var doc = new TestDocument()
-      , obj = doc.toObject();
+    var doc = new TestDocument(),
+        obj = doc.toObject();
 
     delete obj._id;
     assert.deepEqual(obj, { numbers: [], oids: [], em: [] });
@@ -841,22 +841,22 @@ describe('document', function() {
 
   describe('Errors', function() {
     it('MongooseErrors should be instances of Error (gh-209)', function(done) {
-      var MongooseError = require('../lib/error')
-        , err = new MongooseError("Some message");
+      var MongooseError = require('../lib/error'),
+          err = new MongooseError("Some message");
       assert.ok(err instanceof Error);
       done();
     });
     it('ValidationErrors should be instances of Error', function(done) {
-      var ValidationError = Document.ValidationError
-        , err = new ValidationError(new TestDocument);
+      var ValidationError = Document.ValidationError,
+          err = new ValidationError(new TestDocument);
       assert.ok(err instanceof Error);
       done();
     });
   });
 
   it('methods on embedded docs should work', function(done) {
-    var db = start()
-      , ESchema = new Schema({ name: String });
+    var db = start(),
+        ESchema = new Schema({ name: String });
 
     ESchema.methods.test = function() {
       return this.name + ' butter';
@@ -908,18 +908,18 @@ describe('document', function() {
     };
 
     var schema = new Schema({
-      title: String
-      , embed1: [new Schema({name:String})]
-      , embed2: [new Schema({name:String})]
-      , embed3: [new Schema({name:String})]
-      , embed4: [new Schema({name:String})]
-      , embed5: [new Schema({name:String})]
-      , embed6: [new Schema({name:String})]
-      , embed7: [new Schema({name:String})]
-      , embed8: [new Schema({name:String})]
-      , embed9: [new Schema({name:String})]
-      , embed10: [new Schema({name:String})]
-      , embed11: [new Schema({name:String})]
+      title: String,
+      embed1: [new Schema({name:String})],
+      embed2: [new Schema({name:String})],
+      embed3: [new Schema({name:String})],
+      embed4: [new Schema({name:String})],
+      embed5: [new Schema({name:String})],
+      embed6: [new Schema({name:String})],
+      embed7: [new Schema({name:String})],
+      embed8: [new Schema({name:String})],
+      embed9: [new Schema({name:String})],
+      embed10: [new Schema({name:String})],
+      embed11: [new Schema({name:String})]
     });
 
     var S = db.model('noMaxListeners', schema);
@@ -931,9 +931,9 @@ describe('document', function() {
   });
 
   it('unselected required fields should pass validation', function(done) {
-    var db = start()
-      , Tschema = new Schema({ name: String, req: { type: String, required: true }})
-      , T = db.model('unselectedRequiredFieldValidation', Tschema);
+    var db = start(),
+        Tschema = new Schema({ name: String, req: { type: String, required: true }}),
+        T = db.model('unselectedRequiredFieldValidation', Tschema);
 
     var t = new T({ name: 'teeee', req: 'i am required' });
     t.save(function(err) {
@@ -1432,8 +1432,8 @@ describe('document', function() {
           var doc = new TestDocument();
 
           doc.init({
-            test    : 'Test'
-            , nested  : {
+            test    : 'Test',
+            nested  : {
               age   : 5
             }
           });
@@ -1453,8 +1453,8 @@ describe('document', function() {
 
           doc = new TestDocument();
           doc.init({
-            test    : 'Test'
-            , nested  : {
+            test    : 'Test',
+            nested  : {
               age   : 5
             }
           });
@@ -1468,8 +1468,8 @@ describe('document', function() {
 
           doc = new TestDocument();
           doc.init({
-            test    : 'Test'
-            , nested  : {
+            test    : 'Test',
+            nested  : {
               age   : 5
             }
           });
@@ -1494,8 +1494,8 @@ describe('document', function() {
 
           doc = new TestDocument();
           doc.init({
-            test    : 'Test'
-            , nested  : {
+            test    : 'Test',
+            nested  : {
               age   : 5
             }
           });

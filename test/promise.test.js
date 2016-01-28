@@ -13,8 +13,8 @@ var Promise = require('../lib/promise');
 
 describe('Promise', function() {
   it('events fire right after complete()', function(done) {
-    var promise = new Promise()
-      , called = 0;
+    var promise = new Promise(),
+        called = 0;
 
     promise.on('fulfill', function(a, b) {
       assert.equal(a, '1');
@@ -35,8 +35,8 @@ describe('Promise', function() {
   });
 
   it('events fire right after error()', function(done) {
-    var promise = new Promise()
-      , called = 0;
+    var promise = new Promise(),
+        called = 0;
 
     promise.on('reject', function(err) {
       assert.ok(err instanceof Error);
@@ -55,8 +55,8 @@ describe('Promise', function() {
   });
 
   it('events fire right after reject()', function(done) {
-    var promise = new Promise()
-      , called = 0;
+    var promise = new Promise(),
+        called = 0;
 
     promise.on('reject', function(err) {
       assert.equal(9, err);
@@ -90,8 +90,8 @@ describe('Promise', function() {
     });
 
     it('after fulfill()', function(done) {
-      var promise = new Promise()
-        , called = 0;
+      var promise = new Promise(),
+          called = 0;
 
       promise.fulfill('woot');
 
@@ -110,8 +110,8 @@ describe('Promise', function() {
     });
 
     it('after error()', function(done) {
-      var promise = new Promise()
-        , called = 0;
+      var promise = new Promise(),
+          called = 0;
 
       promise.error(new Error('woot'));
 
@@ -131,8 +131,8 @@ describe('Promise', function() {
 
   describe('onFulfill() shortcut', function() {
     it('works', function(done) {
-      var promise = new Promise()
-        , called = 0;
+      var promise = new Promise(),
+          called = 0;
 
       promise.onFulfill(function(woot) {
         assert.strictEqual(woot, undefined);
@@ -148,8 +148,8 @@ describe('Promise', function() {
 
   describe('onReject shortcut', function() {
     it('works', function(done) {
-      var promise = new Promise()
-        , called = 0;
+      var promise = new Promise(),
+          called = 0;
 
       promise.onReject(function(err) {
         assert.ok(err instanceof Error);

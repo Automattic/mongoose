@@ -2,18 +2,18 @@
  * Module dependencies.
  */
 
-var start = require('./common')
-  , mongoose = start.mongoose
-  , assert = require('assert')
-  , Schema = mongoose.Schema
-  , Document = mongoose.Document
-  , VirtualType = mongoose.VirtualType
-  , SchemaTypes = Schema.Types
-  , ObjectId = SchemaTypes.ObjectId
-  , Mixed = SchemaTypes.Mixed
-  , DocumentObjectId = mongoose.Types.ObjectId
-  , ReadPref = mongoose.mongo.ReadPreference
-  , vm = require('vm');
+var start = require('./common'),
+    mongoose = start.mongoose,
+    assert = require('assert'),
+    Schema = mongoose.Schema,
+    Document = mongoose.Document,
+    VirtualType = mongoose.VirtualType,
+    SchemaTypes = Schema.Types,
+    ObjectId = SchemaTypes.ObjectId,
+    Mixed = SchemaTypes.Mixed,
+    DocumentObjectId = mongoose.Types.ObjectId,
+    ReadPref = mongoose.mongo.ReadPreference,
+    vm = require('vm');
 
 /**
  * Test Document constructor.
@@ -34,7 +34,7 @@ TestDocument.prototype.__proto__ = Document.prototype;
  */
 
 TestDocument.prototype.$__setSchema(new Schema({
-  test    : String
+  test: String
 }));
 
 /**
@@ -106,24 +106,24 @@ describe('schema', function() {
 
   it('supports different schematypes', function(done) {
     var Checkin = new Schema({
-      date      : Date
-      , location  : {
-        lat: Number
-          , lng: Number
+      date: Date,
+      location: {
+        lat: Number,
+        lng: Number
       }
     });
 
     var Ferret = new Schema({
-      name      : String
-      , owner     : ObjectId
-      , fur       : String
-      , color     : { type: String }
-      , age       : Number
-      , checkins  : [Checkin]
-      , friends   : [ObjectId]
-      , likes     : Array
-      , alive     : Boolean
-      , extra     : Mixed
+      name: String,
+      owner: ObjectId,
+      fur: String,
+      color: { type: String },
+      age: Number,
+      checkins: [Checkin],
+      friends: [ObjectId],
+      likes: Array,
+      alive: Boolean,
+      extra: Mixed
     });
 
     assert.ok(Ferret.path('name') instanceof SchemaTypes.String);
@@ -143,10 +143,10 @@ describe('schema', function() {
 
     // check strings
     var Checkin1 = new Schema({
-      date      : 'date'
-      , location  : {
-        lat: 'number'
-          , lng: 'Number'
+      date: 'date',
+      location: {
+        lat: 'number',
+        lng: 'Number'
       }
     });
 
@@ -155,20 +155,20 @@ describe('schema', function() {
     assert.ok(Checkin1.path('location.lng') instanceof SchemaTypes.Number);
 
     var Ferret1 = new Schema({
-      name      : "string"
-      , owner     : "oid"
-      , fur       : { type: "string" }
-      , color     : { type: "String" }
-      , checkins  : [Checkin]
-      , friends   : Array
-      , likes     : "array"
-      , alive     : "Bool"
-      , alive1    : "bool"
-      , alive2    : "boolean"
-      , extra     : "mixed"
-      , obj       : "object"
-      , buf       : "buffer"
-      , Buf       : "Buffer"
+      name      : "string",
+      owner     : "oid",
+      fur: { type: "string" },
+      color: { type: "String" },
+      checkins: [Checkin],
+      friends: Array,
+      likes     : "array",
+      alive     : "Bool",
+      alive1    : "bool",
+      alive2    : "boolean",
+      extra     : "mixed",
+      obj       : "object",
+      buf       : "buffer",
+      Buf       : "Buffer"
     });
 
     assert.ok(Ferret1.path('name') instanceof SchemaTypes.String);
@@ -190,19 +190,19 @@ describe('schema', function() {
 
   it('supports dot notation for path accessors', function(done) {
     var Racoon = new Schema({
-      name  : { type: String, enum: ['Edwald', 'Tobi'] }
-      , age   : Number
+      name: { type: String, enum: ['Edwald', 'Tobi'] },
+      age: Number
     });
 
     // check for global variable leak
     assert.equal('undefined', typeof errorMessage);
 
     var Person = new Schema({
-      name      : String
-      , raccoons  : [Racoon]
-      , location  : {
-        city  : String
-          , state : String
+      name: String,
+      raccoons: [Racoon],
+      location: {
+        city: String,
+        state: String
       }
     });
 
@@ -229,11 +229,11 @@ describe('schema', function() {
 
   it('default definition', function(done) {
     var Test = new Schema({
-      simple    : { $type: String, default: 'a' }
-      , array     : { $type: Array, default: [1,2,3,4,5] }
-      , arrayX    : { $type: Array, default: 9 }
-      , arrayFn   : { $type: Array, default: function() { return [8]; } }
-      , callback  : { $type: Number, default: function() {
+      simple: { $type: String, default: 'a' },
+      array: { $type: Array, default: [1,2,3,4,5] },
+      arrayX: { $type: Array, default: 9 },
+      arrayFn: { $type: Array, default: function() { return [8]; } },
+      callback: { $type: Number, default: function() {
         assert.equal('b', this.a);
         return '3';
       }}
@@ -256,8 +256,8 @@ describe('schema', function() {
 
   it('Mixed defaults can be empty arrays', function(done) {
     var Test = new Schema({
-      mixed1    : { type: Mixed, default: [] }
-      , mixed2    : { type: Mixed, default: Array }
+      mixed1: { type: Mixed, default: [] },
+      mixed2: { type: Mixed, default: Array }
     });
 
     assert.ok(Test.path('mixed1').getDefault() instanceof Array);
@@ -322,8 +322,8 @@ describe('schema', function() {
         owner: { type: ObjectId }
       });
 
-      var doc = new TestDocument()
-        , id = doc._id.toString();
+      var doc = new TestDocument(),
+          id = doc._id.toString();
 
       assert.ok(Loki.path('owner').cast('4c54f3453e688c000000001a')
                         instanceof DocumentObjectId);
@@ -340,13 +340,13 @@ describe('schema', function() {
 
     it('array', function(done) {
       var Loki = new Schema({
-        oids        : [ObjectId]
-        , dates       : [Date]
-        , numbers     : [Number]
-        , strings     : [String]
-        , buffers     : [Buffer]
-        , nocast      : []
-        , mixed       : [Mixed]
+        oids: [ObjectId],
+        dates: [Date],
+        numbers: [Number],
+        strings: [String],
+        buffers: [Buffer],
+        nocast: [],
+        mixed: [Mixed]
       });
 
       var oids = Loki.path('oids').cast(['4c54f3453e688c000000001a', new DocumentObjectId]);
@@ -420,8 +420,8 @@ describe('schema', function() {
     var a = new Schema;
     a.method('test', function() {});
     a.method({
-      a: function() {}
-      , b: function() {}
+      a: function() {},
+      b: function() {}
     });
     assert.equal(3, Object.keys(a.methods).length);
     done();
@@ -431,9 +431,9 @@ describe('schema', function() {
     var a = new Schema;
     a.static('test', function() {});
     a.static({
-      a: function() {}
-      , b: function() {}
-      , c: function() {}
+      a: function() {},
+      b: function() {},
+      c: function() {}
     });
 
     assert.equal(Object.keys(a.statics).length, 4);
@@ -473,9 +473,9 @@ describe('schema', function() {
         name: { type: Schema.ObjectId, set: extract }
       });
 
-      var id = new DocumentObjectId
-        , sid = id.toString()
-        , _id = { _id: id };
+      var id = new DocumentObjectId,
+          sid = id.toString(),
+          _id = { _id: id };
 
       assert.equal(Tobi.path('name').applySetters(sid, { a: 'b' }).toString(),sid);
       assert.equal(Tobi.path('name').applySetters(_id, { a: 'b' }).toString(),sid);
@@ -811,20 +811,20 @@ describe('schema', function() {
       });
       it('compound', function(done) {
         var Tobi = new Schema({
-          name: { type: String, index: true }
-          , last: { type: Number, sparse: true }
-          , nope: { type: String, index: { background: false }}
+          name: { type: String, index: true },
+          last: { type: Number, sparse: true },
+          nope: { type: String, index: { background: false }}
         });
 
         Tobi.index({ firstname: 1, last: 1 }, { unique: true, expires: '1h' });
         Tobi.index({ firstname: 1, nope: 1 }, { unique: true, background: false });
 
         assert.deepEqual(Tobi.indexes(), [
-            [{ name: 1 }, { background: true }]
-          , [{ last: 1 }, { sparse: true, background :true }]
-          , [{ nope: 1 }, { background : false}]
-          , [{ firstname: 1, last: 1}, {unique: true, expireAfterSeconds: 60 * 60, background: true }]
-          , [{ firstname: 1, nope: 1 }, { unique: true, background: false }]
+            [{ name: 1 }, { background: true }],
+           [{ last: 1 }, { sparse: true, background :true }],
+           [{ nope: 1 }, { background: false}],
+           [{ firstname: 1, last: 1}, {unique: true, expireAfterSeconds: 60 * 60, background: true }],
+           [{ firstname: 1, nope: 1 }, { unique: true, background: false }]
         ]);
 
         done();
@@ -834,8 +834,8 @@ describe('schema', function() {
 
   describe('plugins', function() {
     it('work', function(done) {
-      var Tobi = new Schema
-        , called = false;
+      var Tobi = new Schema,
+          called = false;
 
       Tobi.plugin(function(schema) {
         assert.equal(schema, Tobi);
@@ -1021,8 +1021,8 @@ describe('schema', function() {
   describe('virtuals', function() {
     it('works', function(done) {
       var Contact = new Schema({
-        firstName: String
-        , lastName: String
+        firstName: String,
+        lastName: String
       });
 
       Contact
@@ -1165,8 +1165,8 @@ describe('schema', function() {
 
       var merged = new Merged({
         a: {
-          foo: 'baz'
-          , b: {
+          foo: 'baz',
+          b: {
             bar: 'qux'
           }
         }
@@ -1235,12 +1235,12 @@ describe('schema', function() {
 
     it('does not alter original argument (gh-1364)', function(done) {
       var schema = {
-        ids: [{ type: Schema.ObjectId, ref: 'something' }]
-        , a: { type: Array }
-        , b: Array
-        , c: [Date]
-        , d: { type: 'Boolean' }
-        , e: [{ a: String, b: [{ type: { type: Buffer }, x: Number }] }]
+        ids: [{ type: Schema.ObjectId, ref: 'something' }],
+        a: { type: Array },
+        b: Array,
+        c: [Date],
+        d: { type: 'Boolean' },
+        e: [{ a: String, b: [{ type: { type: Buffer }, x: Number }] }]
       };
 
       new Schema(schema);
@@ -1257,23 +1257,23 @@ describe('schema', function() {
 
     it('properly gets value of plain objects when dealing with refs (gh-1606)', function(done) {
       var db = start();
-      var el = new Schema({ title : String });
+      var el = new Schema({ title: String });
       var so = new Schema({
-        title : String,
-        obj : { type : Schema.Types.ObjectId, ref : 'Element' }
+        title: String,
+        obj: { type: Schema.Types.ObjectId, ref: 'Element' }
       });
 
       var Element = db.model('Element', el);
       var Some = db.model('Some', so);
 
-      var ele = new Element({ title : 'thing' });
+      var ele = new Element({ title: 'thing' });
 
       ele.save(function(err) {
         assert.ifError(err);
-        var s = new Some({ obj : ele.toObject() });
+        var s = new Some({ obj: ele.toObject() });
         s.save(function(err) {
           assert.ifError(err);
-          Some.findOne({ _id : s.id }, function(err, ss) {
+          Some.findOne({ _id: s.id }, function(err, ss) {
             assert.ifError(err);
             assert.equal(ss.obj, ele.id);
             db.close(done);
@@ -1289,8 +1289,8 @@ describe('schema', function() {
 
       assert.throws(function() {
         new Schema({
-          on: String
-          , child: [child]
+          on: String,
+          child: [child]
         });
       }, /`on` may not be used as a schema pathname/);
 
@@ -1393,10 +1393,10 @@ describe('schema', function() {
 
     before(function() {
       schema = Schema({
-        n: String
-        , nest: { thing: { nests: Boolean }}
-        , docs:[{ x: [{ y:String }] }]
-        , mixed: {}
+        n: String,
+        nest: { thing: { nests: Boolean }},
+        docs:[{ x: [{ y:String }] }],
+        mixed: {}
       });
     });
 

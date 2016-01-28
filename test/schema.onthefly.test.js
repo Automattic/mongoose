@@ -1,16 +1,16 @@
-var start = require('./common')
-  , assert = require('assert')
-  , mongoose = start.mongoose
-  , random = require('../lib/utils').random
-  , Schema = mongoose.Schema
-  , ObjectId = Schema.ObjectId;
+var start = require('./common'),
+    assert = require('assert'),
+    mongoose = start.mongoose,
+    random = require('../lib/utils').random,
+    Schema = mongoose.Schema,
+    ObjectId = Schema.ObjectId;
 
 /**
  * Setup.
  */
 
 var DecoratedSchema = new Schema({
-  title     : String
+  title: String
 }, { strict: false });
 
 mongoose.model('Decorated', DecoratedSchema);
@@ -19,8 +19,8 @@ var collection = 'decorated_' + random();
 
 describe('schema.onthefly', function() {
   it('setting should cache the schema type and cast values appropriately', function(done) {
-    var db = start()
-      , Decorated = db.model('Decorated', collection);
+    var db = start(),
+        Decorated = db.model('Decorated', collection);
 
     db.close();
     var post = new Decorated();
@@ -30,8 +30,8 @@ describe('schema.onthefly', function() {
   });
 
   it('should be local to the particular document', function(done) {
-    var db = start()
-      , Decorated = db.model('Decorated', collection);
+    var db = start(),
+        Decorated = db.model('Decorated', collection);
 
     db.close();
     var postOne = new Decorated();
@@ -45,8 +45,8 @@ describe('schema.onthefly', function() {
   });
 
   it('querying a document that had an on the fly schema should work', function(done) {
-    var db = start()
-      , Decorated = db.model('Decorated', collection);
+    var db = start(),
+        Decorated = db.model('Decorated', collection);
 
     var post = new Decorated({title: 'AD HOC'});
     // Interpret adhoc as a Number
@@ -84,8 +84,8 @@ describe('schema.onthefly', function() {
   });
 
   it('on the fly Embedded Array schemas should cast properly', function(done) {
-    var db = start()
-      , Decorated = db.model('Decorated', collection);
+    var db = start(),
+        Decorated = db.model('Decorated', collection);
 
     db.close();
     var post = new Decorated();
@@ -95,11 +95,11 @@ describe('schema.onthefly', function() {
   });
 
   it('on the fly Embedded Array schemas should get from a fresh queried document properly', function(done) {
-    var db = start()
-      , Decorated = db.model('Decorated', collection);
+    var db = start(),
+        Decorated = db.model('Decorated', collection);
 
-    var post = new Decorated()
-      , ModeratorSchema = new Schema({name: String, ranking: Number});
+    var post = new Decorated(),
+        ModeratorSchema = new Schema({name: String, ranking: Number});
     post.set('moderators', [{name: 'alex trebek', ranking: '1'}], [ModeratorSchema]);
     assert.equal(post.get('moderators')[0].name,'alex trebek');
     post.save(function(err) {

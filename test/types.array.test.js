@@ -3,17 +3,17 @@
  * Module dependencies.
  */
 
-var start = require('./common')
-  , assert = require('assert')
-  , mongoose = require('./common').mongoose
-  , Schema = mongoose.Schema
-  , random = require('../lib/utils').random
-  , MongooseArray = mongoose.Types.Array
-  , collection = 'avengers_' + random();
+var start = require('./common'),
+    assert = require('assert'),
+    mongoose = require('./common').mongoose,
+    Schema = mongoose.Schema,
+    random = require('../lib/utils').random,
+    MongooseArray = mongoose.Types.Array,
+    collection = 'avengers_' + random();
 
 var User = new Schema({
-  name: String
-  , pets: [Schema.ObjectId]
+  name: String,
+  pets: [Schema.ObjectId]
 });
 
 mongoose.model('User', User);
@@ -70,14 +70,14 @@ describe('types array', function() {
 
   describe('indexOf()', function() {
     it('works', function(done) {
-      var db = start()
-        , User = db.model('User', 'users_' + random())
-        , Pet = db.model('Pet', 'pets' + random());
+      var db = start(),
+          User = db.model('User', 'users_' + random()),
+          Pet = db.model('Pet', 'pets' + random());
 
-      var tj = new User({ name: 'tj' })
-        , tobi = new Pet({ name: 'tobi' })
-        , loki = new Pet({ name: 'loki' })
-        , jane = new Pet({ name: 'jane' });
+      var tj = new User({ name: 'tj' }),
+          tobi = new Pet({ name: 'tobi' }),
+          loki = new Pet({ name: 'loki' }),
+          jane = new Pet({ name: 'jane' });
 
       tj.pets.push(tobi);
       tj.pets.push(loki);
@@ -319,8 +319,8 @@ describe('types array', function() {
 
     it('works', function(done) {
       var collection = 'splicetest-number' + random();
-      var schema = new Schema({ numbers: [Number] })
-        , A = db.model('splicetestNumber', schema, collection);
+      var schema = new Schema({ numbers: [Number] }),
+          A = db.model('splicetestNumber', schema, collection);
 
       var a = new A({ numbers: [4,5,6,7] });
       a.save(function(err) {
@@ -349,8 +349,8 @@ describe('types array', function() {
 
     it('on embedded docs', function(done) {
       var collection = 'splicetest-embeddeddocs' + random();
-      var schema = new Schema({ types: [new Schema({ type: String }) ]})
-        , A = db.model('splicetestEmbeddedDoc', schema, collection);
+      var schema = new Schema({ types: [new Schema({ type: String }) ]}),
+          A = db.model('splicetestEmbeddedDoc', schema, collection);
 
       var a = new A({ types: [{type:'bird'},{type:'boy'},{type:'frog'},{type:'cloud'}] });
       a.save(function(err) {
@@ -404,9 +404,9 @@ describe('types array', function() {
           A = db.model('unshift', schema, 'unshift' + random());
 
       var a = new A({
-        types: [{type:'bird'},{type:'boy'},{type:'frog'},{type:'cloud'}]
-        , nums: [1,2,3]
-        , strs: 'one two three'.split(' ')
+        types: [{type:'bird'},{type:'boy'},{type:'frog'},{type:'cloud'}],
+        nums: [1,2,3],
+        strs: 'one two three'.split(' ')
       });
 
       a.save(function(err) {
@@ -521,9 +521,9 @@ describe('types array', function() {
       var A = db.model('shift', schema, 'unshift' + random());
 
       var a = new A({
-        types: [{type:'bird'},{type:'boy'},{type:'frog'},{type:'cloud'}]
-        , nums: [1,2,3]
-        , strs: 'one two three'.split(' ')
+        types: [{type:'bird'},{type:'boy'},{type:'frog'},{type:'cloud'}],
+        nums: [1,2,3],
+        strs: 'one two three'.split(' ')
       });
 
       a.save(function(err) {
@@ -587,7 +587,7 @@ describe('types array', function() {
       var db = start();
       var painting = new Schema({ colors: [] });
       var Painting = db.model('Painting', painting);
-      var p = new Painting({ colors : ['blue', 'green', 'yellow'] });
+      var p = new Painting({ colors: ['blue', 'green', 'yellow'] });
       p.save(function(err) {
         assert.ifError(err);
 
@@ -625,19 +625,19 @@ describe('types array', function() {
 
   describe('pop()', function() {
     it('works', function(done) {
-      var db = start()
-        , schema = new Schema({
-          types: [new Schema({ type: String })]
-            , nums: [Number]
-            , strs: [String]
-        });
+      var db = start(),
+          schema = new Schema({
+            types: [new Schema({ type: String })],
+            nums: [Number],
+            strs: [String]
+          });
 
       var A = db.model('pop', schema, 'pop' + random());
 
       var a = new A({
-        types: [{type:'bird'},{type:'boy'},{type:'frog'},{type:'cloud'}]
-        , nums: [1,2,3]
-        , strs: 'one two three'.split(' ')
+        types: [{type:'bird'},{type:'boy'},{type:'frog'},{type:'cloud'}],
+        nums: [1,2,3],
+        strs: 'one two three'.split(' ')
       });
 
       a.save(function(err) {
@@ -777,7 +777,7 @@ describe('types array', function() {
       var db = start();
       var painting = new Schema({ colors: [] });
       var Painting = db.model('Painting', painting);
-      var p = new Painting({ colors : ['blue', 'green', 'yellow'] });
+      var p = new Painting({ colors: ['blue', 'green', 'yellow'] });
       p.save(function(err) {
         assert.ifError(err);
 
@@ -816,15 +816,15 @@ describe('types array', function() {
 
   describe('addToSet()', function() {
     it('works', function(done) {
-      var db = start()
-        , e = new Schema({ name: String, arr: [] })
-        , schema = new Schema({
-          num: [Number]
-          , str: [String]
-          , doc: [e]
-          , date: [Date]
-          , id:  [Schema.ObjectId]
-        });
+      var db = start(),
+          e = new Schema({ name: String, arr: [] }),
+          schema = new Schema({
+            num: [Number],
+            str: [String],
+            doc: [e],
+            date: [Date],
+            id:  [Schema.ObjectId]
+          });
 
       var M = db.model('testAddToSet', schema);
       var m = new M;
@@ -1028,11 +1028,11 @@ describe('types array', function() {
     });
 
     it('handles sub-documents that do not have an _id gh-1973', function(done) {
-      var db = start()
-        , e = new Schema({ name: String, arr: [] }, { _id: false })
-        , schema = new Schema({
-          doc: [e]
-        });
+      var db = start(),
+          e = new Schema({ name: String, arr: [] }, { _id: false }),
+          schema = new Schema({
+            doc: [e]
+          });
 
       var M = db.model('gh1973', schema);
       var m = new M;
@@ -1523,9 +1523,9 @@ describe('types array', function() {
 
       var d = new D({
         em1: [
-              { name: 'pos0' }
-            , { name: 'pos1' }
-            , { name: 'pos2' }
+              { name: 'pos0' },
+             { name: 'pos1' },
+             { name: 'pos2' }
         ]
       });
 
@@ -1563,15 +1563,15 @@ describe('types array', function() {
 
       var D = db.model('similarPathNames', new Schema({
         account: {
-          role: String
-            , roles: [String]
-        }
-        , em: [new Schema({ name: String })]
+          role: String,
+          roles: [String]
+        },
+        em: [new Schema({ name: String })]
       }));
 
       var d = new D({
-        account: { role: 'teacher', roles: ['teacher', 'admin'] }
-        , em: [{ name: 'bob' }]
+        account: { role: 'teacher', roles: ['teacher', 'admin'] },
+        em: [{ name: 'bob' }]
       });
 
       d.save(function(err) {
@@ -1699,11 +1699,11 @@ describe('types array', function() {
 
   describe('default type', function() {
     it('casts to Mixed', function(done) {
-      var db = start()
-        , DefaultArraySchema = new Schema({
-          num1: Array
-          , num2: []
-        });
+      var db = start(),
+          DefaultArraySchema = new Schema({
+            num1: Array,
+            num2: []
+          });
 
       mongoose.model('DefaultArraySchema', DefaultArraySchema);
       var DefaultArray = db.model('DefaultArraySchema', collection);
@@ -1713,8 +1713,8 @@ describe('types array', function() {
       assert.equal(arr.get('num1').length, 0);
       assert.equal(arr.get('num2').length, 0);
 
-      var threw1 = false
-        , threw2 = false;
+      var threw1 = false,
+          threw2 = false;
 
       try {
         arr.num1.push({ x: 1 });
@@ -1745,11 +1745,11 @@ describe('types array', function() {
 
     before(function(done) {
       var schema = Schema({
-        numbers: ['number']
-        , numberIds: [{ _id: 'number', name: 'string' }]
-        , stringIds: [{ _id: 'string', name: 'string' }]
-        , bufferIds: [{ _id: 'buffer', name: 'string' }]
-        , oidIds:    [{ name: 'string' }]
+        numbers: ['number'],
+        numberIds: [{ _id: 'number', name: 'string' }],
+        stringIds: [{ _id: 'string', name: 'string' }],
+        bufferIds: [{ _id: 'buffer', name: 'string' }],
+        oidIds:    [{ name: 'string' }]
       });
 
       db = start();

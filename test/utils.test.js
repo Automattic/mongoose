@@ -3,14 +3,14 @@
  * Module dependencies.
  */
 
-var start = require('./common')
-  , mongoose = start.mongoose
-  , Schema = mongoose.Schema
-  , utils = require('../lib/utils')
-  , StateMachine = require('../lib/statemachine')
-  , ObjectId = require('../lib/types/objectid')
-  , MongooseBuffer = require('../lib/types/buffer')
-  , assert = require('assert');
+var start = require('./common'),
+    mongoose = start.mongoose,
+    Schema = mongoose.Schema,
+    utils = require('../lib/utils'),
+    StateMachine = require('../lib/statemachine'),
+    ObjectId = require('../lib/types/objectid'),
+    MongooseBuffer = require('../lib/types/buffer'),
+    assert = require('assert');
 
 /**
  * Setup.
@@ -164,8 +164,8 @@ describe('utils', function() {
   it('deepEquals on ObjectIds', function(done) {
     var s = (new ObjectId).toString();
 
-    var a = new ObjectId(s)
-      , b = new ObjectId(s);
+    var a = new ObjectId(s),
+        b = new ObjectId(s);
 
     assert.ok(utils.deepEqual(a, b));
     assert.ok(utils.deepEqual(a, a));
@@ -174,12 +174,12 @@ describe('utils', function() {
   });
 
   it('deepEquals on MongooseDocumentArray works', function(done) {
-    var db = start()
-      , A = new Schema({ a: String })
-      , M = db.model('deepEqualsOnMongooseDocArray', new Schema({
-        a1: [A]
-          , a2: [A]
-      }));
+    var db = start(),
+        A = new Schema({ a: String }),
+        M = db.model('deepEqualsOnMongooseDocArray', new Schema({
+          a1: [A],
+          a2: [A]
+        }));
 
     db.close();
 

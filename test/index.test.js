@@ -129,7 +129,7 @@ describe('mongoose module:', function() {
         };
 
         mong.disconnect()
-          .on('error', function (error) {
+          .on('error', function(error) {
             assert.equal('bam', error.message);
           });
 

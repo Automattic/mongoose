@@ -3,10 +3,10 @@
  * Module dependencies.
  */
 
-var start = require('./common')
-  , mongoose = new start.mongoose.Mongoose
-  , assert = require('assert')
-  , Schema = mongoose.Schema;
+var start = require('./common'),
+    mongoose = new start.mongoose.Mongoose,
+    assert = require('assert'),
+    Schema = mongoose.Schema;
 
 describe('schematype mixed', function() {
   describe('empty object defaults (gh-1380)', function() {

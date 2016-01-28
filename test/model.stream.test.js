@@ -3,13 +3,13 @@
  * Test dependencies.
  */
 
-var start = require('./common')
-  , assert = require('assert')
-  , mongoose = start.mongoose
-  , utils = require('../lib/utils')
-  , random = utils.random
-  , Schema = mongoose.Schema
-  , fs = require('fs');
+var start = require('./common'),
+    assert = require('assert'),
+    mongoose = start.mongoose,
+    utils = require('../lib/utils'),
+    random = utils.random,
+    Schema = mongoose.Schema,
+    fs = require('fs');
 
 var names = ('Aaden Aaron Adrian Aditya Agustin Jim Bob Jonah Frank Sally Lucy').split(' ');
 
@@ -26,8 +26,8 @@ var collection = 'personforstream_' + random();
 
 describe('query stream:', function() {
   before(function(done) {
-    var db = start()
-      , P = db.model('PersonForStream', collection);
+    var db = start(),
+        P = db.model('PersonForStream', collection);
 
     var people = names.map(function(name) {
       return { name: name };
@@ -41,14 +41,14 @@ describe('query stream:', function() {
   });
 
   it('works', function(done) {
-    var db = start()
-      , P = db.model('PersonForStream', collection)
-      , i = 0
-      , closed = 0
-      , paused = 0
-      , resumed = 0
-      , seen = {}
-      , err;
+    var db = start(),
+        P = db.model('PersonForStream', collection),
+        i = 0,
+        closed = 0,
+        paused = 0,
+        resumed = 0,
+        seen = {},
+        err;
 
     var stream = P.find().batchSize(3).stream();
 
@@ -110,9 +110,9 @@ describe('query stream:', function() {
   });
 
   it('immediately destroying a stream prevents the query from executing', function(done) {
-    var db = start()
-      , P = db.model('PersonForStream', collection)
-      , i = 0;
+    var db = start(),
+        P = db.model('PersonForStream', collection),
+        i = 0;
 
     var stream = P.where('name', 'Jonah').select('name').findOne().stream();
 
@@ -138,10 +138,10 @@ describe('query stream:', function() {
   it('destroying a stream stops it', function(done) {
     this.slow(300);
 
-    var db = start()
-      , P = db.model('PersonForStream', collection)
-      , finished = 0
-      , i = 0;
+    var db = start(),
+        P = db.model('PersonForStream', collection),
+        finished = 0,
+        i = 0;
 
     var stream = P.where('name').exists().limit(10).select('_id').stream();
 
@@ -177,11 +177,11 @@ describe('query stream:', function() {
   it('errors', function(done) {
     this.slow(300);
 
-    var db = start({ server: { auto_reconnect: false }})
-      , P = db.model('PersonForStream', collection)
-      , finished = 0
-      , closed = 0
-      , i = 0;
+    var db = start({ server: { auto_reconnect: false }}),
+        P = db.model('PersonForStream', collection),
+        finished = 0,
+        closed = 0,
+        i = 0;
 
     var stream = P.find().batchSize(5).stream();
 
@@ -213,10 +213,10 @@ describe('query stream:', function() {
   });
 
   it('pipe', function(done) {
-    var db = start()
-      , P = db.model('PersonForStream', collection)
-      , filename = '/tmp/_mongoose_stream_out.txt'
-      , out = fs.createWriteStream(filename);
+    var db = start(),
+        P = db.model('PersonForStream', collection),
+        filename = '/tmp/_mongoose_stream_out.txt',
+        out = fs.createWriteStream(filename);
 
     var opts = { transform: JSON.stringify };
     var stream = P.find().sort('name').limit(20).stream(opts);
@@ -240,11 +240,11 @@ describe('query stream:', function() {
   });
 
   it('lean', function(done) {
-    var db = start()
-      , P = db.model('PersonForStream', collection)
-      , i = 0
-      , closed = 0
-      , err;
+    var db = start(),
+        P = db.model('PersonForStream', collection),
+        i = 0,
+        closed = 0,
+        err;
 
     var stream = P.find({}).lean().stream();
 
@@ -294,8 +294,8 @@ describe('query stream:', function() {
     var db = start();
 
     var postSchema = new Schema({
-      ids: [{type: Schema.ObjectId}]
-      , title: String
+      ids: [{type: Schema.ObjectId}],
+      title: String
     });
 
     var B = db.model('gh-1100-stream', postSchema);

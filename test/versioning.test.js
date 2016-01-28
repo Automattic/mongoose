@@ -3,13 +3,13 @@
  * Test dependencies.
  */
 
-var start = require('./common')
-  , mongoose = start.mongoose
-  , assert = require('assert')
-  , random = require('../lib/utils').random
-  , Schema = mongoose.Schema
-  , VersionError = mongoose.Error.VersionError
-  ;
+var start = require('./common'),
+    mongoose = start.mongoose,
+    assert = require('assert'),
+    random = require('../lib/utils').random,
+    Schema = mongoose.Schema,
+    VersionError = mongoose.Error.VersionError
+    ;
 
 /**
  * Setup.
@@ -18,31 +18,31 @@ var start = require('./common')
 var Comments = new Schema();
 
 Comments.add({
-  title     : String
-  , date      : Date
-  , comments  : [Comments]
-  , dontVersionMeEither: []
+  title: String,
+  date: Date,
+  comments: [Comments],
+  dontVersionMeEither: []
 });
 
 var BlogPost = new Schema({
-  title     : String
-  , date      : Date
-  , meta      : {
-    date      : Date
-      , visitors  : Number
-      , nested    : [Comments]
-      , numbers   : [Number]
-  }
-  , mixed        : {}
-  , numbers      : [Number]
-  , comments     : [Comments]
-  , arr          : []
-  , dontVersionMe: []
+  title: String,
+  date: Date,
+  meta: {
+    date: Date,
+    visitors: Number,
+    nested: [Comments],
+    numbers: [Number]
+  },
+  mixed: {},
+  numbers: [Number],
+  comments: [Comments],
+  arr: [],
+  dontVersionMe: []
 }, {
-  collection: 'versioning_' + random()
-  , skipVersioning: {
-    dontVersionMe: true
-    , 'comments.dontVersionMeEither': true
+  collection: 'versioning_' + random(),
+  skipVersioning: {
+    dontVersionMe: true,
+    'comments.dontVersionMeEither': true
   }
 });
 
@@ -76,23 +76,23 @@ describe('versioning', function() {
     doc.meta.visitors = 34;
     doc.meta.numbers = [12,11,10];
     doc.meta.nested = [
-        { title: 'does it work?', date: new Date }
-      , { title: '1', comments: [{ title: 'this is sub #1'},{ title: 'this is sub #2'}] }
-      , { title: '2', comments: [{ title: 'this is sub #3'},{ title: 'this is sub #4'}] }
-      , { title: 'hi', date: new Date }
+        { title: 'does it work?', date: new Date },
+       { title: '1', comments: [{ title: 'this is sub #1'},{ title: 'this is sub #2'}] },
+       { title: '2', comments: [{ title: 'this is sub #3'},{ title: 'this is sub #4'}] },
+       { title: 'hi', date: new Date }
     ];
     doc.mixed = { arr: [12,11,10] };
     doc.numbers = [3,4,5,6,7];
     doc.comments = [
-        { title: 'comments 0', date: new Date }
-      , { title: 'comments 1', comments: [{ title: 'comments.1.comments.1'},{ title: 'comments.1.comments.2'}] }
-      , { title: 'coments 2', comments: [{ title: 'comments.2.comments.1'},{ title: 'comments.2.comments.2'}] }
-      , { title: 'comments 3', date: new Date }
+        { title: 'comments 0', date: new Date },
+       { title: 'comments 1', comments: [{ title: 'comments.1.comments.1'},{ title: 'comments.1.comments.2'}] },
+       { title: 'coments 2', comments: [{ title: 'comments.2.comments.1'},{ title: 'comments.2.comments.2'}] },
+       { title: 'comments 3', date: new Date }
     ];
     doc.arr = [['2d']];
 
     doc.save(function(err) {
-      var a , b;
+      var a, b;
       assert.ifError(err);
       // test 2 concurrent ops
       V.findById(doc, function(err, _a) {
@@ -315,10 +315,10 @@ describe('versioning', function() {
     var doc = new V;
     doc.numbers = [3,4,5,6,7];
     doc.comments = [
-        { title: 'does it work?', date: new Date }
-      , { title: '1', comments: [{ title: 'this is sub #1'},{ title: 'this is sub #2'}] }
-      , { title: '2', comments: [{ title: 'this is sub #3'},{ title: 'this is sub #4'}] }
-      , { title: 'hi', date: new Date }
+        { title: 'does it work?', date: new Date },
+       { title: '1', comments: [{ title: 'this is sub #1'},{ title: 'this is sub #2'}] },
+       { title: '2', comments: [{ title: 'this is sub #3'},{ title: 'this is sub #4'}] },
+       { title: 'hi', date: new Date }
     ];
 
     doc.save(test);
@@ -390,8 +390,8 @@ describe('versioning', function() {
 
   it('versionKey is configurable', function(done) {
     var schema = new Schema(
-        { configured: 'bool' }
-      , { versionKey: 'lolwat', collection: 'configuredversion' + random() });
+        { configured: 'bool' },
+       { versionKey: 'lolwat', collection: 'configuredversion' + random() });
     var V = db.model('ConfiguredVersionKey', schema);
     var v = new V({ configured: true });
     v.save(function(err) {
@@ -465,13 +465,13 @@ describe('versioning', function() {
   });
 
   describe('versioning is off', function() {
-    it('when { safe : false } is set (gh-1520)', function(done) {
-      var schema1 = new Schema({ title : String}, { safe : false });
+    it('when { safe: false } is set (gh-1520)', function(done) {
+      var schema1 = new Schema({ title: String}, { safe: false });
       assert.equal(schema1.options.versionKey, false);
       done();
     });
-    it('when { safe : { w: 0 }} is set (gh-1520)', function(done) {
-      var schema1 = new Schema({ title : String}, { safe : { w: 0 } });
+    it('when { safe: { w: 0 }} is set (gh-1520)', function(done) {
+      var schema1 = new Schema({ title: String}, { safe: { w: 0 } });
       assert.equal(schema1.options.versionKey, false);
       done();
     });

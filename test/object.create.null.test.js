@@ -4,19 +4,19 @@
  * Test dependencies.
  */
 
-var start = require('./common')
-  , assert = require('assert')
-  , mongoose = start.mongoose
-  , Schema = mongoose.Schema;
+var start = require('./common'),
+    assert = require('assert'),
+    mongoose = start.mongoose,
+    Schema = mongoose.Schema;
 
 var schema = new Schema({
-  a: String
-  , b: {
-    c: Number
-      , d: [{ e: String }]
-  }
-  , f: { g: Date }
-  , h: {}
+  a: String,
+  b: {
+    c: Number,
+    d: [{ e: String }]
+  },
+  f: { g: Date },
+  h: {}
 });
 
 describe('is compatible with object created using Object.create(null) (gh-1484)', function() {

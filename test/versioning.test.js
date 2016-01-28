@@ -8,8 +8,7 @@ var start = require('./common'),
     assert = require('assert'),
     random = require('../lib/utils').random,
     Schema = mongoose.Schema,
-    VersionError = mongoose.Error.VersionError
-    ;
+    VersionError = mongoose.Error.VersionError;
 
 /**
  * Setup.
@@ -24,27 +23,29 @@ Comments.add({
   dontVersionMeEither: []
 });
 
-var BlogPost = new Schema({
-  title: String,
-  date: Date,
-  meta: {
-    date: Date,
-    visitors: Number,
-    nested: [Comments],
-    numbers: [Number]
-  },
-  mixed: {},
-  numbers: [Number],
-  comments: [Comments],
-  arr: [],
-  dontVersionMe: []
-}, {
-  collection: 'versioning_' + random(),
-  skipVersioning: {
-    dontVersionMe: true,
-    'comments.dontVersionMeEither': true
-  }
-});
+var BlogPost = new Schema(
+    {
+      title: String,
+      date: Date,
+      meta: {
+        date: Date,
+        visitors: Number,
+        nested: [Comments],
+        numbers: [Number]
+      },
+      mixed: {},
+      numbers: [Number],
+      comments: [Comments],
+      arr: [],
+      dontVersionMe: []
+    },
+    {
+      collection: 'versioning_' + random(),
+      skipVersioning: {
+        dontVersionMe: true,
+        'comments.dontVersionMeEither': true
+      }
+    });
 
 mongoose.model('Versioning', BlogPost);
 
@@ -76,10 +77,10 @@ describe('versioning', function() {
     doc.meta.visitors = 34;
     doc.meta.numbers = [12,11,10];
     doc.meta.nested = [
-        { title: 'does it work?', date: new Date },
-       { title: '1', comments: [{ title: 'this is sub #1'},{ title: 'this is sub #2'}] },
-       { title: '2', comments: [{ title: 'this is sub #3'},{ title: 'this is sub #4'}] },
-       { title: 'hi', date: new Date }
+      { title: 'does it work?', date: new Date },
+      { title: '1', comments: [{ title: 'this is sub #1'},{ title: 'this is sub #2'}] },
+      { title: '2', comments: [{ title: 'this is sub #3'},{ title: 'this is sub #4'}] },
+      { title: 'hi', date: new Date }
     ];
     doc.mixed = { arr: [12,11,10] };
     doc.numbers = [3,4,5,6,7];
@@ -217,7 +218,7 @@ describe('versioning', function() {
       assert.equal('sub one', b.meta.nested[1].comments[0].title);
       assert.equal(a._doc.__v, 10);
       assert.equal(3, a.mixed.arr.length);
-      a.mixed.arr.push([10],{x:1},'woot');
+      a.mixed.arr.push([10],{x: 1},'woot');
       a.markModified('mixed.arr');
       save(a, b, test11);
     }
@@ -365,7 +366,7 @@ describe('versioning', function() {
   it('version works with existing unversioned docs', function(done) {
     var V = db.model('Versioning');
 
-    V.collection.insert({ title: 'unversioned', numbers: [1,2,3] }, {safe:true}, function(err) {
+    V.collection.insert({ title: 'unversioned', numbers: [1,2,3] }, {safe: true}, function(err) {
       assert.ifError(err);
       V.findOne({ title: 'unversioned' }, function(err, d) {
         assert.ifError(err);

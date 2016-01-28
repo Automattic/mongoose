@@ -820,11 +820,11 @@ describe('schema', function() {
         Tobi.index({ firstname: 1, nope: 1 }, { unique: true, background: false });
 
         assert.deepEqual(Tobi.indexes(), [
-            [{ name: 1 }, { background: true }],
-           [{ last: 1 }, { sparse: true, background :true }],
-           [{ nope: 1 }, { background: false}],
-           [{ firstname: 1, last: 1}, {unique: true, expireAfterSeconds: 60 * 60, background: true }],
-           [{ firstname: 1, nope: 1 }, { unique: true, background: false }]
+          [{ name: 1 }, { background: true }],
+          [{ last: 1 }, { sparse: true, background :true }],
+          [{ nope: 1 }, { background: false}],
+          [{ firstname: 1, last: 1}, {unique: true, expireAfterSeconds: 60 * 60, background: true }],
+          [{ firstname: 1, nope: 1 }, { unique: true, background: false }]
         ]);
 
         done();

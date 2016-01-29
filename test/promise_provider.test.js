@@ -332,6 +332,27 @@ describe('ES6 promises: ', function() {
       assert.equal(promise.constructor, bluebird);
       done();
     });
+
+    it('subdoc pre doesnt cause unhandled rejection (gh-3669)', function(done) {
+      var nestedSchema = new Schema({
+        name: { type: String, required: true }
+      });
+
+      nestedSchema.pre('validate', function(next) {
+        next();
+      });
+
+      var schema = new Schema({
+        items: [nestedSchema]
+      });
+
+      var MyModel = db.model('gh3669', schema);
+
+      MyModel.create({ items: [{ name: null}] }).catch(function(error) {
+        assert.ok(error);
+        done();
+      });
+    });
   });
 
   describe('q: ', function() {

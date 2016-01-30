@@ -8,12 +8,6 @@ LEGACY_BRANCH = 3.8.x
 test:
 	@MONGOOSE_DISABLE_STABILITY_WARNING=1 ./node_modules/.bin/mocha $(T) --async-only test/*.test.js
 
-test-short:
-	@MONGOOSE_DISABLE_STABILITY_WARNING=1 ./node_modules/.bin/mocha $(T) -g LONG -i --async-only test/**/*.test.js
-
-test-long:
-	@MONGOOSE_DISABLE_STABILITY_WARNING=1 ./node_modules/.bin/mocha $(T) -g LONG --async-only test/**/*.test.js
-
 docs: ghpages merge_stable docclean gendocs
 docs_legacy: legacy docclean_legacy gendocs copytmp gitreset ghpages copylegacy
 

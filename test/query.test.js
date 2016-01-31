@@ -532,7 +532,7 @@ describe('Query', function () {
   describe('find', function () {
     it('strict array equivalence condition v', function (done) {
       var query = new Query({}, {}, null, p1.collection);
-      query.find({'pets': ['dog', 'cat', 'ferret']});
+      query.find({pets: ['dog', 'cat', 'ferret']});
       assert.deepEqual(query._conditions, {pets: ['dog', 'cat', 'ferret']});
       done();
     });
@@ -729,10 +729,10 @@ describe('Query', function () {
     it('works', function (done) {
       var query = new Query({}, {}, null, p1.collection);
       query.sort('a -c b');
-      assert.deepEqual(query.options.sort, {'a': 1, 'c': -1, 'b': 1});
+      assert.deepEqual(query.options.sort, {a: 1, c: -1, b: 1});
       query = new Query({}, {}, null, p1.collection);
-      query.sort({'a': 1, 'c': -1, 'b': 'asc', e: 'descending', f: 'ascending'});
-      assert.deepEqual(query.options.sort, {'a': 1, 'c': -1, 'b': 1, 'e': -1, 'f': 1});
+      query.sort({a: 1, c: -1, b: 'asc', e: 'descending', f: 'ascending'});
+      assert.deepEqual(query.options.sort, {a: 1, c: -1, b: 1, e: -1, f: 1});
       query = new Query({}, {}, null, p1.collection);
       var e;
 
@@ -1256,8 +1256,8 @@ describe('Query', function () {
     describe('hint', function () {
       it('works', function (done) {
         var query2 = new Query({}, {}, null, p1.collection);
-        query2.hint({'indexAttributeA': 1, 'indexAttributeB': -1});
-        assert.deepEqual(query2.options.hint, {'indexAttributeA': 1, 'indexAttributeB': -1});
+        query2.hint({indexAttributeA: 1, indexAttributeB: -1});
+        assert.deepEqual(query2.options.hint, {indexAttributeA: 1, indexAttributeB: -1});
 
         assert.throws(function () {
           var query3 = new Query({}, {}, null, p1.collection);
@@ -1388,7 +1388,7 @@ describe('Query', function () {
         it('and sends it though the driver', function (done) {
           var db = start();
           var options = {read: 'secondary', safe: {w: 'majority'}};
-          var schema = Schema({name: String}, options);
+          var schema = new Schema({name: String}, options);
           var M = db.model(random(), schema);
           var q = M.find();
 
@@ -1428,7 +1428,7 @@ describe('Query', function () {
       q.setOptions({limit: 4});
       q.setOptions({skip: 3});
       q.setOptions({sort: '-blah'});
-      q.setOptions({sort: {'woot': -1}});
+      q.setOptions({sort: {woot: -1}});
       q.setOptions({hint: {index1: 1, index2: -1}});
       q.setOptions({read: ['s', [{dc: 'eu'}]]});
 

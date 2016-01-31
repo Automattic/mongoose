@@ -1,4 +1,3 @@
-
 // GH-407
 
 var start = require('./common'),

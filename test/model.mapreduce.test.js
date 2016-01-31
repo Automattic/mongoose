@@ -1,4 +1,3 @@
-/* eslint no-unused-vars: 1 */
 /* global emit */
 /**
  * Test dependencies.
@@ -61,9 +60,7 @@ describe('model: mapreduce:', function () {
     MR.create(docs, function (err, insertedDocs) {
       assert.ifError(err);
 
-      var a = insertedDocs[0];
-      var b = insertedDocs[1];
-      magicID = b._id;
+      magicID = insertedDocs[1]._id;
 
       var o = {
         map: function () {
@@ -128,7 +125,7 @@ describe('model: mapreduce:', function () {
           out: {replace: '_mapreduce_test_' + random()}
         };
 
-        MR.mapReduce(o, function (err, ret, stats) {
+        MR.mapReduce(o, function (err, ret) {
           assert.ifError(err);
 
           // ret is a model

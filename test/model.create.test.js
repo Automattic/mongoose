@@ -13,7 +13,7 @@ var start = require('./common'),
  * Setup
  */
 
-var schema = Schema({
+var schema = new Schema({
   title: String
 });
 

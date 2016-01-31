@@ -80,8 +80,8 @@ describe('aggregate: ', function () {
     });
 
     it('throws if non-operator parameter is passed', function (done) {
-      var aggregate = new Aggregate(),
-          regexp = /Arguments must be aggregate pipeline operators/;
+      var aggregate = new Aggregate();
+      var regexp = /Arguments must be aggregate pipeline operators/;
 
       assert.throws(function () {
         aggregate.append({$a: 1}, 'string');
@@ -325,7 +325,7 @@ describe('aggregate: ', function () {
         aggregate.exec();
       }, /Cannot read property 'aggregate' of undefined|Cannot call method 'aggregate' of undefined/);
       assert.deepEqual(aggregate._pipeline,
-        [{$geoNear: {a: 1, query: {__t: 'subschema'}}}]);
+          [{$geoNear: {a: 1, query: {__t: 'subschema'}}}]);
 
       aggregate = new Aggregate();
       aggregate._model = stub;
@@ -335,7 +335,7 @@ describe('aggregate: ', function () {
         aggregate.exec();
       }, /Cannot read property 'aggregate' of undefined|Cannot call method 'aggregate' of undefined/);
       assert.deepEqual(aggregate._pipeline,
-        [{$geoNear: {b: 2, query: {x: 1, __t: 'subschema'}}}]);
+          [{$geoNear: {b: 2, query: {x: 1, __t: 'subschema'}}}]);
 
       done();
     });
@@ -373,8 +373,8 @@ describe('aggregate: ', function () {
 
   describe('bind', function () {
     it('works', function (done) {
-      var aggregate = new Aggregate(),
-          model = {foo: 42};
+      var aggregate = new Aggregate();
+      var model = {foo: 42};
 
       assert.equal(aggregate.model(model), aggregate);
       assert.equal(aggregate._model, model);
@@ -389,16 +389,18 @@ describe('aggregate: ', function () {
 
       setupData(function (db) {
         aggregate
-          .model(db.model('Employee'))
-          .project({sal: 1, sal_k: {$divide: ['$sal', 1000]}})
-          .exec(function (err, docs) {
-            assert.ifError(err);
-            docs.forEach(function (doc) {
-              assert.equal(doc.sal / 1000, doc.sal_k);
-            });
+            .model(db.model('Employee'))
+            .project({sal: 1, sal_k: {$divide: ['$sal', 1000]}})
+            .exec(function (err, docs) {
+              assert.ifError(err);
+              docs.forEach(function (doc) {
+                assert.equal(doc.sal / 1000, doc.sal_k);
+              });
 
-            clearData(db, function () { done(); });
-          });
+              clearData(db, function () {
+                done();
+              });
+            });
       });
     });
 
@@ -407,20 +409,24 @@ describe('aggregate: ', function () {
 
       setupData(function (db) {
         aggregate
-          .model(db.model('Employee'))
-          .group({_id: '$dept'})
-          .exec(function (err, docs) {
-            var depts;
+            .model(db.model('Employee'))
+            .group({_id: '$dept'})
+            .exec(function (err, docs) {
+              var depts;
 
-            assert.ifError(err);
-            assert.equal(docs.length, 2);
+              assert.ifError(err);
+              assert.equal(docs.length, 2);
 
-            depts = docs.map(function (doc) { return doc._id; });
-            assert.notEqual(depts.indexOf('sales'), -1);
-            assert.notEqual(depts.indexOf('r&d'), -1);
+              depts = docs.map(function (doc) {
+                return doc._id;
+              });
+              assert.notEqual(depts.indexOf('sales'), -1);
+              assert.notEqual(depts.indexOf('r&d'), -1);
 
-            clearData(db, function () { done(); });
-          });
+              clearData(db, function () {
+                done();
+              });
+            });
       });
     });
 
@@ -429,14 +435,16 @@ describe('aggregate: ', function () {
 
       setupData(function (db) {
         aggregate
-          .model(db.model('Employee'))
-          .skip(1)
-          .exec(function (err, docs) {
-            assert.ifError(err);
-            assert.equal(docs.length, 3);
+            .model(db.model('Employee'))
+            .skip(1)
+            .exec(function (err, docs) {
+              assert.ifError(err);
+              assert.equal(docs.length, 3);
 
-            clearData(db, function () { done(); });
-          });
+              clearData(db, function () {
+                done();
+              });
+            });
       });
     });
 
@@ -445,14 +453,16 @@ describe('aggregate: ', function () {
 
       setupData(function (db) {
         aggregate
-          .model(db.model('Employee'))
-          .limit(3)
-          .exec(function (err, docs) {
-            assert.ifError(err);
-            assert.equal(docs.length, 3);
+            .model(db.model('Employee'))
+            .limit(3)
+            .exec(function (err, docs) {
+              assert.ifError(err);
+              assert.equal(docs.length, 3);
 
-            clearData(db, function () { done(); });
-          });
+              clearData(db, function () {
+                done();
+              });
+            });
       });
     });
 
@@ -461,14 +471,16 @@ describe('aggregate: ', function () {
 
       setupData(function (db) {
         aggregate
-          .model(db.model('Employee'))
-          .unwind('customers')
-          .exec(function (err, docs) {
-            assert.ifError(err);
-            assert.equal(docs.length, 5);
+            .model(db.model('Employee'))
+            .unwind('customers')
+            .exec(function (err, docs) {
+              assert.ifError(err);
+              assert.equal(docs.length, 5);
 
-            clearData(db, function () { done(); });
-          });
+              clearData(db, function () {
+                done();
+              });
+            });
       });
     });
 
@@ -477,14 +489,16 @@ describe('aggregate: ', function () {
 
       setupData(function (db) {
         aggregate
-          .model(db.model('Employee'))
-          .match({sal: {$gt: 15000}})
-          .exec(function (err, docs) {
-            assert.ifError(err);
-            assert.equal(docs.length, 1);
+            .model(db.model('Employee'))
+            .match({sal: {$gt: 15000}})
+            .exec(function (err, docs) {
+              assert.ifError(err);
+              assert.equal(docs.length, 1);
 
-            clearData(db, function () { done(); });
-          });
+              clearData(db, function () {
+                done();
+              });
+            });
       });
     });
 
@@ -493,14 +507,16 @@ describe('aggregate: ', function () {
 
       setupData(function (db) {
         aggregate
-          .model(db.model('Employee'))
-          .sort('sal')
-          .exec(function (err, docs) {
-            assert.ifError(err);
-            assert.equal(docs[0].sal, 14000);
+            .model(db.model('Employee'))
+            .sort('sal')
+            .exec(function (err, docs) {
+              assert.ifError(err);
+              assert.equal(docs[0].sal, 14000);
 
-            clearData(db, function () { done(); });
-          });
+              clearData(db, function () {
+                done();
+              });
+            });
       });
     });
 
@@ -509,20 +525,22 @@ describe('aggregate: ', function () {
 
       setupData(function (db) {
         aggregate
-          .model(db.model('Employee'))
-          .match({sal: {$lt: 16000}})
-          .unwind('customers')
-          .project({emp: '$name', cust: '$customers'})
-          .sort('-cust')
-          .skip(2)
-          .exec(function (err, docs) {
-            assert.ifError(err);
-            assert.equal(docs.length, 1);
-            assert.equal(docs[0].cust, 'Gary');
-            assert.equal(docs[0].emp, 'Bob');
+            .model(db.model('Employee'))
+            .match({sal: {$lt: 16000}})
+            .unwind('customers')
+            .project({emp: '$name', cust: '$customers'})
+            .sort('-cust')
+            .skip(2)
+            .exec(function (err, docs) {
+              assert.ifError(err);
+              assert.equal(docs.length, 1);
+              assert.equal(docs[0].cust, 'Gary');
+              assert.equal(docs[0].emp, 'Bob');
 
-            clearData(db, function () { done(); });
-          });
+              clearData(db, function () {
+                done();
+              });
+            });
       });
     });
 
@@ -530,25 +548,29 @@ describe('aggregate: ', function () {
       var aggregate = new Aggregate();
       start.mongodVersion(function (err, version) {
         if (err) {
-          return done(err);
+          done(err);
+          return;
         }
         var mongo26 = version[0] > 2 || (version[0] === 2 && version[1] >= 6);
         if (!mongo26) {
-          return done();
+          done();
+          return;
         }
 
         setupData(function (db) {
           aggregate.
-            model(db.model('Employee')).
-            match({sal: {$lt: 16000}}).
-            explain(function (err, output) {
-              assert.ifError(err);
-              assert.ok(output);
-              // make sure we got explain output
-              assert.ok(output.stages);
+          model(db.model('Employee')).
+          match({sal: {$lt: 16000}}).
+          explain(function (err1, output) {
+            assert.ifError(err1);
+            assert.ok(output);
+            // make sure we got explain output
+            assert.ok(output.stages);
 
-              clearData(db, function () { done(); });
+            clearData(db, function () {
+              done();
             });
+          });
         });
       });
     });
@@ -569,8 +591,8 @@ describe('aggregate: ', function () {
       });
 
       it('with a callback', function (done) {
-        var aggregate = new Aggregate(),
-            callback;
+        var aggregate = new Aggregate();
+        var callback;
 
         setupData(function (db) {
           aggregate.model(db.model('Employee'));
@@ -601,7 +623,9 @@ describe('aggregate: ', function () {
     it('handles aggregation options', function (done) {
       setupData(function (db) {
         start.mongodVersion(function (err, version) {
-          if (err) throw err;
+          if (err) {
+            throw err;
+          }
           var mongo26_or_greater = version[0] > 2 || (version[0] === 2 && version[1] >= 6);
 
           var m = db.model('Employee');
@@ -618,12 +642,12 @@ describe('aggregate: ', function () {
           }
 
           aggregate
-            .exec(function (err, docs) {
-              assert.ifError(err);
-              assert.equal(1, docs.length);
-              assert.equal(docs[0].sal, 18000);
-              clearData(db, done);
-            });
+              .exec(function (err, docs) {
+                assert.ifError(err);
+                assert.equal(1, docs.length);
+                assert.equal(docs[0].sal, 18000);
+                clearData(db, done);
+              });
         });
       });
     });
@@ -635,12 +659,12 @@ describe('aggregate: ', function () {
     var MyModel = db.model('gh3160', {name: String});
 
     MyModel.
-      aggregate([{$match: {name: 'test'}}]).
-      cursor({async: true}).
-      exec(function (error, cursor) {
-        assert.ifError(error);
-        assert.ok(cursor);
-        db.close(done);
-      });
+    aggregate([{$match: {name: 'test'}}]).
+    cursor({async: true}).
+    exec(function (error, cursor) {
+      assert.ifError(error);
+      assert.ok(cursor);
+      db.close(done);
+    });
   });
 });

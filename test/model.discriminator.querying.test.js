@@ -71,7 +71,7 @@ describe('model', function () {
                                    BaseCustomEventSchema);
         DiscCustomEvent = BaseCustomEvent.discriminator('disc-custom-event',
                                                         DiscCustomEventSchema);
-        var ContainerSchema = Schema({
+        var ContainerSchema = new Schema({
           title: String,
           events: [{type: Schema.Types.ObjectId, ref: 'base-custom-event'}]
         });

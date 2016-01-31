@@ -411,8 +411,8 @@ describe('versioning', function () {
     var v = new V({configured: true});
     v.save(function (err) {
       assert.ifError(err);
-      V.findById(v, function (err, v) {
-        assert.ifError(err);
+      V.findById(v, function (err1, v) {
+        assert.ifError(err1);
         assert.equal(0, v._doc.lolwat);
         done();
       });
@@ -420,7 +420,7 @@ describe('versioning', function () {
   });
 
   it('can be disabled', function (done) {
-    var schema = Schema({x: ['string']}, {versionKey: false});
+    var schema = new Schema({x: ['string']}, {versionKey: false});
     var M = db.model('disabledVersioning', schema, 's' + random());
     M.create({x: ['hi']}, function (err, doc) {
       assert.ifError(err);

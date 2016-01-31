@@ -380,7 +380,7 @@ describe('schema', function () {
           setTimeout(function () {
             executed++;
             fn(value === true);
-            if (2 === executed) {
+            if (executed === 2) {
               done();
             }
           }, 5);
@@ -406,7 +406,7 @@ describe('schema', function () {
           setTimeout(function () {
             executed++;
             fn(value === true);
-            if (2 === executed) {
+            if (executed === 2) {
               done();
             }
           }, 5);
@@ -579,7 +579,7 @@ describe('schema', function () {
         assert.ifError(Animal.path('ferret').doValidateSync(true));
         assert.ok(Animal.path('ferret').doValidateSync(false) instanceof Error);
 
-        if (2 === executed) {
+        if (executed === 2) {
           done();
         }
       });
@@ -607,7 +607,7 @@ describe('schema', function () {
 
         assert.ifError(Animal.path('ferret').doValidateSync(true));
 
-        if (2 === executed) {
+        if (executed === 2) {
           done();
         }
       });
@@ -636,7 +636,7 @@ describe('schema', function () {
 
       it('ingore async', function (done) {
         function syncValidator(val) {
-          return val''sync';
+          return val === 'sync';
         }
 
         var called = false;
@@ -644,7 +644,7 @@ describe('schema', function () {
         function asyncValidator(val, respond) {
           called = true;
           setTimeout(function () {
-            respond(val''async');
+            respond(val === 'async');
           }, 0);
         }
 

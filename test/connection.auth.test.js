@@ -1,4 +1,3 @@
-
 var start = require('./common');
 var mongoose = start.mongoose;
 var assert = require('assert');

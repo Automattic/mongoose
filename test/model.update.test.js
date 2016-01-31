@@ -711,7 +711,7 @@ describe('model: update:', function () {
 
   it('handles nested paths starting with numbers (gh-1062)', function (done) {
     var db = start();
-    var schema = Schema({counts: Schema.Types.Mixed});
+    var schema = new Schema({counts: Schema.Types.Mixed});
     var M = db.model('gh-1062', schema, '1062-' + random());
     M.create({counts: {}}, function (err, m) {
       assert.ifError(err);
@@ -795,7 +795,7 @@ describe('model: update:', function () {
       }
 
       var db = start();
-      var schema = Schema({name: String, age: Number, x: String});
+      var schema = new Schema({name: String, age: Number, x: String});
       var M = db.model('setoninsert-' + random(), schema);
 
       var match = {name: 'set on insert'};
@@ -829,7 +829,7 @@ describe('model: update:', function () {
       }
 
       var db = start();
-      var schema = Schema({name: String, n: [{x: Number}]});
+      var schema = new Schema({name: String, n: [{x: Number}]});
       var M = db.model('setoninsert-' + random(), schema);
 
       M.create({name: '2.4'}, function (err, created) {
@@ -892,7 +892,7 @@ describe('model: update:', function () {
       }
 
       var db = start();
-      var schema = Schema({name: String, n: [{x: Number}]});
+      var schema = new Schema({name: String, n: [{x: Number}]});
       var M = db.model('setoninsert-' + random(), schema);
 
       var m = new M({name: '2.6', n: [{x: 0}]});
@@ -922,7 +922,7 @@ describe('model: update:', function () {
       }
 
       var db = start();
-      var schema = Schema({name: String, lastModified: Date, lastModifiedTS: Date});
+      var schema = new Schema({name: String, lastModified: Date, lastModifiedTS: Date});
       var M = db.model('gh-2019', schema);
 
       var m = new M({name: '2.6'});
@@ -1503,8 +1503,8 @@ describe('model: update:', function () {
   it('does not add virtuals to update (gh-2046)', function (done) {
     var db = start();
 
-    var childSchema = Schema({foo: String}, {toObject: {getters: true}});
-    var parentSchema = Schema({children: [childSchema]});
+    var childSchema = new Schema({foo: String}, {toObject: {getters: true}});
+    var parentSchema = new Schema({children: [childSchema]});
 
     childSchema.virtual('bar').get(function () {
       return 'bar';
@@ -1529,7 +1529,7 @@ describe('model: update:', function () {
   it('can $rename (gh-1845)', function (done) {
     var db = start();
 
-    var schema = Schema({foo: Date, bar: Date});
+    var schema = new Schema({foo: Date, bar: Date});
     var Model = db.model('gh1845', schema, 'gh1845');
 
     Model.update({}, {$rename: {foo: 'bar'}}, function (error) {
@@ -1555,7 +1555,7 @@ describe('model: update:', function () {
 
   it('can $rename (gh-1845)', function (done) {
     var db = start();
-    var schema = Schema({foo: Date, bar: Date});
+    var schema = new Schema({foo: Date, bar: Date});
     var Model = db.model('gh1845', schema, 'gh1845');
 
     Model.update({}, {$rename: {foo: 'bar'}}, function (error) {
@@ -1566,7 +1566,7 @@ describe('model: update:', function () {
 
   it('allows objects with positional operator (gh-3185)', function (done) {
     var db = start();
-    var schema = Schema({children: [{_id: Number}]});
+    var schema = new Schema({children: [{_id: Number}]});
     var MyModel = db.model('gh3185', schema, 'gh3185');
 
     MyModel.create({children: [{_id: 1}]}, function (error, doc) {

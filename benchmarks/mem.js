@@ -101,7 +101,7 @@ var i = total;
 mongoose.connection.on('open', function () {
   mongoose.connection.db.dropDatabase(function () {
     (function cycle() {
-      if (0 === i--) {
+      if (i-- === 0) {
         return done();
       }
       var a = new A({

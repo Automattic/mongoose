@@ -51,7 +51,7 @@ describe('model: populate:', function () {
         before(function (done) {
           refuser = 'RefUser-' + id;
 
-          var bSchema = Schema({
+          var bSchema = new Schema({
             title: String,
             fans: [{type: id, ref: refuser}],
             adhoc: [{subdoc: id, subarray: [{things: [id]}]}],
@@ -63,7 +63,7 @@ describe('model: populate:', function () {
             }]
           });
 
-          var uSchema = Schema({
+          var uSchema = new Schema({
             _id: id,
             name: String,
             email: String

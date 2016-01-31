@@ -1781,7 +1781,7 @@ describe('types array', function () {
     var B;
 
     before(function (done) {
-      var schema = Schema({
+      var schema = new Schema({
         numbers: ['number'],
         numberIds: [{_id: 'number', name: 'string'}],
         stringIds: [{_id: 'string', name: 'string'}],

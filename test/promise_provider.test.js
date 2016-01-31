@@ -1,5 +1,3 @@
-/* eslint no-unused-vars: 1 */
-
 /**
  * Module dependencies.
  */
@@ -12,7 +10,6 @@ var start = require('./common');
 var PromiseProvider = require('../lib/promise_provider');
 var Schema = require('../lib/schema');
 
-var Promise;
 var db;
 var testSchema = new Schema({test: {type: String, required: true}});
 testSchema.pre('save', function (next) {
@@ -43,7 +40,6 @@ describe('ES6 promises: ', function () {
 
     before(function () {
       PromiseProvider.set(global.Promise);
-      Promise = PromiseProvider.get();
     });
 
     before(function () {
@@ -179,7 +175,6 @@ describe('ES6 promises: ', function () {
   describe('bluebird: ', function () {
     before(function () {
       PromiseProvider.set(bluebird);
-      Promise = PromiseProvider.get();
     });
 
     before(function () {
@@ -357,7 +352,6 @@ describe('ES6 promises: ', function () {
   describe('q: ', function () {
     before(function () {
       PromiseProvider.set(q.Promise);
-      Promise = PromiseProvider.get();
     });
 
     before(function () {

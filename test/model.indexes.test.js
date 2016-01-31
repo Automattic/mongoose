@@ -262,7 +262,7 @@ describe('model', function () {
 
       var db = start({uri: 'mongodb://localhost/mongoose_test_indexing'});
 
-      var schema = Schema({
+      var schema = new Schema({
         name: {type: String, index: true},
         furryness: {type: Number, index: true}
       }, {autoIndex: false});

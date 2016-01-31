@@ -910,7 +910,7 @@ describe('model: findByIdAndUpdate:', function () {
   it('can do deep equals on object id after findOneAndUpdate (gh-2070)', function (done) {
     var db = start();
 
-    var accountSchema = Schema({
+    var accountSchema = new Schema({
       name: String,
       contacts: [{
         account: {type: Schema.Types.ObjectId, ref: 'Account'},
@@ -950,7 +950,7 @@ describe('model: findByIdAndUpdate:', function () {
   it('adds __v on upsert (gh-2122)', function (done) {
     var db = start();
 
-    var accountSchema = Schema({
+    var accountSchema = new Schema({
       name: String
     });
 
@@ -970,8 +970,8 @@ describe('model: findByIdAndUpdate:', function () {
   it('works with nested schemas and $pull+$or (gh-1932)', function (done) {
     var db = start();
 
-    var TickSchema = Schema({name: String});
-    var TestSchema = Schema({a: Number, b: Number, ticks: [TickSchema]});
+    var TickSchema = new Schema({name: String});
+    var TestSchema = new Schema({a: Number, b: Number, ticks: [TickSchema]});
 
     var TestModel = db.model('gh-1932', TestSchema, 'gh-1932');
 

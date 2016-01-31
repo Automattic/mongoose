@@ -70,7 +70,7 @@ files.forEach(function (file) {
   var filename = __dirname + '/' + file;
   jadeify(filename, filemap[file]);
 
-  if ('--watch' === process.argv[2]) {
+  if (process.argv[2] === '--watch') {
     fs.watchFile(filename, {interval: 1000}, function (cur, prev) {
       if (cur.mtime > prev.mtime) {
         jadeify(filename, filemap[file]);

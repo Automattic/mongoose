@@ -11,21 +11,21 @@ describe('cast: ', function () {
     it('with a number', function (done) {
       var schema = new Schema({x: Buffer});
       assert.deepEqual(cast(schema, {x: {$bitsAllClear: 3}}),
-        {x: {$bitsAllClear: 3}});
+          {x: {$bitsAllClear: 3}});
       done();
     });
 
     it('with an array', function (done) {
       var schema = new Schema({x: Buffer});
       assert.deepEqual(cast(schema, {x: {$bitsAllSet: [2, '3']}}),
-        {x: {$bitsAllSet: [2, 3]}});
+          {x: {$bitsAllSet: [2, 3]}});
       done();
     });
 
     it('with a buffer', function (done) {
       var schema = new Schema({x: Number});
       assert.deepEqual(cast(schema, {x: {$bitsAnyClear: new Buffer([3])}}),
-        {x: {$bitsAnyClear: new Buffer([3])}});
+          {x: {$bitsAnyClear: new Buffer([3])}});
       done();
     });
 

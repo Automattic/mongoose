@@ -346,7 +346,7 @@ describe('document', function () {
     doc.schema.options.toObject = {};
     doc.schema.options.toObject.transform = function xform(doc, ret) {
       // ignore embedded docs
-      if ('function' === typeof doc.ownerDocument) {
+      if (typeof doc.ownerDocument === 'function') {
         return;
       }
 
@@ -368,7 +368,7 @@ describe('document', function () {
     var out = {myid: doc._id.toString()};
     doc.schema.options.toObject.transform = function (doc, ret) {
       // ignore embedded docs
-      if ('function' === typeof doc.ownerDocument) {
+      if (typeof doc.ownerDocument === 'function') {
         return;
       }
 
@@ -682,7 +682,7 @@ describe('document', function () {
     doc.schema.options.toJSON = {};
     doc.schema.options.toJSON.transform = function xform(doc, ret) {
       // ignore embedded docs
-      if ('function' === typeof doc.ownerDocument) {
+      if (typeof doc.ownerDocument === 'function') {
         return;
       }
 
@@ -704,7 +704,7 @@ describe('document', function () {
     var out = {myid: doc._id.toString()};
     doc.schema.options.toJSON.transform = function (doc, ret) {
       // ignore embedded docs
-      if ('function' === typeof doc.ownerDocument) {
+      if (typeof doc.ownerDocument === 'function') {
         return;
       }
 
@@ -767,7 +767,7 @@ describe('document', function () {
     var db = start();
     var userSchema, User, groupSchema, Group;
 
-    userSchema = Schema({name: String});
+    userSchema = new Schema({name: String});
     // includes virtual path when 'toJSON'
     userSchema.set('toJSON', {getters: true});
     userSchema.virtual('hello').get(function () {
@@ -775,7 +775,7 @@ describe('document', function () {
     });
     User = db.model('User', userSchema);
 
-    groupSchema = Schema({
+    groupSchema = new Schema({
       name: String,
       _users: [{type: Schema.ObjectId, ref: 'User'}]
     });
@@ -2229,7 +2229,7 @@ describe('document', function () {
     });
 
     it('single embedded docs with arrays pre hooks (gh-3680)', function (done) {
-      var childSchema = Schema({count: Number});
+      var childSchema = new Schema({count: Number});
 
       var preCalls = 0;
       childSchema.pre('save', function (next) {
@@ -2255,7 +2255,7 @@ describe('document', function () {
     });
 
     it('nested single embedded doc validation (gh-3702)', function (done) {
-      var childChildSchema = Schema({count: {type: Number, min: 1}});
+      var childChildSchema = new Schema({count: {type: Number, min: 1}});
       var childSchema = new Schema({child: childChildSchema});
       var parentSchema = new Schema({child: childSchema});
 
@@ -2353,7 +2353,7 @@ describe('document', function () {
     });
 
     it('handles 0 for numeric subdoc ids (gh-3776)', function (done) {
-      var personSchema = Schema({
+      var personSchema = new Schema({
         _id: Number,
         name: String,
         age: Number,

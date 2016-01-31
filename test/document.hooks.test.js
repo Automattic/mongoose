@@ -1,4 +1,3 @@
-
 /**
  * Module dependencies.
  */
@@ -344,7 +343,7 @@ describe('document: hooks:', function () {
 
   it('post remove hooks on subdocuments work', function (done) {
     var db = start();
-    var sub = Schema({_id: Number});
+    var sub = new Schema({_id: Number});
     var called = {pre: 0, post: 0};
 
     sub.pre('remove', function (next) {
@@ -357,7 +356,7 @@ describe('document: hooks:', function () {
       assert.ok(doc instanceof Document);
     });
 
-    var par = Schema({sub: [sub], name: String});
+    var par = new Schema({sub: [sub], name: String});
     var M = db.model('post-remove-hooks-sub', par);
 
     var m = new M({sub: [{_id: 1}, {_id: 2}]});
@@ -366,31 +365,31 @@ describe('document: hooks:', function () {
       assert.equal(0, called.pre);
       assert.equal(0, called.post);
 
-      M.findById(m, function (err, doc) {
-        assert.ifError(err);
+      M.findById(m, function (err1, doc) {
+        assert.ifError(err1);
 
         doc.sub.id(1).remove();
-        doc.save(function (err) {
-          assert.ifError(err);
+        doc.save(function (err2) {
+          assert.ifError(err2);
           assert.equal(1, called.pre);
           assert.equal(1, called.post);
 
           // does not get called when not removed
           doc.name = 'changed1';
-          doc.save(function (err) {
-            assert.ifError(err);
+          doc.save(function (err3) {
+            assert.ifError(err3);
             assert.equal(1, called.pre);
             assert.equal(1, called.post);
 
             doc.sub.id(2).remove();
-            doc.remove(function (err) {
-              assert.ifError(err);
+            doc.remove(function (err4) {
+              assert.ifError(err4);
               assert.equal(2, called.pre);
               assert.equal(2, called.post);
 
               // does not get called twice
-              doc.remove(function (err) {
-                assert.ifError(err);
+              doc.remove(function (err5) {
+                assert.ifError(err5);
                 assert.equal(2, called.pre);
                 assert.equal(2, called.post);
                 db.close(done);
@@ -413,7 +412,7 @@ describe('document: hooks:', function () {
 
     var b = new Bar();
     b.pre('save', function (next) {
-      if (this.isNew && 0 === this.foos.length) {
+      if (this.isNew && this.foos.length === 0) {
         this.foos = undefined;
       }
       next();
@@ -459,10 +458,12 @@ describe('document: hooks:', function () {
 
     var M = db.model('post-save-hooks-sub', postSaveHooks);
 
-    var m = new M({subs: [
-      {name: 'mee'},
-      {name: 'moo'}
-    ]});
+    var m = new M({
+      subs: [
+        {name: 'mee'},
+        {name: 'moo'}
+      ]
+    });
 
     m.save(function (err) {
       assert.ifError(err);
@@ -483,7 +484,8 @@ describe('document: hooks:', function () {
   });
 
   it('pre save hooks should run in parallel', function (done) {
-    // we set the time out to be double that of the validator - 1 (so that running in serial will be greater then that)
+    // we set the time out to be double that of the validator - 1
+    // (so that running in serial will be greater then that)
     this.timeout(1000);
     var db = start(),
         count = 0;
@@ -505,20 +507,15 @@ describe('document: hooks:', function () {
 
     var MWPSH = db.model('mwpsh', new Schema({subs: [SchemaWithPreSaveHook]}));
     var m = new MWPSH({
-      subs: [
-          {
-            preference: 'xx'
-          },
-          {
-            preference: 'yy'
-          },
-          {
-            preference: '1'
-          },
-          {
-            preference: '2'
-          }
-      ]
+      subs: [{
+        preference: 'xx'
+      }, {
+        preference: 'yy'
+      }, {
+        preference: '1'
+      }, {
+        preference: '2'
+      }]
     });
 
     m.save(function (err) {
@@ -535,7 +532,7 @@ describe('document: hooks:', function () {
   });
 
   it('parallel followed by serial (gh-2521)', function (done) {
-    var schema = Schema({name: String});
+    var schema = new Schema({name: String});
 
     schema.pre('save', true, function (next, done) {
       process.nextTick(function () {
@@ -561,7 +558,7 @@ describe('document: hooks:', function () {
   });
 
   it('runs post hooks after function (gh-2949)', function (done) {
-    var schema = Schema({name: String});
+    var schema = new Schema({name: String});
 
     var postCount = 0;
     schema.post('init', function (doc) {
@@ -581,7 +578,7 @@ describe('document: hooks:', function () {
   });
 
   it('pre-init hooks work', function (done) {
-    var schema = Schema({text: String});
+    var schema = new Schema({text: String});
 
     schema.pre('init', function (next, data) {
       data.text = "pre init'd";
@@ -605,7 +602,7 @@ describe('document: hooks:', function () {
   });
 
   it('post save handles multiple args (gh-3155)', function (done) {
-    var schema = Schema({});
+    var schema = new Schema({});
 
     schema.post('save', function (item, next) {
       next();
@@ -623,7 +620,7 @@ describe('document: hooks:', function () {
   });
 
   it('pre-init hooks on subdocuments work', function (done) {
-    var childSchema = Schema({age: Number});
+    var childSchema = new Schema({age: Number});
 
     childSchema.pre('init', function (next, data) {
       ++data.age;
@@ -632,7 +629,7 @@ describe('document: hooks:', function () {
       return this;
     });
 
-    var parentSchema = Schema({name: String, children: [childSchema]});
+    var parentSchema = new Schema({name: String, children: [childSchema]});
     var db = start(),
         Parent = db.model('ParentWithChildren', parentSchema);
 
@@ -655,7 +652,7 @@ describe('document: hooks:', function () {
   });
 
   it('pre-save hooks fire on subdocs before their parent doc', function (done) {
-    var childSchema = Schema({name: String, count: Number});
+    var childSchema = new Schema({name: String, count: Number});
 
     childSchema.pre('save', function (next) {
       ++this.count;
@@ -664,7 +661,7 @@ describe('document: hooks:', function () {
       return this;
     });
 
-    var parentSchema = Schema({
+    var parentSchema = new Schema({
       cumulativeCount: Number,
       children: [childSchema]
     });
@@ -681,15 +678,16 @@ describe('document: hooks:', function () {
         Parent = db.model('ParentWithChildren', parentSchema),
         doc = new Parent({children: [{count: 0, name: 'a'}, {count: 1, name: 'b'}]});
 
-    doc.save(function (err, doc) {
+    doc.save(function (err, doc1) {
       db.close();
 
       try {
-        assert.strictEqual(doc.children[0].count, 1);
-        assert.strictEqual(doc.children[1].count, 2);
-        assert.strictEqual(doc.cumulativeCount, 3);
+        assert.strictEqual(doc1.children[0].count, 1);
+        assert.strictEqual(doc1.children[1].count, 2);
+        assert.strictEqual(doc1.cumulativeCount, 3);
       } catch (e) {
-        return done(e);
+        done(e);
+        return;
       }
 
       done();
@@ -788,15 +786,11 @@ describe('document: hooks:', function () {
     var L1 = db.model('gh3281', L1Schema);
 
     var data = {
-      items: [
-          {
-            items: [
-                {
-                  title: 'test'
-                }
-            ]
-          }
-      ]
+      items: [{
+        items: [{
+          title: 'test'
+        }]
+      }]
     };
 
     L1.create(data, function (error) {
@@ -826,8 +820,8 @@ describe('document: hooks:', function () {
     Person.create({photo: {bla: 'test'}}, function (error, person) {
       assert.ifError(error);
       person.photo.remove();
-      person.save(function (error) {
-        assert.ifError(error);
+      person.save(function (error1) {
+        assert.ifError(error1);
         setTimeout(function () {
           assert.equal(postCount, 1);
           done();

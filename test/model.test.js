@@ -4122,7 +4122,7 @@ describe('Model', function () {
         var db = start(),
             B = db.model('BlogPost' + random(), bpSchema);
 
-        var peopleSchema = Schema({name: String, likes: ['ObjectId']});
+        var peopleSchema = new Schema({name: String, likes: ['ObjectId']});
         var P = db.model('promise-BP-people', peopleSchema, random());
         B.create(
             {title: 'then promise 1'},
@@ -4218,7 +4218,7 @@ describe('Model', function () {
       describe('with mongo down', function () {
         it('and no command buffering should pass an error', function (done) {
           var db = start({db: {bufferMaxEntries: 0}});
-          var schema = Schema({type: String}, {bufferCommands: false});
+          var schema = new Schema({type: String}, {bufferCommands: false});
           var T = db.model('Thing', schema);
           db.on('open', function () {
             var t = new T({type: 'monster'});

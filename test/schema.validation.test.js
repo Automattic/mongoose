@@ -447,7 +447,7 @@ describe('schema', function () {
           setTimeout(function () {
             executed++;
             fn(value === true);
-            if (executed == 2) {
+            if (executed === 2) {
               done();
             }
           }, 5);

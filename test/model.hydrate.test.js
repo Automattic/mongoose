@@ -12,12 +12,12 @@ var start = require('./common'),
  * Setup
  */
 
-var schemaB = Schema({
+var schemaB = new Schema({
   title: String,
   type: String
 }, {discriminatorKey: 'type'});
 
-var schemaC = Schema({
+var schemaC = new Schema({
   test: {
     type: String,
     default: 'test'
@@ -31,7 +31,7 @@ describe('model', function () {
     var B;
     var Breakfast;
 
-    var breakfastSchema = Schema({
+    var breakfastSchema = new Schema({
       food: {type: String, enum: ['bacon', 'eggs']}
     });
 

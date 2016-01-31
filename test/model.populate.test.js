@@ -327,7 +327,7 @@ describe('model: populate:', function () {
         // mock an error
         User.find = function () {
           var args = Array.prototype.map.call(arguments, function (arg) {
-            return 'function' === typeof arg ? function () {
+            return typeof arg === 'function' ? function () {
               arg(new Error('woot'));
             } : arg;
           });
@@ -653,7 +653,7 @@ describe('model: populate:', function () {
             var origFind = User.find;
             User.find = function () {
               var args = Array.prototype.map.call(arguments, function (arg) {
-                return 'function' === typeof arg ? function () {
+                return typeof arg === 'function' ? function () {
                   arg(new Error('woot 2'));
                 } : arg;
               });
@@ -1360,7 +1360,7 @@ describe('model: populate:', function () {
     });
     var User = db.model('gh-2151-1', user, 'gh-2151-1');
 
-    var blogpost = Schema({
+    var blogpost = new Schema({
       title: String,
       tags: [String],
       author: {

@@ -304,7 +304,7 @@ describe('types.documentarray', function () {
         this.date = new Date;
         next();
       });
-      var schema = Schema({children: [child]});
+      var schema = new Schema({children: [child]});
       var M = db.model('embeddedDocArray-push-re-cast', schema, 'edarecast-' + random());
       var m = new M;
       m.save(function (err) {
@@ -396,7 +396,7 @@ describe('types.documentarray', function () {
 
   describe('invalidate()', function () {
     it('works', function (done) {
-      var schema = Schema({docs: [{name: 'string'}]});
+      var schema = new Schema({docs: [{name: 'string'}]});
       schema.pre('validate', function (next) {
         var subdoc = this.docs[this.docs.length - 1];
         subdoc.invalidate('name', 'boo boo', '%');
@@ -424,8 +424,8 @@ describe('types.documentarray', function () {
 
     it('handles validation failures', function (done) {
       var db = start();
-      var nested = Schema({v: {type: Number, max: 30}});
-      var schema = Schema({
+      var nested = new Schema({v: {type: Number, max: 30}});
+      var schema = new Schema({
         docs: [nested]
       }, {collection: 'embedded-invalidate-' + random()});
       var M = db.model('embedded-invalidate', schema);
@@ -438,8 +438,8 @@ describe('types.documentarray', function () {
 
     it('removes attached event listeners when creating new doc array', function (done) {
       var db = start();
-      var nested = Schema({v: {type: Number}});
-      var schema = Schema({
+      var nested = new Schema({v: {type: Number}});
+      var schema = new Schema({
         docs: [nested]
       }, {collection: 'gh-2159'});
       var M = db.model('gh-2159', schema);

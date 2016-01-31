@@ -348,7 +348,7 @@ describe('document: strict mode:', function () {
 
   describe('"throws" mode', function () {
     it('throws on set() of unknown property', function (done) {
-      var schema = Schema({n: String, docs: [{x: [{y: String}]}]});
+      var schema = new Schema({n: String, docs: [{x: [{y: String}]}]});
       schema.set('strict', 'throw');
       var M = mongoose.model('throwStrictSet', schema, 'tss_' + random());
       var m = new M;

@@ -1,4 +1,3 @@
-
 /**
  * Test dependencies.
  */
@@ -42,21 +41,24 @@ var BlogPost = new Schema({
 });
 
 BlogPost
-.path('title')
-.get(function (v) {
-  if (v) return v.toUpperCase();
-});
+    .path('title')
+    .get(function (v) {
+      if (v) {
+        return v.toUpperCase();
+      }
+      return v;
+    });
 
 BlogPost
-.virtual('titleWithAuthor')
-.get(function () {
-  return this.get('title') + ' by ' + this.get('author');
-})
-.set(function (val) {
-  var split = val.split(' by ');
-  this.set('title', split[0]);
-  this.set('author', split[1]);
-});
+    .virtual('titleWithAuthor')
+    .get(function () {
+      return this.get('title') + ' by ' + this.get('author');
+    })
+    .set(function (val) {
+      var split = val.split(' by ');
+      this.set('title', split[0]);
+      this.set('author', split[1]);
+    });
 
 BlogPost.method('cool', function () {
   return this;
@@ -84,11 +86,11 @@ describe('document modified', function () {
         assert.strictEqual(null, err);
 
         b.numbers.push(3);
-        b.save(function (err) {
-          assert.strictEqual(null, err);
+        b.save(function (err1) {
+          assert.strictEqual(null, err1);
 
-          B.findById(b, function (err, b) {
-            assert.strictEqual(null, err);
+          B.findById(b, function (err2, b) {
+            assert.strictEqual(null, err2);
             assert.equal(2, b.numbers.length);
 
             db.close();
@@ -120,7 +122,7 @@ describe('document modified', function () {
       var db = start();
 
       var MyModel = db.model('test',
-        {name: {type: String, default: 'Val '}});
+          {name: {type: String, default: 'Val '}});
       var m = new MyModel();
       assert.ok(m.$isDefault('name'));
       db.close(done);
@@ -480,36 +482,36 @@ describe('document modified', function () {
     it('should mark multi-level nested schemas as modified (gh-1754)', function (done) {
       var db = start();
 
-      var grandChildSchema = Schema({
+      var grandChildSchema = new Schema({
         name: String
       });
 
-      var childSchema = Schema({
+      var childSchema = new Schema({
         name: String,
         grandChild: [grandChildSchema]
       });
 
-      var parentSchema = Schema({
+      var parentSchema = new Schema({
         name: String,
         child: [childSchema]
       });
 
       var Parent = db.model('gh-1754', parentSchema);
       Parent.create(
-        {child: [{name: 'Brian', grandChild: [{name: 'Jake'}]}]},
-        function (error, p) {
-          assert.ifError(error);
-          assert.ok(p);
-          assert.equal(1, p.child.length);
-          assert.equal(1, p.child[0].grandChild.length);
-          p.child[0].grandChild[0].name = 'Jason';
-          assert.ok(p.isModified('child.0.grandChild.0.name'));
-          p.save(function (error, inDb) {
+          {child: [{name: 'Brian', grandChild: [{name: 'Jake'}]}]},
+          function (error, p) {
             assert.ifError(error);
-            assert.equal('Jason', inDb.child[0].grandChild[0].name);
-            db.close(done);
+            assert.ok(p);
+            assert.equal(1, p.child.length);
+            assert.equal(1, p.child[0].grandChild.length);
+            p.child[0].grandChild[0].name = 'Jason';
+            assert.ok(p.isModified('child.0.grandChild.0.name'));
+            p.save(function (error1, inDb) {
+              assert.ifError(error1);
+              assert.equal('Jason', inDb.child[0].grandChild[0].name);
+              db.close(done);
+            });
           });
-        });
     });
   });
 });

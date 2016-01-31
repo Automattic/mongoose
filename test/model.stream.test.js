@@ -71,7 +71,7 @@ describe('query stream:', function () {
       assert.ok(!seen[doc.id]);
       seen[doc.id] = 1;
 
-      if (paused > 0 && 0 === resumed) {
+      if (paused > 0 && resumed === 0) {
         err = new Error('data emitted during pause');
         return cb();
       }
@@ -261,12 +261,12 @@ describe('query stream:', function () {
       assert.strictEqual(false, doc instanceof mongoose.Document);
       i++;
 
-      if (1 === i) {
+      if (i === 1) {
         stream.pause();
         assert.equal(true, stream.paused);
         stream.resume();
         assert.equal(false, stream.paused);
-      } else if (2 === i) {
+      } else if (i === 2) {
         stream.pause();
         assert.equal(true, stream.paused);
         process.nextTick(function () {
@@ -330,11 +330,11 @@ describe('query stream:', function () {
   it('supports population (gh-1411)', function (done) {
     var db = start();
 
-    var barSchema = Schema({
+    var barSchema = new Schema({
       value: Number
     });
 
-    var fooSchema = Schema({
+    var fooSchema = new Schema({
       bar: {type: 'ObjectId', ref: 'Bar'}
     });
 
@@ -372,7 +372,7 @@ describe('query stream:', function () {
   it('respects schema options (gh-1862)', function (done) {
     var db = start();
 
-    var schema = Schema({
+    var schema = new Schema({
       fullname: {type: String},
       password: {type: String, select: false}
     });

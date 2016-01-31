@@ -1,4 +1,3 @@
-
 /**
  * Module dependencies.
  */
@@ -18,7 +17,13 @@ describe('schema.documentarray', function () {
 
     var schema1 = new Schema({x: {type: [child], default: [{title: 'Prometheus'}]}});
     var schema2 = new Schema({x: {type: [child], default: {title: 'Prometheus'}}});
-    var schema3 = new Schema({x: {type: [child], default: function () { return [{title: 'Prometheus'}];}}});
+    var schema3 = new Schema({
+      x: {
+        type: [child], default: function () {
+          return [{title: 'Prometheus'}];
+        }
+      }
+    });
 
     var M = mongoose.model('DefaultDocArrays1', schema1);
     var N = mongoose.model('DefaultDocArrays2', schema2);

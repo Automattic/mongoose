@@ -82,7 +82,7 @@ describe('shard', function () {
               version = info.version.split('.').map(function (n) {
                 return parseInt(n, 10);
               });
-              greaterThan20x = 2 < version[0] || 2 == version[0] && 0 < version[0];
+              greaterThan20x = version[0] > 2 || version[0] === 2 && version[0] > 0;
               done();
             });
           });

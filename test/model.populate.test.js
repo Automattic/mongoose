@@ -297,7 +297,7 @@ describe('model: populate:', function () {
             db.close();
             db2.close();
             assert.ifError(err);
-            assert.ok(post._creator.name == 'Guillermo');
+            assert.ok(post._creator.name === 'Guillermo');
             done();
           });
         });
@@ -327,7 +327,7 @@ describe('model: populate:', function () {
         // mock an error
         User.find = function () {
           var args = Array.prototype.map.call(arguments, function (arg) {
-            return 'function' == typeof arg ? function () {
+            return 'function' === typeof arg ? function () {
               arg(new Error('woot'));
             } : arg;
           });
@@ -653,7 +653,7 @@ describe('model: populate:', function () {
             var origFind = User.find;
             User.find = function () {
               var args = Array.prototype.map.call(arguments, function (arg) {
-                return 'function' == typeof arg ? function () {
+                return 'function' === typeof arg ? function () {
                   arg(new Error('woot 2'));
                 } : arg;
               });
@@ -2758,7 +2758,7 @@ describe('model: populate:', function () {
 
           docs.forEach(function (doc) {
             assert.ok(doc.comment && doc.comment.body);
-            if ('u1' == doc.name) {
+            if (doc.name === 'u1') {
               assert.equal('comment 1', doc.comment.body);
             } else {
               assert.equal('comment 2', doc.comment.body);
@@ -2802,7 +2802,7 @@ describe('model: populate:', function () {
               assert.ifError(err);
 
               var a2 = docs.filter(function (d) {
-                return 'body2' == d.body;
+                return d.body === 'body2';
               })[0];
               assert.equal(a2.mediaAttach.id, media.id);
 

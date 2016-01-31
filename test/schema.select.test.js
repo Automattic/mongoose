@@ -43,7 +43,7 @@ describe('schema select option', function () {
         if (pending === 1) {
           S.findOneAndRemove({_id: item._id}, cb);
         }
-        if (0 === pending) {
+        if (pending === 0) {
           done();
         }
       }
@@ -84,7 +84,7 @@ describe('schema select option', function () {
         assert.strictEqual(true, s.isSelected('docs.name'));
         assert.equal(s.name, 'the included');
 
-        if (0 === pending) {
+        if (pending === 0) {
           done();
         }
       }

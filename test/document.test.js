@@ -346,7 +346,7 @@ describe('document', function () {
     doc.schema.options.toObject = {};
     doc.schema.options.toObject.transform = function xform(doc, ret) {
       // ignore embedded docs
-      if ('function' == typeof doc.ownerDocument) {
+      if ('function' === typeof doc.ownerDocument) {
         return;
       }
 
@@ -368,7 +368,7 @@ describe('document', function () {
     var out = {myid: doc._id.toString()};
     doc.schema.options.toObject.transform = function (doc, ret) {
       // ignore embedded docs
-      if ('function' == typeof doc.ownerDocument) {
+      if ('function' === typeof doc.ownerDocument) {
         return;
       }
 
@@ -682,7 +682,7 @@ describe('document', function () {
     doc.schema.options.toJSON = {};
     doc.schema.options.toJSON.transform = function xform(doc, ret) {
       // ignore embedded docs
-      if ('function' == typeof doc.ownerDocument) {
+      if ('function' === typeof doc.ownerDocument) {
         return;
       }
 
@@ -704,7 +704,7 @@ describe('document', function () {
     var out = {myid: doc._id.toString()};
     doc.schema.options.toJSON.transform = function (doc, ret) {
       // ignore embedded docs
-      if ('function' == typeof doc.ownerDocument) {
+      if ('function' === typeof doc.ownerDocument) {
         return;
       }
 

@@ -425,7 +425,7 @@ describe('Query', function () {
         var match = {gps: {$within: {$box: [[5, 25], [10, 30]]}}};
         if (Query.use$geoWithin) {
           match.gps.$geoWithin = match.gps.$within;
-          delete match.gps['$within'];
+          delete match.gps.$within;
         }
         assert.deepEqual(query._conditions, match);
         done();
@@ -436,7 +436,7 @@ describe('Query', function () {
         var match = {gps: {$within: {$box: [[5, 25], [10, 30]]}}};
         if (Query.use$geoWithin) {
           match.gps.$geoWithin = match.gps.$within;
-          delete match.gps['$within'];
+          delete match.gps.$within;
         }
         assert.deepEqual(query._conditions, match);
         done();
@@ -450,7 +450,7 @@ describe('Query', function () {
         var match = {gps: {$within: {$center: [[5, 25], 5]}}};
         if (Query.use$geoWithin) {
           match.gps.$geoWithin = match.gps.$within;
-          delete match.gps['$within'];
+          delete match.gps.$within;
         }
         assert.deepEqual(query._conditions, match);
         done();
@@ -464,7 +464,7 @@ describe('Query', function () {
         var match = {gps: {$within: {$centerSphere: [[5, 25], 5]}}};
         if (Query.use$geoWithin) {
           match.gps.$geoWithin = match.gps.$within;
-          delete match.gps['$within'];
+          delete match.gps.$within;
         }
         assert.deepEqual(query._conditions, match);
         done();
@@ -478,7 +478,7 @@ describe('Query', function () {
         var match = {gps: {$within: {$polygon: [{a: {x: 10, y: 20}, b: {x: 15, y: 25}, c: {x: 20, y: 20}}]}}};
         if (Query.use$geoWithin) {
           match.gps.$geoWithin = match.gps.$within;
-          delete match.gps['$within'];
+          delete match.gps.$within;
         }
         assert.deepEqual(query._conditions, match);
         done();
@@ -842,7 +842,7 @@ describe('Query', function () {
       assert.equal(2, Object.keys(q._mongooseOptions.populate).length);
       assert.deepEqual(o, q._mongooseOptions.populate['yellow.brick']);
       o.path = 'dirt';
-      assert.deepEqual(o, q._mongooseOptions.populate['dirt']);
+      assert.deepEqual(o, q._mongooseOptions.populate.dirt);
       done();
     });
   });

@@ -83,12 +83,6 @@ describe('types array', function () {
 
       var pending = 3;
 
-      [tobi, loki, jane].forEach(function (pet) {
-        pet.save(function () {
-          --pending || cb();
-        });
-      });
-
       function cb() {
         Pet.find({}, function (err) {
           assert.ifError(err);
@@ -108,6 +102,12 @@ describe('types array', function () {
           });
         });
       }
+
+      [tobi, loki, jane].forEach(function (pet) {
+        pet.save(function () {
+          --pending || cb();
+        });
+      });
     });
   });
 

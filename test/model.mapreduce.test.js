@@ -79,16 +79,16 @@ describe('model: mapreduce:', function () {
         assert.ok(Array.isArray(ret));
         assert.ok(stats);
         ret.forEach(function (res) {
-          if ('aaron' == res._id) {
+          if (res._id === 'aaron') {
             assert.equal(3, res.value);
           }
-          if ('guillermo' == res._id) {
+          if (res._id === 'guillermo') {
             assert.equal(3, res.value);
           }
-          if ('brian' == res._id) {
+          if (res._id === 'brian') {
             assert.equal(2, res.value);
           }
-          if ('nathan' == res._id) {
+          if (res._id === 'nathan') {
             assert.equal(2, res.value);
           }
         });
@@ -275,16 +275,16 @@ describe('model: mapreduce:', function () {
         assert.ok(Array.isArray(ret));
         assert.ok(stats);
         ret.forEach(function (res) {
-          if ('aaron' == res._id) {
+          if (res._id === 'aaron') {
             assert.equal(6, res.value);
           }
-          if ('guillermo' == res._id) {
+          if (res._id === 'guillermo') {
             assert.equal(6, res.value);
           }
-          if ('brian' == res._id) {
+          if (res._id === 'brian') {
             assert.equal(4, res.value);
           }
-          if ('nathan' == res._id) {
+          if (res._id === 'nathan') {
             assert.equal(4, res.value);
           }
         });

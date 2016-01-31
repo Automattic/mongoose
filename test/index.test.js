@@ -221,10 +221,10 @@ describe('mongoose module:', function () {
           var A = m.model(name, s1);
           var B = m.model(name);
           var C = m.model(name, 'alternate');
-          assert.ok(A.collection.name == B.collection.name);
-          assert.ok(A.collection.name != C.collection.name);
-          assert.ok(m.models[name].collection.name != C.collection.name);
-          assert.ok(m.models[name].collection.name == A.collection.name);
+          assert.ok(A.collection.name === B.collection.name);
+          assert.ok(A.collection.name !== C.collection.name);
+          assert.ok(m.models[name].collection.name !== C.collection.name);
+          assert.ok(m.models[name].collection.name === A.collection.name);
           done();
         });
       });

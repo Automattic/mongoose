@@ -205,16 +205,16 @@ describe('model middleware', function () {
     parent.save(function (error) {
       assert.ifError(error);
       assert.equal(2, childPreCalls);
-      assert.equal(1, childPreCallsByName['Jaina']);
-      assert.equal(1, childPreCallsByName['Jacen']);
+      assert.equal(1, childPreCallsByName.Jaina);
+      assert.equal(1, childPreCallsByName.Jacen);
       assert.equal(1, parentPreCalls);
       parent.children[0].name = 'Anakin';
       parent.save(function (error) {
         assert.ifError(error);
         assert.equal(4, childPreCalls);
-        assert.equal(1, childPreCallsByName['Anakin']);
-        assert.equal(1, childPreCallsByName['Jaina']);
-        assert.equal(2, childPreCallsByName['Jacen']);
+        assert.equal(1, childPreCallsByName.Anakin);
+        assert.equal(1, childPreCallsByName.Jaina);
+        assert.equal(2, childPreCallsByName.Jacen);
 
         assert.equal(2, parentPreCalls);
         db.close();

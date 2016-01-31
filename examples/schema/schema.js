@@ -64,7 +64,7 @@ BlogPost.path('date')
   return new Date();
 })
 .set(function (v) {
-  return v == 'now' ? new Date() : v;
+  return v === 'now' ? new Date() : v;
 });
 
 /**

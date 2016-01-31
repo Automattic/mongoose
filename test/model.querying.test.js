@@ -62,7 +62,7 @@ describe('model: querying:', function () {
       if (err) {
         throw err;
       }
-      mongo26_or_greater = 2 < version[0] || (2 == version[0] && 6 <= version[1]);
+      mongo26_or_greater = version[0] > 2 || (version[0] === 2 && version[1] >= 6);
       if (!mongo26_or_greater) {
         console.log('not testing mongodb 2.6 features');
       }
@@ -1143,9 +1143,9 @@ describe('model: querying:', function () {
             var found2 = false;
 
             found.forEach(function (doc) {
-              if (doc.id == one.id) {
+              if (doc.id === one.id) {
                 found1 = true;
-              } else if (doc.id == two.id) {
+              } else if (doc.id === two.id) {
                 found2 = true;
               }
             });
@@ -1174,9 +1174,9 @@ describe('model: querying:', function () {
             var found2 = false;
 
             found.forEach(function (doc) {
-              if (doc.id == one.id) {
+              if (doc.id === one.id) {
                 found1 = true;
-              } else if (doc.id == two.id) {
+              } else if (doc.id === two.id) {
                 found2 = true;
               }
             });
@@ -1519,7 +1519,7 @@ describe('model: querying:', function () {
           assert.equal(docs[1].dt, '2011-03-31');
           assert.equal(docs[2].dt, '2011-04-01');
           assert.equal(false, docs.some(function (d) {
-            return '2011-04-02' === d.dt;
+            return d.dt === '2011-04-02';
           }));
         });
 
@@ -1533,10 +1533,10 @@ describe('model: querying:', function () {
           assert.equal(docs[0].dt, '2011-03-31');
           assert.equal(docs[1].dt, '2011-04-01');
           assert.equal(false, docs.some(function (d) {
-            return '2011-03-30' === d.dt;
+            return d.dt === '2011-03-30';
           }));
           assert.equal(false, docs.some(function (d) {
-            return '2011-04-02' === d.dt;
+            return d.dt === '2011-04-02';
           }));
         });
       }
@@ -1851,7 +1851,7 @@ describe('model: querying:', function () {
         if (err) {
           throw err;
         }
-        var mongo26_or_greater = 2 < version[0] || (2 == version[0] && 6 <= version[1]);
+        var mongo26_or_greater = version[0] > 2 || (version[0] === 2 && version[1] >= 6);
         if (!mongo26_or_greater) {
           return done();
         }
@@ -2316,7 +2316,7 @@ describe('geo-spatial', function () {
           throw err;
         }
 
-        mongo24_or_greater = 2 < version[0] || (2 == version[0] && 4 <= version[1]);
+        mongo24_or_greater = version[0] > 2 || (version[0] === 2 && version[1] >= 4);
         if (!mongo24_or_greater) {
           console.log('not testing mongodb 2.4 features');
         }
@@ -2330,7 +2330,7 @@ describe('geo-spatial', function () {
       }
 
       var ok = schema2dsphere.indexes().some(function (index) {
-        return '2dsphere' == index[0].loc;
+        return index[0].loc === '2dsphere';
       });
       assert.ok(ok);
       done();
@@ -2552,7 +2552,7 @@ describe('geo-spatial', function () {
         if (err) {
           return done(err);
         }
-        mongo24_or_greater = 2 < version[0] || (2 == version[0] && 4 <= version[1]);
+        mongo24_or_greater = version[0] > 2 || (version[0] === 2 && version[1] >= 4);
         if (!mongo24_or_greater) {
           console.log('not testing mongodb 2.4 features');
         }
@@ -2580,7 +2580,7 @@ describe('geo-spatial', function () {
             assert.ifError(err);
 
             var found = indexes.some(function (index) {
-              return 'hashed' === index.key.t;
+              return index.key.t === 'hashed';
             });
             assert.ok(found);
 
@@ -2595,7 +2595,7 @@ describe('geo-spatial', function () {
       });
 
       function complete() {
-        if (0 === --pending) {
+        if (--pending === 0) {
           db.close(done);
         }
       }
@@ -2713,7 +2713,7 @@ describe('lean option:', function () {
         if (err) {
           return done(err);
         }
-        mongo26 = 2 < version[0] || (2 == version[0] && 6 <= version[1]);
+        mongo26 = version[0] > 2 || (version[0] === 2 && version[1] >= 6);
         done();
       });
     });

@@ -36,7 +36,7 @@ describe('model', function () {
   before(function (done) {
     start.mongodVersion(function (err, version) {
       if (err) throw err;
-      mongo24_or_greater = 2 < version[0] || (2 == version[0] && 4 <= version[1]);
+      mongo24_or_greater = version[0] > 2 || (version[0] === 2 && version[1] >= 4);
       if (!mongo24_or_greater) console.log('not testing mongodb 2.4 features');
       done();
     });

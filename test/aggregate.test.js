@@ -532,7 +532,7 @@ describe('aggregate: ', function () {
         if (err) {
           return done(err);
         }
-        var mongo26 = 2 < version[0] || (2 == version[0] && 6 <= version[1]);
+        var mongo26 = version[0] > 2 || (version[0] === 2 && version[1] >= 6);
         if (!mongo26) {
           return done();
         }
@@ -602,7 +602,7 @@ describe('aggregate: ', function () {
       setupData(function (db) {
         start.mongodVersion(function (err, version) {
           if (err) throw err;
-          var mongo26_or_greater = 2 < version[0] || (2 == version[0] && 6 <= version[1]);
+          var mongo26_or_greater = version[0] > 2 || (version[0] === 2 && version[1] >= 6);
 
           var m = db.model('Employee');
           var match = {$match: {sal: {$gt: 15000}}};

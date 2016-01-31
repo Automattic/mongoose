@@ -72,13 +72,13 @@ describe('model', function () {
 
           for (var i in indexes) {
             indexes[i].forEach(function (index) {
-              if (index[0] == 'name') {
+              if (index[0] === 'name') {
                 assertions++;
               }
-              if (index[0] == 'blogposts._id') {
+              if (index[0] === 'blogposts._id') {
                 assertions++;
               }
-              if (index[0] == 'blogposts.title') {
+              if (index[0] === 'blogposts.title') {
                 assertions++;
               }
             });

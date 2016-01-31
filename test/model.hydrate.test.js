@@ -67,7 +67,7 @@ describe('model', function () {
 
       hydrated.validate(function (err) {
         assert.ok(err);
-        assert.ok(err.errors['food']);
+        assert.ok(err.errors.food);
         assert.deepEqual(['food'], Object.keys(err.errors));
         done();
       });

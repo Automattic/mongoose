@@ -68,13 +68,13 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function (err) {
 
     function closeDB() {
       User.count(function (err, res) {
-        if (res != 0) {
+        if (res !== 0) {
           console.log('Still mongoose entries left...');
         }
         mongoose.disconnect();
       });
       user.count({}, function (err, res) {
-        if (res != 0) {
+        if (res !== 0) {
           console.log('Still driver entries left...');
         }
         if (err) {

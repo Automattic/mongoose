@@ -35,21 +35,21 @@ describe('utils', function () {
     it('should detect a path as required if it has been required', function (done) {
       var ar = new ActiveRoster();
       ar.require('hello');
-      assert.equal(ar.paths['hello'], 'require');
+      assert.equal(ar.paths.hello, 'require');
       done();
     });
 
     it('should detect a path as inited if it has been inited', function (done) {
       var ar = new ActiveRoster();
       ar.init('hello');
-      assert.equal(ar.paths['hello'], 'init');
+      assert.equal(ar.paths.hello, 'init');
       done();
     });
 
     it('should detect a path as modified', function (done) {
       var ar = new ActiveRoster();
       ar.modify('hello');
-      assert.equal(ar.paths['hello'], 'modify');
+      assert.equal(ar.paths.hello, 'modify');
       done();
     });
 

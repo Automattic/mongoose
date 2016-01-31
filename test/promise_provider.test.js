@@ -80,7 +80,7 @@ describe('ES6 promises: ', function () {
         }).
         catch(function (err) {
           assert.ok(err);
-          assert.ok(err.errors['test']);
+          assert.ok(err.errors.test);
           done();
         });
     });
@@ -127,7 +127,7 @@ describe('ES6 promises: ', function () {
         }).
         catch(function (err) {
           assert.ok(err);
-          assert.ok(err.errors['test']);
+          assert.ok(err.errors.test);
           done();
         });
     });
@@ -216,7 +216,7 @@ describe('ES6 promises: ', function () {
         }).
         catch(function (err) {
           assert.ok(err);
-          assert.ok(err.errors['test']);
+          assert.ok(err.errors.test);
           done();
         });
     });
@@ -263,7 +263,7 @@ describe('ES6 promises: ', function () {
         }).
         catch(function (err) {
           assert.ok(err);
-          assert.ok(err.errors['test']);
+          assert.ok(err.errors.test);
           done();
         });
     });
@@ -394,7 +394,7 @@ describe('ES6 promises: ', function () {
         }).
         catch(function (err) {
           assert.ok(err);
-          assert.ok(err.errors['test']);
+          assert.ok(err.errors.test);
           done();
         });
     });
@@ -441,7 +441,7 @@ describe('ES6 promises: ', function () {
         }).
         catch(function (err) {
           assert.ok(err);
-          assert.ok(err.errors['test']);
+          assert.ok(err.errors.test);
           done();
         });
     });

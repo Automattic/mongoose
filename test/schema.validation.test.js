@@ -86,7 +86,7 @@ describe('schema', function () {
       Test.path('state').doValidate('x', function (err) {
         assert.ok(err instanceof ValidatorError);
         assert.equal(err.message,
-          'enum validator failed for path `state`: test');
+            'enum validator failed for path `state`: test');
       });
 
       Test.path('state').doValidate('opening', function (err) {
@@ -447,7 +447,9 @@ describe('schema', function () {
           setTimeout(function () {
             executed++;
             fn(value === true);
-            if (2 === executed) done();
+            if (executed == 2) {
+              done();
+            }
           }, 5);
         }
 
@@ -471,23 +473,22 @@ describe('schema', function () {
           setTimeout(function () {
             executed++;
             fn(value === true);
-            if (2 === executed) done();
+            if (executed === 2) {
+              done();
+            }
           }, 5);
         }
 
         var Animal = new Schema({
           ferret: {
             type: Boolean,
-            validate: [
-                {
-                  'validator': validator,
-                  'msg': 'validator1'
-                },
-                {
-                  'validator': validator,
-                  'msg': 'validator2'
-                }
-            ]
+            validate: [{
+              validator: validator,
+              msg: 'validator1'
+            }, {
+              validator: validator,
+              msg: 'validator2'
+            }]
           }
         });
 
@@ -520,16 +521,13 @@ describe('schema', function () {
         var Animal = new Schema({
           ferret: {
             type: Boolean,
-            validate: [
-                {
-                  'validator': validator1,
-                  'msg': 'validator1'
-                },
-                {
-                  'validator': validator2,
-                  'msg': 'validator2'
-                }
-            ]
+            validate: [{
+              validator: validator1,
+              msg: 'validator1'
+            }, {
+              validator: validator2,
+              msg: 'validator2'
+            }]
           }
         });
 
@@ -540,6 +538,7 @@ describe('schema', function () {
 
       it('scope', function (done) {
         var called = false;
+
         function validator(value, fn) {
           assert.equal('b', this.a);
 
@@ -634,7 +633,9 @@ describe('schema', function () {
             x: {
               type: String,
               validate: [{
-                validator: function () { return false; },
+                validator: function () {
+                  return false;
+                },
                 msg: 'Error code {ERRORCODE}',
                 errorCode: 25
               }]
@@ -655,7 +656,9 @@ describe('schema', function () {
             x: {
               type: String,
               validate: [{
-                validator: function (value, fn) { fn(false, 'Custom message'); },
+                validator: function (value, fn) {
+                  fn(false, 'Custom message');
+                },
                 msg: 'Does not matter'
               }]
             }
@@ -677,6 +680,7 @@ describe('schema', function () {
           function validate() {
             return false;
           }
+
           var validator = [validate, '{PATH} failed validation ({VALUE})', 'customType'];
 
           var schema = new Schema({x: {type: [], validate: validator}});
@@ -695,8 +699,9 @@ describe('schema', function () {
           function validate() {
             return false;
           }
+
           var validator = [
-              {validator: validate, msg: '{PATH} failed validation ({VALUE})', type: 'customType'}
+            {validator: validate, msg: '{PATH} failed validation ({VALUE})', type: 'customType'}
           ];
           var schema = new Schema({x: {type: [], validate: validator}});
           var M = mongoose.model('custom-validator-' + random(), schema);
@@ -720,7 +725,7 @@ describe('schema', function () {
       user.validate(function (err) {
         assert.ok(err);
         assert.ok(user.errors);
-        assert.ok(user.errors['name']);
+        assert.ok(user.errors.name);
         user.name = 'bacon';
         user.validate(function (err) {
           assert.ok(!err);
@@ -746,10 +751,10 @@ describe('schema', function () {
           assert.ok(error);
           assert.ok(error.errors['foods.0']);
           assert.equal(error.errors['foods.0'].message,
-            '`tofu` is not a valid enum value for path `foods`.');
+              '`tofu` is not a valid enum value for path `foods`.');
           assert.ok(error.errors['foods.1']);
           assert.equal(error.errors['foods.1'].message,
-            '`waffles` is not a valid enum value for path `foods`.');
+              '`waffles` is not a valid enum value for path `foods`.');
           assert.ok(!error.errors['foods.2']);
 
           done();
@@ -781,7 +786,7 @@ describe('schema', function () {
           assert.ok(error);
           assert.ok(error.errors['votes.0.vote']);
           assert.equal(error.errors['votes.0.vote'].message,
-            '`terrible` is not a valid enum value for path `vote`.');
+              '`terrible` is not a valid enum value for path `vote`.');
 
           done();
         });
@@ -891,7 +896,7 @@ describe('schema', function () {
       bad.validate(function (error) {
         assert.ok(error);
         var errorMessage = 'CastError: Cast to Object failed for value ' +
-          '"waffles" at path "foods"';
+            '"waffles" at path "foods"';
         assert.ok(error.toString().indexOf(errorMessage) !== -1, error.toString());
         done();
       });
@@ -935,8 +940,8 @@ describe('schema', function () {
 
       assert.ok(error);
       assert.equal(Object.keys(error.errors).length, 1);
-      assert.ok(error.errors['other']);
-      assert.ok(!error.errors['description']);
+      assert.ok(error.errors.other);
+      assert.ok(!error.errors.description);
       done();
     });
 
@@ -955,7 +960,11 @@ describe('schema', function () {
 
     it('sets path correctly when setter throws exception (gh-2832)', function (done) {
       var breakfast = new Schema({
-        description: {type: String, set: function () { throw new Error('oops'); }}
+        description: {
+          type: String, set: function () {
+            throw new Error('oops');
+          }
+        }
       });
 
       var Breakfast = mongoose.model('gh2832', breakfast, 'gh2832');
@@ -963,8 +972,8 @@ describe('schema', function () {
         assert.ok(error);
         var errorMessage = 'ValidationError: CastError: Cast to String failed for value "undefined" at path "description"';
         assert.equal(errorMessage, error.toString());
-        assert.ok(error.errors['description']);
-        assert.equal(error.errors['description'].reason.toString(), 'Error: oops');
+        assert.ok(error.errors.description);
+        assert.equal(error.errors.description.reason.toString(), 'Error: oops');
         done();
       });
     });
@@ -991,13 +1000,21 @@ describe('schema', function () {
     });
 
     it('returns correct kind for user defined custom validators (gh-2885)', function (done) {
-      var s = mongoose.Schema({n: {type: String, validate: {validator: function () { return false; }}, msg: 'fail'}});
+      var s = mongoose.Schema({
+        n: {
+          type: String, validate: {
+            validator: function () {
+              return false;
+            }
+          }, msg: 'fail'
+        }
+      });
       var M = mongoose.model('gh2885', s);
 
       var m = new M({n: 'test'});
       m.validate(function (error) {
         assert.ok(error);
-        assert.equal(error.errors['n'].kind, 'user defined');
+        assert.equal(error.errors.n.kind, 'user defined');
         done();
       });
     });
@@ -1009,14 +1026,18 @@ describe('schema', function () {
       var m = new M({n: 'test'});
       m.validate(function (error) {
         assert.ok(error);
-        assert.equal(error.errors['n'].kind, 'enum');
+        assert.equal(error.errors.n.kind, 'enum');
         done();
       });
     });
 
     it('skips conditional required (gh-3539)', function (done) {
       var s = mongoose.Schema({
-        n: {type: Number, required: function () { return false; }, min: 0}
+        n: {
+          type: Number, required: function () {
+            return false;
+          }, min: 0
+        }
       });
       var M = mongoose.model('gh3539', s);
 

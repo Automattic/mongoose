@@ -549,23 +549,22 @@ describe('model: update:', function () {
     var post = new BlogPost;
     post.set('meta.visitors', 5);
 
+    function complete() {
+      BlogPost.findOne({_id: post.get('_id')}, function (err, doc) {
+        db.close();
+        assert.ifError(err);
+        assert.equal(9, doc.get('meta.visitors'));
+        done();
+      });
+    }
+
     post.save(function (err) {
       assert.ifError(err);
-
       for (var i = 0; i < 4; ++i) {
         BlogPost
         .update({_id: post._id}, {$inc: {'meta.visitors': 1}}, function (err) {
           assert.ifError(err);
           --totalDocs || complete();
-        });
-      }
-
-      function complete() {
-        BlogPost.findOne({_id: post.get('_id')}, function (err, doc) {
-          db.close();
-          assert.ifError(err);
-          assert.equal(9, doc.get('meta.visitors'));
-          done();
         });
       }
     });
@@ -784,7 +783,7 @@ describe('model: update:', function () {
     before(function (done) {
       start.mongodVersion(function (err, version) {
         assert.ifError(err);
-        mongo24_or_greater = 2 < version[0] || (2 == version[0] && 4 <= version[1]);
+        mongo24_or_greater = version[0] > 2 || (version[0] === 2 && version[1] >= 4);
         done();
       });
     });
@@ -882,7 +881,7 @@ describe('model: update:', function () {
     before(function (done) {
       start.mongodVersion(function (err, version) {
         assert.ifError(err);
-        mongo26_or_greater = 2 < version[0] || (2 == version[0] && 6 <= version[1]);
+        mongo26_or_greater = version[0] > 2 || (version[0] === 2 && version[1] >= 6);
         done();
       });
     });
@@ -1102,12 +1101,14 @@ describe('model: update:', function () {
 
       var s = new Schema({
         topping: {
-          type: String, validate: function () {
+          type: String,
+          validate: function () {
             return false;
           }
         },
         base: {
-          type: String, validate: function () {
+          type: String,
+          validate: function () {
             return true;
           }
         }
@@ -1119,8 +1120,7 @@ describe('model: update:', function () {
         assert.ok(!!error);
         assert.equal(1, Object.keys(error.errors).length);
         assert.equal('topping', Object.keys(error.errors)[0]);
-        assert.equal('Validator failed for path `topping` with value `bacon`',
-            error.errors['topping'].message);
+        assert.equal('Validator failed for path `topping` with value `bacon`', error.errors.topping.message);
 
         Breakfast.findOne({}, function (error, breakfast) {
           assert.ifError(error);
@@ -1152,10 +1152,8 @@ describe('model: update:', function () {
         assert.equal(2, Object.keys(error.errors).length);
         assert.ok(Object.keys(error.errors).indexOf('eggs') !== -1);
         assert.ok(Object.keys(error.errors).indexOf('steak') !== -1);
-        assert.equal('Validator failed for path `eggs` with value `softboiled`',
-            error.errors['eggs'].message);
-        assert.equal('Path `steak` is required.',
-            error.errors['steak'].message);
+        assert.equal('Validator failed for path `eggs` with value `softboiled`', error.errors.eggs.message);
+        assert.equal('Path `steak` is required.', error.errors.steak.message);
         db.close();
         done();
       });
@@ -1176,23 +1174,19 @@ describe('model: update:', function () {
         assert.ok(!!error);
         assert.equal(1, Object.keys(error.errors).length);
         assert.equal('eggs', Object.keys(error.errors)[0]);
-        assert.equal('Path `eggs` (3) is less than minimum allowed value (4).',
-            error.errors['eggs'].message);
+        assert.equal('Path `eggs` (3) is less than minimum allowed value (4).', error.errors.eggs.message);
 
         Breakfast.update({}, {$set: {steak: 'tofu', eggs: 5, bacon: '3 strips'}}, updateOptions, function (error) {
           assert.ok(!!error);
           assert.equal(1, Object.keys(error.errors).length);
           assert.equal('steak', Object.keys(error.errors)[0]);
-          assert.equal('`tofu` is not a valid enum value for path `steak`.',
-              error.errors['steak']);
-
+          assert.equal('`tofu` is not a valid enum value for path `steak`.', error.errors.steak);
 
           Breakfast.update({}, {$set: {steak: 'sirloin', eggs: 6, bacon: 'none'}}, updateOptions, function (error) {
             assert.ok(!!error);
             assert.equal(1, Object.keys(error.errors).length);
             assert.equal('bacon', Object.keys(error.errors)[0]);
-            assert.equal('Path `bacon` is invalid (none).',
-                error.errors['bacon'].message);
+            assert.equal('Path `bacon` is invalid (none).', error.errors.bacon.message);
 
             db.close();
             done();

@@ -190,7 +190,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function (err) {
             }
             --count || deferred.resolve();
           });
-          if (i % 15 == 0) {
+          if (i % 15 === 0) {
             var nData = utils.clone(data);
             User.create(nData, function (err) {
               if (err) {
@@ -212,7 +212,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function (err) {
             }
             --count || deferred.resolve();
           });
-          if (i % 15 == 0) {
+          if (i % 15 === 0) {
             var nData = utils.clone(data);
             user.insert(nData, function (err) {
               if (err) {
@@ -234,7 +234,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function (err) {
             }
             --count || deferred.resolve();
           });
-          if (i % 15 == 0) {
+          if (i % 15 === 0) {
             var nData = utils.clone(blogData);
             BlogPost.create(nData, function (err) {
               if (err) {
@@ -256,7 +256,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function (err) {
             }
             --count || deferred.resolve();
           });
-          if (i % 15 == 0) {
+          if (i % 15 === 0) {
             var nData = utils.clone(blogData);
             blogpost.insert(nData, function (err) {
               if (err) {
@@ -280,7 +280,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function (err) {
             }
             --count || deferred.resolve();
           });
-          if (i % 15 == 0) {
+          if (i % 15 === 0) {
             User.findOne({_id: getNextmId()}, function (err) {
               if (err) {
                 throw err;
@@ -303,7 +303,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function (err) {
             }
             --count || deferred.resolve();
           });
-          if (i % 15 == 0) {
+          if (i % 15 === 0) {
             user.findOne({_id: getNextdId()}, function (err) {
               if (err) {
                 throw err;
@@ -326,7 +326,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function (err) {
             }
             --count || deferred.resolve();
           });
-          if (i % 15 == 0) {
+          if (i % 15 === 0) {
             BlogPost.findOne({_id: getNextbmId()}, function (err) {
               if (err) {
                 throw err;
@@ -349,7 +349,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function (err) {
             }
             --count || deferred.resolve();
           });
-          if (i % 15 == 0) {
+          if (i % 15 === 0) {
             blogpost.findOne({_id: getNextbdId()}, function (err) {
               if (err) {
                 throw err;
@@ -384,7 +384,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function (err) {
               --count || deferred.resolve();
             }
           });
-          if (i % 15 == 0) {
+          if (i % 15 === 0) {
             var nData = utils.clone(blogData);
             BlogPost.create(nData, function (err) {
               if (err) {
@@ -420,7 +420,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function (err) {
               --count || deferred.resolve();
             }
           });
-          if (i % 15 == 0) {
+          if (i % 15 === 0) {
             var nData = utils.clone(blogData);
             blogpost.insert(nData, function (err) {
               if (err) {

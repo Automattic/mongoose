@@ -20,7 +20,7 @@
         ObjectId.createFromHexString('00000000000000000000001');
         assert.ok(false);
       } catch (err) {
-        assert.ok(err != null);
+        assert.ok(err !== null);
       }
 
       done();

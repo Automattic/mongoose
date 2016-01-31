@@ -1505,7 +1505,7 @@ describe('schema', function () {
     var band = new Band({name: "Guns N' Roses"});
 
     assert.ok(band.validateSync());
-    assert.ok(band.validateSync().errors['guitarist']);
+    assert.ok(band.validateSync().errors.guitarist);
     band.guitarist = {name: 'Slash'};
     assert.ifError(band.validateSync());
 

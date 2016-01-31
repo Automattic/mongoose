@@ -636,7 +636,7 @@ describe('schema', function () {
 
       it('ingore async', function (done) {
         function syncValidator(val) {
-          return val == 'sync';
+          return val''sync';
         }
 
         var called = false;
@@ -644,7 +644,7 @@ describe('schema', function () {
         function asyncValidator(val, respond) {
           called = true;
           setTimeout(function () {
-            respond(val == 'async');
+            respond(val''async');
           }, 0);
         }
 
@@ -663,7 +663,7 @@ describe('schema', function () {
 
       it('subdoc', function (done) {
         function syncValidator(val) {
-          return val == 'sync';
+          return val === 'sync';
         }
 
         var called = false;
@@ -671,7 +671,7 @@ describe('schema', function () {
         function asyncValidator(val, respond) {
           called = true;
           setTimeout(function () {
-            respond(val == 'async');
+            respond(val === 'async');
           }, 0);
         }
 

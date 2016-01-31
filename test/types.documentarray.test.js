@@ -154,8 +154,8 @@ describe('types.documentarray', function () {
     sub4 = new Subdocument();
     sub4.title = 'rock-n-roll';
 
-    a = new MongooseDocumentArray([sub4]),
-        threw = false;
+    a = new MongooseDocumentArray([sub4]);
+    threw = false;
     try {
       a.id('i better not throw');
     } catch (err) {

@@ -168,7 +168,7 @@ describe('connections:', function () {
 
               assert.notEqual(port1, db.port);
               assert.ok(db1 !== db.db);
-              assert.ok(db1.serverConfig.port != db.db.serverConfig.port);
+              assert.ok(db1.serverConfig.port !== db.db.serverConfig.port);
 
               var port2 = db.port;
               var db2 = db.db;
@@ -184,7 +184,7 @@ describe('connections:', function () {
 
                   assert.notEqual(port2, db.port);
                   assert.ok(db2 !== db.db);
-                  assert.ok(db2.serverConfig.port != db.db.serverConfig.port);
+                  assert.ok(db2.serverConfig.port !== db.db.serverConfig.port);
 
                   db.close(done);
                 });
@@ -711,7 +711,7 @@ describe('connections:', function () {
       var A = mongoose.model('testing853a', new Schema({x: String}), 'testing853-1');
       var B = mongoose.model('testing853b', new Schema({x: String}), 'testing853-2');
       var C = B.model('testing853a');
-      assert.ok(C == A);
+      assert.ok(C === A);
       done();
     });
 
@@ -761,7 +761,7 @@ describe('connections:', function () {
       var A = mongoose.model('gh-1209-a', s1);
       var B = db.model('gh-1209-a', s2);
 
-      assert.ok(A.schema != B.schema);
+      assert.ok(A.schema !== B.schema);
       assert.ok(A.schema.paths.one);
       assert.ok(B.schema.paths.two);
       assert.ok(!B.schema.paths.one);
@@ -770,7 +770,7 @@ describe('connections:', function () {
       // reset
       delete db.models['gh-1209-a'];
       var C = db.model('gh-1209-a');
-      assert.ok(C.schema == A.schema);
+      assert.ok(C.schema === A.schema);
 
       db.close();
       done();
@@ -797,10 +797,10 @@ describe('connections:', function () {
           var A = db.model(name, s1);
           var B = db.model(name);
           var C = db.model(name, 'alternate');
-          assert.ok(A.collection.name == B.collection.name);
-          assert.ok(A.collection.name != C.collection.name);
-          assert.ok(db.models[name].collection.name != C.collection.name);
-          assert.ok(db.models[name].collection.name == A.collection.name);
+          assert.ok(A.collection.name === B.collection.name);
+          assert.ok(A.collection.name !== C.collection.name);
+          assert.ok(db.models[name].collection.name !== C.collection.name);
+          assert.ok(db.models[name].collection.name === A.collection.name);
           db.close();
           done();
         });

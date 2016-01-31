@@ -698,7 +698,7 @@ describe('document: hooks:', function () {
 
   describe('gh-3284', function () {
     it('should call pre hooks on nested subdoc', function (done) {
-      var self = this;
+      var _this = this;
 
       var childSchema = new Schema({
         title: String
@@ -706,7 +706,7 @@ describe('document: hooks:', function () {
 
       ['init', 'save', 'validate'].forEach(function (type) {
         childSchema.pre(type, function (next) {
-          self['pre' + type + 'Called'] = true;
+          _this['pre' + type + 'Called'] = true;
           next();
         });
       });
@@ -734,9 +734,9 @@ describe('document: hooks:', function () {
         return Parent.findById(parent._id);
       }).then(function () {
         db.close();
-        assert.ok(self.preinitCalled);
-        assert.ok(self.prevalidateCalled);
-        assert.ok(self.presaveCalled);
+        assert.ok(_this.preinitCalled);
+        assert.ok(_this.prevalidateCalled);
+        assert.ok(_this.presaveCalled);
         done();
       });
     });

@@ -52,6 +52,17 @@ describe('query stream:', function () {
 
     var stream = P.find().batchSize(3).stream();
 
+    function cb() {
+      db.close();
+      assert.strictEqual(undefined, err);
+      assert.equal(i, names.length);
+      assert.equal(1, closed);
+      assert.equal(1, paused);
+      assert.equal(1, resumed);
+      assert.equal(true, stream._cursor.isClosed());
+      done();
+    }
+
     stream.on('data', function (doc) {
       assert.strictEqual(true, !!doc.name);
       assert.strictEqual(true, !!doc._id);
@@ -96,17 +107,6 @@ describe('query stream:', function () {
       closed++;
       cb();
     });
-
-    function cb() {
-      db.close();
-      assert.strictEqual(undefined, err);
-      assert.equal(i, names.length);
-      assert.equal(1, closed);
-      assert.equal(1, paused);
-      assert.equal(1, resumed);
-      assert.equal(true, stream._cursor.isClosed());
-      done();
-    }
   });
 
   it('immediately destroying a stream prevents the query from executing', function (done) {
@@ -115,14 +115,6 @@ describe('query stream:', function () {
         i = 0;
 
     var stream = P.where('name', 'Jonah').select('name').findOne().stream();
-
-    stream.on('data', function () {
-      i++;
-    });
-    stream.on('close', cb);
-    stream.on('error', cb);
-
-    stream.destroy();
 
     function cb(err) {
       assert.ifError(err);
@@ -133,6 +125,14 @@ describe('query stream:', function () {
         done();
       });
     }
+
+    stream.on('data', function () {
+      i++;
+    });
+    stream.on('close', cb);
+    stream.on('error', cb);
+
+    stream.destroy();
   });
 
   it('destroying a stream stops it', function (done) {
@@ -148,17 +148,6 @@ describe('query stream:', function () {
     assert.strictEqual(null, stream._destroyed);
     assert.equal(true, stream.readable);
 
-    stream.on('data', function (doc) {
-      assert.strictEqual(undefined, doc.name);
-      if (++i === 5) {
-        stream.destroy();
-        assert.equal(false, stream.readable);
-      }
-    });
-
-    stream.on('close', cb);
-    stream.on('error', cb);
-
     function cb(err) {
       ++finished;
       setTimeout(function () {
@@ -172,6 +161,17 @@ describe('query stream:', function () {
         done();
       }, 100);
     }
+
+    stream.on('data', function (doc) {
+      assert.strictEqual(undefined, doc.name);
+      if (++i === 5) {
+        stream.destroy();
+        assert.equal(false, stream.readable);
+      }
+    });
+
+    stream.on('close', cb);
+    stream.on('error', cb);
   });
 
   it('errors', function (done) {
@@ -184,18 +184,6 @@ describe('query stream:', function () {
         i = 0;
 
     var stream = P.find().batchSize(5).stream();
-
-    stream.on('data', function () {
-      if (++i === 5) {
-        db.close();
-      }
-    });
-
-    stream.on('close', function () {
-      closed++;
-    });
-
-    stream.on('error', cb);
 
     function cb(err) {
       ++finished;
@@ -210,6 +198,18 @@ describe('query stream:', function () {
         done();
       }, 100);
     }
+
+    stream.on('data', function () {
+      if (++i === 5) {
+        db.close();
+      }
+    });
+
+    stream.on('close', function () {
+      closed++;
+    });
+
+    stream.on('error', cb);
   });
 
   it('pipe', function (done) {
@@ -222,7 +222,7 @@ describe('query stream:', function () {
     var stream = P.find().sort('name').limit(20).stream(opts);
     stream.pipe(out);
 
-    var cb = function (err) {
+    function cb(err) {
       db.close();
       assert.ifError(err);
       var contents = fs.readFileSync(filename, 'utf8');
@@ -233,7 +233,7 @@ describe('query stream:', function () {
       assert.ok(/Agustin/.test(contents));
       fs.unlink(filename);
       done();
-    };
+    }
 
     stream.on('error', cb);
     out.on('close', cb);
@@ -247,6 +247,15 @@ describe('query stream:', function () {
         err;
 
     var stream = P.find({}).lean().stream();
+
+    function cb() {
+      db.close();
+      assert.strictEqual(undefined, err);
+      assert.equal(i, names.length);
+      assert.equal(1, closed);
+      assert.equal(true, stream._cursor.isClosed());
+      done();
+    }
 
     stream.on('data', function (doc) {
       assert.strictEqual(false, doc instanceof mongoose.Document);
@@ -277,15 +286,6 @@ describe('query stream:', function () {
       closed++;
       cb();
     });
-
-    var cb = function () {
-      db.close();
-      assert.strictEqual(undefined, err);
-      assert.equal(i, names.length);
-      assert.equal(1, closed);
-      assert.equal(true, stream._cursor.isClosed());
-      done();
-    };
   });
 
   it('supports $elemMatch with $in (gh-1091)', function (done) {
@@ -342,6 +342,14 @@ describe('query stream:', function () {
     var Bar = db.model('Bar', barSchema);
     var found = [];
 
+    function complete(err) {
+      if (!err) {
+        assert.ok(~found.indexOf(2));
+        assert.ok(~found.indexOf(3));
+      }
+      db.close(done);
+    }
+
     Bar.create({value: 2}, {value: 3}, function (err, bar1, bar2) {
       if (err) return complete(err);
 
@@ -359,14 +367,6 @@ describe('query stream:', function () {
           on('error', complete);
       });
     });
-
-    var complete = function (err) {
-      if (!err) {
-        assert.ok(~found.indexOf(2));
-        assert.ok(~found.indexOf(3));
-      }
-      db.close(done);
-    };
   });
 
   it('respects schema options (gh-1862)', function (done) {

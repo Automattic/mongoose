@@ -48,7 +48,7 @@ describe('model aggregate', function () {
       assert.ifError(err);
       start.mongodVersion(function (err, version) {
         if (err) throw err;
-        mongo26_or_greater = 2 < version[0] || (2 == version[0] && 6 <= version[1]);
+        mongo26_or_greater = version[0] > 2 || (version[0] === 2 && version[1] >= 6);
         if (!mongo26_or_greater) console.log('not testing mongodb 2.6 features');
         done();
       });

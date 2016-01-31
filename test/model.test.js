@@ -782,8 +782,9 @@ describe('Model', function () {
           BlogPost = db.model('BlogPost', collection),
           threw = false;
 
+      var post;
       try {
-        var post = new BlogPost({date: 'Test', meta: {date: 'Test'}});
+        post = new BlogPost({date: 'Test', meta: {date: 'Test'}});
       } catch (e) {
         threw = true;
       }
@@ -1542,7 +1543,7 @@ describe('Model', function () {
         });
 
         ValidationMiddlewareSchema.pre('validate', function (next) {
-          if (this.get('baz') == 'bad') {
+          if (this.get('baz') === 'bad') {
             this.invalidate('baz', 'bad');
           }
           next();
@@ -1580,10 +1581,10 @@ describe('Model', function () {
         });
 
         AsyncValidationMiddlewareSchema.pre('validate', true, function (next, done) {
-          var self = this;
+          var _this = this;
           setTimeout(function () {
-            if (self.get('prop') == 'bad') {
-              self.invalidate('prop', 'bad');
+            if (_this.get('prop') === 'bad') {
+              _this.invalidate('prop', 'bad');
             }
             done();
           }, 5);
@@ -1628,10 +1629,10 @@ describe('Model', function () {
         });
 
         ComplexValidationMiddlewareSchema.pre('validate', true, function (next, done) {
-          var self = this;
+          var _this = this;
           setTimeout(function () {
-            if (self.get('baz') == 'bad') {
-              self.invalidate('baz', 'bad');
+            if (_this.get('baz') === 'bad') {
+              _this.invalidate('baz', 'bad');
             }
             done();
           }, 5);
@@ -2532,6 +2533,58 @@ describe('Model', function () {
 
       var post = new BlogPost;
 
+      function complete() {
+        BlogPost.findOne({_id: post.get('_id')}, function (err, doc) {
+          db.close();
+
+          assert.ifError(err);
+          assert.equal(doc.get('comments').length, 5);
+
+          var v = doc.get('comments').some(function (comment) {
+            return comment.get('title') === '1';
+          });
+
+          assert.ok(v);
+
+          v = doc.get('comments').some(function (comment) {
+            return comment.get('title') === '2';
+          });
+
+          assert.ok(v);
+
+          v = doc.get('comments').some(function (comment) {
+            return comment.get('title') === '3';
+          });
+
+          assert.ok(v);
+
+          v = doc.get('comments').some(function (comment) {
+            return comment.get('title') === '4';
+          });
+
+          assert.ok(v);
+
+          v = doc.get('comments').some(function (comment) {
+            return comment.get('title') === '5';
+          });
+
+          assert.ok(v);
+          done();
+        });
+      }
+
+      function save(doc) {
+        saveQueue.push(doc);
+        if (saveQueue.length === 4) {
+          saveQueue.forEach(function (doc) {
+            doc.save(function (err) {
+              assert.ifError(err);
+              --totalDocs || complete();
+            });
+          });
+        }
+      }
+
       post.save(function (err) {
         assert.ifError(err);
 
@@ -2558,58 +2611,6 @@ describe('Model', function () {
           doc.get('comments').push({title: '4'}, {title: '5'});
           save(doc);
         });
-
-        function save(doc) {
-          saveQueue.push(doc);
-          if (saveQueue.length == 4) {
-            saveQueue.forEach(function (doc) {
-              doc.save(function (err) {
-                assert.ifError(err);
-                --totalDocs || complete();
-              });
-            });
-          }
-        }
-
-        function complete() {
-          BlogPost.findOne({_id: post.get('_id')}, function (err, doc) {
-            db.close();
-
-            assert.ifError(err);
-            assert.equal(doc.get('comments').length, 5);
-
-            var v = doc.get('comments').some(function (comment) {
-              return comment.get('title') == '1';
-            });
-
-            assert.ok(v);
-
-            v = doc.get('comments').some(function (comment) {
-              return comment.get('title') == '2';
-            });
-
-            assert.ok(v);
-
-            v = doc.get('comments').some(function (comment) {
-              return comment.get('title') == '3';
-            });
-
-            assert.ok(v);
-
-            v = doc.get('comments').some(function (comment) {
-              return comment.get('title') == '4';
-            });
-
-            assert.ok(v);
-
-            v = doc.get('comments').some(function (comment) {
-              return comment.get('title') == '5';
-            });
-
-            assert.ok(v);
-            done();
-          });
-        }
       });
     });
 
@@ -2870,6 +2871,41 @@ describe('Model', function () {
 
       var t = new Temp();
 
+      function complete() {
+        Temp.findOne({_id: t.get('_id')}, function (err, doc) {
+          assert.ifError(err);
+          assert.equal(3, doc.get('nums').length);
+
+          var v = doc.get('nums').some(function (num) {
+            return num.valueOf() === 1;
+          });
+          assert.ok(v);
+
+          v = doc.get('nums').some(function (num) {
+            return num.valueOf() === 2;
+          });
+          assert.ok(v);
+
+          v = doc.get('nums').some(function (num) {
+            return num.valueOf() === 3;
+          });
+          assert.ok(v);
+          db.close(done);
+        });
+      }
+
+      function save(doc) {
+        saveQueue.push(doc);
+        if (saveQueue.length === totalDocs) {
+          saveQueue.forEach(function (doc) {
+            doc.save(function (err) {
+              assert.ifError(err);
+              --totalDocs || complete();
+            });
+          });
+        }
+      }
+
       t.save(function (err) {
         assert.ifError(err);
 
@@ -2884,41 +2920,6 @@ describe('Model', function () {
           doc.get('nums').push(2, 3);
           save(doc);
         });
-
-        function save(doc) {
-          saveQueue.push(doc);
-          if (saveQueue.length == totalDocs) {
-            saveQueue.forEach(function (doc) {
-              doc.save(function (err) {
-                assert.ifError(err);
-                --totalDocs || complete();
-              });
-            });
-          }
-        }
-
-        function complete() {
-          Temp.findOne({_id: t.get('_id')}, function (err, doc) {
-            assert.ifError(err);
-            assert.equal(3, doc.get('nums').length);
-
-            var v = doc.get('nums').some(function (num) {
-              return num.valueOf() == '1';
-            });
-            assert.ok(v);
-
-            v = doc.get('nums').some(function (num) {
-              return num.valueOf() == '2';
-            });
-            assert.ok(v);
-
-            v = doc.get('nums').some(function (num) {
-              return num.valueOf() == '3';
-            });
-            assert.ok(v);
-            db.close(done);
-          });
-        }
       });
     });
 
@@ -2935,6 +2936,43 @@ describe('Model', function () {
 
       var t = new StrList();
 
+      function complete() {
+        StrList.findOne({_id: t.get('_id')}, function (err, doc) {
+          db.close();
+          assert.ifError(err);
+
+          assert.equal(3, doc.get('strings').length);
+
+          var v = doc.get('strings').some(function (str) {
+            return str === 'a';
+          });
+          assert.ok(v);
+
+          v = doc.get('strings').some(function (str) {
+            return str === 'b';
+          });
+          assert.ok(v);
+
+          v = doc.get('strings').some(function (str) {
+            return str === 'c';
+          });
+          assert.ok(v);
+          done();
+        });
+      }
+
+      function save(doc) {
+        saveQueue.push(doc);
+        if (saveQueue.length === totalDocs) {
+          saveQueue.forEach(function (doc) {
+            doc.save(function (err) {
+              assert.ifError(err);
+              --totalDocs || complete();
+            });
+          });
+        }
+      }
+
       t.save(function (err) {
         assert.ifError(err);
 
@@ -2949,44 +2987,6 @@ describe('Model', function () {
           doc.get('strings').push('b', 'c');
           save(doc);
         });
-
-
-        function save(doc) {
-          saveQueue.push(doc);
-          if (saveQueue.length == totalDocs) {
-            saveQueue.forEach(function (doc) {
-              doc.save(function (err) {
-                assert.ifError(err);
-                --totalDocs || complete();
-              });
-            });
-          }
-        }
-
-        function complete() {
-          StrList.findOne({_id: t.get('_id')}, function (err, doc) {
-            db.close();
-            assert.ifError(err);
-
-            assert.equal(3, doc.get('strings').length);
-
-            var v = doc.get('strings').some(function (str) {
-              return str == 'a';
-            });
-            assert.ok(v);
-
-            v = doc.get('strings').some(function (str) {
-              return str == 'b';
-            });
-            assert.ok(v);
-
-            v = doc.get('strings').some(function (str) {
-              return str == 'c';
-            });
-            assert.ok(v);
-            done();
-          });
-        }
       });
     });
 
@@ -3003,6 +3003,44 @@ describe('Model', function () {
 
       var t = new BufList();
 
+      function complete() {
+        BufList.findOne({_id: t.get('_id')}, function (err, doc) {
+          db.close();
+          assert.ifError(err);
+
+          assert.equal(3, doc.get('buffers').length);
+
+          var v = doc.get('buffers').some(function (buf) {
+            return buf[0] === 140;
+          });
+          assert.ok(v);
+
+          v = doc.get('buffers').some(function (buf) {
+            return buf[0] === 141;
+          });
+          assert.ok(v);
+
+          v = doc.get('buffers').some(function (buf) {
+            return buf[0] === 142;
+          });
+          assert.ok(v);
+
+          done();
+        });
+      }
+
+      function save(doc) {
+        saveQueue.push(doc);
+        if (saveQueue.length === totalDocs) {
+          saveQueue.forEach(function (doc) {
+            doc.save(function (err) {
+              assert.ifError(err);
+              --totalDocs || complete();
+            });
+          });
+        }
+      }
+
       t.save(function (err) {
         assert.ifError(err);
 
@@ -3017,44 +3055,6 @@ describe('Model', function () {
           doc.get('buffers').push(new Buffer([141]), new Buffer([142]));
           save(doc);
         });
-
-        function save(doc) {
-          saveQueue.push(doc);
-          if (saveQueue.length == totalDocs) {
-            saveQueue.forEach(function (doc) {
-              doc.save(function (err) {
-                assert.ifError(err);
-                --totalDocs || complete();
-              });
-            });
-          }
-        }
-
-        function complete() {
-          BufList.findOne({_id: t.get('_id')}, function (err, doc) {
-            db.close();
-            assert.ifError(err);
-
-            assert.equal(3, doc.get('buffers').length);
-
-            var v = doc.get('buffers').some(function (buf) {
-              return buf[0] == 140;
-            });
-            assert.ok(v);
-
-            v = doc.get('buffers').some(function (buf) {
-              return buf[0] == 141;
-            });
-            assert.ok(v);
-
-            v = doc.get('buffers').some(function (buf) {
-              return buf[0] == 142;
-            });
-            assert.ok(v);
-
-            done();
-          });
-        }
       });
     });
 

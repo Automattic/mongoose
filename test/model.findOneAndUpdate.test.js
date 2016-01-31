@@ -1195,12 +1195,14 @@ describe('model: findByIdAndUpdate:', function () {
 
       var s = new Schema({
         topping: {
-          type: String, validate: function () {
+          type: String,
+          validate: function () {
             return false;
           }
         },
         base: {
-          type: String, validate: function () {
+          type: String,
+          validate: function () {
             return true;
           }
         }
@@ -1222,8 +1224,7 @@ describe('model: findByIdAndUpdate:', function () {
             assert.ok(!breakfast);
             assert.equal(1, Object.keys(error.errors).length);
             assert.equal('topping', Object.keys(error.errors)[0]);
-            assert.equal('Validator failed for path `topping` with value `bacon`',
-                error.errors['topping'].message);
+            assert.equal('Validator failed for path `topping` with value `bacon`', error.errors.topping.message);
 
             assert.ok(!breakfast);
             db.close();
@@ -1253,12 +1254,10 @@ describe('model: findByIdAndUpdate:', function () {
             assert.ok(!!error);
             assert.ok(!breakfast);
             assert.equal(2, Object.keys(error.errors).length);
-            assert.ok(Object.keys(error.errors).indexOf('eggs') != -1);
-            assert.ok(Object.keys(error.errors).indexOf('steak') != -1);
-            assert.equal('Validator failed for path `eggs` with value `softboiled`',
-                error.errors['eggs'].message);
-            assert.equal('Path `steak` is required.',
-                error.errors['steak'].message);
+            assert.ok(Object.keys(error.errors).indexOf('eggs') !== -1);
+            assert.ok(Object.keys(error.errors).indexOf('steak') !== -1);
+            assert.equal('Validator failed for path `eggs` with value `softboiled`', error.errors.eggs.message);
+            assert.equal('Path `steak` is required.', error.errors.steak.message);
             db.close();
             done();
           });
@@ -1283,8 +1282,7 @@ describe('model: findByIdAndUpdate:', function () {
             assert.ok(!!error);
             assert.equal(1, Object.keys(error.errors).length);
             assert.equal('eggs', Object.keys(error.errors)[0]);
-            assert.equal('Path `eggs` (3) is less than minimum allowed value (4).',
-                error.errors['eggs'].message);
+            assert.equal('Path `eggs` (3) is less than minimum allowed value (4).', error.errors.eggs.message);
 
             Breakfast.findOneAndUpdate(
                 {},
@@ -1294,9 +1292,7 @@ describe('model: findByIdAndUpdate:', function () {
                   assert.ok(!!error);
                   assert.equal(1, Object.keys(error.errors).length);
                   assert.equal('steak', Object.keys(error.errors)[0]);
-                  assert.equal('`tofu` is not a valid enum value for path `steak`.',
-                      error.errors['steak']);
-
+                  assert.equal('`tofu` is not a valid enum value for path `steak`.', error.errors.steak);
 
                   Breakfast.findOneAndUpdate(
                       {},
@@ -1306,8 +1302,7 @@ describe('model: findByIdAndUpdate:', function () {
                         assert.ok(!!error);
                         assert.equal(1, Object.keys(error.errors).length);
                         assert.equal('bacon', Object.keys(error.errors)[0]);
-                        assert.equal('Path `bacon` is invalid (none).',
-                            error.errors['bacon'].message);
+                        assert.equal('Path `bacon` is invalid (none).', error.errors.bacon.message);
 
                         db.close();
                         done();

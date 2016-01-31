@@ -23,7 +23,6 @@ If you have a question about Mongoose (not a bug report) please post it to eithe
 - Follow the general coding style of the rest of the project:
   - 2 space tabs
   - no trailing whitespace
-  - comma first
   - inline documentation for new methods, class members, etc.
   - 1 space between conditionals/functions, and their parenthesis and curly braces
     - `if (..) {`

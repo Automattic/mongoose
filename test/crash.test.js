@@ -5,12 +5,12 @@ var start = require('./common'),
     assert = require('assert'),
     mongoose = start.mongoose;
 
-describe('crash: (gh-407)', function() {
-  it('test mongodb crash with invalid objectid string', function(done) {
-    var db = mongoose.createConnection("mongodb://localhost/test-crash");
+describe('crash: (gh-407)', function () {
+  it('test mongodb crash with invalid objectid string', function (done) {
+    var db = mongoose.createConnection('mongodb://localhost/test-crash');
 
     var IndexedGuy = new mongoose.Schema({
-      name: { type: String }
+      name: {type: String}
     });
 
     var Guy = db.model('Guy', IndexedGuy);
@@ -22,7 +22,7 @@ describe('crash: (gh-407)', function() {
           '',
           '4e0e2ca0795666368603d974']
       }
-    }, function(err) {
+    }, function (err) {
       db.close(done);
 
       try {
@@ -32,6 +32,5 @@ describe('crash: (gh-407)', function() {
         throw er;
       }
     });
-
   });
 });

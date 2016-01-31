@@ -14,7 +14,7 @@ var data = [
     {
       name: 'bill',
       age: 25,
-      birthday : new Date().setFullYear((new Date().getFullYear() - 25))
+      birthday: new Date().setFullYear((new Date().getFullYear() - 25))
     },
     {
       name: 'mary',
@@ -24,7 +24,7 @@ var data = [
     {
       name: 'bob',
       age: 21,
-      birthday : new Date().setFullYear((new Date().getFullYear() - 21))
+      birthday: new Date().setFullYear((new Date().getFullYear() - 21))
     },
     {
       name: 'lilly',
@@ -39,18 +39,18 @@ var data = [
 ];
 
 
-mongoose.connect('mongodb://localhost/persons', function(err) {
+mongoose.connect('mongodb://localhost/persons', function (err) {
   if (err) throw err;
 
   // create all of the dummy people
-  async.each(data, function(item, cb) {
+  async.each(data, function (item, cb) {
     Person.create(item, cb);
-  }, function(err) {
+  }, function (err) {
     if (err) throw err;
 
     // when querying data, instead of providing a callback, you can instead
     // leave that off and get a query object returned
-    var query = Person.find({ age : { $lt : 1000 }});
+    var query = Person.find({age: {$lt: 1000}});
 
     // this allows you to continue applying modifiers to it
     query.sort('birthday');
@@ -62,19 +62,18 @@ mongoose.connect('mongodb://localhost/persons', function(err) {
     query.where('age').gt(21);
 
     // finally, when ready to execute the query, call the exec() function
-    query.exec(function(err, results) {
+    query.exec(function (err, results) {
       if (err) throw err;
 
       console.log(results);
 
       cleanup();
     });
-
   });
 });
 
 function cleanup() {
-  Person.remove(function() {
+  Person.remove(function () {
     mongoose.disconnect();
   });
 }

@@ -24,7 +24,7 @@ var test = Schema({
 });
 
 function TestDoc(schema) {
-  var Subdocument = function() {
+  var Subdocument = function () {
     EmbeddedDocument.call(this, {}, new DocumentArray);
   };
 
@@ -47,21 +47,20 @@ function TestDoc(schema) {
  * Test.
  */
 
-describe('debug: colors', function() {
+describe('debug: colors', function () {
   var db;
   var Test;
 
-  before(function() {
+  before(function () {
     db = start();
     Test = db.model('Test', test, 'TEST');
   });
 
-  after(function(done) {
+  after(function (done) {
     db.close(done);
   });
 
-  it('Document', function(done) {
-
+  it('Document', function (done) {
     var date = new Date();
 
     Test.create([{
@@ -76,12 +75,12 @@ describe('debug: colors', function() {
       string: 'zxcvbn',
       number: 789,
       date: date
-    }], function(err) {
+    }], function (err) {
       assert.ifError(err);
       Test
         .find()
         .lean(false)
-        .exec(function(err, docs) {
+        .exec(function (err, docs) {
           assert.ifError(err);
 
           var colorfull = require('util').inspect(docs, {
@@ -103,8 +102,7 @@ describe('debug: colors', function() {
     });
   });
 
-  it('MongooseDocumentArray', function() {
-
+  it('MongooseDocumentArray', function () {
     var Subdocument = TestDoc();
 
     var sub1 = new Subdocument();
@@ -127,7 +125,5 @@ describe('debug: colors', function() {
     // console.log(colorfull, colorless);
 
     assert.notEqual(colorfull, colorless);
-
   });
-
 });

@@ -15,47 +15,47 @@ var data = [
       name: 'bill',
       age: 25,
       birthday: new Date().setFullYear((new Date().getFullYear() - 25)),
-      gender: "Male",
+      gender: 'Male',
       likes: ['movies', 'games', 'dogs']
     },
     {
       name: 'mary',
       age: 30,
-      birthday : new Date().setFullYear((new Date().getFullYear() - 30)),
-      gender: "Female",
+      birthday: new Date().setFullYear((new Date().getFullYear() - 30)),
+      gender: 'Female',
       likes: ['movies', 'birds', 'cats']
     },
     {
       name: 'bob',
       age: 21,
       birthday: new Date().setFullYear((new Date().getFullYear() - 21)),
-      gender: "Male",
+      gender: 'Male',
       likes: ['tv', 'games', 'rabbits']
     },
     {
       name: 'lilly',
       age: 26,
       birthday: new Date().setFullYear((new Date().getFullYear() - 26)),
-      gender: "Female",
+      gender: 'Female',
       likes: ['books', 'cats', 'dogs']
     },
     {
       name: 'alucard',
       age: 1000,
       birthday: new Date().setFullYear((new Date().getFullYear() - 1000)),
-      gender: "Male",
+      gender: 'Male',
       likes: ['glasses', 'wine', 'the night']
     }
 ];
 
 
-mongoose.connect('mongodb://localhost/persons', function(err) {
+mongoose.connect('mongodb://localhost/persons', function (err) {
   if (err) throw err;
 
   // create all of the dummy people
-  async.each(data, function(item, cb) {
+  async.each(data, function (item, cb) {
     Person.create(item, cb);
-  }, function(err) {
+  }, function (err) {
     if (err) {
       // handle error
     }
@@ -66,10 +66,10 @@ mongoose.connect('mongodb://localhost/persons', function(err) {
 
     // when using .lean() the default is true, but you can explicitly set the
     // value by passing in a boolean value. IE. .lean(false)
-    var q = Person.find({ age : { $lt : 1000 }}).sort('age').limit(2).lean();
-    q.exec(function(err, results) {
+    var q = Person.find({age: {$lt: 1000}}).sort('age').limit(2).lean();
+    q.exec(function (err, results) {
       if (err) throw err;
-      console.log("Are the results MongooseDocuments?: %s", results[0] instanceof mongoose.Document);
+      console.log('Are the results MongooseDocuments?: %s', results[0] instanceof mongoose.Document);
 
       console.log(results);
       cleanup();
@@ -78,7 +78,7 @@ mongoose.connect('mongodb://localhost/persons', function(err) {
 });
 
 function cleanup() {
-  Person.remove(function() {
+  Person.remove(function () {
     mongoose.disconnect();
   });
 }

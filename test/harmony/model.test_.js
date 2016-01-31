@@ -18,27 +18,27 @@ var assert = require('assert');
  *  `yield` as described above.
  *
  */
-describe('Models in ES6', function() {
+describe('Models in ES6', function () {
   var db;
   var collectionNameCounter = 0;
 
-  var getCollectionName = function() {
+  var getCollectionName = function () {
     return 'harmony-models-validate-' + (++collectionNameCounter);
   };
 
-  beforeEach(function() {
+  beforeEach(function () {
     db = start();
   });
 
-  afterEach(function(done) {
+  afterEach(function (done) {
     db.close(done);
   });
 
-  it('`create()` integrates with co and the yield keyword', function(done) {
+  it('`create()` integrates with co and the yield keyword', function (done) {
     co(function * () {
       var schema = new Schema({
-        eggs: { type: String, required: true },
-        bacon: { type: Boolean, required: true }
+        eggs: {type: String, required: true},
+        bacon: {type: Boolean, required: true}
       });
 
       var M = db.model('harmonyCreate', schema, getCollectionName());
@@ -46,8 +46,8 @@ describe('Models in ES6', function() {
       var results;
       try {
         results = yield M.create([
-          { eggs: 'sunny-side up', bacon: false },
-          { eggs: 'scrambled', bacon: true }]);
+          {eggs: 'sunny-side up', bacon: false},
+          {eggs: 'scrambled', bacon: true}]);
       } catch (e) {
         return done(e);
       }
@@ -60,19 +60,19 @@ describe('Models in ES6', function() {
     })();
   });
 
-  it('`aggregate()` integrates with co and the yield keyword', function(done) {
+  it('`aggregate()` integrates with co and the yield keyword', function (done) {
     co(function*() {
       var schema = new Schema({
-        eggs: { type: String, required: true },
-        bacon: { type: Boolean, required: true }
+        eggs: {type: String, required: true},
+        bacon: {type: Boolean, required: true}
       });
 
       var M = db.model('harmonyAggregate', schema, getCollectionName());
 
       try {
         yield M.create([
-          { eggs: 'sunny-side up', bacon: false },
-          { eggs: 'scrambled', bacon: true }]);
+          {eggs: 'sunny-side up', bacon: false},
+          {eggs: 'scrambled', bacon: true}]);
       } catch (e) {
         return done(e);
       }
@@ -80,8 +80,8 @@ describe('Models in ES6', function() {
       var results;
       try {
         results = yield M.aggregate([
-          { $group: { _id: '$bacon', eggs: { $first: '$eggs' } } },
-          { $sort: { _id: 1 } }
+          {$group: {_id: '$bacon', eggs: {$first: '$eggs'}}},
+          {$sort: {_id: 1}}
         ]).exec();
       } catch (e) {
         return done(e);
@@ -97,20 +97,20 @@ describe('Models in ES6', function() {
     })();
   });
 
-  it('`mapReduce()` can also be used with co and yield', function(done) {
+  it('`mapReduce()` can also be used with co and yield', function (done) {
     co(function*() {
       var schema = new Schema({
-        eggs: { type: String, required: true },
-        bacon: { type: Boolean, required: true }
+        eggs: {type: String, required: true},
+        bacon: {type: Boolean, required: true}
       });
 
       var M = db.model('harmonyMapreduce', schema, getCollectionName());
 
       try {
         yield M.create([
-          { eggs: 'sunny-side up', bacon: false },
-          { eggs: 'sunny-side up', bacon: true },
-          { eggs: 'scrambled', bacon: true }]);
+          {eggs: 'sunny-side up', bacon: false},
+          {eggs: 'sunny-side up', bacon: true},
+          {eggs: 'scrambled', bacon: true}]);
       } catch (e) {
         return done(e);
       }
@@ -118,8 +118,8 @@ describe('Models in ES6', function() {
       var results;
       try {
         results = yield M.mapReduce({
-          map: function() { emit(this.eggs, 1); },
-          reduce: function(k, vals) { return vals.length; }
+          map: function () { emit(this.eggs, 1); },
+          reduce: function (k, vals) { return vals.length; }
         });
       } catch (e) {
         return done(e);

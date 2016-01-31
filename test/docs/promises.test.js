@@ -2,23 +2,23 @@ var PromiseProvider = require('../../lib/promise_provider');
 var assert = require('assert');
 var mongoose = require('../../');
 
-describe('promises docs', function() {
+describe('promises docs', function () {
   var Band;
   var db;
 
-  before(function(done) {
+  before(function (done) {
     db = mongoose.createConnection('mongodb://localhost:27017/mongoose_test');
 
-    Band = db.model('band-promises', { name: String, members: [String] });
+    Band = db.model('band-promises', {name: String, members: [String]});
 
     done();
   });
 
-  beforeEach(function(done) {
+  beforeEach(function (done) {
     Band.remove({}, done);
   });
 
-  after(function(done) {
+  after(function (done) {
     PromiseProvider.reset();
     db.close(done);
   });
@@ -32,7 +32,7 @@ describe('promises docs', function() {
    * For backwards compatibility, Mongoose 4 returns [mpromise](https://www.npmjs.com/package/mpromise)
    * promises by default.
    */
-  it('Built-in Promises', function(done) {
+  it('Built-in Promises', function (done) {
     var gnr = new Band({
       name: "Guns N' Roses",
       members: ['Axl', 'Slash']
@@ -41,7 +41,7 @@ describe('promises docs', function() {
     var promise = gnr.save();
     assert.ok(promise instanceof require('mpromise'));
 
-    promise.then(function(doc) {
+    promise.then(function (doc) {
       assert.equal(doc.name, "Guns N' Roses");
       // acquit:ignore:start
       done();
@@ -54,8 +54,8 @@ describe('promises docs', function() {
    * function for `yield` and async/await. If you need
    * a fully-fledged promise, use the `.exec()` function.
    */
-  it('Queries are not promises', function(done) {
-    var query = Band.findOne({ name: "Guns N' Roses" });
+  it('Queries are not promises', function (done) {
+    var query = Band.findOne({name: "Guns N' Roses"});
     assert.ok(!(query instanceof require('mpromise')));
 
     // acquit:ignore:start
@@ -63,7 +63,7 @@ describe('promises docs', function() {
     // acquit:ignore:end
 
     // A query is not a fully-fledged promise, but it does have a `.then()`.
-    query.then(function(doc) {
+    query.then(function (doc) {
       // use doc
       // acquit:ignore:start
       assert.ok(!doc);
@@ -75,7 +75,7 @@ describe('promises docs', function() {
     var promise = query.exec();
     assert.ok(promise instanceof require('mpromise'));
 
-    promise.then(function(doc) {
+    promise.then(function (doc) {
       // use doc
       // acquit:ignore:start
       assert.ok(!doc);
@@ -101,13 +101,13 @@ describe('promises docs', function() {
    * often differs from practice. If you find a bug, open
    * [an issue on GitHub](https://github.com/Automattic/mongoose/issues)
    */
-  it('Plugging in your own Promises Library', function(done) {
+  it('Plugging in your own Promises Library', function (done) {
     // acquit:ignore:start
     if (!global.Promise) {
       return done();
     }
     // acquit:ignore:end
-    var query = Band.findOne({ name: "Guns N' Roses" });
+    var query = Band.findOne({name: "Guns N' Roses"});
 
     // Use native promises
     mongoose.Promise = global.Promise;

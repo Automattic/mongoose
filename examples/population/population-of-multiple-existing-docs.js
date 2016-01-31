@@ -35,7 +35,7 @@ var Game = mongoose.model('Game', gameSchema);
  * the default port (27017)
  */
 
-mongoose.connect('mongodb://localhost/console', function(err) {
+mongoose.connect('mongodb://localhost/console', function (err) {
   // if we failed to connect, abort
   if (err) throw err;
 
@@ -59,7 +59,7 @@ function createData() {
       manufacturer: 'Nintendo',
       released: 'August 23, 1991'
     },
-    function(err, nintendo64, superNintendo) {
+    function (err, nintendo64, superNintendo) {
       if (err) return done(err);
 
       Game.create(
@@ -75,7 +75,7 @@ function createData() {
           released: 'September 1, 1992',
           consoles: [superNintendo]
         },
-        function(err) {
+        function (err) {
           if (err) return done(err);
           example();
         }
@@ -91,16 +91,16 @@ function createData() {
 function example() {
   Game
   .find({})
-  .exec(function(err, games) {
+  .exec(function (err, games) {
     if (err) return done(err);
 
     console.log('found %d games', games.length);
 
-    var options = { path: 'consoles', select: 'name released -_id' };
-    Game.populate(games, options, function(err, games) {
+    var options = {path: 'consoles', select: 'name released -_id'};
+    Game.populate(games, options, function (err, games) {
       if (err) return done(err);
 
-      games.forEach(function(game) {
+      games.forEach(function (game) {
         console.log(
           '"%s" was released for the %s on %s',
           game.name,
@@ -116,8 +116,8 @@ function example() {
 
 function done(err) {
   if (err) console.error(err);
-  Console.remove(function() {
-    Game.remove(function() {
+  Console.remove(function () {
+    Game.remove(function () {
       mongoose.disconnect();
     });
   });

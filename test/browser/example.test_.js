@@ -14,8 +14,7 @@
  *  </script>
  *  ```
  */
-describe('Mongoose in the browser', function() {
-
+describe('Mongoose in the browser', function () {
   /**
    *  When you include the `mongoose.js` file in a script tag, mongoose will
    *  attach a `mongoose` object to the global `window`. This object includes
@@ -26,12 +25,12 @@ describe('Mongoose in the browser', function() {
    *  browser. In particular, it will *not* work in Internet Explorer 8
    *  or Safari 5.
    */
-  describe('Declaring schemas in the browser', function() {
-    it('allows you to use mongoose types', function() {
-      var foodSchema = new mongoose.Schema({ name: String });
+  describe('Declaring schemas in the browser', function () {
+    it('allows you to use mongoose types', function () {
+      var foodSchema = new mongoose.Schema({name: String});
       var breakfastSchema = new mongoose.Schema({
         foods: [foodSchema],
-        date: { type: Date, default: Date.now }
+        date: {type: Date, default: Date.now}
       });
 
       assert.ok(foodSchema.path('name') instanceof mongoose.Schema.Types.String);
@@ -46,12 +45,12 @@ describe('Mongoose in the browser', function() {
    *  currently support any sort of querying, you're responsible for creating
    *  your own documents.
    */
-  describe('Validating documents in the browser', function() {
-    it('allows you to create a schema and use it to validate documents', function(done) {
+  describe('Validating documents in the browser', function () {
+    it('allows you to create a schema and use it to validate documents', function (done) {
       var schema = new mongoose.Schema({
-        name: { type: String, required: true },
-        quest: { type: String, match: /Holy Grail/i, required: true },
-        favoriteColor: { type: String, enum: ['Red', 'Blue'], required: true }
+        name: {type: String, required: true},
+        quest: {type: String, match: /Holy Grail/i, required: true},
+        favoriteColor: {type: String, enum: ['Red', 'Blue'], required: true}
       });
 
       /* `mongoose.Document` is different in the browser than in NodeJS.
@@ -59,7 +58,7 @@ describe('Mongoose in the browser', function() {
        * then modify the document and call `validate()` to make sure it
        * passes validation rules. */
       var doc = new mongoose.Document({}, schema);
-      doc.validate(function(error) {
+      doc.validate(function (error) {
         assert.ok(error);
         assert.equal('Path `name` is required.', error.errors['name'].message);
         assert.equal('Path `quest` is required.', error.errors['quest'].message);
@@ -69,13 +68,13 @@ describe('Mongoose in the browser', function() {
         doc.name = 'Sir Lancelot of Camelot';
         doc.quest = 'To seek the holy grail';
         doc.favoriteColor = 'Blue';
-        doc.validate(function(error) {
+        doc.validate(function (error) {
           assert.ifError(error);
 
           doc.name = 'Sir Galahad of Camelot';
           doc.quest = 'I seek the grail'; // Invalid, must contain 'holy grail'
           doc.favoriteColor = 'Yellow'; // Invalid, not 'Red' or 'Blue'
-          doc.validate(function(error) {
+          doc.validate(function (error) {
             assert.ok(error);
             assert.ok(!error.errors['name']);
             assert.equal('Path `quest` is invalid (I seek the grail).',

@@ -1,4 +1,4 @@
-module.exports = function(config) {
+module.exports = function (config) {
   var customLaunchers = {
     sl_chrome_35: {
       base: 'SauceLabs',
@@ -11,12 +11,12 @@ module.exports = function(config) {
       platform: 'OS X 10.8',
       version: '6'
     },
-    /*sl_safari_7: {
+    /* sl_safari_7: {
       base: 'SauceLabs',
       browserName: 'safari',
       platform: 'OS X 10.9',
       version: '7'
-    },*/
+    }, */
     sl_ie_9: {
       base: 'SauceLabs',
       browserName: 'internet explorer',

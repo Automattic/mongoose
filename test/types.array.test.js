@@ -1,4 +1,3 @@
-
 /**
  * Module dependencies.
  */
@@ -28,8 +27,8 @@ mongoose.model('Pet', Pet);
  * Test.
  */
 
-describe('types array', function() {
-  it('behaves and quacks like an Array', function(done) {
+describe('types array', function () {
+  it('behaves and quacks like an Array', function (done) {
     var a = new MongooseArray;
 
     assert.ok(a instanceof Array);
@@ -41,9 +40,9 @@ describe('types array', function() {
     done();
   });
 
-  describe('hasAtomics', function() {
-    it('does not throw', function(done) {
-      var b = new MongooseArray([12,3,4,5]).filter(Boolean);
+  describe('hasAtomics', function () {
+    it('does not throw', function (done) {
+      var b = new MongooseArray([12, 3, 4, 5]).filter(Boolean);
       var threw = false;
 
       try {
@@ -54,9 +53,9 @@ describe('types array', function() {
 
       assert.ok(!threw);
 
-      var a = new MongooseArray([67,8]).filter(Boolean);
+      var a = new MongooseArray([67, 8]).filter(Boolean);
       try {
-        a.push(3,4);
+        a.push(3, 4);
       } catch (_) {
         console.error(_);
         threw = true;
@@ -65,19 +64,18 @@ describe('types array', function() {
       assert.ok(!threw);
       done();
     });
-
   });
 
-  describe('indexOf()', function() {
-    it('works', function(done) {
+  describe('indexOf()', function () {
+    it('works', function (done) {
       var db = start(),
           User = db.model('User', 'users_' + random()),
           Pet = db.model('Pet', 'pets' + random());
 
-      var tj = new User({ name: 'tj' }),
-          tobi = new Pet({ name: 'tobi' }),
-          loki = new Pet({ name: 'loki' }),
-          jane = new Pet({ name: 'jane' });
+      var tj = new User({name: 'tj'}),
+          tobi = new Pet({name: 'tobi'}),
+          loki = new Pet({name: 'loki'}),
+          jane = new Pet({name: 'jane'});
 
       tj.pets.push(tobi);
       tj.pets.push(loki);
@@ -85,73 +83,76 @@ describe('types array', function() {
 
       var pending = 3;
 
-      [tobi, loki, jane].forEach(function(pet) {
-        pet.save(function() {
+      [tobi, loki, jane].forEach(function (pet) {
+        pet.save(function () {
           --pending || cb();
         });
       });
 
       function cb() {
-        Pet.find({}, function(err) {
+        Pet.find({}, function (err) {
           assert.ifError(err);
-          tj.save(function(err) {
+          tj.save(function (err) {
             assert.ifError(err);
-            User.findOne({ name: 'tj' }, function(err, user) {
+            User.findOne({name: 'tj'}, function (err, user) {
               assert.ifError(err);
               assert.equal(user.pets.length, 3);
-              assert.equal(user.pets.indexOf(tobi.id),0);
-              assert.equal(user.pets.indexOf(loki.id),1);
-              assert.equal(user.pets.indexOf(jane.id),2);
-              assert.equal(user.pets.indexOf(tobi._id),0);
-              assert.equal(user.pets.indexOf(loki._id),1);
-              assert.equal(user.pets.indexOf(jane._id),2);
+              assert.equal(user.pets.indexOf(tobi.id), 0);
+              assert.equal(user.pets.indexOf(loki.id), 1);
+              assert.equal(user.pets.indexOf(jane.id), 2);
+              assert.equal(user.pets.indexOf(tobi._id), 0);
+              assert.equal(user.pets.indexOf(loki._id), 1);
+              assert.equal(user.pets.indexOf(jane._id), 2);
               db.close(done);
             });
           });
         });
       }
-
     });
   });
 
-  describe('push()', function() {
+  describe('push()', function () {
     var db, N, S, B, M, D, ST;
 
     function save(doc, cb) {
-      doc.save(function(err) {
-        if (err) return cb(err);
+      doc.save(function (err) {
+        if (err) {
+          return cb(err);
+        }
         doc.constructor.findById(doc._id, cb);
       });
     }
 
-    before(function(done) {
+    before(function (done) {
       db = start();
-      N = db.model('arraySet', Schema({ arr: [Number] }));
-      S = db.model('arraySetString', Schema({ arr: [String] }));
-      B = db.model('arraySetBuffer', Schema({ arr: [Buffer] }));
-      M = db.model('arraySetMixed', Schema({ arr: [] }));
-      D = db.model('arraySetSubDocs', Schema({ arr: [{ name: String}] }));
-      ST = db.model('arrayWithSetters', Schema({ arr: [{
-        type: String,
-        lowercase: true
-      }] }));
+      N = db.model('arraySet', Schema({arr: [Number]}));
+      S = db.model('arraySetString', Schema({arr: [String]}));
+      B = db.model('arraySetBuffer', Schema({arr: [Buffer]}));
+      M = db.model('arraySetMixed', Schema({arr: []}));
+      D = db.model('arraySetSubDocs', Schema({arr: [{name: String}]}));
+      ST = db.model('arrayWithSetters', Schema({
+        arr: [{
+          type: String,
+          lowercase: true
+        }]
+      }));
       done();
     });
 
-    after(function(done) {
+    after(function (done) {
       db.close(done);
     });
 
-    it('works with numbers', function(done) {
-      var m = new N({ arr: [3,4,5,6] });
-      save(m, function(err, doc) {
+    it('works with numbers', function (done) {
+      var m = new N({arr: [3, 4, 5, 6]});
+      save(m, function (err, doc) {
         assert.ifError(err);
         assert.equal(4, doc.arr.length);
         doc.arr.push(8);
         assert.strictEqual(8, doc.arr[doc.arr.length - 1]);
         assert.strictEqual(8, doc.arr[4]);
 
-        save(doc, function(err, doc) {
+        save(doc, function (err, doc) {
           assert.ifError(err);
           assert.equal(5, doc.arr.length);
           assert.strictEqual(3, doc.arr[0]);
@@ -165,16 +166,16 @@ describe('types array', function() {
       });
     });
 
-    it('works with strings', function(done) {
-      var m = new S({ arr: [3,4,5,6] });
-      save(m, function(err, doc) {
+    it('works with strings', function (done) {
+      var m = new S({arr: [3, 4, 5, 6]});
+      save(m, function (err, doc) {
         assert.ifError(err);
         assert.equal(4, doc.arr.length);
         doc.arr.push(8);
         assert.strictEqual('8', doc.arr[doc.arr.length - 1]);
         assert.strictEqual('8', doc.arr[4]);
 
-        save(doc, function(err, doc) {
+        save(doc, function (err, doc) {
           assert.ifError(err);
           assert.equal(5, doc.arr.length);
           assert.strictEqual('3', doc.arr[0]);
@@ -188,41 +189,41 @@ describe('types array', function() {
       });
     });
 
-    it('works with buffers', function(done) {
-      var m = new B({ arr: [[0], new Buffer(1)] });
-      save(m, function(err, doc) {
+    it('works with buffers', function (done) {
+      var m = new B({arr: [[0], new Buffer(1)]});
+      save(m, function (err, doc) {
         assert.ifError(err);
         assert.equal(2, doc.arr.length);
         assert.ok(doc.arr[0].isMongooseBuffer);
         assert.ok(doc.arr[1].isMongooseBuffer);
-        doc.arr.push("nice");
+        doc.arr.push('nice');
         assert.equal(3, doc.arr.length);
         assert.ok(doc.arr[2].isMongooseBuffer);
-        assert.strictEqual("nice", doc.arr[2].toString('utf8'));
+        assert.strictEqual('nice', doc.arr[2].toString('utf8'));
 
-        save(doc, function(err, doc) {
+        save(doc, function (err, doc) {
           assert.ifError(err);
           assert.equal(3, doc.arr.length);
           assert.ok(doc.arr[0].isMongooseBuffer);
           assert.ok(doc.arr[1].isMongooseBuffer);
           assert.ok(doc.arr[2].isMongooseBuffer);
           assert.strictEqual('\u0000', doc.arr[0].toString());
-          assert.strictEqual("nice", doc.arr[2].toString());
+          assert.strictEqual('nice', doc.arr[2].toString());
           done();
         });
       });
     });
 
-    it('works with mixed', function(done) {
-      var m = new M({ arr: [3,{x:1},'yes', [5]] });
-      save(m, function(err, doc) {
+    it('works with mixed', function (done) {
+      var m = new M({arr: [3, {x: 1}, 'yes', [5]]});
+      save(m, function (err, doc) {
         assert.ifError(err);
         assert.equal(4, doc.arr.length);
         doc.arr.push(null);
         assert.equal(5, doc.arr.length);
         assert.strictEqual(null, doc.arr[4]);
 
-        save(doc, function(err, doc) {
+        save(doc, function (err, doc) {
           assert.ifError(err);
 
           assert.equal(5, doc.arr.length);
@@ -241,7 +242,7 @@ describe('types array', function() {
           assert.equal(7, doc.arr.length);
           assert.strictEqual('', doc.arr[6].toString());
 
-          save(doc, function(err, doc) {
+          save(doc, function (err, doc) {
             assert.ifError(err);
 
             assert.equal(7, doc.arr.length);
@@ -260,40 +261,40 @@ describe('types array', function() {
       });
     });
 
-    it('works with sub-docs', function(done) {
-      var m = new D({ arr: [{name:'aaron'}, {name:'moombahton '}] });
-      save(m, function(err, doc) {
+    it('works with sub-docs', function (done) {
+      var m = new D({arr: [{name: 'aaron'}, {name: 'moombahton '}]});
+      save(m, function (err, doc) {
         assert.ifError(err);
         assert.equal(2, doc.arr.length);
-        doc.arr.push({name:"Restrepo"});
+        doc.arr.push({name: 'Restrepo'});
         assert.equal(3, doc.arr.length);
-        assert.equal("Restrepo", doc.arr[2].name);
+        assert.equal('Restrepo', doc.arr[2].name);
 
-        save(doc, function(err, doc) {
+        save(doc, function (err, doc) {
           assert.ifError(err);
 
           // validate
           assert.equal(3, doc.arr.length);
           assert.equal('aaron', doc.arr[0].name);
-          assert.equal("moombahton ", doc.arr[1].name);
-          assert.equal("Restrepo", doc.arr[2].name);
+          assert.equal('moombahton ', doc.arr[1].name);
+          assert.equal('Restrepo', doc.arr[2].name);
 
           done();
         });
       });
     });
 
-    it('applies setters (gh-3032)', function(done) {
-      var m = new ST({ arr: ["ONE", "TWO"] });
-      save(m, function(err, doc) {
+    it('applies setters (gh-3032)', function (done) {
+      var m = new ST({arr: ['ONE', 'TWO']});
+      save(m, function (err, doc) {
         assert.ifError(err);
         assert.equal(2, doc.arr.length);
-        doc.arr.push("THREE");
+        doc.arr.push('THREE');
         assert.strictEqual('one', doc.arr[0]);
         assert.strictEqual('two', doc.arr[1]);
         assert.strictEqual('three', doc.arr[2]);
 
-        save(doc, function(err, doc) {
+        save(doc, function (err, doc) {
           assert.ifError(err);
           assert.equal(3, doc.arr.length);
           assert.strictEqual('one', doc.arr[0]);
@@ -306,38 +307,38 @@ describe('types array', function() {
     });
   });
 
-  describe('splice()', function() {
+  describe('splice()', function () {
     var db;
 
-    before(function() {
+    before(function () {
       db = start();
     });
 
-    after(function(done) {
+    after(function (done) {
       db.close(done);
     });
 
-    it('works', function(done) {
+    it('works', function (done) {
       var collection = 'splicetest-number' + random();
-      var schema = new Schema({ numbers: [Number] }),
+      var schema = new Schema({numbers: [Number]}),
           A = db.model('splicetestNumber', schema, collection);
 
-      var a = new A({ numbers: [4,5,6,7] });
-      a.save(function(err) {
+      var a = new A({numbers: [4, 5, 6, 7]});
+      a.save(function (err) {
         assert.ifError(err);
-        A.findById(a._id, function(err, doc) {
+        A.findById(a._id, function (err, doc) {
           assert.ifError(err);
-          var removed = doc.numbers.splice(1, 1, "10");
+          var removed = doc.numbers.splice(1, 1, '10');
           assert.deepEqual(removed, [5]);
           assert.equal('number', typeof doc.numbers[1]);
-          assert.deepEqual(doc.numbers.toObject(),[4,10,6,7]);
-          doc.save(function(err) {
+          assert.deepEqual(doc.numbers.toObject(), [4, 10, 6, 7]);
+          doc.save(function (err) {
             assert.ifError(err);
-            A.findById(a._id, function(err, doc) {
+            A.findById(a._id, function (err, doc) {
               assert.ifError(err);
-              assert.deepEqual(doc.numbers.toObject(), [4,10,6,7]);
+              assert.deepEqual(doc.numbers.toObject(), [4, 10, 6, 7]);
 
-              A.collection.drop(function(err) {
+              A.collection.drop(function (err) {
                 assert.ifError(err);
                 done();
               });
@@ -347,35 +348,35 @@ describe('types array', function() {
       });
     });
 
-    it('on embedded docs', function(done) {
+    it('on embedded docs', function (done) {
       var collection = 'splicetest-embeddeddocs' + random();
-      var schema = new Schema({ types: [new Schema({ type: String }) ]}),
+      var schema = new Schema({types: [new Schema({type: String})]}),
           A = db.model('splicetestEmbeddedDoc', schema, collection);
 
-      var a = new A({ types: [{type:'bird'},{type:'boy'},{type:'frog'},{type:'cloud'}] });
-      a.save(function(err) {
+      var a = new A({types: [{type: 'bird'}, {type: 'boy'}, {type: 'frog'}, {type: 'cloud'}]});
+      a.save(function (err) {
         assert.ifError(err);
-        A.findById(a._id, function(err, doc) {
+        A.findById(a._id, function (err, doc) {
           assert.ifError(err);
 
           doc.types.$pop();
 
           var removed = doc.types.splice(1, 1);
-          assert.equal(removed.length,1);
-          assert.equal(removed[0].type,'boy');
+          assert.equal(removed.length, 1);
+          assert.equal(removed[0].type, 'boy');
 
           var obj = doc.types.toObject();
-          assert.equal(obj[0].type,'bird');
-          assert.equal(obj[1].type,'frog');
+          assert.equal(obj[0].type, 'bird');
+          assert.equal(obj[1].type, 'frog');
 
-          doc.save(function(err) {
+          doc.save(function (err) {
             assert.ifError(err);
-            A.findById(a._id, function(err, doc) {
+            A.findById(a._id, function (err, doc) {
               assert.ifError(err);
 
               var obj = doc.types.toObject();
-              assert.equal(obj[0].type,'bird');
-              assert.equal(obj[1].type,'frog');
+              assert.equal(obj[0].type, 'bird');
+              assert.equal(obj[1].type, 'frog');
               done();
             });
           });
@@ -384,89 +385,89 @@ describe('types array', function() {
     });
   });
 
-  describe('unshift()', function() {
+  describe('unshift()', function () {
     var db;
 
-    before(function() {
+    before(function () {
       db = start();
     });
 
-    after(function(done) {
+    after(function (done) {
       db.close(done);
     });
 
-    it('works', function(done) {
+    it('works', function (done) {
       var schema = new Schema({
-            types: [new Schema({ type: String })],
+            types: [new Schema({type: String})],
             nums: [Number],
             strs: [String]
           }),
           A = db.model('unshift', schema, 'unshift' + random());
 
       var a = new A({
-        types: [{type:'bird'},{type:'boy'},{type:'frog'},{type:'cloud'}],
-        nums: [1,2,3],
+        types: [{type: 'bird'}, {type: 'boy'}, {type: 'frog'}, {type: 'cloud'}],
+        nums: [1, 2, 3],
         strs: 'one two three'.split(' ')
       });
 
-      a.save(function(err) {
+      a.save(function (err) {
         assert.ifError(err);
-        A.findById(a._id, function(err, doc) {
+        A.findById(a._id, function (err, doc) {
           assert.ifError(err);
 
-          var tlen = doc.types.unshift({type:'tree'});
+          var tlen = doc.types.unshift({type: 'tree'});
           var nlen = doc.nums.unshift(0);
           var slen = doc.strs.unshift('zero');
 
-          assert.equal(tlen,5);
-          assert.equal(nlen,4);
-          assert.equal(slen,4);
+          assert.equal(tlen, 5);
+          assert.equal(nlen, 4);
+          assert.equal(slen, 4);
 
-          doc.types.push({type:'worm'});
+          doc.types.push({type: 'worm'});
           var obj = doc.types.toObject();
-          assert.equal(obj[0].type,'tree');
-          assert.equal(obj[1].type,'bird');
-          assert.equal(obj[2].type,'boy');
-          assert.equal(obj[3].type,'frog');
-          assert.equal(obj[4].type,'cloud');
-          assert.equal(obj[5].type,'worm');
+          assert.equal(obj[0].type, 'tree');
+          assert.equal(obj[1].type, 'bird');
+          assert.equal(obj[2].type, 'boy');
+          assert.equal(obj[3].type, 'frog');
+          assert.equal(obj[4].type, 'cloud');
+          assert.equal(obj[5].type, 'worm');
 
           obj = doc.nums.toObject();
-          assert.equal(obj[0].valueOf(),0);
-          assert.equal(obj[1].valueOf(),1);
-          assert.equal(obj[2].valueOf(),2);
-          assert.equal(obj[3].valueOf(),3);
+          assert.equal(obj[0].valueOf(), 0);
+          assert.equal(obj[1].valueOf(), 1);
+          assert.equal(obj[2].valueOf(), 2);
+          assert.equal(obj[3].valueOf(), 3);
 
           obj = doc.strs.toObject();
-          assert.equal(obj[0],'zero');
-          assert.equal(obj[1],'one');
-          assert.equal(obj[2],'two');
-          assert.equal(obj[3],'three');
+          assert.equal(obj[0], 'zero');
+          assert.equal(obj[1], 'one');
+          assert.equal(obj[2], 'two');
+          assert.equal(obj[3], 'three');
 
-          doc.save(function(err) {
+          doc.save(function (err) {
             assert.ifError(err);
-            A.findById(a._id, function(err, doc) {
+            A.findById(a._id, function (err, doc) {
               assert.ifError(err);
 
               var obj = doc.types.toObject();
-              assert.equal(obj[0].type,'tree');
-              assert.equal(obj[1].type,'bird');
-              assert.equal(obj[2].type,'boy');
-              assert.equal(obj[3].type,'frog');
-              assert.equal(obj[4].type,'cloud');
-              assert.equal(obj[5].type,'worm');
+              assert.equal(obj[0].type, 'tree');
+              assert.equal(obj[1].type, 'bird');
+              assert.equal(obj[2].type, 'boy');
+              assert.equal(obj[3].type, 'frog');
+              assert.equal(obj[4].type, 'cloud');
+              assert.equal(obj[5].type, 'worm');
 
               obj = doc.nums.toObject();
-              assert.equal(obj[0].valueOf(),0);
-              assert.equal(obj[1].valueOf(),1);
-              assert.equal(obj[2].valueOf(),2);
-              assert.equal(obj[3].valueOf(),3);
+              assert.equal(obj[0].valueOf(), 0);
+              assert.equal(obj[1].valueOf(), 1);
+              assert.equal(obj[2].valueOf(), 2);
+              assert.equal(obj[3].valueOf(), 3);
 
               obj = doc.strs.toObject();
-              assert.equal(obj[0],'zero');
-              assert.equal(obj[1],'one');
-              assert.equal(obj[2],'two');
-              assert.equal(obj[3],'three');
+              assert.equal(obj[0], 'zero');
+              assert.equal(obj[1], 'one');
+              assert.equal(obj[2], 'two');
+              assert.equal(obj[3], 'three');
               done();
             });
           });
@@ -474,21 +475,23 @@ describe('types array', function() {
       });
     });
 
-    it('applies setters (gh-3032)', function(done) {
-      var ST = db.model('setterArray', Schema({ arr: [{
-        type: String,
-        lowercase: true
-      }] }));
-      var m = new ST({ arr: ["ONE", "TWO"] });
-      m.save(function(err, doc) {
+    it('applies setters (gh-3032)', function (done) {
+      var ST = db.model('setterArray', Schema({
+        arr: [{
+          type: String,
+          lowercase: true
+        }]
+      }));
+      var m = new ST({arr: ['ONE', 'TWO']});
+      m.save(function (err, doc) {
         assert.ifError(err);
         assert.equal(2, doc.arr.length);
-        doc.arr.unshift("THREE");
+        doc.arr.unshift('THREE');
         assert.strictEqual('three', doc.arr[0]);
         assert.strictEqual('one', doc.arr[1]);
         assert.strictEqual('two', doc.arr[2]);
 
-        doc.save(function(err, doc) {
+        doc.save(function (err, doc) {
           assert.ifError(err);
           assert.equal(3, doc.arr.length);
           assert.strictEqual('three', doc.arr[0]);
@@ -501,19 +504,19 @@ describe('types array', function() {
     });
   });
 
-  describe('shift()', function() {
+  describe('shift()', function () {
     var db;
-    before(function() {
+    before(function () {
       db = start();
     });
 
-    after(function(done) {
+    after(function (done) {
       db.close(done);
     });
 
-    it('works', function(done) {
+    it('works', function (done) {
       var schema = new Schema({
-        types: [new Schema({ type: String })],
+        types: [new Schema({type: String})],
         nums: [Number],
         strs: [String]
       });
@@ -521,58 +524,58 @@ describe('types array', function() {
       var A = db.model('shift', schema, 'unshift' + random());
 
       var a = new A({
-        types: [{type:'bird'},{type:'boy'},{type:'frog'},{type:'cloud'}],
-        nums: [1,2,3],
+        types: [{type: 'bird'}, {type: 'boy'}, {type: 'frog'}, {type: 'cloud'}],
+        nums: [1, 2, 3],
         strs: 'one two three'.split(' ')
       });
 
-      a.save(function(err) {
+      a.save(function (err) {
         assert.ifError(err);
-        A.findById(a._id, function(err, doc) {
+        A.findById(a._id, function (err, doc) {
           assert.ifError(err);
 
           var t = doc.types.shift();
           var n = doc.nums.shift();
           var s = doc.strs.shift();
 
-          assert.equal(t.type,'bird');
-          assert.equal(n,1);
-          assert.equal(s,'one');
+          assert.equal(t.type, 'bird');
+          assert.equal(n, 1);
+          assert.equal(s, 'one');
 
           var obj = doc.types.toObject();
-          assert.equal(obj[0].type,'boy');
-          assert.equal(obj[1].type,'frog');
-          assert.equal(obj[2].type,'cloud');
+          assert.equal(obj[0].type, 'boy');
+          assert.equal(obj[1].type, 'frog');
+          assert.equal(obj[2].type, 'cloud');
 
           doc.nums.push(4);
           obj = doc.nums.toObject();
           assert.equal(2, obj[0].valueOf());
-          assert.equal(obj[1].valueOf(),3);
-          assert.equal(obj[2].valueOf(),4);
+          assert.equal(obj[1].valueOf(), 3);
+          assert.equal(obj[2].valueOf(), 4);
 
           obj = doc.strs.toObject();
-          assert.equal(obj[0],'two');
-          assert.equal(obj[1],'three');
+          assert.equal(obj[0], 'two');
+          assert.equal(obj[1], 'three');
 
-          doc.save(function(err) {
+          doc.save(function (err) {
             assert.ifError(err);
-            A.findById(a._id, function(err, doc) {
+            A.findById(a._id, function (err, doc) {
               db.close();
               assert.ifError(err);
 
               var obj = doc.types.toObject();
-              assert.equal(obj[0].type,'boy');
-              assert.equal(obj[1].type,'frog');
-              assert.equal(obj[2].type,'cloud');
+              assert.equal(obj[0].type, 'boy');
+              assert.equal(obj[1].type, 'frog');
+              assert.equal(obj[2].type, 'cloud');
 
               obj = doc.nums.toObject();
-              assert.equal(obj[0].valueOf(),2);
-              assert.equal(obj[1].valueOf(),3);
-              assert.equal(obj[2].valueOf(),4);
+              assert.equal(obj[0].valueOf(), 2);
+              assert.equal(obj[1].valueOf(), 3);
+              assert.equal(obj[2].valueOf(), 4);
 
               obj = doc.strs.toObject();
-              assert.equal(obj[0],'two');
-              assert.equal(obj[1],'three');
+              assert.equal(obj[0], 'two');
+              assert.equal(obj[1], 'three');
               done();
             });
           });
@@ -581,17 +584,17 @@ describe('types array', function() {
     });
   });
 
-  describe('$shift', function() {
-    it('works', function(done) {
+  describe('$shift', function () {
+    it('works', function (done) {
       // atomic shift uses $pop -1
       var db = start();
-      var painting = new Schema({ colors: [] });
+      var painting = new Schema({colors: []});
       var Painting = db.model('Painting', painting);
-      var p = new Painting({ colors: ['blue', 'green', 'yellow'] });
-      p.save(function(err) {
+      var p = new Painting({colors: ['blue', 'green', 'yellow']});
+      p.save(function (err) {
         assert.ifError(err);
 
-        Painting.findById(p, function(err, doc) {
+        Painting.findById(p, function (err, doc) {
           assert.ifError(err);
           assert.equal(3, doc.colors.length);
           var color = doc.colors.$shift();
@@ -602,14 +605,14 @@ describe('types array', function() {
           color = doc.colors.$shift();
           assert.equal(color, undefined);
           assert.equal(2, doc.colors.length);
-          doc.save(function(err) {
+          doc.save(function (err) {
             assert.equal(null, err);
             var color = doc.colors.$shift();
             assert.equal(1, doc.colors.length);
             assert.equal(color, 'green');
-            doc.save(function(err) {
+            doc.save(function (err) {
               assert.equal(null, err);
-              Painting.findById(doc, function(err, doc) {
+              Painting.findById(doc, function (err, doc) {
                 db.close();
                 assert.ifError(err);
                 assert.equal(1, doc.colors.length);
@@ -623,11 +626,11 @@ describe('types array', function() {
     });
   });
 
-  describe('pop()', function() {
-    it('works', function(done) {
+  describe('pop()', function () {
+    it('works', function (done) {
       var db = start(),
           schema = new Schema({
-            types: [new Schema({ type: String })],
+            types: [new Schema({type: String})],
             nums: [Number],
             strs: [String]
           });
@@ -635,58 +638,58 @@ describe('types array', function() {
       var A = db.model('pop', schema, 'pop' + random());
 
       var a = new A({
-        types: [{type:'bird'},{type:'boy'},{type:'frog'},{type:'cloud'}],
-        nums: [1,2,3],
+        types: [{type: 'bird'}, {type: 'boy'}, {type: 'frog'}, {type: 'cloud'}],
+        nums: [1, 2, 3],
         strs: 'one two three'.split(' ')
       });
 
-      a.save(function(err) {
+      a.save(function (err) {
         assert.ifError(err);
-        A.findById(a._id, function(err, doc) {
+        A.findById(a._id, function (err, doc) {
           assert.ifError(err);
 
           var t = doc.types.pop();
           var n = doc.nums.pop();
           var s = doc.strs.pop();
 
-          assert.equal(t.type,'cloud');
-          assert.equal(n,3);
-          assert.equal(s,'three');
+          assert.equal(t.type, 'cloud');
+          assert.equal(n, 3);
+          assert.equal(s, 'three');
 
           var obj = doc.types.toObject();
-          assert.equal(obj[0].type,'bird');
-          assert.equal(obj[1].type,'boy');
-          assert.equal(obj[2].type,'frog');
+          assert.equal(obj[0].type, 'bird');
+          assert.equal(obj[1].type, 'boy');
+          assert.equal(obj[2].type, 'frog');
 
           doc.nums.push(4);
           obj = doc.nums.toObject();
-          assert.equal(obj[0].valueOf(),1);
-          assert.equal(obj[1].valueOf(),2);
-          assert.equal(obj[2].valueOf(),4);
+          assert.equal(obj[0].valueOf(), 1);
+          assert.equal(obj[1].valueOf(), 2);
+          assert.equal(obj[2].valueOf(), 4);
 
           obj = doc.strs.toObject();
-          assert.equal(obj[0],'one');
-          assert.equal(obj[1],'two');
+          assert.equal(obj[0], 'one');
+          assert.equal(obj[1], 'two');
 
-          doc.save(function(err) {
+          doc.save(function (err) {
             assert.ifError(err);
-            A.findById(a._id, function(err, doc) {
+            A.findById(a._id, function (err, doc) {
               db.close();
               assert.ifError(err);
 
               var obj = doc.types.toObject();
-              assert.equal(obj[0].type,'bird');
-              assert.equal(obj[1].type,'boy');
-              assert.equal(obj[2].type,'frog');
+              assert.equal(obj[0].type, 'bird');
+              assert.equal(obj[1].type, 'boy');
+              assert.equal(obj[2].type, 'frog');
 
               obj = doc.nums.toObject();
-              assert.equal(obj[0].valueOf(),1);
-              assert.equal(obj[1].valueOf(),2);
-              assert.equal(obj[2].valueOf(),4);
+              assert.equal(obj[0].valueOf(), 1);
+              assert.equal(obj[1].valueOf(), 2);
+              assert.equal(obj[2].valueOf(), 4);
 
               obj = doc.strs.toObject();
-              assert.equal(obj[0],'one');
-              assert.equal(obj[1],'two');
+              assert.equal(obj[0], 'one');
+              assert.equal(obj[1], 'two');
               done();
             });
           });
@@ -695,41 +698,41 @@ describe('types array', function() {
     });
   });
 
-  describe('pull()', function() {
-    it('works', function(done) {
+  describe('pull()', function () {
+    it('works', function (done) {
       var db = start();
-      var catschema = new Schema({ name: String });
+      var catschema = new Schema({name: String});
       var Cat = db.model('Cat', catschema);
       var schema = new Schema({
-        a: [{ type: Schema.ObjectId, ref: 'Cat' }]
+        a: [{type: Schema.ObjectId, ref: 'Cat'}]
       });
       var A = db.model('TestPull', schema);
-      var cat = new Cat({ name: 'peanut' });
-      cat.save(function(err) {
+      var cat = new Cat({name: 'peanut'});
+      cat.save(function (err) {
         assert.ifError(err);
 
-        var a = new A({ a: [cat._id] });
-        a.save(function(err) {
+        var a = new A({a: [cat._id]});
+        a.save(function (err) {
           assert.ifError(err);
 
-          A.findById(a, function(err, doc) {
+          A.findById(a, function (err, doc) {
             db.close();
             assert.ifError(err);
             assert.equal(1, doc.a.length);
             doc.a.pull(cat.id);
-            assert.equal(doc.a.length,0);
+            assert.equal(doc.a.length, 0);
             done();
           });
         });
       });
     });
 
-    it('handles pulling with no _id (gh-3341)', function(done) {
+    it('handles pulling with no _id (gh-3341)', function (done) {
       var db = start();
       var personSchema = new Schema({
         name: String,
         role: String
-      }, { _id: false });
+      }, {_id: false});
       var bandSchema = new Schema({
         name: String,
         members: [personSchema]
@@ -740,25 +743,25 @@ describe('types array', function() {
       var gnr = new Band({
         name: "Guns N' Roses",
         members: [
-          { name: 'Axl', role: 'Lead Singer' },
-          { name: 'Slash', role: 'Guitar' },
-          { name: 'Izzy', role: 'Guitar' },
-          { name: 'Duff', role: 'Bass' },
-          { name: 'Adler', role: 'Drums' }
+          {name: 'Axl', role: 'Lead Singer'},
+          {name: 'Slash', role: 'Guitar'},
+          {name: 'Izzy', role: 'Guitar'},
+          {name: 'Duff', role: 'Bass'},
+          {name: 'Adler', role: 'Drums'}
         ]
       });
 
-      gnr.save(function(error) {
+      gnr.save(function (error) {
         assert.ifError(error);
-        gnr.members.pull({ name: 'Slash', role: 'Guitar' });
-        gnr.save(function(error) {
+        gnr.members.pull({name: 'Slash', role: 'Guitar'});
+        gnr.save(function (error) {
           assert.ifError(error);
           assert.equal(gnr.members.length, 4);
           assert.equal(gnr.members[0].name, 'Axl');
           assert.equal(gnr.members[1].name, 'Izzy');
           assert.equal(gnr.members[2].name, 'Duff');
           assert.equal(gnr.members[3].name, 'Adler');
-          Band.findById(gnr._id, function(error, gnr) {
+          Band.findById(gnr._id, function (error, gnr) {
             assert.ifError(error);
             assert.equal(gnr.members.length, 4);
             assert.equal(gnr.members[0].name, 'Axl');
@@ -772,16 +775,16 @@ describe('types array', function() {
     });
   });
 
-  describe('$pop()', function() {
-    it('works', function(done) {
+  describe('$pop()', function () {
+    it('works', function (done) {
       var db = start();
-      var painting = new Schema({ colors: [] });
+      var painting = new Schema({colors: []});
       var Painting = db.model('Painting', painting);
-      var p = new Painting({ colors: ['blue', 'green', 'yellow'] });
-      p.save(function(err) {
+      var p = new Painting({colors: ['blue', 'green', 'yellow']});
+      p.save(function (err) {
         assert.ifError(err);
 
-        Painting.findById(p, function(err, doc) {
+        Painting.findById(p, function (err, doc) {
           assert.ifError(err);
           assert.equal(3, doc.colors.length);
           var color = doc.colors.$pop();
@@ -793,14 +796,14 @@ describe('types array', function() {
           assert.equal(color, undefined);
           assert.equal(2, doc.colors.length);
           assert.equal(false, '$set' in doc.colors._atomics, 'invalid $atomic op used');
-          doc.save(function(err) {
+          doc.save(function (err) {
             assert.equal(null, err);
             var color = doc.colors.$pop();
             assert.equal(1, doc.colors.length);
             assert.equal(color, 'green');
-            doc.save(function(err) {
+            doc.save(function (err) {
               assert.equal(null, err);
-              Painting.findById(doc, function(err, doc) {
+              Painting.findById(doc, function (err, doc) {
                 db.close();
                 assert.strictEqual(null, err);
                 assert.equal(1, doc.colors.length);
@@ -814,31 +817,31 @@ describe('types array', function() {
     });
   });
 
-  describe('addToSet()', function() {
-    it('works', function(done) {
+  describe('addToSet()', function () {
+    it('works', function (done) {
       var db = start(),
-          e = new Schema({ name: String, arr: [] }),
+          e = new Schema({name: String, arr: []}),
           schema = new Schema({
             num: [Number],
             str: [String],
             doc: [e],
             date: [Date],
-            id:  [Schema.ObjectId]
+            id: [Schema.ObjectId]
           });
 
       var M = db.model('testAddToSet', schema);
       var m = new M;
 
-      m.num.push(1,2,3);
-      m.str.push('one','two','tres');
-      m.doc.push({ name: 'Dubstep', arr: [1] }, { name: 'Polka', arr: [{ x: 3 }]});
+      m.num.push(1, 2, 3);
+      m.str.push('one', 'two', 'tres');
+      m.doc.push({name: 'Dubstep', arr: [1]}, {name: 'Polka', arr: [{x: 3}]});
 
       var d1 = new Date;
-      var d2 = new Date( +d1 + 60000);
-      var d3 = new Date( +d1 + 30000);
-      var d4 = new Date( +d1 + 20000);
-      var d5 = new Date( +d1 + 90000);
-      var d6 = new Date( +d1 + 10000);
+      var d2 = new Date(+d1 + 60000);
+      var d3 = new Date(+d1 + 30000);
+      var d4 = new Date(+d1 + 20000);
+      var d5 = new Date(+d1 + 90000);
+      var d6 = new Date(+d1 + 10000);
       m.date.push(d1, d2);
 
       var id1 = new mongoose.Types.ObjectId;
@@ -850,77 +853,83 @@ describe('types array', function() {
 
       m.id.push(id1, id2);
 
-      m.num.addToSet(3,4,5);
+      m.num.addToSet(3, 4, 5);
       assert.equal(5, m.num.length);
       m.str.addToSet('four', 'five', 'two');
-      assert.equal(m.str.length,5);
+      assert.equal(m.str.length, 5);
       m.id.addToSet(id2, id3);
-      assert.equal(m.id.length,3);
+      assert.equal(m.id.length, 3);
       m.doc.addToSet(m.doc[0]);
-      assert.equal(m.doc.length,2);
-      m.doc.addToSet({ name: 'Waltz', arr: [1] }, m.doc[0]);
-      assert.equal(m.doc.length,3);
-      assert.equal(m.date.length,2);
+      assert.equal(m.doc.length, 2);
+      m.doc.addToSet({name: 'Waltz', arr: [1]}, m.doc[0]);
+      assert.equal(m.doc.length, 3);
+      assert.equal(m.date.length, 2);
       m.date.addToSet(d1);
-      assert.equal(m.date.length,2);
+      assert.equal(m.date.length, 2);
       m.date.addToSet(d3);
-      assert.equal(m.date.length,3);
+      assert.equal(m.date.length, 3);
 
-      m.save(function(err) {
+      m.save(function (err) {
         assert.ifError(err);
-        M.findById(m, function(err, m) {
+        M.findById(m, function (err, m) {
           assert.ifError(err);
 
-          assert.equal(m.num.length,5);
+          assert.equal(m.num.length, 5);
           assert.ok(~m.num.indexOf(1));
           assert.ok(~m.num.indexOf(2));
           assert.ok(~m.num.indexOf(3));
           assert.ok(~m.num.indexOf(4));
           assert.ok(~m.num.indexOf(5));
 
-          assert.equal(m.str.length,5);
+          assert.equal(m.str.length, 5);
           assert.ok(~m.str.indexOf('one'));
           assert.ok(~m.str.indexOf('two'));
           assert.ok(~m.str.indexOf('tres'));
           assert.ok(~m.str.indexOf('four'));
           assert.ok(~m.str.indexOf('five'));
 
-          assert.equal(m.id.length,3);
+          assert.equal(m.id.length, 3);
           assert.ok(~m.id.indexOf(id1));
           assert.ok(~m.id.indexOf(id2));
           assert.ok(~m.id.indexOf(id3));
 
-          assert.equal(m.date.length,3);
+          assert.equal(m.date.length, 3);
           assert.ok(~m.date.indexOf(d1.toString()));
           assert.ok(~m.date.indexOf(d2.toString()));
           assert.ok(~m.date.indexOf(d3.toString()));
 
-          assert.equal(m.doc.length,3);
-          assert.ok(m.doc.some(function(v) { return v.name === 'Waltz';}));
-          assert.ok(m.doc.some(function(v) { return v.name === 'Dubstep';}));
-          assert.ok(m.doc.some(function(v) { return v.name === 'Polka';}));
+          assert.equal(m.doc.length, 3);
+          assert.ok(m.doc.some(function (v) {
+            return v.name === 'Waltz';
+          }));
+          assert.ok(m.doc.some(function (v) {
+            return v.name === 'Dubstep';
+          }));
+          assert.ok(m.doc.some(function (v) {
+            return v.name === 'Polka';
+          }));
 
           // test single $addToSet
-          m.num.addToSet(3,4,5,6);
-          assert.equal(m.num.length,6);
+          m.num.addToSet(3, 4, 5, 6);
+          assert.equal(m.num.length, 6);
           m.str.addToSet('four', 'five', 'two', 'six');
-          assert.equal(m.str.length,6);
+          assert.equal(m.str.length, 6);
           m.id.addToSet(id2, id3, id4);
-          assert.equal(m.id.length,4);
+          assert.equal(m.id.length, 4);
 
           m.date.addToSet(d1, d3, d4);
-          assert.equal(m.date.length,4);
+          assert.equal(m.date.length, 4);
 
-          m.doc.addToSet(m.doc[0], { name: '8bit' });
-          assert.equal(m.doc.length,4);
+          m.doc.addToSet(m.doc[0], {name: '8bit'});
+          assert.equal(m.doc.length, 4);
 
-          m.save(function(err) {
+          m.save(function (err) {
             assert.ifError(err);
 
-            M.findById(m, function(err, m) {
+            M.findById(m, function (err, m) {
               assert.ifError(err);
 
-              assert.equal(m.num.length,6);
+              assert.equal(m.num.length, 6);
               assert.ok(~m.num.indexOf(1));
               assert.ok(~m.num.indexOf(2));
               assert.ok(~m.num.indexOf(3));
@@ -928,7 +937,7 @@ describe('types array', function() {
               assert.ok(~m.num.indexOf(5));
               assert.ok(~m.num.indexOf(6));
 
-              assert.equal(m.str.length,6);
+              assert.equal(m.str.length, 6);
               assert.ok(~m.str.indexOf('one'));
               assert.ok(~m.str.indexOf('two'));
               assert.ok(~m.str.indexOf('tres'));
@@ -936,46 +945,54 @@ describe('types array', function() {
               assert.ok(~m.str.indexOf('five'));
               assert.ok(~m.str.indexOf('six'));
 
-              assert.equal(m.id.length,4);
+              assert.equal(m.id.length, 4);
               assert.ok(~m.id.indexOf(id1));
               assert.ok(~m.id.indexOf(id2));
               assert.ok(~m.id.indexOf(id3));
               assert.ok(~m.id.indexOf(id4));
 
-              assert.equal(m.date.length,4);
+              assert.equal(m.date.length, 4);
               assert.ok(~m.date.indexOf(d1.toString()));
               assert.ok(~m.date.indexOf(d2.toString()));
               assert.ok(~m.date.indexOf(d3.toString()));
               assert.ok(~m.date.indexOf(d4.toString()));
 
-              assert.equal(m.doc.length,4);
-              assert.ok(m.doc.some(function(v) { return v.name === 'Waltz';}));
-              assert.ok(m.doc.some(function(v) { return v.name === 'Dubstep';}));
-              assert.ok(m.doc.some(function(v) { return v.name === 'Polka';}));
-              assert.ok(m.doc.some(function(v) { return v.name === '8bit';}));
+              assert.equal(m.doc.length, 4);
+              assert.ok(m.doc.some(function (v) {
+                return v.name === 'Waltz';
+              }));
+              assert.ok(m.doc.some(function (v) {
+                return v.name === 'Dubstep';
+              }));
+              assert.ok(m.doc.some(function (v) {
+                return v.name === 'Polka';
+              }));
+              assert.ok(m.doc.some(function (v) {
+                return v.name === '8bit';
+              }));
 
               // test multiple $addToSet
-              m.num.addToSet(7,8);
-              assert.equal(m.num.length,8);
+              m.num.addToSet(7, 8);
+              assert.equal(m.num.length, 8);
               m.str.addToSet('seven', 'eight');
-              assert.equal(m.str.length,8);
+              assert.equal(m.str.length, 8);
               m.id.addToSet(id5, id6);
-              assert.equal(m.id.length,6);
+              assert.equal(m.id.length, 6);
 
               m.date.addToSet(d5, d6);
-              assert.equal(m.date.length,6);
+              assert.equal(m.date.length, 6);
 
-              m.doc.addToSet(m.doc[1], { name: 'BigBeat' }, { name: 'Funk' });
-              assert.equal(m.doc.length,6);
+              m.doc.addToSet(m.doc[1], {name: 'BigBeat'}, {name: 'Funk'});
+              assert.equal(m.doc.length, 6);
 
-              m.save(function(err) {
+              m.save(function (err) {
                 assert.ifError(err);
 
-                M.findById(m, function(err, m) {
+                M.findById(m, function (err, m) {
                   db.close();
                   assert.ifError(err);
 
-                  assert.equal(m.num.length,8);
+                  assert.equal(m.num.length, 8);
                   assert.ok(~m.num.indexOf(1));
                   assert.ok(~m.num.indexOf(2));
                   assert.ok(~m.num.indexOf(3));
@@ -985,7 +1002,7 @@ describe('types array', function() {
                   assert.ok(~m.num.indexOf(7));
                   assert.ok(~m.num.indexOf(8));
 
-                  assert.equal(m.str.length,8);
+                  assert.equal(m.str.length, 8);
                   assert.ok(~m.str.indexOf('one'));
                   assert.ok(~m.str.indexOf('two'));
                   assert.ok(~m.str.indexOf('tres'));
@@ -995,7 +1012,7 @@ describe('types array', function() {
                   assert.ok(~m.str.indexOf('seven'));
                   assert.ok(~m.str.indexOf('eight'));
 
-                  assert.equal(m.id.length,6);
+                  assert.equal(m.id.length, 6);
                   assert.ok(~m.id.indexOf(id1));
                   assert.ok(~m.id.indexOf(id2));
                   assert.ok(~m.id.indexOf(id3));
@@ -1003,7 +1020,7 @@ describe('types array', function() {
                   assert.ok(~m.id.indexOf(id5));
                   assert.ok(~m.id.indexOf(id6));
 
-                  assert.equal(m.date.length,6);
+                  assert.equal(m.date.length, 6);
                   assert.ok(~m.date.indexOf(d1.toString()));
                   assert.ok(~m.date.indexOf(d2.toString()));
                   assert.ok(~m.date.indexOf(d3.toString()));
@@ -1011,13 +1028,25 @@ describe('types array', function() {
                   assert.ok(~m.date.indexOf(d5.toString()));
                   assert.ok(~m.date.indexOf(d6.toString()));
 
-                  assert.equal(m.doc.length,6);
-                  assert.ok(m.doc.some(function(v) { return v.name === 'Waltz';}));
-                  assert.ok(m.doc.some(function(v) { return v.name === 'Dubstep';}));
-                  assert.ok(m.doc.some(function(v) { return v.name === 'Polka';}));
-                  assert.ok(m.doc.some(function(v) { return v.name === '8bit';}));
-                  assert.ok(m.doc.some(function(v) { return v.name === 'BigBeat';}));
-                  assert.ok(m.doc.some(function(v) { return v.name === 'Funk';}));
+                  assert.equal(m.doc.length, 6);
+                  assert.ok(m.doc.some(function (v) {
+                    return v.name === 'Waltz';
+                  }));
+                  assert.ok(m.doc.some(function (v) {
+                    return v.name === 'Dubstep';
+                  }));
+                  assert.ok(m.doc.some(function (v) {
+                    return v.name === 'Polka';
+                  }));
+                  assert.ok(m.doc.some(function (v) {
+                    return v.name === '8bit';
+                  }));
+                  assert.ok(m.doc.some(function (v) {
+                    return v.name === 'BigBeat';
+                  }));
+                  assert.ok(m.doc.some(function (v) {
+                    return v.name === 'Funk';
+                  }));
                   done();
                 });
               });
@@ -1027,9 +1056,9 @@ describe('types array', function() {
       });
     });
 
-    it('handles sub-documents that do not have an _id gh-1973', function(done) {
+    it('handles sub-documents that do not have an _id gh-1973', function (done) {
       var db = start(),
-          e = new Schema({ name: String, arr: [] }, { _id: false }),
+          e = new Schema({name: String, arr: []}, {_id: false}),
           schema = new Schema({
             doc: [e]
           });
@@ -1037,39 +1066,45 @@ describe('types array', function() {
       var M = db.model('gh1973', schema);
       var m = new M;
 
-      m.doc.addToSet({ name: 'Rap' });
-      m.save(function(error, m) {
+      m.doc.addToSet({name: 'Rap'});
+      m.save(function (error, m) {
         assert.ifError(error);
         assert.equal(1, m.doc.length);
         assert.equal('Rap', m.doc[0].name);
-        m.doc.addToSet({ name: 'House' });
+        m.doc.addToSet({name: 'House'});
         assert.equal(2, m.doc.length);
-        m.save(function(error, m) {
+        m.save(function (error, m) {
           assert.ifError(error);
           assert.equal(2, m.doc.length);
-          assert.ok(m.doc.some(function(v) { return v.name === 'Rap'; }));
-          assert.ok(m.doc.some(function(v) { return v.name === 'House'; }));
+          assert.ok(m.doc.some(function (v) {
+            return v.name === 'Rap';
+          }));
+          assert.ok(m.doc.some(function (v) {
+            return v.name === 'House';
+          }));
           db.close(done);
         });
       });
     });
 
-    it('applies setters (gh-3032)', function(done) {
+    it('applies setters (gh-3032)', function (done) {
       var db = start();
-      var ST = db.model('setterArray', Schema({ arr: [{
-        type: String,
-        lowercase: true
-      }] }));
-      var m = new ST({ arr: ["ONE", "TWO"] });
-      m.save(function(err, doc) {
+      var ST = db.model('setterArray', Schema({
+        arr: [{
+          type: String,
+          lowercase: true
+        }]
+      }));
+      var m = new ST({arr: ['ONE', 'TWO']});
+      m.save(function (err, doc) {
         assert.ifError(err);
         assert.equal(2, doc.arr.length);
-        doc.arr.addToSet("THREE");
+        doc.arr.addToSet('THREE');
         assert.strictEqual('one', doc.arr[0]);
         assert.strictEqual('two', doc.arr[1]);
         assert.strictEqual('three', doc.arr[2]);
 
-        doc.save(function(err, doc) {
+        doc.save(function (err, doc) {
           assert.ifError(err);
           assert.equal(3, doc.arr.length);
           assert.strictEqual('one', doc.arr[0]);
@@ -1082,37 +1117,37 @@ describe('types array', function() {
     });
   });
 
-  describe('nonAtomicPush()', function() {
-    it('works', function(done) {
+  describe('nonAtomicPush()', function () {
+    it('works', function (done) {
       var db = start();
       var U = db.model('User');
       var ID = mongoose.Types.ObjectId;
 
-      var u = new U({ name: 'banana', pets: [new ID] });
-      assert.equal(u.pets.length,1);
+      var u = new U({name: 'banana', pets: [new ID]});
+      assert.equal(u.pets.length, 1);
       u.pets.nonAtomicPush(new ID);
-      assert.equal(u.pets.length,2);
-      u.save(function(err) {
+      assert.equal(u.pets.length, 2);
+      u.save(function (err) {
         assert.ifError(err);
-        U.findById(u._id, function(err) {
+        U.findById(u._id, function (err) {
           assert.ifError(err);
-          assert.equal(u.pets.length,2);
+          assert.equal(u.pets.length, 2);
           var id0 = u.pets[0];
           var id1 = u.pets[1];
           var id2 = new ID;
           u.pets.pull(id0);
           u.pets.nonAtomicPush(id2);
-          assert.equal(u.pets.length,2);
-          assert.equal(u.pets[0].toString(),id1.toString());
-          assert.equal(u.pets[1].toString(),id2.toString());
-          u.save(function(err) {
+          assert.equal(u.pets.length, 2);
+          assert.equal(u.pets[0].toString(), id1.toString());
+          assert.equal(u.pets[1].toString(), id2.toString());
+          u.save(function (err) {
             assert.ifError(err);
-            U.findById(u._id, function(err) {
+            U.findById(u._id, function (err) {
               db.close();
               assert.ifError(err);
-              assert.equal(u.pets.length,2);
-              assert.equal(u.pets[0].toString(),id1.toString());
-              assert.equal(u.pets[1].toString(),id2.toString());
+              assert.equal(u.pets.length, 2);
+              assert.equal(u.pets[0].toString(), id1.toString());
+              assert.equal(u.pets[1].toString(), id2.toString());
               done();
             });
           });
@@ -1121,14 +1156,14 @@ describe('types array', function() {
     });
   });
 
-  describe('sort()', function() {
-    it('order should be saved', function(done) {
+  describe('sort()', function () {
+    it('order should be saved', function (done) {
       var db = start();
-      var M = db.model('ArraySortOrder', new Schema({ x: [Number] }));
-      var m = new M({ x: [1,4,3,2] });
-      m.save(function(err) {
+      var M = db.model('ArraySortOrder', new Schema({x: [Number]}));
+      var m = new M({x: [1, 4, 3, 2]});
+      m.save(function (err) {
         assert.ifError(err);
-        M.findById(m, function(err, m) {
+        M.findById(m, function (err, m) {
           assert.ifError(err);
 
           assert.equal(1, m.x[0]);
@@ -1138,9 +1173,9 @@ describe('types array', function() {
 
           m.x.sort();
 
-          m.save(function(err) {
+          m.save(function (err) {
             assert.ifError(err);
-            M.findById(m, function(err, m) {
+            M.findById(m, function (err, m) {
               assert.ifError(err);
 
               assert.equal(1, m.x[0]);
@@ -1148,13 +1183,13 @@ describe('types array', function() {
               assert.equal(3, m.x[2]);
               assert.equal(4, m.x[3]);
 
-              m.x.sort(function(a,b) {
+              m.x.sort(function (a, b) {
                 return b > a;
               });
 
-              m.save(function(err) {
+              m.save(function (err) {
                 assert.ifError(err);
-                M.findById(m, function(err, m) {
+                M.findById(m, function (err, m) {
                   assert.ifError(err);
 
                   assert.equal(4, m.x[0]);
@@ -1171,37 +1206,41 @@ describe('types array', function() {
     });
   });
 
-  describe('set()', function() {
+  describe('set()', function () {
     var db, N, S, B, M, D, ST;
 
     function save(doc, cb) {
-      doc.save(function(err) {
-        if (err) return cb(err);
+      doc.save(function (err) {
+        if (err) {
+          return cb(err);
+        }
         doc.constructor.findById(doc._id, cb);
       });
     }
 
-    before(function(done) {
+    before(function (done) {
       db = start();
-      N = db.model('arraySet', Schema({ arr: [Number] }));
-      S = db.model('arraySetString', Schema({ arr: [String] }));
-      B = db.model('arraySetBuffer', Schema({ arr: [Buffer] }));
-      M = db.model('arraySetMixed', Schema({ arr: [] }));
-      D = db.model('arraySetSubDocs', Schema({ arr: [{ name: String}] }));
-      ST = db.model('arrayWithSetters', Schema({ arr: [{
-        type: String,
-        lowercase: true
-      }] }));
+      N = db.model('arraySet', Schema({arr: [Number]}));
+      S = db.model('arraySetString', Schema({arr: [String]}));
+      B = db.model('arraySetBuffer', Schema({arr: [Buffer]}));
+      M = db.model('arraySetMixed', Schema({arr: []}));
+      D = db.model('arraySetSubDocs', Schema({arr: [{name: String}]}));
+      ST = db.model('arrayWithSetters', Schema({
+        arr: [{
+          type: String,
+          lowercase: true
+        }]
+      }));
       done();
     });
 
-    after(function(done) {
+    after(function (done) {
       db.close(done);
     });
 
-    it('works combined with other ops', function(done) {
-      var m = new N({ arr: [3,4,5,6] });
-      save(m, function(err, doc) {
+    it('works combined with other ops', function (done) {
+      var m = new N({arr: [3, 4, 5, 6]});
+      save(m, function (err, doc) {
         assert.ifError(err);
 
         assert.equal(4, doc.arr.length);
@@ -1211,7 +1250,7 @@ describe('types array', function() {
         assert.equal(10, doc.arr[2]);
         assert.equal(20, doc.arr[4]);
 
-        save(doc, function(err, doc) {
+        save(doc, function (err, doc) {
           assert.ifError(err);
           assert.equal(5, doc.arr.length);
           assert.equal(3, doc.arr[0]);
@@ -1232,7 +1271,7 @@ describe('types array', function() {
           assert.equal(6, doc.arr[2]);
           assert.equal(99, doc.arr[3]);
 
-          save(doc, function(err, doc) {
+          save(doc, function (err, doc) {
             assert.ifError(err);
             assert.equal(4, doc.arr.length);
             assert.equal(3, doc.arr[0]);
@@ -1247,9 +1286,9 @@ describe('types array', function() {
       // after this works go back to finishing doc.populate() branch
     });
 
-    it('works with numbers', function(done) {
-      var m = new N({ arr: [3,4,5,6] });
-      save(m, function(err, doc) {
+    it('works with numbers', function (done) {
+      var m = new N({arr: [3, 4, 5, 6]});
+      save(m, function (err, doc) {
         assert.ifError(err);
         assert.equal(4, doc.arr.length);
         doc.arr.set(2, 10);
@@ -1259,7 +1298,7 @@ describe('types array', function() {
         assert.equal(5, doc.arr.length);
         assert.equal(11, doc.arr[4]);
 
-        save(doc, function(err, doc) {
+        save(doc, function (err, doc) {
           assert.ifError(err);
           assert.equal(5, doc.arr.length);
           assert.equal(3, doc.arr[0]);
@@ -1269,12 +1308,12 @@ describe('types array', function() {
           assert.equal(11, doc.arr[4]);
 
           // casting + setting beyond current array length
-          doc.arr.set(8, "1");
+          doc.arr.set(8, '1');
           assert.equal(9, doc.arr.length);
           assert.strictEqual(1, doc.arr[8]);
           assert.equal(undefined, doc.arr[7]);
 
-          save(doc, function(err, doc) {
+          save(doc, function (err, doc) {
             assert.ifError(err);
 
             assert.equal(9, doc.arr.length);
@@ -1293,9 +1332,9 @@ describe('types array', function() {
       });
     });
 
-    it('works with strings', function(done) {
-      var m = new S({ arr: [3,4,5,6] });
-      save(m, function(err, doc) {
+    it('works with strings', function (done) {
+      var m = new S({arr: [3, 4, 5, 6]});
+      save(m, function (err, doc) {
         assert.ifError(err);
         assert.equal('4', doc.arr.length);
         doc.arr.set(2, 10);
@@ -1305,7 +1344,7 @@ describe('types array', function() {
         assert.equal(5, doc.arr.length);
         assert.equal('11', doc.arr[4]);
 
-        save(doc, function(err, doc) {
+        save(doc, function (err, doc) {
           assert.ifError(err);
           assert.equal(5, doc.arr.length);
           assert.equal('3', doc.arr[0]);
@@ -1315,12 +1354,12 @@ describe('types array', function() {
           assert.equal('11', doc.arr[4]);
 
           // casting + setting beyond current array length
-          doc.arr.set(8, "yo");
+          doc.arr.set(8, 'yo');
           assert.equal(9, doc.arr.length);
-          assert.strictEqual("yo", doc.arr[8]);
+          assert.strictEqual('yo', doc.arr[8]);
           assert.equal(undefined, doc.arr[7]);
 
-          save(doc, function(err, doc) {
+          save(doc, function (err, doc) {
             assert.ifError(err);
 
             assert.equal('9', doc.arr.length);
@@ -1339,48 +1378,48 @@ describe('types array', function() {
       });
     });
 
-    it('works with buffers', function(done) {
-      var m = new B({ arr: [[0], new Buffer(1)] });
-      save(m, function(err, doc) {
+    it('works with buffers', function (done) {
+      var m = new B({arr: [[0], new Buffer(1)]});
+      save(m, function (err, doc) {
         assert.ifError(err);
         assert.equal(2, doc.arr.length);
         assert.ok(doc.arr[0].isMongooseBuffer);
         assert.ok(doc.arr[1].isMongooseBuffer);
-        doc.arr.set(1, "nice");
+        doc.arr.set(1, 'nice');
         assert.equal(2, doc.arr.length);
         assert.ok(doc.arr[1].isMongooseBuffer);
-        assert.equal("nice", doc.arr[1].toString('utf8'));
+        assert.equal('nice', doc.arr[1].toString('utf8'));
         doc.arr.set(doc.arr.length, [11]);
         assert.equal(3, doc.arr.length);
         assert.equal(11, doc.arr[2][0]);
 
-        save(doc, function(err, doc) {
+        save(doc, function (err, doc) {
           assert.ifError(err);
           assert.equal(3, doc.arr.length);
           assert.ok(doc.arr[0].isMongooseBuffer);
           assert.ok(doc.arr[1].isMongooseBuffer);
           assert.ok(doc.arr[2].isMongooseBuffer);
           assert.equal('\u0000', doc.arr[0].toString());
-          assert.equal("nice", doc.arr[1].toString());
+          assert.equal('nice', doc.arr[1].toString());
           assert.equal(11, doc.arr[2][0]);
           done();
         });
       });
     });
 
-    it('works with mixed', function(done) {
-      var m = new M({ arr: [3,{x:1},'yes', [5]] });
-      save(m, function(err, doc) {
+    it('works with mixed', function (done) {
+      var m = new M({arr: [3, {x: 1}, 'yes', [5]]});
+      save(m, function (err, doc) {
         assert.ifError(err);
         assert.equal(4, doc.arr.length);
         doc.arr.set(2, null);
         assert.equal(4, doc.arr.length);
         assert.equal(null, doc.arr[2]);
-        doc.arr.set(doc.arr.length, "last");
+        doc.arr.set(doc.arr.length, 'last');
         assert.equal(5, doc.arr.length);
-        assert.equal("last", doc.arr[4]);
+        assert.equal('last', doc.arr[4]);
 
-        save(doc, function(err, doc) {
+        save(doc, function (err, doc) {
           assert.ifError(err);
 
           assert.equal(5, doc.arr.length);
@@ -1389,7 +1428,7 @@ describe('types array', function() {
           assert.equal(null, doc.arr[2]);
           assert.ok(Array.isArray(doc.arr[3]));
           assert.equal(5, doc.arr[3][0]);
-          assert.equal("last", doc.arr[4]);
+          assert.equal('last', doc.arr[4]);
 
           doc.arr.set(8, Infinity);
           assert.equal(9, doc.arr.length);
@@ -1400,7 +1439,7 @@ describe('types array', function() {
           assert.equal('', doc.arr[9].toString());
           assert.equal(10, doc.arr.length);
 
-          save(doc, function(err, doc) {
+          save(doc, function (err, doc) {
             assert.ifError(err);
 
             assert.equal(10, doc.arr.length);
@@ -1409,7 +1448,7 @@ describe('types array', function() {
             assert.equal(null, doc.arr[2]);
             assert.ok(Array.isArray(doc.arr[3]));
             assert.equal(5, doc.arr[3][0]);
-            assert.equal("last", doc.arr[4]);
+            assert.equal('last', doc.arr[4]);
             assert.strictEqual(null, doc.arr[5]);
             assert.strictEqual(null, doc.arr[6]);
             assert.strictEqual(null, doc.arr[7]);
@@ -1423,84 +1462,82 @@ describe('types array', function() {
       });
     });
 
-    it('works with sub-docs', function(done) {
-      var m = new D({ arr: [{name:'aaron'}, {name:'moombahton '}] });
-      save(m, function(err, doc) {
+    it('works with sub-docs', function (done) {
+      var m = new D({arr: [{name: 'aaron'}, {name: 'moombahton '}]});
+      save(m, function (err, doc) {
         assert.ifError(err);
         assert.equal(2, doc.arr.length);
-        doc.arr.set(0, {name:'vdrums'});
+        doc.arr.set(0, {name: 'vdrums'});
         assert.equal(2, doc.arr.length);
         assert.equal('vdrums', doc.arr[0].name);
-        doc.arr.set(doc.arr.length, {name:"Restrepo"});
+        doc.arr.set(doc.arr.length, {name: 'Restrepo'});
         assert.equal(3, doc.arr.length);
-        assert.equal("Restrepo", doc.arr[2].name);
+        assert.equal('Restrepo', doc.arr[2].name);
 
-        save(doc, function(err, doc) {
+        save(doc, function (err, doc) {
           assert.ifError(err);
 
           // validate
           assert.equal(3, doc.arr.length);
           assert.equal('vdrums', doc.arr[0].name);
-          assert.equal("moombahton ", doc.arr[1].name);
-          assert.equal("Restrepo", doc.arr[2].name);
+          assert.equal('moombahton ', doc.arr[1].name);
+          assert.equal('Restrepo', doc.arr[2].name);
 
-          doc.arr.set(10, { name: 'temple of doom' });
+          doc.arr.set(10, {name: 'temple of doom'});
           assert.equal(11, doc.arr.length);
           assert.equal('temple of doom', doc.arr[10].name);
           assert.equal(null, doc.arr[9]);
 
-          save(doc, function(err, doc) {
+          save(doc, function (err, doc) {
             assert.ifError(err);
 
             // validate
             assert.equal(11, doc.arr.length);
             assert.equal('vdrums', doc.arr[0].name);
-            assert.equal("moombahton ", doc.arr[1].name);
-            assert.equal("Restrepo", doc.arr[2].name);
+            assert.equal('moombahton ', doc.arr[1].name);
+            assert.equal('Restrepo', doc.arr[2].name);
             assert.equal(null, doc.arr[3]);
             assert.equal(null, doc.arr[9]);
             assert.equal('temple of doom', doc.arr[10].name);
 
             doc.arr.remove(doc.arr[0]);
-            doc.arr.set(7, { name: 7 });
-            assert.strictEqual("7", doc.arr[7].name);
+            doc.arr.set(7, {name: 7});
+            assert.strictEqual('7', doc.arr[7].name);
             assert.equal(10, doc.arr.length);
 
-            save(doc, function(err, doc) {
+            save(doc, function (err, doc) {
               assert.ifError(err);
 
               assert.equal(10, doc.arr.length);
-              assert.equal("moombahton ", doc.arr[0].name);
-              assert.equal("Restrepo", doc.arr[1].name);
+              assert.equal('moombahton ', doc.arr[0].name);
+              assert.equal('Restrepo', doc.arr[1].name);
               assert.equal(null, doc.arr[2]);
               assert.ok(doc.arr[7]);
-              assert.strictEqual("7", doc.arr[7].name);
+              assert.strictEqual('7', doc.arr[7].name);
               assert.equal(null, doc.arr[8]);
               assert.equal('temple of doom', doc.arr[9].name);
 
               done();
-
             });
           });
-
         });
       });
     });
 
-    it('applies setters (gh-3032)', function(done) {
-      var m = new ST({ arr: ["ONE", "TWO"] });
-      save(m, function(err, doc) {
+    it('applies setters (gh-3032)', function (done) {
+      var m = new ST({arr: ['ONE', 'TWO']});
+      save(m, function (err, doc) {
         assert.ifError(err);
         assert.equal(2, doc.arr.length);
-        doc.arr.set(0, "THREE");
+        doc.arr.set(0, 'THREE');
         assert.strictEqual('three', doc.arr[0]);
         assert.strictEqual('two', doc.arr[1]);
-        doc.arr.set(doc.arr.length, "FOUR");
+        doc.arr.set(doc.arr.length, 'FOUR');
         assert.strictEqual('three', doc.arr[0]);
         assert.strictEqual('two', doc.arr[1]);
         assert.strictEqual('four', doc.arr[2]);
 
-        save(doc, function(err, doc) {
+        save(doc, function (err, doc) {
           assert.ifError(err);
           assert.equal(3, doc.arr.length);
           assert.strictEqual('three', doc.arr[0]);
@@ -1513,25 +1550,25 @@ describe('types array', function() {
     });
   });
 
-  describe('setting a doc array', function() {
-    it('should adjust path positions', function(done) {
+  describe('setting a doc array', function () {
+    it('should adjust path positions', function (done) {
       var db = start();
 
       var D = db.model('subDocPositions', new Schema({
-        em1: [new Schema({ name: String })]
+        em1: [new Schema({name: String})]
       }));
 
       var d = new D({
         em1: [
-              { name: 'pos0' },
-             { name: 'pos1' },
-             { name: 'pos2' }
+          {name: 'pos0'},
+          {name: 'pos1'},
+          {name: 'pos2'}
         ]
       });
 
-      d.save(function(err) {
+      d.save(function (err) {
         assert.ifError(err);
-        D.findById(d, function(err, d) {
+        D.findById(d, function (err, d) {
           assert.ifError(err);
 
           var n = d.em1.slice();
@@ -1542,13 +1579,13 @@ describe('types array', function() {
           x = x.filter(Boolean);
           d.em1 = x;
 
-          d.save(function(err) {
+          d.save(function (err) {
             assert.ifError(err);
-            D.findById(d, function(err, d) {
+            D.findById(d, function (err, d) {
               db.close();
               assert.ifError(err);
-              assert.equal(d.em1[0].name,'position two');
-              assert.equal(d.em1[1].name,'pos1');
+              assert.equal(d.em1[0].name, 'position two');
+              assert.equal(d.em1[1].name, 'pos1');
               done();
             });
           });
@@ -1557,8 +1594,8 @@ describe('types array', function() {
     });
   });
 
-  describe('paths with similar names', function() {
-    it('should be saved', function(done) {
+  describe('paths with similar names', function () {
+    it('should be saved', function (done) {
       var db = start();
 
       var D = db.model('similarPathNames', new Schema({
@@ -1566,30 +1603,30 @@ describe('types array', function() {
           role: String,
           roles: [String]
         },
-        em: [new Schema({ name: String })]
+        em: [new Schema({name: String})]
       }));
 
       var d = new D({
-        account: { role: 'teacher', roles: ['teacher', 'admin'] },
-        em: [{ name: 'bob' }]
+        account: {role: 'teacher', roles: ['teacher', 'admin']},
+        em: [{name: 'bob'}]
       });
 
-      d.save(function(err) {
+      d.save(function (err) {
         assert.ifError(err);
-        D.findById(d, function(err, d) {
+        D.findById(d, function (err, d) {
           assert.ifError(err);
 
           d.account.role = 'president';
           d.account.roles = ['president', 'janitor'];
           d.em[0].name = 'memorable';
-          d.em = [{ name: 'frida' }];
+          d.em = [{name: 'frida'}];
 
-          d.save(function(err) {
+          d.save(function (err) {
             assert.ifError(err);
-            D.findById(d, function(err, d) {
+            D.findById(d, function (err, d) {
               db.close();
               assert.ifError(err);
-              assert.equal(d.account.role,'president');
+              assert.equal(d.account.role, 'president');
               assert.equal(d.account.roles.length, 2);
               assert.equal(d.account.roles[0], 'president');
               assert.equal(d.account.roles[1], 'janitor');
@@ -1603,20 +1640,20 @@ describe('types array', function() {
     });
   });
 
-  describe('of number', function() {
-    it('allows nulls', function(done) {
+  describe('of number', function () {
+    it('allows nulls', function (done) {
       var db = start();
-      var schema = new Schema({ x: [Number] }, { collection: 'nullsareallowed' + random() });
+      var schema = new Schema({x: [Number]}, {collection: 'nullsareallowed' + random()});
       var M = db.model('nullsareallowed', schema);
       var m;
 
-      m = new M({ x: [1, null, 3] });
-      m.save(function(err) {
+      m = new M({x: [1, null, 3]});
+      m.save(function (err) {
         assert.ifError(err);
 
         // undefined is not allowed
-        m = new M({ x: [1, undefined, 3] });
-        m.save(function(err) {
+        m = new M({x: [1, undefined, 3]});
+        m.save(function (err) {
           db.close();
           assert.ok(err);
           done();
@@ -1625,24 +1662,24 @@ describe('types array', function() {
     });
   });
 
-  it('modifying subdoc props and manipulating the array works (gh-842)', function(done) {
+  it('modifying subdoc props and manipulating the array works (gh-842)', function (done) {
     var db = start();
-    var schema = new Schema({ em: [new Schema({ username: String })]});
+    var schema = new Schema({em: [new Schema({username: String})]});
     var M = db.model('modifyingSubDocAndPushing', schema);
-    var m = new M({ em: [ { username: 'Arrietty' }]});
+    var m = new M({em: [{username: 'Arrietty'}]});
 
-    m.save(function(err) {
+    m.save(function (err) {
       assert.ifError(err);
-      M.findById(m, function(err, m) {
+      M.findById(m, function (err, m) {
         assert.ifError(err);
         assert.equal(m.em[0].username, 'Arrietty');
 
         m.em[0].username = 'Shawn';
-        m.em.push({ username: 'Homily' });
-        m.save(function(err) {
+        m.em.push({username: 'Homily'});
+        m.save(function (err) {
           assert.ifError(err);
 
-          M.findById(m, function(err, m) {
+          M.findById(m, function (err, m) {
             assert.ifError(err);
             assert.equal(m.em.length, 2);
             assert.equal(m.em[0].username, 'Shawn');
@@ -1650,10 +1687,10 @@ describe('types array', function() {
 
             m.em[0].username = 'Arrietty';
             m.em[1].remove();
-            m.save(function(err) {
+            m.save(function (err) {
               assert.ifError(err);
 
-              M.findById(m, function(err, m) {
+              M.findById(m, function (err, m) {
                 db.close();
                 assert.ifError(err);
                 assert.equal(m.em.length, 1);
@@ -1667,25 +1704,25 @@ describe('types array', function() {
     });
   });
 
-  it('pushing top level arrays and subarrays works (gh-1073)', function(done) {
+  it('pushing top level arrays and subarrays works (gh-1073)', function (done) {
     var db = start();
-    var schema = new Schema({ em: [new Schema({ sub: [String] })]});
+    var schema = new Schema({em: [new Schema({sub: [String]})]});
     var M = db.model('gh1073', schema);
-    var m = new M({ em: [ { sub: [] }]});
-    m.save(function() {
-      M.findById(m, function(err, m) {
+    var m = new M({em: [{sub: []}]});
+    m.save(function () {
+      M.findById(m, function (err, m) {
         assert.ifError(err);
 
-        m.em[m.em.length - 1].sub.push("a");
-        m.em.push({ sub: [] });
+        m.em[m.em.length - 1].sub.push('a');
+        m.em.push({sub: []});
 
         assert.equal(2, m.em.length);
         assert.equal(1, m.em[0].sub.length);
 
-        m.save(function(err) {
+        m.save(function (err) {
           assert.ifError(err);
 
-          M.findById(m, function(err, m) {
+          M.findById(m, function (err, m) {
             assert.ifError(err);
             assert.equal(2, m.em.length);
             assert.equal(1, m.em[0].sub.length);
@@ -1697,8 +1734,8 @@ describe('types array', function() {
     });
   });
 
-  describe('default type', function() {
-    it('casts to Mixed', function(done) {
+  describe('default type', function () {
+    it('casts to Mixed', function (done) {
       var db = start(),
           DefaultArraySchema = new Schema({
             num1: Array,
@@ -1717,9 +1754,9 @@ describe('types array', function() {
           threw2 = false;
 
       try {
-        arr.num1.push({ x: 1 });
+        arr.num1.push({x: 1});
         arr.num1.push(9);
-        arr.num1.push("woah");
+        arr.num1.push('woah');
       } catch (err) {
         threw1 = true;
       }
@@ -1727,9 +1764,9 @@ describe('types array', function() {
       assert.equal(threw1, false);
 
       try {
-        arr.num2.push({ x: 1 });
+        arr.num2.push({x: 1});
         arr.num2.push(9);
-        arr.num2.push("woah");
+        arr.num2.push('woah');
       } catch (err) {
         threw2 = true;
       }
@@ -1739,17 +1776,17 @@ describe('types array', function() {
     });
   });
 
-  describe('removing from an array atomically using MongooseArray#remove', function() {
+  describe('removing from an array atomically using MongooseArray#remove', function () {
     var db;
     var B;
 
-    before(function(done) {
+    before(function (done) {
       var schema = Schema({
         numbers: ['number'],
-        numberIds: [{ _id: 'number', name: 'string' }],
-        stringIds: [{ _id: 'string', name: 'string' }],
-        bufferIds: [{ _id: 'buffer', name: 'string' }],
-        oidIds:    [{ name: 'string' }]
+        numberIds: [{_id: 'number', name: 'string'}],
+        stringIds: [{_id: 'string', name: 'string'}],
+        bufferIds: [{_id: 'buffer', name: 'string'}],
+        oidIds: [{name: 'string'}]
       });
 
       db = start();
@@ -1757,34 +1794,34 @@ describe('types array', function() {
       done();
     });
 
-    after(function(done) {
+    after(function (done) {
       db.close(done);
     });
 
-    it('works', function(done) {
+    it('works', function (done) {
       var post = new B;
       post.numbers.push(1, 2, 3);
 
-      post.save(function(err) {
+      post.save(function (err) {
         assert.ifError(err);
 
-        B.findById(post._id, function(err, doc) {
+        B.findById(post._id, function (err, doc) {
           assert.ifError(err);
 
           doc.numbers.remove('1');
-          doc.save(function(err) {
+          doc.save(function (err) {
             assert.ifError(err);
 
-            B.findById(post.get('_id'), function(err, doc) {
+            B.findById(post.get('_id'), function (err, doc) {
               assert.ifError(err);
 
               assert.equal(doc.numbers.length, 2);
               doc.numbers.remove('2', '3');
 
-              doc.save(function(err) {
+              doc.save(function (err) {
                 assert.ifError(err);
 
-                B.findById(post._id, function(err, doc) {
+                B.findById(post._id, function (err, doc) {
                   assert.ifError(err);
                   assert.equal(0, doc.numbers.length);
                   done();
@@ -1796,23 +1833,23 @@ describe('types array', function() {
       });
     });
 
-    describe('with subdocs', function() {
+    describe('with subdocs', function () {
       function docs(arr) {
-        return arr.map(function(val) {
-          return { _id: val };
+        return arr.map(function (val) {
+          return {_id: val};
         });
       }
 
-      it('supports passing strings', function(done) {
-        var post = new B({ stringIds: docs('a b c d'.split(' ')) });
-        post.save(function(err) {
+      it('supports passing strings', function (done) {
+        var post = new B({stringIds: docs('a b c d'.split(' '))});
+        post.save(function (err) {
           assert.ifError(err);
-          B.findById(post, function(err, post) {
+          B.findById(post, function (err, post) {
             assert.ifError(err);
             post.stringIds.remove('b');
-            post.save(function(err) {
+            post.save(function (err) {
               assert.ifError(err);
-              B.findById(post, function(err, post) {
+              B.findById(post, function (err, post) {
                 assert.ifError(err);
                 assert.equal(3, post.stringIds.length);
                 assert.ok(!post.stringIds.id('b'));
@@ -1822,16 +1859,16 @@ describe('types array', function() {
           });
         });
       });
-      it('supports passing numbers', function(done) {
-        var post = new B({ numberIds: docs([1,2,3,4]) });
-        post.save(function(err) {
+      it('supports passing numbers', function (done) {
+        var post = new B({numberIds: docs([1, 2, 3, 4])});
+        post.save(function (err) {
           assert.ifError(err);
-          B.findById(post, function(err, post) {
+          B.findById(post, function (err, post) {
             assert.ifError(err);
-            post.numberIds.remove(2,4);
-            post.save(function(err) {
+            post.numberIds.remove(2, 4);
+            post.save(function (err) {
               assert.ifError(err);
-              B.findById(post, function(err, post) {
+              B.findById(post, function (err, post) {
                 assert.ifError(err);
                 assert.equal(2, post.numberIds.length);
                 assert.ok(!post.numberIds.id(2));
@@ -1842,20 +1879,20 @@ describe('types array', function() {
           });
         });
       });
-      it('supports passing objectids', function(done) {
+      it('supports passing objectids', function (done) {
         var OID = mongoose.Types.ObjectId;
         var a = new OID;
         var b = new OID;
         var c = new OID;
-        var post = new B({ oidIds: docs([a,b,c]) });
-        post.save(function(err) {
+        var post = new B({oidIds: docs([a, b, c])});
+        post.save(function (err) {
           assert.ifError(err);
-          B.findById(post, function(err, post) {
+          B.findById(post, function (err, post) {
             assert.ifError(err);
-            post.oidIds.remove(a,c);
-            post.save(function(err) {
+            post.oidIds.remove(a, c);
+            post.save(function (err) {
               assert.ifError(err);
-              B.findById(post, function(err, post) {
+              B.findById(post, function (err, post) {
                 assert.ifError(err);
                 assert.equal(1, post.oidIds.length);
                 assert.ok(!post.oidIds.id(a));
@@ -1866,16 +1903,16 @@ describe('types array', function() {
           });
         });
       });
-      it('supports passing buffers', function(done) {
-        var post = new B({ bufferIds: docs(['a','b','c','d']) });
-        post.save(function(err) {
+      it('supports passing buffers', function (done) {
+        var post = new B({bufferIds: docs(['a', 'b', 'c', 'd'])});
+        post.save(function (err) {
           assert.ifError(err);
-          B.findById(post, function(err, post) {
+          B.findById(post, function (err, post) {
             assert.ifError(err);
             post.bufferIds.remove(new Buffer('a'));
-            post.save(function(err) {
+            post.save(function (err) {
               assert.ifError(err);
-              B.findById(post, function(err, post) {
+              B.findById(post, function (err, post) {
                 assert.ifError(err);
                 assert.equal(3, post.bufferIds.length);
                 assert.ok(!post.bufferIds.id(new Buffer('a')));

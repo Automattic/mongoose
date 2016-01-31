@@ -1,56 +1,56 @@
 var Schema = mongoose.Schema,
     ObjectId = mongoose.Schema.Types.ObjectId;
 
-var em = new mongoose.Schema({ title: String, body: String });
-em.virtual('works').get(function() {
+var em = new mongoose.Schema({title: String, body: String});
+em.virtual('works').get(function () {
   return 'em virtual works';
 });
 
 var schema = new Schema({
-  test    : String,
-  oids    : [ ObjectId ],
-  numbers : [ Number ],
-  nested  : {
-    age   : Number,
-    cool  : ObjectId,
-    deep  : { x: String },
-    path  : String,
-    setr  : String
+  test: String,
+  oids: [ObjectId],
+  numbers: [Number],
+  nested: {
+    age: Number,
+    cool: ObjectId,
+    deep: {x: String},
+    path: String,
+    setr: String
   },
-  nested2 : {
+  nested2: {
     nested: String,
-    yup   : {
-      nested  : Boolean,
-      yup     : String,
-      age     : Number
+    yup: {
+      nested: Boolean,
+      yup: String,
+      age: Number
     }
   },
   em: [em],
   date: Date
 });
 
-schema.virtual('nested.agePlus2').get(function() {
+schema.virtual('nested.agePlus2').get(function () {
   return this.get('nested.age') + 2;
 });
-schema.virtual('nested.setAge').set(function(v) {
+schema.virtual('nested.setAge').set(function (v) {
   this.set('nested.age', v);
 });
-schema.path('nested.path').get(function(v) {
+schema.path('nested.path').get(function (v) {
   return (this.get('nested.age') || '') + (v ? v : '');
 });
-schema.path('nested.setr').set(function(v) {
+schema.path('nested.setr').set(function (v) {
   return v + ' setter';
 });
 
-describe('browser:document', function() {
-  it('work', function(done) {
+describe('browser:document', function () {
+  it('work', function (done) {
     var obj = {
-      test    : 'test',
-      oids    : [],
-      nested  : {
-        age   : 5,
-        cool  : mongoose.Types.ObjectId.createFromHexString('4c6c2d6240ced95d0e00003c'),
-        path  : 'my path'
+      test: 'test',
+      oids: [],
+      nested: {
+        age: 5,
+        cool: mongoose.Types.ObjectId.createFromHexString('4c6c2d6240ced95d0e00003c'),
+        path: 'my path'
       }
     };
 
@@ -69,21 +69,21 @@ describe('browser:document', function() {
 
     var doc2 = new mongoose.Document(
         {
-          test    : 'toop',
-          oids    : [],
-          nested  : {
-            age   : 2,
-            cool  : mongoose.Types.ObjectId.createFromHexString('4cf70857337498f95900001c'),
-            deep  : { x: 'yay' }
+          test: 'toop',
+          oids: [],
+          nested: {
+            age: 2,
+            cool: mongoose.Types.ObjectId.createFromHexString('4cf70857337498f95900001c'),
+            deep: {x: 'yay'}
           }
         },
-      schema);
+        schema);
 
     assert.equal('toop', doc2.get('test'));
     assert.ok(doc2.get('oids') instanceof Array);
     assert.equal(doc2.get('nested.age'), 2);
 
-      // GH-366
+    // GH-366
     assert.equal(doc2.get('nested.bonk'), undefined);
     assert.equal(doc2.get('nested.nested'), undefined);
     assert.equal(doc2.get('nested.test'), undefined);
@@ -101,13 +101,13 @@ describe('browser:document', function() {
 
     doc2.set('nested2.yup', {
       age: 150,
-      yup: "Yesiree",
+      yup: 'Yesiree',
       nested: true
     });
 
     assert.equal(doc2.get('nested2.nested'), undefined);
     assert.equal(doc2.get('nested2.yup.nested'), true);
-    assert.equal(doc2.get('nested2.yup.yup'), "Yesiree");
+    assert.equal(doc2.get('nested2.yup.yup'), 'Yesiree');
     assert.equal(doc2.get('nested2.yup.age'), 150);
     doc2.set('nested2.nested', 'y');
     assert.equal(doc2.get('nested2.nested'), 'y');
@@ -122,25 +122,28 @@ describe('browser:document', function() {
   });
 });
 
-describe('browser:validate', function() {
-  it('works', function(done) {
+describe('browser:validate', function () {
+  it('works', function (done) {
     var called = false;
-    var validate = [ function() { called = true; return true; }, 'BAM'];
+    var validate = [function () {
+      called = true;
+      return true;
+    }, 'BAM'];
 
     schema = new Schema({
-      prop: { type: String, required: true, validate: validate },
-      nick: { type: String, required: true }
+      prop: {type: String, required: true, validate: validate},
+      nick: {type: String, required: true}
     });
 
     var doc = new mongoose.Document({}, schema);
-    doc.validate(function(error) {
+    doc.validate(function (error) {
       assert.ok(!!error);
       assert.ok(called);
       assert.equal('Path `prop` is required.', error.errors['prop'].message);
       assert.equal('Path `nick` is required.', error.errors['nick'].message);
 
       doc.prop = 'Bacon';
-      doc.validate(function(error) {
+      doc.validate(function (error) {
         assert.ok(!error.errors['prop']);
         assert.equal('Path `nick` is required.', error.errors['nick'].message);
         done();
@@ -149,48 +152,48 @@ describe('browser:validate', function() {
   });
 });
 
-describe('#equals', function() {
-  describe('should work', function() {
-    var S = new Schema({ _id: String });
-    var N = new Schema({ _id: Number });
-    var O = new Schema({ _id: Schema.ObjectId });
-    var B = new Schema({ _id: mongoose.Schema.Types.Buffer });
-    var M = new Schema({ name: String }, { _id: false });
+describe('#equals', function () {
+  describe('should work', function () {
+    var S = new Schema({_id: String});
+    var N = new Schema({_id: Number});
+    var O = new Schema({_id: Schema.ObjectId});
+    var B = new Schema({_id: mongoose.Schema.Types.Buffer});
+    var M = new Schema({name: String}, {_id: false});
 
-    it('with string _ids', function(done) {
-      var s1 = new mongoose.Document({ _id: 'one' }, S);
-      var s2 = new mongoose.Document({ _id: 'one' }, S);
+    it('with string _ids', function (done) {
+      var s1 = new mongoose.Document({_id: 'one'}, S);
+      var s2 = new mongoose.Document({_id: 'one'}, S);
       assert.ok(s1.equals(s2));
       done();
     });
-    it('with number _ids', function(done) {
-      var n1 = new mongoose.Document({ _id: 0 }, N);
-      var n2 = new mongoose.Document({ _id: 0 }, N);
+    it('with number _ids', function (done) {
+      var n1 = new mongoose.Document({_id: 0}, N);
+      var n2 = new mongoose.Document({_id: 0}, N);
       assert.ok(n1.equals(n2));
       done();
     });
-    it('with ObjectId _ids', function(done) {
+    it('with ObjectId _ids', function (done) {
       var id = new mongoose.Types.ObjectId;
-      var o1 = new mongoose.Document({ _id: id }, O);
-      var o2 = new mongoose.Document({ _id: id }, O);
+      var o1 = new mongoose.Document({_id: id}, O);
+      var o2 = new mongoose.Document({_id: id}, O);
       assert.ok(o1.equals(o2));
 
       id = String(new mongoose.Types.ObjectId);
-      o1 = new mongoose.Document({ _id: id }, O);
-      o2 = new mongoose.Document({ _id: id }, O);
+      o1 = new mongoose.Document({_id: id}, O);
+      o2 = new mongoose.Document({_id: id}, O);
       assert.ok(o1.equals(o2));
       done();
     });
-    it('with Buffer _ids', function(done) {
-      var n1 = new mongoose.Document({ _id: 0 }, B);
-      var n2 = new mongoose.Document({ _id: 0 }, B);
+    it('with Buffer _ids', function (done) {
+      var n1 = new mongoose.Document({_id: 0}, B);
+      var n2 = new mongoose.Document({_id: 0}, B);
       assert.ok(n1.equals(n2));
       done();
     });
-    it('with _id disabled (gh-1687)', function(done) {
+    it('with _id disabled (gh-1687)', function (done) {
       var m1 = new mongoose.Document({}, M);
       var m2 = new mongoose.Document({}, M);
-      assert.doesNotThrow(function() {
+      assert.doesNotThrow(function () {
         m1.equals(m2);
       });
       done();

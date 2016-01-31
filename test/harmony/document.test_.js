@@ -14,23 +14,23 @@ var assert = require('assert');
  *  Note that the `yield` keyword is currently only supported in NodeJS 0.11.x
  *  with the `--harmony` flag.
  */
-describe('Documents in ES6', function() {
+describe('Documents in ES6', function () {
   var db;
   var collectionNameCounter = 0;
 
-  var getCollectionName = function() {
+  var getCollectionName = function () {
     return 'harmony-documents-validate-' + (++collectionNameCounter);
   };
 
-  beforeEach(function() {
-    db = start({ noErrorListener: 1 });
+  beforeEach(function () {
+    db = start({noErrorListener: 1});
   });
 
-  afterEach(function(done) {
+  afterEach(function (done) {
     db.close(done);
   });
 
-  it('validate() integrates with co and the yield keyword', function(done) {
+  it('validate() integrates with co and the yield keyword', function (done) {
     co(function*() {
       var schema = null;
       var called = false;
@@ -38,7 +38,7 @@ describe('Documents in ES6', function() {
       var error;
 
       var validate = {
-        validator: function() {
+        validator: function () {
           called = true;
           return shouldSucceed;
         },
@@ -46,12 +46,12 @@ describe('Documents in ES6', function() {
       };
 
       schema = new Schema({
-        eggs: { type: String, required: true, validate: validate },
-        bacon: { type: Boolean, required: true }
+        eggs: {type: String, required: true, validate: validate},
+        bacon: {type: Boolean, required: true}
       });
 
       var M = db.model('validateSchema', schema, getCollectionName());
-      var m = new M({ eggs: 'Sunny side up', bacon: false });
+      var m = new M({eggs: 'Sunny side up', bacon: false});
 
       try {
         yield m.validate();
@@ -78,16 +78,16 @@ describe('Documents in ES6', function() {
     })();
   });
 
-  it('save() integrates with co and the yield keyword', function(done) {
+  it('save() integrates with co and the yield keyword', function (done) {
     co(function*() {
       var error;
       var schema = new Schema({
-        description: { type: String, required: true }
+        description: {type: String, required: true}
       });
 
       var Breakfast = db.model('breakfast', schema, getCollectionName());
 
-      var goodBreakfast = new Breakfast({ description: 'eggs & bacon' });
+      var goodBreakfast = new Breakfast({description: 'eggs & bacon'});
 
       try {
         yield goodBreakfast.save();
@@ -120,7 +120,7 @@ describe('Documents in ES6', function() {
     })();
   });
 
-  it('populate() *requires* execPopulate() to work with the yield keyword', function(done) {
+  it('populate() *requires* execPopulate() to work with the yield keyword', function (done) {
     /**
      *  Because the `populate()` function supports chaining, it's difficult
      *  to determine when the chain is 'done'. Therefore, you need to call
@@ -131,7 +131,7 @@ describe('Documents in ES6', function() {
       var breakfastCollectionName = getCollectionName();
       var foodCollectionName = getCollectionName();
       var breakfastSchema = new Schema({
-        foods: [{ type: mongoose.Schema.ObjectId, ref: foodCollectionName }]
+        foods: [{type: mongoose.Schema.ObjectId, ref: foodCollectionName}]
       });
 
       var foodSchema = new Schema({
@@ -141,9 +141,9 @@ describe('Documents in ES6', function() {
       var Food = db.model(foodCollectionName, foodSchema, foodCollectionName);
       var Breakfast = db.model(breakfastCollectionName, breakfastSchema, breakfastCollectionName);
 
-      var bacon = new Food({ name: 'bacon' });
-      var eggs = new Food({ name: 'eggs' });
-      var goodBreakfast = new Breakfast({ foods: [bacon, eggs] });
+      var bacon = new Food({name: 'bacon'});
+      var eggs = new Food({name: 'eggs'});
+      var goodBreakfast = new Breakfast({foods: [bacon, eggs]});
 
       try {
         yield [bacon.save(), eggs.save(), goodBreakfast.save()];
@@ -174,7 +174,7 @@ describe('Documents in ES6', function() {
     })();
   });
 
-  it('update() works with co and yield', function(done) {
+  it('update() works with co and yield', function (done) {
     co(function*() {
       var schema = new Schema({
         steak: String,
@@ -187,7 +187,7 @@ describe('Documents in ES6', function() {
       var error;
 
       try {
-        yield breakfast.update({ steak: 'Ribeye', eggs: 'Scrambled' }, { upsert: true }).exec();
+        yield breakfast.update({steak: 'Ribeye', eggs: 'Scrambled'}, {upsert: true}).exec();
       } catch (e) {
         error = e;
       }

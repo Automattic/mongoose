@@ -10,7 +10,7 @@ var ObjectId = mongoose.Types.ObjectId;
 
 var dbname = 'testing_populateAdInfinitum_' + require('../../lib/utils').random();
 mongoose.connect('localhost', dbname);
-mongoose.connection.on('error', function() {
+mongoose.connection.on('error', function () {
   console.error('connection error', arguments);
 });
 
@@ -41,8 +41,7 @@ var BlogPost = mongoose.model('BlogPost', blogpost);
  * example
  */
 
-mongoose.connection.on('open', function() {
-
+mongoose.connection.on('open', function () {
   /**
    * Generate data
    */
@@ -71,7 +70,7 @@ mongoose.connection.on('open', function() {
     friends: [userIds[0], userIds[1], userIds[2]]
   });
 
-  User.create(users, function(err) {
+  User.create(users, function (err) {
     assert.ifError(err);
 
     var blogposts = [];
@@ -91,7 +90,7 @@ mongoose.connection.on('open', function() {
       author: userIds[2]
     });
 
-    BlogPost.create(blogposts, function(err) {
+    BlogPost.create(blogposts, function (err) {
       assert.ifError(err);
 
       /**
@@ -99,10 +98,10 @@ mongoose.connection.on('open', function() {
        */
 
       BlogPost
-      .find({ tags: 'fun' })
+      .find({tags: 'fun'})
       .lean()
       .populate('author')
-      .exec(function(err, docs) {
+      .exec(function (err, docs) {
         assert.ifError(err);
 
         /**
@@ -112,13 +111,13 @@ mongoose.connection.on('open', function() {
         var opts = {
           path: 'author.friends',
           select: 'name',
-          options: { limit: 2 }
+          options: {limit: 2}
         };
 
-        BlogPost.populate(docs, opts, function(err, docs) {
+        BlogPost.populate(docs, opts, function (err, docs) {
           assert.ifError(err);
           console.log('populated');
-          var s = require('util').inspect(docs, { depth: null, colors: true });
+          var s = require('util').inspect(docs, {depth: null, colors: true});
           console.log(s);
           done();
         });
@@ -129,7 +128,7 @@ mongoose.connection.on('open', function() {
 
 function done(err) {
   if (err) console.error(err.stack);
-  mongoose.connection.db.dropDatabase(function() {
+  mongoose.connection.db.dropDatabase(function () {
     mongoose.connection.close();
   });
 }

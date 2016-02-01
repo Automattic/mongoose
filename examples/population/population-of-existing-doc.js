@@ -35,7 +35,7 @@ var Game = mongoose.model('Game', gameSchema);
  * the default port (27017)
  */
 
-mongoose.connect('mongodb://localhost/console', function(err) {
+mongoose.connect('mongodb://localhost/console', function (err) {
   // if we failed to connect, abort
   if (err) throw err;
 
@@ -54,7 +54,7 @@ function createData() {
       manufacturer: 'Nintendo',
       released: 'September 29, 1996'
     },
-    function(err, nintendo64) {
+    function (err, nintendo64) {
       if (err) return done(err);
 
       Game.create({
@@ -63,7 +63,7 @@ function createData() {
         released: new Date('November 21, 1998'),
         consoles: [nintendo64]
       },
-      function(err) {
+      function (err) {
         if (err) return done(err);
         example();
       });
@@ -77,14 +77,14 @@ function createData() {
 
 function example() {
   Game
-  .findOne({ name: /^Legend of Zelda/ })
-  .exec(function(err, ocinara) {
+  .findOne({name: /^Legend of Zelda/})
+  .exec(function (err, ocinara) {
     if (err) return done(err);
 
     console.log('"%s" console _id: %s', ocinara.name, ocinara.consoles[0]);
 
     // population of existing document
-    ocinara.populate('consoles', function(err) {
+    ocinara.populate('consoles', function (err) {
       if (err) return done(err);
 
       console.log(
@@ -101,8 +101,8 @@ function example() {
 
 function done(err) {
   if (err) console.error(err);
-  Console.remove(function() {
-    Game.remove(function() {
+  Console.remove(function () {
+    Game.remove(function () {
       mongoose.disconnect();
     });
   });

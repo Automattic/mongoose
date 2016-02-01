@@ -1,4 +1,3 @@
-
 var mongoose = require('../../lib');
 var Benchmark = require('benchmark');
 
@@ -20,10 +19,14 @@ var ObjectId = Schema.Types.ObjectId;
  */
 
 
-mongoose.connect('mongodb://localhost/mongoose-bench', function(err) {
-  if (err) throw err;
-  mongo.connect('mongodb://localhost/mongoose-bench', function(err, db) {
-    if (err) throw err;
+mongoose.connect('mongodb://localhost/mongoose-bench', function (err) {
+  if (err) {
+    throw err;
+  }
+  mongo.connect('mongodb://localhost/mongoose-bench', function (err, db) {
+    if (err) {
+      throw err;
+    }
 
     var Comments = new Schema;
     Comments.add({
@@ -59,10 +62,10 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function(err) {
       author: 'somebody',
       slug: 'test.post',
       date: new Date(),
-      meta: { date : new Date(), visitors: 9001},
+      meta: {date: new Date(), visitors: 9001},
       published: true,
-      mixed: { thisIsRandom : true },
-      numbers: [1,2,7,10,23432],
+      mixed: {thisIsRandom: true},
+      numbers: [1, 2, 7, 10, 23432],
       tags: ['test', 'BENCH', 'things', 'more things'],
       def: 'THANGS!!!',
       comments: []
@@ -81,14 +84,14 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function(err) {
       blogData.comments.push(commentData);
     }
     var data = {
-      name : "name",
-      age : 0,
-      likes : ["dogs", "cats", "pizza"],
-      address : " Nowhere-ville USA"
+      name: 'name',
+      age: 0,
+      likes: ['dogs', 'cats', 'pizza'],
+      address: ' Nowhere-ville USA'
     };
 
     var UserSchema = new Schema({
-      name : String,
+      name: String,
       age: Number,
       likes: [String],
       address: String
@@ -100,67 +103,74 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function(err) {
     var blogpost = db.collection('blogpost');
 
     function closeDB() {
-      mongoose.connection.db.dropDatabase(function() {
+      mongoose.connection.db.dropDatabase(function () {
         mongoose.disconnect();
         process.exit();
       });
     }
 
     suite.add('Insert - Mongoose - Basic', {
-      defer : true,
-      fn : function(deferred) {
+      defer: true,
+      fn: function (deferred) {
         var nData = utils.clone(data);
-        User.create(nData, function(err) {
-          if (err) throw err;
+        User.create(nData, function (err) {
+          if (err) {
+            throw err;
+          }
           deferred.resolve();
         });
       }
     }).add('Insert - Driver - Basic', {
-      defer : true,
-      fn : function(deferred) {
+      defer: true,
+      fn: function (deferred) {
         var nData = utils.clone(data);
-        user.insert(nData, function(err) {
-          if (err) throw err;
+        user.insert(nData, function (err) {
+          if (err) {
+            throw err;
+          }
           deferred.resolve();
         });
       }
     }).add('Insert - Mongoose - Embedded Docs', {
-      defer : true,
-      fn : function(deferred) {
+      defer: true,
+      fn: function (deferred) {
         var bp = utils.clone(blogData);
-        BlogPost.create(bp, function(err) {
-          if (err) throw err;
+        BlogPost.create(bp, function (err) {
+          if (err) {
+            throw err;
+          }
           deferred.resolve();
         });
       }
     }).add('Insert - Driver - Embedded Docs', {
-      defer : true,
-      fn : function(deferred) {
-
+      defer: true,
+      fn: function (deferred) {
         var bp = utils.clone(blogData);
-        blogpost.insert(bp, function(err) {
-          if (err) throw err;
+        blogpost.insert(bp, function (err) {
+          if (err) {
+            throw err;
+          }
           deferred.resolve();
         });
       }
     })
-    .on('cycle', function(evt) {
+    .on('cycle', function (evt) {
       if (process.env.MONGOOSE_DEV || process.env.PULL_REQUEST) {
         console.log(String(evt.target));
       }
-    }).on('complete', function() {
+    }).on('complete', function () {
       closeDB();
       if (!process.env.MONGOOSE_DEV && !process.env.PULL_REQUEST) {
         var outObj = {};
-        this.forEach(function(item) {
+        this.forEach(function (item) {
           var out = {};
           out.stats = item.stats;
           delete out.stats.sample;
           out.ops = item.hz;
-          outObj[item.name.replace(/\s/g, "")] = out;
+          outObj[item.name.replace(/\s/g, '')] = out;
         });
         console.log(JSON.stringify(outObj));
       }
-    }).run({ async : true });
+    }).run({async: true});
   });
 });

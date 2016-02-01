@@ -1,4 +1,3 @@
-
 /**
  * Module dependencies.
  */
@@ -9,21 +8,20 @@ var SchemaNumber = mongoose.Schema.Types.Number;
  * Test.
  */
 
-describe('types.number', function() {
-
-  it('an empty string casts to null', function(done) {
+describe('types.number', function () {
+  it('an empty string casts to null', function (done) {
     var n = new SchemaNumber();
     assert.strictEqual(n.cast(''), null);
     done();
   });
 
-  it('a null number should castForQuery to null', function(done) {
+  it('a null number should castForQuery to null', function (done) {
     var n = new SchemaNumber();
     assert.strictEqual(n.castForQuery(null), null);
     done();
   });
 
-  it('undefined throws number cast error', function(done) {
+  it('undefined throws number cast error', function (done) {
     var n = new SchemaNumber();
     var err;
     try {
@@ -35,7 +33,7 @@ describe('types.number', function() {
     done();
   });
 
-  it('array throws cast number error', function(done) {
+  it('array throws cast number error', function (done) {
     var n = new SchemaNumber();
     var err;
     try {
@@ -47,7 +45,7 @@ describe('types.number', function() {
     done();
   });
 
-  it('three throws cast number error', function(done) {
+  it('three throws cast number error', function (done) {
     var n = new SchemaNumber();
     var err;
     try {
@@ -59,7 +57,7 @@ describe('types.number', function() {
     done();
   });
 
-  it('{} throws cast number error', function(done) {
+  it('{} throws cast number error', function (done) {
     var n = new SchemaNumber();
     var err;
     try {
@@ -71,7 +69,7 @@ describe('types.number', function() {
     done();
   });
 
-  it('does not throw number cast error', function(done) {
+  it('does not throw number cast error', function (done) {
     var n = new SchemaNumber();
     var items = [1, '2', '0', null, '', new String('47'), new Number(5), Number(47), Number('09'), 0x12];
     var err;
@@ -85,5 +83,4 @@ describe('types.number', function() {
     assert.strictEqual(false, !!err, err);
     done();
   });
-
 });

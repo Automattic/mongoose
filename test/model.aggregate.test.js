@@ -22,14 +22,14 @@ var userSchema = new Schema({
 var collection = 'aggregate_' + random();
 mongoose.model('Aggregate', userSchema);
 
-describe('model aggregate', function() {
-  var group = { $group: { _id: null, maxAge: { $max: '$age' } }};
-  var project = { $project: { maxAge: 1, _id: 0 }};
+describe('model aggregate', function () {
+  var group = {$group: {_id: null, maxAge: {$max: '$age'}}};
+  var project = {$project: {maxAge: 1, _id: 0}};
   var db, A, maxAge;
 
   var mongo26_or_greater = false;
 
-  before(function(done) {
+  before(function (done) {
     db = start();
     A = db.model('Aggregate', collection);
 
@@ -41,29 +41,29 @@ describe('model aggregate', function() {
     for (var i = 0; i < num; ++i) {
       var age = Math.random() * 100 | 0;
       maxAge = Math.max(maxAge, age);
-      docs.push({ author: authors[i % authors.length], age: age });
+      docs.push({author: authors[i % authors.length], age: age});
     }
 
-    A.create(docs, function(err) {
+    A.create(docs, function (err) {
       assert.ifError(err);
-      start.mongodVersion(function(err, version) {
+      start.mongodVersion(function (err, version) {
         if (err) throw err;
-        mongo26_or_greater = 2 < version[0] || (2 == version[0] && 6 <= version[1]);
+        mongo26_or_greater = version[0] > 2 || (version[0] === 2 && version[1] >= 6);
         if (!mongo26_or_greater) console.log('not testing mongodb 2.6 features');
         done();
       });
     });
   });
 
-  after(function(done) {
+  after(function (done) {
     db.close(done);
   });
 
-  describe('works', function() {
-    it('with argument lists', function(done) {
+  describe('works', function () {
+    it('with argument lists', function (done) {
       this.timeout(4000);
 
-      A.aggregate(group, project, function(err, res) {
+      A.aggregate(group, project, function (err, res) {
         assert.ifError(err);
         assert.ok(res);
         assert.equal(1, res.length);
@@ -73,10 +73,10 @@ describe('model aggregate', function() {
       });
     });
 
-    it('with arrays', function(done) {
+    it('with arrays', function (done) {
       this.timeout(4000);
 
-      A.aggregate([group, project], function(err, res) {
+      A.aggregate([group, project], function (err, res) {
         assert.ifError(err);
         assert.ok(res);
         assert.equal(1, res.length);
@@ -86,13 +86,13 @@ describe('model aggregate', function() {
       });
     });
 
-    it('with Aggregate syntax', function(done) {
+    it('with Aggregate syntax', function (done) {
       this.timeout(4000);
 
       var promise = A.aggregate()
         .group(group.$group)
         .project(project.$project)
-        .exec(function(err, res) {
+        .exec(function (err, res) {
           assert.ifError(err);
           assert.ok(promise instanceof mongoose.Promise);
           assert.ok(res);
@@ -103,7 +103,7 @@ describe('model aggregate', function() {
         });
     });
 
-    it('with Aggregate syntax if callback not provided', function(done) {
+    it('with Aggregate syntax if callback not provided', function (done) {
       this.timeout(4000);
 
       var promise = A.aggregate()
@@ -111,7 +111,7 @@ describe('model aggregate', function() {
         .project(project.$project)
         .exec();
 
-      promise.then(function(res) {
+      promise.then(function (res) {
         assert.ok(promise instanceof mongoose.Promise);
         assert.ok(res);
         assert.equal(1, res.length);
@@ -121,12 +121,12 @@ describe('model aggregate', function() {
       }).end();
     });
 
-    it('when returning Aggregate', function(done) {
+    it('when returning Aggregate', function (done) {
       assert(A.aggregate(project) instanceof Aggregate);
       done();
     });
 
-    it('can use helper for $out', function(done) {
+    it('can use helper for $out', function (done) {
       if (!mongo26_or_greater) {
         return done();
       }
@@ -138,9 +138,9 @@ describe('model aggregate', function() {
         .group(group.$group)
         .project(project.$project)
         .out(outputCollection)
-        .exec(function(error) {
+        .exec(function (error) {
           assert.ifError(error);
-          A.db.collection(outputCollection).find().toArray(function(error, documents) {
+          A.db.collection(outputCollection).find().toArray(function (error, documents) {
             assert.ifError(error);
             assert.equal(1, documents.length);
             assert.ok('maxAge' in documents[0]);

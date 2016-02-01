@@ -147,7 +147,7 @@ function parse (docs) {
 
     // add constructor to properties too
     methods.some(function (method) {
-      if (method.ctx && 'method' == method.ctx.type && method.ctx.hasOwnProperty('constructor')) {
+      if (method.ctx && 'method' === method.ctx.type && method.ctx.hasOwnProperty('constructor')) {
         props.forEach(function (prop) {
           prop.ctx.constructor = method.ctx.constructor;
         });
@@ -201,7 +201,7 @@ function fix (str) {
     // parse out the ```language
     var code = /^(?:`{3}([^\n]+)\n)?([\s\S]*)/gm.exec($2);
 
-    if ('js' == code[1] || !code[1]) {
+    if ('js' === code[1] || !code[1]) {
       code[1] = 'javascript';
     }
 
@@ -226,9 +226,9 @@ function order (docs) {
   for (var i = 0; i < docs.length; ++i) {
     var doc = docs[i];
 
-    if ('index.js' == doc.title) {
+    if ('index.js' === doc.title) {
       docs.unshift(docs.splice(i, 1)[0]);
-    } else if ('collection.js' == doc.title) {
+    } else if ('collection.js' === doc.title) {
       docs.push(docs.splice(i, 1)[0]);
     }
 

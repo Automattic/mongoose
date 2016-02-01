@@ -23,8 +23,8 @@ var posts = 'blogposts_' + random(),
  * Tests.
  */
 
-describe('model: populate:', function() {
-  describe('setting populated paths (gh-570)', function() {
+describe('model: populate:', function () {
+  describe('setting populated paths (gh-570)', function () {
     var types = {
       'ObjectId': DocObjectId,
       'String': String,
@@ -36,34 +36,34 @@ describe('model: populate:', function() {
     construct.String = random;
     construct.ObjectId = DocObjectId;
     construct.Number = random;
-    construct.Buffer = function() {
+    construct.Buffer = function () {
       return new Buffer(random());
     };
 
-    Object.keys(types).forEach(function(id) {
-      describe('should not cast to _id of type ' + id, function() {
+    Object.keys(types).forEach(function (id) {
+      describe('should not cast to _id of type ' + id, function () {
         var refuser;
         var db;
         var B, U;
         var u1;
         var b1, b2;
 
-        before(function(done) {
+        before(function (done) {
           refuser = 'RefUser-' + id;
 
-          var bSchema = Schema({
+          var bSchema = new Schema({
             title: String,
-            fans: [{type: id, ref: refuser }],
-            adhoc: [{ subdoc: id, subarray: [{ things: [id] }] }],
-            _creator: { type: id, ref: refuser },
+            fans: [{type: id, ref: refuser}],
+            adhoc: [{subdoc: id, subarray: [{things: [id]}]}],
+            _creator: {type: id, ref: refuser},
             embed: [{
-              other: { type: id, ref: refuser },
-              array: [{ type: id, ref: refuser }],
-              nested: [{ subdoc: { type: id, ref: refuser }}]
+              other: {type: id, ref: refuser},
+              array: [{type: id, ref: refuser}],
+              nested: [{subdoc: {type: id, ref: refuser}}]
             }]
           });
 
-          var uSchema = Schema({
+          var uSchema = new Schema({
             _id: id,
             name: String,
             email: String
@@ -81,24 +81,24 @@ describe('model: populate:', function() {
             _id: construct[id](),
             name: 'Fan 2',
             email: 'fan2@learnboost.com'
-          }, function(err, fan1, fan2) {
+          }, function (err, fan1, fan2) {
             assert.ifError(err);
             u1 = fan1;
 
             B.create({
               title: 'Woot',
               fans: [fan1, fan2],
-              adhoc: [{ subdoc: fan2, subarray: [{ things: [fan1] }]}],
+              adhoc: [{subdoc: fan2, subarray: [{things: [fan1]}]}],
               _creator: fan1,
-              embed: [{ other: fan1, array: [fan1, fan2] }, { other: fan2, array: [fan2, fan1] }]
+              embed: [{other: fan1, array: [fan1, fan2]}, {other: fan2, array: [fan2, fan1]}]
             }, {
               title: 'Woot2',
               fans: [fan2, fan1],
-              adhoc: [{ subdoc: fan1, subarray: [{ things: [fan2] }]}],
+              adhoc: [{subdoc: fan1, subarray: [{things: [fan2]}]}],
               _creator: fan1,
               _creator: fan2,
-              embed: [{ other: fan2, array: [fan2, fan1] }, { other: fan1, array: [fan1, fan2] }]
-            }, function(err, post1, post2) {
+              embed: [{other: fan2, array: [fan2, fan1]}, {other: fan1, array: [fan1, fan2]}]
+            }, function (err, post1, post2) {
               assert.ifError(err);
               b1 = post1;
               b2 = post2;
@@ -107,24 +107,24 @@ describe('model: populate:', function() {
           });
         });
 
-        after(function(done) {
+        after(function (done) {
           db.close(done);
         });
 
         function userLiteral(name) {
-          return { _id: construct[id](), name: name };
+          return {_id: construct[id](), name: name};
         }
 
         function user(name) {
           return new U(userLiteral(name));
         }
 
-        it('if a document', function(done) {
+        it('if a document', function (done) {
           B.findById(b1)
            .populate('fans _creator embed.other embed.array embed.nested.subdoc')
-           .populate({ path: 'adhoc.subdoc', model: refuser })
-           .populate({ path: 'adhoc.subarray.things', model: refuser })
-           .exec(function(err, doc) {
+           .populate({path: 'adhoc.subdoc', model: refuser})
+           .populate({path: 'adhoc.subarray.things', model: refuser})
+           .exec(function (err, doc) {
              assert.ifError(err);
 
              var user3 = user('user3');
@@ -147,7 +147,7 @@ describe('model: populate:', function() {
              doc.fans.addToSet(user7);
              assert.deepEqual(doc.fans[5].toObject(), user7.toObject());
 
-             doc.fans.forEach(function(doc) {
+             doc.fans.forEach(function (doc) {
                assert.ok(doc instanceof U);
              });
 
@@ -186,7 +186,7 @@ describe('model: populate:', function() {
              assert.deepEqual(doc.embed[0].other.toObject(), user1b.toObject());
 
              var user1c = user('user2c');
-             doc.embed[0].nested = [{ subdoc: user1c }];
+             doc.embed[0].nested = [{subdoc: user1c}];
              assert.deepEqual(doc.embed[0].nested[0].subdoc.toObject(), user1c.toObject());
 
             // embedded without declared ref in schema
@@ -198,9 +198,9 @@ describe('model: populate:', function() {
              doc.adhoc[0].subarray[0].things.push(user2b);
              assert.deepEqual(doc.adhoc[0].subarray[0].things[1].toObject(), user2b.toObject());
 
-             doc.save(function(err) {
+             doc.save(function (err) {
                assert.ifError(err);
-               B.findById(b1).exec(function(err, doc) {
+               B.findById(b1).exec(function (err, doc) {
                 // db is closed in after()
                  assert.ifError(err);
                  assert.equal(8, doc.fans.length);
@@ -220,12 +220,12 @@ describe('model: populate:', function() {
            });
         });
 
-        it('if an object', function(done) {
+        it('if an object', function (done) {
           B.findById(b2)
            .populate('fans _creator embed.other embed.array embed.nested.subdoc')
-           .populate({ path: 'adhoc.subdoc', model: refuser })
-           .populate({ path: 'adhoc.subarray.things', model: refuser })
-           .exec(function(err, doc) {
+           .populate({path: 'adhoc.subdoc', model: refuser})
+           .populate({path: 'adhoc.subarray.things', model: refuser})
+           .exec(function (err, doc) {
              assert.ifError(err);
 
              var name = 'fan1';
@@ -239,7 +239,7 @@ describe('model: populate:', function() {
              assert.equal(name, doc.fans[3].name);
 
              name = 'fan3';
-             doc.fans.splice(2,1,userLiteral(name));
+             doc.fans.splice(2, 1, userLiteral(name));
              assert.ok(doc.fans[2]._id);
              assert.equal(name, doc.fans[2].name);
 
@@ -258,7 +258,7 @@ describe('model: populate:', function() {
              assert.ok(doc.fans[0]._id);
              assert.equal(name, doc.fans[0].name);
 
-             doc.fans.forEach(function(doc) {
+             doc.fans.forEach(function (doc) {
                assert.ok(doc instanceof U);
              });
 
@@ -287,7 +287,7 @@ describe('model: populate:', function() {
 
              name = 'user1c';
              var user1c = userLiteral(name);
-             doc.embed[0].nested = [{ subdoc: user1c }];
+             doc.embed[0].nested = [{subdoc: user1c}];
              assert.equal(name, doc.embed[0].nested[0].subdoc.name);
              var user1cId = doc.embed[0].nested[0].subdoc._id;
 
@@ -304,9 +304,9 @@ describe('model: populate:', function() {
              assert.deepEqual(name, doc.adhoc[0].subarray[0].things[1].name);
              var user2bId = doc.adhoc[0].subarray[0].things[1]._id;
 
-             doc.save(function(err) {
+             doc.save(function (err) {
                assert.ifError(err);
-               B.findById(b2).exec(function(err, doc) {
+               B.findById(b2).exec(function (err, doc) {
                 // db is closed in after()
                  assert.ifError(err);
                  assert.equal(6, doc.fans.length);
@@ -323,7 +323,6 @@ describe('model: populate:', function() {
              });
            });
         });
-
       });
     });
   });

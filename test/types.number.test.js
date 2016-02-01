@@ -12,7 +12,6 @@ var mongoose = require('./common').mongoose,
  */
 
 describe('types.number', function() {
-
   it('an empty string casts to null', function(done) {
     var n = new SchemaNumber();
     assert.strictEqual(n.cast(''), null);

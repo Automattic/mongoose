@@ -1,4 +1,3 @@
-
 var start = require('./common'),
     mongoose = start.mongoose,
     assert = require('assert'),
@@ -13,13 +12,15 @@ describe('collections:', function() {
         pending = 2;
 
     function finish() {
-      if (--pending) return;
+      if (--pending) {
+        return;
+      }
       assert.ok(connected);
       assert.ok(inserted);
       done();
     }
 
-    collection.insert({ }, { safe: true }, function() {
+    collection.insert({}, {safe: true}, function() {
       assert.ok(connected);
       inserted = true;
       db.close();

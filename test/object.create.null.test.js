@@ -1,5 +1,3 @@
-
-
 /**
  * Test dependencies.
  */
@@ -13,9 +11,9 @@ var schema = new Schema({
   a: String,
   b: {
     c: Number,
-    d: [{ e: String }]
+    d: [{e: String}]
   },
-  f: { g: Date },
+  f: {g: Date},
   h: {}
 });
 
@@ -71,7 +69,7 @@ describe('is compatible with object created using Object.create(null) (gh-1484)'
       assert.equal(date, m.f.g);
       assert.equal(1, m.h.ad);
       assert.equal(2, m.h.hoc);
-      assert.deepEqual({},m.h.obj);
+      assert.deepEqual({}, m.h.obj);
     });
 
     done();
@@ -128,7 +126,7 @@ describe('is compatible with object created using Object.create(null) (gh-1484)'
       var o = Object.create(null);
       o = {};
       o.name = String;
-      var x = { type: [o] };
+      var x = {type: [o]};
       s.path('works', x);
     });
 

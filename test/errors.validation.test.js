@@ -30,7 +30,7 @@ describe('ValidationError', function() {
       model = new M({
         name: 'Model',
         contents: [
-          { key: 'foo' }
+          {key: 'foo'}
         ]
       });
 
@@ -50,7 +50,7 @@ describe('ValidationError', function() {
           model;
 
       MinSchema = new Schema({
-        appointmentDate: { type: Date, min: Date.now }
+        appointmentDate: {type: Date, min: Date.now}
       });
 
       M = mongoose.model('MinSchema', MinSchema);
@@ -59,12 +59,12 @@ describe('ValidationError', function() {
         appointmentDate: new Date(Date.now().valueOf() - 10000)
       });
 
-      //should fail validation
+      // should fail validation
       model.validate(function(err) {
         assert.notEqual(err, null, 'min Date validation failed.');
         model.appointmentDate = new Date(Date.now().valueOf() + 10000);
 
-        //should pass validation
+        // should pass validation
         model.validate(function(err) {
           assert.equal(err, null);
           done();
@@ -80,7 +80,7 @@ describe('ValidationError', function() {
           model;
 
       MaxSchema = new Schema({
-        birthdate: { type: Date, max: Date.now }
+        birthdate: {type: Date, max: Date.now}
       });
 
       M = mongoose.model('MaxSchema', MaxSchema);
@@ -89,12 +89,12 @@ describe('ValidationError', function() {
         birthdate: new Date(Date.now().valueOf() + 2000)
       });
 
-      //should fail validation
+      // should fail validation
       model.validate(function(err) {
         assert.notEqual(err, null, 'max Date validation failed');
         model.birthdate = Date.now();
 
-        //should pass validation
+        // should pass validation
         model.validate(function(err) {
           assert.equal(err, null, 'max Date validation failed');
           done();
@@ -110,7 +110,7 @@ describe('ValidationError', function() {
           model;
 
       AddressSchema = new Schema({
-        postalCode: { type: String, minlength: 5 }
+        postalCode: {type: String, minlength: 5}
       });
 
       Address = mongoose.model('MinLengthAddress', AddressSchema);
@@ -119,12 +119,12 @@ describe('ValidationError', function() {
         postalCode: '9512'
       });
 
-      //should fail validation
+      // should fail validation
       model.validate(function(err) {
         assert.notEqual(err, null, 'String minlegth validation failed.');
         model.postalCode = '95125';
 
-        //should pass validation
+        // should pass validation
         model.validate(function(err) {
           assert.equal(err, null);
           done();
@@ -140,7 +140,7 @@ describe('ValidationError', function() {
           model;
 
       AddressSchema = new Schema({
-        postalCode: { type: String, maxlength: 10 }
+        postalCode: {type: String, maxlength: 10}
       });
 
       Address = mongoose.model('MaxLengthAddress', AddressSchema);
@@ -149,12 +149,12 @@ describe('ValidationError', function() {
         postalCode: '95125012345'
       });
 
-      //should fail validation
+      // should fail validation
       model.validate(function(err) {
         assert.notEqual(err, null, 'String maxlegth validation failed.');
         model.postalCode = '95125';
 
-        //should pass validation
+        // should pass validation
         model.validate(function(err) {
           assert.equal(err, null);
           done();
@@ -176,7 +176,7 @@ describe('ValidationError', function() {
 
       var M = mongoose.model('A', BSchema);
       var m = new M;
-      m.contents.push({ key: 'asdf' });
+      m.contents.push({key: 'asdf'});
       m.validate(function(err) {
         assert.doesNotThrow(function() {
           String(err);
@@ -188,7 +188,7 @@ describe('ValidationError', function() {
 
   describe('formatMessage', function() {
     it('replaces properties in a message', function(done) {
-      var props = { base: 'eggs', topping: 'bacon' };
+      var props = {base: 'eggs', topping: 'bacon'};
       var message = 'I had {BASE} and {TOPPING} for breakfast';
 
       var result = ValidatorError.prototype.formatMessage(message, props);

@@ -51,19 +51,19 @@ describe('model: populate:', function() {
         before(function(done) {
           refuser = 'RefUser-' + id;
 
-          var bSchema = Schema({
+          var bSchema = new Schema({
             title: String,
-            fans: [{type: id, ref: refuser }],
-            adhoc: [{ subdoc: id, subarray: [{ things: [id] }] }],
-            _creator: { type: id, ref: refuser },
+            fans: [{type: id, ref: refuser}],
+            adhoc: [{subdoc: id, subarray: [{things: [id]}]}],
+            _creator: {type: id, ref: refuser},
             embed: [{
-              other: { type: id, ref: refuser },
-              array: [{ type: id, ref: refuser }],
-              nested: [{ subdoc: { type: id, ref: refuser }}]
+              other: {type: id, ref: refuser},
+              array: [{type: id, ref: refuser}],
+              nested: [{subdoc: {type: id, ref: refuser}}]
             }]
           });
 
-          var uSchema = Schema({
+          var uSchema = new Schema({
             _id: id,
             name: String,
             email: String
@@ -88,16 +88,16 @@ describe('model: populate:', function() {
             B.create({
               title: 'Woot',
               fans: [fan1, fan2],
-              adhoc: [{ subdoc: fan2, subarray: [{ things: [fan1] }]}],
+              adhoc: [{subdoc: fan2, subarray: [{things: [fan1]}]}],
               _creator: fan1,
-              embed: [{ other: fan1, array: [fan1, fan2] }, { other: fan2, array: [fan2, fan1] }]
+              embed: [{other: fan1, array: [fan1, fan2]}, {other: fan2, array: [fan2, fan1]}]
             }, {
               title: 'Woot2',
               fans: [fan2, fan1],
-              adhoc: [{ subdoc: fan1, subarray: [{ things: [fan2] }]}],
+              adhoc: [{subdoc: fan1, subarray: [{things: [fan2]}]}],
               _creator: fan1,
               _creator: fan2,
-              embed: [{ other: fan2, array: [fan2, fan1] }, { other: fan1, array: [fan1, fan2] }]
+              embed: [{other: fan2, array: [fan2, fan1]}, {other: fan1, array: [fan1, fan2]}]
             }, function(err, post1, post2) {
               assert.ifError(err);
               b1 = post1;
@@ -112,7 +112,7 @@ describe('model: populate:', function() {
         });
 
         function userLiteral(name) {
-          return { _id: construct[id](), name: name };
+          return {_id: construct[id](), name: name};
         }
 
         function user(name) {
@@ -122,8 +122,8 @@ describe('model: populate:', function() {
         it('if a document', function(done) {
           B.findById(b1)
            .populate('fans _creator embed.other embed.array embed.nested.subdoc')
-           .populate({ path: 'adhoc.subdoc', model: refuser })
-           .populate({ path: 'adhoc.subarray.things', model: refuser })
+           .populate({path: 'adhoc.subdoc', model: refuser})
+           .populate({path: 'adhoc.subarray.things', model: refuser})
            .exec(function(err, doc) {
              assert.ifError(err);
 
@@ -186,7 +186,7 @@ describe('model: populate:', function() {
              assert.deepEqual(doc.embed[0].other.toObject(), user1b.toObject());
 
              var user1c = user('user2c');
-             doc.embed[0].nested = [{ subdoc: user1c }];
+             doc.embed[0].nested = [{subdoc: user1c}];
              assert.deepEqual(doc.embed[0].nested[0].subdoc.toObject(), user1c.toObject());
 
             // embedded without declared ref in schema
@@ -223,8 +223,8 @@ describe('model: populate:', function() {
         it('if an object', function(done) {
           B.findById(b2)
            .populate('fans _creator embed.other embed.array embed.nested.subdoc')
-           .populate({ path: 'adhoc.subdoc', model: refuser })
-           .populate({ path: 'adhoc.subarray.things', model: refuser })
+           .populate({path: 'adhoc.subdoc', model: refuser})
+           .populate({path: 'adhoc.subarray.things', model: refuser})
            .exec(function(err, doc) {
              assert.ifError(err);
 
@@ -239,7 +239,7 @@ describe('model: populate:', function() {
              assert.equal(name, doc.fans[3].name);
 
              name = 'fan3';
-             doc.fans.splice(2,1,userLiteral(name));
+             doc.fans.splice(2, 1, userLiteral(name));
              assert.ok(doc.fans[2]._id);
              assert.equal(name, doc.fans[2].name);
 
@@ -287,7 +287,7 @@ describe('model: populate:', function() {
 
              name = 'user1c';
              var user1c = userLiteral(name);
-             doc.embed[0].nested = [{ subdoc: user1c }];
+             doc.embed[0].nested = [{subdoc: user1c}];
              assert.equal(name, doc.embed[0].nested[0].subdoc.name);
              var user1cId = doc.embed[0].nested[0].subdoc._id;
 
@@ -323,7 +323,6 @@ describe('model: populate:', function() {
              });
            });
         });
-
       });
     });
   });

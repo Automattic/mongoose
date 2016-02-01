@@ -14,7 +14,7 @@ var data = [
     {
       name: 'bill',
       age: 25,
-      birthday : new Date().setFullYear((new Date().getFullYear() - 25))
+      birthday: new Date().setFullYear((new Date().getFullYear() - 25))
     },
     {
       name: 'mary',
@@ -24,7 +24,7 @@ var data = [
     {
       name: 'bob',
       age: 21,
-      birthday : new Date().setFullYear((new Date().getFullYear() - 21))
+      birthday: new Date().setFullYear((new Date().getFullYear() - 21))
     },
     {
       name: 'lilly',
@@ -50,7 +50,7 @@ mongoose.connect('mongodb://localhost/persons', function(err) {
 
     // when querying data, instead of providing a callback, you can instead
     // leave that off and get a query object returned
-    var query = Person.find({ age : { $lt : 1000 }});
+    var query = Person.find({age: {$lt: 1000}});
 
     // this allows you to continue applying modifiers to it
     query.sort('birthday');
@@ -69,7 +69,6 @@ mongoose.connect('mongodb://localhost/persons', function(err) {
 
       cleanup();
     });
-
   });
 });
 

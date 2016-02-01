@@ -280,7 +280,7 @@ var cast = module.exports = function(schema, obj) {
         throw new Error("Must have a string or function for $where");
       }
 
-      if ('function' === type) {
+      if (type === 'function') {
         obj[path] = val.toString();
       }
 
@@ -400,7 +400,7 @@ var cast = module.exports = function(schema, obj) {
       } else if (val === null || val === undefined) {
         obj[path] = null;
         continue;
-      } else if ('Object' === val.constructor.name) {
+      } else if (val.constructor.name === 'Object') {
 
         any$conditionals = Object.keys(val).some(function(k) {
           return k.charAt(0) === '$' && k !== '$id' && k !== '$ref';
@@ -610,7 +610,7 @@ Document.prototype.$__buildDoc = function(obj, fields, skipId) {
 
   // determine if this doc is a result of a query with
   // excluded fields
-  if (fields && 'Object' === utils.getFunctionName(fields.constructor)) {
+  if (fields && utils.getFunctionName(fields.constructor) === 'Object') {
     keys = Object.keys(fields);
     ki = keys.length;
 
@@ -957,7 +957,7 @@ Document.prototype.set = function(path, val, type, options) {
               this.schema.paths[pathName].options.ref)) {
           this.set(path[key], prefix + key, constructing);
         } else if (strict) {
-          if ('real' === pathtype || 'virtual' === pathtype) {
+          if ('real' === pathtype || pathtype === 'virtual') {
             // Check for setting single embedded schema to document (gh-3535)
             if (this.schema.paths[pathName] &&
                 this.schema.paths[pathName].$isSingleNested &&
@@ -1208,7 +1208,7 @@ Document.prototype.$__set = function(
     if (last) {
       obj[parts[i]] = val;
     } else {
-      if (obj[parts[i]] && 'Object' === utils.getFunctionName(obj[parts[i]].constructor)) {
+      if (obj[parts[i]] && utils.getFunctionName(obj[parts[i]].constructor) === 'Object') {
         obj = obj[parts[i]];
       } else if (obj[parts[i]] && obj[parts[i]] instanceof Embedded) {
         obj = obj[parts[i]];
@@ -1931,7 +1931,7 @@ function compile(tree, proto, prefix, options) {
     limb = tree[key];
 
     defineKey(key
-        , (('Object' === utils.getFunctionName(limb.constructor)
+        , ((utils.getFunctionName(limb.constructor === 'Object')
                && Object.keys(limb).length)
                && (!limb[options.typeKey] || (options.typeKey === 'type' && limb.type.type))
                ? limb
@@ -5091,7 +5091,7 @@ function SchemaArray(key, cast, options) {
   if (cast) {
     var castOptions = {};
 
-    if ('Object' === utils.getFunctionName(cast.constructor)) {
+    if (utils.getFunctionName(cast.constructor) === 'Object') {
       if (cast.type) {
         // support { type: Woot }
         castOptions = utils.clone(cast); // do not alter user arguments
@@ -5194,7 +5194,7 @@ SchemaArray.prototype.cast = function(value, doc, init) {
 
       for (var i = 0, l = indexes.length; i < l; ++i) {
         var pathIndex = indexes[i][0][this.path];
-        if ('2dsphere' === pathIndex || '2d' === pathIndex) {
+        if ('2dsphere' === pathIndex || pathIndex === '2d') {
           return;
         }
       }
@@ -5506,9 +5506,9 @@ SchemaBoolean.prototype.checkRequired = function(value) {
 
 SchemaBoolean.prototype.cast = function(value) {
   if (null === value) return value;
-  if ('0' === value) return false;
-  if ('true' === value) return true;
-  if ('false' === value) return false;
+  if (value === '0') return false;
+  if (value === 'true') return true;
+  if (value === 'false') return false;
   return !!value;
 };
 
@@ -8009,7 +8009,7 @@ SchemaType.prototype.get = function(fn) {
  */
 
 SchemaType.prototype.validate = function(obj, message, type) {
-  if ('function' == typeof obj || obj && 'RegExp' === utils.getFunctionName(obj.constructor)) {
+  if ('function' == typeof obj || obj && utils.getFunctionName(obj.constructor) === 'RegExp') {
     var properties;
     if (message instanceof Object && !type) {
       properties = utils.clone(message);
@@ -8033,7 +8033,7 @@ SchemaType.prototype.validate = function(obj, message, type) {
 
   for (i = 0, length = arguments.length; i < length; i++) {
     arg = arguments[i];
-    if (!(arg && 'Object' === utils.getFunctionName(arg.constructor))) {
+    if (!(arg && utils.getFunctionName(arg.constructor)) === 'Object') {
       var msg = 'Invalid validator. Received (' + typeof arg + ') '
         + arg
         + '. See http://mongoosejs.com/docs/api.html#schematype_SchemaType-validate';
@@ -8892,7 +8892,7 @@ MongooseArray.mixin = {
    */
 
   hasAtomics: function hasAtomics() {
-    if (!(this._atomics && 'Object' === this._atomics.constructor.name)) {
+    if (!(this._atomics && this._atomics.constructor.name) === 'Object') {
       return 0;
     }
 
@@ -23994,13 +23994,13 @@ var clone = exports.clone = function clone (obj, options) {
         : new obj.constructor(obj.value(true), obj.sub_type);
     }
 
-    if ('Date' === obj.constructor.name || 'Function' === obj.constructor.name)
+    if ('Date' === obj.constructor.name || obj.constructor.name === 'Function')
       return new obj.constructor(+obj);
 
-    if ('RegExp' === obj.constructor.name)
+    if (obj.constructor.name === 'RegExp')
       return RegExpClone(obj);
 
-    if ('Buffer' === obj.constructor.name)
+    if (obj.constructor.name === 'Buffer')
       return exports.cloneBuffer(obj);
   }
 

@@ -11,7 +11,7 @@ var start = require('./common'),
 
 var DecoratedSchema = new Schema({
   title: String
-}, { strict: false });
+}, {strict: false});
 
 mongoose.model('Decorated', DecoratedSchema);
 
@@ -36,10 +36,10 @@ describe('schema.onthefly', function() {
     db.close();
     var postOne = new Decorated();
     postOne.set('adhoc', '9', Number);
-    assert.notStrictEqual(postOne.$__path('adhoc'),undefined);
+    assert.notStrictEqual(postOne.$__path('adhoc'), undefined);
 
     var postTwo = new Decorated();
-    assert.notStrictEqual(postTwo.$__path('title'),undefined);
+    assert.notStrictEqual(postTwo.$__path('title'), undefined);
     assert.strictEqual(undefined, postTwo.$__path('adhoc'));
     done();
   });
@@ -90,7 +90,7 @@ describe('schema.onthefly', function() {
     db.close();
     var post = new Decorated();
     post.set('moderators', [{name: 'alex trebek'}], [new Schema({name: String})]);
-    assert.equal(post.get('moderators')[0].name,'alex trebek');
+    assert.equal(post.get('moderators')[0].name, 'alex trebek');
     done();
   });
 
@@ -101,7 +101,7 @@ describe('schema.onthefly', function() {
     var post = new Decorated(),
         ModeratorSchema = new Schema({name: String, ranking: Number});
     post.set('moderators', [{name: 'alex trebek', ranking: '1'}], [ModeratorSchema]);
-    assert.equal(post.get('moderators')[0].name,'alex trebek');
+    assert.equal(post.get('moderators')[0].name, 'alex trebek');
     post.save(function(err) {
       assert.ifError(err);
       Decorated.findById(post.id, function(err, found) {
@@ -113,7 +113,7 @@ describe('schema.onthefly', function() {
         var rankingPostCast = found.get('moderators', [ModeratorSchema])[0].ranking;
         assert.equal(1, rankingPostCast);
 
-        var NewModeratorSchema = new Schema({ name: String, ranking: String});
+        var NewModeratorSchema = new Schema({name: String, ranking: String});
         rankingPostCast = found.get('moderators', [NewModeratorSchema])[0].ranking;
         assert.equal(1, rankingPostCast);
         done();
@@ -125,7 +125,7 @@ describe('schema.onthefly', function() {
     var db = start();
     var Decorated = db.model('gh2360', DecoratedSchema, 'gh2360');
 
-    var d = new Decorated({ title: '1' });
+    var d = new Decorated({title: '1'});
     assert.equal('number', typeof d.get('title', 'Number'));
 
     d.title = '000000000000000000000001';

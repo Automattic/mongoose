@@ -14,7 +14,7 @@ var start = require('./common'),
  * setup
  */
 
-var test = Schema({
+var test = new Schema({
   string: String,
   number: Number,
   date: {
@@ -61,7 +61,6 @@ describe('debug: colors', function() {
   });
 
   it('Document', function(done) {
-
     var date = new Date();
 
     Test.create([{
@@ -79,32 +78,31 @@ describe('debug: colors', function() {
     }], function(err) {
       assert.ifError(err);
       Test
-        .find()
-        .lean(false)
-        .exec(function(err, docs) {
-          assert.ifError(err);
+          .find()
+          .lean(false)
+          .exec(function(err, docs) {
+            assert.ifError(err);
 
-          var colorfull = require('util').inspect(docs, {
-            depth: null,
-            colors: true
+            var colorfull = require('util').inspect(docs, {
+              depth: null,
+              colors: true
+            });
+
+            var colorless = require('util').inspect(docs, {
+              depth: null,
+              colors: false
+            });
+
+            // console.log(colorfull, colorless);
+
+            assert.notEqual(colorfull, colorless);
+
+            done();
           });
-
-          var colorless = require('util').inspect(docs, {
-            depth: null,
-            colors: false
-          });
-
-          // console.log(colorfull, colorless);
-
-          assert.notEqual(colorfull, colorless);
-
-          done();
-        });
     });
   });
 
   it('MongooseDocumentArray', function() {
-
     var Subdocument = TestDoc();
 
     var sub1 = new Subdocument();
@@ -127,7 +125,5 @@ describe('debug: colors', function() {
     // console.log(colorfull, colorless);
 
     assert.notEqual(colorfull, colorless);
-
   });
-
 });

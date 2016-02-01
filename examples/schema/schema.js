@@ -1,4 +1,3 @@
-
 /**
  * Module dependencies.
  */
@@ -43,7 +42,7 @@ var BlogPost = new Schema({
 var Person = new Schema({
   name: {
     first: String,
-    last : String
+    last: String
   },
   email: {
     type: String,
@@ -65,7 +64,7 @@ BlogPost.path('date')
   return new Date();
 })
 .set(function(v) {
-  return v == 'now' ? new Date() : v;
+  return v === 'now' ? new Date() : v;
 });
 
 /**
@@ -87,7 +86,7 @@ BlogPost.methods.findCreator = function(callback) {
 };
 
 BlogPost.statics.findByTitle = function(title, callback) {
-  return this.find({ title: title }, callback);
+  return this.find({title: title}, callback);
 };
 
 BlogPost.methods.expressiveQuery = function(creator, date, callback) {

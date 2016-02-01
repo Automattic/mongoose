@@ -37,8 +37,8 @@ describe('Models in ES6', function() {
   it('`create()` integrates with co and the yield keyword', function(done) {
     co(function * () {
       var schema = new Schema({
-        eggs: { type: String, required: true },
-        bacon: { type: Boolean, required: true }
+        eggs: {type: String, required: true},
+        bacon: {type: Boolean, required: true}
       });
 
       var M = db.model('harmonyCreate', schema, getCollectionName());
@@ -46,8 +46,8 @@ describe('Models in ES6', function() {
       var results;
       try {
         results = yield M.create([
-          { eggs: 'sunny-side up', bacon: false },
-          { eggs: 'scrambled', bacon: true }]);
+          {eggs: 'sunny-side up', bacon: false},
+          {eggs: 'scrambled', bacon: true}]);
       } catch (e) {
         return done(e);
       }
@@ -63,16 +63,16 @@ describe('Models in ES6', function() {
   it('`aggregate()` integrates with co and the yield keyword', function(done) {
     co(function*() {
       var schema = new Schema({
-        eggs: { type: String, required: true },
-        bacon: { type: Boolean, required: true }
+        eggs: {type: String, required: true},
+        bacon: {type: Boolean, required: true}
       });
 
       var M = db.model('harmonyAggregate', schema, getCollectionName());
 
       try {
         yield M.create([
-          { eggs: 'sunny-side up', bacon: false },
-          { eggs: 'scrambled', bacon: true }]);
+          {eggs: 'sunny-side up', bacon: false},
+          {eggs: 'scrambled', bacon: true}]);
       } catch (e) {
         return done(e);
       }
@@ -80,8 +80,8 @@ describe('Models in ES6', function() {
       var results;
       try {
         results = yield M.aggregate([
-          { $group: { _id: '$bacon', eggs: { $first: '$eggs' } } },
-          { $sort: { _id: 1 } }
+          {$group: {_id: '$bacon', eggs: {$first: '$eggs'}}},
+          {$sort: {_id: 1}}
         ]).exec();
       } catch (e) {
         return done(e);
@@ -100,17 +100,17 @@ describe('Models in ES6', function() {
   it('`mapReduce()` can also be used with co and yield', function(done) {
     co(function*() {
       var schema = new Schema({
-        eggs: { type: String, required: true },
-        bacon: { type: Boolean, required: true }
+        eggs: {type: String, required: true},
+        bacon: {type: Boolean, required: true}
       });
 
       var M = db.model('harmonyMapreduce', schema, getCollectionName());
 
       try {
         yield M.create([
-          { eggs: 'sunny-side up', bacon: false },
-          { eggs: 'sunny-side up', bacon: true },
-          { eggs: 'scrambled', bacon: true }]);
+          {eggs: 'sunny-side up', bacon: false},
+          {eggs: 'sunny-side up', bacon: true},
+          {eggs: 'scrambled', bacon: true}]);
       } catch (e) {
         return done(e);
       }

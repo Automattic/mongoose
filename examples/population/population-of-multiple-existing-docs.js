@@ -96,7 +96,7 @@ function example() {
 
     console.log('found %d games', games.length);
 
-    var options = { path: 'consoles', select: 'name released -_id' };
+    var options = {path: 'consoles', select: 'name released -_id'};
     Game.populate(games, options, function(err, games) {
       if (err) return done(err);
 

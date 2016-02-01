@@ -1,4 +1,3 @@
-
 /**
  * Module dependencies.
  */
@@ -96,7 +95,7 @@ describe('Promise', function() {
       promise.fulfill('woot');
 
       promise.onResolve(function(err, data) {
-        assert.equal(data,'woot');
+        assert.equal(data, 'woot');
         called++;
       });
 
@@ -214,7 +213,7 @@ describe('Promise', function() {
   it('doesnt swallow exceptions (gh-3222)', function(done) {
     assert.throws(function() {
       new Promise.ES6(function() {
-        throw 'bacon';
+        throw new Error('bacon');
       });
     });
     done();

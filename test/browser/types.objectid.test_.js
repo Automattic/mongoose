@@ -1,14 +1,13 @@
-/* eslint no-empty: 1 */
 (function() {
   var ObjectId = mongoose.Types.ObjectId;
 
   describe('types.objectid', function() {
     it('Should Correctly convert ObjectId to itself', function(done) {
       var myObject, newObject;
-      var selfConvertion = (function() {
+      var selfConvertion = function() {
         myObject = new ObjectId();
         newObject = ObjectId(myObject);
-      });
+      };
 
       assert.doesNotThrow(selfConvertion);
       assert.equal(myObject, newObject);
@@ -21,7 +20,7 @@
         ObjectId.createFromHexString('00000000000000000000001');
         assert.ok(false);
       } catch (err) {
-        assert.ok(err != null);
+        assert.ok(err !== null);
       }
 
       done();
@@ -71,24 +70,24 @@
     });
 
     it('Should fail to create ObjectId due to illegal hex code', function(done) {
-      try {
-        new ObjectId("zzzzzzzzzzzzzzzzzzzzzzzz");
-        assert.ok(false);
-      } catch (err) {
-      }
+      assert.throws(function() {
+        new ObjectId('zzzzzzzzzzzzzzzzzzzzzzzz');
+      });
+      done();
+    });
 
+    it('Should validate ObjectId', function(done) {
       assert.equal(false, ObjectId.isValid(null));
       assert.equal(false, ObjectId.isValid({}));
       assert.equal(false, ObjectId.isValid([]));
       assert.equal(false, ObjectId.isValid(true));
       assert.equal(true, ObjectId.isValid(0));
-      assert.equal(false, ObjectId.isValid("invalid"));
-      assert.equal(true, ObjectId.isValid("zzzzzzzzzzzz"));
-      assert.equal(false, ObjectId.isValid("zzzzzzzzzzzzzzzzzzzzzzzz"));
-      assert.equal(true, ObjectId.isValid("000000000000000000000000"));
+      assert.equal(false, ObjectId.isValid('invalid'));
+      assert.equal(true, ObjectId.isValid('zzzzzzzzzzzz'));
+      assert.equal(false, ObjectId.isValid('zzzzzzzzzzzzzzzzzzzzzzzz'));
+      assert.equal(true, ObjectId.isValid('000000000000000000000000'));
 
       done();
     });
   });
-
 })();

@@ -14,7 +14,7 @@ var data = [
     {
       name: 'bill',
       age: 25,
-      birthday : new Date().setFullYear((new Date().getFullYear() - 25))
+      birthday: new Date().setFullYear((new Date().getFullYear() - 25))
     },
     {
       name: 'mary',
@@ -24,7 +24,7 @@ var data = [
     {
       name: 'bob',
       age: 21,
-      birthday : new Date().setFullYear((new Date().getFullYear() - 21))
+      birthday: new Date().setFullYear((new Date().getFullYear() - 21))
     },
     {
       name: 'lilly',
@@ -42,7 +42,7 @@ var data = [
 // to connect to a replica set, pass in the comma delimited uri and optionally
 // any connection options such as the rs_name.
 var opts = {
-  replSet : { rs_name : "rs0" }
+  replSet: {rs_name: 'rs0'}
 };
 mongoose.connect('mongodb://localhost:27018/persons,localhost:27019,localhost:27020', opts, function(err) {
   if (err) throw err;
@@ -56,10 +56,10 @@ mongoose.connect('mongodb://localhost:27018/persons,localhost:27019,localhost:27
     }
 
       // create and delete some data
-    var prom = Person.find({age : { $lt : 1000 }}).exec();
+    var prom = Person.find({age: {$lt: 1000}}).exec();
 
     prom.then(function(people) {
-      console.log("young people: %s", people);
+      console.log('young people: %s', people);
     }).then(cleanup);
   });
 });

@@ -1,4 +1,3 @@
-
 /**
  * Module dependencies.
  */
@@ -10,8 +9,9 @@ var mongoose = require('../'),
     opened = 0,
     closed = 0;
 
-if (process.env.D === '1')
+if (process.env.D === '1') {
   mongoose.set('debug', true);
+}
 
 /**
  * Override all Collection related queries to keep count
@@ -31,14 +31,12 @@ if (process.env.D === '1')
   'isCapped',
   'options'
 ].forEach(function(method) {
-
   var oldMethod = Collection.prototype[method];
 
   Collection.prototype[method] = function() {
     queryCount++;
     return oldMethod.apply(this, arguments);
   };
-
 });
 
 /**
@@ -86,7 +84,9 @@ module.exports = function(options) {
 
   var conn = mongoose.createConnection(uri, options);
 
-  if (noErrorListener) return conn;
+  if (noErrorListener) {
+    return conn;
+  }
 
   conn.on('error', function(err) {
     assert.ok(err);
@@ -118,8 +118,12 @@ module.exports.mongodVersion = function(cb) {
   db.on('open', function() {
     var admin = db.db.admin();
     admin.serverStatus(function(err, info) {
-      if (err) return cb(err);
-      var version = info.version.split('.').map(function(n) { return parseInt(n, 10); });
+      if (err) {
+        return cb(err);
+      }
+      var version = info.version.split('.').map(function(n) {
+        return parseInt(n, 10);
+      });
       db.close(function() {
         cb(null, version);
       });
@@ -136,10 +140,12 @@ function dropDBs(done) {
       db2.db.dropDatabase(function() {
         // drop mongos test db if exists
         var mongos = process.env.MONGOOSE_MULTI_MONGOS_TEST_URI;
-        if (!mongos) return done();
+        if (!mongos) {
+          return done();
+        }
 
 
-        var db = mongoose.connect(mongos, {mongos: true });
+        var db = mongoose.connect(mongos, {mongos: true});
         db.once('open', function() {
           db.db.dropDatabase(done);
         });

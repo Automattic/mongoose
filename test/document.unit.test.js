@@ -3,7 +3,7 @@
  */
 
 var start = require('./common');
-var assert = require('assert');
+var assert = require('power-assert');
 var mongoose = start.mongoose;
 
 describe('sharding', function () {

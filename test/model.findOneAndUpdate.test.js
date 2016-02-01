@@ -4,7 +4,7 @@
 
 var CastError = require('../lib/error/cast');
 var start = require('./common');
-var assert = require('assert');
+var assert = require('power-assert');
 var mongoose = start.mongoose;
 var random = require('../lib/utils').random;
 var Utils = require('../lib/utils');

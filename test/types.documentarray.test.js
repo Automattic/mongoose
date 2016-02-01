@@ -10,7 +10,7 @@ var start = require('./common'),
     EmbeddedDocument = require('../lib/types/embedded'),
     DocumentArray = require('../lib/types/documentarray'),
     Schema = mongoose.Schema,
-    assert = require('assert'),
+    assert = require('power-assert'),
     collection = 'types.documentarray_' + random();
 
 /**

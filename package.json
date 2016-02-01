@@ -48,6 +48,7 @@
     "mocha": "2.3.4",
     "node-static": "0.7.7",
     "open": "0.0.5",
+    "power-assert": "1.2.0",
     "q": "1.4.1",
     "tbd": "0.6.4",
     "uglify-js": "2.6.1",

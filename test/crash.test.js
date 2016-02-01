@@ -1,7 +1,7 @@
 // GH-407
 
 var start = require('./common'),
-    assert = require('assert'),
+    assert = require('power-assert'),
     mongoose = start.mongoose;
 
 describe('crash: (gh-407)', function () {

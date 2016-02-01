@@ -10,7 +10,7 @@ var start = require('./common'),
     StateMachine = require('../lib/statemachine'),
     ObjectId = require('../lib/types/objectid'),
     MongooseBuffer = require('../lib/types/buffer'),
-    assert = require('assert');
+    assert = require('power-assert');
 
 /**
  * Setup.

@@ -1,4 +1,4 @@
-var assert = require('assert');
+var assert = require('power-assert');
 var async = require('async');
 var mongoose = require('../../');
 

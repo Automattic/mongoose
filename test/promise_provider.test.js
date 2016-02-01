@@ -2,7 +2,7 @@
  * Module dependencies.
  */
 
-var assert = require('assert');
+var assert = require('power-assert');
 var bluebird = require('bluebird');
 var q = require('q');
 var start = require('./common');

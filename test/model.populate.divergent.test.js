@@ -4,7 +4,7 @@
  */
 
 var start = require('./common'),
-    assert = require('assert'),
+    assert = require('power-assert'),
     mongoose = start.mongoose,
     DivergentArrayError = mongoose.Error.DivergentArrayError,
     utils = require('../lib/utils'),

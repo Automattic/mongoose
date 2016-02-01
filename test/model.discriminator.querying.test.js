@@ -5,7 +5,7 @@
 var start = require('./common'),
     mongoose = start.mongoose,
     Schema = mongoose.Schema,
-    assert = require('assert'),
+    assert = require('power-assert'),
     random = require('../lib/utils').random,
     util = require('util'),
     async = require('async');

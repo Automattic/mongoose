@@ -22,7 +22,7 @@ var AllSchema = new Schema({
   buffers: [Buffer],
   objectids: [Schema.ObjectId],
   docs: {
-    type: [DocSchema], validate: function () {
+    type: [DocSchema], validate: function() {
       return true;
     }
   },
@@ -32,40 +32,40 @@ var AllSchema = new Schema({
 var A = mongoose.model('A', AllSchema);
 
 var methods = [];
-methods.push(function (a, cb) {
+methods.push(function(a, cb) {
   A.findOne({_id: a._id}, cb);
 }); // 2 MB
-methods.push(function (a, cb) {
+methods.push(function(a, cb) {
   A.find({_id: a._id, bool: a.bool}, cb);
 }); // 3.8 MB
-methods.push(function (a, cb) {
+methods.push(function(a, cb) {
   A.findById(a._id, cb);
 }); // 4.6 MB
-methods.push(function (a, cb) {
+methods.push(function(a, cb) {
   A.where('number', a.number).limit(10).exec(cb);
 }); // 4.8 MB
-methods.push(function (a, cb) {
+methods.push(function(a, cb) {
   A.where('date', a.date).select('string').limit(10).exec(cb);
 }); // 3.5 mb
-methods.push(function (a, cb) {
+methods.push(function(a, cb) {
   A.where('date', a.date).select('string bool').limit(10).exec(cb);
 }); // 3.5 MB
-methods.push(function (a, cb) {
+methods.push(function(a, cb) {
   A.where('date', a.date).where('array').in(3).limit(10).exec(cb);
 }); // 1.82 MB
-methods.push(function (a, cb) {
+methods.push(function(a, cb) {
   A.update({_id: a._id}, {$addToset: {array: 'heeeeello'}}, cb);
 }); // 3.32 MB
-methods.push(function (a, cb) {
+methods.push(function(a, cb) {
   A.remove({_id: a._id}, cb);
 }); // 3.32 MB
-methods.push(function (a, cb) {
+methods.push(function(a, cb) {
   A.find().where('objectids').exists().select('dates').limit(10).exec(cb);
 }); // 3.32 MB
-methods.push(function (a, cb) {
+methods.push(function(a, cb) {
   A.count({strings: a.strings[2], number: a.number}, cb);
 }); // 3.32 MB
-methods.push(function (a, cb) {
+methods.push(function(a, cb) {
   a.string = 'asdfaf';
   a.number = 38383838;
   a.date = new Date;
@@ -98,8 +98,8 @@ var start = new Date;
 var total = 10000;
 var i = total;
 
-mongoose.connection.on('open', function () {
-  mongoose.connection.db.dropDatabase(function () {
+mongoose.connection.on('open', function() {
+  mongoose.connection.db.dropDatabase(function() {
     (function cycle() {
       if (i-- === 0) {
         return done();
@@ -121,8 +121,8 @@ mongoose.connection.on('open', function () {
         docs: [{title: 'yo'}, {title: 'nowafasdi0fas asjkdfla fa'}]
       });
 
-      a.save(function () {
-        methods[Math.random() * methods.length | 0](a, function () {
+      a.save(function() {
+        methods[Math.random() * methods.length | 0](a, function() {
           a = null;
           process.nextTick(cycle);
         });
@@ -151,7 +151,7 @@ mongoose.connection.on('open', function () {
 
       console.error('took %d ms for %d docs (%d dps)', time, total, total / (time / 1000), 'change: ', res);
 
-      mongoose.connection.db.dropDatabase(function () {
+      mongoose.connection.db.dropDatabase(function() {
         mongoose.connection.close();
       });
     }

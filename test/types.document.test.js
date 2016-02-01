@@ -64,14 +64,14 @@ mongoose.model('Movie', MovieSchema);
  * Test.
  */
 
-describe('types.document', function () {
-  it('test that validate sets errors', function (done) {
+describe('types.document', function() {
+  it('test that validate sets errors', function(done) {
     var a = new Subdocument();
     a.set('test', '');
     a.set('work', 'nope');
     a.__index = 0;
 
-    a.validate(function () {
+    a.validate(function() {
       assert.ok(a.__parent.$__.validationError instanceof ValidationError);
       assert.equal(a.__parent.errors['jsconf.ar.0.work'].name, 'ValidatorError');
       assert.equal(a.__parent.$__.validationError.toString(), 'ValidationError: Path `test` is required., Validator failed for path `work` with value `nope`');
@@ -79,7 +79,7 @@ describe('types.document', function () {
     });
   });
 
-  it('objects can be passed to #set', function (done) {
+  it('objects can be passed to #set', function(done) {
     var a = new Subdocument();
     a.set({test: 'paradiddle', work: 'good flam'});
     assert.equal(a.test, 'paradiddle');
@@ -87,7 +87,7 @@ describe('types.document', function () {
     done();
   });
 
-  it('Subdocuments can be passed to #set', function (done) {
+  it('Subdocuments can be passed to #set', function(done) {
     var a = new Subdocument();
     a.set({test: 'paradiddle', work: 'good flam'});
     assert.equal(a.test, 'paradiddle');
@@ -99,7 +99,7 @@ describe('types.document', function () {
     done();
   });
 
-  it('cached _ids', function (done) {
+  it('cached _ids', function(done) {
     var db = start();
     var Movie = db.model('Movie');
     var m = new Movie;
@@ -120,7 +120,7 @@ describe('types.document', function () {
     db.close(done);
   });
 
-  it('Subdocument#remove (gh-531)', function (done) {
+  it('Subdocument#remove (gh-531)', function(done) {
     var db = start();
     var Movie = db.model('Movie');
 
@@ -136,7 +136,7 @@ describe('types.document', function () {
     super8.ratings.push({stars: 7, _id: id3});
     super8.ratings.push({stars: 6, _id: id4});
 
-    super8.save(function (err) {
+    super8.save(function(err) {
       assert.ifError(err);
 
       assert.equal(super8.title, 'Super 8');
@@ -150,10 +150,10 @@ describe('types.document', function () {
       super8.ratings.id(id3).stars = 4;
       super8.ratings.id(id4).stars = 3;
 
-      super8.save(function (err) {
+      super8.save(function(err) {
         assert.ifError(err);
 
-        Movie.findById(super8._id, function (err, movie) {
+        Movie.findById(super8._id, function(err, movie) {
           assert.ifError(err);
 
           assert.equal(movie.title, 'Super 8');
@@ -166,10 +166,10 @@ describe('types.document', function () {
           movie.ratings.id(id3).remove();
           movie.ratings.id(id4).stars = 1;
 
-          movie.save(function (err) {
+          movie.save(function(err) {
             assert.ifError(err);
 
-            Movie.findById(super8._id, function (err, movie) {
+            Movie.findById(super8._id, function(err, movie) {
               assert.ifError(err);
               assert.equal(movie.ratings.length, 2);
               assert.equal(movie.ratings.id(id1).stars.valueOf(), 2);
@@ -178,8 +178,8 @@ describe('types.document', function () {
               // gh-531
               movie.ratings[0].remove();
               movie.ratings[0].remove();
-              movie.save(function () {
-                Movie.findById(super8._id, function (err, movie) {
+              movie.save(function() {
+                Movie.findById(super8._id, function(err, movie) {
                   assert.ifError(err);
                   assert.equal(0, movie.ratings.length);
                   db.close(done);
@@ -192,8 +192,8 @@ describe('types.document', function () {
     });
   });
 
-  describe('setting nested objects', function () {
-    it('works (gh-1394)', function (done) {
+  describe('setting nested objects', function() {
+    it('works (gh-1394)', function(done) {
       var db = start();
       var Movie = db.model('Movie');
 
@@ -207,19 +207,19 @@ describe('types.document', function () {
             }
           }
         }]
-      }, function (err, movie) {
+      }, function(err, movie) {
         assert.ifError(err);
 
-        Movie.findById(movie, function (err, movie) {
+        Movie.findById(movie, function(err, movie) {
           assert.ifError(err);
 
           assert.ok(movie.ratings[0].description.source.time instanceof Date);
           movie.ratings[0].description.source = {url: 'http://www.lifeofpimovie.com/'};
 
-          movie.save(function (err) {
+          movie.save(function(err) {
             assert.ifError(err);
 
-            Movie.findById(movie, function (err, movie) {
+            Movie.findById(movie, function(err, movie) {
               assert.ifError(err);
 
               assert.equal('http://www.lifeofpimovie.com/', movie.ratings[0].description.source.url);
@@ -229,10 +229,10 @@ describe('types.document', function () {
 
               var newDate = new Date;
               movie.ratings[0].set('description.source.time', newDate, {merge: true});
-              movie.save(function (err) {
+              movie.save(function(err) {
                 assert.ifError(err);
 
-                Movie.findById(movie, function (err, movie) {
+                Movie.findById(movie, function(err, movie) {
                   assert.ifError(err);
                   assert.equal(String(newDate), movie.ratings[0].description.source.time);
                   // url not overwritten using merge

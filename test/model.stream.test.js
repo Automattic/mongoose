@@ -24,23 +24,23 @@ var Person = new Schema({
 mongoose.model('PersonForStream', Person);
 var collection = 'personforstream_' + random();
 
-describe('query stream:', function () {
-  before(function (done) {
+describe('query stream:', function() {
+  before(function(done) {
     var db = start(),
         P = db.model('PersonForStream', collection);
 
-    var people = names.map(function (name) {
+    var people = names.map(function(name) {
       return {name: name};
     });
 
-    P.create(people, function (err) {
+    P.create(people, function(err) {
       assert.ifError(err);
       db.close();
       done();
     });
   });
 
-  it('works', function (done) {
+  it('works', function(done) {
     var db = start(),
         P = db.model('PersonForStream', collection),
         i = 0,
@@ -63,7 +63,7 @@ describe('query stream:', function () {
       done();
     }
 
-    stream.on('data', function (doc) {
+    stream.on('data', function(doc) {
       assert.strictEqual(true, !!doc.name);
       assert.strictEqual(true, !!doc._id);
 
@@ -84,7 +84,7 @@ describe('query stream:', function () {
         assert.equal(true, stream.paused);
         paused++;
 
-        setTimeout(function () {
+        setTimeout(function() {
           assert.equal(true, stream.paused);
           resumed++;
           stream.resume();
@@ -98,18 +98,18 @@ describe('query stream:', function () {
       }
     });
 
-    stream.on('error', function (er) {
+    stream.on('error', function(er) {
       err = er;
       cb();
     });
 
-    stream.on('close', function () {
+    stream.on('close', function() {
       closed++;
       cb();
     });
   });
 
-  it('immediately destroying a stream prevents the query from executing', function (done) {
+  it('immediately destroying a stream prevents the query from executing', function(done) {
     var db = start(),
         P = db.model('PersonForStream', collection),
         i = 0;
@@ -119,14 +119,14 @@ describe('query stream:', function () {
     function cb(err) {
       assert.ifError(err);
       assert.equal(0, i);
-      process.nextTick(function () {
+      process.nextTick(function() {
         db.close();
         assert.strictEqual(null, stream._fields);
         done();
       });
     }
 
-    stream.on('data', function () {
+    stream.on('data', function() {
       i++;
     });
     stream.on('close', cb);
@@ -135,7 +135,7 @@ describe('query stream:', function () {
     stream.destroy();
   });
 
-  it('destroying a stream stops it', function (done) {
+  it('destroying a stream stops it', function(done) {
     this.slow(300);
 
     var db = start(),
@@ -150,7 +150,7 @@ describe('query stream:', function () {
 
     function cb(err) {
       ++finished;
-      setTimeout(function () {
+      setTimeout(function() {
         db.close();
         assert.strictEqual(undefined, err);
         assert.equal(5, i);
@@ -162,7 +162,7 @@ describe('query stream:', function () {
       }, 100);
     }
 
-    stream.on('data', function (doc) {
+    stream.on('data', function(doc) {
       assert.strictEqual(undefined, doc.name);
       if (++i === 5) {
         stream.destroy();
@@ -174,7 +174,7 @@ describe('query stream:', function () {
     stream.on('error', cb);
   });
 
-  it('errors', function (done) {
+  it('errors', function(done) {
     this.slow(300);
 
     var db = start({server: {auto_reconnect: false}}),
@@ -187,7 +187,7 @@ describe('query stream:', function () {
 
     function cb(err) {
       ++finished;
-      setTimeout(function () {
+      setTimeout(function() {
         assert.ok(/destroyed/.test(err.message), err.message);
         assert.equal(i, 5);
         assert.equal(1, closed);
@@ -199,20 +199,20 @@ describe('query stream:', function () {
       }, 100);
     }
 
-    stream.on('data', function () {
+    stream.on('data', function() {
       if (++i === 5) {
         db.close();
       }
     });
 
-    stream.on('close', function () {
+    stream.on('close', function() {
       closed++;
     });
 
     stream.on('error', cb);
   });
 
-  it('pipe', function (done) {
+  it('pipe', function(done) {
     var db = start(),
         P = db.model('PersonForStream', collection),
         filename = '/tmp/_mongoose_stream_out.txt',
@@ -239,7 +239,7 @@ describe('query stream:', function () {
     out.on('close', cb);
   });
 
-  it('lean', function (done) {
+  it('lean', function(done) {
     var db = start(),
         P = db.model('PersonForStream', collection),
         i = 0,
@@ -257,7 +257,7 @@ describe('query stream:', function () {
       done();
     }
 
-    stream.on('data', function (doc) {
+    stream.on('data', function(doc) {
       assert.strictEqual(false, doc instanceof mongoose.Document);
       i++;
 
@@ -269,7 +269,7 @@ describe('query stream:', function () {
       } else if (i === 2) {
         stream.pause();
         assert.equal(true, stream.paused);
-        process.nextTick(function () {
+        process.nextTick(function() {
           assert.equal(true, stream.paused);
           stream.resume();
           assert.equal(false, stream.paused);
@@ -277,18 +277,18 @@ describe('query stream:', function () {
       }
     });
 
-    stream.on('error', function (er) {
+    stream.on('error', function(er) {
       err = er;
       cb();
     });
 
-    stream.on('close', function () {
+    stream.on('close', function() {
       closed++;
       cb();
     });
   });
 
-  it('supports $elemMatch with $in (gh-1091)', function (done) {
+  it('supports $elemMatch with $in (gh-1091)', function(done) {
     this.timeout(3000);
 
     var db = start();
@@ -302,7 +302,7 @@ describe('query stream:', function () {
     var _id1 = new mongoose.Types.ObjectId;
     var _id2 = new mongoose.Types.ObjectId;
 
-    B.create({ids: [_id1, _id2]}, function (err, doc) {
+    B.create({ids: [_id1, _id2]}, function(err, doc) {
       assert.ifError(err);
 
       var error;
@@ -312,22 +312,22 @@ describe('query stream:', function () {
         .stream();
 
       stream.
-        on('data', function (found) {
+        on('data', function(found) {
           assert.equal(found.id, doc.id);
           assert.equal(1, found.ids.length);
           assert.equal(_id2.toString(), found.ids[0].toString());
         }).
-        on('error', function (err) {
+        on('error', function(err) {
           error = err;
         }).
-        on('close', function () {
+        on('close', function() {
           db.close();
           done(error);
         });
     });
   });
 
-  it('supports population (gh-1411)', function (done) {
+  it('supports population (gh-1411)', function(done) {
     var db = start();
 
     var barSchema = new Schema({
@@ -350,17 +350,17 @@ describe('query stream:', function () {
       db.close(done);
     }
 
-    Bar.create({value: 2}, {value: 3}, function (err, bar1, bar2) {
+    Bar.create({value: 2}, {value: 3}, function(err, bar1, bar2) {
       if (err) return complete(err);
 
-      Foo.create({bar: bar1}, {bar: bar2}, function (err) {
+      Foo.create({bar: bar1}, {bar: bar2}, function(err) {
         if (err) return complete(err);
 
         Foo.
           find().
           populate('bar').
           stream().
-          on('data', function (foo) {
+          on('data', function(foo) {
             found.push(foo.bar.value);
           }).
           on('end', complete).
@@ -369,7 +369,7 @@ describe('query stream:', function () {
     });
   });
 
-  it('respects schema options (gh-1862)', function (done) {
+  it('respects schema options (gh-1862)', function(done) {
     var db = start();
 
     var schema = new Schema({
@@ -378,16 +378,16 @@ describe('query stream:', function () {
     });
 
     var User = db.model('gh-1862', schema, 'gh-1862');
-    User.create({fullname: 'val', password: 'taco'}, function (error) {
+    User.create({fullname: 'val', password: 'taco'}, function(error) {
       assert.ifError(error);
-      User.find().stream().on('data', function (doc) {
+      User.find().stream().on('data', function(doc) {
         assert.equal(undefined, doc.password);
         db.close(done);
       });
     });
   });
 
-  it('works with populate + lean (gh-2841)', function (done) {
+  it('works with populate + lean (gh-2841)', function(done) {
     var db = start();
 
     var Sku = db.model('Sku', {}, 'gh2841_0');
@@ -395,19 +395,19 @@ describe('query stream:', function () {
       sku: {ref: 'Sku', type: Schema.Types.ObjectId}
     }, 'gh2841_1');
 
-    Sku.create({}, function (error, sku) {
+    Sku.create({}, function(error, sku) {
       assert.ifError(error);
-      Item.create({sku: sku._id}, function (error) {
+      Item.create({sku: sku._id}, function(error) {
         assert.ifError(error);
 
         var found = 0;
         var popOpts = {path: 'sku', options: {lean: true}};
         var stream = Item.find().populate(popOpts).stream();
-        stream.on('data', function (doc) {
+        stream.on('data', function(doc) {
           ++found;
           assert.equal(doc.sku._id.toString(), sku._id.toString());
         });
-        stream.on('end', function () {
+        stream.on('end', function() {
           assert.equal(found, 1);
           db.close(done);
         });
@@ -415,7 +415,7 @@ describe('query stream:', function () {
     });
   });
 
-  it('works with populate + dynref (gh-3108)', function (done) {
+  it('works with populate + dynref (gh-3108)', function(done) {
     var db = start();
 
     var reviewSchema = new Schema({
@@ -459,10 +459,10 @@ describe('query stream:', function () {
 
     var c = 0;
 
-    var create = function (cb) {
-      Item1.create({_id: ++c, name: 'Val'}, function (error) {
+    var create = function(cb) {
+      Item1.create({_id: ++c, name: 'Val'}, function(error) {
         assert.ifError(error);
-        Item2.create({_id: ++c, otherName: 'Val'}, function (error) {
+        Item2.create({_id: ++c, otherName: 'Val'}, function(error) {
           assert.ifError(error);
           var review = {
             _id: c,
@@ -473,7 +473,7 @@ describe('query stream:', function () {
               {id: c, type: 'dynrefItem2'}
             ]
           };
-          Review.create(review, function (error) {
+          Review.create(review, function(error) {
             assert.ifError(error);
             cb();
           });
@@ -481,24 +481,24 @@ describe('query stream:', function () {
       });
     };
 
-    var test = function () {
+    var test = function() {
       var stream = Review.find({}).populate('items.id').stream();
       var count = 0;
 
-      stream.on('data', function (doc) {
+      stream.on('data', function(doc) {
         ++count;
         assert.equal('Val', doc.items[0].id.name);
         assert.equal('Val', doc.items[1].id.otherName);
       });
 
-      stream.on('close', function () {
+      stream.on('close', function() {
         assert.equal(count, 2);
         db.close(done);
       });
     };
 
-    create(function () {
-      create(function () {
+    create(function() {
+      create(function() {
         test();
       });
     });

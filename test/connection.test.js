@@ -12,17 +12,17 @@ var start = require('./common'),
  * Test.
  */
 
-describe('connections:', function () {
-  it('should allow closing a closed connection', function (done) {
+describe('connections:', function() {
+  it('should allow closing a closed connection', function(done) {
     var db = mongoose.createConnection();
 
     assert.equal(0, db.readyState);
     db.close(done);
   });
 
-  it('should accept mongodb://localhost/fake', function (done) {
+  it('should accept mongodb://localhost/fake', function(done) {
     var db = mongoose.createConnection('mongodb://localhost/fake');
-    db.on('error', function () {
+    db.on('error', function() {
     });
     assert.equal('object', typeof db.options);
     assert.equal('object', typeof db.options.server);
@@ -37,9 +37,9 @@ describe('connections:', function () {
     db.close(done);
   });
 
-  it('should accept replicaSet query param', function (done) {
+  it('should accept replicaSet query param', function(done) {
     var db = mongoose.createConnection('mongodb://localhost/fake?replicaSet=rs0');
-    db.on('error', function () {
+    db.on('error', function() {
     });
     assert.equal('object', typeof db.options);
     assert.equal('object', typeof db.options.server);
@@ -57,9 +57,9 @@ describe('connections:', function () {
     done();
   });
 
-  it('should accept mongodb://localhost:27000/fake', function (done) {
+  it('should accept mongodb://localhost:27000/fake', function(done) {
     var db = mongoose.createConnection('mongodb://localhost:27000/fake');
-    db.on('error', function () {
+    db.on('error', function() {
     });
     assert.equal('object', typeof db.options);
     assert.equal('object', typeof db.options.server);
@@ -70,9 +70,9 @@ describe('connections:', function () {
     done();
   });
 
-  it('should accept mongodb://aaron:psw@localhost:27000/fake', function (done) {
+  it('should accept mongodb://aaron:psw@localhost:27000/fake', function(done) {
     var db = mongoose.createConnection('mongodb://aaron:psw@localhost:27000/fake');
-    db.on('error', function () {
+    db.on('error', function() {
     });
     assert.equal('object', typeof db.options);
     assert.equal('object', typeof db.options.server);
@@ -88,9 +88,9 @@ describe('connections:', function () {
     done();
   });
 
-  it('should accept mongodb://aaron:psw@localhost:27000/fake with db options', function (done) {
+  it('should accept mongodb://aaron:psw@localhost:27000/fake with db options', function(done) {
     var db = mongoose.createConnection('mongodb://aaron:psw@localhost:27000/fake', {db: {forceServerObjectId: true}});
-    db.on('error', function () {
+    db.on('error', function() {
     });
     assert.equal('object', typeof db.options);
     assert.equal('object', typeof db.options.server);
@@ -101,9 +101,9 @@ describe('connections:', function () {
     done();
   });
 
-  it('should accept mongodb://aaron:psw@localhost:27000/fake with server options', function (done) {
+  it('should accept mongodb://aaron:psw@localhost:27000/fake with server options', function(done) {
     var db = mongoose.createConnection('mongodb://aaron:psw@localhost:27000/fake', {server: {auto_reconnect: false}});
-    db.on('error', function () {
+    db.on('error', function() {
     });
     assert.equal('object', typeof db.options);
     assert.equal('object', typeof db.options.server);
@@ -114,9 +114,9 @@ describe('connections:', function () {
     done();
   });
 
-  it('should accept unix domain sockets', function (done) {
+  it('should accept unix domain sockets', function(done) {
     var db = mongoose.createConnection('mongodb://aaron:psw@/tmp/mongodb-27017.sock/fake', {server: {auto_reconnect: false}});
-    db.on('error', function () {
+    db.on('error', function() {
     });
     assert.equal('object', typeof db.options);
     assert.equal('object', typeof db.options.server);
@@ -131,7 +131,7 @@ describe('connections:', function () {
     done();
   });
 
-  describe('re-opening a closed connection', function () {
+  describe('re-opening a closed connection', function() {
     var mongos = process.env.MONGOOSE_SHARD_TEST_URI;
     if (!mongos) {
       return;
@@ -144,11 +144,11 @@ describe('connections:', function () {
     repl2.push(repl2.shift());
     repl2 = 'mongodb://' + repl2.join(',');
 
-    describe('with different host/port', function () {
-      it('non-replica set', function (done) {
+    describe('with different host/port', function() {
+      it('non-replica set', function(done) {
         var db = mongoose.createConnection();
 
-        db.open(mongod, function (err) {
+        db.open(mongod, function(err) {
           if (err) {
             return done(err);
           }
@@ -156,12 +156,12 @@ describe('connections:', function () {
           var port1 = db.port;
           var db1 = db.db;
 
-          db.close(function (err) {
+          db.close(function(err) {
             if (err) {
               return done(err);
             }
 
-            db.open(mongos, function (err) {
+            db.open(mongos, function(err) {
               if (err) {
                 return done(err);
               }
@@ -173,11 +173,11 @@ describe('connections:', function () {
               var port2 = db.port;
               var db2 = db.db;
 
-              db.close(function (err) {
+              db.close(function(err) {
                 if (err) {
                   return done(err);
                 }
-                db.open(mongod, function (err) {
+                db.open(mongod, function(err) {
                   if (err) {
                     return done(err);
                   }
@@ -194,10 +194,10 @@ describe('connections:', function () {
         });
       });
 
-      it('replica set', function (done) {
+      it('replica set', function(done) {
         var db = mongoose.createConnection();
 
-        db.openSet(repl1, function (err) {
+        db.openSet(repl1, function(err) {
           if (err) {
             return done(err);
           }
@@ -205,17 +205,17 @@ describe('connections:', function () {
           var hosts = db.hosts.slice();
           var db1 = db.db;
 
-          db.close(function (err) {
+          db.close(function(err) {
             if (err) {
               return done(err);
             }
 
-            db.openSet(repl2, function (err) {
+            db.openSet(repl2, function(err) {
               if (err) {
                 return done(err);
               }
 
-              db.hosts.forEach(function (host, i) {
+              db.hosts.forEach(function(host, i) {
                 assert.notEqual(host.port, hosts[i].port);
               });
               assert.ok(db1 !== db.db);
@@ -223,17 +223,17 @@ describe('connections:', function () {
               hosts = db.hosts.slice();
               var db2 = db.db;
 
-              db.close(function (err) {
+              db.close(function(err) {
                 if (err) {
                   return done(err);
                 }
 
-                db.openSet(repl1, function (err) {
+                db.openSet(repl1, function(err) {
                   if (err) {
                     return done(err);
                   }
 
-                  db.hosts.forEach(function (host, i) {
+                  db.hosts.forEach(function(host, i) {
                     assert.notEqual(host.port, hosts[i].port);
                   });
                   assert.ok(db2 !== db.db);
@@ -249,10 +249,10 @@ describe('connections:', function () {
     });
   });
 
-  describe('should accept separated args with options', function () {
-    it('works', function (done) {
+  describe('should accept separated args with options', function() {
+    it('works', function(done) {
       var db = mongoose.createConnection('127.0.0.1', 'faker', 28000, {server: {auto_reconnect: true}});
-      db.on('error', function () {
+      db.on('error', function() {
       });
       assert.equal('object', typeof db.options);
       assert.equal('object', typeof db.options.server);
@@ -265,7 +265,7 @@ describe('connections:', function () {
       db.close();
 
       db = mongoose.createConnection('127.0.0.1', 'faker', {blah: 1});
-      db.on('error', function () {
+      db.on('error', function() {
       });
       assert.equal('object', typeof db.options);
       assert.equal('object', typeof db.options.server);
@@ -280,9 +280,9 @@ describe('connections:', function () {
       done();
     });
 
-    it('including user/pass', function (done) {
+    it('including user/pass', function(done) {
       var db = mongoose.createConnection('localhost', 'fake', 27000, {user: 'aaron', pass: 'psw'});
-      db.on('error', function () {
+      db.on('error', function() {
       });
       assert.equal('object', typeof db.options);
       assert.equal('object', typeof db.options.server);
@@ -298,9 +298,9 @@ describe('connections:', function () {
       done();
     });
 
-    it('but fails when passing user and no pass with standard authentication', function (done) {
+    it('but fails when passing user and no pass with standard authentication', function(done) {
       var db = mongoose.createConnection('localhost', 'fake', 27000, {user: 'no_pass'});
-      db.on('error', function () {
+      db.on('error', function() {
       });
       assert.equal('object', typeof db.options);
       assert.equal('object', typeof db.options.server);
@@ -316,9 +316,9 @@ describe('connections:', function () {
       done();
     });
 
-    it('but passes when passing user and no pass with the MONGODB-X509 authMechanism', function (done) {
+    it('but passes when passing user and no pass with the MONGODB-X509 authMechanism', function(done) {
       var db = mongoose.createConnection('localhost', 'fake', 27000, {user: 'no_pass', auth: {authMechanism: 'MONGODB-X509'}});
-      db.on('error', function () {
+      db.on('error', function() {
       });
       assert.equal('object', typeof db.options);
       assert.equal('object', typeof db.options.server);
@@ -335,10 +335,10 @@ describe('connections:', function () {
     });
   });
 
-  describe('should accept separated args without options', function () {
-    it('works', function (done) {
+  describe('should accept separated args without options', function() {
+    it('works', function(done) {
       var db = mongoose.createConnection('127.0.0.1', 'faker', 28001);
-      db.on('error', function () {
+      db.on('error', function() {
       });
       assert.equal('object', typeof db.options);
       assert.equal('object', typeof db.options.server);
@@ -351,7 +351,7 @@ describe('connections:', function () {
       db.close();
 
       db = mongoose.createConnection('127.0.0.1', 'faker');
-      db.on('error', function () {
+      db.on('error', function() {
       });
       assert.equal('object', typeof db.options);
       assert.equal('object', typeof db.options.server);
@@ -364,9 +364,9 @@ describe('connections:', function () {
       db.close();
       done();
     });
-    it('and accept user/pass in hostname', function (done) {
+    it('and accept user/pass in hostname', function(done) {
       var db = mongoose.createConnection('aaron:psw@localhost', 'fake', 27000);
-      db.on('error', function () {
+      db.on('error', function() {
       });
       assert.equal('object', typeof db.options);
       assert.equal('object', typeof db.options.server);
@@ -383,9 +383,9 @@ describe('connections:', function () {
     });
   });
 
-  describe('querystring options', function () {
-    describe('for replica sets', function () {
-      it('work', function (done) {
+  describe('querystring options', function() {
+    describe('for replica sets', function() {
+      it('work', function(done) {
         var conn = 'mongodb://localhost/fake?autoReconnect=false&poolSize=2'
             + '&slaveOk=false&ssl=true&socketTimeoutMS=10&connectTimeoutMS=12'
             + '&retries=10&reconnectWait=5&rs_name=replworld&readSecondary=true'
@@ -394,7 +394,7 @@ describe('connections:', function () {
             + 'dc:ny,rack:1&readPreferenceTags=dc:sf';
 
         var db = mongoose.createConnection(conn);
-        db.on('error', function () {
+        db.on('error', function() {
         });
         db.close();
         assert.equal('object', typeof db.options);
@@ -427,7 +427,7 @@ describe('connections:', function () {
         assert.equal(false, db.options.db.forceServerObjectId);
         done();
       });
-      it('mixed with passed options', function (done) {
+      it('mixed with passed options', function(done) {
         var conn = 'mongodb://localhost/fake?poolSize=2'
             + '&slaveOk=false&ssl=true&socketTimeoutMS=10&connectTimeoutMS=12'
             + '&retries=10&reconnectWait=5&rs_name=replworld&readSecondary=true'
@@ -436,7 +436,7 @@ describe('connections:', function () {
             + 'dc:ny,rack:1&readPreferenceTags=dc:sf';
 
         var db = mongoose.createConnection(conn, {server: {poolSize: 3, auto_reconnect: false}});
-        db.on('error', function () {
+        db.on('error', function() {
         });
         db.close();
         assert.equal('object', typeof db.options);
@@ -471,8 +471,8 @@ describe('connections:', function () {
         done();
       });
     });
-    describe('for non replica sets', function () {
-      it('work', function (done) {
+    describe('for non replica sets', function() {
+      it('work', function(done) {
         var conn = 'mongodb://localhost/fake?autoReconnect=false&poolSize=2'
             + '&slaveOk=false&ssl=true&socketTimeoutMS=10&connectTimeoutMS=12'
             + '&retries=10&reconnectWait=5&readSecondary=true'
@@ -480,7 +480,7 @@ describe('connections:', function () {
             + '&wtimeoutMS=80&';
 
         var db = mongoose.createConnection(conn);
-        db.on('error', function () {
+        db.on('error', function() {
         });
         db.close();
         assert.equal('object', typeof db.options);
@@ -510,14 +510,14 @@ describe('connections:', function () {
         assert.equal(false, db.options.db.forceServerObjectId);
         done();
       });
-      it('mixed with passed options', function (done) {
+      it('mixed with passed options', function(done) {
         var conn = 'mongodb://localhost/fake?autoReconnect=false&poolSize=2'
             + '&slaveOk=false&ssl=true&socketTimeoutMS=10&connectTimeoutMS=12'
             + '&retries=10&reconnectWait=5&readSecondary=true'
             + '&nativeParser=false&w=2&safe=true&fsync=true&journal=true';
 
         var db = mongoose.createConnection(conn, {db: {w: 3, wtimeoutMS: 80}});
-        db.on('error', function () {
+        db.on('error', function() {
         });
         db.close();
         assert.equal('object', typeof db.options);
@@ -550,9 +550,9 @@ describe('connections:', function () {
     });
   });
 
-  describe('missing protocols', function () {
-    it('are allowed with replsets', function (done) {
-      var conn = mongoose.createConnection('localhost:12345,127.0.0.1:14326?replicaSet=bacon', function (err) {
+  describe('missing protocols', function() {
+    it('are allowed with replsets', function(done) {
+      var conn = mongoose.createConnection('localhost:12345,127.0.0.1:14326?replicaSet=bacon', function(err) {
         // force missing db error so we don't actually connect.
         assert.ok(err);
       });
@@ -562,9 +562,9 @@ describe('connections:', function () {
       setTimeout(done, 10);
     });
 
-    it('are allowed with single connections', function (done) {
+    it('are allowed with single connections', function(done) {
       var conn = mongoose.createConnection();
-      conn.doOpen = function () {
+      conn.doOpen = function() {
       };
       conn.open('localhost:12345/woot');
       assert.deepEqual('localhost', conn.host);
@@ -573,12 +573,12 @@ describe('connections:', function () {
     });
   });
 
-  describe('connect callbacks', function () {
-    it('execute with user:pwd connection strings', function (done) {
-      var db = mongoose.createConnection('mongodb://aaron:psw@localhost:27000/fake', {server: {auto_reconnect: true}}, function () {
+  describe('connect callbacks', function() {
+    it('execute with user:pwd connection strings', function(done) {
+      var db = mongoose.createConnection('mongodb://aaron:psw@localhost:27000/fake', {server: {auto_reconnect: true}}, function() {
         done();
       });
-      db.on('error', function (err) {
+      db.on('error', function(err) {
         assert.ok(err);
       });
       assert.equal('object', typeof db.options);
@@ -588,10 +588,10 @@ describe('connections:', function () {
       assert.equal(false, db.options.db.forceServerObjectId);
       db.close();
     });
-    it('execute without user:pwd connection strings', function (done) {
-      var db = mongoose.createConnection('mongodb://localhost/fake', function () {
+    it('execute without user:pwd connection strings', function(done) {
+      var db = mongoose.createConnection('mongodb://localhost/fake', function() {
       });
-      db.on('error', function (err) {
+      db.on('error', function(err) {
         assert.ok(err);
       });
       assert.equal('object', typeof db.options);
@@ -606,16 +606,16 @@ describe('connections:', function () {
       db.close();
       setTimeout(done, 10);
     });
-    it('should return an error if malformed uri passed', function (done) {
-      var db = mongoose.createConnection('mongodb:///fake', function (err) {
+    it('should return an error if malformed uri passed', function(done) {
+      var db = mongoose.createConnection('mongodb:///fake', function(err) {
         assert.ok(/Missing hostname/.test(err.message));
         done();
       });
       db.close();
       assert.ok(!db.options);
     });
-    it('should use admin db if not specified and user/pass specified', function (done) {
-      var db = mongoose.createConnection('mongodb://u:p@localhost', function () {
+    it('should use admin db if not specified and user/pass specified', function(done) {
+      var db = mongoose.createConnection('mongodb://u:p@localhost', function() {
         done();
       });
       assert.equal('object', typeof db.options);
@@ -628,8 +628,8 @@ describe('connections:', function () {
       assert.equal(27017, db.port);
       db.close();
     });
-    it('should fire when individual args are passed', function (done) {
-      var db = mongoose.createConnection('127.0.0.1', 'faker', 28000, {server: {auto_reconnect: false}}, function () {
+    it('should fire when individual args are passed', function(done) {
+      var db = mongoose.createConnection('127.0.0.1', 'faker', 28000, {server: {auto_reconnect: false}}, function() {
         done();
       });
       assert.equal('object', typeof db.options);
@@ -642,8 +642,8 @@ describe('connections:', function () {
       assert.equal(28000, db.port);
       db.close();
     });
-    it('should fire when no options are passed', function (done) {
-      var db = mongoose.createConnection('127.0.0.1', 'faker', 28000, function () {
+    it('should fire when no options are passed', function(done) {
+      var db = mongoose.createConnection('127.0.0.1', 'faker', 28000, function() {
         done();
       });
       assert.equal('object', typeof db.options);
@@ -656,7 +656,7 @@ describe('connections:', function () {
       assert.equal(28000, db.port);
       db.close();
     });
-    it('should fire when default port utilized', function (done) {
+    it('should fire when default port utilized', function(done) {
       var db = mongoose.createConnection('127.0.0.1', 'faker', done);
       assert.equal('object', typeof db.options);
       assert.equal('object', typeof db.options.server);
@@ -670,20 +670,20 @@ describe('connections:', function () {
     });
   });
 
-  describe('errors', function () {
-    it('event fires with one listener', function (done) {
+  describe('errors', function() {
+    it('event fires with one listener', function(done) {
       this.timeout(1000);
       var db = start({uri: 'mongodb://whatever23939.localhost/fakeeee?connectTimeoutMS=500', noErrorListener: 1});
-      db.on('error', function () {
+      db.on('error', function() {
         // this callback has no params which triggered the bug #759
         db.close();
         done();
       });
     });
 
-    it('should occur without hanging when password with special chars is used (gh-460)', function (done) {
+    it('should occur without hanging when password with special chars is used (gh-460)', function(done) {
       this.timeout(1000);
-      var db = mongoose.createConnection('mongodb://aaron:ps#w@localhost/fake?connectTimeoutMS=500', function (err) {
+      var db = mongoose.createConnection('mongodb://aaron:ps#w@localhost/fake?connectTimeoutMS=500', function(err) {
         assert.ok(err);
         db.close();
         done();
@@ -691,8 +691,8 @@ describe('connections:', function () {
     });
   });
 
-  describe('.model()', function () {
-    it('allows passing a schema', function (done) {
+  describe('.model()', function() {
+    it('allows passing a schema', function(done) {
       var db = start();
       var MyModel = db.model('MyModelasdf', new Schema({
         name: String
@@ -707,7 +707,7 @@ describe('connections:', function () {
       done();
     });
 
-    it('should properly assign the db', function (done) {
+    it('should properly assign the db', function(done) {
       var A = mongoose.model('testing853a', new Schema({x: String}), 'testing853-1');
       var B = mongoose.model('testing853b', new Schema({x: String}), 'testing853-2');
       var C = B.model('testing853a');
@@ -715,12 +715,12 @@ describe('connections:', function () {
       done();
     });
 
-    it('prevents overwriting pre-existing models', function (done) {
+    it('prevents overwriting pre-existing models', function(done) {
       var db = start();
       var name = 'gh-1209-a';
       db.model(name, new Schema);
 
-      assert.throws(function () {
+      assert.throws(function() {
         db.model(name, new Schema);
       }, /Cannot overwrite `gh-1209-a` model/);
 
@@ -728,13 +728,13 @@ describe('connections:', function () {
       done();
     });
 
-    it('allows passing identical name + schema args', function (done) {
+    it('allows passing identical name + schema args', function(done) {
       var db = start();
       var name = 'gh-1209-b';
       var schema = new Schema;
 
       db.model(name, schema);
-      assert.doesNotThrow(function () {
+      assert.doesNotThrow(function() {
         db.model(name, schema);
       });
 
@@ -742,9 +742,9 @@ describe('connections:', function () {
       done();
     });
 
-    it('throws on unknown model name', function (done) {
+    it('throws on unknown model name', function(done) {
       var db = start();
-      assert.throws(function () {
+      assert.throws(function() {
         db.model('iDoNotExist!');
       }, /Schema hasn't been registered/);
 
@@ -752,7 +752,7 @@ describe('connections:', function () {
       done();
     });
 
-    it('uses the passed schema when global model exists with same name (gh-1209)', function (done) {
+    it('uses the passed schema when global model exists with same name (gh-1209)', function(done) {
       var s1 = new Schema({one: String});
       var s2 = new Schema({two: Number});
 
@@ -776,8 +776,8 @@ describe('connections:', function () {
       done();
     });
 
-    describe('get existing model with not existing collection in db', function () {
-      it('must return exiting collection with all collection options', function (done) {
+    describe('get existing model with not existing collection in db', function() {
+      it('must return exiting collection with all collection options', function(done) {
         mongoose.model('some-th-1458', new Schema({test: String}, {capped: {size: 1000, max: 10}}));
         var db = start();
         var m = db.model('some-th-1458');
@@ -788,9 +788,9 @@ describe('connections:', function () {
       });
     });
 
-    describe('passing collection name', function () {
-      describe('when model name already exists', function () {
-        it('returns a new uncached model', function (done) {
+    describe('passing collection name', function() {
+      describe('when model name already exists', function() {
+        it('returns a new uncached model', function(done) {
           var db = start();
           var s1 = new Schema({a: []});
           var name = 'non-cached-collection-name';
@@ -807,15 +807,15 @@ describe('connections:', function () {
       });
     });
 
-    describe('passing object literal schemas', function () {
-      it('works', function (done) {
+    describe('passing object literal schemas', function() {
+      it('works', function(done) {
         var db = start();
         var A = db.model('A', {n: [{age: 'number'}]});
         var a = new A({n: [{age: '47'}]});
         assert.strictEqual(47, a.n[0].age);
-        a.save(function (err) {
+        a.save(function(err) {
           assert.ifError(err);
-          A.findById(a, function (err) {
+          A.findById(a, function(err) {
             db.close();
             assert.ifError(err);
             assert.strictEqual(47, a.n[0].age);
@@ -826,8 +826,8 @@ describe('connections:', function () {
     });
   });
 
-  describe('openSet', function () {
-    it('accepts uris, dbname, options', function (done) {
+  describe('openSet', function() {
+    it('accepts uris, dbname, options', function(done) {
       var m = new mongoose.Mongoose;
       var uris = process.env.MONGOOSE_SET_TEST_URI;
       if (!uris) {
@@ -835,7 +835,7 @@ describe('connections:', function () {
       }
 
       m.connection.on('error', done);
-      m.connection.on('open', function () {
+      m.connection.on('open', function() {
         m.connection.close(done);
       });
 
@@ -845,8 +845,8 @@ describe('connections:', function () {
         done(err);
       }
     });
-    describe('auth', function () {
-      it('from uri', function (done) {
+    describe('auth', function() {
+      it('from uri', function(done) {
         var uris = process.env.MONGOOSE_SET_TEST_URI;
         if (!uris) {
           return done();
@@ -854,14 +854,14 @@ describe('connections:', function () {
 
         var db = mongoose.createConnection();
         db.openSet('mongodb://aaron:psw@localhost:27000,b,c', {server: {auto_reconnect: false}});
-        db.on('error', function () {
+        db.on('error', function() {
         });
         assert.equal('aaron', db.user);
         assert.equal('psw', db.pass);
         db.close();
         done();
       });
-      it('form options', function (done) {
+      it('form options', function(done) {
         var uris = process.env.MONGOOSE_SET_TEST_URI;
         if (!uris) {
           return done();
@@ -869,7 +869,7 @@ describe('connections:', function () {
 
         var db = mongoose.createConnection();
         db.openSet('mongodb://aaron:psw@localhost:27000,b,c', {user: 'tester', pass: 'testpsw'});
-        db.on('error', function () {
+        db.on('error', function() {
         });
         assert.equal('tester', db.user);
         assert.equal('testpsw', db.pass);
@@ -878,10 +878,10 @@ describe('connections:', function () {
       });
     });
 
-    it('handles unix domain sockets', function (done) {
+    it('handles unix domain sockets', function(done) {
       var url = 'mongodb://aaron:psw@/tmp/mongodb-27018.sock,/tmp/mongodb-27019.sock/fake?replicaSet=bacon';
       var db = mongoose.createConnection(url, {server: {auto_reconnect: false}});
-      db.on('error', function () {
+      db.on('error', function() {
       });
       assert.equal('object', typeof db.options);
       assert.equal('object', typeof db.options.server);
@@ -898,7 +898,7 @@ describe('connections:', function () {
       done();
     });
 
-    it('can reopen a disconnected replica set (gh-1263)', function (done) {
+    it('can reopen a disconnected replica set (gh-1263)', function(done) {
       var uris = process.env.MONGOOSE_SET_TEST_URI;
       if (!uris) {
         return done();
@@ -909,17 +909,17 @@ describe('connections:', function () {
       conn.on('error', done);
 
       try {
-        conn.openSet(uris, 'mongoose_test', {}, function (err) {
+        conn.openSet(uris, 'mongoose_test', {}, function(err) {
           if (err) {
             return done(err);
           }
 
-          conn.close(function (err) {
+          conn.close(function(err) {
             if (err) {
               return done(err);
             }
 
-            conn.openSet(uris, 'mongoose_test', {}, function () {
+            conn.openSet(uris, 'mongoose_test', {}, function() {
               conn.close(done);
             });
           });
@@ -930,23 +930,23 @@ describe('connections:', function () {
     });
   });
 
-  it('connecting to single mongos (gh-3537)', function (done) {
+  it('connecting to single mongos (gh-3537)', function(done) {
     var db = mongoose.createConnection('localhost:27017', {mongos: true});
     assert.ok(db.db.serverConfig instanceof mongoose.mongo.Mongos);
     db.close(done);
   });
 
-  describe('connecting to multiple mongos nodes (gh-1037)', function () {
+  describe('connecting to multiple mongos nodes (gh-1037)', function() {
     var mongos = process.env.MONGOOSE_MULTI_MONGOS_TEST_URI;
     if (!mongos) {
       return console.log('Not testing multi-mongos support');
     }
 
-    it('works', function (done) {
+    it('works', function(done) {
       this.timeout(3000);
 
       var m = new mongoose.Mongoose;
-      m.connect(mongos, {mongos: true}, function (err) {
+      m.connect(mongos, {mongos: true}, function(err) {
         assert.ifError(err);
 
         var s = m.connection.db.serverConfig;
@@ -954,10 +954,10 @@ describe('connections:', function () {
         assert.equal(2, s.servers.length);
 
         var M = m.model('TestMultipleMongos', {name: String}, 'test-multi-mongos-' + random());
-        M.create({name: 'works'}, function (err, d) {
+        M.create({name: 'works'}, function(err, d) {
           assert.ifError(err);
 
-          M.findOne({name: 'works'}, function (err, doc) {
+          M.findOne({name: 'works'}, function(err, doc) {
             assert.ifError(err);
             assert.equal(doc.id, d.id);
             m.disconnect(done);
@@ -967,8 +967,8 @@ describe('connections:', function () {
     });
   });
 
-  describe('modelNames()', function () {
-    it('returns names of all models registered on it', function (done) {
+  describe('modelNames()', function() {
+    it('returns names of all models registered on it', function(done) {
       var m = new mongoose.Mongoose;
       m.model('root', {x: String});
       var another = m.model('another', {x: String});
@@ -993,8 +993,8 @@ describe('connections:', function () {
     });
   });
 
-  describe('connection pool sharing: ', function () {
-    it('works', function (done) {
+  describe('connection pool sharing: ', function() {
+    it('works', function(done) {
       var db = mongoose.createConnection('mongodb://localhost/mongoose1');
 
       var db2 = db.useDb('mongoose2');
@@ -1014,7 +1014,7 @@ describe('connections:', function () {
       db2.close(done);
     });
 
-    it('saves correctly', function (done) {
+    it('saves correctly', function(done) {
       var db = start();
       var db2 = db.useDb('mongoose-test-2');
 
@@ -1026,27 +1026,27 @@ describe('connections:', function () {
       var m1 = db.model('testMod', schema);
       var m2 = db2.model('testMod', schema);
 
-      m1.create({body: 'this is some text', thing: 1}, function (err, i1) {
+      m1.create({body: 'this is some text', thing: 1}, function(err, i1) {
         assert.ifError(err);
-        m2.create({body: 'this is another body', thing: 2}, function (err, i2) {
+        m2.create({body: 'this is another body', thing: 2}, function(err, i2) {
           assert.ifError(err);
 
-          m1.findById(i1.id, function (err, item1) {
+          m1.findById(i1.id, function(err, item1) {
             assert.ifError(err);
             assert.equal(item1.body, 'this is some text');
             assert.equal(item1.thing, 1);
 
-            m2.findById(i2.id, function (err, item2) {
+            m2.findById(i2.id, function(err, item2) {
               assert.ifError(err);
               assert.equal(item2.body, 'this is another body');
               assert.equal(item2.thing, 2);
 
               // validate the doc doesn't exist in the other db
-              m1.findById(i2.id, function (err, nothing) {
+              m1.findById(i2.id, function(err, nothing) {
                 assert.ifError(err);
                 assert.strictEqual(null, nothing);
 
-                m2.findById(i1.id, function (err, nothing) {
+                m2.findById(i1.id, function(err, nothing) {
                   assert.ifError(err);
                   assert.strictEqual(null, nothing);
 
@@ -1059,17 +1059,17 @@ describe('connections:', function () {
       });
     });
 
-    it('emits connecting events on both', function (done) {
+    it('emits connecting events on both', function(done) {
       var db = mongoose.createConnection();
       var db2 = db.useDb('mongoose-test-2');
       var hit = false;
 
-      db2.on('connecting', function () {
+      db2.on('connecting', function() {
         hit && close();
         hit = true;
       });
 
-      db.on('connecting', function () {
+      db.on('connecting', function() {
         hit && close();
         hit = true;
       });
@@ -1081,16 +1081,16 @@ describe('connections:', function () {
       }
     });
 
-    it('emits connected events on both', function (done) {
+    it('emits connected events on both', function(done) {
       var db = mongoose.createConnection();
       var db2 = db.useDb('mongoose-test-2');
       var hit = false;
 
-      db2.on('connected', function () {
+      db2.on('connected', function() {
         hit && close();
         hit = true;
       });
-      db.on('connected', function () {
+      db.on('connected', function() {
         hit && close();
         hit = true;
       });
@@ -1102,15 +1102,15 @@ describe('connections:', function () {
       }
     });
 
-    it('emits open events on both', function (done) {
+    it('emits open events on both', function(done) {
       var db = mongoose.createConnection();
       var db2 = db.useDb('mongoose-test-2');
       var hit = false;
-      db2.on('open', function () {
+      db2.on('open', function() {
         hit && close();
         hit = true;
       });
-      db.on('open', function () {
+      db.on('open', function() {
         hit && close();
         hit = true;
       });
@@ -1122,105 +1122,105 @@ describe('connections:', function () {
       }
     });
 
-    it('emits disconnecting events on both, closing initial db', function (done) {
+    it('emits disconnecting events on both, closing initial db', function(done) {
       var db = mongoose.createConnection();
       var db2 = db.useDb('mongoose-test-2');
       var hit = false;
-      db2.on('disconnecting', function () {
+      db2.on('disconnecting', function() {
         hit && done();
         hit = true;
       });
-      db.on('disconnecting', function () {
+      db.on('disconnecting', function() {
         hit && done();
         hit = true;
       });
-      db.on('open', function () {
+      db.on('open', function() {
         db.close();
       });
       db.open(start.uri);
     });
 
-    it('emits disconnecting events on both, closing secondary db', function (done) {
+    it('emits disconnecting events on both, closing secondary db', function(done) {
       var db = mongoose.createConnection();
       var db2 = db.useDb('mongoose-test-2');
       var hit = false;
-      db2.on('disconnecting', function () {
+      db2.on('disconnecting', function() {
         hit && done();
         hit = true;
       });
-      db.on('disconnecting', function () {
+      db.on('disconnecting', function() {
         hit && done();
         hit = true;
       });
-      db.on('open', function () {
+      db.on('open', function() {
         db2.close();
       });
       db.open(start.uri);
     });
 
-    it('emits disconnected events on both, closing initial db', function (done) {
+    it('emits disconnected events on both, closing initial db', function(done) {
       var db = mongoose.createConnection();
       var db2 = db.useDb('mongoose-test-2');
       var hit = false;
-      db2.on('disconnected', function () {
+      db2.on('disconnected', function() {
         hit && done();
         hit = true;
       });
-      db.on('disconnected', function () {
+      db.on('disconnected', function() {
         hit && done();
         hit = true;
       });
-      db.on('open', function () {
+      db.on('open', function() {
         db.close();
       });
       db.open(start.uri);
     });
 
-    it('emits disconnected events on both, closing secondary db', function (done) {
+    it('emits disconnected events on both, closing secondary db', function(done) {
       var db = mongoose.createConnection();
       var db2 = db.useDb('mongoose-test-2');
       var hit = false;
-      db2.on('disconnected', function () {
+      db2.on('disconnected', function() {
         hit && done();
         hit = true;
       });
-      db.on('disconnected', function () {
+      db.on('disconnected', function() {
         hit && done();
         hit = true;
       });
-      db.on('open', function () {
+      db.on('open', function() {
         db2.close();
       });
       db.open(start.uri);
     });
 
-    it('closes correctly for all dbs, closing initial db', function (done) {
+    it('closes correctly for all dbs, closing initial db', function(done) {
       var db = start();
       var db2 = db.useDb('mongoose-test-2');
 
-      db2.on('close', function () {
+      db2.on('close', function() {
         done();
       });
       db.close();
     });
 
-    it('closes correctly for all dbs, closing secondary db', function (done) {
+    it('closes correctly for all dbs, closing secondary db', function(done) {
       var db = start();
       var db2 = db.useDb('mongoose-test-2');
 
-      db.on('close', function () {
+      db.on('close', function() {
         done();
       });
       db2.close();
     });
   });
 
-  describe('shouldAuthenticate()', function () {
-    describe('when using standard authentication', function () {
-      describe('when username and password are undefined', function () {
-        it('should return false', function (done) {
+  describe('shouldAuthenticate()', function() {
+    describe('when using standard authentication', function() {
+      describe('when username and password are undefined', function() {
+        it('should return false', function(done) {
           var db = mongoose.createConnection('localhost', 'fake', 27000, {});
-          db.on('error', function () {
+          db.on('error', function() {
           });
           assert.equal('object', typeof db.options);
           assert.equal('object', typeof db.options.server);
@@ -1239,10 +1239,10 @@ describe('connections:', function () {
           done();
         });
       });
-      describe('when username and password are empty strings', function () {
-        it('should return false', function (done) {
+      describe('when username and password are empty strings', function() {
+        it('should return false', function(done) {
           var db = mongoose.createConnection('localhost', 'fake', 27000, {user: '', pass: ''});
-          db.on('error', function () {
+          db.on('error', function() {
           });
           assert.equal('object', typeof db.options);
           assert.equal('object', typeof db.options.server);
@@ -1261,10 +1261,10 @@ describe('connections:', function () {
           done();
         });
       });
-      describe('when only username is defined', function () {
-        it('should return false', function (done) {
+      describe('when only username is defined', function() {
+        it('should return false', function(done) {
           var db = mongoose.createConnection('localhost', 'fake', 27000, {user: 'user'});
-          db.on('error', function () {
+          db.on('error', function() {
           });
           assert.equal('object', typeof db.options);
           assert.equal('object', typeof db.options.server);
@@ -1283,10 +1283,10 @@ describe('connections:', function () {
           done();
         });
       });
-      describe('when both username and password are defined', function () {
-        it('should return false', function (done) {
+      describe('when both username and password are defined', function() {
+        it('should return false', function(done) {
           var db = mongoose.createConnection('localhost', 'fake', 27000, {user: 'user', pass: 'pass'});
-          db.on('error', function () {
+          db.on('error', function() {
           });
           assert.equal('object', typeof db.options);
           assert.equal('object', typeof db.options.server);
@@ -1306,11 +1306,11 @@ describe('connections:', function () {
         });
       });
     });
-    describe('when using MONGODB-X509 authentication', function () {
-      describe('when username and password are undefined', function () {
-        it('should return false', function (done) {
+    describe('when using MONGODB-X509 authentication', function() {
+      describe('when username and password are undefined', function() {
+        it('should return false', function(done) {
           var db = mongoose.createConnection('localhost', 'fake', 27000, {});
-          db.on('error', function () {
+          db.on('error', function() {
           });
           assert.equal('object', typeof db.options);
           assert.equal('object', typeof db.options.server);
@@ -1329,10 +1329,10 @@ describe('connections:', function () {
           done();
         });
       });
-      describe('when only username is defined', function () {
-        it('should return false', function (done) {
+      describe('when only username is defined', function() {
+        it('should return false', function(done) {
           var db = mongoose.createConnection('localhost', 'fake', 27000, {user: 'user', auth: {authMechanism: 'MONGODB-X509'}});
-          db.on('error', function () {
+          db.on('error', function() {
           });
           assert.equal('object', typeof db.options);
           assert.equal('object', typeof db.options.server);
@@ -1351,10 +1351,10 @@ describe('connections:', function () {
           done();
         });
       });
-      describe('when both username and password are defined', function () {
-        it('should return false', function (done) {
+      describe('when both username and password are defined', function() {
+        it('should return false', function(done) {
           var db = mongoose.createConnection('localhost', 'fake', 27000, {user: 'user', pass: 'pass', auth: {authMechanism: 'MONGODB-X509'}});
-          db.on('error', function () {
+          db.on('error', function() {
           });
           assert.equal('object', typeof db.options);
           assert.equal('object', typeof db.options.server);

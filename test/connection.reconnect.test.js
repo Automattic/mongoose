@@ -1,8 +1,8 @@
 var start = require('./common');
 var mongoose = start.mongoose;
 
-describe('connection: manual reconnect with authReconnect: false', function () {
-  it('should continue processing queries/writes', function (done) {
+describe('connection: manual reconnect with authReconnect: false', function() {
+  it('should continue processing queries/writes', function(done) {
     // connect to mongod
     // perform writes/queries
     // take mongod down
@@ -19,15 +19,15 @@ describe('connection: manual reconnect with authReconnect: false', function () {
     var open = false;
     var times = 0;
 
-    db.on('open', function () {
+    db.on('open', function() {
       ++times;
       open = true;
       hit();
     });
 
-    db.on('disconnected', function () {
+    db.on('disconnected', function() {
       open = false;
-      setTimeout(function () {
+      setTimeout(function() {
         db.open(start.uri, {server: {auto_reconnect: false}});
       }, 30);
     });
@@ -36,11 +36,11 @@ describe('connection: manual reconnect with authReconnect: false', function () {
       if (!open) {
         return;
       }
-      M.create({name: times}, function (err, doc) {
+      M.create({name: times}, function(err, doc) {
         if (err) {
           return complete(err);
         }
-        M.findOne({_id: doc._id}, function (err) {
+        M.findOne({_id: doc._id}, function(err) {
           if (err) {
             return complete(err);
           }

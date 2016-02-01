@@ -18,22 +18,22 @@ var schema = new Schema({
 });
 
 
-describe('model', function () {
-  describe('create()', function () {
+describe('model', function() {
+  describe('create()', function() {
     var db;
     var B;
 
-    before(function () {
+    before(function() {
       db = start();
       B = db.model('model-create', schema, 'model-create-' + random());
     });
 
-    after(function (done) {
+    after(function(done) {
       db.close(done);
     });
 
-    it('accepts an array and returns an array', function (done) {
-      B.create([{title: 'hi'}, {title: 'bye'}], function (err, posts) {
+    it('accepts an array and returns an array', function(done) {
+      B.create([{title: 'hi'}, {title: 'bye'}], function(err, posts) {
         assert.ifError(err);
 
         assert.ok(posts instanceof Array);
@@ -50,30 +50,30 @@ describe('model', function () {
       });
     });
 
-    it('fires callback when passed 0 docs', function (done) {
-      B.create(function (err, a) {
+    it('fires callback when passed 0 docs', function(done) {
+      B.create(function(err, a) {
         assert.ifError(err);
         assert.ok(!a);
         done();
       });
     });
 
-    it('fires callback when empty array passed', function (done) {
-      B.create([], function (err, a) {
+    it('fires callback when empty array passed', function(done) {
+      B.create([], function(err, a) {
         assert.ifError(err);
         assert.ok(!a);
         done();
       });
     });
 
-    it('returns a promise', function (done) {
-      var p = B.create({title: 'returns promise'}, function () {
+    it('returns a promise', function(done) {
+      var p = B.create({title: 'returns promise'}, function() {
         assert.ok(p instanceof mongoose.Promise);
         done();
       });
     });
 
-    it('creates in parallel', function (done) {
+    it('creates in parallel', function(done) {
       // we set the time out to be double that of the validator - 1 (so that running in serial will be greater then that)
       this.timeout(1000);
       var db = start(),
@@ -84,13 +84,13 @@ describe('model', function () {
         preference: String
       });
       SchemaWithPreSaveHook.pre('save', true, function hook(next, done) {
-        setTimeout(function () {
+        setTimeout(function() {
           countPre++;
           next();
           done();
         }, 500);
       });
-      SchemaWithPreSaveHook.post('save', function () {
+      SchemaWithPreSaveHook.post('save', function() {
         countPost++;
       });
       var MWPSH = db.model('mwpsh', SchemaWithPreSaveHook);
@@ -99,7 +99,7 @@ describe('model', function () {
         {preference: 'yy'},
         {preference: '1'},
         {preference: '2'}
-      ], function (err, docs) {
+      ], function(err, docs) {
         assert.ifError(err);
 
         assert.ok(docs instanceof Array);
@@ -119,27 +119,27 @@ describe('model', function () {
     });
 
 
-    describe('callback is optional', function () {
-      it('with one doc', function (done) {
+    describe('callback is optional', function() {
+      it('with one doc', function(done) {
         var p = B.create({title: 'optional callback'});
-        p.then(function (doc) {
+        p.then(function(doc) {
           assert.equal('optional callback', doc.title);
           done();
         }, done).end();
       });
 
-      it('with more than one doc', function (done) {
+      it('with more than one doc', function(done) {
         var p = B.create({title: 'optional callback 2'}, {title: 'orient expressions'});
-        p.then(function (doc1, doc2) {
+        p.then(function(doc1, doc2) {
           assert.equal('optional callback 2', doc1.title);
           assert.equal('orient expressions', doc2.title);
           done();
         }, done).end();
       });
 
-      it('with array of docs', function (done) {
+      it('with array of docs', function(done) {
         var p = B.create([{title: 'optional callback3'}, {title: '3'}]);
-        p.then(function (docs) {
+        p.then(function(docs) {
           assert.ok(docs instanceof Array);
           assert.equal(docs.length, 2);
           var doc1 = docs[0];
@@ -150,13 +150,13 @@ describe('model', function () {
         }, done).end();
       });
 
-      it('and should reject promise on error', function (done) {
+      it('and should reject promise on error', function(done) {
         var p = B.create({title: 'optional callback 4'});
-        p.then(function (doc) {
+        p.then(function(doc) {
           var p2 = B.create({_id: doc._id});
-          p2.then(function () {
+          p2.then(function() {
             assert(false);
-          }, function (err) {
+          }, function(err) {
             assert(err);
             done();
           }).end();

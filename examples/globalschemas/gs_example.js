@@ -9,7 +9,7 @@ var Person = mongoose.model('Person');
 
 // connect to a server to do a quick write / read example
 
-mongoose.connect('mongodb://localhost/persons', function (err) {
+mongoose.connect('mongodb://localhost/persons', function(err) {
   if (err) {
     throw err;
   }
@@ -18,22 +18,22 @@ mongoose.connect('mongodb://localhost/persons', function (err) {
     name: 'bill',
     age: 25,
     birthday: new Date().setFullYear((new Date().getFullYear() - 25))
-  }, function (err, bill) {
+  }, function(err, bill) {
     if (err) {
       throw err;
     }
     console.log('People added to db: %s', bill.toString());
-    Person.find({}, function (err, people) {
+    Person.find({}, function(err, people) {
       if (err) {
         throw err;
       }
 
-      people.forEach(function (person) {
+      people.forEach(function(person) {
         console.log('People in the db: %s', person.toString());
       });
 
       // make sure to clean things up after we're done
-      setTimeout(function () {
+      setTimeout(function() {
         cleanup();
       }, 2000);
     });
@@ -41,7 +41,7 @@ mongoose.connect('mongodb://localhost/persons', function (err) {
 });
 
 function cleanup() {
-  Person.remove(function () {
+  Person.remove(function() {
     mongoose.disconnect();
   });
 }

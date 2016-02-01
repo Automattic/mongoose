@@ -9,28 +9,28 @@ var Schema = mongoose.Schema,
     Mixed = SchemaTypes.Mixed,
     DocumentObjectId = mongoose.Types.ObjectId;
 
-describe('schema', function () {
-  describe('validation', function () {
-    it('invalid arguments are rejected (1044)', function (done) {
-      assert.throws(function () {
+describe('schema', function() {
+  describe('validation', function() {
+    it('invalid arguments are rejected (1044)', function(done) {
+      assert.throws(function() {
         new Schema({
           simple: {type: String, validate: 'nope'}
         });
       }, /Invalid validator/);
 
-      assert.throws(function () {
+      assert.throws(function() {
         new Schema({
           simple: {type: String, validate: ['nope']}
         });
       }, /Invalid validator/);
 
-      assert.throws(function () {
+      assert.throws(function() {
         new Schema({
           simple: {type: String, validate: {nope: 1, msg: 'nope'}}
         });
       }, /Invalid validator/);
 
-      assert.throws(function () {
+      assert.throws(function() {
         new Schema({
           simple: {type: String, validate: [{nope: 1, msg: 'nope'}, 'nope']}
         });
@@ -39,7 +39,7 @@ describe('schema', function () {
       done();
     });
 
-    it('string enum', function (done) {
+    it('string enum', function(done) {
       var Test = new Schema({
         complex: {type: String, enum: ['a', 'b', undefined, 'c', null]},
         state: {type: String}
@@ -62,101 +62,101 @@ describe('schema', function () {
       assert.equal(Test.path('state').validators.length, 1);
       assert.deepEqual(Test.path('state').enumValues, ['opening', 'open', 'closing', 'closed']);
 
-      Test.path('complex').doValidate('x', function (err) {
+      Test.path('complex').doValidate('x', function(err) {
         assert.ok(err instanceof ValidatorError);
       });
 
       // allow unsetting enums
-      Test.path('complex').doValidate(undefined, function (err) {
+      Test.path('complex').doValidate(undefined, function(err) {
         assert.ifError(err);
       });
 
-      Test.path('complex').doValidate(null, function (err) {
+      Test.path('complex').doValidate(null, function(err) {
         assert.ifError(err);
       });
 
-      Test.path('complex').doValidate('da', function (err) {
+      Test.path('complex').doValidate('da', function(err) {
         assert.ok(err instanceof ValidatorError);
       });
 
-      Test.path('state').doValidate('x', function (err) {
+      Test.path('state').doValidate('x', function(err) {
         assert.ok(err instanceof ValidatorError);
       });
 
-      Test.path('state').doValidate('opening', function (err) {
+      Test.path('state').doValidate('opening', function(err) {
         assert.ifError(err);
       });
 
-      Test.path('state').doValidate('open', function (err) {
+      Test.path('state').doValidate('open', function(err) {
         assert.ifError(err);
       });
 
       done();
     });
 
-    it('string regexp', function (done) {
+    it('string regexp', function(done) {
       var Test = new Schema({
         simple: {type: String, match: /[a-z]/}
       });
 
       assert.equal(1, Test.path('simple').validators.length);
 
-      Test.path('simple').doValidate('az', function (err) {
+      Test.path('simple').doValidate('az', function(err) {
         assert.ifError(err);
       });
 
       Test.path('simple').match(/[0-9]/);
       assert.equal(2, Test.path('simple').validators.length);
 
-      Test.path('simple').doValidate('12', function (err) {
+      Test.path('simple').doValidate('12', function(err) {
         assert.ok(err instanceof ValidatorError);
       });
 
-      Test.path('simple').doValidate('a12', function (err) {
+      Test.path('simple').doValidate('a12', function(err) {
         assert.ifError(err);
       });
 
-      Test.path('simple').doValidate('', function (err) {
+      Test.path('simple').doValidate('', function(err) {
         assert.ifError(err);
       });
-      Test.path('simple').doValidate(null, function (err) {
+      Test.path('simple').doValidate(null, function(err) {
         assert.ifError(err);
       });
-      Test.path('simple').doValidate(undefined, function (err) {
+      Test.path('simple').doValidate(undefined, function(err) {
         assert.ifError(err);
       });
       Test.path('simple').validators = [];
       Test.path('simple').match(/[1-9]/);
-      Test.path('simple').doValidate(0, function (err) {
+      Test.path('simple').doValidate(0, function(err) {
         assert.ok(err instanceof ValidatorError);
       });
       done();
     });
 
-    it('number min and max', function (done) {
+    it('number min and max', function(done) {
       var Tobi = new Schema({
         friends: {type: Number, max: 15, min: 5}
       });
 
       assert.equal(Tobi.path('friends').validators.length, 2);
 
-      Tobi.path('friends').doValidate(10, function (err) {
+      Tobi.path('friends').doValidate(10, function(err) {
         assert.ifError(err);
       });
 
-      Tobi.path('friends').doValidate(100, function (err) {
+      Tobi.path('friends').doValidate(100, function(err) {
         assert.ok(err instanceof ValidatorError);
         assert.equal('friends', err.path);
         assert.equal('max', err.kind);
         assert.equal(100, err.value);
       });
 
-      Tobi.path('friends').doValidate(1, function (err) {
+      Tobi.path('friends').doValidate(1, function(err) {
         assert.ok(err instanceof ValidatorError);
       });
 
       // null is allowed
-      Tobi.path('friends').doValidate(null, function (err) {
+      Tobi.path('friends').doValidate(null, function(err) {
         assert.ifError(err);
       });
 
@@ -167,8 +167,8 @@ describe('schema', function () {
       done();
     });
 
-    describe('required', function () {
-      it('string required', function (done) {
+    describe('required', function() {
+      it('string required', function(done) {
         var Test = new Schema({
           simple: String
         });
@@ -176,208 +176,208 @@ describe('schema', function () {
         Test.path('simple').required(true);
         assert.equal(Test.path('simple').validators.length, 1);
 
-        Test.path('simple').doValidate(null, function (err) {
+        Test.path('simple').doValidate(null, function(err) {
           assert.ok(err instanceof ValidatorError);
         });
 
-        Test.path('simple').doValidate(undefined, function (err) {
+        Test.path('simple').doValidate(undefined, function(err) {
           assert.ok(err instanceof ValidatorError);
         });
 
-        Test.path('simple').doValidate('', function (err) {
+        Test.path('simple').doValidate('', function(err) {
           assert.ok(err instanceof ValidatorError);
         });
 
-        Test.path('simple').doValidate('woot', function (err) {
+        Test.path('simple').doValidate('woot', function(err) {
           assert.ifError(err);
         });
 
         done();
       });
 
-      it('string conditional required', function (done) {
+      it('string conditional required', function(done) {
         var Test = new Schema({
           simple: String
         });
 
         var required = true,
-            isRequired = function () {
+            isRequired = function() {
               return required;
             };
 
         Test.path('simple').required(isRequired);
         assert.equal(Test.path('simple').validators.length, 1);
 
-        Test.path('simple').doValidate(null, function (err) {
+        Test.path('simple').doValidate(null, function(err) {
           assert.ok(err instanceof ValidatorError);
         });
 
-        Test.path('simple').doValidate(undefined, function (err) {
+        Test.path('simple').doValidate(undefined, function(err) {
           assert.ok(err instanceof ValidatorError);
         });
 
-        Test.path('simple').doValidate('', function (err) {
+        Test.path('simple').doValidate('', function(err) {
           assert.ok(err instanceof ValidatorError);
         });
 
-        Test.path('simple').doValidate('woot', function (err) {
+        Test.path('simple').doValidate('woot', function(err) {
           assert.ifError(err);
         });
 
         required = false;
 
-        Test.path('simple').doValidate(null, function (err) {
+        Test.path('simple').doValidate(null, function(err) {
           assert.ifError(err);
         });
 
-        Test.path('simple').doValidate(undefined, function (err) {
+        Test.path('simple').doValidate(undefined, function(err) {
           assert.ifError(err);
         });
 
-        Test.path('simple').doValidate('', function (err) {
+        Test.path('simple').doValidate('', function(err) {
           assert.ifError(err);
         });
 
-        Test.path('simple').doValidate('woot', function (err) {
+        Test.path('simple').doValidate('woot', function(err) {
           assert.ifError(err);
         });
 
         done();
       });
 
-      it('number required', function (done) {
+      it('number required', function(done) {
         var Edwald = new Schema({
           friends: {type: Number, required: true}
         });
 
-        Edwald.path('friends').doValidate(null, function (err) {
+        Edwald.path('friends').doValidate(null, function(err) {
           assert.ok(err instanceof ValidatorError);
         });
 
-        Edwald.path('friends').doValidate(undefined, function (err) {
+        Edwald.path('friends').doValidate(undefined, function(err) {
           assert.ok(err instanceof ValidatorError);
         });
 
-        Edwald.path('friends').doValidate(0, function (err) {
+        Edwald.path('friends').doValidate(0, function(err) {
           assert.ifError(err);
         });
 
         done();
       });
 
-      it('date required', function (done) {
+      it('date required', function(done) {
         var Loki = new Schema({
           birth_date: {type: Date, required: true}
         });
 
-        Loki.path('birth_date').doValidate(null, function (err) {
+        Loki.path('birth_date').doValidate(null, function(err) {
           assert.ok(err instanceof ValidatorError);
         });
 
-        Loki.path('birth_date').doValidate(undefined, function (err) {
+        Loki.path('birth_date').doValidate(undefined, function(err) {
           assert.ok(err instanceof ValidatorError);
         });
 
-        Loki.path('birth_date').doValidate(new Date(), function (err) {
+        Loki.path('birth_date').doValidate(new Date(), function(err) {
           assert.ifError(err);
         });
 
         done();
       });
 
-      it('objectid required', function (done) {
+      it('objectid required', function(done) {
         var Loki = new Schema({
           owner: {type: ObjectId, required: true}
         });
 
-        Loki.path('owner').doValidate(new DocumentObjectId(), function (err) {
+        Loki.path('owner').doValidate(new DocumentObjectId(), function(err) {
           assert.ifError(err);
         });
 
-        Loki.path('owner').doValidate(null, function (err) {
+        Loki.path('owner').doValidate(null, function(err) {
           assert.ok(err instanceof ValidatorError);
         });
 
-        Loki.path('owner').doValidate(undefined, function (err) {
+        Loki.path('owner').doValidate(undefined, function(err) {
           assert.ok(err instanceof ValidatorError);
         });
         done();
       });
 
-      it('array required', function (done) {
+      it('array required', function(done) {
         var Loki = new Schema({
           likes: {type: Array, required: true}
         });
 
-        Loki.path('likes').doValidate(null, function (err) {
+        Loki.path('likes').doValidate(null, function(err) {
           assert.ok(err instanceof ValidatorError);
         });
 
-        Loki.path('likes').doValidate(undefined, function (err) {
+        Loki.path('likes').doValidate(undefined, function(err) {
           assert.ok(err instanceof ValidatorError);
         });
 
-        Loki.path('likes').doValidate([], function (err) {
+        Loki.path('likes').doValidate([], function(err) {
           assert.ok(err instanceof ValidatorError);
         });
         done();
       });
 
-      it('boolean required', function (done) {
+      it('boolean required', function(done) {
         var Animal = new Schema({
           isFerret: {type: Boolean, required: true}
         });
 
-        Animal.path('isFerret').doValidate(null, function (err) {
+        Animal.path('isFerret').doValidate(null, function(err) {
           assert.ok(err instanceof ValidatorError);
         });
 
-        Animal.path('isFerret').doValidate(undefined, function (err) {
+        Animal.path('isFerret').doValidate(undefined, function(err) {
           assert.ok(err instanceof ValidatorError);
         });
 
-        Animal.path('isFerret').doValidate(true, function (err) {
+        Animal.path('isFerret').doValidate(true, function(err) {
           assert.ifError(err);
         });
 
-        Animal.path('isFerret').doValidate(false, function (err) {
+        Animal.path('isFerret').doValidate(false, function(err) {
           assert.ifError(err);
         });
         done();
       });
 
-      it('mixed required', function (done) {
+      it('mixed required', function(done) {
         var Animal = new Schema({
           characteristics: {type: Mixed, required: true}
         });
 
-        Animal.path('characteristics').doValidate(null, function (err) {
+        Animal.path('characteristics').doValidate(null, function(err) {
           assert.ok(err instanceof ValidatorError);
         });
 
-        Animal.path('characteristics').doValidate(undefined, function (err) {
+        Animal.path('characteristics').doValidate(undefined, function(err) {
           assert.ok(err instanceof ValidatorError);
         });
 
         Animal.path('characteristics').doValidate({
           aggresive: true
-        }, function (err) {
+        }, function(err) {
           assert.ifError(err);
         });
 
-        Animal.path('characteristics').doValidate('none available', function (err) {
+        Animal.path('characteristics').doValidate('none available', function(err) {
           assert.ifError(err);
         });
         done();
       });
     });
 
-    describe('async', function () {
-      it('works', function (done) {
+    describe('async', function() {
+      it('works', function(done) {
         var executed = 0;
 
         function validator(value, fn) {
-          setTimeout(function () {
+          setTimeout(function() {
             executed++;
             fn(value === true);
             if (executed === 2) {
@@ -390,20 +390,20 @@ describe('schema', function () {
           ferret: {type: Boolean, validate: validator}
         });
 
-        Animal.path('ferret').doValidate(true, function (err) {
+        Animal.path('ferret').doValidate(true, function(err) {
           assert.ifError(err);
         });
 
-        Animal.path('ferret').doValidate(false, function (err) {
+        Animal.path('ferret').doValidate(false, function(err) {
           assert.ok(err instanceof Error);
         });
       });
 
-      it('multiple', function (done) {
+      it('multiple', function(done) {
         var executed = 0;
 
         function validator(value, fn) {
-          setTimeout(function () {
+          setTimeout(function() {
             executed++;
             fn(value === true);
             if (executed === 2) {
@@ -425,18 +425,18 @@ describe('schema', function () {
           }
         });
 
-        Animal.path('ferret').doValidate(true, function (err) {
+        Animal.path('ferret').doValidate(true, function(err) {
           assert.ifError(err);
         });
       });
 
-      it('scope', function (done) {
+      it('scope', function(done) {
         var called = false;
 
         function validator(value, fn) {
           assert.equal('b', this.a);
 
-          setTimeout(function () {
+          setTimeout(function() {
             called = true;
             fn(true);
           }, 5);
@@ -446,7 +446,7 @@ describe('schema', function () {
           ferret: {type: Boolean, validate: validator}
         });
 
-        Animal.path('ferret').doValidate(true, function (err) {
+        Animal.path('ferret').doValidate(true, function(err) {
           assert.ifError(err);
           assert.equal(true, called);
           done();
@@ -454,9 +454,9 @@ describe('schema', function () {
       });
     });
 
-    describe('messages', function () {
-      describe('are customizable', function () {
-        it('within schema definitions', function (done) {
+    describe('messages', function() {
+      describe('are customizable', function() {
+        it('within schema definitions', function(done) {
           var schema = new Schema({
             name: {type: String, enum: ['one', 'two']},
             myenum: {type: String, enum: {values: ['x'], message: 'enum validator failed for path: {PATH} with {VALUE}'}},
@@ -471,7 +471,7 @@ describe('schema', function () {
           });
 
           var a = new mongoose.Document({}, schema);
-          a.validate(function (err) {
+          a.validate(function(err) {
             assert.equal('Path `requiredString1` is required.', err.errors.requiredString1);
             assert.equal('oops, requiredString2 is missing. required', err.errors.requiredString2);
 
@@ -482,7 +482,7 @@ describe('schema', function () {
             a.numMin0 = a.numMin1 = 2;
             a.numMax0 = a.numMax1 = 30;
 
-            a.validate(function (err) {
+            a.validate(function(err) {
               assert.equal('`three` is not a valid enum value for path `name`.', err.errors.name);
               assert.equal('enum validator failed for path: myenum with y', err.errors.myenum);
               assert.equal('Path `matchString0` is invalid (no match).', err.errors.matchString0);
@@ -502,7 +502,7 @@ describe('schema', function () {
           });
         });
 
-        it('for custom validators', function (done) {
+        it('for custom validators', function(done) {
           function validate() {
             return false;
           }
@@ -513,7 +513,7 @@ describe('schema', function () {
 
           var doc = new mongoose.Document({x: [3, 4, 5, 6]}, schema);
 
-          doc.validate(function (err) {
+          doc.validate(function(err) {
             assert.equal('x failed validation (3,4,5,6)', String(err.errors.x));
             assert.equal('user defined', err.errors.x.kind);
             done();
@@ -522,9 +522,9 @@ describe('schema', function () {
       });
     });
 
-    describe('types', function () {
-      describe('are customizable', function () {
-        it('for single custom validators', function (done) {
+    describe('types', function() {
+      describe('are customizable', function() {
+        it('for single custom validators', function(done) {
           function validate() {
             return false;
           }
@@ -535,14 +535,14 @@ describe('schema', function () {
 
           var doc = new mongoose.Document({x: [3, 4, 5, 6]}, schema);
 
-          doc.validate(function (err) {
+          doc.validate(function(err) {
             assert.equal('x failed validation (3,4,5,6)', String(err.errors.x));
             assert.equal('customType', err.errors.x.kind);
             done();
           });
         });
 
-        it('for many custom validators', function (done) {
+        it('for many custom validators', function(done) {
           function validate() {
             return false;
           }
@@ -554,7 +554,7 @@ describe('schema', function () {
 
           var doc = new mongoose.Document({x: [3, 4, 5, 6]}, schema);
 
-          doc.validate(function (err) {
+          doc.validate(function(err) {
             assert.equal('x failed validation (3,4,5,6)', String(err.errors.x));
             assert.equal('customType', err.errors.x.kind);
             done();
@@ -563,8 +563,8 @@ describe('schema', function () {
       });
     });
 
-    describe('sync', function () {
-      it('works', function (done) {
+    describe('sync', function() {
+      it('works', function(done) {
         var executed = 0;
 
         function validator(value) {
@@ -584,7 +584,7 @@ describe('schema', function () {
         }
       });
 
-      it('multiple', function (done) {
+      it('multiple', function(done) {
         var executed = 0;
 
         function validator(value) {
@@ -612,7 +612,7 @@ describe('schema', function () {
         }
       });
 
-      it('scope', function (done) {
+      it('scope', function(done) {
         var called = false;
 
         function validator() {
@@ -634,7 +634,7 @@ describe('schema', function () {
         done();
       });
 
-      it('ingore async', function (done) {
+      it('ingore async', function(done) {
         function syncValidator(val) {
           return val === 'sync';
         }
@@ -643,7 +643,7 @@ describe('schema', function () {
 
         function asyncValidator(val, respond) {
           called = true;
-          setTimeout(function () {
+          setTimeout(function() {
             respond(val === 'async');
           }, 0);
         }
@@ -661,7 +661,7 @@ describe('schema', function () {
         done();
       });
 
-      it('subdoc', function (done) {
+      it('subdoc', function(done) {
         function syncValidator(val) {
           return val === 'sync';
         }
@@ -670,7 +670,7 @@ describe('schema', function () {
 
         function asyncValidator(val, respond) {
           called = true;
-          setTimeout(function () {
+          setTimeout(function() {
             respond(val === 'async');
           }, 0);
         }
@@ -751,7 +751,7 @@ describe('schema', function () {
         done();
       });
 
-      it('string enum', function (done) {
+      it('string enum', function(done) {
         var Test = new Schema({
           complex: {type: String, enum: ['a', 'b', undefined, 'c', null]},
           state: {type: String}
@@ -776,7 +776,7 @@ describe('schema', function () {
         done();
       });
 
-      it('string regexp', function (done) {
+      it('string regexp', function(done) {
         var Test = new Schema({
           simple: {type: String, match: /[a-z]/}
         });
@@ -799,7 +799,7 @@ describe('schema', function () {
         done();
       });
 
-      it('number min and max', function (done) {
+      it('number min and max', function(done) {
         var Tobi = new Schema({
           friends: {type: Number, max: 15, min: 5}
         });
@@ -819,8 +819,8 @@ describe('schema', function () {
         done();
       });
 
-      describe('required', function () {
-        it('string required', function (done) {
+      describe('required', function() {
+        it('string required', function(done) {
           var Test = new Schema({
             simple: String
           });
@@ -835,13 +835,13 @@ describe('schema', function () {
           done();
         });
 
-        it('string conditional required', function (done) {
+        it('string conditional required', function(done) {
           var Test = new Schema({
             simple: String
           });
 
           var required = true,
-              isRequired = function () {
+              isRequired = function() {
                 return required;
               };
 
@@ -862,7 +862,7 @@ describe('schema', function () {
           done();
         });
 
-        it('number required', function (done) {
+        it('number required', function(done) {
           var Edwald = new Schema({
             friends: {type: Number, required: true}
           });
@@ -874,7 +874,7 @@ describe('schema', function () {
           done();
         });
 
-        it('date required', function (done) {
+        it('date required', function(done) {
           var Loki = new Schema({
             birth_date: {type: Date, required: true}
           });
@@ -886,7 +886,7 @@ describe('schema', function () {
           done();
         });
 
-        it('objectid required', function (done) {
+        it('objectid required', function(done) {
           var Loki = new Schema({
             owner: {type: ObjectId, required: true}
           });
@@ -898,7 +898,7 @@ describe('schema', function () {
           done();
         });
 
-        it('array required', function (done) {
+        it('array required', function(done) {
           var Loki = new Schema({
             likes: {type: Array, required: true}
           });
@@ -910,7 +910,7 @@ describe('schema', function () {
           done();
         });
 
-        it('boolean required', function (done) {
+        it('boolean required', function(done) {
           var Animal = new Schema({
             isFerret: {type: Boolean, required: true}
           });
@@ -923,7 +923,7 @@ describe('schema', function () {
           done();
         });
 
-        it('mixed required', function (done) {
+        it('mixed required', function(done) {
           var Animal = new Schema({
             characteristics: {type: Mixed, required: true}
           });

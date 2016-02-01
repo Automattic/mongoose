@@ -35,7 +35,7 @@ TestDocument.prototype.__proto__ = Document.prototype;
  */
 
 var em = new Schema({title: String, body: String});
-em.virtual('works').get(function () {
+em.virtual('works').get(function() {
   return 'em virtual works';
 });
 var schema = new Schema({
@@ -99,11 +99,11 @@ mongoose.model('doc.populate.b', BlogPost);
 mongoose.model('doc.populate.u', User);
 mongoose.model('doc.populate.u2', User);
 
-describe('document.populate', function () {
+describe('document.populate', function() {
   var db, B, User;
   var user1, user2, post, _id;
 
-  before(function (done) {
+  before(function(done) {
     db = start();
     B = db.model('doc.populate.b');
     User = db.model('doc.populate.u');
@@ -118,7 +118,7 @@ describe('document.populate', function () {
       name: 'Newark',
       email: 'ewr@nj.com',
       blogposts: [_id]
-    }, function (err, u1, u2) {
+    }, function(err, u1, u2) {
       assert.ifError(err);
 
       user1 = u1;
@@ -129,7 +129,7 @@ describe('document.populate', function () {
         _creator: user1,
         fans: [user1, user2],
         comments: [{_creator: user2, content: 'user2'}, {_creator: user1, content: 'user1'}]
-      }, function (err, p) {
+      }, function(err, p) {
         assert.ifError(err);
         post = p;
         done();
@@ -137,14 +137,14 @@ describe('document.populate', function () {
     });
   });
 
-  after(function (done) {
+  after(function(done) {
     db.close(done);
   });
 
-  describe('argument processing', function () {
-    describe('duplicates', function () {
-      it('are removed', function (done) {
-        B.findById(post, function (err, post) {
+  describe('argument processing', function() {
+    describe('duplicates', function() {
+      it('are removed', function(done) {
+        B.findById(post, function(err, post) {
           assert.ifError(err);
           post.populate('_creator');
           assert.equal(1, Object.keys(post.$__.populate).length);
@@ -163,8 +163,8 @@ describe('document.populate', function () {
           done();
         });
       });
-      it('overwrite previous', function (done) {
-        B.findById(post, function (err, post) {
+      it('overwrite previous', function(done) {
+        B.findById(post, function(err, post) {
           assert.ifError(err);
           post.populate('_creator');
           assert.equal(1, Object.keys(post.$__.populate).length);
@@ -179,11 +179,11 @@ describe('document.populate', function () {
     });
   });
 
-  describe('options', function () {
-    it('resets populate options after execution', function (done) {
-      B.findById(post, function (err, post) {
+  describe('options', function() {
+    it('resets populate options after execution', function(done) {
+      B.findById(post, function(err, post) {
         var creator_id = post._creator;
-        post.populate('_creator', function (err) {
+        post.populate('_creator', function(err) {
           assert.ifError(err);
           assert.ok(!post.$__.populate);
           assert.ok(post._creator);
@@ -193,7 +193,7 @@ describe('document.populate', function () {
       });
     });
 
-    it('are not modified when no arguments are passed', function (done) {
+    it('are not modified when no arguments are passed', function(done) {
       var d = new TestDocument();
       var o = utils.clone(d.options);
       assert.deepEqual(o, d.populate().options);
@@ -201,12 +201,12 @@ describe('document.populate', function () {
     });
   });
 
-  describe('populating two paths', function () {
-    it('with space delmited string works', function (done) {
-      B.findById(post, function (err, post) {
+  describe('populating two paths', function() {
+    it('with space delmited string works', function(done) {
+      B.findById(post, function(err, post) {
         var creator_id = post._creator;
         var alt_id = post.fans[1];
-        post.populate('_creator fans', function (err) {
+        post.populate('_creator fans', function(err) {
           assert.ifError(err);
           assert.ok(post._creator);
           assert.equal(String(creator_id), String(post._creator._id));
@@ -218,11 +218,11 @@ describe('document.populate', function () {
     });
   });
 
-  it('works with just a callback', function (done) {
-    B.findById(post, function (err, post) {
+  it('works with just a callback', function(done) {
+    B.findById(post, function(err, post) {
       var creator_id = post._creator;
       var alt_id = post.fans[1];
-      post.populate('_creator').populate(function (err) {
+      post.populate('_creator').populate(function(err) {
         assert.ifError(err);
         assert.ok(post._creator);
         assert.equal(String(creator_id), String(post._creator._id));
@@ -232,8 +232,8 @@ describe('document.populate', function () {
     });
   });
 
-  it('populating using space delimited paths with options', function (done) {
-    B.findById(post, function (err, post) {
+  it('populating using space delimited paths with options', function(done) {
+    B.findById(post, function(err, post) {
       var param = {};
       param.select = '-email';
       param.options = {sort: 'name'};
@@ -241,7 +241,7 @@ describe('document.populate', function () {
 
       var creator_id = post._creator;
       var alt_id = post.fans[1];
-      post.populate(param, function (err, post) {
+      post.populate(param, function(err, post) {
         assert.ifError(err);
         assert.equal(2, post.fans.length);
         assert.equal(String(creator_id), String(post._creator._id));
@@ -256,8 +256,8 @@ describe('document.populate', function () {
     });
   });
 
-  it('using multiple populate calls', function (done) {
-    B.findById(post, function (err, post) {
+  it('using multiple populate calls', function(done) {
+    B.findById(post, function(err, post) {
       var creator_id = post._creator;
       var alt_id = post.fans[1];
 
@@ -268,7 +268,7 @@ describe('document.populate', function () {
       post.populate(param);
       param.path = 'fans';
 
-      post.populate(param, function (err, post) {
+      post.populate(param, function(err, post) {
         assert.ifError(err);
         assert.equal(2, post.fans.length);
         assert.equal(String(creator_id), String(post._creator._id));
@@ -283,8 +283,8 @@ describe('document.populate', function () {
     });
   });
 
-  it('with custom model selection', function (done) {
-    B.findById(post, function (err, post) {
+  it('with custom model selection', function(done) {
+    B.findById(post, function(err, post) {
       var param = {};
       param.select = '-email';
       param.options = {sort: 'name'};
@@ -293,7 +293,7 @@ describe('document.populate', function () {
 
       var creator_id = post._creator;
       var alt_id = post.fans[1];
-      post.populate(param, function (err, post) {
+      post.populate(param, function(err, post) {
         assert.ifError(err);
         assert.equal(2, post.fans.length);
         assert.equal(String(creator_id), String(post._creator._id));
@@ -308,17 +308,17 @@ describe('document.populate', function () {
     });
   });
 
-  it('a property not in schema', function (done) {
-    B.findById(post, function (err, post) {
+  it('a property not in schema', function(done) {
+    B.findById(post, function(err, post) {
       assert.ifError(err);
-      post.populate('idontexist', function (err) {
+      post.populate('idontexist', function(err) {
         assert.ifError(err);
 
         // stuff an ad-hoc value in
         post.setValue('idontexist', user1._id);
 
         // populate the non-schema value by passing an explicit model
-        post.populate({path: 'idontexist', model: 'doc.populate.u'}, function (err, post) {
+        post.populate({path: 'idontexist', model: 'doc.populate.u'}, function(err, post) {
           assert.ifError(err);
           assert.ok(post);
           assert.equal(post.get('idontexist')._id, user1._id.toString());
@@ -329,37 +329,37 @@ describe('document.populate', function () {
     });
   });
 
-  it('of empty array', function (done) {
-    B.findById(post, function (err, post) {
+  it('of empty array', function(done) {
+    B.findById(post, function(err, post) {
       post.fans = [];
-      post.populate('fans', function (err) {
+      post.populate('fans', function(err) {
         assert.ifError(err);
         done();
       });
     });
   });
 
-  it('of array of null/undefined', function (done) {
-    B.findById(post, function (err, post) {
+  it('of array of null/undefined', function(done) {
+    B.findById(post, function(err, post) {
       post.fans = [null, undefined];
-      post.populate('fans', function (err) {
+      post.populate('fans', function(err) {
         assert.ifError(err);
         done();
       });
     });
   });
 
-  it('of null property', function (done) {
-    B.findById(post, function (err, post) {
+  it('of null property', function(done) {
+    B.findById(post, function(err, post) {
       post._creator = null;
-      post.populate('_creator', function (err) {
+      post.populate('_creator', function(err) {
         assert.ifError(err);
         done();
       });
     });
   });
 
-  it('String _ids', function (done) {
+  it('String _ids', function(done) {
     var db = start();
 
     var UserSchema = new Schema({
@@ -377,11 +377,11 @@ describe('document.populate', function () {
 
     var alice = new User({_id: 'alice', name: 'Alice In Wonderland'});
 
-    alice.save(function (err) {
+    alice.save(function(err) {
       assert.ifError(err);
 
       var note = new Note({author: 'alice', body: 'Buy Milk'});
-      note.populate('author', function (err) {
+      note.populate('author', function(err) {
         db.close();
         assert.ifError(err);
         assert.ok(note.author);
@@ -392,7 +392,7 @@ describe('document.populate', function () {
     });
   });
 
-  it('Buffer _ids', function (done) {
+  it('Buffer _ids', function(done) {
     var db = start();
 
     var UserSchema = new Schema({
@@ -410,17 +410,17 @@ describe('document.populate', function () {
 
     var alice = new User({_id: new mongoose.Types.Buffer('YWxpY2U=', 'base64'), name: 'Alice'});
 
-    alice.save(function (err) {
+    alice.save(function(err) {
       assert.ifError(err);
 
       var note = new Note({author: 'alice', body: 'Buy Milk'});
-      note.save(function (err) {
+      note.save(function(err) {
         assert.ifError(err);
 
-        Note.findById(note.id, function (err, note) {
+        Note.findById(note.id, function(err, note) {
           assert.ifError(err);
           assert.equal('alice', note.author);
-          note.populate('author', function (err, note) {
+          note.populate('author', function(err, note) {
             db.close();
             assert.ifError(err);
             assert.equal(note.body, 'Buy Milk');
@@ -433,7 +433,7 @@ describe('document.populate', function () {
     });
   });
 
-  it('Number _ids', function (done) {
+  it('Number _ids', function(done) {
     var db = start();
 
     var UserSchema = new Schema({
@@ -451,11 +451,11 @@ describe('document.populate', function () {
 
     var alice = new User({_id: 2359, name: 'Alice'});
 
-    alice.save(function (err) {
+    alice.save(function(err) {
       assert.ifError(err);
 
       var note = new Note({author: 2359, body: 'Buy Milk'});
-      note.populate('author').populate(function (err, note) {
+      note.populate('author').populate(function(err, note) {
         db.close();
         assert.ifError(err);
         assert.ok(note.author);
@@ -466,12 +466,12 @@ describe('document.populate', function () {
     });
   });
 
-  describe('sub-level properties', function () {
-    it('with string arg', function (done) {
-      B.findById(post, function (err, post) {
+  describe('sub-level properties', function() {
+    it('with string arg', function(done) {
+      B.findById(post, function(err, post) {
         var id0 = post.comments[0]._creator;
         var id1 = post.comments[1]._creator;
-        post.populate('comments._creator', function (err, post) {
+        post.populate('comments._creator', function(err, post) {
           assert.ifError(err);
           assert.equal(2, post.comments.length);
           assert.equal(id0, post.comments[0]._creator.id);
@@ -482,15 +482,15 @@ describe('document.populate', function () {
     });
   });
 
-  describe('of new document', function () {
-    it('should save just the populated _id (gh-1442)', function (done) {
+  describe('of new document', function() {
+    it('should save just the populated _id (gh-1442)', function(done) {
       var b = new B({_creator: user1});
-      b.populate('_creator', function (err, b) {
+      b.populate('_creator', function(err, b) {
         if (err) return done(err);
         assert.equal('Phoenix', b._creator.name);
-        b.save(function (err) {
+        b.save(function(err) {
           assert.ifError(err);
-          B.collection.findOne({_id: b._id}, function (err, b) {
+          B.collection.findOne({_id: b._id}, function(err, b) {
             assert.ifError(err);
             assert.equal(b._creator, String(user1._id));
             done();
@@ -500,7 +500,7 @@ describe('document.populate', function () {
     });
   });
 
-  it('gh-3308', function (done) {
+  it('gh-3308', function(done) {
     var db = start();
 
     var Person = db.model('gh3308', {
@@ -525,8 +525,8 @@ describe('document.populate', function () {
     db.close(done);
   });
 
-  describe('gh-2214', function () {
-    it('should return a real document array when populating', function (done) {
+  describe('gh-2214', function() {
+    it('should return a real document array when populating', function(done) {
       var db = start();
 
       var Car = db.model('gh-2214-1', {
@@ -554,10 +554,10 @@ describe('document.populate', function () {
       });
       joe.cars.push(car);
 
-      return joe.save(function () {
-        return car.save(function () {
-          return Person.findById(joe.id, function (err, joe) {
-            return joe.populate('cars', function () {
+      return joe.save(function() {
+        return car.save(function() {
+          return Person.findById(joe.id, function(err, joe) {
+            return joe.populate('cars', function() {
               car = new Car({
                 model: 'BMW',
                 color: 'black'
@@ -573,7 +573,7 @@ describe('document.populate', function () {
     });
   });
 
-  it('can depopulate (gh-2509)', function (done) {
+  it('can depopulate (gh-2509)', function(done) {
     var db = start();
 
     var Person = db.model('gh2509_1', {
@@ -587,15 +587,15 @@ describe('document.populate', function () {
     });
 
     var people = [{name: 'Axl Rose'}, {name: 'Slash'}];
-    Person.create(people, function (error, docs) {
+    Person.create(people, function(error, docs) {
       assert.ifError(error);
       var band = {
-        name: "Guns N' Roses",
+        name: 'Guns N\' Roses',
         members: [docs[0]._id, docs[1]],
         lead: docs[0]._id
       };
-      Band.create(band, function (error, band) {
-        band.populate('members', function () {
+      Band.create(band, function(error, band) {
+        band.populate('members', function() {
           assert.equal(band.members[0].name, 'Axl Rose');
           band.depopulate('members');
           assert.ok(!band.members[0].name);
@@ -603,7 +603,7 @@ describe('document.populate', function () {
           assert.equal(band.members[1].toString(), docs[1]._id.toString());
           assert.ok(!band.populated('members'));
           assert.ok(!band.populated('lead'));
-          band.populate('lead', function () {
+          band.populate('lead', function() {
             assert.equal(band.lead.name, 'Axl Rose');
             band.depopulate('lead');
             assert.ok(!band.lead.name);
@@ -615,7 +615,7 @@ describe('document.populate', function () {
     });
   });
 
-  it('handles pulling from populated array (gh-3579)', function (done) {
+  it('handles pulling from populated array (gh-3579)', function(done) {
     var db = start();
     var barSchema = new Schema({name: String});
 
@@ -630,13 +630,13 @@ describe('document.populate', function () {
 
     var Foo = db.model('gh3579_0', fooSchema);
 
-    Bar.create([{name: 'bar1'}, {name: 'bar2'}], function (error, docs) {
+    Bar.create([{name: 'bar1'}, {name: 'bar2'}], function(error, docs) {
       assert.ifError(error);
       var foo = new Foo({bars: [docs[0], docs[1]]});
       foo.bars.pull(docs[0]._id);
-      foo.save(function (error) {
+      foo.save(function(error) {
         assert.ifError(error);
-        Foo.findById(foo._id, function (error, foo) {
+        Foo.findById(foo._id, function(error, foo) {
           assert.ifError(error);
           assert.equal(foo.bars.length, 1);
           assert.equal(foo.bars[0].toString(), docs[1]._id.toString());

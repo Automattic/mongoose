@@ -4,7 +4,7 @@ var mongoose = require('../../lib');
 var Schema = mongoose.Schema;
 
 // create an export function to encapsulate the model creation
-module.exports = function () {
+module.exports = function() {
   // define schema
   // NOTE : This object must conform *precisely* to the geoJSON specification
   // you cannot embed a geoJSON doc inside a model or anything like that- IT

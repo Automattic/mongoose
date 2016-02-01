@@ -2,17 +2,17 @@ var assert = require('assert');
 var updateValidators = require('../lib/services/updateValidators');
 var emitter = require('events').EventEmitter;
 
-describe('updateValidators', function () {
+describe('updateValidators', function() {
   var schema;
 
-  beforeEach(function () {
+  beforeEach(function() {
     schema = {};
-    schema._getSchema = function (p) {
+    schema._getSchema = function(p) {
       schema._getSchema.calls.push(p);
       return schema;
     };
     schema._getSchema.calls = [];
-    schema.doValidate = function (v, cb) {
+    schema.doValidate = function(v, cb) {
       schema.doValidate.calls.push({v: v, cb: cb});
       schema.doValidate.emitter.emit('called', {v: v, cb: cb});
     };
@@ -20,13 +20,13 @@ describe('updateValidators', function () {
     schema.doValidate.emitter = new emitter();
   });
 
-  describe('validators', function () {
-    it('flattens paths', function (done) {
+  describe('validators', function() {
+    it('flattens paths', function(done) {
       var fn = updateValidators({}, schema, {test: {a: 1, b: null}}, {});
-      schema.doValidate.emitter.on('called', function (args) {
+      schema.doValidate.emitter.on('called', function(args) {
         args.cb();
       });
-      fn(function (err) {
+      fn(function(err) {
         assert.ifError(err);
         assert.equal(schema._getSchema.calls.length, 2);
         assert.equal(schema.doValidate.calls.length, 2);
@@ -38,13 +38,13 @@ describe('updateValidators', function () {
       });
     });
 
-    it('doesnt flatten dates (gh-3194)', function (done) {
+    it('doesnt flatten dates (gh-3194)', function(done) {
       var dt = new Date();
       var fn = updateValidators({}, schema, {test: dt}, {});
-      schema.doValidate.emitter.on('called', function (args) {
+      schema.doValidate.emitter.on('called', function(args) {
         args.cb();
       });
-      fn(function (err) {
+      fn(function(err) {
         assert.ifError(err);
         assert.equal(schema._getSchema.calls.length, 1);
         assert.equal(schema.doValidate.calls.length, 1);
@@ -54,12 +54,12 @@ describe('updateValidators', function () {
       });
     });
 
-    it('doesnt flatten empty arrays (gh-3554)', function (done) {
+    it('doesnt flatten empty arrays (gh-3554)', function(done) {
       var fn = updateValidators({}, schema, {test: []}, {});
-      schema.doValidate.emitter.on('called', function (args) {
+      schema.doValidate.emitter.on('called', function(args) {
         args.cb();
       });
-      fn(function (err) {
+      fn(function(err) {
         assert.ifError(err);
         assert.equal(schema._getSchema.calls.length, 1);
         assert.equal(schema.doValidate.calls.length, 1);

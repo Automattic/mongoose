@@ -17,12 +17,12 @@ var B = mongoose.model('B', Schema({
 var start;
 var count = 0;
 
-mongoose.connect('localhost', 'benchmark-populate', function (err) {
+mongoose.connect('localhost', 'benchmark-populate', function(err) {
   if (err) {
     return done(err);
   }
 
-  A.create({name: 'wooooooooooooooooooooooooooooooooooooooooot'}, function (err, a) {
+  A.create({name: 'wooooooooooooooooooooooooooooooooooooooooot'}, function(err, a) {
     if (err) {
       return done(err);
     }
@@ -33,7 +33,7 @@ mongoose.connect('localhost', 'benchmark-populate', function (err) {
         as: [a, a, a, a, a, a, a, a, a, a, a, a, a, a, a, a, a],
         a: a,
         nested: [{a: a}, {a: a}, {a: a}, {a: a}, {a: a}, {a: a}]
-      }).save(function (err) {
+      }).save(function(err) {
         if (err) {
           return done(err);
         }
@@ -76,7 +76,7 @@ function done(err) {
     console.error(err.stack);
   }
 
-  mongoose.connection.db.dropDatabase(function () {
+  mongoose.connection.db.dropDatabase(function() {
     mongoose.disconnect();
     console.log('%d completed queries on mongoose version %s', count, mongoose.version);
   });

@@ -35,7 +35,7 @@ var Game = mongoose.model('Game', gameSchema);
  * the default port (27017)
  */
 
-mongoose.connect('mongodb://localhost/console', function (err) {
+mongoose.connect('mongodb://localhost/console', function(err) {
   // if we failed to connect, abort
   if (err) throw err;
 
@@ -64,7 +64,7 @@ function createData() {
       manufacturer: 'Microsoft',
       released: 'November 22, 2005'
     },
-    function (err, nintendo64, superNintendo, xbox360) {
+    function(err, nintendo64, superNintendo, xbox360) {
       if (err) return done(err);
 
       Game.create(
@@ -86,7 +86,7 @@ function createData() {
           released: 'November 17, 2005',
           consoles: [xbox360]
         },
-        function (err) {
+        function(err) {
           if (err) return done(err);
           example();
         }
@@ -108,10 +108,10 @@ function example() {
     select: 'name',
     options: {comment: 'population'}
   })
-  .exec(function (err, games) {
+  .exec(function(err, games) {
     if (err) return done(err);
 
-    games.forEach(function (game) {
+    games.forEach(function(game) {
       console.log(
         '"%s" was released for the %s on %s',
         game.name,
@@ -130,8 +130,8 @@ function example() {
 
 function done(err) {
   if (err) console.error(err);
-  Console.remove(function () {
-    Game.remove(function () {
+  Console.remove(function() {
+    Game.remove(function() {
       mongoose.disconnect();
     });
   });

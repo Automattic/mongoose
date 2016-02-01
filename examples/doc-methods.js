@@ -24,7 +24,7 @@ var CharacterSchema = Schema({
  * Methods
  */
 
-CharacterSchema.methods.attack = function () {
+CharacterSchema.methods.attack = function() {
   console.log('%s is attacking', this.name);
 };
 
@@ -44,7 +44,7 @@ var uri = 'mongodb://localhost/' + dbname;
 
 console.log('connecting to %s', uri);
 
-mongoose.connect(uri, function (err) {
+mongoose.connect(uri, function(err) {
   // if we failed to connect, abort
   if (err) throw err;
 
@@ -57,7 +57,7 @@ mongoose.connect(uri, function (err) {
  */
 
 function example() {
-  Character.create({name: 'Link', health: 100}, function (err, link) {
+  Character.create({name: 'Link', health: 100}, function(err, link) {
     if (err) return done(err);
     console.log('found', link);
     link.attack(); // 'Link is attacking'
@@ -71,7 +71,7 @@ function example() {
 
 function done(err) {
   if (err) console.error(err);
-  mongoose.connection.db.dropDatabase(function () {
+  mongoose.connection.db.dropDatabase(function() {
     mongoose.disconnect();
   });
 }

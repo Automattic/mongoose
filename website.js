@@ -27,7 +27,7 @@ function getVersion() {
 function getUnstable(ver) {
   ver = ver.replace('-pre');
   var spl = ver.split('.');
-  spl = spl.map(function (i) {
+  spl = spl.map(function(i) {
     return parseInt(i, 10);
   });
   spl[1]++;
@@ -49,14 +49,14 @@ function jadeify(filename, options, newfile) {
   options.linktype = linktype;
   options.href = href;
   options.klass = klass;
-  jade.renderFile(filename, options, function (err, str) {
+  jade.renderFile(filename, options, function(err, str) {
     if (err) {
       console.error(err.stack);
       return;
     }
 
     newfile = newfile || filename.replace('.jade', '.html');
-    fs.writeFile(newfile, str, function (err) {
+    fs.writeFile(newfile, str, function(err) {
       if (err) {
         console.error('could not write', err.stack);
       } else {
@@ -66,12 +66,12 @@ function jadeify(filename, options, newfile) {
   });
 }
 
-files.forEach(function (file) {
+files.forEach(function(file) {
   var filename = __dirname + '/' + file;
   jadeify(filename, filemap[file]);
 
   if (process.argv[2] === '--watch') {
-    fs.watchFile(filename, {interval: 1000}, function (cur, prev) {
+    fs.watchFile(filename, {interval: 1000}, function(cur, prev) {
       if (cur.mtime > prev.mtime) {
         jadeify(filename, filemap[file]);
       }
@@ -81,7 +81,7 @@ files.forEach(function (file) {
 
 var acquit = require('./docs/source/acquit');
 var acquitFiles = Object.keys(acquit);
-acquitFiles.forEach(function (file) {
+acquitFiles.forEach(function(file) {
   var filename = __dirname + '/docs/acquit.jade';
   jadeify(filename, acquit[file], __dirname + '/docs/' + file);
 });

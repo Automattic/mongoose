@@ -1,10 +1,10 @@
-(function () {
+(function() {
   var ObjectId = mongoose.Types.ObjectId;
 
-  describe('types.objectid', function () {
-    it('Should Correctly convert ObjectId to itself', function (done) {
+  describe('types.objectid', function() {
+    it('Should Correctly convert ObjectId to itself', function(done) {
       var myObject, newObject;
-      var selfConvertion = function () {
+      var selfConvertion = function() {
         myObject = new ObjectId();
         newObject = ObjectId(myObject);
       };
@@ -14,7 +14,7 @@
       done();
     });
 
-    it('ObjectId should correctly create objects', function (done) {
+    it('ObjectId should correctly create objects', function(done) {
       try {
         ObjectId.createFromHexString('000000000000000000000001');
         ObjectId.createFromHexString('00000000000000000000001');
@@ -26,7 +26,7 @@
       done();
     });
 
-    it('ObjectId should correctly retrieve timestamp', function (done) {
+    it('ObjectId should correctly retrieve timestamp', function(done) {
       var testDate = new Date();
       var object1 = new ObjectId();
       assert.equal(Math.floor(testDate.getTime() / 1000), Math.floor(object1.getTimestamp().getTime() / 1000));
@@ -34,7 +34,7 @@
       done();
     });
 
-    it('ObjectId should have a correct cached representation of the hexString', function (done) {
+    it('ObjectId should have a correct cached representation of the hexString', function(done) {
       ObjectId.cacheHexString = true;
       var a = new ObjectId;
       var __id = a.__id;
@@ -69,14 +69,14 @@
       done();
     });
 
-    it('Should fail to create ObjectId due to illegal hex code', function (done) {
-      assert.throws(function () {
+    it('Should fail to create ObjectId due to illegal hex code', function(done) {
+      assert.throws(function() {
         new ObjectId('zzzzzzzzzzzzzzzzzzzzzzzz');
       });
       done();
     });
 
-    it('Should validate ObjectId', function (done) {
+    it('Should validate ObjectId', function(done) {
       assert.equal(false, ObjectId.isValid(null));
       assert.equal(false, ObjectId.isValid({}));
       assert.equal(false, ObjectId.isValid([]));

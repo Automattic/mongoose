@@ -30,10 +30,10 @@ if (process.env.D === '1') {
   'distinct',
   'isCapped',
   'options'
-].forEach(function (method) {
+].forEach(function(method) {
   var oldMethod = Collection.prototype[method];
 
-  Collection.prototype[method] = function () {
+  Collection.prototype[method] = function() {
     queryCount++;
     return oldMethod.apply(this, arguments);
   };
@@ -45,7 +45,7 @@ if (process.env.D === '1') {
 
 var oldOnOpen = Collection.prototype.onOpen;
 
-Collection.prototype.onOpen = function () {
+Collection.prototype.onOpen = function() {
   opened++;
   return oldOnOpen.apply(this, arguments);
 };
@@ -56,7 +56,7 @@ Collection.prototype.onOpen = function () {
 
 var oldOnClose = Collection.prototype.onClose;
 
-Collection.prototype.onClose = function () {
+Collection.prototype.onClose = function() {
   closed++;
   return oldOnClose.apply(this, arguments);
 };
@@ -68,7 +68,7 @@ Collection.prototype.onClose = function () {
  * @api private
  */
 
-module.exports = function (options) {
+module.exports = function(options) {
   options || (options = {});
   var uri;
 
@@ -88,7 +88,7 @@ module.exports = function (options) {
     return conn;
   }
 
-  conn.on('error', function (err) {
+  conn.on('error', function(err) {
     assert.ok(err);
   });
 
@@ -111,20 +111,20 @@ module.exports.mongoose = mongoose;
  * expose mongod version helper
  */
 
-module.exports.mongodVersion = function (cb) {
+module.exports.mongodVersion = function(cb) {
   var db = module.exports();
   db.on('error', cb);
 
-  db.on('open', function () {
+  db.on('open', function() {
     var admin = db.db.admin();
-    admin.serverStatus(function (err, info) {
+    admin.serverStatus(function(err, info) {
       if (err) {
         return cb(err);
       }
-      var version = info.version.split('.').map(function (n) {
+      var version = info.version.split('.').map(function(n) {
         return parseInt(n, 10);
       });
-      db.close(function () {
+      db.close(function() {
         cb(null, version);
       });
     });
@@ -133,11 +133,11 @@ module.exports.mongodVersion = function (cb) {
 
 function dropDBs(done) {
   var db = module.exports();
-  db.once('open', function () {
+  db.once('open', function() {
     // drop the default test database
-    db.db.dropDatabase(function () {
+    db.db.dropDatabase(function() {
       var db2 = db.useDb('mongoose-test-2');
-      db2.db.dropDatabase(function () {
+      db2.db.dropDatabase(function() {
         // drop mongos test db if exists
         var mongos = process.env.MONGOOSE_MULTI_MONGOS_TEST_URI;
         if (!mongos) {
@@ -146,7 +146,7 @@ function dropDBs(done) {
 
 
         var db = mongoose.connect(mongos, {mongos: true});
-        db.once('open', function () {
+        db.once('open', function() {
           db.db.dropDatabase(done);
         });
       });
@@ -154,11 +154,11 @@ function dropDBs(done) {
   });
 }
 
-before(function (done) {
+before(function(done) {
   this.timeout(10 * 1000);
   dropDBs(done);
 });
-after(function (done) {
+after(function(done) {
   // DropDBs can be extraordinarily slow on 3.2
   this.timeout(120 * 1000);
   dropDBs(done);

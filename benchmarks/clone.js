@@ -20,7 +20,7 @@ var AllSchema = new Schema({
   buffers: [Buffer],
   objectids: [Schema.ObjectId],
   docs: {
-    type: [DocSchema], validate: function () {
+    type: [DocSchema], validate: function() {
       return true;
     }
   },

@@ -65,10 +65,11 @@
     "lib": "./lib/mongoose"
   },
   "scripts": {
+    "fix-lint": "eslint . --fix",
     "install-browser": "npm install `node format_deps.js`",
     "test": "mocha test/*.test.js test/**/*.test.js",
-    "test-cov": "istanbul cover --report text --report html _mocha test/*.test.js",
-    "lint": "eslint . --quiet"
+    "postlint": "eslint . --quiet",
+    "test-cov": "istanbul cover --report text --report html _mocha test/*.test.js"
   },
   "main": "./index.js",
   "engines": {

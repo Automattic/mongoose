@@ -3,8 +3,8 @@ var start = require('./common'),
     assert = require('assert'),
     Collection = require('../lib/collection');
 
-describe('collections:', function() {
-  it('should buffer commands until connection is established', function(done) {
+describe('collections:', function () {
+  it('should buffer commands until connection is established', function (done) {
     var db = mongoose.createConnection(),
         collection = db.collection('test-buffering-collection'),
         connected = false,
@@ -20,7 +20,7 @@ describe('collections:', function() {
       done();
     }
 
-    collection.insert({}, {safe: true}, function() {
+    collection.insert({}, {safe: true}, function () {
       assert.ok(connected);
       inserted = true;
       db.close();
@@ -28,13 +28,13 @@ describe('collections:', function() {
     });
 
     var uri = 'mongodb://localhost/mongoose_test';
-    db.open(process.env.MONGOOSE_TEST_URI || uri, function(err) {
+    db.open(process.env.MONGOOSE_TEST_URI || uri, function (err) {
       connected = !err;
       finish();
     });
   });
 
-  it('methods should that throw (unimplemented)', function(done) {
+  it('methods should that throw (unimplemented)', function (done) {
     var collection = new Collection('test', mongoose.connection),
         thrown = false;
 

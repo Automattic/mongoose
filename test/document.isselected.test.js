@@ -29,7 +29,7 @@ TestDocument.prototype.__proto__ = Document.prototype;
  */
 
 var em = new Schema({title: String, body: String});
-em.virtual('works').get(function() {
+em.virtual('works').get(function () {
   return 'em virtual works';
 });
 var schema = new Schema({
@@ -56,20 +56,20 @@ var schema = new Schema({
 });
 TestDocument.prototype.$__setSchema(schema);
 
-schema.virtual('nested.agePlus2').get(function() {
+schema.virtual('nested.agePlus2').get(function () {
   return this.nested.age + 2;
 });
-schema.virtual('nested.setAge').set(function(v) {
+schema.virtual('nested.setAge').set(function (v) {
   this.nested.age = v;
 });
-schema.path('nested.path').get(function(v) {
+schema.path('nested.path').get(function (v) {
   return (this.nested.age || '') + (v ? v : '');
 });
-schema.path('nested.setr').set(function(v) {
+schema.path('nested.setr').set(function (v) {
   return v + ' setter';
 });
 
-schema.path('date').set(function(v) {
+schema.path('date').set(function (v) {
   // should not have been cast to a Date yet
   assert.equal('string', typeof v);
   return v;
@@ -80,15 +80,15 @@ schema.path('date').set(function(v) {
  * executed.
  */
 
-TestDocument.prototype.hooksTest = function(fn) {
+TestDocument.prototype.hooksTest = function (fn) {
   fn(null, arguments);
 };
 
 /**
  * Test.
  */
-describe('document', function() {
-  it('isSelected()', function(done) {
+describe('document', function () {
+  it('isSelected()', function (done) {
     var doc = new TestDocument();
 
     doc.init({
@@ -125,10 +125,10 @@ describe('document', function() {
     assert.ok(doc.isSelected('em.nonpath')); // not a path
 
     var selection = {
-      'test': 1,
-      'numbers': 1,
+      test: 1,
+      numbers: 1,
       'nested.deep': 1,
-      'oids': 1
+      oids: 1
     };
 
     doc = new TestDocument(undefined, selection);
@@ -192,7 +192,7 @@ describe('document', function() {
     assert.ok(!doc.isSelected('em.nonpath'));
 
     selection = {
-      'em': 0
+      em: 0
     };
 
     doc = new TestDocument(undefined, selection);
@@ -229,7 +229,7 @@ describe('document', function() {
     assert.ok(!doc.isSelected('em.nonpath'));
 
     selection = {
-      '_id': 0
+      _id: 0
     };
 
     doc = new TestDocument(undefined, selection);
@@ -270,7 +270,7 @@ describe('document', function() {
     assert.ok(doc.isSelected('em.nonpath'));
 
     selection = {
-      '_id': 1
+      _id: 1
     };
 
     doc = new TestDocument(undefined, selection);
@@ -301,8 +301,8 @@ describe('document', function() {
     assert.ok(doc.isSelected('em.nonpath'));
 
     selection = {
-      '_id': 1,
-      'n': 1
+      _id: 1,
+      n: 1
     };
 
     doc = new TestDocument(undefined, selection);

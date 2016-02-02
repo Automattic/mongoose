@@ -80,7 +80,7 @@ describe('defaults docs', function () {
     var update = {title: 'The Terminator'};
     var options = {
       // Return the document after updates are applied
-      'new': true,
+      new: true,
       // Create a document if one isn't found. Required
       // for `setDefaultsOnInsert`
       upsert: true,

@@ -1,31 +1,54 @@
-extends: 'eslint:recommended'
+extends: 'airbnb/base'
 
 env:
   node: true
   mocha: true
 
 rules:
-  comma-style: 2
+  # rules to fix
+  block-scoped-var: 0
+  camelcase: 0
+  consistent-return: 0
+  dot-notation: 0
+  default-case: 0
+  eqeqeq: 0
+  guard-for-in: 0
+  max-len: 0
+  new-cap: 0
+  no-caller: 0
+  no-extend-native: 0
+  no-loop-func: 0
+  no-new: 0
+  no-new-wrappers: 0
+  no-nested-ternary: 0
+  no-octal-escape: 0
+  no-param-reassign: 0
+  no-proto: 0
+  no-shadow: 0
+  no-unused-expressions: 0
+  no-use-before-define: 0
+  quote-props: 0
+
+  # override airbnb
+  comma-dangle:
+    - 2
+    - never
   consistent-this:
-    - 1
+    - 2
     - _this
   indent:
     - 2
     - 2
     - SwitchCase: 1
       VariableDeclarator: 2
-  keyword-spacing: 2
-  no-console: 0
-  no-multi-spaces: 2
-  no-spaced-func: 2
-  no-trailing-spaces: 2
-  quotes:
-    - 2
-    - single
-  semi: 2
-  space-before-blocks: 2
-  space-before-function-paren:
-    - 2
-    - never
-  space-infix-ops: 2
-  space-unary-ops: 2
+  object-curly-spacing:
+      - 2
+      - never
+
+  # es 6 rules
+  no-var: 0
+  object-shorthand: 0
+  one-var: 0
+  prefer-arrow-callback: 0
+  prefer-template: 0
+  vars-on-top: 0

@@ -92,44 +92,44 @@ var commentData = {
 BlogPost = mongoose.model('BlogPost', BlogPost);
 
 suite.add('Casting - Embedded Docs - 0 Docs', {
-  fn: function() {
+  fn: function () {
     var BlogPost = mongoose.model('BlogPost');
     var bp = new BlogPost();
     bp.init(blogData);
   }
 }).add('Casting - Embedded Docs - 10 Docs', {
-  fn: function() {
+  fn: function () {
     var BlogPost = mongoose.model('BlogPost');
     var bp = new BlogPost();
     bp.init(blogData10);
   }
 }).add('Casting - Embedded Docs - 100 Docs', {
-  fn: function() {
+  fn: function () {
     var BlogPost = mongoose.model('BlogPost');
     var bp = new BlogPost();
     bp.init(blogData100);
   }
 }).add('Casting - Embedded Docs - 1000 Docs', {
-  fn: function() {
+  fn: function () {
     var BlogPost = mongoose.model('BlogPost');
     var bp = new BlogPost();
     bp.init(blogData1000);
   }
 }).add('Casting - Embedded Docs - 10000 Docs', {
-  fn: function() {
+  fn: function () {
     var BlogPost = mongoose.model('BlogPost');
     var bp = new BlogPost();
     bp.init(blogData10000);
   }
 })
-.on('cycle', function(evt) {
+.on('cycle', function (evt) {
   if (process.env.MONGOOSE_DEV || process.env.PULL_REQUEST) {
     console.log(String(evt.target));
   }
-}).on('complete', function() {
+}).on('complete', function () {
   if (!process.env.MONGOOSE_DEV && !process.env.PULL_REQUEST) {
     var outObj = {};
-    this.forEach(function(item) {
+    this.forEach(function (item) {
       var out = {};
       out.stats = item.stats;
       delete out.stats.sample;

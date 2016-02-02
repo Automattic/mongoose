@@ -3,7 +3,7 @@ var mongoose = require('../../lib');
 var Schema = mongoose.Schema;
 
 // create an export function to encapsulate the model creation
-module.exports = function() {
+module.exports = function () {
   // define schema
   var PersonSchema = new Schema({
     name: String,
@@ -12,7 +12,7 @@ module.exports = function() {
   });
 
   // define a static
-  PersonSchema.statics.findPersonByName = function(name, cb) {
+  PersonSchema.statics.findPersonByName = function (name, cb) {
     this.find({name: new RegExp(name, 'i')}, cb);
   };
 

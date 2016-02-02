@@ -39,7 +39,8 @@
     "bluebird": "3.1.4",
     "co": "4.6.0",
     "dox": "0.8.0",
-    "eslint": "2.0.0-beta.3",
+    "eslint": "1.10.3",
+    "eslint-config-airbnb": "4.0.0",
     "highlight.js": "9.1.0",
     "istanbul": "0.4.2",
     "jade": "0.26.3",
@@ -65,10 +66,9 @@
     "lib": "./lib/mongoose"
   },
   "scripts": {
-    "fix-lint": "eslint . --fix",
     "install-browser": "npm install `node format_deps.js`",
     "test": "mocha test/*.test.js test/**/*.test.js",
-    "posttest": "eslint . --quiet",
+    "lint": "eslint . --quiet",
     "test-cov": "istanbul cover --report text --report html _mocha test/*.test.js"
   },
   "main": "./index.js",

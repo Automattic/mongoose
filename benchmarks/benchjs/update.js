@@ -19,11 +19,11 @@ var utils = require('../../lib/utils.js');
  */
 
 
-mongoose.connect('mongodb://localhost/mongoose-bench', function(err) {
+mongoose.connect('mongodb://localhost/mongoose-bench', function (err) {
   if (err) {
     throw err;
   }
-  mongo.connect('mongodb://localhost/mongoose-bench', function(err, db) {
+  mongo.connect('mongodb://localhost/mongoose-bench', function (err, db) {
     if (err) {
       throw err;
     }
@@ -106,7 +106,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function(err) {
     // insert all of the data here
     var count = 4000;
     for (i = 0; i < 1000; i++) {
-      User.create(data, function(err, u) {
+      User.create(data, function (err, u) {
         if (err) {
           throw err;
         }
@@ -114,11 +114,11 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function(err) {
         --count || next();
       });
       var nData = utils.clone(data);
-      user.insert(nData, function(err, res) {
+      user.insert(nData, function (err, res) {
         dIds.push(res[0]._id);
         --count || next();
       });
-      BlogPost.create(blogData, function(err, bp) {
+      BlogPost.create(blogData, function (err, bp) {
         if (err) {
           throw err;
         }
@@ -128,7 +128,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function(err) {
       });
 
       var bpData = utils.clone(blogData);
-      blogpost.insert(bpData, function(err, res) {
+      blogpost.insert(bpData, function (err, res) {
         if (err) {
           throw err;
         }
@@ -163,7 +163,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function(err) {
     }
 
     function closeDB() {
-      mongoose.connection.db.dropDatabase(function() {
+      mongoose.connection.db.dropDatabase(function () {
         mongoose.disconnect();
         process.exit();
       });
@@ -171,8 +171,8 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function(err) {
 
     suite.add('Update - Mongoose - Basic', {
       defer: true,
-      fn: function(deferred) {
-        User.update({_id: getNextmId()}, {$set: {age: 2}, $push: {likes: 'metal'}}, function(err) {
+      fn: function (deferred) {
+        User.update({_id: getNextmId()}, {$set: {age: 2}, $push: {likes: 'metal'}}, function (err) {
           if (err) {
             throw err;
           }
@@ -181,8 +181,8 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function(err) {
       }
     }).add('Update - Driver - Basic', {
       defer: true,
-      fn: function(deferred) {
-        user.update({_id: getNextdId()}, {$set: {age: 2}, $push: {likes: 'metal'}}, function(err) {
+      fn: function (deferred) {
+        user.update({_id: getNextdId()}, {$set: {age: 2}, $push: {likes: 'metal'}}, function (err) {
           if (err) {
             throw err;
           }
@@ -191,8 +191,8 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function(err) {
       }
     }).add('Update - Mongoose - Embedded Docs', {
       defer: true,
-      fn: function(deferred) {
-        BlogPost.findOne({_id: getNextbmId()}, function(err, bp) {
+      fn: function (deferred) {
+        BlogPost.findOne({_id: getNextbmId()}, function (err, bp) {
           if (err) {
             throw err;
           }
@@ -203,7 +203,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function(err) {
           // The driver will send the full document, while mongoose will check
           // and only update fields that have been changed. This is meant to
           // illustrate that difference between the two
-          bp.save(function(err) {
+          bp.save(function (err) {
             if (err) {
               throw err;
             }
@@ -213,15 +213,15 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function(err) {
       }
     }).add('Update - Driver - Embdedded Docs', {
       defer: true,
-      fn: function(deferred) {
-        blogpost.findOne({_id: getNextbdId()}, function(err, bp) {
+      fn: function (deferred) {
+        blogpost.findOne({_id: getNextbdId()}, function (err, bp) {
           if (err) {
             throw err;
           }
           bp.comments[3].title = 'this is a new title';
           bp.comments[0].date = new Date();
           bp.comments.push(commentData);
-          blogpost.save(bp, function(err) {
+          blogpost.save(bp, function (err) {
             if (err) {
               throw err;
             }
@@ -231,12 +231,12 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function(err) {
       }
     }).add('Update - Mongoose - Multiple Documents', {
       defer: true,
-      fn: function(deferred) {
+      fn: function (deferred) {
         var ids = [];
         for (var i = 0; i < 50; i++) {
           ids.push(getNextmId());
         }
-        User.update({_id: {$in: ids}}, {$set: {age: 2}, $push: {likes: 'metal'}}, function(err) {
+        User.update({_id: {$in: ids}}, {$set: {age: 2}, $push: {likes: 'metal'}}, function (err) {
           if (err) {
             throw err;
           }
@@ -245,12 +245,12 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function(err) {
       }
     }).add('Update - Driver - Multiple Documents', {
       defer: true,
-      fn: function(deferred) {
+      fn: function (deferred) {
         var ids = [];
         for (var i = 0; i < 50; i++) {
           ids.push(getNextdId());
         }
-        user.update({_id: {$in: ids}}, {$set: {age: 2}, $push: {likes: 'metal'}}, function(err) {
+        user.update({_id: {$in: ids}}, {$set: {age: 2}, $push: {likes: 'metal'}}, function (err) {
           if (err) {
             throw err;
           }
@@ -259,10 +259,10 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function(err) {
       }
     }).add('Update - Mongoose - pop and push', {
       defer: true,
-      fn: function(deferred) {
+      fn: function (deferred) {
         testBp.comments.push(commentData);
         testBp.comments.$shift();
-        testBp.save(function(err) {
+        testBp.save(function (err) {
           if (err) {
             throw err;
           }
@@ -271,16 +271,16 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function(err) {
       }
     }).add('Update - Mongoose - Array Manipulation, parallel ops', {
       defer: true,
-      fn: function(deferred) {
+      fn: function (deferred) {
         var done = false;
-        BlogPost.update({_id: testBp.id}, {$pop: {comments: -1}}, function(err) {
+        BlogPost.update({_id: testBp.id}, {$pop: {comments: -1}}, function (err) {
           if (err) {
             throw err;
           }
           done && deferred.resolve();
           done = true;
         });
-        BlogPost.update({_id: testBp.id}, {$push: {comments: commentData}}, function(err) {
+        BlogPost.update({_id: testBp.id}, {$push: {comments: commentData}}, function (err) {
           if (err) {
             throw err;
           }
@@ -290,8 +290,8 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function(err) {
       }
     }).add('Update - Mongoose - findOneAndModify', {
       defer: true,
-      fn: function(deferred) {
-        BlogPost.findOneAndUpdate({_id: getNextbmId()}, {$set: {age: 2}, $push: {likes: 'metal'}}, function(err) {
+      fn: function (deferred) {
+        BlogPost.findOneAndUpdate({_id: getNextbmId()}, {$set: {age: 2}, $push: {likes: 'metal'}}, function (err) {
           if (err) {
             throw err;
           }
@@ -300,12 +300,12 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function(err) {
       }
     }).add('Update - Mongoose - find and update, separate ops', {
       defer: true,
-      fn: function(deferred) {
-        BlogPost.findOne({_id: getNextbmId()}, function(err, bp) {
+      fn: function (deferred) {
+        BlogPost.findOne({_id: getNextbmId()}, function (err, bp) {
           if (err) {
             throw err;
           }
-          bp.update({$set: {age: 2}, $push: {likes: 'metal'}}, function(err) {
+          bp.update({$set: {age: 2}, $push: {likes: 'metal'}}, function (err) {
             if (err) {
               throw err;
             }
@@ -314,15 +314,15 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function(err) {
         });
       }
     })
-    .on('cycle', function(evt) {
+    .on('cycle', function (evt) {
       if (process.env.MONGOOSE_DEV || process.env.PULL_REQUEST) {
         console.log(String(evt.target));
       }
-    }).on('complete', function() {
+    }).on('complete', function () {
       closeDB();
       if (!process.env.MONGOOSE_DEV && !process.env.PULL_REQUEST) {
         var outObj = {};
-        this.forEach(function(item) {
+        this.forEach(function (item) {
           var out = {};
           out.stats = item.stats;
           delete out.stats.sample;
@@ -336,7 +336,7 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function(err) {
       for (var i = 0; i < 100; i++) {
         testBp.comments.push(commentData);
       }
-      testBp.save(function(err) {
+      testBp.save(function (err) {
         if (err) {
           throw err;
         }

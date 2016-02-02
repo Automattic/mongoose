@@ -13,23 +13,23 @@ var assert = require('assert');
  *  Note that the `yield` keyword is currently only supported in NodeJS 0.11.x
  *  with the `--harmony` flag.
  */
-describe('Queries in ES6', function() {
+describe('Queries in ES6', function () {
   var db;
   var collectionNameCounter = 0;
 
-  var getCollectionName = function() {
+  var getCollectionName = function () {
     return 'harmony-queries' + (++collectionNameCounter);
   };
 
-  beforeEach(function() {
+  beforeEach(function () {
     db = start();
   });
 
-  afterEach(function(done) {
+  afterEach(function (done) {
     db.close(done);
   });
 
-  it('`exec()` integrates with co and the yield keyword', function(done) {
+  it('`exec()` integrates with co and the yield keyword', function (done) {
     co(function*() {
       var schema = new Schema({
         eggs: {type: Number, required: true},
@@ -80,7 +80,7 @@ describe('Queries in ES6', function() {
     })();
   });
 
-  it('can call `populate()` with `exec()`', function(done) {
+  it('can call `populate()` with `exec()`', function (done) {
     co(function*() {
       var bookSchema = new Schema({
         author: {type: mongoose.Schema.ObjectId, ref: 'AuthorHarmony'},

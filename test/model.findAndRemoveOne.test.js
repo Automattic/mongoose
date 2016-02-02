@@ -41,20 +41,20 @@ var BlogPost = new Schema({
 });
 
 BlogPost.virtual('titleWithAuthor')
-  .get(function() {
+  .get(function () {
     return this.get('title') + ' by ' + this.get('author');
   })
-  .set(function(val) {
+  .set(function (val) {
     var split = val.split(' by ');
     this.set('title', split[0]);
     this.set('author', split[1]);
   });
 
-BlogPost.method('cool', function() {
+BlogPost.method('cool', function () {
   return this;
 });
 
-BlogPost.static('woot', function() {
+BlogPost.static('woot', function () {
   return this;
 });
 
@@ -66,19 +66,19 @@ var collection = 'removeoneblogposts_' + random();
 var strictSchema = new Schema({name: String}, {strict: true});
 mongoose.model('RemoveOneStrictSchema', strictSchema);
 
-describe('model: findOneAndRemove:', function() {
-  it('returns the original document', function(done) {
+describe('model: findOneAndRemove:', function () {
+  it('returns the original document', function (done) {
     var db = start(),
         M = db.model(modelname, collection),
         title = 'remove muah';
 
     var post = new M({title: title});
-    post.save(function(err) {
+    post.save(function (err) {
       assert.ifError(err);
-      M.findOneAndRemove({title: title}, function(err, doc) {
+      M.findOneAndRemove({title: title}, function (err, doc) {
         assert.ifError(err);
         assert.equal(doc.id, post.id);
-        M.findById(post.id, function(err, gone) {
+        M.findById(post.id, function (err, gone) {
           db.close();
           assert.ifError(err);
           assert.equal(null, gone);
@@ -88,7 +88,7 @@ describe('model: findOneAndRemove:', function() {
     });
   });
 
-  it('options/conditions/doc are merged when no callback is passed', function(done) {
+  it('options/conditions/doc are merged when no callback is passed', function (done) {
     var db = start(),
         M = db.model(modelname, collection);
 
@@ -127,7 +127,7 @@ describe('model: findOneAndRemove:', function() {
     done();
   });
 
-  it('executes when a callback is passed', function(done) {
+  it('executes when a callback is passed', function (done) {
     var db = start(),
         M = db.model(modelname, collection + random()),
         pending = 5;
@@ -147,13 +147,13 @@ describe('model: findOneAndRemove:', function() {
     }
   });
 
-  it('executed with only a callback throws', function(done) {
+  it('executed with only a callback throws', function (done) {
     var db = start(),
         M = db.model(modelname, collection),
         err;
 
     try {
-      M.findOneAndRemove(function() {});
+      M.findOneAndRemove(function () {});
     } catch (e) {
       err = e;
     }
@@ -164,14 +164,14 @@ describe('model: findOneAndRemove:', function() {
   });
 });
 
-describe('model: findByIdAndRemove:', function() {
-  it('executed with only a callback throws', function(done) {
+describe('model: findByIdAndRemove:', function () {
+  it('executed with only a callback throws', function (done) {
     var db = start(),
         M = db.model(modelname, collection),
         err;
 
     try {
-      M.findByIdAndRemove(function() {});
+      M.findByIdAndRemove(function () {});
     } catch (e) {
       err = e;
     }
@@ -181,7 +181,7 @@ describe('model: findByIdAndRemove:', function() {
     done();
   });
 
-  it('executes when a callback is passed', function(done) {
+  it('executes when a callback is passed', function (done) {
     var db = start(),
         M = db.model(modelname, collection + random()),
         _id = new DocumentObjectId,
@@ -199,18 +199,18 @@ describe('model: findByIdAndRemove:', function() {
     }
   });
 
-  it('returns the original document', function(done) {
+  it('returns the original document', function (done) {
     var db = start(),
         M = db.model(modelname, collection),
         title = 'remove muah pleez';
 
     var post = new M({title: title});
-    post.save(function(err) {
+    post.save(function (err) {
       assert.ifError(err);
-      M.findByIdAndRemove(post.id, function(err, doc) {
+      M.findByIdAndRemove(post.id, function (err, doc) {
         assert.ifError(err);
         assert.equal(doc.id, post.id);
-        M.findById(post.id, function(err, gone) {
+        M.findById(post.id, function (err, gone) {
           db.close();
           assert.ifError(err);
           assert.equal(null, gone);
@@ -220,7 +220,7 @@ describe('model: findByIdAndRemove:', function() {
     });
   });
 
-  it('options/conditions/doc are merged when no callback is passed', function(done) {
+  it('options/conditions/doc are merged when no callback is passed', function (done) {
     var db = start(),
         M = db.model(modelname, collection),
         _id = new DocumentObjectId;
@@ -245,7 +245,7 @@ describe('model: findByIdAndRemove:', function() {
     done();
   });
 
-  it('supports v3 select string syntax', function(done) {
+  it('supports v3 select string syntax', function (done) {
     var db = start(),
         M = db.model(modelname, collection),
         _id = new DocumentObjectId;
@@ -264,7 +264,7 @@ describe('model: findByIdAndRemove:', function() {
     done();
   });
 
-  it('supports v3 select object syntax', function(done) {
+  it('supports v3 select object syntax', function (done) {
     var db = start(),
         M = db.model(modelname, collection),
         _id = new DocumentObjectId;
@@ -283,7 +283,7 @@ describe('model: findByIdAndRemove:', function() {
     done();
   });
 
-  it('supports v3 sort string syntax', function(done) {
+  it('supports v3 sort string syntax', function (done) {
     var db = start(),
         M = db.model(modelname, collection),
         _id = new DocumentObjectId;
@@ -304,7 +304,7 @@ describe('model: findByIdAndRemove:', function() {
     done();
   });
 
-  it('supports v3 sort object syntax', function(done) {
+  it('supports v3 sort object syntax', function (done) {
     var db = start(),
         M = db.model(modelname, collection),
         _id = new DocumentObjectId;
@@ -323,19 +323,19 @@ describe('model: findByIdAndRemove:', function() {
     db.close(done);
   });
 
-  it('supports population (gh-1395)', function(done) {
+  it('supports population (gh-1395)', function (done) {
     var db = start();
     var M = db.model('A', {name: String});
     var N = db.model('B', {a: {type: Schema.ObjectId, ref: 'A'}, i: Number});
 
-    M.create({name: 'i am an A'}, function(err, a) {
+    M.create({name: 'i am an A'}, function (err, a) {
       if (err) return done(err);
-      N.create({a: a._id, i: 10}, function(err, b) {
+      N.create({a: a._id, i: 10}, function (err, b) {
         if (err) return done(err);
 
         N.findOneAndRemove({_id: b._id}, {select: 'a -_id'})
         .populate('a')
-        .exec(function(err, doc) {
+        .exec(function (err, doc) {
           if (err) return done(err);
           assert.ok(doc);
           assert.equal(undefined, doc._id);
@@ -347,30 +347,30 @@ describe('model: findByIdAndRemove:', function() {
     });
   });
 
-  describe('middleware', function() {
+  describe('middleware', function () {
     var db;
 
-    beforeEach(function() {
+    beforeEach(function () {
       db = start();
     });
 
-    afterEach(function(done) {
+    afterEach(function (done) {
       db.close(done);
     });
 
-    it('works', function(done) {
+    it('works', function (done) {
       var s = new Schema({
         topping: {type: String, default: 'bacon'},
         base: String
       });
 
       var preCount = 0;
-      s.pre('findOneAndRemove', function() {
+      s.pre('findOneAndRemove', function () {
         ++preCount;
       });
 
       var postCount = 0;
-      s.post('findOneAndRemove', function() {
+      s.post('findOneAndRemove', function () {
         ++postCount;
       });
 
@@ -379,13 +379,13 @@ describe('model: findByIdAndRemove:', function() {
         base: 'eggs'
       });
 
-      breakfast.save(function(error) {
+      breakfast.save(function (error) {
         assert.ifError(error);
 
         Breakfast.findOneAndRemove(
           {base: 'eggs'},
           {},
-          function(error, breakfast) {
+          function (error, breakfast) {
             assert.ifError(error);
             assert.equal('eggs', breakfast.base);
             assert.equal(1, preCount);
@@ -395,19 +395,19 @@ describe('model: findByIdAndRemove:', function() {
       });
     });
 
-    it('works with exec()', function(done) {
+    it('works with exec()', function (done) {
       var s = new Schema({
         topping: {type: String, default: 'bacon'},
         base: String
       });
 
       var preCount = 0;
-      s.pre('findOneAndRemove', function() {
+      s.pre('findOneAndRemove', function () {
         ++preCount;
       });
 
       var postCount = 0;
-      s.post('findOneAndRemove', function() {
+      s.post('findOneAndRemove', function () {
         ++postCount;
       });
 
@@ -416,12 +416,12 @@ describe('model: findByIdAndRemove:', function() {
         base: 'eggs'
       });
 
-      breakfast.save(function(error) {
+      breakfast.save(function (error) {
         assert.ifError(error);
 
         Breakfast.
           findOneAndRemove({base: 'eggs'}, {}).
-          exec(function(error, breakfast) {
+          exec(function (error, breakfast) {
             assert.ifError(error);
             assert.equal('eggs', breakfast.base);
             assert.equal(1, preCount);

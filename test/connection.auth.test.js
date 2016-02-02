@@ -1,11 +1,9 @@
-
 var start = require('./common');
 var mongoose = start.mongoose;
-var assert = require('assert');
+var assert = require('power-assert');
 
 describe('connection:', function() {
   describe('supports authSource', function() {
-
     it('in querystring', function(done) {
       var conn = mongoose.createConnection();
       conn._open = function() {
@@ -25,7 +23,7 @@ describe('connection:', function() {
         assert.equal('users', conn.options.auth.authSource);
         conn.close(done);
       };
-      conn.open(start.uri, { auth: { authSource: 'users' }});
+      conn.open(start.uri, {auth: {authSource: 'users'}});
     });
   });
 });

@@ -5,7 +5,7 @@
 
 var start = require('./common'),
     mongoose = start.mongoose,
-    assert = require('assert'),
+    assert = require('power-assert'),
     random = require('../lib/utils').random,
     Schema = mongoose.Schema,
     ObjectId = Schema.Types.ObjectId,
@@ -63,7 +63,7 @@ mongoose.model(modelname, BlogPost);
 
 var collection = 'removeoneblogposts_' + random();
 
-var strictSchema = new Schema({ name: String }, { strict: true });
+var strictSchema = new Schema({name: String}, {strict: true});
 mongoose.model('RemoveOneStrictSchema', strictSchema);
 
 describe('model: findOneAndRemove:', function() {
@@ -72,10 +72,10 @@ describe('model: findOneAndRemove:', function() {
         M = db.model(modelname, collection),
         title = 'remove muah';
 
-    var post = new M({ title: title });
+    var post = new M({title: title});
     post.save(function(err) {
       assert.ifError(err);
-      M.findOneAndRemove({ title: title }, function(err, doc) {
+      M.findOneAndRemove({title: title}, function(err, doc) {
         assert.ifError(err);
         assert.equal(doc.id, post.id);
         M.findById(post.id, function(err, gone) {
@@ -98,11 +98,11 @@ describe('model: findOneAndRemove:', function() {
         query;
 
     // Model.findOneAndRemove
-    query = M.findOneAndRemove({ author: 'aaron' }, { select: 'author' });
+    query = M.findOneAndRemove({author: 'aaron'}, {select: 'author'});
     assert.equal(1, query._fields.author);
     assert.equal('aaron', query._conditions.author);
 
-    query = M.findOneAndRemove({ author: 'aaron' });
+    query = M.findOneAndRemove({author: 'aaron'});
     assert.equal(undefined, query._fields);
     assert.equal('aaron', query._conditions.author);
 
@@ -112,12 +112,12 @@ describe('model: findOneAndRemove:', function() {
     assert.equal(undefined, query._conditions.author);
 
     // Query.findOneAndRemove
-    query = M.where('author', 'aaron').findOneAndRemove({ date: now });
+    query = M.where('author', 'aaron').findOneAndRemove({date: now});
     assert.equal(undefined, query._fields);
     assert.equal(now, query._conditions.date);
     assert.equal('aaron', query._conditions.author);
 
-    query = M.find().findOneAndRemove({ author: 'aaron' }, { select: 'author' });
+    query = M.find().findOneAndRemove({author: 'aaron'}, {select: 'author'});
     assert.equal(1, query._fields.author);
     assert.equal('aaron', query._conditions.author);
 
@@ -132,10 +132,10 @@ describe('model: findOneAndRemove:', function() {
         M = db.model(modelname, collection + random()),
         pending = 5;
 
-    M.findOneAndRemove({ name: 'aaron1' }, { select: 'name' }, cb);
-    M.findOneAndRemove({ name: 'aaron1' }, cb);
-    M.where().findOneAndRemove({ name: 'aaron1' }, { select: 'name' }, cb);
-    M.where().findOneAndRemove({ name: 'aaron1' }, cb);
+    M.findOneAndRemove({name: 'aaron1'}, {select: 'name'}, cb);
+    M.findOneAndRemove({name: 'aaron1'}, cb);
+    M.where().findOneAndRemove({name: 'aaron1'}, {select: 'name'}, cb);
+    M.where().findOneAndRemove({name: 'aaron1'}, cb);
     M.where('name', 'aaron1').findOneAndRemove(cb);
 
     function cb(err, doc) {
@@ -162,7 +162,6 @@ describe('model: findOneAndRemove:', function() {
     assert.ok(/First argument must not be a function/.test(err));
     done();
   });
-
 });
 
 describe('model: findByIdAndRemove:', function() {
@@ -188,7 +187,7 @@ describe('model: findByIdAndRemove:', function() {
         _id = new DocumentObjectId,
         pending = 2;
 
-    M.findByIdAndRemove(_id, { select: 'name' }, cb);
+    M.findByIdAndRemove(_id, {select: 'name'}, cb);
     M.findByIdAndRemove(_id, cb);
 
     function cb(err, doc) {
@@ -205,7 +204,7 @@ describe('model: findByIdAndRemove:', function() {
         M = db.model(modelname, collection),
         title = 'remove muah pleez';
 
-    var post = new M({ title: title });
+    var post = new M({title: title});
     post.save(function(err) {
       assert.ifError(err);
       M.findByIdAndRemove(post.id, function(err, doc) {
@@ -231,7 +230,7 @@ describe('model: findByIdAndRemove:', function() {
     var query;
 
     // Model.findByIdAndRemove
-    query = M.findByIdAndRemove(_id, { select: 'author' });
+    query = M.findByIdAndRemove(_id, {select: 'author'});
     assert.equal(1, query._fields.author);
     assert.equal(_id.toString(), query._conditions._id.toString());
 
@@ -255,11 +254,11 @@ describe('model: findByIdAndRemove:', function() {
 
     var query;
 
-    query = M.findByIdAndRemove(_id, { select: 'author -title' });
+    query = M.findByIdAndRemove(_id, {select: 'author -title'});
     assert.strictEqual(1, query._fields.author);
     assert.strictEqual(0, query._fields.title);
 
-    query = M.findOneAndRemove({}, { select: 'author -title' });
+    query = M.findOneAndRemove({}, {select: 'author -title'});
     assert.strictEqual(1, query._fields.author);
     assert.strictEqual(0, query._fields.title);
     done();
@@ -274,11 +273,11 @@ describe('model: findByIdAndRemove:', function() {
 
     var query;
 
-    query = M.findByIdAndRemove(_id, { select: { author: 1, title: 0 }});
+    query = M.findByIdAndRemove(_id, {select: {author: 1, title: 0}});
     assert.strictEqual(1, query._fields.author);
     assert.strictEqual(0, query._fields.title);
 
-    query = M.findOneAndRemove({}, { select: { author: 1, title: 0 }});
+    query = M.findOneAndRemove({}, {select: {author: 1, title: 0}});
     assert.strictEqual(1, query._fields.author);
     assert.strictEqual(0, query._fields.title);
     done();
@@ -293,12 +292,12 @@ describe('model: findByIdAndRemove:', function() {
 
     var query;
 
-    query = M.findByIdAndRemove(_id, { sort: 'author -title' });
+    query = M.findByIdAndRemove(_id, {sort: 'author -title'});
     assert.equal(2, Object.keys(query.options.sort).length);
     assert.equal(1, query.options.sort.author);
     assert.equal(-1, query.options.sort.title);
 
-    query = M.findOneAndRemove({}, { sort: 'author -title' });
+    query = M.findOneAndRemove({}, {sort: 'author -title'});
     assert.equal(2, Object.keys(query.options.sort).length);
     assert.equal(1, query.options.sort.author);
     assert.equal(-1, query.options.sort.title);
@@ -312,12 +311,12 @@ describe('model: findByIdAndRemove:', function() {
 
     var query;
 
-    query = M.findByIdAndRemove(_id, { sort: { author: 1, title: -1 }});
+    query = M.findByIdAndRemove(_id, {sort: {author: 1, title: -1}});
     assert.equal(2, Object.keys(query.options.sort).length);
     assert.equal(1, query.options.sort.author);
     assert.equal(-1, query.options.sort.title);
 
-    query = M.findOneAndRemove(_id, { sort: { author: 1, title: -1 }});
+    query = M.findOneAndRemove(_id, {sort: {author: 1, title: -1}});
     assert.equal(2, Object.keys(query.options.sort).length);
     assert.equal(1, query.options.sort.author);
     assert.equal(-1, query.options.sort.title);
@@ -326,15 +325,15 @@ describe('model: findByIdAndRemove:', function() {
 
   it('supports population (gh-1395)', function(done) {
     var db = start();
-    var M = db.model('A', { name: String });
-    var N = db.model('B', { a: { type: Schema.ObjectId, ref: 'A' }, i: Number});
+    var M = db.model('A', {name: String});
+    var N = db.model('B', {a: {type: Schema.ObjectId, ref: 'A'}, i: Number});
 
-    M.create({ name: 'i am an A' }, function(err, a) {
+    M.create({name: 'i am an A'}, function(err, a) {
       if (err) return done(err);
-      N.create({ a: a._id, i: 10 }, function(err, b) {
+      N.create({a: a._id, i: 10}, function(err, b) {
         if (err) return done(err);
 
-        N.findOneAndRemove({ _id: b._id }, { select: 'a -_id' })
+        N.findOneAndRemove({_id: b._id}, {select: 'a -_id'})
         .populate('a')
         .exec(function(err, doc) {
           if (err) return done(err);
@@ -361,7 +360,7 @@ describe('model: findByIdAndRemove:', function() {
 
     it('works', function(done) {
       var s = new Schema({
-        topping: { type: String, default: 'bacon' },
+        topping: {type: String, default: 'bacon'},
         base: String
       });
 
@@ -384,7 +383,7 @@ describe('model: findByIdAndRemove:', function() {
         assert.ifError(error);
 
         Breakfast.findOneAndRemove(
-          { base: 'eggs' },
+          {base: 'eggs'},
           {},
           function(error, breakfast) {
             assert.ifError(error);
@@ -398,7 +397,7 @@ describe('model: findByIdAndRemove:', function() {
 
     it('works with exec()', function(done) {
       var s = new Schema({
-        topping: { type: String, default: 'bacon' },
+        topping: {type: String, default: 'bacon'},
         base: String
       });
 
@@ -421,7 +420,7 @@ describe('model: findByIdAndRemove:', function() {
         assert.ifError(error);
 
         Breakfast.
-          findOneAndRemove({ base: 'eggs' }, {}).
+          findOneAndRemove({base: 'eggs'}, {}).
           exec(function(error, breakfast) {
             assert.ifError(error);
             assert.equal('eggs', breakfast.base);

@@ -5,7 +5,7 @@
 
 var start = require('./common'),
     mongoose = start.mongoose,
-    assert = require('assert'),
+    assert = require('power-assert'),
     random = require('../lib/utils').random,
     Aggregate = require('../lib/aggregate'),
     Schema = mongoose.Schema;
@@ -23,8 +23,8 @@ var collection = 'aggregate_' + random();
 mongoose.model('Aggregate', userSchema);
 
 describe('model aggregate', function() {
-  var group = { $group: { _id: null, maxAge: { $max: '$age' } }};
-  var project = { $project: { maxAge: 1, _id: 0 }};
+  var group = {$group: {_id: null, maxAge: {$max: '$age'}}};
+  var project = {$project: {maxAge: 1, _id: 0}};
   var db, A, maxAge;
 
   var mongo26_or_greater = false;
@@ -41,14 +41,14 @@ describe('model aggregate', function() {
     for (var i = 0; i < num; ++i) {
       var age = Math.random() * 100 | 0;
       maxAge = Math.max(maxAge, age);
-      docs.push({ author: authors[i % authors.length], age: age });
+      docs.push({author: authors[i % authors.length], age: age});
     }
 
     A.create(docs, function(err) {
       assert.ifError(err);
       start.mongodVersion(function(err, version) {
         if (err) throw err;
-        mongo26_or_greater = 2 < version[0] || (2 == version[0] && 6 <= version[1]);
+        mongo26_or_greater = version[0] > 2 || (version[0] === 2 && version[1] >= 6);
         if (!mongo26_or_greater) console.log('not testing mongodb 2.6 features');
         done();
       });

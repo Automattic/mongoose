@@ -1,10 +1,10 @@
 
 var static = require('node-static');
-var server = new static.Server('.', { cache: 0 });
+var server = new static.Server('.', {cache: 0});
 var open = require('open');
 
 require('http').createServer(function(req, res) {
-  if ('/favicon.ico' == req.url) {
+  if (req.url === '/favicon.ico') {
     req.destroy();
     res.statusCode = 204;
     return res.end();

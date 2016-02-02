@@ -15,7 +15,6 @@
  *  ```
  */
 describe('Mongoose in the browser', function() {
-
   /**
    *  When you include the `mongoose.js` file in a script tag, mongoose will
    *  attach a `mongoose` object to the global `window`. This object includes
@@ -28,10 +27,10 @@ describe('Mongoose in the browser', function() {
    */
   describe('Declaring schemas in the browser', function() {
     it('allows you to use mongoose types', function() {
-      var foodSchema = new mongoose.Schema({ name: String });
+      var foodSchema = new mongoose.Schema({name: String});
       var breakfastSchema = new mongoose.Schema({
         foods: [foodSchema],
-        date: { type: Date, default: Date.now }
+        date: {type: Date, default: Date.now}
       });
 
       assert.ok(foodSchema.path('name') instanceof mongoose.Schema.Types.String);
@@ -49,9 +48,9 @@ describe('Mongoose in the browser', function() {
   describe('Validating documents in the browser', function() {
     it('allows you to create a schema and use it to validate documents', function(done) {
       var schema = new mongoose.Schema({
-        name: { type: String, required: true },
-        quest: { type: String, match: /Holy Grail/i, required: true },
-        favoriteColor: { type: String, enum: ['Red', 'Blue'], required: true }
+        name: {type: String, required: true},
+        quest: {type: String, match: /Holy Grail/i, required: true},
+        favoriteColor: {type: String, enum: ['Red', 'Blue'], required: true}
       });
 
       /* `mongoose.Document` is different in the browser than in NodeJS.

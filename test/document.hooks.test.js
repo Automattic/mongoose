@@ -1,11 +1,10 @@
-
 /**
  * Module dependencies.
  */
 
 var start = require('./common'),
     mongoose = start.mongoose,
-    assert = require('assert'),
+    assert = require('power-assert'),
     Schema = mongoose.Schema,
     ObjectId = Schema.ObjectId,
     Document = require('../lib/document'),
@@ -29,7 +28,7 @@ TestDocument.prototype.__proto__ = Document.prototype;
  * Set a dummy schema to simulate compilation.
  */
 
-var em = new Schema({ title: String, body: String });
+var em = new Schema({title: String, body: String});
 em.virtual('works').get(function() {
   return 'em virtual works';
 });
@@ -40,7 +39,7 @@ var schema = new Schema({
   nested: {
     age: Number,
     cool: ObjectId,
-    deep: { x: String },
+    deep: {x: String},
     path: String,
     setr: String
   },
@@ -129,7 +128,6 @@ describe('document: hooks:', function() {
       assert.equal(6, steps);
       done();
     });
-
   });
 
   it('calling next twice does not break', function(done) {
@@ -275,7 +273,7 @@ describe('document: hooks:', function() {
   it('hooking set works with document arrays (gh-746)', function(done) {
     var db = start();
 
-    var child = new Schema({ text: String });
+    var child = new Schema({text: String});
 
     child.pre('set', function(next, path, value, type) {
       next(path, value, type);
@@ -288,15 +286,15 @@ describe('document: hooks:', function() {
 
     var S = db.model('docArrayWithHookedSet', schema);
 
-    var s = new S({ name: "test" });
-    s.e = [{ text: 'hi' }];
+    var s = new S({name: 'test'});
+    s.e = [{text: 'hi'}];
     s.save(function(err) {
       assert.ifError(err);
 
-      S.findById(s.id, function(err ,s) {
+      S.findById(s.id, function(err, s) {
         assert.ifError(err);
 
-        s.e = [{ text: 'bye' }];
+        s.e = [{text: 'bye'}];
         s.save(function(err) {
           assert.ifError(err);
 
@@ -315,7 +313,7 @@ describe('document: hooks:', function() {
     var db = start();
     var presave = false;
 
-    var child = new Schema({ text: { type: String, required: true }});
+    var child = new Schema({text: {type: String, required: true}});
 
     child.pre('save', function(next) {
       presave = true;
@@ -328,7 +326,7 @@ describe('document: hooks:', function() {
     });
 
     var S = db.model('docArrayWithHookedSave', schema);
-    var s = new S({ name: 'hi', e: [{}] });
+    var s = new S({name: 'hi', e: [{}]});
     s.save(function(err) {
       db.close();
 
@@ -345,8 +343,8 @@ describe('document: hooks:', function() {
 
   it('post remove hooks on subdocuments work', function(done) {
     var db = start();
-    var sub = Schema({ _id: Number });
-    var called = { pre: 0, post: 0 };
+    var sub = new Schema({_id: Number});
+    var called = {pre: 0, post: 0};
 
     sub.pre('remove', function(next) {
       called.pre++;
@@ -358,40 +356,40 @@ describe('document: hooks:', function() {
       assert.ok(doc instanceof Document);
     });
 
-    var par = Schema({ sub: [sub], name: String });
+    var par = new Schema({sub: [sub], name: String});
     var M = db.model('post-remove-hooks-sub', par);
 
-    var m = new M({ sub: [{ _id: 1 }, { _id: 2 }] });
+    var m = new M({sub: [{_id: 1}, {_id: 2}]});
     m.save(function(err) {
       assert.ifError(err);
       assert.equal(0, called.pre);
       assert.equal(0, called.post);
 
-      M.findById(m, function(err, doc) {
-        assert.ifError(err);
+      M.findById(m, function(err1, doc) {
+        assert.ifError(err1);
 
         doc.sub.id(1).remove();
-        doc.save(function(err) {
-          assert.ifError(err);
+        doc.save(function(err2) {
+          assert.ifError(err2);
           assert.equal(1, called.pre);
           assert.equal(1, called.post);
 
           // does not get called when not removed
           doc.name = 'changed1';
-          doc.save(function(err) {
-            assert.ifError(err);
+          doc.save(function(err3) {
+            assert.ifError(err3);
             assert.equal(1, called.pre);
             assert.equal(1, called.post);
 
             doc.sub.id(2).remove();
-            doc.remove(function(err) {
-              assert.ifError(err);
+            doc.remove(function(err4) {
+              assert.ifError(err4);
               assert.equal(2, called.pre);
               assert.equal(2, called.post);
 
               // does not get called twice
-              doc.remove(function(err) {
-                assert.ifError(err);
+              doc.remove(function(err5) {
+                assert.ifError(err5);
                 assert.equal(2, called.pre);
                 assert.equal(2, called.post);
                 db.close(done);
@@ -414,7 +412,7 @@ describe('document: hooks:', function() {
 
     var b = new Bar();
     b.pre('save', function(next) {
-      if (this.isNew && 0 === this.foos.length) {
+      if (this.isNew && this.foos.length === 0) {
         this.foos = undefined;
       }
       next();
@@ -431,7 +429,6 @@ describe('document: hooks:', function() {
   });
 
   it('post save hooks on subdocuments work (gh-915) (gh-3780)', function(done) {
-
     var doneCalled = false;
     var _done = function(e) {
       if (!doneCalled) {
@@ -440,7 +437,7 @@ describe('document: hooks:', function() {
       }
     };
     var db = start();
-    var called = { post: 0 };
+    var called = {post: 0};
 
     var subSchema = new Schema({
       name: String
@@ -450,8 +447,7 @@ describe('document: hooks:', function() {
       called.post++;
       try {
         assert.ok(doc instanceof EmbeddedDocument);
-      }
-      catch (e) {
+      } catch (e) {
         _done(e);
       }
     });
@@ -462,10 +458,12 @@ describe('document: hooks:', function() {
 
     var M = db.model('post-save-hooks-sub', postSaveHooks);
 
-    var m = new M({ subs: [
-      { name: 'mee' },
-      { name: 'moo' }
-    ] });
+    var m = new M({
+      subs: [
+        {name: 'mee'},
+        {name: 'moo'}
+      ]
+    });
 
     m.save(function(err) {
       assert.ifError(err);
@@ -474,7 +472,7 @@ describe('document: hooks:', function() {
 
       M.findById(m, function(err, doc) {
         assert.ifError(err);
-        doc.subs.push({ name: 'maa' });
+        doc.subs.push({name: 'maa'});
         doc.save(function(err) {
           assert.ifError(err);
           assert.equal(called.post, 3);
@@ -485,8 +483,9 @@ describe('document: hooks:', function() {
     });
   });
 
-  it("pre save hooks should run in parallel", function(done) {
-    // we set the time out to be double that of the validator - 1 (so that running in serial will be greater then that)
+  it('pre save hooks should run in parallel', function(done) {
+    // we set the time out to be double that of the validator - 1
+    // (so that running in serial will be greater then that)
     this.timeout(1000);
     var db = start(),
         count = 0;
@@ -499,7 +498,7 @@ describe('document: hooks:', function() {
         count++;
         next();
         if (count === 3) {
-          done(new Error("gaga"));
+          done(new Error('gaga'));
         } else {
           done();
         }
@@ -508,27 +507,22 @@ describe('document: hooks:', function() {
 
     var MWPSH = db.model('mwpsh', new Schema({subs: [SchemaWithPreSaveHook]}));
     var m = new MWPSH({
-      subs: [
-          {
-            preference: "xx"
-          },
-          {
-            preference: "yy"
-          },
-          {
-            preference: "1"
-          },
-          {
-            preference: "2"
-          }
-      ]
+      subs: [{
+        preference: 'xx'
+      }, {
+        preference: 'yy'
+      }, {
+        preference: '1'
+      }, {
+        preference: '2'
+      }]
     });
 
     m.save(function(err) {
       db.close();
 
       try {
-        assert.equal(err.message, "gaga");
+        assert.equal(err.message, 'gaga');
         assert.ok(count >= 3);
         done();
       } catch (e) {
@@ -538,7 +532,7 @@ describe('document: hooks:', function() {
   });
 
   it('parallel followed by serial (gh-2521)', function(done) {
-    var schema = Schema({ name: String });
+    var schema = new Schema({name: String});
 
     schema.pre('save', true, function(next, done) {
       process.nextTick(function() {
@@ -556,7 +550,7 @@ describe('document: hooks:', function() {
     var db = start();
     var People = db.model('gh-2521', schema, 'gh-2521');
 
-    var p = new People({ name: 'Val' });
+    var p = new People({name: 'Val'});
     p.save(function(error) {
       assert.ifError(error);
       db.close(done);
@@ -564,7 +558,7 @@ describe('document: hooks:', function() {
   });
 
   it('runs post hooks after function (gh-2949)', function(done) {
-    var schema = Schema({ name: String });
+    var schema = new Schema({name: String});
 
     var postCount = 0;
     schema.post('init', function(doc) {
@@ -575,8 +569,8 @@ describe('document: hooks:', function() {
     var db = start();
     var People = db.model('gh-2949', schema, 'gh-2949');
 
-    People.create({ name: 'Val' }, function(err, doc) {
-      People.findOne({ _id: doc._id }, function() {
+    People.create({name: 'Val'}, function(err, doc) {
+      People.findOne({_id: doc._id}, function() {
         assert.equal(postCount, 1);
         db.close(done);
       });
@@ -584,10 +578,10 @@ describe('document: hooks:', function() {
   });
 
   it('pre-init hooks work', function(done) {
-    var schema = Schema({ text: String });
+    var schema = new Schema({text: String});
 
     schema.pre('init', function(next, data) {
-      data.text = "pre init'd";
+      data.text = 'pre init\'d';
       next();
     });
 
@@ -595,13 +589,12 @@ describe('document: hooks:', function() {
         Parent = db.model('Parent', schema);
 
     Parent.create({
-      text: "not init'd"
+      text: 'not init\'d'
     }, function(err, doc) {
-
-      Parent.findOne({ _id: doc._id }, function(err, doc) {
+      Parent.findOne({_id: doc._id}, function(err, doc) {
         db.close();
 
-        assert.strictEqual(doc.text, "pre init'd");
+        assert.strictEqual(doc.text, 'pre init\'d');
 
         done();
       });
@@ -609,7 +602,7 @@ describe('document: hooks:', function() {
   });
 
   it('post save handles multiple args (gh-3155)', function(done) {
-    var schema = Schema({});
+    var schema = new Schema({});
 
     schema.post('save', function(item, next) {
       next();
@@ -627,7 +620,7 @@ describe('document: hooks:', function() {
   });
 
   it('pre-init hooks on subdocuments work', function(done) {
-    var childSchema = Schema({ age: Number });
+    var childSchema = new Schema({age: Number});
 
     childSchema.pre('init', function(next, data) {
       ++data.age;
@@ -636,16 +629,15 @@ describe('document: hooks:', function() {
       return this;
     });
 
-    var parentSchema = Schema({ name: String, children: [childSchema] });
+    var parentSchema = new Schema({name: String, children: [childSchema]});
     var db = start(),
         Parent = db.model('ParentWithChildren', parentSchema);
 
     Parent.create({
       name: 'Bob',
-      children: [{ age: 8 }, { age: 5 }]
+      children: [{age: 8}, {age: 5}]
     }, function(err, doc) {
-
-      Parent.findOne({ _id: doc._id }, function(err, doc) {
+      Parent.findOne({_id: doc._id}, function(err, doc) {
         db.close();
 
         assert.strictEqual(doc.children.length, 2);
@@ -660,7 +652,7 @@ describe('document: hooks:', function() {
   });
 
   it('pre-save hooks fire on subdocs before their parent doc', function(done) {
-    var childSchema = Schema({ name: String, count: Number });
+    var childSchema = new Schema({name: String, count: Number});
 
     childSchema.pre('save', function(next) {
       ++this.count;
@@ -669,31 +661,33 @@ describe('document: hooks:', function() {
       return this;
     });
 
-    var parentSchema = Schema({
+    var parentSchema = new Schema({
       cumulativeCount: Number,
       children: [childSchema]
     });
 
     parentSchema.pre('save', function(next) {
       this.cumulativeCount = this.children.reduce(function(seed, child) {
-        return seed += child.count;
+        seed += child.count;
+        return seed;
       }, 0);
       next();
     });
 
     var db = start(),
         Parent = db.model('ParentWithChildren', parentSchema),
-        doc = new Parent({ children: [{ count: 0, name: 'a' }, { count: 1, name: 'b' }] });
+        doc = new Parent({children: [{count: 0, name: 'a'}, {count: 1, name: 'b'}]});
 
-    doc.save(function(err, doc) {
+    doc.save(function(err, doc1) {
       db.close();
 
       try {
-        assert.strictEqual(doc.children[0].count, 1);
-        assert.strictEqual(doc.children[1].count, 2);
-        assert.strictEqual(doc.cumulativeCount, 3);
+        assert.strictEqual(doc1.children[0].count, 1);
+        assert.strictEqual(doc1.children[1].count, 2);
+        assert.strictEqual(doc1.cumulativeCount, 3);
       } catch (e) {
-        return done(e);
+        done(e);
+        return;
       }
 
       done();
@@ -702,7 +696,7 @@ describe('document: hooks:', function() {
 
   describe('gh-3284', function() {
     it('should call pre hooks on nested subdoc', function(done) {
-      var self = this;
+      var _this = this;
 
       var childSchema = new Schema({
         title: String
@@ -710,7 +704,7 @@ describe('document: hooks:', function() {
 
       ['init', 'save', 'validate'].forEach(function(type) {
         childSchema.pre(type, function(next) {
-          self['pre' + type + 'Called'] = true;
+          _this['pre' + type + 'Called'] = true;
           next();
         });
       });
@@ -738,9 +732,9 @@ describe('document: hooks:', function() {
         return Parent.findById(parent._id);
       }).then(function() {
         db.close();
-        assert.ok(self.preinitCalled);
-        assert.ok(self.prevalidateCalled);
-        assert.ok(self.presaveCalled);
+        assert.ok(_this.preinitCalled);
+        assert.ok(_this.prevalidateCalled);
+        assert.ok(_this.presaveCalled);
         done();
       });
     });
@@ -753,7 +747,7 @@ describe('document: hooks:', function() {
 
     var preCalls = [];
     bookSchema.pre('set', function(next, path, val) {
-      preCalls.push({ path: path, val: val });
+      preCalls.push({path: path, val: val});
       next();
     });
 
@@ -792,15 +786,11 @@ describe('document: hooks:', function() {
     var L1 = db.model('gh3281', L1Schema);
 
     var data = {
-      items: [
-          {
-            items: [
-                {
-                  title: 'test'
-                }
-            ]
-          }
-      ]
+      items: [{
+        items: [{
+          title: 'test'
+        }]
+      }]
     };
 
     L1.create(data, function(error) {
@@ -817,7 +807,7 @@ describe('document: hooks:', function() {
       bla: String
     });
 
-    PhotoSchema.post('remove', function(photo) {
+    PhotoSchema.post('remove', function() {
       ++postCount;
     });
 
@@ -827,11 +817,11 @@ describe('document: hooks:', function() {
 
     var Person = db.model('Person', PersonSchema);
 
-    Person.create({ photo: { bla: 'test' } }, function(error, person) {
+    Person.create({photo: {bla: 'test'}}, function(error, person) {
       assert.ifError(error);
       person.photo.remove();
-      person.save(function(error) {
-        assert.ifError(error);
+      person.save(function(error1) {
+        assert.ifError(error1);
         setTimeout(function() {
           assert.equal(postCount, 1);
           done();

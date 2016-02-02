@@ -1,5 +1,5 @@
 var start = require('./common');
-var assert = require('assert');
+var assert = require('power-assert');
 var mongoose = start.mongoose;
 var Schema = mongoose.Schema;
 
@@ -23,7 +23,7 @@ describe('query middleware', function() {
         if (error) {
           return done(error);
         }
-        Publisher.create({ name: 'Wiley' }, function(error, publisher) {
+        Publisher.create({name: 'Wiley'}, function(error, publisher) {
           if (error) {
             return done(error);
           }
@@ -47,7 +47,7 @@ describe('query middleware', function() {
     schema = new Schema({
       title: String,
       author: String,
-      publisher: { type: Schema.ObjectId, ref: 'gh-2138-1' },
+      publisher: {type: Schema.ObjectId, ref: 'gh-2138-1'},
       options: String
     });
 
@@ -75,7 +75,7 @@ describe('query middleware', function() {
 
     initializeData(function(error) {
       assert.ifError(error);
-      Author.find({ x: 1 }, function(error) {
+      Author.find({x: 1}, function(error) {
         assert.ifError(error);
         assert.equal(1, count);
         done();
@@ -95,7 +95,7 @@ describe('query middleware', function() {
 
     initializeData(function(error) {
       assert.ifError(error);
-      Author.find({ title: 'Professional AngularJS' }, function(error, docs) {
+      Author.find({title: 'Professional AngularJS'}, function(error, docs) {
         assert.ifError(error);
         assert.equal(1, postCount);
         assert.equal(1, docs.length);
@@ -120,7 +120,7 @@ describe('query middleware', function() {
     });
 
     initializeData(function() {
-      Author.find({ title: 'Professional AngularJS' }).exec(function(error, docs) {
+      Author.find({title: 'Professional AngularJS'}).exec(function(error, docs) {
         assert.ifError(error);
         assert.equal(1, count);
         assert.equal(1, postCount);
@@ -145,7 +145,7 @@ describe('query middleware', function() {
     });
 
     initializeData(function() {
-      Author.findOne({ title: 'Professional AngularJS' }).exec(function(error, doc) {
+      Author.findOne({title: 'Professional AngularJS'}).exec(function(error, doc) {
         assert.ifError(error);
         assert.equal(1, count);
         assert.equal(1, postCount);
@@ -162,7 +162,7 @@ describe('query middleware', function() {
     });
 
     initializeData(function() {
-      Author.findOne({ title: 'Professional AngularJS' }).exec(function(error, doc) {
+      Author.findOne({title: 'Professional AngularJS'}).exec(function(error, doc) {
         assert.ifError(error);
         assert.equal('Val', doc.author);
         assert.equal('Wiley', doc.publisher.name);
@@ -179,7 +179,7 @@ describe('query middleware', function() {
     });
 
     initializeData(function() {
-      Author.findOne({ title: 'Professional AngularJS' }).exec(function(error, doc) {
+      Author.findOne({title: 'Professional AngularJS'}).exec(function(error, doc) {
         assert.ifError(error);
         assert.equal('Val', doc.author);
         assert.equal('Wiley', doc.publisher.name);
@@ -202,7 +202,7 @@ describe('query middleware', function() {
 
     initializeData(function(error) {
       assert.ifError(error);
-      Author.find({ title: 'Professional AngularJS' }).count(function(error, count) {
+      Author.find({title: 'Professional AngularJS'}).count(function(error, count) {
         assert.ifError(error);
         assert.equal(1, count);
         assert.equal(1, preCount);

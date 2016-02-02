@@ -1,7 +1,7 @@
 
 var url = require('url'),
     start = require('./common'),
-    assert = require('assert'),
+    assert = require('power-assert'),
     mongoose = start.mongoose,
     Mongoose = mongoose.Mongoose,
     Schema = mongoose.Schema,
@@ -128,13 +128,11 @@ describe('mongoose module:', function() {
           cb(new Error('bam'));
         };
 
-        var failure = {};
-        try {
-          mong.disconnect();
-        } catch (err) {
-          failure = err;
-        }
-        assert.equal('bam', failure.message);
+        mong.disconnect()
+          .on('error', function(error) {
+            assert.equal('bam', error.message);
+          });
+
         done();
       });
     });
@@ -170,15 +168,15 @@ describe('mongoose module:', function() {
     });
 
     it('returns the model at creation', function(done) {
-      var Named = mongoose.model('Named', new Schema({ name: String }));
+      var Named = mongoose.model('Named', new Schema({name: String}));
       var n1 = new Named();
       assert.equal(n1.name, null);
-      var n2 = new Named({ name: 'Peter Bjorn' });
+      var n2 = new Named({name: 'Peter Bjorn'});
       assert.equal(n2.name, 'Peter Bjorn');
 
-      var schema = new Schema({ number: Number });
+      var schema = new Schema({number: Number});
       var Numbered = mongoose.model('Numbered', schema, collection);
-      var n3 = new Numbered({ number: 1234 });
+      var n3 = new Numbered({number: 1234});
       assert.equal(1234, n3.number.valueOf());
       done();
     });
@@ -218,15 +216,15 @@ describe('mongoose module:', function() {
       describe('when model name already exists', function() {
         it('returns a new uncached model', function(done) {
           var m = new Mongoose;
-          var s1 = new Schema({ a: [] });
+          var s1 = new Schema({a: []});
           var name = 'non-cached-collection-name';
           var A = m.model(name, s1);
           var B = m.model(name);
           var C = m.model(name, 'alternate');
-          assert.ok(A.collection.name == B.collection.name);
-          assert.ok(A.collection.name != C.collection.name);
-          assert.ok(m.models[name].collection.name != C.collection.name);
-          assert.ok(m.models[name].collection.name == A.collection.name);
+          assert.ok(A.collection.name === B.collection.name);
+          assert.ok(A.collection.name !== C.collection.name);
+          assert.ok(m.models[name].collection.name !== C.collection.name);
+          assert.ok(m.models[name].collection.name === A.collection.name);
           done();
         });
       });
@@ -235,8 +233,8 @@ describe('mongoose module:', function() {
     describe('passing object literal schemas', function() {
       it('works', function(done) {
         var m = new Mongoose;
-        var A = m.model('A', { n: [{ age: 'number' }]});
-        var a = new A({ n: [{ age: '47' }] });
+        var A = m.model('A', {n: [{age: 'number'}]});
+        var a = new A({n: [{age: '47'}]});
         assert.strictEqual(47, a.n[0].age);
         done();
       });
@@ -261,7 +259,7 @@ describe('mongoose module:', function() {
       var mong = new Mongoose(),
           uri = process.env.MONGOOSE_TEST_URI || 'mongodb://localhost/mongoose_test';
 
-      mong.connect(uri, { db: { safe: false }}, function(err) {
+      mong.connect(uri, {db: {safe: false}}, function(err) {
         assert.ifError(err);
         mong.connection.close();
         done();
@@ -274,7 +272,7 @@ describe('mongoose module:', function() {
 
       if (!uri) return done();
 
-      mong.connect(uri, { db: { safe: false }}, function(err) {
+      mong.connect(uri, {db: {safe: false}}, function(err) {
         assert.ifError(err);
         mong.connection.close();
         done();
@@ -389,10 +387,10 @@ describe('mongoose module:', function() {
       test(mongoose);
       done();
     });
+
     it('of new Mongoose instances', function(done) {
       test(new mongoose.Mongoose);
       done();
     });
   });
-
 });

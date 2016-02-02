@@ -57,7 +57,7 @@ mongoose.connect(uri, function(err) {
  */
 
 function example() {
-  Character.create({ name: 'Link', health: 100 }, function(err, link) {
+  Character.create({name: 'Link', health: 100}, function(err, link) {
     if (err) return done(err);
     console.log('found', link);
     link.attack(); // 'Link is attacking'

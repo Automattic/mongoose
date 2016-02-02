@@ -3,11 +3,10 @@
  * Test dependencies.
  */
 
-var start = require('./common')
-  , mongoose = start.mongoose
-  , assert = require('assert')
-  , Schema = mongoose.Schema
-  ;
+var start = require('./common'),
+    mongoose = start.mongoose,
+    assert = require('power-assert'),
+    Schema = mongoose.Schema;
 
 describe('schema options.timestamps', function() {
   describe('create schema with options.timestamps', function() {
@@ -71,7 +70,7 @@ describe('schema options.timestamps', function() {
       cat.save(function(err, doc) {
         assert.ok(doc.createdAt);
         assert.ok(doc.updatedAt);
-        assert.ok(doc.createdAt.getTime() == doc.updatedAt.getTime());
+        assert.ok(doc.createdAt.getTime() === doc.updatedAt.getTime());
         done();
       });
     });
@@ -80,7 +79,7 @@ describe('schema options.timestamps', function() {
       Cat.findOneAndUpdate({name: 'notexistname'}, {$set: {}}, {upsert: true, 'new': true}, function(err, doc) {
         assert.ok(doc.createdAt);
         assert.ok(doc.updatedAt);
-        assert.ok(doc.createdAt.getTime() == doc.updatedAt.getTime());
+        assert.ok(doc.createdAt.getTime() === doc.updatedAt.getTime());
         done();
       });
     });
@@ -124,5 +123,4 @@ describe('schema options.timestamps', function() {
       });
     });
   });
-
 });

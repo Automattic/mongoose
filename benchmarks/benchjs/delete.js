@@ -1,4 +1,3 @@
-
 var mongoose = require('../../lib');
 var Benchmark = require('benchmark');
 
@@ -19,11 +18,15 @@ var mongo = require('mongodb');
 
 
 mongoose.connect('mongodb://localhost/mongoose-bench', function(err) {
-  if (err) throw err;
+  if (err) {
+    throw err;
+  }
   mongo.connect('mongodb://localhost/mongoose-bench', function(err, db) {
-    if (err) throw err;
+    if (err) {
+      throw err;
+    }
     var UserSchema = new Schema({
-      name : String,
+      name: String,
       age: Number,
       likes: [String],
       address: String
@@ -36,17 +39,19 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function(err) {
     var dIds = [];
 
     var data = {
-      name : "name",
-      age : 0,
-      likes : ["dogs", "cats", "pizza"],
-      address : " Nowhere-ville USA"
+      name: 'name',
+      age: 0,
+      likes: ['dogs', 'cats', 'pizza'],
+      address: ' Nowhere-ville USA'
     };
 
     // insert all of the data here
     var count = 1000;
     for (var i = 0; i < 500; i++) {
       User.create(data, function(err, u) {
-        if (err) throw err;
+        if (err) {
+          throw err;
+        }
         mIds.push(u.id);
         --count || next();
       });
@@ -63,33 +68,39 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function(err) {
 
     function closeDB() {
       User.count(function(err, res) {
-        if (res != 0) {
-          console.log("Still mongoose entries left...");
+        if (res !== 0) {
+          console.log('Still mongoose entries left...');
         }
         mongoose.disconnect();
       });
       user.count({}, function(err, res) {
-        if (res != 0) {
-          console.log("Still driver entries left...");
+        if (res !== 0) {
+          console.log('Still driver entries left...');
         }
-        if (err) throw err;
+        if (err) {
+          throw err;
+        }
         db.close();
       });
     }
 
     suite.add('Delete - Mongoose', {
-      defer : true,
-      fn : function(deferred) {
-        User.remove({ _id : mIds.pop()}, function(err) {
-          if (err) throw err;
+      defer: true,
+      fn: function(deferred) {
+        User.remove({_id: mIds.pop()}, function(err) {
+          if (err) {
+            throw err;
+          }
           deferred.resolve();
         });
       }
     }).add('Delete - Driver', {
-      defer : true,
-      fn : function(deferred) {
-        user.remove({ _id : dIds.pop()}, function(err) {
-          if (err) throw err;
+      defer: true,
+      fn: function(deferred) {
+        user.remove({_id: dIds.pop()}, function(err) {
+          if (err) {
+            throw err;
+          }
           deferred.resolve();
         });
       }
@@ -107,13 +118,13 @@ mongoose.connect('mongodb://localhost/mongoose-bench', function(err) {
           out.stats = item.stats;
           delete out.stats.sample;
           out.ops = item.hz;
-          outObj[item.name.replace(/\s/g, "")] = out;
+          outObj[item.name.replace(/\s/g, '')] = out;
         });
         console.log(JSON.stringify(outObj));
       }
     });
     function next() {
-      suite.run({ async : true });
+      suite.run({async: true});
     }
   });
 });

@@ -1,7 +1,6 @@
-
 var start = require('./common'),
     mongoose = start.mongoose,
-    assert = require('assert'),
+    assert = require('power-assert'),
     Collection = require('../lib/collection');
 
 describe('collections:', function() {
@@ -13,13 +12,15 @@ describe('collections:', function() {
         pending = 2;
 
     function finish() {
-      if (--pending) return;
+      if (--pending) {
+        return;
+      }
       assert.ok(connected);
       assert.ok(inserted);
       done();
     }
 
-    collection.insert({ }, { safe: true }, function() {
+    collection.insert({}, {safe: true}, function() {
       assert.ok(connected);
       inserted = true;
       db.close();

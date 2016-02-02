@@ -1,4 +1,22 @@
-4.3.7 / 2015-01-23
+4.4.0 / 2016-02-02
+==================
+ * docs: fix expireAfterSeconds index option name #3831 [Flash-](https://github.com/Flash-)
+ * chore: run lint after test #3829 [ChristianMurphy](https://github.com/ChristianMurphy)
+ * chore: use power-assert instead of assert #3828 [TrejGun](https://github.com/TrejGun)
+ * chore: stricter lint #3827 [TrejGun](https://github.com/TrejGun)
+ * feat(types): casting moment to date #3813 [TrejGun](https://github.com/TrejGun)
+ * chore: comma-last lint for test folder #3810 [ChristianMurphy](https://github.com/ChristianMurphy)
+ * fix: upgrade async mpath, mpromise, muri, and sliced #3801 [TrejGun](https://github.com/TrejGun)
+ * fix(query): geo queries now return proper ES2015 promises #3800 [TrejGun](https://github.com/TrejGun)
+ * perf(types): use `Object.defineProperties()` for array #3799 [TrejGun](https://github.com/TrejGun)
+ * fix(model): mapReduce, ensureIndexes, remove, and save properly return ES2015 promises #3795 #3628 #3595 [TrejGun](https://github.com/TrejGun)
+ * docs: fixed dates in History.md #3791 [Jokero](https://github.com/Jokero)
+ * feat: connect, open, openSet, and disconnect return ES2015 promises #3790 #3622 [TrejGun](https://github.com/TrejGun)
+ * feat: custom type for int32 via mongoose-int32 npm package #3652 #3102
+ * feat: basic custom schema type API #995
+ * feat(model): `insertAll()` for more performant bulk inserts #723
+
+4.3.7 / 2016-01-23
 ==================
  * docs: grammar fix in timestamps docs #3786 [zclancy](https://github.com/zclancy)
  * fix(document): setting nested populated docs #3783 [slamuu](https://github.com/slamuu)

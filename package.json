@@ -1,7 +1,7 @@
 {
   "name": "mongoose",
   "description": "Mongoose MongoDB ODM",
-  "version": "4.3.7",
+  "version": "4.4.0",
   "author": "Guillermo Rauch <guillermo@learnboost.com>",
   "keywords": [
     "mongodb",
@@ -19,39 +19,40 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "async": "0.9.0",
+    "async": "1.5.2",
     "bson": "0.4.21",
     "hooks-fixed": "1.1.0",
     "kareem": "1.0.1",
     "mongodb": "2.1.4",
-    "mpath": "0.1.1",
-    "mpromise": "0.5.4",
+    "mpath": "0.2.1",
+    "mpromise": "0.5.5",
     "mquery": "1.6.3",
     "ms": "0.7.1",
-    "muri": "1.0.0",
+    "muri": "1.1.0",
     "regexp-clone": "0.0.1",
-    "sliced": "0.0.5"
+    "sliced": "1.0.1"
   },
   "devDependencies": {
     "acquit": "0.4.1",
     "acquit-ignore": "0.0.3",
-    "benchmark": "1.0.0",
-    "bluebird": "2.9.34",
-    "co": "3.1.0",
-    "dox": "0.3.1",
-    "eslint": "2.0.0-alpha-2",
-    "highlight.js": "7.0.1",
-    "istanbul": "^0.3.13",
+    "benchmark": "2.0.0",
+    "bluebird": "3.1.4",
+    "co": "4.6.0",
+    "dox": "0.8.0",
+    "eslint": "2.0.0-beta.3",
+    "highlight.js": "9.1.0",
+    "istanbul": "0.4.2",
     "jade": "0.26.3",
-    "markdown": "0.3.1",
+    "markdown": "0.5.0",
     "marked": "0.3.5",
-    "mocha": "1.20.0",
-    "node-static": "0.5.9",
-    "open": "0.0.3",
+    "mocha": "2.3.4",
+    "node-static": "0.7.7",
+    "open": "0.0.5",
+    "power-assert": "1.2.0",
     "q": "1.4.1",
     "tbd": "0.6.4",
     "uglify-js": "2.6.1",
-    "underscore": "1.5.2"
+    "underscore": "1.8.3"
   },
   "browserDependencies": {
     "browserify": "4.1.10",
@@ -65,10 +66,11 @@
     "lib": "./lib/mongoose"
   },
   "scripts": {
+    "fix-lint": "eslint . --fix",
     "install-browser": "npm install `node format_deps.js`",
     "test": "mocha test/*.test.js test/**/*.test.js",
-    "test-cov": "istanbul cover _mocha test/*.test.js",
-    "lint": "eslint . --quiet"
+    "posttest": "eslint . --quiet",
+    "test-cov": "istanbul cover --report text --report html _mocha test/*.test.js"
   },
   "main": "./index.js",
   "engines": {

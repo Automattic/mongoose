@@ -3,13 +3,13 @@
  * Module dependencies.
  */
 
-var assert = require('assert')
-  , start = require('./common')
-  , mongoose = start.mongoose
-  , EmbeddedDocument = require('../lib/types/embedded')
-  , DocumentArray = require('../lib/types/documentarray')
-  , Schema = mongoose.Schema
-  , ValidationError = mongoose.Document.ValidationError;
+var assert = require('power-assert'),
+    start = require('./common'),
+    mongoose = start.mongoose,
+    EmbeddedDocument = require('../lib/types/embedded'),
+    DocumentArray = require('../lib/types/documentarray'),
+    Schema = mongoose.Schema,
+    ValidationError = mongoose.Document.ValidationError;
 
 /**
  * Setup.
@@ -40,8 +40,8 @@ Subdocument.prototype.__proto__ = EmbeddedDocument.prototype;
  */
 
 Subdocument.prototype.$__setSchema(new Schema({
-  test: { type: String, required: true }
-  , work: { type: String, validate: /^good/ }
+  test: {type: String, required: true},
+  work: {type: String, validate: /^good/}
 }));
 
 /**
@@ -49,13 +49,13 @@ Subdocument.prototype.$__setSchema(new Schema({
  */
 
 var RatingSchema = new Schema({
-  stars: Number
-  , description: { source: { url: String, time: Date }}
+  stars: Number,
+  description: {source: {url: String, time: Date}}
 });
 
 var MovieSchema = new Schema({
-  title: String
-  , ratings: [RatingSchema]
+  title: String,
+  ratings: [RatingSchema]
 });
 
 mongoose.model('Movie', MovieSchema);
@@ -65,7 +65,6 @@ mongoose.model('Movie', MovieSchema);
  */
 
 describe('types.document', function() {
-
   it('test that validate sets errors', function(done) {
     var a = new Subdocument();
     a.set('test', '');
@@ -82,7 +81,7 @@ describe('types.document', function() {
 
   it('objects can be passed to #set', function(done) {
     var a = new Subdocument();
-    a.set({ test: 'paradiddle', work: 'good flam'});
+    a.set({test: 'paradiddle', work: 'good flam'});
     assert.equal(a.test, 'paradiddle');
     assert.equal(a.work, 'good flam');
     done();
@@ -90,7 +89,7 @@ describe('types.document', function() {
 
   it('Subdocuments can be passed to #set', function(done) {
     var a = new Subdocument();
-    a.set({ test: 'paradiddle', work: 'good flam'});
+    a.set({test: 'paradiddle', work: 'good flam'});
     assert.equal(a.test, 'paradiddle');
     assert.equal(a.work, 'good flam');
     var b = new Subdocument();
@@ -113,7 +112,7 @@ describe('types.document', function() {
 
     var m2 = new Movie;
     delete m2._doc._id;
-    m2.init({ _id: new mongoose.Types.ObjectId });
+    m2.init({_id: new mongoose.Types.ObjectId});
     assert.equal(m2.id, m2.$__._id);
     assert.strictEqual(true, m.$__._id !== m2.$__._id);
     assert.strictEqual(true, m.id !== m2.id);
@@ -125,17 +124,17 @@ describe('types.document', function() {
     var db = start();
     var Movie = db.model('Movie');
 
-    var super8 = new Movie({ title: 'Super 8' });
+    var super8 = new Movie({title: 'Super 8'});
 
     var id1 = '4e3d5fc7da5d7eb635063c96';
     var id2 = '4e3d5fc7da5d7eb635063c97';
     var id3 = '4e3d5fc7da5d7eb635063c98';
     var id4 = '4e3d5fc7da5d7eb635063c99';
 
-    super8.ratings.push({ stars: 9, _id: id1 });
-    super8.ratings.push({ stars: 8, _id: id2 });
-    super8.ratings.push({ stars: 7, _id: id3 });
-    super8.ratings.push({ stars: 6, _id: id4 });
+    super8.ratings.push({stars: 9, _id: id1});
+    super8.ratings.push({stars: 8, _id: id2});
+    super8.ratings.push({stars: 7, _id: id3});
+    super8.ratings.push({stars: 6, _id: id4});
 
     super8.save(function(err) {
       assert.ifError(err);
@@ -158,7 +157,7 @@ describe('types.document', function() {
           assert.ifError(err);
 
           assert.equal(movie.title, 'Super 8');
-          assert.equal(movie.ratings.length,3);
+          assert.equal(movie.ratings.length, 3);
           assert.equal(movie.ratings.id(id1).stars.valueOf(), 5);
           assert.equal(movie.ratings.id(id3).stars.valueOf(), 4);
           assert.equal(movie.ratings.id(id4).stars.valueOf(), 3);
@@ -172,7 +171,7 @@ describe('types.document', function() {
 
             Movie.findById(super8._id, function(err, movie) {
               assert.ifError(err);
-              assert.equal(movie.ratings.length,2);
+              assert.equal(movie.ratings.length, 2);
               assert.equal(movie.ratings.id(id1).stars.valueOf(), 2);
               assert.equal(movie.ratings.id(id4).stars.valueOf(), 1);
 
@@ -199,12 +198,12 @@ describe('types.document', function() {
       var Movie = db.model('Movie');
 
       Movie.create({
-        title: 'Life of Pi'
-        , ratings: [{
+        title: 'Life of Pi',
+        ratings: [{
           description: {
             source: {
-              url: 'http://www.imdb.com/title/tt0454876/'
-                    , time: new Date
+              url: 'http://www.imdb.com/title/tt0454876/',
+              time: new Date
             }
           }
         }]
@@ -215,7 +214,7 @@ describe('types.document', function() {
           assert.ifError(err);
 
           assert.ok(movie.ratings[0].description.source.time instanceof Date);
-          movie.ratings[0].description.source = { url: 'http://www.lifeofpimovie.com/' };
+          movie.ratings[0].description.source = {url: 'http://www.lifeofpimovie.com/'};
 
           movie.save(function(err) {
             assert.ifError(err);
@@ -229,7 +228,7 @@ describe('types.document', function() {
               assert.equal(undefined, movie.ratings[0].description.source.time);
 
               var newDate = new Date;
-              movie.ratings[0].set('description.source.time', newDate, { merge: true });
+              movie.ratings[0].set('description.source.time', newDate, {merge: true});
               movie.save(function(err) {
                 assert.ifError(err);
 
@@ -247,5 +246,4 @@ describe('types.document', function() {
       });
     });
   });
-
 });

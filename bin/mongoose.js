@@ -1,6 +1,4 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-/* eslint no-unused-vars: 1 */
-
 /**
  * ES6 Promise wrapper constructor.
  *
@@ -18,8 +16,8 @@
  * @api public
  */
 
-function ES6Promise(fn) {
-  throw 'Can\'t use ES6 promise with mpromise style constructor';
+function ES6Promise() {
+  throw new Error('Can\'t use ES6 promise with mpromise style constructor');
 }
 
 ES6Promise.use = function(Promise) {
@@ -30,6 +28,8 @@ module.exports = ES6Promise;
 
 },{}],2:[function(require,module,exports){
 (function (Buffer){
+/* eslint-env browser */
+
 /**
  * The [MongooseError](#error_MongooseError) constructor.
  *
@@ -156,8 +156,9 @@ var NodeJSDocument = require('./document'),
  */
 
 function Document(obj, schema, fields, skipId, skipInit) {
-  if ( !(this instanceof Document) )
-    return new Document( obj, schema, fields, skipId, skipInit );
+  if (!(this instanceof Document)) {
+    return new Document(obj, schema, fields, skipId, skipInit);
+  }
 
 
   if (utils.isObject(schema) && !schema.instanceOfSchema) {
@@ -168,15 +169,15 @@ function Document(obj, schema, fields, skipId, skipInit) {
   schema = this.schema || schema;
 
   // Generate ObjectId if it is missing, but it requires a scheme
-  if ( !this.schema && schema.options._id ) {
+  if (!this.schema && schema.options._id) {
     obj = obj || {};
 
-    if ( obj._id === undefined ) {
+    if (obj._id === undefined) {
       obj._id = new ObjectId();
     }
   }
 
-  if ( !schema ) {
+  if (!schema) {
     throw new MongooseError.MissingSchemaError();
   }
 
@@ -187,9 +188,9 @@ function Document(obj, schema, fields, skipId, skipInit) {
   this.isNew = true;
   this.errors = undefined;
 
-  //var schema = this.schema;
+  // var schema = this.schema;
 
-  if ('boolean' === typeof fields) {
+  if (typeof fields === 'boolean') {
     this.$__.strictMode = fields;
     fields = undefined;
   } else {
@@ -205,19 +206,19 @@ function Document(obj, schema, fields, skipId, skipInit) {
   this.$__.emitter.setMaxListeners(0);
   this._doc = this.$__buildDoc(obj, fields, skipId);
 
-  if ( !skipInit && obj ) {
-    this.init( obj );
+  if (!skipInit && obj) {
+    this.init(obj);
   }
 
   this.$__registerHooksFromSchema();
 
   // apply methods
-  for ( var m in schema.methods ) {
-    this[ m ] = schema.methods[ m ];
+  for (var m in schema.methods) {
+    this[m] = schema.methods[m];
   }
   // apply statics
-  for ( var s in schema.statics ) {
-    this[ s ] = schema.statics[ s ];
+  for (var s in schema.statics) {
+    this[s] = schema.statics[s];
   }
 }
 
@@ -227,12 +228,9 @@ function Document(obj, schema, fields, skipId, skipInit) {
 Document.prototype = Object.create(NodeJSDocument.prototype);
 Document.prototype.constructor = Document;
 
-
-
 /*!
  * Module exports.
  */
-
 Document.ValidationError = ValidationError;
 module.exports = exports = Document;
 
@@ -266,32 +264,27 @@ var cast = module.exports = function(schema, obj) {
     path = paths[i];
     val = obj[path];
 
-    if ('$or' === path || '$nor' === path || '$and' === path) {
+    if (path === '$or' || path === '$nor' || path === '$and') {
       var k = val.length;
 
       while (k--) {
         val[k] = cast(schema, val[k]);
       }
-
     } else if (path === '$where') {
       type = typeof val;
 
-      if ('string' !== type && 'function' !== type) {
-        throw new Error("Must have a string or function for $where");
+      if (type !== 'string' && type !== 'function') {
+        throw new Error('Must have a string or function for $where');
       }
 
-      if ('function' === type) {
+      if (type === 'function') {
         obj[path] = val.toString();
       }
 
       continue;
-
     } else if (path === '$elemMatch') {
-
       val = cast(schema, val);
-
     } else {
-
       if (!schema) {
         // no casting for Mixed types
         continue;
@@ -311,7 +304,9 @@ var cast = module.exports = function(schema, obj) {
         while (j--) {
           pathFirstHalf = split.slice(0, j).join('.');
           schematype = schema.path(pathFirstHalf);
-          if (schematype) break;
+          if (schematype) {
+            break;
+          }
         }
 
         // If a substring of the input path resolves to an actual real path...
@@ -348,25 +343,23 @@ var cast = module.exports = function(schema, obj) {
             val.$maxDistance = numbertype.castForQuery(val.$maxDistance);
           }
 
-          if ('$within' == geo) {
+          if (geo === '$within') {
             var withinType = value.$center
-                          || value.$centerSphere
-                          || value.$box
-                          || value.$polygon;
+                || value.$centerSphere
+                || value.$box
+                || value.$polygon;
 
             if (!withinType) {
               throw new Error('Bad $within paramater: ' + JSON.stringify(val));
             }
 
             value = withinType;
-
-          } else if ('$near' == geo &&
-              'string' == typeof value.type && Array.isArray(value.coordinates)) {
+          } else if (geo === '$near' &&
+              typeof value.type === 'string' && Array.isArray(value.coordinates)) {
             // geojson; cast the coordinates
             value = value.coordinates;
-
-          } else if (('$near' == geo || '$nearSphere' == geo || '$geoIntersects' == geo) &&
-              value.$geometry && 'string' == typeof value.$geometry.type &&
+          } else if ((geo === '$near' || geo === '$nearSphere' || geo === '$geoIntersects') &&
+              value.$geometry && typeof value.$geometry.type === 'string' &&
               Array.isArray(value.$geometry.coordinates)) {
             // geojson; cast the coordinates
             value = value.$geometry.coordinates;
@@ -396,12 +389,10 @@ var cast = module.exports = function(schema, obj) {
             }
           })(value);
         }
-
       } else if (val === null || val === undefined) {
         obj[path] = null;
         continue;
-      } else if ('Object' === val.constructor.name) {
-
+      } else if (val.constructor.name === 'Object') {
         any$conditionals = Object.keys(val).some(function(k) {
           return k.charAt(0) === '$' && k !== '$id' && k !== '$ref';
         });
@@ -409,7 +400,6 @@ var cast = module.exports = function(schema, obj) {
         if (!any$conditionals) {
           obj[path] = schematype.castForQuery(val);
         } else {
-
           var ks = Object.keys(val),
               $cond;
 
@@ -419,21 +409,21 @@ var cast = module.exports = function(schema, obj) {
             $cond = ks[k];
             nested = val[$cond];
 
-            if ('$exists' === $cond) {
-              if ('boolean' !== typeof nested) {
-                throw new Error("$exists parameter must be Boolean");
+            if ($cond === '$exists') {
+              if (typeof nested !== 'boolean') {
+                throw new Error('$exists parameter must be Boolean');
               }
               continue;
             }
 
-            if ('$type' === $cond) {
-              if ('number' !== typeof nested) {
-                throw new Error("$type parameter must be Number");
+            if ($cond === '$type') {
+              if (typeof nested !== 'number') {
+                throw new Error('$type parameter must be Number');
               }
               continue;
             }
 
-            if ('$not' === $cond) {
+            if ($cond === '$not') {
               cast(schema, nested);
             } else {
               val[$cond] = schematype.castForQuery($cond, nested);
@@ -451,8 +441,6 @@ var cast = module.exports = function(schema, obj) {
 
 },{"./schema/index":33,"./utils":48}],5:[function(require,module,exports){
 (function (process,Buffer){
-/* eslint no-unused-vars: 1 */
-
 /*!
  * Module dependencies.
  */
@@ -497,7 +485,7 @@ function Document(obj, fields, skipId) {
 
   var schema = this.schema;
 
-  if ('boolean' === typeof fields) {
+  if (typeof fields === 'boolean') {
     this.$__.strictMode = fields;
     fields = undefined;
   } else {
@@ -518,12 +506,12 @@ function Document(obj, fields, skipId) {
   }
 
   if (!schema.options.strict && obj) {
-    var self = this,
+    var _this = this,
         keys = Object.keys(this._doc);
 
     keys.forEach(function(key) {
       if (!(key in schema.tree)) {
-        defineKey(key, null, self);
+        defineKey(key, null, _this);
       }
     });
   }
@@ -536,13 +524,13 @@ function Document(obj, fields, skipId) {
  * `on`, `once`, etc.
  */
 utils.each(
-  ['on', 'once', 'emit', 'listeners', 'removeListener', 'setMaxListeners',
-    'removeAllListeners', 'addListener'],
-  function(emitterFn) {
-    Document.prototype[emitterFn] = function() {
-      return this.$__.emitter[emitterFn].apply(this.$__.emitter, arguments);
-    };
-  });
+    ['on', 'once', 'emit', 'listeners', 'removeListener', 'setMaxListeners',
+      'removeAllListeners', 'addListener'],
+    function(emitterFn) {
+      Document.prototype[emitterFn] = function() {
+        return this.$__.emitter[emitterFn].apply(this.$__.emitter, arguments);
+      };
+    });
 
 Document.prototype.constructor = Document;
 
@@ -606,11 +594,11 @@ Document.prototype.$__buildDoc = function(obj, fields, skipId) {
   var exclude = null;
   var keys;
   var ki;
-  var self = this;
+  var _this = this;
 
   // determine if this doc is a result of a query with
   // excluded fields
-  if (fields && 'Object' === utils.getFunctionName(fields.constructor)) {
+  if (fields && utils.getFunctionName(fields.constructor) === 'Object') {
     keys = Object.keys(fields);
     ki = keys.length;
 
@@ -619,7 +607,7 @@ Document.prototype.$__buildDoc = function(obj, fields, skipId) {
     } else {
       while (ki--) {
         if (keys[ki] !== '_id' &&
-          (!fields[keys[ki]] || typeof fields[keys[ki]] !== 'object')) {
+            (!fields[keys[ki]] || typeof fields[keys[ki]] !== 'object')) {
           exclude = !fields[keys[ki]];
           break;
         }
@@ -634,9 +622,13 @@ Document.prototype.$__buildDoc = function(obj, fields, skipId) {
   for (; ii < plen; ++ii) {
     var p = paths[ii];
 
-    if ('_id' == p) {
-      if (skipId) continue;
-      if (obj && '_id' in obj) continue;
+    if (p === '_id') {
+      if (skipId) {
+        continue;
+      }
+      if (obj && '_id' in obj) {
+        continue;
+      }
     }
 
     var type = this.schema.paths[p];
@@ -656,7 +648,9 @@ Document.prototype.$__buildDoc = function(obj, fields, skipId) {
 
       // support excluding intermediary levels
       if (exclude === true) {
-        if (curPath in fields) break;
+        if (curPath in fields) {
+          break;
+        }
       } else if (fields && curPath in fields) {
         included = true;
       }
@@ -665,27 +659,28 @@ Document.prototype.$__buildDoc = function(obj, fields, skipId) {
         if (fields && exclude !== null) {
           if (exclude === true) {
             // apply defaults to all non-excluded fields
-            if (p in fields) continue;
-
-            def = type.getDefault(self, true);
-            if ('undefined' !== typeof def) {
-              doc_[piece] = def;
-              self.$__.activePaths.default(p);
+            if (p in fields) {
+              continue;
             }
 
+            def = type.getDefault(_this, true);
+            if (typeof def !== 'undefined') {
+              doc_[piece] = def;
+              _this.$__.activePaths.default(p);
+            }
           } else if (included) {
             // selected field
-            def = type.getDefault(self, true);
-            if ('undefined' !== typeof def) {
+            def = type.getDefault(_this, true);
+            if (typeof def !== 'undefined') {
               doc_[piece] = def;
-              self.$__.activePaths.default(p);
+              _this.$__.activePaths.default(p);
             }
           }
         } else {
-          def = type.getDefault(self, true);
-          if ('undefined' !== typeof def) {
+          def = type.getDefault(_this, true);
+          if (typeof def !== 'undefined') {
             doc_[piece] = def;
-            self.$__.activePaths.default(p);
+            _this.$__.activePaths.default(p);
           }
         }
       } else {
@@ -712,7 +707,7 @@ Document.prototype.init = function(doc, opts, fn) {
   // do not prefix this method with $__ since its
   // used by public hooks
 
-  if ('function' == typeof opts) {
+  if (typeof opts === 'function') {
     fn = opts;
     opts = null;
   }
@@ -721,7 +716,7 @@ Document.prototype.init = function(doc, opts, fn) {
 
   // handle docs with populated paths
   // If doc._id is not null or undefined
-  if (doc._id != null && opts && opts.populated && opts.populated.length) {
+  if (doc._id !== null && opts && opts.populated && opts.populated.length) {
     var id = String(doc._id);
     for (var i = 0; i < opts.populated.length; ++i) {
       var item = opts.populated[i];
@@ -733,7 +728,9 @@ Document.prototype.init = function(doc, opts, fn) {
   this.$__storeShard();
 
   this.emit('init', this);
-  if (fn) fn(null);
+  if (fn) {
+    fn(null);
+  }
   return this;
 };
 
@@ -761,9 +758,11 @@ function init(self, obj, doc, prefix) {
     schema = self.schema.path(path);
 
     if (!schema && utils.isObject(obj[i]) &&
-        (!obj[i].constructor || 'Object' == utils.getFunctionName(obj[i].constructor))) {
+        (!obj[i].constructor || utils.getFunctionName(obj[i].constructor) === 'Object')) {
       // assume nested object
-      if (!doc[i]) doc[i] = {};
+      if (!doc[i]) {
+        doc[i] = {};
+      }
       init(self, obj[i], doc[i], path + '.');
     } else {
       if (obj[i] === null) {
@@ -807,7 +806,9 @@ function init(self, obj, doc, prefix) {
 Document.prototype.$__storeShard = function() {
   // backwards compat
   var key = this.schema.options.shardKey || this.schema.options.shardkey;
-  if (!(key && 'Object' == utils.getFunctionName(key.constructor))) return;
+  if (!(key && utils.getFunctionName(key.constructor) === 'Object')) {
+    return;
+  }
 
   var orig = this.$__.shardval = {},
       paths = Object.keys(key),
@@ -817,10 +818,10 @@ Document.prototype.$__storeShard = function() {
   for (var i = 0; i < len; ++i) {
     val = this.getValue(paths[i]);
     if (isMongooseObject(val)) {
-      orig[paths[i]] = val.toObject({ depopulate: true });
-    } else if (null != val &&
+      orig[paths[i]] = val.toObject({depopulate: true});
+    } else if (val !== null &&
         val.valueOf &&
-        // Explicitly don't take value of dates
+          // Explicitly don't take value of dates
         (!val.constructor || utils.getFunctionName(val.constructor) !== 'Date')) {
       orig[paths[i]] = val.valueOf();
     } else {
@@ -889,43 +890,42 @@ Document.prototype.update = function update() {
  *
  * @param {String|Object} path path or object of key/vals to set
  * @param {Any} val the value to set
- * @param {Schema|String|Number|Buffer|etc..} [type] optionally specify a type for "on-the-fly" attributes
+ * @param {Schema|String|Number|Buffer|*} [type] optionally specify a type for "on-the-fly" attributes
  * @param {Object} [options] optionally specify options that modify the behavior of the set
  * @api public
  */
 
 Document.prototype.set = function(path, val, type, options) {
-  if (type && 'Object' == utils.getFunctionName(type.constructor)) {
+  if (type && utils.getFunctionName(type.constructor) === 'Object') {
     options = type;
     type = undefined;
   }
 
   var merge = options && options.merge,
-      adhoc = type && true !== type,
-      constructing = true === type,
+      adhoc = type && type !== true,
+      constructing = type === true,
       adhocs;
 
   var strict = options && 'strict' in options
-    ? options.strict
-    : this.$__.strictMode;
+      ? options.strict
+      : this.$__.strictMode;
 
   if (adhoc) {
     adhocs = this.$__.adhocPaths || (this.$__.adhocPaths = {});
     adhocs[path] = Schema.interpretAsType(path, type, this.schema.options);
   }
 
-  if ('string' !== typeof path) {
+  if (typeof path !== 'string') {
     // new Document({ key: val })
 
-    if (null === path || undefined === path) {
+    if (path === null || path === void 0) {
       var _ = path;
       path = val;
       val = _;
-
     } else {
       var prefix = val
-        ? val + '.'
-        : '';
+          ? val + '.'
+          : '';
 
       if (path instanceof Document) {
         if (path.$__isNested) {
@@ -945,30 +945,30 @@ Document.prototype.set = function(path, val, type, options) {
         var pathName = prefix + key;
         pathtype = this.schema.pathType(pathName);
 
-        if (null != path[key]
-            // need to know if plain object - no Buffer, ObjectId, ref, etc
+        if (path[key] !== null
+              // need to know if plain object - no Buffer, ObjectId, ref, etc
             && utils.isObject(path[key])
-            && (!path[key].constructor || 'Object' == utils.getFunctionName(path[key].constructor))
-            && 'virtual' !== pathtype
-            && 'real' !== pathtype
+            && (!path[key].constructor || utils.getFunctionName(path[key].constructor) === 'Object')
+            && pathtype !== 'virtual'
+            && pathtype !== 'real'
             && !(this.$__path(pathName) instanceof MixedSchema)
             && !(this.schema.paths[pathName] &&
-              this.schema.paths[pathName].options &&
-              this.schema.paths[pathName].options.ref)) {
+            this.schema.paths[pathName].options &&
+            this.schema.paths[pathName].options.ref)) {
           this.set(path[key], prefix + key, constructing);
         } else if (strict) {
-          if ('real' === pathtype || 'virtual' === pathtype) {
+          if (pathtype === 'real' || pathtype === 'virtual') {
             // Check for setting single embedded schema to document (gh-3535)
             if (this.schema.paths[pathName] &&
                 this.schema.paths[pathName].$isSingleNested &&
                 path[key] instanceof Document) {
-              path[key] = path[key].toObject({ virtuals: false });
+              path[key] = path[key].toObject({virtuals: false});
             }
             this.set(prefix + key, path[key], constructing);
           } else if (pathtype === 'nested' && path[key] instanceof Document) {
             this.set(prefix + key,
-              path[key].toObject({ virtuals: false }), constructing);
-          } else if ('throw' == strict) {
+                path[key].toObject({virtuals: false}), constructing);
+          } else if (strict === 'throw') {
             if (pathtype === 'nested') {
               throw new ObjectExpectedError(key, path[key]);
             } else {
@@ -988,10 +988,12 @@ Document.prototype.set = function(path, val, type, options) {
   // docschema = new Schema({ path: { nest: 'string' }})
   // doc.set('path', obj);
   var pathType = this.schema.pathType(path);
-  if ('nested' == pathType && val) {
+  if (pathType === 'nested' && val) {
     if (utils.isObject(val) &&
-        (!val.constructor || 'Object' == utils.getFunctionName(val.constructor))) {
-      if (!merge) this.setValue(path, null);
+        (!val.constructor || utils.getFunctionName(val.constructor) === 'Object')) {
+      if (!merge) {
+        this.setValue(path, null);
+      }
       this.set(val, path, constructing);
       return this;
     }
@@ -1002,8 +1004,7 @@ Document.prototype.set = function(path, val, type, options) {
   var schema;
   var parts = path.split('.');
 
-  if ('adhocOrUndefined' == pathType && strict) {
-
+  if (pathType === 'adhocOrUndefined' && strict) {
     // check for roots that are Mixed types
     var mixed;
 
@@ -1018,13 +1019,12 @@ Document.prototype.set = function(path, val, type, options) {
     }
 
     if (!mixed) {
-      if ('throw' == strict) {
+      if (strict === 'throw') {
         throw new StrictModeError(path);
       }
       return this;
     }
-
-  } else if ('virtual' == pathType) {
+  } else if (pathType === 'virtual') {
     schema = this.schema.virtualpath(path);
     schema.applySetters(val, this);
     return this;
@@ -1043,20 +1043,22 @@ Document.prototype.set = function(path, val, type, options) {
     for (i = 0; i < parts.length; ++i) {
       subpath = parts.slice(0, i + 1).join('.');
       if (this.isDirectModified(subpath) // earlier prefixes that are already
-                                         // marked as dirty have precedence
+            // marked as dirty have precedence
           || this.get(subpath) === null) {
         pathToMark = subpath;
         break;
       }
     }
 
-    if (!pathToMark) pathToMark = path;
+    if (!pathToMark) {
+      pathToMark = path;
+    }
   }
 
   // if this doc is being constructed we should not trigger getters
   var priorVal = constructing
-    ? undefined
-    : this.getValue(path);
+      ? undefined
+      : this.getValue(path);
 
   if (!schema) {
     this.$__set(pathToMark, path, constructing, parts, schema, val, priorVal);
@@ -1074,9 +1076,9 @@ Document.prototype.set = function(path, val, type, options) {
         schema.options.ref === val.constructor.modelName) {
       if (this.ownerDocument) {
         this.ownerDocument().populated(this.$__fullPath(path),
-          val._id, { model: val.constructor });
+            val._id, {model: val.constructor});
       } else {
-        this.populated(path, val._id, { model: val.constructor });
+        this.populated(path, val._id, {model: val.constructor});
       }
       didPopulate = true;
     }
@@ -1092,11 +1094,16 @@ Document.prototype.set = function(path, val, type, options) {
         schema.options.type[0].ref === val[0].constructor.modelName) {
       if (this.ownerDocument) {
         this.ownerDocument().populated(this.$__fullPath(path),
-          val.map(function(v) { return v._id; }),
-          { model: val[0].constructor });
+            val.map(function(v) {
+              return v._id;
+            }),
+            {model: val[0].constructor});
       } else {
-        this.populated(path, val.map(function(v) { return v._id; }),
-          { model: val[0].constructor });
+        this.populated(path, val
+        .map(function(v) {
+          return v._id;
+        }),
+            {model: val[0].constructor});
       }
       didPopulate = true;
     }
@@ -1113,7 +1120,7 @@ Document.prototype.set = function(path, val, type, options) {
       reason = e;
     }
     this.invalidate(path,
-      new MongooseError.CastError(schema.instance, val, path, reason));
+        new MongooseError.CastError(schema.instance, val, path, reason));
     shouldSet = false;
   }
 
@@ -1133,10 +1140,10 @@ Document.prototype.set = function(path, val, type, options) {
  * @memberOf Document
  */
 
-Document.prototype.$__shouldModify = function(
-    pathToMark, path, constructing, parts, schema, val, priorVal) {
-
-  if (this.isNew) return true;
+Document.prototype.$__shouldModify = function(pathToMark, path, constructing, parts, schema, val, priorVal) {
+  if (this.isNew) {
+    return true;
+  }
 
   if (undefined === val && !this.isSelected(path)) {
     // when a path is not selected in a query, its initial
@@ -1154,7 +1161,7 @@ Document.prototype.$__shouldModify = function(
   }
 
   if (!constructing &&
-      null != val &&
+      val !== null &&
       path in this.$__.activePaths.states.default &&
       deepEqual(val, schema.getDefault(this, constructing))) {
     // a path with a default was $unset on the server
@@ -1172,8 +1179,7 @@ Document.prototype.$__shouldModify = function(
  * @memberOf Document
  */
 
-Document.prototype.$__set = function(
-    pathToMark, path, constructing, parts, schema, val, priorVal) {
+Document.prototype.$__set = function(pathToMark, path, constructing, parts, schema, val/* , priorVal */) {
   Embedded = Embedded || require('./types/embedded');
 
   var shouldModify = this.$__shouldModify.apply(this, arguments);
@@ -1208,7 +1214,7 @@ Document.prototype.$__set = function(
     if (last) {
       obj[parts[i]] = val;
     } else {
-      if (obj[parts[i]] && 'Object' === utils.getFunctionName(obj[parts[i]].constructor)) {
+      if (obj[parts[i]] && utils.getFunctionName(obj[parts[i]].constructor) === 'Object') {
         obj = obj[parts[i]];
       } else if (obj[parts[i]] && obj[parts[i]] instanceof Embedded) {
         obj = obj[parts[i]];
@@ -1259,7 +1265,7 @@ Document.prototype.setValue = function(path, val) {
  *     doc.get('age', String) // "47"
  *
  * @param {String} path
- * @param {Schema|String|Number|Buffer|etc..} [type] optionally specify a type for on-the-fly attributes
+ * @param {Schema|String|Number|Buffer|*} [type] optionally specify a type for on-the-fly attributes
  * @api public
  */
 
@@ -1274,9 +1280,9 @@ Document.prototype.get = function(path, type) {
       obj = this._doc;
 
   for (var i = 0, l = pieces.length; i < l; i++) {
-    obj = undefined === obj || null === obj
-      ? undefined
-      : obj[pieces[i]];
+    obj = obj === null || obj === void 0
+        ? undefined
+        : obj[pieces[i]];
   }
 
   if (adhoc) {
@@ -1307,9 +1313,8 @@ Document.prototype.$__path = function(path) {
 
   if (adhocType) {
     return adhocType;
-  } else {
-    return this.schema.path(path);
   }
+  return this.schema.path(path);
 };
 
 /**
@@ -1369,8 +1374,8 @@ Document.prototype.modifiedPaths = function() {
 
 Document.prototype.isModified = function(path) {
   return path
-    ? !!~this.modifiedPaths().indexOf(path)
-    : this.$__.activePaths.some('modify');
+      ? !!~this.modifiedPaths().indexOf(path)
+      : this.$__.activePaths.some('modify');
 };
 
 /**
@@ -1438,9 +1443,8 @@ Document.prototype.isInit = function(path) {
 
 Document.prototype.isSelected = function isSelected(path) {
   if (this.$__.selected) {
-
-    if ('_id' === path) {
-      return 0 !== this.$__.selected._id;
+    if (path === '_id') {
+      return this.$__.selected._id !== 0;
     }
 
     var paths = Object.keys(this.$__.selected),
@@ -1448,14 +1452,16 @@ Document.prototype.isSelected = function isSelected(path) {
         inclusive = false,
         cur;
 
-    if (1 === i && '_id' === paths[0]) {
+    if (i === 1 && paths[0] === '_id') {
       // only _id was selected.
-      return 0 === this.$__.selected._id;
+      return this.$__.selected._id === 0;
     }
 
     while (i--) {
       cur = paths[i];
-      if ('_id' == cur) continue;
+      if (cur === '_id') {
+        continue;
+      }
       inclusive = !!this.$__.selected[cur];
       break;
     }
@@ -1469,13 +1475,15 @@ Document.prototype.isSelected = function isSelected(path) {
 
     while (i--) {
       cur = paths[i];
-      if ('_id' == cur) continue;
+      if (cur === '_id') {
+        continue;
+      }
 
-      if (0 === cur.indexOf(pathDot)) {
+      if (cur.indexOf(pathDot) === 0) {
         return inclusive;
       }
 
-      if (0 === pathDot.indexOf(cur + '.')) {
+      if (pathDot.indexOf(cur + '.') === 0) {
         return inclusive;
       }
     }
@@ -1536,28 +1544,28 @@ Document.prototype.validate = function(options, callback) {
  */
 
 Document.prototype.$__validate = function(callback) {
-  var self = this;
+  var _this = this;
   var _complete = function() {
-    var err = self.$__.validationError;
-    self.$__.validationError = undefined;
-    self.emit('validate', self);
+    var err = _this.$__.validationError;
+    _this.$__.validationError = undefined;
+    _this.emit('validate', _this);
     if (err) {
       for (var key in err.errors) {
         // Make sure cast errors persist
-        if (!self.__parent && err.errors[key] instanceof MongooseError.CastError) {
-          self.invalidate(key, err.errors[key]);
+        if (!_this.__parent && err.errors[key] instanceof MongooseError.CastError) {
+          _this.invalidate(key, err.errors[key]);
         }
       }
 
       return err;
-    } else {
-      return;
     }
   };
 
   // only validate required fields when necessary
   var paths = Object.keys(this.$__.activePaths.states.require).filter(function(path) {
-    if (!self.isSelected(path) && !self.isModified(path)) return false;
+    if (!_this.isSelected(path) && !_this.isModified(path)) {
+      return false;
+    }
     return true;
   });
 
@@ -1565,7 +1573,7 @@ Document.prototype.$__validate = function(callback) {
   paths = paths.concat(Object.keys(this.$__.activePaths.states.modify));
   paths = paths.concat(Object.keys(this.$__.activePaths.states.default));
 
-  if (0 === paths.length) {
+  if (paths.length === 0) {
     process.nextTick(function() {
       var err = _complete();
       if (err) {
@@ -1583,9 +1591,8 @@ Document.prototype.$__validate = function(callback) {
   // the children as well
   for (var i = 0; i < paths.length; ++i) {
     var path = paths[i];
-    var val = self.getValue(path);
-    if (val && val.isMongooseArray && !Buffer.isBuffer(val) &&
-        !val.isMongooseDocumentArray) {
+    var val = _this.getValue(path);
+    if (val && val.isMongooseArray && !Buffer.isBuffer(val) && !val.isMongooseDocumentArray) {
       var numElements = val.length;
       for (var j = 0; j < numElements; ++j) {
         paths.push(path + '.' + j);
@@ -1603,30 +1610,32 @@ Document.prototype.$__validate = function(callback) {
   };
 
   var validatePath = function(path) {
-    if (validating[path]) return;
+    if (validating[path]) {
+      return;
+    }
 
     validating[path] = true;
     total++;
 
     process.nextTick(function() {
-      var p = self.schema.path(path);
+      var p = _this.schema.path(path);
       if (!p) {
         return --total || complete();
       }
 
       // If user marked as invalid or there was a cast error, don't validate
-      if (!self.$isValid(path)) {
+      if (!_this.$isValid(path)) {
         --total || complete();
         return;
       }
 
-      var val = self.getValue(path);
+      var val = _this.getValue(path);
       p.doValidate(val, function(err) {
         if (err) {
-          self.invalidate(path, err, undefined, true);
+          _this.invalidate(path, err, undefined, true);
         }
         --total || complete();
-      }, self);
+      }, _this);
     });
   };
 
@@ -1655,7 +1664,7 @@ Document.prototype.$__validate = function(callback) {
  */
 
 Document.prototype.validateSync = function(pathsToValidate) {
-  var self = this;
+  var _this = this;
 
   if (typeof pathsToValidate === 'string') {
     pathsToValidate = pathsToValidate.split(' ');
@@ -1663,7 +1672,9 @@ Document.prototype.validateSync = function(pathsToValidate) {
 
   // only validate required fields when necessary
   var paths = Object.keys(this.$__.activePaths.states.require).filter(function(path) {
-    if (!self.isSelected(path) && !self.isModified(path)) return false;
+    if (!_this.isSelected(path) && !_this.isModified(path)) {
+      return false;
+    }
     return true;
   });
 
@@ -1684,32 +1695,36 @@ Document.prototype.validateSync = function(pathsToValidate) {
   var validating = {};
 
   paths.forEach(function(path) {
-    if (validating[path]) return;
-
-    validating[path] = true;
-
-    var p = self.schema.path(path);
-    if (!p) return;
-    if (!self.$isValid(path)) {
+    if (validating[path]) {
       return;
     }
 
-    var val = self.getValue(path);
-    var err = p.doValidateSync(val, self);
+    validating[path] = true;
+
+    var p = _this.schema.path(path);
+    if (!p) {
+      return;
+    }
+    if (!_this.$isValid(path)) {
+      return;
+    }
+
+    var val = _this.getValue(path);
+    var err = p.doValidateSync(val, _this);
     if (err) {
-      self.invalidate(path, err, undefined, true);
+      _this.invalidate(path, err, undefined, true);
     }
   });
 
-  var err = self.$__.validationError;
-  self.$__.validationError = undefined;
-  self.emit('validate', self);
+  var err = _this.$__.validationError;
+  _this.$__.validationError = undefined;
+  _this.emit('validate', _this);
 
   if (err) {
     for (var key in err.errors) {
       // Make sure cast errors persist
       if (err.errors[key] instanceof MongooseError.CastError) {
-        self.invalidate(key, err.errors[key]);
+        _this.invalidate(key, err.errors[key]);
       }
     }
   }
@@ -1751,9 +1766,11 @@ Document.prototype.invalidate = function(path, err, val) {
     this.$__.validationError = new ValidationError(this);
   }
 
-  if (this.$__.validationError.errors[path]) return;
+  if (this.$__.validationError.errors[path]) {
+    return;
+  }
 
-  if (!err || 'string' === typeof err) {
+  if (!err || typeof err === 'string') {
     err = new ValidatorError({
       path: path,
       message: err,
@@ -1762,7 +1779,9 @@ Document.prototype.invalidate = function(path, err, val) {
     });
   }
 
-  if (this.$__.validationError == err) return;
+  if (this.$__.validationError === err) {
+    return;
+  }
 
   this.$__.validationError.errors[path] = err;
 };
@@ -1810,12 +1829,12 @@ Document.prototype.$isValid = function(path) {
  */
 
 Document.prototype.$__reset = function reset() {
-  var self = this;
+  var _this = this;
   DocumentArray || (DocumentArray = require('./types/documentarray'));
 
   this.$__.activePaths
   .map('init', 'modify', function(i) {
-    return self.getValue(i);
+    return _this.getValue(i);
   })
   .filter(function(val) {
     return val && val instanceof Array && val.isMongooseDocumentArray && val.length;
@@ -1824,7 +1843,9 @@ Document.prototype.$__reset = function reset() {
     var i = array.length;
     while (i--) {
       var doc = array[i];
-      if (!doc) continue;
+      if (!doc) {
+        continue;
+      }
       doc.$__reset();
     }
   });
@@ -1842,9 +1863,9 @@ Document.prototype.$__reset = function reset() {
   this.$__.activePaths.clear('default');
   this.$__.validationError = undefined;
   this.errors = undefined;
-  self = this;
+  _this = this;
   this.schema.requiredPaths().forEach(function(path) {
-    self.$__.activePaths.require(path);
+    _this.$__.activePaths.require(path);
   });
 
   return this;
@@ -1859,26 +1880,26 @@ Document.prototype.$__reset = function reset() {
  */
 
 Document.prototype.$__dirty = function() {
-  var self = this;
+  var _this = this;
 
   var all = this.$__.activePaths.map('modify', function(path) {
     return {
       path: path,
-      value: self.getValue(path),
-      schema: self.$__path(path)
+      value: _this.getValue(path),
+      schema: _this.$__path(path)
     };
   });
 
   // gh-2558: if we had to set a default and the value is not undefined,
   // we have to save as well
   all = all.concat(this.$__.activePaths.map('default', function(path) {
-    if (path === '_id' || !self.getValue(path)) {
+    if (path === '_id' || !_this.getValue(path)) {
       return;
     }
     return {
       path: path,
-      value: self.getValue(path),
-      schema: self.$__path(path)
+      value: _this.getValue(path),
+      schema: _this.$__path(path)
     };
   }));
 
@@ -1892,7 +1913,7 @@ Document.prototype.$__dirty = function() {
       lastPath,
       top;
 
-  all.forEach(function(item, i) {
+  all.forEach(function(item) {
     if (!item) {
       return;
     }
@@ -1930,12 +1951,12 @@ function compile(tree, proto, prefix, options) {
     key = keys[i];
     limb = tree[key];
 
-    defineKey(key
-        , (('Object' === utils.getFunctionName(limb.constructor)
-               && Object.keys(limb).length)
-               && (!limb[options.typeKey] || (options.typeKey === 'type' && limb.type.type))
-               ? limb
-               : null)
+    defineKey(key,
+        ((utils.getFunctionName(limb.constructor) === 'Object'
+        && Object.keys(limb).length)
+        && (!limb[options.typeKey] || (options.typeKey === 'type' && limb.type.type))
+            ? limb
+            : null)
         , proto
         , prefix
         , keys
@@ -1965,28 +1986,30 @@ function defineKey(prop, subprops, prototype, prefix, keys, options) {
   prefix = prefix || '';
 
   if (subprops) {
-
     Object.defineProperty(prototype, prop, {
       enumerable: true,
       configurable: true,
       get: function() {
-        var _self = this;
-        if (!this.$__.getters)
+        var _this = this;
+        if (!this.$__.getters) {
           this.$__.getters = {};
+        }
 
         if (!this.$__.getters[path]) {
           var nested = Object.create(Object.getPrototypeOf(this), getOwnPropertyDescriptors(this));
 
-            // save scope for nested getters/setters
-          if (!prefix) nested.$__.scope = this;
+          // save scope for nested getters/setters
+          if (!prefix) {
+            nested.$__.scope = this;
+          }
 
-            // shadow inherited getters from sub-objects so
-            // thing.nested.nested.nested... doesn't occur (gh-366)
+          // shadow inherited getters from sub-objects so
+          // thing.nested.nested.nested... doesn't occur (gh-366)
           var i = 0,
               len = keys.length;
 
           for (; i < len; ++i) {
-              // over-write the parents getter without triggering it
+            // over-write the parents getter without triggering it
             Object.defineProperty(nested, keys[i], {
               enumerable: false,    // It doesn't show up.
               writable: true,       // We can set it later.
@@ -2000,7 +2023,7 @@ function defineKey(prop, subprops, prototype, prefix, keys, options) {
             configurable: true,
             writable: false,
             value: function() {
-              return _self.get(path);
+              return _this.get(path);
             }
           });
 
@@ -2009,7 +2032,7 @@ function defineKey(prop, subprops, prototype, prefix, keys, options) {
             configurable: true,
             writable: false,
             value: function() {
-              return _self.get(path);
+              return _this.get(path);
             }
           });
 
@@ -2027,17 +2050,22 @@ function defineKey(prop, subprops, prototype, prefix, keys, options) {
         return this.$__.getters[path];
       },
       set: function(v) {
-        if (v instanceof Document) v = v.toObject();
+        if (v instanceof Document) {
+          v = v.toObject();
+        }
         return (this.$__.scope || this).set(path, v);
       }
     });
-
   } else {
     Object.defineProperty(prototype, prop, {
       enumerable: true,
       configurable: true,
-      get: function() { return this.get.call(this.$__.scope || this, path); },
-      set: function(v) { return this.set.call(this.$__.scope || this, path, v); }
+      get: function() {
+        return this.get.call(this.$__.scope || this, path);
+      },
+      set: function(v) {
+        return this.set.call(this.$__.scope || this, path, v);
+      }
     });
   }
 }
@@ -2070,15 +2098,17 @@ Document.prototype.$__getArrayPathsToValidate = function() {
 
   // validate all document arrays.
   return this.$__.activePaths
-    .map('init', 'modify', function(i) {
-      return this.getValue(i);
-    }.bind(this))
-    .filter(function(val) {
-      return val && val instanceof Array && val.isMongooseDocumentArray && val.length;
-    }).reduce(function(seed, array) {
-      return seed.concat(array);
-    }, [])
-    .filter(function(doc) { return doc;});
+  .map('init', 'modify', function(i) {
+    return this.getValue(i);
+  }.bind(this))
+  .filter(function(val) {
+    return val && val instanceof Array && val.isMongooseDocumentArray && val.length;
+  }).reduce(function(seed, array) {
+    return seed.concat(array);
+  }, [])
+  .filter(function(doc) {
+    return doc;
+  });
 };
 
 
@@ -2097,15 +2127,21 @@ Document.prototype.$__getAllSubdocs = function() {
   function docReducer(seed, path) {
     var val = this[path];
 
-    if (val instanceof Embedded) seed.push(val);
+    if (val instanceof Embedded) {
+      seed.push(val);
+    }
     if (val && val.$isSingleNested) {
       seed = Object.keys(val._doc).reduce(docReducer.bind(val._doc), seed);
       seed.push(val);
     }
     if (val && val.isMongooseDocumentArray) {
       val.forEach(function _docReduce(doc) {
-        if (!doc || !doc._doc) return;
-        if (doc instanceof Embedded) seed.push(doc);
+        if (!doc || !doc._doc) {
+          return;
+        }
+        if (doc instanceof Embedded) {
+          seed.push(doc);
+        }
         seed = Object.keys(doc._doc).reduce(docReducer.bind(doc._doc), seed);
       });
     } else if (val instanceof Document && val.$__isNested) {
@@ -2134,19 +2170,23 @@ Document.prototype.$__registerHooksFromSchema = function() {
   Embedded = Embedded || require('./types/embedded');
   var Promise = PromiseProvider.get();
 
-  var self = this;
-  var q = self.schema && self.schema.callQueue;
-  if (!q.length) return self;
+  var _this = this;
+  var q = _this.schema && _this.schema.callQueue;
+  if (!q.length) {
+    return _this;
+  }
 
   // we are only interested in 'pre' hooks, and group by point-cut
   var toWrap = q.reduce(function(seed, pair) {
     if (pair[0] !== 'pre' && pair[0] !== 'post' && pair[0] !== 'on') {
-      self[pair[0]].apply(self, pair[1]);
+      _this[pair[0]].apply(_this, pair[1]);
       return seed;
     }
     var args = [].slice.call(pair[1]);
     var pointCut = pair[0] === 'on' ? 'post' : args[0];
-    if (!(pointCut in seed)) seed[pointCut] = { post: [], pre: [] };
+    if (!(pointCut in seed)) {
+      seed[pointCut] = {post: [], pre: []};
+    }
     if (pair[0] === 'post') {
       seed[pointCut].post.push(args);
     } else if (pair[0] === 'on') {
@@ -2159,20 +2199,20 @@ Document.prototype.$__registerHooksFromSchema = function() {
 
   // 'post' hooks are simpler
   toWrap.post.forEach(function(args) {
-    self.on.apply(self, args);
+    _this.on.apply(_this, args);
   });
   delete toWrap.post;
 
   // 'init' should be synchronous on subdocuments
-  if (toWrap.init && self instanceof Embedded) {
+  if (toWrap.init && _this instanceof Embedded) {
     if (toWrap.init.pre) {
       toWrap.init.pre.forEach(function(args) {
-        self.pre.apply(self, args);
+        _this.pre.apply(_this, args);
       });
     }
     if (toWrap.init.post) {
       toWrap.init.post.forEach(function(args) {
-        self.post.apply(self, args);
+        _this.post.apply(_this, args);
       });
     }
     delete toWrap.init;
@@ -2180,12 +2220,12 @@ Document.prototype.$__registerHooksFromSchema = function() {
     // Set hooks also need to be sync re: gh-3479
     if (toWrap.set.pre) {
       toWrap.set.pre.forEach(function(args) {
-        self.pre.apply(self, args);
+        _this.pre.apply(_this, args);
       });
     }
     if (toWrap.set.post) {
       toWrap.set.post.forEach(function(args) {
-        self.post.apply(self, args);
+        _this.post.apply(_this, args);
       });
     }
     delete toWrap.set;
@@ -2194,11 +2234,11 @@ Document.prototype.$__registerHooksFromSchema = function() {
   Object.keys(toWrap).forEach(function(pointCut) {
     // this is so we can wrap everything into a promise;
     var newName = ('$__original_' + pointCut);
-    if (!self[pointCut]) {
+    if (!_this[pointCut]) {
       return;
     }
-    self[newName] = self[pointCut];
-    self[pointCut] = function wrappedPointCut() {
+    _this[newName] = _this[pointCut];
+    _this[pointCut] = function wrappedPointCut() {
       var args = [].slice.call(arguments);
       var lastArg = args.pop();
       var fn;
@@ -2211,7 +2251,7 @@ Document.prototype.$__registerHooksFromSchema = function() {
         }
         args.push(function(error, result) {
           if (error) {
-            self.$__handleReject(error);
+            _this.$__handleReject(error);
             fn && fn(error);
             reject(error);
             return;
@@ -2221,20 +2261,20 @@ Document.prototype.$__registerHooksFromSchema = function() {
           resolve(result);
         });
 
-        self[newName].apply(self, args);
+        _this[newName].apply(_this, args);
       });
     };
 
     toWrap[pointCut].pre.forEach(function(args) {
       args[0] = newName;
-      self.pre.apply(self, args);
+      _this.pre.apply(_this, args);
     });
     toWrap[pointCut].post.forEach(function(args) {
       args[0] = newName;
-      self.post.apply(self, args);
+      _this.post.apply(_this, args);
     });
   });
-  return self;
+  return _this;
 };
 
 Document.prototype.$__handleReject = function handleReject(err) {
@@ -2257,7 +2297,7 @@ Document.prototype.$__handleReject = function handleReject(err) {
  */
 
 Document.prototype.$toObject = function(options, json) {
-  var defaultOptions = { transform: true, json: json };
+  var defaultOptions = {transform: true, json: json};
 
   if (options && options.depopulate && !options._skipDepopulateTopLevel && this.$__.wasPopulated) {
     // populated paths that we set to a document
@@ -2272,18 +2312,18 @@ Document.prototype.$toObject = function(options, json) {
 
   // When internally saving this document we always pass options,
   // bypassing the custom schema options.
-  if (!(options && 'Object' == utils.getFunctionName(options.constructor)) ||
+  if (!(options && utils.getFunctionName(options.constructor) === 'Object') ||
       (options && options._useSchemaOptions)) {
     if (json) {
       options = this.schema.options.toJSON ?
-        clone(this.schema.options.toJSON) :
-        {};
+          clone(this.schema.options.toJSON) :
+      {};
       options.json = true;
       options._useSchemaOptions = true;
     } else {
       options = this.schema.options.toObject ?
-        clone(this.schema.options.toObject) :
-        {};
+          clone(this.schema.options.toObject) :
+      {};
       options.json = false;
       options._useSchemaOptions = true;
     }
@@ -2312,7 +2352,7 @@ Document.prototype.$toObject = function(options, json) {
     }
   }
 
-  if (options.virtuals || options.getters && false !== options.virtuals) {
+  if (options.virtuals || options.getters && options.virtuals !== false) {
     applyGetters(this, ret, 'virtuals', options);
   }
 
@@ -2327,9 +2367,8 @@ Document.prototype.$toObject = function(options, json) {
   // child schema has a transform (this.schema.options.toObject) In this case,
   // we need to adjust options.transform to be the child schema's transform and
   // not the parent schema's
-  if (true === transform ||
+  if (transform === true ||
       (this.schema.options.toObject && transform)) {
-
     var opts = options.json ? this.schema.options.toJSON : this.schema.options.toObject;
 
     if (opts) {
@@ -2339,9 +2378,11 @@ Document.prototype.$toObject = function(options, json) {
     options.transform = originalTransform;
   }
 
-  if ('function' == typeof transform) {
+  if (typeof transform === 'function') {
     var xformed = transform(this, ret, options);
-    if ('undefined' != typeof xformed) ret = xformed;
+    if (typeof xformed !== 'undefined') {
+      ret = xformed;
+    }
   }
 
   return ret;
@@ -2497,8 +2538,8 @@ function minimize(obj) {
   }
 
   return hasKeys
-    ? obj
-    : undefined;
+      ? obj
+      : undefined;
 }
 
 /*!
@@ -2564,7 +2605,7 @@ Document.prototype.toJSON = function(options) {
  */
 
 Document.prototype.inspect = function(options) {
-  var opts = options && 'Object' == utils.getFunctionName(options.constructor) ? options : {};
+  var opts = options && utils.getFunctionName(options.constructor) === 'Object' ? options : {};
   opts.minimize = false;
   opts.retainKeyOrder = true;
   return this.toObject(opts);
@@ -2600,8 +2641,8 @@ Document.prototype.equals = function(doc) {
     return deepEqual(this, doc);
   }
   return tid && tid.equals
-    ? tid.equals(docid)
-    : tid === docid;
+      ? tid.equals(docid)
+      : tid === docid;
 };
 
 /**
@@ -2618,7 +2659,7 @@ Document.prototype.equals = function(doc) {
  *       model: 'modelName'
  *       options: opts
  *     }, function (err, user) {
- *       assert(doc._id == user._id) // the document itself is passed
+ *       assert(doc._id === user._id) // the document itself is passed
  *     })
  *
  *     // summary
@@ -2644,13 +2685,15 @@ Document.prototype.equals = function(doc) {
  */
 
 Document.prototype.populate = function populate() {
-  if (0 === arguments.length) return this;
+  if (arguments.length === 0) {
+    return this;
+  }
 
   var pop = this.$__.populate || (this.$__.populate = {});
   var args = utils.args(arguments);
   var fn;
 
-  if ('function' == typeof args[args.length - 1]) {
+  if (typeof args[args.length - 1] === 'function') {
     fn = args.pop();
   }
 
@@ -2733,22 +2776,28 @@ Document.prototype.execPopulate = function() {
 Document.prototype.populated = function(path, val, options) {
   // val and options are internal
 
-  if (val == null) {
-    if (!this.$__.populated) return undefined;
+  if (val === null || val === void 0) {
+    if (!this.$__.populated) {
+      return undefined;
+    }
     var v = this.$__.populated[path];
-    if (v) return v.value;
+    if (v) {
+      return v.value;
+    }
     return undefined;
   }
 
   // internal
 
-  if (true === val) {
-    if (!this.$__.populated) return undefined;
+  if (val === true) {
+    if (!this.$__.populated) {
+      return undefined;
+    }
     return this.$__.populated[path];
   }
 
   this.$__.populated || (this.$__.populated = {});
-  this.$__.populated[path] = { value: val, options: options };
+  this.$__.populated[path] = {value: val, options: options};
   return val;
 };
 
@@ -2802,8 +2851,10 @@ Document.ValidationError = ValidationError;
 module.exports = exports = Document;
 
 }).call(this,require("g5I+bs"),require("buffer").Buffer)
-},{"./error":12,"./error/objectExpected":17,"./error/strict":19,"./internal":23,"./promise_provider":25,"./schema":26,"./schema/mixed":34,"./schematype":39,"./types/array":41,"./types/documentarray":43,"./types/embedded":44,"./utils":48,"buffer":71,"events":74,"g5I+bs":92,"hooks-fixed":75,"util":97}],6:[function(require,module,exports){
+},{"./error":12,"./error/objectExpected":17,"./error/strict":19,"./internal":23,"./promise_provider":25,"./schema":26,"./schema/mixed":34,"./schematype":39,"./types/array":41,"./types/documentarray":43,"./types/embedded":44,"./utils":48,"buffer":71,"events":74,"g5I+bs":94,"hooks-fixed":75,"util":98}],6:[function(require,module,exports){
 'use strict';
+
+/* eslint-env browser */
 
 /*!
  * Module dependencies.
@@ -2819,10 +2870,10 @@ var BrowserDocument = require('./browserDocument.js');
 module.exports = function() {
   if (typeof window !== 'undefined' && typeof document !== 'undefined' && document === window.document) {
     return BrowserDocument;
-  } else {
-    return Document;
   }
+  return Document;
 };
+
 },{"./browserDocument.js":3,"./document.js":5}],7:[function(require,module,exports){
 /*!
  * ignore
@@ -3062,23 +3113,22 @@ module.exports = DivergentArrayError;
 var msg = module.exports = exports = {};
 
 msg.general = {};
-msg.general.default = "Validator failed for path `{PATH}` with value `{VALUE}`";
-msg.general.required = "Path `{PATH}` is required.";
+msg.general.default = 'Validator failed for path `{PATH}` with value `{VALUE}`';
+msg.general.required = 'Path `{PATH}` is required.';
 
 msg.Number = {};
-msg.Number.min = "Path `{PATH}` ({VALUE}) is less than minimum allowed value ({MIN}).";
-msg.Number.max = "Path `{PATH}` ({VALUE}) is more than maximum allowed value ({MAX}).";
+msg.Number.min = 'Path `{PATH}` ({VALUE}) is less than minimum allowed value ({MIN}).';
+msg.Number.max = 'Path `{PATH}` ({VALUE}) is more than maximum allowed value ({MAX}).';
 
 msg.Date = {};
-msg.Date.min = "Path `{PATH}` ({VALUE}) is before minimum allowed value ({MIN}).";
-msg.Date.max = "Path `{PATH}` ({VALUE}) is after maximum allowed value ({MAX}).";
+msg.Date.min = 'Path `{PATH}` ({VALUE}) is before minimum allowed value ({MIN}).';
+msg.Date.max = 'Path `{PATH}` ({VALUE}) is after maximum allowed value ({MAX}).';
 
 msg.String = {};
-msg.String.enum = "`{VALUE}` is not a valid enum value for path `{PATH}`.";
-msg.String.match = "Path `{PATH}` is invalid ({VALUE}).";
-msg.String.minlength = "Path `{PATH}` (`{VALUE}`) is shorter than the minimum allowed length ({MINLENGTH}).";
-msg.String.maxlength = "Path `{PATH}` (`{VALUE}`) is longer than the maximum allowed length ({MAXLENGTH}).";
-
+msg.String.enum = '`{VALUE}` is not a valid enum value for path `{PATH}`.';
+msg.String.match = 'Path `{PATH}` is invalid ({VALUE}).';
+msg.String.minlength = 'Path `{PATH}` (`{VALUE}`) is shorter than the minimum allowed length ({MINLENGTH}).';
+msg.String.maxlength = 'Path `{PATH}` (`{VALUE}`) is longer than the maximum allowed length ({MAXLENGTH}).';
 
 },{}],16:[function(require,module,exports){
 
@@ -3223,7 +3273,6 @@ StrictModeError.prototype.constructor = MongooseError;
 module.exports = StrictModeError;
 
 },{"../error.js":12}],20:[function(require,module,exports){
-
 /*!
  * Module requirements
  */
@@ -3240,9 +3289,9 @@ var MongooseError = require('../error.js');
 
 function ValidationError(instance) {
   if (instance && instance.constructor.name === 'model') {
-    MongooseError.call(this, instance.constructor.modelName + " validation failed");
+    MongooseError.call(this, instance.constructor.modelName + ' validation failed');
   } else {
-    MongooseError.call(this, "Validation failed");
+    MongooseError.call(this, 'Validation failed');
   }
   if (Error.captureStackTrace) {
     Error.captureStackTrace(this);
@@ -3273,7 +3322,9 @@ ValidationError.prototype.toString = function() {
   var msgs = [];
 
   Object.keys(this.errors).forEach(function(key) {
-    if (this == this.errors[key]) return;
+    if (this === this.errors[key]) {
+      return;
+    }
     msgs.push(String(this.errors[key]));
   }, this);
 
@@ -3719,7 +3770,7 @@ Promise.prototype.addErrback = Promise.prototype.onReject;
 
 module.exports = Promise;
 
-},{"mpromise":82,"util":97}],25:[function(require,module,exports){
+},{"mpromise":82,"util":98}],25:[function(require,module,exports){
 /*!
  * Module dependencies.
  */
@@ -3838,8 +3889,9 @@ var IS_QUERY_HOOK = {
  */
 
 function Schema(obj, options) {
-  if (!(this instanceof Schema))
+  if (!(this instanceof Schema)) {
     return new Schema(obj, options);
+  }
 
   this.paths = {};
   this.subpaths = {};
@@ -3873,17 +3925,17 @@ function Schema(obj, options) {
 
   // ensure the documents get an auto _id unless disabled
   var auto_id = !this.paths['_id'] &&
-    (!this.options.noId && this.options._id) && !_idSubDoc;
+      (!this.options.noId && this.options._id) && !_idSubDoc;
 
   if (auto_id) {
-    obj = { _id: { auto: true } };
+    obj = {_id: {auto: true}};
     obj._id[this.options.typeKey] = Schema.ObjectId;
     this.add(obj);
   }
 
   // ensure the documents receive an id getter unless disabled
   var autoid = !this.paths['id'] &&
-    (!this.options.noVirtualId && this.options.id);
+      (!this.options.noVirtualId && this.options.id);
   if (autoid) {
     this.virtual('id').get(idGetter);
   }
@@ -3939,7 +3991,6 @@ function Schema(obj, options) {
       next();
     });
   }
-
 }
 
 /*!
@@ -3951,15 +4002,16 @@ function idGetter() {
     return this.$__._id;
   }
 
-  return this.$__._id = null == this._id
-    ? null
-    : String(this._id);
+  this.$__._id = this._id == null
+      ? null
+      : String(this._id);
+  return this.$__._id;
 }
 
 /*!
  * Inherit from EventEmitter.
  */
-Schema.prototype = Object.create( EventEmitter.prototype );
+Schema.prototype = Object.create(EventEmitter.prototype);
 Schema.prototype.constructor = Schema;
 Schema.prototype.instanceOfSchema = true;
 
@@ -3987,8 +4039,8 @@ Object.defineProperty(Schema.prototype, '_defaultMiddleware', {
       }
 
       var hasValidateBeforeSaveOption = options &&
-        (typeof options === 'object') &&
-        ('validateBeforeSave' in options);
+          (typeof options === 'object') &&
+          ('validateBeforeSave' in options);
 
       var shouldValidate;
       if (hasValidateBeforeSaveOption) {
@@ -4002,11 +4054,11 @@ Object.defineProperty(Schema.prototype, '_defaultMiddleware', {
         // HACK: use $__original_validate to avoid promises so bluebird doesn't
         // complain
         if (this.$__original_validate) {
-          this.$__original_validate({ __noPromise: true }, function(error) {
+          this.$__original_validate({__noPromise: true}, function(error) {
             next(error);
           });
         } else {
-          this.validate({ __noPromise: true }, function(error) {
+          this.validate({__noPromise: true}, function(error) {
             next(error);
           });
         }
@@ -4088,11 +4140,11 @@ Schema.prototype.tree;
  */
 
 Schema.prototype.defaultOptions = function(options) {
-  if (options && false === options.safe) {
-    options.safe = { w: 0 };
+  if (options && options.safe === false) {
+    options.safe = {w: 0};
   }
 
-  if (options && options.safe && 0 === options.safe.w) {
+  if (options && options.safe && options.safe.w === 0) {
     // if you turn off safe writes, then versioning goes off as well
     options.versionKey = false;
   }
@@ -4143,16 +4195,16 @@ Schema.prototype.add = function add(obj, prefix) {
   for (var i = 0; i < keys.length; ++i) {
     var key = keys[i];
 
-    if (null == obj[key]) {
+    if (obj[key] == null) {
       throw new TypeError('Invalid value for schema path `' + prefix + key + '`');
     }
 
-    if (Array.isArray(obj[key]) && obj[key].length === 1 && null == obj[key][0]) {
+    if (Array.isArray(obj[key]) && obj[key].length === 1 && obj[key][0] == null) {
       throw new TypeError('Invalid value for schema Array path `' + prefix + key + '`');
     }
 
     if (utils.isObject(obj[key]) &&
-        (!obj[key].constructor || 'Object' == utils.getFunctionName(obj[key].constructor)) &&
+        (!obj[key].constructor || utils.getFunctionName(obj[key].constructor) === 'Object') &&
         (!obj[key][this.options.typeKey] || (this.options.typeKey === 'type' && obj[key].type.type))) {
       if (Object.keys(obj[key]).length) {
         // nested object { last: { name: String }}
@@ -4211,7 +4263,7 @@ reserved._pres = reserved._posts = 1;
 
 var warnings = {};
 warnings.increment = '`increment` should not be used as a schema path name ' +
-  'unless you have disabled versioning.';
+    'unless you have disabled versioning.';
 
 /**
  * Gets/sets schema paths.
@@ -4230,22 +4282,26 @@ warnings.increment = '`increment` should not be used as a schema path name ' +
  */
 
 Schema.prototype.path = function(path, obj) {
-  if (obj == undefined) {
-    if (this.paths[path]) return this.paths[path];
-    if (this.subpaths[path]) return this.subpaths[path];
+  if (obj === undefined) {
+    if (this.paths[path]) {
+      return this.paths[path];
+    }
+    if (this.subpaths[path]) {
+      return this.subpaths[path];
+    }
     if (this.singleNestedPaths[path]) {
       return this.singleNestedPaths[path];
     }
 
     // subpaths?
     return /\.\d+\.?.*$/.test(path)
-      ? getPositionalPath(this, path)
-      : undefined;
+        ? getPositionalPath(this, path)
+        : undefined;
   }
 
   // some path names conflict with document methods
   if (reserved[path]) {
-    throw new Error("`" + path + "` may not be used as a schema pathname");
+    throw new Error('`' + path + '` may not be used as a schema pathname');
   }
 
   if (warnings[path]) {
@@ -4258,13 +4314,15 @@ Schema.prototype.path = function(path, obj) {
       branch = this.tree;
 
   subpaths.forEach(function(sub, i) {
-    if (!branch[sub]) branch[sub] = {};
-    if ('object' != typeof branch[sub]) {
+    if (!branch[sub]) {
+      branch[sub] = {};
+    }
+    if (typeof branch[sub] !== 'object') {
       var msg = 'Cannot set nested path `' + path + '`. '
-              + 'Parent path `'
-              + subpaths.slice(0, i).concat([sub]).join('.')
-              + '` already set to type ' + branch[sub].name
-              + '.';
+          + 'Parent path `'
+          + subpaths.slice(0, i).concat([sub]).join('.')
+          + '` already set to type ' + branch[sub].name
+          + '.';
       throw new Error(msg);
     }
     branch = branch[sub];
@@ -4276,11 +4334,11 @@ Schema.prototype.path = function(path, obj) {
   if (this.paths[path].$isSingleNested) {
     for (var key in this.paths[path].schema.paths) {
       this.singleNestedPaths[path + '.' + key] =
-        this.paths[path].schema.paths[key];
+          this.paths[path].schema.paths[key];
     }
     for (key in this.paths[path].schema.singleNestedPaths) {
       this.singleNestedPaths[path + '.' + key] =
-        this.paths[path].schema.singleNestedPaths[key];
+          this.paths[path].schema.singleNestedPaths[key];
     }
   }
   return this;
@@ -4297,7 +4355,7 @@ Schema.prototype.path = function(path, obj) {
 Schema.interpretAsType = function(path, obj, options) {
   if (obj.constructor) {
     var constructorName = utils.getFunctionName(obj.constructor);
-    if (constructorName != 'Object') {
+    if (constructorName !== 'Object') {
       var oldObj = obj;
       obj = {};
       obj[options.typeKey] = oldObj;
@@ -4308,33 +4366,32 @@ Schema.interpretAsType = function(path, obj, options) {
   // and default to mixed if not specified.
   // { type: { type: String, default: 'freshcut' } }
   var type = obj[options.typeKey] && (options.typeKey !== 'type' || !obj.type.type)
-    ? obj[options.typeKey]
-    : {};
+      ? obj[options.typeKey]
+      : {};
 
-  if ('Object' == utils.getFunctionName(type.constructor) || 'mixed' == type) {
+  if (utils.getFunctionName(type.constructor) === 'Object' || type === 'mixed') {
     return new MongooseTypes.Mixed(path, obj);
   }
 
-  if (Array.isArray(type) || Array == type || 'array' == type) {
+  if (Array.isArray(type) || Array === type || type === 'array') {
     // if it was specified through { type } look for `cast`
-    var cast = (Array == type || 'array' == type)
-      ? obj.cast
-      : type[0];
+    var cast = (Array === type || type === 'array')
+        ? obj.cast
+        : type[0];
 
     if (cast && cast.instanceOfSchema) {
       return new MongooseTypes.DocumentArray(path, cast, obj);
     }
 
-    if ('string' == typeof cast) {
+    if (typeof cast === 'string') {
       cast = MongooseTypes[cast.charAt(0).toUpperCase() + cast.substring(1)];
     } else if (cast && (!cast[options.typeKey] || (options.typeKey === 'type' && cast.type.type))
-                    && 'Object' == utils.getFunctionName(cast.constructor)
-                    && Object.keys(cast).length) {
-
+        && utils.getFunctionName(cast.constructor) === 'Object'
+        && Object.keys(cast).length) {
       // The `minimize` and `typeKey` options propagate to child schemas
       // declared inline, like `{ arr: [{ val: { $type: String } }] }`.
       // See gh-3560
-      var childSchemaOptions = { minimize: options.minimize };
+      var childSchemaOptions = {minimize: options.minimize};
       if (options.typeKey) {
         childSchemaOptions.typeKey = options.typeKey;
       }
@@ -4353,11 +4410,11 @@ Schema.interpretAsType = function(path, obj, options) {
   if (Buffer.isBuffer(type)) {
     name = 'Buffer';
   } else {
-    name = 'string' == typeof type
-      ? type
+    name = typeof type === 'string'
+        ? type
       // If not string, `type` is a function. Outside of IE, function.name
       // gives you the function name. In IE, you need to compute it
-      : type.schemaName || utils.getFunctionName(type);
+        : type.schemaName || utils.getFunctionName(type);
   }
 
   if (name) {
@@ -4403,7 +4460,9 @@ Schema.prototype.eachPath = function(fn) {
  */
 
 Schema.prototype.requiredPaths = function requiredPaths(invalidate) {
-  if (this._requiredpaths && !invalidate) return this._requiredpaths;
+  if (this._requiredpaths && !invalidate) {
+    return this._requiredpaths;
+  }
 
   var paths = Object.keys(this.paths),
       i = paths.length,
@@ -4411,10 +4470,12 @@ Schema.prototype.requiredPaths = function requiredPaths(invalidate) {
 
   while (i--) {
     var path = paths[i];
-    if (this.paths[path].isRequired) ret.push(path);
+    if (this.paths[path].isRequired) {
+      ret.push(path);
+    }
   }
-
-  return this._requiredpaths = ret;
+  this._requiredpaths = ret;
+  return this._requiredpaths;
 };
 
 /**
@@ -4425,9 +4486,11 @@ Schema.prototype.requiredPaths = function requiredPaths(invalidate) {
  */
 
 Schema.prototype.indexedPaths = function indexedPaths() {
-  if (this._indexedpaths) return this._indexedpaths;
-
-  return this._indexedpaths = this.indexes();
+  if (this._indexedpaths) {
+    return this._indexedpaths;
+  }
+  this._indexedpaths = this.indexes();
+  return this._indexedpaths;
 };
 
 /**
@@ -4441,19 +4504,26 @@ Schema.prototype.indexedPaths = function indexedPaths() {
  */
 
 Schema.prototype.pathType = function(path) {
-  if (path in this.paths) return 'real';
-  if (path in this.virtuals) return 'virtual';
-  if (path in this.nested) return 'nested';
-  if (path in this.subpaths) return 'real';
+  if (path in this.paths) {
+    return 'real';
+  }
+  if (path in this.virtuals) {
+    return 'virtual';
+  }
+  if (path in this.nested) {
+    return 'nested';
+  }
+  if (path in this.subpaths) {
+    return 'real';
+  }
   if (path in this.singleNestedPaths) {
     return 'real';
   }
 
   if (/\.\d+\.|\.\d+$/.test(path)) {
     return getPositionalPathType(this, path);
-  } else {
-    return 'adhocOrUndefined';
   }
+  return 'adhocOrUndefined';
 };
 
 /**
@@ -4490,7 +4560,9 @@ function getPositionalPathType(self, path) {
 
   var val = self.path(subpaths[0]);
   var isNested = false;
-  if (!val) return val;
+  if (!val) {
+    return val;
+  }
 
   var last = subpaths.length - 1,
       subpath,
@@ -4511,7 +4583,9 @@ function getPositionalPathType(self, path) {
     }
 
     // ignore if its just a position segment: path.0.subpath
-    if (!/\D/.test(subpath)) continue;
+    if (!/\D/.test(subpath)) {
+      continue;
+    }
 
     if (!(val && val.schema)) {
       val = undefined;
@@ -4569,7 +4643,7 @@ Schema.prototype.queue = function(name, args) {
  *     })
  *
  *     toySchema.pre('validate', function (next) {
- *       if (this.name != 'Woody') this.name = 'Woody';
+ *       if (this.name !== 'Woody') this.name = 'Woody';
  *       next();
  *     })
  *
@@ -4626,10 +4700,10 @@ Schema.prototype.post = function(method, fn) {
   return this.queue('post', [arguments[0], function(next) {
     // wrap original function so that the callback goes last,
     // for compatibility with old code that is using synchronous post hooks
-    var self = this;
+    var _this = this;
     var args = Array.prototype.slice.call(arguments, 1);
     fn.call(this, this, function(err) {
-      return next.apply(self, [err].concat(args));
+      return next.apply(_this, [err].concat(args));
     });
   }]);
 };
@@ -4681,11 +4755,13 @@ Schema.prototype.plugin = function(fn, opts) {
  */
 
 Schema.prototype.method = function(name, fn) {
-  if ('string' != typeof name)
-    for (var i in name)
+  if (typeof name !== 'string') {
+    for (var i in name) {
       this.methods[i] = name[i];
-  else
+    }
+  } else {
     this.methods[name] = fn;
+  }
   return this;
 };
 
@@ -4712,11 +4788,13 @@ Schema.prototype.method = function(name, fn) {
  */
 
 Schema.prototype.static = function(name, fn) {
-  if ('string' != typeof name)
-    for (var i in name)
+  if (typeof name !== 'string') {
+    for (var i in name) {
       this.statics[i] = name[i];
-  else
+    }
+  } else {
     this.statics[name] = fn;
+  }
   return this;
 };
 
@@ -4736,8 +4814,9 @@ Schema.prototype.static = function(name, fn) {
 Schema.prototype.index = function(fields, options) {
   options || (options = {});
 
-  if (options.expires)
+  if (options.expires) {
     utils.expires(options);
+  }
 
   this._indexes.push([fields, options]);
   return this;
@@ -4759,7 +4838,7 @@ Schema.prototype.index = function(fields, options) {
  */
 
 Schema.prototype.set = function(key, value, _tags) {
-  if (1 === arguments.length) {
+  if (arguments.length === 1) {
     return this.options[key];
   }
 
@@ -4768,9 +4847,9 @@ Schema.prototype.set = function(key, value, _tags) {
       this.options[key] = readPref(value, _tags);
       break;
     case 'safe':
-      this.options[key] = false === value
-        ? { w: 0 }
-        : value;
+      this.options[key] = value === false
+          ? {w: 0}
+          : value;
       break;
     default:
       this.options[key] = value;
@@ -4801,8 +4880,12 @@ Schema.prototype.get = function(key) {
 var indexTypes = '2d 2dsphere hashed text'.split(' ');
 
 Object.defineProperty(Schema, 'indexTypes', {
-  get: function() { return indexTypes; },
-  set: function() { throw new Error('Cannot overwrite Schema.indexTypes'); }
+  get: function() {
+    return indexTypes;
+  },
+  set: function() {
+    throw new Error('Cannot overwrite Schema.indexTypes');
+  }
 });
 
 /**
@@ -4831,20 +4914,18 @@ Schema.prototype.indexes = function() {
       key = keys[i];
       path = schema.paths[key];
 
-      if (path instanceof MongooseTypes.DocumentArray) {
-        collectIndexes(path.schema, key + '.');
-      } else if (path.$isSingleNested) {
+      if ((path instanceof MongooseTypes.DocumentArray) || path.$isSingleNested) {
         collectIndexes(path.schema, key + '.');
       } else {
         index = path._index;
 
-        if (false !== index && null != index) {
+        if (index !== false && index !== null) {
           field = {};
           isObject = utils.isObject(index);
           options = isObject ? index : {};
-          type = 'string' == typeof index ? index :
-            isObject ? index.type :
-            false;
+          type = typeof index === 'string' ? index :
+              isObject ? index.type :
+                  false;
 
           if (type && ~Schema.indexTypes.indexOf(type)) {
             field[prefix + key] = type;
@@ -4866,11 +4947,12 @@ Schema.prototype.indexes = function() {
       fixSubIndexPaths(schema, prefix);
     } else {
       schema._indexes.forEach(function(index) {
-        if (!('background' in index[1])) index[1].background = true;
+        if (!('background' in index[1])) {
+          index[1].background = true;
+        }
       });
       indexes = indexes.concat(schema._indexes);
     }
-
   };
 
   collectIndexes(this);
@@ -4922,12 +5004,13 @@ Schema.prototype.indexes = function() {
 Schema.prototype.virtual = function(name, options) {
   var virtuals = this.virtuals;
   var parts = name.split('.');
-  return virtuals[name] = parts.reduce(function(mem, part, i) {
+  virtuals[name] = parts.reduce(function(mem, part, i) {
     mem[part] || (mem[part] = (i === parts.length - 1)
-                            ? new VirtualType(options, name)
-                            : {});
+        ? new VirtualType(options, name)
+        : {});
     return mem[part];
   }, this.tree);
+  return virtuals[name];
 };
 
 /**
@@ -4966,8 +5049,8 @@ Schema.prototype.remove = function(path) {
  */
 
 Schema.prototype._getSchema = function(path) {
-  var schema = this;
-  var pathschema = schema.path(path);
+  var _this = this;
+  var pathschema = _this.path(path);
 
   if (pathschema) {
     return pathschema;
@@ -4996,19 +5079,18 @@ Schema.prototype._getSchema = function(path) {
           // If there is no foundschema.schema we are dealing with
           // a path like array.$
           if (p !== parts.length && foundschema.schema) {
-            if ('$' === parts[p]) {
+            if (parts[p] === '$') {
               // comments.$.comments.$.title
               return search(parts.slice(p + 1), foundschema.schema);
-            } else {
-              // this is the last path of the selector
-              return search(parts.slice(p), foundschema.schema);
             }
+            // this is the last path of the selector
+            return search(parts.slice(p), foundschema.schema);
           }
         }
         return foundschema;
       }
     }
-  })(path.split('.'), schema);
+  })(path.split('.'), _this);
 };
 
 /*!
@@ -5091,7 +5173,7 @@ function SchemaArray(key, cast, options) {
   if (cast) {
     var castOptions = {};
 
-    if ('Object' === utils.getFunctionName(cast.constructor)) {
+    if (utils.getFunctionName(cast.constructor) === 'Object') {
       if (cast.type) {
         // support { type: Woot }
         castOptions = utils.clone(cast); // do not alter user arguments
@@ -5103,13 +5185,13 @@ function SchemaArray(key, cast, options) {
     }
 
     // support { type: 'String' }
-    var name = 'string' == typeof cast
-      ? cast
-      : utils.getFunctionName(cast);
+    var name = typeof cast === 'string'
+        ? cast
+        : utils.getFunctionName(cast);
 
     var caster = name in Types
-      ? Types[name]
-      : cast;
+        ? Types[name]
+        : cast;
 
     this.casterConstructor = caster;
     this.caster = new caster(null, castOptions);
@@ -5120,18 +5202,18 @@ function SchemaArray(key, cast, options) {
 
   SchemaType.call(this, key, options, 'Array');
 
-  var self = this,
+  var _this = this,
       defaultArr,
       fn;
 
   if (this.defaultValue) {
     defaultArr = this.defaultValue;
-    fn = 'function' == typeof defaultArr;
+    fn = typeof defaultArr === 'function';
   }
 
   this.default(function() {
     var arr = fn ? defaultArr() : defaultArr || [];
-    return new MongooseArray(arr, self.path, this);
+    return new MongooseArray(arr, _this.path, this);
   });
 }
 
@@ -5146,7 +5228,7 @@ SchemaArray.schemaName = 'Array';
 /*!
  * Inherits from SchemaType.
  */
-SchemaArray.prototype = Object.create( SchemaType.prototype );
+SchemaArray.prototype = Object.create(SchemaType.prototype);
 SchemaArray.prototype.constructor = SchemaArray;
 
 /**
@@ -5188,13 +5270,12 @@ SchemaArray.prototype.applyGetters = function(value, scope) {
 
 SchemaArray.prototype.cast = function(value, doc, init) {
   if (Array.isArray(value)) {
-
     if (!value.length && doc) {
       var indexes = doc.schema.indexedPaths();
 
       for (var i = 0, l = indexes.length; i < l; ++i) {
         var pathIndex = indexes[i][0][this.path];
-        if ('2dsphere' === pathIndex || '2d' === pathIndex) {
+        if (pathIndex === '2dsphere' || pathIndex === '2d') {
           return;
         }
       }
@@ -5216,14 +5297,13 @@ SchemaArray.prototype.cast = function(value, doc, init) {
     }
 
     return value;
-  } else {
-    // gh-2442: if we're loading this from the db and its not an array, mark
-    // the whole array as modified.
-    if (!!doc && !!init) {
-      doc.markModified(this.path);
-    }
-    return this.cast([value], doc, init);
   }
+  // gh-2442: if we're loading this from the db and its not an array, mark
+  // the whole array as modified.
+  if (!!doc && !!init) {
+    doc.markModified(this.path);
+  }
+  return this.cast([value], doc, init);
 };
 
 /**
@@ -5242,13 +5322,11 @@ SchemaArray.prototype.castForQuery = function($conditional, value) {
     handler = this.$conditionalHandlers[$conditional];
 
     if (!handler) {
-      throw new Error("Can't use " + $conditional + " with Array.");
+      throw new Error('Can\'t use ' + $conditional + ' with Array.');
     }
 
     val = handler.call(this, value);
-
   } else {
-
     val = $conditional;
     var proto = this.casterConstructor.prototype;
     var method = proto.castForQuery || proto.cast;
@@ -5259,20 +5337,21 @@ SchemaArray.prototype.castForQuery = function($conditional, value) {
         if (utils.isObject(v) && v.$elemMatch) {
           return v;
         }
-        if (method) v = method.call(caster, v);
+        if (method) {
+          v = method.call(caster, v);
+        }
         return isMongooseObject(v) ?
-          v.toObject({ virtuals: false }) :
-          v;
+            v.toObject({virtuals: false}) :
+            v;
       });
-
     } else if (method) {
       val = method.call(caster, val);
     }
   }
 
   return val && isMongooseObject(val) ?
-    val.toObject({ virtuals: false }) :
-    val;
+      val.toObject({virtuals: false}) :
+      val;
 };
 
 /*!
@@ -5286,8 +5365,6 @@ function castToNumber(val) {
 }
 
 function castArraysOfNumbers(arr, self) {
-  self || (self = this);
-
   arr.forEach(function(v, i) {
     if (Array.isArray(v)) {
       castArraysOfNumbers(v, self);
@@ -5330,10 +5407,10 @@ function cast$geometry(val, self) {
 }
 
 function cast$within(val) {
-  var self = this;
+  var _this = this;
 
   if (val.$maxDistance) {
-    val.$maxDistance = castToNumber.call(self, val.$maxDistance);
+    val.$maxDistance = castToNumber.call(_this, val.$maxDistance);
   }
 
   if (val.$box || val.$polygon) {
@@ -5341,7 +5418,7 @@ function cast$within(val) {
     val[type].forEach(function(arr) {
       if (!Array.isArray(arr)) {
         var msg = 'Invalid $within $box argument. '
-                + 'Expected an array, received ' + arr;
+            + 'Expected an array, received ' + arr;
         throw new TypeError(msg);
       }
       arr.forEach(function(v, i) {
@@ -5401,7 +5478,9 @@ function cast$elemMatch(val) {
 
 function cast$geoIntersects(val) {
   var geo = val.$geometry;
-  if (!geo) return;
+  if (!geo) {
+    return;
+  }
 
   cast$geometry(val, this);
   return val;
@@ -5484,7 +5563,7 @@ SchemaBoolean.schemaName = 'Boolean';
 /*!
  * Inherits from SchemaType.
  */
-SchemaBoolean.prototype = Object.create( SchemaType.prototype );
+SchemaBoolean.prototype = Object.create(SchemaType.prototype);
 SchemaBoolean.prototype.constructor = SchemaBoolean;
 
 /**
@@ -5505,15 +5584,23 @@ SchemaBoolean.prototype.checkRequired = function(value) {
  */
 
 SchemaBoolean.prototype.cast = function(value) {
-  if (null === value) return value;
-  if ('0' === value) return false;
-  if ('true' === value) return true;
-  if ('false' === value) return false;
+  if (value === null) {
+    return value;
+  }
+  if (value === '0') {
+    return false;
+  }
+  if (value === 'true') {
+    return true;
+  }
+  if (value === 'false') {
+    return false;
+  }
   return !!value;
 };
 
 SchemaBoolean.$conditionalHandlers =
-  utils.options(SchemaType.prototype.$conditionalHandlers, {});
+    utils.options(SchemaType.prototype.$conditionalHandlers, {});
 
 /**
  * Casts contents for queries.
@@ -5525,7 +5612,7 @@ SchemaBoolean.$conditionalHandlers =
 
 SchemaBoolean.prototype.castForQuery = function($conditional, val) {
   var handler;
-  if (2 === arguments.length) {
+  if (arguments.length === 2) {
     handler = SchemaBoolean.$conditionalHandlers[$conditional];
 
     if (handler) {
@@ -5584,7 +5671,7 @@ SchemaBuffer.schemaName = 'Buffer';
 /*!
  * Inherits from SchemaType.
  */
-SchemaBuffer.prototype = Object.create( SchemaType.prototype );
+SchemaBuffer.prototype = Object.create(SchemaType.prototype);
 SchemaBuffer.prototype.constructor = SchemaBuffer;
 
 /**
@@ -5595,10 +5682,9 @@ SchemaBuffer.prototype.constructor = SchemaBuffer;
 
 SchemaBuffer.prototype.checkRequired = function(value, doc) {
   if (SchemaType._isRef(this, value, doc, true)) {
-    return null != value;
-  } else {
-    return !!(value && value.length);
+    return !!value;
   }
+  return !!(value && value.length);
 };
 
 /**
@@ -5615,7 +5701,7 @@ SchemaBuffer.prototype.cast = function(value, doc, init) {
   if (SchemaType._isRef(this, value, doc, init)) {
     // wait! we may need to cast this to a document
 
-    if (null == value) {
+    if (value === null || value === void 0) {
       return value;
     }
 
@@ -5669,10 +5755,12 @@ SchemaBuffer.prototype.cast = function(value, doc, init) {
     return ret;
   }
 
-  if (null === value) return value;
+  if (value === null) {
+    return value;
+  }
 
   var type = typeof value;
-  if ('string' == type || 'number' == type || Array.isArray(value)) {
+  if (type === 'string' || type === 'number' || Array.isArray(value)) {
     if (type === 'number') {
       value = [value];
     }
@@ -5691,16 +5779,16 @@ function handleSingle(val) {
 }
 
 SchemaBuffer.prototype.$conditionalHandlers =
-  utils.options(SchemaType.prototype.$conditionalHandlers, {
-    '$bitsAllClear': handleBitwiseOperator,
-    '$bitsAnyClear': handleBitwiseOperator,
-    '$bitsAllSet': handleBitwiseOperator,
-    '$bitsAnySet': handleBitwiseOperator,
-    '$gt' : handleSingle,
-    '$gte': handleSingle,
-    '$lt' : handleSingle,
-    '$lte': handleSingle
-  });
+    utils.options(SchemaType.prototype.$conditionalHandlers, {
+      '$bitsAllClear': handleBitwiseOperator,
+      '$bitsAnyClear': handleBitwiseOperator,
+      '$bitsAllSet': handleBitwiseOperator,
+      '$bitsAnySet': handleBitwiseOperator,
+      '$gt': handleSingle,
+      '$gte': handleSingle,
+      '$lt': handleSingle,
+      '$lte': handleSingle
+    });
 
 /**
  * Casts contents for queries.
@@ -5714,13 +5802,13 @@ SchemaBuffer.prototype.castForQuery = function($conditional, val) {
   var handler;
   if (arguments.length === 2) {
     handler = this.$conditionalHandlers[$conditional];
-    if (!handler)
-      throw new Error("Can't use " + $conditional + " with Buffer.");
+    if (!handler) {
+      throw new Error('Can\'t use ' + $conditional + ' with Buffer.');
+    }
     return handler.call(this, val);
-  } else {
-    val = $conditional;
-    return this.cast(val).toObject();
   }
+  val = $conditional;
+  return this.cast(val).toObject();
 };
 
 /*!
@@ -5766,13 +5854,13 @@ SchemaDate.schemaName = 'Date';
 /*!
  * Inherits from SchemaType.
  */
-SchemaDate.prototype = Object.create( SchemaType.prototype );
+SchemaDate.prototype = Object.create(SchemaType.prototype);
 SchemaDate.prototype.constructor = SchemaDate;
 
 /**
  * Declares a TTL index (rounded to the nearest second) for _Date_ types only.
  *
- * This sets the `expiresAfterSeconds` index option available in MongoDB >= 2.1.2.
+ * This sets the `expireAfterSeconds` index option available in MongoDB >= 2.1.2.
  * This index type is only compatible with Date types.
  *
  * ####Example:
@@ -5801,7 +5889,7 @@ SchemaDate.prototype.constructor = SchemaDate;
  */
 
 SchemaDate.prototype.expires = function(when) {
-  if (!this._index || 'Object' !== this._index.constructor.name) {
+  if (!this._index || this._index.constructor.name !== 'Object') {
     this._index = {};
   }
 
@@ -5854,17 +5942,17 @@ SchemaDate.prototype.checkRequired = function(value) {
 SchemaDate.prototype.min = function(value, message) {
   if (this.minValidator) {
     this.validators = this.validators.filter(function(v) {
-      return v.validator != this.minValidator;
+      return v.validator !== this.minValidator;
     }, this);
   }
 
   if (value) {
     var msg = message || errorMessages.Date.min;
     msg = msg.replace(/{MIN}/, (value === Date.now ? 'Date.now()' : this.cast(value).toString()));
-    var self = this;
+    var _this = this;
     this.validators.push({
       validator: this.minValidator = function(val) {
-        var min = (value === Date.now ? value() : self.cast(value));
+        var min = (value === Date.now ? value() : _this.cast(value));
         return val === null || val.valueOf() >= min.valueOf();
       },
       message: msg,
@@ -5910,17 +5998,17 @@ SchemaDate.prototype.min = function(value, message) {
 SchemaDate.prototype.max = function(value, message) {
   if (this.maxValidator) {
     this.validators = this.validators.filter(function(v) {
-      return v.validator != this.maxValidator;
+      return v.validator !== this.maxValidator;
     }, this);
   }
 
   if (value) {
     var msg = message || errorMessages.Date.max;
     msg = msg.replace(/{MAX}/, (value === Date.now ? 'Date.now()' : this.cast(value).toString()));
-    var self = this;
+    var _this = this;
     this.validators.push({
       validator: this.maxValidator = function(val) {
-        var max = (value === Date.now ? value() : self.cast(value));
+        var max = (value === Date.now ? value() : _this.cast(value));
         return val === null || val.valueOf() <= max.valueOf();
       },
       message: msg,
@@ -5941,27 +6029,27 @@ SchemaDate.prototype.max = function(value, message) {
 
 SchemaDate.prototype.cast = function(value) {
   // If null or undefined
-  if (value == null || value === '')
+  if (value === null || value === void 0 || value === '') {
     return null;
+  }
 
-  if (value instanceof Date)
+  if (value instanceof Date) {
     return value;
+  }
 
   var date;
 
-  // support for timestamps
-  if (typeof value !== 'undefined') {
-    if (value instanceof Number || 'number' == typeof value
-        || String(value) == Number(value)) {
-      date = new Date(Number(value));
-    } else if (value.toString) {
-      // support for date strings
-      date = new Date(value.toString());
-    }
+  if (value instanceof Number || typeof value === 'number'
+      || String(value) == Number(value)) {
+    // support for timestamps
+    date = new Date(Number(value));
+  } else if (value.valueOf) {
+    // support for moment.js
+    date = new Date(value.valueOf());
+  }
 
-    if (date.toString() != 'Invalid Date') {
-      return date;
-    }
+  if (!Number.isNaN(date.valueOf())) {
+    return date;
   }
 
   throw new CastError('date', value, this.path);
@@ -5978,12 +6066,12 @@ function handleSingle(val) {
 }
 
 SchemaDate.prototype.$conditionalHandlers =
-  utils.options(SchemaType.prototype.$conditionalHandlers, {
-    '$gt': handleSingle,
-    '$gte': handleSingle,
-    '$lt': handleSingle,
-    '$lte': handleSingle
-  });
+    utils.options(SchemaType.prototype.$conditionalHandlers, {
+      '$gt': handleSingle,
+      '$gte': handleSingle,
+      '$lt': handleSingle,
+      '$lte': handleSingle
+    });
 
 
 /**
@@ -5997,14 +6085,14 @@ SchemaDate.prototype.$conditionalHandlers =
 SchemaDate.prototype.castForQuery = function($conditional, val) {
   var handler;
 
-  if (2 !== arguments.length) {
+  if (arguments.length !== 2) {
     return this.cast($conditional);
   }
 
   handler = this.$conditionalHandlers[$conditional];
 
   if (!handler) {
-    throw new Error("Can't use " + $conditional + " with Date.");
+    throw new Error('Can\'t use ' + $conditional + ' with Date.');
   }
 
   return handler.call(this, val);
@@ -6050,12 +6138,14 @@ function DocumentArray(key, schema, options) {
   EmbeddedDocument.schema = schema;
 
   // apply methods
-  for (var i in schema.methods)
+  for (var i in schema.methods) {
     EmbeddedDocument.prototype[i] = schema.methods[i];
+  }
 
   // apply statics
-  for (i in schema.statics)
+  for (i in schema.statics) {
     EmbeddedDocument[i] = schema.statics[i];
+  }
 
   EmbeddedDocument.options = options;
 
@@ -6067,7 +6157,9 @@ function DocumentArray(key, schema, options) {
 
   this.default(function() {
     var arr = fn.call(this);
-    if (!Array.isArray(arr)) arr = [arr];
+    if (!Array.isArray(arr)) {
+      arr = [arr];
+    }
     return new MongooseDocumentArray(arr, path, this);
   });
 }
@@ -6083,7 +6175,7 @@ DocumentArray.schemaName = 'DocumentArray';
 /*!
  * Inherits from ArrayType.
  */
-DocumentArray.prototype = Object.create( ArrayType.prototype );
+DocumentArray.prototype = Object.create(ArrayType.prototype);
 DocumentArray.prototype.constructor = DocumentArray;
 
 /**
@@ -6120,12 +6212,23 @@ DocumentArray.prototype.doValidate = function(array, fn, scope, options) {
         continue;
       }
 
-      doc.validate({ __noPromise: true }, function(err) {
-        if (err) {
-          error = err;
-        }
-        --count || fn(error);
-      });
+      // HACK: use $__original_validate to avoid promises so bluebird doesn't
+      // complain
+      if (doc.$__original_validate) {
+        doc.$__original_validate({__noPromise: true}, function(err) {
+          if (err) {
+            error = err;
+          }
+          --count || fn(error);
+        });
+      } else {
+        doc.validate({__noPromise: true}, function(err) {
+          if (err) {
+            error = err;
+          }
+          --count || fn(error);
+        });
+      }
     }
   }, scope);
 };
@@ -6143,7 +6246,9 @@ DocumentArray.prototype.doValidate = function(array, fn, scope, options) {
 
 DocumentArray.prototype.doValidateSync = function(array, scope) {
   var schemaTypeError = SchemaType.prototype.doValidateSync.call(this, array, scope);
-  if (schemaTypeError) return schemaTypeError;
+  if (schemaTypeError) {
+    return schemaTypeError;
+  }
 
   var count = array && array.length,
       resultError = null;
@@ -6158,10 +6263,14 @@ DocumentArray.prototype.doValidateSync = function(array, scope) {
 
   for (var i = 0, len = count; i < len; ++i) {
     // only first error
-    if ( resultError ) break;
+    if (resultError) {
+      break;
+    }
     // sidestep sparse entries
     var doc = array[i];
-    if (!doc) continue;
+    if (!doc) {
+      continue;
+    }
 
     var subdocValidateError = doc.validateSync();
 
@@ -6214,7 +6323,7 @@ DocumentArray.prototype.cast = function(value, doc, init, prev, options) {
     // Check if the document has a different schema (re gh-3701)
     if ((value[i] instanceof Subdocument) &&
         value[i].schema !== this.casterConstructor.schema) {
-      value[i] = value[i].toObject({ virtuals: false });
+      value[i] = value[i].toObject({virtuals: false});
     }
     if (!(value[i] instanceof Subdocument) && value[i]) {
       if (init) {
@@ -6224,7 +6333,8 @@ DocumentArray.prototype.cast = function(value, doc, init, prev, options) {
       } else {
         try {
           subdoc = prev.id(value[i]._id);
-        } catch (e) {}
+        } catch (e) {
+        }
 
         if (prev && subdoc) {
           // handle resetting doc with existing id but differing data
@@ -6236,7 +6346,7 @@ DocumentArray.prototype.cast = function(value, doc, init, prev, options) {
         } else {
           try {
             subdoc = new this.casterConstructor(value[i], value, undefined,
-              undefined, i);
+                undefined, i);
             // if set() is hooked it will have no return value
             // see gh-746
             value[i] = subdoc;
@@ -6261,7 +6371,9 @@ DocumentArray.prototype.cast = function(value, doc, init, prev, options) {
  */
 
 function scopePaths(array, fields, init) {
-  if (!(init && fields)) return undefined;
+  if (!(init && fields)) {
+    return undefined;
+  }
 
   var path = array.path + '.',
       keys = Object.keys(fields),
@@ -6272,7 +6384,7 @@ function scopePaths(array, fields, init) {
 
   while (i--) {
     key = keys[i];
-    if (0 === key.indexOf(path)) {
+    if (key.indexOf(path) === 0) {
       hasKeys || (hasKeys = true);
       selected[key.substring(path.length)] = fields[key];
     }
@@ -6374,11 +6486,9 @@ Embedded.prototype.castForQuery = function($conditional, val) {
       throw new Error('Can\'t use ' + $conditional);
     }
     return handler.call(this, val);
-  } else {
-    val = $conditional;
-    return new this.caster(val).
-      toObject({ virtuals: false });
   }
+  val = $conditional;
+  return new this.caster(val).toObject({virtuals: false});
 };
 
 /**
@@ -6395,7 +6505,7 @@ Embedded.prototype.doValidate = function(value, fn) {
     if (!value) {
       return fn(null);
     }
-    value.validate(fn, { __noPromise: true });
+    value.validate(fn, {__noPromise: true});
   });
 };
 
@@ -6459,7 +6569,6 @@ exports.Object = exports.Mixed;
 exports.Bool = exports.Boolean;
 
 },{"./array":27,"./boolean":28,"./buffer":29,"./date":30,"./documentarray":31,"./embedded":32,"./mixed":34,"./number":35,"./objectid":36,"./string":38}],34:[function(require,module,exports){
-
 /*!
  * Module dependencies.
  */
@@ -6479,12 +6588,10 @@ var utils = require('../utils');
 function Mixed(path, options) {
   if (options && options.default) {
     var def = options.default;
-    if (Array.isArray(def) && 0 === def.length) {
+    if (Array.isArray(def) && def.length === 0) {
       // make sure empty array defaults are handled
       options.default = Array;
-    } else if (!options.shared &&
-               utils.isObject(def) &&
-               0 === Object.keys(def).length) {
+    } else if (!options.shared && utils.isObject(def) && Object.keys(def).length === 0) {
       // prevent odd "shared" objects between documents
       options.default = function() {
         return {};
@@ -6506,7 +6613,7 @@ Mixed.schemaName = 'Mixed';
 /*!
  * Inherits from SchemaType.
  */
-Mixed.prototype = Object.create( SchemaType.prototype );
+Mixed.prototype = Object.create(SchemaType.prototype);
 Mixed.prototype.constructor = Mixed;
 
 /**
@@ -6541,7 +6648,9 @@ Mixed.prototype.cast = function(val) {
  */
 
 Mixed.prototype.castForQuery = function($cond, val) {
-  if (arguments.length === 2) return val;
+  if (arguments.length === 2) {
+    return val;
+  }
   return $cond;
 };
 
@@ -6588,7 +6697,7 @@ SchemaNumber.schemaName = 'Number';
 /*!
  * Inherits from SchemaType.
  */
-SchemaNumber.prototype = Object.create( SchemaType.prototype );
+SchemaNumber.prototype = Object.create(SchemaType.prototype);
 SchemaNumber.prototype.constructor = SchemaNumber;
 
 /**
@@ -6599,10 +6708,9 @@ SchemaNumber.prototype.constructor = SchemaNumber;
 
 SchemaNumber.prototype.checkRequired = function checkRequired(value, doc) {
   if (SchemaType._isRef(this, value, doc, true)) {
-    return null != value;
-  } else {
-    return typeof value == 'number' || value instanceof Number;
+    return !!value;
   }
+  return typeof value === 'number' || value instanceof Number;
 };
 
 /**
@@ -6639,11 +6747,11 @@ SchemaNumber.prototype.checkRequired = function checkRequired(value, doc) {
 SchemaNumber.prototype.min = function(value, message) {
   if (this.minValidator) {
     this.validators = this.validators.filter(function(v) {
-      return v.validator != this.minValidator;
+      return v.validator !== this.minValidator;
     }, this);
   }
 
-  if (null != value) {
+  if (value !== null && value !== void 0) {
     var msg = message || errorMessages.Number.min;
     msg = msg.replace(/{MIN}/, value);
     this.validators.push({
@@ -6693,11 +6801,11 @@ SchemaNumber.prototype.min = function(value, message) {
 SchemaNumber.prototype.max = function(value, message) {
   if (this.maxValidator) {
     this.validators = this.validators.filter(function(v) {
-      return v.validator != this.maxValidator;
+      return v.validator !== this.maxValidator;
     }, this);
   }
 
-  if (null != value) {
+  if (value !== null && value !== void 0) {
     var msg = message || errorMessages.Number.max;
     msg = msg.replace(/{MAX}/, value);
     this.validators.push({
@@ -6726,7 +6834,7 @@ SchemaNumber.prototype.cast = function(value, doc, init) {
   if (SchemaType._isRef(this, value, doc, init)) {
     // wait! we may need to cast this to a document
 
-    if (null == value) {
+    if (value === null || value === void 0) {
       return value;
     }
 
@@ -6739,7 +6847,7 @@ SchemaNumber.prototype.cast = function(value, doc, init) {
     }
 
     // setting a populated path
-    if ('number' == typeof value) {
+    if (typeof value === 'number') {
       return value;
     } else if (Buffer.isBuffer(value) || !utils.isObject(value)) {
       throw new CastError('number', value, this.path);
@@ -6757,19 +6865,26 @@ SchemaNumber.prototype.cast = function(value, doc, init) {
   }
 
   var val = value && value._id
-    ? value._id // documents
-    : value;
+      ? value._id // documents
+      : value;
 
   if (!isNaN(val)) {
-    if (null === val) return val;
-    if ('' === val) return null;
+    if (val === null) {
+      return val;
+    }
+    if (val === '') {
+      return null;
+    }
     if (typeof val === 'string' || typeof val === 'boolean') {
       val = Number(val);
     }
-    if (val instanceof Number) return val;
-    if ('number' == typeof val) return val;
-    if (val.toString && !Array.isArray(val) &&
-        val.toString() == Number(val)) {
+    if (val instanceof Number) {
+      return val;
+    }
+    if (typeof val === 'number') {
+      return val;
+    }
+    if (val.toString && !Array.isArray(val) && val.toString() == Number(val)) {
       return new Number(val);
     }
   }
@@ -6786,27 +6901,27 @@ function handleSingle(val) {
 }
 
 function handleArray(val) {
-  var self = this;
+  var _this = this;
   if (!Array.isArray(val)) {
     return [this.cast(val)];
   }
   return val.map(function(m) {
-    return self.cast(m);
+    return _this.cast(m);
   });
 }
 
 SchemaNumber.prototype.$conditionalHandlers =
-  utils.options(SchemaType.prototype.$conditionalHandlers, {
-    '$bitsAllClear': handleBitwiseOperator,
-    '$bitsAnyClear': handleBitwiseOperator,
-    '$bitsAllSet': handleBitwiseOperator,
-    '$bitsAnySet': handleBitwiseOperator,
-    '$gt' : handleSingle,
-    '$gte': handleSingle,
-    '$lt' : handleSingle,
-    '$lte': handleSingle,
-    '$mod': handleArray
-  });
+    utils.options(SchemaType.prototype.$conditionalHandlers, {
+      '$bitsAllClear': handleBitwiseOperator,
+      '$bitsAnyClear': handleBitwiseOperator,
+      '$bitsAllSet': handleBitwiseOperator,
+      '$bitsAnySet': handleBitwiseOperator,
+      '$gt': handleSingle,
+      '$gte': handleSingle,
+      '$lt': handleSingle,
+      '$lte': handleSingle,
+      '$mod': handleArray
+    });
 
 /**
  * Casts contents for queries.
@@ -6820,13 +6935,13 @@ SchemaNumber.prototype.castForQuery = function($conditional, val) {
   var handler;
   if (arguments.length === 2) {
     handler = this.$conditionalHandlers[$conditional];
-    if (!handler)
-      throw new Error("Can't use " + $conditional + " with Number.");
+    if (!handler) {
+      throw new Error('Can\'t use ' + $conditional + ' with Number.');
+    }
     return handler.call(this, val);
-  } else {
-    val = this.cast($conditional);
-    return val == null ? val : val;
   }
+  val = this.cast($conditional);
+  return val;
 };
 
 /*!
@@ -6874,7 +6989,7 @@ ObjectId.schemaName = 'ObjectId';
 /*!
  * Inherits from SchemaType.
  */
-ObjectId.prototype = Object.create( SchemaType.prototype );
+ObjectId.prototype = Object.create(SchemaType.prototype);
 ObjectId.prototype.constructor = ObjectId;
 
 /**
@@ -6901,10 +7016,9 @@ ObjectId.prototype.auto = function(turnOn) {
 
 ObjectId.prototype.checkRequired = function checkRequired(value, doc) {
   if (SchemaType._isRef(this, value, doc, true)) {
-    return null != value;
-  } else {
-    return value instanceof oid;
+    return !!value;
   }
+  return value instanceof oid;
 };
 
 /**
@@ -6920,7 +7034,7 @@ ObjectId.prototype.cast = function(value, doc, init) {
   if (SchemaType._isRef(this, value, doc, init)) {
     // wait! we may need to cast this to a document
 
-    if (null == value) {
+    if (value === null || value === void 0) {
       return value;
     }
 
@@ -6951,10 +7065,13 @@ ObjectId.prototype.cast = function(value, doc, init) {
   }
 
   // If null or undefined
-  if (value == null) return value;
-
-  if (value instanceof oid)
+  if (value === null || value === void 0) {
     return value;
+  }
+
+  if (value instanceof oid) {
+    return value;
+  }
 
   if (value._id) {
     if (value._id instanceof oid) {
@@ -6963,7 +7080,8 @@ ObjectId.prototype.cast = function(value, doc, init) {
     if (value._id.toString instanceof Function) {
       try {
         return oid.createFromHexString(value._id.toString());
-      } catch (e) {}
+      } catch (e) {
+      }
     }
   }
 
@@ -6987,12 +7105,12 @@ function handleSingle(val) {
 }
 
 ObjectId.prototype.$conditionalHandlers =
-  utils.options(SchemaType.prototype.$conditionalHandlers, {
-    '$gt': handleSingle,
-    '$gte': handleSingle,
-    '$lt': handleSingle,
-    '$lte': handleSingle
-  });
+    utils.options(SchemaType.prototype.$conditionalHandlers, {
+      '$gt': handleSingle,
+      '$gte': handleSingle,
+      '$lt': handleSingle,
+      '$lte': handleSingle
+    });
 
 /**
  * Casts contents for queries.
@@ -7006,12 +7124,12 @@ ObjectId.prototype.castForQuery = function($conditional, val) {
   var handler;
   if (arguments.length === 2) {
     handler = this.$conditionalHandlers[$conditional];
-    if (!handler)
-      throw new Error("Can't use " + $conditional + " with ObjectId.");
+    if (!handler) {
+      throw new Error('Can\'t use ' + $conditional + ' with ObjectId.');
+    }
     return handler.call(this, val);
-  } else {
-    return this.cast($conditional);
   }
+  return this.cast($conditional);
 };
 
 /*!
@@ -7050,24 +7168,23 @@ function handleBitwiseOperator(val) {
   var _this = this;
   if (Array.isArray(val)) {
     return val.map(function(v) {
-      return _castNumber(_this, v);
+      return _castNumber(_this.path, v);
     });
   } else if (Buffer.isBuffer(val)) {
     return val;
-  } else {
-    // Assume trying to cast to number
-    return _castNumber(_this, val);
   }
+  // Assume trying to cast to number
+  return _castNumber(_this.path, val);
 }
 
 /*!
  * ignore
  */
 
-function _castNumber(_this, num) {
+function _castNumber(path, num) {
   var v = Number(num);
   if (isNaN(v)) {
-    throw new CastError('number', num, _this.path);
+    throw new CastError('number', num, path);
   }
   return v;
 }
@@ -7077,7 +7194,6 @@ module.exports = handleBitwiseOperator;
 }).call(this,require("buffer").Buffer)
 },{"../../error/cast":13,"buffer":71}],38:[function(require,module,exports){
 (function (Buffer){
-
 /*!
  * Module dependencies.
  */
@@ -7114,7 +7230,7 @@ SchemaString.schemaName = 'String';
 /*!
  * Inherits from SchemaType.
  */
-SchemaString.prototype = Object.create( SchemaType.prototype );
+SchemaString.prototype = Object.create(SchemaType.prototype);
 SchemaString.prototype.constructor = SchemaString;
 
 /**
@@ -7155,12 +7271,12 @@ SchemaString.prototype.constructor = SchemaString;
 SchemaString.prototype.enum = function() {
   if (this.enumValidator) {
     this.validators = this.validators.filter(function(v) {
-      return v.validator != this.enumValidator;
+      return v.validator !== this.enumValidator;
     }, this);
     this.enumValidator = false;
   }
 
-  if (undefined === arguments[0] || false === arguments[0]) {
+  if (arguments[0] === void 0 || arguments[0] === false) {
     return this;
   }
 
@@ -7211,8 +7327,12 @@ SchemaString.prototype.enum = function() {
 
 SchemaString.prototype.lowercase = function() {
   return this.set(function(v, self) {
-    if ('string' != typeof v) v = self.cast(v);
-    if (v) return v.toLowerCase();
+    if (typeof v !== 'string') {
+      v = self.cast(v);
+    }
+    if (v) {
+      return v.toLowerCase();
+    }
     return v;
   });
 };
@@ -7233,8 +7353,12 @@ SchemaString.prototype.lowercase = function() {
 
 SchemaString.prototype.uppercase = function() {
   return this.set(function(v, self) {
-    if ('string' != typeof v) v = self.cast(v);
-    if (v) return v.toUpperCase();
+    if (typeof v !== 'string') {
+      v = self.cast(v);
+    }
+    if (v) {
+      return v.toUpperCase();
+    }
     return v;
   });
 };
@@ -7259,8 +7383,12 @@ SchemaString.prototype.uppercase = function() {
 
 SchemaString.prototype.trim = function() {
   return this.set(function(v, self) {
-    if ('string' != typeof v) v = self.cast(v);
-    if (v) return v.trim();
+    if (typeof v !== 'string') {
+      v = self.cast(v);
+    }
+    if (v) {
+      return v.trim();
+    }
     return v;
   });
 };
@@ -7299,11 +7427,11 @@ SchemaString.prototype.trim = function() {
 SchemaString.prototype.minlength = function(value, message) {
   if (this.minlengthValidator) {
     this.validators = this.validators.filter(function(v) {
-      return v.validator != this.minlengthValidator;
+      return v.validator !== this.minlengthValidator;
     }, this);
   }
 
-  if (null != value) {
+  if (value !== null) {
     var msg = message || errorMessages.String.minlength;
     msg = msg.replace(/{MINLENGTH}/, value);
     this.validators.push({
@@ -7353,11 +7481,11 @@ SchemaString.prototype.minlength = function(value, message) {
 SchemaString.prototype.maxlength = function(value, message) {
   if (this.maxlengthValidator) {
     this.validators = this.validators.filter(function(v) {
-      return v.validator != this.maxlengthValidator;
+      return v.validator !== this.maxlengthValidator;
     }, this);
   }
 
-  if (null != value) {
+  if (value != null) {
     var msg = message || errorMessages.String.maxlength;
     msg = msg.replace(/{MAXLENGTH}/, value);
     this.validators.push({
@@ -7421,9 +7549,9 @@ SchemaString.prototype.match = function match(regExp, message) {
       return false;
     }
 
-    var ret = ((null != v && '' !== v)
-      ? regExp.test(v)
-      : true);
+    var ret = ((v != null && v !== '')
+        ? regExp.test(v)
+        : true);
     return ret;
   };
 
@@ -7445,10 +7573,9 @@ SchemaString.prototype.match = function match(regExp, message) {
 
 SchemaString.prototype.checkRequired = function checkRequired(value, doc) {
   if (SchemaType._isRef(this, value, doc, true)) {
-    return null != value;
-  } else {
-    return (value instanceof String || typeof value == 'string') && value.length;
+    return !!value;
   }
+  return (value instanceof String || typeof value === 'string') && value.length;
 };
 
 /**
@@ -7461,7 +7588,7 @@ SchemaString.prototype.cast = function(value, doc, init) {
   if (SchemaType._isRef(this, value, doc, init)) {
     // wait! we may need to cast this to a document
 
-    if (null == value) {
+    if (value === null) {
       return value;
     }
 
@@ -7474,7 +7601,7 @@ SchemaString.prototype.cast = function(value, doc, init) {
     }
 
     // setting a populated path
-    if ('string' == typeof value) {
+    if (typeof value === 'string') {
       return value;
     } else if (Buffer.isBuffer(value) || !utils.isObject(value)) {
       throw new CastError('string', value, this.path);
@@ -7492,13 +7619,13 @@ SchemaString.prototype.cast = function(value, doc, init) {
   }
 
   // If null or undefined
-  if (value == null) {
+  if (value === null || value === void 0) {
     return value;
   }
 
-  if ('undefined' !== typeof value) {
+  if (typeof value !== 'undefined') {
     // handle documents being passed
-    if (value._id && 'string' == typeof value._id) {
+    if (value._id && typeof value._id === 'string') {
       return value._id;
     }
 
@@ -7522,25 +7649,25 @@ function handleSingle(val) {
 }
 
 function handleArray(val) {
-  var self = this;
+  var _this = this;
   if (!Array.isArray(val)) {
     return [this.castForQuery(val)];
   }
   return val.map(function(m) {
-    return self.castForQuery(m);
+    return _this.castForQuery(m);
   });
 }
 
 SchemaString.prototype.$conditionalHandlers =
-  utils.options(SchemaType.prototype.$conditionalHandlers, {
-    '$all': handleArray,
-    '$gt' : handleSingle,
-    '$gte': handleSingle,
-    '$lt' : handleSingle,
-    '$lte': handleSingle,
-    '$options': handleSingle,
-    '$regex': handleSingle
-  });
+    utils.options(SchemaType.prototype.$conditionalHandlers, {
+      '$all': handleArray,
+      '$gt': handleSingle,
+      '$gte': handleSingle,
+      '$lt': handleSingle,
+      '$lte': handleSingle,
+      '$options': handleSingle,
+      '$regex': handleSingle
+    });
 
 /**
  * Casts contents for queries.
@@ -7554,16 +7681,16 @@ SchemaString.prototype.castForQuery = function($conditional, val) {
   var handler;
   if (arguments.length === 2) {
     handler = this.$conditionalHandlers[$conditional];
-    if (!handler)
-      throw new Error("Can't use " + $conditional + " with String.");
-    return handler.call(this, val);
-  } else {
-    val = $conditional;
-    if (Object.prototype.toString.call(val) === '[object RegExp]') {
-      return val;
+    if (!handler) {
+      throw new Error('Can\'t use ' + $conditional + ' with String.');
     }
-    return this.cast(val);
+    return handler.call(this, val);
   }
+  val = $conditional;
+  if (Object.prototype.toString.call(val) === '[object RegExp]') {
+    return val;
+  }
+  return this.cast(val);
 };
 
 /*!
@@ -7605,13 +7732,15 @@ function SchemaType(path, options, instance) {
   this.selected;
 
   for (var i in options) {
-    if (this[i] && 'function' == typeof this[i]) {
+    if (this[i] && typeof this[i] === 'function') {
       // { unique: true, index: true }
-      if ('index' == i && this._index) continue;
+      if (i === 'index' && this._index) {
+        continue;
+      }
 
       var opts = Array.isArray(options[i])
-        ? options[i]
-        : [options[i]];
+          ? options[i]
+          : [options[i]];
 
       this[i].apply(this, opts);
     }
@@ -7662,10 +7791,10 @@ function SchemaType(path, options, instance) {
  */
 
 SchemaType.prototype.default = function(val) {
-  if (1 === arguments.length) {
+  if (arguments.length === 1) {
     this.defaultValue = typeof val === 'function'
-      ? val
-      : this.cast(val);
+        ? val
+        : this.cast(val);
     return this;
   } else if (arguments.length > 1) {
     this.defaultValue = utils.args(arguments);
@@ -7720,10 +7849,10 @@ SchemaType.prototype.index = function(options) {
  */
 
 SchemaType.prototype.unique = function(bool) {
-  if (null == this._index || 'boolean' == typeof this._index) {
+  if (this._index === null || typeof this._index === 'boolean') {
     this._index = {};
-  } else if ('string' == typeof this._index) {
-    this._index = { type: this._index };
+  } else if (typeof this._index === 'string') {
+    this._index = {type: this._index};
   }
 
   this._index.unique = bool;
@@ -7743,10 +7872,10 @@ SchemaType.prototype.unique = function(bool) {
  */
 
 SchemaType.prototype.text = function(bool) {
-  if (null == this._index || 'boolean' == typeof this._index) {
+  if (this._index === null || typeof this._index === 'boolean') {
     this._index = {};
-  } else if ('string' == typeof this._index) {
-    this._index = { type: this._index };
+  } else if (typeof this._index === 'string') {
+    this._index = {type: this._index};
   }
 
   this._index.text = bool;
@@ -7767,10 +7896,10 @@ SchemaType.prototype.text = function(bool) {
  */
 
 SchemaType.prototype.sparse = function(bool) {
-  if (null == this._index || 'boolean' == typeof this._index) {
+  if (this._index === null || typeof this._index === 'boolean') {
     this._index = {};
-  } else if ('string' == typeof this._index) {
-    this._index = { type: this._index };
+  } else if (typeof this._index === 'string') {
+    this._index = {type: this._index};
   }
 
   this._index.sparse = bool;
@@ -7783,7 +7912,7 @@ SchemaType.prototype.sparse = function(bool) {
  * ####Example:
  *
  *     function capitalize (val) {
- *       if ('string' != typeof val) val = '';
+ *       if (typeof val !== 'string') val = '';
  *       return val.charAt(0).toUpperCase() + val.substring(1);
  *     }
  *
@@ -7851,8 +7980,9 @@ SchemaType.prototype.sparse = function(bool) {
  */
 
 SchemaType.prototype.set = function(fn) {
-  if ('function' != typeof fn)
+  if (typeof fn !== 'function') {
     throw new TypeError('A setter must be a function.');
+  }
   this.setters.push(fn);
   return this;
 };
@@ -7920,8 +8050,9 @@ SchemaType.prototype.set = function(fn) {
  */
 
 SchemaType.prototype.get = function(fn) {
-  if ('function' != typeof fn)
+  if (typeof fn !== 'function') {
     throw new TypeError('A getter must be a function.');
+  }
   this.getters.push(fn);
   return this;
 };
@@ -7961,7 +8092,7 @@ SchemaType.prototype.get = function(fn) {
  *
  * ####Error message templates:
  *
- * From the examples above, you may have noticed that error messages support baseic templating. There are a few other template keywords besides `{PATH}` and `{VALUE}` too. To find out more, details are available [here](#error_messages_MongooseError-messages)
+ * From the examples above, you may have noticed that error messages support basic templating. There are a few other template keywords besides `{PATH}` and `{VALUE}` too. To find out more, details are available [here](#error_messages_MongooseError-messages)
  *
  * ####Asynchronous validation:
  *
@@ -8009,7 +8140,7 @@ SchemaType.prototype.get = function(fn) {
  */
 
 SchemaType.prototype.validate = function(obj, message, type) {
-  if ('function' == typeof obj || obj && 'RegExp' === utils.getFunctionName(obj.constructor)) {
+  if (typeof obj === 'function' || obj && utils.getFunctionName(obj.constructor) === 'RegExp') {
     var properties;
     if (message instanceof Object && !type) {
       properties = utils.clone(message);
@@ -8019,9 +8150,13 @@ SchemaType.prototype.validate = function(obj, message, type) {
       properties.validator = obj;
       properties.type = properties.type || 'user defined';
     } else {
-      if (!message) message = errorMessages.general.default;
-      if (!type) type = 'user defined';
-      properties = { message: message, type: type, validator: obj };
+      if (!message) {
+        message = errorMessages.general.default;
+      }
+      if (!type) {
+        type = 'user defined';
+      }
+      properties = {message: message, type: type, validator: obj};
     }
     this.validators.push(properties);
     return this;
@@ -8033,10 +8168,10 @@ SchemaType.prototype.validate = function(obj, message, type) {
 
   for (i = 0, length = arguments.length; i < length; i++) {
     arg = arguments[i];
-    if (!(arg && 'Object' === utils.getFunctionName(arg.constructor))) {
+    if (!(arg && utils.getFunctionName(arg.constructor) === 'Object')) {
       var msg = 'Invalid validator. Received (' + typeof arg + ') '
-        + arg
-        + '. See http://mongoosejs.com/docs/api.html#schematype_SchemaType-validate';
+          + arg
+          + '. See http://mongoosejs.com/docs/api.html#schematype_SchemaType-validate';
 
       throw new Error(msg);
     }
@@ -8075,30 +8210,30 @@ SchemaType.prototype.validate = function(obj, message, type) {
  */
 
 SchemaType.prototype.required = function(required, message) {
-  if (false === required) {
+  if (required === false) {
     this.validators = this.validators.filter(function(v) {
-      return v.validator != this.requiredValidator;
+      return v.validator !== this.requiredValidator;
     }, this);
 
     this.isRequired = false;
     return this;
   }
 
-  var self = this;
+  var _this = this;
   this.isRequired = true;
 
   this.requiredValidator = function(v) {
     // in here, `this` refers to the validating document.
     // no validation when this path wasn't selected in the query.
-    if ('isSelected' in this &&
-        !this.isSelected(self.path) &&
-        !this.isModified(self.path)) return true;
+    if ('isSelected' in this && !this.isSelected(_this.path) && !this.isModified(_this.path)) {
+      return true;
+    }
 
-    return (('function' === typeof required) && !required.apply(this)) ||
-        self.checkRequired(v, this);
+    return ((typeof required === 'function') && !required.apply(this)) ||
+        _this.checkRequired(v, this);
   };
 
-  if ('string' == typeof required) {
+  if (typeof required === 'string') {
     message = required;
     required = undefined;
   }
@@ -8122,15 +8257,14 @@ SchemaType.prototype.required = function(required, message) {
  */
 
 SchemaType.prototype.getDefault = function(scope, init) {
-  var ret = 'function' === typeof this.defaultValue
-    ? this.defaultValue.call(scope)
-    : this.defaultValue;
+  var ret = typeof this.defaultValue === 'function'
+      ? this.defaultValue.call(scope)
+      : this.defaultValue;
 
-  if (null !== ret && undefined !== ret) {
+  if (ret !== null && undefined !== ret) {
     return this.cast(ret, scope, init);
-  } else {
-    return ret;
   }
+  return ret;
 };
 
 /**
@@ -8160,7 +8294,9 @@ SchemaType.prototype.applySetters = function(value, scope, init, priorVal, optio
     v = newVal;
   }
 
-  if (null === v || undefined === v) return v;
+  if (v === null || v === void 0) {
+    return v;
+  }
 
   // do not cast until all setters are applied #665
   v = this.cast(v, scope, init, priorVal, options);
@@ -8228,10 +8364,14 @@ SchemaType.prototype.doValidate = function(value, fn, scope) {
       path = this.path,
       count = this.validators.length;
 
-  if (!count) return fn(null);
+  if (!count) {
+    return fn(null);
+  }
 
   var validate = function(ok, validatorProperties) {
-    if (err) return;
+    if (err) {
+      return;
+    }
     if (ok === undefined || ok) {
       --count || fn(null);
     } else {
@@ -8240,7 +8380,7 @@ SchemaType.prototype.doValidate = function(value, fn, scope) {
     }
   };
 
-  var self = this;
+  var _this = this;
   this.validators.forEach(function(v) {
     if (err) {
       return;
@@ -8254,12 +8394,12 @@ SchemaType.prototype.doValidate = function(value, fn, scope) {
 
     if (validator instanceof RegExp) {
       validate(validator.test(value), validatorProperties);
-    } else if ('function' === typeof validator) {
-      if (value === undefined && !self.isRequired) {
+    } else if (typeof validator === 'function') {
+      if (value === undefined && !_this.isRequired) {
         validate(true, validatorProperties);
         return;
       }
-      if (2 === validator.length) {
+      if (validator.length === 2) {
         validator.call(scope, value, function(ok, customMsg) {
           if (customMsg) {
             validatorProperties.message = customMsg;
@@ -8291,17 +8431,21 @@ SchemaType.prototype.doValidateSync = function(value, scope) {
       path = this.path,
       count = this.validators.length;
 
-  if (!count) return null;
+  if (!count) {
+    return null;
+  }
 
   var validate = function(ok, validatorProperties) {
-    if (err) return;
+    if (err) {
+      return;
+    }
     if (ok !== undefined && !ok) {
       err = new ValidatorError(validatorProperties);
     }
   };
 
-  var self = this;
-  if (value === undefined && !self.isRequired) {
+  var _this = this;
+  if (value === undefined && !_this.isRequired) {
     return null;
   }
 
@@ -8317,9 +8461,9 @@ SchemaType.prototype.doValidateSync = function(value, scope) {
 
     if (validator instanceof RegExp) {
       validate(validator.test(value), validatorProperties);
-    } else if ('function' === typeof validator) {
+    } else if (typeof validator === 'function') {
       // if not async validators
-      if (2 !== validator.length) {
+      if (validator.length !== 2) {
         validate(validator.call(scope, value), validatorProperties);
       }
     }
@@ -8353,11 +8497,13 @@ SchemaType._isRef = function(self, value, doc, init) {
   }
 
   if (ref) {
-    if (null == value) return true;
+    if (value == null) {
+      return true;
+    }
     if (!Buffer.isBuffer(value) &&  // buffers are objects too
-        'Binary' != value._bsontype // raw binary value from the db
+        value._bsontype !== 'Binary' // raw binary value from the db
         && utils.isObject(value)    // might have deselected _id in population query
-       ) {
+    ) {
       return true;
     }
   }
@@ -8392,11 +8538,11 @@ function handleArray(val) {
  */
 
 SchemaType.prototype.$conditionalHandlers = {
-  '$all': handleArray,
-  '$eq': handleSingle,
-  '$in' : handleArray,
-  '$ne' : handleSingle,
-  '$nin': handleArray
+  $all: handleArray,
+  $eq: handleSingle,
+  $in: handleArray,
+  $ne: handleSingle,
+  $nin: handleArray
 };
 
 /**
@@ -8415,10 +8561,20 @@ SchemaType.prototype.castForQuery = function($conditional, val) {
       throw new Error('Can\'t use ' + $conditional);
     }
     return handler.call(this, val);
-  } else {
-    val = $conditional;
-    return this.cast(val);
   }
+  val = $conditional;
+  return this.cast(val);
+};
+
+/**
+ * Default check for if this path satisfies the `required` validator.
+ *
+ * @param {any} val
+ * @api private
+ */
+
+SchemaType.prototype.checkRequired = function(val) {
+  return val != null;
 };
 
 /*!
@@ -8537,10 +8693,10 @@ StateMachine.prototype.clear = function clear(state) {
  */
 
 StateMachine.prototype.some = function some() {
-  var self = this;
+  var _this = this;
   var what = arguments.length ? arguments : this.stateNames;
   return Array.prototype.some.call(what, function(state) {
-    return Object.keys(self.states[state]).length;
+    return Object.keys(_this.states[state]).length;
   });
 };
 
@@ -8561,10 +8717,10 @@ StateMachine.prototype._iter = function _iter(iterMethod) {
 
     if (!states.length) states = this.stateNames;
 
-    var self = this;
+    var _this = this;
 
     var paths = states.reduce(function(paths, state) {
-      return paths.concat(Object.keys(self.states[state]));
+      return paths.concat(Object.keys(_this.states[state]));
     }, []);
 
     return paths[iterMethod](function(path, i, paths) {
@@ -8641,20 +8797,26 @@ var isMongooseObject = utils.isMongooseObject;
 
 function MongooseArray(values, path, doc) {
   var arr = [].concat(values);
+  var props = {
+    isMongooseArray: true,
+    validators: [],
+    _path: path,
+    _atomics: {},
+    _schema: void 0
+  };
+  var tmp = {};
 
-  utils.decorate( arr, MongooseArray.mixin );
-  arr.isMongooseArray = true;
-
-  var _options = { enumerable: false, configurable: true, writable: true };
-  var keys = Object.keys(MongooseArray.mixin).
-    concat(['isMongooseArray', 'validators', '_path']);
-  for (var i = 0; i < keys.length; ++i) {
-    Object.defineProperty(arr, keys[i], _options);
+  var keysMA = Object.keys(MongooseArray.mixin);
+  for (var i = 0; i < keysMA.length; ++i) {
+    tmp[keysMA[i]] = {enumerable: false, configurable: true, writable: true, value: MongooseArray.mixin[keysMA[i]]};
   }
 
-  arr._atomics = {};
-  arr.validators = [];
-  arr._path = path;
+  var keysP = Object.keys(props);
+  for (var j = 0; j < keysP.length; ++j) {
+    tmp[keysP[j]] = {enumerable: false, configurable: true, writable: true, value: props[keysP[j]]};
+  }
+
+  Object.defineProperties(arr, tmp);
 
   // Because doc comes from the context of another function, doc === global
   // can happen if there was a null somewhere up the chain (see #3020)
@@ -8709,14 +8871,14 @@ MongooseArray.mixin = {
       // instance as specified in the original query.
       if (!owner) {
         owner = this._owner = this._parent.ownerDocument
-          ? this._parent.ownerDocument()
-          : this._parent;
+            ? this._parent.ownerDocument()
+            : this._parent;
       }
 
       populated = owner.populated(this._path, true);
     }
 
-    if (populated && null != value) {
+    if (populated && value !== null) {
       // cast to the populated Models schema
       Model = populated.options.model;
 
@@ -8724,13 +8886,13 @@ MongooseArray.mixin = {
       // non-objects are to be interpreted as _id
       if (Buffer.isBuffer(value) ||
           value instanceof ObjectId || !utils.isObject(value)) {
-        value = { _id: value };
+        value = {_id: value};
       }
 
       // gh-2399
       // we should cast model only when it's not a discriminator
       var isDisc = value.schema && value.schema.discriminatorMapping &&
-        value.schema.discriminatorMapping.key !== undefined;
+          value.schema.discriminatorMapping.key !== undefined;
       if (!isDisc) {
         value = new Model(value);
       }
@@ -8760,7 +8922,7 @@ MongooseArray.mixin = {
       dirtyPath = this._path;
 
       if (arguments.length) {
-        if (null != embeddedPath) {
+        if (embeddedPath != null) {
           // an embedded doc bubbled up the change
           dirtyPath = dirtyPath + '.' + this.indexOf(elem) + '.' + embeddedPath;
         } else {
@@ -8786,20 +8948,20 @@ MongooseArray.mixin = {
    */
 
   _registerAtomic: function(op, val) {
-    if ('$set' == op) {
+    if (op === '$set') {
       // $set takes precedence over all other ops.
       // mark entire array modified.
-      this._atomics = { $set: val };
+      this._atomics = {$set: val};
       return this;
     }
 
     var atomics = this._atomics;
 
     // reset pop/shift after save
-    if ('$pop' == op && !('$pop' in atomics)) {
-      var self = this;
+    if (op === '$pop' && !('$pop' in atomics)) {
+      var _this = this;
       this._parent.once('save', function() {
-        self._popped = self._shifted = null;
+        _this._popped = _this._shifted = null;
       });
     }
 
@@ -8809,7 +8971,7 @@ MongooseArray.mixin = {
         Object.keys(atomics).length && !(op in atomics)) {
       // a different op was previously registered.
       // save the entire thing.
-      this._atomics = { $set: this };
+      this._atomics = {$set: this};
       return this;
     }
 
@@ -8823,10 +8985,10 @@ MongooseArray.mixin = {
       if (val[0] instanceof EmbeddedDocument) {
         selector = pullOp['$or'] || (pullOp['$or'] = []);
         Array.prototype.push.apply(selector, val.map(function(v) {
-          return v.toObject({ virtuals: false });
+          return v.toObject({virtuals: false});
         }));
       } else {
-        selector = pullOp['_id'] || (pullOp['_id'] = {'$in' : [] });
+        selector = pullOp['_id'] || (pullOp['_id'] = {'$in': []});
         selector['$in'] = selector['$in'].concat(val);
       }
     } else {
@@ -8852,8 +9014,8 @@ MongooseArray.mixin = {
     var keys = Object.keys(this._atomics);
     var i = keys.length;
 
-    if (0 === i) {
-      ret[0] = ['$set', this.toObject({ depopulate: 1, transform: false })];
+    if (i === 0) {
+      ret[0] = ['$set', this.toObject({depopulate: 1, transform: false})];
       return ret;
     }
 
@@ -8865,15 +9027,15 @@ MongooseArray.mixin = {
       // need to convert their elements as if they were MongooseArrays
       // to handle populated arrays versus DocumentArrays properly.
       if (isMongooseObject(val)) {
-        val = val.toObject({ depopulate: 1, transform: false });
+        val = val.toObject({depopulate: 1, transform: false});
       } else if (Array.isArray(val)) {
-        val = this.toObject.call(val, { depopulate: 1, transform: false });
+        val = this.toObject.call(val, {depopulate: 1, transform: false});
       } else if (val.valueOf) {
         val = val.valueOf();
       }
 
-      if ('$addToSet' == op) {
-        val = { $each: val };
+      if (op === '$addToSet') {
+        val = {$each: val};
       }
 
       ret.push([op, val]);
@@ -8892,7 +9054,7 @@ MongooseArray.mixin = {
    */
 
   hasAtomics: function hasAtomics() {
-    if (!(this._atomics && 'Object' === this._atomics.constructor.name)) {
+    if (!(this._atomics && this._atomics.constructor.name === 'Object')) {
       return 0;
     }
 
@@ -8923,7 +9085,7 @@ MongooseArray.mixin = {
   push: function() {
     var values = [].map.call(arguments, this._mapCast, this);
     values = this._schema.applySetters(values, this._parent, undefined,
-      undefined, { skipDocumentArrayCast: true });
+        undefined, {skipDocumentArrayCast: true});
     var ret = [].push.apply(this, values);
 
     // $pushAll might be fibbed (could be $push). But it makes it easier to
@@ -8994,7 +9156,9 @@ MongooseArray.mixin = {
     this._markModified();
 
     // only allow popping once
-    if (this._popped) return;
+    if (this._popped) {
+      return;
+    }
     this._popped = true;
 
     return [].pop.call(this);
@@ -9058,7 +9222,9 @@ MongooseArray.mixin = {
     this._markModified();
 
     // only allow shifting once
-    if (this._shifted) return;
+    if (this._shifted) {
+      return;
+    }
     this._shifted = true;
 
     return [].shift.call(this);
@@ -9128,7 +9294,9 @@ MongooseArray.mixin = {
     while (i--) {
       mem = cur[i];
       if (mem instanceof Document) {
-        if (values.some(function(v) { return v.equals(mem); } )) {
+        if (values.some(function(v) {
+          return v.equals(mem);
+        })) {
           [].splice.call(cur, i, 1);
         }
       } else if (~cur.indexOf.call(values, mem)) {
@@ -9167,8 +9335,8 @@ MongooseArray.mixin = {
       vals = [];
       for (i = 0; i < arguments.length; ++i) {
         vals[i] = i < 2
-          ? arguments[i]
-          : this._cast(arguments[i], arguments[0] + (i - 2));
+            ? arguments[i]
+            : this._cast(arguments[i], arguments[0] + (i - 2));
       }
       ret = [].splice.apply(this, vals);
       this._registerAtomic('$set', this);
@@ -9239,19 +9407,26 @@ MongooseArray.mixin = {
     var values = [].map.call(arguments, this._mapCast, this);
     values = this._schema.applySetters(values, this._parent);
     var added = [];
-    var type = values[0] instanceof EmbeddedDocument ? 'doc' :
-               values[0] instanceof Date ? 'date' :
-               '';
+    var type = '';
+    if (values[0] instanceof EmbeddedDocument) {
+      type = 'doc';
+    } else if (values[0] instanceof Date) {
+      type = 'date';
+    }
 
     values.forEach(function(v) {
       var found;
       switch (type) {
         case 'doc':
-          found = this.some(function(doc) { return doc.equals(v); });
+          found = this.some(function(doc) {
+            return doc.equals(v);
+          });
           break;
         case 'date':
           var val = +v;
-          found = this.some(function(d) { return +d === val; });
+          found = this.some(function(d) {
+            return +d === val;
+          });
           break;
         default:
           found = ~this.indexOf(v);
@@ -9298,9 +9473,9 @@ MongooseArray.mixin = {
   set: function set(i, val) {
     var value = this._cast(val, i);
     value = this._schema.caster instanceof EmbeddedDocument ?
-            value :
-            this._schema.caster.applySetters(val, this._parent)
-            ;
+        value :
+        this._schema.caster.applySetters(val, this._parent)
+    ;
     this[i] = value;
     this._markModified(i);
     return this;
@@ -9320,8 +9495,8 @@ MongooseArray.mixin = {
     if (options && options.depopulate) {
       return this.map(function(doc) {
         return doc instanceof Document
-          ? doc.toObject(options)
-          : doc;
+            ? doc.toObject(options)
+            : doc;
       });
     }
 
@@ -9351,7 +9526,9 @@ MongooseArray.mixin = {
    */
 
   indexOf: function indexOf(obj) {
-    if (obj instanceof ObjectId) obj = obj.toString();
+    if (obj instanceof ObjectId) {
+      obj = obj.toString();
+    }
     for (var i = 0, len = this.length; i < len; ++i) {
       if (obj == this[i]) {
         return i;
@@ -9406,7 +9583,7 @@ function MongooseBuffer(value, encode, offset) {
   var length = arguments.length;
   var val;
 
-  if (0 === length || null === arguments[0] || undefined === arguments[0]) {
+  if (length === 0 || arguments[0] === null || arguments[0] === void 0) {
     val = 0;
   } else {
     val = value;
@@ -9425,17 +9602,17 @@ function MongooseBuffer(value, encode, offset) {
   }
 
   var buf = new Buffer(val, encoding, offset);
-  utils.decorate( buf, MongooseBuffer.mixin );
+  utils.decorate(buf, MongooseBuffer.mixin);
   buf.isMongooseBuffer = true;
 
   // make sure these internal props don't show up in Object.keys()
   Object.defineProperties(buf, {
-    validators: { value: [] },
-    _path: { value: path },
-    _parent: { value: doc }
+    validators: {value: []},
+    _path: {value: path},
+    _parent: {value: doc}
   });
 
-  if (doc && "string" === typeof path) {
+  if (doc && typeof path === 'string') {
     Object.defineProperty(buf, '_schema', {
       value: doc.schema.path(path)
     });
@@ -9449,7 +9626,7 @@ function MongooseBuffer(value, encode, offset) {
  * Inherit from Buffer.
  */
 
-//MongooseBuffer.prototype = new Buffer(0);
+// MongooseBuffer.prototype = new Buffer(0);
 
 MongooseBuffer.mixin = {
 
@@ -9538,21 +9715,23 @@ MongooseBuffer.mixin = {
 
 (
 // node < 0.5
-'writeUInt8 writeUInt16 writeUInt32 writeInt8 writeInt16 writeInt32 ' +
-'writeFloat writeDouble fill ' +
-'utf8Write binaryWrite asciiWrite set ' +
+    'writeUInt8 writeUInt16 writeUInt32 writeInt8 writeInt16 writeInt32 ' +
+    'writeFloat writeDouble fill ' +
+    'utf8Write binaryWrite asciiWrite set ' +
 
 // node >= 0.5
-'writeUInt16LE writeUInt16BE writeUInt32LE writeUInt32BE ' +
-'writeInt16LE writeInt16BE writeInt32LE writeInt32BE ' +
-'writeFloatLE writeFloatBE writeDoubleLE writeDoubleBE'
+    'writeUInt16LE writeUInt16BE writeUInt32LE writeUInt32BE ' +
+    'writeInt16LE writeInt16BE writeInt32LE writeInt32BE ' +
+    'writeFloatLE writeFloatBE writeDoubleLE writeDoubleBE'
 ).split(' ').forEach(function(method) {
-  if (!Buffer.prototype[method]) return;
-  MongooseBuffer.mixin[method] = new Function(
-    'var ret = Buffer.prototype.' + method + '.apply(this, arguments);' +
-    'this._markModified();' +
-    'return ret;'
-  );
+  if (!Buffer.prototype[method]) {
+    return;
+  }
+  MongooseBuffer.mixin[method] = function() {
+    var ret = Buffer.prototype[method].apply(this, arguments);
+    this._markModified();
+    return ret;
+  };
 });
 
 /**
@@ -9579,9 +9758,9 @@ MongooseBuffer.mixin = {
  */
 
 MongooseBuffer.mixin.toObject = function(options) {
-  var subtype = 'number' == typeof options
-    ? options
-    : (this._subtype || 0);
+  var subtype = typeof options === 'number'
+      ? options
+      : (this._subtype || 0);
   return new Binary(this, subtype);
 };
 
@@ -9604,7 +9783,9 @@ MongooseBuffer.mixin.equals = function(other) {
   }
 
   for (var i = 0; i < this.length; ++i) {
-    if (this[i] !== other[i]) return false;
+    if (this[i] !== other[i]) {
+      return false;
+    }
   }
 
   return true;
@@ -9633,11 +9814,11 @@ MongooseBuffer.mixin.equals = function(other) {
  */
 
 MongooseBuffer.mixin.subtype = function(subtype) {
-  if ('number' != typeof subtype) {
+  if (typeof subtype !== 'number') {
     throw new TypeError('Invalid subtype. Expected a number');
   }
 
-  if (this._subtype != subtype) {
+  if (this._subtype !== subtype) {
     this._markModified();
   }
 
@@ -9679,16 +9860,35 @@ var MongooseArray = require('./array'),
 
 function MongooseDocumentArray(values, path, doc) {
   var arr = [].concat(values);
+  var props = {
+    isMongooseArray: true,
+    isMongooseDocumentArray: true,
+    validators: [],
+    _path: path,
+    _atomics: {},
+    _schema: void 0,
+    _handlers: void 0
+  };
+  var tmp = {};
 
   // Values always have to be passed to the constructor to initialize, since
   // otherwise MongooseArray#push will mark the array as modified to the parent.
-  utils.decorate( arr, MongooseDocumentArray.mixin );
-  arr.isMongooseArray = true;
-  arr.isMongooseDocumentArray = true;
+  var keysMA = Object.keys(MongooseArray.mixin);
+  for (var j = 0; j < keysMA.length; ++j) {
+    tmp[keysMA[j]] = {enumerable: false, configurable: true, writable: true, value: MongooseArray.mixin[keysMA[j]]};
+  }
 
-  arr._atomics = {};
-  arr.validators = [];
-  arr._path = path;
+  var keysMDA = Object.keys(MongooseDocumentArray.mixin);
+  for (var i = 0; i < keysMDA.length; ++i) {
+    tmp[keysMDA[i]] = {enumerable: false, configurable: true, writable: true, value: MongooseDocumentArray.mixin[keysMDA[i]]};
+  }
+
+  var keysP = Object.keys(props);
+  for (var k = 0; k < keysP.length; ++k) {
+    tmp[keysP[k]] = {enumerable: false, configurable: true, writable: true, value: props[keysP[k]]};
+  }
+
+  Object.defineProperties(arr, tmp);
 
   // Because doc comes from the context of another function, doc === global
   // can happen if there was a null somewhere up the chain (see #3020 && #3034)
@@ -9712,157 +9912,168 @@ function MongooseDocumentArray(values, path, doc) {
 /*!
  * Inherits from MongooseArray
  */
-MongooseDocumentArray.mixin = Object.create( MongooseArray.mixin );
+// MongooseDocumentArray.mixin = Object.create( MongooseArray.mixin );
+MongooseDocumentArray.mixin = {
 
-/**
- * Overrides MongooseArray#cast
- *
- * @method _cast
- * @api private
- * @receiver MongooseDocumentArray
- */
+  /**
+   * Overrides MongooseArray#cast
+   *
+   * @method _cast
+   * @api private
+   * @receiver MongooseDocumentArray
+   */
 
-MongooseDocumentArray.mixin._cast = function(value, index) {
-  if (value instanceof this._schema.casterConstructor) {
-    if (!(value.__parent && value.__parentArray)) {
-      // value may have been created using array.create()
-      value.__parent = this._parent;
-      value.__parentArray = this;
-    }
-    value.__index = index;
-    return value;
-  }
-
-  // handle cast('string') or cast(ObjectId) etc.
-  // only objects are permitted so we can safely assume that
-  // non-objects are to be interpreted as _id
-  if (Buffer.isBuffer(value) ||
-      value instanceof ObjectId || !utils.isObject(value)) {
-    value = { _id: value };
-  }
-  return new this._schema.casterConstructor(value, this, undefined, undefined, index);
-};
-
-/**
- * Searches array items for the first document with a matching _id.
- *
- * ####Example:
- *
- *     var embeddedDoc = m.array.id(some_id);
- *
- * @return {EmbeddedDocument|null} the subdocument or null if not found.
- * @param {ObjectId|String|Number|Buffer} id
- * @TODO cast to the _id based on schema for proper comparison
- * @method id
- * @api public
- * @receiver MongooseDocumentArray
- */
-
-MongooseDocumentArray.mixin.id = function(id) {
-  var casted,
-      sid,
-      _id;
-
-  try {
-    var casted_ = ObjectIdSchema.prototype.cast.call({}, id);
-    if (casted_) casted = String(casted_);
-  } catch (e) {
-    casted = null;
-  }
-
-  for (var i = 0, l = this.length; i < l; i++) {
-    _id = this[i].get('_id');
-
-    if (_id === null || typeof _id === 'undefined') {
-      continue;
-    } else if (_id instanceof Document) {
-      sid || (sid = String(id));
-      if (sid == _id._id) return this[i];
-    } else if (!(_id instanceof ObjectId)) {
-      if (utils.deepEqual(id, _id)) return this[i];
-    } else if (casted == _id) {
-      return this[i];
-    }
-  }
-
-  return null;
-};
-
-/**
- * Returns a native js Array of plain js objects
- *
- * ####NOTE:
- *
- * _Each sub-document is converted to a plain object by calling its `#toObject` method._
- *
- * @param {Object} [options] optional options to pass to each documents `toObject` method call during conversion
- * @return {Array}
- * @method toObject
- * @api public
- * @receiver MongooseDocumentArray
- */
-
-MongooseDocumentArray.mixin.toObject = function(options) {
-  return this.map(function(doc) {
-    return doc && doc.toObject(options) || null;
-  });
-};
-
-/**
- * Helper for console.log
- *
- * @method inspect
- * @api public
- * @receiver MongooseDocumentArray
- */
-
-MongooseDocumentArray.mixin.inspect = function() {
-  return Array.prototype.slice.call(this);
-};
-
-/**
- * Creates a subdocument casted to this schema.
- *
- * This is the same subdocument constructor used for casting.
- *
- * @param {Object} obj the value to cast to this arrays SubDocument schema
- * @method create
- * @api public
- * @receiver MongooseDocumentArray
- */
-
-MongooseDocumentArray.mixin.create = function(obj) {
-  return new this._schema.casterConstructor(obj);
-};
-
-/**
- * Creates a fn that notifies all child docs of `event`.
- *
- * @param {String} event
- * @return {Function}
- * @method notify
- * @api private
- * @receiver MongooseDocumentArray
- */
-
-MongooseDocumentArray.mixin.notify = function notify(event) {
-  var self = this;
-  return function notify(val) {
-    var i = self.length;
-    while (i--) {
-      if (!self[i]) continue;
-      switch (event) {
-        // only swap for save event for now, we may change this to all event types later
-        case 'save':
-          val = self[i];
-          break;
-        default:
-          // NO-OP
-          break;
+  _cast: function(value, index) {
+    if (value instanceof this._schema.casterConstructor) {
+      if (!(value.__parent && value.__parentArray)) {
+        // value may have been created using array.create()
+        value.__parent = this._parent;
+        value.__parentArray = this;
       }
-      self[i].emit(event, val);
+      value.__index = index;
+      return value;
     }
-  };
+
+    // handle cast('string') or cast(ObjectId) etc.
+    // only objects are permitted so we can safely assume that
+    // non-objects are to be interpreted as _id
+    if (Buffer.isBuffer(value) ||
+        value instanceof ObjectId || !utils.isObject(value)) {
+      value = {_id: value};
+    }
+    return new this._schema.casterConstructor(value, this, undefined, undefined, index);
+  },
+
+  /**
+   * Searches array items for the first document with a matching _id.
+   *
+   * ####Example:
+   *
+   *     var embeddedDoc = m.array.id(some_id);
+   *
+   * @return {EmbeddedDocument|null} the subdocument or null if not found.
+   * @param {ObjectId|String|Number|Buffer} id
+   * @TODO cast to the _id based on schema for proper comparison
+   * @method id
+   * @api public
+   * @receiver MongooseDocumentArray
+   */
+
+  id: function(id) {
+    var casted,
+        sid,
+        _id;
+
+    try {
+      var casted_ = ObjectIdSchema.prototype.cast.call({}, id);
+      if (casted_) {
+        casted = String(casted_);
+      }
+    } catch (e) {
+      casted = null;
+    }
+
+    for (var i = 0, l = this.length; i < l; i++) {
+      _id = this[i].get('_id');
+
+      if (_id === null || typeof _id === 'undefined') {
+        continue;
+      } else if (_id instanceof Document) {
+        sid || (sid = String(id));
+        if (sid == _id._id) {
+          return this[i];
+        }
+      } else if (!(_id instanceof ObjectId)) {
+        if (utils.deepEqual(id, _id)) {
+          return this[i];
+        }
+      } else if (casted == _id) {
+        return this[i];
+      }
+    }
+
+    return null;
+  },
+
+  /**
+   * Returns a native js Array of plain js objects
+   *
+   * ####NOTE:
+   *
+   * _Each sub-document is converted to a plain object by calling its `#toObject` method._
+   *
+   * @param {Object} [options] optional options to pass to each documents `toObject` method call during conversion
+   * @return {Array}
+   * @method toObject
+   * @api public
+   * @receiver MongooseDocumentArray
+   */
+
+  toObject: function(options) {
+    return this.map(function(doc) {
+      return doc && doc.toObject(options) || null;
+    });
+  },
+
+  /**
+   * Helper for console.log
+   *
+   * @method inspect
+   * @api public
+   * @receiver MongooseDocumentArray
+   */
+
+  inspect: function() {
+    return Array.prototype.slice.call(this);
+  },
+
+  /**
+   * Creates a subdocument casted to this schema.
+   *
+   * This is the same subdocument constructor used for casting.
+   *
+   * @param {Object} obj the value to cast to this arrays SubDocument schema
+   * @method create
+   * @api public
+   * @receiver MongooseDocumentArray
+   */
+
+  create: function(obj) {
+    return new this._schema.casterConstructor(obj);
+  },
+
+  /**
+   * Creates a fn that notifies all child docs of `event`.
+   *
+   * @param {String} event
+   * @return {Function}
+   * @method notify
+   * @api private
+   * @receiver MongooseDocumentArray
+   */
+
+  notify: function notify(event) {
+    var _this = this;
+    return function notify(val) {
+      var i = _this.length;
+      while (i--) {
+        if (!_this[i]) {
+          continue;
+        }
+        switch (event) {
+          // only swap for save event for now, we may change this to all event types later
+          case 'save':
+            val = _this[i];
+            break;
+          default:
+            // NO-OP
+            break;
+        }
+        _this[i].emit(event, val);
+      }
+    };
+  }
+
 };
 
 /*!
@@ -9904,16 +10115,16 @@ function EmbeddedDocument(obj, parentArr, skipId, fields, index) {
 
   Document.call(this, obj, fields, skipId);
 
-  var self = this;
+  var _this = this;
   this.on('isNew', function(val) {
-    self.isNew = val;
+    _this.isNew = val;
   });
 }
 
 /*!
  * Inherit from Document
  */
-EmbeddedDocument.prototype = Object.create( Document.prototype );
+EmbeddedDocument.prototype = Object.create(Document.prototype);
 EmbeddedDocument.prototype.constructor = EmbeddedDocument;
 
 /**
@@ -9932,7 +10143,9 @@ EmbeddedDocument.prototype.constructor = EmbeddedDocument;
 
 EmbeddedDocument.prototype.markModified = function(path) {
   this.$__.activePaths.modify(path);
-  if (!this.__parentArray) return;
+  if (!this.__parentArray) {
+    return;
+  }
 
   if (this.isNew) {
     // Mark the WHOLE parent array as modified
@@ -9964,34 +10177,6 @@ EmbeddedDocument.prototype.save = function(fn) {
   });
 };
 
-/**
- * Removes the subdocument from its parent array.
- *
- * @param {Function} [fn]
- * @api public
- */
-
-EmbeddedDocument.prototype.remove = function(fn) {
-  if (!this.__parentArray) return this;
-
-  var _id;
-  if (!this.willRemove) {
-    _id = this._doc._id;
-    if (!_id) {
-      throw new Error('For your own good, Mongoose does not know ' +
-                      'how to remove an EmbeddedDocument that has no _id');
-    }
-    this.__parentArray.pull({ _id: _id });
-    this.willRemove = true;
-    registerRemoveListener(this);
-  }
-
-  if (fn)
-    fn(null);
-
-  return this;
-};
-
 /*!
  * Registers remove event listeners for triggering
  * on subdocuments.
@@ -10003,16 +10188,47 @@ EmbeddedDocument.prototype.remove = function(fn) {
 function registerRemoveListener(sub) {
   var owner = sub.ownerDocument();
 
-  owner.on('save', emitRemove);
-  owner.on('remove', emitRemove);
-
   function emitRemove() {
     owner.removeListener('save', emitRemove);
     owner.removeListener('remove', emitRemove);
     sub.emit('remove', sub);
-    owner = sub = emitRemove = null;
+    owner = sub = null;
   }
+
+  owner.on('save', emitRemove);
+  owner.on('remove', emitRemove);
 }
+
+/**
+ * Removes the subdocument from its parent array.
+ *
+ * @param {Function} [fn]
+ * @api public
+ */
+
+EmbeddedDocument.prototype.remove = function(fn) {
+  if (!this.__parentArray) {
+    return this;
+  }
+
+  var _id;
+  if (!this.willRemove) {
+    _id = this._doc._id;
+    if (!_id) {
+      throw new Error('For your own good, Mongoose does not know ' +
+          'how to remove an EmbeddedDocument that has no _id');
+    }
+    this.__parentArray.pull({_id: _id});
+    this.willRemove = true;
+    registerRemoveListener(this);
+  }
+
+  if (fn) {
+    fn(null);
+  }
+
+  return this;
+};
 
 /**
  * Override #update method of parent documents.
@@ -10096,9 +10312,7 @@ EmbeddedDocument.prototype.$markValid = function(path) {
 EmbeddedDocument.prototype.$isValid = function(path) {
   var index = this.__index;
   if (typeof index !== 'undefined') {
-
-    return !this.__parent.$__.validationError ||
-      !this.__parent.$__.validationError.errors[path];
+    return !this.__parent.$__.validationError || !this.__parent.$__.validationError.errors[path];
   }
 
   return true;
@@ -10116,13 +10330,16 @@ EmbeddedDocument.prototype.ownerDocument = function() {
   }
 
   var parent = this.__parent;
-  if (!parent) return this;
+  if (!parent) {
+    return this;
+  }
 
   while (parent.__parent) {
     parent = parent.__parent;
   }
 
-  return this.$__.ownerDocument = parent;
+  this.$__.ownerDocument = parent;
+  return this.$__.ownerDocument;
 };
 
 /**
@@ -10137,8 +10354,10 @@ EmbeddedDocument.prototype.ownerDocument = function() {
 
 EmbeddedDocument.prototype.$__fullPath = function(path) {
   if (!this.$__.fullPath) {
-    var parent = this;
-    if (!parent.__parent) return path;
+    var parent = this; // eslint-disable-line consistent-this
+    if (!parent.__parent) {
+      return path;
+    }
 
     var paths = [];
     while (parent.__parent) {
@@ -10155,8 +10374,8 @@ EmbeddedDocument.prototype.$__fullPath = function(path) {
   }
 
   return path
-    ? this.$__.fullPath + '.' + path
-    : this.$__.fullPath;
+      ? this.$__.fullPath + '.' + path
+      : this.$__.fullPath;
 };
 
 /**
@@ -10302,8 +10521,8 @@ Subdocument.prototype.ownerDocument = function() {
   while (parent.$parent) {
     parent = parent.$parent;
   }
-
-  return this.$__.ownerDocument = parent;
+  this.$__.ownerDocument = parent;
+  return this.$__.ownerDocument;
 };
 
 /**
@@ -10331,15 +10550,15 @@ Subdocument.prototype.remove = function(callback) {
 function registerRemoveListener(sub) {
   var owner = sub.ownerDocument();
 
-  owner.on('save', emitRemove);
-  owner.on('remove', emitRemove);
-
   function emitRemove() {
     owner.removeListener('save', emitRemove);
     owner.removeListener('remove', emitRemove);
     sub.emit('remove', sub);
-    owner = sub = emitRemove = null;
+    owner = sub = null;
   }
+
+  owner.on('save', emitRemove);
+  owner.on('remove', emitRemove);
 }
 
 },{"../document":5,"../promise_provider":25}],48:[function(require,module,exports){
@@ -10367,9 +10586,15 @@ var Document;
 
 exports.toCollectionName = function(name, options) {
   options = options || {};
-  if ('system.profile' === name) return name;
-  if ('system.indexes' === name) return name;
-  if (options.pluralization === false) return name;
+  if (name === 'system.profile') {
+    return name;
+  }
+  if (name === 'system.indexes') {
+    return name;
+  }
+  if (options.pluralization === false) {
+    return name;
+  }
   return pluralize(name.toLowerCase());
 };
 
@@ -10459,7 +10684,9 @@ function pluralize(str) {
     found = rules.filter(function(rule) {
       return str.match(rule[0]);
     });
-    if (found[0]) return str.replace(found[0][0], found[0][1]);
+    if (found[0]) {
+      return str.replace(found[0][0], found[0][1]);
+    }
   }
   return str;
 }
@@ -10476,29 +10703,36 @@ function pluralize(str) {
  */
 
 exports.deepEqual = function deepEqual(a, b) {
-  if (a === b) return true;
+  if (a === b) {
+    return true;
+  }
 
-  if (a instanceof Date && b instanceof Date)
+  if (a instanceof Date && b instanceof Date) {
     return a.getTime() === b.getTime();
+  }
 
   if (a instanceof ObjectId && b instanceof ObjectId) {
     return a.toString() === b.toString();
   }
 
   if (a instanceof RegExp && b instanceof RegExp) {
-    return a.source == b.source &&
-           a.ignoreCase == b.ignoreCase &&
-           a.multiline == b.multiline &&
-           a.global == b.global;
+    return a.source === b.source &&
+        a.ignoreCase === b.ignoreCase &&
+        a.multiline === b.multiline &&
+        a.global === b.global;
   }
 
-  if (typeof a !== 'object' && typeof b !== 'object')
+  if (typeof a !== 'object' && typeof b !== 'object') {
     return a == b;
+  }
 
-  if (a === null || b === null || a === undefined || b === undefined)
+  if (a === null || b === null || a === undefined || b === undefined) {
     return false;
+  }
 
-  if (a.prototype !== b.prototype) return false;
+  if (a.prototype !== b.prototype) {
+    return false;
+  }
 
   // Handle MongooseNumbers
   if (a instanceof Number && b instanceof Number) {
@@ -10509,37 +10743,46 @@ exports.deepEqual = function deepEqual(a, b) {
     return exports.buffer.areEqual(a, b);
   }
 
-  if (isMongooseObject(a)) a = a.toObject();
-  if (isMongooseObject(b)) b = b.toObject();
+  if (isMongooseObject(a)) {
+    a = a.toObject();
+  }
+  if (isMongooseObject(b)) {
+    b = b.toObject();
+  }
 
   try {
     var ka = Object.keys(a),
         kb = Object.keys(b),
         key, i;
-  } catch (e) {//happens when one is a string literal and the other isn't
+  } catch (e) {
+    // happens when one is a string literal and the other isn't
     return false;
   }
 
   // having the same number of owned properties (keys incorporates
   // hasOwnProperty)
-  if (ka.length != kb.length)
+  if (ka.length !== kb.length) {
     return false;
+  }
 
-  //the same set of keys (although not necessarily the same order),
+  // the same set of keys (although not necessarily the same order),
   ka.sort();
   kb.sort();
 
-  //~~~cheap key test
+  // ~~~cheap key test
   for (i = ka.length - 1; i >= 0; i--) {
-    if (ka[i] != kb[i])
+    if (ka[i] !== kb[i]) {
       return false;
+    }
   }
 
-  //equivalent values for every corresponding key, and
-  //~~~possibly expensive deep test
+  // equivalent values for every corresponding key, and
+  // ~~~possibly expensive deep test
   for (i = ka.length - 1; i >= 0; i--) {
     key = ka[i];
-    if (!deepEqual(a[key], b[key])) return false;
+    if (!deepEqual(a[key], b[key])) {
+      return false;
+    }
   }
 
   return true;
@@ -10559,18 +10802,19 @@ exports.deepEqual = function deepEqual(a, b) {
  */
 
 exports.clone = function clone(obj, options) {
-  if (obj === undefined || obj === null)
+  if (obj === undefined || obj === null) {
     return obj;
+  }
 
-  if (Array.isArray(obj))
+  if (Array.isArray(obj)) {
     return cloneArray(obj, options);
+  }
 
   if (isMongooseObject(obj)) {
-    if (options && options.json && 'function' === typeof obj.toJSON) {
+    if (options && options.json && typeof obj.toJSON === 'function') {
       return obj.toJSON(options);
-    } else {
-      return obj.toObject(options);
     }
+    return obj.toObject(options);
   }
 
   if (obj.constructor) {
@@ -10587,16 +10831,18 @@ exports.clone = function clone(obj, options) {
     }
   }
 
-  if (obj instanceof ObjectId)
+  if (obj instanceof ObjectId) {
     return new ObjectId(obj.id);
+  }
 
   if (!obj.constructor && exports.isObject(obj)) {
     // object created with Object.create(null)
     return cloneObject(obj, options);
   }
 
-  if (obj.valueOf)
+  if (obj.valueOf) {
     return obj.valueOf();
+  }
 };
 var clone = exports.clone;
 
@@ -10618,7 +10864,7 @@ function cloneObject(obj, options) {
     for (k in obj) {
       val = clone(obj[k], options);
 
-      if (!minimize || ('undefined' !== typeof val)) {
+      if (!minimize || (typeof val !== 'undefined')) {
         hasKeys || (hasKeys = true);
         ret[k] = val;
       }
@@ -10633,22 +10879,25 @@ function cloneObject(obj, options) {
       k = keys[i];
       val = clone(obj[k], options);
 
-      if (!minimize || ('undefined' !== typeof val)) {
-        if (!hasKeys) hasKeys = true;
+      if (!minimize || (typeof val !== 'undefined')) {
+        if (!hasKeys) {
+          hasKeys = true;
+        }
         ret[k] = val;
       }
     }
   }
 
   return minimize
-    ? hasKeys && ret
-    : ret;
+      ? hasKeys && ret
+      : ret;
 }
 
 function cloneArray(arr, options) {
   var ret = [];
-  for (var i = 0, l = arr.length; i < l; i++)
+  for (var i = 0, l = arr.length; i < l; i++) {
     ret.push(clone(arr[i], options));
+  }
   return ret;
 }
 
@@ -10703,7 +10952,7 @@ exports.merge = function merge(to, from) {
 
   while (i--) {
     key = keys[i];
-    if ('undefined' === typeof to[key]) {
+    if (typeof to[key] === 'undefined') {
       to[key] = from[key];
     } else if (exports.isObject(from[key])) {
       merge(to[key], from[key]);
@@ -10772,7 +11021,7 @@ exports.isObject = function(arg) {
   if (Buffer.isBuffer(arg)) {
     return true;
   }
-  return '[object Object]' == toString.call(arg);
+  return toString.call(arg) === '[object Object]';
 };
 
 /*!
@@ -10794,7 +11043,9 @@ exports.args = sliced;
  */
 
 exports.tick = function tick(callback) {
-  if ('function' !== typeof callback) return;
+  if (typeof callback !== 'function') {
+    return;
+  }
   return function() {
     try {
       callback.apply(this, arguments);
@@ -10823,8 +11074,8 @@ exports.isMongooseObject = function(v) {
   MongooseBuffer || (MongooseBuffer = require('./types').Buffer);
 
   return v instanceof Document ||
-         (v && v.isMongooseArray) ||
-         (v && v.isMongooseBuffer);
+      (v && v.isMongooseArray) ||
+      (v && v.isMongooseBuffer);
 };
 var isMongooseObject = exports.isMongooseObject;
 
@@ -10836,11 +11087,15 @@ var isMongooseObject = exports.isMongooseObject;
  */
 
 exports.expires = function expires(object) {
-  if (!(object && 'Object' == object.constructor.name)) return;
-  if (!('expires' in object)) return;
+  if (!(object && object.constructor.name === 'Object')) {
+    return;
+  }
+  if (!('expires' in object)) {
+    return;
+  }
 
   var when;
-  if ('string' != typeof object.expires) {
+  if (typeof object.expires !== 'string') {
     when = object.expires;
   } else {
     when = Math.round(ms(object.expires) / 1000);
@@ -10881,7 +11136,7 @@ exports.populate = function populate(path, select, model, match, options, subPop
   // an array, string, or object literal).
 
   // might have passed an object specifying all arguments
-  if (1 === arguments.length) {
+  if (arguments.length === 1) {
     if (path instanceof PopulateOptions) {
       return [path];
     }
@@ -10900,13 +11155,13 @@ exports.populate = function populate(path, select, model, match, options, subPop
       subPopulate = path.populate;
       path = path.path;
     }
-  } else if ('string' !== typeof model && 'function' !== typeof model) {
+  } else if (typeof model !== 'string' && typeof model !== 'function') {
     options = match;
     match = model;
     model = undefined;
   }
 
-  if ('string' != typeof path) {
+  if (typeof path !== 'string') {
     throw new TypeError('utils.populate: invalid path. Expected string. Got typeof `' + typeof path + '`');
   }
 
@@ -10992,7 +11247,7 @@ exports.object.hasOwnProperty = function(obj, prop) {
  */
 
 exports.isNullOrUndefined = function(val) {
-  return null == val;
+  return val === null || val === void 0;
 };
 
 /*!
@@ -11075,11 +11330,19 @@ exports.array.unique = function(arr) {
 
 exports.buffer = {};
 exports.buffer.areEqual = function(a, b) {
-  if (!Buffer.isBuffer(a)) return false;
-  if (!Buffer.isBuffer(b)) return false;
-  if (a.length !== b.length) return false;
+  if (!Buffer.isBuffer(a)) {
+    return false;
+  }
+  if (!Buffer.isBuffer(b)) {
+    return false;
+  }
+  if (a.length !== b.length) {
+    return false;
+  }
   for (var i = 0, len = a.length; i < len; ++i) {
-    if (a[i] !== b[i]) return false;
+    if (a[i] !== b[i]) {
+      return false;
+    }
   }
   return true;
 };
@@ -11112,17 +11375,17 @@ exports.mergeClone = function(to, from) {
 
   while (i--) {
     key = keys[i];
-    if ('undefined' === typeof to[key]) {
+    if (typeof to[key] === 'undefined') {
       // make sure to retain key order here because of a bug handling the $each
       // operator in mongodb 2.4.4
-      to[key] = exports.clone(from[key], { retainKeyOrder : 1});
+      to[key] = exports.clone(from[key], {retainKeyOrder: 1});
     } else {
       if (exports.isObject(from[key])) {
         exports.mergeClone(to[key], from[key]);
       } else {
         // make sure to retain key order here because of a bug handling the
         // $each operator in mongodb 2.4.4
-        to[key] = exports.clone(from[key], { retainKeyOrder : 1});
+        to[key] = exports.clone(from[key], {retainKeyOrder: 1});
       }
     }
   }
@@ -11143,7 +11406,7 @@ exports.each = function(arr, fn) {
 };
 
 }).call(this,require("g5I+bs"),require("buffer").Buffer)
-},{"./document":5,"./types":45,"./types/objectid":46,"buffer":71,"g5I+bs":92,"mpath":80,"ms":91,"regexp-clone":93,"sliced":94}],49:[function(require,module,exports){
+},{"./document":5,"./types":45,"./types/objectid":46,"buffer":71,"g5I+bs":94,"mpath":80,"ms":93,"regexp-clone":95,"sliced":96}],49:[function(require,module,exports){
 
 /**
  * VirtualType constructor
@@ -11610,8 +11873,8 @@ var objectKeys = Object.keys || function (obj) {
   return keys;
 };
 
-},{"util/":97}],51:[function(require,module,exports){
-(function (process){
+},{"util/":98}],51:[function(require,module,exports){
+(function (process,global){
 /*!
  * async
  * https://github.com/caolan/async
@@ -11619,18 +11882,32 @@ var objectKeys = Object.keys || function (obj) {
  * Copyright 2010-2014 Caolan McMahon
  * Released under the MIT license
  */
-/*jshint onevar: false, indent:4 */
-/*global setImmediate: false, setTimeout: false, console: false */
 (function () {
 
     var async = {};
+    function noop() {}
+    function identity(v) {
+        return v;
+    }
+    function toBool(v) {
+        return !!v;
+    }
+    function notId(v) {
+        return !v;
+    }
 
     // global on the server, window in the browser
-    var root, previous_async;
+    var previous_async;
 
-    root = this;
+    // Establish the root object, `window` (`self`) in the browser, `global`
+    // on the server, or `this` in some virtual machines. We use `self`
+    // instead of `window` for `WebWorker` support.
+    var root = typeof self === 'object' && self.self === self && self ||
+            typeof global === 'object' && global.global === global && global ||
+            this;
+
     if (root != null) {
-      previous_async = root.async;
+        previous_async = root.async;
     }
 
     async.noConflict = function () {
@@ -11639,12 +11916,19 @@ var objectKeys = Object.keys || function (obj) {
     };
 
     function only_once(fn) {
-        var called = false;
         return function() {
-            if (called) throw new Error("Callback was already called.");
-            called = true;
-            fn.apply(root, arguments);
-        }
+            if (fn === null) throw new Error("Callback was already called.");
+            fn.apply(this, arguments);
+            fn = null;
+        };
+    }
+
+    function _once(fn) {
+        return function() {
+            if (fn === null) return;
+            fn.apply(this, arguments);
+            fn = null;
+        };
     }
 
     //// cross-browser compatiblity functions ////
@@ -11655,40 +11939,66 @@ var objectKeys = Object.keys || function (obj) {
         return _toString.call(obj) === '[object Array]';
     };
 
-    var _each = function (arr, iterator) {
-        if (arr.forEach) {
-            return arr.forEach(iterator);
-        }
-        for (var i = 0; i < arr.length; i += 1) {
-            iterator(arr[i], i, arr);
-        }
+    // Ported from underscore.js isObject
+    var _isObject = function(obj) {
+        var type = typeof obj;
+        return type === 'function' || type === 'object' && !!obj;
     };
 
-    var _map = function (arr, iterator) {
-        if (arr.map) {
-            return arr.map(iterator);
-        }
-        var results = [];
-        _each(arr, function (x, i, a) {
-            results.push(iterator(x, i, a));
-        });
-        return results;
-    };
+    function _isArrayLike(arr) {
+        return _isArray(arr) || (
+            // has a positive integer length property
+            typeof arr.length === "number" &&
+            arr.length >= 0 &&
+            arr.length % 1 === 0
+        );
+    }
 
-    var _reduce = function (arr, iterator, memo) {
-        if (arr.reduce) {
-            return arr.reduce(iterator, memo);
+    function _arrayEach(arr, iterator) {
+        var index = -1,
+            length = arr.length;
+
+        while (++index < length) {
+            iterator(arr[index], index, arr);
         }
-        _each(arr, function (x, i, a) {
+    }
+
+    function _map(arr, iterator) {
+        var index = -1,
+            length = arr.length,
+            result = Array(length);
+
+        while (++index < length) {
+            result[index] = iterator(arr[index], index, arr);
+        }
+        return result;
+    }
+
+    function _range(count) {
+        return _map(Array(count), function (v, i) { return i; });
+    }
+
+    function _reduce(arr, iterator, memo) {
+        _arrayEach(arr, function (x, i, a) {
             memo = iterator(memo, x, i, a);
         });
         return memo;
-    };
+    }
 
-    var _keys = function (obj) {
-        if (Object.keys) {
-            return Object.keys(obj);
+    function _forEachOf(object, iterator) {
+        _arrayEach(_keys(object), function (key) {
+            iterator(object[key], key);
+        });
+    }
+
+    function _indexOf(arr, item) {
+        for (var i = 0; i < arr.length; i++) {
+            if (arr[i] === item) return i;
         }
+        return -1;
+    }
+
+    var _keys = Object.keys || function (obj) {
         var keys = [];
         for (var k in obj) {
             if (obj.hasOwnProperty(k)) {
@@ -11698,191 +12008,247 @@ var objectKeys = Object.keys || function (obj) {
         return keys;
     };
 
+    function _keyIterator(coll) {
+        var i = -1;
+        var len;
+        var keys;
+        if (_isArrayLike(coll)) {
+            len = coll.length;
+            return function next() {
+                i++;
+                return i < len ? i : null;
+            };
+        } else {
+            keys = _keys(coll);
+            len = keys.length;
+            return function next() {
+                i++;
+                return i < len ? keys[i] : null;
+            };
+        }
+    }
+
+    // Similar to ES6's rest param (http://ariya.ofilabs.com/2013/03/es6-and-rest-parameter.html)
+    // This accumulates the arguments passed into an array, after a given index.
+    // From underscore.js (https://github.com/jashkenas/underscore/pull/2140).
+    function _restParam(func, startIndex) {
+        startIndex = startIndex == null ? func.length - 1 : +startIndex;
+        return function() {
+            var length = Math.max(arguments.length - startIndex, 0);
+            var rest = Array(length);
+            for (var index = 0; index < length; index++) {
+                rest[index] = arguments[index + startIndex];
+            }
+            switch (startIndex) {
+                case 0: return func.call(this, rest);
+                case 1: return func.call(this, arguments[0], rest);
+            }
+            // Currently unused but handle cases outside of the switch statement:
+            // var args = Array(startIndex + 1);
+            // for (index = 0; index < startIndex; index++) {
+            //     args[index] = arguments[index];
+            // }
+            // args[startIndex] = rest;
+            // return func.apply(this, args);
+        };
+    }
+
+    function _withoutIndex(iterator) {
+        return function (value, index, callback) {
+            return iterator(value, callback);
+        };
+    }
+
     //// exported async module functions ////
 
     //// nextTick implementation with browser-compatible fallback ////
-    if (typeof process === 'undefined' || !(process.nextTick)) {
-        if (typeof setImmediate === 'function') {
-            async.nextTick = function (fn) {
-                // not a direct alias for IE10 compatibility
-                setImmediate(fn);
-            };
-            async.setImmediate = async.nextTick;
-        }
-        else {
-            async.nextTick = function (fn) {
-                setTimeout(fn, 0);
-            };
-            async.setImmediate = async.nextTick;
-        }
-    }
-    else {
-        async.nextTick = process.nextTick;
-        if (typeof setImmediate !== 'undefined') {
-            async.setImmediate = function (fn) {
-              // not a direct alias for IE10 compatibility
-              setImmediate(fn);
-            };
-        }
-        else {
-            async.setImmediate = async.nextTick;
-        }
-    }
 
+    // capture the global reference to guard against fakeTimer mocks
+    var _setImmediate = typeof setImmediate === 'function' && setImmediate;
+
+    var _delay = _setImmediate ? function(fn) {
+        // not a direct alias for IE10 compatibility
+        _setImmediate(fn);
+    } : function(fn) {
+        setTimeout(fn, 0);
+    };
+
+    if (typeof process === 'object' && typeof process.nextTick === 'function') {
+        async.nextTick = process.nextTick;
+    } else {
+        async.nextTick = _delay;
+    }
+    async.setImmediate = _setImmediate ? _delay : async.nextTick;
+
+
+    async.forEach =
     async.each = function (arr, iterator, callback) {
-        callback = callback || function () {};
-        if (!arr.length) {
-            return callback();
+        return async.eachOf(arr, _withoutIndex(iterator), callback);
+    };
+
+    async.forEachSeries =
+    async.eachSeries = function (arr, iterator, callback) {
+        return async.eachOfSeries(arr, _withoutIndex(iterator), callback);
+    };
+
+
+    async.forEachLimit =
+    async.eachLimit = function (arr, limit, iterator, callback) {
+        return _eachOfLimit(limit)(arr, _withoutIndex(iterator), callback);
+    };
+
+    async.forEachOf =
+    async.eachOf = function (object, iterator, callback) {
+        callback = _once(callback || noop);
+        object = object || [];
+
+        var iter = _keyIterator(object);
+        var key, completed = 0;
+
+        while ((key = iter()) != null) {
+            completed += 1;
+            iterator(object[key], key, only_once(done));
         }
-        var completed = 0;
-        _each(arr, function (x) {
-            iterator(x, only_once(done) );
-        });
+
+        if (completed === 0) callback(null);
+
         function done(err) {
-          if (err) {
-              callback(err);
-              callback = function () {};
-          }
-          else {
-              completed += 1;
-              if (completed >= arr.length) {
-                  callback();
-              }
-          }
+            completed--;
+            if (err) {
+                callback(err);
+            }
+            // Check key is null in case iterator isn't exhausted
+            // and done resolved synchronously.
+            else if (key === null && completed <= 0) {
+                callback(null);
+            }
         }
     };
-    async.forEach = async.each;
 
-    async.eachSeries = function (arr, iterator, callback) {
-        callback = callback || function () {};
-        if (!arr.length) {
-            return callback();
-        }
-        var completed = 0;
-        var iterate = function () {
-            iterator(arr[completed], function (err) {
+    async.forEachOfSeries =
+    async.eachOfSeries = function (obj, iterator, callback) {
+        callback = _once(callback || noop);
+        obj = obj || [];
+        var nextKey = _keyIterator(obj);
+        var key = nextKey();
+        function iterate() {
+            var sync = true;
+            if (key === null) {
+                return callback(null);
+            }
+            iterator(obj[key], key, only_once(function (err) {
                 if (err) {
                     callback(err);
-                    callback = function () {};
                 }
                 else {
-                    completed += 1;
-                    if (completed >= arr.length) {
-                        callback();
-                    }
-                    else {
-                        iterate();
+                    key = nextKey();
+                    if (key === null) {
+                        return callback(null);
+                    } else {
+                        if (sync) {
+                            async.setImmediate(iterate);
+                        } else {
+                            iterate();
+                        }
                     }
                 }
-            });
-        };
+            }));
+            sync = false;
+        }
         iterate();
     };
-    async.forEachSeries = async.eachSeries;
 
-    async.eachLimit = function (arr, limit, iterator, callback) {
-        var fn = _eachLimit(limit);
-        fn.apply(null, [arr, iterator, callback]);
+
+
+    async.forEachOfLimit =
+    async.eachOfLimit = function (obj, limit, iterator, callback) {
+        _eachOfLimit(limit)(obj, iterator, callback);
     };
-    async.forEachLimit = async.eachLimit;
 
-    var _eachLimit = function (limit) {
+    function _eachOfLimit(limit) {
 
-        return function (arr, iterator, callback) {
-            callback = callback || function () {};
-            if (!arr.length || limit <= 0) {
-                return callback();
+        return function (obj, iterator, callback) {
+            callback = _once(callback || noop);
+            obj = obj || [];
+            var nextKey = _keyIterator(obj);
+            if (limit <= 0) {
+                return callback(null);
             }
-            var completed = 0;
-            var started = 0;
+            var done = false;
             var running = 0;
+            var errored = false;
 
             (function replenish () {
-                if (completed >= arr.length) {
-                    return callback();
+                if (done && running <= 0) {
+                    return callback(null);
                 }
 
-                while (running < limit && started < arr.length) {
-                    started += 1;
+                while (running < limit && !errored) {
+                    var key = nextKey();
+                    if (key === null) {
+                        done = true;
+                        if (running <= 0) {
+                            callback(null);
+                        }
+                        return;
+                    }
                     running += 1;
-                    iterator(arr[started - 1], function (err) {
+                    iterator(obj[key], key, only_once(function (err) {
+                        running -= 1;
                         if (err) {
                             callback(err);
-                            callback = function () {};
+                            errored = true;
                         }
                         else {
-                            completed += 1;
-                            running -= 1;
-                            if (completed >= arr.length) {
-                                callback();
-                            }
-                            else {
-                                replenish();
-                            }
+                            replenish();
                         }
-                    });
+                    }));
                 }
             })();
         };
-    };
+    }
 
 
-    var doParallel = function (fn) {
-        return function () {
-            var args = Array.prototype.slice.call(arguments);
-            return fn.apply(null, [async.each].concat(args));
+    function doParallel(fn) {
+        return function (obj, iterator, callback) {
+            return fn(async.eachOf, obj, iterator, callback);
         };
-    };
-    var doParallelLimit = function(limit, fn) {
-        return function () {
-            var args = Array.prototype.slice.call(arguments);
-            return fn.apply(null, [_eachLimit(limit)].concat(args));
+    }
+    function doParallelLimit(fn) {
+        return function (obj, limit, iterator, callback) {
+            return fn(_eachOfLimit(limit), obj, iterator, callback);
         };
-    };
-    var doSeries = function (fn) {
-        return function () {
-            var args = Array.prototype.slice.call(arguments);
-            return fn.apply(null, [async.eachSeries].concat(args));
+    }
+    function doSeries(fn) {
+        return function (obj, iterator, callback) {
+            return fn(async.eachOfSeries, obj, iterator, callback);
         };
-    };
+    }
 
-
-    var _asyncMap = function (eachfn, arr, iterator, callback) {
-        arr = _map(arr, function (x, i) {
-            return {index: i, value: x};
+    function _asyncMap(eachfn, arr, iterator, callback) {
+        callback = _once(callback || noop);
+        arr = arr || [];
+        var results = _isArrayLike(arr) ? [] : {};
+        eachfn(arr, function (value, index, callback) {
+            iterator(value, function (err, v) {
+                results[index] = v;
+                callback(err);
+            });
+        }, function (err) {
+            callback(err, results);
         });
-        if (!callback) {
-            eachfn(arr, function (x, callback) {
-                iterator(x.value, function (err) {
-                    callback(err);
-                });
-            });
-        } else {
-            var results = [];
-            eachfn(arr, function (x, callback) {
-                iterator(x.value, function (err, v) {
-                    results[x.index] = v;
-                    callback(err);
-                });
-            }, function (err) {
-                callback(err, results);
-            });
-        }
-    };
+    }
+
     async.map = doParallel(_asyncMap);
     async.mapSeries = doSeries(_asyncMap);
-    async.mapLimit = function (arr, limit, iterator, callback) {
-        return _mapLimit(limit)(arr, iterator, callback);
-    };
-
-    var _mapLimit = function(limit) {
-        return doParallelLimit(limit, _asyncMap);
-    };
+    async.mapLimit = doParallelLimit(_asyncMap);
 
     // reduce only has a series version, as doing reduce in parallel won't
     // work in many situations.
+    async.inject =
+    async.foldl =
     async.reduce = function (arr, memo, iterator, callback) {
-        async.eachSeries(arr, function (x, callback) {
+        async.eachOfSeries(arr, function (x, i, callback) {
             iterator(memo, x, function (err, v) {
                 memo = v;
                 callback(err);
@@ -11891,118 +12257,106 @@ var objectKeys = Object.keys || function (obj) {
             callback(err, memo);
         });
     };
-    // inject alias
-    async.inject = async.reduce;
-    // foldl alias
-    async.foldl = async.reduce;
 
+    async.foldr =
     async.reduceRight = function (arr, memo, iterator, callback) {
-        var reversed = _map(arr, function (x) {
-            return x;
-        }).reverse();
+        var reversed = _map(arr, identity).reverse();
         async.reduce(reversed, memo, iterator, callback);
     };
-    // foldr alias
-    async.foldr = async.reduceRight;
 
-    var _filter = function (eachfn, arr, iterator, callback) {
-        var results = [];
-        arr = _map(arr, function (x, i) {
-            return {index: i, value: x};
+    async.transform = function (arr, memo, iterator, callback) {
+        if (arguments.length === 3) {
+            callback = iterator;
+            iterator = memo;
+            memo = _isArray(arr) ? [] : {};
+        }
+
+        async.eachOf(arr, function(v, k, cb) {
+            iterator(memo, v, k, cb);
+        }, function(err) {
+            callback(err, memo);
         });
-        eachfn(arr, function (x, callback) {
-            iterator(x.value, function (v) {
+    };
+
+    function _filter(eachfn, arr, iterator, callback) {
+        var results = [];
+        eachfn(arr, function (x, index, callback) {
+            iterator(x, function (v) {
                 if (v) {
-                    results.push(x);
+                    results.push({index: index, value: x});
                 }
                 callback();
             });
-        }, function (err) {
+        }, function () {
             callback(_map(results.sort(function (a, b) {
                 return a.index - b.index;
             }), function (x) {
                 return x.value;
             }));
         });
-    };
-    async.filter = doParallel(_filter);
-    async.filterSeries = doSeries(_filter);
-    // select alias
-    async.select = async.filter;
-    async.selectSeries = async.filterSeries;
+    }
 
-    var _reject = function (eachfn, arr, iterator, callback) {
-        var results = [];
-        arr = _map(arr, function (x, i) {
-            return {index: i, value: x};
-        });
-        eachfn(arr, function (x, callback) {
-            iterator(x.value, function (v) {
-                if (!v) {
-                    results.push(x);
-                }
-                callback();
+    async.select =
+    async.filter = doParallel(_filter);
+
+    async.selectLimit =
+    async.filterLimit = doParallelLimit(_filter);
+
+    async.selectSeries =
+    async.filterSeries = doSeries(_filter);
+
+    function _reject(eachfn, arr, iterator, callback) {
+        _filter(eachfn, arr, function(value, cb) {
+            iterator(value, function(v) {
+                cb(!v);
             });
-        }, function (err) {
-            callback(_map(results.sort(function (a, b) {
-                return a.index - b.index;
-            }), function (x) {
-                return x.value;
-            }));
-        });
-    };
+        }, callback);
+    }
     async.reject = doParallel(_reject);
+    async.rejectLimit = doParallelLimit(_reject);
     async.rejectSeries = doSeries(_reject);
 
-    var _detect = function (eachfn, arr, iterator, main_callback) {
-        eachfn(arr, function (x, callback) {
-            iterator(x, function (result) {
-                if (result) {
-                    main_callback(x);
-                    main_callback = function () {};
-                }
-                else {
+    function _createTester(eachfn, check, getResult) {
+        return function(arr, limit, iterator, cb) {
+            function done() {
+                if (cb) cb(getResult(false, void 0));
+            }
+            function iteratee(x, _, callback) {
+                if (!cb) return callback();
+                iterator(x, function (v) {
+                    if (cb && check(v)) {
+                        cb(getResult(true, x));
+                        cb = iterator = false;
+                    }
                     callback();
-                }
-            });
-        }, function (err) {
-            main_callback();
-        });
-    };
-    async.detect = doParallel(_detect);
-    async.detectSeries = doSeries(_detect);
+                });
+            }
+            if (arguments.length > 3) {
+                eachfn(arr, limit, iteratee, done);
+            } else {
+                cb = iterator;
+                iterator = limit;
+                eachfn(arr, iteratee, done);
+            }
+        };
+    }
 
-    async.some = function (arr, iterator, main_callback) {
-        async.each(arr, function (x, callback) {
-            iterator(x, function (v) {
-                if (v) {
-                    main_callback(true);
-                    main_callback = function () {};
-                }
-                callback();
-            });
-        }, function (err) {
-            main_callback(false);
-        });
-    };
-    // any alias
-    async.any = async.some;
+    async.any =
+    async.some = _createTester(async.eachOf, toBool, identity);
 
-    async.every = function (arr, iterator, main_callback) {
-        async.each(arr, function (x, callback) {
-            iterator(x, function (v) {
-                if (!v) {
-                    main_callback(false);
-                    main_callback = function () {};
-                }
-                callback();
-            });
-        }, function (err) {
-            main_callback(true);
-        });
-    };
-    // all alias
-    async.all = async.every;
+    async.someLimit = _createTester(async.eachOfLimit, toBool, identity);
+
+    async.all =
+    async.every = _createTester(async.eachOf, notId, notId);
+
+    async.everyLimit = _createTester(async.eachOfLimit, notId, notId);
+
+    function _findGetResult(v, x) {
+        return x;
+    }
+    async.detect = _createTester(async.eachOf, identity, _findGetResult);
+    async.detectSeries = _createTester(async.eachOfSeries, identity, _findGetResult);
+    async.detectLimit = _createTester(async.eachOfLimit, identity, _findGetResult);
 
     async.sortBy = function (arr, iterator, callback) {
         async.map(arr, function (x, callback) {
@@ -12019,147 +12373,206 @@ var objectKeys = Object.keys || function (obj) {
                 return callback(err);
             }
             else {
-                var fn = function (left, right) {
-                    var a = left.criteria, b = right.criteria;
-                    return a < b ? -1 : a > b ? 1 : 0;
-                };
-                callback(null, _map(results.sort(fn), function (x) {
+                callback(null, _map(results.sort(comparator), function (x) {
                     return x.value;
                 }));
             }
+
         });
+
+        function comparator(left, right) {
+            var a = left.criteria, b = right.criteria;
+            return a < b ? -1 : a > b ? 1 : 0;
+        }
     };
 
-    async.auto = function (tasks, callback) {
-        callback = callback || function () {};
+    async.auto = function (tasks, concurrency, callback) {
+        if (typeof arguments[1] === 'function') {
+            // concurrency is optional, shift the args.
+            callback = concurrency;
+            concurrency = null;
+        }
+        callback = _once(callback || noop);
         var keys = _keys(tasks);
-        var remainingTasks = keys.length
+        var remainingTasks = keys.length;
         if (!remainingTasks) {
-            return callback();
+            return callback(null);
+        }
+        if (!concurrency) {
+            concurrency = remainingTasks;
         }
 
         var results = {};
+        var runningTasks = 0;
+
+        var hasError = false;
 
         var listeners = [];
-        var addListener = function (fn) {
+        function addListener(fn) {
             listeners.unshift(fn);
-        };
-        var removeListener = function (fn) {
-            for (var i = 0; i < listeners.length; i += 1) {
-                if (listeners[i] === fn) {
-                    listeners.splice(i, 1);
-                    return;
-                }
-            }
-        };
-        var taskComplete = function () {
-            remainingTasks--
-            _each(listeners.slice(0), function (fn) {
+        }
+        function removeListener(fn) {
+            var idx = _indexOf(listeners, fn);
+            if (idx >= 0) listeners.splice(idx, 1);
+        }
+        function taskComplete() {
+            remainingTasks--;
+            _arrayEach(listeners.slice(0), function (fn) {
                 fn();
             });
-        };
+        }
 
         addListener(function () {
             if (!remainingTasks) {
-                var theCallback = callback;
-                // prevent final callback from calling itself if it errors
-                callback = function () {};
-
-                theCallback(null, results);
+                callback(null, results);
             }
         });
 
-        _each(keys, function (k) {
+        _arrayEach(keys, function (k) {
+            if (hasError) return;
             var task = _isArray(tasks[k]) ? tasks[k]: [tasks[k]];
-            var taskCallback = function (err) {
-                var args = Array.prototype.slice.call(arguments, 1);
+            var taskCallback = _restParam(function(err, args) {
+                runningTasks--;
                 if (args.length <= 1) {
                     args = args[0];
                 }
                 if (err) {
                     var safeResults = {};
-                    _each(_keys(results), function(rkey) {
-                        safeResults[rkey] = results[rkey];
+                    _forEachOf(results, function(val, rkey) {
+                        safeResults[rkey] = val;
                     });
                     safeResults[k] = args;
+                    hasError = true;
+
                     callback(err, safeResults);
-                    // stop subsequent errors hitting callback multiple times
-                    callback = function () {};
                 }
                 else {
                     results[k] = args;
                     async.setImmediate(taskComplete);
                 }
-            };
-            var requires = task.slice(0, Math.abs(task.length - 1)) || [];
-            var ready = function () {
-                return _reduce(requires, function (a, x) {
+            });
+            var requires = task.slice(0, task.length - 1);
+            // prevent dead-locks
+            var len = requires.length;
+            var dep;
+            while (len--) {
+                if (!(dep = tasks[requires[len]])) {
+                    throw new Error('Has nonexistent dependency in ' + requires.join(', '));
+                }
+                if (_isArray(dep) && _indexOf(dep, k) >= 0) {
+                    throw new Error('Has cyclic dependencies');
+                }
+            }
+            function ready() {
+                return runningTasks < concurrency && _reduce(requires, function (a, x) {
                     return (a && results.hasOwnProperty(x));
                 }, true) && !results.hasOwnProperty(k);
-            };
+            }
             if (ready()) {
+                runningTasks++;
                 task[task.length - 1](taskCallback, results);
             }
             else {
-                var listener = function () {
-                    if (ready()) {
-                        removeListener(listener);
-                        task[task.length - 1](taskCallback, results);
-                    }
-                };
                 addListener(listener);
+            }
+            function listener() {
+                if (ready()) {
+                    runningTasks++;
+                    removeListener(listener);
+                    task[task.length - 1](taskCallback, results);
+                }
             }
         });
     };
 
+
+
     async.retry = function(times, task, callback) {
         var DEFAULT_TIMES = 5;
+        var DEFAULT_INTERVAL = 0;
+
         var attempts = [];
-        // Use defaults if times not passed
-        if (typeof times === 'function') {
+
+        var opts = {
+            times: DEFAULT_TIMES,
+            interval: DEFAULT_INTERVAL
+        };
+
+        function parseTimes(acc, t){
+            if(typeof t === 'number'){
+                acc.times = parseInt(t, 10) || DEFAULT_TIMES;
+            } else if(typeof t === 'object'){
+                acc.times = parseInt(t.times, 10) || DEFAULT_TIMES;
+                acc.interval = parseInt(t.interval, 10) || DEFAULT_INTERVAL;
+            } else {
+                throw new Error('Unsupported argument type for \'times\': ' + typeof t);
+            }
+        }
+
+        var length = arguments.length;
+        if (length < 1 || length > 3) {
+            throw new Error('Invalid arguments - must be either (task), (task, callback), (times, task) or (times, task, callback)');
+        } else if (length <= 2 && typeof times === 'function') {
             callback = task;
             task = times;
-            times = DEFAULT_TIMES;
         }
-        // Make sure times is a number
-        times = parseInt(times, 10) || DEFAULT_TIMES;
-        var wrappedTask = function(wrappedCallback, wrappedResults) {
-            var retryAttempt = function(task, finalAttempt) {
+        if (typeof times !== 'function') {
+            parseTimes(opts, times);
+        }
+        opts.callback = callback;
+        opts.task = task;
+
+        function wrappedTask(wrappedCallback, wrappedResults) {
+            function retryAttempt(task, finalAttempt) {
                 return function(seriesCallback) {
                     task(function(err, result){
                         seriesCallback(!err || finalAttempt, {err: err, result: result});
                     }, wrappedResults);
                 };
-            };
-            while (times) {
-                attempts.push(retryAttempt(task, !(times-=1)));
             }
+
+            function retryInterval(interval){
+                return function(seriesCallback){
+                    setTimeout(function(){
+                        seriesCallback(null);
+                    }, interval);
+                };
+            }
+
+            while (opts.times) {
+
+                var finalAttempt = !(opts.times-=1);
+                attempts.push(retryAttempt(opts.task, finalAttempt));
+                if(!finalAttempt && opts.interval > 0){
+                    attempts.push(retryInterval(opts.interval));
+                }
+            }
+
             async.series(attempts, function(done, data){
                 data = data[data.length - 1];
-                (wrappedCallback || callback)(data.err, data.result);
+                (wrappedCallback || opts.callback)(data.err, data.result);
             });
         }
+
         // If a callback is passed, run this as a controll flow
-        return callback ? wrappedTask() : wrappedTask
+        return opts.callback ? wrappedTask() : wrappedTask;
     };
 
     async.waterfall = function (tasks, callback) {
-        callback = callback || function () {};
+        callback = _once(callback || noop);
         if (!_isArray(tasks)) {
-          var err = new Error('First argument to waterfall must be an array of functions');
-          return callback(err);
+            var err = new Error('First argument to waterfall must be an array of functions');
+            return callback(err);
         }
         if (!tasks.length) {
             return callback();
         }
-        var wrapIterator = function (iterator) {
-            return function (err) {
+        function wrapIterator(iterator) {
+            return _restParam(function (err, args) {
                 if (err) {
-                    callback.apply(null, arguments);
-                    callback = function () {};
+                    callback.apply(null, [err].concat(args));
                 }
                 else {
-                    var args = Array.prototype.slice.call(arguments, 1);
                     var next = iterator.next();
                     if (next) {
                         args.push(wrapIterator(next));
@@ -12167,260 +12580,254 @@ var objectKeys = Object.keys || function (obj) {
                     else {
                         args.push(callback);
                     }
-                    async.setImmediate(function () {
-                        iterator.apply(null, args);
-                    });
+                    ensureAsync(iterator).apply(null, args);
                 }
-            };
-        };
+            });
+        }
         wrapIterator(async.iterator(tasks))();
     };
 
-    var _parallel = function(eachfn, tasks, callback) {
-        callback = callback || function () {};
-        if (_isArray(tasks)) {
-            eachfn.map(tasks, function (fn, callback) {
-                if (fn) {
-                    fn(function (err) {
-                        var args = Array.prototype.slice.call(arguments, 1);
-                        if (args.length <= 1) {
-                            args = args[0];
-                        }
-                        callback.call(null, err, args);
-                    });
+    function _parallel(eachfn, tasks, callback) {
+        callback = callback || noop;
+        var results = _isArrayLike(tasks) ? [] : {};
+
+        eachfn(tasks, function (task, key, callback) {
+            task(_restParam(function (err, args) {
+                if (args.length <= 1) {
+                    args = args[0];
                 }
-            }, callback);
-        }
-        else {
-            var results = {};
-            eachfn.each(_keys(tasks), function (k, callback) {
-                tasks[k](function (err) {
-                    var args = Array.prototype.slice.call(arguments, 1);
-                    if (args.length <= 1) {
-                        args = args[0];
-                    }
-                    results[k] = args;
-                    callback(err);
-                });
-            }, function (err) {
-                callback(err, results);
-            });
-        }
-    };
+                results[key] = args;
+                callback(err);
+            }));
+        }, function (err) {
+            callback(err, results);
+        });
+    }
 
     async.parallel = function (tasks, callback) {
-        _parallel({ map: async.map, each: async.each }, tasks, callback);
+        _parallel(async.eachOf, tasks, callback);
     };
 
     async.parallelLimit = function(tasks, limit, callback) {
-        _parallel({ map: _mapLimit(limit), each: _eachLimit(limit) }, tasks, callback);
+        _parallel(_eachOfLimit(limit), tasks, callback);
     };
 
-    async.series = function (tasks, callback) {
-        callback = callback || function () {};
-        if (_isArray(tasks)) {
-            async.mapSeries(tasks, function (fn, callback) {
-                if (fn) {
-                    fn(function (err) {
-                        var args = Array.prototype.slice.call(arguments, 1);
-                        if (args.length <= 1) {
-                            args = args[0];
-                        }
-                        callback.call(null, err, args);
-                    });
-                }
-            }, callback);
-        }
-        else {
-            var results = {};
-            async.eachSeries(_keys(tasks), function (k, callback) {
-                tasks[k](function (err) {
-                    var args = Array.prototype.slice.call(arguments, 1);
-                    if (args.length <= 1) {
-                        args = args[0];
-                    }
-                    results[k] = args;
-                    callback(err);
-                });
-            }, function (err) {
-                callback(err, results);
-            });
-        }
+    async.series = function(tasks, callback) {
+        _parallel(async.eachOfSeries, tasks, callback);
     };
 
     async.iterator = function (tasks) {
-        var makeCallback = function (index) {
-            var fn = function () {
+        function makeCallback(index) {
+            function fn() {
                 if (tasks.length) {
                     tasks[index].apply(null, arguments);
                 }
                 return fn.next();
-            };
+            }
             fn.next = function () {
                 return (index < tasks.length - 1) ? makeCallback(index + 1): null;
             };
             return fn;
-        };
+        }
         return makeCallback(0);
     };
 
-    async.apply = function (fn) {
-        var args = Array.prototype.slice.call(arguments, 1);
-        return function () {
+    async.apply = _restParam(function (fn, args) {
+        return _restParam(function (callArgs) {
             return fn.apply(
-                null, args.concat(Array.prototype.slice.call(arguments))
+                null, args.concat(callArgs)
             );
-        };
-    };
+        });
+    });
 
-    var _concat = function (eachfn, arr, fn, callback) {
-        var r = [];
-        eachfn(arr, function (x, cb) {
+    function _concat(eachfn, arr, fn, callback) {
+        var result = [];
+        eachfn(arr, function (x, index, cb) {
             fn(x, function (err, y) {
-                r = r.concat(y || []);
+                result = result.concat(y || []);
                 cb(err);
             });
         }, function (err) {
-            callback(err, r);
+            callback(err, result);
         });
-    };
+    }
     async.concat = doParallel(_concat);
     async.concatSeries = doSeries(_concat);
 
     async.whilst = function (test, iterator, callback) {
+        callback = callback || noop;
         if (test()) {
-            iterator(function (err) {
+            var next = _restParam(function(err, args) {
                 if (err) {
-                    return callback(err);
+                    callback(err);
+                } else if (test.apply(this, args)) {
+                    iterator(next);
+                } else {
+                    callback.apply(null, [null].concat(args));
                 }
-                async.whilst(test, iterator, callback);
             });
-        }
-        else {
-            callback();
+            iterator(next);
+        } else {
+            callback(null);
         }
     };
 
     async.doWhilst = function (iterator, test, callback) {
-        iterator(function (err) {
-            if (err) {
-                return callback(err);
-            }
-            var args = Array.prototype.slice.call(arguments, 1);
-            if (test.apply(null, args)) {
-                async.doWhilst(iterator, test, callback);
-            }
-            else {
-                callback();
-            }
-        });
+        var calls = 0;
+        return async.whilst(function() {
+            return ++calls <= 1 || test.apply(this, arguments);
+        }, iterator, callback);
     };
 
     async.until = function (test, iterator, callback) {
-        if (!test()) {
-            iterator(function (err) {
-                if (err) {
-                    return callback(err);
-                }
-                async.until(test, iterator, callback);
-            });
-        }
-        else {
-            callback();
-        }
+        return async.whilst(function() {
+            return !test.apply(this, arguments);
+        }, iterator, callback);
     };
 
     async.doUntil = function (iterator, test, callback) {
-        iterator(function (err) {
-            if (err) {
-                return callback(err);
-            }
-            var args = Array.prototype.slice.call(arguments, 1);
-            if (!test.apply(null, args)) {
-                async.doUntil(iterator, test, callback);
-            }
-            else {
-                callback();
-            }
-        });
+        return async.doWhilst(iterator, function() {
+            return !test.apply(this, arguments);
+        }, callback);
     };
 
-    async.queue = function (worker, concurrency) {
-        if (concurrency === undefined) {
+    async.during = function (test, iterator, callback) {
+        callback = callback || noop;
+
+        var next = _restParam(function(err, args) {
+            if (err) {
+                callback(err);
+            } else {
+                args.push(check);
+                test.apply(this, args);
+            }
+        });
+
+        var check = function(err, truth) {
+            if (err) {
+                callback(err);
+            } else if (truth) {
+                iterator(next);
+            } else {
+                callback(null);
+            }
+        };
+
+        test(check);
+    };
+
+    async.doDuring = function (iterator, test, callback) {
+        var calls = 0;
+        async.during(function(next) {
+            if (calls++ < 1) {
+                next(null, true);
+            } else {
+                test.apply(this, arguments);
+            }
+        }, iterator, callback);
+    };
+
+    function _queue(worker, concurrency, payload) {
+        if (concurrency == null) {
             concurrency = 1;
         }
+        else if(concurrency === 0) {
+            throw new Error('Concurrency must not be zero');
+        }
         function _insert(q, data, pos, callback) {
-          if (!q.started){
+            if (callback != null && typeof callback !== "function") {
+                throw new Error("task callback must be a function");
+            }
             q.started = true;
-          }
-          if (!_isArray(data)) {
-              data = [data];
-          }
-          if(data.length == 0) {
-             // call drain immediately if there are no tasks
-             return async.setImmediate(function() {
-                 if (q.drain) {
-                     q.drain();
-                 }
-             });
-          }
-          _each(data, function(task) {
-              var item = {
-                  data: task,
-                  callback: typeof callback === 'function' ? callback : null
-              };
+            if (!_isArray(data)) {
+                data = [data];
+            }
+            if(data.length === 0 && q.idle()) {
+                // call drain immediately if there are no tasks
+                return async.setImmediate(function() {
+                    q.drain();
+                });
+            }
+            _arrayEach(data, function(task) {
+                var item = {
+                    data: task,
+                    callback: callback || noop
+                };
 
-              if (pos) {
-                q.tasks.unshift(item);
-              } else {
-                q.tasks.push(item);
-              }
+                if (pos) {
+                    q.tasks.unshift(item);
+                } else {
+                    q.tasks.push(item);
+                }
 
-              if (q.saturated && q.tasks.length === q.concurrency) {
-                  q.saturated();
-              }
-              async.setImmediate(q.process);
-          });
+                if (q.tasks.length === q.concurrency) {
+                    q.saturated();
+                }
+            });
+            async.setImmediate(q.process);
+        }
+        function _next(q, tasks) {
+            return function(){
+                workers -= 1;
+
+                var removed = false;
+                var args = arguments;
+                _arrayEach(tasks, function (task) {
+                    _arrayEach(workersList, function (worker, index) {
+                        if (worker === task && !removed) {
+                            workersList.splice(index, 1);
+                            removed = true;
+                        }
+                    });
+
+                    task.callback.apply(task, args);
+                });
+                if (q.tasks.length + workers === 0) {
+                    q.drain();
+                }
+                q.process();
+            };
         }
 
         var workers = 0;
+        var workersList = [];
         var q = {
             tasks: [],
             concurrency: concurrency,
-            saturated: null,
-            empty: null,
-            drain: null,
+            payload: payload,
+            saturated: noop,
+            empty: noop,
+            drain: noop,
             started: false,
             paused: false,
             push: function (data, callback) {
-              _insert(q, data, false, callback);
+                _insert(q, data, false, callback);
             },
             kill: function () {
-              q.drain = null;
-              q.tasks = [];
+                q.drain = noop;
+                q.tasks = [];
             },
             unshift: function (data, callback) {
-              _insert(q, data, true, callback);
+                _insert(q, data, true, callback);
             },
             process: function () {
-                if (!q.paused && workers < q.concurrency && q.tasks.length) {
-                    var task = q.tasks.shift();
-                    if (q.empty && q.tasks.length === 0) {
+                while(!q.paused && workers < q.concurrency && q.tasks.length){
+
+                    var tasks = q.payload ?
+                        q.tasks.splice(0, q.payload) :
+                        q.tasks.splice(0, q.tasks.length);
+
+                    var data = _map(tasks, function (task) {
+                        return task.data;
+                    });
+
+                    if (q.tasks.length === 0) {
                         q.empty();
                     }
                     workers += 1;
-                    var next = function () {
-                        workers -= 1;
-                        if (task.callback) {
-                            task.callback.apply(task, arguments);
-                        }
-                        if (q.drain && q.tasks.length + workers === 0) {
-                            q.drain();
-                        }
-                        q.process();
-                    };
-                    var cb = only_once(next);
-                    worker(task.data, cb);
+                    workersList.push(tasks[0]);
+                    var cb = only_once(_next(q, tasks));
+                    worker(data, cb);
                 }
             },
             length: function () {
@@ -12429,82 +12836,95 @@ var objectKeys = Object.keys || function (obj) {
             running: function () {
                 return workers;
             },
+            workersList: function () {
+                return workersList;
+            },
             idle: function() {
                 return q.tasks.length + workers === 0;
             },
             pause: function () {
-                if (q.paused === true) { return; }
                 q.paused = true;
-                q.process();
             },
             resume: function () {
                 if (q.paused === false) { return; }
                 q.paused = false;
-                q.process();
+                var resumeCount = Math.min(q.concurrency, q.tasks.length);
+                // Need to call q.process once per concurrent
+                // worker to preserve full concurrency after pause
+                for (var w = 1; w <= resumeCount; w++) {
+                    async.setImmediate(q.process);
+                }
             }
         };
         return q;
-    };
-    
-    async.priorityQueue = function (worker, concurrency) {
-        
-        function _compareTasks(a, b){
-          return a.priority - b.priority;
-        };
-        
-        function _binarySearch(sequence, item, compare) {
-          var beg = -1,
-              end = sequence.length - 1;
-          while (beg < end) {
-            var mid = beg + ((end - beg + 1) >>> 1);
-            if (compare(item, sequence[mid]) >= 0) {
-              beg = mid;
-            } else {
-              end = mid - 1;
-            }
-          }
-          return beg;
-        }
-        
-        function _insert(q, data, priority, callback) {
-          if (!q.started){
-            q.started = true;
-          }
-          if (!_isArray(data)) {
-              data = [data];
-          }
-          if(data.length == 0) {
-             // call drain immediately if there are no tasks
-             return async.setImmediate(function() {
-                 if (q.drain) {
-                     q.drain();
-                 }
-             });
-          }
-          _each(data, function(task) {
-              var item = {
-                  data: task,
-                  priority: priority,
-                  callback: typeof callback === 'function' ? callback : null
-              };
-              
-              q.tasks.splice(_binarySearch(q.tasks, item, _compareTasks) + 1, 0, item);
+    }
 
-              if (q.saturated && q.tasks.length === q.concurrency) {
-                  q.saturated();
-              }
-              async.setImmediate(q.process);
-          });
+    async.queue = function (worker, concurrency) {
+        var q = _queue(function (items, cb) {
+            worker(items[0], cb);
+        }, concurrency, 1);
+
+        return q;
+    };
+
+    async.priorityQueue = function (worker, concurrency) {
+
+        function _compareTasks(a, b){
+            return a.priority - b.priority;
         }
-        
+
+        function _binarySearch(sequence, item, compare) {
+            var beg = -1,
+                end = sequence.length - 1;
+            while (beg < end) {
+                var mid = beg + ((end - beg + 1) >>> 1);
+                if (compare(item, sequence[mid]) >= 0) {
+                    beg = mid;
+                } else {
+                    end = mid - 1;
+                }
+            }
+            return beg;
+        }
+
+        function _insert(q, data, priority, callback) {
+            if (callback != null && typeof callback !== "function") {
+                throw new Error("task callback must be a function");
+            }
+            q.started = true;
+            if (!_isArray(data)) {
+                data = [data];
+            }
+            if(data.length === 0) {
+                // call drain immediately if there are no tasks
+                return async.setImmediate(function() {
+                    q.drain();
+                });
+            }
+            _arrayEach(data, function(task) {
+                var item = {
+                    data: task,
+                    priority: priority,
+                    callback: typeof callback === 'function' ? callback : noop
+                };
+
+                q.tasks.splice(_binarySearch(q.tasks, item, _compareTasks) + 1, 0, item);
+
+                if (q.tasks.length === q.concurrency) {
+                    q.saturated();
+                }
+                async.setImmediate(q.process);
+            });
+        }
+
         // Start with a normal queue
         var q = async.queue(worker, concurrency);
-        
+
         // Override push to accept second parameter representing priority
         q.push = function (data, priority, callback) {
-          _insert(q, data, priority, callback);
+            _insert(q, data, priority, callback);
         };
-        
+
         // Remove unshift function
         delete q.unshift;
 
@@ -12512,93 +12932,27 @@ var objectKeys = Object.keys || function (obj) {
     };
 
     async.cargo = function (worker, payload) {
-        var working     = false,
-            tasks       = [];
-
-        var cargo = {
-            tasks: tasks,
-            payload: payload,
-            saturated: null,
-            empty: null,
-            drain: null,
-            drained: true,
-            push: function (data, callback) {
-                if (!_isArray(data)) {
-                    data = [data];
-                }
-                _each(data, function(task) {
-                    tasks.push({
-                        data: task,
-                        callback: typeof callback === 'function' ? callback : null
-                    });
-                    cargo.drained = false;
-                    if (cargo.saturated && tasks.length === payload) {
-                        cargo.saturated();
-                    }
-                });
-                async.setImmediate(cargo.process);
-            },
-            process: function process() {
-                if (working) return;
-                if (tasks.length === 0) {
-                    if(cargo.drain && !cargo.drained) cargo.drain();
-                    cargo.drained = true;
-                    return;
-                }
-
-                var ts = typeof payload === 'number'
-                            ? tasks.splice(0, payload)
-                            : tasks.splice(0, tasks.length);
-
-                var ds = _map(ts, function (task) {
-                    return task.data;
-                });
-
-                if(cargo.empty) cargo.empty();
-                working = true;
-                worker(ds, function () {
-                    working = false;
-
-                    var args = arguments;
-                    _each(ts, function (data) {
-                        if (data.callback) {
-                            data.callback.apply(null, args);
-                        }
-                    });
-
-                    process();
-                });
-            },
-            length: function () {
-                return tasks.length;
-            },
-            running: function () {
-                return working;
-            }
-        };
-        return cargo;
+        return _queue(worker, 1, payload);
     };
 
-    var _console_fn = function (name) {
-        return function (fn) {
-            var args = Array.prototype.slice.call(arguments, 1);
-            fn.apply(null, args.concat([function (err) {
-                var args = Array.prototype.slice.call(arguments, 1);
-                if (typeof console !== 'undefined') {
+    function _console_fn(name) {
+        return _restParam(function (fn, args) {
+            fn.apply(null, args.concat([_restParam(function (err, args) {
+                if (typeof console === 'object') {
                     if (err) {
                         if (console.error) {
                             console.error(err);
                         }
                     }
                     else if (console[name]) {
-                        _each(args, function (x) {
+                        _arrayEach(args, function (x) {
                             console[name](x);
                         });
                     }
                 }
-            }]));
-        };
-    };
+            })]));
+        });
+    }
     async.log = _console_fn('log');
     async.dir = _console_fn('dir');
     /*async.info = _console_fn('info');
@@ -12608,123 +12962,174 @@ var objectKeys = Object.keys || function (obj) {
     async.memoize = function (fn, hasher) {
         var memo = {};
         var queues = {};
-        hasher = hasher || function (x) {
-            return x;
-        };
-        var memoized = function () {
-            var args = Array.prototype.slice.call(arguments);
+        var has = Object.prototype.hasOwnProperty;
+        hasher = hasher || identity;
+        var memoized = _restParam(function memoized(args) {
             var callback = args.pop();
             var key = hasher.apply(null, args);
-            if (key in memo) {
-                async.nextTick(function () {
+            if (has.call(memo, key)) {   
+                async.setImmediate(function () {
                     callback.apply(null, memo[key]);
                 });
             }
-            else if (key in queues) {
+            else if (has.call(queues, key)) {
                 queues[key].push(callback);
             }
             else {
                 queues[key] = [callback];
-                fn.apply(null, args.concat([function () {
-                    memo[key] = arguments;
+                fn.apply(null, args.concat([_restParam(function (args) {
+                    memo[key] = args;
                     var q = queues[key];
                     delete queues[key];
                     for (var i = 0, l = q.length; i < l; i++) {
-                      q[i].apply(null, arguments);
+                        q[i].apply(null, args);
                     }
-                }]));
+                })]));
             }
-        };
+        });
         memoized.memo = memo;
         memoized.unmemoized = fn;
         return memoized;
     };
 
     async.unmemoize = function (fn) {
-      return function () {
-        return (fn.unmemoized || fn).apply(null, arguments);
-      };
+        return function () {
+            return (fn.unmemoized || fn).apply(null, arguments);
+        };
     };
 
-    async.times = function (count, iterator, callback) {
-        var counter = [];
-        for (var i = 0; i < count; i++) {
-            counter.push(i);
-        }
-        return async.map(counter, iterator, callback);
-    };
+    function _times(mapper) {
+        return function (count, iterator, callback) {
+            mapper(_range(count), iterator, callback);
+        };
+    }
 
-    async.timesSeries = function (count, iterator, callback) {
-        var counter = [];
-        for (var i = 0; i < count; i++) {
-            counter.push(i);
-        }
-        return async.mapSeries(counter, iterator, callback);
+    async.times = _times(async.map);
+    async.timesSeries = _times(async.mapSeries);
+    async.timesLimit = function (count, limit, iterator, callback) {
+        return async.mapLimit(_range(count), limit, iterator, callback);
     };
 
     async.seq = function (/* functions... */) {
         var fns = arguments;
-        return function () {
+        return _restParam(function (args) {
             var that = this;
-            var args = Array.prototype.slice.call(arguments);
-            var callback = args.pop();
+
+            var callback = args[args.length - 1];
+            if (typeof callback == 'function') {
+                args.pop();
+            } else {
+                callback = noop;
+            }
+
             async.reduce(fns, args, function (newargs, fn, cb) {
-                fn.apply(that, newargs.concat([function () {
-                    var err = arguments[0];
-                    var nextargs = Array.prototype.slice.call(arguments, 1);
+                fn.apply(that, newargs.concat([_restParam(function (err, nextargs) {
                     cb(err, nextargs);
-                }]))
+                })]));
             },
             function (err, results) {
                 callback.apply(that, [err].concat(results));
             });
-        };
+        });
     };
 
     async.compose = function (/* functions... */) {
-      return async.seq.apply(null, Array.prototype.reverse.call(arguments));
+        return async.seq.apply(null, Array.prototype.reverse.call(arguments));
     };
 
-    var _applyEach = function (eachfn, fns /*args...*/) {
-        var go = function () {
-            var that = this;
-            var args = Array.prototype.slice.call(arguments);
-            var callback = args.pop();
-            return eachfn(fns, function (fn, cb) {
-                fn.apply(that, args.concat([cb]));
-            },
-            callback);
-        };
-        if (arguments.length > 2) {
-            var args = Array.prototype.slice.call(arguments, 2);
-            return go.apply(this, args);
-        }
-        else {
-            return go;
-        }
-    };
-    async.applyEach = doParallel(_applyEach);
-    async.applyEachSeries = doSeries(_applyEach);
+
+    function _applyEach(eachfn) {
+        return _restParam(function(fns, args) {
+            var go = _restParam(function(args) {
+                var that = this;
+                var callback = args.pop();
+                return eachfn(fns, function (fn, _, cb) {
+                    fn.apply(that, args.concat([cb]));
+                },
+                callback);
+            });
+            if (args.length) {
+                return go.apply(this, args);
+            }
+            else {
+                return go;
+            }
+        });
+    }
+
+    async.applyEach = _applyEach(async.eachOf);
+    async.applyEachSeries = _applyEach(async.eachOfSeries);
+
 
     async.forever = function (fn, callback) {
+        var done = only_once(callback || noop);
+        var task = ensureAsync(fn);
         function next(err) {
             if (err) {
-                if (callback) {
-                    return callback(err);
-                }
-                throw err;
+                return done(err);
             }
-            fn(next);
+            task(next);
         }
         next();
     };
 
+    function ensureAsync(fn) {
+        return _restParam(function (args) {
+            var callback = args.pop();
+            args.push(function () {
+                var innerArgs = arguments;
+                if (sync) {
+                    async.setImmediate(function () {
+                        callback.apply(null, innerArgs);
+                    });
+                } else {
+                    callback.apply(null, innerArgs);
+                }
+            });
+            var sync = true;
+            fn.apply(this, args);
+            sync = false;
+        });
+    }
+
+    async.ensureAsync = ensureAsync;
+
+    async.constant = _restParam(function(values) {
+        var args = [null].concat(values);
+        return function (callback) {
+            return callback.apply(this, args);
+        };
+    });
+
+    async.wrapSync =
+    async.asyncify = function asyncify(func) {
+        return _restParam(function (args) {
+            var callback = args.pop();
+            var result;
+            try {
+                result = func.apply(this, args);
+            } catch (e) {
+                return callback(e);
+            }
+            // if result is Promise object
+            if (_isObject(result) && typeof result.then === "function") {
+                result.then(function(value) {
+                    callback(null, value);
+                })["catch"](function(err) {
+                    callback(err.message ? err : new Error(err));
+                });
+            } else {
+                callback(null, result);
+            }
+        });
+    };
+
     // Node.js
-    if (typeof module !== 'undefined' && module.exports) {
+    if (typeof module === 'object' && module.exports) {
         module.exports = async;
     }
     // AMD / RequireJS
-    else if (typeof define !== 'undefined' && define.amd) {
+    else if (typeof define === 'function' && define.amd) {
         define([], function () {
             return async;
         });
@@ -12736,8 +13141,8 @@ var objectKeys = Object.keys || function (obj) {
 
 }());
 
-}).call(this,require("g5I+bs"))
-},{"g5I+bs":92}],52:[function(require,module,exports){
+}).call(this,require("g5I+bs"),typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+},{"g5I+bs":94}],52:[function(require,module,exports){
 var lookup = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
 
 ;(function (exports) {
@@ -13594,7 +13999,7 @@ BinaryParser.Buffer = BinaryParserBuffer;
 exports.BinaryParser = BinaryParser;
 
 }).call(this,require("g5I+bs"))
-},{"g5I+bs":92,"util":97}],55:[function(require,module,exports){
+},{"g5I+bs":94,"util":98}],55:[function(require,module,exports){
 (function (Buffer){
 // "use strict"
 
@@ -15433,7 +15838,7 @@ module.exports.ObjectID = ObjectID;
 module.exports.ObjectId = ObjectID;
 
 }).call(this,require("g5I+bs"))
-},{"./binary_parser":54,"g5I+bs":92}],65:[function(require,module,exports){
+},{"./binary_parser":54,"g5I+bs":94}],65:[function(require,module,exports){
 (function (Buffer){
 "use strict"
 
@@ -16274,7 +16679,7 @@ var JS_INT_MIN_LONG = Long.fromNumber(-0x20000000000000);  // Any integer down t
 
 module.exports = deserialize
 
-},{"../binary":53,"../code":56,"../db_ref":57,"../double":58,"../float_parser":59,"../long":60,"../max_key":62,"../min_key":63,"../objectid":64,"../regexp":68,"../symbol":69,"../timestamp":70,"util":97}],67:[function(require,module,exports){
+},{"../binary":53,"../code":56,"../db_ref":57,"../double":58,"../float_parser":59,"../long":60,"../max_key":62,"../min_key":63,"../objectid":64,"../regexp":68,"../symbol":69,"../timestamp":70,"util":98}],67:[function(require,module,exports){
 (function (Buffer){
 "use strict"
 
@@ -19549,7 +19954,7 @@ function coerce(val) {
   return val;
 }
 
-},{"ms":91}],74:[function(require,module,exports){
+},{"ms":93}],74:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -20424,11 +20829,10 @@ Kareem.prototype.clone = function() {
 module.exports = Kareem;
 
 }).call(this,require("g5I+bs"))
-},{"g5I+bs":92}],80:[function(require,module,exports){
+},{"g5I+bs":94}],80:[function(require,module,exports){
 module.exports = exports = require('./lib');
 
 },{"./lib":81}],81:[function(require,module,exports){
-
 /**
  * Returns the value of object `o` at the given `path`.
  *
@@ -20458,9 +20862,16 @@ module.exports = exports = require('./lib');
  */
 
 exports.get = function (path, o, special, map) {
+  var lookup;
+
   if ('function' == typeof special) {
-    map = special;
-    special = undefined;
+    if (special.length < 2) {
+      map = special;
+      special = undefined;
+    } else {
+      lookup = special;
+      special = undefined;
+    }
   }
 
   map || (map = K);
@@ -20485,14 +20896,18 @@ exports.get = function (path, o, special, map) {
 
       return obj.map(function (item) {
         return item
-          ? exports.get(paths, item, special, map)
+          ? exports.get(paths, item, special || lookup, map)
           : map(undefined);
       });
     }
 
-    obj = special && obj[special]
-      ? obj[special][part]
-      : obj[part];
+    if (lookup) {
+      obj = lookup(obj, part);
+    } else {
+      obj = special && obj[special]
+        ? obj[special][part]
+        : obj[part];
+    }
 
     if (!obj) return map(obj);
   }
@@ -20508,13 +20923,19 @@ exports.get = function (path, o, special, map) {
  * @param {Object} o
  * @param {String} [special] When this property name is present on any object in the path, walking will continue on the value of this property.
  * @param {Function} [map] Optional function which is passed each individual value before setting it. The value returned from `map` is used in the original values place.
-
  */
 
 exports.set = function (path, val, o, special, map, _copying) {
+  var lookup;
+
   if ('function' == typeof special) {
-    map = special;
-    special = undefined;
+    if (special.length < 2) {
+      map = special;
+      special = undefined;
+    } else {
+      lookup = special;
+      special = undefined;
+    }
   }
 
   map || (map = K);
@@ -20553,20 +20974,24 @@ exports.set = function (path, val, o, special, map, _copying) {
       if (!copy && Array.isArray(val)) {
         for (var j = 0; j < obj.length && j < val.length; ++j) {
           // assignment of single values of array
-          exports.set(paths, val[j], obj[j], special, map, copy);
+          exports.set(paths, val[j], obj[j], special || lookup, map, copy);
         }
       } else {
         for (var j = 0; j < obj.length; ++j) {
           // assignment of entire value
-          exports.set(paths, val, obj[j], special, map, copy);
+          exports.set(paths, val, obj[j], special || lookup, map, copy);
         }
       }
       return;
     }
 
-    obj = special && obj[special]
-      ? obj[special][part]
-      : obj[part];
+    if (lookup) {
+      obj = lookup(obj, part);
+    } else {
+      obj = special && obj[special]
+        ? obj[special][part]
+        : obj[part];
+    }
 
     if (!obj) return;
   }
@@ -20586,21 +21011,33 @@ exports.set = function (path, val, o, special, map, _copying) {
       for (var item, j = 0; j < obj.length && j < val.length; ++j) {
         item = obj[j];
         if (item) {
-          if (item[special]) item = item[special];
-          item[part] = map(val[j]);
+          if (lookup) {
+            lookup(item, part, map(val[j]));
+          } else {
+            if (item[special]) item = item[special];
+            item[part] = map(val[j]);
+          }
         }
       }
     } else {
       for (var j = 0; j < obj.length; ++j) {
         item = obj[j];
         if (item) {
-          if (item[special]) item = item[special];
-          item[part] = map(val);
+          if (lookup) {
+            lookup(item, part, map(val));
+          } else {
+            if (item[special]) item = item[special];
+            item[part] = map(val);
+          }
         }
       }
     }
   } else {
-    obj[part] = map(val);
+    if (lookup) {
+      lookup(obj, part, map(val));
+    } else {
+      obj[part] = map(val);
+    }
   }
 }
 
@@ -20628,7 +21065,7 @@ function strongUnshift(x, arrLike) {
 
 
 /**
- * Promise constructor.
+ * MPromise constructor.
  *
  * _NOTE: The success and failure event names can be overridden by setting `Promise.SUCCESS` and `Promise.FAILURE` respectively._
  *
@@ -20642,8 +21079,10 @@ function Promise(back) {
   this.emitter = new EventEmitter();
   this.emitted = {};
   this.ended = false;
-  if ('function' == typeof back)
+  if ('function' == typeof back) {
+    this.ended = true;
     this.onResolve(back);
+  }
 }
 
 
@@ -20667,7 +21106,7 @@ Promise.FAILURE = 'reject';
  *
  * @param {String} event
  * @param {Function} callback
- * @return {Promise} this
+ * @return {MPromise} this
  * @api private
  */
 Promise.prototype.on = function (event, callback) {
@@ -20700,6 +21139,14 @@ Promise.prototype.safeEmit = function (event) {
 
 
 /**
+ * @api private
+ */
+Promise.prototype.hasRejectListeners = function () {
+  return EventEmitter.listenerCount(this.emitter, Promise.FAILURE) > 0;
+};
+
+
+/**
  * Fulfills this promise with passed arguments.
  *
  * If this promise has already been fulfilled or rejected, no action is taken.
@@ -20718,10 +21165,11 @@ Promise.prototype.fulfill = function () {
  *
  * @api public
  * @param {Object|String} reason
- * @return {Promise} this
+ * @return {MPromise} this
  */
 Promise.prototype.reject = function (reason) {
-  if (this.ended && !this.hasRejectListeners()) throw reason;
+  if (this.ended && !this.hasRejectListeners())
+    throw reason;
   return this.safeEmit(Promise.FAILURE, reason);
 };
 
@@ -20743,7 +21191,7 @@ Promise.prototype.resolve = function (err, val) {
 /**
  * Adds a listener to the SUCCESS event.
  *
- * @return {Promise} this
+ * @return {MPromise} this
  * @api public
  */
 Promise.prototype.onFulfill = function (fn) {
@@ -20753,15 +21201,10 @@ Promise.prototype.onFulfill = function (fn) {
 };
 
 
-Promise.prototype.hasRejectListeners = function () {
-  return this.emitter.listeners(Promise.FAILURE).length > 0;
-};
-
-
 /**
  * Adds a listener to the FAILURE event.
  *
- * @return {Promise} this
+ * @return {MPromise} this
  * @api public
  */
 Promise.prototype.onReject = function (fn) {
@@ -20781,10 +21224,9 @@ Promise.prototype.onReject = function (fn) {
  * side effects unless `fn` is undefined or null.
  *
  * @param {Function} fn
- * @return {Promise} this
+ * @return {MPromise} this
  */
 Promise.prototype.onResolve = function (fn) {
-  this.end();
   if (!fn) return this;
   if ('function' != typeof fn) throw new TypeError("fn should be a function");
   this.on(Promise.FAILURE, function (err) { fn.call(this, err); });
@@ -20816,7 +21258,7 @@ Promise.prototype.onResolve = function (fn) {
  * @see promises-A+ https://github.com/promises-aplus/promises-spec
  * @param {Function} onFulfill
  * @param {Function} [onReject]
- * @return {Promise} newPromise
+ * @return {MPromise} newPromise
  */
 Promise.prototype.then = function (onFulfill, onReject) {
   var newPromise = new Promise;
@@ -20924,9 +21366,11 @@ function resolve(promise, x) {
  *
  * @api public
  * @param {Function} [onReject]
- * @return {Promise} this
+ * @return {MPromise} this
  */
-Promise.prototype.end = function (onReject) {
+Promise.prototype.end = Promise.prototype['catch'] = function (onReject) {
+  if (!onReject && !this.hasRejectListeners())
+    onReject = function idRejector(e) { throw e; };
   this.onReject(onReject);
   this.ended = true;
   return this;
@@ -20955,9 +21399,9 @@ Promise.prototype.end = function (onReject) {
  *     }, 10);
  *
  * @api public
- * @param {Promise} p
+ * @param {MPromise} p
  * @param {String} name
- * @return {Promise} this
+ * @return {MPromise} this
  */
 Promise.trace = function (p, name) {
   p.then(
@@ -21053,10 +21497,8 @@ Promise.deferred = function deferred() {
 };
 /* End A+ tests adapter bit */
 
-
-
 }).call(this,require("g5I+bs"))
-},{"events":74,"g5I+bs":92,"util":97}],83:[function(require,module,exports){
+},{"events":74,"g5I+bs":94,"util":98}],83:[function(require,module,exports){
 'use strict';
 
 /**
@@ -21243,7 +21685,7 @@ exports.type = exports.isNode ? 'node'
   : 'unknown'
 
 }).call(this,require("g5I+bs"),typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer)
-},{"buffer":71,"g5I+bs":92}],87:[function(require,module,exports){
+},{"buffer":71,"g5I+bs":94}],87:[function(require,module,exports){
 'use strict';
 
 /**
@@ -23857,7 +24299,7 @@ module.exports = exports = Query;
 // TODO
 // test utils
 
-},{"./collection":84,"./collection/collection":83,"./env":86,"./permissions":88,"./utils":89,"assert":50,"bluebird":90,"debug":72,"sliced":94,"util":97}],88:[function(require,module,exports){
+},{"./collection":84,"./collection/collection":83,"./env":86,"./permissions":88,"./utils":89,"assert":50,"bluebird":90,"debug":72,"sliced":91,"util":98}],88:[function(require,module,exports){
 'use strict';
 
 var denied = exports;
@@ -24284,7 +24726,7 @@ exports.cloneBuffer = function (buff) {
 };
 
 }).call(this,require("g5I+bs"),require("buffer").Buffer)
-},{"buffer":71,"g5I+bs":92,"regexp-clone":93}],90:[function(require,module,exports){
+},{"buffer":71,"g5I+bs":94,"regexp-clone":95}],90:[function(require,module,exports){
 (function (process,global){
 /* @preserve
  * The MIT License (MIT)
@@ -29392,7 +29834,45 @@ function isUndefined(arg) {
 },{}]},{},[4])(4)
 });                    ;if (typeof window !== 'undefined' && window !== null) {                               window.P = window.Promise;                                                     } else if (typeof self !== 'undefined' && self !== null) {                             self.P = self.Promise;                                                         }
 }).call(this,require("g5I+bs"),typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"g5I+bs":92}],91:[function(require,module,exports){
+},{"g5I+bs":94}],91:[function(require,module,exports){
+module.exports = exports = require('./lib/sliced');
+
+},{"./lib/sliced":92}],92:[function(require,module,exports){
+
+/**
+ * An Array.prototype.slice.call(arguments) alternative
+ *
+ * @param {Object} args something with a length
+ * @param {Number} slice
+ * @param {Number} sliceEnd
+ * @api public
+ */
+
+module.exports = function (args, slice, sliceEnd) {
+  var ret = [];
+  var len = args.length;
+
+  if (0 === len) return ret;
+
+  var start = slice < 0
+    ? Math.max(0, slice + len)
+    : slice || 0;
+
+  if (sliceEnd !== undefined) {
+    len = sliceEnd < 0
+      ? sliceEnd + len
+      : sliceEnd
+  }
+
+  while (len-- > start) {
+    ret[len - start] = args[len];
+  }
+
+  return ret;
+}
+
+
+},{}],93:[function(require,module,exports){
 /**
  * Helpers.
  */
@@ -29519,7 +29999,7 @@ function plural(ms, n, name) {
   return Math.ceil(ms / n) + ' ' + name + 's';
 }
 
-},{}],92:[function(require,module,exports){
+},{}],94:[function(require,module,exports){
 // shim for using process in browser
 
 var process = module.exports = {};
@@ -29584,7 +30064,7 @@ process.chdir = function (dir) {
     throw new Error('process.chdir is not supported');
 };
 
-},{}],93:[function(require,module,exports){
+},{}],95:[function(require,module,exports){
 
 var toString = Object.prototype.toString;
 
@@ -29606,52 +30086,16 @@ module.exports = exports = function (regexp) {
 }
 
 
-},{}],94:[function(require,module,exports){
-module.exports = exports = require('./lib/sliced');
-
-},{"./lib/sliced":95}],95:[function(require,module,exports){
-
-/**
- * An Array.prototype.slice.call(arguments) alternative
- *
- * @param {Object} args something with a length
- * @param {Number} slice
- * @param {Number} sliceEnd
- * @api public
- */
-
-module.exports = function (args, slice, sliceEnd) {
-  var ret = [];
-  var len = args.length;
-
-  if (0 === len) return ret;
-
-  var start = slice < 0
-    ? Math.max(0, slice + len)
-    : slice || 0;
-
-  if (sliceEnd !== undefined) {
-    len = sliceEnd < 0
-      ? sliceEnd + len
-      : sliceEnd
-  }
-
-  while (len-- > start) {
-    ret[len - start] = args[len];
-  }
-
-  return ret;
-}
-
-
 },{}],96:[function(require,module,exports){
+module.exports=require(92)
+},{}],97:[function(require,module,exports){
 module.exports = function isBuffer(arg) {
   return arg && typeof arg === 'object'
     && typeof arg.copy === 'function'
     && typeof arg.fill === 'function'
     && typeof arg.readUInt8 === 'function';
 }
-},{}],97:[function(require,module,exports){
+},{}],98:[function(require,module,exports){
 (function (process,global){
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -30241,4 +30685,4 @@ function hasOwnProperty(obj, prop) {
 }
 
 }).call(this,require("g5I+bs"),typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./support/isBuffer":96,"g5I+bs":92,"inherits":77}]},{},[2])
+},{"./support/isBuffer":97,"g5I+bs":94,"inherits":77}]},{},[2])

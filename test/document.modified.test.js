@@ -1,10 +1,9 @@
-
 /**
  * Test dependencies.
  */
 
 var start = require('./common'),
-    assert = require('assert'),
+    assert = require('power-assert'),
     mongoose = start.mongoose,
     random = require('../lib/utils').random,
     Schema = mongoose.Schema,
@@ -38,25 +37,28 @@ var BlogPost = new Schema({
   numbers: [Number],
   owners: [ObjectId],
   comments: [Comments],
-  nested: { array: [Number] }
+  nested: {array: [Number]}
 });
 
 BlogPost
-.path('title')
-.get(function(v) {
-  if (v) return v.toUpperCase();
-});
+    .path('title')
+    .get(function(v) {
+      if (v) {
+        return v.toUpperCase();
+      }
+      return v;
+    });
 
 BlogPost
-.virtual('titleWithAuthor')
-.get(function() {
-  return this.get('title') + ' by ' + this.get('author');
-})
-.set(function(val) {
-  var split = val.split(' by ');
-  this.set('title', split[0]);
-  this.set('author', split[1]);
-});
+    .virtual('titleWithAuthor')
+    .get(function() {
+      return this.get('title') + ' by ' + this.get('author');
+    })
+    .set(function(val) {
+      var split = val.split(' by ');
+      this.set('title', split[0]);
+      this.set('author', split[1]);
+    });
 
 BlogPost.method('cool', function() {
   return this;
@@ -84,11 +86,11 @@ describe('document modified', function() {
         assert.strictEqual(null, err);
 
         b.numbers.push(3);
-        b.save(function(err) {
-          assert.strictEqual(null, err);
+        b.save(function(err1) {
+          assert.strictEqual(null, err1);
 
-          B.findById(b, function(err, b) {
-            assert.strictEqual(null, err);
+          B.findById(b, function(err2, b) {
+            assert.strictEqual(null, err2);
             assert.equal(2, b.numbers.length);
 
             db.close();
@@ -102,8 +104,8 @@ describe('document modified', function() {
       var db = start(),
           BlogPost = db.model(modelName, collection);
 
-      var post = new BlogPost({ title: 'hocus pocus' });
-      post.comments.push({ title: 'Humpty Dumpty', comments: [{title: 'nested'}] });
+      var post = new BlogPost({title: 'hocus pocus'});
+      post.comments.push({title: 'Humpty Dumpty', comments: [{title: 'nested'}]});
       post.save(function(err) {
         db.close();
         assert.strictEqual(null, err);
@@ -120,7 +122,7 @@ describe('document modified', function() {
       var db = start();
 
       var MyModel = db.model('test',
-        { name: { type: String, default: 'Val '} });
+          {name: {type: String, default: 'Val '}});
       var m = new MyModel();
       assert.ok(m.$isDefault('name'));
       db.close(done);
@@ -196,7 +198,7 @@ describe('document modified', function() {
         post.init({
           title: 'Test',
           slug: 'test',
-          comments: [ { title: 'Test', date: new Date, body: 'Test' } ]
+          comments: [{title: 'Test', date: new Date, body: 'Test'}]
         });
 
         assert.equal(false, post.isModified('comments.0.title'));
@@ -216,7 +218,7 @@ describe('document modified', function() {
         post.init({
           title: 'Test',
           slug: 'test',
-          comments: [ { title: 'Test', date: new Date, body: 'Test' } ]
+          comments: [{title: 'Test', date: new Date, body: 'Test'}]
         });
 
         assert.equal(false, post.isModified('comments.0.body'));
@@ -269,12 +271,12 @@ describe('document modified', function() {
           visitors: 5
         },
         published: true,
-        mixed: { x: [ { y: [1,'yes', 2] } ] },
+        mixed: {x: [{y: [1, 'yes', 2]}]},
         numbers: [],
         owners: [new DocumentObjectId, new DocumentObjectId],
         comments: [
-          { title: 'Test', date: new Date, body: 'Test' },
-          { title: 'Super', date: new Date, body: 'Cool' }
+          {title: 'Test', date: new Date, body: 'Test'},
+          {title: 'Super', date: new Date, body: 'Cool'}
         ]
       };
 
@@ -283,8 +285,8 @@ describe('document modified', function() {
         BlogPost.findById(post.id, function(err, postRead) {
           db.close();
           assert.ifError(err);
-          //set the same data again back to the document.
-          //expected result, nothing should be set to modified
+          // set the same data again back to the document.
+          // expected result, nothing should be set to modified
           assert.equal(false, postRead.isModified('comments'));
           assert.equal(false, postRead.isNew);
           postRead.set(postRead.toObject());
@@ -300,7 +302,7 @@ describe('document modified', function() {
           assert.equal(false, postRead.isModified('owners'));
           assert.equal(false, postRead.isModified('comments'));
           var arr = postRead.comments.slice();
-          arr[2] = postRead.comments.create({ title: 'index' });
+          arr[2] = postRead.comments.create({title: 'index'});
           postRead.comments = arr;
           assert.equal(true, postRead.isModified('comments'));
           done();
@@ -312,7 +314,7 @@ describe('document modified', function() {
       var db = start();
 
       var parentSchema = new Schema({
-        child: { type: Schema.Types.ObjectId, ref: 'gh-1530-2' }
+        child: {type: Schema.Types.ObjectId, ref: 'gh-1530-2'}
       });
       var Parent = db.model('gh-1530-1', parentSchema);
       var childSchema = new Schema({
@@ -333,7 +335,7 @@ describe('document modified', function() {
       var Child = db.model('gh-1530-2', childSchema);
 
       var p = new Parent();
-      var c = new Child({ name: 'Luke' });
+      var c = new Child({name: 'Luke'});
       p.child = c;
       assert.equal(p.child.name, 'Luke');
 
@@ -347,12 +349,12 @@ describe('document modified', function() {
           assert.ok(typeof p.child.name === 'undefined');
           assert.equal(0, preCalls);
           assert.equal(0, postCalls);
-          Child.findOne({ name: 'Luke' }, function(error, child) {
+          Child.findOne({name: 'Luke'}, function(error, child) {
             assert.ifError(error);
             assert.ok(!child);
             originalParent.child.save(function(error) {
               assert.ifError(error);
-              Child.findOne({ name: 'Luke' }, function(error, child) {
+              Child.findOne({name: 'Luke'}, function(error, child) {
                 assert.ifError(error);
                 assert.ok(child);
                 assert.equal(child._id.toString(), p.child.toString());
@@ -369,14 +371,14 @@ describe('document modified', function() {
 
       var parentSchema = new Schema({
         name: String,
-        child: { type: Schema.Types.ObjectId, ref: 'Child' }
+        child: {type: Schema.Types.ObjectId, ref: 'Child'}
       });
 
       var Parent = db.model('Parent', parentSchema, 'parents');
       var Child = db.model('Child', parentSchema, 'children');
 
-      var child = new Child({ name: 'Mary' });
-      var p = new Parent({ name: 'Alex', child: child });
+      var child = new Child({name: 'Mary'});
+      var p = new Parent({name: 'Alex', child: child});
 
       assert.equal(p.populated('child').toString(), child._id.toString());
       db.close(done);
@@ -396,14 +398,14 @@ describe('document modified', function() {
       it('gh-1530 for arrays (gh-3575)', function(done) {
         var parentSchema = new Schema({
           name: String,
-          children: [{ type: Schema.Types.ObjectId, ref: 'Child' }]
+          children: [{type: Schema.Types.ObjectId, ref: 'Child'}]
         });
 
         var Parent = db.model('Parent', parentSchema, 'parents');
         var Child = db.model('Child', parentSchema, 'children');
 
-        var child = new Child({ name: 'Luke' });
-        var p = new Parent({ name: 'Anakin', children: [child] });
+        var child = new Child({name: 'Luke'});
+        var p = new Parent({name: 'Anakin', children: [child]});
 
         assert.equal(p.children[0].name, 'Luke');
         assert.ok(p.populated('children'));
@@ -412,23 +414,23 @@ describe('document modified', function() {
 
       it('setting nested arrays (gh-3721)', function(done) {
         var userSchema = new Schema({
-          name: { type: Schema.Types.String }
+          name: {type: Schema.Types.String}
         });
         var User = db.model('User', userSchema);
 
         var accountSchema = new Schema({
           roles: [{
-            name: { type: Schema.Types.String },
-            users: [{ type: Schema.Types.ObjectId, ref: 'User'}]
+            name: {type: Schema.Types.String},
+            users: [{type: Schema.Types.ObjectId, ref: 'User'}]
           }]
         });
 
         var Account = db.model('Account', accountSchema);
 
-        var user = new User({ name: 'Test' });
+        var user = new User({name: 'Test'});
         var account = new Account({
           roles: [
-            { name: 'test group', users: [user] }
+            {name: 'test group', users: [user]}
           ]
         });
 
@@ -437,13 +439,11 @@ describe('document modified', function() {
       });
     });
 
-
-
     it('should support setting mixed paths by string (gh-1418)', function(done) {
       var db = start();
-      var BlogPost = db.model('1418', new Schema({ mixed: {} }));
+      var BlogPost = db.model('1418', new Schema({mixed: {}}));
       var b = new BlogPost;
-      b.init({ mixed: {} });
+      b.init({mixed: {}});
 
       var path = 'mixed.path';
       assert.ok(!b.isModified(path));
@@ -453,13 +453,13 @@ describe('document modified', function() {
       assert.equal(3, b.get(path));
 
       b = new BlogPost;
-      b.init({ mixed: {} });
+      b.init({mixed: {}});
       path = 'mixed.9a';
       b.set(path, 4);
       assert.ok(b.isModified(path));
       assert.equal(4, b.get(path));
 
-      b = new BlogPost({ mixed: {} });
+      b = new BlogPost({mixed: {}});
       b.save(function(err) {
         assert.ifError(err);
 
@@ -482,36 +482,36 @@ describe('document modified', function() {
     it('should mark multi-level nested schemas as modified (gh-1754)', function(done) {
       var db = start();
 
-      var grandChildSchema = Schema({
+      var grandChildSchema = new Schema({
         name: String
       });
 
-      var childSchema = Schema({
+      var childSchema = new Schema({
         name: String,
         grandChild: [grandChildSchema]
       });
 
-      var parentSchema = Schema({
+      var parentSchema = new Schema({
         name: String,
         child: [childSchema]
       });
 
       var Parent = db.model('gh-1754', parentSchema);
       Parent.create(
-        { child: [{ name: 'Brian', grandChild: [{ name: 'Jake' }] }] },
-        function(error, p) {
-          assert.ifError(error);
-          assert.ok(p);
-          assert.equal(1, p.child.length);
-          assert.equal(1, p.child[0].grandChild.length);
-          p.child[0].grandChild[0].name = 'Jason';
-          assert.ok(p.isModified('child.0.grandChild.0.name'));
-          p.save(function(error, inDb) {
+          {child: [{name: 'Brian', grandChild: [{name: 'Jake'}]}]},
+          function(error, p) {
             assert.ifError(error);
-            assert.equal('Jason', inDb.child[0].grandChild[0].name);
-            db.close(done);
+            assert.ok(p);
+            assert.equal(1, p.child.length);
+            assert.equal(1, p.child[0].grandChild.length);
+            p.child[0].grandChild[0].name = 'Jason';
+            assert.ok(p.isModified('child.0.grandChild.0.name'));
+            p.save(function(error1, inDb) {
+              assert.ifError(error1);
+              assert.equal('Jason', inDb.child[0].grandChild[0].name);
+              db.close(done);
+            });
           });
-        });
     });
   });
 });

@@ -77,7 +77,7 @@ function createData() {
 
 function example() {
   Game
-  .findOne({ name: /^Legend of Zelda/ })
+  .findOne({name: /^Legend of Zelda/})
   .populate('consoles')
   .exec(function(err, ocinara) {
     if (err) return done(err);
